@@ -19,8 +19,9 @@ io_whales.pkgdata.load = function()
                 transect = as.transect(effort),
                 effort = effort,
                 mesh = io_whales.mesh(),
-                coast = io_star.coast(),
-                boundary = io_star.boundary(),
+                coast.boundary = io_star.coast(),
+                sea.boundary = io_star.boundary(),
+                inner.boundary = io_whales.inner.boundary(),
                 geometry = "geo",
                 mesh.coords = c("lon","lat"),
                 time.coords = "year",
@@ -120,6 +121,21 @@ io_whales.ips.yearly.save = function(){
   
   save(ips.yearly,file= paste(io_whales.getDataDir(), "bwhales.ips.yearly.RData",sep=.Platform$file.sep))
   return(ips)
+}
+
+
+#' Load \link{whales} inner boundary
+#' 
+#'
+#' @aliases io_whales.inner.boundary
+#' @export
+#' @return boundary inner boundary
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#'
+
+io_whales.inner.boundary = function(){
+  load(file= paste(io_whales.getDataDir(), "bwhales.inner.boundary.Rdata",sep=.Platform$file.sep))
+  return(innerBnd)
 }
 
 #' Load \link{whales} par3d parameters
