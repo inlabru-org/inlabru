@@ -129,12 +129,9 @@ io_sbdolphin.sighting = function(years=NULL,E=NULL,BfLim=NULL,PDLim=NULL)
 { 
   # Load the file
   sightdat = read.csv(file= paste(io_sbdolphin.getDataDir(), "sbdolphin.sighting.csv",sep=.Platform$file.sep),head=TRUE,sep=",")
-  # Columns prior to 2007 update:
-  #[1] "Sp1"      "Sp2"      "Sp3"      "Sp4"      "Cruz"     "Sght"     "E"        "Obs"      "year"    
-  #[10] "month"    "day"      "time"     "lat"      "lon"      "GS"       "TotGS"    "distance" "Bf"      
-  #[19] "SH"       "SD"       "RF"       "HS"       "VS"       "WSp"      "WDi"      "Cue"      "Me"      
-  #[28] "Ph"       "Bi"       "Mx"       "Crs"      "SST"      "Vis"      "Angl"     "Retcl"    "RadD"    
-  #[37] "InitID"   "MSp"
+
+  # Remove NA lines
+  sightdat = sightdat[!is.na(sightdat$perpdist),]
   
   # rename
   names(sightdat)[names(sightdat) %in% "perpdist"] = "PD"
