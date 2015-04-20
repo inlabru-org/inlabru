@@ -58,6 +58,13 @@ pproc_lgcp = function(data,int.points=NULL,
   }
   sgh.points = detdata(data)
   
+  # Filter out points outside the mesh boundary
+  sgh.inside = is.inside(data$mesh,sgh.points,mesh.coords=data$mesh.coords)
+  if ( any(!sgh.inside) ) {
+    warning("pproc_lgcp: Sighting ouside mesh boundary. Discarding.")
+    sgh.points = sgh.points[sgh.inside,]
+  }
+  
   
   #
   # Make SPDE model
@@ -79,9 +86,7 @@ pproc_lgcp = function(data,int.points=NULL,
     int.points = int.points[!(apply(!(abs(as.matrix(intmat))==0),MARGIN=1,sum)==0),]
     intmat = inla.spde.make.A(data$mesh, loc=as.matrix(int.points[,c("lon","lat")]))
   }
-  if ( any(apply(!(abs(as.matrix(locmat))==0),MARGIN=1,sum)==0) ) {
-    stop("Sighting outside of mesh boundary!")
-  }
+
   A.pp = rBind(intmat, locmat)
   
   #
