@@ -95,8 +95,19 @@ summary.dsdata = function(dsdata){
   cat(paste0("Effort columns names: "),"\n")
   cat(paste0(" ",names(dsdata$effort)), "\n")
   cat(paste0("Number of transects: "), dim(as.transect(dsdata))[1], "\n")
-  cat(paste0("Total length of transects: "), sum(len.transect(as.transect(dsdata),dsdata)), "\n")
+  cat(paste0("Total length of transects: "), sum(len.transect(as.transect(dsdata),dsdata)), "km","\n")
   
+  # Mesh area
+  cat(paste0("Total area of mesh: "), sum(Matrix::diag(inla.mesh.fem(dsdata$mesh, order=1)$c0)), " square mesh units","\n")
+  
+  # Survey area
+  if ("inner.boundary" %in% names(dsdata)) {
+    msk =  is.inside.polygon(whales$mesh, whales$inner.boundary,sst$mesh$loc, whales$mesh.coords)
+    A = sum(Matrix::diag(inla.mesh.fem(dsdata$mesh, order=1)$c0) * msk)
+    cat(paste0("Total survey area: "), A, " square mesh units","\n")
+  }
+  
+  # Number of transects
   if (!class(dsdata$effort)[1]=="etpeffort"){ # Note yet implemented by etpdata class
     cat(paste0("Number of segements: "), dim(as.segment(dsdata))[1], "\n")
     cat(paste0("Number of detections: "), dim(as.detection(dsdata))[1], "\n")
