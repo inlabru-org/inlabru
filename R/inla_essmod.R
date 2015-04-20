@@ -1,0 +1,222 @@
+##
+## A wrapper for inla.posterior.sample()
+##
+## Converts each sample into a list of sub-samples representing the
+## latent variables
+##
+## Example: samples[[1]]$somefield is the value of the field "somefield"
+##          in the first sample
+##
+
+inla.posterior.sample.structured = function(result,n){
+
+  samples = inla.posterior.sample(n,result,hyper.user.scale = TRUE)
+
+  ssmpl = list()
+  for (i in 1:length(samples)) {
+    smpl.latent = samples[[i]]$latent
+    smpl.hyperpar = samples[[i]]$hyperpar
+    vals = list()
+
+    # Extract simulated predictor and fixed effects
+    for (name in c("Predictor",result$names.fixed)) { vals[[name]] = extract.entries(name,smpl.latent) }
+
+    # Extract simulated latent variables. If the model is "clinear", however, extract the realisations
+    # from the hyperpar field.
+    for (k in 1:length(result$summary.random)) {
+      name = unlist(names(result$summary.random[k]))
+      model = result$model.random[k]
+      if (!(model=="Constrained linear")) { vals[[name]] = extract.entries(name,smpl.latent) }
+      else { vals[[name]] = smpl.hyperpar[paste0(paste0("Beta_intern for ",name)," -- in user scale")] }
+    }
+    ssmpl[[i]] = vals
+  }
+
+#
+# Return
+#
+return(ssmpl)
+}
+
+extract.entries = function(name,smpl){
+  ename = gsub("\\.", "\\\\.", name)
+  ename = gsub("\\(", "\\\\(", ename)
+  ename = gsub("\\)", "\\\\)", ename)
+  ptn = paste("^", ename, "\\.[0-9]*$", sep="")
+  return(smpl[grep(ptn,rownames(smpl))])
+}
+
+
+#' Shortcut to refine an inla.mesh object
+#'
+#'
+#' @aliases inla.mesh.refine
+#' @export
+#' @param mesh an inla.mesh object
+#' @param int.points integration points
+#' @return mesh A refined inla.mesh object
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#'
+
+mesh.refine = function(mesh,refine=list(max.edge=1)){
+rmesh = inla.mesh.create(loc=mesh$loc,interior=inla.mesh.interior(mesh),boundary=inla.mesh.boundary(mesh),refine=refine)
+return(rmesh)
+}
+
+#' Split triangles of a mesh into four triangles
+#'
+#' Warning: does not reconstruct interior boundary
+#' Warning2: Works in euclidean coordinates. Not suitable for sphere.
+#'
+#' @aliases mesh.split
+#' @export
+#' @param mesh an inla.mesh object
+#' @return mesh A refined inla.mesh object
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#'
+
+mesh.split = function(mesh,n=1){
+
+  p1 = mesh$loc[mesh$graph$tv[,1],]
+  p2 = mesh$loc[mesh$graph$tv[,2],]
+  p3 = mesh$loc[mesh$graph$tv[,3],]
+
+  m1 = p1 + 0.5*(p2-p1)
+  m2 = p1 + 0.5*(p3-p1)
+  m3 = p2 + 0.5*(p3-p2)
+  all.loc = rbind(mesh$loc,m1,m2,m3)
+
+  bnd.mid = mesh$loc[mesh$segm$bnd$idx[,1],] + 0.5 * ( mesh$loc[mesh$segm$bnd$idx[,2],] - mesh$loc[mesh$segm$bnd$idx[,1],]  )
+  all.bnd = rbind(mesh$segm$bnd$loc,bnd.mid)
+
+  #   int.mid = mesh$loc[mesh$segm$int$idx[,1],] + 0.5 * ( mesh$loc[mesh$segm$int$idx[,2],] - mesh$loc[mesh$segm$int$idx[,1],]  )
+  #   all.int = rbind(int.mid)
+  #
+  #   plot(mesh)
+  #   points(mesh$loc[mesh$segm$int$idx[1,1],])
+  #   points(mesh$loc[mesh$segm$int$idx[,2],])
+  #
+  #   int = rbind(mesh$loc[mesh$segm$int$idx[,1],],mesh$loc[mesh$segm$int$idx[,2],])
+  #   points(int)
+  #   points(all.int)
+
+  mesh2 = inla.mesh.create(loc = all.loc, boundary = all.bnd )
+
+  if (n == 1) { return(mesh2) }
+  else { return(mesh.split(mesh2,n-1))}
+}
+
+plot.marginal = function(...){UseMethod("plot.marginal")}
+plot.marginal.inla = function(result,varname="Intercept",lwd=3,...){
+  vars = variables.inla(result)
+  if (vars[varname,"type"] == "fixed"){
+    marg = result$marginals.fixed[[varname]]
+  }
+  else if (vars[varname,"type"] == "random"){
+    marg = result$marginals.random[[varname]]
+  }
+  else if (vars[varname,"type"] == "hyperpar"){
+    marg = result$marginals.hyperpar[[varname]]
+  }
+  plot(marg,type='l',xlab=varname,ylab="Posterior density",...)
+  lheight = max(marg[,"y"])
+  lines(x=c(vars[varname,"mode"],vars[varname,"mode"]),y=c(0,lheight),col="blue",lwd=lwd,...)
+  lines(x=c(vars[varname,"mean"],vars[varname,"mean"]),y=c(0,lheight),col="red",lwd=lwd,...)
+  lines(x=c(vars[varname,"0.025quant"],vars[varname,"0.025quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
+  lines(x=c(vars[varname,"0.975quant"],vars[varname,"0.975quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
+}
+
+variables.inla = function(result, include.random=TRUE){
+  handle.missing <- function(col.names) {
+    cbind(data.frame(type = character(0),
+                     model = character(0),
+                     as.data.frame(
+                         matrix(NA, 0, length(col.names),
+                                dimnames=list(c(), col.names)))))
+  }
+
+  handle.missing.columns <- function(data, col.names) {
+    missing.names <- setdiff(col.names, colnames(data))
+    if (length(missing.names) > 0) {
+      df <- as.data.frame(matrix(NA, nrow(data), length(missing.names),
+                                 dimnames=list(NULL, missing.names)))
+      return(cbind(data, df))
+    } else {
+      return(data)
+    }
+}
+
+  handle.data.frame <- function(data, type, model, col.names) {
+    ##    rownames(data) ???
+    cbind(data.frame(type = rep(type, nrow(data)),
+                     model = rep(model, nrow(data))),
+          handle.missing.columns(data, col.names))
+  }
+
+  ## Get column names, handling possibly empty output:
+  fixed.missing <- (is.null(result$summary.fixed) ||
+                      (ncol(result$summary.fixed) == 0))
+  hyperpar.missing <- (is.null(result$summary.hyperpar) ||
+                         (ncol(result$summary.hyperpar) == 0))
+  random.missing <- (is.null(result$summary.random) ||
+                       (length(result$summary.random) == 0) ||
+                         (ncol(result$summary.random[[1]]) == 0))
+  col.names <- c()
+  if (!fixed.missing) {
+    col.names <- union(col.names, colnames(result$summary.fixed))
+  }
+  if (!hyperpar.missing) {
+    col.names <- union(col.names, colnames(result$summary.hyperpar))
+  }
+  if (!random.missing) {
+    col.names <- union(col.names, colnames(result$summary.random[[1]]))
+  }
+  if (fixed.missing) {
+    fixed <- handle.missing(col.names)
+  } else {
+    fixed <- handle.data.frame(result$summary.fixed,
+                               "fixed", "fixed", col.names)
+  }
+  if (hyperpar.missing) {
+    hyperpar <- handle.missing(col.names)
+  } else {
+    hyperpar <- handle.data.frame(result$summary.hyperpar,
+                                  "hyperpar", NA, col.names)
+  }
+  if (random.missing) {
+    random <- list(handle.missing(col.names))
+  } else {
+    if (!include.random) {
+      random <-
+        lapply(seq_along(result$summary.random),
+               function(x) {
+                 dat <- data.frame(mean = mean(result$summary.random[[x]]$mean),
+                                   sd = mean(result$summary.random[[x]]$sd))
+                 output <- handle.data.frame(dat,
+                                             "random",
+                                             result$model.random[x],
+                                             col.names)
+                 rownames(output) <-
+                   names(result$summary.random)[x]
+               output
+             })
+    } else {
+      random <-
+        lapply(seq_along(result$summary.random),
+               function(x) {
+                 output <- handle.data.frame(result$summary.random[[x]],
+                                             "random",
+                                             result$model.random[x],
+                                             col.names)
+                 rownames(output) <-
+                   paste(names(result$summary.random)[x],
+                         seq_len(nrow(result$summary.random[[x]])))
+                 output
+               })
+    }
+  }
+
+  variables <- do.call(rbind, c(list(fixed, hyperpar), random))
+  return(variables)
+}
+
