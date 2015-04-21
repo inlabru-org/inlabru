@@ -104,14 +104,21 @@ summary.dsdata = function(dsdata){
   if ("inner.boundary" %in% names(dsdata)) {
     msk =  is.inside.polygon(whales$mesh, whales$inner.boundary,sst$mesh$loc, whales$mesh.coords)
     A = sum(Matrix::diag(inla.mesh.fem(dsdata$mesh, order=1)$c0) * msk)
-    cat(paste0("Total survey area: "), A, " square mesh units","\n")
+    cat(paste0("Total survey area: A ="), A, " square mesh units","\n")
   }
   
   # Number of transects
   if (!class(dsdata$effort)[1]=="etpeffort"){ # Note yet implemented by etpdata class
     cat(paste0("Number of segements: "), dim(as.segment(dsdata))[1], "\n")
-    cat(paste0("Number of detections: "), dim(as.detection(dsdata))[1], "\n")
-    }
+  }
+  
+  # Number of detections
+  n.det =  dim(detdata(dsdata))[1]
+  cat(paste0("Number of detections : N = "),n.det, "\n")
+  
+  # Number of detections per unit mesh area inside survey area
+  cat(paste0("Detections per survey area: N/A = "), n.det/A, "\n")
+  
 }
 
 as.transect = function(...){UseMethod("as.transect")}
