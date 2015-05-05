@@ -28,7 +28,9 @@ pproc_lgcp = function(data,int.points=NULL,
                       predict = list(),
                       constant = list(),
                       inla.args = list(),
-                      sgh.E = 0){
+                      sgh.E = 0,
+                      int.filter = NULL,
+                      det.filter = NULL){
   
   #
   # Check if formula actually is a formula update
@@ -65,6 +67,11 @@ pproc_lgcp = function(data,int.points=NULL,
     sgh.points = sgh.points[sgh.inside,]
   }
   
+  #
+  # Apply filters provided by user
+  #
+  if (!is.null(det.filter)) { sgh.points = det.filter(sgh.points) }
+  if (!is.null(int.filter)) { int.points = int.filter(int.points) }
   
   #
   # Make SPDE model
@@ -86,7 +93,7 @@ pproc_lgcp = function(data,int.points=NULL,
     int.points = int.points[!(apply(!(abs(as.matrix(intmat))==0),MARGIN=1,sum)==0),]
     intmat = inla.spde.make.A(data$mesh, loc=as.matrix(int.points[,c("lon","lat")]))
   }
-
+  
   A.pp = rBind(intmat, locmat)
   
   #
@@ -286,20 +293,21 @@ simulate.pproc = function(mdl,formula=NULL,covariates=mdl$covariates,as.data=FAL
 #'
 
 sample.logintensity.pproc = function(mdl,points=mdl$data$mesh$loc,covariates=mdl$covariates,formula=mdl$INLA$formula,n=1){
-  fml.vnames = all.vars(terms.formula(formula)[[3]])
-  rate = matrix(0,nrow(points),n)
+
+  if (is.character(formula)) { fml.vnames = formula }
+  else { fml.vnames = all.vars(terms.formula(formula)[[3]]) }
+  
+  rate = rep(0,nrow(points))
   vars = variables.inla(mdl$INLA$result)
-  covs = fetch.covariate(mdl$INLA$formula,points,covariates=covariates)
+  covs = fetch.covariate(formula,points,covariates=covariates)
   smps = inla.posterior.sample.structured(mdl$INLA$result,n)
   
   for (s in 1:length(smps)){
     smp = smps[[s]]
     for (v in 1:nrow(vars)){
       varname = rownames(vars)[[v]]
-      if (varname %in% fml.vnames){   
-        if (vars[v,"type"] == "fixed") {
-          rate[,s] = rate[,s] + smp[[varname]]*covs[[varname]]
-        } else if (vars[v,"type"] == "random"){
+      if (varname %in% fml.vnames){ 
+        if (vars[v,"type"] == "random"){
           if (vars[v,"model"]=="SPDE2 model") {
             weights = smp[[varname]]
             if (is.null(colnames(points))){fmlocs = points}
@@ -307,11 +315,10 @@ sample.logintensity.pproc = function(mdl,points=mdl$data$mesh$loc,covariates=mdl
             A = inla.mesh.project(mdl$data$mesh,loc=fmlocs)$A
             vals = A%*%weights
             rate[,s] = rate[,s] + as.vector(vals)
-          } else if(vars[v,"model"]=="Constrained linear") {
-            rate[,s] = rate[,s]  + smp[[varname]][[1]]*covs[[varname]]
-          } else {
-            stop("Not supported")
           }
+        } else {
+          if (is.null(covs[[varname]])) { rate = rate + smp[[varname]]}
+          else { rate = rate + smp[[varname]]*covs[[varname]] }       
         }
       }
     }
@@ -337,29 +344,27 @@ sample.logintensity.pproc = function(mdl,points=mdl$data$mesh$loc,covariates=mdl
 #'
 
 logintensity.pproc = function(mdl,points=mdl$data$mesh$loc,covariates=mdl$covariates,formula=mdl$INLA$formula,property="mean"){
-  fml.vnames = all.vars(terms.formula(formula)[[3]])
+  if (is.character(formula)) { fml.vnames = formula }
+  else { fml.vnames = all.vars(terms.formula(formula)[[3]]) }
+  
   rate = rep(0,nrow(points))
   vars = variables.inla(mdl$INLA$result)
-  covs = fetch.covariate(mdl$INLA$formula,points,covariates=covariates)
+  covs = fetch.covariate(formula,points,covariates=covariates)
   
   for (v in 1:nrow(vars)){
     varname = rownames(vars)[[v]]
     if (varname %in% fml.vnames){   
-      if (vars[v,"type"] == "fixed") {
-        rate = rate + vars[v,property]*covs[[varname]]
-      } else if (vars[v,"type"] == "random"){
+      if ( vars[v,"type"] == "random" ) {
         if (vars[v,"model"]=="SPDE2 model") {
           weights = mdl$INLA$result$summary.ran[[varname]][[property]]
           fmlocs = as.matrix(points[,mdl$data$mesh.coords])
           A = inla.mesh.project(mdl$data$mesh,loc=fmlocs)$A
           vals = A%*%weights
           rate = rate + as.vector(vals)
-        } else if(vars[v,"model"]=="Constrained linear") {
-          # beta = vars[paste0("Beta for ",varname),property]
-          # rate = rate + beta*covs[[varname]]
-        } else {
-          stop("Not supported")
         }
+      } else {
+        if (is.null(covs[[varname]])) { rate = rate + vars[v,property]}
+        else { rate = rate + vars[v,property]*covs[[varname]] }       
       }
     }
   }
