@@ -102,7 +102,8 @@ io_sst.download = function(target.dir=tempdir(),year=2006,lat.range=c(-30.25,40.
 #' @examples \\dontrun{}
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-io_sst.save = function(year=1986:2007,month=6:12){
+io_sst.save = function(year=1986:2007,month=6:12,filename=NULL){
+  if (is.null(filename)) { filename = paste0(io_sst.getDataDir(),"/sst.RData") }
   load(file=paste(io_sst.getDataDir(), "mesh_stitchInterior.Rdata",sep="/")) # load mesh
   isst = list()
   k=1
@@ -123,5 +124,5 @@ io_sst.save = function(year=1986:2007,month=6:12){
   sst$time.coords = "year"
   sst$mesh.coords = c("lon","lat")
 
-  save(sst,file=paste0(io_sst.getDataDir(),"/sst.RData"))
+  save(sst,file=file)
 }
