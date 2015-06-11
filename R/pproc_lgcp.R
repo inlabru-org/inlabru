@@ -3,16 +3,20 @@
 #'
 #' @aliases pproc_lgcp
 #' @export
-#' @param data.points  animal sightings
-#'     $lat : Latitude
-#'     $lon : Longitude
-#'     $PD : distance from observer
-#' @param int.points integration points
-#'   $lat : Latitude
-#'   $lon : Longitude
-#'   $PD : distance from observer
-#'   $weight: integration weight
-#' @param mesh an INLA mesh
+#' @param data A distance sampling or SECR data set
+#' @param int.points Integration points for the approximation of the LGCP denominator
+#' @param int.scheme Function that maps a data set to integration points. Needed if no integration points are provided. 
+#' @param int.args List of arguments passed on to int.scheme()
+#' @param dist.trafo Function that transforms distance covariate if integration and observation points. Default: -0.5*d^2
+#' @param covariates List of functions that add covariates to data frames of integration/observation points
+#' @param formula The formula that is used in the call to INLA
+#' @param spde.args List of parameters passed on to inla.spde2.matern() when constructing the SPDE
+#' @param predict List of linear combinations to predict. Each list entry is a list with two fields. "vars" holds the list of variables to include in the prediction and "loc" describes the locations to predict at.
+#' @param constant Function providiong constants to add to the linear predictor
+#' @param inla.args List of arguments passed on to INLA
+#' @param sgh.E Poisson likelihood exposure parameter for detections (see INLA documentation)
+#' @param int.filter Function applied to the data frame of integration points. Use this to filter out particular integration points.
+#' @param det.filter Function applied to the data frame of detection points. Use this to filter out particular detection points.
 #' @return \code{pproc_lgcp}, lgcp object.
 #' @examples \\dontrun{data(whales) ; pp = pproc_lgcp(whales); plot(pp)}
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
