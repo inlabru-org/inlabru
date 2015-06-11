@@ -17,6 +17,9 @@
 #' @param sgh.E Poisson likelihood exposure parameter for detections (see INLA documentation)
 #' @param int.filter Function applied to the data frame of integration points. Use this to filter out particular integration points.
 #' @param det.filter Function applied to the data frame of detection points. Use this to filter out particular detection points.
+#' @param sgh.y Observation values for sightings. Default: 1
+#' @params int.y Observation values for intefration points. Default: 0, later in the alogrithm replaced by integration weights
+#' @params family Distribution familiy of the observations. Default: "poisson". See INLA documentation for more options.
 #' @return \code{pproc_lgcp}, lgcp object.
 #' @examples \\dontrun{data(whales) ; pp = pproc_lgcp(whales); plot(pp)}
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
@@ -34,7 +37,10 @@ pproc_lgcp = function(data,int.points=NULL,
                       inla.args = list(),
                       sgh.E = 0,
                       int.filter = NULL,
-                      det.filter = NULL){
+                      det.filter = NULL,
+                      sgh.y = 1,
+                      int.y = 0,
+                      family = "poisson"){
   
   #
   # Check if formula actually is a formula update
@@ -54,13 +60,17 @@ pproc_lgcp = function(data,int.points=NULL,
   #
   # Integration and sighting points
   #
-  if (is.null(int.scheme) & is.null(int.points)) { int.scheme = select.integration(data) }
-  if (is.null(int.points) ) { 
-    if ("ips" %in% names(data)) { int.points = data$ips } # backwards compatibility
-    else if ("int.points" %in% names(data)) { int.points = data$int.points }
-    else {
-      int.points = do.call(int.scheme,c(list(data=data),int.args))
-    }    
+  if (is.character(int.scheme)) {
+    if (int.scheme == "none") { int.points = NULL }
+  } else {
+    if (is.null(int.scheme) & is.null(int.points)) { int.scheme = select.integration(data) }
+    if (is.null(int.points) ) { 
+      if ("ips" %in% names(data)) { int.points = data$ips } # backwards compatibility
+      else if ("int.points" %in% names(data)) { int.points = data$int.points }
+      else {
+        int.points = do.call(int.scheme,c(list(data=data),int.args))
+      }    
+    }
   }
   sgh.points = detdata(data)
   
@@ -78,6 +88,13 @@ pproc_lgcp = function(data,int.points=NULL,
   if (!is.null(int.filter)) { int.points = int.filter(int.points) }
   
   #
+  # Count integration and detection points
+  #
+  
+  if ( is.null(sgh.points) ) { sgh.n = 0 } else { sgh.n = nrow(sgh.points) }
+  if ( is.null(int.points) ) { int.n = 0 } else { int.n = nrow(int.points) }
+  
+  #
   # Make SPDE model
   #
   
@@ -87,33 +104,67 @@ pproc_lgcp = function(data,int.points=NULL,
   # Projection matrices (A)
   #
   
-  locmat = inla.spde.make.A(data$mesh, loc=as.matrix(sgh.points[,data$mesh.coords]),repl=1)
-  intmat = inla.spde.make.A(data$mesh, loc=as.matrix(int.points[,data$mesh.coords]),repl=1)
-  
-  
-  # Sanity check. Are all of out points within the mesh?
-  if ( any(apply(!(abs(as.matrix(intmat))==0),MARGIN=1,sum)==0) ) {
-    warning("Integration points outside of mesh boundary! Discarding. This affects your results!")
-    int.points = int.points[!(apply(!(abs(as.matrix(intmat))==0),MARGIN=1,sum)==0),]
-    intmat = inla.spde.make.A(data$mesh, loc=as.matrix(int.points[,c("lon","lat")]))
+  if ( sgh.n > 0 ) { locmat = inla.spde.make.A(data$mesh, loc=as.matrix(sgh.points[,data$mesh.coords]),repl=1) } else { locmat = NULL}
+  if ( int.n > 0 ) { 
+    intmat = inla.spde.make.A(data$mesh, loc=as.matrix(int.points[,data$mesh.coords]),repl=1)
+    
+    # Sanity check. Are all of out points within the mesh?
+    if ( any(apply(!(abs(as.matrix(intmat))==0),MARGIN=1,sum)==0) ) {
+      warning("Integration points outside of mesh boundary! Discarding. This affects your results!")
+      int.points = int.points[!(apply(!(abs(as.matrix(intmat))==0),MARGIN=1,sum)==0),]
+      intmat = inla.spde.make.A(data$mesh, loc=as.matrix(int.points[,c("lon","lat")]))
+    }
+  } else { 
+    intmat = NULL
   }
   
-  A.pp = rBind(intmat, locmat)
+  if (int.n ==0 ) { A.pp = locmat }
+  else if ( sgh.n == 0 ) { A.pp = intmat }
+  else if( int.n > 0 & sgh.n > 0 ) { A.pp = rBind(intmat,locmat) }
+  else { stop("The A matrix of integration and sighting points are both NULL.") }
   
   #
   # Observations and expectation (Y and E)
   #
   
-  y.pp = rep(0:1, c(nrow(int.points), nrow(sgh.points)))
-  e.pp = c(int.points[,"weight"],rep(sgh.E,nrow(sgh.points)))
+  # y of integration points
+  if ( is.function(int.y) ) { int.y.values = int.y(int.points) }
+  else if ( is.numeric(int.y) ) {
+    if ( length(int.y) == 1 && int.n >1 ) { int.y.values = rep(int.y,int.n) }
+    else { int.y.values = int.y }
+    if ( int.n == 0 ) { int.y.values = NULL }
+  } else { 
+    stop("unsupported data type of parameter int.y") 
+  }
+  
+  # y of sightings
+  if ( is.function(sgh.y) ) { sgh.y.values = sgh.y(sgh.points) }
+  else if ( is.numeric(sgh.y) ) {
+    if ( length(sgh.y) == 1 && sgh.n >1 ) { sgh.y.values = rep(sgh.y,sgh.n) }
+    else { sgh.y.values = sgh.y }
+    if ( sgh.n == 0 ) { sgh.y.values = NULL }
+  } else { 
+    stop("unsupported data type of parameter sgh.y")
+  }
+  
+  # concatenated y
+  y.pp = c(int.y.values, sgh.y.values)
+  
+  # E parameter
+  if ( int.n > 0) {
+    e.pp = c(int.points[,"weight"],rep(sgh.E,nrow(sgh.points)))
+  } else {
+    e.pp = rep(sgh.E,nrow(sgh.points))
+  }
+  
   
   
   
   #
   # Covariates
   #
-  int.covar = fetch.covariate(formula,int.points,covariates)
-  sgh.covar = fetch.covariate(formula,sgh.points,covariates)
+  if (int.n > 0 ) { int.covar = fetch.covariate(formula,int.points,covariates) } else { int.covar = NULL }
+  if (sgh.n > 0 ) { sgh.covar = fetch.covariate(formula,sgh.points,covariates) } else { sgh.covar = NULL }
   covar.data = rbind(int.covar,sgh.covar)
   
   
@@ -197,10 +248,12 @@ pproc_lgcp = function(data,int.points=NULL,
   #
   
   resultFPP = do.call(inla,c(inla.args,list(
-    formula, family = "poisson",
-    data=inla.stack.data(stk),
-    control.predictor=list(A=inla.stack.A(stk),compute=TRUE),
-    E=inla.stack.data(stk)$e,verbose=TRUE)
+    formula, 
+    family = family,
+    data = inla.stack.data(stk),
+    control.predictor = list(A=inla.stack.A(stk),compute=TRUE),
+    E = inla.stack.data(stk)$e,
+    verbose = TRUE)
   ))
   
   #
