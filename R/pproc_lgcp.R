@@ -13,13 +13,12 @@
 #' @param spde.args List of parameters passed on to inla.spde2.matern() when constructing the SPDE
 #' @param predict List of linear combinations to predict. Each list entry is a list with two fields. "vars" holds the list of variables to include in the prediction and "loc" describes the locations to predict at.
 #' @param constant Function providiong constants to add to the linear predictor
-#' @param inla.args List of arguments passed on to INLA
+#' @param inla.args List of arguments passed on to INLA. Default: list(family = "poisson"). 
 #' @param sgh.E Poisson likelihood exposure parameter for detections (see INLA documentation)
 #' @param int.filter Function applied to the data frame of integration points. Use this to filter out particular integration points.
 #' @param det.filter Function applied to the data frame of detection points. Use this to filter out particular detection points.
 #' @param sgh.y Observation values for sightings. Default: 1
 #' @params int.y Observation values for intefration points. Default: 0, later in the alogrithm replaced by integration weights
-#' @params family Distribution familiy of the observations. Default: "poisson". See INLA documentation for more options.
 #' @return \code{pproc_lgcp}, lgcp object.
 #' @examples \\dontrun{data(whales) ; pp = pproc_lgcp(whales); plot(pp)}
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
@@ -34,13 +33,13 @@ pproc_lgcp = function(data,int.points=NULL,
                       spde.args = list(alpha=2,prior.variance.nominal=10,theta.prior.prec=0.01),
                       predict = list(),
                       constant = list(),
-                      inla.args = list(),
+                      inla.args = list(family = "poisson"),
                       sgh.E = 0,
                       int.filter = NULL,
                       det.filter = NULL,
                       sgh.y = 1,
                       int.y = 0,
-                      family = "poisson"){
+                      stack = list()){
   
   #
   # Check if formula actually is a formula update
@@ -235,6 +234,20 @@ pproc_lgcp = function(data,int.points=NULL,
     stk = inla.stack(stk,tmp.stk)
   }
   
+  #
+  # Join internal stack with stack provided by user
+  #
+  
+  if ( !(length(stack)==0) ) {
+    y.joint = inla.stack.y(stk,stack)
+    e.joint = inla.stack.y(stk,stack)
+    stk = inla.stack.join(stk,stack)
+    inla.data = inla.stack.data(stk)
+    inla.data$y = y.joint
+    inla.data$e = e.joint
+  } else {
+    inla.data = inla.stack.data(stk)
+  }
   
   
   #
@@ -244,16 +257,20 @@ pproc_lgcp = function(data,int.points=NULL,
   environment(formula) = environment()
   
   #
+  # Some more defaults
+  #
+  if (!("family" %in% names(inla.args))) { inla.args$family = "poisson" }
+  
+  #
   # Run INLA
   #
   
-  resultFPP = do.call(inla,c(inla.args,list(
-    formula, 
-    family = family,
-    data = inla.stack.data(stk),
-    control.predictor = list(A=inla.stack.A(stk),compute=TRUE),
-    E = inla.stack.data(stk)$e,
-    verbose = TRUE)
+  resultFPP = do.call(inla, c(inla.args,
+                              list(
+                                formula, 
+                                data = inla.data,
+                                control.predictor = list(A = inla.stack.A(stk), compute = TRUE),
+                                verbose = TRUE)
   ))
   
   #
