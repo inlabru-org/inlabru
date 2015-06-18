@@ -46,6 +46,51 @@ extract.entries = function(name,smpl){
   return(smpl[grep(ptn,rownames(smpl))])
 }
 
+#' Stack multiple observations
+#'
+#'
+#' @aliases inla.stack.y
+#' @export
+#' @param ... observation vectors
+#' @return y observation vector
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#'
+
+inla.stack.y = function(...) {
+  all.y = lapply(list(...),function(x) return(x$data$data$y))
+  nrow.y = lapply(list(...),function(x) return(nrow(x$data$data)))
+  y = list()
+  for (j in 1:nargs()){
+    ny = nrow.y[[j]]
+    y[[j]] = cbind( matrix(NA,nrow=ny,ncol=j-1) , all.y[[j]], matrix(NA,nrow=ny,ncol=nargs()-j) )
+  }
+  return(do.call(rbind,y))
+}
+
+#' Stack multiple exposures
+#'
+#'
+#' @aliases inla.stack.e
+#' @export
+#' @param ... observation vectors
+#' @return e observation vector
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+
+inla.stack.e = function(...) {
+  all.y = lapply(list(...),function(x) return(x$data$data$e))
+  nrow.y = lapply(list(...),function(x) return(nrow(x$data$data)))
+  y = list()
+  for (j in 1:nargs()){
+    ny = length(all.y[[j]])
+    if (ny==0) { e.tmp = rep(NA,nrow.y[[j]])
+                 cat(length(e.tmp))
+    } else { e.tmp = all.y[[j]] }
+    y[[j]] = cbind( matrix(NA,nrow=nrow.y[[j]],ncol=j-1) , e.tmp , matrix(NA,nrow=nrow.y[[j]],ncol=nargs()-j) )
+  }
+  return(do.call(rbind,y))
+}
+
+
 
 #' Shortcut to refine an inla.mesh object
 #'
