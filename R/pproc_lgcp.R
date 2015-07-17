@@ -270,6 +270,7 @@ pproc_lgcp = function(data,int.points=NULL,
                                 formula, 
                                 data = inla.data,
                                 control.predictor = list(A = inla.stack.A(stk), compute = TRUE),
+                                E = inla.stack.data(stk)$e,
                                 verbose = TRUE)
   ))
   
