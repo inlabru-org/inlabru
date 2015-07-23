@@ -82,14 +82,55 @@ inla.stack.e = function(...) {
   y = list()
   for (j in 1:nargs()){
     ny = length(all.y[[j]])
-    if (ny==0) { e.tmp = rep(NA,nrow.y[[j]])
-                 cat(length(e.tmp))
-    } else { e.tmp = all.y[[j]] }
+    if (ny==0) { 
+      e.tmp = rep(NA,nrow.y[[j]])
+    } else { 
+      e.tmp = all.y[[j]] 
+    }
     y[[j]] = cbind( matrix(NA,nrow=nrow.y[[j]],ncol=j-1) , e.tmp , matrix(NA,nrow=nrow.y[[j]],ncol=nargs()-j) )
   }
   return(do.call(rbind,y))
 }
 
+
+#' Join stacks intended to be run with different likelihoods
+#'
+#' @aliases inla.stack.mjoin
+#' 
+
+inla.stack.mjoin = function(..., compress = TRUE, remove.unused = TRUE){
+  y = inla.stack.y(...)
+  e = inla.stack.e(...)
+  mstack = inla.stack.join(...,compress = compress, remove.unused = remove.unused)
+  mstack$data$y = y
+  mstack$data$e = e
+  return(mstack)
+}
+
+
+#' Retrieve data from stack. Other than inla.stack.data this will give
+#' an observation vector y with multiple columns
+#'
+#' @aliases inla.stack.mdata
+#' 
+
+inla.stack.mdata = function(stack){
+  mdata = inla.stack.data(stack)
+  mdata$y = stack$data$y
+  return(mdata)
+}
+
+#' Combine stacks by adding up predictors
+#'
+#' @aliases inla.stack.add 
+#' 
+
+inla.stack.add = function(...) {
+  stacks = list(...)
+  stk3 = inla.stack.sum(stacks[[1]]$data$data, 
+                        A = lapply(stacks,function(x) {return(inla.stack.A(x))}), 
+                        effects = lapply(stacks,function(x) {return(x$effects$data)}))
+}
 
 
 #' Shortcut to refine an inla.mesh object
