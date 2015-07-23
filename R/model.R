@@ -6,7 +6,6 @@ join = function(...){UseMethod("join")}
 list.covariates = function(...){UseMethod("list.covariates")}
 list.A = function(...){UseMethod("list.A")}
 list.indices = function(...){UseMethod("list.indices")}
-eval.covariates = function(...){UseMethod("eval.covariates")}
 
 #####################################
 # OPERATORS ON MODELS
