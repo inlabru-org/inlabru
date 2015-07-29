@@ -299,14 +299,15 @@ model.logconcave = function(truncation, segments = 5, clinear = TRUE, linbasis =
 #' 
 
 model.grpsize = function(data, mesh = data$mesh) {
-  spde.args = list(alpha=2, prior.variance.nominal = 10, theta.prior.prec = 0.01)
-  gs.mdl = do.call(inla.spde2.matern, c(list(mesh=mesh), spde.args)) 
-  formula = ~ . + f(grpsize, model = gs.mdl)
+  gs.mdl.args = list(alpha=2, prior.variance.nominal = 10, theta.prior.prec = 0.01)
+  gs.mdl = do.call(inla.spde2.matern, c(list(mesh=mesh), gs.mdl.args)) 
+  formula = ~ . + f(grps, model = gs.mdl)
   covariates = list()
   
   return(make.model(name = "Spatial group size model",
                     formula = formula, 
                     covariates = covariates,
-                    mesh = list(grpsize = mesh),
-                    mesh.coords = list(grpsize = data$mesh.coords)))
+                    mesh = list(grps = mesh),
+                    mesh.coords = list(grps = data$mesh.coords)))
 }
+
