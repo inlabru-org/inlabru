@@ -147,7 +147,11 @@ list.indices.model = function(mdl, ...){
   if ( length(mdl$mesh) > 0) {
     for (k in 1:length(mdl$mesh)) {
       name = names(mdl$mesh)[[k]]
-      idx.lst[[name]] = 1:mdl$mesh[[k]]$n
+      if ( "m" %in% names(mdl$mesh[[k]]) ) {
+        idx.lst[[name]] = 1:mdl$mesh[[k]]$m # support inla.mesh.1d models  
+      } else {
+        idx.lst[[name]] = 1:mdl$mesh[[k]]$n
+      }
     }
   }
   return(idx.lst)
