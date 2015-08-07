@@ -181,7 +181,13 @@ make.model = function(formula = NULL, name = NULL, mesh = NULL, mesh.coords = li
 # MODELS: Point process
 #####################################
 
-#' A simple intercept model
+#' Intercept model
+#'
+#' This model represents a simpel intercept added to the formula, i.e.:
+#' 
+#' ~ . + Intercept
+#'
+#' where the effects are 1 for each observation.
 #'
 #' @aliases model.intercept
 #' 
@@ -189,15 +195,22 @@ make.model = function(formula = NULL, name = NULL, mesh = NULL, mesh.coords = li
 model.intercept = function(data) {
   formula = ~ . -1 + Intercept
   covariates = list( Intercept = function(x) { return(0*x[,1]+1) } )
+
   return(make.model(formula = formula,
                     covariates = covariates))
 }
 
 
-#' A SPDE model
+#' Spatial SPDE model
+#' 
+#' Constructs a spatial SPDE model with formula
+#' 
+#'  ~ . + f(spde, model = spde.mdl)
 #'
 #' @aliases model.spde
-#' 
+#' @param data Data set to read the names of the mesh coordinates from (mesh.coords)
+#' @param mesh The mesh used to construct the SPDE. If not provided, the mesh is read form the data set
+#'  
 
 model.spde = function(data, mesh = data$mesh) {
   spde.args = list(alpha=2,prior.variance.nominal=10,theta.prior.prec=0.01)
@@ -216,7 +229,20 @@ model.spde = function(data, mesh = data$mesh) {
 
 #' Half-normal detection function model
 #'
-#' @aliases halfnormal
+#' Construct a half-normal detection function model using the formula
+#' 
+#'  ~ . + f(nhsd, model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1))))
+#'
+#' Hence, the effect is obtained from a contrained linear INLA model. The covariate "nhsd" for this model is as a 
+#' function of the data.frame provided during the inference process:
+#'  
+#'  nhsd = function(X) { return(-0.5*X$distance^2) },
+#'  
+#' that is, nhsd is half of the negative squared distance of an observation/integration point.
+#'
+#' @aliases model.halfnormal
+#' @param truncation Distance to truncate at. Currently unused but passed on the the formula environment for later usage.
+#' @param constrained If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging. 
 #' 
 
 model.halfnormal = function(truncation, constrained = TRUE, ...){
@@ -227,13 +253,6 @@ model.halfnormal = function(truncation, constrained = TRUE, ...){
   # Covariate
   covariates = list(nhsd = function(X) { return(-0.5*X$distance^2) })
   
-  # Evaluator
-  evaluate = function(mdl,x) { stop("Not implemented.") }
-  log.evaluate = function(mdl,x) { stop("Not implemented.") }
-  
-  # Environment
-  env = list(...)
-  
   return(make.model(name = "Half-normal detection function",
                     formula = formula, 
                     covariates = covariates))
@@ -241,15 +260,28 @@ model.halfnormal = function(truncation, constrained = TRUE, ...){
 
 
 #' Log-concave detection function model
-#'
-#' @aliases model.logconcave
 #' 
+#' Constructs a log-concave detection function model with formula
+#' 
+#' ~ . + f(linbasis, model = "clinear", ...) 
+#'      + f(basis_1, model = "clinear", ...) 
+#'      + ... + f(basis_K, model = "clinear", ...)
+#'
+#'  whare K is the number of segments the basis lives on.
+#'   
+#' @aliases model.logconcave
+#' @param truncation Maximum distance assumed to be observed..
+#' @param segments Number of quadratic basis basis functions
+#' @param clinear If set to false, non-constrained linear INLA effects are used for this mode. 
+#' This is handy for debugging but the detection function is not necessarily log-concave anymore.
+#' @param linbasis Wether to use a linear basis function. 
+#' If set to FALSE this implies that that the detection function has zero derivative at the origin. 
 
-model.logconcave = function(truncation, segments = 5, clinear = TRUE, linbasis = TRUE, ...){
+model.logconcave = function(truncation, segments = 5, constrained = TRUE, linbasis = TRUE, ...){
   
   # Formula
   nSeg = segments
-  if (clinear) {
+  if (constrained) {
     params = ",model = 'clinear',hyper=list(theta=list(prior=loggamma)),range = c(-10,0)" # 
     if (linbasis){
       fml = paste0("~ . + f(linbasis",params,")+",paste0("f(basis_",1:nSeg,params,")",collapse="+"))
@@ -297,9 +329,13 @@ model.logconcave = function(truncation, segments = 5, clinear = TRUE, linbasis =
 # MODELS: Group size
 #####################################
 
-#' Spatial SPDE model for groupsize
+#' Spatial SPDE model for group size with formula
+#' 
+#'  ~ . + f(grps, model = gs.mdl)
 #'
 #' @aliases model.grpsize
+#' @param data Data set to read the names of the mesh coordinates from (mesh.coords)
+#' @param mesh The mesh used to construct the SPDE. If not provided, the mesh is read form the data set
 #' 
 
 model.grpsize = function(data, mesh = data$mesh) {
