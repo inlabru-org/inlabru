@@ -1,3 +1,27 @@
+#' DS and SECR model
+#' 
+#' Constructor: \link{make.model}
+#' 
+#' Operators:
+#' 
+#'  Summary: \link{summary}, \link{summary.model}
+#'  Join models: \link{join}, \link{join.model}
+#'  List covariates: \link{list.covariates}, \link{list.covariates.model}
+#'  List A matrices: \link{list.A}, \link{list.A.model}
+#'  List indices: \link{list.indices}, \link{list.indices.model}
+#' 
+#' Pre-defined models:
+#' 
+#' Intercept: \link{model.intercept}
+#' Half-normal detection function: \link{model.halfnormal}
+#' Log-concave detection function: \link{model.logconcave}
+#' Spatial SPDE model for animal intensity: \link{model.spde}
+#' Spatial group size model: \link{model.grpsize}
+#'     
+#' @name model
+NULL
+
+
 #####################################
 # GENERICS
 #####################################
