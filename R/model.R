@@ -234,10 +234,18 @@ model.intercept = function(data) {
 #' @aliases model.spde
 #' @param data Data set to read the names of the mesh coordinates from (mesh.coords)
 #' @param mesh The mesh used to construct the SPDE. If not provided, the mesh is read form the data set
+#' @param ... Arguments passed on to inla.spde2.matern. If none, the defaults are alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01
 #'  
 
-model.spde = function(data, mesh = data$mesh) {
-  spde.args = list(alpha=2,prior.variance.nominal=10,theta.prior.prec=0.01)
+model.spde = function(data, mesh = data$mesh, ...) {
+  
+  vargs = list(...)
+  if ( length(vargs) == 0 ){ 
+    spde.args = list(alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01) }
+  else { 
+    spde.args = vargs 
+  }
+  
   spde.mdl = do.call(inla.spde2.matern,c(list(mesh=mesh),spde.args)) 
   formula = ~ . + f(spde, model=spde.mdl)
   return(make.model(name = "Spatial SPDE model",
@@ -360,10 +368,17 @@ model.logconcave = function(truncation, segments = 5, constrained = TRUE, linbas
 #' @aliases model.grpsize
 #' @param data Data set to read the names of the mesh coordinates from (mesh.coords)
 #' @param mesh The mesh used to construct the SPDE. If not provided, the mesh is read form the data set
-#' 
+#' @param ... Arguments passed on to inla.spde2.matern. If none, the defaults are alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01
 
-model.grpsize = function(data, mesh = data$mesh) {
-  gs.mdl.args = list(alpha=2, prior.variance.nominal = 10, theta.prior.prec = 0.01)
+model.grpsize = function(data, mesh = data$mesh, ...) {
+  
+  vargs = list(...)
+  if ( length(vargs) == 0 ){ 
+    gs.mdl.args = list(alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01) }
+  else { 
+    gs.mdl.args = vargs 
+  }
+  
   gs.mdl = do.call(inla.spde2.matern, c(list(mesh=mesh), gs.mdl.args)) 
   formula = ~ . + f(grps, model = gs.mdl)
   covariates = list()
