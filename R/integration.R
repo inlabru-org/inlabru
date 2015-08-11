@@ -578,7 +578,7 @@ barycentric.vertices = function(mesh,tri){
 #' @param sp Start points of lines
 #' @param ep End points of lines
 #' @param truncation distance at which we truncate sightings
-#' @param ... argments to quadrature
+#' @param ... argments to int.quadrature
 #' @return List of start and end points resulting from splitting the given lines
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
@@ -627,16 +627,16 @@ split.lines = function(mesh,sp,ep) {
 #' @param sp Start points of lines
 #' @param ep End points of lines
 #' @param truncation distance at which we truncate sightings
-#' @param ... argments to quadrature
+#' @param ... argments to int.quadrature
 #' @return List of 1) Start and end points of replicated lines 2) their distances to the original line
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 replicate.lines = function(sp,ep,truncation,scheme="equidistant",n=3,fake.distance=FALSE,geometry="euc") {
   
   if (fake.distance) {
-    quad = quadrature(0,truncation,scheme,n)
+    quad = int.quadrature(0,truncation,scheme,n)
   } else {
-    quad = quadrature(-truncation,truncation,scheme,n)
+    quad = int.quadrature(-truncation,truncation,scheme,n)
   }
   
   dst = quad$ips
@@ -675,7 +675,7 @@ replicate.lines = function(sp,ep,truncation,scheme="equidistant",n=3,fake.distan
 
 #' Gaussian quadrature and other integration point constructors
 #'
-#' @aliases quadrature
+#' @aliases int.quadrature
 #' @export
 #' @param sp Start points of lines
 #' @param ep End points of lines
@@ -684,7 +684,7 @@ replicate.lines = function(sp,ep,truncation,scheme="equidistant",n=3,fake.distan
 #' @return List with integration poins (ips), weights (w) and weights including line length (wl)
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-quadrature = function(sp,ep,scheme="gaussian",n.points=1,geometry="euc",coords=c("x","y")){
+int.quadrature = function(sp,ep,scheme="gaussian",n.points=1,geometry="euc",coords=c("x","y")){
   if (is.vector(sp)) { 
     n.lines = 1
     len = function(a) {abs(a)}
@@ -757,8 +757,8 @@ quadrature = function(sp,ep,scheme="gaussian",n.points=1,geometry="euc",coords=c
   }
   else if (scheme == "twosided-gaussian"){
     if (geometry == "geo") {stop("Geometry geo not supported")}
-    ips1 = quadrature(sp,sp+0.5*(ep-sp),scheme="gaussian",n.points=n.points)
-    ips2 = quadrature(sp+0.5*(ep-sp),ep,scheme="gaussian",n.points=n.points)
+    ips1 = int.quadrature(sp,sp+0.5*(ep-sp),scheme="gaussian",n.points=n.points)
+    ips2 = int.quadrature(sp+0.5*(ep-sp),ep,scheme="gaussian",n.points=n.points)
     ips = rbind(ips1$ips,ips2$ips)
     w = 0.5*rbind(ips1$w,ips2$w)
     wl = 0.5*rbind(ips1$wl,ips2$wl)
@@ -784,35 +784,41 @@ quadrature = function(sp,ep,scheme="gaussian",n.points=1,geometry="euc",coords=c
 
 #' 
 #'
-#' @aliases projection.integration
+#' @aliases int.points
 #' @export
 #' @param data Either a dsdata/etpdata data set (e.g. whales) or a data.frame describing effort data
-#' @param idx Two-column index matrix, first column: column index of transect start points in effort data, second column: column index of transect end points in effort data
-#' @param mesh Mesh used to construct the integration points
-#' @param mesh.split Split mesh triangles into four sub-triangles
+#' @param on Either "transect" or "segment". This determines on which of these the integration is based on. Alternatively a two column index matrix, first column: column index of transect start points in effort data, second column: column index of transect end points in effort data
+#' @param line.split TRUE or FALSE, determines if lines that cross mesh edged should be splitted
+#' @param mesh Mesh used to construct the integration points. By default the mesh of the given data set.
+#' @param mesh.split Split mesh triangles into four sub-triangles for refined integration.
 #' @param mesh.coords Character description of the mesh coordinates, e.g. c("lon","lat")
 #' @param geometry Either "geo" (geographic)  or "euc" (Euclidean)
-#' @param transect.scheme Integration scheme along transect
-#' @param n.transect Number of integration points along transect
+#' @param length.scheme Integration scheme along the line (transect/segment)
+#' @param n.length Number of integration points along the line
 #' @param distance.scheme Integration scheme along perpendicular distance
 #' @param n.distance Number of integration points perpendicular distance
-#' @param truncation Truncation for perpendicular distance (i.e. integration limit)
-#' @param fake.distance Wether or not integration points stay on the transect line
-#' @param projection Type of projection, "linear" or "bezier"
+#' @param distance.truncation Truncation for perpendicular distance (i.e. integration limit)
+#' @param fake.distance Wether or not integration points stay on the transect line and distances are faked.
+#' @param projection Type of projection. Currently only "linear" works.
 #' @param group.by Create independent integration points for sub-groups of the data, e.g. group.by=c("year","month")
 #' @return List with integration poins (ips), weights (w) and weights including line length (wl)
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 
-projection.integration = function(data, 
-                  idx = "transect", 
+int.points = function(data, 
+                  on = "transect",
+                  line.split = FALSE,
                   mesh = data$mesh, 
                   mesh.split = FALSE,
                   mesh.coords = data$mesh.coords,
                   geometry = data$geometry, 
-                  transect.scheme = "gaussian", n.transect = 1, 
-                  distance.scheme = "equidistant", n.distance = 5, truncation = NA, fake.distance = FALSE,
-                  projection="linear",
+                  length.scheme = "gaussian", 
+                  n.length = 1, 
+                  distance.scheme = "equidistant", 
+                  n.distance = 5, 
+                  distance.truncation = 1, 
+                  fake.distance = FALSE,
+                  projection = NULL,
                   group.by = NULL
 ){
   
@@ -824,9 +830,12 @@ projection.integration = function(data,
     sp = data[idx[,1],mesh.coords]
     ep = data[idx[,2],mesh.coords]
   } else {
+    
     # Get segments/transect indices
-    if (idx == "transect"){ idx = as.transect(data) }
-    else { idx = as.segment(data) }
+    if (on == "transect" ){ idx = as.transect(data) }
+    else if (on == "segment" ) { idx = as.segment(data) }
+    else ( idx = on )
+    
     # Covariates
     covariates = data$effort
     # Segment/transect start and end points 
@@ -845,7 +854,7 @@ projection.integration = function(data,
   
   
   # Replicate segments for different distances (out:sp,ep,distance)
-  line.rep = replicate.lines(sp,ep,truncation,scheme=distance.scheme,n=n.distance,fake.distance=fake.distance)
+  line.rep = replicate.lines(sp,ep,distance.truncation,scheme=distance.scheme,n=n.distance,fake.distance=fake.distance)
   sp = line.rep$sp
   ep = line.rep$ep
   distance = line.rep$distance
@@ -853,16 +862,18 @@ projection.integration = function(data,
   idx = idx[line.rep$idx,]
   
   # Split lines
-  line.spl = split.lines(mesh,sp,ep)
-  sp = line.spl$sp
-  ep = line.spl$ep
-  distance = distance[line.spl$split.origin]
-  idx = idx[line.spl$split.origin,]
+  if ( line.split ) {
+    line.spl = split.lines(mesh,sp,ep)
+    sp = line.spl$sp
+    ep = line.spl$ep
+    distance = distance[line.spl$split.origin]
+    idx = idx[line.spl$split.origin,]
+  }
   
   # Determine integration points along lines
-  quad = quadrature(sp, ep, scheme = transect.scheme, n.points = n.transect, geometry=geometry,coords=mesh.coords)
+  quad = int.quadrature(sp, ep, scheme = length.scheme, n.points = n.length, geometry=geometry,coords=mesh.coords)
   ips = quad$ips 
-  w = 2*truncation*quad$wl/n.distance #total length of all transect lines:390
+  w = 2*distance.truncation*quad$wl/n.distance
   distance = distance[quad$line.idx]
   idx = idx[quad$line.idx,]
   
@@ -870,12 +881,91 @@ projection.integration = function(data,
   ips = data.frame(ips)
   colnames(ips) = mesh.coords
   ips= cbind(ips, distance = distance, weight = w)
-  if (!is.null(group.by)) { ips = cbind(ips,covariates[idx[,1],group.by,drop=FALSE])}
   
-  projfun = function(dframe) { data.frame(ip.project(projection = projection, mesh, as.matrix(dframe[,mesh.coords]), dframe$weight,mesh.coords=mesh.coords),
-                                          dframe[1,c("distance",group.by),drop=FALSE]) }
-  ips = recurse.rbind(projfun,ips,c("distance",group.by))
+  #
+  # OLD SCHEME
+  #
+  
+  #   if (!is.null(group.by)) { ips = cbind(ips,covariates[idx[,1],group.by,drop=FALSE])}
+  #   
+  #   projfun = function(dframe) { data.frame(ip.project(projection = projection, mesh, as.matrix(dframe[,mesh.coords]), dframe$weight,mesh.coords=mesh.coords),
+  #                                           dframe[1,c("distance",group.by),drop=FALSE]) }
+  #   ips = recurse.rbind(projfun,ips,c("distance",group.by))
+  if ( !is.null(projection)){
+    fu = function(x) data.frame(cbind(project.weights(x, mesh = data$mesh, mesh.coords = data$mesh.coords),distance = x$distance[1]))
+    ips = recurse.rbind(fu, ips, c(list("distance"),group.by))
+  }
   
   return(ips)
+}
+
+#' Prjection integration done FAST. Not implemented completely, has to deal with distances.
+
+project.weights = function(ips, mesh, mesh.coords = NULL){
+  
+  w = ips[,"weight"]
+  
+  if ( is.null(mesh.coords) ) {
+    ips.loc = ips
+  } else {
+    ips.loc = as.matrix(ips[,mesh.coords])
+  }
+  
+  res = inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = ips.loc)
+  tri = res$p2m.t 
+  
+  # Filter integration points outside mesh
+  if ( any(tri==0) ) {
+    ips = ips[!tri==0,]
+    w = w[!tri==0]
+    res$p2m.b = res$p2m.b[!tri==0,]
+    warning("Integration points outside mesh. Omitting.")
+  }
+  
+  nw = w * res$p2m.b
+  w.by = by(as.vector(nw), as.vector(mesh$graph$tv[tri,]), sum, simplify = TRUE)
+  nw = as.vector(w.by)
+  
+  if ( is.null(mesh.coords)) {
+    ret = data.frame(mesh$loc[as.numeric(names(w.by))], w = nw)
+  } else {
+    nips = mesh$loc[as.numeric(names(w.by)),1:length(mesh.coords)]
+    colnames(nips) = mesh.coords
+    ret = cbind(nips, weight = nw)
+  }
+  
+  return(ret)
+  
+}
+
+int.expand = function(ips, ...) {
+  dots = list(...)
+  x = list()
+  weight = list()
+  for (k in 1: length(dots)){
+    if (is.numeric(dots[[k]])) {
+      weight[[k]] = rep(1,length(dots[[k]]))
+    }
+    else {
+      width = (dots[[k]]$range[2] - dots[[k]]$range[1])
+      weight[[k]] = rep(width/(dots[[k]]$n), dots[[k]]$n)
+      dw = 0.5/(dots[[k]]$n)
+      x[[k]] = (width) * seq(dw, 1-dw,by = 2*dw) + dots[[k]]$range[1]
+      names(x)[[k]] = names(dots)[[k]]
+    }
+  }
+  if (length(dots)>1){ 
+    grd = do.call(expand.grid, x) 
+    w = apply(do.call(expand.grid, weight), MARGIN = 1, prod)
+  }
+  else { 
+    grd = data.frame(x[[1]])
+    names(grd) = names(x)[[1]]
+    w = weight[[1]]
+  }
+  rips = ips[as.vector(t(matrix(1:nrow(ips),ncol = nrow(grd),nrow = nrow(ips)))) , ]
+  rgrd = grd[rep(seq_len(nrow(grd)), nrow(ips)), , drop = FALSE]
+  rips$weight = rips$weight * w[rep(seq_len(nrow(grd)), nrow(ips))]
+  return(cbind(rgrd,rips))
 }
 
