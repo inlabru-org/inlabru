@@ -8,7 +8,7 @@
 #' - mesh.coords = c("lon","lat")
 #' 
 #' @name dsdata
-#' @example whales
+#' @examples whales
 NULL
 
 detdata.etpdata = function(data,detection=NULL,...){ 

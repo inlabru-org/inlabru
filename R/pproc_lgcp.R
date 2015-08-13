@@ -18,7 +18,7 @@
 #' @param int.filter Function applied to the data frame of integration points. Use this to filter out particular integration points.
 #' @param det.filter Function applied to the data frame of detection points. Use this to filter out particular detection points.
 #' @param sgh.y Observation values for sightings. Default: 1
-#' @params int.y Observation values for intefration points. Default: 0, later in the alogrithm replaced by integration weights
+#' @param int.y Observation values for intefration points. Default: 0, later in the alogrithm replaced by integration weights
 #' @return \code{pproc_lgcp}, lgcp object.
 #' @examples \\dontrun{data(whales) ; pp = pproc_lgcp(whales); plot(pp)}
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>

@@ -74,7 +74,7 @@ linedata = function(...){UseMethod("linedata")}
 #' @export
 #' @param tr Transects
 #' @param dsdata Distance sampling data set
-#' @example \dontrun{ toy=toy1() ; plot(toy) }
+#' @examples \dontrun{ toy=toy1() ; plot(toy) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 len.transect = function(tr,data) {
@@ -92,7 +92,7 @@ len.transect = function(tr,data) {
 #' @export
 #' @param tr Transects
 #' @param dsdata Distance sampling data set
-#' @example \dontrun{ toy=toy1() ; plot(toy) }
+#' @examples \dontrun{ toy=toy1() ; plot(toy) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 gaplen.transect = function(tr,data,...) {
@@ -111,7 +111,7 @@ gaplen.transect = function(tr,data,...) {
 #' @export
 #' @param seg Transect segments
 #' @param dsdata Distance sampling data set
-#' @example \dontrun{ toy=toy1() ; plot(toy) }
+#' @examples \dontrun{ toy=toy1() ; plot(toy) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 gaplen.segment = function(seg,data,...) {

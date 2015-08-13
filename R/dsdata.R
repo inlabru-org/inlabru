@@ -6,7 +6,7 @@
 #' - mesh.coords = c("lon","lat")
 #' 
 #' @name dsdata
-#' @example toy1, whales
+#' 
 NULL
 
 #' Plot generic distance sampling data
@@ -14,8 +14,10 @@ NULL
 #' @aliases plot.dsdata 
 #' @export
 #' @param dsdata Distance sampling data set
-#' @example \dontrun{ toy=toy1() ; plot(toy) }
+#' @name blah
+#' @examples \dontrun{ toy=toy1() ; plot(toy) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#' 
 
 plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,...){
   if (rgl==FALSE) {
@@ -86,7 +88,7 @@ plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,...){
 #' @aliases summary.dsdata 
 #' @export
 #' @param dsdata Distance sampling data set
-#' @example \dontrun{ data(toy1) ; summary(toy1) }
+#' @examples \dontrun{ data(toy1) ; summary(toy1) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 summary.dsdata = function(dsdata){
