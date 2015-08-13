@@ -782,6 +782,22 @@ int.quadrature = function(sp,ep,scheme="gaussian",n.points=1,geometry="euc",coor
   return(list(ips=ips,w=w,wl=wl,line.idx=line.idx))
 }
 
+
+#' Wrapper for \link{int.quadrature}
+#' 
+#' Returns a data frame instead of a list
+#' 
+#' @aliases int.1d
+#' @param ... see 
+#' @export \link{int.quadrature}
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+
+int.1d = function(...){
+  quad = int.quadrature(...)
+  ips = data.frame(distance = quad$ips, weight = quad$wl)
+  return(ips)
+}
+
 #' 
 #'
 #' @aliases int.points
