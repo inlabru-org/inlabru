@@ -674,7 +674,13 @@ replicate.lines = function(sp,ep,truncation,scheme="equidistant",n=3,fake.distan
 }
 
 #' Gaussian quadrature and other integration point constructors
-#'
+#' 
+#' Contruct integration points for each of lines defined by the start and end points provided.
+#' The following schemes are available: 
+#' "equidistant" : Equidistant integration points without boundary. All weights are identical and sum uf to the length of a line.
+#' "gaussian": Points and weight according to the Gaussian quadrature rule. Currently only n=1 and n=2 are supported (Exact integration for linear and quadratic functions).
+#' "twosided-gaussian": Experimental
+#'    
 #' @aliases int.quadrature
 #' @export
 #' @param sp Start points of lines
@@ -785,7 +791,7 @@ int.quadrature = function(sp,ep,scheme="gaussian",n.points=1,geometry="euc",coor
 
 #' Wrapper for \link{int.quadrature}
 #' 
-#' Returns a data frame instead of a list
+#' Returns a data frame instead of a list. See documentation of \link{int.quadrature}.
 #' 
 #' @aliases int.1d
 #' @param ... see 
@@ -798,7 +804,19 @@ int.1d = function(...){
   return(ips)
 }
 
+#' Line transect integration
 #' 
+#' Creates a set of integration points with weights from a \link{dsdata} structure. 
+#' The integration points can be based on the transect lines or the line segments of the survey (parameter "on").
+#' By default, the integration points are arranged on a grid and their number in direction of the transect and perpendicular
+#' to the transect are given by the parameters n.length and n.distance. The boundary of the integration in perpendicular
+#' direction is given by distance.truncation. Since transect lines can be long compared to the mesh that is used to model
+#' the data it can be useful to set the parameter line.split to TRUE. This means that transect lines / segments are split
+#' into parts at the edges of the mesh before the integration points are constructed (for each of these parts). The
+#' mesh that is used for this procedure is (by default) the mesh of the data set (data$mesh). However, it can by replaced
+#' by a mesh provided as a parameter. Additionaly, the given mesh can automatically be refined (mesh.refine) if a denser set 
+#' of integration points is required. The latter also holds for integration points constructed using the option 
+#' "projection = TRUE". Hereby, after their contruction, integration points are projected onto points at the mesh vertices.
 #'
 #' @aliases int.points
 #' @export
