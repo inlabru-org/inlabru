@@ -218,7 +218,7 @@ make.model = function(formula = NULL, name = NULL, mesh = NULL, mesh.coords = li
 
 model.intercept = function(data) {
   formula = ~ . -1 + Intercept
-  covariates = list( Intercept = function(x) { return(0*x[,1]+1) } )
+  covariates = list( Intercept = function(x) { return(data.frame(Intercept = rep(1, nrow(x)) )) } )
 
   return(make.model(formula = formula,
                     covariates = covariates))
