@@ -97,10 +97,11 @@ summary.dsdata = function(dsdata){
   cat(paste0("Effort columns names: "),"\n")
   cat(paste0(" ",names(dsdata$effort)), "\n")
   cat(paste0("Number of transects: "), dim(as.transect(dsdata))[1], "\n")
-  cat(paste0("Total length of transects: "), sum(len.transect(as.transect(dsdata),dsdata)), "km","\n")
+  cat(paste0("Total length of transects: "), sum(len.transect(as.transect(dsdata),dsdata)), "units","\n")
   
   # Mesh area
-  cat(paste0("Total area of mesh: "), sum(Matrix::diag(inla.mesh.fem(dsdata$mesh, order=1)$c0)), " square mesh units","\n")
+  A.mesh = sum(Matrix::diag(inla.mesh.fem(dsdata$mesh, order=1)$c0))
+  cat(paste0("Total area of mesh: "), A.mesh, " square mesh units","\n")
   
   # Survey area
   if ("inner.boundary" %in% names(dsdata)) {
@@ -119,7 +120,7 @@ summary.dsdata = function(dsdata){
   cat(paste0("Number of detections : N = "),n.det, "\n")
   
   # Number of detections per unit mesh area inside survey area
-  cat(paste0("Detections per survey area: N/A = "), n.det/A, "\n")
+  cat(paste0("Detections per survey area: N/A = "), n.det/A.mesh, "\n")
   
 }
 
