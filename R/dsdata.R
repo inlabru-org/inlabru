@@ -1,9 +1,18 @@
-#' Generic distance sampling data format
+#' iDistance data format for distance sampling surveys
 #' 
 #' Fields:
 #' - effort = 
 #' - geometry = "euc"
 #' - mesh.coords = c("lon","lat")
+#' 
+#' Data sets:
+#' \itemize{
+#'  \item{\link{toy1}: }{A toy data set with a single transect line}
+#'  \item{\link{whales}: }{Blue whales (line transect)}
+#'  \item{\link{strdolphin}: }{Striped dolphins (line transect)}
+#'  \item{\link{sbdolphin}: }{Short beaked dolphins (line transect)}
+#' }
+#' 
 #' 
 #' @name dsdata
 #' 
