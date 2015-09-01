@@ -972,6 +972,18 @@ project.weights = function(ips, mesh, mesh.coords = NULL){
   
 }
 
+
+#' Expand integration points over additional dimensions
+#' 
+#' See int.quadrature on how to formulate the further arguments.
+#'
+#' @aliases int.expand
+#' @export
+#' @param ips Integration points to expand
+#' @param ... lists with arguments for multiple calls of int.quadrature
+#' @return Integration points
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+
 int.expand = function(ips, ...) {
   dots = list(...)
   x = list()
@@ -981,10 +993,9 @@ int.expand = function(ips, ...) {
       weight[[k]] = rep(1,length(dots[[k]]))
     }
     else {
-      width = (dots[[k]]$range[2] - dots[[k]]$range[1])
-      weight[[k]] = rep(width/(dots[[k]]$n), dots[[k]]$n)
-      dw = 0.5/(dots[[k]]$n)
-      x[[k]] = (width) * seq(dw, 1-dw,by = 2*dw) + dots[[k]]$range[1]
+      quad = do.call(int.quadrature,dots[[k]])
+      x[[k]] = quad$ips
+      weight[[k]] = quad$wl
       names(x)[[k]] = names(dots)[[k]]
     }
   }
