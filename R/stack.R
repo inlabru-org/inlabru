@@ -35,7 +35,8 @@ detection.stack = function(data,
   return(inla.stack(data = list(y = y.pp, e = e.pp),
                      A = A,
                      tag = tag,
-                     effects = c(idx, eff)))
+                     effects = c(idx, eff),
+                    compress = FALSE))
 }
 
 
@@ -104,7 +105,7 @@ prediction.stack = function(data, model = NULL, pts = NULL, tag = "prediction.st
   idx = list.indices.model(model, pts)
   
   # Number of prediction rows
-  np = max(ifelse( length(A) > 0, nrow(A[[1]]), 0),
+  np = max(ifelse( length(A) > 0, ifelse(is.matrix(A[[1]]),nrow(A[[1]]),size(A)), 0),
         ifelse( length(eff) > 0, nrow(eff[[1]]), 0))
   
   # Create and return stack
