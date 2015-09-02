@@ -1,23 +1,25 @@
-#' DS and SECR model
+#' Linear predictor models for usage with INLA
 #' 
-#' Constructor: \link{make.model}
-#' 
-#' Operators:
-#' 
-#'  Summary: \link{summary}, \link{summary.model}
-#'  Join models: \link{join}, \link{join.model}
-#'  List covariates: \link{list.covariates}, \link{list.covariates.model}
-#'  List A matrices: \link{list.A}, \link{list.A.model}
-#'  List indices: \link{list.indices}, \link{list.indices.model}
-#' 
-#' Pre-defined models:
-#' 
-#' Intercept: \link{model.intercept}
-#' Half-normal detection function: \link{model.halfnormal}
-#' Log-concave detection function: \link{model.logconcave}
-#' Spatial SPDE model for animal intensity: \link{model.spde}
-#' Spatial group size model: \link{model.grpsize}
-#'     
+#' This class facilitates the usage of sophisticated modeling approaches using INLA. 
+#' A \code{model} has a formula that describes one or more of INLA's \code{f} objects. 
+#' It describes how given a data frame of locations or other coordinates translates into
+#' evaluating the predictors of the formula. For manually setting up a \code{model} see the
+#' constructor \link{make.model}. Useful operators on \code{model} objects are:
+#' \itemize{
+#'  \item{\link{summary}: }{Summarize a model}
+#'  \item{\link{join}: }{Join multiple models}
+#'  \item{\link{list.covariates}: }{List covariates of a model}
+#'  \item{\link{list.A}: }{List projection matrices of a model}
+#'  \item{\link{list.indices}: }{List indices of a model}
+#' }
+#' Default models are:
+#' \itemize{
+#' \item Intercept: \link{model.intercept}
+#' \item Half-normal detection function: \link{model.halfnormal}
+#' \item Log-concave detection function: \link{model.logconcave}
+#' \item Spatial SPDE model for animal intensity: \link{model.spde}
+#' \item Spatial group size model: \link{model.grpsize}
+#' }     
 #' @name model
 NULL
 

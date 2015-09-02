@@ -1,6 +1,18 @@
-#####################################
-# Stacks for distance sampling
-#####################################
+#' INLA stack constructors for distance sampling
+#' 
+#' Distance sampling using INLA requires different kinds of \code{inla.stack} structures to be set up. 
+#' These often represent different kinds of likelihoods but may also represent parts of the model 
+#' that we might want to compute predictions for. iDistance provides the following stack constructors:
+#' 
+#' \itemize{
+#'  \item{\link{detection.stack}: }{Stack for distance sampling detections}
+#'  \item{\link{integration.stack}: }{Stack for integration points}
+#'  \item{\link{prediction.stack}: }{Stack for predictions}
+#'  \item{\link{grpsize.stack}: }{Stack for group size models}
+#' }
+#' @name stack
+NULL
+
 
 #' Create a stack for animal detections
 #'

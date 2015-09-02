@@ -2,25 +2,17 @@
 % Please edit documentation in R/iDistance.R
 \name{iDistance}
 \alias{iDistance}
-\title{Distance sampling using integrated nested Laplace approximations (INLA)}
+\title{iDistance}
 \description{
-\url{http://www.creem.st-andrews.ac.uk:8082/ESSMod/}
+A package for distance sampling using integrated nested Laplace approximations (INLA).
+iDistance is a product of the Ecological Survey Spatial Modelling project (\url{http://www.creem.st-andrews.ac.uk:8082/ESSMod/}).
 }
 \details{
-This package comes with he following data sets:
-\describe{
- \item{\link{whales}}{Line transect data of whale sightings.}
- }
-
- It exports the following methods
-\describe{
- \item{\link{dfun}}{Fit a detection function to a set of sightings.}
- \item{\link{pproc}}{Fit point process model to line transect survey data.}
- }
+This package comes multiple distance sampling data sets. Please use \code{help(dsdata)} to find a respective list and a description of the data format.
+The core objects needed for inference using iDistance are derived from the class \link{model}. Use these models to generate \link{stack} structures
+to set up your INLA call.
 }
 \author{
 Fabian E. Bachl <\email{f.e.bachl@bath.ac.uk}>
-
-Yuan (Joyce) Yuan <\email{yy84@st-andrews.ac.uk}>
 }
 
