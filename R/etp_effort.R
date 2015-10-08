@@ -11,6 +11,138 @@
 #' @examples whales
 NULL
 
+
+#'
+#' Register ETP effort with ETP sightings and return a respective \link{effort} data structure
+#' 
+#'
+#' @aliases as.effort.etpeffort
+#' @param effort ETP effort data.frame (class "etpeffort")
+#' @param sighting Sightings from the ETP survey
+#' 
+as.effort.etpeffort = function(effort, sighting) {
+  
+  # Add a column to identify transect
+  
+  trans.idx = rep(0,length(effort$effort))
+  trans.idx[effort$effort== "S"] = 1
+  trans.idx = cumsum(trans.idx)
+  
+  effort = cbind(effort, trans.idx = trans.idx)
+  
+  
+  # Segment start and end points
+  sp = effort[!(effort$effort=="E"),]
+  ep = effort[!(effort$effort=="S"),]
+  
+  colnames(sp) = c("cruise", "ship", "year", "month", "day", "start.time", "start.lat", "start.lon", "start.bft", "effort", "trans.idx")
+  colnames(ep) = c("cruise", "ship", "year", "month", "day", "end.time", "end.lat", "end.lon", "end.bft", "effort", "trans.idx.end")
+  
+  tmp = cbind(sp[,c("trans.idx","cruise", "ship", "year", "month", "day", "start.time", "start.lat", "start.lon", "start.bft")], 
+              ep[,c("end.time","end.lat","end.lon","end.bft")])
+  
+  effort = cbind(strat = NaN, trans = NaN, seg = NaN , det = NaN, tmp)
+  
+  # merge in sightings
+  
+  # Function tp compute unix time from effort data (has 6 digit HHMMSS format)
+  eff.unix.time = function(X) {
+    timestr = paste0(as.character(X$year),sprintf("%02d", X$month),sprintf("%02d", X$day),sprintf("%06d", X$start.time))
+    time = strptime(timestr, "%Y%m%d%H%M%S")
+    return(as.numeric(time))
+  }
+  
+  
+  # Function tp compute unix time from sighting data (has 4 digit HHMM format)
+  sig.unix.time = function(X) {
+    timestr = paste0(as.character(X$year),sprintf("%02d", X$month),sprintf("%02d", X$day),sprintf("%04d", X$time))
+    time = strptime(timestr, "%Y%m%d%H%M")
+    return(as.numeric(time))
+  }
+  
+  effort.time = eff.unix.time(effort)
+  sighting.time = sig.unix.time(sighting)
+  
+  effort = cbind(effort, 
+                 unix.time.start = effort.time, 
+                 species = NA, sight.num = NA, on.eff = NA, grpsize = NaN, distance = NaN, 
+                 Bf = NaN, vis = NaN, time = NaN, lat = NaN, lon = NaN, effort = NaN)
+  
+  sighting = cbind(sighting,
+                   unix.time.start = sighting.time,
+                   strat = NaN, trans = NaN, seg = NaN, det = NaN, trans.idx = NaN, ship = NaN, 
+                   start.time = NaN, start.lat = NaN, start.lon = NaN, start.bft = NaN, 
+                   end.time = NaN, end.lat = NaN, end.lon = NaN, end.bft = NaN, 
+                   effort = NaN)
+  
+  
+  # colnames(effort)[!(colnames(effort) %in% colnames(sighting))]
+  # colnames(sighting)[!(colnames(sighting) %in% colnames(effort))]
+  
+  
+  teff = effort
+  tsig = sighting
+  all = list()
+  n=1
+  for (cr in unique(effort$cruise)) {
+    cr.eff  = teff[teff$cruise==cr,]
+    cr.sig  = tsig[tsig$cruise==cr,]
+    teff = teff[!(teff$cruise==cr),]
+    tsig = tsig[!(tsig$cruise==cr),]
+    
+    cr.all = rbind(cr.eff, cr.sig)
+    all[[n]] = cr.all[order(cr.all$unix.time.start),]
+    n=n+1
+  }
+  effort = do.call(rbind,all)
+  
+  
+  # Add trans/seg/det name
+  effort$strat = 1
+  seg = numeric()
+  det = numeric()
+  trans = numeric()
+  
+  for (k in 1:dim(effort)[1]){
+    if ( is.na(effort$trans.idx[k]) ) { effort$trans[k] = effort$trans[k-1] }
+    else { effort$trans[k] = effort$trans.idx[k] }
+    
+    # seg name
+    if (k == 1) { seg[k] = 1 }
+    else {
+      if ( !is.na(effort$distance[k]) ) { seg[k] = seg[k-1] } # detections
+      else if ( effort$trans[k] == effort$trans[k-1] ) { seg[k] = seg[k-1]+1 }
+      else {
+        seg[k] = 1
+      }
+    }
+    # det name
+    if (is.na(effort[k,"distance"])) { det[k] = NaN }
+    else {    
+      if (is.na(effort[k-1,"distance"])) { det[k] = 1 }
+      else { det[k] = det[k-1]+1 }
+    }
+    # Copy over data from transect
+    if (!is.na(effort[k,"distance"])) {
+      effort[k,c("start.lat","start.lon","start.time","end.lat","end.lon","end.time")] = effort[k-1,c("start.lat","start.lon","start.time","end.lat","end.lon","end.time")]
+    }
+  }
+  
+  effort$trans = paste(effort$strat, effort$trans, sep = ".")
+  effort$seg = paste(effort$trans, seg, sep=".")
+  effort$det = paste(effort$seg, det, sep=".")
+  effort$det[is.na(det)] = NaN
+  
+  # Tidy up
+  effort = effort[,!(colnames(effort) == "unix.time.start" | colnames(effort) == "trans.idx" | colnames(effort) == "effort")]
+  
+  # RETURN
+  class(effort) = c("effort","data.frame")
+  return(effort)
+}
+
+
+
 detdata.etpdata = function(data,detection=NULL,...){ 
   if (is.null(detection)) {
     return(data$sighting)
