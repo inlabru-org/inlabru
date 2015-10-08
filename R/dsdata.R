@@ -237,8 +237,10 @@ join.effort = function(effort,detection){
   final = merge(x=all,y=effort,by=c("seg"),all.x=TRUE,suffixes=c("",".EFFORT"))
   final = final[,!(names(final)=="det.EFFORT")]
   final$det[is.na(final$det)] = "0.0.0.0"
-  final = final[order(final$det),]
-  final = final[order(final$seg),]
+  det.srt = as.numeric(unlist(lapply(strsplit(as.character(final$det),"[.]"), function(x) {return(x[length(x)])})))
+  seg.srt = as.numeric(unlist(lapply(strsplit(as.character(final$seg),"[.]"), function(x) {return(x[length(x)])})))
+  final = final[order(det.srt),]
+  final = final[order(seg.srt),]
   final$det[final$det=="0.0.0.0"] = NA
   class(final) = c("effort","data.frame")
   return(final)
