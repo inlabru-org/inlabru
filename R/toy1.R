@@ -36,7 +36,7 @@ generate.toy1 = function(lambda=10,dfun=function(x){exp(-(0.5*(x)^2)*2)},truncat
   # Mesh
   lattice = inla.mesh.lattice(x = seq(-3, 9, length.out=7),
                               y = seq(-3, 9, length.out=5))
-  toy$mesh = do.call(inla.mesh.create,list(lattice=lattice))
+  toy$mesh = do.call(inla.mesh.create,list(lattice = lattice, refine = list(max.edge = 3)))
   
   toy$mesh.coords = c("x","y")
   
