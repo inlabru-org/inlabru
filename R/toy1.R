@@ -73,9 +73,11 @@ make.detections = function(seg,data,lambda=1,dfun=function(x){1},truncation=1.5)
     orthvec = normalize.euc(data.frame(x=locvec$y,y=-locvec$x));
     orthvec = orthvec[rep(1,length(distance)),]
     pts = spoint[rep(1,length(distance)),] + orthvec*distance + loc*locvec[rep(1,length(distance)),]
+    obs.loc = spoint[rep(1,length(distance)),] + loc*locvec[rep(1,length(distance)),]
+    colnames(obs.loc) = c("obs.x","obs.y")
     seg.id = ids[k]
     det.id = paste0(seg.id,".",1:length(distance))
-    detections[[k]] = cbind(seg=seg.id,det=det.id,pts,distance=abs(distance))
+    detections[[k]] = cbind(seg=seg.id,det=det.id,pts,distance=abs(distance), obs.loc)
   }
   return(do.call(rbind,detections))  
 }
