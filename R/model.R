@@ -29,6 +29,7 @@ NULL
 #####################################
 
 join = function(...){UseMethod("join")}
+evaluate = function(...){UseMethod("evaluate")}
 list.covariates = function(...){UseMethod("list.covariates")}
 list.A = function(...){UseMethod("list.A")}
 list.indices = function(...){UseMethod("list.indices")}
@@ -70,6 +71,7 @@ join.model = function(...){
   mesh = list()
   mesh.coords = list()
   covariates = list()
+  eval = list()
   
   env.upd = function(env1,env2) 
     {
@@ -86,13 +88,14 @@ join.model = function(...){
     mesh.coords = c(mesh.coords,mdl$mesh.coords)
     A = c(A,mdl$A)
     environment(formula) = env.upd(environment(formula), environment(mdl$formula))
-    
+    eval = c(eval, mdl$eval)
   }
   return(make.model(
     formula = formula,
     covariates = covariates,
     mesh = mesh,
     mesh.coords = mesh.coords,
+    eval = eval
     ))
   
 }
@@ -189,17 +192,48 @@ list.indices.model = function(mdl, ...){
 #' @aliases make.model
 #' 
 
-make.model = function(formula = NULL, name = NULL, mesh = NULL, mesh.coords = list(), covariates = list(), ...){
+make.model = function(formula = NULL, name = NULL, mesh = NULL, mesh.coords = list(), covariates = list(), eval = list(), ...){
   mdl = list(
     formula = formula,
     name = name,
     mesh = mesh,
     mesh.coords = mesh.coords,
     covariates = covariates,
+    eval = eval,
     args = list(...)
   )
   class(mdl) = c("model","list")
   return(mdl)
+}
+
+#' Evaluate model at given locations
+#'
+#' @aliases evaluate.model
+#' 
+
+evaluate.model = function(model, dframe, result, field = NULL) {
+  if (is.list(model$eval)){
+    vals = list()
+    for (k in 1:length(model$eval)){
+      vals[[k]] = model$eval[[k]](dframe, result, field = field)
+    }
+    return(do.call(cbind,vals))
+  }
+  else {
+    return(model$eval(dframe, result, field = field))
+  }
+}
+
+
+#' Sample from a model
+#'
+#' @aliases sample.model
+#' 
+
+sample.model = function(model, result, n = 1, dframe = NULL) {
+  samples = inla.posterior.sample.structured(result, n)
+  samples = lapply(samples, function(x) {evaluate.model(model, dframe, result = x)})
+  return(samples)
 }
 
 
@@ -221,9 +255,19 @@ make.model = function(formula = NULL, name = NULL, mesh = NULL, mesh.coords = li
 model.intercept = function(data) {
   formula = ~ . -1 + Intercept
   covariates = list( Intercept = function(x) { return(data.frame(Intercept = rep(1, nrow(x)) )) } )
+  
+  eval = function(dframe, result, field = NULL) {
+    if ( is.list(result) ){ w = result$Intercept }
+    else if ( is.numeric(result) ){ w = result }
+    else { stop("Type of result parameter not supported") }
+    val = data.frame(Intercept = rep(w, dim(dframe)[1]))
+    
+    return(val)
+  }
 
   return(make.model(formula = formula,
-                    covariates = covariates))
+                    covariates = covariates,
+                    eval = eval))
 }
 
 
@@ -250,10 +294,21 @@ model.spde = function(data, mesh = data$mesh, ...) {
   
   spde.mdl = do.call(inla.spde2.matern,c(list(mesh=mesh),spde.args)) 
   formula = ~ . + f(spde, model=spde.mdl)
+  
+  eval = function(dframe, result, field = NULL) {
+    if ( is.list(result) ){ weights = result$spde }
+    else if ( is.numeric(result) ){ weights = result }
+    else { stop("Type of field parameter not supported") }
+    A = inla.spde.make.A(mesh, loc = as.matrix(dframe[, data$mesh.coords]))
+    val = data.frame(spde = as.vector(A%*%as.vector(weights)))
+    return(val)
+  }
+  
   return(make.model(name = "Spatial SPDE model",
                     formula = formula,  
                     mesh = list(spde = mesh), 
-                    mesh.coords = list(spde = data$mesh.coords)))
+                    mesh.coords = list(spde = data$mesh.coords),
+                    eval = eval))
 }
 
 
