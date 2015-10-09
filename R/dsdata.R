@@ -117,7 +117,7 @@ summary.dsdata = function(dsdata){
   
   # Survey area
   if ("inner.boundary" %in% names(dsdata)) {
-    msk =  is.inside.polygon(whales$mesh, whales$inner.boundary,sst$mesh$loc, whales$mesh.coords)
+    msk =  is.inside.polygon(whales$mesh, whales$inner.boundary,dsdata$mesh$loc, dsdata$mesh.coords)
     A = sum(Matrix::diag(inla.mesh.fem(dsdata$mesh, order=1)$c0) * msk)
     cat(paste0("Total survey area: A ="), A, " square mesh units","\n")
   }
