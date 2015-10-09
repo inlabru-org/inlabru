@@ -44,7 +44,7 @@ detection.stack = function(data,
   e.pp = rep(E, nrow(pts))
   
   # Create and return stack
-  return(inla.stack(data = list(y = y.pp, e = e.pp),
+  return(inla.stack(data = list(y.inla = y.pp, e = e.pp),
                      A = A,
                      tag = tag,
                      effects = c(idx, eff),
@@ -91,7 +91,7 @@ integration.stack = function(data,
   e.pp = pts[,E]
   
   # Create and return stack
-  return(inla.stack(data = list(y = y.pp, e = e.pp),
+  return(inla.stack(data = list(y.inla = y.pp, e = e.pp),
                     A = A,
                     tag = tag,
                     effects = c(idx, eff)))
@@ -121,7 +121,7 @@ prediction.stack = function(data, model = NULL, pts = NULL, tag = "prediction.st
         ifelse( length(eff) > 0, nrow(eff[[1]]), 0))
   
   # Create and return stack
-  return(inla.stack(data = list(y = rep(NA,np), e = rep(NA,np)),
+  return(inla.stack(data = list(y.inla = rep(NA,np), e = rep(NA,np)),
                     A = A,
                     tag = tag,
                     effects = c(idx, eff)))
@@ -157,7 +157,7 @@ grpsize.stack = function(data,
   e.pp = rep(NA, nrow(pts))
   
   # Create and return stack
-  return(inla.stack(data = list(y = y.pp, e = e.pp),
+  return(inla.stack(data = list(y.inla = y.pp, e = e.pp),
                     A = A,
                     tag = tag,
                     effects = c(idx, eff)))

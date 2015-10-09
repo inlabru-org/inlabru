@@ -65,7 +65,7 @@ is.model = function(mdl) { return(class(mdl)[[1]] == "model")}
 join.model = function(...){
   models = list(...)
   A = list()
-  formula = y ~ - 1
+  formula = y.inla ~ - 1
   environment(formula) = new.env()
   mesh = list()
   mesh.coords = list()
