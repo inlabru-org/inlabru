@@ -207,20 +207,25 @@ make.model = function(formula = NULL, name = NULL, mesh = NULL, mesh.coords = li
 }
 
 #' Evaluate model at given locations
+#' 
+#' Compute an approximation to the linear predictor at given locations and gicen coordinates.
 #'
 #' @aliases evaluate.model
-#' 
+#' @param model An iDistance \link{model}
+#' @param inla.result The result of an \link{inla} run or a sample obtained from \link{inla.posterior.sample.structured}
+#' @param loc Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
+#' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
 
-evaluate.model = function(model, dframe, result, field = NULL) {
+evaluate.model = function(model, inla.result, loc = NULL, property = "mode") {
   if (is.list(model$eval)){
     vals = list()
     for (k in 1:length(model$eval)){
-      vals[[k]] = model$eval[[k]](dframe, result, field = field)
+      vals[[k]] = model$eval[[k]](inla.result, loc, property = property)
     }
     return(do.call(cbind,vals))
   }
   else {
-    return(model$eval(dframe, result, field = field))
+    return(model$eval(inla.result, loc, property = property))
   }
 }
 
@@ -230,9 +235,9 @@ evaluate.model = function(model, dframe, result, field = NULL) {
 #' @aliases sample.model
 #' 
 
-sample.model = function(model, result, n = 1, dframe = NULL) {
-  samples = inla.posterior.sample.structured(result, n)
-  samples = lapply(samples, function(x) {evaluate.model(model, dframe, result = x)})
+sample.model = function(model, inla.result, n = 1, loc = NULL) {
+  samples = inla.posterior.sample.structured(inla.result, n)
+  samples = lapply(samples, function(x) { evaluate.model(model, inla.result = x, loc) } )
   return(samples)
 }
 
@@ -256,11 +261,12 @@ model.intercept = function(data) {
   formula = ~ . -1 + Intercept
   covariates = list( Intercept = function(x) { return(data.frame(Intercept = rep(1, nrow(x)) )) } )
   
-  eval = function(dframe, result, field = NULL) {
-    if ( is.list(result) ){ w = result$Intercept }
-    else if ( is.numeric(result) ){ w = result }
+  eval = function(inla.result, loc, property = "mode") {
+    if (class(inla.result)[[1]] == "inla") { w = inla.result$summary.fixed["Intercept", property]  }
+    else if ( is.list(inla.result) ){ w = inla.result$Intercept }
+    else if ( is.numeric(inla.result) ){ w = inla.result }
     else { stop("Type of result parameter not supported") }
-    val = data.frame(Intercept = rep(w, dim(dframe)[1]))
+    val = data.frame(Intercept = rep(w, dim(loc)[1]))
     
     return(val)
   }
@@ -295,12 +301,14 @@ model.spde = function(data, mesh = data$mesh, ...) {
   spde.mdl = do.call(inla.spde2.matern,c(list(mesh=mesh),spde.args)) 
   formula = ~ . + f(spde, model=spde.mdl)
   
-  eval = function(dframe, result, field = NULL) {
-    if ( is.list(result) ){ weights = result$spde }
-    else if ( is.numeric(result) ){ weights = result }
+  eval = function(inla.result, loc, property = "mode") {
+    if (class(inla.result)[[1]] == "inla"){ weights = inla.result$summary.random$spde[,property] }
+    else if ( is.list(inla.result) ){ weights = inla.result$spde }
+    else if ( is.numeric(inla.result) ){ weights = inla.result }
     else { stop("Type of field parameter not supported") }
-    A = inla.spde.make.A(mesh, loc = as.matrix(dframe[, data$mesh.coords]))
+    A = inla.spde.make.A(mesh, loc = as.matrix(loc[, data$mesh.coords]))
     val = data.frame(spde = as.vector(A%*%as.vector(weights)))
+    
     return(val)
   }
   
