@@ -374,21 +374,29 @@ model.halfnormal = function(truncation, constrained = TRUE, ...){
 #' @param linbasis Wether to use a linear basis function. 
 #' If set to FALSE this implies that that the detection function has zero derivative at the origin. 
 
-model.logconcave = function(truncation, segments = 5, constrained = TRUE, linbasis = TRUE, ...){
+model.logconcave = function(truncation, segments = 5, constrained = TRUE, linbasis = TRUE, quadbasis = TRUE, ...){
   
   # Formula
   nSeg = segments
   if (constrained) {
     params = ",model = 'clinear',hyper=list(theta=list(prior=loggamma)),range = c(-10,0)" # 
     if (linbasis){
-      fml = paste0("~ . + f(linbasis",params,")+",paste0("f(basis_",1:nSeg,params,")",collapse="+"))
+      if (quadbasis) {
+        fml = paste0("~ . + f(linbasis",params,")+",paste0("f(basis_",1:nSeg,params,")",collapse="+"))
+      } else {
+        fml = paste0("~ . + f(linbasis", params, ")")
+      }
     } else {
       fml = paste0("~ . +",paste0("f(basis_",1:nSeg,params,")",collapse="+"))
     }
     
   } else {
     if (linbasis){
-      fml = paste("~ . + linbasis",paste(paste(rep(" + basis_",nSeg),seq(1:nSeg),sep=""),collapse=''),sep="")  
+        if (quadbasis) {
+          fml = paste("~ . + linbasis",paste(paste(rep(" + basis_",nSeg),seq(1:nSeg),sep=""),collapse=''),sep="")  
+        } else {
+          fml = "~ . + linbasis"
+        }
     } else {
       fml = paste("~ . + ",paste(paste(rep(" + basis_",nSeg),seq(1:nSeg),sep=""),collapse=''),sep="")  
     }
