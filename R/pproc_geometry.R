@@ -9,10 +9,13 @@ normalize = function(...){UseMethod("normalize")}
 dist.data.frame = function(sp,ep, geometry){
   class(sp) = c(geometry,"data.frame")
   class(ep) = c(geometry,"data.frame")
-  colnames(sp) = c("x","y")
-  colnames(ep) = c("x","y")
+  #colnames(sp) = c("x","y")
+  #colnames(ep) = c("x","y")
   return(dist(sp,ep))
 } 
+
+### A little tool to remove coordinate annotations
+strip.coords = function(dframe) { names(dframe) = gsub("^.*?\\.","",names(dframe)); return(dframe)}
 
 
 #################################################################################################
