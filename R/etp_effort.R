@@ -41,7 +41,7 @@ as.effort.etpeffort = function(effort, sighting) {
   tmp = cbind(sp[,c("trans.idx","cruise", "ship", "year", "month", "day", "start.time", "start.lat", "start.lon", "start.bft")], 
               ep[,c("end.time","end.lat","end.lon","end.bft")])
   
-  effort = cbind(strat = NaN, trans = NaN, seg = NaN , det = NaN, tmp)
+  effort = cbind(strat = NA, trans = NA, seg = NA , det = NA, tmp)
   
   # merge in sightings
   
@@ -65,15 +65,15 @@ as.effort.etpeffort = function(effort, sighting) {
   
   effort = cbind(effort, 
                  unix.time.start = effort.time, 
-                 species = NA, sight.num = NA, on.eff = NA, grpsize = NaN, distance = NaN, 
-                 Bf = NaN, vis = NaN, time = NaN, lat = NaN, lon = NaN, effort = NaN)
+                 species = NA, sight.num = NA, on.eff = NA, grpsize = NA, distance = NA, 
+                 Bf = NA, vis = NA, time = NA, lat = NA, lon = NA, effort = NA)
   
   sighting = cbind(sighting,
                    unix.time.start = sighting.time,
-                   strat = NaN, trans = NaN, seg = NaN, det = NaN, trans.idx = NaN, ship = NaN, 
-                   start.time = NaN, start.lat = NaN, start.lon = NaN, start.bft = NaN, 
-                   end.time = NaN, end.lat = NaN, end.lon = NaN, end.bft = NaN, 
-                   effort = NaN)
+                   strat = NA, trans = NA, seg = NA, det = NA, trans.idx = NA, ship = NA, 
+                   start.time = NA, start.lat = NA, start.lon = NA, start.bft = NA, 
+                   end.time = NA, end.lat = NA, end.lon = NA, end.bft = NA, 
+                   effort = NA)
   
   
   # colnames(effort)[!(colnames(effort) %in% colnames(sighting))]
@@ -117,7 +117,7 @@ as.effort.etpeffort = function(effort, sighting) {
       }
     }
     # det name
-    if (is.na(effort[k,"distance"])) { det[k] = NaN }
+    if (is.na(effort[k,"distance"])) { det[k] = NA }
     else {    
       if (is.na(effort[k-1,"distance"])) { det[k] = 1 }
       else { det[k] = det[k-1]+1 }
@@ -131,7 +131,7 @@ as.effort.etpeffort = function(effort, sighting) {
   effort$trans = paste(effort$strat, effort$trans, sep = ".")
   effort$seg = paste(effort$trans, seg, sep=".")
   effort$det = paste(effort$seg, det, sep=".")
-  effort$det[is.na(det)] = NaN
+  effort$det[is.na(det)] = NA
   
   # Tidy up
   effort = effort[,!(colnames(effort) == "unix.time.start" | colnames(effort) == "trans.idx" | colnames(effort) == "effort")]
