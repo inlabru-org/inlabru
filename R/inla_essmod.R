@@ -116,7 +116,7 @@ inla.stack.mjoin = function(..., compress = TRUE, remove.unused = TRUE){
 
 inla.stack.mdata = function(stack){
   mdata = inla.stack.data(stack)
-  mdata$y = stack$data$y
+  mdata$y.inla = stack$data$y
   return(mdata)
 }
 
