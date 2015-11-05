@@ -125,8 +125,10 @@ list.covariates.model = function(mdl, pts){
     
     fetched.covar = list()
     for (cov.name in names(covariates)){
-      cov.fun = covariates[[cov.name]]
-      fetched.covar[[cov.name]] = cov.fun(pts)
+      if (is.null(mdl$mesh[[cov.name]])) {
+        cov.fun = covariates[[cov.name]]
+        fetched.covar[[cov.name]] = cov.fun(pts)
+      } else {}
     }
     fetched.covar = do.call(cbind,c(fetched.covar))
     
@@ -158,7 +160,14 @@ list.A.model = function(mdl, points){
     for (k in 1:length(mdl$mesh)) {
       name = names(mdl$mesh)[[k]]
       loc = as.matrix(points[,mdl$mesh.coords[[k]]])
-      A.lst[[name]] = inla.spde.make.A(mdl$mesh[[k]], loc)
+      A = inla.spde.make.A(mdl$mesh[[k]], loc)
+      # Covariates for models with A-matrix are realized in the follwoing way:
+      if (name %in% names(mdl$covariates)) {
+        w = mdl$covariates[[name]](points)
+        if (is.data.frame(w)) { stop("Your covariate function returns a data.frame. This is not allowed, a numeric vector is required.") }
+        A = as.matrix(A)*as.vector(w)
+      }
+      A.lst[[name]] = A
     }
   }  
   if ( length(mdl$covariates) > 0 ) { A.lst = c(A.lst,1) }
@@ -456,10 +465,22 @@ model.grpsize = function(data, mesh = data$mesh, ...) {
   formula = ~ . + f(grps, model = gs.mdl)
   covariates = list()
   
+  eval = function(inla.result, loc, property = "mode") {
+    if (class(inla.result)[[1]] == "inla"){ weights = inla.result$summary.random$grps[,property] }
+    else if ( is.list(inla.result) ){ weights = inla.result$grps }
+    else if ( is.numeric(inla.result) ){ weights = inla.result }
+    else { stop("Type of field parameter not supported") }
+    A = inla.spde.make.A(mesh, loc = as.matrix(loc[, data$mesh.coords]))
+    val = data.frame(spde = as.vector(A%*%as.vector(weights)))
+    
+    return(val)
+  }
+  
   return(make.model(name = "Spatial group size model",
                     formula = formula, 
                     covariates = covariates,
                     mesh = list(grps = mesh),
-                    mesh.coords = list(grps = data$mesh.coords)))
+                    mesh.coords = list(grps = data$mesh.coords),
+                    eval = eval))
 }
 
