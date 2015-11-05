@@ -575,14 +575,15 @@ barycentric.vertices = function(mesh,tri){
 #'
 #' @aliases split.lines
 #' @export
+#' @param mesh An inla.mesh object
 #' @param sp Start points of lines
 #' @param ep End points of lines
-#' @param truncation distance at which we truncate sightings
+#' @param filter.zero.length Filter out segments with zero length? (Bool)
 #' @param ... argments to int.quadrature
 #' @return List of start and end points resulting from splitting the given lines
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-split.lines = function(mesh,sp,ep) {
+split.lines = function(mesh, sp, ep, filter.zero.length = TRUE) {
   
   # locations for splitting
   loc = as.matrix(rbind(sp,ep))
@@ -609,13 +610,17 @@ split.lines = function(mesh,sp,ep) {
   sp = splt$split.loc[splt$split.idx[,1],1:dim(sp)[2]] # Start point of new segments
   ep = splt$split.loc[splt$split.idx[,2],1:dim(ep)[2]] # End points of new segments
   idx = idx[splt$split.idx[,1]]
+  origin = splt$split.origin
   
-  # TEMPORARY: Filter out zero length segments
-  sl = apply((ep-sp)^2,MARGIN=1,sum)
-  sp = sp[!(sl==0),]
-  ep = ep[!(sl==0),]
-  origin = splt$split.origin[!(sl==0)]
-  idx = idx[!(sl==0)]
+  # Filter out zero length segments
+  if ( filter.zero.length ) {
+    sl = apply((ep-sp)^2,MARGIN=1,sum)
+    sp = sp[!(sl==0),]
+    ep = ep[!(sl==0),]
+    origin = origin[!(sl==0)]
+    idx = idx[!(sl==0)]
+  }
+  
   return(list(sp=sp,ep=ep,split.origin=origin,idx=idx))
   
 }
@@ -853,7 +858,8 @@ int.points = function(data,
                   distance.truncation = 1, 
                   fake.distance = FALSE,
                   projection = NULL,
-                  group.by = NULL
+                  group.by = NULL,
+                  filter.zero.length = TRUE
 ){
   
   if (mesh.split) { mesh = mesh.split(mesh) }
@@ -861,8 +867,10 @@ int.points = function(data,
   if (is.data.frame(data)){
     covariates = data
     # Segment/transect start and end points 
-    sp = data[idx[,1],mesh.coords]
-    ep = data[idx[,2],mesh.coords]
+    sp = strip.coords(data[, paste0("start.",mesh.coords)])
+    ep = strip.coords(data[, paste0("end.",mesh.coords)])
+    idx = data.frame(1:nrow(sp), 1:nrow(sp))
+    
   } else {
     
     # Get segments/transect indices
@@ -897,7 +905,7 @@ int.points = function(data,
   
   # Split lines
   if ( line.split ) {
-    line.spl = split.lines(mesh,sp,ep)
+    line.spl = split.lines(mesh, sp, ep, filter.zero.length)
     sp = line.spl$sp
     ep = line.spl$ep
     distance = distance[line.spl$split.origin]
@@ -929,7 +937,7 @@ int.points = function(data,
     fu = function(x) data.frame(cbind(project.weights(x, mesh = data$mesh, mesh.coords = data$mesh.coords),distance = x$distance[1]))
     ips = recurse.rbind(fu, ips, c(list("distance"),group.by))
   }
-  
+  ips = data.frame(ips, idx = idx[,1])
   return(ips)
 }
 
