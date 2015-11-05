@@ -64,6 +64,7 @@ integration.stack = function(data,
                                 filter = NULL,
                                 y = 0,
                                 E = "weight",
+                                const = NULL,
                                 tag = "integration.stack"){
 
   # Extract points from data set
@@ -89,6 +90,10 @@ integration.stack = function(data,
   
   # Expectation parameter E
   e.pp = pts[,E]
+  
+  # Adding constants to the predictor turns into re-weighting the integration points
+  if ( !is.null(const) ){ e.pp = e.pp * exp( const(pts) ) }
+  names(e.pp) = "e.inla" # INLA will complain if the column name coincides with a vraible name on the RHS 
   
   # Create and return stack
   return(inla.stack(data = list(y.inla = y.pp, e = e.pp),
