@@ -937,7 +937,7 @@ int.points = function(data,
     fu = function(x) data.frame(cbind(project.weights(x, mesh = data$mesh, mesh.coords = data$mesh.coords),distance = x$distance[1]))
     ips = recurse.rbind(fu, ips, c(list("distance"),group.by))
   }
-  ips = data.frame(ips, idx = idx[,1])
+  if (length(idx) == dim(ips)[1]) {ips = data.frame(ips, idx = idx[,1])} # only return index if it makes sense
   return(ips)
 }
 
