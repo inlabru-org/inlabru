@@ -276,7 +276,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
   }
   ret = do.call(cbind, posts)
   if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
-  return(data.frame(link(ret)))
+  return(link(ret))
 }
 
 
@@ -418,6 +418,7 @@ model.exponential = function(colname = "distance", truncation = NULL,  constrain
   covariates = list(df.exp = function(X) { return(-X[,colname]) })
   
   return(make.model(name = "Exponential detection function",
+                    effects = "df.exp",
                     formula = formula, 
                     covariates = covariates))
 }
@@ -493,7 +494,11 @@ model.logconcave = function(colname = "distance", truncation = NULL, segments = 
     environment(covariates[[paste0("basis_",k)]])$k = k
   }
   
+  effects = paste0("basis_", 1:nSeg)
+  if (linbasis) { effects = c("linbasis", effects)}
+  
   return(make.model(name = "Log-concave detection function",
+                    effects = effects,
                     formula = formula, 
                     covariates = covariates))
 }
