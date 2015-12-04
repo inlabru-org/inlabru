@@ -44,10 +44,14 @@ list.indices = function(...){UseMethod("list.indices")}
 #' 
 
 summary.model = function(mdl) {
-  cat("--- Model summary --- \n")
-  cat(paste0("Model name: ",mdl$name, "\n"))
-  cat(paste0("Formula:" , mdl$formula, "\n"))
-  cat(paste0("Covariates: ", names(mdl$covariates), "\n"))
+  cat("--- Effects --- \n")
+  for (k in 1:length(mdl$effects)){
+    cat(paste0("'", mdl$effect[k],"' from sub-model '", mdl$name[k], "'\n"))
+  }
+  cat("\n")
+  cat("--- Formula --- \n")
+  cat(as.character(mdl$formula))
+
 }
 
 #' Is it a model?
@@ -66,6 +70,7 @@ is.model = function(mdl) { return(class(mdl)[[1]] == "model")}
 join.model = function(...){
   models = list(...)
   A = list()
+  name = character()
   formula = y.inla ~ - 1
   environment(formula) = new.env()
   mesh = list()
@@ -83,6 +88,7 @@ join.model = function(...){
   
   for (k in 1:length(models)){
     mdl = models[[k]]
+    name = c(name, mdl$name)
     formula = update.formula(formula,mdl$formula)  
     covariates = c(covariates,mdl$covariates)
     effects = c(effects, mdl$effects)
@@ -93,6 +99,7 @@ join.model = function(...){
     eval = c(eval, mdl$eval)
   }
   return(make.model(
+    name = name,
     formula = formula,
     covariates = covariates,
     effects = effects,
@@ -311,7 +318,7 @@ model.intercept = function(data, effects = "Intercept") {
     return(ret) 
   }
   
-  return(make.model(formula = formula, effects = effects, covariates = covariates))
+  return(make.model(name = "Basic Intercept", formula = formula, effects = effects, covariates = covariates))
 }
 
 
