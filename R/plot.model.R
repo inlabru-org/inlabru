@@ -31,6 +31,7 @@ plot.detfun = function(mdl = NULL,
                            loc = NULL,
                            distance.truncation = environment(mdl$formula)$truncation,
                            covariate = mdl$covariates[[name]],
+                           add = FALSE,
                            add.uncertainty = TRUE,
                            add.histogram = TRUE,
                            col = rgb(250/256, 83/256, 62/256, 1),
@@ -51,13 +52,17 @@ plot.detfun = function(mdl = NULL,
     hst = hist(detdata(data)$distance,plot=FALSE, breaks = breaks)
     hst$density = hst$density/mean(hst$density) # normalized 
     uy = max(hst$density[1],max(dmean/mean(dmean)))
-    plot(hst, 
-         freq = FALSE,
-         xaxt = 'n', yaxt = 'n',
-         ylab = "", xlab = "",
-         main = "",
-         ylim = c(0,uy),
-         xlim = c(0,distance.truncation))
+    if ( add ) {
+      
+    } else {
+      plot(hst, 
+           freq = FALSE,
+           xaxt = 'n', yaxt = 'n',
+           ylab = "", xlab = "",
+           main = "",
+           ylim = c(0,uy),
+           xlim = c(0,distance.truncation))
+    }
     scale = 1/mean(dmean)
     yaxt = 'n'
     par(new = TRUE)
@@ -68,15 +73,18 @@ plot.detfun = function(mdl = NULL,
   }
   
   # Plot mode
-  plot(x$distance,scale * dmean,, lwd = 3, col = col,
-       xlim = c(0,distance.truncation), 
-       ylim = c(0,uy),
-       type = "l",
-       yaxt = yaxt,
-       main = "",
-       ylab = "Detection probability", 
-       xlab = "Distance")
-  
+  if (add) {
+    lines(x$distance,scale * dmean, lwd = 3, col = col)
+  } else {
+    plot(x$distance,scale * dmean,, lwd = 3, col = col,
+         xlim = c(0,distance.truncation), 
+         ylim = c(0,uy),
+         type = "l",
+         yaxt = yaxt,
+         main = "",
+         ylab = "Detection probability", 
+         xlab = "Distance")
+  }  
   # Plot uncertainty bounds
   if ( add.uncertainty ) {
     polygon(c(x$distance, rev(x$distance)), scale*c(lower, rev(upper)),  col = ucol, border = NA, yaxt = "n")
