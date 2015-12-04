@@ -95,6 +95,111 @@ plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,...){
 }
 
 
+
+#' Check sanity of a data set
+#' 
+#' @aliases sanity.dsdata 
+#' @export
+#' @param dsdata Distance sampling data set
+#' 
+#' @examples \dontrun{ data(toy1) ; sanity(toy1) }
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+
+sanity.dsdata = function(dset){
+
+  # Error handlers
+  sanity.stop = function(ret) { if (!ret$sane) { stop(ret$message) } else { cat(" [OK]\n") } }
+  sanity.warning = function(ret) { if (!ret$sane) { warning(ret$message) } else { cat(" [OK]\n") } }
+  
+  # Checks
+  
+  cat("Checking if data set has all the necessary fields ...")
+  sanity.stop(sanity.fields(dset, message = TRUE))
+  
+  cat("Checking if $effort has all the necessary columns ...")
+  sanity.stop(sanity.columns(dset, message = TRUE))
+  
+  cat("Checking if effort$seg is sorted ...")
+  sanity.stop(sanity.unsorted(dset, message = TRUE))
+  
+  cat("Checking if all segments are inside the mesh boundary ...")
+  sanity.stop(sanity.effort.inside(dset, message = TRUE))
+  
+  cat("Checking if all detections are inside the mesh boundary ...")
+  sanity.stop(sanity.detection.inside(dset, message = TRUE))
+  
+  cat("Checking if any distances are NA or NaN...")
+  sanity.stop(sanity.finite(dset, message = TRUE))
+  
+  #
+  # The following checks will only throw warnings
+  #
+  
+  cat("Checking if $effort has distance column ...")
+  sanity.warning(sanity.distance(dset, message = TRUE))
+  
+}
+
+
+# Finite data?
+sanity.finite = function(dset, message = FALSE) {
+  # cols = c(paste0("start.",dset$mesh.coords), paste0("end.",dset$mesh.coords), dset$mesh.coords, "distance")
+  cols = "distance"
+  sane = !any(!is.finite(as.matrix(detdata(dset)[,cols]))) 
+  if ( message & !sane) { message = paste0("Non-finite values in one of the following columns: ", do.call(paste, c(as.list(cols),sep = ", "))) }
+  return(list(sane = sane, message = message))
+}
+
+
+# Has all the fields? effort, mesh, mesh.coords, geometry
+sanity.fields = function(dset, message = FALSE) {
+  cols = c("mesh", "effort", "mesh.coords", "geometry")
+  sane = !any(!(cols %in% names(dset)))
+  if ( message & !sane) { message = paste0("The data set is missing one of the fields: ", do.call(paste, c(as.list(cols),sep = ", "))) }
+  return(list(sane = sane, message = message))
+}
+
+# Has Distance column
+sanity.distance = function(dset, message = FALSE) {
+  cols = c("mesh", "effort", "mesh.coords", "geometry")
+  sane = "distance" %in% names(dset$effort)
+  if ( message & !sane) { message = "The effort has not distance column"  }
+  return(list(sane = sane, message = message))
+}
+
+
+# Has all the columns: strat, trans, seg, det
+sanity.columns = function(dset, message = FALSE) {
+  cols = c("strat", "trans", "seg", "det")
+  sane = !any(!(cols %in% names(dset$effort)))
+  if ( message & !sane) { message = paste0("The data set is missing one of the following colums: ", do.call(paste, c(as.list(cols),sep = ", "))) }
+  return(list(sane = sane, message = message))
+}
+
+# Segments sorted?
+sanity.unsorted = function(dset, message = FALSE) {
+  sane = !is.unsorted(order(dset$effort$seg))
+  if ( message & !sane ) { message = "Segments are not sorted" }
+  return(list(sane = sane, message = message))
+}
+
+
+# All detections inside mesh ?
+sanity.detection.inside = function(dset, message = FALSE){
+  sane = !any(!(is.inside(dset$mesh, detdata(dset), mesh.coords = dset$mesh.coords)))
+  if ( message & !sane) { message = "There are detections outside the mesh." }
+  return(list(sane = sane, message = message))
+}
+
+# All effort inside mesh?
+sanity.effort.inside = function(dset, message = FALSE){
+  sane = !any(!(is.inside(dset$mesh, dset$effort[is.na(dset$effort$det),], mesh.coords = paste0("start.",dset$mesh.coords))))
+  if ( message & !sane) { message = "There is effort outside the mesh." }
+  return(list(sane = sane, message = message))
+}
+
+
+
 #' Summarize generic distance sampling data
 #' 
 #' @aliases summary.dsdata 
@@ -136,6 +241,7 @@ summary.dsdata = function(dsdata){
   
 }
 
+sanity = function(...){UseMethod("sanity")}
 as.transect = function(...){UseMethod("as.transect")}
 as.segment = function(...){UseMethod("as.segment")}
 as.detection = function(...){UseMethod("as.detection")}
