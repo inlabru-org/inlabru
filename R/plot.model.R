@@ -1,12 +1,22 @@
-#' Plot a half normal detection function
-#'
+#' Plot a half-normal detection function
+#' 
+#' See \link{plot.detfun} for details
 #'
 #' @aliases plot plot.halfnormal
+#' @export
+
+plot.halfnormal = function(...) { plot.detfun(...) }
+
+
+#' Plot a detection function
+#'
+#'
+#' @aliases plot plot.detfun
 #' @export
 #' @param mdl A \link{model} object
 #' @param result An \link{inla} object, i.e. the result of running INLA
 #' @param data iDistance data structure. Used to plot a histogram of the detections.
-#' @param name Name of the effect used to model the detection function. Default: "nhsd"
+#' @param loc Distance at which to plot at (optional)
 #' @param distance.truncation Distance at which to truncate
 #' @param covariate Function transforming distances into effect covariates
 #' @param add.uncertainty Plot uncertainty boundaries
@@ -15,35 +25,23 @@
 #' @param ucol Color to plot uncertainty polygon
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-plot.halfnormal = function(mdl = NULL,
+plot.detfun = function(mdl = NULL,
                            result = NULL, 
                            data = NULL,  
-                           name = "nhsd", 
+                           loc = NULL,
                            distance.truncation = environment(mdl$formula)$truncation,
                            covariate = mdl$covariates[[name]],
                            add.uncertainty = TRUE,
                            add.histogram = TRUE,
                            col = rgb(250/256, 83/256, 62/256, 1),
-                           ucol = rgb(250/256, 83/256, 62/256, 0.3)) {
+                           ucol = rgb(250/256, 83/256, 62/256, 0.3), ...) {
 
-  hyper.name = paste("Beta for",name)
+  if (is.null(loc)) { x = data.frame(distance = seq(0, distance.truncation, length.out = 100)) }
+  else { x = loc }
   
-  if (hyper.name %in% rownames(result$summary.hyperpar)) {
-    qtl.dist.lower = result$summary.hyperpar[hyper.name,"0.025quant"]
-    qtl.dist.upper = result$summary.hyperpar[hyper.name,"0.975quant"]
-    de = result$summary.hyperpar[hyper.name,"mean"]
-  } 
-  else {
-    qtl.dist.lower = result$summary.fixed[name,"0.025quant"]
-    qtl.dist.upper = result$summary.fixed[name,"0.975quant"]
-    de = result$summary.fixed[name,"mode"]
-  }
-  
-  x = data.frame(distance = seq(0, distance.truncation, length.out = 100))
-  
-  upper = exp(qtl.dist.upper * covariate(x))
-  dmean = exp(de*covariate(x))
-  lower = exp(qtl.dist.lower * covariate(x))
+  upper = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.975quant", link = exp)
+  dmean = evaluate.model(model = mdl, inla.result = result, loc = x, property = "mode", link = exp)
+  lower = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.025quant", link = exp)
   
   # If data was provided, plot histogram
   if ( !is.null(data) & add.histogram ) {
@@ -85,7 +83,6 @@ plot.halfnormal = function(mdl = NULL,
   }
   
 }
-
 
 #' Plot spatial field
 #'
