@@ -69,6 +69,7 @@ join.model = function(...){
   formula = y.inla ~ - 1
   environment(formula) = new.env()
   mesh = list()
+  effects = character()
   mesh.coords = list()
   covariates = list()
   eval = list()
@@ -84,6 +85,7 @@ join.model = function(...){
     mdl = models[[k]]
     formula = update.formula(formula,mdl$formula)  
     covariates = c(covariates,mdl$covariates)
+    effects = c(effects, mdl$effects)
     mesh = c(mesh,mdl$mesh)
     mesh.coords = c(mesh.coords,mdl$mesh.coords)
     A = c(A,mdl$A)
@@ -93,6 +95,7 @@ join.model = function(...){
   return(make.model(
     formula = formula,
     covariates = covariates,
+    effects = effects,
     mesh = mesh,
     mesh.coords = mesh.coords,
     eval = eval
@@ -201,10 +204,11 @@ list.indices.model = function(mdl, ...){
 #' @aliases make.model
 #' 
 
-make.model = function(formula = NULL, name = NULL, mesh = NULL, mesh.coords = list(), covariates = list(), eval = list(), ...){
+make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, mesh.coords = list(), covariates = list(), eval = list(), ...){
   mdl = list(
     formula = formula,
     name = name,
+    effects = effects,
     mesh = mesh,
     mesh.coords = mesh.coords,
     covariates = covariates,
@@ -239,6 +243,37 @@ evaluate.model = function(model, inla.result, loc = NULL, property = "mode") {
 }
 
 
+evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity) {
+  cov = do.call(cbind, list.covariates.model(model, loc))
+  Amat = list.A.model(model, loc)
+  
+  posts = list()
+  
+  for (k in 1:length(model$effects)){
+    name = model$effects[k]
+    if (is.null(name)) { name =  names(model$mesh)[[k]] }
+    # Either fixed effect or hyper parameter
+    if (name %in% rownames(inla.result$summary.fixed)){
+      # Fixed effect
+      post = inla.result$summary.fixed[name, property] * cov[[name]]
+    } else if (paste0("Beta for ",name) %in% rownames(inla.result$summary.hyperpar)) {
+      # Hyper parameter
+      post = inla.result$summary.hyperpar[paste0("Beta for ",name), property] * cov[[name]]
+    } else {
+      # SPDE model   
+      post = inla.result$summary.random[[name]][,property]
+      A = Amat[[name]]
+      post = as.vector(A%*%as.vector(post))
+    }
+    posts[[name]] = post
+  }
+  ret = do.call(cbind, posts)
+  if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
+  return(data.frame(link(ret)))
+}
+
+
+
 #' Sample from a model
 #'
 #' @aliases sample.model
@@ -266,23 +301,17 @@ sample.model = function(model, inla.result, n = 1, loc = NULL) {
 #' @aliases model.intercept
 #' 
 
-model.intercept = function(data) {
-  formula = ~ . -1 + Intercept
-  covariates = list( Intercept = function(x) { return(data.frame(Intercept = rep(1, nrow(x)) )) } )
-  
-  eval = function(inla.result, loc, property = "mode") {
-    if (class(inla.result)[[1]] == "inla") { w = inla.result$summary.fixed["Intercept", property]  }
-    else if ( is.list(inla.result) ){ w = inla.result$Intercept }
-    else if ( is.numeric(inla.result) ){ w = inla.result }
-    else { stop("Type of result parameter not supported") }
-    val = data.frame(Intercept = rep(w, dim(loc)[1]))
-    
-    return(val)
+model.intercept = function(data, effects = "Intercept") {
+  formula = as.formula(paste0("~ . -1 + ", effects))
+  covariates = list()
+  covariates[[effects]] = function(x) {
+    v = rep(1, nrow(x))
+    ret = data.frame(v)
+    colnames(ret) = effects
+    return(ret) 
   }
-
-  return(make.model(formula = formula,
-                    covariates = covariates,
-                    eval = eval))
+  
+  return(make.model(formula = formula, effects = effects, covariates = covariates))
 }
 
 
@@ -310,24 +339,12 @@ model.spde = function(data, mesh = data$mesh, ...) {
   spde.mdl = do.call(inla.spde2.matern,c(list(mesh=mesh),spde.args)) 
   formula = ~ . + f(spde, model=spde.mdl)
   
-  eval = function(inla.result, loc, property = "mode") {
-    if (class(inla.result)[[1]] == "inla"){ weights = inla.result$summary.random$spde[,property] }
-    else if ( is.list(inla.result) ){ weights = inla.result$spde }
-    else if ( is.numeric(inla.result) ){ weights = inla.result }
-    else { stop("Type of field parameter not supported") }
-    A = inla.spde.make.A(mesh, loc = as.matrix(loc[, data$mesh.coords]))
-    val = data.frame(spde = as.vector(A%*%as.vector(weights)))
-    
-    return(val)
-  }
-  
   return(make.model(name = "Spatial SPDE model",
-                    formula = formula,  
+                    formula = formula,
+                    effects = "spde",
                     mesh = list(spde = mesh), 
-                    mesh.coords = list(spde = data$mesh.coords),
-                    eval = eval))
+                    mesh.coords = list(spde = data$mesh.coords)))
 }
-
 
 #####################################
 # MODELS: Detection functions
@@ -342,24 +359,58 @@ model.spde = function(data, mesh = data$mesh, ...) {
 #' Hence, the effect is obtained from a contrained linear INLA model. The covariate "nhsd" for this model is as a 
 #' function of the data.frame provided during the inference process:
 #'  
-#'  nhsd = function(X) { return(-0.5*X$distance^2) },
+#'  nhsd = function(X) { return(-0.5*X[,colname]^2) },
 #'  
 #' that is, nhsd is half of the negative squared distance of an observation/integration point.
 #'
 #' @aliases model.halfnormal
+#' @param colname Effort data column to use for the covariate extraction. Default: "distance"
 #' @param truncation Distance to truncate at. Currently unused but passed on the the formula environment for later usage.
 #' @param constrained If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging. 
 #' 
 
-model.halfnormal = function(truncation, constrained = TRUE, ...){
+model.halfnormal = function(colname = "distance", truncation = NULL,  constrained = TRUE){
   # Formula
   if (!constrained) { formula = ~ . + nhsd }
   else { formula = ~. + f(nhsd, model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1))))}
   
   # Covariate
-  covariates = list(nhsd = function(X) { return(-0.5*X$distance^2) })
+  covariates = list(nhsd = function(X) { return(-0.5*X[,colname]^2) })
   
   return(make.model(name = "Half-normal detection function",
+                    formula = formula, 
+                    effects = "nhsd",
+                    covariates = covariates))
+}
+
+
+#' Expoential detection function model
+#'
+#' Construct a exponential detection function model using the formula
+#' 
+#'  ~ . + f(df.exp, model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1))))
+#'
+#' Hence, the effect is obtained from a contrained linear INLA model. The covariate "df.exp" for this model is as a 
+#' function of the data.frame provided during the inference process:
+#'  
+#'  df.exp = function(X) { return(-X[,colname]) },
+#'  
+#'
+#' @aliases model.exponential
+#' @param colname Effort data column to use for the covariate extraction. Default: "distance"
+#' @param truncation Distance to truncate at. Currently unused but passed on the the formula environment for later usage.
+#' @param constrained If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging. 
+#' 
+
+model.exponential = function(colname = "distance", truncation = NULL,  constrained = TRUE){
+  # Formula
+  if (!constrained) { formula = ~ . + df.exp }
+  else { formula = ~. + f(df.exp, model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1))))}
+  
+  # Covariate
+  covariates = list(df.exp = function(X) { return(-X[,colname]) })
+  
+  return(make.model(name = "Exponential detection function",
                     formula = formula, 
                     covariates = covariates))
 }
@@ -376,14 +427,15 @@ model.halfnormal = function(truncation, constrained = TRUE, ...){
 #'  whare K is the number of segments the basis lives on.
 #'   
 #' @aliases model.logconcave
+#' @param colname Effort data column to use for the covariate extraction. Default: "distance"
 #' @param truncation Maximum distance assumed to be observed..
 #' @param segments Number of quadratic basis basis functions
-#' @param clinear If set to false, non-constrained linear INLA effects are used for this mode. 
+#' @param clinear If set to false, non-constrained linear INLA effects are used for this model. 
 #' This is handy for debugging but the detection function is not necessarily log-concave anymore.
 #' @param linbasis Wether to use a linear basis function. 
 #' If set to FALSE this implies that that the detection function has zero derivative at the origin. 
 
-model.logconcave = function(truncation, segments = 5, constrained = TRUE, linbasis = TRUE, quadbasis = TRUE, ...){
+model.logconcave = function(colname = "distance", truncation = NULL, segments = 5, constrained = TRUE, linbasis = TRUE, quadbasis = TRUE, ...){
   
   # Formula
   nSeg = segments
@@ -401,11 +453,11 @@ model.logconcave = function(truncation, segments = 5, constrained = TRUE, linbas
     
   } else {
     if (linbasis){
-        if (quadbasis) {
-          fml = paste("~ . + linbasis",paste(paste(rep(" + basis_",nSeg),seq(1:nSeg),sep=""),collapse=''),sep="")  
-        } else {
-          fml = "~ . + linbasis"
-        }
+      if (quadbasis) {
+        fml = paste("~ . + linbasis",paste(paste(rep(" + basis_",nSeg),seq(1:nSeg),sep=""),collapse=''),sep="")  
+      } else {
+        fml = "~ . + linbasis"
+      }
     } else {
       fml = paste("~ . + ",paste(paste(rep(" + basis_",nSeg),seq(1:nSeg),sep=""),collapse=''),sep="")  
     }
@@ -425,10 +477,10 @@ model.logconcave = function(truncation, segments = 5, constrained = TRUE, linbas
   
   # Covariate
   covariates = list()
-  if (linbasis) { covariates = c(covariates, list(linbasis = function(x) { return(x$distance) }) ) }
+  if (linbasis) { covariates = c(covariates, list(linbasis = function(x) { return(x[,colname]) }) ) }
   for ( k in 1:nSeg ) {
     covariates[[paste0("basis_",k)]] = function(x) { 
-      return( data.frame(dfun_logconcave.basis.value(x$distance,nSeg,truncation))[,paste0("basis_",k)] )
+      return( data.frame(dfun_logconcave.basis.value(x[,colname],nSeg,truncation))[,paste0("basis_",k)] )
     }
     environment(covariates[[paste0("basis_",k)]]) = new.env(parent=environment())
     environment(covariates[[paste0("basis_",k)]])$k = k
@@ -438,6 +490,59 @@ model.logconcave = function(truncation, segments = 5, constrained = TRUE, linbas
                     formula = formula, 
                     covariates = covariates))
 }
+
+#' Expoential detection function model in two dimensions
+#'
+#'
+#' @aliases model.exponential2d
+#' @param colname Effort data column to use for the covariate extraction. Default: c("distance","lgrpsize")
+#' @param truncation Distance and log group size at which to truncate. Default: c(6,6)
+#' @param constrained If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging. 
+#' 
+
+model.exponential2d = function(colname = c("distance","lgrpsize"), truncation = c(6,6), constrained = TRUE, ...){
+  
+  truncation = as.list(truncation)
+  names(truncation) = colname
+  
+  # Formula
+  if (!constrained) { formula = ~ . + gdet.beta0 + gdet.beta1 }
+  else { 
+    formula = ~. + f(gdet.beta0, model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1)))) +
+      f(gdet.beta1, model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1))))
+  }
+  gdet.beta0.cov = function(X) { return( ( (1 - X[,colname[2]]/truncation[[colname[1]]])) * -X[,colname[1]] ) }
+  gdet.beta1.cov = function(X) { return( ( (X$colname[2]) / truncation[[colname[1]]]) * -X[,colname[1]] ) }
+  covariates = list(gdet.beta0 = gdet.beta0.cov, gdet.beta1 = gdet.beta1.cov)
+  
+  
+  eval = function(inla.result, loc, property = "mode", mdl = NULL) {
+    if (class(inla.result)[[1]] == "inla") {       
+      if ( "gdet.beta0" %in% colnames(inla.result$summary.fixed) ) { gdet.beta0 = inla.result$summary.fixed["gdet.beta0", property] }
+      else { gdet.beta0 = inla.result$summary.hyperpar["Beta for gdet.beta0", property] }
+      if ( "gdet.beta1" %in% colnames(inla.result$summary.fixed) ) { gdet.beta1 = inla.result$summary.fixed["gdet.beta1", property] }
+      else { gdet.beta1 = inla.result$summary.hyperpar["Beta for gdet.beta1", property] }
+    }
+    else if ( is.list(inla.result) ){ 
+      gdet.beta0 = inla.result$gdet.beta0
+      gdet.beta1 = inla.result$gdet.beta1
+    }
+    else if ( is.numeric(inla.result) ){ 
+      gdet.beta0 = inla.result$gdet.beta0
+      gdet.beta1 = inla.result$gdet.beta1
+    }
+    else { stop("Type of result parameter not supported") }
+    val = data.frame(gdet.beta0 = gdet.beta0*gdet.beta0.cov(loc), gdet.beta1 = gdet.beta1*gdet.beta1.cov(loc))    
+    return(val)
+  }
+  
+  return(make.model(name = "2D exponential detection function",
+                    formula = formula, 
+                    covariates = covariates,
+                    eval = eval,
+                    args = list(truncation = truncation, constrained = constrained)))
+}
+
 
 #####################################
 # MODELS: Group size
@@ -483,4 +588,3 @@ model.grpsize = function(data, mesh = data$mesh, ...) {
                     mesh.coords = list(grps = data$mesh.coords),
                     eval = eval))
 }
-
