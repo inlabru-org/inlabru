@@ -39,7 +39,7 @@ plot.halfnormal = function(mdl = NULL,
     de = result$summary.fixed[name,"mode"]
   }
   
-  x = data.frame(distance = seq(0,distance.truncation,0.1))
+  x = data.frame(distance = seq(0, distance.truncation, length.out = 100))
   
   upper = exp(qtl.dist.upper * covariate(x))
   dmean = exp(de*covariate(x))
@@ -48,16 +48,18 @@ plot.halfnormal = function(mdl = NULL,
   # If data was provided, plot histogram
   if ( !is.null(data) & add.histogram ) {
     # Compute data histogram, replace values to plot by area normalized to 1
-    n.breaks = 10 # breaks=seq(0,mdl$int.args$truncation,length.out=n.breaks)
-    hst = hist(detdata(data)$distance,plot=FALSE)
-    hst$density = length(hst$density)*hst$density/sum(hst$density,feq=FALSE) # normalized
+    n.breaks = 10
+    breaks = seq(0,distance.truncation,length.out=n.breaks)
+    hst = hist(detdata(data)$distance,plot=FALSE, breaks = breaks)
+    hst$density = hst$density/mean(hst$density) # normalized 
+    uy = max(hst$density[1],max(dmean/mean(dmean)))
     plot(hst, 
          freq = FALSE,
          xaxt = 'n', yaxt = 'n',
          ylab = "", xlab = "",
          main = "",
-         ylim = c(0,hst$density[1]))
-    uy = hst$density[1]
+         ylim = c(0,uy),
+         xlim = c(0,distance.truncation))
     scale = 1/mean(dmean)
     yaxt = 'n'
     par(new = TRUE)
