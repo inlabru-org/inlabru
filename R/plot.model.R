@@ -29,6 +29,7 @@ plot.detfun = function(mdl = NULL,
                            result = NULL, 
                            data = NULL,  
                            loc = NULL,
+                           do.ecdf = FALSE,
                            distance.truncation = environment(mdl$formula)$truncation,
                            covariate = mdl$covariates[[name]],
                            add = FALSE,
@@ -37,7 +38,7 @@ plot.detfun = function(mdl = NULL,
                            col = rgb(250/256, 83/256, 62/256, 1),
                            ucol = rgb(250/256, 83/256, 62/256, 0.3), ...) {
 
-  if (is.null(loc)) { x = data.frame(distance = seq(0, distance.truncation, length.out = 100)) }
+  if (is.null(loc)) { x = data.frame(distance = seq(0, distance.truncation, length.out = 500)) }
   else { x = loc }
   
   upper = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.975quant", link = exp)
@@ -46,22 +47,36 @@ plot.detfun = function(mdl = NULL,
   
   # If data was provided, plot histogram
   if ( !is.null(data) & add.histogram ) {
-    # Compute data histogram, replace values to plot by area normalized to 1
-    n.breaks = 10
-    breaks = seq(0,distance.truncation,length.out=n.breaks)
-    hst = hist(detdata(data)$distance,plot=FALSE, breaks = breaks)
-    hst$density = hst$density/mean(hst$density) # normalized 
-    uy = max(hst$density[1],max(dmean/mean(dmean)))
-    if ( add ) {
-      
+    if ( do.ecdf ) {
+      dfdata = detdata(dset)$distance
+      df = ecdf(dfdata)
+      x.plot = seq(0,distance.truncation,length.out=100)
+      if ( add ) { lines(x,1-df(x$distance)) }
+      else {
+        plot(x.plot, 1-df(x.plot), type = "l",
+             xaxt = 'n', yaxt = 'n',
+             ylab = "", xlab = "",
+             main = "",)
+      }
+      uy = 1
     } else {
-      plot(hst, 
-           freq = FALSE,
-           xaxt = 'n', yaxt = 'n',
-           ylab = "", xlab = "",
-           main = "",
-           ylim = c(0,uy),
-           xlim = c(0,distance.truncation))
+      # Compute data histogram, replace values to plot by area normalized to 1
+      n.breaks = 10
+      breaks = seq(0,distance.truncation,length.out=n.breaks)
+      hst = hist(detdata(data)$distance,plot=FALSE, breaks = breaks)
+      hst$density = hst$density/mean(hst$density) # normalized 
+      uy = max(hst$density[1],max(dmean/mean(dmean)))
+      if ( add ) {
+        
+      } else {
+        plot(hst, 
+             freq = FALSE,
+             xaxt = 'n', yaxt = 'n',
+             ylab = "", xlab = "",
+             main = "",
+             ylim = c(0,uy),
+             xlim = c(0,distance.truncation))
+      }
     }
     scale = 1/mean(dmean)
     yaxt = 'n'
@@ -72,11 +87,21 @@ plot.detfun = function(mdl = NULL,
     yaxt = NULL
   }
   
+  # Are we plotting the ECDF?
+  if ( do.ecdf ) { 
+    y.plot = 1-cumsum(dmean)/sum(dmean)
+    y.boundary = c(1-cumsum(lower)/sum(lower), rev(1-cumsum(upper)/sum(upper)) ) #1-cumsum(upper)/sum(upper)
+  }
+  else { 
+    y.plot = scale * dmean
+    y.boundary = scale*c(lower, rev(upper))
+  }
+  
   # Plot mode
   if (add) {
-    lines(x$distance,scale * dmean, lwd = 3, col = col)
+    lines(x$distance,y.plot, lwd = 3, col = col)
   } else {
-    plot(x$distance,scale * dmean,, lwd = 3, col = col,
+    plot(x$distance,y.plot, lwd = 3, col = col,
          xlim = c(0,distance.truncation), 
          ylim = c(0,uy),
          type = "l",
@@ -87,7 +112,7 @@ plot.detfun = function(mdl = NULL,
   }  
   # Plot uncertainty bounds
   if ( add.uncertainty ) {
-    polygon(c(x$distance, rev(x$distance)), scale*c(lower, rev(upper)),  col = ucol, border = NA, yaxt = "n")
+    polygon(c(x$distance, rev(x$distance)), y.boundary,  col = ucol, border = NA, yaxt = "n")
   }
   
 }
