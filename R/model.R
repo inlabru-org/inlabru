@@ -236,7 +236,7 @@ make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, 
 #' @param loc Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
 
-evaluate.model = function(model, inla.result, loc = NULL, property = "mode") {
+evaluate.model.old = function(model, inla.result, loc = NULL, property = "mode") {
   if (is.list(model$eval)){
     vals = list()
     for (k in 1:length(model$eval)){
@@ -356,6 +356,23 @@ model.spde = function(data, mesh = data$mesh, ...) {
 #####################################
 # MODELS: Detection functions
 #####################################
+
+
+#' Create detection function model
+#' 
+#' A wrapper for convenient construction of different detection functions (see parameter \code{type}).
+#' For further help use the help files of the wrapped functions, e.g. \code{model.halfnormal()}
+#' 
+#' @aliases model.detfun
+#' @param type Character setting the type of detection function. Options: "halfnormal", "exponential", "logconcave".
+
+model.detfun = function(type, ...) {
+  if (type == "halfnormal") { return(model.halfnormal(...))}
+  else if (type == "exponential") { return(model.exponential(...))}
+  else if (type == "logconcave") { return(model.logconcave(...))}
+  else { stop(paste0("Unknown detection function type: ", type)) }
+}
+
 
 #' Half-normal detection function model
 #'
