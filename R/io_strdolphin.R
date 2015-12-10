@@ -135,7 +135,6 @@ io_strdolphin.sighting = function(years=NULL,E=NULL,BfLim=NULL,PDLim=NULL)
   
   # rename
   names(sightdat)[names(sightdat) %in% "perpdist"] = "PD"
-  names(sightdat)[names(sightdat) %in% "bft"] = "Bf"
   
   # Filter out on.eff=0
   sightdat = sightdat[sightdat$on.eff==1, ]
@@ -155,7 +154,7 @@ io_strdolphin.sighting = function(years=NULL,E=NULL,BfLim=NULL,PDLim=NULL)
   # Tim commented that it is not LT mode if Bft>5
   if (is.numeric(BfLim)) {
     #print("io_strdolphin.sightings(): Filtering Bf")
-    sightdat = sightdat[sightdat$Bf<=BfLim,]
+    sightdat = sightdat[sightdat$bft<=BfLim,]
   } 
   
   # Distance limit
