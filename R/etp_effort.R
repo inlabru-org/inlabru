@@ -229,7 +229,7 @@ endpoint.etptransect = function(tr,data=data,keep=FALSE) {
   else { return(data$effort[tr$end,c("lat","lon")]) } 
 }
 
-numel.etptransect = function(tr,data=data) { return(dim(tr)[1]) }
+numtr.etptransect = function(tr,data=data) { return(dim(tr)[1]) }
 
 linedata.etptransect = function(tr,data,fields){
   return(data$effort[tr$start,fields])

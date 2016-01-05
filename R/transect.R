@@ -62,7 +62,7 @@ endpoint = function(...){UseMethod("endpoint")}
 len = function(...){UseMethod("len")}
 tim = function(...){UseMethod("tim")}
 gaplen = function(...){UseMethod("gaplen")}
-numel = function(...){UseMethod("numel")}
+numtr = function(...){UseMethod("numtr")}
 linedata = function(...){UseMethod("linedata")}
 
 

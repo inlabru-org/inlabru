@@ -395,14 +395,14 @@ endpoint.transect = function(tr,data,keep=FALSE) {
 
 #' Number of transects
 #' 
-#' @aliases numel.transect
+#' @aliases numtr.transect
 #' @export
 #' @param transects
 #' @param data Data set with $effort
 #' @return n
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-numel.transect = function(tr,data=data) { return(dim(tr)[1]) }
+numtr.transect = function(tr,data=data) { return(dim(tr)[1]) }
 
 
 #' Linedata
