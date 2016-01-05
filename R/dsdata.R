@@ -21,6 +21,58 @@
 #' 
 NULL
 
+
+#' Make dsdata 
+#' 
+#' @aliases make.dsdata 
+#' @export
+#' @examples \dontrun{  }
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#' 
+
+make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords = NULL, ...) {
+  if (is.null(effort)) { 
+    stop("You have to provide an effort data frame.") 
+  }
+  
+  if (is.null(geometry) | !any((geometry %in% c("euc", "geo")))) { 
+    stop(paste0("You have to provide a geometry that is not supported: ",geometry)) 
+  }
+  
+  if (is.null(mesh)) { 
+    stop("You have to provide a mesh.")
+  }
+  
+  if (is.null(mesh.coords)) { 
+    stop("You have to provide mesh.coords.")
+  }
+  
+  #
+  # Seems like we have all we need. Let's assemble the dsdata object.
+  #
+  
+  dset = list(effort = effort,
+            geometry = geometry,
+            mesh = mesh,
+            mesh.coords = mesh.coords, ...)  
+  
+  class(dset) = c("dsdata", "list")
+  
+  #
+  # Sanity check
+  #
+  
+  sanity(dset)
+  
+  #
+  # Done.
+  # 
+  
+  return(dset)
+  
+}
+
+
 #' Plot generic distance sampling data
 #' 
 #' @aliases plot.dsdata 
