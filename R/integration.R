@@ -189,7 +189,7 @@ midpoint.integration = function(data,group,distance){
   tr = data$transect
   spoint = startpoint(tr,data)
   epoint = endpoint(tr,data)
-  weight = 2*dist(epoint,spoint)/length(distance)
+  weight = 2*distance(epoint,spoint)/length(distance)
   ipoint = ssum(spoint,epoint)/2
   ips = list()
   for (k in 1:length(distance)) {
@@ -253,7 +253,7 @@ ischeme = function(spoints,epoints,n.dist=5,truncation=6,R=6371,project=FALSE,..
     epoints$z = 0
   }
   # Finns integration scheme
-  len = dist(spoints,epoints)
+  len = distance(spoints,epoints)
   tim = tdist(spoints,epoints)
   w.hat.s = sum(len)
   w.hat.t = sum(tim)
@@ -320,7 +320,7 @@ grid.integration = function(data,group,n.distance=3,n.length=3,truncation=3){
         locvec = ssum(epoint,-spoint)
         orthvec = normalize.euc(data.frame(x=locvec$y,y=-locvec$x));
         pt = spoint + orthvec*d + l*locvec
-        pt$weight = 2*dist(epoint,spoint)*truncation/(length(distance)*length(lens))
+        pt$weight = 2*distance(epoint,spoint)*truncation/(length(distance)*length(lens))
         pt$distance = abs(d)
         ips[[i]] = pt
         i=i+1

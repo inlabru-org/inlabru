@@ -1,7 +1,7 @@
 ##############
 # GENERICS
 ssum = function(...){UseMethod("ssum")}
-dist = function(...){UseMethod("dist")}
+distance = function(...){UseMethod("distance")}
 normalize = function(...){UseMethod("normalize")}
 
 ### Unknown space
