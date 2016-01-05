@@ -38,9 +38,6 @@ summary.dfun = function(dfun){
   cat(paste0("Rate mean per transect length unit: ", mrate/trlen)," -log-> ", log(mrate/trlen))
 }
 
-# Plot ecdf generic
-plot.ecdf <- function(x) UseMethod("plot.ecdf")
-
 #' Evaluate detection function at given distances
 #' 
 #' @aliases value

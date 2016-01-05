@@ -21,7 +21,6 @@ pproc= function(family,data,...){
 lgcp = function(...){ return(pproc_lgcp(...)) }
 
 # GENERICS
-simulate = function(...){UseMethod("simulate")}
 logintensity = function(...){UseMethod("logintensity")}
 
 summary.pproc = function(pproc, include.random=FALSE){
