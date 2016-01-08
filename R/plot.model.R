@@ -186,7 +186,6 @@ plot.spatial = function(mdl = NULL,
       if (!add){ rgl.open() }
       bg3d(color = "white")
       rgl.earth()
-      rgl.sphmesh(mesh, add=TRUE, radius=1.001, col = col)
       
       # Plot detections and integration points
       if ( add.detections ) { rgl.sphpoints(long = det.points$lon+360, lat = det.points$lat, radius = 1.01, col="red", size = 5) }
@@ -198,6 +197,8 @@ plot.spatial = function(mdl = NULL,
         rgl.linestrips(x=-0.85,y=0.85,z=seq(-1,1,length.out=length(cb.col)),col=cb.col,lwd=50)
         rgl.texts(x=-0.79,y=0.79,z=c(-0.97,0.97),c(format(min(col),digits=3),format(max(col),digits=3)),col="black",cex=1)
       }
+      rgl.pop()
+      rgl.sphmesh(mesh, add=TRUE, radius=1.001, col = col)
       
     }
     else {
@@ -205,7 +206,7 @@ plot.spatial = function(mdl = NULL,
       if ( add.detections ) { rgl.points(x = det.points$x, y = det.points$y, z =0.02, col = rgb(1,0,0), size=8) }
       if ( int.points ) { rgl.points(x = add.points$x, y = add.points$y, z = 0.01, col = rgb(0,0,0.6), size=4) }
     }
-    if (any("par3d.args" %in% names(data))) { do.call(par3d,data$par3d.args) }
+    #if (any("par3d.args" %in% names(data))) { do.call(par3d,data$par3d.args) }
   }
   else {
     
@@ -262,3 +263,30 @@ plot.spatial = function(mdl = NULL,
   }
 }
 
+#' Play (animate) spatial field
+#'
+#' Animates a spatial field using RGL. 
+#' 
+#' @aliases play.spatial
+#' @export
+#' @param group Example: group = list(year = c(1,2)) animates the field for years 1 and 2
+#' @param ... Parameters passed on to \link{plot.spatial}
+#' 
+
+
+play.spatial = function(group = list(), rgl, ...){
+  if ( !rgl ) { rgl = TRUE}
+  rgl.earth()
+  sargs = list(...)
+  myanim = function(time, ...) {
+    par3d(skipRedraw = TRUE)
+    grp = list()
+    grp[[names(group)[[1]]]] = group[[1]][mod(floor(time),2)+1]
+    do.call(plot.spatial, c(sargs, list(group = grp, add = TRUE, rgl = TRUE))) ;
+    par3d(skipRedraw = FALSE)
+    return("")
+  }
+  
+  play3d(myanim, duration = 10, startTime = 0, fps = 1)
+  
+}
