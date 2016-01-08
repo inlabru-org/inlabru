@@ -75,7 +75,9 @@ join.model = function(...){
   environment(formula) = new.env()
   mesh = list()
   effects = character()
+  inla.spde = list()
   mesh.coords = list()
+  time.coords = list()
   covariates = list()
   eval = list()
   
@@ -93,7 +95,9 @@ join.model = function(...){
     covariates = c(covariates,mdl$covariates)
     effects = c(effects, mdl$effects)
     mesh = c(mesh,mdl$mesh)
+    inla.spde = c(inla.spde, mdl$inla.spde)
     mesh.coords = c(mesh.coords,mdl$mesh.coords)
+    time.coords = c(time.coords,mdl$time.coords)
     A = c(A,mdl$A)
     environment(formula) = env.upd(environment(formula), environment(mdl$formula))
     eval = c(eval, mdl$eval)
@@ -104,7 +108,9 @@ join.model = function(...){
     covariates = covariates,
     effects = effects,
     mesh = mesh,
+    inla.spde = inla.spde,
     mesh.coords = mesh.coords,
+    time.coords = time.coords,
     eval = eval
     ))
   
@@ -170,7 +176,10 @@ list.A.model = function(mdl, points){
     for (k in 1:length(mdl$mesh)) {
       name = names(mdl$mesh)[[k]]
       loc = as.matrix(points[,mdl$mesh.coords[[k]]])
-      A = inla.spde.make.A(mdl$mesh[[k]], loc)
+      if (mdl$inla.spde[[k]]$n.group > 1) {
+        group = as.matrix(points[,mdl$time.coords[[k]]])
+      } else { group = NULL }
+      A = inla.spde.make.A(mdl$mesh[[k]], loc = loc, group = group)
       # Covariates for models with A-matrix are realized in the follwoing way:
       if (name %in% names(mdl$covariates)) {
         w = mdl$covariates[[name]](points)
@@ -198,7 +207,7 @@ list.indices.model = function(mdl, ...){
       if ( "m" %in% names(mdl$mesh[[k]]) ) {
         idx.lst[[name]] = 1:mdl$mesh[[k]]$m # support inla.mesh.1d models  
       } else {
-        idx.lst[[name]] = 1:mdl$mesh[[k]]$n
+        idx.lst = c(idx.lst, list(inla.spde.make.index(name, n.spde = mdl$inla.spde[[k]]$n.spde, n.group = mdl$inla.spde[[k]]$n.group)))
       }
     }
   }
@@ -211,13 +220,15 @@ list.indices.model = function(mdl, ...){
 #' @aliases make.model
 #' 
 
-make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, mesh.coords = list(), covariates = list(), eval = list(), ...){
+make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, inla.spde = list(), mesh.coords = list(), time.coords = list(), covariates = list(), eval = list(), ...){
   mdl = list(
     formula = formula,
     name = name,
     effects = effects,
     mesh = mesh,
+    inla.spde = inla.spde,
     mesh.coords = mesh.coords,
+    time.coords = time.coords,
     covariates = covariates,
     eval = eval,
     args = list(...)
@@ -270,6 +281,8 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
       # SPDE model   
       post = inla.result$summary.random[[name]][,property]
       A = Amat[[name]]
+      # A workaround, needed for make.A called with group=1
+      if (length(post) == 2*dim(A)[2]) { post = post[1:dim(A)[2]]}
       post = as.vector(A%*%as.vector(post))
     }
     posts[[name]] = post
@@ -326,15 +339,16 @@ model.intercept = function(data, effects = "Intercept") {
 #' 
 #' Constructs a spatial SPDE model with formula
 #' 
-#'  ~ . + f(spde, model = spde.mdl)
+#'  ~ . + f(spde, model = spde.mdl, group = spde.group)
 #'
 #' @aliases model.spde
 #' @param data Data set to read the names of the mesh coordinates from (mesh.coords)
 #' @param mesh The mesh used to construct the SPDE. If not provided, the mesh is read form the data set
+#' @param n.group Number of SPDE model groups (see \link{f}), e.g. for temporal models.
 #' @param ... Arguments passed on to inla.spde2.matern. If none, the defaults are alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01
 #'  
 
-model.spde = function(data, mesh = data$mesh, ...) {
+model.spde = function(data, mesh = data$mesh, n.group = 1, ...) {
   
   vargs = list(...)
   if ( length(vargs) == 0 ){ 
@@ -344,13 +358,16 @@ model.spde = function(data, mesh = data$mesh, ...) {
   }
   
   spde.mdl = do.call(inla.spde2.matern,c(list(mesh=mesh),spde.args)) 
-  formula = ~ . + f(spde, model=spde.mdl)
+  spde.mdl$n.group = n.group
+  formula = ~ . + f(spde, model=spde.mdl, group = spde.group)
   
-  return(make.model(name = "Spatial SPDE model",
+  return(make.model(name = "Spatio-temporal SPDE model",
                     formula = formula,
                     effects = "spde",
-                    mesh = list(spde = mesh), 
-                    mesh.coords = list(spde = data$mesh.coords)))
+                    mesh = list(spde = mesh),
+                    inla.spde = list(spde = spde.mdl),
+                    mesh.coords = list(spde = data$mesh.coords),
+                    time.coords = list(spde = data$time.coords)))
 }
 
 #####################################

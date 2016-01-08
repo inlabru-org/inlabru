@@ -144,6 +144,7 @@ plot.spatial = function(mdl = NULL,
                      data = NULL,
                      name = "spde",
                      property = "mode",
+                     group = list(),
                      stack = NULL,
                      mesh = mdl$mesh[[name]],
                      mesh.coords = mdl$mesh.coords[[name]],
@@ -172,6 +173,7 @@ plot.spatial = function(mdl = NULL,
       # col = result$summary.ran[[name]][[property]] # deprecated
       loc = data$mesh$loc[,c(1,2)]
       colnames(loc) = data$mesh.coords
+      if (!(length(group)==0)) { loc = data.frame(loc, group) }
       col = evaluate.model(mdl, inla.result = result, loc = loc, do.sum = TRUE)
     } else {
       ind = inla.stack.index(stack, name)$data
@@ -224,6 +226,7 @@ plot.spatial = function(mdl = NULL,
     else if (name %in% names(result$summary.ran)){
       loc = cbind(grid$x,grid$y)
       colnames(loc) = data$mesh.coords
+      if (!(length(group)==0)) { loc = data.frame(loc, group) }
       col = evaluate.model(mdl, inla.result = result, loc = loc, do.sum = TRUE)
       col[!is.inside(mesh,loc,data$mesh.coords)] = NA
       #col = inla.mesh.project(proj, field = result$summary.ran[[name]][[property]]) # deprecated
