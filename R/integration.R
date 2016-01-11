@@ -695,7 +695,7 @@ replicate.lines = function(sp,ep,truncation,scheme="equidistant",n=3,fake.distan
 #' @return List with integration poins (ips), weights (w) and weights including line length (wl)
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-int.quadrature = function(sp,ep,scheme="gaussian",n.points=1,geometry="euc",coords=c("x","y")){
+int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry="euc",coords=c("x","y"), at = NULL){
   if (is.vector(sp)) { 
     n.lines = 1
     len = function(a) {abs(a)}
@@ -764,12 +764,12 @@ int.quadrature = function(sp,ep,scheme="gaussian",n.points=1,geometry="euc",coor
       line.idx = c(1:n.lines,1:n.lines)
     }
     
-    else { stop("Gaussian quadrature with n>2 not implemented") }
+    else { stop("Gaussian quadrature with n>3 not implemented") }
   }
   else if (scheme == "twosided-gaussian"){
     if (geometry == "geo") {stop("Geometry geo not supported")}
-    ips1 = int.quadrature(sp,sp+0.5*(ep-sp),scheme="gaussian",n.points=n.points)
-    ips2 = int.quadrature(sp+0.5*(ep-sp),ep,scheme="gaussian",n.points=n.points)
+    ips1 = int.quadrature(sp,sp+0.5*(ep-sp),scheme="gaussian",n.points=n.points, geometry, coords)
+    ips2 = int.quadrature(sp+0.5*(ep-sp),ep,scheme="gaussian",n.points=n.points, geometry, coords)
     ips = rbind(ips1$ips,ips2$ips)
     w = 0.5*rbind(ips1$w,ips2$w)
     wl = 0.5*rbind(ips1$wl,ips2$wl)
@@ -790,6 +790,13 @@ int.quadrature = function(sp,ep,scheme="gaussian",n.points=1,geometry="euc",coor
     # Index of line a point comes from
     line.idx = rep(1:n.lines,n.points)
   }
+  else if (scheme == "fixed"){ 
+    ips = data.frame(tmp = sp)
+    #colnames(ips) = coords
+    w = rep(1,length(sp))
+    wl = rep(1,length(sp))
+    line.idx = rep(NaN,length(sp))
+  }
   return(list(ips=ips,w=w,wl=wl,line.idx=line.idx))
 }
 
@@ -805,7 +812,7 @@ int.quadrature = function(sp,ep,scheme="gaussian",n.points=1,geometry="euc",coor
 
 int.1d = function(...){
   quad = int.quadrature(...)
-  ips = data.frame(distance = quad$ips, weight = quad$wl)
+  ips = data.frame(quad$ips, weight = quad$wl)
   return(ips)
 }
 
