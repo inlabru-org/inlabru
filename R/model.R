@@ -50,7 +50,7 @@ summary.model = function(mdl) {
   }
   cat("\n")
   cat("--- Formula --- \n")
-  cat(as.character(mdl$formula))
+  cat(as.character(mdl$formula)[c(2,1,3)])
 
 }
 
@@ -410,17 +410,22 @@ model.detfun = function(type, ...) {
 #' @param constrained If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging. 
 #' 
 
-model.halfnormal = function(colname = "distance", truncation = NULL,  constrained = TRUE){
+model.halfnormal = function(data = NULL, truncation = NULL, constrained = TRUE, colname = "distance", effect = "nhsd"){
+  
+  # Extract truncation limit from data (if data is given but limit is not)
+  if ( !is.null (data) & is.null(truncation) ) { truncation = max(detdata(data)[, colname]) }
+  
   # Formula
-  if (!constrained) { formula = ~ . + nhsd }
-  else { formula = ~. + f(nhsd, model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1))))}
+  if (!constrained) { formula = as.formula(paste0("~ . + ", effect)) }
+  else { formula =  as.formula(paste0(" ~ . + f(", effect, ", model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1))))" ))}
   
   # Covariate
-  covariates = list(nhsd = function(X) { return(-0.5*X[,colname]^2) })
+  covariates = list()
+  covariates[[effect]] = function(X) { return(-0.5*X[,colname]^2) }
   
   return(make.model(name = "Half-normal detection function",
                     formula = formula, 
-                    effects = "nhsd",
+                    effects = effect,
                     covariates = covariates))
 }
 
