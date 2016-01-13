@@ -592,7 +592,7 @@ split.lines = function(mesh, sp, ep, filter.zero.length = TRUE) {
   # Filter out segments not on the mesh
   t1 = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(sp,z=0)))$p2m.t
   t2 = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(ep,z=0)))$p2m.t
-  if (any(t1==0) | any(t2==0)) { warning("points outside boundary! filtering...")}
+  # if (any(t1==0) | any(t2==0)) { warning("points outside boundary! filtering...")}
   sp = sp[!((t1==0) | (t2==0)),]
   ep = ep[!((t1==0) | (t2==0)),]
   idx = idx[!((t1==0) | (t2==0))]
