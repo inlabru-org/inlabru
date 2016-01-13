@@ -69,6 +69,11 @@ is.model = function(mdl) { return(class(mdl)[[1]] == "model")}
 
 join.model = function(...){
   models = list(...)
+  
+  # Check for duplicated effect names
+  dup = duplicated(lapply(models, function(x) {x$effects}))
+  if (any(dup)) { stop(paste0("Some of your models have identical effect names: ", lapply(models, function(x) {x$effects})[dup])) }
+  
   A = list()
   name = character()
   formula = y.inla ~ - 1
