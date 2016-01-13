@@ -695,7 +695,11 @@ replicate.lines = function(sp,ep,truncation,scheme="equidistant",n=3,fake.distan
 #' @return List with integration poins (ips), weights (w) and weights including line length (wl)
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry="euc",coords=c("x","y"), at = NULL){
+int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry="euc",coords = NULL){
+
+  if ( is.null(colnames(sp)) & !is.null(coords)) { sp = data.frame(sp) ; colnames(sp) = coords }
+  if ( is.null(colnames(ep)) & !is.null(coords) & !(length(ep)==0) ) { ep = data.frame(ep) ; colnames(ep) = coords  }
+  
   if (is.vector(sp)) { 
     n.lines = 1
     len = function(a) {abs(a)}
@@ -1026,6 +1030,6 @@ int.expand = function(ips, ...) {
   rips = ips[as.vector(t(matrix(1:nrow(ips),ncol = nrow(grd),nrow = nrow(ips)))) , ]
   rgrd = grd[rep(seq_len(nrow(grd)), nrow(ips)), , drop = FALSE]
   rips$weight = rips$weight * w[rep(seq_len(nrow(grd)), nrow(ips))]
-  return(cbind(rgrd,rips))
+  return(cbind(rips[,!(colnames(rips)=="weight")],rgrd,weight=rips$weight))
 }
 
