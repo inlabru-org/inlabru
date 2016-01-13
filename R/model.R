@@ -348,7 +348,7 @@ model.intercept = function(data, effects = "Intercept") {
 #' @param ... Arguments passed on to inla.spde2.matern. If none, the defaults are alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01
 #'  
 
-model.spde = function(data, mesh = data$mesh, n.group = 1, ...) {
+model.spde = function(data, mesh = data$mesh, n.group = 1, covariates = NULL, ...) {
   
   vargs = list(...)
   if ( length(vargs) == 0 ){ 
@@ -405,9 +405,11 @@ model.detfun = function(type, ...) {
 #' that is, nhsd is half of the negative squared distance of an observation/integration point.
 #'
 #' @aliases model.halfnormal
-#' @param colname Effort data column to use for the covariate extraction. Default: "distance"
+#' @param data \link{dsdata} data set. Used to determine distance truncation (if not provided)
 #' @param truncation Distance to truncate at. Currently unused but passed on the the formula environment for later usage.
 #' @param constrained If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging. 
+#' @param colname Effort data column to use for the covariate extraction. Default: "distance"
+#' @param effect Character setting the name of the effect in the model. Default: "nhsd" ("negative half squared distance")
 #' 
 
 model.halfnormal = function(data = NULL, truncation = NULL, constrained = TRUE, colname = "distance", effect = "nhsd"){
