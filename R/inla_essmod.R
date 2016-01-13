@@ -193,7 +193,7 @@ mesh.split = function(mesh,n=1){
 }
 
 # plot.marginal = function(...){UseMethod("plot.marginal")}
-plot.marginal.inla = function(result,varname="Intercept",lwd=3,...){
+plot.marginal.inla = function(result,varname="Intercept", add = FALSE, lwd=3,...){
   vars = variables.inla(result)
   if (paste0("Beta for ", varname) %in% rownames(vars)) { varname = paste0("Beta for ", varname)}
   
@@ -206,7 +206,11 @@ plot.marginal.inla = function(result,varname="Intercept",lwd=3,...){
   else if (vars[varname,"type"] == "hyperpar"){
     marg = result$marginals.hyperpar[[varname]]
   }
-  plot(marg,type='l',xlab=varname,ylab="Posterior density",...)
+  if (!add) {
+    plot(marg,type='l',xlab=varname,ylab="Posterior density",...)
+  } else {
+    points(marg, type='l', xlab="",ylab="", ...)
+  }
   lheight = max(marg[,"y"])
   lines(x=c(vars[varname,"mode"],vars[varname,"mode"]),y=c(0,lheight),col="blue",lwd=lwd,...)
   lines(x=c(vars[varname,"mean"],vars[varname,"mean"]),y=c(0,lheight),col="red",lwd=lwd,...)
