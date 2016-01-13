@@ -40,7 +40,7 @@ generate.toy1 = function(lambda=10,dfun=function(x){exp(-(0.5*(x)^2)*2)},truncat
   
   toy$mesh.coords = c("x","y")
   
-  class(toy) = c("toy1","dsdata","list")
+  class(toy) = c("dsdata","list")
   return(toy)
 }
 
@@ -54,7 +54,7 @@ make.detections = function(seg,data,lambda=1,dfun=function(x){1},truncation=1.5)
   for (k in 1:nrow(spoints)){
     spoint = spoints[k,] ; class(spoint) = class(spoints)
     epoint = epoints[k,] ; class(epoint) = class(epoints)
-    trlen = dist(spoint,epoint)
+    trlen = dist.euc(spoint,epoint)
     lambda.total = 2*lambda*truncation*trlen
     
     # Sample the number of potential detections
