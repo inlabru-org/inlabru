@@ -195,6 +195,7 @@ mesh.split = function(mesh,n=1){
 plot.marginal = function(...){UseMethod("plot.marginal")}
 plot.marginal.inla = function(result,varname="Intercept",lwd=3,...){
   vars = variables.inla(result)
+  if (!varname %in% vars[,1]) { varname = paste0("Beta for ", varname)}
   if (vars[varname,"type"] == "fixed"){
     marg = result$marginals.fixed[[varname]]
   }
