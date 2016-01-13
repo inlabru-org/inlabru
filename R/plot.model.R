@@ -4,7 +4,9 @@
 #' @aliases plot.marginal
 #' @export
 
-plot.marginal = function(...){ plot.marginal.inla(...) }
+plot.marginal = function(result, effects, ...){ 
+  plot.marginal.inla(result, varname = effects, ...) 
+}
 
 
 #' Plot a half-normal detection function
@@ -57,7 +59,7 @@ plot.detfun = function(mdl = NULL,
   # If data was provided, plot histogram
   if ( !is.null(data) & add.histogram ) {
     if ( do.ecdf ) {
-      dfdata = detdata(dset)$distance
+      dfdata = detdata(data)$distance
       df = ecdf(dfdata)
       x.plot = seq(0,distance.truncation,length.out=100)
       if ( add ) { lines(x,1-df(x$distance)) }
@@ -116,7 +118,7 @@ plot.detfun = function(mdl = NULL,
          type = "l",
          yaxt = yaxt,
          main = "",
-         ylab = "Detection probability", 
+         ylab = "1 - ECDF", 
          xlab = "Distance")
   }  
   # Plot uncertainty bounds
