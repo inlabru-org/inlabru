@@ -87,7 +87,3 @@ plot.pproc_lgcp = function(mdl,rgl=TRUE,field="spde",property="mean",add=FALSE,c
     ) 
   }
 }
-
-
-
-plot.marginal = function(pproc,...){ plot.marginal.inla(pproc$INLA$result,...) }

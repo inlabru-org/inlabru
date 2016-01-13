@@ -1,3 +1,12 @@
+#' Plot a marginal posterior given an INLA result
+#' 
+#'
+#' @aliases plot.marginal
+#' @export
+
+plot.marginal = function(...){ plot.marginal.inla(...) }
+
+
 #' Plot a half-normal detection function
 #' 
 #' See \link{plot.detfun} for details
