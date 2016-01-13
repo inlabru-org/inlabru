@@ -83,7 +83,7 @@ make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords 
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' 
 
-plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,...){
+plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,asp=1,...){
   if (rgl==FALSE) {
     c1 = data$mesh.coords[1]
     c2 = data$mesh.coords[2]
@@ -91,7 +91,7 @@ plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,...){
     ylim=range(data$mesh$loc[,2])
     
     # Plot mesh
-    plot(data$mesh,col=col,main="")
+    plot(data$mesh, col = col, main="", asp = asp)
     
     # Plot transect lines
     spoint = startpoint(as.transect(data),data)
@@ -103,7 +103,7 @@ plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,...){
     
     # Plot detections
     par(new=TRUE)
-    plot(detdata(data)[,data$mesh.coords],xlim=xlim,ylim=ylim,col=det.col)
+    plot(detdata(data)[,data$mesh.coords],xlim=xlim,ylim=ylim,col=det.col, asp = asp)
   }
   else {
     require(rgl)
