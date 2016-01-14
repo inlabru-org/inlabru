@@ -171,8 +171,8 @@ sanity.dsdata = function(dset){
   cat("Checking if $effort has all the necessary columns ...")
   sanity.stop(sanity.columns(dset, message = TRUE))
   
-  cat("Checking if effort$seg is sorted ...")
-  sanity.stop(sanity.unsorted(dset, message = TRUE))
+  #cat("Checking if effort$seg is sorted ...")
+  #sanity.stop(sanity.unsorted(dset, message = TRUE))
   
   cat("Checking if all segments are inside the mesh boundary ...")
   sanity.stop(sanity.effort.inside(dset, message = TRUE))
@@ -230,7 +230,7 @@ sanity.columns = function(dset, message = FALSE) {
 
 # Segments sorted?
 sanity.unsorted = function(dset, message = FALSE) {
-  sane = !is.unsorted(order(dset$effort$seg))
+  sane = is.sorted(segment.id(dset$effort))
   if ( message & !sane ) { message = "Segments are not sorted" }
   return(list(sane = sane, message = message))
 }
@@ -339,7 +339,10 @@ trdata.dsdata = function(data,tr=NULL,...){
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 as.transect.effort = function(effort){
-  end.idx = findInterval(1:length(levels(effort$tr)),as.numeric(effort$tr))
+  if (!is.sorted(transect.id(effort))) { stop("The transects of your data set are not sorted in increasing order. Fix that.") }
+  # end.idx = findInterval(1:length(levels(effort$tr)),as.numeric(effort$tr))
+  # end.idx = findInterval(1:max(transect.id(effort)), transect.id(effort))
+  end.idx = which(diff(transect.id(effort))>0)
   if (length(end.idx)==1){ start.idx=1 } 
   else {start.idx = c(1,end.idx[1:(length(end.idx)-1)]+1)}
   tr = data.frame(start=start.idx,end=end.idx)
@@ -356,6 +359,7 @@ as.transect.effort = function(effort){
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 as.segment.effort = function(effort){
+  if (!is.sorted(transect.id(effort))) { stop("The transects of your data set are not sorted in increasing order. Fix that.") }
   end.idx = findInterval(1:length(levels(effort$seg)),as.numeric(effort$seg))
   if (length(end.idx)==1){ start.idx=1 } 
   else {start.idx = c(1,end.idx[1:(length(end.idx)-1)]+1)}
@@ -415,11 +419,10 @@ join.effort = function(effort,detection){
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 startpoint.transect = function(tr,data,keep=FALSE) {
-  cols = names(data$effort) %in% c("start.x","start.y")
+  cols = names(data$effort) %in% paste0("start.",data$mesh.coords)
   if (keep){ return(data$effort[tr$start,]) }
   else {
-    pts = data$effort[tr$start,cols]
-    names(pts) = c("x","y")
+    pts = strip.coords(data$effort[tr$start,cols])
     class(pts) = c(data$geometry,"data.frame")
     return(pts)
   }
@@ -435,11 +438,10 @@ startpoint.transect = function(tr,data,keep=FALSE) {
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 endpoint.transect = function(tr,data,keep=FALSE) {
-  cols = names(data$effort) %in% c("end.x","end.y")
+  cols = names(data$effort) %in% paste0("end.",data$mesh.coords)
   if (keep){ return(data$effort[tr$end,]) } 
   else {
-    pts = data$effort[tr$end,cols]
-    names(pts) = c("x","y")
+    pts = strip.coords(data$effort[tr$end,cols])
     class(pts) = c(data$geometry,"data.frame")
     return(pts)
   } 
@@ -500,25 +502,45 @@ startpoint.segment = startpoint.transect
 
 endpoint.segment = endpoint.transect
 
-#' Transect name according to convention, e.g. "Trans.Name" = 1.2
+
+#' Numeric statum id
 #' 
-#' @aliases id.transect
+#' @aliases stratum.id
 #' @export
-#' @param transect
-#' @param data Data set with $effort
+#' @param effort
 #' @return id
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-id.transect = function(tr,data){ return(data$effort[tr$start,"tr"]) }
+stratum.id = function(effort) { as.numeric(effort$strat) }
 
-#' Segment name according to convention, e.g. "Seg.Name" = 1.2.2
+
+#' Numeri transect id
 #' 
-#' @aliases id.segment
+#' @aliases transect.id
 #' @export
-#' @param segment
-#' @param data Data set with $effort
+#' @param effort
 #' @return id
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-id.segment = function(seg,data){ return(data$effort[seg$start,"seg"]) }
+transect.id = function(effort) { as.numeric(gsub("^.*\\.","", as.character(effort$trans))) }
 
+#' Numeric segment id
+#'  
+#' @aliases segment.id
+#' @export
+#' @param effort
+#' @return id
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+
+segment.id = function(effort) { as.numeric(gsub("^.*\\.","", as.character(effort$seg))) }
+
+
+#' Numeric detection id
+#'  
+#' @aliases detection.id
+#' @export
+#' @param effort
+#' @return id
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+
+detection.id = function(effort) { as.numeric(gsub("^.*\\.","", as.character(effort$det))) }
