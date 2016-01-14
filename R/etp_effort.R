@@ -66,7 +66,7 @@ as.effort.etpeffort = function(effort, sighting) {
   effort = cbind(effort, 
                  unix.time.start = effort.time, 
                  species = NA, sight.num = NA, on.eff = NA, grpsize = NA, distance = NA, 
-                 Bf = NA, vis = NA, time = NA, lat = NA, lon = NA, effort = NA)
+                 bft = NA, vis = NA, time = NA, lat = NA, lon = NA, effort = NA)
   
   sighting = cbind(sighting,
                    unix.time.start = sighting.time,
@@ -98,7 +98,7 @@ as.effort.etpeffort = function(effort, sighting) {
   
   
   # Add trans/seg/det name
-  effort$strat = 1
+  effort$strat = as.factor(1)
   seg = numeric()
   det = numeric()
   trans = numeric()
@@ -128,9 +128,9 @@ as.effort.etpeffort = function(effort, sighting) {
     }
   }
   
-  effort$trans = paste(effort$strat, effort$trans, sep = ".")
-  effort$seg = paste(effort$trans, seg, sep=".")
-  effort$det = paste(effort$seg, det, sep=".")
+  effort$trans = as.factor(paste(effort$strat, effort$trans, sep = "."))
+  effort$seg = as.factor(paste(effort$trans, seg, sep="."))
+  effort$det = as.factor(paste(effort$seg, det, sep="."))
   effort$det[is.na(det)] = NA
   
   # Tidy up

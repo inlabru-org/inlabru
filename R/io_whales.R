@@ -15,7 +15,7 @@ io_whales.pkgdata.load = function()
 { 
   effort = io_whales.effort(rem.intermediate=FALSE)
   par3d.args = io_whales.par3d()
-  whales = list(sighting=io_whales.sighting(BfLim=5,PDLim=6),
+  dset = list(sighting=io_whales.sighting(BfLim=5,PDLim=6),
                 transect = as.transect(effort),
                 effort = effort,
                 mesh = io_whales.mesh(),
@@ -29,8 +29,24 @@ io_whales.pkgdata.load = function()
                 ips = io_whales.ips(),
                 ips.yearly = io_whales.ips.yearly()
   )
-  class(whales) = c("whales","etpdata","dsdata","list")
-  return(whales)
+  
+  # Convert into dsdata format
+  cat("Converting ETP data into dsdata. This might take a couple of minutes.")
+  dset$effort = as.effort.etpeffort(dset$effort, dset$sighting)
+  dset$sighting = NULL
+  class(dset) = c("dsdata", "list")
+  
+  # Sort transects and segments
+  srt = sort(segment.id(dset$effort), index.return = TRUE)
+  dset$effort = dset$effort[srt$ix,]
+  srt = sort(transect.id(dset$effort), index.return = TRUE)
+  dset$effort = dset$effort[srt$ix,]
+  
+#   # Discard effort outside the mesh
+  msk = is.inside(dset$mesh, dset$effort, mesh.coords = paste0("start.", dset$mesh.coords)) & is.inside(dset$mesh, dset$effort, mesh.coords = paste0("end.", dset$mesh.coords))
+  dset$effort = dset$effort[msk,]
+  
+  return(dset)
 }
 
 #' Regenerate \link{whales} data and store it to \code{whales.RData}
