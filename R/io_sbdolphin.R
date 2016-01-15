@@ -15,7 +15,7 @@ io_sbdolphin.pkgdata.load = function()
 { 
   effort = io_sbdolphin.effort(rem.intermediate=FALSE)
   par3d.args = io_sbdolphin.par3d()
-  sbdolphin = list(sighting=io_sbdolphin.sighting(BfLim=5,PDLim=6),
+  dset = list(sighting=io_sbdolphin.sighting(BfLim=5,PDLim=6),
                 transect = as.transect(effort),
                 effort = effort,
                 mesh = io_sbdolphin.mesh(),
@@ -29,8 +29,24 @@ io_sbdolphin.pkgdata.load = function()
                 ips = io_sbdolphin.ips(),
                 ips.yearly = io_sbdolphin.ips.yearly()
   )
-  class(sbdolphin) = c("sbdolphin","etpdata","dsdata","list")
-  return(sbdolphin)
+  
+  # Convert into dsdata format
+  cat("Converting ETP data into dsdata. This might take a couple of minutes.")
+  dset$effort = as.effort.etpeffort(dset$effort, dset$sighting)
+  dset$sighting = NULL
+  class(dset) = c("dsdata", "list")
+  
+  # Sort transects and segments
+  srt = sort(segment.id(dset$effort), index.return = TRUE)
+  dset$effort = dset$effort[srt$ix,]
+  srt = sort(transect.id(dset$effort), index.return = TRUE)
+  dset$effort = dset$effort[srt$ix,]
+  
+  # Discard effort outside the mesh
+  msk = is.inside(dset$mesh, dset$effort, mesh.coords = paste0("start.", dset$mesh.coords)) & is.inside(dset$mesh, dset$effort, mesh.coords = paste0("end.", dset$mesh.coords))
+  dset$effort = dset$effort[msk,]
+  
+  return(dset)
 }
 
 #' Regenerate \link{sbdolphin} data and store it to \code{sbdolphin.RData}
