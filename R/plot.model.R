@@ -239,7 +239,7 @@ plot.spatial = function(mdl = NULL,
       loc = cbind(grid$x,grid$y)
       colnames(loc) = data$mesh.coords
       if (!(length(group)==0)) { loc = data.frame(loc, group) }
-      col = evaluate.model(mdl, inla.result = result, loc = loc, do.sum = TRUE)
+      col = evaluate.model(mdl, inla.result = result, loc = loc, do.sum = TRUE, property = property)
       col[!is.inside(mesh,loc,data$mesh.coords)] = NA
       #col = inla.mesh.project(proj, field = result$summary.ran[[name]][[property]]) # deprecated
     } 
