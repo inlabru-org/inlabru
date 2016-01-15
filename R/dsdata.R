@@ -340,11 +340,14 @@ trdata.dsdata = function(data,tr=NULL,...){
 
 as.transect.effort = function(effort){
   if (!is.sorted(transect.id(effort))) { stop("The transects of your data set are not sorted in increasing order. Fix that.") }
-  # end.idx = findInterval(1:length(levels(effort$tr)),as.numeric(effort$tr))
-  # end.idx = findInterval(1:max(transect.id(effort)), transect.id(effort))
-  end.idx = which(diff(transect.id(effort))>0)
-  if (length(end.idx)==1){ start.idx=1 } 
-  else {start.idx = c(1,end.idx[1:(length(end.idx)-1)]+1)}
+  tr.id = transect.id(effort)
+  if (tr.id[length(tr.id)]==1) {
+    end.idx = length(tr.id)
+    start.idx = 1
+  } else {
+    end.idx = which(diff(tr.id)>0)
+    start.idx = c(1,end.idx[1:(length(end.idx)-1)]+1)
+  }
   tr = data.frame(start=start.idx,end=end.idx)
   class(tr) = c("transect","data.frame")
   return(tr)
