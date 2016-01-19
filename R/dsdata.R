@@ -300,6 +300,7 @@ as.detection = function(...){UseMethod("as.detection")}
 startpoint = function(...){UseMethod("startpoint")}
 endpoint = function(...){UseMethod("endpoint")}
 detdata = function(...){UseMethod("detdata")}
+effort = function(...){UseMethod("effort")}
 trdata = function(...){UseMethod("trdata")}
 
 join = function(...){UseMethod("join")}
@@ -319,6 +320,10 @@ detdata.dsdata = function(data,detection=NULL,...){
   else {
     return(data$effort[detection[,"start"],])
   }
+}
+
+effort.dsdata = function(dsdata){ 
+  return(dsdata$effort[is.na(dsdata$effort$det),])
 }
 
 trdata.dsdata = function(data,tr=NULL,...){ 
