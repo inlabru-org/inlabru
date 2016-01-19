@@ -1030,6 +1030,6 @@ int.expand = function(ips, ...) {
   rips = ips[as.vector(t(matrix(1:nrow(ips),ncol = nrow(grd),nrow = nrow(ips)))) , ]
   rgrd = grd[rep(seq_len(nrow(grd)), nrow(ips)), , drop = FALSE]
   rips$weight = rips$weight * w[rep(seq_len(nrow(grd)), nrow(ips))]
-  return(cbind(rips[,!(colnames(rips)=="weight")],rgrd,weight=rips$weight))
+  return(cbind(rips[,!(colnames(rips)=="weight"),drop=FALSE],rgrd,weight=rips$weight))
 }
 
