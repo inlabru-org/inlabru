@@ -40,6 +40,7 @@ plot.detfun = function(mdl = NULL,
                            result = NULL, 
                            data = NULL,  
                            loc = NULL,
+                           prior = NULL,
                            do.ecdf = FALSE,
                            distance.truncation = environment(mdl$formula)$truncation,
                            covariate = mdl$covariates[[name]],
@@ -49,12 +50,31 @@ plot.detfun = function(mdl = NULL,
                            col = rgb(250/256, 83/256, 62/256, 1),
                            ucol = rgb(250/256, 83/256, 62/256, 0.3), ...) {
 
-  if (is.null(loc)) { x = data.frame(distance = seq(0, distance.truncation, length.out = 500)) }
-  else { x = loc }
+  if (is.null(loc)) { 
+    x = data.frame(distance = seq(0, distance.truncation, length.out = 500)) 
+    integrate = FALSE
+  }
+  else { 
+    x = loc 
+    integrate = TRUE
+  }
   
   upper = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.975quant", link = exp)
   dmean = evaluate.model(model = mdl, inla.result = result, loc = x, property = "mode", link = exp)
   lower = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.025quant", link = exp)
+  
+  if ( !is.null(prior) ) {
+    upper = upper * prior(loc)
+    dmean = dmean * prior(loc)
+    lower = lower * prior(loc)
+  }
+  
+  if ( integrate ) {
+    upper = as.vector(by(upper * loc[,"weight"], loc$distance, sum))
+    dmean = as.vector(by(dmean * loc[,"weight"], loc$distance, sum))
+    lower = as.vector(by(lower * loc[,"weight"], loc$distance, sum))
+    x = data.frame(distance = seq(0, distance.truncation, length.out = length(dmean))) 
+  }
   
   # If data was provided, plot histogram
   if ( !is.null(data) & add.histogram ) {
@@ -94,7 +114,7 @@ plot.detfun = function(mdl = NULL,
     par(new = TRUE)
   } else {
     uy = 1
-    scale = 1
+    scale = 1/max(dmean)
     yaxt = NULL
   }
   
