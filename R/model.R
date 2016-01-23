@@ -643,23 +643,3 @@ model.grpsize = function(data, mesh = data$mesh, ...) {
                     time.coords = list(spde = data$time.coords),
                     eval = eval))
 }
-
-# 
-# vargs = list(...)
-# if ( length(vargs) == 0 ){ 
-#   spde.args = list(alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01) }
-# else { 
-#   spde.args = vargs 
-# }
-# 
-# spde.mdl = do.call(inla.spde2.matern,c(list(mesh=mesh),spde.args)) 
-# spde.mdl$n.group = n.group
-# formula = ~ . + f(spde, model=spde.mdl, group = spde.group)
-# 
-# return(make.model(name = "Spatio-temporal SPDE model",
-#                   formula = formula,
-#                   effects = "spde",
-#                   mesh = list(spde = mesh),
-#                   inla.spde = list(spde = spde.mdl),
-#                   mesh.coords = list(spde = data$mesh.coords),
-#                   time.coords = list(spde = data$time.coords)))
