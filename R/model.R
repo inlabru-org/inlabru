@@ -643,3 +643,124 @@ model.grpsize = function(data, mesh = data$mesh, ...) {
                     time.coords = list(spde = data$time.coords),
                     eval = eval))
 }
+
+
+#' Model for Taylor approximation in a single variable 
+#' 
+#' See \link{model.taylor} for the real deal. This function is kept for means of debugging.
+#'
+#' @aliases model.taylor1d
+
+model.taylor1d = function(expr = NULL, effects = NULL, initial = NULL, result = NULL) {
+  
+  effect = effects
+  #formula = as.formula(paste0("~. +  f(", effect ,", model = 'clinear', range = c(0, 10), hyper = list(beta = list(initial = 0, param = c(0,0.1))))"))
+  formula = as.formula(paste0("~. + ", effect))
+  covariates = list()
+    
+  covariates[[effect]] = function(loc) {
+    myenv <- new.env()
+    assign(effect, initial[[effect]], envir = myenv)
+    assign("loc", loc, envir = myenv)
+    nderiv = numericDeriv(expr[[1]], c(effect), myenv)
+    gradient = attr(nderiv,"grad")[,1]
+    ret = data.frame(gradient)
+    colnames(ret) = effect
+    return(ret)
+  } 
+  
+  const = function(loc) {
+    myenv <- new.env()
+    assign(effect, initial[[effect]], envir = myenv)
+    assign("loc", loc, envir = myenv)
+    nderiv = numericDeriv(expr[[1]], c(effect), myenv)
+    gradient = attr(nderiv,"grad")[,1]
+    ret = nderiv - gradient * initial[[effect]]
+    return(ret) 
+  }
+
+  mdl = make.model(name = paste0("Taylor approximation in '",effect, "' of ",as.character(expr)), 
+                   formula = formula, effects = effects, covariates = covariates)
+  
+  mdl$const = const
+  return(mdl)
+}
+
+
+
+#' Model for Taylor approximations
+#' 
+#'
+#' @aliases model.taylor
+#' @param expr Expression approximated
+#' @param effect List of charact arrays giving the variables that the expression is approximated in
+#' @param inital List of initial values of the Taylor approximation
+#' @param formula By default, the Variables of the Taylor approximation are modeled using INLA fixed effects. This can be changed by overwriting the formula of the model.
+
+model.taylor = function(expr = NULL, effects = NULL, initial = NULL, formula = NULL) {
+  
+  if (is.null(formula)) {
+    formula = as.formula(paste0("~. + ", do.call(paste, c(sep = " +", as.list(effects)))   ))
+  }
+  
+  covariates = list()
+  grads = list()
+  
+  for (k in 1:length(effects)) { 
+    effect = effects[k]
+    covariates[[effect]] = function(loc) { 
+      myenv = new.env()
+      assign(effect, initial[[effect]], envir = myenv)
+      assign("loc", loc, envir = myenv)
+      nderiv = numericDeriv(expr[[1]], c(effect), myenv)
+      gradient = attr(nderiv,"grad")[,1]
+      ret = data.frame(gradient)
+      colnames(ret) = effect
+      return(ret)
+      
+    }
+    # clone environment
+    environment(covariates[[effect]]) = new.env()
+    assign("effect", effect, envir = environment(covariates[[effect]]))
+    
+    
+    grads[[effect]] = function(loc) {
+      myenv = new.env()
+      assign(effect, initial[[effect]], envir = myenv)
+      assign("loc", loc, envir = myenv)
+      nderiv = numericDeriv(expr[[1]], c(effect), myenv)
+      gradient = attr(nderiv,"grad")[,1]
+      ret = gradient * initial[[effect]]
+      return(ret) 
+    }
+    environment(grads[[effect]]) = new.env()
+    assign("effect", effect, envir = environment(grads[[effect]]))
+    
+  }
+  
+  value = function(loc){
+    myenv = new.env()
+    assign(effect, initial[[effect]], envir = myenv)
+    assign("loc", loc, envir = myenv)
+    nderiv = numericDeriv(expr[[1]], c(effect), myenv)
+    return(nderiv)
+  }
+  
+  
+  const = function(loc) { 
+    return( value(loc) - apply(do.call(cbind, lapply(grads, function(f) {f(loc)})), MARGIN=1, sum)  )
+  }
+  environment(const) = new.env()
+  assign("covariates", covariates, envir = environment(const))
+  assign("value", value, envir = environment(const))
+  
+  mdl = make.model(name = paste0("Taylor approximation in '",effect, "' of ",as.character(expr)), 
+                   formula = formula, effects = effects, covariates = covariates)
+  
+  mdl$grad = grads
+  mdl$const = const
+  mdl$value = value
+  return(mdl)
+}
+
+
