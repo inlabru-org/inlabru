@@ -149,6 +149,10 @@ list.covariates.model = function(mdl, pts){
       if (is.null(mdl$mesh[[cov.name]])) {
         cov.fun = covariates[[cov.name]]
         fetched.covar[[cov.name]] = cov.fun(pts)
+        # Check if we actually got values back
+        if(length(fetched.covar[[cov.name]]) == 0 ) { 
+          stop(paste0("Evaluating cvoariate '", cov.name, "' returned no values. Do your points have all the data columns required by the covariate function?"))
+        }
       } else {}
     }
     fetched.covar = do.call(cbind,c(fetched.covar))
@@ -624,25 +628,38 @@ model.grpsize = function(data, mesh = data$mesh, ...) {
     gs.mdl.args = vargs 
   }
   
-  gs.mdl = do.call(inla.spde2.matern, c(list(mesh=mesh), gs.mdl.args)) 
+  gs.mdl = do.call(inla.spde2.matern, c(list(mesh=mesh), gs.mdl.args))
+  gs.mdl$n.group = 1
   formula = ~ . + f(grps, model = gs.mdl)
   covariates = list()
-  
-  eval = function(inla.result, loc, property = "mode") {
-    if (class(inla.result)[[1]] == "inla"){ weights = inla.result$summary.random$grps[,property] }
-    else if ( is.list(inla.result) ){ weights = inla.result$grps }
-    else if ( is.numeric(inla.result) ){ weights = inla.result }
-    else { stop("Type of field parameter not supported") }
-    A = inla.spde.make.A(mesh, loc = as.matrix(loc[, data$mesh.coords]))
-    val = data.frame(spde = as.vector(A%*%as.vector(weights)))
     
-    return(val)
-  }
-  
   return(make.model(name = "Spatial group size model",
-                    formula = formula, 
+                    formula = formula,
+                    effects = "grps",
                     covariates = covariates,
                     mesh = list(grps = mesh),
+                    inla.spde = list(grps = gs.mdl),
                     mesh.coords = list(grps = data$mesh.coords),
+                    time.coords = list(spde = data$time.coords),
                     eval = eval))
 }
+
+# 
+# vargs = list(...)
+# if ( length(vargs) == 0 ){ 
+#   spde.args = list(alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01) }
+# else { 
+#   spde.args = vargs 
+# }
+# 
+# spde.mdl = do.call(inla.spde2.matern,c(list(mesh=mesh),spde.args)) 
+# spde.mdl$n.group = n.group
+# formula = ~ . + f(spde, model=spde.mdl, group = spde.group)
+# 
+# return(make.model(name = "Spatio-temporal SPDE model",
+#                   formula = formula,
+#                   effects = "spde",
+#                   mesh = list(spde = mesh),
+#                   inla.spde = list(spde = spde.mdl),
+#                   mesh.coords = list(spde = data$mesh.coords),
+#                   time.coords = list(spde = data$time.coords)))
