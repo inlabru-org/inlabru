@@ -42,6 +42,10 @@ plot.detfun = function(mdl = NULL,
                            loc = NULL,
                            prior = NULL,
                            do.ecdf = FALSE,
+                           upper = NULL,
+                           mode = NULL,
+                           lower = NULL,
+                           integrate = FALSE,
                            distance.truncation = environment(mdl$formula)$truncation,
                            covariate = mdl$covariates[[name]],
                            add = FALSE,
@@ -52,16 +56,18 @@ plot.detfun = function(mdl = NULL,
 
   if (is.null(loc)) { 
     x = data.frame(distance = seq(0, distance.truncation, length.out = 500)) 
-    integrate = FALSE
+
   }
   else { 
     x = loc 
-    integrate = TRUE
+
   }
   
-  upper = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.975quant", link = exp)
-  dmean = evaluate.model(model = mdl, inla.result = result, loc = x, property = "mode", link = exp)
-  lower = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.025quant", link = exp)
+  if ( is.null(upper) ) { upper = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.975quant", link = exp) }
+  if ( is.null(mode) ) { 
+    dmean = evaluate.model(model = mdl, inla.result = result, loc = x, property = "mode", link = exp)
+  } else {dmean = mode}
+  if ( is.null(lower) ) { lower = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.025quant", link = exp) }
   
   if ( !is.null(prior) ) {
     upper = upper * prior(loc)
