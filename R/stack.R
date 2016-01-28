@@ -92,8 +92,13 @@ integration.stack = function(data,
   e.pp = pts[,E]
   
   # Adding constants to the predictor turns into re-weighting the integration points
-  if ( !is.null(const) ){ e.pp = as.numeric(e.pp * exp( const(pts) )) }
-  # names(e.pp) = "e.inla" # INLA will complain if the column name coincides with a vraible name on the RHS 
+  if ( !is.null(const) ){ 
+    const.values = const(pts)
+    if ( !(length(const.values) == length(e.pp)) ) { 
+      stop("E-vector length does not equal length of vector returned by const function") }
+    e.pp = as.numeric(e.pp * exp( const.values )) 
+  }
+  
   
   # Create and return stack
   return(inla.stack(data = list(y.inla = y.pp, e = e.pp),
