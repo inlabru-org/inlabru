@@ -311,8 +311,29 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
 
 sample.model = function(model, inla.result, n = 1, loc = NULL) {
   samples = inla.posterior.sample.structured(inla.result, n)
-  samples = lapply(samples, function(x) { evaluate.model(model, inla.result = x, loc) } )
-  return(samples)
+  cov = do.call(cbind, list.covariates.model(model, loc))
+  Amat = list.A.model(model, loc)
+  ret.samples = list()
+  for (s in 1:n) {
+    posts = list() 
+    for (k in 1:length(model$effects)){
+      name = model$effects[k]
+      post = samples[[s]][[name]]
+      if (name %in% names(Amat)) {
+        A = Amat[[name]]
+        post = as.vector(A%*%as.vector(post))
+      }
+      posts[[name]] = post
+    }
+    ret = do.call(cbind, posts)
+    ret = apply(ret, MARGIN = 1, sum)
+    ret.samples[[s]] = ret
+  }
+  
+  return(ret.samples)
+  
+
+
 }
 
 
