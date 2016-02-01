@@ -30,6 +30,7 @@ NULL
 
 join = function(...){UseMethod("join")}
 evaluate = function(...){UseMethod("evaluate")}
+sample.points = function(...){UseMethod("sample.points")}
 list.covariates = function(...){UseMethod("list.covariates")}
 list.A = function(...){UseMethod("list.A")}
 list.indices = function(...){UseMethod("list.indices")}
@@ -335,6 +336,26 @@ sample.model = function(model, inla.result, n = 1, loc = NULL) {
 
 
 }
+
+
+#' Sample points from a model
+#'
+#' @aliases sample.points.model
+#'
+ 
+sample.points.model = function(model, data = NULL, inla.result = NULL, property = "random"){
+  loc = data$mesh$loc[,1:2]
+  colnames(loc) = data$mesh.coords
+  if ( property == "random") {
+    weights = sample.model(model, inla.result = inla.result, n = 1, loc = loc)[[1]]
+  } else {
+    weights = evaluate(model = model, inla.result = inla.result, loc = loc, do.sum = TRUE, property = property)
+  }
+  pts = sample.lgcp(data$mesh, weights = weights, geometry = data$geometry)
+  colnames(pts) = data$mesh.coords
+  return(pts)
+}
+
 
 
 #####################################
