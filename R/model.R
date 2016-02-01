@@ -30,6 +30,7 @@ NULL
 
 join = function(...){UseMethod("join")}
 evaluate = function(...){UseMethod("evaluate")}
+sample.value = function(...){UseMethod("sample.value")}
 sample.points = function(...){UseMethod("sample.points")}
 list.covariates = function(...){UseMethod("list.covariates")}
 list.A = function(...){UseMethod("list.A")}
@@ -307,10 +308,16 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
 
 #' Sample from a model
 #'
-#' @aliases sample.model
+#' @aliases sample.value.model
 #' 
 
-sample.model = function(model, inla.result, n = 1, loc = NULL) {
+sample.value.model = function(model, inla.result, n = 1, data = NULL, loc = NULL) {
+  
+  if ( is.null(loc) ) {
+    loc = data$mesh$loc[,1:2]; 
+    colnames(loc) = data$mesh.coords    
+  }
+  
   samples = inla.posterior.sample.structured(inla.result, n)
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
@@ -330,11 +337,8 @@ sample.model = function(model, inla.result, n = 1, loc = NULL) {
     ret = apply(ret, MARGIN = 1, sum)
     ret.samples[[s]] = ret
   }
-  
-  return(ret.samples)
-  
-
-
+  ret = do.call(cbind, ret.samples)
+  return(ret)
 }
 
 
@@ -347,7 +351,7 @@ sample.points.model = function(model, data = NULL, inla.result = NULL, property 
   loc = data$mesh$loc[,1:2]
   colnames(loc) = data$mesh.coords
   if ( property == "random") {
-    weights = sample.model(model, inla.result = inla.result, n = 1, loc = loc)[[1]]
+    weights = sample.value.model(model, inla.result = inla.result, n = 1, loc = loc)
   } else {
     weights = evaluate(model = model, inla.result = inla.result, loc = loc, do.sum = TRUE, property = property)
   }
