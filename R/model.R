@@ -356,13 +356,14 @@ model.intercept = function(data, effects = "Intercept") {
 #' @aliases model.fixed
 #' 
 
-model.fixed = function(effects = NULL) {
-  if ( is.null(effects) ) { stop("Please specify the effect names (parameter 'effects').") }
-  formula = as.formula(paste0("~ . ", do.call(paste0,as.list(paste(" + ", effects, ".eff",sep = "")))))
-  covariates = list()
+model.fixed = function(effects = NULL, covariates = list()) {
+  if ( is.null(effects) ) { effects = names(covariates) }
+  formula = as.formula(paste0("~ . ", do.call(paste0,as.list(paste(" + ", effects, "",sep = "")))))
   for ( k in 1:length(effects) ) {
     effect = effects[k]
-    covariates[[effect]] = function(x) { x[,effect] }  
+    if (!(effect %in% names(covariates))) { covariates[[effect]] = function(x) { x[,effect] } }
+    environment(covariates[[effect]]) = new.env()
+    assign("effect", effect, envir = environment(covariates[[effect]]))
   }
   return(make.model(name = "Fixed effect", formula = formula, effects = effects, covariates = covariates))
 }
