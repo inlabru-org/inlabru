@@ -298,6 +298,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
   }
   ret = do.call(cbind, posts)
   if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
+  if( "const" %in% names(model) ) { ret = ret + model$const(loc) }
   return(link(ret))
 }
 
@@ -342,6 +343,30 @@ model.intercept = function(data, effects = "Intercept") {
   
   return(make.model(name = "Basic Intercept", formula = formula, effects = effects, covariates = covariates))
 }
+
+
+
+#' Fixed effect model
+#'
+#' A simple fixed effect of an equally named covariate
+#' 
+#' ~ . + fixed
+#'
+#'
+#' @aliases model.fixed
+#' 
+
+model.fixed = function(effects = NULL) {
+  if ( is.null(effects) ) { stop("Please specify the effect names (parameter 'effects').") }
+  formula = as.formula(paste0("~ . ", do.call(paste0,as.list(paste(" + ", effects, ".eff",sep = "")))))
+  covariates = list()
+  for ( k in 1:length(effects) ) {
+    effect = effects[k]
+    covariates[[effect]] = function(x) { x[,effect] }  
+  }
+  return(make.model(name = "Fixed effect", formula = formula, effects = effects, covariates = covariates))
+}
+
 
 
 #' Spatial SPDE model
