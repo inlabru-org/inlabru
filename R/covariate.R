@@ -11,8 +11,8 @@ plot.covariate = function(covariate,time=NULL,fun=NULL){
   # The grid
   xlim = range(covariate$mesh$loc[,1])
   ylim = range(covariate$mesh$loc[,2])
-  x = seq(xlim[1],xlim[2],length.out=200)
-  y = seq(ylim[1],ylim[2],length.out=200)
+  x = seq(xlim[1],xlim[2],length.out=500)
+  y = seq(ylim[1],ylim[2],length.out=500)
   grid = expand.grid(x=x,y=y)
 
   # Locations/time
@@ -27,8 +27,8 @@ plot.covariate = function(covariate,time=NULL,fun=NULL){
   # Plot
   require(lattice)
   levelplot(val ~ grid$x + grid$y,
-            col.regions=heat.colors(100),
-            panel=function(...){panel.levelplot(...)},
+            col.regions = topo.colors(100),
+            panel=function(...){ panel.levelplot(...) },
             xlab = covariate$mesh.coords[[1]],
             ylab = covariate$mesh.coords[[2]])
 
@@ -51,12 +51,9 @@ get.value = function(covariate,loc){
   for (t in times){
     msk = loc[,covariate$time.coords]==t
     A = inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[msk,covariate$mesh.coords]))
-    chk = apply(A,MARGIN=1,sum)==0
-    if(any(chk) & length(chk)==covariate$mesh$n) {
-      warning("You tried to evaluate your covariate at a location outside the mesh. Filling in diag(A) = 1. This is a very dirty workaround!")
-      diag(A) = 1
-    }
+    inside = is.inside(covariate$mesh, loc = loc[msk,covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
     values[msk] = as.vector(A%*%covariate$values[,as.character(t)])
+    values[msk & !inside] = NA
   }
   return(values)
 }
