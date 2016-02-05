@@ -30,34 +30,54 @@ NULL
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' 
 
-make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords = NULL, ...) {
-  if (is.null(effort)) { 
-    stop("You have to provide an effort data frame.") 
-  }
+make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords = NULL, mesh.args = list()) {
   
-  if (is.null(geometry) | !any((geometry %in% c("euc", "geo")))) { 
-    stop(paste0("You have to provide a geometry that is not supported: ",geometry)) 
-  }
-  
-  if (is.null(mesh)) { 
-    stop("You have to provide a mesh.")
-  }
-  
-  if (is.null(mesh.coords)) { 
-    stop("You have to provide mesh.coords.")
-  }
-  
-  #
-  # Seems like we have all we need. Let's assemble the dsdata object.
-  #
-  
-  dset = list(effort = effort,
-            geometry = geometry,
-            mesh = mesh,
-            mesh.coords = mesh.coords, ...)  
-  
+  dset = list()
   class(dset) = c("dsdata", "list")
   
+  # EFFORT
+  if (is.null(effort)) { 
+    stop("make.dsdata(): You have to provide an effort data frame.") 
+  } else {
+    dset$effort = effort
+  }
+  
+  # GEOMETRY
+  if ( is.null(geometry) ) { 
+    cat("make.dsdata(): You did not provide a geometry. ")
+    if ( "lon" %in% colnames(effort) & "lat" %in% colnames(effort)) {
+      cat("However, your effort table has longitude and latitude data. Assuming geographic coordinates and setting geometry to 'geo'.\n")
+      geometry = "geo"
+    } else if ( "x" %in% colnames(effort) & "y" %in% colnames(effort)){
+      cat("However, your effort table has 'x' and 'y' columns. Assuming euclidean coordinates and setting geometry to 'euc'.\n")
+      geometry = "euc"
+    }
+  } else if ( !any((geometry %in% c("euc", "geo"))) ){
+    stop(paste0("You have to provide a geometry that is not supported: ", geometry)) 
+  }
+  dset$geometry = geometry
+  
+  # MESH COORDS
+  if ( is.null(mesh.coords) ) { 
+    cat("make.dsdata(): You did not provide mesh.coords")
+    if ( geometry=="geo" ) {
+      cat(" but geometry is set to 'geo'. Will assume defaults 'lon' and 'lat' for mesh.coords.\n")
+      mesh.coords = c("lon","lat")
+    } else if ( geometry=="euc" ) {
+      cat(" but geometry is set to 'euc'. Will assume defaults 'x' and 'y' for mesh.coords.\n")
+      mesh.coords = c("x","y")
+    } else {
+      stop(".")
+    }
+  }
+  dset$mesh.coords = mesh.coords
+  
+  if (is.null(mesh)) { 
+    cat("make.dsdata(): You did not provide a mesh. A default mesh will be constructed.\n")
+    mesh = do.call(make.mesh, c(list(dset), mesh.args))
+  }
+  dset$mesh = mesh
+    
   #
   # Sanity check
   #
@@ -70,6 +90,56 @@ make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords 
   
   return(dset)
   
+}
+
+
+#' Make a default mesh
+#' 
+#' @aliases make.mesh
+#' @export
+#' @examples \dontrun{  }
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#' 
+
+make.mesh = function(dset, ...) {
+  
+  # Determine range of coordinates
+  det.x1.range = range(dset$effort[,dset$mesh.coords[1]], na.rm = TRUE)
+  det.x2.range = range(dset$effort[,dset$mesh.coords[2]], na.rm = TRUE)
+  eff.x1.range = range(dset$effort[,paste0("start.",dset$mesh.coords[1])], na.rm = TRUE)
+  eff.x2.range = range(dset$effort[,paste0("start.",dset$mesh.coords[2])], na.rm = TRUE)
+  x1.range = c(min(det.x1.range[1],eff.x1.range[1]), max(det.x1.range[2],eff.x1.range[2]))
+  x2.range = c(min(det.x2.range[1],eff.x2.range[1]), max(det.x2.range[2],eff.x2.range[2]))
+  # Minimum range
+  min.range = min(x1.range[2]-x1.range[1],x2.range[2]-x2.range[1])
+  max.range = max(x1.range[2]-x1.range[1],x2.range[2]-x2.range[1])
+  
+  mesh.args = list(...)
+  
+  # Default mesh for geographic coordinates 
+  if ( dset$geometry == "geo" ) {
+    if ( length(mesh.args) == 0) {
+      bnd = data.frame(rbind(c(x1.range[1],x2.range[1]),
+                      c(x1.range[1],x2.range[2]),
+                      c(x1.range[2],x2.range[1]),
+                      c(x1.range[2],x2.range[2])))
+      colnames(bnd) = dset$mesh.coords
+      eloc = geo.to.euc(bnd, R=1)
+      mesh = inla.mesh.create(loc = eloc,  extend=FALSE, refine = list(max.edge = min.range/360))
+    } else {
+      mesh = do.call(inla.mesh.create, mesh.args)
+    }
+  # Default mesh for coordinates in the plane
+  } else if (dset$geometry == "euc") {
+    if ( length(mesh.args) == 0 ) {
+      lattice = inla.mesh.lattice(x = seq(x1.range[1], x1.range[2], length.out = 2),
+                                  y = seq(x2.range[1], x2.range[2], length.out = 2))
+      mesh = do.call(inla.mesh.create, list(lattice = lattice, refine = list(max.edge = min.range/5)))
+    } else {
+      mesh = do.call(inla.mesh.create, mesh.args)
+    }
+  }
+  return(mesh)
 }
 
 
@@ -238,15 +308,21 @@ sanity.unsorted = function(dset, message = FALSE) {
 
 # All detections inside mesh ?
 sanity.detection.inside = function(dset, message = FALSE){
-  sane = !any(!(is.inside(dset$mesh, detdata(dset), mesh.coords = dset$mesh.coords)))
-  if ( message & !sane) { message = "There are detections outside the mesh." }
+  pts = detdata(dset)[, dset$mesh.coords]
+  if ( dset$geometry=="geo" ) { pts = geo.to.euc(pts, R = 1) }
+  sane = all(is.inside(dset$mesh, pts, mesh.coords = colnames(pts)))
+  if ( message & !sane ) { message = "There are detections outside the mesh." }
   return(list(sane = sane, message = message))
 }
 
 # All effort inside mesh?
 sanity.effort.inside = function(dset, message = FALSE){
-  sane = !any(!(is.inside(dset$mesh, dset$effort[is.na(dset$effort$det),], mesh.coords = paste0("start.",dset$mesh.coords))))
-  if ( message & !sane) { message = "There is effort outside the mesh." }
+  pts1 = dset$effort[is.na(dset$effort$det), paste0("start.",dset$mesh.coords)]; colnames(pts1) = dset$mesh.coords
+  pts2 = dset$effort[is.na(dset$effort$det), paste0("end.",dset$mesh.coords)]; colnames(pts2) = dset$mesh.coords
+  pts = rbind(pts1, pts2)
+  if ( dset$geometry=="geo" ) { pts = geo.to.euc(pts, R = 1) }
+  sane = all(is.inside(dset$mesh, pts, mesh.coords = colnames(pts)))
+  if ( message & !sane ) { message = "There is effort outside the mesh." }
   return(list(sane = sane, message = message))
 }
 
