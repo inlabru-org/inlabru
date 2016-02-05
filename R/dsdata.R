@@ -63,9 +63,15 @@ make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords 
     if ( geometry=="geo" ) {
       cat(" but geometry is set to 'geo'. Will assume defaults 'lon' and 'lat' for mesh.coords.\n")
       mesh.coords = c("lon","lat")
+      if (!( "lon" %in% colnames(effort) & "lat" %in% colnames(effort))) { 
+        stop("make.dsdata(): Your effort data has not 'lon' and 'lat' columns.")
+      }
     } else if ( geometry=="euc" ) {
       cat(" but geometry is set to 'euc'. Will assume defaults 'x' and 'y' for mesh.coords.\n")
       mesh.coords = c("x","y")
+      if (!( "x" %in% colnames(effort) & "y" %in% colnames(effort))) { 
+        stop("make.dsdata(): Your effort data has not 'x' and 'y' columns.")
+      }
     } else {
       stop(".")
     }
@@ -178,17 +184,22 @@ plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,asp=1
   else {
     require(rgl)
     if (data$geometry == "euc"){
+      if( is.null(col) ) { col = "white" }
       # plot mesh
-      plot(data$mesh,rgl=TRUE,col=col)
+      plot(data$mesh, rgl = TRUE, col = col, edge.color = rgb(0.4,0.4,0.4))
       
       # plot detections
-      detections = cbind(detdata(data)[,c("x","y")],z=rep(0.01,nrow(detdata(data))))
+      detections = cbind(detdata(data)[,data$mesh.coords],z=rep(0.01,nrow(detdata(data))))
       rgl.points(x=detections, z=0.001,size=5,col="red")
       
       # plot transect lines
-      sp = startpoint(as.transect(data),data)
-      ep = endpoint(as.transect(data),data)
-      rgl.lines(cbind(matrix(cbind(sp,ep),ncol=2,byrow=TRUE),z=0.01),lwd=5,col="black")
+      sp = startpoint(as.transect(data),data)[,data$mesh.coords]
+      ep = endpoint(as.transect(data),data)[,data$mesh.coords]
+      sp$z = 0.001
+      ep$z = 0.001
+      lns = as.matrix(cbind(ep,sp,matrix(NaN, nrow = dim(sp)[1], ncol = 3)))
+      qq = matrix(t(lns), ncol = 3, byrow = TRUE)
+      rgl.linestrips(qq, lwd = 3, col = "black", alpha = 0.4)
     }
     else if (data$geometry == "geo"){
       # Elevation for plotting on top of earth surface
