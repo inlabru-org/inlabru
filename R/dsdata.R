@@ -26,7 +26,12 @@ NULL
 #' 
 #' @aliases make.dsdata 
 #' @export
-#' @examples \dontrun{  }
+#' @param effort A data.frame object describing transects and detections
+#' @param geometry Character describing the geometry of the data set. Either "euc" for euclidean or "geo" for geographic coordinates.
+#' @param mesh An inla.mesh object modeling the domain.
+#' @param mesh.coords Names of the effort columns that are interpreted as coordinates
+#' @param mesh.args If no mesh if provided these arguments passed on to inla.mesh.create to construct the mesh. 
+#' @examples \dontrun{ data(toy1) ; dset = make.dsdata(effort = toy1$effort) ; plot(dset) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' 
 
