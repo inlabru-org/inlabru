@@ -218,7 +218,7 @@ plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,asp=1
         rgl.sphmesh(data$mesh,add=TRUE,radius=R+R.delta,lwd = 1,edge.color = rgb(0,0,0),col=col)
       }
       
-      do.call(par3d,data$par3d.args)
+      # do.call(par3d,data$par3d.args)
       
       # transects
       plot(as.transect(data$effort),data=data,rgl=TRUE,add=TRUE,radius=R+R.delta,col=rgb(0.1,0.1,0.7))
