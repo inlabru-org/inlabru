@@ -101,8 +101,12 @@ rgl.earth = function(R=1,R.grid=1.05){
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' 
 #' 
-rgl.sphmesh = function(mesh,radius=1,add=NULL,col=NULL,...){
-  mesh$loc = geo.to.euc(data.frame(lat=mesh$loc[,2],lon=mesh$loc[,1]),R=radius)
+rgl.sphmesh = function(mesh, radius=1, add=NULL, col=NULL,...){
+  if ( mesh$manifold  == "S2" ) {
+    mesh$loc = radius * mesh$loc
+  } else {
+    mesh$loc = geo.to.euc(data.frame(lat=mesh$loc[,2],lon=mesh$loc[,1]),R=radius)
+  }
   if (is.null(col)) { plot(mesh,rgl=TRUE,add=add,...) }
   else{ plot(mesh,rgl=TRUE,add=add,col=col,...) }
 }
