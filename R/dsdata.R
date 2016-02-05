@@ -192,7 +192,7 @@ plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,asp=1
     }
     else if (data$geometry == "geo"){
       # Elevation for plotting on top of earth surface
-      R.delta=0.001
+      R.delta = 0.003
       
       # earth
       rgl.earth()
