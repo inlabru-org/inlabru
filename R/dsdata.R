@@ -45,6 +45,9 @@ make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords 
     stop("make.dsdata(): You have to provide an effort data frame.") 
   } else {
     dset$effort = effort
+    cat("make.dsdata(): Checking if the effort table has all the necessary columns ...")
+    sanity.stop = function(ret) { if (!ret$sane) { stop(ret$message) } else { cat(" [OK]\n") } }
+    sanity.stop(sanity.columns(dset, message = TRUE))
   }
   
   # GEOMETRY
@@ -92,7 +95,7 @@ make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords 
   #
   # Sanity check
   #
-  
+  cat("make.dsdata(): Done with constructing the data set. Running sanity checks...\n")
   sanity(dset)
   
   #
@@ -310,7 +313,7 @@ sanity.distance = function(dset, message = FALSE) {
 sanity.columns = function(dset, message = FALSE) {
   cols = c("strat", "trans", "seg", "det")
   sane = !any(!(cols %in% names(dset$effort)))
-  if ( message & !sane) { message = paste0("The data set is missing one of the following colums: ", do.call(paste, c(as.list(cols),sep = ", "))) }
+  if ( message & !sane) { message = paste0("The effort table is missing one of the following colums: ", do.call(paste, c(as.list(cols),sep = ", "))) }
   return(list(sane = sane, message = message))
 }
 
