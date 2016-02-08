@@ -169,13 +169,26 @@ make.mesh = function(dset, ...) {
 
 plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,asp=1,...){
   if (rgl==FALSE) {
+    
+    # 2D plot of spherical mesh
+    if ( data$geometry == "geo" & data$mesh$manifold == "S2") {
+      # Transform coordinates of mesh before plotting
+      loc = data.frame(data$mesh$loc)
+      colnames(loc)  = c("x","y","z")
+      mesh = data$mesh
+      mesh$manifold = "R2"
+      mesh$loc = as.matrix(euc.to.geo(loc, R = 1)[,data$mesh.coords])
+    }  else {
+      mesh = data$mesh
+    }
+    
     c1 = data$mesh.coords[1]
     c2 = data$mesh.coords[2]
-    xlim=range(data$mesh$loc[,1])
-    ylim=range(data$mesh$loc[,2])
+    xlim=range(mesh$loc[,1])
+    ylim=range(mesh$loc[,2])
     
     # Plot mesh
-    plot(data$mesh, col = col, main="", asp = asp)
+    plot(mesh, col = col, main="", asp = asp)
     
     # Plot transect lines
     spoint = startpoint(as.transect(data),data)
@@ -188,6 +201,7 @@ plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,asp=1
     # Plot detections
     par(new=TRUE)
     plot(detdata(data)[,data$mesh.coords],xlim=xlim,ylim=ylim,col=det.col, asp = asp)
+
   }
   else {
     require(rgl)
