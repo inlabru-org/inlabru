@@ -766,14 +766,16 @@ model.taylor1d = function(expr = NULL, effects = NULL, initial = NULL, result = 
 #' @aliases model.taylor
 #' @param expr Expression approximated
 #' @param effect List of charact arrays giving the variables that the expression is approximated in
-#' @param inital List of initial values of the Taylor approximation
+#' @param iterator An environment giving the (inital) values of the effects
 #' @param formula By default, the Variables of the Taylor approximation are modeled using INLA fixed effects. This can be changed by overwriting the formula of the model.
 
-model.taylor = function(expr = NULL, effects = NULL, initial = NULL, formula = NULL) {
+model.taylor2 = function(expr = NULL, effects = NULL, iterator = NULL, formula = NULL) {
   
   if (is.null(formula)) {
     formula = as.formula(paste0("~. + ", do.call(paste, c(sep = " +", as.list(effects)))   ))
   }
+  
+  if ( !is.environment(iterator) ) { iterator = as.environment(iterator) }
   
   covariates = list()
   grads = list()
@@ -781,15 +783,13 @@ model.taylor = function(expr = NULL, effects = NULL, initial = NULL, formula = N
   for (k in 1:length(effects)) { 
     effect = effects[k]
     covariates[[effect]] = function(loc) { 
-      myenv = new.env()
-      assign(effect, initial[[effect]], envir = myenv)
+      myenv = new.env(parent = iterator)
       assign("loc", loc, envir = myenv)
       nderiv = numericDeriv(expr[[1]], c(effect), myenv)
       gradient = attr(nderiv,"grad")[,1]
       ret = data.frame(gradient)
       colnames(ret) = effect
-      return(ret)
-      
+      return(as.vector(ret[,1]))
     }
     # clone environment
     environment(covariates[[effect]]) = new.env()
@@ -797,12 +797,13 @@ model.taylor = function(expr = NULL, effects = NULL, initial = NULL, formula = N
     
     
     grads[[effect]] = function(loc) {
-      myenv = new.env()
-      assign(effect, initial[[effect]], envir = myenv)
+      myenv = new.env(parent = iterator)
       assign("loc", loc, envir = myenv)
       nderiv = numericDeriv(expr[[1]], c(effect), myenv)
       gradient = attr(nderiv,"grad")[,1]
-      ret = gradient * initial[[effect]]
+      if (paste0(effect,".projector") %in% names(iterator)) {
+        ret = gradient * iterator[[paste0(effect,".projector")]](loc)
+      } else { ret = gradient * iterator[[effect]] }
       return(ret) 
     }
     environment(grads[[effect]]) = new.env()
@@ -811,8 +812,8 @@ model.taylor = function(expr = NULL, effects = NULL, initial = NULL, formula = N
   }
   
   value = function(loc){
-    myenv = new.env()
-    assign(effect, initial[[effect]], envir = myenv)
+    myenv = new.env(parent = iterator)
+    assign(effect, iterator[[effect]], envir = myenv)
     assign("loc", loc, envir = myenv)
     nderiv = numericDeriv(expr[[1]], c(effect), myenv)
     return(nderiv)
@@ -823,6 +824,7 @@ model.taylor = function(expr = NULL, effects = NULL, initial = NULL, formula = N
     return( value(loc) - apply(do.call(cbind, lapply(grads, function(f) {f(loc)})), MARGIN=1, sum)  )
   }
   environment(const) = new.env()
+  # assign("grads", grads, envir = environment(const))
   assign("covariates", covariates, envir = environment(const))
   assign("value", value, envir = environment(const))
   
