@@ -769,7 +769,7 @@ model.taylor1d = function(expr = NULL, effects = NULL, initial = NULL, result = 
 #' @param iterator An environment giving the (inital) values of the effects
 #' @param formula By default, the Variables of the Taylor approximation are modeled using INLA fixed effects. This can be changed by overwriting the formula of the model.
 
-model.taylor2 = function(expr = NULL, effects = NULL, iterator = NULL, formula = NULL) {
+model.taylor = function(expr = NULL, effects = NULL, iterator = NULL, formula = NULL) {
   
   if (is.null(formula)) {
     formula = as.formula(paste0("~. + ", do.call(paste, c(sep = " +", as.list(effects)))   ))
