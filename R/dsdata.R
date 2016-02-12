@@ -44,6 +44,7 @@ make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords 
   if (is.null(effort)) { 
     stop("make.dsdata(): You have to provide an effort data frame.") 
   } else {
+    class(effort) = c("effort", "data.frame")
     dset$effort = effort
     cat("make.dsdata(): Checking if the effort table has all the necessary columns ...")
     sanity.stop = function(ret) { if (!ret$sane) { stop(ret$message) } else { cat(" [OK]\n") } }
