@@ -158,17 +158,36 @@ make.mesh = function(dset, ...) {
 }
 
 
-#' Plot generic distance sampling data
+#' Plot distance sampling data (\link{dsdata})
 #' 
 #' @aliases plot.dsdata 
+#' @name plot.dsdata
 #' @export
-#' @param dsdata Distance sampling data set
-#' @name blah
+#' @param data Distance sampling data set
+#' @param rgl If TRUE, use RGL to plot the data
+#' @param add If TRUE, add the plot instead of starting a new one
+#' @param transect If TRUE, plot the transect lines
+#' @param segment If TRUE, plot the segment lines
+#' @param segment.colorize Colorize segments according to their transect. Only supported if rgl=FALSE
+#' @param detection If TRUE, plot the detected animals
+#' @param col Color specification for the mesh. Requires rgl=TRUE
+#' @param asp Apect ration of the plot
 #' @examples \dontrun{ toy=toy1() ; plot(toy) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' 
-
-plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,asp=1,...){
+plot.dsdata = function(data, 
+                       rgl = FALSE, 
+                       add=FALSE,
+                       transect = TRUE,
+                       segment = FALSE,
+                       segment.colorize = FALSE,
+                       detection = TRUE, 
+                       col = NULL, 
+                       asp = 1, ...){
+  # Defaults
+  det.col = "red"
+  R = 1
+  
   if (rgl==FALSE) {
     
     # 2D plot of spherical mesh
@@ -189,20 +208,47 @@ plot.dsdata = function(data,rgl=FALSE,det.col="red",add=FALSE,R=1,col=NULL,asp=1
     ylim=range(mesh$loc[,2])
     
     # Plot mesh
-    plot(mesh, col = col, main="", asp = asp)
+    plot(mesh, main="", asp = asp)
+    
+    # Plot segments
+    if ( segment | segment.colorize ) {
+      if ( segment.colorize ){
+        # plot segments of same transect with identification color
+        for (k in 1:nrow(data$effort)){
+          lines(data$effort[k, c(paste0("start.",data$mesh.coords[1]), paste0("end.",data$mesh.coords[1]))], 
+                data$effort[k, c(paste0("start.",data$mesh.coords[2]), paste0("end.",data$mesh.coords[2]))],
+                col = data$effort$trans[k],
+                lwd = 3
+          )
+        }  
+        
+      } else {
+        scol = 0.6
+        spoint = data$effort[,paste0("start.",data$mesh.coords)]
+        epoint = data$effort[,paste0("end.",data$mesh.coords)]
+        lines(x=as.vector(t(cbind(spoint[,1],epoint[,1],rep(NA,dim(spoint)[1])))),
+              y=as.vector(t(cbind(spoint[,2],epoint[,2],rep(NA,dim(spoint)[1])))),
+              xlim = xlim, ylim = ylim,
+              lwd = 3, 
+              col = rgb(scol,scol,scol))
+      }
+    }
     
     # Plot transect lines
-    spoint = startpoint(as.transect(data),data)
-    epoint = endpoint(as.transect(data),data)
-    lines(x=as.vector(t(cbind(spoint[,c1],epoint[,c1],rep(NA,dim(spoint)[1])))),
-          y=as.vector(t(cbind(spoint[,c2],epoint[,c2],rep(NA,dim(spoint)[1])))),
-          xlim=xlim,ylim=ylim,
-          lwd=2)
+    if ( transect ) {
+      spoint = startpoint(as.transect(data),data)
+      epoint = endpoint(as.transect(data),data)
+      lines(x=as.vector(t(cbind(spoint[,c1],epoint[,c1],rep(NA,dim(spoint)[1])))),
+            y=as.vector(t(cbind(spoint[,c2],epoint[,c2],rep(NA,dim(spoint)[1])))),
+            xlim = xlim, ylim = ylim,
+            lwd = 3, col = 1:(nrow(spoint)-1))
+    }
     
     # Plot detections
-    par(new=TRUE)
-    plot(detdata(data)[,data$mesh.coords],xlim=xlim,ylim=ylim,col=det.col, asp = asp)
-
+    if ( detection ) {
+      par(new=TRUE)
+      plot(detdata(data)[,data$mesh.coords],xlim=xlim,ylim=ylim,col=det.col, asp = asp, pch = 16, cex = 1.2)
+    }
   }
   else {
     require(rgl)
