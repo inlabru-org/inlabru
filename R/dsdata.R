@@ -24,7 +24,8 @@ NULL
 
 #' Make dsdata 
 #' 
-#' @aliases make.dsdata 
+#' @aliases make.dsdata
+#' @name make.dsdata
 #' @export
 #' @param effort A data.frame object describing transects and detections
 #' @param geometry Character describing the geometry of the data set. Either "euc" for euclidean or "geo" for geographic coordinates.
