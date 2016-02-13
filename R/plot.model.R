@@ -158,6 +158,7 @@ plot.detfun = function(mdl = NULL,
 #'
 #' 
 #' @aliases plot plot.spatial
+#' @name plot.spatial
 #' @export
 #' @param mdl A \link{model} object
 #' @param result An \link{inla} object, i.e. the result of running INLA
