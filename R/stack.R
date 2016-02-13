@@ -173,6 +173,47 @@ grpsize.stack = function(data,
                     effects = c(idx, eff)))
 }
 
+#' Create a stack from a model and data
+#'
+#' @aliases generic.stack
+#' @name generic.stack
+
+generic.stack = function(model = NULL,
+                    data = NULL,   
+                    filter = NULL,
+                    y = 0,
+                    E = NULL, ...) {
+
+  # Extract points from data set
+  if (is.dsdata(data)) { pts = data$effort } else { pts = data }
+  
+  # Apply filters provided by user
+  if (!is.null(filter)) { pts = det.filter(pts) }
+  
+  # Projection matrices (A) and mesh index effects
+  A = list.A.model(model, pts)
+  eff = list.covariates.model(model, pts)
+  idx = list.indices.model(model, pts)
+  
+  # Observations y
+  y.inla = eval.if.function(y, pts)
+  inla.data = list(y.inla = y.inla)
+  
+  # Expectation parameter E
+  if ( !is.null(E) ) { 
+    E = eval.if.function(E, pts) 
+    inla.data$e = E
+  }
+  
+  # Create and return stack
+  stack = inla.stack(data = inla.data,
+                     A = A,
+                     effects = c(idx, eff), ...)
+  return(stack)
+}
+
+
+
 
 #####################################
 # Helpers
