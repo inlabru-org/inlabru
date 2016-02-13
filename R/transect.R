@@ -18,7 +18,7 @@ plot.transect = function(tr,data=FALSE,rgl=TRUE,col=NULL,add=FALSE,radius=1.1,..
       }
       # draw transects
       
-      rgl.sphlines2(startpoint(tr,data),endpoint(tr,data),add=add,radius=radius,col=col,lwd=2)
+      rgl.sphlines2(startpoint(tr,data),endpoint(tr,data),add=add,radius=radius,col=col, ...)
     }
     else {
       xl = c(-13,32)
