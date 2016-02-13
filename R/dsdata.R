@@ -506,7 +506,7 @@ as.transect.effort = function(effort){
     end.idx = length(tr.id)
     start.idx = 1
   } else {
-    end.idx = which(diff(tr.id)>0)
+    end.idx = c(which(diff(tr.id)>0), length(tr.id))
     start.idx = c(1,end.idx[1:(length(end.idx)-1)]+1)
   }
   tr = data.frame(start=start.idx,end=end.idx)
