@@ -22,6 +22,17 @@
 NULL
 
 
+#' Check if an object is of class dsdata
+#' 
+#' @aliases is.dsdata
+#' @name is.dsdata
+#' @export
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#' 
+
+is.dsdata = function(data) { return( class(data)[1] == "dsdata") }
+
+
 #' Make dsdata 
 #' 
 #' @aliases make.dsdata
