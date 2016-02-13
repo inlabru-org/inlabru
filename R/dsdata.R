@@ -167,12 +167,12 @@ make.mesh = function(dset, ...) {
 #' @param rgl If TRUE, use RGL to plot the data
 #' @param add If TRUE, add the plot instead of starting a new one
 #' @param transect If TRUE, plot the transect lines
-#' @param transect.args Plotting argument for transects. Only supported if rgl=FALSE
+#' @param transect.args Plotting argument for transects.
 #' @param segment If TRUE, plot the segment lines
-#' @param segment.args Plotting argument for segments. Only supported if rgl=FALSE
+#' @param segment.args Plotting argument for segments.
 #' @param segment.colorize Colorize segments according to their transect. Only supported if rgl=FALSE
 #' @param detection If TRUE, plot the detected animals
-#' @param detection.args Plotting argument for detections. Only supported if rgl=FALSE
+#' @param detection.args Plotting argument for detections.
 #' @param col Color specification for the mesh. Requires rgl=TRUE
 #' @param asp Apect ration of the plot
 #' @examples \dontrun{ toy=toy1() ; plot(toy) }
@@ -187,12 +187,18 @@ plot.dsdata = function(data,
                        segment.args = list(lwd = 2, col = rgb(0.6, 0.6, 0.6)),
                        segment.colorize = FALSE,
                        detection = TRUE,
-                       detection.args = list(col = "red", pch = 16, cex = 1.2),
+                       detection.args = list(col = "red2", pch = 16, cex = 1.2),
                        col = NULL, 
                        asp = 1, ...){
+
   # Defaults
-  det.col = "red"
-  R = 1
+  if ( !("lwd" %in% names(transect.args)) ) { transect.args$lwd = 3 }
+  if ( !("col" %in% names(transect.args)) ) { transect.args$col = "black" }
+  if ( !("lwd" %in% names(segment.args)) ) { segment.args$lwd = 2 }
+  if ( !("col" %in% names(segment.args)) ) { segment.args$col = rgb(0.6, 0.6, 0.6) }
+  if ( !("col" %in% names(detection.args)) ) { detection.args$col = "red" }
+  if ( !("cex" %in% names(detection.args)) ) { detection.args$cex = 1.2 }
+  if ( !("pch" %in% names(detection.args)) ) { detection.args$pch = 16 }
   
   if (rgl==FALSE) {
     
@@ -258,26 +264,43 @@ plot.dsdata = function(data,
     }
     else if (data$geometry == "geo"){
       # Elevation for plotting on top of earth surface
+      R = 1
       R.delta = 0.003
       
-      # earth
+      # Draw earth
       rgl.earth()
       rgl.viewpoint(0,-90)
 
-      # detections
-      detections = detdata(data)[,c("lat","lon")]
-      rgl.sphpoints(long=detdata(data)[,"lon"]+360,lat=detdata(data)[,"lat"],radius=R+2*R.delta,col="red",size=5)
-      if (is.null(col)){
-        rgl.sphmesh(data$mesh,add=TRUE,radius=R+R.delta,lwd = 1,edge.color = rgb(0,0,0),alpha=0.3,draw.segments = TRUE)
-      } else {
-        rgl.sphmesh(data$mesh,add=TRUE,radius=R+R.delta,lwd = 1,edge.color = rgb(0,0,0),col=col)
+      # Draw detections
+      if ( detection ) {
+        detection.args = c(detection.args, list(size = 4*detection.args$cex))
+        detections = detdata(data)[,data$mesh.coords]
+        do.call(rgl.sphpoints, c(list(long = detections[,1] + 360, 
+                                      lat = detections[,2],
+                                      radius = R + 2 * R.delta),
+                                 detection.args))
       }
       
-      # do.call(par3d,data$par3d.args)
+      # Draw the mesh
+      if (is.null(col)){
+        rgl.sphmesh(data$mesh, add = TRUE, radius = R+R.delta, lwd = 1, edge.color = rgb(0,0,0), alpha = 0.3, draw.segments = TRUE)
+      } else {
+        rgl.sphmesh(data$mesh, add = TRUE, radius = R+R.delta, lwd = 1, edge.color = rgb(0,0,0), col = col)
+      }
       
-      # transects
-      plot(as.transect(data$effort),data=data,rgl=TRUE,add=TRUE,radius=R+R.delta,col=rgb(0.1,0.1,0.7))
+      # Draw segments
+      if ( segment ) {
+        if ( segment.colorize ){ segment.args$col = data$effort$trans }
+        pseudo.transect = data.frame(start=1:nrow(data$effort), end=1:nrow(data$effort))
+        class(pseudo.transect) = c("transect", "data.frame")
+        do.call(plot, c(list(pseudo.transect, data = data, rgl = TRUE, add = TRUE, radius = R+R.delta), segment.args) )
+      }
       
+      # Draw transects
+      if ( transect ) {
+        do.call(plot, c(list(as.transect(data$effort), data = data, rgl = TRUE, add = TRUE, radius = R+R.delta), transect.args) )
+      }
+                
     }
   }
 }
