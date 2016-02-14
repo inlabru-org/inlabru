@@ -3,39 +3,11 @@
 \name{plot.halfnormal}
 \alias{plot}
 \alias{plot.halfnormal}
-\title{Plot a half normal detection function}
+\title{Plot a half-normal detection function}
 \usage{
-plot.halfnormal(mdl = NULL, result = NULL, data = NULL, name = "nhsd",
-  distance.truncation = environment(mdl$formula)$truncation,
-  covariate = mdl$covariates[[name]], add.uncertainty = TRUE,
-  add.histogram = TRUE, col = rgb(250/256, 83/256, 62/256, 1),
-  ucol = rgb(250/256, 83/256, 62/256, 0.3))
-}
-\arguments{
-\item{mdl}{A \link{model} object}
-
-\item{result}{An \link{inla} object, i.e. the result of running INLA}
-
-\item{data}{iDistance data structure. Used to plot a histogram of the detections.}
-
-\item{name}{Name of the effect used to model the detection function. Default: "nhsd"}
-
-\item{distance.truncation}{Distance at which to truncate}
-
-\item{covariate}{Function transforming distances into effect covariates}
-
-\item{add.uncertainty}{Plot uncertainty boundaries}
-
-\item{add.histogram}{Use data to plot a histogram of the detections.}
-
-\item{col}{Color to plot mode of detection function}
-
-\item{ucol}{Color to plot uncertainty polygon}
+plot.halfnormal(...)
 }
 \description{
-Plot a half normal detection function
-}
-\author{
-Fabian E. Bachl <\email{f.e.bachl@bath.ac.uk}>
+See \link{plot.detfun} for details
 }
 

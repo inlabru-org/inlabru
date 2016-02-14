@@ -4,7 +4,7 @@
 \alias{dist.cyl}
 \title{Distance in cylindric geometry}
 \usage{
-\method{dist}{cyl}(cyl1, cyl2, R = 6371)
+dist.cyl(cyl1, cyl2, R = 6371)
 }
 \value{
 distance

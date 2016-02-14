@@ -4,14 +4,16 @@
 \alias{split.lines}
 \title{Split lines at mesh edges}
 \usage{
-\method{split}{lines}(mesh, sp, ep)
+\method{split}{lines}(mesh, sp, ep, filter.zero.length = TRUE)
 }
 \arguments{
+\item{mesh}{An inla.mesh object}
+
 \item{sp}{Start points of lines}
 
 \item{ep}{End points of lines}
 
-\item{truncation}{distance at which we truncate sightings}
+\item{filter.zero.length}{Filter out segments with zero length? (Bool)}
 
 \item{...}{argments to int.quadrature}
 }

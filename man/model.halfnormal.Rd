@@ -4,12 +4,19 @@
 \alias{model.halfnormal}
 \title{Half-normal detection function model}
 \usage{
-model.halfnormal(truncation, constrained = TRUE, ...)
+model.halfnormal(data = NULL, truncation = NULL, constrained = TRUE,
+  colname = "distance", effect = "nhsd")
 }
 \arguments{
+\item{data}{\link{dsdata} data set. Used to determine distance truncation (if not provided)}
+
 \item{truncation}{Distance to truncate at. Currently unused but passed on the the formula environment for later usage.}
 
 \item{constrained}{If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging.}
+
+\item{colname}{Effort data column to use for the covariate extraction. Default: "distance"}
+
+\item{effect}{Character setting the name of the effect in the model. Default: "nhsd" ("negative half squared distance")}
 }
 \description{
 Construct a half-normal detection function model using the formula
@@ -20,7 +27,7 @@ Construct a half-normal detection function model using the formula
 Hence, the effect is obtained from a contrained linear INLA model. The covariate "nhsd" for this model is as a
 function of the data.frame provided during the inference process:
 
-nhsd = function(X) { return(-0.5*X$distance^2) },
+nhsd = function(X) { return(-0.5*X[,colname]^2) },
 
 that is, nhsd is half of the negative squared distance of an observation/integration point.
 }

@@ -5,7 +5,8 @@
 \title{Create a stack for integration points}
 \usage{
 integration.stack(data, scheme = NULL, scheme.args = NULL, model = NULL,
-  filter = NULL, y = 0, E = "weight", tag = "integration.stack")
+  filter = NULL, y = 0, E = "weight", const = NULL,
+  tag = "integration.stack")
 }
 \description{
 Create a stack for integration points

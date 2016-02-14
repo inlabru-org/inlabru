@@ -4,7 +4,7 @@
 \alias{dist.geo}
 \title{Distance in geographic geometry (geodesic distance) using Havesine formula.}
 \usage{
-\method{dist}{geo}(geo1, geo2 = NA, R = 6371)
+dist.geo(geo1, geo2 = NA, R = 6371)
 }
 \value{
 distance Distance in km

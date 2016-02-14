@@ -4,7 +4,7 @@
 \alias{dist.euc}
 \title{Euclidian distance (CURRENTLY ONLY 2D)}
 \usage{
-\method{dist}{euc}(euc1, euc2 = NA)
+dist.euc(euc1, euc2 = NA)
 }
 \value{
 distance Euclidian distance

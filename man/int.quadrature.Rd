@@ -4,8 +4,8 @@
 \alias{int.quadrature}
 \title{Gaussian quadrature and other integration point constructors}
 \usage{
-int.quadrature(sp, ep, scheme = "gaussian", n.points = 1,
-  geometry = "euc", coords = c("x", "y"))
+int.quadrature(sp = NULL, ep = NULL, scheme = "gaussian", n.points = 1,
+  geometry = "euc", coords = NULL)
 }
 \arguments{
 \item{sp}{Start points of lines}

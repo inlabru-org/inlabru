@@ -4,7 +4,7 @@
 \alias{stack}
 \title{INLA stack constructors for distance sampling}
 \description{
-Distance sampling using INLA requires different kinds of \code{inla.stack} strucures to be set up.
+Distance sampling using INLA requires different kinds of \code{inla.stack} structures to be set up.
 These often represent different kinds of likelihoods but may also represent parts of the model
 that we might want to compute predictions for. iDistance provides the following stack constructors:
 }

@@ -4,7 +4,7 @@
 \alias{model.intercept}
 \title{Intercept model}
 \usage{
-model.intercept(data)
+model.intercept(data, effects = "Intercept")
 }
 \description{
 This model represents a simpel intercept added to the formula, i.e.:

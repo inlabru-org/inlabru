@@ -4,8 +4,9 @@
 \alias{make.model}
 \title{Create a model}
 \usage{
-make.model(formula = NULL, name = NULL, mesh = NULL,
-  mesh.coords = list(), covariates = list(), ...)
+make.model(formula = NULL, name = NULL, effects = NULL, mesh = NULL,
+  inla.spde = list(), mesh.coords = list(), time.coords = list(),
+  covariates = list(), eval = list(), ...)
 }
 \description{
 Create a model

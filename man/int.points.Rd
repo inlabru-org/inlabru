@@ -9,7 +9,7 @@ int.points(data, on = "transect", line.split = FALSE, mesh = data$mesh,
   geometry = data$geometry, length.scheme = "gaussian", n.length = 1,
   distance.scheme = "equidistant", n.distance = 5,
   distance.truncation = 1, fake.distance = FALSE, projection = NULL,
-  group.by = NULL)
+  group.by = NULL, filter.zero.length = TRUE)
 }
 \arguments{
 \item{data}{Either a dsdata/etpdata data set (e.g. whales) or a data.frame describing effort data}

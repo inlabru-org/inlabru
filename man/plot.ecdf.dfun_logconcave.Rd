@@ -5,7 +5,7 @@
 \alias{plot.ecdf.dfun_logconcave}
 \title{Plot empirical CDF for log concave detection function}
 \usage{
-\method{plot.ecdf}{dfun_logconcave}(mdl)
+plot.ecdf.dfun_logconcave(mdl)
 }
 \arguments{
 \item{mdl}{A \link{dfun_logconcave} model}

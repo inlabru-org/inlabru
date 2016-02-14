@@ -6,9 +6,9 @@
 \title{Plot spatial field}
 \usage{
 plot.spatial(mdl = NULL, result = NULL, data = NULL, name = "spde",
-  property = "mode", stack = NULL, mesh = mdl$mesh[[name]],
-  mesh.coords = mdl$mesh.coords[[name]], rgl = FALSE,
-  add.detections = TRUE, add.points = FALSE, add = FALSE,
+  property = "mode", group = list(), stack = NULL,
+  mesh = mdl$mesh[[name]], mesh.coords = mdl$mesh.coords[[name]],
+  rgl = FALSE, add.detections = TRUE, add.points = FALSE, add = FALSE,
   colorbar = TRUE, logscale = TRUE, col = NULL, ...)
 }
 \arguments{

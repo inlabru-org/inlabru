@@ -6,7 +6,7 @@
 \alias{plot.ecdf.dfun_logconcave}
 \title{Plot empirical CDF for half-normal detection function}
 \usage{
-\method{plot.ecdf}{dfun_halfnormal}(mdl)
+plot.ecdf.dfun_halfnormal(mdl)
 }
 \arguments{
 \item{mdl}{A \link{dfun_logconcave} model}

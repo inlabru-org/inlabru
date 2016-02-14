@@ -4,10 +4,12 @@
 \alias{model.logconcave}
 \title{Log-concave detection function model}
 \usage{
-model.logconcave(truncation, segments = 5, constrained = TRUE,
-  linbasis = TRUE, ...)
+model.logconcave(colname = "distance", truncation = NULL, segments = 5,
+  constrained = TRUE, linbasis = TRUE, quadbasis = TRUE, ...)
 }
 \arguments{
+\item{colname}{Effort data column to use for the covariate extraction. Default: "distance"}
+
 \item{truncation}{Maximum distance assumed to be observed..}
 
 \item{segments}{Number of quadratic basis basis functions}
@@ -15,7 +17,7 @@ model.logconcave(truncation, segments = 5, constrained = TRUE,
 \item{linbasis}{Wether to use a linear basis function.
 If set to FALSE this implies that that the detection function has zero derivative at the origin.}
 
-\item{clinear}{If set to false, non-constrained linear INLA effects are used for this mode.
+\item{clinear}{If set to false, non-constrained linear INLA effects are used for this model.
 This is handy for debugging but the detection function is not necessarily log-concave anymore.}
 }
 \description{
