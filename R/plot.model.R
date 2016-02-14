@@ -24,7 +24,7 @@ plot.halfnormal = function(...) { plot.detfun(...) }
 #'
 #' @aliases plot plot.detfun
 #' @export
-#' @param mdl A \link{model} object
+#' @param model A \link{model} object
 #' @param result An \link{inla} object, i.e. the result of running INLA
 #' @param data iDistance data structure. Used to plot a histogram of the detections.
 #' @param loc Distance at which to plot at (optional)
@@ -36,7 +36,7 @@ plot.halfnormal = function(...) { plot.detfun(...) }
 #' @param ucol Color to plot uncertainty polygon
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-plot.detfun = function(mdl = NULL,
+plot.detfun = function(model = NULL,
                            result = NULL, 
                            data = NULL,  
                            loc = NULL,
@@ -46,8 +46,8 @@ plot.detfun = function(mdl = NULL,
                            mode = NULL,
                            lower = NULL,
                            integrate = FALSE,
-                           distance.truncation = environment(mdl$formula)$truncation,
-                           covariate = mdl$covariates[[name]],
+                           distance.truncation = environment(model$formula)$truncation,
+                           covariate = model$covariates[[name]],
                            add = FALSE,
                            add.uncertainty = TRUE,
                            add.histogram = TRUE,
@@ -63,11 +63,11 @@ plot.detfun = function(mdl = NULL,
 
   }
   
-  if ( is.null(upper) ) { upper = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.975quant", link = exp) }
+  if ( is.null(upper) ) { upper = evaluate.model(model = model, inla.result = result, loc = x, property = "0.975quant", link = exp) }
   if ( is.null(mode) ) { 
-    dmean = evaluate.model(model = mdl, inla.result = result, loc = x, property = "mode", link = exp)
+    dmean = evaluate.model(model = model, inla.result = result, loc = x, property = "mode", link = exp)
   } else {dmean = mode}
-  if ( is.null(lower) ) { lower = evaluate.model(model = mdl, inla.result = result, loc = x, property = "0.025quant", link = exp) }
+  if ( is.null(lower) ) { lower = evaluate.model(model = model, inla.result = result, loc = x, property = "0.025quant", link = exp) }
   
   if ( !is.null(prior) ) {
     upper = upper * prior(loc)
@@ -160,7 +160,7 @@ plot.detfun = function(mdl = NULL,
 #' @aliases plot plot.spatial
 #' @name plot.spatial
 #' @export
-#' @param mdl A \link{model} object
+#' @param model A \link{model} object
 #' @param result An \link{inla} object, i.e. the result of running INLA
 #' @param data iDistance data structure. Used to plot a histogram of the detections.
 #' @param name Name of the effect used to model the detection function. Default: "spde"
@@ -177,15 +177,15 @@ plot.detfun = function(mdl = NULL,
 #' @param col Plot this data instead of the model data
 #' 
 
-plot.spatial = function(mdl = NULL,
+plot.spatial = function(model = NULL,
                      result = NULL, 
                      data = NULL,
                      name = "spde",
                      property = "mode",
                      group = list(),
                      stack = NULL,
-                     mesh = mdl$mesh[[name]],
-                     mesh.coords = mdl$mesh.coords[[name]],
+                     mesh = model$mesh[[name]],
+                     mesh.coords = model$mesh.coords[[name]],
                      rgl = FALSE,
                      add.detections = TRUE,
                      add.points = FALSE,
@@ -212,7 +212,7 @@ plot.spatial = function(mdl = NULL,
       loc = data$mesh$loc[,c(1,2)]
       colnames(loc) = data$mesh.coords
       if (!(length(group)==0)) { loc = data.frame(loc, group) }
-      col = evaluate.model(mdl, inla.result = result, loc = loc, do.sum = TRUE)
+      col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE)
     } else {
       ind = inla.stack.index(stack, name)$data
       col = result$summary.fitted.values[ind,property]
@@ -266,7 +266,7 @@ plot.spatial = function(mdl = NULL,
       loc = cbind(grid$x,grid$y)
       colnames(loc) = data$mesh.coords
       if (!(length(group)==0)) { loc = data.frame(loc, group) }
-      col = evaluate.model(mdl, inla.result = result, loc = loc, do.sum = TRUE, property = property)
+      col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = property)
       col[!is.inside(mesh,loc,data$mesh.coords)] = NA
       #col = inla.mesh.project(proj, field = result$summary.ran[[name]][[property]]) # deprecated
     } 
