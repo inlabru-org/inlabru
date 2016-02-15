@@ -183,23 +183,26 @@ list.covariates.model = function(mdl, pts){
 
 list.A.model = function(mdl, points){
   A.lst = list()
-  if ( length(mdl$mesh)>0 ) {
-    for (k in 1:length(mdl$mesh)) {
-      name = names(mdl$mesh)[[k]]
-      loc = as.matrix(points[,mdl$mesh.coords[[k]]])
-      if (mdl$inla.spde[[k]]$n.group > 1) {
-        group = as.matrix(points[,mdl$time.coords[[k]]])
-      } else { group = NULL }
-      A = inla.spde.make.A(mdl$mesh[[k]], loc = loc, group = group)
-      # Covariates for models with A-matrix are realized in the follwoing way:
-      if (name %in% names(mdl$covariates)) {
-        w = mdl$covariates[[name]](points)
-        if (is.data.frame(w)) { stop("Your covariate function returns a data.frame. This is not allowed, a numeric vector is required.") }
-        A = as.matrix(A)*as.vector(w)
-      }
-      A.lst[[name]] = A
+  
+  for ( name in names(mdl$mesh)) {
+    if ( name %in% names(mdl$mesh.map) ) {
+      loc = as.matrix(mdl$mesh.map[[name]](points[,mdl$mesh.coords[[name]]]))
+    } else {
+      loc = as.matrix(points[,mdl$mesh.coords[[name]]])
     }
-  }  
+    if (mdl$inla.spde[[name]]$n.group > 1) {
+      group = as.matrix(points[,mdl$time.coords[[name]]])
+    } else { group = NULL }
+    A = inla.spde.make.A(mdl$mesh[[name]], loc = loc, group = group)
+    # Covariates for models with A-matrix are realized in the follwoing way:
+    if (name %in% names(mdl$covariates)) {
+      w = mdl$covariates[[name]](points)
+      if (is.data.frame(w)) { stop("Your covariate function returns a data.frame. This is not allowed, a numeric vector is required.") }
+      A = as.matrix(A)*as.vector(w)
+    }
+    A.lst[[name]] = A
+  }
+  
   if ( length(mdl$covariates) > 0 ) { A.lst = c(A.lst,1) }
   return(A.lst)
 }
