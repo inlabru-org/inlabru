@@ -437,40 +437,92 @@ sanity.effort.inside = function(dset, message = FALSE){
 #' @examples \dontrun{ data(toy1) ; summary(toy1) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-summary.dsdata = function(dsdata){
-  cat(paste0("Geometry: "),dsdata$geometry,"\n")
-  cat(paste0("Coordinate names: "),dsdata$mesh.coords,"\n")
+summary.dsdata = function(data, ...){
+  
+  cat("#-------- data fields --------#\n")
+  cat(paste0("Geometry: "),data$geometry,"\n")
+  cat(paste0("Coordinate names: "),data$mesh.coords,"\n")
   cat(paste0("Effort columns names: "),"\n")
-  cat(paste0(" ",names(dsdata$effort)), "\n")
-  cat(paste0("Number of transects: "), dim(as.transect(dsdata))[1], "\n")
-  cat(paste0("Total length of transects: "), sum(len.transect(as.transect(dsdata),dsdata)), "units","\n")
+  cat(paste0(" ",names(data$effort)), "\n")
   
-  # Mesh area
-  A.mesh = sum(Matrix::diag(inla.mesh.fem(dsdata$mesh, order=1)$c0))
-  cat(paste0("Total area of mesh: "), A.mesh, " square mesh units","\n")
-  
-  # Survey area
-  if ("inner.boundary" %in% names(dsdata)) {
-    msk =  is.inside.polygon(whales$mesh, whales$inner.boundary,dsdata$mesh$loc, dsdata$mesh.coords)
-    A = sum(Matrix::diag(inla.mesh.fem(dsdata$mesh, order=1)$c0) * msk)
-    cat(paste0("Total survey area: A ="), A, " square mesh units","\n")
-  }
-  
-  # Number of transects
-  if (!class(dsdata$effort)[1]=="etpeffort"){ # Note yet implemented by etpdata class
-    cat(paste0("Number of segements: "), dim(as.segment(dsdata))[1], "\n")
-  }
-  
-  # Number of detections
-  n.det =  dim(detdata(dsdata))[1]
-  cat(paste0("Number of detections : N = "),n.det, "\n")
-  
-  # Number of detections per unit mesh area inside survey area
-  cat(paste0("Detections per survey area: N/A = "), n.det/A.mesh, "\n")
+  cat("#-------- statistics --------#\n")
+
+  statistics.dsdata(data, ...)
   
 }
 
+#' Calculate some baseline statistics
+#' 
+#' @aliases statistics.dsdata 
+#' @name statistics.dsdata 
+#' @export
+#' @param dsdata Distance sampling data set
+#' @examples \dontrun{ data(toy1) ; statistics(toy1) }
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+
+statistics.dsdata = function(data, distance.truncation = NULL){
+  
+  #
+  # Calculate the stats
+  #
+  
+  n.det = nrow(detdata(data))
+  n.seg = nrow(as.segment(data))
+  len.seg = sum(distance(startpoint(as.segment(data), data), endpoint(as.segment(data), data), geometry = data$geo))
+  n.tr = nrow(as.transect(data))
+  len.tr = sum(len.transect(as.transect(data),data))
+  
+  if (data$geometry == "geo") {
+    if (data$mesh$manifold == "S2"){
+      A.mesh = (6371^2)*sum(Matrix::diag(inla.mesh.fem(tmp.mesh, order=1)$c0))
+      unit.mesh = "km"
+    } else if (data$mesh$manifold == "R2") { # Special case: the mesh is R2 but coordinates are lon/lat
+      tmp.mesh = data$mesh
+      loc = data.frame(tmp.mesh$loc[,c(1,2)]); colnames(loc) = data$mesh.coords
+      eloc = as.matrix(geo.to.euc(loc, R = 1))
+      tmp.mesh$loc = as.matrix(geo.to.euc(loc, R = 1))
+      tmp.mesh.manifold = "S2"
+      A.mesh = (6371^2)*sum(Matrix::diag(inla.mesh.fem(tmp.mesh, order=1)$c0)) # in km^2
+      unit.mesh = "km"
+    }
+  } else if ( data$geometry == "euc" ){
+    A.mesh = sum(Matrix::diag(inla.mesh.fem(data$mesh, order=1)$c0))
+    unit.mesh = "mesh units"  
+  }
+  
+  #
+  # Output
+  #
+  
+  cat(paste0("Number of transects: N_tr ="), n.tr, "\n")
+  cat(paste0("Total length of transects: L ="), len.tr, "units","\n")
+  cat(paste0("Number of segments: N_s ="), n.seg, "\n")
+  cat(paste0("Total length of segments: L_s ="), len.seg, "units","\n")
+  cat(paste0("Number of detections N = "), n.det, "\n")
+  cat(paste0("Total area of mesh A_m ="), A.mesh, " square ",unit.mesh,"\n")
+  
+  if ( !is.null(distance.truncation) ) {
+    A.eff = 2 * distance.truncation * len.tr
+    rate.eff = n.det/A.eff
+    cat(paste0("Distance truncation: Z = "), distance.truncation, "\n")
+    cat(paste0("Effort area (transect based): A_eff := 2 * Z * L = "), A.eff, "\n")
+    cat(paste0("On-effort rate (transect based): R_e := N/A_eff ="), rate.eff, " =>  log(R_e) =", log(rate.eff),"\n")
+    cat(paste0("Expected detections on mesh (approximate): N_m := A_m * R_e  = "), A.mesh * rate.eff, "per square", unit.mesh ,"\n")
+    cat("--> Only rely on this if mesh units = transect units!")
+  }
+  
+  #   # Survey area
+  #   if ("inner.boundary" %in% names(data)) {
+  #     msk =  is.inside.polygon(whales$mesh, whales$inner.boundary,data$mesh$loc, data$mesh.coords)
+  #     A = sum(Matrix::diag(inla.mesh.fem(data$mesh, order=1)$c0) * msk)
+  #     cat(paste0("Total survey area: A ="), A, " square mesh units","\n")
+  #   }
+  
+}
+
+
 sanity = function(...){UseMethod("sanity")}
+statistics = function(...){UseMethod("statistics")}
 as.transect = function(...){UseMethod("as.transect")}
 as.segment = function(...){UseMethod("as.segment")}
 as.detection = function(...){UseMethod("as.detection")}
