@@ -1,17 +1,16 @@
 ##############
 # GENERICS
 ssum = function(...){UseMethod("ssum")}
-distance = function(...){UseMethod("distance")}
+# distance = function(...){UseMethod("distance")}
 normalize = function(...){UseMethod("normalize")}
 
 ### Unknown space
 
-dist.data.frame = function(sp,ep, geometry){
+distance = function(sp, ep, geometry){
   class(sp) = c(geometry,"data.frame")
   class(ep) = c(geometry,"data.frame")
-  #colnames(sp) = c("x","y")
-  #colnames(ep) = c("x","y")
-  return(dist(sp,ep))
+  if (geometry == "euc") { return(dist.euc(sp,ep)) }
+  else if (geometry == "geo") { return(dist.geo(sp,ep)) }
 } 
 
 ### A little tool to remove coordinate annotations
