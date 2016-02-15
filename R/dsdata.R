@@ -545,10 +545,8 @@ as.transect.effort = function(effort){
 
 as.segment.effort = function(effort){
   if (!is.sorted(transect.id(effort))) { stop("The transects of your data set are not sorted in increasing order. Fix that.") }
-  end.idx = findInterval(1:length(levels(effort$seg)),as.numeric(effort$seg))
-  if (length(end.idx)==1){ start.idx=1 } 
-  else {start.idx = c(1,end.idx[1:(length(end.idx)-1)]+1)}
-  seg = data.frame(start=start.idx,end=end.idx)
+  wh = which(is.na(effort$det))
+  seg = data.frame(start = wh, end = wh)
   class(seg) = c("segment","data.frame")
   return(seg)
 }
