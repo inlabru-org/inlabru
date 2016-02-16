@@ -277,11 +277,13 @@ plot.dsdata = function(data,
     }
     else if (data$geometry == "geo"){
       # Elevation for plotting on top of earth surface
-      R = 1
-      R.delta = 0.003
+      if ( data$geometry == "geo" & data$mesh$manifold == "S2") {
+        R = sqrt(sum(data$mesh$loc[1,]^2))
+      } else { R = 1 }
+      R.delta = 1.003
       
       # Draw earth
-      rgl.earth()
+      rgl.earth(R = R)
       rgl.viewpoint(0,-90)
 
       # Draw detections
@@ -290,15 +292,15 @@ plot.dsdata = function(data,
         detections = detdata(data)[,data$mesh.coords]
         do.call(rgl.sphpoints, c(list(long = detections[,1] + 360, 
                                       lat = detections[,2],
-                                      radius = R + 2 * R.delta),
+                                      radius = R * R.delta),
                                  detection.args))
       }
       
       # Draw the mesh
       if (is.null(col)){
-        rgl.sphmesh(data$mesh, add = TRUE, radius = R+R.delta, lwd = 1, edge.color = rgb(0,0,0), alpha = 0.3, draw.segments = TRUE)
+        rgl.sphmesh(data$mesh, add = TRUE, radius = R*R.delta, lwd = 1, edge.color = rgb(0,0,0), alpha = 0.3, draw.segments = TRUE)
       } else {
-        rgl.sphmesh(data$mesh, add = TRUE, radius = R+R.delta, lwd = 1, edge.color = rgb(0,0,0), col = col)
+        rgl.sphmesh(data$mesh, add = TRUE, radius = R*R.delta, lwd = 1, edge.color = rgb(0,0,0), col = col)
       }
       
       # Draw segments
@@ -306,12 +308,12 @@ plot.dsdata = function(data,
         if ( segment.colorize ){ segment.args$col = data$effort$trans }
         pseudo.transect = data.frame(start=1:nrow(data$effort), end=1:nrow(data$effort))
         class(pseudo.transect) = c("transect", "data.frame")
-        do.call(plot, c(list(pseudo.transect, data = data, rgl = TRUE, add = TRUE, radius = R+R.delta), segment.args) )
+        do.call(plot, c(list(pseudo.transect, data = data, rgl = TRUE, add = TRUE, radius = R*R.delta), segment.args) )
       }
       
       # Draw transects
       if ( transect ) {
-        do.call(plot, c(list(as.transect(data$effort), data = data, rgl = TRUE, add = TRUE, radius = R+R.delta), transect.args) )
+        do.call(plot, c(list(as.transect(data$effort), data = data, rgl = TRUE, add = TRUE, radius = R*(R.delta-0.001)), transect.args) )
       }
                 
     }
