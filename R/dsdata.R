@@ -218,10 +218,11 @@ plot.dsdata = function(data,
     if ( data$geometry == "geo" & data$mesh$manifold == "S2") {
       # Transform coordinates of mesh before plotting
       loc = data.frame(data$mesh$loc)
+      R = sqrt(sum(loc[1,]^2))
       colnames(loc)  = c("x","y","z")
       mesh = data$mesh
       mesh$manifold = "R2"
-      mesh$loc = as.matrix(euc.to.geo(loc, R = 1)[,data$mesh.coords])
+      mesh$loc = as.matrix(euc.to.geo(loc, R = R)[,data$mesh.coords])
     }  else {
       mesh = data$mesh
     }
