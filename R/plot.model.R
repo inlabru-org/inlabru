@@ -180,12 +180,12 @@ plot.detfun = function(model = NULL,
 plot.spatial = function(model = NULL,
                      result = NULL, 
                      data = NULL,
-                     name = "spde",
+                     name = NULL,
                      property = "mode",
                      group = list(),
                      stack = NULL,
-                     mesh = model$mesh[[name]],
-                     mesh.coords = model$mesh.coords[[name]],
+                     mesh = data$mesh,
+                     mesh.coords = model$mesh.coords,
                      rgl = FALSE,
                      add.detections = TRUE,
                      add.points = FALSE,
@@ -206,16 +206,28 @@ plot.spatial = function(model = NULL,
   if (rgl) {
     require(rgl)  
     
-    # Get predicted values
-    if (name %in% names(result$summary.ran)){
-      # col = result$summary.ran[[name]][[property]] # deprecated
-      loc = data$mesh$loc[,c(1,2)]
-      colnames(loc) = data$mesh.coords
-      if (!(length(group)==0)) { loc = data.frame(loc, group) }
-      col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE)
-    } else {
+    # Get predicted values from a stack tag
+    if ( !is.null(stack) ){
       ind = inla.stack.index(stack, name)$data
       col = result$summary.fitted.values[ind,property]
+    }
+    # Get predicted values from a model
+    if ( !is.null(model) ){
+      if (data$geometry == "geo" & data$mesh$manifold == "S2") {
+        loc = euc.to.geo(data.frame(data$mesh$loc))
+        R = sqrt(sum(data$mesh$loc[1,]^2))
+      } else {
+        loc = data$mesh$loc[,c(1,2)]
+        colnames(loc) = data$mesh.coords
+        R = 1
+      }
+      
+      if (!(length(group)==0)) { loc = data.frame(loc, group) }
+      col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = property)
+    }
+    # Get predicted values from an inla result effect name
+    if ( !is.null(name) ){
+      col = result$summary.ran[[name]][[property]]
     }
     
     if (geometry == "geo"){
@@ -223,11 +235,11 @@ plot.spatial = function(model = NULL,
       # Plot sphere
       if (!add){ rgl.open() }
       bg3d(color = "white")
-      rgl.earth()
+      rgl.earth(R)
       
       # Plot detections and integration points
-      if ( add.detections ) { rgl.sphpoints(long = det.points$lon+360, lat = det.points$lat, radius = 1.01, col="red", size = 5) }
-      if ( add.points ) { rgl.sphpoints(long = add.points$lon+360, lat = add.points$lat, radius=1.01, col = rgb(0,0,1), size = 3) }
+      if ( add.detections ) { rgl.sphpoints(long = det.points$lon+360, lat = det.points$lat, radius = 1.01*R, col="red", size = 5) }
+      if ( add.points ) { rgl.sphpoints(long = add.points$lon+360, lat = add.points$lat, radius=1.01*R, col = rgb(0,0,1), size = 3) }
       
       # Plot colorbar (This is a temporary workaround, rgl people are working on something like this)
       if (colorbar){
@@ -250,37 +262,38 @@ plot.spatial = function(model = NULL,
     
     require(lattice)
     proj <- inla.mesh.projector(mesh, dims = c(300,300))
-    xlim = range(mesh$loc[,1])
-    ylim = range(mesh$loc[,2])
+    if (data$geometry == "geo" & data$mesh$manifold == "S2") {
+      loc = euc.to.geo(data.frame(data$mesh$loc))[,data$mesh.coords]
+    } else {
+      loc = mesh$loc
+    }
+    xlim = range(loc[,1])
+    ylim = range(loc[,2])
     x = seq(xlim[1], xlim[2], length.out = 300)
     y = seq(ylim[1], ylim[2], length.out = 300)
     grid = expand.grid(x=x,y=y)
-    
-    if ( !is.null(col) ) {
-      A = inla.spde.make.A(mesh, loc = cbind(grid$x,grid$y))
-      col = A%*%as.vector(col)
-      msk = apply(abs(A), MARGIN = 1, sum) > 0
-      col[!msk] = NA
-    }
-    else if (name %in% names(result$summary.ran)){
-      loc = cbind(grid$x,grid$y)
-      colnames(loc) = data$mesh.coords
-      if (!(length(group)==0)) { loc = data.frame(loc, group) }
-      col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = property)
-      col[!is.inside(mesh,loc,data$mesh.coords)] = NA
-      #col = inla.mesh.project(proj, field = result$summary.ran[[name]][[property]]) # deprecated
-    } 
-    else {
+    loc = data.frame(cbind(grid$x,grid$y))
+    colnames(loc) = data$mesh.coords
+      
+    if ( !is.null(stack) ) {
       ind = inla.stack.index(stack, name)$data
       col = inla.mesh.project(proj, field = result$summary.fitted.values[ind,property])
     }
     
+    if ( !is.null(model) ){  
+      if (!(length(group)==0)) { loc = data.frame(loc, group) }
+      col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = property)
+      col[!is.inside(mesh,loc,data$mesh.coords)] = NA
+    }
+    
+    if ( !is.null(name) ) {
+      col = result$summary.ran[[name]][[property]]
+    }
+    
     if (!logscale) { col = exp(col) }
     
-    # print(paste0("min:", min(col,na.rm=TRUE),", max:",max(col,na.rm=TRUE), ", mean:",mean(col,na.rm=TRUE)))
-    
-    co1 = mesh.coords[1]
-    co2 = mesh.coords[2]
+    co1 = data$mesh.coords[1]
+    co2 = data$mesh.coords[2]
     levelplot(col ~ grid$x + grid$y,
               col.regions = topo.colors(100),
               panel=function(...){
