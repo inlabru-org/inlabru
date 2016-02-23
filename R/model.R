@@ -251,6 +251,7 @@ make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, 
   return(mdl)
 }
 
+
 #' Evaluate model at given locations
 #' 
 #' Compute an approximation to the linear predictor at given locations and gicen coordinates.
@@ -469,6 +470,7 @@ model.spde = function(data, mesh = data$mesh, n.group = 1, covariates = NULL, ..
 
 model.detfun = function(type, ...) {
   if (type == "halfnormal") { return(model.halfnormal(...))}
+  else if (type == "hazard") { return(model.hazard(...))}
   else if (type == "exponential") { return(model.exponential(...))}
   else if (type == "logconcave") { return(model.logconcave(...))}
   else { stop(paste0("Unknown detection function type: ", type)) }
@@ -513,6 +515,28 @@ model.halfnormal = function(data = NULL, truncation = NULL, constrained = TRUE, 
                     formula = formula, 
                     effects = effect,
                     covariates = covariates))
+}
+
+#' Hazard rate detection function model (approximative)
+#'
+#' 1 - exp[ - (z/sigma)^(-b) ]
+#' 
+#' @aliases model.hazard
+#' @name model.hazard
+#' @param iterator An environment used to pass on the current state of the Taylor approximation
+#' 
+
+model.hazard = function(iterator = new.env()){ 
+  
+  if ( is.null(iterator) ) { }
+  if ( !("haz.logb" %in% names(iterator)) ) {assign("haz.logb", log(1), iterator) }
+  if ( !("haz.logsigma" %in% names(iterator)) ) {assign("haz.logsigma", log(1), iterator) }
+  
+  lhaz = expression( log(1-exp(-(loc$distance/(exp( haz.logsigma )))^(-exp(haz.logb)))) )
+  df.mdl = model.taylor(expr = lhaz, iterator = iterator, effects = c("haz.logsigma","haz.logb"))
+  df.mdl$iterator = list(haz.logsigma = iterator, haz.logb = iterator)
+  
+  return(df.mdl)
 }
 
 
