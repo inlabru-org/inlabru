@@ -287,7 +287,8 @@ plot.spatial = function(model = NULL,
     }
     
     if ( !is.null(name) ) {
-      col = result$summary.ran[[name]][[property]]
+      col = inla.spde.make.A(data$mesh, loc = as.matrix(loc)) %*% result$summary.ran[[name]][[property]]
+      col[!is.inside(mesh,loc,data$mesh.coords)] = NA
     }
     
     if (!logscale) { col = exp(col) }
