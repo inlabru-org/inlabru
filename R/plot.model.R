@@ -32,6 +32,7 @@ plot.halfnormal = function(...) { plot.detfun(...) }
 #' @param covariate Function transforming distances into effect covariates
 #' @param add.uncertainty Plot uncertainty boundaries
 #' @param add.histogram Use data to plot a histogram of the detections.
+#' @param filter A function used to filter the data before calculating the histogram
 #' @param col Color to plot mode of detection function
 #' @param ucol Color to plot uncertainty polygon
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
@@ -51,6 +52,7 @@ plot.detfun = function(model = NULL,
                            add = FALSE,
                            add.uncertainty = TRUE,
                            add.histogram = TRUE,
+                           filter = NULL,
                            col = rgb(250/256, 83/256, 62/256, 1),
                            ucol = rgb(250/256, 83/256, 62/256, 0.3), ...) {
 
@@ -84,9 +86,13 @@ plot.detfun = function(model = NULL,
   
   # If data was provided, plot histogram
   if ( !is.null(data) & add.histogram ) {
+    
+    # Filter
+    dets = detdata(data)
+    if ( !is.null(filter) ) { dets = filter(dets) } 
+    
     if ( do.ecdf ) {
-      dfdata = detdata(data)$distance
-      df = ecdf(dfdata)
+      df = ecdf(dets$distance)
       x.plot = seq(0,distance.truncation,length.out=100)
       if ( add ) { lines(x,1-df(x$distance)) }
       else {
@@ -100,7 +106,7 @@ plot.detfun = function(model = NULL,
       # Compute data histogram, replace values to plot by area normalized to 1
       n.breaks = 10
       breaks = seq(0,distance.truncation,length.out=n.breaks)
-      hst = hist(detdata(data)$distance,plot=FALSE, breaks = breaks)
+      hst = hist(dets$distance,plot=FALSE, breaks = breaks)
       hst$density = hst$density/mean(hst$density) # normalized 
       uy = max(hst$density[1],max(dmean/mean(dmean)))
       if ( add ) {
