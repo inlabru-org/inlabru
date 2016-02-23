@@ -252,6 +252,38 @@ make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, 
 }
 
 
+#' Update a model's iterators using an INLA result
+#'
+#' @aliases update.model
+#' @name update.model
+#' @param model A model
+#' @param result An inla result
+#' 
+
+update.model = function(model, result){
+  for (name in names(model$iterator)) {
+    iter = model$iterator[[name]]
+    hname = paste0(name,".history")
+    if ( name %in% rownames(result$summary.fixed) ) { 
+      assign(name, result$summary.fixed[name,"mode"], envir = iter)
+      assign(hname, c(iter[[hname]], result$summary.fixed[name,"mode"]), envir = iter)
+      }
+    if ( name %in% names(result$summary.random) ) { 
+      assign(name, result$summary.random[[name]][,"mode"], envir = iter)
+      assign(hname, rbind(iter[[hname]], result$summary.random[[name]][,"mode"]), envir = iter)
+      }
+    if ( name %in% rownames(result$summary.hyperpar) ) { 
+      assign(name, result$summary.hyperpar[name,"mode"], envir = iter)
+      assign(hname, c(iter[[hname]], result$summary.hyperpar[name,"mode"]), envir = iter)
+      }
+    if ( paste0("Beta for ",name) %in% rownames(result$summary.hyperpar) ) {
+      assign(name, result$summary.hyperpar[paste0("Beta for ",name),"mode"], envir = iter)
+      assign(hname, c(iter[[hname]], result$summary.hyperpar[paste0("Beta for ",name),"mode"]), envir = iter)
+      }
+  }
+}
+
+
 #' Evaluate model at given locations
 #' 
 #' Compute an approximation to the linear predictor at given locations and gicen coordinates.
