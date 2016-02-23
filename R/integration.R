@@ -794,6 +794,23 @@ int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry=
     # Index of line a point comes from
     line.idx = rep(1:n.lines,n.points)
   }
+  else if (scheme == "trapezoid"){
+    if (geometry == "geo") {stop("Geometry geo not supported")}
+    # points
+    mult = seq(0,1,length.out=n.points)
+    nips = list()
+    for (k in 1:n.points){
+      nips[[k]] = sp + mult[k]*(ep-sp)
+    }
+    ips = do.call(rbind,nips)
+    # weights
+    w = rep(1,dim(ips)[1])/n.points
+    w[1] = 0.5 * w[1]
+    w[length(w)] = 0.5 * w[length(w)] 
+    wl = w * (len(ep-sp)[rep(1:n.lines,n.points)])
+    # Index of line a point comes from
+    line.idx = rep(1:n.lines,n.points)
+  }
   else if (scheme == "fixed"){ 
     ips = data.frame(tmp = sp)
     #colnames(ips) = coords
