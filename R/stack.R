@@ -30,7 +30,7 @@ detection.stack = function(data,
   pts = detdata(data)
   
   # Apply filters provided by user
-  if (!is.null(filter)) { pts = det.filter(pts) }
+  if (!is.null(filter)) { pts = filter(pts) }
   
   # Projection matrices (A) and mesh index effects
   A = list.A.model(model, pts)
@@ -78,7 +78,7 @@ integration.stack = function(data,
   }
   
   # Apply filters provided by user
-  if (!is.null(filter)) { pts = det.filter(pts) }
+  if (!is.null(filter)) { pts = filter(pts) }
     
   # Projection matrices (A) and mesh index effects
   A = list.A.model(model, pts)
