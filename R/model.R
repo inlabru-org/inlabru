@@ -86,6 +86,7 @@ join.model = function(...){
   mesh.coords = list()
   time.coords = list()
   covariates = list()
+  const = list()
   eval = list()
   
   env.upd = function(env1,env2) 
@@ -106,6 +107,7 @@ join.model = function(...){
     mesh.coords = c(mesh.coords,mdl$mesh.coords)
     time.coords = c(time.coords,mdl$time.coords)
     A = c(A,mdl$A)
+    const = c(const, mdl$const)
     environment(formula) = env.upd(environment(formula), environment(mdl$formula))
     eval = c(eval, mdl$eval)
   }
@@ -234,7 +236,7 @@ list.indices.model = function(mdl, ...){
 #' @aliases make.model
 #' 
 
-make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, inla.spde = list(), mesh.coords = list(), time.coords = list(), covariates = list(), eval = list(), ...){
+make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, inla.spde = list(), mesh.coords = list(), time.coords = list(), covariates = list(), eval = list(), const = list(), ...){
   mdl = list(
     formula = formula,
     name = name,
@@ -244,6 +246,7 @@ make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, 
     mesh.coords = mesh.coords,
     time.coords = time.coords,
     covariates = covariates,
+    const = const,
     eval = eval,
     args = list(...)
   )
