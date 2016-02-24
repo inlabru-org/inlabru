@@ -120,6 +120,7 @@ join.model = function(...){
     inla.spde = inla.spde,
     mesh.coords = mesh.coords,
     time.coords = time.coords,
+    const = const,
     eval = eval
     ))
   
