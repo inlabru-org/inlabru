@@ -897,6 +897,8 @@ model.taylor = function(expr = NULL, effects = NULL, iterator = NULL, formula = 
   mdl$grad = grads
   mdl$const = const
   mdl$value = value
+  mdl$iterator = lapply(effects, function(eff) { iterator })
+  names(mdl$iterator) = effects
   return(mdl)
 }
 
