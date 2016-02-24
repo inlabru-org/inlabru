@@ -64,7 +64,7 @@ integration.stack = function(data,
                                 filter = NULL,
                                 y = 0,
                                 E = "weight",
-                                const = NULL,
+                                const = model$const,
                                 tag = "integration.stack"){
 
   # Extract points from data set
@@ -90,6 +90,13 @@ integration.stack = function(data,
   
   # Expectation parameter E
   e.pp = pts[,E]
+  
+  # If const is empty list, set it to NULL
+  if ( is.list(const) & length(const)==0 ) { const = NULL }
+  # If const is a list, turn it into a function
+  if ( is.list(const) ) { 
+    clist = const
+    const = function(loc) {apply(do.call(cbind, lapply(clist, function(cf) { cf(loc)})), MARGIN = 1, sum)}  }
   
   # Adding constants to the predictor turns into re-weighting the integration points
   if ( !is.null(const) ){ 
