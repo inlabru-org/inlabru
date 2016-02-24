@@ -230,6 +230,9 @@ plot.dsdata = function(data,
     # Plot mesh
     plot(mesh, main="", asp = asp)
     
+    # Axis
+    if ( !add ) { axis(1); axis(2) ; box()}
+    
     # Plot segments
     if ( segment | segment.colorize ) {
       if ( segment.colorize ){ segment.args$col = data$effort$trans }
