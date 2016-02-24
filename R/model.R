@@ -562,18 +562,27 @@ model.halfnormal = function(data = NULL, truncation = NULL, constrained = TRUE, 
 #' @param iterator An environment used to pass on the current state of the Taylor approximation
 #' 
 
-model.hazard = function(iterator = new.env()){ 
+model.hazard = function(conditional = NULL, iterator = new.env()){ 
   
-  if ( is.null(iterator) ) { }
   if ( !("haz.logb" %in% names(iterator)) ) {assign("haz.logb", log(1), iterator) }
-  if ( !("haz.logsigma" %in% names(iterator)) ) {assign("haz.logsigma", log(1), iterator) }
   
-  lhaz = expression( log(1-exp(-(loc$distance/(exp( haz.logsigma )))^(-exp(haz.logb)))) )
-  df.mdl = model.taylor(expr = lhaz, iterator = iterator, effects = c("haz.logsigma","haz.logb"))
-  df.mdl$iterator = list(haz.logsigma = iterator, haz.logb = iterator)
+  if ( is.null(conditional) ) {
+    if ( !("haz.logsigma" %in% names(iterator)) ) {assign("haz.logsigma", log(1), iterator) }
+    lhaz = expression( log(1-exp(-(loc$distance/(exp( haz.logsigma )))^(-exp(haz.logb)))) )
+    df.mdl = model.taylor(expr = lhaz, iterator = iterator, effects = c("haz.logsigma","haz.logb"))
+    df.mdl$iterator = list(haz.logsigma = iterator, haz.logb = iterator)
+  } else {
+    if ( !("haz.logsigma1" %in% names(iterator)) ) {assign("haz.logsigma1", log(1), iterator) }
+    if ( !("haz.logsigma2" %in% names(iterator)) ) {assign("haz.logsigma2", log(1), iterator) }
+    assign("conditional", conditional, iterator)
+    lhaz = expression( log(1-exp(-(loc$distance/(exp( - haz.logsigma1 + loc[,conditional]*haz.logsigma2 )))^(-exp(haz.logb)))) )
+    df.mdl = model.taylor(expr = lhaz, iterator = iterator, effects = c("haz.logsigma1", "haz.logsigma2", "haz.logb"))
+    df.mdl$iterator = list(haz.logsigma1 = iterator, haz.logsigma2 = iterator, haz.logb = iterator)
+  }
   
   return(df.mdl)
 }
+
 
 
 #' Expoential detection function model
