@@ -238,6 +238,21 @@ list.indices.model = function(mdl, ...){
 #' 
 
 make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, inla.spde = list(), mesh.coords = list(), time.coords = list(), covariates = list(), eval = list(), const = list(), ...){
+  
+  # Some defaults and shortcuts
+  if ( is.null(effects) ) { 
+    if ( is.list(covariates) ) { effects = names(covariates) }
+    else {
+      stop("make.model(): Please give your effect a name (via the 'effect' parameter)") 
+    }
+  }
+  
+  if ( is.function(covariates) ) { 
+    tmp = covariates
+    covariates = list()
+    covariates[[effects]] = tmp
+    }
+  
   mdl = list(
     formula = formula,
     name = name,
