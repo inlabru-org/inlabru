@@ -298,20 +298,6 @@ update.model = function(model, result){
 #' @param loc Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
 
-evaluate.model.old = function(model, inla.result, loc = NULL, property = "mode") {
-  if (is.list(model$eval)){
-    vals = list()
-    for (k in 1:length(model$eval)){
-      vals[[k]] = model$eval[[k]](inla.result, loc, property = property)
-    }
-    return(do.call(cbind,vals))
-  }
-  else {
-    return(model$eval(inla.result, loc, property = property))
-  }
-}
-
-
 evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity) {
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
