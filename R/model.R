@@ -392,6 +392,20 @@ sample.points.model = function(model, data = NULL, inla.result = NULL, property 
 # MODELS: Point process
 #####################################
 
+#' Generic INLA f() wrapper
+#'
+#'
+#'
+#' @aliases model.inla
+#' 
+
+model.f = function(covariates, ...) {
+  effects = names(covariates)[[1]]
+  formula = as.formula(paste0("~ . + f(",effects, ", ...)"))
+  return(make.model(name = "INLA f", formula = formula, effects = effects, covariates = covariates))
+}
+
+
 #' Intercept model
 #'
 #' This model represents a simpel intercept added to the formula, i.e.:
