@@ -326,7 +326,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
   }
   ret = do.call(cbind, posts)
   if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
-  if( "const" %in% names(model) ) { ret = ret + model$const(loc) }
+  if( "const" %in% names(model) & is.function(model$const)) { ret = ret + model$const(loc) }
   return(link(ret))
 }
 
