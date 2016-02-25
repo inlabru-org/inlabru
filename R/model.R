@@ -315,12 +315,16 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
       # Hyper parameter
       post = inla.result$summary.hyperpar[paste0("Beta for ",name), property] * cov[[name]]
     } else {
-      # SPDE model   
       post = inla.result$summary.random[[name]][,property]
-      A = Amat[[name]]
-      # A workaround, needed for make.A called with group=1
-      if (length(post) == 2*dim(A)[2]) { post = post[1:dim(A)[2]]}
-      post = as.vector(A%*%as.vector(post))
+      if ( name %in% names(Amat) ){ # SPDE model
+        A = Amat[[name]]
+        # A workaround, needed for make.A called with group=1
+        if (length(post) == 2*dim(A)[2]) { post = post[1:dim(A)[2]]}
+        post = as.vector(A%*%as.vector(post))
+      } else { # other models
+        post = post[model$covariates[[name]](loc)]
+      }
+
     }
     posts[[name]] = post
   }
