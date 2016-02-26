@@ -202,7 +202,7 @@ plot.spatial = function(model = NULL,
   
   geometry = data$geometry
   if (is.null(mesh)) { mesh = data$mesh }
-  if ( !is.null(data)) { det.points = detdata(data) } else { add.detections = FALSE }
+  if ( !is.null(data) & add.detections ) { det.points = detdata(data) } else { add.detections = FALSE }
   if ( add.points == TRUE ) { add.points = data$ips }
   if ( is.data.frame(add.detections) ) { 
     det.points = add.detections
@@ -284,18 +284,19 @@ plot.spatial = function(model = NULL,
     if ( !is.null(stack) ) {
       ind = inla.stack.index(stack, name)$data
       col = inla.mesh.project(proj, field = result$summary.fitted.values[ind,property])
-    }
-    
-    if ( !is.null(model) ){  
+    } else if ( !is.null(model) ){  
       if (!(length(group)==0)) { loc = data.frame(loc, group) }
       col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = property)
       col[!is.inside(mesh,loc,data$mesh.coords)] = NA
-    }
-    
-    if ( !is.null(name) ) {
+    } else if ( !is.null(name) ) {
       col = inla.spde.make.A(data$mesh, loc = as.matrix(loc)) %*% result$summary.ran[[name]][[property]]
       col[!is.inside(mesh,loc,data$mesh.coords)] = NA
+    } else {
+      col = inla.spde.make.A(data$mesh, loc = as.matrix(loc)) %*% col
+      col[!is.inside(mesh,loc,data$mesh.coords)] = NA
     }
+    
+    
     
     if (!logscale) { col = exp(col) }
     
