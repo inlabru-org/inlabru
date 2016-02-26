@@ -316,7 +316,7 @@ plot.spatial = function(model = NULL,
                                                   pch = ".",
                                                   cex = 2) }
               },
-              xlab = co1, ylab = co2,...
+              xlab = co1, ylab = co2
     ) 
   }
 }
