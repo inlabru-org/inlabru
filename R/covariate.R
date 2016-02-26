@@ -1,37 +1,68 @@
-#' Plot covariate data set
+#' Create covariate data set (covdata)
 #'
-#' @aliases plot.covariate
+#' @aliases make.covdata
+#' @name make.covdata
 #' @export
-#' @param covariate A covariate data set
-#' @examples \\dontrun{data(sst); plot.covariate(sst)}
+#' @param mesh
+#' @param values
+#' @param mesh.coords
+#' @param time.coords
+#' @examples \\dontrun{}
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-plot.covariate = function(covariate,time=NULL,fun=NULL){
+make.covdata = function(mesh, values, mesh.coords, time.coords){
+  covdata = list(mesh=mesh, values=values, mesh.coords=mesh.coords, time.coords=time.coords)
+  class(covdata) = c("covdata","list")
+  return(covdata)
+}
 
-  # The grid
-  xlim = range(covariate$mesh$loc[,1])
-  ylim = range(covariate$mesh$loc[,2])
-  x = seq(xlim[1],xlim[2],length.out=500)
-  y = seq(ylim[1],ylim[2],length.out=500)
-  grid = expand.grid(x=x,y=y)
+#' Create covariate data set (covdata)
+#'
+#' @aliases make.covdata
+#' @name make.covdata
+#' @export
+#' @param mesh
+#' @param values
+#' @param mesh.coords
+#' @param time.coords
+#' @examples \\dontrun{}
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-  # Locations/time
-  if (is.null(time)) { time = colnames(covariate$values)[[1]] }
-  loc = data.frame(lon = grid$x, lat = grid$y)
-  loc[[covariate$time.coords]] = rep(time,nrow(loc))
+covdata.import = function(dframe, colname, data){
+  
+  covloc = as.matrix(dframe[,data$mesh.coords])
+  scale = max(abs(dframe[,colname]))
+  dframe[,colname] = dframe[,colname]/scale
+  
+  spde.mdl = inla.spde2.matern(mesh = data$mesh, alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.1)
+  A = inla.spde.make.A(data$mesh, loc = covloc)
+  stack = inla.stack(data=list(y = dframe[,colname]), A=list(A,1), 
+                     effects = list(spde=1:spde.mdl$n.spde, m = rep(1,nrow(dframe))))
+  
+  result = inla( formula = y ~ f(spde, model = spde.mdl) -1, 
+                 family = "gaussian",
+                 data = inla.stack.data(stack),
+                 control.predictor = list(A = inla.stack.A(stack)),
+                 verbose = FALSE)
+  
+  value = scale * result$summary.random$spde[,"mode", drop = FALSE]
+  
+  depth = make.covdata(mesh = data$mesh, values = value, mesh.coords = data$mesh.coords, time.coords = NULL)
+}
 
-  # Covariate values
-  if (is.null(fun)) { fun = get.value }
-  val = do.call(fun,list(covariate=covariate,loc=loc))
 
-  # Plot
-  require(lattice)
-  levelplot(val ~ grid$x + grid$y,
-            col.regions = topo.colors(100),
-            panel=function(...){ panel.levelplot(...) },
-            xlab = covariate$mesh.coords[[1]],
-            ylab = covariate$mesh.coords[[2]])
+#' Plot covariate data set
+#'
+#' @aliases plot.covdata
+#' @export
+#' @param covdata A covariate data set
+#' @examples \\dontrun{data(sst); plot.covariate(sst, time = 1)}
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
+plot.covdata = function(covdata, time = 1, fun=NULL, ...){
+  if (is.null(covdata$geometry)) {covdata$geometry = "euc"}
+  col = covdata$values[, time]
+  plot.spatial(data = covdata, col = col, add.detections = FALSE, ...)
 }
 
 
@@ -48,12 +79,19 @@ plot.covariate = function(covariate,time=NULL,fun=NULL){
 get.value = function(covariate,loc){
   times = unique(loc[,covariate$time.coords])
   values = numeric(length=nrow(loc))
-  for (t in times){
-    msk = loc[,covariate$time.coords]==t
-    A = inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[msk,covariate$mesh.coords]))
-    inside = is.inside(covariate$mesh, loc = loc[msk,covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
-    values[msk] = as.vector(A%*%covariate$values[,as.character(t)])
-    values[msk & !inside] = NA
+  if (nrow(times)>0) {
+    for (t in times){
+      msk = loc[,covariate$time.coords]==t
+      A = inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[msk,covariate$mesh.coords]))
+      inside = is.inside(covariate$mesh, loc = loc[msk,covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
+      values[msk] = as.vector(A%*%covariate$values[,as.character(t)])
+      values[msk & !inside] = NA
+    }
+  } else {
+    A = inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[,covariate$mesh.coords]))
+    inside = is.inside(covariate$mesh, loc = loc[,covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
+    values = as.vector(A%*%covariate$values[,1])
+    values[!inside] = NA
   }
   return(values)
 }
