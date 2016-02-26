@@ -181,13 +181,16 @@ get.smean = function(covariate,loc=NULL,weights=NULL){
   loc2 <- data.frame(covariate$mesh$loc[, 1:length(covariate$mesh.coords),
                                         drop=FALSE])
   colnames(loc2) <- covariate$mesh.coords
-  if (!(covariate$time.coords %in% colnames(loc))) {
-    stop("Time coordinates missing")
-  }
-  for (t in unique(loc[,covariate$time.coords])){
-    loc2[[covariate$time.coords]] <- t
+  
+  if (is.null(covariate$time.coords)){
     values <- get.value(covariate, loc2)
-    sm[loc[covariate$time.coords]==t] <- sum(values * weights)
+    sm <- sum(values * weights)
+  } else {
+    for (t in unique(loc[,covariate$time.coords])){
+      loc2[[covariate$time.coords]] <- t
+      values <- get.value(covariate, loc2)
+      sm[loc[covariate$time.coords]==t] <- sum(values * weights)
+    }
   }
   return(sm)
 }
