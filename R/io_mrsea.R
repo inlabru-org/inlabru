@@ -1,0 +1,76 @@
+# INTERNAL DATA STORAGE
+io_mrsea.getDataDir = function() {return(system.file("data",package="iDistance"))}
+
+
+#' Load \link{mrsea} survey data from raw data sets
+#'
+#' @aliases io_mrsea.pkgdata.load
+#' @export
+#' @return \code{mrsea} the \link{mrsea} data set
+#' @examples \\dontrun{mrsea = io_mrsea.pkgdata.load();}
+#' @author Lindesay Scott-Hayward <\email{lass@st-andrews.ac.uk}>
+#'
+
+io_mrsea.pkgdata.load = function() { 
+  
+  library(MRSea)
+  data("dis.data.re")
+  data("predict.data.re")
+  
+  require(dplyr)
+  preddata_gpseas<-group_by(predict.data.re, impact, segment.id )
+  
+  # Some housekeeping to change the name labels to the right format and correct the effort unit to match
+  # the coordinate information.
+  names(dis.data.re)[1:2]<-c('Transect.Label', 'Transect.label')
+  names(dis.data.re)[8:9]<-c('x','y')
+  names(dis.data.re)[5]<-c('Sample.Label')
+
+  # change Effort column to same units as coordinates
+  dis.data.re$Effort<-dis.data.re$length*1000
+  
+  segdata<-dis.data.re[,c("Transect.Label", "Transect.label" ,"season", "impact", "depth", "Sample.Label",
+                          "segment.label" , "length", "Effort", 'x', 'y')]
+  segdata<- distinct(segdata, Sample.Label)
+  
+  # effort, object and distance.
+  # Not taken x and y as these are segement mid points not detection locations
+  distdata<-dis.data.re[,c("object" ,"distance" , "Effort")]
+  distdata<-na.omit(distdata)
+  distdata$size<-rep(1, nrow(distdata))
+  
+  # obsdata
+  obsdata<-na.omit(dis.data.re)
+  obsdata<-obsdata[,c("object" , "Sample.Label", "distance" , "Effort")]
+  obsdata$size<-rep(1, nrow(obsdata))
+  head(obsdata)
+  
+  preddata = predict.data.re
+  colnames(preddata)[c(2,3)] = c("x","y")
+  
+  dsmdata = list(obsdata = obsdata, distdata = distdata, segdata = segdata, preddata = preddata)
+  dset = import.dsmdata(dsmdata)
+  
+  return(dset)
+  
+}
+
+
+#' Regenerate \link{mrsea} data and store it to \code{mrsea.RData}
+#' 
+#' Uses \code{\link{io_mrsea.pkgdata.load}} to load the data and stores
+#' the result to mrsea.RData. Thereby the data that is distributed with 
+#' our package is generated.
+#'
+#' @aliases io_mrsea.pkgdata.save
+#' @export
+#' @return NULL
+#' @examples \\dontrun{io_mrsea.pkgdata.save();}
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#'
+
+io_mrsea.pkgdata.save = function(){
+  ## save the data we will include in the R package
+  mrsea = io_mrsea.pkgdata.load()
+  save(mrsea,file=paste0(io_mrsea.getDataDir(),"/mrsea.RData"))
+}
