@@ -43,8 +43,7 @@ io_mrsea.pkgdata.load = function() {
   obsdata<-na.omit(dis.data.re)
   obsdata<-obsdata[,c("object" , "Sample.Label", "distance" , "Effort")]
   obsdata$size<-rep(1, nrow(obsdata))
-  head(obsdata)
-  
+
   preddata = predict.data.re
   colnames(preddata)[c(2,3)] = c("x","y")
   
