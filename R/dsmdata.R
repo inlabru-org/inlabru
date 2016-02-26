@@ -32,22 +32,26 @@ import.dsmdata = function(dsmdata){
   #distdata[1:2, ]
   
   
+  # Generate location for detections if location missing
+  # Use do.plot=T to see the location generated for each detection
+  if ( !("x" %in% colnames(distdata)) ) {
+    det.new.coords <- generate.obs.location.f(seg=segdata,dists=distdata,geometry="euc",do.plot=F)
+    #det.new.coords[1:3, ]
+    distdata <- cbind(distdata,det.new.coords)
+  }
+  
   newdata <- combine.dsmdata.f(blocks=blocks,dists=distdata)
   # Only one strata for this data so need to add this information
   newdata$strat <- 1
   #newdata[1:3, ]
   
-  # Generate location for detections if location missing
-  # Use do.plot=T to see the location generated for each detection
-  det.new.coords <- generate.obs.location.f(seg=segdata,dists=distdata,geometry="euc",do.plot=F)
-  #det.new.coords[1:3, ]
-  
+
   
   # Prediction data to mesh
   if (require(splancs)) {
     loc = as.matrix(preddata[,c("x","y")])
     seg = inla.nonconvex.hull(loc, convex = -0.01)
-    mesh = inla.mesh.create(interior = seg, refine = list(max.edge = (max(as.vector(loc)) - min(as.vector(loc)))/30))
+    mesh = inla.mesh.create(interior = seg, refine = list(max.edge = (min(diff(range(loc[,1])), diff(range(loc[,1])))/10)))
   } else {
     mesh = NULL
   }
