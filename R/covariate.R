@@ -66,6 +66,32 @@ plot.covdata = function(covdata, time = 1, fun=NULL, ...){
 }
 
 
+#' Make covariate function
+#'
+#' @aliases make.covariate
+#' @name make.covariate
+#' @export
+#' @param covdata A covariate data set
+#' @return A function intended to act as a covariate for a distance sampling model
+#' @examples \\dontrun{data(sst); plot.covariate(sst, time = 1)}
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+
+make.covariate = function(cdata, method = NULL, ...){
+
+    if ( class(cdata)[1] == "covdata") { 
+      if ( is.null(method) ) { method = get.value }
+      return( function(loc){ method(covariate, loc) } )
+    }  
+
+    else if (class(cdata)[1] == "SpatialPolygonsDataFrame") {
+      if ( is.null(method) ) { method = shapefile.to.covariate }
+      return( method(cdata, ...) )
+    }
+  
+}
+
+
+
 #' Get covariate value at given location/time
 #'
 #' @aliases get.value
