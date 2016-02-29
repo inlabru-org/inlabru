@@ -101,3 +101,55 @@ io_weeds.pkgdata.load = function(){
   
   return(dset)
 }
+
+
+#' Generate a shapefile describing the weed data transects by polygons
+#' 
+#' @aliases io_weeds.transect.save
+#' @export
+#' @return NULL
+#' @examples \\dontrun{io_weeds.transect.save();}
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#'
+
+io_weeds.transect.save = function(){
+  
+  xx = numeric()
+  yy = numeric()
+  id = numeric()
+  
+  for ( k in 1:8 ){
+    xx = c(xx, 150*c((k-1), k, k, (k-1)))
+    yy = c(yy, 0, 0, 1200, 1200)
+    id = c(id,rep(k, 4))
+  }
+  dd = data.frame(Id = id, x = xx, y = yy)
+  
+  ddTable <- data.frame(Id = 1:8, Name = paste0("trans_",1:8))
+  ddShapefile <- convert.to.shapefile(dd, ddTable, "Id", 5)
+  
+  write.shapefile(ddShapefile, paste0(io_weeds.getDataDir(),"/weeds.transect"), arcgis = T)
+}
+
+
+#' Generate a shapefile describing the weed data sheeps presence by two polygons
+#' 
+#' @aliases io_weeds.sheep.save
+#' @export
+#' @return NULL
+#' @examples \\dontrun{io_weeds.sheep.save();}
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#'
+
+io_weeds.sheep.save = function(){
+
+  dd = data.frame(Id = c(1,1,1,1,2,2,2,2), 
+                  x = c(0,600,600,0, 600, 1200, 1200, 600), 
+                  y = c(0,0,1200,1200, 0,0,1200,1200))
+  
+  ddTable <- data.frame(Id = 1:2, Name = paste0("sheep_",1:2))
+  ddShapefile <- convert.to.shapefile(dd, ddTable, "Id", 5)
+  
+  write.shapefile(ddShapefile, paste0(io_weeds.getDataDir(),"/weeds.sheep"), arcgis = T)
+}
+
