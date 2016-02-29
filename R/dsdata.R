@@ -228,7 +228,7 @@ plot.dsdata = function(data,
     }
     
     # Plot mesh
-    plot(mesh, main="", asp = asp)
+    plot(mesh, main="", asp = asp, add = add)
     
     # Axis
     if ( !add ) { axis(1); axis(2) ; box()}
