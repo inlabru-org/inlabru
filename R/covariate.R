@@ -80,7 +80,7 @@ make.covariate = function(cdata, method = NULL, ...){
 
     if ( class(cdata)[1] == "covdata") { 
       if ( is.null(method) ) { method = get.value }
-      return( function(loc){ method(covariate, loc) } )
+      return( function(loc){ method(cdata, loc) } )
     }  
 
     else if (class(cdata)[1] == "SpatialPolygonsDataFrame") {
