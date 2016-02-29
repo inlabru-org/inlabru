@@ -50,6 +50,12 @@ io_mrsea.pkgdata.load = function() {
   dsmdata = list(obsdata = obsdata, distdata = distdata, segdata = segdata, preddata = preddata)
   dset = import.dsmdata(dsmdata)
   
+  # Attach depth data to the data set
+  
+  depth = predict.data.re[(predict.data.re$season==1) & (predict.data.re$impact==0), c("x.pos","y.pos","depth")]
+  colnames(depth) = c("x","y","depth")
+  dset$depth = depth
+  
   return(dset)
   
 }
