@@ -267,16 +267,22 @@ plot.spatial = function(model = NULL,
   else {
     
     require(lattice)
-    proj <- inla.mesh.projector(mesh, dims = c(300,300))
+    
     if (data$geometry == "geo" & data$mesh$manifold == "S2") {
       loc = euc.to.geo(data.frame(data$mesh$loc))[,data$mesh.coords]
     } else {
       loc = mesh$loc
     }
+    
     xlim = range(loc[,1])
     ylim = range(loc[,2])
-    x = seq(xlim[1], xlim[2], length.out = 300)
-    y = seq(ylim[1], ylim[2], length.out = 300)
+    aspect = diff(ylim)/diff(xlim)
+    nx = 300
+    ny = round(300 * aspect)
+    proj <- inla.mesh.projector(mesh, dims = c(nx,ny))
+    
+    x = seq(xlim[1], xlim[2], length.out = nx)
+    y = seq(ylim[1], ylim[2], length.out = ny)
     grid = expand.grid(x=x,y=y)
     loc = data.frame(cbind(grid$x,grid$y))
     colnames(loc) = data$mesh.coords
@@ -302,7 +308,7 @@ plot.spatial = function(model = NULL,
     
     co1 = data$mesh.coords[1]
     co2 = data$mesh.coords[2]
-    levelplot(col ~ grid$x + grid$y,
+    levelplot(col ~ grid$x + grid$y, aspect = aspect,
               col.regions = topo.colors(100),
               panel=function(...){
                 panel.levelplot(...)
