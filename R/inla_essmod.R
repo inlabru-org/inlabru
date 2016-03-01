@@ -197,25 +197,42 @@ plot.marginal.inla = function(result,varname="Intercept", add = FALSE, lwd=3,...
   vars = variables.inla(result)
   if (paste0("Beta for ", varname) %in% rownames(vars)) { varname = paste0("Beta for ", varname)}
   
-  if (vars[varname,"type"] == "fixed"){
-    marg = result$marginals.fixed[[varname]]
-  }
-  else if (vars[varname,"type"] == "random"){
-    marg = result$marginals.random[[varname]]
-  }
-  else if (vars[varname,"type"] == "hyperpar"){
-    marg = result$marginals.hyperpar[[varname]]
-  }
-  if (!add) {
-    plot(marg,type='l',xlab=varname,ylab="Posterior density",...)
+  if (varname %in% c(result$names.fixed, rownames(result$summary.hyperpar) )) {
+    
+    if (vars[varname,"type"] == "fixed"){
+      marg = result$marginals.fixed[[varname]]
+    }
+    else if (vars[varname,"type"] == "random"){
+      marg = result$marginals.random[[varname]]
+    }
+    else if (vars[varname,"type"] == "hyperpar"){
+      marg = result$marginals.hyperpar[[varname]]
+    }
+    if (!add) {
+      plot(marg,type='l',xlab=varname,ylab="Posterior density",...)
+    } else {
+      points(marg, type='l', xlab="",ylab="", ...)
+    }
+    lheight = max(marg[,"y"])
+    lines(x=c(vars[varname,"mode"],vars[varname,"mode"]),y=c(0,lheight),col="blue",lwd=lwd,...)
+    lines(x=c(vars[varname,"mean"],vars[varname,"mean"]),y=c(0,lheight),col="red",lwd=lwd,...)
+    lines(x=c(vars[varname,"0.025quant"],vars[varname,"0.025quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
+    lines(x=c(vars[varname,"0.975quant"],vars[varname,"0.975quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
   } else {
-    points(marg, type='l', xlab="",ylab="", ...)
+    if ( require(ggplot2) ){
+      df = result$summary.random[[varname]]
+      colnames(df) = c("ID","mean","sd","lower","mid","upper","mode","kld")
+      p <- ggplot(df, aes(ID, mode))
+      p + geom_crossbar(aes(ymin = lower, ymax = upper)) + ylab("mod and quantiles") + xlab(paste0(varname," ID"))
+    } else {
+      uq = result$summary.random[[varname]][,"0.975quant"]
+      lq = result$summary.random[[varname]][,"0.025quant"]
+      md = result$summary.random[[varname]][,"mode"]
+      plot(md, ylim = c(min(lq),max(uq)))
+      points(uq, col = "red")
+      points(lq, col = "red")
+    }
   }
-  lheight = max(marg[,"y"])
-  lines(x=c(vars[varname,"mode"],vars[varname,"mode"]),y=c(0,lheight),col="blue",lwd=lwd,...)
-  lines(x=c(vars[varname,"mean"],vars[varname,"mean"]),y=c(0,lheight),col="red",lwd=lwd,...)
-  lines(x=c(vars[varname,"0.025quant"],vars[varname,"0.025quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
-  lines(x=c(vars[varname,"0.975quant"],vars[varname,"0.975quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
 }
 
 variables.inla = function(result, include.random=TRUE){
