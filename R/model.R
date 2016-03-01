@@ -35,6 +35,7 @@ sample.points = function(...){UseMethod("sample.points")}
 list.covariates = function(...){UseMethod("list.covariates")}
 list.A = function(...){UseMethod("list.A")}
 list.indices = function(...){UseMethod("list.indices")}
+list.data = function(...){UseMethod("list.data")}
 
 #####################################
 # OPERATORS ON MODELS
@@ -124,6 +125,23 @@ join.model = function(...){
     eval = eval
     ))
   
+}
+
+
+#' List data needed to run INLA
+#'
+#' @aliases list.data.model
+#' 
+
+list.data.model = function(model){
+  # THIS IS A WORKAROUND. If a formula is constructed and contains the stack of 
+  # a previous run INLA will confuse the data from the new stack with the old stack
+  # due to the data = ... as.list(environment(jmdl$formula))) ... parameter.
+  # INLA reports the following error: 
+  # Error in data.frame(..., check.names = FALSE): arguments imply differing number of rows: 2379, 2739
+  
+  assign("stack", NULL, envir = environment(jmdl$formula))
+  return( as.list(environment(model$formula)) )
 }
 
 #' List of covariates effects needed to run INLA
@@ -500,6 +518,7 @@ model.spde = function(data, mesh = data$mesh, n.group = 1, covariates = NULL, ..
   spde.mdl = do.call(inla.spde2.matern,c(list(mesh=mesh),spde.args)) 
   spde.mdl$n.group = n.group
   formula = ~ . + f(spde, model=spde.mdl, group = spde.group)
+  assign("spde.mdl", spde.mdl, envir = environment(formula))
   
   return(make.model(name = "Spatio-temporal SPDE model",
                     formula = formula,
