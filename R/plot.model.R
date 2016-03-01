@@ -198,7 +198,8 @@ plot.spatial = function(model = NULL,
                      add = FALSE, 
                      colorbar = TRUE, 
                      logscale = TRUE, 
-                     col = NULL, ...){
+                     col = NULL,
+                     ggp = TRUE, ...){
   
   geometry = data$geometry
   if (is.null(mesh)) { mesh = data$mesh }
@@ -278,7 +279,7 @@ plot.spatial = function(model = NULL,
     ylim = range(loc[,2])
     aspect = diff(ylim)/diff(xlim)
     nx = 300
-    ny = round(300 * aspect)
+    ny = round(nx * aspect)
     proj <- inla.mesh.projector(mesh, dims = c(nx,ny))
     
     x = seq(xlim[1], xlim[2], length.out = nx)
@@ -308,6 +309,29 @@ plot.spatial = function(model = NULL,
     
     co1 = data$mesh.coords[1]
     co2 = data$mesh.coords[2]
+    
+    if ( ggp ) {
+      
+      require(ggplot2)
+      mcol = rgb(0,0,0,0.1)
+      
+      df = data.frame(grid,col=as.vector(col), alpha = is.inside(mesh,loc,data$mesh.coords))
+      gg = ggplot(df, aes(x=x,y=y) )
+      gg = gg + geom_raster(aes(fill = col, alpha=alpha),hjust=0.5, vjust=0.5, interpolate = TRUE)
+      gg = gg + scale_alpha_discrete(guide = 'none')
+      gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) + theme(legend.title=element_blank()) + coord_fixed()
+      
+      gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]), 
+                           aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
+      
+      gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
+                            aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
+      gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
+                            aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
+      gg  
+      return(gg)
+       
+    } else {
     levelplot(col ~ grid$x + grid$y, aspect = aspect,
               col.regions = topo.colors(100),
               panel=function(...){
@@ -323,8 +347,8 @@ plot.spatial = function(model = NULL,
                                                   pch = ".",
                                                   cex = 2) }
               },
-              xlab = co1, ylab = co2
-    ) 
+              xlab = co1, ylab = co2)
+    }
   }
 }
 
