@@ -1,4 +1,4 @@
-#' Linear predictor models for usage with INLA
+#' iDistance models for usage with INLA
 #' 
 #' This class facilitates the usage of sophisticated modeling approaches using INLA. 
 #' A \code{model} has a formula that describes one or more of INLA's \code{f} objects. 
@@ -6,18 +6,23 @@
 #' evaluating the predictors of the formula. For manually setting up a \code{model} see the
 #' constructor \link{make.model}. Useful operators on \code{model} objects are:
 #' \itemize{
+#'  \item{\link{make.model}: }{Create a model}
 #'  \item{\link{summary}: }{Summarize a model}
 #'  \item{\link{join}: }{Join multiple models}
-#'  \item{\link{list.covariates}: }{List covariates of a model}
-#'  \item{\link{list.A}: }{List projection matrices of a model}
-#'  \item{\link{list.indices}: }{List indices of a model}
+#'  \item{\link{evaluate}: }{ Determine the linear predictor's value at some location }
+#'  \item{\link{list.data}: }{ List environmental variables needed to call INLA}
+#'  \item{\link{sample.value}: }{ Sample the linear predictor value for geiven locations}
+#'  \item{\link{sample.points}: }{ Sample spatial points from a log gaussion Cox process model}
+#'  \item{\link{update}: }{ Update the iterator of an axproximative model}
+
 #' }
-#' Default models are:
+#' 
+#' Some useful default models are:
 #' \itemize{
 #' \item Intercept: \link{model.intercept}
-#' \item Half-normal detection function: \link{model.halfnormal}
-#' \item Log-concave detection function: \link{model.logconcave}
-#' \item Spatial SPDE model for animal intensity: \link{model.spde}
+#' \item Fixed effects models: \link{model.fixed}
+#' \item Detection function models: \link{model.detfun}
+#' \item Spatial SPDE model \link{model.spde}
 #' \item Spatial group size model: \link{model.grpsize}
 #' }     
 #' @name model
@@ -44,6 +49,7 @@ list.data = function(...){UseMethod("list.data")}
 #' Model summary
 #'
 #' @aliases summary.model
+#' @export
 #' 
 
 summary.model = function(mdl) {
@@ -67,7 +73,8 @@ is.model = function(mdl) { return(class(mdl)[[1]] == "model")}
 
 #' Join two or more models by summing up their linear predictors
 #'
-#' @aliases join.model
+#' @aliases join.model join
+#' @export
 #' 
 
 join.model = function(...){
@@ -131,6 +138,7 @@ join.model = function(...){
 #' List data needed to run INLA
 #'
 #' @aliases list.data.model
+#' @export
 #' 
 
 list.data.model = function(model){
@@ -253,7 +261,16 @@ list.indices.model = function(mdl, ...){
 #' Create a model
 #'
 #' @aliases make.model
-#' 
+#' @export
+#' @param formula A formula describing the (INLA) effect
+#' @param name A character array describing the model
+#' @param effects a list of strings naming the effects used in the formula
+#' @param mesh An inla.mesh object (needed for SPDE models)
+#' @param inla.spde An inla.spde model, if needed
+#' @param mesh.coords Names of the data coordinates used to map from data to locations on the mesh
+#' @param time.coords Names of the data coordinates mapping to a temporal aspect of the model
+#' @param covariates A named list of covariate functions used to map data to weights or groupings of the effects
+#' @param const A function that maps data to values that are constant with respect to the inference process
 
 make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, inla.spde = list(), mesh.coords = list(), time.coords = list(), covariates = list(), eval = list(), const = list(), ...){
   
@@ -291,7 +308,8 @@ make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, 
 
 #' Update a model's iterators using an INLA result
 #'
-#' @aliases update.model
+#' @aliases update.model update
+#' @export 
 #' @name update.model
 #' @param model A model
 #' @param result An inla result
@@ -325,7 +343,8 @@ update.model = function(model, result){
 #' 
 #' Compute an approximation to the linear predictor at given locations and gicen coordinates.
 #'
-#' @aliases evaluate.model
+#' @aliases evaluate.model evaluate
+#' @export
 #' @param model An iDistance \link{model}
 #' @param inla.result The result of an \link{inla} run or a sample obtained from \link{inla.posterior.sample.structured}
 #' @param loc Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
@@ -371,8 +390,8 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
 
 #' Sample from a model
 #'
-#' @aliases sample.value.model
-#' 
+#' @aliases sample.value.model sample.value
+#' @export
 
 sample.value.model = function(model, inla.result, n = 1, data = NULL, loc = NULL) {
   
@@ -407,8 +426,8 @@ sample.value.model = function(model, inla.result, n = 1, data = NULL, loc = NULL
 
 #' Sample points from a model
 #'
-#' @aliases sample.points.model
-#'
+#' @aliases sample.points.model sample.points
+#' @export
  
 sample.points.model = function(model, data = NULL, inla.result = NULL, property = "random"){
   loc = data$mesh$loc[,1:2]
@@ -477,6 +496,7 @@ model.intercept = function(data, effects = "Intercept") {
 #'
 #'
 #' @aliases model.fixed
+#' @export
 #' 
 
 model.fixed = function(effects = NULL, covariates = list()) {
@@ -537,10 +557,22 @@ model.spde = function(data, mesh = data$mesh, n.group = 1, covariates = NULL, ..
 #' Create detection function model
 #' 
 #' A wrapper for convenient construction of different detection functions (see parameter \code{type}).
-#' For further help use the help files of the wrapped functions, e.g. \code{model.halfnormal()}
+#' For further help use the help files of the wrapped functions,
+#' \itemize{
+#'  \item{\link{model.halfnormal}: }{Half-normal model}
+#'  \item{\link{model.exponential}: }{Exponential model}
+#'  \item{\link{model.logconcave}: }{Log-concave model}
+#'  \item{\link{model.hazard}: }{Hazard rate model}
+#' }
+#' 
 #' 
 #' @aliases model.detfun
+#' @name model.detfun
+#' @export
 #' @param type Character setting the type of detection function. Options: "halfnormal", "exponential", "logconcave".
+#' @param ... Parameters that are passed on to the model.X function
+#' @return A detection function \link{model}
+
 
 model.detfun = function(type, ...) {
   if (type == "halfnormal") { return(model.halfnormal(...))}
@@ -551,9 +583,11 @@ model.detfun = function(type, ...) {
 }
 
 
-#' Half-normal detection function model
+#' Half-normal detection function
 #'
-#' Construct a half-normal detection function model using the formula
+#' Construct a half-normal detection function model
+#
+#' The formula of this model is
 #' 
 #'  ~ . + f(nhsd, model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1))))
 #'
@@ -565,6 +599,7 @@ model.detfun = function(type, ...) {
 #' that is, nhsd is half of the negative squared distance of an observation/integration point.
 #'
 #' @aliases model.halfnormal
+#' @export
 #' @param data \link{dsdata} data set. Used to determine distance truncation (if not provided)
 #' @param truncation Distance to truncate at. Currently unused but passed on the the formula environment for later usage.
 #' @param constrained If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging. 
@@ -591,12 +626,22 @@ model.halfnormal = function(data = NULL, truncation = NULL, constrained = TRUE, 
                     covariates = covariates))
 }
 
-#' Hazard rate detection function model (approximative)
+#' Hazard rate detection function 
+#' 
+#' A taylor approximation to the hazard rate detection function. 
 #'
-#' 1 - exp[ - (z/sigma)^(-b) ]
+#' This model approximates the detection function
+#'
+#' \deqn{f(z) = 1 - exp[ - (z/sigma)^(-b) ]}
+#' 
+#' with parameters sigma and b and distance z. Note that the parameters are modeled in log-space. 
+#' For data dependent sigma the 'conditional' parameter can be used. The respective model is
+#' 
+#' \deqn{f(z) = 1 - exp[ - (z/(sigma_1 + sigma_2*data)^(-b) ]}
 #' 
 #' @aliases model.hazard
 #' @name model.hazard
+#' @param conditional Character array denoting the data that sigma depends on (linearly)
 #' @param iterator An environment used to pass on the current state of the Taylor approximation
 #' 
 
@@ -636,6 +681,7 @@ model.hazard = function(conditional = NULL, iterator = new.env()){
 #'  
 #'
 #' @aliases model.exponential
+#' @export
 #' @param colname Effort data column to use for the covariate extraction. Default: "distance"
 #' @param truncation Distance to truncate at. Currently unused but passed on the the formula environment for later usage.
 #' @param constrained If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging. 
@@ -667,6 +713,7 @@ model.exponential = function(colname = "distance", truncation = NULL,  constrain
 #'  whare K is the number of segments the basis lives on.
 #'   
 #' @aliases model.logconcave
+#' @export
 #' @param colname Effort data column to use for the covariate extraction. Default: "distance"
 #' @param truncation Maximum distance assumed to be observed..
 #' @param segments Number of quadratic basis basis functions
