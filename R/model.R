@@ -1,6 +1,7 @@
-#' iDistance models for usage with INLA
+#' iDistance models for INLA
 #' 
-#' This class facilitates the usage of sophisticated modeling approaches using INLA. 
+#' Facilitates the spatial modeling approaches using INLA.
+#' 
 #' A \code{model} has a formula that describes one or more of INLA's \code{f} objects. 
 #' It describes how given a data frame of locations or other coordinates translates into
 #' evaluating the predictors of the formula. For manually setting up a \code{model} see the
@@ -592,15 +593,17 @@ model.detfun = function(type, ...) {
 
 #' Half-normal detection function
 #'
-#' Construct a half-normal detection function model
+#' Construct a half-normal detection function \link{model}
 #
-#' The formula of this model is
+#' The log-likelihood of this model is
+#' \deqn{log p(z) = -0.5 * q * z^2}
 #' 
+#' with precision parameter q and distance z. Internally, it is represented by the \link{formula}
 #'  ~ . + f(nhsd, model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1))))
-#'
-#' Hence, the effect is obtained from a contrained linear INLA model. The covariate "nhsd" for this model is as a 
-#' function of the data.frame provided during the inference process:
-#'  
+#' 
+#' Hence, the precision effect 'nhsd' is obtained from a contrained linear INLA model. The covariate used for this
+#' model is:
+#' 
 #'  nhsd = function(X) { return(-0.5*X[,colname]^2) },
 #'  
 #' that is, nhsd is half of the negative squared distance of an observation/integration point.
@@ -612,6 +615,7 @@ model.detfun = function(type, ...) {
 #' @param constrained If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging. 
 #' @param colname Effort data column to use for the covariate extraction. Default: "distance"
 #' @param effect Character setting the name of the effect in the model. Default: "nhsd" ("negative half squared distance")
+#' @return A \link{model} 
 #' 
 
 model.halfnormal = function(data = NULL, truncation = NULL, constrained = TRUE, colname = "distance", effect = "nhsd"){
@@ -637,9 +641,9 @@ model.halfnormal = function(data = NULL, truncation = NULL, constrained = TRUE, 
 #' 
 #' A taylor approximation to the hazard rate detection function. 
 #'
-#' This model approximates the detection function
+#' This model approximates the detection probability
 #'
-#' \deqn{f(z) = 1 - exp[ - (z/sigma)^(-b) ]}
+#' \deqn{p(z) = 1 - exp[ - (z/sigma)^(-b) ]}
 #' 
 #' with parameters sigma and b and distance z. Note that the parameters are modeled in log-space. 
 #' For data dependent sigma the 'conditional' parameter can be used. The respective model is
@@ -650,7 +654,7 @@ model.halfnormal = function(data = NULL, truncation = NULL, constrained = TRUE, 
 #' @name model.hazard
 #' @param conditional Character array denoting the data that sigma depends on (linearly)
 #' @param iterator An environment used to pass on the current state of the Taylor approximation
-#' 
+#' @return A \link{model}
 
 model.hazard = function(conditional = NULL, iterator = new.env()){ 
   
@@ -677,7 +681,12 @@ model.hazard = function(conditional = NULL, iterator = new.env()){
 
 #' Expoential detection function model
 #'
-#' Construct a exponential detection function model using the formula
+#' Construct a model representing an exponential detection function.
+#' 
+#' The log-likelihood of this model is
+#' \deqn{log p(z) = -0.5 * q * z}
+#' 
+#' with precision parameter q and distance z. Internally, it is represented by the \link{formula}
 #' 
 #'  ~ . + f(df.exp, model = 'clinear', range = c(0, Inf), hyper = list(beta = list(initial = 0, param = c(0,0.1))))
 #'
@@ -685,14 +694,13 @@ model.hazard = function(conditional = NULL, iterator = new.env()){
 #' function of the data.frame provided during the inference process:
 #'  
 #'  df.exp = function(X) { return(-X[,colname]) },
-#'  
 #'
 #' @aliases model.exponential
 #' @export
 #' @param colname Effort data column to use for the covariate extraction. Default: "distance"
 #' @param truncation Distance to truncate at. Currently unused but passed on the the formula environment for later usage.
 #' @param constrained If set to false a non-constrained linear effect is used for estimating the detection function. Handy for debugging. 
-#' 
+#' @return A \link{model}
 
 model.exponential = function(colname = "distance", truncation = NULL,  constrained = TRUE){
   # Formula
@@ -726,8 +734,8 @@ model.exponential = function(colname = "distance", truncation = NULL,  constrain
 #' @param segments Number of quadratic basis basis functions
 #' @param clinear If set to false, non-constrained linear INLA effects are used for this model. 
 #' This is handy for debugging but the detection function is not necessarily log-concave anymore.
-#' @param linbasis Wether to use a linear basis function. 
-#' If set to FALSE this implies that that the detection function has zero derivative at the origin. 
+#' @param linbasis Wether to use a linear basis function. If set to FALSE this implies that that the detection function has zero derivative at the origin. 
+#' @return A \link{model}
 
 model.logconcave = function(colname = "distance", truncation = NULL, segments = 5, constrained = TRUE, linbasis = TRUE, quadbasis = TRUE, ...){
   
