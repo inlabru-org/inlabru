@@ -14,7 +14,14 @@
 #'  \item{\link{sample.value}: }{ Sample the linear predictor value for geiven locations}
 #'  \item{\link{sample.points}: }{ Sample spatial points from a log gaussion Cox process model}
 #'  \item{\link{update}: }{ Update the iterator of an axproximative model}
-
+#' }
+#' 
+#' After running inference plotting aspects of models is straight forward using:
+#' 
+#' \itemize{
+#'  \item{\link{plot.detfun}: }{Plot detection functions (\link{model.detfun})}
+#'  \item{\link{plot.spatial}: }{Plot a spatial models, e.g. \link{model.spde}}
+#'  \item{\link{plot.marginal}: }{Plot marginal prosterior of any model effect}
 #' }
 #' 
 #' Some useful default models are:
