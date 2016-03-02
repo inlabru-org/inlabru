@@ -2,6 +2,7 @@
 #' 
 #'
 #' @aliases plot.marginal
+#' @param effects Character array stating the name of the effect to be plotted
 #' @export
 
 plot.marginal = function(result, effects, ...){ 
@@ -9,36 +10,62 @@ plot.marginal = function(result, effects, ...){
 }
 
 
-#' Plot a half-normal detection function
+#' Plot a half-normal detection function (DEPRECATED)
 #' 
-#' See \link{plot.detfun} for details
+#' DEPRECATED. Use \link{plot.detfun}.
 #'
 #' @aliases plot plot.halfnormal
-#' @export
 
 plot.halfnormal = function(...) { plot.detfun(...) }
 
 
 #' Plot a detection function
 #'
+#' Plots a detection function from a given \link{model} and \link{INLA} estimate. 
+#' 
+#' This function is fairly general but in most cases it is applied to a model of the \link{model.detfun} family. The model is
+#' evaluated for distances from 0 to a value picked by the \code{distance.truncation} parameter. In order
+#' to give an idea about the uncertainty of the estimates, the upper an lower 2.5 percent quantiles are 
+#' plotted as well. Note, however that their estimated are only plausible for some models and a better way
+#' of caclulating the has yet to be implemented. Any of the plotted graphs can be replace by manually 
+#' setting the \code{upper}, \code{lower} and \code{mode} as vectors of values. Note that these must have
+#' length of 500 or otherwise the \code{loc} parameter has to be set to a data frame with a column
+#' called 'distance' corresponding to the distances the graphs are representing.
+#' 
+#' For convenience multiple plotting options are available. If a \link{dsdata} object is provided, the
+#' detection function is plotted against a histogram of the detection distances. In case the detection
+#' function is only mean to model a subset of the detection, the \code{filter} parameter can be used
+#' to select them. 
+#' 
+#' Plotting detection functions that are conditional on covariated is slightly more involved.
+#' For this purpose please provide the \code{prior} parameter (function) and set \code{integration} to TRUE. 
+#' For each of the location in \code{loc} the prior as well as the detection function are evaluated.
+#' Thereafter all locations are integrated over except for the distance dimension.
 #'
 #' @aliases plot plot.detfun
 #' @export
 #' @param model A \link{model} object
 #' @param result An \link{inla} object, i.e. the result of running INLA
-#' @param data iDistance data structure. Used to plot a histogram of the detections.
-#' @param loc Distance at which to plot at (optional)
 #' @param distance.truncation Distance at which to truncate
+#' @param data iDistance data structure. Used to plot a histogram of the detections.
+#' @param loc Distance and possibly covariates at which to plot at (optional).
+#' @param prior A function representiong a prior probability for each location in the \code{loc} parameter
+#' @param do.ecdf If TRUE, plot an ECDF instead of the detection function
+#' @param upper Vector of upper quantiles to plot
+#' @param mode Vector of modes to plot (basically the detection function)
+#' @param lower  Vector of lower quantiles to plot
+#' @param integrate If TRUE, integrate detection function over all od loc's dimensions except for distance
 #' @param covariate Function transforming distances into effect covariates
-#' @param add.uncertainty Plot uncertainty boundaries
-#' @param add.histogram Use data to plot a histogram of the detections.
-#' @param filter A function used to filter the data before calculating the histogram
+#' @param add.uncertainty If TRUE, plot uncertainty boundaries
+#' @param add.histogram If TRUE, use \code{data} to plot a histogram of the detections.
+#' @param filter A function used to filter the detections before calculating the histogram
 #' @param col Color to plot mode of detection function
 #' @param ucol Color to plot uncertainty polygon
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 plot.detfun = function(model = NULL,
-                           result = NULL, 
+                           result = NULL,
+                           distance.truncation,
                            data = NULL,  
                            loc = NULL,
                            prior = NULL,
@@ -47,7 +74,6 @@ plot.detfun = function(model = NULL,
                            mode = NULL,
                            lower = NULL,
                            integrate = FALSE,
-                           distance.truncation = environment(model$formula)$truncation,
                            covariate = model$covariates[[name]],
                            add = FALSE,
                            add.uncertainty = TRUE,
@@ -162,13 +188,25 @@ plot.detfun = function(model = NULL,
 
 #' Plot spatial field
 #'
+#' Plots spatial \link{model}s given an \link{inla} result object.
+#' 
+#' The main purpose of this function is to visualize spatial model posteriors using the parameters
+#' \code{model}, \code{result} and \code{data}. The model is then evaluated on the data set's mesh
+#' and using the \code{property} setting. The latter determins which property of the latent effects
+#' are used of each effect to be combined. 
+#' Options are: 'mode', 'mean', 'sd', '0.975quant', '0.025quant', 'kld'
+#' 
+#' The other paramters of this function mainly serve a purpose if one of the three main paramters
+#' is not set. The \code{result} object is not needed if the \code{col} parameter is provided as
+#' the latter already defines the spatial field to be plotted. Moreover, if no \code{model} is
+#' provided, the \code{name} parameter is used to select an effect from the INLA \code{result}. 
 #' 
 #' @aliases plot plot.spatial
 #' @name plot.spatial
 #' @export
 #' @param model A \link{model} object
 #' @param result An \link{inla} object, i.e. the result of running INLA
-#' @param data iDistance data structure. Used to plot a histogram of the detections.
+#' @param data A \link{dsdata} object
 #' @param name Name of the effect used to model the detection function. Default: "spde"
 #' @param property Which property of the spatial field to plot, e.g. 'mode' (default)
 #' @param stack Plot a combined effect via this stack \link{inla.stack}
@@ -181,6 +219,7 @@ plot.detfun = function(model = NULL,
 #' @param colorbar Plot a colorbar
 #' @param logscale If set to FALSE, exp() of the predictor is plotted
 #' @param col Plot this data instead of the model data
+#' @param ggp If TRUE and rgl is FALSE, use ggplot2 for plotting. If FALSE and rgl FALSE, use default R plotting methods
 #' 
 
 plot.spatial = function(model = NULL,
