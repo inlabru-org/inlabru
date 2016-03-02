@@ -1,20 +1,20 @@
 #' iDistance data format for distance sampling surveys
 #' 
-#' A \code{dsdata} object is a \code{list} with the following fields:
-#' \itemize{
-#'  \item{effort: }{A data.frame with distance sampling data.}
-#'  \item{mesh: }{An \code{inla.mesh} modeling the survey area.}
-#'  \item{geometry: }{String determining the geometry of the data. 
-#'  Choices are \code{"euc"} for two-dimensional data sets in the Euclidean plane and \code{"geo"} for a geographic geometry on the sphere}
-#'  \item{mesh.coords: }{Column names of the effort table that describe coordinates of detections and transects. 
-#'  These are arbitrary but for Euclidean data you might want to use \code{c("x","y")} and \code{c("lon","lat"}) for geographic coordinates.}
-#'  }
+#' For details on ho to construct such a data set see \link{make.dsdata}
+#' 
 #' Data sets included in iDistance:
 #' \itemize{
 #'  \item{\link{toy1}: }{A toy data set with a single transect line}
-#'  \item{\link{whales}: }{Blue whales (line transect)}
-#'  \item{\link{strdolphin}: }{Striped dolphins (line transect)}
-#'  \item{\link{sbdolphin}: }{Short beaked dolphins (line transect)}
+#'  \item{\link{weeds}: }{Johnson et al. (2010) weeds data (line transect)}
+#'  \item{\link{whales}: }{ETP blue whales (line transect)}
+#'  \item{\link{strdolphin}: }{ETP striped dolphins (line transect)}
+#'  \item{\link{sbdolphin}: }{ETP short beaked dolphins (line transect)}
+#'  \item{\link{mrsea}: }{Marine renewables strategic environmental assessment (line transect, see package MRSea)}
+#' }
+#' 
+#' Data sets that can be imported from other packages
+#' \itemize{
+#'  \item{mexdolphin (dsm package):}{ Use \link{import.dsmdata} }
 #' }
 #' 
 #' @name dsdata
@@ -34,6 +34,16 @@ is.dsdata = function(data) { return( class(data)[1] == "dsdata") }
 
 
 #' Make dsdata 
+#' 
+#' #' A \code{dsdata} object is a \code{list} with the following fields:
+#' \itemize{
+#'  \item{effort: }{A data.frame with distance sampling data.}
+#'  \item{mesh: }{An \code{inla.mesh} modeling the survey area.}
+#'  \item{geometry: }{String determining the geometry of the data. 
+#'  Choices are \code{"euc"} for two-dimensional data sets in the Euclidean plane and \code{"geo"} for a geographic geometry on the sphere}
+#'  \item{mesh.coords: }{Column names of the effort table that describe coordinates of detections and transects. 
+#'  These are arbitrary but for Euclidean data you might want to use \code{c("x","y")} and \code{c("lon","lat"}) for geographic coordinates.}
+#' }
 #' 
 #' @aliases make.dsdata
 #' @name make.dsdata
