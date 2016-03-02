@@ -627,6 +627,7 @@ as.transect.effort = function(effort){
   } else {
     end.idx = c(which(diff(tr.id)>0), length(tr.id))
     start.idx = c(1,end.idx[1:(length(end.idx)-1)]+1)
+  }
   tr = data.frame(start=start.idx,end=end.idx)
   class(tr) = c("transect","data.frame")
   return(tr)
