@@ -35,16 +35,37 @@ is.dsdata = function(data) { return( class(data)[1] == "dsdata") }
 
 #' Make dsdata 
 #' 
-#' #' A \code{dsdata} object is a \code{list} with the following fields:
-#' \itemize{
-#'  \item{effort: }{A data.frame with distance sampling data.}
-#'  \item{mesh: }{An \code{inla.mesh} modeling the survey area.}
-#'  \item{geometry: }{String determining the geometry of the data. 
-#'  Choices are \code{"euc"} for two-dimensional data sets in the Euclidean plane and \code{"geo"} for a geographic geometry on the sphere}
-#'  \item{mesh.coords: }{Column names of the effort table that describe coordinates of detections and transects. 
-#'  These are arbitrary but for Euclidean data you might want to use \code{c("x","y")} and \code{c("lon","lat"}) for geographic coordinates.}
-#' }
+#' Constructs a distance sampling data set from transects, detections and model of the survey area
+#'
+#' The core item that this function needs is a \code{data.frame}, hereafter called \code{effort}
+#' containing transect definitions, segments thereof, detections and possibly some covariates.
+#' The effort table needs to have the following columns:
 #' 
+#'  \itemize{
+#'  \item{strat: }{ An identifier of the stratum }
+#'  \item{trans: }{ An identifier of the transect }
+#'  \item{seg: }{An identifier of a segment}
+#'  \item{det: }{An identifier of a detection}
+#'  \item{start.x}{x-coordinate of a transect's/semgent's starting point}
+#'  \item{start.y}{y-coordinate of a transect's/semgent's starting point}
+#'  \item{end.x}{x-coordinate of a transect's/semgent's end point}
+#'  \item{end.y}{y-coordinate of a transect's/semgent's end point}
+#'  \item{x}{x-coordinate of a detection (NA for transects and segments)}
+#'  \item{y}{y-coordinate of a detection (NA for transects and segments)}
+#'  \item{distance}{distance of the detection from the observer}
+#'  }
+#'  
+#'  Note that in pinciple the coordinates can have arbitrary names which can be set by the mesh.coords
+#'  parameter explained below. For instance, if \code{mesh.coords = c("lon",("lat")}, the columns above
+#'  must be called 'lon' and 'lat' for detections and start.lon etc. for trensects and segments.
+#'  
+#'  If no \link{inla.mesh} is provided via the \code{mesh} parameter, \code{make.dsdata} will try to
+#'  construct a mesh from the effort table. By default, an inner boundary segment is constructed from the
+#'  non-convex hull of all detections and transect/segment points. Thereafter, a convex hull is found
+#'  to create the mesh. As this might not reflect the reality of your data please consider to construct
+#'  a mesh manually.
+#'  
+#'  
 #' @aliases make.dsdata
 #' @name make.dsdata
 #' @export
@@ -53,6 +74,7 @@ is.dsdata = function(data) { return( class(data)[1] == "dsdata") }
 #' @param mesh An inla.mesh object modeling the domain.
 #' @param mesh.coords Names of the effort columns that are interpreted as coordinates
 #' @param mesh.args If no mesh if provided these arguments passed on to inla.mesh.create to construct the mesh. 
+#' @value a \link{dsdata} object
 #' @examples \dontrun{ data(toy1) ; dset = make.dsdata(effort = toy1$effort) ; plot(dset) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' 
@@ -185,7 +207,7 @@ make.mesh = function(dset, ...) {
 #' @aliases plot.dsdata 
 #' @name plot.dsdata
 #' @export
-#' @param data Distance sampling data set
+#' @param data A \link{dsdata} object
 #' @param rgl If TRUE, use RGL to plot the data
 #' @param add If TRUE, add the plot instead of starting a new one
 #' @param transect If TRUE, plot the transect lines
@@ -335,7 +357,9 @@ plot.dsdata = function(data,
 
 
 
-#' Check sanity of a data set
+#' Sanity of a \link{dsdata} object
+#' 
+#' Analyzes if a distance sampling data object is well defined. 
 #' 
 #' @aliases sanity.dsdata 
 #' @export
@@ -445,11 +469,14 @@ sanity.effort.inside = function(dset, message = FALSE){
 
 
 
-#' Summarize generic distance sampling data
+#' Summarize distance sampling data 
+#' 
+#' Gives a brief summary of the data and calls the \link{statistics.dsdata} function to print some statistics.
 #' 
 #' @aliases summary.dsdata 
 #' @export
-#' @param dsdata Distance sampling data set
+#' @param data A \link{dsdata} object
+#' @param ... arguments passed on to \link{statistics.dsdata}
 #' @examples \dontrun{ data(toy1) ; summary(toy1) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
@@ -467,12 +494,15 @@ summary.dsdata = function(data, ...){
   
 }
 
-#' Calculate some baseline statistics
+#' Calculate baseline statistics
+#' 
+#' A brief overview of important statistics like the area covered by the mesh and the number of observations
 #' 
 #' @aliases statistics.dsdata 
 #' @name statistics.dsdata 
 #' @export
-#' @param dsdata Distance sampling data set
+#' @param dsdata A \link{dsdata} object
+#' @param distance.truncation Set this to a numeric value to obtain more detailed statistics.
 #' @examples \dontrun{ data(toy1) ; statistics(toy1) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
@@ -597,7 +627,6 @@ as.transect.effort = function(effort){
   } else {
     end.idx = c(which(diff(tr.id)>0), length(tr.id))
     start.idx = c(1,end.idx[1:(length(end.idx)-1)]+1)
-  }
   tr = data.frame(start=start.idx,end=end.idx)
   class(tr) = c("transect","data.frame")
   return(tr)
