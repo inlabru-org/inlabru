@@ -447,7 +447,7 @@ sample.points.model = function(model, result = NULL, data = NULL,  property = "r
   }
   pts = sample.lgcp(data$mesh, weights = weights, geometry = data$geometry)
   colnames(pts) = data$mesh.coords
-  return(pts)
+  return(data.frame(pts))
 }
 
 
