@@ -193,8 +193,9 @@ mesh.split = function(mesh,n=1){
 }
 
 # plot.marginal = function(...){UseMethod("plot.marginal")}
-plot.marginal.inla = function(result,varname="Intercept", add = FALSE, lwd=3,...){
+plot.marginal.inla = function(result,varname="Intercept", add = FALSE, ggp = TRUE, lwd=3,...){
   vars = variables.inla(result)
+  ovarname = varname
   if (paste0("Beta for ", varname) %in% rownames(vars)) { varname = paste0("Beta for ", varname)}
   
   if (varname %in% c(result$names.fixed, rownames(result$summary.hyperpar) )) {
@@ -208,16 +209,26 @@ plot.marginal.inla = function(result,varname="Intercept", add = FALSE, lwd=3,...
     else if (vars[varname,"type"] == "hyperpar"){
       marg = result$marginals.hyperpar[[varname]]
     }
-    if (!add) {
-      plot(marg,type='l',xlab=varname,ylab="Posterior density",...)
+    if ( ggp ) {
+      require( ggplot2 )
+      df = data.frame(marg)
+      ggplot(data = df, aes(x=x,y=y)) + geom_path() + geom_ribbon(ymin = 0,aes(ymax = y), alpha = 0.1) +
+        geom_segment(x = vars[varname,"0.025quant"], y = 0, xend = vars[varname,"0.025quant"], yend = 0.5 * max(df$y),color = "red") +
+        geom_segment(x = vars[varname,"0.975quant"], y = 0, xend = vars[varname,"0.975quant"], yend = 0.5 * max(df$y),color = "red") +
+        geom_segment(x = vars[varname,"mode"], y = 0, xend = vars[varname,"mode"], yend = max(df$y),color = "blue") +
+        xlab(ovarname) + ylab("pdf")
     } else {
-      points(marg, type='l', xlab="",ylab="", ...)
+      if (!add) {
+        plot(marg,type='l',xlab=varname,ylab="Posterior density",...)
+      } else {
+        points(marg, type='l', xlab="",ylab="", ...)
+      }
+      lheight = max(marg[,"y"])
+      lines(x=c(vars[varname,"mode"],vars[varname,"mode"]),y=c(0,lheight),col="blue",lwd=lwd,...)
+      lines(x=c(vars[varname,"mean"],vars[varname,"mean"]),y=c(0,lheight),col="red",lwd=lwd,...)
+      lines(x=c(vars[varname,"0.025quant"],vars[varname,"0.025quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
+      lines(x=c(vars[varname,"0.975quant"],vars[varname,"0.975quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
     }
-    lheight = max(marg[,"y"])
-    lines(x=c(vars[varname,"mode"],vars[varname,"mode"]),y=c(0,lheight),col="blue",lwd=lwd,...)
-    lines(x=c(vars[varname,"mean"],vars[varname,"mean"]),y=c(0,lheight),col="red",lwd=lwd,...)
-    lines(x=c(vars[varname,"0.025quant"],vars[varname,"0.025quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
-    lines(x=c(vars[varname,"0.975quant"],vars[varname,"0.975quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
   } else {
     if ( require(ggplot2) ){
       df = result$summary.random[[varname]]
