@@ -5,7 +5,7 @@
 #' @param mesh an inla.mesh object
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL) {
+ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = rgb(0,0,0,0.3)) {
   
   xlim = range(mesh$loc[,1])
   ylim = range(mesh$loc[,2])
@@ -30,7 +30,6 @@ ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL) {
     gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) + theme(legend.title=element_blank())
     
   } else {
-    mcol = rgb(0,0,0,0.8)
     df = data.frame(grid)
     if (!is.null(add)) { gg = add } else { gg = ggplot(df, aes(x=x,y=y) )}
   }
