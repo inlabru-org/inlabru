@@ -10,4 +10,6 @@ License: What license is it under?
 Suggests:
     testthat
 Depends:
-    INLA, Matrix
+    INLA,
+    Matrix
+RoxygenNote: 5.0.1
