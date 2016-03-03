@@ -65,7 +65,7 @@ plot.halfnormal = function(...) { plot.detfun(...) }
 
 plot.detfun = function(model = NULL,
                            result = NULL,
-                           distance.truncation,
+                           distance.truncation = NULL,
                            data = NULL,  
                            loc = NULL,
                            prior = NULL,
@@ -82,6 +82,15 @@ plot.detfun = function(model = NULL,
                            col = rgb(250/256, 83/256, 62/256, 1),
                            ucol = rgb(250/256, 83/256, 62/256, 0.3), 
                            ggp = TRUE,...) {
+  
+  if ( is.null(distance.truncation) ) {
+    if ( is.null(data) & is.null (loc) ) {
+      stop("Your have to provide at least one of the following parameters: distance.truncation, data or loc")
+    } else {
+      if (! is.null(loc) ) (distance.truncation = max(loc$distance))
+      if (! is.null(data) ) (distance.truncation = max(detdata(data)$distance))
+    }
+  }
 
   if (is.null(loc)) { 
     x = data.frame(distance = seq(0, distance.truncation, length.out = 2000)) 
