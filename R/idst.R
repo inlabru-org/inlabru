@@ -22,21 +22,21 @@ idst = function(data, model, ips = NULL, stack = NULL, n = 1, ...){
   if ( is.null(stack) ) {
     det.stack <- detection.stack(data, model = model)
     int.stack <- integration.stack(data, scheme = ips, model = model)
-    stack <- inla.stack(det.stack, int.stack)  
+    stk <- inla.stack(det.stack, int.stack)  
   }
 
   for ( k in 1:n ) {
     result <- inla(formula = model$formula, 
                    family = "poisson",
-                   data = c(inla.stack.data(stack), list.data(model)),
-                   control.predictor = list( A = inla.stack.A(stack), compute = TRUE),
-                   E = inla.stack.data(stack)$e,
+                   data = c(inla.stack.data(stk), list.data(model)),
+                   control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
+                   E = inla.stack.data(stk)$e,
                    ...)
     if ( k > 1) {
       update.model(model, result)
       det.stack <- detection.stack(data, model = model)
       int.stack <- integration.stack(data, scheme = ips, model = model)
-      stack <- inla.stack(det.stack, int.stack)  
+      stk <- inla.stack(det.stack, int.stack)  
     }
   }
   return(result)
