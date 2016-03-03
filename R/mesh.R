@@ -6,7 +6,7 @@
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = rgb(0,0,0,0.3)) {
-  
+  if ( !require(ggplot2) ) { stop("This function requires the ggplot2 package to run.") }
   xlim = range(mesh$loc[,1])
   ylim = range(mesh$loc[,2])
   aspect = diff(ylim)/diff(xlim)
