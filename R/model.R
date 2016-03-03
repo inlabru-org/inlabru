@@ -157,7 +157,7 @@ list.data.model = function(model){
   # INLA reports the following error: 
   # Error in data.frame(..., check.names = FALSE): arguments imply differing number of rows: 2379, 2739
   
-  assign("stack", NULL, envir = environment(jmdl$formula))
+  assign("stack", NULL, envir = environment(model$formula))
   return( as.list(environment(model$formula)) )
 }
 
