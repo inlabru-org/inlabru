@@ -80,10 +80,11 @@ plot.detfun = function(model = NULL,
                            add.histogram = TRUE,
                            filter = NULL,
                            col = rgb(250/256, 83/256, 62/256, 1),
-                           ucol = rgb(250/256, 83/256, 62/256, 0.3), ...) {
+                           ucol = rgb(250/256, 83/256, 62/256, 0.3), 
+                           ggp = TRUE,...) {
 
   if (is.null(loc)) { 
-    x = data.frame(distance = seq(0, distance.truncation, length.out = 500)) 
+    x = data.frame(distance = seq(0, distance.truncation, length.out = 2000)) 
 
   }
   else { 
@@ -111,21 +112,23 @@ plot.detfun = function(model = NULL,
   }
   
   # If data was provided, plot histogram
-  if ( !is.null(data) & add.histogram ) {
+  if ( !is.null(data) & add.histogram) {
     
     # Filter
     dets = detdata(data)
     if ( !is.null(filter) ) { dets = filter(dets) } 
     
     if ( do.ecdf ) {
-      df = ecdf(dets$distance)
+      edf = ecdf(dets$distance)
       x.plot = seq(0,distance.truncation,length.out=100)
-      if ( add ) { lines(x,1-df(x$distance)) }
-      else {
-        plot(x.plot, 1-df(x.plot), type = "l",
-             xaxt = 'n', yaxt = 'n',
-             ylab = "", xlab = "",
-             main = "",)
+      if ( ! ggp ) {
+        if ( add ) { lines(x,1-edf(x$distance)) }
+        else {
+          plot(x.plot, 1-edf(x.plot), type = "l",
+               xaxt = 'n', yaxt = 'n',
+               ylab = "", xlab = "",
+               main = "",)
+        }
       }
       uy = 1
     } else {
@@ -135,16 +138,18 @@ plot.detfun = function(model = NULL,
       hst = hist(dets$distance,plot=FALSE, breaks = breaks)
       hst$density = hst$density/mean(hst$density) # normalized 
       uy = max(hst$density[1],max(dmean/mean(dmean)))
-      if ( add ) {
-        
-      } else {
-        plot(hst, 
-             freq = FALSE,
-             xaxt = 'n', yaxt = 'n',
-             ylab = "", xlab = "",
-             main = "",
-             ylim = c(0,uy),
-             xlim = c(0,distance.truncation))
+      if (! ggp ) {
+        if ( add ) {
+          
+        } else {
+          plot(hst, 
+               freq = FALSE,
+               xaxt = 'n', yaxt = 'n',
+               ylab = "", xlab = "",
+               main = "",
+               ylim = c(0,uy),
+               xlim = c(0,distance.truncation))
+        }
       }
     }
     scale = 1/mean(dmean)
@@ -167,21 +172,62 @@ plot.detfun = function(model = NULL,
   }
   
   # Plot mode
-  if (add) {
-    lines(x$distance,y.plot, lwd = 3, col = col)
+  ggp = TRUE
+  if ( ggp ) {
+    if (!require(ggplot2)) {stop("ggplot2 not installed. Set ggp = FALSE to use default plotting method")}
+    if ( do.ecdf ) {
+      
+      df = data.frame(distance=x$distance, 
+                      mode = 1-cumsum(dmean)/sum(dmean), 
+                      upper = 1-cumsum(upper)/sum(upper), 
+                      lower = 1-cumsum(lower)/sum(lower),
+                      edf = 1-edf(x$distance))
+      
+      gg = ggplot(data=df, aes(x=distance, y=mode))
+      if ( !is.null(data) & add.histogram ) {
+        gg = gg + geom_path(aes(y = edf),colour = "black" , alpha = 0.5)
+      }
+      gg = gg + geom_ribbon(aes(x=distance, ymax=upper, ymin=lower), fill = ucol, alpha = 0.2) + 
+        geom_path(colour = col, size = 1) +
+        ylab("detection probability ecdf")
+      gg
+      return(gg)
+      
+    } else {
+      df = data.frame(distance=x$distance, mode = dmean, upper = upper, lower = lower)
+      gg = ggplot(data=df, aes(x=distance, y=mode))
+      
+      if ( add.histogram & !do.ecdf ) {
+        hstdf = data.frame(x=hst$mids, y = hst$density/scale)
+        gg = gg + geom_bar(data = hstdf, stat="identity", aes(x=x, y=y), fill = rgb(0,0,0,0.2)) +
+          coord_cartesian(ylim = c(0,max(hstdf$y,1)))
+      }
+      gg = gg + geom_ribbon(aes(x=distance, ymax=upper, ymin=lower), fill = ucol, alpha = 0.2) + 
+        geom_path(colour = col, size = 1) +
+        ylab("detection probability")
+      
+      gg
+      return(gg)
+    }
+    
+
   } else {
-    plot(x$distance,y.plot, lwd = 3, col = col,
-         xlim = c(0,distance.truncation), 
-         ylim = c(0,uy),
-         type = "l",
-         yaxt = yaxt,
-         main = "",
-         ylab = "1 - ECDF", 
-         xlab = "Distance")
-  }  
-  # Plot uncertainty bounds
-  if ( add.uncertainty ) {
-    polygon(c(x$distance, rev(x$distance)), y.boundary,  col = ucol, border = NA, yaxt = "n")
+    if (add) {
+      lines(x$distance,y.plot, lwd = 3, col = col)
+    } else {
+      plot(x$distance,y.plot, lwd = 3, col = col,
+           xlim = c(0,distance.truncation), 
+           ylim = c(0,uy),
+           type = "l",
+           yaxt = yaxt,
+           main = "",
+           ylab = "1 - ECDF", 
+           xlab = "Distance")
+    }  
+    # Plot uncertainty bounds
+    if ( add.uncertainty ) {
+      polygon(c(x$distance, rev(x$distance)), y.boundary,  col = ucol, border = NA, yaxt = "n")
+    }
   }
   
 }
