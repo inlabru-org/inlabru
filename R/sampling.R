@@ -37,8 +37,8 @@ if ( strategy == "bounding-rectangle") {
     #Do some thinning
     A <- inla.mesh.project(mesh,points)$A
     weights =exp( weights-lambda_max)
-    pointValues = A%*%weights
-    keep =which(runif(Npoints) < pointValues)
+    pointValues = as.vector(A%*%weights)
+    keep = which(runif(Npoints) < pointValues)
     
     return(points[keep,])
 
