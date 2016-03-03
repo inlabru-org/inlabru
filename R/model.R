@@ -401,14 +401,14 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
 #' @aliases sample.value.model sample.value
 #' @export
 
-sample.value.model = function(model, inla.result, n = 1, data = NULL, loc = NULL) {
+sample.value.model = function(model, result = NULL, n = 1, data = NULL, loc = NULL) {
   
   if ( is.null(loc) ) {
     loc = data$mesh$loc[,1:2]; 
     colnames(loc) = data$mesh.coords    
   }
   
-  samples = inla.posterior.sample.structured(inla.result, n)
+  samples = inla.posterior.sample.structured(result, n)
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
   ret.samples = list()
@@ -437,13 +437,13 @@ sample.value.model = function(model, inla.result, n = 1, data = NULL, loc = NULL
 #' @aliases sample.points.model sample.points
 #' @export
  
-sample.points.model = function(model, data = NULL, inla.result = NULL, property = "random"){
+sample.points.model = function(model, result = NULL, data = NULL,  property = "random"){
   loc = data$mesh$loc[,1:2]
   colnames(loc) = data$mesh.coords
   if ( property == "random") {
-    weights = sample.value.model(model, inla.result = inla.result, n = 1, loc = loc)
+    weights = sample.value.model(model, result = result, n = 1, loc = loc)
   } else {
-    weights = evaluate(model = model, inla.result = inla.result, loc = loc, do.sum = TRUE, property = property)
+    weights = evaluate(model = model, inla.result = result, loc = loc, do.sum = TRUE, property = property)
   }
   pts = sample.lgcp(data$mesh, weights = weights, geometry = data$geometry)
   colnames(pts) = data$mesh.coords
