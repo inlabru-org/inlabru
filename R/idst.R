@@ -14,6 +14,8 @@
 
 idst = function(data, model, ips = NULL, stack = NULL, n = 1, ...){
   
+  model = join(model)
+  
   if ( is.null(ips) ) {
     if ( "ips" %in% names(data) ) { ips = data$ips }
     else { stop("Parameter 'ips' not provided and data set data has no field 'ips'" ) }
