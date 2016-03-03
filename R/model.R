@@ -137,7 +137,8 @@ join.model = function(...){
     mesh.coords = mesh.coords,
     time.coords = time.coords,
     const = const,
-    eval = eval
+    eval = eval,
+    iterator = do.call(c, lapply(models, function(m){m$iterator}))
     ))
   
 }
@@ -296,7 +297,7 @@ make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, 
     covariates[[effects]] = tmp
     }
   
-  mdl = list(
+  mdl = c(list(
     formula = formula,
     name = name,
     effects = effects,
@@ -306,9 +307,8 @@ make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, 
     time.coords = time.coords,
     covariates = covariates,
     const = const,
-    eval = eval,
-    args = list(...)
-  )
+    eval = eval), list(...))
+
   class(mdl) = c("model","list")
   return(mdl)
 }
