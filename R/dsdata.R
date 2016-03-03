@@ -209,6 +209,7 @@ make.mesh = function(dset, ...) {
 #' @export
 #' @param data A \link{dsdata} object
 #' @param rgl If TRUE, use RGL to plot the data
+#' @param ggp if TRUE, use ggplot2 for plotting
 #' @param add If TRUE, add the plot instead of starting a new one
 #' @param transect If TRUE, plot the transect lines
 #' @param transect.args Plotting argument for transects.
@@ -223,7 +224,8 @@ make.mesh = function(dset, ...) {
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' 
 plot.dsdata = function(data, 
-                       rgl = FALSE, 
+                       rgl = FALSE,
+                       ggp = TRUE,
                        add=FALSE,
                        transect = TRUE,
                        transect.args = list(lwd = 3, col = "black"),
@@ -259,35 +261,65 @@ plot.dsdata = function(data,
       mesh = data$mesh
     }
     
-    # Plot mesh
-    plot(mesh, main="", asp = asp, add = add)
-    
-    # Axis
-    if ( !add ) { axis(1); axis(2) ; box()}
-    
-    # Plot segments
-    if ( segment | segment.colorize ) {
-      if ( segment.colorize ){ segment.args$col = data$effort$trans }
-      do.call(segments, c(list(data$effort[, paste0("start.",data$mesh.coords[1])],
-                             data$effort[, paste0("start.",data$mesh.coords[2])],
-                             data$effort[, paste0("end.",data$mesh.coords[1])],
-                             data$effort[, paste0("end.",data$mesh.coords[2])]),
-                             segment.args))
-
-    }
-    
-    # Plot transect lines
-    if ( transect ) {
-      spoint = startpoint(as.transect(data),data)
-      epoint = endpoint(as.transect(data),data)
-      do.call(segments, c(list(spoint[, data$mesh.coords[1]], spoint[, data$mesh.coords[2]], 
-                               epoint[, data$mesh.coords[1]], epoint[, data$mesh.coords[2]]), 
-                               transect.args))
-    }
+    if ( ggp ) {
+      gg = ggp.mesh(mesh, mcol = rgb(0,0,0,0.1))
+      # Plot segments
+      if ( segment | segment.colorize ) {
+        if ( segment.colorize ){ segment.args$col = data$effort$trans }
+        df = data$effort[,c(paste0("start.",data$mesh.coords), paste0("end.",data$mesh.coords))]
+        colnames(df) = c("x","y","xend","yend")
+        gg = gg + geom_segment(data = df, aes(x = x, y = y, xend = xend, yend = yend))
+      }
+      # Plot transects
+      if ( transect ) {
+        spoint = startpoint(as.transect(data),data)
+        epoint = endpoint(as.transect(data),data)
+        df = cbind(startpoint(as.transect(data),data)[,data$mesh.coords], endpoint(as.transect(data),data)[,data$mesh.coords])
+        colnames(df) = c("x","y","xend","yend")
+        gg = gg + geom_segment(data = df, aes(x = x, y = y, xend = xend, yend = yend))
+      }
+      # Plot detections
+      if( detection ){
+        df = detdata(data)[,data$mesh.coords]
+        colnames(df) = c("x","y")
+        gg = gg + geom_point(data = df, aes(x=x,y=y), color = "red", size = 1)
+      }
+      gg = gg + xlab(data$mesh.coords[1]) + ylab(data$mesh.coords[2])
+      gg
+      return(gg)
+      
+    } else {
+      
+      # Plot mesh
+      plot(mesh, main="", asp = asp, add = add)
+      
+      # Axis
+      if ( !add ) { axis(1); axis(2) ; box()}
+      
+      # Plot segments
+      if ( segment | segment.colorize ) {
+        if ( segment.colorize ){ segment.args$col = data$effort$trans }
+        do.call(segments, c(list(data$effort[, paste0("start.",data$mesh.coords[1])],
+                               data$effort[, paste0("start.",data$mesh.coords[2])],
+                               data$effort[, paste0("end.",data$mesh.coords[1])],
+                               data$effort[, paste0("end.",data$mesh.coords[2])]),
+                               segment.args))
   
-    # Plot detections
-    if ( detection ) {
-      do.call(points, c(list(detdata(data)[,data$mesh.coords]), detection.args) )
+      }
+      
+      # Plot transect lines
+      if ( transect ) {
+        spoint = startpoint(as.transect(data),data)
+        epoint = endpoint(as.transect(data),data)
+        do.call(segments, c(list(spoint[, data$mesh.coords[1]], spoint[, data$mesh.coords[2]], 
+                                 epoint[, data$mesh.coords[1]], epoint[, data$mesh.coords[2]]), 
+                                 transect.args))
+      }
+    
+      # Plot detections
+      if ( detection ) {
+        do.call(points, c(list(detdata(data)[,data$mesh.coords]), detection.args) )
+      }
     }
   }
   else {
