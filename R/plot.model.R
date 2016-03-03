@@ -414,6 +414,7 @@ plot.spatial = function(model = NULL,
       gg = gg + geom_raster(aes(fill = col, alpha=alpha),hjust=0.5, vjust=0.5, interpolate = TRUE)
       gg = gg + scale_alpha_discrete(guide = 'none')
       gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) + theme(legend.title=element_blank()) + coord_fixed()
+      gg = gg + xlab(data$mesh.coords[1]) + ylab(data$mesh.coords[2])
       
       gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]), 
                            aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
