@@ -1,4 +1,4 @@
-import.dsmdata = function(dsmdata){
+import.dsmdata = function(dsmdata, covar.col = NA){
   
   # Extract data
   segdata <- dsmdata$segdata
@@ -10,7 +10,7 @@ import.dsmdata = function(dsmdata){
   # Take account of depth in defining blocks - Block.Label is identifier
   # More than one covariate can be listed
   # If no covariates, then covar.col=NA and transects are used (to be done)
-  segdata <- define.blocks.f(seg=segdata,covar.col=6,geometry="euc")
+  segdata <- define.blocks.f(seg=segdata,covar.col = covar.col,geometry="euc")
   #segdata[1:2, ]
   
   # 2. GET THE ANGLE OF DIRECTION FOR EACH SEGMENT

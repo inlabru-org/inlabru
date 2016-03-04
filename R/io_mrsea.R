@@ -48,7 +48,7 @@ io_mrsea.pkgdata.load = function() {
   colnames(preddata)[c(2,3)] = c("x","y")
   
   dsmdata = list(obsdata = obsdata, distdata = distdata, segdata = segdata, preddata = preddata)
-  dset = import.dsmdata(dsmdata)
+  dset = import.dsmdata(dsmdata, covar.col = 5)
   
   # Attach depth data to the data set
   
