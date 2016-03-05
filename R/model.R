@@ -519,42 +519,57 @@ model.fixed = function(effects = NULL, covariates = list()) {
   return(make.model(name = "Fixed effect", formula = formula, effects = effects, covariates = covariates))
 }
 
-
-
 #' Spatial SPDE model
 #' 
-#' Constructs a spatial SPDE model with formula
+#' Constructs a spatial SPDE model
 #' 
-#'  ~ . + f(spde, model = spde.mdl, group = spde.group)
+#' This model uses the formula
+#' 
+#'  ~ . + f(spde, model = spde.mdl, group = spde.group, ...)
+#'  
+#'  where the name 'spde' can be replaced by the \code{effect} parameter. The internal INLA spde model
+#'  spde.mdl is constructed using the dotted arguments. If these do not contain a mesh, the mesh of the
+#'  data set \code{data} is used. If there are no ... arguments, it sets alpha = 2, 
+#'  prior.variance.nominal = 10 and theta.prior.prec = 0.01. 
 #'
 #' @aliases model.spde
 #' @param data Data set to read the names of the mesh coordinates from (mesh.coords)
-#' @param mesh The mesh used to construct the SPDE. If not provided, the mesh is read form the data set
+#' @param effect A string defining the name of the SPDE effect
 #' @param n.group Number of SPDE model groups (see \link{f}), e.g. for temporal models.
+#' @param group A string defining the data column to group by, e.g. "season". Groups must be integer and > 0 
+#' @param covariate A function that maps a data frame of points to a scaling factor for the SPDE at that point.
 #' @param ... Arguments passed on to inla.spde2.matern. If none, the defaults are alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01
 #'  
 
-model.spde = function(data, mesh = data$mesh, n.group = 1, covariates = NULL, ...) {
+model.spde = function(data, effect = "spde", n.group = 1, group = data$time.coords, covariate = NULL, ...) {
   
+  # Set default parameters for SPDE (if none provided)
   vargs = list(...)
-  if ( length(vargs) == 0 ){ 
-    spde.args = list(alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01) }
-  else { 
-    spde.args = vargs 
-  }
+  if ( length(vargs) == 0 ){ spde.args = list(alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01) }
+  else { spde.args = vargs }
   
-  spde.mdl = do.call(inla.spde2.matern,c(list(mesh=mesh),spde.args)) 
-  spde.mdl$n.group = n.group
-  formula = ~ . + f(spde, model=spde.mdl, group = spde.group)
-  assign("spde.mdl", spde.mdl, envir = environment(formula))
+  # If no mesh is provided, the SPDE lives on the data mesh 
+  if (!("mesh" %in% names(spde.args))) { spde.args[["mesh"]] = data$mesh }
+  
+  # Create the SPDE model
+  tmp.mdl = do.call(inla.spde2.matern, spde.args)
+  tmp.mdl$n.group = n.group
+  
+  # Make the formula
+  formula = as.formula(paste0("~ . + f(",effect,", model = ",effect,".mdl, group = ",effect,".group)"))
+  assign(paste0(effect,".mdl"), tmp.mdl, envir = environment(formula))
+  
+  # Little helper
+  lassign = function(name,value) { tmp = list(); tmp[[name]] = value ; return(tmp) }
   
   return(make.model(name = "Spatio-temporal SPDE model",
                     formula = formula,
-                    effects = "spde",
-                    mesh = list(spde = mesh),
-                    inla.spde = list(spde = spde.mdl),
-                    mesh.coords = list(spde = data$mesh.coords),
-                    time.coords = list(spde = data$time.coords)))
+                    effects = effect,
+                    mesh = lassign(effect, spde.args$mesh),
+                    covariates = lassign(effect, covariate),
+                    inla.spde = lassign(effect, tmp.mdl),
+                    mesh.coords = lassign(effect, data$mesh.coords),
+                    time.coords = lassign(effect, group)))
 }
 
 #####################################
