@@ -822,13 +822,13 @@ int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry=
 }
 
 
-#' Wrapper for \link{int.quadrature}
+#' Integration points in one dimension
 #' 
-#' Returns a data frame instead of a list. See documentation of \link{int.quadrature}.
+#' This function is a wrapper for \link{int.quadrature}. It returns a data frame instead of a list.
 #' 
 #' @aliases int.1d
-#' @param ... see 
-#' @export \link{int.quadrature}
+#' @param ... see \link{int.quadrature}
+#' @export 
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 int.1d = function(...){

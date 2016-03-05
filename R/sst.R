@@ -7,7 +7,6 @@
 #' Other methods: \link{mean.sst},\link{interpolate.sst}
 #'
 #' @aliases plot.sst
-#' @export 
 #' @examples \\dontrun{sst = io_sst.load(year=c(2006,2007)); plot(sst)}
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' @name sst
