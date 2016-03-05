@@ -282,7 +282,7 @@ plot.spatial = function(model = NULL,
                      data = NULL,
                      name = NULL,
                      property = "mode",
-                     group = list(),
+                     group = NULL,
                      stack = NULL,
                      mesh = data$mesh,
                      mesh.coords = model$mesh.coords,
@@ -386,7 +386,7 @@ plot.spatial = function(model = NULL,
       ind = inla.stack.index(stack, name)$data
       col = inla.mesh.project(proj, field = result$summary.fitted.values[ind,property])
     } else if ( !is.null(model) ){  
-      if (!(length(group)==0)) { loc = data.frame(loc, group) }
+      if (!is.null(group)) { loc = merge(loc, group) }
       col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = property)
       col[!is.inside(mesh,loc,data$mesh.coords)] = NA
     } else if ( !is.null(name) ) {
@@ -397,8 +397,6 @@ plot.spatial = function(model = NULL,
       col[!is.inside(mesh,loc,data$mesh.coords)] = NA
     }
     
-    
-    
     if (!logscale) { col = exp(col) }
     
     co1 = data$mesh.coords[1]
@@ -406,16 +404,22 @@ plot.spatial = function(model = NULL,
     
     if ( ggp ) {
       
-      require(ggplot2)
-      mcol = rgb(0,0,0,0.1)
+      if ( !require(ggplot2) ) { stop("This function requires the ggplot2 package to run. Set ggp = FALSE.") }
       
-      df = data.frame(grid,col=as.vector(col), alpha = is.inside(mesh,loc,data$mesh.coords))
+      
+      # Plot intensity
+      df = data.frame(loc,col=as.vector(col), alpha = is.inside(mesh,loc,data$mesh.coords))
       gg = ggplot(df, aes(x=x,y=y) )
-      gg = gg + geom_raster(aes(fill = col, alpha=alpha),hjust=0.5, vjust=0.5, interpolate = TRUE)
+      gg = gg + geom_raster(aes(fill = col, alpha = alpha), hjust=0.5, vjust=0.5, interpolate = TRUE)
       gg = gg + scale_alpha_discrete(guide = 'none')
       gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) + theme(legend.title=element_blank()) + coord_fixed()
       gg = gg + xlab(data$mesh.coords[1]) + ylab(data$mesh.coords[2])
       
+      # If the data if grouped, use ggplot facets
+      if (!is.null(group)) { gg = gg + facet_grid(as.formula(paste0(". ~ ", colnames(group)[1]))) }
+      
+      # Plot the mesh
+      mcol = rgb(0,0,0,0.1)
       gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]), 
                            aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
       
