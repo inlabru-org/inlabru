@@ -12,7 +12,7 @@
 #' @return A \link{inla} object
 
 
-idst = function(data, model, ips = NULL, stack = NULL, n = 1, ...){
+idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, ...){
   
   model = join(model)
   
@@ -24,7 +24,18 @@ idst = function(data, model, ips = NULL, stack = NULL, n = 1, ...){
   if ( is.null(stack) ) {
     det.stack <- detection.stack(data, model = model)
     int.stack <- integration.stack(data, scheme = ips, model = model)
-    stk <- inla.stack(det.stack, int.stack)  
+    
+    if ( !is.null(predict) ) {
+      if ( is.model(predict) ) {
+        loc = data$mesh$loc[,c(1,2)] ; colnames(loc) = data$mesh.coords
+        predict = list(data = data, model = predict, loc = loc, tag = "prediction")
+      }
+      pred.stack = do.call(prediction.stack,predict)
+      stk <- inla.stack(det.stack, int.stack, pred.stack)
+    } else { 
+      stk <- inla.stack(det.stack, int.stack)
+    }
+    
   }
 
   for ( k in 1:n ) {
@@ -35,11 +46,24 @@ idst = function(data, model, ips = NULL, stack = NULL, n = 1, ...){
                    E = inla.stack.data(stk)$e,
                    ...)
     if ( k > 1) {
+      # Update model
       update.model(model, result)
+      # Update stacks
       det.stack <- detection.stack(data, model = model)
       int.stack <- integration.stack(data, scheme = ips, model = model)
-      stk <- inla.stack(det.stack, int.stack)  
+      
+      if ( !is.null(predict) ) {
+        if ( is.model(predict) ) {
+          loc = data$mesh$loc[,c(1,2)] ; colnames(loc) = data$mesh.coords
+          predict = list(data = data, model = predict, loc = loc, tag = "prediction")
+        }
+        pred.stack = do.call(prediction.stack,predict)
+        stk <- inla.stack(det.stack, int.stack, pred.stack)
+      } else { 
+        stk <- inla.stack(det.stack, int.stack)
+      }
     }
   }
+  result$stack = stk
   return(result)
 }
