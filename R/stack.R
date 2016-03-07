@@ -120,7 +120,12 @@ integration.stack = function(data,
 #' @aliases prediction.stack
 #' 
 
-prediction.stack = function(data, model = NULL, pts = NULL, tag = "prediction.stack"){
+prediction.stack = function(data, model = NULL, loc = NULL, pts = NULL, tag = "prediction.stack"){
+  
+  if ( !is.null(pts) ) {
+    warning("pts is a deprecated parameter. Use loc instead. Setting loc=pts.")
+    loc = pts
+  }
   
   # Where to predict
   if (is.null(pts)) { 
