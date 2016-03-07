@@ -306,6 +306,7 @@ plot.spatial = function(model = NULL,
 
   if (rgl) {
     require(rgl)  
+    R = 6371
     
     # Get predicted values from a stack tag
     if ( !is.null(stack) ){
@@ -322,7 +323,6 @@ plot.spatial = function(model = NULL,
         colnames(loc) = data$mesh.coords
         R = 1
       }
-      
       if (!(length(group)==0)) { loc = data.frame(loc, group) }
       col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = property)
     }
@@ -336,7 +336,7 @@ plot.spatial = function(model = NULL,
       # Plot sphere
       if (!add){ rgl.open() }
       bg3d(color = "white")
-      rgl.earth(R)
+      rgl.earth()
       
       # Plot detections and integration points
       if ( add.detections ) { rgl.sphpoints(long = det.points$lon+360, lat = det.points$lat, radius = 1.01*R, col="red", size = 5) }
@@ -383,21 +383,34 @@ plot.spatial = function(model = NULL,
     colnames(loc) = data$mesh.coords
       
     if ( !is.null(stack) ) {
-      ind = inla.stack.index(stack, name)$data
+      ind = inla.stack.index(result$stack, name)$data
       col = inla.mesh.project(proj, field = result$summary.fitted.values[ind,property])
-    } else if ( !is.null(model) ){  
+    } else if ( !is.null(model) ){
       if (!is.null(group)) { loc = merge(loc, group) }
-      col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = property)
-      col[!is.inside(mesh,loc,data$mesh.coords)] = NA
+      col = do.call(c,lapply(property, 
+             function(prp) { 
+               col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = prp) 
+               col[!is.inside(mesh,loc,data$mesh.coords)] = NA
+               return(as.vector(col))
+               }))
+      col = data.frame(col=col, property = merge(rep(1,nrow(loc)), property)[,2])
+      loc =  loc[rep(seq_len(nrow(loc)), length(property)), ]
     } else if ( !is.null(name) ) {
-      col = inla.spde.make.A(data$mesh, loc = as.matrix(loc)) %*% result$summary.ran[[name]][[property]]
-      col[!is.inside(mesh,loc,data$mesh.coords)] = NA
+      if (name %in% names(result$summary.random)){
+        col = inla.spde.make.A(data$mesh, loc = as.matrix(loc)) %*% result$summary.ran[[name]][[property]]
+        col[!is.inside(mesh,loc,data$mesh.coords)] = NA
+      } else {
+        ind = inla.stack.index(result$stack, name)$data
+        col = inla.mesh.project(proj, field = result$summary.fitted.values[ind, property])
+      }
+      
     } else {
       col = inla.spde.make.A(data$mesh, loc = as.matrix(loc)) %*% col
       col[!is.inside(mesh,loc,data$mesh.coords)] = NA
     }
     
-    if (!logscale) { col = exp(col) }
+    if (!is.data.frame(col)) { col = data.frame(col = as.vector(col))}
+    if (!logscale) { col$col = exp(col$col) }
     
     co1 = data$mesh.coords[1]
     co2 = data$mesh.coords[2]
@@ -406,15 +419,14 @@ plot.spatial = function(model = NULL,
       
       if ( !require(ggplot2) ) { stop("This function requires the ggplot2 package to run. Set ggp = FALSE.") }
       
-      
       # Plot intensity
-      df = data.frame(loc,col=as.vector(col), alpha = is.inside(mesh,loc,data$mesh.coords))
-      gg = ggplot(df, aes(x=x,y=y) )
-      gg = gg + geom_raster(aes(fill = col, alpha = alpha), hjust=0.5, vjust=0.5, interpolate = TRUE)
+      df = cbind(loc, col, alpha = is.inside(mesh,loc,data$mesh.coords))
+      gg = ggplot(df, aes_string(x = data$mesh.coords[1],y = data$mesh.coords[2]) )
+      gg = gg + geom_raster(aes_string(fill = "col", alpha = "alpha"), hjust=0.5, vjust=0.5, interpolate = TRUE)
       gg = gg + scale_alpha_discrete(guide = 'none')
       gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) + theme(legend.title=element_blank()) + coord_fixed()
-      gg = gg + xlab(data$mesh.coords[1]) + ylab(data$mesh.coords[2])
-      
+      # Facet properties
+      if (length(property)>1) { gg = gg + facet_grid(. ~ property) }
       # If the data if grouped, use ggplot facets
       if (!is.null(group)) { gg = gg + facet_grid(as.formula(paste0(". ~ ", colnames(group)[1]))) }
       
