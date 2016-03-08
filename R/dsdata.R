@@ -227,10 +227,10 @@ plot.dsdata = function(data,
                        rgl = FALSE,
                        ggp = TRUE,
                        add=FALSE,
-                       transect = TRUE,
-                       transect.args = list(lwd = 3, col = "black"),
-                       segment = FALSE,
-                       segment.args = list(lwd = 2, col = rgb(0.6, 0.6, 0.6)),
+                       transect = FALSE,
+                       transect.args = list(lwd = 2, col = rgb(0.6, 0.6, 0.6)),
+                       segment = TRUE,
+                       segment.args = list(lwd = 3, col = "black"),
                        segment.colorize = FALSE,
                        detection = TRUE,
                        detection.args = list(col = "red2", pch = 16, cex = 1.2),
@@ -238,10 +238,10 @@ plot.dsdata = function(data,
                        asp = 1, ...){
 
   # Defaults
-  if ( !("lwd" %in% names(transect.args)) ) { transect.args$lwd = 3 }
-  if ( !("col" %in% names(transect.args)) ) { transect.args$col = "black" }
-  if ( !("lwd" %in% names(segment.args)) ) { segment.args$lwd = 2 }
-  if ( !("col" %in% names(segment.args)) ) { segment.args$col = rgb(0.6, 0.6, 0.6) }
+  if ( !("lwd" %in% names(segment.args)) ) { segment.args$lwd = 3 }
+  if ( !("col" %in% names(segment.args)) ) { segment.args$col = "black" }
+  if ( !("lwd" %in% names(transect.args)) ) { transect.args$lwd = 2 }
+  if ( !("col" %in% names(transect.args)) ) { transect.args$col = rgb(0.6, 0.6, 0.6) }
   if ( !("col" %in% names(detection.args)) ) { detection.args$col = "red" }
   if ( !("cex" %in% names(detection.args)) ) { detection.args$cex = 1.2 }
   if ( !("pch" %in% names(detection.args)) ) { detection.args$pch = 16 }
@@ -266,7 +266,7 @@ plot.dsdata = function(data,
       # Plot segments
       if ( segment | segment.colorize ) {
         if ( segment.colorize ){ segment.args$col = data$effort$trans }
-        df = data$effort[,c(paste0("start.",data$mesh.coords), paste0("end.",data$mesh.coords))]
+        df = data.frame(startpoint(as.segment(data),data), endpoint(as.segment(data),data))
         colnames(df) = c("x","y","xend","yend")
         gg = gg + geom_segment(data = df, aes(x = x, y = y, xend = xend, yend = yend))
       }
