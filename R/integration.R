@@ -873,7 +873,7 @@ int.1d = function(...){
 
 
 int.points = function(data, 
-                  on = "transect",
+                  on = "segment",
                   line.split = FALSE,
                   mesh = data$mesh, 
                   mesh.split = FALSE,
