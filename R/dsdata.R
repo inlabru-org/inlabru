@@ -333,13 +333,15 @@ plot.dsdata = function(data,
       rgl.points(x=detections, z=0.001,size=5,col="red")
       
       # plot transect lines
-      sp = startpoint(as.transect(data),data)[,data$mesh.coords]
-      ep = endpoint(as.transect(data),data)[,data$mesh.coords]
-      sp$z = 0.001
-      ep$z = 0.001
-      lns = as.matrix(cbind(ep,sp,matrix(NaN, nrow = dim(sp)[1], ncol = 3)))
-      qq = matrix(t(lns), ncol = 3, byrow = TRUE)
-      rgl.linestrips(qq, lwd = 3, col = "black", alpha = 0.4)
+      if ( segment ) {
+        sp = startpoint(as.segment(data),data)[,data$mesh.coords]
+        ep = endpoint(as.segment(data),data)[,data$mesh.coords]
+        sp$z = 0.001
+        ep$z = 0.001
+        lns = as.matrix(cbind(ep,sp,matrix(NaN, nrow = dim(sp)[1], ncol = 3)))
+        qq = matrix(t(lns), ncol = 3, byrow = TRUE)
+        rgl.linestrips(qq, lwd = 3, col = "black", alpha = 0.4)
+      }
     }
     else if (data$geometry == "geo"){
       # Elevation for plotting on top of earth surface
