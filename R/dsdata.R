@@ -299,11 +299,10 @@ plot.dsdata = function(data,
       # Plot segments
       if ( segment | segment.colorize ) {
         if ( segment.colorize ){ segment.args$col = data$effort$trans }
-        do.call(segments, c(list(data$effort[, paste0("start.",data$mesh.coords[1])],
-                               data$effort[, paste0("start.",data$mesh.coords[2])],
-                               data$effort[, paste0("end.",data$mesh.coords[1])],
-                               data$effort[, paste0("end.",data$mesh.coords[2])]),
-                               segment.args))
+        sp = startpoint(as.segment(data),data)
+        ep = endpoint(as.segment(data),data)
+        do.call(segments, c(list(sp[,1],sp[,2],ep[,1],ep[,2]), segment.args))
+        
   
       }
       
