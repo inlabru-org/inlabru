@@ -266,6 +266,7 @@ plot.detfun = function(model = NULL,
 #' @param property Which property of the spatial field to plot, e.g. 'mode' (default)
 #' @param stack Plot a combined effect via this stack \link{inla.stack}
 #' @param mesh The mesh used for spatial plotting
+#' @param add.mesh If TRUE, plot the mesh
 #' @param mesh.coordinates Coordinates to plot over
 #' @param rgl Use rgl to plot
 #' @param add.detection Add detections to the plot (needs: data)
@@ -285,6 +286,7 @@ plot.spatial = function(model = NULL,
                      group = NULL,
                      stack = NULL,
                      mesh = data$mesh,
+                     add.mesh = TRUE,
                      mesh.coords = model$mesh.coords,
                      rgl = FALSE,
                      add.detections = TRUE,
@@ -430,15 +432,17 @@ plot.spatial = function(model = NULL,
       # If the data if grouped, use ggplot facets
       if (!is.null(group)) { gg = gg + facet_grid(as.formula(paste0(". ~ ", colnames(group)[1]))) }
       
-      # Plot the mesh
-      mcol = rgb(0,0,0,0.1)
-      gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]), 
-                           aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
-      
-      gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-                            aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
-      gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-                            aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
+      if ( add.mesh ) {
+        # Plot the mesh
+        mcol = rgb(0,0,0,0.1)
+        gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]), 
+                             aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
+        
+        gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
+                              aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
+        gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
+                              aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
+      }
       gg  
       return(gg)
        
