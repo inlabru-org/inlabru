@@ -473,7 +473,7 @@ sanity.columns = function(dset, message = FALSE) {
 
 # Segments sorted?
 sanity.unsorted = function(dset, message = FALSE) {
-  sane = is.sorted(segment.id(dset$effort))
+  sane = !is.unsorted(segment.id(dset$effort), na.rm=TRUE)
   if ( message & !sane ) { message = "Segments are not sorted" }
   return(list(sane = sane, message = message))
 }
@@ -651,7 +651,7 @@ trdata.dsdata = function(data,tr=NULL,...){
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 as.transect.effort = function(effort){
-  if (!is.sorted(transect.id(effort))) { stop("The transects of your data set are not sorted in increasing order. Fix that.") }
+  if (is.unsorted(transect.id(effort),na.rm=TRUE)) { stop("The transects of your data set are not sorted in increasing order. Fix that.") }
   tr.id = transect.id(effort)
   if (tr.id[length(tr.id)]==1) {
     end.idx = length(tr.id)
@@ -674,7 +674,7 @@ as.transect.effort = function(effort){
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 as.segment.effort = function(effort){
-  if (!is.sorted(transect.id(effort))) { stop("The transects of your data set are not sorted in increasing order. Fix that.") }
+  if (is.unsorted(transect.id(effort), na.rm = TRUE)) { stop("The transects of your data set are not sorted in increasing order. Fix that.") }
   wh = which(is.na(effort$det))
   seg = data.frame(start = wh, end = wh)
   class(seg) = c("segment","data.frame")
