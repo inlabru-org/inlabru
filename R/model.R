@@ -533,6 +533,7 @@ model.fixed = function(effects = NULL, covariates = list()) {
 #'  prior.variance.nominal = 10 and theta.prior.prec = 0.01. 
 #'
 #' @aliases model.spde
+#' @export
 #' @param data Data set to read the names of the mesh coordinates from (mesh.coords)
 #' @param effect A string defining the name of the SPDE effect
 #' @param n.group Number of SPDE model groups (see \link{f}), e.g. for temporal models.
