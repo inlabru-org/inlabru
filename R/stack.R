@@ -139,7 +139,8 @@ prediction.stack = function(data, model = NULL, loc = NULL, pts = NULL, tag = "p
   idx = list.indices.model(model, pts)
   
   # Number of prediction rows
-  np = max(ifelse( length(A) > 0, ifelse(is.matrix(A[[1]]),nrow(A[[1]]),size(A)), 0),
+  if (is.vector(A)) {siz = length(A)} else { siz = dim(A)[1] }
+  np = max(ifelse( length(A) > 0, ifelse(is.matrix(A[[1]]),nrow(A[[1]]), siz), 0),
         ifelse( length(eff) > 0, nrow(eff[[1]]), 0))
   
   # Create and return stack
