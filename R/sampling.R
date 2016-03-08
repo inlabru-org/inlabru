@@ -78,7 +78,7 @@ if ( strategy == "bounding-rectangle") {
   # cat(Npoints)
   sampled.points = list()
   nblocks = max(1,Npoints/1000000)
-  sp = ceil(seq(1,Npoints+1, length.out = max(2,nblocks)))
+  sp = ceiling(seq(1,Npoints+1, length.out = max(2,nblocks)))
   n.sampled = 0
   
   for (k in 1:(length(sp)-1)) {
