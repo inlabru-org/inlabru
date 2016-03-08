@@ -414,8 +414,8 @@ sanity.dsdata = function(dset){
   cat("Checking if $effort has all the necessary columns ...")
   sanity.stop(sanity.columns(dset, message = TRUE))
   
-  #cat("Checking if effort$seg is sorted ...")
-  #sanity.stop(sanity.unsorted(dset, message = TRUE))
+  cat("Checking if transects are sorted ...")
+  sanity.stop(sanity.unsorted.transect(dset, message = TRUE))
   
   cat("Checking if all segments are inside the mesh boundary ...")
   sanity.stop(sanity.effort.inside(dset, message = TRUE))
@@ -472,9 +472,9 @@ sanity.columns = function(dset, message = FALSE) {
 }
 
 # Segments sorted?
-sanity.unsorted = function(dset, message = FALSE) {
-  sane = !is.unsorted(segment.id(dset$effort), na.rm=TRUE)
-  if ( message & !sane ) { message = "Segments are not sorted" }
+sanity.unsorted.transect = function(dset, message = FALSE) {
+  sane = !is.unsorted(transect.id(dset$effort), na.rm=TRUE)
+  if ( message & !sane ) { message = "Transects are not sorted" }
   return(list(sane = sane, message = message))
 }
 
