@@ -74,7 +74,7 @@ is.dsdata = function(data) { return( class(data)[1] == "dsdata") }
 #' @param mesh An inla.mesh object modeling the domain.
 #' @param mesh.coords Names of the effort columns that are interpreted as coordinates
 #' @param mesh.args If no mesh if provided these arguments passed on to inla.mesh.create to construct the mesh. 
-#' @value a \link{dsdata} object
+#' @return  a \link{dsdata} object
 #' @examples \dontrun{ data(toy1) ; dset = make.dsdata(effort = toy1$effort) ; plot(dset) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' 
