@@ -43,6 +43,7 @@ NULL
 
 join = function(...){UseMethod("join")}
 evaluate = function(...){UseMethod("evaluate")}
+iteration.history  = function(...){UseMethod("iteration.history")}
 sample.value = function(...){UseMethod("sample.value")}
 sample.points = function(...){UseMethod("sample.points")}
 list.covariates = function(...){UseMethod("list.covariates")}
@@ -323,27 +324,41 @@ make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, 
 #' @param result An inla result
 #' 
 
-update.model = function(model, result){
+update.model = function(model, result = NULL){
   for (name in names(model$iterator)) {
     iter = model$iterator[[name]]
     hname = paste0(name,".history")
-    if ( name %in% rownames(result$summary.fixed) ) { 
-      assign(name, result$summary.fixed[name,"mode"], envir = iter)
-      assign(hname, c(iter[[hname]], result$summary.fixed[name,"mode"]), envir = iter)
+    if (!is.null(result)) {
+      if ( name %in% rownames(result$summary.fixed) ) { 
+        assign(name, result$summary.fixed[name,"mode"], envir = iter)
+        assign(hname, c(iter[[hname]], result$summary.fixed[name,"mode"]), envir = iter)
+        }
+      if ( name %in% names(result$summary.random) ) { 
+        assign(name, result$summary.random[[name]][,"mode"], envir = iter)
+        assign(hname, rbind(iter[[hname]], result$summary.random[[name]][,"mode"]), envir = iter)
+        }
+      if ( name %in% rownames(result$summary.hyperpar) ) { 
+        assign(name, result$summary.hyperpar[name,"mode"], envir = iter)
+        assign(hname, c(iter[[hname]], result$summary.hyperpar[name,"mode"]), envir = iter)
+        }
+      if ( paste0("Beta for ",name) %in% rownames(result$summary.hyperpar) ) {
+        assign(name, result$summary.hyperpar[paste0("Beta for ",name),"mode"], envir = iter)
+        assign(hname, c(iter[[hname]], result$summary.hyperpar[paste0("Beta for ",name),"mode"]), envir = iter)
       }
-    if ( name %in% names(result$summary.random) ) { 
-      assign(name, result$summary.random[[name]][,"mode"], envir = iter)
-      assign(hname, rbind(iter[[hname]], result$summary.random[[name]][,"mode"]), envir = iter)
-      }
-    if ( name %in% rownames(result$summary.hyperpar) ) { 
-      assign(name, result$summary.hyperpar[name,"mode"], envir = iter)
-      assign(hname, c(iter[[hname]], result$summary.hyperpar[name,"mode"]), envir = iter)
-      }
-    if ( paste0("Beta for ",name) %in% rownames(result$summary.hyperpar) ) {
-      assign(name, result$summary.hyperpar[paste0("Beta for ",name),"mode"], envir = iter)
-      assign(hname, c(iter[[hname]], result$summary.hyperpar[paste0("Beta for ",name),"mode"]), envir = iter)
-      }
+    } else {
+      iter[[hname]] = iter[[name]]
+    }
   }
+}
+
+#' Extract the history of the model's iterators
+#'
+#' @aliases iteration.history
+#' @export
+#' @param model a \link{model}
+#' 
+iteration.history.model = function(model, effect){
+  return(model$iterator[[effect]][[paste0(effect,".history")]])
 }
 
 

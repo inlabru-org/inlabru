@@ -15,6 +15,7 @@
 idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, ...){
   
   model = join(model)
+  update.model(model, result = NULL) # This will initialize the history
   
   if ( is.null(ips) ) {
     if ( "ips" %in% names(data) ) { ips = data$ips }
