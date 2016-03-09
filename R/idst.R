@@ -30,6 +30,7 @@ idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, ..
         loc = data$mesh$loc[,c(1,2)] ; colnames(loc) = data$mesh.coords
         predict = list(data = data, model = predict, loc = loc, tag = "prediction")
       }
+      if ( !("data" %in% names(predict)) ) { predict$data = data }
       pred.stack = do.call(prediction.stack,predict)
       stk <- inla.stack(det.stack, int.stack, pred.stack)
     } else { 
@@ -57,6 +58,7 @@ idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, ..
           loc = data$mesh$loc[,c(1,2)] ; colnames(loc) = data$mesh.coords
           predict = list(data = data, model = predict, loc = loc, tag = "prediction")
         }
+        if ( !("data" %in% names(predict)) ) { predict$data = data }
         pred.stack = do.call(prediction.stack,predict)
         stk <- inla.stack(det.stack, int.stack, pred.stack)
       } else { 
