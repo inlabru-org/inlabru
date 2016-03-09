@@ -6,7 +6,7 @@
 #' @export
 #' @param covar.col Column of the original data set to extract covariate information from
 #' @return a \link{dsdata} object
-#' @examples \dontrun{ library(dsm) ; data(mexdolphins); dset = import.dsdata(mexdolphins, covar.col = 6) }
+#' @examples \dontrun{ library(dsm) ; data(mexdolphins); dset = import.dsdata(mexdolphins, covar.col = 8) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 import.dsmdata = function(dsmdata, covar.col = NA){
