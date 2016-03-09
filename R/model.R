@@ -870,16 +870,20 @@ model.exponential2d = function(colname = c("distance","lgrpsize"), truncation = 
 # MODELS: Group size
 #####################################
 
-#' Spatial SPDE model for group size with formula
-#' 
-#'  ~ . + f(grps, model = gs.mdl)
+#' Spatial SPDE model for log group size
 #'
-#' @aliases model.grpsize
-#' @param data Data set to read the names of the mesh coordinates from (mesh.coords)
-#' @param mesh The mesh used to construct the SPDE. If not provided, the mesh is read form the data set
+#' @aliases model.loggroupsize
+#' @export
+#' @param data A \link{dsdata} object
+#' @param iterator An environment to store the current state of the approximation
 #' @param ... Arguments passed on to inla.spde2.matern. If none, the defaults are alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01
 
-model.grpsize = function(data, mesh = data$mesh, ...) {
+model.loggroupsize = function(data, iterator = new.env(), ...) {
+  
+  mesh = data$mesh
+  rep(mean(detdata(dset)$lgrpsize),dset$mesh$n)
+  assign("grps", rep(mean(detdata(data)$lgrpsize),data$mesh$n), envir = iterator)
+  assign("tau", 1/sd(detdata(data)$lgrpsize), envir = iterator)
   
   vargs = list(...)
   if ( length(vargs) == 0 ){ 
@@ -890,19 +894,49 @@ model.grpsize = function(data, mesh = data$mesh, ...) {
   
   gs.mdl = do.call(inla.spde2.matern, c(list(mesh=mesh), gs.mdl.args))
   gs.mdl$n.group = 1
-  formula = ~ . + f(grps, model = gs.mdl)
+  formula = ~ . + f(grps, model = gs.mdl) + tau
+  
+  loglik = function(loc) { -0.5*exp(tau)*(loc$lgrpsize - as.numeric(inla.spde.make.A(mesh, as.matrix(loc[, data$mesh.coords])) %*% grps))^2 + 0.5*tau - log(sqrt(2*pi))}
+  environment(loglik) = new.env(parent = iterator)
+  assign("mesh", mesh, envir = environment(loglik))
+  assign("data", data, envir = environment(loglik))
+  
+  d.tau = function(loc) {-0.5*exp(tau)*(loc$lgrpsize - as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% grps))^2 + 0.5 }
+  environment(d.tau) = new.env(parent = iterator)
+  assign("mesh", mesh, envir = environment(d.tau))
+  assign("data", data, envir = environment(d.tau))
+  
+  d.grps = function(loc) { exp(tau)*(loc$lgrpsize - as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% grps)) }
+  environment(d.grps) = new.env(parent = iterator)
+  assign("mesh", mesh, envir = environment(d.grps))
+  assign("data", data, envir = environment(d.grps))
+  
   covariates = list()
-    
-  return(make.model(name = "Spatial group size model",
-                    formula = formula,
-                    effects = "grps",
-                    covariates = covariates,
-                    mesh = list(grps = mesh),
-                    inla.spde = list(grps = gs.mdl),
-                    mesh.coords = list(grps = data$mesh.coords),
-                    time.coords = list(spde = data$time.coords),
-                    eval = eval))
+  covariates[["grps"]] = d.grps
+  covariates[["tau"]] = d.tau  
+  const = function(loc) { loglik(loc) - d.tau(loc)*tau -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% grps))}
+  environment(const) = new.env(parent = iterator)
+  assign("loglik", loglik, envir = environment(const))
+  assign("d.tau", d.tau, envir = environment(const))
+  assign("d.grps", d.grps, envir = environment(const))
+  assign("mesh", mesh, envir = environment(const))
+  assign("data", data, envir = environment(const))
+  
+  ret = make.model(name = "First order Taylor expansion of spatial log group size model",
+                   formula = formula,
+                   effects = c("grps", "tau"),
+                   covariates = covariates,
+                   mesh = list(grps = mesh),
+                   inla.spde = list(grps = gs.mdl),
+                   mesh.coords = list(grps = data$mesh.coords),
+                   time.coords = list(spde = data$time.coords),
+                   eval = eval, iterator = list(grps = iterator, tau = iterator)
+  )
+  
+  ret$const = const
+  return(ret)
 }
+
 
 
 #' Model for Taylor approximation in a single variable 
