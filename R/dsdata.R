@@ -299,7 +299,7 @@ plot.dsdata = function(data,
         gg = gg + geom_point(data = df, aes(x=x,y=y), color = "red", size = 1)
       }
       gg = gg + xlab(data$mesh.coords[1]) + ylab(data$mesh.coords[2])
-      gg
+
       return(gg)
       
     } else {

@@ -214,8 +214,7 @@ plot.detfun = function(model = NULL,
       gg = gg + geom_ribbon(aes(x=distance, ymax=upper, ymin=lower), fill = ucol, alpha = 0.2) + 
         geom_path(colour = col, size = 1) +
         ylab("detection probability")
-      
-      gg
+    
       return(gg)
     }
     
@@ -456,7 +455,7 @@ plot.spatial = function(model = NULL,
         gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
                               aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
       }
-      gg  
+ 
       return(gg)
        
     } else {
