@@ -266,7 +266,8 @@ plot.dsdata = function(data,
       # Plot segments
       if ( segment | segment.colorize ) {
         if ( segment.colorize ){ segment.args$col = data$effort$trans }
-        df = data.frame(startpoint(as.segment(data),data), endpoint(as.segment(data),data))
+        df = data.frame(startpoint(as.segment(data),data)[,data$mesh.coords], 
+                        endpoint(as.segment(data),data)[,data$mesh.coords])
         colnames(df) = c("x","y","xend","yend")
         gg = gg + geom_segment(data = df, aes(x = x, y = y, xend = xend, yend = yend))
 
