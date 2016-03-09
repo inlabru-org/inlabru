@@ -46,9 +46,10 @@ idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, ..
                    control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
                    E = inla.stack.data(stk)$e,
                    ...)
+    # Update model
+    update.model(model, result)
+    
     if ( k > 1) {
-      # Update model
-      update.model(model, result)
       # Update stacks
       det.stack <- detection.stack(data, model = model)
       int.stack <- integration.stack(data, scheme = ips, model = model)
