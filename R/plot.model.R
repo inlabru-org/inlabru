@@ -399,11 +399,24 @@ plot.spatial = function(model = NULL,
       loc =  loc[rep(seq_len(nrow(loc)), length(property)), ]
     } else if ( !is.null(name) ) {
       if (name %in% names(result$summary.random)){
-        col = inla.spde.make.A(data$mesh, loc = as.matrix(loc)) %*% result$summary.ran[[name]][[property]]
-        col[!is.inside(mesh,loc,data$mesh.coords)] = NA
+        col = do.call(c,lapply(property, 
+                               function(prp) { 
+                                 col = inla.spde.make.A(data$mesh, loc = as.matrix(loc)) %*% result$summary.ran[[name]][[prp]] 
+                                 col[!is.inside(mesh,loc,data$mesh.coords)] = NA
+                                 return(as.vector(col))
+                               }))
+        col = data.frame(col=col, property = merge(rep(1,nrow(loc)), property)[,2])
+        loc =  loc[rep(seq_len(nrow(loc)), length(property)), ]
       } else {
         ind = inla.stack.index(result$stack, name)$data
-        col = inla.mesh.project(proj, field = result$summary.fitted.values[ind, property])
+        col = do.call(c,lapply(property, 
+                               function(prp) { 
+                                 col = inla.mesh.project(proj, field = result$summary.fitted.values[ind, prp])
+                                 col[!is.inside(mesh,loc,data$mesh.coords)] = NA
+                                 return(as.vector(col))
+                               }))
+        col = data.frame(col=col, property = merge(rep(1,nrow(loc)), property)[,2])
+        loc =  loc[rep(seq_len(nrow(loc)), length(property)), ]
       }
       
     } else {
