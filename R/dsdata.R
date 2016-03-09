@@ -269,6 +269,19 @@ plot.dsdata = function(data,
         df = data.frame(startpoint(as.segment(data),data), endpoint(as.segment(data),data))
         colnames(df) = c("x","y","xend","yend")
         gg = gg + geom_segment(data = df, aes(x = x, y = y, xend = xend, yend = yend))
+
+          # sp = startpoint(as.segment(data),data)
+          # ep = endpoint(as.segment(data),data)
+          # v = ep-sp
+          # vo = data.frame(x = v[,2],y = -v[,1])
+          # v1 = data.frame(sp + dst * normalize.euc(vo), seg = 1:dim(vo)[1])
+          # v2 = data.frame(sp - dst * normalize.euc(vo), seg = 1:dim(vo)[1])
+          # v3 = data.frame(ep - dst * normalize.euc(vo), seg = 1:dim(vo)[1])
+          # v4 = data.frame(ep + dst * normalize.euc(vo), seg = 1:dim(vo)[1])
+          # df = rbind(v1, v2, v3, v4)
+          # 
+          # gg = gg + geom_polygon(data=df, aes(group=seg), fill = rgb(0,0,0,0.1) )
+        
       }
       # Plot transects
       if ( transect ) {
