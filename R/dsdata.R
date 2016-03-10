@@ -275,7 +275,7 @@ plot.dsdata = function(data,
       if ( detection ) { gg = gg + do.call(gg.det, c(list(data), detection.args)) }
       
       # Set labels
-      gg = gg + xlab(data$mesh.coords[1]) + ylab(data$mesh.coords[2])
+      gg = gg + xlab(data$mesh.coords[1]) + ylab(data$mesh.coords[2]) + coord_fixed()
 
       return(gg)
       
