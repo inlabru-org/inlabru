@@ -286,6 +286,7 @@ plot.spatial = function(model = NULL,
                         add.mesh = TRUE,
                         add.detection = FALSE,
                         add.segment = FALSE,
+                        logscale = TRUE,
                         rgl = FALSE,
                         add = FALSE){
   
@@ -344,8 +345,10 @@ plot.spatial = function(model = NULL,
 #
 # (3) Values at the mesh location 
 #
+  if ( logscale ) { link = function(x){x} } else { link = exp }
+  
   if ( !is.null(col) ) {
-    df = data.frame(mode = col, ploc)
+    df = data.frame(mode = link(col), ploc)
   }
   else if ( !is.null(effect) ) {
     # We extract values from a tagged INLA result OR directly from a random effect
@@ -364,7 +367,7 @@ plot.spatial = function(model = NULL,
                                return(as.vector(col))}))
     col = data.frame(col=col, property = merge(rep(1,nrow(ploc)), property)[,2])
     ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
-    df = data.frame(col, ploc)
+    df = data.frame(link(col), ploc)
   }
   else if ( !is.null(model) ) {
     # We extract values from a model and INLA result
@@ -375,7 +378,7 @@ plot.spatial = function(model = NULL,
                            return(as.vector(col))}))
     col = data.frame(col=col, property = merge(rep(1,nrow(ploc)), property)[,2])
     ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
-    df = data.frame(col, ploc)
+    df = data.frame(link(col), ploc)
   }
   else { stop("Not sure what to plot.") }
 
