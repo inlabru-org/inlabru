@@ -8,11 +8,12 @@
 #' @param ips A data.frame of integration points
 #' @param stack A stack configuration (Not implemented yet, use NULL)
 #' @param n Number of \link{inla} iterations
+#' @param idst.verbose If TRUE, be verbose (use verbose=TRUE) to make INLA verbose
 #' @param ... Arguments passed on to \link{inla}
 #' @return A \link{inla} object
 
 
-idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, ...){
+idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, idst.verbose = FALSE, ...){
   
   model = join(model)
   update.model(model, result = NULL) # This will initialize the history
@@ -41,12 +42,18 @@ idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, ..
   }
 
   for ( k in 1:n ) {
-    result <- inla(formula = model$formula, 
-                   family = "poisson",
-                   data = c(inla.stack.data(stk), list.data(model)),
-                   control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
-                   E = inla.stack.data(stk)$e,
-                   ...)
+    
+    result <- tryCatch( inla(formula = model$formula, 
+                     family = "poisson",
+                     data = c(inla.stack.data(stk), list.data(model)),
+                     control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
+                     E = inla.stack.data(stk)$e, ...), 
+                   error = function(e) { 
+                     if (k == 1) { stop(e) }
+                     else { stop(paste0("INLA crashed during iteration ",k,". It is likely that there is a convergence problem.")) }
+                     }
+                   )
+    if ( idst.verbose ) { cat(".") }
     # Update model
     update.model(model, result)
     
