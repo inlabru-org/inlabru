@@ -234,16 +234,16 @@ plot.dsdata = function(data,
                        segment.args = list(lwd = 1, color = "turquoise4"),
                        segment.colorize = FALSE,
                        detection = TRUE,
-                       detection.args = list(col = "red2", pch = 16, cex = 1.2),
+                       detection.args = list(color = "red2", size = 1),
                        add.mesh = TRUE,
                        col = NULL, 
                        asp = 1, ...){
 
   # Defaults
   
-  if ( !("lwd" %in% names(segment.args)) ) { segment.args$lwd = 1 }
+  if ( !("lwd" %in% names(segment.args)) ) { segment.args$lwd = 0.8 }
   if ( !("color" %in% names(segment.args)) ) { segment.args$color = "turquoise4" }
-  if ( !("color" %in% names(detection.args)) ) { detection.args$color = "red" }
+  if ( !("color" %in% names(detection.args)) ) { detection.args$color = "red2" }
   
   if (rgl==FALSE) {
     
