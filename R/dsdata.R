@@ -218,6 +218,7 @@ make.mesh = function(dset, ...) {
 #' @param segment.colorize Colorize segments according to their transect. Only supported if rgl=FALSE
 #' @param detection If TRUE, plot the detected animals
 #' @param detection.args Plotting argument for detections.
+#' @param add.mesh If TRUE, add the mesh to the plot (only ggplot)
 #' @param col Color specification for the mesh. Requires rgl=TRUE
 #' @param asp Apect ration of the plot
 #' @examples \dontrun{ toy=toy1() ; plot(toy) }
@@ -234,6 +235,7 @@ plot.dsdata = function(data,
                        segment.colorize = FALSE,
                        detection = TRUE,
                        detection.args = list(col = "red2", pch = 16, cex = 1.2),
+                       add.mesh = TRUE,
                        col = NULL, 
                        asp = 1, ...){
 
@@ -262,7 +264,7 @@ plot.dsdata = function(data,
     }
     
     if ( ggp ) {
-      gg = ggp.mesh(mesh, mcol = rgb(0,0,0,0.1))
+      if (add.mesh) { gg = ggp.mesh(mesh, mcol = rgb(0,0,0,0.1)) } else { gg = ggplot() }
       # Plot segments
       if ( segment | segment.colorize ) {
         if ( segment.colorize ){ segment.args$col = data$effort$trans }
