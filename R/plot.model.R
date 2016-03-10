@@ -260,222 +260,189 @@ plot.detfun = function(model = NULL,
 #' @param model A \link{model} object
 #' @param result An \link{inla} object, i.e. the result of running INLA
 #' @param data A \link{dsdata} object
-#' @param name Name of the effect used to model the detection function. Default: "spde"
+#' @param effect Needed if no model or col is provided. This selects the random field to plot, e.g. "spde". For predictions this corresponds to the tag parameter.
 #' @param property Which property of the spatial field to plot, e.g. 'mode' (default)
-#' @param stack Plot a combined effect via this stack \link{inla.stack}
-#' @param mesh The mesh used for spatial plotting
+#' @param group A data frame that is merged with the spatial locations at which we plot the data. For instance, in temporal SPDE models, we can set group = data.frame(group=1:10).
+#' @param mesh The mesh used for spatial plotting. If given, overrides meshes from data and model.
+#' @param mask A spatial mask restricting the region where we plot. Not implemented yet.
+#' @param col A numeric vector of values to plot. It's length must be equal to the number of mesh nodes. Overrides all data coming from the inla result.
 #' @param add.mesh If TRUE, plot the mesh
-#' @param mesh.coordinates Coordinates to plot over
+#' @param add.detection If TRUE, plot the detections (requires: data)
+#' @param add.segment If TRUE, plot the segments (requires: data)
+#' @param logscale If set to FALSE, exp() of the values is plotted
 #' @param rgl Use rgl to plot
-#' @param add.detection Add detections to the plot (needs: data)
-#' @param add.points Addtitional points to plot (data.frame). If Boolean and TRUE, plot integration points data$ips (needs: data$ips)
-#' @param add Add to previous rgl plot
-#' @param colorbar Plot a colorbar
-#' @param logscale If set to FALSE, exp() of the predictor is plotted
-#' @param col Plot this data instead of the model data
-#' @param ggp If TRUE and rgl is FALSE, use ggplot2 for plotting. If FALSE and rgl FALSE, use default R plotting methods
+#' @param add Add to previous rgl plot 
+#' @return gg A ggplot2 object (if rgl=FALSE)
 #' 
-
 plot.spatial = function(model = NULL,
-                     result = NULL, 
-                     data = NULL,
-                     name = NULL,
-                     property = "mode",
-                     group = NULL,
-                     stack = NULL,
-                     mesh = data$mesh,
-                     add.mesh = TRUE,
-                     mesh.coords = model$mesh.coords,
-                     rgl = FALSE,
-                     add.detections = TRUE,
-                     add.points = FALSE,
-                     add = FALSE, 
-                     colorbar = TRUE, 
-                     logscale = TRUE, 
-                     col = NULL,
-                     ggp = TRUE, ...){
+                        result = NULL, 
+                        data = NULL,
+                        effect = NULL,
+                        property = "mode",
+                        group = NULL,
+                        mesh = NULL,
+                        mask = NULL,
+                        col = NULL,
+                        add.mesh = TRUE,
+                        add.detection = FALSE,
+                        add.segment = FALSE,
+                        rgl = FALSE,
+                        add = FALSE){
   
-  geometry = data$geometry
-  if (is.null(mesh)) { mesh = data$mesh }
-  if ( !is.null(data) & add.detections ) { det.points = detdata(data) } else { add.detections = FALSE }
-  if ( add.points == TRUE ) { add.points = data$ips }
-  if ( is.data.frame(add.detections) ) { 
-    det.points = add.detections
-    add.detections = TRUE
-  }
+#  
+# (1) The mesh and vertex location
+#
 
-  if (rgl) {
-    require(rgl)  
-    R = 6371
-    
-    # Get predicted values from a stack tag
-    if ( !is.null(stack) ){
-      ind = inla.stack.index(stack, name)$data
-      col = result$summary.fitted.values[ind,property]
-    }
-    # Get predicted values from a model
-    if ( !is.null(model) ){
-      if (data$geometry == "geo" & data$mesh$manifold == "S2") {
-        loc = euc.to.geo(data.frame(data$mesh$loc))
-        R = sqrt(sum(data$mesh$loc[1,]^2))
-      } else {
-        loc = data$mesh$loc[,c(1,2)]
-        colnames(loc) = data$mesh.coords
-        R = 1
+  if ( is.null(mesh) ) {
+    # If no mesh is provided we first check if data is provided. If so, use the data mesh
+    if ( !is.null(data) ) { 
+      mesh = data$mesh
+      mloc = mesh$loc[,1:length(data$mesh.coords)]
+      colnames(mloc) = data$mesh.coords
       }
-      if (!(length(group)==0)) { loc = data.frame(loc, group) }
-      col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = property)
-    }
-    # Get predicted values from an inla result effect name
-    if ( !is.null(name) ){
-      col = result$summary.ran[[name]][[property]]
-    }
-    
-    if (geometry == "geo"){
-      
-      # Plot sphere
-      if (!add){ rgl.open() }
-      bg3d(color = "white")
-      rgl.earth()
-      
-      # Plot detections and integration points
-      if ( add.detections ) { rgl.sphpoints(long = det.points$lon+360, lat = det.points$lat, radius = 1.01*R, col="red", size = 5) }
-      if ( add.points ) { rgl.sphpoints(long = add.points$lon+360, lat = add.points$lat, radius=1.01*R, col = rgb(0,0,1), size = 3) }
-      
-      # Plot colorbar (This is a temporary workaround, rgl people are working on something like this)
-      if (colorbar){
-        cb.col = cm.colors(100)
-        rgl.linestrips(x=-0.85,y=0.85,z=seq(-1,1,length.out=length(cb.col)),col=cb.col,lwd=50)
-        rgl.texts(x=-0.79,y=0.79,z=c(-0.97,0.97),c(format(min(col),digits=3),format(max(col),digits=3)),col="black",cex=1)
-      }
-      rgl.pop()
-      rgl.sphmesh(mesh, add=TRUE, radius=1.001, col = col)
-      
-    }
     else {
-      plot(mesh, rgl = rgl, col = col,...)
-      if ( add.detections ) { rgl.points(x = det.points$x, y = det.points$y, z =0.02, col = rgb(1,0,0), size=8) }
-      if ( int.points ) { rgl.points(x = add.points$x, y = add.points$y, z = 0.01, col = rgb(0,0,0.6), size=4) }
+      # No mesh and no data set provided. Check if the model has a mesh. If so, use the first mesh we find.
+      if ( is.null(model) ) { stop("Your provided no mesh, no data set with a mesh and not model to take a mesh from") }
+      if ( "mesh" %in% names(model) & length(model$mesh)>0) {
+        mesh = model$mesh[[1]]
+        mloc = mesh$loc[,1:length(model$mesh.coords[[1]])]
+        colnames(mloc) = model$mesh.coords[[1]]
+      } else {
+        stop("Your provided no mesh, no data set with a mesh and your model does not have a mesh.")
+      }
     }
-    #if (any("par3d.args" %in% names(data))) { do.call(par3d,data$par3d.args) }
+  } else {
+    # User provided mesh. Where to take the coordinate names from?
+    if (all(mesh$loc[,2]==0)) { mdim = 1 } 
+    else if(all(mesh$loc[,3]==0)) { mdim = 2 }
+    else { mdim = 3 }
+    mloc = mesh$loc[,1:mdim]
+    colnames(mloc) = c("x","y","z")[1:mdim]
   }
+  coords = colnames(mloc)
+
+#
+# (2) Projection locations
+#
+  
+  if ( rgl ) { ploc = mloc }
   else {
-    
-    require(lattice)
-    
-    if (data$geometry == "geo" & data$mesh$manifold == "S2") {
-      loc = euc.to.geo(data.frame(data$mesh$loc))[,data$mesh.coords]
-    } else {
-      loc = mesh$loc
-    }
-    
-    xlim = range(loc[,1])
-    ylim = range(loc[,2])
+    xlim = range(mloc[,1])
+    ylim = range(mloc[,2])
     aspect = diff(ylim)/diff(xlim)
-    nx = 300
+    nx = 500
     ny = round(nx * aspect)
     proj <- inla.mesh.projector(mesh, dims = c(nx,ny))
-    
     x = seq(xlim[1], xlim[2], length.out = nx)
     y = seq(ylim[1], ylim[2], length.out = ny)
     grid = expand.grid(x=x,y=y)
-    loc = data.frame(cbind(grid$x,grid$y))
-    colnames(loc) = data$mesh.coords
-      
-    if ( !is.null(stack) ) {
-      ind = inla.stack.index(result$stack, name)$data
-      col = inla.mesh.project(proj, field = result$summary.fitted.values[ind,property])
-    } else if ( !is.null(model) ){
-      if (!is.null(group)) { loc = merge(loc, group) }
-      col = do.call(c,lapply(property, 
-             function(prp) { 
-               col = evaluate.model(model, inla.result = result, loc = loc, do.sum = TRUE, property = prp) 
-               col[!is.inside(mesh,loc,data$mesh.coords)] = NA
-               return(as.vector(col))
-               }))
-      col = data.frame(col=col, property = merge(rep(1,nrow(loc)), property)[,2])
-      loc =  loc[rep(seq_len(nrow(loc)), length(property)), ]
-    } else if ( !is.null(name) ) {
-      if (name %in% names(result$summary.random)){
-        col = do.call(c,lapply(property, 
-                               function(prp) { 
-                                 col = inla.spde.make.A(data$mesh, loc = as.matrix(loc)) %*% result$summary.ran[[name]][[prp]] 
-                                 col[!is.inside(mesh,loc,data$mesh.coords)] = NA
-                                 return(as.vector(col))
-                               }))
-        col = data.frame(col=col, property = merge(rep(1,nrow(loc)), property)[,2])
-        loc =  loc[rep(seq_len(nrow(loc)), length(property)), ]
-      } else {
-        ind = inla.stack.index(result$stack, name)$data
-        col = do.call(c,lapply(property, 
-                               function(prp) { 
-                                 col = inla.mesh.project(proj, field = result$summary.fitted.values[ind, prp])
-                                 col[!is.inside(mesh,loc,data$mesh.coords)] = NA
-                                 return(as.vector(col))
-                               }))
-        col = data.frame(col=col, property = merge(rep(1,nrow(loc)), property)[,2])
-        loc =  loc[rep(seq_len(nrow(loc)), length(property)), ]
-      }
-      
-    } else {
-      col = inla.spde.make.A(data$mesh, loc = as.matrix(loc)) %*% col
-      col[!is.inside(mesh,loc,data$mesh.coords)] = NA
-    }
-    
-    if (!is.data.frame(col)) { col = data.frame(col = as.vector(col))}
-    if (!logscale) { col$col = exp(col$col) }
-    
-    co1 = data$mesh.coords[1]
-    co2 = data$mesh.coords[2]
-    
-    if ( ggp ) {
-      
-      if ( !require(ggplot2) ) { stop("This function requires the ggplot2 package to run. Set ggp = FALSE.") }
-      
-      # Plot intensity
-      df = cbind(loc, col, alpha = is.inside(mesh,loc,data$mesh.coords))
-      gg = ggplot(df, aes_string(x = data$mesh.coords[1],y = data$mesh.coords[2]) )
-      gg = gg + geom_raster(aes_string(fill = "col", alpha = "alpha"), hjust=0.5, vjust=0.5, interpolate = TRUE)
-      gg = gg + scale_alpha_discrete(guide = 'none')
-      gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) + theme(legend.title=element_blank()) + coord_fixed()
-      # Facet properties
-      if (length(property)>1) { gg = gg + facet_grid(. ~ property) }
-      # If the data if grouped, use ggplot facets
-      if (!is.null(group)) { gg = gg + facet_grid(as.formula(paste0(". ~ ", colnames(group)[1]))) }
-      
-      if ( add.mesh ) {
-        # Plot the mesh
-        mcol = rgb(0,0,0,0.1)
-        gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]), 
-                             aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
-        
-        gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-                              aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
-        gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-                              aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
-      }
- 
-      return(gg)
-       
-    } else {
-    levelplot(col ~ grid$x + grid$y, aspect = aspect,
-              col.regions = topo.colors(100),
-              panel=function(...){
-                panel.levelplot(...)
-                if ( add.points ) { panel.points( x = add.points[,co1], 
-                                                  y = add.points[,co2], 
-                                                  pch = ".", 
-                                                  col = "blue",
-                                                  cex = 2) }
-                if ( add.detections ) { panel.points( x = det.points[,co1],
-                                                  y = det.points[,co2], 
-                                                  col = rgb(0,0,0),
-                                                  pch = ".",
-                                                  cex = 2) }
-              },
-              xlab = co1, ylab = co2)
-    }
+    ploc = data.frame(cbind(grid$x,grid$y))
+    colnames(ploc) = colnames(mloc)
   }
+  if ( !is.null(group) ) { loc = merge(ploc, group) }
+  
+#
+# (3) Values at the mesh location 
+#
+  if ( !is.null(col) ) {
+    df = data.frame(mode = col, ploc)
+  }
+  else if ( !is.null(effect) ) {
+    # We extract values from a tagged INLA result OR directly from a random effect
+    if ( is.null(result) ) { stop("You are trying to plot without providing an INLA result.") } 
+    if ( effect %in% names(result$summary.random)) {
+      # Values come from a random effect
+      ires = result$summary.random[[name]] 
+    }
+    else {
+      # Values come from a tagged effect, e.g. a prediction
+      ires = result$summary.fitted.values[inla.stack.index(result$stack, effect)$data, ]
+    }
+    col = do.call(c,lapply(property, 
+                             function(prp) { 
+                               col = inla.mesh.project(proj, field = ires[, prp])
+                               return(as.vector(col))}))
+    col = data.frame(col=col, property = merge(rep(1,nrow(ploc)), property)[,2])
+    ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
+    df = data.frame(col, ploc)
+  }
+  else if ( !is.null(model) ) {
+    # We extract values from a model and INLA result
+    if ( is.null(result) ) { stop("You are trying to plot a model without providing an INLA result.") } 
+    col = do.call(c,lapply(property, 
+                         function(prp) { 
+                           col = evaluate.model(model, inla.result = result, loc = ploc, do.sum = TRUE, property = prp) 
+                           return(as.vector(col))}))
+    col = data.frame(col=col, property = merge(rep(1,nrow(ploc)), property)[,2])
+    ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
+    df = data.frame(col, ploc)
+  }
+  else { stop("Not sure what to plot.") }
+
+#
+# (4) Select a region to plot and create alpha channel
+#
+    df$col[!is.inside(mesh, ploc, colnames(ploc))] = NA
+    df = cbind(df, alpha = is.inside(mesh, ploc, colnames(ploc)))
+    
+#
+# (5) Create the plot using either rgl or ggplot2
+#
+    
+if ( !rgl ){ 
+  # Use ggplot2
+  if ( !requireNamespace("ggplot2", quietly = TRUE) ) { stop("This function requires the ggplot2 package")}
+  
+  gg = ggplot(df, aes_string(x = coords[1], y = coords[2]) )
+  gg = gg + geom_raster(aes_string(fill = "col", alpha = "alpha"), interpolate = TRUE)
+  gg = gg + scale_alpha_discrete(guide = 'none')
+  gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) 
+  gg = gg + theme(legend.title = element_blank()) + coord_fixed()
+
+  # Facet properties
+  if (length(property)>1) { gg = gg + facet_grid(. ~ property) }
+  
+  # If the data is grouped, use ggplot facets
+  if ( !is.null(group) ) { gg = gg + facet_grid(as.formula(paste0(". ~ ", colnames(group)[1]))) }
+  
+  # Plot the mesh
+  if ( add.mesh ) { gg = gg + gg.mesh(mesh) }
+  
+  return(gg)
+  
+} else {
+  # Use rgl to plot
+  col = df$col
+  if ( !requireNamespace("rgl", quietly = TRUE) ) { stop("This function requires the rgl package. Install rgl or set rgl=FALSE.")}
+  
+  if (data$geometry == "geo"){
+    
+    # Plot sphere
+    if (!add){ rgl.open() }
+    bg3d(color = "white")
+    rgl.earth()
+    
+    # # Plot detections and integration points
+    # if ( add.detections ) { rgl.sphpoints(long = det.points$lon+360, lat = det.points$lat, radius = 1.01*R, col="red", size = 5) }
+    # if ( add.points ) { rgl.sphpoints(long = add.points$lon+360, lat = add.points$lat, radius=1.01*R, col = rgb(0,0,1), size = 3) }
+    # 
+    # Plot colorbar (This is a temporary workaround, rgl people are working on something like this)
+    if ( TRUE ){
+      cb.col = cm.colors(100)
+      rgl.linestrips(x=-0.85,y=0.85,z=seq(-1,1,length.out=length(cb.col)),col=cb.col,lwd=50)
+      rgl.texts(x=-0.79,y=0.79,z=c(-0.97,0.97),c(format(min(col),digits=3),format(max(col),digits=3)),col="black",cex=1)
+    }
+    rgl.pop()
+    rgl.sphmesh(mesh, add=TRUE, radius=1.001, col = col)
+    
+  }
+  else {
+    plot(mesh, rgl = rgl, col = col,...)
+    if ( add.detections ) { rgl.points(x = det.points$x, y = det.points$y, z =0.02, col = rgb(1,0,0), size=8) }
+    if ( int.points ) { rgl.points(x = add.points$x, y = add.points$y, z = 0.01, col = rgb(0,0,0.6), size=4) }
+  }
+}
+  
 }
 
 #' Play (animate) spatial field
