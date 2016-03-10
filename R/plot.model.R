@@ -181,7 +181,6 @@ plot.detfun = function(model = NULL,
   }
   
   # Plot mode
-  ggp = TRUE
   if ( ggp ) {
     if (!require(ggplot2)) {stop("ggplot2 not installed. Set ggp = FALSE to use default plotting method")}
     if ( do.ecdf ) {
