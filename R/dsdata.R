@@ -211,8 +211,6 @@ make.mesh = function(dset, ...) {
 #' @param rgl If TRUE, use RGL to plot the data
 #' @param ggp if TRUE, use ggplot2 for plotting
 #' @param add If TRUE, add the plot instead of starting a new one
-#' @param transect If TRUE, plot the transect lines
-#' @param transect.args Plotting argument for transects.
 #' @param segment If TRUE, plot the segment lines
 #' @param segment.args Plotting argument for segments.
 #' @param segment.colorize Colorize segments according to their transect. Only supported if rgl=FALSE
@@ -221,6 +219,8 @@ make.mesh = function(dset, ...) {
 #' @param add.mesh If TRUE, add the mesh to the plot (only ggplot)
 #' @param col Color specification for the mesh. Requires rgl=TRUE
 #' @param asp Apect ration of the plot
+#' @param transect DEPRECATED. Use segment instead.
+#' @param transect.args DEPRECATED. Use segment instead.
 #' @examples \dontrun{ toy=toy1() ; plot(toy) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' 
@@ -231,7 +231,7 @@ plot.dsdata = function(data,
                        transect = FALSE,
                        transect.args = list(lwd = 2, col = rgb(0.6, 0.6, 0.6)),
                        segment = TRUE,
-                       segment.args = list(lwd = 3, col = "black"),
+                       segment.args = list(lwd = 1, color = "turquoise4"),
                        segment.colorize = FALSE,
                        detection = TRUE,
                        detection.args = list(col = "red2", pch = 16, cex = 1.2),
@@ -240,13 +240,10 @@ plot.dsdata = function(data,
                        asp = 1, ...){
 
   # Defaults
-  if ( !("lwd" %in% names(segment.args)) ) { segment.args$lwd = 3 }
-  if ( !("col" %in% names(segment.args)) ) { segment.args$col = "black" }
-  if ( !("lwd" %in% names(transect.args)) ) { transect.args$lwd = 2 }
-  if ( !("col" %in% names(transect.args)) ) { transect.args$col = rgb(0.6, 0.6, 0.6) }
-  if ( !("col" %in% names(detection.args)) ) { detection.args$col = "red" }
-  if ( !("cex" %in% names(detection.args)) ) { detection.args$cex = 1.2 }
-  if ( !("pch" %in% names(detection.args)) ) { detection.args$pch = 16 }
+  
+  if ( !("lwd" %in% names(segment.args)) ) { segment.args$lwd = 1 }
+  if ( !("color" %in% names(segment.args)) ) { segment.args$color = "turquoise4" }
+  if ( !("color" %in% names(detection.args)) ) { detection.args$color = "red" }
   
   if (rgl==FALSE) {
     
@@ -264,42 +261,20 @@ plot.dsdata = function(data,
     }
     
     if ( ggp ) {
-      if (add.mesh) { gg = ggp.mesh(mesh, mcol = rgb(0,0,0,0.1)) } else { gg = ggplot() }
+      
+      # Check for package
+      if ( !requireNamespace("ggplot2", quietly = TRUE) ) { stop("This function requires the ggplot2 package.")}
+      
+      # Plot the mesh
+      if ( add.mesh ) { gg = ggplot() + gg.mesh(data) }
+      
       # Plot segments
-      if ( segment | segment.colorize ) {
-        if ( segment.colorize ){ segment.args$col = data$effort$trans }
-        df = data.frame(startpoint(as.segment(data),data)[,data$mesh.coords], 
-                        endpoint(as.segment(data),data)[,data$mesh.coords])
-        colnames(df) = c("x","y","xend","yend")
-        gg = gg + geom_segment(data = df, aes(x = x, y = y, xend = xend, yend = yend))
+      if ( segment ) { gg = gg + do.call(gg.seg, c(list(data), segment.args)) }
 
-          # sp = startpoint(as.segment(data),data)
-          # ep = endpoint(as.segment(data),data)
-          # v = ep-sp
-          # vo = data.frame(x = v[,2],y = -v[,1])
-          # v1 = data.frame(sp + dst * normalize.euc(vo), seg = 1:dim(vo)[1])
-          # v2 = data.frame(sp - dst * normalize.euc(vo), seg = 1:dim(vo)[1])
-          # v3 = data.frame(ep - dst * normalize.euc(vo), seg = 1:dim(vo)[1])
-          # v4 = data.frame(ep + dst * normalize.euc(vo), seg = 1:dim(vo)[1])
-          # df = rbind(v1, v2, v3, v4)
-          # 
-          # gg = gg + geom_polygon(data=df, aes(group=seg), fill = rgb(0,0,0,0.1) )
-        
-      }
-      # Plot transects
-      if ( transect ) {
-        spoint = startpoint(as.transect(data),data)
-        epoint = endpoint(as.transect(data),data)
-        df = cbind(startpoint(as.transect(data),data)[,data$mesh.coords], endpoint(as.transect(data),data)[,data$mesh.coords])
-        colnames(df) = c("x","y","xend","yend")
-        gg = gg + geom_segment(data = df, aes(x = x, y = y, xend = xend, yend = yend))
-      }
       # Plot detections
-      if( detection ){
-        df = detdata(data)[,data$mesh.coords]
-        colnames(df) = c("x","y")
-        gg = gg + geom_point(data = df, aes(x=x,y=y), color = "red", size = 1)
-      }
+      if ( detection ) { gg = gg + do.call(gg.det, c(list(data), detection.args)) }
+      
+      # Set labels
       gg = gg + xlab(data$mesh.coords[1]) + ylab(data$mesh.coords[2])
 
       return(gg)
