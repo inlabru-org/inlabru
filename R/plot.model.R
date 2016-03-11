@@ -371,7 +371,8 @@ plot.spatial = function(model = NULL,
   }
   else if ( !is.null(model) ) {
     # We extract values from a model and INLA result
-    if ( is.null(result) ) { stop("You are trying to plot a model without providing an INLA result.") } 
+    if ( is.null(result) ) { stop("You are trying to plot a model without providing an INLA result.") }
+    ploc = merge(ploc, group)
     col = do.call(c,lapply(property, 
                          function(prp) { 
                            col = evaluate.model(model, inla.result = result, loc = ploc, do.sum = TRUE, property = prp) 
