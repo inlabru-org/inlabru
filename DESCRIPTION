@@ -11,6 +11,6 @@ Suggests:
     testthat
 Depends:
     INLA,
-    Matrix
-    ggplot2
+    Matrix,
+    ggplot2,
 RoxygenNote: 5.0.1
