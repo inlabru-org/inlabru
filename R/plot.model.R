@@ -332,7 +332,7 @@ plot.spatial = function(model = NULL,
     xlim = range(mloc[,1])
     ylim = range(mloc[,2])
     aspect = diff(ylim)/diff(xlim)
-    nx = 500
+    nx = 300
     ny = round(nx * aspect)
     proj <- inla.mesh.projector(mesh, dims = c(nx,ny))
     x = seq(xlim[1], xlim[2], length.out = nx)
@@ -349,7 +349,8 @@ plot.spatial = function(model = NULL,
   if ( logscale ) { link = function(x){x} } else { link = exp }
   
   if ( !is.null(col) ) {
-    df = data.frame(mode = link(col), ploc)
+    col = as.vector((inla.mesh.project(proj, field = col)))
+    df = data.frame(col = link(col), ploc)
   }
   else if ( !is.null(effect) ) {
     # We extract values from a tagged INLA result OR directly from a random effect

@@ -60,9 +60,9 @@ covdata.import = function(dframe, colname, data){
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 plot.covdata = function(covdata, time = 1, fun=NULL, ...){
-  if (is.null(covdata$geometry)) {covdata$geometry = "euc"}
+  if (is.null(covdata$geometry)) { covdata$geometry = "euc" }
   col = covdata$values[, time]
-  plot.spatial(data = covdata, col = col, add.detections = FALSE, ...)
+  plot.spatial(data = covdata, col = col, ...)
 }
 
 
