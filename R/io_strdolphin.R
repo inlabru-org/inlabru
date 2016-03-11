@@ -46,6 +46,10 @@ io_strdolphin.pkgdata.load = function()
   msk = is.inside(dset$mesh, dset$effort, mesh.coords = paste0("start.", dset$mesh.coords)) & is.inside(dset$mesh, dset$effort, mesh.coords = paste0("end.", dset$mesh.coords))
   dset$effort = dset$effort[msk,]
   
+  # Attach CRS projection strings
+  dset$p4s = "+proj=longlat"
+  dset$mesh.p4s = "+proj=longlat"
+  
   return(dset)
 }
 

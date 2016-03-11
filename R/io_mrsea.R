@@ -17,7 +17,7 @@ io_mrsea.pkgdata.load = function() {
   data("dis.data.re")
   data("predict.data.re")
   
-  require(dplyr)
+  library(dplyr)
   preddata_gpseas<-group_by(predict.data.re, impact, segment.id )
   
   # Some housekeeping to change the name labels to the right format and correct the effort unit to match
@@ -54,7 +54,13 @@ io_mrsea.pkgdata.load = function() {
   
   depth = predict.data.re[(predict.data.re$season==1) & (predict.data.re$impact==0), c("x.pos","y.pos","depth")]
   colnames(depth) = c("x","y","depth")
+  
+  # Attach covariate data
   dset$depth = depth
+  
+  # Attach CRS projection strings
+  dset$p4s = "+proj=utm +zone=32"
+  dset$mesh.p4s = "+proj=utm +zone=32"
   
   return(dset)
   
