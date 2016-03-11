@@ -264,7 +264,8 @@ plot.detfun = function(model = NULL,
 #' @param property Which property of the spatial field to plot, e.g. 'mode' (default)
 #' @param group A data frame that is merged with the spatial locations at which we plot the data. For instance, in temporal SPDE models, we can set group = data.frame(group=1:10).
 #' @param mesh The mesh used for spatial plotting. If given, overrides meshes from data and model.
-#' @param mask A spatial mask restricting the region where we plot. Not implemented yet.
+#' @param mask A spatial mask restricting the region where we plot. A mask can be one of the following objects:
+#' (1) A data frame with x and y coordinated defining a polygon. (2) An inla.mesh.segment object. (3) A SpatialPolygonDataFrame (see sp package)
 #' @param col A numeric vector of values to plot. It's length must be equal to the number of mesh nodes. Overrides all data coming from the inla result.
 #' @param add.mesh If TRUE, plot the mesh
 #' @param add.detection If TRUE, plot the detections (requires: data)
@@ -372,7 +373,7 @@ plot.spatial = function(model = NULL,
   else if ( !is.null(model) ) {
     # We extract values from a model and INLA result
     if ( is.null(result) ) { stop("You are trying to plot a model without providing an INLA result.") }
-    ploc = merge(ploc, group)
+    if ( !is.null(group) ){ ploc = merge(ploc, group) }
     col = do.call(c,lapply(property, 
                          function(prp) { 
                            col = evaluate.model(model, inla.result = result, loc = ploc, do.sum = TRUE, property = prp) 
@@ -388,6 +389,21 @@ plot.spatial = function(model = NULL,
 #
     df$col[!is.inside(mesh, ploc, colnames(ploc))] = NA
     df = cbind(df, alpha = is.inside(mesh, ploc, colnames(ploc)))
+    
+    if ( class(mask) == "inla.mesh.segment" ) {
+      mask.mesh = inla.mesh.create(loc = mesh$loc, boundary = list(mask))
+      df$col[!is.inside(mask.mesh, ploc, colnames(ploc))] = NA
+      df$alpha = df$alpha & is.inside(mask.mesh, ploc, colnames(ploc))
+    } else if ( class(mask) == "SpatialPolygonsDataFrame" ) {
+      msk = is.na(sp::over(SpatialPoints(ploc), mask , fn = NULL)[,1])
+      df$col[msk] = NA
+      df$alpha = df$alpha & msk
+    } else if ( is.data.frame(mask) ){
+      if ( !require(sp) ) { "You provided a data.frame as mask. The package sp is required to interpret it as a polygon."}
+      msk = point.in.polygon(ploc[,1], ploc[,2], mask[,1], mask[,2]) == 1
+      df$col[!msk] = NA
+      df$alpha = df$alpha & msk
+    }
     
 #
 # (5) Create the plot using either rgl or ggplot2
