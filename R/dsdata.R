@@ -266,7 +266,7 @@ plot.dsdata = function(data,
       if ( !requireNamespace("ggplot2", quietly = TRUE) ) { stop("This function requires the ggplot2 package.")}
       
       # Plot the mesh
-      if ( add.mesh ) { gg = ggplot() + gg.mesh(data) }
+      if ( add.mesh ) { gg = ggplot() + gg.mesh(data) + gg.bnd(data) + gg.int(data) }
       
       # Plot segments
       if ( segment ) { gg = gg + do.call(gg.seg, c(list(data), segment.args)) }
