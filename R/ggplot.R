@@ -28,6 +28,59 @@ gg.mesh = function(data, color = rgb(0,0,0,0.1), ...) {
 }
 
 
+#' Plot inla.mesh using ggplot2
+#' 
+#' @aliases gg.col
+#' @name gg.col
+#' @export
+#' @param data A \link{dsdata} object or a \link{inla.mesh}
+#' @param color on mesh vertices
+#' @param alpha on mesh vertices
+#' @return A ggplot2 object
+#' 
+
+gg.col = function(data, color, alpha = 1, ...) {
+
+  if ( class(data)[1] == "inla.mesh" ) { mesh = data } else { mesh = data$mesh }
+  if ( length(alpha) == 1 ) { 
+    alpha = rep(alpha,length(color))
+    alph.fix = TRUE}
+  else { alph.fix = FALSE }
+  
+  refine = TRUE
+  if ( refine ) {
+    omesh = mesh
+    mesh = mesh.refine(mesh, refine = list(max.edge = diff(range(omesh$loc[,1]))/100))
+    color = as.vector(inla.spde.make.A(omesh, loc = mesh$loc) %*% color)
+    if ( !is.null(alpha) ) { alpha = as.vector(inla.spde.make.A(omesh, loc = mesh$loc) %*% alpha) }
+  } 
+  
+  df = matrix(NA, nrow(mesh$graph$tv)*3, 2)
+  df[seq(1, nrow(mesh$graph$tv)*3, by=3), ] = mesh$loc[mesh$graph$tv[,1],1:2]
+  df[seq(2, nrow(mesh$graph$tv)*3, by=3), ] = mesh$loc[mesh$graph$tv[,2],1:2]
+  df[seq(3, nrow(mesh$graph$tv)*3, by=3), ] = mesh$loc[mesh$graph$tv[,3],1:2]
+  df = data.frame(df, tr = as.vector(matrix(1:nrow(mesh$graph$tv), 3, nrow(mesh$graph$tv),byrow=TRUE)))
+  colnames(df) = c(data$mesh.coords,"tr")
+  icol  = (color[mesh$graph$tv[,1]] + color[mesh$graph$tv[,2]] + color[mesh$graph$tv[,3]])/3
+  ialpha  = (alpha[mesh$graph$tv[,1]] + alpha[mesh$graph$tv[,2]] + alpha[mesh$graph$tv[,3]])/3
+  df$col = as.vector(matrix(icol, 3, nrow(mesh$graph$tv),byrow=TRUE))
+  df$alph = as.vector(matrix(ialpha, 3, nrow(mesh$graph$tv),byrow=TRUE))
+  
+  aest = aes_string(x = data$mesh.coords[1], 
+             y = data$mesh.coords[2],
+             group = "tr", 
+             fill = "col",
+             alpha = df$alph)
+  if (alph.fix) { 
+    gg = geom_polygon(data = df, aest, linetype = "blank", show.legend = FALSE, alpha = alpha[1])
+  } else {
+    gg = geom_polygon(data = df, aest, linetype = "blank", show.legend = FALSE)
+  }
+  
+  return(gg)
+}
+
+
 #' Plot exterior boundary of a mesh
 #'
 #' @aliases gg.bnd
