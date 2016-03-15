@@ -351,8 +351,7 @@ plot.dsdata = function(data,
         detections = detdata(data)[,data$mesh.coords]
         do.call(rgl.sphpoints, c(list(long = detections[,1] + 360, 
                                       lat = detections[,2],
-                                      radius = R * R.delta),
-                                 detection.args))
+                                      radius = R * R.delta)))
       }
       
       # Draw the mesh
