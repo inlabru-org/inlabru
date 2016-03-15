@@ -357,7 +357,7 @@ plot.spatial = function(model = NULL,
     if ( is.null(result) ) { stop("You are trying to plot without providing an INLA result.") } 
     if ( effect %in% names(result$summary.random)) {
       # Values come from a random effect
-      ires = result$summary.random[[name]] 
+      ires = result$summary.random[[effect]] 
     }
     else {
       # Values come from a tagged effect, e.g. a prediction
