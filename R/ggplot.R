@@ -102,10 +102,10 @@ gg.bnd = function(data, mapping = NULL, ...) {
   mp = aes(x = x,y = y, xend = xend, yend = yend)
   # Add user aesthetics
   if ( !is.null(mapping) ) { mp = modifyList(mp, mapping) }
-  # If user did not provide color, set color to blue
+  # If user did not provide color, set color to red
   more.args = list(...)
   nms = c(names(mapping), names(more.args))
-  if ( !("color" %in% nms | "colour" %in% nms | "col" %in% nms) )  { more.args$color = rgb(0,0,1,0.5) }
+  if ( !("color" %in% nms | "colour" %in% nms | "col" %in% nms) )  { more.args$color = rgb(1,0,0,0.5) }
   # Make geom
   gg = do.call(geom_segment, c(list(data = df, mapping = mp), more.args))
   return(gg)
@@ -134,10 +134,10 @@ gg.int = function(data, mapping = NULL, ...) {
   mp = aes(x = x,y = y, xend = xend, yend = yend)
   # Add user aesthetics
   if ( !is.null(mapping) ) { mp = modifyList(mp, mapping) }
-  # If user did not provide color, set color to red
+  # If user did not provide color, set color to blue
   more.args = list(...)
   nms = c(names(mapping), names(more.args))
-  if ( !("color" %in% nms | "colour" %in% nms | "col" %in% nms) )  { more.args$color = rgb(1,0,0,0.5) }
+  if ( !("color" %in% nms | "colour" %in% nms | "col" %in% nms) )  { more.args$color = rgb(0,0,1,0.5) }
   # Make geom
   gg = do.call(geom_segment, c(list(data = df, mapping = mp), more.args))
   return(gg)
