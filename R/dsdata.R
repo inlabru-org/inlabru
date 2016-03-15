@@ -378,7 +378,56 @@ plot.dsdata = function(data,
   }
 }
 
+#' Change the coordinate system of \link{dsdata}
+#' 
+#' @aliases remap.dsdata 
+#' @export
+#' @param dsdata Distance sampling data set
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
+remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat"){
+  
+  # We need the proj4 strings for the effort and the mesh
+  if ( is.null(data$p4s) | is.null(data$mesh.p4s) ) { 
+    stop("Your data set has no p4s or mesh.p4s entry. These are required for remapping") 
+  }
+  # rgdal is needed for the projection
+  if ( !require("rgdal") ) { stop("This function requires the rgdal package")}
+  
+  # Our projection function
+  projFun = function(df, from.p4s, to.p4s) {
+    class(df) = "data.frame"
+    msk = is.finite(df[,1]) & is.finite(df[,2])
+    spts <-SpatialPoints(df[msk,], proj4string = CRS(from.p4s))
+    geo.pts <-spTransform(spts, CRS(to.p4s))
+    df[msk,] = as.data.frame(geo.pts)
+    return(df)
+  }
+  
+  # Project detections
+  data$effort[,data$mesh.coords] = projFun(data$effort[,data$mesh.coords], data$p4s, p4s)
+  
+  # Project segment start end end points
+  data$effort[,paste0("start.", data$mesh.coords)] = projFun(data$effort[,paste0("start.", data$mesh.coords)], data$p4s, p4s)
+  data$effort[,paste0("end.", data$mesh.coords)] = projFun(data$effort[,paste0("end.", data$mesh.coords)], data$p4s, p4s)
+  
+  # If we are projecting to lon/lat change column names and mesh.coords entry
+  if (p4s == "+proj=longlat") {
+    names(data$effort)[which(names(data$effort) %in% data$mesh.coords)] = c("lon","lat")
+    names(data$effort)[which(names(data$effort) %in% paste0("start.", data$mesh.coords))] = c("start.lon","start.lat")
+    names(data$effort)[which(names(data$effort) %in% paste0("end.", data$mesh.coords))] = c("end.lon","end.lat")
+    data$mesh.coords = c("lon","lat")
+  }
+  # Project mesh
+  data$mesh$loc[,c(1,2)] = as.matrix(projFun(as.data.frame(data$mesh$loc[,c(1,2)]), data$mesh.p4s, mesh.p4s))
+  
+  # Set new proj4 string
+  data$p4s = p4s
+  data$mesh.p4s = p4s
+  
+  # Return
+  return(data)
+}
 
 #' Sanity of a \link{dsdata} object
 #' 
@@ -589,7 +638,7 @@ statistics.dsdata = function(data, distance.truncation = NULL){
   
 }
 
-
+remap = function(...){UseMethod("remap")}
 sanity = function(...){UseMethod("sanity")}
 statistics = function(...){UseMethod("statistics")}
 as.transect = function(...){UseMethod("as.transect")}
