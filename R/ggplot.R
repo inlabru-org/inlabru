@@ -1,4 +1,4 @@
-# This filie contains several helpers to plot distance sampling data using ggplot2
+# This file contains several helpers to plot distance sampling data using ggplot2
 # gg.mesh() : A geom for plotting the mesh
 # gg.bnd() : A geom for plotting the boundary segment of a mesh
 # gg.int() : A geom for plotting the interior segments of a mesh
@@ -13,6 +13,7 @@
 #' @name gg.mesh
 #' @export
 #' @param data A \link{dsdata} object or a \link{inla.mesh}
+#' @param color Color of the mesh
 #' @return A ggplot2 object
 #' 
 
@@ -87,14 +88,26 @@ gg.col = function(data, color, alpha = 1, ...) {
 #' @name gg.bnd
 #' @export
 #' @param data A \link{dsdata} object or a \link{inla.mesh}
+#' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}.
+#' @param ... Arguments passed on to \link{geom_segment}
 #' @return A ggplot2 object
 #' 
 
-gg.bnd = function(data, color = rgb(0,0,1,0.5), ...) {
+gg.bnd = function(data, mapping = NULL, ...) {
   if ( class(data)[1] == "inla.mesh" ) { mesh = data } else { mesh = data$mesh }
+  # Make data frame
   df = data.frame(mesh$loc[mesh$segm$bnd$idx[,1],1:2], mesh$loc[mesh$segm$bnd$idx[,2],1:2])
   colnames(df) = c("x","y","xend","yend")
-  gg = geom_segment(data = df, aes(x = x,y = y, xend = xend, yend = yend), color = color, ...)
+  # Make aesthetics
+  mp = aes(x = x,y = y, xend = xend, yend = yend)
+  # Add user aesthetics
+  if ( !is.null(mapping) ) { mp = modifyList(mp, mapping) }
+  # If user did not provide color, set color to blue
+  more.args = list(...)
+  nms = c(names(mapping), names(more.args))
+  if ( !("color" %in% nms | "colour" %in% nms | "col" %in% nms) )  { more.args$color = rgb(0,0,1,0.5) }
+  # Make geom
+  gg = do.call(geom_segment, c(list(data = df, mapping = mp), more.args))
   return(gg)
 }
 
@@ -106,15 +119,27 @@ gg.bnd = function(data, color = rgb(0,0,1,0.5), ...) {
 #' @name gg.int
 #' @export
 #' @param data A \link{dsdata} object or a \link{inla.mesh}
+#' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}.
+#' @param ... Arguments passed on to \link{geom_segment}
 #' @return A ggplot2 object
 #' 
 
-gg.int = function(data, color = rgb(1,0,0,0.5), ...) {
+gg.int = function(data, mapping = NULL, ...) {
   if ( class(data)[1] == "inla.mesh" ) { mesh = data } else { mesh = data$mesh }
+  # Make data frame
   df = data.frame(mesh$loc[mesh$segm$int$idx[,1],1:2], mesh$loc[mesh$segm$int$idx[,2],1:2])
   if ( nrow(df) == 0 ) { return(NULL) }
   colnames(df) = c("x","y","xend","yend")
-  gg = geom_segment(data = df, aes(x = x,y = y, xend = xend, yend = yend), color = color, ...)
+  # Make aesthetics
+  mp = aes(x = x,y = y, xend = xend, yend = yend)
+  # Add user aesthetics
+  if ( !is.null(mapping) ) { mp = modifyList(mp, mapping) }
+  # If user did not provide color, set color to red
+  more.args = list(...)
+  nms = c(names(mapping), names(more.args))
+  if ( !("color" %in% nms | "colour" %in% nms | "col" %in% nms) )  { more.args$color = rgb(1,0,0,0.5) }
+  # Make geom
+  gg = do.call(geom_segment, c(list(data = df, mapping = mp), more.args))
   return(gg)
 }
 
@@ -124,14 +149,23 @@ gg.int = function(data, color = rgb(1,0,0,0.5), ...) {
 #' @aliases plot gg.seg
 #' @export
 #' @param data a \link{dsdata} object
+#' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}.
+#' @param ... Arguments passed on to \link{geom_segment}
 #' @return A ggplot2 object
 #' 
 
-gg.seg = function(data, ...) {
-  df = data.frame(startpoint(as.segment(data),data)[,data$mesh.coords], 
-                  endpoint(as.segment(data),data)[,data$mesh.coords])
-  colnames(df) = c("x","y","xend","yend")
-  gg = geom_segment(data = df, aes(x = x, y = y, xend = xend, yend = yend), ...)
+gg.seg = function(data, mapping = NULL, ...) {
+  # Make the data frame
+  df = data$effort[as.segment(data)[,1],]
+  # Default aesthetics
+  mp = aes_string(x = paste0("start.", data$mesh.coords[1]), 
+                  y = paste0("start.", data$mesh.coords[2]), 
+                  xend = paste0("end.", data$mesh.coords[1]), 
+                  yend = paste0("end.", data$mesh.coords[2]))
+  # Add user aesthetics
+  if ( !is.null(mapping) ) { mp = modifyList(mp, mapping) }
+  # Make geom
+  gg = geom_segment(data = df, mapping = mp, ...)
   return(gg)
 }
 
@@ -142,15 +176,24 @@ gg.seg = function(data, ...) {
 #' @aliases gg.det
 #' @export
 #' @param data a \link{dsdata} object
-#' @param color Color used to plot detections
+#' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}.
+#' @param ... Arguments passed on to \link{geom_point}
 #' @return A ggplot2 object
 #' 
 
-gg.det = function(data, color = "red", ...) {
+gg.det = function(data, mapping = NULL, ...) {
+  # Make data frame
   df = detdata(data)
-  gg = geom_point(data = df, aes_string(x = data$mesh.coords[1], 
-                                        y = data$mesh.coords[2]), 
-                  color = color, ...)
+  # Default aesthetics
+  mp = aes_string(x = data$mesh.coords[1], y = data$mesh.coords[2])
+  # Add user aesthetics
+  if ( !is.null(mapping) ) { mp = modifyList(mp, mapping) }
+  # If user did not provide color, set color to red
+  more.args = list(...)
+  nms = c(names(mapping), names(more.args))
+  if ( !("color" %in% nms | "colour" %in% nms | "col" %in% nms) )  { more.args$color = rgb(1,0,0,1) }
+  # Make geom
+  gg = do.call(geom_point, c(list(mapping = mp, data = df), more.args))
   return(gg)
 }
 
@@ -160,12 +203,14 @@ gg.det = function(data, color = "red", ...) {
 #' @aliases gg.swath
 #' @export
 #' @param data a \link{dsdata} object
+#' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}
 #' @param width The width of the swath
-#' @param fill Filling color of the swath
+#' @param ... Arguments passed on to \link{geom_polygon}
 #' @return A ggplot2 object
 #' 
 
-gg.swath = function(data, width = 1, fill = rgb(0,0,0,0.1), ...) {
+gg.swath = function(data, mapping = NULL, width = 1, ...) {
+  # Make data frame
   sp = startpoint(as.segment(data),data)[,data$mesh.coords]
   ep = endpoint(as.segment(data),data)[,data$mesh.coords]
   v = ep-sp
@@ -175,7 +220,14 @@ gg.swath = function(data, width = 1, fill = rgb(0,0,0,0.1), ...) {
   v3 = data.frame(ep - width * normalize.euc(vo), seg = 1:dim(vo)[1])
   v4 = data.frame(ep + width * normalize.euc(vo), seg = 1:dim(vo)[1])
   df = rbind(v1, v2, v3, v4)
-  gg = geom_polygon(data = df, aes_string(x = data$mesh.coords[1], y = data$mesh.coords[2], group = "seg"), fill = fill)
+  # Default aesthetics
+  mp = aes_string(x = data$mesh.coords[1], y = data$mesh.coords[2], group = "seg")
+  # Add user aesthetics
+  if ( !is.null(mapping) ) { mp = modifyList(mp, mapping) }
+  more.args = list(...)
+  
+  if ( !("fill" %in% names(mapping)) )  { more.args$fill = rgb(0,0,0,0.1) }
+  gg = do.call(geom_polygon, c(list(data = df, mapping = mp),list(...)))
 
   return(gg)
 }
