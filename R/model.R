@@ -635,9 +635,10 @@ model.detfun = function(type, ...) {
 #' Hence, the precision effect 'nhsd' is obtained from a contrained linear INLA model. The covariate used for this
 #' model is:
 #' 
-#'  nhsd = function(X) { return(-0.5*X[,colname]^2) },
+#'  nhsd = function(X) { return(-0.5*scale*X[,colname]^2) },
 #'  
-#' that is, nhsd is half of the negative squared distance of an observation/integration point.
+#' that is, nhsd is half of the negative squared distance of an observation/integration point. 
+#' The parameter 'scale' is currently set to 'truncation'. If truncation is NULL, scale is set to 1.
 #'
 #' @aliases model.halfnormal
 #' @export
@@ -660,7 +661,14 @@ model.halfnormal = function(data = NULL, truncation = NULL, constrained = TRUE, 
   
   # Covariate
   covariates = list()
-  covariates[[effect]] = function(X) { return(-0.5*X[,colname]^2) }
+  covariates[[effect]] = function(X) { return(-(0.5/scale)*X[,colname]^2) }
+  assign("colname", colname, envir = environment(covariates[[effect]]))
+  
+  if (!is.null(truncation)) {
+    assign("scale", truncation, envir = environment(covariates[[effect]]))
+  } else {
+    assign("scale", 1, envir = environment(covariates[[effect]]))
+  }
   
   return(make.model(name = "Half-normal detection function",
                     formula = formula, 
