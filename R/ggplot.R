@@ -209,7 +209,10 @@ gg.det = function(data, mapping = NULL, ...) {
 #' @return A ggplot2 object
 #' 
 
-gg.swath = function(data, mapping = NULL, width = 1, ...) {
+gg.swath = function(data, mapping = NULL, width = NULL, ...) {
+  
+  if ( is.null(width) ) { stop("Please provide a width for the swaths.") }
+  
   # Make data frame
   sp = startpoint(as.segment(data),data)[,data$mesh.coords]
   ep = endpoint(as.segment(data),data)[,data$mesh.coords]
