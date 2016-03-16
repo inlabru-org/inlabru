@@ -123,6 +123,6 @@ io_sst.save = function(year=1986:2007,month=6:12,filename=NULL){
   sst$mesh = mesh
   sst$time.coords = "year"
   sst$mesh.coords = c("lon","lat")
-
+  class(sst) = c("covdata","list")
   save(sst,file=file)
 }
