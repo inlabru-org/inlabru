@@ -215,10 +215,10 @@ gg.swath = function(data, mapping = NULL, width = 1, ...) {
   ep = endpoint(as.segment(data),data)[,data$mesh.coords]
   v = ep-sp
   vo = data.frame(x = v[,2],y = -v[,1])
-  v1 = data.frame(sp + width * normalize.euc(vo), seg = 1:dim(vo)[1])
-  v2 = data.frame(sp - width * normalize.euc(vo), seg = 1:dim(vo)[1])
-  v3 = data.frame(ep - width * normalize.euc(vo), seg = 1:dim(vo)[1])
-  v4 = data.frame(ep + width * normalize.euc(vo), seg = 1:dim(vo)[1])
+  v1 = data.frame(sp + width/2 * normalize.euc(vo), seg = 1:dim(vo)[1])
+  v2 = data.frame(sp - width/2 * normalize.euc(vo), seg = 1:dim(vo)[1])
+  v3 = data.frame(ep - width/2 * normalize.euc(vo), seg = 1:dim(vo)[1])
+  v4 = data.frame(ep + width/2 * normalize.euc(vo), seg = 1:dim(vo)[1])
   df = rbind(v1, v2, v3, v4)
   # Default aesthetics
   mp = aes_string(x = data$mesh.coords[1], y = data$mesh.coords[2], group = "seg")
