@@ -90,3 +90,52 @@ io_mrsea.pkgdata.save = function(){
   mrsea = io_mrsea.pkgdata.load()
   save(mrsea,file=paste0(io_mrsea.getDataDir(),"/mrsea.RData"))
 }
+
+#########################################################################################################
+#'
+#' Tools written by Lindesay 
+#'
+
+mrseanames2dsmnames<-function(data){
+  nam<-names(data)
+  cols2change<-c('transect.id', 'transect.label', 'x.pos', 'y.pos', 'segment.id')
+  id<-NULL
+  for(i in 1:length(cols2change)){
+    id<-c(id, grep(cols2change[i], nam))
+  }
+  names(data)[id]<-c('Transect.Label', 'Transect.label', 'x','y', 'Sample.Label')
+  # make sure effort column is same unit as coordinate system
+  data$Effort<-data$length
+  return(data)
+}
+# ---------------------------------------------------------------------
+prednamechange<-function(data){
+  id<-c(grep('x.pos', colnames(data)), grep('y.pos', colnames(data)))
+  names(data)[id]<-c('x', 'y')
+  return(data)
+}
+# ---------------------------------------------------------------------
+makedistdata<-function(data){
+  # effort, object and distance.
+  # Not taken x and y as these are segement mid points not detection locations
+  distdata<-data[,c("object" ,"distance" , "Effort")]
+  if(is.null(data$size)){
+    distdata$size<-rep(1, nrow(distdata))  
+  }else{
+    distdata$size<-data$size
+  }
+  distdata<-na.omit(distdata)
+  return(distdata)
+}
+# ---------------------------------------------------------------------
+makeobsdata<-function(data){
+  obsdata<-na.omit(data)
+  if(is.null(data$size)){
+    obsdata$size<-rep(1, nrow(obsdata))  
+  }else{
+    obsdata$size<-obsdata$size
+  }
+  obsdata<-obsdata[,c("object" , "Sample.Label", "distance" , "Effort", 'size')]
+  return(obsdata)
+}
+# ---------------------------------------------------------------------
