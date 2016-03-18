@@ -394,17 +394,23 @@ plot.dsdata = function(data,
 
 #' Change the coordinate system of \link{dsdata}
 #' 
+#' Maps a distance sampling data set to a new coordinate reference system using a proj.4 string. 
+#' 
+#' This function requires that the \link{dsdata} has \code{p4s} and \code{mesh.p4s} entries in order
+#' to identify the source reference system. The effort data (detections and segments) as well as the mesh
+#' are then mapped to new coordinate systems defined by the parameters \code{p4s} and \code{mesh.p4s}. 
+#' 
+#' For details on proj.4 see for instance https://en.wikipedia.org/wiki/PROJ.4
+#' 
 #' @aliases remap.dsdata remap
 #' @export
 #' @param dsdata Distance sampling data set
+#' @param p4s A proj4 string defining the target coordinate system for the effort data (detections and segments)
+#' @param mesh.p4s A proj4 string defining the target coordinate system for the mesh. By default uses p4s.
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat"){
-  
-  # We need the proj4 strings for the effort and the mesh
-  if ( is.null(data$p4s) | is.null(data$mesh.p4s) ) { 
-    stop("Your data set has no p4s or mesh.p4s entry. These are required for remapping") 
-  }
+remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = p4s){
+
   # rgdal is needed for the projection
   if ( !require("rgdal") ) { stop("This function requires the rgdal package")}
   
@@ -418,26 +424,39 @@ remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat")
     return(df)
   }
   
-  # Project detections
-  data$effort[,data$mesh.coords] = projFun(data$effort[,data$mesh.coords], data$p4s, p4s)
-  
-  # Project segment start end end points
-  data$effort[,paste0("start.", data$mesh.coords)] = projFun(data$effort[,paste0("start.", data$mesh.coords)], data$p4s, p4s)
-  data$effort[,paste0("end.", data$mesh.coords)] = projFun(data$effort[,paste0("end.", data$mesh.coords)], data$p4s, p4s)
-  
-  # If we are projecting to lon/lat change column names and mesh.coords entry
-  if (p4s == "+proj=longlat") {
-    names(data$effort)[which(names(data$effort) %in% data$mesh.coords)] = c("lon","lat")
-    names(data$effort)[which(names(data$effort) %in% paste0("start.", data$mesh.coords))] = c("start.lon","start.lat")
-    names(data$effort)[which(names(data$effort) %in% paste0("end.", data$mesh.coords))] = c("end.lon","end.lat")
-    data$mesh.coords = c("lon","lat")
+  if ("effort" %in% names(data) & !is.null(p4s)){
+    if ( is.null(data$p4s) ) {
+      stop("Your data set has no p4s entry, which is required for remapping the effort data.")
+    }
+    # Project detections
+    data$effort[,data$mesh.coords] = projFun(data$effort[,data$mesh.coords], data$p4s, p4s)
+    
+    # Project segment start end end points
+    data$effort[,paste0("start.", data$mesh.coords)] = projFun(data$effort[,paste0("start.", data$mesh.coords)], data$p4s, p4s)
+    data$effort[,paste0("end.", data$mesh.coords)] = projFun(data$effort[,paste0("end.", data$mesh.coords)], data$p4s, p4s)
+    
+    # If we are projecting to lon/lat change column names and mesh.coords entry
+    if (p4s == "+proj=longlat") {
+      names(data$effort)[which(names(data$effort) %in% data$mesh.coords)] = c("lon","lat")
+      names(data$effort)[which(names(data$effort) %in% paste0("start.", data$mesh.coords))] = c("start.lon","start.lat")
+      names(data$effort)[which(names(data$effort) %in% paste0("end.", data$mesh.coords))] = c("end.lon","end.lat")
+    }
+    # Set new proj4 string
+    data$p4s = p4s
   }
-  # Project mesh
-  data$mesh$loc[,c(1,2)] = as.matrix(projFun(as.data.frame(data$mesh$loc[,c(1,2)]), data$mesh.p4s, mesh.p4s))
-  
-  # Set new proj4 string
-  data$p4s = p4s
-  data$mesh.p4s = p4s
+  if ("mesh" %in% names(data) &!is.null(mesh.p4s)){
+    # We need the proj4 strings for the effort and the mesh
+    if ( is.null(data$mesh.p4s) ) {
+      stop("Your data set has no mesh.p4s entry, which is required for remapping the mesh")
+    }
+    # Project mesh
+    data$mesh$loc[,c(1,2)] = as.matrix(projFun(as.data.frame(data$mesh$loc[,c(1,2)]), data$mesh.p4s, mesh.p4s))
+    # Set new proj4 string
+    data$mesh.p4s = p4s
+    if (mesh.p4s == "+proj=longlat") {
+      data$mesh.coords = c("lon","lat")
+    }
+  }
   
   # Return
   return(data)
