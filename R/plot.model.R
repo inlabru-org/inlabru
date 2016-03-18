@@ -369,7 +369,8 @@ plot.spatial = function(model = NULL,
                                return(as.vector(col))}))
     col = data.frame(col=col, property = merge(rep(1,nrow(ploc)), property)[,2])
     ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
-    df = data.frame(link(col), ploc)
+    df = data.frame(col, ploc)
+    df$col = link(df$col)
   }
   else if ( !is.null(model) ) {
     # We extract values from a model and INLA result
