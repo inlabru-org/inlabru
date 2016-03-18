@@ -105,11 +105,11 @@ make.covariate = function(cdata, method = NULL, ...){
 get.value = function(covariate,loc){
   times = unique(loc[,covariate$time.coords])
   values = numeric(length=nrow(loc))
-  if (nrow(times)>0) {
+  if (length(times)>0) {
     for (t in times){
       msk = loc[,covariate$time.coords]==t
       A = inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[msk,covariate$mesh.coords]))
-      inside = is.inside(covariate$mesh, loc = loc[msk,covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
+      inside = is.inside(covariate$mesh, loc = loc[,covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
       values[msk] = as.vector(A%*%covariate$values[,as.character(t)])
       values[msk & !inside] = NA
     }
@@ -197,13 +197,13 @@ get.tmean = function(covariate,loc=NULL){
 
 get.smean = function(covariate,loc=NULL,weights=NULL){
   sm <- numeric(length=ifelse(is.null(loc), 0, dim(loc)[1]))
-
+  
   if (is.null(weights)) {
     weights <- rep(1, covariate$mesh$n)
   }
   weights <- weights * Matrix::diag(inla.mesh.fem(covariate$mesh, order=1)$c0)
   weights <- weights / sum(weights)
-
+  
   loc2 <- data.frame(covariate$mesh$loc[, 1:length(covariate$mesh.coords),
                                         drop=FALSE])
   colnames(loc2) <- covariate$mesh.coords
