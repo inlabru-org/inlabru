@@ -649,6 +649,7 @@ as.detection = function(...){UseMethod("as.detection")}
 startpoint = function(...){UseMethod("startpoint")}
 endpoint = function(...){UseMethod("endpoint")}
 detdata = function(...){UseMethod("detdata")}
+segdata = function(...){UseMethod("segdata")}
 effort = function(...){UseMethod("effort")}
 trdata = function(...){UseMethod("trdata")}
 
@@ -670,6 +671,11 @@ detdata.dsdata = function(data,detection=NULL,...){
     return(data$effort[detection[,"start"],])
   }
 }
+
+segdata.dsdata = function(data,...){ 
+ return(data$effort[is.na(data$effort$det),])
+}
+
 
 effort.dsdata = function(dsdata){ 
   return(dsdata$effort[is.na(dsdata$effort$det),])
