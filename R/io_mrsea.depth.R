@@ -21,6 +21,7 @@ io_mrsea.depth.pkgdata.load = function() {
   
   data(mrsea)
   depth = covdata.import(preddata, "depth", mrsea)
+  depth$mesh.p4s = "+proj=utm +zone=32"
   return(depth)
   
 }
