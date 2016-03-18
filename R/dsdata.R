@@ -2,7 +2,7 @@
 #' 
 #' For details on ho to construct such a data set see \link{make.dsdata}
 #' 
-#' Data sets included in iDistance:
+#' Data sets included in iDistance (use data() to load them):
 #' \itemize{
 #'  \item{\link{toy1}: }{A toy data set with a single transect line}
 #'  \item{\link{weeds}: }{Johnson et al. (2010) weeds data (line transect)}
@@ -15,6 +15,18 @@
 #' Data sets that can be imported from other packages
 #' \itemize{
 #'  \item{mexdolphin (dsm package):}{ Use \link{import.dsmdata} }
+#' }
+#' 
+#' Methods on dsdata are:
+#' 
+#' \itemize{
+#'  \item{\link{summary.dsdata}: }{ Print a brief summary }
+#'  \item{\link{plot.dsdata}: }{ Plot dsdata objects }
+#'  \item{\link{detdata}: }{ Extract detections }
+#'  \item{\link{segdata}: }{ Extract segments}
+#'  \item{\link{sanity}: }{ Check if the data set is defined properly}
+#'  \item{\link{statistics}: }{ Calculate and print some basic statistics regarding the data set }
+#'  \item{\link{remap}: }{ Map data to a different coordinate system}
 #' }
 #' 
 #' @name dsdata
