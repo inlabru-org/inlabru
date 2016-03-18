@@ -1,3 +1,11 @@
+#' Marine renewables strategic environmental assessment 
+#' 
+#' Data imported from package MRSea, see http://creem2.st-andrews.ac.uk/software/
+#'  
+#' @examples \\donttest{ data(mrsea) ; plot(mrsea)}
+#' @name mrsea
+NULL
+
 # INTERNAL DATA STORAGE
 io_mrsea.getDataDir = function() {return(system.file("data",package="iDistance"))}
 
@@ -54,9 +62,6 @@ io_mrsea.pkgdata.load = function() {
   
   depth = predict.data.re[(predict.data.re$season==1) & (predict.data.re$impact==0), c("x.pos","y.pos","depth")]
   colnames(depth) = c("x","y","depth")
-  
-  # Attach covariate data
-  dset$depth = depth
   
   # Attach CRS projection strings
   dset$p4s = "+proj=utm +zone=32"
