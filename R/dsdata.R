@@ -662,6 +662,16 @@ as.detection.dsdata = function(dsdata,...) {return(as.detection(dsdata$effort,..
 startpoint.dsdata = function(dsdata,obj,...) { return(startpoint(obj,dsdata,...))}
 endpoint.dsdata = function(dsdata,obj,...) { return(endpoint(obj,dsdata,...))}
 
+#' Extract detections from \link{dsdata}
+#' 
+#' Returns the rows of the effort table that define detections.
+#' 
+#' @aliases detdata.dsdata 
+#' @export
+#' @param dsdata A \link{dsdata} object
+#' @examples \dontrun{ data(toy1) ; detdata(toy1) }
+#' @return A data.frame of detections
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 detdata.dsdata = function(data,detection=NULL,...){ 
   if (is.null(detection)) {
@@ -671,6 +681,17 @@ detdata.dsdata = function(data,detection=NULL,...){
     return(data$effort[detection[,"start"],])
   }
 }
+
+#' Extract segments from \link{dsdata}
+#' 
+#' Returns the rows of the effort table that define segments.
+#' 
+#' @aliases segdata.dsdata 
+#' @export
+#' @param dsdata A \link{dsdata} object
+#' @examples \dontrun{ data(toy1) ; segdata(toy1) }
+#' @return A data.frame of segments
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 segdata.dsdata = function(data,...){ 
  return(data$effort[is.na(data$effort$det),])
