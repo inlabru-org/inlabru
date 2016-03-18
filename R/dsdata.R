@@ -216,7 +216,7 @@ make.mesh = function(dset, ...) {
 
 #' Plot distance sampling data (\link{dsdata})
 #' 
-#' @aliases plot.dsdata 
+#' @aliases plot.dsdata plot
 #' @name plot.dsdata
 #' @export
 #' @param data A \link{dsdata} object
@@ -394,7 +394,7 @@ plot.dsdata = function(data,
 
 #' Change the coordinate system of \link{dsdata}
 #' 
-#' @aliases remap.dsdata 
+#' @aliases remap.dsdata remap
 #' @export
 #' @param dsdata Distance sampling data set
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
@@ -447,7 +447,7 @@ remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat")
 #' 
 #' Analyzes if a distance sampling data object is well defined. 
 #' 
-#' @aliases sanity.dsdata 
+#' @aliases sanity.dsdata sanity
 #' @export
 #' @param dsdata Distance sampling data set
 #' 
@@ -559,7 +559,7 @@ sanity.effort.inside = function(dset, message = FALSE){
 #' 
 #' Gives a brief summary of the data and calls the \link{statistics.dsdata} function to print some statistics.
 #' 
-#' @aliases summary.dsdata 
+#' @aliases summary.dsdata summary
 #' @export
 #' @param data A \link{dsdata} object
 #' @param ... arguments passed on to \link{statistics.dsdata}
@@ -584,7 +584,7 @@ summary.dsdata = function(data, ...){
 #' 
 #' A brief overview of important statistics like the area covered by the mesh and the number of observations
 #' 
-#' @aliases statistics.dsdata 
+#' @aliases statistics.dsdata statistics
 #' @name statistics.dsdata 
 #' @export
 #' @param dsdata A \link{dsdata} object
@@ -678,7 +678,7 @@ endpoint.dsdata = function(dsdata,obj,...) { return(endpoint(obj,dsdata,...))}
 #' 
 #' Returns the rows of the effort table that define detections.
 #' 
-#' @aliases detdata.dsdata 
+#' @aliases detdata.dsdata detdata
 #' @export
 #' @param dsdata A \link{dsdata} object
 #' @examples \dontrun{ data(toy1) ; detdata(toy1) }
@@ -698,7 +698,7 @@ detdata.dsdata = function(data,detection=NULL,...){
 #' 
 #' Returns the rows of the effort table that define segments.
 #' 
-#' @aliases segdata.dsdata 
+#' @aliases segdata.dsdata segdata
 #' @export
 #' @param dsdata A \link{dsdata} object
 #' @examples \dontrun{ data(toy1) ; segdata(toy1) }
