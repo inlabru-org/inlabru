@@ -621,7 +621,7 @@ split.lines = function(mesh, sp, ep, filter.zero.length = TRUE) {
     idx = idx[!(sl==0)]
   }
   
-  return(list(sp=sp,ep=ep,split.origin=origin,idx=idx))
+  return(list(sp=sp,ep=ep,split.origin=origin,idx=idx,split.loc=splt$split.loc))
   
 }
 
