@@ -689,6 +689,7 @@ model.halfnormal = function(data = NULL, truncation = NULL, constrained = TRUE, 
 #' \deqn{f(z) = 1 - exp[ - (z/(sigma_1 + sigma_2*data)^(-b) ]}
 #' 
 #' @aliases model.hazard
+#' @export
 #' @name model.hazard
 #' @param conditional Character array denoting the data that sigma depends on (linearly)
 #' @param iterator An environment used to pass on the current state of the Taylor approximation
