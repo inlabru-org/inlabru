@@ -867,7 +867,7 @@ int.1d = function(...){
 #' @param distance.truncation Truncation for perpendicular distance (i.e. integration limit)
 #' @param fake.distance Wether or not integration points stay on the transect line and distances are faked.
 #' @param projection Type of projection. Currently only "linear" works.
-#' @param group.by Create independent integration points for sub-groups of the data, e.g. group.by=c("year","month")
+#' @param group Create independent integration points for sub-groups of the data, e.g. group.by=c("year","month")
 #' @return List with integration poins (ips), weights (w) and weights including line length (wl)
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
@@ -886,7 +886,7 @@ int.points = function(data,
                   distance.truncation = 1, 
                   fake.distance = FALSE,
                   projection = NULL,
-                  group.by = NULL,
+                  group = NULL,
                   filter.zero.length = TRUE
 ){
   
@@ -947,13 +947,13 @@ int.points = function(data,
   distance = distance[quad$line.idx]
   idx = idx[quad$line.idx,]
   
-  # Wrap everything up and perform projection according to distance and given group.by argument
+  # Wrap everything up and perform projection according to distance and given group argument
   ips = data.frame(ips)
   colnames(ips) = mesh.coords
-  if ( is.null(group.by) ) {
+  if ( is.null(group) ) {
     ips= cbind(ips, distance = distance, weight = w)  
   } else {
-    ips= cbind(ips, distance = distance, weight = w, segdata(dset)[idx[,1],group.by,drop=FALSE])  
+    ips= cbind(ips, distance = distance, weight = w, segdata(dset)[idx[,1],group,drop=FALSE])  
   }
   
   
@@ -961,14 +961,14 @@ int.points = function(data,
   # OLD SCHEME
   #
   
-  #   if (!is.null(group.by)) { ips = cbind(ips,covariates[idx[,1],group.by,drop=FALSE])}
+  #   if (!is.null(group)) { ips = cbind(ips,covariates[idx[,1],group,drop=FALSE])}
   #   
   #   projfun = function(dframe) { data.frame(ip.project(projection = projection, mesh, as.matrix(dframe[,mesh.coords]), dframe$weight,mesh.coords=mesh.coords),
-  #                                           dframe[1,c("distance",group.by),drop=FALSE]) }
-  #   ips = recurse.rbind(projfun,ips,c("distance",group.by))
+  #                                           dframe[1,c("distance",group),drop=FALSE]) }
+  #   ips = recurse.rbind(projfun,ips,c("distance",group))
   if ( !is.null(projection)){
     fu = function(x) data.frame(cbind(project.weights(x, mesh = data$mesh, mesh.coords = data$mesh.coords),distance = x$distance[1]))
-    ips = recurse.rbind(fu, ips, c(list("distance"),group.by))
+    ips = recurse.rbind(fu, ips, c(list("distance"),group))
   }
   if (length(idx) == dim(ips)[1]) {ips = data.frame(ips, idx = idx[,1])} # only return index if it makes sense
   return(ips)
