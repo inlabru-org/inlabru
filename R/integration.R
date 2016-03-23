@@ -950,7 +950,12 @@ int.points = function(data,
   # Wrap everything up and perform projection according to distance and given group.by argument
   ips = data.frame(ips)
   colnames(ips) = mesh.coords
-  ips= cbind(ips, distance = distance, weight = w)
+  if ( is.null(group.by) ) {
+    ips= cbind(ips, distance = distance, weight = w)  
+  } else {
+    ips= cbind(ips, distance = distance, weight = w, segdata(dset)[idx[,1],group.by,drop=FALSE])  
+  }
+  
   
   #
   # OLD SCHEME
