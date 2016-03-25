@@ -193,7 +193,7 @@ mesh.split = function(mesh,n=1){
 }
 
 # plot.marginal = function(...){UseMethod("plot.marginal")}
-plot.marginal.inla = function(result,varname="Intercept", add = FALSE, ggp = TRUE, lwd=3,...){
+plot.marginal.inla = function(result,varname="Intercept", link = function(x){x}, add = FALSE, ggp = TRUE, lwd=3,...){
   vars = variables.inla(result)
   ovarname = varname
   if (paste0("Beta for ", varname) %in% rownames(vars)) { varname = paste0("Beta for ", varname)}
@@ -212,10 +212,11 @@ plot.marginal.inla = function(result,varname="Intercept", add = FALSE, ggp = TRU
     if ( ggp ) {
       require( ggplot2 )
       df = data.frame(marg)
+      df$x = link(df$x)
       ggplot(data = df, aes(x=x,y=y)) + geom_path() + geom_ribbon(ymin = 0,aes(ymax = y), alpha = 0.1) +
-        geom_segment(x = vars[varname,"0.025quant"], y = 0, xend = vars[varname,"0.025quant"], yend = 0.5 * max(df$y),color = "red") +
-        geom_segment(x = vars[varname,"0.975quant"], y = 0, xend = vars[varname,"0.975quant"], yend = 0.5 * max(df$y),color = "red") +
-        geom_segment(x = vars[varname,"mode"], y = 0, xend = vars[varname,"mode"], yend = max(df$y),color = "blue") +
+        geom_segment(x = link(vars[varname,"0.025quant"]), y = 0, xend = link(vars[varname,"0.025quant"]), yend = 0.5 * max(df$y),color = "red") +
+        geom_segment(x = link(vars[varname,"0.975quant"]), y = 0, xend = link(vars[varname,"0.975quant"]), yend = 0.5 * max(df$y),color = "red") +
+        geom_segment(x = link(vars[varname,"mode"]), y = 0, xend = link(vars[varname,"mode"]), yend = max(df$y),color = "blue") +
         xlab(ovarname) + ylab("pdf")
     } else {
       if (!add) {
@@ -239,9 +240,9 @@ plot.marginal.inla = function(result,varname="Intercept", add = FALSE, ggp = TRU
       uq = result$summary.random[[varname]][,"0.975quant"]
       lq = result$summary.random[[varname]][,"0.025quant"]
       md = result$summary.random[[varname]][,"mode"]
-      plot(md, ylim = c(min(lq),max(uq)))
-      points(uq, col = "red")
-      points(lq, col = "red")
+      plot(link(md), ylim = c(min(lq),max(uq)))
+      points(link(uq), col = "red")
+      points(link(lq), col = "red")
     }
   }
 }
