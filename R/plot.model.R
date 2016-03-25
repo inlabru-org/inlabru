@@ -247,7 +247,7 @@ plot.detfun = function(model = NULL,
 #' \code{model}, \code{result} and \code{data}. The model is then evaluated on the data set's mesh
 #' and using the \code{property} setting. The latter determins which property of the latent effects
 #' are used of each effect to be combined. 
-#' Options are: 'mode', 'mean', 'sd', '0.975quant', '0.025quant', 'kld'
+#' Options are: 'mode', 'mean', 'sd', '0.975quant', '0.025quant', 'kld'. Default is 'mean'.
 #' 
 #' The other paramters of this function mainly serve a purpose if one of the three main paramters
 #' is not set. The \code{result} object is not needed if the \code{col} parameter is provided as
@@ -279,7 +279,7 @@ plot.spatial = function(model = NULL,
                         result = NULL, 
                         data = NULL,
                         effect = NULL,
-                        property = "mode",
+                        property = "mean",
                         group = NULL,
                         mesh = NULL,
                         mask = NULL,
