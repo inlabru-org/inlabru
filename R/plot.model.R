@@ -367,9 +367,9 @@ plot.spatial = function(model = NULL,
                              function(prp) { 
                                col = inla.mesh.project(proj, field = ires[, prp])
                                return(as.vector(col))}))
-    col = data.frame(col=col, property = merge(rep(1,nrow(ploc)), property)[,2])
+    col = data.frame(col = link(col), property = merge(rep(1,nrow(ploc)), property)[,2])
     ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
-    df = data.frame(link(col), ploc)
+    df = data.frame(col, ploc)
   }
   else if ( !is.null(model) ) {
     # We extract values from a model and INLA result
