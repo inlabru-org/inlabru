@@ -375,30 +375,41 @@ iteration.history.model = function(model, effect){
 evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity) {
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
-  
+  if ( property == "sample") { smp = inla.posterior.sample.structured(inla.result, n = 1)[[1]] } 
   posts = list()
   
   for (k in 1:length(model$effects)){
     name = model$effects[k]
-    if (is.null(name)) { name =  names(model$mesh)[[k]] }
-    # Either fixed effect or hyper parameter
-    if (name %in% rownames(inla.result$summary.fixed)){
-      # Fixed effect
-      post = inla.result$summary.fixed[name, property] * cov[[name]]
-    } else if (paste0("Beta for ",name) %in% rownames(inla.result$summary.hyperpar)) {
-      # Hyper parameter
-      post = inla.result$summary.hyperpar[paste0("Beta for ",name), property] * cov[[name]]
-    } else {
-      post = inla.result$summary.random[[name]][,property]
-      if ( name %in% names(Amat) ){ # SPDE model
+    if ( property == "sample") {
+      if (name %in% names(model$mesh)) {
+        # SPDE model
         A = Amat[[name]]
-        # A workaround, needed for make.A called with group=1
-        if (length(post) == 2*dim(A)[2]) { post = post[1:dim(A)[2]]}
-        post = as.vector(A%*%as.vector(post))
-      } else { # other models
-        post = post[model$covariates[[name]](loc)]
+        post = as.vector(A%*%as.vector(smp[[name]]))
+      } else {
+        post = smp[[name]] * cov[[name]]
       }
-
+      
+    } else {
+      if (is.null(name)) { name =  names(model$mesh)[[k]] }
+      # Either fixed effect or hyper parameter
+      if (name %in% rownames(inla.result$summary.fixed)){
+        # Fixed effect
+        post = inla.result$summary.fixed[name, property] * cov[[name]]
+      } else if (paste0("Beta for ",name) %in% rownames(inla.result$summary.hyperpar)) {
+        # Hyper parameter
+        post = inla.result$summary.hyperpar[paste0("Beta for ",name), property] * cov[[name]]
+      } else {
+        post = inla.result$summary.random[[name]][,property]
+        if ( name %in% names(Amat) ){ # SPDE model
+          A = Amat[[name]]
+          # A workaround, needed for make.A called with group=1
+          if (length(post) == 2*dim(A)[2]) { post = post[1:dim(A)[2]]}
+          post = as.vector(A%*%as.vector(post))
+        } else { # other models
+          post = post[model$covariates[[name]](loc)]
+        }
+  
+      }
     }
     posts[[name]] = post
   }
