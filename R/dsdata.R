@@ -419,6 +419,11 @@ remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat")
     names(data$effort)[which(names(data$effort) %in% paste0("start.", data$mesh.coords))] = c("start.lon","start.lat")
     names(data$effort)[which(names(data$effort) %in% paste0("end.", data$mesh.coords))] = c("end.lon","end.lat")
     data$mesh.coords = c("lon","lat")
+  } else {
+    names(data$effort)[which(names(data$effort) %in% data$mesh.coords)] = c("x","y")
+    names(data$effort)[which(names(data$effort) %in% paste0("start.", data$mesh.coords))] = c("start.x","start.y")
+    names(data$effort)[which(names(data$effort) %in% paste0("end.", data$mesh.coords))] = c("end.y","end.y")
+    data$mesh.coords = c("x","y")
   }
   # Project mesh
   data$mesh$loc[,c(1,2)] = as.matrix(projFun(as.data.frame(data$mesh$loc[,c(1,2)]), data$mesh.p4s, mesh.p4s))
