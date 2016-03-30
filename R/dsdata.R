@@ -415,14 +415,14 @@ remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat")
   
   # If we are projecting to lon/lat change column names and mesh.coords entry
   if (p4s == "+proj=longlat") {
-    names(data$effort)[which(names(data$effort) %in% data$mesh.coords)] = c("lon","lat")
-    names(data$effort)[which(names(data$effort) %in% paste0("start.", data$mesh.coords))] = c("start.lon","start.lat")
-    names(data$effort)[which(names(data$effort) %in% paste0("end.", data$mesh.coords))] = c("end.lon","end.lat")
+    names(data$effort)[match(data$mesh.coords, names(data$effort))] = c("lon","lat")
+    names(data$effort)[match(paste0("start.", data$mesh.coords), names(data$effort))] = c("start.lon","start.lat")
+    names(data$effort)[match(paste0("end.", data$mesh.coords), names(data$effort))] = c("end.lon","end.lat")
     data$mesh.coords = c("lon","lat")
   } else {
-    names(data$effort)[which(names(data$effort) %in% data$mesh.coords)] = c("x","y")
-    names(data$effort)[which(names(data$effort) %in% paste0("start.", data$mesh.coords))] = c("start.x","start.y")
-    names(data$effort)[which(names(data$effort) %in% paste0("end.", data$mesh.coords))] = c("end.y","end.y")
+    names(data$effort)[match(data$mesh.coords, names(data$effort))] = c("x","y")
+    names(data$effort)[match(paste0("start.", data$mesh.coords), names(data$effort))] = c("start.x","start.y")
+    names(data$effort)[match(paste0("end.", data$mesh.coords), names(data$effort))] = c("end.x","end.y")
     data$mesh.coords = c("x","y")
   }
   # Project mesh
