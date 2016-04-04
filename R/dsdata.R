@@ -2,7 +2,7 @@
 #' 
 #' For details on ho to construct such a data set see \link{make.dsdata}
 #' 
-#' Data sets included in iDistance (use data() to load them):
+#' Data sets included in iDistance:
 #' \itemize{
 #'  \item{\link{toy1}: }{A toy data set with a single transect line}
 #'  \item{\link{weeds}: }{Johnson et al. (2010) weeds data (line transect)}
@@ -15,18 +15,6 @@
 #' Data sets that can be imported from other packages
 #' \itemize{
 #'  \item{mexdolphin (dsm package):}{ Use \link{import.dsmdata} }
-#' }
-#' 
-#' Methods on dsdata are:
-#' 
-#' \itemize{
-#'  \item{\link{summary.dsdata}: }{ Print a brief summary }
-#'  \item{\link{plot.dsdata}: }{ Plot dsdata objects }
-#'  \item{\link{detdata}: }{ Extract detections }
-#'  \item{\link{segdata}: }{ Extract segments}
-#'  \item{\link{sanity}: }{ Check if the data set is defined properly}
-#'  \item{\link{statistics}: }{ Calculate and print some basic statistics regarding the data set }
-#'  \item{\link{remap}: }{ Map data to a different coordinate system}
 #' }
 #' 
 #' @name dsdata
@@ -148,7 +136,7 @@ make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords 
     mesh = do.call(make.mesh, c(list(dset), mesh.args))
   }
   dset$mesh = mesh
-    
+  
   #
   # Sanity check
   #
@@ -191,16 +179,16 @@ make.mesh = function(dset, ...) {
   if ( dset$geometry == "geo" ) {
     if ( length(mesh.args) == 0) {
       bnd = data.frame(rbind(c(x1.range[1],x2.range[1]),
-                      c(x1.range[1],x2.range[2]),
-                      c(x1.range[2],x2.range[1]),
-                      c(x1.range[2],x2.range[2])))
+                             c(x1.range[1],x2.range[2]),
+                             c(x1.range[2],x2.range[1]),
+                             c(x1.range[2],x2.range[2])))
       colnames(bnd) = dset$mesh.coords
       eloc = geo.to.euc(bnd, R=1)
       mesh = inla.mesh.create(loc = eloc,  extend=FALSE, refine = list(max.edge = min.range/360))
     } else {
       mesh = do.call(inla.mesh.create, mesh.args)
     }
-  # Default mesh for coordinates in the plane
+    # Default mesh for coordinates in the plane
   } else if (dset$geometry == "euc") {
     if ( length(mesh.args) == 0 ) {
       lattice = inla.mesh.lattice(x = seq(x1.range[1], x1.range[2], length.out = 2),
@@ -216,7 +204,7 @@ make.mesh = function(dset, ...) {
 
 #' Plot distance sampling data (\link{dsdata})
 #' 
-#' @aliases plot.dsdata plot
+#' @aliases plot.dsdata 
 #' @name plot.dsdata
 #' @export
 #' @param data A \link{dsdata} object
@@ -250,7 +238,7 @@ plot.dsdata = function(data,
                        add.mesh = TRUE,
                        col = NULL, 
                        asp = 1, ...){
-
+  
   # Defaults
   
   if ( !("lwd" %in% names(segment.args)) ) { segment.args$lwd = 0.8 }
@@ -284,13 +272,13 @@ plot.dsdata = function(data,
       
       # Plot segments
       if ( segment ) { gg = gg + do.call(gg.seg, c(list(data), segment.args)) }
-
+      
       # Plot detections
       if ( detection ) { gg = gg + do.call(gg.det, c(list(data), detection.args)) }
       
       # Set labels
       gg = gg + xlab(data$mesh.coords[1]) + ylab(data$mesh.coords[2]) + coord_fixed()
-
+      
       return(gg)
       
     } else {
@@ -308,7 +296,7 @@ plot.dsdata = function(data,
         ep = endpoint(as.segment(data),data)
         do.call(segments, c(list(sp[,1],sp[,2],ep[,1],ep[,2]), segment.args))
         
-  
+        
       }
       
       # Plot transect lines
@@ -317,9 +305,9 @@ plot.dsdata = function(data,
         epoint = endpoint(as.transect(data),data)
         do.call(segments, c(list(spoint[, data$mesh.coords[1]], spoint[, data$mesh.coords[2]], 
                                  epoint[, data$mesh.coords[1]], epoint[, data$mesh.coords[2]]), 
-                                 transect.args))
+                            transect.args))
       }
-    
+      
       # Plot detections
       if ( detection ) {
         do.call(points, c(list(detdata(data)[,data$mesh.coords]), detection.args) )
@@ -358,7 +346,7 @@ plot.dsdata = function(data,
       # Draw earth
       rgl.earth(R = R)
       rgl.viewpoint(0,-90)
-
+      
       # Draw detections
       if ( detection ) {
         detection.args = c(detection.args, list(size = 4*detection.args$cex))
@@ -387,30 +375,24 @@ plot.dsdata = function(data,
       if ( transect ) {
         do.call(plot, c(list(as.transect(data$effort), data = data, rgl = TRUE, add = TRUE, radius = R*(R.delta-0.001)), transect.args) )
       }
-                
+      
     }
   }
 }
 
 #' Change the coordinate system of \link{dsdata}
 #' 
-#' Maps a distance sampling data set to a new coordinate reference system using a proj.4 string. 
-#' 
-#' This function requires that the \link{dsdata} has \code{p4s} and \code{mesh.p4s} entries in order
-#' to identify the source reference system. The effort data (detections and segments) as well as the mesh
-#' are then mapped to new coordinate systems defined by the parameters \code{p4s} and \code{mesh.p4s}. 
-#' 
-#' For details on proj.4 see for instance https://en.wikipedia.org/wiki/PROJ.4
-#' 
-#' @aliases remap.dsdata remap
+#' @aliases remap.dsdata 
 #' @export
 #' @param dsdata Distance sampling data set
-#' @param p4s A proj4 string defining the target coordinate system for the effort data (detections and segments)
-#' @param mesh.p4s A proj4 string defining the target coordinate system for the mesh. By default uses p4s.
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = p4s){
-
+remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat"){
+  
+  # We need the proj4 strings for the effort and the mesh
+  if ( is.null(data$p4s) | is.null(data$mesh.p4s) ) { 
+    stop("Your data set has no p4s or mesh.p4s entry. These are required for remapping") 
+  }
   # rgdal is needed for the projection
   if ( !require("rgdal") ) { stop("This function requires the rgdal package")}
   
@@ -424,39 +406,31 @@ remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = p4s){
     return(df)
   }
   
-  if ("effort" %in% names(data) & !is.null(p4s)){
-    if ( is.null(data$p4s) ) {
-      stop("Your data set has no p4s entry, which is required for remapping the effort data.")
-    }
-    # Project detections
-    data$effort[,data$mesh.coords] = projFun(data$effort[,data$mesh.coords], data$p4s, p4s)
-    
-    # Project segment start end end points
-    data$effort[,paste0("start.", data$mesh.coords)] = projFun(data$effort[,paste0("start.", data$mesh.coords)], data$p4s, p4s)
-    data$effort[,paste0("end.", data$mesh.coords)] = projFun(data$effort[,paste0("end.", data$mesh.coords)], data$p4s, p4s)
-    
-    # If we are projecting to lon/lat change column names and mesh.coords entry
-    if (p4s == "+proj=longlat") {
-      names(data$effort)[which(names(data$effort) %in% data$mesh.coords)] = c("lon","lat")
-      names(data$effort)[which(names(data$effort) %in% paste0("start.", data$mesh.coords))] = c("start.lon","start.lat")
-      names(data$effort)[which(names(data$effort) %in% paste0("end.", data$mesh.coords))] = c("end.lon","end.lat")
-    }
-    # Set new proj4 string
-    data$p4s = p4s
+  # Project detections
+  data$effort[,data$mesh.coords] = projFun(data$effort[,data$mesh.coords], data$p4s, p4s)
+  
+  # Project segment start end end points
+  data$effort[,paste0("start.", data$mesh.coords)] = projFun(data$effort[,paste0("start.", data$mesh.coords)], data$p4s, p4s)
+  data$effort[,paste0("end.", data$mesh.coords)] = projFun(data$effort[,paste0("end.", data$mesh.coords)], data$p4s, p4s)
+  
+  # If we are projecting to lon/lat change column names and mesh.coords entry
+  if (p4s == "+proj=longlat") {
+    names(data$effort)[match(data$mesh.coords, names(data$effort))] = c("lon","lat")
+    names(data$effort)[match(paste0("start.", data$mesh.coords), names(data$effort))] = c("start.lon","start.lat")
+    names(data$effort)[match(paste0("end.", data$mesh.coords), names(data$effort))] = c("end.lon","end.lat")
+    data$mesh.coords = c("lon","lat")
+  } else {
+    names(data$effort)[match(data$mesh.coords, names(data$effort))] = c("x","y")
+    names(data$effort)[match(paste0("start.", data$mesh.coords), names(data$effort))] = c("start.x","start.y")
+    names(data$effort)[match(paste0("end.", data$mesh.coords), names(data$effort))] = c("end.x","end.y")
+    data$mesh.coords = c("x","y")
   }
-  if ("mesh" %in% names(data) &!is.null(mesh.p4s)){
-    # We need the proj4 strings for the effort and the mesh
-    if ( is.null(data$mesh.p4s) ) {
-      stop("Your data set has no mesh.p4s entry, which is required for remapping the mesh")
-    }
-    # Project mesh
-    data$mesh$loc[,c(1,2)] = as.matrix(projFun(as.data.frame(data$mesh$loc[,c(1,2)]), data$mesh.p4s, mesh.p4s))
-    # Set new proj4 string
-    data$mesh.p4s = p4s
-    if (mesh.p4s == "+proj=longlat") {
-      data$mesh.coords = c("lon","lat")
-    }
-  }
+  # Project mesh
+  data$mesh$loc[,c(1,2)] = as.matrix(projFun(as.data.frame(data$mesh$loc[,c(1,2)]), data$mesh.p4s, mesh.p4s))
+  
+  # Set new proj4 string
+  data$p4s = p4s
+  data$mesh.p4s = p4s
   
   # Return
   return(data)
@@ -466,7 +440,7 @@ remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = p4s){
 #' 
 #' Analyzes if a distance sampling data object is well defined. 
 #' 
-#' @aliases sanity.dsdata sanity
+#' @aliases sanity.dsdata 
 #' @export
 #' @param dsdata Distance sampling data set
 #' 
@@ -474,7 +448,7 @@ remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = p4s){
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 sanity.dsdata = function(dset){
-
+  
   # Error handlers
   sanity.stop = function(ret) { if (!ret$sane) { stop(ret$message) } else { cat(" [OK]\n") } }
   sanity.warning = function(ret) { if (!ret$sane) { warning(ret$message) } else { cat(" [OK]\n") } }
@@ -578,7 +552,7 @@ sanity.effort.inside = function(dset, message = FALSE){
 #' 
 #' Gives a brief summary of the data and calls the \link{statistics.dsdata} function to print some statistics.
 #' 
-#' @aliases summary.dsdata summary
+#' @aliases summary.dsdata 
 #' @export
 #' @param data A \link{dsdata} object
 #' @param ... arguments passed on to \link{statistics.dsdata}
@@ -594,7 +568,7 @@ summary.dsdata = function(data, ...){
   cat(paste0(" ",names(data$effort)), "\n")
   
   cat("#-------- statistics --------#\n")
-
+  
   statistics.dsdata(data, ...)
   
 }
@@ -603,7 +577,7 @@ summary.dsdata = function(data, ...){
 #' 
 #' A brief overview of important statistics like the area covered by the mesh and the number of observations
 #' 
-#' @aliases statistics.dsdata statistics
+#' @aliases statistics.dsdata 
 #' @name statistics.dsdata 
 #' @export
 #' @param dsdata A \link{dsdata} object
@@ -693,16 +667,6 @@ as.detection.dsdata = function(dsdata,...) {return(as.detection(dsdata$effort,..
 startpoint.dsdata = function(dsdata,obj,...) { return(startpoint(obj,dsdata,...))}
 endpoint.dsdata = function(dsdata,obj,...) { return(endpoint(obj,dsdata,...))}
 
-#' Extract detections from \link{dsdata}
-#' 
-#' Returns the rows of the effort table that define detections.
-#' 
-#' @aliases detdata.dsdata detdata
-#' @export
-#' @param dsdata A \link{dsdata} object
-#' @examples \dontrun{ data(toy1) ; detdata(toy1) }
-#' @return A data.frame of detections
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 detdata.dsdata = function(data,detection=NULL,...){ 
   if (is.null(detection)) {
@@ -713,19 +677,8 @@ detdata.dsdata = function(data,detection=NULL,...){
   }
 }
 
-#' Extract segments from \link{dsdata}
-#' 
-#' Returns the rows of the effort table that define segments.
-#' 
-#' @aliases segdata.dsdata segdata
-#' @export
-#' @param dsdata A \link{dsdata} object
-#' @examples \dontrun{ data(toy1) ; segdata(toy1) }
-#' @return A data.frame of segments
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-
 segdata.dsdata = function(data,...){ 
- return(data$effort[is.na(data$effort$det),])
+  return(data$effort[is.na(data$effort$det),])
 }
 
 
