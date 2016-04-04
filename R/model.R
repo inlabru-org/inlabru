@@ -476,6 +476,41 @@ sample.points.model = function(model, result = NULL, data = NULL,  property = "r
 }
 
 
+#' Estimate animal abundance
+#' 
+#'
+#' @aliases abundance.model abundance
+#' @export
+#' @param model An iDistance \link{model}
+#' @param result The result of an \link{inla} run or a sample obtained from \link{inla.posterior.sample.structured}
+#' @param n Number of samples used to calculate abundance
+
+abundance.model = function(model, data, result, n = 1, mask = NULL, property = "sample"){
+  if (is.null(mask)) {
+    loc = data.frame(data$mesh$loc)
+    colnames(loc) = data$mesh.coords
+    weights = diag(as.matrix(inla.mesh.fem(data$mesh)$c0))
+  } else if ( class(mask) == "inla.mesh") {
+    loc = data.frame(mask$loc)
+    colnames(loc) = data$mesh.coords
+    weights = diag(as.matrix(inla.mesh.fem(mask)$c0))
+  }
+  
+  rates = numeric()
+  
+  for (k in 1:n) {
+    rates[k] = sum( evaluate(model=model, inla.result = result, loc = loc, property = property, link = exp) * weights)
+  }
+  x = floor(range(rates)[1]):ceiling(range(rates)[2])
+  dens = matrix(ncol = n, nrow = length(x))
+  for (k in 1:n) {
+    dens[,k] = dpois(x, rates[k])
+  }
+  dens = apply(dens, MARGIN=1, sum)
+  return(data.frame(n = x, probability = dens ))
+}
+
+
 
 #####################################
 # MODELS: Point process
