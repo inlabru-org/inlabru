@@ -58,7 +58,7 @@ idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, id
     # Update model
     update.model(model, result)
     
-    if ( k > 1) {
+    if ( n > 1) {
       # Update stacks
       det.stack <- detection.stack(data, model = model)
       int.stack <- integration.stack(data, scheme = ips, model = model)
