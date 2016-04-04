@@ -330,6 +330,7 @@ update.model = function(model, result = NULL){
     hname = paste0(name,".history")
     if (!is.null(result)) {
       if ( name %in% rownames(result$summary.fixed) ) { 
+        assign(name, result$summary.fixed[name,"mode"], envir = iter)
         assign(hname, c(iter[[hname]], result$summary.fixed[name,"mode"]), envir = iter)
         }
       if ( name %in% names(result$summary.random) ) { 
