@@ -289,7 +289,8 @@ plot.spatial = function(model = NULL,
                         add.segment = FALSE,
                         logscale = TRUE,
                         rgl = FALSE,
-                        add = FALSE){
+                        add = FALSE,
+                        nx = 300){
   
 #  
 # (1) The mesh and vertex location
@@ -332,7 +333,6 @@ plot.spatial = function(model = NULL,
     xlim = range(mloc[,1])
     ylim = range(mloc[,2])
     aspect = diff(ylim)/diff(xlim)
-    nx = 300
     ny = round(nx * aspect)
     proj <- inla.mesh.projector(mesh, dims = c(nx,ny))
     x = seq(xlim[1], xlim[2], length.out = nx)
