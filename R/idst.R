@@ -28,13 +28,14 @@ idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, id
     int.stack <- integration.stack(data, scheme = ips, model = model)
     
     if ( !is.null(predict) ) {
-      if ( is.model(predict) ) {
-        loc = data$mesh$loc[,c(1,2)] ; colnames(loc) = data$mesh.coords
-        predict = list(data = data, model = predict, loc = loc, tag = "prediction")
+      if ("model" %in% names(predict)) { predict = list(predict) } # Old syntax
+      pstacks = list()
+      for (pr in predict) {
+        if ( !("data" %in% names(pr)) ) { pr$data = data }
+        if ( !("loc" %in% names(pr)) ) { pr$loc = data$mesh$loc[,c(1,2)] ; colnames(pr$loc) = data$mesh.coords }
+        pstacks = c(pstacks, list(do.call(prediction.stack, pr)))
       }
-      if ( !("data" %in% names(predict)) ) { predict$data = data }
-      pred.stack = do.call(prediction.stack,predict)
-      stk <- inla.stack(det.stack, int.stack, pred.stack)
+      stk <- do.call(inla.stack, c(list(det.stack, int.stack), pstacks))
     } else { 
       stk <- inla.stack(det.stack, int.stack)
     }
@@ -57,22 +58,25 @@ idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, id
     # Update model
     update.model(model, result)
     
-    if ( k > 1) {
+    if ( n > 1) {
       # Update stacks
       det.stack <- detection.stack(data, model = model)
       int.stack <- integration.stack(data, scheme = ips, model = model)
       
+
       if ( !is.null(predict) ) {
-        if ( is.model(predict) ) {
-          loc = data$mesh$loc[,c(1,2)] ; colnames(loc) = data$mesh.coords
-          predict = list(data = data, model = predict, loc = loc, tag = "prediction")
+        if ("model" %in% names(predict)) { predict = list(predict) } # Old syntax
+        pstacks = list()
+        for (pr in predict) {
+          if ( !("data" %in% names(pr)) ) { pr$data = data }
+          if ( !("loc" %in% names(pr)) ) { pr$loc = data$mesh$loc[,c(1,2)] ; colnames(pr$loc) = data$mesh.coords }
+          pstacks = c(pstacks, list(do.call(prediction.stack, pr)))
         }
-        if ( !("data" %in% names(predict)) ) { predict$data = data }
-        pred.stack = do.call(prediction.stack,predict)
-        stk <- inla.stack(det.stack, int.stack, pred.stack)
+        stk <- do.call(inla.stack, c(list(det.stack, int.stack), pstacks))
       } else { 
         stk <- inla.stack(det.stack, int.stack)
       }
+      
     }
   }
   result$stack = stk

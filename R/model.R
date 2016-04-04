@@ -330,6 +330,7 @@ update.model = function(model, result = NULL){
     hname = paste0(name,".history")
     if (!is.null(result)) {
       if ( name %in% rownames(result$summary.fixed) ) { 
+        assign(name, result$summary.fixed[name,"mode"], envir = iter)
         assign(hname, c(iter[[hname]], result$summary.fixed[name,"mode"]), envir = iter)
         }
       if ( name %in% names(result$summary.random) ) { 
@@ -375,30 +376,41 @@ iteration.history.model = function(model, effect){
 evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity) {
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
-  
+  if ( property == "sample") { smp = inla.posterior.sample.structured(inla.result, n = 1)[[1]] } 
   posts = list()
   
   for (k in 1:length(model$effects)){
     name = model$effects[k]
-    if (is.null(name)) { name =  names(model$mesh)[[k]] }
-    # Either fixed effect or hyper parameter
-    if (name %in% rownames(inla.result$summary.fixed)){
-      # Fixed effect
-      post = inla.result$summary.fixed[name, property] * cov[[name]]
-    } else if (paste0("Beta for ",name) %in% rownames(inla.result$summary.hyperpar)) {
-      # Hyper parameter
-      post = inla.result$summary.hyperpar[paste0("Beta for ",name), property] * cov[[name]]
-    } else {
-      post = inla.result$summary.random[[name]][,property]
-      if ( name %in% names(Amat) ){ # SPDE model
+    if ( property == "sample") {
+      if (name %in% names(model$mesh)) {
+        # SPDE model
         A = Amat[[name]]
-        # A workaround, needed for make.A called with group=1
-        if (length(post) == 2*dim(A)[2]) { post = post[1:dim(A)[2]]}
-        post = as.vector(A%*%as.vector(post))
-      } else { # other models
-        post = post[model$covariates[[name]](loc)]
+        post = as.vector(A%*%as.vector(smp[[name]]))
+      } else {
+        post = smp[[name]] * cov[[name]]
       }
-
+      
+    } else {
+      if (is.null(name)) { name =  names(model$mesh)[[k]] }
+      # Either fixed effect or hyper parameter
+      if (name %in% rownames(inla.result$summary.fixed)){
+        # Fixed effect
+        post = inla.result$summary.fixed[name, property] * cov[[name]]
+      } else if (paste0("Beta for ",name) %in% rownames(inla.result$summary.hyperpar)) {
+        # Hyper parameter
+        post = inla.result$summary.hyperpar[paste0("Beta for ",name), property] * cov[[name]]
+      } else {
+        post = inla.result$summary.random[[name]][,property]
+        if ( name %in% names(Amat) ){ # SPDE model
+          A = Amat[[name]]
+          # A workaround, needed for make.A called with group=1
+          if (length(post) == 2*dim(A)[2]) { post = post[1:dim(A)[2]]}
+          post = as.vector(A%*%as.vector(post))
+        } else { # other models
+          post = post[model$covariates[[name]](loc)]
+        }
+  
+      }
     }
     posts[[name]] = post
   }
@@ -462,6 +474,41 @@ sample.points.model = function(model, result = NULL, data = NULL,  property = "r
   pts = sample.lgcp(data$mesh, weights = weights, geometry = data$geometry)
   colnames(pts) = data$mesh.coords
   return(data.frame(pts))
+}
+
+
+#' Estimate animal abundance
+#' 
+#'
+#' @aliases abundance.model abundance
+#' @export
+#' @param model An iDistance \link{model}
+#' @param result The result of an \link{inla} run or a sample obtained from \link{inla.posterior.sample.structured}
+#' @param n Number of samples used to calculate abundance
+
+abundance.model = function(model, data, result, n = 1, mask = NULL, property = "sample"){
+  if (is.null(mask)) {
+    loc = data.frame(data$mesh$loc)
+    colnames(loc) = data$mesh.coords
+    weights = diag(as.matrix(inla.mesh.fem(data$mesh)$c0))
+  } else if ( class(mask) == "inla.mesh") {
+    loc = data.frame(mask$loc)
+    colnames(loc) = data$mesh.coords
+    weights = diag(as.matrix(inla.mesh.fem(mask)$c0))
+  }
+  
+  rates = numeric()
+  
+  for (k in 1:n) {
+    rates[k] = sum( evaluate(model=model, inla.result = result, loc = loc, property = property, link = exp) * weights)
+  }
+  x = floor(range(rates)[1]):ceiling(range(rates)[2])
+  dens = matrix(ncol = n, nrow = length(x))
+  for (k in 1:n) {
+    dens[,k] = dpois(x, rates[k])
+  }
+  dens = apply(dens, MARGIN=1, sum)
+  return(data.frame(n = x, probability = dens ))
 }
 
 

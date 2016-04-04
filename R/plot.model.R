@@ -247,7 +247,7 @@ plot.detfun = function(model = NULL,
 #' \code{model}, \code{result} and \code{data}. The model is then evaluated on the data set's mesh
 #' and using the \code{property} setting. The latter determins which property of the latent effects
 #' are used of each effect to be combined. 
-#' Options are: 'mode', 'mean', 'sd', '0.975quant', '0.025quant', 'kld'
+#' Options are: 'mode', 'mean', 'sd', '0.975quant', '0.025quant', 'kld'. Default is 'mean'.
 #' 
 #' The other paramters of this function mainly serve a purpose if one of the three main paramters
 #' is not set. The \code{result} object is not needed if the \code{col} parameter is provided as
@@ -279,7 +279,7 @@ plot.spatial = function(model = NULL,
                         result = NULL, 
                         data = NULL,
                         effect = NULL,
-                        property = "mode",
+                        property = "mean",
                         group = NULL,
                         mesh = NULL,
                         mask = NULL,
@@ -289,7 +289,8 @@ plot.spatial = function(model = NULL,
                         add.segment = FALSE,
                         logscale = TRUE,
                         rgl = FALSE,
-                        add = FALSE){
+                        add = FALSE,
+                        nx = 300){
   
 #  
 # (1) The mesh and vertex location
@@ -332,7 +333,6 @@ plot.spatial = function(model = NULL,
     xlim = range(mloc[,1])
     ylim = range(mloc[,2])
     aspect = diff(ylim)/diff(xlim)
-    nx = 300
     ny = round(nx * aspect)
     proj <- inla.mesh.projector(mesh, dims = c(nx,ny))
     x = seq(xlim[1], xlim[2], length.out = nx)
@@ -367,10 +367,13 @@ plot.spatial = function(model = NULL,
                              function(prp) { 
                                col = inla.mesh.project(proj, field = ires[, prp])
                                return(as.vector(col))}))
-    col = data.frame(col=col, property = merge(rep(1,nrow(ploc)), property)[,2])
+    col = data.frame(col = link(col), property = merge(rep(1,nrow(ploc)), property)[,2])
     ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
     df = data.frame(col, ploc)
+<<<<<<< HEAD
     df$col = link(df$col)
+=======
+>>>>>>> package
   }
   else if ( !is.null(model) ) {
     # We extract values from a model and INLA result

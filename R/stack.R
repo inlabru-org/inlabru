@@ -126,6 +126,7 @@ prediction.stack = function(data, model = NULL, loc = NULL, pts = NULL, tag = "p
     warning("pts is a deprecated parameter. Use loc instead. Setting loc=pts.")
     loc = pts
   }
+  pts = loc
   
   # Where to predict
   if (is.null(pts)) { 
