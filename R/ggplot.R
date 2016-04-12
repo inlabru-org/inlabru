@@ -211,7 +211,9 @@ gg.det = function(data, mapping = NULL, ...) {
 
 gg.swath = function(data, mapping = NULL, width = NULL, ...) {
   
-  if ( is.null(width) ) { stop("Please provide a width for the swaths.") }
+  if ( is.null(width) ) { 
+    width = segdata(data)$width
+    }
   
   # Make data frame
   sp = startpoint(as.segment(data),data)[,data$mesh.coords]
