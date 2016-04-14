@@ -78,6 +78,7 @@ plot.detfun = function(model = NULL,
                            add = FALSE,
                            add.uncertainty = TRUE,
                            add.histogram = TRUE,
+                           breaks = "sturges",
                            filter = NULL,
                            col = rgb(250/256, 83/256, 62/256, 1),
                            ucol = rgb(250/256, 83/256, 62/256, 0.3), 
@@ -142,8 +143,7 @@ plot.detfun = function(model = NULL,
       uy = 1
     } else {
       # Compute data histogram, replace values to plot by area normalized to 1
-      n.breaks = 10
-      breaks = seq(0,distance.truncation,length.out=n.breaks)
+      if (is.numeric(breaks) & length(breaks)==1) { breaks = seq(0, distance.truncation,length.out = breaks) }
       hst = hist(dets$distance,plot=FALSE, breaks = breaks)
       hst$density = hst$density/mean(hst$density) # normalized 
       uy = max(hst$density[1],max(dmean/mean(dmean)))
