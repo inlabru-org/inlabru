@@ -16,6 +16,13 @@ if ( strategy == "bounding-rectangle") {
     ## This code comes with no warranty or guarantee of any kind.
     ###########################################################################
     
+    ###########################################################################
+    ## Code was adapted to accommodate sampling from multiple fields in
+    ## one go. The fields have to be provided as rows in the weights arguments
+    ## Author: Fabian E. Bachl
+    ###########################################################################
+    
+  
     # Construct bounding rectangle
     loc <- mesh$loc
     xmin = min(loc[,1])
@@ -24,22 +31,27 @@ if ( strategy == "bounding-rectangle") {
     ymax = max(loc[,2])
     area =(xmax- xmin)*(ymax- ymin)
     
-    #Simulate number of points
-    lambda_max <- max(weights)
-    Npoints <- rpois(n=1,lambda=area*exp(lambda_max))
+    # If weights is a vector, turn it into a matrix
+    if ( !is.matrix(weights) ){ weights = matrix(weights, nrow = 1) }
     
-    #Simulate uniform points on the bounding rectangle
-    x <- runif(n=Npoints, min=xmin, max=xmax)
-    y <- runif(n=Npoints, min=ymin, max=ymax)
+    # Simulate number of points
+    n.fields = dim(weights)[1]
+    lambda_max <- apply(weights, MARGIN = 1, max)
+    Npoints <- sapply(1:n.fields, function(x) {rpois(1, lambda = area * exp(lambda_max[x]))})
     
+    # Simulate uniform points on the bounding rectangle
+    x <- runif(n = sum(Npoints), min=xmin, max=xmax)
+    y <- runif(n = sum(Npoints), min=ymin, max=ymax)
+    s <- rep(1:n.fields, Npoints) # Which field are these intended for
     points <-cbind(x,y)
     
-    #Do some thinning
+    # Do some thinning
     A <- inla.mesh.project(mesh,points)$A
-    weights =exp( weights-lambda_max)
-    pointValues = as.vector(A%*%weights)
-    keep = which(runif(Npoints) < pointValues)
-    
+    pweights = exp( weights - lambda_max)
+    pointValues = A %*% t(pweights)
+    # Extract value for each point depending on which field the point was created for
+    pointValues = pointValues[cbind(seq_along(s), s)]
+    keep = which(runif(sum(Npoints)) < pointValues)
     return(points[keep,])
 
 } else if ( strategy == "spherical" ) {
