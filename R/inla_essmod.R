@@ -201,22 +201,27 @@ plot.marginal.inla = function(result,varname="Intercept", link = function(x){x},
   if (varname %in% c(result$names.fixed, rownames(result$summary.hyperpar) )) {
     
     if (vars[varname,"type"] == "fixed"){
-      marg = result$marginals.fixed[[varname]]
+      marg = inla.tmarginal(link, result$marginals.fixed[[varname]])
     }
     else if (vars[varname,"type"] == "random"){
-      marg = result$marginals.random[[varname]]
+      marg = inla.tmarginal(link, result$marginals.random[[varname]])
     }
     else if (vars[varname,"type"] == "hyperpar"){
-      marg = result$marginals.hyperpar[[varname]]
+      marg = inla.tmarginal(link, result$marginals.hyperpar[[varname]])
     }
+    uq = inla.qmarginal(0.975, marg)
+    uqy = inla.dmarginal(uq, marg)
+    lq = inla.qmarginal(0.025, marg)
+    lqy = inla.dmarginal(lq, marg)
+    inner.x = seq(lq, uq, length.out = 100)
+    inner.marg = data.frame(x = inner.x, y = inla.dmarginal(inner.x, marg))
     if ( ggp ) {
       require( ggplot2 )
       df = data.frame(marg)
-      df$x = link(df$x)
       ggplot(data = df, aes(x=x,y=y)) + geom_path() + geom_ribbon(ymin = 0,aes(ymax = y), alpha = 0.1) +
-        geom_segment(x = link(vars[varname,"0.025quant"]), y = 0, xend = link(vars[varname,"0.025quant"]), yend = 0.5 * max(df$y),color = "red") +
-        geom_segment(x = link(vars[varname,"0.975quant"]), y = 0, xend = link(vars[varname,"0.975quant"]), yend = 0.5 * max(df$y),color = "red") +
-        geom_segment(x = link(vars[varname,"mode"]), y = 0, xend = link(vars[varname,"mode"]), yend = max(df$y),color = "blue") +
+        geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
+        geom_segment(x = uq, y = 0, xend = uq, yend = uqy) +
+        geom_ribbon(data = inner.marg, ymin = 0, aes(ymax = y), alpha = 0.1) +
         xlab(ovarname) + ylab("pdf")
     } else {
       if (!add) {

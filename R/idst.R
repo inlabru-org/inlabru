@@ -13,21 +13,24 @@
 #' @return A \link{inla} object
 
 
-idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, idst.verbose = FALSE, ...){
+idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, idst.verbose = FALSE, result = NULL, ...){
   
   model = join(model)
-  update.model(model, result = NULL) # This will initialize the history
+  # if ( init.history ) { update.model(model, result = NULL) } # This will initialize the history
   
   if ( is.null(ips) ) {
     if ( "ips" %in% names(data) ) { ips = data$ips }
     else { stop("Parameter 'ips' not provided and data set data has no field 'ips'" ) }
   }
   
+  k = 1
+  
   if ( is.null(stack) ) {
     det.stack <- detection.stack(data, model = model)
     int.stack <- integration.stack(data, scheme = ips, model = model)
     
-    if ( !is.null(predict) ) {
+    if ( !is.null(predict) & k == n ) {
+      cat("Preparing predictions\n")
       if ("model" %in% names(predict)) { predict = list(predict) } # Old syntax
       pstacks = list()
       for (pr in predict) {
@@ -43,28 +46,44 @@ idst = function(data, model, ips = NULL, stack = NULL, predict = NULL, n = 1, id
   }
 
   for ( k in 1:n ) {
+    iargs = list(...) # Arguments passed on to INLA
     
-    result <- tryCatch( inla(formula = model$formula, 
+    # When running multiple times propagate theta
+    if ( k>1 ) {
+      iargs[["control.mode"]] = list(restart = TRUE, theta = result$mode$theta)
+    }
+    
+    # Verbose
+    if ( idst.verbose ) { cat(paste0("Iteration: "),k, " ...") }
+    
+    # Return previous result if inla crashes, e.g. when connection to server is lost 
+    if ( k > 1 ) { old.result = result } 
+    
+    result <- tryCatch( do.call(inla, c(list(formula = model$formula, 
                      family = "poisson",
                      data = c(inla.stack.data(stk), list.data(model)),
                      control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
-                     E = inla.stack.data(stk)$e, ...), 
+                     E = inla.stack.data(stk)$e), iargs)), 
                    error = function(e) { 
                      if (k == 1) { stop(e) }
-                     else { stop(paste0("INLA crashed during iteration ",k,". It is likely that there is a convergence problem.")) }
+                     else { 
+                       cat(paste0("INLA crashed during iteration ",k,". It is likely that there is a convergence problem or the connection to the server was lost (if computing remotely)."))
+                       return(old.result)
+                       }
                      }
                    )
-    if ( idst.verbose ) { cat(".") }
+    if ( idst.verbose ) { cat("done.\n") }
     # Update model
     update.model(model, result)
     
-    if ( n > 1) {
+    if ( n > 1 & k < n) {
       # Update stacks
       det.stack <- detection.stack(data, model = model)
       int.stack <- integration.stack(data, scheme = ips, model = model)
       
 
-      if ( !is.null(predict) ) {
+      if ( !is.null(predict) & k == (n-1) ) {
+        cat("Preparing predictions\n")
         if ("model" %in% names(predict)) { predict = list(predict) } # Old syntax
         pstacks = list()
         for (pr in predict) {
