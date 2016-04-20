@@ -64,24 +64,25 @@ plot.halfnormal = function(...) { plot.detfun(...) }
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 plot.detfun = function(model = NULL,
-                           result = NULL,
-                           distance.truncation = NULL,
-                           data = NULL,  
-                           loc = NULL,
-                           prior = NULL,
-                           do.ecdf = FALSE,
-                           upper = NULL,
-                           mode = NULL,
-                           lower = NULL,
-                           integrate = FALSE,
-                           covariate = model$covariates[[name]],
-                           add = FALSE,
-                           add.uncertainty = TRUE,
-                           add.histogram = TRUE,
-                           filter = NULL,
-                           col = rgb(250/256, 83/256, 62/256, 1),
-                           ucol = rgb(250/256, 83/256, 62/256, 0.3), 
-                           ggp = TRUE,...) {
+                       result = NULL,
+                       distance.truncation = NULL,
+                       data = NULL,  
+                       loc = NULL,
+                       prior = NULL,
+                       do.ecdf = FALSE,
+                       upper = NULL,
+                       mode = NULL,
+                       lower = NULL,
+                       integrate = FALSE,
+                       covariate = model$covariates[[name]],
+                       add = FALSE,
+                       add.uncertainty = TRUE,
+                       add.histogram = TRUE,
+                       breaks = "sturges",
+                       filter = NULL,
+                       col = rgb(250/256, 83/256, 62/256, 1),
+                       ucol = rgb(250/256, 83/256, 62/256, 0.3), 
+                       ggp = TRUE,...) {
   
   if ( is.null(distance.truncation) ) {
     if ( is.null(data) & is.null (loc) ) {
@@ -91,14 +92,14 @@ plot.detfun = function(model = NULL,
       if (! is.null(data) ) (distance.truncation = max(detdata(data)$distance))
     }
   }
-
+  
   if (is.null(loc)) { 
     x = data.frame(distance = seq(0, distance.truncation, length.out = 2000)) 
-
+    
   }
   else { 
     x = loc 
-
+    
   }
   
   if ( is.null(upper) ) { upper = evaluate.model(model = model, inla.result = result, loc = x, property = "0.975quant", link = exp) }
@@ -142,8 +143,7 @@ plot.detfun = function(model = NULL,
       uy = 1
     } else {
       # Compute data histogram, replace values to plot by area normalized to 1
-      n.breaks = 10
-      breaks = seq(0,distance.truncation,length.out=n.breaks)
+      if (is.numeric(breaks) & length(breaks)==1) { breaks = seq(0, distance.truncation,length.out = breaks) }
       hst = hist(dets$distance,plot=FALSE, breaks = breaks)
       hst$density = hst$density/mean(hst$density) # normalized 
       uy = max(hst$density[1],max(dmean/mean(dmean)))
@@ -213,11 +213,11 @@ plot.detfun = function(model = NULL,
       gg = gg + geom_ribbon(aes(x=distance, ymax=upper, ymin=lower), fill = ucol, alpha = 0.2) + 
         geom_path(colour = col, size = 1) +
         ylab("detection probability")
-    
+      
       return(gg)
     }
     
-
+    
   } else {
     if (add) {
       lines(x$distance,y.plot, lwd = 3, col = col)
@@ -292,17 +292,17 @@ plot.spatial = function(model = NULL,
                         add = FALSE,
                         nx = 300){
   
-#  
-# (1) The mesh and vertex location
-#
-
+  #  
+  # (1) The mesh and vertex location
+  #
+  
   if ( is.null(mesh) ) {
     # If no mesh is provided we first check if data is provided. If so, use the data mesh
     if ( !is.null(data) ) { 
       mesh = data$mesh
       mloc = mesh$loc[,1:length(data$mesh.coords)]
       colnames(mloc) = data$mesh.coords
-      }
+    }
     else {
       # No mesh and no data set provided. Check if the model has a mesh. If so, use the first mesh we find.
       if ( is.null(model) ) { stop("Your provided no mesh, no data set with a mesh and not model to take a mesh from") }
@@ -323,10 +323,10 @@ plot.spatial = function(model = NULL,
     colnames(mloc) = c("x","y","z")[1:mdim]
   }
   coords = colnames(mloc)
-
-#
-# (2) Projection locations
-#
+  
+  #
+  # (2) Projection locations
+  #
   
   if ( rgl ) { ploc = mloc }
   else {
@@ -343,9 +343,9 @@ plot.spatial = function(model = NULL,
   }
   if ( !is.null(group) ) { loc = merge(ploc, group) }
   
-#
-# (3) Values at the mesh location 
-#
+  #
+  # (3) Values at the mesh location 
+  #
   if ( logscale ) { link = function(x){x} } else { link = exp }
   
   if ( !is.null(col) ) {
@@ -364,109 +364,105 @@ plot.spatial = function(model = NULL,
       ires = result$summary.fitted.values[inla.stack.index(result$stack, effect)$data, ]
     }
     col = do.call(c,lapply(property, 
-                             function(prp) { 
-                               col = inla.mesh.project(proj, field = ires[, prp])
-                               return(as.vector(col))}))
+                           function(prp) { 
+                             col = inla.mesh.project(proj, field = ires[, prp])
+                             return(as.vector(col))}))
     col = data.frame(col = link(col), property = merge(rep(1,nrow(ploc)), property)[,2])
     ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
     df = data.frame(col, ploc)
-<<<<<<< HEAD
-    df$col = link(df$col)
-=======
->>>>>>> package
   }
   else if ( !is.null(model) ) {
     # We extract values from a model and INLA result
     if ( is.null(result) ) { stop("You are trying to plot a model without providing an INLA result.") }
     if ( !is.null(group) ){ ploc = merge(ploc, group) }
     col = do.call(c,lapply(property, 
-                         function(prp) { 
-                           col = evaluate.model(model, inla.result = result, loc = ploc, do.sum = TRUE, property = prp) 
-                           return(as.vector(col))}))
+                           function(prp) { 
+                             col = evaluate.model(model, inla.result = result, loc = ploc, do.sum = TRUE, property = prp) 
+                             return(as.vector(col))}))
     col = data.frame(col = link(col), property = merge(rep(1,nrow(ploc)), property)[,2])
     ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
     df = data.frame(col, ploc)
   }
   else { stop("Not sure what to plot.") }
-
-#
-# (4) Select a region to plot and create alpha channel
-#
-    df$col[!is.inside(mesh, ploc, colnames(ploc))] = NA
-    df = cbind(df, alpha = is.inside(mesh, ploc, colnames(ploc)))
-    
-    if ( class(mask) == "inla.mesh.segment" ) {
-      mask.mesh = inla.mesh.create(loc = mesh$loc, boundary = list(mask))
-      df$col[!is.inside(mask.mesh, ploc, colnames(ploc))] = NA
-      df$alpha = df$alpha & is.inside(mask.mesh, ploc, colnames(ploc))
-    } else if ( class(mask) == "SpatialPolygonsDataFrame" ) {
-      msk = is.na(sp::over(SpatialPoints(ploc), mask , fn = NULL)[,1])
-      df$col[msk] = NA
-      df$alpha = df$alpha & msk
-    } else if ( is.data.frame(mask) ){
-      if ( !require(sp) ) { "You provided a data.frame as mask. The package sp is required to interpret it as a polygon."}
-      msk = point.in.polygon(ploc[,1], ploc[,2], mask[,1], mask[,2]) == 1
-      df$col[!msk] = NA
-      df$alpha = df$alpha & msk
-    }
-    
-#
-# (5) Create the plot using either rgl or ggplot2
-#
-    
-if ( !rgl ){ 
-  # Use ggplot2
-  if ( !requireNamespace("ggplot2", quietly = TRUE) ) { stop("This function requires the ggplot2 package")}
   
-  gg = ggplot(df, aes_string(x = coords[1], y = coords[2]) )
-  gg = gg + geom_raster(aes_string(fill = "col", alpha = "alpha"), interpolate = TRUE)
-  gg = gg + scale_alpha_discrete(guide = 'none')
-  gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) 
-  gg = gg + theme(legend.title = element_blank()) + coord_fixed()
-
-  # Facet properties
-  if (length(property)>1) { gg = gg + facet_grid(. ~ property) }
+  #
+  # (4) Select a region to plot and create alpha channel
+  #
+  df$col[!is.inside(mesh, ploc, colnames(ploc))] = NA
+  df = cbind(df, alpha = is.inside(mesh, ploc, colnames(ploc)))
   
-  # If the data is grouped, use ggplot facets
-  if ( !is.null(group) ) { gg = gg + facet_grid(as.formula(paste0(". ~ ", colnames(group)[1]))) }
-  
-  # Plot the mesh
-  if ( add.mesh ) { gg = gg + gg.mesh(mesh) }
-  
-  return(gg)
-  
-} else {
-  # Use rgl to plot
-  col = df$col
-  if ( !requireNamespace("rgl", quietly = TRUE) ) { stop("This function requires the rgl package. Install rgl or set rgl=FALSE.")}
-  
-  if (data$geometry == "geo"){
-    
-    # Plot sphere
-    if (!add){ rgl.open() }
-    bg3d(color = "white")
-    rgl.earth()
-    
-    # # Plot detections and integration points
-    # if ( add.detections ) { rgl.sphpoints(long = det.points$lon+360, lat = det.points$lat, radius = 1.01*R, col="red", size = 5) }
-    # if ( add.points ) { rgl.sphpoints(long = add.points$lon+360, lat = add.points$lat, radius=1.01*R, col = rgb(0,0,1), size = 3) }
-    # 
-    # Plot colorbar (This is a temporary workaround, rgl people are working on something like this)
-    if ( TRUE ){
-      cb.col = cm.colors(100)
-      rgl.linestrips(x=-0.85,y=0.85,z=seq(-1,1,length.out=length(cb.col)),col=cb.col,lwd=50)
-      rgl.texts(x=-0.79,y=0.79,z=c(-0.97,0.97),c(format(min(col),digits=3),format(max(col),digits=3)),col="black",cex=1)
-    }
-    rgl.pop()
-    rgl.sphmesh(mesh, add=TRUE, radius=1.001, col = col)
-    
+  if ( class(mask) == "inla.mesh.segment" ) {
+    mask.mesh = inla.mesh.create(loc = mesh$loc, boundary = list(mask))
+    df$col[!is.inside(mask.mesh, ploc, colnames(ploc))] = NA
+    df$alpha = df$alpha & is.inside(mask.mesh, ploc, colnames(ploc))
+  } else if ( class(mask) == "SpatialPolygonsDataFrame" ) {
+    msk = is.na(sp::over(SpatialPoints(ploc), mask , fn = NULL)[,1])
+    df$col[msk] = NA
+    df$alpha = df$alpha & msk
+  } else if ( is.data.frame(mask) ){
+    if ( !require(sp) ) { "You provided a data.frame as mask. The package sp is required to interpret it as a polygon."}
+    msk = point.in.polygon(ploc[,1], ploc[,2], mask[,1], mask[,2]) == 1
+    df$col[!msk] = NA
+    df$alpha = df$alpha & msk
   }
-  else {
-    plot(mesh, rgl = rgl, col = col,...)
-    if ( add.detections ) { rgl.points(x = det.points$x, y = det.points$y, z =0.02, col = rgb(1,0,0), size=8) }
-    if ( int.points ) { rgl.points(x = add.points$x, y = add.points$y, z = 0.01, col = rgb(0,0,0.6), size=4) }
+  
+  #
+  # (5) Create the plot using either rgl or ggplot2
+  #
+  
+  if ( !rgl ){ 
+    # Use ggplot2
+    if ( !requireNamespace("ggplot2", quietly = TRUE) ) { stop("This function requires the ggplot2 package")}
+    
+    gg = ggplot(df, aes_string(x = coords[1], y = coords[2]) )
+    gg = gg + geom_raster(aes_string(fill = "col", alpha = "alpha"), interpolate = TRUE)
+    gg = gg + scale_alpha_discrete(guide = 'none')
+    gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) 
+    gg = gg + theme(legend.title = element_blank()) + coord_fixed()
+    
+    # Facet properties
+    if (length(property)>1) { gg = gg + facet_grid(. ~ property) }
+    
+    # If the data is grouped, use ggplot facets
+    if ( !is.null(group) ) { gg = gg + facet_grid(as.formula(paste0(". ~ ", colnames(group)[1]))) }
+    
+    # Plot the mesh
+    if ( add.mesh ) { gg = gg + gg.mesh(mesh) }
+    
+    return(gg)
+    
+  } else {
+    # Use rgl to plot
+    col = df$col
+    if ( !requireNamespace("rgl", quietly = TRUE) ) { stop("This function requires the rgl package. Install rgl or set rgl=FALSE.")}
+    
+    if (data$geometry == "geo"){
+      
+      # Plot sphere
+      if (!add){ rgl.open() }
+      bg3d(color = "white")
+      rgl.earth()
+      
+      # # Plot detections and integration points
+      # if ( add.detections ) { rgl.sphpoints(long = det.points$lon+360, lat = det.points$lat, radius = 1.01*R, col="red", size = 5) }
+      # if ( add.points ) { rgl.sphpoints(long = add.points$lon+360, lat = add.points$lat, radius=1.01*R, col = rgb(0,0,1), size = 3) }
+      # 
+      # Plot colorbar (This is a temporary workaround, rgl people are working on something like this)
+      if ( TRUE ){
+        cb.col = cm.colors(100)
+        rgl.linestrips(x=-0.85,y=0.85,z=seq(-1,1,length.out=length(cb.col)),col=cb.col,lwd=50)
+        rgl.texts(x=-0.79,y=0.79,z=c(-0.97,0.97),c(format(min(col),digits=3),format(max(col),digits=3)),col="black",cex=1)
+      }
+      rgl.pop()
+      rgl.sphmesh(mesh, add=TRUE, radius=1.001, col = col)
+      
+    }
+    else {
+      plot(mesh, rgl = rgl, col = col,...)
+      if ( add.detections ) { rgl.points(x = det.points$x, y = det.points$y, z =0.02, col = rgb(1,0,0), size=8) }
+      if ( int.points ) { rgl.points(x = add.points$x, y = add.points$y, z = 0.01, col = rgb(0,0,0.6), size=4) }
+    }
   }
-}
   
 }
 
