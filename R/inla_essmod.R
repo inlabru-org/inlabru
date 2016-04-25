@@ -23,11 +23,13 @@ inla.posterior.sample.structured = function(result,n){
 
     # Extract simulated latent variables. If the model is "clinear", however, extract the realisations
     # from the hyperpar field.
-    for (k in 1:length(result$summary.random)) {
-      name = unlist(names(result$summary.random[k]))
-      model = result$model.random[k]
-      if (!(model=="Constrained linear")) { vals[[name]] = extract.entries(name,smpl.latent) }
-      else { vals[[name]] = smpl.hyperpar[paste0(paste0("Beta_intern for ",name)," -- in user scale")] }
+    if (length(result$summary.random) > 0) {
+      for (k in 1:length(result$summary.random)) {
+        name = unlist(names(result$summary.random[k]))
+        model = result$model.random[k]
+        if (!(model=="Constrained linear")) { vals[[name]] = extract.entries(name,smpl.latent) }
+        else { vals[[name]] = smpl.hyperpar[paste0(paste0("Beta_intern for ",name)," -- in user scale")] }
+      }
     }
     ssmpl[[i]] = c(vals, list(hyper=smpl.hyperpar))
   }
