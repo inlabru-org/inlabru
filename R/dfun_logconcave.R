@@ -161,16 +161,20 @@ return (ret)
 
 
 dfun_logconcave.basis.value = function(d,nSeg,truncation){
-  pts = seq(0,truncation,length.out=nSeg+1) # segment boundary points
-  wdh = pts[2]-pts[1] # segment width
+  if ( length(nSeg) == 1) {
+    pts = seq(0,truncation,length.out=nSeg+1) # segment boundary points
+  } else {
+    pts = nSeg # arbitrary intervals
+    nSeg = length(nSeg)-1
+  }
+  # wdh = pts[2]-pts[1] # segment width
+  wdh = diff(pts)
   lidx = findInterval(d,pts) # for each data point the index of left segment boundary
   offs = d-pts[lidx] # local offsets: (x-x_i) for data point x and left boundary neighbor
   w = list()
   for (j in 1:nSeg) { 
-    w[[paste("basis_",j,sep="")]] =  (pmax(0,lidx-j-1)*2*wdh*wdh + (j<lidx)*(2*wdh)*(offs) + (j<lidx)*(wdh^2) + (j==lidx)*offs^2)
-    #w[[paste("basis_",j,sep="")]] = w[[paste("basis_",j,sep="")]]/max(w[[paste("basis_",j,sep="")]])
-    #mx = (pmax(0,nSeg-j-1)*2*wdh*wdh + (j<nSeg)*(2*wdh)*(wdh) + (j<nSeg)*(wdh^2) + (j==nSeg)*wdh^2)
-    #w[[paste("basis_",j,sep="")]] =  w[[paste("basis_",j,sep="")]]/mx
+    w[[paste("basis_",j,sep="")]] =  (pmax(0,lidx-j-1)*2*wdh[j]*wdh[j] + (j<lidx)*(2*wdh[j])*(offs) + (j<lidx)*(wdh[j]^2) + (j==lidx)*offs^2)
+    # w[[paste("basis_",j,sep="")]] =  (pmax(0,lidx-j-1)*2*wdh*wdh + (j<lidx)*(2*wdh)*(offs) + (j<lidx)*(wdh^2) + (j==lidx)*offs^2)
   } 
   return(w)
 }

@@ -41,7 +41,8 @@ detection.stack = function(data,
   y.pp = eval.if.function(y, pts)
   
   # Expectation parameter E
-  e.pp = rep(E, nrow(pts))
+  if ( !(length(E) == nrow(pts)) ) { e.pp = rep(E, nrow(pts)) } else { e.pp = E }
+  
   
   # Create and return stack
   return(inla.stack(data = list(y.inla = y.pp, e = e.pp),

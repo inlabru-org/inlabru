@@ -826,7 +826,12 @@ model.exponential = function(colname = "distance", truncation = NULL,  constrain
 model.logconcave = function(colname = "distance", truncation = NULL, segments = 5, constrained = TRUE, linbasis = TRUE, quadbasis = TRUE, ...){
   
   # Formula
-  nSeg = segments
+  if (length(segments) == 1) {
+    nSeg = segments
+  } else {
+    nSeg = length(segments)-1
+  }
+  
   if (constrained) {
     params = ",model = 'clinear',hyper=list(theta=list(prior=loggamma)),range = c(-10,0)" # 
     if (linbasis){
@@ -868,10 +873,14 @@ model.logconcave = function(colname = "distance", truncation = NULL, segments = 
   if (linbasis) { covariates = c(covariates, list(linbasis = function(x) { return(x[,colname]) }) ) }
   for ( k in 1:nSeg ) {
     covariates[[paste0("basis_",k)]] = function(x) { 
-      return( data.frame(dfun_logconcave.basis.value(x[,colname],nSeg,truncation))[,paste0("basis_",k)] )
+      return( data.frame(dfun_logconcave.basis.value(d = x[,colname], nSeg = segments, truncation = truncation))[,paste0("basis_",k)] )
     }
     environment(covariates[[paste0("basis_",k)]]) = new.env(parent=environment())
     environment(covariates[[paste0("basis_",k)]])$k = k
+    environment(covariates[[paste0("basis_",k)]])$colname = colname
+    environment(covariates[[paste0("basis_",k)]])$truncation = truncation
+    environment(covariates[[paste0("basis_",k)]])$segments = segments
+    environment(covariates[[paste0("basis_",k)]])$nSeg = nSeg
   }
   
   effects = paste0("basis_", 1:nSeg)
@@ -1020,6 +1029,93 @@ model.normal = function(data, effect, covariate, iterator = new.env(), ...) {
   return(ret)
 }
 
+
+#' Spatial log group size distribution with scaling
+#'
+#' @aliases model.loggroupsize
+#' @export
+#' @param data A \link{dsdata} object
+#' @param iterator An environment to store the current state of the approximation
+#' @param ... Arguments passed on to inla.spde2.matern. If none, the defaults are alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01
+
+model.loggroupsize = function(data, effect, covariate, iterator = new.env(), ...) {
+  
+  mesh = data$mesh
+  tau.name = paste0(effect,".tau")
+  assign(effect, rep(mean(covariate(detdata(data))),data$mesh$n), envir = iterator)
+  assign(tau.name, 1/sd(covariate(detdata(data))), envir = iterator)
+  
+  vargs = list(...)
+  if ( length(vargs) == 0 ){ 
+    gs.mdl.args = list(alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01) }
+  else { 
+    gs.mdl.args = vargs 
+  }
+  
+  gs.mdl = do.call(inla.spde2.matern, c(list(mesh=mesh), gs.mdl.args))
+  gs.mdl$n.group = 1
+  formula = as.formula(paste0("~ . + f(", effect, ", model = gs.mdl) +", tau.name))
+  
+  # loglik = function(loc) { -0.5*exp(tau)*(covariate(loc) - as.numeric(inla.spde.make.A(mesh, as.matrix(loc[, data$mesh.coords])) %*% mode))^2 + 0.5*tau - log(sqrt(2*pi))}
+  loglik = eval(parse(text=paste0("function(loc) { -0.5*exp(",tau.name,")*(covariate(loc) - 
+                                  as.numeric(inla.spde.make.A(mesh, as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))^2 -
+                                  as.numeric(inla.spde.make.A(mesh, as.matrix(loc[, data$mesh.coords])) %*% ",effect,") -
+                                  0.5 * exp(-",tau.name,") +
+                                  0.5*",tau.name," - log(sqrt(2*pi))}")))
+  environment(loglik) = new.env(parent = iterator)
+  assign("covariate", covariate, envir = environment(loglik))
+  assign("mesh", mesh, envir = environment(loglik))
+  assign("data", data, envir = environment(loglik))
+  
+  # d.tau = function(loc) {-0.5*exp(tau)*(covariate(loc) - as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% mode))^2 + 0.5 }
+  d.tau = eval(parse(text=paste0("function(loc) {-0.5*exp(",tau.name,")*(covariate(loc) - 
+                                 as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))^2 + 0.5 + 0.5 * exp(-",tau.name,")}")))
+  environment(d.tau) = new.env(parent = iterator)
+  assign("covariate", covariate, envir = environment(d.tau))
+  assign("mesh", mesh, envir = environment(d.tau))
+  assign("data", data, envir = environment(d.tau))
+  
+  # d.grps = function(loc) { exp(tau)*(covariate(loc) - as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% mode)) }
+  d.grps = eval(parse(text=paste0("function(loc) { exp(",tau.name,")*(covariate(loc) - 
+                                  as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,")) - 1 }")))
+  
+  environment(d.grps) = new.env(parent = iterator)
+  assign("covariate", covariate, envir = environment(d.grps))
+  assign("mesh", mesh, envir = environment(d.grps))
+  assign("data", data, envir = environment(d.grps))
+  
+  covariates = list()
+  covariates[[effect]] = d.grps
+  covariates[[paste0(effect,".tau")]] = d.tau  
+  
+  # const = function(loc) { loglik(loc) - d.tau(loc)*tau -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% mode))}
+  const = eval(parse(text=paste0("function(loc) { loglik(loc) - 
+          d.tau(loc)*",tau.name," -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))}")))
+  
+  environment(const) = new.env(parent = iterator)
+  assign("loglik", loglik, envir = environment(const))
+  assign("d.tau", d.tau, envir = environment(const))
+  assign("d.grps", d.grps, envir = environment(const))
+  assign("mesh", mesh, envir = environment(const))
+  assign("data", data, envir = environment(const))
+  
+  mklist = function(name, value) {ll=list(); ll[[name]]=value; return(ll)} 
+  
+  ret = make.model(name = "First order Taylor approximation of a spatial normal model",
+                   formula = formula,
+                   effects = c(effect, tau.name),
+                   covariates = covariates,
+                   mesh = mklist(effect, mesh),
+                   inla.spde = mklist(effect, gs.mdl),
+                   mesh.coords = mklist(effect, data$mesh.coords),
+                   time.coords = mklist(effect, data$time.coords),
+                   eval = eval, 
+                   iterator = c(mklist(effect, iterator), mklist(tau.name, iterator))
+  )
+  
+  ret$const = const
+  return(ret)
+  }
 
 
 #####################################

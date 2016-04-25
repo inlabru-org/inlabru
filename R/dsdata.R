@@ -399,11 +399,13 @@ remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat")
   # Our projection function
   projFun = function(df, from.p4s, to.p4s) {
     class(df) = "data.frame"
+    ndims = ncol(df)
+    if ( ndims == 2 ) { df[,3] = 0 }
     msk = is.finite(df[,1]) & is.finite(df[,2])
     spts <-SpatialPoints(df[msk,], proj4string = CRS(from.p4s))
     geo.pts <-spTransform(spts, CRS(to.p4s))
     df[msk,] = as.data.frame(geo.pts)
-    return(df)
+    return(df[,1:ndims])
   }
   
   # Project detections
@@ -426,11 +428,13 @@ remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat")
     data$mesh.coords = c("x","y")
   }
   # Project mesh
-  data$mesh$loc[,c(1,2)] = as.matrix(projFun(as.data.frame(data$mesh$loc[,c(1,2)]), data$mesh.p4s, mesh.p4s))
+  data$mesh$loc = as.matrix(projFun(as.data.frame(data$mesh$loc), data$mesh.p4s, mesh.p4s))
+  if ( length(grep("geocent", mesh.p4s))>0 ) { data$mesh$manifold = "S2" } else { data$mesh$manifold = "R2" }
+  
   
   # Set new proj4 string
   data$p4s = p4s
-  data$mesh.p4s = p4s
+  data$mesh.p4s = mesh.p4s
   
   # Return
   return(data)
