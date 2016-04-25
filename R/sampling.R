@@ -52,7 +52,9 @@ if ( strategy == "bounding-rectangle") {
     # Extract value for each point depending on which field the point was created for
     pointValues = pointValues[cbind(seq_along(s), s)]
     keep = which(runif(sum(Npoints)) < pointValues)
-    return(points[keep,])
+    ret = points[keep,]
+    attr(ret, "field") = s[keep]
+    return(ret)
 
 } else if ( strategy == "spherical" ) {
   # Simulate number of points
