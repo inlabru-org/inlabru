@@ -29,7 +29,7 @@ inla.posterior.sample.structured = function(result,n){
       if (!(model=="Constrained linear")) { vals[[name]] = extract.entries(name,smpl.latent) }
       else { vals[[name]] = smpl.hyperpar[paste0(paste0("Beta_intern for ",name)," -- in user scale")] }
     }
-    ssmpl[[i]] = vals
+    ssmpl[[i]] = c(vals, list(hyper=smpl.hyperpar))
   }
 
 #
