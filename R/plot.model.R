@@ -350,7 +350,6 @@ plot.spatial = function(model = NULL,
   
   if ( !is.null(col) ) {
     if ( is.data.frame(col) ) {
-      # property = colnames(col)
       col = do.call(c,lapply(property, 
                              function(prp) { 
                                col = inla.mesh.project(proj, field = col[, prp])
