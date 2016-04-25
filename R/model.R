@@ -825,7 +825,12 @@ model.exponential = function(colname = "distance", truncation = NULL,  constrain
 model.logconcave = function(colname = "distance", truncation = NULL, segments = 5, constrained = TRUE, linbasis = TRUE, quadbasis = TRUE, ...){
   
   # Formula
-  nSeg = segments
+  if (length(segments) == 1) {
+    nSeg = segments
+  } else {
+    nSeg = length(segments)-1
+  }
+  
   if (constrained) {
     params = ",model = 'clinear',hyper=list(theta=list(prior=loggamma)),range = c(-10,0)" # 
     if (linbasis){
@@ -867,10 +872,14 @@ model.logconcave = function(colname = "distance", truncation = NULL, segments = 
   if (linbasis) { covariates = c(covariates, list(linbasis = function(x) { return(x[,colname]) }) ) }
   for ( k in 1:nSeg ) {
     covariates[[paste0("basis_",k)]] = function(x) { 
-      return( data.frame(dfun_logconcave.basis.value(x[,colname],nSeg,truncation))[,paste0("basis_",k)] )
+      return( data.frame(dfun_logconcave.basis.value(d = x[,colname], nSeg = segments, truncation = truncation))[,paste0("basis_",k)] )
     }
     environment(covariates[[paste0("basis_",k)]]) = new.env(parent=environment())
     environment(covariates[[paste0("basis_",k)]])$k = k
+    environment(covariates[[paste0("basis_",k)]])$colname = colname
+    environment(covariates[[paste0("basis_",k)]])$truncation = truncation
+    environment(covariates[[paste0("basis_",k)]])$segments = segments
+    environment(covariates[[paste0("basis_",k)]])$nSeg = nSeg
   }
   
   effects = paste0("basis_", 1:nSeg)
