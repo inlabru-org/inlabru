@@ -349,8 +349,19 @@ plot.spatial = function(model = NULL,
   if ( logscale ) { link = function(x){x} } else { link = exp }
   
   if ( !is.null(col) ) {
-    col = as.vector((inla.mesh.project(proj, field = col)))
-    df = data.frame(col = link(col), ploc)
+    if ( is.data.frame(col) ) {
+      # property = colnames(col)
+      col = do.call(c,lapply(property, 
+                             function(prp) { 
+                               col = inla.mesh.project(proj, field = col[, prp])
+                               return(as.vector(col))}))
+      col = data.frame(col = link(col), property = merge(rep(1,nrow(ploc)), property)[,2])
+      ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
+      df = data.frame(col, ploc)
+    } else {
+      col = as.vector((inla.mesh.project(proj, field = col)))
+      df = data.frame(col = link(col), ploc)
+    }
   }
   else if ( !is.null(effect) ) {
     # We extract values from a tagged INLA result OR directly from a random effect
