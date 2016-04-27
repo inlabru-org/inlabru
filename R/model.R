@@ -672,6 +672,7 @@ model.detfun = function(type, ...) {
   else if (type == "hazard") { return(model.hazard(...))}
   else if (type == "exponential") { return(model.exponential(...))}
   else if (type == "logconcave") { return(model.logconcave(...))}
+  else if (type == "smooth") { return(model.smoothdf(...))}
   else { stop(paste0("Unknown detection function type: ", type)) }
 }
 
