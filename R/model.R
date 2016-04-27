@@ -961,9 +961,9 @@ model.exponential2d = function(colname = c("distance","lgrpsize"), truncation = 
 #' @param effect Character defining the internal INLA effect name
 #' 
 
-model.smoothdf = function(dset, knots = seq(0, 6, by=1), effect = "smoothdf") {
+model.smoothdf = function(dset, knots = seq(0, 6, by=1), degree = 2, effect = "smoothdf") {
   covariate = NULL
-  mesh <- inla.mesh.1d(knots, degree=1, boundary=c("neumann", "free"))
+  mesh <- inla.mesh.1d(knots, degree = degree, boundary=c("neumann", "free"))
   # mesh$m = mesh$n-1
   
   tmp.mdl <- inla.spde2.matern(mesh, B.tau=cbind(0), B.kappa=cbind(-6))
