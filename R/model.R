@@ -94,6 +94,7 @@ join.model = function(...){
   if (any(dup)) { stop(paste0("Some of your models have identical effect names: ", lapply(models, function(x) {x$effects})[dup])) }
   
   A = list()
+  A.msk = list()
   name = character()
   formula = y.inla ~ - 1
   environment(formula) = new.env()
@@ -124,6 +125,7 @@ join.model = function(...){
     mesh.coords = c(mesh.coords,mdl$mesh.coords)
     time.coords = c(time.coords,mdl$time.coords)
     A = c(A,mdl$A)
+    A.msk = c(A.msk, mdl$A.msk)
     const = c(const, mdl$const)
     environment(formula) = env.upd(environment(formula), environment(mdl$formula))
     eval = c(eval, mdl$eval)
@@ -139,6 +141,7 @@ join.model = function(...){
     time.coords = time.coords,
     const = const,
     eval = eval,
+    A.msk = A.msk,
     iterator = do.call(c, lapply(models, function(m){m$iterator}))
     ))
   
@@ -233,6 +236,8 @@ list.A.model = function(mdl, points){
       group = as.matrix(points[,mdl$time.coords[[name]]])
     } else { group = NULL }
     A = inla.spde.make.A(mdl$mesh[[name]], loc = loc, group = group)
+    # Mask columns of A
+    if (!is.null(mdl$A.msk[[name]])) { A = A[, as.logical(mdl$A.msk[[name]]), drop=FALSE]}
     # Covariates for models with A-matrix are realized in the follwoing way:
     if (name %in% names(mdl$covariates)) {
       w = mdl$covariates[[name]](points)
@@ -258,11 +263,14 @@ list.indices.model = function(mdl, ...){
     for (k in 1:length(mdl$mesh)) {
       name = names(mdl$mesh)[[k]]
       if ( "m" %in% names(mdl$mesh[[k]]) ) {
-        idx.lst[[name]] = 1:mdl$mesh[[k]]$m # support inla.mesh.1d models  
+        idx.lst[[name]] = 1:mdl$mesh[[k]]$m # support inla.mesh.1d models
+        # If a is masked, correct number of indices
+        if (!is.null(mdl$A.msk[[name]])) { idx.lst[[name]] = 1:sum(mdl$A.msk[[name]])}
       } else {
         idx.lst = c(idx.lst, list(inla.spde.make.index(name, n.spde = mdl$inla.spde[[k]]$n.spde, n.group = mdl$inla.spde[[k]]$n.group)))
       }
     }
+    
   }
   return(idx.lst)
 }
