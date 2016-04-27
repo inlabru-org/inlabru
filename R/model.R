@@ -952,6 +952,45 @@ model.exponential2d = function(colname = c("distance","lgrpsize"), truncation = 
                     args = list(truncation = truncation, constrained = constrained)))
 }
 
+#' Smooth 2nd order random walk detection function with boundary constraint
+#'
+#'
+#' @aliases model.smoothdf
+#' @param knots Knots at which the model operates. Usually a sequence from 0 to truncation distance.
+#' @param effect Character defining the internal INLA effect name
+#' 
+
+model.smoothdf = function(dset, knots = seq(0, 6, by=1), effect = "smoothdf") {
+  covariate = NULL
+  mesh <- inla.mesh.1d(knots, degree=1, boundary=c("neumann", "free"))
+  # mesh$m = mesh$n-1
+  
+  tmp.mdl <- inla.spde2.matern(mesh, B.tau=cbind(0), B.kappa=cbind(-6))
+  tmp.mdl$n.group = 1
+  tmp.Q <- inla.spde.precision(tmp.mdl, theta=c())[-1,-1,drop=FALSE]
+  msk = c(FALSE,rep(TRUE,length(knots)-1))
+  
+  formula <- as.formula(paste0("~ . + f(",effect,", model = 'generic0', Cmatrix = ", effect,".Q", ")"))
+  assign(paste0(effect,".mdl"), tmp.mdl, envir = environment(formula))
+  assign(paste0(effect,".Q"), tmp.Q, envir = environment(formula))
+  
+  # Little helper
+  lassign = function(name,value) { tmp = list(); tmp[[name]] = value ; return(tmp) }
+  
+  mdl = make.model(name = "Smooth detection function",
+                   formula = formula,
+                   effects = effect,
+                   mesh = lassign(effect, mesh),
+                   covariates = lassign(effect, covariate),
+                   inla.spde = lassign(effect, tmp.mdl),
+                   mesh.coords = lassign(effect, "distance"),
+                   A.msk = lassign(effect, msk))
+}
+
+
+
+
+
 #' Spatial normal distribution
 #'
 #' @aliases model.normal
