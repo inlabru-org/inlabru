@@ -381,10 +381,10 @@ iteration.history.model = function(model, effect){
 #' @param loc Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
 
-evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity) {
+evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1) {
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
-  if ( property == "sample") { smp = inla.posterior.sample.structured(inla.result, n = 1)[[1]] } 
+  if ( property == "sample") { smp = inla.posterior.sample.structured(inla.result, n = n) } 
   posts = list()
   
   for (k in 1:length(model$effects)){
@@ -393,9 +393,9 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
       if (name %in% names(model$mesh)) {
         # SPDE model
         A = Amat[[name]]
-        post = as.vector(A%*%as.vector(smp[[name]]))
+        post = lapply(smp, function(s) { as.vector(A%*%as.vector(s[[name]])) })
       } else {
-        post = smp[[name]] * cov[[name]]
+        post = lapply(smp, function(s) {s[[name]] * cov[name]})
       }
       
     } else {
@@ -422,9 +422,17 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
     }
     posts[[name]] = post
   }
-  ret = do.call(cbind, posts)
-  if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
-  if( "const" %in% names(model) & is.function(model$const)) { ret = ret + model$const(loc) }
+  if ( property == "sample") {
+    ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
+    if( "const" %in% names(model) & is.function(model$const)) {
+      ret = lapply(ret, function(r) r + model$const(loc))
+    }
+  } else {
+    ret = do.call(cbind, posts)
+    if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
+    if( "const" %in% names(model) & is.function(model$const)) { ret = ret + model$const(loc) }
+  }
+  
   return(link(ret))
 }
 
