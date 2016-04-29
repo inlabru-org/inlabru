@@ -424,13 +424,16 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
   }
   if ( property == "sample") {
     ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
-    if( "const" %in% names(model) & is.function(model$const)) {
-      ret = lapply(ret, function(r) r + model$const(loc))
+    if( "const" %in% names(model)) {
+      const = colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
+      ret = lapply(ret, function(x) { x + const })
     }
   } else {
     ret = do.call(cbind, posts)
     if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
-    if( "const" %in% names(model) & is.function(model$const)) { ret = ret + model$const(loc) }
+    if( "const" %in% names(model)) { 
+      ret = ret + colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
+      }
   }
   
   return(link(ret))
