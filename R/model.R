@@ -384,7 +384,14 @@ iteration.history.model = function(model, effect){
 evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1) {
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
-  if ( property == "sample") { smp = inla.posterior.sample.structured(inla.result, n = n) } 
+  if ( property == "sample") {
+    if ( class(inla.result) == "inla" ) {
+      smp = inla.posterior.sample.structured(inla.result, n = n) 
+    } else {
+      smp = inla.result
+      n = length(smp)
+    }
+    } 
   posts = list()
   
   for (k in 1:length(model$effects)){
@@ -424,19 +431,21 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
   }
   if ( property == "sample") {
     ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
-    if( "const" %in% names(model)) {
+    if( "const" %in% names(model) & !(length(model$const)==0)) {
       const = colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
       ret = lapply(ret, function(x) { x + const })
     }
+    ret = lapply(ret, link)
   } else {
     ret = do.call(cbind, posts)
     if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
-    if( "const" %in% names(model)) { 
+    if( "const" %in% names(model) & !(length(model$const)==0)) { 
       ret = ret + colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
-      }
+    }
+    ret = link(ret)
   }
   
-  return(link(ret))
+  return(ret)
 }
 
 
@@ -1188,66 +1197,66 @@ model.loggroupsize = function(data, effect, covariate, iterator = new.env(), ...
 #' @param data A \link{dsdata} object
 #' @param iterator An environment to store the current state of the approximation
 #' @param ... Arguments passed on to inla.spde2.matern. If none, the defaults are alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01
-
-model.loggroupsize = function(data, iterator = new.env(), ...) {
-  
-  mesh = data$mesh
-  rep(mean(detdata(dset)$lgrpsize),dset$mesh$n)
-  assign("grps", rep(mean(detdata(data)$lgrpsize),data$mesh$n), envir = iterator)
-  assign("tau", 1/sd(detdata(data)$lgrpsize), envir = iterator)
-  
-  vargs = list(...)
-  if ( length(vargs) == 0 ){ 
-    gs.mdl.args = list(alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01) }
-  else { 
-    gs.mdl.args = vargs 
-  }
-  
-  gs.mdl = do.call(inla.spde2.matern, c(list(mesh=mesh), gs.mdl.args))
-  gs.mdl$n.group = 1
-  formula = ~ . + f(grps, model = gs.mdl) + tau
-  
-  loglik = function(loc) { -0.5*exp(tau)*(loc$lgrpsize - as.numeric(inla.spde.make.A(mesh, as.matrix(loc[, data$mesh.coords])) %*% grps))^2 + 0.5*tau - log(sqrt(2*pi))}
-  environment(loglik) = new.env(parent = iterator)
-  assign("mesh", mesh, envir = environment(loglik))
-  assign("data", data, envir = environment(loglik))
-  
-  d.tau = function(loc) {-0.5*exp(tau)*(loc$lgrpsize - as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% grps))^2 + 0.5 }
-  environment(d.tau) = new.env(parent = iterator)
-  assign("mesh", mesh, envir = environment(d.tau))
-  assign("data", data, envir = environment(d.tau))
-  
-  d.grps = function(loc) { exp(tau)*(loc$lgrpsize - as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% grps)) }
-  environment(d.grps) = new.env(parent = iterator)
-  assign("mesh", mesh, envir = environment(d.grps))
-  assign("data", data, envir = environment(d.grps))
-  
-  covariates = list()
-  covariates[["grps"]] = d.grps
-  covariates[["tau"]] = d.tau  
-  const = function(loc) { loglik(loc) - d.tau(loc)*tau -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% grps))}
-  environment(const) = new.env(parent = iterator)
-  assign("loglik", loglik, envir = environment(const))
-  assign("d.tau", d.tau, envir = environment(const))
-  assign("d.grps", d.grps, envir = environment(const))
-  assign("mesh", mesh, envir = environment(const))
-  assign("data", data, envir = environment(const))
-  
-  ret = make.model(name = "First order Taylor expansion of spatial log group size model",
-                   formula = formula,
-                   effects = c("grps", "tau"),
-                   covariates = covariates,
-                   mesh = list(grps = mesh),
-                   inla.spde = list(grps = gs.mdl),
-                   mesh.coords = list(grps = data$mesh.coords),
-                   time.coords = list(spde = data$time.coords),
-                   eval = eval, iterator = list(grps = iterator, tau = iterator)
-  )
-  
-  ret$const = const
-  return(ret)
-}
-
+# 
+# model.loggroupsize = function(data, iterator = new.env(), ...) {
+#   
+#   mesh = data$mesh
+#   rep(mean(detdata(dset)$lgrpsize),dset$mesh$n)
+#   assign("grps", rep(mean(detdata(data)$lgrpsize),data$mesh$n), envir = iterator)
+#   assign("tau", 1/sd(detdata(data)$lgrpsize), envir = iterator)
+#   
+#   vargs = list(...)
+#   if ( length(vargs) == 0 ){ 
+#     gs.mdl.args = list(alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.01) }
+#   else { 
+#     gs.mdl.args = vargs 
+#   }
+#   
+#   gs.mdl = do.call(inla.spde2.matern, c(list(mesh=mesh), gs.mdl.args))
+#   gs.mdl$n.group = 1
+#   formula = ~ . + f(grps, model = gs.mdl) + tau
+#   
+#   loglik = function(loc) { -0.5*exp(tau)*(loc$lgrpsize - as.numeric(inla.spde.make.A(mesh, as.matrix(loc[, data$mesh.coords])) %*% grps))^2 + 0.5*tau - log(sqrt(2*pi))}
+#   environment(loglik) = new.env(parent = iterator)
+#   assign("mesh", mesh, envir = environment(loglik))
+#   assign("data", data, envir = environment(loglik))
+#   
+#   d.tau = function(loc) {-0.5*exp(tau)*(loc$lgrpsize - as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% grps))^2 + 0.5 }
+#   environment(d.tau) = new.env(parent = iterator)
+#   assign("mesh", mesh, envir = environment(d.tau))
+#   assign("data", data, envir = environment(d.tau))
+#   
+#   d.grps = function(loc) { exp(tau)*(loc$lgrpsize - as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% grps)) }
+#   environment(d.grps) = new.env(parent = iterator)
+#   assign("mesh", mesh, envir = environment(d.grps))
+#   assign("data", data, envir = environment(d.grps))
+#   
+#   covariates = list()
+#   covariates[["grps"]] = d.grps
+#   covariates[["tau"]] = d.tau  
+#   const = function(loc) { loglik(loc) - d.tau(loc)*tau -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% grps))}
+#   environment(const) = new.env(parent = iterator)
+#   assign("loglik", loglik, envir = environment(const))
+#   assign("d.tau", d.tau, envir = environment(const))
+#   assign("d.grps", d.grps, envir = environment(const))
+#   assign("mesh", mesh, envir = environment(const))
+#   assign("data", data, envir = environment(const))
+#   
+#   ret = make.model(name = "First order Taylor expansion of spatial log group size model",
+#                    formula = formula,
+#                    effects = c("grps", "tau"),
+#                    covariates = covariates,
+#                    mesh = list(grps = mesh),
+#                    inla.spde = list(grps = gs.mdl),
+#                    mesh.coords = list(grps = data$mesh.coords),
+#                    time.coords = list(spde = data$time.coords),
+#                    eval = eval, iterator = list(grps = iterator, tau = iterator)
+#   )
+#   
+#   ret$const = const
+#   return(ret)
+# }
+# 
 
 
 #' Model for Taylor approximation in a single variable 
