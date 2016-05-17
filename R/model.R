@@ -568,6 +568,7 @@ model.f = function(covariates, ...) {
 #' where the effects are 1 for each observation.
 #'
 #' @aliases model.intercept
+#' @export
 #' 
 
 model.intercept = function(data, effects = "Intercept") {
@@ -977,6 +978,7 @@ model.exponential2d = function(colname = c("distance","lgrpsize"), truncation = 
 #'
 #'
 #' @aliases model.smoothdf
+#' @export
 #' @param knots Knots at which the model operates. Usually a sequence from 0 to truncation distance.
 #' @param effect Character defining the internal INLA effect name
 #' 
