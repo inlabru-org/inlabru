@@ -956,19 +956,13 @@ int.points = function(data,
     ips= cbind(ips, distance = distance, weight = w, segdata(dset)[idx[,1],group,drop=FALSE])  
   }
   
-  
-  #
-  # OLD SCHEME
-  #
-  
-  #   if (!is.null(group)) { ips = cbind(ips,covariates[idx[,1],group,drop=FALSE])}
-  #   
-  #   projfun = function(dframe) { data.frame(ip.project(projection = projection, mesh, as.matrix(dframe[,mesh.coords]), dframe$weight,mesh.coords=mesh.coords),
-  #                                           dframe[1,c("distance",group),drop=FALSE]) }
-  #   ips = recurse.rbind(projfun,ips,c("distance",group))
   if ( !is.null(projection)){
-    fu = function(x) data.frame(cbind(project.weights(x, mesh = data$mesh, mesh.coords = data$mesh.coords),distance = x$distance[1]))
-    ips = recurse.rbind(fu, ips, c(list("distance"),group))
+    fu = function(x) { 
+      ret = data.frame(cbind(project.weights(x, mesh = data$mesh, mesh.coords = data$mesh.coords),distance = x$distance[1])) 
+      if (!is.null(group)) {ret[[group]] = x[1,group]}
+      return(ret)
+      }
+    ips = do.call(rbind, by(ips, ips[,c("distance", group)], fu))
   }
   if (length(idx) == dim(ips)[1]) {ips = data.frame(ips, idx = idx[,1])} # only return index if it makes sense
   return(ips)
