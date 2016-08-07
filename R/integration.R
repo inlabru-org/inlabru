@@ -898,9 +898,13 @@ int.points = function(data,
     sp = strip.coords(data[, paste0("start.",mesh.coords)])
     ep = strip.coords(data[, paste0("end.",mesh.coords)])
     idx = data.frame(1:nrow(sp), 1:nrow(sp))
-    
+  } else if ( class(data) == "SpatialLinesDataFrame" ) {
+    qq = coordinates(data)
+    sp = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x)-1),]))))
+    ep = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)),]))))
+    idx = data.frame(1:nrow(sp), 1:nrow(sp))
+
   } else {
-    
     # Get segments/transect indices
     if (on == "transect" ){ idx = as.transect(data) }
     else if (on == "segment" ) { idx = as.segment(data) }
@@ -957,8 +961,10 @@ int.points = function(data,
   }
   
   if ( !is.null(projection)){
+    if (!is.null(data$mesh.coords)) { coords = data$mesh.coords } else { coords = colnames(ips)[1:2] } # Workaround for SpatialPoints
+    
     fu = function(x) { 
-      ret = data.frame(cbind(project.weights(x, mesh = data$mesh, mesh.coords = data$mesh.coords),distance = x$distance[1])) 
+      ret = data.frame(cbind(project.weights(x, mesh = mesh, mesh.coords = coords),distance = x$distance[1])) 
       if (!is.null(group)) {ret[[group]] = x[1,group]}
       return(ret)
       }
