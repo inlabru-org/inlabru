@@ -227,11 +227,20 @@ list.A.model = function(mdl, points){
   A.lst = list()
   
   for ( name in names(mdl$mesh)) {
-    if ( name %in% names(mdl$mesh.map) ) {
-      loc = as.matrix(mdl$mesh.map[[name]](points[,mdl$mesh.coords[[name]]]))
+    # Check if the coordinate names are columns of the data frame. If not, assume we are looking for coordinates
+    # of a SpatialPointsDataFrame
+    if (all(mdl$mesh.coords[[name]] %in% names(points))) {
+      pts = points[,mdl$mesh.coords[[name]]]
     } else {
-      loc = as.matrix(points[,mdl$mesh.coords[[name]]])
+      pts = coordinates(points)
     }
+    
+    if ( name %in% names(mdl$mesh.map) ) {
+      loc = as.matrix(mdl$mesh.map[[name]](pts))
+    } else {
+      loc = as.matrix(pts)
+    }
+    
     if (mdl$inla.spde[[name]]$n.group > 1) {
       group = as.matrix(points[,mdl$time.coords[[name]]])
     } else { group = NULL }

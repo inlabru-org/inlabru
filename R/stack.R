@@ -26,8 +26,10 @@ detection.stack = function(data,
                            E = 0,
                            tag = "detection.stack"){
   
-  # Extract points from data set  
-  pts = detdata(data)
+  # Extract points from data set
+  if (class(data) == "SpatialPointsDataFrame" || class(data) == "SpatialPoints") { pts = coordinates(data) } 
+  else { pts = detdata(data) }
+  
   
   # Apply filters provided by user
   if (!is.null(filter)) { pts = filter(pts) }
@@ -76,6 +78,8 @@ integration.stack = function(data,
     pts = do.call(scheme, c(list(data=data), scheme.args))
   } else if (is.data.frame(scheme)) {
     pts = scheme
+  } else if (class(scheme) == "SpatialPointsDataFrame") {
+    pts = scheme
   }
   
   # Apply filters provided by user
@@ -90,7 +94,7 @@ integration.stack = function(data,
   y.pp = eval.if.function(y, pts)
   
   # Expectation parameter E
-  e.pp = pts[,E]
+  e.pp = as.data.frame(pts[,E, drop = FALSE])[,E] # Weird workaround for SpatialPointsDF
   
   # If const is empty list, set it to NULL
   if ( is.list(const) & length(const)==0 ) { const = NULL }
