@@ -960,7 +960,7 @@ int.points = function(data,
     ips= cbind(ips, distance = distance, weight = w)  
   } else {
     if (class(data)[[1]] == "dsdata") {
-      ips= cbind(ips, distance = distance, weight = w, segdata(data)[idx[,1],group,drop=FALSE])  
+      ips= cbind(ips, distance = distance, weight = w, data$effort[idx[,1],group,drop=FALSE])  
     } else {
       ips= cbind(ips, distance = distance, weight = w, as.data.frame(data)[idx[,1],group,drop=FALSE])  
     }
@@ -969,13 +969,13 @@ int.points = function(data,
   
   if ( !is.null(projection)){
     if (!is.null(data$mesh.coords)) { coords = data$mesh.coords } else { coords = colnames(ips)[1:2] } # Workaround for SpatialPoints
+
+    fn = function(x) { 
+      pr =  project.weights(x, mesh, mesh.coords = data$mesh.coords)
+      cbind(pr, x[rep(1, nrow(pr)),c("distance", group), drop = FALSE])
+    }
+    ips = recurse.rbind(fun = fn, ips, cols = c("distance", group))
     
-    fu = function(x) { 
-      ret = data.frame(cbind(project.weights(x, mesh = mesh, mesh.coords = coords),distance = x$distance[1])) 
-      if (!is.null(group)) {ret[[group]] = x[1,group]}
-      return(ret)
-      }
-    ips = do.call(rbind, by(ips, ips[,c("distance", group)], fu))
   }
   if (length(idx) == dim(ips)[1]) {ips = data.frame(ips, idx = idx[,1])} # only return index if it makes sense
   return(ips)
