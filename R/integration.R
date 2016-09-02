@@ -902,7 +902,9 @@ int.points = function(data,
     qq = coordinates(data)
     sp = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x)-1),]))))
     ep = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)),]))))
-    idx = data.frame(1:nrow(sp), 1:nrow(sp))
+    
+    idx = do.call(rbind, lapply(1:length(qq), function(k) do.call(cbind, lapply(qq[[k]], function(x) rep(k, nrow(x)-1) ))))
+    idx = cbind(idx, idx)
 
   } else {
     # Get segments/transect indices
@@ -957,7 +959,12 @@ int.points = function(data,
   if ( is.null(group) ) {
     ips= cbind(ips, distance = distance, weight = w)  
   } else {
-    ips= cbind(ips, distance = distance, weight = w, segdata(dset)[idx[,1],group,drop=FALSE])  
+    if (class(data)[[1]] == "dsdata") {
+      ips= cbind(ips, distance = distance, weight = w, segdata(data)[idx[,1],group,drop=FALSE])  
+    } else {
+      ips= cbind(ips, distance = distance, weight = w, as.data.frame(data)[idx[,1],group,drop=FALSE])  
+    }
+    
   }
   
   if ( !is.null(projection)){
