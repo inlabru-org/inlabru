@@ -198,10 +198,13 @@ iconfig = function(samplers, points, model) {
         ret$n.coord = ncol(ret$get.coord(points))
         ret$class = "matrix"  
       }
+    # Dimension name does not resolve to a function
     } else {
-      ret$get.coord = function(sp) { sp@data[,nm, drop = FALSE] }
+      # Spatial* object or data.frame?
+      if ( is.data.frame(points) ) { ret$get.coord = function(sp) { sp[,nm, drop = FALSE] }} 
+      else { ret$get.coord = function(sp) { sp@data[,nm, drop = FALSE] } }
       ret$n.coord = 1
-      ret$class = class(points@data[, nm])
+      ret$class = class(ret$get.coord(points))
     }
     
     # If there is a mesh in the model that has the same name as the dimension
