@@ -27,7 +27,7 @@ detection.stack = function(data,
                            tag = "detection.stack"){
   
   # Extract points from data set
-  if (class(data) == "SpatialPointsDataFrame" || class(data) == "SpatialPoints") { pts = data } 
+  if (class(data) == "SpatialPointsDataFrame" || class(data) == "SpatialPoints" || is.data.frame(data)) { pts = data } 
   else { pts = detdata(data) }
   
   
