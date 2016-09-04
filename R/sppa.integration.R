@@ -217,10 +217,10 @@ iconfig = function(samplers, points, model) {
         ret$min = min(ret$mesh$loc)
         ret$max = max(ret$mesh$loc)
         ret$cnames = colnames(ret$get.coord(points))
-        ret$scheme = "fixed"
-        ret$sp = ret$mesh$loc
-        ret$ep = NULL
-        ret$n.points = length(ret$sp)
+        ret$scheme = "trapezoid"
+        ret$sp = ret$min
+        ret$ep = ret$max
+        ret$n.points = length(ret$mesh$loc)
       } else { stop( "not implemented: 2d mesh auto-integration") }
       
     } else {
