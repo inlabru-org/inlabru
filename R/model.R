@@ -88,6 +88,7 @@ is.model = function(mdl) { return(class(mdl)[[1]] == "model")}
 
 join.model = function(...){
   models = list(...)
+  models = models[!unlist(lapply(models, is.null))]
   
   # Check for duplicated effect names
   dup = duplicated(lapply(models, function(x) {x$effects}))
