@@ -804,7 +804,7 @@ int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry=
     }
     ips = do.call(rbind,nips)
     # weights
-    w = rep(1,dim(ips)[1])/n.points
+    w = rep(1,dim(ips)[1])/(n.points-1)
     w[1] = 0.5 * w[1]
     w[length(w)] = 0.5 * w[length(w)] 
     wl = w * (len(ep-sp)[rep(1:n.lines,n.points)])
