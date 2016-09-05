@@ -104,7 +104,7 @@ ipoints = function(samplers, config) {
   } else if ( is.null(samplers) ){
     if ( "coordinates" %in% names(config) ) {
       ips = SpatialPointsDataFrame(config[["coordinates"]]$mesh$loc[,c(1,2)], 
-                                   data = data.frame(weight = diag(inla.mesh.fem(config[["coordinates"]]$mesh)$c0)))
+                                   data = data.frame(weight = diag(as.matrix(inla.mesh.fem(config[["coordinates"]]$mesh)$c0))))
     } else {
       ips = NULL
       spatial = FALSE
