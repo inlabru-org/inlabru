@@ -37,6 +37,9 @@ ipoints = function(samplers, config) {
   pregroup = setdiff(names(samplers), "weight")
   postgroup = setdiff(names(config), c(pregroup, "coordinates"))
   
+  # By default we assume we are handling a Spatial* object
+  spatial = TRUE
+  
   # If samplers is a data frame assume these are integration points with a weight column attached
   if ( is.data.frame(samplers) ) {
     if (!("weight" %in% names(samplers))) { 
@@ -104,6 +107,7 @@ ipoints = function(samplers, config) {
                                    data = data.frame(weight = diag(inla.mesh.fem(config[["coordinates"]]$mesh)$c0)))
     } else {
       ips = NULL
+      spatial = FALSE
     }
   } else {
     stop("Unknown format of integration data")
@@ -126,7 +130,9 @@ ipoints = function(samplers, config) {
       ips = do.call(int.1d, c(list(coords = gname), li[[gname]]))
     } else {
       ips = do.call(int.expand, c(list(as.data.frame(ips)), li))
-      ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,c(postgroup, pregroup, "weight")])
+      if ( spatial ) {
+        ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,c(postgroup, pregroup, "weight")])
+      }
     }
   }
   
@@ -213,16 +219,20 @@ iconfig = function(samplers, points, model) {
     
     if ( nm %in% names(model$mesh) ) {
       if ( model$mesh[[nm]]$manifold == "R1" ) {
+        # The mesh is 1-dimensional. 
+        # By default a two-point Gaussian quadrature is used for each interval between the mesh knots.
+        # This intergration is exact for poylnomials of second degree. 
         ret$mesh = model$mesh[[nm]]
         ret$min = min(ret$mesh$loc)
         ret$max = max(ret$mesh$loc)
         ret$cnames = colnames(ret$get.coord(points))
-        ret$scheme = "trapezoid"
-        ret$sp = ret$min
-        ret$ep = ret$max
-        ret$n.points = length(ret$mesh$loc)
-      } else { stop( "not implemented: 2d mesh auto-integration") }
-      
+        ret$scheme = "gaussian"
+        ret$sp = ret$mesh$loc[1:(length(ret$mesh$loc)-1)]
+        ret$ep = ret$mesh$loc[2:length(ret$mesh$loc)] 
+        ret$n.points = 2
+      } else { 
+        stop( "not implemented: 2d mesh auto-integration") 
+      }
     } else {
       ret$min = apply(ret$get.coord(points), MARGIN = 2, min)
       ret$max = apply(ret$get.coord(points), MARGIN = 2, max)
@@ -238,8 +248,8 @@ iconfig = function(samplers, points, model) {
         stop("Not implemented.")
       } else { 
         ret$scheme = "trapezoid"
-        ret$sp = NULL
-        ret$ep = NULL
+        ret$sp = ret$min
+        ret$ep = ret$max
         ret$n.points = 10
       }      
     }
