@@ -71,10 +71,10 @@ lgcp = function(points, samplers = NULL, model = NULL, mesh = NULL, ...) {
 
   if ( class(model)[[1]] == "formula" ) {
     fml = model
-    base.model = model.intercept()
+    if (attr(terms(fml), "intercept") == 1) { base.model = model.intercept() } else { base.model = NULL }
     more.model = as.model.formula(model)
     lhs = update.formula(fml, . ~ 0)
-    if (!is.null(more.model)) { model = join(base.model, more.model) } else { model = join(base.model) }
+    model = join.model(more.model, base.model)
     rhs = reformulate(attr(terms(model$formula), "term.labels"), intercept = FALSE)
     model$formula = update.formula(lhs, rhs)
   } 
@@ -82,7 +82,7 @@ lgcp = function(points, samplers = NULL, model = NULL, mesh = NULL, ...) {
   # Create integration points
   icfg = iconfig(samplers, points, model)
   ips = ipoints(samplers, icfg)
-  
+
   # Stack
   stk = function(points, model) { 
     inla.stack(detection.stack(points, model = model), 
