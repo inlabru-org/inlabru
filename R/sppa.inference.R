@@ -101,15 +101,15 @@ lgcp = function(points, samplers = NULL, model = NULL, mesh = NULL, ...) {
 #' @param spObject A Spatial* object
 #' @return An \code{inla.mesh} object
 
-default.mesh = function(spObject){
+default.mesh = function(spObject, max.edge = NULL){
   if (class(spObject) == "SpatialPointsDataFrame") {
     x = c(bbox(spObject)[1,1], bbox(spObject)[1,2], bbox(spObject)[1,2], bbox(spObject)[1,1])
     y = c(bbox(spObject)[2,1], bbox(spObject)[2,1], bbox(spObject)[2,2], bbox(spObject)[2,2])
     # bnd = inla.mesh.segment(loc = cbind(x,y))
     # mesh = inla.mesh.2d(interior = bnd, max.edge = diff(bbox(spObject)[1,])/10)
-    
+    if ( is.null(max.edge) ) { max.edge = max.edge = diff(bbox(spObject)[1,])/20 }
     hull = inla.nonconvex.hull(points = coordinates(spObject))
-    mesh = inla.mesh.2d(boundary = hull, max.edge = diff(bbox(spObject)[1,])/10)
+    mesh = inla.mesh.2d(boundary = hull, max.edge = max.edge)
   } else {
     NULL
   }
