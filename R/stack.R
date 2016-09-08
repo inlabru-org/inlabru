@@ -26,8 +26,10 @@ detection.stack = function(data,
                            E = 0,
                            tag = "detection.stack"){
   
-  # Extract points from data set  
-  pts = detdata(data)
+  # Extract points from data set
+  if (class(data) == "SpatialPointsDataFrame" || class(data) == "SpatialPoints" || is.data.frame(data)) { pts = data } 
+  else { pts = detdata(data) }
+  
   
   # Apply filters provided by user
   if (!is.null(filter)) { pts = filter(pts) }
@@ -41,15 +43,15 @@ detection.stack = function(data,
   y.pp = eval.if.function(y, pts)
   
   # Expectation parameter E
-  if ( !(length(E) == nrow(pts)) ) { e.pp = rep(E, nrow(pts)) } else { e.pp = E }
+  if ( !(length(E) == nrow(as.data.frame(pts))) ) { e.pp = rep(E, nrow(as.data.frame(pts))) } else { e.pp = E } # as.data.frame required for SpatialPoints because they have no nrow function
   
-  
+  # eff[[1]] = eff[[1]][,"Intercept",drop=FALSE]
   # Create and return stack
-  return(inla.stack(data = list(y.inla = y.pp, e = e.pp),
+  stk = inla.stack(data = list(y.inla = y.pp, e = e.pp),
                      A = A,
                      tag = tag,
                      effects = c(idx, eff),
-                    compress = FALSE))
+                    compress = FALSE)
 }
 
 
@@ -58,7 +60,7 @@ detection.stack = function(data,
 #' @aliases integration.stack
 #' 
 
-integration.stack = function(data,
+integration.stack = function(data = NULL,
                                 scheme = NULL,
                                 scheme.args = NULL,
                                 model = NULL,
@@ -76,6 +78,8 @@ integration.stack = function(data,
     pts = do.call(scheme, c(list(data=data), scheme.args))
   } else if (is.data.frame(scheme)) {
     pts = scheme
+  } else if (class(scheme) == "SpatialPointsDataFrame") {
+    pts = scheme
   }
   
   # Apply filters provided by user
@@ -90,7 +94,7 @@ integration.stack = function(data,
   y.pp = eval.if.function(y, pts)
   
   # Expectation parameter E
-  e.pp = pts[,E]
+  e.pp = as.data.frame(pts[,E, drop = FALSE])[,E] # Weird workaround for SpatialPointsDF
   
   # If const is empty list, set it to NULL
   if ( is.list(const) & length(const)==0 ) { const = NULL }
@@ -106,13 +110,12 @@ integration.stack = function(data,
       stop("E-vector length does not equal length of vector returned by const function") }
     e.pp = as.numeric(e.pp * exp( const.values )) 
   }
-  
-  
+  # eff[[1]] = eff[[1]][,"Intercept",drop=FALSE]
   # Create and return stack
-  return(inla.stack(data = list(y.inla = y.pp, e = e.pp),
+  stk = inla.stack(data = list(y.inla = y.pp, e = e.pp),
                     A = A,
                     tag = tag,
-                    effects = c(idx, eff)))
+                    effects = c(idx, eff))
 }
 
 
@@ -235,7 +238,7 @@ generic.stack = function(model = NULL,
 #####################################
 
 eval.if.function = function(fun, x, n = NULL){
-  if (is.null(n)) { n = nrow(x) }
+  if (is.null(n)) { n = nrow(as.data.frame(x)) }
   if ( is.function(fun) ) { fx = fun(x) }
   else if ( is.numeric(fun) ) {
     if ( length(fun) == 1 && n >1 ) { fx = rep(fun, n) }

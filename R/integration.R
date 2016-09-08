@@ -804,7 +804,7 @@ int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry=
     }
     ips = do.call(rbind,nips)
     # weights
-    w = rep(1,dim(ips)[1])/n.points
+    w = rep(1,dim(ips)[1])/(n.points-1)
     w[1] = 0.5 * w[1]
     w[length(w)] = 0.5 * w[length(w)] 
     wl = w * (len(ep-sp)[rep(1:n.lines,n.points)])
@@ -898,9 +898,15 @@ int.points = function(data,
     sp = strip.coords(data[, paste0("start.",mesh.coords)])
     ep = strip.coords(data[, paste0("end.",mesh.coords)])
     idx = data.frame(1:nrow(sp), 1:nrow(sp))
+  } else if ( class(data) == "SpatialLinesDataFrame" ) {
+    qq = coordinates(data)
+    sp = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x)-1),]))))
+    ep = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)),]))))
     
+    idx = do.call(rbind, lapply(1:length(qq), function(k) do.call(cbind, lapply(qq[[k]], function(x) rep(k, nrow(x)-1) ))))
+    idx = cbind(idx, idx)
+
   } else {
-    
     # Get segments/transect indices
     if (on == "transect" ){ idx = as.transect(data) }
     else if (on == "segment" ) { idx = as.segment(data) }
@@ -953,16 +959,23 @@ int.points = function(data,
   if ( is.null(group) ) {
     ips= cbind(ips, distance = distance, weight = w)  
   } else {
-    ips= cbind(ips, distance = distance, weight = w, segdata(dset)[idx[,1],group,drop=FALSE])  
+    if (class(data)[[1]] == "dsdata") {
+      ips= cbind(ips, distance = distance, weight = w, data$effort[idx[,1],group,drop=FALSE])  
+    } else {
+      ips= cbind(ips, distance = distance, weight = w, as.data.frame(data)[idx[,1],group,drop=FALSE])  
+    }
+    
   }
   
   if ( !is.null(projection)){
-    fu = function(x) { 
-      ret = data.frame(cbind(project.weights(x, mesh = data$mesh, mesh.coords = data$mesh.coords),distance = x$distance[1])) 
-      if (!is.null(group)) {ret[[group]] = x[1,group]}
-      return(ret)
-      }
-    ips = do.call(rbind, by(ips, ips[,c("distance", group)], fu))
+    if (!is.null(data$mesh.coords)) { coords = data$mesh.coords } else { coords = colnames(ips)[1:2] } # Workaround for SpatialPoints
+
+    fn = function(x) { 
+      pr =  project.weights(x, mesh, mesh.coords = data$mesh.coords)
+      cbind(pr, x[rep(1, nrow(pr)),c("distance", group), drop = FALSE])
+    }
+    ips = recurse.rbind(fun = fn, ips, cols = c("distance", group))
+    
   }
   if (length(idx) == dim(ips)[1]) {ips = data.frame(ips, idx = idx[,1])} # only return index if it makes sense
   return(ips)

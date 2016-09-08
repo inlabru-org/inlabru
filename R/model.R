@@ -88,6 +88,7 @@ is.model = function(mdl) { return(class(mdl)[[1]] == "model")}
 
 join.model = function(...){
   models = list(...)
+  models = models[!unlist(lapply(models, is.null))]
   
   # Check for duplicated effect names
   dup = duplicated(lapply(models, function(x) {x$effects}))
@@ -174,7 +175,7 @@ list.covariates.model = function(mdl, pts){
   if ( length(mdl$covariates)>0 ) {
     formula = mdl$formula
     covariates = mdl$covariates
-    all.varnames = all.vars(formula)
+    all.varnames = setdiff(all.vars(formula), names(mdl$mesh)) # Remove mesh names. Effects with names equal to SPDE models will lead to strange errors.
     covar.data = list()
     
     # Points may be annotated with covariates
@@ -189,8 +190,8 @@ list.covariates.model = function(mdl, pts){
     # Add additional covariates defined by the user
     
     fetched.covar = list()
-    for (cov.name in names(covariates)){
-      if (is.null(mdl$mesh[[cov.name]])) {
+    for (cov.name in names(covariates)[!(names(covariates) == "")]){
+      if (is.null(mdl$mesh[[cov.name]]) && !is.character(covariates[[cov.name]])) {
         cov.fun = covariates[[cov.name]]
         fetched.covar[[cov.name]] = cov.fun(pts)
         # Check if we actually got values back
@@ -203,9 +204,9 @@ list.covariates.model = function(mdl, pts){
     
     if (length(fetched.covar)>0 & length(covar.data)>0){ 
       covar.data = cbind(covar.data,fetched.covar)
-    } else { 
+    } else if (length(fetched.covar)>0) { 
       covar.data = fetched.covar 
-    }
+    } else { }
     
     if (is.null(covar.data)) {
       return(list())
@@ -227,12 +228,26 @@ list.A.model = function(mdl, points){
   A.lst = list()
   
   for ( name in names(mdl$mesh)) {
-    if ( name %in% names(mdl$mesh.map) ) {
-      loc = as.matrix(mdl$mesh.map[[name]](points[,mdl$mesh.coords[[name]]]))
+    # Check if the coordinate names are columns of the data frame. If not, assume we are looking for coordinates
+    # of a SpatialPointsDataFrame
+    if (!is.null(mdl$mesh.coords[[name]]) && all(mdl$mesh.coords[[name]] %in% names(points))) {
+      pts = as.data.frame(points)[,mdl$mesh.coords[[name]]]
     } else {
-      loc = as.matrix(points[,mdl$mesh.coords[[name]]])
+      if ( ifelse(is.null(get0(name)),FALSE,TRUE)) {
+        pts = get0(name)(points)
+      } else {
+        pts = coordinates(points)
+      }
     }
-    if (mdl$inla.spde[[name]]$n.group > 1) {
+    
+    if ( name %in% names(mdl$mesh.map) ) {
+      loc = as.matrix(mdl$mesh.map[[name]](pts))
+    } else {
+      loc = as.matrix(as.data.frame(pts)) # Convert to DF first because as.matrix is not defined for Spatial* objects
+    }
+    
+    if (is.null(mdl$inla.spde[[name]]$n.group)) { ng = 1 } else { ng = mdl$inla.spde[[name]]$n.group }
+    if (ng > 1) {
       group = as.matrix(points[,mdl$time.coords[[name]]])
     } else { group = NULL }
     A = inla.spde.make.A(mdl$mesh[[name]], loc = loc, group = group)
@@ -267,7 +282,9 @@ list.indices.model = function(mdl, ...){
         # If a is masked, correct number of indices
         if (!is.null(mdl$A.msk[[name]])) { idx.lst[[name]] = 1:sum(mdl$A.msk[[name]])}
       } else {
-        idx.lst = c(idx.lst, list(inla.spde.make.index(name, n.spde = mdl$inla.spde[[k]]$n.spde, n.group = mdl$inla.spde[[k]]$n.group)))
+        ng = mdl$inla.spde[[k]]$n.group
+        if (is.null(ng)) { ng = 1 }
+        idx.lst = c(idx.lst, list(inla.spde.make.index(name, n.spde = mdl$inla.spde[[k]]$n.spde, n.group = ng)))
       }
     }
     
@@ -574,8 +591,9 @@ model.f = function(covariates, ...) {
 model.intercept = function(data, effects = "Intercept") {
   formula = as.formula(paste0("~ . -1 + ", effects))
   covariates = list()
+  
   covariates[[effects]] = function(x) {
-    v = rep(1, nrow(x))
+    v = rep(1, nrow(as.data.frame(x)))
     ret = data.frame(v)
     colnames(ret) = effects
     return(ret) 
@@ -1011,6 +1029,79 @@ model.smoothdf = function(dset, knots = seq(0, 6, by=1), degree = 2, effect = "s
 }
 
 
+
+
+#' Detectability at zero distance
+#'
+#'
+#' @aliases model.g0fix
+#' @export
+#' @param g0 Probability of detecting an animal
+#' 
+
+model.g0fix = function(g0 = 1) {
+  
+  formula = ~ . + f(g0fix, model = "clinear", fixed = TRUE, range = c(1, 1+1E-5))
+  
+  covariates = list()
+  covariates[["g0fix"]] = function(x) {
+    v = rep(log(g0), nrow(as.data.frame(x)))
+    ret = data.frame(v)
+    colnames(ret) = "g0fix"
+    return(ret) 
+  }
+
+model = make.model(name = "g0",
+                  formula = formula, 
+                  effects = "g0",
+                  covariates = covariates)
+}
+
+#' Prior distribution for detectability at zero distance
+#' 
+#' The probability g0 of detecting an animal at zero distance is implicitly modeled 
+#' via a latent Gaussian distribution p(theta). The parameters "mean" and "sd" determine 
+#' the mean and standard deviation of tau. Tau is then linked to g0 as
+#' 
+#'  g0 = exp(-exp(tau))
+#'
+#'
+#' @aliases model.g0prior
+#' @export
+#' @param theta.mean Mean of the latent theta
+#' @param theta.sd Standard deviation of the latent theta
+#' @param effect Character setting the name of this effect in INLA
+#' @param covariate A function returning a weight for exp(theta). Can be used to mask out g0 for particular sightings.
+#' 
+
+model.g0prior = function(theta.mean, theta.sd, effect = "g0prior", covariate = NULL) {
+  
+  hyper = list(theta = list(prior = paste0("expression: mean = ", theta.mean,"; sigma = ", theta.sd,"; 
+                                          dens = 1/sqrt(2*pi) * 1/sigma * exp(-0.5*(x-mean)^2/sigma^2); 
+                                          logdens = log(dens); 
+                                          return(logdens)"),
+                            initial = log(2), 
+                            fixed = FALSE))
+  
+  formula = as.formula(paste0("~ . + f(", effect, ", model = 'clinear', range = c(0, Inf), fixed = FALSE, initial = 0, hyper =",effect,".hyper)"))
+  
+  environment(formula)[[paste0(effect,".hyper")]] = hyper
+  
+  covariates = list()
+  if ( is.null(covariate) ) {
+    covariates[[effect]] = function(x) {
+      v = rep(-1, nrow(as.data.frame(x)))
+      ret = data.frame(v)
+      colnames(ret) = effect
+      return(ret) 
+    }
+  } else { covariates[[effect]] = covariate }
+  
+  model = make.model(name = effect,
+                     formula = formula, 
+                     effects = effect,
+                     covariates = covariates)
+}
 
 
 
