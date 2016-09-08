@@ -1039,22 +1039,27 @@ model.smoothdf = function(dset, knots = seq(0, 6, by=1), degree = 2, effect = "s
 #' @param g0 Probability of detecting an animal
 #' 
 
-model.g0fix = function(g0 = 1) {
+model.g0fix = function(g0 = 1, effect = "g0fix", covariate = NULL) {
   
-  formula = ~ . + f(g0fix, model = "clinear", fixed = TRUE, range = c(1, 1+1E-5))
+  formula = as.formula(paste0("~ . + f(", effect, ", model = 'clinear', fixed = TRUE, range = c(1, 1+1E-5))"))
   
   covariates = list()
-  covariates[["g0fix"]] = function(x) {
-    v = rep(log(g0), nrow(as.data.frame(x)))
-    ret = data.frame(v)
-    colnames(ret) = "g0fix"
-    return(ret) 
+  
+  if ( is.null(covariate) ) {
+    covariates[[effect]] = function(x) {
+      v = rep(log(g0), nrow(as.data.frame(x)))
+      ret = data.frame(v)
+      colnames(ret) = effect
+      return(ret) 
+    }  
+  } else {
+    covariates[[effect]] = covariate
   }
 
-model = make.model(name = "g0",
-                  formula = formula, 
-                  effects = "g0",
-                  covariates = covariates)
+  model = make.model(name = effect,
+                    formula = formula, 
+                    effects = effect,
+                    covariates = covariates)
 }
 
 #' Prior distribution for detectability at zero distance

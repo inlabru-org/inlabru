@@ -33,17 +33,38 @@ gauss = function(points, model = NULL, mesh = NULL, y = ~ k, ...) {
 #' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
 #' @return An \link{inla} object
 
-poiss = function(points, model = NULL, mesh = NULL, y = ~ k, E = ~ 1, ...) {
+poiss = function(points, model = NULL, mesh = NULL, ...) {
   
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
-  if ( is.null(model) ) { model = default.model(mesh) }
-  if ( class(model)[[1]] == "formula" ) { 
-    base.model = model.intercept()
-    model = as.model.formula(model)
-    if (!is.null(model)) { model = join(base.model, model) } else { model = join(base.model) }
+  if ( is.null(model) ) { 
+    model = default.model(mesh)
+    model$formula = update.formula(model$formula, coordinates ~ .)
   }
   
-  stk = function(points, model) { detection.stack(points, model = model, y = as.numeric(get_all_vars(y, points)[,1]), E = get_all_vars(E, points)) }
+  if ( class(model)[[1]] == "formula" ) {
+    # Check if right hand side was provided
+    if (as.character(model)[length(as.character(model))] == ".") {
+      fml = model
+      model = join.model(default.model(mesh))
+      model$formula = update.formula(model$formula, fml)
+      
+    } else {
+      fml = model
+      if (attr(terms(fml), "intercept") == 1) { base.model = model.intercept() } else { base.model = NULL }
+      more.model = as.model.formula(model)
+      lhs = update.formula(fml, . ~ 0)
+      model = join.model(more.model, base.model)
+      rhs = reformulate(attr(terms(model$formula), "term.labels"), intercept = FALSE)
+      model$formula = update.formula(lhs, rhs)
+    }
+  } 
+  
+  yE = get_all_vars(update.formula(model$formula , . ~ 1), data = points)
+  y = yE[,1]
+  E = yE[,2]
+  # y = as.numeric(get_all_vars(y, points)[,1])
+  # E = get_all_vars(E, points)
+  stk = function(points, model) { detection.stack(points, model = model, y = y, E = E) }
   
   result = iinla(points, model, stk, family = "poisson", ...)
   result$mesh = mesh
@@ -101,15 +122,15 @@ lgcp = function(points, samplers = NULL, model = NULL, mesh = NULL, ...) {
 #' @param spObject A Spatial* object
 #' @return An \code{inla.mesh} object
 
-default.mesh = function(spObject){
+default.mesh = function(spObject, max.edge = NULL){
   if (class(spObject) == "SpatialPointsDataFrame") {
     x = c(bbox(spObject)[1,1], bbox(spObject)[1,2], bbox(spObject)[1,2], bbox(spObject)[1,1])
     y = c(bbox(spObject)[2,1], bbox(spObject)[2,1], bbox(spObject)[2,2], bbox(spObject)[2,2])
     # bnd = inla.mesh.segment(loc = cbind(x,y))
     # mesh = inla.mesh.2d(interior = bnd, max.edge = diff(bbox(spObject)[1,])/10)
-    
+    if ( is.null(max.edge) ) { max.edge = max.edge = diff(bbox(spObject)[1,])/20 }
     hull = inla.nonconvex.hull(points = coordinates(spObject))
-    mesh = inla.mesh.2d(boundary = hull, max.edge = diff(bbox(spObject)[1,])/10)
+    mesh = inla.mesh.2d(boundary = hull, max.edge = max.edge)
   } else {
     NULL
   }
