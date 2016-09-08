@@ -40,6 +40,8 @@ ipoints = function(samplers, config) {
   # By default we assume we are handling a Spatial* object
   spatial = TRUE
   
+  
+  
   # If samplers is a data frame assume these are integration points with a weight column attached
   if ( is.data.frame(samplers) ) {
     if (!("weight" %in% names(samplers))) { 
@@ -59,6 +61,10 @@ ipoints = function(samplers, config) {
     ips = samplers
   } 
   else if ( class(samplers) == "SpatialLinesDataFrame" ){
+    if (!("weight" %in% names(samplers))) { 
+      warning("The integration points provided have no weight column. Setting weights to 1.")
+      samplers$weight = 1
+    }
     
     # Store coordinate names
     cnames = coordnames(samplers)
