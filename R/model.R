@@ -1097,9 +1097,9 @@ model.g0prior = function(theta.mean, theta.sd, effect = "g0prior", covariate = N
     }
   } else { covariates[[effect]] = covariate }
   
-  model = make.model(name = "g0",
+  model = make.model(name = effect,
                      formula = formula, 
-                     effects = "g0",
+                     effects = effect,
                      covariates = covariates)
 }
 
