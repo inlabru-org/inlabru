@@ -61,14 +61,14 @@ gg.col = function(data, color, alpha = 1, ...) {
   df[seq(2, nrow(mesh$graph$tv)*3, by=3), ] = mesh$loc[mesh$graph$tv[,2],1:2]
   df[seq(3, nrow(mesh$graph$tv)*3, by=3), ] = mesh$loc[mesh$graph$tv[,3],1:2]
   df = data.frame(df, tr = as.vector(matrix(1:nrow(mesh$graph$tv), 3, nrow(mesh$graph$tv),byrow=TRUE)))
-  colnames(df) = c(data$mesh.coords,"tr")
+  colnames(df) = c("x","y","tr")
   icol  = (color[mesh$graph$tv[,1]] + color[mesh$graph$tv[,2]] + color[mesh$graph$tv[,3]])/3
   ialpha  = (alpha[mesh$graph$tv[,1]] + alpha[mesh$graph$tv[,2]] + alpha[mesh$graph$tv[,3]])/3
   df$col = as.vector(matrix(icol, 3, nrow(mesh$graph$tv),byrow=TRUE))
   df$alph = as.vector(matrix(ialpha, 3, nrow(mesh$graph$tv),byrow=TRUE))
   
-  aest = aes_string(x = data$mesh.coords[1], 
-             y = data$mesh.coords[2],
+  aest = aes_string(x = "x", 
+             y = "y",
              group = "tr", 
              fill = "col",
              alpha = df$alph)
