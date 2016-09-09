@@ -216,7 +216,7 @@ iconfig = function(samplers, points, model) {
       if ( is.data.frame(points) ) { ret$get.coord = function(sp) { sp[,nm, drop = FALSE] }} 
       else { ret$get.coord = function(sp) { sp@data[,nm, drop = FALSE] } }
       ret$n.coord = 1
-      ret$class = class(ret$get.coord(points))
+      ret$class = class(ret$get.coord(points)[,nm])
     }
     
     # If there is a mesh in the model that has the same name as the dimension
