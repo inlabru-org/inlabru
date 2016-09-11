@@ -402,7 +402,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
   if ( property == "sample") {
-    if ( class(inla.result) == "inla" ) {
+    if ( inherits(inla.result, "inla") ) {
       smp = inla.posterior.sample.structured(inla.result, n = n) 
     } else {
       smp = inla.result
