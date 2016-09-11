@@ -113,6 +113,8 @@ lgcp = function(points, samplers = NULL, model = NULL, mesh = NULL, ...) {
   result = iinla(points, model, stk, family = "poisson", ...)
   result$mesh = mesh
   result$ips = ips
+  result$iconfig = icfg
+  result$sppa$model = model
   return(result)
 }
 
@@ -181,7 +183,7 @@ as.model.formula = function(fml) {
     mesh.coords = list()
     # mesh.map = list()
     inla.models = list()
-    effects = list()
+    effects = lbl
     
     # Select g-terms
     
