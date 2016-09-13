@@ -33,7 +33,7 @@ gauss = function(points, model = NULL, mesh = NULL, y = ~ k, ...) {
 #' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
 #' @return An \link{inla} object
 
-poiss = function(points, model = NULL, mesh = NULL, ...) {
+poiss = function(points, model = NULL, mesh = NULL, family = "poisson", ...) {
   
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
   if ( is.null(model) ) { 
@@ -66,7 +66,7 @@ poiss = function(points, model = NULL, mesh = NULL, ...) {
   # E = get_all_vars(E, points)
   stk = function(points, model) { detection.stack(points, model = model, y = y, E = E) }
   
-  result = iinla(points, model, stk, family = "poisson", ...)
+  result = iinla(points, model, stk, family = family, ...)
   result$mesh = mesh
   return(result)
 }
