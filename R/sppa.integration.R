@@ -34,7 +34,7 @@ ipoints = function(samplers, config) {
   
   # First step: Figure out which marks are already included in the samplers (e.g. time)
   # For each of the levels of these marks the integration points will be computed independently
-  pregroup = setdiff(names(samplers), "weight")
+  pregroup = setdiff(colnames(samplers), "weight")
   postgroup = setdiff(names(config), c(pregroup, "coordinates"))
   
   # By default we assume we are handling a Spatial* object
@@ -60,7 +60,14 @@ ipoints = function(samplers, config) {
     
     ips = samplers
   } 
-  else if ( class(samplers) == "SpatialLinesDataFrame" ){
+  else if ( inherits(samplers, "SpatialLines") || inherits(samplers, "SpatialLinesDataFrame") ){
+    
+    # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
+    if ( inherits(samplers, "SpatialLines") ) { 
+      samplers = SpatialLinesDataFrame(samplers, data = data.frame(weight = rep(1, length(samplers)))) 
+    }
+    
+    # Set weights to 1 if not provided
     if (!("weight" %in% names(samplers))) { 
       warning("The integration points provided have no weight column. Setting weights to 1.")
       samplers$weight = 1
