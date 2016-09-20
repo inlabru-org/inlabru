@@ -427,7 +427,13 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
       # Either fixed effect or hyper parameter
       if (name %in% rownames(inla.result$summary.fixed)){
         # Fixed effect
-        post = inla.result$summary.fixed[name, property] * cov[[name]]
+        # Check if the fixed effect is actually a function call
+        if ( grepl("[()]", name)) {
+          post = inla.result$summary.fixed[name, property] * eval(parse(text = name), as.data.frame(loc))
+        } else {
+          post = inla.result$summary.fixed[name, property] * cov[[name]]
+        }
+        
       } else if (paste0("Beta for ",name) %in% rownames(inla.result$summary.hyperpar)) {
         # Hyper parameter
         post = inla.result$summary.hyperpar[paste0("Beta for ",name), property] * cov[[name]]
