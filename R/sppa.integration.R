@@ -209,7 +209,7 @@ iconfig = function(samplers, points, model) {
       if ( nm == "coordinates" ) {
         ret$get.coord = get0(nm)
         ret$n.coord = ncol(ret$get.coord(points))
-        ret$mesh = model$mesh$spde
+        ret$mesh = model$mesh[[1]]
         ret$class = "matrix"  
         ret$project = TRUE
       } else {
