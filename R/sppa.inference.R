@@ -7,7 +7,7 @@
 #' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
 #' @return An \link{inla} object
 
-gauss = function(points, model = NULL, mesh = NULL, y = ~ k, ...) {
+gauss = function(points, model = NULL, predictor = NULL, mesh = NULL, y = ~ k, ...) {
   
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
   if ( is.null(model) ) { model = default.model(mesh) }
@@ -16,6 +16,7 @@ gauss = function(points, model = NULL, mesh = NULL, y = ~ k, ...) {
     model = as.model.formula(model)
     if (!is.null(model)) { model = join(base.model, model) } else { model = join(base.model) }
   }
+  if ( !is.null(predictor) ) { model$expr = expr ; stop("Not implemented: gaussian likelihood and non-linear predictor. missing: use const-parameter of INLA instead of E")}
   
   stk = function(points, model) { detection.stack(points, model = model, y = get_all_vars(y, points)[,1], E = 1) }
   
@@ -33,7 +34,7 @@ gauss = function(points, model = NULL, mesh = NULL, y = ~ k, ...) {
 #' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
 #' @return An \link{inla} object
 
-poiss = function(points, model = NULL, mesh = NULL, family = "poisson", ...) {
+poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "poisson", ...) {
   
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
   if ( is.null(model) ) { 
@@ -57,7 +58,8 @@ poiss = function(points, model = NULL, mesh = NULL, family = "poisson", ...) {
       rhs = reformulate(attr(terms(model$formula), "term.labels"), intercept = FALSE)
       model$formula = update.formula(lhs, rhs)
     }
-  } 
+  }
+  if ( !is.null(predictor) ) { model$expr = predictor }
   
   yE = get_all_vars(update.formula(model$formula , . ~ 1), data = points)
   y = yE[,1]
@@ -82,14 +84,14 @@ poiss = function(points, model = NULL, mesh = NULL, family = "poisson", ...) {
 #' @param ... Arguments passed on to iinla
 #' @return An \link{inla} object
 
-lgcp = function(points, samplers = NULL, model = NULL, mesh = NULL, ...) {
+lgcp = function(points, samplers = NULL, model = NULL, expr = NULL, mesh = NULL, ...) {
   
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
   if ( is.null(model) ) { 
     model = default.model(mesh)
     model$formula = update.formula(model$formula, coordinates ~ .)
     }
-
+  
   if ( class(model)[[1]] == "formula" ) {
     fml = model
     if (attr(terms(fml), "intercept") == 1) { base.model = model.intercept() } else { base.model = NULL }
@@ -98,7 +100,9 @@ lgcp = function(points, samplers = NULL, model = NULL, mesh = NULL, ...) {
     model = join.model(more.model, base.model)
     rhs = reformulate(attr(terms(model$formula), "term.labels"), intercept = FALSE)
     model$formula = update.formula(lhs, rhs)
-  } 
+  }
+  
+  if ( !is.null(predictor) ) { model$expr = predictor }
   
   # Create integration points
   icfg = iconfig(samplers, points, model)
@@ -204,8 +208,11 @@ as.model.formula = function(fml) {
     }
     if ( (length(gidx) > 0) || length(others) > 0 ) {
       new.fml = as.formula(paste0("~.+", paste0("",paste0("", lbl, collapse = " + "))))
+      # Add left hand side of fml
+      new.fml = update.formula(update.formula(fml, ~ 1),new.fml)
+      # Add environment
       environment(new.fml) = environment(fml)
-      
+      # Make model
       mdl = make.model(formula = new.fml, name = "", mesh = mesh, effects = effects, 
                        inla.spde = inla.models, mesh.coords = mesh.coords, time.coords = NULL)  
     } else { return(NULL) }
@@ -266,7 +273,7 @@ iinla = function(data, model, stackmaker, n = 1, idst.verbose = FALSE, result = 
     
     # Update model
     update.model(model, result)
-    
+    model$result = result
     if ( n > 1 & k < n) { stk = stackmaker(data, model) }
   }
   result$stack = stk
