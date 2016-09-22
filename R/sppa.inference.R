@@ -84,7 +84,7 @@ poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "
 #' @param ... Arguments passed on to iinla
 #' @return An \link{inla} object
 
-lgcp = function(points, samplers = NULL, model = NULL, expr = NULL, mesh = NULL, ...) {
+lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = NULL, ...) {
   
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
   if ( is.null(model) ) { 
