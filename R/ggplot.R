@@ -1,10 +1,73 @@
 # This file contains several helpers to plot distance sampling data using ggplot2
+# gg.map() : Plot a ggmap covering the area some data sits in
+# gg.point(): Point geom for Spatial* objects
+# gg.segment(): Segment geom for Spatial* objects
 # gg.mesh() : A geom for plotting the mesh
 # gg.bnd() : A geom for plotting the boundary segment of a mesh
 # gg.int() : A geom for plotting the interior segments of a mesh
 # gg.seg() : A geom for plotting segment lines
 # gg.det() : A geom for plotting detections
 # gg.swath() : A geom for plotting the segment area
+
+
+#' Plot a gg-map covering the area a spatial object resides in
+#' 
+#' @aliases gg.map
+#' @name gg.map
+#' @export
+#' @param data A Spatial* object
+#' @return A ggmap
+#' 
+gg.map = function(data, ...) {
+  data = spTransform(data, CRS("+proj=longlat"))
+  df = cbind(coordinates(data), data@data)
+  
+  # Figure out a sensible bounding box (range of data plus 30%)
+  extend = 1.3
+  cloc = apply(coordinates(data), MARGIN = 2, mean)
+  crange = apply(coordinates(data), MARGIN = 2, range)
+  lonlim = (extend*(crange[,1] - cloc[1])) + cloc[1]
+  latlim = (extend*(crange[,2] - cloc[2])) + cloc[2]
+  
+  # Create map
+  myMap = get_map(c(lonlim[1], latlim[1], lonlim[2], latlim[2]), ...)
+  
+  # Return map
+  ggmap(myMap)
+}
+
+#' Point geom for Spatial* objects
+#' 
+#' @aliases gg.point
+#' @name gg.point
+#' @export
+#' @param data A Spatial* object
+#' @return geom_point
+#' 
+gg.point = function(data, ...) {
+  data = spTransform(data, CRS("+proj=longlat"))
+  df = data.frame(coordinates(data))
+  geom_point(data = df, aes(x=lon,y=lat), color = "red", ...)
+}
+
+#' Segment geom for Spatial* objects
+#' 
+#' @aliases gg.segment
+#' @name gg.segment
+#' @export
+#' @param data A Spatial* objectt
+#' @return geom_segment
+#' 
+gg.segment = function(data, ...) {
+  data = spTransform(data, CRS("+proj=longlat"))
+  qq = coordinates(data)
+  sp = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x)-1),]))))
+  ep = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)),]))))
+  colnames(sp) = paste0("start.", c("lon","lat"))
+  colnames(ep) = paste0("end.", c("lon","lat"))
+  df = data.frame(cbind(sp, ep))
+  geom_segment(data = df, aes(x = start.lon, y = start.lat, xend = end.lon, yend = end.lat), color = "green", ...)  
+} 
 
 
 #' Plot inla.mesh using ggplot2
