@@ -1,15 +1,16 @@
 
-nlinla.taylor = function(expr, data) {
-  effects = colnames(data)
-  grd = matrix(NA, ncol = length(effects), nrow = nrow(data))
+nlinla.taylor = function(expr, epunkt, data) {
+  effects = colnames(epunkt)
+  grd = matrix(NA, ncol = length(effects), nrow = nrow(epunkt))
   const = numeric()
   const2 = numeric()
-  for (k in 1:nrow(data)) {
+  for (k in 1:nrow(epunkt)) {
     myenv = new.env()
-    invisible(lapply(effects, function(x) myenv[[x]] = data[k,x]))
+    invisible(lapply(effects, function(x) myenv[[x]] = epunkt[k,x]))
+    invisible(lapply(names(data), function(x) myenv[[x]] = as.data.frame(data)[k,x]))
     tmp = numericDeriv(expr[[1]], effects, myenv)
     grd[k,] = attr(tmp, "gradient")
-    const[k] = tmp[1] - sum(grd[k,] * t(as.vector(data[k,effects])))
+    const[k] = tmp[1] - sum(grd[k,] * t(as.vector(epunkt[k,effects])))
   }
   grd =  data.frame(grd)
   colnames(grd) = effects
@@ -29,10 +30,10 @@ nlinla.epunkt = function(model, data, result = NULL) {
 nlinla.reweight = function(A, weights, model, data){
   expr = model$expr
   epkt = nlinla.epunkt(model, data, result = model$result)
-  ae = nlinla.taylor(expr, epkt)
+  ae = nlinla.taylor(expr, epkt, data)
   for ( k in 1:length(A) ) {
     nm = names(A)[k]
-    if (!(nm=="")){ A[[k]] = A[[k]] * ae$gradient[[nm]] }
+    if ( !(is.null(nm) || nm == "")){ A[[k]] = A[[k]] * ae$gradient[[nm]] }
   }
   for ( k in 1:length(weights) ){
     for (j in 1:ncol(weights[[k]])) {
