@@ -45,9 +45,9 @@ gg.map = function(data, ...) {
 #' @return geom_point
 #' 
 gg.point = function(data, ...) {
-  data = spTransform(data, CRS("+proj=longlat"))
+  # data = spTransform(data, CRS("+proj=longlat"))
   df = data.frame(coordinates(data))
-  geom_point(data = df, aes(x=lon,y=lat), color = "red", ...)
+  geom_point(data = df, aes_string(x = coordnames(data)[1], y = coordnames(data)[2]), color = "red", ...)
 }
 
 #' Segment geom for Spatial* objects
@@ -59,14 +59,19 @@ gg.point = function(data, ...) {
 #' @return geom_segment
 #' 
 gg.segment = function(data, ...) {
-  data = spTransform(data, CRS("+proj=longlat"))
+  # data = spTransform(data, CRS("+proj=longlat"))
   qq = coordinates(data)
+  cnames = coordnames(data)
   sp = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x)-1),]))))
   ep = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)),]))))
-  colnames(sp) = paste0("start.", c("lon","lat"))
-  colnames(ep) = paste0("end.", c("lon","lat"))
+  colnames(sp) = paste0("start.", cnames)
+  colnames(ep) = paste0("end.", cnames)
   df = data.frame(cbind(sp, ep))
-  geom_segment(data = df, aes(x = start.lon, y = start.lat, xend = end.lon, yend = end.lat), color = "green", ...)  
+  geom_segment(data = df, aes_string(x = paste0("start.", cnames)[1], 
+                                     y = paste0("start.", cnames)[2], 
+                                     xend = paste0("end.", cnames)[1], 
+                                     yend = paste0("end.", cnames)[2]),
+               color = "green", ...)  
 } 
 
 
