@@ -70,6 +70,8 @@ poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "
   
   result = iinla(points, model, stk, family = family, ...)
   result$mesh = mesh
+  result$sppa$method = "poiss"
+  if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
   return(result)
 }
 
@@ -118,7 +120,9 @@ lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = 
   result$mesh = mesh
   result$ips = ips
   result$iconfig = icfg
+  result$sppa$method = "lgcp"
   result$sppa$model = model
+  if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
   return(result)
 }
 
@@ -187,6 +191,7 @@ as.model.formula = function(fml) {
     mesh.coords = list()
     # mesh.map = list()
     inla.models = list()
+    covariates = list()
     effects = lbl
     
     # Select g-terms
@@ -213,7 +218,7 @@ as.model.formula = function(fml) {
       # Add environment
       environment(new.fml) = environment(fml)
       # Make model
-      mdl = make.model(formula = new.fml, name = "", mesh = mesh, effects = effects, 
+      mdl = make.model(formula = new.fml, name = "", mesh = mesh, effects = effects, covariates = covariates, 
                        inla.spde = inla.models, mesh.coords = mesh.coords, time.coords = NULL)  
     } else { return(NULL) }
   } else { return(NULL)}
