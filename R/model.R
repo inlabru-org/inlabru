@@ -419,7 +419,9 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
         A = Amat[[name]]
         post = lapply(smp, function(s) { as.vector(A%*%as.vector(s[[name]])) })
       } else {
-        post = lapply(smp, function(s) {s[[name]] * cov[name]})
+        post = lapply(smp, function(s) {
+          # Note: if there is no covariate, assume covariate = 1
+          if (is.null(cov[name])) {rep(s[[name]],nrow(loc))} else { s[[name]] * cov[name] } } )
       }
       
     } else {
@@ -431,7 +433,12 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
         if ( grepl("[()]", name)) {
           post = inla.result$summary.fixed[name, property] * eval(parse(text = name), as.data.frame(loc))
         } else {
-          post = inla.result$summary.fixed[name, property] * cov[[name]]
+            # Note: if there is no covariate, assume covariate = 1
+            if (is.null(cov[[name]])) {
+              post = rep(inla.result$summary.fixed[name, property], nrow(loc))
+            } else {
+              post = inla.result$summary.fixed[name, property] * cov[[name]]
+            }
         }
         
       } else if (paste0("Beta for ",name) %in% rownames(inla.result$summary.hyperpar)) {
