@@ -23,11 +23,10 @@ gg.map = function(data, ...) {
   df = cbind(coordinates(data), data@data)
   
   # Figure out a sensible bounding box (range of data plus 30%)
-  extend = 1.3
-  cloc = apply(coordinates(data), MARGIN = 2, mean)
+  extend = 2.5
   crange = apply(coordinates(data), MARGIN = 2, range)
-  lonlim = (extend*(crange[,1] - cloc[1])) + cloc[1]
-  latlim = (extend*(crange[,2] - cloc[2])) + cloc[2]
+  lonlim = (extend*(crange[,1] - mean(crange[,1]))) + mean(crange[,1])
+  latlim = (extend*(crange[,2] - mean(crange[,2]))) + mean(crange[,2])
   
   # Create map
   myMap = get_map(c(lonlim[1], latlim[1], lonlim[2], latlim[2]), ...)
