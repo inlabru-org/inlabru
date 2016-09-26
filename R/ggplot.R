@@ -46,7 +46,7 @@ gg.map = function(data, ...) {
 gg.point = function(data, ...) {
   # data = spTransform(data, CRS("+proj=longlat"))
   df = data.frame(coordinates(data))
-  geom_point(data = df, aes_string(x = coordnames(data)[1], y = coordnames(data)[2]), color = "red", ...)
+  geom_point(data = df, aes_string(x = coordnames(data)[1], y = coordnames(data)[2]), ...)
 }
 
 #' Segment geom for Spatial* objects
