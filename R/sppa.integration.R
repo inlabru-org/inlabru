@@ -263,7 +263,7 @@ iconfig = function(samplers, points, model) {
         ret$scheme = "trapezoid"
         ret$sp = ret$min
         ret$ep = ret$max
-        ret$n.points = 10
+        ret$n.points = 20
       }      
     }
     ret
