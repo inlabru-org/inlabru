@@ -86,7 +86,7 @@ poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "
 #' @param ... Arguments passed on to iinla
 #' @return An \link{inla} object
 
-lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = NULL, ...) {
+lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = NULL, scale = NULL, ...) {
   
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
   if ( is.null(model) ) { 
@@ -109,6 +109,9 @@ lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = 
   # Create integration points
   icfg = iconfig(samplers, points, model)
   ips = ipoints(samplers, icfg)
+  
+  # If scale is not NULL, rescale integration weights
+  if ( !is.null(scale) ) { ips$weight = scale * ips$weight }
 
   # Stack
   stk = function(points, model) { 
@@ -211,6 +214,19 @@ as.model.formula = function(fml) {
       lb = gsub("[,][ ]*mesh[ ]*=[^),]*", "", lb)
       lbl[[k]] = lb
     }
+    for ( k in others ) {
+      gpd = getParseData(parse(text=lbl[k]))
+      if (gpd[1,"token"] == "SYMBOL" && gpd[1,"text"] %in% names(environment(fml))) {
+        covariates[[lbl[k]]] = function(x) {
+          v = rep(1, nrow(as.data.frame(x)))
+          ret = data.frame(v)
+          colnames(ret) = effect
+          return(ret) 
+        }
+      environment(covariates[[lbl[k]]]) = new.env()
+      assign("effect", lbl[k], envir = environment(covariates[[lbl[k]]]))
+      }
+    }
     if ( (length(gidx) > 0) || length(others) > 0 ) {
       new.fml = as.formula(paste0("~.+", paste0("",paste0("", lbl, collapse = " + "))))
       # Add left hand side of fml
@@ -242,7 +258,6 @@ as.model.formula = function(fml) {
 
 
 iinla = function(data, model, stackmaker, n = 1, idst.verbose = FALSE, result = NULL, ...){
-  
   # Inital stack
   stk = stackmaker(data, model)
   
