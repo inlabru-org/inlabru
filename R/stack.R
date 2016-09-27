@@ -51,6 +51,7 @@ detection.stack = function(data,
     A = rw$A
     eff = rw$weights
     e.pp = e.pp * exp(rw$const)
+    if ( min(e.pp) < 0.01) { warning("Poisson exposure is smaller than 0.01. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")}
   }
   
   # Create and return stack
@@ -124,6 +125,7 @@ integration.stack = function(data = NULL,
     A = rw$A
     eff = rw$weights
     e.pp = e.pp * exp(rw$const)
+    if ( min(e.pp) < 0.01) { warning("Poisson exposure is smaller than 0.01. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")}
   }
   
   # Create and return stack
