@@ -398,7 +398,7 @@ iteration.history.model = function(model, effect){
 #' @param loc Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
 
-evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1) {
+evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr) {
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
   if ( property == "sample") {
@@ -460,6 +460,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
     posts[[name]] = post
   }
   if ( property == "sample") {
+    if (!is.null(predictor)) {stop("Sampling with non-linear predictor not yet implemented.")}
     ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
     if( "const" %in% names(model) & !(length(model$const)==0)) {
       const = colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
@@ -468,7 +469,10 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
     ret = lapply(ret, link)
   } else {
     ret = do.call(cbind, posts)
+    if (!is.null(predictor) && do.sum) { ret = eval(predictor, c(posts, as.list(data.frame(loc)))) }
+    
     if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
+
     if( "const" %in% names(model) & !(length(model$const)==0)) { 
       ret = ret + colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
     }
