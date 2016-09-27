@@ -258,6 +258,9 @@ as.model.formula = function(fml) {
 
 
 iinla = function(data, model, stackmaker, n = 1, idst.verbose = FALSE, result = NULL, ...){
+  # Track variables?
+  track = list()
+  
   # Inital stack
   stk = stackmaker(data, model)
   
@@ -294,10 +297,12 @@ iinla = function(data, model, stackmaker, n = 1, idst.verbose = FALSE, result = 
     # Update model
     update.model(model, result)
     model$result = result
+    track[[k]] = result$summary.fixed[,"mode"]
     if ( n > 1 & k < n) { stk = stackmaker(data, model) }
   }
   result$stack = stk
   result$model = model
+  result$iinla$track = do.call(rbind, track)
   class(result) = c("iinla", "inla", "list")
   return(result)
 }
