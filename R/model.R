@@ -469,9 +469,8 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
     ret = lapply(ret, link)
   } else {
     ret = do.call(cbind, posts)
-    if (!is.null(predictor) && do.sum) { ret = eval(predictor, c(posts, as.list(data.frame(loc)))) }
-    
-    if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
+    if (!is.null(predictor) && do.sum) { ret = eval(predictor, c(posts, as.list(data.frame(loc)))) } 
+    else if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
 
     if( "const" %in% names(model) & !(length(model$const)==0)) { 
       ret = ret + colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
