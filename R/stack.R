@@ -51,7 +51,7 @@ detection.stack = function(data,
     A = rw$A
     eff = rw$weights
     e.pp = e.pp * exp(rw$const)
-    if ( min(e.pp) < 0.01) { warning("Poisson exposure is smaller than 0.01. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")}
+    if ( any((e.pp > 0) & (e.pp < 0.00001)) ) { warning("Exposure E is smaller than 0.00001. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")}
   }
   
   # Create and return stack
@@ -124,8 +124,8 @@ integration.stack = function(data = NULL,
     rw = nlinla.reweight(A, eff, model, pts)
     A = rw$A
     eff = rw$weights
-    e.pp = e.pp * exp(rw$const)
-    if ( min(e.pp) < 0.01) { warning("Poisson exposure is smaller than 0.01. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")}
+    e.pp = e.pp * exp(rw$const) # min(exp(rw$const)
+    if ( any((e.pp > 0) & (e.pp < 0.00001)) ) { warning("Exposure E is smaller than 0.00001. This may lead to numerical problems and non-convergence. Consider setting scale = 100 or higher (order of magnitude) when calling lgcp().")}
   }
   
   # Create and return stack
