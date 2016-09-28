@@ -297,7 +297,7 @@ iinla = function(data, model, stackmaker, n = 1, idst.verbose = FALSE, result = 
     # Update model
     update.model(model, result)
     model$result = result
-    track[[k]] = result$summary.fixed[,"mode"]
+    track[[k]] = cbind(effect = rownames(result$summary.fixed), iteration = k, result$summary.fixed)
     if ( n > 1 & k < n) { stk = stackmaker(data, model) }
   }
   result$stack = stk
