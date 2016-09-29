@@ -26,13 +26,22 @@ gauss = function(points, model = NULL, predictor = NULL, mesh = NULL, y = ~ k, .
 }
 
 #' Poisson regression using INLA
+#' 
+#' This function provides an easy-to-use interface to Poisson regression using INLA, in particular for spatial count data. 
+#' The \code{points} parameter is used to provide the regression data, e.g. counts, exposures and covariates to regress on.
+#' The \code{model} parameter, typically a \link{formula}, defines two aspects of the regression. On the left hand side
+#' the (known) counts as well as the exposures are stated. The right hand side defines the log linear predictor of the 
+#' regression. For non-linear regression the \code{predictor} parameter can be emplyed to override the linear structure
+#' implied by the formula. Note that the \link{INLA} \code{family} argument can be overwritten and thereby other INLA 
+#' likelihoods like the binomial and zero-inflated count models are accessible.
 #'
 #' @aliases poiss
 #' @export
-#' @param points A SpatialPoints[DataFrame] object
-#' @param model Typically a formula or a \link{model} describing the components of the LGCP density. If NULL, an intercept and a spatial SPDE component are used
-#' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
-#' @return An \link{inla} object
+#' @param points A data frame or SpatialPointsDataFrame object
+#' @param model Typically a formula or a \link{model} describing the linear regression predictor. If NULL, an intercept and a spatial SPDE component are used
+#' @param predictor If NULL, the linear combination defined by the model/formula is used as a predictor for the counts. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
+#' @param mesh An inla.mesh object modelling s spatial domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
+#' @return An \link{iinla} object
 
 poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "poisson", ...) {
   
@@ -75,16 +84,31 @@ poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "
   return(result)
 }
 
-#' Log Gaussian Cox process models using INLA
+#' Log Gaussian Cox process (LGCP) inference using INLA
+#' 
+#' This function performs inference on a LGCP observed via points residing possibly multiple dimensions. 
+#' These dimensions are defined via the left hand side of the formula provided via the model parameter.
+#' The left hand side determines the intensity function that is assumed to drive the LGCP. This may include
+#' effects that lead to a thinning (filtering) of the point process. By default, the log intensity is assumed
+#' to be a linear combination of the effects defined by the formula's RHS. More sofisticated models, e.g.
+#' non-linear thinning, can be achieved by using the predictor argument. The latter requires multiple runs
+#' of INLA for improving the required approximation of the predictor (see \link{iinla}). In many applications
+#' the LGCP is only observed through subsets of the dimensions the process is living in. For example, spatial
+#' point realizations may only be known in sub-areas of the modeled space. These observed subsets of the LGCP
+#' domain are called samplers and can be provided via the respective parameter. If samplers is NULL it is
+#' assumed that all of the LGCP's dimensions have been observed completely. 
+#' 
 #'
 #' @aliases lgcp
 #' @export
-#' @param points A SpatialPoints[DataFrame] object
-#' @param samplers A Spatial[Points/Lines/Polygons]DataFrame objects
+#' @param points A data frame or SpatialPoints[DataFrame] object
+#' @param samplers A data frame or Spatial[Points/Lines/Polygons]DataFrame objects
 #' @param model Typically a formula or a \link{model} describing the components of the LGCP density. If NULL, an intercept and a spatial SPDE component are used
-#' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
-#' @param ... Arguments passed on to iinla
-#' @return An \link{inla} object
+#' @param predictor If NULL, the linear combination defined by the model/formula is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
+#' @param mesh An inla.mesh object modelling a spatial domain. If NULL and spatial data is provied the mesh is constructed from a non-convex hull of the points
+#' @param scale If provided as a scalar then rescale the exposure parameter of the Poisson likelihood. This will influence your model's intercept but can help with numerical instabilities, e.g. by setting scale to a large value like 10000
+#' @param ... Arguments passed on to \link{iinla}
+#' @return An \link{iinla} object
 
 lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = NULL, scale = NULL, ...) {
   
@@ -129,10 +153,12 @@ lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = 
   return(result)
 }
 
-#' Generate a mesh from a hull of points
+#' Generate a simple default mesh
 #'
 #' @aliases default.mesh
+#' @export
 #' @param spObject A Spatial* object
+#' @param max.edge A parameter passed on to \link{inla.mesh.2d} which controls the granularity of the mesh. If NULL, 1/20 of the domain size is used.
 #' @return An \code{inla.mesh} object
 
 default.mesh = function(spObject, max.edge = NULL){
@@ -153,6 +179,7 @@ default.mesh = function(spObject, max.edge = NULL){
 #' Generate a default model with a spatial SPDE component and an intercept
 #'
 #' @aliases default.model
+#' @export
 #' @param mesh An inla.mesh object
 #' @return A \link{model} object
 
@@ -160,11 +187,13 @@ default.model = function(mesh) {
   model = join(model.spde(list(mesh = mesh)), model.intercept())
 }
 
-#' A wrapper for inla f() function 
+#' A wrapper for the \link{inla} \link{f} function
 #' 
-#' g makes the mesh an explicit argument and catches the provided model for later usage
+#' g makes the mesh an explicit argument and catches the provided model for later usage.
+#' See \link{f} for details on model specifications.
 #'
 #' @aliases g
+#' @export
 #' @param mesh An inla.mesh
 #' @param model See \link{f} model specifications
 #' @param ... Passed on to inla \link{f}
@@ -176,6 +205,8 @@ g = function(mesh, model, ...) { c(list(mesh = mesh, model = model), f(model = m
 #' Turn a formula into an iDistance \link{model}
 #' 
 #' To be used with formulae that use the \link{g} function as wrapper for inla's \link{f} function
+#' Warning: this functions mainly exists for reasons of back-compatibilty. Avoid using it at all
+#' costs.
 #'
 #' @aliases as.model.formula
 #' @export
@@ -243,8 +274,10 @@ as.model.formula = function(fml) {
 
 #' Iterated INLA
 #' 
-#' This is a wrapper for iterated calls to \link{inla}.
-#' Before each call the stackmaker function is used to set up the stack.
+#' This is a wrapper for iterated runs of \link{inla}. Before each run the \code{stackmaker} function is used to
+#' set up the \link{inla.stack} for the next iteration. For this purpose \code{stackmaker} is called given the
+#' \code{data} and \code{model} arguments. The \code{data} argument is the usual data provided to \link{inla}
+#' while \link{model} provides more information than just the usual inla formula. 
 #' 
 #' @aliases iinla
 #' @export
