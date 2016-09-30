@@ -285,12 +285,16 @@ as.model.formula = function(fml) {
 #' @param model A \link{model} object
 #' @param stackmaker A function creating a stack from data and a model
 #' @param n Number of \link{inla} iterations
-#' @param idst.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
+#' @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
 #' @param ... Arguments passed on to \link{inla}
 #' @return An \link{inla} object
 
 
-iinla = function(data, model, stackmaker, n = 1, idst.verbose = FALSE, result = NULL, ...){
+iinla = function(data, model, stackmaker, n = NULL, iinla.verbose = FALSE, result = NULL, ...){
+  
+  # Default number of maximum iterations
+  if ( !is.null(model$expr) ) { n = 10 } else { n = 1 }
+  
   # Track variables?
   track = list()
   
@@ -298,8 +302,9 @@ iinla = function(data, model, stackmaker, n = 1, idst.verbose = FALSE, result = 
   stk = stackmaker(data, model)
   
   k = 1
+  interrupt = FALSE
   
-  for ( k in 1:n ) {
+  while ( (k <= n) & !interrupt ) {
     iargs = list(...) # Arguments passed on to INLA
     
     # When running multiple times propagate theta
@@ -308,7 +313,7 @@ iinla = function(data, model, stackmaker, n = 1, idst.verbose = FALSE, result = 
     }
     
     # Verbose
-    if ( idst.verbose ) { cat(paste0("Iteration: "),k, " ...") }
+    if ( iinla.verbose ) { cat(paste0("INLA iteration"),k,"[ max:", n,"].") }
     
     # Return previous result if inla crashes, e.g. when connection to server is lost 
     if ( k > 1 ) { old.result = result } 
@@ -325,13 +330,25 @@ iinla = function(data, model, stackmaker, n = 1, idst.verbose = FALSE, result = 
                           }
                         }
     )
-    if ( idst.verbose ) { cat("done.\n") }
+    if ( iinla.verbose ) { cat(" Done. ") }
     
     # Update model
     update.model(model, result)
     model$result = result
     track[[k]] = cbind(effect = rownames(result$summary.fixed), iteration = k, result$summary.fixed)
     if ( n > 1 & k < n) { stk = stackmaker(data, model) }
+    
+    # Stopping criterion
+    if ( k>1 ){
+      max.dev = 0.01
+      dev = do.call(c, lapply(by(do.call(rbind, track), as.factor(do.call(rbind, track)$effect), identity), function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
+      cat(paste0("Max deviation from previous: ", signif(100*max(dev),3),"% of SD [stop if: <",100*max.dev,"%]\n"))
+      interrupt = all( dev < max.dev)
+      if (interrupt) {cat("Convergence criterion met, stopping INLA iteration.")}
+    } else {
+      cat("\n")
+    }
+    k = k+1
   }
   result$stack = stk
   result$model = model
