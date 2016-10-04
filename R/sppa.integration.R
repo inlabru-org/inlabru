@@ -144,7 +144,7 @@ ipoints = function(samplers, config) {
     } else {
       ips = do.call(int.expand, c(list(as.data.frame(ips)), li))
       if ( spatial ) {
-        ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,c(postgroup, pregroup, "weight")])
+        ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,intersect(c(postgroup, pregroup, "weight"), colnames(ips)) ])
       }
     }
   }
