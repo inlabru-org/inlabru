@@ -460,11 +460,15 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
     posts[[name]] = post
   }
   if ( property == "sample") {
-    if (!is.null(predictor)) {stop("Sampling with non-linear predictor not yet implemented.")}
-    ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
-    if( "const" %in% names(model) & !(length(model$const)==0)) {
-      const = colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
-      ret = lapply(ret, function(x) { x + const })
+    if (!is.null(predictor) && do.sum) { 
+      ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,identity)}), posts))
+      ret = lapply(ret, function(r) {eval(predictor, envir = cbind(as.data.frame(t(r)), loc))})
+    } else {
+        ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
+        if( "const" %in% names(model) & !(length(model$const)==0)) {
+          const = colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
+          ret = lapply(ret, function(x) { x + const })
+        }
     }
     ret = lapply(ret, link)
   } else {
