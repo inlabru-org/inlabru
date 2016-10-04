@@ -34,7 +34,7 @@ ipoints = function(samplers, config) {
   
   # First step: Figure out which marks are already included in the samplers (e.g. time)
   # For each of the levels of these marks the integration points will be computed independently
-  pregroup = setdiff(names(samplers), "weight")
+  pregroup = setdiff(colnames(samplers), "weight")
   postgroup = setdiff(names(config), c(pregroup, "coordinates"))
   
   # By default we assume we are handling a Spatial* object
@@ -60,7 +60,14 @@ ipoints = function(samplers, config) {
     
     ips = samplers
   } 
-  else if ( class(samplers) == "SpatialLinesDataFrame" ){
+  else if ( inherits(samplers, "SpatialLines") || inherits(samplers, "SpatialLinesDataFrame") ){
+    
+    # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
+    if ( inherits(samplers, "SpatialLines") ) { 
+      samplers = SpatialLinesDataFrame(samplers, data = data.frame(weight = rep(1, length(samplers)))) 
+    }
+    
+    # Set weights to 1 if not provided
     if (!("weight" %in% names(samplers))) { 
       warning("The integration points provided have no weight column. Setting weights to 1.")
       samplers$weight = 1
@@ -137,7 +144,7 @@ ipoints = function(samplers, config) {
     } else {
       ips = do.call(int.expand, c(list(as.data.frame(ips)), li))
       if ( spatial ) {
-        ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,c(postgroup, pregroup, "weight")])
+        ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,intersect(c(postgroup, pregroup, "weight"), colnames(ips)) ])
       }
     }
   }
@@ -202,7 +209,7 @@ iconfig = function(samplers, points, model) {
       if ( nm == "coordinates" ) {
         ret$get.coord = get0(nm)
         ret$n.coord = ncol(ret$get.coord(points))
-        ret$mesh = model$mesh$spde
+        ret$mesh = model$mesh[[1]]
         ret$class = "matrix"  
         ret$project = TRUE
       } else {
@@ -216,7 +223,7 @@ iconfig = function(samplers, points, model) {
       if ( is.data.frame(points) ) { ret$get.coord = function(sp) { sp[,nm, drop = FALSE] }} 
       else { ret$get.coord = function(sp) { sp@data[,nm, drop = FALSE] } }
       ret$n.coord = 1
-      ret$class = class(ret$get.coord(points))
+      ret$class = class(ret$get.coord(points)[,nm])
     }
     
     # If there is a mesh in the model that has the same name as the dimension
@@ -256,7 +263,7 @@ iconfig = function(samplers, points, model) {
         ret$scheme = "trapezoid"
         ret$sp = ret$min
         ret$ep = ret$max
-        ret$n.points = 10
+        ret$n.points = 20
       }      
     }
     ret

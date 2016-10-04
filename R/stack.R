@@ -45,7 +45,15 @@ detection.stack = function(data,
   # Expectation parameter E
   if ( !(length(E) == nrow(as.data.frame(pts))) ) { e.pp = rep(E, nrow(as.data.frame(pts))) } else { e.pp = E } # as.data.frame required for SpatialPoints because they have no nrow function
   
-  # eff[[1]] = eff[[1]][,"Intercept",drop=FALSE]
+  # Reweight things if dealing with taylor approximated model
+  if ( !is.null(model$expr) ) {
+    rw = nlinla.reweight(A, eff, model, pts)
+    A = rw$A
+    eff = rw$weights
+    e.pp = e.pp * exp(rw$const)
+    if ( any((e.pp > 0) & (e.pp < 0.00001)) ) { warning("Exposure E is smaller than 0.00001. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")}
+  }
+  
   # Create and return stack
   stk = inla.stack(data = list(y.inla = y.pp, e = e.pp),
                      A = A,
@@ -110,7 +118,16 @@ integration.stack = function(data = NULL,
       stop("E-vector length does not equal length of vector returned by const function") }
     e.pp = as.numeric(e.pp * exp( const.values )) 
   }
-  # eff[[1]] = eff[[1]][,"Intercept",drop=FALSE]
+  
+  # Reweight things if dealing with taylor approximated model
+  if ( !is.null(model$expr) ) {
+    rw = nlinla.reweight(A, eff, model, pts)
+    A = rw$A
+    eff = rw$weights
+    e.pp = e.pp * exp(rw$const) # min(exp(rw$const)
+    if ( any((e.pp > 0) & (e.pp < 0.00001)) ) { warning("Exposure E is smaller than 0.00001. This may lead to numerical problems and non-convergence. Consider setting scale = 100 or higher (order of magnitude) when calling lgcp().")}
+  }
+  
   # Create and return stack
   stk = inla.stack(data = list(y.inla = y.pp, e = e.pp),
                     A = A,

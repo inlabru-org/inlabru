@@ -6,7 +6,7 @@ normalize = function(...){UseMethod("normalize")}
 
 ### Unknown space
 
-distance = function(sp, ep, geometry){
+sdistance = function(sp, ep, geometry){
   class(sp) = c(geometry,"data.frame")
   class(ep) = c(geometry,"data.frame")
   if (geometry == "euc") { return(dist.euc(sp,ep)) }

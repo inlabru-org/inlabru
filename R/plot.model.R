@@ -287,18 +287,24 @@ plot.spatial = function(model = NULL,
                         add.mesh = TRUE,
                         add.detection = FALSE,
                         add.segment = FALSE,
-                        logscale = TRUE,
+                        logscale = NULL,
                         rgl = FALSE,
                         add = FALSE,
                         nx = 300){
-  
+#
+# (0) Some defaults
+#
+if ( inherits(model, "inla") ) { result = model ; model = NULL}
+if ( is.null(model) && ("model" %in% names(result)) ) { model = result$model }
+if ( is.null(logscale) && !is.null(result$sppa$method) && (result$sppa$method=="lgcp" || result$sppa$method=="poiss")) { logscale = FALSE } else { logscale = TRUE } 
+    
 #  
 # (1) The mesh and vertex location
 #
 
   if ( is.null(mesh) ) {
     # If no mesh is provided we first check if data is provided. If so, use the data mesh
-    if ( !is.null(data) ) { 
+    if ( !is.null(data) && ("mesh" %in% names(data)) ) { 
       mesh = data$mesh
       mloc = mesh$loc[,1:length(data$mesh.coords)]
       colnames(mloc) = data$mesh.coords
@@ -308,8 +314,13 @@ plot.spatial = function(model = NULL,
       if ( is.null(model) ) { stop("Your provided no mesh, no data set with a mesh and not model to take a mesh from") }
       if ( "mesh" %in% names(model) & length(model$mesh)>0) {
         mesh = model$mesh[[1]]
-        mloc = mesh$loc[,1:length(model$mesh.coords[[1]])]
-        colnames(mloc) = model$mesh.coords[[1]]
+        if ("coordnames" %in% names(result$sppa)) {
+          mloc = mesh$loc[,1:length(result$sppa$coordnames)]
+          colnames(mloc) = result$sppa$coordnames
+        } else {
+          mloc = mesh$loc[,1:length(model$mesh.coords[[1]])]
+          colnames(mloc) = model$mesh.coords[[1]]
+        }
       } else {
         stop("Your provided no mesh, no data set with a mesh and your model does not have a mesh.")
       }

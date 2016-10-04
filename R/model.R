@@ -398,11 +398,11 @@ iteration.history.model = function(model, effect){
 #' @param loc Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
 
-evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1) {
+evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr) {
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
   if ( property == "sample") {
-    if ( class(inla.result) == "inla" ) {
+    if ( inherits(inla.result, "inla") ) {
       smp = inla.posterior.sample.structured(inla.result, n = n) 
     } else {
       smp = inla.result
@@ -419,7 +419,9 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
         A = Amat[[name]]
         post = lapply(smp, function(s) { as.vector(A%*%as.vector(s[[name]])) })
       } else {
-        post = lapply(smp, function(s) {s[[name]] * cov[name]})
+        post = lapply(smp, function(s) {
+          # Note: if there is no covariate, assume covariate = 1
+          if (is.null(cov[name])) {rep(s[[name]],nrow(loc))} else { s[[name]] * cov[name] } } )
       }
       
     } else {
@@ -427,7 +429,18 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
       # Either fixed effect or hyper parameter
       if (name %in% rownames(inla.result$summary.fixed)){
         # Fixed effect
-        post = inla.result$summary.fixed[name, property] * cov[[name]]
+        # Check if the fixed effect is actually a function call
+        if ( grepl("[()]", name)) {
+          post = inla.result$summary.fixed[name, property] * eval(parse(text = name), as.data.frame(loc))
+        } else {
+            # Note: if there is no covariate, assume covariate = 1
+            if (is.null(cov[[name]])) {
+              post = rep(inla.result$summary.fixed[name, property], nrow(loc))
+            } else {
+              post = inla.result$summary.fixed[name, property] * cov[[name]]
+            }
+        }
+        
       } else if (paste0("Beta for ",name) %in% rownames(inla.result$summary.hyperpar)) {
         # Hyper parameter
         post = inla.result$summary.hyperpar[paste0("Beta for ",name), property] * cov[[name]]
@@ -447,6 +460,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
     posts[[name]] = post
   }
   if ( property == "sample") {
+    if (!is.null(predictor)) {stop("Sampling with non-linear predictor not yet implemented.")}
     ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
     if( "const" %in% names(model) & !(length(model$const)==0)) {
       const = colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
@@ -455,7 +469,9 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
     ret = lapply(ret, link)
   } else {
     ret = do.call(cbind, posts)
-    if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
+    if (!is.null(predictor) && do.sum) { ret = eval(predictor, c(posts, as.list(data.frame(loc)))) } 
+    else if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
+
     if( "const" %in% names(model) & !(length(model$const)==0)) { 
       ret = ret + colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
     }
