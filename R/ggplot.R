@@ -61,6 +61,7 @@ gg.segment = function(data, ...) {
   # data = spTransform(data, CRS("+proj=longlat"))
   qq = coordinates(data)
   cnames = coordnames(data)
+  if (is.null(cnames)) { cnames = c("x","y") }
   sp = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x)-1),]))))
   ep = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)),]))))
   colnames(sp) = paste0("start.", cnames)
