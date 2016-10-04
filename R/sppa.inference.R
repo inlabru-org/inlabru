@@ -293,7 +293,7 @@ as.model.formula = function(fml) {
 iinla = function(data, model, stackmaker, n = NULL, iinla.verbose = FALSE, result = NULL, ...){
   
   # Default number of maximum iterations
-  if ( !is.null(model$expr) ) { n = 10 } else { n = 1 }
+  if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
   
   # Track variables?
   track = list()
