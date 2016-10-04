@@ -1,18 +1,26 @@
 
 nlinla.taylor = function(expr, epunkt, data) {
-  effects = colnames(epunkt)
-  wh = cbind(as.data.frame(data), epunkt)
-  myenv = new.env()
-  invisible(lapply(colnames(wh), function(x) myenv[[x]] = wh[,x]))
-  tmp = numericDeriv(expr[[1]], effects,  rho = myenv)
-  gra = attr(tmp, "gradient")
-  nr = nrow(gra)
-  ngrd = matrix(NA,nrow=nr,ncol=length(effects))
-  for (k in 1:length(effects)){ ngrd[,k] = diag(gra[,((k-1)*nr+1):(k*nr)]) }
-  nconst = as.vector(tmp) - rowSums(ngrd * epunkt)
-  ngrd =  data.frame(ngrd)
-  colnames(ngrd) = effects
-  return(list(gradient = ngrd, const = nconst))
+  if (nrow(epunkt)<=1000) {
+    effects = colnames(epunkt)
+    wh = cbind(as.data.frame(data), epunkt)
+    myenv = new.env()
+    invisible(lapply(colnames(wh), function(x) myenv[[x]] = wh[,x]))
+    tmp = numericDeriv(expr[[1]], effects,  rho = myenv)
+    gra = attr(tmp, "gradient")
+    nr = nrow(gra)
+    ngrd = matrix(NA,nrow=nr,ncol=length(effects))
+    for (k in 1:length(effects)){ ngrd[,k] = diag(gra[,((k-1)*nr+1):(k*nr)]) }
+    nconst = as.vector(tmp) - rowSums(ngrd * epunkt)
+    ngrd =  data.frame(ngrd)
+    colnames(ngrd) = effects
+    return(list(gradient = ngrd, const = nconst))
+  } else {
+    blk = round(1:nrow(epunkt)/1000)
+    qq = by(1:nrow(epunkt), blk, function(idx) {nlinla.taylor(expr,epunkt[idx,],data[idx,])})
+    nconst = do.call(c, lapply(qq, function(x) { x$const }))
+    ngrd = do.call(rbind, lapply(qq, function(x) { x$grad }))
+    return(list(gradient = ngrd, const = nconst))
+  }
 }
 
 nlinla.epunkt = function(model, data, result = NULL) {
