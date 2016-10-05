@@ -290,7 +290,12 @@ as.model.formula = function(fml) {
 #' @return An \link{inla} object
 
 
-iinla = function(data, model, stackmaker, n = NULL, iinla.verbose = FALSE, result = NULL, ...){
+iinla = function(data, model, stackmaker, n = NULL, result = NULL, 
+                 iinla.verbose = iinla.getOption("iinla.verbose"), 
+                 control.inla = iinla.getOption("control.inla"), 
+                 control.compute = iinla.getOption("control.compute"), ...){
+  
+  if ( iinla.verbose ) { cat("iinla(): Let's go.\n") }
   
   # Default number of maximum iterations
   if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
@@ -313,7 +318,7 @@ iinla = function(data, model, stackmaker, n = NULL, iinla.verbose = FALSE, resul
     }
     
     # Verbose
-    if ( iinla.verbose ) { cat(paste0("INLA iteration"),k,"[ max:", n,"].") }
+    if ( iinla.verbose ) { cat(paste0("iinla() iteration"),k,"[ max:", n,"].") }
     
     # Return previous result if inla crashes, e.g. when connection to server is lost 
     if ( k > 1 ) { old.result = result } 
@@ -321,7 +326,9 @@ iinla = function(data, model, stackmaker, n = NULL, iinla.verbose = FALSE, resul
     result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
                                              data = c(inla.stack.data(stk), list.data(model)),
                                              control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
-                                             E = inla.stack.data(stk)$e), iargs)), 
+                                             E = inla.stack.data(stk)$e,
+                                             control.inla = control.inla,
+                                             control.compute = control.compute), iargs)), 
                         error = function(e) { 
                           if (k == 1) { stop(e) }
                           else { 
