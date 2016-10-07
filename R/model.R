@@ -2,7 +2,7 @@
 #' 
 #' Facilitates the spatial modeling approaches using INLA.
 #' 
-#' A \code{model} has a formula that describes one or more of INLA's \code{f} objects. 
+#' A \code{model} has a formula that describes one or more of INLA's \code{f} objects.
 #' It describes how given a data frame of locations or other coordinates translates into
 #' evaluating the predictors of the formula. For manually setting up a \code{model} see the
 #' constructor \link{make.model}. Useful operators on \code{model} objects are:
@@ -421,7 +421,11 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
       } else {
         post = lapply(smp, function(s) {
           # Note: if there is no covariate, assume covariate = 1
-          if (is.null(cov[name])) {rep(s[[name]],nrow(loc))} else { s[[name]] * cov[name] } } )
+          if (is.null(cov[[name]])) {
+            rep(s[[name]],nrow(loc))
+            } else { 
+              s[[name]] * cov[[name]] } 
+          })
       }
       
     } else {
@@ -462,7 +466,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
   if ( property == "sample") {
     if (!is.null(predictor) && do.sum) { 
       ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,identity)}), posts))
-      ret = lapply(ret, function(r) {eval(predictor, envir = cbind(as.data.frame(t(r)), loc))})
+      ret = lapply(ret, function(r) {eval(predictor, envir = cbind(as.data.frame(t(r)), as.data.frame(loc)))})
     } else {
         ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
         if( "const" %in% names(model) & !(length(model$const)==0)) {
