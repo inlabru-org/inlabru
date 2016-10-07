@@ -272,6 +272,82 @@ as.model.formula = function(fml) {
 }
 
 
+#' Predictions based on log Gaussian Cox processes
+#' 
+#' @aliases predict.lgcp 
+#' @export
+#' @param result An object obtained by ralling lgcp()
+#' @return Predicted values
+
+predict.lgcp = function(result,  predictor = result$model$expr, model = NULL, samplers = NULL, property = "sample", n = 100, postproc = summarize) {
+  
+  # Is the predictor is either supplied as an expression?
+  if ( !(substitute(predictor)[[1]] == "expression" ) )  { predictor = as.expression(substitute(predictor)) }
+  
+  # Determine which dimensions NOT to integrate over. Via the model paramter the user can specify
+  # either characters (dimension names), a formula where the left hand side determines the dimensions
+  # or a model where model$ formula determines the dimensions that are not integrated over.
+  if ( is.null(model) ) {
+    dims = NULL
+  } else if ( is.character(model) ) {
+    dims = model
+  } else if ( class(model)[1] == "formula" ) {
+    dims = all.vars(update.formula(model, . ~ 0))
+  } else {
+    dims = all.vars(update.formula(model$formula, . ~ 0))
+  }
+  
+  # Determine all dimensions of the process
+  pdims = names(result$iconfig)
+  
+  # Determine dimensions to intagrate over
+  idims = setdiff(pdims, dims)
+  
+  # Generate points for dimensions to integrate over
+  wips = ipoints(samplers, result$iconfig[idims])
+  
+  if ( is.null(dims) ) { 
+    pts = wips
+  } else {
+    # Generate points for dimensions that we are returning. 
+    # Remove weight and then merge with dims to integrate over
+    rips = ipoints(NULL, result$iconfig[dims])
+    rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
+    pts = merge(rips[,setdiff(names(rips),"weight"),drop=FALSE], wips)
+    if ("coordinates" %in% dims ) { coordinates(pts) = coordnames(rips) }
+  }
+  
+  # Evaluate the model for these points
+  vals = evaluate.model(result$sppa$model, result, pts, property = property, do.sum = TRUE, link = identity, n = n, predictor = predictor)
+  
+  # If we sampled, summarize
+  if ( is.list(vals) ) { vals = do.call(cbind, vals) }
+  
+  # Weighting
+  vals = vals * pts$weight
+  
+  # Sum up!
+  if ( is.null(dims) ) {
+    integral = data.frame(colSums(vals)) ; colnames(integral) = "integral"
+    if ( !is.null(postproc) ) { integral = postproc(t(integral)) }
+  } else {
+    # If we are integrating over space we have to turn the coordinates into data that the by() function understands
+    if ("coordinates" %in% dims ) { by.coords = cbind(coordinates(pts), pts@data[,c(setdiff(dims, "coordinates"))]) } 
+    else { by.coords = pts[,dims]}
+    
+    integral = do.call(rbind, by(vals, by.coords, colSums))
+    if ( !is.null(postproc) ) { integral = postproc(integral, x = as.data.frame(rips)) }
+    if ("coordinates" %in% dims ) { coordinates(integral) = coordnames(rips) }
+  }
+  
+  # return
+  integral
+}
+
+
+
+
+
 #' Iterated INLA
 #' 
 #' This is a wrapper for iterated runs of \link{inla}. Before each run the \code{stackmaker} function is used to
