@@ -63,7 +63,7 @@ ipoints = function(samplers, config) {
   else if ( inherits(samplers, "SpatialLines") || inherits(samplers, "SpatialLinesDataFrame") ){
     
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
-    if ( inherits(samplers, "SpatialLines") ) { 
+    if ( class(samplers)[1] == "SpatialLines" ) { 
       samplers = SpatialLinesDataFrame(samplers, data = data.frame(weight = rep(1, length(samplers)))) 
     }
     
@@ -112,7 +112,6 @@ ipoints = function(samplers, config) {
     ips = int.polygon(config[["coordinates"]]$mesh, loc = polyloc[,1:2], group = polyloc[,3])
     df = data.frame(samplers@data[ips$group, pregroup, drop = FALSE], weight = ips[,"weight"])
     ips = SpatialPointsDataFrame(ips[,c("x","y")],data = df)
-    
     
   } else if ( is.null(samplers) ){
     if ( "coordinates" %in% names(config) ) {
@@ -174,6 +173,7 @@ ipoints = function(samplers, config) {
     }
   }
   
+  if (spatial) { proj4string(ips) = CRS(config[["coordinates"]]$p4s) }
   ips
 }
 
@@ -214,6 +214,7 @@ iconfig = function(samplers, points, model) {
         ret$mesh = model$mesh[[1]]
         ret$class = "matrix"  
         ret$project = TRUE
+        ret$p4s = proj4string(points)
       } else {
         ret$get.coord = get0(nm)
         ret$n.coord = ncol(ret$get.coord(points))
