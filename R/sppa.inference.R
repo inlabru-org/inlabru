@@ -150,6 +150,7 @@ lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = 
   result$sppa$method = "lgcp"
   result$sppa$model = model
   if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
+  class(result) = c("lgcp",class(result))
   return(result)
 }
 
@@ -279,44 +280,50 @@ as.model.formula = function(fml) {
 #' @param result An object obtained by ralling lgcp()
 #' @return Predicted values
 
-predict.lgcp = function(result,  predictor = result$model$expr, model = NULL, samplers = NULL, property = "sample", n = 100, postproc = summarize) {
+predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samplers = NULL,  property = "sample", n = 250, postproc = summarize) {
   
-  # Is the predictor is either supplied as an expression?
-  if ( !(substitute(predictor)[[1]] == "expression" ) )  { predictor = as.expression(substitute(predictor)) }
+  # Extract target dimension from predictor (given as right hand side of formula)
+  dims = setdiff(all.vars(update(predictor, .~0)), ".")
+  pchar = as.character(predictor)
+  predictor.rhs = pchar[-1]
+  predictor = parse(text = predictor.rhs)
   
-  # Determine which dimensions NOT to integrate over. Via the model paramter the user can specify
-  # either characters (dimension names), a formula where the left hand side determines the dimensions
-  # or a model where model$ formula determines the dimensions that are not integrated over.
-  if ( is.null(model) ) {
-    dims = NULL
-  } else if ( is.character(model) ) {
-    dims = model
-  } else if ( class(model)[1] == "formula" ) {
-    dims = all.vars(update.formula(model, . ~ 0))
-  } else {
-    dims = all.vars(update.formula(model$formula, . ~ 0))
-  }
+  # Dimensions we are integrating over
+  idims = integrate
   
-  # Determine all dimensions of the process
+  # Determine all dimensions of the process (pdims)
   pdims = names(result$iconfig)
   
-  # Determine dimensions to intagrate over
-  idims = setdiff(pdims, dims)
+  # Collect some information that will be useful for plotting
+  misc = list(predictor = predictor.rhs, dims = dims, idims = idims, pdims = pdims)
+  type = "1d"
   
   # Generate points for dimensions to integrate over
   wips = ipoints(samplers, result$iconfig[idims])
   
-  if ( is.null(dims) ) { 
+  if ( length(dims) == 0 ) { 
     pts = wips
+    type = "full"
   } else {
-    # Generate points for dimensions that we are returning. 
-    # Remove weight and then merge with dims to integrate over
-    rips = ipoints(NULL, result$iconfig[dims])
-    rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
-    pts = merge(rips[,setdiff(names(rips),"weight"),drop=FALSE], wips)
-    if ("coordinates" %in% dims ) { coordinates(pts) = coordnames(rips) }
+    # If no points for return dimensions were supplied we generate them
+    if (is.null(points)) {
+      rips = ipoints(NULL, result$iconfig[dims])
+      rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
+    } else {
+      rips = points
+    }
+    # Merge in integrations points if we are integrating
+    if ( !is.null(wips) ) {
+      pts = merge(rips, wips, by = NULL)
+      coordinates(pts) = coordnames(rips)
+    } else {
+      pts = rips
+      pts$weight = 1
+    }
+    
+    # if ("coordinates" %in% dims ) { coordinates(pts) = coordnames(rips) }
   }
-  
+
   # Evaluate the model for these points
   vals = evaluate.model(result$sppa$model, result, pts, property = property, do.sum = TRUE, link = identity, n = n, predictor = predictor)
   
@@ -327,12 +334,14 @@ predict.lgcp = function(result,  predictor = result$model$expr, model = NULL, sa
   vals = vals * pts$weight
   
   # Sum up!
-  if ( is.null(dims) ) {
+  if ( length(dims) == 0 ) {
     integral = data.frame(colSums(vals)) ; colnames(integral) = "integral"
+    samples = integral
     if ( !is.null(postproc) ) { integral = postproc(t(integral)) }
+    attr(integral, "samples") = samples
   } else {
     # If we are integrating over space we have to turn the coordinates into data that the by() function understands
-    if ("coordinates" %in% dims ) { by.coords = cbind(coordinates(pts), pts@data[,c(setdiff(dims, "coordinates"))]) } 
+    if ("coordinates" %in% dims ) { by.coords = cbind(1:nrow(rips), pts@data[,c(setdiff(dims, "coordinates"))]) } 
     else { by.coords = pts[,dims]}
     
     integral = do.call(rbind, by(vals, by.coords, colSums))
@@ -340,7 +349,20 @@ predict.lgcp = function(result,  predictor = result$model$expr, model = NULL, sa
     if ("coordinates" %in% dims ) { coordinates(integral) = coordnames(rips) }
   }
   
-  # return
+  
+  
+  if (inherits(integral, "SpatialPointsDataFrame")){
+    type = "spatial"
+    misc$p4s = r$iconfig$coordinates$p4s
+    misc$cnames = r$iconfig$coordinates$cnames
+    misc$mesh = r$iconfig$coordinates$mesh
+    integral = as.data.frame(integral)
+  }
+  attr(integral, "total.weight") = sum(pts$weight)
+  attr(integral, "type") = type
+  attr(integral, "misc") = misc
+  class(integral) = c("prediction",class(integral))
+
   integral
 }
 
