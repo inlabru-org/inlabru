@@ -306,4 +306,40 @@ gg.swath = function(data, mapping = NULL, width = NULL, ...) {
 }
 
 
+plot.prediction = function(data, ...) {
+  ggopts = attr(data, "misc")
+  
+  if ( attr(data,"type") == "full" ) {
+    df = attr(data,"samples")
+    df$effect = ""
+    
+    # The old boxplot
+    # ggplot(data = df) +
+    #   geom_boxplot(aes_string("effect","integral")) + 
+    #   ylab(paste0("integral(", paste(ggopts$idims, collapse = ","), ")")) + 
+    #   xlab(ggopts$predictor)
+    
+    ggplot(data = df) +
+      geom_violin(aes_string("effect","integral"), draw_quantiles = c(0.025, 0.5, 0.975), alpha = 0.7, fill = "skyblue") +
+      geom_jitter(aes_string("effect","integral"), width = 0.05) +
+      ylab(paste0("integral(", paste(ggopts$idims, collapse = ","), ")")) + 
+      xlab(ggopts$predictor) +
+      guides(fill=FALSE)
+    
+    
+  } 
+    else if ( attr(data,"type") == "1d" ) {
+    
+      ggplot(data = data) + 
+        geom_ribbon(aes_string(x = ggopts$dims, ymin = "lq", ymax = "uq"), fill = "blue", alpha = 0.1) + 
+        geom_line(aes_string(x = ggopts$dims, y = "mean"), color = "blue") +
+        ylab(ggopts$predictor)
+      
+  } 
+    else if ( attr(data,"type") == "spatial" ) {
+      # ggplot() + gg.col(ggopts$mesh, color = data$mean) + scale_fill_gradientn(colours = topo.colors(100))
+      plot.spatial(mesh = ggopts$mesh, col = data$mean)
+  }
+}
+
 
