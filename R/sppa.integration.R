@@ -98,13 +98,18 @@ ipoints = function(samplers, config) {
     ips$distance = NULL
     ips = SpatialPointsDataFrame(ips[,c(1,2)], data = ips[,3:ncol(ips),drop=FALSE])
     
-  } else if ( class(samplers) == "SpatialPolygonsDataFrame" ){
+  } else if ( inherits(samplers, "SpatialPolygons") ){
+    
+    # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
+    if ( class(samplers)[1] == "SpatialPolygons" ) { 
+      samplers = SpatialPolygonsDataFrame(samplers, data = data.frame(weight = rep(1, length(samplers)))) 
+    }
     
     # Store coordinate names
     cnames = coordnames(samplers)
     
     
-    polyloc = do.call(rbind, lapply(1:nrow(samplers@data), 
+    polyloc = do.call(rbind, lapply(1:length(samplers), 
                                     function(k) cbind(
                                       x = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[,1]),
                                       y = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[,2]),
