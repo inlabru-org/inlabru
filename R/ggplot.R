@@ -43,10 +43,10 @@ gg.map = function(data, ...) {
 #' @param data A Spatial* object
 #' @return geom_point
 #' 
-gg.point = function(data, ...) {
+gg.point = function(data, color = "red", alpha = 0.5, ...) {
   # data = spTransform(data, CRS("+proj=longlat"))
   df = data.frame(coordinates(data))
-  geom_point(data = df, aes_string(x = coordnames(data)[1], y = coordnames(data)[2]), ...)
+  geom_point(data = df, aes_string(x = coordnames(data)[1], y = coordnames(data)[2]), color = color, alpha = alpha, ...)
 }
 
 #' Segment geom for Spatial* objects
@@ -57,7 +57,7 @@ gg.point = function(data, ...) {
 #' @param data A Spatial* objectt
 #' @return geom_segment
 #' 
-gg.segment = function(data, ...) {
+gg.segment = function(data, color = "black", ...) {
   # data = spTransform(data, CRS("+proj=longlat"))
   qq = coordinates(data)
   cnames = coordnames(data)
@@ -71,7 +71,7 @@ gg.segment = function(data, ...) {
                                      y = paste0("start.", cnames)[2], 
                                      xend = paste0("end.", cnames)[1], 
                                      yend = paste0("end.", cnames)[2]),
-               color = "green", ...)  
+               color = "black", ...)  
 } 
 
 
@@ -305,5 +305,38 @@ gg.swath = function(data, mapping = NULL, width = NULL, ...) {
   return(gg)
 }
 
+
+plot.prediction = function(data, ...) {
+  ggopts = attr(data, "misc")
+  
+  if ( attr(data,"type") == "full" ) {
+    df = attr(data,"samples")
+    df$effect = ""
+    qfun = function(x) {quantile(x, probs = c(0.025, 0.5, 0.975))}
+    ggplot(data = df, aes(x="",y=integral)) + 
+      geom_violin(aes_string(x="effect",y="integral"), draw_quantiles = c(0.025, 0.5, 0.975), alpha = 0.7, fill = "skyblue") +
+      stat_summary(geom="text", fun.y=qfun,
+                   aes(label=sprintf("%1.2f", ..y..), x = ""),
+                   position=position_nudge(x=0.03,y=diff(range(df$integral))/100), size=3.5) +
+      geom_jitter(aes_string("effect","integral"), width = 0, shape = 95, size = 5, alpha = 100/nrow(df)) +
+      ylab(paste0("integral(", paste(ggopts$idims, collapse = ","), ")")) + 
+      xlab(ggopts$predictor) +
+      guides(fill=FALSE)
+    
+  } 
+    else if ( attr(data,"type") == "1d" ) {
+    
+      ggplot(data = data) + 
+        geom_ribbon(aes_string(x = ggopts$dims, ymin = "lq", ymax = "uq"), fill = "skyblue", alpha = 0.3) + 
+        geom_line(aes_string(x = ggopts$dims, y = "mean"), color = "skyblue", size = 1.1) +
+        xlab(ggopts$predictor) +
+        ylab(ggopts$predictor[2])
+      
+  } 
+    else if ( attr(data,"type") == "spatial" ) {
+      # ggplot() + gg.col(ggopts$mesh, color = data$mean) + scale_fill_gradientn(colours = topo.colors(100))
+      plot.spatial(mesh = ggopts$mesh, col = data$median)
+  }
+}
 
 

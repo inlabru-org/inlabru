@@ -63,7 +63,7 @@ ipoints = function(samplers, config) {
   else if ( inherits(samplers, "SpatialLines") || inherits(samplers, "SpatialLinesDataFrame") ){
     
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
-    if ( inherits(samplers, "SpatialLines") ) { 
+    if ( class(samplers)[1] == "SpatialLines" ) { 
       samplers = SpatialLinesDataFrame(samplers, data = data.frame(weight = rep(1, length(samplers)))) 
     }
     
@@ -98,13 +98,18 @@ ipoints = function(samplers, config) {
     ips$distance = NULL
     ips = SpatialPointsDataFrame(ips[,c(1,2)], data = ips[,3:ncol(ips),drop=FALSE])
     
-  } else if ( class(samplers) == "SpatialPolygonsDataFrame" ){
+  } else if ( inherits(samplers, "SpatialPolygons") ){
+    
+    # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
+    if ( class(samplers)[1] == "SpatialPolygons" ) { 
+      samplers = SpatialPolygonsDataFrame(samplers, data = data.frame(weight = rep(1, length(samplers)))) 
+    }
     
     # Store coordinate names
     cnames = coordnames(samplers)
     
     
-    polyloc = do.call(rbind, lapply(1:nrow(samplers@data), 
+    polyloc = do.call(rbind, lapply(1:length(samplers), 
                                     function(k) cbind(
                                       x = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[,1]),
                                       y = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[,2]),
@@ -113,11 +118,12 @@ ipoints = function(samplers, config) {
     df = data.frame(samplers@data[ips$group, pregroup, drop = FALSE], weight = ips[,"weight"])
     ips = SpatialPointsDataFrame(ips[,c("x","y")],data = df)
     
-    
   } else if ( is.null(samplers) ){
     if ( "coordinates" %in% names(config) ) {
       ips = SpatialPointsDataFrame(config[["coordinates"]]$mesh$loc[,c(1,2)], 
                                    data = data.frame(weight = diag(as.matrix(inla.mesh.fem(config[["coordinates"]]$mesh)$c0))))
+      coordnames(ips) = config[["coordinates"]]$cnames
+      cnames = coordnames(ips)
     } else {
       ips = NULL
       spatial = FALSE
@@ -172,6 +178,7 @@ ipoints = function(samplers, config) {
     }
   }
   
+  if (spatial) { proj4string(ips) = CRS(config[["coordinates"]]$p4s) }
   ips
 }
 
@@ -204,7 +211,7 @@ iconfig = function(samplers, points, model) {
     
     # Create a function to fetch coordinates. 
     # If the name of the dimension resolves to a function, use this function as fetcher.
-    if ( ifelse(is.null(get0(nm)),FALSE,TRUE)) {
+    if ( ifelse(is.null(get0(nm)),FALSE,TRUE) && is.function(get(nm))) {
       # "coordinates" is a special case for which we extract an integration mesh from the model
       if ( nm == "coordinates" ) {
         ret$get.coord = get0(nm)
@@ -212,6 +219,7 @@ iconfig = function(samplers, points, model) {
         ret$mesh = model$mesh[[1]]
         ret$class = "matrix"  
         ret$project = TRUE
+        ret$p4s = proj4string(points)
       } else {
         ret$get.coord = get0(nm)
         ret$n.coord = ncol(ret$get.coord(points))
@@ -247,15 +255,25 @@ iconfig = function(samplers, points, model) {
         stop( "not implemented: 2d mesh auto-integration") 
       }
     } else {
-      ret$min = apply(ret$get.coord(points), MARGIN = 2, min)
-      ret$max = apply(ret$get.coord(points), MARGIN = 2, max)
+      # If the dimension is defined via the formula extract the respective information.
+      # If not, extract information from the data
+      if ( nm %in% names(environment(model$formula)) ) {
+        dim.def = environment(model$formula)[[nm]]
+        ret$min = min(dim.def)
+        ret$max = max(dim.def)
+        ret$n.points = length(dim.def)
+      } else {
+        ret$min = apply(ret$get.coord(points), MARGIN = 2, min)
+        ret$max = apply(ret$get.coord(points), MARGIN = 2, max)
+      }
+      
       ret$cnames = colnames(ret$get.coord(points))
       
       if ( ret$class == "integer" ) {
         ret$scheme = "fixed"
         ret$sp = ret$min:ret$max
         ret$ep = NULL
-        ret$n.points = length(ret$sp)
+        if (is.null(ret$n.points)) { ret$n.points = length(ret$sp) }
       } else if ( ret$class == "factor" ) {
         ret$scheme = "fixed"
         stop("Not implemented.")
@@ -263,7 +281,7 @@ iconfig = function(samplers, points, model) {
         ret$scheme = "trapezoid"
         ret$sp = ret$min
         ret$ep = ret$max
-        ret$n.points = 20
+        if (is.null(ret$n.points)) { ret$n.points = 20 }
       }      
     }
     ret

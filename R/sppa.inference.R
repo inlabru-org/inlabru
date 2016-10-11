@@ -150,8 +150,42 @@ lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = 
   result$sppa$method = "lgcp"
   result$sppa$model = model
   if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
+  class(result) = c("lgcp",class(result))
   return(result)
 }
+
+#' Summarize a LGCP object
+#'
+#' @aliases summary.lgcp
+#' @export
+#' @param result A result object obtained from a lgcp() run
+#' 
+summary.lgcp = function(result) {
+  cat("### LGCP Summary: #################################################################################\n")
+  
+  cat("\n Dimensions: \n")
+  icfg = result$iconfig
+  invisible(lapply(names(icfg), function(nm) {
+    cat(paste0("  ",nm, " [",icfg[[nm]]$class,"]",
+               ": ",
+               "n=",icfg[[nm]]$n.points,
+               ", min=",icfg[[nm]]$min,
+               ", max=",icfg[[nm]]$max,
+               ", cardinality=",signif(icfg[[nm]]$max-icfg[[nm]]$min),
+               "\n"))
+  }))
+  
+  cat("\n Effects: \n")
+  cat(paste0("  ",paste(result$names.fixed, collapse = ", "),", ", paste(names(result$summary.random), collapse = ","), "\n"))
+  
+  cat("\n Hyper parameters: \n")
+  cat(paste0("  ", paste(rownames(result$summary.hyperpar), collapse = ", "), "\n"))
+  
+  cat("\n Criterions: \n")
+  cat(paste0("  Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic), " (Effective params: ",sprintf("%1.3e", result$waic$p.eff),")\n"))
+  cat(paste0("  Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic), " (Effective params: ",sprintf("%1.3e", result$dic$p.eff),")\n"))
+}
+
 
 #' Generate a simple default mesh
 #'
@@ -218,8 +252,8 @@ as.model.formula = function(fml) {
   tms = terms(fml)
   lbl = attr(tms, "term.labels")
   if ( length(lbl)> 0 ) {
-    gidx = which(substr(lbl,1,1) == "g")
-    others = which(!substr(lbl,1,1) == "g")
+    gidx = which(substr(lbl,1,1) == "g(")
+    others = which(!substr(lbl,1,1) == "g(")
     base.fml.char = paste0("~. +", paste0("", lbl[others], collapse = " +"))
     mesh = list()
     mesh.coords = list()
@@ -271,6 +305,102 @@ as.model.formula = function(fml) {
   } else { return(NULL)}
 }
 
+#' Predictions based on log Gaussian Cox processes
+#' 
+#' @aliases predict.lgcp 
+#' @export
+#' @param result An object obtained by ralling lgcp()
+#' @return Predicted values
+
+predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samplers = NULL,  property = "sample", n = 250, postproc = summarize) {
+  
+  # Extract target dimension from predictor (given as right hand side of formula)
+  dims = setdiff(all.vars(update(predictor, .~0)), ".")
+  pchar = as.character(predictor)
+  predictor.rhs = pchar[-1]
+  predictor = parse(text = predictor.rhs)
+  
+  # Dimensions we are integrating over
+  idims = integrate
+  
+  # Determine all dimensions of the process (pdims)
+  pdims = names(result$iconfig)
+  
+  # Collect some information that will be useful for plotting
+  misc = list(predictor = predictor.rhs, dims = dims, idims = idims, pdims = pdims)
+  type = "1d"
+  
+  # Generate points for dimensions to integrate over
+  wips = ipoints(samplers, result$iconfig[idims])
+  
+  if ( length(dims) == 0 ) { 
+    pts = wips
+    type = "full"
+  } else {
+    # If no points for return dimensions were supplied we generate them
+    if (is.null(points)) {
+      rips = ipoints(NULL, result$iconfig[dims])
+      rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
+    } else {
+      rips = points
+    }
+    # Merge in integrations points if we are integrating
+    if ( !is.null(wips) ) {
+      pts = merge(rips, wips, by = NULL)
+      if (!is.data.frame(pts)) {coordinates(pts) = coordnames(rips)}
+    } else {
+      pts = rips
+      pts$weight = 1
+    }
+    
+    # if ("coordinates" %in% dims ) { coordinates(pts) = coordnames(rips) }
+  }
+
+  # Evaluate the model for these points
+  vals = evaluate.model(result$sppa$model, result, pts, property = property, do.sum = TRUE, link = identity, n = n, predictor = predictor)
+  
+  # If we sampled, summarize
+  if ( is.list(vals) ) { vals = do.call(cbind, vals) }
+  
+  # Weighting
+  vals = vals * pts$weight
+  
+  # Sum up!
+  if ( length(dims) == 0 ) {
+    integral = data.frame(colSums(vals)) ; colnames(integral) = "integral"
+    samples = integral
+    if ( !is.null(postproc) ) { integral = postproc(t(integral)) }
+    attr(integral, "samples") = samples
+  } else {
+    # If we are integrating over space we have to turn the coordinates into data that the by() function understands
+    if ("coordinates" %in% dims ) { by.coords = cbind(1:nrow(rips), pts@data[,c(setdiff(dims, "coordinates"))]) } 
+    else { by.coords = pts[,dims]}
+    
+    integral = do.call(rbind, by(vals, by.coords, colSums))
+    if ( !is.null(postproc) ) { integral = postproc(integral, x = as.data.frame(rips)) }
+    if ("coordinates" %in% dims ) { coordinates(integral) = coordnames(rips) }
+  }
+  
+  
+  
+  if (inherits(integral, "SpatialPointsDataFrame")){
+    type = "spatial"
+    misc$p4s = r$iconfig$coordinates$p4s
+    misc$cnames = r$iconfig$coordinates$cnames
+    misc$mesh = r$iconfig$coordinates$mesh
+    integral = as.data.frame(integral)
+  }
+  attr(integral, "total.weight") = sum(pts$weight)
+  attr(integral, "type") = type
+  attr(integral, "misc") = misc
+  class(integral) = c("prediction",class(integral))
+
+  integral
+}
+
+
+
+
 
 #' Iterated INLA
 #' 
@@ -290,7 +420,12 @@ as.model.formula = function(fml) {
 #' @return An \link{inla} object
 
 
-iinla = function(data, model, stackmaker, n = NULL, iinla.verbose = FALSE, result = NULL, ...){
+iinla = function(data, model, stackmaker, n = NULL, result = NULL, 
+                 iinla.verbose = iinla.getOption("iinla.verbose"), 
+                 control.inla = iinla.getOption("control.inla"), 
+                 control.compute = iinla.getOption("control.compute"), ...){
+  
+  if ( iinla.verbose ) { cat("iinla(): Let's go.\n") }
   
   # Default number of maximum iterations
   if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
@@ -313,7 +448,7 @@ iinla = function(data, model, stackmaker, n = NULL, iinla.verbose = FALSE, resul
     }
     
     # Verbose
-    if ( iinla.verbose ) { cat(paste0("INLA iteration"),k,"[ max:", n,"].") }
+    if ( iinla.verbose ) { cat(paste0("iinla() iteration"),k,"[ max:", n,"].") }
     
     # Return previous result if inla crashes, e.g. when connection to server is lost 
     if ( k > 1 ) { old.result = result } 
@@ -321,7 +456,9 @@ iinla = function(data, model, stackmaker, n = NULL, iinla.verbose = FALSE, resul
     result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
                                              data = c(inla.stack.data(stk), list.data(model)),
                                              control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
-                                             E = inla.stack.data(stk)$e), iargs)), 
+                                             E = inla.stack.data(stk)$e,
+                                             control.inla = control.inla,
+                                             control.compute = control.compute), iargs)), 
                         error = function(e) { 
                           if (k == 1) { stop(e) }
                           else { 
