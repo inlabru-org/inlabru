@@ -272,7 +272,6 @@ as.model.formula = function(fml) {
   } else { return(NULL)}
 }
 
-
 #' Predictions based on log Gaussian Cox processes
 #' 
 #' @aliases predict.lgcp 
@@ -315,7 +314,7 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
     # Merge in integrations points if we are integrating
     if ( !is.null(wips) ) {
       pts = merge(rips, wips, by = NULL)
-      coordinates(pts) = coordnames(rips)
+      if (!is.data.frame(pts)) {coordinates(pts) = coordnames(rips)}
     } else {
       pts = rips
       pts$weight = 1
