@@ -309,7 +309,14 @@ as.model.formula = function(fml) {
 #' 
 #' @aliases predict.lgcp 
 #' @export
-#' @param result An object obtained by ralling lgcp()
+#' @param result An lgcp object obtained by calling lgcp()
+#' @param predictor A formula defining what to predict. The left hand side defines the dimension to predict over. The right hand side ought to be an expression that is evaluated for a given sample of the LGCP.
+#' @param points Locations at which to predict. If NULL, the integration points of the LGCP are used
+#' @param integrate A character array defining the dimensions to integrate the predicted expression over (e.g. "coordinates")
+#' @param samplers A data.frame or Spatial* object that defines subsets of the dimensions to integrate over.
+#' @param property By default ("sample") predictions are made using samples from the LGCP posterior. For debugging purposes this can also be set to the usual INLA summary statistics, i.e. "mean", "mode", "median", "sd" etc.
+#' @param n Number of samples used to compute the predictor's statistics. The default is a rather low number, chose more for higher precision.
+#' @param postproc Function used to summarize the samples
 #' @return Predicted values
 
 predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samplers = NULL,  property = "sample", n = 250, postproc = summarize) {
@@ -397,7 +404,6 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
 
   integral
 }
-
 
 
 
