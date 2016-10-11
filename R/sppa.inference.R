@@ -341,6 +341,8 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
     if (is.null(points)) {
       rips = ipoints(NULL, result$iconfig[dims])
       rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
+      # Sort by value in dimension to plot over. Prevents scrambles prediction plots.
+      rips = rips[sort(rips[,dims], index.return = TRUE)$ix,,drop=FALSE]
     } else {
       rips = points
     }
@@ -380,8 +382,6 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
     if ( !is.null(postproc) ) { integral = postproc(integral, x = as.data.frame(rips)) }
     if ("coordinates" %in% dims ) { coordinates(integral) = coordnames(rips) }
   }
-  
-  
   
   if (inherits(integral, "SpatialPointsDataFrame")){
     type = "spatial"
