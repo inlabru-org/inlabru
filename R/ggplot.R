@@ -43,10 +43,10 @@ gg.map = function(data, ...) {
 #' @param data A Spatial* object
 #' @return geom_point
 #' 
-gg.point = function(data, ...) {
+gg.point = function(data, color = "red", alpha = 0.5, ...) {
   # data = spTransform(data, CRS("+proj=longlat"))
   df = data.frame(coordinates(data))
-  geom_point(data = df, aes_string(x = coordnames(data)[1], y = coordnames(data)[2]), ...)
+  geom_point(data = df, aes_string(x = coordnames(data)[1], y = coordnames(data)[2]), color = color, alpha = alpha, ...)
 }
 
 #' Segment geom for Spatial* objects
@@ -57,7 +57,7 @@ gg.point = function(data, ...) {
 #' @param data A Spatial* objectt
 #' @return geom_segment
 #' 
-gg.segment = function(data, ...) {
+gg.segment = function(data, color = "black", ...) {
   # data = spTransform(data, CRS("+proj=longlat"))
   qq = coordinates(data)
   cnames = coordnames(data)
@@ -71,7 +71,7 @@ gg.segment = function(data, ...) {
                                      y = paste0("start.", cnames)[2], 
                                      xend = paste0("end.", cnames)[1], 
                                      yend = paste0("end.", cnames)[2]),
-               color = "green", ...)  
+               color = "black", ...)  
 } 
 
 
