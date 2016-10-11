@@ -252,8 +252,8 @@ as.model.formula = function(fml) {
   tms = terms(fml)
   lbl = attr(tms, "term.labels")
   if ( length(lbl)> 0 ) {
-    gidx = which(substr(lbl,1,1) == "g(")
-    others = which(!substr(lbl,1,1) == "g(")
+    gidx = which(substr(lbl,1,2) == "g(")
+    others = which(!substr(lbl,1,2) == "g(")
     base.fml.char = paste0("~. +", paste0("", lbl[others], collapse = " +"))
     mesh = list()
     mesh.coords = list()
