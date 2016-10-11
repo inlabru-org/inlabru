@@ -27,6 +27,8 @@ nlinla.epunkt = function(model, data, result = NULL) {
   if ( is.null(result) ){
     df = data.frame(matrix(0, nrow = nrow(data), ncol = length(model$effects)))
     colnames(df) = model$effects
+    # Obtain initial values from environment of formula
+    for (eff in model$effects) { if (!is.null(environment(model$formula)[[eff]])) { df[,eff] = environment(model$formula)[[eff]]} }
     df
   } else {
     evaluate.model(model, result, data, link = identity, do.sum = FALSE)  
