@@ -154,6 +154,39 @@ lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = 
   return(result)
 }
 
+#' Summarize a LGCP object
+#'
+#' @aliases summary.lgcp
+#' @export
+#' @param result A result object obtained from a lgcp() run
+#' 
+summary.lgcp = function(result) {
+  cat("### LGCP Summary: #################################################################################\n")
+  
+  cat("\n Dimensions: \n")
+  icfg = result$iconfig
+  invisible(lapply(names(icfg), function(nm) {
+    cat(paste0("  ",nm, " [",icfg[[nm]]$class,"]",
+               ": ",
+               "n=",icfg[[nm]]$n.points,
+               ", min=",icfg[[nm]]$min,
+               ", max=",icfg[[nm]]$max,
+               ", cardinality=",signif(icfg[[nm]]$max-icfg[[nm]]$min),
+               "\n"))
+  }))
+  
+  cat("\n Effects: \n")
+  cat(paste0("  ",paste(result$names.fixed, collapse = ", "),", ", paste(names(result$summary.random), collapse = ","), "\n"))
+  
+  cat("\n Hyper parameters: \n")
+  cat(paste0("  ", paste(rownames(result$summary.hyperpar), collapse = ", "), "\n"))
+  
+  cat("\n Criterions: \n")
+  cat(paste0("  Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic), " (Effective params: ",sprintf("%1.3e", result$waic$p.eff),")\n"))
+  cat(paste0("  Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic), " (Effective params: ",sprintf("%1.3e", result$dic$p.eff),")\n"))
+}
+
+
 #' Generate a simple default mesh
 #'
 #' @aliases default.mesh
