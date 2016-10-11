@@ -312,33 +312,30 @@ plot.prediction = function(data, ...) {
   if ( attr(data,"type") == "full" ) {
     df = attr(data,"samples")
     df$effect = ""
-    
-    # The old boxplot
-    # ggplot(data = df) +
-    #   geom_boxplot(aes_string("effect","integral")) + 
-    #   ylab(paste0("integral(", paste(ggopts$idims, collapse = ","), ")")) + 
-    #   xlab(ggopts$predictor)
-    
-    ggplot(data = df) +
-      geom_violin(aes_string("effect","integral"), draw_quantiles = c(0.025, 0.5, 0.975), alpha = 0.7, fill = "skyblue") +
-      geom_jitter(aes_string("effect","integral"), width = 0.05) +
+    qfun = function(x) {quantile(x, probs = c(0.025, 0.5, 0.975))}
+    ggplot(data = df, aes(x="",y=integral)) + 
+      geom_violin(aes_string(x="effect",y="integral"), draw_quantiles = c(0.025, 0.5, 0.975), alpha = 0.7, fill = "skyblue") +
+      stat_summary(geom="text", fun.y=qfun,
+                   aes(label=sprintf("%1.2f", ..y..), x = ""),
+                   position=position_nudge(x=0.03,y=diff(range(df$integral))/100), size=3.5) +
+      geom_jitter(aes_string("effect","integral"), width = 0, shape = 95, size = 5, alpha = 100/nrow(df)) +
       ylab(paste0("integral(", paste(ggopts$idims, collapse = ","), ")")) + 
       xlab(ggopts$predictor) +
       guides(fill=FALSE)
-    
     
   } 
     else if ( attr(data,"type") == "1d" ) {
     
       ggplot(data = data) + 
-        geom_ribbon(aes_string(x = ggopts$dims, ymin = "lq", ymax = "uq"), fill = "blue", alpha = 0.1) + 
-        geom_line(aes_string(x = ggopts$dims, y = "mean"), color = "blue") +
-        ylab(ggopts$predictor)
+        geom_ribbon(aes_string(x = ggopts$dims, ymin = "lq", ymax = "uq"), fill = "skyblue", alpha = 0.3) + 
+        geom_line(aes_string(x = ggopts$dims, y = "mean"), color = "skyblue", size = 1.1) +
+        xlab(ggopts$predictor) +
+        ylab(ggopts$predictor[2])
       
   } 
     else if ( attr(data,"type") == "spatial" ) {
       # ggplot() + gg.col(ggopts$mesh, color = data$mean) + scale_fill_gradientn(colours = topo.colors(100))
-      plot.spatial(mesh = ggopts$mesh, col = data$mean)
+      plot.spatial(mesh = ggopts$mesh, col = data$median)
   }
 }
 
