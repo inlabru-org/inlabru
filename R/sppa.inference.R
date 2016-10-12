@@ -349,7 +349,7 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
       rips = ipoints(NULL, result$iconfig[dims])
       rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
       # Sort by value in dimension to plot over. Prevents scrambles prediction plots.
-      rips = rips[sort(rips[,dims], index.return = TRUE)$ix,,drop=FALSE]
+      if (!"coordinates" %in% dims) {rips = rips[sort(rips[,dims], index.return = TRUE)$ix,,drop=FALSE]}
     } else {
       rips = points
     }
