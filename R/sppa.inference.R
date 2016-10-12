@@ -406,6 +406,35 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
 }
 
 
+#' Summarize and annotate data
+#' 
+#' @aliases summarize
+#' @export
+#' @param data A data.frame
+#' @param x Annotations for the resulting summary
+#' @return A data.frame with summary statistics
+summarize = function(data, x = NULL, gg = FALSE) {
+  if ( is.list(data) ) { data = do.call(cbind, data) }
+  if ( gg ) {
+    smy = rbind(
+      data.frame(y = apply(data, MARGIN = 1, mean), property = "mean"),
+      data.frame(y = apply(data, MARGIN = 1, sd), property = "sd"),
+      data.frame(y = apply(data, MARGIN = 1, quantile, 0.025), property = "lq"),
+      data.frame(y = apply(data, MARGIN = 1, quantile, 0.5), property = "median"),
+      data.frame(y = apply(data, MARGIN = 1, quantile, 0.975), property = "uq"))
+  }
+  else { 
+    smy = data.frame(
+      apply(data, MARGIN = 1, mean),
+      apply(data, MARGIN = 1, sd),
+      t(apply(data, MARGIN = 1, quantile, prob = c(0.025, 0.5, 0.975))))
+    colnames(smy) = c("mean", "sd", "lq", "median","uq")
+  }
+  if ( !is.null(x) ) { smy = cbind(x, smy)}
+  return(smy)
+}
+
+
 
 
 #' Iterated INLA
