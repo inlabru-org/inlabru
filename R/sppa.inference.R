@@ -392,9 +392,9 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
   
   if (inherits(integral, "SpatialPointsDataFrame")){
     type = "spatial"
-    misc$p4s = r$iconfig$coordinates$p4s
-    misc$cnames = r$iconfig$coordinates$cnames
-    misc$mesh = r$iconfig$coordinates$mesh
+    misc$p4s = result$iconfig$coordinates$p4s
+    misc$cnames = result$iconfig$coordinates$cnames
+    misc$mesh = result$iconfig$coordinates$mesh
     integral = as.data.frame(integral)
   }
   attr(integral, "total.weight") = sum(pts$weight)
