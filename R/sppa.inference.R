@@ -80,7 +80,10 @@ poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "
   result = iinla(points, model, stk, family = family, ...)
   result$mesh = mesh
   result$sppa$method = "poiss"
+  result$sppa$model = model
+  result$sppa$points = points
   if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
+  class(result) = c("poiss",class(result))
   return(result)
 }
 
