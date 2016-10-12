@@ -309,7 +309,14 @@ as.model.formula = function(fml) {
 #' 
 #' @aliases predict.lgcp 
 #' @export
-#' @param result An object obtained by ralling lgcp()
+#' @param result An lgcp object obtained by calling lgcp()
+#' @param predictor A formula defining what to predict. The left hand side defines the dimension to predict over. The right hand side ought to be an expression that is evaluated for a given sample of the LGCP.
+#' @param points Locations at which to predict. If NULL, the integration points of the LGCP are used
+#' @param integrate A character array defining the dimensions to integrate the predicted expression over (e.g. "coordinates")
+#' @param samplers A data.frame or Spatial* object that defines subsets of the dimensions to integrate over.
+#' @param property By default ("sample") predictions are made using samples from the LGCP posterior. For debugging purposes this can also be set to the usual INLA summary statistics, i.e. "mean", "mode", "median", "sd" etc.
+#' @param n Number of samples used to compute the predictor's statistics. The default is a rather low number, chose more for higher precision.
+#' @param postproc Function used to summarize the samples
 #' @return Predicted values
 
 predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samplers = NULL,  property = "sample", n = 250, postproc = summarize) {
@@ -341,6 +348,8 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
     if (is.null(points)) {
       rips = ipoints(NULL, result$iconfig[dims])
       rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
+      # Sort by value in dimension to plot over. Prevents scrambles prediction plots.
+      rips = rips[sort(rips[,dims], index.return = TRUE)$ix,,drop=FALSE]
     } else {
       rips = points
     }
@@ -381,13 +390,11 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
     if ("coordinates" %in% dims ) { coordinates(integral) = coordnames(rips) }
   }
   
-  
-  
   if (inherits(integral, "SpatialPointsDataFrame")){
     type = "spatial"
-    misc$p4s = r$iconfig$coordinates$p4s
-    misc$cnames = r$iconfig$coordinates$cnames
-    misc$mesh = r$iconfig$coordinates$mesh
+    misc$p4s = result$iconfig$coordinates$p4s
+    misc$cnames = result$iconfig$coordinates$cnames
+    misc$mesh = result$iconfig$coordinates$mesh
     integral = as.data.frame(integral)
   }
   attr(integral, "total.weight") = sum(pts$weight)
@@ -398,6 +405,34 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
   integral
 }
 
+
+#' Summarize and annotate data
+#' 
+#' @aliases summarize
+#' @export
+#' @param data A data.frame
+#' @param x Annotations for the resulting summary
+#' @return A data.frame with summary statistics
+summarize = function(data, x = NULL, gg = FALSE) {
+  if ( is.list(data) ) { data = do.call(cbind, data) }
+  if ( gg ) {
+    smy = rbind(
+      data.frame(y = apply(data, MARGIN = 1, mean), property = "mean"),
+      data.frame(y = apply(data, MARGIN = 1, sd), property = "sd"),
+      data.frame(y = apply(data, MARGIN = 1, quantile, 0.025), property = "lq"),
+      data.frame(y = apply(data, MARGIN = 1, quantile, 0.5), property = "median"),
+      data.frame(y = apply(data, MARGIN = 1, quantile, 0.975), property = "uq"))
+  }
+  else { 
+    smy = data.frame(
+      apply(data, MARGIN = 1, mean),
+      apply(data, MARGIN = 1, sd),
+      t(apply(data, MARGIN = 1, quantile, prob = c(0.025, 0.5, 0.975))))
+    colnames(smy) = c("mean", "sd", "lq", "median","uq")
+  }
+  if ( !is.null(x) ) { smy = cbind(x, smy)}
+  return(smy)
+}
 
 
 
