@@ -275,7 +275,7 @@ as.model.formula = function(fml) {
       mesh.coords[[ge$term]] = ge$term
       # mesh.map[[ge$term]] = function(x) { x[,ge$term,drop=FALSE]}
       inla.models[[ge$term]] = ge$model
-      effects[[gidx]] = ge$term
+      effects[[k]] = ge$term
       # Replace function name by INLA f function
       lb = gsub("g\\(","f(",lb)
       # Remove extra mesh argument
