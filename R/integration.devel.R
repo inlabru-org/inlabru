@@ -55,7 +55,7 @@ int.polygon = function(mesh, loc, group = NULL){
 if ( is.null(group) ) { group = rep(1, nrow(loc)) }
 ipsl = list()
 k = 1
-print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
+# print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
 for ( g in unique(group) ) {
   gloc = loc[group==g, ]
   # Check where the polygon intersects with the mesh edges
@@ -74,7 +74,7 @@ for ( g in unique(group) ) {
   ips$weight = diag(as.matrix(inla.mesh.fem(imesh)$c0))
   ips$group = g
   ipsl = c(ipsl, list(ips))
-  print(k)
+  # print(k)
   k = k + 1
 }
 return(do.call(rbind,ipsl))
