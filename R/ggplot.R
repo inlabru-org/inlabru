@@ -74,6 +74,17 @@ gg.segment = function(data, color = "black", ...) {
                color = "black", ...)  
 } 
 
+#' Polygon geom for Spatial* objects
+#' 
+#' @aliases gg.polygon
+#' @name gg.polygon
+#' @export
+#' @param data A SpatialPolygon* object
+#' @return geom_polygon
+#' 
+gg.polygon = function(data, colour = "black", alpha = 0.1, ...) {
+  geom_polygon(data= fortify(data), aes(x=long,y=lat,group=group), colour = colour, alpha = alpha)
+} 
 
 #' Plot inla.mesh using ggplot2
 #' 
