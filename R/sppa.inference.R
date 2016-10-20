@@ -184,7 +184,7 @@ summary.lgcp = function(result) {
   cat("\n Hyper parameters: \n")
   cat(paste0("  ", paste(rownames(result$summary.hyperpar), collapse = ", "), "\n"))
   
-  cat("\n Criterions: \n")
+  cat("\n Criteria: \n")
   cat(paste0("  Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic), " (Effective params: ",sprintf("%1.3e", result$waic$p.eff),")\n"))
   cat(paste0("  Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic), " (Effective params: ",sprintf("%1.3e", result$dic$p.eff),")\n"))
 }
