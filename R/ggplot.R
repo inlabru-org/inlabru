@@ -316,7 +316,7 @@ plot.prediction = function(data, ...) {
     ggplot(data = df, aes(x="",y=integral)) + 
       geom_violin(aes_string(x="effect",y="integral"), draw_quantiles = c(0.025, 0.5, 0.975), alpha = 0.7, fill = "skyblue") +
       stat_summary(geom="text", fun.y=qfun,
-                   aes(label=sprintf("%1.2f", ..y..), x = ""),
+                   aes(label=sprintf("%1.4f", ..y..), x = ""),
                    position=position_nudge(x=0.03,y=diff(range(df$integral))/100), size=3.5) +
       geom_jitter(aes_string("effect","integral"), width = 0, shape = 95, size = 5, alpha = 100/nrow(df)) +
       ylab(paste0("integral(", paste(ggopts$idims, collapse = ","), ")")) + 
