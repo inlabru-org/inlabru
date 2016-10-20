@@ -80,7 +80,10 @@ poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "
   result = iinla(points, model, stk, family = family, ...)
   result$mesh = mesh
   result$sppa$method = "poiss"
+  result$sppa$model = model
+  result$sppa$points = points
   if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
+  class(result) = c("poiss",class(result))
   return(result)
 }
 
@@ -181,7 +184,7 @@ summary.lgcp = function(result) {
   cat("\n Hyper parameters: \n")
   cat(paste0("  ", paste(rownames(result$summary.hyperpar), collapse = ", "), "\n"))
   
-  cat("\n Criterions: \n")
+  cat("\n Criteria: \n")
   cat(paste0("  Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic), " (Effective params: ",sprintf("%1.3e", result$waic$p.eff),")\n"))
   cat(paste0("  Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic), " (Effective params: ",sprintf("%1.3e", result$dic$p.eff),")\n"))
 }
@@ -196,7 +199,7 @@ summary.lgcp = function(result) {
 #' @return An \code{inla.mesh} object
 
 default.mesh = function(spObject, max.edge = NULL){
-  if (class(spObject) == "SpatialPointsDataFrame") {
+  if (inherits(spObject, "SpatialPoints")) {
     x = c(bbox(spObject)[1,1], bbox(spObject)[1,2], bbox(spObject)[1,2], bbox(spObject)[1,1])
     y = c(bbox(spObject)[2,1], bbox(spObject)[2,1], bbox(spObject)[2,2], bbox(spObject)[2,2])
     # bnd = inla.mesh.segment(loc = cbind(x,y))
@@ -272,7 +275,7 @@ as.model.formula = function(fml) {
       mesh.coords[[ge$term]] = ge$term
       # mesh.map[[ge$term]] = function(x) { x[,ge$term,drop=FALSE]}
       inla.models[[ge$term]] = ge$model
-      effects[[gidx]] = ge$term
+      effects[[k]] = ge$term
       # Replace function name by INLA f function
       lb = gsub("g\\(","f(",lb)
       # Remove extra mesh argument

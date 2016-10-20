@@ -58,8 +58,7 @@ detection.stack = function(data,
   stk = inla.stack(data = list(y.inla = y.pp, e = e.pp),
                      A = A,
                      tag = tag,
-                     effects = c(idx, eff),
-                    compress = FALSE)
+                     effects = c(idx, eff))
 }
 
 

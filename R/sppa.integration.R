@@ -194,11 +194,12 @@ ipoints = function(samplers, config) {
 #' @param y Left hand side of a LGCP formula. Determines the integration dimensions. Currently in use but soon to be deprecated
 #' @return An integration configuration
 
-iconfig = function(samplers, points, model) {
+iconfig = function(samplers, points, model, dim.names = NULL) {
   
   # Obtain dimensions to integrate over. 
   # These are provided as the left hand side of model$formula
-  dim.names = all.vars(update(model$formula, .~0))
+  if ( is.null(dim.names) ) { dim.names = all.vars(update(model$formula, .~0)) }
+  
   
   # Function that maps each dimension name to a setup
   ret = make.setup = function(nm) {
