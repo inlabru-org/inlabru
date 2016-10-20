@@ -199,7 +199,7 @@ summary.lgcp = function(result) {
 #' @return An \code{inla.mesh} object
 
 default.mesh = function(spObject, max.edge = NULL){
-  if (class(spObject) == "SpatialPointsDataFrame") {
+  if (inherits(spObject, "SpatialPoints")) {
     x = c(bbox(spObject)[1,1], bbox(spObject)[1,2], bbox(spObject)[1,2], bbox(spObject)[1,1])
     y = c(bbox(spObject)[2,1], bbox(spObject)[2,1], bbox(spObject)[2,2], bbox(spObject)[2,2])
     # bnd = inla.mesh.segment(loc = cbind(x,y))
