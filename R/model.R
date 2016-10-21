@@ -1,7 +1,6 @@
 #' iDistance models for INLA
 #' 
 #' Facilitates the spatial modeling approaches using INLA.
-#' 
 #' A \code{model} has a formula that describes one or more of INLA's \code{f} objects.
 #' It describes how given a data frame of locations or other coordinates translates into
 #' evaluating the predictors of the formula. For manually setting up a \code{model} see the
@@ -163,7 +162,12 @@ list.data.model = function(model){
   # Error in data.frame(..., check.names = FALSE): arguments imply differing number of rows: 2379, 2739
   
   assign("stack", NULL, envir = environment(model$formula))
-  return( as.list(environment(model$formula)) )
+  
+  # Formula environment as list
+  elist = as.list(environment(model$formula))
+  
+  # Remove previous inla results. For some reason these slow down the next INLA call.
+  elist = elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
 }
 
 #' List of covariates effects needed to run INLA
