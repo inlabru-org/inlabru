@@ -317,9 +317,12 @@ as.model.formula = function(fml) {
 #' x_i for which the right hand side is evaluated are then either taken from the predictor's environment or, if not present, from
 #' the integration points of the LGCP. If not points are provided and the right hand side is empty as well, \code{predict} assumes
 #' that the predicted expression will evaluate so a single values for which the summary statistics are computed. Otherwise the
-#' summary statistics are computed for each of the x_i. A common task is to look at statistics that result from integrating the 
+#' summary statistics are computed for each of the x_i. 
+#' 
+#' A common task is to look at statistics that result from integrating the 
 #' right hand side expression over one or more dimensions, say y and z. This can be achieved by setting the \code{integrate}
-#' parameter. The summary statistics are then computed for the values resulting from the integration.
+#' parameter. The summary statistics are then computed for the values resulting from the integration. If only a subset of
+#' the space should be integrated over the \code{samplers} argument can be used. Usually this is a Spatial* object (see \link{sp}).
 #' 
 #' @aliases predict.lgcp 
 #' @export
