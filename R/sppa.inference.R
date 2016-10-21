@@ -310,6 +310,17 @@ as.model.formula = function(fml) {
 
 #' Predictions based on log Gaussian Cox processes
 #' 
+#' Takes a fitted LGCP produced by \link{lgcp} and predicts the expression stated by the right hand side of \code{predictor} for
+#' a given set of \code{points}. A typical task is to predict values of the model for a sequence of points with consecutive values x_i, 
+#' where x is one of the dimensions that the LGCP lives in. For convenience, this can be done automatically by leaving 
+#' \code{points} set to \code{NULL} and stating a left hand side of the \code{predictor} formula, e.g. \code{x ~ f(x)}. The values
+#' x_i for which the right hand side is evaluated are then either taken from the predictor's environment or, if not present, from
+#' the integration points of the LGCP. If not points are provided and the right hand side is empty as well, \code{predict} assumes
+#' that the predicted expression will evaluate so a single values for which the summary statistics are computed. Otherwise the
+#' summary statistics are computed for each of the x_i. A common task is to look at statistics that result from integrating the 
+#' right hand side expression over one or more dimensions, say y and z. This can be achieved by setting the \code{integrate}
+#' parameter. The summary statistics are then computed for the values resulting from the integration.
+#' 
 #' @aliases predict.lgcp 
 #' @export
 #' @param result An lgcp object obtained by calling lgcp()
