@@ -324,23 +324,38 @@ gg.swath = function(data, mapping = NULL, width = NULL, ...) {
 }
 
 
-plot.prediction = function(data, ...) {
-  ggopts = attr(data, "misc")
+plot.prediction = function(...) {
+  args = list(...)
+  pnames = sapply(substitute(list(...))[-1], deparse)
+  
+  ggopts = attr(args[[1]], "misc")
+  data = args[[1]]
   
   if ( attr(data,"type") == "full" ) {
-    df = attr(data,"samples")
-    df$effect = ""
-    qfun = function(x) {quantile(x, probs = c(0.025, 0.5, 0.975))}
-    ggplot(data = df, aes(x="",y=integral)) + 
-      geom_violin(aes_string(x="effect",y="integral"), draw_quantiles = c(0.025, 0.5, 0.975), alpha = 0.7, fill = "skyblue") +
-      stat_summary(geom="text", fun.y=qfun,
-                   aes(label=sprintf("%1.4f", ..y..), x = ""),
-                   position=position_nudge(x=0.03,y=diff(range(df$integral))/100), size=3.5) +
-      geom_jitter(aes_string("effect","integral"), width = 0, shape = 95, size = 5, alpha = 100/nrow(df)) +
-      ylab(paste0("integral(", paste(ggopts$idims, collapse = ","), ")")) + 
-      xlab(ggopts$predictor) +
-      guides(fill=FALSE)
     
+    df = do.call(rbind, lapply(1:length(args), function(k) data.frame(integral = attr(args[[k]],"samples"), effect = pnames[[k]])))
+    qfun = function(x) {quantile(x, probs = c(0.025, 0.5, 0.975))}
+
+    qtl = do.call(rbind, lapply(1:length(args), function(k) 
+      data.frame(y = quantile(attr(args[[k]],"samples")$integral, c(0.025, 0.5, 0.975)),
+                 yend = quantile(attr(args[[k]],"samples")$integral, c(0.025, 0.5, 0.975)),
+                 x = k, xend = k + 0.5,
+                 effect = pnames[[k]])))
+    
+    # This still causes a warning since the violin plot does not like the width argument 
+    ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y=integral,fill=effect, width = 0.5), alpha = 0.7) +
+      stat_summary(data = df, geom="text", fun.y=qfun,
+                   aes(label=signif(..y..), x = as.numeric(effect), y=integral),
+                   position=position_nudge(x=0.4,y=diff(range(df$integral))/100), size=3.5) +
+      geom_segment(data = qtl, aes(x=x,xend=xend,y=y,yend=yend), linetype = 1, alpha = 0.2) +
+      geom_jitter(data = df, aes(x=as.numeric(effect), y=integral), width = 0, shape = 95, size = 5, alpha = 100/nrow(df)) +
+      ylab(paste0("integral_{", paste(ggopts$idims, collapse = ","), "} (", ggopts$predictor, ")")) + 
+      guides(fill=FALSE) + 
+      scale_x_continuous(name = "", breaks = 1:length(pnames), labels = pnames)
+      
+    
+  
+
   } 
     else if ( attr(data,"type") == "1d" ) {
     
