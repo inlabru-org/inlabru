@@ -43,8 +43,8 @@ gg.map = function(data, ...) {
 #' @param data A Spatial* object
 #' @return geom_point
 #' 
-gg.point = function(data, color = "red", alpha = 0.5, ...) {
-  # data = spTransform(data, CRS("+proj=longlat"))
+gg.point = function(data, CRS = NULL, color = "red", alpha = 0.5, ...) {
+  if ( !is.null(CRS) ) { data = spTransform(data, CRS) }
   df = data.frame(coordinates(data))
   geom_point(data = df, aes_string(x = coordnames(data)[1], y = coordnames(data)[2]), color = color, alpha = alpha, ...)
 }
@@ -57,8 +57,9 @@ gg.point = function(data, color = "red", alpha = 0.5, ...) {
 #' @param data A Spatial* objectt
 #' @return geom_segment
 #' 
-gg.segment = function(data, color = "black", ...) {
-  # data = spTransform(data, CRS("+proj=longlat"))
+gg.segment = function(data, CRS = NULL,  color = "black", ...) {
+  if ( !is.null(CRS) ) { data = spTransform(data, CRS) }
+  
   qq = coordinates(data)
   cnames = coordnames(data)
   if (is.null(cnames)) { cnames = c("x","y") }
@@ -82,7 +83,8 @@ gg.segment = function(data, color = "black", ...) {
 #' @param data A SpatialPolygon* object
 #' @return geom_polygon
 #' 
-gg.polygon = function(data, colour = "black", alpha = 0.1, ...) {
+gg.polygon = function(data, CRS = NULL, colour = "black", alpha = 0.1, ...) {
+  if ( !is.null(CRS) ) { data = spTransform(data, CRS) }
   geom_polygon(data= fortify(data), aes(x=long,y=lat,group=group), colour = colour, alpha = alpha)
 } 
 
@@ -96,9 +98,14 @@ gg.polygon = function(data, colour = "black", alpha = 0.1, ...) {
 #' @return A ggplot2 object
 #' 
 
-gg.mesh = function(data, color = rgb(0,0,0,0.1), ...) {
+gg.mesh = function(data, CRS = NULL, color = rgb(0,0,0,0.1), ...) {
   if ( class(data)[1] == "inla.mesh" ) { mesh = data } else { mesh = data$mesh }
   if ( mesh$manifold == "S2" ) { stop("Geom not implemented for spherical meshes (manifold = S2)" ) }
+  if ( !is.null(CRS) ) { 
+    mesh$loc = as.data.frame(coordinates(SpatialPoints(mesh$loc[,c(1,2)], proj4string = CRS)))
+    }
+  
+  
   df = rbind(data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]),
                data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
                data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]))
