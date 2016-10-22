@@ -179,7 +179,7 @@ list.covariates.model = function(mdl, pts){
   if ( length(mdl$covariates)>0 ) {
     formula = mdl$formula
     covariates = mdl$covariates
-    all.varnames = setdiff(all.vars(formula), names(mdl$mesh)) # Remove mesh names. Effects with names equal to SPDE models will lead to strange errors.
+    all.varnames = setdiff(c(all.vars(formula), all.vars(mdl$expr)), names(mdl$mesh)) # Remove mesh names. Effects with names equal to SPDE models will lead to strange errors.
     covar.data = list()
     
     # Points may be annotated with covariates
