@@ -185,8 +185,8 @@ list.covariates.model = function(mdl, pts){
     # Points may be annotated with covariates
     
     for (vname in all.varnames){
-      if (vname %in% names(pts)) {
-        covar.data[[vname]] = pts[,vname]
+      if (vname %in% names(data.frame(pts))) {
+        covar.data[[vname]] = data.frame(pts)[,vname]
       }
     }
     covar.data = data.frame(do.call(cbind,covar.data))
