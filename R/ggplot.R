@@ -342,8 +342,7 @@ plot.prediction = function(...) {
                  x = k, xend = k + 0.5,
                  effect = pnames[[k]])))
     
-    # This still causes a warning since the violin plot does not like the width argument 
-    ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y=integral,fill=effect, width = 0.5), alpha = 0.7) +
+    plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y=integral,fill=effect, width = 0.5), alpha = 0.7) +
       stat_summary(data = df, geom="text", fun.y=qfun,
                    aes(label=signif(..y..), x = as.numeric(effect), y=integral),
                    position=position_nudge(x=0.4,y=diff(range(df$integral))/100), size=3.5) +
@@ -352,10 +351,10 @@ plot.prediction = function(...) {
       ylab(paste0("integral_{", paste(ggopts$idims, collapse = ","), "} (", ggopts$predictor, ")")) + 
       guides(fill=FALSE) + 
       scale_x_continuous(name = "", breaks = 1:length(pnames), labels = pnames)
-      
     
-  
-
+    # This still causes a warning since the violin plot does not like the width argument
+    suppressWarnings(print(plt))  
+    
   } 
     else if ( attr(data,"type") == "1d" ) {
     
