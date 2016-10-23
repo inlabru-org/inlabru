@@ -197,7 +197,7 @@ list.covariates.model = function(mdl, pts){
     for (cov.name in names(covariates)[!(names(covariates) == "")]){
       if (is.null(mdl$mesh[[cov.name]]) && !is.character(covariates[[cov.name]])) {
         cov.fun = covariates[[cov.name]]
-        fetched.covar[[cov.name]] = cov.fun(pts)
+        fetched.covar[[cov.name]] = cov.fun(data.frame(pts))
         # Check if we actually got values back
         if(length(fetched.covar[[cov.name]]) == 0 ) { 
           stop(paste0("Evaluating cvoariate '", cov.name, "' returned no values. Do your points have all the data columns required by the covariate function?"))

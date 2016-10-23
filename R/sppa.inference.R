@@ -293,6 +293,11 @@ as.model.formula = function(fml) {
         }
       environment(covariates[[lbl[k]]]) = new.env()
       assign("effect", lbl[k], envir = environment(covariates[[lbl[k]]]))
+      } else if (gpd[1,"token"] == "expr") {
+        old.label = lbl[k]
+        lbl[k] = paste0(gpd[2,"text"],".effect")
+        effects[k] = paste0(gpd[2,"text"],".effect")
+        covariates[[lbl[k]]] = function(...) {do.call(function(...) {eval(parse(text=old.label), envir = list(...))}, as.list(...))}
       }
     }
     if ( (length(gidx) > 0) || length(others) > 0 ) {
