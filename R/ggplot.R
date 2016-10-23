@@ -357,14 +357,23 @@ plot.prediction = function(...) {
     
   } 
     else if ( attr(data,"type") == "1d" ) {
-    
-      ggplot(data = data) + 
-        geom_ribbon(aes_string(x = ggopts$dims, ymin = "lq", ymax = "uq"), fill = "skyblue", alpha = 0.3) + 
-        geom_line(aes_string(x = ggopts$dims, y = "mean"), color = "skyblue", size = 1.1) +
-        xlab(ggopts$predictor) +
-        ylab(ggopts$predictor[2])
       
-  } 
+      data = do.call(rbind, lapply(1:length(args), function(k) data.frame(args[[k]], Prediction = pnames[[k]])))
+    
+      ggp = ggplot(data = data) + 
+              geom_ribbon(aes_string(x = ggopts$dims, ymin = "lq", ymax = "uq",  fill = "Prediction"), alpha = 0.3) + 
+              geom_line(aes_string(x = ggopts$dims, y = "mean", color = "Prediction"), size = 1.1) +
+              xlab(ggopts$predictor) +
+              ylab(ggopts$predictor[2])
+      
+      # Show guide only for multiple graphs
+      if (length(pnames) == 1) { ggp = ggp + guides(color=FALSE, fill=FALSE) } 
+      
+      # Plot graph
+      ggp
+    }
+      
+     
     else if ( attr(data,"type") == "spatial" ) {
       # ggplot() + gg.col(ggopts$mesh, color = data$mean) + scale_fill_gradientn(colours = topo.colors(100))
       plot.spatial(mesh = ggopts$mesh, col = data$median, add.mesh = FALSE)
