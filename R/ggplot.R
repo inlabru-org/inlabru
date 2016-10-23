@@ -342,11 +342,25 @@ plot.prediction = function(...) {
                  x = k, xend = k + 0.5,
                  effect = pnames[[k]])))
     
-    plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y=integral,fill=effect, width = 0.5), alpha = 0.7) +
-      stat_summary(data = df, geom="text", fun.y=qfun,
-                   aes(label=signif(..y..), x = as.numeric(effect), y=integral),
-                   position=position_nudge(x=0.4,y=diff(range(df$integral))/100), size=3.5) +
+    expec = do.call(rbind, lapply(1:length(args), function(k) 
+      data.frame(y = mean(attr(args[[k]],"samples")$integral),
+                 yend = mean(attr(args[[k]],"samples")$integral),
+                 x = k, xend = k - 0.28,
+                 sdy = mean(attr(args[[k]],"samples")$integral),
+                 effect = pnames[[k]])))
+    
+    sdev = do.call(rbind, lapply(1:length(args), function(k) 
+      data.frame(y = mean(attr(args[[k]],"samples")$integral) + sd(attr(args[[k]],"samples")$integral),
+                 yend = mean(attr(args[[k]],"samples")$integral)- sd(attr(args[[k]],"samples")$integral),
+                 x = k - 0.28, xend = k - 0.28,
+                 effect = pnames[[k]])))
+    
+    plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y=integral,fill=effect, width = 0.4), alpha = 0.7) +
+      geom_text(data = qtl, aes(x=xend, y=y, label = signif(y)), size = 3.5, family = "", vjust = -0.5, hjust = 1.1) + 
+      geom_text(data = expec, aes(x=xend, y=y, label = paste0(signif(y)," ± ", signif(sdy))), size = 3.5, family = "", vjust = -0.5, angle = 90) + 
       geom_segment(data = qtl, aes(x=x,xend=xend,y=y,yend=yend), linetype = 1, alpha = 0.2) +
+      geom_segment(data = expec, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 3) +
+      geom_segment(data = sdev, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 1) +
       geom_jitter(data = df, aes(x=as.numeric(effect), y=integral), width = 0, shape = 95, size = 5, alpha = 100/nrow(df)) +
       ylab(paste0("integral_{", paste(ggopts$idims, collapse = ","), "} (", ggopts$predictor, ")")) + 
       guides(fill=FALSE) + 
