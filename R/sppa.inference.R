@@ -198,14 +198,14 @@ summary.lgcp = function(result) {
 #' @param max.edge A parameter passed on to \link{inla.mesh.2d} which controls the granularity of the mesh. If NULL, 1/20 of the domain size is used.
 #' @return An \code{inla.mesh} object
 
-default.mesh = function(spObject, max.edge = NULL){
+default.mesh = function(spObject, max.edge = NULL, convex = -0.15){
   if (inherits(spObject, "SpatialPoints")) {
     x = c(bbox(spObject)[1,1], bbox(spObject)[1,2], bbox(spObject)[1,2], bbox(spObject)[1,1])
     y = c(bbox(spObject)[2,1], bbox(spObject)[2,1], bbox(spObject)[2,2], bbox(spObject)[2,2])
     # bnd = inla.mesh.segment(loc = cbind(x,y))
     # mesh = inla.mesh.2d(interior = bnd, max.edge = diff(bbox(spObject)[1,])/10)
     if ( is.null(max.edge) ) { max.edge = max.edge = diff(bbox(spObject)[1,])/20 }
-    hull = inla.nonconvex.hull(points = coordinates(spObject))
+    hull = inla.nonconvex.hull(points = coordinates(spObject), convex = convex)
     mesh = inla.mesh.2d(boundary = hull, max.edge = max.edge)
   } else {
     NULL
