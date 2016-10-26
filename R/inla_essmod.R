@@ -47,7 +47,7 @@ extract.entries = function(name,smpl){
   ename = gsub("\\.", "\\\\.", name)
   ename = gsub("\\(", "\\\\(", ename)
   ename = gsub("\\)", "\\\\)", ename)
-  ptn = paste("^", ename, "\\.[0-9]*$", sep="")
+  ptn = paste("^", ename, "[\\:]*[\\.]*[0-9]*$", sep="")
   return(smpl[grep(ptn,rownames(smpl))])
 }
 
