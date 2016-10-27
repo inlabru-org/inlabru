@@ -402,7 +402,7 @@ iteration.history.model = function(model, effect){
 #' @param loc Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
 
-evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr) {
+evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr, use.covariate = TRUE) {
   cov = do.call(cbind, list.covariates.model(model, loc))
   Amat = list.A.model(model, loc)
   if ( property == "sample") {
@@ -425,7 +425,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
       } else {
         post = lapply(smp, function(s) {
           # Note: if there is no covariate, assume covariate = 1
-          if (is.null(cov[[name]])) {
+          if (is.null(cov[[name]]) | !use.covariate) {
             rep(s[[name]],nrow(loc))
             } else { 
               s[[name]] * cov[[name]] } 
@@ -442,7 +442,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
           post = inla.result$summary.fixed[name, property] * eval(parse(text = name), as.data.frame(loc))
         } else {
             # Note: if there is no covariate, assume covariate = 1
-            if (is.null(cov[[name]])) {
+            if (is.null(cov[[name]]) | !use.covariate) {
               post = rep(inla.result$summary.fixed[name, property], nrow(loc))
             } else {
               post = inla.result$summary.fixed[name, property] * cov[[name]]
