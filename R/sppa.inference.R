@@ -439,17 +439,17 @@ summarize = function(data, x = NULL, gg = FALSE) {
   if ( is.list(data) ) { data = do.call(cbind, data) }
   if ( gg ) {
     smy = rbind(
-      data.frame(y = apply(data, MARGIN = 1, mean), property = "mean"),
-      data.frame(y = apply(data, MARGIN = 1, sd), property = "sd"),
-      data.frame(y = apply(data, MARGIN = 1, quantile, 0.025), property = "lq"),
-      data.frame(y = apply(data, MARGIN = 1, quantile, 0.5), property = "median"),
-      data.frame(y = apply(data, MARGIN = 1, quantile, 0.975), property = "uq"))
+      data.frame(y = apply(data, MARGIN = 1, mean, na.rm = TRUE), property = "mean"),
+      data.frame(y = apply(data, MARGIN = 1, sd, na.rm = TRUE), property = "sd"),
+      data.frame(y = apply(data, MARGIN = 1, quantile, 0.025, na.rm = TRUE), property = "lq"),
+      data.frame(y = apply(data, MARGIN = 1, quantile, 0.5, na.rm = TRUE), property = "median"),
+      data.frame(y = apply(data, MARGIN = 1, quantile, 0.975, na.rm = TRUE), property = "uq"))
   }
   else { 
     smy = data.frame(
-      apply(data, MARGIN = 1, mean),
-      apply(data, MARGIN = 1, sd),
-      t(apply(data, MARGIN = 1, quantile, prob = c(0.025, 0.5, 0.975))))
+      apply(data, MARGIN = 1, mean, na.rm = TRUE),
+      apply(data, MARGIN = 1, sd, na.rm = TRUE),
+      t(apply(data, MARGIN = 1, quantile, prob = c(0.025, 0.5, 0.975), na.rm = TRUE)))
     colnames(smy) = c("mean", "sd", "lq", "median","uq")
   }
   if ( !is.null(x) ) { smy = cbind(x, smy)}
