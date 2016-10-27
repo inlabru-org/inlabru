@@ -284,7 +284,8 @@ as.model.formula = function(fml) {
     }
     for ( k in others ) {
       gpd = getParseData(parse(text=lbl[k]))
-      if (gpd[1,"token"] == "SYMBOL" && gpd[1,"text"] %in% names(environment(fml))) {
+      if (gpd[1,"token"] == "SYMBOL") {
+        if (!(gpd[1,"text"] %in% names(environment(fml)))) { environment(fml)[[gpd[1,"text"]]] = 0 }
         covariates[[lbl[k]]] = function(x) {
           v = rep(1, nrow(as.data.frame(x)))
           ret = data.frame(v)
