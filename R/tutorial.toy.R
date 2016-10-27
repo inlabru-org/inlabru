@@ -136,8 +136,10 @@ toy.polysample = function(lambda, n = 1, seed = 1) {
 
     x1 = runif(1, min = -5, max = 3)
     y1 = runif(1, min = -5, max = 3)
-    off = 2# runif(1, min = 1, max = 2)
-    loc = rbind(c(x1,y1), c(x1,y1+off), c(x1+off,y1+off), c(x1+off,y1))
+    xoff = runif(1, min = 0.5, max = 2)
+    yoff = runif(1, min = 0.5, max = 2)
+         
+    loc = rbind(c(x1,y1), c(x1,y1+yoff), c(x1+xoff,y1+yoff), c(x1+xoff,y1))
     
     po = Polygon(loc)
     pss = Polygons(list(po), ID = k)
@@ -148,23 +150,25 @@ toy.polysample = function(lambda, n = 1, seed = 1) {
     # Evaluate lambda at mesh vertices
     lambda.mesh = lambda(SpatialPoints(mesh$loc))
     lambda.max = max(lambda.mesh)
-    n.smp = rpois(1, (off)^2 * lambda.max)
-    sx = x1 + off*runif(n.smp)
-    sy = y1 + off*runif(n.smp)
+    n.smp = rpois(1, xoff*yoff * lambda.max)
+    sx = x1 + xoff*runif(n.smp)
+    sy = y1 + yoff*runif(n.smp)
     
     # Filter
     A = inla.spde.make.A(mesh = mesh, loc = cbind(sx,sy))
     prob = as.vector((A %*% lambda.mesh)/lambda.max)
     keep = runif(n.smp) < prob
+    nkeep = sum(keep)
     
     # plot(mesh)
     # points(sx,sy, col = 1+keep)
-    det = SpatialPoints(data.frame(sx,sy)[keep,])
+    
+    if (nkeep >0) det = SpatialPointsDataFrame(data.frame(sx,sy)[keep,], data = data.frame(sampler = rep(k, nkeep)))
     
     df = data.frame(n = sum(keep), n.true = n.smp)
     rownames(df) = k
     spdfs = c(spdfs, list(SpatialPolygonsDataFrame(spos, data = df)))
-    detections = c(detections, list(det))
+    if (nkeep >0) detections = c(detections, list(det))
     smpls = c(smpls, list(spos))
   }
   
