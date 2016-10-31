@@ -1,0 +1,236 @@
+
+#' ETP distance sampling data format
+#' 
+#' Fields:
+#' - effort
+#' - sighting
+#' - geometry = "euc"
+#' - mesh.coords = c("lon","lat")
+#' 
+#' @name dsdata
+#' @examples whales
+NULL
+
+
+#'
+#' Register ETP effort with ETP sightings and return a respective \link{effort} data structure
+#' 
+#'
+#' @aliases as.effort.etpeffort
+#' @param effort ETP effort data.frame (class "etpeffort")
+#' @param sighting Sightings from the ETP survey
+#' 
+as.effort.etpeffort = function(effort, sighting) {
+  
+  # Add a column to identify transect
+  
+  trans.idx = rep(0,length(effort$effort))
+  trans.idx[effort$effort== "S"] = 1
+  trans.idx = cumsum(trans.idx)
+  
+  effort = cbind(effort, trans.idx = trans.idx)
+  
+  
+  # Segment start and end points
+  sp = effort[!(effort$effort=="E"),]
+  ep = effort[!(effort$effort=="S"),]
+  
+  colnames(sp) = c("cruise", "ship", "year", "month", "day", "start.time", "start.lat", "start.lon", "start.bft", "effort", "trans.idx")
+  colnames(ep) = c("cruise", "ship", "year", "month", "day", "end.time", "end.lat", "end.lon", "end.bft", "effort", "trans.idx.end")
+  
+  tmp = cbind(sp[,c("trans.idx","cruise", "ship", "year", "month", "day", "start.time", "start.lat", "start.lon", "start.bft")], 
+              ep[,c("end.time","end.lat","end.lon","end.bft")])
+  
+  effort = cbind(strat = NA, trans = NA, seg = NA , det = NA, tmp)
+  
+  # merge in sightings
+  
+  # Function tp compute unix time from effort data (has 6 digit HHMMSS format)
+  eff.unix.time = function(X) {
+    timestr = paste0(as.character(X$year),sprintf("%02d", X$month),sprintf("%02d", X$day),sprintf("%06d", X$start.time))
+    time = strptime(timestr, "%Y%m%d%H%M%S")
+    return(as.numeric(time))
+  }
+  
+  
+  # Function tp compute unix time from sighting data (has 4 digit HHMM format)
+  sig.unix.time = function(X) {
+    timestr = paste0(as.character(X$year),sprintf("%02d", X$month),sprintf("%02d", X$day),sprintf("%04d", X$time))
+    time = strptime(timestr, "%Y%m%d%H%M")
+    return(as.numeric(time))
+  }
+  
+  effort.time = eff.unix.time(effort)
+  sighting.time = sig.unix.time(sighting)
+  
+  effort = cbind(effort, 
+                 unix.time.start = effort.time, 
+                 species = NA, sight.num = NA, on.eff = NA, grpsize = NA, distance = NA, 
+                 bft = NA, vis = NA, time = NA, lat = NA, lon = NA, effort = NA)
+  
+  sighting = cbind(sighting,
+                   unix.time.start = sighting.time,
+                   strat = NA, trans = NA, seg = NA, det = NA, trans.idx = NA, ship = NA, 
+                   start.time = NA, start.lat = NA, start.lon = NA, start.bft = NA, 
+                   end.time = NA, end.lat = NA, end.lon = NA, end.bft = NA, 
+                   effort = NA)
+  
+  
+  # colnames(effort)[!(colnames(effort) %in% colnames(sighting))]
+  # colnames(sighting)[!(colnames(sighting) %in% colnames(effort))]
+  
+  
+  teff = effort
+  tsig = sighting
+  all = list()
+  n=1
+  for (cr in unique(effort$cruise)) {
+    cr.eff  = teff[teff$cruise==cr,]
+    cr.sig  = tsig[tsig$cruise==cr,]
+    teff = teff[!(teff$cruise==cr),]
+    tsig = tsig[!(tsig$cruise==cr),]
+    
+    cr.all = rbind(cr.eff, cr.sig)
+    all[[n]] = cr.all[order(cr.all$unix.time.start),]
+    n=n+1
+  }
+  effort = do.call(rbind,all)
+  
+  
+  # Add trans/seg/det name
+  effort$strat = as.factor(1)
+  seg = numeric()
+  det = numeric()
+  trans = numeric()
+  
+  for (k in 1:dim(effort)[1]){
+    if ( is.na(effort$trans.idx[k]) ) { effort$trans[k] = effort$trans[k-1] }
+    else { effort$trans[k] = effort$trans.idx[k] }
+    
+    # seg name
+    if (k == 1) { seg[k] = 1 }
+    else {
+      if ( !is.na(effort$distance[k]) ) { seg[k] = seg[k-1] } # detections
+      else if ( effort$trans[k] == effort$trans[k-1] ) { seg[k] = seg[k-1]+1 }
+      else {
+        seg[k] = 1
+      }
+    }
+    # det name
+    if (is.na(effort[k,"distance"])) { det[k] = NA }
+    else {    
+      if (is.na(effort[k-1,"distance"])) { det[k] = 1 }
+      else { det[k] = det[k-1]+1 }
+    }
+    # Copy over data from transect
+    if (!is.na(effort[k,"distance"])) {
+      effort[k,c("start.lat","start.lon","start.time","end.lat","end.lon","end.time")] = effort[k-1,c("start.lat","start.lon","start.time","end.lat","end.lon","end.time")]
+    }
+  }
+  
+  effort$trans = as.factor(paste(effort$strat, effort$trans, sep = "."))
+  effort$seg = as.factor(paste(effort$trans, seg, sep="."))
+  effort$det = as.factor(paste(effort$seg, det, sep="."))
+  effort$det[is.na(det)] = NA
+  
+  # Tidy up
+  effort = effort[,!(colnames(effort) == "unix.time.start" | colnames(effort) == "trans.idx" | colnames(effort) == "effort")]
+  
+  # Add estimated observer location for detections
+  obs.loc = observer.location(effort)
+  effort = cbind(effort, obs.loc)  
+  
+  # RETURN
+  class(effort) = c("effort","data.frame")
+  return(effort)
+}
+
+
+#'
+#' Infer observer location when detecting an animal
+#' 
+#'
+#' @aliases observer.location
+#' @param effort effort data.frame as generated by as.effort.etpeffort()
+#' 
+
+observer.location = function(effort){
+  
+  # 0) Some helper functions
+  
+  det.unix.time = function(X) {
+    timestr = paste0(as.character(X$year),sprintf("%02d", X$month),sprintf("%02d", X$day),sprintf("%04d", X$time))
+    time = strptime(timestr, "%Y%m%d%H%M")
+    return(as.numeric(time))
+  }
+  
+  sp.unix.time = function(X) {
+    timestr = paste0(as.character(X$year),sprintf("%02d", X$month),sprintf("%02d", X$day),sprintf("%06d", X$start.time))
+    time = strptime(timestr, "%Y%m%d%H%M")
+    return(as.numeric(time))
+  }
+  
+  ep.unix.time = function(X) {
+    timestr = paste0(as.character(X$year),sprintf("%02d", X$month),sprintf("%02d", X$day),sprintf("%06d", X$end.time))
+    time = strptime(timestr, "%Y%m%d%H%M")
+    return(as.numeric(time))
+  }
+  
+  
+  # 1) Ship location when sighting is made
+  
+  det.idx = which(!(effort$det == "NA"))
+  det = effort[det.idx,]
+  mtime = det.unix.time(det)
+  stime = sp.unix.time(det)
+  etime = ep.unix.time(det)
+  
+  alpha = (mtime - stime) / (etime - stime)
+  alpha[etime == stime] = 0
+  obs.loc = det[,c("start.lat","start.lon")] + alpha * (det[,c("end.lat","end.lon")] - det[,c("start.lat","start.lon")])
+  
+  ret = data.frame(rep(NA, nrow(effort)), rep(NA, nrow(effort)))
+  ret[det.idx,] = obs.loc
+  colnames(ret) = c("obs.lat","obs.lon")
+  return(ret)
+}
+
+
+detdata.etpdata = function(data,detection=NULL,...){ 
+  if (is.null(detection)) {
+    return(data$sighting)
+  } 
+  else {
+    return(data$sighting[detection,])
+  }
+}
+
+
+as.transect.etpeffort = function(effort){
+  #na.rows = which(is.na(effort$cruise))
+  #start.idx = c(1,na.rows[1:length(na.rows)-1]+1)
+  #end.idx = na.rows-1
+  end.idx = which(effort$effort=="E")
+  start.idx = c(1,end.idx[1:length(end.idx)-1]+1)
+  #
+  tr = data.frame(start=start.idx,end=end.idx)
+  class(tr) = c("etptransect","transect","data.frame")
+  return(tr)
+}
+
+
+startpoint.etptransect = function(tr,data=data,keep=FALSE) {
+  if (keep){ return(data$effort[tr$start,]) }
+  else { return(data$effort[tr$start,c("lat","lon")])}
+}
+
+endpoint.etptransect = function(tr,data=data,keep=FALSE) {
+  if (keep){ return(data$effort[tr$end,]) } 
+  else { return(data$effort[tr$end,c("lat","lon")]) } 
+}
+
+numtr.etptransect = function(tr,data=data) { return(dim(tr)[1]) }
+
+linedata.etptransect = function(tr,data,fields){
+  return(data$effort[tr$start,fields])
+}
