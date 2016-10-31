@@ -31,7 +31,7 @@ nlinla.epunkt = function(model, data, result = NULL) {
     for (eff in model$effects) { if (!is.null(environment(model$formula)[[eff]])) { df[,eff] = environment(model$formula)[[eff]]} }
     df
   } else {
-    evaluate.model(model, result, data, link = identity, do.sum = FALSE)  
+    evaluate.model(model, result, data, link = identity, do.sum = FALSE, use.covariate = FALSE)  
   }
 }
 
