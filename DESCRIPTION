@@ -13,4 +13,5 @@ Depends:
     INLA,
     Matrix,
     ggplot2,
+    RColorBrewer,
 RoxygenNote: 5.0.1
