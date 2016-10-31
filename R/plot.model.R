@@ -438,7 +438,7 @@ if ( !rgl ){
   gg = ggplot(df, aes_string(x = coords[1], y = coords[2]) )
   gg = gg + geom_raster(aes_string(fill = "col", alpha = "alpha"), interpolate = TRUE)
   gg = gg + scale_alpha_discrete(guide = 'none')
-  gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) 
+  gg = gg + scale_fill_gradientn(colours = brewer.pal(9,"YlOrRd"))
   gg = gg + theme(legend.title = element_blank()) + coord_fixed()
 
   # Facet properties

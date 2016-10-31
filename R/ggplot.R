@@ -43,7 +43,7 @@ gg.map = function(data, ...) {
 #' @param data A Spatial* object
 #' @return geom_point
 #' 
-gg.point = function(data, CRS = NULL, color = "red", alpha = 0.5, ...) {
+gg.point = function(data, CRS = NULL, color = "#08519c", alpha = 0.5, ...) {
   if ( !is.null(CRS) ) { data = spTransform(data, CRS) }
   df = data.frame(coordinates(data))
   geom_point(data = df, aes_string(x = coordnames(data)[1], y = coordnames(data)[2]), color = color, alpha = alpha, ...)
@@ -364,7 +364,8 @@ plot.prediction = function(...) {
       geom_jitter(data = df, aes(x=as.numeric(effect), y=integral), width = 0, shape = 95, size = 5, alpha = 100/nrow(df)) +
       ylab(paste0("integral_{", paste(ggopts$idims, collapse = ","), "} (", ggopts$predictor, ")")) + 
       guides(fill=FALSE) + 
-      scale_x_continuous(name = "", breaks = 1:length(pnames), labels = pnames)
+      scale_x_continuous(name = "", breaks = 1:length(pnames), labels = pnames) +
+      scale_fill_brewer(palette = "YlOrRd", direction = -1) # YlOrRd, PuBu
     
     # This still causes a warning since the violin plot does not like the width argument
     suppressWarnings(print(plt))  
