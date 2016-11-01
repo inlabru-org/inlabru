@@ -346,7 +346,8 @@ plot.prediction = function(...) {
       data.frame(y = mean(attr(args[[k]],"samples")$integral),
                  yend = mean(attr(args[[k]],"samples")$integral),
                  x = k, xend = k - 0.28,
-                 sdy = mean(attr(args[[k]],"samples")$integral),
+                 sdy = sd(attr(args[[k]],"samples")$integral),
+                 cvy = sd(attr(args[[k]],"samples")$integral)/mean(attr(args[[k]],"samples")$integral),
                  effect = pnames[[k]])))
     
     sdev = do.call(rbind, lapply(1:length(args), function(k) 
@@ -357,7 +358,7 @@ plot.prediction = function(...) {
     
     plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y=integral,fill=effect, width = 0.4), alpha = 0.7) +
       geom_text(data = qtl, aes(x=xend, y=y, label = signif(y)), size = 3.5, family = "", vjust = -0.5, hjust = 1.1) + 
-      geom_text(data = expec, aes(x=xend, y=y, label = paste0(signif(y)," ± ", signif(sdy))), size = 3.5, family = "", vjust = -0.5, angle = 90) + 
+      geom_text(data = expec, aes(x=xend, y=y, label = paste0(signif(y)," ± ", signif(sdy), " [",round(100*cvy),"%]")), size = 3.5, family = "", vjust = -0.5, angle = 90) + 
       geom_segment(data = qtl, aes(x=x,xend=xend,y=y,yend=yend), linetype = 1, alpha = 0.2) +
       geom_segment(data = expec, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 3) +
       geom_segment(data = sdev, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 1) +
