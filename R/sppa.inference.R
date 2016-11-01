@@ -152,6 +152,7 @@ lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = 
   result$iconfig = icfg
   result$sppa$method = "lgcp"
   result$sppa$model = model
+  result$sppa$points = points
   if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
   class(result) = c("lgcp",class(result))
   return(result)
@@ -314,6 +315,17 @@ as.model.formula = function(fml) {
   } else { return(NULL)}
 }
 
+
+#' Predictions for iinla objects
+#' 
+#' Currently only a shortcut to \link{predict.lgcp}
+#'  
+#' @aliases predict.iinla
+#' @export
+
+predict.iinla = function(...) { predict.lgcp(...) }
+
+
 #' Predictions based on log Gaussian Cox processes
 #' 
 #' Takes a fitted LGCP produced by \link{lgcp} and predicts the expression stated by the right hand side of \code{predictor} for
@@ -361,7 +373,8 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
   type = "1d"
   
   # Generate points for dimensions to integrate over
-  wips = ipoints(samplers, result$iconfig[idims])
+  wicfg = iconfig(NULL, result$sppa$points, result$model, idims)
+  wips = ipoints(samplers, wicfg[idims])
   
   if ( length(dims) == 0 ) { 
     pts = wips
@@ -369,10 +382,11 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
   } else {
     # If no points for return dimensions were supplied we generate them
     if (is.null(points)) {
-      rips = ipoints(NULL, result$iconfig[dims])
+      icfg = iconfig(NULL, result$sppa$points, result$model, dims)
+      rips = ipoints(NULL, icfg[dims])
       rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
       # Sort by value in dimension to plot over. Prevents scrambles prediction plots.
-      if (!"coordinates" %in% dims) {rips = rips[sort(rips[,dims], index.return = TRUE)$ix,,drop=FALSE]}
+      if (!(dims[1] == "coordinates")) {rips = rips[sort(rips[,dims], index.return = TRUE)$ix,,drop=FALSE]}
     } else {
       rips = points
     }
@@ -383,13 +397,15 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
     } else {
       pts = rips
       pts$weight = 1
+      # Generate ifcg to set attribs of return value
+      icfg = iconfig(NULL, result$sppa$points, result$model, dims)
     }
     
     # if ("coordinates" %in% dims ) { coordinates(pts) = coordnames(rips) }
   }
-
+  
   # Evaluate the model for these points
-  vals = evaluate.model(result$sppa$model, result, pts, property = property, do.sum = TRUE, link = identity, n = n, predictor = predictor, use.covariate = FALSE)
+  vals = evaluate.model(result$sppa$model, result, pts, property = property, do.sum = TRUE, link = identity, n = n, predictor = predictor)
   
   # If we sampled, summarize
   if ( is.list(vals) ) { vals = do.call(cbind, vals) }
@@ -415,16 +431,16 @@ predict.lgcp = function(result, predictor, points = NULL, integrate = NULL, samp
   
   if (inherits(integral, "SpatialPointsDataFrame")){
     type = "spatial"
-    misc$p4s = result$iconfig$coordinates$p4s
-    misc$cnames = result$iconfig$coordinates$cnames
-    misc$mesh = result$iconfig$coordinates$mesh
+    misc$p4s = icfg$coordinates$p4s
+    misc$cnames = icfg$coordinates$cnames
+    misc$mesh = icfg$coordinates$mesh
     integral = as.data.frame(integral)
   }
   attr(integral, "total.weight") = sum(pts$weight)
   attr(integral, "type") = type
   attr(integral, "misc") = misc
   class(integral) = c("prediction",class(integral))
-
+  
   integral
 }
 
