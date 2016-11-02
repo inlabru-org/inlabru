@@ -333,7 +333,10 @@ plot.prediction = function(...) {
   
   if ( attr(data,"type") == "full" ) {
     
-    df = do.call(rbind, lapply(1:length(args), function(k) data.frame(integral = attr(args[[k]],"samples"), effect = pnames[[k]])))
+    df = do.call(rbind, lapply(1:length(args), function(k) {
+      apr = approx(args[[k]]$x, args[[k]]$y, xout = seq(range(args[[k]]$x)[1],range(args[[k]]$x)[2],length.out = 1000))
+      data.frame(effect = pnames[[k]], x = apr$x, y = 0.1*apr$y/max(apr$y))}))
+    
     qfun = function(x) {quantile(x, probs = c(0.025, 0.5, 0.975))}
 
     qtl = do.call(rbind, lapply(1:length(args), function(k) 
@@ -356,13 +359,18 @@ plot.prediction = function(...) {
                  x = k - 0.28, xend = k - 0.28,
                  effect = pnames[[k]])))
     
-    plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y=integral,fill=effect, width = 0.4), alpha = 0.7) +
+    jit = do.call(rbind, lapply(1:length(args), function(k) 
+      data.frame(y = attr(args[[k]],"samples")$integral,
+                 n = length(attr(args[[k]],"samples")$integral),
+                 effect = pnames[[k]])))
+    
+    plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y = x, weight = y, fill=effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
       geom_text(data = qtl, aes(x=xend, y=y, label = signif(y)), size = 3.5, family = "", vjust = -0.5, hjust = 1.1) + 
       geom_text(data = expec, aes(x=xend, y=y, label = paste0(signif(y)," ± ", signif(sdy), " [",round(100*cvy),"%]")), size = 3.5, family = "", vjust = -0.5, angle = 90) + 
       geom_segment(data = qtl, aes(x=x,xend=xend,y=y,yend=yend), linetype = 1, alpha = 0.2) +
       geom_segment(data = expec, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 3) +
       geom_segment(data = sdev, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 1) +
-      geom_jitter(data = df, aes(x=as.numeric(effect), y=integral), width = 0, shape = 95, size = 5, alpha = 100/nrow(df)) +
+      geom_jitter(data = jit, aes(x=as.numeric(effect), y = y), width = 0, shape = 95, size = 5, alpha = 0.2) +
       ylab(paste0("integral_{", paste(ggopts$idims, collapse = ","), "} (", ggopts$predictor, ")")) + 
       guides(fill=FALSE) + 
       scale_x_continuous(name = "", breaks = 1:length(pnames), labels = pnames) +
