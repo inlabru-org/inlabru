@@ -370,7 +370,7 @@ plot.prediction = function(...) {
       geom_segment(data = qtl, aes(x=x,xend=xend,y=y,yend=yend), linetype = 1, alpha = 0.2) +
       geom_segment(data = expec, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 3) +
       geom_segment(data = sdev, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 1) +
-      geom_jitter(data = jit, aes(x=as.numeric(effect), y = y), width = 0, shape = 95, size = 5, alpha = 0.2) +
+      geom_point(data = jit, aes(x=as.numeric(effect), y = y), shape = 95, size = 3, alpha = 0.3) +
       ylab(paste0("integral_{", paste(ggopts$idims, collapse = ","), "} (", ggopts$predictor, ")")) + 
       guides(fill=FALSE) + 
       scale_x_continuous(name = "", breaks = 1:length(pnames), labels = pnames) +
