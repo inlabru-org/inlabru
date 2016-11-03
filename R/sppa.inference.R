@@ -365,7 +365,8 @@ predict.lgcp = function(result,
                         n = 250,  
                         dens = NULL,
                         discrete = FALSE,
-                        mcerr = 5e-4)
+                        mcerr = 5e-4,
+                        verbose = FALSE)
   {
   
   # Extract target dimension from predictor (given as right hand side of formula)
@@ -457,7 +458,7 @@ predict.lgcp = function(result,
     }
     
     mixer = function(x, smp) { apply(do.call(rbind, lapply(smp, function(s) component(x,s))), MARGIN = 2, mean)}
-    prd = montecarlo.posterior(dfun = mixer, sfun = sample.fun, samples = pre.smp, mcerr = mcerr, n = n, discrete = discrete)
+    prd = montecarlo.posterior(dfun = mixer, sfun = sample.fun, samples = pre.smp, mcerr = mcerr, n = n, discrete = discrete, verbose = verbose)
     
     class(prd) = c("prediction", class(prd))
     attr(prd, "type") = "full"
@@ -545,7 +546,7 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 1e
     
     # Plot new density estimate versus old one (debugging)
     if ( verbose ) {
-      cat(paste0("hpd:", hpd[1]," ",hpd[2], ", err = ", err, ", n = ",n, "\n")) 
+      cat(paste0("hpd:", min(x)," ",max(x), ", err = ", err, ", n = ",n, "\n")) 
       plot(x, lest, type = "l") ; lines(x, est, type = "l", col = "red")
     }
     
