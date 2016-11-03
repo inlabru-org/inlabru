@@ -1,0 +1,1 @@
+print.prediction = function(prd) { print(summary(attr(prd, "samples"))) }
