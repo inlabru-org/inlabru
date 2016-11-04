@@ -61,7 +61,7 @@ poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "
     } else {
       fml = model
       if (attr(terms(fml), "intercept") == 1) { base.model = model.intercept() } else { base.model = NULL }
-      more.model = as.model.formula(model)
+      more.model = as.model.formula(model, data.frame(points))
       lhs = update.formula(fml, . ~ 0)
       model = join.model(more.model, base.model)
       rhs = reformulate(attr(terms(model$formula), "term.labels"), intercept = FALSE)
@@ -124,7 +124,7 @@ lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = 
   if ( class(model)[[1]] == "formula" ) {
     fml = model
     if (attr(terms(fml), "intercept") == 1) { base.model = model.intercept() } else { base.model = NULL }
-    more.model = as.model.formula(model)
+    more.model = as.model.formula(model, data.frame(points))
     lhs = update.formula(fml, . ~ 0)
     model = join.model(more.model, base.model)
     rhs = reformulate(attr(terms(model$formula), "term.labels"), intercept = FALSE)
@@ -251,7 +251,7 @@ g = function(mesh, model, ...) { c(list(mesh = mesh, model = model), f(model = m
 #' @param fml A formula
 #' @return A \link{model} object
 
-as.model.formula = function(fml) {
+as.model.formula = function(fml, data) {
   
   tms = terms(fml)
   lbl = attr(tms, "term.labels")
@@ -286,15 +286,22 @@ as.model.formula = function(fml) {
     for ( k in others ) {
       gpd = getParseData(parse(text=lbl[k]))
       if (gpd[1,"token"] == "SYMBOL") {
-        if (!(gpd[1,"text"] %in% names(environment(fml)))) { environment(fml)[[gpd[1,"text"]]] = 0 }
-        covariates[[lbl[k]]] = function(x) {
-          v = rep(1, nrow(as.data.frame(x)))
-          ret = data.frame(v)
-          colnames(ret) = effect
-          return(ret) 
+        if (!(gpd[1,"text"] %in% c(names(environment(fml)), names(data)))) { environment(fml)[[gpd[1,"text"]]] = 0 }
+        if ( gpd[1,"text"] %in% names(data) ) {
+          # covariates[[lbl[k]]] = function(x) {x[,effect,drop=FALSE]}
+          # environment(covariates[[lbl[k]]]) = new.env()
+          # assign("effect", lbl[k], envir = environment(covariates[[lbl[k]]]))
+        } else {
+          covariates[[lbl[k]]] = function(x) {
+            v = rep(1, nrow(as.data.frame(x)))
+            ret = data.frame(v)
+            colnames(ret) = effect
+            return(ret)
+          }
+          environment(covariates[[lbl[k]]]) = new.env()
+          assign("effect", lbl[k], envir = environment(covariates[[lbl[k]]]))
         }
-      environment(covariates[[lbl[k]]]) = new.env()
-      assign("effect", lbl[k], envir = environment(covariates[[lbl[k]]]))
+      
       } else if (gpd[1,"token"] == "expr") {
         old.label = lbl[k]
         lbl[k] = paste0(gpd[2,"text"],".effect")
