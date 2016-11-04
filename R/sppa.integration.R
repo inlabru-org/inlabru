@@ -217,7 +217,8 @@ iconfig = function(samplers, points, model, dim.names = NULL) {
       if ( nm == "coordinates" ) {
         ret$get.coord = get0(nm)
         ret$n.coord = ncol(ret$get.coord(points))
-        ret$mesh = model$mesh[[1]]
+        # Use the first spatial mesh that we find
+        ret$mesh = model$mesh[[which(as.vector(unlist(lapply(model$mesh, function(m) m$manifold == "R2"))))[[1]]]]
         ret$class = "matrix"  
         ret$project = TRUE
         ret$p4s = proj4string(points)
