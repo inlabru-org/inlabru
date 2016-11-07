@@ -106,6 +106,7 @@ join.model = function(...){
   covariates = list()
   const = list()
   eval = list()
+  map = list()
   
   env.upd = function(env1,env2) 
     {
@@ -129,6 +130,7 @@ join.model = function(...){
     const = c(const, mdl$const)
     environment(formula) = env.upd(environment(formula), environment(mdl$formula))
     eval = c(eval, mdl$eval)
+    map = c(map, mdl$map)
   }
   return(make.model(
     name = name,
@@ -142,7 +144,8 @@ join.model = function(...){
     const = const,
     eval = eval,
     A.msk = A.msk,
-    iterator = do.call(c, lapply(models, function(m){m$iterator}))
+    iterator = do.call(c, lapply(models, function(m){m$iterator})),
+    map = map
     ))
   
 }
@@ -232,23 +235,29 @@ list.A.model = function(mdl, points){
   A.lst = list()
   
   for ( name in names(mdl$mesh)) {
-    # Check if the coordinate names are columns of the data frame. If not, assume we are looking for coordinates
-    # of a SpatialPointsDataFrame
+
+    # What to use as loc input to inla.spde.make.A ?
+    #
+    # 1) if mesh.coords are provided, use them to select columns from the points data frame
+    # 2) if a map function is provided use this function to map points to locations
+    #    a) Function provided as call object
+    #    b) Function provided as name object 
+    # 3) Otherwise assume points is a SpatialPoints object hence the locations are given as coordinates(points)
+    
     if (!is.null(mdl$mesh.coords[[name]]) && all(mdl$mesh.coords[[name]] %in% names(points))) {
-      pts = as.data.frame(points)[,mdl$mesh.coords[[name]]]
-    } else {
-      if ( ifelse(is.null(get0(name)),FALSE,TRUE)) {
-        pts = get0(name)(points)
+      loc = as.data.frame(points)[,mdl$mesh.coords[[name]]]
+    } else if ( name %in% names(mdl$map) ) {
+      if (class(mdl$map[[name]]) == "call") {
+        loc = eval(mdl$map[[name]], data.frame(points))
       } else {
-        pts = coordinates(points)
+        loc = get0(as.character(mdl$map[[name]]))(points)
       }
+    } else { 
+      loc = coordinates(points)
     }
     
-    if ( name %in% names(mdl$mesh.map) ) {
-      loc = as.matrix(mdl$mesh.map[[name]](pts))
-    } else {
-      loc = as.matrix(as.data.frame(pts)) # Convert to DF first because as.matrix is not defined for Spatial* objects
-    }
+    # inla.spde.make.A requires matrix format as input
+    loc = as.matrix(loc)
     
     if (is.null(mdl$inla.spde[[name]]$n.group)) { ng = 1 } else { ng = mdl$inla.spde[[name]]$n.group }
     if (ng > 1) {
@@ -257,9 +266,9 @@ list.A.model = function(mdl, points){
     A = inla.spde.make.A(mdl$mesh[[name]], loc = loc, group = group)
     # Mask columns of A
     if (!is.null(mdl$A.msk[[name]])) { A = A[, as.logical(mdl$A.msk[[name]]), drop=FALSE]}
-    # Covariates for models with A-matrix are realized in the follwoing way:
-    if (name %in% names(mdl$covariates)) {
-      w = mdl$covariates[[name]](points)
+    # Weights for models with A-matrix are realized in the follwoing way:
+    if (name %in% names(mdl$weights)) {
+      w = mdl$weights[[name]](points)
       if (is.data.frame(w)) { stop("Your covariate function returns a data.frame. This is not allowed, a numeric vector is required.") }
       A = as.matrix(A)*as.vector(w)
     }

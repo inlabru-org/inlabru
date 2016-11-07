@@ -237,8 +237,10 @@ default.model = function(mesh) {
 #' @param ... Passed on to inla \link{f}
 #' @return A list with mesh, model and the return value of the f-call
 
-g = function(mesh, model, ...) { c(list(mesh = mesh, model = model), f(model = model, ...)) }
-
+g = function(..., map, mesh, model) {
+  if (as.character(substitute(map))[[1]] == "" ) { map = NULL }
+  ret = list(mesh = mesh, map = substitute(map), model = model, f = f(..., model = model))
+}
 
 #' Turn a formula into an iDistance \link{model}
 #' 
@@ -253,15 +255,34 @@ g = function(mesh, model, ...) { c(list(mesh = mesh, model = model), f(model = m
 
 as.model.formula = function(fml, data) {
   
-  tms = terms(fml)
-  lbl = attr(tms, "term.labels")
+  # Define function for shifting the effect name into the g-call
+  shift.names = function(fml) {
+    tms = terms(fml)
+    labels = attr(tms, "term.labels")
+    effects = character()
+    for (k in 1:length(labels)){
+      lb = labels[[k]]
+      gpd = getParseData(parse(text=lb))
+      # Determine the name of the effect
+      ename = getParseText(gpd, id=1)
+      is.fixed = (gpd[1,"token"] == "SYMBOL")
+      if ( !(ename %in% c("g","f","offset")) & !is.fixed ) {
+        effects[[k]] = ename
+        # Replace effect name by g(ename
+        labels[[k]] = gsub(paste0(ename,"("), paste0("g(",ename,", "), lb, fixed = TRUE)
+      }
+    }
+    labels
+  }
+
+  lbl = shift.names(fml)
   if ( length(lbl)> 0 ) {
     gidx = which(substr(lbl,1,2) == "g(")
     others = which(!substr(lbl,1,2) == "g(")
     base.fml.char = paste0("~. +", paste0("", lbl[others], collapse = " +"))
     mesh = list()
     mesh.coords = list()
-    # mesh.map = list()
+    map = list()
     inla.models = list()
     covariates = list()
     effects = lbl
@@ -272,16 +293,28 @@ as.model.formula = function(fml, data) {
       lb = lbl[[k]]
       # Extract mesh and spde model
       ge = eval(parse(text = lb), envir = environment(fml))
-      mesh[[ge$term]] = ge$mesh
-      mesh.coords[[ge$term]] = ge$term
-      # mesh.map[[ge$term]] = function(x) { x[,ge$term,drop=FALSE]}
-      inla.models[[ge$term]] = ge$model
-      effects[[k]] = ge$term
+      name = ge$f$term
+      effects[[k]] = name
+      mesh[[name]] = ge$mesh
+      mesh.coords[[name]] = ge$f$term
+      inla.models[[name]] = ge$model
+      map[[name]] = ge$map
+      
+      
       # Replace function name by INLA f function
       lb = gsub("g\\(","f(",lb)
+      
       # Remove extra mesh argument
       lb = gsub("[,][ ]*mesh[ ]*=[^),]*", "", lb)
+      
+      # Remove extra map argument
+      pat = paste0("", deparse(ge$map))
+      lb = gsub(deparse(ge$map), "", lb, fixed =TRUE)
+      lb = gsub("[,][ ]*map[ ]*=[^),]*", "", lb)
+    
       lbl[[k]] = lb
+      
+      
     }
     for ( k in others ) {
       gpd = getParseData(parse(text=lbl[k]))
@@ -317,7 +350,9 @@ as.model.formula = function(fml, data) {
       environment(new.fml) = environment(fml)
       # Make model
       mdl = make.model(formula = new.fml, name = "", mesh = mesh, effects = effects, covariates = covariates, 
-                       inla.spde = inla.models, mesh.coords = mesh.coords, time.coords = NULL)  
+                       inla.spde = inla.models, mesh.coords = mesh.coords, time.coords = NULL)
+      mdl$map = map
+      mdl
     } else { return(NULL) }
   } else { return(NULL)}
 }
@@ -382,6 +417,15 @@ predict.lgcp = function(result,
   predictor.rhs = pchar[-1]
   predictor = parse(text = predictor.rhs)
   
+  # Alternatively, take dims from points
+  if ( !is.null(points) ) {
+    dims = colnames(points)
+    icfg.points = points
+  } else {
+    icfg.points = result$sppa$points
+  }
+  
+  
   # Dimensions we are integrating over
   idims = integrate
   
@@ -396,9 +440,9 @@ predict.lgcp = function(result,
   wicfg = iconfig(NULL, result$sppa$points, result$model, idims)
   wips = ipoints(samplers, wicfg[idims])
   
-  if ( length(dims) == 0 ) { 
+  if ( length(dims) == 0 ) {
     pts = wips
-    type = "full"
+    type = "full" 
   } else {
     # If no points for return dimensions were supplied we generate them
     if (is.null(points)) {
@@ -418,7 +462,7 @@ predict.lgcp = function(result,
       pts = rips
       pts$weight = 1
       # Generate ifcg to set attribs of return value
-      icfg = iconfig(NULL, result$sppa$points, result$model, dims)
+      icfg = iconfig(NULL, icfg.points, result$model, dims)
     }
     
     # if ("coordinates" %in% dims ) { coordinates(pts) = coordnames(rips) }
