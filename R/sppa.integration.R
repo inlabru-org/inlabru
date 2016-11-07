@@ -75,9 +75,7 @@ ipoints = function(samplers, config) {
     
     # Store coordinate names
     cnames = coordnames(samplers)
-    
-    if (!(diff(range(samplers$weight))<0.0001)) {stop("lines do not have equal width. Not implemented.")}
-    
+
     ips = int.points(samplers,
                      on = "segment",
                      line.split = TRUE,
@@ -89,13 +87,15 @@ ipoints = function(samplers, config) {
                      n.length = 1,
                      distance.scheme = "equidistant",
                      n.distance = 1,
-                     distance.truncation = samplers$weight[1]/2,
+                     distance.truncation = 1/2,
                      fake.distance = TRUE,
                      projection = NULL,
                      group = pregroup,
                      filter.zero.length = TRUE)
     
     ips$distance = NULL
+    ips$weight = ips$weight * samplers$weight[ips$idx]
+    ips$idx = NULL
     ips = SpatialPointsDataFrame(ips[,c(1,2)], data = ips[,3:ncol(ips),drop=FALSE])
     
   } else if ( inherits(samplers, "SpatialPolygons") ){

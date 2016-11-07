@@ -977,7 +977,7 @@ int.points = function(data,
     ips = recurse.rbind(fun = fn, ips, cols = c("distance", group))
     
   }
-  if (length(idx) == dim(ips)[1]) {ips = data.frame(ips, idx = idx[,1])} # only return index if it makes sense
+  if (length(idx[,1]) == dim(ips)[1]) { ips$idx = idx[,1] }
   return(ips)
 }
 
