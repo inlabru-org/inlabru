@@ -1,27 +1,51 @@
-#' Normal regression using INLA
+#' Spatial model fitting using INLA
 #'
-#' @aliases gauss
+#' @aliases bru
 #' @export
 #' @param points A SpatialPoints[DataFrame] object
-#' @param model Typically a formula or a \link{model} describing the components of the LGCP density. If NULL, an intercept and a spatial SPDE component are used
+#' @param model a formula describing the model components
 #' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
 #' @return An \link{inla} object
 
-gauss = function(points, model = NULL, predictor = NULL, mesh = NULL, y = ~ k, ...) {
+bru = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "gaussian", ...) {
   
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
-  if ( is.null(model) ) { model = default.model(mesh) }
-  if ( class(model)[[1]] == "formula" ) { 
-    base.model = model.intercept()
-    model = as.model.formula(model)
-    if (!is.null(model)) { model = join(base.model, model) } else { model = join(base.model) }
+  if ( is.null(model) ) { 
+    model = default.model(mesh)
+    model$formula = update.formula(model$formula, coordinates ~ .)
   }
-  if ( !is.null(predictor) ) { model$expr = expr ; stop("Not implemented: gaussian likelihood and non-linear predictor. missing: use const-parameter of INLA instead of E")}
   
-  stk = function(points, model) { detection.stack(points, model = model, y = get_all_vars(y, points)[,1], E = 1) }
+  if ( class(model)[[1]] == "formula" ) {
+    # Check if right hand side was provided
+    if (as.character(model)[length(as.character(model))] == ".") {
+      fml = model
+      model = join.model(default.model(mesh))
+      model$formula = update.formula(model$formula, fml)
+      
+    } else {
+      fml = model
+      if (attr(terms(fml), "intercept") == 1) { base.model = model.intercept() } else { base.model = NULL }
+      more.model = as.model.formula(model, data.frame(points))
+      lhs = update.formula(fml, . ~ 0)
+      model = join.model(more.model, base.model)
+      rhs = reformulate(attr(terms(model$formula), "term.labels"), intercept = FALSE)
+      model$formula = update.formula(lhs, rhs)
+    }
+  }
+  if ( !is.null(predictor) ) { model$expr = predictor }
   
-  result = iinla(points, model, stk, family = "gaussian", ...)
+  yE = get_all_vars(update.formula(model$formula , . ~ 1), data = points)
+  y = yE[,1]
+
+  stk = function(points, model) { detection.stack(points, model = model, y = y, E = 1) }
+  
+  result = iinla(points, model, stk, family = family, ...)
   result$mesh = mesh
+  result$sppa$method = "bru"
+  result$sppa$model = model
+  result$sppa$points = points
+  if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
+  class(result) = c("bru",class(result))
   return(result)
 }
 
