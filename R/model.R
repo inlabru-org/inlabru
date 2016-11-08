@@ -259,7 +259,7 @@ list.A.model = function(mdl, points){
     # inla.spde.make.A requires matrix format as input
     loc = as.matrix(loc)
     
-    if (is.null(mdl$inla.spde[[name]]$n.group)) { ng = 1 } else { ng = mdl$inla.spde[[name]]$n.group }
+    if (!("n.group" %in% names(mdl$inla.spde[[name]]))) { ng = 1 } else { ng = mdl$inla.spde[[name]]$n.group }
     if (ng > 1) {
       group = as.matrix(points[,mdl$time.coords[[name]]])
     } else { group = NULL }

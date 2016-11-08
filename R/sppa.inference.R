@@ -261,9 +261,14 @@ default.model = function(mesh) {
 #' @param ... Passed on to inla \link{f}
 #' @return A list with mesh, model and the return value of the f-call
 
-g = function(..., map, mesh, model) {
-  if (as.character(substitute(map))[[1]] == "" ) { map = NULL }
-  ret = list(mesh = mesh, map = substitute(map), model = model, f = f(..., model = model))
+g = function(..., map, A.msk, mesh, model) {
+  if (as.character(substitute(map))[[1]] == "" ) { map = NULL } else { map = substitute(map) }
+  if (as.character(substitute(A.msk))[[1]] == "" ) { A.msk = NULL } else { A.msk = A.msk }
+  ret = list(mesh = mesh, 
+             map = map,
+             A.msk = A.msk,
+             model = model, 
+             f = f(..., model = model))
 }
 
 #' Turn a formula into an iDistance \link{model}
@@ -307,6 +312,7 @@ as.model.formula = function(fml, data) {
     mesh = list()
     mesh.coords = list()
     map = list()
+    A.msk = list()
     inla.models = list()
     covariates = list()
     effects = lbl
@@ -323,7 +329,7 @@ as.model.formula = function(fml, data) {
       mesh.coords[[name]] = ge$f$term
       inla.models[[name]] = ge$model
       map[[name]] = ge$map
-      
+      A.msk[[name]] = ge$A.msk
       
       # Replace function name by INLA f function
       lb = gsub("g\\(","f(",lb)
@@ -335,6 +341,11 @@ as.model.formula = function(fml, data) {
       pat = paste0("", deparse(ge$map))
       lb = gsub(deparse(ge$map), "", lb, fixed =TRUE)
       lb = gsub("[,][ ]*map[ ]*=[^),]*", "", lb)
+      
+      # Remove extra A.msk argument
+      pat = paste0("", deparse(ge$A.msk))
+      lb = gsub(deparse(ge$map), "", lb, fixed =TRUE)
+      lb = gsub("[,][ ]*A.msk[ ]*=[^),]*", "", lb)
     
       lbl[[k]] = lb
       
@@ -376,6 +387,7 @@ as.model.formula = function(fml, data) {
       mdl = make.model(formula = new.fml, name = "", mesh = mesh, effects = effects, covariates = covariates, 
                        inla.spde = inla.models, mesh.coords = mesh.coords, time.coords = NULL)
       mdl$map = map
+      mdl$A.msk = A.msk
       mdl
     } else { return(NULL) }
   } else { return(NULL)}
