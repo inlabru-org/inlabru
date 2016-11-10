@@ -73,10 +73,19 @@ gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 #' @param data A Spatial* object
 #' @return geom_point
 #' 
-gg.point = function(data, crs = NULL, color = "#08519c", alpha = 0.5, ...) {
+gg.point = function(data, crs = NULL, 
+                    mapping = NULL, 
+                    color = "#08519c", 
+                    alpha = 0.5, ...) { 
   if ( !is.null(crs) ) { data = spTransform(data, crs) }
-  df = data.frame(coordinates(data))
-  gp = geom_point(data = df, aes_string(x = coordnames(data)[1], y = coordnames(data)[2]), color = color, alpha = alpha, ...)
+  df = data.frame(data)
+  if (is.null(mapping)) { 
+    mapping = aes_string(x = coordnames(data)[1], y = coordnames(data)[2])
+    gp = geom_point(data = df, mapping = mapping, color = "#08519c", alpha = 0.5,...)
+  } else {
+    gp = geom_point(data = df, mapping = mapping, ...)
+  }
+
   return(gp)
 }
 
@@ -103,7 +112,7 @@ gg.segment = function(data, crs = NULL,  color = "black", ...) {
                                      y = paste0("start.", cnames)[2], 
                                      xend = paste0("end.", cnames)[1], 
                                      yend = paste0("end.", cnames)[2]),
-               color = "black", ...)  
+               color = color, ...)  
 } 
 
 #' Polygon geom for Spatial* objects
@@ -116,7 +125,7 @@ gg.segment = function(data, crs = NULL,  color = "black", ...) {
 #' 
 gg.polygon = function(data, crs = NULL, colour = "black", alpha = 0.1, ...) {
   if ( !is.null(crs) ) { data = spTransform(data, crs) }
-  geom_polygon(data= fortify(data), aes(x=long,y=lat,group=group), colour = colour, alpha = alpha)
+  geom_polygon(data= fortify(data), aes(x=long,y=lat,group=group), colour = colour, alpha = alpha, ...)
 } 
 
 #' Plot inla.mesh using ggplot2
