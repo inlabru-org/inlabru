@@ -1,5 +1,5 @@
 # INTERNAL DATA STORAGE
-io_sbdolphin.getDataDir = function() {return(system.file("data",package="iDistance"))}
+io_sbdolphin.getDataDir = function() {return(system.file("data",package="inlabru"))}
 
 
 #' Load \link{sbdolphin} survey data from raw data sets
@@ -13,44 +13,45 @@ io_sbdolphin.getDataDir = function() {return(system.file("data",package="iDistan
 
 io_sbdolphin.pkgdata.load = function()
 { 
+  # Load mesh and set CRS
+  mesh = io_sbdolphin.mesh()
+  mesh$crs = inla.CRS("+proj=longlat")
+  
+  # Load the ETP data
   effort = io_sbdolphin.effort(rem.intermediate=FALSE)
-  par3d.args = io_sbdolphin.par3d()
-  dset = list(sighting=io_sbdolphin.sighting(BfLim=5,PDLim=6),
-                transect = as.transect(effort),
-                effort = effort,
-                mesh = io_sbdolphin.mesh(),
-                coast.boundary = io_star.coast(),
-                sea.boundary = io_star.boundary(),
-                inner.boundary = io_sbdolphin.inner.boundary(),
-                geometry = "geo",
-                mesh.coords = c("lon","lat"),
-                time.coords = "year",
-                par3d.args = par3d.args,
-                ips = io_sbdolphin.ips(),
-                ips.yearly = io_sbdolphin.ips.yearly()
-  )
+  sighting = io_sbdolphin.sighting(BfLim=5,PDLim=6)
+  effort = as.effort.etpeffort(effort, sighting)
+  effort = as.data.frame(effort[is.na(effort$det),])
   
-  # Convert into dsdata format
-  cat("Converting ETP data into dsdata. This might take a couple of minutes.")
-  dset$effort = as.effort.etpeffort(dset$effort, dset$sighting)
-  dset$sighting = NULL
-  class(dset) = c("dsdata", "list")
+  # Remove data that is outside the mesh constructed by Joyce
+  is.inside(mesh, as.matrix(sighting[,c("lon","lat")]))
+  sighting = sighting[is.inside(mesh, as.matrix(sighting[,c("lon","lat")])), ]
+  effort = effort[is.inside(mesh, as.matrix(effort[,c("start.lon","start.lat")])) | is.inside(mesh, as.matrix(effort[,c("end.lon","end.lat")])), ]
   
-  # Sort transects and segments
-  srt = sort(segment.id(dset$effort), index.return = TRUE)
-  dset$effort = dset$effort[srt$ix,]
-  srt = sort(transect.id(dset$effort), index.return = TRUE)
-  dset$effort = dset$effort[srt$ix,]
+  # Turn effort into spatial lines
+  sl = sline(effort, 
+             start.cols = c("start.lon","start.lat"), 
+             end.cols = c("end.lon","end.lat"),
+             crs = CRS("+proj=longlat"),
+             to.crs = CRS("+proj=longlat"))
   
-  # Discard effort outside the mesh
-  msk = is.inside(dset$mesh, dset$effort, mesh.coords = paste0("start.", dset$mesh.coords)) & is.inside(dset$mesh, dset$effort, mesh.coords = paste0("end.", dset$mesh.coords))
-  dset$effort = dset$effort[msk,]
+  sl$weight = 12 # strip width
   
-  # Attach CRS projection strings
-  dset$p4s = "+proj=longlat"
-  dset$mesh.p4s = "+proj=longlat"
+  # Turn sightings into spatial points
+  sp = SpatialPointsDataFrame(sighting[,c("lon","lat")], 
+                              data = sighting[,setdiff(names(sighting), c("lon","lat"))],
+                              proj4string = CRS("+proj=longlat"))
   
-  return(dset)
+  
+  
+  # Create polygon representing interior domain (survey area)
+  sbnd = data.frame(mesh$loc[mesh$segm$int$idx[,1],1:2])
+  cbnd = data.frame(mesh$loc[mesh$segm$bnd$idx[c(69:152,1),1],1:2])
+  survey.area = spoly(rbind(sbnd, cbnd), crs = CRS("+proj=longlat"), to.crs = CRS("+proj=longlat"))
+  
+  # Put everything into a list
+  sbdolphin = list(points = sp, samplers = sl, mesh = mesh, survey.area = survey.area)
+
 }
 
 #' Regenerate \link{sbdolphin} data and store it to \code{sbdolphin.RData}
