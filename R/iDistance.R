@@ -1,14 +1,13 @@
-#' iDistance
+#' inlabru
 #' 
-#' A package for distance sampling using integrated nested Laplace approximations (INLA). 
-#' iDistance is a product of the Ecological Survey Spatial Modelling project (\url{http://www.creem.st-andrews.ac.uk:8082/ESSMod/}).
+#' inla bru facilitates Beyesian spatial modeling using integrated nested Laplace approximations. It
+#' is heavily based on R-inla (\url{http://www.r-inla.org}) but adds additional modeling abilities.
+#' Tutorials and more information can be found at \url{https://fbachl.github.io/inlabru/} and
+#' soon also at \url{http://inlabru.r-inla.org/}.
 #' 
-#' @details
-#' This package comes multiple distance sampling data sets. Please use \code{help(dsdata)} to find a respective list and a description of the data format. 
-#' The core objects needed for inference using iDistance are derived from the class \link{model}. Use these models to generate \link{stack} structures
-#' to set up your INLA call. 
+#' @details 
 #'
-#' @aliases iDistance
+#' @aliases inlabru
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' @name iDistance
+#' @name inlabru
 NULL
