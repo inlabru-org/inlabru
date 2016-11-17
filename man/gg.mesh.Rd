@@ -4,7 +4,7 @@
 \alias{gg.mesh}
 \title{Plot inla.mesh using ggplot2}
 \usage{
-gg.mesh(data, color = rgb(0, 0, 0, 0.1), ...)
+gg.mesh(data, crs = NULL, color = rgb(0, 0, 0, 0.1), ...)
 }
 \arguments{
 \item{data}{A \link{dsdata} object or a \link{inla.mesh}}

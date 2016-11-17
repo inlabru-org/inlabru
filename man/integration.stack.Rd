@@ -4,9 +4,9 @@
 \alias{integration.stack}
 \title{Create a stack for integration points}
 \usage{
-integration.stack(data, scheme = NULL, scheme.args = NULL, model = NULL,
-  filter = NULL, y = 0, E = "weight", const = model$const,
-  tag = "integration.stack")
+integration.stack(data = NULL, scheme = NULL, scheme.args = NULL,
+  model = NULL, filter = NULL, y = 0, E = "weight",
+  const = model$const, tag = "integration.stack")
 }
 \description{
 Create a stack for integration points

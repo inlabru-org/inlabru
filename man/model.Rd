@@ -5,9 +5,7 @@
 \title{iDistance models for INLA}
 \description{
 Facilitates the spatial modeling approaches using INLA.
-}
-\details{
-A \code{model} has a formula that describes one or more of INLA's \code{f} objects. 
+A \code{model} has a formula that describes one or more of INLA's \code{f} objects.
 It describes how given a data frame of locations or other coordinates translates into
 evaluating the predictors of the formula. For manually setting up a \code{model} see the
 constructor \link{make.model}. Useful operators on \code{model} objects are:
@@ -21,7 +19,8 @@ constructor \link{make.model}. Useful operators on \code{model} objects are:
  \item{\link{sample.points}: }{ Sample spatial points from a log gaussion Cox process model}
  \item{\link{update}: }{ Update the iterator of an axproximative model}
 }
-
+}
+\details{
 After running inference plotting aspects of models is straight forward using:
 
 \itemize{
