@@ -7,8 +7,8 @@
 \usage{
 plot.spatial(model = NULL, result = NULL, data = NULL, effect = NULL,
   property = "mean", group = NULL, mesh = NULL, mask = NULL,
-  col = NULL, add.mesh = TRUE, add.detection = FALSE,
-  add.segment = FALSE, logscale = TRUE, rgl = FALSE, add = FALSE,
+  col = NULL, add.mesh = FALSE, add.detection = FALSE,
+  add.segment = FALSE, logscale = NULL, rgl = FALSE, add = FALSE,
   nx = 300)
 }
 \arguments{

@@ -6,7 +6,8 @@
 \title{Evaluate model at given locations}
 \usage{
 \method{evaluate}{model}(model, inla.result, loc, property = "mode",
-  do.sum = TRUE, link = identity, n = 1)
+  do.sum = TRUE, link = identity, n = 1, predictor = model$expr,
+  use.covariate = TRUE)
 }
 \arguments{
 \item{model}{An iDistance \link{model}}
