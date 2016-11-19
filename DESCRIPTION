@@ -5,13 +5,13 @@ Version: 1.0
 Date: 2014-09-24
 Author: Fabian E. Bachl
 Maintainer: Fabian E. Bachl <bachlfab@gmail.com>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Description: Inference for spatial point processes with uncertain detection.
+License: GPL (>= 2)
 Suggests:
     testthat
 Depends:
     INLA,
     Matrix,
     ggplot2,
-    RColorBrewer,
+    RColorBrewer
 RoxygenNote: 5.0.1
