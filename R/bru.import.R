@@ -73,3 +73,9 @@ import.mexdolphin = function() {
   # return
   mexdolphin 
 }
+
+
+save.mexdolphin = function() {
+  mexdolphin = import.mexdolphin()
+  save("mexdolphin", file=paste0(system.file("data",package="inlabru"),"/mexdolphin.RData"))
+}
