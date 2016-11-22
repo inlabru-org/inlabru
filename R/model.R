@@ -241,7 +241,8 @@ list.A.model = function(mdl, points){
     # 1) if mesh.coords are provided, use them to select columns from the points data frame
     # 2) if a map function is provided use this function to map points to locations
     #    a) Function provided as call object
-    #    b) Function provided as name object 
+    #    b) Function provided as name object
+    #    c) Map function is not really a function but a clumn name
     # 3) Otherwise assume points is a SpatialPoints object hence the locations are given as coordinates(points)
     
     if (!is.null(mdl$mesh.coords[[name]]) && all(mdl$mesh.coords[[name]] %in% names(points))) {
@@ -250,7 +251,8 @@ list.A.model = function(mdl, points){
       if (class(mdl$map[[name]]) == "call") {
         loc = eval(mdl$map[[name]], data.frame(points))
       } else {
-        loc = get0(as.character(mdl$map[[name]]))(points)
+        fetcher = get0(as.character(mdl$map[[name]]))
+        if (is.function(fetcher)) { loc = fetcher(points) } else { loc = points[,as.character(mdl$map[[name]])] }
       }
     } else { 
       loc = coordinates(points)
@@ -452,7 +454,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
         } else {
             # Note: if there is no covariate, assume covariate = 1
             if (is.null(cov[[name]]) | !use.covariate) {
-              post = rep(inla.result$summary.fixed[name, property], nrow(loc))
+              post = rep(inla.result$summary.fixed[name, property], nrow(data.frame(loc)))
             } else {
               post = inla.result$summary.fixed[name, property] * cov[[name]]
             }

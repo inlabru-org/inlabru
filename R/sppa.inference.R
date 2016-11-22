@@ -137,26 +137,41 @@ poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "
 #' @param ... Arguments passed on to \link{iinla}
 #' @return An \link{iinla} object
 
-lgcp = function(points, samplers = NULL, model = NULL, predictor = NULL, mesh = NULL, scale = NULL, ...) {
+lgcp = function(points, 
+                samplers = NULL, 
+                model = ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
+                predictor = coordinates ~ spde + Intercept, 
+                mesh = NULL, 
+                scale = NULL, ...) {
   
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
-  if ( is.null(model) ) { 
-    model = default.model(mesh)
-    model$formula = update.formula(model$formula, coordinates ~ .)
-    }
   
-  if ( class(model)[[1]] == "formula" ) {
-    fml = model
-    if (attr(terms(fml), "intercept") == 1) { base.model = model.intercept() } else { base.model = NULL }
-    more.model = as.model.formula(model, data.frame(points))
-    lhs = update.formula(fml, . ~ 0)
-    model = join.model(more.model, base.model)
-    rhs = reformulate(attr(terms(model$formula), "term.labels"), intercept = FALSE)
-    model$formula = update.formula(lhs, rhs)
+  # Backwards compatibility: 
+  # - If model has left hand side use it as left hand side of predictor
+  # - If predictor is default use sum of effects in model as predictor RHS
+  if (length(as.character(model)) == 3 ) { #( length(as.character(mdl)) == 3 )
+    message("Note: You are using the old syntax where the left hand side of model defines the dimensions of the LGCP. Please use the LHS of predictor in the future.")
+    prd.lhs = as.formula(paste0(paste(  all.vars(update.formula(model, .~0))  , collapse = " + "), "~."))
+    if ( inherits(predictor, "expression") ) { predictor = as.formula(paste0("~", as.character(predictor))) }
+    predictor = update.formula(predictor, prd.lhs)
+    tmp = as.model.formula(model, data.frame(points))
+    # if (!(toString(model) == toString(. ~ g(spde, model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1))){
+    #   prd.rhs = as.formula(paste0(".~ ", paste(tmp$effects, collapse = " + ")))
+    #   predictor = update.formula(predictor, prd.rhs)
+    # } 
   }
   
-  if ( !is.null(predictor) ) { model$expr = predictor }
+  # Turn model formula into internal bru model
+  model = as.model.formula(model, data.frame(points))
   
+  # Set model$expr as RHS of predictor
+  if ( inherits(predictor, "formula") ) {
+    model$expr = parse(text = as.character(predictor)[3])
+  }
+  
+  # Figure out LGCP dimensions. This is the left hand side of the predictor
+  model$dim.names = all.vars(update(predictor, .~0))
+    
   # Create integration points
   icfg = iconfig(samplers, points, model)
   ips = ipoints(samplers, icfg)
@@ -381,6 +396,8 @@ as.model.formula = function(fml, data) {
       new.fml = as.formula(paste0("~.+", paste0("",paste0("", lbl, collapse = " + "))))
       # Add left hand side of fml
       new.fml = update.formula(update.formula(fml, ~ 1),new.fml)
+      # If input formula had no intercept, add -1 to new formula
+      if ( !(attr(terms(update.formula(~ DOT.FILL, fml)), "intercept") == 1) ) { new.fml = update.formula(new.fml, . ~ .-1) }
       # Add environment
       environment(new.fml) = environment(fml)
       # Make model

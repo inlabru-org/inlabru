@@ -198,7 +198,7 @@ iconfig = function(samplers, points, model, dim.names = NULL) {
   
   # Obtain dimensions to integrate over. 
   # These are provided as the left hand side of model$formula
-  if ( is.null(dim.names) ) { dim.names = all.vars(update(model$formula, .~0)) }
+  if ( is.null(dim.names) ) { dim.names = model$dim.names }
   
   
   # Function that maps each dimension name to a setup
