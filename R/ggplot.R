@@ -81,7 +81,7 @@ gg.point = function(data, crs = NULL,
   df = data.frame(data)
   if (is.null(mapping)) { 
     mapping = aes_string(x = coordnames(data)[1], y = coordnames(data)[2])
-    gp = geom_point(data = df, mapping = mapping, color = "#08519c", alpha = 0.5,...)
+    gp = geom_point(data = df, mapping = mapping, color = color, alpha = alpha,...)
   } else {
     gp = geom_point(data = df, mapping = mapping, ...)
   }
