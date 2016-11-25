@@ -11,8 +11,9 @@ bru = function(points,
                model = ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
                predictor = y ~ spde + Intercept, 
                mesh = NULL, 
-               family = "gaussian", 
-               run = TRUE, ...) {
+               run = TRUE,
+               E = 1,
+               family = "gaussian", ...) {
   
   # Construct default mesh
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
@@ -29,7 +30,7 @@ bru = function(points,
   y = as.data.frame(points)[,pred.lhs]
   
   # Create the stack
-  stk = function(points, model) { detection.stack(points, model = model, y = y, E = 1) }
+  stk = function(points, model) { detection.stack(points, model = model, y = y, E = E) }
   
   # Run iterated INLA
   if ( run ) { result = iinla(points, model, stk, family = family, ...) } 
@@ -98,65 +99,9 @@ multibru = function(brus, model = NULL, ...) {
 
 
 #' Poisson regression using INLA
-#' 
-#' This function provides an easy-to-use interface to Poisson regression using INLA, in particular for spatial count data. 
-#' The \code{points} parameter is used to provide the regression data, e.g. counts, exposures and covariates to regress on.
-#' The \code{model} parameter, typically a \link{formula}, defines two aspects of the regression. On the left hand side
-#' the (known) counts as well as the exposures are stated. The right hand side defines the log linear predictor of the 
-#' regression. For non-linear regression the \code{predictor} parameter can be emplyed to override the linear structure
-#' implied by the formula. Note that the \link{INLA} \code{family} argument can be overwritten and thereby other INLA 
-#' likelihoods like the binomial and zero-inflated count models are accessible.
-#'
-#' @aliases poiss
-#' @export
-#' @param points A data frame or SpatialPointsDataFrame object
-#' @param model Typically a formula or a \link{model} describing the linear regression predictor. If NULL, an intercept and a spatial SPDE component are used
-#' @param predictor If NULL, the linear combination defined by the model/formula is used as a predictor for the counts. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
-#' @param mesh An inla.mesh object modelling s spatial domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
-#' @return An \link{iinla} object
-
-poiss = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "poisson", ...) {
-  
-  if ( is.null(mesh) ) { mesh = default.mesh(points) }
-  if ( is.null(model) ) { 
-    model = default.model(mesh)
-    model$formula = update.formula(model$formula, coordinates ~ .)
-  }
-  
-  if ( class(model)[[1]] == "formula" ) {
-    # Check if right hand side was provided
-    if (as.character(model)[length(as.character(model))] == ".") {
-      fml = model
-      model = join.model(default.model(mesh))
-      model$formula = update.formula(model$formula, fml)
-      
-    } else {
-      fml = model
-      if (attr(terms(fml), "intercept") == 1) { base.model = model.intercept() } else { base.model = NULL }
-      more.model = as.model.formula(model, data.frame(points))
-      lhs = update.formula(fml, . ~ 0)
-      model = join.model(more.model, base.model)
-      rhs = reformulate(attr(terms(model$formula), "term.labels"), intercept = FALSE)
-      model$formula = update.formula(lhs, rhs)
-    }
-  }
-  if ( !is.null(predictor) ) { model$expr = predictor }
-  
-  yE = get_all_vars(update.formula(model$formula , . ~ 1), data = points)
-  y = yE[,1]
-  E = yE[,2]
-  # y = as.numeric(get_all_vars(y, points)[,1])
-  # E = get_all_vars(E, points)
-  stk = function(points, model) { detection.stack(points, model = model, y = y, E = E) }
-  
-  result = iinla(points, model, stk, family = family, ...)
-  result$mesh = mesh
-  result$sppa$method = "poiss"
-  result$sppa$model = model
-  result$sppa$points = points
-  if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
-  class(result) = c("poiss",class(result))
-  return(result)
+poiss = function(...) {
+  stop("poiss() has been removed from the inlabru package. Please use bru() with family='poisson' instead. 
+       Note: Instead of providing the exposure via the formula use the bru() E-parameter.")
 }
 
 #' Log Gaussian Cox process (LGCP) inference using INLA
