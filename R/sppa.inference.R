@@ -7,47 +7,95 @@
 #' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
 #' @return An \link{inla} object
 
-bru = function(points, model = NULL, predictor = NULL, mesh = NULL, family = "gaussian", ...) {
+bru = function(points,
+               model = ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
+               predictor = y ~ spde + Intercept, 
+               mesh = NULL, 
+               family = "gaussian", 
+               run = TRUE, ...) {
   
+  # Construct default mesh
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
-  if ( is.null(model) ) { 
-    model = default.model(mesh)
-    model$formula = update.formula(model$formula, coordinates ~ .)
-  }
   
-  if ( class(model)[[1]] == "formula" ) {
-    # Check if right hand side was provided
-    if (as.character(model)[length(as.character(model))] == ".") {
-      fml = model
-      model = join.model(default.model(mesh))
-      model$formula = update.formula(model$formula, fml)
-      
-    } else {
-      fml = model
-      if (attr(terms(fml), "intercept") == 1) { base.model = model.intercept() } else { base.model = NULL }
-      more.model = as.model.formula(model, data.frame(points))
-      lhs = update.formula(fml, . ~ 0)
-      model = join.model(more.model, base.model)
-      rhs = reformulate(attr(terms(model$formula), "term.labels"), intercept = FALSE)
-      model$formula = update.formula(lhs, rhs)
-    }
-  }
-  if ( !is.null(predictor) ) { model$expr = predictor }
+  # Turn model formula into internal bru model
+  model = as.model.formula(model, data.frame(points))
   
-  yE = get_all_vars(update.formula(model$formula , . ~ 1), data = points)
-  y = yE[,1]
-
+  # Set model$expr as RHS of predictor 
+  pred.rhs = parse(text = as.character(predictor)[3])
+  model$expr = pred.rhs
+  
+  # Extract y as from left hand side of the predictor
+  pred.lhs = all.vars(update(predictor, .~0))
+  y = as.data.frame(points)[,pred.lhs]
+  
+  # Create the stack
   stk = function(points, model) { detection.stack(points, model = model, y = y, E = 1) }
   
-  result = iinla(points, model, stk, family = family, ...)
-  result$mesh = mesh
+  # Run iterated INLA
+  if ( run ) { result = iinla(points, model, stk, family = family, ...) } 
+  else { result = list() }
+  
+  # Create result object
+  result$sppa$expr = pred.rhs
   result$sppa$method = "bru"
   result$sppa$model = model
   result$sppa$points = points
-  if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
-  class(result) = c("bru",class(result))
+  result$sppa$stack = stk
+  result$sppa$family = family
+
+  class(result) = c("bru", class(result))
   return(result)
 }
+
+
+#' Multi-likelihood models
+#' 
+#' @details 
+#' This function realizes model fitting using multiple likelihoods. Single likelihood can
+#' be constructed by running the \link{bru} command using the parameter \code{run=FALSE}. 
+#' The resulting object can be one of many passed on to \code{multibru} via the
+#' \code{brus} parameter.
+#'
+#' @aliases multibru
+#' @export
+#' @param bru A list of \code{bru} objects (each obtained by a call of \link{bru}) 
+#' @param model a formula describing the model components
+#' @param ... further arguments passed on to iinla
+#' @return An \link{inla} object
+
+multibru = function(brus, model = NULL, ...) {
+  
+  # Default model: take it from first bru
+  if ( is.null(model) ) { 
+    model = brus[[1]]$sppa$model
+  } else {
+    model = as.model.formula(model, data.frame(brus[[1]]$sppa$points))
+  }
+  
+  # Create joint stackmaker
+  stk = function(xx, mdl) { 
+    do.call(inla.stack.mjoin, lapply(brus, function(br) {br$sppa$stack(br$sppa$points, br$sppa$model)}))
+  }
+  
+  #' Family
+  family = as.character(lapply(brus, function(br) br$sppa$family))
+  
+  #' Run INLA
+  result = iinla(NULL, model = model, stackmaker = stk, family = family, ...)
+  
+  # Create result object
+  result$sppa$expr = lapply(brus, function(br) br$sppa$model$expr)
+  result$sppa$method = "multibru"
+  result$sppa$model = model
+  result$sppa$points = brus[[1]]$sppa$points
+  result$sppa$stack = stk
+  result$sppa$family = family
+  
+  class(result) = c("bru", class(result))
+  return(result)
+}
+
+
 
 #' Poisson regression using INLA
 #' 
@@ -760,7 +808,7 @@ iinla = function(data, model, stackmaker, n = NULL, result = NULL,
     if ( k > 1 ) { old.result = result } 
     
     result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
-                                             data = c(inla.stack.data(stk), list.data(model)),
+                                             data = c(inla.stack.mdata(stk), list.data(model)),
                                              control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
                                              E = inla.stack.data(stk)$e,
                                              control.inla = control.inla,
