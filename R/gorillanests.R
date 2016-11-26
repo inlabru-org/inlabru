@@ -11,9 +11,11 @@
 #'    \item{\code{gnests}:}{ A \code{SpatialPointsDataFrame} object containing the locations of 
 #'    the gorilla nests.}
 #'    \item{\code{gnestboundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary
-#'    of the regoin that was searched for the nests.}
+#'    of the region that was searched for the nests.}
 #'    \item{\code{gnestmesh}:}{ An \code{inla.mesh} object containing a mesh that can be used
 #'    with function \code{lgcp} to fit a LGCP to the nest data.}
+#'    \item{\code{g_raster_elevation}:}{ A \code{raster} object with the elevation of the gorilla
+#'    nests survey region.}
 #'  }
 #' @source 
 #' Library \code{spatstat}.
