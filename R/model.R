@@ -252,7 +252,7 @@ list.A.model = function(mdl, points){
         loc = eval(mdl$map[[name]], data.frame(points))
       } else {
         fetcher = get0(as.character(mdl$map[[name]]))
-        if (is.function(fetcher)) { loc = fetcher(points) } else { loc = points[,as.character(mdl$map[[name]])] }
+        if (is.function(fetcher)) { loc = fetcher(points) } else { loc = as.data.frame(points)[,as.character(mdl$map[[name]])] }
       }
     } else { 
       loc = coordinates(points)
