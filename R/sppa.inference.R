@@ -43,7 +43,7 @@ bru = function(points,
   result$sppa$points = points
   result$sppa$stack = stk
   result$sppa$family = family
-
+  if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
   class(result) = c("bru", class(result))
   return(result)
 }
@@ -169,7 +169,7 @@ lgcp = function(points,
   model$dim.names = all.vars(update(predictor, .~0))
     
   # Create integration points
-  icfg = iconfig(samplers, points, model)
+  icfg = iconfig(samplers, points, model, mesh = mesh)
   ips = ipoints(samplers, icfg)
   
   # Apend covariates to points and integration points
@@ -195,6 +195,7 @@ lgcp = function(points,
   
   result = iinla(points, model, stk, family = "poisson", ...)
   result$mesh = mesh
+  result$sppa$mesh = mesh
   result$ips = ips
   result$iconfig = icfg
   result$sppa$method = "lgcp"
@@ -507,7 +508,7 @@ predict.lgcp = function(result,
   } else {
     # If no points for return dimensions were supplied we generate them
     if (is.null(points)) {
-      icfg = iconfig(NULL, result$sppa$points, result$model, dims)
+      icfg = iconfig(NULL, result$sppa$points, result$model, dims, mesh = result$sppa$mesh)
       rips = ipoints(NULL, icfg[dims])
       rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
       # Sort by value in dimension to plot over. Prevents scrambles prediction plots.
@@ -523,7 +524,7 @@ predict.lgcp = function(result,
       pts = rips
       pts$weight = 1
       # Generate ifcg to set attribs of return value
-      icfg = iconfig(NULL, icfg.points, result$model, dims)
+      icfg = iconfig(NULL, icfg.points, result$model, dims, mesh = result$sppa$mesh)
     }
     
     # if ("coordinates" %in% dims ) { coordinates(pts) = coordnames(rips) }

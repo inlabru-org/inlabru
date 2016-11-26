@@ -194,12 +194,17 @@ ipoints = function(samplers, config) {
 #' @param y Left hand side of a LGCP formula. Determines the integration dimensions. Currently in use but soon to be deprecated
 #' @return An integration configuration
 
-iconfig = function(samplers, points, model, dim.names = NULL) {
+iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL) {
   
   # Obtain dimensions to integrate over. 
   # These are provided as the left hand side of model$formula
   if ( is.null(dim.names) ) { dim.names = model$dim.names }
   
+  # Default mesh for spatial integration:
+  issp = as.vector(unlist(lapply(model$mesh, function(m) m$manifold == "R2")))
+  if (!is.null(issp) & any(issp)) { 
+    spmesh = model$mesh[[which(issp)[[1]]]] } 
+  else { spmesh = mesh }
   
   # Function that maps each dimension name to a setup
   ret = make.setup = function(nm) {
@@ -218,7 +223,7 @@ iconfig = function(samplers, points, model, dim.names = NULL) {
         ret$get.coord = get0(nm)
         ret$n.coord = ncol(ret$get.coord(points))
         # Use the first spatial mesh that we find
-        ret$mesh = model$mesh[[which(as.vector(unlist(lapply(model$mesh, function(m) m$manifold == "R2"))))[[1]]]]
+        ret$mesh = spmesh
         ret$class = "matrix"  
         ret$project = TRUE
         ret$p4s = proj4string(points)
