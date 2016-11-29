@@ -537,21 +537,23 @@ predict.lgcp = function(result,
     # If we sampled, summarize
     if ( is.list(vals) ) { vals = do.call(cbind, vals) }
     
-    # Weighting
-    vals = vals * pts$weight
-    
-    # Sum up!
-    if ( length(dims) == 0 ) {
-      integral = as.list(colSums(vals))
-      integral = lapply(integral, function(s) {list(integral=s)})
-    } else {
-      # If we are integrating over space we have to turn the coordinates into data that the by() function understands
-      if ("coordinates" %in% dims ) { by.coords = cbind(1:nrow(rips), pts@data[,c(setdiff(dims, "coordinates"))]) } 
-      else { by.coords = pts[,dims]}
-      integral = do.call(rbind, by(vals, by.coords, colSums))
-      integral = summarize(integral, x = as.data.frame(rips))
-      if ("coordinates" %in% dims ) { coordinates(integral) = coordnames(rips) }
-    }
+    if ( !is.null(integrate) ) {
+      # Weighting
+      vals = vals * pts$weight
+      
+      # Sum up!
+      if ( length(dims) == 0 ) {
+        integral = as.list(colSums(vals))
+        integral = lapply(integral, function(s) {list(integral=s)})
+      } else {
+        # If we are integrating over space we have to turn the coordinates into data that the by() function understands
+        if ("coordinates" %in% dims ) { by.coords = cbind(1:nrow(rips), pts@data[,c(setdiff(dims, "coordinates"))]) } 
+        else { by.coords = pts[,dims]}
+        integral = do.call(rbind, by(vals, by.coords, colSums))
+        # integral = summarize(integral, x = as.data.frame(rips))
+        # if ("coordinates" %in% dims ) { coordinates(integral) = coordnames(rips) }
+      }
+    } else { integral = vals}
 
     integral
   }
@@ -584,7 +586,10 @@ predict.lgcp = function(result,
   # Calculating the exact posterior in this case is not implemented yet
   else {
   
-    prd = sample.fun(n)
+    smp = sample.fun(n)
+    prd = summarize(smp, x = as.data.frame(rips))
+    if ("coordinates" %in% dims ) { coordinates(prd) = coordnames(rips) }
+    
     if (inherits(prd, "SpatialPointsDataFrame")){
       type = "spatial"
       misc$p4s = icfg$coordinates$p4s
@@ -593,6 +598,7 @@ predict.lgcp = function(result,
       prd = as.data.frame(prd)
     }
     
+    attr(prd, "samples") = smp
     attr(prd, "total.weight") = sum(pts$weight)
     attr(prd, "type") = type
     attr(prd, "misc") = misc
