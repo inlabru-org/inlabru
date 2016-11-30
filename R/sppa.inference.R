@@ -3,15 +3,22 @@
 #' @aliases bru
 #' @export
 #' @param points A SpatialPoints[DataFrame] object
+#' @param predictor A formula stating the data column (LHS) and mathematical expression (RHS) used for predicting.
 #' @param model a formula describing the model components
 #' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
-#' @return An \link{inla} object
+#' @param run If TRUE, rund inference. Otherwise only return configuration needed to run inference.
+#' @param linear If TRUE, do not perform linear approximation of predictor
+#' @param E Exposure parameter passed on to \link{inla}
+#' @param family Likelihood family passed on to \link{inla}
+#' @param ... more arguments passed on to \link{inla}
+#' @return A \link{bru} object (inherits from iinla and \link{inla})
 
 bru = function(points,
+               predictor = y ~ spde + Intercept,
                model = ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
-               predictor = y ~ spde + Intercept, 
                mesh = NULL, 
                run = TRUE,
+               linear = FALSE, 
                E = 1,
                family = "gaussian", ...) {
   
@@ -23,7 +30,7 @@ bru = function(points,
   
   # Set model$expr as RHS of predictor 
   pred.rhs = parse(text = as.character(predictor)[3])
-  model$expr = pred.rhs
+  if ( !linear ) { model$expr = pred.rhs } else { model$expr = NULL }
   
   # Extract y as from left hand side of the predictor
   pred.lhs = all.vars(update(predictor, .~0))
