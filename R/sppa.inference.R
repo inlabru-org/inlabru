@@ -501,6 +501,9 @@ predict.lgcp = function(result,
   # Determine all dimensions of the process (pdims)
   pdims = names(result$iconfig)
   
+  # Check for ambiguous dimension definition
+  if (any(idims %in% dims)) { stop("The left hand side of the predictor contains dimensions you want to integrate over. Remove them.") }
+  
   # Collect some information that will be useful for plotting
   misc = list(predictor = predictor.rhs, dims = dims, idims = idims, pdims = pdims)
   type = "1d"
