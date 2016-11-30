@@ -635,6 +635,12 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 1e
   xmaker = function(hpd) {
     mid = (hpd[2]+hpd[1])/2
     rg = (hpd[2]-hpd[1])/2
+    x = seq(mid-1.2*rg, mid+1.2*rg, length.out = 256)
+  }
+  
+  inital.xmaker = function(smp) {
+    mid = median(smp)
+    rg = (quantile(smp,0.95)-quantile(smp,0.25))/2
     x = seq(mid-2*rg, mid+2*rg, length.out = 256)
   }
   
@@ -642,7 +648,7 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 1e
   if ( is.null(samples) ) { samples = sfun(n) }
   
   # Inital HPD
-  if ( is.null(x) ) { x = xmaker(range(as.vector(unlist(samples)))) }
+  if ( is.null(x) ) { x = inital.xmaker(as.vector(unlist(samples))) }
   
   # Round x if needed
   if (discrete) x = round(x)
