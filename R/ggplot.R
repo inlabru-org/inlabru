@@ -373,32 +373,30 @@ plot.prediction = function(..., property = "median") {
     df = do.call(rbind, lapply(1:length(args), function(k) {
       apr = approx(args[[k]]$x, args[[k]]$y, xout = seq(range(args[[k]]$x)[1],range(args[[k]]$x)[2],length.out = 1000))
       data.frame(effect = pnames[[k]], x = apr$x, y = 0.1*apr$y/max(apr$y))}))
-    
-    qfun = function(x) {quantile(x, probs = c(0.025, 0.5, 0.975))}
 
     qtl = do.call(rbind, lapply(1:length(args), function(k) 
-      data.frame(y = quantile(attr(args[[k]],"samples")$integral, c(0.025, 0.5, 0.975)),
-                 yend = quantile(attr(args[[k]],"samples")$integral, c(0.025, 0.5, 0.975)),
+      data.frame(y = args[[k]]$quantiles,
+                 yend = args[[k]]$quantiles,
                  x = k, xend = k + 0.5,
                  effect = pnames[[k]])))
     
     expec = do.call(rbind, lapply(1:length(args), function(k) 
-      data.frame(y = mean(attr(args[[k]],"samples")$integral),
-                 yend = mean(attr(args[[k]],"samples")$integral),
+      data.frame(y = args[[k]]$mean,
+                 yend = args[[k]]$mean,
                  x = k, xend = k - 0.28,
-                 sdy = sd(attr(args[[k]],"samples")$integral),
-                 cvy = sd(attr(args[[k]],"samples")$integral)/mean(attr(args[[k]],"samples")$integral),
+                 sdy = args[[k]]$sd,
+                 cvy = args[[k]]$cv,
                  effect = pnames[[k]])))
     
     sdev = do.call(rbind, lapply(1:length(args), function(k) 
-      data.frame(y = mean(attr(args[[k]],"samples")$integral) + sd(attr(args[[k]],"samples")$integral),
-                 yend = mean(attr(args[[k]],"samples")$integral)- sd(attr(args[[k]],"samples")$integral),
+      data.frame(y = args[[k]]$mean + args[[k]]$sd,
+                 yend = args[[k]]$mean - args[[k]]$sd,
                  x = k - 0.28, xend = k - 0.28,
                  effect = pnames[[k]])))
-    
-    jit = do.call(rbind, lapply(1:length(args), function(k) 
-      data.frame(y = attr(args[[k]],"samples")$integral,
-                 n = length(attr(args[[k]],"samples")$integral),
+
+    jit = do.call(rbind, lapply(1:length(args), function(k)
+      data.frame(y = inla.rmarginal(5000,args[[k]]),
+                 n = 500,
                  effect = pnames[[k]])))
     
     plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y = x, weight = y, fill=effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
@@ -407,7 +405,7 @@ plot.prediction = function(..., property = "median") {
       geom_segment(data = qtl, aes(x=x,xend=xend,y=y,yend=yend), linetype = 1, alpha = 0.2) +
       geom_segment(data = expec, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 3) +
       geom_segment(data = sdev, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 1) +
-      geom_point(data = jit, aes(x=as.numeric(effect), y = y), shape = 95, size = 3, alpha = 0.3) +
+      geom_point(data = jit, aes(x=as.numeric(effect), y = y), shape = 95, size = 3, alpha = 0.05) +
       ylab(paste0("integral_{", paste(ggopts$idims, collapse = ","), "} (", ggopts$predictor, ")")) + 
       guides(fill=FALSE) + 
       scale_x_continuous(name = "", breaks = 1:length(pnames), labels = pnames) +

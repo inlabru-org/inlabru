@@ -476,7 +476,7 @@ predict.lgcp = function(result,
                         n = 250,  
                         dens = NULL,
                         discrete = FALSE,
-                        mcerr = 5e-4,
+                        mcerr = 0.01,
                         verbose = FALSE)
   {
   
@@ -633,18 +633,21 @@ predict.lgcp = function(result,
 #' @param discrete St this to \code{TRUE} if the density is only defined for integer \code{x}
 #' @param verbose Be verbose?
 
-montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 1e-4, n = 100, discrete = FALSE, verbose = FALSE) {
+montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.01, n = 100, discrete = FALSE, verbose = FALSE) {
 
   xmaker = function(hpd) {
     mid = (hpd[2]+hpd[1])/2
     rg = (hpd[2]-hpd[1])/2
     x = seq(mid-1.2*rg, mid+1.2*rg, length.out = 256)
   }
+  xmaker2 = function(hpd) {
+    x = seq(hpd[1], hpd[2], length.out = 256)
+  }
   
   inital.xmaker = function(smp) {
     mid = median(smp)
-    rg = (quantile(smp,0.95)-quantile(smp,0.25))/2
-    x = seq(mid-2*rg, mid+2*rg, length.out = 256)
+    rg = (quantile(smp,0.975)-quantile(smp,0.25))/2
+    x = seq(mid-3*rg, mid+3*rg, length.out = 256)
   }
   
   # Inital samples
@@ -654,7 +657,7 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 1e
   if ( is.null(x) ) { x = inital.xmaker(as.vector(unlist(samples))) }
   
   # Round x if needed
-  if (discrete) x = round(x)
+  if (discrete) x = unique(round(x))
 
   # First density estimate
   lest = dfun(x, samples) 
@@ -664,10 +667,10 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 1e
   while ( !converged ) {
     
     # Compute last HPD interval
-    xnew = xmaker(inla.hpdmarginal(0.95, list(x=x, y=lest)))
+    xnew = xmaker2(inla.hpdmarginal(0.999, list(x=x, y=lest)))
     
     # Map last estimate to the HPD interval
-    if (discrete) xnew = round(xnew)
+    if (discrete) xnew = unique(round(xnew))
     lest = inla.dmarginal(xnew, list(x=x, y=lest))  
     x = xnew
     
@@ -677,7 +680,8 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 1e
     est = dfun(x, samples)
     
     # Compute Monte Carlo error
-    err = sd(est/sum(est)-lest/sum(lest))
+    # err = sd(est/sum(est)-lest/sum(lest))
+    err = max( ( (est-lest) / max(lest) )^2 )
     
     # Plot new density estimate versus old one (debugging)
     if ( verbose ) {
@@ -687,9 +691,21 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 1e
     
     # Convergence?
     if ( err < mcerr ) { converged = TRUE } 
-    else { lest =  0.5*(est + lest) }
+    else { 
+      lest =  0.5*(est + lest) 
+    }
   }
-  list(x = x, y = est, samples = samples, mcerr = err)
+
+  marg = list(x = x, y = est, samples = samples, mcerr = err)
+  
+  # Append some important statistics
+  marg$quantiles = inla.qmarginal(c(0.025, 0.5, 0.975),marg)
+  marg$mean = inla.emarginal(identity, marg) 
+  marg$sd = sqrt(inla.emarginal(function(x) x^2, marg) - marg$mean^2) 
+  marg$cv = marg$sd/marg$mean
+  marg$mce = err
+  
+  marg
 }  
 
 
