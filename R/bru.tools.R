@@ -25,5 +25,6 @@ vertex.projection = function(mesh, points, columns = names(points)){
   coords = mesh$loc[as.numeric(names(w.by)),c(1,2)]
   data$vertex = as.numeric(names(w.by))
   ret = SpatialPointsDataFrame(coords, proj4string = CRS(proj4string(points)), data = data)
-  return(ret)
+  coordnames(ret) = coordnames(points)
+  ret
 }
