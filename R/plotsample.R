@@ -52,9 +52,13 @@ makepoly=function(start,dx,dy) {
 #' ggplot() +gg(plotpts$plots) +gg(plotpts$dets) +gg(gnestboundary)
 #' 
 #' @export
+#' 
 plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
   if(x.ppn<=0 | x.ppn>=1) stop("'x.ppn' must greater than 0 and less than 1")
   if(y.ppn<=0 | y.ppn>=1) stop("'y.ppn' must greater than 0 and less than 1")
+  
+  require(raster)
+  
   srange=extent(boundary)
   xrange=srange[1:2]
   yrange=srange[3:4]
@@ -79,7 +83,7 @@ plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
     polys[[i]]=Polygons(list(makepoly(as.numeric(starts[i,]),width,height)), i)
   }
   plots = SpatialPolygons(polys,proj4string=CRS(as.character(proj4string(spdf))))
-  plots = intersect(boundary,plots) # remove bits of plot outside boundary
+  plots = raster::intersect(boundary,plots) # remove bits of plot outside boundary
   dets=spdf[plots,] # extract only those nests inside the polygons (neat!)
   
   return(list(plots=plots,dets=dets))
@@ -103,7 +107,7 @@ plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
 #' library(inlabru)
 #' library(raster)
 #' data(gorillanests)
-#' plotpts = plotsample(gnests,gnestboundary,nx=10,ny=10,percover=25)
+#' plotpts = plotsample(gnests,gnestboundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
 #' ggplot() +gg(plotpts$plots) +gg(plotpts$dets) +gg(gnestboundary)
 #' countdata = point2count(plotpts$plots,plotpts$dets)
 #' x=coordinates(countdata)[,1]
