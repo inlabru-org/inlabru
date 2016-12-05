@@ -220,29 +220,56 @@ lgcp = function(points,
 #' @param result A result object obtained from a lgcp() run
 #' 
 summary.lgcp = function(result) {
-  cat("### LGCP Summary: #################################################################################\n")
+  cat("### LGCP Summary #################################################################################\n\n")
   
-  cat("\n Dimensions: \n")
+  cat(paste0("Predictor: log(lambda) = ", as.character(result$model$expr),"\n"))
+  
+  cat("\n--- Points & Samplers ----\n\n")
+  cat(paste0("Number of points: ", nrow(result$sppa$points)), "\n")
+  if ( inherits(result$sppa$points,"Spatial") ) {
+    cat(paste0("Coordinate names: ", paste0(coordnames(result$sppa$points), collapse = ", ")), "\n")
+    cat(paste0("Coordinate system: ", proj4string(result$sppa$points), "\n"))
+  }
+  
+  cat(paste0("Total integration weight: ", sum(result$ips$weight)), "\n")
+
+  cat("\n--- Dimensions -----------\n\n")
   icfg = result$iconfig
   invisible(lapply(names(icfg), function(nm) {
     cat(paste0("  ",nm, " [",icfg[[nm]]$class,"]",
                ": ",
-               "n=",icfg[[nm]]$n.points,
-               ", min=",icfg[[nm]]$min,
-               ", max=",icfg[[nm]]$max,
-               ", cardinality=",signif(icfg[[nm]]$max-icfg[[nm]]$min),
+               "n = ",icfg[[nm]]$n.points,
+               ", min = ",icfg[[nm]]$min,
+               ", max = ",icfg[[nm]]$max,
+               ", cardinality = ",signif(icfg[[nm]]$max-icfg[[nm]]$min),
                "\n"))
   }))
   
-  cat("\n Effects: \n")
-  cat(paste0("  ",paste(result$names.fixed, collapse = ", "),", ", paste(names(result$summary.random), collapse = ","), "\n"))
+  cat("\n--- Fixed effects -------- \n\n")
+  fe = result$summary.fixed
+  fe$kld=NULL
+  fe$signif = sign(fe[,"0.025quant"]) == sign(fe[,"0.975quant"])
+  print(fe)
   
-  cat("\n Hyper parameters: \n")
-  cat(paste0("  ", paste(rownames(result$summary.hyperpar), collapse = ", "), "\n"))
+  cat("\n--- Random effects -------- \n\n")
+  for ( nm in names(result$summary.random) ){
+    sm = result$summary.random[[nm]]
+    cat(paste0(nm,": "))
+    cat(paste0("mean = [", signif(range(sm$mean)[1])," : ",signif(range(sm$mean)[2]), "]"))
+    cat(paste0(", quantiles = [", signif(range(sm[,c(4,6)])[1])," : ",signif(range(c(4,6))[2]), "]"))
+    if (nm %in% names(result$model$mesh)) {
+      cat(paste0(", area = ", signif(sum(diag(as.matrix(inla.mesh.fem(result$model$mesh[[nm]])$c0))))))
+    }
+    cat("\n")
+  }
   
-  cat("\n Criteria: \n")
-  cat(paste0("  Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic), " (Effective params: ",sprintf("%1.3e", result$waic$p.eff),")\n"))
-  cat(paste0("  Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic), " (Effective params: ",sprintf("%1.3e", result$dic$p.eff),")\n"))
+  cat("\n--- Hyper parameters ----- \n\n")
+  # cat(paste0("  ", paste(rownames(result$summary.hyperpar), collapse = ", "), "\n"))
+  print(result$summary.hyperpar)
+  
+  cat("\n--- Criteria --------------\n\n")
+  cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic),"\n"))
+  cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic),"\n"))
 }
 
 
