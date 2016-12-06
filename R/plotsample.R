@@ -11,12 +11,12 @@
 #' @return A \code{SpatialPolygonsDataFrame}.
 #'  
 #' @export
-makepoly=function(start,dx,dy) {
+makepoly=function(start,width,height) {
   poly=matrix(c(
     start[1],start[2],
-    start[1],start[2]+dy,
-    start[1]+dx,start[2]+dy,
-    start[1]+dx,start[2],
+    start[1],start[2]+height,
+    start[1]+width,start[2]+height,
+    start[1]+width,start[2],
     start[1],start[2]),
     ncol=2,byrow=TRUE)
   return(Polygon(poly))
