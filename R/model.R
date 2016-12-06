@@ -415,7 +415,16 @@ iteration.history.model = function(model, effect){
 
 evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr, use.covariate = TRUE) {
   cov = do.call(cbind, list.covariates.model(model, loc))
+  
+  # If predictor is given, remove model components not involved
+  if (!is.null(predictor)) {
+    pvars = all.vars(predictor)
+    model$effects = intersect(pvars, model$effects)
+    model$mesh = model$mesh[intersect(names(model$mesh), model$effects)]
+    }
+
   Amat = list.A.model(model, loc)
+  
   if ( property == "sample") {
     if ( inherits(inla.result, "inla") ) {
       smp = inla.posterior.sample.structured(inla.result, n = n) 
@@ -481,6 +490,14 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
   if ( property == "sample") {
     if (!is.null(predictor) && do.sum) { 
       ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,identity)}), posts))
+      
+      # The line above drops row names if only one effetc is present. Fix this:
+      if(is.null(rownames(ret[[1]])[1])) { 
+        for (k in 1:length(ret)) { 
+          ret[[k]] = t(ret[[k]])
+          rownames(ret[[k]]) = names(posts) }
+      }
+
       ret = lapply(ret, function(r) {eval(predictor, envir = cbind(as.data.frame(t(r)), as.data.frame(loc)))})
     } else {
         ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))

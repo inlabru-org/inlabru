@@ -541,6 +541,7 @@ predict.lgcp = function(result,
   
   if ( length(dims) == 0 ) {
     pts = wips
+    if ( is.null(pts) ) { pts = data.frame(integral = 1) }
     type = "full" 
   } else {
     # If no points for return dimensions were supplied we generate them
@@ -568,7 +569,6 @@ predict.lgcp = function(result,
   }
   
   sample.fun = function(n) {
-    # Evaluate the model for these points
     vals = evaluate.model(result$sppa$model, result, pts, property = property, do.sum = TRUE, link = identity, n = n, predictor = predictor, use.covariate = FALSE)
     
     # If we sampled, summarize
@@ -603,7 +603,7 @@ predict.lgcp = function(result,
     pre.smp = sample.fun(n)
 
     if (is.null(dens)) {
-      component = function(x, smp) { approxfun(density(smp$integral, kernel = "triangular", 
+      component = function(x, smp) { approxfun(density(smp[[1]], kernel = "triangular", 
                                          bw = bw.nrd(as.vector(unlist(pre.smp)))), rule = 0)(x) }
     } else {
       component = function(x,smp) eval(dens, c(list(x=x),smp))
