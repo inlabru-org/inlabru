@@ -515,7 +515,7 @@ predict.lgcp = function(result,
   
   # Alternatively, take dims from points
   if ( !is.null(points) ) {
-    dims = colnames(points)
+    dims = names(points)
     icfg.points = points
   } else {
     icfg.points = result$sppa$points
