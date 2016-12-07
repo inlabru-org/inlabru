@@ -209,21 +209,11 @@ list.covariates.model = function(mdl, pts){
     }
     fetched.covar = do.call(cbind,c(fetched.covar))
     
-    if (length(fetched.covar)>0 & length(covar.data)>0){ 
-      covar.data = cbind(covar.data,fetched.covar)
-    } else if (length(fetched.covar)>0) { 
-      covar.data = fetched.covar 
-    } else { }
-    
-    if (is.null(covar.data)) {
-      return(list())
-    } else { 
-      return(list(as.data.frame(covar.data)))
-    }
+    ret = c(as.list(fetched.covar), list(covar.data))
+
   } else { 
-    E = list() 
+    ret = list()
   }
-  return(E)
 }
 
 #' List of A matrices needed to run INLA
@@ -277,8 +267,13 @@ list.A.model = function(mdl, points){
     A.lst[[name]] = A
   }
   
-  if ( length(mdl$covariates) > 0 ) { A.lst = c(A.lst,1) }
-  return(A.lst)
+  # if ( length(mdl$covariates) > 0 ) { A.lst = c(A.lst,1) }
+  
+  for ( name in setdiff(mdl$effects, names(mdl$mesh)) ) {
+    A.lst[[name]] = Matrix::Diagonal(nrow(points))
+  }
+  
+  return(c(A.lst,1))
 }
 
 

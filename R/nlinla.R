@@ -43,18 +43,18 @@ nlinla.reweight = function(A, weights, model, data){
     nm = names(A)[k]
     if ( !(is.null(nm) || nm == "")){ A[[k]] = A[[k]] * ae$gradient[[nm]] }
   }
-  for ( k in 1:length(weights) ){
-    for (j in 1:ncol(weights[[k]])) {
-      nm = names(weights[[k]])[j]
-      if ( nm %in% names(ae$gradient) ) {
-        weights[[k]][[nm]] = weights[[k]][[nm]] * ae$gradient[[nm]]
-      }
-    }
+  # for ( k in 1:length(weights) ){
+  #   for (j in 1:ncol(weights[[k]])) {
+  #     nm = names(weights[[k]])[j]
+  #     if ( nm %in% names(ae$gradient) ) {
+  #       weights[[k]][[nm]] = weights[[k]][[nm]] * ae$gradient[[nm]]
+  #     }
+  #   }
   # Add gradients that are not represented in weights before
   # add.names = setdiff(names(ae$gradient), names(weights[[k]]))
   # weights[[k]] = cbind(weights[[k]], ae$gradient[,add.names, drop = FALSE])
-  }
+  # }
   
-  return(list(A = A, weights = weights, const = ae$const))
+  return(list(A = A, weights = NULL, const = ae$const))
 }
 

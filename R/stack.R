@@ -49,7 +49,7 @@ detection.stack = function(data,
   if ( !is.null(model$expr) ) {
     rw = nlinla.reweight(A, eff, model, pts)
     A = rw$A
-    eff = rw$weights
+    # eff = rw$weights
     e.pp = e.pp * exp(rw$const)
     if ( any((e.pp > 0) & (e.pp < 0.00001)) ) { warning("Exposure E is smaller than 0.00001. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")}
   }
@@ -122,16 +122,16 @@ integration.stack = function(data = NULL,
   if ( !is.null(model$expr) ) {
     rw = nlinla.reweight(A, eff, model, pts)
     A = rw$A
-    eff = rw$weights
+    # eff = rw$weights
     e.pp = e.pp * exp(rw$const) # min(exp(rw$const)
     if ( any((e.pp > 0) & (e.pp < 0.00001)) ) { warning("Exposure E is smaller than 0.00001. This may lead to numerical problems and non-convergence. Consider setting scale = 100 or higher (order of magnitude) when calling lgcp().")}
   }
   
   # Create and return stack
   stk = inla.stack(data = list(y.inla = y.pp, e = e.pp),
-                    A = A,
-                    tag = tag,
-                    effects = c(idx, eff))
+                   A = A,
+                   tag = tag,
+                   effects = c(idx, eff))
 }
 
 
