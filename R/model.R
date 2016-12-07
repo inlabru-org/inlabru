@@ -223,9 +223,18 @@ list.covariates.model = function(mdl, pts){
 
 list.A.model = function(mdl, points){
   A.lst = list()
+
+  mapper = function(map) {
+    if (class(map) == "call") { loc = eval(map, data.frame(points)) } 
+    else {
+      fetcher = get0(as.character(map))
+      if (is.function(fetcher)) { loc = fetcher(points) } 
+      else { loc = as.data.frame(points)[,as.character(map)] }
+    }
+  }
   
   for ( name in names(mdl$mesh)) {
-
+    
     # What to use as loc input to inla.spde.make.A ?
     #
     # 1) if mesh.coords are provided, use them to select columns from the points data frame
@@ -270,7 +279,14 @@ list.A.model = function(mdl, points){
   # if ( length(mdl$covariates) > 0 ) { A.lst = c(A.lst,1) }
   
   for ( name in setdiff(mdl$effects, names(mdl$mesh)) ) {
-    A.lst[[name]] = Matrix::Diagonal(nrow(points))
+    if ( name %in% names(mdl$map) ) {
+      idx = mapper(mdl$map[[name]])
+      A = matrix(0, nrow = nrow(points), ncol=6)
+      A[cbind(1:nrow(A), idx)] = 1
+      A.lst[[name]] = A
+    } else {
+      A.lst[[name]] = Matrix::Diagonal(nrow(points))
+    }
   }
   
   return(c(A.lst,1))
@@ -282,7 +298,17 @@ list.A.model = function(mdl, points){
 #' @aliases list.indices.model
 #' 
 
-list.indices.model = function(mdl, ...){
+list.indices.model = function(mdl, points, ...){
+  
+  mapper = function(map) {
+    if (class(map) == "call") { loc = eval(map, data.frame(points)) } 
+    else {
+      fetcher = get0(as.character(map))
+      if (is.function(fetcher)) { loc = fetcher(points) } 
+      else { loc = as.data.frame(points)[,as.character(map)] }
+    }
+  }
+  
   idx.lst = list()
   if ( length(mdl$mesh) > 0) {
     for (k in 1:length(mdl$mesh)) {
@@ -297,8 +323,13 @@ list.indices.model = function(mdl, ...){
         idx.lst = c(idx.lst, list(inla.spde.make.index(name, n.spde = mdl$inla.spde[[k]]$n.spde, n.group = ng)))
       }
     }
-    
   }
+  
+  # Non-mesh models with indices
+  for ( name in setdiff(names(mdl$map), names(mdl$mesh)) ) {
+    idx.lst[[name]] = 1:max(mapper(mdl$map[[name]]))
+  }
+  
   return(idx.lst)
 }
 
