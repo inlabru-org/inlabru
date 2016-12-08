@@ -209,8 +209,11 @@ list.covariates.model = function(mdl, pts){
     }
     fetched.covar = do.call(cbind,c(fetched.covar))
     
-    ret = c(as.list(fetched.covar), list(covar.data))
-
+    
+    ret = list()
+    ret = c(ret, fetched.covar)
+    if (nrow(covar.data) > 0 ) { ret = c(ret, covar.data) }
+    ret
   } else { 
     ret = list()
   }
@@ -275,9 +278,7 @@ list.A.model = function(mdl, points){
     }
     A.lst[[name]] = A
   }
-  
-  # if ( length(mdl$covariates) > 0 ) { A.lst = c(A.lst,1) }
-  
+
   for ( name in setdiff(mdl$effects, names(mdl$mesh)) ) {
     if ( name %in% names(mdl$map) ) {
       idx = mapper(mdl$map[[name]])
@@ -285,11 +286,13 @@ list.A.model = function(mdl, points){
       A[cbind(1:nrow(A), idx)] = 1
       A.lst[[name]] = A
     } else {
-      A.lst[[name]] = Matrix::Diagonal(nrow(points))
+      A.lst[[name]] = Matrix::Diagonal(nrow(data.frame(points)))
     }
   }
   
-  return(c(A.lst,1))
+  # if ( length(mdl$covariates) > 0 ) { A.lst = c(A.lst,1) }
+  
+  return(A.lst)
 }
 
 
@@ -440,7 +443,7 @@ iteration.history.model = function(model, effect){
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
 
 evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr, use.covariate = TRUE) {
-  cov = do.call(cbind, list.covariates.model(model, loc))
+  cov = as.data.frame(do.call(cbind, list.covariates.model(model, loc)))
   Amat = list.A.model(model, loc)
   if ( property == "sample") {
     if ( inherits(inla.result, "inla") ) {
@@ -462,7 +465,9 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
       } else {
         A = Amat[[name]]
         post = lapply(smp, function(s) {
-          rowSums(t(t(as.matrix(A)) * s[[name]]))
+          mult = s[[name]]
+          if (length(mult) == 1) { as.vector(A %*% rep(mult, nrow(A))) } 
+          else { rowSums(t(t(as.matrix(A)) * mult)) }
           })
       }
     } else {
@@ -500,6 +505,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
     }
     posts[[name]] = post
   }
+
   if ( property == "sample") {
     if (!is.null(predictor) && do.sum) { 
       ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,identity)}), posts))

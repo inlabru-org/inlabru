@@ -55,9 +55,10 @@ detection.stack = function(data,
   
   # Sort effects and A by names
   effects = c(idx, eff)
-  names(effects)[length(effects)] = "TMP"
-  names(A)[length(A)] = "TMP"
-  effects = effects[names(A)]
+  for (k in seq_len(length(effects)-length(A))) { A = c(A, list(1))}
+  # names(effects)[length(effects)] = "TMP"
+  #names(A)[length(A)] = "TMP"
+  # effects = effects[names(A)]
 
   # Create and return stack
   stk = inla.stack(data = list(y.inla = y.pp, e = e.pp),
@@ -133,9 +134,10 @@ integration.stack = function(data = NULL,
   
   # Sort effects and A by names
   effects = c(idx, eff)
-  names(effects)[length(effects)] = "TMP"
-  names(A)[length(A)] = "TMP"
-  effects = effects[names(A)]
+  for (k in seq_len(length(effects)-length(A))) { A = c(A, list(1))}
+  # names(effects)[length(effects)] = "TMP"
+  #names(A)[length(A)] = "TMP"
+  # effects = effects[names(A)]
   
   # Create and return stack
   stk = inla.stack(data = list(y.inla = y.pp, e = e.pp),
