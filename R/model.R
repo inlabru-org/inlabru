@@ -460,15 +460,11 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
         A = Amat[[name]]
         post = lapply(smp, function(s) { as.vector(A%*%as.vector(s[[name]])) })
       } else {
+        A = Amat[[name]]
         post = lapply(smp, function(s) {
-          # Note: if there is no covariate, assume covariate = 1
-          if (is.null(cov[[name]]) | !use.covariate) {
-            rep(s[[name]],nrow(loc))
-            } else { 
-              s[[name]] * cov[[name]] } 
+          rowSums(t(t(as.matrix(A)) * s[[name]]))
           })
       }
-      
     } else {
       if (is.null(name)) { name =  names(model$mesh)[[k]] }
       # Either fixed effect or hyper parameter
