@@ -201,9 +201,11 @@ iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL) {
   if ( is.null(dim.names) ) { dim.names = model$dim.names }
   
   # Default mesh for spatial integration:
-  issp = as.vector(unlist(lapply(model$mesh, function(m) m$manifold == "R2")))
+  meshes = lapply(effect(model), function(e) e$mesh)
+  names(meshes) = labels(model)
+  issp = as.vector(unlist(lapply(meshes, function(m) m$manifold == "R2")))
   if (!is.null(issp) & any(issp)) { 
-    spmesh = model$mesh[[which(issp)[[1]]]] } 
+    spmesh = meshes[[which(issp)[[1]]]] } 
   else { spmesh = mesh }
   
   # Function that maps each dimension name to a setup
@@ -245,12 +247,12 @@ iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL) {
     # use the mesh knots/vertices as integration points. Otherwise use some
     # standard setting depending on the class of the dimension.
     
-    if ( nm %in% names(model$mesh) ) {
-      if ( model$mesh[[nm]]$manifold == "R1" ) {
+    if ( nm %in% names(meshes) ) {
+      if ( meshes[[nm]]$manifold == "R1" ) {
         # The mesh is 1-dimensional. 
         # By default a two-point Gaussian quadrature is used for each interval between the mesh knots.
         # This intergration is exact for poylnomials of second degree. 
-        ret$mesh = model$mesh[[nm]]
+        ret$mesh = meshes[[nm]]
         ret$min = min(ret$mesh$loc)
         ret$max = max(ret$mesh$loc)
         ret$cnames = colnames(ret$get.coord(points))

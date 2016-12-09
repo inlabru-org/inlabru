@@ -26,7 +26,7 @@ bru = function(points,
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
   
   # Turn model formula into internal bru model
-  model = as.model.formula(model, data.frame(points))
+  model = make.model(model, data.frame(points))
   
   # Set model$expr as RHS of predictor 
   pred.rhs = parse(text = as.character(predictor)[3])
@@ -77,7 +77,7 @@ multibru = function(brus, model = NULL, ...) {
   if ( is.null(model) ) { 
     model = brus[[1]]$sppa$model
   } else {
-    model = as.model.formula(model, data.frame(brus[[1]]$sppa$points))
+    model = make.model(model, data.frame(brus[[1]]$sppa$points))
   }
   
   # Create joint stackmaker
@@ -157,7 +157,7 @@ lgcp = function(points,
     prd.lhs = as.formula(paste0(paste(  all.vars(update.formula(model, .~0))  , collapse = " + "), "~."))
     if ( inherits(predictor, "expression") ) { predictor = as.formula(paste0("~", as.character(predictor))) }
     predictor = update.formula(predictor, prd.lhs)
-    tmp = as.model.formula(model, data.frame(points))
+    tmp = make.model(model, data.frame(points))
     # if (!(toString(model) == toString(. ~ g(spde, model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1))){
     #   prd.rhs = as.formula(paste0(".~ ", paste(tmp$effects, collapse = " + ")))
     #   predictor = update.formula(predictor, prd.rhs)
@@ -165,7 +165,7 @@ lgcp = function(points,
   }
   
   # Turn model formula into internal bru model
-  model = as.model.formula(model, data.frame(points))
+  model = make.model(model, data.frame(points))
   
   # Set model$expr as RHS of predictor
   if ( inherits(predictor, "formula") ) {
@@ -305,152 +305,6 @@ default.mesh = function(spObject, max.edge = NULL, convex = -0.15){
 
 default.model = function(mesh) {
   model = join(model.spde(list(mesh = mesh)), model.intercept())
-}
-
-#' A wrapper for the \link{inla} \link{f} function
-#' 
-#' g makes the mesh an explicit argument and catches the provided model for later usage.
-#' See \link{f} for details on model specifications.
-#'
-#' @aliases g
-#' @export
-#' @param mesh An inla.mesh
-#' @param model See \link{f} model specifications
-#' @param ... Passed on to inla \link{f}
-#' @return A list with mesh, model and the return value of the f-call
-
-g = function(..., map, A.msk, mesh, model) {
-  if (as.character(substitute(map))[[1]] == "" ) { map = NULL } else { map = substitute(map) }
-  if (as.character(substitute(A.msk))[[1]] == "" ) { A.msk = NULL } else { A.msk = A.msk }
-  ret = list(mesh = mesh, 
-             map = map,
-             A.msk = A.msk,
-             model = model, 
-             f = f(..., model = model))
-}
-
-#' Turn a formula into an iDistance \link{model}
-#' 
-#' To be used with formulae that use the \link{g} function as wrapper for inla's \link{f} function
-#' Warning: this functions mainly exists for reasons of back-compatibilty. Avoid using it at all
-#' costs.
-#'
-#' @aliases as.model.formula
-#' @export
-#' @param fml A formula
-#' @return A \link{model} object
-
-as.model.formula = function(fml, data) {
-  
-  # Define function for shifting the effect name into the g-call
-  shift.names = function(fml) {
-    tms = terms(fml)
-    labels = attr(tms, "term.labels")
-    effects = character()
-    for (k in 1:length(labels)){
-      lb = labels[[k]]
-      gpd = getParseData(parse(text=lb))
-      # Determine the name of the effect
-      ename = getParseText(gpd, id=1)
-      is.fixed = (gpd[1,"token"] == "SYMBOL")
-      if ( !(ename %in% c("g","f","offset")) & !is.fixed ) {
-        effects[[k]] = ename
-        # Replace effect name by g(ename
-        labels[[k]] = gsub(paste0(ename,"("), paste0("g(",ename,", "), lb, fixed = TRUE)
-      }
-    }
-    labels
-  }
-
-  lbl = shift.names(fml)
-  if ( length(lbl)> 0 ) {
-    gidx = which(substr(lbl,1,2) == "g(")
-    others = which(!substr(lbl,1,2) == "g(")
-    base.fml.char = paste0("~. +", paste0("", lbl[others], collapse = " +"))
-    mesh = list()
-    mesh.coords = list()
-    map = list()
-    A.msk = list()
-    inla.models = list()
-    covariates = list()
-    effects = lbl
-    
-    # Select g-terms
-    
-    for ( k in gidx ) {
-      lb = lbl[[k]]
-      # Extract mesh and spde model
-      ge = eval(parse(text = lb), envir = environment(fml))
-      name = ge$f$term
-      effects[[k]] = name
-      mesh[[name]] = ge$mesh
-      mesh.coords[[name]] = ge$f$term
-      inla.models[[name]] = ge$model
-      map[[name]] = ge$map
-      A.msk[[name]] = ge$A.msk
-      
-      # Replace function name by INLA f function
-      lb = gsub("g\\(","f(",lb)
-      
-      # Remove extra mesh argument
-      lb = gsub("[,][ ]*mesh[ ]*=[^),]*", "", lb)
-      
-      # Remove extra map argument
-      pat = paste0("", deparse(ge$map))
-      lb = gsub(deparse(ge$map), "", lb, fixed =TRUE)
-      lb = gsub("[,][ ]*map[ ]*=[^),]*", "", lb)
-      
-      # Remove extra A.msk argument
-      pat = paste0("", deparse(ge$A.msk))
-      lb = gsub(deparse(ge$map), "", lb, fixed =TRUE)
-      lb = gsub("[,][ ]*A.msk[ ]*=[^),]*", "", lb)
-    
-      lbl[[k]] = lb
-      
-      
-    }
-    for ( k in others ) {
-      gpd = getParseData(parse(text=lbl[k]))
-      if (gpd[1,"token"] == "SYMBOL") {
-        if (!(gpd[1,"text"] %in% c(names(environment(fml)), names(data)))) { environment(fml)[[gpd[1,"text"]]] = 0 }
-        if ( gpd[1,"text"] %in% names(data) ) {
-          # covariates[[lbl[k]]] = function(x) {x[,effect,drop=FALSE]}
-          # environment(covariates[[lbl[k]]]) = new.env()
-          # assign("effect", lbl[k], envir = environment(covariates[[lbl[k]]]))
-        } else {
-          covariates[[lbl[k]]] = function(x) {
-            v = rep(1, nrow(as.data.frame(x)))
-            ret = data.frame(v)
-            colnames(ret) = effect
-            return(ret)
-          }
-          environment(covariates[[lbl[k]]]) = new.env()
-          assign("effect", lbl[k], envir = environment(covariates[[lbl[k]]]))
-        }
-      
-      } else if (gpd[1,"token"] == "expr") {
-        old.label = lbl[k]
-        lbl[k] = paste0(gpd[2,"text"],".effect")
-        effects[k] = paste0(gpd[2,"text"],".effect")
-        covariates[[lbl[k]]] = function(...) {do.call(function(...) {eval(parse(text=old.label), envir = list(...))}, as.list(...))}
-      }
-    }
-    if ( (length(gidx) > 0) || length(others) > 0 ) {
-      new.fml = as.formula(paste0("~.+", paste0("",paste0("", lbl, collapse = " + "))))
-      # Add left hand side of fml
-      new.fml = update.formula(update.formula(fml, ~ 1),new.fml)
-      # If input formula had no intercept, add -1 to new formula
-      if ( !(attr(terms(update.formula(~ DOT.FILL, fml)), "intercept") == 1) ) { new.fml = update.formula(new.fml, . ~ .-1) }
-      # Add environment
-      environment(new.fml) = environment(fml)
-      # Make model
-      mdl = make.model(formula = new.fml, name = "", mesh = mesh, effects = effects, covariates = covariates, 
-                       inla.spde = inla.models, mesh.coords = mesh.coords, time.coords = NULL)
-      mdl$map = map
-      mdl$A.msk = A.msk
-      mdl
-    } else { return(NULL) }
-  } else { return(NULL)}
 }
 
 
