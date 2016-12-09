@@ -207,12 +207,12 @@ list.covariates.model = function(mdl, pts){
         }
       } else {}
     }
-    fetched.covar = do.call(cbind,c(fetched.covar))
+    # fetched.covar = do.call(cbind,c(fetched.covar))
     
     
     ret = list()
     ret = c(ret, fetched.covar)
-    if (nrow(covar.data) > 0 ) { ret = c(ret, covar.data) }
+    if (nrow(covar.data) > 0 ) { ret = c(ret, list(from.points = covar.data)) }
     ret
   } else { 
     ret = list()
@@ -321,9 +321,9 @@ list.indices.model = function(mdl, points, ...){
         # If a is masked, correct number of indices
         if (!is.null(mdl$A.msk[[name]])) { idx.lst[[name]] = 1:sum(mdl$A.msk[[name]])}
       } else {
-        ng = mdl$inla.spde[[k]]$n.group
+        ng = mdl$inla.spde[[name]]$n.group
         if (is.null(ng)) { ng = 1 }
-        idx.lst = c(idx.lst, list(inla.spde.make.index(name, n.spde = mdl$inla.spde[[k]]$n.spde, n.group = ng)))
+        idx.lst[[name]] = inla.spde.make.index(name, n.spde = mdl$inla.spde[[name]]$n.spde, n.group = ng)
       }
     }
   }
