@@ -68,7 +68,7 @@ summary.model = function(mdl) {
   cat("\n")
   cat("--- Formula --- \n")
   cat(as.character(mdl$formula)[c(2,1,3)])
-
+  
 }
 
 #' Is it a model?
@@ -109,11 +109,11 @@ join.model = function(...){
   map = list()
   
   env.upd = function(env1,env2) 
-    {
+  {
     nms = names(env2)[which(!(names(env2) %in% names(env1)))]
     lapply(nms,function(nm) {env1[[nm]] = env2[[nm]]})
     return(env1)
-    }
+  }
   
   for (k in 1:length(models)){
     mdl = models[[k]]
@@ -146,7 +146,7 @@ join.model = function(...){
     A.msk = A.msk,
     iterator = do.call(c, lapply(models, function(m){m$iterator})),
     map = map
-    ))
+  ))
   
 }
 
@@ -207,9 +207,15 @@ list.covariates.model = function(mdl, pts){
         }
       } else {}
     }
+    # fetched.covar = do.call(cbind,c(fetched.covar))
     
     
+    ret = list()
+    ret = c(ret, fetched.covar)
+    if (nrow(covar.data) > 0 ) { ret = c(ret, list(from.points = covar.data)) }
+    ret
   } else { 
+    ret = list()
   }
 }
 
@@ -220,7 +226,7 @@ list.covariates.model = function(mdl, pts){
 
 list.A.model = function(mdl, points){
   A.lst = list()
-
+  
   mapper = function(map) {
     if (class(map) == "call") { loc = eval(map, data.frame(points)) } 
     else {
@@ -231,6 +237,7 @@ list.A.model = function(mdl, points){
   }
   
   for ( name in names(mdl$mesh)) {
+    
     # What to use as loc input to inla.spde.make.A ?
     #
     # 1) if mesh.coords are provided, use them to select columns from the points data frame
@@ -271,7 +278,7 @@ list.A.model = function(mdl, points){
     }
     A.lst[[name]] = A
   }
-
+  
   for ( name in setdiff(mdl$effects, names(mdl$mesh)) ) {
     if ( name %in% names(mdl$map) ) {
       idx = mapper(mdl$map[[name]])
@@ -283,6 +290,8 @@ list.A.model = function(mdl, points){
     }
   }
   
+  # if ( length(mdl$covariates) > 0 ) { A.lst = c(A.lst,1) }
+  
   return(A.lst)
 }
 
@@ -292,6 +301,17 @@ list.A.model = function(mdl, points){
 #' @aliases list.indices.model
 #' 
 
+list.indices.model = function(mdl, points, ...){
+  
+  mapper = function(map) {
+    if (class(map) == "call") { loc = eval(map, data.frame(points)) } 
+    else {
+      fetcher = get0(as.character(map))
+      if (is.function(fetcher)) { loc = fetcher(points) } 
+      else { loc = as.data.frame(points)[,as.character(map)] }
+    }
+  }
+  
   idx.lst = list()
   if ( length(mdl$mesh) > 0) {
     for (k in 1:length(mdl$mesh)) {
@@ -301,7 +321,9 @@ list.A.model = function(mdl, points){
         # If a is masked, correct number of indices
         if (!is.null(mdl$A.msk[[name]])) { idx.lst[[name]] = 1:sum(mdl$A.msk[[name]])}
       } else {
+        ng = mdl$inla.spde[[name]]$n.group
         if (is.null(ng)) { ng = 1 }
+        idx.lst[[name]] = inla.spde.make.index(name, n.spde = mdl$inla.spde[[name]]$n.spde, n.group = ng)
       }
     }
   }
@@ -343,7 +365,7 @@ make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, 
     tmp = covariates
     covariates = list()
     covariates[[effects]] = tmp
-    }
+  }
   
   mdl = c(list(
     formula = formula,
@@ -356,7 +378,7 @@ make.model = function(formula = NULL, name = NULL, effects = NULL, mesh = NULL, 
     covariates = covariates,
     const = const,
     eval = eval), list(...))
-
+  
   class(mdl) = c("model","list")
   return(mdl)
 }
@@ -379,15 +401,15 @@ update.model = function(model, result = NULL){
       if ( name %in% rownames(result$summary.fixed) ) { 
         assign(name, result$summary.fixed[name,"mode"], envir = iter)
         assign(hname, c(iter[[hname]], result$summary.fixed[name,"mode"]), envir = iter)
-        }
+      }
       if ( name %in% names(result$summary.random) ) { 
         assign(name, result$summary.random[[name]][,"mode"], envir = iter)
         assign(hname, rbind(iter[[hname]], result$summary.random[[name]][,"mode"]), envir = iter)
-        }
+      }
       if ( name %in% rownames(result$summary.hyperpar) ) { 
         assign(name, result$summary.hyperpar[name,"mode"], envir = iter)
         assign(hname, c(iter[[hname]], result$summary.hyperpar[name,"mode"]), envir = iter)
-        }
+      }
       if ( paste0("Beta for ",name) %in% rownames(result$summary.hyperpar) ) {
         assign(name, result$summary.hyperpar[paste0("Beta for ",name),"mode"], envir = iter)
         assign(hname, c(iter[[hname]], result$summary.hyperpar[paste0("Beta for ",name),"mode"]), envir = iter)
@@ -421,21 +443,8 @@ iteration.history.model = function(model, effect){
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
 
 evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr, use.covariate = TRUE) {
-<<<<<<< HEAD
-  cov = do.call(cbind, list.covariates.model(model, loc))
-  
-  # If predictor is given, remove model components not involved
-  if (!is.null(predictor)) {
-    pvars = all.vars(predictor)
-    model$effects = intersect(pvars, model$effects)
-    model$mesh = model$mesh[intersect(names(model$mesh), model$effects)]
-    }
-
-=======
   cov = as.data.frame(do.call(cbind, list.covariates.model(model, loc)))
->>>>>>> master
   Amat = list.A.model(model, loc)
-  
   if ( property == "sample") {
     if ( inherits(inla.result, "inla") ) {
       smp = inla.posterior.sample.structured(inla.result, n = n) 
@@ -443,7 +452,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
       smp = inla.result
       n = length(smp)
     }
-    } 
+  } 
   posts = list()
   
   for (k in 1:length(model$effects)){
@@ -456,7 +465,10 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
       } else {
         A = Amat[[name]]
         post = lapply(smp, function(s) {
-          })
+          mult = s[[name]]
+          if (length(mult) == 1) { as.vector(A %*% rep(mult, nrow(A))) } 
+          else { rowSums(t(t(as.matrix(A)) * mult)) }
+        })
       }
     } else {
       if (is.null(name)) { name =  names(model$mesh)[[k]] }
@@ -467,12 +479,12 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
         if ( grepl("[()]", name)) {
           post = inla.result$summary.fixed[name, property] * eval(parse(text = name), as.data.frame(loc))
         } else {
-            # Note: if there is no covariate, assume covariate = 1
-            if (is.null(cov[[name]]) | !use.covariate) {
-              post = rep(inla.result$summary.fixed[name, property], nrow(data.frame(loc)))
-            } else {
-              post = inla.result$summary.fixed[name, property] * cov[[name]]
-            }
+          # Note: if there is no covariate, assume covariate = 1
+          if (is.null(cov[[name]]) | !use.covariate) {
+            post = rep(inla.result$summary.fixed[name, property], nrow(data.frame(loc)))
+          } else {
+            post = inla.result$summary.fixed[name, property] * cov[[name]]
+          }
         }
         
       } else if (paste0("Beta for ",name) %in% rownames(inla.result$summary.hyperpar)) {
@@ -488,37 +500,29 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
         } else { # other models
           post = post[model$covariates[[name]](loc)]
         }
-  
+        
       }
     }
     posts[[name]] = post
   }
-
+  
   if ( property == "sample") {
     if (!is.null(predictor) && do.sum) { 
       ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,identity)}), posts))
-      
-      # The line above drops row names if only one effetc is present. Fix this:
-      if(is.null(rownames(ret[[1]])[1])) { 
-        for (k in 1:length(ret)) { 
-          ret[[k]] = t(ret[[k]])
-          rownames(ret[[k]]) = names(posts) }
-      }
-
       ret = lapply(ret, function(r) {eval(predictor, envir = cbind(as.data.frame(t(r)), as.data.frame(loc)))})
     } else {
-        ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
-        if( "const" %in% names(model) & !(length(model$const)==0)) {
-          const = colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
-          ret = lapply(ret, function(x) { x + const })
-        }
+      ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
+      if( "const" %in% names(model) & !(length(model$const)==0)) {
+        const = colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
+        ret = lapply(ret, function(x) { x + const })
+      }
     }
     ret = lapply(ret, link)
   } else {
     ret = do.call(cbind, posts)
     if (!is.null(predictor) && do.sum) { ret = eval(predictor, c(posts, as.list(data.frame(loc)))) } 
     else if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
-
+    
     if( "const" %in% names(model) & !(length(model$const)==0)) { 
       ret = ret + colSums(do.call(rbind, lapply(model$const, function(f) { f(loc) })))
     }
@@ -570,7 +574,7 @@ sample.value.model = function(model, result = NULL, n = 1, data = NULL, loc = NU
 #'
 #' @aliases sample.points.model sample.points
 #' @export
- 
+
 sample.points.model = function(model, result = NULL, data = NULL,  property = "random"){
   loc = data$mesh$loc[,1:2]
   colnames(loc) = data$mesh.coords
@@ -1118,11 +1122,11 @@ model.g0fix = function(g0 = 1, effect = "g0fix", covariate = NULL) {
   } else {
     covariates[[effect]] = covariate
   }
-
+  
   model = make.model(name = effect,
-                    formula = formula, 
-                    effects = effect,
-                    covariates = covariates)
+                     formula = formula, 
+                     effects = effect,
+                     covariates = covariates)
 }
 
 #' Prior distribution for detectability at zero distance
@@ -1145,9 +1149,9 @@ model.g0fix = function(g0 = 1, effect = "g0fix", covariate = NULL) {
 model.g0prior = function(theta.mean, theta.sd, effect = "g0prior", covariate = NULL) {
   
   hyper = list(theta = list(prior = paste0("expression: mean = ", theta.mean,"; sigma = ", theta.sd,"; 
-                                          dens = 1/sqrt(2*pi) * 1/sigma * exp(-0.5*(x-mean)^2/sigma^2); 
-                                          logdens = log(dens); 
-                                          return(logdens)"),
+                                           dens = 1/sqrt(2*pi) * 1/sigma * exp(-0.5*(x-mean)^2/sigma^2); 
+                                           logdens = log(dens); 
+                                           return(logdens)"),
                             initial = log(2), 
                             fixed = FALSE))
   
@@ -1201,8 +1205,8 @@ model.normal = function(data, effect, covariate, iterator = new.env(), ...) {
   
   # loglik = function(loc) { -0.5*exp(tau)*(covariate(loc) - as.numeric(inla.spde.make.A(mesh, as.matrix(loc[, data$mesh.coords])) %*% mode))^2 + 0.5*tau - log(sqrt(2*pi))}
   loglik = eval(parse(text=paste0("function(loc) { -0.5*exp(",tau.name,")*(covariate(loc) - 
-                  as.numeric(inla.spde.make.A(mesh, as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))^2 + 
-                  0.5*",tau.name," - log(sqrt(2*pi))}")))
+                                  as.numeric(inla.spde.make.A(mesh, as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))^2 + 
+                                  0.5*",tau.name," - log(sqrt(2*pi))}")))
   environment(loglik) = new.env(parent = iterator)
   assign("covariate", covariate, envir = environment(loglik))
   assign("mesh", mesh, envir = environment(loglik))
@@ -1210,7 +1214,7 @@ model.normal = function(data, effect, covariate, iterator = new.env(), ...) {
   
   # d.tau = function(loc) {-0.5*exp(tau)*(covariate(loc) - as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% mode))^2 + 0.5 }
   d.tau = eval(parse(text=paste0("function(loc) {-0.5*exp(",tau.name,")*(covariate(loc) - 
-            as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))^2 + 0.5 }")))
+                                 as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))^2 + 0.5 }")))
   environment(d.tau) = new.env(parent = iterator)
   assign("covariate", covariate, envir = environment(d.tau))
   assign("mesh", mesh, envir = environment(d.tau))
@@ -1218,7 +1222,7 @@ model.normal = function(data, effect, covariate, iterator = new.env(), ...) {
   
   # d.grps = function(loc) { exp(tau)*(covariate(loc) - as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% mode)) }
   d.grps = eval(parse(text=paste0("function(loc) { exp(",tau.name,")*(covariate(loc) - 
-            as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,")) }")))
+                                  as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,")) }")))
   
   environment(d.grps) = new.env(parent = iterator)
   assign("covariate", covariate, envir = environment(d.grps))
@@ -1231,7 +1235,7 @@ model.normal = function(data, effect, covariate, iterator = new.env(), ...) {
   
   # const = function(loc) { loglik(loc) - d.tau(loc)*tau -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% mode))}
   const = eval(parse(text=paste0("function(loc) { loglik(loc) - 
-          d.tau(loc)*",tau.name," -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))}")))
+                                 d.tau(loc)*",tau.name," -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))}")))
   
   environment(const) = new.env(parent = iterator)
   assign("loglik", loglik, envir = environment(const))
@@ -1252,11 +1256,11 @@ model.normal = function(data, effect, covariate, iterator = new.env(), ...) {
                    time.coords = mklist(effect, data$time.coords),
                    eval = eval, 
                    iterator = c(mklist(effect, iterator), mklist(tau.name, iterator))
-                  )
+  )
   
   ret$const = const
   return(ret)
-}
+  }
 
 
 #' Spatial log group size distribution with scaling
@@ -1319,7 +1323,7 @@ model.loggroupsize = function(data, effect, covariate, iterator = new.env(), ...
   
   # const = function(loc) { loglik(loc) - d.tau(loc)*tau -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% mode))}
   const = eval(parse(text=paste0("function(loc) { loglik(loc) - 
-          d.tau(loc)*",tau.name," -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))}")))
+                                 d.tau(loc)*",tau.name," -d.grps(loc) * (as.numeric(inla.spde.make.A(mesh = mesh, loc = as.matrix(loc[, data$mesh.coords])) %*% ",effect,"))}")))
   
   environment(const) = new.env(parent = iterator)
   assign("loglik", loglik, envir = environment(const))
@@ -1432,7 +1436,7 @@ model.taylor1d = function(expr = NULL, effects = NULL, initial = NULL, result = 
   #formula = as.formula(paste0("~. +  f(", effect ,", model = 'clinear', range = c(0, 10), hyper = list(beta = list(initial = 0, param = c(0,0.1))))"))
   formula = as.formula(paste0("~. + ", effect))
   covariates = list()
-    
+  
   covariates[[effect]] = function(loc) {
     myenv <- new.env()
     assign(effect, initial[[effect]], envir = myenv)
@@ -1453,7 +1457,7 @@ model.taylor1d = function(expr = NULL, effects = NULL, initial = NULL, result = 
     ret = nderiv - gradient * initial[[effect]]
     return(ret) 
   }
-
+  
   mdl = make.model(name = paste0("Taylor approximation in '",effect, "' of ",as.character(expr)), 
                    formula = formula, effects = effects, covariates = covariates)
   
