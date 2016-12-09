@@ -2,7 +2,9 @@
 nlinla.taylor = function(expr, epunkt, data) {
   if (nrow(epunkt)<=1000) {
     effects = colnames(epunkt)
-    wh = cbind(as.data.frame(data), epunkt)
+    df = as.data.frame(data)
+    df = df[,setdiff(names(df),names(epunkt)),drop=FALSE]
+    wh = cbind(df, epunkt)
     myenv = new.env()
     invisible(lapply(colnames(wh), function(x) myenv[[x]] = wh[,x]))
     tmp = numericDeriv(expr[[1]], effects,  rho = myenv)
@@ -35,7 +37,7 @@ nlinla.epunkt = function(model, data, result = NULL) {
   }
 }
 
-nlinla.reweight = function(A, weights, model, data){
+nlinla.reweight = function(A, model, data){
   expr = model$expr
   epkt = nlinla.epunkt(model, data, result = model$result)
   ae = nlinla.taylor(expr, epkt, data)
@@ -43,18 +45,6 @@ nlinla.reweight = function(A, weights, model, data){
     nm = names(A)[k]
     if ( !(is.null(nm) || nm == "")){ A[[k]] = A[[k]] * ae$gradient[[nm]] }
   }
-  for ( k in 1:length(weights) ){
-    for (j in 1:ncol(weights[[k]])) {
-      nm = names(weights[[k]])[j]
-      if ( nm %in% names(ae$gradient) ) {
-        weights[[k]][[nm]] = weights[[k]][[nm]] * ae$gradient[[nm]]
-      }
-    }
-  # Add gradients that are not represented in weights before
-  # add.names = setdiff(names(ae$gradient), names(weights[[k]]))
-  # weights[[k]] = cbind(weights[[k]], ae$gradient[,add.names, drop = FALSE])
-  }
-  
-  return(list(A = A, weights = weights, const = ae$const))
+  return(list(A = A, const = ae$const))
 }
 

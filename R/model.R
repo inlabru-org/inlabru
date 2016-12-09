@@ -207,23 +207,10 @@ list.covariates.model = function(mdl, pts){
         }
       } else {}
     }
-    fetched.covar = do.call(cbind,c(fetched.covar))
     
-    if (length(fetched.covar)>0 & length(covar.data)>0){ 
-      covar.data = cbind(covar.data,fetched.covar)
-    } else if (length(fetched.covar)>0) { 
-      covar.data = fetched.covar 
-    } else { }
     
-    if (is.null(covar.data)) {
-      return(list())
-    } else { 
-      return(list(as.data.frame(covar.data)))
-    }
   } else { 
-    E = list() 
   }
-  return(E)
 }
 
 #' List of A matrices needed to run INLA
@@ -233,9 +220,17 @@ list.covariates.model = function(mdl, pts){
 
 list.A.model = function(mdl, points){
   A.lst = list()
+
+  mapper = function(map) {
+    if (class(map) == "call") { loc = eval(map, data.frame(points)) } 
+    else {
+      fetcher = get0(as.character(map))
+      if (is.function(fetcher)) { loc = fetcher(points) } 
+      else { loc = as.data.frame(points)[,as.character(map)] }
+    }
+  }
   
   for ( name in names(mdl$mesh)) {
-
     # What to use as loc input to inla.spde.make.A ?
     #
     # 1) if mesh.coords are provided, use them to select columns from the points data frame
@@ -276,8 +271,18 @@ list.A.model = function(mdl, points){
     }
     A.lst[[name]] = A
   }
+
+  for ( name in setdiff(mdl$effects, names(mdl$mesh)) ) {
+    if ( name %in% names(mdl$map) ) {
+      idx = mapper(mdl$map[[name]])
+      A = matrix(0, nrow = nrow(points), ncol=6)
+      A[cbind(1:nrow(A), idx)] = 1
+      A.lst[[name]] = A
+    } else {
+      A.lst[[name]] = Matrix::Diagonal(nrow(data.frame(points)))
+    }
+  }
   
-  if ( length(mdl$covariates) > 0 ) { A.lst = c(A.lst,1) }
   return(A.lst)
 }
 
@@ -287,7 +292,6 @@ list.A.model = function(mdl, points){
 #' @aliases list.indices.model
 #' 
 
-list.indices.model = function(mdl, ...){
   idx.lst = list()
   if ( length(mdl$mesh) > 0) {
     for (k in 1:length(mdl$mesh)) {
@@ -297,13 +301,16 @@ list.indices.model = function(mdl, ...){
         # If a is masked, correct number of indices
         if (!is.null(mdl$A.msk[[name]])) { idx.lst[[name]] = 1:sum(mdl$A.msk[[name]])}
       } else {
-        ng = mdl$inla.spde[[k]]$n.group
         if (is.null(ng)) { ng = 1 }
-        idx.lst = c(idx.lst, list(inla.spde.make.index(name, n.spde = mdl$inla.spde[[k]]$n.spde, n.group = ng)))
       }
     }
-    
   }
+  
+  # Non-mesh models with indices
+  for ( name in setdiff(names(mdl$map), names(mdl$mesh)) ) {
+    idx.lst[[name]] = 1:max(mapper(mdl$map[[name]]))
+  }
+  
   return(idx.lst)
 }
 
@@ -414,6 +421,7 @@ iteration.history.model = function(model, effect){
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
 
 evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr, use.covariate = TRUE) {
+<<<<<<< HEAD
   cov = do.call(cbind, list.covariates.model(model, loc))
   
   # If predictor is given, remove model components not involved
@@ -423,6 +431,9 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
     model$mesh = model$mesh[intersect(names(model$mesh), model$effects)]
     }
 
+=======
+  cov = as.data.frame(do.call(cbind, list.covariates.model(model, loc)))
+>>>>>>> master
   Amat = list.A.model(model, loc)
   
   if ( property == "sample") {
@@ -443,15 +454,10 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
         A = Amat[[name]]
         post = lapply(smp, function(s) { as.vector(A%*%as.vector(s[[name]])) })
       } else {
+        A = Amat[[name]]
         post = lapply(smp, function(s) {
-          # Note: if there is no covariate, assume covariate = 1
-          if (is.null(cov[[name]]) | !use.covariate) {
-            rep(s[[name]],nrow(loc))
-            } else { 
-              s[[name]] * cov[[name]] } 
           })
       }
-      
     } else {
       if (is.null(name)) { name =  names(model$mesh)[[k]] }
       # Either fixed effect or hyper parameter
@@ -487,6 +493,7 @@ evaluate.model = function(model, inla.result, loc, property = "mode", do.sum = T
     }
     posts[[name]] = post
   }
+
   if ( property == "sample") {
     if (!is.null(predictor) && do.sum) { 
       ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,identity)}), posts))
