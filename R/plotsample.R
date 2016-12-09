@@ -11,12 +11,12 @@
 #' @return A \code{SpatialPolygonsDataFrame}.
 #'  
 #' @export
-makepoly=function(start,dx,dy) {
+makepoly=function(start,width,height) {
   poly=matrix(c(
     start[1],start[2],
-    start[1],start[2]+dy,
-    start[1]+dx,start[2]+dy,
-    start[1]+dx,start[2],
+    start[1],start[2]+height,
+    start[1]+width,start[2]+height,
+    start[1]+width,start[2],
     start[1],start[2]),
     ncol=2,byrow=TRUE)
   return(Polygon(poly))
@@ -108,14 +108,16 @@ plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
 #' library(raster)
 #' data(gorillanests)
 #' plotpts = plotsample(gnests,gnestboundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
-#' ggplot() +gg(plotpts$plots) +gg(plotpts$dets) +gg(gnestboundary)
+#' p1 = ggplot() +gg(plotpts$plots) +gg(plotpts$dets) +gg(gnestboundary)
 #' countdata = point2count(plotpts$plots,plotpts$dets)
 #' x=coordinates(countdata)[,1]
 #' y=coordinates(countdata)[,2]
 #' count=countdata@data$n
-#' ggplot() +gg(gnestboundary) +gg(plotpts$plots) +  geom_text(aes(label=count, x=x, y=y))
-#'      
+#' p2 = ggplot() +gg(gnestboundary) +gg(plotpts$plots) +  geom_text(aes(label=count, x=x, y=y))
+#' multiplot(p1,p2,cols=2)
+#' 
 #' @export
+#' 
 point2count = function(plots,dets) {
   np = length(plots)
   x = y = plotarea = count = numeric(length=np)

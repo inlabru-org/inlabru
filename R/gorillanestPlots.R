@@ -15,7 +15,7 @@
 #'    of the regoin that was searched for the nests.}
 #'    \item{\code{gnestmesh}:}{ An \code{inla.mesh} object containing a mesh that can be used
 #'    with function \code{lgcp} to fit a LGCP to the nest data.}
-#'    \item{\code{plots}:}{ A \code{SpatialPolygonsDataFrame} object containing a the 15 polygons
+#'    \item{\code{plots}:}{ A \code{SpatialPolygonsDataFrame} object containing the 15 polygons
 #'    that were searched for nests.}
 #'  }
 #' @source 
