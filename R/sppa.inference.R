@@ -835,7 +835,6 @@ iinla = function(data, model, stackmaker, n = NULL, result = NULL,
     if ( iinla.verbose ) { cat(" Done. ") }
     
     # Update model
-    update.model(model, result)
     model$result = result
     track[[k]] = cbind(effect = rownames(result$summary.fixed), iteration = k, result$summary.fixed)
     if ( n > 1 & k < n) { stk = stackmaker(data, model) }
