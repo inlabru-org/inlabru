@@ -55,7 +55,7 @@ detection.stack = function(data,
   
   # Sort effects and A by names
   effects = c(idx, eff)
-  A = c(A, list(from.points = 1))
+  if ("from.points" %in% names(eff)) A = c(A, list(from.points = 1))
   effects = effects[names(A)]
 
   # Create and return stack
@@ -132,7 +132,7 @@ integration.stack = function(data = NULL,
   
   # Sort effects and A by names
   effects = c(idx, eff)
-  A = c(A, list(from.points = 1))
+  if ("from.points" %in% names(eff)) A = c(A, list(from.points = 1))
   effects = effects[names(A)]
   
   # Create and return stack
