@@ -1,3 +1,25 @@
+
+extract.summary = function(result, property) {
+  ret = list()
+  
+  for ( label in rownames(result$summary.fixed) ) {
+    ret[[label]] = result$summary.fixed[label, property]
+  }
+  
+  for ( label in names(result$summary.random) ) {
+    ret[[label]] = result$summary.random[[label]][, property]
+  }
+  
+  for ( label in rownames(result$summary.hyperpar) ) {
+    new.label = gsub(" ","_", x = label, fixed = TRUE)
+    ret[[new.label]] = result$summary.hyperpar[label, property]
+  }
+  
+  ret
+}
+
+
+
 ##
 ## A wrapper for inla.posterior.sample()
 ##

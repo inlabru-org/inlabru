@@ -202,7 +202,8 @@ iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL) {
   
   # Default mesh for spatial integration:
   meshes = lapply(effect(model), function(e) e$mesh)
-  names(meshes) = labels(model)
+  names(meshes) = elabels(model)
+  meshes = meshes[!unlist(lapply(meshes, is.null))]
   issp = as.vector(unlist(lapply(meshes, function(m) m$manifold == "R2")))
   if (!is.null(issp) & any(issp)) { 
     spmesh = meshes[[which(issp)[[1]]]] } 

@@ -1,15 +1,52 @@
-#' iDistance models for INLA
+#' \link{inlabru} models
+#'
+#' As with most inference methods inlabru models are set up via model formulae.
+#' However, inlabru supports a slightly more advanced syntax which separates the name of an
+#' effect from the name of a covariate. For instance, a very simple formula that inlabru
+#' can work with is 
 #' 
-#' Facilitates the spatial modeling approaches using INLA.
-#' A \code{model} has a formula that describes one or more of INLA's \code{f} objects.
-#' It describes how given a data frame of locations or other coordinates translates into
-#' evaluating the predictors of the formula. For manually setting up a \code{model} see the
-#' constructor \link{make.model}. Useful operators on \code{model} objects are:
+#' \code{y ~ myFixedEffect(temperature)}
+#'
+#' which defines a latent effect named 'myFixedEffect' with 'tepmerature' as a multiplier.
+#' Hence, except for explicitly giving a name to the effect, the above formula is equivalent
+#' to
+#' 
+#' \code{y ~ temperature}
+#' 
+#' In fact, the latter will also work in inlabru but the name of the effect will be
+#' 'temperature'. The advantage of having an explicit name for the effect is that it 
+#' allows for a more sophisticated syntax when making predictions.
+#' 
+#' In general, inlabru formula components are of the form
+#' 
+#' MyEffectName(map = aFunctionOfMyData, model = 'modelType', ...)
+#' 
+#' where 
+#' 
 #' \itemize{
-#'  \item{\link{make.model}: }{Create a model}
-#'  \item{\link{summary}: }{Summarize a model}
-#'  \item{\link{evaluate}: }{ Determine the linear predictor's value at some location }
+#' \item{\code{MyEffectName} is an aribtrary string defining the name of the effect}
+#' \item{\code{map} can be 
+#' (A) a name of a covariate, 
+#' (B) a function's name that will be called with your data as a parameter
+#' (C) an expression that is valid with your data as an environment
+#' \item{model} is one of the \link{inla.models}
+#' \item{... are further arguments passed that inla \link{f} understands}
+#' }
+#' 
+#' Internally, inlabru will construct a \code{model} form the formula that you define
+#' using the \link{make.model} function. Useful operators on \code{model} objects are:
+#' 
+#' \itemize{
+#'  \item{\link{summary}: }{ Summarize an \link{inlabru} model }
+#'  \item{\link{labels}: }{ Character array of effect labels }
+#'  \item{\link{effect}: }{ Retrieve one or more effects from a model }
+#'  \item{\link{default}: }{ Default linear predictor expression }
+#'  \item{\link{list.A}: }{ List A-matrices that will be constructed for the INLA stack }
 #'  \item{\link{list.data}: }{ List environmental variables needed to call INLA}
+#'  \item{\link{list.indices}: }{ List indices that will be constructed for the INLA stack}
+#'  \item{\link{list.effects}: }{ List weights that will be constructed for the INLA stack}
+#'  \item{\link{evaluate}: }{ Determine the linear predictor's value at some location }
+#'  
 #' }
 #' 
 #' 
@@ -17,29 +54,66 @@
 NULL
 
 
-#####################################
+##########################################################################
 # GENERICS
-#####################################
+##########################################################################
 
 evaluate = function(...){UseMethod("evaluate")}
-list.covariates = function(...){UseMethod("list.covariates")}
 list.A = function(...){UseMethod("list.A")}
+list.covariates = function(...){UseMethod("list.covariates")}
 list.indices = function(...){UseMethod("list.indices")}
 list.data = function(...){UseMethod("list.data")}
 
 
-#####################################
+##########################################################################
 # Constructor
-#####################################
+##########################################################################
 
-#' Create an inlabru \link{model}
+#' Create an inlabru \link{model} from a formula
 #' 
+#' The \link{inlabru} syntax for model forulae is different from what \link{inla} considers a valid.
+#' In inla most of the effects are defined by adding an f(...) expression to the formula. 
+#' In \link{inlabru} the f is replaced by an arbitrary (exception: 'offset') string that will
+#' determine the label of the effect. For instance
+#' 
+#' \code{y ~ f(myspde, ...)}
+#' 
+#' is equivalent to
+#' 
+#' \code{y ~ myspde(...)}
+#' 
+#' A disadvantage of the inla way is that there is no clear separation between the name of the covariate
+#' and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
+#' use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
+#' \link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
+#' like the first argument of the f function, e.g.
+#' 
+#' \code{y ~ f(temperature, model = "fixed)}
+#' 
+#' is equivalent to
+#' 
+#' \code{y ~ temperature(map = temperature, model = fixed)}
+#' as well as
+#' \code{y ~ temperature(model = fixed)}
+#' 
+#' On the other hand, map can also be a function mapping, e.g the \link{coordinates} function of the
+#' \link{sp} package :
+#' 
+#' \code{y ~ mySPDE(map = coordinates, ...)}
+#'
+#' Morevover, \code{map} can be any expression that evaluate within your data as an environment.
+#' For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'a+b' by
+#' setting \code{map} in the following way:
+#' 
+#' \code{y ~ myEffect(map = sin(a+b))} 
+#'
 #'
 #' @export
 #' @param fml A formula
-#' @param points a data.frame of data points
 #' @return A \link{model} object
-make.model = function(fml, data) {
+#' 
+
+make.model = function(fml) {
   submodel = list()
   covariates = list()
   
@@ -47,106 +121,81 @@ make.model = function(fml, data) {
   shift.names = function(fml) {
     tms = terms(fml)
     labels = attr(tms, "term.labels")
-    effects = character()
+
+    # Check for offset()
+    isoff = as.vector(unlist(lapply(rownames(attr(tms, "factors")), function(s) substr(s,1,6)=="offset")))
+    if (any(isoff)) {
+      labels[[length(labels)+1]] = rownames(attr(tms, "factors"))[isoff]
+    }
+    
     for (k in 1:length(labels)){
       lb = labels[[k]]
       gpd = getParseData(parse(text=lb))
       # Determine the name of the effect
       ename = getParseText(gpd, id=1)
+      # Fixed effect ?
       is.fixed = (gpd[1,"token"] == "SYMBOL")
-      if ( !(ename %in% c("g","f","offset")) & !is.fixed ) {
-        effects[[k]] = ename
-        # Replace effect name by g(ename
-        labels[[k]] = gsub(paste0(ename,"("), paste0("g(",ename,", "), lb, fixed = TRUE)
+      
+      # Construct g() call
+      if ( is.fixed ) {
+        labels[[k]] = sprintf("g(%s, map = %s, model = 'linear')", ename, ename)
+      } else {
+        if ( !(ename %in% c("g","f"))) {
+          labels[[k]] = gsub(paste0(ename,"("), paste0("g(",ename,", "), lb, fixed = TRUE)
+        }
+        if ( ename %in% c("f") ) {
+          labels[[k]] = gsub(paste0(ename,"("), paste0("g("), lb, fixed = TRUE)
+        }
+        
       }
     }
+    
     labels
   }
   
+
   lbl = shift.names(fml)
   
   for ( k in 1:length(lbl) ) {
     
     lb = lbl[[k]]
+
+    # Call g()
+    ge = eval(parse(text = lb), envir = environment(fml))
+
+    # Replace function name by INLA f function
+    lb = gsub("g\\(","f(",lb)
+
+    # Remove extra mesh argument
+    lb = gsub("[,][ ]*mesh[ ]*=[^),]*", "", lb)
+
+    # Remove extra map argument
+    pat = paste0("", deparse(ge$map))
+    lb = gsub(paste0(" ", deparse(ge$map)), "", lb, fixed =TRUE)
+    lb = gsub(paste0("=", deparse(ge$map)), "", lb, fixed =TRUE)
+    lb = gsub("[,][ ]*map[ ]*=[^),]*", "", lb)
     
-    #
-    # We expect to see three types of terms
-    # g
-    # f 
-    # offset
-    # fixed
     
-    if (substr(lb,1,2) == "g(") { ########################## g() term
-      
-      # Extract mesh and spde model
-      ge = eval(parse(text = lb), envir = environment(fml))
-      
-      # Replace function name by INLA f function
-      lb = gsub("g\\(","f(",lb)
-      
-      # Remove extra mesh argument
-      lb = gsub("[,][ ]*mesh[ ]*=[^),]*", "", lb)
-      
-      # Remove extra map argument
-      pat = paste0("", deparse(ge$map))
-      lb = gsub(deparse(ge$map), "", lb, fixed =TRUE)
-      lb = gsub("[,][ ]*map[ ]*=[^),]*", "", lb)
-      
-      # Remove extra A.msk argument
-      pat = paste0("", deparse(ge$A.msk))
-      lb = gsub(deparse(ge$map), "", lb, fixed =TRUE)
-      lb = gsub("[,][ ]*A.msk[ ]*=[^),]*", "", lb)
-      
-      lbl[[k]] = lb
-      
-      submodel[[ge$f$label]] = c(ge$f, list(mesh = ge$mesh, 
-                                            A.msk = ge$A.msk,
-                                            mesh.coords = ge$f$term,
-                                            map = ge$map,
-                                            inla.spde = ge$model))
-      
-    } else if (substr(lb,1,2) == "f(") { ##################### f() term
-      
-    } else if (substr(lb,1,7) == "offset(") { ################ offset() term
-      
-    } else { ################################################# fixed effect term
-      
-      gpd = getParseData(parse(text=lb))
-      
-      if (gpd[1,"token"] == "SYMBOL") {
-        if (!(gpd[1,"text"] %in% c(names(environment(fml)), names(data)))) { environment(fml)[[gpd[1,"text"]]] = 0 }
-        if ( gpd[1,"text"] %in% names(data) ) {
-          
-        } else {
-          covariates[[lbl[k]]] = function(x) {
-            v = rep(1, nrow(as.data.frame(x)))
-            ret = data.frame(v)
-            colnames(ret) = effect
-            return(ret)
-          }
-          environment(covariates[[lbl[k]]]) = new.env()
-          assign("effect", lbl[k], envir = environment(covariates[[lbl[k]]]))
-        }
-        
-      } else if (gpd[1,"token"] == "expr") {
-        old.label = lb
-        lb = paste0(gpd[2,"text"],".effect")
-        effects[k] = paste0(gpd[2,"text"],".effect")
-        covariates[[lb]] = function(...) {do.call(function(...) {eval(parse(text=old.label), envir = list(...))}, as.list(...))}
-      }
-      
-      
-      # New label
-      lbl[[k]] = paste0("f(",lb,", model='linear')")
-      ge = eval(parse(text = lbl[[k]]))
-      
-      submodel[[lb]] = c(eval(parse(text = lbl[[k]])), 
-                         list(mesh = ge$mesh, 
-                              A.msk = ge$A.msk,
-                              mesh.coords = ge$f$term,
-                              map = as.name(lb)))
-      
-    }
+    # Remove extra A.msk argument
+    pat = paste0("", deparse(ge$A.msk))
+    lb = gsub(paste0(" ", deparse(ge$A.msk)), "", lb, fixed =TRUE)
+    lb = gsub(paste0("=", deparse(ge$A.msk)), "", lb, fixed =TRUE)
+    lb = gsub("[,][ ]*A.msk[ ]*=[^),]*", "", lb)
+
+    lbl[[k]] = lb
+    
+    smod = c(ge$f, list(mesh = ge$mesh, 
+                        A.msk = ge$A.msk,
+                        mesh.coords = ge$f$term,
+                        map = ge$map,
+                        inla.spde = ge$model),
+                        fchar = lb)
+    
+    submodel[[ge$f$label]] = smod
+    
+    # Fix label for offset effect
+    if (smod$label == "offset") lbl[[k]] = paste0("offset(",as.character(smod$map),")")
+    
   }
   
   # Did the old formula have an intercept?
@@ -164,58 +213,121 @@ make.model = function(fml, data) {
 }
 
 
-#####################################
-# OPERATORS ON MODELS
-#####################################
+#' A wrapper for the \link{inla} \link{f} function
+#' 
+#' @aliases g
+#' @export
+#' @param covariate A string defining the label of the INLA effect. If \code{map} is provided this also sets the coariate used as a first argument to the \link{f} call.
+#' @param map A name, call or function that maps points to effect indices or locations that the model understands.
+#' @param model See \link{f} model specifications
+#' @parma mesh An \link{inla.mesh} object required for SPDE models
+#' @param A.mask A boolean vector for masking A matrix columns. 
+#' @param ... Arguments passed on to inla \link{f}
+#' @return A list with mesh, model and the return value of the f-call
 
-labels = function(mdl) { names(mdl$effects) }
-predictor = function(mdl) { parse(text=paste0(labels(m),collapse="+"))}
-effect = function(mdl, name = NULL) {
-  if (is.null(name)) { 
-    mdl$effects } 
-  else {
-    mdl$effects[[name]]
+g = function(covariate, 
+             map = NULL, 
+             model = "linear", 
+             mesh = NULL, 
+             A.msk = NULL, ...){
+ 
+  label = as.character(substitute(covariate))
+  map.char = as.character(substitute(map))
+  A.msk.char = as.character(substitute(A.msk))
+  
+  if ( length(map.char) == 0 ) { map = NULL } else { map = substitute(map) }
+  if ( length(A.msk.char) == 0 ) { A.msk = NULL } else { A.msk = A.msk }
+  
+  # Only call f if we are  not dealing with an offset
+  if ( label == "offset" ) { fvals = list(model="offset") } 
+  else { fvals = f(xxx, ..., model = model) }
+  fvals$label = label
+  
+  # Default map
+  if ( is.null(map) ) { 
+    if ( fvals$model == "spde2") { map = expression(coordinates) }
+    else { map = substitute(covariate) }
   }
-   
+  
+  # Check if we got a mesh argument if the model is an SPDE
+  if ( fvals$model == "spde2" & is.null(mesh) ) stop(sprintf("Model %s is an SPDE but no mesh was provided", label))
+  
+  
+  ret = list(mesh = mesh, 
+             map = map,
+             A.msk = A.msk,
+             model = model, 
+             f = fvals)
 }
 
+
+##########################################################################
+# OPERATORS ON MODELS
+##########################################################################
 
 #' Model summary
 #'
 #' @aliases summary.model
 #' @export
-#' @param mdl An \link{inlabru} \link{model}
+#' @param model An \link{inlabru} \link{model}
 #' 
-summary.model = function(mdl) {
-  for (label in labels(mdl)) {
-    eff = effect(mdl,label)
+summary.model = function(model) {
+  for (label in elabels(model)) {
+    eff = effect(model,label)
+    en = ifelse("n" %in% names(eff), eff$n, 1)
     cat(paste0(label, ":\n"))
-    cat(paste0("\t model: ",eff$model, "\n"))
-    cat(paste0("\t map: ",eff$map,", class = ", class(eff$map),"\n"))
-    cat(paste0("\t covariate function: ",eff$covariate, "\n"))
+    cat(sprintf("\t model: %s , n = %s \n", eff$model, en))
+    cat(sprintf("\t map: %s [class: %s] \n", deparse(eff$map), class(eff$map)))
+    cat(sprintf("\t f call: %s \n", eff$fchar))
+    
     cat("\n")
     
   }
   cat(paste0("--- FORMULA ---\n\n"))
-  print(mdl$formula)
+  print(model$formula)
 }
+
+
+#' Retrieve effect labels
+#'
+#' @aliases elabels
+#' @export
+#' @param model An \link{inlabru} \link{model}
+#' 
+elabels = function(model) { names(model$effects) }
+
+
+#' Retrieve effect properties
+#'
+#' @aliases effect
+#' @export
+#' @param model An \link{inlabru} \link{model}
+#' @param label String defining the label of the effect. If NULL, return all effects
+#' 
+effect = function(model, label = NULL) {
+  if (is.null(label)) { model$effects } 
+  else { model$effects[[label]] }
+}
+
+
+#' Retrieve linear predictor expression
+#'
+#' @aliases predictor
+#' @export
+#' @param model An \link{inlabru} \link{model}
+#'
+default.predictor = function(model) { parse(text=paste0(elabels(model),collapse="+"))}
 
 
 
 #' List data needed to run INLA
 #'
 #' @aliases list.data.model
+#' @param model An \link{inlabru} \link{model}
 #' @export
 #' 
 
 list.data.model = function(model){
-  # THIS IS A WORKAROUND. If a formula is constructed and contains the stack of 
-  # a previous run INLA will confuse the data from the new stack with the old stack
-  # due to the data = ... as.list(environment(jmdl$formula))) ... parameter.
-  # INLA reports the following error: 
-  # Error in data.frame(..., check.names = FALSE): arguments imply differing number of rows: 2379, 2739
-  
-  assign("stack", NULL, envir = environment(model$formula))
   
   # Formula environment as list
   elist = as.list(environment(model$formula))
@@ -227,18 +339,20 @@ list.data.model = function(model){
 #' List of covariates effects needed to run INLA
 #'
 #' @aliases list.covariates.model
+#' @param model An \link{inlabru} \link{model}
+#' @param points A data fram to extract the data from
 #' 
 
-list.covariates.model = function(mdl, pts){
+list.covariates.model = function(model, points){
     
-  all.varnames = c(all.vars(mdl$formula), all.vars(mdl$expr)) 
+  all.varnames = c(all.vars(model$formula), all.vars(model$expr)) 
   covar.data = list()
     
     # Points may be annotated with covariates
     
     for (vname in all.varnames){
-      if (vname %in% names(data.frame(pts))) {
-        covar.data[[vname]] = data.frame(pts)[,vname]
+      if (vname %in% names(data.frame(points))) {
+        covar.data[[vname]] = data.frame(points)[,vname]
       }
     }
     covar.data = data.frame(do.call(cbind,covar.data))
@@ -247,23 +361,24 @@ list.covariates.model = function(mdl, pts){
 #' List of A matrices needed to run INLA
 #'
 #' @aliases list.A.model
-#' 
+#' @param model An \link{inlabru} \link{model}
+#' @param points Locations to create the A-matrices for
 
-list.A.model = function(mdl, points){
+list.A.model = function(model, points){
   A.lst = list()
 
   # For each effect create indices
-  for ( eff in effect(mdl) ) {
+  for ( eff in effect(model) ) {
     if ( is.null(eff$n) ) {
       A.lst[[eff$label]] = Matrix::Diagonal(nrow(data.frame(points)))
     } else if ( is.null(eff$mesh) ) {
-      idx = mapper(eff$map, points)
+      idx = mapper(eff$map, points, eff)
       A = matrix(0, nrow = nrow(data.frame(points)), ncol=eff$n)
       A[cbind(1:nrow(A), idx)] = 1
       A.lst[[eff$label]] = A
     } else {
       
-      loc = mapper(eff$map, points)
+      loc = mapper(eff$map, points, eff)
       loc = as.matrix(loc) # inla.spde.make.A requires matrix format as input
 
       if (!("n.group" %in% names(eff$inla.spde))) { ng = 1 } else { ng = eff$inla.spde$n.group }
@@ -283,11 +398,6 @@ list.A.model = function(mdl, points){
     }
   }
   
-  
-  
-  
-  
-  
   return(A.lst)
 }
 
@@ -295,15 +405,16 @@ list.A.model = function(mdl, points){
 #' List of spde indexing effects needed to run INLA
 #'
 #' @aliases list.indices.model
-#' 
+#' @param model An \link{inlabru} \link{model}
+#' @param points A data frame to extract indices from
 
-list.indices.model = function(mdl, points){
+list.indices.model = function(model, points){
   
   # The list of indices to be returned
   idx = list()
 
   # For each effect create indices
-  for ( eff in effect(mdl) ) {
+  for ( eff in effect(model) ) {
     name = eff$label
     
     # Only create indices if the number n of effect variables is known
@@ -324,29 +435,32 @@ list.indices.model = function(mdl, points){
         }
       }
     } else {
-      idx[[name]] = mapper(eff$map, points)
+      idx[[name]] = mapper(eff$map, points, eff)
     }
     
   }
   idx
 }
 
-#' Evaluate model at given locations
+#' Evaluate model given a posterior and locations
 #' 
 #' Compute an approximation to the linear predictor at given locations and gicen coordinates.
 #'
 #' @aliases evaluate.model evaluate
 #' @export
 #' @param model An iDistance \link{model}
-#' @param result The result of an \link{inla} run or a sample obtained from \link{inla.posterior.sample.structured}
-#' @param loc Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
+#' @param result The resulting posterior of an \link{inla}
+#' @param points Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
-#' @param use.covariate DEPRECATED (will be irgnored)
 
-evaluate.model = function(model, result, loc, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr, use.covariate = NULL) {
+evaluate.model = function(model, result, points, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr) {
+  
+  # Remove effect from model that are not required for the evaluation 
+  effs = effect(model)
+  model$effects = effs[intersect(names(effs), all.vars(predictor))]
   
   # Obtain A-matrices
-  A = list.A.model(model, loc)
+  A = list.A.model(model, points)
   
   # Do we otain our values from sampling or from a property of a summary?
   if ( property == "sample") {
@@ -365,12 +479,10 @@ evaluate.model = function(model, result, loc, property = "mode", do.sum = TRUE, 
     
     # Values from samples
     if ( property == "sample") {
-
       post = lapply(smp, function(s) {
         mult = as.vector(s[[name]])
         if (length(mult) == 1) { as.vector(A[[name]] %*% rep(mult, nrow(A[[name]]))) }
-        else { rowSums(t(t(as.matrix(A[[name]])) * mult)) }
-      })
+        else { rowSums(t(t(as.matrix(A[[name]])) * mult)) }})
     
     # Values from inla result
     } else {
@@ -378,13 +490,13 @@ evaluate.model = function(model, result, loc, property = "mode", do.sum = TRUE, 
       # Fixed effects
       if (name %in% rownames(result$summary.fixed)) {
         post = result$summary.fixed[name, property]
-        post = rep(post, nrow(data.frame(loc)))
+        post = rep(post, nrow(data.frame(points)))
         
       # Hyper parameter
       } else if (paste0("Beta for ",name) %in% rownames(result$summary.hyperpar)) {
         
         post = result$summary.hyperpar[paste0("Beta for ",name), property]
-        post = rep(post, nrow(data.frame(loc)))
+        post = rep(post, nrow(data.frame(points)))
         
         # Random effects
       } else if (name %in% names(result$summary.random)) {
@@ -399,18 +511,18 @@ evaluate.model = function(model, result, loc, property = "mode", do.sum = TRUE, 
     }
     posts[[name]] = post
   }
-  
   if ( property == "sample") {
     if (!is.null(predictor) && do.sum) { 
+      stop("THIS CODE NEEEDS TO WORK EVEN IF THERE IS ONLE ONE EFFECT")
       ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,identity)}), posts))
-      ret = lapply(ret, function(r) {eval(predictor, envir = cbind(as.data.frame(t(r)), as.data.frame(loc)))})
+      ret = lapply(ret, function(r) {eval(predictor, envir = cbind(as.data.frame(t(r)), as.data.frame(points)))})
     } else {
       ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
     }
     ret = lapply(ret, link)
   } else {
     ret = do.call(cbind, posts)
-    if (!is.null(predictor) && do.sum) { ret = eval(predictor, c(posts, as.list(data.frame(loc)))) } 
+    if (!is.null(predictor) && do.sum) { ret = eval(predictor, c(posts, as.list(data.frame(points)))) } 
     else if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
     ret = link(ret)
   }
@@ -419,43 +531,17 @@ evaluate.model = function(model, result, loc, property = "mode", do.sum = TRUE, 
 }
 
 
-
-
-#' A wrapper for the \link{inla} \link{f} function
-#' 
-#' g makes the mesh an explicit argument and catches the provided model for later usage.
-#' See \link{f} for details on model specifications.
-#'
-#' @aliases g
-#' @export
-#' @param mesh An inla.mesh
-#' @param model See \link{f} model specifications
-#' @param ... Passed on to inla \link{f}
-#' @return A list with mesh, model and the return value of the f-call
-
-g = function(..., map, A.msk, mesh = NULL, model = "linear") {
-  if (as.character(substitute(map))[[1]] == "" ) { map = NULL } else { map = substitute(map) }
-  if (as.character(substitute(A.msk))[[1]] == "" ) { A.msk = NULL } else { A.msk = A.msk }
-  
-  fvals = f(..., model = model)
-  
-  if (fvals$model == "spde2" & is.null(map)) { map = expression(coordinates) }
-  
-  ret = list(mesh = mesh, 
-             map = map,
-             A.msk = A.msk,
-             model = model, 
-             f = fvals)
-}
-
-
-mapper = function(map, points) {
+mapper = function(map, points, eff) {
   # If map is a function, return map(points)
   # If map is not a function but a column in points, return points$map
   # Otherwise assume map is an expression that can be evaluated with points as an environment
-  cat("mapping")
+
   if (is.function(map)) { loc = map(points) } 
-  else if (class(map) == "call") { loc = eval(map, data.frame(points)) } 
+  else if (class(map) == "call") { 
+    loc = tryCatch( eval(map, data.frame(points)), error = function(e){
+      loc = data.frame(points)[[eff$label]]
+    })
+    } 
   else {
     fetcher = get0(as.character(map))
     if (is.function(fetcher)) { loc = fetcher(points) } 

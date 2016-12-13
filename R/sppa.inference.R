@@ -26,7 +26,7 @@ bru = function(points,
   if ( is.null(mesh) ) { mesh = default.mesh(points) }
   
   # Turn model formula into internal bru model
-  model = make.model(model, data.frame(points))
+  model = make.model(model)
   
   # Set model$expr as RHS of predictor 
   pred.rhs = parse(text = as.character(predictor)[3])
@@ -77,7 +77,7 @@ multibru = function(brus, model = NULL, ...) {
   if ( is.null(model) ) { 
     model = brus[[1]]$sppa$model
   } else {
-    model = make.model(model, data.frame(brus[[1]]$sppa$points))
+    model = make.model(model)
   }
   
   # Create joint stackmaker
@@ -157,7 +157,7 @@ lgcp = function(points,
     prd.lhs = as.formula(paste0(paste(  all.vars(update.formula(model, .~0))  , collapse = " + "), "~."))
     if ( inherits(predictor, "expression") ) { predictor = as.formula(paste0("~", as.character(predictor))) }
     predictor = update.formula(predictor, prd.lhs)
-    tmp = make.model(model, data.frame(points))
+    tmp = make.model(model)
     # if (!(toString(model) == toString(. ~ g(spde, model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1))){
     #   prd.rhs = as.formula(paste0(".~ ", paste(tmp$effects, collapse = " + ")))
     #   predictor = update.formula(predictor, prd.rhs)
@@ -165,7 +165,7 @@ lgcp = function(points,
   }
   
   # Turn model formula into internal bru model
-  model = make.model(model, data.frame(points))
+  model = make.model(model)
   
   # Set model$expr as RHS of predictor
   if ( inherits(predictor, "formula") ) {
@@ -423,7 +423,7 @@ predict.lgcp = function(result,
   }
   
   sample.fun = function(n) {
-    vals = evaluate.model(result$sppa$model, result, pts, property = property, do.sum = TRUE, link = identity, n = n, predictor = predictor, use.covariate = FALSE)
+    vals = evaluate.model(result$sppa$model, result, pts, property = property, do.sum = TRUE, link = identity, n = n, predictor = predictor)
     
     # If we sampled, summarize
     if ( is.list(vals) ) { vals = do.call(cbind, vals) }
