@@ -1,4 +1,4 @@
-#' \link{inlabru} models
+#' Models for \link{inlabru} 
 #'
 #' As with most inference methods inlabru models are set up via model formulae.
 #' However, inlabru supports a slightly more advanced syntax which separates the name of an
@@ -28,7 +28,7 @@
 #' \item{\code{map} can be 
 #' (A) a name of a covariate, 
 #' (B) a function's name that will be called with your data as a parameter
-#' (C) an expression that is valid with your data as an environment
+#' (C) an expression that is valid with your data as an environment}
 #' \item{model} is one of the \link{inla.models}
 #' \item{... are further arguments passed that inla \link{f} understands}
 #' }
@@ -220,7 +220,7 @@ make.model = function(fml) {
 #' @param covariate A string defining the label of the INLA effect. If \code{map} is provided this also sets the coariate used as a first argument to the \link{f} call.
 #' @param map A name, call or function that maps points to effect indices or locations that the model understands.
 #' @param model See \link{f} model specifications
-#' @parma mesh An \link{inla.mesh} object required for SPDE models
+#' @param mesh An \link{inla.mesh} object required for SPDE models
 #' @param A.mask A boolean vector for masking A matrix columns. 
 #' @param ... Arguments passed on to inla \link{f}
 #' @return A list with mesh, model and the return value of the f-call
