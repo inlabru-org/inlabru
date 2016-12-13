@@ -423,7 +423,7 @@ predict.lgcp = function(result,
   }
   
   sample.fun = function(n) {
-    vals = evaluate.model(result$sppa$model, result, pts, property = property, do.sum = TRUE, link = identity, n = n, predictor = predictor)
+    vals = evaluate.model(model = result$sppa$model, result = result, points = pts, property = property, n = n, predictor = predictor)
     
     # If we sampled, summarize
     if ( is.list(vals) ) { vals = do.call(cbind, vals) }

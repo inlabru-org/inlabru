@@ -56,7 +56,10 @@ inla.posterior.sample.structured = function(result,n){
         else { vals[[name]] = smpl.hyperpar[paste0(paste0("Beta_intern for ",name)," -- in user scale")] }
       }
     }
-    ssmpl[[i]] = c(vals, list(hyper=smpl.hyperpar))
+    if(length(smpl.hyperpar)>0){
+      names(smpl.hyperpar) = sapply(names(smpl.hyperpar), function(nm) gsub(" ","_", x = nm, fixed = TRUE))
+    }
+    ssmpl[[i]] = c(vals, smpl.hyperpar)
   }
 
 #

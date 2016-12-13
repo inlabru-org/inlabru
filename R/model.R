@@ -442,92 +442,74 @@ list.indices.model = function(model, points){
   idx
 }
 
-#' Evaluate model given a posterior and locations
+#' Evaluate or sample from a posterior result given a model and locations
 #' 
-#' Compute an approximation to the linear predictor at given locations and gicen coordinates.
-#'
 #' @aliases evaluate.model evaluate
 #' @export
-#' @param model An iDistance \link{model}
-#' @param result The resulting posterior of an \link{inla}
-#' @param points Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.
-#' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".
-
-evaluate.model = function(model, result, points, property = "mode", do.sum = TRUE, link = identity, n = 1, predictor = model$expr) {
-  
-  # Remove effect from model that are not required for the evaluation 
-  effs = effect(model)
-  model$effects = effs[intersect(names(effs), all.vars(predictor))]
-  
-  # Obtain A-matrices
-  A = list.A.model(model, points)
+#' @param model An \link{inlabru} \link{model}
+#' @param result Posterior of an \link{inla}, \link{bru} or \link(lgcp) run.
+#' @param points Locations and covariates needed to evaluate the model.
+#' @param predictor An expression to be ealuated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects.
+#' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
+#' @param n Number of samples to draw.
+#' 
+evaluate.model = function(model, 
+                          result, 
+                          points,
+                          predictor = NULL,
+                          property = "mode",
+                          n = 1) {
   
   # Do we otain our values from sampling or from a property of a summary?
   if ( property == "sample") {
-    if ( inherits(result, "inla") ) {
       smp = inla.posterior.sample.structured(result, n = n) 
-    } else {
-      smp = result
-      n = length(smp)
-    }
-  } 
- 
-  posts = list()
-  
-  for ( eff in effect(model) ){
-    name = eff$label
-    
-    # Values from samples
-    if ( property == "sample") {
-      post = lapply(smp, function(s) {
-        mult = as.vector(s[[name]])
-        if (length(mult) == 1) { as.vector(A[[name]] %*% rep(mult, nrow(A[[name]]))) }
-        else { rowSums(t(t(as.matrix(A[[name]])) * mult)) }})
-    
-    # Values from inla result
-    } else {
-      
-      # Fixed effects
-      if (name %in% rownames(result$summary.fixed)) {
-        post = result$summary.fixed[name, property]
-        post = rep(post, nrow(data.frame(points)))
-        
-      # Hyper parameter
-      } else if (paste0("Beta for ",name) %in% rownames(result$summary.hyperpar)) {
-        
-        post = result$summary.hyperpar[paste0("Beta for ",name), property]
-        post = rep(post, nrow(data.frame(points)))
-        
-        # Random effects
-      } else if (name %in% names(result$summary.random)) {
-        
-        post = A[[name]] %*% result$summary.random[[name]][,property]
-        post = as.vector(post)
-        
-      } else {
-        stop(sprintf("Effect with name %s not found in inla result.", name))
-      }
-      
-    }
-    posts[[name]] = post
-  }
-  if ( property == "sample") {
-    if (!is.null(predictor) && do.sum) { 
-      stop("THIS CODE NEEEDS TO WORK EVEN IF THERE IS ONLE ONE EFFECT")
-      ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,identity)}), posts))
-      ret = lapply(ret, function(r) {eval(predictor, envir = cbind(as.data.frame(t(r)), as.data.frame(points)))})
-    } else {
-      ret = do.call(Map, c(list(function(...){apply(cbind(...),MARGIN=1,sum)}), posts))
-    }
-    ret = lapply(ret, link)
   } else {
-    ret = do.call(cbind, posts)
-    if (!is.null(predictor) && do.sum) { ret = eval(predictor, c(posts, as.list(data.frame(points)))) } 
-    else if ( do.sum ) { ret = apply(ret, MARGIN = 1, sum) }
-    ret = link(ret)
+      smp = rep(list(extract.summary(result, property)), n)
   }
   
-  return(ret)
+  # Which effects do we want? Remove effect from model that are not required for the evaluation
+  if ( is.null(predictor) ) {
+    vars = setdiff(names(smp[[1]]), "Predictor")
+  } else {
+    effs = effect(model)
+    model$effects = effs[intersect(names(effs), all.vars(predictor))]
+    vars = intersect(names(smp[[1]]), all.vars(predictor))
+  }
+
+  # Obtain A-matrices
+  A = list.A.model(model, points)
+  
+  # Make a function that will apply the A-matrices
+  apply.A = function(name, s) {
+      mult = as.vector(s[[name]])
+      if (!is.null(A[[name]])) {
+        if (length(mult) == 1) { as.vector(A[[name]] %*% rep(mult, nrow(A[[name]]))) 
+          }
+        else { as.vector(A[[name]] %*% s[[name]]) }
+      } else { 
+        mult 
+      }
+  }
+  
+
+  for ( k in 1:n ) {
+    # Discard variables we do not need
+    sm = smp[[k]][vars]
+    
+    # Apply A matrices
+    for (label in names(sm)) { if (label %in% vars) sm[[label]] = apply.A(label, sm) }
+    
+    # If no predictor is provided simply return the samples. 
+    # Otherwise evaluate predictor with each sample as an environment
+    if ( is.null(predictor) ) {
+      smp[[k]] = data.frame(sm)
+    } else {
+      smp[[k]] = eval(predictor, envir = c(sm, as.list(data.frame(points))))
+    }
+  }
+  
+  # Return
+  if ( property == "sample") { smp } else { smp[[1]] }
 }
 
 

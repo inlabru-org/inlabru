@@ -29,12 +29,8 @@ nlinla.epunkt = function(model, data, result = NULL) {
   if ( is.null(result) ){
     df = data.frame(matrix(0, nrow = nrow(data.frame(data)), ncol = length(model$effects)))
     colnames(df) = elabels(model)
-    # Obtain initial values from environment of formula
-    # for (eff in model$effects) { if (!is.null(environment(model$formula)[[eff]])) { df[,eff] = environment(model$formula)[[eff]]} }
     df
-  } else {
-    evaluate.model(model, result, data, link = identity, do.sum = FALSE)  
-  }
+  } else { evaluate.model(model, result, data, property = "mode") }
 }
 
 nlinla.reweight = function(A, model, data){
