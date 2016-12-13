@@ -1,21 +1,43 @@
+#' Sample from a log Gaussian Cox process (LGCP)
+#' 
+#'
+#' @aliases sample.lgcp
+#' @export
+#'
+#' @param mesh An \link{inla.mesh} object
+#' @param loglambda A vector of log intensities at the mesh vertices
+#' @param strategy Only applicable to 2D meshes. Use "rectangle" for flat 2D meshes and "spherical" for "sliced-spherical" for spherical meshes. 
+#' @param R Only for spherical meshes. This sets the radius of the sphere approximated by the mesh.
+#'
+#' @return point samples on the mesh
+#' 
+#' @examples 
+#' library(inlabru)
+#' vertices = seq(0, 3, by = 0.1)
+#' mesh = inla.mesh.1d(vertices)
+#' loglambda = 5-0.5*vertices)
+#' pts = sample.lgcp(mesh, loglambda)
+#' pts$y = 0
+#' plot(vertices, exp(loglambda), type = "l", ylim = c(0,150))
+#' points(pts, pch = "|" )
+#'
+#' @examples 
+#' data("gorillanests")
+#' pts = sample.lgcp(gnestmesh, rep(-10, gnestmesh$n))
+#' ggplot() + gg(gnestmesh) + gg(pts)
 
-sample.lgcp = function(mesh, weights, geometry = "euc", strategy = NULL, R = 6371) {
-  
-if (is.null(strategy)) {
-  if ( geometry == "euc" ) { strategy = "bounding-rectangle" }
-  if ( geometry == "geo" ) { strategy = "sliced-spherical"}
-}
+sample.lgcp = function(mesh, loglambda, strategy = "rectangle", R = 6371) {
   
 if (class(mesh) == "inla.mesh.1d") {
   xmin = min(mesh$loc)
   xmax = max(mesh$loc)
   area = xmax - xmin
-  wmax = max(weights)
+  wmax = max(loglambda)
   Npoints = rpois(1, lambda = area * exp(wmax))
   points = runif(n = sum(Npoints), min=xmin, max=xmax)
   A = inla.mesh.project(mesh,points)$A
-  pweights = exp( weights - wmax)
-  pointValues = as.vector(A %*% pweights)
+  ploglambda = exp( loglambda - wmax)
+  pointValues = as.vector(A %*% ploglambda)
   keep = which(runif(Npoints) < pointValues)
   ret = data.frame(points[keep])
   colnames(ret) = "x"
@@ -23,7 +45,7 @@ if (class(mesh) == "inla.mesh.1d") {
   
 } else {
   
-  if ( strategy == "bounding-rectangle") {
+  if ( strategy == "rectangle") {
       
       ###########################################################################
       ## Code for simulating LGCPs on triangulated domains (planar or spherical)
@@ -34,7 +56,7 @@ if (class(mesh) == "inla.mesh.1d") {
       
       ###########################################################################
       ## Code was adapted to accommodate sampling from multiple fields in
-      ## one go. The fields have to be provided as rows in the weights arguments
+      ## one go. The fields have to be provided as rows in the loglambda arguments
       ## Author: Fabian E. Bachl
       ###########################################################################
       
@@ -47,12 +69,12 @@ if (class(mesh) == "inla.mesh.1d") {
       ymax = max(loc[,2])
       area =(xmax- xmin)*(ymax- ymin)
       
-      # If weights is a vector, turn it into a matrix
-      if ( !is.matrix(weights) ){ weights = matrix(weights, nrow = 1) }
+      # If loglambda is a vector, turn it into a matrix
+      if ( !is.matrix(loglambda) ){ loglambda = matrix(loglambda, nrow = 1) }
       
       # Simulate number of points
-      n.fields = dim(weights)[1]
-      lambda_max <- apply(weights, MARGIN = 1, max)
+      n.fields = dim(loglambda)[1]
+      lambda_max <- apply(loglambda, MARGIN = 1, max)
       Npoints <- sapply(1:n.fields, function(x) {rpois(1, lambda = area * exp(lambda_max[x]))})
       
       # Simulate uniform points on the bounding rectangle
@@ -63,19 +85,21 @@ if (class(mesh) == "inla.mesh.1d") {
       
       # Do some thinning
       A <- inla.mesh.project(mesh,points)$A
-      pweights = exp( weights - lambda_max)
-      pointValues = A %*% t(pweights)
+      ploglambda = exp( loglambda - lambda_max)
+      pointValues = A %*% t(ploglambda)
       # Extract value for each point depending on which field the point was created for
       pointValues = pointValues[cbind(seq_along(s), s)]
       keep = which(runif(sum(Npoints)) < pointValues)
       ret = points[keep,]
       attr(ret, "field") = s[keep]
-      return(ret)
+      
+      # What to return
+      ret = ret
   
   } else if ( strategy == "spherical" ) {
     # Simulate number of points
     area =   4*pi*R^2
-    lambda_max <- max(weights)
+    lambda_max <- max(loglambda)
     Npoints <- rpois(n=1,lambda=area*exp(lambda_max))
     if (Npoints > 5000000) { stop(paste0("Too many points!: ",Npoints)) }
   
@@ -90,10 +114,13 @@ if (class(mesh) == "inla.mesh.1d") {
     loc = euc.to.geo(data.frame(x=x,y=y,z=z), R = 1)
     points = as.matrix(loc[,c("lon","lat")])
     A = inla.mesh.project(mesh,points)$A
-    weights = exp(weights - lambda_max)
-    pointValues = as.vector(A%*%weights)
+    loglambda = exp(loglambda - lambda_max)
+    pointValues = as.vector(A%*%loglambda)
     points = points[runif(Npoints) < pointValues,]
-    return(points)
+    
+    # What to return
+    ret = points
+    
   
   } else if ( strategy == "sliced-spherical" ) {
     
@@ -102,8 +129,8 @@ if (class(mesh) == "inla.mesh.1d") {
     lon.rel = abs((lon.range[2]-lon.range[1])/360)
     area = (4*pi*R^2)*lon.rel
     
-    lambda_max <- max(weights)
-    weights = exp(weights - lambda_max)
+    lambda_max <- max(loglambda)
+    loglambda = exp(loglambda - lambda_max)
     Npoints <- rpois(n=1,lambda=area*exp(lambda_max))
     # cat(Npoints)
     sampled.points = list()
@@ -127,7 +154,7 @@ if (class(mesh) == "inla.mesh.1d") {
       
       points = as.matrix(loc[,c("lon","lat")])
       A <- inla.mesh.project(mesh,points)$A
-      pointValues = as.vector(A%*%weights)
+      pointValues = as.vector(A%*%loglambda)
       keep = runif(n.points) < pointValues
       sampled.points[[k]] = points[keep,]
       n.sampled = n.sampled + sum(pointValues == 0)
@@ -135,10 +162,18 @@ if (class(mesh) == "inla.mesh.1d") {
   #   cat(paste0("sp:",sp))
   #   cat(paste0("n.sampled:",n.sampled))
   #   print(paste0("Fraction of points kept: ", n.sampled/Npoints) )
-    return(do.call(rbind,sampled.points))
+    
+    # What to return
+    ret = do.call(rbind,sampled.points)
   }
 
 }
 
+  if ( !is.null(mesh$crs) ) {
+    ret = as.data.frame(ret)
+    coordinates(ret) = c("x","y")
+    proj4string(ret) = mesh$crs
+  }
   
+  ret
 }
