@@ -4,7 +4,7 @@
 \alias{predict.iinla}
 \title{Predictions for iinla objects}
 \usage{
-\method{predict}{iinla}(...)
+predict.iinla(...)
 }
 \description{
 Currently only a shortcut to \link{predict.lgcp}

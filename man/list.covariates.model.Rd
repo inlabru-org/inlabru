@@ -4,7 +4,12 @@
 \alias{list.covariates.model}
 \title{List of covariates effects needed to run INLA}
 \usage{
-\method{list.covariates}{model}(mdl, pts)
+\method{list.covariates}{model}(model, points)
+}
+\arguments{
+\item{model}{An \link{inlabru} \link{model}}
+
+\item{points}{A data fram to extract the data from}
 }
 \description{
 List of covariates effects needed to run INLA

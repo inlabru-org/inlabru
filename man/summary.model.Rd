@@ -4,7 +4,10 @@
 \alias{summary.model}
 \title{Model summary}
 \usage{
-\method{summary}{model}(mdl)
+\method{summary}{model}(model)
+}
+\arguments{
+\item{model}{An \link{inlabru} \link{model}}
 }
 \description{
 Model summary

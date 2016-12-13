@@ -4,7 +4,12 @@
 \alias{list.indices.model}
 \title{List of spde indexing effects needed to run INLA}
 \usage{
-\method{list.indices}{model}(mdl, ...)
+\method{list.indices}{model}(model, points)
+}
+\arguments{
+\item{model}{An \link{inlabru} \link{model}}
+
+\item{points}{A data frame to extract indices from}
 }
 \description{
 List of spde indexing effects needed to run INLA

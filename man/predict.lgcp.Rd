@@ -4,9 +4,9 @@
 \alias{predict.lgcp}
 \title{Predictions based on log Gaussian Cox processes}
 \usage{
-\method{predict}{lgcp}(result, predictor, points = NULL, integrate = NULL,
+predict.lgcp(result, predictor, points = NULL, integrate = NULL,
   samplers = NULL, property = "sample", n = 250, dens = NULL,
-  discrete = FALSE, mcerr = 5e-04, verbose = FALSE)
+  discrete = FALSE, mcerr = 0.01, verbose = FALSE)
 }
 \arguments{
 \item{result}{An lgcp object obtained by calling lgcp()}

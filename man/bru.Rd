@@ -4,18 +4,32 @@
 \alias{bru}
 \title{Spatial model fitting using INLA}
 \usage{
-bru(points, model = NULL, predictor = NULL, mesh = NULL,
-  family = "gaussian", ...)
+bru(points, predictor = y ~ spde + Intercept, model = ~spde(model =
+  inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1,
+  mesh = NULL, run = TRUE, linear = FALSE, E = 1, family = "gaussian",
+  ...)
 }
 \arguments{
 \item{points}{A SpatialPoints[DataFrame] object}
 
+\item{predictor}{A formula stating the data column (LHS) and mathematical expression (RHS) used for predicting.}
+
 \item{model}{a formula describing the model components}
 
 \item{mesh}{An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided}
+
+\item{run}{If TRUE, rund inference. Otherwise only return configuration needed to run inference.}
+
+\item{linear}{If TRUE, do not perform linear approximation of predictor}
+
+\item{E}{Exposure parameter passed on to \link{inla}}
+
+\item{family}{Likelihood family passed on to \link{inla}}
+
+\item{...}{more arguments passed on to \link{inla}}
 }
 \value{
-An \link{inla} object
+A \link{bru} object (inherits from iinla and \link{inla})
 }
 \description{
 Spatial model fitting using INLA

@@ -3,22 +3,25 @@
 \name{evaluate.model}
 \alias{evaluate}
 \alias{evaluate.model}
-\title{Evaluate model at given locations}
+\title{Evaluate or sample from a posterior result given a model and locations}
 \usage{
-\method{evaluate}{model}(model, inla.result, loc, property = "mode",
-  do.sum = TRUE, link = identity, n = 1, predictor = model$expr,
-  use.covariate = TRUE)
+\method{evaluate}{model}(model, result, points, predictor = NULL,
+  property = "mode", n = 1)
 }
 \arguments{
-\item{model}{An iDistance \link{model}}
+\item{model}{An \link{inlabru} \link{model}}
 
-\item{inla.result}{The result of an \link{inla} run or a sample obtained from \link{inla.posterior.sample.structured}}
+\item{result}{Posterior of an \link{inla}, \link{bru} or \link(lgcp) run.}
 
-\item{loc}{Locations and covariates needed to evaluate the model. If \code{NULL}, SPDE models will be evaluated at the mesh coordinates.}
+\item{points}{Locations and covariates needed to evaluate the model.}
 
-\item{property}{Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant" and "sd".}
+\item{predictor}{An expression to be ealuated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects.}
+
+\item{property}{Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).}
+
+\item{n}{Number of samples to draw.}
 }
 \description{
-Compute an approximation to the linear predictor at given locations and gicen coordinates.
+Evaluate or sample from a posterior result given a model and locations
 }
 

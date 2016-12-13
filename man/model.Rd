@@ -2,40 +2,56 @@
 % Please edit documentation in R/model.R
 \name{model}
 \alias{model}
-\title{iDistance models for INLA}
+\title{Models for \link{inlabru}}
 \description{
-Facilitates the spatial modeling approaches using INLA.
-A \code{model} has a formula that describes one or more of INLA's \code{f} objects.
-It describes how given a data frame of locations or other coordinates translates into
-evaluating the predictors of the formula. For manually setting up a \code{model} see the
-constructor \link{make.model}. Useful operators on \code{model} objects are:
-\itemize{
- \item{\link{make.model}: }{Create a model}
- \item{\link{summary}: }{Summarize a model}
- \item{\link{join}: }{Join multiple models}
- \item{\link{evaluate}: }{ Determine the linear predictor's value at some location }
- \item{\link{list.data}: }{ List environmental variables needed to call INLA}
- \item{\link{sample.value}: }{ Sample the linear predictor value for geiven locations}
- \item{\link{sample.points}: }{ Sample spatial points from a log gaussion Cox process model}
- \item{\link{update}: }{ Update the iterator of an axproximative model}
-}
+As with most inference methods inlabru models are set up via model formulae.
+However, inlabru supports a slightly more advanced syntax which separates the name of an
+effect from the name of a covariate. For instance, a very simple formula that inlabru
+can work with is
 }
 \details{
-After running inference plotting aspects of models is straight forward using:
+\code{y ~ myFixedEffect(temperature)}
+
+which defines a latent effect named 'myFixedEffect' with 'tepmerature' as a multiplier.
+Hence, except for explicitly giving a name to the effect, the above formula is equivalent
+to
+
+\code{y ~ temperature}
+
+In fact, the latter will also work in inlabru but the name of the effect will be
+'temperature'. The advantage of having an explicit name for the effect is that it 
+allows for a more sophisticated syntax when making predictions.
+
+In general, inlabru formula components are of the form
+
+MyEffectName(map = aFunctionOfMyData, model = 'modelType', ...)
+
+where
 
 \itemize{
- \item{\link{plot.detfun}: }{Plot detection functions (\link{model.detfun})}
- \item{\link{plot.spatial}: }{Plot a spatial models, e.g. \link{model.spde}}
- \item{\link{plot.marginal}: }{Plot marginal prosterior of any model effect}
+\item{\code{MyEffectName} is an aribtrary string defining the name of the effect}
+\item{\code{map} can be 
+(A) a name of a covariate, 
+(B) a function's name that will be called with your data as a parameter
+(C) an expression that is valid with your data as an environment}
+\item{model} is one of the \link{inla.models}
+\item{... are further arguments passed that inla \link{f} understands}
 }
 
-Some useful default models are:
+Internally, inlabru will construct a \code{model} form the formula that you define
+using the \link{make.model} function. Useful operators on \code{model} objects are:
+
 \itemize{
-\item Intercept: \link{model.intercept}
-\item Fixed effects models: \link{model.fixed}
-\item Detection function models: \link{model.detfun}
-\item Spatial SPDE model \link{model.spde}
-\item Spatial group size model: \link{model.grpsize}
+ \item{\link{summary}: }{ Summarize an \link{inlabru} model }
+ \item{\link{labels}: }{ Character array of effect labels }
+ \item{\link{effect}: }{ Retrieve one or more effects from a model }
+ \item{\link{default}: }{ Default linear predictor expression }
+ \item{\link{list.A}: }{ List A-matrices that will be constructed for the INLA stack }
+ \item{\link{list.data}: }{ List environmental variables needed to call INLA}
+ \item{\link{list.indices}: }{ List indices that will be constructed for the INLA stack}
+ \item{\link{list.effects}: }{ List weights that will be constructed for the INLA stack}
+ \item{\link{evaluate}: }{ Determine the linear predictor's value at some location }
+ 
 }
 }
 

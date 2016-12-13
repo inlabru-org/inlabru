@@ -4,7 +4,12 @@
 \alias{list.A.model}
 \title{List of A matrices needed to run INLA}
 \usage{
-\method{list.A}{model}(mdl, points)
+\method{list.A}{model}(model, points)
+}
+\arguments{
+\item{model}{An \link{inlabru} \link{model}}
+
+\item{points}{Locations to create the A-matrices for}
 }
 \description{
 List of A matrices needed to run INLA

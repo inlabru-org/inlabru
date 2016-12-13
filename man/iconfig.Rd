@@ -4,7 +4,7 @@
 \alias{iconfig}
 \title{Integration point configuration generator}
 \usage{
-iconfig(samplers, points, model, dim.names = NULL)
+iconfig(samplers, points, model, dim.names = NULL, mesh = NULL)
 }
 \arguments{
 \item{samplers}{A Spatial[Points/Lines/Polygons]DataFrame objects}

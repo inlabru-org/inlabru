@@ -4,28 +4,9 @@
 \alias{poiss}
 \title{Poisson regression using INLA}
 \usage{
-poiss(points, model = NULL, predictor = NULL, mesh = NULL,
-  family = "poisson", ...)
-}
-\arguments{
-\item{points}{A data frame or SpatialPointsDataFrame object}
-
-\item{model}{Typically a formula or a \link{model} describing the linear regression predictor. If NULL, an intercept and a spatial SPDE component are used}
-
-\item{predictor}{If NULL, the linear combination defined by the model/formula is used as a predictor for the counts. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.}
-
-\item{mesh}{An inla.mesh object modelling s spatial domain. If NULL, the mesh is constructed from a non-convex hull of the points provided}
-}
-\value{
-An \link{iinla} object
+poiss(...)
 }
 \description{
-This function provides an easy-to-use interface to Poisson regression using INLA, in particular for spatial count data. 
-The \code{points} parameter is used to provide the regression data, e.g. counts, exposures and covariates to regress on.
-The \code{model} parameter, typically a \link{formula}, defines two aspects of the regression. On the left hand side
-the (known) counts as well as the exposures are stated. The right hand side defines the log linear predictor of the 
-regression. For non-linear regression the \code{predictor} parameter can be emplyed to override the linear structure
-implied by the formula. Note that the \link{INLA} \code{family} argument can be overwritten and thereby other INLA 
-likelihoods like the binomial and zero-inflated count models are accessible.
+Poisson regression using INLA
 }
 
