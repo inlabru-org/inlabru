@@ -88,7 +88,7 @@ list.data = function(...){UseMethod("list.data")}
 #' \link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
 #' like the first argument of the f function, e.g.
 #' 
-#' \code{y ~ f(temperature, model = "fixed)}
+#' \code{y ~ f(temperature, model = 'fixed')}
 #' 
 #' is equivalent to
 #' 
@@ -447,7 +447,7 @@ list.indices.model = function(model, points){
 #' @aliases evaluate.model evaluate
 #' @export
 #' @param model An \link{inlabru} \link{model}
-#' @param result Posterior of an \link{inla}, \link{bru} or \link(lgcp) run.
+#' @param result Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.
 #' @param points Locations and covariates needed to evaluate the model.
 #' @param predictor An expression to be ealuated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects.
 #' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).

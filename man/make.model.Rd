@@ -31,7 +31,7 @@ use spatial coordinates as covariates rather than an index into the SPDE vertice
 \link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
 like the first argument of the f function, e.g.
 
-\code{y ~ f(temperature, model = "fixed)}
+\code{y ~ f(temperature, model = 'fixed')}
 
 is equivalent to
 

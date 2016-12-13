@@ -11,7 +11,7 @@
 \arguments{
 \item{model}{An \link{inlabru} \link{model}}
 
-\item{result}{Posterior of an \link{inla}, \link{bru} or \link(lgcp) run.}
+\item{result}{Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.}
 
 \item{points}{Locations and covariates needed to evaluate the model.}
 
