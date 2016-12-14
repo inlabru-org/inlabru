@@ -350,66 +350,75 @@ predict.lgcp = function(result,
                         verbose = FALSE)
   {
   
-  # Extract target dimension from predictor (given as right hand side of formula)
-  dims = setdiff(all.vars(update(predictor, .~0)), ".")
+  # Extract target dimension from predictor (given as left hand side of formula)
+  lhs.dims = setdiff(all.vars(update(predictor, .~0)), ".")
   pchar = as.character(predictor)
   predictor.rhs = pchar[-1]
   predictor = parse(text = predictor.rhs)
   
-  # Alternatively, take dims from points
-  if ( !is.null(points) ) {
-    dims = names(points)
-    icfg.points = points
-  } else {
-    icfg.points = result$sppa$points
-  }
-  
-  
   # Dimensions we are integrating over
   idims = integrate
   
+  # CAT
+  cat(sprintf("---- Input ----- \n"))
+  cat(sprintf("LHS : %s \n", paste0(lhs.dims, collapse = ", ")))
+  cat(sprintf("integrate : %s \n", paste0(idims, collapse = ", ")))
+  cat(sprintf("points : %s \n", paste0(names(points), collapse = ", ")))
+  
   # Determine all dimensions of the process (pdims)
-  pdims = names(result$iconfig)
+  # pdims = names(result$iconfig)
   
-  # Check for ambiguous dimension definition
-  if (any(idims %in% dims)) { stop("The left hand side of the predictor contains dimensions you want to integrate over. Remove them.") }
+  cat(sprintf("---- Generated points ----- \n"))
   
-  # Collect some information that will be useful for plotting
-  misc = list(predictor = predictor.rhs, dims = dims, idims = idims, pdims = pdims)
-  type = "1d"
   
-  # Generate points for dimensions to integrate over
-  wicfg = iconfig(NULL, result$sppa$points, result$model, idims)
-  wips = ipoints(samplers, wicfg[idims])
+  ## Generate points for dimensions to integrate over
+  ## Skip dimensions that are given via points
+  gen.idims = setdiff(idims, names(points))
+  if ( length(gen.idims) > 0 ) {
+    wicfg = iconfig(NULL, result$sppa$points, result$model, gen.idims)
+    wips = ipoints(samplers, wicfg[gen.idims])
+  } else { wips = NULL }
+  cat(sprintf("wips dims : %s \n", paste0(names(wips), collapse = ", ")))
+
   
-  if ( length(dims) == 0 ) {
-    pts = wips
-    if ( is.null(pts) ) { pts = data.frame(integral = 1) }
-    type = "full" 
-  } else {
-    # If no points for return dimensions were supplied we generate them
-    if (is.null(points)) {
-      icfg = iconfig(NULL, result$sppa$points, result$model, dims, mesh = result$sppa$mesh)
-      rips = ipoints(NULL, icfg[dims])
-      rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
-      # Sort by value in dimension to plot over. Prevents scrambles prediction plots.
-      if (!(dims[1] == "coordinates") & (length(dims)==1)) {rips = rips[sort(rips[,dims], index.return = TRUE)$ix,,drop=FALSE]}
-    } else {
-      rips = points
-    }
-    # Merge in integrations points if we are integrating
-    if ( !is.null(wips) ) {
-      pts = merge(rips, wips, by = NULL)
-      if (!is.data.frame(pts)) {coordinates(pts) = coordnames(rips)}
-    } else {
-      pts = rips
-      pts$weight = 1
-      # Generate ifcg to set attribs of return value
-      icfg = iconfig(NULL, icfg.points, result$model, dims, mesh = result$sppa$mesh)
-    }
-    
-    # if ("coordinates" %in% dims ) { coordinates(pts) = coordnames(rips) }
-  }
+  ## Generate points from predictor LHS
+  ## Skip dimensions that we are integrating over or that are given via points
+  gen.rdims = setdiff(lhs.dims, c(names(wips), names(points)))
+  if ( length(gen.rdims) > 0 ) {
+    icfg = iconfig(NULL, result$sppa$points, result$model, gen.rdims, mesh = result$sppa$mesh)
+    rips = ipoints(NULL, icfg[gen.rdims])
+    rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
+    # Sort by value in dimension to plot over. Prevents scrambles prediction plots.
+    if (!(gen.rdims[1] == "coordinates") & (length(gen.rdims)==1)) {rips = rips[sort(rips[,gen.rdims], index.return = TRUE)$ix,,drop=FALSE]}
+  } else { rips = NULL }
+  cat(sprintf("rips dims : %s \n", paste0(names(rips), collapse = ", ")))
+  
+  ## Provided points
+  cat(sprintf("points : %s \n", paste0(names(points), collapse = ", ")))
+  
+  ## MERGE 
+  all = list()
+  if (!is.null(points)) { all = c(all, list(points))}
+  if (!is.null(wips)) { all = c(all, list(wips))}
+  if (!is.null(rips)) { all = c(all, list(rips))}
+  if( length(all)>1 ) { pts = do.call(merge, all)} else { pts = all[[1]] }
+  cat(sprintf("pts dims : %s \n", paste0(names(pts), collapse = ", ")))
+  
+  
+  remain = list()
+  if (!is.null(points)) { remain = c(remain, list(points))}
+  if (!is.null(rips)) { remain = c(remain, list(rips))}
+  if( length(remain)>1 ) { remain = do.call(merge, remain)} 
+  else if (length(remain) ==1 ) { remain = remain[[1]] } 
+  else { remain = NULL }
+  dims = names(remain)
+  if ( inherits(remain, "SpatialPoints") ) dims = c("coordinates", dims)
+  cat(sprintf("remain dims : %s \n", paste0(dims, collapse = ", ")))
+  
+  ## Some additional info for plotting
+  misc = list(predictor = predictor.rhs, dims = dims, idims = idims, pdims = names(pts))
+  
+  ## Define the sampling function 
   
   sample.fun = function(n) {
     vals = evaluate.model(model = result$sppa$model, result = result, points = pts, property = property, n = n, predictor = predictor)
@@ -427,13 +436,11 @@ predict.lgcp = function(result,
         integral = lapply(integral, function(s) {list(integral=s)})
       } else {
         # If we are integrating over space we have to turn the coordinates into data that the by() function understands
-        if ("coordinates" %in% dims ) { by.coords = cbind(1:nrow(rips), pts@data[,c(setdiff(dims, "coordinates"))]) } 
+        if ("coordinates" %in% dims ) { by.coords = cbind(1:nrow(remain), pts@data[,c(setdiff(dims, "coordinates"))]) } 
         else { by.coords = pts[,dims]}
         integral = do.call(rbind, by(vals, by.coords, colSums))
-        # integral = summarize(integral, x = as.data.frame(rips))
-        # if ("coordinates" %in% dims ) { coordinates(integral) = coordnames(rips) }
       }
-    } else { integral = vals}
+    } else { integral = vals }
 
     integral
   }
@@ -465,24 +472,24 @@ predict.lgcp = function(result,
   # This is the case when predicting in more than one dimensions.
   # Calculating the exact posterior in this case is not implemented yet
   else {
-  
+    type = "1d"
     smp = sample.fun(n)
-    prd = summarize(smp, x = as.data.frame(rips))
-    if ("coordinates" %in% dims ) { coordinates(prd) = coordnames(rips) }
+    prd = summarize(smp, x = as.data.frame(remain))
     
-    if (inherits(prd, "SpatialPointsDataFrame")){
+    if ("coordinates" %in% dims ) { 
       type = "spatial"
+      coordinates(prd) = coordnames(rips) 
       misc$p4s = icfg$coordinates$p4s
       misc$cnames = icfg$coordinates$cnames
       misc$mesh = icfg$coordinates$mesh
       prd = as.data.frame(prd)
-    }
+      }
     
     attr(prd, "samples") = smp
     attr(prd, "total.weight") = sum(pts$weight)
     attr(prd, "type") = type
     attr(prd, "misc") = misc
-    class(prd) = c("prediction",class(prd))
+    class(prd) = c("prediction", class(prd))
   }
   
   prd
