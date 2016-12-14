@@ -166,3 +166,22 @@ save.seals = function(...) {
 }
 
 
+
+import.gorillas = function() {
+
+  data("gorillanests") 
+  
+  # data("gorillanestPlots")
+  
+  gorillas = list(nests = gnests, 
+                  boundary = gnestboundary,
+                  elevation = g_raster_elevation,
+                  mesh = gnestmesh)
+  
+}
+
+save.gorillas = function(...) {
+  gorillas = import.gorillas(...)
+  save("gorillas", file=paste0(system.file("data",package="inlabru"),"/gorillas.RData"))
+}
+
