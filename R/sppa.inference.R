@@ -14,37 +14,39 @@
 #' @return A \link{bru} object (inherits from iinla and \link{inla})
 
 bru = function(points,
-               predictor = y ~ spde + Intercept,
-               model = ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
+               predictor = . ~ .,
+               model = y ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh),
                mesh = NULL, 
                run = TRUE,
                linear = FALSE, 
                E = 1,
                family = "gaussian", ...) {
   
-  # Construct default mesh
-  if ( is.null(mesh) ) { mesh = default.mesh(points) }
+  
+  # Automatically complete moel and predictor
+  ac = autocomplete(model, predictor, points, mesh)
+  
+  # If automatic completion detected linearity, expr to NULL
+  if ( ac$linear ) ac$expr = NULL
   
   # Turn model formula into internal bru model
-  model = make.model(model)
+  model = make.model(ac$model)
   
-  # Set model$expr as RHS of predictor 
-  pred.rhs = parse(text = as.character(predictor)[3])
-  if ( !linear ) { model$expr = pred.rhs } else { model$expr = NULL }
+  # Extract LHS data
+  y = as.data.frame(points)[, ac$lhs]
   
-  # Extract y as from left hand side of the predictor
-  pred.lhs = all.vars(update(predictor, .~0))
-  y = as.data.frame(points)[,pred.lhs]
+  ######### This is where the actual inference begins
   
   # Create the stack
-  stk = function(points, model) { detection.stack(points, model = model, y = y, E = E) }
+  stk = function(points, model) { make.stack(points = points, model = model, expr = ac$expr, y = y, E = E) }
   
   # Run iterated INLA
   if ( run ) { result = iinla(points, model, stk, family = family, ...) } 
   else { result = list() }
   
-  # Create result object
-  result$sppa$expr = pred.rhs
+  
+  ########## Create result object
+  result$sppa$expr = ac$expr
   result$sppa$method = "bru"
   result$sppa$model = model
   result$sppa$points = points
@@ -142,41 +144,24 @@ lgcp = function(points,
                 samplers = NULL, 
                 model = ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
                 predictor = coordinates ~ spde + Intercept, 
-                mesh = NULL, 
+                mesh = NULL,
+                run = TRUE,
                 scale = NULL,
                 append = NULL, 
                 ...) {
   
-  if ( is.null(mesh) ) { mesh = default.mesh(points) }
+  # Automatically complete moel and predictor
+  ac = autocomplete(model, predictor, points, mesh)
   
-  # Backwards compatibility: 
-  # - If model has left hand side use it as left hand side of predictor
-  # - If predictor is default use sum of effects in model as predictor RHS
-  if (length(as.character(model)) == 3 ) { #( length(as.character(mdl)) == 3 )
-    message("Note: You are using the old syntax where the left hand side of model defines the dimensions of the LGCP. Please use the LHS of predictor in the future.")
-    prd.lhs = as.formula(paste0(paste(  all.vars(update.formula(model, .~0))  , collapse = " + "), "~."))
-    if ( inherits(predictor, "expression") ) { predictor = as.formula(paste0("~", as.character(predictor))) }
-    predictor = update.formula(predictor, prd.lhs)
-    tmp = make.model(model)
-    # if (!(toString(model) == toString(. ~ g(spde, model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1))){
-    #   prd.rhs = as.formula(paste0(".~ ", paste(tmp$effects, collapse = " + ")))
-    #   predictor = update.formula(predictor, prd.rhs)
-    # } 
-  }
+  # If automatic completion detected linearity, expr to NULL
+  if ( ac$linear ) ac$expr = NULL
   
   # Turn model formula into internal bru model
-  model = make.model(model)
-  
-  # Set model$expr as RHS of predictor
-  if ( inherits(predictor, "formula") ) {
-    model$expr = parse(text = as.character(predictor)[3])
-  }
-  
-  # Figure out LGCP dimensions. This is the left hand side of the predictor
-  model$dim.names = all.vars(update(predictor, .~0))
-    
+  model = make.model(ac$model)
+
   # Create integration points
-  icfg = iconfig(samplers, points, model, mesh = mesh)
+  model$dim.names = ac$lhs # workaround :(
+  icfg = iconfig(samplers, points, model, mesh = ac$mesh)
   ips = ipoints(samplers, icfg)
   
   # Apend covariates to points and integration points
@@ -196,11 +181,15 @@ lgcp = function(points,
 
   # Stack
   stk = function(points, model) { 
-    inla.stack(detection.stack(points, model = model), 
-               integration.stack(scheme = ips, model = model)) 
+    inla.stack(make.stack(points = points, model = model, expr = ac$expr, y = 1, E = 0), 
+               make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = ips$weight)) 
   }
   
-  result = iinla(points, model, stk, family = "poisson", ...)
+  # Run iterated INLA
+  if ( run ) { result = iinla(points, model, stk, family = "poisson", ...) } 
+  else { result = list() }
+  
+  ########## Create result object
   result$mesh = mesh
   result$sppa$mesh = mesh
   result$ips = ips
@@ -639,15 +628,13 @@ summarize = function(data, x = NULL, gg = FALSE) {
 #' @return An \link{inla} object
 
 
-iinla = function(data, model, stackmaker, n = NULL, result = NULL, 
+iinla = function(data, model, stackmaker, n = 10, result = NULL, 
                  iinla.verbose = iinla.getOption("iinla.verbose"), 
                  control.inla = iinla.getOption("control.inla"), 
                  control.compute = iinla.getOption("control.compute"), ...){
   
-  if ( iinla.verbose ) { cat("iinla(): Let's go.\n") }
-  
-  # Default number of maximum iterations
-  if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
+  # # Default number of maximum iterations
+  # if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
   
   # Track variables?
   track = list()
@@ -710,4 +697,84 @@ iinla = function(data, model, stackmaker, n = NULL, result = NULL,
   result$iinla$track = do.call(rbind, track)
   class(result) = c("iinla", "inla", "list")
   return(result)
+}
+
+
+
+#' Automatically complete model and predictor:
+#' - Set RHS and LHS
+#' - Add intercept
+#' - Add mesh if needed
+#' - substitute . with default SPDE model
+#'
+autocomplete = function(model, predictor, points, mesh) {
+  
+  
+  # Automatically insert default SPDE model
+  env = environment(model)
+  model = update.formula(~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh), model)
+  environment(model) = env
+  
+  # Automatically add intercept
+  env = environment(model)
+  if (attr(terms(model),"intercept")) {
+    model = update.formula(model, . ~ . + Intercept-1)
+  } 
+  environment(model) = env
+  
+  # If predictor RHS has "." fill in effect names of model
+  apred = auto.pred(model,predictor)
+  
+  # If RHS has "." we know that the predictor is linear
+  linear = !(predictor == apred)
+  
+  # Set predictor to automatically generated one
+  predictor = apred
+  
+  # Set model$expr as RHS of predictor 
+  expr = parse(text = as.character(predictor)[3])
+  
+  # Extract y as from left hand side of the predictor
+  lhs = all.vars(update(predictor, .~0))
+  
+  # Add mesh to model environment if needed
+  if ( "mesh" %in% all.vars(model) & !("mesh" %in% names(environment(model)))) {
+    if ( is.null(mesh) ) { mesh = default.mesh(points) }
+    environment(model)$mesh = mesh
+  }
+  
+  
+  return(list(model = model, 
+              predictor = predictor,
+              linear = linear,
+              lhs = lhs,
+              expr = expr,
+              mesh = mesh))
+  
+}
+
+
+#'
+#' A helper function used in autocomplete()
+#'
+auto.pred = function(model, predictor) {
+  
+  # Predictor LHS
+  auto.pred.lhs = function(predictor, model){
+    lhs = as.character(predictor)[2]
+    if (lhs == ".") { lhs = as.character(model)[2] }
+    lhs
+  }
+  
+  # Predictor RHS
+  auto.pred.rhs = function(model) {
+    imodel = make.model(model)
+    paste0(elabels(imodel), collapse = " + ")
+  }
+  
+  # Predictor RHS is dot?
+  if ( as.character(predictor)[3] == "." ) {
+    predictor = as.formula(paste0(auto.pred.lhs(predictor,model)," ~ ",  paste0(auto.pred.rhs(model))))
+  }
+  predictor
 }

@@ -1,10 +1,16 @@
 iinla.env = new.env()
+iinla.env$log = sprintf("inlabru @ %s", date())
 
 init.tutorial = function() {
   cat("Setting defaults for tutorial session. \n")
   iinla.setOption("iinla.verbose", list(TRUE))
   iinla.setOption("control.inla", list(list(int.strategy = "'eb'")))
   iinla.setOption("control.compute", list(list(config = TRUE, dic = TRUE, waic = TRUE)))
+}
+
+msg = function(txt) {
+  if ( iinla.getOption("iinla.verbose") ) { cat(paste0(txt,"\n")) }
+  iinla.env$log = c(iinla.env$log, txt)
 }
 
 iinla.getOption = function (option = c("control.compute", "control.inla","iinla.verbose")) 

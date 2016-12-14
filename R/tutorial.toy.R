@@ -2,7 +2,7 @@ toy.completesample = function(lambda = function(loc) { 1000 * dnorm(coordinates(
   set.seed(seed)
   bnd = inla.mesh.segment(loc = rbind(c(-5,-5), c(5,-5), c(5,5), c(-5,5)))
   mesh = inla.mesh.2d(interior = bnd, max.edge = 1)
-  sp = SpatialPoints(sample.lgcp(mesh, log(lambda(SpatialPoints(mesh$loc))), geometry = "euc"))
+  sp = SpatialPoints(sample.lgcp(mesh, log(lambda(SpatialPoints(mesh$loc)))))
   return(list(points = sp, mesh = mesh))
 }
 

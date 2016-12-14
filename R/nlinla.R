@@ -30,11 +30,12 @@ nlinla.epunkt = function(model, data, result = NULL) {
     df = data.frame(matrix(0, nrow = nrow(data.frame(data)), ncol = length(model$effects)))
     colnames(df) = elabels(model)
     df
-  } else { evaluate.model(model, result, data, property = "mode") }
+  } else { 
+    evaluate.model(model, result, data, property = "mode") 
+    }
 }
 
-nlinla.reweight = function(A, model, data){
-  expr = model$expr
+nlinla.reweight = function(A, model, data, expr){
   epkt = nlinla.epunkt(model, data, result = model$result)
   ae = nlinla.taylor(expr, epkt, data)
   for ( k in 1:length(A) ) {
