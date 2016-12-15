@@ -49,7 +49,7 @@ gg = function(data, ...) {
   if (inherits(data, "SpatialPoints") | inherits(data, "SpatialPointsDataFrame")) gg.point(data, ...)
   else if (inherits(data, "SpatialLines") | inherits(data, "SpatialLinesDataFrame")) gg.segment(data, ...)
   else if (inherits(data, "SpatialPolygons") | inherits(data, "SpatialPolygonsDataFrame")) gg.polygon(data, ...)
-  else if (inherits(data, "inla.mesh")) gg.mesh(data, ...)
+  else if (inherits(data, "inla.mesh") || inherits(data, "inla.mesh.1d")) gg.mesh(data, ...)
 }
 
 #' ggmap geom for spatial objects
@@ -133,21 +133,32 @@ gg.polygon = function(data, crs = NULL, colour = "black", alpha = 0.1, ...) {
 #' @aliases gg.mesh
 #' @name gg.mesh
 #' @export
-#' @param data A \link{dsdata} object or a \link{inla.mesh}
+#' @param mesh A inla.mesh or inla.mesh.1d object
 #' @param color Color of the mesh
 #' @return A ggplot2 object
 #' 
 
-gg.mesh = function(data, crs = NULL, color = rgb(0,0,0,0.1), ...) {
-  if ( class(data)[1] == "inla.mesh" ) { mesh = data } else { mesh = data$mesh }
-  if ( mesh$manifold == "S2" ) { stop("Geom not implemented for spherical meshes (manifold = S2)" ) }
-  if ( !is.null(crs) ) { mesh = inla.spTransform(mesh, CRSobj = crs)}
-  
-  df = rbind(data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]),
+gg.mesh = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
+
+  if ( inherits(mesh, "inla.mesh") ) {
+    if ( mesh$manifold == "S2" ) { stop("Geom not implemented for spherical meshes (manifold = S2)" ) }
+    if ( !is.null(crs) ) { mesh = inla.spTransform(mesh, CRSobj = crs)}
+    
+    df = rbind(data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]),
                data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
                data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]))
-  colnames(df) = c("x","y","xend","yend")
-  gg = geom_segment(data = df, aes(x = x,y = y, xend = xend, yend = yend), color = color, ...)
+    colnames(df) = c("x","y","xend","yend")
+    gg = geom_segment(data = df, aes(x = x,y = y, xend = xend, yend = yend), color = color, ...)
+  
+  } else if ( inherits(mesh, "inla.mesh.1d") ) {
+    df = data.frame(x = mesh$loc, y = 0)
+    gg = geom_point(data = df, mapping = aes(x,y), shape = shape, ...)
+    
+  } else {
+    stop(sprintf("Can't deal with mesh of class %s", class(mesh)))
+  }
+  
+  
   return(gg)
 }
 
