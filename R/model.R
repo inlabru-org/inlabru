@@ -334,6 +334,13 @@ list.data.model = function(model){
   
   # Remove previous inla results. For some reason these slow down the next INLA call.
   elist = elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
+  
+  # Remove functions. This can cause problems as well
+  elist = elist[unlist(lapply(elist, function(x) !is.function(x)))]
+  
+  # Remove functions. This can cause problems as well
+  elist = elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
+  
 }
 
 #' List of covariates effects needed to run INLA
