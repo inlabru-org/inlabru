@@ -32,7 +32,7 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
   points$bin = rep(1:nbins,each = nint)
   
   # Predict
-  prd = predict(r, predictor = predictor, points = points, ...)
+  prd = predict(result, predictor = predictor, points = points, ...)
   
   # Integrate per bin
   smp = attr(prd,"samples")
