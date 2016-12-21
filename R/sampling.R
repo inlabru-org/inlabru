@@ -29,8 +29,8 @@
 sample.lgcp = function(mesh, loglambda, strategy = "rectangle", R = 6371) {
   
 if (class(mesh) == "inla.mesh.1d") {
-  xmin = min(mesh$loc)
-  xmax = max(mesh$loc)
+  xmin = mesh$interval[1]
+  xmax = mesh$interval[2]
   area = xmax - xmin
   wmax = max(loglambda)
   Npoints = rpois(1, lambda = area * exp(wmax))
