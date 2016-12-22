@@ -59,14 +59,23 @@ k = 1
 for ( g in unique(group) ) {
   gloc = loc[group==g, ]
   # Check where the polygon intersects with the mesh edges
-  sp = gloc[1:nrow(gloc),]
-  ep = rbind(gloc[2:nrow(gloc),], gloc[1,])
+  sp = gloc[1:(nrow(gloc)-1),]
+  ep = gloc[2:nrow(gloc),]
   sloc = split.lines(mesh, sp, ep, filter.zero.length = FALSE)$split.loc[,1:2]
   if (!is.null(sloc)){ colnames(sloc) = colnames(loc) }
   # plot(mesh) ; points(sp) ; points(ep) ; points(sloc)
   bloc = rbind(gloc, sloc[,1:2])
   bnd = inla.mesh.segment(loc = bloc)
   imesh = inla.mesh.create(boundary = bnd, loc = mesh$loc[,1:2])
+  
+  # This is a workaround for when imesh has no vertices. The cause for that is not clear.
+  if(nrow(imesh$loc)==0) { 
+    imesh = inla.mesh.2d(loc.domain = sloc, loc = mesh$loc[,1:2], 
+                       boundary = bnd, 
+                       max.edge = sqrt(2*max(diff(range(sloc[,1])), diff(range(sloc[,2])))^2))
+  }
+  
+  
   # plot(mesh); 
   # plot(imesh, add = TRUE)
   ips = data.frame(imesh$loc[,1:2])
