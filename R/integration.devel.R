@@ -68,12 +68,11 @@ for ( g in unique(group) ) {
                        max.edge =  sqrt(2*max(diff(range(sloc[,1])), diff(range(sloc[,2])))^2))
   
   ii = is.inside(imesh, mesh$loc)
-
+  
   imesh = inla.mesh.2d(loc.domain = sloc,
-                       mesh$loc[ii,],
+                       loc = mesh$loc[ii,1:2, drop = FALSE],
                        max.edge =  sqrt(2*max(diff(range(sloc[,1])), diff(range(sloc[,2])))^2))
-  
-  
+
   ips = data.frame(imesh$loc[,1:2])
   colnames(ips) = c("x","y")
   ips$weight = diag(as.matrix(inla.mesh.fem(imesh)$c0))
