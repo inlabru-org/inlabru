@@ -341,6 +341,7 @@ list.data.model = function(model){
   # Remove functions. This can cause problems as well
   elist = elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
   
+  elist = elist[names(elist) %in% all.vars(model$formula)]
 }
 
 #' List of covariates effects needed to run INLA
