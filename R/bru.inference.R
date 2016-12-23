@@ -142,8 +142,8 @@ poiss = function(...) {
 
 lgcp = function(points, 
                 samplers = NULL, 
-                model = ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
-                predictor = coordinates ~ spde + Intercept, 
+                model = coordinates ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
+                predictor = . ~ ., 
                 mesh = NULL,
                 run = TRUE,
                 scale = NULL,
