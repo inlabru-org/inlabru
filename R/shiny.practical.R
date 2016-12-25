@@ -21,6 +21,15 @@ shinyApp(server = shinyServer(function(input, output) {
     do.gam = 1 %in% input$method
     do.bru = 2 %in% input$method
     do.lgcp = 3 %in% input$method
+    do.brupcp = 4 %in% input$method
+    do.lgcppcp = 5 %in% input$method
+    
+   
+    range0 = input$range0
+    sigma0 = input$sigma0
+    
+    # Seed
+    set.seed(input$seed)
     
     #' Prediction data
     preddata = data.frame(x = seq(xmin, xmax, length.out = 200))
@@ -32,10 +41,10 @@ shinyApp(server = shinyServer(function(input, output) {
     dflambda = data.frame(x = preddata$x, intensity = lambda(preddata$x), method = "lambda")
     
     #' Sample from intensity
-    #set.seed(123)
+    #
     x = seq(xmin, xmax, length.out=100)
     y = lambda(x)
-    mesh <- inla.mesh.1d(x, degree = 1)
+    mesh <- inla.mesh.1d(x, degree = 1, boundary = input$boundary)
     pts = sample.lgcp(mesh, log(lambda(x)))
     
     #' Histogram
@@ -55,14 +64,14 @@ shinyApp(server = shinyServer(function(input, output) {
     
     # bru inference
     if (do.bru) {
-      
       mdl = ~ mySPDE(map=x, model = inla.spde2.matern(mesh), mesh = mesh) + Intercept -1
       prd = count ~ mySPDE + Intercept
       rbru = bru(hst, model = mdl, predictor = prd, E = hst$exposure, n = 1, family = "poisson")
-      
       dbru = predict(rbru, ~ exp(mySPDE + Intercept), points = preddata)
       dfbru = data.frame(x = dbru$x, intensity = dbru$mean, method = "bru")
     } else {dfbru = NULL}
+    
+    
     
     # LGCP inference
     if (do.lgcp) {
@@ -73,7 +82,25 @@ shinyApp(server = shinyServer(function(input, output) {
       dflgcp = data.frame(x = dlgcp$x, intensity = dlgcp$mean, method = "lgcp")
     } else {dflgcp = NULL}
     
-    df = rbind(dflambda, dfgam, dfbru, dflgcp)
+    # bru with pc prior inference
+    if (do.brupcp) {
+      mdl = ~ mySPDE(map=x, model = inla.spde2.pcmatern(mesh, prior.range = c(range0, NA), prior.sigma = c(1,NA)), mesh = mesh) + Intercept -1
+      prd = count ~ mySPDE + Intercept
+      rbru = bru(hst, model = mdl, predictor = prd, E = hst$exposure, n = 1, family = "poisson")
+      dbrupcp = predict(rbru, ~ exp(mySPDE + Intercept), points = preddata)
+      dfbrupcp = data.frame(x = dbrupcp$x, intensity = dbrupcp$mean, method = "bru pcprior")
+    } else {dfbrupcp = NULL}
+    
+    # LGCP with pc prior inference
+    if (do.lgcppcp) {
+      mdl = ~ mySPDE(map=x, model = inla.spde2.pcmatern(mesh, prior.range = c(range0, NA), prior.sigma = c(1,NA)), mesh = mesh) + Intercept -1
+      prd = x ~ mySPDE + Intercept
+      rlgcp = lgcp(points = pts, model = mdl, predictor = prd, n = 1)
+      dlgcppcp = predict(rlgcp, ~ exp(mySPDE + Intercept), points = preddata)
+      dflgcppcp = data.frame(x = dlgcppcp$x, intensity = dlgcppcp$mean, method = "lgcp pcprior")
+    } else {dflgcppcp = NULL}
+    
+    df = rbind(dflambda, dfgam, dfbru, dflgcp, dfbrupcp, dflgcppcp)
     ggplot() + 
       geom_line(data = df,  mapping = aes(x,y=intensity,color=method)) +
       geom_point(data=pts,aes(x=x), y=0.2,shape="|",cex=4,alpha=0.4) +
@@ -106,10 +133,34 @@ ui = shinyUI(fluidPage(
                   max = 10,
                   value = 0.4,
                   step = 0.1),
+      
+      numericInput("seed","Seed", 1234, min = 1, max = 5000, step = 1),
+      
+      textInput("ifun","Lambda", value = "lambda_1D(x)"),
+      
       checkboxGroupInput("method", label = h3("Method"), 
-                         choices = list("gam" = 1, "bru" = 2,"lgcp" = 3),
+                         choices = list("gam" = 1, "bru" = 2,"lgcp" = 3, "bru with fixed pc prior" = 4, "lgcp with fixed pc prior" = 5),
                          selected = c()),
-      textInput("ifun","Intensity function", value = "lambda_1D(x)")
+      
+      sliderInput("range0",
+                  "PC prior range_0",
+                  min = 1,
+                  max = 50,
+                  value = 5),
+      
+      sliderInput("sigma0",
+                  "PC prior sigma_0",
+                  min = 0.1,
+                  max = 10,
+                  value = 1,
+                  step = 0.1),
+      
+      selectInput("boundary", "bru/lgcp boundary",
+                  c("free" = "free",
+                    "neumann" = "neumann"))
+      
+      
+      
     ),
     
     # Show a plot of the generated distribution
