@@ -14,7 +14,7 @@ shinyApp(server = shinyServer(function(input, output) {
     # input$bins = 50
     # input$imult = 1
     
-    xmin = 1
+    xmin = 0
     xmax = 55
     breaks = seq(xmin, xmax, length.out = input$bins+1)
     
@@ -37,7 +37,9 @@ shinyApp(server = shinyServer(function(input, output) {
     preddata = data.frame(x = seq(xmin, xmax, length.out = 200))
     
     #' Load the intensity function shown in slides:
-    data("lgcp1D")
+    data("Poisson1_1D")
+    data("Poisson2_1D")
+    data("Poisson3_1D")
     lambda = function(x) lambda_1D(x) * input$imult
     lambda = function(x) eval(parse(text = input$ifun)) * input$imult
     dflambda = data.frame(x = preddata$x,
@@ -61,7 +63,7 @@ shinyApp(server = shinyServer(function(input, output) {
     #' GAM inference
     if (do.gam) {
       library(mgcv)
-      fit.gam = gam(count ~ s(x), offset=log(exposure), data = hst, family = poisson())
+      fit.gam = gam(count ~ s(x,k=input$bins), offset=log(exposure), data = hst, family = poisson())
       rgam = exp(predict(fit.gam, newdata = preddata))
       dfgam = data.frame(x = preddata$x, mean = rgam, method = "gam", uq = NA, lq = NA, median = NA, sd = NA)
     } else {dfgam = NULL}
@@ -153,7 +155,7 @@ ui = shinyUI(fluidPage(
       
       numericInput("seed","Seed", 1234, min = 1, max = 5000, step = 1),
       
-      textInput("ifun","Lambda", value = "lambda_1D(x)"),
+      textInput("ifun","Lambda", value = "lambda2_1D(x)"),
       
       checkboxGroupInput("method", label = "Method", 
                          choices = list("gam" = 1, "bru" = 2,"lgcp" = 3, "bru with fixed pc prior" = 4, "lgcp with fixed pc prior" = 5),
