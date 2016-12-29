@@ -6,7 +6,7 @@
 #' 
 #' @usage data(gorillanests)
 #' 
-#' @format The data contain these objects:
+#' @format The data are a list that contains these elements:
 #'  \describe{
 #'    \item{\code{gnests}:}{ A \code{SpatialPointsDataFrame} object containing the locations of 
 #'    the gorilla nests.}
@@ -57,8 +57,17 @@
 #' 26 (6), 793–811.
 #' 
 #' @examples
-#'  data(gorillanests)
+#'  data(gorillanests) # get the data
+#'  # extract all the objects, for convenience:
+#'  gnests=gorillanests$gnests
+#'  gnestmesh=gorillanests$gnestmesh
+#'  gnestboundary=gorillanests$gnestboundary
+#'  gcov=gorillanests$gcov
+#'  gnestsamples=gorillanests$gnestsamples
+#'  
+#'  # plot all the nests, mesh and boundary
 #'  ggplot()+gg(gnestmesh,lwd=0.1)+gg(gnestboundary)+gg(gnests,pch="+",cex=2)
+#'  
 #'  #' plot the raster file with elevations
 #'  plot(gcov$elevation) 
 #'  # inlabru needs a SpatialPointsDataFrame, so convert raster to SpatialPointsDataFrame
