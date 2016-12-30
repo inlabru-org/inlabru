@@ -359,6 +359,9 @@ predict.lgcp = function(result,
   # Alternatively, take dims from points
   if ( !is.null(points) ) {
     dims = names(points)
+    if ( inherits(points, "Spatial") ) { dims = c(dims, "coordinates") }
+    if ( !inherits(points, "SpatialPointsDataFrame") ) { 
+      points = SpatialPointsDataFrame(points, data = data.frame(weight = rep(1, nrow(coordinates(points)))))}
     icfg.points = points
   } else {
     icfg.points = result$sppa$points
