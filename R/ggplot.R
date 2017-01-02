@@ -50,6 +50,7 @@ gg = function(data, ...) {
   else if (inherits(data, "SpatialLines") | inherits(data, "SpatialLinesDataFrame")) gg.segment(data, ...)
   else if (inherits(data, "SpatialPolygons") | inherits(data, "SpatialPolygonsDataFrame")) gg.polygon(data, ...)
   else if (inherits(data, "inla.mesh") || inherits(data, "inla.mesh.1d")) gg.mesh(data, ...)
+  else if (inherits(data, "RasterLayer")) gg.RasterLayer(data, ...)
 }
 
 #' ggmap geom for spatial objects
@@ -160,6 +161,25 @@ gg.mesh = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
   
   
   return(gg)
+}
+
+#' Plot RasterLayer using ggplot2
+#' 
+#' @aliases gg.RasterLayer
+#' @name gg.RasterLayer
+#' @export
+#' @param r A RasterLayer object
+#' @return A ggplot2 object
+#' 
+
+gg.RasterLayer = function(r) {
+  
+  library(raster)
+  spdf <- as(r, "SpatialPixelsDataFrame")
+  df <- as.data.frame(spdf)
+  # head(r.df)
+  # g <- ggplot(r.df, aes(x=x, y=y)) + geom_tile(aes(fill = layer)) + coord_equal()
+  geom_tile(data = df, mapping = aes(x=x, y=y, fill = layer))
 }
 
 
