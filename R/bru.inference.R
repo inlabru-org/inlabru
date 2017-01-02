@@ -2,7 +2,7 @@
 #'
 #' @aliases bru
 #' @export
-#' @param points A SpatialPoints[DataFrame] object
+#' @param points A data.frame or SpatialPoints[DataFrame] object
 #' @param predictor A formula stating the data column (LHS) and mathematical expression (RHS) used for predicting.
 #' @param model a formula describing the model components
 #' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
