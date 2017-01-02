@@ -130,11 +130,16 @@ make.model = function(fml) {
     
     for (k in 1:length(labels)){
       lb = labels[[k]]
-      gpd = getParseData(parse(text=lb))
-      # Determine the name of the effect
-      ename = getParseText(gpd, id=1)
-      # Fixed effect ?
-      is.fixed = (gpd[1,"token"] == "SYMBOL")
+      
+      # Function syntax or fixed effect?
+      ix = regexpr("(", text = lb, fixed = TRUE)
+      if (ix > 0) {
+        ename = substr(lb, 1, ix-1)
+        is.fixed = FALSE
+      } else {
+        ename = lb
+        is.fixed = TRUE
+      }
       
       # Construct g() call
       if ( is.fixed ) {
