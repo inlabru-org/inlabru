@@ -430,9 +430,11 @@ plot.prediction = function(..., property = "median") {
                  n = 500,
                  effect = pnames[[k]])))
     
+    txt_size = (5/14) * theme_get()$text$size
+    
     plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y = x, weight = y, fill=effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
-      geom_text(data = qtl, aes(x=xend, y=y, label = signif(y)), size = 3.5, family = "", vjust = -0.5, hjust = 1.1) + 
-      geom_text(data = expec, aes(x=xend, y=y, label = paste0(signif(y)," ± ", signif(sdy), " [",round(100*cvy),"%]")), size = 3.5, family = "", vjust = -0.5, angle = 90) + 
+      geom_text(data = qtl, aes(x=xend, y=y, label = signif(y)), size = txt_size, family = "", vjust = -0.5, hjust = 1.1) + 
+      geom_text(data = expec, aes(x=xend, y=y, label = paste0(signif(y)," ± ", signif(sdy), " [",round(100*cvy),"%]")), size = txt_size, family = "", vjust = -0.5, angle = 90) + 
       geom_segment(data = qtl, aes(x=x,xend=xend,y=y,yend=yend), linetype = 1, alpha = 0.2) +
       geom_segment(data = expec, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 3) +
       geom_segment(data = sdev, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 1) +

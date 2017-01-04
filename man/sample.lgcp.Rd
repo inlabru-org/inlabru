@@ -9,7 +9,7 @@ sample.lgcp(mesh, loglambda, strategy = "rectangle", R = 6371)
 \arguments{
 \item{mesh}{An \link{inla.mesh} object}
 
-\item{loglambda}{A vector of log intensities at the mesh vertices}
+\item{loglambda}{A vector of log intensities at the mesh vertices (for higher order basis functions, e.g. for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis function weights rather than the values at the \code{mesh$n} vertices)}
 
 \item{strategy}{Only applicable to 2D meshes. Use "rectangle" for flat 2D meshes and "spherical" for "sliced-spherical" for spherical meshes.}
 
