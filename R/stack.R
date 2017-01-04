@@ -34,6 +34,10 @@ make.stack = function(points,
   effects = c(idx, eff)
   if ("from.points" %in% names(eff)) A = c(A, list(from.points = 1))
   effects = effects[names(A)]
+  
+  # The weirdest workaround ever. Without this, there are convergence problems on ubuntu but not on MacOS ?!?!?!
+  A = c(A, list(1))
+  effects = c(effects, list(WORKAROUND = runif(dim(A[[1]])[1])))
 
   # Create and return stack
   stk = inla.stack(data = list(y.inla = y.pp, e = e.pp),
