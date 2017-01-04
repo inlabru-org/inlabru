@@ -4,10 +4,10 @@
 \alias{gg.mesh}
 \title{Plot inla.mesh using ggplot2}
 \usage{
-gg.mesh(data, crs = NULL, color = rgb(0, 0, 0, 0.1), ...)
+gg.mesh(mesh, crs = NULL, color = rgb(0, 0, 0, 0.1), shape = 4, ...)
 }
 \arguments{
-\item{data}{A \link{dsdata} object or a \link{inla.mesh}}
+\item{mesh}{A inla.mesh or inla.mesh.1d object}
 
 \item{color}{Color of the mesh}
 }
