@@ -51,6 +51,8 @@ gg = function(data, ...) {
   else if (inherits(data, "SpatialPolygons") | inherits(data, "SpatialPolygonsDataFrame")) gg.polygon(data, ...)
   else if (inherits(data, "inla.mesh") || inherits(data, "inla.mesh.1d")) gg.mesh(data, ...)
   else if (inherits(data, "RasterLayer")) gg.RasterLayer(data, ...)
+  else if ("ggp" %in% names(attributes(data))) attributes(data)$ggp
+  else {stop("Unknown data format.")}
 }
 
 #' ggmap geom for spatial objects
