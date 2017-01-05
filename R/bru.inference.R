@@ -360,7 +360,7 @@ predict.lgcp = function(result,
   if ( !is.null(points) ) {
     dims = names(points)
     if ( inherits(points, "Spatial") ) { dims = c(dims, "coordinates") }
-    if ( !inherits(points, "SpatialPointsDataFrame") ) { 
+    if ( !inherits(points, "SpatialPointsDataFrame") & (nrow(points) == 2)) { 
       points = SpatialPointsDataFrame(points, data = data.frame(weight = rep(1, nrow(coordinates(points)))))}
     icfg.points = points
   } else {
