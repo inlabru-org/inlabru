@@ -62,9 +62,9 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
     pint)
   pint$inside = ( pint$counts >= pint$lq ) & ( pint$counts <= pint$uq ) 
   
-  ggp = ggplot(pint) + geom_crossbar(aes(x=mid,y=mq,ymin=lq,ymax=uq,fill=inside,color=inside), show.legend=FALSE) +
-    geom_point(aes(x=mid,y=mq), shape = 95, size = 3, color = "blue") +
-    geom_point(aes(x=mid,y=counts), shape = 20, size = 2) +
+  ggp = ggplot() + geom_crossbar(data = pint, mapping = aes(x=mid,y=mq,ymin=lq,ymax=uq,fill=inside,color=inside), show.legend=FALSE) +
+    geom_point(data = pint, mapping = aes(x=mid,y=mq), shape = 95, size = 3, color = "blue") +
+    geom_point(data = pint, mapping = aes(x=mid,y=counts), shape = 20, size = 2) +
     xlab(all.vars(update.formula(predictor, ~.0))) +
     ylab("count")
   
