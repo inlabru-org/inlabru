@@ -440,7 +440,7 @@ list.indices.model = function(model, points){
         if ( "m" %in% names(eff$mesh) ) {
           idx[[name]] = 1:eff$mesh$m # support inla.mesh.1d models
           # If a is masked, correct number of indices
-          if (!is.null(eff$A.msk)) { lst[[name]] = 1:sum(eff$A.msk)}
+          if (!is.null(eff$A.msk)) { idx[[name]] = 1:sum(eff$A.msk)}
         } else {
           ng = eff$inla.spde[[name]]$n.group
           if (is.null(ng)) { ng = 1 }
