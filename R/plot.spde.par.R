@@ -29,8 +29,8 @@
 #' @export
 plot.spde.par = function(result,varname="range", add = FALSE, ggp = TRUE, lwd=3,...) {
   marg = switch(varname,
-                range = result$marginals.variance.nominal[[1]],
-                log.range = result$marginals.log.variance.nominal[[1]],
+                range = result$marginals.range.nominal[[1]],
+                log.range = result$marginals.log.range.nominal[[1]],
                 variance = result$marginals.variance.nominal[[1]],
                 log.variance = result$marginals.log.variance.nominal[[1]]
   )
