@@ -169,7 +169,7 @@ make.model = function(fml) {
     ge = eval(parse(text = lb), envir = environment(fml))
 
     # Replace function name by INLA f function
-    lb = gsub("g\\(","f(",lb)
+    if ( substr(lb,1,2) == "g(" ) { lb = paste0("g(", substr(lb, 3, nchar(lb)))}
 
     # Remove extra mesh argument
     lb = gsub("[,][ ]*mesh[ ]*=[^),]*", "", lb)
