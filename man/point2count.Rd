@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotsample.R
 \name{point2count}
 \alias{point2count}
-\title{Create a plot sample.}
+\title{Convert a plot sample of points into one of counts.}
 \usage{
 point2count(plots, dets)
 }
@@ -17,7 +17,8 @@ points within the plots.}
 A \code{SpatialPolygonsDataFrame} with counts in each plot contained in slot @data$n.
 }
 \description{
-Creates a plot sample on a regular grid with a random start location.
+Converts a plot sample with locations of each point within each plot, into a plot
+sample with only the count within each plot.
 }
 \examples{
 library(inlabru)

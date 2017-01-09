@@ -36,9 +36,13 @@ x = seq(0, 55, length.out = 50)
 mesh1D <- inla.mesh.1d(x, boundary="free")
 ggplot() + gg(mesh1D) + xlim(0,55)
 mdl = count ~ spde1D(map=x, model=inla.spde2.matern(mesh1D), mesh=mesh1D) + Intercept
-fit3b.bru = bru(cd,model=mdl,family="poisson",E=log(cd$exposure))
+fit3b.bru = bru(cd,model=mdl,family="poisson",E=cd$exposure)
 spdespec<-inla.spde2.matern(mesh=mesh1D)
+spde.pars <- inla.spde.result(fit3b.bru, "spde1D", spdespec)
 plot.spde.par(spde.pars)
+plot.spde.par(spde.pars,"variance")
+plot.spde.par(spde.pars,"log.range")
+plot.spde.par(spde.pars,"log.variance")
  
 }
 
