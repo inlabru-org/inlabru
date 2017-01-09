@@ -470,7 +470,7 @@ plot.prediction = function(..., property = "median") {
      
     else if ( attr(data,"type") == "spatial" ) {
       # ggplot() + gg.col(ggopts$mesh, color = data$mean) + scale_fill_gradientn(colours = topo.colors(100))
-      plot.spatial(mesh = ggopts$mesh, col = data[,property], add.mesh = FALSE)
+      plot.spatial(mesh = ggopts$mesh, col = data[,property], add.mesh = FALSE, ...)
   }
 }
 
