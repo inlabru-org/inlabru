@@ -43,7 +43,7 @@ shinyApp(server = shinyServer(function(input, output) {
     lambda = function(x) lambda_1D(x) * input$imult
     lambda = function(x) eval(parse(text = input$ifun)) * input$imult
     dflambda = data.frame(x = preddata$x,
-                          uq = NA, lq = NA, median = NA, sd = NA,
+                          uq = NA, lq = NA, median = NA, sd = NA, cv = NA,
                           mean = lambda(preddata$x), method = "lambda")
     
     #' Sample from intensity
@@ -65,7 +65,7 @@ shinyApp(server = shinyServer(function(input, output) {
       library(mgcv)
       fit.gam = gam(count ~ s(x,k=input$bins), offset=log(exposure), data = hst, family = poisson())
       rgam = exp(predict(fit.gam, newdata = preddata))
-      dfgam = data.frame(x = preddata$x, mean = rgam, method = "gam", uq = NA, lq = NA, median = NA, sd = NA)
+      dfgam = data.frame(x = preddata$x, mean = rgam, method = "gam", uq = NA, lq = NA, median = NA, sd = NA, cv = NA)
     } else {dfgam = NULL}
     
     
