@@ -10,6 +10,7 @@
 #' @param linear If TRUE, do not perform linear approximation of predictor
 #' @param E Exposure parameter passed on to \link{inla}
 #' @param family Likelihood family passed on to \link{inla}
+#' @param n maximum number of \link{iinla} iterations
 #' @param ... more arguments passed on to \link{inla}
 #' @return A \link{bru} object (inherits from iinla and \link{inla})
 
@@ -20,14 +21,15 @@ bru = function(points,
                run = TRUE,
                linear = FALSE, 
                E = 1,
-               family = "gaussian", ...) {
+               family = "gaussian",
+               n = 10, ...) {
   
   
   # Automatically complete moel and predictor
   ac = autocomplete(model, predictor, points, mesh)
   
   # If automatic completion detected linearity, expr to NULL
-  if ( ac$linear ) ac$expr = NULL
+  if ( ac$linear ) { ac$expr = NULL ; n = 1 }
   
   # Turn model formula into internal bru model
   model = make.model(ac$model)
@@ -41,7 +43,7 @@ bru = function(points,
   stk = function(points, model) { make.stack(points = points, model = model, expr = ac$expr, y = y, E = E) }
   
   # Run iterated INLA
-  if ( run ) { result = iinla(points, model, stk, family = family, ...) } 
+  if ( run ) { result = iinla(points, model, stk, family = family, n, ...) } 
   else { result = list() }
   
   
@@ -137,6 +139,7 @@ poiss = function(...) {
 #' @param mesh An inla.mesh object modelling a spatial domain. If NULL and spatial data is provied the mesh is constructed from a non-convex hull of the points
 #' @param scale If provided as a scalar then rescale the exposure parameter of the Poisson likelihood. This will influence your model's intercept but can help with numerical instabilities, e.g. by setting scale to a large value like 10000
 #' @param append A list of functions which are evaluated for the \code{points} and the constructed integration points. The Returned values are appended to the respective data frame of points/integration points.
+#' @param n maximum number of \link{iinla} iterations
 #' @param ... Arguments passed on to \link{iinla}
 #' @return An \link{iinla} object
 
@@ -147,14 +150,15 @@ lgcp = function(points,
                 mesh = NULL,
                 run = TRUE,
                 scale = NULL,
-                append = NULL, 
+                append = NULL,
+                n = 10,
                 ...) {
   
   # Automatically complete moel and predictor
   ac = autocomplete(model, predictor, points, mesh)
   
   # If automatic completion detected linearity, expr to NULL
-  if ( ac$linear ) ac$expr = NULL
+  if ( ac$linear ) { ac$expr = NULL ; n = 1 }
   
   # Turn model formula into internal bru model
   model = make.model(ac$model)
@@ -186,7 +190,7 @@ lgcp = function(points,
   }
   
   # Run iterated INLA
-  if ( run ) { result = iinla(points, model, stk, family = "poisson", ...) } 
+  if ( run ) { result = iinla(points, model, stk, family = "poisson", n, ...) } 
   else { result = list() }
   
   ########## Create result object
