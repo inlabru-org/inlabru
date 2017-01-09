@@ -605,6 +605,7 @@ summarize = function(data, x = NULL, gg = FALSE) {
       apply(data, MARGIN = 1, sd, na.rm = TRUE),
       t(apply(data, MARGIN = 1, quantile, prob = c(0.025, 0.5, 0.975), na.rm = TRUE)))
     colnames(smy) = c("mean", "sd", "lq", "median","uq")
+    smy$cv = smy$sd/smy$mean
   }
   if ( !is.null(x) ) { smy = cbind(x, smy)}
   return(smy)
