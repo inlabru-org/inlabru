@@ -21,6 +21,8 @@ plotMatern = function(spde.pars,corr=TRUE,ylim=NULL,rangemult=1,d=2) {
     inla.matern.cov(nu=1, kappa, x=dist,d=d, corr = corr)
   }
   
+  kappaQ = inla.qmarginal(p=c(0.025,0.5,0.975), marginal=spde.pars$marginals.kappa[[1]])
+  
   xmax = exp(spde.pars$summary.log.range.nominal$mean)*rangemult
   x = seq(0,xmax,length=200)
   # median
