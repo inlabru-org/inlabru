@@ -394,9 +394,9 @@ list.A.model = function(model, points){
       loc = mapper(eff$map, points, eff)
       loc = as.matrix(loc) # inla.spde.make.A requires matrix format as input
 
-      if (!("n.group" %in% names(eff$inla.spde))) { ng = 1 } else { ng = eff$inla.spde$n.group }
+      if (is.null(eff$ngroup)) { ng = 1 } else { ng = eff$ngroup }
       if (ng > 1) {
-        group = as.matrix(points[,eff$time.coords])
+        group = as.matrix(eff$group)
       } else { group = NULL }
       A = inla.spde.make.A(eff$mesh, loc = loc, group = group)
       # Mask columns of A
