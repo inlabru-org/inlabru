@@ -36,12 +36,19 @@ makepoly=function(start,width,height) {
 #' @param nx The number of plots in the x-dimension.
 #' @param nx The number of plots in the y-dimension.
 #'
-#' @return A list with two components:
+#' @return A list with three components:
 #'  \describe{
 #'    \item{\code{plots}:}{ A \code{SpatialPolygonsDataFrame} object containing the plots that were 
 #'    sampled.}
 #'    \item{\code{dets}:}{ A \code{SpatialPointsDataFrame} object containing the locations of the 
 #'    points within the plots.}
+#'    \item{\code{counts}:}{ A \code{dataframe} containing the following columns
+#'    \describe{
+#'    \item{\code{x}:}{The x-coordinates of the centres of the plots within the boundary.}
+#'    \item{\code{y}:}{The y-coordinates of the centres of the plots within the boundary.}
+#'    \item{\code{n}:}{The numbers of points in each plot.}
+#'    \item{\code{area}:}{The areas of the plots within the boundary}
+#'    }}
 #'  }.
 #'  
 #' @examples 
@@ -49,7 +56,7 @@ makepoly=function(start,width,height) {
 #' library(raster)
 #' data(gorillanests)
 #' plotpts = plotsample(gnests,gnestboundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
-#' ggplot() +gg(plotpts$plots) +gg(plotpts$dets) +gg(gnestboundary)
+#' ggplot() +gg(plotpts$plots) +gg(plotpts$dets,pch="+",cex=2) +gg(gnestboundary)
 #' 
 #' @export
 #' 
@@ -91,10 +98,11 @@ plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
 
 
 
-#' @title Create a plot sample.
+#' @title Convert a plot sample of points into one of counts.
 #'
 #' @description
-#' Creates a plot sample on a regular grid with a random start location. 
+#' Converts a plot sample with locations of each point within each plot, into a plot
+#' sample with only the count within each plot. 
 #'
 #' @param plots A \code{SpatialPolygonsDataFrame} object containing the plots that were 
 #'    sampled.
