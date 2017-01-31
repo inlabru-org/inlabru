@@ -73,6 +73,9 @@ io_mrsea.pkgdata.load = function() {
   dset = as.spatial.dsdata(dset, cnames = c("x","y"), crs = CRS(dset$p4s))
   dset$mesh$crs = inla.CRS("+proj=utm +zone=32")
   
+  # Set weight of samplers to the strip width
+  dset$samplers$weight = 500
+  
   # Boundary
   dset$boundary = spoly(dset$mesh$loc[dset$mesh$segm$int$idx[,1], 1:2], dset$mesh$crs)
   
