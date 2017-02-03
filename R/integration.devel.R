@@ -62,21 +62,18 @@ for ( g in unique(group) ) {
   ep = gloc[2:nrow(gloc),]
   sloc = split.lines(mesh, sp, ep, filter.zero.length = FALSE)$split.loc[,1:2]
   if (!is.null(sloc)){ colnames(sloc) = colnames(loc) }
+  
   # plot(mesh) ; points(sp) ; points(ep) ; points(sloc)
-
-  imesh = inla.mesh.2d(loc.domain = sloc, 
-                       max.edge =  sqrt(2*max(diff(range(sloc[,1])), diff(range(sloc[,2])))^2))
+  bloc = rbind(gloc)
+  bnd = inla.mesh.segment(loc = bloc)
+  imesh = inla.mesh.create(boundary = bnd, loc = rbind(mesh$loc[,1:2], sloc[,1:2]))
+  # plot(imesh) ; points(sp) ; points(ep) ; points(gloc)
+  # plot(imesh) ; points(sp) ; points(ep) ; points(gloc) ; plot(mesh, add = TRUE)
   
-  ii = is.inside(imesh, mesh$loc)
-  
-  imesh = inla.mesh.2d(loc.domain = sloc,
-                       loc = mesh$loc[ii,1:2, drop = FALSE],
-                       max.edge =  sqrt(2*max(diff(range(sloc[,1])), diff(range(sloc[,2])))^2))
-
   ips = data.frame(imesh$loc[,1:2])
   colnames(ips) = c("x","y")
   ips$weight = diag(as.matrix(inla.mesh.fem(imesh)$c0))
-  ips = as.data.frame(project.weights(ips, mesh, mesh.coords = c("x","y")))
+  # ips = as.data.frame(project.weights(ips, mesh, mesh.coords = c("x","y")))
   ips$group = g
   ipsl = c(ipsl, list(ips))
 }
