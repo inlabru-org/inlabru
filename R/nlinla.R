@@ -11,7 +11,7 @@ nlinla.taylor = function(expr, epunkt, data) {
     gra = attr(tmp, "gradient")
     nr = nrow(gra)
     ngrd = matrix(NA,nrow=nr,ncol=length(effects))
-    for (k in 1:length(effects)){ ngrd[,k] = diag(gra[,((k-1)*nr+1):(k*nr)]) }
+    for (k in 1:length(effects)){ ngrd[,k] = diag(as.matrix(gra[,((k-1)*nr+1):(k*nr)])) } # as.matrix required since diag() will not work if gra has single entry
     nconst = as.vector(tmp) - rowSums(ngrd * epunkt)
     ngrd =  data.frame(ngrd)
     colnames(ngrd) = effects
