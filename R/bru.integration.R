@@ -132,6 +132,31 @@ ipoints = function(samplers, config) {
     stop("Unknown format of integration data")
   }
   
+  
+  #
+  # Reduce number of integration points by projection onto mesh vertices
+  # 
+  
+  all.groups = intersect(names(ips), c(postgroup,pregroup))
+  if ("coordinates" %in% names(config)) {
+    coords = coordinates(ips)
+    cnames = colnames(coords)
+    df = cbind(coords, ips@data)
+    
+    if ( length(all.groups) > 0 ) { # Apply projection for each group independently
+      fn = function(x) { 
+        pr =  project.weights(x, config[["coordinates"]]$mesh, mesh.coords = cnames)
+        cbind(pr, x[rep(1, nrow(pr)),all.groups, drop = FALSE])
+      }
+      ips = recurse.rbind(fun = fn, df, cols = all.groups)
+      ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,c(postgroup, pregroup, "weight")])
+    } else { # No groups, simply project everything
+      ips = project.weights(df, config[["coordinates"]]$mesh, mesh.coords = cnames)
+      ips = SpatialPointsDataFrame(ips[,cnames],data = data.frame(weight = ips[,"weight"]))
+    }
+  }
+  
+  
   #
   # Expand the integration points over postgroup dimensions
   #
@@ -155,28 +180,7 @@ ipoints = function(samplers, config) {
     }
   }
   
-  #
-  # Reduce number of integration points by projection onto mesh vertices
-  # 
-  
-  all.groups = c(postgroup,pregroup)
-  if ("coordinates" %in% names(config)) {
-    coords = coordinates(ips)
-    cnames = colnames(coords)
-    df = cbind(coords, ips@data)
-    
-    if ( length(all.groups) > 0 ) { # Apply projection for each group independently
-      fn = function(x) { 
-        pr =  project.weights(x, config[["coordinates"]]$mesh, mesh.coords = cnames)
-        cbind(pr, x[rep(1, nrow(pr)),all.groups, drop = FALSE])
-      }
-      ips = recurse.rbind(fun = fn, df, cols = all.groups)
-      ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,c(postgroup, pregroup, "weight")])
-    } else { # No groups, simply project everything
-      ips = project.weights(df, config[["coordinates"]]$mesh, mesh.coords = cnames)
-      ips = SpatialPointsDataFrame(ips[,cnames],data = data.frame(weight = ips[,"weight"]))
-    }
-  }
+
   
   if (spatial) { proj4string(ips) = CRS(config[["coordinates"]]$p4s) }
   ips
