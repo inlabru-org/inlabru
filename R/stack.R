@@ -5,6 +5,7 @@ make.stack = function(points,
                        model,
                        y,
                        E = 1,
+                       offset = 0,
                        expr = NULL,
                        tag = "LeStack"){
   
@@ -26,8 +27,9 @@ make.stack = function(points,
   if ( !is.null(expr) ) {
     rw = nlinla.reweight(A, model, points, expr)
     A = rw$A
-    e.pp = e.pp * exp(rw$const)
-    if ( any((e.pp > 0) & (e.pp < 0.00001)) ) { msg("Exposure E is smaller than 0.00001. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")}
+    #e.pp = e.pp * exp(rw$const)
+    if ( any((e.pp > 0) & ((e.pp < 0.00001) || (e.pp > 1E7))) ) { msg("Exposure E is smaller than 0.00001. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")}
+    #msg(paste0("Exposure range: ", min(e.pp), ", to ",max(e.pp)))
   }
   
   # Sort effects and A by names
@@ -40,7 +42,7 @@ make.stack = function(points,
   effects = c(effects, list(WORKAROUND = runif(dim(A[[1]])[1])))
 
   # Create and return stack
-  stk = inla.stack(data = list(y.inla = y.pp, e = e.pp),
+  stk = inla.stack(data = list(y.inla = y.pp, e = e.pp, bru.offset = rw$const + offset),
                      A = A,
                      tag = tag,
                      effects = effects)

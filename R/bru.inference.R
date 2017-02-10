@@ -11,6 +11,7 @@
 #' @param E Exposure parameter passed on to \link{inla}
 #' @param family Likelihood family passed on to \link{inla}
 #' @param n maximum number of \link{iinla} iterations
+#' @param offset the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.
 #' @param ... more arguments passed on to \link{inla}
 #' @return A \link{bru} object (inherits from iinla and \link{inla})
 
@@ -22,7 +23,8 @@ bru = function(points,
                linear = FALSE, 
                E = 1,
                family = "gaussian",
-               n = 10, ...) {
+               n = 10,
+               offset = 0, ...) {
   
   
   # Automatically complete moel and predictor
@@ -43,7 +45,7 @@ bru = function(points,
   stk = function(points, model) { make.stack(points = points, model = model, expr = ac$expr, y = y, E = E) }
   
   # Run iterated INLA
-  if ( run ) { result = iinla(points, model, stk, family = family, n, ...) } 
+  if ( run ) { result = iinla(points, model, stk, family = family, n, offset = offset, ...) } 
   else { result = list() }
   
   
@@ -140,6 +142,7 @@ poiss = function(...) {
 #' @param scale If provided as a scalar then rescale the exposure parameter of the Poisson likelihood. This will influence your model's intercept but can help with numerical instabilities, e.g. by setting scale to a large value like 10000
 #' @param append A list of functions which are evaluated for the \code{points} and the constructed integration points. The Returned values are appended to the respective data frame of points/integration points.
 #' @param n maximum number of \link{iinla} iterations
+#' @param offset the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.
 #' @param ... Arguments passed on to \link{iinla}
 #' @return An \link{iinla} object
 
@@ -152,6 +155,7 @@ lgcp = function(points,
                 scale = NULL,
                 append = NULL,
                 n = 10,
+                offset = 0,
                 ...) {
   
   # Automatically complete moel and predictor
@@ -186,11 +190,11 @@ lgcp = function(points,
   # Stack
   stk = function(points, model) { 
     inla.stack(make.stack(points = points, model = model, expr = ac$expr, y = 1, E = 0), 
-               make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = ips$weight)) 
+               make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = 1, offset = log(ips$weight))) 
   }
   
   # Run iterated INLA
-  if ( run ) { result = iinla(points, model, stk, family = "poisson", n, ...) } 
+  if ( run ) { result = iinla(points, model, stk, family = "poisson", n, offset = offset, ...) } 
   else { result = list() }
   
   ########## Create result object
@@ -639,7 +643,8 @@ summarize = function(data, x = NULL, gg = FALSE) {
 iinla = function(data, model, stackmaker, n = 10, result = NULL, 
                  iinla.verbose = iinla.getOption("iinla.verbose"), 
                  control.inla = iinla.getOption("control.inla"), 
-                 control.compute = iinla.getOption("control.compute"), ...){
+                 control.compute = iinla.getOption("control.compute"),
+                 offset = NULL, ...){
   
   # # Default number of maximum iterations
   # if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
@@ -671,6 +676,7 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
                                              data = c(inla.stack.mdata(stk), list.data(model)),
                                              control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
                                              E = inla.stack.data(stk)$e,
+                                             offset = inla.stack.data(stk)$bru.offset + offset,
                                              control.inla = control.inla,
                                              control.compute = control.compute), iargs)), 
                         error = function(e) { 
