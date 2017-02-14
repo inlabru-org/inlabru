@@ -196,10 +196,14 @@ make.model = function(fml) {
                         inla.spde = ge$model),
                         fchar = lb)
     
-    submodel[[ge$f$label]] = smod
+    # Fix label for factor effects
+    if (smod$model == "factor") { lbl[[k]] = smod$label ; smod$fchar = smod$label }
     
     # Fix label for offset effect
     if (smod$label == "offset") lbl[[k]] = paste0("offset(",as.character(smod$map),")")
+    
+    # Set submodel
+    submodel[[ge$f$label]] = smod
     
   }
   
@@ -244,7 +248,8 @@ g = function(covariate,
   if ( length(A.msk.char) == 0 ) { A.msk = NULL } else { A.msk = A.msk }
   
   # Only call f if we are  not dealing with an offset
-  if ( label == "offset" ) { fvals = list(model="offset") } 
+  if ( label == "offset" ) { fvals = list(model="offset") }
+  else if ( is.character(model) && model == "factor" ) { fvals = list(model="factor") } # , n = list(...)$n
   else { fvals = f(xxx, ..., model = model) }
   fvals$label = label
   
@@ -509,6 +514,14 @@ evaluate.model = function(model,
     # Discard variables we do not need
     sm = smp[[k]][vars]
     
+    # For factor models we need to do a little trick
+    for (label in names(sm)) { 
+      if (effect(model)[[label]]$model == "factor") {
+        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]]) 
+        sm[[label]] = as.vector(sm[[label]][fc])
+      }
+    }
+ 
     # Apply A matrices
     for (label in names(sm)) { if (label %in% vars) sm[[label]] = apply.A(label, sm) }
     
