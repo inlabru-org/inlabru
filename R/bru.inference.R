@@ -652,6 +652,9 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
   # Track variables?
   track = list()
   
+  # If a previous result was supplied, attach the result to the model
+  if ( !is.null(result) ) { model$result = result}
+  
   # Inital stack
   stk = stackmaker(data, model)
   
