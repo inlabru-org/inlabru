@@ -516,7 +516,7 @@ evaluate.model = function(model,
     
     # For factor models we need to do a little trick
     for (label in names(sm)) { 
-      if (effect(model)[[label]]$model == "factor") {
+      if (label %in% names(effect(model)) && effect(model)[[label]]$model == "factor") {
         fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]]) 
         sm[[label]] = as.vector(sm[[label]][fc])
       }
