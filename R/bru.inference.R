@@ -728,14 +728,19 @@ autocomplete = function(model, predictor, points, mesh) {
   
   
   # Automatically insert default SPDE model
-  env = environment(model)
-  model = update.formula(~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh), model)
-  environment(model) = env
+  #env = environment(model)
+  #model = update.formula(~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh), model)
+  #environment(model) = env
   
-  # Automatically add intercept
+  # Automatically add intercept (unless '-Intercept' is in the formula)
   env = environment(model)
   if (attr(terms(model),"intercept")) {
-    model = update.formula(model, . ~ . + Intercept-1)
+    if (!(length(grep("-[ ]*Intercept", as.character(model)[[3]]))>0)) {
+      model = update.formula(model, . ~ . + Intercept-1)
+    } else {
+      model = update.formula(model, . ~ . -1)
+    }
+    
   } 
   environment(model) = env
   
