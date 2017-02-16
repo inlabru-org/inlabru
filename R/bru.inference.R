@@ -751,7 +751,7 @@ autocomplete = function(model, predictor, points, mesh) {
   # Automatically add intercept (unless '-Intercept' is in the formula)
   env = environment(model)
   if (attr(terms(model),"intercept")) {
-    if (!(length(grep("-[ ]*Intercept", as.character(model)[[-1]]))>0)) {
+    if (!(length(grep("-[ ]*Intercept", as.character(model)[[length(as.character(model))]]))>0)) {
       model = update.formula(model, . ~ . + Intercept-1)
     } else {
       model = update.formula(model, . ~ . -1)
