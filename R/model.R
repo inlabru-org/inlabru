@@ -545,11 +545,16 @@ mapper = function(map, points, eff) {
   # Otherwise assume map is an expression that can be evaluated with points as an environment
 
   if (is.function(map)) { loc = map(points) } 
-  else if (class(map) == "call") { 
-    loc = tryCatch( eval(map, data.frame(points)), error = function(e){
-      loc = data.frame(points)[[eff$label]]
-    })
-    } 
+  else if (class(map) == "call") {
+    if ( inherits(eval(map), "SpatialGridDataFrame") ){
+      loc = over(points, eval(map))
+      if (eff$label %in% names(loc)) { loc = loc[[eff$label]] }
+    } else {
+      loc = tryCatch( eval(map, data.frame(points)), error = function(e){
+        loc = data.frame(points)[[eff$label]]
+      })
+    }
+  } 
   else {
     fetcher = get0(as.character(map))
     if (is.function(fetcher)) { loc = fetcher(points) } 
