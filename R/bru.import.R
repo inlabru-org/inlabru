@@ -216,8 +216,8 @@ import.gorillas = function() {
   gorillas = list(nests = nests,
                   mesh = mesh,
                   broundary = boundary,
-                  plotsample = sample_9x9_60pc
-  )
+                  plotsample = sample_9x9_60pc,
+                  gcov = gcov)
   
   gorillas
 }
