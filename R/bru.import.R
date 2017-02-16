@@ -189,6 +189,8 @@ import.gorillas = function() {
   for ( nm in names(gorillas.extra) ) { 
     gcov[[nm]] = as(gorillas.extra[[nm]], "SpatialGridDataFrame") 
     proj4string(gcov[[nm]]) = proj4string(nests)
+    coordnames(gcov[[nm]]) = c("x","y")
+    names(gcov[[nm]]) = nm
   }
   
   # Create a plot sampling data set
@@ -219,7 +221,7 @@ import.gorillas = function() {
                   plotsample = sample_9x9_60pc,
                   gcov = gcov)
   
-  gorillas
+  return(gorillas)
 }
 
 
