@@ -51,6 +51,7 @@ gg = function(data, ...) {
   else if (inherits(data, "SpatialPolygons") | inherits(data, "SpatialPolygonsDataFrame")) gg.polygon(data, ...)
   else if (inherits(data, "inla.mesh") || inherits(data, "inla.mesh.1d")) gg.mesh(data, ...)
   else if (inherits(data, "RasterLayer")) gg.RasterLayer(data, ...)
+  else if (inherits(data, "SpatialGridDataFrame")) gg.SpatialGridDataFrame(data, ...)
   else if ("ggp" %in% names(attributes(data))) attributes(data)$ggp
   else {stop("Unknown data format.")}
 }
@@ -163,6 +164,20 @@ gg.mesh = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
   
   
   return(gg)
+}
+
+#' Plot SpatialGridDataFrame using ggplot2
+#' 
+#' @aliases SpatialGridDataFrame
+#' @name SpatialGridDataFrame
+#' @export
+#' @param sgdf A SpatialGridDataFrame object
+#' @return A ggplot2 object
+#' 
+
+gg.SpatialGridDataFrame = function(sgdf, ...) {
+  df <- as.data.frame(sgdf)
+  geom_tile(data = df, mapping = aes_string(x = "x", y = "y", fill = names(sgdf)[[1]]))
 }
 
 #' Plot RasterLayer using ggplot2
