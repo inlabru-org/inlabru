@@ -7,6 +7,7 @@ make.stack = function(points,
                        E = 1,
                        offset = 0,
                        expr = NULL,
+                       result = NULL,
                        tag = "LeStack"){
   
   
@@ -25,7 +26,7 @@ make.stack = function(points,
   
   # Reweight things if dealing with taylor approximated model
   if ( !is.null(expr) ) {
-    rw = nlinla.reweight(A, model, points, expr)
+    rw = nlinla.reweight(A, model, points, expr, result)
     A = rw$A
     taylor.offset = rw$const
   } else {

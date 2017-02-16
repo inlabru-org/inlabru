@@ -35,8 +35,8 @@ nlinla.epunkt = function(model, data, result = NULL) {
     }
 }
 
-nlinla.reweight = function(A, model, data, expr){
-  epkt = nlinla.epunkt(model, data, result = model$result)
+nlinla.reweight = function(A, model, data, expr, result){
+  epkt = nlinla.epunkt(model, data, result = result)
   ae = nlinla.taylor(expr, epkt, data)
   for ( k in 1:length(A) ) {
     nm = names(A)[k]
