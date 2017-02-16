@@ -215,7 +215,7 @@ import.gorillas = function() {
   ### Make final gorilla data set
   gorillas = list(nests = nests,
                   mesh = mesh,
-                  broundary = boundary,
+                  boundary = boundary,
                   plotsample = sample_9x9_60pc,
                   gcov = gcov)
   

@@ -1,18 +1,18 @@
-#' @name gorillanests
+#' @name gorillas
 #' @title Gorilla Nesting Sites.
 #' @docType data
 #' @description This the \code{gorillas} dataset from the package \code{spatstat}, reformatted
 #' as point process data for use with \code{inlabru}. 
 #' 
-#' @usage data(gorillanests)
+#' @usage data(gorillas)
 #' 
 #' @format The data are a list that contains these elements:
 #'  \describe{
-#'    \item{\code{gnests}:}{ A \code{SpatialPointsDataFrame} object containing the locations of 
+#'    \item{\code{nests}:}{ A \code{SpatialPointsDataFrame} object containing the locations of 
 #'    the gorilla nests.}
-#'    \item{\code{gnestboundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary
+#'    \item{\code{boundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary
 #'    of the region that was searched for the nests.}
-#'    \item{\code{gnestmesh}:}{ An \code{inla.mesh} object containing a mesh that can be used
+#'    \item{\code{mesh}:}{ An \code{inla.mesh} object containing a mesh that can be used
 #'    with function \code{lgcp} to fit a LGCP to the nest data.}
 #'    \item{\code{gcov}:}{ A list of raster objects, one for each of these spatial covariates:
 #'     \describe{
@@ -31,16 +31,13 @@
 #'       \item{\code{waterdist}}{ Euclidean distance from nearest water body, in metres.}
 #'     }
 #'    }
-#'    \item{\code{gnestsamples}}{ A list with elements \code{sample_9x9}, \code{sample_5x5}, 
-#'    \code{sample_9x9_60pc}, \code{sample_5x5_60pc}, containing plot samples of gorilla nests, 
-#'    sampling 9x9 and 5x5 plots over the region, with 100\% coverage and with 60\% coverage. Each 
-#'    element of the list has these components:
+#'    \item{\code{plotsample}}{Plot sample of gorilla nests, sampling 9x9 over the region, with 60\% coverage. Components:
 #'    \describe{
 #'      \item{\code{counts}}{ A data frame with elements \code{x}, \code{y}, \code{count}, 
 #'      \code{exposure}, being the x- and y-coordinates of the centre of each plot, the count in each 
 #'      plot and the area of each plot.}
 #'      \item{\code{plots}}{ A \code{SpatialPolygonsDataFrame} defining the individual plot boundaries.}
-#'      \item{\code{dets}}{ A \code{SpatialPointsDataFrame} giving the locations of each detected nest.}
+#'      \item{\code{nests}}{ A \code{SpatialPointsDataFrame} giving the locations of each detected nest.}
 #'    }
 #'    }
 #'  }
@@ -57,49 +54,22 @@
 #' 26 (6), 793–811.
 #' 
 #' @examples
-#'  data(gorillanests) # get the data
+#'  data(gorillas) # get the data
 #'  # extract all the objects, for convenience:
-#'  gnests=gorillanests$gnests
-#'  gnestmesh=gorillanests$gnestmesh
-#'  gnestboundary=gorillanests$gnestboundary
-#'  gcov=gorillanests$gcov
-#'  gnestsamples=gorillanests$gnestsamples
+#'  nests = gorillas$nests
+#'  mesh = gorillas$mesh
+#'  boundary = gorillas$boundary
+#'  gcov = gorillas$gcov
+#'  gnestsamples = gorillas$plotsample
 #'  
 #'  # plot all the nests, mesh and boundary
-#'  ggplot()+gg(gnestmesh,lwd=0.1)+gg(gnestboundary)+gg(gnests,pch="+",cex=2)
+#'  ggplot() + gg(mesh,lwd=0.1) + gg(boundary) + gg(gnests, pch="+",cex=2)
 #'  
-#'  #' plot the raster file with elevations
+#'  # Plot the elevation covariate
 #'  plot(gcov$elevation) 
-#'  # inlabru needs a SpatialPointsDataFrame, so convert raster to SpatialPointsDataFrame
-#'  gelevation = as(gcov$elevation,"SpatialPointsDataFrame")
-#'  # now create an elevation covariate for inlabru
-#'  elevn = covariate(gelevation, predictor = layer, mesh = gnestmesh) # this takes a while
-#'  # and plot it
-#'  plot(elevn) 
-#'  plot(elevn) +gg(gnests,cex=0.5) + gg(gnestboundary) # with the nests and boundary
-#' 
-#'  # plot the raster file with vegetations
-#'  plot(gcov$vegetation) 
-#'  # inlabru needs a SpatialPointsDataFrame, so convert raster to SpatialPointsDataFrame
-#'  gvegetation = as(gcov$vegetation,"SpatialPointsDataFrame")
-#'  # now create an vegetation covariate for inlabru
-#'  vegn = covariate(gvegetation, predictor = layer, mesh = gnestmesh) # this takes a while
-#'  # and plot it
-#'  plot(vegn) 
-#'  plot(vegn) +gg(gnests,cex=0.5) + gg(gnestboundary) # with the nests and boundary
 #'  
-#'  # Plot the plot sample data:
-#'  sample = gnestsamples$sample_9x9
-#'  ggplot() +gg(gnestboundary) +gg(sample$plots) +  gg(sample$dets,pch="+",cex=4) +
-#'    geom_text(aes(label=sample$counts$count, x=sample$counts$x, y=sample$counts$y)) + coord_fixed()
-#'  sample = gnestsamples$sample_5x5
-#'  ggplot() +gg(gnestboundary) +gg(sample$plots) +  gg(sample$dets,pch="+",cex=4) +
-#'    geom_text(aes(label=sample$counts$count, x=sample$counts$x, y=sample$counts$y)) + coord_fixed()
-#'  sample = gnestsamples$sample_9x9_60pc
-#'  ggplot() +gg(gnestboundary) +gg(sample$plots) +  gg(sample$dets,pch="+",cex=4) +
-#'    geom_text(aes(label=sample$counts$count, x=sample$counts$x, y=sample$counts$y)) + coord_fixed()
-#'  sample = gnestsamples$sample_5x5_60pc
-#'  ggplot() +gg(gnestboundary) +gg(sample$plots) +  gg(sample$dets,pch="+",cex=4) +
-#'    geom_text(aes(label=sample$counts$count, x=sample$counts$x, y=sample$counts$y)) + coord_fixed()
-#'    
+#'  # Plot the plot sample
+#'  ggplot() + gg(gnestsamples$nests) + gg(gnestsamples$plots)
+#'  
+
 NULL
