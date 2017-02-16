@@ -653,7 +653,10 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
   track = list()
   
   # If a previous result was supplied, attach the result to the model
-  if ( !is.null(result) ) { model$result = result}
+  if ( !is.null(result) ) { model$result = result }
+  
+  # Set old result
+  old.result = result
   
   # Inital stack
   stk = stackmaker(data, model)
@@ -674,22 +677,33 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     
     # Return previous result if inla crashes, e.g. when connection to server is lost 
     if ( k > 1 ) { old.result = result } 
+    result = NULL
     
-    result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
-                                             data = c(inla.stack.mdata(stk), list.data(model)),
-                                             control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
-                                             E = inla.stack.data(stk)$e,
-                                             offset = inla.stack.data(stk)$bru.offset + offset,
-                                             control.inla = control.inla,
-                                             control.compute = control.compute), iargs)), 
-                        error = function(e) { 
-                          if (k == 1) { stop(e) }
-                          else { 
-                            cat(paste0("INLA crashed during iteration ",k,". It is likely that there is a convergence problem or the connection to the server was lost (if computing remotely)."))
-                            return(old.result)
-                          }
-                        }
-    )
+    icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
+                                                   data = c(inla.stack.mdata(stk), list.data(model)),
+                                                   control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
+                                                   E = inla.stack.data(stk)$e,
+                                                   offset = inla.stack.data(stk)$bru.offset + offset,
+                                                   control.inla = control.inla,
+                                                   control.compute = control.compute), iargs)), 
+                              error = warning
+                            )
+                       )
+    eval(icall)
+    
+    n.retry = 0
+    max.retry = 10
+    while ( ( is.null(result) | length(result) == 5 ) & ( n.retry <= max.retry ) ) {
+      msg("INLA crashed or returned NULL. Waiting for 60 seconds and trying again.")
+      Sys.sleep(60)
+      eval(icall)
+      n.retry = n.retry + 1
+    } 
+    if ( ( is.null(result) | length(result) == 5 ) ) { 
+      msg(sprintf("The computation failed %d times. Giving up and returning last successfully obtained result.", n.retry-1))
+      return(old.result)
+    }
+    
     if ( iinla.verbose ) { cat(" Done. ") }
     
     # Update model
@@ -735,7 +749,7 @@ autocomplete = function(model, predictor, points, mesh) {
   # Automatically add intercept (unless '-Intercept' is in the formula)
   env = environment(model)
   if (attr(terms(model),"intercept")) {
-    if (!(length(grep("-[ ]*Intercept", as.character(model)[[3]]))>0)) {
+    if (!(length(grep("-[ ]*Intercept", as.character(model)[[-1]]))>0)) {
       model = update.formula(model, . ~ . + Intercept-1)
     } else {
       model = update.formula(model, . ~ . -1)
