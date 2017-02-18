@@ -546,14 +546,14 @@ mapper = function(map, points, eff) {
 
   if (is.function(map)) { loc = map(points) } 
   else if (class(map) == "call") {
-    if ( inherits(eval(map), "SpatialGridDataFrame") ){
-      loc = over(points, eval(map))
-      if (eff$label %in% names(loc)) { loc = loc[[eff$label]] }
-    } else {
+    #if ( inherits(eval(map), "SpatialGridDataFrame") ){
+    #  loc = over(points, eval(map))
+    #  if (eff$label %in% names(loc)) { loc = loc[[eff$label]] }
+    #} else {
       loc = tryCatch( eval(map, data.frame(points)), error = function(e){
         loc = data.frame(points)[[eff$label]]
       })
-    }
+    #}
   } 
   else {
     fetcher = get0(as.character(map))
@@ -566,4 +566,12 @@ mapper = function(map, points, eff) {
       }
     }
   }
+  
+  # Check if any of the locations are NA. INLA will not like that!
+  if ( any(is.na(loc)) ) {
+    stop(sprintf("Map '%s' of effect '%s' has returned NA values. Please design your 'map='
+                 argument as to return non-NA for all points in your model domain/mesh.",
+                 as.character(map)[[1]], eff$label))
+  }
+  loc
 }
