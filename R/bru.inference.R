@@ -160,6 +160,7 @@ lgcp = function(points,
                 n = 10,
                 offset = 0,
                 result = NULL,
+                weights.as.offset = FALSE,
                 ...) {
   
   # Automatically complete moel and predictor
@@ -192,11 +193,18 @@ lgcp = function(points,
   if ( !is.null(scale) ) { ips$weight = scale * ips$weight }
 
   # Stack
-  stk = function(points, model, result) { 
-    inla.stack(make.stack(points = points, model = model, expr = ac$expr, y = 1, E = 0, result = result), 
-               make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = 1, offset = log(ips$weight), result = result))
+  if ( weights.as.offset ) {
+    stk = function(points, model, result) {
+      inla.stack(make.stack(points = points, model = model, expr = ac$expr, y = 1, E = 0, result = result),
+                 make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = 1, offset = log(ips$weight), result = result))
+    }
+  } else {
+    stk = function(points, model, result) {
+      inla.stack(make.stack(points = points, model = model, expr = ac$expr, y = 1, E = 0, result = result),
+                 make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = ips$weight, offset = 0, result = result))
+    }
   }
-  
+
   # Run iterated INLA
   if ( run ) { result = iinla(points, model, stk, family = "poisson", n, offset = offset, result = result, ...) } 
   else { result = list() }

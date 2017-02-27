@@ -518,7 +518,7 @@ evaluate.model = function(model,
     for (label in names(sm)) { 
       if (label %in% names(effect(model)) && effect(model)[[label]]$model == "factor") {
         fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]]) 
-        sm[[label]] = as.vector(sm[[label]][fc])
+        sm[[label]] = as.vector(sm[[label]][fc[,1]])
       }
     }
  
@@ -540,38 +540,43 @@ evaluate.model = function(model,
 
 
 mapper = function(map, points, eff) {
-  # If map is a function, return map(points)
-  # If map is not a function but a column in points, return points$map
-  # Otherwise assume map is an expression that can be evaluated with points as an environment
-
-  if (is.function(map)) { loc = map(points) } 
-  else if (class(map) == "call") {
-    #if ( inherits(eval(map), "SpatialGridDataFrame") ){
-    #  loc = over(points, eval(map))
-    #  if (eff$label %in% names(loc)) { loc = loc[[eff$label]] }
-    #} else {
-      loc = tryCatch( eval(map, data.frame(points)), error = function(e){
-        loc = data.frame(points)[[eff$label]]
-      })
-    #}
-  } 
-  else {
-    fetcher = get0(as.character(map))
-    if (is.function(fetcher)) { loc = fetcher(points) } 
-    else {
-      if(as.character(map) %in% names(as.data.frame(points))) {
-        loc = as.data.frame(points)[,as.character(map)] 
-      } else {
-        loc = rep(1, nrow(data.frame(points))) 
-      }
-    }
-  }
   
-  # Check if any of the locations are NA. INLA will not like that!
+  # Evaluate the map with the points as an environment
+  emap = tryCatch(eval(map, data.frame(points)), error = function(e) {})
+  
+  # 0) Eval failed. map everything to 1. This happens for automatically added Intercept
+  # 1) If we obtain a function, apply the function to the points
+  # 2) If we obtain a SpatialGridDataFrame extract the values of that data frame at the point locations using the over() function
+  # 3) Else we obtain a vector and return as-is. This happens when map states a column of the data points
+  
+  if ( is.null(emap) ) { 
+    loc = data.frame(x = rep(1, nrow(points))) 
+    colnames(loc) = deparse(map)
+    }
+  else if ( is.function(emap) ) { loc = emap(points) }
+  else if ( inherits(emap, "SpatialGridDataFrame") ) { loc = over(points, emap) }
+  else { loc = emap }
+  
+  # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
+  # to fix that by filling in nearest neighbor values.
+  if ( any(is.na(loc)) & ( inherits(emap, "SpatialGridDataFrame") )) {
+  
+    warning(sprintf("Map '%s' has returned NA values. As it is a SpatialGridDataFrame I will try to fix this by filling in values of spatially nearest neighbors. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
+                 deparse(map), eff$label))
+    
+    BADpoints = points[as.vector(is.na(loc)),]
+    GOODpoints = points[as.vector(!is.na(loc)),]
+    dst = gDistance(GOODpoints,BADpoints, byid=T)
+    nn = apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
+    loc[is.na(loc)] = loc[!is.na(loc)][nn]
+  }
+    
+  # Check for NA values.    
   if ( any(is.na(loc)) ) {
     stop(sprintf("Map '%s' of effect '%s' has returned NA values. Please design your 'map='
                  argument as to return non-NA for all points in your model domain/mesh.",
-                 as.character(map)[[1]], eff$label))
+                   as.character(map)[[1]], eff$label))
   }
+  
   loc
 }
