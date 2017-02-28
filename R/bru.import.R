@@ -168,6 +168,9 @@ save.seals = function(...) {
 
 import.gorillas = function() {
   
+  # Explicitly load spatstat
+  library(spatstat)
+  
   # Load Gorilla data from spatstat
   data(gorillas,package="spatstat")
   
@@ -181,7 +184,7 @@ import.gorillas = function() {
   
   #' Build mesh
   bnd = inla.mesh.segment(loc = data.frame(gorillas$window$bdry[[1]]))
-  mesh = inla.mesh.2d(interior = bnd, max.edge = 250)
+  mesh = inla.mesh.2d(interior = bnd, max.edge = 222) # ! With higher max.edge we run into various INLA errors/warnings
   mesh$crs = inla.CRS(proj4string(nests))
   
   #' Turn covariates int SpatialGridDataFrame
