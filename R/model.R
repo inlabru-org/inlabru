@@ -447,7 +447,7 @@ list.indices.model = function(model, points){
           # If a is masked, correct number of indices
           if (!is.null(eff$A.msk)) { idx[[name]] = 1:sum(eff$A.msk)}
         } else {
-          ng = eff$inla.spde[[name]]$n.group
+          ng = eff$ngroup
           if (is.null(ng)) { ng = 1 }
           idx[[name]] = inla.spde.make.index(name, n.spde = eff$inla.spde$n.spde, n.group = ng)
         }
