@@ -73,3 +73,48 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
   # Return
   pint
 }
+
+
+
+#' Variance and correlations measures for prediction components
+#'
+#' @aliases devel.cvmeasure
+#' @export
+#' @param join A joint prediction of two latent components
+#' @param prediction1 A prediction of first component
+#' @param prediction2 A prediction of the first component
+#' @return Variance and correlations measures
+
+devel.cvmeasure = function(joint, prediction1, prediction2, integrate = list()) {
+
+  #' Covariance
+  joint$cov = (joint$var - prediction1$var - prediction2$var)/2
+  
+  #' Correlation
+  corr = function(joint, a, b) { ((joint - a - b) / (2 * sqrt(a * b)))}
+  joint$cor = corr(joint$var, prediction1$var, prediction2$var)
+  
+  if ( "coordinates" %in% integrate ){
+    mesh = attributes(joint)[["misc"]]$mesh
+    weights = diag(as.matrix(inla.mesh.fem(mesh)$c0))
+    weights = weights/sum(weights) 
+    vj = sum(joint$var * weights)
+    v1 = sum(prediction1$var * weights)
+    v2 = sum(prediction2$var * weights)
+    cr = corr(vj, v1, v2)
+    ret = data.frame(var.joint = vj, var1 = v1, var2 = v2, cor = cr)
+    
+  } else {
+    tmp = attributes(joint)
+    ret = joint[,c("cov","cor")]
+    ret$var.joint = joint$var
+    ret$var1 = prediction1$var
+    ret$var2 = prediction2$var
+    attr(ret, "misc") = tmp[["misc"]]
+    attr(ret, "type") = tmp[["type"]]
+  }
+  
+  return(ret)
+}
+
+
