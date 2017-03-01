@@ -199,6 +199,7 @@ make.model = function(fml) {
                         A.msk = ge$A.msk,
                         mesh.coords = ge$f$term,
                         map = ge$map,
+                        group.char = ge$group.char,
                         inla.spde = ge$model),
                         fchar = lb)
     
@@ -241,13 +242,15 @@ make.model = function(fml) {
 #' @return A list with mesh, model and the return value of the f-call
 
 g = function(covariate, 
-             map = NULL, 
+             map = NULL,
+             group = NULL,
              model = "linear", 
              mesh = NULL, 
              A.msk = NULL, ...){
  
   label = as.character(substitute(covariate))
   map.char = as.character(substitute(map))
+  group.char = as.character(substitute(group))
   A.msk.char = as.character(substitute(A.msk))
   
   if ( length(map.char) == 0 ) { map = NULL } else { map = substitute(map) }
@@ -256,7 +259,7 @@ g = function(covariate,
   # Only call f if we are  not dealing with an offset
   if ( label == "offset" ) { fvals = list(model="offset") }
   else if ( is.character(model) && model == "factor" ) { fvals = list(model="factor") } # , n = list(...)$n
-  else { fvals = f(xxx, ..., model = model) }
+  else { fvals = f(xxx, ..., group = group, model = model) }
   fvals$label = label
   
   # Default map
@@ -268,9 +271,9 @@ g = function(covariate,
   # Check if we got a mesh argument if the model is an SPDE
   if ( fvals$model == "spde2" & is.null(mesh) ) stop(sprintf("Model %s is an SPDE but no mesh was provided", label))
   
-  
   ret = list(mesh = mesh, 
              map = map,
+             group.char = group.char,
              A.msk = A.msk,
              model = model, 
              f = fvals)
@@ -407,9 +410,9 @@ list.A.model = function(model, points){
 
       if (is.null(eff$ngroup)) { ng = 1 } else { ng = eff$ngroup }
       if (ng > 1) {
-        group = as.matrix(eff$group)
+        group = points[[eff$group.char]]
       } else { group = NULL }
-      A = inla.spde.make.A(eff$mesh, loc = loc, group = group)
+      A = inla.spde.make.A(eff$mesh, loc = loc, group = group, n.group = ng)
       # Mask columns of A
       if (!is.null(eff$A.msk)) { A = A[, as.logical(eff$A.msk), drop=FALSE]}
       # Weights for models with A-matrix are realized in the follwoing way:
