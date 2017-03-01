@@ -373,7 +373,7 @@ predict.lgcp = function(result,
   # Extract target dimension from predictor (given as right hand side of formula)
   dims = setdiff(all.vars(update(predictor, .~0)), ".")
   pchar = as.character(predictor)
-  predictor.rhs = pchar[-1]
+  predictor.rhs = pchar[length(pchar)]
   predictor = parse(text = predictor.rhs)
   
   # Alternatively, take dims from points
