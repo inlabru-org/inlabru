@@ -572,10 +572,11 @@ mapper = function(map, points, eff) {
   # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
   # to fix that by filling in nearest neighbor values.
   if ( any(is.na(loc)) & ( inherits(emap, "SpatialGridDataFrame") )) {
-  
+    
     warning(sprintf("Map '%s' has returned NA values. As it is a SpatialGridDataFrame I will try to fix this by filling in values of spatially nearest neighbors. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
                  deparse(map), eff$label))
     
+    require(rgeos)
     BADpoints = points[as.vector(is.na(loc)),]
     GOODpoints = points[as.vector(!is.na(loc)),]
     dst = gDistance(GOODpoints,BADpoints, byid=T)
