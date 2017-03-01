@@ -187,6 +187,12 @@ make.model = function(fml) {
     lb = gsub(paste0("=", deparse(ge$A.msk)), "", lb, fixed =TRUE)
     lb = gsub("[,][ ]*A.msk[ ]*=[^),]*", "", lb)
 
+    # For SPDE models replace group=XXX by group=effectname.group
+    if (ge$f$model == "spde2") {
+      lb = gsub("[,][ ]*group[ ]*=[^),]*", paste0(", group = ",ge$f$label,".group"), lb)
+    }
+    
+    
     lbl[[k]] = lb
     
     smod = c(ge$f, list(mesh = ge$mesh, 
@@ -450,6 +456,9 @@ list.indices.model = function(model, points){
           ng = eff$ngroup
           if (is.null(ng)) { ng = 1 }
           idx[[name]] = inla.spde.make.index(name, n.spde = eff$inla.spde$n.spde, n.group = ng)
+          # NOTE: MODELS WITH REPLICATES ARE NOTE IMPLEMENTED YET.
+          #      - when using group= or replicate, the f-formula has to be adjusted to read the groups/replicates from the stack
+          #      - see make.model() for an example on how to do this for groups
         }
       }
     } else {
