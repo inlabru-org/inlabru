@@ -402,7 +402,7 @@ predict.lgcp = function(result,
   type = "1d"
   
   # Generate points for dimensions to integrate over
-  wicfg = iconfig(NULL, result$sppa$points, result$model, idims)
+  wicfg = iconfig(NULL, result$sppa$points, result$model, idims, mesh = result$sppa$mesh)
   wips = ipoints(samplers, wicfg[idims])
   
   if ( length(dims) == 0 ) {
