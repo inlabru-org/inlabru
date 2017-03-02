@@ -701,6 +701,8 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
                        )
     eval(icall)
     
+    if ( is.character(result) ) { stop(paste0("INLA returned message: ", result)) }
+    
     n.retry = 0
     max.retry = 10
     while ( ( is.null(result) | length(result) == 5 ) & ( n.retry <= max.retry ) ) {
