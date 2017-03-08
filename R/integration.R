@@ -365,7 +365,7 @@ triangle = function(mesh,loc){
     c2 = mcross(bp,bc)
     c3 = mcross(cp,ca)
     
-    # AP × AB, BP × BC, and CP × CA must have same sign
+    # AP x AB, BP x BC, and CP x CA must have same sign
     inside = which( ((sign(c1) == -1) & (sign(c2)==-1) & (sign(c3)==-1)) | ((sign(c1) == 1) & (sign(c2)==1) & (sign(c3)==1)))
     
     tri[inside] = j
