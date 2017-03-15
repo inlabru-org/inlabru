@@ -8,6 +8,7 @@
 #' @param loglambda A vector of log intensities at the mesh vertices (for higher order basis functions, e.g. for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis function weights rather than the values at the \code{mesh$n} vertices)
 #' @param strategy Only applicable to 2D meshes. Use "rectangle" for flat 2D meshes and "spherical" for "sliced-spherical" for spherical meshes. 
 #' @param R Only for spherical meshes. This sets the radius of the sphere approximated by the mesh.
+#' @param samplers A SpatialPolygonsDataFrame. Simulated points that fall outside these polygons are discarded.
 #'
 #' @return point samples on the mesh
 #' 
@@ -26,7 +27,7 @@
 #' pts = sample.lgcp(gnestmesh, rep(-10, gnestmesh$n))
 #' ggplot() + gg(gnestmesh) + gg(pts)
 
-sample.lgcp = function(mesh, loglambda, strategy = "rectangle", R = 6371) {
+sample.lgcp = function(mesh, loglambda, strategy = "rectangle", R = 6371, samplers = NULL) {
   
 if (class(mesh) == "inla.mesh.1d") {
   xmin = mesh$interval[1]
@@ -173,6 +174,11 @@ if (class(mesh) == "inla.mesh.1d") {
     ret = as.data.frame(ret)
     coordinates(ret) = c("x","y")
     proj4string(ret) = mesh$crs
+  }
+  
+  # Only retain points within the samplers
+  if( !is.null(samplers) ){
+    ret = ret[!is.na(over(ret, samplers)), ]
   }
   
   ret
