@@ -207,7 +207,7 @@ make.model = function(fml) {
     if (smod$model == "factor") { lbl[[k]] = smod$label ; smod$fchar = smod$label }
     
     # Fix label for offset effect
-    if (smod$label == "offset") lbl[[k]] = paste0("offset(",as.character(smod$map),")")
+    if (smod$label == "offset") lbl[[k]] = paste0("offset(",deparse(smod$map),")")
     
     # Set submodel
     submodel[[ge$f$label]] = smod
