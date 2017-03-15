@@ -7,7 +7,7 @@
 iinla(data, model, stackmaker, n = 10, result = NULL,
   iinla.verbose = iinla.getOption("iinla.verbose"),
   control.inla = iinla.getOption("control.inla"),
-  control.compute = iinla.getOption("control.compute"), ...)
+  control.compute = iinla.getOption("control.compute"), offset = NULL, ...)
 }
 \arguments{
 \item{data}{A data.frame}

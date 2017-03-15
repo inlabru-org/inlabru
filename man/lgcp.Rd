@@ -7,7 +7,8 @@
 lgcp(points, samplers = NULL, model = coordinates ~ spde(model =
   inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1,
   predictor = . ~ ., mesh = NULL, run = TRUE, scale = NULL,
-  append = NULL, ...)
+  append = NULL, n = 10, offset = 0, result = NULL,
+  weights.as.offset = FALSE, ...)
 }
 \arguments{
 \item{points}{A data frame or SpatialPoints[DataFrame] object}
@@ -23,6 +24,12 @@ lgcp(points, samplers = NULL, model = coordinates ~ spde(model =
 \item{scale}{If provided as a scalar then rescale the exposure parameter of the Poisson likelihood. This will influence your model's intercept but can help with numerical instabilities, e.g. by setting scale to a large value like 10000}
 
 \item{append}{A list of functions which are evaluated for the \code{points} and the constructed integration points. The Returned values are appended to the respective data frame of points/integration points.}
+
+\item{n}{maximum number of \link{iinla} iterations}
+
+\item{offset}{the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.}
+
+\item{result}{An \code{iinla} object returned from previous calls of \code{bru}/\code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
 
 \item{...}{Arguments passed on to \link{iinla}}
 }

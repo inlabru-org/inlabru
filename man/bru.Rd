@@ -6,7 +6,8 @@
 \usage{
 bru(points, predictor = . ~ ., model = y ~ spde(model =
   inla.spde2.matern(mesh), map = coordinates, mesh = mesh), mesh = NULL,
-  run = TRUE, linear = FALSE, E = 1, family = "gaussian", ...)
+  run = TRUE, linear = FALSE, E = 1, family = "gaussian", n = 10,
+  offset = 0, result = NULL, ...)
 }
 \arguments{
 \item{points}{A data.frame or SpatialPoints[DataFrame] object}
@@ -24,6 +25,12 @@ bru(points, predictor = . ~ ., model = y ~ spde(model =
 \item{E}{Exposure parameter passed on to \link{inla}}
 
 \item{family}{Likelihood family passed on to \link{inla}}
+
+\item{n}{maximum number of \link{iinla} iterations}
+
+\item{offset}{the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.}
+
+\item{result}{An \code{iinla} object returned from previous calls of \code{bru}/\code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
 
 \item{...}{more arguments passed on to \link{inla}}
 }

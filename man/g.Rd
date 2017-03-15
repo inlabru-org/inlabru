@@ -4,8 +4,8 @@
 \alias{g}
 \title{A wrapper for the \link{inla} \link{f} function}
 \usage{
-g(covariate, map = NULL, model = "linear", mesh = NULL, A.msk = NULL,
-  ...)
+g(covariate, map = NULL, group = NULL, model = "linear", mesh = NULL,
+  A.msk = NULL, ...)
 }
 \arguments{
 \item{covariate}{A string defining the label of the INLA effect. If \code{map} is provided this also sets the coariate used as a first argument to the \link{f} call.}
