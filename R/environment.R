@@ -10,7 +10,13 @@ init.tutorial = function() {
 
 msg = function(txt) {
   if ( iinla.getOption("iinla.verbose") ) { cat(paste0(txt,"\n")) }
-  iinla.env$log = c(iinla.env$log, txt)
+  logentry(msg)
+}
+
+logentry = function(txt) { iinla.env$log = c(iinla.env$log, paste0(Sys.time(),": ", txt)) }
+
+logbook = function() {
+  sprintf(iinla.env$log)
 }
 
 iinla.getOption = function (option = c("control.compute", "control.inla","iinla.verbose")) 
