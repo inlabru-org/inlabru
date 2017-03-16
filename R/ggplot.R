@@ -477,6 +477,23 @@ plot.prediction = function(..., property = "median") {
     return(plt)
     
   } 
+  
+    else if ( attr(data,"type") == "0d" ) {
+      dnames = colnames(data)
+      ggp = ggplot()
+      
+      if ( "summary" %in% names(attributes(data)) ){
+        smy = attr(data, "summary")
+        ggp = ggp + geom_ribbon(data = smy$inner.marg, ymin = 0, aes_string(x = dnames[1], ymax = dnames[2]), alpha = 0.1, colour = "grey")
+      } 
+      
+      ggp = ggp + geom_path(data = data, aes_string(x = dnames[1], y = dnames[2]))
+      
+      if (length(pnames) == 1) { ggp = ggp + guides(color=FALSE, fill=FALSE) } 
+
+      ggp
+    }
+
     else if ( attr(data,"type") == "1d" ) {
       
       data = do.call(rbind, lapply(1:length(args), function(k) data.frame(args[[k]], Prediction = pnames[[k]])))
