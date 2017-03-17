@@ -272,9 +272,35 @@ summary.lgcp = function(result) {
     cat("\n")
   }
   
-  cat("\n--- Hyper parameters ----- \n\n")
+  cat("\n--- All hyper parameters (internal representation) ----- \n\n")
   # cat(paste0("  ", paste(rownames(result$summary.hyperpar), collapse = ", "), "\n"))
   print(result$summary.hyperpar)
+  
+  
+  marginal.summary = function(m, name) {
+    df = data.frame(param = name,
+                    mean = inla.emarginal(identity, m))
+    df$var = inla.emarginal(function(x) {(x-df$mean)^2}, m)
+    df$sd = sqrt(df$var)
+    df[c("uq","median","lq")] = inla.qmarginal(c(0.025, 0.5, 0.975), m)
+    df
+  }
+  
+  cat("\n")
+  for (nm in names(result$sppa$model$effects)) {
+    eff = result$sppa$model$effects[[nm]]
+    if (!is.null(eff$mesh)){
+      hyp = inla.spde.result(result, nm, eff$inla.spde)
+      cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
+      df = rbind(marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"), 
+                marginal.summary(hyp$marginals.log.range.nominal$range.nominal.1, "log.range"), 
+                marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
+                marginal.summary(hyp$marginals.log.variance.nominal$variance.nominal.1, "log.variance"))
+      print(df)
+    }
+  }
+  
+  
   
   cat("\n--- Criteria --------------\n\n")
   cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic),"\n"))
