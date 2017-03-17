@@ -85,22 +85,43 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
 #' @param prediction2 A prediction of the first component
 #' @return Variance and correlations measures
 
-devel.cvmeasure = function(joint, prediction1, prediction2, integrate = list()) {
+devel.cvmeasure = function(joint, prediction1, prediction2, samplers = NULL) {
 
   #' Covariance
   joint$cov = (joint$var - prediction1$var - prediction2$var)/2
   
   #' Correlation
   corr = function(joint, a, b) { ((joint - a - b) / (2 * sqrt(a * b)))}
-  joint$cor = corr(joint$var, prediction1$var, prediction2$var)
+  cor = corr(joint$var, prediction1$var, prediction2$var)
+  if (any((cor>1) | (cor<(-1)))) {
+    cor[(cor>1) | (cor<(-1))] = NA
+  }
+  joint$cor = cor
   
-  if ( "coordinates" %in% integrate ){
+  if ( !is.null(samplers) ){
+    
+    #
+    # PRESENTED TO YOU BY HACKY McHACKERSON
+    #
     mesh = attributes(joint)[["misc"]]$mesh
-    weights = diag(as.matrix(inla.mesh.fem(mesh)$c0))
+
+    ret = list()
+    ret$name = "tmp"
+    ret$mesh = mesh
+    ret$get.coord = coordinates
+    ret$n.coord = 2
+    ret$class = "matrix"  
+    ret$project = TRUE
+    ret$p4s = proj4string(samplers)
+    
+    wips = ipoints(samplers, list(coordinates = ret))
+    A = inla.spde.make.A(mesh, loc = wips)
+    
+    weights = wips$weight
     weights = weights/sum(weights) 
-    vj = sum(joint$var * weights)
-    v1 = sum(prediction1$var * weights)
-    v2 = sum(prediction2$var * weights)
+    vj = sum(as.vector(A %*% joint$var) * weights)
+    v1 = sum(as.vector(A %*% prediction1$var) * weights)
+    v2 = sum(as.vector(A %*% prediction2$var) * weights)
     cr = corr(vj, v1, v2)
     ret = data.frame(var.joint = vj, var1 = v1, var2 = v2, cor = cr)
     
