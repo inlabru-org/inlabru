@@ -307,6 +307,14 @@ summary.lgcp = function(result) {
   cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic),"\n"))
 }
 
+#' Summarize a bru object
+#'
+#' @aliases summary.bru
+#' @export
+#' @param result A result object obtained from a bru() run
+#' 
+summary.bru = summary.lgcp
+
 
 #' Generate a simple default mesh
 #'
