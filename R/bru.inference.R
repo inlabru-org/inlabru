@@ -282,7 +282,7 @@ summary.lgcp = function(result) {
                     mean = inla.emarginal(identity, m))
     df$var = inla.emarginal(function(x) {(x-df$mean)^2}, m)
     df$sd = sqrt(df$var)
-    df[c("uq","median","lq")] = inla.qmarginal(c(0.025, 0.5, 0.975), m)
+    df[c("lq","median","uq")] = inla.qmarginal(c(0.025, 0.5, 0.975), m)
     df
   }
   
