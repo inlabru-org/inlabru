@@ -1,3 +1,8 @@
+# GENERICS
+
+vertices = function(...){UseMethod("vertices")}
+
+
 #' Plot an inla.mesh using ggplot
 #'
 #' @aliases ggp.mesh
@@ -93,4 +98,16 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
   } else {
     return(mask)
   }
+}
+
+
+
+vertices.inla.mesh = function(mesh) {
+  if (is.null(mesh$crs)) {
+    mesh$loc
+  } else {
+    if (any(!(mesh$loc[,3]==0))) { vrt = mesh$loc } else { vrt = mesh$loc[,c(1,2)] }
+    SpatialPointsDataFrame(vrt, proj4string = mesh$crs, data = data.frame(idx = 1:nrow(mesh$loc)))
+  }
+  
 }
