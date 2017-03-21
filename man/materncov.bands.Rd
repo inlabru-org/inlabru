@@ -36,9 +36,9 @@ cyclic interval}
 \value{
 A list with estimated covariance or correlation (when \code{log.variance} is
     \code{NULL}) functions:
-\item{lower} An estimate of the lower \code{(1-quantile)/2} quantile
-\item{middle} An estimate of the median quantile
-\item{upper} An estimate of the upper \code{(1-quantile)/2} quantile
+\item{lower}{An approximate lower bound for the \code{quantile} credible region}
+\item{median}{The function for for the approximate median parameters quantile}
+\item{upper}{An approximate upper bound for the \code{quantile} credible region}
 }
 \description{
 Evaluate the covariance function for an inla.spde

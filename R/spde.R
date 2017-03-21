@@ -25,9 +25,9 @@
 #'     cyclic interval
 #' @return A list with estimated covariance or correlation (when \code{log.variance} is
 #'     \code{NULL}) functions:
-#' \item{lower} An estimate of the lower \code{(1-quantile)/2} quantile
-#' \item{middle} An estimate of the median quantile
-#' \item{upper} An estimate of the upper \code{(1-quantile)/2} quantile
+#' \item{lower}{An approximate lower bound for the \code{quantile} credible region}
+#' \item{median}{The function for for the approximate median parameters quantile}
+#' \item{upper}{An approximate upper bound for the \code{quantile} credible region}
 #' 
 #' @details
 #' Uses a Gaussian assumption for the internal model parameters, and finds a region in parameter
@@ -41,9 +41,8 @@ materncov.bands = function(manifold, dist, log.range,
     }
     ## Do the right thing for _nominal_ variance
     calc.cov.S1 <- function(dist, kappa, var) {
-        L <- diff(mesh$interval)
-        dist <- dist %% L
-        out <- calc.cov.R(abs(dist), kappa, var) + calc.cov.R(abs(dist-L),
+        dist <- dist %% S1.L
+        out <- calc.cov.R(abs(dist), kappa, var) + calc.cov.R(abs(dist-S1.L),
                                                               kappa,
                                                               var)
         cov0 <- calc.cov.R(0, kappa, 1) ## Measure the relative contribution of each term
@@ -51,9 +50,9 @@ materncov.bands = function(manifold, dist, log.range,
         max.loop <- 10
         while ((cov0 > 1e-3) && (loop < max.loop)) {
             loop <- loop+1
-            out <- out + calc.cov.R(abs(dist+L*loop), kappa, var) +
-                calc.cov.R(abs(dist-L-L*loop), kappa, var)
-            cov0 <- calc.cov.R(L*loop, kappa, 1)
+            out <- out + calc.cov.R(abs(dist+S1.L*loop), kappa, var) +
+                calc.cov.R(abs(dist-S1.L-S1.L*loop), kappa, var)
+            cov0 <- calc.cov.R(S1.L*loop, kappa, 1)
         }
         out
     }
@@ -74,7 +73,8 @@ materncov.bands = function(manifold, dist, log.range,
         inla.matern.cov.s2(nu=nu, kappa, x=0, norm.corr=FALSE)
     }
     if (!is.character(manifold)) {
-        if (inherits(manifold, "inla.mesh") || inherits(manifold, "inla.mesh.1d")) {
+        if (inherits(manifold, "inla.mesh") ||
+            inherits(manifold, "inla.mesh.1d")) {
             if ((mesh$manifold == "S1") && is.null(S1.L)) {
                 S1.L <- diff(mesh$interval)
             }
@@ -112,7 +112,7 @@ materncov.bands = function(manifold, dist, log.range,
         qq <- qnorm(c((1-quantile)/2, 0.5, (1+quantile)/2))
         kappas <- sqrt(8*nu)/exp(log.range$mean + log.range$sd*rev(qq))
         out <- data.frame(lower=calc.corr(dist, kappas[1]),
-                          middle=calc.corr(dist, kappas[2]),
+                          median=calc.corr(dist, kappas[2]),
                           upper=calc.corr(dist, kappas[3]))
     } else { ## !is.null(log.variance)
         if (!is.list(log.variance)) {
@@ -120,11 +120,11 @@ materncov.bands = function(manifold, dist, log.range,
         }
         kappa <- sqrt(8*nu)/exp(log.range$mean)
         out <- data.frame(lower=Inf,
-                          middle=calc.cov(dist, kappa, exp(log.variance$mean)),
+                          median=calc.cov(dist, kappa, exp(log.variance$mean)),
                           upper=-Inf)
         if (log.variance$sd == 0) {
-            out$lower <- out$middle
-            out$upper <- out$middle
+            out$lower <- out$median
+            out$upper <- out$median
         } else {
             qq <- qchisq(quantile, 2)^0.5
             log.kappas <- log(sqrt(8*nu)) - (log.range$mean + log.range$sd * c(qq,-qq))
@@ -166,37 +166,33 @@ spde.posterior = function(result, name, what = "range") {
   spderesult <- inla.spde.result(result, name, spdespec)
   
   if ( what == "matern.correlation" || what == "matern.covariance") {
-    
+
+      xmax <- exp(spderesult$summary.log.range.nominal[["0.975quant"]]) * 1.2
+      x <- seq(0, xmax, length=200)
+      log.range <- list(mean=spderesult$summary.log.range.nominal[["mean"]],
+                        sd=spderesult$summary.log.range.nominal[["sd"]])
+      log.variance <- list(mean=spderesult$summary.log.variance.nominal[["mean"]],
+                           sd=spderesult$summary.log.variance.nominal[["sd"]])
     if ( what == "matern.correlation" ) { 
       corr = TRUE 
       ylab = "Matern Correlation"
+      out <- materncov.bands(result$sppa$model$effects[[name]]$mesh,
+                             dist=x,
+                             log.range=log.range,
+                             log.variance=NULL,
+                             alpha=2, quantile=0.95)
     } else { 
       corr = FALSE
       ylab = "Matern Covariance"
-      }
-
-    if ( class(result$sppa$model$effects[[name]]$mesh) == "inla.mesh.1d") { d = 1 } else { d = 2 }
-    
-    materncov = function(dist, kappa,d,corr){
-      inla.matern.cov(nu=1, kappa, x=dist,d=d, corr = corr)
+      out <- materncov.bands(result$sppa$model$effects[[name]]$mesh,
+                             dist=x,
+                             log.range=log.range,
+                             log.variance=log.variance,
+                             alpha=2, quantile=0.95)
     }
-    
-    kappaQ = inla.qmarginal(p=c(0.025,0.5,0.975), marginal=spderesult$marginals.kappa[[1]])
-    
-    xmax = exp(spderesult$summary.log.range.nominal[["0.975quant"]]) * 1.2
-    x = seq(0,xmax,length=200)
-    
-    # median
-    med = apply(matrix(data=x, ncol=1), 1, 
-                              function(X)materncov(dist=X, kappa =kappaQ[2],d=d,corr=corr ))
-    # lower band
-    uq = apply(matrix(data=x, ncol=1), 1, 
-                              function(X)materncov(dist=X, kappa =kappaQ[1],d=d,corr=corr))
-    # upper band
-    lq = apply(matrix(data=x, ncol=1), 1,
-                              function(X)materncov(dist=X, kappa =kappaQ[3],d=d,corr=corr))
 
-    df = data.frame(x = x, median = med, lq = lq, uq = uq)
+
+    df = data.frame(x = x, median = out$median, lq = out$lower, uq = out$upper)
     attr(df, "type") = "1d"
     attr(df, "misc") = list(dims = "x", predictor = c("distance", ylab))
     class(df) = list("prediction","data.frame")
