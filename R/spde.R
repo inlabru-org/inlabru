@@ -75,8 +75,8 @@ materncov.bands = function(manifold, dist, log.range,
     if (!is.character(manifold)) {
         if (inherits(manifold, "inla.mesh") ||
             inherits(manifold, "inla.mesh.1d")) {
-            if ((mesh$manifold == "S1") && is.null(S1.L)) {
-                S1.L <- diff(mesh$interval)
+            if ((manifold == "S1") && is.null(S1.L)) {
+                S1.L <- diff(manifold$interval)
             }
             manifold <- manifold$manifold
         }
