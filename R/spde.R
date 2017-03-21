@@ -7,22 +7,28 @@
 #'     function.
 #'
 #' @param manifold Either "R1", "S1", "R2", or "S2", from
-#'     \code{mesh$manifold}, or a full \code{inla.mesh} or \code{inla.mesh.1d} object.
+#'     \code{mesh$manifold}, or a full \code{inla.mesh} or
+#'     \code{inla.mesh.1d} object.
 #' @param dist A vector of distances at which to calculate the
 #'     covariances/correlations
-#' @param log.range A list (mean, sd), such as produced by
-#'     inla.spde.result(...)$summary.log.range.nominal[[1]][
-#'     c("mean", "sd")]
-#' @param log.variance Either \code{NULL}, a vector of the same type
-#'     as for log.range. When \code{NULL}, the correlations are
-#'     calculated instead of the covariances.
+#' @param log.range A scalar or a list (mean, sd), such as produced by
+#'     inla.spde.result(...)$summary.log.range.nominal[[1]][ c("mean",
+#'     "sd")]
+#' @param log.variance Either \code{NULL}, a scalar, or vector of the
+#'     same type as for log.range. When \code{NULL}, the correlations
+#'     are calculated instead of the covariances.
 #' @param alpha The SPDE operator order. Default 2.
 #' @param quantile The target credible probability. Default 0.95.
-#' @param n The number of parameter combinations to use for the approximation. Default 64.
-#' @param S1.L For \code{manifold} \code{"S1"}, give the length of the cyclic interval
-#' @return A covariance or correlation (when \code{log.variance} is
-#'     \code{NULL}) function.
-#'
+#' @param n The number of parameter combinations to use for the
+#'     approximation. Default 64.
+#' @param S1.L For \code{manifold} \code{"S1"}, give the length of the
+#'     cyclic interval
+#' @return A list with estimated covariance or correlation (when \code{log.variance} is
+#'     \code{NULL}) functions:
+#' \item{lower} An estimate of the lower \code{(1-quantile)/2} quantile
+#' \item{middle} An estimate of the median quantile
+#' \item{upper} An estimate of the upper \code{(1-quantile)/2} quantile
+#' 
 #' @details
 #' Uses a Gaussian assumption for the internal model parameters, and finds a region in parameter
 #' space with approximately \code{quantile} probability.
@@ -99,6 +105,9 @@ materncov.bands = function(manifold, dist, log.range,
                     manifold))
     }
     nu <- alpha-d/2
+    if (!is.list(log.range)) {
+        log.range <- list(mean=log.range, sd=0)
+    }
     if (is.null(log.variance)) {
         qq <- qnorm(c((1-quantile)/2, 0.5, (1+quantile)/2))
         kappas <- sqrt(8*nu)/exp(log.range$mean + log.range$sd*rev(qq))
@@ -106,23 +115,31 @@ materncov.bands = function(manifold, dist, log.range,
                           middle=calc.corr(dist, kappas[2]),
                           upper=calc.corr(dist, kappas[3]))
     } else { ## !is.null(log.variance)
+        if (!is.list(log.variance)) {
+            log.variance <- list(mean=log.variance, sd=0)
+        }
         kappa <- sqrt(8*nu)/exp(log.range$mean)
         out <- data.frame(lower=Inf,
                           middle=calc.cov(dist, kappa, exp(log.variance$mean)),
                           upper=-Inf)
-        qq <- qchisq(quantile, 2)^0.5
-        log.kappas <- log(sqrt(8*nu)) - (log.range$mean + log.range$sd * c(qq,-qq))
-        log.variances <- log.variance$mean + log.variance$sd * c(-qq,qq)
-        for (angle in 2*pi*(1:n)/n) {
-            ca <- cos(angle)
-            sa <- sin(angle)
-            the.corr <- calc.cov(dist,
-                                 exp(log.kappas[1] * (1-ca)/2 +
-                                     log.kappas[2] * (ca+1)/2),
-                                 exp(log.variances[1] * (1-sa)/2+
-                                     log.variances[2] * (sa+1)/2))
-            out$lower <- pmin(out$lower, the.corr)
-            out$upper <- pmax(out$upper, the.corr)
+        if (log.variance$sd == 0) {
+            out$lower <- out$middle
+            out$upper <- out$middle
+        } else {
+            qq <- qchisq(quantile, 2)^0.5
+            log.kappas <- log(sqrt(8*nu)) - (log.range$mean + log.range$sd * c(qq,-qq))
+            log.variances <- log.variance$mean + log.variance$sd * c(-qq,qq)
+            for (angle in 2*pi*(1:n)/n) {
+                ca <- cos(angle)
+                sa <- sin(angle)
+                the.corr <- calc.cov(dist,
+                                     exp(log.kappas[1] * (1-ca)/2 +
+                                         log.kappas[2] * (ca+1)/2),
+                                     exp(log.variances[1] * (1-sa)/2+
+                                         log.variances[2] * (sa+1)/2))
+                out$lower <- pmin(out$lower, the.corr)
+                out$upper <- pmax(out$upper, the.corr)
+            }
         }
     }
     out

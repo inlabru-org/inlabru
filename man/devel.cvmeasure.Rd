@@ -4,7 +4,7 @@
 \alias{devel.cvmeasure}
 \title{Variance and correlations measures for prediction components}
 \usage{
-devel.cvmeasure(joint, prediction1, prediction2, integrate = list())
+devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL)
 }
 \arguments{
 \item{prediction1}{A prediction of first component}
