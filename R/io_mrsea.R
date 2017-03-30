@@ -7,7 +7,7 @@
 NULL
 
 # INTERNAL DATA STORAGE
-io_mrsea.getDataDir = function() {return(system.file("data",package="iDistance"))}
+io_mrsea.getDataDir = function() {return(system.file("data",package="inlabru"))}
 
 
 #' Load \link{mrsea} survey data from raw data sets
@@ -39,7 +39,7 @@ io_mrsea.pkgdata.load = function() {
   
   segdata<-dis.data.re[,c("Transect.Label", "Transect.label" ,"season", "impact", "depth", "Sample.Label",
                           "segment.label" , "length", "Effort", 'x', 'y')]
-  segdata<- distinct(segdata, Sample.Label)
+  segdata<- distinct(segdata, Sample.Label, .keep_all = TRUE)
   
   # effort, object and distance.
   # Not taken x and y as these are segement mid points not detection locations
@@ -66,6 +66,21 @@ io_mrsea.pkgdata.load = function() {
   # Attach CRS projection strings
   dset$p4s = "+proj=utm +zone=32"
   dset$mesh.p4s = "+proj=utm +zone=32"
+  
+  
+  ############ NEW FORMAT USING sp objects ##############
+
+  dset = as.spatial.dsdata(dset, cnames = c("x","y"), crs = CRS(dset$p4s))
+  dset$mesh$crs = inla.CRS("+proj=utm +zone=32")
+  
+  # Set weight of samplers to the strip width
+  dset$samplers$weight = 500
+  
+  # Boundary
+  dset$boundary = spoly(dset$mesh$loc[dset$mesh$segm$int$idx[,1], 1:2], dset$mesh$crs)
+  
+  # Covariates
+  dset$covar = SpatialPointsDataFrame(depth[,1:2], data = depth[,3,drop=FALSE], proj4string = CRS("+proj=utm +zone=32"))
   
   return(dset)
   

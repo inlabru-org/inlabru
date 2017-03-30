@@ -62,9 +62,9 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
     pint)
   pint$inside = ( pint$counts >= pint$lq ) & ( pint$counts <= pint$uq ) 
   
-  ggp = ggplot(pint) + geom_crossbar(aes(x=mid,y=mq,ymin=lq,ymax=uq,fill=inside,color=inside), show.legend=FALSE) +
-    geom_point(aes(x=mid,y=mq), shape = 95, size = 3, color = "blue") +
-    geom_point(aes(x=mid,y=counts), shape = 20, size = 2) +
+  ggp = ggplot() + geom_crossbar(data = pint, mapping = aes(x=mid,y=mq,ymin=lq,ymax=uq,fill=inside,color=inside), show.legend=FALSE) +
+    geom_point(data = pint, mapping = aes(x=mid,y=mq), shape = 95, size = 3, color = "blue") +
+    geom_point(data = pint, mapping = aes(x=mid,y=counts), shape = 20, size = 2) +
     xlab(all.vars(update.formula(predictor, ~.0))) +
     ylab("count")
   
@@ -73,3 +73,69 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
   # Return
   pint
 }
+
+
+
+#' Variance and correlations measures for prediction components
+#'
+#' @aliases devel.cvmeasure
+#' @export
+#' @param join A joint prediction of two latent components
+#' @param prediction1 A prediction of first component
+#' @param prediction2 A prediction of the first component
+#' @return Variance and correlations measures
+
+devel.cvmeasure = function(joint, prediction1, prediction2, samplers = NULL) {
+
+  #' Covariance
+  joint$cov = (joint$var - prediction1$var - prediction2$var)/2
+  
+  #' Correlation
+  corr = function(joint, a, b) { ((joint - a - b) / (2 * sqrt(a * b)))}
+  cor = corr(joint$var, prediction1$var, prediction2$var)
+  if (any((cor>1) | (cor<(-1)))) {
+    cor[(cor>1) | (cor<(-1))] = NA
+  }
+  joint$cor = cor
+  
+  if ( !is.null(samplers) ){
+    
+    #
+    # PRESENTED TO YOU BY HACKY McHACKERSON
+    #
+    mesh = attributes(joint)[["misc"]]$mesh
+
+    ret = list()
+    ret$name = "tmp"
+    ret$mesh = mesh
+    ret$get.coord = coordinates
+    ret$n.coord = 2
+    ret$class = "matrix"  
+    ret$project = TRUE
+    ret$p4s = proj4string(samplers)
+    
+    wips = ipoints(samplers, list(coordinates = ret))
+    A = inla.spde.make.A(mesh, loc = wips)
+    
+    weights = wips$weight
+    weights = weights/sum(weights) 
+    vj = sum(as.vector(A %*% joint$var) * weights)
+    v1 = sum(as.vector(A %*% prediction1$var) * weights)
+    v2 = sum(as.vector(A %*% prediction2$var) * weights)
+    cr = corr(vj, v1, v2)
+    ret = data.frame(var.joint = vj, var1 = v1, var2 = v2, cor = cr)
+    
+  } else {
+    tmp = attributes(joint)
+    ret = joint[,c("cov","cor")]
+    ret$var.joint = joint$var
+    ret$var1 = prediction1$var
+    ret$var2 = prediction2$var
+    attr(ret, "misc") = tmp[["misc"]]
+    attr(ret, "type") = tmp[["type"]]
+  }
+  
+  return(ret)
+}
+
+

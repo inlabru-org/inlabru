@@ -187,9 +187,9 @@ if ( is.null(logscale) && !is.null(result$sppa$method) && (result$sppa$method=="
       df$col[!is.inside(mask.mesh, ploc, colnames(ploc))] = NA
       df$alpha = df$alpha & is.inside(mask.mesh, ploc, colnames(ploc))
     } else if ( class(mask) == "SpatialPolygonsDataFrame" ) {
-      msk = is.na(sp::over(SpatialPoints(ploc), mask , fn = NULL)[,1])
+      msk = is.na(sp::over(SpatialPoints(ploc, proj4string = CRS(proj4string(mask))), mask , fn = NULL)[,1])
       df$col[msk] = NA
-      df$alpha = df$alpha & msk
+      # df$alpha[msk] = 0 ; df$alpha[!msk] = 1
     } else if ( is.data.frame(mask) ){
       if ( !require(sp) ) { "You provided a data.frame as mask. The package sp is required to interpret it as a polygon."}
       msk = point.in.polygon(ploc[,1], ploc[,2], mask[,1], mask[,2]) == 1
@@ -210,7 +210,7 @@ if ( !rgl ){
   gg = gg + scale_alpha_discrete(guide = 'none')
   gg = gg + scale_fill_gradientn(colours = brewer.pal(9,"YlOrRd"))
   gg = gg + theme(legend.title = element_blank()) + coord_fixed()
-
+  
   # Facet properties
   if (length(property)>1) { gg = gg + facet_grid(. ~ property) }
   

@@ -44,8 +44,18 @@ inla.posterior.sample.structured = function(result,n){
     vals = list()
 
     # Extract simulated predictor and fixed effects
-    for (name in c("Predictor",result$names.fixed)) { vals[[name]] = extract.entries(name,smpl.latent) }
-
+    for (name in unique(c("Predictor", result$names.fixed))) { 
+      vals[[name]] = extract.entries(name,smpl.latent) 
+    }
+    
+    # For fixed effects that were modeled via factors we attach an extra vector holding the samples
+    fac.names = names(effect(result$model))[unlist(lapply(result$model$effects, function(e) {e$model == "factor"}) )]
+    for (name in fac.names) {
+      vals[[name]] = smpl.latent[startsWith(rownames(smpl.latent), name),]
+      names(vals[[name]]) = lapply(names(vals[[name]]), function(nm) {substring(nm, nchar(name)+1)})
+    }
+    
+      
     # Extract simulated latent variables. If the model is "clinear", however, extract the realisations
     # from the hyperpar field.
     if (length(result$summary.random) > 0) {

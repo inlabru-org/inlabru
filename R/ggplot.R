@@ -50,6 +50,10 @@ gg = function(data, ...) {
   else if (inherits(data, "SpatialLines") | inherits(data, "SpatialLinesDataFrame")) gg.segment(data, ...)
   else if (inherits(data, "SpatialPolygons") | inherits(data, "SpatialPolygonsDataFrame")) gg.polygon(data, ...)
   else if (inherits(data, "inla.mesh") || inherits(data, "inla.mesh.1d")) gg.mesh(data, ...)
+  else if (inherits(data, "RasterLayer")) gg.RasterLayer(data, ...)
+  else if (inherits(data, "SpatialGridDataFrame")) gg.SpatialGridDataFrame(data, ...)
+  else if ("ggp" %in% names(attributes(data))) attributes(data)$ggp
+  else {stop("Unknown data format.")}
 }
 
 #' ggmap geom for spatial objects
@@ -160,6 +164,39 @@ gg.mesh = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
   
   
   return(gg)
+}
+
+#' Plot SpatialGridDataFrame using ggplot2
+#' 
+#' @aliases SpatialGridDataFrame
+#' @name SpatialGridDataFrame
+#' @export
+#' @param sgdf A SpatialGridDataFrame object
+#' @return A ggplot2 object
+#' 
+
+gg.SpatialGridDataFrame = function(sgdf, ...) {
+  df <- as.data.frame(sgdf)
+  geom_tile(data = df, mapping = aes_string(x = "x", y = "y", fill = names(sgdf)[[1]]))
+}
+
+#' Plot RasterLayer using ggplot2
+#' 
+#' @aliases gg.RasterLayer
+#' @name gg.RasterLayer
+#' @export
+#' @param r A RasterLayer object
+#' @return A ggplot2 object
+#' 
+
+gg.RasterLayer = function(r) {
+  
+  library(raster)
+  spdf <- as(r, "SpatialPixelsDataFrame")
+  df <- as.data.frame(spdf)
+  # head(r.df)
+  # g <- ggplot(r.df, aes(x=x, y=y)) + geom_tile(aes(fill = layer)) + coord_equal()
+  geom_tile(data = df, mapping = aes(x=x, y=y, fill = layer))
 }
 
 
@@ -410,9 +447,22 @@ plot.prediction = function(..., property = "median") {
                  n = 500,
                  effect = pnames[[k]])))
     
+    txt_size = (5/14) * theme_get()$text$size
+    
+    # Function for formating numbers
+    fmt = function(x) {
+      th = 1E3
+      if (abs(x)<th & abs(x)>0.01) {
+        # sprintf("%.2f",x)
+        as.character(signif(x,4))
+      } else {
+        sprintf("%.2E",x)
+      }
+    }
+    
     plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y = x, weight = y, fill=effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
-      geom_text(data = qtl, aes(x=xend, y=y, label = signif(y)), size = 3.5, family = "", vjust = -0.5, hjust = 1.1) + 
-      geom_text(data = expec, aes(x=xend, y=y, label = paste0(signif(y)," ± ", signif(sdy), " [",round(100*cvy),"%]")), size = 3.5, family = "", vjust = -0.5, angle = 90) + 
+      geom_text(data = qtl, aes(x=xend, y=y, label = fmt(y)), size = txt_size, family = "", vjust = -0.5, hjust = 1.1) + 
+      geom_text(data = expec, aes(x=xend, y=y, label = paste0(fmt(y)," ± ", fmt(sdy), " [",round(100*cvy),"%]")), size = txt_size, family = "", vjust = -0.5, angle = 90) + 
       geom_segment(data = qtl, aes(x=x,xend=xend,y=y,yend=yend), linetype = 1, alpha = 0.2) +
       geom_segment(data = expec, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 3) +
       geom_segment(data = sdev, aes(x=x,xend=xend,y=y,yend=yend), alpha = 0.5, linetype = 1) +
@@ -423,16 +473,34 @@ plot.prediction = function(..., property = "median") {
       scale_fill_brewer(palette = "YlOrRd", direction = -1) # YlOrRd, PuBu
     
     # This still causes a warning since the violin plot does not like the width argument
-    suppressWarnings(print(plt))  
+    # suppressWarnings(print(plt))  
+    return(plt)
     
   } 
+  
+    else if ( attr(data,"type") == "0d" ) {
+      dnames = colnames(data)
+      ggp = ggplot()
+      
+      if ( "summary" %in% names(attributes(data)) ){
+        smy = attr(data, "summary")
+        ggp = ggp + geom_ribbon(data = smy$inner.marg, ymin = 0, aes_string(x = dnames[1], ymax = dnames[2]), alpha = 0.1, colour = "grey")
+      } 
+      
+      ggp = ggp + geom_path(data = data, aes_string(x = dnames[1], y = dnames[2]))
+      
+      if (length(pnames) == 1) { ggp = ggp + guides(color=FALSE, fill=FALSE) } 
+
+      ggp
+    }
+
     else if ( attr(data,"type") == "1d" ) {
       
       data = do.call(rbind, lapply(1:length(args), function(k) data.frame(args[[k]], Prediction = pnames[[k]])))
     
       ggp = ggplot(data = data) + 
               geom_ribbon(aes_string(x = ggopts$dims, ymin = "lq", ymax = "uq",  fill = "Prediction"), alpha = 0.3) + 
-              geom_line(aes_string(x = ggopts$dims, y = "mean", color = "Prediction"), size = 1.1) +
+              geom_line(aes_string(x = ggopts$dims, y = "median", color = "Prediction"), size = 1.1) +
               xlab(ggopts$predictor) +
               ylab(ggopts$predictor[2])
       
@@ -446,8 +514,6 @@ plot.prediction = function(..., property = "median") {
      
     else if ( attr(data,"type") == "spatial" ) {
       # ggplot() + gg.col(ggopts$mesh, color = data$mean) + scale_fill_gradientn(colours = topo.colors(100))
-      plot.spatial(mesh = ggopts$mesh, col = data[,property], add.mesh = FALSE)
+      plot.spatial(mesh = ggopts$mesh, col = data[,property], add.mesh = FALSE, property = property, ...)
   }
 }
-
-

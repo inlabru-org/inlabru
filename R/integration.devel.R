@@ -54,28 +54,28 @@ int.polygon = function(mesh, loc, group = NULL){
   
 if ( is.null(group) ) { group = rep(1, nrow(loc)) }
 ipsl = list()
-k = 1
 # print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
 for ( g in unique(group) ) {
   gloc = loc[group==g, ]
   # Check where the polygon intersects with the mesh edges
-  sp = gloc[1:nrow(gloc),]
-  ep = rbind(gloc[2:nrow(gloc),], gloc[1,])
+  sp = gloc[1:(nrow(gloc)-1),]
+  ep = gloc[2:nrow(gloc),]
   sloc = split.lines(mesh, sp, ep, filter.zero.length = FALSE)$split.loc[,1:2]
   if (!is.null(sloc)){ colnames(sloc) = colnames(loc) }
+  
   # plot(mesh) ; points(sp) ; points(ep) ; points(sloc)
-  bloc = rbind(gloc, sloc[,1:2])
+  bloc = rbind(gloc)
   bnd = inla.mesh.segment(loc = bloc)
-  imesh = inla.mesh.create(boundary = bnd, loc = mesh$loc[,1:2])
-  # plot(mesh); 
-  # plot(imesh, add = TRUE)
+  imesh = inla.mesh.create(boundary = bnd, loc = rbind(mesh$loc[,1:2], sloc[,1:2]))
+  # plot(imesh) ; points(sp) ; points(ep) ; points(gloc)
+  # plot(imesh) ; points(sp) ; points(ep) ; points(gloc) ; plot(mesh, add = TRUE)
+  
   ips = data.frame(imesh$loc[,1:2])
-  colnames(ips) = colnames(gloc)
+  colnames(ips) = c("x","y")
   ips$weight = diag(as.matrix(inla.mesh.fem(imesh)$c0))
+  # ips = as.data.frame(project.weights(ips, mesh, mesh.coords = c("x","y")))
   ips$group = g
   ipsl = c(ipsl, list(ips))
-  # print(k)
-  k = k + 1
 }
 return(do.call(rbind,ipsl))
 }

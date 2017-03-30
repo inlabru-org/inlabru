@@ -2,7 +2,7 @@
 #'
 #' @aliases bru
 #' @export
-#' @param points A SpatialPoints[DataFrame] object
+#' @param points A data.frame or SpatialPoints[DataFrame] object
 #' @param predictor A formula stating the data column (LHS) and mathematical expression (RHS) used for predicting.
 #' @param model a formula describing the model components
 #' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
@@ -10,6 +10,9 @@
 #' @param linear If TRUE, do not perform linear approximation of predictor
 #' @param E Exposure parameter passed on to \link{inla}
 #' @param family Likelihood family passed on to \link{inla}
+#' @param n maximum number of \link{iinla} iterations
+#' @param offset the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.
+#' @param result An \code{iinla} object returned from previous calls of \code{bru}/\code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
 #' @param ... more arguments passed on to \link{inla}
 #' @return A \link{bru} object (inherits from iinla and \link{inla})
 
@@ -20,14 +23,17 @@ bru = function(points,
                run = TRUE,
                linear = FALSE, 
                E = 1,
-               family = "gaussian", ...) {
+               family = "gaussian",
+               n = 10,
+               offset = 0,
+               result = NULL, ...) {
   
   
   # Automatically complete moel and predictor
   ac = autocomplete(model, predictor, points, mesh)
   
   # If automatic completion detected linearity, expr to NULL
-  if ( ac$linear ) ac$expr = NULL
+  if ( ac$linear ) { ac$expr = NULL ; n = 1 }
   
   # Turn model formula into internal bru model
   model = make.model(ac$model)
@@ -38,10 +44,10 @@ bru = function(points,
   ######### This is where the actual inference begins
   
   # Create the stack
-  stk = function(points, model) { make.stack(points = points, model = model, expr = ac$expr, y = y, E = E) }
+  stk = function(points, model, result) { make.stack(points = points, model = model, expr = ac$expr, y = y, E = E, result = result) }
   
   # Run iterated INLA
-  if ( run ) { result = iinla(points, model, stk, family = family, ...) } 
+  if ( run ) { result = iinla(points, model, stk, family = family, n, offset = offset, result = result, ...) } 
   else { result = list() }
   
   
@@ -137,24 +143,31 @@ poiss = function(...) {
 #' @param mesh An inla.mesh object modelling a spatial domain. If NULL and spatial data is provied the mesh is constructed from a non-convex hull of the points
 #' @param scale If provided as a scalar then rescale the exposure parameter of the Poisson likelihood. This will influence your model's intercept but can help with numerical instabilities, e.g. by setting scale to a large value like 10000
 #' @param append A list of functions which are evaluated for the \code{points} and the constructed integration points. The Returned values are appended to the respective data frame of points/integration points.
+#' @param n maximum number of \link{iinla} iterations
+#' @param offset the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.
+#' @param result An \code{iinla} object returned from previous calls of \code{bru}/\code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
 #' @param ... Arguments passed on to \link{iinla}
 #' @return An \link{iinla} object
 
 lgcp = function(points, 
                 samplers = NULL, 
-                model = ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
-                predictor = coordinates ~ spde + Intercept, 
+                model = coordinates ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
+                predictor = . ~ ., 
                 mesh = NULL,
                 run = TRUE,
                 scale = NULL,
-                append = NULL, 
+                append = NULL,
+                n = 10,
+                offset = 0,
+                result = NULL,
+                weights.as.offset = FALSE,
                 ...) {
   
   # Automatically complete moel and predictor
   ac = autocomplete(model, predictor, points, mesh)
   
   # If automatic completion detected linearity, expr to NULL
-  if ( ac$linear ) ac$expr = NULL
+  if ( ac$linear ) { ac$expr = NULL ; n = 1 }
   
   # Turn model formula into internal bru model
   model = make.model(ac$model)
@@ -180,13 +193,20 @@ lgcp = function(points,
   if ( !is.null(scale) ) { ips$weight = scale * ips$weight }
 
   # Stack
-  stk = function(points, model) { 
-    inla.stack(make.stack(points = points, model = model, expr = ac$expr, y = 1, E = 0), 
-               make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = ips$weight)) 
+  if ( weights.as.offset ) {
+    stk = function(points, model, result) {
+      inla.stack(make.stack(points = points, model = model, expr = ac$expr, y = 1, E = 0, result = result),
+                 make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = 1, offset = log(ips$weight), result = result))
+    }
+  } else {
+    stk = function(points, model, result) {
+      inla.stack(make.stack(points = points, model = model, expr = ac$expr, y = 1, E = 0, result = result),
+                 make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = ips$weight, offset = 0, result = result))
+    }
   }
-  
+
   # Run iterated INLA
-  if ( run ) { result = iinla(points, model, stk, family = "poisson", ...) } 
+  if ( run ) { result = iinla(points, model, stk, family = "poisson", n, offset = offset, result = result, ...) } 
   else { result = list() }
   
   ########## Create result object
@@ -252,14 +272,48 @@ summary.lgcp = function(result) {
     cat("\n")
   }
   
-  cat("\n--- Hyper parameters ----- \n\n")
+  cat("\n--- All hyper parameters (internal representation) ----- \n\n")
   # cat(paste0("  ", paste(rownames(result$summary.hyperpar), collapse = ", "), "\n"))
   print(result$summary.hyperpar)
+  
+  
+  marginal.summary = function(m, name) {
+    df = data.frame(param = name,
+                    mean = inla.emarginal(identity, m))
+    df$var = inla.emarginal(function(x) {(x-df$mean)^2}, m)
+    df$sd = sqrt(df$var)
+    df[c("lq","median","uq")] = inla.qmarginal(c(0.025, 0.5, 0.975), m)
+    df
+  }
+  
+  cat("\n")
+  for (nm in names(result$sppa$model$effects)) {
+    eff = result$sppa$model$effects[[nm]]
+    if (!is.null(eff$mesh)){
+      hyp = inla.spde.result(result, nm, eff$inla.spde)
+      cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
+      df = rbind(marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"), 
+                marginal.summary(hyp$marginals.log.range.nominal$range.nominal.1, "log.range"), 
+                marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
+                marginal.summary(hyp$marginals.log.variance.nominal$variance.nominal.1, "log.variance"))
+      print(df)
+    }
+  }
+  
+  
   
   cat("\n--- Criteria --------------\n\n")
   cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic),"\n"))
   cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic),"\n"))
 }
+
+#' Summarize a bru object
+#'
+#' @aliases summary.bru
+#' @export
+#' @param result A result object obtained from a bru() run
+#' 
+summary.bru = summary.lgcp
 
 
 #' Generate a simple default mesh
@@ -353,17 +407,41 @@ predict.lgcp = function(result,
   # Extract target dimension from predictor (given as left hand side of formula)
   lhs.dims = setdiff(all.vars(update(predictor, .~0)), ".")
   pchar = as.character(predictor)
-  predictor.rhs = pchar[-1]
+  predictor.rhs = pchar[length(pchar)]
   predictor = parse(text = predictor.rhs)
   
   # Dimensions we are integrating over
   idims = integrate
   
-  # CAT
-  cat(sprintf("---- Input ----- \n"))
-  cat(sprintf("LHS : %s \n", paste0(lhs.dims, collapse = ", ")))
-  cat(sprintf("integrate : %s \n", paste0(idims, collapse = ", ")))
-  cat(sprintf("points : %s \n", paste0(names(points), collapse = ", ")))
+
+  # Alternatively, take dims from points
+  if ( !is.null(points) ) {
+    dims = names(points)
+    if ( inherits(points, "Spatial") ) { dims = c(dims, "coordinates") }
+    if ( !inherits(points, "SpatialPointsDataFrame") & (nrow(points) == 2)) { 
+      points = SpatialPointsDataFrame(points, data = data.frame(weight = rep(1, nrow(coordinates(points)))))}
+    icfg.points = points
+  } else {
+    icfg.points = result$sppa$points
+  }
+  
+  
+  # Dimensions we are integrating over
+  idims = integrate
+  
+  # Determine all dimensions of the process (pdims)
+  pdims = names(result$iconfig)
+  
+  # Check for ambiguous dimension definition
+  if (any(idims %in% dims)) { stop("The left hand side of the predictor contains dimensions you want to integrate over. Remove them.") }
+  
+  # Collect some information that will be useful for plotting
+  misc = list(predictor = predictor.rhs, dims = dims, idims = idims, pdims = pdims)
+  type = "1d"
+  
+  # Generate points for dimensions to integrate over
+  wicfg = iconfig(NULL, result$sppa$points, result$model, idims, mesh = result$sppa$mesh)
+  wips = ipoints(samplers, wicfg[idims])
   
   # Determine all dimensions of the process (pdims)
   # pdims = names(result$iconfig)
@@ -609,6 +687,8 @@ summarize = function(data, x = NULL, gg = FALSE) {
       apply(data, MARGIN = 1, sd, na.rm = TRUE),
       t(apply(data, MARGIN = 1, quantile, prob = c(0.025, 0.5, 0.975), na.rm = TRUE)))
     colnames(smy) = c("mean", "sd", "lq", "median","uq")
+    smy$cv = smy$sd/smy$mean
+    smy$var = smy$sd^2
   }
   if ( !is.null(x) ) { smy = cbind(x, smy)}
   return(smy)
@@ -638,7 +718,8 @@ summarize = function(data, x = NULL, gg = FALSE) {
 iinla = function(data, model, stackmaker, n = 10, result = NULL, 
                  iinla.verbose = iinla.getOption("iinla.verbose"), 
                  control.inla = iinla.getOption("control.inla"), 
-                 control.compute = iinla.getOption("control.compute"), ...){
+                 control.compute = iinla.getOption("control.compute"),
+                 offset = NULL, ...){
   
   # # Default number of maximum iterations
   # if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
@@ -646,8 +727,11 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
   # Track variables?
   track = list()
   
+  # Set old result
+  old.result = result
+  
   # Inital stack
-  stk = stackmaker(data, model)
+  stk = stackmaker(data, model, result)
   
   k = 1
   interrupt = FALSE
@@ -665,27 +749,42 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     
     # Return previous result if inla crashes, e.g. when connection to server is lost 
     if ( k > 1 ) { old.result = result } 
+    result = NULL
     
-    result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
-                                             data = c(inla.stack.mdata(stk), list.data(model)),
-                                             control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
-                                             E = inla.stack.data(stk)$e,
-                                             control.inla = control.inla,
-                                             control.compute = control.compute), iargs)), 
-                        error = function(e) { 
-                          if (k == 1) { stop(e) }
-                          else { 
-                            cat(paste0("INLA crashed during iteration ",k,". It is likely that there is a convergence problem or the connection to the server was lost (if computing remotely)."))
-                            return(old.result)
-                          }
-                        }
-    )
+    icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
+                                                   data = c(inla.stack.mdata(stk), list.data(model)),
+                                                   control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
+                                                   E = inla.stack.data(stk)$e,
+                                                   offset = inla.stack.data(stk)$bru.offset + offset,
+                                                   control.inla = control.inla,
+                                                   control.compute = control.compute), iargs)), 
+                              error = warning
+                            )
+                       )
+    eval(icall)
+    
+    if ( is.character(result) ) { stop(paste0("INLA returned message: ", result)) }
+    
+    n.retry = 0
+    max.retry = 10
+    while ( ( is.null(result) | length(result) == 5 ) & ( n.retry <= max.retry ) ) {
+      msg("INLA crashed or returned NULL. Waiting for 60 seconds and trying again.")
+      Sys.sleep(60)
+      eval(icall)
+      n.retry = n.retry + 1
+    } 
+    if ( ( is.null(result) | length(result) == 5 ) ) { 
+      msg(sprintf("The computation failed %d times. Giving up and returning last successfully obtained result.", n.retry-1))
+      return(old.result)
+    }
+    
     if ( iinla.verbose ) { cat(" Done. ") }
     
-    # Update model
-    model$result = result
+    # Extract values tracked for estimating convergence
     track[[k]] = cbind(effect = rownames(result$summary.fixed), iteration = k, result$summary.fixed)
-    if ( n > 1 & k < n) { stk = stackmaker(data, model) }
+    
+    # Update stack given current result
+    if ( n > 1 & k < n) { stk = stackmaker(data, model, result) }
     
     # Stopping criterion
     if ( k>1 ){
@@ -718,14 +817,19 @@ autocomplete = function(model, predictor, points, mesh) {
   
   
   # Automatically insert default SPDE model
-  env = environment(model)
-  model = update.formula(~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh), model)
-  environment(model) = env
+  #env = environment(model)
+  #model = update.formula(~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh), model)
+  #environment(model) = env
   
-  # Automatically add intercept
+  # Automatically add intercept (unless '-Intercept' is in the formula)
   env = environment(model)
   if (attr(terms(model),"intercept")) {
-    model = update.formula(model, . ~ . + Intercept-1)
+    if (!(length(grep("-[ ]*Intercept", as.character(model)[[length(as.character(model))]]))>0)) {
+      model = update.formula(model, . ~ . + Intercept-1)
+    } else {
+      model = update.formula(model, . ~ . -1)
+    }
+    
   } 
   environment(model) = env
   

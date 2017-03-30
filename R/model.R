@@ -130,11 +130,16 @@ make.model = function(fml) {
     
     for (k in 1:length(labels)){
       lb = labels[[k]]
-      gpd = getParseData(parse(text=lb))
-      # Determine the name of the effect
-      ename = getParseText(gpd, id=1)
-      # Fixed effect ?
-      is.fixed = (gpd[1,"token"] == "SYMBOL")
+      
+      # Function syntax or fixed effect?
+      ix = regexpr("(", text = lb, fixed = TRUE)
+      if (ix > 0) {
+        ename = substr(lb, 1, ix-1)
+        is.fixed = FALSE
+      } else {
+        ename = lb
+        is.fixed = TRUE
+      }
       
       # Construct g() call
       if ( is.fixed ) {
@@ -164,7 +169,7 @@ make.model = function(fml) {
     ge = eval(parse(text = lb), envir = environment(fml))
 
     # Replace function name by INLA f function
-    lb = gsub("g\\(","f(",lb)
+    if ( substr(lb,1,2) == "g(" ) { lb = paste0("f(", substr(lb, 3, nchar(lb)))}
 
     # Remove extra mesh argument
     lb = gsub("[,][ ]*mesh[ ]*=[^),]*", "", lb)
@@ -182,19 +187,30 @@ make.model = function(fml) {
     lb = gsub(paste0("=", deparse(ge$A.msk)), "", lb, fixed =TRUE)
     lb = gsub("[,][ ]*A.msk[ ]*=[^),]*", "", lb)
 
+    # For SPDE models replace group=XXX by group=effectname.group
+    if (ge$f$model == "spde2") {
+      lb = gsub("[,][ ]*group[ ]*=[^),]*", paste0(", group = ",ge$f$label,".group"), lb)
+    }
+    
+    
     lbl[[k]] = lb
     
     smod = c(ge$f, list(mesh = ge$mesh, 
                         A.msk = ge$A.msk,
                         mesh.coords = ge$f$term,
                         map = ge$map,
+                        group.char = ge$group.char,
                         inla.spde = ge$model),
                         fchar = lb)
     
-    submodel[[ge$f$label]] = smod
+    # Fix label for factor effects
+    if (smod$model == "factor") { lbl[[k]] = smod$label ; smod$fchar = smod$label }
     
     # Fix label for offset effect
-    if (smod$label == "offset") lbl[[k]] = paste0("offset(",as.character(smod$map),")")
+    if (smod$label == "offset") lbl[[k]] = paste0("offset(",deparse(smod$map),")")
+    
+    # Set submodel
+    submodel[[ge$f$label]] = smod
     
   }
   
@@ -226,21 +242,24 @@ make.model = function(fml) {
 #' @return A list with mesh, model and the return value of the f-call
 
 g = function(covariate, 
-             map = NULL, 
+             map = NULL,
+             group = NULL,
              model = "linear", 
              mesh = NULL, 
              A.msk = NULL, ...){
  
   label = as.character(substitute(covariate))
   map.char = as.character(substitute(map))
+  group.char = as.character(substitute(group))
   A.msk.char = as.character(substitute(A.msk))
   
   if ( length(map.char) == 0 ) { map = NULL } else { map = substitute(map) }
   if ( length(A.msk.char) == 0 ) { A.msk = NULL } else { A.msk = A.msk }
   
   # Only call f if we are  not dealing with an offset
-  if ( label == "offset" ) { fvals = list(model="offset") } 
-  else { fvals = f(xxx, ..., model = model) }
+  if ( label == "offset" ) { fvals = list(model="offset") }
+  else if ( is.character(model) && model == "factor" ) { fvals = list(model="factor") } # , n = list(...)$n
+  else { fvals = f(xxx, ..., group = group, model = model) }
   fvals$label = label
   
   # Default map
@@ -257,6 +276,7 @@ g = function(covariate,
   
   ret = list(mesh = mesh, 
              map = map,
+             group.char = group.char,
              A.msk = A.msk,
              model = model, 
              f = fvals)
@@ -343,6 +363,7 @@ list.data.model = function(model){
   # Remove functions. This can cause problems as well
   elist = elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
   
+  elist = elist[names(elist) %in% all.vars(model$formula)]
 }
 
 #' List of covariates effects needed to run INLA
@@ -390,11 +411,11 @@ list.A.model = function(model, points){
       loc = mapper(eff$map, points, eff)
       loc = as.matrix(loc) # inla.spde.make.A requires matrix format as input
 
-      if (!("n.group" %in% names(eff$inla.spde))) { ng = 1 } else { ng = eff$inla.spde$n.group }
+      if (is.null(eff$ngroup)) { ng = 1 } else { ng = eff$ngroup }
       if (ng > 1) {
-        group = as.matrix(points[,eff$time.coords])
+        group = points[[eff$group.char]]
       } else { group = NULL }
-      A = inla.spde.make.A(eff$mesh, loc = loc, group = group)
+      A = inla.spde.make.A(eff$mesh, loc = loc, group = group, n.group = ng)
       # Mask columns of A
       if (!is.null(eff$A.msk)) { A = A[, as.logical(eff$A.msk), drop=FALSE]}
       # Weights for models with A-matrix are realized in the follwoing way:
@@ -436,11 +457,14 @@ list.indices.model = function(model, points){
         if ( "m" %in% names(eff$mesh) ) {
           idx[[name]] = 1:eff$mesh$m # support inla.mesh.1d models
           # If a is masked, correct number of indices
-          if (!is.null(eff$A.msk)) { lst[[name]] = 1:sum(eff$A.msk)}
+          if (!is.null(eff$A.msk)) { idx[[name]] = 1:sum(eff$A.msk)}
         } else {
-          ng = eff$inla.spde[[name]]$n.group
+          ng = eff$ngroup
           if (is.null(ng)) { ng = 1 }
           idx[[name]] = inla.spde.make.index(name, n.spde = eff$inla.spde$n.spde, n.group = ng)
+          # NOTE: MODELS WITH REPLICATES ARE NOTE IMPLEMENTED YET.
+          #      - when using group= or replicate, the f-formula has to be adjusted to read the groups/replicates from the stack
+          #      - see make.model() for an example on how to do this for groups
         }
       }
     } else {
@@ -505,6 +529,14 @@ evaluate.model = function(model,
     # Discard variables we do not need
     sm = smp[[k]][vars]
     
+    # For factor models we need to do a little trick
+    for (label in names(sm)) { 
+      if (label %in% names(effect(model)) && effect(model)[[label]]$model == "factor") {
+        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]]) 
+        sm[[label]] = as.vector(sm[[label]][fc[,1]])
+      }
+    }
+ 
     # Apply A matrices
     for (label in names(sm)) { if (label %in% vars) sm[[label]] = apply.A(label, sm) }
     
@@ -523,25 +555,44 @@ evaluate.model = function(model,
 
 
 mapper = function(map, points, eff) {
-  # If map is a function, return map(points)
-  # If map is not a function but a column in points, return points$map
-  # Otherwise assume map is an expression that can be evaluated with points as an environment
-
-  if (is.function(map)) { loc = map(points) } 
-  else if (class(map) == "call") { 
-    loc = tryCatch( eval(map, data.frame(points)), error = function(e){
-      loc = data.frame(points)[[eff$label]]
-    })
-    } 
-  else {
-    fetcher = get0(as.character(map))
-    if (is.function(fetcher)) { loc = fetcher(points) } 
-    else {
-      if(as.character(map) %in% names(as.data.frame(points))) {
-        loc = as.data.frame(points)[,as.character(map)] 
-      } else {
-        loc = rep(1, nrow(data.frame(points))) 
-      }
+  
+  # Evaluate the map with the points as an environment
+  emap = tryCatch(eval(map, data.frame(points)), error = function(e) {})
+  
+  # 0) Eval failed. map everything to 1. This happens for automatically added Intercept
+  # 1) If we obtain a function, apply the function to the points
+  # 2) If we obtain a SpatialGridDataFrame extract the values of that data frame at the point locations using the over() function
+  # 3) Else we obtain a vector and return as-is. This happens when map states a column of the data points
+  
+  if ( is.null(emap) ) { 
+    loc = data.frame(x = rep(1, nrow(points))) 
+    colnames(loc) = deparse(map)
     }
+  else if ( is.function(emap) ) { loc = emap(points) }
+  else if ( inherits(emap, "SpatialGridDataFrame") ) { loc = over(points, emap) }
+  else { loc = emap }
+  
+  # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
+  # to fix that by filling in nearest neighbor values.
+  if ( any(is.na(loc)) & ( inherits(emap, "SpatialGridDataFrame") )) {
+    
+    warning(sprintf("Map '%s' has returned NA values. As it is a SpatialGridDataFrame I will try to fix this by filling in values of spatially nearest neighbors. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
+                 deparse(map), eff$label))
+    
+    require(rgeos)
+    BADpoints = points[as.vector(is.na(loc)),]
+    GOODpoints = points[as.vector(!is.na(loc)),]
+    dst = gDistance(GOODpoints,BADpoints, byid=T)
+    nn = apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
+    loc[is.na(loc)] = loc[!is.na(loc)][nn]
   }
+    
+  # Check for NA values.    
+  if ( any(is.na(loc)) ) {
+    stop(sprintf("Map '%s' of effect '%s' has returned NA values. Please design your 'map='
+                 argument as to return non-NA for all points in your model domain/mesh.",
+                   as.character(map)[[1]], eff$label))
+  }
+  
+  loc
 }

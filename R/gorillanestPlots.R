@@ -28,7 +28,7 @@
 #' 
 #' Funwi-Gabga, N. and Mateu, J. (2012) Understanding the nesting spatial behaviour of gorillas 
 #' in the Kagwene Sanctuary, Cameroon. Stochastic Environmental Research and Risk Assessment 
-#' 26 (6), 793–811.
+#' 26 (6), 793-811.
 #' 
 #' @examples
 #'  data(gorillanestPlots)

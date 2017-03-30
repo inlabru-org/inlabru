@@ -4,16 +4,19 @@
 \alias{sample.lgcp}
 \title{Sample from a log Gaussian Cox process (LGCP)}
 \usage{
-sample.lgcp(mesh, loglambda, strategy = "rectangle", R = 6371)
+sample.lgcp(mesh, loglambda, strategy = "rectangle", R = 6371,
+  samplers = NULL)
 }
 \arguments{
 \item{mesh}{An \link{inla.mesh} object}
 
-\item{loglambda}{A vector of log intensities at the mesh vertices}
+\item{loglambda}{A vector of log intensities at the mesh vertices (for higher order basis functions, e.g. for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis function weights rather than the values at the \code{mesh$n} vertices)}
 
 \item{strategy}{Only applicable to 2D meshes. Use "rectangle" for flat 2D meshes and "spherical" for "sliced-spherical" for spherical meshes.}
 
 \item{R}{Only for spherical meshes. This sets the radius of the sphere approximated by the mesh.}
+
+\item{samplers}{A SpatialPolygonsDataFrame. Simulated points that fall outside these polygons are discarded.}
 }
 \value{
 point samples on the mesh
