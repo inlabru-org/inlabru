@@ -2,67 +2,96 @@
 #'
 #' @aliases bru
 #' @export
-#' @param points A data.frame or SpatialPoints[DataFrame] object
-#' @param predictor A formula stating the data column (LHS) and mathematical expression (RHS) used for predicting.
-#' @param model a formula describing the model components
-#' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided
-#' @param run If TRUE, rund inference. Otherwise only return configuration needed to run inference.
-#' @param linear If TRUE, do not perform linear approximation of predictor
-#' @param E Exposure parameter passed on to \link{inla}
-#' @param family Likelihood family passed on to \link{inla}
+#' @param components a formula describing the latent components
+#' @param family Character defining one of the likelihoods supported by \link{like}. Alternatively, an object cunstructed by \link{like}.
+#' @param data A data.frame or SpatialPoints[DataFrame] object
+#' @param ... Additional likelihoods, each constructed by a calling \code{like}
+#' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the data provided
+#' @param run If TRUE, run inference. Otherwise only return configuration needed to run inference.
 #' @param n maximum number of \link{iinla} iterations
-#' @param offset the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.
-#' @param result An \code{iinla} object returned from previous calls of \code{bru}/\code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
-#' @param ... more arguments passed on to \link{inla}
+#' @param offset the usual \link{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.
+#' @param result An \code{inla} object returned from previous calls of \code{inla}, \code{bru} or \code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
 #' @return A \link{bru} object (inherits from iinla and \link{inla})
 
-bru = function(points,
-               predictor = . ~ .,
-               model = y ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh),
+bru = function(components = y ~ Intercept,
+               family = "gaussian",
+               data,
+               ...,
                mesh = NULL, 
                run = TRUE,
-               linear = FALSE, 
-               E = 1,
-               family = "gaussian",
                n = 10,
                offset = 0,
-               result = NULL, ...) {
+               result = NULL, 
+               options = bru.options()) {
   
+  # Construct likelihood list from the family parameter and the '...'
+  lhoods = list()
+  if ( is.character(family) ) { lhoods = list(default = like(family = family)) }
+  lhoods = c(lhoods, list(...))
   
-  # Automatically complete moel and predictor
-  ac = autocomplete(model, predictor, points, mesh)
+  # Extract likelihhod parameters (compatibility with old code)
+  formula = lhoods$default$formula
+  family = lhoods$default$family
+  E = lhoods$default$E
+  
+  # Automatically complete moel and formula
+  ac = autocomplete(components, formula, data, mesh)
   
   # If automatic completion detected linearity, expr to NULL
   if ( ac$linear ) { ac$expr = NULL ; n = 1 }
   
   # Turn model formula into internal bru model
-  model = make.model(ac$model)
+  components = make.model(ac$model)
   
   # Extract LHS data
-  y = as.data.frame(points)[, ac$lhs]
+  y = as.data.frame(data)[, ac$lhs]
   
   ######### This is where the actual inference begins
   
   # Create the stack
-  stk = function(points, model, result) { make.stack(points = points, model = model, expr = ac$expr, y = y, E = E, result = result) }
+  stk = function(points, model, result) { make.stack(points = data, model = components, expr = ac$expr, y = y, E = E, result = result) }
   
   # Run iterated INLA
-  if ( run ) { result = iinla(points, model, stk, family = family, n, offset = offset, result = result, ...) } 
+  if ( run ) { result = do.call(iinla, c(list(data, components, stk, family = family, n, offset = offset, result = result), options))} 
   else { result = list() }
   
   
   ########## Create result object
   result$sppa$expr = ac$expr
   result$sppa$method = "bru"
-  result$sppa$model = model
-  result$sppa$points = points
+  result$sppa$model = components
+  result$sppa$points = data
   result$sppa$stack = stk
-  result$sppa$family = family
-  if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
+  result$sppa$family = lhoods$default$family
+  if ( inherits(data, "SpatialPoints") ) {result$sppa$coordnames = coordnames(data)}
   class(result) = c("bru", class(result))
   return(result)
 }
 
+
+#' Likelihood construction for usage with \link{bru}
+#'
+#' @aliases like
+#' @param family A character identifying a valid \link{inla} likelihood. Alternatively 'cp' for Cox processes.
+#' @param formula a \link{formula} where the right hand side expression defines the predictor used in the optimization.
+#' @param E Exposure parameter passed on to \link{inla}, e.g. for family = 'poisson'
+#' @param samplers Integration domain for 'cp' family
+#' @export
+#' 
+like = function(family, formula = . ~ ., E = 1, samplers = NULL) {
+  list(family = family, formula = formula, E = E, samplers = samplers)
+}
+
+
+#' Additional \link{bru} options
+#'
+#' @aliases bru.options
+#' @param ...
+#' @export
+#' 
+bru.options = function(...) {
+  list(...)
+}
 
 #' Multi-likelihood models
 #' 
