@@ -1,69 +1,99 @@
-#' Spatial model fitting using INLA
+#' @title Convenient model fitting using (iterated) INLA
+#'
+#' @description This method is a wrapper for \link{inla} and provides multiple enhancements. 
+#' (1) For spatial data and models, \code{bru} will construct the required projection matrices automatically
+#' (2) Multiple likelihoods can be employed in a convenient way
+#' (3) Non-linear predictors are approximated numerically and fitting happens via iterated INLA calls.
 #'
 #' @aliases bru
 #' @export
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
 #' @param components a formula describing the latent components
 #' @param family Character defining one of the likelihoods supported by \link{like}. Alternatively, an object cunstructed by \link{like}.
 #' @param data A data.frame or SpatialPoints[DataFrame] object
-#' @param ... Additional likelihoods, each constructed by a calling \code{like}
-#' @param mesh An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the data provided
+#' @param ... Additional likelihoods, each constructed by a calling \link{like}
+#' @param mesh An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.
 #' @param run If TRUE, run inference. Otherwise only return configuration needed to run inference.
-#' @param n maximum number of \link{iinla} iterations
+#' @param max.iter maximum number of \link{iinla} iterations
 #' @param offset the usual \link{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.
-#' @param result An \code{inla} object returned from previous calls of \code{inla}, \code{bru} or \code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
+#' @param result An \code{inla} object returned from previous calls of \link{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
+#' 
 #' @return A \link{bru} object (inherits from iinla and \link{inla})
+#' 
+#' @example 
+#' 
+#' input.df <- data.frame(x=cos(1:10))
+#' input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+#' fit.newbru <- bru(y ~ x, "gaussian", input.df)
+#' summary(fit.newbru)
+#' 
 
 bru = function(components = y ~ Intercept,
                family = "gaussian",
-               data,
+               data = NULL,
                ...,
                mesh = NULL, 
                run = TRUE,
-               n = 10,
+               max.iter = 10,
                offset = 0,
                result = NULL, 
-               options = bru.options()) {
+               options = bru.options(control.compute = list(config = TRUE, dic = TRUE, waic = TRUE))) {
   
-  # Construct likelihood list from the family parameter and the '...'
+  # The `family` parameter can be either a string or a likelihood constructed
+  # by like(). In the former case constrcut a proper likelihood using like() and
+  # merge it with the list of likelihood provided via `...`.
+  
   lhoods = list()
-  if ( is.character(family) ) { lhoods = list(default = like(family = family)) }
+  if ( is.character(family) ) { 
+    lhoods = list(default = like(family = family, data = data)) } 
+  else { lhoods = list(default = family) }
   lhoods = c(lhoods, list(...))
+
+  for (k in 1:length(lhoods)) {
+    
+    lh = lhoods[[k]]
+    
+    # Autocomplete
+    lh$ac = autocomplete(components, lh$formula, lh$data, mesh)
+    lh$linear = lh$ac$linear
+    if ( lh$linear ) { lh$expr = NULL } else { lh$expr = lh$ac$expr }
   
-  # Extract likelihhod parameters (compatibility with old code)
-  formula = lhoods$default$formula
-  family = lhoods$default$family
-  E = lhoods$default$E
+    # Turn model components into internal bru model
+    components = make.model(lh$ac$model)
+    
+    # Extract responses y for each likelihood and its data set
+      lh$y = as.data.frame(lh$data)[, lh$ac$lhs]
+    
+    # Create stackmaker for each likelihood
+      lh$stackmaker = function(points, model, result) { 
+        make.stack(points = lh$data, model = components, expr = lh$expr, y = lh$y, E = lh$E, result = result) 
+      }
+      
+    lhoods[[k]] = lh
+  }
   
-  # Automatically complete moel and formula
-  ac = autocomplete(components, formula, data, mesh)
+  # Create joint stackmaker
+  stk = function(xx, mdl, result) {
+    do.call(inla.stack.mjoin, lapply(lhoods, function(lh) { lh$stackmaker(lh$data, components, result)}))
+  }
   
-  # If automatic completion detected linearity, expr to NULL
-  if ( ac$linear ) { ac$expr = NULL ; n = 1 }
+  # Set max interations to 1 if all likelihood formulae are linear 
+  if (all(sapply(lhoods, function(lh) lh$linear))) { max.iter = 1 }
   
-  # Turn model formula into internal bru model
-  components = make.model(ac$model)
-  
-  # Extract LHS data
-  y = as.data.frame(data)[, ac$lhs]
-  
-  ######### This is where the actual inference begins
-  
-  # Create the stack
-  stk = function(points, model, result) { make.stack(points = data, model = components, expr = ac$expr, y = y, E = E, result = result) }
+  # Extract the family of each likelihood
+  family = sapply(1:length(lhoods), function(k) lhoods[[k]]$family)
   
   # Run iterated INLA
-  if ( run ) { result = do.call(iinla, c(list(data, components, stk, family = family, n, offset = offset, result = result), options))} 
+  if ( run ) { result = do.call(iinla, c(list(data, components, stk, family = family, n = max.iter, offset = offset, result = result), options))} 
   else { result = list() }
   
   
-  ########## Create result object
-  result$sppa$expr = ac$expr
+  ## Create result object ## 
   result$sppa$method = "bru"
+  result$sppa$lhoods = lhoods
   result$sppa$model = components
-  result$sppa$points = data
-  result$sppa$stack = stk
-  result$sppa$family = lhoods$default$family
-  if ( inherits(data, "SpatialPoints") ) {result$sppa$coordnames = coordnames(data)}
   class(result) = c("bru", class(result))
   return(result)
 }
@@ -72,22 +102,29 @@ bru = function(components = y ~ Intercept,
 #' Likelihood construction for usage with \link{bru}
 #'
 #' @aliases like
-#' @param family A character identifying a valid \link{inla} likelihood. Alternatively 'cp' for Cox processes.
-#' @param formula a \link{formula} where the right hand side expression defines the predictor used in the optimization.
-#' @param E Exposure parameter passed on to \link{inla}, e.g. for family = 'poisson'
-#' @param samplers Integration domain for 'cp' family
 #' @export
 #' 
-like = function(family, formula = . ~ ., E = 1, samplers = NULL) {
-  list(family = family, formula = formula, E = E, samplers = samplers)
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+#' @param family A character identifying a valid \link{inla} likelihood. Alternatively 'cp' for Cox processes.
+#' @param formula a \link{formula} where the right hand side expression defines the predictor used in the optimization.
+#' @param data Likelihood-specific data
+#' @param E Poisson exposure parameter (if family = 'poisson') passed on to \link{inla} 
+#' @param samplers Integration domain for 'cp' family (not implemented!)
+#' 
+like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
+  list(family = family, formula = formula, data = data, E = E, samplers = samplers)
 }
 
 
 #' Additional \link{bru} options
 #'
 #' @aliases bru.options
-#' @param ...
 #' @export
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+#' @param ...
 #' 
 bru.options = function(...) {
   list(...)
@@ -141,12 +178,6 @@ multibru = function(brus, model = NULL, ...) {
 }
 
 
-
-#' Poisson regression using INLA
-poiss = function(...) {
-  stop("poiss() has been removed from the inlabru package. Please use bru() with family='poisson' instead. 
-       Note: Instead of providing the exposure via the formula use the bru() E-parameter.")
-}
 
 #' Log Gaussian Cox process (LGCP) inference using INLA
 #' 
@@ -343,6 +374,35 @@ summary.lgcp = function(result) {
 #' @param result A result object obtained from a bru() run
 #' 
 summary.bru = summary.lgcp
+
+
+internal.summary.fixed = function(result) {
+  cat("\n--- Fixed effects -------- \n\n")
+  fe = result$summary.fixed
+  fe$kld=NULL
+  fe$signif = sign(fe[,"0.025quant"]) == sign(fe[,"0.975quant"])
+  print(fe)
+}
+
+internal.summary.random = function(result) {
+  cat("\n--- Random effects -------- \n\n")
+  for ( nm in names(result$summary.random) ){
+    sm = result$summary.random[[nm]]
+    cat(paste0(nm,": "))
+    cat(paste0("mean = [", signif(range(sm$mean)[1])," : ",signif(range(sm$mean)[2]), "]"))
+    cat(paste0(", quantiles = [", signif(range(sm[,c(4,6)])[1])," : ",signif(range(c(4,6))[2]), "]"))
+    if (nm %in% names(result$model$mesh)) {
+      cat(paste0(", area = ", signif(sum(diag(as.matrix(inla.mesh.fem(result$model$mesh[[nm]])$c0))))))
+    }
+    cat("\n")
+  }
+}
+
+internal.summary.criteria = function(result) {
+  cat("\n--- Criteria --------------\n\n")
+  cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic),"\n"))
+  cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic),"\n"))
+}
 
 
 #' Generate a simple default mesh
