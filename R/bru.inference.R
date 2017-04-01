@@ -61,18 +61,22 @@ bru = function(components = y ~ Intercept,
     if ( lh$linear ) { lh$expr = NULL } else { lh$expr = lh$ac$expr }
   
     # Turn model components into internal bru model
-    components = make.model(lh$ac$model)
+    bru.model = make.model(lh$ac$model)
     
     # Extract responses y for each likelihood and its data set
       lh$y = as.data.frame(lh$data)[, lh$ac$lhs]
     
     # Create stackmaker for each likelihood
       lh$stackmaker = function(points, model, result) { 
-        make.stack(points = lh$data, model = components, expr = lh$expr, y = lh$y, E = lh$E, result = result) 
+        make.stack(points = lh$data, model = bru.model, expr = lh$expr, y = lh$y, E = lh$E, result = result) 
       }
       
     lhoods[[k]] = lh
   }
+  
+  # Turn model components into internal bru model
+  components = make.model(lhoods[[1]]$ac$model)
+  
   
   # Create joint stackmaker
   stk = function(xx, mdl, result) {
@@ -314,13 +318,37 @@ summary.lgcp = function(result) {
                "\n"))
   }))
   
-  cat("\n--- Fixed effects -------- \n\n")
+  summary.bru(result)
+}
+
+#' Summarize a bru object
+#'
+#' @aliases summary.bru
+#' @export
+#' @param result A result object obtained from a bru() run
+#' 
+summary.bru = function(result) {
+  
+  cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
+  for ( k in 1:length(result$sppa$lhoods) ) {
+    lh = result$sppa$lhoods[[k]]
+    cat(sprintf("Name: '%s', family: '%s',\t formula: '%s' \n", names(result$sppa$lhoods)[[k]], lh$family, deparse(lh$formula)))
+  }
+  
+  #rownames(df) = names(result$sppa$lhoods)
+  #print(df)
+  
+  cat("\n--- Criteria -------------------------------------------------------------------------------------\n\n")
+  cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic),"\n"))
+  cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic),"\n"))
+  
+  cat("\n--- Fixed effects -------------------------------------------------------------------------------- \n\n")
   fe = result$summary.fixed
   fe$kld=NULL
   fe$signif = sign(fe[,"0.025quant"]) == sign(fe[,"0.975quant"])
   print(fe)
   
-  cat("\n--- Random effects -------- \n\n")
+  cat("\n--- Random effects ------------------------------------------------------------------------------- \n\n")
   for ( nm in names(result$summary.random) ){
     sm = result$summary.random[[nm]]
     cat(paste0(nm,": "))
@@ -331,8 +359,9 @@ summary.lgcp = function(result) {
     }
     cat("\n")
   }
+  if ( length(names(result$summary.random)) == 0 ) {cat("None.\n")}
   
-  cat("\n--- All hyper parameters (internal representation) ----- \n\n")
+  cat("\n--- All hyper parameters (internal representation) ----------------------------------------------- \n\n")
   # cat(paste0("  ", paste(rownames(result$summary.hyperpar), collapse = ", "), "\n"))
   print(result$summary.hyperpar)
   
@@ -353,55 +382,14 @@ summary.lgcp = function(result) {
       hyp = inla.spde.result(result, nm, eff$inla.spde)
       cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
       df = rbind(marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"), 
-                marginal.summary(hyp$marginals.log.range.nominal$range.nominal.1, "log.range"), 
-                marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
-                marginal.summary(hyp$marginals.log.variance.nominal$variance.nominal.1, "log.variance"))
+                 marginal.summary(hyp$marginals.log.range.nominal$range.nominal.1, "log.range"), 
+                 marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
+                 marginal.summary(hyp$marginals.log.variance.nominal$variance.nominal.1, "log.variance"))
       print(df)
     }
   }
   
-  
-  
-  cat("\n--- Criteria --------------\n\n")
-  cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic),"\n"))
-  cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic),"\n"))
-}
 
-#' Summarize a bru object
-#'
-#' @aliases summary.bru
-#' @export
-#' @param result A result object obtained from a bru() run
-#' 
-summary.bru = summary.lgcp
-
-
-internal.summary.fixed = function(result) {
-  cat("\n--- Fixed effects -------- \n\n")
-  fe = result$summary.fixed
-  fe$kld=NULL
-  fe$signif = sign(fe[,"0.025quant"]) == sign(fe[,"0.975quant"])
-  print(fe)
-}
-
-internal.summary.random = function(result) {
-  cat("\n--- Random effects -------- \n\n")
-  for ( nm in names(result$summary.random) ){
-    sm = result$summary.random[[nm]]
-    cat(paste0(nm,": "))
-    cat(paste0("mean = [", signif(range(sm$mean)[1])," : ",signif(range(sm$mean)[2]), "]"))
-    cat(paste0(", quantiles = [", signif(range(sm[,c(4,6)])[1])," : ",signif(range(c(4,6))[2]), "]"))
-    if (nm %in% names(result$model$mesh)) {
-      cat(paste0(", area = ", signif(sum(diag(as.matrix(inla.mesh.fem(result$model$mesh[[nm]])$c0))))))
-    }
-    cat("\n")
-  }
-}
-
-internal.summary.criteria = function(result) {
-  cat("\n--- Criteria --------------\n\n")
-  cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic),"\n"))
-  cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic),"\n"))
 }
 
 
