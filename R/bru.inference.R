@@ -41,6 +41,12 @@ bru = function(components = y ~ Intercept,
                result = NULL, 
                options = bru.options(control.compute = list(config = TRUE, dic = TRUE, waic = TRUE))) {
   
+  # Automatically add Intercept and -1 to components unless -1 is in components formula
+  components = auto.intercept(components)
+  
+  # Turn model components into internal bru model
+  bru.model = make.model(components)
+  
   # The `family` parameter can be either a string or a likelihood constructed
   # by like(). In the former case constrcut a proper likelihood using like() and
   # merge it with the list of likelihood provided via `...`.
@@ -51,36 +57,29 @@ bru = function(components = y ~ Intercept,
   else { lhoods = list(default = family) }
   lhoods = c(lhoods, list(...))
 
+
   for (k in 1:length(lhoods)) {
     
     lh = lhoods[[k]]
     
-    # Autocomplete
-    lh$ac = autocomplete(components, lh$formula, lh$data, mesh)
-    lh$linear = lh$ac$linear
-    if ( lh$linear ) { lh$expr = NULL } else { lh$expr = lh$ac$expr }
-  
-    # Turn model components into internal bru model
-    bru.model = make.model(lh$ac$model)
-    
     # Extract responses y for each likelihood and its data set
-      lh$y = as.data.frame(lh$data)[, lh$ac$lhs]
+    if (is.null(lh$response)) {
+      y = as.data.frame(lh$data)[, all.vars(update(components, .~0))]
+    } else {
+      y = as.data.frame(lh$data)[, lh$response]
+    }
     
     # Create stackmaker for each likelihood
       lh$stackmaker = function(points, model, result) { 
-        make.stack(points = lh$data, model = bru.model, expr = lh$expr, y = lh$y, E = lh$E, result = result) 
+        make.stack(points = lh$data, model = bru.model, expr = lh$expr, y = y, E = lh$E, result = result) 
       }
       
     lhoods[[k]] = lh
   }
   
-  # Turn model components into internal bru model
-  components = make.model(lhoods[[1]]$ac$model)
-  
-  
   # Create joint stackmaker
   stk = function(xx, mdl, result) {
-    do.call(inla.stack.mjoin, lapply(lhoods, function(lh) { lh$stackmaker(lh$data, components, result)}))
+    do.call(inla.stack.mjoin, lapply(lhoods, function(lh) { lh$stackmaker(lh$data, bru.model, result) }))
   }
   
   # Set max interations to 1 if all likelihood formulae are linear 
@@ -90,14 +89,15 @@ bru = function(components = y ~ Intercept,
   family = sapply(1:length(lhoods), function(k) lhoods[[k]]$family)
   
   # Run iterated INLA
-  if ( run ) { result = do.call(iinla, c(list(data, components, stk, family = family, n = max.iter, offset = offset, result = result), options))} 
+  if ( run ) { result = do.call(iinla, c(list(data, bru.model, stk, family = family, n = max.iter, offset = offset, result = result), options))} 
   else { result = list() }
   
   
   ## Create result object ## 
   result$sppa$method = "bru"
   result$sppa$lhoods = lhoods
-  result$sppa$model = components
+  result$sppa$model = bru.model
+  result$sppa$mesh = mesh
   class(result) = c("bru", class(result))
   return(result)
 }
@@ -117,7 +117,24 @@ bru = function(components = y ~ Intercept,
 #' @param samplers Integration domain for 'cp' family (not implemented!)
 #' 
 like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
-  list(family = family, formula = formula, data = data, E = E, samplers = samplers)
+  
+  # Does the likelihood formula imply a linear predictor?
+  linear = as.character(formula)[2] == "."
+  
+  # If not linear, set predictor expression according to the formula's RHS
+  if ( !linear ) { expr = parse(text = as.character(formula)[3]) }
+  else { expr = NULL }
+  
+  response = all.vars(update(formula, .~0))
+  
+  list(family = family, 
+       formula = formula, 
+       data = data, 
+       E = E, 
+       samplers = samplers, 
+       linear = linear,
+       expr = expr,
+       response)
 }
 
 
@@ -965,4 +982,19 @@ auto.pred = function(model, predictor) {
     predictor = as.formula(paste0(auto.pred.lhs(predictor,model)," ~ ",  paste0(auto.pred.rhs(model))))
   }
   predictor
+}
+
+auto.intercept = function(components) {
+  env = environment(components)
+  
+  if (attr(terms(components),"intercept")) {
+    if (!(length(grep("-[ ]*Intercept", as.character(components)[[length(as.character(components))]]))>0)) {
+      components = update.formula(components, . ~ . + Intercept-1)
+    } else {
+      components = update.formula(components, . ~ . -1)
+    }
+    
+  } 
+  environment(components) = env
+  components
 }
