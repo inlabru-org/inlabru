@@ -574,7 +574,7 @@ mapper = function(map, points, eff) {
   # 3) Else we obtain a vector and return as-is. This happens when map states a column of the data points
   
   if ( is.null(emap) ) { 
-    loc = data.frame(x = rep(1, nrow(points))) 
+    loc = data.frame(x = rep(1, nrow(as.data.frame(points)))) 
     colnames(loc) = deparse(map)
     }
   else if ( is.function(emap) ) { loc = emap(points) }
