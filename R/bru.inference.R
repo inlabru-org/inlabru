@@ -489,7 +489,7 @@ predict.bru = function(result,
                         property = "sample", n = n.samples, predictor = expr)
 
   # Summarize
-  vals = summarize(vals, x = as.data.frame(data))
+  vals = summarize(vals, x = data)
   
   vals
   
@@ -830,7 +830,14 @@ summarize = function(data, x = NULL, gg = FALSE) {
     smy$cv = smy$sd/smy$mean
     smy$var = smy$sd^2
   }
-  if ( !is.null(x) ) { smy = cbind(x, smy)}
+  if ( !is.null(x) ) { 
+    if ( inherits(x, "Spatial") ) {
+      if ( class(x) == "SpatialPoints" ) { smy = SpatialPointsDataFrame(x, data = smy) }
+      else if ( class(x) == "SpatialPixels" ) { smy = SpatialPixelsDataFrame(x, data = smy) }
+      else { x@data = cbind(x@data, smy) ; smy = x }
+    }
+    else {smy = cbind(x, smy) }
+  }
   return(smy)
 }
 
