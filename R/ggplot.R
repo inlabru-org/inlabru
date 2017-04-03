@@ -46,7 +46,8 @@ gg.map = function(data, ...) {
 #' @param data A Spatial* object or a mesh
 #' 
 gg = function(data, ...) {
-  if (inherits(data, "SpatialPoints") | inherits(data, "SpatialPointsDataFrame")) gg.point(data, ...)
+  if (inherits(data, "SpatialPixelsDataFrame")) gg.SpatialGridDataFrame(data, ...)
+  else if (inherits(data, "SpatialPoints") | inherits(data, "SpatialPointsDataFrame")) gg.point(data, ...)
   else if (inherits(data, "SpatialLines") | inherits(data, "SpatialLinesDataFrame")) gg.segment(data, ...)
   else if (inherits(data, "SpatialPolygons") | inherits(data, "SpatialPolygonsDataFrame")) gg.polygon(data, ...)
   else if (inherits(data, "inla.mesh") || inherits(data, "inla.mesh.1d")) gg.mesh(data, ...)
@@ -175,9 +176,9 @@ gg.mesh = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
 #' @return A ggplot2 object
 #' 
 
-gg.SpatialGridDataFrame = function(sgdf, ...) {
+gg.SpatialGridDataFrame = function(sgdf, fill = names(sgdf)[[1]], ...) {
   df <- as.data.frame(sgdf)
-  geom_tile(data = df, mapping = aes_string(x = "x", y = "y", fill = names(sgdf)[[1]]))
+  geom_tile(data = df, mapping = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill))
 }
 
 #' Plot RasterLayer using ggplot2
