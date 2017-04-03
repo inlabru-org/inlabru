@@ -360,10 +360,13 @@ summary.bru = function(result) {
   cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic),"\n"))
   
   cat("\n--- Fixed effects -------------------------------------------------------------------------------- \n\n")
+  
+  if ( nrow(result$summary.fixed)>0 ) {
   fe = result$summary.fixed
   fe$kld=NULL
   fe$signif = sign(fe[,"0.025quant"]) == sign(fe[,"0.975quant"])
   print(fe)
+  } else { cat("None.\n") }
   
   cat("\n--- Random effects ------------------------------------------------------------------------------- \n\n")
   for ( nm in names(result$summary.random) ){
@@ -453,6 +456,49 @@ default.model = function(mesh) {
 #' @export
 
 predict.iinla = function(...) { predict.lgcp(...) }
+
+
+#' Predictions based on bru
+#' 
+#' @aliases predict.bru
+#' @export
+#' @param result An object obtained by calling \link{bru})
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
+#' @param formula A formula determining which effects to predict and how to combine them
+#' 
+#' @return Predicted values
+
+predict.bru = function(result,
+                       data,
+                       formula = NULL,
+                       n.samples = 100)
+{
+  if ( is.null(formula) ) {
+    lh.name = "default"
+    if ( is.null(result$sppa$lhoods[[lh.name]]$expr) ) { 
+      expr = parse(text = paste0(names(result$sppa$model$effects), collapse = "+")) }
+    else {
+      expr = parse(text = as.character(result$sppa$lhoods[[lh.name]]$formula)[3])
+    }
+  } else {
+    expr = parse(text = as.character(formula)[length(as.character(formula))])
+  }
+  
+
+  vals = evaluate.model(model = result$sppa$model, result = result, points = data, 
+                        property = "sample", n = n.samples, predictor = expr)
+
+  # Summarize
+  vals = summarize(vals, x = as.data.frame(data))
+  
+  vals
+  
+}
+
+
+
+
+
 
 
 #' Predictions based on log Gaussian Cox processes
@@ -875,7 +921,7 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     if ( iinla.verbose ) { cat(" Done. ") }
     
     # Extract values tracked for estimating convergence
-    track[[k]] = cbind(effect = rownames(result$summary.fixed), iteration = k, result$summary.fixed)
+    if ( n > 1 & k < n) track[[k]] = cbind(effect = rownames(result$summary.fixed), iteration = k, result$summary.fixed)
     
     # Update stack given current result
     if ( n > 1 & k < n) { stk = stackmaker(data, model, result) }

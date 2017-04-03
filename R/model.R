@@ -264,7 +264,7 @@ g = function(covariate,
   
   # Default map
   if ( is.null(map) ) { 
-    if ( fvals$model == "spde2") { map = expression(coordinates) }
+    if ( fvals$model == "spde2" && class(mesh) == "inla.mesh") { map = expression(coordinates) }
     else { map = substitute(covariate) }
   }
   
@@ -529,11 +529,20 @@ evaluate.model = function(model,
     # Discard variables we do not need
     sm = smp[[k]][vars]
     
-    # For factor models we need to do a little trick
+    # Factor models
     for (label in names(sm)) { 
       if (label %in% names(effect(model)) && effect(model)[[label]]$model == "factor") {
         fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]]) 
         sm[[label]] = as.vector(sm[[label]][fc[,1]])
+      }
+    }
+    
+    # Linear models
+    for (label in names(sm)) { 
+      if (label %in% names(effect(model)) && effect(model)[[label]]$model == "linear") {
+        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]])
+        if (is.data.frame(fc)) {fc = fc[,1]}
+        sm[[label]] = as.vector(sm[[label]] * as.vector(fc))
       }
     }
  
