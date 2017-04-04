@@ -130,7 +130,6 @@ config:
 	@echo BRANCH_ORIGIN $(BRANCH_ORIGIN)
 	@echo FILENAME_SRC $(FILENAME_SRC)
 	@echo FILENAME_BIN $(FILENAME_BIN)
-	@echo FILENAME_DEV $(FILENAME_DEV)
 
 .PHONY: default prepare roxy rpkg rpkg-source config \
 	bmake-rpkg bmake-rpkg-Rdev check check-Rdev \
