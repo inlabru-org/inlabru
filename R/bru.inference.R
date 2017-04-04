@@ -31,7 +31,7 @@
 #' 
 
 bru = function(components = y ~ Intercept,
-               family = "gaussian",
+               family = NULL,
                data = NULL,
                ...,
                mesh = NULL, 
@@ -52,41 +52,46 @@ bru = function(components = y ~ Intercept,
   # merge it with the list of likelihood provided via `...`.
   
   lhoods = list()
-  if ( is.character(family) ) { 
-    lhoods = list(default = like(family = family, data = data)) } 
-  else { lhoods = list(default = family) }
+  if ( inherits(family, "lhood") & inherits(data, "lhood") ) {
+    lhoods = c(lhoods, list(default = family, lh2 = data)) ; data = NULL ; family = NULL
+  } else if ( inherits(family, "lhood") & !inherits(data, "lhood") ) {
+    lhoods = c(list(default = family), lhoods) ; family = NULL 
+  } else if ( !inherits(family, "lhood") & inherits(data, "lhood") ) {
+    lhoods = c(list(default = like(family), lh2 = data), lhoods); data = NULL 
+  } else {
+    if( !is.null(family) ) { lhoods = c(list(default = like(family, data = data))); family = NULL }
+  }
   lhoods = c(lhoods, list(...))
-
-
+  
+  
+  # If a likelihood was provided without data/response, update according to bru's 
+  # arguments `data` and LHS of components
+  
   for (k in 1:length(lhoods)) {
     
     lh = lhoods[[k]]
     
-    # Extract responses y for each likelihood and its data set
-    if (is.null(lh$response)) {
-      y = as.data.frame(lh$data)[, all.vars(update(components, .~0))]
-    } else {
-      y = as.data.frame(lh$data)[, lh$response]
+    # Check if likelihood has data attached to it. If not, attach the 'data' argument or break if not available
+    if ( is.null(lh$data) ) {
+      if (is.null(data)) {stop(sprintf("Likelihood %s has not data attached to it and no data was supplied to bru() either.", names(lhoods)[[k]]))}
+      lh$data = data
     }
+    if ( is.null(lh$components) ) { lh$components = components }
+    if ( is.null(lh$response) ) { lh$response = all.vars(update(components, .~0)) }
     
-    # Create stackmaker for each likelihood
-      lh$stackmaker = function(points, model, result) { 
-        make.stack(points = lh$data, model = bru.model, expr = lh$expr, y = y, E = lh$E, result = result) 
-      }
-      
     lhoods[[k]] = lh
   }
   
   # Create joint stackmaker
   stk = function(xx, mdl, result) {
-    do.call(inla.stack.mjoin, lapply(lhoods, function(lh) { lh$stackmaker(lh$data, bru.model, result) }))
+    do.call(inla.stack.mjoin, lapply(lhoods, function(lh) { stackmaker.like(lh)(bru.model, result) }))
   }
   
   # Set max interations to 1 if all likelihood formulae are linear 
   if (all(sapply(lhoods, function(lh) lh$linear))) { max.iter = 1 }
   
   # Extract the family of each likelihood
-  family = sapply(1:length(lhoods), function(k) lhoods[[k]]$family)
+  family = sapply(1:length(lhoods), function(k) lhoods[[k]]$inla.family)
   
   # Run iterated INLA
   if ( run ) { result = do.call(iinla, c(list(data, bru.model, stk, family = family, n = max.iter, offset = offset, result = result), options))} 
@@ -113,28 +118,83 @@ bru = function(components = y ~ Intercept,
 #' @param family A character identifying a valid \link{inla} likelihood. Alternatively 'cp' for Cox processes.
 #' @param formula a \link{formula} where the right hand side expression defines the predictor used in the optimization.
 #' @param data Likelihood-specific data
+#' @param components
+#' @param mesh
 #' @param E Poisson exposure parameter (if family = 'poisson') passed on to \link{inla} 
 #' @param samplers Integration domain for 'cp' family (not implemented!)
 #' 
-like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
+like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = NULL, E = 1, samplers = NULL) {
+  
+  # Some defaults
+  inla.family = family
+  ips = NULL
   
   # Does the likelihood formula imply a linear predictor?
-  linear = as.character(formula)[2] == "."
+  linear = as.character(formula)[length(as.character(formula))] == "."
   
   # If not linear, set predictor expression according to the formula's RHS
-  if ( !linear ) { expr = parse(text = as.character(formula)[3]) }
+  if ( !linear ) { expr = parse(text = as.character(formula)[length(as.character(formula))]) }
   else { expr = NULL }
   
+  #' Set response name
   response = all.vars(update(formula, .~0))
+  if (response == ".") response = NULL
   
-  list(family = family, 
-       formula = formula, 
-       data = data, 
-       E = E, 
-       samplers = samplers, 
-       linear = linear,
-       expr = expr,
-       response)
+  
+  #' More on special bru likelihoods
+  if ( family == "cp" ) {
+    if ( is.null(data) ) { stop("You called like() with family='cp' but no 'data' argument was supplied.") }
+    if ( is.null(samplers) ) { stop("You called like() with family='cp' but no 'samplers' argument was supplied.") }
+    bru.model = make.model(components)
+    if (as.character(formula)[2] == ".") { 
+      bru.model$dim.names = all.vars(update(components, .~0)) } 
+    else { 
+      bru.model$dim.names = all.vars(update(formula, .~0))
+    }
+    icfg = iconfig(samplers, data, bru.model, mesh = mesh)
+    ips = ipoints(samplers, icfg)
+    inla.family = "poisson"
+  }
+  
+  # The likelihood object that will be returned
+  
+  lh = list(family = family, 
+         formula = formula, 
+         data = data, 
+         E = E, 
+         samplers = samplers, 
+         linear = linear,
+         expr = expr,
+         response = response,
+         inla.family = inla.family,
+         ips = ips)
+  
+  class(lh) = c("lhood","list")
+  
+  # Return likelihood
+  lh
+}
+
+stackmaker.like = function(lhood) {
+  
+  env = new.env() ; env$lhood = lhood
+  
+  # Special inlabru likelihoods
+  if (lhood$family == "cp"){
+    sm = function(model, result) {
+      inla.stack(make.stack(points = lhood$data, model = model, expr = lhood$expr, y = 1, E = 0, result = result),
+                 make.stack(points = lhood$ips, model = model, expr = lhood$expr, y = 0, E = lhood$ips$weight, offset = 0, result = result))
+    }
+    
+  } else { 
+    
+    sm = function(model, result) { 
+      make.stack(points = lhood$data, model = model, expr = lhood$expr, y = as.data.frame(lhood$data)[,lhood$response], E = lhood$E, result = result) 
+    }
+    
+  }
+  environment(sm) = env
+  sm
 }
 
 
@@ -349,7 +409,7 @@ summary.bru = function(result) {
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
   for ( k in 1:length(result$sppa$lhoods) ) {
     lh = result$sppa$lhoods[[k]]
-    cat(sprintf("Name: '%s', family: '%s',\t formula: '%s' \n", names(result$sppa$lhoods)[[k]], lh$family, deparse(lh$formula)))
+    cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(result$sppa$lhoods)[[k]], lh$family, class(lh$data),deparse(lh$formula)))
   }
   
   #rownames(df) = names(result$sppa$lhoods)
