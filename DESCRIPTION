@@ -14,5 +14,5 @@ Depends:
     Matrix,
     ggplot2,
     RColorBrewer
-Additional_repositories: https://www.math.ntnu.no/inla/R/stable
+Additional_repositories: https://www.math.ntnu.no/inla/R/testing
 RoxygenNote: 5.0.1
