@@ -25,7 +25,7 @@
 ##   make bmake-rpkg
 ##   make bmake-rpkg-Rdev:
 ##
-## Check the latest built source package:
+## Check the latest built *source* package (from make rpkg-source):
 ##   make check
 ##   make check-Rdev
 ##
