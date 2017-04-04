@@ -269,7 +269,7 @@ g = function(covariate,
   }
   
   # Check if we got a mesh argument if the model is an SPDE
-  if ( fvals$model == "spde2" & is.null(mesh) ) stop(sprintf("Model %s is an SPDE but no mesh was provided", label))
+  if ( fvals$model == "spde2" & is.null(mesh) ) { mesh = model$mesh } 
   
   # Check if n is present for models that are not fixed effects
   if (is.null(fvals$n) & !(fvals$model == "linear")) stop(sprintf("Please provide parameter 'n' for effect '%s'", label))
