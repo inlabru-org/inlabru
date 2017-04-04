@@ -76,7 +76,7 @@ bru = function(components = y ~ Intercept,
       if (is.null(data)) {stop(sprintf("Likelihood %s has not data attached to it and no data was supplied to bru() either.", names(lhoods)[[k]]))}
       lh$data = data
     }
-    
+    if ( is.null(lh$components) ) { lh$components = components }
     if ( is.null(lh$response) ) { lh$response = all.vars(update(components, .~0)) }
     
     lhoods[[k]] = lh
@@ -91,7 +91,7 @@ bru = function(components = y ~ Intercept,
   if (all(sapply(lhoods, function(lh) lh$linear))) { max.iter = 1 }
   
   # Extract the family of each likelihood
-  family = sapply(1:length(lhoods), function(k) lhoods[[k]]$family)
+  family = sapply(1:length(lhoods), function(k) lhoods[[k]]$inla.family)
   
   # Run iterated INLA
   if ( run ) { result = do.call(iinla, c(list(data, bru.model, stk, family = family, n = max.iter, offset = offset, result = result), options))} 
@@ -118,13 +118,19 @@ bru = function(components = y ~ Intercept,
 #' @param family A character identifying a valid \link{inla} likelihood. Alternatively 'cp' for Cox processes.
 #' @param formula a \link{formula} where the right hand side expression defines the predictor used in the optimization.
 #' @param data Likelihood-specific data
+#' @param components
+#' @param mesh
 #' @param E Poisson exposure parameter (if family = 'poisson') passed on to \link{inla} 
 #' @param samplers Integration domain for 'cp' family (not implemented!)
 #' 
-like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
+like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = NULL, E = 1, samplers = NULL) {
+  
+  # Some defaults
+  inla.family = family
+  ips = NULL
   
   # Does the likelihood formula imply a linear predictor?
-  linear = as.character(formula)[2] == "."
+  linear = as.character(formula)[length(as.character(formula))] == "."
   
   # If not linear, set predictor expression according to the formula's RHS
   if ( !linear ) { expr = parse(text = as.character(formula)[length(as.character(formula))]) }
@@ -134,9 +140,23 @@ like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
   response = all.vars(update(formula, .~0))
   if (response == ".") response = NULL
   
-  #' For special bru likelihoods overwrite the family parameter
-  if ( family == "cp" ) { family = "poisson" ;  bru.family = "cp" } else { bru.family = family }
   
+  #' More on special bru likelihoods
+  if ( family == "cp" ) {
+    if ( is.null(data) ) { stop("You called like() with family='cp' but no 'data' argument was supplied.") }
+    if ( is.null(samplers) ) { stop("You called like() with family='cp' but no 'samplers' argument was supplied.") }
+    bru.model = make.model(components)
+    if (as.character(formula)[2] == ".") { 
+      bru.model$dim.names = all.vars(update(components, .~0)) } 
+    else { 
+      bru.model$dim.names = all.vars(update(formula, .~0))
+    }
+    icfg = iconfig(samplers, data, bru.model, mesh = mesh)
+    ips = ipoints(samplers, icfg)
+    inla.family = "poisson"
+  }
+  
+  # The likelihood object that will be returned
   
   lh = list(family = family, 
          formula = formula, 
@@ -146,7 +166,8 @@ like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
          linear = linear,
          expr = expr,
          response = response,
-         bru.family = bru.family)
+         inla.family = inla.family,
+         ips = ips)
   
   class(lh) = c("lhood","list")
   
@@ -159,10 +180,10 @@ stackmaker.like = function(lhood) {
   env = new.env() ; env$lhood = lhood
   
   # Special inlabru likelihoods
-  if (lhood$bru.family == "cp"){
+  if (lhood$family == "cp"){
     sm = function(model, result) {
       inla.stack(make.stack(points = lhood$data, model = model, expr = lhood$expr, y = 1, E = 0, result = result),
-                 make.stack(points = lhood$samplers, model = model, expr = lhood$expr, y = 0, E = lhood$samplers$weight, offset = 0, result = result))
+                 make.stack(points = lhood$ips, model = model, expr = lhood$expr, y = 0, E = lhood$ips$weight, offset = 0, result = result))
     }
     
   } else { 
