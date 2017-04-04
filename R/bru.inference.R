@@ -73,26 +73,29 @@ bru = function(components = y ~ Intercept,
     if ( is.null(lh$data) ) {
       if (is.null(data)) {stop(sprintf("Likelihood %s has not data attached to it and no data was supplied to bru() either.", names(lhoods)[[k]]))}
       lh$data = data
-      }
-    
-    # Extract responses y for each likelihood and its data set
-    if (is.null(lh$response)) {
-      y = as.data.frame(lh$data)[, all.vars(update(components, .~0))]
-    } else {
-      y = as.data.frame(lh$data)[, lh$response]
     }
     
-    # Create stackmaker for each likelihood
-      lh$stackmaker = function(points, model, result) { 
-        make.stack(points = lh$data, model = bru.model, expr = lh$expr, y = y, E = lh$E, result = result) 
-      }
+    # Check the likelihood's response. If NULL, set the component's left hand side as response
+    if ( is.null(lh$response) ) lh$response = all.vars(update(components, .~0))
+    
+    # Extract responses y for each likelihood and its data set
+    lh$y = as.data.frame(lh$data)[, lh$response]
+    
+    # Create stackmaker for each likelihood (each stackmaker needs its own environment!)
+    env = new.env() ; env$lh = lh
+    
+    lh$stackmaker = function(model, result) { 
+      make.stack(points = lh$data, model = model, expr = lh$expr, y = lh$y, E = lh$E, result = result) 
+    }
+    environment(lh$stackmaker) = env
+      
       
     lhoods[[k]] = lh
   }
   
   # Create joint stackmaker
   stk = function(xx, mdl, result) {
-    do.call(inla.stack.mjoin, lapply(lhoods, function(lh) { lh$stackmaker(lh$data, bru.model, result) }))
+    do.call(inla.stack.mjoin, lapply(lhoods, function(lh) { lh$stackmaker(bru.model, result) }))
   }
   
   # Set max interations to 1 if all likelihood formulae are linear 
@@ -135,10 +138,11 @@ like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
   linear = as.character(formula)[2] == "."
   
   # If not linear, set predictor expression according to the formula's RHS
-  if ( !linear ) { expr = parse(text = as.character(formula)[3]) }
+  if ( !linear ) { expr = parse(text = as.character(formula)[length(as.character(formula))]) }
   else { expr = NULL }
   
   response = all.vars(update(formula, .~0))
+  if (response == ".") response = NULL
   
   lh = list(family = family, 
          formula = formula, 
@@ -147,7 +151,7 @@ like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
          samplers = samplers, 
          linear = linear,
          expr = expr,
-         response)
+         response = response)
   
   class(lh) = c("lhood","list")
   
