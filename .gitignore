@@ -1,0 +1,12 @@
+#
+# Ignore the staging directory and build directory, if any
+# Ignore the package checking directory
+# Ignore the built package files
+# Ignore backup files
+#
+
+stage/
+build/
+*.Rcheck
+*.tar.gz
+*~
