@@ -64,7 +64,9 @@ bru = function(components = y ~ Intercept,
   lhoods = c(lhoods, list(...))
   
   
-  # Handle each likelihood
+  # If a likelihood was provided without data/response, update according to bru's 
+  # arguments `data` and LHS of components
+  
   for (k in 1:length(lhoods)) {
     
     lh = lhoods[[k]]
@@ -75,27 +77,14 @@ bru = function(components = y ~ Intercept,
       lh$data = data
     }
     
-    # Check the likelihood's response. If NULL, set the component's left hand side as response
-    if ( is.null(lh$response) ) lh$response = all.vars(update(components, .~0))
+    if ( is.null(lh$response) ) { lh$response = all.vars(update(components, .~0)) }
     
-    # Extract responses y for each likelihood and its data set
-    lh$y = as.data.frame(lh$data)[, lh$response]
-    
-    # Create stackmaker for each likelihood (each stackmaker needs its own environment!)
-    env = new.env() ; env$lh = lh
-    
-    lh$stackmaker = function(model, result) { 
-      make.stack(points = lh$data, model = model, expr = lh$expr, y = lh$y, E = lh$E, result = result) 
-    }
-    environment(lh$stackmaker) = env
-      
-      
     lhoods[[k]] = lh
   }
   
   # Create joint stackmaker
   stk = function(xx, mdl, result) {
-    do.call(inla.stack.mjoin, lapply(lhoods, function(lh) { lh$stackmaker(bru.model, result) }))
+    do.call(inla.stack.mjoin, lapply(lhoods, function(lh) { stackmaker.like(lh)(bru.model, result) }))
   }
   
   # Set max interations to 1 if all likelihood formulae are linear 
@@ -141,8 +130,13 @@ like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
   if ( !linear ) { expr = parse(text = as.character(formula)[length(as.character(formula))]) }
   else { expr = NULL }
   
+  #' Set response name
   response = all.vars(update(formula, .~0))
   if (response == ".") response = NULL
+  
+  #' For special bru likelihoods overwrite the family parameter
+  if ( family == "cp" ) { family = "poisson" ;  bru.family = "cp" } else { bru.family = family }
+  
   
   lh = list(family = family, 
          formula = formula, 
@@ -151,12 +145,35 @@ like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
          samplers = samplers, 
          linear = linear,
          expr = expr,
-         response = response)
+         response = response,
+         bru.family = bru.family)
   
   class(lh) = c("lhood","list")
   
   # Return likelihood
   lh
+}
+
+stackmaker.like = function(lhood) {
+  
+  env = new.env() ; env$lhood = lhood
+  
+  # Special inlabru likelihoods
+  if (lhood$bru.family == "cp"){
+    sm = function(model, result) {
+      inla.stack(make.stack(points = lhood$data, model = model, expr = lhood$expr, y = 1, E = 0, result = result),
+                 make.stack(points = lhood$samplers, model = model, expr = lhood$expr, y = 0, E = lhood$samplers$weight, offset = 0, result = result))
+    }
+    
+  } else { 
+    
+    sm = function(model, result) { 
+      make.stack(points = lhood$data, model = model, expr = lhood$expr, y = as.data.frame(lhood$data)[,lhood$response], E = lhood$E, result = result) 
+    }
+    
+  }
+  environment(sm) = env
+  sm
 }
 
 
