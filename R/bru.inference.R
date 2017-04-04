@@ -31,7 +31,7 @@
 #' 
 
 bru = function(components = y ~ Intercept,
-               family = "gaussian",
+               family = NULL,
                data = NULL,
                ...,
                mesh = NULL, 
@@ -52,15 +52,28 @@ bru = function(components = y ~ Intercept,
   # merge it with the list of likelihood provided via `...`.
   
   lhoods = list()
-  if ( is.character(family) ) { 
-    lhoods = list(default = like(family = family, data = data)) } 
-  else { lhoods = list(default = family) }
+  if ( inherits(family, "lhood") & inherits(data, "lhood") ) {
+    lhoods = c(lhoods, list(default = family, lh2 = data)) ; data = NULL ; family = NULL
+  } else if ( inherits(family, "lhood") & !inherits(data, "lhood") ) {
+    lhoods = c(list(default = family), lhoods) ; family = NULL 
+  } else if ( !inherits(family, "lhood") & inherits(data, "lhood") ) {
+    lhoods = c(list(default = like(family), lh2 = data), lhoods); data = NULL 
+  } else {
+    if( !is.null(family) ) { lhoods = c(list(default = like(family, data = data))); family = NULL }
+  }
   lhoods = c(lhoods, list(...))
-
-
+  
+  
+  # Handle each likelihood
   for (k in 1:length(lhoods)) {
     
     lh = lhoods[[k]]
+    
+    # Check if likelihood has data attached to it. If not, attach the 'data' argument or break if not available
+    if ( is.null(lh$data) ) {
+      if (is.null(data)) {stop(sprintf("Likelihood %s has not data attached to it and no data was supplied to bru() either.", names(lhoods)[[k]]))}
+      lh$data = data
+      }
     
     # Extract responses y for each likelihood and its data set
     if (is.null(lh$response)) {
@@ -127,14 +140,19 @@ like = function(family, formula = . ~ ., data = NULL, E = 1, samplers = NULL) {
   
   response = all.vars(update(formula, .~0))
   
-  list(family = family, 
-       formula = formula, 
-       data = data, 
-       E = E, 
-       samplers = samplers, 
-       linear = linear,
-       expr = expr,
-       response)
+  lh = list(family = family, 
+         formula = formula, 
+         data = data, 
+         E = E, 
+         samplers = samplers, 
+         linear = linear,
+         expr = expr,
+         response)
+  
+  class(lh) = c("lhood","list")
+  
+  # Return likelihood
+  lh
 }
 
 
@@ -349,7 +367,7 @@ summary.bru = function(result) {
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
   for ( k in 1:length(result$sppa$lhoods) ) {
     lh = result$sppa$lhoods[[k]]
-    cat(sprintf("Name: '%s', family: '%s',\t formula: '%s' \n", names(result$sppa$lhoods)[[k]], lh$family, deparse(lh$formula)))
+    cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(result$sppa$lhoods)[[k]], lh$family, class(lh$data),deparse(lh$formula)))
   }
   
   #rownames(df) = names(result$sppa$lhoods)
