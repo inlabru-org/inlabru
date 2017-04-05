@@ -1,7 +1,7 @@
 # GENERICS
 
 vertices = function(...){UseMethod("vertices")}
-
+pixels = function(...){UseMethod("pixels")}
 
 #' Plot an inla.mesh using ggplot
 #'
@@ -109,5 +109,19 @@ vertices.inla.mesh = function(mesh) {
     if (any(!(mesh$loc[,3]==0))) { vrt = mesh$loc } else { vrt = mesh$loc[,c(1,2)] }
     SpatialPointsDataFrame(vrt, proj4string = mesh$crs, data = data.frame(idx = 1:nrow(mesh$loc)))
   }
+  
+}
+
+pixels.inla.mesh = function(mesh, nx = 150, ny = 150, mask = TRUE) {
+  lattice <- inla.mesh.lattice(x=seq(min(mesh$loc[,1]), max(mesh$loc[,1]),length = nx),
+                               y=seq(min(mesh$loc[,2]), max(mesh$loc[,2]),length = ny))
+  pixels <- data.frame(x=lattice$loc[,1], y=lattice$loc[,2])
+
+  coordinates(pixels) <- c("x","y")
+  
+  if (!is.null(mesh$crs)) { pixels = SpatialPixels(pixels, proj4string = mesh$crs) }
+  else { pixels = SpatialPixels(pixels) }
+  
+  if ( mask ) { pixels = pixels[is.inside(mesh, coordinates(pixels))] }
   
 }
