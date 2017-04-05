@@ -142,7 +142,7 @@ point2count = function(plots,dets) {
     y[i] = min(ys) + abs(diff(range(ys))/2)
   }
   
-  #' make a data frame of it
+  # make a data frame of it
   countdf = data.frame(n=count, area=plotarea, x=x, y=y)
   # make SpatialPointsDataFrame of it
   plotcounts = SpatialPointsDataFrame(coords=data.frame(x=x,y=y),data=data.frame(n=count,area=plotarea), 
