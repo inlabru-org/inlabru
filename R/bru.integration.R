@@ -299,3 +299,38 @@ iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL) {
   ret
 }
 
+
+#' Integration point configuration generator
+#'   
+#'
+#' @aliases iconfig2
+#' @return An integration configuration
+
+iconfig2 = function(dims, domain, data) {
+  icfg = list()
+  
+  for (dname in dims){
+    ret = list()
+    if (dname == "coordinates") {
+      ret$name = "coordinates"
+      ret$domain = domain[[dname]]
+      ret$class = "inla.mesh"
+    } else {
+      ret$name = dname
+      # If no domain specification is given use data range for this dimension to construct a 1D mesh
+      if ( !(dname %in% names(domain)) ) {
+        domain[[dname]] = inla.mesh.1d(seq(min(data.frame(data[,dname])), max(data.frame(data[,dname])),length.out = 25))
+      }
+      if ( class(domain[[dname]]) == "inla.mesh.1d" ) { dom = domain[[dname]] }
+      else if ( is.numeric(domain[[dname]]) ) { dom = inla.mesh.1d(domain[[dname]]) }
+      else if ( is.factor(domain[[dname]]) ) { dom = domain[[dname]] }
+      else { stop(sprintf("Unsupported domain class '%s' for domain '%s'"), class(domain[[dname]]), dname) }
+      ret$domain = dom
+      ret$class = class(domain[[dname]])
+    }
+    icfg[[dname]] = ret
+  }
+  icfg
+ 
+}
+
