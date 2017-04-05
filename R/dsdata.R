@@ -1,83 +1,83 @@
-#' iDistance data format for distance sampling surveys
-#' 
-#' For details on ho to construct such a data set see \link{make.dsdata}
-#' 
-#' Data sets included in iDistance:
-#' \itemize{
-#'  \item{\link{toy1}: }{A toy data set with a single transect line}
-#'  \item{\link{weeds}: }{Johnson et al. (2010) weeds data (line transect)}
-#'  \item{\link{whales}: }{ETP blue whales (line transect)}
-#'  \item{\link{strdolphin}: }{ETP striped dolphins (line transect)}
-#'  \item{\link{sbdolphin}: }{ETP short beaked dolphins (line transect)}
-#'  \item{\link{mrsea}: }{Marine renewables strategic environmental assessment (line transect, see package MRSea)}
-#' }
-#' 
-#' Data sets that can be imported from other packages
-#' \itemize{
-#'  \item{mexdolphin (dsm package):}{ Use \link{import.dsmdata} }
-#' }
-#' 
-#' @name dsdata
-#' 
+# iDistance data format for distance sampling surveys
+# 
+# For details on ho to construct such a data set see \link{make.dsdata}
+# 
+# Data sets included in iDistance:
+# \itemize{
+#  \item{\link{toy1}: }{A toy data set with a single transect line}
+#  \item{\link{weeds}: }{Johnson et al. (2010) weeds data (line transect)}
+#  \item{\link{whales}: }{ETP blue whales (line transect)}
+#  \item{\link{strdolphin}: }{ETP striped dolphins (line transect)}
+#  \item{\link{sbdolphin}: }{ETP short beaked dolphins (line transect)}
+#  \item{\link{mrsea}: }{Marine renewables strategic environmental assessment (line transect, see package MRSea)}
+# }
+# 
+# Data sets that can be imported from other packages
+# \itemize{
+#  \item{mexdolphin (dsm package):}{ Use \link{import.dsmdata} }
+# }
+# 
+# @name dsdata
+# 
 NULL
 
 
-#' Check if an object is of class dsdata
-#' 
-#' @aliases is.dsdata
-#' @name is.dsdata
-#' @export
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' 
+# Check if an object is of class dsdata
+# 
+# @aliases is.dsdata
+# @name is.dsdata
+# @export
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# 
 
 is.dsdata = function(data) { return( class(data)[1] == "dsdata") }
 
 
-#' Make dsdata 
-#' 
-#' Constructs a distance sampling data set from transects, detections and model of the survey area
-#'
-#' The core item that this function needs is a \code{data.frame}, hereafter called \code{effort}
-#' containing transect definitions, segments thereof, detections and possibly some covariates.
-#' The effort table needs to have the following columns:
-#' 
-#'  \itemize{
-#'  \item{strat: }{ An identifier of the stratum }
-#'  \item{trans: }{ An identifier of the transect }
-#'  \item{seg: }{An identifier of a segment}
-#'  \item{det: }{An identifier of a detection}
-#'  \item{start.x}{x-coordinate of a transect's/semgent's starting point}
-#'  \item{start.y}{y-coordinate of a transect's/semgent's starting point}
-#'  \item{end.x}{x-coordinate of a transect's/semgent's end point}
-#'  \item{end.y}{y-coordinate of a transect's/semgent's end point}
-#'  \item{x}{x-coordinate of a detection (NA for transects and segments)}
-#'  \item{y}{y-coordinate of a detection (NA for transects and segments)}
-#'  \item{distance}{distance of the detection from the observer}
-#'  }
-#'  
-#'  Note that in pinciple the coordinates can have arbitrary names which can be set by the mesh.coords
-#'  parameter explained below. For instance, if \code{mesh.coords = c("lon",("lat")}, the columns above
-#'  must be called 'lon' and 'lat' for detections and start.lon etc. for trensects and segments.
-#'  
-#'  If no \link{inla.mesh} is provided via the \code{mesh} parameter, \code{make.dsdata} will try to
-#'  construct a mesh from the effort table. By default, an inner boundary segment is constructed from the
-#'  non-convex hull of all detections and transect/segment points. Thereafter, a convex hull is found
-#'  to create the mesh. As this might not reflect the reality of your data please consider to construct
-#'  a mesh manually.
-#'  
-#'  
-#' @aliases make.dsdata
-#' @name make.dsdata
-#' @export
-#' @param effort A data.frame object describing transects and detections
-#' @param geometry Character describing the geometry of the data set. Either "euc" for euclidean or "geo" for geographic coordinates.
-#' @param mesh An inla.mesh object modeling the domain.
-#' @param mesh.coords Names of the effort columns that are interpreted as coordinates
-#' @param mesh.args If no mesh if provided these arguments passed on to inla.mesh.create to construct the mesh. 
-#' @return  a \link{dsdata} object
-#' @examples \dontrun{ data(toy1) ; dset = make.dsdata(effort = toy1$effort) ; plot(dset) }
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' 
+# Make dsdata 
+# 
+# Constructs a distance sampling data set from transects, detections and model of the survey area
+#
+# The core item that this function needs is a \code{data.frame}, hereafter called \code{effort}
+# containing transect definitions, segments thereof, detections and possibly some covariates.
+# The effort table needs to have the following columns:
+# 
+#  \itemize{
+#  \item{strat: }{ An identifier of the stratum }
+#  \item{trans: }{ An identifier of the transect }
+#  \item{seg: }{An identifier of a segment}
+#  \item{det: }{An identifier of a detection}
+#  \item{start.x}{x-coordinate of a transect's/semgent's starting point}
+#  \item{start.y}{y-coordinate of a transect's/semgent's starting point}
+#  \item{end.x}{x-coordinate of a transect's/semgent's end point}
+#  \item{end.y}{y-coordinate of a transect's/semgent's end point}
+#  \item{x}{x-coordinate of a detection (NA for transects and segments)}
+#  \item{y}{y-coordinate of a detection (NA for transects and segments)}
+#  \item{distance}{distance of the detection from the observer}
+#  }
+#  
+#  Note that in pinciple the coordinates can have arbitrary names which can be set by the mesh.coords
+#  parameter explained below. For instance, if \code{mesh.coords = c("lon",("lat")}, the columns above
+#  must be called 'lon' and 'lat' for detections and start.lon etc. for trensects and segments.
+#  
+#  If no \link{inla.mesh} is provided via the \code{mesh} parameter, \code{make.dsdata} will try to
+#  construct a mesh from the effort table. By default, an inner boundary segment is constructed from the
+#  non-convex hull of all detections and transect/segment points. Thereafter, a convex hull is found
+#  to create the mesh. As this might not reflect the reality of your data please consider to construct
+#  a mesh manually.
+#  
+#  
+# @aliases make.dsdata
+# @name make.dsdata
+# @export
+# @param effort A data.frame object describing transects and detections
+# @param geometry Character describing the geometry of the data set. Either "euc" for euclidean or "geo" for geographic coordinates.
+# @param mesh An inla.mesh object modeling the domain.
+# @param mesh.coords Names of the effort columns that are interpreted as coordinates
+# @param mesh.args If no mesh if provided these arguments passed on to inla.mesh.create to construct the mesh. 
+# @return  a \link{dsdata} object
+# @examples \dontrun{ data(toy1) ; dset = make.dsdata(effort = toy1$effort) ; plot(dset) }
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# 
 
 make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords = NULL, mesh.args = list()) {
   
@@ -152,13 +152,13 @@ make.dsdata = function(effort = NULL, geometry = NULL, mesh = NULL, mesh.coords 
 }
 
 
-#' Make a default mesh
-#' 
-#' @aliases make.mesh
-#' @export
-#' @examples \dontrun{  }
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' 
+# Make a default mesh
+# 
+# @aliases make.mesh
+# @export
+# @examples \dontrun{  }
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# 
 
 make.mesh = function(dset, ...) {
   
@@ -202,28 +202,28 @@ make.mesh = function(dset, ...) {
 }
 
 
-#' Plot distance sampling data (\link{dsdata})
-#' 
-#' @aliases plot.dsdata 
-#' @name plot.dsdata
-#' @export
-#' @param data A \link{dsdata} object
-#' @param rgl If TRUE, use RGL to plot the data
-#' @param ggp if TRUE, use ggplot2 for plotting
-#' @param add If TRUE, add the plot instead of starting a new one
-#' @param segment If TRUE, plot the segment lines
-#' @param segment.args Plotting argument for segments.
-#' @param segment.colorize Colorize segments according to their transect. Only supported if rgl=FALSE
-#' @param detection If TRUE, plot the detected animals
-#' @param detection.args Plotting argument for detections.
-#' @param add.mesh If TRUE, add the mesh to the plot (only ggplot)
-#' @param col Color specification for the mesh. Requires rgl=TRUE
-#' @param asp Apect ration of the plot
-#' @param transect DEPRECATED. Use segment instead.
-#' @param transect.args DEPRECATED. Use segment instead.
-#' @examples \dontrun{ toy=toy1() ; plot(toy) }
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' 
+# Plot distance sampling data (\link{dsdata})
+# 
+# @aliases plot.dsdata 
+# @name plot.dsdata
+# @export
+# @param data A \link{dsdata} object
+# @param rgl If TRUE, use RGL to plot the data
+# @param ggp if TRUE, use ggplot2 for plotting
+# @param add If TRUE, add the plot instead of starting a new one
+# @param segment If TRUE, plot the segment lines
+# @param segment.args Plotting argument for segments.
+# @param segment.colorize Colorize segments according to their transect. Only supported if rgl=FALSE
+# @param detection If TRUE, plot the detected animals
+# @param detection.args Plotting argument for detections.
+# @param add.mesh If TRUE, add the mesh to the plot (only ggplot)
+# @param col Color specification for the mesh. Requires rgl=TRUE
+# @param asp Apect ration of the plot
+# @param transect DEPRECATED. Use segment instead.
+# @param transect.args DEPRECATED. Use segment instead.
+# @examples \dontrun{ toy=toy1() ; plot(toy) }
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# 
 plot.dsdata = function(data, 
                        rgl = FALSE,
                        ggp = TRUE,
@@ -380,12 +380,12 @@ plot.dsdata = function(data,
   }
 }
 
-#' Change the coordinate system of \link{dsdata}
-#' 
-#' @aliases remap.dsdata 
-#' @export
-#' @param dsdata Distance sampling data set
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Change the coordinate system of \link{dsdata}
+# 
+# @aliases remap.dsdata 
+# @export
+# @param dsdata Distance sampling data set
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat"){
   
@@ -440,16 +440,16 @@ remap.dsdata = function(data, p4s = "+proj=longlat", mesh.p4s = "+proj=longlat")
   return(data)
 }
 
-#' Sanity of a \link{dsdata} object
-#' 
-#' Analyzes if a distance sampling data object is well defined. 
-#' 
-#' @aliases sanity.dsdata 
-#' @export
-#' @param dsdata Distance sampling data set
-#' 
-#' @examples \dontrun{ data(toy1) ; sanity(toy1) }
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Sanity of a \link{dsdata} object
+# 
+# Analyzes if a distance sampling data object is well defined. 
+# 
+# @aliases sanity.dsdata 
+# @export
+# @param dsdata Distance sampling data set
+# 
+# @examples \dontrun{ data(toy1) ; sanity(toy1) }
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 sanity.dsdata = function(dset){
   
@@ -552,16 +552,16 @@ sanity.effort.inside = function(dset, message = FALSE){
 
 
 
-#' Summarize distance sampling data 
-#' 
-#' Gives a brief summary of the data and calls the \link{statistics.dsdata} function to print some statistics.
-#' 
-#' @aliases summary.dsdata 
-#' @export
-#' @param data A \link{dsdata} object
-#' @param ... arguments passed on to \link{statistics.dsdata}
-#' @examples \dontrun{ data(toy1) ; summary(toy1) }
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Summarize distance sampling data 
+# 
+# Gives a brief summary of the data and calls the \link{statistics.dsdata} function to print some statistics.
+# 
+# @aliases summary.dsdata 
+# @export
+# @param data A \link{dsdata} object
+# @param ... arguments passed on to \link{statistics.dsdata}
+# @examples \dontrun{ data(toy1) ; summary(toy1) }
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 summary.dsdata = function(data, ...){
   
@@ -577,17 +577,17 @@ summary.dsdata = function(data, ...){
   
 }
 
-#' Calculate baseline statistics
-#' 
-#' A brief overview of important statistics like the area covered by the mesh and the number of observations
-#' 
-#' @aliases statistics.dsdata 
-#' @name statistics.dsdata 
-#' @export
-#' @param dsdata A \link{dsdata} object
-#' @param distance.truncation Set this to a numeric value to obtain more detailed statistics.
-#' @examples \dontrun{ data(toy1) ; statistics(toy1) }
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Calculate baseline statistics
+# 
+# A brief overview of important statistics like the area covered by the mesh and the number of observations
+# 
+# @aliases statistics.dsdata 
+# @name statistics.dsdata 
+# @export
+# @param dsdata A \link{dsdata} object
+# @param distance.truncation Set this to a numeric value to obtain more detailed statistics.
+# @examples \dontrun{ data(toy1) ; statistics(toy1) }
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 statistics.dsdata = function(data, distance.truncation = NULL){
   
@@ -699,13 +699,13 @@ trdata.dsdata = function(data,tr=NULL,...){
   }
 }
 
-#' Extract transect pointers from effort data
-#' 
-#' @aliases as.transect.effort 
-#' @export
-#' @param effort Effort data set
-#' @return transect Transects
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Extract transect pointers from effort data
+# 
+# @aliases as.transect.effort 
+# @export
+# @param effort Effort data set
+# @return transect Transects
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 as.transect.effort = function(effort){
   if (is.unsorted(transect.id(effort),na.rm=TRUE)) { stop("The transects of your data set are not sorted in increasing order. Fix that.") }
@@ -722,13 +722,13 @@ as.transect.effort = function(effort){
   return(tr)
 }
 
-#' Extract segment pointers from effort data
-#' 
-#' @aliases as.effort.effort 
-#' @export
-#' @param effort Effort data set
-#' @return segmet Segments
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Extract segment pointers from effort data
+# 
+# @aliases as.effort.effort 
+# @export
+# @param effort Effort data set
+# @return segmet Segments
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 as.segment.effort = function(effort){
   if (is.unsorted(transect.id(effort), na.rm = TRUE)) { stop("The transects of your data set are not sorted in increasing order. Fix that.") }
@@ -738,13 +738,13 @@ as.segment.effort = function(effort){
   return(seg)
 }
 
-#' Extract detection pointers from effort data
-#' 
-#' @aliases as.detection.effort 
-#' @export
-#' @param effort Effort data set
-#' @return sighting sightings
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Extract detection pointers from effort data
+# 
+# @aliases as.detection.effort 
+# @export
+# @param effort Effort data set
+# @return sighting sightings
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 as.detection.effort = function(effort){
   idx = which(!(is.na(effort$det)))
@@ -754,14 +754,14 @@ as.detection.effort = function(effort){
 }
 
 
-#' Join an effort data set with a sighting data set
-#' 
-#' @aliases join.effort 
-#' @export
-#' @param effort Effort data set
-#' @param detection Detections
-#' @return effort Effort data set including provided sightings
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Join an effort data set with a sighting data set
+# 
+# @aliases join.effort 
+# @export
+# @param effort Effort data set
+# @param detection Detections
+# @return effort Effort data set including provided sightings
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 join.effort = function(effort,detection){
   all = rbind(effort[,c("seg","det")],detection[,c("seg","det")])
@@ -779,14 +779,14 @@ join.effort = function(effort,detection){
 }
 
 
-#' Start points coordinates of transect(s)
-#' 
-#' @aliases startpoint.transect
-#' @export
-#' @param transect
-#' @param data Data set with $effort
-#' @return spoint
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Start points coordinates of transect(s)
+# 
+# @aliases startpoint.transect
+# @export
+# @param transect
+# @param data Data set with $effort
+# @return spoint
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 startpoint.transect = function(tr,data,keep=FALSE) {
   cols = names(data$effort) %in% paste0("start.",data$mesh.coords)
@@ -798,14 +798,14 @@ startpoint.transect = function(tr,data,keep=FALSE) {
   }
 }
 
-#' End points coordinates of transect(s)
-#' 
-#' @aliases endpoint.transect
-#' @export
-#' @param transect
-#' @param data Data set with $effort
-#' @return epoint
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# End points coordinates of transect(s)
+# 
+# @aliases endpoint.transect
+# @export
+# @param transect
+# @param data Data set with $effort
+# @return epoint
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 endpoint.transect = function(tr,data,keep=FALSE) {
   cols = names(data$effort) %in% paste0("end.",data$mesh.coords)
@@ -817,26 +817,26 @@ endpoint.transect = function(tr,data,keep=FALSE) {
   } 
 }
 
-#' Number of transects
-#' 
-#' @aliases numtr.transect
-#' @export
-#' @param transects
-#' @param data Data set with $effort
-#' @return n
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Number of transects
+# 
+# @aliases numtr.transect
+# @export
+# @param transects
+# @param data Data set with $effort
+# @return n
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 numtr.transect = function(tr,data=data) { return(dim(tr)[1]) }
 
 
-#' Linedata
-#' 
-#' @aliases linedata linedata.transect
-#' @export
-#' @param transects
-#' @param data Data set with $effort
-#' @return data
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Linedata
+# 
+# @aliases linedata linedata.transect
+# @export
+# @param transects
+# @param data Data set with $effort
+# @return data
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 linedata = function(...){
   #stop("This method is deprecated")
@@ -850,81 +850,81 @@ linedata.segment = function(seg,data,fields){
 }
 
 
-#' Start points coordinates of segment(s)
-#' 
-#' @aliases startpoint.segment
-#' @export
-#' @param segment
-#' @param data Data set with $effort
-#' @return spoint
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Start points coordinates of segment(s)
+# 
+# @aliases startpoint.segment
+# @export
+# @param segment
+# @param data Data set with $effort
+# @return spoint
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 startpoint.segment = startpoint.transect
 
-#' End points coordinates of segment(s)
-#' 
-#' @aliases endpoint.segment
-#' @export
-#' @param segment
-#' @param data Data set with $effort
-#' @return epoint
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# End points coordinates of segment(s)
+# 
+# @aliases endpoint.segment
+# @export
+# @param segment
+# @param data Data set with $effort
+# @return epoint
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 endpoint.segment = endpoint.transect
 
 
-#' Numeric statum id
-#' 
-#' @aliases stratum.id
-#' @export
-#' @param effort
-#' @return id
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Numeric statum id
+# 
+# @aliases stratum.id
+# @export
+# @param effort
+# @return id
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 stratum.id = function(effort) { as.numeric(effort$strat) }
 
 
-#' Numeri transect id
-#' 
-#' @aliases transect.id
-#' @export
-#' @param effort
-#' @return id
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Numeri transect id
+# 
+# @aliases transect.id
+# @export
+# @param effort
+# @return id
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 transect.id = function(effort) { as.numeric(gsub("^.*\\.","", as.character(effort$trans))) }
 
-#' Numeric segment id
-#'  
-#' @aliases segment.id
-#' @export
-#' @param effort
-#' @return id
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Numeric segment id
+#  
+# @aliases segment.id
+# @export
+# @param effort
+# @return id
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 segment.id = function(effort) { as.numeric(gsub("^.*\\.","", as.character(effort$seg))) }
 
 
-#' Numeric detection id
-#'  
-#' @aliases detection.id
-#' @export
-#' @param effort
-#' @return id
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Numeric detection id
+#  
+# @aliases detection.id
+# @export
+# @param effort
+# @return id
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 detection.id = function(effort) { as.numeric(gsub("^.*\\.","", as.character(effort$det))) }
 
 
-#' Convert dsdata into Spatial* objects
-#'  
-#' @aliases as.spatial.dsdata
-#' @export
-#' @param dsdata dsdata object
-#' @param cnames Column names of the coordinates, e.g. c("lon","lat")
-#' @param crs Coordinate reference system, e.g. CRS("+proj=longlat")
-#' @return list with spatial points, spatial lines and a mesh
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Convert dsdata into Spatial* objects
+#  
+# @aliases as.spatial.dsdata
+# @export
+# @param dsdata dsdata object
+# @param cnames Column names of the coordinates, e.g. c("lon","lat")
+# @param crs Coordinate reference system, e.g. CRS("+proj=longlat")
+# @return list with spatial points, spatial lines and a mesh
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 as.spatial.dsdata = function(dset, cnames, crs){
   

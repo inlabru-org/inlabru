@@ -2,29 +2,13 @@
 % Please edit documentation in R/bru.inference.R
 \name{multibru}
 \alias{multibru}
-\title{Multi-likelihood models}
+\title{Family
+Run INLA}
 \usage{
 multibru(brus, model = NULL, ...)
 }
-\arguments{
-\item{model}{a formula describing the model components}
-
-\item{...}{further arguments passed on to iinla}
-
-\item{bru}{A list of \code{bru} objects (each obtained by a call of \link{bru})}
-}
-\value{
-An \link{inla} object
+\description{
 Family
 Run INLA
-}
-\description{
-Multi-likelihood models
-}
-\details{
-This function realizes model fitting using multiple likelihoods. Single likelihood can
-be constructed by running the \link{bru} command using the parameter \code{run=FALSE}. 
-The resulting object can be one of many passed on to \code{multibru} via the
-\code{brus} parameter.
 }
 

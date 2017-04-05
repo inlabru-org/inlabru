@@ -1,6 +1,6 @@
-#' A toy data set
-#' 
-#' @name toy1
+# A toy data set
+# 
+# @name toy1
 NULL
 
 io_toy1.getDataDir = function() {return(system.file("data",package="iDistance"))}

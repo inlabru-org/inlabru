@@ -300,11 +300,10 @@ iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL) {
 }
 
 
-#' Integration point configuration generator
-#'   
-#'
-#' @aliases iconfig2
-#' @return An integration configuration
+# Integration point configuration generator
+#   
+# @keywords internal
+# @return An integration configuration
 
 iconfig2 = function(dims, domain, data) {
   icfg = list()

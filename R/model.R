@@ -310,44 +310,44 @@ summary.model = function(model) {
 }
 
 
-#' Retrieve effect labels
-#'
-#' @aliases elabels
-#' @export
-#' @param model An \link{inlabru} \link{model}
-#' 
+# Retrieve effect labels
+#
+# @aliases elabels
+# @export
+# @param model An \link{inlabru} \link{model}
+# 
 elabels = function(model) { names(model$effects) }
 
 
-#' Retrieve effect properties
-#'
-#' @aliases effect
-#' @export
-#' @param model An \link{inlabru} \link{model}
-#' @param label String defining the label of the effect. If NULL, return all effects
-#' 
+# Retrieve effect properties
+#
+# @aliases effect
+# @export
+# @param model An \link{inlabru} \link{model}
+# @param label String defining the label of the effect. If NULL, return all effects
+# 
 effect = function(model, label = NULL) {
   if (is.null(label)) { model$effects } 
   else { model$effects[[label]] }
 }
 
 
-#' Retrieve linear predictor expression
-#'
-#' @aliases predictor
-#' @export
-#' @param model An \link{inlabru} \link{model}
-#'
+# Retrieve linear predictor expression
+#
+# @aliases predictor
+# @export
+# @param model An \link{inlabru} \link{model}
+#
 default.predictor = function(model) { parse(text=paste0(elabels(model),collapse="+"))}
 
 
 
 #' List data needed to run INLA
 #'
-#' @aliases list.data.model
-#' @param model An \link{inlabru} \link{model}
-#' @export
-#' 
+# @aliases list.data.model
+# @param model An \link{inlabru} \link{model}
+# @export
+# 
 
 list.data.model = function(model){
   
@@ -366,12 +366,12 @@ list.data.model = function(model){
   elist = elist[names(elist) %in% all.vars(model$formula)]
 }
 
-#' List of covariates effects needed to run INLA
-#'
-#' @aliases list.covariates.model
-#' @param model An \link{inlabru} \link{model}
-#' @param points A data fram to extract the data from
-#' 
+# List of covariates effects needed to run INLA
+#
+# @aliases list.covariates.model
+# @param model An \link{inlabru} \link{model}
+# @param points A data fram to extract the data from
+# 
 
 list.covariates.model = function(model, points){
     
@@ -388,11 +388,11 @@ list.covariates.model = function(model, points){
     covar.data = data.frame(do.call(cbind,covar.data))
 }
 
-#' List of A matrices needed to run INLA
-#'
-#' @aliases list.A.model
-#' @param model An \link{inlabru} \link{model}
-#' @param points Locations to create the A-matrices for
+# List of A matrices needed to run INLA
+#
+# @aliases list.A.model
+# @param model An \link{inlabru} \link{model}
+# @param points Locations to create the A-matrices for
 
 list.A.model = function(model, points){
   A.lst = list()
@@ -432,11 +432,11 @@ list.A.model = function(model, points){
 }
 
 
-#' List of spde indexing effects needed to run INLA
-#'
-#' @aliases list.indices.model
-#' @param model An \link{inlabru} \link{model}
-#' @param points A data frame to extract indices from
+# List of spde indexing effects needed to run INLA
+#
+# @aliases list.indices.model
+# @param model An \link{inlabru} \link{model}
+# @param points A data frame to extract indices from
 
 list.indices.model = function(model, points){
   
@@ -475,17 +475,17 @@ list.indices.model = function(model, points){
   idx
 }
 
-#' Evaluate or sample from a posterior result given a model and locations
-#' 
-#' @aliases evaluate.model evaluate
-#' @export
-#' @param model An \link{inlabru} \link{model}
-#' @param result Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.
-#' @param points Locations and covariates needed to evaluate the model.
-#' @param predictor An expression to be ealuated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects.
-#' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
-#' @param n Number of samples to draw.
-#' 
+# Evaluate or sample from a posterior result given a model and locations
+# 
+# @aliases evaluate.model evaluate
+# @export
+# @param model An \link{inlabru} \link{model}
+# @param result Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.
+# @param points Locations and covariates needed to evaluate the model.
+# @param predictor An expression to be ealuated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects.
+# @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
+# @param n Number of samples to draw.
+# 
 evaluate.model = function(model, 
                           result, 
                           points,

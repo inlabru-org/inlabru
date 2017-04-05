@@ -1,14 +1,14 @@
-#' Create covariate data set (covdata)
-#'
-#' @aliases make.covdata
-#' @name make.covdata
-#' @export
-#' @param mesh
-#' @param values
-#' @param mesh.coords
-#' @param time.coords
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Create covariate data set (covdata)
+#
+# @aliases make.covdata
+# @name make.covdata
+# @export
+# @param mesh
+# @param values
+# @param mesh.coords
+# @param time.coords
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 make.covdata = function(mesh, values, mesh.coords, time.coords){
   covdata = list(mesh=mesh, values=values, mesh.coords=mesh.coords, time.coords=time.coords)
@@ -16,17 +16,17 @@ make.covdata = function(mesh, values, mesh.coords, time.coords){
   return(covdata)
 }
 
-#' Create covariate data set (covdata)
-#'
-#' @aliases make.covdata
-#' @name make.covdata
-#' @export
-#' @param mesh
-#' @param values
-#' @param mesh.coords
-#' @param time.coords
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Create covariate data set (covdata)
+#
+# @aliases make.covdata
+# @name make.covdata
+# @export
+# @param mesh
+# @param values
+# @param mesh.coords
+# @param time.coords
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 covdata.import = function(dframe, colname, data){
   
@@ -51,13 +51,13 @@ covdata.import = function(dframe, colname, data){
 }
 
 
-#' Plot covariate data set
-#'
-#' @aliases plot.covdata
-#' @export
-#' @param covdata A covariate data set
-#' @examples \\dontrun{data(sst); plot.covariate(sst, time = 1)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Plot covariate data set
+#
+# @aliases plot.covdata
+# @export
+# @param covdata A covariate data set
+# @examples \\dontrun{data(sst); plot.covariate(sst, time = 1)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 plot.covdata = function(covdata, time = 1, fun=NULL, ...){
   if (is.null(covdata$geometry)) { covdata$geometry = "euc" }
@@ -65,30 +65,30 @@ plot.covdata = function(covdata, time = 1, fun=NULL, ...){
   plot.spatial(data = covdata, col = col, ...)
 }
 
-#' Remap covariate data
-#'
-#' This is a wrapper for \link{remap.dsdata}
-#'
-#' @aliases remap.covdata
-#' @name remap.covdata
-#' @export
-#' @param mesh.p4s A proj.4 string setting the target coordinate system
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Remap covariate data
+#
+# This is a wrapper for \link{remap.dsdata}
+#
+# @aliases remap.covdata
+# @name remap.covdata
+# @export
+# @param mesh.p4s A proj.4 string setting the target coordinate system
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 remap.covdata = function(data, mesh.p4s = "+proj=longlat") {
   return(remap.dsdata(data, p4s = NULL, mesh.p4s = mesh.p4s))
 }
 
-#' Make covariate function
-#'
-#' @aliases make.covariate
-#' @name make.covariate
-#' @export
-#' @param covdata A covariate data set
-#' @return A function intended to act as a covariate for a distance sampling model
-#' @examples \\dontrun{data(sst); plot.covariate(sst, time = 1)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Make covariate function
+#
+# @aliases make.covariate
+# @name make.covariate
+# @export
+# @param covdata A covariate data set
+# @return A function intended to act as a covariate for a distance sampling model
+# @examples \\dontrun{data(sst); plot.covariate(sst, time = 1)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 make.covariate = function(cdata, method = NULL, ...){
 
@@ -106,15 +106,15 @@ make.covariate = function(cdata, method = NULL, ...){
 
 
 
-#' Get covariate value at given location/time
-#'
-#' @aliases get.value
-#' @export
-#' @param covariate A covariate data set
-#' @param loc Locations (spatial/temporal) to obtain the covariate value at
-#' @return \code{values} Covariate values
-#' @examples \\dontrun{data(sst); get.value(sst,loc=data.frame(lon=-110,lat=0,year=1986))}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Get covariate value at given location/time
+#
+# @aliases get.value
+# @export
+# @param covariate A covariate data set
+# @param loc Locations (spatial/temporal) to obtain the covariate value at
+# @return \code{values} Covariate values
+# @examples \\dontrun{data(sst); get.value(sst,loc=data.frame(lon=-110,lat=0,year=1986))}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 get.value = function(covariate,loc){
   times = unique(loc[,covariate$time.coords])
@@ -136,15 +136,15 @@ get.value = function(covariate,loc){
   return(values)
 }
 
-#' Get maximum value of covariate
-#'
-#' @aliases get.max
-#' @export
-#' @param covariate A covariate data set
-#' @param loc Locations (spatial/temporal) to obtain the maximal covariate value at. If not provided, return overall maximum.
-#' @return \code{values} Maximal covariate values
-#' @examples \\dontrun{data(sst); get.max(sst)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Get maximum value of covariate
+#
+# @aliases get.max
+# @export
+# @param covariate A covariate data set
+# @param loc Locations (spatial/temporal) to obtain the maximal covariate value at. If not provided, return overall maximum.
+# @return \code{values} Maximal covariate values
+# @examples \\dontrun{data(sst); get.max(sst)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 get.max = function(covariate,loc=NULL){
   if (is.null(loc)){ return(max(as.vector(covariate$values))) }
@@ -154,15 +154,15 @@ get.max = function(covariate,loc=NULL){
   }
 }
 
-#' Get minimum value of covariate
-#'
-#' @aliases get.min
-#' @export
-#' @param covariate A covariate data set
-#' @param loc Locations (spatial/temporal) to obtain the maximal covariate value at. If not provided, return overall maximum.
-#' @return \code{values} Maximal covariate values
-#' @examples \\dontrun{data(sst); get.min(sst)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Get minimum value of covariate
+#
+# @aliases get.min
+# @export
+# @param covariate A covariate data set
+# @param loc Locations (spatial/temporal) to obtain the maximal covariate value at. If not provided, return overall maximum.
+# @return \code{values} Maximal covariate values
+# @examples \\dontrun{data(sst); get.min(sst)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 get.min = function(covariate,loc=NULL){
   if (is.null(loc)){ return(max(as.vector(covariate$values))) }
@@ -173,15 +173,15 @@ get.min = function(covariate,loc=NULL){
 }
 
 
-#' Get temporal mean
-#'
-#' @aliases get.tmean
-#' @export
-#' @param covariate A covariate data set
-#' @param loc Locations (spatial/temporal) to obtain temporal mean covariate value at. If not provided, return overall maximum.
-#' @return \code{values} Temporal mean
-#' @examples \\dontrun{data(sst); get.min(sst)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Get temporal mean
+#
+# @aliases get.tmean
+# @export
+# @param covariate A covariate data set
+# @param loc Locations (spatial/temporal) to obtain temporal mean covariate value at. If not provided, return overall maximum.
+# @return \code{values} Temporal mean
+# @examples \\dontrun{data(sst); get.min(sst)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 get.tmean = function(covariate,loc=NULL){
   tm = apply(covariate$values,MARGIN=1,mean)
@@ -192,22 +192,22 @@ get.tmean = function(covariate,loc=NULL){
 }
 
 
-#' Get spatial mean of covariate for given time
-#'
-#' Note: If this function seems to run forever use
-#' refine = list(max.edge=K) with some integer K>1
-#'
-#' WARNING: This is an approximation!
-#'
-#'
-#' @aliases get.smean
-#' @export
-#' @param covariate A covariate data set
-#' @param loc Locations (spatial/temporal) to obtain the spatial mean covariate value at.
-#' @param weights Averaging weights, default all ones
-#' @return \code{values} Spatial mean or spatial weighted mean
-#' @examples \\dontrun{data(sst); get.smean(sst)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Get spatial mean of covariate for given time
+#
+# Note: If this function seems to run forever use
+# refine = list(max.edge=K) with some integer K>1
+#
+# WARNING: This is an approximation!
+#
+#
+# @aliases get.smean
+# @export
+# @param covariate A covariate data set
+# @param loc Locations (spatial/temporal) to obtain the spatial mean covariate value at.
+# @param weights Averaging weights, default all ones
+# @return \code{values} Spatial mean or spatial weighted mean
+# @examples \\dontrun{data(sst); get.smean(sst)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 get.smean = function(covariate,loc=NULL,weights=NULL){
   sm <- numeric(length=ifelse(is.null(loc), 0, dim(loc)[1]))
@@ -237,17 +237,17 @@ get.smean = function(covariate,loc=NULL,weights=NULL){
 
 
 
-#' Get mean
-#'
-#' @aliases get.mean
-#' @export
-#' @param covariate A covariate data set
-#' @param loc Locations (spatial/temporal) to obtain mean covariate value at. If not provided, return overall maximum.
-#' @param timepoints ????
-#' @param weights ????
-#' @return \code{values} Temporal mean
-#' @examples \\dontrun{data(sst); get.min(sst)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Get mean
+#
+# @aliases get.mean
+# @export
+# @param covariate A covariate data set
+# @param loc Locations (spatial/temporal) to obtain mean covariate value at. If not provided, return overall maximum.
+# @param timepoints ????
+# @param weights ????
+# @return \code{values} Temporal mean
+# @examples \\dontrun{data(sst); get.min(sst)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 get.mean = function(covariate,loc=NULL, timepoints=NULL, weights=NULL){
   if (is.null(timepoints)) {

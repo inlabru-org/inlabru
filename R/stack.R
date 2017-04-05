@@ -1,5 +1,4 @@
-#' Create a stack from a model, points and prediction alues
-#' 
+# Create a stack from a model, points and prediction alues
 
 make.stack = function(points,
                        model,

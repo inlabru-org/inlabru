@@ -1,23 +1,23 @@
-#' Marine renewables strategic environmental assessment 
-#' 
-#' Data imported from package MRSea, see http://creem2.st-andrews.ac.uk/software/
-#'  
-#' @examples \\donttest{ data(mrsea) ; plot(mrsea)}
 #' @name mrsea
+#' @title Marine renewables strategic environmental assessment 
+#' @docType data
+#' 
+#' @description Data imported from package MRSea, see http://creem2.st-andrews.ac.uk/software/
+#'  
 NULL
 
 # INTERNAL DATA STORAGE
 io_mrsea.getDataDir = function() {return(system.file("data",package="inlabru"))}
 
 
-#' Load \link{mrsea} survey data from raw data sets
-#'
-#' @aliases io_mrsea.pkgdata.load
-#' @export
-#' @return \code{mrsea} the \link{mrsea} data set
-#' @examples \\dontrun{mrsea = io_mrsea.pkgdata.load();}
-#' @author Lindesay Scott-Hayward <\email{lass@st-andrews.ac.uk}>
-#'
+# Load \link{mrsea} survey data from raw data sets
+#
+# @aliases io_mrsea.pkgdata.load
+# @export
+# @return \code{mrsea} the \link{mrsea} data set
+# @examples \\dontrun{mrsea = io_mrsea.pkgdata.load();}
+# @author Lindesay Scott-Hayward <\email{lass@st-andrews.ac.uk}>
+#
 
 io_mrsea.pkgdata.load = function() { 
   
@@ -87,18 +87,18 @@ io_mrsea.pkgdata.load = function() {
 }
 
 
-#' Regenerate \link{mrsea} data and store it to \code{mrsea.RData}
-#' 
-#' Uses \code{\link{io_mrsea.pkgdata.load}} to load the data and stores
-#' the result to mrsea.RData. Thereby the data that is distributed with 
-#' our package is generated.
-#'
-#' @aliases io_mrsea.pkgdata.save
-#' @export
-#' @return NULL
-#' @examples \\dontrun{io_mrsea.pkgdata.save();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Regenerate \link{mrsea} data and store it to \code{mrsea.RData}
+# 
+# Uses \code{\link{io_mrsea.pkgdata.load}} to load the data and stores
+# the result to mrsea.RData. Thereby the data that is distributed with 
+# our package is generated.
+#
+# @aliases io_mrsea.pkgdata.save
+# @export
+# @return NULL
+# @examples \\dontrun{io_mrsea.pkgdata.save();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_mrsea.pkgdata.save = function(){
   ## save the data we will include in the R package
@@ -107,9 +107,9 @@ io_mrsea.pkgdata.save = function(){
 }
 
 #########################################################################################################
-#'
-#' Tools written by Lindesay 
-#'
+#
+# Tools written by Lindesay 
+#
 
 mrseanames2dsmnames<-function(data){
   nam<-names(data)

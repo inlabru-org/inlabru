@@ -2,14 +2,14 @@
 io_whales.getDataDir = function() {return(system.file("data",package="inlabru"))}
 
 
-#' Load \link{whales} survey data from raw data sets
-#'
-#' @aliases io_whales.pkgdata.load
-#' @export
-#' @return \code{whales} the \link{whales} data set
-#' @examples \\dontrun{whales = io_whales.pkgdata.load();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{whales} survey data from raw data sets
+#
+# @aliases io_whales.pkgdata.load
+# @export
+# @return \code{whales} the \link{whales} data set
+# @examples \\dontrun{whales = io_whales.pkgdata.load();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.pkgdata.load = function()
 { 
@@ -53,18 +53,18 @@ io_whales.pkgdata.load = function()
   whales = list(points = sp, samplers = sl, mesh = mesh, survey.area = survey.area)
 }
 
-#' Regenerate \link{whales} data and store it to \code{whales.RData}
-#' 
-#' Uses \code{\link{io_whales.pkgdata.load}} to load the data and stores
-#' the result to whales.RData. Thereby the data that is distributed with 
-#' our package is generated.
-#'
-#' @aliases io_whales.pkgdata.save
-#' @export
-#' @return NULL
-#' @examples \\dontrun{io_whales.pkgdata.save();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Regenerate \link{whales} data and store it to \code{whales.RData}
+# 
+# Uses \code{\link{io_whales.pkgdata.load}} to load the data and stores
+# the result to whales.RData. Thereby the data that is distributed with 
+# our package is generated.
+#
+# @aliases io_whales.pkgdata.save
+# @export
+# @return NULL
+# @examples \\dontrun{io_whales.pkgdata.save();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.pkgdata.save = function(){
   ## save the data we will include in the R package
@@ -72,28 +72,28 @@ io_whales.pkgdata.save = function(){
   save(whales,file=paste0(io_whales.getDataDir(),"/whales.RData"))
 }
 
-#' Load \link{whales} integration points
-#' 
-#'
-#' @aliases io_whales.ips
-#' @export
-#' @return ips integration points
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{whales} integration points
+# 
+#
+# @aliases io_whales.ips
+# @export
+# @return ips integration points
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.ips = function(){
   load(file= paste(io_whales.getDataDir(), "bwhales.ips.RData",sep=.Platform$file.sep))
   return(ips)
 }
 
-#' Save \link{whales} integration points
-#' 
-#'
-#' @aliases io_whales.ips.save
-#' @export
-#' @return ips integration points
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Save \link{whales} integration points
+# 
+#
+# @aliases io_whales.ips.save
+# @export
+# @return ips integration points
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.ips.save = function(){
   data(whales)
@@ -107,14 +107,14 @@ io_whales.ips.save = function(){
   return(ips)
 }
 
-#' Load \link{whales} integration points (yearly)
-#' 
-#'
-#' @aliases io_whales.ips.yearly
-#' @export
-#' @return ips integration points
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{whales} integration points (yearly)
+# 
+#
+# @aliases io_whales.ips.yearly
+# @export
+# @return ips integration points
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.ips.yearly = function(){
   load(file= paste(io_whales.getDataDir(), "bwhales.ips.yearly.RData",sep=.Platform$file.sep))
@@ -122,14 +122,14 @@ io_whales.ips.yearly = function(){
 }
 
 
-#' Save \link{whales} integration points (yearly)
-#' 
-#'
-#' @aliases io_whales.ips.yearly.save
-#' @export
-#' @return ips integration points
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Save \link{whales} integration points (yearly)
+# 
+#
+# @aliases io_whales.ips.yearly.save
+# @export
+# @return ips integration points
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.ips.yearly.save = function(){
   data(whales)
@@ -144,28 +144,28 @@ io_whales.ips.yearly.save = function(){
 }
 
 
-#' Load \link{whales} inner boundary
-#' 
-#'
-#' @aliases io_whales.inner.boundary
-#' @export
-#' @return boundary inner boundary
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{whales} inner boundary
+# 
+#
+# @aliases io_whales.inner.boundary
+# @export
+# @return boundary inner boundary
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.inner.boundary = function(){
   load(file= paste(io_whales.getDataDir(), "bwhales.inner.boundary.Rdata",sep=.Platform$file.sep))
   return(innerBnd)
 }
 
-#' Load \link{whales} par3d parameters
-#' 
-#'
-#' @aliases io_whales.par3d
-#' @export
-#' @return params pard3d() parameters for rgl plot of whales
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{whales} par3d parameters
+# 
+#
+# @aliases io_whales.par3d
+# @export
+# @return params pard3d() parameters for rgl plot of whales
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.par3d = function(){
   #par3d(zoom=0.62,FOV=1)
@@ -177,16 +177,16 @@ io_whales.par3d = function(){
 }
   
 
-#' Load \link{whales} sightings
-#' 
-#' Load whale sightings from "Bmus86_06.csv" and apply filters (see parameters).
-#'
-#' @aliases io_whales.sighting
-#' @export
-#' @return sightings Whale sighting
-#' @examples \\dontrun{sightings = io_whales.sightings(years=c(2000:2006),E=1,BfLim=5);}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{whales} sightings
+# 
+# Load whale sightings from "Bmus86_06.csv" and apply filters (see parameters).
+#
+# @aliases io_whales.sighting
+# @export
+# @return sightings Whale sighting
+# @examples \\dontrun{sightings = io_whales.sightings(years=c(2000:2006),E=1,BfLim=5);}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.sighting = function(years=NULL,E=NULL,BfLim=NULL,PDLim=NULL)
 { 
@@ -246,14 +246,14 @@ io_whales.sighting = function(years=NULL,E=NULL,BfLim=NULL,PDLim=NULL)
 } 
 
 
-#' Generate \link{whales} transect lines from ETP effort data
-#'
-#' @aliases io_whales.transect
-#' @export
-#' @return tr Data frame with transect lines
-#' @examples \\dontrun{transect = io_whales.transect();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Generate \link{whales} transect lines from ETP effort data
+#
+# @aliases io_whales.transect
+# @export
+# @return tr Data frame with transect lines
+# @examples \\dontrun{transect = io_whales.transect();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 
 io_whales.transect = function(years=FALSE,rem.intermediate=TRUE)
@@ -279,16 +279,16 @@ io_whales.transect = function(years=FALSE,rem.intermediate=TRUE)
   return(tr)
 }
 
-#' Load \link{whales} effort
-#' 
-#' Load effort data from "ETP effort.csv"
-#'
-#' @aliases io_whales.effort
-#' @export
-#' @return effort ETP effort related to \link{whales} data
-#' @examples \\dontrun{transects = io_whales.transects();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{whales} effort
+# 
+# Load effort data from "ETP effort.csv"
+#
+# @aliases io_whales.effort
+# @export
+# @return effort ETP effort related to \link{whales} data
+# @examples \\dontrun{transects = io_whales.transects();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.effort = function(years=FALSE,rem.intermediate=TRUE)
 { 
@@ -323,36 +323,36 @@ io_whales.effort = function(years=FALSE,rem.intermediate=TRUE)
 } 
 
 
-#' Load \link{whales} boundary
-#' 
-#' @aliases io_whales.boundary
-#' @export
-#' @return boundary 
-#' @examples \\dontrun{boundary = io_whales.boundary();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{whales} boundary
+# 
+# @aliases io_whales.boundary
+# @export
+# @return boundary 
+# @examples \\dontrun{boundary = io_whales.boundary();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.boundary = function(...) {return(io_star.boundary(...))}
 
-#' Load \link{whales} coast
-#' 
-#' @aliases io_whales.coast
-#' @export
-#' @return coast
-#' @examples \\dontrun{coast = io_whales.coast();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{whales} coast
+# 
+# @aliases io_whales.coast
+# @export
+# @return coast
+# @examples \\dontrun{coast = io_whales.coast();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.coast = function(...) {return(io_star.coast(...))}
 
-#' Load \link{whales} mesh
-#' 
-#' @aliases io_whales.mesh
-#' @export
-#' @return mesh An INLA mesh
-#' @examples \\dontrun{mesh = io_whales.mesh(); plot(mesh)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{whales} mesh
+# 
+# @aliases io_whales.mesh
+# @export
+# @return mesh An INLA mesh
+# @examples \\dontrun{mesh = io_whales.mesh(); plot(mesh)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_whales.mesh = function(...) 
 {

@@ -257,15 +257,15 @@ if ( !rgl ){
   
 }
 
-#' Play (animate) spatial field
-#'
-#' Animates a spatial field using RGL. 
-#' 
-#' @aliases play.spatial
-#' @export
-#' @param group Example: group = list(year = c(1,2)) animates the field for years 1 and 2
-#' @param ... Parameters passed on to \link{plot.spatial}
-#' 
+# Play (animate) spatial field
+#
+# Animates a spatial field using RGL. 
+# 
+# @aliases play.spatial
+# @export
+# @param group Example: group = list(year = c(1,2)) animates the field for years 1 and 2
+# @param ... Parameters passed on to \link{plot.spatial}
+# 
 
 
 play.spatial = function(group = list(), rgl, ...){

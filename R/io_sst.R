@@ -2,23 +2,23 @@
 io_sst.getDataDir = function() {return(system.file("data",package="iDistance"))}
 
 
-#' Load sea surface temperature (SST) from SODA data
-#'
-#' The SODA (Simple Ocean Data Assimilation) model is summarized at http://apdrc.soest.hawaii.edu/datadoc/soda_2.2.4.php
-#' the format of the URL query is described at http://coastwatch.pfeg.noaa.gov/erddap/griddap/documentation.html
-#' The SST data may also be downloaded using the interface at http://coastwatch.pfeg.noaa.gov/erddap/griddap/hawaii_d90f_20ee_c4cb.html.
-#' Specify time (year and months 01 to 12), latitude (-30.25 to 40.25), longitude (190.25 to 290.75), variable (sst) and file type (NetCDF),
-#' then click ?Submit?.  This procedure should produce the same URL query and same NetCDF file as the code below.
+# Load sea surface temperature (SST) from SODA data
+#
+# The SODA (Simple Ocean Data Assimilation) model is summarized at http://apdrc.soest.hawaii.edu/datadoc/soda_2.2.4.php
+# the format of the URL query is described at http://coastwatch.pfeg.noaa.gov/erddap/griddap/documentation.html
+# The SST data may also be downloaded using the interface at http://coastwatch.pfeg.noaa.gov/erddap/griddap/hawaii_d90f_20ee_c4cb.html.
+# Specify time (year and months 01 to 12), latitude (-30.25 to 40.25), longitude (190.25 to 290.75), variable (sst) and file type (NetCDF),
+# then click ?Submit?.  This procedure should produce the same URL query and same NetCDF file as the code below.
 
-#' @aliases io_sst.load
-#' @export
-#' @param year Vector of years to return SST for
-#' @param month Vector of months to select from the SST data sets
-#' @param source.dir Direcory to load SST NetCDF files from (default: system temporary directory)
-#' @return \code{sst} sea surface temperature
-#' @examples \\dontrun{}
-#' @author Tim Gerrodette Oct 2014 <\email{tim.gerrodette@@noaa.gov}>
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @aliases io_sst.load
+# @export
+# @param year Vector of years to return SST for
+# @param month Vector of months to select from the SST data sets
+# @param source.dir Direcory to load SST NetCDF files from (default: system temporary directory)
+# @return \code{sst} sea surface temperature
+# @examples \\dontrun{}
+# @author Tim Gerrodette Oct 2014 <\email{tim.gerrodette@@noaa.gov}>
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 io_sst.load = function(year=2006,month=1,source.dir=tempdir(),lat.stride=1,lon.stride=1,lat.range=c(-30.25,40.25),lon.range=c(-169.25,-69.25)){
   require(RNetCDF)
@@ -64,24 +64,24 @@ io_sst.load = function(year=2006,month=1,source.dir=tempdir(),lat.stride=1,lon.s
   return(sst.list)
 }
 
-#' Download sea surface temperature (SST) data in NetCDF format
-#' 
-#' Create a formatted URL query to download SODA monthly mean SST data from Univ of Hawaii Asia-Pacific Data Research Center server, one year at a time
-#' in code below, specify the years of the data desired, then execute the other R commands.
-#' the SODA model produces estimates at 0.5 degree spatial resolution for both longitude and latitude
-#' data are written to files named sst-YYYY.nc in the provided directory in NetCDF format, where YYYY is the year requested
-#'
-#' 
-#' @aliases io_sst.download(dir)
-#' @export
-#' @param target.dir target directory for NetCDF SST files
-#' @param year Vector of years to load SST data for
-#' @author Tim Gerrodette Oct 2014 <\email{tim.gerrodette@@noaa.gov}>
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Download sea surface temperature (SST) data in NetCDF format
+# 
+# Create a formatted URL query to download SODA monthly mean SST data from Univ of Hawaii Asia-Pacific Data Research Center server, one year at a time
+# in code below, specify the years of the data desired, then execute the other R commands.
+# the SODA model produces estimates at 0.5 degree spatial resolution for both longitude and latitude
+# data are written to files named sst-YYYY.nc in the provided directory in NetCDF format, where YYYY is the year requested
+#
+# 
+# @aliases io_sst.download(dir)
+# @export
+# @param target.dir target directory for NetCDF SST files
+# @param year Vector of years to load SST data for
+# @author Tim Gerrodette Oct 2014 <\email{tim.gerrodette@@noaa.gov}>
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sst.download = function(target.dir=tempdir(),year=2006,lat.range=c(-30.25,40.25),lon.range=c(190.25,290.75),lon.stride=1,lat.stride,filename=NA) {
-  #' year <- c(1986:1990,1992,1993,1998:2000,2003,2006)
+  # year <- c(1986:1990,1992,1993,1998:2000,2003,2006)
   for (yr in year) {
     url.query <- paste("http://coastwatch.pfeg.noaa.gov/erddap/griddap/hawaii_d90f_20ee_c4cb.nc?temp[(",as.character(yr),"-01-15T00:00:00Z):1:(",as.character(yr),"-12-15T00:00:00Z)][(5.01):1:(5.01)][(",as.character(lat.range[1]),"):",as.character(lat.stride),":(",as.character(lat.range[2]),")][(",as.character(lon.range[1]),"):",as.character(lon.stride),":(",as.character(lon.range[2]),")]",sep="")
     if (is.na(filename)) {
@@ -95,12 +95,12 @@ io_sst.download = function(target.dir=tempdir(),year=2006,lat.range=c(-30.25,40.
   }
 }
 
-#' Save SST data linearized on mesh triangles
-#'
-#' @aliases io_sst.save
-#' @export
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Save SST data linearized on mesh triangles
+#
+# @aliases io_sst.save
+# @export
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 io_sst.save = function(year=1986:2007,month=6:12,filename=NULL){
   if (is.null(filename)) { filename = paste0(io_sst.getDataDir(),"/sst.RData") }

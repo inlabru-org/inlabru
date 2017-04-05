@@ -6,9 +6,6 @@
 \usage{
 \method{list.data}{model}(model)
 }
-\arguments{
-\item{model}{An \link{inlabru} \link{model}}
-}
 \description{
 List data needed to run INLA
 }

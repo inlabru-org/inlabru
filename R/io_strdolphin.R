@@ -2,14 +2,14 @@
 io_strdolphin.getDataDir = function() {return(system.file("data",package="inlabru"))}
 
 
-#' Load \link{strdolphin} survey data from raw data sets
-#'
-#' @aliases io_strdolphin.pkgdata.load
-#' @export
-#' @return \code{strdolphin} the \link{strdolphin} data set
-#' @examples \\dontrun{strdolphin = io_strdolphin.pkgdata.load();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{strdolphin} survey data from raw data sets
+#
+# @aliases io_strdolphin.pkgdata.load
+# @export
+# @return \code{strdolphin} the \link{strdolphin} data set
+# @examples \\dontrun{strdolphin = io_strdolphin.pkgdata.load();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.pkgdata.load = function()
 { 
@@ -54,18 +54,18 @@ io_strdolphin.pkgdata.load = function()
   strdolphin = list(points = sp, samplers = sl, mesh = mesh, survey.area = survey.area)
 }
 
-#' Regenerate \link{strdolphin} data and store it to \code{strdolphin.RData}
-#' 
-#' Uses \code{\link{io_strdolphin.pkgdata.load}} to load the data and stores
-#' the result to strdolphin.RData. Thereby the data that is distributed with 
-#' our package is generated.
-#'
-#' @aliases io_strdolphin.pkgdata.save
-#' @export
-#' @return NULL
-#' @examples \\dontrun{io_strdolphin.pkgdata.save();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Regenerate \link{strdolphin} data and store it to \code{strdolphin.RData}
+# 
+# Uses \code{\link{io_strdolphin.pkgdata.load}} to load the data and stores
+# the result to strdolphin.RData. Thereby the data that is distributed with 
+# our package is generated.
+#
+# @aliases io_strdolphin.pkgdata.save
+# @export
+# @return NULL
+# @examples \\dontrun{io_strdolphin.pkgdata.save();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.pkgdata.save = function(){
   ## save the data we will include in the R package
@@ -73,28 +73,28 @@ io_strdolphin.pkgdata.save = function(){
   save(strdolphin,file=paste0(io_strdolphin.getDataDir(),"/strdolphin.RData"))
 }
 
-#' Load \link{strdolphin} integration points
-#' 
-#'
-#' @aliases io_strdolphin.ips
-#' @export
-#' @return ips integration points
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{strdolphin} integration points
+# 
+#
+# @aliases io_strdolphin.ips
+# @export
+# @return ips integration points
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.ips = function(){
   load(file= paste(io_strdolphin.getDataDir(), "etp.ips.RData",sep=.Platform$file.sep))
   return(ips)
 }
 
-#' Load \link{strdolphin} integration points (yearly)
-#' 
-#'
-#' @aliases io_strdolphin.ips.yearly
-#' @export
-#' @return ips integration points
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{strdolphin} integration points (yearly)
+# 
+#
+# @aliases io_strdolphin.ips.yearly
+# @export
+# @return ips integration points
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.ips.yearly = function(){
   load(file= paste(io_strdolphin.getDataDir(), "etp.ips.yearly.RData",sep=.Platform$file.sep))
@@ -102,28 +102,28 @@ io_strdolphin.ips.yearly = function(){
 }
 
 
-#' Load \link{strdolphin} inner boundary
-#' 
-#'
-#' @aliases io_strdolphin.inner.boundary
-#' @export
-#' @return boundary inner boundary
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{strdolphin} inner boundary
+# 
+#
+# @aliases io_strdolphin.inner.boundary
+# @export
+# @return boundary inner boundary
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.inner.boundary = function(){
   load(file= paste(io_strdolphin.getDataDir(), "etp.inner.boundary.Rdata",sep=.Platform$file.sep))
   return(innerBnd)
 }
 
-#' Load \link{strdolphin} par3d parameters
-#' 
-#'
-#' @aliases io_strdolphin.par3d
-#' @export
-#' @return params pard3d() parameters for rgl plot of strdolphin
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{strdolphin} par3d parameters
+# 
+#
+# @aliases io_strdolphin.par3d
+# @export
+# @return params pard3d() parameters for rgl plot of strdolphin
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.par3d = function(){
   #par3d(zoom=0.62,FOV=1)
@@ -135,16 +135,16 @@ io_strdolphin.par3d = function(){
 }
 
 
-#' Load \link{strdolphin} sightings
-#' 
-#' Load whale sightings from "Bmus86_06.csv" and apply filters (see parameters).
-#'
-#' @aliases io_strdolphin.sighting
-#' @export
-#' @return sightings Whale sighting
-#' @examples \\dontrun{sightings = io_strdolphin.sightings(years=c(2000:2006),E=1,BfLim=5);}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{strdolphin} sightings
+# 
+# Load whale sightings from "Bmus86_06.csv" and apply filters (see parameters).
+#
+# @aliases io_strdolphin.sighting
+# @export
+# @return sightings Whale sighting
+# @examples \\dontrun{sightings = io_strdolphin.sightings(years=c(2000:2006),E=1,BfLim=5);}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.sighting = function(years=NULL,E=NULL,BfLim=NULL,PDLim=NULL)
 { 
@@ -201,14 +201,14 @@ io_strdolphin.sighting = function(years=NULL,E=NULL,BfLim=NULL,PDLim=NULL)
 } 
 
 
-#' Generate \link{strdolphin} transect lines from ETP effort data
-#'
-#' @aliases io_strdolphin.transect
-#' @export
-#' @return tr Data frame with transect lines
-#' @examples \\dontrun{transect = io_strdolphin.transect();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Generate \link{strdolphin} transect lines from ETP effort data
+#
+# @aliases io_strdolphin.transect
+# @export
+# @return tr Data frame with transect lines
+# @examples \\dontrun{transect = io_strdolphin.transect();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 
 io_strdolphin.transect = function(years=FALSE,rem.intermediate=TRUE)
@@ -234,16 +234,16 @@ io_strdolphin.transect = function(years=FALSE,rem.intermediate=TRUE)
   return(tr)
 }
 
-#' Load \link{strdolphin} effort
-#' 
-#' Load effort data from "ETP effort.csv"
-#'
-#' @aliases io_strdolphin.effort
-#' @export
-#' @return effort ETP effort related to \link{strdolphin} data
-#' @examples \\dontrun{transects = io_strdolphin.transects();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{strdolphin} effort
+# 
+# Load effort data from "ETP effort.csv"
+#
+# @aliases io_strdolphin.effort
+# @export
+# @return effort ETP effort related to \link{strdolphin} data
+# @examples \\dontrun{transects = io_strdolphin.transects();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.effort = function(years=FALSE,rem.intermediate=TRUE)
 { 
@@ -278,36 +278,36 @@ io_strdolphin.effort = function(years=FALSE,rem.intermediate=TRUE)
 } 
 
 
-#' Load \link{strdolphin} boundary
-#' 
-#' @aliases io_strdolphin.boundary
-#' @export
-#' @return boundary 
-#' @examples \\dontrun{boundary = io_strdolphin.boundary();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{strdolphin} boundary
+# 
+# @aliases io_strdolphin.boundary
+# @export
+# @return boundary 
+# @examples \\dontrun{boundary = io_strdolphin.boundary();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.boundary = function(...) {return(io_star.boundary(...))}
 
-#' Load \link{strdolphin} coast
-#' 
-#' @aliases io_strdolphin.coast
-#' @export
-#' @return coast
-#' @examples \\dontrun{coast = io_strdolphin.coast();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{strdolphin} coast
+# 
+# @aliases io_strdolphin.coast
+# @export
+# @return coast
+# @examples \\dontrun{coast = io_strdolphin.coast();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.coast = function(...) {return(io_star.coast(...))}
 
-#' Load \link{strdolphin} mesh
-#' 
-#' @aliases io_strdolphin.mesh
-#' @export
-#' @return mesh An INLA mesh
-#' @examples \\dontrun{mesh = io_strdolphin.mesh(); plot(mesh)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{strdolphin} mesh
+# 
+# @aliases io_strdolphin.mesh
+# @export
+# @return mesh An INLA mesh
+# @examples \\dontrun{mesh = io_strdolphin.mesh(); plot(mesh)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_strdolphin.mesh = function(...) 
 {

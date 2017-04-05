@@ -121,8 +121,8 @@ bru = function(components = y ~ Intercept,
 #' @param family A character identifying a valid \link{inla} likelihood. Alternatively 'cp' for Cox processes.
 #' @param formula a \link{formula} where the right hand side expression defines the predictor used in the optimization.
 #' @param data Likelihood-specific data
-#' @param components
-#' @param mesh
+#' @param components Components
+#' @param mesh An inla.mesh object
 #' @param E Poisson exposure parameter (if family = 'poisson') passed on to \link{inla} 
 #' @param samplers Integration domain for 'cp' family (not implemented!)
 #' 
@@ -214,20 +214,20 @@ bru.options = function(...) {
   list(...)
 }
 
-#' Multi-likelihood models
-#' 
-#' @details 
-#' This function realizes model fitting using multiple likelihoods. Single likelihood can
-#' be constructed by running the \link{bru} command using the parameter \code{run=FALSE}. 
-#' The resulting object can be one of many passed on to \code{multibru} via the
-#' \code{brus} parameter.
-#'
-#' @aliases multibru
-#' @export
-#' @param bru A list of \code{bru} objects (each obtained by a call of \link{bru}) 
-#' @param model a formula describing the model components
-#' @param ... further arguments passed on to iinla
-#' @return An \link{inla} object
+# Multi-likelihood models
+# 
+# @details 
+# This function realizes model fitting using multiple likelihoods. Single likelihood can
+# be constructed by running the \link{bru} command using the parameter \code{run=FALSE}. 
+# The resulting object can be one of many passed on to \code{multibru} via the
+# \code{brus} parameter.
+#
+# @aliases multibru
+# @export
+# @param bru A list of \code{bru} objects (each obtained by a call of \link{bru}) 
+# @param model a formula describing the model components
+# @param ... further arguments passed on to iinla
+# @return An \link{inla} object
 
 multibru = function(brus, model = NULL, ...) {
   
@@ -478,11 +478,11 @@ summary.bru = function(result) {
 
 #' Generate a simple default mesh
 #'
-#' @aliases default.mesh
-#' @export
-#' @param spObject A Spatial* object
-#' @param max.edge A parameter passed on to \link{inla.mesh.2d} which controls the granularity of the mesh. If NULL, 1/20 of the domain size is used.
-#' @return An \code{inla.mesh} object
+# @aliases default.mesh
+# @export
+# @param spObject A Spatial* object
+# @param max.edge A parameter passed on to \link{inla.mesh.2d} which controls the granularity of the mesh. If NULL, 1/20 of the domain size is used.
+# @return An \code{inla.mesh} object
 
 default.mesh = function(spObject, max.edge = NULL, convex = -0.15){
   if (inherits(spObject, "SpatialPoints")) {
@@ -499,24 +499,24 @@ default.mesh = function(spObject, max.edge = NULL, convex = -0.15){
 }
 
 
-#' Generate a default model with a spatial SPDE component and an intercept
-#'
-#' @aliases default.model
-#' @export
-#' @param mesh An inla.mesh object
-#' @return A \link{model} object
+# Generate a default model with a spatial SPDE component and an intercept
+#
+# @aliases default.model
+# @export
+# @param mesh An inla.mesh object
+# @return A \link{model} object
 
 default.model = function(mesh) {
   model = join(model.spde(list(mesh = mesh)), model.intercept())
 }
 
 
-#' Predictions for iinla objects
-#' 
-#' Currently only a shortcut to \link{predict.lgcp}
-#'  
-#' @aliases predict.iinla
-#' @export
+# Predictions for iinla objects
+# 
+# Currently only a shortcut to \link{predict.lgcp}
+#  
+# @aliases predict.iinla
+# @export
 
 predict.iinla = function(...) { predict.lgcp(...) }
 
@@ -809,18 +809,18 @@ predict.lgcp = function(result,
   }
 
 
-#' Monte Carlo method for estimating aposterior
-#'  
-#' @aliases montecarlo.posterior
-#' @export
-#' @param dfun A function returning a density for given x
-#' @param sfun A function providing samples from a posterior
-#' @param x Inital domain on which to perform the estimation. This will be adjusted as more samples are generated.
-#' @param samples An initial set of samples. Not required but will be used to estimate the inital domain \code{x} if \code{x} is \code{NULL}
-#' @param mcerr Monte Carlo error at which to stop the chain
-#' @param n Inital number of samples. This will be doubled for each iteration.
-#' @param discrete St this to \code{TRUE} if the density is only defined for integer \code{x}
-#' @param verbose Be verbose?
+# Monte Carlo method for estimating aposterior
+#  
+# @aliases montecarlo.posterior
+# @export
+# @param dfun A function returning a density for given x
+# @param sfun A function providing samples from a posterior
+# @param x Inital domain on which to perform the estimation. This will be adjusted as more samples are generated.
+# @param samples An initial set of samples. Not required but will be used to estimate the inital domain \code{x} if \code{x} is \code{NULL}
+# @param mcerr Monte Carlo error at which to stop the chain
+# @param n Inital number of samples. This will be doubled for each iteration.
+# @param discrete St this to \code{TRUE} if the density is only defined for integer \code{x}
+# @param verbose Be verbose?
 
 montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.01, n = 100, discrete = FALSE, verbose = FALSE) {
 
@@ -1050,12 +1050,12 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
 
 
 
-#' Automatically complete model and predictor:
-#' - Set RHS and LHS
-#' - Add intercept
-#' - Add mesh if needed
-#' - substitute . with default SPDE model
-#'
+# Automatically complete model and predictor:
+# - Set RHS and LHS
+# - Add intercept
+# - Add mesh if needed
+# - substitute . with default SPDE model
+#
 autocomplete = function(model, predictor, points, mesh) {
   
   
@@ -1108,9 +1108,9 @@ autocomplete = function(model, predictor, points, mesh) {
 }
 
 
-#'
-#' A helper function used in autocomplete()
-#'
+#
+# A helper function used in autocomplete()
+#
 auto.pred = function(model, predictor) {
   
   # Predictor LHS

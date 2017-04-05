@@ -1,11 +1,11 @@
-#' Automatic integration scheme selection
-#'
-#'
-#' @aliases select.integration
-#' @export
-#' @param data A distance sampling data set
-#' @return scheme An integration scheme 
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Automatic integration scheme selection
+#
+#
+# @aliases select.integration
+# @export
+# @param data A distance sampling data set
+# @return scheme An integration scheme 
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 select.integration = function(data){
   if (data$geometry=="euc"){ scheme = grid.integration }
@@ -14,16 +14,16 @@ select.integration = function(data){
   return(scheme)
 }
 
-#' INLA inference in log Gaussian Cox processes for distance sampling data.
-#'
-#'
-#' @aliases pproc_int.scheme.default
-#' @export
-#' @import pracma
-#' @param data A distance sampling data set, e.g. \link{whales}.
-#' @return \code{int.points}, Integration points with respective weights.
-#' @author Yuan (Joyce) Yuan <\email{yy84@@st-andrews.ac.uk}>
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# INLA inference in log Gaussian Cox processes for distance sampling data.
+#
+#
+# @aliases pproc_int.scheme.default
+# @export
+# @import pracma
+# @param data A distance sampling data set, e.g. \link{whales}.
+# @return \code{int.points}, Integration points with respective weights.
+# @author Yuan (Joyce) Yuan <\email{yy84@@st-andrews.ac.uk}>
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 pproc_int.scheme.default = function(data){
   
@@ -172,19 +172,19 @@ pproc_int.scheme.reduce.daily= function(data,w=6,dLT=12*8,dPD=3){
   
 }
 
-#' Midpoint integration
-#'
-#'
-#' @aliases cylindric.integration
-#' @export
-#' @return int.points integration points
-#'   $lat : Latitude
-#'   $lon : Longitude
-#'   $PD : distance from observer
-#'   $weight: integration weight
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Midpoint integration
+#
+#
+# @aliases cylindric.integration
+# @export
+# @return int.points integration points
+#   $lat : Latitude
+#   $lon : Longitude
+#   $PD : distance from observer
+#   $weight: integration weight
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 midpoint.integration = function(data,group,distance){
   tr = data$transect
   spoint = startpoint(tr,data)
@@ -198,19 +198,19 @@ midpoint.integration = function(data,group,distance){
   return(do.call(rbind,ips))
 }
 
-#' Construct integration points in cylindric space
-#'
-#'
-#' @aliases cylindric.integration
-#' @export
-#' @return int.points integration points
-#'   $lat : Latitude
-#'   $lon : Longitude
-#'   $PD : distance from observer
-#'   $weight: integration weight
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Construct integration points in cylindric space
+#
+#
+# @aliases cylindric.integration
+# @export
+# @return int.points integration points
+#   $lat : Latitude
+#   $lon : Longitude
+#   $PD : distance from observer
+#   $weight: integration weight
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 cylindric.integration = function(data,group=NULL,...){
   tr = as.transect(data)
   if (is.null(group)){group = group.by.length(tr,data,max.ratio=500,max.arclen=5000)}
@@ -237,15 +237,15 @@ cylindric.integration = function(data,group=NULL,...){
 }
 
 
-#' Create integration points from cylindric coordinates of a group of transect lines.
-#'
-#' @aliases ischeme
-#' @export
-#' @param spoints Start points of transects
-#' @param epoints End points of transects
-#' @return Integration points ($lat,$lon) with integration weights ($weight) and perpendicular distance ($PD)
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Create integration points from cylindric coordinates of a group of transect lines.
+#
+# @aliases ischeme
+# @export
+# @param spoints Start points of transects
+# @param epoints End points of transects
+# @return Integration points ($lat,$lon) with integration weights ($weight) and perpendicular distance ($PD)
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 ischeme = function(spoints,epoints,n.dist=5,truncation=6,R=6371,project=FALSE,...){
   if (project){
@@ -274,14 +274,14 @@ ischeme = function(spoints,epoints,n.dist=5,truncation=6,R=6371,project=FALSE,..
   return(ret)
 }
 
-#' Temporary implementation of integration point construction
-#'
-#' @aliases temporary.integration.scheme
-#' @export
-#' @param effort ETP effort data with NA-lines removed
-#' @return Integration points ($lat,$lon) with integration weights ($weight), perpendicular distance ($PD) and year ($year)
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Temporary implementation of integration point construction
+#
+# @aliases temporary.integration.scheme
+# @export
+# @param effort ETP effort data with NA-lines removed
+# @return Integration points ($lat,$lon) with integration weights ($weight), perpendicular distance ($PD) and year ($year)
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 temporary.integration.scheme = function(effort,max.ratio=300,...){
   transect = as.transect.etpeffort(effort)
@@ -294,12 +294,12 @@ temporary.integration.scheme = function(effort,max.ratio=300,...){
 }
 
 
-#' Integration on a grid (for Euclidean data)
-#'
-#' @aliases grid.integration
-#' @export
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Integration on a grid (for Euclidean data)
+#
+# @aliases grid.integration
+# @export
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 
 grid.integration = function(data,group,n.distance=3,n.length=3,truncation=3){
@@ -332,15 +332,15 @@ grid.integration = function(data,group,n.distance=3,n.length=3,truncation=3){
 }
 
 
-#' Triangle indices of points given a mesh
-#'
-#' @aliases triangle
-#' @export
-#' @param mesh A inla.mesh
-#' @param loc Locations using the coordinate system of the mesh 
-#' @return tri Triangle indices
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Triangle indices of points given a mesh
+#
+# @aliases triangle
+# @export
+# @param mesh A inla.mesh
+# @param loc Locations using the coordinate system of the mesh 
+# @return tri Triangle indices
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 triangle = function(mesh,loc){
   mcross = function(a,b) { return( (a[,1])*(b[2]) - (a[,2])*(b[1]) )}
@@ -571,17 +571,17 @@ barycentric.vertices = function(mesh,tri){
 
 
 
-#' Split lines at mesh edges
-#'
-#' @aliases split.lines
-#' @export
-#' @param mesh An inla.mesh object
-#' @param sp Start points of lines
-#' @param ep End points of lines
-#' @param filter.zero.length Filter out segments with zero length? (Bool)
-#' @param ... argments to int.quadrature
-#' @return List of start and end points resulting from splitting the given lines
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Split lines at mesh edges
+#
+# @aliases split.lines
+# @export
+# @param mesh An inla.mesh object
+# @param sp Start points of lines
+# @param ep End points of lines
+# @param filter.zero.length Filter out segments with zero length? (Bool)
+# @param ... argments to int.quadrature
+# @return List of start and end points resulting from splitting the given lines
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 split.lines = function(mesh, sp, ep, filter.zero.length = TRUE) {
   
@@ -625,16 +625,16 @@ split.lines = function(mesh, sp, ep, filter.zero.length = TRUE) {
   
 }
 
-#' Replicate lines with different distances to base line
-#'
-#' @aliases replicate.lines
-#' @export
-#' @param sp Start points of lines
-#' @param ep End points of lines
-#' @param truncation distance at which we truncate sightings
-#' @param ... argments to int.quadrature
-#' @return List of 1) Start and end points of replicated lines 2) their distances to the original line
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Replicate lines with different distances to base line
+#
+# @aliases replicate.lines
+# @export
+# @param sp Start points of lines
+# @param ep End points of lines
+# @param truncation distance at which we truncate sightings
+# @param ... argments to int.quadrature
+# @return List of 1) Start and end points of replicated lines 2) their distances to the original line
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 replicate.lines = function(sp,ep,truncation,scheme="equidistant",n=3,fake.distance=FALSE,geometry="euc") {
   
@@ -678,22 +678,22 @@ replicate.lines = function(sp,ep,truncation,scheme="equidistant",n=3,fake.distan
   }
 }
 
-#' Gaussian quadrature and other integration point constructors
-#' 
-#' Contruct integration points for each of lines defined by the start and end points provided.
-#' The following schemes are available: 
-#' "equidistant" : Equidistant integration points without boundary. All weights are identical and sum uf to the length of a line.
-#' "gaussian": Points and weight according to the Gaussian quadrature rule. Currently only n=1 and n=2 are supported (Exact integration for linear and quadratic functions).
-#' "twosided-gaussian": Experimental
-#'    
-#' @aliases int.quadrature
-#' @export
-#' @param sp Start points of lines
-#' @param ep End points of lines
-#' @param scheme Integration scheme (gaussian or equdistant)
-#' @param n Number of integration points
-#' @return List with integration poins (ips), weights (w) and weights including line length (wl)
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Gaussian quadrature and other integration point constructors
+# 
+# Contruct integration points for each of lines defined by the start and end points provided.
+# The following schemes are available: 
+# "equidistant" : Equidistant integration points without boundary. All weights are identical and sum uf to the length of a line.
+# "gaussian": Points and weight according to the Gaussian quadrature rule. Currently only n=1 and n=2 are supported (Exact integration for linear and quadratic functions).
+# "twosided-gaussian": Experimental
+#    
+# @aliases int.quadrature
+# @export
+# @param sp Start points of lines
+# @param ep End points of lines
+# @param scheme Integration scheme (gaussian or equdistant)
+# @param n Number of integration points
+# @return List with integration poins (ips), weights (w) and weights including line length (wl)
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry="euc",coords = NULL){
 
@@ -822,14 +822,14 @@ int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry=
 }
 
 
-#' Integration points in one dimension
-#' 
-#' This function is a wrapper for \link{int.quadrature}. It returns a data frame instead of a list.
-#' 
-#' @aliases int.1d
-#' @param ... see \link{int.quadrature}
-#' @export 
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Integration points in one dimension
+# 
+# This function is a wrapper for \link{int.quadrature}. It returns a data frame instead of a list.
+# 
+# @aliases int.1d
+# @param ... see \link{int.quadrature}
+# @export 
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 int.1d = function(...){
   quad = int.quadrature(...)
@@ -837,39 +837,39 @@ int.1d = function(...){
   return(ips)
 }
 
-#' Line transect integration
-#' 
-#' Creates a set of integration points with weights from a \link{dsdata} structure. 
-#' The integration points can be based on the transect lines or the line segments of the survey (parameter "on").
-#' By default, the integration points are arranged on a grid and their number in direction of the transect and perpendicular
-#' to the transect are given by the parameters n.length and n.distance. The boundary of the integration in perpendicular
-#' direction is given by distance.truncation. Since transect lines can be long compared to the mesh that is used to model
-#' the data it can be useful to set the parameter line.split to TRUE. This means that transect lines / segments are split
-#' into parts at the edges of the mesh before the integration points are constructed (for each of these parts). The
-#' mesh that is used for this procedure is (by default) the mesh of the data set (data$mesh). However, it can by replaced
-#' by a mesh provided as a parameter. Additionaly, the given mesh can automatically be refined (mesh.refine) if a denser set 
-#' of integration points is required. The latter also holds for integration points constructed using the option 
-#' "projection = TRUE". Hereby, after their contruction, integration points are projected onto points at the mesh vertices.
-#'
-#' @aliases int.points
-#' @export
-#' @param data Either a dsdata/etpdata data set (e.g. whales) or a data.frame describing effort data
-#' @param on Either "transect" or "segment". This determines on which of these the integration is based on. Alternatively a two column index matrix, first column: column index of transect start points in effort data, second column: column index of transect end points in effort data
-#' @param line.split TRUE or FALSE, determines if lines that cross mesh edged should be splitted
-#' @param mesh Mesh used to construct the integration points. By default the mesh of the given data set.
-#' @param mesh.split Split mesh triangles into four sub-triangles for refined integration.
-#' @param mesh.coords Character description of the mesh coordinates, e.g. c("lon","lat")
-#' @param geometry Either "geo" (geographic)  or "euc" (Euclidean)
-#' @param length.scheme Integration scheme along the line (transect/segment)
-#' @param n.length Number of integration points along the line
-#' @param distance.scheme Integration scheme along perpendicular distance
-#' @param n.distance Number of integration points perpendicular distance
-#' @param distance.truncation Truncation for perpendicular distance (i.e. integration limit)
-#' @param fake.distance Wether or not integration points stay on the transect line and distances are faked.
-#' @param projection Type of projection. Currently only "linear" works.
-#' @param group Create independent integration points for sub-groups of the data, e.g. group.by=c("year","month")
-#' @return List with integration poins (ips), weights (w) and weights including line length (wl)
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Line transect integration
+# 
+# Creates a set of integration points with weights from a \link{dsdata} structure. 
+# The integration points can be based on the transect lines or the line segments of the survey (parameter "on").
+# By default, the integration points are arranged on a grid and their number in direction of the transect and perpendicular
+# to the transect are given by the parameters n.length and n.distance. The boundary of the integration in perpendicular
+# direction is given by distance.truncation. Since transect lines can be long compared to the mesh that is used to model
+# the data it can be useful to set the parameter line.split to TRUE. This means that transect lines / segments are split
+# into parts at the edges of the mesh before the integration points are constructed (for each of these parts). The
+# mesh that is used for this procedure is (by default) the mesh of the data set (data$mesh). However, it can by replaced
+# by a mesh provided as a parameter. Additionaly, the given mesh can automatically be refined (mesh.refine) if a denser set 
+# of integration points is required. The latter also holds for integration points constructed using the option 
+# "projection = TRUE". Hereby, after their contruction, integration points are projected onto points at the mesh vertices.
+#
+# @aliases int.points
+# @export
+# @param data Either a dsdata/etpdata data set (e.g. whales) or a data.frame describing effort data
+# @param on Either "transect" or "segment". This determines on which of these the integration is based on. Alternatively a two column index matrix, first column: column index of transect start points in effort data, second column: column index of transect end points in effort data
+# @param line.split TRUE or FALSE, determines if lines that cross mesh edged should be splitted
+# @param mesh Mesh used to construct the integration points. By default the mesh of the given data set.
+# @param mesh.split Split mesh triangles into four sub-triangles for refined integration.
+# @param mesh.coords Character description of the mesh coordinates, e.g. c("lon","lat")
+# @param geometry Either "geo" (geographic)  or "euc" (Euclidean)
+# @param length.scheme Integration scheme along the line (transect/segment)
+# @param n.length Number of integration points along the line
+# @param distance.scheme Integration scheme along perpendicular distance
+# @param n.distance Number of integration points perpendicular distance
+# @param distance.truncation Truncation for perpendicular distance (i.e. integration limit)
+# @param fake.distance Wether or not integration points stay on the transect line and distances are faked.
+# @param projection Type of projection. Currently only "linear" works.
+# @param group Create independent integration points for sub-groups of the data, e.g. group.by=c("year","month")
+# @return List with integration poins (ips), weights (w) and weights including line length (wl)
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 
 int.points = function(data, 
@@ -981,7 +981,7 @@ int.points = function(data,
   return(ips)
 }
 
-#' Prjection integration done FAST. Not implemented completely, has to deal with distances.
+# Prjection integration done FAST. Not implemented completely, has to deal with distances.
 
 project.weights = function(ips, mesh, mesh.coords = NULL){
   
@@ -1021,16 +1021,16 @@ project.weights = function(ips, mesh, mesh.coords = NULL){
 }
 
 
-#' Expand integration points over additional dimensions
-#' 
-#' See int.quadrature on how to formulate the further arguments.
-#'
-#' @aliases int.expand
-#' @export
-#' @param ips Integration points to expand
-#' @param ... lists with arguments for multiple calls of int.quadrature
-#' @return Integration points
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Expand integration points over additional dimensions
+# 
+# See int.quadrature on how to formulate the further arguments.
+#
+# @aliases int.expand
+# @export
+# @param ips Integration points to expand
+# @param ... lists with arguments for multiple calls of int.quadrature
+# @return Integration points
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 int.expand = function(ips, ...) {
   dots = list(...)

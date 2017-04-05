@@ -6,14 +6,6 @@
 \usage{
 default.mesh(spObject, max.edge = NULL, convex = -0.15)
 }
-\arguments{
-\item{spObject}{A Spatial* object}
-
-\item{max.edge}{A parameter passed on to \link{inla.mesh.2d} which controls the granularity of the mesh. If NULL, 1/20 of the domain size is used.}
-}
-\value{
-An \code{inla.mesh} object
-}
 \description{
 Generate a simple default mesh
 }

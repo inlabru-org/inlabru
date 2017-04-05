@@ -1,12 +1,12 @@
-#' Project data to mesh vertices under the assumption of lineariity
-#'   
-#'
-#' @aliases vertex.projections
-#' @export
-#' @param mesh An inla.mesh object
-#' @param points A SpatialPointsDataFrame object
-#' @param columns A character array of the points columns which whall be projected
-#' @return SpatialPointsDataFrame of mesh vertices with projected data attached
+# Project data to mesh vertices under the assumption of lineariity
+#   
+#
+# @aliases vertex.projections
+# @export
+# @param mesh An inla.mesh object
+# @param points A SpatialPointsDataFrame object
+# @param columns A character array of the points columns which whall be projected
+# @return SpatialPointsDataFrame of mesh vertices with projected data attached
 
 vertex.projection = function(mesh, points, columns = names(points)){
   

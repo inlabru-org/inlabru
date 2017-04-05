@@ -1,13 +1,13 @@
-#' Determine integration points 
-#' 
-#' @aliases polygon.integration
-#' @export
-#' @param data A \link{dsdata} object
-#' @param poly A function turning segments into polygons, e.g. \link{swath}
-#' @param project If TRUE, project integration points to mesh vertices
-#' @param group A grouping for the polygons, e.g. "year" for temporal integration schemes. This can also be a function mapping segments to a group.
-#' @param ... Additional arguments passed on to the poly function.
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Determine integration points 
+# 
+# @aliases polygon.integration
+# @export
+# @param data A \link{dsdata} object
+# @param poly A function turning segments into polygons, e.g. \link{swath}
+# @param project If TRUE, project integration points to mesh vertices
+# @param group A grouping for the polygons, e.g. "year" for temporal integration schemes. This can also be a function mapping segments to a group.
+# @param ... Additional arguments passed on to the poly function.
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 polygon.integration = function(data, poly, project = TRUE, group = NULL, ...){
     poly.args = list(...)
@@ -41,14 +41,14 @@ polygon.integration = function(data, poly, project = TRUE, group = NULL, ...){
 
 
 
-#' Integration points for polygons inside an inla.mesh
-#' 
-#' @aliases int.polygon
-#' @export
-#' @param mesh An inla.mesh object
-#' @param loc Locations defining the polygons
-#' @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Integration points for polygons inside an inla.mesh
+# 
+# @aliases int.polygon
+# @export
+# @param mesh An inla.mesh object
+# @param loc Locations defining the polygons
+# @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 int.polygon = function(mesh, loc, group = NULL){
   

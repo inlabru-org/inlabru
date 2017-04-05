@@ -1,26 +1,26 @@
-#' Sea surface temperature (SST) from SODA data
-#'
-#' The SODA (Simple Ocean Data Assimilation) model is summarized at http://apdrc.soest.hawaii.edu/datadoc/soda_2.2.4.php
-#' The data can be accessed via \link{io_sst.load}, which internally calls \link{io_sst.load} if the SODA NetCDF files can not be found on the local machine.
-#'
-#' SST data can be plotted via \link{plot.sst} (see also the example)
-#' Other methods: \link{mean.sst},\link{interpolate.sst}
-#'
-#' @aliases plot.sst
-#' @examples \\dontrun{sst = io_sst.load(year=c(2006,2007)); plot(sst)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' @name sst
+# Sea surface temperature (SST) from SODA data
+#
+# The SODA (Simple Ocean Data Assimilation) model is summarized at http://apdrc.soest.hawaii.edu/datadoc/soda_2.2.4.php
+# The data can be accessed via \link{io_sst.load}, which internally calls \link{io_sst.load} if the SODA NetCDF files can not be found on the local machine.
+#
+# SST data can be plotted via \link{plot.sst} (see also the example)
+# Other methods: \link{mean.sst},\link{interpolate.sst}
+#
+# @aliases plot.sst
+# @examples \\dontrun{sst = io_sst.load(year=c(2006,2007)); plot(sst)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @name sst
 NULL
 
 
-#' Plot SST data
-#'
-#' @aliases plot.sst
-#' @export
-#' @examples \\dontrun{sst = io_sst.load(year=c(2006,2007),month=c(5,6)); plot(sst)}
-#' @author Tim Gerrodette Oct 2014 <\email{tim.gerrodette@@noaa.gov}>
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' 
+# Plot SST data
+#
+# @aliases plot.sst
+# @export
+# @examples \\dontrun{sst = io_sst.load(year=c(2006,2007),month=c(5,6)); plot(sst)}
+# @author Tim Gerrodette Oct 2014 <\email{tim.gerrodette@@noaa.gov}>
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# 
 
 plot.sst = function(sst){
   warning("This plot code is merely a placeholder.")
@@ -34,15 +34,15 @@ plot.sst = function(sst){
 }
 
 
-#' Mean of sea surface temperature (SST)
-#' 
-#' @aliases mean.sst
-#' @export
-#' @param sst sea surface temperature
-#' @param \code{mweights} Monthwise averaging weights (must equal the number of months \code{sst} incorporates)
-#' @return \code{sst} weighted yearly mean sea surface temperature
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Mean of sea surface temperature (SST)
+# 
+# @aliases mean.sst
+# @export
+# @param sst sea surface temperature
+# @param \code{mweights} Monthwise averaging weights (must equal the number of months \code{sst} incorporates)
+# @return \code{sst} weighted yearly mean sea surface temperature
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 mean.sst = function(sst,mweights=rep(1,dim(sst)[3])) {
   wfun = function(x,w) {weighted.mean(x,mweights)}
@@ -52,14 +52,14 @@ mean.sst = function(sst,mweights=rep(1,dim(sst)[3])) {
 }
 
 
-#' Interpolate sea surface temperature (SST)
-#' 
-#' @aliases interpolate.sst
-#' @export
-#' @param sst Spatial SST estimate or list of such
-#' @param loc Locations to interpolate SST at
-#' @return sst.at.loc SST at the provided locations
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Interpolate sea surface temperature (SST)
+# 
+# @aliases interpolate.sst
+# @export
+# @param sst Spatial SST estimate or list of such
+# @param loc Locations to interpolate SST at
+# @return sst.at.loc SST at the provided locations
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 interpolate.sst = function(sst,loc) {
   if (length(dim(sst$temp))>2){ stop(print("This method is not implemented to work with temporal SST slabs.")) }
@@ -96,13 +96,13 @@ interpolate.sst.internal = function(sst,loc,extrapolate=TRUE) {
 }
 
 
-#' Extract sea surface temperature (SST) for given locations (and time)
-#' 
-#' @aliases get.sst
-#' @export
-#' @param loc Locations to interpolate SST at
-#' @return sst.at.loc SST at the provided locations
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Extract sea surface temperature (SST) for given locations (and time)
+# 
+# @aliases get.sst
+# @export
+# @param loc Locations to interpolate SST at
+# @return sst.at.loc SST at the provided locations
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 get.sst = function(loc,method=yearly.mean.sst,...) {
   if (is.character(method)){
@@ -167,16 +167,16 @@ yearly.sdev.sst = function(loc,month=6:12,...){
 
 
 
-#' Yearly weighted average SST for given locations
-#'
-#' @aliases yearly.wmean.sst
-#' @export
-#' @param loc Geographic locations annotated with year, day and month
-#' @param wloc If defined, locations to determine weights from
-#' @return sst SST
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' 
+# Yearly weighted average SST for given locations
+#
+# @aliases yearly.wmean.sst
+# @export
+# @param loc Geographic locations annotated with year, day and month
+# @param wloc If defined, locations to determine weights from
+# @return sst SST
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# 
 yearly.wmean.sst = function(loc,wloc=FALSE,...){
   year = unique(loc$year)
   if (is.data.frame(wloc)){ weights = weights.sst(wloc) }
@@ -200,15 +200,15 @@ yearly.wmean.sst = function(loc,wloc=FALSE,...){
 }
 
 
-#' Weights for yearly averages of SST data
-#'
-#' @aliases weights.sst
-#' @export
-#' @param effdat effort data
-#' @return sstweights Weights for each month and each year of the given effort data
-#' @examples \\dontrun{}
-#' @author Yuan (Joyce) Yuan <\email{yy84@@st-andrews.ac.uk}>
-#' 
+# Weights for yearly averages of SST data
+#
+# @aliases weights.sst
+# @export
+# @param effdat effort data
+# @return sstweights Weights for each month and each year of the given effort data
+# @examples \\dontrun{}
+# @author Yuan (Joyce) Yuan <\email{yy84@@st-andrews.ac.uk}>
+# 
 
 weights.sst = function(effdat)
 {
@@ -254,14 +254,14 @@ weights.sst = function(effdat)
 }
 
 
-#' Extrapolate sea surface temperature (SST) at regions where the SODA defines the sst to be NA
-#' 
-#' @aliases extrapolate.sst
-#' @export
-#' @param sst Spatial SST estimates with NA values
-#' @param mesh inla.mesh to extrapolate values on
-#' @return sst Spatial SST with filled in conditional expectations for NA values
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Extrapolate sea surface temperature (SST) at regions where the SODA defines the sst to be NA
+# 
+# @aliases extrapolate.sst
+# @export
+# @param sst Spatial SST estimates with NA values
+# @param mesh inla.mesh to extrapolate values on
+# @return sst Spatial SST with filled in conditional expectations for NA values
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 
 extrapolate.sst = function(sst,mesh) {

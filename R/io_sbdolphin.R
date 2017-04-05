@@ -2,14 +2,14 @@
 io_sbdolphin.getDataDir = function() {return(system.file("data",package="inlabru"))}
 
 
-#' Load \link{sbdolphin} survey data from raw data sets
-#'
-#' @aliases io_sbdolphin.pkgdata.load
-#' @export
-#' @return \code{sbdolphin} the \link{sbdolphin} data set
-#' @examples \\dontrun{sbdolphin = io_sbdolphin.pkgdata.load();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{sbdolphin} survey data from raw data sets
+#
+# @aliases io_sbdolphin.pkgdata.load
+# @export
+# @return \code{sbdolphin} the \link{sbdolphin} data set
+# @examples \\dontrun{sbdolphin = io_sbdolphin.pkgdata.load();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.pkgdata.load = function()
 { 
@@ -54,18 +54,18 @@ io_sbdolphin.pkgdata.load = function()
 
 }
 
-#' Regenerate \link{sbdolphin} data and store it to \code{sbdolphin.RData}
-#' 
-#' Uses \code{\link{io_sbdolphin.pkgdata.load}} to load the data and stores
-#' the result to sbdolphin.RData. Thereby the data that is distributed with 
-#' our package is generated.
-#'
-#' @aliases io_sbdolphin.pkgdata.save
-#' @export
-#' @return NULL
-#' @examples \\dontrun{io_sbdolphin.pkgdata.save();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Regenerate \link{sbdolphin} data and store it to \code{sbdolphin.RData}
+# 
+# Uses \code{\link{io_sbdolphin.pkgdata.load}} to load the data and stores
+# the result to sbdolphin.RData. Thereby the data that is distributed with 
+# our package is generated.
+#
+# @aliases io_sbdolphin.pkgdata.save
+# @export
+# @return NULL
+# @examples \\dontrun{io_sbdolphin.pkgdata.save();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.pkgdata.save = function(){
   ## save the data we will include in the R package
@@ -73,28 +73,28 @@ io_sbdolphin.pkgdata.save = function(){
   save(sbdolphin,file=paste0(io_sbdolphin.getDataDir(),"/sbdolphin.RData"))
 }
 
-#' Load \link{sbdolphin} integration points
-#' 
-#'
-#' @aliases io_sbdolphin.ips
-#' @export
-#' @return ips integration points
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{sbdolphin} integration points
+# 
+#
+# @aliases io_sbdolphin.ips
+# @export
+# @return ips integration points
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.ips = function(){
   load(file= paste(io_sbdolphin.getDataDir(), "etp.ips.RData",sep=.Platform$file.sep))
   return(ips)
 }
 
-#' Load \link{sbdolphin} integration points (yearly)
-#' 
-#'
-#' @aliases io_sbdolphin.ips.yearly
-#' @export
-#' @return ips integration points
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{sbdolphin} integration points (yearly)
+# 
+#
+# @aliases io_sbdolphin.ips.yearly
+# @export
+# @return ips integration points
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.ips.yearly = function(){
   load(file= paste(io_sbdolphin.getDataDir(), "etp.ips.yearly.RData",sep=.Platform$file.sep))
@@ -102,28 +102,28 @@ io_sbdolphin.ips.yearly = function(){
 }
 
 
-#' Load \link{sbdolphin} inner boundary
-#' 
-#'
-#' @aliases io_sbdolphin.inner.boundary
-#' @export
-#' @return boundary inner boundary
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{sbdolphin} inner boundary
+# 
+#
+# @aliases io_sbdolphin.inner.boundary
+# @export
+# @return boundary inner boundary
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.inner.boundary = function(){
   load(file= paste(io_sbdolphin.getDataDir(), "etp.inner.boundary.Rdata",sep=.Platform$file.sep))
   return(innerBnd)
 }
 
-#' Load \link{sbdolphin} par3d parameters
-#' 
-#'
-#' @aliases io_sbdolphin.par3d
-#' @export
-#' @return params pard3d() parameters for rgl plot of sbdolphin
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{sbdolphin} par3d parameters
+# 
+#
+# @aliases io_sbdolphin.par3d
+# @export
+# @return params pard3d() parameters for rgl plot of sbdolphin
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.par3d = function(){
   #par3d(zoom=0.62,FOV=1)
@@ -135,16 +135,16 @@ io_sbdolphin.par3d = function(){
 }
 
 
-#' Load \link{sbdolphin} sightings
-#' 
-#' Load whale sightings from "Bmus86_06.csv" and apply filters (see parameters).
-#'
-#' @aliases io_sbdolphin.sighting
-#' @export
-#' @return sightings Whale sighting
-#' @examples \\dontrun{sightings = io_sbdolphin.sightings(years=c(2000:2006),E=1,BfLim=5);}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{sbdolphin} sightings
+# 
+# Load whale sightings from "Bmus86_06.csv" and apply filters (see parameters).
+#
+# @aliases io_sbdolphin.sighting
+# @export
+# @return sightings Whale sighting
+# @examples \\dontrun{sightings = io_sbdolphin.sightings(years=c(2000:2006),E=1,BfLim=5);}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.sighting = function(years=NULL,E=NULL,BfLim=NULL,PDLim=NULL)
 { 
@@ -201,14 +201,14 @@ io_sbdolphin.sighting = function(years=NULL,E=NULL,BfLim=NULL,PDLim=NULL)
 } 
 
 
-#' Generate \link{sbdolphin} transect lines from ETP effort data
-#'
-#' @aliases io_sbdolphin.transect
-#' @export
-#' @return tr Data frame with transect lines
-#' @examples \\dontrun{transect = io_sbdolphin.transect();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Generate \link{sbdolphin} transect lines from ETP effort data
+#
+# @aliases io_sbdolphin.transect
+# @export
+# @return tr Data frame with transect lines
+# @examples \\dontrun{transect = io_sbdolphin.transect();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 
 io_sbdolphin.transect = function(years=FALSE,rem.intermediate=TRUE)
@@ -234,16 +234,16 @@ io_sbdolphin.transect = function(years=FALSE,rem.intermediate=TRUE)
   return(tr)
 }
 
-#' Load \link{sbdolphin} effort
-#' 
-#' Load effort data from "ETP effort.csv"
-#'
-#' @aliases io_sbdolphin.effort
-#' @export
-#' @return effort ETP effort related to \link{sbdolphin} data
-#' @examples \\dontrun{transects = io_sbdolphin.transects();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{sbdolphin} effort
+# 
+# Load effort data from "ETP effort.csv"
+#
+# @aliases io_sbdolphin.effort
+# @export
+# @return effort ETP effort related to \link{sbdolphin} data
+# @examples \\dontrun{transects = io_sbdolphin.transects();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.effort = function(years=FALSE,rem.intermediate=TRUE)
 { 
@@ -278,36 +278,36 @@ io_sbdolphin.effort = function(years=FALSE,rem.intermediate=TRUE)
 } 
 
 
-#' Load \link{sbdolphin} boundary
-#' 
-#' @aliases io_sbdolphin.boundary
-#' @export
-#' @return boundary 
-#' @examples \\dontrun{boundary = io_sbdolphin.boundary();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{sbdolphin} boundary
+# 
+# @aliases io_sbdolphin.boundary
+# @export
+# @return boundary 
+# @examples \\dontrun{boundary = io_sbdolphin.boundary();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.boundary = function(...) {return(io_star.boundary(...))}
 
-#' Load \link{sbdolphin} coast
-#' 
-#' @aliases io_sbdolphin.coast
-#' @export
-#' @return coast
-#' @examples \\dontrun{coast = io_sbdolphin.coast();}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{sbdolphin} coast
+# 
+# @aliases io_sbdolphin.coast
+# @export
+# @return coast
+# @examples \\dontrun{coast = io_sbdolphin.coast();}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.coast = function(...) {return(io_star.coast(...))}
 
-#' Load \link{sbdolphin} mesh
-#' 
-#' @aliases io_sbdolphin.mesh
-#' @export
-#' @return mesh An INLA mesh
-#' @examples \\dontrun{mesh = io_sbdolphin.mesh(); plot(mesh)}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Load \link{sbdolphin} mesh
+# 
+# @aliases io_sbdolphin.mesh
+# @export
+# @return mesh An INLA mesh
+# @examples \\dontrun{mesh = io_sbdolphin.mesh(); plot(mesh)}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 io_sbdolphin.mesh = function(...) 
 {

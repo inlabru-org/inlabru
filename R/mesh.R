@@ -3,12 +3,12 @@
 vertices = function(...){UseMethod("vertices")}
 pixels = function(...){UseMethod("pixels")}
 
-#' Plot an inla.mesh using ggplot
-#'
-#' @aliases ggp.mesh
-#' @export
-#' @param mesh an inla.mesh object
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Plot an inla.mesh using ggplot
+#
+# @aliases ggp.mesh
+# @export
+# @param mesh an inla.mesh object
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = rgb(0,0,0,0.3)) {
   if ( !require(ggplot2) ) { stop("This function requires the ggplot2 package to run.") }
@@ -77,15 +77,15 @@ is.inside = function(mesh, loc, mesh.coords = NULL) {
 #' Query if a point is inside a polygon AND inside the mesh;
 #'
 #'
-#' @aliases is.in.polygon
-#' @export
-#' @param mesh an inla.mesh object
-#' @param ploc Points defining a polygon
-#' @param loc Points to quer
-#' @param mask.mesh Mask points outside mesh, default: TRUE
-#' @param mesh.coords Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.
-#' @return inside Boolean, TRUE if inside polygon
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @aliases is.in.polygon
+# @export
+# @param mesh an inla.mesh object
+# @param ploc Points defining a polygon
+# @param loc Points to quer
+# @param mask.mesh Mask points outside mesh, default: TRUE
+# @param mesh.coords Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.
+# @return inside Boolean, TRUE if inside polygon
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TRUE ) {
   if (!is.null(mesh.coords) & is.data.frame(loc)) { loc = as.matrix(loc[,mesh.coords,drop=FALSE])}

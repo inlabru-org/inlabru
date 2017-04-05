@@ -12,7 +12,6 @@
 #'    \item{\code{lambda3_1D}:}{ A function defining the intensity function of a 
 #'    nonhomogeneous Poisson process. Note that this function is only defined on
 #'    the interval (0,55).}
-#'    'habitat suitability' covariate in 1D space.}
 #'    \item{\code{E_nc3a}}{ The expected counts of gridded data for the wider bins (10 bins).}
 #'    \item{\code{E_nc3b}}{ The expected counts of gridded data for the wider bins (20 bins).}
 #'    \item{\code{pts3}}{ The locations of the observed points (a data frame with one column, named \code{x}).}

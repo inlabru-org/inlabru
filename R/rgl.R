@@ -1,11 +1,11 @@
-#' Plot linestrips on sphere using rgl
-#'
-#' @aliases rgl.sphlinestrips
-#' @export
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' 
-#' 
+# Plot linestrips on sphere using rgl
+#
+# @aliases rgl.sphlinestrips
+# @export
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# 
+# 
 rgl.sphlinestrips = function(lat,lon,radius=1,...){
   R=radius
   for (k in 1:(length(lat)-1)){
@@ -18,14 +18,14 @@ rgl.sphlinestrips = function(lat,lon,radius=1,...){
   }
 }
 
-#' Plot lines on sphere using rgl
-#'
-#' @aliases rgl.sphlines
-#' @export
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' 
-#' 
+# Plot lines on sphere using rgl
+#
+# @aliases rgl.sphlines
+# @export
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# 
+# 
 rgl.sphlines = function(lat,lon,radius=1,smooth=FALSE,...){
   if (smooth) {
     for (k in seq(1,(length(lat)-1),by=2)){
@@ -43,17 +43,17 @@ rgl.sphlines = function(lat,lon,radius=1,smooth=FALSE,...){
   }
 }
 
-#' Plot lines on sphere using rgl
-#' 
-#' This version of \link{rgl.rgl.sphlines2} uses a parametrization by the
-#' start end end points of the lines
-#'
-#' @aliases rgl.sphlines2
-#' @export
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' 
-#' 
+# Plot lines on sphere using rgl
+# 
+# This version of \link{rgl.rgl.sphlines2} uses a parametrization by the
+# start end end points of the lines
+#
+# @aliases rgl.sphlines2
+# @export
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# 
+# 
 rgl.sphlines2 = function(start,end,col="black",...){
   # And here comes the worst way to do this...
   slat = start[,"lat"]
@@ -93,14 +93,14 @@ rgl.earth = function(R=1,R.grid=1.05){
 
 }
 
-#' Plot an inla.mesh with geographic coordinates onto a sphere
-#' 
-#' @aliases rgl.sphmesh
-#' @export
-#' @examples \\dontrun{}
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#' 
-#' 
+# Plot an inla.mesh with geographic coordinates onto a sphere
+# 
+# @aliases rgl.sphmesh
+# @export
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# 
+# 
 rgl.sphmesh = function(mesh, radius = 1, add=NULL, col=NULL,...){
   if ( mesh$manifold  == "S2" ) {
     mesh$loc = radius * normalize.euc(mesh$loc)

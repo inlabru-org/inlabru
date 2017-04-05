@@ -14,6 +14,10 @@ like(family, formula = . ~ ., data = NULL, components = NULL,
 
 \item{data}{Likelihood-specific data}
 
+\item{components}{Components}
+
+\item{mesh}{An inla.mesh object}
+
 \item{E}{Poisson exposure parameter (if family = 'poisson') passed on to \link{inla}}
 
 \item{samplers}{Integration domain for 'cp' family (not implemented!)

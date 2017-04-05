@@ -28,7 +28,6 @@ Data imported from package MRSea, see http://creem2.st-andrews.ac.uk/software/
 Data imported from package MRSea, see http://creem2.st-andrews.ac.uk/software/
 }
 \examples{
-\\\donttest{ data(mrsea) ; plot(mrsea)}
  data(mrsea)
  ggplot() + gg(mrsea$mesh) + gg(mrsea$samplers) + gg(mrsea$points) + gg(mrsea$boundary)
 }
