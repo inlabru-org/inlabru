@@ -5,7 +5,7 @@
 \alias{gg.SpatialGridDataFrame}
 \title{Plot SpatialGridDataFrame using ggplot2}
 \usage{
-gg.SpatialGridDataFrame(sgdf, ...)
+gg.SpatialGridDataFrame(sgdf, fill = names(sgdf)[[1]], ...)
 }
 \arguments{
 \item{sgdf}{A SpatialGridDataFrame object}
