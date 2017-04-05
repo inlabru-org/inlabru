@@ -83,13 +83,13 @@ roxy: stage-cleanup
 	@cd $(STAGE) ; Rscript -e "library(devtools); document()"
 
 build-dir:
-	mkdir -p $(BUILD)
+	@mkdir -p $(BUILD)
 rpkg: prepare build-dir
 	$(R) CMD INSTALL -l $(BUILD) --build $(STAGE)
-	$(MAKE) clean-build
+	@$(MAKE) clean-build
 rpkg-Rdev: prepare build-dir
 	$(RDEV) CMD INSTALL -l $(BUILD) --build $(STAGE)
-	$(MAKE) clean-build
+	@$(MAKE) clean-build
 
 rpkg-source: prepare
 	$(R) CMD build --build $(STAGE)
@@ -97,19 +97,19 @@ rpkg-source-Rdev: prepare
 	$(RDEV) CMD build --build $(STAGE)
 
 clean-stage:
-	rm -rf $(STAGE)
+	@rm -rf $(STAGE)
 clean-build:
-	rm -rf $(BUILD)
+	@rm -rf $(BUILD)
 
 clean: clean-stage clean-build
 
 ## Check building with a non-GNU-make:
 bmake-rpkg: prepare build-dir
 	@./bmake-check.sh $(R) $(BUILD) $(STAGE)
-	$(MAKE) clean-build
+	@$(MAKE) clean-build
 bmake-rpkg-Rdev: prepare build-dir
 	@./bmake-check.sh $(RDEV) $(BUILD) $(STAGE)
-	$(MAKE) clean-build
+	@$(MAKE) clean-build
 
 ## Check the latest built source package:
 check:
