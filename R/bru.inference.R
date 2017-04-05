@@ -144,7 +144,7 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
   #' More on special bru likelihoods
   if ( family == "cp" ) {
     if ( is.null(data) ) { stop("You called like() with family='cp' but no 'data' argument was supplied.") }
-    if ( is.null(samplers) ) { stop("You called like() with family='cp' but no 'samplers' argument was supplied.") }
+    #if ( is.null(samplers) ) { stop("You called like() with family='cp' but no 'samplers' argument was supplied.") }
     bru.model = make.model(components)
     if (as.character(formula)[2] == ".") { 
       bru.model$dim.names = all.vars(update(components, .~0)) } 
@@ -555,7 +555,36 @@ predict.bru = function(result,
   
 }
 
+#' Samples based on bru
+#' 
+#' @aliases predict.bru
+#' @export
+#' @param result An object obtained by calling \link{bru})
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
+#' @param formula A formula determining which effects to predict and how to combine them
+#' 
+#' @return Predicted values
 
+generate.bru = function(result,
+                       data,
+                       formula = NULL,
+                       n.samples = 100)
+{
+  if ( is.null(formula) ) {
+    lh.name = "default"
+    if ( is.null(result$sppa$lhoods[[lh.name]]$expr) ) { 
+      expr = parse(text = paste0(names(result$sppa$model$effects), collapse = "+")) }
+    else {
+      expr = parse(text = as.character(result$sppa$lhoods[[lh.name]]$formula)[3])
+    }
+  } else {
+    expr = parse(text = as.character(formula)[length(as.character(formula))])
+  }
+  
+  
+  vals = evaluate.model(model = result$sppa$model, result = result, points = data, 
+                        property = "sample", n = n.samples, predictor = expr)
+}
 
 
 
