@@ -1,3 +1,6 @@
+# GENERICS
+generate = function(...){UseMethod("generate")}
+
 #' @title Convenient model fitting using (iterated) INLA
 #'
 #' @description This method is a wrapper for \link{inla} and provides multiple enhancements. 
@@ -555,9 +558,9 @@ predict.bru = function(result,
   
 }
 
-#' Samples based on bru
+#' Sampling based on bru posteriors
 #' 
-#' @aliases predict.bru
+#' @aliases generate.bru
 #' @export
 #' @param result An object obtained by calling \link{bru})
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
@@ -584,6 +587,8 @@ generate.bru = function(result,
   
   vals = evaluate.model(model = result$sppa$model, result = result, points = data, 
                         property = "sample", n = n.samples, predictor = expr)
+  
+  smy = summarize(vals, x = data, cbind.only = TRUE)
 }
 
 
@@ -900,7 +905,7 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.
 #' @param data A data.frame
 #' @param x Annotations for the resulting summary
 #' @return A data.frame with summary statistics
-summarize = function(data, x = NULL, gg = FALSE) {
+summarize = function(data, x = NULL, gg = FALSE, cbind.only = FALSE) {
   if ( is.list(data) ) { data = do.call(cbind, data) }
   if ( gg ) {
     smy = rbind(
@@ -909,8 +914,10 @@ summarize = function(data, x = NULL, gg = FALSE) {
       data.frame(y = apply(data, MARGIN = 1, quantile, 0.025, na.rm = TRUE), property = "lq"),
       data.frame(y = apply(data, MARGIN = 1, quantile, 0.5, na.rm = TRUE), property = "median"),
       data.frame(y = apply(data, MARGIN = 1, quantile, 0.975, na.rm = TRUE), property = "uq"))
-  }
-  else { 
+  } else if ( cbind.only ) {
+    smy = data.frame(data)
+    colnames(smy) = paste0("sample.",1:ncol(smy))
+  } else { 
     smy = data.frame(
       apply(data, MARGIN = 1, mean, na.rm = TRUE),
       apply(data, MARGIN = 1, sd, na.rm = TRUE),
