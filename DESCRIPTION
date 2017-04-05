@@ -1,8 +1,8 @@
 Package: inlabru
 Type: Package
 Title: Spatial inference using INLA
-Version: 1.0.0
-Date: 2016-12-22
+Version: 1.0.1
+Date: 2017-04-04
 Author: Fabian E. Bachl
 Maintainer: Fabian E. Bachl <bachlfab@gmail.com>
 Description: Inference for spatial point processes with uncertain detection.
@@ -14,5 +14,5 @@ Depends:
     Matrix,
     ggplot2,
     RColorBrewer
-Additional_repositories: https://www.math.ntnu.no/inla/R/stable
+Additional_repositories: https://www.math.ntnu.no/inla/R/testing
 RoxygenNote: 5.0.1
