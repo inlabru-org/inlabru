@@ -5,9 +5,6 @@
 ## This clones the repository from $(PKGPATH) (henceforth called the origin.)
 ## into a staging clone, called stage.
 ##
-## Keep the staging clone up-to-date by pulling from the origin:
-##   make stage-update
-##
 ## Which version to build and check?
 ##   make branch-origin What it the current origin branch?
 ##   make branch        What is the current staging branch?
@@ -35,6 +32,11 @@
 ##
 ## List config variables:
 ##   make config
+##
+## Keep the staging clone clear and up-to-date by pulling from the origin
+## (called automatically, so should normally not be needed):
+##   make stage-cleanup
+##   make stage-update
 
 PKG=inlabru
 PKGPATH=../inlabru/
@@ -55,7 +57,7 @@ BRANCH_ORIGIN := $(shell cd $(PKGPATH); git branch | grep "^\*" | $(SED) "s/^\* 
 
 default:
 
-branch:
+branch: stage-update
 	@echo "Current branch: "$(BRANCH)
 branch-origin:
 	@echo "Current branch on local origin: "$(BRANCH_ORIGIN)
@@ -69,18 +71,14 @@ branch.%: stage-update
 	@make branch
 
 stage-cleanup:
-	@cd $(STAGE) ; git checkout -f $(BRANCH)
+	@cd $(STAGE) ; git checkout -f $(BRANCH) > /dev/null
 stage-update: stage-cleanup
-	@cd $(STAGE) ; git pull
-
+	@cd $(STAGE) ; git pull > /dev/null
 stage:
 	@git clone $(PKGPATH) $(STAGE)/
 	@make branch
 
-prepare: stage-cleanup clean-build
-
-roxy: stage-cleanup
-	@cd $(STAGE) ; Rscript -e "library(devtools); document()"
+prepare: stage-update clean-build
 
 build-dir:
 	@mkdir -p $(BUILD)
