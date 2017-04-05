@@ -4,7 +4,7 @@
 \alias{summarize}
 \title{Summarize and annotate data}
 \usage{
-summarize(data, x = NULL, gg = FALSE)
+summarize(data, x = NULL, gg = FALSE, cbind.only = FALSE)
 }
 \arguments{
 \item{data}{A data.frame}
