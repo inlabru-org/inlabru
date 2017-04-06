@@ -173,8 +173,8 @@ gg.mesh = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
 
 #' Plot SpatialGridDataFrame using ggplot2
 #' 
-#' @aliases SpatialGridDataFrame
-#' @name SpatialGridDataFrame
+#' @aliases gg.SpatialGridDataFrame
+#' @name gg.SpatialGridDataFrame
 #' @export
 #' @import ggplot2
 #' @param sgdf A SpatialGridDataFrame object
