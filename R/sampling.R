@@ -16,16 +16,16 @@
 #' library(inlabru)
 #' vertices = seq(0, 3, by = 0.1)
 #' mesh = inla.mesh.1d(vertices)
-#' loglambda = 5-0.5*vertices)
+#' loglambda = 5-0.5*vertices
 #' pts = sample.lgcp(mesh, loglambda)
 #' pts$y = 0
 #' plot(vertices, exp(loglambda), type = "l", ylim = c(0,150))
 #' points(pts, pch = "|" )
 #'
 #' @examples 
-#' data("gorillanests")
-#' pts = sample.lgcp(gnestmesh, rep(-10, gnestmesh$n))
-#' ggplot() + gg(gnestmesh) + gg(pts)
+#' data("gorillas")
+#' pts = sample.lgcp(gorillas$mesh, rep(-10, gorillas$mesh$n))
+#' ggplot() + gg(gorillas$mesh) + gg(pts)
 
 sample.lgcp = function(mesh, loglambda, strategy = "rectangle", R = 6371, samplers = NULL) {
   
