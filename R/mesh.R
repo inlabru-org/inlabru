@@ -25,7 +25,7 @@ ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = rgb(0,0,0,0.3
   if ( !is.null(col) ) {
     mcol = rgb(0,0,0,0.1)
     loc = data.frame(cbind(grid$x,grid$y))
-    col = inla.spde.make.A(mesh, loc = as.matrix(loc)) %*% as.vector(col)
+    col = INLA::inla.spde.make.A(mesh, loc = as.matrix(loc)) %*% as.vector(col)
     msk = is.inside(mesh,as.matrix(loc))
     # col[msk] = NA
     df = data.frame(grid, col=as.vector(col), alpha = msk)

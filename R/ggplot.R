@@ -224,8 +224,8 @@ gg.col = function(data, color, alpha = 1, ...) {
   if ( refine ) {
     omesh = mesh
     mesh = mesh.refine(mesh, refine = list(max.edge = diff(range(omesh$loc[,1]))/100))
-    color = as.vector(inla.spde.make.A(omesh, loc = mesh$loc) %*% color)
-    if ( !is.null(alpha) ) { alpha = as.vector(inla.spde.make.A(omesh, loc = mesh$loc) %*% alpha) }
+    color = as.vector(INLA::inla.spde.make.A(omesh, loc = mesh$loc) %*% color)
+    if ( !is.null(alpha) ) { alpha = as.vector(INLA::inla.spde.make.A(omesh, loc = mesh$loc) %*% alpha) }
   } 
   
   df = matrix(NA, nrow(mesh$graph$tv)*3, 2)

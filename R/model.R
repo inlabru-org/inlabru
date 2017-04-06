@@ -415,7 +415,7 @@ list.A.model = function(model, points){
       if (ng > 1) {
         group = points[[eff$group.char]]
       } else { group = NULL }
-      A = inla.spde.make.A(eff$mesh, loc = loc, group = group, n.group = ng)
+      A = INLA::inla.spde.make.A(eff$mesh, loc = loc, group = group, n.group = ng)
       # Mask columns of A
       if (!is.null(eff$A.msk)) { A = A[, as.logical(eff$A.msk), drop=FALSE]}
       # Weights for models with A-matrix are realized in the follwoing way:

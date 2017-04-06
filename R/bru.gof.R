@@ -115,7 +115,7 @@ devel.cvmeasure = function(joint, prediction1, prediction2, samplers = NULL) {
     ret$p4s = proj4string(samplers)
     
     wips = ipoints(samplers, list(coordinates = ret))
-    A = inla.spde.make.A(mesh, loc = wips)
+    A = INLA::inla.spde.make.A(mesh, loc = wips)
     
     weights = wips$weight
     weights = weights/sum(weights) 
