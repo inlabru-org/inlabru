@@ -125,3 +125,46 @@ pixels.inla.mesh = function(mesh, nx = 150, ny = 150, mask = TRUE) {
   if ( mask ) { pixels = pixels[is.inside(mesh, coordinates(pixels))] }
   
 }
+
+
+
+# Triangle indices of points given a mesh
+#
+# @aliases triangle
+# @export
+# @param mesh A inla.mesh
+# @param loc Locations using the coordinate system of the mesh 
+# @return tri Triangle indices
+# @examples \\dontrun{}
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+
+triangle = function(mesh,loc){
+  mcross = function(a,b) { return( (a[,1])*(b[2]) - (a[,2])*(b[1]) )}
+  tri = numeric(length=dim(loc)[1])
+  tv = mesh$graph$tv  
+  for (j in 1:nrow(tv)) {
+    v = mesh$loc[tv[j,],c(1,2)]
+    
+    a = v[1,]
+    b = v[2,]
+    c = v[3,]
+    
+    ap =  loc - cbind(rep(a[1],nrow(loc)),rep(a[2],nrow(loc)))
+    bp =  loc - cbind(rep(b[1],nrow(loc)),rep(b[2],nrow(loc)))
+    cp =  loc - cbind(rep(c[1],nrow(loc)),rep(c[2],nrow(loc)))
+    
+    ab = a-b
+    bc = b-c
+    ca = c-a
+    
+    c1 = mcross(ap,ab)
+    c2 = mcross(bp,bc)
+    c3 = mcross(cp,ca)
+    
+    # AP x AB, BP x BC, and CP x CA must have same sign
+    inside = which( ((sign(c1) == -1) & (sign(c2)==-1) & (sign(c3)==-1)) | ((sign(c1) == 1) & (sign(c2)==1) & (sign(c3)==1)))
+    
+    tri[inside] = j
+  }
+  return(tri)
+}
