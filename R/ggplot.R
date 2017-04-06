@@ -530,3 +530,63 @@ plot.prediction = function(..., property = "median") {
       plot.spatial(mesh = ggopts$mesh, col = data[,property], add.mesh = FALSE, property = property, ...)
   }
 }
+
+
+#' @title Multiple ggplots on a page.
+#'
+#' @description
+#' Renders multiple ggplots on a single page. 
+#'
+#' @param ... Comma-separated \code{ggplot} objects.
+#' @param plotlist A list of \code{ggplot} objects - an alternative to the comma-separated argument above.
+#' @param cols Number of columns of plots on the page.
+#' @param layout A matrix specifying the layout. If present, 'cols' is ignored. If the layout is 
+#' something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE), then plot 1 will go in the upper left, 
+#' 2 will go in the upper right, and 3 will go all the way across the bottom.
+#'
+#' @source 
+#' \url{http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/}
+#'  
+#' @examples 
+#' df = data.frame(x=1:10,y=1:10,z=11:20)
+#' pl1 = ggplot(data = df) + geom_line(mapping = aes(x,y), color = "red")
+#' pl2 = ggplot(data = df) + geom_line(mapping = aes(x,z), color = "blue")
+#' multiplot(pl1,pl2, cols = 2)
+#' 
+#' @export
+#
+multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}

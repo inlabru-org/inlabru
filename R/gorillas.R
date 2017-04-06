@@ -54,22 +54,16 @@
 #' 26 (6), 793-811.
 #' 
 #' @examples
-#'  data(gorillas) # get the data
-#'  # extract all the objects, for convenience:
-#'  nests = gorillas$nests
-#'  mesh = gorillas$mesh
-#'  boundary = gorillas$boundary
-#'  gcov = gorillas$gcov
-#'  gnestsamples = gorillas$plotsample
-#'  
-#'  # plot all the nests, mesh and boundary
-#'  ggplot() + gg(mesh,lwd=0.1) + gg(boundary) + gg(gnests, pch="+",cex=2)
-#'  
-#'  # Plot the elevation covariate
-#'  plot(gcov$elevation) 
-#'  
-#'  # Plot the plot sample
-#'  ggplot() + gg(gnestsamples$nests) + gg(gnestsamples$plots)
-#'  
+#' data(gorillas) # get the data
+#' # extract all the objects, for convenience:
+#'
+#' # plot all the nests, mesh and boundary
+#' ggplot() + gg(gorillas$mesh) + gg(gorillas$boundary) + gg(gorillas$nests)
+#'
+#' # Plot the elevation covariate
+#' plot(gorillas$gcov$elevation)
+#'
+#' # Plot the plot sample
+#' ggplot() + gg(gorillas$plotsample$plots) + gg(gorillas$plotsample$nests)
 
 NULL
