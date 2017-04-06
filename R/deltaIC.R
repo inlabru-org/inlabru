@@ -13,7 +13,7 @@
 deltaIC = function(...,criterion="DIC"){
   if(criterion != "DIC" & criterion != "WAIC") {
     warning("Invalid criterion argument: using DIC")
-    criterion = DIC
+    criterion = "DIC"
   }
   names <- as.character(substitute(list(...)))[-1L]
   model = eval(list(...))
