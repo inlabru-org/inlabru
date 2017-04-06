@@ -214,54 +214,6 @@ bru.options = function(...) {
   list(...)
 }
 
-# Multi-likelihood models
-# 
-# @details 
-# This function realizes model fitting using multiple likelihoods. Single likelihood can
-# be constructed by running the \link{bru} command using the parameter \code{run=FALSE}. 
-# The resulting object can be one of many passed on to \code{multibru} via the
-# \code{brus} parameter.
-#
-# @aliases multibru
-# @export
-# @param bru A list of \code{bru} objects (each obtained by a call of \link{bru}) 
-# @param model a formula describing the model components
-# @param ... further arguments passed on to iinla
-# @return An \link{inla} object
-
-multibru = function(brus, model = NULL, ...) {
-  
-  # Default model: take it from first bru
-  if ( is.null(model) ) { 
-    model = brus[[1]]$sppa$model
-  } else {
-    model = make.model(model)
-  }
-  
-  # Create joint stackmaker
-  stk = function(xx, mdl) { 
-    do.call(inla.stack.mjoin, lapply(brus, function(br) {br$sppa$stack(br$sppa$points, br$sppa$model)}))
-  }
-  
-  #' Family
-  family = as.character(lapply(brus, function(br) br$sppa$family))
-  
-  #' Run INLA
-  result = iinla(NULL, model = model, stackmaker = stk, family = family, ...)
-  
-  # Create result object
-  result$sppa$expr = lapply(brus, function(br) br$sppa$model$expr)
-  result$sppa$method = "multibru"
-  result$sppa$model = model
-  result$sppa$points = brus[[1]]$sppa$points
-  result$sppa$stack = stk
-  result$sppa$family = family
-  
-  class(result) = c("bru", class(result))
-  return(result)
-}
-
-
 
 #' Log Gaussian Cox process (LGCP) inference using INLA
 #' 
