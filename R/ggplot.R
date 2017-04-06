@@ -75,6 +75,7 @@ gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 #' @aliases gg.point
 #' @name gg.point
 #' @export
+#' @import ggplot2
 #' @param data A Spatial* object
 #' @return geom_point
 #' 
@@ -99,6 +100,7 @@ gg.point = function(data, crs = NULL,
 #' @aliases gg.segment
 #' @name gg.segment
 #' @export
+#' @import ggplot2
 #' @param data A Spatial* objectt
 #' @return geom_segment
 #' 
@@ -125,6 +127,7 @@ gg.segment = function(data, crs = NULL,  color = "black", ...) {
 #' @aliases gg.polygon
 #' @name gg.polygon
 #' @export
+#' @import ggplot2
 #' @param data A SpatialPolygon* object
 #' @return geom_polygon
 #' 
@@ -138,6 +141,7 @@ gg.polygon = function(data, crs = NULL, colour = "black", alpha = 0.1, ...) {
 #' @aliases gg.mesh
 #' @name gg.mesh
 #' @export
+#' @import ggplot2
 #' @param mesh A inla.mesh or inla.mesh.1d object
 #' @param color Color of the mesh
 #' @return A ggplot2 object
@@ -172,6 +176,7 @@ gg.mesh = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
 #' @aliases SpatialGridDataFrame
 #' @name SpatialGridDataFrame
 #' @export
+#' @import ggplot2
 #' @param sgdf A SpatialGridDataFrame object
 #' @return A ggplot2 object
 #' 
@@ -186,6 +191,7 @@ gg.SpatialGridDataFrame = function(sgdf, fill = names(sgdf)[[1]], ...) {
 #' @aliases gg.RasterLayer
 #' @name gg.RasterLayer
 #' @export
+#' @import ggplot2
 #' @param r A RasterLayer object
 #' @return A ggplot2 object
 #' 
@@ -206,6 +212,7 @@ gg.RasterLayer = function(r) {
 #' @aliases gg.col
 #' @name gg.col
 #' @export
+#' @import ggplot2
 #' @param data A \link{dsdata} object or a \link{inla.mesh}
 #' @param color on mesh vertices
 #' @param alpha on mesh vertices
@@ -259,6 +266,7 @@ gg.col = function(data, color, alpha = 1, ...) {
 #' @aliases gg.bnd
 #' @name gg.bnd
 #' @export
+#' @import ggplot2
 #' @param data A \link{dsdata} object or a \link{inla.mesh}
 #' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}.
 #' @param ... Arguments passed on to \link{geom_segment}
@@ -290,6 +298,7 @@ gg.bnd = function(data, mapping = NULL, ...) {
 #' @aliases gg.int
 #' @name gg.int
 #' @export
+#' @import ggplot2
 #' @param data A \link{dsdata} object or a \link{inla.mesh}
 #' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}.
 #' @param ... Arguments passed on to \link{geom_segment}
@@ -320,6 +329,7 @@ gg.int = function(data, mapping = NULL, ...) {
 #'
 #' @aliases plot gg.seg
 #' @export
+#' @import ggplot2
 #' @param data a \link{dsdata} object
 #' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}.
 #' @param ... Arguments passed on to \link{geom_segment}
@@ -347,6 +357,7 @@ gg.seg = function(data, mapping = NULL, ...) {
 #' 
 #' @aliases gg.det
 #' @export
+#' @import ggplot2
 #' @param data a \link{dsdata} object
 #' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}.
 #' @param ... Arguments passed on to \link{geom_point}
@@ -374,6 +385,7 @@ gg.det = function(data, mapping = NULL, ...) {
 #' 
 #' @aliases gg.swath
 #' @export
+#' @import ggplot2
 #' @param data a \link{dsdata} object
 #' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}
 #' @param width The width of the swath
