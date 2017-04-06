@@ -2,14 +2,14 @@
 % Please edit documentation in R/ggplot.R
 \name{gg}
 \alias{gg}
-\title{ggplot2 geom for spatial objects}
+\title{ggplot2 geomes for spatial data}
 \usage{
-gg(data, ...)
+gg(...)
 }
 \arguments{
-\item{data}{A Spatial* object or a mesh}
+\item{data}{A Spatial*, an inla.mesh or a RasterLayer}
 }
 \description{
-ggplot2 geom for spatial objects
+ggplot2 geomes for spatial data
 }
 

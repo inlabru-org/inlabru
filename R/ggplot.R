@@ -25,25 +25,17 @@ gg.map = function(data, ...) {
 
 
 
-#' ggplot2 geom for spatial objects
+#' ggplot2 geomes for spatial data
 #' 
 #' 
 #' @aliases gg
 #' @name gg
 #' @export
-#' @param data A Spatial* object or a mesh
+#' @param data A Spatial*, an inla.mesh or a RasterLayer
 #' 
-gg = function(data, ...) {
-  if (inherits(data, "SpatialPixelsDataFrame")) gg.SpatialGridDataFrame(data, ...)
-  else if (inherits(data, "SpatialPoints") | inherits(data, "SpatialPointsDataFrame")) gg.point(data, ...)
-  else if (inherits(data, "SpatialLines") | inherits(data, "SpatialLinesDataFrame")) gg.segment(data, ...)
-  else if (inherits(data, "SpatialPolygons") | inherits(data, "SpatialPolygonsDataFrame")) gg.polygon(data, ...)
-  else if (inherits(data, "inla.mesh") || inherits(data, "inla.mesh.1d")) gg.mesh(data, ...)
-  else if (inherits(data, "RasterLayer")) gg.RasterLayer(data, ...)
-  else if (inherits(data, "SpatialGridDataFrame")) gg.SpatialGridDataFrame(data, ...)
-  else if ("ggp" %in% names(attributes(data))) attributes(data)$ggp
-  else {stop("Unknown data format.")}
-}
+
+gg = function(...){UseMethod("gg")}
+
 
 #' ggmap geom for spatial objects
 #' 
@@ -58,41 +50,43 @@ gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 
 
 
-#' Point geom for Spatial* objects
+#' Point geom for SpatialPoints objects
 #' 
-#' @aliases gg.point
-#' @name gg.point
+#' @aliases gg.SpatialPoints
+#' @name gg.SpatialPoints
 #' @export
 #' @import ggplot2
-#' @param data A Spatial* object
+#' @param data A SpatialPoints object
+#' 
 #' @return geom_point
 #' 
-gg.point = function(data, crs = NULL, 
-                    mapping = NULL, 
-                    color = "#08519c", 
-                    alpha = 0.5, ...) { 
+gg.SpatialPoints = function(data, mapping = NULL, crs = NULL, ...) {
+  
   if ( !is.null(crs) ) { data = spTransform(data, crs) }
+  
   df = data.frame(data)
-  if (is.null(mapping)) { 
-    mapping = aes_string(x = coordnames(data)[1], y = coordnames(data)[2])
-    gp = geom_point(data = df, mapping = mapping, color = color, alpha = alpha,...)
-  } else {
-    gp = geom_point(data = df, mapping = mapping, ...)
-  }
-
-  return(gp)
+  
+  dmap = aes_string(x = coordnames(data)[1], 
+                    y = coordnames(data)[2])
+  
+  # dmap = modifyList(dmap, aes(color = "#08519c")) # , alpha = 0.6))
+  
+  if ( !is.null(mapping) ) {dmap = modifyList(dmap, mapping)}
+  
+  geom_point(data = df, mapping = dmap, ...)
 }
 
-#' Segment geom for Spatial* objects
+#' Segment geom for SpatialLines objects
 #' 
-#' @aliases gg.segment
-#' @name gg.segment
+#' @aliases gg.SpatialLines
+#' @name gg.SpatialLines
 #' @export
 #' @import ggplot2
-#' @param data A Spatial* objectt
+#' @param data A SpatialLines object
 #' @return geom_segment
 #' 
-gg.segment = function(data, crs = NULL,  color = "black", ...) {
+gg.SpatialLines = function(data, mapping = NULL, crs = NULL, ...) {
+  
   if ( !is.null(crs) ) { data = spTransform(data, crs) }
   
   qq = coordinates(data)
@@ -102,32 +96,75 @@ gg.segment = function(data, crs = NULL,  color = "black", ...) {
   ep = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)),]))))
   colnames(sp) = paste0("start.", cnames)
   colnames(ep) = paste0("end.", cnames)
-  df = data.frame(cbind(sp, ep))
-  geom_segment(data = df, aes_string(x = paste0("start.", cnames)[1], 
-                                     y = paste0("start.", cnames)[2], 
-                                     xend = paste0("end.", cnames)[1], 
-                                     yend = paste0("end.", cnames)[2]),
-               color = color, ...)  
+  df = data.frame(cbind(sp, ep), data@data)
+  
+  dmap = aes_string(x = paste0("start.", cnames)[1], 
+                    y = paste0("start.", cnames)[2], 
+                    xend = paste0("end.", cnames)[1], 
+                    yend = paste0("end.", cnames)[2])
+  
+  if ( !is.null(mapping) ) {dmap = modifyList(dmap, mapping)}
+  
+  geom_segment(data = df, mapping = dmap, ...)  
 } 
 
-#' Polygon geom for Spatial* objects
+#' Polygon geom for SpatialPolygons objects
 #' 
-#' @aliases gg.polygon
-#' @name gg.polygon
+#' @aliases gg.SpatialPolygons
+#' @name gg.SpatialPolygons
 #' @export
 #' @import ggplot2
-#' @param data A SpatialPolygon* object
+#' @param data A SpatialPolygons object
 #' @return geom_polygon
 #' 
-gg.polygon = function(data, crs = NULL, colour = "black", alpha = 0.1, ...) {
+gg.SpatialPolygons = function(data, mapping = NULL, crs = NULL, alpha = NULL, color = color, ...) {
+  
   if ( !is.null(crs) ) { data = spTransform(data, crs) }
-  geom_polygon(data= fortify(data), aes(x=long,y=lat,group=group), colour = colour, alpha = alpha, ...)
-} 
+  df = fortify(data)
+  dmap = aes_string(x = "long", y = "lat", group = "group")
+  if ( !is.null(mapping) ) { dmap = modifyList(dmap, mapping) }
+  if (!("alpha" %in% names(dmap)) & is.null(alpha)) { alpha = 0.1 }
+  if (!("color" %in% names(dmap)) & is.null(color)) { color = "black" }
+
+  geom_polygon(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+}
+
+#' Plot SpatialGrid using ggplot2
+#' 
+#' @aliases gg.SpatialGrid
+#' @name gg.SpatialGrid
+#' @export
+#' @import ggplot2
+#' @param sgdf A SpatialGrid object
+#' @return A ggplot2 object
+#' 
+
+gg.SpatialGrid = function(sgdf, fill = names(sgdf)[[1]], ...) {
+  df <- as.data.frame(sgdf)
+  geom_tile(data = df, mapping = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill))
+}
+
+#' Plot SpatialPixels using ggplot2
+#' 
+#' @aliases gg.SpatialPixels
+#' @name gg.SpatialPixels
+#' @export
+#' @import ggplot2
+#' @param sgdf A SpatialPixels object
+#' @return A ggplot2 object
+#' 
+
+gg.SpatialPixels = function(sgdf, fill = names(sgdf)[[1]], ...) {
+  df <- as.data.frame(sgdf)
+  geom_tile(data = df, mapping = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill))
+}
+
+
 
 #' Plot inla.mesh using ggplot2
 #' 
-#' @aliases gg.mesh
-#' @name gg.mesh
+#' @aliases gg.inla.mesh
+#' @name gg.inla.mesh
 #' @export
 #' @import ggplot2
 #' @param mesh A inla.mesh or inla.mesh.1d object
@@ -135,44 +172,40 @@ gg.polygon = function(data, crs = NULL, colour = "black", alpha = 0.1, ...) {
 #' @return A ggplot2 object
 #' 
 
-gg.mesh = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
+gg.inla.mesh = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
 
-  if ( inherits(mesh, "inla.mesh") ) {
-    if ( mesh$manifold == "S2" ) { stop("Geom not implemented for spherical meshes (manifold = S2)" ) }
-    if ( !is.null(crs) ) { mesh = inla.spTransform(mesh, CRSobj = crs)}
-    
-    df = rbind(data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]),
-               data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-               data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]))
-    colnames(df) = c("x","y","xend","yend")
-    gg = geom_segment(data = df, aes(x = x,y = y, xend = xend, yend = yend), color = color, ...)
+  if ( mesh$manifold == "S2" ) { stop("Geom not implemented for spherical meshes (manifold = S2)" ) }
+  if ( !is.null(crs) ) { mesh = inla.spTransform(mesh, CRSobj = crs)}
   
-  } else if ( inherits(mesh, "inla.mesh.1d") ) {
-    df = data.frame(x = mesh$loc, y = 0)
-    gg = geom_point(data = df, mapping = aes(x,y), shape = shape, ...)
-    
-  } else {
-    stop(sprintf("Can't deal with mesh of class %s", class(mesh)))
-  }
+  df = rbind(data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]),
+             data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
+             data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]))
   
+  colnames(df) = c("x","y","xend","yend")
   
-  return(gg)
+  geom_segment(data = df, aes(x = x,y = y, xend = xend, yend = yend), color = color, ...)
 }
 
-#' Plot SpatialGridDataFrame using ggplot2
+
+#' Plot inla.mesh using ggplot2
 #' 
-#' @aliases gg.SpatialGridDataFrame
-#' @name gg.SpatialGridDataFrame
+#' @aliases gg.inla.mesh.1d
+#' @name gg.inla.mesh.1d
 #' @export
 #' @import ggplot2
-#' @param sgdf A SpatialGridDataFrame object
+#' @param mesh An inla.mesh.1d object
+#' @param color Color of the mesh
 #' @return A ggplot2 object
 #' 
 
-gg.SpatialGridDataFrame = function(sgdf, fill = names(sgdf)[[1]], ...) {
-  df <- as.data.frame(sgdf)
-  geom_tile(data = df, mapping = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill))
+gg.inla.mesh.1d = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
+  
+    df = data.frame(x = mesh$loc, y = 0)
+    geom_point(data = df, mapping = aes(x,y), shape = shape, ...)
+
 }
+
+
 
 #' Plot RasterLayer using ggplot2
 #' 
