@@ -122,10 +122,12 @@ gg.SpatialLines = function(data, mapping = NULL, crs = NULL, ...) {
 #' @param data A SpatialPolygons object
 #' @param mapping Set of aesthetic mappings created by \link{aes} or \link{aes_}
 #' @param crs A \link{CRS} object defining the coordinate system to project the data to before plotting
+#' @param color Filling color for the polygons
+#' @param alpha Alpha level for polygon filling
 #' @param ... Arguments passed on to \link{geom_polygon}
 #' @return geom_polygon
 #' 
-gg.SpatialPolygons = function(data, mapping = NULL, crs = NULL, alpha = NULL, color = color, ...) {
+gg.SpatialPolygons = function(data, mapping = NULL, crs = NULL, color = "black", alpha = NULL, ...) {
   
   if ( !is.null(crs) ) { data = spTransform(data, crs) }
   df = fortify(data)
