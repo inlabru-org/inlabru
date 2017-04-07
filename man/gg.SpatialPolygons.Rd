@@ -9,6 +9,12 @@
 }
 \arguments{
 \item{data}{A SpatialPolygons object}
+
+\item{mapping}{Set of aesthetic mappings created by \link{aes} or \link{aes_}}
+
+\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting}
+
+\item{...}{Arguments passed on to \link{geom_polygon}}
 }
 \value{
 geom_polygon

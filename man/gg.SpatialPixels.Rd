@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{sgdf}{A SpatialPixels object}
+
+\item{...}{Arguments passed on to \link{geom_tile}}
 }
 \value{
 A ggplot2 object

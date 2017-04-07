@@ -4,16 +4,31 @@
 \alias{gg.inla.mesh}
 \title{Plot inla.mesh using ggplot2}
 \usage{
-\method{gg}{inla.mesh}(mesh, crs = NULL, color = rgb(0, 0, 0, 0.1),
-  shape = 4, ...)
+\method{gg}{inla.mesh}(mesh, color = NULL, alpha = 1, edge.color = "grey",
+  interior = TRUE, int.color = "blue", exterior = TRUE,
+  ext.color = "black", crs = NULL)
 }
 \arguments{
-\item{mesh}{A inla.mesh or inla.mesh.1d object}
+\item{mesh}{An \link{inla.mesh} object}
 
-\item{color}{Color of the mesh}
+\item{color}{A vector of scalar values to fill the mesh with colors. The length of the vector mus correspond to the number of mesh vertices.}
+
+\item{alpha}{A vector of scalar values setting the alpha value of the colors provided}
+
+\item{edge.color}{Color of the mesh edges}
+
+\item{interior}{If TRUE, plot the interior boundaries of the mesh}
+
+\item{int.color}{Color used to plot the interior boundaries}
+
+\item{exterior}{If TRUE, plot the exterior boundaries of the mesh}
+
+\item{ext.color}{Color used to plot the interior boundaries}
+
+\item{crs}{A \link{CRS} object defining the coordinate system to project the mesh to before plotting}
 }
 \value{
-A ggplot2 object
+geom_polygon or geom_segment
 }
 \description{
 Plot inla.mesh using ggplot2

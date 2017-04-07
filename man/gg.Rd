@@ -6,9 +6,6 @@
 \usage{
 gg(...)
 }
-\arguments{
-\item{data}{A Spatial*, an inla.mesh or a RasterLayer}
-}
 \description{
 ggplot2 geomes for spatial data
 }

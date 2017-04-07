@@ -4,7 +4,7 @@
 \alias{predict.lgcp}
 \title{Predictions based on log Gaussian Cox processes}
 \usage{
-predict.lgcp(result, predictor, points = NULL, integrate = NULL,
+\method{predict}{lgcp}(result, predictor, points = NULL, integrate = NULL,
   samplers = NULL, property = "sample", n = 250, dens = NULL,
   discrete = FALSE, mcerr = 0.01, verbose = FALSE)
 }

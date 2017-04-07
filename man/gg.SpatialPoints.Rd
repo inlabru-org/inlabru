@@ -8,6 +8,12 @@
 }
 \arguments{
 \item{data}{A SpatialPoints object}
+
+\item{mapping}{Set of aesthetic mappings created by \link{aes} or \link{aes_}}
+
+\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting}
+
+\item{...}{Arguments passed on to \link{geom_point}}
 }
 \value{
 geom_point

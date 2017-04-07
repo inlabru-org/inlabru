@@ -1,12 +1,13 @@
-#' Plot a gg-map covering the area a spatial object resides in
+#' Plot a map using extend of a spatial object
 #' 
-#' @aliases gg.map
-#' @name gg.map
+#' @aliases gmap
+#' @name gmap
 #' @export
 #' @param data A Spatial* object
+#' @param ... Arguments passed on to get_map
 #' @return A ggmap
 #' 
-gg.map = function(data, ...) {
+gmap = function(data, ...) {
   data = spTransform(data, CRS("+proj=longlat"))
   df = cbind(coordinates(data), data@data)
   
@@ -17,13 +18,12 @@ gg.map = function(data, ...) {
   latlim = (extend*(crange[,2] - mean(crange[,2]))) + mean(crange[,2])
   
   # Create map
-  myMap = get_map(c(lonlim[1], latlim[1], lonlim[2], latlim[2]), ...)
+  requireNamespace("ggmap")
+  myMap = ggmap::get_map(c(lonlim[1], latlim[1], lonlim[2], latlim[2]), ...)
   
   # Return map
   ggmap(myMap)
 }
-
-
 
 #' ggplot2 geomes for spatial data
 #' 
@@ -31,7 +31,6 @@ gg.map = function(data, ...) {
 #' @aliases gg
 #' @name gg
 #' @export
-#' @param data A Spatial*, an inla.mesh or a RasterLayer
 #' 
 
 gg = function(...){UseMethod("gg")}
@@ -45,6 +44,7 @@ gg = function(...){UseMethod("gg")}
 #' @name gm
 #' @export
 #' @param data A Spatial* object or a mesh
+#' @param ... Arguments passed on to \link{gg}
 #' 
 gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 
@@ -57,7 +57,9 @@ gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 #' @export
 #' @import ggplot2
 #' @param data A SpatialPoints object
-#' 
+#' @param mapping Set of aesthetic mappings created by \link{aes} or \link{aes_}
+#' @param crs A \link{CRS} object defining the coordinate system to project the data to before plotting
+#' @param ... Arguments passed on to \link{geom_point}
 #' @return geom_point
 #' 
 gg.SpatialPoints = function(data, mapping = NULL, crs = NULL, ...) {
@@ -83,6 +85,9 @@ gg.SpatialPoints = function(data, mapping = NULL, crs = NULL, ...) {
 #' @export
 #' @import ggplot2
 #' @param data A SpatialLines object
+#' @param mapping Set of aesthetic mappings created by \link{aes} or \link{aes_}
+#' @param crs A \link{CRS} object defining the coordinate system to project the data to before plotting
+#' @param ... Arguments passed on to \link{geom_segment}
 #' @return geom_segment
 #' 
 gg.SpatialLines = function(data, mapping = NULL, crs = NULL, ...) {
@@ -115,6 +120,9 @@ gg.SpatialLines = function(data, mapping = NULL, crs = NULL, ...) {
 #' @export
 #' @import ggplot2
 #' @param data A SpatialPolygons object
+#' @param mapping Set of aesthetic mappings created by \link{aes} or \link{aes_}
+#' @param crs A \link{CRS} object defining the coordinate system to project the data to before plotting
+#' @param ... Arguments passed on to \link{geom_polygon}
 #' @return geom_polygon
 #' 
 gg.SpatialPolygons = function(data, mapping = NULL, crs = NULL, alpha = NULL, color = color, ...) {
@@ -136,12 +144,13 @@ gg.SpatialPolygons = function(data, mapping = NULL, crs = NULL, alpha = NULL, co
 #' @export
 #' @import ggplot2
 #' @param sgdf A SpatialGrid object
+#' @param ... Arguments passed on to \link{geom_tile}
 #' @return A ggplot2 object
 #' 
 
 gg.SpatialGrid = function(sgdf, fill = names(sgdf)[[1]], ...) {
   df <- as.data.frame(sgdf)
-  geom_tile(data = df, mapping = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill))
+  geom_tile(data = df, mapping = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill), ...)
 }
 
 #' Plot SpatialPixels using ggplot2
@@ -151,6 +160,7 @@ gg.SpatialGrid = function(sgdf, fill = names(sgdf)[[1]], ...) {
 #' @export
 #' @import ggplot2
 #' @param sgdf A SpatialPixels object
+#' @param ... Arguments passed on to \link{geom_tile}
 #' @return A ggplot2 object
 #' 
 
@@ -167,82 +177,27 @@ gg.SpatialPixels = function(sgdf, fill = names(sgdf)[[1]], ...) {
 #' @name gg.inla.mesh
 #' @export
 #' @import ggplot2
-#' @param mesh A inla.mesh or inla.mesh.1d object
-#' @param color Color of the mesh
-#' @return A ggplot2 object
+#' @param mesh An \link{inla.mesh} object
+#' @param color A vector of scalar values to fill the mesh with colors. The length of the vector mus correspond to the number of mesh vertices.
+#' @param alpha A vector of scalar values setting the alpha value of the colors provided
+#' @param edge.color Color of the mesh edges
+#' @param interior If TRUE, plot the interior boundaries of the mesh
+#' @param int.color Color used to plot the interior boundaries
+#' @param exterior If TRUE, plot the exterior boundaries of the mesh
+#' @param ext.color Color used to plot the interior boundaries
+#' @param crs A \link{CRS} object defining the coordinate system to project the mesh to before plotting
+#' @return geom_polygon or geom_segment
 #' 
 
-gg.inla.mesh = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
+gg.inla.mesh = function(mesh, 
+                        color = NULL, alpha = 1,
+                        edge.color = "grey",
+                        interior = TRUE, int.color = "blue", 
+                        exterior = TRUE, ext.color = "black",
+                        crs = NULL) {
 
-  if ( mesh$manifold == "S2" ) { stop("Geom not implemented for spherical meshes (manifold = S2)" ) }
-  if ( !is.null(crs) ) { mesh = inla.spTransform(mesh, CRSobj = crs)}
   
-  df = rbind(data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]),
-             data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-             data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]))
-  
-  colnames(df) = c("x","y","xend","yend")
-  
-  geom_segment(data = df, aes(x = x,y = y, xend = xend, yend = yend), color = color, ...)
-}
-
-
-#' Plot inla.mesh using ggplot2
-#' 
-#' @aliases gg.inla.mesh.1d
-#' @name gg.inla.mesh.1d
-#' @export
-#' @import ggplot2
-#' @param mesh An inla.mesh.1d object
-#' @param color Color of the mesh
-#' @return A ggplot2 object
-#' 
-
-gg.inla.mesh.1d = function(mesh, crs = NULL, color = rgb(0,0,0,0.1), shape = 4, ...) {
-  
-    df = data.frame(x = mesh$loc, y = 0)
-    geom_point(data = df, mapping = aes(x,y), shape = shape, ...)
-
-}
-
-
-
-#' Plot RasterLayer using ggplot2
-#' 
-#' @aliases gg.RasterLayer
-#' @name gg.RasterLayer
-#' @export
-#' @import ggplot2
-#' @param r A RasterLayer object
-#' @return A ggplot2 object
-#' 
-
-gg.RasterLayer = function(r) {
-  
-  library(raster)
-  spdf <- as(r, "SpatialPixelsDataFrame")
-  df <- as.data.frame(spdf)
-  # head(r.df)
-  # g <- ggplot(r.df, aes(x=x, y=y)) + geom_tile(aes(fill = layer)) + coord_equal()
-  geom_tile(data = df, mapping = aes(x=x, y=y, fill = layer))
-}
-
-
-#' Plot inla.mesh using ggplot2
-#' 
-#' @aliases gg.col
-#' @name gg.col
-#' @export
-#' @import ggplot2
-#' @param data A \link{dsdata} object or a \link{inla.mesh}
-#' @param color on mesh vertices
-#' @param alpha on mesh vertices
-#' @return A ggplot2 object
-#' 
-
-gg.col = function(data, color, alpha = 1, ...) {
-
-  if ( class(data)[1] == "inla.mesh" ) { mesh = data } else { mesh = data$mesh }
+if ( !is.null(color) ) {
   if ( length(alpha) == 1 ) { 
     alpha = rep(alpha,length(color))
     alph.fix = TRUE}
@@ -268,83 +223,96 @@ gg.col = function(data, color, alpha = 1, ...) {
   df$alph = as.vector(matrix(ialpha, 3, nrow(mesh$graph$tv),byrow=TRUE))
   
   aest = aes_string(x = "x", 
-             y = "y",
-             group = "tr", 
-             fill = "col",
-             alpha = df$alph)
+                    y = "y",
+                    group = "tr", 
+                    fill = "col",
+                    alpha = df$alph)
   if (alph.fix) { 
     gg = geom_polygon(data = df, aest, linetype = "blank", show.legend = FALSE, alpha = alpha[1])
   } else {
     gg = geom_polygon(data = df, aest, linetype = "blank", show.legend = FALSE)
   }
+  return(gg)
   
-  return(gg)
+} else {
+  if ( mesh$manifold == "S2" ) { stop("Geom not implemented for spherical meshes (manifold = S2)" ) }
+  if ( !is.null(crs) ) { mesh = inla.spTransform(mesh, CRSobj = crs)}
+  
+  df = rbind(data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]),
+             data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
+             data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]))
+  
+  colnames(df) = c("x","y","xend","yend")
+  mp = aes(x = x,y = y, xend = xend, yend = yend)
+  
+  msh = geom_segment(data = df, mapping = mp, color = edge.color)
+  
+  # Outer boundary
+  if ( exterior ) {
+    df = data.frame(mesh$loc[mesh$segm$bnd$idx[,1],1:2], mesh$loc[mesh$segm$bnd$idx[,2],1:2])
+    colnames(df) = c("x","y","xend","yend")
+    bnd = geom_segment(data = df, mapping = mp, color = ext.color)
+  } else { bnd = NULL }
+  
+  if ( interior ) {
+    # Interior boundary
+    df = data.frame(mesh$loc[mesh$segm$int$idx[,1],1:2], mesh$loc[mesh$segm$int$idx[,2],1:2])
+    colnames(df) = c("x","y","xend","yend")
+    if ( nrow(df) == 0 ) { int = NULL } else {
+      int = geom_segment(data = df, mapping = mp, color = int.color)
+    }
+  } else { int = NULL }
+  
+  # Return combined geomes
+  c(msh, bnd, int)
+} 
+  
+  
 }
 
 
-#' Plot exterior boundary of a mesh
-#'
-#' @aliases gg.bnd
-#' @name gg.bnd
+#' Plot inla.mesh.1d using ggplot2
+#' 
+#' @aliases gg.inla.mesh.1d
+#' @name gg.inla.mesh.1d
 #' @export
 #' @import ggplot2
-#' @param data A \link{dsdata} object or a \link{inla.mesh}
-#' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}.
-#' @param ... Arguments passed on to \link{geom_segment}
-#' @return A ggplot2 object
+#' @param mesh An inla.mesh.1d object
+#' @param y Single numeric defining the y-coordinates of the mesh knots to plot
+#' @param shape Shape of the knot markers
+#' @param ... parameters passed on to \link{geom_point}
+#' @return geom_point
 #' 
 
-gg.bnd = function(data, mapping = NULL, ...) {
-  if ( class(data)[1] == "inla.mesh" ) { mesh = data } else { mesh = data$mesh }
-  # Make data frame
-  df = data.frame(mesh$loc[mesh$segm$bnd$idx[,1],1:2], mesh$loc[mesh$segm$bnd$idx[,2],1:2])
-  colnames(df) = c("x","y","xend","yend")
-  # Make aesthetics
-  mp = aes(x = x,y = y, xend = xend, yend = yend)
-  # Add user aesthetics
-  if ( !is.null(mapping) ) { mp = modifyList(mp, mapping) }
-  # If user did not provide color, set color to red
-  more.args = list(...)
-  nms = c(names(mapping), names(more.args))
-  if ( !("color" %in% nms | "colour" %in% nms | "col" %in% nms) )  { more.args$color = rgb(1,0,0,0.5) }
-  # Make geom
-  gg = do.call(geom_segment, c(list(data = df, mapping = mp), more.args))
-  return(gg)
+gg.inla.mesh.1d = function(mesh, y = 0, shape = 4, ...) {
+  
+    df = data.frame(x = mesh$loc, y = y)
+    geom_point(data = df, mapping = aes(x,y), shape = shape, ...)
+
 }
 
 
-#' Plot interior boundaries of a mesh
-#'
+
+#' Plot RasterLayer using ggplot2
 #' 
-#' @aliases gg.int
-#' @name gg.int
+#' @aliases gg.RasterLayer
+#' @name gg.RasterLayer
 #' @export
 #' @import ggplot2
-#' @param data A \link{dsdata} object or a \link{inla.mesh}
-#' @param mapping A set of aesthetics mappings created by \link{aes} or \link{aes_}.
-#' @param ... Arguments passed on to \link{geom_segment}
-#' @return A ggplot2 object
+#' @param r A RasterLayer object
+#' @param ... Arguments passed on to \link{geom_tile}
+#' @return geom_tile
 #' 
 
-gg.int = function(data, mapping = NULL, ...) {
-  if ( class(data)[1] == "inla.mesh" ) { mesh = data } else { mesh = data$mesh }
-  # Make data frame
-  df = data.frame(mesh$loc[mesh$segm$int$idx[,1],1:2], mesh$loc[mesh$segm$int$idx[,2],1:2])
-  if ( nrow(df) == 0 ) { return(NULL) }
-  colnames(df) = c("x","y","xend","yend")
-  # Make aesthetics
-  mp = aes(x = x,y = y, xend = xend, yend = yend)
-  # Add user aesthetics
-  if ( !is.null(mapping) ) { mp = modifyList(mp, mapping) }
-  # If user did not provide color, set color to blue
-  more.args = list(...)
-  nms = c(names(mapping), names(more.args))
-  if ( !("color" %in% nms | "colour" %in% nms | "col" %in% nms) )  { more.args$color = rgb(0,0,1,0.5) }
-  # Make geom
-  gg = do.call(geom_segment, c(list(data = df, mapping = mp), more.args))
-  return(gg)
+gg.RasterLayer = function(r) {
+  
+  library(raster)
+  spdf <- as(r, "SpatialPixelsDataFrame")
+  df <- as.data.frame(spdf)
+  # head(r.df)
+  # g <- ggplot(r.df, aes(x=x, y=y)) + geom_tile(aes(fill = layer)) + coord_equal()
+  geom_tile(data = df, mapping = aes(x=x, y=y, fill = layer))
 }
-
 
 
 

@@ -8,6 +8,8 @@ gm(data, ...)
 }
 \arguments{
 \item{data}{A Spatial* object or a mesh}
+
+\item{...}{Arguments passed on to \link{gg}}
 }
 \description{
 Coordinates are transformed to lon/lat for convenient plotting using ggmap

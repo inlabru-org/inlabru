@@ -2,20 +2,23 @@
 % Please edit documentation in R/ggplot.R
 \name{gg.inla.mesh.1d}
 \alias{gg.inla.mesh.1d}
-\title{Plot inla.mesh using ggplot2}
+\title{Plot inla.mesh.1d using ggplot2}
 \usage{
-\method{gg}{inla.mesh.1d}(mesh, crs = NULL, color = rgb(0, 0, 0, 0.1),
-  shape = 4, ...)
+\method{gg}{inla.mesh.1d}(mesh, y = 0, shape = 4, ...)
 }
 \arguments{
 \item{mesh}{An inla.mesh.1d object}
 
-\item{color}{Color of the mesh}
+\item{y}{Single numeric defining the y-coordinates of the mesh knots to plot}
+
+\item{shape}{Shape of the knot markers}
+
+\item{...}{parameters passed on to \link{geom_point}}
 }
 \value{
-A ggplot2 object
+geom_point
 }
 \description{
-Plot inla.mesh using ggplot2
+Plot inla.mesh.1d using ggplot2
 }
 
