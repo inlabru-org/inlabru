@@ -208,7 +208,7 @@ if ( !is.null(color) ) {
   refine = TRUE
   if ( refine ) {
     omesh = mesh
-    mesh = mesh.refine(mesh, refine = list(max.edge = diff(range(omesh$loc[,1]))/100))
+    mesh = refine.inla.mesh(mesh, refine = list(max.edge = diff(range(omesh$loc[,1]))/100))
     color = as.vector(INLA::inla.spde.make.A(omesh, loc = mesh$loc) %*% color)
     if ( !is.null(alpha) ) { alpha = as.vector(INLA::inla.spde.make.A(omesh, loc = mesh$loc) %*% alpha) }
   } 

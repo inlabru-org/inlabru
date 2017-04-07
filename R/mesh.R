@@ -2,6 +2,8 @@
 
 vertices = function(...){UseMethod("vertices")}
 pixels = function(...){UseMethod("pixels")}
+refine = function(...){UseMethod("refine")}
+tsplit = function(...){UseMethod("tsplit")}
 
 # Plot an inla.mesh using ggplot
 #
@@ -167,4 +169,58 @@ triangle = function(mesh,loc){
     tri[inside] = j
   }
   return(tri)
+}
+
+
+
+
+#' Refine an inla.mesh object
+#'
+#'
+#' @aliases refine.inla.mesh
+#' @export
+#' @param mesh an inla.mesh object
+#' @param refine A list of refinement options passed on to \link{inla.mesh.create}
+#' @return mesh A refined inla.mesh object
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#'
+
+refine.inla.mesh = function(mesh, refine = list(max.edge=1)){
+  rmesh = inla.mesh.create(loc=mesh$loc,interior=inla.mesh.interior(mesh),boundary=inla.mesh.boundary(mesh),refine=refine)
+  return(rmesh)
+}
+
+#' Split triangles of a mesh into four triangles
+#'
+#' Warning: does not reconstruct interior boundary
+#' Warning2: Works in euclidean coordinates. Not suitable for sphere.
+#'
+#' @aliases tsplit.inla.mesh
+#' @export
+#' @param mesh an inla.mesh object
+#' @return mesh A refined inla.mesh object
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#'
+
+tsplit.inla.mesh = function(mesh){
+  
+  n = 1
+  
+  p1 = mesh$loc[mesh$graph$tv[,1],]
+  p2 = mesh$loc[mesh$graph$tv[,2],]
+  p3 = mesh$loc[mesh$graph$tv[,3],]
+  
+  m1 = p1 + 0.5*(p2-p1)
+  m2 = p1 + 0.5*(p3-p1)
+  m3 = p2 + 0.5*(p3-p2)
+  all.loc = rbind(mesh$loc,m1,m2,m3)
+  
+  bnd.mid = mesh$loc[mesh$segm$bnd$idx[,1],] + 0.5 * ( mesh$loc[mesh$segm$bnd$idx[,2],] - mesh$loc[mesh$segm$bnd$idx[,1],]  )
+  all.bnd = rbind(mesh$segm$bnd$loc,bnd.mid)
+  
+  
+  mesh2 = inla.mesh.create(loc = all.loc, boundary = all.bnd )
+  
+  if (n == 1) { return(mesh2) }
+  else { return(mesh.split(mesh2,n-1))}
 }

@@ -317,7 +317,7 @@ int.points = function(data,
                   filter.zero.length = TRUE
 ){
   
-  if (mesh.split) { mesh = mesh.split(mesh) }
+  if (mesh.split) { mesh = tsplit.inla.mesh(mesh) }
   
   if (is.data.frame(data)){
     covariates = data
