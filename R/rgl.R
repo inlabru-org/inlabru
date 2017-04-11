@@ -1,77 +1,16 @@
-# Plot linestrips on sphere using rgl
-#
-# @aliases rgl.sphlinestrips
-# @export
-# @examples \\dontrun{}
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-# 
-# 
-rgl.sphlinestrips = function(lat,lon,radius=1,...){
-  R=radius
-  for (k in 1:(length(lat)-1)){
-    x.start = geo.to.euc(data.frame(lat=lat[k],lon=lon[k]),R=1)
-    x.end = geo.to.euc(data.frame(lat=lat[k+1],lon=lon[k+1]),R=1)
-    n.pts = min(10,max(3,round(1000*dist.euc(x.start,x.end)/R)))
-    xseq = t(sapply(seq(0,1,length.out=n.pts),FUN=function(a){t(x.start+a*(x.end-x.start))}))
-    xseq = radius*normalize.euc(xseq)
-    rgl.linestrips(xseq[,1],xseq[,2],xseq[,3],...)
-  }
-}
+#' Plot a globe using rgl
+#' 
+#' @aliases globe
+#' @name globe
+#' @export
 
-# Plot lines on sphere using rgl
-#
-# @aliases rgl.sphlines
-# @export
-# @examples \\dontrun{}
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-# 
-# 
-rgl.sphlines = function(lat,lon,radius=1,smooth=FALSE,...){
-  if (smooth) {
-    for (k in seq(1,(length(lat)-1),by=2)){
-      x.start = geo.to.euc(data.frame(lat=lat[k],lon=lon[k]),R=radius)
-      x.end = geo.to.euc(data.frame(lat=lat[k+1],lon=lon[k+1]),R=radius)
-      n.pts = 2# min(10,max(3,round(1000*dist.euc(x.start,x.end)/R)))
-      xseq = t(sapply(seq(0,1,length.out=n.pts),FUN=function(a){t(x.start+a*(x.end-x.start))}))
-      xseq = radius*normalize.euc(xseq)
-      rgl.linestrips(xseq[,1],xseq[,2],xseq[,3],...)
-    }
-  }
-  else {
-    x = geo.to.euc(data.frame(lat=lat,lon=lon),R=radius)
-    rgl.lines(x[,1],x[,2],x[,3],...)
-  }
-}
-
-# Plot lines on sphere using rgl
-# 
-# This version of \link{rgl.rgl.sphlines2} uses a parametrization by the
-# start end end points of the lines
-#
-# @aliases rgl.sphlines2
-# @export
-# @examples \\dontrun{}
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-# 
-# 
-rgl.sphlines2 = function(start,end,col="black",...){
-  # And here comes the worst way to do this...
-  slat = start[,"lat"]
-  slon = start[,"lon"]
-  elat = end[,"lat"]
-  elon = end[,"lon"]
-  lat = rep(0,2*length(slat))
-  lat[seq(1,length(lat),by=2)] = slat
-  lat[seq(2,length(lat),by=2)] = elat
-  lon = rep(0,2*length(slon))
-  lon[seq(1,length(lon),by=2)] = slon
-  lon[seq(2,length(lon),by=2)] = elon
-  rgl.sphlines(lat,lon,col=as.vector(rbind(col,col)),...)
-}
-
-
-rgl.earth = function(R=1,R.grid=1.05){
-
+globe = function(R = 1, 
+                 R.grid = 1.05,
+                 specular = "black", 
+                 axes = FALSE, 
+                 box = FALSE, 
+                 xlab = "", ylab= "", zlab = ""){
+  
   require(sphereplot)
   
   # coordinates for texture
@@ -84,28 +23,78 @@ rgl.earth = function(R=1,R.grid=1.05){
   
   # globe and texture
   persp3d(x, y, z, col="white", 
-          texture=system.file("misc/Lambert_ocean.png",package="iDistance"), 
-          specular="black", axes=FALSE, box=FALSE, xlab="", ylab="", zlab="",
+          texture=system.file("misc/Lambert_ocean.png",package="inlabru"), 
+          specular = specular, axes = axes, box = box, xlab=xlab, ylab=ylab, zlab=zlab,
           normal_x=x, normal_y=y, normal_z=z)
   
   # spheric grid
   rgl.sphgrid(longtype = "D",add=TRUE,radius=R.grid)
-
+  
 }
 
-# Plot an inla.mesh with geographic coordinates onto a sphere
-# 
-# @aliases rgl.sphmesh
-# @export
-# @examples \\dontrun{}
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-# 
-# 
-rgl.sphmesh = function(mesh, radius = 1, add=NULL, col=NULL,...){
+#' Plot sp objects and and meshes using RGL
+#' 
+#' 
+#' @aliases gl
+#' @name gl
+#' @export
+
+gl = function(...){UseMethod("gl")}
+
+
+
+gl.SpatialPoints = function(data, add = TRUE, color = "red", ...) {
+  
+  if ( length(coordnames(data))<3 ) {
+    ll = data.frame(data)
+    ll$TMP.ZCOORD = 0
+    coordinates(ll) = c(coordnames(data), "TMP.ZCOORD")
+    proj4string(ll) = CRS(proj4string(data))
+    data = ll
+  }
+  
+  data = spTransform(data, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
+  cc = coordinates(data)
+  rgl.points(x=cc[,1], y = cc[,2], z = cc[,3], add = add, color = color, ...)
+  
+}
+
+gl.SpatialLines = function(data, add = TRUE,  ...) {
+  
+  qq = coordinates(data)
+  sp = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x)-1),]))))
+  ep = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)),]))))
+  sp = data.frame(x = sp[,1], y = sp[,2], z = 0)
+  ep = data.frame(x = ep[,1], y = ep[,2], z = 0)
+  
+  coordinates(sp) = c("x","y","z")
+  coordinates(ep) = c("x","y","z")
+  proj4string(sp) = CRS(proj4string(data))
+  proj4string(ep) = CRS(proj4string(data))
+  
+  sp = spTransform(sp, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
+  ep = spTransform(ep, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
+  
+  cs = coordinates(sp)
+  ce = coordinates(ep)
+  na = matrix(NA, ncol = 3, nrow = nrow(cs))
+
+  mm = matrix(t(cbind(cs,ce,na)), ncol = 3, nrow = 3*nrow(ce), byrow=TRUE)
+
+  rgl.linestrips(mm, add = add, ...)
+  
+}
+
+gl.inla.mesh = function(mesh, add = TRUE, col = NULL,...){
   if ( mesh$manifold  == "S2" ) {
-    mesh$loc = radius * normalize.euc(mesh$loc)
+    # mesh$loc = mesh$loc
   } else {
-    mesh$loc = geo.to.euc(data.frame(lat=mesh$loc[,2],lon=mesh$loc[,1]),R=radius)
+    ll = data.frame(mesh$loc)
+    colnames(ll) = c("x","y","z")
+    coordinates(ll) = c("x","y","z")
+    proj4string(ll) = mesh$crs
+    ll = spTransform(ll, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
+    mesh$loc = coordinates(ll)
   }
   if (is.null(col)) { plot(mesh,rgl=TRUE,add=add,...) }
   else{ plot(mesh,rgl=TRUE,add=add,col=col,...) }
