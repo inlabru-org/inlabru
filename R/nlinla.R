@@ -1,5 +1,5 @@
 
-nlinla.taylor = function(expr, epunkt, data) {
+nlinla.taylor = function(expr, epunkt, data, env) {
   if (nrow(epunkt)<=1000) {
     effects = colnames(epunkt)
     df = as.data.frame(data)
@@ -7,6 +7,7 @@ nlinla.taylor = function(expr, epunkt, data) {
     wh = cbind(df, epunkt)
     myenv = new.env()
     invisible(lapply(colnames(wh), function(x) myenv[[x]] = wh[,x]))
+    invisible(lapply(setdiff(names(env), names(myenv)), function(x) myenv[[x]] = env[[x]]))
     tmp = numericDeriv(expr[[1]], effects,  rho = myenv)
     gra = attr(tmp, "gradient")
     nr = nrow(gra)
@@ -18,7 +19,7 @@ nlinla.taylor = function(expr, epunkt, data) {
     return(list(gradient = ngrd, const = nconst))
   } else {
     blk = round(1:nrow(epunkt)/1000)
-    qq = by(1:nrow(epunkt), blk, function(idx) {nlinla.taylor(expr,epunkt[idx,],data[idx,])})
+    qq = by(1:nrow(epunkt), blk, function(idx) {nlinla.taylor(expr,epunkt[idx,],data[idx,], env)})
     nconst = do.call(c, lapply(qq, function(x) { x$const }))
     ngrd = do.call(rbind, lapply(qq, function(x) { x$grad }))
     return(list(gradient = ngrd, const = nconst))
@@ -37,7 +38,7 @@ nlinla.epunkt = function(model, data, result = NULL) {
 
 nlinla.reweight = function(A, model, data, expr, result){
   epkt = nlinla.epunkt(model, data, result = result)
-  ae = nlinla.taylor(expr, epkt, data)
+  ae = nlinla.taylor(expr, epkt, data, environment(model$formula))
   for ( k in 1:length(A) ) {
     nm = names(A)[k]
     if ( !(is.null(nm) || nm == "")){ A[[k]] = A[[k]] * ae$gradient[[nm]] }
