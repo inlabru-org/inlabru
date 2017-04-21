@@ -22,13 +22,15 @@ globe = function(R = 1,
   z <- R*sin(lat)
   
   # globe and texture
-  persp3d(x, y, z, col="white", 
+  requireNamespace("rgl")
+  rgl::persp3d(x, y, z, col="white", 
           texture=system.file("misc/Lambert_ocean.png",package="inlabru"), 
           specular = specular, axes = axes, box = box, xlab=xlab, ylab=ylab, zlab=zlab,
           normal_x=x, normal_y=y, normal_z=z)
   
   # spheric grid
-  rgl.sphgrid(longtype = "D",add=TRUE,radius=R.grid)
+  requireNamespace("sphereplot")
+  sphereplot::rgl.sphgrid(longtype = "D",add=TRUE,radius=R.grid)
   
 }
 
@@ -55,7 +57,8 @@ rgl.SpatialPoints = function(data, add = TRUE, color = "red", ...) {
   
   data = spTransform(data, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
   cc = coordinates(data)
-  rgl.points(x=cc[,1], y = cc[,2], z = cc[,3], add = add, color = color, ...)
+  requireNamespace("rgl")
+  rgl::rgl.points(x=cc[,1], y = cc[,2], z = cc[,3], add = add, color = color, ...)
   
 }
 
@@ -81,7 +84,9 @@ rgl.SpatialLines = function(data, add = TRUE,  ...) {
 
   mm = matrix(t(cbind(cs,ce,na)), ncol = 3, nrow = 3*nrow(ce), byrow=TRUE)
 
-  rgl.linestrips(mm, add = add, ...)
+  requireNamespace("rgl")
+  
+  rgl::rgl.linestrips(mm, add = add, ...)
   
 }
 
@@ -96,6 +101,7 @@ rgl.inla.mesh = function(mesh, add = TRUE, col = NULL,...){
     ll = spTransform(ll, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
     mesh$loc = coordinates(ll)
   }
+  
   if (is.null(col)) { plot(mesh,rgl=TRUE,add=add,...) }
   else{ plot(mesh,rgl=TRUE,add=add,col=col,...) }
 }
