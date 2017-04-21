@@ -357,48 +357,48 @@ summary.lgcp = function(result) {
 #'
 #' @aliases summary.bru
 #' @export
-#' @param result A result object obtained from a bru() run
+#' @param object A result object obtained from a bru() run
 #' 
-summary.bru = function(result) {
+summary.bru = function(object, ...) {
   
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
-  for ( k in 1:length(result$sppa$lhoods) ) {
-    lh = result$sppa$lhoods[[k]]
-    cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(result$sppa$lhoods)[[k]], lh$family, class(lh$data),deparse(lh$formula)))
+  for ( k in 1:length(object$sppa$lhoods) ) {
+    lh = object$sppa$lhoods[[k]]
+    cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(object$sppa$lhoods)[[k]], lh$family, class(lh$data),deparse(lh$formula)))
   }
   
-  #rownames(df) = names(result$sppa$lhoods)
+  #rownames(df) = names(object$sppa$lhoods)
   #print(df)
   
   cat("\n--- Criteria -------------------------------------------------------------------------------------\n\n")
-  cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", result$waic$waic),"\n"))
-  cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", result$dic$dic),"\n"))
+  cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", object$waic$waic),"\n"))
+  cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", object$dic$dic),"\n"))
   
   cat("\n--- Fixed effects -------------------------------------------------------------------------------- \n\n")
   
-  if ( nrow(result$summary.fixed)>0 ) {
-  fe = result$summary.fixed
+  if ( nrow(object$summary.fixed)>0 ) {
+  fe = object$summary.fixed
   fe$kld=NULL
   fe$signif = sign(fe[,"0.025quant"]) == sign(fe[,"0.975quant"])
   print(fe)
   } else { cat("None.\n") }
   
   cat("\n--- Random effects ------------------------------------------------------------------------------- \n\n")
-  for ( nm in names(result$summary.random) ){
-    sm = result$summary.random[[nm]]
+  for ( nm in names(object$summary.random) ){
+    sm = object$summary.random[[nm]]
     cat(paste0(nm,": "))
     cat(paste0("mean = [", signif(range(sm$mean)[1])," : ",signif(range(sm$mean)[2]), "]"))
     cat(paste0(", quantiles = [", signif(range(sm[,c(4,6)])[1])," : ",signif(range(c(4,6))[2]), "]"))
-    if (nm %in% names(result$model$mesh)) {
-      cat(paste0(", area = ", signif(sum(diag(as.matrix(inla.mesh.fem(result$model$mesh[[nm]])$c0))))))
+    if (nm %in% names(object$model$mesh)) {
+      cat(paste0(", area = ", signif(sum(diag(as.matrix(inla.mesh.fem(object$model$mesh[[nm]])$c0))))))
     }
     cat("\n")
   }
-  if ( length(names(result$summary.random)) == 0 ) {cat("None.\n")}
+  if ( length(names(object$summary.random)) == 0 ) {cat("None.\n")}
   
   cat("\n--- All hyper parameters (internal representation) ----------------------------------------------- \n\n")
-  # cat(paste0("  ", paste(rownames(result$summary.hyperpar), collapse = ", "), "\n"))
-  print(result$summary.hyperpar)
+  # cat(paste0("  ", paste(rownames(object$summary.hyperpar), collapse = ", "), "\n"))
+  print(object$summary.hyperpar)
   
   
   marginal.summary = function(m, name) {
@@ -411,10 +411,10 @@ summary.bru = function(result) {
   }
   
   cat("\n")
-  for (nm in names(result$sppa$model$effects)) {
-    eff = result$sppa$model$effects[[nm]]
+  for (nm in names(object$sppa$model$effects)) {
+    eff = object$sppa$model$effects[[nm]]
     if (!is.null(eff$mesh)){
-      hyp = inla.spde.result(result, nm, eff$inla.spde)
+      hyp = inla.spde.result(object, nm, eff$inla.spde)
       cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
       df = rbind(marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"), 
                  marginal.summary(hyp$marginals.log.range.nominal$range.nominal.1, "log.range"), 
