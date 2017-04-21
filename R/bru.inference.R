@@ -585,7 +585,7 @@ generate.bru = function(result,
 #' @param ... ignored arguments (S3 generic compatibility)
 #' @return Predicted values
 
-predict.lgcp = function(result, 
+predict.lgcp = function(object, 
                         predictor, 
                         points = NULL, 
                         integrate = NULL, 

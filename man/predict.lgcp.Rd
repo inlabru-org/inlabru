@@ -4,11 +4,13 @@
 \alias{predict.lgcp}
 \title{Predictions based on log Gaussian Cox processes}
 \usage{
-\method{predict}{lgcp}(result, predictor, points = NULL, integrate = NULL,
+\method{predict}{lgcp}(object, predictor, points = NULL, integrate = NULL,
   samplers = NULL, property = "sample", n = 250, dens = NULL,
   discrete = FALSE, mcerr = 0.01, verbose = FALSE, ...)
 }
 \arguments{
+\item{object}{An lgcp object obtained by calling lgcp()}
+
 \item{predictor}{A formula defining what to predict. The left hand side defines the dimension to predict over. The right hand side ought to be an expression that is evaluated for a given sample of the LGCP.}
 
 \item{points}{Locations at which to predict. If NULL, the integration points of the LGCP are used}
@@ -28,8 +30,6 @@
 \item{mcerr}{Monte Carlo error at which the sampling chain is stopped}
 
 \item{...}{ignored arguments (S3 generic compatibility)}
-
-\item{object}{An lgcp object obtained by calling lgcp()}
 }
 \value{
 Predicted values
