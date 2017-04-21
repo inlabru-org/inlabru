@@ -4,7 +4,8 @@
 \alias{import.gorillas}
 \title{Turn the observation window into spatial polygon
 Build mesh
-Turn covariates int SpatialGridDataFrame}
+Turn covariates int SpatialGridDataFrame
+Hack: change CRS units of the covariates to km}
 \usage{
 import.gorillas()
 }
@@ -12,5 +13,6 @@ import.gorillas()
 Turn the observation window into spatial polygon
 Build mesh
 Turn covariates int SpatialGridDataFrame
+Hack: change CRS units of the covariates to km
 }
 

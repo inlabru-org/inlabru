@@ -35,15 +35,15 @@ globe = function(R = 1,
 #' Plot sp objects and and meshes using RGL
 #' 
 #' 
-#' @aliases gl
-#' @name gl
+#' @aliases rgl
+#' @name rgl
 #' @export
 
-gl = function(...){UseMethod("gl")}
+rgl = function(...){UseMethod("rgl")}
 
 
 
-gl.SpatialPoints = function(data, add = TRUE, color = "red", ...) {
+rgl.SpatialPoints = function(data, add = TRUE, color = "red", ...) {
   
   if ( length(coordnames(data))<3 ) {
     ll = data.frame(data)
@@ -59,7 +59,7 @@ gl.SpatialPoints = function(data, add = TRUE, color = "red", ...) {
   
 }
 
-gl.SpatialLines = function(data, add = TRUE,  ...) {
+rgl.SpatialLines = function(data, add = TRUE,  ...) {
   
   qq = coordinates(data)
   sp = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x)-1),]))))
@@ -85,7 +85,7 @@ gl.SpatialLines = function(data, add = TRUE,  ...) {
   
 }
 
-gl.inla.mesh = function(mesh, add = TRUE, col = NULL,...){
+rgl.inla.mesh = function(mesh, add = TRUE, col = NULL,...){
   if ( mesh$manifold  == "S2" ) {
     # mesh$loc = mesh$loc
   } else {
