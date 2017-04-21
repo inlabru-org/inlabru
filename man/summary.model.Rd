@@ -4,10 +4,12 @@
 \alias{summary.model}
 \title{Model summary}
 \usage{
-\method{summary}{model}(model)
+\method{summary}{model}(object, ...)
 }
 \arguments{
-\item{model}{An \link{inlabru} \link{model}}
+\item{object}{An \link{inlabru} \link{model}}
+
+\item{...}{ignored arguments (S3 generic compatibility)}
 }
 \description{
 Model summary

@@ -291,11 +291,12 @@ g = function(covariate,
 #'
 #' @aliases summary.model
 #' @export
-#' @param model An \link{inlabru} \link{model}
+#' @param object An \link{inlabru} \link{model}
+#' @param ... ignored arguments (S3 generic compatibility)
 #' 
-summary.model = function(model) {
-  for (label in elabels(model)) {
-    eff = effect(model,label)
+summary.model = function(object, ...) {
+  for (label in elabels(object)) {
+    eff = effect(object,label)
     en = ifelse("n" %in% names(eff), eff$n, 1)
     cat(paste0(label, ":\n"))
     cat(sprintf("\t model: %s , n = %s \n", eff$model, en))
@@ -306,7 +307,7 @@ summary.model = function(model) {
     
   }
   cat(paste0("--- FORMULA ---\n\n"))
-  print(model$formula)
+  print(object$formula)
 }
 
 

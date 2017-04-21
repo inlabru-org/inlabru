@@ -188,6 +188,7 @@ gg.SpatialPixels = function(sgdf, fill = names(sgdf)[[1]], ...) {
 #' @param exterior If TRUE, plot the exterior boundaries of the mesh
 #' @param ext.color Color used to plot the interior boundaries
 #' @param crs A \link{CRS} object defining the coordinate system to project the mesh to before plotting
+#' @param ... ignored arguments (S3 generic compatibility)
 #' @return geom_polygon or geom_segment
 #' 
 
@@ -196,7 +197,8 @@ gg.inla.mesh = function(mesh,
                         edge.color = "grey",
                         interior = TRUE, int.color = "blue", 
                         exterior = TRUE, ext.color = "black",
-                        crs = NULL) {
+                        crs = NULL,
+                        ...) {
 
   
 if ( !is.null(color) ) {
@@ -306,14 +308,14 @@ gg.inla.mesh.1d = function(mesh, y = 0, shape = 4, ...) {
 #' @return geom_tile
 #' 
 
-gg.RasterLayer = function(r) {
+gg.RasterLayer = function(r, ...) {
   
   requireNamespace("raster")
   spdf <- as(r, "SpatialPixelsDataFrame")
   df <- as.data.frame(spdf)
   # head(r.df)
   # g <- ggplot(r.df, aes(x=x, y=y)) + geom_tile(aes(fill = layer)) + coord_equal()
-  geom_tile(data = df, mapping = aes(x=x, y=y, fill = layer))
+  geom_tile(data = df, mapping = aes(x=x, y=y, fill = layer),...)
 }
 
 

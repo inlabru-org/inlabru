@@ -6,7 +6,7 @@
 \usage{
 \method{gg}{inla.mesh}(mesh, color = NULL, alpha = 1, edge.color = "grey",
   interior = TRUE, int.color = "blue", exterior = TRUE,
-  ext.color = "black", crs = NULL)
+  ext.color = "black", crs = NULL, ...)
 }
 \arguments{
 \item{mesh}{An \link{inla.mesh} object}
@@ -26,6 +26,8 @@
 \item{ext.color}{Color used to plot the interior boundaries}
 
 \item{crs}{A \link{CRS} object defining the coordinate system to project the mesh to before plotting}
+
+\item{...}{ignored arguments (S3 generic compatibility)}
 }
 \value{
 geom_polygon or geom_segment

@@ -4,14 +4,16 @@
 \alias{predict.bru}
 \title{Predictions based on bru}
 \usage{
-\method{predict}{bru}(result, data, formula = NULL, n.samples = 100)
+\method{predict}{bru}(object, data, formula = NULL, n.samples = 100, ...)
 }
 \arguments{
-\item{result}{An object obtained by calling \link{bru})}
+\item{object}{An object obtained by calling \link{bru})}
 
 \item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for the prediction}
 
 \item{formula}{A formula determining which effects to predict and how to combine them}
+
+\item{...}{ignored arguments (S3 generic compatibility)}
 }
 \value{
 Predicted values

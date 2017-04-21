@@ -4,7 +4,7 @@
 \alias{gg.RasterLayer}
 \title{Plot RasterLayer using ggplot2}
 \usage{
-\method{gg}{RasterLayer}(r)
+\method{gg}{RasterLayer}(r, ...)
 }
 \arguments{
 \item{r}{A RasterLayer object}

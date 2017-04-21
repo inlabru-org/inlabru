@@ -4,10 +4,12 @@
 \alias{summary.lgcp}
 \title{Summarize a LGCP object}
 \usage{
-\method{summary}{lgcp}(result)
+\method{summary}{lgcp}(object, ...)
 }
 \arguments{
-\item{result}{A result object obtained from a lgcp() run}
+\item{object}{A result object obtained from a lgcp() run}
+
+\item{...}{ignored arguments (S3 generic compatibility)}
 }
 \description{
 Summarize a LGCP object
