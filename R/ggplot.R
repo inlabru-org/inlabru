@@ -308,7 +308,7 @@ gg.inla.mesh.1d = function(mesh, y = 0, shape = 4, ...) {
 
 gg.RasterLayer = function(r) {
   
-  library(raster)
+  requireNamespace("raster")
   spdf <- as(r, "SpatialPixelsDataFrame")
   df <- as.data.frame(spdf)
   # head(r.df)

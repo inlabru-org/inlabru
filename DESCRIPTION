@@ -11,7 +11,8 @@ Suggests:
     testthat,
     ggmap,
     rgl,
-    sphereplot
+    sphereplot,
+    raster
 Depends:
     INLA,
     sp,
