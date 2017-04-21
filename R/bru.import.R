@@ -197,9 +197,27 @@ import.gorillas = function() {
     names(gcov[[nm]]) = nm
   }
   
+  #' Hack: change CRS units of the covariates to km
+  for ( nm in names(gcov) ) { 
+    ga = attributes(gcov[[nm]])$grid
+    attributes(ga)$cellcentre.offset = attributes(ga)$cellcentre.offset/1000
+    attributes(ga)$cellsize = attributes(ga)$cellsize/1000
+    attributes(gcov[[nm]])$grid = ga
+    attributes(gcov[[nm]])$proj4string = CRS("+proj=utm +zone=32N +datum=WGS84 +units=km")
+  }
+  
+  
+  ### Make final gorilla data set
+  gorillas = list(nests = nests,
+                  mesh = mesh,
+                  boundary = boundary,
+                  gcov = gcov)
+  
+  gorillas = stransform(gorillas, CRS("+proj=utm +zone=32N +datum=WGS84 +units=km"))
+  
   # Create a plot sampling data set
   set.seed(121)
-  plotpts = plotsample(nests, boundary, x.ppn=0.6, y.ppn=0.6, nx=5.4, ny=5.4)
+  plotpts = plotsample(gorillas$nests, gorillas$boundary, x.ppn=0.6, y.ppn=0.6, nx=5.4, ny=5.4)
   counts = point2count(plotpts$plots,plotpts$dets)
   x = coordinates(counts)[,1]
   y = coordinates(counts)[,2]
@@ -212,18 +230,9 @@ import.gorillas = function() {
   sample_9x9_60pc = list( counts = gnestcount_9x9_60pc, 
                           plots = gnestplots_9x9_60pc, 
                           nests = gnestdets_9x9_60pc)
-  
-  # plot to check:
-  # ggplot() +gg(boundary) +gg(gnestplots_9x9_60pc) +  gg(gnestdets_9x9_60pc,pch="+",cex=4) +
-  #   geom_text(aes(label=count, x=x, y=y)) + coord_fixed()
-  # 
-  
-  ### Make final gorilla data set
-  gorillas = list(nests = nests,
-                  mesh = mesh,
-                  boundary = boundary,
-                  plotsample = sample_9x9_60pc,
-                  gcov = gcov)
+
+  # Attach plotsample to gorilla data
+  gorillas$plotsample = sample_9x9_60pc
   
   return(gorillas)
 }
