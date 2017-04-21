@@ -67,3 +67,82 @@
 #' ggplot() + gg(gorillas$plotsample$plots) + gg(gorillas$plotsample$nests)
 
 NULL
+
+
+
+import.gorillas = function() {
+  
+  # Explicitly load spatstat
+  library(spatstat)
+  
+  # Load Gorilla data from spatstat
+  data(gorillas,package="spatstat")
+  
+  # Create SpatialPoints representing nest locations
+  nests = as.data.frame(gorillas)
+  coordinates(nests) = c("x","y")
+  proj4string(nests) = CRS("+proj=utm +zone=32N +datum=WGS84") # from the Gorillas help file
+  
+  #' Turn the observation window into spatial polygon
+  boundary = spoly(points = gorillas$window$bdry, crs = CRS("+proj=utm +zone=32N +datum=WGS84"))
+  
+  #' Build mesh
+  bnd = inla.mesh.segment(loc = data.frame(gorillas$window$bdry[[1]]))
+  mesh = inla.mesh.2d(interior = bnd, max.edge = 222) # ! With higher max.edge we run into various INLA errors/warnings
+  mesh$crs = inla.CRS(proj4string(nests))
+  
+  #' Turn covariates int SpatialGridDataFrame
+  gcov = list()
+  for ( nm in names(gorillas.extra) ) { 
+    gcov[[nm]] = as(gorillas.extra[[nm]], "SpatialGridDataFrame") 
+    proj4string(gcov[[nm]]) = proj4string(nests)
+    coordnames(gcov[[nm]]) = c("x","y")
+    names(gcov[[nm]]) = nm
+  }
+  
+  #' Hack: change CRS units of the covariates to km
+  for ( nm in names(gcov) ) { 
+    ga = attributes(gcov[[nm]])$grid
+    attributes(ga)$cellcentre.offset = attributes(ga)$cellcentre.offset/1000
+    attributes(ga)$cellsize = attributes(ga)$cellsize/1000
+    attributes(gcov[[nm]])$grid = ga
+    attributes(gcov[[nm]])$proj4string = CRS("+proj=utm +zone=32N +datum=WGS84 +units=km")
+  }
+  
+  
+  ### Make final gorilla data set
+  gorillas = list(nests = nests,
+                  mesh = mesh,
+                  boundary = boundary,
+                  gcov = gcov)
+  
+  gorillas = stransform(gorillas, CRS("+proj=utm +zone=32N +datum=WGS84 +units=km"))
+  
+  # Create a plot sampling data set
+  set.seed(121)
+  plotpts = plotsample(gorillas$nests, gorillas$boundary, x.ppn=0.6, y.ppn=0.6, nx=5.4, ny=5.4)
+  counts = point2count(plotpts$plots,plotpts$dets)
+  x = coordinates(counts)[,1]
+  y = coordinates(counts)[,2]
+  count = counts@data$n
+  
+  # Make gam data frame
+  gnestcount_9x9_60pc = data.frame(x = x, y = y, count = count, exposure = counts$area)
+  gnestplots_9x9_60pc = plotpts$plots
+  gnestdets_9x9_60pc = plotpts$dets
+  sample_9x9_60pc = list( counts = gnestcount_9x9_60pc, 
+                          plots = gnestplots_9x9_60pc, 
+                          nests = gnestdets_9x9_60pc)
+  
+  # Attach plotsample to gorilla data
+  gorillas$plotsample = sample_9x9_60pc
+  
+  return(gorillas)
+}
+
+
+save.gorillas = function() {
+  gorillas = import.gorillas()
+  save("gorillas", file=paste0(system.file("data",package="inlabru"),"/gorillas.RData"))
+}
+
