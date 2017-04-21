@@ -58,31 +58,41 @@ io_mrsea.pkgdata.load = function() {
   dsmdata = list(obsdata = obsdata, distdata = distdata, segdata = segdata, preddata = preddata)
   dset = import.dsmdata(dsmdata, covar.col = 5)
   
-  # Attach depth data to the data set
+  # Depth data to the data set
   
   depth = predict.data.re[(predict.data.re$season==1) & (predict.data.re$impact==0), c("x.pos","y.pos","depth")]
   colnames(depth) = c("x","y","depth")
   
-  # Attach CRS projection strings
-  dset$p4s = "+proj=utm +zone=32"
-  dset$mesh.p4s = "+proj=utm +zone=32"
-  
-  
-  ############ NEW FORMAT USING sp objects ##############
 
-  dset = as.spatial.dsdata(dset, cnames = c("x","y"), crs = CRS(dset$p4s))
-  dset$mesh$crs = inla.CRS("+proj=utm +zone=32")
+  ############ NEW FORMAT USING sp objects ##############
   
-  # Set weight of samplers to the strip width
-  dset$samplers$weight = 500
+  # Transects lines
+  lns = subset(dset$effort, is.na(det)) ; class(lns) = "data.frame"
+  lns = sline(lns, c("start.x", "start.y"), c("end.x", "end.y"), crs = CRS("+proj=utm +zone=32"))
+  lns$weight = 500
+  
+  # Detections
+  pts = subset(dset$effort, !is.na(det))[c("x","y","season","distance")]; class(pts) = "data.frame"
+  coordinates(pts) = c("x","y")
+  proj4string(pts) = CRS("+proj=utm +zone=32")
+  
+  # Mesh
+  mesh = dset$mesh
+  mesh$crs = inla.CRS("+proj=utm +zone=32")
+  
   
   # Boundary
-  dset$boundary = spoly(dset$mesh$loc[dset$mesh$segm$int$idx[,1], 1:2], dset$mesh$crs)
+  boundary = spoly(dset$mesh$loc[dset$mesh$segm$int$idx[,1], 1:2], CRS("+proj=utm +zone=32"))
   
   # Covariates
-  dset$covar = SpatialPointsDataFrame(depth[,1:2], data = depth[,3,drop=FALSE], proj4string = CRS("+proj=utm +zone=32"))
+  covar = SpatialPointsDataFrame(depth[,1:2], data = depth[,3,drop=FALSE], proj4string = CRS("+proj=utm +zone=32"))
   
-  return(dset)
+  
+  mrsea = list(points = pts,
+               samplers = lns,
+               boundary = boundary,
+               mesh = mesh,
+               covar = covar)
   
 }
 

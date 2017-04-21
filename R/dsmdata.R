@@ -68,7 +68,7 @@ import.dsmdata = function(dsmdata, covar.col = NA){
   }
   
   
-  dset = make.dsdata(effort = newdata, mesh = mesh)
+  dset = list(effort = newdata, mesh = mesh)
   
   return(dset)
 }
