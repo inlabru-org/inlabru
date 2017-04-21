@@ -554,7 +554,7 @@ evaluate.model = function(model,
     if ( is.null(predictor) ) {
       smp[[k]] = data.frame(sm)
     } else {
-      smp[[k]] = eval(predictor, envir = c(sm, as.list(data.frame(points))))
+      smp[[k]] = eval(predictor, envir = c(sm, as.list(data.frame(points)), as.list(environment(model$formula))))
     }
   }
   
