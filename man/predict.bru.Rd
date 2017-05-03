@@ -4,7 +4,8 @@
 \alias{predict.bru}
 \title{Predictions based on bru}
 \usage{
-\method{predict}{bru}(object, data, formula = NULL, n.samples = 100, ...)
+\method{predict}{bru}(object, data = NULL, formula = NULL,
+  n.samples = 100, ...)
 }
 \arguments{
 \item{object}{An object obtained by calling \link{bru})}

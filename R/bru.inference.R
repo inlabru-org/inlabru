@@ -245,76 +245,16 @@ bru.options = function(...) {
 #' @param ... Arguments passed on to \link{iinla}
 #' @return An \link{iinla} object
 
-lgcp = function(points, 
-                samplers = NULL, 
-                model = coordinates ~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1, 
-                predictor = . ~ ., 
-                mesh = NULL,
-                run = TRUE,
-                scale = NULL,
-                append = NULL,
-                n = 10,
-                offset = 0,
-                result = NULL,
-                weights.as.offset = FALSE,
-                ...) {
-  
-  # Automatically complete moel and predictor
-  ac = autocomplete(model, predictor, points, mesh)
-  
-  # If automatic completion detected linearity, expr to NULL
-  if ( ac$linear ) { ac$expr = NULL ; n = 1 }
-  
-  # Turn model formula into internal bru model
-  model = make.model(ac$model)
+lgcp = function(components,
+                data,
+                samplers,
+                formula,
+                options = bru.options(control.compute = list(config = TRUE))) {
 
-  # Create integration points
-  model$dim.names = ac$lhs # workaround :(
-  icfg = iconfig(samplers, points, model, mesh = ac$mesh)
-  ips = ipoints(samplers, icfg)
+  lik = like("cp", formula = formula, data = data, samplers = samplers, components = components)
+  result = bru(cmp, lik)
   
-  # Apend covariates to points and integration points
-  if (!is.null(append)) {
-    append.tool = function(points, append) { 
-      for ( k in 1:length(append) ) { 
-        points[[names(append)[[k]]]] = append[[k]](points) 
-      } 
-      points 
-    }
-    ips = append.tool(ips, append)
-    points = append.tool(points, append)
-  }
-  
-  # If scale is not NULL, rescale integration weights
-  if ( !is.null(scale) ) { ips$weight = scale * ips$weight }
-
-  # Stack
-  if ( weights.as.offset ) {
-    stk = function(points, model, result) {
-      inla.stack(make.stack(points = points, model = model, expr = ac$expr, y = 1, E = 0, result = result),
-                 make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = 1, offset = log(ips$weight), result = result))
-    }
-  } else {
-    stk = function(points, model, result) {
-      inla.stack(make.stack(points = points, model = model, expr = ac$expr, y = 1, E = 0, result = result),
-                 make.stack(points = ips, model = model, expr = ac$expr, y = 0, E = ips$weight, offset = 0, result = result))
-    }
-  }
-
-  # Run iterated INLA
-  if ( run ) { result = iinla(points, model, stk, family = "poisson", n, offset = offset, result = result, ...) } 
-  else { result = list() }
-  
-  ########## Create result object
-  result$mesh = mesh
-  result$sppa$mesh = mesh
-  result$ips = ips
-  result$iconfig = icfg
-  result$sppa$method = "lgcp"
-  result$sppa$model = model
-  result$sppa$points = points
-  if ( inherits(points, "SpatialPoints") ) {result$sppa$coordnames = coordnames(points)}
-  class(result) = c("lgcp",class(result))
+  # class(result) = c("lgcp", "bru", class(result))
   return(result)
 }
 
@@ -431,52 +371,6 @@ summary.bru = function(object, ...) {
 
 }
 
-
-#' Generate a simple default mesh
-#'
-# @aliases default.mesh
-# @export
-# @param spObject A Spatial* object
-# @param max.edge A parameter passed on to \link{inla.mesh.2d} which controls the granularity of the mesh. If NULL, 1/20 of the domain size is used.
-# @return An \code{inla.mesh} object
-
-default.mesh = function(spObject, max.edge = NULL, convex = -0.15){
-  if (inherits(spObject, "SpatialPoints")) {
-    x = c(bbox(spObject)[1,1], bbox(spObject)[1,2], bbox(spObject)[1,2], bbox(spObject)[1,1])
-    y = c(bbox(spObject)[2,1], bbox(spObject)[2,1], bbox(spObject)[2,2], bbox(spObject)[2,2])
-    # bnd = inla.mesh.segment(loc = cbind(x,y))
-    # mesh = inla.mesh.2d(interior = bnd, max.edge = diff(bbox(spObject)[1,])/10)
-    if ( is.null(max.edge) ) { max.edge = max.edge = diff(bbox(spObject)[1,])/20 }
-    hull = inla.nonconvex.hull(points = coordinates(spObject), convex = convex)
-    mesh = inla.mesh.2d(boundary = hull, max.edge = max.edge)
-  } else {
-    NULL
-  }
-}
-
-
-# Generate a default model with a spatial SPDE component and an intercept
-#
-# @aliases default.model
-# @export
-# @param mesh An inla.mesh object
-# @return A \link{model} object
-
-default.model = function(mesh) {
-  model = join(model.spde(list(mesh = mesh)), model.intercept())
-}
-
-
-# Predictions for iinla objects
-# 
-# Currently only a shortcut to \link{predict.lgcp}
-#  
-# @aliases predict.iinla
-# @export
-
-predict.iinla = function(...) { predict.lgcp(...) }
-
-
 #' Predictions based on bru
 #' 
 #' @aliases predict.bru
@@ -564,226 +458,6 @@ generate.bru = function(result,
   # smy = summarize(vals, x = data, cbind.only = TRUE)
 }
 
-
-
-
-
-#' Predictions based on log Gaussian Cox processes
-#' 
-#' Takes a fitted LGCP produced by \link{lgcp} and predicts the expression stated by the right hand side of \code{predictor} for
-#' a given set of \code{points}. A typical task is to predict values of the model for a sequence of points with consecutive values x_i, 
-#' where x is one of the dimensions that the LGCP lives in. For convenience, this can be done automatically by leaving 
-#' \code{points} set to \code{NULL} and stating a left hand side of the \code{predictor} formula, e.g. \code{x ~ f(x)}. The values
-#' x_i for which the right hand side is evaluated are then either taken from the predictor's environment or, if not present, from
-#' the integration points of the LGCP. If not points are provided and the right hand side is empty as well, \code{predict} assumes
-#' that the predicted expression will evaluate so a single values for which the summary statistics are computed. Otherwise the
-#' summary statistics are computed for each of the x_i. 
-#' 
-#' A common task is to look at statistics that result from integrating the 
-#' right hand side expression over one or more dimensions, say y and z. This can be achieved by setting the \code{integrate}
-#' parameter. The summary statistics are then computed for the values resulting from the integration. If only a subset of
-#' the space should be integrated over the \code{samplers} argument can be used. Usually this is a Spatial* object (see \link{sp}).
-#' 
-#' @aliases predict.lgcp 
-#' @export
-#' @param object An lgcp object obtained by calling lgcp()
-#' @param predictor A formula defining what to predict. The left hand side defines the dimension to predict over. The right hand side ought to be an expression that is evaluated for a given sample of the LGCP.
-#' @param points Locations at which to predict. If NULL, the integration points of the LGCP are used
-#' @param integrate A character array defining the dimensions to integrate the predicted expression over (e.g. "coordinates")
-#' @param samplers A data.frame or Spatial* object that defines subsets of the dimensions to integrate over.
-#' @param property By default ("sample") predictions are made using samples from the LGCP posterior. For debugging purposes this can also be set to the usual INLA summary statistics, i.e. "mean", "mode", "median", "sd" etc.
-#' @param n Number of samples used to compute the predictor's statistics. The default is a rather low number, chose more for higher precision.
-#' @param dens An expression defining an element of a micture density to be computed based on the samples generated by \code{predict}
-#' @param discrete Set this to TRUE if \code{dens} is only defined for integer values
-#' @param mcerr Monte Carlo error at which the sampling chain is stopped
-#' @param ... ignored arguments (S3 generic compatibility)
-#' @return Predicted values
-
-predict.lgcp = function(object, 
-                        predictor, 
-                        points = NULL, 
-                        integrate = NULL, 
-                        samplers = NULL,  
-                        property = "sample", 
-                        n = 250,  
-                        dens = NULL,
-                        discrete = FALSE,
-                        mcerr = 0.01,
-                        verbose = FALSE,
-                        ...)
-  {
-  
-  result = object
-  
-  # Extract target dimension from predictor (given as left hand side of formula)
-  lhs.dims = setdiff(all.vars(update(predictor, .~0)), ".")
-  pchar = as.character(predictor)
-  predictor.rhs = pchar[length(pchar)]
-  predictor = parse(text = predictor.rhs)
-  
-  # Dimensions we are integrating over
-  idims = integrate
-  
-
-  # Alternatively, take dims from points
-  if ( !is.null(points) ) {
-    dims = names(points)
-    if ( inherits(points, "Spatial") ) { dims = c(dims, "coordinates") }
-    if ( !inherits(points, "SpatialPointsDataFrame") & (nrow(points) == 2)) { 
-      points = SpatialPointsDataFrame(points, data = data.frame(weight = rep(1, nrow(coordinates(points)))))}
-    icfg.points = points
-  } else {
-    icfg.points = result$sppa$points
-  }
-  
-  
-  # Dimensions we are integrating over
-  idims = integrate
-  
-  # Determine all dimensions of the process (pdims)
-  pdims = names(result$iconfig)
-  
-  # Check for ambiguous dimension definition
-  if (any(idims %in% dims)) { stop("The left hand side of the predictor contains dimensions you want to integrate over. Remove them.") }
-  
-  # Collect some information that will be useful for plotting
-  misc = list(predictor = predictor.rhs, dims = dims, idims = idims, pdims = pdims)
-  type = "1d"
-  
-  # Generate points for dimensions to integrate over
-  wicfg = iconfig(NULL, result$sppa$points, result$model, idims, mesh = result$sppa$mesh)
-  wips = ipmaker(samplers, wicfg[idims])
-  
-  # Determine all dimensions of the process (pdims)
-  # pdims = names(result$iconfig)
-  
-  cat(sprintf("---- Generated points ----- \n"))
-  
-  
-  ## Generate points for dimensions to integrate over
-  ## Skip dimensions that are given via points
-  gen.idims = setdiff(idims, names(points))
-  if ( length(gen.idims) > 0 ) {
-    wicfg = iconfig(NULL, result$sppa$points, result$model, gen.idims)
-    wips = ipoints(samplers, wicfg[gen.idims])
-  } else { wips = NULL }
-  cat(sprintf("wips dims : %s \n", paste0(names(wips), collapse = ", ")))
-
-  
-  ## Generate points from predictor LHS
-  ## Skip dimensions that we are integrating over or that are given via points
-  gen.rdims = setdiff(lhs.dims, c(names(wips), names(points)))
-  if ( length(gen.rdims) > 0 ) {
-    icfg = iconfig(NULL, result$sppa$points, result$model, gen.rdims, mesh = result$sppa$mesh)
-    rips = ipoints(NULL, icfg[gen.rdims])
-    rips = rips[,setdiff(names(rips),"weight"),drop=FALSE]
-    # Sort by value in dimension to plot over. Prevents scrambles prediction plots.
-    if (!(gen.rdims[1] == "coordinates") & (length(gen.rdims)==1)) {rips = rips[sort(rips[,gen.rdims], index.return = TRUE)$ix,,drop=FALSE]}
-  } else { rips = NULL }
-  cat(sprintf("rips dims : %s \n", paste0(names(rips), collapse = ", ")))
-  
-  ## Provided points
-  cat(sprintf("points : %s \n", paste0(names(points), collapse = ", ")))
-  
-  ## MERGE 
-  all = list()
-  if (!is.null(points)) { all = c(all, list(points))}
-  if (!is.null(wips)) { all = c(all, list(wips))}
-  if (!is.null(rips)) { all = c(all, list(rips))}
-  if( length(all)>1 ) { pts = do.call(merge, all)} else { pts = all[[1]] }
-  cat(sprintf("pts dims : %s \n", paste0(names(pts), collapse = ", ")))
-  
-  
-  remain = list()
-  if (!is.null(points)) { remain = c(remain, list(points))}
-  if (!is.null(rips)) { remain = c(remain, list(rips))}
-  if( length(remain)>1 ) { remain = do.call(merge, remain)} 
-  else if (length(remain) ==1 ) { remain = remain[[1]] } 
-  else { remain = NULL }
-  dims = names(remain)
-  if ( inherits(remain, "SpatialPoints") ) dims = c("coordinates", dims)
-  cat(sprintf("remain dims : %s \n", paste0(dims, collapse = ", ")))
-  
-  ## Some additional info for plotting
-  misc = list(predictor = predictor.rhs, dims = dims, idims = idims, pdims = names(pts))
-  
-  ## Define the sampling function 
-  
-  sample.fun = function(n) {
-    vals = evaluate.model(model = result$sppa$model, result = result, points = pts, property = property, n = n, predictor = predictor)
-    
-    # If we sampled, summarize
-    if ( is.list(vals) ) { vals = do.call(cbind, vals) }
-    
-    if ( !is.null(integrate) ) {
-      # Weighting
-      vals = vals * pts$weight
-      
-      # Sum up!
-      if ( length(dims) == 0 ) {
-        integral = as.list(colSums(vals))
-        integral = lapply(integral, function(s) {list(integral=s)})
-      } else {
-        # If we are integrating over space we have to turn the coordinates into data that the by() function understands
-        if ("coordinates" %in% dims ) { by.coords = cbind(1:nrow(remain), pts@data[,c(setdiff(dims, "coordinates"))]) } 
-        else { by.coords = pts[,dims]}
-        integral = do.call(rbind, by(vals, by.coords, colSums))
-      }
-    } else { integral = vals }
-
-    integral
-  }
-  
-  # If we are calculating a univariate density, do it properly. For multivariate predictions we currently only
-  # compute rough estimates of the mean and the default inla quantiles
-  if ( length(dims) == 0 ){
-    
-    # Pre-sample for bandwidth selection and intal interval x
-    pre.smp = sample.fun(n)
-
-    if (is.null(dens)) {
-      component = function(x, smp) { approxfun(density(smp[[1]], kernel = "triangular", 
-                                         bw = bw.nrd(as.vector(unlist(pre.smp)))), rule = 0)(x) }
-    } else {
-      component = function(x,smp) eval(dens, c(list(x=x),smp))
-    }
-    
-    mixer = function(x, smp) { apply(do.call(rbind, lapply(smp, function(s) component(x,s))), MARGIN = 2, mean)}
-    prd = montecarlo.posterior(dfun = mixer, sfun = sample.fun, samples = pre.smp, mcerr = mcerr, n = n, discrete = discrete, verbose = verbose)
-    
-    class(prd) = c("prediction", class(prd))
-    attr(prd, "type") = "full"
-    attr(prd,"samples") = data.frame(integral = as.vector(unlist(prd$samples)))
-    attr(prd, "misc") = misc
-
-  } 
-  
-  # This is the case when predicting in more than one dimensions.
-  # Calculating the exact posterior in this case is not implemented yet
-  else {
-    type = "1d"
-    smp = sample.fun(n)
-    prd = summarize(smp, x = as.data.frame(remain))
-    
-    if ("coordinates" %in% dims ) { 
-      type = "spatial"
-      coordinates(prd) = coordnames(rips) 
-      misc$p4s = icfg$coordinates$p4s
-      misc$cnames = icfg$coordinates$cnames
-      misc$mesh = icfg$coordinates$mesh
-      prd = as.data.frame(prd)
-      }
-    
-    attr(prd, "samples") = smp
-    attr(prd, "total.weight") = sum(pts$weight)
-    attr(prd, "type") = type
-    attr(prd, "misc") = misc
-    class(prd) = c("prediction", class(prd))
-  }
-  
-  prd
-  
-  }
 
 
 # Monte Carlo method for estimating aposterior
@@ -882,6 +556,7 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.
 #' @param data A data.frame
 #' @param x Annotations for the resulting summary
 #' @return A data.frame with summary statistics
+
 summarize = function(data, x = NULL, gg = FALSE, cbind.only = FALSE) {
   if ( is.list(data) ) { data = do.call(cbind, data) }
   if ( gg ) {
@@ -917,22 +592,22 @@ summarize = function(data, x = NULL, gg = FALSE, cbind.only = FALSE) {
 
 
 
-#' Iterated INLA
-#' 
-#' This is a wrapper for iterated runs of \link{inla}. Before each run the \code{stackmaker} function is used to
-#' set up the \link{inla.stack} for the next iteration. For this purpose \code{stackmaker} is called given the
-#' \code{data} and \code{model} arguments. The \code{data} argument is the usual data provided to \link{inla}
-#' while \link{model} provides more information than just the usual inla formula. 
-#' 
-#' @aliases iinla
-#' @export
-#' @param data A data.frame
-#' @param model A \link{model} object
-#' @param stackmaker A function creating a stack from data and a model
-#' @param n Number of \link{inla} iterations
-#' @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
-#' @param ... Arguments passed on to \link{inla}
-#' @return An \link{inla} object
+# Iterated INLA
+# 
+# This is a wrapper for iterated runs of \link{inla}. Before each run the \code{stackmaker} function is used to
+# set up the \link{inla.stack} for the next iteration. For this purpose \code{stackmaker} is called given the
+# \code{data} and \code{model} arguments. The \code{data} argument is the usual data provided to \link{inla}
+# while \link{model} provides more information than just the usual inla formula. 
+# 
+# @aliases iinla
+# @export
+# @param data A data.frame
+# @param model A \link{model} object
+# @param stackmaker A function creating a stack from data and a model
+# @param n Number of \link{inla} iterations
+# @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
+# @param ... Arguments passed on to \link{inla}
+# @return An \link{inla} object
 
 
 iinla = function(data, model, stackmaker, n = 10, result = NULL, 
@@ -1023,104 +698,4 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
   result$iinla$track = do.call(rbind, track)
   class(result) = c("iinla", "inla", "list")
   return(result)
-}
-
-
-
-# Automatically complete model and predictor:
-# - Set RHS and LHS
-# - Add intercept
-# - Add mesh if needed
-# - substitute . with default SPDE model
-#
-autocomplete = function(model, predictor, points, mesh) {
-  
-  
-  # Automatically insert default SPDE model
-  #env = environment(model)
-  #model = update.formula(~ spde(model = inla.spde2.matern(mesh), map = coordinates, mesh = mesh), model)
-  #environment(model) = env
-  
-  # Automatically add intercept (unless '-Intercept' is in the formula)
-  env = environment(model)
-  if (attr(terms(model),"intercept")) {
-    if (!(length(grep("-[ ]*Intercept", as.character(model)[[length(as.character(model))]]))>0)) {
-      model = update.formula(model, . ~ . + Intercept-1)
-    } else {
-      model = update.formula(model, . ~ . -1)
-    }
-    
-  } 
-  environment(model) = env
-  
-  # If predictor RHS has "." fill in effect names of model
-  apred = auto.pred(model,predictor)
-  
-  # If RHS has "." we know that the predictor is linear
-  linear = !(predictor == apred)
-  
-  # Set predictor to automatically generated one
-  predictor = apred
-  
-  # Set model$expr as RHS of predictor 
-  expr = parse(text = as.character(predictor)[3])
-  
-  # Extract y as from left hand side of the predictor
-  lhs = all.vars(update(predictor, .~0))
-  
-  # Add mesh to model environment if needed
-  if ( "mesh" %in% all.vars(model) & !("mesh" %in% names(environment(model)))) {
-    if ( is.null(mesh) ) { mesh = default.mesh(points) }
-    environment(model)$mesh = mesh
-  }
-  
-  
-  return(list(model = model, 
-              predictor = predictor,
-              linear = linear,
-              lhs = lhs,
-              expr = expr,
-              mesh = mesh))
-  
-}
-
-
-#
-# A helper function used in autocomplete()
-#
-auto.pred = function(model, predictor) {
-  
-  # Predictor LHS
-  auto.pred.lhs = function(predictor, model){
-    lhs = as.character(predictor)[2]
-    if (lhs == ".") { lhs = as.character(model)[2] }
-    lhs
-  }
-  
-  # Predictor RHS
-  auto.pred.rhs = function(model) {
-    imodel = make.model(model)
-    paste0(elabels(imodel), collapse = " + ")
-  }
-  
-  # Predictor RHS is dot?
-  if ( as.character(predictor)[3] == "." ) {
-    predictor = as.formula(paste0(auto.pred.lhs(predictor,model)," ~ ",  paste0(auto.pred.rhs(model))))
-  }
-  predictor
-}
-
-auto.intercept = function(components) {
-  env = environment(components)
-  
-  if (attr(terms(components),"intercept")) {
-    if (!(length(grep("-[ ]*Intercept", as.character(components)[[length(as.character(components))]]))>0)) {
-      components = update.formula(components, . ~ . + Intercept-1)
-    } else {
-      components = update.formula(components, . ~ . -1)
-    }
-    
-  } 
-  environment(components) = env
-  components
 }

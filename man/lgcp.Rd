@@ -4,16 +4,13 @@
 \alias{lgcp}
 \title{Log Gaussian Cox process (LGCP) inference using INLA}
 \usage{
-lgcp(points, samplers = NULL, model = coordinates ~ spde(model =
-  inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1,
-  predictor = . ~ ., mesh = NULL, run = TRUE, scale = NULL,
-  append = NULL, n = 10, offset = 0, result = NULL,
-  weights.as.offset = FALSE, ...)
+lgcp(components, data, samplers, formula,
+  options = bru.options(control.compute = list(config = TRUE)))
 }
 \arguments{
-\item{points}{A data frame or SpatialPoints[DataFrame] object}
-
 \item{samplers}{A data frame or Spatial[Points/Lines/Polygons]DataFrame objects}
+
+\item{points}{A data frame or SpatialPoints[DataFrame] object}
 
 \item{model}{Typically a formula or a \link{model} describing the components of the LGCP density. If NULL, an intercept and a spatial SPDE component are used}
 
