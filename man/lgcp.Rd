@@ -8,27 +8,15 @@ lgcp(components, data, samplers, formula,
   options = bru.options(control.compute = list(config = TRUE)))
 }
 \arguments{
+\item{components}{A formula describing the latent components}
+
+\item{data}{A data frame or SpatialPoints[DataFrame] object}
+
 \item{samplers}{A data frame or Spatial[Points/Lines/Polygons]DataFrame objects}
 
-\item{points}{A data frame or SpatialPoints[DataFrame] object}
+\item{formula}{If NULL, the linear combination implied by the \code{components} is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.}
 
-\item{model}{Typically a formula or a \link{model} describing the components of the LGCP density. If NULL, an intercept and a spatial SPDE component are used}
-
-\item{predictor}{If NULL, the linear combination defined by the model/formula is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.}
-
-\item{mesh}{An inla.mesh object modelling a spatial domain. If NULL and spatial data is provied the mesh is constructed from a non-convex hull of the points}
-
-\item{scale}{If provided as a scalar then rescale the exposure parameter of the Poisson likelihood. This will influence your model's intercept but can help with numerical instabilities, e.g. by setting scale to a large value like 10000}
-
-\item{append}{A list of functions which are evaluated for the \code{points} and the constructed integration points. The Returned values are appended to the respective data frame of points/integration points.}
-
-\item{n}{maximum number of \link{iinla} iterations}
-
-\item{offset}{the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.}
-
-\item{result}{An \code{iinla} object returned from previous calls of \code{bru}/\code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
-
-\item{...}{Arguments passed on to \link{iinla}}
+\item{options}{See \link{bru.options}}
 }
 \value{
 An \link{iinla} object

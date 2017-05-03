@@ -232,17 +232,11 @@ bru.options = function(...) {
 #'
 #' @aliases lgcp
 #' @export
-#' @param points A data frame or SpatialPoints[DataFrame] object
+#' @param components A formula describing the latent components
+#' @param data A data frame or SpatialPoints[DataFrame] object
 #' @param samplers A data frame or Spatial[Points/Lines/Polygons]DataFrame objects
-#' @param model Typically a formula or a \link{model} describing the components of the LGCP density. If NULL, an intercept and a spatial SPDE component are used
-#' @param predictor If NULL, the linear combination defined by the model/formula is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
-#' @param mesh An inla.mesh object modelling a spatial domain. If NULL and spatial data is provied the mesh is constructed from a non-convex hull of the points
-#' @param scale If provided as a scalar then rescale the exposure parameter of the Poisson likelihood. This will influence your model's intercept but can help with numerical instabilities, e.g. by setting scale to a large value like 10000
-#' @param append A list of functions which are evaluated for the \code{points} and the constructed integration points. The Returned values are appended to the respective data frame of points/integration points.
-#' @param n maximum number of \link{iinla} iterations
-#' @param offset the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.
-#' @param result An \code{iinla} object returned from previous calls of \code{bru}/\code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
-#' @param ... Arguments passed on to \link{iinla}
+#' @param formula If NULL, the linear combination implied by the \code{components} is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
+#' @param options See \link{bru.options}
 #' @return An \link{iinla} object
 
 lgcp = function(components,
@@ -254,17 +248,15 @@ lgcp = function(components,
   lik = like("cp", formula = formula, data = data, samplers = samplers, components = components)
   result = bru(cmp, lik)
   
-  # class(result) = c("lgcp", "bru", class(result))
-  return(result)
 }
 
-#' Summarize a LGCP object
-#'
-#' @aliases summary.lgcp
-#' @export
-#' @param object A result object obtained from a lgcp() run
-#' @param ... ignored arguments (S3 generic compatibility)
-#' 
+# Summarize a LGCP object
+#
+# @aliases summary.lgcp
+# @export
+# @param object A result object obtained from a lgcp() run
+# @param ... ignored arguments (S3 generic compatibility)
+ 
 summary.lgcp = function(object, ...) {
   
   result = object
@@ -297,12 +289,14 @@ summary.lgcp = function(object, ...) {
   summary.bru(result)
 }
 
-#' Summarize a bru object
-#'
-#' @aliases summary.bru
-#' @export
-#' @param object A result object obtained from a bru() run
-#' 
+
+# Summarize a bru object
+#
+# @aliases summary.bru
+# @export
+# @param object A result object obtained from a bru() run
+# 
+
 summary.bru = function(object, ...) {
   
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
@@ -698,4 +692,20 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
   result$iinla$track = do.call(rbind, track)
   class(result) = c("iinla", "inla", "list")
   return(result)
+}
+
+
+auto.intercept = function(components) {
+  env = environment(components)
+  
+  if (attr(terms(components),"intercept")) {
+    if (!(length(grep("-[ ]*Intercept", as.character(components)[[length(as.character(components))]]))>0)) {
+      components = update.formula(components, . ~ . + Intercept-1)
+    } else {
+      components = update.formula(components, . ~ . -1)
+    }
+    
+  } 
+  environment(components) = env
+  components
 }
