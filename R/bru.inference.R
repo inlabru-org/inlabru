@@ -155,7 +155,7 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
       bru.model$dim.names = all.vars(update(formula, .~0))
     }
     icfg = iconfig(samplers, data, bru.model, mesh = mesh)
-    ips = ipoints(samplers, icfg)
+    ips = ipmaker(samplers, icfg)
     inla.family = "poisson"
   }
   
@@ -489,7 +489,7 @@ predict.iinla = function(...) { predict.lgcp(...) }
 #' @return Predicted values
 
 predict.bru = function(object,
-                       data,
+                       data = NULL,
                        formula = NULL,
                        n.samples = 100, ...)
 {
@@ -511,8 +511,22 @@ predict.bru = function(object,
                         property = "sample", n = n.samples, predictor = expr)
 
   # Summarize
-  vals = summarize(vals, x = data)
   
+  if (is.data.frame(vals[[1]])) {
+    vals.names = names(vals[[1]])
+    covar = intersect(vals.names, names(data))
+    estim = setdiff(vals.names, covar)
+    smy = list()
+    for ( nm in estim ) {
+        smy[[nm]] = summarize(lapply(vals, function(v) v[[nm]]), x = vals[[1]][,covar,drop=FALSE])
+    }
+    vals = smy
+    if(length(vals)==1) vals = vals[[1]]
+  } else {
+  vals = summarize(vals, x = data)
+  }
+
+  if (!inherits(vals, "Spatial")) class(vals) = c("prediction",class(vals))
   vals
   
 }
@@ -547,7 +561,7 @@ generate.bru = function(result,
   vals = evaluate.model(model = result$sppa$model, result = result, points = data, 
                         property = "sample", n = n.samples, predictor = expr)
   
-  smy = summarize(vals, x = data, cbind.only = TRUE)
+  # smy = summarize(vals, x = data, cbind.only = TRUE)
 }
 
 
@@ -638,7 +652,7 @@ predict.lgcp = function(object,
   
   # Generate points for dimensions to integrate over
   wicfg = iconfig(NULL, result$sppa$points, result$model, idims, mesh = result$sppa$mesh)
-  wips = ipoints(samplers, wicfg[idims])
+  wips = ipmaker(samplers, wicfg[idims])
   
   # Determine all dimensions of the process (pdims)
   # pdims = names(result$iconfig)

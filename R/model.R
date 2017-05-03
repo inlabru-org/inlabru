@@ -494,6 +494,8 @@ evaluate.model = function(model,
                           property = "mode",
                           n = 1) {
   
+  data = points # Within the evaluation make points available via the name "data" 
+  
   # Do we otain our values from sampling or from a property of a summary?
   if ( property == "sample") {
       smp = inla.posterior.sample.structured(result, n = n) 

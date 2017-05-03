@@ -1,3 +1,113 @@
+ipoints = function(region, domain = NULL, name = "x") {
+  
+  pregroup = NULL
+  
+  if (is.integer(region)){
+    
+    ips = data.frame(weight = rep(1,length(region)))
+    ips[name] = region
+  }
+  
+  else if (is.numeric(region)) {
+    domain = inla.mesh.1d(seq(region[1], region[2], length.out = 25))
+    fem = inla.mesh.1d.fem(domain)
+    ips = data.frame(weight = diag(as.matrix(fem$c0)))
+    ips[name] = domain$loc
+  
+  } else if ( inherits(region, "inla.mesh") ){
+    
+    ips = vertices(region)
+    ips$weight = diag(as.matrix(inla.mesh.fem(region)$c0))
+    
+  } else if ( class(region) == "SpatialPointsDataFrame" ){
+    
+      if (!("weight" %in% names(region))) { 
+        warning("The integration points provided have no weight column. Setting weights to 1.")
+        region$weight = 1
+      }
+      
+      ips = region
+  
+  } else if ( inherits(region, "SpatialLines") || inherits(region, "SpatialLinesDataFrame") ){
+    
+    # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
+    if ( class(region)[1] == "SpatialLines" ) { 
+      region = SpatialLinesDataFrame(region, data = data.frame(weight = rep(1, length(region)))) 
+    }
+    
+    # Set weights to 1 if not provided
+    if (!("weight" %in% names(region))) { 
+      warning("The integration points provided have no weight column. Setting weights to 1.")
+      region$weight = 1
+    }
+    
+    # Store coordinate names
+    cnames = coordnames(region)
+    
+    ips = int.points(region,
+                     on = "segment",
+                     line.split = TRUE,
+                     mesh = domain,
+                     mesh.split = FALSE,
+                     mesh.coords = coordnames(region),
+                     geometry = "euc",
+                     length.scheme = "gaussian",
+                     n.length = 1,
+                     distance.scheme = "equidistant",
+                     n.distance = 1,
+                     distance.truncation = 1/2,
+                     fake.distance = TRUE,
+                     projection = NULL,
+                     group = pregroup,
+                     filter.zero.length = TRUE)
+    
+    ips$distance = NULL
+    ips$weight = ips$weight * region$weight[ips$idx]
+    ips$idx = NULL
+    ips = SpatialPointsDataFrame(ips[,c(1,2)], data = ips[,3:ncol(ips),drop=FALSE])
+  
+  } else if (inherits(region,"SpatialPolygons")){
+    
+    cnames = coordnames(region)
+    pregroup = NULL
+    
+    polyloc = do.call(rbind, lapply(1:length(region), 
+                                    function(k) cbind(
+                                      x = rev(coordinates(region@polygons[[k]]@Polygons[[1]])[,1]),
+                                      y = rev(coordinates(region@polygons[[k]]@Polygons[[1]])[,2]),
+                                      group = k)))
+    ips = int.polygon(domain, loc = polyloc[,1:2], group = polyloc[,3])
+    df = data.frame(region@data[ips$group, pregroup, drop = FALSE], weight = ips[,"weight"])
+    ips = SpatialPointsDataFrame(ips[,c("x","y")],data = df)
+    
+  }
+  
+  ips
+  
+}
+
+cprod = function(...) {
+  ipl = list(...)
+  
+  if ( length(ipl) == 1 ) {
+    ips = ipl[[1]]
+    # loc1 = ipl[[1]][,setdiff(names(ipl[[1]]),"weight")]
+    # loc2 = ipl[[2]][,setdiff(names(ipl[[2]]),"weight")]
+    # ips = merge(loc1, loc2)
+    # weight = merge(ipl[[1]][,"weight", drop = FALSE], data.frame(weight2 = ipl[[2]][,"weight"]))
+    # ips$weight = weight$weight * weight$weight2
+  } else {
+    loc1 = ipl[[1]][,setdiff(names(ipl[[1]]),"weight"), drop = FALSE]
+    w1 = ipl[[1]][,"weight", drop = FALSE]
+    ips2 = do.call(cprod, ipl[2:length(ipl)])
+    loc2 = ips2[,setdiff(names(ipl[[2]]),"weight"), drop = FALSE]
+    w2 = data.frame(weight2 = ips2[,"weight"])
+    ips = merge(loc1, loc2)
+    weight = merge(w1, w2)
+    ips$weight = weight$weight * weight$weight2
+  }
+  ips
+}
 
 #' Integration points for log Gaussian Cox process models using INLA
 #' 
@@ -30,7 +140,7 @@
 #' @param config An integration configuration. See \link{iconfig}
 #' @return Integration points
 
-ipoints = function(samplers, config) {
+ipmaker = function(samplers, config) {
   
   # First step: Figure out which marks are already included in the samplers (e.g. time)
   # For each of the levels of these marks the integration points will be computed independently
@@ -305,7 +415,7 @@ iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL) {
 # @keywords internal
 # @return An integration configuration
 
-iconfig2 = function(dims, domain, data) {
+iconfig2 = function(data, dims, domain, samplers) {
   icfg = list()
   
   for (dname in dims){
@@ -318,18 +428,67 @@ iconfig2 = function(dims, domain, data) {
       ret$name = dname
       # If no domain specification is given use data range for this dimension to construct a 1D mesh
       if ( !(dname %in% names(domain)) ) {
-        domain[[dname]] = inla.mesh.1d(seq(min(data.frame(data[,dname])), max(data.frame(data[,dname])),length.out = 25))
+        domain[[dname]] = inla.mesh.1d(seq(min(data.frame(data)[,dname]), max(data.frame(data)[,dname]),length.out = 25))
       }
-      if ( class(domain[[dname]]) == "inla.mesh.1d" ) { dom = domain[[dname]] }
-      else if ( is.numeric(domain[[dname]]) ) { dom = inla.mesh.1d(domain[[dname]]) }
+      ips = NULL
+      if ( class(domain[[dname]]) == "inla.mesh.1d" ) { 
+        dom = domain[[dname]] 
+        ips = data.frame(dom$loc, weight = diag(as.matrix(inla.mesh.1d.fem(dom)$c0)))
+        colnames(ips)[1] = dname
+        }
+      else if ( is.integer(domain[[dname]]) ) {
+        dom = inla.mesh.1d(domain[[dname]])
+        ips = data.frame(dom$loc, weight = 1)
+        colnames(ips)[1] = dname
+        }
+      else if ( is.numeric(domain[[dname]]) ) { 
+        dom = inla.mesh.1d(domain[[dname]])
+        ips = data.frame(dom$loc, weight = diag(as.matrix(inla.mesh.1d.fem(dom)$c0)))
+        colnames(ips)[1] = dname
+        }
       else if ( is.factor(domain[[dname]]) ) { dom = domain[[dname]] }
       else { stop(sprintf("Unsupported domain class '%s' for domain '%s'"), class(domain[[dname]]), dname) }
       ret$domain = dom
+      ret$ips = ips
       ret$class = class(domain[[dname]])
     }
     icfg[[dname]] = ret
   }
+  
+  if ( inherits(samplers, "Spatial") | is.data.frame(samplers) ){
+    samplerdf = samplers
+    for ( dname in setdiff(dims,"coordinates") ) {
+      if ( dname %in% names(samplerdf) ) { 
+        sdf = data.frame(samplerdf[[dname]], weight = 1)
+        colnames(sdf)[1] = dname
+        icfg[[dname]]$tips = sdf
+      } else if ( paste0("min.",dname) %in% names(samplerdf) ) {
+        
+
+        
+        ips = mint(as.data.frame(samplerdf)[,paste0(c("min.","max."),dname)], icfg[[dname]]$domain$loc, dname)
+        
+        
+        stop("s")
+      }
+      
+    }
+  }
+  
   icfg
  
+}
+
+mint = function(df,knots,dname) {
+  ips = list()
+  for (k in 1:nrow(df)) {
+    mi = df[k,1]
+    ma = df[k,2]
+    msh = inla.mesh.1d(sort(unique(c(mi,ma,knots[knots<=ma & knots>=mi]))))
+    w = diag(as.matrix(inla.mesh.1d.fem(msh)$c0))
+    ips[[k]] = data.frame(msh$loc, weight = w)
+  }
+  ips = do.call(rbind, ips)
+  colnames(ips) = c(dname, "weight")
 }
 
