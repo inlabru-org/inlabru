@@ -1,6 +1,15 @@
 iinla.env = new.env()
 iinla.env$log = sprintf("inlabru @ %s", date())
 
+
+
+#' @title Global setting for tutorial sessions
+#'
+#' @aliases init.tutorial
+#' @export
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
 init.tutorial = function() {
   cat("Setting defaults for tutorial session. \n")
   iinla.setOption("iinla.verbose", list(TRUE))
