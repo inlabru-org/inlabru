@@ -1,3 +1,23 @@
+#' @title Generate integration points 
+#'
+#' @description Generate integration points based on a desciption of the integration region.
+#' @aliases ipoints
+#' @export
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+#' @param region Description of the integration region boundary
+#' @param domain An object describing a discretization of the domain
+#' @param name Character array stating the name of the domains dimension(s)
+#' @param group Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged.
+#' @return A \code{data.frame} or \code{SpatialPointsDataFrame}
+#' 
+#' @examples
+#' 
+#' ips = ipoints(c(0,10), name = "myDim")
+#' myDim
+#' 
+
 ipoints = function(region, domain = NULL, name = "x", group = NULL) {
   
   pregroup = NULL
@@ -46,7 +66,6 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL) {
   } else if (inherits(region,"SpatialPolygons")){
     
     cnames = coordnames(region)
-    pregroup = NULL
     
     polyloc = do.call(rbind, lapply(1:length(region), 
                                     function(k) cbind(
@@ -62,6 +81,24 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL) {
   ips
   
 }
+
+#' @title Cross product of integration points
+#'
+#' @description Calculates the dimensional cross product of integration points and multiply their weights accordingly.
+#' @aliases cprod
+#' @export
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+#' @param ... \code{data.frame} or \code{SpatialPointsDataFrame} objects
+#' @return A \code{data.frame} or \code{SpatialPointsDataFrame} object
+#' 
+#' @examples
+#' 
+#' ips1 = ipoints(c(0,8), name = "myDim")
+#' ips2 = ipoints(as.integer(c(0,2,5)), name = "myDiscreteDim")
+#' ips = cprod(ips1, ips2)
+#' plot(ips$myDim) ; points(ips$myDiscreteDim, col = "red")
 
 cprod = function(...) {
   ipl = list(...)
