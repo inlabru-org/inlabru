@@ -1,4 +1,4 @@
-ipoints = function(region, domain = NULL, name = "x") {
+ipoints = function(region, domain = NULL, name = "x", group = NULL) {
   
   pregroup = NULL
   
@@ -41,30 +41,7 @@ ipoints = function(region, domain = NULL, name = "x") {
       region$weight = 1
     }
     
-    # Store coordinate names
-    cnames = coordnames(region)
-    
-    ips = int.points(region,
-                     on = "segment",
-                     line.split = TRUE,
-                     mesh = domain,
-                     mesh.split = FALSE,
-                     mesh.coords = coordnames(region),
-                     geometry = "euc",
-                     length.scheme = "gaussian",
-                     n.length = 1,
-                     distance.scheme = "equidistant",
-                     n.distance = 1,
-                     distance.truncation = 1/2,
-                     fake.distance = TRUE,
-                     projection = NULL,
-                     group = pregroup,
-                     filter.zero.length = TRUE)
-    
-    ips$distance = NULL
-    ips$weight = ips$weight * region$weight[ips$idx]
-    ips$idx = NULL
-    ips = SpatialPointsDataFrame(ips[,c(1,2)], data = ips[,3:ncol(ips),drop=FALSE])
+    ips = int.slines(region, domain, group = group)
   
   } else if (inherits(region,"SpatialPolygons")){
     
@@ -79,7 +56,7 @@ ipoints = function(region, domain = NULL, name = "x") {
     ips = int.polygon(domain, loc = polyloc[,1:2], group = polyloc[,3])
     df = data.frame(region@data[ips$group, pregroup, drop = FALSE], weight = ips[,"weight"])
     ips = SpatialPointsDataFrame(ips[,c("x","y")],data = df)
-    
+    proj4string(ips) = proj4string(region)
   }
   
   ips
@@ -91,20 +68,25 @@ cprod = function(...) {
   
   if ( length(ipl) == 1 ) {
     ips = ipl[[1]]
-    # loc1 = ipl[[1]][,setdiff(names(ipl[[1]]),"weight")]
-    # loc2 = ipl[[2]][,setdiff(names(ipl[[2]]),"weight")]
-    # ips = merge(loc1, loc2)
-    # weight = merge(ipl[[1]][,"weight", drop = FALSE], data.frame(weight2 = ipl[[2]][,"weight"]))
-    # ips$weight = weight$weight * weight$weight2
   } else {
-    loc1 = ipl[[1]][,setdiff(names(ipl[[1]]),"weight"), drop = FALSE]
-    w1 = ipl[[1]][,"weight", drop = FALSE]
+    ips1 = ipl[[1]]
+    loc1 = ips1[,setdiff(names(ipl[[1]]),"weight"), drop = FALSE]
+    w1 = ips1[,"weight", drop = FALSE]
     ips2 = do.call(cprod, ipl[2:length(ipl)])
     loc2 = ips2[,setdiff(names(ipl[[2]]),"weight"), drop = FALSE]
     w2 = data.frame(weight2 = ips2[,"weight"])
     ips = merge(loc1, loc2)
     weight = merge(w1, w2)
     ips$weight = weight$weight * weight$weight2
+    
+    if ( inherits(ips1, "Spatial" ) ) {
+      coordinates(ips) = coordnames(ips1)
+      proj4string(ips) = CRS(proj4string(ips1))
+    } else if (inherits(ips2, "Spatial")) {
+      coordinates(ips) = coordnames(ips2)
+      proj4string(ips) = CRS(proj4string(ips2))
+    }
+    
   }
   ips
 }
@@ -183,30 +165,10 @@ ipmaker = function(samplers, config) {
       samplers$weight = 1
     }
     
+    ips = int.slines(samplers, config[["coordinates"]]$mesh, group = pregroup, project = FALSE)
+    
     # Store coordinate names
     cnames = coordnames(samplers)
-
-    ips = int.points(samplers,
-                     on = "segment",
-                     line.split = TRUE,
-                     mesh = config[["coordinates"]]$mesh,
-                     mesh.split = FALSE,
-                     mesh.coords = coordnames(samplers),
-                     geometry = "euc",
-                     length.scheme = "gaussian",
-                     n.length = 1,
-                     distance.scheme = "equidistant",
-                     n.distance = 1,
-                     distance.truncation = 1/2,
-                     fake.distance = TRUE,
-                     projection = NULL,
-                     group = pregroup,
-                     filter.zero.length = TRUE)
-    
-    ips$distance = NULL
-    ips$weight = ips$weight * samplers$weight[ips$idx]
-    ips$idx = NULL
-    ips = SpatialPointsDataFrame(ips[,c(1,2)], data = ips[,3:ncol(ips),drop=FALSE])
     
   } else if ( inherits(samplers, "SpatialPolygons") ){
     
@@ -248,22 +210,24 @@ ipmaker = function(samplers, config) {
   # 
   
   all.groups = intersect(names(ips), c(postgroup,pregroup))
+  if ( length(all.groups) == 0 ) all.groups = NULL
   if ("coordinates" %in% names(config)) {
-    coords = coordinates(ips)
-    cnames = colnames(coords)
-    df = cbind(coords, ips@data)
-    
-    if ( length(all.groups) > 0 ) { # Apply projection for each group independently
-      fn = function(x) { 
-        pr =  project.weights(x, config[["coordinates"]]$mesh, mesh.coords = cnames)
-        cbind(pr, x[rep(1, nrow(pr)),all.groups, drop = FALSE])
-      }
-      ips = recurse.rbind(fun = fn, df, cols = all.groups)
-      ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,c(postgroup, pregroup, "weight")])
-    } else { # No groups, simply project everything
-      ips = project.weights(df, config[["coordinates"]]$mesh, mesh.coords = cnames)
-      ips = SpatialPointsDataFrame(ips[,cnames],data = data.frame(weight = ips[,"weight"]))
-    }
+    # coords = coordinates(ips)
+    # cnames = colnames(coords)
+    # df = cbind(coords, ips@data)
+    # 
+    # if ( length(all.groups) > 0 ) { # Apply projection for each group independently
+    #   fn = function(x) {
+    #     pr =  project.weights(x, config[["coordinates"]]$mesh, mesh.coords = cnames)
+    #     cbind(pr, x[rep(1, nrow(pr)),all.groups, drop = FALSE])
+    #   }
+    #   ips = recurse.rbind(fun = fn, df, cols = all.groups)
+    #   ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,c(postgroup, pregroup, "weight")])
+    # } else { # No groups, simply project everything
+    #   ips = project.weights(df, config[["coordinates"]]$mesh, mesh.coords = cnames)
+    #   ips = SpatialPointsDataFrame(ips[,cnames],data = data.frame(weight = ips[,"weight"]))
+    # }
+    ips = vertex.projection(ips, config[["coordinates"]]$mesh, columns = "weight", group = all.groups)
   }
   
   
