@@ -1,7 +1,4 @@
 # GENERICS
-
-vertices = function(...){UseMethod("vertices")}
-pixels = function(...){UseMethod("pixels")}
 refine = function(...){UseMethod("refine")}
 tsplit = function(...){UseMethod("tsplit")}
 
@@ -103,8 +100,25 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
 }
 
 
+#' @title Extract vertex locations from an \code{inla.mesh}
+#'
+#' 
+#' @aliases vertices
+#' @export
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+#' @param mesh An \code{inla.mesh} object
+#' @return A \code{SpatialPointsDataFrame} of vertex locations
+#' 
+#' @examples
+#' 
+#' data("mrsea")
+#' vrt = vertices(mrsea$mesh)
+#' ggplot() + gg(mrsea$mesh) + gg(vrt, color = "red")
+#' 
 
-vertices.inla.mesh = function(mesh) {
+vertices = function(mesh) {
   if (is.null(mesh$crs)) {
     mesh$loc
   } else {
@@ -114,7 +128,30 @@ vertices.inla.mesh = function(mesh) {
   
 }
 
-pixels.inla.mesh = function(mesh, nx = 150, ny = 150, mask = TRUE) {
+
+#' @title Generate \code{SpatialPixels} covering an \code{inla.mesh}
+#'
+#' @description 
+#' 
+#' @aliases pixels
+#' @export
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+#' @param mesh An \code{inla.mesh} object
+#' @param nx Number of pixels in x direction
+#' @param ny Number of pixels in y direction
+#' @param mask If TRUE, remove pixels that are outside the mesh
+#' @return \code{SpatialPixels} covering the mesh
+#' 
+#' @examples
+#' 
+#' data("mrsea")
+#' pxl = pixels(mrsea$mesh, nx = 50, ny = 50)
+#' ggplot() + gg(pxl) + gg(mrsea$mesh)
+#' 
+
+pixels = function(mesh, nx = 150, ny = 150, mask = TRUE) {
   lattice <- inla.mesh.lattice(x=seq(min(mesh$loc[,1]), max(mesh$loc[,1]),length = nx),
                                y=seq(min(mesh$loc[,2]), max(mesh$loc[,2]),length = ny))
   pixels <- data.frame(x=lattice$loc[,1], y=lattice$loc[,2])
