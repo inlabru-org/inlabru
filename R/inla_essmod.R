@@ -1,14 +1,3 @@
-inla.spde2.matern = function(...) {
-  ret = INLA::inla.spde2.matern(...)
-  ret$mesh = list(...)[[1]]
-  ret
-}
-
-inla.spde2.pcmatern = function(...) {
-  ret = INLA::inla.spde2.pcmatern(...)
-  ret$mesh = list(...)[[1]]
-  ret
-}
 
 extract.summary = function(result, property) {
   ret = list()
