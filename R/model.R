@@ -409,13 +409,18 @@ list.A.model = function(model, points){
       A.lst[[eff$label]] = A
     } else {
       
-      loc = mapper(eff$map, points, eff)
-      loc = as.matrix(loc) # inla.spde.make.A requires matrix format as input
-
+      if ( eff$map == "coordinates" ) {
+        loc = stransform(points, crs = eff$mesh$crs)
+      } else {
+        loc = mapper(eff$map, points, eff)
+        loc = as.matrix(loc)
+      }
+  
       if (is.null(eff$ngroup)) { ng = 1 } else { ng = eff$ngroup }
       if (ng > 1) {
         group = points[[eff$group.char]]
       } else { group = NULL }
+      
       A = INLA::inla.spde.make.A(eff$mesh, loc = loc, group = group, n.group = ng)
       # Mask columns of A
       if (!is.null(eff$A.msk)) { A = A[, as.logical(eff$A.msk), drop=FALSE]}
