@@ -66,7 +66,14 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL) {
   } else if (inherits(region,"SpatialPolygons")){
     
     cnames = coordnames(region)
+    p4s = proj4string(region)
     
+    # Convert region and domain to equal area CRS
+    if ( !is.null(domain$crs) ){
+      region = stransform(region, crs = CRS("+proj=cea +units=km"))
+      domain = stransform(domain, crs = CRS("+proj=cea +units=km"))
+    }
+      
     polyloc = do.call(rbind, lapply(1:length(region), 
                                     function(k) cbind(
                                       x = rev(coordinates(region@polygons[[k]]@Polygons[[1]])[,1]),
