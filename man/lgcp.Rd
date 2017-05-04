@@ -4,7 +4,7 @@
 \alias{lgcp}
 \title{Log Gaussian Cox process (LGCP) inference using INLA}
 \usage{
-lgcp(components, data, samplers, formula,
+lgcp(components, data, samplers, formula = . ~ .,
   options = bru.options(control.compute = list(config = TRUE)))
 }
 \arguments{
