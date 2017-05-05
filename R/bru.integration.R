@@ -121,16 +121,19 @@ cprod = function(...) {
     w2 = data.frame(weight2 = ips2[,"weight"])
     
     # Merge the locations. In case of Spatial objects we need to use the sp:merge
-    # function. The avoids duplicateGeoms argument avoids getting "Error in .local(x, y, ...) : non-unique matches detected"
+    # function. Unfortunately sp::merge replicates entries in a different order than
+    # base merge so we need to reverse the order of merging the weights
+    
     if ( inherits(loc1, "Spatial") ) {
-      ips = sp::merge(loc1, loc2, duplicateGeoms = TRUE)  
+      ips = sp::merge(loc1, loc2, duplicateGeoms = TRUE) 
+      weight = merge(w2, w1)
     } else if ( inherits(loc2, "Spatial") ){
       ips = sp::merge(loc2, loc1, duplicateGeoms = TRUE)
+      weight = merge(w2, w1)
     } else {
       ips = merge(loc1, loc2)
+      weight = merge(w1, w2)
     }
-    
-    weight = merge(w1, w2)
     ips$weight = weight$weight * weight$weight2
     
   }
