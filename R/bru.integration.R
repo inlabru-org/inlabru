@@ -115,21 +115,23 @@ cprod = function(...) {
   } else {
     ips1 = ipl[[1]]
     loc1 = ips1[,setdiff(names(ipl[[1]]),"weight"), drop = FALSE]
-    w1 = ips1[,"weight", drop = FALSE]
+    w1 = data.frame(weight = ips1$weight)
     ips2 = do.call(cprod, ipl[2:length(ipl)])
     loc2 = ips2[,setdiff(names(ipl[[2]]),"weight"), drop = FALSE]
     w2 = data.frame(weight2 = ips2[,"weight"])
-    ips = merge(loc1, loc2)
+    
+    # Merge the locations. In case of Spatial objects we need to use the sp:merge
+    # function. The avoids duplicateGeoms argument avoids getting "Error in .local(x, y, ...) : non-unique matches detected"
+    if ( inherits(loc1, "Spatial") ) {
+      ips = sp::merge(loc1, loc2, duplicateGeoms = TRUE)  
+    } else if ( inherits(loc2, "Spatial") ){
+      ips = sp::merge(loc2, loc1, duplicateGeoms = TRUE)
+    } else {
+      ips = merge(loc1, loc2)
+    }
+    
     weight = merge(w1, w2)
     ips$weight = weight$weight * weight$weight2
-    
-    if ( inherits(ips1, "Spatial" ) ) {
-      coordinates(ips) = coordnames(ips1)
-      proj4string(ips) = CRS(proj4string(ips1))
-    } else if (inherits(ips2, "Spatial")) {
-      coordinates(ips) = coordnames(ips2)
-      proj4string(ips) = CRS(proj4string(ips2))
-    }
     
   }
   ips
