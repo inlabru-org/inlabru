@@ -49,7 +49,21 @@ gg = function(...){UseMethod("gg")}
 gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 
 
-#' Point geom for SpatialPoints objects
+#' Geom for data.frame
+#' 
+#' @aliases gg.data.frame
+#' @name gg.data.frame
+#' @export
+#' @import ggplot2
+#' @param data A data.frame
+#' @param ... Arguments passed on to \link{gg.prediction}
+#' @return c(geom_ribbon, geom_line)
+#' 
+gg.data.frame = function(...){
+}
+
+
+#' Geom for predictions
 #' 
 #' @aliases gg.prediction
 #' @name gg.prediction
@@ -62,21 +76,23 @@ gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 #' @param ... Arguments passed on to \link{geom_point}
 #' @return c(geom_ribbon, geom_line)
 #' 
-gg.prediction = function(data, mapping = NULL, color = "black", alpha = 0.3){
+gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", alpha = 0.3){
   
   line.map = aes_string(x = names(data)[1], 
-                        y = "median")
+                        y = "mean")
   ribbon.map = aes_string(x = names(data)[1], 
-                          ymin = "lq", 
-                          ymax = "uq")
+                          ymin = "q0.025", 
+                          ymax = "q0.975")
   
   if ( !is.null(mapping) ) { 
     line.map = modifyList(line.map, mapping) 
     ribbon.map = modifyList(ribbon.map, mapping) 
   }
-  
-    c(geom_ribbon(data = data, ribbon.map, fill = color, alpha = 0.3),
-      geom_line(data = data, line.map, color = color))
+  geom = geom_line(data = data, line.map, color = color)
+  if ( ribbon ) {
+    geom = c(geom, geom_ribbon(data = data, ribbon.map, fill = color, alpha = 0.3))
+  }
+  geom
 }
 
 #' Point geom for SpatialPoints objects

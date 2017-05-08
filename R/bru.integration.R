@@ -109,6 +109,8 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL) {
 
 cprod = function(...) {
   ipl = list(...)
+  ipl = ipl[!sapply(ipl, is.null)]
+  if ( length(ipl) == 0 ) return(NULL)
   
   if ( length(ipl) == 1 ) {
     ips = ipl[[1]]

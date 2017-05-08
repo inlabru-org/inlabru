@@ -100,7 +100,6 @@ bru = function(components = y ~ Intercept,
   if ( run ) { result = do.call(iinla, c(list(data, bru.model, stk, family = family, n = max.iter, offset = offset, result = result), options))} 
   else { result = list() }
   
-  
   ## Create result object ## 
   result$sppa$method = "bru"
   result$sppa$lhoods = lhoods
@@ -159,6 +158,12 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
     inla.family = "poisson"
   }
   
+  # Calculate data ranges
+  drange = lapply(names(data), function(nm) range(data[[nm]]))
+  names(drange) = names(data)
+  if ( inherits(data, "Spatial") ) drange[["coordinates"]] = mesh
+  
+  
   # The likelihood object that will be returned
   
   lh = list(family = family, 
@@ -170,7 +175,8 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
          expr = expr,
          response = response,
          inla.family = inla.family,
-         ips = ips)
+         ips = ips,
+         drange = drange)
   
   class(lh) = c("lhood","list")
   
@@ -381,22 +387,8 @@ predict.bru = function(object,
                        formula = NULL,
                        n.samples = 100, ...)
 {
-  result = object
   
-  if ( is.null(formula) ) {
-    lh.name = "default"
-    if ( is.null(result$sppa$lhoods[[lh.name]]$expr) ) { 
-      expr = parse(text = paste0(names(result$sppa$model$effects), collapse = "+")) }
-    else {
-      expr = parse(text = as.character(result$sppa$lhoods[[lh.name]]$formula)[3])
-    }
-  } else {
-    expr = parse(text = as.character(formula)[length(as.character(formula))])
-  }
-  
-
-  vals = evaluate.model(model = result$sppa$model, result = result, points = data, 
-                        property = "sample", n = n.samples, predictor = expr)
+  vals = generate.bru(object, data, formula = formula, n.samples = n.samples)
 
   # Summarize
   
@@ -405,13 +397,21 @@ predict.bru = function(object,
     covar = intersect(vals.names, names(data))
     estim = setdiff(vals.names, covar)
     smy = list()
+    
     for ( nm in estim ) {
         smy[[nm]] = summarize(lapply(vals, function(v) v[[nm]]), x = vals[[1]][,covar,drop=FALSE])
     }
     vals = smy
+    is.annot = sapply(names(vals), function(v) all(vals[[v]]$sd==0))
+    annot = do.call(cbind, lapply(vals[is.annot], function(v) v[,1]))
+    vals = vals[!is.annot]
+    vals = lapply(vals, function(v) cbind(data.frame(annot), v))
+    
     if(length(vals)==1) vals = vals[[1]]
+    
   } else {
-  vals = summarize(vals, x = data)
+    # if ( nrow(vals[[1]]) == nrow(data) ) { add.x = vals[[1]][,covar,drop=FALSE] } else { add.x = NULL }
+    vals = summarize(vals, x = data)
   }
 
   if (!inherits(vals, "Spatial")) class(vals) = c("prediction",class(vals))
@@ -434,9 +434,21 @@ generate.bru = function(result,
                        formula = NULL,
                        n.samples = 100)
 {
+  # Convert data into list, data.frame or a Spatial object if not provided as such
+  if ( is.character(data) ) { data = as.list(setNames(data, data)) }
+  else if ( inherits(data, "inla.mesh") ) { data = vertices(data) }
+
+  # If data is provided as list, generate data automatically for each dimension stated in this list
+  if ( class(data)[1] == "list" ) {
+    lhs.names = names(data)
+    add.pts = lapply(lhs.names, function(nm) { ipoints(object$sppa$lhoods$default$drange[[nm]], name = nm) })
+    data = do.call(cprod, add.pts)
+  }
+
+  # Turn formula into an expression
   if ( is.null(formula) ) {
     lh.name = "default"
-    if ( is.null(result$sppa$lhoods[[lh.name]]$expr) ) { 
+    if ( is.null(result$sppa$lhoods[[lh.name]]$expr) ) {
       expr = parse(text = paste0(names(result$sppa$model$effects), collapse = "+")) }
     else {
       expr = parse(text = as.character(result$sppa$lhoods[[lh.name]]$formula)[3])
@@ -445,11 +457,9 @@ generate.bru = function(result,
     expr = parse(text = as.character(formula)[length(as.character(formula))])
   }
   
-  
   vals = evaluate.model(model = result$sppa$model, result = result, points = data, 
                         property = "sample", n = n.samples, predictor = expr)
-  
-  # smy = summarize(vals, x = data, cbind.only = TRUE)
+
 }
 
 
@@ -547,38 +557,33 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.
 #' 
 #' @aliases summarize
 #' @export
-#' @param data A data.frame
-#' @param x Annotations for the resulting summary
-#' @return A data.frame with summary statistics
+#' @param data A list of samples, each either numeric or a \code{data.frame}
+#' @param x A \code{data.frame} of data columns that should be added to the summary data frame
+#' @return A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
 
-summarize = function(data, x = NULL, gg = FALSE, cbind.only = FALSE) {
+summarize = function(data, x = NULL, cbind.only = FALSE) {
   if ( is.list(data) ) { data = do.call(cbind, data) }
-  if ( gg ) {
-    smy = rbind(
-      data.frame(y = apply(data, MARGIN = 1, mean, na.rm = TRUE), property = "mean"),
-      data.frame(y = apply(data, MARGIN = 1, sd, na.rm = TRUE), property = "sd"),
-      data.frame(y = apply(data, MARGIN = 1, quantile, 0.025, na.rm = TRUE), property = "lq"),
-      data.frame(y = apply(data, MARGIN = 1, quantile, 0.5, na.rm = TRUE), property = "median"),
-      data.frame(y = apply(data, MARGIN = 1, quantile, 0.975, na.rm = TRUE), property = "uq"))
-  } else if ( cbind.only ) {
+  if ( cbind.only ) {
     smy = data.frame(data)
     colnames(smy) = paste0("sample.",1:ncol(smy))
   } else { 
     smy = data.frame(
       apply(data, MARGIN = 1, mean, na.rm = TRUE),
       apply(data, MARGIN = 1, sd, na.rm = TRUE),
-      t(apply(data, MARGIN = 1, quantile, prob = c(0.025, 0.5, 0.975), na.rm = TRUE)))
-    colnames(smy) = c("mean", "sd", "lq", "median","uq")
+      t(apply(data, MARGIN = 1, quantile, prob = c(0.025, 0.5, 0.975), na.rm = TRUE)),
+      apply(data, MARGIN = 1, min, na.rm = TRUE),
+      apply(data, MARGIN = 1, max, na.rm = TRUE))
+    colnames(smy) = c("mean", "sd", "q0.025", "median","q0.975", "smin", "smax")
     smy$cv = smy$sd/smy$mean
     smy$var = smy$sd^2
   }
-  if ( !is.null(x) ) { 
+  if ( !is.null(x) & (nrow(smy) == nrow(x))) { 
     if ( inherits(x, "Spatial") ) {
       if ( class(x) == "SpatialPoints" ) { smy = SpatialPointsDataFrame(x, data = smy) }
       else if ( class(x) == "SpatialPixels" ) { smy = SpatialPixelsDataFrame(x, data = smy) }
       else { x@data = cbind(x@data, smy) ; smy = x }
     }
-    else {smy = cbind(x, smy) }
+    else { smy = cbind(x, smy) }
   }
   return(smy)
 }
