@@ -49,6 +49,35 @@ gg = function(...){UseMethod("gg")}
 gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 
 
+#' Point geom for SpatialPoints objects
+#' 
+#' @aliases gg.prediction
+#' @name gg.prediction
+#' @export
+#' @import ggplot2
+#' @param data A prediction object
+#' @param mapping Set of aesthetic mappings created by \link{aes} or \link{aes_}
+#' @param color Color of the ribbon and the line
+#' @param alpha Alpha level of the ribbon
+#' @param ... Arguments passed on to \link{geom_point}
+#' @return c(geom_ribbon, geom_line)
+#' 
+gg.prediction = function(data, mapping = NULL, color = "black", alpha = 0.3){
+  
+  line.map = aes_string(x = names(data)[1], 
+                        y = "median")
+  ribbon.map = aes_string(x = names(data)[1], 
+                          ymin = "lq", 
+                          ymax = "uq")
+  
+  if ( !is.null(mapping) ) { 
+    line.map = modifyList(line.map, mapping) 
+    ribbon.map = modifyList(ribbon.map, mapping) 
+  }
+  
+    c(geom_ribbon(data = data, ribbon.map, fill = color, alpha = 0.3),
+      geom_line(data = data, line.map, color = color))
+}
 
 #' Point geom for SpatialPoints objects
 #' 
