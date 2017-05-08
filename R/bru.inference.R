@@ -566,7 +566,7 @@ summarize = function(data, x = NULL, cbind.only = FALSE) {
   if ( cbind.only ) {
     smy = data.frame(data)
     colnames(smy) = paste0("sample.",1:ncol(smy))
-  } else { 
+  } else {
     smy = data.frame(
       apply(data, MARGIN = 1, mean, na.rm = TRUE),
       apply(data, MARGIN = 1, sd, na.rm = TRUE),
@@ -577,13 +577,17 @@ summarize = function(data, x = NULL, cbind.only = FALSE) {
     smy$cv = smy$sd/smy$mean
     smy$var = smy$sd^2
   }
-  if ( !is.null(x) & (nrow(smy) == nrow(x))) { 
+  if ( !is.null(x) ) {
     if ( inherits(x, "Spatial") ) {
-      if ( class(x) == "SpatialPoints" ) { smy = SpatialPointsDataFrame(x, data = smy) }
-      else if ( class(x) == "SpatialPixels" ) { smy = SpatialPixelsDataFrame(x, data = smy) }
-      else { x@data = cbind(x@data, smy) ; smy = x }
+      if ( nrow( coordinates(x)) == nrow(smy) ) {
+        if ( class(x) == "SpatialPoints" ) { smy = SpatialPointsDataFrame(x, data = smy) }
+        else if ( class(x) == "SpatialPixels" ) { smy = SpatialPixelsDataFrame(x, data = smy) }
+        else { x@data = cbind(x@data, smy) ; smy = x }
+      }
     }
-    else { smy = cbind(x, smy) }
+    else {
+      if ( (nrow(smy) == nrow(x)) ) { smy = cbind(x, smy) }
+    }
   }
   return(smy)
 }
