@@ -519,7 +519,7 @@ mint = function(df,knots,dname) {
 # @param group Character array identifying columns in \code{points}. These coloumns are interpreted as factors and the projection is performed independently for eah combination of factor levels.
 # @return SpatialPointsDataFrame of mesh vertices with projected data attached
 
-vertex.projection = function(points, mesh, columns = names(points), group = NULL){
+vertex.projection = function(points, mesh, columns = names(points), group = NULL, fill = NULL){
   
   if ( is.null(group) ) {
     
@@ -537,8 +537,23 @@ vertex.projection = function(points, mesh, columns = names(points), group = NULL
     data = data.frame(data)
     coords = mesh$loc[as.numeric(names(w.by)),c(1,2)]
     data$vertex = as.numeric(names(w.by))
+    
     ret = SpatialPointsDataFrame(coords, proj4string = CRS(proj4string(points)), data = data)
     coordnames(ret) = coordnames(points)
+    
+    # If null is not not NULL, add vertices to which no data was projected
+    # and set their projected data according to `fill`
+    
+    if ( !is.null(fill) ) {
+      vrt = vertices(mesh)
+      vrt = vrt[setdiff(vrt$vertex, data$vertex),]
+      if ( nrow(vrt) > 0 ){
+        for (nm in setdiff(names(data), "vertex")) vrt[[nm]] = fill
+        ret = rbind(ret, vrt)
+      }
+      ret = ret[match(1:mesh$n, ret$vertex),]
+    } 
+    
     
   } else {
     fn = function(X) {
