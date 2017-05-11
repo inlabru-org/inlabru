@@ -123,7 +123,7 @@ vertices = function(mesh) {
     mesh$loc
   } else {
     if (any(!(mesh$loc[,3]==0))) { vrt = mesh$loc } else { vrt = mesh$loc[,c(1,2)] }
-    SpatialPointsDataFrame(vrt, proj4string = mesh$crs, data = data.frame(idx = 1:nrow(mesh$loc)))
+    SpatialPointsDataFrame(vrt, proj4string = mesh$crs, data = data.frame(vertex = 1:nrow(mesh$loc)))
   }
   
 }
