@@ -413,7 +413,7 @@ list.A.model = function(model, points){
         loc = stransform(points, crs = eff$mesh$crs)
       } else {
         loc = mapper(eff$map, points, eff)
-        loc = as.matrix(loc)
+        if ( !is.matrix(loc) & !inherits(loc,"Spatial") ) loc = as.matrix(loc)
       }
   
       if (is.null(eff$ngroup)) { ng = 1 } else { ng = eff$ngroup }
