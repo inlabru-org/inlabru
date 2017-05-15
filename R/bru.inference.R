@@ -249,10 +249,11 @@ lgcp = function(components,
                 data,
                 samplers,
                 formula = . ~ .,
+                run = TRUE,
                 options = bru.options(control.compute = list(config = TRUE))) {
 
   lik = like("cp", formula = formula, data = data, samplers = samplers, components = components)
-  result = bru(components, lik)
+  result = bru(components, lik, run = run)
   
 }
 
