@@ -9,7 +9,17 @@ bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
   TRUE), control.inla = iinla.getOption("control.inla"), ...)
 }
 \arguments{
-\item{...}{}
+\item{mesh}{An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.}
+
+\item{run}{If TRUE, run inference. Otherwise only return configuration needed to run inference.}
+
+\item{max.iter}{maximum number of inla iterations}
+
+\item{offset}{the usual \link{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.}
+
+\item{result}{An \code{inla} object returned from previous calls of \link{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
+
+\item{...}{Additional options passed on to \link{inla}}
 }
 \description{
 Additional \link{bru} options

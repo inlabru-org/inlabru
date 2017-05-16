@@ -205,10 +205,16 @@ stackmaker.like = function(lhood) {
 #' @aliases bru.options
 #' @export
 #' 
+#' @param mesh An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.
+#' @param run If TRUE, run inference. Otherwise only return configuration needed to run inference.
+#' @param max.iter maximum number of inla iterations
+#' @param offset the usual \link{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.
+#' @param result An \code{inla} object returned from previous calls of \link{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
+#' @param ... Additional options passed on to \link{inla}
+#' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-#' @param ...
-#' 
+
 bru.options = function(mesh = NULL, 
                        run = TRUE,
                        max.iter = 10,
@@ -222,13 +228,6 @@ bru.options = function(mesh = NULL,
   args <- as.list(environment())
   args$control.compute = NULL
   args$control.inla = NULL
-  # 
-  # args = list(mesh = mesh, 
-  #             run = run, 
-  #             max.iter = max.iter, 
-  #             offset = offset, 
-  #             result = result)
-  
   args$inla.options = list(...)
   args$inla.options$control.compute = control.compute
   args$inla.options$control.inla = control.inla
