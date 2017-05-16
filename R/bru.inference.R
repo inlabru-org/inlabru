@@ -406,6 +406,10 @@ predict.bru = function(object,
                        n.samples = 100, ...)
 {
   
+  # Convert data into list, data.frame or a Spatial object if not provided as such
+  if ( is.character(data) ) { data = as.list(setNames(data, data)) }
+  else if ( inherits(data, "inla.mesh") ) { data = vertices(data) }
+  
   vals = generate.bru(object, data, formula = formula, n.samples = n.samples)
 
   # Summarize
