@@ -488,7 +488,7 @@ list.indices.model = function(model, points){
 # @param model An \link{inlabru} \link{model}
 # @param result Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.
 # @param points Locations and covariates needed to evaluate the model.
-# @param predictor An expression to be ealuated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects.
+# @param predictor A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects. In case of a formula the right hand side is used for evaluation.
 # @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
 # @param n Number of samples to draw.
 # 
@@ -500,6 +500,12 @@ evaluate.model = function(model,
                           n = 1) {
   
   data = points # Within the evaluation make points available via the name "data" 
+  
+  
+  if ( inherits(predictor, "formula") ) {
+    fml.envir = as.list(environment(predictor))
+    predictor = parse(text = as.character(predictor)[length(as.character(predictor))])
+  } else { fml.envir = list() }
   
   # Do we otain our values from sampling or from a property of a summary?
   if ( property == "sample") {
@@ -562,7 +568,8 @@ evaluate.model = function(model,
     if ( is.null(predictor) ) {
       smp[[k]] = data.frame(sm)
     } else {
-      smp[[k]] = eval(predictor, envir = c(sm, as.list(data.frame(points)), as.list(environment(model$formula))))
+      envir = c(sm, as.list(data.frame(points)), fml.envir, as.list(environment(model$formula)))
+      smp[[k]] = eval(predictor, envir = envir)
     }
   }
   
