@@ -37,6 +37,7 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL) {
     fem = inla.mesh.1d.fem(domain)
     ips = data.frame(weight = diag(as.matrix(fem$c0)))
     ips[name] = domain$loc
+    ips = ips[,c(2,1)] # make weights second column
   
   } else if ( inherits(region, "inla.mesh") ){
     
