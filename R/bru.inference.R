@@ -406,7 +406,10 @@ predict.bru = function(object,
     is.annot = sapply(names(vals), function(v) all(vals[[v]]$sd==0))
     annot = do.call(cbind, lapply(vals[is.annot], function(v) v[,1]))
     vals = vals[!is.annot]
-    vals = lapply(vals, function(v) cbind(data.frame(annot), v))
+    if ( !is.null(annot) ) {
+      vals = lapply(vals, function(v) cbind(data.frame(annot), v))
+    }
+    
     
     if(length(vals)==1) vals = vals[[1]]
     
@@ -447,19 +450,10 @@ generate.bru = function(result,
   }
 
   # Turn formula into an expression
-  if ( is.null(formula) ) {
-    lh.name = "default"
-    if ( is.null(result$sppa$lhoods[[lh.name]]$expr) ) {
-      expr = parse(text = paste0(names(result$sppa$model$effects), collapse = "+")) }
-    else {
-      expr = parse(text = as.character(result$sppa$lhoods[[lh.name]]$formula)[3])
-    }
-  } else {
-    expr = parse(text = as.character(formula)[length(as.character(formula))])
-  }
+  if ( is.null(formula) ) { formula = result$sppa$lhoods[["default"]]$formula }
   
   vals = evaluate.model(model = result$sppa$model, result = result, points = data, 
-                        property = "sample", n = n.samples, predictor = expr)
+                        property = "sample", n = n.samples, predictor = formula)
 
 }
 
