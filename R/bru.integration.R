@@ -123,7 +123,7 @@ cprod = function(...) {
     loc1 = ips1[,setdiff(names(ipl[[1]]),"weight"), drop = FALSE]
     w1 = data.frame(weight = ips1$weight)
     ips2 = do.call(cprod, ipl[2:length(ipl)])
-    loc2 = ips2[,setdiff(names(ipl[[2]]),"weight"), drop = FALSE]
+    loc2 = ips2[,setdiff(names(ips2),"weight"), drop = FALSE]
     w2 = data.frame(weight2 = ips2[,"weight"])
     
     # Merge the locations. In case of Spatial objects we need to use the sp:merge
