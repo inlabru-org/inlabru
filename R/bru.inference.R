@@ -159,10 +159,10 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
   }
   
   # Calculate data ranges
-  drange = lapply(names(data), function(nm) range(data[[nm]]))
+  drange = lapply(names(data), function(nm) {  if(is.numeric(data[[nm]])) {range(data[[nm]])} else {NULL} } )
   names(drange) = names(data)
   if ( inherits(data, "Spatial") ) drange[["coordinates"]] = mesh
-  
+
   
   # The likelihood object that will be returned
   
