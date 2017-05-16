@@ -263,7 +263,7 @@ bru.options = function(mesh = NULL,
 
 lgcp = function(components,
                 data,
-                samplers,
+                samplers = NULL,
                 formula = . ~ .,
                 E = 1,
                 options = list()) {
