@@ -51,7 +51,7 @@ int.slines = function(data, mesh, group = NULL, project = TRUE) {
   if ( "weight" %in% names(data) ) { ips$weight = ips$weight * data$weight[idx[,1]] }
   
   
-  # if ( !is.null(group) ) { ips = cbind(ips, as.data.frame(data)[idx[,1],group,drop=FALSE]) }
+  if ( !is.null(group) ) { ips = cbind(ips, as.data.frame(data)[idx[,1],group,drop=FALSE]) }
   
   coordinates(ips) = c("x","y")
   if (!is.null(coordnames(data))) coordnames(ips) = coordnames(data)

@@ -18,11 +18,16 @@
 #' myDim
 #' 
 
-ipoints = function(region, domain = NULL, name = "x", group = NULL) {
+ipoints = function(region, domain = NULL, name = "x", group = NULL, project) {
   
   pregroup = NULL
   
-  if (is.integer(region)){
+  if ( is.data.frame(region) ) {
+    if (!("weight" %in% names(region))) { region$weight = 1 }
+    ips = region
+  }
+  
+  else if (is.integer(region)){
     
     ips = data.frame(weight = rep(1,length(region)))
     ips[name] = region
@@ -43,6 +48,11 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL) {
     
     ips = vertices(region)
     ips$weight = diag(as.matrix(inla.mesh.fem(region)$c0))
+    
+  } else if ( class(region) == "SpatialPoints" ){
+    
+    ips = region
+    ips$weight = 1
     
   } else if ( class(region) == "SpatialPointsDataFrame" ){
     
@@ -69,6 +79,11 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL) {
     ips = int.slines(region, domain, group = group)
   
   } else if (inherits(region,"SpatialPolygons")){
+    
+    # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
+    if ( class(region)[1] == "SpatialPolygons" ) { 
+      region = SpatialPolygonsDataFrame(regio, data = data.frame(weight = rep(1, length(region)))) 
+    }
     
     cnames = coordnames(region)
     p4s = proj4string(region)
@@ -182,110 +197,29 @@ ipmaker = function(samplers, config) {
   
   # First step: Figure out which marks are already included in the samplers (e.g. time)
   # For each of the levels of these marks the integration points will be computed independently
-  pregroup = setdiff(colnames(samplers), "weight")
+  pregroup = intersect(setdiff(names(samplers), "weight"), names(config))
   postgroup = setdiff(names(config), c(pregroup, "coordinates"))
   
   # By default we assume we are handling a Spatial* object
   spatial = TRUE
   
-  
-  
-  # If samplers is a data frame assume these are integration points with a weight column attached
-  if ( is.data.frame(samplers) ) {
-    if (!("weight" %in% names(samplers))) { 
-      warning("The integration points provided have no weight column. Setting weights to 1.")
-      samplers$weight = 1
-    }
-    stop("Not implemented")
-  }
-  
-  # If a samplers is a SpatialPointsDataFrame we assume these are already integration points with a weight column attached
-  else if ( class(samplers) == "SpatialPointsDataFrame" ){
-    if (!("weight" %in% names(samplers))) { 
-      warning("The integration points provided have no weight column. Setting weights to 1.")
-      samplers$weight = 1
-    }
-    
-    ips = samplers
-  } 
-  else if ( inherits(samplers, "SpatialLines") || inherits(samplers, "SpatialLinesDataFrame") ){
-    
-    # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
-    if ( class(samplers)[1] == "SpatialLines" ) { 
-      samplers = SpatialLinesDataFrame(samplers, data = data.frame(weight = rep(1, length(samplers)))) 
-    }
-    
-    # Set weights to 1 if not provided
-    if (!("weight" %in% names(samplers))) { 
-      warning("The integration points provided have no weight column. Setting weights to 1.")
-      samplers$weight = 1
-    }
-    
-    ips = int.slines(samplers, config[["coordinates"]]$mesh, group = pregroup, project = FALSE)
-    
-    # Store coordinate names
-    cnames = coordnames(samplers)
-    
-  } else if ( inherits(samplers, "SpatialPolygons") ){
-    
-    # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
-    if ( class(samplers)[1] == "SpatialPolygons" ) { 
-      samplers = SpatialPolygonsDataFrame(samplers, data = data.frame(weight = rep(1, length(samplers)))) 
-    }
-    
-    # Store coordinate names
-    cnames = coordnames(samplers)
-    
-    
-    polyloc = do.call(rbind, lapply(1:length(samplers), 
-                                    function(k) cbind(
-                                      x = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[,1]),
-                                      y = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[,2]),
-                                      group = k)))
-    ips = int.polygon(config[["coordinates"]]$mesh, loc = polyloc[,1:2], group = polyloc[,3])
-    df = data.frame(samplers@data[ips$group, pregroup, drop = FALSE], weight = ips[,"weight"])
-    ips = SpatialPointsDataFrame(ips[,c("x","y")],data = df)
-    
-  } else if ( is.null(samplers) ){
-    if ( "coordinates" %in% names(config) ) {
-      ips = SpatialPointsDataFrame(config[["coordinates"]]$mesh$loc[,c(1,2)], 
-                                   data = data.frame(weight = diag(as.matrix(inla.mesh.fem(config[["coordinates"]]$mesh)$c0))))
-      coordnames(ips) = config[["coordinates"]]$cnames
-      cnames = coordnames(ips)
-    } else {
-      ips = NULL
-      spatial = FALSE
-    }
-  } else {
-    stop("Unknown format of integration data")
-  }
-  
-  
   #
-  # Reduce number of integration points by projection onto mesh vertices
+  # Inital integration points
   # 
   
-  all.groups = intersect(names(ips), c(postgroup,pregroup))
-  if ( length(all.groups) == 0 ) all.groups = NULL
-  if ("coordinates" %in% names(config)) {
-    # coords = coordinates(ips)
-    # cnames = colnames(coords)
-    # df = cbind(coords, ips@data)
-    # 
-    # if ( length(all.groups) > 0 ) { # Apply projection for each group independently
-    #   fn = function(x) {
-    #     pr =  project.weights(x, config[["coordinates"]]$mesh, mesh.coords = cnames)
-    #     cbind(pr, x[rep(1, nrow(pr)),all.groups, drop = FALSE])
-    #   }
-    #   ips = recurse.rbind(fun = fn, df, cols = all.groups)
-    #   ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,c(postgroup, pregroup, "weight")])
-    # } else { # No groups, simply project everything
-    #   ips = project.weights(df, config[["coordinates"]]$mesh, mesh.coords = cnames)
-    #   ips = SpatialPointsDataFrame(ips[,cnames],data = data.frame(weight = ips[,"weight"]))
-    # }
-    ips = vertex.projection(ips, config[["coordinates"]]$mesh, columns = "weight", group = all.groups)
+  if ( !is.null(samplers) ) {
+    ips = ipoints(samplers, config[["coordinates"]]$mesh, group = pregroup, project = FALSE)
+    
+    # Reduce number of integration points by projection onto mesh vertices
+    all.groups = intersect(names(ips), c(postgroup,pregroup))
+    if ( length(all.groups) == 0 ) all.groups = NULL
+    if ("coordinates" %in% names(config)) {
+      ips = vertex.projection(ips, config[["coordinates"]]$mesh, columns = "weight", group = all.groups)
+    }
+    
+  } else {
+    ips = NULL
   }
-  
   
   #
   # Expand the integration points over postgroup dimensions
@@ -300,19 +234,11 @@ ipmaker = function(samplers, config) {
                                      n = grp.cfg$n.points,
                                      geometry = "euc")
     
-    if ( is.null(ips) ) {
-      ips = do.call(int.1d, c(list(coords = gname), li[[gname]]))
-    } else {
-      ips = do.call(int.expand, c(list(as.data.frame(ips)), li))
-      if ( spatial ) {
-        ips = SpatialPointsDataFrame(ips[,cnames],data = ips[,intersect(c(postgroup, pregroup, "weight"), colnames(ips)) ])
-      }
-    }
+    nips = ipoints(c(li[[gname]]$sp, li[[gname]]$ep), li[[gname]]$n, name = gname)
+    
+    if ( is.null(ips) ) { ips = nips } else { ips = cprod(ips, nips) }
   }
   
-
-  
-  if (spatial) { proj4string(ips) = CRS(config[["coordinates"]]$p4s) }
   ips
 }
 
