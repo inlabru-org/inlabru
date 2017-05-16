@@ -4,8 +4,7 @@
 \alias{lgcp}
 \title{Log Gaussian Cox process (LGCP) inference using INLA}
 \usage{
-lgcp(components, data, samplers, formula = . ~ ., E = 1, run = TRUE,
-  options = bru.options(control.compute = list(config = TRUE)))
+lgcp(components, data, samplers, formula = . ~ ., E = 1, options = list())
 }
 \arguments{
 \item{components}{A formula describing the latent components}

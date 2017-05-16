@@ -17,13 +17,8 @@ generate = function(...){UseMethod("generate")}
 #' @param family Character defining one of the likelihoods supported by \link{like}. Alternatively, an object cunstructed by \link{like}.
 #' @param data A data.frame or SpatialPoints[DataFrame] object
 #' @param ... Additional likelihoods, each constructed by a calling \link{like}
-#' @param mesh An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.
-#' @param run If TRUE, run inference. Otherwise only return configuration needed to run inference.
-#' @param max.iter maximum number of \link{iinla} iterations
-#' @param offset the usual \link{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.
-#' @param result An \code{inla} object returned from previous calls of \link{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
-#' 
-#' @return A \link{bru} object (inherits from iinla and \link{inla})
+#' @param options See \link{bru.options} 
+#' @return A \link{bru} object
 #' 
 #' @examples
 #' 
@@ -37,12 +32,10 @@ bru = function(components = y ~ Intercept,
                family = NULL,
                data = NULL,
                ...,
-               mesh = NULL, 
-               run = TRUE,
-               max.iter = 10,
-               offset = 0,
-               result = NULL, 
-               options = bru.options(control.compute = list(config = TRUE, dic = TRUE, waic = TRUE))) {
+               options = list()) {
+  
+  # Update default options
+  options = do.call(bru.options, options)
   
   # Automatically add Intercept and -1 to components unless -1 is in components formula
   components = auto.intercept(components)
@@ -97,14 +90,14 @@ bru = function(components = y ~ Intercept,
   family = sapply(1:length(lhoods), function(k) lhoods[[k]]$inla.family)
   
   # Run iterated INLA
-  if ( run ) { result = do.call(iinla, c(list(data, bru.model, stk, family = family, n = max.iter, offset = offset, result = result), options))} 
+  if ( options$run ) { result = do.call(iinla, list(data, bru.model, stk, family = family, n = options$max.iter, offset = options$offset, result = options$result, inla.options = options$inla.options))} 
   else { result = list() }
   
   ## Create result object ## 
   result$sppa$method = "bru"
   result$sppa$lhoods = lhoods
   result$sppa$model = bru.model
-  result$sppa$mesh = mesh
+  result$sppa$mesh = options$mesh
   class(result) = c("bru", class(result))
   return(result)
 }
@@ -216,8 +209,31 @@ stackmaker.like = function(lhood) {
 #' 
 #' @param ...
 #' 
-bru.options = function(...) {
-  list(...)
+bru.options = function(mesh = NULL, 
+                       run = TRUE,
+                       max.iter = 10,
+                       offset = 0,
+                       result = NULL, 
+                       control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
+                       control.inla = iinla.getOption("control.inla"),
+                       ... )
+{
+  
+  args <- as.list(environment())
+  args$control.compute = NULL
+  args$control.inla = NULL
+  # 
+  # args = list(mesh = mesh, 
+  #             run = run, 
+  #             max.iter = max.iter, 
+  #             offset = offset, 
+  #             result = result)
+  
+  args$inla.options = list(...)
+  args$inla.options$control.compute = control.compute
+  args$inla.options$control.inla = control.inla
+  
+  args
 }
 
 
@@ -251,13 +267,13 @@ lgcp = function(components,
                 samplers,
                 formula = . ~ .,
                 E = 1,
-                run = TRUE,
-                options = bru.options(control.compute = list(config = TRUE))) {
-
+                options = list()) {
+  
   lik = like("cp", formula = formula, data = data, samplers = samplers, components = components, E = E)
-  result = bru(components, lik, run = run)
+  result = bru(components, lik, options = options)
   
 }
+
 
 # Summarize a LGCP object
 #
@@ -611,10 +627,9 @@ summarize = function(data, x = NULL, cbind.only = FALSE) {
 
 
 iinla = function(data, model, stackmaker, n = 10, result = NULL, 
+                 family,
                  iinla.verbose = iinla.getOption("iinla.verbose"), 
-                 control.inla = iinla.getOption("control.inla"), 
-                 control.compute = iinla.getOption("control.compute"),
-                 offset = NULL, ...){
+                 offset = NULL, inla.options){
   
   # # Default number of maximum iterations
   # if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
@@ -632,11 +647,10 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
   interrupt = FALSE
   
   while ( (k <= n) & !interrupt ) {
-    iargs = list(...) # Arguments passed on to INLA
     
     # When running multiple times propagate theta
     if ( k>1 ) {
-      iargs[["control.mode"]] = list(restart = TRUE, theta = result$mode$theta)
+      inla.options[["control.mode"]] = list(restart = TRUE, theta = result$mode$theta)
     }
     
     # Verbose
@@ -648,11 +662,11 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     
     icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
                                                    data = c(inla.stack.mdata(stk), list.data(model)),
+                                                   family = family,
                                                    control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
                                                    E = inla.stack.data(stk)$e,
-                                                   offset = inla.stack.data(stk)$bru.offset + offset,
-                                                   control.inla = control.inla,
-                                                   control.compute = control.compute), iargs)), 
+                                                   offset = inla.stack.data(stk)$bru.offset + offset),
+                                                   inla.options)), 
                               error = warning
                             )
                        )

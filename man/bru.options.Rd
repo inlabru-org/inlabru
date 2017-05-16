@@ -4,7 +4,9 @@
 \alias{bru.options}
 \title{Additional \link{bru} options}
 \usage{
-bru.options(...)
+bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
+  result = NULL, control.compute = list(config = TRUE, dic = TRUE, waic =
+  TRUE), control.inla = iinla.getOption("control.inla"), ...)
 }
 \arguments{
 \item{...}{}

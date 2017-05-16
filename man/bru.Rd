@@ -5,9 +5,7 @@
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
 bru(components = y ~ Intercept, family = NULL, data = NULL, ...,
-  mesh = NULL, run = TRUE, max.iter = 10, offset = 0, result = NULL,
-  options = bru.options(control.compute = list(config = TRUE, dic = TRUE, waic
-  = TRUE)))
+  options = list())
 }
 \arguments{
 \item{components}{a formula describing the latent components}
@@ -18,18 +16,10 @@ bru(components = y ~ Intercept, family = NULL, data = NULL, ...,
 
 \item{...}{Additional likelihoods, each constructed by a calling \link{like}}
 
-\item{mesh}{An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.}
-
-\item{run}{If TRUE, run inference. Otherwise only return configuration needed to run inference.}
-
-\item{max.iter}{maximum number of \link{iinla} iterations}
-
-\item{offset}{the usual \link{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.}
-
-\item{result}{An \code{inla} object returned from previous calls of \link{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
+\item{options}{See \link{bru.options}}
 }
 \value{
-A \link{bru} object (inherits from iinla and \link{inla})
+A \link{bru} object
 }
 \description{
 This method is a wrapper for \link{inla} and provides multiple enhancements. 
