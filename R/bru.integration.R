@@ -29,7 +29,11 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL) {
   }
   
   else if (is.numeric(region)) {
-    domain = inla.mesh.1d(seq(region[1], region[2], length.out = 25))
+    # If domain is NULL set domain to a 1D mesh with 25 equally spaced vertices and boundary according to region
+    # If domain is a single numeric set domain to a 1D mesh with n=domain vertices and boundary according to region
+    if ( is.null(domain) ) { domain = inla.mesh.1d(seq(region[1], region[2], length.out = 25)) }
+    else if ( is.numeric(domain)) { domain = inla.mesh.1d(seq(region[1], region[2], length.out = domain)) }
+    
     fem = inla.mesh.1d.fem(domain)
     ips = data.frame(weight = diag(as.matrix(fem$c0)))
     ips[name] = domain$loc
