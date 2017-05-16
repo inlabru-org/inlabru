@@ -18,7 +18,7 @@ like(family, formula = . ~ ., data = NULL, components = NULL,
 
 \item{mesh}{An inla.mesh object}
 
-\item{E}{Poisson exposure parameter (if family = 'poisson') passed on to \link{inla}}
+\item{E}{Exposure parameter for family = 'poisson' passed on to \link{inla}. Special case if family is 'cp': rescale all integration weights by E.}
 
 \item{samplers}{Integration domain for 'cp' family (not implemented!)
 

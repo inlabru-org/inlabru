@@ -122,7 +122,7 @@ bru = function(components = y ~ Intercept,
 #' @param data Likelihood-specific data
 #' @param components Components
 #' @param mesh An inla.mesh object
-#' @param E Poisson exposure parameter (if family = 'poisson') passed on to \link{inla} 
+#' @param E Exposure parameter for family = 'poisson' passed on to \link{inla}. Special case if family is 'cp': rescale all integration weights by E.
 #' @param samplers Integration domain for 'cp' family (not implemented!)
 #' 
 like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = NULL, E = 1, samplers = NULL) {
@@ -192,7 +192,7 @@ stackmaker.like = function(lhood) {
   if (lhood$family == "cp"){
     sm = function(model, result) {
       inla.stack(make.stack(points = lhood$data, model = model, expr = lhood$expr, y = 1, E = 0, result = result),
-                 make.stack(points = lhood$ips, model = model, expr = lhood$expr, y = 0, E = lhood$ips$weight, offset = 0, result = result))
+                 make.stack(points = lhood$ips, model = model, expr = lhood$expr, y = 0, E = lhood$E * lhood$ips$weight, offset = 0, result = result))
     }
     
   } else { 
@@ -242,6 +242,7 @@ bru.options = function(...) {
 #' @param data A data frame or SpatialPoints[DataFrame] object
 #' @param samplers A data frame or Spatial[Points/Lines/Polygons]DataFrame objects
 #' @param formula If NULL, the linear combination implied by the \code{components} is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
+#' @param E Single numeric used rescale all integration weights by a fixed factor 
 #' @param options See \link{bru.options}
 #' @return An \link{iinla} object
 
@@ -249,10 +250,11 @@ lgcp = function(components,
                 data,
                 samplers,
                 formula = . ~ .,
+                E = 1,
                 run = TRUE,
                 options = bru.options(control.compute = list(config = TRUE))) {
 
-  lik = like("cp", formula = formula, data = data, samplers = samplers, components = components)
+  lik = like("cp", formula = formula, data = data, samplers = samplers, components = components, E = E)
   result = bru(components, lik, run = run)
   
 }

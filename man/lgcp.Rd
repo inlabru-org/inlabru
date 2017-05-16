@@ -4,7 +4,7 @@
 \alias{lgcp}
 \title{Log Gaussian Cox process (LGCP) inference using INLA}
 \usage{
-lgcp(components, data, samplers, formula = . ~ ., run = TRUE,
+lgcp(components, data, samplers, formula = . ~ ., E = 1, run = TRUE,
   options = bru.options(control.compute = list(config = TRUE)))
 }
 \arguments{
@@ -15,6 +15,8 @@ lgcp(components, data, samplers, formula = . ~ ., run = TRUE,
 \item{samplers}{A data frame or Spatial[Points/Lines/Polygons]DataFrame objects}
 
 \item{formula}{If NULL, the linear combination implied by the \code{components} is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.}
+
+\item{E}{Single numeric used rescale all integration weights by a fixed factor}
 
 \item{options}{See \link{bru.options}}
 }
