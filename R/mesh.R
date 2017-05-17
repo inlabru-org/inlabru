@@ -266,8 +266,8 @@ tsplit.inla.mesh = function(mesh){
 
 
 
-#' Generate a simple default mesh
-#'
+# Generate a simple default mesh
+#
 # @aliases default.mesh
 # @export
 # @param spObject A Spatial* object
