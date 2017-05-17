@@ -5,7 +5,7 @@
 \title{Geom for predictions}
 \usage{
 \method{gg}{prediction}(data, mapping = NULL, ribbon = TRUE,
-  color = "black", alpha = 0.3)
+  color = "black", alpha = 0.3, ...)
 }
 \arguments{
 \item{data}{A prediction object}
@@ -16,7 +16,7 @@
 
 \item{alpha}{Alpha level of the ribbon}
 
-\item{...}{Arguments passed on to \link{geom_point}}
+\item{...}{Arguments passed on to \link{geom_line}}
 }
 \value{
 c(geom_ribbon, geom_line)
