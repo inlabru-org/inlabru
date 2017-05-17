@@ -1,17 +1,4 @@
-#' Plot a marginal posterior given an INLA result
-#' 
-#'
-#' @aliases plot.marginal
-#' @param x An object inheriting from \link{inla}
-#' @param effects Character array stating the name of the effect to be plotted
-#' @param ... Passed on to \code{plot.marginal.inla}
-#' @export
 
-plot.marginal = function(x, effects, ...){ 
-  plot.marginal.inla(x, varname = effects, ...) 
-}
-
- 
 # Play (animate) spatial field
 #
 # Animates a spatial field using RGL. 
