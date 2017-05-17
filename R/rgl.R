@@ -11,7 +11,6 @@ globe = function(R = 1,
                  box = FALSE, 
                  xlab = "", ylab= "", zlab = ""){
   
-  require(sphereplot)
   
   # coordinates for texture
   n.smp = 50

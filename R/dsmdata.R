@@ -59,7 +59,7 @@ import.dsmdata = function(dsmdata, covar.col = NA){
 
   
   # Prediction data to mesh
-  if (require(splancs)) {
+  if (requireNamespace(splancs)) {
     loc = as.matrix(preddata[,c("x","y")])
     seg = inla.nonconvex.hull(loc, convex = -0.01)
     mesh = inla.mesh.create(interior = seg, refine = list(max.edge = (min(diff(range(loc[,1])), diff(range(loc[,1])))/10)))

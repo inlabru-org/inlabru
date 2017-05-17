@@ -202,7 +202,6 @@ plot.marginal.inla = function(result,varname="Intercept", link = function(x){x},
     inner.x = seq(lq, uq, length.out = 100)
     inner.marg = data.frame(x = inner.x, y = inla.dmarginal(inner.x, marg))
     if ( ggp ) {
-      require( ggplot2 )
       df = data.frame(marg)
       ggplot(data = df, aes(x=x,y=y)) + geom_path() + geom_ribbon(ymin = 0,aes(ymax = y), alpha = 0.1) +
         geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
@@ -222,19 +221,12 @@ plot.marginal.inla = function(result,varname="Intercept", link = function(x){x},
       lines(x=c(vars[varname,"0.975quant"],vars[varname,"0.975quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
     }
   } else {
-    if ( require(ggplot2) ){
-      df = result$summary.random[[varname]]
-      colnames(df) = c("ID","mean","sd","lower","mid","upper","mode","kld")
-      p <- ggplot(df, aes(ID, mode))
-      p + geom_crossbar(aes(ymin = lower, ymax = upper)) + ylab("mod and quantiles") + xlab(paste0(varname," ID"))
-    } else {
-      uq = result$summary.random[[varname]][,"0.975quant"]
-      lq = result$summary.random[[varname]][,"0.025quant"]
-      md = result$summary.random[[varname]][,"mode"]
-      plot(link(md), ylim = c(min(lq),max(uq)))
-      points(link(uq), col = "red")
-      points(link(lq), col = "red")
-    }
+    
+    df = result$summary.random[[varname]]
+    colnames(df) = c("ID","mean","sd","lower","mid","upper","mode","kld")
+    p <- ggplot(df, aes(ID, mode))
+    p + geom_crossbar(aes(ymin = lower, ymax = upper)) + ylab("mod and quantiles") + xlab(paste0(varname," ID"))
+
   }
 }
 

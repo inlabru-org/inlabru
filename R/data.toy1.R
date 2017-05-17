@@ -202,13 +202,11 @@ toy.linesample = function(lambda, n = 1, nseg = 1000, width = 0.1, seed = 1, ID 
 toy.polysample = function(lambda, n = 1, seed = 1) {
   
   spRbindRecurse = function(x) { 
-    if (length(x)>1) {spRbind(x[[1]], spRbindRecurse(x[2:length(x)]))} 
+    if (length(x)>1) {maptools::spRbind(x[[1]], spRbindRecurse(x[2:length(x)]))} 
     else {x[[1]]} 
   }
   
   set.seed(seed)
-  
-  require(maptools) # for spRbind
   
   bnd = inla.mesh.segment(loc = rbind(c(-5,-5), c(5,-5), c(5,5), c(-5,5)))
   mesh = inla.mesh.2d(interior = bnd, max.edge = 1)

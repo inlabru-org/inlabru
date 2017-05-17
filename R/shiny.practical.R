@@ -4,9 +4,8 @@
 
 shiny.practical.fit1d = function(){
 
-library(shiny)  
-  
-shinyApp(server = shinyServer(function(input, output) {
+
+shiny::shinyApp(server = shinyServer(function(input, output) {
   
   output$distPlot <- renderPlot({
     
@@ -69,8 +68,7 @@ shinyApp(server = shinyServer(function(input, output) {
     
     #' GAM inference
     if (do.gam) {
-      library(mgcv)
-      fit.gam = gam(count ~ s(x,k=input$bins), offset=log(exposure), data = hst, family = poisson())
+      fit.gam = mgcv::gam(count ~ s(x,k=input$bins), offset=log(exposure), data = hst, family = poisson())
       rgam = exp(predict(fit.gam, newdata = preddata))
       dfgam = data.frame(x = preddata$x, mean = rgam, method = "gam", uq = NA, lq = NA, median = NA, sd = NA, cv = NA, var = "NA")
     } else {dfgam = NULL}
@@ -140,7 +138,7 @@ shinyApp(server = shinyServer(function(input, output) {
 
 ## UI
 
-ui = shinyUI(fluidPage(
+ui = shiny::shinyUI(fluidPage(
   
   # Application title
   titlePanel("Poisson process fitting"),

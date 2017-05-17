@@ -11,10 +11,7 @@
 
 shapefile.to.covariate = function(shapefile, coords = c("x","y")) {
   
-  if ( !require(maptools) ) { stop("This functionality requires the maptools package") }
-  if ( !require(sp) ) { stop("This functionality requires the sp package") }
-  
-  if ( is.character(shapefile) ) { shapefile = readShapeSpatial(shapefile) }
+  if ( is.character(shapefile) ) { shapefile = maptools::readShapeSpatial(shapefile) }
   
   fun = function(loc) { sp::over(SpatialPoints(as.data.frame(loc[,coords])) , shapefile , fn = NULL)[,1] }
 

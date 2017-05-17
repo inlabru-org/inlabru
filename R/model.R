@@ -603,10 +603,9 @@ mapper = function(map, points, eff) {
     warning(sprintf("Map '%s' has returned NA values. As it is a SpatialGridDataFrame I will try to fix this by filling in values of spatially nearest neighbors. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
                  deparse(map), eff$label))
     
-    require(rgeos)
     BADpoints = points[as.vector(is.na(loc)),]
     GOODpoints = points[as.vector(!is.na(loc)),]
-    dst = gDistance(GOODpoints,BADpoints, byid=T)
+    dst = rgeos::gDistance(GOODpoints,BADpoints, byid=T)
     nn = apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
     loc[is.na(loc)] = loc[!is.na(loc)][nn]
   }

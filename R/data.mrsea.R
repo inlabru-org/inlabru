@@ -47,8 +47,7 @@ import.mrsea = function() {
   data("dis.data.re", package = "MRSea", envir = environment())
   data("predict.data.re", package = "MRSea", envir = environment())
   
-  library(dplyr)
-  preddata_gpseas<-group_by(predict.data.re, impact, segment.id )
+  dplyr::preddata_gpseas<-group_by(predict.data.re, impact, segment.id )
   
   # Some housekeeping to change the name labels to the right format and correct the effort unit to match
   # the coordinate information.

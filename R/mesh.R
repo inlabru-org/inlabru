@@ -10,7 +10,7 @@ tsplit = function(...){UseMethod("tsplit")}
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = rgb(0,0,0,0.3)) {
-  if ( !require(ggplot2) ) { stop("This function requires the ggplot2 package to run.") }
+
   xlim = range(mesh$loc[,1])
   ylim = range(mesh$loc[,2])
   aspect = diff(ylim)/diff(xlim)
@@ -89,8 +89,8 @@ is.inside = function(mesh, loc, mesh.coords = NULL) {
 is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TRUE ) {
   if (!is.null(mesh.coords) & is.data.frame(loc)) { loc = as.matrix(loc[,mesh.coords,drop=FALSE])}
   if (!is.null(mesh.coords) & is.data.frame(ploc)) { ploc = as.matrix(ploc[,mesh.coords,drop=FALSE])}
-  require(sp)
-  mask <- point.in.polygon(loc[,1], loc[,2],ploc[,1], ploc[,2]) > 0
+  
+  mask <- sp::point.in.polygon(loc[,1], loc[,2],ploc[,1], ploc[,2]) > 0
   if (mask.mesh){
     mask2 = is.inside(mesh, loc)
     return(mask & mask2)

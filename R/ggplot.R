@@ -499,7 +499,6 @@ plot.prediction = function(..., property = "median") {
 #' @export
 #
 multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
-  library(grid)
   
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
@@ -520,15 +519,15 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
     
   } else {
     # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    grid::grid.newpage()
+    grid::pushViewport(grid::viewport(layout = grid::grid.layout(nrow(layout), ncol(layout))))
     
     # Make each plot, in the correct location
     for (i in 1:numPlots) {
       # Get the i,j matrix positions of the regions that contain this subplot
       matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
       
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+      print(plots[[i]], vp = grid::viewport(layout.pos.row = matchidx$row,
                                       layout.pos.col = matchidx$col))
     }
   }
@@ -698,7 +697,6 @@ pixelplot.mesh = function(mesh = NULL,
     df$col[msk] = NA
     # df$alpha[msk] = 0 ; df$alpha[!msk] = 1
   } else if ( is.data.frame(mask) ){
-    if ( !require(sp) ) { "You provided a data.frame as mask. The package sp is required to interpret it as a polygon."}
     msk = point.in.polygon(ploc[,1], ploc[,2], mask[,1], mask[,2]) == 1
     df$col[!msk] = NA
     df$alpha = df$alpha & msk
