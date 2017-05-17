@@ -55,7 +55,7 @@ NULL
 #' @aliases import.mexdolphin
 #' @export
 #' @return The \link{mexdolphin} data set
-#' @examples \\dontrun{mexdolphin = import.mexdolphin();}
+#' @examples \dontrun{mexdolphin = import.mexdolphin();}
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
