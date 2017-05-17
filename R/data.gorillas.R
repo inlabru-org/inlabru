@@ -73,10 +73,10 @@ NULL
 import.gorillas = function() {
   
   # Explicitly load spatstat
-  library(spatstat)
+  # library(spatstat)
   
   # Load Gorilla data from spatstat
-  data(gorillas,package="spatstat")
+  data(gorillas, package="spatstat", envir = environment())
   
   # Create SpatialPoints representing nest locations
   nests = as.data.frame(gorillas)

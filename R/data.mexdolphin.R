@@ -62,8 +62,8 @@ NULL
 
 import.mexdolphin = function() {
   
-  library(dsm)
-  data(mexdolphins)
+  # library(dsm)
+  data("mexdolphins", package = "dsm", envir = environment())
   data.p4s = "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
   dset = import.dsmdata(mexdolphins, covar.col = 8)
   mexdolphin = as.spatial.dsdata(dset, cnames = c("x","y"), crs = CRS(data.p4s))

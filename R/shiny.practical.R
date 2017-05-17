@@ -44,9 +44,9 @@ shinyApp(server = shinyServer(function(input, output) {
     preddata = data.frame(x = seq(xmin, xmax, length.out = 200))
     
     #' Load the intensity function shown in slides:
-    data("Poisson1_1D")
-    data("Poisson2_1D")
-    data("Poisson3_1D")
+    data("Poisson1_1D", package = "inlabru", envir = environment())
+    data("Poisson2_1D", package = "inlabru", envir = environment())
+    data("Poisson3_1D", package = "inlabru", envir = environment())
     lambda = function(x) lambda_1D(x) * input$imult
     lambda = function(x) eval(parse(text = input$ifun)) * input$imult
     dflambda = data.frame(x = preddata$x,

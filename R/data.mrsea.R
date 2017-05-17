@@ -43,9 +43,9 @@ NULL
 
 import.mrsea = function() { 
   
-  library(MRSea)
-  data("dis.data.re")
-  data("predict.data.re")
+  # library(MRSea)
+  data("dis.data.re", package = "MRSea", envir = environment())
+  data("predict.data.re", package = "MRSea", envir = environment())
   
   library(dplyr)
   preddata_gpseas<-group_by(predict.data.re, impact, segment.id )
