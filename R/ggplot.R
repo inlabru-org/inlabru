@@ -73,10 +73,10 @@ gg.data.frame = function(...){
 #' @param mapping Set of aesthetic mappings created by \link{aes} or \link{aes_}
 #' @param color Color of the ribbon and the line
 #' @param alpha Alpha level of the ribbon
-#' @param ... Arguments passed on to \link{geom_point}
+#' @param ... Arguments passed on to \link{geom_line}
 #' @return c(geom_ribbon, geom_line)
 #' 
-gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", alpha = 0.3){
+gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", alpha = 0.3, ...){
   
   line.map = aes_string(x = names(data)[1], 
                         y = "mean")
@@ -88,7 +88,7 @@ gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", a
     line.map = modifyList(line.map, mapping) 
     ribbon.map = modifyList(ribbon.map, mapping) 
   }
-  geom = geom_line(data = data, line.map, color = color)
+  geom = geom_line(data = data, line.map, color = color, ...)
   if ( ribbon ) {
     geom = c(geom, geom_ribbon(data = data, ribbon.map, fill = color, alpha = 0.3))
   }
