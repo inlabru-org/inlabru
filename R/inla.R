@@ -86,15 +86,15 @@ extract.entries = function(name,smpl){
   return(smpl[grep(ptn,rownames(smpl))])
 }
 
-#' Stack multiple observations
-#'
-#'
-#' @aliases inla.stack.y
-#' @export
-#' @param ... observation vectors
-#' @return y observation vector
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-#'
+# Stack multiple observations
+#
+#
+# @aliases inla.stack.y
+# @export
+# @param ... observation vectors
+# @return y observation vector
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#
 
 inla.stack.y = function(...) {
   all.y = lapply(list(...),function(x) return(x$data$data$y))
@@ -107,14 +107,14 @@ inla.stack.y = function(...) {
   return(do.call(rbind,y))
 }
 
-#' Stack multiple exposures
-#'
-#'
-#' @aliases inla.stack.e
-#' @export
-#' @param ... observation vectors
-#' @return e observation vector
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Stack multiple exposures
+#
+#
+# @aliases inla.stack.e
+# @export
+# @param ... observation vectors
+# @return e observation vector
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 inla.stack.e = function(...) {
   all.y = lapply(list(...),function(x) return(x$data$data$e))
@@ -133,10 +133,10 @@ inla.stack.e = function(...) {
 }
 
 
-#' Join stacks intended to be run with different likelihoods
-#'
-#' @aliases inla.stack.mjoin
-#' 
+# Join stacks intended to be run with different likelihoods
+#
+# @aliases inla.stack.mjoin
+# 
 
 inla.stack.mjoin = function(..., compress = TRUE, remove.unused = TRUE){
   y = inla.stack.y(...)
@@ -148,11 +148,11 @@ inla.stack.mjoin = function(..., compress = TRUE, remove.unused = TRUE){
 }
 
 
-#' Retrieve data from stack. Other than inla.stack.data this will give
-#' an observation vector y with multiple columns
-#'
-#' @aliases inla.stack.mdata
-#' 
+# Retrieve data from stack. Other than inla.stack.data this will give
+# an observation vector y with multiple columns
+#
+# @aliases inla.stack.mdata
+# 
 
 inla.stack.mdata = function(stack){
   mdata = inla.stack.data(stack)
@@ -165,10 +165,10 @@ inla.stack.mdata = function(stack){
   return(mdata)
 }
 
-#' Combine stacks by adding up predictors
-#'
-#' @aliases inla.stack.add 
-#' 
+# Combine stacks by adding up predictors
+#
+# @aliases inla.stack.add 
+# 
 
 inla.stack.add = function(...) {
   stacks = list(...)
