@@ -4,10 +4,14 @@
 \alias{plot.marginal}
 \title{Plot a marginal posterior given an INLA result}
 \usage{
-plot.marginal(result, effects, ...)
+plot.marginal(x, effects, ...)
 }
 \arguments{
+\item{x}{An object inheriting from \link{inla}}
+
 \item{effects}{Character array stating the name of the effect to be plotted}
+
+\item{...}{Passed on to \code{plot.marginal.inla}}
 }
 \description{
 Plot a marginal posterior given an INLA result
