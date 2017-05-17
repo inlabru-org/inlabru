@@ -72,8 +72,8 @@ import.mexdolphin = function() {
   target.p4s = "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=km +no_defs +towgs84=0,0,0"
   
   # Units to km
-  mexdolphin$points = spTransform(mexdolphin$points, CRS = CRS(target.p4s))
-  mexdolphin$samplers = spTransform(mexdolphin$samplers, CRS = CRS(target.p4s))  
+  mexdolphin$points = spTransform(mexdolphin$points, CRSobj = CRS(target.p4s))
+  mexdolphin$samplers = spTransform(mexdolphin$samplers, CRSobj = CRS(target.p4s))  
   mexdolphin$points$distance = mexdolphin$points$distance / 1000
   mexdolphin$mesh$loc = mexdolphin$mesh$loc/1000
   
