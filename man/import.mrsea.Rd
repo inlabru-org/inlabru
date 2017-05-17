@@ -13,7 +13,7 @@ The \link{mrsea} data set
 Load \link{mrsea} survey data from MRSea package and convert to spatial formats defined by the \link{sp} package.
 }
 \examples{
-\\\dontrun{mrsea = import.mrsea();}
+\dontrun{mrsea = import.mrsea();}
 }
 \author{
 Lindesay Scott-Hayward <\email{lass@st-andrews.ac.uk}>

@@ -37,7 +37,7 @@ NULL
 #' @aliases import.mrsea
 #' @export
 #' @return The \link{mrsea} data set
-#' @examples \\dontrun{mrsea = import.mrsea();}
+#' @examples \dontrun{mrsea = import.mrsea();}
 #' @author Lindesay Scott-Hayward <\email{lass@@st-andrews.ac.uk}>
 #'
 
