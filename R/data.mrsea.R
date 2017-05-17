@@ -29,20 +29,19 @@
 #'  ggplot() + gg(mrsea$mesh) + gg(mrsea$samplers) + gg(mrsea$points) + gg(mrsea$boundary)
 NULL
 
-# INTERNAL DATA STORAGE
-io_mrsea.getDataDir = function() {return(system.file("data",package="inlabru"))}
+#' MRSea data import
+#' 
+#' 
+#' Load \link{mrsea} survey data from MRSea package and convert to spatial formats defined by the \link{sp} package.
+#'
+#' @aliases import.mrsea
+#' @export
+#' @return The \link{mrsea} data set
+#' @examples \\dontrun{mrsea = import.mrsea();}
+#' @author Lindesay Scott-Hayward <\email{lass@@st-andrews.ac.uk}>
+#'
 
-
-# Load \link{mrsea} survey data from raw data sets
-#
-# @aliases io_mrsea.pkgdata.load
-# @export
-# @return \code{mrsea} the \link{mrsea} data set
-# @examples \\dontrun{mrsea = io_mrsea.pkgdata.load();}
-# @author Lindesay Scott-Hayward <\email{lass@st-andrews.ac.uk}>
-#
-
-io_mrsea.pkgdata.load = function() { 
+import.mrsea = function() { 
   
   library(MRSea)
   data("dis.data.re")
@@ -120,6 +119,10 @@ io_mrsea.pkgdata.load = function() {
 }
 
 
+# INTERNAL DATA STORAGE
+io_mrsea.getDataDir = function() {return(system.file("data",package="inlabru"))}
+
+
 # Regenerate \link{mrsea} data and store it to \code{mrsea.RData}
 # 
 # Uses \code{\link{io_mrsea.pkgdata.load}} to load the data and stores
@@ -135,7 +138,7 @@ io_mrsea.pkgdata.load = function() {
 
 io_mrsea.pkgdata.save = function(){
   ## save the data we will include in the R package
-  mrsea = io_mrsea.pkgdata.load()
+  mrsea = import.mrsea()
   save(mrsea,file=paste0(io_mrsea.getDataDir(),"/mrsea.RData"))
 }
 

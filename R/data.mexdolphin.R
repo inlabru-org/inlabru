@@ -47,6 +47,18 @@
 NULL
 
 
+#' Mexdolphin data import
+#' 
+#' 
+#' Load \link{mexdolphins} survey data from dsm package and convert to spatial formats defined by the \link{sp} package.
+#'
+#' @aliases import.mexdolphin
+#' @export
+#' @return The \link{mexdolphin} data set
+#' @examples \\dontrun{mexdolphin = import.mexdolphin();}
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#'
+
 
 import.mexdolphin = function() {
   
