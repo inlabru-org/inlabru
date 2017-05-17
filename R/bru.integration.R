@@ -15,7 +15,7 @@
 #' @examples
 #' 
 #' ips = ipoints(c(0,10), name = "myDim")
-#' myDim
+#' ips
 #' 
 
 ipoints = function(region, domain = NULL, name = "x", group = NULL, project) {

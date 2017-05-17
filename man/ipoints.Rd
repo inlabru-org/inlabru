@@ -24,7 +24,7 @@ Generate integration points based on a desciption of the integration region.
 \examples{
 
 ips = ipoints(c(0,10), name = "myDim")
-myDim
+ips
 
 }
 \author{
