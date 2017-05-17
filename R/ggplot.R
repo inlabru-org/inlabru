@@ -707,13 +707,13 @@ pixelplot.mesh = function(mesh = NULL,
   #
   
   if ( !rgl ){ 
-    # Use ggplot2
-    if ( !requireNamespace("ggplot2", quietly = TRUE) ) { stop("This function requires the ggplot2 package")}
-    
+
     gg = ggplot(df, aes_string(x = coords[1], y = coords[2]) )
     gg = gg + geom_raster(aes_string(fill = "col", alpha = "alpha"), interpolate = TRUE)
     gg = gg + scale_alpha_discrete(guide = 'none')
-    gg = gg + scale_fill_gradientn(colours = brewer.pal(9,"YlOrRd"))
+    if (requireNamespace("RColorBrewer", quietly = TRUE)) {
+      gg = gg + scale_fill_gradientn(colours = RColorBrewer::brewer.pal(9,"YlOrRd"))
+    } 
     gg = gg + theme(legend.title = element_blank()) + coord_fixed()
     
     # Facet properties

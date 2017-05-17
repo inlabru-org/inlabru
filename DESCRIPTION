@@ -21,11 +21,11 @@ Suggests:
     maptools,
     mgcv,
     shiny,
-    spatstat
+    spatstat,
+    RColorBrewer
 Depends:
     INLA,
     sp,
     ggplot2,
-    RColorBrewer
 Additional_repositories: https://www.math.ntnu.no/inla/R/testing
 RoxygenNote: 5.0.1
