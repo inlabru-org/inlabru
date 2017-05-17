@@ -227,15 +227,8 @@ ipmaker = function(samplers, config) {
   
   for ( k in seq_len(length(postgroup)) ){
     gname = postgroup[[k]]
-    grp.cfg = config[[gname]]
-    li = list() ; li[[gname]] = list(sp = grp.cfg$sp, 
-                                     ep = grp.cfg$ep, 
-                                     scheme = grp.cfg$scheme, 
-                                     n = grp.cfg$n.points,
-                                     geometry = "euc")
-    
-    nips = ipoints(c(li[[gname]]$sp, li[[gname]]$ep), li[[gname]]$n, name = gname)
-    
+    cfg = config[[gname]]
+    nips = ipoints(c(cfg$sp, cfg$ep), cfg$n, name = gname)
     if ( is.null(ips) ) { ips = nips } else { ips = cprod(ips, nips) }
   }
   
