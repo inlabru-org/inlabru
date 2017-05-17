@@ -178,8 +178,8 @@ inla.stack.add = function(...) {
 }
 
 
-# plot.marginal = function(...){UseMethod("plot.marginal")}
-plot.marginal.inla = function(result,varname="Intercept", link = function(x){x}, add = FALSE, ggp = TRUE, lwd=3,...){
+
+plotmarginal.inla = function(result,varname="Intercept", link = function(x){x}, add = FALSE, ggp = TRUE, lwd=3,...){
   vars = variables.inla(result)
   ovarname = varname
   if (paste0("Beta for ", varname) %in% rownames(vars)) { varname = paste0("Beta for ", varname)}
