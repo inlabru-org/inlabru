@@ -4,7 +4,7 @@
 \alias{summary.model}
 \title{Model summary}
 \usage{
-\method{summary}{model}(object, ...)
+summary.model(object, ...)
 }
 \arguments{
 \item{object}{An \link{inlabru} \link{model}}

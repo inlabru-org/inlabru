@@ -21,7 +21,7 @@ lgcp(components, data, samplers = NULL, formula = . ~ ., E = 1,
 \item{options}{See \link{bru.options}}
 }
 \value{
-An \link{iinla} object
+An \link{bru} object
 }
 \description{
 This function performs inference on a LGCP observed via points residing possibly multiple dimensions. 
@@ -30,7 +30,7 @@ The left hand side determines the intensity function that is assumed to drive th
 effects that lead to a thinning (filtering) of the point process. By default, the log intensity is assumed
 to be a linear combination of the effects defined by the formula's RHS. More sofisticated models, e.g.
 non-linear thinning, can be achieved by using the predictor argument. The latter requires multiple runs
-of INLA for improving the required approximation of the predictor (see \link{iinla}). In many applications
+of INLA for improving the required approximation of the predictor. In many applications
 the LGCP is only observed through subsets of the dimensions the process is living in. For example, spatial
 point realizations may only be known in sub-areas of the modeled space. These observed subsets of the LGCP
 domain are called samplers and can be provided via the respective parameter. If samplers is NULL it is

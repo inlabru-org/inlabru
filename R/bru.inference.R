@@ -244,7 +244,7 @@ bru.options = function(mesh = NULL,
 #' effects that lead to a thinning (filtering) of the point process. By default, the log intensity is assumed
 #' to be a linear combination of the effects defined by the formula's RHS. More sofisticated models, e.g.
 #' non-linear thinning, can be achieved by using the predictor argument. The latter requires multiple runs
-#' of INLA for improving the required approximation of the predictor (see \link{iinla}). In many applications
+#' of INLA for improving the required approximation of the predictor. In many applications
 #' the LGCP is only observed through subsets of the dimensions the process is living in. For example, spatial
 #' point realizations may only be known in sub-areas of the modeled space. These observed subsets of the LGCP
 #' domain are called samplers and can be provided via the respective parameter. If samplers is NULL it is
@@ -259,7 +259,7 @@ bru.options = function(mesh = NULL,
 #' @param formula If NULL, the linear combination implied by the \code{components} is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
 #' @param E Single numeric used rescale all integration weights by a fixed factor 
 #' @param options See \link{bru.options}
-#' @return An \link{iinla} object
+#' @return An \link{bru} object
 
 lgcp = function(components,
                 data,

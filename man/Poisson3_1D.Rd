@@ -50,7 +50,8 @@ multiplot(p1a,p2a,cols=1)
 
 # Then the plots for the 20-bin case:
 p1a = ggplot(countdata3b) + 
-  geom_point(data = countdata3b, aes(x=x,y=count),col="blue") +ylim(0,max(countdata3b$count,E_nc3b)) +
+  geom_point(data = countdata3b, aes(x=x,y=count),col="blue") +
+  ylim(0,max(countdata3b$count,E_nc3b)) +
   geom_point(data = countdata3b, aes(x=x), y = 0, shape = "+",col="blue",cex=4) +
   geom_point(data=data.frame(x=countdata3b$x,y=E_nc3b), aes(x=x), y = E_nc3b, shape = "_",cex=5) +
   xlab(expression(bold(s))) +ylab("count")
