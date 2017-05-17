@@ -13,7 +13,7 @@ The \link{mexdolphin} data set
 Load \link{mexdolphins} survey data from dsm package and convert to spatial formats defined by the \link{sp} package.
 }
 \examples{
-\\\dontrun{mexdolphin = import.mexdolphin();}
+\dontrun{mexdolphin = import.mexdolphin();}
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
