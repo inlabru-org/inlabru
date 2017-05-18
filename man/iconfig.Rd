@@ -13,7 +13,9 @@ iconfig(samplers, points, model, dim.names = NULL, mesh = NULL)
 
 \item{model}{A \link{model}}
 
-\item{y}{Left hand side of a LGCP formula. Determines the integration dimensions. Currently in use but soon to be deprecated}
+\item{dim.names}{Dimension names (character array)}
+
+\item{mesh}{default spatial mesh used for integration}
 }
 \value{
 An integration configuration

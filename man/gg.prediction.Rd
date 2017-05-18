@@ -12,7 +12,7 @@
 
 \item{mapping}{Set of aesthetic mappings created by \link{aes} or \link{aes_}}
 
-\item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5% quantiles}
+\item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles}
 
 \item{color}{Color of the ribbon and the line}
 
@@ -21,7 +21,7 @@
 \item{...}{Arguments passed on to \link{geom_line}}
 }
 \value{
-c(geom_ribbon, geom_line)
+\code{c(geom_ribbon, geom_line)}
 }
 \description{
 Geom for predictions

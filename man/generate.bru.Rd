@@ -13,7 +13,7 @@
 
 \item{formula}{A formula determining which effects to predict and how to combine them}
 
-\item{n.samplers}{Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick result.}
+\item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.}
 }
 \value{
 Predicted values

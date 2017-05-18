@@ -14,6 +14,8 @@ ipoints(region, domain = NULL, name = "x", group = NULL, project)
 \item{name}{Character array stating the name of the domains dimension(s)}
 
 \item{group}{Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged.}
+
+\item{project}{If TRUE, project the integration points to mesh vertices}
 }
 \value{
 A \code{data.frame} or \code{SpatialPointsDataFrame}

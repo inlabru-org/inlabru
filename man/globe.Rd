@@ -10,13 +10,13 @@ globe(R = 1, R.grid = 1.05, specular = "black", axes = FALSE,
 \arguments{
 \item{R}{Radius of the globe}
 
+\item{R.grid}{Radius of the annotation sphere}
+
 \item{axes}{If TRUE, plot x, y and z axes}
 
 \item{box}{If TRUE, plot a box around the globe}
 
 \item{xlab, ylab, zlab}{Axes labels}
-
-\item{R.grid.}{Radius of the annotation sphere}
 }
 \description{
 Plot a globe using rgl
