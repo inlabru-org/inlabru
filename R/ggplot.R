@@ -352,7 +352,7 @@ if ( !is.null(color) ) {
 gg.inla.mesh.1d = function(mesh, y = 0, shape = 4, ...) {
   
     df = data.frame(x = mesh$loc, y = y)
-    geom_point(data = df, mapping = aes(x,y), shape = shape, ...)
+    geom_point(data = df, mapping = aes_string("x","y"), shape = shape, ...)
 
 }
 
@@ -685,16 +685,7 @@ pixelplot.mesh = function(mesh = NULL,
     df = data.frame(col, ploc)
   }
   else if ( !is.null(model) ) {
-    # We extract values from a model and INLA result
-    if ( is.null(result) ) { stop("You are trying to plot a model without providing an INLA result.") }
-    if ( !is.null(group) ){ ploc = merge(ploc, group) }
-    col = do.call(c,lapply(property, 
-                           function(prp) { 
-                             col = evaluate.model(model, inla.result = result, loc = ploc, do.sum = TRUE, property = prp) 
-                             return(as.vector(col))}))
-    col = data.frame(col = link(col), property = merge(rep(1,nrow(ploc)), property)[,2])
-    ploc =  ploc[rep(seq_len(nrow(ploc)), length(property)), ]
-    df = data.frame(col, ploc)
+    stop("Not supported anymore.")
   }
   else { stop("Not sure what to plot.") }
   
@@ -738,7 +729,7 @@ pixelplot.mesh = function(mesh = NULL,
     if ( !is.null(group) ) { gg = gg + facet_grid(as.formula(paste0(". ~ ", colnames(group)[1]))) }
     
     # Plot the mesh
-    if ( add.mesh ) { gg = gg + gg.mesh(mesh) }
+    if ( add.mesh ) { gg = gg + gg.inla.mesh(mesh) }
     
     return(gg)
   

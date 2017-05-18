@@ -80,6 +80,8 @@ import.gorillas = function() {
   # library(spatstat)
   
   # Load Gorilla data from spatstat
+  gorillas = NULL
+  gorillas.extra = NULL
   data(gorillas, package="spatstat", envir = environment())
   
   # Create SpatialPoints representing nest locations

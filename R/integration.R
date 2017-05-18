@@ -77,7 +77,7 @@ int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry=
   
   if (is.vector(sp)) { 
     n.lines = 1
-    len = function(a) {abs(a)}
+    len = function(x) {abs(x)}
   }
   else { 
     n.lines = dim(sp)[1] 
@@ -92,17 +92,7 @@ int.quadrature = function(sp=NULL,ep=NULL,scheme="gaussian",n.points=1,geometry=
         w = rep(1,n.lines)
         wl = w*len(ep-sp)
       }  
-      else if (geometry == "geo"){
-        colnames(sp) = coords
-        sp.euc = geo.to.euc(data.frame(sp))
-        colnames(ep) = coords
-        ep.euc = geo.to.euc(data.frame(ep))
-        ips = sp.euc + (ep.euc-sp.euc)/2
-        ips = euc.to.geo(data.frame(ips))[,coords,drop=FALSE]
-        # weights
-        w = rep(1,n.lines)
-        wl = w*dist.geo(data.frame(sp),data.frame(ep))
-      }
+      else if (geometry == "geo"){ stop("Geometry geo not supported") }
 
       # PD vector
       # pdv = cbind(-(ep[,2]-sp[,2]),ep[,1]-sp[,1])

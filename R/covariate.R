@@ -62,7 +62,7 @@ covdata.import = function(dframe, colname, data){
 plot.covdata = function(covdata, time = 1, fun=NULL, ...){
   if (is.null(covdata$geometry)) { covdata$geometry = "euc" }
   col = covdata$values[, time]
-  plot.spatial(data = covdata, col = col, ...)
+  pixelplot.mesh(data = covdata, col = col, ...)
 }
 
 # Remap covariate data

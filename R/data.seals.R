@@ -100,7 +100,7 @@ import.seals = function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.0
   
   #' Interpolate ice covariate
   
-  icecv = covariate(ice, predictor = band1, mesh = mesh)
+  icecv = covariate(ice, predictor = "band1", mesh = mesh)
   plot(icecv)
   
   #' Add band1 covariate to seals data frame
