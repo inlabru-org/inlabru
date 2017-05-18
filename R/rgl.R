@@ -3,7 +3,6 @@
 #' @aliases globe
 #' @name globe
 #' @export
-#' @import rgl
 #' @param R Radius of the globe
 #' @param R.grid Radius of the annotation sphere
 #' @param axes If TRUE, plot x, y and z axes
