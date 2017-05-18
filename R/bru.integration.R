@@ -447,7 +447,7 @@ mint = function(df,knots,dname) {
 
 vertex.projection = function(points, mesh, columns = names(points), group = NULL, fill = NULL){
   
-  if ( is.null(group) ) {
+  if ( is.null(group) | (length(group) == 0) ) {
     
     res = inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
     tri = res$p2m.t 

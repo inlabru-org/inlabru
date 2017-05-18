@@ -84,7 +84,7 @@ bru = function(components = y ~ Intercept,
   }
   
   # Set max interations to 1 if all likelihood formulae are linear 
-  if (all(sapply(lhoods, function(lh) lh$linear))) { max.iter = 1 }
+  if (all(sapply(lhoods, function(lh) lh$linear))) { options$max.iter = 1 }
   
   # Extract the family of each likelihood
   family = sapply(1:length(lhoods), function(k) lhoods[[k]]$inla.family)
