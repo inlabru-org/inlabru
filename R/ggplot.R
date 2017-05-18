@@ -22,7 +22,7 @@ gmap = function(data, ...) {
   myMap = ggmap::get_map(c(lonlim[1], latlim[1], lonlim[2], latlim[2]), ...)
   
   # Return map
-  ggmap(myMap)
+  ggmap::ggmap(myMap)
 }
 
 #' ggplot2 geomes for spatial data
@@ -297,8 +297,7 @@ if ( !is.null(color) ) {
              data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]))
   
   colnames(df) = c("x","y","xend","yend")
-  mp = aes(x = x,y = y, xend = xend, yend = yend)
-  
+  mp = aes_string(x = "x",y = "y", xend = "xend", yend = "yend")
   msh = geom_segment(data = df, mapping = mp, color = edge.color)
   
   # Outer boundary
@@ -365,7 +364,7 @@ gg.RasterLayer = function(r, ...) {
   df <- as.data.frame(spdf)
   # head(r.df)
   # g <- ggplot(r.df, aes(x=x, y=y)) + geom_tile(aes(fill = layer)) + coord_equal()
-  geom_tile(data = df, mapping = aes(x=x, y=y, fill = layer),...)
+  geom_tile(data = df, mapping = aes_string(x="x", y="y", fill = "layer"),...)
 }
 
 
