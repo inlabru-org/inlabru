@@ -6,6 +6,9 @@
 \usage{
 rgl(...)
 }
+\arguments{
+\item{...}{Parameters passed on}
+}
 \description{
 Plot sp objects and and meshes using RGL
 }

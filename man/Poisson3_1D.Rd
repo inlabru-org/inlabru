@@ -2,7 +2,13 @@
 % Please edit documentation in R/data.Poisson3_1D.R
 \docType{data}
 \name{Poisson3_1D}
+\alias{E_nc3a}
+\alias{E_nc3b}
 \alias{Poisson3_1D}
+\alias{countdata3a}
+\alias{countdata3b}
+\alias{lambda3_1D}
+\alias{pts3}
 \title{1-Dimensional NonHomogeneous Poisson example.}
 \format{The data contain the following \code{R} objects:
  \describe{

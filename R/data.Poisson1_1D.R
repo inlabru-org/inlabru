@@ -4,6 +4,8 @@
 #' @description Point data and count data, together with intensity function and expected counts for 
 #' a homogeneous 1-dimensional Poisson process example. 
 #' 
+#' @aliases lambda1_1D E_nc1 pts1 countdata1
+#' 
 #' @usage data(Poisson1_1D)
 #' 
 #' @format The data contain the following \code{R} objects:

@@ -19,7 +19,7 @@ the  points occur.}
 
 \item{nx}{The number of plots in the x-dimension.}
 
-\item{nx}{The number of plots in the y-dimension.}
+\item{ny}{The number of plots in the y-dimension.}
 }
 \value{
 A list with three components:

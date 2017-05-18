@@ -19,7 +19,7 @@ pixels(mesh, nx = 150, ny = 150, mask = TRUE)
 \code{SpatialPixels} covering the mesh
 }
 \description{
-
+Generate \code{SpatialPixels} covering an \code{inla.mesh}
 }
 \examples{
 

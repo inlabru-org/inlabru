@@ -4,6 +4,8 @@
 #' @description Point data and count data, together with intensity function and expected counts for 
 #' a unimodal nonhomogeneous 1-dimensional Poisson process example. 
 #' 
+#' @aliases lambda2_1D cov2_1D E_nc2 pts2 countdata2
+#' 
 #' @usage data(Poisson2_1D)
 #' 
 #' @format The data contain the following \code{R} objects:

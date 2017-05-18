@@ -5,6 +5,8 @@
 #' a multimodal nonhomogeneous 1-dimensional Poisson process example. Counts are given for two 
 #' different gridded data interval widths.
 #' 
+#' @aliases lambda3_1D E_nc3a E_nc3b pts3 countdata3a countdata3b
+#' 
 #' @usage data(Poisson3_1D)
 #' 
 #' @format The data contain the following \code{R} objects:

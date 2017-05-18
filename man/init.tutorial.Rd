@@ -6,6 +6,9 @@
 \usage{
 init.tutorial()
 }
+\description{
+Increases verbosity and sets the inference strategy to empirical Bayes.
+}
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }

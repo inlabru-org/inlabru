@@ -12,6 +12,9 @@ vertices(mesh)
 \value{
 A \code{SpatialPointsDataFrame} of vertex locations
 }
+\description{
+Converts the vertices of an \code{inla.mesh} object into a \code{SpatialPointsDataFrame}.
+}
 \examples{
 
 data("mrsea")

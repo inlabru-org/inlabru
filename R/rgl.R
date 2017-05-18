@@ -5,6 +5,7 @@
 #' @export
 #' @param R Radius of the globe
 #' @param R.grid Radius of the annotation sphere
+#' @param specular Light color of specular effect
 #' @param axes If TRUE, plot x, y and z axes
 #' @param box If TRUE, plot a box around the globe
 #' @param xlab,ylab,zlab Axes labels
@@ -44,6 +45,7 @@ globe = function(R = 1,
 #' @aliases rgl
 #' @name rgl
 #' @export
+#' @param ... Parameters passed on
 
 rgl = function(...){UseMethod("rgl")}
 

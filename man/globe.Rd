@@ -12,6 +12,8 @@ globe(R = 1, R.grid = 1.05, specular = "black", axes = FALSE,
 
 \item{R.grid}{Radius of the annotation sphere}
 
+\item{specular}{Light color of specular effect}
+
 \item{axes}{If TRUE, plot x, y and z axes}
 
 \item{box}{If TRUE, plot a box around the globe}

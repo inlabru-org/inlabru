@@ -4,6 +4,8 @@ iinla.env$log = sprintf("inlabru @ %s", date())
 
 
 #' @title Global setting for tutorial sessions
+#' 
+#' @description Increases verbosity and sets the inference strategy to empirical Bayes.
 #'
 #' @aliases init.tutorial
 #' @export

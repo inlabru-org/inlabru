@@ -34,7 +34,7 @@ makepoly=function(start,width,height) {
 #' @param x.ppn The proportion of the x=axis that is to be included in the plots.
 #' @param y.ppn The proportion of the y=axis that is to be included in the plots.
 #' @param nx The number of plots in the x-dimension.
-#' @param nx The number of plots in the y-dimension.
+#' @param ny The number of plots in the y-dimension.
 #'
 #' @return A list with three components:
 #'  \describe{

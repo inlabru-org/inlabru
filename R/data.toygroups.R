@@ -1,3 +1,10 @@
+#' A toy data set for group size inference
+#' 
+#' @name toygroups
+#' 
+NULL
+
+
 save.toygroups = function(){
   set.seed(123)
   

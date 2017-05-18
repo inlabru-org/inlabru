@@ -73,9 +73,9 @@ is.inside = function(mesh, loc, mesh.coords = NULL) {
   return(!(p2m$p2m.t == 0))
 }
 
-#' Query if a point is inside a polygon AND inside the mesh;
-#'
-#'
+# Query if a point is inside a polygon AND inside the mesh;
+#
+#
 # @aliases is.in.polygon
 # @export
 # @param mesh an inla.mesh object
@@ -102,6 +102,7 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
 
 #' @title Extract vertex locations from an \code{inla.mesh}
 #'
+#' @description Converts the vertices of an \code{inla.mesh} object into a \code{SpatialPointsDataFrame}.
 #' 
 #' @aliases vertices
 #' @export
@@ -131,7 +132,7 @@ vertices = function(mesh) {
 
 #' @title Generate \code{SpatialPixels} covering an \code{inla.mesh}
 #'
-#' @description 
+#' @description Generate \code{SpatialPixels} covering an \code{inla.mesh}
 #' 
 #' @aliases pixels
 #' @export
