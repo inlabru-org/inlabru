@@ -7,13 +7,13 @@
 \method{generate}{bru}(object, data, formula = NULL, n.samples = 100)
 }
 \arguments{
+\item{object}{An object obtained by calling \link{bru})}
+
 \item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for the prediction}
 
 \item{formula}{A formula determining which effects to predict and how to combine them}
 
 \item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.}
-
-\item{result}{An object obtained by calling \link{bru})}
 }
 \value{
 Predicted values

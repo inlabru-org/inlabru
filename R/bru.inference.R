@@ -451,7 +451,7 @@ predict.bru = function(object,
 #' 
 #' @aliases generate.bru
 #' @export
-#' @param result An object obtained by calling \link{bru})
+#' @param object An object obtained by calling \link{bru})
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
 #' @param formula A formula determining which effects to predict and how to combine them
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
