@@ -2,6 +2,7 @@
 #'
 #' @aliases bincount
 #' @export
+#' @importFrom graphics hist
 #' @param result A result object from a \link{bru} or \link{lgcp} call
 #' @param predictor A formula describing the prediction of a 1D function via \link{predict}.
 #' @param observations A vector of observed values

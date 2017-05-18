@@ -1,7 +1,10 @@
 # iDistance project
 # R functions to convert data formatted for dsm to a data format for iDistance
 
-gap.in.segments.f <- function(seg=segments,geometry="euc") {
+gap.in.segments.f <- function(seg=NULL,geometry="euc") {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  #
   # Identify where there is a gap in the effort along a transect (so the segments do not join together)
   # Create an indicator, gap=0 can join to previous segment, gap=1 cannot join
   # To get distance between points, if geometry='geo' uses columns latitude/longitude and great circle distances,
@@ -30,7 +33,10 @@ gap.in.segments.f <- function(seg=segments,geometry="euc") {
 
 # ---------------------------------------------------------- 
 
-define.blocks.f <- function(seg=segments,covar.col=covariate.columns,geometry="euc") {
+define.blocks.f <- function(seg=NULL,covar.col=covariate.columns,geometry="euc") {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  #
   # Define blocks - adjoining segments which can be combined because the covariates are the same
   # covar.cols = number of the column in the dataframe containing covariates
   #              thius can be a list of columns (i.e. c(2,6,7)) 
@@ -75,7 +81,10 @@ define.blocks.f <- function(seg=segments,covar.col=covariate.columns,geometry="e
 
 # -------------------------------------------------------
 
-get.blocks.f <- function(seg=segments,geometry="euc") {
+get.blocks.f <- function(seg=NULL,geometry="euc") {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  #
   # Create a dataset for the blocks
   # Segments must contain column called Block.Label, Effort
   # geometry defines how the geometry is measured, either euclidean space (x, y) or geometic coords (lon, lat)
@@ -118,7 +127,10 @@ get.blocks.f <- function(seg=segments,geometry="euc") {
 
 # -------------------------------------------------------
 
-add.labels.to.obs.f <- function(dists=distances,obs=obsservations,seg=segments) {
+add.labels.to.obs.f <- function(dists=distances,obs=obsservations,seg=NULL) {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  #
   # Add segment and block labels to observations
   # distance data and observation data MUST be in the same order
   
@@ -358,7 +370,10 @@ get.direction.segment.f <- function(data=data,geometry="euc") {
 
 # -------------------------------------------------------  
 
-start.end.points.segments.f <- function(seg=segment,use.tran=FALSE,tran=transect.quadrant,geometry="euc") {
+start.end.points.segments.f <- function(seg=NULL,use.tran=FALSE,tran=transect.quadrant,geometry="euc") {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  #
   # Calculate the start and end points of a block of segments
   # Start and end points based on half the length of the first and last segments in a block
   # Direction is given by direction of segment (use.tran=FALSE) or transect (use.tran=TRUE)
@@ -545,7 +560,10 @@ get.triangle.sides.f <- function(seg.len=half.segment.length,angle=angle) {
 
 # ------------------------------------------------------------------
 
-generate.obs.location.f <- function(seg=segments,dists=distance.data,geometry="euc",do.plot=F) {
+generate.obs.location.f <- function(seg=NULL,dists=distance.data,geometry="euc",do.plot=F) {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  #
   # Generate coords for an observation if not contained in observations
   # Location is randomly generated along segment and random side of segment at perp distance of sighting
   # Side of line; 1=above and -1=below segment
@@ -562,7 +580,7 @@ generate.obs.location.f <- function(seg=segments,dists=distance.data,geometry="e
   new.sgt$y <- rep(NA,num.sgt)
   new.sgt <- data.frame(new.sgt)
   
-  if (do.plot) par(ask=T)
+  if (do.plot)  stop("do.plot code has been removed")#par(ask=T)
   for (i in 1:num.sgt) {
     temp <- seg[seg$Sample.Label==dists$Sample.Label[i], ]
     # Randomly choose location along line
@@ -579,12 +597,13 @@ generate.obs.location.f <- function(seg=segments,dists=distance.data,geometry="e
     new.sgt$y[i] <- sgt.coords[2]
     # Plot segment and location if requested
     if (do.plot) {
-      plot.segment.f(temp$start.x,temp$start.y,temp$end.x,temp$end.y)
-      points(new.x,new.y,col=3,pch=16)
-      points(sgt.coords[1],sgt.coords[2],pch=19,col=2)
-      segments(new.x,new.y,sgt.coords[1],sgt.coords[2],lty=2)
-      print(paste("Sighting",i," perp. dist=",format(pd)))
-      title(temp$Sample.Label[1])
+      stop("do.plot=TRUE. This code has been removed.")
+      # plot.segment.f(temp$start.x,temp$start.y,temp$end.x,temp$end.y)
+      # points(new.x,new.y,col=3,pch=16)
+      # points(sgt.coords[1],sgt.coords[2],pch=19,col=2)
+      # segments(new.x,new.y,sgt.coords[1],sgt.coords[2],lty=2)
+      # print(paste("Sighting",i," perp. dist=",format(pd)))
+      # title(temp$Sample.Label[1])
     }
     
   } # End of sgts
@@ -770,19 +789,19 @@ get.hypot.f <- function(side1,side2) {
 
 # -------------------------------
 
-plot.segment.f <- function(x1,y1,x2,y2) {
-  # Plots segment defined by (x1,y1) and (x2,y2)
-  
-  minx <- min(x1,x2)
-  maxx <- max(x1,x2)
-  miny <- min(y1,y2)
-  maxy <- max(y1,y2)
-  
-  plot(x1,y1,xlim=c(minx,maxx),ylim=c(miny,maxy),asp=1)
-  points(x2,y2,pch=2)
-  segments(x1,y1,x2,y2)
-  
-}
+# plot.segment.f <- function(x1,y1,x2,y2) {
+#   # Plots segment defined by (x1,y1) and (x2,y2)
+#   
+#   minx <- min(x1,x2)
+#   maxx <- max(x1,x2)
+#   miny <- min(y1,y2)
+#   maxy <- max(y1,y2)
+#   
+#   plot(x1,y1,xlim=c(minx,maxx),ylim=c(miny,maxy),asp=1)
+#   points(x2,y2,pch=2)
+#   segments(x1,y1,x2,y2)
+#   
+# }
 
 # ---------------------------------------------------------------------
 

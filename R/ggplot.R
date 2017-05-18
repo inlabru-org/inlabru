@@ -711,7 +711,6 @@ pixelplot.mesh = function(mesh = NULL,
   # (5) Create the plot using either rgl or ggplot2
   #
   
-  if ( !rgl ){ 
 
     gg = ggplot(df, aes_string(x = coords[1], y = coords[2]) )
     gg = gg + geom_raster(aes_string(fill = "col", alpha = "alpha"), interpolate = TRUE)
@@ -731,39 +730,6 @@ pixelplot.mesh = function(mesh = NULL,
     if ( add.mesh ) { gg = gg + gg.mesh(mesh) }
     
     return(gg)
-    
-  } else {
-    # Use rgl to plot
-    col = df$col
-    if ( !requireNamespace("rgl", quietly = TRUE) ) { stop("This function requires the rgl package. Install rgl or set rgl=FALSE.")}
-    
-    if (data$geometry == "geo"){
-      
-      # Plot sphere
-      if (!add){ rgl.open() }
-      bg3d(color = "white")
-      rgl.earth()
-      
-      # # Plot detections and integration points
-      # if ( add.detections ) { rgl.sphpoints(long = det.points$lon+360, lat = det.points$lat, radius = 1.01*R, col="red", size = 5) }
-      # if ( add.points ) { rgl.sphpoints(long = add.points$lon+360, lat = add.points$lat, radius=1.01*R, col = rgb(0,0,1), size = 3) }
-      # 
-      # Plot colorbar (This is a temporary workaround, rgl people are working on something like this)
-      if ( TRUE ){
-        cb.col = cm.colors(100)
-        rgl.linestrips(x=-0.85,y=0.85,z=seq(-1,1,length.out=length(cb.col)),col=cb.col,lwd=50)
-        rgl.texts(x=-0.79,y=0.79,z=c(-0.97,0.97),c(format(min(col),digits=3),format(max(col),digits=3)),col="black",cex=1)
-      }
-      rgl.pop()
-      rgl.sphmesh(mesh, add=TRUE, radius=1.001, col = col)
-      
-    }
-    else {
-      plot(mesh, rgl = rgl, col = col,...)
-      if ( add.detections ) { rgl.points(x = det.points$x, y = det.points$y, z =0.02, col = rgb(1,0,0), size=8) }
-      if ( int.points ) { rgl.points(x = add.points$x, y = add.points$y, z = 0.01, col = rgb(0,0,0.6), size=4) }
-    }
-  }
   
 }
 

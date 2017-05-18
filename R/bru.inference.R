@@ -550,7 +550,7 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.
     # Plot new density estimate versus old one (debugging)
     if ( verbose ) {
       cat(paste0("hpd:", min(x)," ",max(x), ", err = ", err, ", n = ",n, "\n")) 
-      plot(x, lest, type = "l") ; lines(x, est, type = "l", col = "red")
+      # plot(x, lest, type = "l") ; lines(x, est, type = "l", col = "red")
     }
     
     # Convergence?

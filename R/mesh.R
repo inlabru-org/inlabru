@@ -9,7 +9,7 @@ tsplit = function(...){UseMethod("tsplit")}
 # @param mesh an inla.mesh object
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = rgb(0,0,0,0.3)) {
+ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = "black") {
 
   xlim = range(mesh$loc[,1])
   ylim = range(mesh$loc[,2])
@@ -22,7 +22,7 @@ ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = rgb(0,0,0,0.3
   
   
   if ( !is.null(col) ) {
-    mcol = rgb(0,0,0,0.1)
+    mcol = "green"
     loc = data.frame(cbind(grid$x,grid$y))
     col = INLA::inla.spde.make.A(mesh, loc = as.matrix(loc)) %*% as.vector(col)
     msk = is.inside(mesh,as.matrix(loc))
@@ -31,7 +31,7 @@ ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = rgb(0,0,0,0.3
     gg = ggplot(df, aes(x=x,y=y) )
     gg = gg + geom_raster(aes(fill = col, alpha = alpha), hjust=0.5, vjust=0.5, interpolate = TRUE)
     gg = gg + scale_alpha_discrete(guide = 'none')
-    gg = gg + scale_fill_gradientn(colours = topo.colors(100) ) + theme(legend.title=element_blank())
+    gg = gg + theme(legend.title=element_blank())
     
   } else {
     df = data.frame(grid)

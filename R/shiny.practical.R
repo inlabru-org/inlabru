@@ -1,7 +1,8 @@
-#############################################################################################
-### Shiny app for 1D Poisson process fitting
-#############################################################################################
-
+#' Shiny app for 1D Poisson process fitting
+#' @export
+#' @importFrom graphics hist
+#' @return NULL
+#' 
 shiny.practical.fit1d = function(){
 
 

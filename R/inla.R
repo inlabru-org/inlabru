@@ -201,25 +201,14 @@ plotmarginal.inla = function(result,varname="Intercept", link = function(x){x}, 
     lqy = inla.dmarginal(lq, marg)
     inner.x = seq(lq, uq, length.out = 100)
     inner.marg = data.frame(x = inner.x, y = inla.dmarginal(inner.x, marg))
-    if ( ggp ) {
-      df = data.frame(marg)
-      ggplot(data = df, aes(x=x,y=y)) + geom_path() + geom_ribbon(ymin = 0,aes(ymax = y), alpha = 0.1) +
-        geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
-        geom_segment(x = uq, y = 0, xend = uq, yend = uqy) +
-        geom_ribbon(data = inner.marg, ymin = 0, aes(ymax = y), alpha = 0.1) +
-        xlab(ovarname) + ylab("pdf")
-    } else {
-      if (!add) {
-        plot(marg,type='l',xlab=varname,ylab="Posterior density",...)
-      } else {
-        points(marg, type='l', xlab="",ylab="", ...)
-      }
-      lheight = max(marg[,"y"])
-      lines(x=c(vars[varname,"mode"],vars[varname,"mode"]),y=c(0,lheight),col="blue",lwd=lwd,...)
-      lines(x=c(vars[varname,"mean"],vars[varname,"mean"]),y=c(0,lheight),col="red",lwd=lwd,...)
-      lines(x=c(vars[varname,"0.025quant"],vars[varname,"0.025quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
-      lines(x=c(vars[varname,"0.975quant"],vars[varname,"0.975quant"]),y=c(0,lheight),col=rgb(0,0.6,0),lwd=lwd,...)
-    }
+
+    df = data.frame(marg)
+    ggplot(data = df, aes(x=x,y=y)) + geom_path() + geom_ribbon(ymin = 0,aes(ymax = y), alpha = 0.1) +
+      geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
+      geom_segment(x = uq, y = 0, xend = uq, yend = uqy) +
+      geom_ribbon(data = inner.marg, ymin = 0, aes(ymax = y), alpha = 0.1) +
+      xlab(ovarname) + ylab("pdf")
+
   } else {
     
     df = result$summary.random[[varname]]

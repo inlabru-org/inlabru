@@ -2,21 +2,21 @@
 % Please edit documentation in R/shiny.practical.R
 \name{shiny.practical.fit1d}
 \alias{shiny.practical.fit1d}
-\title{Prediction data
-Load the intensity function shown in slides:
-Sample from intensity
-Histogram
-Mesh for INLA methods
-GAM inference}
+\title{Shiny app for 1D Poisson process fitting}
 \usage{
 shiny.practical.fit1d()
 }
-\description{
+\value{
+NULL
+
 Prediction data
 Load the intensity function shown in slides:
 Sample from intensity
 Histogram
 Mesh for INLA methods
 GAM inference
+}
+\description{
+Shiny app for 1D Poisson process fitting
 }
 

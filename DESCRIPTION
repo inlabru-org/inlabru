@@ -23,7 +23,8 @@ Suggests:
     mgcv,
     shiny,
     spatstat,
-    RColorBrewer
+    RColorBrewer,
+    graphics
 Depends:
     INLA,
     sp,
