@@ -83,7 +83,7 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL, project) {
     
     # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
     if ( class(region)[1] == "SpatialPolygons" ) { 
-      region = SpatialPolygonsDataFrame(regio, data = data.frame(weight = rep(1, length(region)))) 
+      region = SpatialPolygonsDataFrame(region, data = data.frame(weight = rep(1, length(region)))) 
     }
     
     cnames = coordnames(region)
