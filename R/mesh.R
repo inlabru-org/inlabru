@@ -40,13 +40,13 @@ ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = "black") {
   
   # Plot mesh lines
   gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]), 
-                         aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
+                         aes_string(x="a.1",y="a.2",xend="b.1",yend="b.2"), color = mcol)
   
   gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-                         aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
+                         aes_string(x="a.1",y="a.2",xend="b.1",yend="b.2"), color = mcol)
   
   gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-                         aes(x=a.1,y=a.2,xend=b.1,yend=b.2), color = mcol)
+                         aes_string(x="a.1",y="a.2",xend="b.1",yend="b.2"), color = mcol)
   
   gg = gg + coord_fixed()
 
