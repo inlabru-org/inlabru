@@ -26,7 +26,7 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
   mid = breaks[1:(length(breaks)-1)] + diff(breaks)/2
   
   # Create integration points
-  ip = int.quadrature(breaks[1:(length(breaks)-1)], breaks[2:(length(breaks))], scheme = "trapezoid", n = nint)
+  ip = int.quadrature(breaks[1:(length(breaks)-1)], breaks[2:(length(breaks))], scheme = "trapezoid", n.points = nint)
   points = data.frame(tmp = as.vector(ip$ips))
   colnames(points) = all.vars(update.formula(predictor, ~.0))
   points$bin = rep(1:nbins,each = nint)
