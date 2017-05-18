@@ -35,6 +35,7 @@ NULL
 #'
 #' @aliases import.seals
 #' @export
+#' @importFrom utils read.csv
 #' @param sealfile Character pointing to the file containing the seal counts and photo locations
 #' @param icefile Character pointing to the .tif file containing the ice sheet covariate
 #' @return The \link{seals} data set

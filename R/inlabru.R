@@ -13,6 +13,8 @@
 #' @aliases inlabru
 #' @import sp
 #' @import INLA
+#' @import stats
+#' @import methods
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' @name inlabru
 NULL

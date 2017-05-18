@@ -65,10 +65,14 @@
 #'
 #' # Plot the plot sample
 #' ggplot() + gg(gorillas$plotsample$plots) + gg(gorillas$plotsample$nests)
-
 NULL
 
-
+#' Gorilla data import
+#'
+#' @aliases import.gorillas
+#' @export
+#' @importFrom utils data
+#' @return gorilla data
 
 import.gorillas = function() {
   

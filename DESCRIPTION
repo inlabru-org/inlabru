@@ -9,7 +9,8 @@ Description: Inference for spatial point processes with uncertain detection.
 License: GPL (>= 2)
 Imports:
   rgdal,
-  rgeos
+  rgeos,
+  utils
 Suggests:
     testthat,
     ggmap,
@@ -26,6 +27,8 @@ Suggests:
 Depends:
     INLA,
     sp,
+    stats,
+    methods,
     ggplot2,
 Additional_repositories: https://www.math.ntnu.no/inla/R/testing
 RoxygenNote: 5.0.1

@@ -70,6 +70,7 @@ gg.data.frame = function(...){
 #' @name gg.prediction
 #' @export
 #' @import ggplot2
+#' @importFrom utils modifyList
 #' @param data A prediction object
 #' @param mapping Set of aesthetic mappings created by \link{aes} or \link{aes_}
 #' @param ribbon If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles
@@ -87,7 +88,7 @@ gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", a
                           ymax = "q0.975")
   
   if ( !is.null(mapping) ) { 
-    line.map = modifyList(line.map, mapping) 
+    line.map = utils::modifyList(line.map, mapping) 
     ribbon.map = modifyList(ribbon.map, mapping) 
   }
   geom = geom_line(data = data, line.map, color = color, ...)
