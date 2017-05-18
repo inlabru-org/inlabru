@@ -458,7 +458,7 @@ predict.bru = function(object,
 #' 
 #' @return Predicted values
 
-generate.bru = function(result,
+generate.bru = function(object,
                        data,
                        formula = NULL,
                        n.samples = 100)
@@ -475,9 +475,9 @@ generate.bru = function(result,
   }
 
   # Turn formula into an expression
-  if ( is.null(formula) ) { formula = result$sppa$lhoods[["default"]]$formula }
+  if ( is.null(formula) ) { formula = object$sppa$lhoods[["default"]]$formula }
   
-  vals = evaluate.model(model = result$sppa$model, result = result, points = data, 
+  vals = evaluate.model(model = object$sppa$model, result = object, points = data, 
                         property = "sample", n = n.samples, predictor = formula)
 
 }
