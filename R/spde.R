@@ -65,8 +65,9 @@ materncov.bands = function(manifold, dist, log.range,
       INLA::inla.matern.cov(nu=nu, kappa, x=dist, d=d, corr=TRUE)
     }
     calc.corr.S1 <- function(dist, kappa) {
-      INLA::inla.matern.cov.s1(nu=nu, kappa, x=dist, norm.corr=FALSE) /
-        INLA::inla.matern.cov.s1(nu=nu, kappa, x=0, norm.corr=FALSE)
+      stop("Ooops, somehow inla.matern.cov.s1() is not available.")
+      # INLA::inla.matern.cov.s1(nu=nu, kappa, x=dist, norm.corr=FALSE) /
+      #   INLA::inla.matern.cov.s1(nu=nu, kappa, x=0, norm.corr=FALSE)
     }
     calc.corr.S2 <- function(dist, kappa) {
       INLA::inla.matern.cov.s2(nu=nu, kappa, x=dist, norm.corr=FALSE) /
