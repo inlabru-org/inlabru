@@ -4,10 +4,12 @@
 \alias{tsplit.inla.mesh}
 \title{Split triangles of a mesh into four triangles}
 \usage{
-\method{tsplit}{inla.mesh}(mesh)
+\method{tsplit}{inla.mesh}(mesh, n = 1)
 }
 \arguments{
 \item{mesh}{an inla.mesh object}
+
+\item{n}{number of splitting recursions}
 }
 \value{
 mesh A refined inla.mesh object

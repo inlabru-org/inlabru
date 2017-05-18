@@ -236,11 +236,12 @@ refine.inla.mesh = function(mesh, refine = list(max.edge=1)){
 #' @aliases tsplit.inla.mesh
 #' @export
 #' @param mesh an inla.mesh object
+#' @param n number of splitting recursions
 #' @return mesh A refined inla.mesh object
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
-tsplit.inla.mesh = function(mesh){
+tsplit.inla.mesh = function(mesh, n = 1){
   
   n = 1
   
@@ -260,7 +261,7 @@ tsplit.inla.mesh = function(mesh){
   mesh2 = inla.mesh.create(loc = all.loc, boundary = all.bnd )
   
   if (n == 1) { return(mesh2) }
-  else { return(mesh.split(mesh2,n-1))}
+  else { return(tsplit.inla.mesh(mesh2,n-1))}
 }
 
 
