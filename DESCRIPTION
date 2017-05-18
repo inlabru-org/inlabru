@@ -1,6 +1,6 @@
 Package: inlabru
 Type: Package
-Title: Spatial inference using INLA
+Title: Spatial Inference Using INLA
 Version: 1.0.1
 Date: 2017-05-17
 Author: Fabian E. Bachl
