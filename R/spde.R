@@ -37,7 +37,7 @@ materncov.bands = function(manifold, dist, log.range,
                            log.variance=NULL, alpha=2,
                            quantile=0.95, n=64, S1.L=NULL) {
     calc.cov.R <- function(dist, kappa, var) {
-        inla.matern.cov(nu=nu, kappa, x=dist, d=d, corr=TRUE) * var
+        INLA::inla.matern.cov(nu=nu, kappa, x=dist, d=d, corr=TRUE) * var
     }
     ## Do the right thing for _nominal_ variance
     calc.cov.S1 <- function(dist, kappa, var) {
