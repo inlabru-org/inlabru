@@ -9,6 +9,8 @@
 \arguments{
 \item{sgdf}{A SpatialGrid object}
 
+\item{fill}{Character identifying the data column used for plotting}
+
 \item{...}{Arguments passed on to \link{geom_tile}}
 }
 \value{

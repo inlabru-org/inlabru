@@ -12,6 +12,8 @@
 
 \item{mapping}{Set of aesthetic mappings created by \link{aes} or \link{aes_}}
 
+\item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5% quantiles}
+
 \item{color}{Color of the ribbon and the line}
 
 \item{alpha}{Alpha level of the ribbon}

@@ -6,6 +6,9 @@
 \usage{
 gg(...)
 }
+\arguments{
+\item{...}{Arguments passed on the the geomes}
+}
 \description{
 ggplot2 geomes for spatial data
 }

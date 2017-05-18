@@ -28,6 +28,18 @@
 #'  
 NULL
 
+#' Seal pup edata import
+#' 
+#' Generate \code{Spatial} objects from raw seal pup survey data (not inlcuded in \link{inlabru}). Note that this function
+#' will only extract one of the survey transects.
+#'
+#' @aliases import.seals
+#' @export
+#' @param sealfile Character pointing to the file containing the seal counts and photo locations
+#' @param icefile Character pointing to the .tif file containing the ice sheet covariate
+#' @return The \link{seals} data set
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#'
 
 import.seals = function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif") {
   

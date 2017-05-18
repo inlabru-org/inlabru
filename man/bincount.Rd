@@ -9,7 +9,7 @@ bincount(result, predictor, observations, breaks, nint = 20, ...)
 \arguments{
 \item{result}{A result object from a \link{bru} or \link{lgcp} call}
 
-\item{predictor}{A formula describing what and where to predict. See \link{predict.lgcp} for details.}
+\item{predictor}{A formula describing the prediction of a 1D function via \link{predict}.}
 
 \item{observations}{A vector of observed values}
 

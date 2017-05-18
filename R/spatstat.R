@@ -5,7 +5,7 @@
 #' @param points A SpatialPoints[DataFrame] describing the point pattern
 #' @param samplers A SpatialPolygons[DataFrame] describing the observation window
 #' @param ... arguments passed on to \link{predict}
-#' @return A spatstat \link{ppp} object
+#' @return A spatstat \code{spatstat} \code{ppp} object
 
 spatial.to.ppp = function(points, samplers) {
 

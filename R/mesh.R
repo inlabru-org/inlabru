@@ -62,7 +62,7 @@ ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = rgb(0,0,0,0.3
 #' @aliases is.inside
 #' @export
 #' @param mesh an inla.mesh object
-#' @param points points to query
+#' @param loc points to query
 #' @param mesh.coords Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.
 #' @return inside Boolean, TRUE if inside
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>

@@ -50,7 +50,7 @@ NULL
 #' Mexdolphin data import
 #' 
 #' 
-#' Load \link{mexdolphins} survey data from dsm package and convert to spatial formats defined by the \link{sp} package.
+#' Load \code{mexdolphins} survey data from \code{dsm} package and convert to spatial formats defined by the \link{sp} package.
 #'
 #' @aliases import.mexdolphin
 #' @export

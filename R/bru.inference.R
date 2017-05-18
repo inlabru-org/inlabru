@@ -210,6 +210,8 @@ stackmaker.like = function(lhood) {
 #' @param max.iter maximum number of inla iterations
 #' @param offset the usual \link{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.
 #' @param result An \code{inla} object returned from previous calls of \link{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
+#' @param control.compute INLA option, See \link{control.compute}
+#' @param control.inla INLA option, See \link{control.inla}
 #' @param ... Additional options passed on to \link{inla}
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
@@ -396,6 +398,7 @@ summary.bru = function(object, ...) {
 #' @param object An object obtained by calling \link{bru})
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
 #' @param formula A formula determining which effects to predict and how to combine them
+#' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
 #' @param ... ignored arguments (S3 generic compatibility)
 #' 
 #' @return Predicted values
@@ -451,6 +454,7 @@ predict.bru = function(object,
 #' @param result An object obtained by calling \link{bru})
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
 #' @param formula A formula determining which effects to predict and how to combine them
+#' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
 #' 
 #' @return Predicted values
 

@@ -3,6 +3,12 @@
 #' @aliases globe
 #' @name globe
 #' @export
+#' @import rgl
+#' @param R Radius of the globe
+#' @param R.grid Radius of the annotation sphere
+#' @param axes If TRUE, plot x, y and z axes
+#' @param box If TRUE, plot a box around the globe
+#' @param xlab,ylab,zlab Axes labels
 
 globe = function(R = 1, 
                  R.grid = 1.05,
@@ -24,7 +30,7 @@ globe = function(R = 1,
   requireNamespace("rgl")
   rgl::persp3d(x, y, z, col="white", 
           texture=system.file("misc/Lambert_ocean.png",package="inlabru"), 
-          specular = specular, axes = axes, box = box, xlab=xlab, ylab=ylab, zlab=zlab,
+          specular = "black", axes = axes, box = box, xlab=xlab, ylab=ylab, zlab=zlab,
           normal_x=x, normal_y=y, normal_z=z)
   
   # spheric grid

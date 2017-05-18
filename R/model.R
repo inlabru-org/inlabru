@@ -235,9 +235,10 @@ make.model = function(fml) {
 #' @export
 #' @param covariate A string defining the label of the INLA effect. If \code{map} is provided this also sets the coariate used as a first argument to the \link{f} call.
 #' @param map A name, call or function that maps points to effect indices or locations that the model understands.
+#' @param group A name, call or function that maps the data to groups
 #' @param model See \link{f} model specifications
 #' @param mesh An \link{inla.mesh} object required for SPDE models
-#' @param A.mask A boolean vector for masking A matrix columns. 
+#' @param A.msk A boolean vector for masking A matrix columns. 
 #' @param ... Arguments passed on to inla \link{f}
 #' @return A list with mesh, model and the return value of the f-call
 

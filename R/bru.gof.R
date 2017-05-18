@@ -3,7 +3,7 @@
 #' @aliases bincount
 #' @export
 #' @param result A result object from a \link{bru} or \link{lgcp} call
-#' @param predictor A formula describing what and where to predict. See \link{predict.lgcp} for details.
+#' @param predictor A formula describing the prediction of a 1D function via \link{predict}.
 #' @param observations A vector of observed values
 #' @param breaks A vector of bin boundaries
 #' @param nint Number of integration points per bin
@@ -80,9 +80,10 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
 #'
 #' @aliases devel.cvmeasure
 #' @export
-#' @param join A joint prediction of two latent components
+#' @param joint A joint prediction of two latent components
 #' @param prediction1 A prediction of first component
 #' @param prediction2 A prediction of the first component
+#' @param samplers A spatial object describing an area for which to compute the cummulative variance measure
 #' @return Variance and correlations measures
 
 devel.cvmeasure = function(joint, prediction1, prediction2, samplers = NULL) {

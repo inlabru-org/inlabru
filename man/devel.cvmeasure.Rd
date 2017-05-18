@@ -7,11 +7,13 @@
 devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL)
 }
 \arguments{
+\item{joint}{A joint prediction of two latent components}
+
 \item{prediction1}{A prediction of first component}
 
 \item{prediction2}{A prediction of the first component}
 
-\item{join}{A joint prediction of two latent components}
+\item{samplers}{A spatial object describing an area for which to compute the cummulative variance measure}
 }
 \value{
 Variance and correlations measures

@@ -19,6 +19,10 @@ bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
 
 \item{result}{An \code{inla} object returned from previous calls of \link{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
 
+\item{control.compute}{INLA option, See \link{control.compute}}
+
+\item{control.inla}{INLA option, See \link{control.inla}}
+
 \item{...}{Additional options passed on to \link{inla}}
 }
 \description{

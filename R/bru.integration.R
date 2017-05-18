@@ -10,6 +10,7 @@
 #' @param domain An object describing a discretization of the domain
 #' @param name Character array stating the name of the domains dimension(s)
 #' @param group Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged.
+#' @param project If TRUE, project the integration points to mesh vertices
 #' @return A \code{data.frame} or \code{SpatialPointsDataFrame}
 #' 
 #' @examples
@@ -244,7 +245,8 @@ ipmaker = function(samplers, config) {
 #' @param samplers A Spatial[Points/Lines/Polygons]DataFrame objects
 #' @param points A SpatialPoints[DataFrame] object
 #' @param model A \link{model}
-#' @param y Left hand side of a LGCP formula. Determines the integration dimensions. Currently in use but soon to be deprecated
+#' @param dim.names Dimension names (character array)
+#' @param mesh default spatial mesh used for integration
 #' @return An integration configuration
 
 iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL) {

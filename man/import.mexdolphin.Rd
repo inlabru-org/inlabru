@@ -10,7 +10,7 @@ import.mexdolphin()
 The \link{mexdolphin} data set
 }
 \description{
-Load \link{mexdolphins} survey data from dsm package and convert to spatial formats defined by the \link{sp} package.
+Load \code{mexdolphins} survey data from \code{dsm} package and convert to spatial formats defined by the \link{sp} package.
 }
 \examples{
 \dontrun{mexdolphin = import.mexdolphin();}

@@ -31,6 +31,7 @@ gmap = function(data, ...) {
 #' @aliases gg
 #' @name gg
 #' @export
+#' @param ... Arguments passed on the the geomes
 #' 
 
 gg = function(...){UseMethod("gg")}
@@ -71,10 +72,11 @@ gg.data.frame = function(...){
 #' @import ggplot2
 #' @param data A prediction object
 #' @param mapping Set of aesthetic mappings created by \link{aes} or \link{aes_}
+#' @param ribbon If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles
 #' @param color Color of the ribbon and the line
 #' @param alpha Alpha level of the ribbon
 #' @param ... Arguments passed on to \link{geom_line}
-#' @return c(geom_ribbon, geom_line)
+#' @return \code{c(geom_ribbon, geom_line)}
 #' 
 gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", alpha = 0.3, ...){
   
@@ -191,6 +193,7 @@ gg.SpatialPolygons = function(data, mapping = NULL, crs = NULL, color = "black",
 #' @export
 #' @import ggplot2
 #' @param sgdf A SpatialGrid object
+#' @param fill Character identifying the data column used for plotting
 #' @param ... Arguments passed on to \link{geom_tile}
 #' @return A ggplot2 object
 #' 
@@ -207,6 +210,7 @@ gg.SpatialGrid = function(sgdf, fill = names(sgdf)[[1]], ...) {
 #' @export
 #' @import ggplot2
 #' @param sgdf A SpatialPixels object
+#' @param fill Character identifying the data column used for plotting
 #' @param ... Arguments passed on to \link{geom_tile}
 #' @return A ggplot2 object
 #' 
