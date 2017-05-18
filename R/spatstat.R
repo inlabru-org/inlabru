@@ -13,6 +13,6 @@ spatial.to.ppp = function(points, samplers) {
   bnd = bnd[1:(nrow(bnd)-1),]
   gp = spatstat::ppp(x = coordinates(points)[,1], 
            y = coordinates(points)[,2], 
-           window = owin(poly = list(x=rev(bnd[,1]), y = rev(bnd[,2]))) )
+           window = spatstat::owin(poly = list(x=rev(bnd[,1]), y = rev(bnd[,2]))) )
   
 }
