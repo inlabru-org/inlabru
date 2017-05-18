@@ -240,13 +240,13 @@ g = function(covariate,
 # OPERATORS ON MODELS
 ##########################################################################
 
-#' Model summary
-#'
-#' @aliases summary
-#' @export
-#' @param object An \link{inlabru} \link{model}
-#' @param ... ignored arguments (S3 generic compatibility)
-#' 
+# Model summary
+#
+# @aliases summary
+# @export
+# @param object An \link{inlabru} \link{model}
+# @param ... ignored arguments (S3 generic compatibility)
+# 
 summary.model = function(object, ...) {
   for (label in elabels(object)) {
     eff = effect(object,label)
