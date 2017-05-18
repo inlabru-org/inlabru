@@ -212,7 +212,7 @@ g = function(covariate,
   # Only call f if we are  not dealing with an offset
   if ( label == "offset" ) { fvals = list(model="offset") }
   else if ( is.character(model) && model == "factor" ) { fvals = list(model="factor") } # , n = list(...)$n
-  else { fvals = f(xxx, ..., group = group, model = model) }
+  else { xxx = NULL ; fvals = f(xxx, ..., group = group, model = model) }
   fvals$label = label
   
   # Default map
