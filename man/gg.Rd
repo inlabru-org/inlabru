@@ -10,6 +10,18 @@ gg(...)
 \item{...}{Arguments passed on the the geomes}
 }
 \description{
-ggplot2 geomes for spatial data
+Depending on the class of the first argument one of the following functions is called:
+\describe{
+\item{}{\link{gg.data.frame}}
+\item{}{\link{gg.prediction}}
+\item{}{\link{gg.SpatialPoints}}
+\item{}{\link{gg.SpatialLines}}
+\item{}{\link{gg.SpatialPolygons}}
+\item{}{\link{gg.SpatialPixels}}
+\item{}{\link{gg.SpatialGrid}}
+\item{}{\link{gg.RasterLayer}}
+\item{}{\link{gg.inla.mesh}}
+\item{}{\link{gg.inla.mesh.1d}}
+}
 }
 
