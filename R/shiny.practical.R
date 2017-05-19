@@ -1,6 +1,5 @@
 #' Shiny app for 1D Poisson process fitting
 #' @export
-#' @import shiny
 #' @importFrom graphics hist
 #' @return NULL
 #' 

@@ -44,8 +44,12 @@ NULL
 import.mrsea = function() { 
   
   # library(MRSea)
+  predict.data.re = NULL
+  dis.data.re = NULL
   data("dis.data.re", package = "MRSea", envir = environment())
   data("predict.data.re", package = "MRSea", envir = environment())
+  impact = dis.data.re$impact
+  segment.id = dis.data.re$segment.id
   
   preddata_gpseas<-dplyr::group_by(predict.data.re, impact, segment.id )
   
@@ -60,7 +64,7 @@ import.mrsea = function() {
   
   segdata<-dis.data.re[,c("Transect.Label", "Transect.label" ,"season", "impact", "depth", "Sample.Label",
                           "segment.label" , "length", "Effort", 'x', 'y')]
-  segdata<- distinct(segdata, Sample.Label, .keep_all = TRUE)
+  segdata<- dplyr::distinct(segdata, segdata$Sample.Label, .keep_all = TRUE)
   
   # effort, object and distance.
   # Not taken x and y as these are segement mid points not detection locations
