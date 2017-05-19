@@ -65,20 +65,6 @@ plot.covdata = function(covdata, time = 1, fun=NULL, ...){
   pixelplot.mesh(data = covdata, col = col, ...)
 }
 
-# Remap covariate data
-#
-# This is a wrapper for \link{remap.dsdata}
-#
-# @aliases remap.covdata
-# @name remap.covdata
-# @export
-# @param mesh.p4s A proj.4 string setting the target coordinate system
-# @examples \\dontrun{}
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-
-remap.covdata = function(data, mesh.p4s = "+proj=longlat") {
-  return(remap.dsdata(data, p4s = NULL, mesh.p4s = mesh.p4s))
-}
 
 # Make covariate function
 #
