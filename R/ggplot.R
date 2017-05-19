@@ -432,6 +432,14 @@ plot.prediction = function(..., property = "median") {
       }
     }
     
+    # Workaround for non-visible bindings
+    x = NULL
+    y = NULL
+    xend = NULL
+    yend = NULL
+    sdy = NULL
+    cvy = NULL
+    
     plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y = x, weight = y, fill=effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
       geom_text(data = qtl, aes(x=xend, y=y, label = fmt(y)), size = txt_size, family = "", vjust = -0.5, hjust = 1.1) + 
       geom_text(data = expec, aes(x=xend, y=y, label = paste0(fmt(y)," +/- ", fmt(sdy), " [",round(100*cvy),"%]")), size = txt_size, family = "", vjust = -0.5, angle = 90) + 

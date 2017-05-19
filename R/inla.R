@@ -213,7 +213,7 @@ plotmarginal.inla = function(result,varname="Intercept", link = function(x){x}, 
     
     df = result$summary.random[[varname]]
     colnames(df) = c("ID","mean","sd","lower","mid","upper","mode","kld")
-    p <- ggplot(df, aes(ID, mode))
+    p <- ggplot(df, aes_string("ID", "mode"))
     p + geom_crossbar(aes_string(ymin = "lower", ymax = "upper")) + ylab("mod and quantiles") + xlab(paste0(varname," ID"))
 
   }
