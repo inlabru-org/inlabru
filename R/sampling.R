@@ -112,9 +112,12 @@ if (class(mesh) == "inla.mesh.1d") {
     x = r * cos(t)
     y = r * sin(t)
     
-    loc = euc.to.geo(data.frame(x=x,y=y,z=z), R = 1)
-    points = as.matrix(loc[,c("lon","lat")])
-    A = inla.mesh.project(mesh,points)$A
+    df = data.frame(x,y,z)
+    coordinates(df) = c("x","y","z")
+    proj4string(df) = CRS(paste0("+proj=geocent +ellps=sphere +R=",R))
+    points = coordinates(spTransform(df, CRS("+proj=longlat")))
+    
+    A = inla.mesh.project(mesh, points)$A
     loglambda = exp(loglambda - lambda_max)
     pointValues = as.vector(A%*%loglambda)
     points = points[runif(Npoints) < pointValues,]
@@ -150,9 +153,13 @@ if (class(mesh) == "inla.mesh.1d") {
       x = r * cos(t)
       y = r * sin(t)
       
-      loc = euc.to.geo(data.frame(x=x,y=y,z=z), R = 1)
+      df = data.frame(x,y,z)
+      coordinates(df) = c("x","y","z")
+      proj4string(df) = CRS(paste0("+proj=geocent +ellps=sphere +R=",R))
+      points = coordinates(spTransform(df, CRS("+proj=longlat")))
+      loc = coordinates(points)
       loc[,2] = loc[,2] - 180
-      
+      colnames(loc) = c("lon","lat","z")
       points = as.matrix(loc[,c("lon","lat")])
       A <- inla.mesh.project(mesh,points)$A
       pointValues = as.vector(A%*%loglambda)
@@ -170,7 +177,7 @@ if (class(mesh) == "inla.mesh.1d") {
 
 }
 
-  if ( !is.null(mesh$crs) ) {
+  if ( !is.null(mesh$crs) & !(inherits(ret, "Spatial"))) {
     ret = as.data.frame(ret)
     coordinates(ret) = c("x","y")
     proj4string(ret) = mesh$crs

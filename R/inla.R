@@ -203,10 +203,10 @@ plotmarginal.inla = function(result,varname="Intercept", link = function(x){x}, 
     inner.marg = data.frame(x = inner.x, y = inla.dmarginal(inner.x, marg))
 
     df = data.frame(marg)
-    ggplot(data = df, aes(x=x,y=y)) + geom_path() + geom_ribbon(ymin = 0,aes(ymax = y), alpha = 0.1) +
+    ggplot(data = df, aes_string(x="x",y="y")) + geom_path() + geom_ribbon(ymin = 0,aes_string(ymax = "y"), alpha = 0.1) +
       geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
       geom_segment(x = uq, y = 0, xend = uq, yend = uqy) +
-      geom_ribbon(data = inner.marg, ymin = 0, aes(ymax = y), alpha = 0.1) +
+      geom_ribbon(data = inner.marg, ymin = 0, aes_string(ymax = "y"), alpha = 0.1) +
       xlab(ovarname) + ylab("pdf")
 
   } else {
@@ -214,7 +214,7 @@ plotmarginal.inla = function(result,varname="Intercept", link = function(x){x}, 
     df = result$summary.random[[varname]]
     colnames(df) = c("ID","mean","sd","lower","mid","upper","mode","kld")
     p <- ggplot(df, aes(ID, mode))
-    p + geom_crossbar(aes(ymin = lower, ymax = upper)) + ylab("mod and quantiles") + xlab(paste0(varname," ID"))
+    p + geom_crossbar(aes_string(ymin = "lower", ymax = "upper")) + ylab("mod and quantiles") + xlab(paste0(varname," ID"))
 
   }
 }

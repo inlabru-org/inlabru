@@ -253,47 +253,6 @@ int.slines = function(data, mesh, group = NULL, project = TRUE) {
   ips
 }
 
-# Determine integration points 
-# 
-# @aliases polygon.integration
-# @export
-# @param data A \link{dsdata} object
-# @param poly A function turning segments into polygons, e.g. \link{swath}
-# @param project If TRUE, project integration points to mesh vertices
-# @param group A grouping for the polygons, e.g. "year" for temporal integration schemes. This can also be a function mapping segments to a group.
-# @param ... Additional arguments passed on to the poly function.
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-
-polygon.integration = function(data, poly, project = TRUE, group = NULL, ...){
-  poly.args = list(...)
-  poly = do.call(poly, c(list(data), poly.args))
-  loc = poly[,data$mesh.coords]
-  ips = int.polygon(data$mesh, loc, group = poly$seg)
-  colnames(ips)[match("group", colnames(ips))] = "seg"
-  
-  if ( project ) {
-    # Was a grouping supplied? If so, calculate the group index for each integration point
-    if ( is.null(group) ) {
-      ips.grp = rep(1, nrow(ips))
-      group.name = "int.group"
-    } else if ( is.character(group) ) {
-      ips.grp = segdata(data)[match(ips$seg, segdata(data)$seg), group]
-      group.name = group
-    } else {
-      ips.grp = group(segdata(data)[match(ips$group, segdata(data)$seg),])
-      group.name = colnames(ips.grp)[1]
-    }
-    # Project the integration points for each group independently
-    ips = lapply(unique(ips.grp), function(g){  
-      gips = data.frame(project.weights(ips[ips.grp==g,], data$mesh, mesh.coords = data$mesh.coords))
-      gips[[group.name]] = g
-      return(gips)
-    })
-    ips = do.call(rbind,ips)
-  }
-}
-
-
 
 
 # Integration points for polygons inside an inla.mesh
