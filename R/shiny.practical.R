@@ -1,5 +1,6 @@
 #' Shiny app for 1D Poisson process fitting
 #' @export
+#' @import shiny
 #' @importFrom graphics hist
 #' @return NULL
 #' 
@@ -69,6 +70,7 @@ shiny::shinyApp(server = shinyServer(function(input, output) {
     
     #' GAM inference
     if (do.gam) {
+      requireNamespace("mgcv")
       fit.gam = mgcv::gam(count ~ s(x,k=input$bins), offset=log(exposure), data = hst, family = poisson())
       rgam = exp(predict(fit.gam, newdata = preddata))
       dfgam = data.frame(x = preddata$x, mean = rgam, method = "gam", uq = NA, lq = NA, median = NA, sd = NA, cv = NA, var = "NA")
@@ -77,10 +79,9 @@ shiny::shinyApp(server = shinyServer(function(input, output) {
     
     # bru inference
     if (do.bru) {
-      mdl = ~ mySPDE(map=x, model = inla.spde2.matern(mesh), mesh = mesh) + Intercept -1
-      prd = count ~ mySPDE + Intercept
-      rbru = bru(hst, model = mdl, predictor = prd, E = hst$exposure, n = 1, family = "poisson")
-      dbru = predict(rbru, ~ exp(mySPDE + Intercept), points = preddata)
+      mdl = count ~ mySPDE(map=x, model = inla.spde2.matern(mesh), mesh = mesh) + Intercept -1
+      rbru = bru(mdl, data = hst, family = "poisson", options = list(E = hst$exposure))
+      dbru = predict(rbru, preddata, ~ exp(mySPDE + Intercept))
       dfbru = data.frame(dbru, method = "bru")
     } else {dfbru = NULL}
     
@@ -140,6 +141,7 @@ shiny::shinyApp(server = shinyServer(function(input, output) {
 ## UI
 
 ui = shiny::shinyUI(fluidPage(
+  
   
   # Application title
   titlePanel("Poisson process fitting"),
