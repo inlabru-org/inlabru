@@ -32,11 +32,11 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
   colnames(points) = all.vars(update.formula(predictor, ~.0))
   points$bin = rep(1:nbins,each = nint)
   
-  # Predict
-  prd = predict(result, predictor = predictor, points = points, ...)
+  # Sampler
+  smp = generate(result, points, predictor, ...)
+  smp = do.call(cbind, smp)
   
   # Integrate per bin
-  smp = attr(prd,"samples")
   smp = ip$wl * smp
   qq = aggregate(smp, by = list(rep(1:nbins,each = nint)), FUN = sum, drop = TRUE)[,2:(ncol(smp)+1)]
 
