@@ -104,6 +104,7 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL, project) {
     df = data.frame(region@data[ips$group, pregroup, drop = FALSE], weight = ips[,"weight"])
     ips = SpatialPointsDataFrame(ips[,c("x","y")],data = df)
     proj4string(ips) = proj4string(region)
+    ips = stransform(ips, crs = CRS(p4s))  
   }
   
   ips
