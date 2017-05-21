@@ -8,13 +8,15 @@
 #' @param observations A vector of observed values
 #' @param breaks A vector of bin boundaries
 #' @param nint Number of integration points per bin
+#' @param probs numeric vector of probabilities with values in [0,1]
 #' @param ... arguments passed on to \link{predict}
 #' @return An \link{inla} object
 
 
-bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
-  # Quantiles to comoute
-  qtls = c(0.025, 0.5, 0.975)
+bincount = function(result, predictor, observations, breaks, nint = 20, probs = c(0.025, 0.5, 0.975), ...) {
+
+  # Sort probabilities
+  probs = sort(probs)
   
   # Filter out observations outside bins
   observations = observations[(observations>=min(breaks)) & (observations<=max(breaks))]
@@ -50,10 +52,13 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
     cdff = function (p) pbinom(xx, size = nobs, prob = p)
     zz = apply(qq[k,,drop=FALSE], MARGIN = 2, cdff)
     zz = apply(zz, MARGIN = 1, mean)
-    pint[[k]] = approx(zz, xx, xout = qtls, rule = 2)$y
+    pint[[k]] = approx(zz, xx, xout = probs, rule = 2)$y
   }
   pint = data.frame(do.call(rbind, pint))
-  colnames(pint) = c("lq","mq","uq")
+  colnames(pint) = paste0("q",probs)
+  mxname = paste0("q", max(probs))
+  miname = paste0("q", min(probs))
+  mdname = paste0("q", probs[1+floor(length(probs)/2)])
   
   # Append more information
   pint = cbind(data.frame(
@@ -61,10 +66,10 @@ bincount = function(result, predictor, observations, breaks, nint = 20, ...) {
     width = diff(breaks),
     counts = hist(observations, breaks = breaks, plot = FALSE)$counts),
     pint)
-  pint$inside = ( pint$counts >= pint$lq ) & ( pint$counts <= pint$uq ) 
+  pint$inside = ( pint$counts >= pint[[miname]] ) & ( pint$counts <= pint[[mxname]] ) 
   
-  ggp = ggplot() + geom_crossbar(data = pint, mapping = aes_string(x="mid",y="mq",ymin="lq",ymax="uq",fill="inside",color="inside"), show.legend=FALSE) +
-    geom_point(data = pint, mapping = aes_string(x="mid",y="mq"), shape = 95, size = 3, color = "blue") +
+  ggp = ggplot() + geom_crossbar(data = pint, mapping = aes_string(x="mid",y=mdname,ymin=miname,ymax=mxname,fill="inside",color="inside"), show.legend=FALSE) +
+    geom_point(data = pint, mapping = aes_string(x="mid",y=mdname), shape = 95, size = 3, color = "blue") +
     geom_point(data = pint, mapping = aes_string(x="mid",y="counts"), shape = 20, size = 2) +
     xlab(all.vars(update.formula(predictor, ~.0))) +
     ylab("count")
