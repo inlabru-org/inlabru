@@ -134,6 +134,9 @@ import.mexdolphin = function() {
   # # gg.polygon(mexdolphin$ppoly, CRS("+proj=longlat"))
   # mexdolphin$depth = spTransform(depth, CRS(target.p4s))
   # 
+  #
+  # mexdolphin$samplers$distance = NULL
+  #
   # # return
   # mexdolphin 
 }
