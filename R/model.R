@@ -159,7 +159,8 @@ make.model = function(fml) {
     if (smod$model == "factor") { lbl[[k]] = smod$label ; smod$fchar = smod$label }
     
     # Fix label for offset effect
-    if (smod$label == "offset") lbl[[k]] = paste0("offset(",deparse(smod$map),")")
+    # if (smod$label == "offset") lbl[[k]] = paste0("offset(",deparse(smod$map),")")
+    if (smod$label == "offset") lbl[[k]] = "offset(offset)"
     
     # Set submodel
     submodel[[ge$f$label]] = smod
@@ -225,7 +226,10 @@ g = function(covariate,
   if ( fvals$model == "spde2" & is.null(mesh) ) { mesh = model$mesh } 
   
   # Check if n is present for models that are not fixed effects
-  if (is.null(fvals$n) & !(fvals$model == "linear")) stop(sprintf("Please provide parameter 'n' for effect '%s'", label))
+  if (is.null(fvals$n) & !(fvals$model == "linear") & !(fvals$model == "offset")) {
+    stop(sprintf("Please provide parameter 'n' for effect '%s'", label))
+    }
+  
   
   ret = list(mesh = mesh, 
              map = map,
@@ -547,6 +551,7 @@ mapper = function(map, points, eff) {
     }
   else if ( is.function(emap) ) { loc = emap(points) }
   else if ( inherits(emap, "SpatialGridDataFrame") ) { loc = over(points, emap) }
+  else if ( eff$label == "offset" && is.numeric(emap) && length(emap)==1 ) { loc = data.frame(offset = rep(emap, nrow(points)))}
   else { loc = emap }
   
   # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
