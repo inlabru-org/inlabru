@@ -1,5 +1,10 @@
 
 nlinla.taylor = function(expr, epunkt, data, env) {
+  
+  if ( "offset" %in% names(epunkt) ) { stop("One of your model components is an offset. 
+                                            However, you are using a non-linear predictor (formula), which would set the respective term to zero. 
+                                            Please remove the offset component and add its value to the predictor formula.") }
+  
   if (nrow(epunkt)<=1000) {
     effects = colnames(epunkt)
     df = as.data.frame(data)
