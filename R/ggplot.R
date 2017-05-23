@@ -391,6 +391,20 @@ gg.RasterLayer = function(r, ...) {
   geom_tile(data = df, mapping = aes_string(x="x", y="y", fill = "layer"),...)
 }
 
+#' Plot bru effects
+#' 
+#' @aliases plot.bru
+#' @name plot.bru
+#' @export
+#' @import ggplot2
+#' @param x a \link{bru} object
+#' @param y Character naming the effect to plot
+#' @return a gg object
+
+plot.bru = function(x, y = "Intercept") {
+  plotmarginal.inla(x, varname = y)
+}
+
 #' Plot predction using ggplot2
 #' 
 #' @aliases plot.prediction
