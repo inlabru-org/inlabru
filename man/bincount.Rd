@@ -4,7 +4,8 @@
 \alias{bincount}
 \title{Bin checking}
 \usage{
-bincount(result, predictor, observations, breaks, nint = 20, ...)
+bincount(result, predictor, observations, breaks, nint = 20,
+  probs = c(0.025, 0.5, 0.975), ...)
 }
 \arguments{
 \item{result}{A result object from a \link{bru} or \link{lgcp} call}
@@ -16,6 +17,8 @@ bincount(result, predictor, observations, breaks, nint = 20, ...)
 \item{breaks}{A vector of bin boundaries}
 
 \item{nint}{Number of integration points per bin}
+
+\item{probs}{numeric vector of probabilities with values in [0,1]}
 
 \item{...}{arguments passed on to \link{predict}}
 }
