@@ -5,8 +5,8 @@
 \title{Additional \link{bru} options}
 \usage{
 bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
-  result = NULL, control.compute = list(config = TRUE, dic = TRUE, waic =
-  TRUE), control.inla = iinla.getOption("control.inla"), ...)
+  result = NULL, E = NULL, control.compute = list(config = TRUE, dic =
+  TRUE, waic = TRUE), control.inla = iinla.getOption("control.inla"), ...)
 }
 \arguments{
 \item{mesh}{An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.}
@@ -18,6 +18,8 @@ bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
 \item{offset}{the usual \link{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.}
 
 \item{result}{An \code{inla} object returned from previous calls of \link{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
+
+\item{E}{\link{inla} exposure parameter}
 
 \item{control.compute}{INLA option, See \link{control.compute}}
 
