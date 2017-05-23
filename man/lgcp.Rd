@@ -4,8 +4,8 @@
 \alias{lgcp}
 \title{Log Gaussian Cox process (LGCP) inference using INLA}
 \usage{
-lgcp(components, data, samplers = NULL, formula = . ~ ., E = 1,
-  options = list())
+lgcp(components, data, samplers = NULL, ips = NULL, formula = . ~ .,
+  E = 1, options = list())
 }
 \arguments{
 \item{components}{A formula describing the latent components}
@@ -13,6 +13,8 @@ lgcp(components, data, samplers = NULL, formula = . ~ ., E = 1,
 \item{data}{A data frame or SpatialPoints[DataFrame] object}
 
 \item{samplers}{A data frame or Spatial[Points/Lines/Polygons]DataFrame objects}
+
+\item{ips}{Integration points (overrides \code{samplers})}
 
 \item{formula}{If NULL, the linear combination implied by the \code{components} is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.}
 
