@@ -55,7 +55,7 @@ bru = function(components = y ~ Intercept,
   } else if ( !inherits(family, "lhood") & inherits(data, "lhood") ) {
     lhoods = c(list(default = like(family), lh2 = data), lhoods); data = NULL 
   } else {
-    if( !is.null(family) ) { lhoods = c(list(default = like(family, data = data))); family = NULL }
+    if( !is.null(family) ) { lhoods = c(list(default = like(family, data = data, E = options$E))); family = NULL }
   }
   lhoods = c(lhoods, list(...))
   
@@ -226,6 +226,7 @@ bru.options = function(mesh = NULL,
                        max.iter = 10,
                        offset = 0,
                        result = NULL, 
+                       E = NULL,
                        control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
                        control.inla = iinla.getOption("control.inla"),
                        ... )
