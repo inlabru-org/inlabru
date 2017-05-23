@@ -193,7 +193,7 @@ spde.posterior = function(result, name, what = "range") {
     }
 
 
-    df = data.frame(x = x, median = out$median, lq = out$lower, uq = out$upper)
+    df = data.frame(x = x, median = out$median, q0.025 = out$lower, q0.975 = out$upper)
     attr(df, "type") = "1d"
     attr(df, "misc") = list(dims = "x", predictor = c("distance", ylab))
     class(df) = list("prediction","data.frame")

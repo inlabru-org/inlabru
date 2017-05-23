@@ -93,8 +93,20 @@ gg.data.frame = function(...){
 #' 
 gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", alpha = 0.3, ...){
   
+  if ( "pdf" %in% names(data) ) { 
+    y.str = "pdf"
+    ribbon = FALSE
+  } else if ( "mean" %in% names(data) ){ 
+    y.str = "mean" 
+  } else if ( "median" %in% names(data) ){
+    y.str = "median"
+  } else {
+    stop("Prediction has neither mean nor median or pdf as column. Don't know what to plot.")
+  }
+  
   line.map = aes_string(x = names(data)[1], 
-                        y = "mean")
+                        y = y.str)
+  
   ribbon.map = aes_string(x = names(data)[1], 
                           ymin = "q0.025", 
                           ymax = "q0.975")
@@ -379,9 +391,22 @@ gg.RasterLayer = function(r, ...) {
   geom_tile(data = df, mapping = aes_string(x="x", y="y", fill = "layer"),...)
 }
 
+#' Plot predction using ggplot2
+#' 
+#' @aliases plot.prediction
+#' @name plot.prediction
+#' @export
+#' @import ggplot2
+#' @param x a prediction object
+#' @param y a mapping created by \link{aes} or \link{aes_string}
+#' @param ... Arguments passed on to \link{gg.prediction}
+#' @return a gg object
 
+plot.prediction = function(x, y = NULL, ...) {
+  ggplot() + gg(x, mapping = y, ...)
+}
 
-plot.prediction = function(..., property = "median") {
+plot.prediction_old = function(..., property = "median") {
   args = list(...)
   pnames = sapply(substitute(list(...))[-1], deparse)
   
