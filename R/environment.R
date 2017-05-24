@@ -19,16 +19,26 @@ init.tutorial = function() {
   iinla.setOption("control.compute", list(list(config = TRUE, dic = TRUE, waic = TRUE)))
 }
 
+#' @title Print inlabru log
+#' 
+#' @description Print inlabru log
+#'
+#' @aliases bru.log
+#' @export
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+
+bru.log = function() {
+  sprintf(iinla.env$log)
+}
+
 msg = function(txt) {
   if ( iinla.getOption("iinla.verbose") ) { cat(paste0(txt,"\n")) }
   logentry(msg)
 }
 
 logentry = function(txt) { iinla.env$log = c(iinla.env$log, paste0(Sys.time(),": ", txt)) }
-
-logbook = function() {
-  sprintf(iinla.env$log)
-}
 
 iinla.getOption = function (option = c("control.compute", "control.inla","iinla.verbose")) 
 {
