@@ -35,9 +35,9 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL, project) {
   }
   
   else if (is.numeric(region)) {
-    # If domain is NULL set domain to a 1D mesh with 25 equally spaced vertices and boundary according to region
+    # If domain is NULL set domain to a 1D mesh with 30 equally spaced vertices and boundary according to region
     # If domain is a single numeric set domain to a 1D mesh with n=domain vertices and boundary according to region
-    if ( is.null(domain) ) { domain = inla.mesh.1d(seq(region[1], region[2], length.out = 25)) }
+    if ( is.null(domain) ) { domain = inla.mesh.1d(seq(region[1], region[2], length.out = 30)) }
     else if ( is.numeric(domain)) { domain = inla.mesh.1d(seq(region[1], region[2], length.out = domain)) }
     
     fem = inla.mesh.1d.fem(domain)
