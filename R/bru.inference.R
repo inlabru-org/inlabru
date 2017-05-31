@@ -324,11 +324,11 @@ summary.lgcp = function(object, ...) {
 }
 
 
-# Summarize a bru object
-#
-# @aliases summary.bru
-# @export
-# @param object A result object obtained from a bru() run
+#' Summarize a \link{bru} object
+#'
+#' @aliases summary.bru
+#' @export
+#' @param object An object obtained from a \link{bru} or \link{lgcp} call
 # 
 
 summary.bru = function(object, ...) {
