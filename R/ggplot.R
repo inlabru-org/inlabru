@@ -235,14 +235,23 @@ gg.SpatialGrid = function(sgdf, fill = names(sgdf)[[1]], ...) {
 #' @export
 #' @import ggplot2
 #' @param sgdf A SpatialPixels object
-#' @param fill Character identifying the data column used for plotting
+#' @param fill Character array identifying the data column used for plotting
+#' @param alpha Character array identifying the data column used for transparency
+#' @param mask A SpatialPolygon defining the region that is plotted
 #' @param ... Arguments passed on to \link{geom_tile}
 #' @return A ggplot2 object
 #' 
 
-gg.SpatialPixels = function(sgdf, fill = names(sgdf)[[1]], ...) {
+gg.SpatialPixels = function(sgdf, fill = names(sgdf)[[1]], alpha = NULL, mask = NULL, ...) {
+  
+  if ( !is.null(mask) ) {
+    sgdf = sgdf[as.vector(!is.na(over(sgdf, mask))), ]
+  }
+  
   df <- as.data.frame(sgdf)
-  geom_tile(data = df, mapping = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill))
+  dmap = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill)
+  if ( !is.null(alpha) ) dmap = modifyList(dmap, aes_string(alpha = alpha))
+  geom_tile(data = df, mapping = dmap, ...)
 }
 
 
@@ -262,54 +271,36 @@ gg.SpatialPixels = function(sgdf, fill = names(sgdf)[[1]], ...) {
 #' @param exterior If TRUE, plot the exterior boundaries of the mesh
 #' @param ext.color Color used to plot the interior boundaries
 #' @param crs A \link{CRS} object defining the coordinate system to project the mesh to before plotting
+#' @param nx Number of pixels in x direction (when plotting using the color parameter)
+#' @param ny Number of pixels in y direction (when plotting using the color parameter)
+#' @param mask A SpatialPolygon defining the region that is plotted
 #' @param ... ignored arguments (S3 generic compatibility)
 #' @return geom_polygon or geom_segment
 #' 
 
 gg.inla.mesh = function(mesh, 
-                        color = NULL, alpha = 1,
+                        color = NULL, alpha = NULL,
                         edge.color = "grey",
                         interior = TRUE, int.color = "blue", 
                         exterior = TRUE, ext.color = "black",
                         crs = NULL,
+                        mask = NULL,
+                        nx = 500, ny = 500,
                         ...) {
 
   
 if ( !is.null(color) ) {
-  if ( length(alpha) == 1 ) { 
-    alpha = rep(alpha,length(color))
-    alph.fix = TRUE}
-  else { alph.fix = FALSE }
   
-  refine = TRUE
-  if ( refine ) {
-    omesh = mesh
-    mesh = refine.inla.mesh(mesh, refine = list(max.edge = diff(range(omesh$loc[,1]))/100))
-    color = as.vector(INLA::inla.spde.make.A(omesh, loc = mesh$loc) %*% color)
-    if ( !is.null(alpha) ) { alpha = as.vector(INLA::inla.spde.make.A(omesh, loc = mesh$loc) %*% alpha) }
-  } 
-  
-  df = matrix(NA, nrow(mesh$graph$tv)*3, 2)
-  df[seq(1, nrow(mesh$graph$tv)*3, by=3), ] = mesh$loc[mesh$graph$tv[,1],1:2]
-  df[seq(2, nrow(mesh$graph$tv)*3, by=3), ] = mesh$loc[mesh$graph$tv[,2],1:2]
-  df[seq(3, nrow(mesh$graph$tv)*3, by=3), ] = mesh$loc[mesh$graph$tv[,3],1:2]
-  df = data.frame(df, tr = as.vector(matrix(1:nrow(mesh$graph$tv), 3, nrow(mesh$graph$tv),byrow=TRUE)))
-  colnames(df) = c("x","y","tr")
-  icol  = (color[mesh$graph$tv[,1]] + color[mesh$graph$tv[,2]] + color[mesh$graph$tv[,3]])/3
-  ialpha  = (alpha[mesh$graph$tv[,1]] + alpha[mesh$graph$tv[,2]] + alpha[mesh$graph$tv[,3]])/3
-  df$col = as.vector(matrix(icol, 3, nrow(mesh$graph$tv),byrow=TRUE))
-  df$alph = as.vector(matrix(ialpha, 3, nrow(mesh$graph$tv),byrow=TRUE))
-  
-  aest = aes_string(x = "x", 
-                    y = "y",
-                    group = "tr", 
-                    fill = "col",
-                    alpha = df$alph)
-  if (alph.fix) { 
-    gg = geom_polygon(data = df, aest, linetype = "blank", show.legend = FALSE, alpha = alpha[1])
+  px = pixels(mesh, nx = nx, ny = ny)
+  A = inla.spde.make.A(mesh, px)
+  px$color = as.vector(A %*% color)
+  if ( !is.null(alpha) ) { 
+    px$alpha = as.vector(A %*% alpha)
+    gg = gg(px, mask = mask, alpha = "alpha")
   } else {
-    gg = geom_polygon(data = df, aest, linetype = "blank", show.legend = FALSE)
+    gg = gg(px, mask = mask)
   }
+  
   return(gg)
   
 } else {
