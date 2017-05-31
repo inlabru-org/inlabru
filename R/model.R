@@ -486,7 +486,7 @@ evaluate.model = function(model,
   # Make a function that will apply the A-matrices
   apply.A = function(name, s) {
       mult = as.vector(s[[name]])
-      if ( !is.null(A[[name]]) & ( nrow(A[[name]]) > 0) ) {
+      if ( !is.null(A[[name]]) && ( nrow(A[[name]]) > 0) ) {
         if (length(mult) == 1) { as.vector(A[[name]] %*% rep(mult, nrow(A[[name]]))) 
           }
         else { as.vector(A[[name]] %*% s[[name]]) }
