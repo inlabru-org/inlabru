@@ -486,7 +486,7 @@ evaluate.model = function(model,
   # Make a function that will apply the A-matrices
   apply.A = function(name, s) {
       mult = as.vector(s[[name]])
-      if (!is.null(A[[name]])) {
+      if ( !is.null(A[[name]]) & ( nrow(A[[name]]) > 0) ) {
         if (length(mult) == 1) { as.vector(A[[name]] %*% rep(mult, nrow(A[[name]]))) 
           }
         else { as.vector(A[[name]] %*% s[[name]]) }
@@ -546,7 +546,7 @@ mapper = function(map, points, eff) {
   # 3) Else we obtain a vector and return as-is. This happens when map states a column of the data points
   
   if ( is.null(emap) ) { 
-    loc = data.frame(x = rep(1, nrow(as.data.frame(points)))) 
+    loc = data.frame(x = rep(1, max(1,nrow(as.data.frame(points)))))
     colnames(loc) = deparse(map)
     }
   else if ( is.function(emap) ) { loc = emap(points) }
