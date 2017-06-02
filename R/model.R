@@ -226,7 +226,7 @@ g = function(covariate,
   if ( fvals$model == "spde2" & is.null(mesh) ) { mesh = model$mesh } 
   
   # Check if n is present for models that are not fixed effects
-  if (is.null(fvals$n) & !(fvals$model == "linear") & !(fvals$model == "offset")) {
+  if (is.null(fvals$n) & !(fvals$model == "linear") & !(fvals$model == "offset") & !(fvals$model == "factor")) {
     stop(sprintf("Please provide parameter 'n' for effect '%s'", label))
     }
   
