@@ -4,12 +4,17 @@
 \alias{gg.SpatialPixels}
 \title{Plot SpatialPixels using ggplot2}
 \usage{
-\method{gg}{SpatialPixels}(sgdf, fill = names(sgdf)[[1]], ...)
+\method{gg}{SpatialPixels}(sgdf, fill = names(sgdf)[[1]], alpha = NULL,
+  mask = NULL, ...)
 }
 \arguments{
 \item{sgdf}{A SpatialPixels object}
 
-\item{fill}{Character identifying the data column used for plotting}
+\item{fill}{Character array identifying the data column used for plotting}
+
+\item{alpha}{Character array identifying the data column used for transparency}
+
+\item{mask}{A SpatialPolygon defining the region that is plotted}
 
 \item{...}{Arguments passed on to \link{geom_tile}}
 }

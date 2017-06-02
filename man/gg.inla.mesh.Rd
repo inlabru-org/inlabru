@@ -4,9 +4,10 @@
 \alias{gg.inla.mesh}
 \title{Plot inla.mesh using ggplot2}
 \usage{
-\method{gg}{inla.mesh}(mesh, color = NULL, alpha = 1, edge.color = "grey",
-  interior = TRUE, int.color = "blue", exterior = TRUE,
-  ext.color = "black", crs = NULL, ...)
+\method{gg}{inla.mesh}(mesh, color = NULL, alpha = NULL,
+  edge.color = "grey", interior = TRUE, int.color = "blue",
+  exterior = TRUE, ext.color = "black", crs = NULL, mask = NULL,
+  nx = 500, ny = 500, ...)
 }
 \arguments{
 \item{mesh}{An \link{inla.mesh} object}
@@ -26,6 +27,12 @@
 \item{ext.color}{Color used to plot the interior boundaries}
 
 \item{crs}{A \link{CRS} object defining the coordinate system to project the mesh to before plotting}
+
+\item{mask}{A SpatialPolygon defining the region that is plotted}
+
+\item{nx}{Number of pixels in x direction (when plotting using the color parameter)}
+
+\item{ny}{Number of pixels in y direction (when plotting using the color parameter)}
 
 \item{...}{ignored arguments (S3 generic compatibility)}
 }
