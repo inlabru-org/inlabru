@@ -66,18 +66,20 @@ spoly = function(points, crs, to.crs = NULL) {
 #' @return List of Spatial* objects
 
 stransform = function(splist, crs) {
-  if ( class(splist)[[1]] == "list" ) {
-    for (k in 1:length(splist)) {
-      if (inherits(splist[[k]], "Spatial")) {
-        # cn = coordnames(splist[[k]])
-        splist[[k]] = spTransform(splist[[k]], crs)
-        #coordnames(splist[[k]]) = cn
-      } else if (inherits(splist[[k]], "inla.mesh")) {
-        splist[[k]] = inla.spTransform(splist[[k]], CRSobj = crs)
+  if (!is.null(crs)) {
+    if ( class(splist)[[1]] == "list" ) {
+      for (k in 1:length(splist)) {
+        if (inherits(splist[[k]], "Spatial")) {
+          # cn = coordnames(splist[[k]])
+          splist[[k]] = spTransform(splist[[k]], crs)
+          #coordnames(splist[[k]]) = cn
+        } else if (inherits(splist[[k]], "inla.mesh")) {
+          splist[[k]] = inla.spTransform(splist[[k]], CRSobj = crs)
+        }
       }
-    }
-  } else { 
-    splist = stransform(list(splist), crs = crs)[[1]]
-  } 
-  splist
+    } else { 
+      splist = stransform(list(splist), crs = crs)[[1]]
+    } 
+    splist
+  } else {splist}
 }
