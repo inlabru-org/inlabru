@@ -706,7 +706,7 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     if ( iinla.verbose ) { cat(" Done. ") }
     
     # Extract values tracked for estimating convergence
-    if ( n > 1 & k < n) track[[k]] = cbind(effect = rownames(result$summary.fixed), iteration = k, result$summary.fixed)
+    if ( n > 1 & k <= n) track[[k]] = cbind(effect = rownames(result$summary.fixed), iteration = k, result$summary.fixed)
     
     # Update stack given current result
     if ( n > 1 & k < n) { stk = stackmaker(data, model, result) }
