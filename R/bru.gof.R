@@ -110,18 +110,9 @@ devel.cvmeasure = function(joint, prediction1, prediction2, samplers = NULL) {
     #
     # PRESENTED TO YOU BY HACKY McHACKERSON
     #
-    mesh = attributes(joint)[["misc"]]$mesh
-
-    ret = list()
-    ret$name = "tmp"
-    ret$mesh = mesh
-    ret$get.coord = coordinates
-    ret$n.coord = 2
-    ret$class = "matrix"  
-    ret$project = TRUE
-    ret$p4s = proj4string(samplers)
+ 
     
-    wips = ipoints(samplers, list(coordinates = ret))
+    wips = ipoints(samplers)
     A = INLA::inla.spde.make.A(mesh, loc = wips)
     
     weights = wips$weight
