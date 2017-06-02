@@ -138,9 +138,12 @@ cprod = function(...) {
     ips = ipl[[1]]
   } else {
     ips1 = ipl[[1]]
+    ips2 = do.call(cprod, ipl[2:length(ipl)])
+    if (! "weight" %in% names(ips1) ) { ips1$weight = 1 }
+    if (! "weight" %in% names(ips2) ) { ips2$weight = 1 }
+    
     loc1 = ips1[,setdiff(names(ipl[[1]]),"weight"), drop = FALSE]
     w1 = data.frame(weight = ips1$weight)
-    ips2 = do.call(cprod, ipl[2:length(ipl)])
     loc2 = ips2[,setdiff(names(ips2),"weight"), drop = FALSE]
     w2 = data.frame(weight2 = ips2[,"weight"])
     
@@ -495,4 +498,27 @@ vertex.projection = function(points, mesh, columns = names(points), group = NULL
     proj4string(ret) = proj4string(points)
   }
   ret
+}
+
+#' Weighted summation (integration) of data frame subsets
+#'   
+#' 
+#' @aliases int
+#' @export
+#' @param data A \code{data.frame} or \code{Spatial} object. Has to have a weight column with numeric values.
+#' @param values Numerical values to be summed up.
+#' @param dims Columns of the \code{data} obect to integrate over
+#' @return A \code{data.frame} of integrated values
+
+
+int = function(data, values, dims = NULL) {
+  keep = setdiff(names(data), c(dims, "weight"))
+  if (length(keep) > 0 & !is.null(dims)) { 
+    agg = aggregate(values * data$weight, by = as.list(data[,keep,drop=FALSE]), FUN = sum)
+    names(agg)[ncol(agg)] = "integral" # paste0("integral_{",dims,"}(",deparse(values),")")
+  } else { 
+    agg = sum(data$weight * values) 
+  }
+  
+  agg
 }
