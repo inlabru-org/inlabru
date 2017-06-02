@@ -225,8 +225,13 @@ gg.SpatialPolygons = function(data, mapping = NULL, crs = NULL, color = "black",
 
 gg.SpatialGrid = function(sgdf, fill = names(sgdf)[[1]], ...) {
   df <- as.data.frame(sgdf)
-  c(geom_tile(data = df, mapping = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill), ...),
-    scale_fill_gradientn(colours = bru.pal()))
+  gm = geom_tile(data = df, mapping = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill), ...)
+  
+  # If data is not discrete (factor), add default color palette
+  if (!inherits(sgdf[[fill]], "factor")) {
+    gm = c(gm, scale_fill_gradientn(colours = bru.pal()))
+  }
+  gm
 }
 
 #' Plot SpatialPixels using ggplot2
@@ -252,7 +257,13 @@ gg.SpatialPixels = function(sgdf, fill = names(sgdf)[[1]], alpha = NULL, mask = 
   df <- as.data.frame(sgdf)
   dmap = aes_string(x = coordnames(sgdf)[1], y = coordnames(sgdf)[2], fill = fill)
   if ( !is.null(alpha) ) dmap = modifyList(dmap, aes_string(alpha = alpha))
-  c(geom_tile(data = df, mapping = dmap, ...), scale_fill_gradientn(colours = bru.pal()))
+  gm = geom_tile(data = df, mapping = dmap, ...)
+  
+  # If data is not discrete (factor), add default color palette
+  if (!inherits(sgdf[[fill]], "factor")) {
+    gm = c(gm, scale_fill_gradientn(colours = bru.pal()))
+  }
+  gm
 }
 
 
@@ -774,13 +785,13 @@ pixelplot.mesh = function(mesh = NULL,
   
 }
 
-#' Plot predction using ggplot2
-#' 
-#' @aliases bru.pal
-#' @name bru.pal
-#' @export
-#' @param 
-#' @return Color values as returned by \code{RColorBrewer::brewer.pal(9, "YlOrRd")}
+# Default color palette for plots using \link{gg}
+# 
+# @aliases bru.pal
+# @name bru.pal
+# @export
+# @param 
+# @return Color values as returned by \code{RColorBrewer::brewer.pal(9, "YlOrRd")}
 
 bru.pal = function() {
   # library(RColorBrewer)
