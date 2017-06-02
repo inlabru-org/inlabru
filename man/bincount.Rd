@@ -28,4 +28,3 @@ An \link{inla} object
 \description{
 Bin checking
 }
-

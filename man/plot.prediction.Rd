@@ -19,4 +19,3 @@ a gg object
 \description{
 Plot predction using ggplot2
 }
-

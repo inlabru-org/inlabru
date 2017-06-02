@@ -2,13 +2,13 @@
 % Please edit documentation in R/data.Poisson3_1D.R
 \docType{data}
 \name{Poisson3_1D}
+\alias{Poisson3_1D}
+\alias{lambda3_1D}
 \alias{E_nc3a}
 \alias{E_nc3b}
-\alias{Poisson3_1D}
+\alias{pts3}
 \alias{countdata3a}
 \alias{countdata3b}
-\alias{lambda3_1D}
-\alias{pts3}
 \title{1-Dimensional NonHomogeneous Poisson example.}
 \format{The data contain the following \code{R} objects:
  \describe{
@@ -70,4 +70,3 @@ p2a = ggplot() +
 multiplot(p1a,p2a,cols=1)
 
 }
-

@@ -21,4 +21,3 @@ geom_point
 \description{
 Point geom for SpatialPoints objects
 }
-

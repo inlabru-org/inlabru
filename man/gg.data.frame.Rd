@@ -17,4 +17,3 @@ c(geom_ribbon, geom_line)
 \description{
 Geom for data.frame
 }
-

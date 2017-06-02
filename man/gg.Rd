@@ -24,4 +24,3 @@ Depending on the class of the first argument one of the following functions is c
 \item{}{\link{gg.inla.mesh.1d}}
 }
 }
-

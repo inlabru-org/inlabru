@@ -19,4 +19,3 @@ A spatstat \code{spatstat} \code{ppp} object
 \description{
 Convert SpatialPoints and boundary polygon to  spatstat ppp object
 }
-

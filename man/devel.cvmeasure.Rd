@@ -23,4 +23,3 @@ Correlation
 \description{
 Variance and correlations measures for prediction components
 }
-

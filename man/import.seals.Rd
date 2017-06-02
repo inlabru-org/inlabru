@@ -36,4 +36,3 @@ Add band1 covariate to seals data frame
 Plot seal count and ice together
 Create a data set
 }
-

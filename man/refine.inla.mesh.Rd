@@ -20,4 +20,3 @@ Refine an inla.mesh object
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
-

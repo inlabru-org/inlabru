@@ -31,4 +31,3 @@ ggplot() + gg(pxl) + gg(mrsea$mesh)
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
-

@@ -23,4 +23,3 @@ An integration configuration
 \description{
 Integration point configuration generator
 }
-

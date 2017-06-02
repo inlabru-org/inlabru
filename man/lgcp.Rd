@@ -38,4 +38,3 @@ point realizations may only be known in sub-areas of the modeled space. These ob
 domain are called samplers and can be provided via the respective parameter. If samplers is NULL it is
 assumed that all of the LGCP's dimensions have been observed completely.
 }
-

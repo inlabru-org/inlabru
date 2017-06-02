@@ -25,4 +25,3 @@ ggplot() + gg(mrsea$mesh) + gg(vrt, color = "red")
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
-

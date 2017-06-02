@@ -19,4 +19,3 @@ GAM inference
 \description{
 Shiny app for 1D Poisson process fitting
 }
-

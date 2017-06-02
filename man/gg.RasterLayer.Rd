@@ -17,4 +17,3 @@ geom_tile
 \description{
 Plot RasterLayer using ggplot2
 }
-

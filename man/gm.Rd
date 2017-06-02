@@ -14,4 +14,3 @@ gm(data, ...)
 \description{
 Coordinates are transformed to lon/lat for convenient plotting using ggmap
 }
-

@@ -6,4 +6,3 @@
 \description{
 A toy data set for group size inference
 }
-

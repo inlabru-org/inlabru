@@ -24,4 +24,3 @@ A ggplot2 object
 \description{
 Plot SpatialPixels using ggplot2
 }
-

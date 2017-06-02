@@ -21,4 +21,3 @@ Plots the posterior distribution of the range, log(range), variance, or log(vari
 parameter of a model's SPDE component. Can also plot Matern correlation or covariance function.
 \code{inla.spde.result}.
 }
-

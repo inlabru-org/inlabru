@@ -23,4 +23,3 @@ globe(R = 1, R.grid = 1.05, specular = "black", axes = FALSE,
 \description{
 Plot a globe using rgl
 }
-

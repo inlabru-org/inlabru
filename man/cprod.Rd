@@ -25,4 +25,3 @@ plot(ips$myDim) ; points(ips$myDiscreteDim, col = "red")
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
-

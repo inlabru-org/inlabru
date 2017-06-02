@@ -30,4 +30,3 @@ pl2 = ggplot(data = df) + geom_line(mapping = aes(x,z), color = "blue")
 multiplot(pl1,pl2, cols = 2)
 
 }
-

@@ -22,4 +22,3 @@ Query if a point is inside the mesh boundary
 \author{
 Fabian E. Bachl <\email{f.e.bachl@bath.ac.uk}>
 }
-

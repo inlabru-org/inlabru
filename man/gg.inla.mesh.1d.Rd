@@ -21,4 +21,3 @@ geom_point
 \description{
 Plot inla.mesh.1d using ggplot2
 }
-

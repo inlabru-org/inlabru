@@ -19,4 +19,3 @@ A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
 \description{
 Summarize and annotate data
 }
-

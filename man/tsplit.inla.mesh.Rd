@@ -21,4 +21,3 @@ Warning2: Works in euclidean coordinates. Not suitable for sphere.
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
-

@@ -34,4 +34,3 @@ p2 = ggplot() +gg(gorillas$boundary) +gg(plotpts$plots) +  geom_text(aes(label=c
 multiplot(p1,p2,cols=2)
 
 }
-

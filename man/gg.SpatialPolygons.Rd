@@ -26,4 +26,3 @@ geom_polygon
 \description{
 Polygon geom for SpatialPolygons objects
 }
-

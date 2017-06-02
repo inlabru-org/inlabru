@@ -21,4 +21,3 @@ geom_segment
 \description{
 Segment geom for SpatialLines objects
 }
-

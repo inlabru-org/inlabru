@@ -12,4 +12,3 @@ rgl(...)
 \description{
 Plot sp objects and and meshes using RGL
 }
-

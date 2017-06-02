@@ -18,4 +18,3 @@ deltaWAIC.
 \description{
 Calculates DIC and WAIC differences and produces an ordered summary.
 }
-

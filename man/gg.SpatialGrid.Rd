@@ -19,4 +19,3 @@ A ggplot2 object
 \description{
 Plot SpatialGrid using ggplot2
 }
-

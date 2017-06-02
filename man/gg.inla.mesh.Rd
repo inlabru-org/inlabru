@@ -42,4 +42,3 @@ geom_polygon or geom_segment
 \description{
 Plot inla.mesh using ggplot2
 }
-

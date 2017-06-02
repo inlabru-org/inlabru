@@ -48,4 +48,3 @@ plotpts = plotsample(gorillas$nests,gorillas$boundary,x.ppn=0.4,y.ppn=0.4,nx=5,n
 ggplot() +gg(plotpts$plots) +gg(plotpts$dets,pch="+",cex=2) +gg(gorillas$boundary)
 
 }
-

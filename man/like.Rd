@@ -33,4 +33,3 @@ Likelihood construction for usage with \link{bru}
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
-

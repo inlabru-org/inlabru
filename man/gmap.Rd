@@ -17,4 +17,3 @@ A ggmap
 \description{
 Plot a map using extend of a spatial object
 }
-

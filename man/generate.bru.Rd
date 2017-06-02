@@ -21,4 +21,3 @@ Predicted values
 \description{
 Sampling based on bru posteriors
 }
-

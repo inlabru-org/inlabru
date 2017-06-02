@@ -24,4 +24,3 @@ Predicted values
 \description{
 Predictions based on bru
 }
-

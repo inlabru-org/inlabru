@@ -2,11 +2,11 @@
 % Please edit documentation in R/data.Poisson1_1D.R
 \docType{data}
 \name{Poisson1_1D}
-\alias{E_nc1}
 \alias{Poisson1_1D}
-\alias{countdata1}
 \alias{lambda1_1D}
+\alias{E_nc1}
 \alias{pts1}
+\alias{countdata1}
 \title{1-Dimensional Homogeneous Poisson example.}
 \format{The data contain the following \code{R} objects:
  \describe{
@@ -40,4 +40,3 @@ geom_point(data = countdata1, aes(x=x,y=count),col="blue") +ylim(0,max(countdata
   xlab(expression(bold(s))) +ylab("count")
 
 }
-

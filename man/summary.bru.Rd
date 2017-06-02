@@ -12,4 +12,3 @@ summary.bru(object, ...)
 \description{
 Summarize a \link{bru} object
 }
-

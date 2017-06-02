@@ -6,4 +6,3 @@
 \description{
 See \link{make.model}.
 }
-

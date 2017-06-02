@@ -17,4 +17,3 @@ a gg object
 \description{
 Plot bru effects
 }
-

@@ -32,4 +32,4 @@ Depends:
     methods,
     ggplot2,
 Additional_repositories: https://www.math.ntnu.no/inla/R/testing
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

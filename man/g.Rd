@@ -28,4 +28,3 @@ A list with mesh, model and the return value of the f-call
 \description{
 A wrapper for the \link{inla} \link{f} function
 }
-

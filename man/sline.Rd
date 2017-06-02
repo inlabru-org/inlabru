@@ -23,4 +23,3 @@ SpatialLinesDataFrame
 \description{
 Convert data frame to SpatialLinesDataFrame
 }
-

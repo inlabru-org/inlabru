@@ -18,4 +18,3 @@ Load \link{mrsea} survey data from MRSea package and convert to spatial formats 
 \author{
 Lindesay Scott-Hayward <\email{lass@st-andrews.ac.uk}>
 }
-

@@ -33,4 +33,3 @@ Additional \link{bru} options
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
-

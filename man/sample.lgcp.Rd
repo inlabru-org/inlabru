@@ -34,5 +34,7 @@ pts$y = 0
 plot(vertices, exp(loglambda), type = "l", ylim = c(0,150))
 points(pts, pch = "|" )
 
+data("gorillas")
+pts = sample.lgcp(gorillas$mesh, rep(-10, gorillas$mesh$n))
+ggplot() + gg(gorillas$mesh) + gg(pts)
 }
-
