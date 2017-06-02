@@ -142,7 +142,7 @@ vertices = function(mesh) {
 #' @param mesh An \code{inla.mesh} object
 #' @param nx Number of pixels in x direction
 #' @param ny Number of pixels in y direction
-#' @param mask If TRUE, remove pixels that are outside the mesh
+#' @param mask If logical and TRUE, remove pixels that are outside the mesh. If \code{mask} is a \code{Spatial} object, only return pixels covered by this object. 
 #' @return \code{SpatialPixels} covering the mesh
 #' 
 #' @examples
@@ -162,8 +162,11 @@ pixels = function(mesh, nx = 150, ny = 150, mask = TRUE) {
   if (!is.null(mesh$crs)) { pixels = SpatialPixels(pixels, proj4string = mesh$crs) }
   else { pixels = SpatialPixels(pixels) }
   
-  if ( mask ) { pixels = pixels[is.inside(mesh, coordinates(pixels))] }
-  
+  if ( is.logical(mask) && (mask == TRUE) ){ 
+    pixels = pixels[is.inside(mesh, coordinates(pixels))] 
+  } else if ( !is.null(mask) ) {
+    pixels = pixels[as.vector(!is.na(over(pixels, mask))), ]
+  }
 }
 
 
