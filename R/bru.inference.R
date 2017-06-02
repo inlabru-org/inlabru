@@ -133,7 +133,7 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
   
   #' Set response name
   response = all.vars(update(formula, .~0))
-  if (response == ".") response = NULL
+  if (response[1] == ".") response = NULL
   
   
   #' More on special bru likelihoods
