@@ -563,7 +563,7 @@ mapper = function(map, points, eff) {
     
     BADpoints = points[as.vector(is.na(loc)),]
     GOODpoints = points[as.vector(!is.na(loc)),]
-    dst = rgeos::gDistance(GOODpoints,BADpoints, byid=T)
+    dst = rgeos::gDistance(SpatialPoints(GOODpoints),SpatialPoints(BADpoints), byid=T)
     nn = apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
     loc[is.na(loc)] = loc[!is.na(loc)][nn]
   }
