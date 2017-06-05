@@ -385,7 +385,7 @@ summary.bru = function(object, ...) {
   cat("\n")
   for (nm in names(object$sppa$model$effects)) {
     eff = object$sppa$model$effects[[nm]]
-    if (!is.null(eff$mesh)){
+    if (eff$model == "spde2"){
       hyp = inla.spde.result(object, nm, eff$inla.spde)
       cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
       df = rbind(marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"), 
