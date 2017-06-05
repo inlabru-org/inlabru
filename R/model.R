@@ -431,7 +431,7 @@ list.indices.model = function(model, points){
         }
       }
     } else {
-      idx[[name]] = mapper(eff$map, points, eff)
+      idx[[name]] = mapper(eff$map, points, eff, environment(model$in.formula))
     }
     
   }
@@ -535,10 +535,10 @@ evaluate.model = function(model,
 }
 
 
-mapper = function(map, points, eff) {
+mapper = function(map, points, eff, env = NULL) {
   
   # Evaluate the map with the points as an environment
-  emap = tryCatch(eval(map, data.frame(points)), error = function(e) {})
+  emap = tryCatch(eval(map, c(data.frame(points), as.list(env))), error = function(e) {})
   
   # 0) Eval failed. map everything to 1. This happens for automatically added Intercept
   # 1) If we obtain a function, apply the function to the points
