@@ -47,6 +47,9 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL, project) {
   
   } else if ( inherits(region, "inla.mesh") ){
     
+    if ( !is.null(region$crs) ) {
+      region = stransform(region, crs = CRS("+proj=cea +units=km"))
+    }
     ips = vertices(region)
     ips$weight = diag(as.matrix(inla.mesh.fem(region)$c0))
     
