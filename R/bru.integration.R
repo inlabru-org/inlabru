@@ -50,6 +50,12 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL, project) {
     ips = vertices(region)
     ips$weight = diag(as.matrix(inla.mesh.fem(region)$c0))
     
+  } else if ( inherits(region, "inla.mesh.1d") ){
+    
+    ips = data.frame(x = region$loc)
+    colnames(ips) = name
+    ips$weight = diag(as.matrix(inla.mesh.fem(region)$c0))
+    
   } else if ( class(region) == "SpatialPoints" ){
     
     ips = region
@@ -253,7 +259,7 @@ ipmaker = function(samplers, config) {
 #' @param mesh default spatial mesh used for integration
 #' @return An integration configuration
 
-iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL) {
+iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL, domain = NULL) {
   
   # Obtain dimensions to integrate over. 
   # These are provided as the left hand side of model$formula
@@ -318,11 +324,10 @@ iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL) {
     } else {
       # If the dimension is defined via the formula extract the respective information.
       # If not, extract information from the data
-      if ( nm %in% names(environment(model$formula)) ) {
-        dim.def = environment(model$formula)[[nm]]
-        ret$min = min(dim.def)
-        ret$max = max(dim.def)
-        ret$n.points = length(dim.def)
+      if ( nm %in% names(domain) ) {
+        ret$min = min(domain[[nm]][1])
+        ret$max = max(domain[[nm]][2])
+        ret$n.points = 30
       } else {
         ret$min = apply(ret$get.coord(points), MARGIN = 2, min)
         ret$max = apply(ret$get.coord(points), MARGIN = 2, max)

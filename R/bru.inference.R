@@ -118,8 +118,9 @@ bru = function(components = y ~ Intercept,
 #' @param E Exposure parameter for family = 'poisson' passed on to \link{inla}. Special case if family is 'cp': rescale all integration weights by E.
 #' @param samplers Integration domain for 'cp' family
 #' @param ips Integration points for 'cp' family. Overrides \code{samplers}
+#' @param domain Named list of domain definitions
 #' 
-like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = NULL, E = 1, samplers = NULL, ips = NULL) {
+like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = NULL, E = 1, samplers = NULL, ips = NULL, domain = NULL) {
   
   # Some defaults
   inla.family = family
@@ -148,7 +149,7 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
     }
     
     if ( is.null(ips) ) {
-      icfg = iconfig(samplers, data, bru.model, mesh = mesh)
+      icfg = iconfig(samplers, data, bru.model, mesh = mesh, domain = domain)
       ips = ipmaker(samplers, icfg)
     }
     
@@ -173,6 +174,7 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
          response = response,
          inla.family = inla.family,
          ips = ips,
+         domain = domain,
          drange = drange)
   
   class(lh) = c("lhood","list")
@@ -264,6 +266,7 @@ bru.options = function(mesh = NULL,
 #' @param components A formula describing the latent components
 #' @param data A data frame or SpatialPoints[DataFrame] object
 #' @param samplers A data frame or Spatial[Points/Lines/Polygons]DataFrame objects
+#' @param domain Named list of domain definitions
 #' @param ips Integration points (overrides \code{samplers})
 #' @param formula If NULL, the linear combination implied by the \code{components} is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
 #' @param E Single numeric used rescale all integration weights by a fixed factor 
@@ -273,12 +276,13 @@ bru.options = function(mesh = NULL,
 lgcp = function(components,
                 data,
                 samplers = NULL,
+                domain = NULL,
                 ips = NULL,
                 formula = . ~ .,
                 E = 1,
                 options = list()) {
   
-  lik = like("cp", formula = formula, data = data, samplers = samplers, components = components, E = E, ips = ips)
+  lik = like("cp", formula = formula, data = data, samplers = samplers, components = components, E = E, ips = ips, domain = domain)
   result = bru(components, lik, options = options)
   
 }
