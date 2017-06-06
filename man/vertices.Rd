@@ -2,26 +2,10 @@
 % Please edit documentation in R/mesh.R
 \name{vertices}
 \alias{vertices}
-\title{Extract vertex locations from an \code{inla.mesh}}
+\title{Plot an inla.mesh using ggplot}
 \usage{
-vertices(mesh)
-}
-\arguments{
-\item{mesh}{An \code{inla.mesh} object}
-}
-\value{
-A \code{SpatialPointsDataFrame} of vertex locations
+vertices(...)
 }
 \description{
-Converts the vertices of an \code{inla.mesh} object into a \code{SpatialPointsDataFrame}.
-}
-\examples{
-
-data("mrsea")
-vrt = vertices(mrsea$mesh)
-ggplot() + gg(mrsea$mesh) + gg(vrt, color = "red")
-
-}
-\author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Plot an inla.mesh using ggplot
 }

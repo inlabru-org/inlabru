@@ -100,12 +100,19 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
 }
 
 
+#' Plot an inla.mesh using ggplot
+#'
+#' @export
+vertices = function(...){UseMethod("vertices")}
+
+
+
 #' @title Extract vertex locations from an \code{inla.mesh}
 #'
 #' @description Converts the vertices of an \code{inla.mesh} object into a \code{SpatialPointsDataFrame}.
 #' 
-#' @aliases vertices
-#' @export
+#' @aliases vertices.inla.mesh
+#' @export vertices.inla.mesh
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
@@ -119,7 +126,7 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
 #' ggplot() + gg(mrsea$mesh) + gg(vrt, color = "red")
 #' 
 
-vertices = function(mesh) {
+vertices.inla.mesh = function(mesh) {
   if (is.null(mesh$crs)) {
     mesh$loc
   } else {
