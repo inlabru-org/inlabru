@@ -5,7 +5,7 @@
 \title{Likelihood construction for usage with \link{bru}}
 \usage{
 like(family, formula = . ~ ., data = NULL, components = NULL,
-  mesh = NULL, E = 1, samplers = NULL, ips = NULL)
+  mesh = NULL, E = 1, samplers = NULL, ips = NULL, domain = NULL)
 }
 \arguments{
 \item{family}{A character identifying a valid \link{inla} likelihood. Alternatively 'cp' for Cox processes.}
@@ -22,7 +22,9 @@ like(family, formula = . ~ ., data = NULL, components = NULL,
 
 \item{samplers}{Integration domain for 'cp' family}
 
-\item{ips}{Integration points for 'cp' family. Overrides \code{samplers}
+\item{ips}{Integration points for 'cp' family. Overrides \code{samplers}}
+
+\item{domain}{Named list of domain definitions
 
 Set response name
 More on special bru likelihoods}

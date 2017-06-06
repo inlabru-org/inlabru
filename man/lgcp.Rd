@@ -4,8 +4,8 @@
 \alias{lgcp}
 \title{Log Gaussian Cox process (LGCP) inference using INLA}
 \usage{
-lgcp(components, data, samplers = NULL, ips = NULL, formula = . ~ .,
-  E = 1, options = list())
+lgcp(components, data, samplers = NULL, domain = NULL, ips = NULL,
+  formula = . ~ ., E = 1, options = list())
 }
 \arguments{
 \item{components}{A formula describing the latent components}
@@ -13,6 +13,8 @@ lgcp(components, data, samplers = NULL, ips = NULL, formula = . ~ .,
 \item{data}{A data frame or SpatialPoints[DataFrame] object}
 
 \item{samplers}{A data frame or Spatial[Points/Lines/Polygons]DataFrame objects}
+
+\item{domain}{Named list of domain definitions}
 
 \item{ips}{Integration points (overrides \code{samplers})}
 
