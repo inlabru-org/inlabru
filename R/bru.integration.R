@@ -101,14 +101,23 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL, project) {
     # Convert region and domain to equal area CRS
     if ( !is.null(domain$crs) ){
       region = stransform(region, crs = CRS("+proj=cea +units=km"))
-      domain = stransform(domain, crs = CRS("+proj=cea +units=km"))
     }
-      
+    
     polyloc = do.call(rbind, lapply(1:length(region), 
                                     function(k) cbind(
                                       x = rev(coordinates(region@polygons[[k]]@Polygons[[1]])[,1]),
                                       y = rev(coordinates(region@polygons[[k]]@Polygons[[1]])[,2]),
                                       group = k)))
+    
+    # If domain is NULL, make a mesh with the polygons as boundary
+    if ( is.null(domain) ) {
+      max.edge = max(diff(range(polyloc[,1])), diff(range(polyloc[,2])))/20
+      domain = inla.mesh.2d(boundary = region, max.edge = max.edge)
+      domain$crs = CRS(proj4string(region))
+    } else {
+      domain = stransform(domain, crs = CRS("+proj=cea +units=km"))
+    }
+    
     ips = int.polygon(domain, loc = polyloc[,1:2], group = polyloc[,3])
     df = data.frame(region@data[ips$group, pregroup, drop = FALSE], weight = ips[,"weight"])
     ips = SpatialPointsDataFrame(ips[,c("x","y")],data = df)
