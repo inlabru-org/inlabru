@@ -100,9 +100,10 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
 }
 
 
-#' Plot an inla.mesh using ggplot
+#' Extract mesh vertices
 #'
 #' @export
+#' @param ... an inla.mesh
 vertices = function(...){UseMethod("vertices")}
 
 

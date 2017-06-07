@@ -17,6 +17,8 @@ iconfig(samplers, points, model, dim.names = NULL, mesh = NULL,
 \item{dim.names}{Dimension names (character array)}
 
 \item{mesh}{default spatial mesh used for integration}
+
+\item{domain}{A domain specification}
 }
 \value{
 An integration configuration

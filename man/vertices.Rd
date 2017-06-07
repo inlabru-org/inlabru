@@ -2,10 +2,13 @@
 % Please edit documentation in R/mesh.R
 \name{vertices}
 \alias{vertices}
-\title{Plot an inla.mesh using ggplot}
+\title{Extract mesh vertices}
 \usage{
 vertices(...)
 }
+\arguments{
+\item{...}{an inla.mesh}
+}
 \description{
-Plot an inla.mesh using ggplot
+Extract mesh vertices
 }

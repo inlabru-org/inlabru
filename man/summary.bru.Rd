@@ -8,6 +8,8 @@ summary.bru(object, ...)
 }
 \arguments{
 \item{object}{An object obtained from a \link{bru} or \link{lgcp} call}
+
+\item{...}{ignored arguments}
 }
 \description{
 Summarize a \link{bru} object

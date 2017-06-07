@@ -269,6 +269,7 @@ ipmaker = function(samplers, config) {
 #' @param model A \link{model}
 #' @param dim.names Dimension names (character array)
 #' @param mesh default spatial mesh used for integration
+#' @param domain A domain specification
 #' @return An integration configuration
 
 iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL, domain = NULL) {
