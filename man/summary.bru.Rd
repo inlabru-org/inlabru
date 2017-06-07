@@ -4,7 +4,7 @@
 \alias{summary.bru}
 \title{Summarize a \link{bru} object}
 \usage{
-summary.bru(object, ...)
+\method{summary}{bru}(object, ...)
 }
 \arguments{
 \item{object}{An object obtained from a \link{bru} or \link{lgcp} call}

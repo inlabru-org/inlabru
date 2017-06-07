@@ -4,10 +4,10 @@
 \alias{vertices}
 \title{Extract mesh vertices}
 \usage{
-vertices(...)
+vertices(mesh)
 }
 \arguments{
-\item{...}{an inla.mesh}
+\item{mesh}{an inla.mesh}
 }
 \description{
 Extract mesh vertices

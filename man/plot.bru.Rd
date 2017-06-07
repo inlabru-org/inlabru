@@ -4,12 +4,12 @@
 \alias{plot.bru}
 \title{Plot bru effects}
 \usage{
-plot.bru(x, y = "Intercept")
+\method{plot}{bru}(x, ...)
 }
 \arguments{
 \item{x}{a \link{bru} object}
 
-\item{y}{Character naming the effect to plot}
+\item{...}{A character naming the effect to plot}
 }
 \value{
 a gg object

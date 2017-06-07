@@ -332,6 +332,7 @@ summary.lgcp = function(object, ...) {
 #'
 #' @aliases summary.bru
 #' @export
+#' @method summary bru
 #' @param object An object obtained from a \link{bru} or \link{lgcp} call
 #' @param ... ignored arguments
 # 

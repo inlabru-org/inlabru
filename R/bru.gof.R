@@ -90,9 +90,10 @@ bincount = function(result, predictor, observations, breaks, nint = 20, probs = 
 #' @param prediction1 A prediction of first component
 #' @param prediction2 A prediction of the first component
 #' @param samplers A spatial object describing an area for which to compute the cummulative variance measure
+#' @param mesh The \code{inla.mesh} at for which the prediction was performed (required for cummulative Vmeasure)
 #' @return Variance and correlations measures
 
-devel.cvmeasure = function(joint, prediction1, prediction2, samplers = NULL) {
+devel.cvmeasure = function(joint, prediction1, prediction2, samplers = NULL, mesh = NULL) {
 
   #' Covariance
   joint$cov = (joint$var - prediction1$var - prediction2$var)/2

@@ -103,8 +103,8 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
 #' Extract mesh vertices
 #'
 #' @export
-#' @param ... an inla.mesh
-vertices = function(...){UseMethod("vertices")}
+#' @param mesh an inla.mesh
+vertices = function(mesh){UseMethod("vertices")}
 
 
 
@@ -112,8 +112,8 @@ vertices = function(...){UseMethod("vertices")}
 #'
 #' @description Converts the vertices of an \code{inla.mesh} object into a \code{SpatialPointsDataFrame}.
 #' 
-#' @aliases vertices.inla.mesh
-#' @export vertices.inla.mesh
+#' @export
+#' @method vertices inla.mesh
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 

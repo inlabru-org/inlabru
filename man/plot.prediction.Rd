@@ -4,7 +4,7 @@
 \alias{plot.prediction}
 \title{Plot predction using ggplot2}
 \usage{
-plot.prediction(x, y = NULL, ...)
+\method{plot}{prediction}(x, y = NULL, ...)
 }
 \arguments{
 \item{x}{a prediction object}

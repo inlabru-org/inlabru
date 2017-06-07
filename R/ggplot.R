@@ -412,23 +412,21 @@ gg.RasterLayer = function(r, ...) {
 
 #' Plot bru effects
 #' 
-#' @aliases plot.bru
-#' @name plot.bru
+#' @method plot bru
 #' @export
 #' @import ggplot2
 #' @param x a \link{bru} object
-#' @param y Character naming the effect to plot
+#' @param ... A character naming the effect to plot
 #' @return a gg object
 
-plot.bru = function(x, y = "Intercept") {
-  plotmarginal.inla(x, varname = y)
+plot.bru = function(x, ...) {
+  plotmarginal.inla(x, ...)
 }
 
 #' Plot predction using ggplot2
 #' 
-#' @aliases plot.prediction
-#' @name plot.prediction
 #' @export
+#' @method plot prediction
 #' @import ggplot2
 #' @param x a prediction object
 #' @param y a mapping created by \link{aes} or \link{aes_string}
