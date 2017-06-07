@@ -24,7 +24,7 @@
 #'
 #' @examples 
 #' data("gorillas")
-#' pts = sample.lgcp(gorillas$mesh, rep(-10, gorillas$mesh$n))
+#' pts = sample.lgcp(gorillas$mesh, rep(1.5, gorillas$mesh$n))
 #' ggplot() + gg(gorillas$mesh) + gg(pts)
 
 sample.lgcp = function(mesh, loglambda, strategy = "rectangle", R = 6371, samplers = NULL) {
