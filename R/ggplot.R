@@ -234,13 +234,13 @@ gg.SpatialGrid = function(sgdf, fill = names(sgdf)[[1]], ...) {
   gm
 }
 
-#' Plot SpatialPixels using ggplot2
+#' Plot SpatialPixelsDataFram using ggplot2
 #' 
-#' @aliases gg.SpatialPixels
-#' @name gg.SpatialPixels
+#' @aliases gg.SpatialPixelsDataFrame
+#' @name gg.SpatialPixelsDataFrame
 #' @export
 #' @import ggplot2
-#' @param sgdf A SpatialPixels object
+#' @param sgdf A SpatialPixelsDataFrame object
 #' @param fill Character array identifying the data column used for plotting
 #' @param alpha Character array identifying the data column used for transparency
 #' @param mask A SpatialPolygon defining the region that is plotted
@@ -248,7 +248,7 @@ gg.SpatialGrid = function(sgdf, fill = names(sgdf)[[1]], ...) {
 #' @return A ggplot2 object
 #' 
 
-gg.SpatialPixels = function(sgdf, fill = names(sgdf)[[1]], alpha = NULL, mask = NULL, ...) {
+gg.SpatialPixelsDataFrame = function(sgdf, fill = names(sgdf)[[1]], alpha = NULL, mask = NULL, ...) {
   
   if ( !is.null(mask) ) {
     sgdf = sgdf[as.vector(!is.na(over(sgdf, mask))), ]
@@ -264,6 +264,22 @@ gg.SpatialPixels = function(sgdf, fill = names(sgdf)[[1]], alpha = NULL, mask = 
     gm = c(gm, scale_fill_gradientn(colours = bru.pal()))
   }
   gm
+}
+
+
+#' Plot SpatialPixels using ggplot2
+#' 
+#' @aliases gg.SpatialPixels
+#' @name gg.SpatialPixels
+#' @export
+#' @import ggplot2
+#' @param sgdf A SpatialPixels object
+#' @param ... Arguments passed on to \link{geom_tile}
+#' @return A ggplot2 object
+#' 
+
+gg.SpatialPixels = function(sgdf, ...) {
+  gg(SpatialPoints(sgdf), ...) 
 }
 
 
