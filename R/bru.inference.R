@@ -229,7 +229,7 @@ bru.options = function(mesh = NULL,
                        max.iter = 10,
                        offset = 0,
                        result = NULL, 
-                       E = NULL,
+                       E = 1,
                        control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
                        control.inla = iinla.getOption("control.inla"),
                        ... )
