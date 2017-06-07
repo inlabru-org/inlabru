@@ -337,9 +337,15 @@ iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL, domai
       # If the dimension is defined via the formula extract the respective information.
       # If not, extract information from the data
       if ( nm %in% names(domain) ) {
-        ret$min = min(domain[[nm]][1])
-        ret$max = max(domain[[nm]][2])
-        ret$n.points = 30
+        if ( inherits(domain[[nm]], "inla.mesh.1d") ) {
+          ret$min = min(domain[[nm]]$loc)
+          ret$max = max(domain[[nm]]$loc)
+          ret$n.points = length(domain[[nm]]$loc)
+        } else {
+          ret$min = min(domain[[nm]][1])
+          ret$max = max(domain[[nm]][2])
+          ret$n.points = 30
+        }
       } else {
         ret$min = apply(ret$get.coord(points), MARGIN = 2, min)
         ret$max = apply(ret$get.coord(points), MARGIN = 2, max)
