@@ -149,8 +149,7 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
     }
     
     if ( is.null(ips) ) {
-      icfg = iconfig(samplers, data, bru.model, mesh = mesh, domain = domain)
-      ips = ipmaker(samplers, icfg)
+      ips = ipmaker(samplers, domain = domain, dnames = bru.model$dim.names, data = data, model = bru.model)
     }
     
     inla.family = "poisson"

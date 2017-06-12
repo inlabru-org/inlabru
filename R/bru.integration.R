@@ -253,250 +253,54 @@ cprod = function(...) {
 # @param config An integration configuration. See \link{iconfig}
 # @return Integration points
 
-ipmaker = function(samplers, config) {
+
+ipmaker = function(samplers, domain, dnames, model = NULL, data = NULL) {
   
-  # First step: Figure out which marks are already included in the samplers (e.g. time)
-  # For each of the levels of these marks the integration points will be computed independently
-  pregroup = intersect(setdiff(names(samplers), "weight"), names(config))
-  postgroup = setdiff(names(config), c(pregroup, "coordinates"))
+  # Fill missing domain definitions using meshes from effects where map equals the domain name
+  meshes = list()
+  for (e in effect(model)) {meshes[[paste0(as.character(e$map), collapse ="")]] = e$mesh}
+  for ( nm in dnames) {
+    if ( is.null(domain[[nm]]) ) { domain[[nm]] = meshes[[nm]] }
+  }
   
-  # By default we assume we are handling a Spatial* object
-  spatial = TRUE
-  
-  #
-  # Inital integration points
-  # 
-  
-  if ( !is.null(samplers) ) {
-    ips = ipoints(samplers, config[["coordinates"]]$mesh, group = pregroup, project = FALSE)
-    
-    # Reduce number of integration points by projection onto mesh vertices
-    all.groups = intersect(names(ips), c(postgroup,pregroup))
-    if ( length(all.groups) == 0 ) all.groups = NULL
-    if ("coordinates" %in% names(config)) {
-      ips = vertex.projection(ips, config[["coordinates"]]$mesh, columns = "weight", group = all.groups)
+  # Fill missing domain definitions with data ranges
+  for ( nm in dnames) {
+    if ( !(nm %in% names(domain)) & !is.null(data) & !(nm %in% names(samplers))){
+      if ( nm == "coordinates" ) {
+        domain[["coordinates"]] = INLA::inla.mesh.2d(loc.domain = coordinates(data), max.edge = diff(range(coordinates(data)[,1]))/10)
+        domain[["coordinates"]]$crs = inla.CRS(proj4string(data))
+      } else {
+        domain[[nm]] = range(data[[nm]])
+      }
     }
-    
-  } else {
+  }
+  
+  
+  if ( "coordinates" %in% dnames ) { spatial = TRUE } else { spatial = FALSE }
+  
+  # Dimensions provided via samplers (except "coordinates")
+  samp.dim = intersect(names(samplers), dnames)
+  
+  # Dimensions provided via domain but not via samplers
+  nosamp.dim = setdiff(names(domain), c(samp.dim, "coordinates"))
+  
+  # Check if a domain definition is missing
+  missing.dims = setdiff(dnames, c(names(domain), samp.dim))
+  if ( length(missing.dims > 0) ) stop(paste0("Domain definitions missing for dimensions: ", paste0(missing.dims, collapse = ", ")))
+  
+  if ( spatial ) {
+    ips = ipoints(samplers, domain$coordinates, project = TRUE, group = samp.dim)
+  } else { 
     ips = NULL
   }
   
-  #
-  # Expand the integration points over postgroup dimensions
-  #
   
-  for ( k in seq_len(length(postgroup)) ){
-    gname = postgroup[[k]]
-    cfg = config[[gname]]
-    nips = ipoints(c(cfg$sp, cfg$ep), cfg$n, name = gname)
-    if ( is.null(ips) ) { ips = nips } else { ips = cprod(ips, nips) }
-  }
+  lips = lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm))
+  ips = do.call(cprod, c(list(ips), lips))
   
-  ips
 }
 
 
-#' Integration point configuration generator
-#'   
-#'
-#' @aliases iconfig
-#' @export
-#' @param samplers A Spatial[Points/Lines/Polygons]DataFrame objects
-#' @param points A SpatialPoints[DataFrame] object
-#' @param model A \link{model}
-#' @param dim.names Dimension names (character array)
-#' @param mesh default spatial mesh used for integration
-#' @param domain A domain specification
-#' @return An integration configuration
-
-iconfig = function(samplers, points, model, dim.names = NULL, mesh = NULL, domain = NULL) {
-  
-  # Obtain dimensions to integrate over. 
-  # These are provided as the left hand side of model$formula
-  if ( is.null(dim.names) ) { dim.names = model$dim.names }
-  
-  # Default mesh for spatial integration:
-  meshes = lapply(effect(model), function(e) e$mesh)
-  names(meshes) = elabels(model)
-  meshes = meshes[!unlist(lapply(meshes, is.null))]
-  issp = as.vector(unlist(lapply(meshes, function(m) m$manifold == "R2")))
-  if (!is.null(issp) & any(issp)) { 
-    spmesh = meshes[[which(issp)[[1]]]] } 
-  else { spmesh = mesh }
-  
-  # Function that maps each dimension name to a setup
-  ret = make.setup = function(nm) {
-    ret = list()
-    
-    # Set the name of the coordinate system
-    ret$name = nm
-    ret$mesh = NULL
-    ret$project = FALSE
-    
-    # Create a function to fetch coordinates. 
-    # "coordinates" is a special case for which we extract an integration mesh from the model
-    if ( nm == "coordinates" ) {
-      ret$get.coord = get0(nm)
-      ret$n.coord = ncol(ret$get.coord(points))
-      # Use the first spatial mesh that we find
-      ret$mesh = spmesh
-      ret$class = "matrix"  
-      ret$project = TRUE
-      ret$p4s = proj4string(points)
-    } else {
-      # Spatial* object or data.frame?
-      if ( is.data.frame(points) ) { ret$get.coord = function(sp) { sp[,nm, drop = FALSE] }} 
-      else { ret$get.coord = function(sp) { sp@data[,nm, drop = FALSE] } }
-      ret$n.coord = 1
-      ret$class = class(ret$get.coord(points)[,nm])
-    }
-    
-    # If there is a mesh in the model that has the same name as the dimension
-    # use the mesh knots/vertices as integration points. Otherwise use some
-    # standard setting depending on the class of the dimension.
-    
-    if ( nm %in% names(meshes) ) {
-      if ( meshes[[nm]]$manifold == "R1" ) {
-        # The mesh is 1-dimensional. 
-        # By default a two-point Gaussian quadrature is used for each interval between the mesh knots.
-        # This intergration is exact for poylnomials of second degree. 
-        ret$mesh = meshes[[nm]]
-        ret$min = min(ret$mesh$loc)
-        ret$max = max(ret$mesh$loc)
-        ret$cnames = colnames(ret$get.coord(points))
-        ret$scheme = "gaussian"
-        ret$sp = ret$mesh$loc[1:(length(ret$mesh$loc)-1)]
-        ret$ep = ret$mesh$loc[2:length(ret$mesh$loc)] 
-        ret$n.points = 2
-      } else { 
-        stop( "not implemented: 2d mesh auto-integration") 
-      }
-    } else {
-      # If the dimension is defined via the formula extract the respective information.
-      # If not, extract information from the data
-      if ( nm %in% names(domain) ) {
-        if ( inherits(domain[[nm]], "inla.mesh.1d") ) {
-          ret$min = min(domain[[nm]]$loc)
-          ret$max = max(domain[[nm]]$loc)
-          ret$n.points = length(domain[[nm]]$loc)
-        } else {
-          ret$min = min(domain[[nm]][1])
-          ret$max = max(domain[[nm]][2])
-          ret$n.points = 30
-        }
-      } else {
-        ret$min = apply(ret$get.coord(points), MARGIN = 2, min)
-        ret$max = apply(ret$get.coord(points), MARGIN = 2, max)
-      }
-      
-      ret$cnames = colnames(ret$get.coord(points))
-      
-      if ( ret$class == "integer" ) {
-        ret$scheme = "fixed"
-        ret$sp = ret$min:ret$max
-        ret$ep = NULL
-        if (is.null(ret$n.points)) { ret$n.points = length(ret$sp) }
-      } else if ( ret$class == "factor" ) {
-        ret$scheme = "fixed"
-        stop("Not implemented.")
-      } else { 
-        ret$scheme = "trapezoid"
-        ret$sp = ret$min
-        ret$ep = ret$max
-        if (is.null(ret$n.points)) { ret$n.points = 20 }
-      }      
-    }
-    ret
-  }
-
-  # Create configurations
-  ret = lapply(dim.names, make.setup)
-  names(ret) = dim.names
-  ret
-}
-
-
-# Integration point configuration generator
-#   
-# @keywords internal
-# @return An integration configuration
-
-iconfig2 = function(data, dims, domain, samplers) {
-  icfg = list()
-  
-  for (dname in dims){
-    ret = list()
-    if (dname == "coordinates") {
-      ret$name = "coordinates"
-      ret$domain = domain[[dname]]
-      ret$class = "inla.mesh"
-    } else {
-      ret$name = dname
-      # If no domain specification is given use data range for this dimension to construct a 1D mesh
-      if ( !(dname %in% names(domain)) ) {
-        domain[[dname]] = inla.mesh.1d(seq(min(data.frame(data)[,dname]), max(data.frame(data)[,dname]),length.out = 25))
-      }
-      ips = NULL
-      if ( class(domain[[dname]]) == "inla.mesh.1d" ) { 
-        dom = domain[[dname]] 
-        ips = data.frame(dom$loc, weight = diag(as.matrix(inla.mesh.1d.fem(dom)$c0)))
-        colnames(ips)[1] = dname
-        }
-      else if ( is.integer(domain[[dname]]) ) {
-        dom = inla.mesh.1d(domain[[dname]])
-        ips = data.frame(dom$loc, weight = 1)
-        colnames(ips)[1] = dname
-        }
-      else if ( is.numeric(domain[[dname]]) ) { 
-        dom = inla.mesh.1d(domain[[dname]])
-        ips = data.frame(dom$loc, weight = diag(as.matrix(inla.mesh.1d.fem(dom)$c0)))
-        colnames(ips)[1] = dname
-        }
-      else if ( is.factor(domain[[dname]]) ) { dom = domain[[dname]] }
-      else { stop(sprintf("Unsupported domain class '%s' for domain '%s'"), class(domain[[dname]]), dname) }
-      ret$domain = dom
-      ret$ips = ips
-      ret$class = class(domain[[dname]])
-    }
-    icfg[[dname]] = ret
-  }
-  
-  if ( inherits(samplers, "Spatial") | is.data.frame(samplers) ){
-    samplerdf = samplers
-    for ( dname in setdiff(dims,"coordinates") ) {
-      if ( dname %in% names(samplerdf) ) { 
-        sdf = data.frame(samplerdf[[dname]], weight = 1)
-        colnames(sdf)[1] = dname
-        icfg[[dname]]$tips = sdf
-      } else if ( paste0("min.",dname) %in% names(samplerdf) ) {
-        
-
-        
-        ips = mint(as.data.frame(samplerdf)[,paste0(c("min.","max."),dname)], icfg[[dname]]$domain$loc, dname)
-        
-        
-        stop("s")
-      }
-      
-    }
-  }
-  
-  icfg
- 
-}
-
-mint = function(df,knots,dname) {
-  ips = list()
-  for (k in 1:nrow(df)) {
-    mi = df[k,1]
-    ma = df[k,2]
-    msh = inla.mesh.1d(sort(unique(c(mi,ma,knots[knots<=ma & knots>=mi]))))
-    w = diag(as.matrix(inla.mesh.1d.fem(msh)$c0))
-    ips[[k]] = data.frame(msh$loc, weight = w)
-  }
-  ips = do.call(rbind, ips)
-  colnames(ips) = c(dname, "weight")
-}
 
 
 # Project data to mesh vertices under the assumption of lineariity
@@ -583,3 +387,4 @@ int = function(data, values, dims = NULL) {
   
   agg
 }
+
