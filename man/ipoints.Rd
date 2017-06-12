@@ -4,7 +4,7 @@
 \alias{ipoints}
 \title{Generate integration points}
 \usage{
-ipoints(region, domain = NULL, name = "x", group = NULL, project)
+ipoints(region = NULL, domain = NULL, name = "x", group = NULL, project)
 }
 \arguments{
 \item{region}{Description of the integration region boundary}
