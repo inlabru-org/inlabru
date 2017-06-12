@@ -199,27 +199,32 @@ int.slines = function(data, mesh, group = NULL, project = TRUE) {
   idx = do.call(rbind, lapply(1:length(qq), function(k) do.call(cbind, lapply(qq[[k]], function(x) rep(k, nrow(x)-1) ))))
   idx = cbind(idx, idx)
   
-  # Filter out points outside the mesh...
-  loc = as.matrix(rbind(sp,ep))
-  t1 = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(sp,z=0)))$p2m.t
-  t2 = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(ep,z=0)))$p2m.t
-  if (any(t1==0) | any(t2==0)) { warning("Found spatial lines with start or end point ouside of the mesh. Omitting.")}
-  sp = sp[!((t1==0) | (t2==0)),]
-  ep = ep[!((t1==0) | (t2==0)),]
-  idx = idx[!((t1==0) | (t2==0)),]
+  if ( !is.null(mesh) ) {
+    # Filter out points outside the mesh...
+    loc = as.matrix(rbind(sp,ep))
+    t1 = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(sp,z=0)))$p2m.t
+    t2 = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(ep,z=0)))$p2m.t
+    if (any(t1==0) | any(t2==0)) { warning("Found spatial lines with start or end point ouside of the mesh. Omitting.")}
+    sp = sp[!((t1==0) | (t2==0)),]
+    ep = ep[!((t1==0) | (t2==0)),]
+    idx = idx[!((t1==0) | (t2==0)),]
   
-  # Split at mesh edges
-  line.spl = split.lines(mesh, sp, ep, TRUE)
-  sp = line.spl$sp
-  ep = line.spl$ep
-  idx = idx[line.spl$split.origin,]
+    # Split at mesh edges
+    line.spl = split.lines(mesh, sp, ep, TRUE)
+    sp = line.spl$sp
+    ep = line.spl$ep
+    idx = idx[line.spl$split.origin,]
+    
+  }
   
   # Determine integration points along lines
   
   sp3d = within(data.frame(sp), Z <- 0)
+  colnames(sp3d) = c("X1","X2","Z")
   coordinates(sp3d) = c("X1","X2","Z")
   proj4string(sp3d) = proj4string(data)
   ep3d = within(data.frame(ep), Z <- 0)
+  colnames(ep3d) = c("X1","X2","Z")
   coordinates(ep3d) = c("X1","X2","Z")
   proj4string(ep3d) = proj4string(data)
   
@@ -248,7 +253,7 @@ int.slines = function(data, mesh, group = NULL, project = TRUE) {
   proj4string(ips) = proj4string(data)
   
   # Project to mesh vertices
-  if ( project ) ips = vertex.projection(ips, mesh, columns = "weight", group = group)
+  if ( project & !is.null(mesh) ) ips = vertex.projection(ips, mesh, columns = "weight", group = group)
   
   ips
 }

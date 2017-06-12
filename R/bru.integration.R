@@ -19,9 +19,16 @@
 #' ips
 #' 
 
-ipoints = function(region, domain = NULL, name = "x", group = NULL, project) {
+ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, project) {
   
   pregroup = NULL
+  
+  # If region is null treat domain as the region definition
+  if ( is.null(region) ) {
+    if ( is.null(domain) ) { stop("regio and domain can not be NULL at the same time.") }
+    else { region = domain ; domain = NULL }
+  }
+  
   
   if ( is.data.frame(region) ) {
     if (!("weight" %in% names(region))) { region$weight = 1 }
@@ -35,23 +42,53 @@ ipoints = function(region, domain = NULL, name = "x", group = NULL, project) {
   }
   
   else if (is.numeric(region)) {
-    # If domain is NULL set domain to a 1D mesh with 30 equally spaced vertices and boundary according to region
-    # If domain is a single numeric set domain to a 1D mesh with n=domain vertices and boundary according to region
-    if ( is.null(domain) ) { domain = inla.mesh.1d(seq(region[1], region[2], length.out = 30)) }
-    else if ( is.numeric(domain)) { domain = inla.mesh.1d(seq(region[1], region[2], length.out = domain)) }
     
-    fem = inla.mesh.1d.fem(domain)
-    ips = data.frame(weight = diag(as.matrix(fem$c0)))
-    ips[name] = domain$loc
-    ips = ips[,c(2,1)] # make weights second column
+    if ( is.null(dim(region)) ){ region = matrix(region, nrow = 1) }
+    
+    if ( ncol(region) == 1) {
+      
+      ips = data.frame(x = region[,1], weight = 1)
+      colnames(ips) = c(name, "weight")
+      
+    } else {
+      
+      ips = list()
+      
+      for (j in 1:nrow(region) ) {
+        
+        subregion = region[j,]
+        
+        # If domain is NULL set domain to a 1D mesh with 30 equally spaced vertices and boundary according to region
+        # If domain is a single numeric set domain to a 1D mesh with n=domain vertices and boundary according to region
+        if ( is.null(domain) ) { subdomain = inla.mesh.1d(seq(min(subregion), max(subregion), length.out = 30)) }
+        else if ( is.numeric(domain)) { subdomain = inla.mesh.1d(seq(min(subregion), max(subregion), length.out = domain)) }
+        else { subdomain = stop("1D weight projection not yet implemented") }
+        
+        fem = inla.mesh.1d.fem(subdomain)
+        ips[[j]] = data.frame(weight = diag(as.matrix(fem$c0)))
+        ips[[j]][name] = subdomain$loc
+        ips[[j]] = ips[[j]][,c(2,1)] # make weights second column
+      }
+      
+      ips = do.call(rbind, ips)
+  }
   
   } else if ( inherits(region, "inla.mesh") ){
     
+    # If domain is provided: break
+    if ( !is.null(domain) ) stop("Integration region provided as 2D and domain is not NULL.")
+    
+    # transform to equal area projection
     if ( !is.null(region$crs) ) {
+      crs = region$crs
       region = stransform(region, crs = CRS("+proj=cea +units=km"))
     }
+    
     ips = vertices(region)
     ips$weight = diag(as.matrix(inla.mesh.fem(region)$c0))
+    
+    # backtransform
+    if ( !is.null(region$crs) ) { ips = stransform(ips, crs = crs) }
     
   } else if ( inherits(region, "inla.mesh.1d") ){
     
