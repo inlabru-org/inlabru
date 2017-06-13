@@ -88,36 +88,63 @@ gg.data.frame = function(...){
 #' @param ribbon If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles
 #' @param color Color of the ribbon and the line
 #' @param alpha Alpha level of the ribbon
+#' @param bar If TRUE plot boxplot-style summary for each variable
 #' @param ... Arguments passed on to \link{geom_line}
 #' @return \code{c(geom_ribbon, geom_line)}
 #' 
-gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", alpha = 0.3, ...){
+gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", alpha = 0.3, bar = FALSE, ...){
   
-  if ( "pdf" %in% names(data) ) { 
-    y.str = "pdf"
-    ribbon = FALSE
-  } else if ( "mean" %in% names(data) ){ 
-    y.str = "mean" 
-  } else if ( "median" %in% names(data) ){
-    y.str = "median"
+  if ( bar | ( nrow(data) == 1) ) {
+    
+    sz = 10 # bar width
+    med_sz = 4 # median marker size
+    
+    data = cbind(data.frame(data), 
+                 data.frame(row = rownames(data), 
+                            summary = 1,
+                            sdmax = data$mean+data$sd,
+                            sdmin = data$mean-data$sd))
+    
+    geom = c(geom_point(data = data, mapping = aes(x = row, y = summary, color = row), shape = 95, size = sz), # Fake ylab
+             geom_segment(data = data, mapping = aes(y = q0.025, yend = q0.975, x = row, xend = row, color = row), size = sz),
+             geom_segment(data = data, mapping = aes(y = smin, yend = smax, x = row, xend = row, color = row), size = 1),
+             geom_segment(data = data, mapping = aes(y = sdmin, yend = sdmax, x = row, xend = row), color = "black", linetype = 2, size = 1),
+             geom_point(data = data, mapping = aes(x = row, y = smax, color = row), shape = 95, size = 5),
+             geom_point(data = data, mapping = aes(x = row, y = smin, color = row), shape = 95, size = sz),
+             geom_point(data = data, mapping = aes(x = row, y = mean), color = "black", shape = 95, size = sz),
+             geom_point(data = data, mapping = aes(x = row, y = median), color = "black", shape = 20, size = med_sz))
+             
+    
+    # geom = geom + ylab("2.5 percent quantiles and sample range")
+    
   } else {
-    stop("Prediction has neither mean nor median or pdf as column. Don't know what to plot.")
-  }
-  
-  line.map = aes_string(x = names(data)[1], 
-                        y = y.str)
-  
-  ribbon.map = aes_string(x = names(data)[1], 
-                          ymin = "q0.025", 
-                          ymax = "q0.975")
-  
-  if ( !is.null(mapping) ) { 
-    line.map = utils::modifyList(line.map, mapping) 
-    ribbon.map = modifyList(ribbon.map, mapping) 
-  }
-  geom = geom_line(data = data, line.map, color = color, ...)
-  if ( ribbon ) {
-    geom = c(geom, geom_ribbon(data = data, ribbon.map, fill = color, alpha = 0.3))
+    
+    if ( "pdf" %in% names(data) ) { 
+      y.str = "pdf"
+      ribbon = FALSE
+    } else if ( "mean" %in% names(data) ){ 
+      y.str = "mean" 
+    } else if ( "median" %in% names(data) ){
+      y.str = "median"
+    } else {
+      stop("Prediction has neither mean nor median or pdf as column. Don't know what to plot.")
+    }
+    
+    line.map = aes_string(x = names(data)[1], 
+                          y = y.str)
+    
+    ribbon.map = aes_string(x = names(data)[1], 
+                            ymin = "q0.025", 
+                            ymax = "q0.975")
+    
+    if ( !is.null(mapping) ) { 
+      line.map = utils::modifyList(line.map, mapping) 
+      ribbon.map = modifyList(ribbon.map, mapping) 
+    }
+    geom = geom_line(data = data, line.map, color = color, ...)
+    if ( ribbon ) {
+      geom = c(geom, geom_ribbon(data = data, ribbon.map, fill = color, alpha = 0.3))
+    }
   }
   geom
 }

@@ -5,7 +5,7 @@
 \title{Geom for predictions}
 \usage{
 \method{gg}{prediction}(data, mapping = NULL, ribbon = TRUE,
-  color = "black", alpha = 0.3, ...)
+  color = "black", alpha = 0.3, bar = FALSE, ...)
 }
 \arguments{
 \item{data}{A prediction object}
@@ -17,6 +17,8 @@
 \item{color}{Color of the ribbon and the line}
 
 \item{alpha}{Alpha level of the ribbon}
+
+\item{bar}{If TRUE plot boxplot-style summary for each variable}
 
 \item{...}{Arguments passed on to \link{geom_line}}
 }
