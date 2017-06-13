@@ -550,7 +550,10 @@ mapper = function(map, points, eff, env = NULL) {
     colnames(loc) = deparse(map)
     }
   else if ( is.function(emap) ) { loc = emap(points) }
-  else if ( inherits(emap, "SpatialGridDataFrame") ) { loc = over(points, emap) }
+  else if ( inherits(emap, "SpatialGridDataFrame") ) { 
+    loc = over(points, emap) 
+    colnames(loc) = eff$label
+    }
   else if ( eff$label == "offset" && is.numeric(emap) && length(emap)==1 ) { loc = data.frame(offset = rep(emap, nrow(points)))}
   else { loc = emap }
   
@@ -566,6 +569,7 @@ mapper = function(map, points, eff, env = NULL) {
     dst = rgeos::gDistance(SpatialPoints(GOODpoints),SpatialPoints(BADpoints), byid=T)
     nn = apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
     loc[is.na(loc)] = loc[!is.na(loc)][nn]
+    colnames(loc) = eff$label
   }
     
   # Check for NA values.    
