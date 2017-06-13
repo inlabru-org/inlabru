@@ -101,7 +101,7 @@ gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", a
     
     data = cbind(data.frame(data), 
                  data.frame(row = rownames(data), 
-                            summary = 1,
+                            summary = data$mean[1],
                             sdmax = data$mean+data$sd,
                             sdmin = data$mean-data$sd))
     
@@ -110,7 +110,7 @@ gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", a
              geom_segment(data = data, mapping = aes(y = smin, yend = smax, x = row, xend = row, color = row), size = 1),
              geom_segment(data = data, mapping = aes(y = sdmin, yend = sdmax, x = row, xend = row), color = "black", linetype = 2, size = 1),
              geom_point(data = data, mapping = aes(x = row, y = smax, color = row), shape = 95, size = 5),
-             geom_point(data = data, mapping = aes(x = row, y = smin, color = row), shape = 95, size = sz),
+             geom_point(data = data, mapping = aes(x = row, y = smin, color = row), shape = 95, size = 5),
              geom_point(data = data, mapping = aes(x = row, y = mean), color = "black", shape = 95, size = sz),
              geom_point(data = data, mapping = aes(x = row, y = median), color = "black", shape = 20, size = med_sz))
              
