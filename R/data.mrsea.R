@@ -112,6 +112,8 @@ import.mrsea = function() {
   # Covariates
   covar = SpatialPointsDataFrame(depth[,1:2], data = depth[,3,drop=FALSE], proj4string = CRS("+proj=utm +zone=32"))
   
+  # Remove `distance` column from transects
+  lns$distance = NULL
   
   mrsea = list(points = pts,
                samplers = lns,
