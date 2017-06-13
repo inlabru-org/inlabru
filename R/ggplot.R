@@ -143,7 +143,7 @@ gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", a
     }
     geom = geom_line(data = data, line.map, color = color, ...)
     if ( ribbon ) {
-      geom = c(geom, geom_ribbon(data = data, ribbon.map, fill = color, alpha = 0.3))
+      geom = c(geom, geom_ribbon(data = data, ribbon.map, fill = color, alpha = alpha))
     }
   }
   geom
