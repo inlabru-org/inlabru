@@ -550,16 +550,25 @@ mapper = function(map, points, eff, env = NULL) {
     colnames(loc) = deparse(map)
     }
   else if ( is.function(emap) ) { loc = emap(points) }
-  else if ( inherits(emap, "SpatialGridDataFrame") ) { 
-    loc = over(points, emap) 
-    colnames(loc) = eff$label
+  else if ( inherits(emap, "SpatialGridDataFrame") | inherits(emap, "SpatialPixelsDataFrame")) {
+    if ( length(eff$group.char) == 0 ) {
+      loc = over(points, emap)[,1,drop=FALSE]
+      colnames(loc) = eff$label
+    } else {
+      layr = points[[eff$group.char]]
+      loc = vector()
+      for (l in unique(layr)) { loc[layr == l] = over(points[layr == l,], emap)[,l] }
+      loc = data.frame(loc = loc)
+      colnames(loc) = eff$label
+    }
+    
     }
   else if ( eff$label == "offset" && is.numeric(emap) && length(emap)==1 ) { loc = data.frame(offset = rep(emap, nrow(points)))}
   else { loc = emap }
   
   # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
   # to fix that by filling in nearest neighbor values.
-  if ( any(is.na(loc)) & ( inherits(emap, "SpatialGridDataFrame") )) {
+  if ( any(is.na(loc)) & ( inherits(emap, "SpatialGridDataFrame") | inherits(emap, "SpatialPixelsDataFrame") )) {
     
     warning(sprintf("Map '%s' has returned NA values. As it is a SpatialGridDataFrame I will try to fix this by filling in values of spatially nearest neighbors. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
                  deparse(map), eff$label))
