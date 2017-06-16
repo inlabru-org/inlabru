@@ -180,8 +180,8 @@ pixels = function(mesh, nx = 150, ny = 150, mask = TRUE) {
   
   if ( is.logical(mask) && (mask == TRUE) ){ 
     pixels = pixels[is.inside(mesh, coordinates(pixels))] 
-  } else if ( !is.null(mask) ) {
-    pixels = pixels[as.vector(!is.na(over(pixels, mask))), ]
+  } else if ( !is.null(mask) && (mask == FALSE)) {
+    pixels # pixels = pixels[as.vector(!is.na(over(pixels, mask))), ]
   }
 }
 
