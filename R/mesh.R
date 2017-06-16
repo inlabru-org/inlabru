@@ -1,3 +1,7 @@
+# Needed for registerin S4 methods, e.g. vertices()
+setClass("inla.mesh")
+
+
 # GENERICS
 refine = function(...){UseMethod("refine")}
 tsplit = function(...){UseMethod("tsplit")}
@@ -99,26 +103,27 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
   }
 }
 
+#' Vertices
+#' 
+#' @name vertices
+#' @rdname vertices.inla.mesh
+#' @exportMethod vertices
+setGeneric("vertices", valueClass = "SpatialPointsDataFrame", function(object) {
+  standardGeneric("vertices")
+})
 
-#' Extract mesh vertices
-#'
-#' @export
-#' @param mesh an inla.mesh
-vertices = function(mesh){UseMethod("vertices")}
-
+setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mesh(object))
 
 
 #' @title Extract vertex locations from an \code{inla.mesh}
 #'
 #' @description Converts the vertices of an \code{inla.mesh} object into a \code{SpatialPointsDataFrame}.
 #' 
+#' @aliases vertices.inla.mesh
 #' @export
-#' @method vertices inla.mesh
+#' @param object An \code{inla.mesh} object
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
-#' 
-#' @param mesh An \code{inla.mesh} object
-#' @return A \code{SpatialPointsDataFrame} of vertex locations
 #' 
 #' @examples
 #' 
@@ -127,14 +132,13 @@ vertices = function(mesh){UseMethod("vertices")}
 #' ggplot() + gg(mrsea$mesh) + gg(vrt, color = "red")
 #' 
 
-vertices.inla.mesh = function(mesh) {
-  if (is.null(mesh$crs)) {
-    mesh$loc
+vertices.inla.mesh = function(object) {
+  if (is.null(object$crs)) {
+    object$loc
   } else {
-    if (any(!(mesh$loc[,3]==0))) { vrt = mesh$loc } else { vrt = mesh$loc[,c(1,2)] }
-    SpatialPointsDataFrame(vrt, proj4string = mesh$crs, data = data.frame(vertex = 1:nrow(mesh$loc)))
+    if (any(!(object$loc[,3]==0))) { vrt = object$loc } else { vrt = object$loc[,c(1,2)] }
+    SpatialPointsDataFrame(vrt, proj4string = object$crs, data = data.frame(vertex = 1:nrow(object$loc)))
   }
-  
 }
 
 
