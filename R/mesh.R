@@ -106,12 +106,16 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
 #' Vertices
 #' 
 #' @name vertices
-#' @rdname vertices.inla.mesh
 #' @exportMethod vertices
+#' @param object An \code{inla.mesh} object
+
 setGeneric("vertices", valueClass = "SpatialPointsDataFrame", function(object) {
   standardGeneric("vertices")
 })
 
+#' Vertices
+#' 
+#' @rdname vertices
 setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mesh(object))
 
 
