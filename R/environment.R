@@ -15,7 +15,7 @@ iinla.env$log = sprintf("inlabru @ %s", date())
 init.tutorial = function() {
   cat("Setting defaults for tutorial session. \n")
   iinla.setOption("iinla.verbose", list(TRUE))
-  iinla.setOption("control.inla", list(list(int.strategy = "'eb'")))
+  iinla.setOption("control.inla", list(list(int.strategy = "eb")))
   iinla.setOption("control.compute", list(list(config = TRUE, dic = TRUE, waic = TRUE)))
 }
 
