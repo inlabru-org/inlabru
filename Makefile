@@ -90,9 +90,9 @@ rpkg-Rdev: prepare build-dir
 	@$(MAKE) clean-build
 
 rpkg-source: prepare
-	$(R) CMD build --build $(STAGE)
+	$(R) CMD build --resave-data $(STAGE)
 rpkg-source-Rdev: prepare
-	$(RDEV) CMD build --build $(STAGE)
+	$(RDEV) CMD build --resave-data $(STAGE)
 
 clean-stage:
 	@rm -rf $(STAGE)
