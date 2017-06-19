@@ -178,9 +178,11 @@ pixels = function(mesh, nx = 150, ny = 150, mask = TRUE) {
   if (!is.null(mesh$crs)) { pixels = SpatialPixels(pixels, proj4string = mesh$crs) }
   else { pixels = SpatialPixels(pixels) }
   
-  if ( is.logical(mask) && (mask == TRUE) ){ 
-    pixels = pixels[is.inside(mesh, coordinates(pixels))] 
-  } 
+  if ( is.logical(mask) ) {
+    if ( mask ) { pixels = pixels[is.inside(mesh, coordinates(pixels))] }
+  } else {
+    pixels = pixels[!is.na(sp::over(pixels, mask)),]
+  }
   pixels
 }
 
