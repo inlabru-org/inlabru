@@ -268,7 +268,7 @@ ipmaker = function(samplers, domain, dnames, model = NULL, data = NULL) {
     if ( !(nm %in% names(domain)) & !is.null(data) & !(nm %in% names(samplers))){
       if ( nm == "coordinates" ) {
         domain[["coordinates"]] = INLA::inla.mesh.2d(loc.domain = coordinates(data), max.edge = diff(range(coordinates(data)[,1]))/10)
-        domain[["coordinates"]]$crs = inla.CRS(proj4string(data))
+        domain[["coordinates"]]$crs = INLA::inla.CRS(proj4string(data))
       } else {
         domain[[nm]] = range(data[[nm]])
       }

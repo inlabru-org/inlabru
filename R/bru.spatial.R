@@ -71,10 +71,10 @@ stransform = function(splist, crs) {
       for (k in 1:length(splist)) {
         if (inherits(splist[[k]], "Spatial")) {
           # cn = coordnames(splist[[k]])
-          splist[[k]] = spTransform(splist[[k]], crs)
+          splist[[k]] = sp::spTransform(splist[[k]], crs)
           #coordnames(splist[[k]]) = cn
         } else if (inherits(splist[[k]], "inla.mesh")) {
-          splist[[k]] = inla.spTransform(splist[[k]], CRSobj = crs)
+          splist[[k]] = INLA::inla.spTransform(splist[[k]], CRSobj = crs)
         }
       }
     } else { 
