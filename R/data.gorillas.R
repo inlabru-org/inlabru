@@ -143,6 +143,12 @@ import.gorillas = function() {
   # Attach plotsample to gorilla data
   gorillas$plotsample = sample_9x9_60pc
   
+  # Extrapolate covariate
+  pxl = pixels(gorillas$mesh, mask = FALSE, nx = 220, ny = 180)
+  for (k in 1:length(gorillas$gcov)) {
+    gorillas$gcov[[k]] = sfill(gorillas$gcov[[k]], pxl)
+  }
+  
   return(gorillas)
 }
 
