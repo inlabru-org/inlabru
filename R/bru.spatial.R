@@ -26,7 +26,7 @@ sfill = function(data, where = NULL) {
     nn = spatstat::nncross(where.ppp, data.ppp)[,"which"]
     vallist[[k]] = vals[nn]
   }
-  ret = data.frame(do.call(cbind, vallist))
+  ret = data.frame(do.call(data.frame, vallist))
   colnames(ret) = colnames(data@data)
   ret = sp::SpatialPixelsDataFrame(where, data = ret)
 
