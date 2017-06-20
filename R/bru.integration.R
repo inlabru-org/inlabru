@@ -71,8 +71,8 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
       }
       
       ips = do.call(rbind, ips)
-  }
-  
+    }
+    
   } else if ( inherits(region, "inla.mesh") ){
     
     # If domain is provided: break
@@ -364,6 +364,74 @@ vertex.projection = function(points, mesh, columns = names(points), group = NULL
   }
   ret
 }
+
+
+# Project data to mesh vertices under the assumption of lineariity
+#   
+#
+# @aliases vertex.projection
+# @export
+# @param points A SpatialPointsDataFrame object
+# @param mesh An inla.mesh object
+# @param columns A character array of the points columns which whall be projected
+# @param group Character array identifying columns in \code{points}. These coloumns are interpreted as factors and the projection is performed independently for eah combination of factor levels.
+# @return SpatialPointsDataFrame of mesh vertices with projected data attached
+# @example
+#
+# pts = data.frame(x = 50 * runif(10), weight = abs(rnorm(100)))
+# msh = inla.mesh.1d(seq(0,50,by=1))
+# pts$year = c(rep(1,5), rep(2,5))
+# ip =  vertex.projection.1d(pts, msh)
+# ggplot(ip) + geom_point(aes(x=x, y=weight))
+#
+# ip =  vertex.projection.1d(pts, msh, group = "year", fill = 0, column = "weight")
+# head(ip)
+# ggplot(ip) + geom_point(aes(x=x, y=weight, color = year))
+
+vertex.projection.1d = function(points, mesh, group = NULL, column = "weight", simplify = TRUE, fill = NULL) {
+
+  dname = setdiff(names(points),c(column, group))
+  if ( length(dname)>1 ) { dname = dname[1] }
+  
+  xx = points[, dname]
+  ww = points[, column]
+  iv = findInterval(xx, mesh$loc)
+  
+  # Left and right vertex location
+  left = mesh$loc[iv]  
+  right = mesh$loc[iv+1]  
+  
+  # Relative location within the two neighboring vertices
+  w.right = (xx-left)/(right-left)
+  w.left = 1 - w.right
+  
+  # Projected integration points
+  ips = rbind(data.frame(x = left, vertex = iv),
+              data.frame(x = right, vertex = iv+1))
+  ips[column] = c(ww * w.left, ww * w.right)
+  
+  
+  # Simplify 
+  if ( simplify ) {
+    bygroup = list(vertex = ips$vertex)
+    if ( !is.null(group) ) { bygroup = c(bygroup, as.list(rbind(points[,group,drop=FALSE], points[,group,drop=FALSE]))) }
+    ips = aggregate(ips[,column, drop = FALSE], by = bygroup, FUN = sum)
+  }
+  
+  # Add x-coordinate
+  ips[dname] = mesh$loc[ips$vertex]
+  
+  # Fill
+  if ( !is.null(fill) ) { 
+    miss = setdiff(1:length(mesh$loc), ips$vertex)
+    mips = data.frame(vertex = miss, x = mesh$loc[miss])
+    mips[,column] = fill
+    ips = rbind(ips, merge(mips, ips[,group, drop=FALSE]))
+  }
+  
+  ips
+}
+
 
 #' Weighted summation (integration) of data frame subsets
 #'   
