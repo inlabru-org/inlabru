@@ -1,3 +1,39 @@
+# Convert data frame to SpatialLinesDataFrame
+#   
+#
+# @aliases sfill
+# @export
+# @param data A SpatialGridDataFrame or SpatialPixelDataFrame
+# @param where Spatial*DataFrame of locations for which to fill in values from \code{data}. If NULL, use \code{data} to determine the locations.
+# @return Spatial object
+
+sfill = function(data, where = NULL) {
+  
+  if ( is.null(where) ) { where = data }
+  vallist = list()
+  for (k in 1:ncol(data@data)) {
+    
+    dpoints = SpatialPoints(data)
+    vals = data@data[,k]
+    dpoints = dpoints[!is.na(vals),]
+    vals = vals[!is.na(vals)]
+    
+    data.ow = spatstat::owin(range(coordinates(dpoints)[,1]), range(coordinates(dpoints)[,2]))
+    data.ppp = spatstat::as.ppp(coordinates(dpoints), data.ow)
+    where.ow = spatstat::owin(range(coordinates(where)[,1]), range(coordinates(where)[,2]))
+    where.ppp = spatstat::as.ppp(coordinates(where), where.ow)
+    
+    nn = spatstat::nncross(where.ppp, data.ppp)[,"which"]
+    vallist[[k]] = vals[nn]
+  }
+  ret = data.frame(do.call(data.frame, vallist))
+  colnames(ret) = colnames(data@data)
+  ret = sp::SpatialPixelsDataFrame(where, data = ret)
+
+
+}
+
+
 #' Convert data frame to SpatialLinesDataFrame
 #'   
 #'
@@ -71,10 +107,10 @@ stransform = function(splist, crs) {
       for (k in 1:length(splist)) {
         if (inherits(splist[[k]], "Spatial")) {
           # cn = coordnames(splist[[k]])
-          splist[[k]] = spTransform(splist[[k]], crs)
+          splist[[k]] = sp::spTransform(splist[[k]], crs)
           #coordnames(splist[[k]]) = cn
         } else if (inherits(splist[[k]], "inla.mesh")) {
-          splist[[k]] = inla.spTransform(splist[[k]], CRSobj = crs)
+          splist[[k]] = INLA::inla.spTransform(splist[[k]], CRSobj = crs)
         }
       }
     } else { 

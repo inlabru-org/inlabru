@@ -26,6 +26,7 @@ Suggests:
     RColorBrewer,
     graphics
 Depends:
+    R (>= 2.10),
     INLA,
     sp,
     stats,

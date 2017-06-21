@@ -103,7 +103,7 @@ import.mrsea = function() {
   
   # Mesh
   mesh = dset$mesh
-  mesh$crs = inla.CRS("+proj=utm +zone=32")
+  mesh$crs = INLA::inla.CRS("+proj=utm +zone=32")
   
   
   # Boundary

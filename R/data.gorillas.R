@@ -95,7 +95,7 @@ import.gorillas = function() {
   #' Build mesh
   bnd = inla.mesh.segment(loc = data.frame(gorillas$window$bdry[[1]]))
   mesh = inla.mesh.2d(interior = bnd, max.edge = 222) # ! With higher max.edge we run into various INLA errors/warnings
-  mesh$crs = inla.CRS(proj4string(nests))
+  mesh$crs = INLA::inla.CRS(proj4string(nests))
   
   #' Turn covariates int SpatialGridDataFrame
   gcov = list()
@@ -142,6 +142,12 @@ import.gorillas = function() {
   
   # Attach plotsample to gorilla data
   gorillas$plotsample = sample_9x9_60pc
+  
+  # Extrapolate covariate
+  pxl = pixels(gorillas$mesh, mask = FALSE, nx = 220, ny = 180)
+  for (k in 1:length(gorillas$gcov)) {
+    gorillas$gcov[[k]] = sfill(gorillas$gcov[[k]], pxl)
+  }
   
   return(gorillas)
 }

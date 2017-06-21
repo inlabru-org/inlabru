@@ -347,7 +347,7 @@ gg.inla.mesh = function(mesh,
 if ( !is.null(color) ) {
   
   px = pixels(mesh, nx = nx, ny = ny)
-  A = inla.spde.make.A(mesh, px)
+  A = INLA::inla.spde.make.A(mesh, px)
   px$color = as.vector(A %*% color)
   if ( !is.null(alpha) ) { 
     px$alpha = as.vector(A %*% alpha)
@@ -360,7 +360,7 @@ if ( !is.null(color) ) {
   
 } else {
   if ( mesh$manifold == "S2" ) { stop("Geom not implemented for spherical meshes (manifold = S2)" ) }
-  if ( !is.null(crs) ) { mesh = inla.spTransform(mesh, CRSobj = crs)}
+  if ( !is.null(crs) ) { mesh = INLA::inla.spTransform(mesh, CRSobj = crs)}
   
   df = rbind(data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]),
              data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
