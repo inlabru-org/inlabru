@@ -1,7 +1,10 @@
 # iDistance project
 # R functions to convert data formatted for dsm to a data format for iDistance
 
-gap.in.segments.f <- function(seg=segments,geometry="euc") {
+gap.in.segments.f <- function(seg=NULL,geometry="euc") {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  #
   # Identify where there is a gap in the effort along a transect (so the segments do not join together)
   # Create an indicator, gap=0 can join to previous segment, gap=1 cannot join
   # To get distance between points, if geometry='geo' uses columns latitude/longitude and great circle distances,
@@ -30,7 +33,11 @@ gap.in.segments.f <- function(seg=segments,geometry="euc") {
 
 # ---------------------------------------------------------- 
 
-define.blocks.f <- function(seg=segments,covar.col=covariate.columns,geometry="euc") {
+define.blocks.f <- function(seg=NULL,covar.col=NULL,geometry="euc") {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  # samoe for: covar.col=covariate.columns
+  #
   # Define blocks - adjoining segments which can be combined because the covariates are the same
   # covar.cols = number of the column in the dataframe containing covariates
   #              thius can be a list of columns (i.e. c(2,6,7)) 
@@ -75,7 +82,10 @@ define.blocks.f <- function(seg=segments,covar.col=covariate.columns,geometry="e
 
 # -------------------------------------------------------
 
-get.blocks.f <- function(seg=segments,geometry="euc") {
+get.blocks.f <- function(seg=NULL,geometry="euc") {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  #
   # Create a dataset for the blocks
   # Segments must contain column called Block.Label, Effort
   # geometry defines how the geometry is measured, either euclidean space (x, y) or geometic coords (lon, lat)
@@ -118,7 +128,11 @@ get.blocks.f <- function(seg=segments,geometry="euc") {
 
 # -------------------------------------------------------
 
-add.labels.to.obs.f <- function(dists=distances,obs=obsservations,seg=segments) {
+add.labels.to.obs.f <- function(dists=NULL,obs=NULL,seg=NULL) {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  # same for: dists=distances,obs=obsservations
+  #
   # Add segment and block labels to observations
   # distance data and observation data MUST be in the same order
   
@@ -143,7 +157,10 @@ add.labels.to.obs.f <- function(dists=distances,obs=obsservations,seg=segments) 
 
 # -------------------------------------------------------
 
-combine.dsmdata.f <- function(blocks=blockdata,dists=distdata) {
+combine.dsmdata.f <- function(blocks=NULL,dists=NULL) {
+  #
+  # NOTE: old problematic parameteriation: blocks=blockdata,dists=distdata
+  #
   # Combine segments and perp distances into one dataframe for iDistance
   
   num.blocks <- dim(blocks)[1]
@@ -200,7 +217,10 @@ combine.dsmdata.f <- function(blocks=blockdata,dists=distdata) {
 
 # -------------------------------------------------------
 
-get.direction.unit.f <- function(data=data,is.blocks=T,geometry="euc") {
+get.direction.unit.f <- function(data=NULL,is.blocks=T,geometry="euc") {
+  
+  # NOTE: old param: data=data
+  
   # Get the quadrant and angle (from 0 to 360o) using blocks (is.block=T) or transects (is.block=F)
   # NEED TO CHECK THAT THIS IS CORRECT FOR UNITS IN QUADRANT = 7
   
@@ -258,7 +278,10 @@ get.direction.unit.f <- function(data=data,is.blocks=T,geometry="euc") {
 
 # -------------------------------------------------------
 
-get.direction.segment.f <- function(data=data,geometry="euc") {
+get.direction.segment.f <- function(data=NULL,geometry="euc") {
+  
+  # NOTE: old param: data=data
+  
   # Get the quadrant and angle (from 0 to 360o clockwise) for each segment
   # Last segment in transect is assumed to be in same direction as penultimate segment.
   # Quadrant=Direction of travel; 1=N, 2=E, 3=S, 4=W, 5=NE, 6=SE, 7=SW, 8=NW
@@ -358,7 +381,11 @@ get.direction.segment.f <- function(data=data,geometry="euc") {
 
 # -------------------------------------------------------  
 
-start.end.points.segments.f <- function(seg=segment,use.tran=FALSE,tran=transect.quadrant,geometry="euc") {
+start.end.points.segments.f <- function(seg=NULL,use.tran=FALSE,tran=NULL,geometry="euc") {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  # same for: tran=transect.quadrant
+  #
   # Calculate the start and end points of a block of segments
   # Start and end points based on half the length of the first and last segments in a block
   # Direction is given by direction of segment (use.tran=FALSE) or transect (use.tran=TRUE)
@@ -529,7 +556,10 @@ geo.distance.f <- function (lon1,lat1,lon2,lat2) {
 
 # ---------------------------------------------------------------
 
-get.triangle.sides.f <- function(seg.len=half.segment.length,angle=angle) {
+get.triangle.sides.f <- function(seg.len=NULL,angle=NULL) {
+  
+  # NOTE: old parameterization: seg.len=half.segment.length,angle=angle
+  
   # Calculate the height and length of triangle given length of hypotenuse and angle
   
   deg2rad <- pi/180
@@ -545,7 +575,11 @@ get.triangle.sides.f <- function(seg.len=half.segment.length,angle=angle) {
 
 # ------------------------------------------------------------------
 
-generate.obs.location.f <- function(seg=segments,dists=distance.data,geometry="euc",do.plot=F) {
+generate.obs.location.f <- function(seg=NULL,dists=NULL,geometry="euc",do.plot=F) {
+  #
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  # same for dists=distance.data
+  #
   # Generate coords for an observation if not contained in observations
   # Location is randomly generated along segment and random side of segment at perp distance of sighting
   # Side of line; 1=above and -1=below segment
@@ -562,7 +596,7 @@ generate.obs.location.f <- function(seg=segments,dists=distance.data,geometry="e
   new.sgt$y <- rep(NA,num.sgt)
   new.sgt <- data.frame(new.sgt)
   
-  if (do.plot) par(ask=T)
+  if (do.plot)  stop("do.plot code has been removed")#par(ask=T)
   for (i in 1:num.sgt) {
     temp <- seg[seg$Sample.Label==dists$Sample.Label[i], ]
     # Randomly choose location along line
@@ -579,12 +613,13 @@ generate.obs.location.f <- function(seg=segments,dists=distance.data,geometry="e
     new.sgt$y[i] <- sgt.coords[2]
     # Plot segment and location if requested
     if (do.plot) {
-      plot.segment.f(temp$start.x,temp$start.y,temp$end.x,temp$end.y)
-      points(new.x,new.y,col=3,pch=16)
-      points(sgt.coords[1],sgt.coords[2],pch=19,col=2)
-      segments(new.x,new.y,sgt.coords[1],sgt.coords[2],lty=2)
-      print(paste("Sighting",i," perp. dist=",format(pd)))
-      title(temp$Sample.Label[1])
+      stop("do.plot=TRUE. This code has been removed.")
+      # plot.segment.f(temp$start.x,temp$start.y,temp$end.x,temp$end.y)
+      # points(new.x,new.y,col=3,pch=16)
+      # points(sgt.coords[1],sgt.coords[2],pch=19,col=2)
+      # segments(new.x,new.y,sgt.coords[1],sgt.coords[2],lty=2)
+      # print(paste("Sighting",i," perp. dist=",format(pd)))
+      # title(temp$Sample.Label[1])
     }
     
   } # End of sgts
@@ -595,7 +630,10 @@ generate.obs.location.f <- function(seg=segments,dists=distance.data,geometry="e
 
 # ---------------------------------
 
-get.point.along.segment.f <- function(x1,y1,x2,y2,quad=quadrant,seg.angle) {
+get.point.along.segment.f <- function(x1,y1,x2,y2,quad=NULL,seg.angle) {
+  
+  # NOTE: old parameterization: quad=quadrant
+  
   # Get a random point along the segment (at which object was detected)
   # Segment end points defined by (x1,y1) and (x2,y2)
   # Direction of travel defined by quadrant and angle
@@ -615,7 +653,7 @@ get.point.along.segment.f <- function(x1,y1,x2,y2,quad=quadrant,seg.angle) {
   }
   if (quad==2) {
     new.x <- runif(1,min=x2,max=x1)
-    new.y <- temp$start.y[1]
+    new.y <- y1
   }
   if (quad==5) {
     theta <- 90 - seg.angle
@@ -677,7 +715,11 @@ get.point.along.segment.f <- function(x1,y1,x2,y2,quad=quadrant,seg.angle) {
 
 # --------------------------------------------------------------
 
-get.coords.f <- function(quad=quadrant,alpha=angle,new.x=x.reference,new.y=y.reference,pd=perp.dist,side=side.of.segment) {
+get.coords.f <- function(quad=NULL,alpha=NULL,new.x=NULL,new.y=NULL,pd=NULL,side=NULL) {
+  
+  # NOTE old parameterization:
+  # quad=quadrant,alpha=angle,new.x=x.reference,new.y=y.reference,pd=perp.dist,side=side.of.segment
+  
   # Get the coordinates of the sighting based on 
   # 1. the reference point (new.x,new.y)
   # 2. the perp distance of the sighting
@@ -770,23 +812,26 @@ get.hypot.f <- function(side1,side2) {
 
 # -------------------------------
 
-plot.segment.f <- function(x1,y1,x2,y2) {
-  # Plots segment defined by (x1,y1) and (x2,y2)
-  
-  minx <- min(x1,x2)
-  maxx <- max(x1,x2)
-  miny <- min(y1,y2)
-  maxy <- max(y1,y2)
-  
-  plot(x1,y1,xlim=c(minx,maxx),ylim=c(miny,maxy),asp=1)
-  points(x2,y2,pch=2)
-  segments(x1,y1,x2,y2)
-  
-}
+# plot.segment.f <- function(x1,y1,x2,y2) {
+#   # Plots segment defined by (x1,y1) and (x2,y2)
+#   
+#   minx <- min(x1,x2)
+#   maxx <- max(x1,x2)
+#   miny <- min(y1,y2)
+#   maxy <- max(y1,y2)
+#   
+#   plot(x1,y1,xlim=c(minx,maxx),ylim=c(miny,maxy),asp=1)
+#   points(x2,y2,pch=2)
+#   segments(x1,y1,x2,y2)
+#   
+# }
 
 # ---------------------------------------------------------------------
 
-what.angle.f <- function(dy=diff.y,dx=diff.x,quad=quadrant) {
+what.angle.f <- function(dy=NULL,dx=NULL,quad=NULL) {
+  
+  # NOTE old parameterization: dy=diff.y,dx=diff.x,quad=quadrant
+  
   # Get the angle between two points (from 0 to 360) using trig and the direction (quadrant)
   
   what.angle <- atan(dy/dx) * (180/pi)

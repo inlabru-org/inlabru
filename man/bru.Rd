@@ -2,42 +2,41 @@
 % Please edit documentation in R/bru.inference.R
 \name{bru}
 \alias{bru}
-\title{Spatial model fitting using INLA}
+\title{Convenient model fitting using (iterated) INLA}
 \usage{
-bru(points, predictor = . ~ ., model = y ~ spde(model =
-  inla.spde2.matern(mesh), map = coordinates, mesh = mesh), mesh = NULL,
-  run = TRUE, linear = FALSE, E = 1, family = "gaussian", n = 10,
-  offset = 0, result = NULL, ...)
+bru(components = y ~ Intercept, family = NULL, data = NULL, ...,
+  options = list())
 }
 \arguments{
-\item{points}{A data.frame or SpatialPoints[DataFrame] object}
+\item{components}{a formula describing the latent components}
 
-\item{predictor}{A formula stating the data column (LHS) and mathematical expression (RHS) used for predicting.}
+\item{family}{Character defining one of the likelihoods supported by \link{like}. Alternatively, an object cunstructed by \link{like}.}
 
-\item{model}{a formula describing the model components}
+\item{data}{A data.frame or SpatialPoints[DataFrame] object}
 
-\item{mesh}{An inla.mesh object modelling the domain. If NULL, the mesh is constructed from a non-convex hull of the points provided}
+\item{...}{Additional likelihoods, each constructed by a calling \link{like}}
 
-\item{run}{If TRUE, rund inference. Otherwise only return configuration needed to run inference.}
-
-\item{linear}{If TRUE, do not perform linear approximation of predictor}
-
-\item{E}{Exposure parameter passed on to \link{inla}}
-
-\item{family}{Likelihood family passed on to \link{inla}}
-
-\item{n}{maximum number of \link{iinla} iterations}
-
-\item{offset}{the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.}
-
-\item{result}{An \code{iinla} object returned from previous calls of \code{bru}/\code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
-
-\item{...}{more arguments passed on to \link{inla}}
+\item{options}{See \link{bru.options}}
 }
 \value{
-A \link{bru} object (inherits from iinla and \link{inla})
+A \link{bru} object
 }
 \description{
-Spatial model fitting using INLA
+This method is a wrapper for \link{inla} and provides multiple enhancements. 
+(1) For spatial data and models, \code{bru} will construct the required projection matrices automatically
+(2) Multiple likelihoods can be employed in a convenient way
+(3) Non-linear predictors are approximated numerically and fitting happens via iterated INLA calls.
+}
+\examples{
+
+\dontrun{
+input.df <- data.frame(x=cos(1:10))
+input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+fit.newbru <- bru(y ~ x, "gaussian", input.df)
+summary(fit.newbru)
 }
 
+}
+\author{
+Fabian E. Bachl <\email{bachlfab@gmail.com}>
+}

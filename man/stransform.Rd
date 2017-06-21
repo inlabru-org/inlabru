@@ -17,4 +17,3 @@ List of Spatial* objects
 \description{
 Apply spTransform to all Spatial* elements of a list
 }
-

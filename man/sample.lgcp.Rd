@@ -28,11 +28,13 @@ Sample from a log Gaussian Cox process (LGCP)
 library(inlabru)
 vertices = seq(0, 3, by = 0.1)
 mesh = inla.mesh.1d(vertices)
-loglambda = 5-0.5*vertices)
+loglambda = 5-0.5*vertices
 pts = sample.lgcp(mesh, loglambda)
 pts$y = 0
 plot(vertices, exp(loglambda), type = "l", ylim = c(0,150))
 points(pts, pch = "|" )
 
+data("gorillas")
+pts = sample.lgcp(gorillas$mesh, rep(1.5, gorillas$mesh$n))
+ggplot() + gg(gorillas$mesh) + gg(pts)
 }
-

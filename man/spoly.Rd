@@ -19,4 +19,3 @@ SpatialPolygonsDataFrame
 \description{
 Create a SpatialPolygonsDataFrame from a boundary description
 }
-

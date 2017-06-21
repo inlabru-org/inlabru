@@ -2,14 +2,25 @@
 % Please edit documentation in R/ggplot.R
 \name{gg}
 \alias{gg}
-\title{ggplot2 geom for spatial objects}
+\title{ggplot2 geomes for spatial data}
 \usage{
-gg(data, ...)
+gg(...)
 }
 \arguments{
-\item{data}{A Spatial* object or a mesh}
+\item{...}{Arguments passed on the the geomes}
 }
 \description{
-ggplot2 geom for spatial objects
+Depending on the class of the first argument one of the following functions is called:
+\describe{
+\item{}{\link{gg.data.frame}}
+\item{}{\link{gg.prediction}}
+\item{}{\link{gg.SpatialPoints}}
+\item{}{\link{gg.SpatialLines}}
+\item{}{\link{gg.SpatialPolygons}}
+\item{}{\link{gg.SpatialPixels}}
+\item{}{\link{gg.SpatialGrid}}
+\item{}{\link{gg.RasterLayer}}
+\item{}{\link{gg.inla.mesh}}
+\item{}{\link{gg.inla.mesh.1d}}
 }
-
+}

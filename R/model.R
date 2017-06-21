@@ -1,54 +1,6 @@
-#' Models for \link{inlabru} 
-#'
-#' As with most inference methods inlabru models are set up via model formulae.
-#' However, inlabru supports a slightly more advanced syntax which separates the name of an
-#' effect from the name of a covariate. For instance, a very simple formula that inlabru
-#' can work with is 
+#' Internal \link{inlabru} model structure
 #' 
-#' \code{y ~ myFixedEffect(temperature)}
-#'
-#' which defines a latent effect named 'myFixedEffect' with 'tepmerature' as a multiplier.
-#' Hence, except for explicitly giving a name to the effect, the above formula is equivalent
-#' to
-#' 
-#' \code{y ~ temperature}
-#' 
-#' In fact, the latter will also work in inlabru but the name of the effect will be
-#' 'temperature'. The advantage of having an explicit name for the effect is that it 
-#' allows for a more sophisticated syntax when making predictions.
-#' 
-#' In general, inlabru formula components are of the form
-#' 
-#' MyEffectName(map = aFunctionOfMyData, model = 'modelType', ...)
-#' 
-#' where 
-#' 
-#' \itemize{
-#' \item{\code{MyEffectName} is an aribtrary string defining the name of the effect}
-#' \item{\code{map} can be 
-#' (A) a name of a covariate, 
-#' (B) a function's name that will be called with your data as a parameter
-#' (C) an expression that is valid with your data as an environment}
-#' \item{model} is one of the \link{inla.models}
-#' \item{... are further arguments passed that inla \link{f} understands}
-#' }
-#' 
-#' Internally, inlabru will construct a \code{model} form the formula that you define
-#' using the \link{make.model} function. Useful operators on \code{model} objects are:
-#' 
-#' \itemize{
-#'  \item{\link{summary}: }{ Summarize an \link{inlabru} model }
-#'  \item{\link{labels}: }{ Character array of effect labels }
-#'  \item{\link{effect}: }{ Retrieve one or more effects from a model }
-#'  \item{\link{default}: }{ Default linear predictor expression }
-#'  \item{\link{list.A}: }{ List A-matrices that will be constructed for the INLA stack }
-#'  \item{\link{list.data}: }{ List environmental variables needed to call INLA}
-#'  \item{\link{list.indices}: }{ List indices that will be constructed for the INLA stack}
-#'  \item{\link{list.effects}: }{ List weights that will be constructed for the INLA stack}
-#'  \item{\link{evaluate}: }{ Determine the linear predictor's value at some location }
-#'  
-#' }
-#' 
+#' See \link{make.model}.
 #' 
 #' @name model
 NULL
@@ -207,7 +159,8 @@ make.model = function(fml) {
     if (smod$model == "factor") { lbl[[k]] = smod$label ; smod$fchar = smod$label }
     
     # Fix label for offset effect
-    if (smod$label == "offset") lbl[[k]] = paste0("offset(",deparse(smod$map),")")
+    # if (smod$label == "offset") lbl[[k]] = paste0("offset(",deparse(smod$map),")")
+    if (smod$label == "offset") lbl[[k]] = "offset(offset)"
     
     # Set submodel
     submodel[[ge$f$label]] = smod
@@ -235,9 +188,10 @@ make.model = function(fml) {
 #' @export
 #' @param covariate A string defining the label of the INLA effect. If \code{map} is provided this also sets the coariate used as a first argument to the \link{f} call.
 #' @param map A name, call or function that maps points to effect indices or locations that the model understands.
+#' @param group A name, call or function that maps the data to groups
 #' @param model See \link{f} model specifications
 #' @param mesh An \link{inla.mesh} object required for SPDE models
-#' @param A.mask A boolean vector for masking A matrix columns. 
+#' @param A.msk A boolean vector for masking A matrix columns. 
 #' @param ... Arguments passed on to inla \link{f}
 #' @return A list with mesh, model and the return value of the f-call
 
@@ -259,17 +213,23 @@ g = function(covariate,
   # Only call f if we are  not dealing with an offset
   if ( label == "offset" ) { fvals = list(model="offset") }
   else if ( is.character(model) && model == "factor" ) { fvals = list(model="factor") } # , n = list(...)$n
-  else { fvals = f(xxx, ..., group = group, model = model) }
+  else { xxx = NULL ; fvals = f(xxx, ..., group = group, model = model) }
   fvals$label = label
   
   # Default map
   if ( is.null(map) ) { 
-    if ( fvals$model == "spde2") { map = expression(coordinates) }
+    if ( fvals$model == "spde2" && class(mesh) == "inla.mesh") { map = expression(coordinates) }
     else { map = substitute(covariate) }
   }
   
   # Check if we got a mesh argument if the model is an SPDE
-  if ( fvals$model == "spde2" & is.null(mesh) ) stop(sprintf("Model %s is an SPDE but no mesh was provided", label))
+  if ( fvals$model == "spde2" & is.null(mesh) ) { mesh = model$mesh } 
+  
+  # Check if n is present for models that are not fixed effects
+  if (is.null(fvals$n) & !(fvals$model == "linear") & !(fvals$model == "offset") & !(fvals$model == "factor")) {
+    stop(sprintf("Please provide parameter 'n' for effect '%s'", label))
+    }
+  
   
   ret = list(mesh = mesh, 
              map = map,
@@ -284,15 +244,16 @@ g = function(covariate,
 # OPERATORS ON MODELS
 ##########################################################################
 
-#' Model summary
-#'
-#' @aliases summary.model
-#' @export
-#' @param model An \link{inlabru} \link{model}
-#' 
-summary.model = function(model) {
-  for (label in elabels(model)) {
-    eff = effect(model,label)
+# Model summary
+#
+# @aliases summary
+# @export
+# @param object An \link{inlabru} \link{model}
+# @param ... ignored arguments (S3 generic compatibility)
+# 
+summary.model = function(object, ...) {
+  for (label in elabels(object)) {
+    eff = effect(object,label)
     en = ifelse("n" %in% names(eff), eff$n, 1)
     cat(paste0(label, ":\n"))
     cat(sprintf("\t model: %s , n = %s \n", eff$model, en))
@@ -303,48 +264,48 @@ summary.model = function(model) {
     
   }
   cat(paste0("--- FORMULA ---\n\n"))
-  print(model$formula)
+  print(object$formula)
 }
 
 
-#' Retrieve effect labels
-#'
-#' @aliases elabels
-#' @export
-#' @param model An \link{inlabru} \link{model}
-#' 
+# Retrieve effect labels
+#
+# @aliases elabels
+# @export
+# @param model An \link{inlabru} \link{model}
+# 
 elabels = function(model) { names(model$effects) }
 
 
-#' Retrieve effect properties
-#'
-#' @aliases effect
-#' @export
-#' @param model An \link{inlabru} \link{model}
-#' @param label String defining the label of the effect. If NULL, return all effects
-#' 
+# Retrieve effect properties
+#
+# @aliases effect
+# @export
+# @param model An \link{inlabru} \link{model}
+# @param label String defining the label of the effect. If NULL, return all effects
+# 
 effect = function(model, label = NULL) {
   if (is.null(label)) { model$effects } 
   else { model$effects[[label]] }
 }
 
 
-#' Retrieve linear predictor expression
-#'
-#' @aliases predictor
-#' @export
-#' @param model An \link{inlabru} \link{model}
-#'
+# Retrieve linear predictor expression
+#
+# @aliases predictor
+# @export
+# @param model An \link{inlabru} \link{model}
+#
 default.predictor = function(model) { parse(text=paste0(elabels(model),collapse="+"))}
 
 
 
-#' List data needed to run INLA
-#'
-#' @aliases list.data.model
-#' @param model An \link{inlabru} \link{model}
-#' @export
-#' 
+# List data needed to run INLA
+#
+# @aliases list.data.model
+# @param model An \link{inlabru} \link{model}
+# @export
+# 
 
 list.data.model = function(model){
   
@@ -363,12 +324,12 @@ list.data.model = function(model){
   elist = elist[names(elist) %in% all.vars(model$formula)]
 }
 
-#' List of covariates effects needed to run INLA
-#'
-#' @aliases list.covariates.model
-#' @param model An \link{inlabru} \link{model}
-#' @param points A data fram to extract the data from
-#' 
+# List of covariates effects needed to run INLA
+#
+# @aliases list.covariates.model
+# @param model An \link{inlabru} \link{model}
+# @param points A data fram to extract the data from
+# 
 
 list.covariates.model = function(model, points){
     
@@ -385,11 +346,11 @@ list.covariates.model = function(model, points){
     covar.data = data.frame(do.call(cbind,covar.data))
 }
 
-#' List of A matrices needed to run INLA
-#'
-#' @aliases list.A.model
-#' @param model An \link{inlabru} \link{model}
-#' @param points Locations to create the A-matrices for
+# List of A matrices needed to run INLA
+#
+# @aliases list.A.model
+# @param model An \link{inlabru} \link{model}
+# @param points Locations to create the A-matrices for
 
 list.A.model = function(model, points){
   A.lst = list()
@@ -405,14 +366,19 @@ list.A.model = function(model, points){
       A.lst[[eff$label]] = A
     } else {
       
-      loc = mapper(eff$map, points, eff)
-      loc = as.matrix(loc) # inla.spde.make.A requires matrix format as input
-
+      if ( eff$map == "coordinates" ) {
+        loc = stransform(points, crs = eff$mesh$crs)
+      } else {
+        loc = mapper(eff$map, points, eff)
+        if ( !is.matrix(loc) & !inherits(loc,"Spatial") ) loc = as.matrix(loc)
+      }
+  
       if (is.null(eff$ngroup)) { ng = 1 } else { ng = eff$ngroup }
       if (ng > 1) {
         group = points[[eff$group.char]]
       } else { group = NULL }
-      A = inla.spde.make.A(eff$mesh, loc = loc, group = group, n.group = ng)
+      
+      A = INLA::inla.spde.make.A(eff$mesh, loc = loc, group = group, n.group = ng)
       # Mask columns of A
       if (!is.null(eff$A.msk)) { A = A[, as.logical(eff$A.msk), drop=FALSE]}
       # Weights for models with A-matrix are realized in the follwoing way:
@@ -429,11 +395,11 @@ list.A.model = function(model, points){
 }
 
 
-#' List of spde indexing effects needed to run INLA
-#'
-#' @aliases list.indices.model
-#' @param model An \link{inlabru} \link{model}
-#' @param points A data frame to extract indices from
+# List of spde indexing effects needed to run INLA
+#
+# @aliases list.indices.model
+# @param model An \link{inlabru} \link{model}
+# @param points A data frame to extract indices from
 
 list.indices.model = function(model, points){
   
@@ -465,30 +431,38 @@ list.indices.model = function(model, points){
         }
       }
     } else {
-      idx[[name]] = mapper(eff$map, points, eff)
+      idx[[name]] = mapper(eff$map, points, eff, environment(model$in.formula))
     }
     
   }
   idx
 }
 
-#' Evaluate or sample from a posterior result given a model and locations
-#' 
-#' @aliases evaluate.model evaluate
-#' @export
-#' @param model An \link{inlabru} \link{model}
-#' @param result Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.
-#' @param points Locations and covariates needed to evaluate the model.
-#' @param predictor An expression to be ealuated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects.
-#' @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
-#' @param n Number of samples to draw.
-#' 
+# Evaluate or sample from a posterior result given a model and locations
+# 
+# @aliases evaluate.model evaluate
+# @export
+# @param model An \link{inlabru} \link{model}
+# @param result Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.
+# @param points Locations and covariates needed to evaluate the model.
+# @param predictor A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects. In case of a formula the right hand side is used for evaluation.
+# @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
+# @param n Number of samples to draw.
+# 
 evaluate.model = function(model, 
                           result, 
                           points,
                           predictor = NULL,
                           property = "mode",
                           n = 1) {
+  
+  data = points # Within the evaluation make points available via the name "data" 
+  
+  
+  if ( inherits(predictor, "formula") ) {
+    fml.envir = as.list(environment(predictor))
+    predictor = parse(text = as.character(predictor)[length(as.character(predictor))])
+  } else { fml.envir = list() }
   
   # Do we otain our values from sampling or from a property of a summary?
   if ( property == "sample") {
@@ -512,7 +486,7 @@ evaluate.model = function(model,
   # Make a function that will apply the A-matrices
   apply.A = function(name, s) {
       mult = as.vector(s[[name]])
-      if (!is.null(A[[name]])) {
+      if ( !is.null(A[[name]]) && ( nrow(A[[name]]) > 0) ) {
         if (length(mult) == 1) { as.vector(A[[name]] %*% rep(mult, nrow(A[[name]]))) 
           }
         else { as.vector(A[[name]] %*% s[[name]]) }
@@ -526,11 +500,20 @@ evaluate.model = function(model,
     # Discard variables we do not need
     sm = smp[[k]][vars]
     
-    # For factor models we need to do a little trick
+    # Factor models
     for (label in names(sm)) { 
       if (label %in% names(effect(model)) && effect(model)[[label]]$model == "factor") {
         fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]]) 
         sm[[label]] = as.vector(sm[[label]][fc[,1]])
+      }
+    }
+    
+    # Linear models
+    for (label in names(sm)) { 
+      if (label %in% names(effect(model)) && effect(model)[[label]]$model == "linear") {
+        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]])
+        if (is.data.frame(fc)) {fc = fc[,1]}
+        sm[[label]] = as.vector(sm[[label]] * as.vector(fc))
       }
     }
  
@@ -542,7 +525,8 @@ evaluate.model = function(model,
     if ( is.null(predictor) ) {
       smp[[k]] = data.frame(sm)
     } else {
-      smp[[k]] = eval(predictor, envir = c(sm, as.list(data.frame(points)), as.list(environment(model$formula))))
+      envir = c(sm, as.list(data.frame(points)), fml.envir, as.list(environment(model$formula)))
+      smp[[k]] = eval(predictor, envir = envir)
     }
   }
   
@@ -551,10 +535,10 @@ evaluate.model = function(model,
 }
 
 
-mapper = function(map, points, eff) {
+mapper = function(map, points, eff, env = NULL) {
   
   # Evaluate the map with the points as an environment
-  emap = tryCatch(eval(map, data.frame(points)), error = function(e) {})
+  emap = tryCatch(eval(map, c(data.frame(points), as.list(env))), error = function(e) {})
   
   # 0) Eval failed. map everything to 1. This happens for automatically added Intercept
   # 1) If we obtain a function, apply the function to the points
@@ -562,26 +546,39 @@ mapper = function(map, points, eff) {
   # 3) Else we obtain a vector and return as-is. This happens when map states a column of the data points
   
   if ( is.null(emap) ) { 
-    loc = data.frame(x = rep(1, nrow(points))) 
+    loc = data.frame(x = rep(1, max(1,nrow(as.data.frame(points)))))
     colnames(loc) = deparse(map)
     }
   else if ( is.function(emap) ) { loc = emap(points) }
-  else if ( inherits(emap, "SpatialGridDataFrame") ) { loc = over(points, emap) }
+  else if ( inherits(emap, "SpatialGridDataFrame") | inherits(emap, "SpatialPixelsDataFrame")) {
+    if ( length(eff$group.char) == 0 ) {
+      loc = over(points, emap)[,1,drop=FALSE]
+      colnames(loc) = eff$label
+    } else {
+      layr = points[[eff$group.char]]
+      loc = vector()
+      for (l in unique(layr)) { loc[layr == l] = over(points[layr == l,], emap)[,l] }
+      loc = data.frame(loc = loc)
+      colnames(loc) = eff$label
+    }
+    
+    }
+  else if ( eff$label == "offset" && is.numeric(emap) && length(emap)==1 ) { loc = data.frame(offset = rep(emap, nrow(points)))}
   else { loc = emap }
   
   # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
   # to fix that by filling in nearest neighbor values.
-  if ( any(is.na(loc)) & ( inherits(emap, "SpatialGridDataFrame") )) {
+  if ( any(is.na(loc)) & ( inherits(emap, "SpatialGridDataFrame") | inherits(emap, "SpatialPixelsDataFrame") )) {
     
     warning(sprintf("Map '%s' has returned NA values. As it is a SpatialGridDataFrame I will try to fix this by filling in values of spatially nearest neighbors. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
                  deparse(map), eff$label))
     
-    require(rgeos)
     BADpoints = points[as.vector(is.na(loc)),]
     GOODpoints = points[as.vector(!is.na(loc)),]
-    dst = gDistance(GOODpoints,BADpoints, byid=T)
+    dst = rgeos::gDistance(SpatialPoints(GOODpoints),SpatialPoints(BADpoints), byid=T)
     nn = apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
     loc[is.na(loc)] = loc[!is.na(loc)][nn]
+    colnames(loc) = eff$label
   }
     
   # Check for NA values.    

@@ -4,17 +4,18 @@
 \alias{summarize}
 \title{Summarize and annotate data}
 \usage{
-summarize(data, x = NULL, gg = FALSE)
+summarize(data, x = NULL, cbind.only = FALSE)
 }
 \arguments{
-\item{data}{A data.frame}
+\item{data}{A list of samples, each either numeric or a \code{data.frame}}
 
-\item{x}{Annotations for the resulting summary}
+\item{x}{A \code{data.frame} of data columns that should be added to the summary data frame}
+
+\item{cbind.only}{If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample}
 }
 \value{
-A data.frame with summary statistics
+A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
 }
 \description{
 Summarize and annotate data
 }
-

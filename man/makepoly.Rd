@@ -20,4 +20,3 @@ A \code{SpatialPolygonsDataFrame}.
 Makes a rectangular \code{SpatialPolygonsDataFrame} using its bottom left coordinates, 
 its width and its height.
 }
-

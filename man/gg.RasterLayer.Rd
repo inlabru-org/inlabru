@@ -4,15 +4,16 @@
 \alias{gg.RasterLayer}
 \title{Plot RasterLayer using ggplot2}
 \usage{
-gg.RasterLayer(r)
+\method{gg}{RasterLayer}(r, ...)
 }
 \arguments{
 \item{r}{A RasterLayer object}
+
+\item{...}{Arguments passed on to \link{geom_tile}}
 }
 \value{
-A ggplot2 object
+geom_tile
 }
 \description{
 Plot RasterLayer using ggplot2
 }
-

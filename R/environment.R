@@ -1,11 +1,36 @@
 iinla.env = new.env()
 iinla.env$log = sprintf("inlabru @ %s", date())
 
+
+
+#' @title Global setting for tutorial sessions
+#' 
+#' @description Increases verbosity and sets the inference strategy to empirical Bayes.
+#'
+#' @aliases init.tutorial
+#' @export
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
 init.tutorial = function() {
   cat("Setting defaults for tutorial session. \n")
   iinla.setOption("iinla.verbose", list(TRUE))
-  iinla.setOption("control.inla", list(list(int.strategy = "'eb'")))
+  iinla.setOption("control.inla", list(list(int.strategy = "eb")))
   iinla.setOption("control.compute", list(list(config = TRUE, dic = TRUE, waic = TRUE)))
+}
+
+#' @title Print inlabru log
+#' 
+#' @description Print inlabru log
+#'
+#' @aliases bru.log
+#' @export
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+
+bru.log = function() {
+  sprintf(iinla.env$log)
 }
 
 msg = function(txt) {
@@ -14,10 +39,6 @@ msg = function(txt) {
 }
 
 logentry = function(txt) { iinla.env$log = c(iinla.env$log, paste0(Sys.time(),": ", txt)) }
-
-logbook = function() {
-  sprintf(iinla.env$log)
-}
 
 iinla.getOption = function (option = c("control.compute", "control.inla","iinla.verbose")) 
 {

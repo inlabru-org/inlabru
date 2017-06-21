@@ -2,42 +2,33 @@
 % Please edit documentation in R/bru.integration.R
 \name{ipoints}
 \alias{ipoints}
-\title{Integration points for log Gaussian Cox process models using INLA}
+\title{Generate integration points}
 \usage{
-ipoints(samplers, config)
+ipoints(region = NULL, domain = NULL, name = "x", group = NULL, project)
 }
 \arguments{
-\item{samplers}{A Spatial[Points/Lines/Polygons]DataFrame objects}
+\item{region}{Description of the integration region boundary}
 
-\item{config}{An integration configuration. See \link{iconfig}}
+\item{domain}{An object describing a discretization of the domain}
 
-\item{points}{A SpatialPoints[DataFrame] object}
+\item{name}{Character array stating the name of the domains dimension(s)}
+
+\item{group}{Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged.}
+
+\item{project}{If TRUE, project the integration points to mesh vertices}
 }
 \value{
-Integration points
+A \code{data.frame} or \code{SpatialPointsDataFrame}
 }
 \description{
-prerequisits:
+Generate integration points based on a desciption of the integration region.
 }
-\details{
-- List of integration dimension names, extend and quadrature 
-- Samplers: These may live in a subset of the dimensions, usually space and time 
-            ("Where and wehen did a have a look at the point process")
-- Actually this is a simplified view. Samplers should have start and end time !
+\examples{
 
-Procedure:
-- Select integration strategy by type of samplers: 
-      1) SpatialPointsDataFrame: Assume these are already integration points
-      2) SpatialLinesDataFrame: Use simplified integration along line with (width provided by samplers)
-      3) SpatialPolygonDataFrame: Use full integration over polygons
+ips = ipoints(c(0,10), name = "myDim")
+ips
 
-- Create integration points from samplers. Do NOT perform simplification projection here!
-- Simplify integration points. 
-  1) Group by non-mesh dimensions, e.g. time, weather
-  2) For each group simplify with respect to mesh-dimensions, e.g. space
-  3) Merge
-  
-  Dependencies (iDistance):
-  int.points(), int.polygon(), int.1d(), int.expand(), recurse.rbind()
 }
-
+\author{
+Fabian E. Bachl <\email{bachlfab@gmail.com}>
+}

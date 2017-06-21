@@ -14,9 +14,8 @@ spatial.to.ppp(points, samplers)
 \item{...}{arguments passed on to \link{predict}}
 }
 \value{
-A spatstat \link{ppp} object
+A spatstat \code{spatstat} \code{ppp} object
 }
 \description{
 Convert SpatialPoints and boundary polygon to  spatstat ppp object
 }
-

@@ -13,7 +13,7 @@
 deltaIC = function(...,criterion="DIC"){
   if(criterion != "DIC" & criterion != "WAIC") {
     warning("Invalid criterion argument: using DIC")
-    criterion = DIC
+    criterion = "DIC"
   }
   names <- as.character(substitute(list(...)))[-1L]
   model = eval(list(...))
@@ -21,7 +21,6 @@ deltaIC = function(...,criterion="DIC"){
   dic = waic = rep(NA,nmod)
   for(i in 1:nmod) {
     mod = model[[i]]
-    if(!inherits(mod,"lgcp")) stop("Object ",i," is not of class lgcp.")
     if(criterion=="DIC" & is.null(mod$dic$dic)) stop("Object ",i," does not have a DIC.")
     if(criterion=="WAIC" & is.null(mod$waic$waic)) stop("Object ",i," does not have a WAIC.")
     dic[i] = mod$dic$dic

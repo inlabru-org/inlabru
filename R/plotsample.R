@@ -34,7 +34,7 @@ makepoly=function(start,width,height) {
 #' @param x.ppn The proportion of the x=axis that is to be included in the plots.
 #' @param y.ppn The proportion of the y=axis that is to be included in the plots.
 #' @param nx The number of plots in the x-dimension.
-#' @param nx The number of plots in the y-dimension.
+#' @param ny The number of plots in the y-dimension.
 #'
 #' @return A list with three components:
 #'  \describe{
@@ -54,9 +54,9 @@ makepoly=function(start,width,height) {
 #' @examples 
 #' library(inlabru)
 #' library(raster)
-#' data(gorillanests)
-#' plotpts = plotsample(gnests,gnestboundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
-#' ggplot() +gg(plotpts$plots) +gg(plotpts$dets,pch="+",cex=2) +gg(gnestboundary)
+#' data(gorillas)
+#' plotpts = plotsample(gorillas$nests,gorillas$boundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
+#' ggplot() +gg(plotpts$plots) +gg(plotpts$dets,pch="+",cex=2) +gg(gorillas$boundary)
 #' 
 #' @export
 #' 
@@ -64,9 +64,8 @@ plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
   if(x.ppn<=0 | x.ppn>=1) stop("'x.ppn' must greater than 0 and less than 1")
   if(y.ppn<=0 | y.ppn>=1) stop("'y.ppn' must greater than 0 and less than 1")
   
-  require(raster)
-  
-  srange=extent(boundary)
+
+  srange=raster::extent(boundary)
   xrange=srange[1:2]
   yrange=srange[3:4]
   nxtot=round(nx/x.ppn)
@@ -114,14 +113,14 @@ plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
 #' @examples 
 #' library(inlabru)
 #' library(raster)
-#' data(gorillanests)
-#' plotpts = plotsample(gnests,gnestboundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
-#' p1 = ggplot() +gg(plotpts$plots) +gg(plotpts$dets) +gg(gnestboundary)
+#' data(gorillas)
+#' plotpts = plotsample(gorillas$nests,gorillas$boundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
+#' p1 = ggplot() +gg(plotpts$plots) +gg(plotpts$dets) +gg(gorillas$boundary)
 #' countdata = point2count(plotpts$plots,plotpts$dets)
 #' x=coordinates(countdata)[,1]
 #' y=coordinates(countdata)[,2]
 #' count=countdata@data$n
-#' p2 = ggplot() +gg(gnestboundary) +gg(plotpts$plots) +  geom_text(aes(label=count, x=x, y=y))
+#' p2 = ggplot() +gg(gorillas$boundary) +gg(plotpts$plots) +  geom_text(aes(label=count, x=x, y=y))
 #' multiplot(p1,p2,cols=2)
 #' 
 #' @export
@@ -142,7 +141,7 @@ point2count = function(plots,dets) {
     y[i] = min(ys) + abs(diff(range(ys))/2)
   }
   
-  #' make a data frame of it
+  # make a data frame of it
   countdf = data.frame(n=count, area=plotarea, x=x, y=y)
   # make SpatialPointsDataFrame of it
   plotcounts = SpatialPointsDataFrame(coords=data.frame(x=x,y=y),data=data.frame(n=count,area=plotarea), 

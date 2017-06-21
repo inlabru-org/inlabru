@@ -9,9 +9,9 @@ is.inside(mesh, loc, mesh.coords = NULL)
 \arguments{
 \item{mesh}{an inla.mesh object}
 
-\item{mesh.coords}{Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.}
+\item{loc}{points to query}
 
-\item{points}{points to query}
+\item{mesh.coords}{Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.}
 }
 \value{
 inside Boolean, TRUE if inside
@@ -22,4 +22,3 @@ Query if a point is inside the mesh boundary
 \author{
 Fabian E. Bachl <\email{f.e.bachl@bath.ac.uk}>
 }
-

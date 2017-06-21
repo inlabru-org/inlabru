@@ -4,14 +4,19 @@
 \alias{devel.cvmeasure}
 \title{Variance and correlations measures for prediction components}
 \usage{
-devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL)
+devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL,
+  mesh = NULL)
 }
 \arguments{
+\item{joint}{A joint prediction of two latent components}
+
 \item{prediction1}{A prediction of first component}
 
 \item{prediction2}{A prediction of the first component}
 
-\item{join}{A joint prediction of two latent components}
+\item{samplers}{A spatial object describing an area for which to compute the cummulative variance measure}
+
+\item{mesh}{The \code{inla.mesh} at for which the prediction was performed (required for cummulative Vmeasure)}
 }
 \value{
 Variance and correlations measures
@@ -21,4 +26,3 @@ Correlation
 \description{
 Variance and correlations measures for prediction components
 }
-

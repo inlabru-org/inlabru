@@ -12,13 +12,15 @@ g(covariate, map = NULL, group = NULL, model = "linear", mesh = NULL,
 
 \item{map}{A name, call or function that maps points to effect indices or locations that the model understands.}
 
+\item{group}{A name, call or function that maps the data to groups}
+
 \item{model}{See \link{f} model specifications}
 
 \item{mesh}{An \link{inla.mesh} object required for SPDE models}
 
-\item{...}{Arguments passed on to inla \link{f}}
+\item{A.msk}{A boolean vector for masking A matrix columns.}
 
-\item{A.mask}{A boolean vector for masking A matrix columns.}
+\item{...}{Arguments passed on to inla \link{f}}
 }
 \value{
 A list with mesh, model and the return value of the f-call
@@ -26,4 +28,3 @@ A list with mesh, model and the return value of the f-call
 \description{
 A wrapper for the \link{inla} \link{f} function
 }
-

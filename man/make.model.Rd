@@ -50,4 +50,3 @@ setting \code{map} in the following way:
 
 \code{y ~ myEffect(map = sin(a+b))}
 }
-

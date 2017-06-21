@@ -2,14 +2,15 @@
 % Please edit documentation in R/bru.inference.R
 \name{summary.bru}
 \alias{summary.bru}
-\title{Summarize a bru object}
+\title{Summarize a \link{bru} object}
 \usage{
-\method{summary}{bru}(result)
+\method{summary}{bru}(object, ...)
 }
 \arguments{
-\item{result}{A result object obtained from a bru() run}
+\item{object}{An object obtained from a \link{bru} or \link{lgcp} call}
+
+\item{...}{ignored arguments}
 }
 \description{
-Summarize a bru object
+Summarize a \link{bru} object
 }
-

@@ -1,13 +1,13 @@
-#' Import dsm data 
-#'
-#' Converts a dsm style data set into a \link{dsdata} object.
-#'
-#' @aliases import.dsmdata
-#' @export
-#' @param covar.col Column of the original data set to extract covariate information from
-#' @return a \link{dsdata} object
-#' @examples \dontrun{ library(dsm) ; data(mexdolphins); dset = import.dsdata(mexdolphins, covar.col = 8) }
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# Import dsm data 
+#
+# Converts a dsm style data set into a \link{dsdata} object.
+#
+# @aliases import.dsmdata
+# @export
+# @param covar.col Column of the original data set to extract covariate information from
+# @return a \link{dsdata} object
+# @examples \dontrun{ library(dsm) ; data(mexdolphins); dset = import.dsdata(mexdolphins, covar.col = 8) }
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 import.dsmdata = function(dsmdata, covar.col = NA){
   
@@ -59,16 +59,13 @@ import.dsmdata = function(dsmdata, covar.col = NA){
 
   
   # Prediction data to mesh
-  if (require(splancs)) {
     loc = as.matrix(preddata[,c("x","y")])
-    seg = inla.nonconvex.hull(loc, convex = -0.01)
-    mesh = inla.mesh.create(interior = seg, refine = list(max.edge = (min(diff(range(loc[,1])), diff(range(loc[,1])))/10)))
-  } else {
-    mesh = NULL
-  }
+    seg = INLA::inla.nonconvex.hull(loc, convex = -0.01)
+    mesh = INLA::inla.mesh.create(interior = seg, refine = list(max.edge = (min(diff(range(loc[,1])), diff(range(loc[,1])))/10)))
+
   
   
-  dset = make.dsdata(effort = newdata, mesh = mesh)
+  dset = list(effort = newdata, mesh = mesh)
   
   return(dset)
 }

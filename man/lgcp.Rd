@@ -4,37 +4,28 @@
 \alias{lgcp}
 \title{Log Gaussian Cox process (LGCP) inference using INLA}
 \usage{
-lgcp(points, samplers = NULL, model = coordinates ~ spde(model =
-  inla.spde2.matern(mesh), map = coordinates, mesh = mesh) + Intercept - 1,
-  predictor = . ~ ., mesh = NULL, run = TRUE, scale = NULL,
-  append = NULL, n = 10, offset = 0, result = NULL,
-  weights.as.offset = FALSE, ...)
+lgcp(components, data, samplers = NULL, domain = NULL, ips = NULL,
+  formula = . ~ ., E = 1, options = list())
 }
 \arguments{
-\item{points}{A data frame or SpatialPoints[DataFrame] object}
+\item{components}{A formula describing the latent components}
+
+\item{data}{A data frame or SpatialPoints[DataFrame] object}
 
 \item{samplers}{A data frame or Spatial[Points/Lines/Polygons]DataFrame objects}
 
-\item{model}{Typically a formula or a \link{model} describing the components of the LGCP density. If NULL, an intercept and a spatial SPDE component are used}
+\item{domain}{Named list of domain definitions}
 
-\item{predictor}{If NULL, the linear combination defined by the model/formula is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.}
+\item{ips}{Integration points (overrides \code{samplers})}
 
-\item{mesh}{An inla.mesh object modelling a spatial domain. If NULL and spatial data is provied the mesh is constructed from a non-convex hull of the points}
+\item{formula}{If NULL, the linear combination implied by the \code{components} is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.}
 
-\item{scale}{If provided as a scalar then rescale the exposure parameter of the Poisson likelihood. This will influence your model's intercept but can help with numerical instabilities, e.g. by setting scale to a large value like 10000}
+\item{E}{Single numeric used rescale all integration weights by a fixed factor}
 
-\item{append}{A list of functions which are evaluated for the \code{points} and the constructed integration points. The Returned values are appended to the respective data frame of points/integration points.}
-
-\item{n}{maximum number of \link{iinla} iterations}
-
-\item{offset}{the usual \link{inla} offset. If a nonline predictor is used, the resulting Taylor approximation constant will be added to this automatically.}
-
-\item{result}{An \code{iinla} object returned from previous calls of \code{bru}/\code{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
-
-\item{...}{Arguments passed on to \link{iinla}}
+\item{options}{See \link{bru.options}}
 }
 \value{
-An \link{iinla} object
+An \link{bru} object
 }
 \description{
 This function performs inference on a LGCP observed via points residing possibly multiple dimensions. 
@@ -43,10 +34,9 @@ The left hand side determines the intensity function that is assumed to drive th
 effects that lead to a thinning (filtering) of the point process. By default, the log intensity is assumed
 to be a linear combination of the effects defined by the formula's RHS. More sofisticated models, e.g.
 non-linear thinning, can be achieved by using the predictor argument. The latter requires multiple runs
-of INLA for improving the required approximation of the predictor (see \link{iinla}). In many applications
+of INLA for improving the required approximation of the predictor. In many applications
 the LGCP is only observed through subsets of the dimensions the process is living in. For example, spatial
 point realizations may only be known in sub-areas of the modeled space. These observed subsets of the LGCP
 domain are called samplers and can be provided via the respective parameter. If samplers is NULL it is
 assumed that all of the LGCP's dimensions have been observed completely.
 }
-

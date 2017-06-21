@@ -37,7 +37,7 @@ materncov.bands = function(manifold, dist, log.range,
                            log.variance=NULL, alpha=2,
                            quantile=0.95, n=64, S1.L=NULL) {
     calc.cov.R <- function(dist, kappa, var) {
-        inla.matern.cov(nu=nu, kappa, x=dist, d=d, corr=TRUE) * var
+        INLA::inla.matern.cov(nu=nu, kappa, x=dist, d=d, corr=TRUE) * var
     }
     ## Do the right thing for _nominal_ variance
     calc.cov.S1 <- function(dist, kappa, var) {
@@ -58,19 +58,20 @@ materncov.bands = function(manifold, dist, log.range,
     }
     ## Do the right thing for _nominal_ variance
     calc.cov.S2 <- function(dist, kappa, var) {
-        inla.matern.cov.s2(nu=nu, kappa, x=dist, norm.corr=FALSE) /
-            inla.matern.cov(nu=nu, kappa, x=0, d=2, corr=FALSE) * var
+        INLA::inla.matern.cov.s2(nu=nu, kappa, x=dist, norm.corr=FALSE) /
+          INLA::inla.matern.cov(nu=nu, kappa, x=0, d=2, corr=FALSE) * var
     }
     calc.corr.R <- function(dist, kappa) {
-        inla.matern.cov(nu=nu, kappa, x=dist, d=d, corr=TRUE)
+      INLA::inla.matern.cov(nu=nu, kappa, x=dist, d=d, corr=TRUE)
     }
     calc.corr.S1 <- function(dist, kappa) {
-        inla.matern.cov.s1(nu=nu, kappa, x=dist, norm.corr=FALSE) /
-            inla.matern.cov.s1(nu=nu, kappa, x=0, norm.corr=FALSE)
+      stop("Ooops, somehow inla.matern.cov.s1() is not available.")
+      # INLA::inla.matern.cov.s1(nu=nu, kappa, x=dist, norm.corr=FALSE) /
+      #   INLA::inla.matern.cov.s1(nu=nu, kappa, x=0, norm.corr=FALSE)
     }
     calc.corr.S2 <- function(dist, kappa) {
-        inla.matern.cov.s2(nu=nu, kappa, x=dist, norm.corr=FALSE) /
-        inla.matern.cov.s2(nu=nu, kappa, x=0, norm.corr=FALSE)
+      INLA::inla.matern.cov.s2(nu=nu, kappa, x=dist, norm.corr=FALSE) /
+        INLA::inla.matern.cov.s2(nu=nu, kappa, x=0, norm.corr=FALSE)
     }
     if (!is.character(manifold)) {
         if (inherits(manifold, "inla.mesh") ||
@@ -192,7 +193,7 @@ spde.posterior = function(result, name, what = "range") {
     }
 
 
-    df = data.frame(x = x, median = out$median, lq = out$lower, uq = out$upper)
+    df = data.frame(x = x, median = out$median, q0.025 = out$lower, q0.975 = out$upper)
     attr(df, "type") = "1d"
     attr(df, "misc") = list(dims = "x", predictor = c("distance", ylab))
     class(df) = list("prediction","data.frame")

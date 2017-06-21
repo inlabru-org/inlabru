@@ -1,18 +1,36 @@
 Package: inlabru
 Type: Package
-Title: Spatial inference using INLA
-Version: 1.0.2
-Date: 2017-04-04
+Title: Spatial Inference using INLA
+Version: 2.0.0
+Date: 2017-06-21
 Author: Fabian E. Bachl
 Maintainer: Fabian E. Bachl <bachlfab@gmail.com>
 Description: Inference for spatial point processes with uncertain detection.
 License: GPL (>= 2)
+Imports:
+  rgdal,
+  rgeos,
+  utils
 Suggests:
-    testthat
-Depends:
-    INLA,
+    testthat,
+    ggmap,
+    rgl,
+    sphereplot,
+    raster,
     Matrix,
+    dplyr,
+    maptools,
+    mgcv,
+    shiny,
+    spatstat,
+    RColorBrewer,
+    graphics
+Depends:
+    R (>= 2.10),
+    INLA,
+    sp,
+    stats,
+    methods,
     ggplot2,
-    RColorBrewer
 Additional_repositories: https://www.math.ntnu.no/inla/R/testing
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
