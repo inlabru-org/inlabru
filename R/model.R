@@ -155,6 +155,13 @@ make.model = function(fml) {
                         inla.spde = ge$model),
                         fchar = lb)
     
+    # For copy model extract the mesh from the model that is copied
+    if ( !is.null(smod$of) ) {
+      smod$mesh = submodel[[smod$of]]$mesh
+      smod$n = submodel[[smod$of]]$n
+      smod$inla.spde = submodel[[smod$of]]$inla.spde
+    }
+    
     # Fix label for factor effects
     if (smod$model == "factor") { lbl[[k]] = smod$label ; smod$fchar = smod$label }
     
@@ -206,6 +213,7 @@ g = function(covariate,
   map.char = as.character(substitute(map))
   group.char = as.character(substitute(group))
   A.msk.char = as.character(substitute(A.msk))
+  is.copy = !is.null(list(...)$copy)
   
   if ( length(map.char) == 0 ) { map = NULL } else { map = substitute(map) }
   if ( length(A.msk.char) == 0 ) { A.msk = NULL } else { A.msk = A.msk }
@@ -226,7 +234,7 @@ g = function(covariate,
   if ( fvals$model == "spde2" & is.null(mesh) ) { mesh = model$mesh } 
   
   # Check if n is present for models that are not fixed effects
-  if (is.null(fvals$n) & !(fvals$model == "linear") & !(fvals$model == "offset") & !(fvals$model == "factor")) {
+  if (is.null(fvals$n) & !(fvals$model == "linear") & !(fvals$model == "offset") & !(fvals$model == "factor") & !is.copy) {
     stop(sprintf("Please provide parameter 'n' for effect '%s'", label))
     }
   
