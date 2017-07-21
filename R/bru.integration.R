@@ -225,21 +225,31 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
 
 #' @title Cross product of integration points
 #'
-#' @description Calculates the dimensional cross product of integration points and multiply their weights accordingly.
+#' @description 
+#' Calculates the cross product of integration points in different dimensions
+#' and multiplies their weights accordingly. If the object defining points in a particular
+#' dimension has no weights attached to it all weights are assumend to be 1.
+#' 
 #' @aliases cprod
 #' @export
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-#' @param ... \code{data.frame} or \code{SpatialPointsDataFrame} objects
-#' @return A \code{data.frame} or \code{SpatialPointsDataFrame} object
+#' @param ... \code{data.frame} or \code{SpatialPointsDataFrame} objects, each one usually obtained by a call to the \link{ipoints} function.
+#' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of multidimensional integration points and their weights
 #' 
 #' @examples
-#' 
+#'
+#' # Create integration points in dimension 'myDim' and 'myDiscreteDim' 
 #' ips1 = ipoints(c(0,8), name = "myDim")
-#' ips2 = ipoints(as.integer(c(0,2,5)), name = "myDiscreteDim")
+#' ips2 = ipoints(as.integer(c(1,2,3)), name = "myDiscreteDim")
+#' 
+#' # Calculate the cross product
 #' ips = cprod(ips1, ips2)
-#' plot(ips$myDim) ; points(ips$myDiscreteDim, col = "red")
+#' 
+#' # Plot the integration points
+#' plot(ips$myDim, ips$myDiscreteDim, cex = 10*ips$weight)
+#' 
 
 cprod = function(...) {
   ipl = list(...)
