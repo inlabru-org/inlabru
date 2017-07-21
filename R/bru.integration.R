@@ -152,7 +152,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
       domain = inla.mesh.2d(boundary = region, max.edge = max.edge)
       domain$crs = CRS(proj4string(region))
     } else {
-      domain = stransform(domain, crs = CRS("+proj=cea +units=km"))
+      if ( !is.null(domain$crs) ) domain = stransform(domain, crs = CRS("+proj=cea +units=km"))
     }
     
     ips = int.polygon(domain, loc = polyloc[,1:2], group = polyloc[,3])

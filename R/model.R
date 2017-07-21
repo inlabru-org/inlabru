@@ -375,7 +375,12 @@ list.A.model = function(model, points){
     } else {
       
       if ( eff$map == "coordinates" ) {
-        loc = stransform(points, crs = eff$mesh$crs)
+        if ( is.na(proj4string(points)) | is.null(eff$mesh$crs) ) {
+          loc = points
+        } else {
+          loc = stransform(points, crs = eff$mesh$crs)
+        }
+        
       } else {
         loc = mapper(eff$map, points, eff)
         if ( !is.matrix(loc) & !inherits(loc,"Spatial") ) loc = as.matrix(loc)
