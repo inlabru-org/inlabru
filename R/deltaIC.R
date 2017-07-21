@@ -1,15 +1,31 @@
-#' @title Summarise DIC and WIC from \code{lgcp} objects.
+#' @title Summarise DIC and WAIC from \code{lgcp} objects.
 #'
 #' @description
 #' Calculates DIC and WAIC differences and produces an ordered summary. 
 #'
-#' @param ... Comma-separated objects of class \code{lgcp}
-#' @param criterion If 'DIC', plots DIC differences; If 'DIC', plots DIC differences.
+#' @param ... Comma-separated objects inheriting from class \code{inla} and obtained from a run of \link{inla}, \link{bru} or \link{lgcp}
+#' @param criterion If 'DIC', plots DIC differences; If 'WAIC', plots WAIC differences.
 #'
 #' @return A data frame with each row containing the model name, DIC, WAIC, deltaDIC, and
 #' deltaWAIC.
 #'  
 #' @export
+#' 
+#' @examples
+#' 
+#' # Generate some data
+#' input.df <- data.frame(x=cos(1:10))
+#' input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+#' 
+#' # Fit two models
+#' fit <- bru(y ~ x, "gaussian", input.df)
+#' fit2 <- bru(y ~ x, "Poisson", input.df)
+#' 
+#' # Compare DIC
+#' 
+#' deltaIC(fit, fit2)
+#' 
+
 deltaIC = function(...,criterion="DIC"){
   if(criterion != "DIC" & criterion != "WAIC") {
     warning("Invalid criterion argument: using DIC")
