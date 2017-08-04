@@ -1,16 +1,17 @@
-#' @title Make rectangular \code{SpatialPolygonsDataFrame}.
-#'
-#' @description
-#' Makes a rectangular \code{SpatialPolygonsDataFrame} using its bottom left coordinates, 
-#' its width and its height. 
-#'
-#' @param start Bottom left coordinates (x,y).
-#' @param width Width of base of the rectangle.
-#' @param height Height of the rectangle.
-#'
-#' @return A \code{SpatialPolygonsDataFrame}.
-#'  
-#' @export
+# @title Make rectangular \code{SpatialPolygonsDataFrame}.
+#
+# @description
+# Makes a rectangular \code{SpatialPolygonsDataFrame} using its bottom left coordinates, 
+# its width and its height. 
+#
+# @param start Bottom left coordinates (x,y).
+# @param width Width of base of the rectangle.
+# @param height Height of the rectangle.
+#
+# @return A \code{SpatialPolygonsDataFrame}.
+#  
+# @export
+
 makepoly=function(start,width,height) {
   poly=matrix(c(
     start[1],start[2],
