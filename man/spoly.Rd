@@ -2,12 +2,15 @@
 % Please edit documentation in R/bru.spatial.R
 \name{spoly}
 \alias{spoly}
-\title{Create a SpatialPolygonsDataFrame from a boundary description}
+\title{Convert a data.frame of boundary points into a SpatialPolgonsDataFrame}
 \usage{
-spoly(points, crs, to.crs = NULL)
+spoly(data, cols = colnames(data)[1:2], crs = CRS(as.character(NA)),
+  to.crs = NULL)
 }
 \arguments{
-\item{points}{A matrix or data.frame of points describing the boundary of the polygon}
+\item{data}{A data.frame of points describing the boundary of the polygon}
+
+\item{cols}{Column names of the x and y coordinates within the data}
 
 \item{crs}{Coordinate reference system of the points}
 
@@ -17,5 +20,26 @@ spoly(points, crs, to.crs = NULL)
 SpatialPolygonsDataFrame
 }
 \description{
-Create a SpatialPolygonsDataFrame from a boundary description
+A polygon can be described as a sequence of points defining the polygon's boundary.
+When given such a sequence (anti clockwise!) this function creates a 
+SpatialPolygonsDataFrame holding the polygon decribed. By default, the
+first two columns of \code{data} are assumed to define the x and y coordinates
+of the points. This behavior can ba changed using the \code{cols} parameter, which
+points out the names of the columns holding the coordinates. The coordinate
+reference system of the resulting spatial polygon can be set via the \code{crs}
+paraemter. Posterior conversion to a different CRS is supported using the
+\code{to.crs} parameter.
+}
+\examples{
+
+# Create data frame of boundary points (anti clockwise!)
+pts = data.frame(x = c(1,2,1.7,1.3),
+                 y = c(1,1,2,2))
+
+# Convert to SpatialPolygonsDataFrame
+pol = spoly(pts, crs = CRS(as.character(NA)))
+
+# Plot it!
+ggplot() + gg(pol)
+
 }

@@ -94,18 +94,42 @@ sline = function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.crs
 }
 
 
-#' Create a SpatialPolygonsDataFrame from a boundary description
+#' Convert a data.frame of boundary points into a SpatialPolgonsDataFrame
+#' 
+#' A polygon can be described as a sequence of points defining the polygon's boundary.
+#' When given such a sequence (anti clockwise!) this function creates a 
+#' SpatialPolygonsDataFrame holding the polygon decribed. By default, the
+#' first two columns of \code{data} are assumed to define the x and y coordinates
+#' of the points. This behavior can ba changed using the \code{cols} parameter, which
+#' points out the names of the columns holding the coordinates. The coordinate
+#' reference system of the resulting spatial polygon can be set via the \code{crs}
+#' paraemter. Posterior conversion to a different CRS is supported using the
+#' \code{to.crs} parameter.
 #'
 #' @aliases spoly
 #' @export
-#' @param points A matrix or data.frame of points describing the boundary of the polygon
+#' @param data A data.frame of points describing the boundary of the polygon
+#' @param cols Column names of the x and y coordinates within the data
 #' @param crs Coordinate reference system of the points
 #' @param to.crs Coordinate reference system for the SpatialLines ouput. 
 #' @return SpatialPolygonsDataFrame 
+#' 
+#' @examples 
+#' 
+#' # Create data frame of boundary points (anti clockwise!)
+#' pts = data.frame(x = c(1,2,1.7,1.3),
+#'                  y = c(1,1,2,2))
+#' 
+#' # Convert to SpatialPolygonsDataFrame
+#' pol = spoly(pts, crs = CRS(as.character(NA)))
+#' 
+#' # Plot it!
+#' ggplot() + gg(pol)
+#' 
 
-spoly = function(points, crs, to.crs = NULL) {
+spoly = function(data, cols = colnames(data)[1:2], crs = CRS(as.character(NA)), to.crs = NULL) {
   
-  po = Polygon(points, hole=FALSE)
+  po = Polygon(data[, cols], hole=FALSE)
   pos = Polygons(list(po), ID = "tmp")
   predpoly = SpatialPolygons(list(pos), proj4string = crs)
   df = data.frame(weight = 1)
@@ -118,13 +142,32 @@ spoly = function(points, crs, to.crs = NULL) {
 }
 
 
-#' Apply spTransform to all Spatial* elements of a list 
-#'
+#' Coordinate transformation for spatial objects
+#' 
+#' This is a wrapper for the \link{spTransform} function provided by the \code{sp} package.
+#' Given a spatial object (or a list thereof) it will transform the coordinate system according
+#' to the parameter \code{crs}. In addition to the usual spatial objects this function is
+#' also capables of transforming \link{inla.mesh} objects that are equipped with a coordinate
+#' system.#'
 #' @aliases stransform
 #' @export
 #' @param splist list of Spatial* objects
 #' @param crs Coordinate reference system to change to
 #' @return List of Spatial* objects
+#' 
+#' @examples
+#' 
+#' # Load Gorilla data
+#' data("gorillas", package = "inlabru")
+#' 
+#' # Take the mesh and transform it to latitude/longitude
+#' tmesh = stransform(gorillas$mesh, crs = CRS("+proj=longlat"))
+#'
+#' # Compare original and transformed mesh
+#' 
+#' multiplot(ggplot() + gg(gorillas$mesh) + ggtitle("Original mesh"),
+#'           ggplot() + gg(tmesh) + ggtitle("Transformed mesh"))
+#'           
 
 stransform = function(splist, crs) {
   if (!is.null(crs)) {
