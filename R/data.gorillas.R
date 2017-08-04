@@ -90,7 +90,7 @@ import.gorillas = function() {
   proj4string(nests) = CRS("+proj=utm +zone=32N +datum=WGS84") # from the Gorillas help file
   
   #' Turn the observation window into spatial polygon
-  boundary = spoly(points = gorillas$window$bdry, crs = CRS("+proj=utm +zone=32N +datum=WGS84"))
+  boundary = spoly(gorillas$window$bdry, crs = CRS("+proj=utm +zone=32N +datum=WGS84"))
   
   #' Build mesh
   bnd = inla.mesh.segment(loc = data.frame(gorillas$window$bdry[[1]]))
