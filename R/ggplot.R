@@ -105,10 +105,10 @@ gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", a
                             sdmax = data$mean+data$sd,
                             sdmin = data$mean-data$sd))
     
-    geom = c(geom_point(data = data, mapping = aes_string(x = "row", y = "summary", color = "row"), shape = 95, size = sz), # Fake ylab
-             geom_segment(data = data, mapping = aes_string(y = "q0.025", yend = "q0.975", x = "row", xend = "row", color = row), size = sz),
+    geom = c(geom_point(data = data, mapping = aes_string(x = "row", y = "summary", color = "row"), shape = 95, size = 0), # Fake ylab
+             geom_segment(data = data, mapping = aes_string(y = "q0.025", yend = "q0.975", x = "row", xend = "row", color = "row"), size = sz),
              geom_segment(data = data, mapping = aes_string(y = "smin", yend = "smax", x = "row", xend = "row", color = "row"), size = 1),
-             geom_segment(data = data, mapping = aes_string(y = "sdmin", yend = "sdmax", x = "row", xend = "row"), color = "black", linetype = 2, size = 1),
+             #geom_segment(data = data, mapping = aes_string(y = "sdmin", yend = "sdmax", x = "row", xend = "row"), color = "black", linetype = 2, size = 1),
              geom_point(data = data, mapping = aes_string(x = "row", y = "smax", color = "row"), shape = 95, size = 5),
              geom_point(data = data, mapping = aes_string(x = "row", y = "smin", color = "row"), shape = 95, size = 5),
              geom_point(data = data, mapping = aes_string(x = "row", y = "mean"), color = "black", shape = 95, size = sz),
