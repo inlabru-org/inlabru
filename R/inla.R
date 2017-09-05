@@ -15,6 +15,16 @@ extract.summary = function(result, property) {
     ret[[new.label]] = result$summary.hyperpar[label, property]
   }
   
+  
+  # For factors we add a data.frame with column names equivalent to the factor levels
+  fac.names = names(effect(result$model))[unlist(lapply(result$model$effects, function(e) {e$model == "factor"}) )]
+  for (name in fac.names) {
+    tmp = unlist(ret[startsWith(names(ret), name)])
+    names(tmp) = lapply(names(tmp), function(nm) {substring(nm, nchar(name)+1)})
+    ret[[name]] = tmp
+  }
+  
+  
   ret
 }
 

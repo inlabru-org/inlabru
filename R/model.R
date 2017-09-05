@@ -481,6 +481,7 @@ evaluate.model = function(model,
   if ( property == "sample") {
       smp = inla.posterior.sample.structured(result, n = n) 
   } else {
+      result$model = model
       smp = rep(list(extract.summary(result, property)), n)
   }
   
@@ -517,7 +518,7 @@ evaluate.model = function(model,
     for (label in names(sm)) { 
       if (label %in% names(effect(model)) && effect(model)[[label]]$model == "factor") {
         fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]]) 
-        sm[[label]] = as.vector(sm[[label]][fc[,1]])
+        sm[[label]] = as.vector(sm[[label]][as.data.frame(fc)[,1]])
       }
     }
     
