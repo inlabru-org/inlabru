@@ -86,13 +86,12 @@ gg.data.frame = function(...){
 #' @param data A prediction object
 #' @param mapping Set of aesthetic mappings created by \link{aes} or \link{aes_}
 #' @param ribbon If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles
-#' @param color Color of the ribbon and the line
 #' @param alpha Alpha level of the ribbon
 #' @param bar If TRUE plot boxplot-style summary for each variable
 #' @param ... Arguments passed on to \link{geom_line}
 #' @return \code{c(geom_ribbon, geom_line)}
 #' 
-gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", alpha = 0.3, bar = FALSE, ...){
+gg.prediction = function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar = FALSE, ...){
   
   if ( bar | ( nrow(data) == 1) ) {
     
@@ -137,13 +136,16 @@ gg.prediction = function(data, mapping = NULL, ribbon = TRUE, color = "black", a
                             ymin = "q0.025", 
                             ymax = "q0.975")
     
-    if ( !is.null(mapping) ) { 
-      line.map = utils::modifyList(line.map, mapping) 
-      ribbon.map = modifyList(ribbon.map, mapping) 
-    }
-    geom = geom_line(data = data, line.map, color = color, ...)
+    if ( !is.null(mapping) ) { line.map = utils::modifyList(line.map, mapping) }
+    
+    # Use line color for ribbon filling
+    if ( "colour" %in% names(line.map) ) { 
+      ribbon.map = modifyList(ribbon.map, aes_string(fill = line.map[["colour"]])) 
+      }
+    
+    geom = geom_line(data = data, line.map, ...)
     if ( ribbon ) {
-      geom = c(geom, geom_ribbon(data = data, ribbon.map, fill = color, alpha = alpha))
+      geom = c(geom, geom_ribbon(data = data, ribbon.map, alpha = alpha))
     }
   }
   geom
