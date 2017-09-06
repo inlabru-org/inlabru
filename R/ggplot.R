@@ -72,8 +72,7 @@ gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 #' @param ... Arguments passed on to \link{gg.prediction}
 #' @return c(geom_ribbon, geom_line)
 #' 
-gg.data.frame = function(...){
-}
+gg.data.frame = function(...){ gg.prediction(...) }
 
 
 #' Geom for predictions
@@ -93,29 +92,43 @@ gg.data.frame = function(...){
 #' 
 gg.prediction = function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar = FALSE, ...){
   
+  if ( all(c("0.025quant", "0.975quant") %in% names(data)) ) {
+    names(data)[names(data) == "0.975quant"] = "q0.975"
+    names(data)[names(data) == "0.025quant"] = "q0.025"
+    names(data)[names(data) == "0.5quant"] = "median"
+  }
+  lqname = "q0.025"
+  uqname = "q0.975"
+
+  
   if ( bar | ( nrow(data) == 1) ) {
     
     sz = 10 # bar width
     med_sz = 4 # median marker size
     
     data = cbind(data.frame(data), 
-                 data.frame(row = rownames(data), 
+                 data.frame(variable = rownames(data), 
                             summary = data$mean[1],
                             sdmax = data$mean+data$sd,
                             sdmin = data$mean-data$sd))
     
-    geom = c(geom_point(data = data, mapping = aes_string(x = "row", y = "summary", color = "row"), shape = 95, size = 0), # Fake ylab
-             geom_segment(data = data, mapping = aes_string(y = "q0.025", yend = "q0.975", x = "row", xend = "row", color = "row"), size = sz),
-             geom_segment(data = data, mapping = aes_string(y = "smin", yend = "smax", x = "row", xend = "row", color = "row"), size = 1),
-             #geom_segment(data = data, mapping = aes_string(y = "sdmin", yend = "sdmax", x = "row", xend = "row"), color = "black", linetype = 2, size = 1),
-             geom_point(data = data, mapping = aes_string(x = "row", y = "smax", color = "row"), shape = 95, size = 5),
-             geom_point(data = data, mapping = aes_string(x = "row", y = "smin", color = "row"), shape = 95, size = 5),
-             geom_point(data = data, mapping = aes_string(x = "row", y = "mean"), color = "black", shape = 95, size = sz),
-             geom_point(data = data, mapping = aes_string(x = "row", y = "median"), color = "black", shape = 20, size = med_sz))
+    geom = c(geom_point(data = data, mapping = aes_string(x = "variable", y = "summary", color = "variable"), shape = 95, size = 0), # Fake ylab
+             geom_segment(data = data, mapping = aes_string(y = lqname, yend = uqname, x = "variable", xend = "variable", color = "variable"), size = sz))
+    
+    # Min and max sample
+    if ( all(c("smax", "smax") %in% names(data)) ) {
+      geom = c(geom, 
+               geom_segment(data = data, mapping = aes_string(y = "smin", yend = "smax", x = "variable", xend = "variable", color = "variable"), size = 1),
+               geom_point(data = data, mapping = aes_string(x = "variable", y = "smax", color = "variable"), shape = 95, size = 5),
+               geom_point(data = data, mapping = aes_string(x = "variable", y = "smin", color = "variable"), shape = 95, size = 5))
+    }
+
+    # Mean and median       
+    geom = c(geom,       
+             geom_point(data = data, mapping = aes_string(x = "variable", y = "mean"), color = "black", shape = 95, size = sz),
+             geom_point(data = data, mapping = aes_string(x = "variable", y = "median"), color = "black", shape = 20, size = med_sz),
+             coord_flip())
              
-    
-    # geom = geom + ylab("2.5 percent quantiles and sample range")
-    
   } else {
     
     if ( "pdf" %in% names(data) ) { 
@@ -133,8 +146,8 @@ gg.prediction = function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar =
                           y = y.str)
     
     ribbon.map = aes_string(x = names(data)[1], 
-                            ymin = "q0.025", 
-                            ymax = "q0.975")
+                            ymin = lqname, 
+                            ymax = uqname)
     
     if ( !is.null(mapping) ) { line.map = utils::modifyList(line.map, mapping) }
     
