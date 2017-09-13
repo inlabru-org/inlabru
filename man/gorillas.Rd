@@ -31,7 +31,7 @@
    }
    \item{\code{plotsample}}{Plot sample of gorilla nests, sampling 9x9 over the region, with 60\% coverage. Components:
    \describe{
-     \item{\code{counts}}{ A data frame with elements \code{x}, \code{y}, \code{count}, 
+     \item{\code{counts}}{ A SpatialPointsDataFrame frame with elements \code{x}, \code{y}, \code{count}, 
      \code{exposure}, being the x- and y-coordinates of the centre of each plot, the count in each 
      plot and the area of each plot.}
      \item{\code{plots}}{ A \code{SpatialPolygonsDataFrame} defining the individual plot boundaries.}
