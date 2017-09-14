@@ -1,9 +1,9 @@
-#' Internal \link{inlabru} model structure
-#' 
-#' See \link{make.model}.
-#' 
-#' @name model
-NULL
+# Internal \link{inlabru} model structure
+# 
+# See \link{make.model}.
+# 
+# @name model
+#NULL
 
 
 ##########################################################################
@@ -21,49 +21,49 @@ list.data = function(...){UseMethod("list.data")}
 # Constructor
 ##########################################################################
 
-#' Create an inlabru \link{model} from a formula
-#' 
-#' The \link{inlabru} syntax for model forulae is different from what \link{inla} considers a valid.
-#' In inla most of the effects are defined by adding an f(...) expression to the formula. 
-#' In \link{inlabru} the f is replaced by an arbitrary (exception: 'offset') string that will
-#' determine the label of the effect. For instance
-#' 
-#' \code{y ~ f(myspde, ...)}
-#' 
-#' is equivalent to
-#' 
-#' \code{y ~ myspde(...)}
-#' 
-#' A disadvantage of the inla way is that there is no clear separation between the name of the covariate
-#' and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
-#' use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-#' \link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
-#' like the first argument of the f function, e.g.
-#' 
-#' \code{y ~ f(temperature, model = 'fixed')}
-#' 
-#' is equivalent to
-#' 
-#' \code{y ~ temperature(map = temperature, model = fixed)}
-#' as well as
-#' \code{y ~ temperature(model = fixed)}
-#' 
-#' On the other hand, map can also be a function mapping, e.g the \link{coordinates} function of the
-#' \link{sp} package :
-#' 
-#' \code{y ~ mySPDE(map = coordinates, ...)}
-#'
-#' Morevover, \code{map} can be any expression that evaluate within your data as an environment.
-#' For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'a+b' by
-#' setting \code{map} in the following way:
-#' 
-#' \code{y ~ myEffect(map = sin(a+b))} 
-#'
-#'
-#' @export
-#' @param fml A formula
-#' @return A \link{model} object
-#' 
+# Create an inlabru \link{model} from a formula
+# 
+# The \link{inlabru} syntax for model forulae is different from what \link{inla} considers a valid.
+# In inla most of the effects are defined by adding an f(...) expression to the formula. 
+# In \link{inlabru} the f is replaced by an arbitrary (exception: 'offset') string that will
+# determine the label of the effect. For instance
+# 
+# \code{y ~ f(myspde, ...)}
+# 
+# is equivalent to
+# 
+# \code{y ~ myspde(...)}
+# 
+# A disadvantage of the inla way is that there is no clear separation between the name of the covariate
+# and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
+# use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
+# \link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
+# like the first argument of the f function, e.g.
+# 
+# \code{y ~ f(temperature, model = 'fixed')}
+# 
+# is equivalent to
+# 
+# \code{y ~ temperature(map = temperature, model = fixed)}
+# as well as
+# \code{y ~ temperature(model = fixed)}
+# 
+# On the other hand, map can also be a function mapping, e.g the \link{coordinates} function of the
+# \link{sp} package :
+# 
+# \code{y ~ mySPDE(map = coordinates, ...)}
+#
+# Morevover, \code{map} can be any expression that evaluate within your data as an environment.
+# For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'a+b' by
+# setting \code{map} in the following way:
+# 
+# \code{y ~ myEffect(map = sin(a+b))} 
+#
+#
+# @export
+# @param fml A formula
+# @return A \link{model} object
+# 
 
 make.model = function(fml) {
   submodel = list()
@@ -118,7 +118,11 @@ make.model = function(fml) {
     lb = lbl[[k]]
 
     # Call g()
-    ge = eval(parse(text = lb), envir = environment(fml))
+    # We have to add g() to the environment because it is not exported by inlabru and
+    # therefore note visible within the parent environment.
+    env = environment(fml)
+    env$g = g
+    ge = eval(parse(text = lb), envir = env)
 
     # Replace function name by INLA f function
     if ( substr(lb,1,2) == "g(" ) { lb = paste0("f(", substr(lb, 3, nchar(lb)))}
@@ -189,18 +193,18 @@ make.model = function(fml) {
 }
 
 
-#' A wrapper for the \link{inla} \link{f} function
-#' 
-#' @aliases g
-#' @export
-#' @param covariate A string defining the label of the INLA effect. If \code{map} is provided this also sets the coariate used as a first argument to the \link{f} call.
-#' @param map A name, call or function that maps points to effect indices or locations that the model understands.
-#' @param group A name, call or function that maps the data to groups
-#' @param model See \link{f} model specifications
-#' @param mesh An \link{inla.mesh} object required for SPDE models
-#' @param A.msk A boolean vector for masking A matrix columns. 
-#' @param ... Arguments passed on to inla \link{f}
-#' @return A list with mesh, model and the return value of the f-call
+# A wrapper for the \link{inla} \link{f} function
+# 
+# @aliases g
+# @export
+# @param covariate A string defining the label of the INLA effect. If \code{map} is provided this also sets the coariate used as a first argument to the \link{f} call.
+# @param map A name, call or function that maps points to effect indices or locations that the model understands.
+# @param group A name, call or function that maps the data to groups
+# @param model See \link{f} model specifications
+# @param mesh An \link{inla.mesh} object required for SPDE models
+# @param A.msk A boolean vector for masking A matrix columns. 
+# @param ... Arguments passed on to inla \link{f}
+# @return A list with mesh, model and the return value of the f-call
 
 g = function(covariate, 
              map = NULL,

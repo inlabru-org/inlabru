@@ -588,14 +588,14 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.
 }  
 
 
-#' Summarize and annotate data
-#' 
-#' @aliases summarize
-#' @export
-#' @param data A list of samples, each either numeric or a \code{data.frame}
-#' @param x A \code{data.frame} of data columns that should be added to the summary data frame
-#' @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
-#' @return A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
+# Summarize and annotate data
+# 
+# @aliases summarize
+# @export
+# @param data A list of samples, each either numeric or a \code{data.frame}
+# @param x A \code{data.frame} of data columns that should be added to the summary data frame
+# @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
+# @return A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
 
 summarize = function(data, x = NULL, cbind.only = FALSE) {
   if ( is.list(data) ) { data = do.call(cbind, data) }
