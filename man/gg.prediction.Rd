@@ -4,8 +4,8 @@
 \alias{gg.prediction}
 \title{Geom for predictions}
 \usage{
-\method{gg}{prediction}(data, mapping = NULL, ribbon = TRUE,
-  color = "black", alpha = 0.3, bar = FALSE, ...)
+\method{gg}{prediction}(data, mapping = NULL, ribbon = TRUE, alpha = 0.3,
+  bar = FALSE, ...)
 }
 \arguments{
 \item{data}{A prediction object}
@@ -13,8 +13,6 @@
 \item{mapping}{Set of aesthetic mappings created by \link{aes} or \link{aes_}}
 
 \item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles}
-
-\item{color}{Color of the ribbon and the line}
 
 \item{alpha}{Alpha level of the ribbon}
 
