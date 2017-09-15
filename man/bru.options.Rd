@@ -30,6 +30,19 @@ bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
 \description{
 Additional \link{bru} options
 }
+\examples{
+
+\dontrun{
+
+# Generate default bru options
+opts = bru.options()
+
+# Print them:
+pts
+
+}
+
+}
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }

@@ -224,7 +224,18 @@ stackmaker.like = function(lhood) {
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-
+#' @examples
+#' 
+#' \dontrun{
+#' 
+#' # Generate default bru options
+#' opts = bru.options()
+#'
+#' # Print them:
+#' pts
+#' 
+#' }
+#' 
 bru.options = function(mesh = NULL, 
                        run = TRUE,
                        max.iter = 10,
@@ -273,6 +284,47 @@ bru.options = function(mesh = NULL,
 #' @param E Single numeric used rescale all integration weights by a fixed factor 
 #' @param options See \link{bru.options}
 #' @return An \link{bru} object
+#' @examples
+#' 
+#' \dontrun{
+#' 
+#' Load the Gorilla data
+#' data(gorillas)
+#' 
+#' # Use tutorial setting and thus empirical Bayes for faster inference
+#' init.tutorial()
+#' 
+#' # Plot the Gorilla nests, the mesh and the survey boundary
+#' ggplot() + 
+#'   gg(gorillas$mesh) + 
+#'   gg(gorillas$nests) + 
+#'   gg(gorillas$boundary) + 
+#'   coord_fixed()
+#' 
+#' # Define SPDE prior
+#' matern <- inla.spde2.pcmatern(gorillas$mesh, 
+#'                               prior.sigma = c(0.1, 0.01), 
+#'                               prior.range = c(5, 0.01))
+#' 
+#' # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
+#' cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+#' 
+#' # Fit the model
+#' fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+#' 
+#' # Predict the spatial intensity surface
+#' lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+#' 
+#' # Plot the intensity
+#' ggplot() + 
+#'   gg(lambda) +
+#'   gg(gorillas$mesh) + 
+#'   gg(gorillas$nests) + 
+#'   gg(gorillas$boundary) + 
+#'   coord_fixed()
+#' 
+#' }
+#' 
 
 lgcp = function(components,
                 data,

@@ -17,3 +17,19 @@ a gg object
 \description{
 Plot bru effects
 }
+\examples{
+
+\dontrun{
+
+# Generate some data and fit a simple model
+input.df <- data.frame(x=cos(1:10))
+input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+fit <- bru(y ~ x, "gaussian", input.df)
+summary(fit)
+
+# Plot the posterior of the model's x-effect
+plot(fit, "x")
+
+}
+
+}

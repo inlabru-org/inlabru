@@ -1,12 +1,28 @@
 #' Plot a map using extend of a spatial object
 #' 
+#' Uses \link{get_map} to query map services like Google Maps for a region centered around
+#' the spatial object provided. Then calls \link{ggmap} to plot the map.
+#' 
 #' @aliases gmap
 #' @name gmap
 #' @export
 #' @param data A Spatial* object
 #' @param ... Arguments passed on to get_map
-#' @return A ggmap
+#' @return a ggplot object
 #' 
+#' @examples
+#' 
+#' \dontrun{
+#' 
+#' # Load the Gorilla data
+#' data(gorillas)
+#' 
+#' # Create a base map centered around the nests and plot the boundary as well as the nests
+#' gmap(gorillas$nests, maptype = "satellite") + 
+#'      gm(gorillas$boundary) + 
+#'      gm(gorillas$nests, color = "white", size = 0.5)
+#' 
+#' }
 gmap = function(data, ...) {
   data = spTransform(data, CRS("+proj=longlat"))
   df = cbind(coordinates(data), data@data)
@@ -460,6 +476,23 @@ gg.RasterLayer = function(r, ...) {
 #' @param x a \link{bru} object
 #' @param ... A character naming the effect to plot
 #' @return a gg object
+#' 
+#' 
+#' @examples
+#' 
+#' \dontrun{
+#' 
+#' # Generate some data and fit a simple model
+#' input.df <- data.frame(x=cos(1:10))
+#' input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+#' fit <- bru(y ~ x, "gaussian", input.df)
+#' summary(fit)
+#' 
+#' # Plot the posterior of the model's x-effect
+#' plot(fit, "x")
+#' 
+#' }
+#' 
 
 plot.bru = function(x, ...) {
   plotmarginal.inla(x, ...)
