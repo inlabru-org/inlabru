@@ -87,6 +87,8 @@ gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 
 #' Geom for data.frame
 #' 
+#' This geom constructor will simply call gg.prediction for the data provided.
+#' 
 #' @name gg.data.frame
 #' @export
 #' @import ggplot2
@@ -94,6 +96,7 @@ gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 #' @param ... Arguments passed on to \link{gg.prediction}
 #' @return c(geom_ribbon, geom_line)
 #' @family geomes for inla and inlabru predictions
+#' @example inst/examples/gg.prediction.R
 
 gg.data.frame = function(...){ gg.prediction(...) }
 
@@ -113,6 +116,8 @@ gg.data.frame = function(...){ gg.prediction(...) }
 #' @param ... Arguments passed on to \link{geom_line}
 #' @return \code{c(geom_ribbon, geom_line)}
 #' @family geomes for inla and inlabru predictions
+#' @examples For spatial examples see the documentation of \link{lgcp}
+#' @example inst/examples/gg.prediction.R
 
 gg.prediction = function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar = FALSE, ...){
   
@@ -559,6 +564,8 @@ plot.bru = function(x, ...) {
 
 #' Plot predction using ggplot2
 #' 
+#' Generates a base ggplot2 and adds a geom for x using \link{gg}
+#' 
 #' @export
 #' @method plot prediction
 #' @import ggplot2
@@ -566,6 +573,7 @@ plot.bru = function(x, ...) {
 #' @param y a mapping created by \link{aes} or \link{aes_string}
 #' @param ... Arguments passed on to \link{gg.prediction}
 #' @return a gg object
+#' @example inst/examples/gg.prediction.R
 
 plot.prediction = function(x, y = NULL, ...) {
   ggplot() + gg(x, mapping = y, ...)
