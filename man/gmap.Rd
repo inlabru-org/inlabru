@@ -19,16 +19,12 @@ Uses \link{get_map} to query map services like Google Maps for a region centered
 the spatial object provided. Then calls \link{ggmap} to plot the map.
 }
 \examples{
-
-\dontrun{
-
 # Load the Gorilla data
 data(gorillas)
-
+ 
 # Create a base map centered around the nests and plot the boundary as well as the nests
 gmap(gorillas$nests, maptype = "satellite") + 
-     gm(gorillas$boundary) + 
-     gm(gorillas$nests, color = "white", size = 0.5)
-
-}
+    gm(gorillas$boundary) + 
+    gm(gorillas$nests, color = "white", size = 0.5)
+ 
 }

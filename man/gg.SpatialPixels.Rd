@@ -4,10 +4,10 @@
 \alias{gg.SpatialPixels}
 \title{Plot SpatialPixels using ggplot2}
 \usage{
-\method{gg}{SpatialPixels}(sgdf, ...)
+\method{gg}{SpatialPixels}(data, ...)
 }
 \arguments{
-\item{sgdf}{A SpatialPixels object}
+\item{data}{A SpatialPixels object}
 
 \item{...}{Arguments passed on to \link{geom_tile}}
 }
@@ -16,4 +16,24 @@ A ggplot2 object
 }
 \description{
 Plot SpatialPixels using ggplot2
+}
+\examples{
+
+# Load Gorilla data
+
+data(gorillas)
+
+# Turn elevation covariate into SpatialPixels
+pxl = SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
+
+# Plot the pixel centers
+ggplot() + gg(pxl, size = 0.1)
+}
+\seealso{
+Other geomes for spatial data: \code{\link{gg.SpatialGrid}},
+  \code{\link{gg.SpatialLines}},
+  \code{\link{gg.SpatialPixelsDataFrame}},
+  \code{\link{gg.SpatialPoints}},
+  \code{\link{gg.SpatialPolygons}}, \code{\link{gg}},
+  \code{\link{gm}}
 }

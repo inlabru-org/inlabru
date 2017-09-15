@@ -4,10 +4,10 @@
 \alias{gg.SpatialGrid}
 \title{Plot SpatialGrid using ggplot2}
 \usage{
-\method{gg}{SpatialGrid}(sgdf, fill = names(sgdf)[[1]], ...)
+\method{gg}{SpatialGrid}(data, fill = names(data)[[1]], ...)
 }
 \arguments{
-\item{sgdf}{A SpatialGrid object}
+\item{data}{A SpatialGrid object}
 
 \item{fill}{Character identifying the data column used for plotting}
 
@@ -18,4 +18,58 @@ A ggplot2 object
 }
 \description{
 Plot SpatialGrid using ggplot2
+}
+\examples{
+# Load Gorilla data
+
+data("gorillas")
+
+# Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame. 
+# The same syntax applies to SpatialGridDataFrame objects.
+
+ggplot() + gg(gorillas$gcov$elevation)
+
+# Add Gorilla survey boundary and nest sightings
+
+ggplot() + 
+  gg(gorillas$gcov$elevation) + 
+  gg(gorillas$boundary) +
+  gg(gorillas$nests)
+
+# Load pantropical dolphin data
+
+data("mexdolphin")
+
+# Plot the pantropiical survey boundary, ship transects and dolphin sightings
+
+ggplot() + 
+  gg(mexdolphin$ppoly) + # survey boundary as SpatialPolygon
+  gg(mexdolphin$samplers) + # ship transects as SpatialLines
+  gg(mexdolphin$points)  # dolphin sightings as SpatialPoints
+
+# Change color
+
+ggplot() + 
+  gg(mexdolphin$ppoly, color = "green") + # survey boundary as SpatialPolygon
+  gg(mexdolphin$samplers, color = "red") + # ship transects as SpatialLines
+  gg(mexdolphin$points, color = "blue")  # dolphin sightings as SpatialPoints
+
+
+# Visualize data annotations: line width by segment number
+
+names(mexdolphin$samplers) # 'seg' holds the segment number
+ggplot() + gg(mexdolphin$samplers, aes(color = seg))
+
+# Visualize data annotations: point size by dolphin group size
+
+names(mexdolphin$points) # 'size' holds the group size
+ggplot() + gg(mexdolphin$points, aes(size = size))
+}
+\seealso{
+Other geomes for spatial data: \code{\link{gg.SpatialLines}},
+  \code{\link{gg.SpatialPixelsDataFrame}},
+  \code{\link{gg.SpatialPixels}},
+  \code{\link{gg.SpatialPoints}},
+  \code{\link{gg.SpatialPolygons}}, \code{\link{gg}},
+  \code{\link{gm}}
 }

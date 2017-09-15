@@ -17,3 +17,20 @@ geom_tile
 \description{
 Plot RasterLayer using ggplot2
 }
+\examples{
+
+# Load Gorilla data
+data("gorillas")
+
+# Convert elevation covariate to RasterLayer
+
+elev = as(gorillas.extra$elevation, "RasterLayer")
+
+# Plot the elevation
+
+ggplot() + gg(elev)
+}
+\seealso{
+Other geomes for Raster data: \code{\link{gg}},
+  \code{\link{gm}}
+}

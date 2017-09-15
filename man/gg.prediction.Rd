@@ -26,3 +26,7 @@
 \description{
 Geom for predictions
 }
+\seealso{
+Other geomes for inla and inlabru predictions: \code{\link{gg.data.frame}},
+  \code{\link{gg}}, \code{\link{gm}}
+}

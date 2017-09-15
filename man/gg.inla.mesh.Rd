@@ -4,13 +4,13 @@
 \alias{gg.inla.mesh}
 \title{Plot inla.mesh using ggplot2}
 \usage{
-\method{gg}{inla.mesh}(mesh, color = NULL, alpha = NULL,
+\method{gg}{inla.mesh}(data, color = NULL, alpha = NULL,
   edge.color = "grey", interior = TRUE, int.color = "blue",
   exterior = TRUE, ext.color = "black", crs = NULL, mask = NULL,
   nx = 500, ny = 500, ...)
 }
 \arguments{
-\item{mesh}{An \link{inla.mesh} object}
+\item{data}{An \link{inla.mesh} object}
 
 \item{color}{A vector of scalar values to fill the mesh with colors. The length of the vector mus correspond to the number of mesh vertices.}
 
@@ -41,4 +41,41 @@ geom_polygon or geom_segment
 }
 \description{
 Plot inla.mesh using ggplot2
+}
+\examples{
+# Load Gorilla data
+data("gorillas")
+
+# Plot mesh using default edge colors
+
+ggplot() + gg(gorillas$mesh)
+
+# Don't show interior and exterior boundaries
+
+ggplot() + gg(gorillas$mesh, interior = FALSE, exterior = FALSE)
+
+# Change the edge colors
+
+ggplot() + gg(gorillas$mesh, 
+              edge.color = "green",
+              int.color = "black",
+              ext.color = "blue"
+              )
+
+# Use the x-coordinate of the vertices to colorize the triangles
+
+xcoord = gorillas$mesh$loc[,1]
+ggplot() + 
+  gg(gorillas$mesh, color = (xcoord-580)) +
+  gg(gorillas$boundary)
+
+# Mask the colorized area by the survey boundary, i.e. only plot the inside
+
+ggplot() + 
+  gg(gorillas$mesh, color = (xcoord-580), mask = gorillas$boundary) +
+  gg(gorillas$boundary)
+}
+\seealso{
+Other geomes for meshes: \code{\link{gg.inla.mesh.1d}},
+  \code{\link{gg}}, \code{\link{gm}}
 }

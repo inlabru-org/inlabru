@@ -4,10 +4,10 @@
 \alias{gg.inla.mesh.1d}
 \title{Plot inla.mesh.1d using ggplot2}
 \usage{
-\method{gg}{inla.mesh.1d}(mesh, y = 0, shape = 4, ...)
+\method{gg}{inla.mesh.1d}(data, y = 0, shape = 4, ...)
 }
 \arguments{
-\item{mesh}{An inla.mesh.1d object}
+\item{data}{An inla.mesh.1d object}
 
 \item{y}{Single numeric defining the y-coordinates of the mesh knots to plot}
 
@@ -20,4 +20,22 @@ geom_point
 }
 \description{
 Plot inla.mesh.1d using ggplot2
+}
+\examples{
+
+# Create a 1D mesh
+
+mesh = inla.mesh.1d(seq(0,10,by=0.5))
+
+# Plot it
+
+ggplot() + gg(mesh)
+
+# Plot it using a different shape and size for the mesh nodes
+
+ggplot() + gg(mesh, shape = "|", size = 5)
+}
+\seealso{
+Other geomes for meshes: \code{\link{gg.inla.mesh}},
+  \code{\link{gg}}, \code{\link{gm}}
 }

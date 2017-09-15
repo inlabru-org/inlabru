@@ -17,3 +17,7 @@ c(geom_ribbon, geom_line)
 \description{
 Geom for data.frame
 }
+\seealso{
+Other geomes for inla and inlabru predictions: \code{\link{gg.prediction}},
+  \code{\link{gg}}, \code{\link{gm}}
+}
