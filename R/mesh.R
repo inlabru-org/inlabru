@@ -65,13 +65,29 @@ ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = "black") {
 #'
 #' @aliases is.inside
 #' @export
-#' @param mesh an inla.mesh object
-#' @param loc points to query
+#' @param mesh an inla.mesh object.
+#' @param loc Points in space stored either as data.frame, a two-column matrix of x and y coordinates or a SpatialPoints object.
 #' @param mesh.coords Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.
-#' @return inside Boolean, TRUE if inside
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#' @return Single column matrix of Boolean values indicating if a point is inside the mesh.
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+#' @examples 
+#' 
+#' # Load Gorilla data
+#' 
+#' data("gorillas")
+#' 
+#' # Check if all Gorilla nests are inside the mesh
+#' 
+#' all(is.inside(gorillas$mesh, gorillas$nests))
+#' 
+#' # Also works for locations not stored as SpatialPoints object
+#' 
+#' loc = coordinates(gorillas$nests)
+#' all(is.inside(gorillas$mesh, loc))
 
 is.inside = function(mesh, loc, mesh.coords = NULL) {
+  if ( inherits(loc, "Spatial") ) { loc = coordinates(loc) }
   if (!is.null(mesh.coords) & is.data.frame(loc)) { loc = as.matrix(loc[,mesh.coords,drop=FALSE])}
   p2m = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=loc)
   return(!(p2m$p2m.t == 0))
