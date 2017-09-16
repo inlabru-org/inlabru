@@ -1,3 +1,4 @@
+\dontrun{
 # Load the Gorilla data
 
 data(gorillas)
@@ -87,3 +88,5 @@ mySmooth = predict(fit, pxl, ~ mySmooth)
 
 head(mySmooth)
 ggplot() + gg(mySmooth)
+}
+

@@ -15,8 +15,8 @@ gmap(data, ...)
 a ggplot object
 }
 \description{
-Uses \link{get_map} to query map services like Google Maps for a region centered around
-the spatial object provided. Then calls \link{ggmap} to plot the map.
+Uses get_map() to query map services like Google Maps for a region centered around
+the spatial object provided. Then calls ggmap() to plot the map.
 }
 \examples{
 # Load the Gorilla data

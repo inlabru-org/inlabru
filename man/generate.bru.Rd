@@ -4,7 +4,7 @@
 \alias{generate.bru}
 \title{Sampling based on bru posteriors}
 \usage{
-\method{generate}{bru}(object, data, formula = NULL, n.samples = 100)
+\method{generate}{bru}(object, data, formula = NULL, n.samples = 100, ...)
 }
 \arguments{
 \item{object}{An object obtained by calling \link{bru})}
@@ -14,6 +14,8 @@
 \item{formula}{A formula determining which effects to predict and how to combine them}
 
 \item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.}
+
+\item{...}{ignored arguments (needed for S3 compatibility).}
 }
 \value{
 Predicted values
@@ -36,17 +38,17 @@ summary(fit)
 # Generate samples for some predefined x
 
 df = data.frame(x = seq(-4, 4, by = 0.1))
-smp = generate.bru(fit, df, ~ xeff + Intercept, n.samples = 10)
+smp = generate(fit, df, ~ xeff + Intercept, n.samples = 10)
 
 # Plot the resulting realizations
 
 plot(df$x, smp[[1]], type = "l")
-for (k in 2:100) points(df$x, smp[[k]], type = "l")
+for (k in 2:length(smp)) points(df$x, smp[[k]], type = "l")
 
 # We can also draw samples form the joint posterior
 
 df = data.frame(x = 1)
-smp = generate.bru(fit, df, ~ data.frame(xeff, Intercept), n.samples = 100)
+smp = generate(fit, df, ~ data.frame(xeff, Intercept), n.samples = 100)
 smp[[1]]
 
 # ... and plot them

@@ -27,7 +27,6 @@
 Geom for predictions
 }
 \examples{
-For spatial examples see the documentation of \\link{lgcp}
 
 # Generate some data
 

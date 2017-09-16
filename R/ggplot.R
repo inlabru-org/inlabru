@@ -1,7 +1,7 @@
 #' Plot a map using extend of a spatial object
 #' 
-#' Uses \link{get_map} to query map services like Google Maps for a region centered around
-#' the spatial object provided. Then calls \link{ggmap} to plot the map.
+#' Uses get_map() to query map services like Google Maps for a region centered around
+#' the spatial object provided. Then calls ggmap() to plot the map.
 #' 
 #' @aliases gmap
 #' @name gmap
@@ -116,7 +116,6 @@ gg.data.frame = function(...){ gg.prediction(...) }
 #' @param ... Arguments passed on to \link{geom_line}
 #' @return \code{c(geom_ribbon, geom_line)}
 #' @family geomes for inla and inlabru predictions
-#' @examples For spatial examples see the documentation of \link{lgcp}
 #' @example inst/examples/gg.prediction.R
 
 gg.prediction = function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar = FALSE, ...){
@@ -504,7 +503,7 @@ gg.inla.mesh.1d = function(data, y = 0, shape = 4, ...) {
 #' @name gg.RasterLayer
 #' @export
 #' @import ggplot2
-#' @param r A RasterLayer object
+#' @param data A RasterLayer object
 #' @param ... Arguments passed on to \link{geom_tile}
 #' @return geom_tile
 #' @family geomes for Raster data 
@@ -512,20 +511,21 @@ gg.inla.mesh.1d = function(data, y = 0, shape = 4, ...) {
 #' @examples
 #' 
 #' # Load Gorilla data
-#' data("gorillas")
+#' data("gorillas", package = "spatstat")
 #' 
 #' # Convert elevation covariate to RasterLayer
 #'
+#' library(raster)
 #' elev = as(gorillas.extra$elevation, "RasterLayer")
 #'
 #' # Plot the elevation
 #'
 #' ggplot() + gg(elev)
 
-gg.RasterLayer = function(r, ...) {
+gg.RasterLayer = function(data, ...) {
   
   requireNamespace("raster")
-  spdf <- as(r, "SpatialPixelsDataFrame")
+  spdf <- as(data, "SpatialPixelsDataFrame")
   df <- as.data.frame(spdf)
   # head(r.df)
   # g <- ggplot(r.df, aes(x=x, y=y)) + geom_tile(aes(fill = layer)) + coord_equal()

@@ -74,7 +74,7 @@ lik2 = like("poisson", formula = y ~ x + z + Intercept, data = df2)
 jcmp = y ~ x + z + Intercept
 jfit = bru(jcmp, lik1, lik2)
 
-# Lets compare the estimates
+# Compare the estimates
 
 p1 = ggplot() + gg(fit1$summary.fixed, bar = TRUE) + ylim(0, 4) + ggtitle("Model 1")
 p2 = ggplot() + gg(fit2$summary.fixed, bar = TRUE) + ylim(0, 4) + ggtitle("Model 2")

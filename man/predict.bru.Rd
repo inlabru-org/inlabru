@@ -35,6 +35,7 @@ value drawn in course of estimating the statistics.
 Internally, this method calls \link{generate.bru} in order to draw samples from the model.
 }
 \examples{
+\dontrun{
 # Load the Gorilla data
 
 data(gorillas)
@@ -124,4 +125,6 @@ mySmooth = predict(fit, pxl, ~ mySmooth)
 
 head(mySmooth)
 ggplot() + gg(mySmooth)
+}
+
 }

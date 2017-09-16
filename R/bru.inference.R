@@ -1,5 +1,16 @@
-# GENERICS
-generate = function(...){UseMethod("generate")}
+#' Generate samples
+#' 
+#' @description 
+#' NONE
+#'
+#' @name generate
+#' @export
+#' @param object a fitted model
+#' @param ... additional arguments affecting the samples produced.
+#' @return The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
+#' @example inst/examples/generate.bru.R
+
+generate = function(object, ...){ UseMethod("generate") }
 
 #' @title Convenient model fitting using (iterated) INLA
 #'
@@ -538,14 +549,16 @@ predict.bru = function(object,
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
 #' @param formula A formula determining which effects to predict and how to combine them
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
+#' @param ... ignored arguments (needed for S3 compatibility).
 #' 
 #' @return Predicted values
-#' @example /inst/examples/generate.bru.R
+#' @example inst/examples/generate.bru.R
 
 generate.bru = function(object,
                        data,
                        formula = NULL,
-                       n.samples = 100)
+                       n.samples = 100,
+                       ...)
 {
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if ( is.character(data) ) { data = as.list(setNames(data, data)) }

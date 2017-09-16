@@ -4,10 +4,10 @@
 \alias{gg.RasterLayer}
 \title{Plot RasterLayer using ggplot2}
 \usage{
-\method{gg}{RasterLayer}(r, ...)
+\method{gg}{RasterLayer}(data, ...)
 }
 \arguments{
-\item{r}{A RasterLayer object}
+\item{data}{A RasterLayer object}
 
 \item{...}{Arguments passed on to \link{geom_tile}}
 }
@@ -20,10 +20,11 @@ Plot RasterLayer using ggplot2
 \examples{
 
 # Load Gorilla data
-data("gorillas")
+data("gorillas", package = "spatstat")
 
 # Convert elevation covariate to RasterLayer
 
+library(raster)
 elev = as(gorillas.extra$elevation, "RasterLayer")
 
 # Plot the elevation
