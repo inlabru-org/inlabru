@@ -458,17 +458,29 @@ summary.bru = function(object, ...) {
 
 }
 
-#' Predictions based on bru
+#' Prediction from fitted bru model
+#' 
+#' Takes a fitted \code{bru} object produced by the function \link{bru}() and produces predictions given 
+#' a new set of values for the model covariates or the original values used for the model fit. The
+#' predictions can be based on any R expression that is valid given these values/covariates and the 
+#' posterior of the estimated effects.
+#'  
+#' Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
+#' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
+#' value drawn in course of estimating the statistics.
+#' 
+#' Internally, this method calls \link{generate.bru} in order to draw samples from the model.
 #' 
 #' @aliases predict.bru
 #' @export
-#' @param object An object obtained by calling \link{bru})
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
-#' @param formula A formula determining which effects to predict and how to combine them
+#' @param object An object obtained by calling \link{bru} or \link{lgcp}.
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction.
+#' @param formula A formula determining which effects to predict and how to combine them.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
-#' @param ... ignored arguments (S3 generic compatibility)
+#' @param ... ignored arguments (S3 generic compatibility).
 #' 
-#' @return Predicted values
+#' @return a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
+#' @example inst/examples/predict.bru.R
 
 predict.bru = function(object,
                        data = NULL,
