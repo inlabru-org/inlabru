@@ -114,14 +114,18 @@ bru = function(components = y ~ Intercept,
 #' 
 #' @param family A character identifying a valid \link{inla} likelihood. Alternatively 'cp' for Cox processes.
 #' @param formula a \link{formula} where the right hand side expression defines the predictor used in the optimization.
-#' @param data Likelihood-specific data
-#' @param components Components
-#' @param mesh An inla.mesh object
+#' @param data Likelihood-specific data.
+#' @param components Components.
+#' @param mesh An inla.mesh object.
 #' @param E Exposure parameter for family = 'poisson' passed on to \link{inla}. Special case if family is 'cp': rescale all integration weights by E.
-#' @param samplers Integration domain for 'cp' family
-#' @param ips Integration points for 'cp' family. Overrides \code{samplers}
-#' @param domain Named list of domain definitions
+#' @param samplers Integration domain for 'cp' family.
+#' @param ips Integration points for 'cp' family. Overrides \code{samplers}.
+#' @param domain Named list of domain definitions.
 #' 
+#' @return A likelihood configuration which can be used to parameterize \link{bru}.
+#' 
+#' @example inst/examples/like.R
+
 like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = NULL, E = 1, samplers = NULL, ips = NULL, domain = NULL) {
   
   # Some defaults
@@ -134,12 +138,12 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
   if ( !linear ) { expr = parse(text = as.character(formula)[length(as.character(formula))]) }
   else { expr = NULL }
   
-  #' Set response name
+  # Set response name
   response = all.vars(update(formula, .~0))
   if (response[1] == ".") response = NULL
   
   
-  #' More on special bru likelihoods
+  # More on special bru likelihoods
   if ( family == "cp" ) {
     if ( is.null(data) ) { stop("You called like() with family='cp' but no 'data' argument was supplied.") }
     #if ( is.null(samplers) ) { stop("You called like() with family='cp' but no 'samplers' argument was supplied.") }
