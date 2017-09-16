@@ -524,6 +524,7 @@ predict.bru = function(object,
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
 #' 
 #' @return Predicted values
+#' @example /inst/examples/generate.bru.R
 
 generate.bru = function(object,
                        data,
