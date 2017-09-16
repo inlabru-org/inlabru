@@ -161,6 +161,7 @@ materncov.bands = function(manifold, dist, log.range,
 #' @return A posterior
 #'  
 #' @export
+#' @example inst/examples/spde.posterior.R
 
 spde.posterior = function(result, name, what = "range") {
   spdespec = result$sppa$model$effects[[name]]$inla.spde
