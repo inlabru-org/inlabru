@@ -19,3 +19,18 @@ A spatstat \code{spatstat} \code{ppp} object
 \description{
 Convert SpatialPoints and boundary polygon to  spatstat ppp object
 }
+\examples{
+
+# Load Gorilla data
+
+data("gorillas")
+
+# Use nest locations and survey boundary to create a spatstat ppp object
+
+gp <- spatial.to.ppp(gorillas$nests, gorillas$boundary)
+class(gp)
+
+# Plot it
+
+plot(gp)
+}
