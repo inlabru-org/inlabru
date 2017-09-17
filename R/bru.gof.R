@@ -135,6 +135,8 @@ bincount = function(result, predictor, observations, breaks, nint = 20, probs = 
 #' @param samplers A spatial object describing an area for which to compute the cummulative variance measure
 #' @param mesh The \code{inla.mesh} at for which the prediction was performed (required for cummulative Vmeasure)
 #' @return Variance and correlations measures
+#' 
+#' @examples inst/examples/devel.cvmeasure.R
 
 devel.cvmeasure = function(joint, prediction1, prediction2, samplers = NULL, mesh = NULL) {
 

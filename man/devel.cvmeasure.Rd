@@ -20,9 +20,12 @@ devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL,
 }
 \value{
 Variance and correlations measures
-Covariance
-Correlation
 }
 \description{
 Variance and correlations measures for prediction components
+}
+\examples{
+inst/examples/devel.cvmeasure.R
+Covariance
+Correlation
 }
