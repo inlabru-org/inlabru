@@ -17,7 +17,7 @@
 }
 \description{
 This function transforms the mesh to 3D cartesian coordinates and uses 
-\link{inla.plot.mesh} with \code{rgl=TRUE} to plot the result.
+inla.plot.mesh() with \code{rgl=TRUE} to plot the result.
 }
 \examples{
 # Load rgl library (needed due to a bug in sphereplot library)

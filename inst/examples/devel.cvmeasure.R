@@ -1,5 +1,4 @@
 \dontrun{
-
 # Load Gorilla data
 
 data("gorillas")
@@ -13,8 +12,8 @@ library(RColorBrewer)
 # 2) A spatial covariate effect (vegetation)
 
 pcmatern <- inla.spde2.pcmatern(gorillas$mesh, 
-                                  prior.sigma = c(0.1, 0.01), 
-                                  prior.range = c(5, 0.01))
+                                prior.sigma = c(0.1, 0.01), 
+                                prior.range = c(5, 0.01))
 
 cmp <- coordinates ~ vegetation(map = gorillas$gcov$vegetation, model = "factor") +
   spde(map = coordinates, model = pcmatern, mesh = gorillas$mesh) -
@@ -81,8 +80,9 @@ ggplot() + gg(gorillas$mesh, color = vm$cor)
 # Variance and correlation integrated over space
 
 vm.int <- devel.cvmeasure(joint, field, veg, 
-                              samplers = ipoints(gorillas$boundary, gorillas$mesh),
-                              mesh = gorillas$mesh)
+                          samplers = ipoints(gorillas$boundary, gorillas$mesh),
+                          mesh = gorillas$mesh)
 vm.int
+
 }
 

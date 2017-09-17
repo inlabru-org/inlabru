@@ -70,7 +70,7 @@ NULL
 #' Gorilla data import
 #'
 #' @aliases import.gorillas
-#' @export
+#' @keywords internal
 #' @importFrom utils data
 #' @return gorilla data
 

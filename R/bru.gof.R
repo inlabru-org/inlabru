@@ -136,14 +136,14 @@ bincount = function(result, predictor, observations, breaks, nint = 20, probs = 
 #' @param mesh The \code{inla.mesh} at for which the prediction was performed (required for cummulative Vmeasure)
 #' @return Variance and correlations measures
 #' 
-#' @examples inst/examples/devel.cvmeasure.R
+#' @example inst/examples/devel.cvmeasure.R
 
 devel.cvmeasure = function(joint, prediction1, prediction2, samplers = NULL, mesh = NULL) {
 
-  #' Covariance
+  # Covariance
   joint$cov = (joint$var - prediction1$var - prediction2$var)/2
   
-  #' Correlation
+  # Correlation
   corr = function(joint, a, b) { ((joint - a - b) / (2 * sqrt(a * b)))}
   cor = corr(joint$var, prediction1$var, prediction2$var)
   if (any((cor>1) | (cor<(-1)))) {

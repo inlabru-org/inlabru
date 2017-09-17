@@ -35,7 +35,7 @@ NULL
 #' Load \link{mrsea} survey data from MRSea package and convert to spatial formats defined by the \link{sp} package.
 #'
 #' @aliases import.mrsea
-#' @export
+#' @keywords internal
 #' @return The \link{mrsea} data set
 #' @examples \dontrun{mrsea = import.mrsea();}
 #' @author Lindesay Scott-Hayward <\email{lass@@st-andrews.ac.uk}>

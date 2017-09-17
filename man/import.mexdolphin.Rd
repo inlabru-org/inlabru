@@ -18,3 +18,4 @@ Load \code{mexdolphins} survey data from \code{dsm} package and convert to spati
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
+\keyword{internal}

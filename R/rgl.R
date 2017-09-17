@@ -135,7 +135,7 @@ glplot.SpatialLines = function(object, add = TRUE,  ...) {
 #' Plot inla.mesh objects using RGL 
 #' 
 #' This function transforms the mesh to 3D cartesian coordinates and uses 
-#' \link{inla.plot.mesh} with \code{rgl=TRUE} to plot the result.
+#' inla.plot.mesh() with \code{rgl=TRUE} to plot the result.
 #' 
 #' @export
 #' @name glplot.inla.mesh

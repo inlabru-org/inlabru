@@ -6,6 +6,8 @@
 #'     SPDE component. Can also plot Matern correlation or covariance
 #'     function.
 #'
+#' @keywords internal
+#'
 #' @param manifold Either "R1", "S1", "R2", or "S2", from
 #'     \code{mesh$manifold}, or a full \code{inla.mesh} or
 #'     \code{inla.mesh.1d} object.

@@ -1,7 +1,26 @@
-#' A toy data set for group size inference
-#' 
 #' @name toygroups
+#' @title Simulated 1D animal group locations and group sizes
+#' @docType data
+#' @description 
 #' 
+#' This data set serves to teach the concept of modelling species that gather in groups and where
+#' the grouping behaviour depends on space.
+#' 
+#' @usage data(toygroups)
+#' 
+#' @format The data are a list that contains these elements:
+#'  \describe{
+#'    \item{\code{groups}:}{ A \code{data.frame} of group locations \code{x} and size \code{size}}
+#'    \item{\code{df.size}:}{ IGNORE THIS }
+#'    \item{\code{df.intensity}:}{ A \code{data.frame} with Poisson process 
+#'      intensity \code{d.lambda} at locations \code{x}}
+#'    \item{\code{df.rate}:}{ A \code{data.frame} the locations \code{x} and associated \code{rate} which
+#'      parameterized the exponential distribution from which the group sizes were drawn.}
+#'  }
+#' 
+#' 
+#' @example inst/examples/data.toygroups.R
+
 NULL
 
 
