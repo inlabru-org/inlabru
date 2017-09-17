@@ -6,65 +6,12 @@ setClass("inla.mesh")
 refine = function(...){UseMethod("refine")}
 tsplit = function(...){UseMethod("tsplit")}
 
-# Plot an inla.mesh using ggplot
-#
-# @aliases ggp.mesh
-# @export
-# @param mesh an inla.mesh object
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-
-ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = "black") {
-
-  xlim = range(mesh$loc[,1])
-  ylim = range(mesh$loc[,2])
-  aspect = diff(ylim)/diff(xlim)
-  ny = round(nx * aspect)
-  proj <- inla.mesh.projector(mesh, dims = c(nx,ny))
-  x = seq(xlim[1], xlim[2], length.out = nx)
-  y = seq(ylim[1], ylim[2], length.out = ny)
-  grid = expand.grid(x=x,y=y)
-  
-  
-  if ( !is.null(col) ) {
-    mcol = "green"
-    loc = data.frame(cbind(grid$x,grid$y))
-    col = INLA::inla.spde.make.A(mesh, loc = as.matrix(loc)) %*% as.vector(col)
-    msk = is.inside(mesh,as.matrix(loc))
-    # col[msk] = NA
-    df = data.frame(grid, col=as.vector(col), alpha = msk)
-    gg = ggplot(df, aes(x=x,y=y) )
-    gg = gg + geom_raster(aes(fill = col, alpha = alpha), hjust=0.5, vjust=0.5, interpolate = TRUE)
-    gg = gg + scale_alpha_discrete(guide = 'none')
-    gg = gg + theme(legend.title=element_blank())
-    
-  } else {
-    df = data.frame(grid)
-    if (!is.null(add)) { gg = add } else { gg = ggplot(df, aes(x=x,y=y) )}
-  }
-  
-  # Plot mesh lines
-  gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]), 
-                         aes_string(x="a.1",y="a.2",xend="b.1",yend="b.2"), color = mcol)
-  
-  gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-                         aes_string(x="a.1",y="a.2",xend="b.1",yend="b.2"), color = mcol)
-  
-  gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-                         aes_string(x="a.1",y="a.2",xend="b.1",yend="b.2"), color = mcol)
-  
-  gg = gg + coord_fixed()
-
-  return(gg)
-}
-
-
-
 
 #' Query if a point is inside the mesh boundary
 #'
 #'
 #' @aliases is.inside
-#' @export
+#' @keywords internal
 #' @param mesh an inla.mesh object.
 #' @param loc Points in space stored either as data.frame, a two-column matrix of x and y coordinates or a SpatialPoints object.
 #' @param mesh.coords Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.
@@ -301,27 +248,3 @@ tsplit.inla.mesh = function(mesh, n = 1){
 }
 
 
-
-
-
-# Generate a simple default mesh
-#
-# @aliases default.mesh
-# @export
-# @param spObject A Spatial* object
-# @param max.edge A parameter passed on to \link{inla.mesh.2d} which controls the granularity of the mesh. If NULL, 1/20 of the domain size is used.
-# @return An \code{inla.mesh} object
-
-default.mesh = function(spObject, max.edge = NULL, convex = -0.15){
-  if (inherits(spObject, "SpatialPoints")) {
-    x = c(bbox(spObject)[1,1], bbox(spObject)[1,2], bbox(spObject)[1,2], bbox(spObject)[1,1])
-    y = c(bbox(spObject)[2,1], bbox(spObject)[2,1], bbox(spObject)[2,2], bbox(spObject)[2,2])
-    # bnd = inla.mesh.segment(loc = cbind(x,y))
-    # mesh = inla.mesh.2d(interior = bnd, max.edge = diff(bbox(spObject)[1,])/10)
-    if ( is.null(max.edge) ) { max.edge = max.edge = diff(bbox(spObject)[1,])/20 }
-    hull = inla.nonconvex.hull(points = coordinates(spObject), convex = convex)
-    mesh = inla.mesh.2d(boundary = hull, max.edge = max.edge)
-  } else {
-    NULL
-  }
-}
