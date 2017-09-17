@@ -37,3 +37,4 @@ all(is.inside(gorillas$mesh, loc))
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
+\keyword{internal}
