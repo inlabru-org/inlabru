@@ -19,7 +19,7 @@ tsplit = function(...){UseMethod("tsplit")}
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
 #' @examples 
-#' 
+#' \dontrun{
 #' # Load Gorilla data
 #' 
 #' data("gorillas")
@@ -32,6 +32,8 @@ tsplit = function(...){UseMethod("tsplit")}
 #' 
 #' loc = coordinates(gorillas$nests)
 #' all(is.inside(gorillas$mesh, loc))
+#' }
+#' 
 
 is.inside = function(mesh, loc, mesh.coords = NULL) {
   if ( inherits(loc, "Spatial") ) { loc = coordinates(loc) }
