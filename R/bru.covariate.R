@@ -11,9 +11,7 @@
 
 covariate = function(data, predictor = NULL, mesh = NULL){
   if ( inherits(data, "SpatialPointsDataFrame") ) {
-    
-    if ( is.null(mesh) ) { mesh = suppressWarnings(default.mesh(data, convex = -0.01)) }
-    
+
     cv = covdata.import(as.data.frame(data), 
                         deparse(substitute(predictor)), 
                         data = list(mesh = mesh, mesh.coords = coordnames(data)))
