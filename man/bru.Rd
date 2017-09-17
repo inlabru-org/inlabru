@@ -28,14 +28,15 @@ This method is a wrapper for \link{inla} and provides multiple enhancements.
 (3) Non-linear predictors are approximated numerically and fitting happens via iterated INLA calls.
 }
 \examples{
-
-\dontrun{
+# Simulate some covariates x and observations y
 input.df <- data.frame(x=cos(1:10))
 input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
-fit <- bru(y ~ x, "gaussian", input.df)
-summary(fit)
-}
 
+# Fit a Gaussian likelihood model
+fit <- bru(y ~ x, "gaussian", input.df)
+
+# Obtain summary
+summary(fit)
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>

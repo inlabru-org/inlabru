@@ -31,14 +31,7 @@ generate = function(object, ...){ UseMethod("generate") }
 #' @param options See \link{bru.options} 
 #' @return A \link{bru} object
 #' 
-#' @examples
-#' 
-#' \dontrun{
-#' input.df <- data.frame(x=cos(1:10))
-#' input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
-#' fit <- bru(y ~ x, "gaussian", input.df)
-#' summary(fit)
-#' }
+#' @example inst/examples/bru.R
 #' 
 
 bru = function(components = y ~ Intercept,
@@ -396,14 +389,17 @@ summary.lgcp = function(object, ...) {
 }
 
 
-#' Summarize a \link{bru} object
+#' Summary for a \link{bru} fit
+#'
+#' Takes a fitted bru object produced by bru() or lgcp() and creates various summaries from it. 
 #'
 #' @aliases summary.bru
 #' @export
 #' @method summary bru
 #' @param object An object obtained from a \link{bru} or \link{lgcp} call
 #' @param ... ignored arguments
-# 
+#' @example inst/examples/bru.R
+#' 
 
 summary.bru = function(object, ...) {
   
