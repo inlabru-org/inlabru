@@ -521,7 +521,7 @@ evaluate.model = function(model,
     # Factor models
     for (label in names(sm)) { 
       if (label %in% names(effect(model)) && effect(model)[[label]]$model == "factor") {
-        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]]) 
+        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]], environment(model$in.formula)) 
         sm[[label]] = as.vector(sm[[label]][as.data.frame(fc)[,1]])
       }
     }
@@ -529,7 +529,7 @@ evaluate.model = function(model,
     # Linear models
     for (label in names(sm)) { 
       if (label %in% names(effect(model)) && effect(model)[[label]]$model == "linear") {
-        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]])
+        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]], environment(model$in.formula)) 
         if (is.data.frame(fc)) {fc = fc[,1]}
         sm[[label]] = as.vector(sm[[label]] * as.vector(fc))
       }
