@@ -8,18 +8,25 @@ bru(components = y ~ Intercept, family = NULL, data = NULL, ...,
   options = list())
 }
 \arguments{
-\item{components}{a formula describing the latent components}
+\item{components}{a formula describing the latent components.}
 
-\item{family}{Character defining one of the likelihoods supported by \link{like}. Alternatively, an object cunstructed by \link{like}.}
+\item{family}{A string indicating the likelihood family. The default is \code{gaussian} with 
+identity link. In addition to the likelihoods provided by inla 
+(see \code{inla.models()$likelihood}) inlabru supports fitting Cox processes 
+via \code{family = "cp"}. Alternatively, \code{family} can be a likelihood
+constructed using the \link{like} function.}
 
-\item{data}{A data.frame or SpatialPoints[DataFrame] object}
+\item{data}{A data.frame or SpatialPoints[DataFrame] object.}
 
-\item{...}{Additional likelihoods, each constructed by a calling \link{like}}
+\item{...}{Additional likelihoods, each constructed by a calling \link{like}.}
 
-\item{options}{See \link{bru.options}}
+\item{options}{A list of name and value pairs that are either interpretable by \link{bru.options} 
+or valid inla parameters.}
 }
 \value{
-A \link{bru} object
+bru returns an object of class "bru". A \code{bru} object inherits from \link{inla} 
+        (see the inla documentation for its properties) and adds additional information stored 
+        in the \code{sppa} field.
 }
 \description{
 This method is a wrapper for \link{inla} and provides multiple enhancements. 

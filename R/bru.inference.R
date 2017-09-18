@@ -24,12 +24,20 @@ generate = function(object, ...){ UseMethod("generate") }
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-#' @param components a formula describing the latent components
-#' @param family Character defining one of the likelihoods supported by \link{like}. Alternatively, an object cunstructed by \link{like}.
-#' @param data A data.frame or SpatialPoints[DataFrame] object
-#' @param ... Additional likelihoods, each constructed by a calling \link{like}
-#' @param options See \link{bru.options} 
-#' @return A \link{bru} object
+#' @param components a formula describing the latent components. 
+#' @param family A string indicating the likelihood family. The default is \code{gaussian} with 
+#'               identity link. In addition to the likelihoods provided by inla 
+#'               (see \code{inla.models()$likelihood}) inlabru supports fitting Cox processes 
+#'               via \code{family = "cp"}. Alternatively, \code{family} can be a likelihood
+#'               constructed using the \link{like} function.
+#' @param data A data.frame or SpatialPoints[DataFrame] object.
+#' @param ... Additional likelihoods, each constructed by a calling \link{like}.
+#' @param options A list of name and value pairs that are either interpretable by \link{bru.options} 
+#'                or valid inla parameters.
+#' 
+#' @return bru returns an object of class "bru". A \code{bru} object inherits from \link{inla} 
+#'         (see the inla documentation for its properties) and adds additional information stored 
+#'         in the \code{sppa} field.
 #' 
 #' @example inst/examples/bru.R
 #' 
