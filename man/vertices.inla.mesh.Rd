@@ -7,7 +7,7 @@
 vertices.inla.mesh(object)
 }
 \arguments{
-\item{object}{An \code{inla.mesh} object}
+\item{object}{An \code{inla.mesh} object.}
 }
 \value{
 A SpatialPointsDataFrame of mesh vertex locations. The \code{vrt} column indicates the internal vertex id.

@@ -1,3 +1,53 @@
+#' Prediction from fitted inla model
+#' 
+#' Takes a fitted inla object produced by the function inla() and produces predictions given a 
+#' new set of values for the model covariates or the original values used for the model fit. 
+#' The predictions can be based on any R expression that is valid given these values/covariates 
+#' and the posterior of the estimated effects.
+#' 
+#' IMPORTANT: The inla object provided has to have an additional field called "formula". This
+#' is the formula used to call the inla() function and will be used to convert the inla object
+#' to a bru object. Thereafter, preict.bru() is called to perform the prediction.
+#'
+#' @aliases predict.inla
+#' @param object An object obtained by calling \link{bru} or \link{lgcp}.
+#' @param ... Arguments passed on to predict.bru().
+#' @return A \code{prediction} object.
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+#' @examples 
+#' \dontrun{
+#' 
+#' # Generate some data
+#' 
+#' input.df <- data.frame(x=cos(1:10))
+#' input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+#'
+#' # Fit a Gaussian likelihood model
+#' 
+#' formula = y ~ x
+#' fit <- inla(formula, "gaussian", data = input.df, control.compute=list(config = TRUE))
+#' 
+#' # Add formula to inla object
+#' 
+#' fit$formula = y ~ x
+#'
+#' Estimate posterior statistics of exp(x), where x is the random effect.
+#' 
+#' xpost = predict(fit, NULL, ~ exp(x))
+#' xpost
+#' plot(xpost)
+#' 
+#' }
+
+predict.inla = function(object, ...) {
+  fit$sppa$model = make.model(object$formula)
+  class(fit) = c("bru","inla")
+  predict(fit, ...)
+}
+
+
 
 extract.summary = function(result, property) {
   ret = list()
