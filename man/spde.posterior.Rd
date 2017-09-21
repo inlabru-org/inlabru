@@ -9,15 +9,15 @@ spde.posterior(result, name, what = "range")
 \arguments{
 \item{result}{An object inheriting from \code{inla}.}
 
-\item{name}{Name of the SPDE, see \code{names(result$summary.random)}}
+\item{name}{Character stating the name of the SPDE effect, see \code{names(result$summary.random)}.}
 
 \item{what}{One of "range", "log.range", "variance", "log.variance", "matern.correlation" or "matern.covariance".}
 }
 \value{
-A posterior
+A \code{prediction} object.
 }
 \description{
-Plots the posterior distribution of the range, log(range), variance, or log(variance) 
+Calculate posterior distribution of the range, log(range), variance, or log(variance) 
 parameter of a model's SPDE component. Can also plot Matern correlation or covariance function.
 \code{inla.spde.result}.
 }

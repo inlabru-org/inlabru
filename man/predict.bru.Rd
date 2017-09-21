@@ -24,8 +24,8 @@ a data.frame or Spatial* object with predicted mean values and other summary sta
 \description{
 Takes a fitted \code{bru} object produced by the function \link{bru}() and produces predictions given 
 a new set of values for the model covariates or the original values used for the model fit. The
-predictions can be based on any R expression that is valid given these values/covariates and the 
-posterior of the estimated effects.
+predictions can be based on any R expression that is valid given these values/covariates and the joint 
+posterior of the estimated random effects.
  
 Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
 median, variance, coefficient of variation as well as the variance and minimum and maximum sample

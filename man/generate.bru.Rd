@@ -7,13 +7,14 @@
 \method{generate}{bru}(object, data, formula = NULL, n.samples = 100, ...)
 }
 \arguments{
-\item{object}{An object obtained by calling \link{bru})}
+\item{object}{A \code{bru} object obtained by calling \link{bru}.}
 
-\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for the prediction}
+\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for sampling.}
 
-\item{formula}{A formula determining which effects to predict and how to combine them}
+\item{formula}{A formula determining which effects to sample from and how to combine them analytically.}
 
-\item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.}
+\item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. 
+The default is rather low but provides a quick approximate result.}
 
 \item{...}{ignored arguments (needed for S3 compatibility).}
 }
@@ -21,7 +22,14 @@
 Predicted values
 }
 \description{
-Sampling based on bru posteriors
+Takes a fitted \code{bru} object produced by the function \link{bru}() and produces samples given 
+a new set of values for the model covariates or the original values used for the model fit. The
+samples can be based on any R expression that is valid given these values/covariates and the joint
+posterior of the estimated random effects.
+ 
+Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
+median, variance, coefficient of variation as well as the variance and minimum and maximum sample
+value drawn in course of estimating the statistics.
 }
 \examples{
 
@@ -54,4 +62,7 @@ smp[[1]]
 # ... and plot them
 
 plot(do.call(rbind, smp))
+}
+\seealso{
+Other sample generators: \code{\link{generate}}
 }

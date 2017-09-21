@@ -1,11 +1,14 @@
-#' Generate samples
+#' Generate samples from fitted bru and inla models
 #' 
 #' @description 
-#' NONE
+#' 
+#' Generic function for sampling for fitted models. The function invokes particular methods 
+#' which depend on the class of the first argument.
 #'
 #' @name generate
 #' @export
-#' @param object a fitted model
+#' @family sample generators
+#' @param object a fitted model.
 #' @param ... additional arguments affecting the samples produced.
 #' @return The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
 #' @example inst/examples/generate.bru.R
@@ -481,8 +484,8 @@ summary.bru = function(object, ...) {
 #' 
 #' Takes a fitted \code{bru} object produced by the function \link{bru}() and produces predictions given 
 #' a new set of values for the model covariates or the original values used for the model fit. The
-#' predictions can be based on any R expression that is valid given these values/covariates and the 
-#' posterior of the estimated effects.
+#' predictions can be based on any R expression that is valid given these values/covariates and the joint 
+#' posterior of the estimated random effects.
 #'  
 #' Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
 #' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
@@ -547,12 +550,24 @@ predict.bru = function(object,
 
 #' Sampling based on bru posteriors
 #' 
+#' @description 
+#' Takes a fitted \code{bru} object produced by the function \link{bru}() and produces samples given 
+#' a new set of values for the model covariates or the original values used for the model fit. The
+#' samples can be based on any R expression that is valid given these values/covariates and the joint
+#' posterior of the estimated random effects.
+#'  
+#' Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
+#' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
+#' value drawn in course of estimating the statistics.
+#'
 #' @aliases generate.bru
 #' @export
-#' @param object An object obtained by calling \link{bru})
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
-#' @param formula A formula determining which effects to predict and how to combine them
-#' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
+#' @family sample generators
+#' @param object A \code{bru} object obtained by calling \link{bru}.
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for sampling.
+#' @param formula A formula determining which effects to sample from and how to combine them analytically.
+#' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. 
+#'                  The default is rather low but provides a quick approximate result.
 #' @param ... ignored arguments (needed for S3 compatibility).
 #' 
 #' @return Predicted values

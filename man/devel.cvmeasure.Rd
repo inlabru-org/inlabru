@@ -8,21 +8,21 @@ devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL,
   mesh = NULL)
 }
 \arguments{
-\item{joint}{A joint prediction of two latent components}
+\item{joint}{A joint \code{prediction} of two latent model components.}
 
-\item{prediction1}{A prediction of first component}
+\item{prediction1}{A \code{prediction} of first component.}
 
-\item{prediction2}{A prediction of the first component}
+\item{prediction2}{A \code{prediction} of the first component.}
 
-\item{samplers}{A spatial object describing an area for which to compute the cummulative variance measure}
+\item{samplers}{A SpatialPolygon object describing the area for which to compute the cummulative variance measure.}
 
-\item{mesh}{The \code{inla.mesh} at for which the prediction was performed (required for cummulative Vmeasure)}
+\item{mesh}{The \code{inla.mesh} for which the prediction was performed (required for cummulative Vmeasure).}
 }
 \value{
-Variance and correlations measures
+Variance and correlations measures.
 }
 \description{
-Variance and correlations measures for prediction components
+Calculates local and integrated variance and correlation measures as introduced by Yuan et al. (2017).
 }
 \examples{
 \dontrun{
@@ -113,4 +113,9 @@ vm.int
 
 }
 
+}
+\references{
+Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017. 
+Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales.
+\url{https://arxiv.org/abs/1604.06013}
 }

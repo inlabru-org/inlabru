@@ -126,15 +126,22 @@ bincount = function(result, predictor, observations, breaks, nint = 20, probs = 
 
 
 #' Variance and correlations measures for prediction components
+#' 
+#' Calculates local and integrated variance and correlation measures as introduced by Yuan et al. (2017).
 #'
 #' @aliases devel.cvmeasure
 #' @export
-#' @param joint A joint prediction of two latent components
-#' @param prediction1 A prediction of first component
-#' @param prediction2 A prediction of the first component
-#' @param samplers A spatial object describing an area for which to compute the cummulative variance measure
-#' @param mesh The \code{inla.mesh} at for which the prediction was performed (required for cummulative Vmeasure)
-#' @return Variance and correlations measures
+#' @param joint A joint \code{prediction} of two latent model components.
+#' @param prediction1 A \code{prediction} of first component.
+#' @param prediction2 A \code{prediction} of the first component.
+#' @param samplers A SpatialPolygon object describing the area for which to compute the cummulative variance measure.
+#' @param mesh The \code{inla.mesh} for which the prediction was performed (required for cummulative Vmeasure).
+#' @return Variance and correlations measures.
+#' 
+#' @references 
+#' Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017. 
+#' Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales.
+#' \url{https://arxiv.org/abs/1604.06013}
 #' 
 #' @example inst/examples/devel.cvmeasure.R
 

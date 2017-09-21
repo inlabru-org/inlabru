@@ -2,12 +2,12 @@
 % Please edit documentation in R/bru.inference.R
 \name{generate}
 \alias{generate}
-\title{Generate samples}
+\title{Generate samples from fitted bru and inla models}
 \usage{
 generate(object, ...)
 }
 \arguments{
-\item{object}{a fitted model}
+\item{object}{a fitted model.}
 
 \item{...}{additional arguments affecting the samples produced.}
 }
@@ -15,7 +15,8 @@ generate(object, ...)
 The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
 }
 \description{
-NONE
+Generic function for sampling for fitted models. The function invokes particular methods 
+which depend on the class of the first argument.
 }
 \examples{
 
@@ -48,4 +49,7 @@ smp[[1]]
 # ... and plot them
 
 plot(do.call(rbind, smp))
+}
+\seealso{
+Other sample generators: \code{\link{generate.bru}}
 }
