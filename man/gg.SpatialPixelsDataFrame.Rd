@@ -2,27 +2,31 @@
 % Please edit documentation in R/ggplot.R
 \name{gg.SpatialPixelsDataFrame}
 \alias{gg.SpatialPixelsDataFrame}
-\title{Plot SpatialPixelsDataFram using ggplot2}
+\title{Geom for SpatialPixelsDataFrame objects}
 \usage{
-\method{gg}{SpatialPixelsDataFrame}(data, fill = names(data)[[1]],
-  alpha = NULL, mask = NULL, ...)
+\method{gg}{SpatialPixelsDataFrame}(data, mapping = NULL, alpha = NULL,
+  crs = NULL, mask = NULL, ...)
 }
 \arguments{
-\item{data}{A SpatialPixelsDataFrame object}
+\item{data}{A SpatialPixelsDataFrame object.}
 
-\item{fill}{Character array identifying the data column used for plotting}
+\item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
+mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], 
+y = coordnames(data)[2], fill = names(data)[[1]])}.}
 
-\item{alpha}{Character array identifying the data column used for transparency}
+\item{alpha}{Character array identifying the data column used for tile transparency.}
 
-\item{mask}{A SpatialPolygon defining the region that is plotted}
+\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
 
-\item{...}{Arguments passed on to \link{geom_tile}}
+\item{mask}{A SpatialPolygon defining the region that is plotted.}
+
+\item{...}{Arguments passed on to \link{geom_tile}.}
 }
 \value{
-A ggplot2 object
+A \link{geom_tile} return value.
 }
 \description{
-Plot SpatialPixelsDataFram using ggplot2
+Coerces input SpatialPixelsDataFrame to data.frame and uses \link{geom_tile} to plot it.
 }
 \examples{
 # Load Gorilla data
@@ -71,7 +75,7 @@ names(mexdolphin$points) # 'size' holds the group size
 ggplot() + gg(mexdolphin$points, aes(size = size))
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialGrid}},
+Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
   \code{\link{gg.SpatialLines}},
   \code{\link{gg.SpatialPixels}},
   \code{\link{gg.SpatialPoints}},

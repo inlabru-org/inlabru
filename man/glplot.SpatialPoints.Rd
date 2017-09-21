@@ -2,12 +2,12 @@
 % Please edit documentation in R/rgl.R
 \name{glplot.SpatialPoints}
 \alias{glplot.SpatialPoints}
-\title{Plot SpatialPoints using RGL}
+\title{Visualize SpatialPoints using RGL}
 \usage{
 \method{glplot}{SpatialPoints}(object, add = TRUE, color = "red", ...)
 }
 \arguments{
-\item{object}{a SpatialPoints or SpatialPointsDataFrame object}
+\item{object}{a SpatialPoints or SpatialPointsDataFrame object.}
 
 \item{add}{If TRUE, add the points to an existing plot. If FALSE, create new plot.}
 
@@ -16,7 +16,8 @@
 \item{...}{Parameters passed on to rgl.points()}
 }
 \description{
-Plot SpatialPoints using RGL
+This function will calculate the cartesian coordinates of the points provided 
+and use rgl.points() in order to render them.
 }
 \examples{
 # Load rgl library (needed due to a bug in sphereplot library)

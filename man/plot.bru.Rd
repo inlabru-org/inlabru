@@ -2,20 +2,22 @@
 % Please edit documentation in R/ggplot.R
 \name{plot.bru}
 \alias{plot.bru}
-\title{Plot bru effects}
+\title{Plot method for posterior marginals estimated by \link{bru}}
 \usage{
 \method{plot}{bru}(x, ...)
 }
 \arguments{
-\item{x}{a \link{bru} object}
+\item{x}{a fitted \link{bru} model.}
 
-\item{...}{A character naming the effect to plot}
+\item{...}{A character naming the effect to plot, e.g. "Intercept".}
 }
 \value{
-a gg object
+an object of class \code{gg}
 }
 \description{
-Plot bru effects
+\link{bru} uses \link{inla} to fit models. The latter estimates the posterior densities of
+all random effects in the model. This function serves to access and plot the posterior
+densities in a convenient way.
 }
 \examples{
 

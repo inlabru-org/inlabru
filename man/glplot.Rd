@@ -2,7 +2,7 @@
 % Please edit documentation in R/rgl.R
 \name{glplot}
 \alias{glplot}
-\title{Plot Spatial* and inla.mesh objects using RGL}
+\title{Render Spatial* and inla.mesh objects using RGL}
 \usage{
 glplot(object, ...)
 }
@@ -12,7 +12,8 @@ glplot(object, ...)
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-Plot Spatial* and inla.mesh objects using RGL
+glplot is a generic function for renders various kinds of spatial objects, i.e. Spatial* data 
+and inla.mesh objects. The function invokes particular methods which depend on the class of the first argument.
 }
 \examples{
 # Load rgl library (needed due to a bug in sphereplot library)

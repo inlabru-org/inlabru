@@ -2,24 +2,26 @@
 % Please edit documentation in R/ggplot.R
 \name{gg.SpatialPoints}
 \alias{gg.SpatialPoints}
-\title{Point geom for SpatialPoints objects}
+\title{Geom for SpatialPoints objects}
 \usage{
 \method{gg}{SpatialPoints}(data, mapping = NULL, crs = NULL, ...)
 }
 \arguments{
-\item{data}{A SpatialPoints object}
+\item{data}{A SpatialPoints object.}
 
-\item{mapping}{Set of aesthetic mappings created by \link{aes} or \link{aes_}}
+\item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
+mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], y = coordnames(data)[2])}.}
 
-\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting}
+\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
 
-\item{...}{Arguments passed on to \link{geom_point}}
+\item{...}{Arguments passed on to \link{geom_point}.}
 }
 \value{
-geom_point
+A \link{geom_point} return value
 }
 \description{
-Point geom for SpatialPoints objects
+This function coerces the \code{SpatialPoints} into a \code{data.frame} and uses \link{geom_point}
+to plot the points.
 }
 \examples{
 # Load Gorilla data
@@ -68,7 +70,7 @@ names(mexdolphin$points) # 'size' holds the group size
 ggplot() + gg(mexdolphin$points, aes(size = size))
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialGrid}},
+Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
   \code{\link{gg.SpatialLines}},
   \code{\link{gg.SpatialPixelsDataFrame}},
   \code{\link{gg.SpatialPixels}},

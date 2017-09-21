@@ -2,20 +2,24 @@
 % Please edit documentation in R/ggplot.R
 \name{gg.RasterLayer}
 \alias{gg.RasterLayer}
-\title{Plot RasterLayer using ggplot2}
+\title{Geom for RasterLayer objects}
 \usage{
-\method{gg}{RasterLayer}(data, ...)
+\method{gg}{RasterLayer}(data, mapping = aes_string(x = "x", y = "y", fill =
+  "layer"), ...)
 }
 \arguments{
-\item{data}{A RasterLayer object}
+\item{data}{A RasterLayer object.}
 
-\item{...}{Arguments passed on to \link{geom_tile}}
+\item{mapping}{aesthetic mappings created by \link{aes} or \link{aes_}. These are passed on to \link{geom_tile}.}
+
+\item{...}{Arguments passed on to \link{geom_tile}.}
 }
 \value{
-geom_tile
+An object returned by \link{geom_tile}
 }
 \description{
-Plot RasterLayer using ggplot2
+This function takes a RasterLayer object, converts it into a SpatialPixelsDataFrame and
+uses \link{geom_tile} to plot the data.
 }
 \examples{
 

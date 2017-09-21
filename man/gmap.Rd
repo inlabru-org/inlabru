@@ -7,9 +7,9 @@
 gmap(data, ...)
 }
 \arguments{
-\item{data}{A Spatial* object}
+\item{data}{A Spatial* object.}
 
-\item{...}{Arguments passed on to get_map}
+\item{...}{Arguments passed on to get_map().}
 }
 \value{
 a ggplot object

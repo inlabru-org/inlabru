@@ -2,19 +2,20 @@
 % Please edit documentation in R/rgl.R
 \name{glplot.SpatialLines}
 \alias{glplot.SpatialLines}
-\title{Plot SpatialLines using RGL}
+\title{Visualize SpatialLines using RGL}
 \usage{
 \method{glplot}{SpatialLines}(object, add = TRUE, ...)
 }
 \arguments{
-\item{object}{a SpatialLines or SpatialLinesDataFrame object}
+\item{object}{a SpatialLines or SpatialLinesDataFrame object.}
 
 \item{add}{If TRUE, add the lines to an existing plot. If FALSE, create new plot.}
 
 \item{...}{Parameters passed on to rgl.linestrips().}
 }
 \description{
-Plot SpatialLines using RGL
+This function will calculate a cartesian representation of the lines provided 
+and use rgl.linestrip() in order to render them.
 }
 \examples{
 # Load rgl library (needed due to a bug in sphereplot library)

@@ -501,14 +501,21 @@ vertex.projection.1d = function(points, mesh, group = NULL, column = "weight", s
 
 
 #' Weighted summation (integration) of data frame subsets
-#'   
+#'
+#' A typicel task in statistical inference to integrate a (multivariate) function along one or
+#' more dimensions of its domain. For this purpose, the function is evaluated at some points
+#' in the domain and the values are summed up using weights that depend on the area being 
+#' integrated over. This function performs the weighting and summation conditional for each level
+#' of the dimensions that are not integrated over. The parameter \code{dims} states the the 
+#' dimensions to integrate over. The set of dimensions that are held fixed is the set difference
+#' of all column names in \code{data} and the dimensions stated by \code{dims}.
 #' 
 #' @aliases int
 #' @export
-#' @param data A \code{data.frame} or \code{Spatial} object. Has to have a weight column with numeric values.
-#' @param values Numerical values to be summed up.
-#' @param dims Columns of the \code{data} obect to integrate over
-#' @return A \code{data.frame} of integrated values
+#' @param data A \code{data.frame} or \code{Spatial} object. Has to have a \code{weight} column with numeric values.
+#' @param values Numerical values to be summed up, usually the result of function evaluations.
+#' @param dims Column names (dimension names) of the \code{data} object to integrate over.
+#' @return A \code{data.frame} of integrals, one for each level of the cross product of all dimensions not being integrated over.
 #' 
 #' @examples 
 #' # Create integration points in two dimensions, x and y

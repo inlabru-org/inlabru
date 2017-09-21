@@ -2,12 +2,12 @@
 % Please edit documentation in R/rgl.R
 \name{glplot.inla.mesh}
 \alias{glplot.inla.mesh}
-\title{Plot inla.mesh objects using RGL}
+\title{Visualize SpatialPoints using RGL}
 \usage{
 \method{glplot}{inla.mesh}(object, add = TRUE, col = NULL, ...)
 }
 \arguments{
-\item{object}{an inla.mesh object}
+\item{object}{an inla.mesh object.}
 
 \item{add}{If TRUE, add the lines to an existing plot. If FALSE, create new plot.}
 

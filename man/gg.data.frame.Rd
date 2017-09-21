@@ -7,15 +7,13 @@
 \method{gg}{data.frame}(...)
 }
 \arguments{
-\item{...}{Arguments passed on to \link{gg.prediction}}
-
-\item{data}{A data.frame}
+\item{...}{Arguments passed on to \link{gg.prediction}.}
 }
 \value{
-c(geom_ribbon, geom_line)
+Concatenation of a \link{geom_line} value and optionally a \link{geom_ribbon} value.
 }
 \description{
-This geom constructor will simply call gg.prediction for the data provided.
+This geom constructor will simply call \link{gg.prediction} for the data provided.
 }
 \examples{
 

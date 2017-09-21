@@ -2,20 +2,20 @@
 % Please edit documentation in R/ggplot.R
 \name{gg.SpatialPixels}
 \alias{gg.SpatialPixels}
-\title{Plot SpatialPixels using ggplot2}
+\title{Geom for SpatialPixels objects}
 \usage{
 \method{gg}{SpatialPixels}(data, ...)
 }
 \arguments{
-\item{data}{A SpatialPixels object}
+\item{data}{A \link{SpatialPixels} object.}
 
-\item{...}{Arguments passed on to \link{geom_tile}}
+\item{...}{Arguments passed on to \link{geom_tile}.}
 }
 \value{
-A ggplot2 object
+A \link{geom_tile} return value.
 }
 \description{
-Plot SpatialPixels using ggplot2
+Uses \link{geom_point} to plot the pixel centers.
 }
 \examples{
 
@@ -30,7 +30,7 @@ pxl = SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
 ggplot() + gg(pxl, size = 0.1)
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialGrid}},
+Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
   \code{\link{gg.SpatialLines}},
   \code{\link{gg.SpatialPixelsDataFrame}},
   \code{\link{gg.SpatialPoints}},

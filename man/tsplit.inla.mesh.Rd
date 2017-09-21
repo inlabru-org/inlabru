@@ -4,7 +4,7 @@
 \alias{tsplit.inla.mesh}
 \title{Split triangles of a mesh into four triangles}
 \usage{
-\method{tsplit}{inla.mesh}(mesh, n = 1)
+tsplit.inla.mesh(mesh, n = 1)
 }
 \arguments{
 \item{mesh}{an inla.mesh object}
@@ -21,3 +21,4 @@ Warning2: Works in euclidean coordinates. Not suitable for sphere.
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
+\keyword{internal}

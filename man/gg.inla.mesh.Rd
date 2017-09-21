@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggplot.R
 \name{gg.inla.mesh}
 \alias{gg.inla.mesh}
-\title{Plot inla.mesh using ggplot2}
+\title{Geom for inla.mesh objects}
 \usage{
 \method{gg}{inla.mesh}(data, color = NULL, alpha = NULL,
   edge.color = "grey", interior = TRUE, int.color = "blue",
@@ -10,37 +10,40 @@
   nx = 500, ny = 500, ...)
 }
 \arguments{
-\item{data}{An \link{inla.mesh} object}
+\item{data}{An \link{inla.mesh} object.}
 
 \item{color}{A vector of scalar values to fill the mesh with colors. The length of the vector mus correspond to the number of mesh vertices.}
 
-\item{alpha}{A vector of scalar values setting the alpha value of the colors provided}
+\item{alpha}{A vector of scalar values setting the alpha value of the colors provided.}
 
-\item{edge.color}{Color of the mesh edges}
+\item{edge.color}{Color of the mesh edges.}
 
-\item{interior}{If TRUE, plot the interior boundaries of the mesh}
+\item{interior}{If TRUE, plot the interior boundaries of the mesh.}
 
-\item{int.color}{Color used to plot the interior boundaries}
+\item{int.color}{Color used to plot the interior boundaries.}
 
-\item{exterior}{If TRUE, plot the exterior boundaries of the mesh}
+\item{exterior}{If TRUE, plot the exterior boundaries of the mesh.}
 
-\item{ext.color}{Color used to plot the interior boundaries}
+\item{ext.color}{Color used to plot the interior boundaries.}
 
-\item{crs}{A \link{CRS} object defining the coordinate system to project the mesh to before plotting}
+\item{crs}{A \link{CRS} object defining the coordinate system to project the mesh to before plotting.}
 
-\item{mask}{A SpatialPolygon defining the region that is plotted}
+\item{mask}{A SpatialPolygon defining the region that is plotted.}
 
-\item{nx}{Number of pixels in x direction (when plotting using the color parameter)}
+\item{nx}{Number of pixels in x direction (when plotting using the color parameter).}
 
-\item{ny}{Number of pixels in y direction (when plotting using the color parameter)}
+\item{ny}{Number of pixels in y direction (when plotting using the color parameter).}
 
-\item{...}{ignored arguments (S3 generic compatibility)}
+\item{...}{ignored arguments (S3 generic compatibility).}
 }
 \value{
-geom_polygon or geom_segment
+\link{geom_line} return values or, if the color argument is used, the values of gg.SpatialPixelDataFrame().
 }
 \description{
-Plot inla.mesh using ggplot2
+This function extracts the graph of an inla.mesh object and uses \link{geom_line} to visualize
+the graph's edges. Alternatively, if the \code{color} argument is provided, interpolates the colors
+across for a set of SpatialPixels covering the mesh area and calls gg.SpatialPixelDataFrame()
+to plot the interpolation.
 }
 \examples{
 # Load Gorilla data

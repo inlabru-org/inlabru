@@ -2,22 +2,22 @@
 % Please edit documentation in R/ggplot.R
 \name{plot.prediction}
 \alias{plot.prediction}
-\title{Plot predction using ggplot2}
+\title{Plot prediction using ggplot2}
 \usage{
 \method{plot}{prediction}(x, y = NULL, ...)
 }
 \arguments{
-\item{x}{a prediction object}
+\item{x}{a prediction object.}
 
-\item{y}{a mapping created by \link{aes} or \link{aes_string}}
+\item{y}{Ignored argument but required for S3 compatibility.}
 
-\item{...}{Arguments passed on to \link{gg.prediction}}
+\item{...}{Arguments passed on to \link{gg.prediction}.}
 }
 \value{
-a gg object
+an object of class \code{gg}
 }
 \description{
-Generates a base ggplot2 and adds a geom for x using \link{gg}
+Generates a base ggplot2 using \link{ggplot} and adds a geom for input \code{x} using \link{gg}.
 }
 \examples{
 

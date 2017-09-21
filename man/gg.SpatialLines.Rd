@@ -2,24 +2,28 @@
 % Please edit documentation in R/ggplot.R
 \name{gg.SpatialLines}
 \alias{gg.SpatialLines}
-\title{Segment geom for SpatialLines objects}
+\title{Geom for SpatialLines objects}
 \usage{
 \method{gg}{SpatialLines}(data, mapping = NULL, crs = NULL, ...)
 }
 \arguments{
-\item{data}{A SpatialLines object}
+\item{data}{A SpatialLines object.}
 
-\item{mapping}{Set of aesthetic mappings created by \link{aes} or \link{aes_}}
+\item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
+mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], 
+y = coordnames(data)[2], 
+xend = paste0("end.", coordnames(data)[1]), 
+yend = paste0("end.", coordnames(data)[2]))}.}
 
-\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting}
+\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
 
-\item{...}{Arguments passed on to \link{geom_segment}}
+\item{...}{Arguments passed on to \link{geom_segment}.}
 }
 \value{
-geom_segment
+A \link{geom_segment} return value.
 }
 \description{
-Segment geom for SpatialLines objects
+Extracts start and end points of the lines and calls \link{geom_segment} to plot  lines between them.
 }
 \examples{
 # Load Gorilla data
@@ -68,7 +72,7 @@ names(mexdolphin$points) # 'size' holds the group size
 ggplot() + gg(mexdolphin$points, aes(size = size))
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialGrid}},
+Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
   \code{\link{gg.SpatialPixelsDataFrame}},
   \code{\link{gg.SpatialPixels}},
   \code{\link{gg.SpatialPoints}},

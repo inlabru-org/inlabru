@@ -3,8 +3,8 @@ setClass("inla.mesh")
 
 
 # GENERICS
-refine = function(...){UseMethod("refine")}
-tsplit = function(...){UseMethod("tsplit")}
+# refine = function(...){UseMethod("refine")}
+# tsplit = function(...){UseMethod("tsplit")}
 
 
 #' Query if a point is inside the mesh boundary
@@ -70,9 +70,12 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
 
 #' Vertices
 #' 
+#' This is a generic function. The outcome depends on the \code{object} provided
+#' 
 #' @name vertices
 #' @exportMethod vertices
-#' @param object An \code{inla.mesh} object
+#' @param object An object for which to call the particular vertices method.
+#' @return The form of the value returned by vertices() depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
 
 setGeneric("vertices", valueClass = "SpatialPointsDataFrame", function(object) {
   standardGeneric("vertices")
@@ -90,7 +93,8 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #' 
 #' @aliases vertices.inla.mesh
 #' @export
-#' @param object An \code{inla.mesh} object
+#' @param object An \code{inla.mesh} object.
+#' @return A SpatialPointsDataFrame of mesh vertex locations. The \code{vrt} column indicates the internal vertex id.
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
@@ -201,7 +205,8 @@ triangle = function(mesh,loc){
 #'
 #'
 #' @aliases refine.inla.mesh
-#' @export
+#' @keywords internal
+#' 
 #' @param mesh an inla.mesh object
 #' @param refine A list of refinement options passed on to \link{inla.mesh.create}
 #' @return mesh A refined inla.mesh object
@@ -219,7 +224,7 @@ refine.inla.mesh = function(mesh, refine = list(max.edge=1)){
 #' Warning2: Works in euclidean coordinates. Not suitable for sphere.
 #'
 #' @aliases tsplit.inla.mesh
-#' @export
+#' @keywords internal
 #' @param mesh an inla.mesh object
 #' @param n number of splitting recursions
 #' @return mesh A refined inla.mesh object
@@ -227,24 +232,24 @@ refine.inla.mesh = function(mesh, refine = list(max.edge=1)){
 #'
 
 tsplit.inla.mesh = function(mesh, n = 1){
-  
+
   n = 1
-  
+
   p1 = mesh$loc[mesh$graph$tv[,1],]
   p2 = mesh$loc[mesh$graph$tv[,2],]
   p3 = mesh$loc[mesh$graph$tv[,3],]
-  
+
   m1 = p1 + 0.5*(p2-p1)
   m2 = p1 + 0.5*(p3-p1)
   m3 = p2 + 0.5*(p3-p2)
   all.loc = rbind(mesh$loc,m1,m2,m3)
-  
+
   bnd.mid = mesh$loc[mesh$segm$bnd$idx[,1],] + 0.5 * ( mesh$loc[mesh$segm$bnd$idx[,2],] - mesh$loc[mesh$segm$bnd$idx[,1],]  )
   all.bnd = rbind(mesh$segm$bnd$loc,bnd.mid)
-  
-  
+
+
   mesh2 = inla.mesh.create(loc = all.loc, boundary = all.bnd )
-  
+
   if (n == 1) { return(mesh2) }
   else { return(tsplit.inla.mesh(mesh2,n-1))}
 }
