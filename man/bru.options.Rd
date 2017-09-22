@@ -38,7 +38,7 @@ Additional \link{bru} options
 opts = bru.options()
 
 # Print them:
-pts
+opts
 
 }
 

@@ -8,7 +8,7 @@ bru(components = y ~ Intercept, family = NULL, data = NULL, ...,
   options = list())
 }
 \arguments{
-\item{components}{a formula describing the latent components.}
+\item{components}{a \link{formula} describing the latent components. See \link{bru.components} for details.}
 
 \item{family}{A string indicating the likelihood family. The default is \code{gaussian} with 
 identity link. In addition to the likelihoods provided by inla 
@@ -30,9 +30,13 @@ bru returns an object of class "bru". A \code{bru} object inherits from \link{in
 }
 \description{
 This method is a wrapper for \link{inla} and provides multiple enhancements. 
-(1) For spatial data and models, \code{bru} will construct the required projection matrices automatically
-(2) Multiple likelihoods can be employed in a convenient way
-(3) Non-linear predictors are approximated numerically and fitting happens via iterated INLA calls.
+
+\itemize{
+\item{Automatic construction of inla projection matrices}
+\item{Constructing multiple likelihoods is facilitated}
+\item{Support for non-linear}
+\item{Log Gaussian Cox process (LGCP) inference}
+}
 }
 \examples{
 # Simulate some covariates x and observations y
