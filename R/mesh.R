@@ -106,12 +106,17 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #' 
 
 vertices.inla.mesh = function(object) {
-  if (is.null(object$crs)) {
-    object$loc
-  } else {
-    if (any(!(object$loc[,3]==0))) { vrt = object$loc } else { vrt = object$loc[,c(1,2)] }
-    SpatialPointsDataFrame(vrt, proj4string = object$crs, data = data.frame(vertex = 1:nrow(object$loc)))
-  }
+  
+  if ( is.null(object$crs) ) { object$crs = CRS("")  }
+
+  vrt = data.frame(object$loc)
+  if (! is.null(colnames(vrt))) { colnames(vrt) = c("x","y","z") }
+  if ( all(vrt[, 3]==0) ) { vrt = vrt[,1:2] }
+  coordinates(vrt) = colnames(vrt)
+  vrt = SpatialPointsDataFrame(vrt, data = data.frame(vertex = 1:nrow(object$loc)))
+  proj4string(vrt) = object$crs
+  
+  vrt  # return
 }
 
 
