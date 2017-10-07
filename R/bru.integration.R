@@ -193,7 +193,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     p4s = proj4string(region)
     
     # Convert region and domain to equal area CRS
-    if ( !is.null(domain$crs) ){
+    if ( !is.null(domain$crs) && !is.na(domain$crs@projargs)){
       region = stransform(region, crs = CRS("+proj=cea +units=km"))
     }
     
@@ -209,14 +209,19 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
       domain = inla.mesh.2d(boundary = region, max.edge = max.edge)
       domain$crs = CRS(proj4string(region))
     } else {
-      if ( !is.null(domain$crs) ) domain = stransform(domain, crs = CRS("+proj=cea +units=km"))
+      if ( !is.null(domain$crs) && !is.na(domain$crs@projargs)) 
+        domain = stransform(domain, crs = CRS("+proj=cea +units=km"))
     }
     
     ips = int.polygon(domain, loc = polyloc[,1:2], group = polyloc[,3])
     df = data.frame(region@data[ips$group, pregroup, drop = FALSE], weight = ips[,"weight"])
     ips = SpatialPointsDataFrame(ips[,c("x","y")],data = df)
     proj4string(ips) = proj4string(region)
-    ips = stransform(ips, crs = CRS(p4s))  
+    
+    if ( !is.na(p4s) ) {
+      ips = stransform(ips, crs = CRS(p4s))  
+    }
+    
   }
   
   ips
