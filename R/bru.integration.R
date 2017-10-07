@@ -136,7 +136,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     if ( !is.null(domain) ) stop("Integration region provided as 2D and domain is not NULL.")
     
     # transform to equal area projection
-    if ( !is.null(region$crs) ) {
+    if ( !is.null(region$crs) && !(is.na(mesh$crs@projargs))) {
       crs = region$crs
       region = stransform(region, crs = CRS("+proj=cea +units=km"))
     }
@@ -145,7 +145,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     ips$weight = diag(as.matrix(inla.mesh.fem(region)$c0))
     
     # backtransform
-    if ( !is.null(region$crs) ) { ips = stransform(ips, crs = crs) }
+    if ( !is.null(region$crs) && !(is.na(mesh$crs@projargs))) { ips = stransform(ips, crs = crs) }
     
   } else if ( inherits(region, "inla.mesh.1d") ){
     
