@@ -120,7 +120,7 @@ can be se to \code{coordinates}, which is the \code{sp} package function that ex
 coordinates from the SpatialPointsDataFrame that was provided as input to bru. The code for
 this would look as follows:
 
-\itemize{\item{\code{components = y ~ mySPDE(coordinates, model = inla.spde2.matern(...))}.}}
+\itemize{\item{\code{components = y ~ mySPDE(map = coordinates, model = inla.spde2.matern(...))}.}}
 }
 
 \author{

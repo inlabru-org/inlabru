@@ -13,8 +13,9 @@ bru(components = y ~ Intercept, family = NULL, data = NULL, ...,
 \item{family}{A string indicating the likelihood family. The default is \code{gaussian} with 
 identity link. In addition to the likelihoods provided by inla 
 (see \code{inla.models()$likelihood}) inlabru supports fitting Cox processes 
-via \code{family = "cp"}. Alternatively, \code{family} can be a likelihood
-constructed using the \link{like} function.}
+via \code{family = "cp"}. The latter requires contructing a likelihood using the \link{like}
+function and providing it via the ... parameter list. As an alternative to bru, the \link{lgcp} 
+function provides a convenient interface to fitting Cox processes.}
 
 \item{data}{A data.frame or SpatialPoints[DataFrame] object.}
 
@@ -32,21 +33,44 @@ bru returns an object of class "bru". A \code{bru} object inherits from \link{in
 This method is a wrapper for \link{inla} and provides multiple enhancements. 
 
 \itemize{
-\item{Automatic construction of inla projection matrices}
-\item{Constructing multiple likelihoods is facilitated}
-\item{Support for non-linear}
-\item{Log Gaussian Cox process (LGCP) inference}
+\item{Easy usage of spatial covariates and automatic construction of inla projection matrices for (spatial) SPDE models. 
+      This feature is accessible via the \code{components} parameter and for additional information see \link{bru.components}.
+      Examples in how to use spatial data by means of the components parameter can also be found by looking at the \link{lgcp}
+      function's documentation.}
+\item{Constructing multiple likelihoods is facilitated. See \link{like} for more information on how to provide additional
+      likelihoods to \code{bru} using the ... parameter list.}
+\item{Support for non-linear predictors. See example below.}
+\item{Log Gaussian Cox process (LGCP) inference is available by using the \code{cp} family or (even easier) by using the 
+      \link{lgcp} function.}
 }
 }
 \examples{
 # Simulate some covariates x and observations y
 input.df <- data.frame(x=cos(1:10))
-input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+input.df <- within(input.df, y <- 5 + 2*x + rnorm(10, mean=0, sd=0.1))
 
 # Fit a Gaussian likelihood model
-fit <- bru(y ~ x, "gaussian", input.df)
+fit <- bru(y ~ x + Intercept, "gaussian", input.df)
 
 # Obtain summary
+summary(fit)
+
+# Alternatively, we can use the like() function to construct the likelihood:
+
+lik = like(family = "gaussian", data = input.df)
+fit <- bru(y ~ x + Intercept, lik)
+summary(fit)
+
+# An important addition to the INLA methodology is bru's ability to use
+# non-linear predictors. Such a predictor can be formulated via like()'s 
+# \\code{formula} parameter. For instance
+
+z = 2
+input.df <- within(input.df, y <- 5 + exp(z)*x + rnorm(10, mean=0, sd=0.1))
+lik = like(family = "gaussian", data = input.df, formula = y ~ exp(z)*x + Intercept, E = 10000)
+fit <- bru( ~ z + Intercept, lik)
+
+# Check the result (z posterior should be around 2)
 summary(fit)
 }
 \author{

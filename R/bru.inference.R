@@ -20,10 +20,15 @@ generate = function(object, ...){ UseMethod("generate") }
 #' @description This method is a wrapper for \link{inla} and provides multiple enhancements. 
 #' 
 #' \itemize{
-#' \item{Automatic construction of inla projection matrices}
-#' \item{Constructing multiple likelihoods is facilitated}
-#' \item{Support for non-linear}
-#' \item{Log Gaussian Cox process (LGCP) inference}
+#' \item{Easy usage of spatial covariates and automatic construction of inla projection matrices for (spatial) SPDE models. 
+#'       This feature is accessible via the \code{components} parameter.
+#'       Practical examples on how to use spatial data by means of the components parameter can also be found by looking at the \link{lgcp}
+#'       function's documentation.}
+#' \item{Constructing multiple likelihoods is straight forward. See \link{like} for more information on how to provide additional
+#'       likelihoods to \code{bru} using the ... parameter list.}
+#' \item{Support for non-linear predictors. See example below.}
+#' \item{Log Gaussian Cox process (LGCP) inference is available by using the \code{cp} family or (even easier) by using the 
+#'       \link{lgcp} function.}
 #' }
 #' @aliases bru
 #' @export
@@ -34,8 +39,9 @@ generate = function(object, ...){ UseMethod("generate") }
 #' @param family A string indicating the likelihood family. The default is \code{gaussian} with 
 #'               identity link. In addition to the likelihoods provided by inla 
 #'               (see \code{inla.models()$likelihood}) inlabru supports fitting Cox processes 
-#'               via \code{family = "cp"}. Alternatively, \code{family} can be a likelihood
-#'               constructed using the \link{like} function.
+#'               via \code{family = "cp"}. The latter requires contructing a likelihood using the \link{like}
+#'               function and providing it via the ... parameter list. As an alternative to bru, the \link{lgcp} 
+#'               function provides a convenient interface to fitting Cox processes.
 #' @param data A data.frame or SpatialPoints[DataFrame] object.
 #' @param ... Additional likelihoods, each constructed by a calling \link{like}.
 #' @param options A list of name and value pairs that are either interpretable by \link{bru.options} 
@@ -390,7 +396,7 @@ bru.options = function(mesh = NULL,
 #' coordinates from the SpatialPointsDataFrame that was provided as input to bru. The code for
 #' this would look as follows:
 #' 
-#' \itemize{\item{\code{components = y ~ mySPDE(coordinates, model = inla.spde2.matern(...))}.}}
+#' \itemize{\item{\code{components = y ~ mySPDE(map = coordinates, model = inla.spde2.matern(...))}.}}
 #' 
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
