@@ -276,10 +276,10 @@ gg.SpatialLines = function(data, mapping = NULL, crs = NULL, ...) {
   colnames(ep) = paste0("end.", cnames)
   df = data.frame(cbind(sp, ep), data@data)
   
-  dmap = aes_string(x = coordnames(data)[1], 
-                    y = coordnames(data)[2], 
-                    xend = paste0("end.", coordnames(data)[1]), 
-                    yend = paste0("end.", coordnames(data)[2]))
+  dmap = aes_string(x = cnames[1], 
+                    y = cnames[2], 
+                    xend = paste0("end.", cnames[1]), 
+                    yend = paste0("end.", cnames[2]))
   
   if ( !is.null(mapping) ) { dmap = modifyList(dmap, mapping) }
   
