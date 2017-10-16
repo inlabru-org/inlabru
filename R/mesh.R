@@ -143,8 +143,14 @@ vertices.inla.mesh = function(object) {
 #' 
 
 pixels = function(mesh, nx = 150, ny = 150, mask = TRUE) {
-  lattice <- inla.mesh.lattice(x=seq(min(mesh$loc[,1]), max(mesh$loc[,1]),length = nx),
-                               y=seq(min(mesh$loc[,2]), max(mesh$loc[,2]),length = ny))
+  if ( length(nx)==1 ){
+    x = seq(min(mesh$loc[,1]), max(mesh$loc[,1]),length = nx)
+  } else { x = nx }
+  if ( length(ny)==1 ){
+    y = seq(min(mesh$loc[,2]), max(mesh$loc[,2]),length = ny)
+  } else { y = ny }
+  
+  lattice <- inla.mesh.lattice(x=x,y=y)
   pixels <- data.frame(x=lattice$loc[,1], y=lattice$loc[,2])
 
   coordinates(pixels) <- c("x","y")
