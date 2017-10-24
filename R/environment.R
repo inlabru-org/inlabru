@@ -56,7 +56,7 @@ bru.log = function() {
 
 msg = function(txt) {
   if ( iinla.getOption("iinla.verbose") ) { cat(paste0(txt,"\n")) }
-  logentry(msg)
+  logentry(txt)
 }
 
 logentry = function(txt) { iinla.env$log = c(iinla.env$log, paste0(Sys.time(),": ", txt)) }
