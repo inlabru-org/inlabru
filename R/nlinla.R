@@ -32,13 +32,30 @@ nlinla.taylor = function(expr, epunkt, data, env) {
 }
 
 nlinla.epunkt = function(model, data, result = NULL) {
+  # This function determines the current point around which
+  # to perform the taylo approximation
+  # (1) If result is NULL set all all effects to 0
+  # (2) If result is a data.frame, use the entries as to where to approximate
+  # (3) if result is an inla object, use these estimates as to where to approximate
+  
+  dfdata = data.frame(data) # data as data.frame (may have been supplied as Spatial* object)
   if ( is.null(result) ){
-    df = data.frame(matrix(0, nrow = nrow(data.frame(data)), ncol = length(model$effects)))
+    df = data.frame(matrix(0, nrow = nrow(dfdata), ncol = length(model$effects)))
     colnames(df) = elabels(model)
     df
-  } else { 
-    evaluate.model(model, result, data, property = "mode") 
+  } else if ( !inherits(result, "inla") & is.data.frame(result) ) {
+    # If result contains only a single row data frame repeat it to match the data
+    if ( (nrow(result) == 1) & (nrow(dfdata)>1) ) {
+        result = result[rep(1,nrow(dfdata)),,drop = FALSE]
     }
+    # Check if all variables have been supplied. Those that aren't are set to 0
+    for (eff in setdiff(names(model$effects), names(result))) {
+      result[[eff]] = 0
+    }
+    return(result)
+  } else { 
+    evaluate.model(model, result, data, property = "mean") 
+  }
 }
 
 nlinla.reweight = function(A, model, data, expr, result){
