@@ -570,7 +570,7 @@ gg.inla.mesh.1d = function(data, mapping = aes_string("x","y"), y = 0, shape = 4
 #' @examples
 #' 
 #' # Load Gorilla data
-#' data("gorillas", package = "spatstat")
+#' data("gorillas", package = "spatstat.data")
 #' 
 #' # Convert elevation covariate to RasterLayer
 #'

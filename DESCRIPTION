@@ -23,6 +23,7 @@ Suggests:
     mgcv,
     shiny,
     spatstat,
+    spatstat.data,
     RColorBrewer,
     graphics
 Depends:
