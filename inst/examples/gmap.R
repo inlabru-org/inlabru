@@ -1,3 +1,4 @@
+\dontrun{
 # Load the Gorilla data
 data(gorillas)
  
@@ -6,3 +7,4 @@ gmap(gorillas$nests, maptype = "satellite") +
     gm(gorillas$boundary) + 
     gm(gorillas$nests, color = "white", size = 0.5)
  
+}

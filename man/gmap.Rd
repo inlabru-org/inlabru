@@ -19,6 +19,7 @@ Uses get_map() to query map services like Google Maps for a region centered arou
 the spatial object provided. Then calls ggmap() to plot the map.
 }
 \examples{
+\dontrun{
 # Load the Gorilla data
 data(gorillas)
  
@@ -27,4 +28,5 @@ gmap(gorillas$nests, maptype = "satellite") +
     gm(gorillas$boundary) + 
     gm(gorillas$nests, color = "white", size = 0.5)
  
+}
 }

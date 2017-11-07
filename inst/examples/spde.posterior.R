@@ -11,7 +11,7 @@ ggplot(pts2) +
 
 # Fit an LGCP model with  and SPDE component
 
-x <- seq(0, 55, length = 50)
+x <- seq(0, 55, length = 20)
 mesh1D <- inla.mesh.1d(x, boundary = "free")
 mdl <- x ~ spde1D(map = x, model = inla.spde2.matern(mesh1D)) + Intercept
 init.tutorial()
