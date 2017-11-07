@@ -16,7 +16,7 @@ Concatenation of a \link{geom_line} value and optionally a \link{geom_ribbon} va
 This geom constructor will simply call \link{gg.prediction} for the data provided.
 }
 \examples{
-
+\donttest{
 # Generate some data
 
 input.df <- data.frame(x=cos(1:10))
@@ -81,6 +81,7 @@ ggplot() +
   gg(xipost) +
   gg(xipost, mapping = aes(y = median), ribbon = FALSE, color = "red")
 
+}
 }
 \seealso{
 Other geomes for inla and inlabru predictions: \code{\link{gg.prediction}},

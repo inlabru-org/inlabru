@@ -1,3 +1,4 @@
+\donttest{
 # The like function's main purpose is to set up models with multiple likelihoods. 
 # The following example generates some random covariates which are observed through
 # two different random effect models with different likelihoods
@@ -46,4 +47,5 @@ p2 = ggplot() + gg(fit2$summary.fixed, bar = TRUE) + ylim(0, 4) + ggtitle("Model
 pj = ggplot() + gg(jfit$summary.fixed, bar = TRUE) + ylim(0, 4) + ggtitle("Joint model")
 
 multiplot(p1, p2, pj)
+}
 

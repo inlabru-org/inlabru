@@ -45,6 +45,7 @@ This method is a wrapper for \link{inla} and provides multiple enhancements.
 }
 }
 \examples{
+\donttest{
 # Simulate some covariates x and observations y
 input.df <- data.frame(x=cos(1:10))
 input.df <- within(input.df, y <- 5 + 2*x + rnorm(10, mean=0, sd=0.1))
@@ -72,6 +73,7 @@ fit <- bru( ~ z + Intercept, lik)
 
 # Check the result (z posterior should be around 2)
 summary(fit)
+}
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>

@@ -1,3 +1,4 @@
+\donttest{
 # Load 1D Poisson process data
 
 data(Poisson2_1D)
@@ -47,4 +48,4 @@ plot(matcor)
 matcov = spde.posterior(fit, "spde1D", "matern.covariance")
 plot(matcov)
 
-
+}

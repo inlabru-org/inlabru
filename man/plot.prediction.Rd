@@ -20,7 +20,7 @@ an object of class \code{gg}
 Generates a base ggplot2 using \link{ggplot} and adds a geom for input \code{x} using \link{gg}.
 }
 \examples{
-
+\donttest{
 # Generate some data
 
 input.df <- data.frame(x=cos(1:10))
@@ -85,4 +85,5 @@ ggplot() +
   gg(xipost) +
   gg(xipost, mapping = aes(y = median), ribbon = FALSE, color = "red")
 
+}
 }

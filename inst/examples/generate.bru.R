@@ -1,4 +1,4 @@
-
+\donttest{
 # Generate data for a simple linear model
 
 input.df <- data.frame(x=cos(1:10))
@@ -22,9 +22,10 @@ for (k in 2:length(smp)) points(df$x, smp[[k]], type = "l")
 # We can also draw samples form the joint posterior
 
 df = data.frame(x = 1)
-smp = generate(fit, df, ~ data.frame(xeff, Intercept), n.samples = 100)
+smp = generate(fit, df, ~ data.frame(xeff, Intercept), n.samples = 10)
 smp[[1]]
 
 # ... and plot them
 
 plot(do.call(rbind, smp))
+}

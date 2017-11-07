@@ -36,7 +36,7 @@ Note: \code{gg.prediction} also understands the format of INLA-style posterior s
 \code{fit$summary.fixed} for an inla object \code{fit}
 }
 \examples{
-
+\donttest{
 # Generate some data
 
 input.df <- data.frame(x=cos(1:10))
@@ -101,6 +101,7 @@ ggplot() +
   gg(xipost) +
   gg(xipost, mapping = aes(y = median), ribbon = FALSE, color = "red")
 
+}
 }
 \seealso{
 Other geomes for inla and inlabru predictions: \code{\link{gg.data.frame}},
