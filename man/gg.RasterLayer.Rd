@@ -24,7 +24,7 @@ uses \link{geom_tile} to plot the data.
 \examples{
 
 # Load Gorilla data
-data("gorillas", package = "spatstat")
+data("gorillas", package = "spatstat.data")
 
 # Convert elevation covariate to RasterLayer
 
