@@ -8,34 +8,72 @@ bru(components = y ~ Intercept, family = NULL, data = NULL, ...,
   options = list())
 }
 \arguments{
-\item{components}{a formula describing the latent components}
+\item{components}{a \link{formula} describing the latent components. See \link{bru.components} for details.}
 
-\item{family}{Character defining one of the likelihoods supported by \link{like}. Alternatively, an object cunstructed by \link{like}.}
+\item{family}{A string indicating the likelihood family. The default is \code{gaussian} with 
+identity link. In addition to the likelihoods provided by inla 
+(see \code{inla.models()$likelihood}) inlabru supports fitting Cox processes 
+via \code{family = "cp"}. The latter requires contructing a likelihood using the \link{like}
+function and providing it via the ... parameter list. As an alternative to bru, the \link{lgcp} 
+function provides a convenient interface to fitting Cox processes.}
 
-\item{data}{A data.frame or SpatialPoints[DataFrame] object}
+\item{data}{A data.frame or SpatialPoints[DataFrame] object.}
 
-\item{...}{Additional likelihoods, each constructed by a calling \link{like}}
+\item{...}{Additional likelihoods, each constructed by a calling \link{like}.}
 
-\item{options}{See \link{bru.options}}
+\item{options}{A list of name and value pairs that are either interpretable by \link{bru.options} 
+or valid inla parameters.}
 }
 \value{
-A \link{bru} object
+bru returns an object of class "bru". A \code{bru} object inherits from \link{inla} 
+        (see the inla documentation for its properties) and adds additional information stored 
+        in the \code{sppa} field.
 }
 \description{
 This method is a wrapper for \link{inla} and provides multiple enhancements. 
-(1) For spatial data and models, \code{bru} will construct the required projection matrices automatically
-(2) Multiple likelihoods can be employed in a convenient way
-(3) Non-linear predictors are approximated numerically and fitting happens via iterated INLA calls.
+
+\itemize{
+\item{Easy usage of spatial covariates and automatic construction of inla projection matrices for (spatial) SPDE models. 
+      This feature is accessible via the \code{components} parameter.
+      Practical examples on how to use spatial data by means of the components parameter can also be found by looking at the \link{lgcp}
+      function's documentation.}
+\item{Constructing multiple likelihoods is straight forward. See \link{like} for more information on how to provide additional
+      likelihoods to \code{bru} using the ... parameter list.}
+\item{Support for non-linear predictors. See example below.}
+\item{Log Gaussian Cox process (LGCP) inference is available by using the \code{cp} family or (even easier) by using the 
+      \link{lgcp} function.}
+}
 }
 \examples{
-
-\dontrun{
+\donttest{
+# Simulate some covariates x and observations y
 input.df <- data.frame(x=cos(1:10))
-input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
-fit.newbru <- bru(y ~ x, "gaussian", input.df)
-summary(fit.newbru)
-}
+input.df <- within(input.df, y <- 5 + 2*x + rnorm(10, mean=0, sd=0.1))
 
+# Fit a Gaussian likelihood model
+fit <- bru(y ~ x + Intercept, "gaussian", input.df)
+
+# Obtain summary
+summary(fit)
+
+# Alternatively, we can use the like() function to construct the likelihood:
+
+lik = like(family = "gaussian", data = input.df)
+fit <- bru(y ~ x + Intercept, lik)
+summary(fit)
+
+# An important addition to the INLA methodology is bru's ability to use
+# non-linear predictors. Such a predictor can be formulated via like()'s 
+# \\code{formula} parameter. For instance
+
+z = 2
+input.df <- within(input.df, y <- 5 + exp(z)*x + rnorm(10, mean=0, sd=0.1))
+lik = like(family = "gaussian", data = input.df, formula = y ~ exp(z)*x + Intercept, E = 10000)
+fit <- bru( ~ z + Intercept, lik)
+
+# Check the result (z posterior should be around 2)
+summary(fit)
+}
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>

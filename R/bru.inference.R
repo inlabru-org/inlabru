@@ -1,33 +1,57 @@
-# GENERICS
-generate = function(...){UseMethod("generate")}
+#' Generate samples from fitted bru and inla models
+#' 
+#' @description 
+#' 
+#' Generic function for sampling for fitted models. The function invokes particular methods 
+#' which depend on the class of the first argument.
+#'
+#' @name generate
+#' @export
+#' @family sample generators
+#' @param object a fitted model.
+#' @param ... additional arguments affecting the samples produced.
+#' @return The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
+#' @example inst/examples/generate.bru.R
+
+generate = function(object, ...){ UseMethod("generate") }
 
 #' @title Convenient model fitting using (iterated) INLA
 #'
 #' @description This method is a wrapper for \link{inla} and provides multiple enhancements. 
-#' (1) For spatial data and models, \code{bru} will construct the required projection matrices automatically
-#' (2) Multiple likelihoods can be employed in a convenient way
-#' (3) Non-linear predictors are approximated numerically and fitting happens via iterated INLA calls.
-#'
+#' 
+#' \itemize{
+#' \item{Easy usage of spatial covariates and automatic construction of inla projection matrices for (spatial) SPDE models. 
+#'       This feature is accessible via the \code{components} parameter.
+#'       Practical examples on how to use spatial data by means of the components parameter can also be found by looking at the \link{lgcp}
+#'       function's documentation.}
+#' \item{Constructing multiple likelihoods is straight forward. See \link{like} for more information on how to provide additional
+#'       likelihoods to \code{bru} using the ... parameter list.}
+#' \item{Support for non-linear predictors. See example below.}
+#' \item{Log Gaussian Cox process (LGCP) inference is available by using the \code{cp} family or (even easier) by using the 
+#'       \link{lgcp} function.}
+#' }
 #' @aliases bru
 #' @export
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-#' @param components a formula describing the latent components
-#' @param family Character defining one of the likelihoods supported by \link{like}. Alternatively, an object cunstructed by \link{like}.
-#' @param data A data.frame or SpatialPoints[DataFrame] object
-#' @param ... Additional likelihoods, each constructed by a calling \link{like}
-#' @param options See \link{bru.options} 
-#' @return A \link{bru} object
+#' @param components a \link{formula} describing the latent components. See \link{bru.components} for details.
+#' @param family A string indicating the likelihood family. The default is \code{gaussian} with 
+#'               identity link. In addition to the likelihoods provided by inla 
+#'               (see \code{inla.models()$likelihood}) inlabru supports fitting Cox processes 
+#'               via \code{family = "cp"}. The latter requires contructing a likelihood using the \link{like}
+#'               function and providing it via the ... parameter list. As an alternative to bru, the \link{lgcp} 
+#'               function provides a convenient interface to fitting Cox processes.
+#' @param data A data.frame or SpatialPoints[DataFrame] object.
+#' @param ... Additional likelihoods, each constructed by a calling \link{like}.
+#' @param options A list of name and value pairs that are either interpretable by \link{bru.options} 
+#'                or valid inla parameters.
 #' 
-#' @examples
+#' @return bru returns an object of class "bru". A \code{bru} object inherits from \link{inla} 
+#'         (see the inla documentation for its properties) and adds additional information stored 
+#'         in the \code{sppa} field.
 #' 
-#' \dontrun{
-#' input.df <- data.frame(x=cos(1:10))
-#' input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
-#' fit.newbru <- bru(y ~ x, "gaussian", input.df)
-#' summary(fit.newbru)
-#' }
+#' @example inst/examples/bru.R
 #' 
 
 bru = function(components = y ~ Intercept,
@@ -114,14 +138,18 @@ bru = function(components = y ~ Intercept,
 #' 
 #' @param family A character identifying a valid \link{inla} likelihood. Alternatively 'cp' for Cox processes.
 #' @param formula a \link{formula} where the right hand side expression defines the predictor used in the optimization.
-#' @param data Likelihood-specific data
-#' @param components Components
-#' @param mesh An inla.mesh object
+#' @param data Likelihood-specific data.
+#' @param components Components.
+#' @param mesh An inla.mesh object.
 #' @param E Exposure parameter for family = 'poisson' passed on to \link{inla}. Special case if family is 'cp': rescale all integration weights by E.
-#' @param samplers Integration domain for 'cp' family
-#' @param ips Integration points for 'cp' family. Overrides \code{samplers}
-#' @param domain Named list of domain definitions
+#' @param samplers Integration domain for 'cp' family.
+#' @param ips Integration points for 'cp' family. Overrides \code{samplers}.
+#' @param domain Named list of domain definitions.
 #' 
+#' @return A likelihood configuration which can be used to parameterize \link{bru}.
+#' 
+#' @example inst/examples/like.R
+
 like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = NULL, E = 1, samplers = NULL, ips = NULL, domain = NULL) {
   
   # Some defaults
@@ -134,12 +162,12 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
   if ( !linear ) { expr = parse(text = as.character(formula)[length(as.character(formula))]) }
   else { expr = NULL }
   
-  #' Set response name
+  # Set response name
   response = all.vars(update(formula, .~0))
   if (response[1] == ".") response = NULL
   
   
-  #' More on special bru likelihoods
+  # More on special bru likelihoods
   if ( family == "cp" ) {
     if ( is.null(data) ) { stop("You called like() with family='cp' but no 'data' argument was supplied.") }
     #if ( is.null(samplers) ) { stop("You called like() with family='cp' but no 'samplers' argument was supplied.") }
@@ -224,7 +252,18 @@ stackmaker.like = function(lhood) {
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-
+#' @examples
+#' 
+#' \dontrun{
+#' 
+#' # Generate default bru options
+#' opts = bru.options()
+#'
+#' # Print them:
+#' opts
+#' 
+#' }
+#' 
 bru.options = function(mesh = NULL, 
                        run = TRUE,
                        max.iter = 10,
@@ -245,6 +284,127 @@ bru.options = function(mesh = NULL,
   
   args
 }
+
+#' bru components
+#' 
+#' @description 
+#' 
+#' Similar to glm(), gam() and inla() \link{bru} uses formula objects to describe response data and latent 
+#' (unknonw) components of the model to be fitted. However, in addition to the syntax compatible with 
+#' \link{inla}, bru components offer addtitional functionality which facilitates modeling.
+#' 
+#' @details 
+#' 
+#' \link{bru} will understand formulae describing fixed effect models just like the other methods. For instance, the
+#' formula \code{y ~ x} will fit the linear combination of an effect named \code{x} and an intercept to
+#' the response \code{y} with respect to the likelihood family stated when calling \link{bru}. Mathematically,
+#' the linear predictor \eqn{\eta} would be written down as 
+#' 
+#' \deqn{\eta = \beta * x + c,} 
+#' 
+#' where:
+#' 
+#' \itemize{
+#' \item{\eqn{c} }{is the \emph{intercept}}
+#' \item{\eqn{x }}{is a \emph{covariate}}
+#' \item{\eqn{\beta} }{is a \emph{random variable} associated with \eqn{x} and} 
+#' \item{\eqn{\psi = \beta * x }}{ is called the \emph{random effect} of \eqn{x}}
+#' }
+#' 
+#' A problem that arises when using this kind of R formula is that it does not clearly relect the mathematical
+#' formula. For instance, when providing the formula to inla, the resulting object will refer to the random
+#' effect \eqn{\psi = \beta * x } as \code{x}. Hence, it is not clear if \code{x} refers to the covariate 
+#' or the effect of the covariate.
+#' 
+#' @section Naming random effects:
+#' 
+#' In inla, a simple random effect model would be expressed as 
+#' 
+#' \itemize{\item{\code{formula = y ~ f(x, model = "linear")},}}
+#' 
+#' where \link{f} is the inla specific function to set up random effects of all kinds. The underlying 
+#' predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state 
+#' \code{x} as the random effect's name. bru allows to rewrite this formula in order to explicitly state 
+#' the name of the random effect and the name of the associated. This is achived by replacing \code{f}
+#' with an arbitrary name that we wish to assign to the effect, e.g.
+#' 
+#' \itemize{\item{\code{components = y ~ psi(x, model = "linear")}.}}
+#'
+#' Being able to disciminate between \eqn{x} and \eqn{\psi} is relevant because of two functionalities
+#' bru offers. The formula parameters of both, \link{bru} and the prediction method \link{predict.bru}
+#' are interpreted in the mathematical sense. For instance, \code{predict} may be used to analyze the
+#' an analytical combination of the covariate \eqn{x} and the intercept using
+#' 
+#' \itemize{\item{\code{predict(fit, data.frame(x=1)), ~ exp(x + Intercept)}.}}
+#' 
+#' On the other hand, predict may be used to only look at a transformation of the random effect \eqn{\psi}
+#' 
+#' \itemize{\item{\code{predict(fit, NULL, ~ exp(psi)}.}}
+#' 
+#' @section Simple covariates and the map parameter:
+#' 
+#' It is not unusual for a random effect act on a transformation of a covariate. In other frameworks this
+#' would mean that the transformed covariate would have to be calculated in advance and added to the 
+#' data frame that is usually provided via the \code{data} parameter. inlabru provides the option to do
+#' this transformation automatically. For instance, one might be interested in the effect of a covariate
+#' \eqn{x^2}. In inla and other frameworks this would require to add a column \code{xsquared} to the
+#' input data frame and use the formula
+#' 
+#' \itemize{\item{\code{formula = y ~ f(xsquared, model = "linear")},}}
+#' 
+#' In inlabru this can be achived using two ways of using the \code{map} parameter. 
+#' 
+#' \itemize{
+#' \item{\code{components = y ~ psi(map = x^2, model = "linear")}}
+#' \item{\code{components = y ~ psi(map = mySquareFun(x), model = "linear")},}
+#' \item{\code{components = y ~ psi(map = myOtherSquareFun, model = "linear")},}
+#' 
+#' }
+#' 
+#' In the first example inlabru will interpret the map parameter as an expression to be evaluated within
+#' the data provided. Since \eqn{x} is a knonwn covariate it will know how to calculate it. The second
+#' example is an expression as well but it uses a function alled \code{mySquareFun}. This function is
+#' defined by user but has wo be accessible within the work space when setting up the compoonents. 
+#' The third example provides the function \code{myOtherSquareFun} directly and not within an expression.
+#' In this case, inlabru will call the function using the data provided via the  \code{data} parameter. 
+#' inlabru expects that the output of this function is a data.frame with "psi" being the name of the 
+#' single existing column. For instance, 
+#' 
+#' \code{myOtherSquareFun = function(data) {
+#'                             data = data[,"x", drop = FALSE] ; 
+#'                             colnames(data) = "psi" ;
+#'                             return(data)}}
+#' 
+#' @section Spatial Covariates:
+#' 
+#' When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
+#' surface temperature or elevation. Although it is straight forward to add this data to the input
+#' data frame or write a covariate function like in the previous section there is an even more 
+#' convenient way in inlabru. Spatial covariates are often stored as \code{SpatialPixelDataFrame}, 
+#' \code{SpatialPixelDataFrame} or \code{RasterLayer} objects. These can be provided directly via 
+#' the map parameter if the input data is a \code{SpatialPointsDataFrame}. inlabru will automatically
+#' evaluate and/or interpolate the coariate at your data locations when using code like
+#' 
+#' \itemize{\item{\code{components = y ~ psi(mySpatialPixels, model = "linear")}.}}
+#'
+#' @section Coordinates:
+#' 
+#' A common spatial modelling component when using inla are SPDE models. An important feature of
+#' inlabru is that it will automatically calculate the so called A-matrix which maps SPDE 
+#' values at the mesh vertices to values at the data locations. For this purpose, the map parameter
+#' can be se to \code{coordinates}, which is the \code{sp} package function that extracts point 
+#' coordinates from the SpatialPointsDataFrame that was provided as input to bru. The code for
+#' this would look as follows:
+#' 
+#' \itemize{\item{\code{components = y ~ mySPDE(map = coordinates, model = inla.spde2.matern(...))}.}}
+#' 
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @aliases bru.components
+#' @export
+#' @return NULL
+#' 
+bru.components = function() { NULL }
 
 
 #' Log Gaussian Cox process (LGCP) inference using INLA
@@ -273,6 +433,47 @@ bru.options = function(mesh = NULL,
 #' @param E Single numeric used rescale all integration weights by a fixed factor 
 #' @param options See \link{bru.options}
 #' @return An \link{bru} object
+#' @examples
+#' 
+#' \dontrun{
+#' 
+#' Load the Gorilla data
+#' data(gorillas)
+#' 
+#' # Use tutorial setting and thus empirical Bayes for faster inference
+#' init.tutorial()
+#' 
+#' # Plot the Gorilla nests, the mesh and the survey boundary
+#' ggplot() + 
+#'   gg(gorillas$mesh) + 
+#'   gg(gorillas$nests) + 
+#'   gg(gorillas$boundary) + 
+#'   coord_fixed()
+#' 
+#' # Define SPDE prior
+#' matern <- inla.spde2.pcmatern(gorillas$mesh, 
+#'                               prior.sigma = c(0.1, 0.01), 
+#'                               prior.range = c(5, 0.01))
+#' 
+#' # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
+#' cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+#' 
+#' # Fit the model
+#' fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+#' 
+#' # Predict the spatial intensity surface
+#' lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+#' 
+#' # Plot the intensity
+#' ggplot() + 
+#'   gg(lambda) +
+#'   gg(gorillas$mesh) + 
+#'   gg(gorillas$nests) + 
+#'   gg(gorillas$boundary) + 
+#'   coord_fixed()
+#' 
+#' }
+#' 
 
 lgcp = function(components,
                 data,
@@ -329,14 +530,17 @@ summary.lgcp = function(object, ...) {
 }
 
 
-#' Summarize a \link{bru} object
+#' Summary for a \link{bru} fit
+#'
+#' Takes a fitted bru object produced by bru() or lgcp() and creates various summaries from it. 
 #'
 #' @aliases summary.bru
 #' @export
 #' @method summary bru
 #' @param object An object obtained from a \link{bru} or \link{lgcp} call
 #' @param ... ignored arguments
-# 
+#' @example inst/examples/bru.R
+#' 
 
 summary.bru = function(object, ...) {
   
@@ -406,17 +610,29 @@ summary.bru = function(object, ...) {
 
 }
 
-#' Predictions based on bru
+#' Prediction from fitted bru model
+#' 
+#' Takes a fitted \code{bru} object produced by the function \link{bru}() and produces predictions given 
+#' a new set of values for the model covariates or the original values used for the model fit. The
+#' predictions can be based on any R expression that is valid given these values/covariates and the joint 
+#' posterior of the estimated random effects.
+#'  
+#' Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
+#' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
+#' value drawn in course of estimating the statistics.
+#' 
+#' Internally, this method calls \link{generate.bru} in order to draw samples from the model.
 #' 
 #' @aliases predict.bru
 #' @export
-#' @param object An object obtained by calling \link{bru})
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
-#' @param formula A formula determining which effects to predict and how to combine them
+#' @param object An object obtained by calling \link{bru} or \link{lgcp}.
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction.
+#' @param formula A formula determining which effects to predict and how to combine them.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
-#' @param ... ignored arguments (S3 generic compatibility)
+#' @param ... ignored arguments (S3 generic compatibility).
 #' 
-#' @return Predicted values
+#' @return a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
+#' @example inst/examples/predict.bru.R
 
 predict.bru = function(object,
                        data = NULL,
@@ -464,19 +680,34 @@ predict.bru = function(object,
 
 #' Sampling based on bru posteriors
 #' 
+#' @description 
+#' Takes a fitted \code{bru} object produced by the function \link{bru}() and produces samples given 
+#' a new set of values for the model covariates or the original values used for the model fit. The
+#' samples can be based on any R expression that is valid given these values/covariates and the joint
+#' posterior of the estimated random effects.
+#'  
+#' Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
+#' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
+#' value drawn in course of estimating the statistics.
+#'
 #' @aliases generate.bru
 #' @export
-#' @param object An object obtained by calling \link{bru})
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction
-#' @param formula A formula determining which effects to predict and how to combine them
-#' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
+#' @family sample generators
+#' @param object A \code{bru} object obtained by calling \link{bru}.
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for sampling.
+#' @param formula A formula determining which effects to sample from and how to combine them analytically.
+#' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. 
+#'                  The default is rather low but provides a quick approximate result.
+#' @param ... ignored arguments (needed for S3 compatibility).
 #' 
 #' @return Predicted values
+#' @example inst/examples/generate.bru.R
 
 generate.bru = function(object,
                        data,
                        formula = NULL,
-                       n.samples = 100)
+                       n.samples = 100,
+                       ...)
 {
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if ( is.character(data) ) { data = as.list(setNames(data, data)) }
@@ -588,14 +819,14 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.
 }  
 
 
-#' Summarize and annotate data
-#' 
-#' @aliases summarize
-#' @export
-#' @param data A list of samples, each either numeric or a \code{data.frame}
-#' @param x A \code{data.frame} of data columns that should be added to the summary data frame
-#' @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
-#' @return A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
+# Summarize and annotate data
+# 
+# @aliases summarize
+# @export
+# @param data A list of samples, each either numeric or a \code{data.frame}
+# @param x A \code{data.frame} of data columns that should be added to the summary data frame
+# @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
+# @return A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
 
 summarize = function(data, x = NULL, cbind.only = FALSE) {
   if ( is.list(data) ) { data = do.call(cbind, data) }

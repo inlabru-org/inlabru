@@ -7,15 +7,33 @@
 int(data, values, dims = NULL)
 }
 \arguments{
-\item{data}{A \code{data.frame} or \code{Spatial} object. Has to have a weight column with numeric values.}
+\item{data}{A \code{data.frame} or \code{Spatial} object. Has to have a \code{weight} column with numeric values.}
 
-\item{values}{Numerical values to be summed up.}
+\item{values}{Numerical values to be summed up, usually the result of function evaluations.}
 
-\item{dims}{Columns of the \code{data} obect to integrate over}
+\item{dims}{Column names (dimension names) of the \code{data} object to integrate over.}
 }
 \value{
-A \code{data.frame} of integrated values
+A \code{data.frame} of integrals, one for each level of the cross product of all dimensions not being integrated over.
 }
 \description{
-Weighted summation (integration) of data frame subsets
+A typicel task in statistical inference to integrate a (multivariate) function along one or
+more dimensions of its domain. For this purpose, the function is evaluated at some points
+in the domain and the values are summed up using weights that depend on the area being 
+integrated over. This function performs the weighting and summation conditional for each level
+of the dimensions that are not integrated over. The parameter \code{dims} states the the 
+dimensions to integrate over. The set of dimensions that are held fixed is the set difference
+of all column names in \code{data} and the dimensions stated by \code{dims}.
+}
+\examples{
+# Create integration points in two dimensions, x and y
+
+ips = cprod(ipoints(c(0,10), 10, name = "x"),
+            ipoints(c(1,5), 10, name = "y"))
+
+# The sizes of the domains are 10 and 4 for x and y, respectively.
+# Integrating f(x,y) = 1 along x and y should result in the total
+# domain size 40
+
+int(ips, rep(1, nrow(ips)), c("x","y"))
 }

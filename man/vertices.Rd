@@ -11,10 +11,13 @@ vertices(object)
 \S4method{vertices}{inla.mesh}(object)
 }
 \arguments{
-\item{object}{An \code{inla.mesh} object}
+\item{object}{An object for which to call the particular vertices method.}
+}
+\value{
+The form of the value returned by vertices() depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
 }
 \description{
-Vertices
+This is a generic function. The outcome depends on the \code{object} provided
 
 Vertices
 }

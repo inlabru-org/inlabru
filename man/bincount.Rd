@@ -2,7 +2,7 @@
 % Please edit documentation in R/bru.gof.R
 \name{bincount}
 \alias{bincount}
-\title{Bin checking}
+\title{1D LGCP bin count simulation and comparison with data}
 \usage{
 bincount(result, predictor, observations, breaks, nint = 20,
   probs = c(0.025, 0.5, 0.975), ...)
@@ -10,13 +10,13 @@ bincount(result, predictor, observations, breaks, nint = 20,
 \arguments{
 \item{result}{A result object from a \link{bru} or \link{lgcp} call}
 
-\item{predictor}{A formula describing the prediction of a 1D function via \link{predict}.}
+\item{predictor}{A formula describing the prediction of a 1D LGCP via \link{predict}.}
 
 \item{observations}{A vector of observed values}
 
 \item{breaks}{A vector of bin boundaries}
 
-\item{nint}{Number of integration points per bin}
+\item{nint}{Number of integration points per bin. Increase this if the bins are wide and}
 
 \item{probs}{numeric vector of probabilities with values in [0,1]}
 
@@ -26,5 +26,45 @@ bincount(result, predictor, observations, breaks, nint = 20,
 An \link{inla} object
 }
 \description{
-Bin checking
+A common procedure of analyzing the distribution of 1D points is to chose a binning
+and plot the data's histogram with respect to this binning. This function compares the
+counts that the histogram calculates to simulations from a 1D log Gaussian Cox process
+conditioned on the number of data samples. For each bin this results in a median number 
+of counts as well as a confidence interval. If the LGCP is a plausible model for the 
+observed points then most of the histrogram counts (number of points within a bin) 
+should be within the confidence intervals. Note that a proper comparison  is a multiple 
+testing problem which the function does not solve for you.
+}
+\examples{
+
+\dontrun{
+
+# Load a point pattern
+data(Poisson2_1D)
+
+# Take a look at the point (and frequency) data
+
+ggplot(pts2) + 
+  geom_histogram(aes(x = x), binwidth = 55/20, boundary = 0, fill = NA, color = "black") +
+  geom_point(aes(x), y = 0, pch = "|", cex = 4) + 
+  coord_fixed(ratio = 1)
+
+#' Fit an LGCP model 
+x <- seq(0, 55, length = 50)
+mesh1D <- inla.mesh.1d(x, boundary = "free")
+mdl <- x ~ spde1D(map = x, model = inla.spde2.matern(mesh1D)) + Intercept # SOLUTION
+init.tutorial()
+fit.spde <- lgcp(mdl, pts2, domain = list(x = c(0,55)))
+
+# Calculate bin statistics
+bc <- bincount(result = fit.spde, 
+               observations = pts2, 
+               breaks = seq(0,max(pts2),length = 12), 
+               predictor = x ~ exp(spde1D + Intercept))
+
+
+# Plot them!
+attributes(bc)$ggp
+
+}
 }

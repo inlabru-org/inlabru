@@ -10,16 +10,44 @@ globe(R = 1, R.grid = 1.05, specular = "black", axes = FALSE,
 \arguments{
 \item{R}{Radius of the globe}
 
-\item{R.grid}{Radius of the annotation sphere}
+\item{R.grid}{Radius of the annotation sphere.}
 
-\item{specular}{Light color of specular effect}
+\item{specular}{Light color of specular effect.}
 
-\item{axes}{If TRUE, plot x, y and z axes}
+\item{axes}{If TRUE, plot x, y and z axes.}
 
-\item{box}{If TRUE, plot a box around the globe}
+\item{box}{If TRUE, plot a box around the globe.}
 
 \item{xlab, ylab, zlab}{Axes labels}
 }
+\value{
+No value, used for plotting side effect.
+}
 \description{
-Plot a globe using rgl
+Creates a textured sphere and lon/lat coordinate annotations.
+}
+\examples{
+# Load rgl library (needed due to a bug in sphereplot library)
+
+library(rgl)
+
+# Load pantropoical dolphin data
+
+data("mexdolphin")
+
+# Show the globe
+
+globe()
+
+# Add mesh, ship transects and dolphin sightings stored
+# as inla.mesh, SpatialLines and SpatialPoints objects, respectively
+
+glplot(mexdolphin$mesh)
+glplot(mexdolphin$samplers)
+glplot(mexdolphin$points)
+}
+\seealso{
+Other inlabru RGL tools: \code{\link{glplot.SpatialLines}},
+  \code{\link{glplot.SpatialPoints}},
+  \code{\link{glplot.inla.mesh}}, \code{\link{glplot}}
 }

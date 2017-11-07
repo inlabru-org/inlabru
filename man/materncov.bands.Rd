@@ -51,3 +51,4 @@ Evaluate the covariance function for an inla.spde
 Uses a Gaussian assumption for the internal model parameters, and finds a region in parameter
 space with approximately \code{quantile} probability.
 }
+\keyword{internal}

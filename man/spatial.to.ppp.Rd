@@ -2,14 +2,14 @@
 % Please edit documentation in R/spatstat.R
 \name{spatial.to.ppp}
 \alias{spatial.to.ppp}
-\title{Convert SpatialPoints and boundary polygon to  spatstat ppp object}
+\title{Convert SpatialPoints and boundary polygon to spatstat ppp object}
 \usage{
 spatial.to.ppp(points, samplers)
 }
 \arguments{
-\item{points}{A SpatialPoints[DataFrame] describing the point pattern}
+\item{points}{A SpatialPoints[DataFrame] object describing the point pattern.}
 
-\item{samplers}{A SpatialPolygons[DataFrame] describing the observation window}
+\item{samplers}{A SpatialPolygons[DataFrame] object describing the observation window.}
 
 \item{...}{arguments passed on to \link{predict}}
 }
@@ -17,5 +17,22 @@ spatial.to.ppp(points, samplers)
 A spatstat \code{spatstat} \code{ppp} object
 }
 \description{
-Convert SpatialPoints and boundary polygon to  spatstat ppp object
+Spatstat point pattern objects consist of points and an observation windows. This
+function uses a SpatialPoints object and a SpatialPolygon object to generate the points
+and the window. Lastly, the ppp() function is called to create the \code{ppp} object.
+}
+\examples{
+
+# Load Gorilla data
+
+data("gorillas", package = "inlabru")
+
+# Use nest locations and survey boundary to create a spatstat ppp object
+
+gp <- spatial.to.ppp(gorillas$nests, gorillas$boundary)
+class(gp)
+
+# Plot it
+
+plot(gp)
 }

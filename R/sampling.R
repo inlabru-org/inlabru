@@ -1,16 +1,28 @@
-#' Sample from a log Gaussian Cox process (LGCP)
+#' Sample from an inhomogeneous Poisson process
 #' 
+#' This function provides point samples from one- and two-dimensional inhomogeneous Poisson processes. The
+#' log intensity has to be provided via its values at the nodes of an \code{inla.mesh.1d} or 
+#' \code{inla.mesh} object. In between mesh nodes the log intensity is assumed to be linear. 
+#' 
+#' For 2D processes on a sphere the \code{R} parameter can be used to adjust to sphere's radius implied by 
+#' the mesh. If the intensity is very high the standard \code{strategy} "spherical" can cause memory issues. 
+#' Using the "sliced-spherical" strategy can help in this case.
 #'
 #' @aliases sample.lgcp
 #' @export
 #'
 #' @param mesh An \link{inla.mesh} object
-#' @param loglambda A vector of log intensities at the mesh vertices (for higher order basis functions, e.g. for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis function weights rather than the values at the \code{mesh$n} vertices)
-#' @param strategy Only applicable to 2D meshes. Use "rectangle" for flat 2D meshes and "spherical" for "sliced-spherical" for spherical meshes. 
-#' @param R Only for spherical meshes. This sets the radius of the sphere approximated by the mesh.
+#' @param loglambda A vector of log intensities at the mesh vertices (for higher order basis functions, e.g. 
+#'                  for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis 
+#'                  function weights rather than the values at the \code{mesh$n} vertices)
+#' @param strategy Only relevant for 2D meshes. Use "rectangle" for flat 2D meshes and "spherical" or 
+#'                 "sliced-spherical" for spherical meshes. 
+#' @param R Numerical value only applicable to spherical meshes. This sets the radius of the sphere 
+#'          approximated by the mesh. The default is 6371, which is approximately the radius of the earth 
+#'          in kilometers.
 #' @param samplers A SpatialPolygonsDataFrame. Simulated points that fall outside these polygons are discarded.
 #'
-#' @return point samples on the mesh
+#' @return A \code{data.frame} (1D case) or SpatialPoints (2D case) object of point locations.
 #' 
 #' @examples
 #' library(inlabru)

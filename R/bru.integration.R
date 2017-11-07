@@ -1,22 +1,79 @@
 #' @title Generate integration points 
 #'
-#' @description Generate integration points based on a desciption of the integration region.
+#' @description 
+#' This function generates points in one or two dimensions with a weight attached to each point.
+#' The weighted sum of a function evaluated at these points is the integral of that function approximated
+#' by linear basis functions. The parameter \code{region} describes the area(s) integrated over. 
+#' 
+#' In case of a single dimension \code{region} is supposed to be a two-column \code{matrix} where
+#' each row describes the start and end point of the interval to integrate over. In the two-dimensional
+#' case \code{region} can be either a \code{SpatialPolygon}, an \code{inla.mesh} or a 
+#' \code{SpatialLinesDataFrame} describing the area to integrate over. If a \code{SpatialLineDataFrame}
+#' is provided it has to have a column called 'weight' in order to indicate the width of the line.
+#' 
+#' The domain parameter is an \code{inla.mesh.1d} or \code{inla.mesh} object that can be employed to 
+#' project the integration points to the vertices of the mesh. This reduces the final number of
+#' integration points and reduces the computational cost of the integration. The projection can also 
+#' prevent numerical issues in spatial LGCP models where each observed point is ideally surrounded
+#' by three integration point sitting at the coresponding mesh vertices. For convenience, the
+#' \code{domain} parameter can also be a single integer setting the number of equally spaced integration
+#' points in the one-dimensional case. 
+#' 
 #' @aliases ipoints
 #' @export
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-#' @param region Description of the integration region boundary
-#' @param domain An object describing a discretization of the domain
+#' @param region Description of the integration region boundary. 
+#' In 1D either a vector of two numerics or a two-column matrix where each row describes and interval. 
+#' In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a weight column defining the width of the line.
+#' @param domain In 1D a single numeric setting the numer of integration points or an \code{inla.mesh.1d} 
+#' defining the locations to project the integration points to. In 2D \code{domain} has to be an
+#' \code{inla.mesh} object describing the projection and granularity of the integration.
 #' @param name Character array stating the name of the domains dimension(s)
-#' @param group Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged.
+#' @param group Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged by the projection.
 #' @param project If TRUE, project the integration points to mesh vertices
-#' @return A \code{data.frame} or \code{SpatialPointsDataFrame}
+#' 
+#' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
 #' 
 #' @examples
 #' 
-#' ips = ipoints(c(0,10), name = "myDim")
-#' ips
+#' # Create 50 integration points covering the dimension 'myDim' between 0 and 10. 
+#' 
+#' ips = ipoints(c(0,10), 50, name = "myDim")
+#' plot(ips)
+#' 
+#' 
+#' # Create integration points for the two intervals [0,3] and [5,10]
+#' 
+#' ips = ipoints(matrix(c(0,3, 5,10), nrow = 2, byrow = TRUE), 50)
+#' plot(ips)
+#' 
+#' 
+#' # Convert a 1D mesh into integration points
+#'  
+#' mesh = inla.mesh.1d(seq(0,10,by = 1))
+#' ips = ipoints(mesh, name = "time")
+#' plot(ips)
+#'
+#' 
+#' # Obtain 2D integration points from a SpatialPolygon
+#' 
+#' data(gorillas, package = "inlabru")
+#' ips = ipoints(gorillas$boundary)
+#' ggplot() + gg(gorillas$boundary) + gg(ips, aes(size = weight))
+#' 
+#' 
+#' #' Project integration points to mesh vertices
+#' 
+#' ips = ipoints(gorillas$boundary, domain = gorillas$mesh)
+#' ggplot() + gg(gorillas$mesh) +  gg(gorillas$boundary) + gg(ips, aes(size = weight))
+#' 
+#' 
+#' # Turn a 2D mesh into integration points
+#' 
+#' ips = ipoints(gorillas$mesh)
+#' ggplot() + gg(gorillas$boundary) + gg(ips, aes(size = weight))
 #' 
 
 ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, project) {
@@ -79,7 +136,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     if ( !is.null(domain) ) stop("Integration region provided as 2D and domain is not NULL.")
     
     # transform to equal area projection
-    if ( !is.null(region$crs) ) {
+    if ( !is.null(region$crs) && !(is.na(region$crs@projargs))) {
       crs = region$crs
       region = stransform(region, crs = CRS("+proj=cea +units=km"))
     }
@@ -88,7 +145,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     ips$weight = diag(as.matrix(inla.mesh.fem(region)$c0))
     
     # backtransform
-    if ( !is.null(region$crs) ) { ips = stransform(ips, crs = crs) }
+    if ( !is.null(region$crs) && !(is.na(region$crs@projargs))) { ips = stransform(ips, crs = crs) }
     
   } else if ( inherits(region, "inla.mesh.1d") ){
     
@@ -136,7 +193,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     p4s = proj4string(region)
     
     # Convert region and domain to equal area CRS
-    if ( !is.null(domain$crs) ){
+    if ( !is.null(domain$crs) && !is.na(domain$crs@projargs)){
       region = stransform(region, crs = CRS("+proj=cea +units=km"))
     }
     
@@ -152,14 +209,19 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
       domain = inla.mesh.2d(boundary = region, max.edge = max.edge)
       domain$crs = CRS(proj4string(region))
     } else {
-      domain = stransform(domain, crs = CRS("+proj=cea +units=km"))
+      if ( !is.null(domain$crs) && !is.na(domain$crs@projargs)) 
+        domain = stransform(domain, crs = CRS("+proj=cea +units=km"))
     }
     
     ips = int.polygon(domain, loc = polyloc[,1:2], group = polyloc[,3])
     df = data.frame(region@data[ips$group, pregroup, drop = FALSE], weight = ips[,"weight"])
     ips = SpatialPointsDataFrame(ips[,c("x","y")],data = df)
     proj4string(ips) = proj4string(region)
-    ips = stransform(ips, crs = CRS(p4s))  
+    
+    if ( !is.na(p4s) ) {
+      ips = stransform(ips, crs = CRS(p4s))  
+    }
+    
   }
   
   ips
@@ -168,21 +230,31 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
 
 #' @title Cross product of integration points
 #'
-#' @description Calculates the dimensional cross product of integration points and multiply their weights accordingly.
+#' @description 
+#' Calculates the cross product of integration points in different dimensions
+#' and multiplies their weights accordingly. If the object defining points in a particular
+#' dimension has no weights attached to it all weights are assumend to be 1.
+#' 
 #' @aliases cprod
 #' @export
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-#' @param ... \code{data.frame} or \code{SpatialPointsDataFrame} objects
-#' @return A \code{data.frame} or \code{SpatialPointsDataFrame} object
+#' @param ... \code{data.frame} or \code{SpatialPointsDataFrame} objects, each one usually obtained by a call to the \link{ipoints} function.
+#' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of multidimensional integration points and their weights
 #' 
 #' @examples
-#' 
+#'
+#' # Create integration points in dimension 'myDim' and 'myDiscreteDim' 
 #' ips1 = ipoints(c(0,8), name = "myDim")
-#' ips2 = ipoints(as.integer(c(0,2,5)), name = "myDiscreteDim")
+#' ips2 = ipoints(as.integer(c(1,2,3)), name = "myDiscreteDim")
+#' 
+#' # Calculate the cross product
 #' ips = cprod(ips1, ips2)
-#' plot(ips$myDim) ; points(ips$myDiscreteDim, col = "red")
+#' 
+#' # Plot the integration points
+#' plot(ips$myDim, ips$myDiscreteDim, cex = 10*ips$weight)
+#' 
 
 cprod = function(...) {
   ipl = list(...)
@@ -434,14 +506,34 @@ vertex.projection.1d = function(points, mesh, group = NULL, column = "weight", s
 
 
 #' Weighted summation (integration) of data frame subsets
-#'   
+#'
+#' A typicel task in statistical inference to integrate a (multivariate) function along one or
+#' more dimensions of its domain. For this purpose, the function is evaluated at some points
+#' in the domain and the values are summed up using weights that depend on the area being 
+#' integrated over. This function performs the weighting and summation conditional for each level
+#' of the dimensions that are not integrated over. The parameter \code{dims} states the the 
+#' dimensions to integrate over. The set of dimensions that are held fixed is the set difference
+#' of all column names in \code{data} and the dimensions stated by \code{dims}.
 #' 
 #' @aliases int
 #' @export
-#' @param data A \code{data.frame} or \code{Spatial} object. Has to have a weight column with numeric values.
-#' @param values Numerical values to be summed up.
-#' @param dims Columns of the \code{data} obect to integrate over
-#' @return A \code{data.frame} of integrated values
+#' @param data A \code{data.frame} or \code{Spatial} object. Has to have a \code{weight} column with numeric values.
+#' @param values Numerical values to be summed up, usually the result of function evaluations.
+#' @param dims Column names (dimension names) of the \code{data} object to integrate over.
+#' @return A \code{data.frame} of integrals, one for each level of the cross product of all dimensions not being integrated over.
+#' 
+#' @examples 
+#' # Create integration points in two dimensions, x and y
+#'
+#' ips = cprod(ipoints(c(0,10), 10, name = "x"),
+#'             ipoints(c(1,5), 10, name = "y"))
+#'
+#' # The sizes of the domains are 10 and 4 for x and y, respectively.
+#' # Integrating f(x,y) = 1 along x and y should result in the total
+#' # domain size 40
+#'
+#' int(ips, rep(1, nrow(ips)), c("x","y"))
+
 
 
 int = function(data, values, dims = NULL) {

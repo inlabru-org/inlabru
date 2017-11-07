@@ -4,7 +4,7 @@
 \alias{refine.inla.mesh}
 \title{Refine an inla.mesh object}
 \usage{
-\method{refine}{inla.mesh}(mesh, refine = list(max.edge = 1))
+refine.inla.mesh(mesh, refine = list(max.edge = 1))
 }
 \arguments{
 \item{mesh}{an inla.mesh object}
@@ -20,3 +20,4 @@ Refine an inla.mesh object
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 }
+\keyword{internal}

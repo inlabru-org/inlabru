@@ -40,3 +40,45 @@ point realizations may only be known in sub-areas of the modeled space. These ob
 domain are called samplers and can be provided via the respective parameter. If samplers is NULL it is
 assumed that all of the LGCP's dimensions have been observed completely.
 }
+\examples{
+
+\dontrun{
+
+Load the Gorilla data
+data(gorillas)
+
+# Use tutorial setting and thus empirical Bayes for faster inference
+init.tutorial()
+
+# Plot the Gorilla nests, the mesh and the survey boundary
+ggplot() + 
+  gg(gorillas$mesh) + 
+  gg(gorillas$nests) + 
+  gg(gorillas$boundary) + 
+  coord_fixed()
+
+# Define SPDE prior
+matern <- inla.spde2.pcmatern(gorillas$mesh, 
+                              prior.sigma = c(0.1, 0.01), 
+                              prior.range = c(5, 0.01))
+
+# Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
+cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+
+# Fit the model
+fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+
+# Predict the spatial intensity surface
+lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+
+# Plot the intensity
+ggplot() + 
+  gg(lambda) +
+  gg(gorillas$mesh) + 
+  gg(gorillas$nests) + 
+  gg(gorillas$boundary) + 
+  coord_fixed()
+
+}
+
+}

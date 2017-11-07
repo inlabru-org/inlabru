@@ -6,6 +6,8 @@
 #'     SPDE component. Can also plot Matern correlation or covariance
 #'     function.
 #'
+#' @keywords internal
+#'
 #' @param manifold Either "R1", "S1", "R2", or "S2", from
 #'     \code{mesh$manifold}, or a full \code{inla.mesh} or
 #'     \code{inla.mesh.1d} object.
@@ -151,16 +153,17 @@ materncov.bands = function(manifold, dist, log.range,
 #' @title Posteriors of SPDE hyper parameters and Matern correlation or covariance function.
 #' 
 #' @description
-#' Plots the posterior distribution of the range, log(range), variance, or log(variance) 
+#' Calculate posterior distribution of the range, log(range), variance, or log(variance) 
 #' parameter of a model's SPDE component. Can also plot Matern correlation or covariance function.
 #' \code{inla.spde.result}. 
 #'
 #' @param result An object inheriting from \code{inla}.
-#' @param name Name of the SPDE, see \code{names(result$summary.random)}
+#' @param name Character stating the name of the SPDE effect, see \code{names(result$summary.random)}.
 #' @param what One of "range", "log.range", "variance", "log.variance", "matern.correlation" or "matern.covariance".
-#' @return A posterior
+#' @return A \code{prediction} object.
 #'  
 #' @export
+#' @example inst/examples/spde.posterior.R
 
 spde.posterior = function(result, name, what = "range") {
   spdespec = result$sppa$model$effects[[name]]$inla.spde

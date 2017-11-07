@@ -2,25 +2,47 @@
 % Please edit documentation in R/ggplot.R
 \name{gg}
 \alias{gg}
-\title{ggplot2 geomes for spatial data}
+\title{ggplot2 geomes for inlabru related objects}
 \usage{
-gg(...)
+gg(data, ...)
 }
 \arguments{
-\item{...}{Arguments passed on the the geomes}
+\item{data}{an object for which to generate a geom.}
+
+\item{...}{Arguments passed on to the geom method.}
+}
+\value{
+The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
 }
 \description{
-Depending on the class of the first argument one of the following functions is called:
-\describe{
-\item{}{\link{gg.data.frame}}
-\item{}{\link{gg.prediction}}
-\item{}{\link{gg.SpatialPoints}}
-\item{}{\link{gg.SpatialLines}}
-\item{}{\link{gg.SpatialPolygons}}
-\item{}{\link{gg.SpatialPixels}}
-\item{}{\link{gg.SpatialGrid}}
-\item{}{\link{gg.RasterLayer}}
-\item{}{\link{gg.inla.mesh}}
-\item{}{\link{gg.inla.mesh.1d}}
+gg is a generic function for generating geomes from various kinds of spatial objects, e.g. Spatial* data,
+meshes, Raster objects and inla/inlabru predictions. The function invokes particular methods which depend 
+on the \link{class} of the first argument.
 }
+\examples{
+
+# Load Gorilla data
+
+data(gorillas)
+
+# Invoke ggplot and add geomes for the Gorilla nests and the survey boundary
+
+ggplot() + gg(gorillas$boundary) + gg(gorillas$nests)
+}
+\seealso{
+Other geomes for inla and inlabru predictions: \code{\link{gg.data.frame}},
+  \code{\link{gg.prediction}}, \code{\link{gm}}
+
+Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
+  \code{\link{gg.SpatialLines}},
+  \code{\link{gg.SpatialPixelsDataFrame}},
+  \code{\link{gg.SpatialPixels}},
+  \code{\link{gg.SpatialPoints}},
+  \code{\link{gg.SpatialPolygons}}, \code{\link{gm}}
+
+Other geomes for meshes: \code{\link{gg.inla.mesh.1d}},
+  \code{\link{gg.inla.mesh}}, \code{\link{gm}}
+
+Other geomes for Raster data: \code{\link{gg.RasterLayer}},
+  \code{\link{gm}}
 }

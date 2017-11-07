@@ -1,9 +1,9 @@
-#' Internal \link{inlabru} model structure
-#' 
-#' See \link{make.model}.
-#' 
-#' @name model
-NULL
+# Internal \link{inlabru} model structure
+# 
+# See \link{make.model}.
+# 
+# @name model
+#NULL
 
 
 ##########################################################################
@@ -21,49 +21,49 @@ list.data = function(...){UseMethod("list.data")}
 # Constructor
 ##########################################################################
 
-#' Create an inlabru \link{model} from a formula
-#' 
-#' The \link{inlabru} syntax for model forulae is different from what \link{inla} considers a valid.
-#' In inla most of the effects are defined by adding an f(...) expression to the formula. 
-#' In \link{inlabru} the f is replaced by an arbitrary (exception: 'offset') string that will
-#' determine the label of the effect. For instance
-#' 
-#' \code{y ~ f(myspde, ...)}
-#' 
-#' is equivalent to
-#' 
-#' \code{y ~ myspde(...)}
-#' 
-#' A disadvantage of the inla way is that there is no clear separation between the name of the covariate
-#' and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
-#' use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-#' \link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
-#' like the first argument of the f function, e.g.
-#' 
-#' \code{y ~ f(temperature, model = 'fixed')}
-#' 
-#' is equivalent to
-#' 
-#' \code{y ~ temperature(map = temperature, model = fixed)}
-#' as well as
-#' \code{y ~ temperature(model = fixed)}
-#' 
-#' On the other hand, map can also be a function mapping, e.g the \link{coordinates} function of the
-#' \link{sp} package :
-#' 
-#' \code{y ~ mySPDE(map = coordinates, ...)}
-#'
-#' Morevover, \code{map} can be any expression that evaluate within your data as an environment.
-#' For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'a+b' by
-#' setting \code{map} in the following way:
-#' 
-#' \code{y ~ myEffect(map = sin(a+b))} 
-#'
-#'
-#' @export
-#' @param fml A formula
-#' @return A \link{model} object
-#' 
+# Create an inlabru \link{model} from a formula
+# 
+# The \link{inlabru} syntax for model forulae is different from what \link{inla} considers a valid.
+# In inla most of the effects are defined by adding an f(...) expression to the formula. 
+# In \link{inlabru} the f is replaced by an arbitrary (exception: 'offset') string that will
+# determine the label of the effect. For instance
+# 
+# \code{y ~ f(myspde, ...)}
+# 
+# is equivalent to
+# 
+# \code{y ~ myspde(...)}
+# 
+# A disadvantage of the inla way is that there is no clear separation between the name of the covariate
+# and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
+# use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
+# \link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
+# like the first argument of the f function, e.g.
+# 
+# \code{y ~ f(temperature, model = 'fixed')}
+# 
+# is equivalent to
+# 
+# \code{y ~ temperature(map = temperature, model = fixed)}
+# as well as
+# \code{y ~ temperature(model = fixed)}
+# 
+# On the other hand, map can also be a function mapping, e.g the \link{coordinates} function of the
+# \link{sp} package :
+# 
+# \code{y ~ mySPDE(map = coordinates, ...)}
+#
+# Morevover, \code{map} can be any expression that evaluate within your data as an environment.
+# For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'a+b' by
+# setting \code{map} in the following way:
+# 
+# \code{y ~ myEffect(map = sin(a+b))} 
+#
+#
+# @export
+# @param fml A formula
+# @return A \link{model} object
+# 
 
 make.model = function(fml) {
   submodel = list()
@@ -118,7 +118,11 @@ make.model = function(fml) {
     lb = lbl[[k]]
 
     # Call g()
-    ge = eval(parse(text = lb), envir = environment(fml))
+    # We have to add g() to the environment because it is not exported by inlabru and
+    # therefore note visible within the parent environment.
+    env = environment(fml)
+    env$g = g
+    ge = eval(parse(text = lb), envir = env)
 
     # Replace function name by INLA f function
     if ( substr(lb,1,2) == "g(" ) { lb = paste0("f(", substr(lb, 3, nchar(lb)))}
@@ -155,6 +159,13 @@ make.model = function(fml) {
                         inla.spde = ge$model),
                         fchar = lb)
     
+    # For copy model extract the mesh from the model that is copied
+    if ( !is.null(smod$of) ) {
+      smod$mesh = submodel[[smod$of]]$mesh
+      smod$n = submodel[[smod$of]]$n
+      smod$inla.spde = submodel[[smod$of]]$inla.spde
+    }
+    
     # Fix label for factor effects
     if (smod$model == "factor") { lbl[[k]] = smod$label ; smod$fchar = smod$label }
     
@@ -182,18 +193,18 @@ make.model = function(fml) {
 }
 
 
-#' A wrapper for the \link{inla} \link{f} function
-#' 
-#' @aliases g
-#' @export
-#' @param covariate A string defining the label of the INLA effect. If \code{map} is provided this also sets the coariate used as a first argument to the \link{f} call.
-#' @param map A name, call or function that maps points to effect indices or locations that the model understands.
-#' @param group A name, call or function that maps the data to groups
-#' @param model See \link{f} model specifications
-#' @param mesh An \link{inla.mesh} object required for SPDE models
-#' @param A.msk A boolean vector for masking A matrix columns. 
-#' @param ... Arguments passed on to inla \link{f}
-#' @return A list with mesh, model and the return value of the f-call
+# A wrapper for the \link{inla} \link{f} function
+# 
+# @aliases g
+# @export
+# @param covariate A string defining the label of the INLA effect. If \code{map} is provided this also sets the coariate used as a first argument to the \link{f} call.
+# @param map A name, call or function that maps points to effect indices or locations that the model understands.
+# @param group A name, call or function that maps the data to groups
+# @param model See \link{f} model specifications
+# @param mesh An \link{inla.mesh} object required for SPDE models
+# @param A.msk A boolean vector for masking A matrix columns. 
+# @param ... Arguments passed on to inla \link{f}
+# @return A list with mesh, model and the return value of the f-call
 
 g = function(covariate, 
              map = NULL,
@@ -206,6 +217,7 @@ g = function(covariate,
   map.char = as.character(substitute(map))
   group.char = as.character(substitute(group))
   A.msk.char = as.character(substitute(A.msk))
+  is.copy = !is.null(list(...)$copy)
   
   if ( length(map.char) == 0 ) { map = NULL } else { map = substitute(map) }
   if ( length(A.msk.char) == 0 ) { A.msk = NULL } else { A.msk = A.msk }
@@ -226,7 +238,7 @@ g = function(covariate,
   if ( fvals$model == "spde2" & is.null(mesh) ) { mesh = model$mesh } 
   
   # Check if n is present for models that are not fixed effects
-  if (is.null(fvals$n) & !(fvals$model == "linear") & !(fvals$model == "offset") & !(fvals$model == "factor")) {
+  if (is.null(fvals$n) & !(fvals$model == "linear") & !(fvals$model == "offset") & !(fvals$model == "factor") & !is.copy) {
     stop(sprintf("Please provide parameter 'n' for effect '%s'", label))
     }
   
@@ -367,7 +379,12 @@ list.A.model = function(model, points){
     } else {
       
       if ( eff$map == "coordinates" ) {
-        loc = stransform(points, crs = eff$mesh$crs)
+        if ( is.na(proj4string(points)) | is.null(eff$mesh$crs) ) {
+          loc = points
+        } else {
+          loc = stransform(points, crs = eff$mesh$crs)
+        }
+        
       } else {
         loc = mapper(eff$map, points, eff)
         if ( !is.matrix(loc) & !inherits(loc,"Spatial") ) loc = as.matrix(loc)
@@ -468,6 +485,7 @@ evaluate.model = function(model,
   if ( property == "sample") {
       smp = inla.posterior.sample.structured(result, n = n) 
   } else {
+      result$model = model
       smp = rep(list(extract.summary(result, property)), n)
   }
   
@@ -503,15 +521,15 @@ evaluate.model = function(model,
     # Factor models
     for (label in names(sm)) { 
       if (label %in% names(effect(model)) && effect(model)[[label]]$model == "factor") {
-        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]]) 
-        sm[[label]] = as.vector(sm[[label]][fc[,1]])
+        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]], environment(model$in.formula)) 
+        sm[[label]] = as.vector(sm[[label]][as.data.frame(fc)[,1]])
       }
     }
     
     # Linear models
     for (label in names(sm)) { 
       if (label %in% names(effect(model)) && effect(model)[[label]]$model == "linear") {
-        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]])
+        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]], environment(model$in.formula)) 
         if (is.data.frame(fc)) {fc = fc[,1]}
         sm[[label]] = as.vector(sm[[label]] * as.vector(fc))
       }

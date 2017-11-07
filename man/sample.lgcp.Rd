@@ -2,7 +2,7 @@
 % Please edit documentation in R/sampling.R
 \name{sample.lgcp}
 \alias{sample.lgcp}
-\title{Sample from a log Gaussian Cox process (LGCP)}
+\title{Sample from an inhomogeneous Poisson process}
 \usage{
 sample.lgcp(mesh, loglambda, strategy = "rectangle", R = 6371,
   samplers = NULL)
@@ -10,19 +10,31 @@ sample.lgcp(mesh, loglambda, strategy = "rectangle", R = 6371,
 \arguments{
 \item{mesh}{An \link{inla.mesh} object}
 
-\item{loglambda}{A vector of log intensities at the mesh vertices (for higher order basis functions, e.g. for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis function weights rather than the values at the \code{mesh$n} vertices)}
+\item{loglambda}{A vector of log intensities at the mesh vertices (for higher order basis functions, e.g. 
+for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis 
+function weights rather than the values at the \code{mesh$n} vertices)}
 
-\item{strategy}{Only applicable to 2D meshes. Use "rectangle" for flat 2D meshes and "spherical" for "sliced-spherical" for spherical meshes.}
+\item{strategy}{Only relevant for 2D meshes. Use "rectangle" for flat 2D meshes and "spherical" or 
+"sliced-spherical" for spherical meshes.}
 
-\item{R}{Only for spherical meshes. This sets the radius of the sphere approximated by the mesh.}
+\item{R}{Numerical value only applicable to spherical meshes. This sets the radius of the sphere 
+approximated by the mesh. The default is 6371, which is approximately the radius of the earth 
+in kilometers.}
 
 \item{samplers}{A SpatialPolygonsDataFrame. Simulated points that fall outside these polygons are discarded.}
 }
 \value{
-point samples on the mesh
+A \code{data.frame} (1D case) or SpatialPoints (2D case) object of point locations.
 }
 \description{
-Sample from a log Gaussian Cox process (LGCP)
+This function provides point samples from one- and two-dimensional inhomogeneous Poisson processes. The
+log intensity has to be provided via its values at the nodes of an \code{inla.mesh.1d} or 
+\code{inla.mesh} object. In between mesh nodes the log intensity is assumed to be linear.
+}
+\details{
+For 2D processes on a sphere the \code{R} parameter can be used to adjust to sphere's radius implied by 
+the mesh. If the intensity is very high the standard \code{strategy} "spherical" can cause memory issues. 
+Using the "sliced-spherical" strategy can help in this case.
 }
 \examples{
 library(inlabru)

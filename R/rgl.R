@@ -1,14 +1,22 @@
 #' Plot a globe using rgl
 #' 
+#' Creates a textured sphere and lon/lat coordinate annotations.
+#' 
 #' @aliases globe
 #' @name globe
 #' @export
 #' @param R Radius of the globe
-#' @param R.grid Radius of the annotation sphere
-#' @param specular Light color of specular effect
-#' @param axes If TRUE, plot x, y and z axes
-#' @param box If TRUE, plot a box around the globe
+#' @param R.grid Radius of the annotation sphere.
+#' @param specular Light color of specular effect.
+#' @param axes If TRUE, plot x, y and z axes.
+#' @param box If TRUE, plot a box around the globe.
 #' @param xlab,ylab,zlab Axes labels
+#' 
+#' @return No value, used for plotting side effect.
+#' 
+#' @family inlabru RGL tools
+#' 
+#' @example inst/examples/rgl.R
 
 globe = function(R = 1, 
                  R.grid = 1.05,
@@ -39,38 +47,78 @@ globe = function(R = 1,
   
 }
 
-#' Plot sp objects and and meshes using RGL
+#' Render Spatial* and inla.mesh objects using RGL
 #' 
+#' glplot is a generic function for renders various kinds of spatial objects, i.e. Spatial* data 
+#' and inla.mesh objects. The function invokes particular methods which depend on the class of the first argument.
 #' 
-#' @aliases rgl
-#' @name rgl
+#' @aliases glplot
+#' @name glplot
 #' @export
-#' @param ... Parameters passed on
+#' @param object an object used to select a method.
+#' @param ... further arguments passed to or from other methods.
+#' 
+#' @family inlabru RGL tools
+#' 
+#' @example inst/examples/rgl.R
 
-rgl = function(...){UseMethod("rgl")}
+glplot = function(object, ...) { UseMethod("glplot") }
+
+#' Visualize SpatialPoints using RGL
+#' 
+#' This function will calculate the cartesian coordinates of the points provided 
+#' and use rgl.points() in order to render them.
+#' 
+#' @export
+#' @name glplot.SpatialPoints
+#' 
+#' @param object a SpatialPoints or SpatialPointsDataFrame object.
+#' @param add If TRUE, add the points to an existing plot. If FALSE, create new plot.
+#' @param color vector of R color characters. See rgl.material() for details.
+#' @param ... Parameters passed on to rgl.points()
+#' 
+#' @family inlabru RGL tools
+#' 
+#' @example inst/examples/rgl.R
 
 
-
-rgl.SpatialPoints = function(data, add = TRUE, color = "red", ...) {
+glplot.SpatialPoints = function(object, add = TRUE, color = "red", ...) {
   
-  if ( length(coordnames(data))<3 ) {
-    ll = data.frame(data)
+  if ( length(coordnames(object))<3 ) {
+    ll = data.frame(object)
     ll$TMP.ZCOORD = 0
-    coordinates(ll) = c(coordnames(data), "TMP.ZCOORD")
-    proj4string(ll) = CRS(proj4string(data))
-    data = ll
+    coordinates(ll) = c(coordnames(object), "TMP.ZCOORD")
+    proj4string(ll) = CRS(proj4string(object))
+    object = ll
   }
   
-  data = spTransform(data, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
-  cc = coordinates(data)
+  object = spTransform(object, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
+  cc = coordinates(object)
   requireNamespace("rgl")
   rgl::rgl.points(x=cc[,1], y = cc[,2], z = cc[,3], add = add, color = color, ...)
   
 }
 
-rgl.SpatialLines = function(data, add = TRUE,  ...) {
+#' Visualize SpatialLines using RGL
+#' 
+#' This function will calculate a cartesian representation of the lines provided 
+#' and use rgl.linestrip() in order to render them.
+#' 
+#' 
+#' @export
+#' @name glplot.SpatialLines
+#' 
+#' @param object a SpatialLines or SpatialLinesDataFrame object.
+#' @param add If TRUE, add the lines to an existing plot. If FALSE, create new plot.
+#' @param ... Parameters passed on to rgl.linestrips().
+#' 
+#' @family inlabru RGL tools
+#' 
+#' @example inst/examples/rgl.R
+
+glplot.SpatialLines = function(object, add = TRUE,  ...) {
   
-  qq = coordinates(data)
+  qq = coordinates(object)
   sp = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x)-1),]))))
   ep = do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)),]))))
   sp = data.frame(x = sp[,1], y = sp[,2], z = 0)
@@ -78,8 +126,8 @@ rgl.SpatialLines = function(data, add = TRUE,  ...) {
   
   coordinates(sp) = c("x","y","z")
   coordinates(ep) = c("x","y","z")
-  proj4string(sp) = CRS(proj4string(data))
-  proj4string(ep) = CRS(proj4string(data))
+  proj4string(sp) = CRS(proj4string(object))
+  proj4string(ep) = CRS(proj4string(object))
   
   sp = spTransform(sp, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
   ep = spTransform(ep, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
@@ -96,20 +144,38 @@ rgl.SpatialLines = function(data, add = TRUE,  ...) {
   
 }
 
-rgl.inla.mesh = function(mesh, add = TRUE, col = NULL,...){
-  if ( mesh$manifold  == "S2" ) {
+
+#' Visualize SpatialPoints using RGL
+#' 
+#' This function transforms the mesh to 3D cartesian coordinates and uses 
+#' inla.plot.mesh() with \code{rgl=TRUE} to plot the result.
+#' 
+#' @export
+#' @name glplot.inla.mesh
+#' 
+#' @param object an inla.mesh object.
+#' @param add If TRUE, add the lines to an existing plot. If FALSE, create new plot.
+#' @param col Color specification. A single named color, a vector of scalar values, or a matrix of RGB values.
+#' @param ... Parameters passed on to plot.inla.mesh()
+#' 
+#' @family inlabru RGL tools
+#'
+#' @example inst/examples/rgl.R
+
+glplot.inla.mesh = function(object, add = TRUE, col = NULL,...){
+  if ( object$manifold  == "S2" ) {
     # mesh$loc = mesh$loc
   } else {
-    ll = data.frame(mesh$loc)
+    ll = data.frame(object$loc)
     colnames(ll) = c("x","y","z")
     coordinates(ll) = c("x","y","z")
-    proj4string(ll) = mesh$crs
+    proj4string(ll) = object$crs
     ll = spTransform(ll, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
-    mesh$loc = coordinates(ll)
+    object$loc = coordinates(ll)
   }
   
-  if (is.null(col)) { plot(mesh,rgl=TRUE,add=add,...) }
-  else{ plot(mesh,rgl=TRUE,add=add,col=col,...) }
+  if (is.null(col)) { plot(object,rgl=TRUE,add=add,...) }
+  else{ plot(object,rgl=TRUE,add=add,col=col,...) }
 }
 
 

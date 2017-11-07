@@ -7,26 +7,80 @@
 ipoints(region = NULL, domain = NULL, name = "x", group = NULL, project)
 }
 \arguments{
-\item{region}{Description of the integration region boundary}
+\item{region}{Description of the integration region boundary. 
+In 1D either a vector of two numerics or a two-column matrix where each row describes and interval. 
+In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a weight column defining the width of the line.}
 
-\item{domain}{An object describing a discretization of the domain}
+\item{domain}{In 1D a single numeric setting the numer of integration points or an \code{inla.mesh.1d} 
+defining the locations to project the integration points to. In 2D \code{domain} has to be an
+\code{inla.mesh} object describing the projection and granularity of the integration.}
 
 \item{name}{Character array stating the name of the domains dimension(s)}
 
-\item{group}{Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged.}
+\item{group}{Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged by the projection.}
 
 \item{project}{If TRUE, project the integration points to mesh vertices}
 }
 \value{
-A \code{data.frame} or \code{SpatialPointsDataFrame}
+A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
 }
 \description{
-Generate integration points based on a desciption of the integration region.
+This function generates points in one or two dimensions with a weight attached to each point.
+The weighted sum of a function evaluated at these points is the integral of that function approximated
+by linear basis functions. The parameter \code{region} describes the area(s) integrated over. 
+
+In case of a single dimension \code{region} is supposed to be a two-column \code{matrix} where
+each row describes the start and end point of the interval to integrate over. In the two-dimensional
+case \code{region} can be either a \code{SpatialPolygon}, an \code{inla.mesh} or a 
+\code{SpatialLinesDataFrame} describing the area to integrate over. If a \code{SpatialLineDataFrame}
+is provided it has to have a column called 'weight' in order to indicate the width of the line.
+
+The domain parameter is an \code{inla.mesh.1d} or \code{inla.mesh} object that can be employed to 
+project the integration points to the vertices of the mesh. This reduces the final number of
+integration points and reduces the computational cost of the integration. The projection can also 
+prevent numerical issues in spatial LGCP models where each observed point is ideally surrounded
+by three integration point sitting at the coresponding mesh vertices. For convenience, the
+\code{domain} parameter can also be a single integer setting the number of equally spaced integration
+points in the one-dimensional case.
 }
 \examples{
 
-ips = ipoints(c(0,10), name = "myDim")
-ips
+# Create 50 integration points covering the dimension 'myDim' between 0 and 10. 
+
+ips = ipoints(c(0,10), 50, name = "myDim")
+plot(ips)
+
+
+# Create integration points for the two intervals [0,3] and [5,10]
+
+ips = ipoints(matrix(c(0,3, 5,10), nrow = 2, byrow = TRUE), 50)
+plot(ips)
+
+
+# Convert a 1D mesh into integration points
+ 
+mesh = inla.mesh.1d(seq(0,10,by = 1))
+ips = ipoints(mesh, name = "time")
+plot(ips)
+
+
+# Obtain 2D integration points from a SpatialPolygon
+
+data(gorillas, package = "inlabru")
+ips = ipoints(gorillas$boundary)
+ggplot() + gg(gorillas$boundary) + gg(ips, aes(size = weight))
+
+
+#' Project integration points to mesh vertices
+
+ips = ipoints(gorillas$boundary, domain = gorillas$mesh)
+ggplot() + gg(gorillas$mesh) +  gg(gorillas$boundary) + gg(ips, aes(size = weight))
+
+
+# Turn a 2D mesh into integration points
+
+ips = ipoints(gorillas$mesh)
+ggplot() + gg(gorillas$boundary) + gg(ips, aes(size = weight))
 
 }
 \author{

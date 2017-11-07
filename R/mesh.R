@@ -3,75 +3,40 @@ setClass("inla.mesh")
 
 
 # GENERICS
-refine = function(...){UseMethod("refine")}
-tsplit = function(...){UseMethod("tsplit")}
-
-# Plot an inla.mesh using ggplot
-#
-# @aliases ggp.mesh
-# @export
-# @param mesh an inla.mesh object
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-
-ggp.mesh = function(mesh, col = NULL, nx = 400, add = NULL, mcol = "black") {
-
-  xlim = range(mesh$loc[,1])
-  ylim = range(mesh$loc[,2])
-  aspect = diff(ylim)/diff(xlim)
-  ny = round(nx * aspect)
-  proj <- inla.mesh.projector(mesh, dims = c(nx,ny))
-  x = seq(xlim[1], xlim[2], length.out = nx)
-  y = seq(ylim[1], ylim[2], length.out = ny)
-  grid = expand.grid(x=x,y=y)
-  
-  
-  if ( !is.null(col) ) {
-    mcol = "green"
-    loc = data.frame(cbind(grid$x,grid$y))
-    col = INLA::inla.spde.make.A(mesh, loc = as.matrix(loc)) %*% as.vector(col)
-    msk = is.inside(mesh,as.matrix(loc))
-    # col[msk] = NA
-    df = data.frame(grid, col=as.vector(col), alpha = msk)
-    gg = ggplot(df, aes(x=x,y=y) )
-    gg = gg + geom_raster(aes(fill = col, alpha = alpha), hjust=0.5, vjust=0.5, interpolate = TRUE)
-    gg = gg + scale_alpha_discrete(guide = 'none')
-    gg = gg + theme(legend.title=element_blank())
-    
-  } else {
-    df = data.frame(grid)
-    if (!is.null(add)) { gg = add } else { gg = ggplot(df, aes(x=x,y=y) )}
-  }
-  
-  # Plot mesh lines
-  gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,2],c(1,2)]), 
-                         aes_string(x="a.1",y="a.2",xend="b.1",yend="b.2"), color = mcol)
-  
-  gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,2],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-                         aes_string(x="a.1",y="a.2",xend="b.1",yend="b.2"), color = mcol)
-  
-  gg = gg + geom_segment(data = data.frame(a=mesh$loc[mesh$graph$tv[,1],c(1,2)],b=mesh$loc[mesh$graph$tv[,3],c(1,2)]),
-                         aes_string(x="a.1",y="a.2",xend="b.1",yend="b.2"), color = mcol)
-  
-  gg = gg + coord_fixed()
-
-  return(gg)
-}
-
-
+# refine = function(...){UseMethod("refine")}
+# tsplit = function(...){UseMethod("tsplit")}
 
 
 #' Query if a point is inside the mesh boundary
 #'
 #'
 #' @aliases is.inside
-#' @export
-#' @param mesh an inla.mesh object
-#' @param loc points to query
+#' @keywords internal
+#' @param mesh an inla.mesh object.
+#' @param loc Points in space stored either as data.frame, a two-column matrix of x and y coordinates or a SpatialPoints object.
 #' @param mesh.coords Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.
-#' @return inside Boolean, TRUE if inside
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#' @return Single column matrix of Boolean values indicating if a point is inside the mesh.
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' 
+#' @examples 
+#' \dontrun{
+#' # Load Gorilla data
+#' 
+#' data("gorillas")
+#' 
+#' # Check if all Gorilla nests are inside the mesh
+#' 
+#' all(is.inside(gorillas$mesh, gorillas$nests))
+#' 
+#' # Also works for locations not stored as SpatialPoints object
+#' 
+#' loc = coordinates(gorillas$nests)
+#' all(is.inside(gorillas$mesh, loc))
+#' }
+#' 
 
 is.inside = function(mesh, loc, mesh.coords = NULL) {
+  if ( inherits(loc, "Spatial") ) { loc = coordinates(loc) }
   if (!is.null(mesh.coords) & is.data.frame(loc)) { loc = as.matrix(loc[,mesh.coords,drop=FALSE])}
   p2m = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=loc)
   return(!(p2m$p2m.t == 0))
@@ -105,9 +70,12 @@ is.inside.polygon = function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TR
 
 #' Vertices
 #' 
+#' This is a generic function. The outcome depends on the \code{object} provided
+#' 
 #' @name vertices
 #' @exportMethod vertices
-#' @param object An \code{inla.mesh} object
+#' @param object An object for which to call the particular vertices method.
+#' @return The form of the value returned by vertices() depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
 
 setGeneric("vertices", valueClass = "SpatialPointsDataFrame", function(object) {
   standardGeneric("vertices")
@@ -125,7 +93,8 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #' 
 #' @aliases vertices.inla.mesh
 #' @export
-#' @param object An \code{inla.mesh} object
+#' @param object An \code{inla.mesh} object.
+#' @return A SpatialPointsDataFrame of mesh vertex locations. The \code{vrt} column indicates the internal vertex id.
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
@@ -137,12 +106,17 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #' 
 
 vertices.inla.mesh = function(object) {
-  if (is.null(object$crs)) {
-    object$loc
-  } else {
-    if (any(!(object$loc[,3]==0))) { vrt = object$loc } else { vrt = object$loc[,c(1,2)] }
-    SpatialPointsDataFrame(vrt, proj4string = object$crs, data = data.frame(vertex = 1:nrow(object$loc)))
-  }
+  
+  if ( is.null(object$crs) ) { object$crs = CRS("")  }
+
+  vrt = data.frame(object$loc)
+  if (! is.null(colnames(vrt))) { colnames(vrt) = c("x","y","z") }
+  if ( all(vrt[, 3]==0) ) { vrt = vrt[,1:2] }
+  coordinates(vrt) = colnames(vrt)
+  vrt = SpatialPointsDataFrame(vrt, data = data.frame(vertex = 1:nrow(object$loc)))
+  proj4string(vrt) = object$crs
+  
+  vrt  # return
 }
 
 
@@ -169,8 +143,14 @@ vertices.inla.mesh = function(object) {
 #' 
 
 pixels = function(mesh, nx = 150, ny = 150, mask = TRUE) {
-  lattice <- inla.mesh.lattice(x=seq(min(mesh$loc[,1]), max(mesh$loc[,1]),length = nx),
-                               y=seq(min(mesh$loc[,2]), max(mesh$loc[,2]),length = ny))
+  if ( length(nx)==1 ){
+    x = seq(min(mesh$loc[,1]), max(mesh$loc[,1]),length = nx)
+  } else { x = nx }
+  if ( length(ny)==1 ){
+    y = seq(min(mesh$loc[,2]), max(mesh$loc[,2]),length = ny)
+  } else { y = ny }
+  
+  lattice <- inla.mesh.lattice(x=x,y=y)
   pixels <- data.frame(x=lattice$loc[,1], y=lattice$loc[,2])
 
   coordinates(pixels) <- c("x","y")
@@ -236,7 +216,8 @@ triangle = function(mesh,loc){
 #'
 #'
 #' @aliases refine.inla.mesh
-#' @export
+#' @keywords internal
+#' 
 #' @param mesh an inla.mesh object
 #' @param refine A list of refinement options passed on to \link{inla.mesh.create}
 #' @return mesh A refined inla.mesh object
@@ -254,7 +235,7 @@ refine.inla.mesh = function(mesh, refine = list(max.edge=1)){
 #' Warning2: Works in euclidean coordinates. Not suitable for sphere.
 #'
 #' @aliases tsplit.inla.mesh
-#' @export
+#' @keywords internal
 #' @param mesh an inla.mesh object
 #' @param n number of splitting recursions
 #' @return mesh A refined inla.mesh object
@@ -262,50 +243,26 @@ refine.inla.mesh = function(mesh, refine = list(max.edge=1)){
 #'
 
 tsplit.inla.mesh = function(mesh, n = 1){
-  
+
   n = 1
-  
+
   p1 = mesh$loc[mesh$graph$tv[,1],]
   p2 = mesh$loc[mesh$graph$tv[,2],]
   p3 = mesh$loc[mesh$graph$tv[,3],]
-  
+
   m1 = p1 + 0.5*(p2-p1)
   m2 = p1 + 0.5*(p3-p1)
   m3 = p2 + 0.5*(p3-p2)
   all.loc = rbind(mesh$loc,m1,m2,m3)
-  
+
   bnd.mid = mesh$loc[mesh$segm$bnd$idx[,1],] + 0.5 * ( mesh$loc[mesh$segm$bnd$idx[,2],] - mesh$loc[mesh$segm$bnd$idx[,1],]  )
   all.bnd = rbind(mesh$segm$bnd$loc,bnd.mid)
-  
-  
+
+
   mesh2 = inla.mesh.create(loc = all.loc, boundary = all.bnd )
-  
+
   if (n == 1) { return(mesh2) }
   else { return(tsplit.inla.mesh(mesh2,n-1))}
 }
 
 
-
-
-
-# Generate a simple default mesh
-#
-# @aliases default.mesh
-# @export
-# @param spObject A Spatial* object
-# @param max.edge A parameter passed on to \link{inla.mesh.2d} which controls the granularity of the mesh. If NULL, 1/20 of the domain size is used.
-# @return An \code{inla.mesh} object
-
-default.mesh = function(spObject, max.edge = NULL, convex = -0.15){
-  if (inherits(spObject, "SpatialPoints")) {
-    x = c(bbox(spObject)[1,1], bbox(spObject)[1,2], bbox(spObject)[1,2], bbox(spObject)[1,1])
-    y = c(bbox(spObject)[2,1], bbox(spObject)[2,1], bbox(spObject)[2,2], bbox(spObject)[2,2])
-    # bnd = inla.mesh.segment(loc = cbind(x,y))
-    # mesh = inla.mesh.2d(interior = bnd, max.edge = diff(bbox(spObject)[1,])/10)
-    if ( is.null(max.edge) ) { max.edge = max.edge = diff(bbox(spObject)[1,])/20 }
-    hull = inla.nonconvex.hull(points = coordinates(spObject), convex = convex)
-    mesh = inla.mesh.2d(boundary = hull, max.edge = max.edge)
-  } else {
-    NULL
-  }
-}
