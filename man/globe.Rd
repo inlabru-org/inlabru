@@ -27,6 +27,7 @@ No value, used for plotting side effect.
 Creates a textured sphere and lon/lat coordinate annotations.
 }
 \examples{
+\donttest{
 # Load rgl library (needed due to a bug in sphereplot library)
 
 library(rgl)
@@ -45,6 +46,7 @@ globe()
 glplot(mexdolphin$mesh)
 glplot(mexdolphin$samplers)
 glplot(mexdolphin$points)
+}
 }
 \seealso{
 Other inlabru RGL tools: \code{\link{glplot.SpatialLines}},

@@ -20,6 +20,7 @@ This function transforms the mesh to 3D cartesian coordinates and uses
 inla.plot.mesh() with \code{rgl=TRUE} to plot the result.
 }
 \examples{
+\donttest{
 # Load rgl library (needed due to a bug in sphereplot library)
 
 library(rgl)
@@ -38,6 +39,7 @@ globe()
 glplot(mexdolphin$mesh)
 glplot(mexdolphin$samplers)
 glplot(mexdolphin$points)
+}
 }
 \seealso{
 Other inlabru RGL tools: \code{\link{globe}},

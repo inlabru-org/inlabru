@@ -20,6 +20,7 @@ This function will calculate the cartesian coordinates of the points provided
 and use rgl.points() in order to render them.
 }
 \examples{
+\donttest{
 # Load rgl library (needed due to a bug in sphereplot library)
 
 library(rgl)
@@ -38,6 +39,7 @@ globe()
 glplot(mexdolphin$mesh)
 glplot(mexdolphin$samplers)
 glplot(mexdolphin$points)
+}
 }
 \seealso{
 Other inlabru RGL tools: \code{\link{globe}},

@@ -1,8 +1,8 @@
 Package: inlabru
 Type: Package
-Title: Spatial Inference using INLA
-Version: 2.1.9999
-Date: 2017-11-07
+Title: Spatial Inference using Integrated Nested Laplace Approximation
+Version: 2.1.1
+Date: 2017-11-08
 Author: Fabian E. Bachl
 Maintainer: Fabian E. Bachl <bachlfab@gmail.com>
 Description: Inference for spatial point processes with uncertain detection.
