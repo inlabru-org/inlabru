@@ -1,3 +1,4 @@
+\donttest{
 # Load rgl library (needed due to a bug in sphereplot library)
 
 library(rgl)
@@ -16,3 +17,4 @@ globe()
 glplot(mexdolphin$mesh)
 glplot(mexdolphin$samplers)
 glplot(mexdolphin$points)
+}

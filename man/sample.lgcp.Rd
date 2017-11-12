@@ -50,3 +50,7 @@ data("gorillas")
 pts = sample.lgcp(gorillas$mesh, rep(1.5, gorillas$mesh$n))
 ggplot() + gg(gorillas$mesh) + gg(pts)
 }
+\author{
+Daniel Simpson <\email{dp.simpson@gmail.com}> (base algorithm), 
+Fabian E. Bachl <\email{bachlfab@gmail.com}> (inclusion in inlabru, sliced spherical sampling)
+}

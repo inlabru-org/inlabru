@@ -44,6 +44,7 @@
 #' @source 
 #' Library \code{spatstat}.
 #' 
+#' 
 #' @references 
 #' Funwi-Gabga, N. (2008) A pastoralist survey and fire impact assessment in the Kagwene Gorilla 
 #' Sanctuary, Cameroon. M.Sc. thesis, Geology and Environmental Science, University of Buea, 
@@ -72,6 +73,7 @@ NULL
 #' @aliases import.gorillas
 #' @keywords internal
 #' @importFrom utils data
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>, David L. Borchers <\email{dlb@@st-andrews.ac.uk}> 
 #' @return gorilla data
 
 import.gorillas = function() {

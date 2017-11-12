@@ -34,6 +34,8 @@
 #' @details
 #' Uses a Gaussian assumption for the internal model parameters, and finds a region in parameter
 #' space with approximately \code{quantile} probability.
+#' 
+#' @author Finn Lindgren <\email{Finn.Lindgren@@ed.ac.uk}>
 
 materncov.bands = function(manifold, dist, log.range,
                            log.variance=NULL, alpha=2,
@@ -164,6 +166,8 @@ materncov.bands = function(manifold, dist, log.range,
 #'  
 #' @export
 #' @example inst/examples/spde.posterior.R
+#' 
+#' @author Finn Lindgren <\email{Finn.Lindgren@@ed.ac.uk}>
 
 spde.posterior = function(result, name, what = "range") {
   spdespec = result$sppa$model$effects[[name]]$inla.spde

@@ -16,6 +16,7 @@ glplot is a generic function for renders various kinds of spatial objects, i.e. 
 and inla.mesh objects. The function invokes particular methods which depend on the class of the first argument.
 }
 \examples{
+\donttest{
 # Load rgl library (needed due to a bug in sphereplot library)
 
 library(rgl)
@@ -34,6 +35,7 @@ globe()
 glplot(mexdolphin$mesh)
 glplot(mexdolphin$samplers)
 glplot(mexdolphin$points)
+}
 }
 \seealso{
 Other inlabru RGL tools: \code{\link{globe}},

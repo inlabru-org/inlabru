@@ -16,4 +16,7 @@ Hack: change CRS units of the covariates to km
 \description{
 Gorilla data import
 }
+\author{
+Fabian E. Bachl <\email{bachlfab@gmail.com}>, David L. Borchers <\email{dlb@st-andrews.ac.uk}>
+}
 \keyword{internal}
