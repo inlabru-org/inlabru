@@ -30,3 +30,6 @@ pl2 = ggplot(data = df) + geom_line(mapping = aes(x,z), color = "blue")
 multiplot(pl1,pl2, cols = 2)
 
 }
+\author{
+David L. Borchers <\email{dlb@st-andrews.ac.uk}>
+}

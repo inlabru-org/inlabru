@@ -74,3 +74,6 @@ plot(matcov)
 
 }
 }
+\author{
+Finn Lindgren <\email{Finn.Lindgren@ed.ac.uk}>
+}

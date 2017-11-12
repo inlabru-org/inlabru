@@ -24,6 +24,9 @@
 #'
 #' @return A \code{data.frame} (1D case) or SpatialPoints (2D case) object of point locations.
 #' 
+#' @author Daniel Simpson <\email{dp.simpson@@gmail.com}> (base algorithm), 
+#' Fabian E. Bachl <\email{bachlfab@@gmail.com}> (inclusion in inlabru, sliced spherical sampling)
+#' 
 #' @examples
 #' library(inlabru)
 #' vertices = seq(0, 3, by = 0.1)
@@ -60,20 +63,6 @@ if (class(mesh) == "inla.mesh.1d") {
   
   if ( strategy == "rectangle") {
       
-      ###########################################################################
-      ## Code for simulating LGCPs on triangulated domains (planar or spherical)
-      ## used throughout Simpson et al. (2011)
-      ## Author: Daniel Simpson
-      ## This code comes with no warranty or guarantee of any kind.
-      ###########################################################################
-      
-      ###########################################################################
-      ## Code was adapted to accommodate sampling from multiple fields in
-      ## one go. The fields have to be provided as rows in the loglambda arguments
-      ## Author: Fabian E. Bachl
-      ###########################################################################
-      
-    
       # Construct bounding rectangle
       loc <- mesh$loc
       xmin = min(loc[,1])

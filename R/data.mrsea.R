@@ -147,11 +147,6 @@ io_mrsea.pkgdata.save = function(){
   save(mrsea,file=paste0(io_mrsea.getDataDir(),"/mrsea.RData"))
 }
 
-#########################################################################################################
-#
-# Tools written by Lindesay 
-#
-
 mrseanames2dsmnames<-function(data){
   nam<-names(data)
   cols2change<-c('transect.id', 'transect.label', 'x.pos', 'y.pos', 'segment.id')
