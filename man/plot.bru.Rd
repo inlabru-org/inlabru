@@ -15,7 +15,7 @@
 an object of class \code{gg}
 }
 \description{
-\link{bru} uses \link{inla} to fit models. The latter estimates the posterior densities of
+\link{bru} uses \link[INLA]{inla} to fit models. The latter estimates the posterior densities of
 all random effects in the model. This function serves to access and plot the posterior
 densities in a convenient way.
 }

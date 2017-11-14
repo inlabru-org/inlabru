@@ -23,7 +23,7 @@ bincount(result, predictor, observations, breaks, nint = 20,
 \item{...}{arguments passed on to \link{predict}}
 }
 \value{
-An \link{inla} object
+An \link[INLA]{inla} object
 }
 \description{
 A common procedure of analyzing the distribution of 1D points is to chose a binning

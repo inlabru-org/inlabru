@@ -11,7 +11,7 @@
 #' @aliases sample.lgcp
 #' @export
 #'
-#' @param mesh An \link{inla.mesh} object
+#' @param mesh An \link[INLA]{inla.mesh} object
 #' @param loglambda A vector of log intensities at the mesh vertices (for higher order basis functions, e.g. 
 #'                  for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis 
 #'                  function weights rather than the values at the \code{mesh$n} vertices)
@@ -28,7 +28,7 @@
 #' Fabian E. Bachl <\email{bachlfab@@gmail.com}> (inclusion in inlabru, sliced spherical sampling)
 #' 
 #' @examples
-#' library(inlabru)
+#' library(INLA)
 #' vertices = seq(0, 3, by = 0.1)
 #' mesh = inla.mesh.1d(vertices)
 #' loglambda = 5-0.5*vertices
@@ -51,7 +51,7 @@ if (class(mesh) == "inla.mesh.1d") {
   wmax = max(loglambda)
   Npoints = rpois(1, lambda = area * exp(wmax))
   points = runif(n = sum(Npoints), min=xmin, max=xmax)
-  A = inla.mesh.project(mesh,points)$A
+  A = INLA::inla.mesh.project(mesh,points)$A
   ploglambda = exp( loglambda - wmax)
   pointValues = as.vector(A %*% ploglambda)
   keep = which(runif(Npoints) < pointValues)
@@ -86,7 +86,7 @@ if (class(mesh) == "inla.mesh.1d") {
       points <-cbind(x,y)
       
       # Do some thinning
-      A <- inla.mesh.project(mesh,points)$A
+      A <- INLA::inla.mesh.project(mesh,points)$A
       ploglambda = exp( loglambda - lambda_max)
       pointValues = A %*% t(ploglambda)
       # Extract value for each point depending on which field the point was created for
@@ -118,7 +118,7 @@ if (class(mesh) == "inla.mesh.1d") {
     proj4string(df) = CRS(paste0("+proj=geocent +ellps=sphere +R=",R))
     points = coordinates(spTransform(df, CRS("+proj=longlat")))
     
-    A = inla.mesh.project(mesh, points)$A
+    A = INLA::inla.mesh.project(mesh, points)$A
     loglambda = exp(loglambda - lambda_max)
     pointValues = as.vector(A%*%loglambda)
     points = points[runif(Npoints) < pointValues,]
@@ -162,7 +162,7 @@ if (class(mesh) == "inla.mesh.1d") {
       loc[,2] = loc[,2] - 180
       colnames(loc) = c("lon","lat","z")
       points = as.matrix(loc[,c("lon","lat")])
-      A <- inla.mesh.project(mesh,points)$A
+      A <- INLA::inla.mesh.project(mesh,points)$A
       pointValues = as.vector(A%*%loglambda)
       keep = runif(n.points) < pointValues
       sampled.points[[k]] = points[keep,]

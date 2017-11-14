@@ -1,6 +1,27 @@
 iinla.env = new.env()
 iinla.env$log = sprintf("inlabru @ %s", date())
 
+.onAttach <- function(libname, pkgname) {
+  if (length(find.package("INLA", quiet = TRUE)) == 0) { 
+    iinla.env$inla.installed = FALSE 
+  } else { 
+    iinla.env$inla.installed = TRUE
+  }
+  
+}
+
+requireINLA = function(){
+  tc = tryCatch(attachNamespace("INLA"), error = function(x){})
+  #if ( iinla.env$inla.installed ) {
+    # if (!isNamespaceLoaded("INLA")) {
+    #   attachNamespace("INLA")
+    # }
+    
+  #} else {
+  #  stop("This function requires INLA to be installed. Please consult www.r-inla.org on how to install INLA. After installing INLA please reload inlabru.")
+  #}
+}
+
 
 
 #' @title Global setting for tutorial sessions

@@ -147,7 +147,7 @@ spoly = function(data, cols = colnames(data)[1:2], crs = CRS(as.character(NA)), 
 #' This is a wrapper for the \link{spTransform} function provided by the \code{sp} package.
 #' Given a spatial object (or a list thereof) it will transform the coordinate system according
 #' to the parameter \code{crs}. In addition to the usual spatial objects this function is
-#' also capables of transforming \link{inla.mesh} objects that are equipped with a coordinate
+#' also capables of transforming \link[INLA]{inla.mesh} objects that are equipped with a coordinate
 #' system.#'
 #' @aliases stransform
 #' @export

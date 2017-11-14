@@ -23,6 +23,11 @@ parameter of a model's SPDE component. Can also plot Matern correlation or covar
 }
 \examples{
 \donttest{
+
+# Load INLA
+
+library(INLA)
+    
 # Load 1D Poisson process data
 
 data(Poisson2_1D)

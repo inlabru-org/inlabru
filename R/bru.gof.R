@@ -20,7 +20,7 @@
 #' @param nint Number of integration points per bin. Increase this if the bins are wide and
 #' @param probs numeric vector of probabilities with values in [0,1]
 #' @param ... arguments passed on to \link{predict}
-#' @return An \link{inla} object
+#' @return An \link[INLA]{inla} object
 #' 
 #' @examples 
 #' 

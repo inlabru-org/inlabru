@@ -15,17 +15,17 @@ bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
 
 \item{max.iter}{maximum number of inla iterations}
 
-\item{offset}{the usual \link{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.}
+\item{offset}{the usual \link[INLA]{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.}
 
-\item{result}{An \code{inla} object returned from previous calls of \link{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
+\item{result}{An \code{inla} object returned from previous calls of \link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
 
-\item{E}{\link{inla} exposure parameter}
+\item{E}{\link[INLA]{inla} exposure parameter}
 
-\item{control.compute}{INLA option, See \link{control.compute}}
+\item{control.compute}{INLA option, See \link[INLA]{control.compute}}
 
-\item{control.inla}{INLA option, See \link{control.inla}}
+\item{control.inla}{INLA option, See \link[INLA]{control.inla}}
 
-\item{...}{Additional options passed on to \link{inla}}
+\item{...}{Additional options passed on to \link[INLA]{inla}}
 }
 \description{
 Additional \link{bru} options

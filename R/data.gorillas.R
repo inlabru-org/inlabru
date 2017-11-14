@@ -95,8 +95,8 @@ import.gorillas = function() {
   boundary = spoly(gorillas$window$bdry, crs = CRS("+proj=utm +zone=32N +datum=WGS84"))
   
   #' Build mesh
-  bnd = inla.mesh.segment(loc = data.frame(gorillas$window$bdry[[1]]))
-  mesh = inla.mesh.2d(interior = bnd, max.edge = 222) # ! With higher max.edge we run into various INLA errors/warnings
+  bnd = INLA::inla.mesh.segment(loc = data.frame(gorillas$window$bdry[[1]]))
+  mesh = INLA::inla.mesh.2d(interior = bnd, max.edge = 222) # ! With higher max.edge we run into various INLA errors/warnings
   mesh$crs = INLA::inla.CRS(proj4string(nests))
   
   #' Turn covariates int SpatialGridDataFrame

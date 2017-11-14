@@ -38,7 +38,7 @@ setClass("inla.mesh")
 is.inside = function(mesh, loc, mesh.coords = NULL) {
   if ( inherits(loc, "Spatial") ) { loc = coordinates(loc) }
   if (!is.null(mesh.coords) & is.data.frame(loc)) { loc = as.matrix(loc[,mesh.coords,drop=FALSE])}
-  p2m = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=loc)
+  p2m = INLA::inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=loc)
   return(!(p2m$p2m.t == 0))
 }
 
@@ -150,7 +150,7 @@ pixels = function(mesh, nx = 150, ny = 150, mask = TRUE) {
     y = seq(min(mesh$loc[,2]), max(mesh$loc[,2]),length = ny)
   } else { y = ny }
   
-  lattice <- inla.mesh.lattice(x=x,y=y)
+  lattice <- INLA::inla.mesh.lattice(x=x,y=y)
   pixels <- data.frame(x=lattice$loc[,1], y=lattice$loc[,2])
 
   coordinates(pixels) <- c("x","y")
@@ -219,13 +219,13 @@ triangle = function(mesh,loc){
 #' @keywords internal
 #' 
 #' @param mesh an inla.mesh object
-#' @param refine A list of refinement options passed on to \link{inla.mesh.create}
+#' @param refine A list of refinement options passed on to \link[INLA]{inla.mesh.create}
 #' @return mesh A refined inla.mesh object
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
 refine.inla.mesh = function(mesh, refine = list(max.edge=1)){
-  rmesh = inla.mesh.create(loc=mesh$loc,interior=inla.mesh.interior(mesh),boundary=inla.mesh.boundary(mesh),refine=refine)
+  rmesh = INLA::inla.mesh.create(loc=mesh$loc,interior=INLA::inla.mesh.interior(mesh),boundary=INLA::inla.mesh.boundary(mesh),refine=refine)
   return(rmesh)
 }
 
@@ -259,7 +259,7 @@ tsplit.inla.mesh = function(mesh, n = 1){
   all.bnd = rbind(mesh$segm$bnd$loc,bnd.mid)
 
 
-  mesh2 = inla.mesh.create(loc = all.loc, boundary = all.bnd )
+  mesh2 = INLA::inla.mesh.create(loc = all.loc, boundary = all.bnd )
 
   if (n == 1) { return(mesh2) }
   else { return(tsplit.inla.mesh(mesh2,n-1))}

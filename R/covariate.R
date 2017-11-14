@@ -34,17 +34,17 @@ covdata.import = function(dframe, colname, data){
   scale = max(abs(dframe[,colname]))
   dframe[,colname] = dframe[,colname]/scale
   
-  spde.mdl = inla.spde2.matern(mesh = data$mesh, alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.1)
-  A = inla.spde.make.A(data$mesh, loc = covloc)
-  stack = inla.stack(data=list(y = dframe[,colname]), A=list(A,1), 
+  spde.mdl = INLA::inla.spde2.matern(mesh = data$mesh, alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.1)
+  A = INLA::inla.spde.make.A(data$mesh, loc = covloc)
+  stack = INLA::inla.stack(data=list(y = dframe[,colname]), A=list(A,1), 
                      effects = list(spde=1:spde.mdl$n.spde, m = rep(1,nrow(dframe))))
   
-  result = inla( formula = y ~ f(spde, model = spde.mdl) -1, 
-                 family = "gaussian",
-                 data = inla.stack.data(stack),
-                 control.predictor = list(A = inla.stack.A(stack)),
-                 verbose = FALSE)
-  
+  result = INLA::inla( formula = y ~ f(spde, model = spde.mdl) -1, 
+                       family = "gaussian",
+                       data = INLA::inla.stack.data(stack),
+                       control.predictor = list(A = INLA::inla.stack.A(stack)),
+                       verbose = FALSE)
+        
   value = scale * result$summary.random$spde[,"mode", drop = FALSE]
   
   depth = make.covdata(mesh = data$mesh, values = value, mesh.coords = data$mesh.coords, time.coords = NULL)
@@ -108,13 +108,13 @@ get.value = function(covariate,loc){
   if (length(times)>0) {
     for (t in times){
       msk = loc[,covariate$time.coords]==t
-      A = inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[msk,covariate$mesh.coords]))
+      A = INLA::inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[msk,covariate$mesh.coords]))
       inside = is.inside(covariate$mesh, loc = loc[,covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
       values[msk] = as.vector(A%*%covariate$values[,as.character(t)])
       values[msk & !inside] = NA
     }
   } else {
-    A = inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[,covariate$mesh.coords]))
+    A = INLA::inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[,covariate$mesh.coords]))
     inside = is.inside(covariate$mesh, loc = loc[,covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
     values = as.vector(A%*%covariate$values[,1])
     values[!inside] = NA
@@ -172,7 +172,7 @@ get.min = function(covariate,loc=NULL){
 get.tmean = function(covariate,loc=NULL){
   tm = apply(covariate$values,MARGIN=1,mean)
   loc2 = loc[,covariate$mesh.coords,drop=FALSE]
-  A = inla.spde.make.A(covariate$mesh,loc=as.matrix(loc2))
+  A = INLA::inla.spde.make.A(covariate$mesh,loc=as.matrix(loc2))
   values = as.vector(A%*%tm)
   return(values)
 }
@@ -201,7 +201,7 @@ get.smean = function(covariate,loc=NULL,weights=NULL){
   if (is.null(weights)) {
     weights <- rep(1, covariate$mesh$n)
   }
-  weights <- weights * Matrix::diag(inla.mesh.fem(covariate$mesh, order=1)$c0)
+  weights <- weights * Matrix::diag(INLA::inla.mesh.fem(covariate$mesh, order=1)$c0)
   weights <- weights / sum(weights)
   
   loc2 <- data.frame(covariate$mesh$loc[, 1:length(covariate$mesh.coords),

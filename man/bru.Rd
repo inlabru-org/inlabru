@@ -25,12 +25,12 @@ function provides a convenient interface to fitting Cox processes.}
 or valid inla parameters.}
 }
 \value{
-bru returns an object of class "bru". A \code{bru} object inherits from \link{inla} 
+bru returns an object of class "bru". A \code{bru} object inherits from \link[INLA]{inla} 
         (see the inla documentation for its properties) and adds additional information stored 
         in the \code{sppa} field.
 }
 \description{
-This method is a wrapper for \link{inla} and provides multiple enhancements. 
+This method is a wrapper for \link[INLA]{inla} and provides multiple enhancements. 
 
 \itemize{
 \item{Easy usage of spatial covariates and automatic construction of inla projection matrices for (spatial) SPDE models. 
