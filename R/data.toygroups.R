@@ -30,7 +30,7 @@ save.toygroups = function(){
   xx = seq(-10,10,length.out = 300)
   
   # Sample group locations
-  mesh1D = inla.mesh.1d(xx)
+  mesh1D = INLA::inla.mesh.1d(xx)
   g.lambda = function(x) 60 * dnorm(0.2*(x-10)) + 20
   groups = sample.lgcp(mesh1D, log(g.lambda(mesh1D$loc)))
   

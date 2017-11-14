@@ -51,7 +51,7 @@
 #' 
 #' 
 #' # Convert a 1D mesh into integration points
-#'  
+#' library(INLA)
 #' mesh = inla.mesh.1d(seq(0,10,by = 1))
 #' ips = ipoints(mesh, name = "time")
 #' plot(ips)
@@ -117,11 +117,11 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
         
         # If domain is NULL set domain to a 1D mesh with 30 equally spaced vertices and boundary according to region
         # If domain is a single numeric set domain to a 1D mesh with n=domain vertices and boundary according to region
-        if ( is.null(domain) ) { subdomain = inla.mesh.1d(seq(min(subregion), max(subregion), length.out = 30)) }
-        else if ( is.numeric(domain)) { subdomain = inla.mesh.1d(seq(min(subregion), max(subregion), length.out = domain)) }
+        if ( is.null(domain) ) { subdomain = INLA::inla.mesh.1d(seq(min(subregion), max(subregion), length.out = 30)) }
+        else if ( is.numeric(domain)) { subdomain = INLA::inla.mesh.1d(seq(min(subregion), max(subregion), length.out = domain)) }
         else { subdomain = stop("1D weight projection not yet implemented") }
         
-        fem = inla.mesh.1d.fem(subdomain)
+        fem = INLA::inla.mesh.1d.fem(subdomain)
         ips[[j]] = data.frame(weight = diag(as.matrix(fem$c0)))
         ips[[j]][name] = subdomain$loc
         ips[[j]] = ips[[j]][,c(2,1)] # make weights second column
@@ -142,7 +142,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     }
     
     ips = vertices(region)
-    ips$weight = diag(as.matrix(inla.mesh.fem(region)$c0))
+    ips$weight = diag(as.matrix(INLA::inla.mesh.fem(region)$c0))
     
     # backtransform
     if ( !is.null(region$crs) && !(is.na(region$crs@projargs))) { ips = stransform(ips, crs = crs) }
@@ -151,7 +151,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     
     ips = data.frame(x = region$loc)
     colnames(ips) = name
-    ips$weight = diag(as.matrix(inla.mesh.fem(region)$c0))
+    ips$weight = diag(as.matrix(INLA::inla.mesh.fem(region)$c0))
     
   } else if ( class(region) == "SpatialPoints" ){
     
@@ -206,7 +206,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     # If domain is NULL, make a mesh with the polygons as boundary
     if ( is.null(domain) ) {
       max.edge = max(diff(range(polyloc[,1])), diff(range(polyloc[,2])))/20
-      domain = inla.mesh.2d(boundary = region, max.edge = max.edge)
+      domain = INLA::inla.mesh.2d(boundary = region, max.edge = max.edge)
       domain$crs = CRS(proj4string(region))
     } else {
       if ( !is.null(domain$crs) && !is.na(domain$crs@projargs)) 
@@ -390,7 +390,7 @@ vertex.projection = function(points, mesh, columns = names(points), group = NULL
   
   if ( is.null(group) | (length(group) == 0) ) {
     
-    res = inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
+    res = INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
     tri = res$p2m.t 
     
     data = list()

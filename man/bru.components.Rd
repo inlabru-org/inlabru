@@ -9,7 +9,7 @@ bru.components()
 \description{
 Similar to glm(), gam() and inla() \link{bru} uses formula objects to describe response data and latent 
 (unknonw) components of the model to be fitted. However, in addition to the syntax compatible with 
-\link{inla}, bru components offer addtitional functionality which facilitates modeling.
+\link[INLA]{inla}, bru components offer addtitional functionality which facilitates modeling.
 }
 \details{
 \link{bru} will understand formulae describing fixed effect models just like the other methods. For instance, the
@@ -40,7 +40,7 @@ In inla, a simple random effect model would be expressed as
 
 \itemize{\item{\code{formula = y ~ f(x, model = "linear")},}}
 
-where \link{f} is the inla specific function to set up random effects of all kinds. The underlying 
+where \link[INLA]{f} is the inla specific function to set up random effects of all kinds. The underlying 
 predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state 
 \code{x} as the random effect's name. bru allows to rewrite this formula in order to explicitly state 
 the name of the random effect and the name of the associated. This is achived by replacing \code{f}

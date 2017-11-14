@@ -431,7 +431,7 @@ gg.SpatialPixels = function(data, ...) {
 #' @name gg.inla.mesh
 #' @export
 #' @import ggplot2
-#' @param data An \link{inla.mesh} object.
+#' @param data An \link[INLA]{inla.mesh} object.
 #' @param color A vector of scalar values to fill the mesh with colors. The length of the vector mus correspond to the number of mesh vertices.
 #' @param alpha A vector of scalar values setting the alpha value of the colors provided.
 #' @param edge.color Color of the mesh edges.
@@ -531,6 +531,10 @@ if ( !is.null(color) ) {
 #' 
 #' @examples
 #' 
+#' # Load INLA
+#' 
+#' library(INLA)
+#' 
 #' # Create a 1D mesh
 #' 
 #' mesh = inla.mesh.1d(seq(0,10,by=0.5))
@@ -595,7 +599,7 @@ gg.RasterLayer = function(data, mapping = aes_string(x="x", y="y", fill = "layer
 #' 
 #' @description
 #' 
-#' \link{bru} uses \link{inla} to fit models. The latter estimates the posterior densities of
+#' \link{bru} uses \link[INLA]{inla} to fit models. The latter estimates the posterior densities of
 #' all random effects in the model. This function serves to access and plot the posterior
 #' densities in a convenient way.
 #' 
@@ -678,7 +682,7 @@ plot.prediction_old = function(..., property = "median") {
                  effect = pnames[[k]])))
 
     jit = do.call(rbind, lapply(1:length(args), function(k)
-      data.frame(y = inla.rmarginal(5000,args[[k]]),
+      data.frame(y = INLA::inla.rmarginal(5000,args[[k]]),
                  n = 500,
                  effect = pnames[[k]])))
     

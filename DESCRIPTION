@@ -2,7 +2,7 @@ Package: inlabru
 Type: Package
 Title: Spatial Inference using Integrated Nested Laplace Approximation
 Version: 2.1.9999
-Date: 2017-11-08
+Date: 2017-11-14
 Author: Fabian E. Bachl <bachlfab@gmail.com> (main code), 
         Finn Lindgren <Finn.Lindgren@ed.ac.uk> (SPDE posterior plotting),
         David L. Borchers <dlb@st-andrews.ac.uk> (Gorilla data import and sampling, multiplot tool), 
@@ -34,10 +34,10 @@ Suggests:
     spatstat,
     spatstat.data,
     RColorBrewer,
-    graphics
+    graphics,
+    INLA,
 Depends:
     R (>= 3.3),
-    INLA,
     sp,
     stats,
     methods,

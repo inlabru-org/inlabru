@@ -10,7 +10,7 @@
   nx = 500, ny = 500, ...)
 }
 \arguments{
-\item{data}{An \link{inla.mesh} object.}
+\item{data}{An \link[INLA]{inla.mesh} object.}
 
 \item{color}{A vector of scalar values to fill the mesh with colors. The length of the vector mus correspond to the number of mesh vertices.}
 

@@ -225,7 +225,7 @@ g = function(covariate,
   # Only call f if we are  not dealing with an offset
   if ( label == "offset" ) { fvals = list(model="offset") }
   else if ( is.character(model) && model == "factor" ) { fvals = list(model="factor") } # , n = list(...)$n
-  else { xxx = NULL ; fvals = f(xxx, ..., group = group, model = model) }
+  else { xxx = NULL ; fvals = INLA::f(xxx, ..., group = group, model = model) }
   fvals$label = label
   
   # Default map
@@ -441,7 +441,7 @@ list.indices.model = function(model, points){
         } else {
           ng = eff$ngroup
           if (is.null(ng)) { ng = 1 }
-          idx[[name]] = inla.spde.make.index(name, n.spde = eff$inla.spde$n.spde, n.group = ng)
+          idx[[name]] = INLA::inla.spde.make.index(name, n.spde = eff$inla.spde$n.spde, n.group = ng)
           # NOTE: MODELS WITH REPLICATES ARE NOTE IMPLEMENTED YET.
           #      - when using group= or replicate, the f-formula has to be adjusted to read the groups/replicates from the stack
           #      - see make.model() for an example on how to do this for groups

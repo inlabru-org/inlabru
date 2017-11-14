@@ -17,8 +17,8 @@ split.lines = function(mesh, sp, ep, filter.zero.length = TRUE) {
   idx = 1:dim(sp)[1]
 
   # Filter out segments not on the mesh
-  t1 = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(sp,z=0)))$p2m.t
-  t2 = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(ep,z=0)))$p2m.t
+  t1 = INLA::inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(sp,z=0)))$p2m.t
+  t2 = INLA::inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(ep,z=0)))$p2m.t
   # if (any(t1==0) | any(t2==0)) { warning("points outside boundary! filtering...")}
   sp = sp[!((t1==0) | (t2==0)),]
   ep = ep[!((t1==0) | (t2==0)),]
@@ -29,7 +29,7 @@ split.lines = function(mesh, sp, ep, filter.zero.length = TRUE) {
   if ( dim(loc)[2] == 2 ) {loc = cbind(loc,rep(0,dim(loc)[1]))}
   np = dim(sp)[1]
   sp.idx = t(rbind(1:np,np+1:np))
-  splt = inla.fmesher.smorg(mesh$loc,mesh$graph$tv, splitlines=list(loc=loc, idx=sp.idx))
+  splt = INLA::inla.fmesher.smorg(mesh$loc,mesh$graph$tv, splitlines=list(loc=loc, idx=sp.idx))
   #plot(data$mesh)
   #points(loc)
   #points(splt$split.loc,col="blue)
@@ -202,8 +202,8 @@ int.slines = function(data, mesh, group = NULL, project = TRUE) {
   if ( !is.null(mesh) ) {
     # Filter out points outside the mesh...
     loc = as.matrix(rbind(sp,ep))
-    t1 = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(sp,z=0)))$p2m.t
-    t2 = inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(ep,z=0)))$p2m.t
+    t1 = INLA::inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(sp,z=0)))$p2m.t
+    t2 = INLA::inla.fmesher.smorg(loc=mesh$loc,tv=mesh$graph$tv,points2mesh=as.matrix(data.frame(ep,z=0)))$p2m.t
     if (any(t1==0) | any(t2==0)) { warning("Found spatial lines with start or end point ouside of the mesh. Omitting.")}
     sp = sp[!((t1==0) | (t2==0)),]
     ep = ep[!((t1==0) | (t2==0)),]
@@ -284,14 +284,14 @@ int.polygon = function(mesh, loc, group = NULL){
     
     # plot(mesh) ; points(sp) ; points(ep) ; points(sloc)
     bloc = rbind(gloc)
-    bnd = inla.mesh.segment(loc = bloc)
-    imesh = inla.mesh.create(boundary = bnd, loc = rbind(mesh$loc[,1:2], sloc[,1:2]))
+    bnd = INLA::inla.mesh.segment(loc = bloc)
+    imesh = INLA::inla.mesh.create(boundary = bnd, loc = rbind(mesh$loc[,1:2], sloc[,1:2]))
     # plot(imesh) ; points(sp) ; points(ep) ; points(gloc)
     # plot(imesh) ; points(sp) ; points(ep) ; points(gloc) ; plot(mesh, add = TRUE)
     
     ips = data.frame(imesh$loc[,1:2])
     colnames(ips) = c("x","y")
-    ips$weight = diag(as.matrix(inla.mesh.fem(imesh)$c0))
+    ips$weight = diag(as.matrix(INLA::inla.mesh.fem(imesh)$c0))
     # ips = as.data.frame(project.weights(ips, mesh, mesh.coords = c("x","y")))
     ips$group = g
     ipsl = c(ipsl, list(ips))

@@ -17,7 +17,7 @@ generate = function(object, ...){ UseMethod("generate") }
 
 #' @title Convenient model fitting using (iterated) INLA
 #'
-#' @description This method is a wrapper for \link{inla} and provides multiple enhancements. 
+#' @description This method is a wrapper for \link[INLA]{inla} and provides multiple enhancements. 
 #' 
 #' \itemize{
 #' \item{Easy usage of spatial covariates and automatic construction of inla projection matrices for (spatial) SPDE models. 
@@ -47,7 +47,7 @@ generate = function(object, ...){ UseMethod("generate") }
 #' @param options A list of name and value pairs that are either interpretable by \link{bru.options} 
 #'                or valid inla parameters.
 #' 
-#' @return bru returns an object of class "bru". A \code{bru} object inherits from \link{inla} 
+#' @return bru returns an object of class "bru". A \code{bru} object inherits from \link[INLA]{inla} 
 #'         (see the inla documentation for its properties) and adds additional information stored 
 #'         in the \code{sppa} field.
 #' 
@@ -59,6 +59,8 @@ bru = function(components = y ~ Intercept,
                data = NULL,
                ...,
                options = list()) {
+  
+  requireINLA()
   
   # Update default options
   options = do.call(bru.options, options)
@@ -136,12 +138,12 @@ bru = function(components = y ~ Intercept,
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-#' @param family A character identifying a valid \link{inla} likelihood. Alternatively 'cp' for Cox processes.
+#' @param family A character identifying a valid \link[INLA]{inla} likelihood. Alternatively 'cp' for Cox processes.
 #' @param formula a \link{formula} where the right hand side expression defines the predictor used in the optimization.
 #' @param data Likelihood-specific data.
 #' @param components Components.
 #' @param mesh An inla.mesh object.
-#' @param E Exposure parameter for family = 'poisson' passed on to \link{inla}. Special case if family is 'cp': rescale all integration weights by E.
+#' @param E Exposure parameter for family = 'poisson' passed on to \link[INLA]{inla}. Special case if family is 'cp': rescale all integration weights by E.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides \code{samplers}.
 #' @param domain Named list of domain definitions.
@@ -219,7 +221,7 @@ stackmaker.like = function(lhood) {
   # Special inlabru likelihoods
   if (lhood$family == "cp"){
     sm = function(model, result) {
-      inla.stack(make.stack(points = lhood$data, model = model, expr = lhood$expr, y = 1, E = 0, result = result),
+      INLA::inla.stack(make.stack(points = lhood$data, model = model, expr = lhood$expr, y = 1, E = 0, result = result),
                  make.stack(points = lhood$ips, model = model, expr = lhood$expr, y = 0, E = lhood$E * lhood$ips$weight, offset = 0, result = result))
     }
     
@@ -243,12 +245,12 @@ stackmaker.like = function(lhood) {
 #' @param mesh An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.
 #' @param run If TRUE, run inference. Otherwise only return configuration needed to run inference.
 #' @param max.iter maximum number of inla iterations
-#' @param offset the usual \link{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.
-#' @param result An \code{inla} object returned from previous calls of \link{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
-#' @param E \link{inla} exposure parameter
-#' @param control.compute INLA option, See \link{control.compute}
-#' @param control.inla INLA option, See \link{control.inla}
-#' @param ... Additional options passed on to \link{inla}
+#' @param offset the usual \link[INLA]{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.
+#' @param result An \code{inla} object returned from previous calls of \link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
+#' @param E \link[INLA]{inla} exposure parameter
+#' @param control.compute INLA option, See \link[INLA]{control.compute}
+#' @param control.inla INLA option, See \link[INLA]{control.inla}
+#' @param ... Additional options passed on to \link[INLA]{inla}
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
@@ -291,7 +293,7 @@ bru.options = function(mesh = NULL,
 #' 
 #' Similar to glm(), gam() and inla() \link{bru} uses formula objects to describe response data and latent 
 #' (unknonw) components of the model to be fitted. However, in addition to the syntax compatible with 
-#' \link{inla}, bru components offer addtitional functionality which facilitates modeling.
+#' \link[INLA]{inla}, bru components offer addtitional functionality which facilitates modeling.
 #' 
 #' @details 
 #' 
@@ -322,7 +324,7 @@ bru.options = function(mesh = NULL,
 #' 
 #' \itemize{\item{\code{formula = y ~ f(x, model = "linear")},}}
 #' 
-#' where \link{f} is the inla specific function to set up random effects of all kinds. The underlying 
+#' where \link[INLA]{f} is the inla specific function to set up random effects of all kinds. The underlying 
 #' predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state 
 #' \code{x} as the random effect's name. bru allows to rewrite this formula in order to explicitly state 
 #' the name of the random effect and the name of the associated. This is achived by replacing \code{f}
@@ -573,7 +575,7 @@ summary.bru = function(object, ...) {
     cat(paste0("mean = [", signif(range(sm$mean)[1])," : ",signif(range(sm$mean)[2]), "]"))
     cat(paste0(", quantiles = [", signif(range(sm[,c(4,6)])[1])," : ",signif(range(c(4,6))[2]), "]"))
     if (nm %in% names(object$model$mesh)) {
-      cat(paste0(", area = ", signif(sum(diag(as.matrix(inla.mesh.fem(object$model$mesh[[nm]])$c0))))))
+      cat(paste0(", area = ", signif(sum(diag(as.matrix(INLA::inla.mesh.fem(object$model$mesh[[nm]])$c0))))))
     }
     cat("\n")
   }
@@ -586,10 +588,10 @@ summary.bru = function(object, ...) {
   
   marginal.summary = function(m, name) {
     df = data.frame(param = name,
-                    mean = inla.emarginal(identity, m))
-    df$var = inla.emarginal(function(x) {(x-df$mean)^2}, m)
+                    mean = INLA::inla.emarginal(identity, m))
+    df$var = INLA::inla.emarginal(function(x) {(x-df$mean)^2}, m)
     df$sd = sqrt(df$var)
-    df[c("lq","median","uq")] = inla.qmarginal(c(0.025, 0.5, 0.975), m)
+    df[c("lq","median","uq")] = INLA::inla.qmarginal(c(0.025, 0.5, 0.975), m)
     df
   }
   
@@ -597,7 +599,7 @@ summary.bru = function(object, ...) {
   for (nm in names(object$sppa$model$effects)) {
     eff = object$sppa$model$effects[[nm]]
     if (eff$model == "spde2"){
-      hyp = inla.spde.result(object, nm, eff$inla.spde)
+      hyp = INLA::inla.spde.result(object, nm, eff$inla.spde)
       cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
       df = rbind(marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"), 
                  marginal.summary(hyp$marginals.log.range.nominal$range.nominal.1, "log.range"), 
@@ -777,11 +779,11 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.
   while ( !converged ) {
     
     # Compute last HPD interval
-    xnew = xmaker2(inla.hpdmarginal(0.999, list(x=x, y=lest)))
+    xnew = xmaker2(INLA::inla.hpdmarginal(0.999, list(x=x, y=lest)))
     
     # Map last estimate to the HPD interval
     if (discrete) xnew = unique(round(xnew))
-    lest = inla.dmarginal(xnew, list(x=x, y=lest))  
+    lest = INLA::inla.dmarginal(xnew, list(x=x, y=lest))  
     x = xnew
     
     # Sample new density
@@ -809,9 +811,9 @@ montecarlo.posterior = function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.
   marg = list(x = x, y = est, samples = samples, mcerr = err)
   
   # Append some important statistics
-  marg$quantiles = inla.qmarginal(c(0.025, 0.5, 0.975),marg)
-  marg$mean = inla.emarginal(identity, marg) 
-  marg$sd = sqrt(inla.emarginal(function(x) x^2, marg) - marg$mean^2) 
+  marg$quantiles = INLA::inla.qmarginal(c(0.025, 0.5, 0.975),marg)
+  marg$mean = INLA::inla.emarginal(identity, marg) 
+  marg$sd = sqrt(INLA::inla.emarginal(function(x) x^2, marg) - marg$mean^2) 
   marg$cv = marg$sd/marg$mean
   marg$mce = err
   
@@ -864,9 +866,9 @@ summarize = function(data, x = NULL, cbind.only = FALSE) {
 
 # Iterated INLA
 # 
-# This is a wrapper for iterated runs of \link{inla}. Before each run the \code{stackmaker} function is used to
+# This is a wrapper for iterated runs of \link[INLA]{inla}. Before each run the \code{stackmaker} function is used to
 # set up the \link{inla.stack} for the next iteration. For this purpose \code{stackmaker} is called given the
-# \code{data} and \code{model} arguments. The \code{data} argument is the usual data provided to \link{inla}
+# \code{data} and \code{model} arguments. The \code{data} argument is the usual data provided to \link[INLA]{inla}
 # while \link{model} provides more information than just the usual inla formula. 
 # 
 # @aliases iinla
@@ -874,10 +876,10 @@ summarize = function(data, x = NULL, cbind.only = FALSE) {
 # @param data A data.frame
 # @param model A \link{model} object
 # @param stackmaker A function creating a stack from data and a model
-# @param n Number of \link{inla} iterations
+# @param n Number of \link[INLA]{inla} iterations
 # @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
-# @param ... Arguments passed on to \link{inla}
-# @return An \link{inla} object
+# @param ... Arguments passed on to \link[INLA]{inla}
+# @return An \link[INLA]{inla} object
 
 
 iinla = function(data, model, stackmaker, n = 10, result = NULL, 
@@ -917,9 +919,9 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
                                                    data = c(inla.stack.mdata(stk), list.data(model)),
                                                    family = family,
-                                                   control.predictor = list( A = inla.stack.A(stk), compute = TRUE),
-                                                   E = inla.stack.data(stk)$e,
-                                                   offset = inla.stack.data(stk)$bru.offset + offset),
+                                                   control.predictor = list( A = INLA::inla.stack.A(stk), compute = TRUE),
+                                                   E = INLA::inla.stack.data(stk)$e,
+                                                   offset = INLA::inla.stack.data(stk)$bru.offset + offset),
                                                    inla.options)), 
                               error = warning
                             )

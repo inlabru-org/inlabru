@@ -27,6 +27,10 @@ of a 1D mesh.
 }
 \examples{
 
+# Load INLA
+
+library(INLA)
+
 # Create a 1D mesh
 
 mesh = inla.mesh.1d(seq(0,10,by=0.5))

@@ -171,7 +171,7 @@ materncov.bands = function(manifold, dist, log.range,
 
 spde.posterior = function(result, name, what = "range") {
   spdespec = result$sppa$model$effects[[name]]$inla.spde
-  spderesult <- inla.spde.result(result, name, spdespec)
+  spderesult <- INLA::inla.spde.result(result, name, spdespec)
   
   if ( what == "matern.correlation" || what == "matern.covariance") {
 
@@ -218,11 +218,11 @@ spde.posterior = function(result, name, what = "range") {
                            'log.range',  'variance',  'log.variance', 
                            'matern.correlation', matern.covariance")
     
-    med = inla.qmarginal(0.5, marg)
-    uq = inla.qmarginal(0.975, marg)
-    lq = inla.qmarginal(0.025, marg)
+    med = INLA::inla.qmarginal(0.5, marg)
+    uq = INLA::inla.qmarginal(0.975, marg)
+    lq = INLA::inla.qmarginal(0.025, marg)
     inner.x = seq(lq, uq, length.out = 100)
-    inner.marg = data.frame(x = inner.x, y = inla.dmarginal(inner.x, marg))
+    inner.marg = data.frame(x = inner.x, y = INLA::inla.dmarginal(inner.x, marg))
     colnames(inner.marg) = c(what, "pdf")
     df = data.frame(marg)
     colnames(df) = c(what, "pdf")

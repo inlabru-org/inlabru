@@ -8,7 +8,7 @@ sample.lgcp(mesh, loglambda, strategy = "rectangle", R = 6371,
   samplers = NULL)
 }
 \arguments{
-\item{mesh}{An \link{inla.mesh} object}
+\item{mesh}{An \link[INLA]{inla.mesh} object}
 
 \item{loglambda}{A vector of log intensities at the mesh vertices (for higher order basis functions, e.g. 
 for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis 
@@ -37,7 +37,7 @@ the mesh. If the intensity is very high the standard \code{strategy} "spherical"
 Using the "sliced-spherical" strategy can help in this case.
 }
 \examples{
-library(inlabru)
+library(INLA)
 vertices = seq(0, 3, by = 0.1)
 mesh = inla.mesh.1d(vertices)
 loglambda = 5-0.5*vertices

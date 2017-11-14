@@ -93,7 +93,7 @@ extract.summary = function(result, property) {
 inla.posterior.sample.structured = function(result,n){
 
   # Workaround for older versions of INLA
-  if ("hyper.user.scale" %in% formalArgs(inla.posterior.sample)) {
+  if ("hyper.user.scale" %in% formalArgs(INLA::inla.posterior.sample)) {
     samples = INLA::inla.posterior.sample(n, result)
   } else { samples = INLA::inla.posterior.sample(n, result, FALSE) }
   
@@ -201,7 +201,7 @@ inla.stack.e = function(...) {
 inla.stack.mjoin = function(..., compress = TRUE, remove.unused = TRUE){
   y = inla.stack.y(...)
   e = inla.stack.e(...)
-  mstack = inla.stack.join(...,compress = compress, remove.unused = remove.unused)
+  mstack = INLA::inla.stack.join(...,compress = compress, remove.unused = remove.unused)
   mstack$data$y = y
   mstack$data$e = e
   return(mstack)
@@ -215,7 +215,7 @@ inla.stack.mjoin = function(..., compress = TRUE, remove.unused = TRUE){
 # 
 
 inla.stack.mdata = function(stack){
-  mdata = inla.stack.data(stack)
+  mdata = INLA::inla.stack.data(stack)
   if (!is.null(stack$data$y)) {
     mdata$y.inla = stack$data$y
   } else {
@@ -232,8 +232,8 @@ inla.stack.mdata = function(stack){
 
 inla.stack.add = function(...) {
   stacks = list(...)
-  stk3 = inla.stack.sum(stacks[[1]]$data$data, 
-                        A = lapply(stacks,function(x) {return(inla.stack.A(x))}), 
+  stk3 = INLA::inla.stack.sum(stacks[[1]]$data$data, 
+                        A = lapply(stacks,function(x) {return(INLA::inla.stack.A(x))}), 
                         effects = lapply(stacks,function(x) {return(x$effects$data)}))
 }
 
@@ -247,20 +247,20 @@ plotmarginal.inla = function(result,varname="Intercept", link = function(x){x}, 
   if (varname %in% c(result$names.fixed, rownames(result$summary.hyperpar) )) {
     
     if (vars[varname,"type"] == "fixed"){
-      marg = inla.tmarginal(link, result$marginals.fixed[[varname]])
+      marg = INLA::inla.tmarginal(link, result$marginals.fixed[[varname]])
     }
     else if (vars[varname,"type"] == "random"){
-      marg = inla.tmarginal(link, result$marginals.random[[varname]])
+      marg = INLA::inla.tmarginal(link, result$marginals.random[[varname]])
     }
     else if (vars[varname,"type"] == "hyperpar"){
-      marg = inla.tmarginal(link, result$marginals.hyperpar[[varname]])
+      marg = INLA::inla.tmarginal(link, result$marginals.hyperpar[[varname]])
     }
-    uq = inla.qmarginal(0.975, marg)
-    uqy = inla.dmarginal(uq, marg)
-    lq = inla.qmarginal(0.025, marg)
-    lqy = inla.dmarginal(lq, marg)
+    uq = INLA::inla.qmarginal(0.975, marg)
+    uqy = INLA::inla.dmarginal(uq, marg)
+    lq = INLA::inla.qmarginal(0.025, marg)
+    lqy = INLA::inla.dmarginal(lq, marg)
     inner.x = seq(lq, uq, length.out = 100)
-    inner.marg = data.frame(x = inner.x, y = inla.dmarginal(inner.x, marg))
+    inner.marg = data.frame(x = inner.x, y = INLA::inla.dmarginal(inner.x, marg))
 
     df = data.frame(marg)
     ggplot(data = df, aes_string(x="x",y="y")) + geom_path() + geom_ribbon(ymin = 0,aes_string(ymax = "y"), alpha = 0.1) +

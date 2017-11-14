@@ -1,4 +1,9 @@
 \donttest{
+
+# Load INLA
+
+library(INLA)
+    
 # Load 1D Poisson process data
 
 data(Poisson2_1D)
