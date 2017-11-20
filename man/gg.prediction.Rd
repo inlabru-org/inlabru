@@ -105,5 +105,6 @@ ggplot() +
 }
 \seealso{
 Other geomes for inla and inlabru predictions: \code{\link{gg.data.frame}},
-  \code{\link{gg}}, \code{\link{gm}}
+  \code{\link{gg.matrix}}, \code{\link{gg}},
+  \code{\link{gm}}
 }
