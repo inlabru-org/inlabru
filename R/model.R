@@ -12,7 +12,6 @@
 
 evaluate = function(...){UseMethod("evaluate")}
 list.A = function(...){UseMethod("list.A")}
-list.covariates = function(...){UseMethod("list.covariates")}
 list.indices = function(...){UseMethod("list.indices")}
 list.data = function(...){UseMethod("list.data")}
 
@@ -173,6 +172,10 @@ make.model = function(fml) {
     # if (smod$label == "offset") lbl[[k]] = paste0("offset(",deparse(smod$map),")")
     if (smod$label == "offset") lbl[[k]] = "offset(offset)"
     
+    # Create an effect structure
+    smod$env = env
+    class(smod) = "effect"
+    
     # Set submodel
     submodel[[ge$f$label]] = smod
     
@@ -238,10 +241,17 @@ g = function(covariate,
   if ( fvals$model == "spde2" & is.null(mesh) ) { mesh = model$mesh } 
   
   # Check if n is present for models that are not fixed effects
-  if (is.null(fvals$n) & !(fvals$model == "linear") & !(fvals$model == "offset") & !(fvals$model == "factor") & !is.copy) {
-    stop(sprintf("Please provide parameter 'n' for effect '%s'", label))
-    }
-  
+  # if (is.null(fvals$n) & 
+  #     !(fvals$model == "linear") & 
+  #     !(fvals$model == "offset") & 
+  #     !(fvals$model == "factor") &
+  #     !(fvals$model == "rw1") &
+  #     !(fvals$model == "seasonal") & # Obtains n via season.length parameter
+  #     !is.copy) 
+  #   {
+  #   stop(sprintf("Please provide parameter 'n' for effect '%s'", label))
+  #   }
+  # 
   
   ret = list(mesh = mesh, 
              map = map,
@@ -265,7 +275,7 @@ g = function(covariate,
 # 
 summary.model = function(object, ...) {
   for (label in elabels(object)) {
-    eff = effect(object,label)
+    eff = effects(object,label)
     en = ifelse("n" %in% names(eff), eff$n, 1)
     cat(paste0(label, ":\n"))
     cat(sprintf("\t model: %s , n = %s \n", eff$model, en))
@@ -296,7 +306,7 @@ elabels = function(model) { names(model$effects) }
 # @param model An \link{inlabru} \link{model}
 # @param label String defining the label of the effect. If NULL, return all effects
 # 
-effect = function(model, label = NULL) {
+effects = function(model, label = NULL) {
   if (is.null(label)) { model$effects } 
   else { model$effects[[label]] }
 }
@@ -336,124 +346,11 @@ list.data.model = function(model){
   elist = elist[names(elist) %in% all.vars(model$formula)]
 }
 
-# List of covariates effects needed to run INLA
-#
-# @aliases list.covariates.model
-# @param model An \link{inlabru} \link{model}
-# @param points A data fram to extract the data from
-# 
 
-list.covariates.model = function(model, points){
-    
-  all.varnames = c(all.vars(model$formula), all.vars(model$expr)) 
-  covar.data = list()
-    
-    # Points may be annotated with covariates
-    
-    for (vname in all.varnames){
-      if (vname %in% names(data.frame(points))) {
-        covar.data[[vname]] = data.frame(points)[,vname]
-      }
-    }
-    covar.data = data.frame(do.call(cbind,covar.data))
-}
-
-# List of A matrices needed to run INLA
-#
-# @aliases list.A.model
-# @param model An \link{inlabru} \link{model}
-# @param points Locations to create the A-matrices for
-
-list.A.model = function(model, points){
-  A.lst = list()
-
-  # For each effect create indices
-  for ( eff in effect(model) ) {
-    if ( is.null(eff$n) ) {
-      A.lst[[eff$label]] = Matrix::Diagonal(nrow(data.frame(points)))
-    } else if ( is.null(eff$mesh) ) {
-      idx = mapper(eff$map, points, eff)
-      A = matrix(0, nrow = nrow(data.frame(points)), ncol=eff$n)
-      A[cbind(1:nrow(A), idx)] = 1
-      A.lst[[eff$label]] = A
-    } else {
-      
-      if ( eff$map == "coordinates" ) {
-        if ( is.na(proj4string(points)) | is.null(eff$mesh$crs) ) {
-          loc = points
-        } else {
-          loc = stransform(points, crs = eff$mesh$crs)
-        }
-        
-      } else {
-        loc = mapper(eff$map, points, eff)
-        if ( !is.matrix(loc) & !inherits(loc,"Spatial") ) loc = as.matrix(loc)
-      }
-  
-      if (is.null(eff$ngroup)) { ng = 1 } else { ng = eff$ngroup }
-      if (ng > 1) {
-        group = points[[eff$group.char]]
-      } else { group = NULL }
-      
-      A = INLA::inla.spde.make.A(eff$mesh, loc = loc, group = group, n.group = ng)
-      # Mask columns of A
-      if (!is.null(eff$A.msk)) { A = A[, as.logical(eff$A.msk), drop=FALSE]}
-      # Weights for models with A-matrix are realized in the follwoing way:
-      if (!is.null(eff$weights)) {
-        w = eff$weights
-        A = as.matrix(A)*as.vector(w)
-      }
-      A.lst[[eff$label]] = A
-
-    }
-  }
-  
-  return(A.lst)
-}
+list.A.model = function(model, points){ lapply(model$effects, amatrix.effect, points) }
+list.indices.model = function(model, points){ lapply(model$effects, index.effect, points) }
 
 
-# List of spde indexing effects needed to run INLA
-#
-# @aliases list.indices.model
-# @param model An \link{inlabru} \link{model}
-# @param points A data frame to extract indices from
-
-list.indices.model = function(model, points){
-  
-  # The list of indices to be returned
-  idx = list()
-
-  # For each effect create indices
-  for ( eff in effect(model) ) {
-    name = eff$label
-    
-    # Only create indices if the number n of effect variables is known
-    if (!is.null(eff$n)){
-      
-      # Effects with meshes need a special treatment ...
-      if ( is.null(eff$mesh) ) { 
-        idx[[name]] = seq_len(eff$n) 
-      } else {
-        if ( "m" %in% names(eff$mesh) ) {
-          idx[[name]] = 1:eff$mesh$m # support inla.mesh.1d models
-          # If a is masked, correct number of indices
-          if (!is.null(eff$A.msk)) { idx[[name]] = 1:sum(eff$A.msk)}
-        } else {
-          ng = eff$ngroup
-          if (is.null(ng)) { ng = 1 }
-          idx[[name]] = INLA::inla.spde.make.index(name, n.spde = eff$inla.spde$n.spde, n.group = ng)
-          # NOTE: MODELS WITH REPLICATES ARE NOTE IMPLEMENTED YET.
-          #      - when using group= or replicate, the f-formula has to be adjusted to read the groups/replicates from the stack
-          #      - see make.model() for an example on how to do this for groups
-        }
-      }
-    } else {
-      idx[[name]] = mapper(eff$map, points, eff, environment(model$in.formula))
-    }
-    
-  }
-  idx
-}
 
 # Evaluate or sample from a posterior result given a model and locations
 # 
@@ -493,50 +390,25 @@ evaluate.model = function(model,
   if ( is.null(predictor) ) {
     vars = setdiff(names(smp[[1]]), "Predictor")
   } else {
-    effs = effect(model)
+    effs = effects(model)
     model$effects = effs[intersect(names(effs), all.vars(predictor))]
     vars = intersect(names(smp[[1]]), all.vars(predictor))
   }
-
-  # Obtain A-matrices
-  A = list.A.model(model, points)
   
-  # Make a function that will apply the A-matrices
-  apply.A = function(name, s) {
-      mult = as.vector(s[[name]])
-      if ( !is.null(A[[name]]) && ( nrow(A[[name]]) > 0) ) {
-        if (length(mult) == 1) { as.vector(A[[name]] %*% rep(mult, nrow(A[[name]]))) 
-          }
-        else { as.vector(A[[name]] %*% s[[name]]) }
-      } else { 
-        mult 
-      }
-  }
-  
+  # Pre-calculate projection matrices
+  As = lapply(model$effects, amatrix, points)
 
   for ( k in 1:n ) {
     # Discard variables we do not need
     sm = smp[[k]][vars]
     
-    # Factor models
-    for (label in names(sm)) { 
-      if (label %in% names(effect(model)) && effect(model)[[label]]$model == "factor") {
-        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]], environment(model$in.formula)) 
-        sm[[label]] = as.vector(sm[[label]][as.data.frame(fc)[,1]])
-      }
-    }
+    # Evaluate effects. Note that the expression may only contain hyper parameters in which case there 
+    # are no effects to evaluate.
+    enm = intersect(names(sm), names(model$effects))
     
-    # Linear models
-    for (label in names(sm)) { 
-      if (label %in% names(effect(model)) && effect(model)[[label]]$model == "linear") {
-        fc = mapper(effect(model)[[label]]$map, points, effect(model)[[label]], environment(model$in.formula)) 
-        if (is.data.frame(fc)) {fc = fc[,1]}
-        sm[[label]] = as.vector(sm[[label]] * as.vector(fc))
+    for (label in enm) {
+      sm[[label]] = value(model$effects[[label]], data = points, state = sm[[label]], A = As[[label]]) 
       }
-    }
- 
-    # Apply A matrices
-    for (label in names(sm)) { if (label %in% vars) sm[[label]] = apply.A(label, sm) }
     
     # If no predictor is provided simply return the samples. 
     # Otherwise evaluate predictor with each sample as an environment
@@ -552,59 +424,3 @@ evaluate.model = function(model,
   if ( property == "sample") { smp } else { smp[[1]] }
 }
 
-
-mapper = function(map, points, eff, env = NULL) {
-  
-  # Evaluate the map with the points as an environment
-  emap = tryCatch(eval(map, c(data.frame(points), as.list(env))), error = function(e) {})
-  
-  # 0) Eval failed. map everything to 1. This happens for automatically added Intercept
-  # 1) If we obtain a function, apply the function to the points
-  # 2) If we obtain a SpatialGridDataFrame extract the values of that data frame at the point locations using the over() function
-  # 3) Else we obtain a vector and return as-is. This happens when map states a column of the data points
-  
-  if ( is.null(emap) ) { 
-    loc = data.frame(x = rep(1, max(1,nrow(as.data.frame(points)))))
-    colnames(loc) = deparse(map)
-    }
-  else if ( is.function(emap) ) { loc = emap(points) }
-  else if ( inherits(emap, "SpatialGridDataFrame") | inherits(emap, "SpatialPixelsDataFrame")) {
-    if ( length(eff$group.char) == 0 ) {
-      loc = over(points, emap)[,1,drop=FALSE]
-      colnames(loc) = eff$label
-    } else {
-      layr = points[[eff$group.char]]
-      loc = vector()
-      for (l in unique(layr)) { loc[layr == l] = over(points[layr == l,], emap)[,l] }
-      loc = data.frame(loc = loc)
-      colnames(loc) = eff$label
-    }
-    
-    }
-  else if ( eff$label == "offset" && is.numeric(emap) && length(emap)==1 ) { loc = data.frame(offset = rep(emap, nrow(points)))}
-  else { loc = emap }
-  
-  # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
-  # to fix that by filling in nearest neighbor values.
-  if ( any(is.na(loc)) & ( inherits(emap, "SpatialGridDataFrame") | inherits(emap, "SpatialPixelsDataFrame") )) {
-    
-    warning(sprintf("Map '%s' has returned NA values. As it is a SpatialGridDataFrame I will try to fix this by filling in values of spatially nearest neighbors. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
-                 deparse(map), eff$label))
-    
-    BADpoints = points[as.vector(is.na(loc)),]
-    GOODpoints = points[as.vector(!is.na(loc)),]
-    dst = rgeos::gDistance(SpatialPoints(GOODpoints),SpatialPoints(BADpoints), byid=T)
-    nn = apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
-    loc[is.na(loc)] = loc[!is.na(loc)][nn]
-    colnames(loc) = eff$label
-  }
-    
-  # Check for NA values.    
-  if ( any(is.na(loc)) ) {
-    stop(sprintf("Map '%s' of effect '%s' has returned NA values. Please design your 'map='
-                 argument as to return non-NA for all points in your model domain/mesh.",
-                   as.character(map)[[1]], eff$label))
-  }
-  
-  loc
-}

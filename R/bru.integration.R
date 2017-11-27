@@ -330,7 +330,7 @@ ipmaker = function(samplers, domain, dnames, model = NULL, data = NULL) {
   
   # Fill missing domain definitions using meshes from effects where map equals the domain name
   meshes = list()
-  for (e in effect(model)) {meshes[[paste0(as.character(e$map), collapse ="")]] = e$mesh}
+  for (e in effects(model)) {meshes[[paste0(as.character(e$map), collapse ="")]] = e$mesh}
   for ( nm in dnames) {
     if ( is.null(domain[[nm]]) ) { domain[[nm]] = meshes[[nm]] }
   }

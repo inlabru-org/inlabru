@@ -19,8 +19,8 @@ summary(fit)
 # non-linear predictors. Such a predictor can be formulated via like()'s 
 # \code{formula} parameter. For instance
 
-z = 2
-input.df <- within(input.df, y <- 5 + exp(z)*x + rnorm(10, mean=0, sd=0.1))
+
+input.df <- within(input.df, y <- 5 + exp(2)*x + rnorm(10, mean=0, sd=0.1))
 lik = like(family = "gaussian", data = input.df, formula = y ~ exp(z)*x + Intercept, E = 10000)
 fit <- bru( ~ z + Intercept, lik)
 

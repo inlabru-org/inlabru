@@ -67,7 +67,7 @@ extract.summary = function(result, property) {
   
   
   # For factors we add a data.frame with column names equivalent to the factor levels
-  fac.names = names(effect(result$model))[unlist(lapply(result$model$effects, function(e) {e$model == "factor"}) )]
+  fac.names = names(effects(result$model))[unlist(lapply(result$model$effects, function(e) {e$model == "factor"}) )]
   for (name in fac.names) {
     tmp = unlist(ret[startsWith(names(ret), name)])
     names(tmp) = lapply(names(tmp), function(nm) {substring(nm, nchar(name)+1)})
@@ -109,7 +109,7 @@ inla.posterior.sample.structured = function(result,n){
     }
     
     # For fixed effects that were modeled via factors we attach an extra vector holding the samples
-    fac.names = names(effect(result$model))[unlist(lapply(result$model$effects, function(e) {e$model == "factor"}) )]
+    fac.names = names(effects(result$model))[unlist(lapply(result$model$effects, function(e) {e$model == "factor"}) )]
     for (name in fac.names) {
       vals[[name]] = smpl.latent[startsWith(rownames(smpl.latent), name),]
       names(vals[[name]]) = lapply(names(vals[[name]]), function(nm) {substring(nm, nchar(name)+1)})
@@ -122,7 +122,9 @@ inla.posterior.sample.structured = function(result,n){
       for (k in 1:length(result$summary.random)) {
         name = unlist(names(result$summary.random[k]))
         model = result$model.random[k]
-        if (!(model=="Constrained linear")) { vals[[name]] = extract.entries(name,smpl.latent) }
+        if (!(model=="Constrained linear")) { 
+          vals[[name]] = data.frame(ID = result$summary.random[[name]]$ID, value = extract.entries(name,smpl.latent))
+          }
         else { vals[[name]] = smpl.hyperpar[paste0(paste0("Beta_intern for ",name)," -- in user scale")] }
       }
     }
@@ -142,7 +144,7 @@ extract.entries = function(name,smpl){
   ename = gsub("\\.", "\\\\.", name)
   ename = gsub("\\(", "\\\\(", ename)
   ename = gsub("\\)", "\\\\)", ename)
-  ptn = paste("^", ename, "[\\:]*[\\.]*[0-9]*$", sep="")
+  ptn = paste("^", ename, "[\\:]*[\\.]*[0-9]*[\\.]*[0-9]*$", sep="")
   return(smpl[grep(ptn,rownames(smpl))])
 }
 
