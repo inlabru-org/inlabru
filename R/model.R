@@ -373,6 +373,7 @@ list.A.model = function(model, points){
       A.lst[[eff$label]] = Matrix::Diagonal(nrow(data.frame(points)))
     } else if ( is.null(eff$mesh) ) {
       idx = mapper(eff$map, points, eff)
+      if (is.data.frame(idx)) idx = idx[,1]
       A = matrix(0, nrow = nrow(data.frame(points)), ncol=eff$n)
       A[cbind(1:nrow(A), idx)] = 1
       A.lst[[eff$label]] = A
