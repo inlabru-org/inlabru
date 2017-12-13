@@ -64,7 +64,7 @@ effect.character = function(label,
   
 
   if ( model.type %in% c("offset") ) {
-    effect$inla.formula = as.formula(paste0("~ offset(offset)"))
+    effect$inla.formula = as.formula(paste0("~ . + offset(offset)"))
   } 
   else if ( model.type %in% c("factor") ) {
     effect$inla.formula = as.formula(paste0("~", label))
@@ -78,7 +78,7 @@ effect.character = function(label,
     fcall = fcall[!(names(fcall) %in% c("map","A.msk"))]
     fvals = do.call(f, as.list(fcall[2:length(fcall)])) # eval(parse(text=deparse(fcall)))
     effect$f = fvals
-    effect$inla.formula = as.formula(paste0("~", paste0(deparse(fcall), collapse = "")))
+    effect$inla.formula = as.formula(paste0("~ . + ", paste0(deparse(fcall), collapse = "")))
     
     
 
@@ -154,7 +154,7 @@ code.components = function(components) {
     
     # Make code
     if ( is.fixed ) {
-      codes[[k]] = sprintf("%s(%s, map = %s, model = 'linear')", fname, label, label)
+      codes[[k]] = sprintf("%s(\"%s\", map = %s, model = 'linear')", fname, label, label)
     }
     else if ( is.offset ) {
       codes[[k]] = gsub(paste0(label,"("), paste0(fname,"(\"",label,"\", model = \"offset\", map = "), code, fixed = TRUE)

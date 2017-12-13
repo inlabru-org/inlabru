@@ -64,7 +64,25 @@ list.data = function(...){UseMethod("list.data")}
 # @return A \link{model} object
 # 
 
-make.model = function(fml) {
+make.model = function(fml){
+  
+  # Create effects
+  effects = effect(fml)
+  
+  # Create joint formula that will be used by inla
+  formula = y ~ 1
+  for (fm in lapply(effects, function(eff) {eff$inla.formula})) {
+    formula = update.formula(formula, fm)
+  }
+  
+  mdl = list(effects = effects, formula = formula, in.formula = fml)
+  class(mdl) = c("model","list")
+  return(mdl)
+  
+}
+
+
+make.model.old = function(fml) {
   submodel = list()
   covariates = list()
   
