@@ -11,9 +11,6 @@
 ##########################################################################
 
 evaluate = function(...){UseMethod("evaluate")}
-list.A = function(...){UseMethod("list.A")}
-list.indices = function(...){UseMethod("list.indices")}
-list.data = function(...){UseMethod("list.data")}
 
 
 ##########################################################################
@@ -64,309 +61,34 @@ list.data = function(...){UseMethod("list.data")}
 # @return A \link{model} object
 # 
 
-make.model = function(fml){
+make.model = function(components){
+  
+  # Automatically add Intercept and -1 to components unless -1 is in components formula
+  components = auto.intercept(components)
+  
+  # Back up environment
+  env = environment(components)
   
   # Create effects
-  effects = effect(fml)
-  
+  effects = effect(components)
+
   # Create joint formula that will be used by inla
-  formula = y ~ 1
+  formula = y ~ -1 
   for (fm in lapply(effects, function(eff) {eff$inla.formula})) {
     formula = update.formula(formula, fm)
   }
   
-  mdl = list(effects = effects, formula = formula, in.formula = fml)
+  # Restore environment
+  environment(formula) = env
+  
+  
+  # Make model
+  mdl = list(effects = effects, formula = formula)
   class(mdl) = c("model","list")
   return(mdl)
-  
 }
 
 
-make.model.old = function(fml) {
-  submodel = list()
-  covariates = list()
-  
-  # Define function for shifting the effect name into the g-call
-  shift.names = function(fml) {
-    tms = terms(fml)
-    labels = attr(tms, "term.labels")
-
-    # Check for offset()
-    isoff = as.vector(unlist(lapply(rownames(attr(tms, "factors")), function(s) substr(s,1,6)=="offset")))
-    if (any(isoff)) {
-      labels[[length(labels)+1]] = rownames(attr(tms, "factors"))[isoff]
-    }
-    
-    for (k in 1:length(labels)){
-      lb = labels[[k]]
-      
-      # Function syntax or fixed effect?
-      ix = regexpr("(", text = lb, fixed = TRUE)
-      if (ix > 0) {
-        ename = substr(lb, 1, ix-1)
-        is.fixed = FALSE
-      } else {
-        ename = lb
-        is.fixed = TRUE
-      }
-      
-      # Construct g() call
-      if ( is.fixed ) {
-        labels[[k]] = sprintf("g(%s, map = %s, model = 'linear')", ename, ename)
-      } else {
-        if ( !(ename %in% c("g","f"))) {
-          labels[[k]] = gsub(paste0(ename,"("), paste0("g(",ename,", "), lb, fixed = TRUE)
-        }
-        if ( ename %in% c("f") ) {
-          labels[[k]] = gsub(paste0(ename,"("), paste0("g("), lb, fixed = TRUE)
-        }
-        
-      }
-    }
-    
-    labels
-  }
-  
-
-  lbl = shift.names(fml)
-  
-  for ( k in 1:length(lbl) ) {
-    
-    lb = lbl[[k]]
-
-    # Call g()
-    # We have to add g() to the environment because it is not exported by inlabru and
-    # therefore note visible within the parent environment.
-    env = environment(fml)
-    env$g = g
-    ge = eval(parse(text = lb), envir = env)
-
-    # Replace function name by INLA f function
-    if ( substr(lb,1,2) == "g(" ) { lb = paste0("f(", substr(lb, 3, nchar(lb)))}
-
-    # Remove extra mesh argument
-    lb = gsub("[,][ ]*mesh[ ]*=[^),]*", "", lb)
-
-    # Remove extra map argument
-    pat = paste0("", deparse(ge$map))
-    lb = gsub(paste0(" ", deparse(ge$map)), "", lb, fixed =TRUE)
-    lb = gsub(paste0("=", deparse(ge$map)), "", lb, fixed =TRUE)
-    lb = gsub("[,][ ]*map[ ]*=[^),]*", "", lb)
-    
-    
-    # Remove extra A.msk argument
-    pat = paste0("", deparse(ge$A.msk))
-    lb = gsub(paste0(" ", deparse(ge$A.msk)), "", lb, fixed =TRUE)
-    lb = gsub(paste0("=", deparse(ge$A.msk)), "", lb, fixed =TRUE)
-    lb = gsub("[,][ ]*A.msk[ ]*=[^),]*", "", lb)
-
-    # For SPDE models replace group=XXX by group=effectname.group
-    if (ge$f$model == "spde2") {
-      lb = gsub("[,][ ]*group[ ]*=[^),]*", paste0(", group = ",ge$f$label,".group"), lb)
-    }
-    
-    
-    lbl[[k]] = lb
-    
-    smod = c(ge$f, list(mesh = ge$mesh, 
-                        A.msk = ge$A.msk,
-                        mesh.coords = ge$f$term,
-                        map = ge$map,
-                        group.char = ge$group.char,
-                        inla.spde = ge$model),
-                        fchar = lb)
-    
-    # For copy model extract the mesh from the model that is copied
-    if ( !is.null(smod$of) ) {
-      smod$mesh = submodel[[smod$of]]$mesh
-      smod$n = submodel[[smod$of]]$n
-      smod$inla.spde = submodel[[smod$of]]$inla.spde
-    }
-    
-    # Fix label for factor effects
-    if (smod$model == "factor") { lbl[[k]] = smod$label ; smod$fchar = smod$label }
-    
-    # Fix label for offset effect
-    # if (smod$label == "offset") lbl[[k]] = paste0("offset(",deparse(smod$map),")")
-    if (smod$label == "offset") lbl[[k]] = "offset(offset)"
-    
-    # Create an effect structure
-    smod$env = env
-    class(smod) = "effect"
-    
-    # Set submodel
-    submodel[[ge$f$label]] = smod
-    
-  }
-  
-  # Did the old formula have an intercept?
-  if ( attr(terms(fml), "intercept") == 0 ) {icpt = "-1"} else { icpt = ""}
-  
-  # Combine labels into new formula
-  new.rhs = as.formula(paste0(". ~ ", paste0(lbl, collapse = " + "), icpt))
-  new.fml = update.formula(fml, new.rhs)
-  environment(new.fml) = environment(fml)
-  
-  # Return
-  ret = list(effects = submodel, formula = new.fml, in.formula = fml)
-  class(ret) = c("model","list")
-  ret
-}
-
-
-# A wrapper for the \link{inla} \link{f} function
-# 
-# @aliases g
-# @export
-# @param covariate A string defining the label of the INLA effect. If \code{map} is provided this also sets the coariate used as a first argument to the \link{f} call.
-# @param map A name, call or function that maps points to effect indices or locations that the model understands.
-# @param group A name, call or function that maps the data to groups
-# @param model See \link{f} model specifications
-# @param mesh An \link{inla.mesh} object required for SPDE models
-# @param A.msk A boolean vector for masking A matrix columns. 
-# @param ... Arguments passed on to inla \link{f}
-# @return A list with mesh, model and the return value of the f-call
-
-g = function(covariate, 
-             map = NULL,
-             group = NULL,
-             model = "linear", 
-             mesh = NULL, 
-             A.msk = NULL, ...){
- 
-  label = as.character(substitute(covariate))
-  map.char = as.character(substitute(map))
-  group.char = as.character(substitute(group))
-  A.msk.char = as.character(substitute(A.msk))
-  is.copy = !is.null(list(...)$copy)
-  
-  if ( length(map.char) == 0 ) { map = NULL } else { map = substitute(map) }
-  if ( length(A.msk.char) == 0 ) { A.msk = NULL } else { A.msk = A.msk }
-  
-  # Only call f if we are  not dealing with an offset
-  if ( label == "offset" ) { fvals = list(model="offset") }
-  else if ( is.character(model) && model == "factor" ) { fvals = list(model="factor") } # , n = list(...)$n
-  else { xxx = NULL ; fvals = INLA::f(xxx, ..., group = group, model = model) }
-  fvals$label = label
-  
-  # Default map
-  if ( is.null(map) ) { 
-    if ( fvals$model == "spde2" && class(mesh) == "inla.mesh") { map = expression(coordinates) }
-    else { map = substitute(covariate) }
-  }
-  
-  # Check if we got a mesh argument if the model is an SPDE
-  if ( fvals$model == "spde2" & is.null(mesh) ) { mesh = model$mesh } 
-  
-  # Check if n is present for models that are not fixed effects
-  # if (is.null(fvals$n) & 
-  #     !(fvals$model == "linear") & 
-  #     !(fvals$model == "offset") & 
-  #     !(fvals$model == "factor") &
-  #     !(fvals$model == "rw1") &
-  #     !(fvals$model == "seasonal") & # Obtains n via season.length parameter
-  #     !is.copy) 
-  #   {
-  #   stop(sprintf("Please provide parameter 'n' for effect '%s'", label))
-  #   }
-  # 
-  
-  ret = list(mesh = mesh, 
-             map = map,
-             group.char = group.char,
-             A.msk = A.msk,
-             model = model, 
-             f = fvals)
-}
-
-
-##########################################################################
-# OPERATORS ON MODELS
-##########################################################################
-
-# Model summary
-#
-# @aliases summary
-# @export
-# @param object An \link{inlabru} \link{model}
-# @param ... ignored arguments (S3 generic compatibility)
-# 
-summary.model = function(object, ...) {
-  for (label in elabels(object)) {
-    eff = effects(object,label)
-    en = ifelse("n" %in% names(eff), eff$n, 1)
-    cat(paste0(label, ":\n"))
-    cat(sprintf("\t model: %s , n = %s \n", eff$model, en))
-    cat(sprintf("\t map: %s [class: %s] \n", deparse(eff$map), class(eff$map)))
-    cat(sprintf("\t f call: %s \n", eff$fchar))
-    
-    cat("\n")
-    
-  }
-  cat(paste0("--- FORMULA ---\n\n"))
-  print(object$formula)
-}
-
-
-# Retrieve effect labels
-#
-# @aliases elabels
-# @export
-# @param model An \link{inlabru} \link{model}
-# 
-elabels = function(model) { names(model$effects) }
-
-
-# Retrieve effect properties
-#
-# @aliases effect
-# @export
-# @param model An \link{inlabru} \link{model}
-# @param label String defining the label of the effect. If NULL, return all effects
-# 
-effects = function(model, label = NULL) {
-  if (is.null(label)) { model$effects } 
-  else { model$effects[[label]] }
-}
-
-
-# Retrieve linear predictor expression
-#
-# @aliases predictor
-# @export
-# @param model An \link{inlabru} \link{model}
-#
-default.predictor = function(model) { parse(text=paste0(elabels(model),collapse="+"))}
-
-
-
-# List data needed to run INLA
-#
-# @aliases list.data.model
-# @param model An \link{inlabru} \link{model}
-# @export
-# 
-
-list.data.model = function(model){
-  
-  # Formula environment as list
-  elist = as.list(environment(model$formula))
-  
-  # Remove previous inla results. For some reason these slow down the next INLA call.
-  elist = elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
-  
-  # Remove functions. This can cause problems as well
-  elist = elist[unlist(lapply(elist, function(x) !is.function(x)))]
-  
-  # Remove functions. This can cause problems as well
-  elist = elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
-  
-  elist = elist[names(elist) %in% all.vars(model$formula)]
-}
-
-
-list.A.model = function(model, points){ lapply(model$effects, amatrix.effect, points) }
-list.indices.model = function(model, points){ lapply(model$effects, index.effect, points) }
 
 
 
@@ -408,7 +130,7 @@ evaluate.model = function(model,
   if ( is.null(predictor) ) {
     vars = setdiff(names(smp[[1]]), "Predictor")
   } else {
-    effs = effects(model)
+    effs = model$effects
     model$effects = effs[intersect(names(effs), all.vars(predictor))]
     vars = intersect(names(smp[[1]]), all.vars(predictor))
   }

@@ -67,7 +67,7 @@ extract.summary = function(result, property) {
   
   
   # For factors we add a data.frame with column names equivalent to the factor levels
-  fac.names = names(effects(result$model))[unlist(lapply(result$model$effects, function(e) {e$model == "factor"}) )]
+  fac.names = names(result$model$effects)[unlist(lapply(result$model$effects, function(e) {e$model == "factor"}) )]
   for (name in fac.names) {
     tmp = unlist(ret[startsWith(names(ret), name)])
     names(tmp) = lapply(names(tmp), function(nm) {substring(nm, nchar(name)+1)})
@@ -109,7 +109,7 @@ inla.posterior.sample.structured = function(result,n){
     }
     
     # For fixed effects that were modeled via factors we attach an extra vector holding the samples
-    fac.names = names(effects(result$model))[unlist(lapply(result$model$effects, function(e) {e$model == "factor"}) )]
+    fac.names = names(result$model$effects)[unlist(lapply(result$model$effects, function(e) {e$model == "factor"}) )]
     for (name in fac.names) {
       vals[[name]] = smpl.latent[startsWith(rownames(smpl.latent), name),]
       names(vals[[name]]) = lapply(names(vals[[name]]), function(nm) {substring(nm, nchar(name)+1)})

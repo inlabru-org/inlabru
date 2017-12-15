@@ -1,18 +1,8 @@
 ####################################################################################################
 # GENERICS
 ####################################################################################################
-# 
-# setClass("effect")
-# setGeneric("value", valueClass = "numeric", function(object) { standardGeneric("value") })
-# setGeneric("map", valueClass = "numeric", function(object) { standardGeneric("map") })
-# setGeneric("amatrix", valueClass = "numeric", function(object) { standardGeneric("amatrix") })
-# 
-# setMethod("value", signature("effect"), function(object) value.effect(object))
-# setMethod("amatrix", signature("effect"), function(object) amatrix.effect(object))
-# setMethod("map", signature("effect"), function(object) map.effect(object))
-# 
-# 
-effect = function(...){UseMethod("effect")}
+
+
 value = function(...){UseMethod("value")}
 amatrix = function(...){UseMethod("amatrix")}
 map = function(...){UseMethod("map")}
@@ -22,6 +12,18 @@ index = function(...){UseMethod("index")}
 ####################################################################################################
 # CONSTRUCTORS
 ####################################################################################################
+
+
+#' Latent effects
+#'  
+#' @aliases effect
+#' @keywords internal
+#' @param ... A 
+#' @param fname Chracter setting the name of the function that will interpret the components.
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#'
+effect = function(...){UseMethod("effect")}
+
 
 effect.formula = function(formula, ...) {
   code = code.components(formula)
@@ -44,20 +46,27 @@ effect.character = function(label,
                              ...){
   
   # INLA models:
-  # linear iid mec meb rgeneric rw1 rw2 crw2 seasonal besag besag2 bym bym2 besagproper besagproper2 fgn fgn2 ar1 ar1c ar ou generic generic0 generic1 generic2 generic3 spde spde2 spde3 iid1d iid2d iid3d iid4d iid5d 2diid z rw2d rw2diid slm matern2d copy clinear sigm revsigm log1exp logdist 
+  # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper, 
+  #            besagproper2, fgn, fgn2, ar1, ar1c, ar, ou, generic, generic0, generic1, generic2, generic3, spde, 
+  #            spde2, spde3, iid1d, iid2d, iid3d, iid4d, iid5d, 2diid, z, rw2d, rw2diid, slm, matern2d, copy,
+  #            clinear, sigm, revsigm, log1exp, logdist) 
+  #
+  # Supported:
+  # btypes = c("offset", "factor", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
+  
   model.type = model
   if ( inherits(model, "inla.spde") ) { model.type = "spde" }
+  
+  miss.msg = "Effect '%s' (type '%s') requires argument '%s'. Check out f() for additional information on this argument."
   
   # map.char = as.character(substitute(map))
   group.char = as.character(substitute(group))
   # A.msk.char = as.character(substitute(A.msk))
-  #
-  
   
   effect = list(label = label,
                 type = model.type,
                 map = substitute(map),
-                group.char = group.char,
+                group.char = group.char, # Name of the data column holding the group index
                 values = values,
                 A.msk = A.msk,
                 model = model)
@@ -67,7 +76,7 @@ effect.character = function(label,
     effect$inla.formula = as.formula(paste0("~ . + offset(offset)"))
   } 
   else if ( model.type %in% c("factor") ) {
-    effect$inla.formula = as.formula(paste0("~", label))
+    effect$inla.formula = as.formula(paste0("~ . + ", label))
   }
   else {
     
@@ -83,34 +92,32 @@ effect.character = function(label,
     
 
     if ( model.type %in% c("linear", "clinear") ) {
-      
+      effect$mesh = NA
     }
     
     else if ( model.type %in% c("iid") ) {
-      
+      if ( missing(n) ) { stop(sprintf(miss.msg, effect$label, model.type, "n")) }
+      effect$mesh = INLA::inla.mesh.1d(1:fvals$n)
     }
-    
     else if ( model.type %in% c("seasonal") ) {
-  
+      if ( missing(season.length) ) { stop(sprintf(miss.msg, effect$label, model.type, "season.length")) }
+      effect$mesh = INLA::inla.mesh.1d(1:fvals$season.length)
     }
     else if ( model.type %in% c("rw1", "rw2", "ar", "ar1", "ou") ) {
-
+      if ( missing(values) ) { stop(sprintf(miss.msg, effect$label, model.type, "values")) }
+      effect$mesh = INLA::inla.mesh.1d(sort(unique(fvals$values)))
     }
     else if ( model.type %in% c("spde") ) {
       effect$mesh = model$mesh
-    } else {
+      if (is.null(effect$f$ngroup)) { effect$ngroup = 1 } else { effect$ngroup = effect$f$ngroup }
+      if (is.null(effect$f$nrep)) { effect$nrep = 1 } else { effect$nrep = effect$f$nrep }
+    } 
+    else {
       stop(paste0("Effect type '", model.type, "' not implemented."))
     }
   }
 
   
-  # effect = list(mesh = mesh,
-  #               map = map,
-  #               group.char = group.char,
-  #               A.msk = A.msk,
-  #               model = model,
-  #               f = fvals)
-
   class(effect) = c("effect","lists")
   effect
 }
@@ -195,6 +202,8 @@ summary.effect = function(object, ...) {
   
 }
 
+
+
 #' Evaluate an effect
 #' 
 #' Calculates a latent effect given some data and the state of the effect's internal random variables.
@@ -211,50 +220,60 @@ summary.effect = function(object, ...) {
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
+
 value.effect = function(effect, data, state, A = NULL) {
   
-  # Extract state if a list of states was provided
+  # Convenience: extract state if a list of states was provided
   if ( is.list(state) &!is.data.frame(state)) { state = state[[effect$label]] }
   
   # Obtain covariates
   mapped = mapper(effect$map, data, effect, effect$env)
   
-  # Obtain A-matrix
+  if (is.data.frame(mapped)) { 
+    if (effect$label %in% names(mapped)) {
+      mapped = mapped[,effect$label,drop=TRUE]
+    } else {
+      mapped = mapped[,1,drop=TRUE] 
+    }
+  }
+    
+  # Make A-matrix (if not provided)
   if ( is.null(A) ) { A = amatrix(effect, data) }
   
   # Determine effect depending on the type of latent model
   if ( effect$type %in% c("linear", "clinear") ) {
-    if (is.data.frame(mapped)) { mapped = mapped[,1,drop=TRUE] }
+
     values = A %*% (state * mapped)
   }
   else if ( effect$type %in% c("offset") ) {
-    if (is.data.frame(mapped)) { mapped = mapped[,1,drop=TRUE] }
+
     values = A %*% mapped
   }
   else if ( effect$type %in% c("factor") ) {
-    if (is.data.frame(mapped)) { flevel = mapped[,effect$label] } else {flevel = mapped}
-    values = A %*% state[flevel]
+
+    values = A %*% state[mapped]
   } 
   else if ( effect$type %in% c("iid", "seasonal") ) {
+    
     values = A %*% state[mapped]
+    
   }
   else if ( effect$type %in% c("rw1", "rw2", "ar", "ar1", "ou") ) {
-    if ( ncol(data.frame(state)) == 2 ) {
-      values = A %*% state[, 2, drop = TRUE]
-    } else {
-      values = A %*% state
-    }
+    
+    values = A %*% state
     
   }
   else if ( effect$type %in% c("spde") ) {
-    if (is.data.frame(state)) { state = state$value }
+
     values = A %*% state
+    
   } else {
     stop(paste0("Evaluation of ", effect$type, " not implemented."))
   }
   
   as.vector(values)
 }
+
 
 
 
@@ -286,12 +305,16 @@ amatrix.effect = function(effect, data) {
       if ( !is.matrix(loc) & !inherits(loc,"Spatial") ) loc = as.matrix(loc)
     }
     
-    if (is.null(effect$ngroup)) { ng = 1 } else { ng = effect$ngroup }
-    if (ng > 1) {
+    
+    if (effect$ngroup > 1) {
       group = data[[effect$group.char]]
     } else { group = NULL }
     
-    A = INLA::inla.spde.make.A(effect$mesh, loc = loc, group = group, n.group = ng)
+    A = INLA::inla.spde.make.A(effect$mesh, 
+                               loc = loc, 
+                               group = group, 
+                               n.group = effect$ngroup, 
+                               n.repl = effect$nrepl)
   } 
   else if ( effect$type %in% c("rw1", "rw2", "ar", "ar1", "ou") ) {
     if ( is.null(effect$values) ) { stop("Parameter 'values' not set for effect '", effect$label, "'.") }
@@ -332,7 +355,7 @@ amatrix.effect = function(effect, data) {
 map.effect = function(effect, data) {
   
   mp = mapper(effect$map, data, effect, effect$env)
-  
+
 }
 
 
@@ -345,7 +368,7 @@ map.effect = function(effect, data) {
 #' @keywords internal
 #' @param effect An effect.
 #' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations. If null, return the effect's map.
-#' @return indices
+#' @return a data.frame of indices or list of indices into the effects latent variables
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
@@ -357,16 +380,24 @@ index.effect = function(effect, data) {
       # If a is masked, correct number of indices
       if ( !is.null(effect$A.msk) ) { idx = 1:sum(effect$A.msk) }
     } else {
-      ng = effect$ngroup
-      if ( is.null(ng) ) { ng = 1 }
       
       idx = INLA::inla.spde.make.index(effect$label, 
                                        n.spde = effect$model$n.spde, 
-                                       n.group = ng)
+                                       n.group = effect$ngroup,
+                                       n.repl = effect$nrep)
     }
+  }
+  else if ( effect$type %in% c("factor") ) {
+    idx = map.effect(effect, data)
+    if (!is.data.frame(idx)) { idx = data.frame(idx) ; colnames(idx) = effect$label }
+    idx[,1] = as.factor(paste0(effect$label, idx[,1]))
   }
   else {
     idx = map.effect(effect, data)
+    if (!is.data.frame(idx)) {
+      idx = data.frame(idx)
+      colnames(idx) = effect$label
+    }
   }
 
   idx

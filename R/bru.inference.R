@@ -65,9 +65,6 @@ bru = function(components = y ~ Intercept,
   # Update default options
   options = do.call(bru.options, options)
   
-  # Automatically add Intercept and -1 to components unless -1 is in components formula
-  components = auto.intercept(components)
-  
   # Turn model components into internal bru model
   bru.model = make.model(components)
   
@@ -274,6 +271,7 @@ bru.options = function(mesh = NULL,
                        E = 1,
                        control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
                        control.inla = iinla.getOption("control.inla"),
+                       control.fixed = list(expand.factor.strategy = "inla"),
                        ... )
 {
   
@@ -283,6 +281,7 @@ bru.options = function(mesh = NULL,
   args$inla.options = list(...)
   args$inla.options$control.compute = control.compute
   args$inla.options$control.inla = control.inla
+  args$inla.options$control.fixed = control.fixed
   
   args
 }
@@ -917,7 +916,7 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     result = NULL
     
     icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
-                                                   data = c(inla.stack.mdata(stk), list.data(model)),
+                                                   data = c(inla.stack.mdata(stk), get.data(model)),
                                                    family = family,
                                                    control.predictor = list( A = INLA::inla.stack.A(stk), compute = TRUE),
                                                    E = INLA::inla.stack.data(stk)$e,
@@ -973,15 +972,39 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
 
 auto.intercept = function(components) {
   env = environment(components)
-  
+
   if (attr(terms(components),"intercept")) {
     if (!(length(grep("-[ ]*Intercept", as.character(components)[[length(as.character(components))]]))>0)) {
       components = update.formula(components, . ~ . + Intercept-1)
     } else {
       components = update.formula(components, . ~ . -1)
     }
-    
-  } 
+
+  }
   environment(components) = env
   components
 }
+
+
+# Returns a formula's environemnt as a data frame. Removes all variable that are of type
+# inla, function or formula. Also removes all variables that are not variables of the formula.
+get.data = function(formula){
+  
+  # Formula environment as list
+  elist = as.list(environment(formula))
+  
+  # Remove previous inla results. For some reason these slow down the next INLA call.
+  elist = elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
+  
+  # Remove functions. This can cause problems as well.
+  elist = elist[unlist(lapply(elist, function(x) !is.function(x)))]
+  
+  # Remove formulae. This can cause problems as well.
+  elist = elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
+  
+  elist = elist[names(elist) %in% all.vars(formula)]
+}
+
+
+
+

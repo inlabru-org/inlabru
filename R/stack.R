@@ -4,6 +4,7 @@ make.stack = function(points,
                        model,
                        y,
                        E = 1,
+                       Ntrials = 1,
                        offset = 0,
                        expr = NULL,
                        result = NULL,
@@ -16,9 +17,13 @@ make.stack = function(points,
   # Expectation parameter E
   if ( length(E) == 1 ) { E = rep(E, nrow(as.data.frame(points))) }
   
+  # Ntrials
+  if ( length(Ntrials) == 1 ) { Ntrials = rep(Ntrials, nrow(as.data.frame(points))) }
+  
+  
   # Projection matrices (A) and mesh index effects
-  A = list.A.model(model, points)
-  effects = list.indices.model(model, points)
+  A = lapply(model$effects, amatrix.effect, points)
+  effects = lapply(model$effects, index.effect, points)
   
   
   # Taylor approximation
@@ -37,6 +42,7 @@ make.stack = function(points,
   # Create and return stack
   stk = INLA::inla.stack(data = list(y.inla = y, 
                                      e = E, 
+                                     Ntrials = Ntrials,
                                      bru.offset = taylor.offset + offset),
                          A = A,
                          tag = tag,
