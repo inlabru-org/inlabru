@@ -30,6 +30,8 @@ effect.formula = function(formula, ...) {
   parsed = lapply(code, function(x) parse(text=x))
   effects = lapply(parsed, function(x) eval(x, envir = environment(formula)))
   names(effects) = lapply(effects, function(x) x$label)
+  
+  if ( length(effects)==1 ) effects = effects[[1]]
   effects
 }
 
