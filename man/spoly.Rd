@@ -31,7 +31,7 @@ paraemter. Posterior conversion to a different CRS is supported using the
 \code{to.crs} parameter.
 }
 \examples{
-
+\donttest{
 # Create data frame of boundary points (anti clockwise!)
 pts = data.frame(x = c(1,2,1.7,1.3),
                  y = c(1,1,2,2))
@@ -41,5 +41,5 @@ pol = spoly(pts, crs = CRS(as.character(NA)))
 
 # Plot it!
 ggplot() + gg(pol)
-
+}
 }

@@ -27,6 +27,7 @@ of a 1D mesh.
 }
 \examples{
 
+\donttest{
 # Load INLA
 
 library(INLA)
@@ -42,6 +43,7 @@ ggplot() + gg(mesh)
 # Plot it using a different shape and size for the mesh nodes
 
 ggplot() + gg(mesh, shape = "|", size = 5)
+}
 }
 \seealso{
 Other geomes for meshes: \code{\link{gg.inla.mesh}},

@@ -38,6 +38,7 @@
 #' 
 #' @examples
 #' 
+#' \donttest{
 #' # Create 50 integration points covering the dimension 'myDim' between 0 and 10. 
 #' 
 #' ips = ipoints(c(0,10), 50, name = "myDim")
@@ -75,6 +76,7 @@
 #' ips = ipoints(gorillas$mesh)
 #' ggplot() + gg(gorillas$boundary) + gg(ips, aes(size = weight))
 #' 
+#' }
 
 ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, project) {
   
@@ -245,6 +247,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
 #' 
 #' @examples
 #'
+#' \donttest{
 #' # Create integration points in dimension 'myDim' and 'myDiscreteDim' 
 #' ips1 = ipoints(c(0,8), name = "myDim")
 #' ips2 = ipoints(as.integer(c(1,2,3)), name = "myDiscreteDim")
@@ -254,7 +257,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
 #' 
 #' # Plot the integration points
 #' plot(ips$myDim, ips$myDiscreteDim, cex = 10*ips$weight)
-#' 
+#' }
 
 cprod = function(...) {
   ipl = list(...)
@@ -523,6 +526,8 @@ vertex.projection.1d = function(points, mesh, group = NULL, column = "weight", s
 #' @return A \code{data.frame} of integrals, one for each level of the cross product of all dimensions not being integrated over.
 #' 
 #' @examples 
+#' 
+#' \donttest{
 #' # Create integration points in two dimensions, x and y
 #'
 #' ips = cprod(ipoints(c(0,10), 10, name = "x"),
@@ -533,6 +538,7 @@ vertex.projection.1d = function(points, mesh, group = NULL, column = "weight", s
 #' # domain size 40
 #'
 #' int(ips, rep(1, nrow(ips)), c("x","y"))
+#' }
 
 
 

@@ -19,6 +19,7 @@ Coerces input SpatialGridDataFrame to SpatialPixelsDataFrame and calls
 gg.SpatialPixelDataFrame to plot it.
 }
 \examples{
+\donttest{
 # Load Gorilla data
 
 data("gorillas")
@@ -63,6 +64,7 @@ ggplot() + gg(mexdolphin$samplers, aes(color = seg))
 
 names(mexdolphin$points) # 'size' holds the group size
 ggplot() + gg(mexdolphin$points, aes(size = size))
+}
 }
 \seealso{
 Other geomes for spatial data: \code{\link{gg.SpatialLines}},

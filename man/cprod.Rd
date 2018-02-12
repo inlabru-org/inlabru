@@ -19,6 +19,7 @@ dimension has no weights attached to it all weights are assumend to be 1.
 }
 \examples{
 
+\donttest{
 # Create integration points in dimension 'myDim' and 'myDiscreteDim' 
 ips1 = ipoints(c(0,8), name = "myDim")
 ips2 = ipoints(as.integer(c(1,2,3)), name = "myDiscreteDim")
@@ -28,7 +29,7 @@ ips = cprod(ips1, ips2)
 
 # Plot the integration points
 plot(ips$myDim, ips$myDiscreteDim, cex = 10*ips$weight)
-
+}
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>

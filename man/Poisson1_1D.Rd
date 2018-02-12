@@ -30,7 +30,7 @@ Point data and count data, together with intensity function and expected counts 
 a homogeneous 1-dimensional Poisson process example.
 }
 \examples{
-library(inlabru)
+\donttest{
 library(ggplot2)
 data(Poisson1_1D)
 ggplot(countdata1) + 
@@ -38,5 +38,5 @@ geom_point(data = countdata1, aes(x=x,y=count),col="blue") +ylim(0,max(countdata
   geom_point(data = pts1, aes(x=x), y = 0.2, shape = "|",cex=4) +
   geom_point(data = countdata1, aes(x=x), y = 0, shape = "+",col="blue",cex=4) +
   xlab(expression(bold(s))) +ylab("count")
-
+}
 }

@@ -33,12 +33,14 @@ of groups of dolphins wre detected. The group size was recorded, as well as the 
 the time of the observation.
 }
 \examples{
- data(mexdolphin)
+\donttest{
+ data(mexdolphin, package="inlabru")
  plot(mexdolphin$mesh,edge.color="lightgray",draw.segments=FALSE) # draw mesh
  plot(mexdolphin$ppoly,add=TRUE) # add survey region boundary
  plot(mexdolphin$samplers,col="blue",add=TRUE) # draw transects (in and out of survey region)
  grsize = attributes(mexdolphin$points)$data[,"size"] # Get group size data
  plot(mexdolphin$points,pch=19,col="red",cex=log(grsize/30),add=TRUE)
+ }
 }
 \references{
 Halpin, P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K. Urian, 
