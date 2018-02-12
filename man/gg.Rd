@@ -31,7 +31,8 @@ ggplot() + gg(gorillas$boundary) + gg(gorillas$nests)
 }
 \seealso{
 Other geomes for inla and inlabru predictions: \code{\link{gg.data.frame}},
-  \code{\link{gg.prediction}}, \code{\link{gm}}
+  \code{\link{gg.matrix}}, \code{\link{gg.prediction}},
+  \code{\link{gm}}
 
 Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
   \code{\link{gg.SpatialLines}},

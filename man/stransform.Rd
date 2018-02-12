@@ -22,7 +22,7 @@ also capables of transforming \link[INLA]{inla.mesh} objects that are equipped w
 system.#'
 }
 \examples{
-
+\donttest{
 # Load Gorilla data
 data("gorillas", package = "inlabru")
 
@@ -33,5 +33,5 @@ tmesh = stransform(gorillas$mesh, crs = CRS("+proj=longlat"))
 
 multiplot(ggplot() + gg(gorillas$mesh) + ggtitle("Original mesh"),
           ggplot() + gg(tmesh) + ggtitle("Transformed mesh"))
-          
+}         
 }

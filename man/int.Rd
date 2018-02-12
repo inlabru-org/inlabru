@@ -26,6 +26,8 @@ dimensions to integrate over. The set of dimensions that are held fixed is the s
 of all column names in \code{data} and the dimensions stated by \code{dims}.
 }
 \examples{
+
+\donttest{
 # Create integration points in two dimensions, x and y
 
 ips = cprod(ipoints(c(0,10), 10, name = "x"),
@@ -36,4 +38,5 @@ ips = cprod(ipoints(c(0,10), 10, name = "x"),
 # domain size 40
 
 int(ips, rep(1, nrow(ips)), c("x","y"))
+}
 }

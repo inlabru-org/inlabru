@@ -26,6 +26,7 @@ A \link{geom_segment} return value.
 Extracts start and end points of the lines and calls \link{geom_segment} to plot  lines between them.
 }
 \examples{
+\donttest{
 # Load Gorilla data
 
 data("gorillas")
@@ -70,6 +71,7 @@ ggplot() + gg(mexdolphin$samplers, aes(color = seg))
 
 names(mexdolphin$points) # 'size' holds the group size
 ggplot() + gg(mexdolphin$points, aes(size = size))
+}
 }
 \seealso{
 Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},

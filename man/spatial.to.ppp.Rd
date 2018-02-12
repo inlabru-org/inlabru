@@ -23,6 +23,7 @@ and the window. Lastly, the ppp() function is called to create the \code{ppp} ob
 }
 \examples{
 
+\donttest{
 # Load Gorilla data
 
 data("gorillas", package = "inlabru")
@@ -35,4 +36,5 @@ class(gp)
 # Plot it
 
 plot(gp)
+}
 }

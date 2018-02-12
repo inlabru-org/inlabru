@@ -26,7 +26,7 @@
 #'  }
 #' 
 #' @examples
-#' library(inlabru)
+#' \donttest{
 #' library(ggplot2)
 #' data(Poisson2_1D)
 #' p1 = ggplot(countdata2) + 
@@ -41,4 +41,5 @@
 #'   geom_point(data = pts2, aes(x=x), y = 0.2, shape = "|",cex=4) +
 #'   xlab(expression(bold(s))) +ylab(expression(lambda(bold(s))))
 #' multiplot(p1,p2,cols=1)
+#' }
 NULL

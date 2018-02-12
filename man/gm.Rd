@@ -35,7 +35,8 @@ gmap(gorillas$nests, maptype = "satellite") +
 }
 \seealso{
 Other geomes for inla and inlabru predictions: \code{\link{gg.data.frame}},
-  \code{\link{gg.prediction}}, \code{\link{gg}}
+  \code{\link{gg.matrix}}, \code{\link{gg.prediction}},
+  \code{\link{gg}}
 
 Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
   \code{\link{gg.SpatialLines}},

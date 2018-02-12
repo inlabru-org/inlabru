@@ -89,6 +89,38 @@ gg = function(data, ...){UseMethod("gg")}
 gm = function(data, ...) { gg(data, crs = CRS("+proj=longlat"), ...) }
 
 
+#' Geom for matrix
+#' 
+#' Creates a tile geom for plotting a matrix
+#' 
+#' @name gg.matrix
+#' @export
+#' @import ggplot2
+#' @param data A \code{matrix} object.
+#' @param mapping a set of aesthetic mappings created by \link{aes} or \link{aes_}. These are passed on to \link{geom_tile}.
+#' @param ... Arguments passed on to \link{geom_tile}.
+#' @return A \link{geom_tile} with reversed y scale.
+#' @family geomes for inla and inlabru predictions
+#' 
+#' @examples
+#' 
+#' A = matrix(runif(100), nrow = 10)
+#' ggplot() + gg(A)
+#' 
+
+gg.matrix = function(data, mapping = NULL, ...) {
+  A = as.matrix(data)
+  grd = expand.grid(row = 1:nrow(A), column = 1:ncol(A))
+  df = data.frame(value = as.vector(A), grd)
+  
+  dmap = aes_string(x="column", y="row", fill = "value")
+  
+  if ( !is.null(mapping) ) { dmap = modifyList(dmap, mapping) }
+  
+  ggp = c(geom_tile(dmap, data = df, ...), scale_y_reverse())
+}
+
+
 #' Geom for data.frame
 #' 
 #' This geom constructor will simply call \link{gg.prediction} for the data provided.
@@ -531,6 +563,7 @@ if ( !is.null(color) ) {
 #' 
 #' @examples
 #' 
+#' \donttest{
 #' # Load INLA
 #' 
 #' library(INLA)
@@ -546,6 +579,7 @@ if ( !is.null(color) ) {
 #' # Plot it using a different shape and size for the mesh nodes
 #' 
 #' ggplot() + gg(mesh, shape = "|", size = 5)
+#' }
 
 gg.inla.mesh.1d = function(data, mapping = aes_string("x","y"), y = 0, shape = 4, ...) {
   
