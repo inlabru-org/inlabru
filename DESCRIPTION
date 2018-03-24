@@ -42,5 +42,5 @@ Depends:
     stats,
     methods,
     ggplot2,
-Additional_repositories: https://www.math.ntnu.no/inla/R/testing
+Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 6.0.1
