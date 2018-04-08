@@ -116,7 +116,7 @@ sline = function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.crs
 #' @return SpatialPolygonsDataFrame 
 #' 
 #' @examples 
-#' 
+#' \donttest{
 #' # Create data frame of boundary points (anti clockwise!)
 #' pts = data.frame(x = c(1,2,1.7,1.3),
 #'                  y = c(1,1,2,2))
@@ -126,7 +126,7 @@ sline = function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.crs
 #' 
 #' # Plot it!
 #' ggplot() + gg(pol)
-#' 
+#' }
 
 spoly = function(data, cols = colnames(data)[1:2], crs = CRS(as.character(NA)), to.crs = NULL) {
   
