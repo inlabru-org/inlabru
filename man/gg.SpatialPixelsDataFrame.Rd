@@ -29,6 +29,7 @@ A \link{geom_tile} return value.
 Coerces input SpatialPixelsDataFrame to data.frame and uses \link{geom_tile} to plot it.
 }
 \examples{
+\donttest{
 # Load Gorilla data
 
 data("gorillas")
@@ -73,6 +74,7 @@ ggplot() + gg(mexdolphin$samplers, aes(color = seg))
 
 names(mexdolphin$points) # 'size' holds the group size
 ggplot() + gg(mexdolphin$points, aes(size = size))
+}
 }
 \seealso{
 Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},

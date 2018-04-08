@@ -37,7 +37,7 @@ a multimodal nonhomogeneous 1-dimensional Poisson process example. Counts are gi
 different gridded data interval widths.
 }
 \examples{
-#' library(inlabru)
+\donttest{
 library(ggplot2)
 data(Poisson3_1D)
 # first the plots for the 10-bin case:
@@ -68,5 +68,5 @@ p2a = ggplot() +
   geom_point(data = pts3, aes(x=x), y = 0.2, shape = "|",cex=4) +
   xlab(expression(bold(s))) +ylab(expression(lambda(bold(s))))
 multiplot(p1a,p2a,cols=1)
-
+}
 }

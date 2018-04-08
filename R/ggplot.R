@@ -563,6 +563,7 @@ if ( !is.null(color) ) {
 #' 
 #' @examples
 #' 
+#' \donttest{
 #' # Load INLA
 #' 
 #' library(INLA)
@@ -578,6 +579,7 @@ if ( !is.null(color) ) {
 #' # Plot it using a different shape and size for the mesh nodes
 #' 
 #' ggplot() + gg(mesh, shape = "|", size = 5)
+#' }
 
 gg.inla.mesh.1d = function(data, mapping = aes_string("x","y"), y = 0, shape = 4, ...) {
   

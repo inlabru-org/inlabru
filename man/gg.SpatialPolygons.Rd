@@ -29,6 +29,7 @@ Uses the fortitfy() function to turn the SpatialPolygons objects into a data.fra
 calls \link{geom_polygon} to plot the polygons.
 }
 \examples{
+\donttest{
 # Load Gorilla data
 
 data("gorillas")
@@ -73,6 +74,7 @@ ggplot() + gg(mexdolphin$samplers, aes(color = seg))
 
 names(mexdolphin$points) # 'size' holds the group size
 ggplot() + gg(mexdolphin$points, aes(size = size))
+}
 }
 \seealso{
 Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},

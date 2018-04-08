@@ -37,6 +37,7 @@ the mesh. If the intensity is very high the standard \code{strategy} "spherical"
 Using the "sliced-spherical" strategy can help in this case.
 }
 \examples{
+\donttest{
 library(INLA)
 vertices = seq(0, 3, by = 0.1)
 mesh = inla.mesh.1d(vertices)
@@ -45,10 +46,13 @@ pts = sample.lgcp(mesh, loglambda)
 pts$y = 0
 plot(vertices, exp(loglambda), type = "l", ylim = c(0,150))
 points(pts, pch = "|" )
+}
 
+\donttest{ 
 data("gorillas")
 pts = sample.lgcp(gorillas$mesh, rep(1.5, gorillas$mesh$n))
 ggplot() + gg(gorillas$mesh) + gg(pts)
+}
 }
 \author{
 Daniel Simpson <\email{dp.simpson@gmail.com}> (base algorithm), 

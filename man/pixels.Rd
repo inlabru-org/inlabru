@@ -22,11 +22,11 @@ pixels(mesh, nx = 150, ny = 150, mask = TRUE)
 Generate \code{SpatialPixels} covering an \code{inla.mesh}
 }
 \examples{
-
+\donttest{
 data("mrsea")
 pxl = pixels(mrsea$mesh, nx = 50, ny = 50)
 ggplot() + gg(pxl) + gg(mrsea$mesh)
-
+}
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>

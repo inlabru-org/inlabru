@@ -1,4 +1,7 @@
-\dontrun{
+\donttest{
+# Load INLA
+library(INLA)
+
 # Load the Gorilla data
 
 data(gorillas)

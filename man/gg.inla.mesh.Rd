@@ -46,6 +46,7 @@ across for a set of SpatialPixels covering the mesh area and calls gg.SpatialPix
 to plot the interpolation.
 }
 \examples{
+\donttest{
 # Load Gorilla data
 data("gorillas")
 
@@ -65,7 +66,6 @@ ggplot() + gg(gorillas$mesh,
               ext.color = "blue"
               )
 
-\dontrun{
 # Use the x-coordinate of the vertices to colorize the triangles and
 # mask the plotted area by the survey boundary, i.e. only plot the inside
 

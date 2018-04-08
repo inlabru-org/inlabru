@@ -58,6 +58,7 @@ sfill = function(data, where = NULL) {
 #' 
 #' @examples 
 #'
+#' \donttest{
 #' # Create a data frame defining three lines 
 #' lns = data.frame(xs = c(1,2,3), ys = c(1,1,1), # start points
 #'                  xe = c(2,3,4), ye = c(2,2,2)) # end points
@@ -69,7 +70,7 @@ sfill = function(data, where = NULL) {
 #' 
 #' # Plot the lines
 #' ggplot() + gg(spl)
-#' 
+#' }
 
 sline = function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.crs = NULL) {
   
@@ -156,7 +157,7 @@ spoly = function(data, cols = colnames(data)[1:2], crs = CRS(as.character(NA)), 
 #' @return List of Spatial* objects
 #' 
 #' @examples
-#' 
+#' \donttest{
 #' # Load Gorilla data
 #' data("gorillas", package = "inlabru")
 #' 
@@ -167,7 +168,7 @@ spoly = function(data, cols = colnames(data)[1:2], crs = CRS(as.character(NA)), 
 #' 
 #' multiplot(ggplot() + gg(gorillas$mesh) + ggtitle("Original mesh"),
 #'           ggplot() + gg(tmesh) + ggtitle("Transformed mesh"))
-#'           
+#' }         
 
 stransform = function(splist, crs) {
   if (!is.null(crs)) {
