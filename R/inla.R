@@ -146,95 +146,126 @@ extract.entries = function(name,smpl){
   return(smpl[grep(ptn,rownames(smpl))])
 }
 
-# Stack multiple observations
-#
+# Expand observation vector to a multicolumn matrix for multiple likelihoods
 #
 # @aliases inla.stack.y
 # @export
-# @param ... observation vectors
-# @return y observation vector
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @param ... List of stacks that contain vector observations
+#            (existing multilikelihood observation matrices are also permitted)
+# @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
+#        If a single string, this is assumed for all the stacks. (default "y")
+# @param new.name The name to be used for the expanded observation matrix. (default "y.inla")
+# @return a list of modified stacks with multicolumn observations
+# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}> and Finn Lindgren <\email{finn.lindgren@@gmail.com}>
 #
 
-inla.stack.y = function(...) {
-  all.y = lapply(list(...),function(x) return(x$data$data$y))
-  nrow.y = lapply(list(...),function(x) return(nrow(x$data$data)))
-  y = list()
-  for (j in 1:nargs()){
-    ny = nrow.y[[j]]
-    y[[j]] = cbind( matrix(NA,nrow=ny,ncol=j-1) , all.y[[j]], matrix(NA,nrow=ny,ncol=nargs()-j) )
+inla.stack.y = function(...,
+                        old.names = "y",
+                        new.name = "y.inla") {
+  stacks <- list(...)
+  if (length(old.names) == 1) {
+    old.names <- rep(old.names, length(stacks))
   }
-  return(do.call(rbind,y))
+  y.cols <- unlist(lapply(seq_along(stacks),
+                          function(x) {
+                            LHS <- INLA::inla.stack.LHS(stacks)[[old.names[x]]]
+                            ifelse(is.vector(LHS), 1, ncol(LHS))
+                          }))
+  y.offset <- c(0, cumsum(y.cols))
+  y.cols.total <- sum(y.cols)
+  for (j in 1:length(stacks)){
+    LHS <- INLA::inla.stack.LHS(stacks[[j]])
+    RHS <- INLA::inla.stack.LHS(stacks[[j]])
+    A <- INLA::inla.stack.A(stacks[[j]])
+    # Access the raw tag indexing information
+    tags <- list(data = stacks[[j]]$data$index,
+                 effects = stacks[[j]]$effects$index)
+    
+    # Expand the observation vector/matrix into a multilikelihood observation matrix:
+    y.rows <- ifelse(is.vector(LHS[[old.names[j]]]),
+                     length(LHS[[old.names[j]]]),
+                     nrow(LHS[[old.names[j]]]))
+    LHS[[new.name]] <-
+      cbind( matrix(NA, nrow = y.rows, ncol=y.offset[j]),
+             LHS[[old.names[j]]],
+             matrix(NA, nrow = y.rows, ncol=y.cols.total - y.offset[j+1]) )
+    
+    # Create the modified stack, with model compression disabled to prevent modifications:
+    stacks[[j]] <-
+      INLA::inla.stack.sum(data = LHS, A = A, effects = RHS, compress = FALSE, remove.unused = FALSE)
+    # Since the row indexing is unchanged, copy the tag index information:
+    stacks[[j]]$data$index <- tags$data
+    stacks[[j]]$effects$index <- tags$effects
+  }
+  stacks
 }
 
 # Stack multiple exposures
-#
+# Obsolete. Do not use. Exposure vector stacking is handled automatically by inla.stack
 #
 # @aliases inla.stack.e
-# @export
 # @param ... observation vectors
 # @return e observation vector
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 inla.stack.e = function(...) {
-  all.y = lapply(list(...),function(x) return(x$data$data$e))
-  nrow.y = lapply(list(...),function(x) return(nrow(x$data$data)))
-  y = list()
-  for (j in 1:nargs()){
-    ny = length(all.y[[j]])
-    if (ny==0) { 
-      e.tmp = rep(NA,nrow.y[[j]])
-    } else { 
-      e.tmp = all.y[[j]] 
-    }
-    y[[j]] = cbind( matrix(NA,nrow=nrow.y[[j]],ncol=j-1) , e.tmp , matrix(NA,nrow=nrow.y[[j]],ncol=nargs()-j) )
-  }
-  return(do.call(rbind,y))
+  stop("This function is obsolete and should not be used.")
 }
 
 
 # Join stacks intended to be run with different likelihoods
 #
+# @param ... List of stacks that contain vector observations
+#            (existing multilikelihood observation matrices are also permitted)
+# @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
+#        If a single string, this is assumed for all the stacks. (default "y")
+# @param new.name The name to be used for the expanded observation matrix,
+#        possibly the same as an old name. (default "y.inla")
 # @aliases inla.stack.mjoin
 # 
 
-inla.stack.mjoin = function(..., compress = TRUE, remove.unused = TRUE){
-  y = inla.stack.y(...)
-  e = inla.stack.e(...)
-  mstack = INLA::inla.stack.join(...,compress = compress, remove.unused = remove.unused)
-  mstack$data$y = y
-  mstack$data$e = e
-  return(mstack)
+inla.stack.mjoin = function(..., compress = TRUE, remove.unused = TRUE,
+                            old.names = "y", new.name = "y.inla"){
+  stacks = inla.stack.y(..., old.names = old.names, new.name = new.name)
+  do.call(INLA::inla.stack.join,
+          c(stacks, list(compress = compress, remove.unused = remove.unused)))
 }
 
 
-# Retrieve data from stack. Other than inla.stack.data this will give
-# an observation vector y with multiple columns
+# Retrieve data from stack.
+# The special "y.inla" object should have been constructed before, via inla.stack.mjoin.
+# Since all the work to setup the stack properly was already done by inla.stack.mjoin,
+# this function just passes its arguments through to INLA::inla.stack.data
 #
 # @aliases inla.stack.mdata
+# @param stack The stack to extract data from
+# @param ... Additional named objects to add to the list of data objects.
+#            Typically used for spde model objects.
+# @return A list of data and effect vectors/matrices, and optional extra objects
 # 
 
-inla.stack.mdata = function(stack){
-  mdata = INLA::inla.stack.data(stack)
-  if (!is.null(stack$data$y)) {
-    mdata$y.inla = stack$data$y
-  } else {
-    mdata$y.inla = stack$data$data$y
-  }
-  
-  return(mdata)
+inla.stack.mdata = function(stack, ...){
+  INLA::inla.stack.data(stack, ...)
 }
 
-# Combine stacks by adding up predictors
+# Combine stacks by adding up predictors "horizontally".
+# Only the data section from the first stack is preserved.
+# Only the tag information from the data section first stack is preserved.
+# TODO: The effects tag information is not computed.
+# NOTE: This function appears to be unused.
 #
 # @aliases inla.stack.add 
 # 
 
-inla.stack.add = function(...) {
-  stacks = list(...)
-  stk3 = INLA::inla.stack.sum(stacks[[1]]$data$data, 
-                        A = lapply(stacks,function(x) {return(INLA::inla.stack.A(x))}), 
-                        effects = lapply(stacks,function(x) {return(x$effects$data)}))
+inla.stack.add = function(..., compress = TRUE, remove.unused = TRUE) {
+  stacks <- list(...)
+  stack <- INLA::inla.stack.sum(data = INLA::inla.stack.LHS(stacks[[1]]), 
+                                A = lapply(stacks, function(x) { INLA::inla.stack.A(x) }), 
+                                effects = lapply(stacks, function(x) { INLA::inla.stack.RHS(x) }),
+                                compress = compress, remove.unused = remove.unused)
+  stack$data$index <- stacks[[1]]$data$index
+  stack$effects$index <- NULL
+  stack
 }
 
 
@@ -263,7 +294,8 @@ plotmarginal.inla = function(result,varname="Intercept", link = function(x){x}, 
     inner.marg = data.frame(x = inner.x, y = INLA::inla.dmarginal(inner.x, marg))
 
     df = data.frame(marg)
-    ggplot(data = df, aes_string(x="x",y="y")) + geom_path() + geom_ribbon(ymin = 0,aes_string(ymax = "y"), alpha = 0.1) +
+    ggplot(data = df, aes_string(x="x",y="y")) + geom_path() +
+      geom_ribbon(ymin = 0,aes_string(ymax = "y"), alpha = 0.1) +
       geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
       geom_segment(x = uq, y = 0, xend = uq, yend = uqy) +
       geom_ribbon(data = inner.marg, ymin = 0, aes_string(ymax = "y"), alpha = 0.1) +
@@ -274,7 +306,8 @@ plotmarginal.inla = function(result,varname="Intercept", link = function(x){x}, 
     df = result$summary.random[[varname]]
     colnames(df) = c("ID","mean","sd","lower","mid","upper","mode","kld")
     p <- ggplot(df, aes_string("ID", "mode"))
-    p + geom_crossbar(aes_string(ymin = "lower", ymax = "upper")) + ylab("mod and quantiles") + xlab(paste0(varname," ID"))
+    p + geom_crossbar(aes_string(ymin = "lower", ymax = "upper")) +
+      ylab("mod and quantiles") + xlab(paste0(varname," ID"))
 
   }
 }
