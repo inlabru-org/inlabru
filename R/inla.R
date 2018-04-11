@@ -175,7 +175,7 @@ inla.stack.y = function(...,
   y.cols.total <- sum(y.cols)
   for (j in 1:length(stacks)){
     LHS <- INLA::inla.stack.LHS(stacks[[j]])
-    RHS <- INLA::inla.stack.LHS(stacks[[j]])
+    RHS <- INLA::inla.stack.RHS(stacks[[j]])
     A <- INLA::inla.stack.A(stacks[[j]])
     # Access the raw tag indexing information
     tags <- list(data = stacks[[j]]$data$index,
