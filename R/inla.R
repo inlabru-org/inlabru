@@ -169,10 +169,11 @@ inla.stack.mexpand <- function(...,
     old.names <- rep(old.names, length(stacks))
   }
   y.cols <- unlist(lapply(seq_along(stacks),
-                          function(x) {
-                            LHS <- INLA::inla.stack.LHS(stacks)[[old.names[x]]]
+                          function(x, stacks, old.names) {
+                            LHS <- INLA::inla.stack.LHS(stacks[[x]])[[old.names[x]]]
                             ifelse(is.vector(LHS), 1, ncol(LHS))
-                          }))
+                          },
+                          stacks = stacks, old.names = old.names))
   y.offset <- c(0, cumsum(y.cols))
   y.cols.total <- sum(y.cols)
   for (j in 1:length(stacks)){
