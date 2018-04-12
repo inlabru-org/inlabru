@@ -29,6 +29,9 @@
 #' 
 #' @examples
 #' \donttest{
+#' # The INLA package is required
+#' if (requireNamespace("INLA", quietly = TRUE)) {
+#'
 #' library(INLA)
 #' vertices = seq(0, 3, by = 0.1)
 #' mesh = inla.mesh.1d(vertices)
@@ -37,13 +40,20 @@
 #' pts$y = 0
 #' plot(vertices, exp(loglambda), type = "l", ylim = c(0,150))
 #' points(pts, pch = "|" )
+#'
+#' }
 #' }
 #'
 #' @examples
 #' \donttest{ 
+#' # The INLA package is required
+#' if (requireNamespace("INLA", quietly = TRUE)) {
+#'
 #' data("gorillas")
 #' pts = sample.lgcp(gorillas$mesh, rep(1.5, gorillas$mesh$n))
 #' ggplot() + gg(gorillas$mesh) + gg(pts)
+#'
+#' }
 #' }
 
 sample.lgcp = function(mesh, loglambda, strategy = "rectangle", R = 6371, samplers = NULL) {
