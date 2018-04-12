@@ -562,10 +562,12 @@ if ( !is.null(color) ) {
 #' @family geomes for meshes
 #' 
 #' @examples
-#' 
 #' \donttest{
+#' # Some features use the INLA package.
+#' if (requireNamespace("INLA", quietly = TRUE)) {
+#'
 #' # Load INLA
-#' 
+#'
 #' library(INLA)
 #' 
 #' # Create a 1D mesh
@@ -579,7 +581,8 @@ if ( !is.null(color) ) {
 #' # Plot it using a different shape and size for the mesh nodes
 #' 
 #' ggplot() + gg(mesh, shape = "|", size = 5)
-#' }
+#'
+#' }}
 
 gg.inla.mesh.1d = function(data, mapping = aes_string("x","y"), y = 0, shape = 4, ...) {
   
@@ -606,6 +609,9 @@ gg.inla.mesh.1d = function(data, mapping = aes_string("x","y"), y = 0, shape = 4
 #' @family geomes for Raster data 
 #' 
 #' @examples
+#' # Some features require the raster and spatstat packages.
+#' if (requireNamespace("spatstat.data", quietly = TRUE) &&
+#'     requireNamespace("raster", quietly = TRUE)) {
 #' 
 #' # Load Gorilla data
 #' data("gorillas", package = "spatstat.data")
@@ -618,6 +624,8 @@ gg.inla.mesh.1d = function(data, mapping = aes_string("x","y"), y = 0, shape = 4
 #' # Plot the elevation
 #'
 #' ggplot() + gg(elev)
+#'
+#' }
 
 gg.RasterLayer = function(data, mapping = aes_string(x="x", y="y", fill = "layer"), ...) {
   
