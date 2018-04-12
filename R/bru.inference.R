@@ -570,11 +570,19 @@ summary.bru = function(object, ...) {
   cat("\n--- Random effects ------------------------------------------------------------------------------- \n\n")
   for ( nm in names(object$summary.random) ){
     sm = object$summary.random[[nm]]
-    cat(paste0(nm,": "))
-    cat(paste0("mean = [", signif(range(sm$mean)[1])," : ",signif(range(sm$mean)[2]), "]"))
-    cat(paste0(", quantiles = [", signif(range(sm[,c(4,6)])[1])," : ",signif(range(c(4,6))[2]), "]"))
+    cat(paste0(nm," ranges: "))
+    cat(paste0("mean = [",
+               signif(range(sm$mean)[1]),", ",
+               signif(range(sm$mean)[2]), "]"))
+    cat(paste0(", sd = [",
+               signif(range(sm$sd)[1]),", ",
+               signif(range(sm$sd)[2]), "]"))
+    cat(paste0(", quantiles = [",
+               signif(range(sm[,c(4,6)])[1])," : ",
+               signif(range(sm[,c(4,6)])[2]), "]"))
     if (nm %in% names(object$model$mesh)) {
-      cat(paste0(", area = ", signif(sum(diag(as.matrix(INLA::inla.mesh.fem(object$model$mesh[[nm]])$c0))))))
+      cat(paste0(", and area = ",
+                 signif(sum(diag(as.matrix(INLA::inla.mesh.fem(object$model$mesh[[nm]])$c0))))))
     }
     cat("\n")
   }
@@ -945,15 +953,44 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     if ( iinla.verbose ) { cat(" Done. ") }
     
     # Extract values tracked for estimating convergence
-    if ( n > 1 & k <= n) track[[k]] = cbind(effect = rownames(result$summary.fixed), iteration = k, result$summary.fixed)
+    if ( n > 1 & k <= n) {
+      # Note: The number of fixed effets may be zero, and strong
+      # non-linearities that don't necessarily affect the fixed
+      # effects may appear in the random effects, so we need to
+      # track all of them.
+      track[[k]] <- data.frame(effect = NULL, iteration = NULL, mean = NULL, sd = NULL)
+      if (!is.null(result$summary.fixed) && (nrow(result$summary.fixed) > 0)) {
+        track[[k]] <-
+          data.frame(effect = rownames(result$summary.fixed),
+                     iteration = rep(k, nrow(result$summary.fixed)),
+                     mean = result$summary.fixed[, "mean"],
+                     sd = result$summary.fixed[, "sd"])
+      }
+      if (!is.null(result$summary.random) &&
+          (length(result$summary.random) > 0)) {
+        ## This wastes memory temporarily.
+        joined.random <- do.call(rbind, result$summary.random)
+        track[[k]] <-
+          rbind(track[[k]],
+                data.frame(effect = rownames(joined.random),
+                           iteration = rep(k, nrow(joined.random)),
+                           mean = joined.random[, "mean"],
+                           sd = joined.random[, "sd"]))
+      }
+    }
     
     # Update stack given current result
     if ( n > 1 & k < n) { stk = stackmaker(data, model, result) }
     
     # Stopping criterion
     if ( k>1 ){
+      ## TODO: Make max.dev a configurable option.
       max.dev = 0.01
-      dev = do.call(c, lapply(by(do.call(rbind, track), as.factor(do.call(rbind, track)$effect), identity), function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
+      dev = abs(track[[k-1]]$mean - track[[k]]$mean)/track[[k]]$sd
+      ##do.call(c, lapply(by(do.call(rbind, track),
+      ##                           as.factor(do.call(rbind, track)$effect),
+      ##                           identity),
+      ##                        function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
       cat(paste0("Max deviation from previous: ", signif(100*max(dev),3),"% of SD [stop if: <",100*max.dev,"%]\n"))
       interrupt = all( dev < max.dev)
       if (interrupt) {cat("Convergence criterion met, stopping INLA iteration.")}
