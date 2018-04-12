@@ -18,8 +18,10 @@ make.covdata = function(mesh, values, mesh.coords, time.coords){
 
 # Create covariate data set (covdata)
 #
-# @aliases make.covdata
-# @name make.covdata
+# Note: documentation does not match code
+#
+# @aliases covdata.import
+# @name covdata.import
 # @export
 # @param mesh
 # @param values
@@ -53,6 +55,8 @@ covdata.import = function(dframe, colname, data){
 
 # Plot covariate data set
 #
+# Note: documentation does not match code
+#
 # @aliases plot.covdata
 # @export
 # @param covdata A covariate data set
@@ -67,6 +71,8 @@ plot.covdata = function(covdata, time = 1, fun=NULL, ...){
 
 
 # Make covariate function
+#
+# Note: documentation does not match code
 #
 # @aliases make.covariate
 # @name make.covariate

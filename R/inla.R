@@ -146,22 +146,24 @@ extract.entries = function(name,smpl){
   return(smpl[grep(ptn,rownames(smpl))])
 }
 
-# Expand observation vector to a multicolumn matrix for multiple likelihoods
+# Expand observation vectors/matrices in stacks into to a multicolumn matrix for multiple likelihoods
 #
-# @aliases inla.stack.y
+# @aliases inla.stack.mexpand
+# @name inla.stack.mexpand
 # @export
 # @param ... List of stacks that contain vector observations
 #            (existing multilikelihood observation matrices are also permitted)
 # @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
-#        If a single string, this is assumed for all the stacks. (default "y")
-# @param new.name The name to be used for the expanded observation matrix. (default "y.inla")
+#        If a single string, this is assumed for all the stacks. (default "BRU.response")
+# @param new.name The name to be used for the expanded observation matrix,
+#        possibly the same as an old name. (default "BRU.response")
 # @return a list of modified stacks with multicolumn observations
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}> and Finn Lindgren <\email{finn.lindgren@@gmail.com}>
 #
 
-inla.stack.y = function(...,
-                        old.names = "y",
-                        new.name = "y.inla") {
+inla.stack.mexpand <- function(...,
+                               old.names = "BRU.response",
+                               new.name = "BRU.response") {
   stacks <- list(...)
   if (length(old.names) == 1) {
     old.names <- rep(old.names, length(stacks))
@@ -218,22 +220,24 @@ inla.stack.e = function(...) {
 # @param ... List of stacks that contain vector observations
 #            (existing multilikelihood observation matrices are also permitted)
 # @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
-#        If a single string, this is assumed for all the stacks. (default "y")
+#        If a single string, this is assumed for all the stacks. (default "BRU.response")
 # @param new.name The name to be used for the expanded observation matrix,
-#        possibly the same as an old name. (default "y.inla")
+#        possibly the same as an old name. (default "BRU.response")
 # @aliases inla.stack.mjoin
 # 
 
 inla.stack.mjoin = function(..., compress = TRUE, remove.unused = TRUE,
-                            old.names = "y", new.name = "y.inla"){
-  stacks = inla.stack.y(..., old.names = old.names, new.name = new.name)
+                            old.names = "BRU.response", new.name = "BRU.response"){
+  stacks = inla.stack.mexpand(..., old.names = old.names, new.name = new.name)
   do.call(INLA::inla.stack.join,
           c(stacks, list(compress = compress, remove.unused = remove.unused)))
 }
 
 
 # Retrieve data from stack.
-# The special "y.inla" object should have been constructed before, via inla.stack.mjoin.
+# Obsolete. Do not use. Exposure vector stacking is handled automatically by inla.stack
+#
+# The special "BRU.response" object should have been constructed before, via inla.stack.mjoin.
 # Since all the work to setup the stack properly was already done by inla.stack.mjoin,
 # this function just passes its arguments through to INLA::inla.stack.data
 #
@@ -245,6 +249,7 @@ inla.stack.mjoin = function(..., compress = TRUE, remove.unused = TRUE,
 # 
 
 inla.stack.mdata = function(stack, ...){
+  warning("inla.stack.mdata: This function is obsolete and should not be used.")
   INLA::inla.stack.data(stack, ...)
 }
 
