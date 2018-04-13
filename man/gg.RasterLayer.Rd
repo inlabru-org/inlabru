@@ -22,6 +22,9 @@ This function takes a RasterLayer object, converts it into a SpatialPixelsDataFr
 uses \link{geom_tile} to plot the data.
 }
 \examples{
+# Some features require the raster and spatstat packages.
+if (requireNamespace("spatstat.data", quietly = TRUE) &&
+    requireNamespace("raster", quietly = TRUE)) {
 
 # Load Gorilla data
 data("gorillas", package = "spatstat.data")
@@ -34,6 +37,8 @@ elev = as(gorillas.extra$elevation, "RasterLayer")
 # Plot the elevation
 
 ggplot() + gg(elev)
+
+}
 }
 \seealso{
 Other geomes for Raster data: \code{\link{gg}},
