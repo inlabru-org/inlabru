@@ -114,6 +114,8 @@ check:
 	@./check-rpkg.sh $(R) $(FILENAME_SRC)
 check-Rdev:
 	@./check-rpkg.sh $(RDEV) $(FILENAME_SRC)
+check-Rdev-withdonttesst:
+	@./check-rpkg-withdonttest.sh $(RDEV) $(FILENAME_SRC)
 
 ## Install latest built packages:
 install:

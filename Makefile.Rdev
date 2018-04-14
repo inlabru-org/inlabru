@@ -1,0 +1,66 @@
+#!/usr/bin/make -f
+
+PKG_DEP='sp', 'ggplot2', 'rgdal', 'rgeos'
+PKG_SUG='testthat', 'ggmap', 'rgl', 'sphereplot', 'raster', 'dplyr', 'maptools', \
+  'shiny', 'spatstat', 'spatstat.data', 'RColorBrewer'
+REPOS=\
+  CRAN='https://www.stats.bris.ac.uk/R/',\
+  INLA='https://inla.r-inla-download.org/R/testing'
+
+RDEVEL_URL=https://stat.ethz.ch/R/daily/R-devel.tar.gz
+
+ROOT_DIR=$(HOME)/R-dev
+SRC_ROOT_DIR=$(ROOT_DIR)/src
+SRC_DIR=$(SRC_ROOT_DIR)/R-devel
+INSTALL_DIR=$(ROOT_DIR)
+
+BIN_DIR=$(INSTALL_DIR)/bin
+RR=$(BIN_DIR)/R
+RRscript=$(BIN_DIR)/Rscript
+
+default:
+	@echo "Usage: Rdev-install CMD"
+	@echo ""
+	@echo "   CMD should be one of"
+	@echo "       download"
+	@echo "       configure"
+	@echo "       make"
+	@echo "       make-check"
+	@echo "       install"
+	@echo "       packages-repos (informational)"
+	@echo "       packages-all (install INLA, Depends, and Suggests for inlabru)"
+	@echo "       packages-INLA (install INLA)"
+	@echo "       packages-depends (install inlabru 'Depends' packages)"
+	@echo "       packages-suggests (install inlabru 'Suggests' packages)"
+
+
+download:
+	mkdir -p $(SRC_ROOT_DIR)
+	cd $(SRC_ROOT_DIR) && \
+	    curl -O $(RDEVEL_URL) && \
+	    tar xzvf R-devel.tar.gz
+
+configure:
+	cd $(SRC_DIR) && \
+	./configure --prefix="$(INSTALL_DIR)"
+
+make:
+	make -j -C $(SRC_DIR)
+
+make-check:
+	make -C $(SRC_DIR) check
+
+install:
+	make -C $(SRC_DIR) install
+
+
+packages-repos:
+	@echo $(REPOS)
+packages-all:
+	$(RRscript) -e "install.packages(c('INLA', $(PKG_DEP), $(PKG_SUG)), repos=c($(REPOS)), dependencies = TRUE)"
+packages-INLA:
+	$(RRscript) -e "install.packages('INLA', repos=c($(REPOS)), dependencies = TRUE)"
+packages-depends:
+	$(RRscript) -e "install.packages(c($(PKG_DEP)), repos=c($(REPOS)), dependencies = TRUE)"
+packages-suggests:
+	$(RRscript) -e "install.packages(c($(PKG_SUG)), repos=c($(REPOS)), dependencies = TRUE)"
