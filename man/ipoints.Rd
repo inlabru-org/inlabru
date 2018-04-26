@@ -45,19 +45,17 @@ points in the one-dimensional case.
 }
 \examples{
 \donttest{
-# ipoints needs INLA
 if (requireNamespace("INLA", quietly = TRUE)) {
+
 # Create 50 integration points covering the dimension 'myDim' between 0 and 10. 
 
 ips = ipoints(c(0,10), 50, name = "myDim")
 plot(ips)
 
-
 # Create integration points for the two intervals [0,3] and [5,10]
 
 ips = ipoints(matrix(c(0,3, 5,10), nrow = 2, byrow = TRUE), 50)
 plot(ips)
-
 
 # Convert a 1D mesh into integration points
 mesh = inla.mesh.1d(seq(0,10,by = 1))

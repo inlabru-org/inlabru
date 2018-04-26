@@ -921,12 +921,13 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     if ( k > 1 ) { old.result = result } 
     result = NULL
     
-    icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
-                                                   data = c(inla.stack.mdata(stk), list.data(model)),
+    stk.data <- INLA::inla.stack.data(stk)
+    icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, BRU.response ~ .),
+                                                   data = c(stk.data, list.data(model)),
                                                    family = family,
                                                    control.predictor = list( A = INLA::inla.stack.A(stk), compute = TRUE),
-                                                   E = INLA::inla.stack.data(stk)$e,
-                                                   offset = INLA::inla.stack.data(stk)$bru.offset + offset),
+                                                   E = stk.data[["BRU.E"]],
+                                                   offset = stk.data[["BRU.offset"]] + offset),
                                                    inla.options)), 
                               error = warning
                             )
