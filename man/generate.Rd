@@ -52,5 +52,6 @@ plot(do.call(rbind, smp))
 }
 }
 \seealso{
-Other sample generators: \code{\link{generate.bru}}
+Other sample generators: \code{\link{generate.bru}},
+  \code{\link{generate.inla}}
 }

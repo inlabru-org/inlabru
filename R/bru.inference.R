@@ -696,10 +696,6 @@ predict.bru = function(object,
 #' samples can be based on any R expression that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
 #'  
-#' Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
-#' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
-#' value drawn in course of estimating the statistics.
-#'
 #' @aliases generate.bru
 #' @export
 #' @family sample generators
@@ -708,9 +704,10 @@ predict.bru = function(object,
 #' @param formula A formula determining which effects to sample from and how to combine them analytically.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. 
 #'                  The default is rather low but provides a quick approximate result.
-#' @param ... ignored arguments (needed for S3 compatibility).
+#' @param ... additional, unused arguments.
 #' 
-#' @return Predicted values
+#' @return List of generated samples
+#' @seealso \link{predict.bru}
 #' @example inst/examples/generate.bru.R
 
 generate.bru = function(object,
