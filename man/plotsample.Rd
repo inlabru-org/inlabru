@@ -41,6 +41,7 @@ A list with three components:
 Creates a plot sample on a regular grid with a random start location.
 }
 \examples{
+
 \donttest{
 # Some features require the raster package
 if (requireNamespace("raster", quietly = TRUE)) {

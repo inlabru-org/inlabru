@@ -695,10 +695,6 @@ predict.bru = function(object,
 #' samples can be based on any R expression that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
 #'  
-#' Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
-#' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
-#' value drawn in course of estimating the statistics.
-#'
 #' @aliases generate.bru
 #' @export
 #' @family sample generators
@@ -707,9 +703,10 @@ predict.bru = function(object,
 #' @param formula A formula determining which effects to sample from and how to combine them analytically.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. 
 #'                  The default is rather low but provides a quick approximate result.
-#' @param ... ignored arguments (needed for S3 compatibility).
+#' @param ... additional, unused arguments.
 #' 
-#' @return Predicted values
+#' @return List of generated samples
+#' @seealso \link{predict.bru}
 #' @example inst/examples/generate.bru.R
 
 generate.bru = function(object,
@@ -923,12 +920,14 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     if ( k > 1 ) { old.result = result } 
     result = NULL
     
-    icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
-                                                   data = c(inla.stack.mdata(stk), get.data(model)),
+    stk.data <- INLA::inla.stack.data(stk)
+    icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, BRU.response ~ .),
+                                                   data = c(stk.data, get.data(model)),
                                                    family = family,
                                                    control.predictor = list( A = INLA::inla.stack.A(stk), compute = TRUE),
-                                                   E = INLA::inla.stack.data(stk)$e,
-                                                   offset = INLA::inla.stack.data(stk)$bru.offset + offset),
+                                                   E = stk.data[["BRU.E"]],
+                                                   Ntrials = stk.data[["BRU.Ntrials"]],
+                                                   offset = stk.data[["BRU.offset"]] + offset),
                                                    inla.options)), 
                               error = warning
                             )
@@ -1021,27 +1020,3 @@ auto.intercept = function(components) {
   environment(components) = env
   components
 }
-
-
-# Returns a formula's environemnt as a data frame. Removes all variable that are of type
-# inla, function or formula. Also removes all variables that are not variables of the formula.
-get.data = function(formula){
-  
-  # Formula environment as list
-  elist = as.list(environment(formula))
-  
-  # Remove previous inla results. For some reason these slow down the next INLA call.
-  elist = elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
-  
-  # Remove functions. This can cause problems as well.
-  elist = elist[unlist(lapply(elist, function(x) !is.function(x)))]
-  
-  # Remove formulae. This can cause problems as well.
-  elist = elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
-  
-  elist = elist[names(elist) %in% all.vars(formula)]
-}
-
-
-
-

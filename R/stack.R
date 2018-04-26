@@ -40,11 +40,11 @@ make.stack = function(points,
   effects = c(effects, list(WORKAROUND = runif(dim(A[[1]])[1])))
 
   # Create and return stack
-  stk = INLA::inla.stack(data = list(y.inla = y, 
-                                     e = E, 
-                                     Ntrials = Ntrials,
-                                     bru.offset = taylor.offset + offset),
-                         A = A,
-                         tag = tag,
-                         effects = effects)
+  stk = INLA::inla.stack(data = list(BRU.response = y,
+                                     BRU.E = E,
+                                     BRU.Ntrials = Ntrials,
+                                     BRU.offset = taylor.offset + offset),
+                     A = A,
+                     tag = tag,
+                     effects = effects)
 }

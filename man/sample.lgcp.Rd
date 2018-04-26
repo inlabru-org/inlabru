@@ -37,6 +37,7 @@ the mesh. If the intensity is very high the standard \code{strategy} "spherical"
 Using the "sliced-spherical" strategy can help in this case.
 }
 \examples{
+
 \donttest{
 # The INLA package is required
 if (requireNamespace("INLA", quietly = TRUE)) {
@@ -52,6 +53,7 @@ points(pts, pch = "|" )
 
 }
 }
+
 
 \donttest{ 
 # The INLA package is required

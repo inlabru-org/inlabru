@@ -22,6 +22,7 @@ This function takes a RasterLayer object, converts it into a SpatialPixelsDataFr
 uses \link{geom_tile} to plot the data.
 }
 \examples{
+
 # Some features require the raster and spatstat packages.
 if (requireNamespace("spatstat.data", quietly = TRUE) &&
     requireNamespace("raster", quietly = TRUE)) {

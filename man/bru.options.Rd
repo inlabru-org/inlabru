@@ -6,7 +6,8 @@
 \usage{
 bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
   result = NULL, E = 1, control.compute = list(config = TRUE, dic = TRUE,
-  waic = TRUE), control.inla = iinla.getOption("control.inla"), ...)
+  waic = TRUE), control.inla = iinla.getOption("control.inla"),
+  control.fixed = list(expand.factor.strategy = "inla"), ...)
 }
 \arguments{
 \item{mesh}{An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.}
