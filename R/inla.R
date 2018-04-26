@@ -5,19 +5,17 @@
 #' The predictions can be based on any R expression that is valid given these values/covariates 
 #' and the posterior of the estimated effects.
 #' 
-#' IMPORTANT: The inla object provided has to have an additional field called "formula". This
-#' is the formula used to call the inla() function and will be used to convert the inla object
-#' to a bru object. Thereafter, preict.bru() is called to perform the prediction.
-#'
 #' @aliases predict.inla
-#' @param object An object obtained by calling \link{bru} or \link{lgcp}.
-#' @param ... Arguments passed on to predict.bru().
+#' @param object A \code{bru} object obtained by calling \link{bru} or \link{lgcp}.
+#' @param ... Arguments passed on to \link{predict.bru}.
 #' @return A \code{prediction} object.
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
 #' @examples 
 #' \dontrun{
+#' # Some features use the INLA package.
+#' if (requireNamespace("INLA", quietly = TRUE)) {
 #' 
 #' # Generate some data
 #' 
@@ -29,23 +27,74 @@
 #' formula = y ~ x
 #' fit <- inla(formula, "gaussian", data = input.df, control.compute=list(config = TRUE))
 #' 
-#' # Add formula to inla object
-#' 
-#' fit$formula = y ~ x
-#'
-#' Estimate posterior statistics of exp(x), where x is the random effect.
+#' # Estimate posterior statistics of exp(x), where x is the fixed effect.
 #' 
 #' xpost = predict(fit, NULL, ~ exp(x))
 #' xpost
 #' plot(xpost)
 #' 
 #' }
+#' }
 
-predict.inla = function(object, ...) {
-  fit$sppa$model = make.model(object$formula)
-  class(fit) = c("bru","inla")
-  predict(fit, ...)
+predict.inla <- function(object, ...) {
+  object$sppa$model <- make.model(object$.args$formula)
+  class(object) <- c("bru", class(object))
+  predict(object, ...)
 }
+
+
+
+#' Sampling based on bru posteriors
+#' 
+#' @description 
+#' Takes a fitted \code{inla} object produced by \code{INLA::inla()} and produces samples given 
+#' a new set of values for the model covariates or the original values used for the model fit. The
+#' samples can be based on any R expression that is valid given these values/covariates and the joint
+#' posterior of the estimated random effects.
+#'  
+#' @aliases generate.inla
+#' @export
+#' @family sample generators
+#' @param object An \code{inla} object obtained by calling \code{INLA::inla()}.
+#' @param ... additional arguments passed on to\link{generate.bru}.
+#' 
+#' @return List of generated samples
+#' @seealso \link{predict.inla}
+#' 
+#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' \dontrun{
+#' # Some features use the INLA package.
+#' if (requireNamespace("INLA", quietly = TRUE)) {
+#' 
+#' # Generate some data
+#' 
+#' input.df <- data.frame(x=cos(1:10))
+#' input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+#'
+#' # Fit a Gaussian likelihood model
+#' 
+#' formula = y ~ x
+#' fit <- inla(formula, "gaussian", data = input.df, control.compute=list(config = TRUE))
+#' 
+#' # Generate samples from the posterior distribution of exp(x), where x is the fixed effect.
+#' 
+#' xpost = generate(fit, NULL, ~ exp(x), n.samples = 2)
+#' xpost
+#' plot(xpost[[1]])
+#' 
+#' }
+#' }
+
+generate.inla = function(object,
+                         ...)
+{
+  object$sppa$model <- make.model(object$.args$formula)
+  class(object) <- c("bru", class(object))
+  generate(object, ...)
+}  
+
+
+
 
 
 

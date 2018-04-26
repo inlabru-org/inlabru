@@ -58,7 +58,7 @@ ips = ipoints(matrix(c(0,3, 5,10), nrow = 2, byrow = TRUE), 50)
 plot(ips)
 
 # Convert a 1D mesh into integration points
-mesh = INLA::inla.mesh.1d(seq(0,10,by = 1))
+mesh = inla.mesh.1d(seq(0,10,by = 1))
 ips = ipoints(mesh, name = "time")
 plot(ips)
 

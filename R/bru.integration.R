@@ -51,7 +51,7 @@
 #' plot(ips)
 #' 
 #' # Convert a 1D mesh into integration points
-#' mesh = INLA::inla.mesh.1d(seq(0,10,by = 1))
+#' mesh = inla.mesh.1d(seq(0,10,by = 1))
 #' ips = ipoints(mesh, name = "time")
 #' plot(ips)
 #'
