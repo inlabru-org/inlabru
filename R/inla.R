@@ -6,6 +6,7 @@
 #' and the posterior of the estimated effects.
 #' 
 #' @aliases predict.inla
+#' @export
 #' @param object A \code{bru} object obtained by calling \link{bru} or \link{lgcp}.
 #' @param ... Arguments passed on to \link{predict.bru}.
 #' @return A \code{prediction} object.
