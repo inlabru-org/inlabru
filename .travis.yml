@@ -6,9 +6,10 @@ cache: packages
 
 r:
  - oldrel
- - release
- - devel
+# - release
+# - devel
 
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install libgdal.dev
+addons:
+  apt:
+    packages:
+      - libgdal-dev
