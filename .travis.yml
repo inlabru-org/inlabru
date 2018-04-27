@@ -12,4 +12,6 @@ r:
 addons:
   apt:
     packages:
+      - libgeos-dev
+      - libproj-dev
       - libgdal-dev
