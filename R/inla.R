@@ -13,8 +13,8 @@
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-#' @examples 
-#' \dontrun{
+#' @examples
+#' \donttest{
 #' # Some features use the INLA package.
 #' if (requireNamespace("INLA", quietly = TRUE)) {
 #' 
@@ -63,7 +63,8 @@ predict.inla <- function(object, ...) {
 #' @seealso \link{predict.inla}
 #' 
 #' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
-#' \dontrun{
+#' @examples
+#' \donttest{
 #' # Some features use the INLA package.
 #' if (requireNamespace("INLA", quietly = TRUE)) {
 #' 

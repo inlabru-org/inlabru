@@ -20,15 +20,8 @@ a new set of values for the model covariates or the original values used for the
 samples can be based on any R expression that is valid given these values/covariates and the joint
 posterior of the estimated random effects.
 }
-\seealso{
-\link{predict.inla}
-
-Other sample generators: \code{\link{generate.bru}},
-  \code{\link{generate}}
-}
-\author{
-Finn Lindgren <\email{finn.lindgren@gmail.com}>
-\dontrun{
+\examples{
+\donttest{
 # Some features use the INLA package.
 if (requireNamespace("INLA", quietly = TRUE)) {
 
@@ -50,4 +43,13 @@ plot(xpost[[1]])
 
 }
 }
+}
+\seealso{
+\link{predict.inla}
+
+Other sample generators: \code{\link{generate.bru}},
+  \code{\link{generate}}
+}
+\author{
+Finn Lindgren <\email{finn.lindgren@gmail.com}>
 }
