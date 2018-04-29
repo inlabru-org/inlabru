@@ -38,7 +38,7 @@
 #' 
 #' @examples
 #' \donttest{
-#' if (requireNamespace("INLA", quietly = TRUE)) {
+#' if (require("INLA", quietly = TRUE)) {
 #' 
 #' # Create 50 integration points covering the dimension 'myDim' between 0 and 10. 
 #' 
@@ -246,7 +246,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
 #' @examples
 #' \donttest{
 #' # ipoints needs INLA
-#' if (requireNamespace("INLA", quietly = TRUE)) {
+#' if (require("INLA", quietly = TRUE)) {
 #' # Create integration points in dimension 'myDim' and 'myDiscreteDim' 
 #' ips1 = ipoints(c(0,8), name = "myDim")
 #' ips2 = ipoints(as.integer(c(1,2,3)), name = "myDiscreteDim")
@@ -528,7 +528,7 @@ vertex.projection.1d = function(points, mesh, group = NULL, column = "weight", s
 #' @examples 
 #' \donttest{
 #' # ipoints needs INLA
-#' if (requireNamespace("INLA", quietly = TRUE)) {
+#' if (require("INLA", quietly = TRUE)) {
 #' # Create integration points in two dimensions, x and y
 #'
 #' ips = cprod(ipoints(c(0,10), 10, name = "x"),

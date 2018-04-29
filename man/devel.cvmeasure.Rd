@@ -26,9 +26,11 @@ Calculates local and integrated variance and correlation measures as introduced 
 }
 \examples{
 \dontrun{
+if (require("INLA", quietly = TRUE)) {
+  
 # Load Gorilla data
 
-data("gorillas")
+data("gorillas", package = "inlabru")
 
 # Use RColorBrewer 
 
@@ -112,7 +114,7 @@ vm.int <- devel.cvmeasure(joint, field, veg,
 vm.int
 
 }
-
+}
 }
 \references{
 Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017. 

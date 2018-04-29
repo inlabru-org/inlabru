@@ -23,7 +23,7 @@ posterior of the estimated random effects.
 \examples{
 \donttest{
 # Some features use the INLA package.
-if (requireNamespace("INLA", quietly = TRUE)) {
+if (require("INLA", quietly = TRUE)) {
 
 # Generate some data
 

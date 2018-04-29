@@ -2,6 +2,8 @@
 #' 
 #' Creates a textured sphere and lon/lat coordinate annotations.
 #' 
+#' This funciton requires the `rgl` and `sphereplot` packages.
+#' 
 #' @aliases globe
 #' @name globe
 #' @export

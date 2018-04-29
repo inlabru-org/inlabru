@@ -20,7 +20,7 @@ dimension has no weights attached to it all weights are assumend to be 1.
 \examples{
 \donttest{
 # ipoints needs INLA
-if (requireNamespace("INLA", quietly = TRUE)) {
+if (require("INLA", quietly = TRUE)) {
 # Create integration points in dimension 'myDim' and 'myDiscreteDim' 
 ips1 = ipoints(c(0,8), name = "myDim")
 ips2 = ipoints(as.integer(c(1,2,3)), name = "myDiscreteDim")

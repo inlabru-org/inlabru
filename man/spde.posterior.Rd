@@ -23,14 +23,11 @@ parameter of a model's SPDE component. Can also plot Matern correlation or covar
 }
 \examples{
 \donttest{
+if (require("INLA", quietly = TRUE)) {
 
-# Load INLA
-
-library(INLA)
-    
 # Load 1D Poisson process data
 
-data(Poisson2_1D)
+data(Poisson2_1D, package = "inlabru")
 
 # Take a look at the point (and frequency) data
 
@@ -77,6 +74,7 @@ plot(matcor)
 matcov = spde.posterior(fit, "spde1D", "matern.covariance")
 plot(matcov)
 
+}
 }
 }
 \author{

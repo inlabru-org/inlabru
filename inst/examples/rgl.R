@@ -1,11 +1,10 @@
 \donttest{
-# Load rgl library (needed due to a bug in sphereplot library)
-
-library(rgl)
+if (require("rgl", quietly = TRUE) &&
+    require("sphereplot", quietly = TRUE)) {
 
 # Load pantropoical dolphin data
 
-data("mexdolphin")
+data("mexdolphin", package = "inlabru")
 
 # Show the globe
 
@@ -17,4 +16,6 @@ globe()
 glplot(mexdolphin$mesh)
 glplot(mexdolphin$samplers)
 glplot(mexdolphin$points)
+
+}
 }

@@ -16,6 +16,8 @@ Takes a fitted bru object produced by bru() or lgcp() and creates various summar
 }
 \examples{
 \donttest{
+if (require("INLA", quietly = TRUE)) {
+
 # Simulate some covariates x and observations y
 input.df <- data.frame(x=cos(1:10))
 input.df <- within(input.df, y <- 5 + 2*x + rnorm(10, mean=0, sd=0.1))
@@ -43,5 +45,7 @@ fit <- bru( ~ z + Intercept, lik)
 
 # Check the result (z posterior should be around 2)
 summary(fit)
+
+}
 }
 }
