@@ -89,14 +89,14 @@ if (class(mesh) == "inla.mesh.1d") {
       if ( !is.matrix(loglambda) ){ loglambda = matrix(loglambda, nrow = 1) }
       
       # Simulate number of points
-      n.fields = dim(loglambda)[1]
+      n.fields <- dim(loglambda)[1]
       lambda_max <- apply(loglambda, MARGIN = 1, max)
-      Npoints <- sapply(1:n.fields, function(x) {rpois(1, lambda = area * exp(lambda_max[x]))})
+      Npoints <- rpois(n.fields, lambda = area * exp(lambda_max))
       
       # Simulate uniform points on the bounding rectangle
       x <- runif(n = sum(Npoints), min=xmin, max=xmax)
       y <- runif(n = sum(Npoints), min=ymin, max=ymax)
-      s <- rep(1:n.fields, Npoints) # Which field are these intended for
+      s <- rep(seq_len(n.fields), Npoints) # Which field are these intended for
       points <-cbind(x,y)
       
       # Do some thinning

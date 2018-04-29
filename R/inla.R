@@ -178,7 +178,9 @@ inla.posterior.sample.structured = function(result,n){
       }
     }
     if(length(smpl.hyperpar)>0){
-      names(smpl.hyperpar) = sapply(names(smpl.hyperpar), function(nm) gsub(" ","_", x = nm, fixed = TRUE))
+      names(smpl.hyperpar) <- vapply(names(smpl.hyperpar),
+                                     function(nm) gsub(" ","_", x = nm, fixed = TRUE),
+                                     "name")
     }
     ssmpl[[i]] = c(vals, smpl.hyperpar)
   }
