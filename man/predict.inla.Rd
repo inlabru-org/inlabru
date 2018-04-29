@@ -21,7 +21,7 @@ The predictions can be based on any R expression that is valid given these value
 and the posterior of the estimated effects.
 }
 \examples{
-\dontrun{
+\donttest{
 # Some features use the INLA package.
 if (requireNamespace("INLA", quietly = TRUE)) {
 

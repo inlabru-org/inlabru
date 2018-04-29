@@ -261,7 +261,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
 
 cprod = function(...) {
   ipl = list(...)
-  ipl = ipl[!sapply(ipl, is.null)]
+  ipl = ipl[!vapply(ipl, is.null, TRUE)]
   if ( length(ipl) == 0 ) return(NULL)
   
   if ( length(ipl) == 1 ) {
