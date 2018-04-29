@@ -6,14 +6,15 @@
 #' and the posterior of the estimated effects.
 #' 
 #' @aliases predict.inla
+#' @export
 #' @param object A \code{bru} object obtained by calling \link{bru} or \link{lgcp}.
 #' @param ... Arguments passed on to \link{predict.bru}.
 #' @return A \code{prediction} object.
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-#' @examples 
-#' \dontrun{
+#' @examples
+#' \donttest{
 #' # Some features use the INLA package.
 #' if (requireNamespace("INLA", quietly = TRUE)) {
 #' 
@@ -62,7 +63,8 @@ predict.inla <- function(object, ...) {
 #' @seealso \link{predict.inla}
 #' 
 #' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
-#' \dontrun{
+#' @examples
+#' \donttest{
 #' # Some features use the INLA package.
 #' if (requireNamespace("INLA", quietly = TRUE)) {
 #' 
@@ -178,7 +180,9 @@ inla.posterior.sample.structured = function(result,n){
       }
     }
     if(length(smpl.hyperpar)>0){
-      names(smpl.hyperpar) = sapply(names(smpl.hyperpar), function(nm) gsub(" ","_", x = nm, fixed = TRUE))
+      names(smpl.hyperpar) <- vapply(names(smpl.hyperpar),
+                                     function(nm) gsub(" ","_", x = nm, fixed = TRUE),
+                                     "name")
     }
     ssmpl[[i]] = c(vals, smpl.hyperpar)
   }

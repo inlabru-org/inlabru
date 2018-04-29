@@ -109,14 +109,25 @@ bru = function(components = y ~ Intercept,
   }
   
   # Set max interations to 1 if all likelihood formulae are linear 
-  if (all(sapply(lhoods, function(lh) lh$linear))) { options$max.iter = 1 }
+  if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) { options$max.iter <- 1 }
   
   # Extract the family of each likelihood
-  family = sapply(1:length(lhoods), function(k) lhoods[[k]]$inla.family)
+  family <- vapply(seq_along(lhoods), function(k) lhoods[[k]]$inla.family, "family")
   
   # Run iterated INLA
-  if ( options$run ) { result = do.call(iinla, list(data, bru.model, stk, family = family, n = options$max.iter, offset = options$offset, result = options$result, inla.options = options$inla.options))} 
-  else { result = list() }
+  if (options$run) {
+    result <- do.call(iinla,
+                      list(data,
+                           bru.model,
+                           stk,
+                           family = family,
+                           n = options$max.iter,
+                           offset = options$offset,
+                           result = options$result,
+                           inla.options = options$inla.options))
+  } else {
+    result <- list()
+  }
   
   ## Create result object ## 
   result$sppa$method = "bru"
@@ -667,7 +678,7 @@ predict.bru = function(object,
         smy[[nm]] = summarize(lapply(vals, function(v) v[[nm]]), x = vals[[1]][,covar,drop=FALSE])
     }
     vals = smy
-    is.annot = sapply(names(vals), function(v) all(vals[[v]]$sd==0))
+    is.annot <- vapply(names(vals), function(v) all(vals[[v]]$sd == 0), TRUE)
     annot = do.call(cbind, lapply(vals[is.annot], function(v) v[,1]))
     vals = vals[!is.annot]
     if ( !is.null(annot) ) {
