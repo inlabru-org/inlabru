@@ -5,8 +5,8 @@ sudo: false
 cache: packages
 
 r:
- - oldrel
-# - release
+# - oldrel
+ - release
 # - devel
 
 addons:
@@ -15,3 +15,7 @@ addons:
       - libgeos-dev
       - libproj-dev
       - libgdal-dev
+
+r_build_args: --resave-data
+
+r_check_args: --as-cran --run-donttest --timings
