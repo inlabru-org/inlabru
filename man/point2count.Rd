@@ -23,9 +23,8 @@ sample with only the count within each plot.
 \examples{
 \donttest{
 # Some features require the raster package
-if (requireNamespace("raster", quietly = TRUE)) {
+if (require("raster", quietly = TRUE)) {
 
-library(raster)
 data(gorillas)
 plotpts = plotsample(gorillas$nests,gorillas$boundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
 p1 = ggplot() +gg(plotpts$plots) +gg(plotpts$dets) +gg(gorillas$boundary)

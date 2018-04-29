@@ -39,9 +39,8 @@ Using the "sliced-spherical" strategy can help in this case.
 \examples{
 \donttest{
 # The INLA package is required
-if (requireNamespace("INLA", quietly = TRUE)) {
+if (require("INLA", quietly = TRUE)) {
 
-library(INLA)
 vertices = seq(0, 3, by = 0.1)
 mesh = inla.mesh.1d(vertices)
 loglambda = 5-0.5*vertices
@@ -55,7 +54,7 @@ points(pts, pch = "|" )
 
 \donttest{ 
 # The INLA package is required
-if (requireNamespace("INLA", quietly = TRUE)) {
+if (require("INLA", quietly = TRUE)) {
 
 data("gorillas")
 pts = sample.lgcp(gorillas$mesh, rep(1.5, gorillas$mesh$n))

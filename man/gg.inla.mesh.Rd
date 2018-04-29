@@ -48,7 +48,7 @@ to plot the interpolation.
 \examples{
 \donttest{
 # Load Gorilla data
-data("gorillas")
+data("gorillas", package = "inlabru")
 
 # Plot mesh using default edge colors
 

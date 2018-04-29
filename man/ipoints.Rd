@@ -45,7 +45,7 @@ points in the one-dimensional case.
 }
 \examples{
 \donttest{
-if (requireNamespace("INLA", quietly = TRUE)) {
+if (require("INLA", quietly = TRUE)) {
 
 # Create 50 integration points covering the dimension 'myDim' between 0 and 10. 
 
