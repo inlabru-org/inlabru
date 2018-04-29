@@ -36,16 +36,11 @@ Internally, this method calls \link{generate.bru} in order to draw samples from 
 }
 \examples{
 \donttest{
-# Load INLA
-library(INLA)
+if (require("INLA", quietly = TRUE)) {
 
 # Load the Gorilla data
 
-data(gorillas)
-
-# Use tutorial setting and thus empirical Bayes for faster inference
-
-init.tutorial()
+data(gorillas, package ="inlabru")
 
 # Plot the Gorilla nests, the mesh and the survey boundary
 
@@ -128,6 +123,7 @@ mySmooth = predict(fit, pxl, ~ mySmooth)
 
 head(mySmooth)
 ggplot() + gg(mySmooth)
-}
 
+}
+}
 }

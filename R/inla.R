@@ -16,7 +16,7 @@
 #' @examples
 #' \donttest{
 #' # Some features use the INLA package.
-#' if (requireNamespace("INLA", quietly = TRUE)) {
+#' if (require("INLA", quietly = TRUE)) {
 #' 
 #' # Generate some data
 #' 
@@ -66,7 +66,7 @@ predict.inla <- function(object, ...) {
 #' @examples
 #' \donttest{
 #' # Some features use the INLA package.
-#' if (requireNamespace("INLA", quietly = TRUE)) {
+#' if (require("INLA", quietly = TRUE)) {
 #' 
 #' # Generate some data
 #' 

@@ -29,7 +29,7 @@ of a 1D mesh.
 
 \donttest{
 # Some features use the INLA package.
-if (requireNamespace("INLA", quietly = TRUE)) {
+if (require("INLA", quietly = TRUE)) {
 
 # Load INLA
 

@@ -20,6 +20,8 @@ which depend on the class of the first argument.
 }
 \examples{
 \donttest{
+if (require("INLA", quietly = TRUE)) {
+  
 # Generate data for a simple linear model
 
 input.df <- data.frame(x=cos(1:10))
@@ -49,6 +51,8 @@ smp[[1]]
 # ... and plot them
 
 plot(do.call(rbind, smp))
+
+}
 }
 }
 \seealso{

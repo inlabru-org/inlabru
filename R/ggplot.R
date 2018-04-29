@@ -7,6 +7,8 @@ pixelplot.mesh = function(...) { stop("function removed from inlabru") }
 #' Uses get_map() to query map services like Google Maps for a region centered around
 #' the spatial object provided. Then calls ggmap() to plot the map.
 #' 
+#' This function requires the `ggmap` package.
+#' 
 #' @aliases gmap
 #' @name gmap
 #' @export
@@ -562,10 +564,9 @@ if ( !is.null(color) ) {
 #' @family geomes for meshes
 #' 
 #' @examples
-#' 
 #' \donttest{
 #' # Some features use the INLA package.
-#' if (requireNamespace("INLA", quietly = TRUE)) {
+#' if (require("INLA", quietly = TRUE)) {
 #'
 #' # Load INLA
 #'
@@ -582,8 +583,8 @@ if ( !is.null(color) ) {
 #' # Plot it using a different shape and size for the mesh nodes
 #' 
 #' ggplot() + gg(mesh, shape = "|", size = 5)
-#' }
-#' }
+#'
+#' }}
 
 gg.inla.mesh.1d = function(data, mapping = aes_string("x","y"), y = 0, shape = 4, ...) {
   
@@ -599,6 +600,8 @@ gg.inla.mesh.1d = function(data, mapping = aes_string("x","y"), y = 0, shape = 4
 #' This function takes a RasterLayer object, converts it into a SpatialPixelsDataFrame and
 #' uses \link{geom_tile} to plot the data.
 #' 
+#' This function requires the `raster` package.
+#' 
 #' @aliases gg.RasterLayer
 #' @name gg.RasterLayer
 #' @export
@@ -610,17 +613,15 @@ gg.inla.mesh.1d = function(data, mapping = aes_string("x","y"), y = 0, shape = 4
 #' @family geomes for Raster data 
 #' 
 #' @examples
-#'
-#' # Some features require the raster and spatstat packages.
-#' if (requireNamespace("spatstat.data", quietly = TRUE) &&
-#'     requireNamespace("raster", quietly = TRUE)) {
+#' # Some features require the raster and spatstat.data packages.
+#' if (require("spatstat.data", quietly = TRUE) &&
+#'     require("raster", quietly = TRUE)) {
 #' 
 #' # Load Gorilla data
 #' data("gorillas", package = "spatstat.data")
 #' 
 #' # Convert elevation covariate to RasterLayer
 #'
-#' library(raster)
 #' elev = as(gorillas.extra$elevation, "RasterLayer")
 #'
 #' # Plot the elevation

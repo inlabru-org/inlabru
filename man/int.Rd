@@ -29,7 +29,7 @@ of all column names in \code{data} and the dimensions stated by \code{dims}.
 
 \donttest{
 # ipoints needs INLA
-if (requireNamespace("INLA", quietly = TRUE)) {
+if (require("INLA", quietly = TRUE)) {
 # Create integration points in two dimensions, x and y
 
 ips = cprod(ipoints(c(0,10), 10, name = "x"),

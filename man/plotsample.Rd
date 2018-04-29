@@ -44,10 +44,9 @@ Creates a plot sample on a regular grid with a random start location.
 
 \donttest{
 # Some features require the raster package
-if (requireNamespace("raster", quietly = TRUE)) {
+if (require("raster", quietly = TRUE)) {
 
-library(raster)
-data(gorillas)
+data(gorillas, package = "inlabru")
 plotpts = plotsample(gorillas$nests,gorillas$boundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
 ggplot() +gg(plotpts$plots) +gg(plotpts$dets,pch="+",cex=2) +gg(gorillas$boundary)
 
