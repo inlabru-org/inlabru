@@ -1,4 +1,4 @@
-\dontrun{
+\donttest{
 # Load the Gorilla data
 data(gorillas, package = "inlabru")
  

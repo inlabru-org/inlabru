@@ -36,7 +36,7 @@ requireINLA = function(){
 #' 
 #' @examples
 #' 
-#' \dontrun{
+#' \donttest{
 #' 
 #' # Determine current bru default:
 #' bo = bru.options()
