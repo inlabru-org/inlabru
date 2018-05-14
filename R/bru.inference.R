@@ -1031,3 +1031,26 @@ auto.intercept = function(components) {
   environment(components) = env
   components
 }
+
+
+# Returns a formula's environemnt as a data frame. Removes all variable that are of type
+# inla, function or formula. Also removes all variables that are not variables of the formula.
+get.data = function(formula){
+  
+  # Formula environment as list
+  elist = as.list(environment(formula))
+  
+  # Remove previous inla results. For some reason these slow down the next INLA call.
+  elist = elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
+  
+  # Remove functions. This can cause problems as well.
+  elist = elist[unlist(lapply(elist, function(x) !is.function(x)))]
+  
+  # Remove formulae. This can cause problems as well.
+  elist = elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
+  
+  elist = elist[names(elist) %in% all.vars(formula)]
+}
+
+
+

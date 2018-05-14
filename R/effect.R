@@ -439,6 +439,11 @@ mapper = function(map, points, eff, env = NULL) {
   else if ( eff$label == "offset" && is.numeric(emap) && length(emap)==1 ) { loc = data.frame(offset = rep(emap, nrow(points)))}
   else { loc = emap }
   
+  # Always return as many rows as points has
+  if (is.vector(loc) && (length(loc) == 1) && (nrow(as.data.frame(points))>1)) {
+    loc = rep(loc, nrow(as.data.frame(points)))
+  }
+  
   # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
   # to fix that by filling in nearest neighbor values.
   if ( any(is.na(loc)) & ( inherits(emap, "SpatialGridDataFrame") | inherits(emap, "SpatialPixelsDataFrame") )) {

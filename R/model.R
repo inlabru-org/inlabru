@@ -147,6 +147,7 @@ evaluate.model = function(model,
     enm = intersect(names(sm), names(model$effects))
     
     for (label in enm) {
+      if ( is.data.frame(sm[[label]])) { sm[[label]] = sm[[label]]$value } 
       sm[[label]] = value(model$effects[[label]], data = points, state = sm[[label]], A = As[[label]]) 
       }
     
