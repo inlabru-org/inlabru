@@ -1,4 +1,4 @@
-\dontrun{
+\donttest{
 if (require("INLA", quietly = TRUE)) {
   
 # Load Gorilla data

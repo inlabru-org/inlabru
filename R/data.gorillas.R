@@ -55,7 +55,7 @@
 #' 26 (6), 793-811.
 #' 
 #' @examples
-#' data(gorillas) # get the data
+#' data(gorillas, package = "inlabru") # get the data
 #' # extract all the objects, for convenience:
 #'
 #' # plot all the nests, mesh and boundary

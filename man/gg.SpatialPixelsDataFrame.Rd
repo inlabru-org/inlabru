@@ -32,7 +32,7 @@ Coerces input SpatialPixelsDataFrame to data.frame and uses \link{geom_tile} to 
 \donttest{
 # Load Gorilla data
 
-data("gorillas")
+data("gorillas", package = "inlabru")
 
 # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame. 
 # The same syntax applies to SpatialGridDataFrame objects.

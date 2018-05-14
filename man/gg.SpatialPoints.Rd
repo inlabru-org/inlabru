@@ -27,7 +27,7 @@ to plot the points.
 \donttest{
 # Load Gorilla data
 
-data("gorillas")
+data("gorillas", package = "inlabru")
 
 # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame. 
 # The same syntax applies to SpatialGridDataFrame objects.

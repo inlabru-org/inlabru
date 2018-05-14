@@ -43,6 +43,8 @@ Suggests:
     RColorBrewer,
     graphics,
     INLA,
+    knitr,
+    rmarkdown
 Depends:
     R (>= 3.3),
     sp,
@@ -51,3 +53,4 @@ Depends:
     ggplot2,
 Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr

@@ -58,7 +58,7 @@ gmap = function(data, ...) {
 #' 
 #' # Load Gorilla data
 #' 
-#' data(gorillas)
+#' data(gorillas, package = "inlabru")
 #' 
 #' # Invoke ggplot and add geomes for the Gorilla nests and the survey boundary
 #' 

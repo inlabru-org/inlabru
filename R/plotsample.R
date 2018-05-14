@@ -123,7 +123,7 @@ plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
 #' # Some features require the raster package
 #' if (require("raster", quietly = TRUE)) {
 #'
-#' data(gorillas)
+#' data(gorillas, package = "inlabru")
 #' plotpts = plotsample(gorillas$nests,gorillas$boundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
 #' p1 = ggplot() +gg(plotpts$plots) +gg(plotpts$dets) +gg(gorillas$boundary)
 #' countdata = point2count(plotpts$plots,plotpts$dets)

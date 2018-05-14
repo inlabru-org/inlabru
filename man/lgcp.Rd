@@ -42,10 +42,10 @@ assumed that all of the LGCP's dimensions have been observed completely.
 }
 \examples{
 
-\dontrun{
+\donttest{
 
-Load the Gorilla data
-data(gorillas)
+# Load the Gorilla data
+data(gorillas, package = "inlabru")
 
 # Use tutorial setting and thus empirical Bayes for faster inference
 init.tutorial()
@@ -65,6 +65,7 @@ matern <- inla.spde2.pcmatern(gorillas$mesh,
 # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 
+if (require("INLA", quietly = TRUE)) {
 # Fit the model
 fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
 
@@ -79,6 +80,7 @@ ggplot() +
   gg(gorillas$boundary) + 
   coord_fixed()
 
+}
 }
 
 }

@@ -264,7 +264,7 @@ stackmaker.like = function(lhood) {
 #' 
 #' @examples
 #' 
-#' \dontrun{
+#' \donttest{
 #' 
 #' # Generate default bru options
 #' opts = bru.options()
@@ -447,10 +447,10 @@ bru.components = function() { NULL }
 #' @return An \link{bru} object
 #' @examples
 #' 
-#' \dontrun{
+#' \donttest{
 #' 
-#' Load the Gorilla data
-#' data(gorillas)
+#' # Load the Gorilla data
+#' data(gorillas, package = "inlabru")
 #' 
 #' # Use tutorial setting and thus empirical Bayes for faster inference
 #' init.tutorial()
@@ -470,6 +470,7 @@ bru.components = function() { NULL }
 #' # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 #' cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #' 
+#' if (require("INLA", quietly = TRUE)) {
 #' # Fit the model
 #' fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
 #' 
@@ -484,6 +485,7 @@ bru.components = function() { NULL }
 #'   gg(gorillas$boundary) + 
 #'   coord_fixed()
 #' 
+#' }
 #' }
 #' 
 

@@ -11,7 +11,7 @@ Increases verbosity and sets the inference strategy to empirical Bayes.
 }
 \examples{
 
-\dontrun{
+\donttest{
 
 # Determine current bru default:
 bo = bru.options()

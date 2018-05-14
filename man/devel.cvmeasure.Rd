@@ -25,7 +25,7 @@ Variance and correlations measures.
 Calculates local and integrated variance and correlation measures as introduced by Yuan et al. (2017).
 }
 \examples{
-\dontrun{
+\donttest{
 if (require("INLA", quietly = TRUE)) {
   
 # Load Gorilla data

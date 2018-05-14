@@ -50,7 +50,7 @@ This the \code{gorillas} dataset from the package \code{spatstat}, reformatted
 as point process data for use with \code{inlabru}.
 }
 \examples{
-data(gorillas) # get the data
+data(gorillas, package = "inlabru") # get the data
 # extract all the objects, for convenience:
 
 # plot all the nests, mesh and boundary

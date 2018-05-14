@@ -50,7 +50,7 @@
 #' # The INLA package is required
 #' if (require("INLA", quietly = TRUE)) {
 #'
-#' data("gorillas")
+#' data("gorillas", package = "inlabru")
 #' pts = sample.lgcp(gorillas$mesh, rep(1.5, gorillas$mesh$n))
 #' ggplot() + gg(gorillas$mesh) + gg(pts)
 #'

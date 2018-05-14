@@ -29,7 +29,7 @@ Extracts start and end points of the lines and calls \link{geom_segment} to plot
 \donttest{
 # Load Gorilla data
 
-data("gorillas")
+data("gorillas", package = "inlabru")
 
 # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame. 
 # The same syntax applies to SpatialGridDataFrame objects.
