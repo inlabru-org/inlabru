@@ -129,6 +129,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           multi.sample[[sample]] <- data.frame(x = points[keep])
         }
       } else {
+        waste_ratio <- 0
         if (multi.samples) {
           multi.sample[[sample]] <- data.frame(x = numeric(0), sample = integer(0))
         } else {
