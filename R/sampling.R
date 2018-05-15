@@ -16,6 +16,7 @@
 #'   (for higher order basis functions, e.g.
 #'   for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis
 #'   function weights rather than the values at the \code{mesh$n} vertices)
+#'   A single scalar is expanded to a vector of the appropriate length.
 #'   If a matrix is supplied, one process sample for each column is produced.
 #' @param strategy Only relevant for 2D meshes. One of \code{'triangulated'}, \code{'rectangle'},
 #'   \code{'sliced-spherical'}, \code{'spherical'}. The \code{'rectangle'} method is only valid for
@@ -34,8 +35,9 @@
 #'
 #' @return A \code{data.frame} (1D case),
 #'   SpatialPoints (2D flat and 3D spherical surface cases)
-#'   SpatialPointsDataFrame (2D/3D surface cases with multiple samples,
-#'     data column \code{'sample'} giving the index for each sample)
+#'   SpatialPointsDataFrame (2D/3D surface cases with multiple samples).
+#'   For multiple samples, the \code{data.frame} output has a 
+#'   column \code{'sample'} giving the index for each sample.
 #' object of point locations.
 #'
 #' @details
@@ -75,7 +77,9 @@
 #' if (require("INLA", quietly = TRUE)) {
 #'
 #' data("gorillas", package = "inlabru")
-#' pts = sample.lgcp(gorillas$mesh, rep(1.5, gorillas$mesh$n))
+#' pts = sample.lgcp(gorillas$mesh,
+#'                   loglambda = 1.5,
+#'                   samplers = gorillas$boundary)
 #' ggplot() + gg(gorillas$mesh) + gg(pts)
 #'
 #' }
@@ -88,15 +92,53 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     xmin <- mesh$interval[1]
     xmax <- mesh$interval[2]
     area <- xmax - xmin
-    # The B-spline basis expansion has a convex hull property
-    # which implies that the maximum weight is not greater or equal to the maximum function value.
-    wmax <- max(loglambda)
-    Npoints <- rpois(1, lambda = area * exp(wmax))
-    points <- runif(n = sum(Npoints), min = xmin, max = xmax)
-    A <- INLA::inla.mesh.project(mesh, points)$A
-    lambda_ratio <- exp(as.vector(A %*% loglambda) - wmax)
-    keep <- which(runif(Npoints) < lambda_ratio)
-    ret <- data.frame(x = points[keep])
+
+    multi.samples <- is.matrix(loglambda)
+    if (multi.samples) {
+      result <- list()
+      n.samples <- ncol(loglambda)
+      loglambda.matrix <- loglambda
+    } else {
+      n.samples <- 1
+    }
+    
+    multi.sample <- list()
+    for (sample in seq_len(n.samples)) {
+      if (multi.samples) {
+        loglambda <- as.vector(loglambda.matrix[, sample, drop = TRUE])
+      }
+      
+      # The B-spline basis expansion has a convex hull property
+      # which implies that the maximum weight is not greater or equal to the maximum function value.
+      wmax <- max(loglambda)
+
+      Npoints <- rpois(1, lambda = area * exp(wmax))
+      if (Npoints > 0) {
+        points <- runif(n = Npoints, min = xmin, max = xmax)
+        proj <- INLA::inla.mesh.project(mesh, points)
+        if (length(loglambda) == 1) {
+          lambda_ratio <- exp(as.vector(rowSums(proj$A) * loglambda) - wmax)
+        } else {
+          lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - wmax)
+        }
+        keep <- (runif(Npoints) <= lambda_ratio)
+        waste_ratio <- sum(keep) / length(keep)
+        if (multi.samples) {
+          multi.sample[[sample]] <- data.frame(x = points[keep], sample = sample)
+        } else {
+          multi.sample[[sample]] <- data.frame(x = points[keep])
+        }
+      } else {
+        waste_ratio <- 0
+        if (multi.samples) {
+          multi.sample[[sample]] <- data.frame(x = numeric(0), sample = integer(0))
+        } else {
+          multi.sample[[sample]] <- data.frame(x = numeric(0))
+        }
+      }
+    }
+    ret <- do.call(rbind, multi.sample)
+
   } else if (inherits(mesh, "inla.mesh")) {
     multi.samples <- is.matrix(loglambda)
     if (multi.samples) {
@@ -107,7 +149,6 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       } else {
         loglambda.matrix <- loglambda
       }
-      idx.sample <- 0
     } else {
       n.samples <- 1
       loglambda <- as.vector(loglambda)
@@ -140,9 +181,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       } else if (identical(input.crs.list$proj, "longlat")) {
         strategy <- "sliced-spherical"
       }
-    } else {
-      strategy <- match.arg(strategy, strategies)
     }
+    strategy <- match.arg(strategy, strategies)
 
     if (is.geocent) {
       space.R <- mean(rowSums(mesh$loc^2)^0.5)
@@ -176,8 +216,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       
     for (sample in seq_len(n.samples)) {
       if (multi.samples) {
-        idx.sample <- idx.sample + 1
-        loglambda <- as.vector(loglambda.matrix[, idx.sample, drop = TRUE])
+        loglambda <- as.vector(loglambda.matrix[, sample, drop = TRUE])
       }
 
       if (strategy == "triangulated") {
@@ -367,10 +406,10 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       }
 
       if (multi.samples) {
-        result[[idx.sample]] <-
+        result[[sample]] <-
           sp::SpatialPointsDataFrame(
             ret,
-            data = data.frame(sample = rep(idx.sample, length(ret)))
+            data = data.frame(sample = rep(sample, length(ret)))
           )
       }
     }

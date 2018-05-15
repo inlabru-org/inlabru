@@ -14,6 +14,7 @@ sample.lgcp(mesh, loglambda, strategy = NULL, R = NULL, samplers = NULL,
 (for higher order basis functions, e.g.
 for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis
 function weights rather than the values at the \code{mesh$n} vertices)
+A single scalar is expanded to a vector of the appropriate length.
 If a matrix is supplied, one process sample for each column is produced.}
 
 \item{strategy}{Only relevant for 2D meshes. One of \code{'triangulated'}, \code{'rectangle'},
@@ -37,8 +38,9 @@ This affects \code{R} and the permitted values for \code{strategy}.}
 \value{
 A \code{data.frame} (1D case),
   SpatialPoints (2D flat and 3D spherical surface cases)
-  SpatialPointsDataFrame (2D/3D surface cases with multiple samples,
-    data column \code{'sample'} giving the index for each sample)
+  SpatialPointsDataFrame (2D/3D surface cases with multiple samples).
+  For multiple samples, the \code{data.frame} output has a 
+  column \code{'sample'} giving the index for each sample.
 object of point locations.
 }
 \description{
@@ -83,7 +85,9 @@ points(pts, pch = "|" )
 if (require("INLA", quietly = TRUE)) {
 
 data("gorillas", package = "inlabru")
-pts = sample.lgcp(gorillas$mesh, rep(1.5, gorillas$mesh$n))
+pts = sample.lgcp(gorillas$mesh,
+                  loglambda = 1.5,
+                  samplers = gorillas$boundary)
 ggplot() + gg(gorillas$mesh) + gg(pts)
 
 }
