@@ -26,6 +26,8 @@ bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
 
 \item{control.inla}{INLA option, See \link[INLA]{control.inla}}
 
+\item{control.fixed}{INLA option, See \link[INLA]{control.fixed}}
+
 \item{...}{Additional options passed on to \link[INLA]{inla}}
 }
 \description{

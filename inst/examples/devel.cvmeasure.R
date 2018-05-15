@@ -18,7 +18,7 @@ pcmatern <- inla.spde2.pcmatern(gorillas$mesh,
                                 prior.range = c(5, 0.01))
 
 cmp <- coordinates ~ vegetation(map = gorillas$gcov$vegetation, model = "factor") +
-  spde(map = coordinates, model = pcmatern, mesh = gorillas$mesh) -
+  spde(map = coordinates, model = pcmatern) -
   Intercept
 
 init.tutorial() # Faster inferece for example

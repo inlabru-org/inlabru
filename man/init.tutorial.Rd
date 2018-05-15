@@ -19,8 +19,7 @@ bo = bru.options()
 # By default, INLA's integration strategy is set to the INLA default 'auto':
 bo$inla.options$control.inla
 
-# Now, let's run init.tutorial() to make empirical Bayes the default 
-integration method when \\code{bru} calls \\code{inla}
+# Now, let's run init.tutorial() to make empirical Bayes the default
 
 init.tutorial()
 

@@ -258,6 +258,7 @@ stackmaker.like = function(lhood) {
 #' @param E \link[INLA]{inla} exposure parameter
 #' @param control.compute INLA option, See \link[INLA]{control.compute}
 #' @param control.inla INLA option, See \link[INLA]{control.inla}
+#' @param control.fixed INLA option, See \link[INLA]{control.fixed}
 #' @param ... Additional options passed on to \link[INLA]{inla}
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
@@ -462,6 +463,11 @@ bru.components = function() { NULL }
 #'   gg(gorillas$boundary) + 
 #'   coord_fixed()
 #' 
+#' if (require("INLA", quietly = TRUE)) {
+#' 
+#' # Load INLA
+#' library(INLA)
+#' 
 #' # Define SPDE prior
 #' matern <- inla.spde2.pcmatern(gorillas$mesh, 
 #'                               prior.sigma = c(0.1, 0.01), 
@@ -470,7 +476,6 @@ bru.components = function() { NULL }
 #' # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 #' cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #' 
-#' if (require("INLA", quietly = TRUE)) {
 #' # Fit the model
 #' fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
 #' 

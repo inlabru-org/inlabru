@@ -17,14 +17,21 @@ index = function(...){UseMethod("index")}
 #' Latent effects
 #'  
 #' @aliases effect
-#' @keywords internal
-#' @param ... A 
-#' @param fname Chracter setting the name of the function that will interpret the components.
+#' @export
+#' @param ... EXPERIMENTAL
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 effect = function(...){UseMethod("effect")}
 
 
+#' Latent effects
+#'  
+#' @aliases effect.formula
+#' @export
+#' @param formula A formula defining the effect.
+#' @param ... EXPERIMENTAL
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#'
 effect.formula = function(formula, ...) {
   code = code.components(formula)
   parsed = lapply(code, function(x) parse(text=x))
@@ -35,7 +42,24 @@ effect.formula = function(formula, ...) {
   effects
 }
 
-
+#' Latent effects
+#'  
+#' @aliases effect.character
+#' @export
+#' @param label EXPERIMENTAL
+#' @param data EXPERIMENTAL
+#' @param model EXPERIMENTAL
+#' @param map EXPERIMENTAL
+#' @param n EXPERIMENTAL
+#' @param season.length EXPERIMENTAL
+#' @param group EXPERIMENTAL
+#' @param values EXPERIMENTAL
+#' @param A.msk EXPERIMENTAL
+#' @param ... EXPERIMENTAL
+#' 
+#' 
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#'
 effect.character = function(label,
                              data,
                              model,
@@ -87,7 +111,7 @@ effect.character = function(label,
     fcall[[2]] = ""
     fcall[[2]] = as.symbol(label)
     fcall = fcall[!(names(fcall) %in% c("map","A.msk"))]
-    fvals = do.call(f, as.list(fcall[2:length(fcall)])) # eval(parse(text=deparse(fcall)))
+    fvals = do.call(INLA::f, as.list(fcall[2:length(fcall)])) # eval(parse(text=deparse(fcall)))
     effect$f = fvals
     effect$inla.formula = as.formula(paste0("~ . + ", paste0(deparse(fcall), collapse = "")))
     
@@ -136,7 +160,7 @@ effect.character = function(label,
 #'
 
 code.components = function(components) {
-  fname = "effect.character"
+  fname = "effect"
   tms = terms(components)
   codes = attr(tms, "term.labels")
   
