@@ -423,8 +423,6 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       "')"
     ))
   }
-  
-  print(length(ret))
 
   ret
 }
