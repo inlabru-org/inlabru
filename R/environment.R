@@ -35,8 +35,8 @@ requireINLA = function(){
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
 #' @examples
-#' 
-#' \donttest{
+#' \dontrun{
+#' # Note: Only run this if you want to change the inlabru options for this session
 #' 
 #' # Determine current bru default:
 #' bo = bru.options()
@@ -45,7 +45,7 @@ requireINLA = function(){
 #' bo$inla.options$control.inla
 #' 
 #' # Now, let's run init.tutorial() to make empirical Bayes the default 
-#' integration method when \code{bru} calls \code{inla}
+#' # integration method when \code{bru} calls \code{inla}
 #' 
 #' init.tutorial()
 #' 

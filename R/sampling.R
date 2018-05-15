@@ -184,15 +184,15 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (is.geocent) {
           area.mesh <- mesh
         } else if (use.crs) {
-          area.mesh <- inla.spTransform(mesh, CRSobj = internal.crs)
+          area.mesh <- INLA::inla.spTransform(mesh, CRSobj = internal.crs)
         } else {
           area.mesh <- mesh
           area.R <- 1
         }
-        areas <- inla.fmesher.smorg(area.mesh$loc,
-                                    area.mesh$graph$tv,
-                                    fem = 0,
-                                    output = "ta")$ta * area.R^2
+        areas <- INLA::inla.fmesher.smorg(area.mesh$loc,
+                                          area.mesh$graph$tv,
+                                          fem = 0,
+                                          output = "ta")$ta * area.R^2
         
         loglambda_tri <- matrix(loglambda[mesh$graph$tv], nrow(mesh$graph$tv), ncol(mesh$graph$tv))
         loglambda_max <- apply(loglambda_tri, 1, max)
