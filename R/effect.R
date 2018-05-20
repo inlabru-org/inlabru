@@ -110,9 +110,18 @@ effect.character = function(label,
     fcall[[1]] = "f"
     fcall[[2]] = ""
     fcall[[2]] = as.symbol(label)
-    fcall = fcall[!(names(fcall) %in% c("map","A.msk"))]
+    fcall = fcall[!(names(fcall) %in% c("map","A.msk", "mesh"))]
+    # For SPDE models we need a little nasty trick
+    if ( model.type %in% c("spde") ) {
+      tmp = NA
+      fcall$group = as.symbol("tmp") 
+    }
     fvals = do.call(INLA::f, as.list(fcall[2:length(fcall)])) # eval(parse(text=deparse(fcall)))
     effect$f = fvals
+    # Second part of the trick above
+    if ( model.type %in% c("spde") ) { 
+      fcall$group = as.symbol(paste0(label, ".group"))
+    }
     effect$inla.formula = as.formula(paste0("~ . + ", paste0(deparse(fcall), collapse = "")))
     
     
