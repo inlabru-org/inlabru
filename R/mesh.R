@@ -19,7 +19,7 @@ setClass("inla.mesh")
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
 #' @examples 
-#' \donttest{
+#' \dontrun{
 #' if (require("INLA", quietly = TRUE)) {
 #' # Load Gorilla data
 #' 
