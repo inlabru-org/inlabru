@@ -374,8 +374,11 @@ list.A.model = function(model, points){
     } else if ( is.null(eff$mesh) ) {
       idx = mapper(eff$map, points, eff)
       if (is.data.frame(idx)) idx = idx[,1]
-      A = matrix(0, nrow = nrow(data.frame(points)), ncol=eff$n)
-      A[cbind(1:nrow(A), idx)] = 1
+      N <- nrow(data.frame(points))
+      A = Matrix::sparseMatrix(i = seq_len(N),
+                               j = idx,
+                               x = rep(1, N),
+                               dims = c(N, eff$n))
       A.lst[[eff$label]] = A
     } else {
       
@@ -399,10 +402,10 @@ list.A.model = function(model, points){
       A = INLA::inla.spde.make.A(eff$mesh, loc = loc, group = group, n.group = ng)
       # Mask columns of A
       if (!is.null(eff$A.msk)) { A = A[, as.logical(eff$A.msk), drop=FALSE]}
-      # Weights for models with A-matrix are realized in the follwoing way:
+      # Weights for models with A-matrix are realized in the following way:
       if (!is.null(eff$weights)) {
-        w = eff$weights
-        A = as.matrix(A)*as.vector(w)
+        w = as.vector(eff$weights)
+        A = Matrix::Diagonal(length(w), w) %*% A
       }
       A.lst[[eff$label]] = A
 
