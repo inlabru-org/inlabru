@@ -39,7 +39,7 @@ This affects \code{R} and the permitted values for \code{strategy}.}
 A \code{data.frame} (1D case),
   SpatialPoints (2D flat and 3D spherical surface cases)
   SpatialPointsDataFrame (2D/3D surface cases with multiple samples).
-  For multiple samples, the \code{data.frame} output has a 
+  For multiple samples, the \code{data.frame} output has a
   column \code{'sample'} giving the index for each sample.
 object of point locations.
 }
