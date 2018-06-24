@@ -26,8 +26,10 @@ This function generates a \link{geom_point} object showing the knots (vertices)
 of a 1D mesh.
 }
 \examples{
-
 \donttest{
+# Some features use the INLA package.
+if (require("INLA", quietly = TRUE)) {
+
 # Load INLA
 
 library(INLA)
@@ -43,7 +45,8 @@ ggplot() + gg(mesh)
 # Plot it using a different shape and size for the mesh nodes
 
 ggplot() + gg(mesh, shape = "|", size = 5)
-}
+
+}}
 }
 \seealso{
 Other geomes for meshes: \code{\link{gg.inla.mesh}},

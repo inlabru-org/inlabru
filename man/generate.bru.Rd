@@ -16,23 +16,21 @@
 \item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. 
 The default is rather low but provides a quick approximate result.}
 
-\item{...}{ignored arguments (needed for S3 compatibility).}
+\item{...}{additional, unused arguments.}
 }
 \value{
-Predicted values
+List of generated samples
 }
 \description{
 Takes a fitted \code{bru} object produced by the function \link{bru}() and produces samples given 
 a new set of values for the model covariates or the original values used for the model fit. The
 samples can be based on any R expression that is valid given these values/covariates and the joint
 posterior of the estimated random effects.
- 
-Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
-median, variance, coefficient of variation as well as the variance and minimum and maximum sample
-value drawn in course of estimating the statistics.
 }
 \examples{
 \donttest{
+if (require("INLA", quietly = TRUE)) {
+  
 # Generate data for a simple linear model
 
 input.df <- data.frame(x=cos(1:10))
@@ -62,8 +60,13 @@ smp[[1]]
 # ... and plot them
 
 plot(do.call(rbind, smp))
+
+}
 }
 }
 \seealso{
-Other sample generators: \code{\link{generate}}
+\link{predict.bru}
+
+Other sample generators: \code{\link{generate.inla}},
+  \code{\link{generate}}
 }

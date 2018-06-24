@@ -7,9 +7,9 @@
 \method{predict}{inla}(object, ...)
 }
 \arguments{
-\item{object}{An object obtained by calling \link{bru} or \link{lgcp}.}
+\item{object}{A \code{bru} object obtained by calling \link{bru} or \link{lgcp}.}
 
-\item{...}{Arguments passed on to predict.bru().}
+\item{...}{Arguments passed on to \link{predict.bru}.}
 }
 \value{
 A \code{prediction} object.
@@ -20,13 +20,10 @@ new set of values for the model covariates or the original values used for the m
 The predictions can be based on any R expression that is valid given these values/covariates 
 and the posterior of the estimated effects.
 }
-\details{
-IMPORTANT: The inla object provided has to have an additional field called "formula". This
-is the formula used to call the inla() function and will be used to convert the inla object
-to a bru object. Thereafter, preict.bru() is called to perform the prediction.
-}
 \examples{
-\dontrun{
+\donttest{
+# Some features use the INLA package.
+if (require("INLA", quietly = TRUE)) {
 
 # Generate some data
 
@@ -38,16 +35,13 @@ input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
 formula = y ~ x
 fit <- inla(formula, "gaussian", data = input.df, control.compute=list(config = TRUE))
 
-# Add formula to inla object
-
-fit$formula = y ~ x
-
-Estimate posterior statistics of exp(x), where x is the random effect.
+# Estimate posterior statistics of exp(x), where x is the fixed effect.
 
 xpost = predict(fit, NULL, ~ exp(x))
 xpost
 plot(xpost)
 
+}
 }
 }
 \author{

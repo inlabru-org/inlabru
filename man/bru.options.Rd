@@ -32,7 +32,7 @@ Additional \link{bru} options
 }
 \examples{
 
-\dontrun{
+\donttest{
 
 # Generate default bru options
 opts = bru.options()

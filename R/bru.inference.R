@@ -112,14 +112,25 @@ bru = function(components = y ~ Intercept,
   }
   
   # Set max interations to 1 if all likelihood formulae are linear 
-  if (all(sapply(lhoods, function(lh) lh$linear))) { options$max.iter = 1 }
+  if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) { options$max.iter <- 1 }
   
   # Extract the family of each likelihood
-  family = sapply(1:length(lhoods), function(k) lhoods[[k]]$inla.family)
+  family <- vapply(seq_along(lhoods), function(k) lhoods[[k]]$inla.family, "family")
   
   # Run iterated INLA
-  if ( options$run ) { result = do.call(iinla, list(data, bru.model, stk, family = family, n = options$max.iter, offset = options$offset, result = options$result, inla.options = options$inla.options))} 
-  else { result = list() }
+  if (options$run) {
+    result <- do.call(iinla,
+                      list(data,
+                           bru.model,
+                           stk,
+                           family = family,
+                           n = options$max.iter,
+                           offset = options$offset,
+                           result = options$result,
+                           inla.options = options$inla.options))
+  } else {
+    result <- list()
+  }
   
   ## Create result object ## 
   result$sppa$method = "bru"
@@ -256,7 +267,7 @@ stackmaker.like = function(lhood) {
 #' 
 #' @examples
 #' 
-#' \dontrun{
+#' \donttest{
 #' 
 #' # Generate default bru options
 #' opts = bru.options()
@@ -437,10 +448,10 @@ bru.components = function() { NULL }
 #' @return An \link{bru} object
 #' @examples
 #' 
-#' \dontrun{
+#' \donttest{
 #' 
-#' Load the Gorilla data
-#' data(gorillas)
+#' # Load the Gorilla data
+#' data(gorillas, package = "inlabru")
 #' 
 #' # Use tutorial setting and thus empirical Bayes for faster inference
 #' init.tutorial()
@@ -460,6 +471,7 @@ bru.components = function() { NULL }
 #' # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 #' cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #' 
+#' if (require("INLA", quietly = TRUE)) {
 #' # Fit the model
 #' fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
 #' 
@@ -474,6 +486,7 @@ bru.components = function() { NULL }
 #'   gg(gorillas$boundary) + 
 #'   coord_fixed()
 #' 
+#' }
 #' }
 #' 
 
@@ -668,7 +681,7 @@ predict.bru = function(object,
         smy[[nm]] = summarize(lapply(vals, function(v) v[[nm]]), x = vals[[1]][,covar,drop=FALSE])
     }
     vals = smy
-    is.annot = sapply(names(vals), function(v) all(vals[[v]]$sd==0))
+    is.annot <- vapply(names(vals), function(v) all(vals[[v]]$sd == 0), TRUE)
     annot = do.call(cbind, lapply(vals[is.annot], function(v) v[,1]))
     vals = vals[!is.annot]
     if ( !is.null(annot) ) {
@@ -696,10 +709,6 @@ predict.bru = function(object,
 #' samples can be based on any R expression that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
 #'  
-#' Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
-#' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
-#' value drawn in course of estimating the statistics.
-#'
 #' @aliases generate.bru
 #' @export
 #' @family sample generators
@@ -708,9 +717,10 @@ predict.bru = function(object,
 #' @param formula A formula determining which effects to sample from and how to combine them analytically.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. 
 #'                  The default is rather low but provides a quick approximate result.
-#' @param ... ignored arguments (needed for S3 compatibility).
+#' @param ... additional, unused arguments.
 #' 
-#' @return Predicted values
+#' @return List of generated samples
+#' @seealso \link{predict.bru}
 #' @example inst/examples/generate.bru.R
 
 generate.bru = function(object,
@@ -924,12 +934,13 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     if ( k > 1 ) { old.result = result } 
     result = NULL
     
-    icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, y.inla ~ .),
-                                                   data = c(inla.stack.mdata(stk), list.data(model)),
+    stk.data <- INLA::inla.stack.data(stk)
+    icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, BRU.response ~ .),
+                                                   data = c(stk.data, list.data(model)),
                                                    family = family,
                                                    control.predictor = list( A = INLA::inla.stack.A(stk), compute = TRUE),
-                                                   E = INLA::inla.stack.data(stk)$e,
-                                                   offset = INLA::inla.stack.data(stk)$bru.offset + offset),
+                                                   E = stk.data[["BRU.E"]],
+                                                   offset = stk.data[["BRU.offset"]] + offset),
                                                    inla.options)), 
                               error = warning
                             )

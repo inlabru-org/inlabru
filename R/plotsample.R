@@ -52,12 +52,16 @@ makepoly=function(start,width,height) {
 #'    }}
 #'  }.
 #'  
-#' @examples 
+#' @examples
 #' \donttest{
-#' library(raster)
-#' data(gorillas)
+#' # Some features require the raster package
+#' if (require("raster", quietly = TRUE)) {
+#' 
+#' data(gorillas, package = "inlabru")
 #' plotpts = plotsample(gorillas$nests,gorillas$boundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
 #' ggplot() +gg(plotpts$plots) +gg(plotpts$dets,pch="+",cex=2) +gg(gorillas$boundary)
+#'
+#' }
 #' }
 #' 
 #' @export
@@ -112,10 +116,12 @@ plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
 #'
 #' @return A \code{SpatialPolygonsDataFrame} with counts in each plot contained in slot @data$n.
 #'
-#' @examples 
+#' @examples
 #' \donttest{
-#' library(raster)
-#' data(gorillas)
+#' # Some features require the raster package
+#' if (require("raster", quietly = TRUE)) {
+#'
+#' data(gorillas, package = "inlabru")
 #' plotpts = plotsample(gorillas$nests,gorillas$boundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
 #' p1 = ggplot() +gg(plotpts$plots) +gg(plotpts$dets) +gg(gorillas$boundary)
 #' countdata = point2count(plotpts$plots,plotpts$dets)
@@ -124,7 +130,10 @@ plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
 #' count=countdata@data$n
 #' p2 = ggplot() +gg(gorillas$boundary) +gg(plotpts$plots) +  geom_text(aes(label=count, x=x, y=y))
 #' multiplot(p1,p2,cols=2)
+#'
 #' }
+#' }
+#'
 #' @export
 #' 
 point2count = function(plots,dets) {

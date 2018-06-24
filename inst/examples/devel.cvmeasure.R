@@ -1,7 +1,9 @@
-\dontrun{
+\donttest{
+if (require("INLA", quietly = TRUE)) {
+  
 # Load Gorilla data
 
-data("gorillas")
+data("gorillas", package = "inlabru")
 
 # Use RColorBrewer 
 
@@ -85,4 +87,4 @@ vm.int <- devel.cvmeasure(joint, field, veg,
 vm.int
 
 }
-
+}

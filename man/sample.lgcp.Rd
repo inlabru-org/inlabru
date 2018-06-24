@@ -4,41 +4,71 @@
 \alias{sample.lgcp}
 \title{Sample from an inhomogeneous Poisson process}
 \usage{
-sample.lgcp(mesh, loglambda, strategy = "rectangle", R = 6371,
-  samplers = NULL)
+sample.lgcp(mesh, loglambda, strategy = NULL, R = NULL, samplers = NULL,
+  ignore.CRS = FALSE)
 }
 \arguments{
 \item{mesh}{An \link[INLA]{inla.mesh} object}
 
-\item{loglambda}{A vector of log intensities at the mesh vertices (for higher order basis functions, e.g. 
-for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis 
-function weights rather than the values at the \code{mesh$n} vertices)}
+\item{loglambda}{vector or matrix; A vector of log intensities at the mesh vertices
+(for higher order basis functions, e.g.
+for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis
+function weights rather than the values at the \code{mesh$n} vertices)
+A single scalar is expanded to a vector of the appropriate length.
+If a matrix is supplied, one process sample for each column is produced.}
 
-\item{strategy}{Only relevant for 2D meshes. Use "rectangle" for flat 2D meshes and "spherical" or 
-"sliced-spherical" for spherical meshes.}
+\item{strategy}{Only relevant for 2D meshes. One of \code{'triangulated'}, \code{'rectangle'},
+\code{'sliced-spherical'}, \code{'spherical'}. The \code{'rectangle'} method is only valid for
+CRS-less flat 2D meshes.
+If \code{NULL} or \code{'auto'}, the the likely fastest method is chosen;
+\code{'rectangle'} for flat 2D meshes with no CRS,
+\code{'sliced-spherical'} for CRS \code{'longlat'} meshes, and
+\code{'triangulated'} for all other meshes.}
 
-\item{R}{Numerical value only applicable to spherical meshes. This sets the radius of the sphere 
-approximated by the mesh. The default is 6371, which is approximately the radius of the earth 
-in kilometers.}
+\item{R}{Numerical value only applicable to spherical and geographical meshes. It is interpreted as
+\code{R} is the equivalent Earth radius, in km, used to scale the lambda intensity.
+  For CRS enabled meshes, the default is 6371. For CRS-less spherical meshes, the default is 1.}
 
-\item{samplers}{A SpatialPolygonsDataFrame. Simulated points that fall outside these polygons are discarded.}
+\item{samplers}{A `SpatialPolygonsDataFrame` or `inla.mesh` object.
+Simulated points that fall outside these polygons are discarded.}
+
+\item{ignore.CRS}{logical; if \code{TRUE}, ignore any CRS information in the mesh. Default \code{FALSE}.
+This affects \code{R} and the permitted values for \code{strategy}.}
 }
 \value{
-A \code{data.frame} (1D case) or SpatialPoints (2D case) object of point locations.
+A \code{data.frame} (1D case),
+  SpatialPoints (2D flat and 3D spherical surface cases)
+  SpatialPointsDataFrame (2D/3D surface cases with multiple samples).
+  For multiple samples, the \code{data.frame} output has a
+  column \code{'sample'} giving the index for each sample.
+object of point locations.
 }
 \description{
 This function provides point samples from one- and two-dimensional inhomogeneous Poisson processes. The
-log intensity has to be provided via its values at the nodes of an \code{inla.mesh.1d} or 
+log intensity has to be provided via its values at the nodes of an \code{inla.mesh.1d} or
 \code{inla.mesh} object. In between mesh nodes the log intensity is assumed to be linear.
 }
 \details{
-For 2D processes on a sphere the \code{R} parameter can be used to adjust to sphere's radius implied by 
-the mesh. If the intensity is very high the standard \code{strategy} "spherical" can cause memory issues. 
+For 2D processes on a sphere the \code{R} parameter can be used to adjust to sphere's radius implied by
+the mesh. If the intensity is very high the standard \code{strategy} "spherical" can cause memory issues.
 Using the "sliced-spherical" strategy can help in this case.
+
+
+\itemize{
+\item For crs-less meshes on R2: Lambda is interpreted in the raw coordinate system. Output has an NA CRS.
+\item For crs-less meshes on S2: Lambda with raw units, after scaling the mesh to radius \code{R}, if specified.
+  Output is given on the same domain as the mesh, with an NA CRS.
+\item For crs meshes on R2: Lambda is interpreted as per km^2, after scaling the globe to the Earth radius 6371 km,
+  or \code{R}, if specified. Output given in the same CRS as the mesh.
+\item For crs meshes on S2: Lambda is interpreted as per km^2, after scaling the globe to the Earth radius 6371 km,
+  or \code{R}, if specified. Output given in the same CRS as the mesh.
+}
 }
 \examples{
 \donttest{
-library(INLA)
+# The INLA package is required
+if (require("INLA", quietly = TRUE)) {
+
 vertices = seq(0, 3, by = 0.1)
 mesh = inla.mesh.1d(vertices)
 loglambda = 5-0.5*vertices
@@ -46,15 +76,25 @@ pts = sample.lgcp(mesh, loglambda)
 pts$y = 0
 plot(vertices, exp(loglambda), type = "l", ylim = c(0,150))
 points(pts, pch = "|" )
+
+}
 }
 
-\donttest{ 
-data("gorillas")
-pts = sample.lgcp(gorillas$mesh, rep(1.5, gorillas$mesh$n))
+\donttest{
+# The INLA package is required
+if (require("INLA", quietly = TRUE)) {
+
+data("gorillas", package = "inlabru")
+pts = sample.lgcp(gorillas$mesh,
+                  loglambda = 1.5,
+                  samplers = gorillas$boundary)
 ggplot() + gg(gorillas$mesh) + gg(pts)
+
+}
 }
 }
 \author{
-Daniel Simpson <\email{dp.simpson@gmail.com}> (base algorithm), 
-Fabian E. Bachl <\email{bachlfab@gmail.com}> (inclusion in inlabru, sliced spherical sampling)
+Daniel Simpson <\email{dp.simpson@gmail.com}> (base rectangle and spherical algorithms),
+Fabian E. Bachl <\email{bachlfab@gmail.com}> (inclusion in inlabru, sliced spherical sampling),
+Finn Lindgren <\email{finn.lindgren@gmail.com}> (extended CRS support, triangulated sampling)
 }

@@ -1,15 +1,22 @@
 Package: inlabru
 Type: Package
 Title: Spatial Inference using Integrated Nested Laplace Approximation
-Version: 2.1.4
-Date: 2018-03-25
-Author: Fabian E. Bachl <bachlfab@gmail.com> (main code), 
-        Finn Lindgren <Finn.Lindgren@ed.ac.uk> (SPDE posterior plotting),
-        David L. Borchers <dlb@st-andrews.ac.uk> (Gorilla data import and sampling, multiplot tool), 
-        Daniel Simpson <dp.simpson@gmail.com> (basic LGCP sampling method),
-        Lindesay Scott-Hayward <lass@@st-andrews.ac.uk> (MRSea data import)
-Maintainer: Fabian E. Bachl <bachlfab@gmail.com>
+Version: 2.1.5
+Authors@R: c(
+  person("Fabian E.", "Bachl", email = "bachlfab@gmail.com", role = c("aut", "cre"),
+         comment = "Fabian Bachl wrote the main code"),
+  person("Finn", "Lindgren", email = "Finn.Lindgren@ed.ac.uk", role = c("aut"),
+         comment = c(ORCID = "0000-0002-5833-2011",
+                     "Finn Lindgren wrote code for SPDE posterior plotting, and continued development of the main code")),
+  person("David L.", "Borchers", email = "dlb@st-andrews.ac.uk", role = c("ctb"),
+         comment = "David Borchers wrote code for Gorilla data import and sampling, multiplot tool"),
+  person("Daniel", "Simpson", email = "dp.simpson@gmail.com", role = c("ctb"),
+         comment = "Daniel Simpson wrote the basic LGCP sampling method"),
+  person("Lindesay", "Scott-Howard", email ="lass@@st-andrews.ac.uk", role = c("ctb"),
+         comment = "Lindesay Scott-Howard provied MRSea data import code")
+  )
 URL: http://www.inlabru.org, 
+BugReports: https://github.com/fbachl/inlabru/issues
 Description: Facilitates spatial modeling using integrated nested Laplace approximation via the 
   INLA package (<http://www.r-inla.org>). Additionally, implements a log Gaussian Cox process likelihood for 
   modeling univariate and spatial point processes based on ecological survey data. See Yuan Yuan, 
@@ -36,11 +43,14 @@ Suggests:
     RColorBrewer,
     graphics,
     INLA,
+    knitr,
+    rmarkdown
 Depends:
     R (>= 3.3),
     sp,
     stats,
     methods,
     ggplot2,
-Additional_repositories: https://www.math.ntnu.no/inla/R/testing
+Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr

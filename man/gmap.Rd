@@ -18,10 +18,13 @@ a ggplot object
 Uses get_map() to query map services like Google Maps for a region centered around
 the spatial object provided. Then calls ggmap() to plot the map.
 }
+\details{
+This function requires the `ggmap` package.
+}
 \examples{
-\dontrun{
+\donttest{
 # Load the Gorilla data
-data(gorillas)
+data(gorillas, package = "inlabru")
  
 # Create a base map centered around the nests and plot the boundary as well as the nests
 gmap(gorillas$nests, maptype = "satellite") + 

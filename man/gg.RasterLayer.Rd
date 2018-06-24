@@ -21,19 +21,26 @@ An object returned by \link{geom_tile}
 This function takes a RasterLayer object, converts it into a SpatialPixelsDataFrame and
 uses \link{geom_tile} to plot the data.
 }
+\details{
+This function requires the `raster` package.
+}
 \examples{
+# Some features require the raster and spatstat.data packages.
+if (require("spatstat.data", quietly = TRUE) &&
+    require("raster", quietly = TRUE)) {
 
 # Load Gorilla data
 data("gorillas", package = "spatstat.data")
 
 # Convert elevation covariate to RasterLayer
 
-library(raster)
 elev = as(gorillas.extra$elevation, "RasterLayer")
 
 # Plot the elevation
 
 ggplot() + gg(elev)
+
+}
 }
 \seealso{
 Other geomes for Raster data: \code{\link{gg}},

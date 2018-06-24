@@ -2,6 +2,8 @@
 #' 
 #' Creates a textured sphere and lon/lat coordinate annotations.
 #' 
+#' This funciton requires the `rgl` and `sphereplot` packages.
+#' 
 #' @aliases globe
 #' @name globe
 #' @export
@@ -198,7 +200,7 @@ play.spatial = function(group = list(), rgl, ...){
     rgl::par3d(skipRedraw = TRUE)
     grp = list()
     grp[[names(group)[[1]]]] = group[[1]][(floor(time) %% 2)+1]
-    do.call(pixelplot.mesh, c(sargs, list(group = grp, add = TRUE, rgl = TRUE))) ;
+    do.call(pixelplot.mesh, c(sargs, list(group = grp, add = TRUE, rgl = TRUE)))
     rgl::par3d(skipRedraw = FALSE)
     return("")
   }

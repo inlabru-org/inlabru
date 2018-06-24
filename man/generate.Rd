@@ -20,6 +20,8 @@ which depend on the class of the first argument.
 }
 \examples{
 \donttest{
+if (require("INLA", quietly = TRUE)) {
+  
 # Generate data for a simple linear model
 
 input.df <- data.frame(x=cos(1:10))
@@ -49,8 +51,11 @@ smp[[1]]
 # ... and plot them
 
 plot(do.call(rbind, smp))
+
+}
 }
 }
 \seealso{
-Other sample generators: \code{\link{generate.bru}}
+Other sample generators: \code{\link{generate.bru}},
+  \code{\link{generate.inla}}
 }

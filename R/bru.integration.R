@@ -37,22 +37,20 @@
 #' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
 #' 
 #' @examples
-#' 
 #' \donttest{
+#' if (require("INLA", quietly = TRUE)) {
+#' 
 #' # Create 50 integration points covering the dimension 'myDim' between 0 and 10. 
 #' 
 #' ips = ipoints(c(0,10), 50, name = "myDim")
 #' plot(ips)
-#' 
 #' 
 #' # Create integration points for the two intervals [0,3] and [5,10]
 #' 
 #' ips = ipoints(matrix(c(0,3, 5,10), nrow = 2, byrow = TRUE), 50)
 #' plot(ips)
 #' 
-#' 
 #' # Convert a 1D mesh into integration points
-#' library(INLA)
 #' mesh = inla.mesh.1d(seq(0,10,by = 1))
 #' ips = ipoints(mesh, name = "time")
 #' plot(ips)
@@ -75,7 +73,7 @@
 #' 
 #' ips = ipoints(gorillas$mesh)
 #' ggplot() + gg(gorillas$boundary) + gg(ips, aes(size = weight))
-#' 
+#' }
 #' }
 
 ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, project) {
@@ -246,8 +244,9 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
 #' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of multidimensional integration points and their weights
 #' 
 #' @examples
-#'
 #' \donttest{
+#' # ipoints needs INLA
+#' if (require("INLA", quietly = TRUE)) {
 #' # Create integration points in dimension 'myDim' and 'myDiscreteDim' 
 #' ips1 = ipoints(c(0,8), name = "myDim")
 #' ips2 = ipoints(as.integer(c(1,2,3)), name = "myDiscreteDim")
@@ -258,10 +257,11 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
 #' # Plot the integration points
 #' plot(ips$myDim, ips$myDiscreteDim, cex = 10*ips$weight)
 #' }
+#' }
 
 cprod = function(...) {
   ipl = list(...)
-  ipl = ipl[!sapply(ipl, is.null)]
+  ipl = ipl[!vapply(ipl, is.null, TRUE)]
   if ( length(ipl) == 0 ) return(NULL)
   
   if ( length(ipl) == 1 ) {
@@ -510,7 +510,7 @@ vertex.projection.1d = function(points, mesh, group = NULL, column = "weight", s
 
 #' Weighted summation (integration) of data frame subsets
 #'
-#' A typicel task in statistical inference to integrate a (multivariate) function along one or
+#' A typical task in statistical inference to integrate a (multivariate) function along one or
 #' more dimensions of its domain. For this purpose, the function is evaluated at some points
 #' in the domain and the values are summed up using weights that depend on the area being 
 #' integrated over. This function performs the weighting and summation conditional for each level
@@ -526,8 +526,9 @@ vertex.projection.1d = function(points, mesh, group = NULL, column = "weight", s
 #' @return A \code{data.frame} of integrals, one for each level of the cross product of all dimensions not being integrated over.
 #' 
 #' @examples 
-#' 
 #' \donttest{
+#' # ipoints needs INLA
+#' if (require("INLA", quietly = TRUE)) {
 #' # Create integration points in two dimensions, x and y
 #'
 #' ips = cprod(ipoints(c(0,10), 10, name = "x"),
@@ -538,6 +539,7 @@ vertex.projection.1d = function(points, mesh, group = NULL, column = "weight", s
 #' # domain size 40
 #'
 #' int(ips, rep(1, nrow(ips)), c("x","y"))
+#' }
 #' }
 
 

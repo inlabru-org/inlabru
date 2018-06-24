@@ -17,7 +17,7 @@ int(data, values, dims = NULL)
 A \code{data.frame} of integrals, one for each level of the cross product of all dimensions not being integrated over.
 }
 \description{
-A typicel task in statistical inference to integrate a (multivariate) function along one or
+A typical task in statistical inference to integrate a (multivariate) function along one or
 more dimensions of its domain. For this purpose, the function is evaluated at some points
 in the domain and the values are summed up using weights that depend on the area being 
 integrated over. This function performs the weighting and summation conditional for each level
@@ -26,8 +26,9 @@ dimensions to integrate over. The set of dimensions that are held fixed is the s
 of all column names in \code{data} and the dimensions stated by \code{dims}.
 }
 \examples{
-
 \donttest{
+# ipoints needs INLA
+if (require("INLA", quietly = TRUE)) {
 # Create integration points in two dimensions, x and y
 
 ips = cprod(ipoints(c(0,10), 10, name = "x"),
@@ -38,5 +39,6 @@ ips = cprod(ipoints(c(0,10), 10, name = "x"),
 # domain size 40
 
 int(ips, rep(1, nrow(ips)), c("x","y"))
+}
 }
 }
