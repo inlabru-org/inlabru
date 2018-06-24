@@ -10,6 +10,8 @@
 
 * Fix `sample.lgcp` output formatting, extended CRS support, and more efficient sampling algorithm
 
+* Avoid dense matrices for effect mapping
+
 # inlabru 2.1.4
 
 * `iinla()` tracks convergence of both fixed and random effects
