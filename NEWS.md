@@ -1,4 +1,8 @@
-# inlabru 2.1.4.999
+#inlabru 2.1.6
+
+* Updated NEWS
+
+# inlabru 2.1.5
 
 * Added a `NEWS.md` file to track changes to the package.
 
