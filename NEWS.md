@@ -1,5 +1,7 @@
 # inlabru 2.1.7.999
 
+* Fix bru() to like() parameter logic. (Thanks to Peter Vesk for bug example)
+
 # inlabru 2.1.7
 
 * Added a `NEWS.md` file to track changes to the package.

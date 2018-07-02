@@ -41,11 +41,15 @@ generate = function(object, ...){ UseMethod("generate") }
 #'               (see \code{inla.models()$likelihood}) inlabru supports fitting Cox processes 
 #'               via \code{family = "cp"}. The latter requires contructing a likelihood using the \link{like}
 #'               function and providing it via the ... parameter list. As an alternative to bru, the \link{lgcp} 
-#'               function provides a convenient interface to fitting Cox processes.
-#' @param data A data.frame or SpatialPoints[DataFrame] object.
-#' @param ... Additional likelihoods, each constructed by a calling \link{like}.
+#'               function provides a convenient interface to fitting Cox processes. See details.
+#' @param data A data.frame or SpatialPoints[DataFrame] object. See details.
+#' @param ... Additional likelihoods, each constructed by a calling \link{like}. See details.
 #' @param options A list of name and value pairs that are either interpretable by \link{bru.options} 
-#'                or valid inla parameters.
+#'                or valid inla parameters. 
+#'                
+#' @details family and ... must either be parameters to \link{like}, or \code{lhood} objects constructed by \link{like}.
+#'          \code{data} must either be an \code{lhood} object, a data container, or \code{NULL}. If \code{NULL},
+#'          data must be supplied through direct calls to \link{like}.
 #' 
 #' @return bru returns an object of class "bru". A \code{bru} object inherits from \link[INLA]{inla} 
 #'         (see the inla documentation for its properties) and adds additional information stored 
@@ -75,35 +79,46 @@ bru = function(components = y ~ Intercept,
   # by like(). In the former case constrcut a proper likelihood using like() and
   # merge it with the list of likelihood provided via `...`.
   
-  lhoods = list()
-  if ( inherits(family, "lhood") & inherits(data, "lhood") ) {
-    lhoods = c(lhoods, list(default = family, lh2 = data)) ; data = NULL ; family = NULL
-  } else if ( inherits(family, "lhood") & !inherits(data, "lhood") ) {
-    lhoods = c(list(default = family), lhoods) ; family = NULL 
-  } else if ( !inherits(family, "lhood") & inherits(data, "lhood") ) {
-    lhoods = c(list(default = like(family), lh2 = data), lhoods); data = NULL 
+  dot_is_lhood <- vapply(list(...), function(lh) inherits(lh, "lhood"), TRUE)
+  if (inherits(family, "lhood") | inherits(data, "lhood")) {
+    ## Check that family and all '...' are lhood objects
+    if (!inherits(family, "lhood") | !all(dot_is_lhood)) {
+      stop("Cannot mix like() parameters with 'lhood' objects.")
+    }
+    if (inherits(data, "lhood")) {
+      lhoods = list(family, data, ...) ; data = NULL ; family = NULL
+    } else {
+      lhoods = list(family, ...) ; family = NULL 
+    }
+  } else if (any(dot_is_lhood)) {
+    if (!is.null(family)) {
+      stop("Cannot mix like() parameters with 'lhood' objects.")
+    }
+    if (!all(dot_is_lhood)) {
+      stop("Cannot mix like() parameters with 'lhood' objects.")
+    }
+    lhoods = list(...)
   } else {
-    if( !is.null(family) ) { lhoods = c(list(default = like(family, data = data, E = options$E))); family = NULL }
+    lhoods = list(like(family = family, data = data, ..., options = options)); family = NULL
   }
-  lhoods = c(lhoods, list(...))
-  
-  
+
+  if (length(lhoods) == 0) {
+    stop("No response likelihood models provided.")
+  }
+
   # If a likelihood was provided without data/response, update according to bru's 
   # arguments `data` and LHS of components
   
-  for (k in 1:length(lhoods)) {
-    
-    lh = lhoods[[k]]
-    
+  for (k in seq_along(lhoods)) {
     # Check if likelihood has data attached to it. If not, attach the 'data' argument or break if not available
-    if ( is.null(lh$data) ) {
-      if (is.null(data)) {stop(sprintf("Likelihood %s has not data attached to it and no data was supplied to bru() either.", names(lhoods)[[k]]))}
-      lh$data = data
+    if ( is.null(lhoods[[k]]$data) ) {
+      if (is.null(data)) {
+        stop(paste0("Likelihood ", k, " has no data attached to it and no data was supplied to bru()."))
+      }
+      lhoods[[k]]$data = data
     }
-    if ( is.null(lh$components) ) { lh$components = components }
-    if ( is.null(lh$response) ) { lh$response = all.vars(update(components, .~0)) }
-    
-    lhoods[[k]] = lh
+    if ( is.null(lhoods[[k]]$components) ) { lhoods[[k]]$components = components }
+    if ( is.null(lhoods[[k]]$response) ) { lhoods[[k]]$response = all.vars(update(components, .~0)) }
   }
   
   # Create joint stackmaker
@@ -154,16 +169,23 @@ bru = function(components = y ~ Intercept,
 #' @param data Likelihood-specific data.
 #' @param components Components.
 #' @param mesh An inla.mesh object.
-#' @param E Exposure parameter for family = 'poisson' passed on to \link[INLA]{inla}. Special case if family is 'cp': rescale all integration weights by E.
+#' @param E Exposure parameter for family = 'poisson' passed on to
+#'   \link[INLA]{inla}. Special case if family is 'cp': rescale all integration
+#'   weights by E. Default taken from \code{options$E}.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides \code{samplers}.
 #' @param domain Named list of domain definitions.
+#' @param options list of global options overriding \link{bru.options}
 #' 
 #' @return A likelihood configuration which can be used to parameterize \link{bru}.
 #' 
 #' @example inst/examples/like.R
 
-like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = NULL, E = 1, samplers = NULL, ips = NULL, domain = NULL) {
+like = function(family, formula = . ~ ., data = NULL, components = NULL,
+                mesh = NULL, E = NULL, samplers = NULL, ips = NULL, domain = NULL,
+                options = list()) {
+
+  options = do.call(bru.options, options)
   
   # Some defaults
   inla.family = family
@@ -172,13 +194,19 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL, mesh = 
   linear = as.character(formula)[length(as.character(formula))] == "."
   
   # If not linear, set predictor expression according to the formula's RHS
-  if ( !linear ) { expr = parse(text = as.character(formula)[length(as.character(formula))]) }
-  else { expr = NULL }
+  if ( !linear ) {
+    expr = parse(text = as.character(formula)[length(as.character(formula))])
+  } else {
+    expr = NULL
+  }
   
   # Set response name
   response = all.vars(update(formula, .~0))
   if (response[1] == ".") response = NULL
   
+  if (is.null(E)) {
+    E <- options$E
+  }
   
   # More on special bru likelihoods
   if ( family == "cp" ) {
@@ -230,18 +258,21 @@ stackmaker.like = function(lhood) {
   env = new.env() ; env$lhood = lhood
   
   # Special inlabru likelihoods
-  if (lhood$family == "cp"){
-    sm = function(model, result) {
-      INLA::inla.stack(make.stack(points = lhood$data, model = model, expr = lhood$expr, y = 1, E = 0, result = result),
-                 make.stack(points = lhood$ips, model = model, expr = lhood$expr, y = 0, E = lhood$E * lhood$ips$weight, offset = 0, result = result))
+  if (lhood$family == "cp") {
+    sm <- function(model, result) {
+      INLA::inla.stack(
+        make.stack(points = lhood$data, model = model, expr = lhood$expr, y = 1,
+                   E = 0, result = result),
+        make.stack(points = lhood$ips, model = model, expr = lhood$expr, y = 0,
+                   E = lhood$E * lhood$ips$weight, offset = 0, result = result)
+      )
     }
-    
-  } else { 
-    
-    sm = function(model, result) { 
-      make.stack(points = lhood$data, model = model, expr = lhood$expr, y = as.data.frame(lhood$data)[,lhood$response], E = lhood$E, result = result) 
+  } else {
+    sm <- function(model, result) {
+      make.stack(points = lhood$data, model = model, expr = lhood$expr,
+                 y = as.data.frame(lhood$data)[, lhood$response],
+                 E = lhood$E, result = result)
     }
-    
   }
   environment(sm) = env
   sm
@@ -496,10 +527,11 @@ lgcp = function(components,
                 domain = NULL,
                 ips = NULL,
                 formula = . ~ .,
-                E = 1,
+                E = NULL,
                 options = list()) {
-  
-  lik = like("cp", formula = formula, data = data, samplers = samplers, components = components, E = E, ips = ips, domain = domain)
+  lik = like("cp", formula = formula, data = data, samplers = samplers,
+             components = components, E = E, ips = ips, domain = domain,
+             options = options)
   result = bru(components, lik, options = options)
   
 }
