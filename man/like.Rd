@@ -5,7 +5,8 @@
 \title{Likelihood construction for usage with \link{bru}}
 \usage{
 like(family, formula = . ~ ., data = NULL, components = NULL,
-  mesh = NULL, E = 1, samplers = NULL, ips = NULL, domain = NULL)
+  mesh = NULL, E = NULL, samplers = NULL, ips = NULL, domain = NULL,
+  options = list())
 }
 \arguments{
 \item{family}{A character identifying a valid \link[INLA]{inla} likelihood. Alternatively 'cp' for Cox processes.}
@@ -18,13 +19,17 @@ like(family, formula = . ~ ., data = NULL, components = NULL,
 
 \item{mesh}{An inla.mesh object.}
 
-\item{E}{Exposure parameter for family = 'poisson' passed on to \link[INLA]{inla}. Special case if family is 'cp': rescale all integration weights by E.}
+\item{E}{Exposure parameter for family = 'poisson' passed on to
+\link[INLA]{inla}. Special case if family is 'cp': rescale all integration
+weights by E. Default taken from \code{options$E}.}
 
 \item{samplers}{Integration domain for 'cp' family.}
 
 \item{ips}{Integration points for 'cp' family. Overrides \code{samplers}.}
 
 \item{domain}{Named list of domain definitions.}
+
+\item{options}{list of global options overriding \link{bru.options}}
 }
 \value{
 A likelihood configuration which can be used to parameterize \link{bru}.

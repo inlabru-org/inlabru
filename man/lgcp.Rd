@@ -5,7 +5,7 @@
 \title{Log Gaussian Cox process (LGCP) inference using INLA}
 \usage{
 lgcp(components, data, samplers = NULL, domain = NULL, ips = NULL,
-  formula = . ~ ., E = 1, options = list())
+  formula = . ~ ., E = NULL, options = list())
 }
 \arguments{
 \item{components}{A formula describing the latent components}
