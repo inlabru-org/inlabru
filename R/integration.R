@@ -274,29 +274,56 @@ int.polygon = function(mesh, loc, group = NULL){
   if ( is.null(group) ) { group = rep(1, nrow(loc)) }
   ipsl = list()
   # print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
+  # Extract the mesh boundary
+  mesh_bnd <- INLA::inla.mesh.boundary(mesh)
   for ( g in unique(group) ) {
-    gloc = loc[group==g, ]
+    gloc = loc[group==g, , drop=FALSE]
     # Check where the polygon intersects with the mesh edges
-    sp = gloc[1:(nrow(gloc)-1),]
-    ep = gloc[2:nrow(gloc),]
-    sloc = split.lines(mesh, sp, ep, filter.zero.length = FALSE)$split.loc[,1:2]
-    if (!is.null(sloc)){ colnames(sloc) = colnames(loc) }
-    
+    sp = gloc[seq_len(nrow(gloc)-1), , drop=FALSE]
+    ep = gloc[1+seq_len(nrow(gloc)-1), , drop=FALSE]
+    sloc = split.lines(mesh, sp, ep,
+                       filter.zero.length = FALSE)$split.loc
+
     # plot(mesh) ; points(sp) ; points(ep) ; points(sloc)
-    bloc = rbind(gloc)
+    # Combine polygon with mesh boundary to get mesh covering the intersection,
+    # plus possible disconnected components.
+    bloc <- rbind(gloc)
+    if (ncol(bloc) == 2) {
+      bloc = cbind(bloc, 0)
+    }
     bnd = INLA::inla.mesh.segment(loc = bloc)
-    imesh = INLA::inla.mesh.create(boundary = bnd, loc = rbind(mesh$loc[,1:2], sloc[,1:2]))
+    
+    # Create domain mesh for disconnected component detection
+    gmesh = INLA::inla.mesh.create(boundary = bnd,
+                                   loc = sloc)
+    
+    # Create integration domain mesh
+    joint_bnd <- c(list(bnd), mesh_bnd)
+    joint_loc <- rbind(mesh$loc, sloc)
+    imesh = INLA::inla.mesh.create(boundary = joint_bnd,
+                                   loc = joint_loc)
     # plot(imesh) ; points(sp) ; points(ep) ; points(gloc)
     # plot(imesh) ; points(sp) ; points(ep) ; points(gloc) ; plot(mesh, add = TRUE)
     
-    ips = data.frame(imesh$loc[,1:2])
+    # Anly integrate mesh triangles that fall outside the domain
+    # Since all vertices in a component belong to triangles in the component,
+    # and no triangles lie both inside and outside the component,
+    # it's enough (barring numerical accuracy) to detect valid vertices.
+    ok <- inla.mesh.project(gmesh, imesh$loc)$ok
+
+    ips = data.frame(imesh$loc[ok, 1:2, drop=FALSE])
     colnames(ips) = c("x","y")
-    ips$weight = diag(as.matrix(INLA::inla.mesh.fem(imesh)$c0))
+    ips$weight = pmax(0, diag(as.matrix(INLA::inla.mesh.fem(imesh)$c0))[ok])
+    ok <- ips$weight > 0
+    if (!all(ok)) {
+      ips <- ips[ok,,drop=FALSE]
+    }
+    
     # ips = as.data.frame(project.weights(ips, mesh, mesh.coords = c("x","y")))
     ips$group = g
     ipsl = c(ipsl, list(ips))
   }
-  return(do.call(rbind,ipsl))
+  return(do.call(rbind, ipsl))
 }
 
 
