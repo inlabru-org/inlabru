@@ -38,7 +38,7 @@ effect.formula = function(formula, ...) {
   effects = lapply(parsed, function(x) eval(x, envir = environment(formula)))
   names(effects) = lapply(effects, function(x) x$label)
   
-  if ( length(effects)==1 ) effects = effects[[1]]
+  #if ( length(effects)==1 ) effects = effects[[1]]
   effects
 }
 
@@ -411,7 +411,8 @@ index.effect = function(effect, data) {
   
   if ( effect$type %in% c("spde") ) {
     if ( "m" %in% names(effect$mesh) ) {
-      idx = 1:effect$mesh$m # support inla.mesh.1d models
+      # idx = 1:effect$mesh$m # support inla.mesh.1d models
+      idx = INLA::inla.spde.make.index(name = effect$label, n.spde = effect$mesh$m)
       # If a is masked, correct number of indices
       if ( !is.null(effect$A.msk) ) { idx = 1:sum(effect$A.msk) }
     } else {
