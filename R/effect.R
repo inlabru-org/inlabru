@@ -2,10 +2,13 @@
 # GENERICS
 ####################################################################################################
 
-
+#' @export
 value = function(...){UseMethod("value")}
+#' @export
 amatrix = function(...){UseMethod("amatrix")}
+#' @export
 map = function(...){UseMethod("map")}
+#' @export
 index = function(...){UseMethod("index")}
 
 
@@ -28,6 +31,7 @@ effect = function(...){UseMethod("effect")}
 #'  
 #' @aliases effect.formula
 #' @export
+#' @method effect formula
 #' @param formula A formula defining the effect.
 #' @param ... EXPERIMENTAL
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
@@ -46,6 +50,7 @@ effect.formula = function(formula, ...) {
 #'  
 #' @aliases effect.character
 #' @export
+#' @method effect character
 #' @param label EXPERIMENTAL
 #' @param data EXPERIMENTAL
 #' @param model EXPERIMENTAL
@@ -208,24 +213,47 @@ code.components = function(components) {
 ####################################################################################################
 
 
-#' Sumarize an effect
+#' Summarize an effect
 #'  
 #' @aliases summary.effect
+#' @export
+#' @method summary effect
 #' @keywords internal
-#' @param effect An effect.
+#' @param object An effect.
 #' @param ... ignored.
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
 summary.effect = function(object, ...) {
   
-  eff = object
-  cat(paste0("Label:\t ", eff$label, "\n"))
-  cat(sprintf("Type:\t %s\n", eff$type))
-  cat(sprintf("Map:\t %s [class: %s] \n", deparse(eff$map), class(eff$map)))
-  cat(sprintf("f call:\t %s \n", eff$fchar))
-  cat("\n")
-  
+  eff <- list('Label' = object$label,
+              'Type' = object$type,
+              'Map' = sprintf("%s [class: %s]",
+                              deparse(object$map),
+                              class(object$map)),
+              'f call' = object$fchar)
+  class(eff) <- c('summary.effect', 'list')
+  eff
+}
+
+#' Print the summary of an effect
+#'  
+#' @aliases print.summary.effect
+#' @export
+#' @method print summary.effect
+#' @keywords internal
+#' @param x A 'summary.effect' object.
+#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @rdname summary.effect
+
+print.summary.effect = function(x, ...) {
+  for (name in names(x)) {
+    # Split TAB character to attempt proper printing in RStudio,
+    # but even though this makes a difference on the command line,
+    # there's no effect when inside the function. /FL
+    cat(name, ":", "\t", x[[name]], "\n", sep="")
+  }
+  invisible(x)
 }
 
 
@@ -237,6 +265,8 @@ summary.effect = function(object, ...) {
 #' TODO: Improve speed for iterated calls by making 'mapped' a parameter 
 #' 
 #' @aliases value.effect
+#' @export
+#' @method value effect
 #' @keywords internal
 #' @param effect An effect.
 #' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations.
@@ -309,6 +339,7 @@ value.effect = function(effect, data, state, A = NULL) {
 #'  
 #' @aliases amatrix.effect
 #' @export
+#' @method amatrix effect
 #' @keywords internal
 #' @param effect An effect.
 #' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations.
@@ -371,6 +402,8 @@ amatrix.effect = function(effect, data) {
 #' Uses the effet's map value/function to extract covariates.
 #'  
 #' @aliases map.effect
+#' @export
+#' @method map effect
 #' @keywords internal
 #' @param effect An effect.
 #' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations. If null, return the effect's map.
@@ -391,6 +424,8 @@ map.effect = function(effect, data) {
 #' Idexes into to the effects
 #'  
 #' @aliases index.effect
+#' @export
+#' @method index effect
 #' @keywords internal
 #' @param effect An effect.
 #' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations. If null, return the effect's map.
