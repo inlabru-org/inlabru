@@ -628,7 +628,7 @@ summary.bru = function(object, ...) {
                signif(range(sm[,c(4,6)])[2]), "]"))
     if (nm %in% names(object$model$mesh)) {
       cat(paste0(", and area = ",
-                 signif(sum(diag(as.matrix(INLA::inla.mesh.fem(object$model$mesh[[nm]])$c0))))))
+                 signif(sum(diag(INLA::inla.mesh.fem(object$model$mesh[[nm]])$c0))))
     }
     cat("\n")
   }

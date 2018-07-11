@@ -313,7 +313,7 @@ int.polygon = function(mesh, loc, group = NULL){
 
     ips = data.frame(imesh$loc[ok, 1:2, drop=FALSE])
     colnames(ips) = c("x","y")
-    ips$weight = pmax(0, diag(as.matrix(INLA::inla.mesh.fem(imesh)$c0))[ok])
+    ips$weight = pmax(0, diag(INLA::inla.mesh.fem(imesh)$c0)[ok])
     ok <- ips$weight > 0
     if (!all(ok)) {
       ips <- ips[ok,,drop=FALSE]
