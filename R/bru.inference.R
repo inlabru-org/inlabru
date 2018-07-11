@@ -494,6 +494,7 @@ bru.components = function() { NULL }
 #'   gg(gorillas$boundary) + 
 #'   coord_fixed()
 #' 
+#' if (require("INLA", quietly = TRUE)) {
 #' # Define SPDE prior
 #' matern <- inla.spde2.pcmatern(gorillas$mesh, 
 #'                               prior.sigma = c(0.1, 0.01), 
@@ -502,7 +503,6 @@ bru.components = function() { NULL }
 #' # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 #' cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #' 
-#' if (require("INLA", quietly = TRUE)) {
 #' # Fit the model
 #' fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
 #' 
