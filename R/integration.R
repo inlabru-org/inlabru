@@ -309,7 +309,7 @@ int.polygon = function(mesh, loc, group = NULL){
     # Since all vertices in a component belong to triangles in the component,
     # and no triangles lie both inside and outside the component,
     # it's enough (barring numerical accuracy) to detect valid vertices.
-    ok <- inla.mesh.project(gmesh, imesh$loc)$ok
+    ok <- INLA::inla.mesh.project(gmesh, imesh$loc)$ok
 
     ips = data.frame(imesh$loc[ok, 1:2, drop=FALSE])
     colnames(ips) = c("x","y")
