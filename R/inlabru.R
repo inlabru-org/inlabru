@@ -18,7 +18,7 @@
 #' @import sp
 #' @import stats
 #' @import methods
-#' @import Matrix
+#' @importFrom Matrix diag
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' @name inlabru
 NULL
