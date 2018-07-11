@@ -47,7 +47,7 @@ BUILD=build
 SED = sed
 CPR = rsync -a --delete
 R = R
-RDEV = ~/R-dev/bin/R
+RDEV = ~/local/R3.4.4/bin/R
 
 FILENAME_SRC := $(shell ls -rt $(PKG)_*.tar.gz | grep -v _R_ | tail -1 ) 
 FILENAME_BIN := $(shell ls -rt $(PKG)_*.tar.gz | grep _R_ | tail -1 )
