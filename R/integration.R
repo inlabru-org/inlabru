@@ -1,15 +1,15 @@
-# Split lines at mesh edges
-#
-# @aliases split.lines
-# @export
-# @param mesh An inla.mesh object
-# @param sp Start points of lines
-# @param ep End points of lines
-# @param filter.zero.length Filter out segments with zero length? (Bool)
-# @param ... argments to int.quadrature
-# @return List of start and end points resulting from splitting the given lines
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
-# 
+#' Split lines at mesh edges
+#'
+#' @aliases split.lines
+#' @export
+#' @param mesh An inla.mesh object
+#' @param sp Start points of lines
+#' @param ep End points of lines
+#' @param filter.zero.length Filter out segments with zero length? (Bool)
+#' @param ... argments to int.quadrature
+#' @return List of start and end points resulting from splitting the given lines
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#' @keywords internal
 split.lines = function(mesh, sp, ep, filter.zero.length = TRUE) {
 
   # locations for splitting
@@ -260,70 +260,129 @@ int.slines = function(data, mesh, group = NULL, project = TRUE) {
 
 
 
-# Integration points for polygons inside an inla.mesh
-# 
-# @aliases int.polygon
-# @export
-# @param mesh An inla.mesh object
-# @param loc Locations defining the polygons
-# @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#' Construct the intersection mesh of a mesh and a polygon
+#'
+#' @param mesh \code{inla.mesh} object to be intersected
+#' @param poly \code{inla.mesh.segment} object with a closed polygon
+#'   to intersect with the mesh 
+#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @keywords internal
+intersection_mesh <- function(mesh, poly) {
+  if (ncol(poly$loc) < 3) {
+    poly$loc <- cbind(poly$loc, 0)
+  }
+  
+  all_edges <- INLA::inla.mesh.segment(loc = mesh$loc,
+                                 idx = cbind(as.vector(t(mesh$graph$tv)),
+                                             as.vector(t(mesh$graph$tv[, c(2, 3, 1), drop=FALSE]))),
+                                 is.bnd = FALSE)
+  
+  mesh_cover <- INLA::inla.mesh.create(loc = rbind(mesh$loc, poly$loc),
+                                 interior = c(list(all_edges)))
+  
+  split <- INLA::inla.fmesher.smorg(mesh_cover$loc,
+                              mesh_cover$graph$tv,
+                              splitlines = list(loc = poly$loc,
+                                                idx = poly$idx))
+  
+  split_segm <- INLA::inla.mesh.segment(loc = split$split.loc,
+                                  idx = split$split.idx,
+                                  is.bnd = FALSE)
+  
+  mesh_joint_cover <- INLA::inla.mesh.create(loc = rbind(mesh$loc, poly$loc),
+                                       interior = list(all_edges, split_segm))
+  
+  mesh_poly <- INLA::inla.mesh.create(boundary = poly)
+  
+  loc_tri <-
+    (mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 1], , drop=FALSE] +
+       mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 2], , drop=FALSE] +
+       mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 3], , drop=FALSE]) / 3
+  ok_tri <-
+    INLA::inla.mesh.projector(mesh, loc = loc_tri)$proj$ok &
+    INLA::inla.mesh.projector(mesh_poly, loc = loc_tri)$proj$ok
+  
+  loc_subset <- unique(sort(as.vector(mesh_joint_cover$graph$tv[ok_tri, , drop=FALSE])))
+  new_idx <- integer(mesh$n)
+  new_idx[loc_subset] = seq_along(loc_subset)
+  tv_subset <- matrix(new_idx[mesh_joint_cover$graph$tv[ok_tri, , drop=FALSE]],
+                      ncol = 3)
+  loc_subset <- mesh_joint_cover$loc[loc_subset, , drop=FALSE]
+  mesh_subset <- INLA::inla.mesh.create(loc = loc_subset,
+                                  tv = tv_subset,
+                                  extend = FALSE)
+  
+  mesh_subset
+}
+
+#' Safe way to construct integration weights for mesh/polygon intersections
+#'
+#' @param mesh Mesh on which to integrate
+#' @param mesh_inter intersection mesh from \code{intersection_mesh}
+#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @keywords internal
+integration_weight_construction <- function(mesh, mesh_inter) {
+  # Safe mesh for point lookups
+  mesh_cover <- INLA::inla.mesh.create(loc = mesh$loc,
+                                       interior = list(all_edges),
+                                       extend = TRUE)
+  
+  proj_cover <- INLA::inla.mesh.projector(mesh_cover,
+                                          loc = mesh_inter$loc)
+  # Remove points not in the original 'mesh'
+  A <- proj_cover$proj$A[, mesh_cover$idx$loc, drop = FALSE]
+  # Renormalise
+  A <- A / Matrix::rowSums(A)
+
+  # Convert integration weights from intersection mesh points to original mesh points
+  fem <- INLA::inla.mesh.fem(mesh_inter, order = 0)
+  weight <- as.vector(as.vector(fem$va) %*% A)
+  
+  list(loc = mesh$loc, weight = weight)
+}
+
+
+
+#' Integration points for polygons inside an inla.mesh
+#' 
+#' @aliases int.polygon
+#' @export
+#' @param mesh An inla.mesh object
+#' @param loc Locations defining the polygons
+#' @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
+#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}> and Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @keywords internal
 
 int.polygon = function(mesh, loc, group = NULL){
   
   if ( is.null(group) ) { group = rep(1, nrow(loc)) }
-  ipsl = list()
+  ipsl <- list()
   # print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
-  # Extract the mesh boundary
-  mesh_bnd <- INLA::inla.mesh.boundary(mesh)
   for ( g in unique(group) ) {
-    gloc = loc[group==g, , drop=FALSE]
-    # Check where the polygon intersects with the mesh edges
-    sp = gloc[seq_len(nrow(gloc)-1), , drop=FALSE]
-    ep = gloc[1+seq_len(nrow(gloc)-1), , drop=FALSE]
-    sloc = split.lines(mesh, sp, ep,
-                       filter.zero.length = FALSE)$split.loc
+    gloc <- loc[group == g, , drop=FALSE]
 
-    # plot(mesh) ; points(sp) ; points(ep) ; points(sloc)
-    # Combine polygon with mesh boundary to get mesh covering the intersection,
-    # plus possible disconnected components.
-    bloc <- rbind(gloc)
-    if (ncol(bloc) == 2) {
-      bloc = cbind(bloc, 0)
-    }
-    bnd = INLA::inla.mesh.segment(loc = bloc)
+    # Combine polygon with mesh boundary to get mesh covering the intersection.
+    bnd <- INLA::inla.mesh.segment(loc = gloc, is.bnd = TRUE)
     
-    # Create domain mesh for disconnected component detection
-    gmesh = INLA::inla.mesh.create(boundary = bnd,
-                                   loc = sloc)
-    
-    # Create integration domain mesh
-    joint_bnd <- c(list(bnd), mesh_bnd)
-    joint_loc <- rbind(mesh$loc, sloc)
-    imesh = INLA::inla.mesh.create(boundary = joint_bnd,
-                                   loc = joint_loc)
-    # plot(imesh) ; points(sp) ; points(ep) ; points(gloc)
-    # plot(imesh) ; points(sp) ; points(ep) ; points(gloc) ; plot(mesh, add = TRUE)
-    
-    # Anly integrate mesh triangles that fall outside the domain
-    # Since all vertices in a component belong to triangles in the component,
-    # and no triangles lie both inside and outside the component,
-    # it's enough (barring numerical accuracy) to detect valid vertices.
-    ok <- INLA::inla.mesh.project(gmesh, imesh$loc)$ok
+    # Create intersection mesh
+    mesh_inter <- intersection_mesh(mesh, bnd)
 
-    ips = data.frame(imesh$loc[ok, 1:2, drop=FALSE])
-    colnames(ips) = c("x","y")
-    ips$weight = pmax(0, diag(INLA::inla.mesh.fem(imesh)$c0)[ok])
-    ok <- ips$weight > 0
-    if (!all(ok)) {
-      ips <- ips[ok,,drop=FALSE]
-    }
-    
-    # ips = as.data.frame(project.weights(ips, mesh, mesh.coords = c("x","y")))
-    ips$group = g
-    ipsl = c(ipsl, list(ips))
+    # Compute integration locations and weights
+    loc_weight <- integration_weight_construction(mesh, mesh_inter)
+
+    ok <-
+      INLA::inla.mesh.project(mesh, loc_weight$loc)$ok &
+      (loc_weight$weight > 0)
+
+    ips <- data.frame(loc_weight$loc[ok, 1:2, drop=FALSE])
+    colnames(ips) <- c("x","y")
+    ips$weight <- loc_weight$weight[ok]
+
+    ips$group <- g
+    ipsl <- c(ipsl, list(ips))
   }
-  return(do.call(rbind, ipsl))
+  
+  do.call(rbind, ipsl)
 }
 
 

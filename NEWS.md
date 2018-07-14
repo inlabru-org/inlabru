@@ -1,6 +1,7 @@
 # inlabru 2.1.7.999
 
-* Prevent int.polygon from integrating outside the mesh domain
+* Prevent int.polygon from integrating outside the mesh domain,
+  and generally more robust integration scheme construction.
 
 * Fix bru() to like() parameter logic. (Thanks to Peter Vesk for bug example)
 

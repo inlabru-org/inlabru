@@ -122,7 +122,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
         else { subdomain = stop("1D weight projection not yet implemented") }
         
         fem = INLA::inla.mesh.1d.fem(subdomain)
-        ips[[j]] = data.frame(weight = diag(fem$c0))
+        ips[[j]] = data.frame(weight = Matrix::diag(fem$c0))
         ips[[j]][name] = subdomain$loc
         ips[[j]] = ips[[j]][,c(2,1)] # make weights second column
       }
@@ -142,7 +142,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     }
     
     ips = vertices(region)
-    ips$weight = diag(INLA::inla.mesh.fem(region)$c0)
+    ips$weight = INLA::inla.mesh.fem(region, order = 0)$va
     
     # backtransform
     if ( !is.null(region$crs) && !(is.na(region$crs@projargs))) { ips = stransform(ips, crs = crs) }
@@ -151,7 +151,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     
     ips = data.frame(x = region$loc)
     colnames(ips) = name
-    ips$weight = diag(INLA::inla.mesh.fem(region)$c0)
+    ips$weight = Matrix::diag(INLA::inla.mesh.fem(region)$c0)
     
   } else if ( class(region) == "SpatialPoints" ){
     
