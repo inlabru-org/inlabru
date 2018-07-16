@@ -1,6 +1,6 @@
 #' Split lines at mesh edges
 #'
-#' @aliases split.lines
+#' @aliases split_lines
 #' @export
 #' @param mesh An inla.mesh object
 #' @param sp Start points of lines
@@ -10,7 +10,7 @@
 #' @return List of start and end points resulting from splitting the given lines
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 #' @keywords internal
-split.lines = function(mesh, sp, ep, filter.zero.length = TRUE) {
+split_lines = function(mesh, sp, ep, filter.zero.length = TRUE) {
 
   # locations for splitting
   loc = as.matrix(rbind(sp,ep))
@@ -210,7 +210,7 @@ int.slines = function(data, mesh, group = NULL, project = TRUE) {
     idx = idx[!((t1==0) | (t2==0)),]
   
     # Split at mesh edges
-    line.spl = split.lines(mesh, sp, ep, TRUE)
+    line.spl = split_lines(mesh, sp, ep, TRUE)
     sp = line.spl$sp
     ep = line.spl$ep
     idx = idx[line.spl$split.origin,]
@@ -260,6 +260,56 @@ int.slines = function(data, mesh, group = NULL, project = TRUE) {
 
 
 
+join_segm <- function(...) {
+  segm_list <- list(...)
+  loc <- matrix(0, 0, 3)
+  idx <- matrix(0, 0, 2)
+  for (k in seq_along(segm_list)) {
+    idx <- rbind(idx, segm_list[[k]]$idx + nrow(loc))
+    loc <- rbind(loc, segm_list[[k]]$loc)
+  }
+  
+  # Collapse duplicate points
+  new_loc <- loc
+  new_idx <- seq_len(nrow(loc))
+  prev_idx <- 0
+  for (k in seq_len(nrow(loc))) {
+    if (any(is.na(new_loc[k, ]))) {
+      new_idx[k] <- NA
+    } else {
+      if (prev_idx == 0) {
+        prev_dist <- 1
+      } else {
+        prev_dist <- ((new_loc[seq_len(prev_idx), 1] - new_loc[k, 1])^2 +
+                        (new_loc[seq_len(prev_idx), 2] - new_loc[k, 2])^2 +
+                        (new_loc[seq_len(prev_idx), 3] - new_loc[k, 3])^2)^0.5
+      }
+      if (all(prev_dist > 0)) {
+        prev_idx <- prev_idx + 1
+        new_idx[k] <- prev_idx
+        new_loc[prev_idx, ] <- new_loc[k, ]
+      } else {
+        new_idx[k] <- which.min(prev_dist)
+      }
+    }
+  }
+  idx <- matrix(new_idx[idx], nrow(idx), 2)
+  # Remove NA and atomic lines
+  ok <-
+    !is.na(idx[, 1]) &
+    !is.na(idx[, 2]) &
+    idx[, 1] != idx[, 2]
+  idx <- idx[ok, , drop=FALSE]
+  # Set locations
+  loc <- new_loc[seq_len(prev_idx), , drop = FALSE]
+  
+  INLA::inla.mesh.segment(loc = loc,
+                          idx = idx,
+                          is.bnd = FALSE)
+}
+
+
+
 #' Construct the intersection mesh of a mesh and a polygon
 #'
 #' @param mesh \code{inla.mesh} object to be intersected
@@ -284,13 +334,14 @@ intersection_mesh <- function(mesh, poly) {
                               mesh_cover$graph$tv,
                               splitlines = list(loc = poly$loc,
                                                 idx = poly$idx))
-  
   split_segm <- INLA::inla.mesh.segment(loc = split$split.loc,
-                                  idx = split$split.idx,
-                                  is.bnd = FALSE)
+                                        idx = split$split.idx,
+                                        is.bnd = FALSE)
   
-  mesh_joint_cover <- INLA::inla.mesh.create(loc = rbind(mesh$loc, poly$loc),
-                                       interior = list(all_edges, split_segm))
+  joint_segm <- join_segm(split_segm, all_edges)
+  
+  mesh_joint_cover <- INLA::inla.mesh.create(interior = list(joint_segm),
+                                             extend = TRUE)
   
   mesh_poly <- INLA::inla.mesh.create(boundary = poly)
   
@@ -301,47 +352,107 @@ intersection_mesh <- function(mesh, poly) {
   ok_tri <-
     INLA::inla.mesh.projector(mesh, loc = loc_tri)$proj$ok &
     INLA::inla.mesh.projector(mesh_poly, loc = loc_tri)$proj$ok
-  
-  loc_subset <- unique(sort(as.vector(mesh_joint_cover$graph$tv[ok_tri, , drop=FALSE])))
-  new_idx <- integer(mesh$n)
-  new_idx[loc_subset] = seq_along(loc_subset)
-  tv_subset <- matrix(new_idx[mesh_joint_cover$graph$tv[ok_tri, , drop=FALSE]],
-                      ncol = 3)
-  loc_subset <- mesh_joint_cover$loc[loc_subset, , drop=FALSE]
-  mesh_subset <- INLA::inla.mesh.create(loc = loc_subset,
-                                  tv = tv_subset,
-                                  extend = FALSE)
+  if (any(ok_tri)) {
+    loc_subset <- unique(sort(as.vector(mesh_joint_cover$graph$tv[ok_tri, , drop=FALSE])))
+    new_idx <- integer(mesh$n)
+    new_idx[loc_subset] = seq_along(loc_subset)
+    tv_subset <- matrix(new_idx[mesh_joint_cover$graph$tv[ok_tri, , drop=FALSE]],
+                        ncol = 3)
+    loc_subset <- mesh_joint_cover$loc[loc_subset, , drop=FALSE]
+    mesh_subset <- INLA::inla.mesh.create(loc = loc_subset,
+                                          tv = tv_subset,
+                                          extend = FALSE)
+  } else {
+    mesh_subset <- NULL
+  }
   
   mesh_subset
 }
 
-#' Safe way to construct integration weights for mesh/polygon intersections
+#' Safe(?) way to construct integration weights for mesh/polygon intersections
 #'
 #' @param mesh Mesh on which to integrate
-#' @param mesh_inter intersection mesh from \code{intersection_mesh}
+#' @param inter \code{list} of \code{loc}, integration points,
+#'   and \code{weight}, integration weights
 #' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
 #' @keywords internal
-integration_weight_construction <- function(mesh, mesh_inter) {
+integration_weight_construction <- function(mesh, inter) {
   # Safe mesh for point lookups
+  all_edges <- INLA::inla.mesh.segment(loc = mesh$loc,
+                                       idx = cbind(as.vector(t(mesh$graph$tv)),
+                                                   as.vector(t(mesh$graph$tv[, c(2, 3, 1), drop=FALSE]))),
+                                       is.bnd = FALSE)
   mesh_cover <- INLA::inla.mesh.create(loc = mesh$loc,
                                        interior = list(all_edges),
                                        extend = TRUE)
   
   proj_cover <- INLA::inla.mesh.projector(mesh_cover,
-                                          loc = mesh_inter$loc)
+                                          loc = inter$loc)
   # Remove points not in the original 'mesh'
   A <- proj_cover$proj$A[, mesh_cover$idx$loc, drop = FALSE]
   # Renormalise
   A <- A / Matrix::rowSums(A)
 
   # Convert integration weights from intersection mesh points to original mesh points
-  fem <- INLA::inla.mesh.fem(mesh_inter, order = 0)
-  weight <- as.vector(as.vector(fem$va) %*% A)
+  weight <- as.vector(as.vector(inter$weight) %*% A)
   
   list(loc = mesh$loc, weight = weight)
 }
 
 
+#' Basic robust integration weights for mesh/polygon intersections
+#'
+#' @param mesh Mesh on which to integrate
+#' @param bnd \code{inla.mesh.segment} defining the integration domain
+#' @param nsub number of subdivision points along each triangle edge, giving
+#'    \code{(nsub + 1)^2} proto-integration points used to compute
+#'   the vertex weights
+#'   (default \code{9}, giving 100 proto-integration points)
+#' @return \code{list} with elements \code{loc} and \code{weight} with
+#'   one integration point for each mesh vertex of triangles overlapping
+#'   the integration domain
+#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @keywords internal
+make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
+  # Construct a barycentric grid of subdivision triangle midpoints
+  if (is.null(nsub)) {
+    nsub <- 9
+  }
+  stopifnot(nsub >= 0)
+  nB <- (nsub + 1)^2
+
+  b <- seq(1/3, 1/3 + nsub, length = nsub + 1) / (nsub + 1)
+  bb <- as.matrix(expand.grid(b, b))
+  # Points above the diagonal should be reflected into the lower triangle:
+  refl <- rowSums(bb) > 1
+  if (any(refl)) {
+    bb[refl, ] = cbind(1 - bb[refl, 2], 1 - bb[refl, 1])
+  }
+  # Construct complete barycentric coordinates:
+  barycentric_grid <- cbind(1 - rowSums(bb), bb)
+
+  # Construct integration points
+  nT <- nrow(mesh$graph$tv)
+  loc <- matrix(0.0, nT*nB, 3)
+  idx_end <- 0
+  for (tri in seq_len(nT)) {
+    idx_start <- idx_end + 1
+    idx_end <- idx_start + nB - 1
+    loc[seq(idx_start, idx_end, length = nB), ] <-
+      as.matrix(barycentric_grid %*%
+                  mesh$loc[mesh$graph$tv[tri, ], , drop = FALSE])
+  }
+  
+  # Construct integration weights
+  weight <- rep(INLA::inla.mesh.fem(mesh, order = 0)$ta / nB, each = nB)
+  
+  # Filter away point outside integration domain boundary:
+  mesh_bnd <- INLA::inla.mesh.create(boundary = bnd)
+  ok <- INLA::inla.mesh.projector(mesh_bnd, loc = loc)$proj$ok
+  
+  list(loc = loc[ok, , drop = FALSE],
+       weight = weight[ok])
+}
 
 #' Integration points for polygons inside an inla.mesh
 #' 
@@ -363,12 +474,22 @@ int.polygon = function(mesh, loc, group = NULL){
 
     # Combine polygon with mesh boundary to get mesh covering the intersection.
     bnd <- INLA::inla.mesh.segment(loc = gloc, is.bnd = TRUE)
-    
-    # Create intersection mesh
-    mesh_inter <- intersection_mesh(mesh, bnd)
 
+    method <- "stable"
+    inter <- list(loc = matrix(0, 0, 3), weight = numeric(0))
+    if (method == "stable") {
+      inter <- make_stable_integration_points(mesh, bnd)
+    } else {
+      # Create intersection mesh
+      mesh_inter <- intersection_mesh(mesh, bnd)
+      if (!is.null(mesh_inter)) {
+        inter <- list(loc = mesh_inter$loc,
+                      weight = INLA::inla.mesh.fem(mesh_inter, order = 0)$va)
+      }
+    }
+    
     # Compute integration locations and weights
-    loc_weight <- integration_weight_construction(mesh, mesh_inter)
+    loc_weight <- integration_weight_construction(mesh, inter)
 
     ok <-
       INLA::inla.mesh.project(mesh, loc_weight$loc)$ok &

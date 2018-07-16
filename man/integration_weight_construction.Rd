@@ -2,17 +2,18 @@
 % Please edit documentation in R/integration.R
 \name{integration_weight_construction}
 \alias{integration_weight_construction}
-\title{Safe way to construct integration weights for mesh/polygon intersections}
+\title{Safe(?) way to construct integration weights for mesh/polygon intersections}
 \usage{
-integration_weight_construction(mesh, mesh_inter)
+integration_weight_construction(mesh, inter)
 }
 \arguments{
 \item{mesh}{Mesh on which to integrate}
 
-\item{mesh_inter}{intersection mesh from \code{intersection_mesh}}
+\item{inter}{\code{list} of \code{loc}, integration points,
+and \code{weight}, integration weights}
 }
 \description{
-Safe way to construct integration weights for mesh/polygon intersections
+Safe(?) way to construct integration weights for mesh/polygon intersections
 }
 \author{
 Finn Lindgren <\email{finn.lindgren@gmail.com}>
