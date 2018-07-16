@@ -292,6 +292,7 @@ stackmaker.like = function(lhood) {
 #' @param E \link[INLA]{inla} exposure parameter
 #' @param control.compute INLA option, See \link[INLA]{control.compute}
 #' @param control.inla INLA option, See \link[INLA]{control.inla}
+#' @param control.fixed INLA option, See \link[INLA]{control.fixed}
 #' @param ... Additional options passed on to \link[INLA]{inla}
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
@@ -314,17 +315,20 @@ bru.options = function(mesh = NULL,
                        offset = 0,
                        result = NULL, 
                        E = 1,
-                       control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
-                       control.inla = iinla.getOption("control.inla"),
+                       control.compute = inlabru:::iinla.getOption("control.compute"),
+                       control.inla = inlabru:::iinla.getOption("control.inla"),
+                       control.fixed = inlabru:::iinla.getOption("control.fixed"),
                        ... )
 {
   
   args <- as.list(environment())
   args$control.compute = NULL
   args$control.inla = NULL
+  args$control.fixed = NULL
   args$inla.options = list(...)
   args$inla.options$control.compute = control.compute
   args$inla.options$control.inla = control.inla
+  args$inla.options$control.fixed = control.fixed
   
   args
 }
@@ -483,9 +487,6 @@ bru.components = function() { NULL }
 #' 
 #' # Load the Gorilla data
 #' data(gorillas, package = "inlabru")
-#' 
-#' # Use tutorial setting and thus empirical Bayes for faster inference
-#' init.tutorial()
 #' 
 #' # Plot the Gorilla nests, the mesh and the survey boundary
 #' ggplot() + 
@@ -934,7 +935,7 @@ summarize = function(data, x = NULL, cbind.only = FALSE) {
 
 iinla = function(data, model, stackmaker, n = 10, result = NULL, 
                  family,
-                 iinla.verbose = iinla.getOption("iinla.verbose"), 
+                 iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"), 
                  offset = NULL, inla.options){
   
   # # Default number of maximum iterations

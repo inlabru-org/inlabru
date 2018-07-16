@@ -5,8 +5,10 @@
 \title{Additional \link{bru} options}
 \usage{
 bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
-  result = NULL, E = 1, control.compute = list(config = TRUE, dic = TRUE,
-  waic = TRUE), control.inla = iinla.getOption("control.inla"), ...)
+  result = NULL, E = 1,
+  control.compute = inlabru:::iinla.getOption("control.compute"),
+  control.inla = inlabru:::iinla.getOption("control.inla"),
+  control.fixed = inlabru:::iinla.getOption("control.fixed"), ...)
 }
 \arguments{
 \item{mesh}{An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.}
@@ -24,6 +26,8 @@ bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
 \item{control.compute}{INLA option, See \link[INLA]{control.compute}}
 
 \item{control.inla}{INLA option, See \link[INLA]{control.inla}}
+
+\item{control.fixed}{INLA option, See \link[INLA]{control.fixed}}
 
 \item{...}{Additional options passed on to \link[INLA]{inla}}
 }

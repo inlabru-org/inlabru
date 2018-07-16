@@ -1,5 +1,7 @@
 # inlabru 2.1.7.999
 
+* Update default options
+
 * Prevent int.polygon from integrating outside the mesh domain,
   and generally more robust integration scheme construction.
 

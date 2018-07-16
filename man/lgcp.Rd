@@ -47,9 +47,6 @@ assumed that all of the LGCP's dimensions have been observed completely.
 # Load the Gorilla data
 data(gorillas, package = "inlabru")
 
-# Use tutorial setting and thus empirical Bayes for faster inference
-init.tutorial()
-
 # Plot the Gorilla nests, the mesh and the survey boundary
 ggplot() + 
   gg(gorillas$mesh) + 
