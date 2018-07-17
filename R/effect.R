@@ -3,12 +3,16 @@
 ####################################################################################################
 
 #' @export
+#' @rdname value.effect
 value = function(...){UseMethod("value")}
 #' @export
+#' @rdname amatrix.effect
 amatrix = function(...){UseMethod("amatrix")}
 #' @export
+#' @rdname map.effect
 map = function(...){UseMethod("map")}
 #' @export
+#' @rdname index.effect
 index = function(...){UseMethod("index")}
 
 
@@ -272,12 +276,13 @@ print.summary.effect = function(x, ...) {
 #' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations.
 #' @param state Either a numeric vector or a list with a numeric entry whose name is equal to the name parameter.
 #' @param A A matrix overriding the default projection matrix.
+#' @param ... Unused.
 #' @return A numeric vector of effect values
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
 
-value.effect = function(effect, data, state, A = NULL) {
+value.effect = function(effect, data, state, A = NULL, ...) {
   
   # Convenience: extract state if a list of states was provided
   if ( is.list(state) &!is.data.frame(state)) { state = state[[effect$label]] }
@@ -343,11 +348,12 @@ value.effect = function(effect, data, state, A = NULL) {
 #' @keywords internal
 #' @param effect An effect.
 #' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations.
+#' @param ... Unused.
 #' @return An A-matrix.
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
-amatrix.effect = function(effect, data) {
+amatrix.effect = function(effect, data, ...) {
   
   if ( effect$type %in% c("spde") ) {
     if ( effect$map == "coordinates" ) {
@@ -407,11 +413,12 @@ amatrix.effect = function(effect, data) {
 #' @keywords internal
 #' @param effect An effect.
 #' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations. If null, return the effect's map.
+#' @param ... Unused.
 #' @return An A-matrix.
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
-map.effect = function(effect, data) {
+map.effect = function(effect, data, ...) {
   
   mp = mapper(effect$map, data, effect, effect$env)
 
@@ -429,11 +436,12 @@ map.effect = function(effect, data) {
 #' @keywords internal
 #' @param effect An effect.
 #' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations. If null, return the effect's map.
+#' @param ... Unused.
 #' @return a data.frame of indices or list of indices into the effects latent variables
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
-index.effect = function(effect, data) {
+index.effect = function(effect, data, ...) {
   
   if ( effect$type %in% c("spde") ) {
     if ( "m" %in% names(effect$mesh) ) {

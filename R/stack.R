@@ -47,4 +47,5 @@ make.stack = function(points,
                      A = A,
                      tag = tag,
                      effects = effects)
+  stk
 }
