@@ -172,6 +172,9 @@ bru = function(components = y ~ Intercept,
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   \link[INLA]{inla}. Special case if family is 'cp': rescale all integration
 #'   weights by E. Default taken from \code{options$E}.
+#' @param Ntrials A vector containing the number of trials for the 'binomial'
+#'  likelihood. Default value is rep(1, n.data).
+#'  Default taken from \code{options$Ntrials}.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides \code{samplers}.
 #' @param domain Named list of domain definitions.
@@ -181,9 +184,10 @@ bru = function(components = y ~ Intercept,
 #' 
 #' @example inst/examples/like.R
 
-like = function(family, formula = . ~ ., data = NULL, components = NULL,
-                mesh = NULL, E = NULL, samplers = NULL, ips = NULL, domain = NULL,
-                options = list()) {
+like <- function(family, formula = . ~ ., data = NULL, components = NULL,
+                 mesh = NULL, E = NULL, Ntrials = NULL,
+                 samplers = NULL, ips = NULL, domain = NULL,
+                 options = list()) {
 
   options = do.call(bru.options, options)
   
@@ -206,6 +210,9 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL,
   
   if (is.null(E)) {
     E <- options$E
+  }
+  if (is.null(Ntrials)) {
+    Ntrials <- options$Ntrials
   }
   
   # More on special bru likelihoods
@@ -238,6 +245,7 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL,
          formula = formula, 
          data = data, 
          E = E, 
+         Ntrials = Ntrials, 
          samplers = samplers, 
          linear = linear,
          expr = expr,
@@ -271,7 +279,7 @@ stackmaker.like = function(lhood) {
     sm <- function(model, result) {
       make.stack(points = lhood$data, model = model, expr = lhood$expr,
                  y = as.data.frame(lhood$data)[, lhood$response],
-                 E = lhood$E, result = result)
+                 E = lhood$E, Ntrials = lhood$Ntrials, result = result)
     }
   }
   environment(sm) = env
@@ -315,6 +323,7 @@ bru.options = function(mesh = NULL,
                        offset = 0,
                        result = NULL, 
                        E = 1,
+                       Ntrials = 1,
                        control.compute = inlabru:::iinla.getOption("control.compute"),
                        control.inla = inlabru:::iinla.getOption("control.inla"),
                        control.fixed = inlabru:::iinla.getOption("control.fixed"),
@@ -968,16 +977,20 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     result = NULL
     
     stk.data <- INLA::inla.stack.data(stk)
-    icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, BRU.response ~ .),
-                                                   data = c(stk.data, list.data(model)),
-                                                   family = family,
-                                                   control.predictor = list( A = INLA::inla.stack.A(stk), compute = TRUE),
-                                                   E = stk.data[["BRU.E"]],
-                                                   offset = stk.data[["BRU.offset"]] + offset),
-                                                   inla.options)), 
-                              error = warning
-                            )
-                       )
+    icall <- expression(
+      result <- tryCatch(
+        do.call(inla,
+                c(list(formula = update.formula(model$formula, BRU.response ~ .),
+                       data = c(stk.data, list.data(model)),
+                       family = family,
+                       control.predictor = list(A = INLA::inla.stack.A(stk), compute = TRUE),
+                       E = stk.data[["BRU.E"]],
+                       Ntrials = stk.data[["BRU.Ntrials"]],
+                       offset = stk.data[["BRU.offset"]] + offset),
+                  inla.options)), 
+        error = warning
+      )
+    )
     eval(icall)
     
     if ( is.character(result) ) { stop(paste0("INLA returned message: ", result)) }

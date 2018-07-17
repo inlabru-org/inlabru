@@ -5,7 +5,7 @@
 \title{Additional \link{bru} options}
 \usage{
 bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
-  result = NULL, E = 1,
+  result = NULL, E = 1, Ntrials = 1,
   control.compute = inlabru:::iinla.getOption("control.compute"),
   control.inla = inlabru:::iinla.getOption("control.inla"),
   control.fixed = inlabru:::iinla.getOption("control.fixed"), ...)
