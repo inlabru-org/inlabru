@@ -21,7 +21,9 @@ bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
 
 \item{result}{An \code{inla} object returned from previous calls of \link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
 
-\item{E}{\link[INLA]{inla} exposure parameter}
+\item{E}{\link[INLA]{inla} 'poisson' likelihood exposure parameter}
+
+\item{Ntrials}{\link[INLA]{inla} 'binomial' likelihood parameter}
 
 \item{control.compute}{INLA option, See \link[INLA]{control.compute}}
 

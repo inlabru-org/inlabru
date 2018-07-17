@@ -297,7 +297,8 @@ stackmaker.like = function(lhood) {
 #' @param max.iter maximum number of inla iterations
 #' @param offset the usual \link[INLA]{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.
 #' @param result An \code{inla} object returned from previous calls of \link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
-#' @param E \link[INLA]{inla} exposure parameter
+#' @param E \link[INLA]{inla} 'poisson' likelihood exposure parameter
+#' @param Ntrials \link[INLA]{inla} 'binomial' likelihood parameter
 #' @param control.compute INLA option, See \link[INLA]{control.compute}
 #' @param control.inla INLA option, See \link[INLA]{control.inla}
 #' @param control.fixed INLA option, See \link[INLA]{control.fixed}
