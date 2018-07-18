@@ -172,6 +172,9 @@ bru = function(components = y ~ Intercept,
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   \link[INLA]{inla}. Special case if family is 'cp': rescale all integration
 #'   weights by E. Default taken from \code{options$E}.
+#' @param Ntrials A vector containing the number of trials for the 'binomial'
+#'  likelihood. Default value is rep(1, n.data).
+#'  Default taken from \code{options$Ntrials}.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides \code{samplers}.
 #' @param domain Named list of domain definitions.
@@ -181,9 +184,10 @@ bru = function(components = y ~ Intercept,
 #' 
 #' @example inst/examples/like.R
 
-like = function(family, formula = . ~ ., data = NULL, components = NULL,
-                mesh = NULL, E = NULL, samplers = NULL, ips = NULL, domain = NULL,
-                options = list()) {
+like <- function(family, formula = . ~ ., data = NULL, components = NULL,
+                 mesh = NULL, E = NULL, Ntrials = NULL,
+                 samplers = NULL, ips = NULL, domain = NULL,
+                 options = list()) {
 
   options = do.call(bru.options, options)
   
@@ -206,6 +210,9 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL,
   
   if (is.null(E)) {
     E <- options$E
+  }
+  if (is.null(Ntrials)) {
+    Ntrials <- options$Ntrials
   }
   
   # More on special bru likelihoods
@@ -238,6 +245,7 @@ like = function(family, formula = . ~ ., data = NULL, components = NULL,
          formula = formula, 
          data = data, 
          E = E, 
+         Ntrials = Ntrials, 
          samplers = samplers, 
          linear = linear,
          expr = expr,
@@ -271,7 +279,7 @@ stackmaker.like = function(lhood) {
     sm <- function(model, result) {
       make.stack(points = lhood$data, model = model, expr = lhood$expr,
                  y = as.data.frame(lhood$data)[, lhood$response],
-                 E = lhood$E, result = result)
+                 E = lhood$E, Ntrials = lhood$Ntrials, result = result)
     }
   }
   environment(sm) = env
@@ -289,9 +297,11 @@ stackmaker.like = function(lhood) {
 #' @param max.iter maximum number of inla iterations
 #' @param offset the usual \link[INLA]{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.
 #' @param result An \code{inla} object returned from previous calls of \link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
-#' @param E \link[INLA]{inla} exposure parameter
+#' @param E \link[INLA]{inla} 'poisson' likelihood exposure parameter
+#' @param Ntrials \link[INLA]{inla} 'binomial' likelihood parameter
 #' @param control.compute INLA option, See \link[INLA]{control.compute}
 #' @param control.inla INLA option, See \link[INLA]{control.inla}
+#' @param control.fixed INLA option, See \link[INLA]{control.fixed}
 #' @param ... Additional options passed on to \link[INLA]{inla}
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
@@ -314,17 +324,21 @@ bru.options = function(mesh = NULL,
                        offset = 0,
                        result = NULL, 
                        E = 1,
-                       control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
-                       control.inla = iinla.getOption("control.inla"),
+                       Ntrials = 1,
+                       control.compute = inlabru:::iinla.getOption("control.compute"),
+                       control.inla = inlabru:::iinla.getOption("control.inla"),
+                       control.fixed = inlabru:::iinla.getOption("control.fixed"),
                        ... )
 {
   
   args <- as.list(environment())
   args$control.compute = NULL
   args$control.inla = NULL
+  args$control.fixed = NULL
   args$inla.options = list(...)
   args$inla.options$control.compute = control.compute
   args$inla.options$control.inla = control.inla
+  args$inla.options$control.fixed = control.fixed
   
   args
 }
@@ -484,9 +498,6 @@ bru.components = function() { NULL }
 #' # Load the Gorilla data
 #' data(gorillas, package = "inlabru")
 #' 
-#' # Use tutorial setting and thus empirical Bayes for faster inference
-#' init.tutorial()
-#' 
 #' # Plot the Gorilla nests, the mesh and the survey boundary
 #' ggplot() + 
 #'   gg(gorillas$mesh) + 
@@ -494,6 +505,7 @@ bru.components = function() { NULL }
 #'   gg(gorillas$boundary) + 
 #'   coord_fixed()
 #' 
+#' if (require("INLA", quietly = TRUE)) {
 #' # Define SPDE prior
 #' matern <- inla.spde2.pcmatern(gorillas$mesh, 
 #'                               prior.sigma = c(0.1, 0.01), 
@@ -502,7 +514,6 @@ bru.components = function() { NULL }
 #' # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 #' cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #' 
-#' if (require("INLA", quietly = TRUE)) {
 #' # Fit the model
 #' fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
 #' 
@@ -628,7 +639,7 @@ summary.bru = function(object, ...) {
                signif(range(sm[,c(4,6)])[2]), "]"))
     if (nm %in% names(object$model$mesh)) {
       cat(paste0(", and area = ",
-                 signif(sum(diag(INLA::inla.mesh.fem(object$model$mesh[[nm]])$c0))))
+                 signif(sum(Matrix::diag(INLA::inla.mesh.fem(object$model$mesh[[nm]])$c0)))))
     }
     cat("\n")
   }
@@ -934,7 +945,7 @@ summarize = function(data, x = NULL, cbind.only = FALSE) {
 
 iinla = function(data, model, stackmaker, n = 10, result = NULL, 
                  family,
-                 iinla.verbose = iinla.getOption("iinla.verbose"), 
+                 iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"), 
                  offset = NULL, inla.options){
   
   # # Default number of maximum iterations
@@ -967,16 +978,20 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     result = NULL
     
     stk.data <- INLA::inla.stack.data(stk)
-    icall = expression(result <- tryCatch( do.call(inla, c(list(formula = update.formula(model$formula, BRU.response ~ .),
-                                                   data = c(stk.data, list.data(model)),
-                                                   family = family,
-                                                   control.predictor = list( A = INLA::inla.stack.A(stk), compute = TRUE),
-                                                   E = stk.data[["BRU.E"]],
-                                                   offset = stk.data[["BRU.offset"]] + offset),
-                                                   inla.options)), 
-                              error = warning
-                            )
-                       )
+    icall <- expression(
+      result <- tryCatch(
+        do.call(inla,
+                c(list(formula = update.formula(model$formula, BRU.response ~ .),
+                       data = c(stk.data, list.data(model)),
+                       family = family,
+                       control.predictor = list(A = INLA::inla.stack.A(stk), compute = TRUE),
+                       E = stk.data[["BRU.E"]],
+                       Ntrials = stk.data[["BRU.Ntrials"]],
+                       offset = stk.data[["BRU.offset"]] + offset),
+                  inla.options)), 
+        error = warning
+      )
+    )
     eval(icall)
     
     if ( is.character(result) ) { stop(paste0("INLA returned message: ", result)) }

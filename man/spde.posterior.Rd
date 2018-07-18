@@ -41,7 +41,6 @@ ggplot(pts2) +
 x <- seq(0, 55, length = 20)
 mesh1D <- inla.mesh.1d(x, boundary = "free")
 mdl <- x ~ spde1D(map = x, model = inla.spde2.matern(mesh1D)) + Intercept
-init.tutorial()
 fit <- lgcp(mdl, pts2, domain = list(x = c(0,55)))
 
 # Calculate and plot the posterior range 

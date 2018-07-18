@@ -5,8 +5,10 @@
 \title{Additional \link{bru} options}
 \usage{
 bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
-  result = NULL, E = 1, control.compute = list(config = TRUE, dic = TRUE,
-  waic = TRUE), control.inla = iinla.getOption("control.inla"), ...)
+  result = NULL, E = 1, Ntrials = 1,
+  control.compute = inlabru:::iinla.getOption("control.compute"),
+  control.inla = inlabru:::iinla.getOption("control.inla"),
+  control.fixed = inlabru:::iinla.getOption("control.fixed"), ...)
 }
 \arguments{
 \item{mesh}{An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.}
@@ -19,11 +21,15 @@ bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
 
 \item{result}{An \code{inla} object returned from previous calls of \link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
 
-\item{E}{\link[INLA]{inla} exposure parameter}
+\item{E}{\link[INLA]{inla} 'poisson' likelihood exposure parameter}
+
+\item{Ntrials}{\link[INLA]{inla} 'binomial' likelihood parameter}
 
 \item{control.compute}{INLA option, See \link[INLA]{control.compute}}
 
 \item{control.inla}{INLA option, See \link[INLA]{control.inla}}
+
+\item{control.fixed}{INLA option, See \link[INLA]{control.fixed}}
 
 \item{...}{Additional options passed on to \link[INLA]{inla}}
 }

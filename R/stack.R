@@ -1,13 +1,14 @@
 # Create a stack from a model, points and prediction alues
 
-make.stack = function(points,
+make.stack <- function(points,
                        model,
                        y,
                        E = 1,
+                       Ntrials = 1,
                        offset = 0,
                        expr = NULL,
                        result = NULL,
-                       tag = "LeStack"){
+                       tag = "BRU.stack"){
   
   
   # Projection matrices (A) and mesh index effects
@@ -21,7 +22,15 @@ make.stack = function(points,
   # Expectation parameter E
   if ( !(length(E) == nrow(as.data.frame(points))) ) { 
     e.pp = rep(E, nrow(as.data.frame(points))) 
-  } else { e.pp = E } 
+  } else {
+    e.pp = E
+  }
+  # Binomial parameter Ntrials
+  if ( !(length(Ntrials) == nrow(as.data.frame(points))) ) { 
+    Ntrials = rep(Ntrials, nrow(as.data.frame(points))) 
+  } else {
+    Ntrials = Ntrials
+  }
   
   # Reweight things if dealing with taylor approximated model
   if ( !is.null(expr) ) {
@@ -33,7 +42,9 @@ make.stack = function(points,
   }
   
   # Check if exposure is unusually small/large
-  if ( any((e.pp > 0) & ((e.pp < 0.00001) || (e.pp > 1E7))) ) { logentry("Exposure E is smaller than 0.00001. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")}
+  if ( any((e.pp > 0) & ((e.pp < 0.00001) || (e.pp > 1E7))) ) {
+    logentry("Exposure E is smaller than 0.00001. This may lead to numerical problems and non-convergence. Consider setting scale = 10 or higher when calling lgcp().")
+  }
   logentry(sprintf("\n Exposure: %f:%f:(%f), Offset: %f:%f:(%f), Taylor: %f:%f:(%f)", 
               min(e.pp),max(e.pp),sum(e.pp), min(offset),max(offset),sum(offset), min(taylor.offset),max(taylor.offset),sum(taylor.offset)  ))
   
@@ -48,10 +59,14 @@ make.stack = function(points,
   effects = c(effects, list(WORKAROUND = runif(dim(A[[1]])[1])))
 
   # Create and return stack
-  stk = INLA::inla.stack(data = list(BRU.response = y.pp, BRU.E = e.pp, BRU.offset = taylor.offset + offset),
-                     A = A,
-                     tag = tag,
-                     effects = effects)
+  stk <- INLA::inla.stack(data = list(BRU.response = y.pp,
+                                      BRU.E = e.pp,
+                                      BRU.Ntrials = Ntrials,
+                                      BRU.offset = taylor.offset + offset),
+                          A = A,
+                          tag = tag,
+                          effects = effects)
+  stk
 }
 
 #####################################

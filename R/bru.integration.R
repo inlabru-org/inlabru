@@ -122,7 +122,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
         else { subdomain = stop("1D weight projection not yet implemented") }
         
         fem = INLA::inla.mesh.1d.fem(subdomain)
-        ips[[j]] = data.frame(weight = diag(fem$c0))
+        ips[[j]] = data.frame(weight = Matrix::diag(fem$c0))
         ips[[j]][name] = subdomain$loc
         ips[[j]] = ips[[j]][,c(2,1)] # make weights second column
       }
@@ -142,7 +142,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     }
     
     ips = vertices(region)
-    ips$weight = diag(INLA::inla.mesh.fem(region)$c0)
+    ips$weight = INLA::inla.mesh.fem(region, order = 0)$va
     
     # backtransform
     if ( !is.null(region$crs) && !(is.na(region$crs@projargs))) { ips = stransform(ips, crs = crs) }
@@ -151,7 +151,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     
     ips = data.frame(x = region$loc)
     colnames(ips) = name
-    ips$weight = diag(INLA::inla.mesh.fem(region)$c0)
+    ips$weight = Matrix::diag(INLA::inla.mesh.fem(region)$c0)
     
   } else if ( class(region) == "SpatialPoints" ){
     
@@ -186,7 +186,9 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     
     # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
     if ( class(region)[1] == "SpatialPolygons" ) { 
-      region = SpatialPolygonsDataFrame(region, data = data.frame(weight = rep(1, length(region)))) 
+      region = SpatialPolygonsDataFrame(region,
+                                        data = data.frame(weight = rep(1, length(region))),
+                                        match.ID = FALSE)
     }
     
     cnames = coordnames(region)
@@ -214,8 +216,9 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
     }
     
     ips = int.polygon(domain, loc = polyloc[,1:2], group = polyloc[,3])
-    df = data.frame(region@data[ips$group, pregroup, drop = FALSE], weight = ips[,"weight"])
-    ips = SpatialPointsDataFrame(ips[,c("x","y")],data = df)
+    df = data.frame(region@data[ips$group, pregroup, drop = FALSE],
+                    weight = ips[,"weight"])
+    ips = SpatialPointsDataFrame(ips[,c("x","y")], data = df, match.ID = FALSE)
     proj4string(ips) = proj4string(region)
     
     if ( !is.na(p4s) ) {
@@ -408,7 +411,10 @@ vertex.projection = function(points, mesh, columns = names(points), group = NULL
     coords = mesh$loc[as.numeric(names(w.by)),c(1,2)]
     data$vertex = as.numeric(names(w.by))
     
-    ret = SpatialPointsDataFrame(coords, proj4string = CRS(proj4string(points)), data = data)
+    ret = SpatialPointsDataFrame(coords,
+                                 proj4string = CRS(proj4string(points)),
+                                 data = data,
+                                 match.ID = FALSE)
     coordnames(ret) = coordnames(points)
     
     # If null is not not NULL, add vertices to which no data was projected

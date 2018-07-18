@@ -11,6 +11,7 @@ setClass("inla.mesh")
 #'
 #'
 #' @aliases is.inside
+#' @export
 #' @keywords internal
 #' @param mesh an inla.mesh object.
 #' @param loc Points in space stored either as data.frame, a two-column matrix of x and y coordinates or a SpatialPoints object.
