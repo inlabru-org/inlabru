@@ -1,4 +1,13 @@
-# inlabru 2.1.4.999
+# inlabru 2.1.7.999
+
+* Update default options
+
+* Prevent int.polygon from integrating outside the mesh domain,
+  and generally more robust integration scheme construction.
+
+* Fix bru() to like() parameter logic. (Thanks to Peter Vesk for bug example)
+
+# inlabru 2.1.7
 
 * Added a `NEWS.md` file to track changes to the package.
 
@@ -9,6 +18,8 @@
 * Added protection for examples requiring optional packages
 
 * Fix `sample.lgcp` output formatting, extended CRS support, and more efficient sampling algorithm
+
+* Avoid dense matrices for effect mapping
 
 # inlabru 2.1.4
 

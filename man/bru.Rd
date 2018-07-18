@@ -15,11 +15,11 @@ identity link. In addition to the likelihoods provided by inla
 (see \code{inla.models()$likelihood}) inlabru supports fitting Cox processes 
 via \code{family = "cp"}. The latter requires contructing a likelihood using the \link{like}
 function and providing it via the ... parameter list. As an alternative to bru, the \link{lgcp} 
-function provides a convenient interface to fitting Cox processes.}
+function provides a convenient interface to fitting Cox processes. See details.}
 
-\item{data}{A data.frame or SpatialPoints[DataFrame] object.}
+\item{data}{A data.frame or SpatialPoints[DataFrame] object. See details.}
 
-\item{...}{Additional likelihoods, each constructed by a calling \link{like}.}
+\item{...}{Additional likelihoods, each constructed by a calling \link{like}. See details.}
 
 \item{options}{A list of name and value pairs that are either interpretable by \link{bru.options} 
 or valid inla parameters.}
@@ -43,6 +43,11 @@ This method is a wrapper for \link[INLA]{inla} and provides multiple enhancement
 \item{Log Gaussian Cox process (LGCP) inference is available by using the \code{cp} family or (even easier) by using the 
       \link{lgcp} function.}
 }
+}
+\details{
+family and ... must either be parameters to \link{like}, or \code{lhood} objects constructed by \link{like}.
+         \code{data} must either be an \code{lhood} object, a data container, or \code{NULL}. If \code{NULL},
+         data must be supplied through direct calls to \link{like}.
 }
 \examples{
 \donttest{

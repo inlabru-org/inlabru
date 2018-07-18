@@ -53,7 +53,6 @@ ggplot(pts2) +
 x <- seq(0, 55, length = 50)
 mesh1D <- inla.mesh.1d(x, boundary = "free")
 mdl <- x ~ spde1D(map = x, model = inla.spde2.matern(mesh1D)) + Intercept # SOLUTION
-init.tutorial()
 fit.spde <- lgcp(mdl, pts2, domain = list(x = c(0,55)))
 
 # Calculate bin statistics

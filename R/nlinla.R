@@ -1,9 +1,13 @@
 
 nlinla.taylor = function(expr, epunkt, data, env) {
   
-  if ( "offset" %in% names(epunkt) ) { stop("One of your model components is an offset. 
-                                            However, you are using a non-linear predictor (formula), which would set the respective term to zero. 
-                                            Please remove the offset component and add its value to the predictor formula.") }
+  if ( "offset" %in% names(epunkt) ) {
+    stop("One of your model components is an offset. 
+          However, you are using a non-linear predictor (formula),
+          which would set the respective term to zero. 
+          Please remove the offset component and add its value
+          to the predictor formula.")
+  }
   
   if (nrow(epunkt)<=1000) {
     effects = colnames(epunkt)
@@ -17,7 +21,10 @@ nlinla.taylor = function(expr, epunkt, data, env) {
     gra = attr(tmp, "gradient")
     nr = nrow(gra)
     ngrd = matrix(NA,nrow=nr,ncol=length(effects))
-    for (k in 1:length(effects)){ ngrd[,k] = diag(as.matrix(gra[,((k-1)*nr+1):(k*nr)])) } # as.matrix required since diag() will not work if gra has single entry
+    for (k in 1:length(effects)){
+      # as.matrix required since diag() will not work if gra has single entry
+      ngrd[,k] = diag(as.matrix(gra[, ((k-1)*nr+1):(k*nr), drop=FALSE]))
+    }
     nconst = as.vector(tmp) - rowSums(ngrd * epunkt)
     ngrd =  data.frame(ngrd)
     colnames(ngrd) = effects
