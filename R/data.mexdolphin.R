@@ -108,7 +108,6 @@ import.mexdolphin = function() {
   # distance = seq(0, 8, length.out = 20)
   # fml = coordinates + distance ~ df.lsigma + g(spat, model = inla.spde2.matern(mexdolphin$mesh), mesh = mexdolphin$mesh)
   # pred = expression(log(1-exp(-(distance/(exp(df.lsigma)))^-1)) + spat + Intercept)
-  # init.tutorial()
   # r = lgcp(points = mexdolphin$points, samplers = mexdolphin$samplers, model = fml, predictor = pred, mesh = mexdolphin$mesh)
   # llambda = log(8) + r$summary.random$spat$mean + r$summary.fixed["Intercept","mean"]
   # # sum( exp(llambda) * diag(inla.mesh.fem(mexdolphin$mesh)$c0))

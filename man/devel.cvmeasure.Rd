@@ -48,8 +48,6 @@ cmp <- coordinates ~ vegetation(map = gorillas$gcov$vegetation, model = "factor"
   spde(map = coordinates, model = pcmatern) -
   Intercept
 
-init.tutorial() # Faster inferece for example
-
 fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
 
 # Predict SPDE and vegetation at the mesh vertex locations

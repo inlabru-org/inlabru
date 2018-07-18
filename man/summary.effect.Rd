@@ -2,19 +2,28 @@
 % Please edit documentation in R/effect.R
 \name{summary.effect}
 \alias{summary.effect}
-\title{Sumarize an effect}
+\alias{print.summary.effect}
+\title{Summarize an effect}
 \usage{
-summary.effect(object, ...)
+\method{summary}{effect}(object, ...)
+
+\method{print}{summary.effect}(x, ...)
 }
 \arguments{
+\item{object}{An effect.}
+
 \item{...}{ignored.}
 
-\item{effect}{An effect.}
+\item{x}{A 'summary.effect' object.}
 }
 \description{
-Sumarize an effect
+Summarize an effect
+
+Print the summary of an effect
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
+
+Finn Lindgren <\email{finn.lindgren@gmail.com}>
 }
 \keyword{internal}

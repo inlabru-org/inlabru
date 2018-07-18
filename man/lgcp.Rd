@@ -5,7 +5,7 @@
 \title{Log Gaussian Cox process (LGCP) inference using INLA}
 \usage{
 lgcp(components, data, samplers = NULL, domain = NULL, ips = NULL,
-  formula = . ~ ., E = 1, options = list())
+  formula = . ~ ., E = NULL, options = list())
 }
 \arguments{
 \item{components}{A formula describing the latent components}
@@ -47,9 +47,6 @@ assumed that all of the LGCP's dimensions have been observed completely.
 # Load the Gorilla data
 data(gorillas, package = "inlabru")
 
-# Use tutorial setting and thus empirical Bayes for faster inference
-init.tutorial()
-
 # Plot the Gorilla nests, the mesh and the survey boundary
 ggplot() + 
   gg(gorillas$mesh) + 
@@ -58,10 +55,6 @@ ggplot() +
   coord_fixed()
 
 if (require("INLA", quietly = TRUE)) {
-
-# Load INLA
-library(INLA)
-
 # Define SPDE prior
 matern <- inla.spde2.pcmatern(gorillas$mesh, 
                               prior.sigma = c(0.1, 0.01), 
