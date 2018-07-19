@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Spatial Inference using Integrated Nested Laplace Approximation
-Version: 2.1.7
+Version: 2.1.8
 Authors@R: c(
   person("Fabian E.", "Bachl", email = "bachlfab@gmail.com", role = c("aut", "cre"),
          comment = "Fabian Bachl wrote the main code"),
@@ -26,14 +26,14 @@ License: GPL (>= 2)
 Imports:
   rgdal,
   rgeos,
-  utils
+  utils,
+  Matrix
 Suggests:
     testthat,
     ggmap,
     rgl,
     sphereplot,
     raster,
-    Matrix,
     dplyr,
     maptools,
     mgcv,

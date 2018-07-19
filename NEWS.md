@@ -1,3 +1,12 @@
+# inlabru 2.1.8
+
+* Update default options
+
+* Prevent int.polygon from integrating outside the mesh domain,
+  and generally more robust integration scheme construction.
+
+* Fix bru() to like() parameter logic. (Thanks to Peter Vesk for bug example)
+
 # inlabru 2.1.7
 
 * Added a `NEWS.md` file to track changes to the package.
