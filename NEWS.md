@@ -1,4 +1,4 @@
-# inlabru 2.1.7.999
+# inlabru 2.1.8
 
 * Update default options
 
