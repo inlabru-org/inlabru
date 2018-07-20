@@ -1,4 +1,6 @@
-# inlabru 2.1.8.999
+# inlabru 2.1.9
+
+* Remove unused VignetteBuilder entry from DESCRIPTION
 
 # inlabru 2.1.8
 
@@ -32,3 +34,4 @@
 * Added matrix geom `gg.matrix()`
 
 * Fixed CRAN test issues
+
