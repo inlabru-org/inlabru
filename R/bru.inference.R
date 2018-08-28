@@ -287,35 +287,49 @@ stackmaker.like = function(lhood) {
 }
 
 
+
+
+
 #' Additional \link{bru} options
 #'
 #' @aliases bru.options
 #' @export
-#' 
-#' @param mesh An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.
-#' @param run If TRUE, run inference. Otherwise only return configuration needed to run inference.
+#'
+#' @param mesh An \code{inla.mesh} object for spatial models without SPDE
+#'   components. Mostly used for successive spatial predictions.
+#' @param run If TRUE, run inference. Otherwise only return configuration needed
+#'   to run inference.
 #' @param max.iter maximum number of inla iterations
-#' @param offset the usual \link[INLA]{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.
-#' @param result An \code{inla} object returned from previous calls of \link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.
+#' @param offset the usual \link[INLA]{inla} offset. If a nonlinear formula is
+#'   used, the resulting Taylor approximation constant will be added to this
+#'   automatically.
+#' @param result An \code{inla} object returned from previous calls of
+#'   \link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a
+#'   starting point for further improvement of the approximate posterior.
 #' @param E \link[INLA]{inla} 'poisson' likelihood exposure parameter
 #' @param Ntrials \link[INLA]{inla} 'binomial' likelihood parameter
 #' @param control.compute INLA option, See \link[INLA]{control.compute}
 #' @param control.inla INLA option, See \link[INLA]{control.inla}
-#' @param control.fixed INLA option, See \link[INLA]{control.fixed}
+#' @param control.fixed INLA option, See \link[INLA]{control.fixed}. Warning:
+#'   due to how inlabru currently constructs the \code{inla()}, the \code{mean},
+#'   \code{prec}, \code{mean.intercept}, and \code{prec.intercept} will have no
+#'   effect. Until a more elegant alterative has been implemented, use explicit
+#'   \code{mean.linear} and \code{prec.linear} specifications in each
+#'   \code{model="linear"} component instead.
 #' @param ... Additional options passed on to \link[INLA]{inla}
-#' 
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
-#' 
+#'
+#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}> and Finn Lindgren \email{finn.lindgren@@gmail.com}
+#'
 #' @examples
-#' 
+#'
 #' \donttest{
-#' 
+#'
 #' # Generate default bru options
 #' opts = bru.options()
 #'
 #' # Print them:
 #' opts
-#' 
+#'
 #' }
 #' 
 bru.options = function(mesh = NULL, 
@@ -325,12 +339,21 @@ bru.options = function(mesh = NULL,
                        result = NULL, 
                        E = 1,
                        Ntrials = 1,
-                       control.compute = inlabru:::iinla.getOption("control.compute"),
-                       control.inla = inlabru:::iinla.getOption("control.inla"),
-                       control.fixed = inlabru:::iinla.getOption("control.fixed"),
+                       control.compute = list(),
+                       control.inla = list(),
+                       control.fixed = list(),
                        ... )
 {
-  
+  control.compute <-
+    override_config_defaults(control.compute,
+                             iinla.getOption("control.compute"))
+  control.inla <-
+    override_config_defaults(control.inla,
+                             iinla.getOption("control.inla"))
+  control.fixed <-
+    override_config_defaults(control.fixed,
+                             iinla.getOption("control.fixed"))
+    
   args <- as.list(environment())
   args$control.compute = NULL
   args$control.inla = NULL

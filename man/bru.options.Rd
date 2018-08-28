@@ -5,21 +5,25 @@
 \title{Additional \link{bru} options}
 \usage{
 bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
-  result = NULL, E = 1, Ntrials = 1,
-  control.compute = inlabru:::iinla.getOption("control.compute"),
-  control.inla = inlabru:::iinla.getOption("control.inla"),
-  control.fixed = inlabru:::iinla.getOption("control.fixed"), ...)
+  result = NULL, E = 1, Ntrials = 1, control.compute = list(),
+  control.inla = list(), control.fixed = list(), ...)
 }
 \arguments{
-\item{mesh}{An \code{inla.mesh} object for spatial models without SPDE components. Mostly used for successive spatial predictions.}
+\item{mesh}{An \code{inla.mesh} object for spatial models without SPDE
+components. Mostly used for successive spatial predictions.}
 
-\item{run}{If TRUE, run inference. Otherwise only return configuration needed to run inference.}
+\item{run}{If TRUE, run inference. Otherwise only return configuration needed
+to run inference.}
 
 \item{max.iter}{maximum number of inla iterations}
 
-\item{offset}{the usual \link[INLA]{inla} offset. If a nonlinear formula is used, the resulting Taylor approximation constant will be added to this automatically.}
+\item{offset}{the usual \link[INLA]{inla} offset. If a nonlinear formula is
+used, the resulting Taylor approximation constant will be added to this
+automatically.}
 
-\item{result}{An \code{inla} object returned from previous calls of \link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a starting point for further improvement of the approximate posterior.}
+\item{result}{An \code{inla} object returned from previous calls of
+\link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a
+starting point for further improvement of the approximate posterior.}
 
 \item{E}{\link[INLA]{inla} 'poisson' likelihood exposure parameter}
 
@@ -29,7 +33,12 @@ bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
 
 \item{control.inla}{INLA option, See \link[INLA]{control.inla}}
 
-\item{control.fixed}{INLA option, See \link[INLA]{control.fixed}}
+\item{control.fixed}{INLA option, See \link[INLA]{control.fixed}. Warning:
+due to how inlabru currently constructs the \code{inla()}, the \code{mean},
+\code{prec}, \code{mean.intercept}, and \code{prec.intercept} will have no
+effect. Until a more elegant alterative has been implemented, use explicit
+\code{mean.linear} and \code{prec.linear} specifications in each
+\code{model="linear"} component instead.}
 
 \item{...}{Additional options passed on to \link[INLA]{inla}}
 }
@@ -50,5 +59,5 @@ opts
 
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl <\email{bachlfab@gmail.com}> and Finn Lindgren \email{finn.lindgren@gmail.com}
 }
