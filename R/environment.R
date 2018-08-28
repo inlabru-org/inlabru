@@ -102,7 +102,7 @@ logentry = function(txt) { iinla.env$log = c(iinla.env$log, paste0(Sys.time(),":
 #' 
 #' @examples
 #' def <- list(iterations = 10, method = "newton")
-#' override_config_defaults(list(iterations = 20, verbose = TRUE), def)
+#' inlabru:::override_config_defaults(list(iterations = 20, verbose = TRUE), def)
 
 override_config_defaults <- function(options, defaults)
 {

@@ -26,7 +26,7 @@ Helper function for setting option variables and lists.
 }
 \examples{
 def <- list(iterations = 10, method = "newton")
-override_config_defaults(list(iterations = 20, verbose = TRUE), def)
+inlabru:::override_config_defaults(list(iterations = 20, verbose = TRUE), def)
 }
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}
