@@ -36,7 +36,7 @@
 #' @return A \code{data.frame} (1D case),
 #'   SpatialPoints (2D flat and 3D spherical surface cases)
 #'   SpatialPointsDataFrame (2D/3D surface cases with multiple samples).
-#'   For multiple samples, the \code{data.frame} output has a 
+#'   For multiple samples, the \code{data.frame} output has a
 #'   column \code{'sample'} giving the index for each sample.
 #' object of point locations.
 #'
@@ -101,13 +101,13 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     } else {
       n.samples <- 1
     }
-    
+
     multi.sample <- list()
     for (sample in seq_len(n.samples)) {
       if (multi.samples) {
         loglambda <- as.vector(loglambda.matrix[, sample, drop = TRUE])
       }
-      
+
       # The B-spline basis expansion has a convex hull property
       # which implies that the maximum weight is not greater or equal to the maximum function value.
       wmax <- max(loglambda)
@@ -138,7 +138,6 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       }
     }
     ret <- do.call(rbind, multi.sample)
-
   } else if (inherits(mesh, "inla.mesh")) {
     multi.samples <- is.matrix(loglambda)
     if (multi.samples) {
@@ -185,7 +184,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     strategy <- match.arg(strategy, strategies)
 
     if (is.geocent) {
-      space.R <- mean(rowSums(mesh$loc^2)^0.5)
+      space.R <- mean(rowSums(mesh$loc ^ 2) ^ 0.5)
       if (is.null(input.crs.list$units)) {
         space.units <- "m"
       } else {
@@ -211,9 +210,9 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         area.R <- 6371
       } else if (is.geocent) {
         area.R <- space.R
-      }  
+      }
     }
-      
+
     for (sample in seq_len(n.samples)) {
       if (multi.samples) {
         loglambda <- as.vector(loglambda.matrix[, sample, drop = TRUE])
@@ -228,32 +227,34 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           area.mesh <- mesh
           area.R <- 1
         }
-        areas <- INLA::inla.fmesher.smorg(area.mesh$loc,
-                                          area.mesh$graph$tv,
-                                          fem = 0,
-                                          output = "ta")$ta * area.R^2
-        
+        areas <- INLA::inla.fmesher.smorg(
+          area.mesh$loc,
+          area.mesh$graph$tv,
+          fem = 0,
+          output = "ta"
+        )$ta * area.R ^ 2
+
         loglambda_tri <- matrix(loglambda[mesh$graph$tv], nrow(mesh$graph$tv), ncol(mesh$graph$tv))
         loglambda_max <- apply(loglambda_tri, 1, max)
-        
+
         Npoints <- rpois(length(areas), lambda = exp(loglambda_max) * areas)
-        
+
         if (sum(Npoints) > 0) {
           triangle <- rep(seq_along(areas), Npoints)
-        
+
           # Sample uniformly on base triangle (0,0),(1,0),(0,1)
-          points <- matrix(runif(2*sum(Npoints)), sum(Npoints), 2)
+          points <- matrix(runif(2 * sum(Npoints)), sum(Npoints), 2)
           flip <- rowSums(points) > 1.0
-          points[flip, ] <- 1 - points[flip, 2:1, drop=FALSE]
+          points[flip, ] <- 1 - points[flip, 2:1, drop = FALSE]
           # Convert to in-triangle points
           points <-
-            mesh$loc[mesh$graph$tv[triangle,1], , drop=FALSE] +
-              (mesh$loc[mesh$graph$tv[triangle,2], , drop=FALSE] -
-               mesh$loc[mesh$graph$tv[triangle,1], , drop=FALSE]) * points[, 1] +
-              (mesh$loc[mesh$graph$tv[triangle,3], , drop=FALSE] -
-               mesh$loc[mesh$graph$tv[triangle,1], , drop=FALSE]) * points[, 2]
+            mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE] +
+            (mesh$loc[mesh$graph$tv[triangle, 2], , drop = FALSE] -
+              mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE]) * points[, 1] +
+            (mesh$loc[mesh$graph$tv[triangle, 3], , drop = FALSE] -
+              mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE]) * points[, 2]
           if (is.geocent) {
-            points <- points / rowSums(points^2)^0.5
+            points <- points / rowSums(points ^ 2) ^ 0.5
           }
         }
 
@@ -272,14 +273,14 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           lambda_ratio <- exp(as.vector(A %*% loglambda) - loglambda_max[triangle])
           keep <- (runif(sum(Npoints)) <= lambda_ratio)
           ret <- points[keep]
-          waste_ratio <- sum(keep)/length(keep)
+          waste_ratio <- sum(keep) / length(keep)
         } else {
           points <- sp::SpatialPoints(matrix(0, 1, 3), proj4string = target.crs)[-1]
           ret <- points
           waste_ratio <- 0
         }
       } else if (strategy == "rectangle") {
-          # Construct bounding rectangle
+        # Construct bounding rectangle
         loc <- mesh$loc
         xmin <- min(loc[, 1])
         xmax <- max(loc[, 1])
@@ -309,17 +310,17 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           ret <- points[keep]
-          waste_ratio <- sum(keep)/length(keep)
+          waste_ratio <- sum(keep) / length(keep)
         }
       } else if (strategy == "spherical") {
-          # Simulate number of points
-          area <- 4 * pi * area.R ^ 2
-          lambda_max <- max(loglambda)
-          Npoints <- rpois(n = 1, lambda = area * exp(lambda_max))
+        # Simulate number of points
+        area <- 4 * pi * area.R ^ 2
+        lambda_max <- max(loglambda)
+        Npoints <- rpois(n = 1, lambda = area * exp(lambda_max))
         if (Npoints > 5000000) {
           stop(paste0("Too many points!: ", Npoints))
         }
-        
+
         if (Npoints == 0) {
           ret <- SpatialPoints(matrix(0, 1, 3), proj4string = internal.crs)[-1]
           waste_ratio <- 0
@@ -340,7 +341,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           ret <- points[keep]
-          waste_ratio <- sum(keep)/length(keep)
+          waste_ratio <- sum(keep) / length(keep)
         }
       } else if (strategy == "sliced-spherical") {
         if (identical(input.crs.list$proj, "longlat")) {
@@ -367,7 +368,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         sp <- ceiling(seq(1, Npoints + 1, length.out = max(2, nblocks)))
         n.keep <- 0
         n.sampled <- 0
-        
+
         for (k in seq_len(length(sp) - 1)) {
           n.points <- sp[k + 1] - sp[k]
           if (n.points == 0) {
@@ -421,9 +422,9 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       if (length(ret) > 0) {
         ret <- sp::spTransform(ret, INLA::inla.CRS("sphere", args = list(a = space.R, b = space.R, units = "m")))
       } else if (multi.samples) {
-        ret <- SpatialPointsDataFrame(matrix(0,1,3), data = data.frame(sample = 1))[-1]
+        ret <- SpatialPointsDataFrame(matrix(0, 1, 3), data = data.frame(sample = 1))[-1]
       } else {
-        ret <- SpatialPoints(matrix(0,1,3))[-1]
+        ret <- SpatialPoints(matrix(0, 1, 3))[-1]
       }
       if (use.crs) {
         proj4string(ret) <- input.crs
@@ -435,10 +436,10 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (length(ret) > 0) {
           ret <- spTransform(ret, input.crs)
         } else if (multi.samples) {
-          ret <- SpatialPointsDataFrame(matrix(0,1,2), data = data.frame(sample = 1))[-1]
+          ret <- SpatialPointsDataFrame(matrix(0, 1, 2), data = data.frame(sample = 1))[-1]
           proj4string(ret) <- input.crs
         } else {
-          ret <- SpatialPoints(matrix(0,1,2))[-1]
+          ret <- SpatialPoints(matrix(0, 1, 2))[-1]
           proj4string(ret) <- input.crs
         }
       } else {
