@@ -453,17 +453,15 @@ map.effect = function(effect, data, ...) {
 index.effect = function(effect, data, ...) {
   
   if ( effect$type %in% c("spde") ) {
-    if ( "m" %in% names(effect$mesh) ) {
-      idx = 1:effect$mesh$m # support inla.mesh.1d models
-      # If a is masked, correct number of indices
-      if ( !is.null(effect$A.msk) ) { idx = 1:sum(effect$A.msk) }
-    } else {
-      
-      idx = INLA::inla.spde.make.index(effect$label, 
-                                       n.spde = effect$model$n.spde, 
-                                       n.group = effect$ngroup,
-                                       n.repl = effect$nrep)
-    }
+    
+    idx = INLA::inla.spde.make.index(effect$label, 
+                                     n.spde = effect$model$n.spde, 
+                                     n.group = effect$ngroup,
+                                     n.repl = effect$nrep)
+    
+    # Masking has only been tested in the 1D case
+    if (("m" %in% names(effect$mesh))  && (!is.null(effect$A.msk))) {idx = 1:sum(effect$A.msk) }
+
   }
   else if ( effect$type %in% c("factor") ) {
     idx = map.effect(effect, data)
