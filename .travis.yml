@@ -22,6 +22,6 @@ install:
 
 # r_build_args: --resave-data
 
-# r_check_args: --as-cran --run-donttest --timings
+r_check_args: --as-cran --run-donttest --timings
 
-r_check_args: --as-cran --timings
+# r_check_args: --as-cran --timings
