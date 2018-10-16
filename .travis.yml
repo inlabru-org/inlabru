@@ -2,7 +2,7 @@
 
 group: travis_latest
 language: R
-dist: trusty
+dist: xenial
 sudo: false
 cache: packages
 
