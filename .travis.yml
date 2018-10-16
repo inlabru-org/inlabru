@@ -1,11 +1,11 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 sudo: required
+
 services:
   - docker
-language: R
-dist: xenial
-sudo: false
+
+language: r
 cache: packages
 
 before_install:
@@ -18,6 +18,8 @@ r_packages:
   - sp
   - rgdal
   - rgeos
+
+
 
 # r_build_args: --resave-data
 
