@@ -2,6 +2,7 @@
 
 group: travis_latest
 language: R
+dist: trusty
 sudo: false
 cache: packages
 
