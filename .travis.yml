@@ -4,7 +4,7 @@ group: travis_latest
 language: R
 dist: xenial
 sudo: false
-cache: packages
+#cache: packages
 
 r:
  - oldrel
