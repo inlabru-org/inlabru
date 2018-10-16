@@ -18,13 +18,15 @@ addons:
       - libproj-dev
       - libgdal-dev
 
-r_github_packages:
-  - cran/rgdal
-  - cran/rgeos
+#r_github_packages:
+#  - cran/rgdal
+#  - cran/rgeos
 
 install:
   - R -e 'install.packages("INLA", repos=c(getOption("repos"), INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)'
-
+  - R -e 'install.packages('rgeos', type="source")'
+  - R -e 'install.packages('rgdal', type="source")'
+  
 # r_build_args: --resave-data
 
 r_check_args: --as-cran --run-donttest --timings
