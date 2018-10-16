@@ -1,6 +1,7 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 sudo: required
+dist: xenial
 
 services:
   - docker
@@ -14,12 +15,6 @@ before_install:
   # - sudo apt-get --yes --force-yes update -qq
   - sudo apt-get install libgdal-dev libgeos-dev libproj-dev
   #  libudunits2-dev libv8-dev libprotobuf-dev protobuf-compiler libjq-dev
-
-r_packages:
-  - sp
-  - rgdal
-  - rgeos
-
 
 
 # r_build_args: --resave-data
