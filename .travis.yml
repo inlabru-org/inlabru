@@ -28,7 +28,9 @@ install:
   # - docker exec -it my_ubuntu /bin/bash sudo R -e "install.packages('sp', 'ggplot2')"
   # 'testthat, ggmap, rgl, sphereplot, raster, dplyr, maptools, mgcv, shiny, spatstat, spatstat.data, RColorBrewer, graphics, knitr, rmarkdown)"
   - docker exec -it my_ubuntu R -e ".libPaths()"
+  - docker exec -it my_ubuntu R -e "getwd()"
 script:
   - docker exec -it my_ubuntu R CMD build /home/work/
   - docker exec -it my_ubuntu ls -al /home/work
+  - docker exec -it my_ubuntu ls -al /home/travis/
   - docker exec -it my_ubuntu R CMD check --as-cran /home/work/inlabru_2.1.7.999.tar.gz
