@@ -25,7 +25,7 @@ install:
   - docker exec -it my_ubuntu ls /usr/local/lib/R/site-library
   - docker exec -it my_ubuntu ls /usr/lib/R/site-library
   - docker exec -it my_ubuntu ls /usr/lib/R/library
-  - docker exec -it my_ubuntu R -e "devtools::install_deps(pkg='/home/work',dep = TRUE)"
+  # - docker exec -it my_ubuntu R -e "devtools::install_deps(pkg='/home/work',dep = TRUE)"
 
 script:
   - docker exec -it my_ubuntu R -e "quit('no',status=length(do.call(c, as.list(devtools::check('/home/work', run_dont_test=TRUE)))))"
