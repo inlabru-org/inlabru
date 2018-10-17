@@ -23,7 +23,7 @@ before_install:
   #  libudunits2-dev libv8-dev libprotobuf-dev protobuf-compiler libjq-dev
 
 install:
-  - docker exec -it my_ubuntu R -e "install_packages('devtools')"
+  - docker exec -it my_ubuntu R -e "install.packages('devtools')"
   - docker exec -it my_ubuntu R -e "devtools::install_deps(pkg='/home/work',dep = T)"
 
 script:
