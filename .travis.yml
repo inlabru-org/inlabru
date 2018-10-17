@@ -31,6 +31,5 @@ install:
   - docker exec -it my_ubuntu R -e "getwd()"
 script:
   - docker exec -it my_ubuntu R CMD build /home/work/
-  - docker exec -it my_ubuntu ls -al /home/work
   - docker exec -it my_ubuntu ls -al /
-  - docker exec -it my_ubuntu R CMD check --as-cran /inlabru_2.1.7.999.tar.gz
+  - docker exec -it my_ubuntu R CMD check --as-cran /*.tar.gz
