@@ -25,7 +25,7 @@ before_install:
 install:
   # - docker exec -it my_ubuntu R -e "install.packages('devtools')"
   # - docker exec -it my_ubuntu R -e "devtools::install_deps(pkg='/home/work',dep = T)"
-  - docker exec -it my_ubuntu sudo R -e "install.packages('sp', 'ggplot2')"
+  - docker exec -it my_ubuntu /bin/bash sudo R -e "install.packages('sp', 'ggplot2')"
   # 'testthat, ggmap, rgl, sphereplot, raster, dplyr, maptools, mgcv, shiny, spatstat, spatstat.data, RColorBrewer, graphics, knitr, rmarkdown)"
 
 script:
