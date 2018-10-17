@@ -11,32 +11,26 @@ cache: packages
 
 before_install:
   - docker --version
-  # - docker pull fbachl/inlabru:latest
   - docker run --name my_ubuntu -v /$(pwd):/home/work -it -d fbachl/inlabru:latest /bin/bash
   - docker ps
   - docker container ls --all
+
+install:
   - docker exec -it my_ubuntu ls -al /home
   - docker exec -it my_ubuntu ls -al /home/work
-  #- docker exec -it my_ubuntu "echo $PATH"
-  #- docker exec -it my_ubuntu "echo $PKG_CONFIG_PATH"
-  #- sudo apt-get -y install pkg-config # Not sure this is in the image
-  #- sudo apt-get -y install libgit2-dev libcurl4-openssl-dev libssl-dev # for git2r (devtools requirement)
-  
-install:
-  # - docker exec -it my_ubuntu R -e "install.packages('devtools')"
-  
-  # - docker exec -it my_ubuntu /bin/bash sudo R -e "install.packages('sp', 'ggplot2')"
-  # 'testthat, ggmap, rgl, sphereplot, raster, dplyr, maptools, mgcv, shiny, spatstat, spatstat.data, RColorBrewer, graphics, knitr, rmarkdown)"
+  - docker exec -it my_ubuntu whoami
   - docker exec -it my_ubuntu R -e ".libPaths()"
   - docker exec -it my_ubuntu R -e "getwd()"
-  - docker exec -it my_ubuntu whoami
+  - docker exec -it my_ubuntu R -e "devtools::session_info()"
   - docker exec -it my_ubuntu ls /usr/local/lib/R/site-library
   - docker exec -it my_ubuntu ls /usr/lib/R/site-library
   - docker exec -it my_ubuntu ls /usr/lib/R/library
-  - docker exec -it my_ubuntu R -e "devtools::install_deps(pkg='/home/work',dep = T)"
+  - docker exec -it my_ubuntu R -e "devtools::install_deps(pkg='/home/work',dep = TRUE)"
 
 script:
-  - docker exec -it my_ubuntu R -e "devtools::check(pkg='/home/work', run_dont_test = TRUE)"
+  - docker exec -it my_ubuntu R -e "quit('no',status=length(do.call(c, as.list(devtools::check('/home/work', run_dont_test=TRUE)))))"
+  
+
   #- docker exec -it my_ubuntu R CMD build /home/work/
   #- docker exec -it my_ubuntu ls -al /
   #- docker exec -it my_ubuntu R CMD check /home/work
