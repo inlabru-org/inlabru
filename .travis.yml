@@ -30,4 +30,4 @@ install:
   - docker exec -it my_ubuntu R -e ".libPaths()"
 script:
   - docker exec -it my_ubuntu R CMD build /home/work/
-  - docker exec -it my_ubuntu R CMD check /home/work/*tar.gz
+  - docker exec -it my_ubuntu R CMD check --as-cran /home/work/
