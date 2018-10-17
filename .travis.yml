@@ -36,6 +36,7 @@ install:
   - docker exec -it my_ubuntu R -e "devtools::install_deps(pkg='/home/work',dep = T)"
 
 script:
-  - docker exec -it my_ubuntu R CMD build /home/work/
-  - docker exec -it my_ubuntu ls -al /
-  - docker exec -it my_ubuntu R CMD check /home/work
+  - docker exec -it my_ubuntu R -e "devtools::check(pkg='/home/work', run_dont_test = TRUE)"
+  #- docker exec -it my_ubuntu R CMD build /home/work/
+  #- docker exec -it my_ubuntu ls -al /
+  #- docker exec -it my_ubuntu R CMD check /home/work
