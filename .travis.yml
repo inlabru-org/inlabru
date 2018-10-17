@@ -29,6 +29,11 @@ install:
   # 'testthat, ggmap, rgl, sphereplot, raster, dplyr, maptools, mgcv, shiny, spatstat, spatstat.data, RColorBrewer, graphics, knitr, rmarkdown)"
   - docker exec -it my_ubuntu R -e ".libPaths()"
   - docker exec -it my_ubuntu R -e "getwd()"
+  - docker exec -it my_ubuntu whoami
+  - docker exec -it my_ubuntu ls /usr/local/lib/R/site-library
+  - docker exec -it my_ubuntu ls /usr/lib/R/site-library
+  - docker exec -it my_ubuntu ls /usr/lib/R/library
+  
 script:
   - docker exec -it my_ubuntu R CMD build /home/work/
   - docker exec -it my_ubuntu ls -al /
