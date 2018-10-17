@@ -32,4 +32,4 @@ install:
 script:
   - docker exec -it my_ubuntu R CMD build /home/work/
   - docker exec -it my_ubuntu ls -al /
-  - docker exec -it my_ubuntu R CMD check --as-cran /*.tar.gz
+  - docker exec -it my_ubuntu R CMD check --as-cran .
