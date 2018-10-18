@@ -28,6 +28,9 @@ install:
   # - docker exec -it my_ubuntu R -e "devtools::install_deps(pkg='/home/work',dep = TRUE)"
 
 script:
+  # We need to be in a tmp directory because travis_wait generates a file that R CHECK will complain about.
+  - mkdir tmp
+  - cd tmp
   - travis_wait 60 sleep infinity & docker exec -it my_ubuntu R -e "quit('no',status=length(do.call(c, as.list(devtools::check('/home/work', run_dont_test=TRUE)))))"
   
 
