@@ -28,7 +28,7 @@ install:
   # - docker exec -it my_ubuntu R -e "devtools::install_deps(pkg='/home/work',dep = TRUE)"
 
 script:
-  - docker exec -it my_ubuntu R -e "quit('no',status=length(do.call(c, as.list(devtools::check('/home/work', run_dont_test=TRUE)))))"
+  - travis_wait 60 docker exec -it my_ubuntu R -e "quit('no',status=length(do.call(c, as.list(devtools::check('/home/work', run_dont_test=TRUE)))))"
   
 
   #- docker exec -it my_ubuntu R CMD build /home/work/
