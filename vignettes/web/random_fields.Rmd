@@ -1,0 +1,486 @@
+---
+title: "Random Fields"
+author: "Finn Lindgren"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Set things up
+
+```{r results="hide",warning=FALSE,message=FALSE}
+library(INLA)
+library(inlabru)
+library(mgcv)
+```
+
+Set default INLA values for tutorial session,
+and make a shortcut to a nicer colour scale:
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+init.tutorial()
+colsc <- function(...) {
+  scale_fill_gradientn(colours = rev(RColorBrewer::brewer.pal(11,"RdYlBu")),
+                       limits = range(..., na.rm=TRUE))
+}
+```
+
+This is precisely what `init.tutorial` does:
+
+```{r echo=FALSE}
+
+print(init.tutorial)
+```
+
+`iinla.verbose=TRUE` prints iterated inla progression information
+
+`int.strategy="eb"` limits INLA to Empirical Bayes so that the
+examples run faster; no posterior integration over $\theta$ is performed.
+See `?INLA::control.inla` for some more information.
+
+The `control.compute` options turn on information needed for posterior sampling, and
+tells INLA to compute DIC and WAIC. See `?INLA::control.compute` for more information.
+Fitting to 1-dimensional gridded data (counts)
+=========================================================
+Get the data
+-----------------------------------
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+data(Poisson2_1D)
+```
+
+Put the count data in `cd` (just because '`cd`' is less to type than '`countdata2`'.)
+
+```{r }
+cd <- countdata2
+```
+
+Take a look at the count data.
+
+
+```{r warning=FALSE,message=FALSE}
+
+cd
+ggplot(cd) + geom_point(aes(x, y = count)) + ylim(0, max(cd$count))
+```
+
+_Tip_: `RStudio > Help > Cheatsheets > Data visualisation with ggplot2` is a useful 
+reference for `ggplot2` syntax.
+Fit a Generalised Additive Model (GAM)
+-----------------------------------
+If you're not familiar with GAMs and the syntax of `gam` don't worry, the point of 
+this is just to provide something to which we can compare the `inlabru` model fit.
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+fit2.gam <- gam(count ~ s(x, k = 10) + offset(log(exposure)), family = poisson(), data = cd)
+```
+
+The term `s(x,k=10)` just specifies that as nonparametric smooth function is to be 
+fitted to the data, with _no more than_ 10 degrees of freedom (df). (The larger 
+the df, the more wiggly the fitted curve (recall from the lecture that this is an effect
+of how some spline methods are defined, without discretisation dependent penalty); `gam` selects the 'best' df.)  Notice the 
+use of `offset=`. (Refer to slides for an explanation of `offset`.) The variable
+`exposure` in data frame `cd` is the size of the bin in which each count was made. 
+
+You can look at the fitted model using `summary( )` as below if you want to, but 
+you do not need to understand this output, or the code that makes the predictions 
+immediately below it if you are not familiar with GAMs.
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+summary(fit2.gam)
+```
+
+Make a prediction data frame, get predictions and add them to the data frame
+First make vectors of x-values and associated (equal) exposures:
+
+```{r }
+xs <- seq(0, 55, length = 100)
+exposures <- rep(cd$exposure[1], 100) 
+```
+
+and put them in a data frame:
+
+```{r }
+dat4pred <- data.frame(x = xs, exposure = exposures)
+```
+
+Then predict 
+
+```{r }
+pred2.gam <- predict(fit2.gam, newdata = dat4pred, type = "response")
+dat4pred2 <- cbind(dat4pred, gam = pred2.gam) # add column for prediction in data frame
+```
+
+Ploting the fit and the data using the `ggplot2` commands below should give you the 
+plot shown below
+
+```{r }
+ggplot(dat4pred2) + 
+  geom_line(aes(x = x,y = gam), lty = 2) + 
+  ylim(0, max(dat4pred2$gam, cd$count)) +
+  geom_point(aes(x = x, y = count),cd)
+```
+
+Now try fitting an SPDE model with `inlabru`
+-----------------------------------
+Make mesh.
+
+```{r }
+x <- seq(0, 55, length = 50) # this sets mesh points - try others if you like
+mesh1D <- inla.mesh.1d(x, boundary = "free")
+```
+
+... and see where the mesh points are:
+
+
+```{r fig.show="hide"}
+
+ggplot() + gg(mesh1D) + xlim(0,55)
+```
+
+### Using function `bru( )` to fit to count data
+We need to speficy an model in order to fit it. This can be done inside the call
+to `bru( )` but that is a bit messy, so we'll store it in `mdl` first and then pass
+that to `bru( )`.
+
+Our response variable in the data frame `cd` is called `count` so the model specification
+needs to have that on the left of the `~`. The right has to have `+ Intercept` (all the 
+models we use have intercepts), and because we want to fit a Gaussian random field (GRF),
+it must have a GCRF specification. In `inlabru` the GRF specification is a function, which 
+allows the GRF to be calculated at any point in space while `inlabru` is doing its calculations. 
+
+The user gets to name the GRF function. The syntax is 'myname(map = ..., model= ...)',
+where:
+
+* 'myname' is whatever you want to call the GRF (we called it `field` below);
+* `map=` specifies the dimension in which the GRF or SPDE 'lives'. Here we are working in one
+dimension, and we called that dimension `x` when we set up the data set.
+* `model=` designates the type of effect, here an SPDE model object from the 
+`INLA` function `inla.spde2.pcmatern( )`, which requires a mesh to be passed to it, so we 
+pass it the 1D mesh that we created above, ``mesh1D`.
+
+```{r }
+the_spde <- inla.spde2.pcmatern(mesh1D,
+                                prior.range=c(1, 0.01),
+                                prior.sigma=c(10, 0.01))
+comp <- count ~ field(map = x, model = the_spde) + Intercept
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+fit2.bru <- bru(comp, cd, family = "poisson", options = list(E = cd$exposure))
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+summary(fit2.bru)
+```
+
+Predict the values at the x points used for mesh
+(the data argument must be a data frame, see `?predict.bru`):
+
+```{r }
+x4pred <- data.frame(x = xs)
+pred2.bru <- predict(fit2.bru, x4pred, x ~ exp(field+Intercept), n.samples=1000)
+```
+
+Let's do a plot to compare the fitted model to the true model. The expected counts 
+of the true model are stored in the variable `E_nc2` which comes with the dataset 
+`Poisson2_1D`. For ease of use in plotting with `ggplot2` (which needs a data frame),
+we create a data frame which we call `true.lambda`, containing `x`- and `y` variables 
+as shown below.
+
+Given that `inlabru` predictions are always on the intensity function scale, do you 
+understand why we divide the count by `cd$exposure`? (We will in due course allow 
+predictions on the count scale as well.)
+
+
+```{r }
+true.lambda <- data.frame(x = cd$x, y = E_nc2/cd$exposure)
+```
+
+These `ggplot2` commands should generate the plot shown below. It shows the true 
+intensities as short horizontal blue lines, the observed intensities as black dots, 
+and the fitted intensity function as a red curve, with 95% credible intervals 
+shown as a light red band about the curve.
+
+```{r }
+ggplot() + 
+  gg(pred2.bru) + 
+  geom_point(data = cd, aes(x = x, y = count/cd$exposure), cex = 2) + 
+  geom_point(data = true.lambda, aes(x, y), pch="_", cex = 9, col = "blue") +
+  xlab("x") + ylab("Intensity")
+```
+
+Compare the `inlabru` fit to the `gam` fit:
+
+```{r fig.show="hide"}
+
+ggplot() + 
+  gg(pred2.bru) +
+  geom_point(data = cd , aes(x = x,y = count/exposure), cex = 2) + 
+  geom_line(data = dat4pred2, aes(x, gam/exposure), lty = 2) + 
+  xlab("x") + ylab("Intensity") 
+```
+
+### Looking at the posterior distributions
+We can look at the Intercept posterior using the function 
+`plot( )`, as below. 
+
+```{r }
+plot(fit2.bru, "Intercept")
+```
+
+You have to know that there is a variable called `Intercept` in order to use this 
+function. To see what fixed effect parameters' posterior distributions are available 
+to be plotted, you can type
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+names(fit2.bru$marginals.fixed)
+```
+
+This does not tell you about the SPDE parameters, and if you type
+
+
+```{r warning=FALSE,message=FALSE}
+
+names(fit2.bru$marginals.random)
+```
+
+this just tells you that there is an SPDE in fit2.bru called 'field', it does not 
+tell you what the associated parameter names are. The parameters that are used in 
+estimation are cryptic -- what we are interested in is the 
+range and variance of the Matern covariance funcion, that are functions of the
+internal parameters.  We can look at the posterior distributions of the range parameter 
+and the log of the variance parameters as follows. (We look at the 
+posterior of the *log* of the variance because the variance posterior is very skewed 
+and so it is easier to view the log of the variance)
+
+
+```{r warning=FALSE,message=FALSE}
+
+spde.range <- spde.posterior(fit2.bru, "field", what = "range")
+spde.logvar <- spde.posterior(fit2.bru, "field", what = "log.variance")
+
+range.plot <- plot(spde.range)
+var.plot <- plot(spde.logvar)
+multiplot(range.plot, var.plot)
+```
+
+We can look at the posterior distributions of the Matern correlatioin and covariance
+funcitons as follows:
+
+
+```{r warning=FALSE,message=FALSE}
+
+plot(spde.posterior(fit2.bru, "field", what="matern.correlation"))
+plot(spde.posterior(fit2.bru, "field", what="matern.covariance"))
+```
+
+Modelling random fields on 2D domains
+=========================================================
+We will now construct a 2D model, generate a sample of a
+random field, and attempt to recover the field from observations at a few locations.
+Tomorrow, we will look into more general mesh constructions that adapt to irregular domains.
+
+First, we build a high resolution mesh for the true field, using low level INLA functions
+
+```{r }
+bnd <- spoly(data.frame(lon = c(0, 10, 10, 0), lat = c(0, 0, 10, 10)),
+             crs=inla.CRS("longlat"))
+mesh_fine <- inla.mesh.2d(boundary = bnd, max.edge = 0.2)
+plot(mesh_fine)
+
+# Note: the priors here will not be used in estimation
+matern_fine <-
+  inla.spde2.pcmatern(mesh_fine, 
+                      prior.sigma = c(1, 0.01), 
+                      prior.range = c(1, 0.01))
+true_range <- 4
+true_sigma <- 1
+true_Q <- inla.spde.precision(matern_fine, theta=log(c(true_range, true_sigma)))
+```
+
+What is the pointwise standard deviation of the field? Along straight boundaries,
+the variance is twice the target variance. At corners the variance is 4 times as large.
+
+```{r results="hide"}
+
+true_sd <- diag(inla.qinv(true_Q))^0.5
+ggplot() + gg(mesh_fine, col=true_sd)
+```
+
+Generate a sample from the model:
+
+```{r }
+true_field <- inla.qsample(1, true_Q)[,1]
+
+truth <- expand.grid(lon=seq(0, 10, length=100),
+                     lat=seq(0, 10, length=100))
+truth$field <- inla.mesh.project(mesh_fine,
+                                 loc = as.matrix(truth),
+                                 field = true_field)
+coordinates(truth) <- c("lon", "lat")
+truth <- as(truth, "SpatialPixelsDataFrame")
+
+pl_truth <- ggplot() +
+              gg(truth, mapping=aes_string("lon","lat",fill="field")) +
+              coord_equal() +
+              ggtitle("True field")
+pl_truth
+
+## Or with another colour scale:
+csc <- colsc(truth$field)
+multiplot(pl_truth, pl_truth + csc, cols = 2)
+```
+
+Extract observations from some random locations:
+
+```{r }
+n <- 200
+mydata <- data.frame(lon = runif(n, 0, 10), lat = runif(n, 0, 10))
+mydata$observed <- inla.mesh.project(mesh_fine,
+                                     loc = as.matrix(mydata),
+                                     field = true_field) + rnorm(n, sd = 0.4)
+coordinates(mydata) <- c("lon", "lat")
+plot(mydata)
+```
+
+Estimating the field
+----------
+
+```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
+```
+
+Construct a mesh covering the data:
+
+```{r }
+mesh <- inla.mesh.2d(boundary = bnd, max.edge = 0.5)
+plot(mesh)
+```
+
+Construct an SPDE model object for a Matern model:
+
+```{r }
+matern <-
+  inla.spde2.pcmatern(mesh, 
+                      prior.sigma = c(10, 0.01), 
+                      prior.range = c(1, 0.01))
+```
+
+Specify the model components:
+
+```{r }
+cmp <- observed ~ field(map = coordinates,
+                        model = matern) +
+                  Intercept
+```
+
+Fit the model and inspect the results:
+
+```{r warning=FALSE,message=FALSE,results="hide"}
+
+fit <- bru(cmp, mydata, family="gaussian")
+summary(fit)
+INLA:::summary.inla(fit)
+```
+
+Predict the field on a lattice, and generate
+a single realisation from the posterior distribution:
+
+```{r warning=FALSE,message=FALSE}
+
+pix <- pixels(mesh, nx = 200, ny = 200)
+pred <- predict(fit, pix,
+                ~ field + Intercept)
+samp <- generate(fit, pix,
+                ~ field + Intercept,
+                n.samples = 1)
+pred$sample <- samp[[1]]
+```
+
+Compare the truth to the estimated field
+(posterior mean and a sample from the posterior distribution):
+
+
+```{r results="hide",warning=FALSE,message=FALSE, pfig.height=5,fig.width=12}
+
+pl_posterior_mean <- ggplot() + 
+  gg(pred) + 
+  gg(bnd) +
+  ggtitle("Posterior mean") + 
+  coord_fixed()
+pl_posterior_sample <- ggplot() + 
+  gg(pred, mapping=aes_string(x="x", y="y", fill="sample")) + 
+  gg(bnd) +
+  ggtitle("Posterior sample") + 
+  coord_fixed()
+
+# Common colour scale for the truth and estimate:
+csc <- colsc(truth$field, pred$mean, pred$sample)
+multiplot(pl_truth + csc,
+          pl_posterior_mean + csc,
+          pl_posterior_sample + csc,
+          cols = 3)
+```
+
+Plot the SPDE parameter and fixed effect parameter posteriors.
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+int.plot <- plot(fit, "Intercept")
+spde.range <- spde.posterior(fit, "field", what = "range")
+spde.logvar <- spde.posterior(fit, "field", what = "log.variance")
+range.plot <- plot(spde.range)
+var.plot <- plot(spde.logvar)
+
+multiplot(range.plot, var.plot, int.plot)
+```
+
+Look at the correlation function if you want to:
+
+
+```{r eval=TRUE,warning=FALSE,message=FALSE}
+
+corplot <- plot(spde.posterior(fit, "field", what = "matern.correlation"))
+covplot <- plot(spde.posterior(fit, "field", what = "matern.covariance"))
+multiplot(covplot, corplot)
+```
+
+You can plot the median, lower 95% and upper 95% density surfaces as follows (assuming
+that the predicted intensity is in object `pred`).
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+csc <- colsc(pred@data["median"],
+             pred@data["q0.025"],
+             pred@data["q0.975"]) ## Common colour scale from SpatialPixelsDataFrame
+
+gmedian <- ggplot() + gg(pred["median"]) + coord_equal() + csc
+glower95 <- ggplot() + gg(pred["q0.025"]) + coord_equal() + csc + theme(legend.position = "none")
+gupper95 <- ggplot() + gg(pred["q0.975"]) + coord_equal() + csc + theme(legend.position = "none")
+
+multiplot(gmedian, glower95, gupper95, 
+          layout = matrix(c(1,1,2,3), byrow = TRUE, ncol = 2))
+```
+
+

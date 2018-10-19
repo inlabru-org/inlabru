@@ -1,0 +1,273 @@
+---
+title: "LGCPs - An example in one dimension"
+author: "David Borchers"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=FALSE}
+
+options(width=100) # sets width of ouput window
+```
+
+Introduction
+----------------
+In this vignette we are going to see how to fit an SPDE to one-dimensional *point* 
+data, i.e. data that consist of the points at which things are located, not the number
+of points in some area.
+
+Setting things up
+----------------
+
+Load libraries
+```{r results="hide",warning=FALSE,message=FALSE}
+library(inlabru)
+library(INLA)
+library(mgcv)
+```
+
+Use empricial Bayes in order to speed things up a little bit:
+```{r results="hide",warning=FALSE,message=FALSE}
+init.tutorial()
+```
+
+
+
+Get the data
+-----------------------------------
+
+```{r }
+data(Poisson2_1D)
+```
+
+Take a look at the point (and frequency) data
+
+
+```{r fig.width=10, fig.heigth=4}
+ggplot(pts2) + 
+  geom_histogram(aes(x = x), binwidth = 55/20, boundary = 0, fill = NA, color = "black") +
+  geom_point(aes(x), y = 0, pch = "|", cex = 4) + 
+  coord_fixed(ratio = 1)
+```
+
+Fiting the model
+-----------------------------------
+Build a 1D mesh: 
+
+```{r }
+x <- seq(0, 55, length = 50)
+mesh1D <- inla.mesh.1d(x, boundary = "free")
+```
+
+Make a 1D SPDE model:
+```{r results="hide",warning=FALSE,message=FALSE}
+matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150,0.75), prior.sigma = c(0.1,0.75))
+mdl <- x ~ spde1D(map = x, model = matern) + Intercept
+```
+
+Here we want to fit to the actual points, and the `inlabru` function that does this is called `lgcp` (for 'Log Gaussian Cox Process'). The `ips' and `domain` parameters are optional, one or the other or neither can be used. If neither are used, `lgcp` will infer the boundary of the `x` domain by using the upper and lower limits of the `x` column in `pts2`. Here are three ways of doing the same thing:
+
+```{r results="hide",warning=FALSE,message=FALSE}
+fit.spde <- lgcp(mdl, pts2, ips = ipoints(c(0,55), 50, name = "x"))
+fita.spde <- lgcp(mdl, pts2, domain = list(x = mesh1D))
+fitb.spde <- lgcp(mdl, pts2)
+```
+
+SPDE parameters 
+-----------------------------------
+
+We can look at the posterior distributions of the parameters of the SPDE using the function `spde.posterior`.
+It returns `x` and `y` values for a plot of the posterior PDF in a data frame, which can be printed using 
+the `plot` function. To see the PDF for the range parameter, for example:
+
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE,fig.height=3, fig.width=7}
+post.range = spde.posterior(fit.spde,name="spde1D",what="range"); plot(post.range)
+```
+
+Look at the help file for `spde.posterior` and then plot the posterior for the log of the SPDE range parameter, the 
+SPDE variance and/or log of the variance, and for the Matern covariance function. Make sure you understand the difference 
+between what is plotted for the range and variance parameters, and for the covariance function 
+(which involves both these parameters).
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE, eval=FALSE}
+post.log.range = spde.posterior(fit.spde,name="spde1D",what="log.range");plot(post.log.range) # SOLUTION
+post.variance = spde.posterior(fit.spde,name="spde1D",what="variance"); plot(post.variance) # SOLUTION
+post.log.variance = spde.posterior(fit.spde,name="spde1D",what="log.variance"); plot(post.log.variance) # SOLUTION
+post.matcorr = spde.posterior(fit.spde,name="spde1D",what="matern.correlation");plot(post.matcorr) # SOLUTION
+```
+
+You can get a feel for sensitivity to priors by specifying different priors and looking at the posterior plots.
+
+Predicting intensity
+-----------------------------------
+
+We can also now predict on any scale we want. For example, to predict on the 'response' 
+scale (i.e. the intensity function $\lambda(s)$), we call `predict` thus:
+
+```{r }
+predf <- data.frame(x = seq(0, 55, by = 1)) # Set up a data frame of explanatory values at which to predict
+pred_spde <- predict(fit.spde, predf,  ~ exp(spde1D + Intercept))
+```
+
+while to predict on the linear predictor scale (i.e. that of the log intensity, 
+$\log(\lambda(s))$), we call `predict` thus:
+
+```{r }
+pred_spde_lp <- predict(fit.spde, predf, ~ spde1D + Intercept)
+```
+
+here's how to plot the prediction and 95% credible interval:
+
+```{r }
+plot(pred_spde, color = "red") + 
+  geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) + 
+  xlab("x") + ylab("Intensity")
+```
+
+How does this compare with the underlying intensity function that generated the data? 
+The function `lambda2_1D( )` in the dataset `Poission2_1D` calculates the true intensity 
+that was used in simulating these data. In order to plot this, we make a data frame with 
+`x`- and `y`-coordinates giving the true intensity function,  $\lambda(s)$. We use lots 
+of `x`-values to get a nice smooth plot (150 values).
+
+```{r }
+xs <- seq(0,55,length=150)
+true.lambda <- data.frame(x=xs, y=lambda2_1D(xs))
+```
+
+Plot the fitted and true intensity functions:
+
+```{r fig.show="hide"}
+plot(pred_spde, color = "red") + 
+  geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) + 
+  geom_line(data=true.lambda, aes(x,y)) +
+  xlab("x") + ylab("Intensity")
+```
+
+Goodness-of-Fit
+-----------------------------------
+
+We can look at the goodness-of-fit of the mode using the `inlabru` function `bincount( )`,
+which plots the 95% credible intervals in a specified set of bins along the `x`-axis
+together with the observed count in each bin:
+The credible intervals are shown as red rectangles, the mean fitted value as a short 
+horizontal blue line, and the observed data as black points:
+
+```{r }
+bc <- bincount(result = fit.spde, 
+              observations = pts2, 
+              breaks = seq(0,max(pts2),length = 12), 
+              predictor = x ~ exp(spde1D + Intercept))
+
+attributes(bc)$ggp
+```
+
+Estimating Abundance
+-----------------------------------
+
+Abundance is the integral of the intensity over space. We estimate it by integrating
+the predicted intensity over `x`. Integration is done by adding up the intensity at 
+locations `x` weighted by a particular weight. The locations `x` and their weights
+are constructed using the `ipoints` function
+
+```{r }
+ips <- ipoints(c(0,55), 100, name = "x")
+head(ips)
+Lambda <- predict(fit.spde, ips, ~ sum(weight * exp(spde1D + Intercept)))
+```
+
+You can look at the abundance estimate by typing
+
+```{r }
+Lambda
+```
+
+* `mean` is the posterior mean abundance.
+* `sd` is the estimated standard error of the posterior of the abundance.
+* `cv` is its estimated coefficient of variation (stander error divided by mean).
+* `q0.025` and `q0.975` are the 95% credible interval bounds.
+* `q0.5` is the posterior median abundance
+
+But it is not quite that simple! The above posterior for abundance takes account 
+only of the variance due to us not knowing the parameters of the intensity function.
+It neglects the variance in the number of point locations, given the intensity function.
+To include this we need to modify `predict( )` as follows:
+
+
+```{r }
+Nest <- predict(fit.spde, ips, 
+                 ~ data.frame(N = 50:250, 
+                              dpois = dpois(50:250,
+                                            lambda = sum(weight * exp(spde1D + Intercept)))))
+```
+
+This calculates the same statistics as were calculated for `Lambda`, but for evey value of `N` from 50 to 250, 
+rather than for the posterior mean `N` alone:
+
+```{r }
+head(Nest)
+```
+
+We compute the 95% prediction interval and the median as follows
+
+```{r }
+inla.qmarginal(c(0.025, 0.5, 0.975), marginal = list(x = Nest$N, y = Nest$mean))
+```
+
+Compare `Lambda` to `Nest` by plotting:
+First calculate the posterior conditional on the mean of `Lambda`
+
+```{r }
+Nest$plugin_estimate <- dpois(Nest$N, lambda=Lambda$mean)
+```
+
+Then plot it and the unconditional posterior
+
+```{r }
+ggplot(data = Nest) +
+  geom_line(aes(x = N, y = mean, colour = "Posterior")) +
+  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
+```
+
+Do the differences make sense to you?
+
+Comparison to GAM fit
+----------------------------------
+
+Now refit a GAM for the count data of `Poisson2_1D` and plot the 
+estimated intensity function from this GAM fit, together with the LGCP fitted above 
+and the true intensity.
+
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+cd2 <- countdata2
+fit2.gam <- gam(count ~ s(x, k = 10) + offset(log(exposure)), family = poisson(), data = cd2)
+dat4pred <- data.frame(x = seq(0, 55, length = 100), exposure = rep(cd2$exposure[1], 100))
+pred2.gam <- predict(fit2.gam, newdata = dat4pred, type="response")
+dat4pred2 <- cbind(dat4pred, gam = pred2.gam)  # SOLUTION
+```
+
+You should get a plot like this (thick line is the true intensity, the thin solid line the inlabru fit, the dshed line the GAM fit:
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE,eval=TRUE}
+plot(pred_spde) +  
+  geom_point(data = pts2, aes(x = x),y = 0, pch = "|", cex = 2) + 
+  geom_line(data = dat4pred2, aes(x, gam/exposure), lty = 2) + 
+  geom_line(data = true.lambda, aes(x, y), lwd=1.5) + 
+  geom_point(data = cd2, aes(x, y = count/exposure)) + 
+  ylab("Intensity") + xlab("x") # SOLUTION
+```
+

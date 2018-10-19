@@ -1,0 +1,173 @@
+---
+title: "LGCPs - Plot sampling"
+author: "David Borchers"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Introduction
+----------
+
+This practical demonstrates use of the `samplers` argument in `lgcp`, which you
+need to use when you have observed points from only a sample of plots in the survey 
+region. 
+
+
+Setting things up
+----------------
+
+Load libraries
+```{r results="hide",warning=FALSE,message=FALSE}
+library(inlabru)
+library(INLA)
+library(mgcv)
+```
+
+Use empricial Bayes in order to speed things up a little bit:
+```{r results="hide",warning=FALSE,message=FALSE}
+init.tutorial()
+```
+
+Get the data
+-----------------------------------
+
+```{r }
+data(gorillas, package = "inlabru")
+```
+
+This dataset is a list (see `help(gorillas)` for details. Extract the the objects 
+you need from the list, for convenience:
+
+```{r }
+nests <- gorillas$nests
+mesh <- gorillas$mesh
+boundary <- gorillas$boundary
+gcov <- gorillas$gcov
+```
+
+The `gorillas` data also contains a plot sample subset which covers 60% of the survey region.
+
+```{r }
+sample <- gorillas$plotsample
+
+```{r results="hide",warning=FALSE,message=FALSE}
+plotdets <- ggplot() + gg(boundary) + gg(sample$plots) + 
+  gg(sample$nests, pch = "+", cex = 4, color = "red") +
+  geom_text(aes(label = sample$counts$count, x = sample$counts$x, y = sample$counts$y)) + 
+  coord_fixed() + labs(x = "Easting", y = "Northing")
+plot(plotdets)
+```
+
+On this plot survey, only points within the rectangles are detected, but it is also 
+informative to plot all the points here (which if it was a real plot survey you could
+not do, because you would not have seen them all).
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+plotwithall <- ggplot() + gg(boundary) + gg(sample$plots) + 
+  gg(nests, pch="+", cex = 4, color = "blue") +
+  geom_text(aes(label = sample$counts$count, x = sample$counts$x, y = sample$counts$y)) + 
+  gg(sample$nests, pch = "+", cex = 4, color = "red") +
+  coord_fixed() + labs(x = "Easting", y = "Northing")
+plot(plotwithall)
+```
+
+Inference
+------------------------------------
+The observed nest locations are in the SpatialPointsDataFrame `sample$nests`, and the 
+plots are in the SpatialPolygonsDataFrame `sample$plots`. Again, we are using the following SPDE
+setup:
+
+
+```{r }
+matern <- inla.spde2.pcmatern(mesh, 
+                              prior.sigma = c(0.1, 0.01), 
+                              prior.range = c(5, 0.01))
+```
+
+
+Fit an LGCP model with SPDE only to these data by using the `samplers=` argument of 
+the function `lgcp( )`:
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+cmp <- coordinates ~ my.spde(map = coordinates, 
+                             model = matern) 
+
+fit <- lgcp(cmp, sample$nests, samplers = sample$plots)
+```
+
+
+Plot the density surface from your fitted model
+
+```{r results="hide",warning=FALSE,message=FALSE}
+lambda.sample <- predict(fit, pixels(mesh), ~ exp(my.spde + Intercept))
+```
+
+```{r warning=FALSE,message=FALSE}
+lambda.sample.plot <- ggplot() + 
+                        gg(lambda.sample) + 
+                        gg(sample$plots) + 
+                        gg(boundary, col = "yellow") + 
+                        coord_fixed() + 
+                        theme(legend.position = "bottom")
+
+lambda.sample.plot
+```
+
+
+Estimate the integrated intensity lambda.
+```{r results="hide",warning=FALSE,message=FALSE}
+Lambda <- predict(fit, ipoints(boundary, mesh), ~ sum(weight * exp(my.spde + Intercept)))
+Lambda
+```
+
+
+Fit the same model to the full dataset (the points in `gorillas$nests`), or get your previous 
+fit, if you kept it. Plot the intensity surface and estimate the integrated intensity
+
+```{r results="hide",warning=FALSE,message=FALSE}
+
+fit.all <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+lambda.all <- predict(fit.all, pixels(mesh), ~ exp(my.spde + Intercept))
+Lambda.all <- predict(fit.all,  ipoints(boundary, mesh), ~ sum(weight * exp(my.spde + Intercept)))
+```
+
+Your plot should look like this:
+
+
+```{r results="hide",warning=FALSE,message=FALSE,fig.height=5,fig.width=11, echo=FALSE}
+lambda.all.plot <- ggplot() + gg(lambda.all) + 
+                                gg(sample$plots) + 
+                                gg(boundary, col = "yellow") + 
+                                coord_fixed() + 
+                                theme(legend.position = "bottom")
+lambda.all.plot
+```
+
+And `Lambda.all` should be close to
+
+```{r }
+Lambda
+```
+
+Now, let's compare the results
+
+
+```{r results="hide",warning=FALSE,message=FALSE,fig.height=5,fig.width=11}
+multiplot(lambda.sample.plot, lambda.all.plot, cols = 2)
+```
+
+Do you understand the reason for the differences in the posteriors of the two abundance estimates?
