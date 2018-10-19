@@ -52,3 +52,4 @@ ggplot() + gg(mesh, shape = "|", size = 5)
 Other geomes for meshes: \code{\link{gg.inla.mesh}},
   \code{\link{gg}}, \code{\link{gm}}
 }
+\concept{geomes for meshes}

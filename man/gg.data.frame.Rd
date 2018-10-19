@@ -88,3 +88,4 @@ Other geomes for inla and inlabru predictions: \code{\link{gg.matrix}},
   \code{\link{gg.prediction}}, \code{\link{gg}},
   \code{\link{gm}}
 }
+\concept{geomes for inla and inlabru predictions}
