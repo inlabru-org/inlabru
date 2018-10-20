@@ -30,7 +30,7 @@ install:
 script:
   # We need to be in inst/misc directory because travis_wait generates a file that R CHECK will complain about.
   - cd inst/misc
-  - travis_wait 60 sleep infinity & docker exec -it my_ubuntu R -e "quit('no',status=length(do.call(c, as.list(devtools::check('/home/work', run_dont_test=TRUE)))))"
+  - travis_wait 60 sleep infinity & docker exec -it my_ubuntu R -e "quit('no',status=length(do.call(c, as.list(devtools::check('/home/work', run_dont_test=FALSE)))))"
   
 
   #- docker exec -it my_ubuntu R CMD build /home/work/
