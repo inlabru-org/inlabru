@@ -1,4 +1,8 @@
 context("2D LGCP fitting and prediction")
+library(INLA)
+library(inlabru)
+
+
 data(gorillas, package = "inlabru")
 matern <- inla.spde2.pcmatern(gorillas$mesh, prior.sigma = c(0.1, 0.01), prior.range = c(5, 0.01))
 cmp <- coordinates ~ mySmooth(map = coordinates,model = matern) +Intercept
@@ -12,18 +16,18 @@ test_that("2D LGCP fitting: Result object", {
 
 test_that("2D LGCP fitting: INLA intercept", {
 
-  expect_equal(fit$summary.fixed["Intercept","mean"], 1.121929, tolerance = lowtol)
-  expect_equal(fit$summary.fixed["Intercept","sd"], 0.5799173, tolerance = lowtol)
+  expect_equal(fit$summary.fixed["Intercept","mean"], 1.121929, tolerance = midtol)
+  expect_equal(fit$summary.fixed["Intercept","sd"], 0.5799173, tolerance = midtol)
 
 })
 
 test_that("2D LGCP fitting: INLA random field", {
   expect_equal(fit$summary.random$mySmooth$mean[c(1, 456, 789, 1058, 1479)],
                c(-2.0224597, 0.3874104, -0.4473572, 0.4019972, -1.7000660),
-               tolerance = 1E-5)
+               tolerance = midtol)
   expect_equal(fit$summary.random$mySmooth$sd[c(1, 436, 759, 1158, 1279)],
                c(1.5924485,0.8243210,0.8209047,0.7928983,1.0671142),
-               tolerance = 1E-5)
+               tolerance = midtol)
 })
 
 test_that("2D LGCP fitting: predicted random field", {

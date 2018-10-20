@@ -1,4 +1,6 @@
 context("Integration point construction using ipoints()")
+library(INLA)
+library(inlabru)
 
 test_that("1D integration points can be generated", {
   ips = ipoints(c(0,10), 3, name = "myDim")
