@@ -57,3 +57,4 @@ Other inlabru RGL tools: \code{\link{glplot.SpatialLines}},
   \code{\link{glplot.SpatialPoints}},
   \code{\link{glplot.inla.mesh}}, \code{\link{glplot}}
 }
+\concept{inlabru RGL tools}

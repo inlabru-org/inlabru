@@ -415,9 +415,9 @@ gg.SpatialPixelsDataFrame = function(data,
   gm = geom_tile(data = df, mapping = dmap, ...)
   
   # If data is not discrete (factor), add default color palette
-  if (!inherits(data[[deparse(dmap$fill)]], "factor")) {
-    gm = c(gm, scale_fill_gradientn(colours = bru.pal()))
-  }
+  #if (!inherits(data[[deparse(dmap$fill)]], "factor")) {
+  #  gm = c(gm, scale_fill_gradientn(colours = bru.pal()))
+  #}
   gm
 }
 

@@ -4,8 +4,8 @@
 \alias{materncov.bands}
 \title{Matern correlation or covariance function approximate credible bands.}
 \usage{
-materncov.bands(manifold, dist, log.range, log.variance = NULL, alpha = 2,
-  quantile = 0.95, n = 64, S1.L = NULL)
+materncov.bands(manifold, dist, log.range, log.variance = NULL,
+  alpha = 2, quantile = 0.95, n = 64, S1.L = NULL)
 }
 \arguments{
 \item{manifold}{Either "R1", "S1", "R2", or "S2", from

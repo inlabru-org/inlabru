@@ -59,3 +59,4 @@ plot(do.call(rbind, smp))
 Other sample generators: \code{\link{generate.bru}},
   \code{\link{generate.inla}}
 }
+\concept{sample generators}
