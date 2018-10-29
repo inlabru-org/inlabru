@@ -1,6 +1,5 @@
 context("2D LGCP fitting and prediction")
 library(INLA)
-library(inlabru)
 
 
 data(gorillas, package = "inlabru")
@@ -37,8 +36,8 @@ test_that("2D LGCP fitting: predicted random field", {
   loc = SpatialPoints(gorillas$mesh$loc[,c(1,2)])
   proj4string(loc) = CRS(proj4string(gorillas$nests))
   pr <- predict(fit, loc,  ~ mySmooth, n.samples = 100)
-  expect_equal(pr$mean[c(1,255,778,1000)], c(-2.057675,-1.766163,-1.512785,-1.488362), tolerance = 1E-1)
-  expect_equal(pr$sd[c(2,215,656,1010)], c(0.0000000,0.6629913,0.9822118,1.2876455), tolerance = 1E-1)
+  expect_equal(pr$mean[c(1,255,778,1000)], c(-2.057675,-1.766163,-1.512785,-1.488362), tolerance = hitol)
+  expect_equal(pr$sd[c(2,215,656,1010)], c(0.0000000,0.6629913,0.9822118,1.2876455), tolerance = hitol)
   
 })
 
@@ -53,13 +52,10 @@ test_that("2D LGCP fitting: predicted intensity integral", {
   
 })
 
-test_that("(KNOWN BUG): Supplying integration points instead of samplers", {
-  ips = ipoints(gorillas$boundary)
+test_that("Supplying integration points instead of samplers", {
+  ips = ipoints(gorillas$boundary, gorillas$mesh)
   fit_ips <- lgcp(cmp, gorillas$nests, ips = ips)
   
-  # FAIL: 
-  # We expect that the result is very similar to the "fit" object. However, the following fails:
-  #
   expect_equal(fit_ips$summary.fixed["Intercept","mean"], fit$summary.fixed["Intercept","mean"], tolerance = lowtol)
   expect_equal(fit_ips$summary.fixed["Intercept","sd"], fit$summary.fixed["Intercept","sd"], tolerance = lowtol)
   expect_equal(fit_ips$summary.random$mySmooth$mean, fit$summary.random$mySmooth$mean, tolerance = lowtol)

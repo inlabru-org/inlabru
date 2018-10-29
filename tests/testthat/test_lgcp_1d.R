@@ -1,5 +1,4 @@
 context("1D LGCP fitting and prediction")
-library(inlabru)
 library(INLA)
 
 data(Poisson2_1D)

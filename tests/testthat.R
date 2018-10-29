@@ -1,6 +1,5 @@
 library(testthat)
 library(INLA)
-library(inlabru)
 
 lowtol = 1E-5
 midtol = 1E-3
