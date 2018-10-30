@@ -3,7 +3,7 @@
 \docType{data}
 \name{mexdolphin}
 \alias{mexdolphin}
-\title{Pan-tropical spotted dolphins in the Gulf of Mexico.}
+\title{Pan-tropical spotted dolphins in the Gulf of Mexico}
 \format{A list of objects:
  \describe{
    \item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of 
@@ -23,7 +23,7 @@
 Library \code{dsm}.
 }
 \usage{
-mexdolphin
+data(mexdolphin)
 }
 \description{
 This a version of the \code{mexdolphins} dataset from the package \code{dsm}, reformatted
@@ -35,11 +35,12 @@ the time of the observation.
 \examples{
 \donttest{
  data(mexdolphin, package="inlabru")
- plot(mexdolphin$mesh,edge.color="lightgray",draw.segments=FALSE) # draw mesh
- plot(mexdolphin$ppoly,add=TRUE) # add survey region boundary
- plot(mexdolphin$samplers,col="blue",add=TRUE) # draw transects (in and out of survey region)
- grsize = attributes(mexdolphin$points)$data[,"size"] # Get group size data
- plot(mexdolphin$points,pch=19,col="red",cex=log(grsize/30),add=TRUE)
+ ggplot() + 
+ gg(mexdolphin$mesh) +
+   gg(mexdolphin$ppoly, color = "blue") +
+   gg(mexdolphin$samplers) +
+   gg(mexdolphin$points, aes(size = size), color = "red") + 
+   coord_equal()
  }
 }
 \references{

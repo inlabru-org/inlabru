@@ -3,7 +3,7 @@
 \docType{data}
 \name{gorillas}
 \alias{gorillas}
-\title{Gorilla Nesting Sites.}
+\title{Gorilla nesting sites}
 \format{The data are a list that contains these elements:
  \describe{
    \item{\code{nests}:}{ A \code{SpatialPointsDataFrame} object containing the locations of 
@@ -46,7 +46,7 @@ Library \code{spatstat}.
 data(gorillas)
 }
 \description{
-This the \code{gorillas} dataset from the package \code{spatstat}, reformatted
+This is the \code{gorillas} dataset from the package \code{spatstat}, reformatted
 as point process data for use with \code{inlabru}.
 }
 \examples{
