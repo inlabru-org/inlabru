@@ -8,46 +8,59 @@ bru(components = y ~ Intercept, family = NULL, data = NULL, ...,
   options = list())
 }
 \arguments{
-\item{components}{a \link{formula} describing the latent components. See \link{bru.components} for details.}
+\item{components}{a \link{formula} describing the latent components. See
+\link{bru.components} for details.}
 
-\item{family}{A string indicating the likelihood family. The default is \code{gaussian} with 
-identity link. In addition to the likelihoods provided by inla 
-(see \code{inla.models()$likelihood}) inlabru supports fitting Cox processes 
-via \code{family = "cp"}. The latter requires contructing a likelihood using the \link{like}
-function and providing it via the ... parameter list. As an alternative to bru, the \link{lgcp} 
-function provides a convenient interface to fitting Cox processes. See details.}
+\item{family}{A string indicating the likelihood family. The default is
+\code{gaussian} with identity link. In addition to the likelihoods provided
+by inla (see \code{inla.models()$likelihood}) inlabru supports fitting Cox
+processes via \code{family = "cp"}. The latter requires contructing a
+likelihood using the \link{like} function and providing it via the ...
+parameter list. As an alternative to bru, the \link{lgcp} function provides
+a convenient interface to fitting Cox processes. See details.}
 
 \item{data}{A data.frame or SpatialPoints[DataFrame] object. See details.}
 
-\item{...}{Additional likelihoods, each constructed by a calling \link{like}. See details.}
+\item{...}{Additional likelihoods, each constructed by a calling \link{like}.
+See details.}
 
-\item{options}{A list of name and value pairs that are either interpretable by \link{bru.options} 
-or valid inla parameters.}
+\item{options}{A list of name and value pairs that are either interpretable
+by \link{bru.options} or valid inla parameters. See \link{bru.options} for
+caveats about some of the \code{control.*} inla options.}
 }
 \value{
-bru returns an object of class "bru". A \code{bru} object inherits from \link[INLA]{inla} 
-        (see the inla documentation for its properties) and adds additional information stored 
-        in the \code{sppa} field.
+bru returns an object of class "bru". A \code{bru} object inherits
+  from \link[INLA]{inla} (see the inla documentation for its properties) and
+  adds additional information stored in the \code{sppa} field.
 }
 \description{
-This method is a wrapper for \link[INLA]{inla} and provides multiple enhancements. 
+This method is a wrapper for \link[INLA]{inla} and provides
+  multiple enhancements.
 
-\itemize{
-\item{Easy usage of spatial covariates and automatic construction of inla projection matrices for (spatial) SPDE models. 
-      This feature is accessible via the \code{components} parameter.
-      Practical examples on how to use spatial data by means of the components parameter can also be found by looking at the \link{lgcp}
-      function's documentation.}
-\item{Constructing multiple likelihoods is straight forward. See \link{like} for more information on how to provide additional
-      likelihoods to \code{bru} using the ... parameter list.}
-\item{Support for non-linear predictors. See example below.}
-\item{Log Gaussian Cox process (LGCP) inference is available by using the \code{cp} family or (even easier) by using the 
-      \link{lgcp} function.}
-}
+  \itemize{
+    \item
+      Easy usage of spatial covariates and automatic construction
+      of inla projection matrices for (spatial) SPDE models. This feature is
+      accessible via the \code{components} parameter. Practical examples on how
+      to use spatial data by means of the components parameter can also be found
+      by looking at the \link{lgcp} function's documentation.
+    \item
+      Constructing multiple likelihoods is straight forward. See \link{like} for more
+      information on how to provide additional likelihoods to \code{bru} using
+      the \code{...} parameter list.
+    \item
+      Support for non-linear predictors. See example below.
+    \item
+      Log Gaussian Cox process (LGCP) inference is
+      available by using the \code{cp} family or (even easier) by using the
+      \link{lgcp} function.
+  }
 }
 \details{
-family and ... must either be parameters to \link{like}, or \code{lhood} objects constructed by \link{like}.
-         \code{data} must either be an \code{lhood} object, a data container, or \code{NULL}. If \code{NULL},
-         data must be supplied through direct calls to \link{like}.
+family and ... must either be parameters to \link{like}, or
+  \code{lhood} objects constructed by \link{like}. \code{data} must either be
+  an \code{lhood} object, a data container, or \code{NULL}. If \code{NULL},
+  data must be supplied through direct calls to \link{like}.
 }
 \examples{
 \donttest{

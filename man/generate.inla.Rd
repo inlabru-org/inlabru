@@ -53,3 +53,4 @@ Other sample generators: \code{\link{generate.bru}},
 \author{
 Finn Lindgren <\email{finn.lindgren@gmail.com}>
 }
+\concept{sample generators}

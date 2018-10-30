@@ -1,4 +1,10 @@
-# inlabru 2.1.7.999
+# inlabru 2.1.9.999
+
+# inlabru 2.1.9
+
+* Remove unused VignetteBuilder entry from DESCRIPTION
+
+# inlabru 2.1.8
 
 * Update default options
 
@@ -30,3 +36,4 @@
 * Added matrix geom `gg.matrix()`
 
 * Fixed CRAN test issues
+
