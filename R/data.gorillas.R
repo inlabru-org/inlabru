@@ -1,7 +1,7 @@
 #' @name gorillas
-#' @title Gorilla Nesting Sites.
+#' @title Gorilla nesting sites
 #' @docType data
-#' @description This the \code{gorillas} dataset from the package \code{spatstat}, reformatted
+#' @description This is the \code{gorillas} dataset from the package \code{spatstat}, reformatted
 #' as point process data for use with \code{inlabru}. 
 #' 
 #' @usage data(gorillas)

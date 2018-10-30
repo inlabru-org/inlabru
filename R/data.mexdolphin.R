@@ -1,5 +1,5 @@
 #' @name mexdolphin
-#' @title Pan-tropical spotted dolphins in the Gulf of Mexico.
+#' @title Pan-tropical spotted dolphins in the Gulf of Mexico
 #' @docType data
 #' @description This a version of the \code{mexdolphins} dataset from the package \code{dsm}, reformatted
 #' as point process data for use with \code{inlabru}. The data are from a combination of several NOAA 
@@ -7,7 +7,7 @@
 #' of groups of dolphins wre detected. The group size was recorded, as well as the Beaufort sea state at 
 #' the time of the observation.
 #' 
-#' @usage mexdolphin
+#' @usage data(mexdolphin)
 #' 
 #' @format A list of objects:
 #'  \describe{
@@ -40,14 +40,14 @@
 #' @examples
 #' \donttest{
 #'  data(mexdolphin, package="inlabru")
-#'  plot(mexdolphin$mesh,edge.color="lightgray",draw.segments=FALSE) # draw mesh
-#'  plot(mexdolphin$ppoly,add=TRUE) # add survey region boundary
-#'  plot(mexdolphin$samplers,col="blue",add=TRUE) # draw transects (in and out of survey region)
-#'  grsize = attributes(mexdolphin$points)$data[,"size"] # Get group size data
-#'  plot(mexdolphin$points,pch=19,col="red",cex=log(grsize/30),add=TRUE)
+#'  ggplot() + 
+#'  gg(mexdolphin$mesh) +
+#'    gg(mexdolphin$ppoly, color = "blue") +
+#'    gg(mexdolphin$samplers) +
+#'    gg(mexdolphin$points, aes(size = size), color = "red") + 
+#'    coord_equal()
 #'  }
 NULL
-
 
 #' Mexdolphin data import
 #' 
