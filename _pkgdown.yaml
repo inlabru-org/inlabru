@@ -48,6 +48,10 @@ navbar:
     - text: "workshops"
       icon: fa-university
       href: https://sites.google.com/inlabru.org/inlabru/workshops
+    - text: "publications"
+      icon: fa-book
+      href: articles/web/publications.html
+      
   right:
     - text: "faq"
       icon: fa-question-circle-o
@@ -55,7 +59,7 @@ navbar:
     - icon: fa-newspaper-o
       text: "changes"
       href: news/index.html
-    - icon: fa-github fa-lg
+    - icon: fa-question-circle-o
       text: "github"
       href: https://github.com/fbachl/inlabru/
 
