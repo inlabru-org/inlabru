@@ -125,9 +125,18 @@ effect.character = function(label,
       tmp = NA
       fcall$group = as.symbol("tmp") 
     }
-    fvals = do.call(INLA::f, as.list(fcall[2:length(fcall)])) # eval(parse(text=deparse(fcall)))
+    fargs = as.list(fcall[2:length(fcall)])
+    
+    # A trick for "Copy" models
+    if ("copy" %in% names(fargs)) { 
+      fargs[["copy"]] = NULL
+      fcall$model = NULL
+    }
+    
+    fvals = do.call(INLA::f, fargs) # eval(parse(text=deparse(fcall)))
     effect$f = fvals
-    # Second part of the trick above
+    
+    # Second part of the SPDE model trick above
     if ( model.type %in% c("spde") ) { 
       fcall$group = as.symbol(paste0(label, ".group"))
     }
@@ -386,7 +395,7 @@ amatrix.effect = function(effect, data, ...) {
                                loc = loc, 
                                group = group, 
                                n.group = effect$ngroup, 
-                               n.repl = effect$nrepl)
+                               n.repl = effect$nrep)
   } 
   else if ( effect$type %in% c("rw1", "rw2", "ar", "ar1", "ou") ) {
     if ( is.null(effect$values) ) { stop("Parameter 'values' not set for effect '", effect$label, "'.") }
