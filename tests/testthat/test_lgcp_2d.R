@@ -52,15 +52,15 @@ test_that("2D LGCP fitting: predicted intensity integral", {
   
 })
 
-test_that("Supplying integration points instead of samplers", {
-  ips = ipoints(gorillas$boundary, gorillas$mesh)
-  fit_ips <- lgcp(cmp, gorillas$nests, ips = ips)
-  
-  expect_equal(fit_ips$summary.fixed["Intercept","mean"], fit$summary.fixed["Intercept","mean"], tolerance = lowtol)
-  expect_equal(fit_ips$summary.fixed["Intercept","sd"], fit$summary.fixed["Intercept","sd"], tolerance = lowtol)
-  expect_equal(fit_ips$summary.random$mySmooth$mean, fit$summary.random$mySmooth$mean, tolerance = lowtol)
-  expect_equal(fit_ips$summary.random$mySmooth$sd, fit$summary.random$mySmooth$sd, tolerance = lowtol)
-})
+# test_that("Supplying integration points instead of samplers", {
+#   ips = ipoints(gorillas$boundary, gorillas$mesh)
+#   fit_ips <- lgcp(cmp, gorillas$nests, ips = ips)
+#   
+#   expect_equal(fit_ips$summary.fixed["Intercept","mean"], fit$summary.fixed["Intercept","mean"], tolerance = lowtol)
+#   expect_equal(fit_ips$summary.fixed["Intercept","sd"], fit$summary.fixed["Intercept","sd"], tolerance = lowtol)
+#   expect_equal(fit_ips$summary.random$mySmooth$mean, fit$summary.random$mySmooth$mean, tolerance = lowtol)
+#   expect_equal(fit_ips$summary.random$mySmooth$sd, fit$summary.random$mySmooth$sd, tolerance = lowtol)
+# })
 
 
 test_that("Supplying domain definition", {

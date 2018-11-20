@@ -3,7 +3,7 @@
 #' @docType data
 #' @description Data imported from package MRSea, see http://creem2.st-andrews.ac.uk/software/
 #' 
-#' @usage mrsea
+#' @usage data(mrsea)
 #' 
 #' @format A list of objects:
 #'  \describe{
