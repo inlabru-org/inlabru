@@ -146,7 +146,11 @@ inla.posterior.sample.structured = function(result,n){
   # Workaround for older versions of INLA
   if ("hyper.user.scale" %in% formalArgs(INLA::inla.posterior.sample)) {
     samples = INLA::inla.posterior.sample(n, result)
-  } else { samples = INLA::inla.posterior.sample(n, result, FALSE) }
+  } else {
+    samples = INLA::inla.posterior.sample(n = n,
+                                          result = result,
+                                          intern = FALSE)
+  }
   
   ssmpl = list()
   for (i in 1:length(samples)) {
