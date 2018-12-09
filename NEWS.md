@@ -1,5 +1,9 @@
 # inlabru 2.1.9.999
 
+* Fix bug for posterior sampling due to INLA interface change
+
+* Add package unit testing
+
 # inlabru 2.1.9
 
 * Remove unused VignetteBuilder entry from DESCRIPTION
