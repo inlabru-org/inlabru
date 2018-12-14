@@ -184,15 +184,13 @@ inla.posterior.sample.structured = function(result,n){
       }
     }
     if(length(smpl.hyperpar)>0){
-      # Replace blank by underscore
-      names(smpl.hyperpar) <- vapply(names(smpl.hyperpar),
-                                     function(nm) gsub(" ","_", x = nm, fixed = TRUE),
-                                     "name")
-      # Replace minus ("-") by underscore, e..g for "zero-probability_parameter_for_zero-inflated_poisson_1"
-      names(smpl.hyperpar) <- vapply(names(smpl.hyperpar),
-                                     function(nm) gsub("-","_", x = nm, fixed = TRUE),
-                                     "name")
-      
+      ## Sanitize the variable names; replace problems with "_".
+      ## Needs to handle whatever INLA uses to describe the hyperparameters.
+      ## Known to include " " and "-" and potentially "(" and ")".
+      names(smpl.hyperpar) <-
+        vapply(names(smpl.hyperpar),
+               function(nm) gsub("[-() ]","_", x = nm, fixed = FALSE),
+               "name")
     }
     ssmpl[[i]] = c(vals, smpl.hyperpar)
   }
