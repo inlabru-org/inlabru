@@ -70,7 +70,7 @@ make.model = function(components){
   env = environment(components)
   
   # Create effects
-  effects = effect(components)
+  effects = component(components)
 
   # Create joint formula that will be used by inla
   formula = y ~ -1 

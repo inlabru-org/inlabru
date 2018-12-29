@@ -22,8 +22,8 @@ make.stack <- function(points,
   
   
   # Projection matrices (A) and mesh index effects
-  A = lapply(model$effects, amatrix.effect, points)
-  effects = lapply(model$effects, index.effect, points)
+  A = lapply(model$effects, amatrix.component, points)
+  effects = lapply(model$effects, index.component, points)
   
   
   # Taylor approximation
