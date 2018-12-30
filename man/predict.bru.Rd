@@ -16,7 +16,7 @@
 
 \item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.}
 
-\item{seed}{Random number genreator seed passed on to \link{inla.posterior.sample}}
+\item{seed}{Random number genreator seed passed on to \code{inla.posterior.sample}}
 
 \item{...}{ignored arguments (S3 generic compatibility).}
 }

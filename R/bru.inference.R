@@ -731,7 +731,7 @@ summary.bru = function(object, ...) {
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction.
 #' @param formula A formula determining which effects to predict and how to combine them.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
-#' @param seed Random number genreator seed passed on to \link{inla.posterior.sample}
+#' @param seed Random number genreator seed passed on to \code{inla.posterior.sample}
 #' @param ... ignored arguments (S3 generic compatibility).
 #' 
 #' @return a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
@@ -799,7 +799,7 @@ predict.bru = function(object,
 #' @param formula A formula determining which effects to sample from and how to combine them analytically.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. 
 #'                  The default is rather low but provides a quick approximate result.
-#' @param seed Random number genreator seed passed on to \link{inla.posterior.sample}
+#' @param seed Random number genreator seed passed on to \code{inla.posterior.sample}
 #' @param ... additional, unused arguments.
 #' 
 #' @return List of generated samples
