@@ -257,6 +257,9 @@ tsplit.inla.mesh = function(mesh, n = 1){
   m3 = p2 + 0.5*(p3-p2)
   all.loc = rbind(mesh$loc,m1,m2,m3)
 
+  # TODO: Make this compliant with the inla.mesh boundary specifications;
+  #   - Order is not guaranteed
+  #   - Multiple disconnected components may occur
   bnd.mid = mesh$loc[mesh$segm$bnd$idx[,1],] + 0.5 * ( mesh$loc[mesh$segm$bnd$idx[,2],] - mesh$loc[mesh$segm$bnd$idx[,1],]  )
   all.bnd = rbind(mesh$segm$bnd$loc,bnd.mid)
 
