@@ -5,7 +5,7 @@
 \title{Prediction from fitted bru model}
 \usage{
 \method{predict}{bru}(object, data = NULL, formula = NULL,
-  n.samples = 100, ...)
+  n.samples = 100, seed = 0L, ...)
 }
 \arguments{
 \item{object}{An object obtained by calling \link{bru} or \link{lgcp}.}
@@ -15,6 +15,8 @@
 \item{formula}{A formula determining which effects to predict and how to combine them.}
 
 \item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.}
+
+\item{seed}{Random number genreator seed passed on to \link{inla.posterior.sample}}
 
 \item{...}{ignored arguments (S3 generic compatibility).}
 }
