@@ -5,7 +5,7 @@
 \title{Sampling based on bru posteriors}
 \usage{
 \method{generate}{bru}(object, data, formula = NULL, n.samples = 100,
-  ...)
+  seed = 0L, ...)
 }
 \arguments{
 \item{object}{A \code{bru} object obtained by calling \link{bru}.}
@@ -16,6 +16,8 @@
 
 \item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. 
 The default is rather low but provides a quick approximate result.}
+
+\item{seed}{Random number genreator seed passed on to \code{inla.posterior.sample}}
 
 \item{...}{additional, unused arguments.}
 }

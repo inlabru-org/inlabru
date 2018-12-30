@@ -141,15 +141,16 @@ extract.summary = function(result, property) {
 ##          in the first sample
 ##
 
-inla.posterior.sample.structured = function(result,n){
+inla.posterior.sample.structured = function(result, n, seed = 0L){
 
   # Workaround for older versions of INLA
   if ("hyper.user.scale" %in% formalArgs(INLA::inla.posterior.sample)) {
-    samples = INLA::inla.posterior.sample(n, result)
+    samples = INLA::inla.posterior.sample(n, result, seed = seed)
   } else {
     samples = INLA::inla.posterior.sample(n = n,
                                           result = result,
-                                          intern = FALSE)
+                                          intern = FALSE,
+                                          seed = seed)
   }
   
   ssmpl = list()
