@@ -32,10 +32,10 @@ test_that("bru: factor component", {
   fit = bru(y ~ fac(map = x, model = "factor") - Intercept, "gaussian", input.df)
   
   # Check fixed effect results
-  expect_equal(fit$summary.fixed["facAlpha", "mean"], 1.009040, midtol)
-  expect_equal(fit$summary.fixed["facAlpha", "sd"], 0.009721, midtol)
-  expect_equal(fit$summary.fixed["facBeta", "mean"], -2.01075, midtol)
-  expect_equal(fit$summary.fixed["facBeta", "sd"], 0.009721, midtol)
+  expect_equal(fit$summary.fixed[1, "mean"], 1.009040, midtol)
+  expect_equal(fit$summary.fixed[1, "sd"], 0.009721, midtol)
+  expect_equal(fit$summary.fixed[2, "mean"], -2.01075, midtol)
+  expect_equal(fit$summary.fixed[2, "sd"], 0.009721, midtol)
   
   # Check if prediction works
   pr = predict(fit, data.frame(x=c("Alpha","Beta")), ~ fac + 1, seed = 1)
