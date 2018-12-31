@@ -644,8 +644,8 @@ index.component = function(component, data, ...) {
   else if ( component$type %in% c("factor") ) {
     idx = map.component(component, data)
     if (!is.data.frame(idx)) { idx = data.frame(idx) ; colnames(idx) = component$label }
-    #idx[,1] = as.factor(paste0(component$label, idx[,1]))
-    idx[,1] = as.factor(idx[,1])
+    idx[,1] = as.factor(paste0(component$label, idx[,1]))
+    #idx[,1] = as.factor(idx[,1])
   }
   else {
     idx = map.component(component, data)
