@@ -67,15 +67,6 @@ import.shrimp = function() {
   return(shrimp)
 }
 
-download.coastlines = function(){
-  
-  download.file("http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_coastline.zip", 
-                destfile = 'coastlines.zip')
-  unzip(zipfile = "coastlines.zip", exdir = 'ne-coastlines-10m')
-  
-  coastlines <- rgdal::readOGR("ne-coastlines-10m/ne_10m_coastline.shp")
-}
-
 save.shrimp = function() {
   shrimp = import.shrimp()
   save("shrimp", file=paste0(system.file("data",package="inlabru"),"/shrimp.RData"), compression_level = 9)
