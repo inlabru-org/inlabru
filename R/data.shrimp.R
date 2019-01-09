@@ -20,7 +20,7 @@
 #' Pennino, Maria Grazia. Personal communication.
 #' 
 #' @references 
-#' Pennino, M. G., Paradinas, I., Muñoz, F., Illian, J.,Quilez-Lopez, A., Bellido, J.M., Conesa, 
+#' Pennino, M. G., Paradinas, I., Munoz, F., Illian, J.,Quilez-Lopez, A., Bellido, J.M., Conesa, 
 #' D. Accounting for preferential sampling in species distribution models. Ecology and Evolution,  In Press.
 #' 
 #' @examples
@@ -42,7 +42,6 @@ NULL
 #' @return The \link{shrimp} data set
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
-
 
 import.shrimp = function() {
 
