@@ -7,12 +7,18 @@ REPOS=\
   CRAN='https://www.stats.bris.ac.uk/R/',\
   INLA='https://inla.r-inla-download.org/R/testing'
 
-RDEVEL_URL=https://stat.ethz.ch/R/daily/R-devel.tar.gz
+#RDEVEL_URL=https://stat.ethz.ch/R/daily/R-devel.tar.gz
 
-ROOT_DIR=$(HOME)/R-dev
-SRC_ROOT_DIR=$(ROOT_DIR)/src
-SRC_DIR=$(SRC_ROOT_DIR)/R-devel
+RDEVEL_VERSION=R-3.5.1
+
+RDEVEL_FILENAME=$(RDEVEL_VERSION).tar.gz
+RDEVEL_URL=https://cran.r-project.org/src/base/R-3/$(RDEVEL_FILENAME)
+ROOT_DIR=$(HOME)/local/$(RDEVEL_VERSION)
+
+SRC_ROOT_DIR=$(HOME)/local/src
+SRC_DIR=$(SRC_ROOT_DIR)/$(RDEVEL_VERSION)
 INSTALL_DIR=$(ROOT_DIR)
+LIB_DIR=$(ROOT_DIR)/Rlib
 
 BIN_DIR=$(INSTALL_DIR)/bin
 RR=$(BIN_DIR)/R
@@ -38,7 +44,7 @@ download:
 	mkdir -p $(SRC_ROOT_DIR)
 	cd $(SRC_ROOT_DIR) && \
 	    curl -O $(RDEVEL_URL) && \
-	    tar xzvf R-devel.tar.gz
+	    tar xzvf $(RDEVEL_FILENAME)
 
 configure:
 	cd $(SRC_DIR) && \
@@ -55,12 +61,18 @@ install:
 
 
 packages-repos:
-	@echo $(REPOS)
+	@echo "Source:" $(REPOS)
+	@echo "Target:" $(LIB_DIR)
+	@echo "libPaths:" `$(RRscript) -e ".libPaths()"`
 packages-all:
-	$(RRscript) -e "install.packages(c('INLA', $(PKG_DEP), $(PKG_SUG)), repos=c($(REPOS)), dependencies = TRUE)"
+	mkdir -p $(LIB_DIR)
+	$(RRscript) -e "install.packages(c('INLA', $(PKG_DEP), $(PKG_SUG)), lib = '$(LIB_DIR)', repos=c($(REPOS)), dependencies = TRUE)"
 packages-INLA:
-	$(RRscript) -e "install.packages('INLA', repos=c($(REPOS)), dependencies = TRUE)"
+	mkdir -p $(LIB_DIR)
+	$(RRscript) -e "install.packages('INLA', lib = '$(LIB_DIR)', repos=c($(REPOS)), dependencies = TRUE)"
 packages-depends:
-	$(RRscript) -e "install.packages(c($(PKG_DEP)), repos=c($(REPOS)), dependencies = TRUE)"
+	mkdir -p $(LIB_DIR)
+	$(RRscript) -e "install.packages(c($(PKG_DEP)), lib = '$(LIB_DIR)', repos=c($(REPOS)), dependencies = TRUE)"
 packages-suggests:
-	$(RRscript) -e "install.packages(c($(PKG_SUG)), repos=c($(REPOS)), dependencies = TRUE)"
+	mkdir -p $(LIB_DIR)
+	$(RRscript) -e "install.packages(c($(PKG_SUG)), lib = '$(LIB_DIR)', repos=c($(REPOS)), dependencies = TRUE)"
