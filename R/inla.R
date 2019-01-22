@@ -141,12 +141,17 @@ extract.summary = function(result, property) {
 ##          in the first sample
 ##
 
-inla.posterior.sample.structured = function(result,n){
+inla.posterior.sample.structured = function(result, n, seed = 0L){
 
   # Workaround for older versions of INLA
   if ("hyper.user.scale" %in% formalArgs(INLA::inla.posterior.sample)) {
-    samples = INLA::inla.posterior.sample(n, result)
-  } else { samples = INLA::inla.posterior.sample(n, result, FALSE) }
+    samples = INLA::inla.posterior.sample(n, result, seed = seed)
+  } else {
+    samples = INLA::inla.posterior.sample(n = n,
+                                          result = result,
+                                          intern = FALSE,
+                                          seed = seed)
+  }
   
   ssmpl = list()
   for (i in 1:length(samples)) {
@@ -178,9 +183,13 @@ inla.posterior.sample.structured = function(result,n){
       }
     }
     if(length(smpl.hyperpar)>0){
-      names(smpl.hyperpar) <- vapply(names(smpl.hyperpar),
-                                     function(nm) gsub(" ","_", x = nm, fixed = TRUE),
-                                     "name")
+      ## Sanitize the variable names; replace problems with "_".
+      ## Needs to handle whatever INLA uses to describe the hyperparameters.
+      ## Known to include " " and "-" and potentially "(" and ")".
+      names(smpl.hyperpar) <-
+        vapply(names(smpl.hyperpar),
+               function(nm) gsub("[-() ]","_", x = nm, fixed = FALSE),
+               "name")
     }
     ssmpl[[i]] = c(vals, smpl.hyperpar)
   }
