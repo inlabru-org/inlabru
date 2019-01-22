@@ -26,6 +26,7 @@ Blue and red shrimp in the Western Mediterranean Sea.
 }
 \examples{
 \donttest{
+data(shrimp, package="inlabru")
 ggplot() +
   gg(shrimp$mesh) + 
   gg(shrimp$hauls) + 

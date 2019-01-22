@@ -25,6 +25,7 @@
 #' 
 #' @examples
 #' \donttest{
+#' data(shrimp, package="inlabru")
 #' ggplot() +
 #'   gg(shrimp$mesh) + 
 #'   gg(shrimp$hauls) + 
