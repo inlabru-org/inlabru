@@ -34,6 +34,8 @@ navbar:
          href: reference/seals.html
       -  text: MRSea
          href: reference/MRSea.html
+      -  text: Shrimp
+         href: reference/shrimp.html
       -  text: Simulated animal groups
          href: reference/toygroups.html
       -  text: Simulated 1D homogeneous Poisson process 
