@@ -16,7 +16,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-Set things up
+
+Setting things up
+----------------
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(INLA)
@@ -29,7 +31,6 @@ and make a shortcut to a nicer colour scale:
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-
 init.tutorial()
 colsc <- function(...) {
   scale_fill_gradientn(colours = rev(RColorBrewer::brewer.pal(11,"RdYlBu")),
@@ -40,7 +41,6 @@ colsc <- function(...) {
 This is precisely what `init.tutorial` does:
 
 ```{r echo=FALSE}
-
 print(init.tutorial)
 ```
 
@@ -53,12 +53,11 @@ See `?INLA::control.inla` for some more information.
 The `control.compute` options turn on information needed for posterior sampling, and
 tells INLA to compute DIC and WAIC. See `?INLA::control.compute` for more information.
 Fitting to 1-dimensional gridded data (counts)
-=========================================================
+
 Get the data
 -----------------------------------
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-
 data(Poisson2_1D)
 ```
 
@@ -72,21 +71,20 @@ Take a look at the count data.
 
 
 ```{r warning=FALSE,message=FALSE}
-
 cd
 ggplot(cd) + geom_point(aes(x, y = count)) + ylim(0, max(cd$count))
 ```
 
 _Tip_: `RStudio > Help > Cheatsheets > Data visualisation with ggplot2` is a useful 
 reference for `ggplot2` syntax.
-Fit a Generalised Additive Model (GAM)
+
+Fiting a Generalised Additive Model (GAM)
 -----------------------------------
 If you're not familiar with GAMs and the syntax of `gam` don't worry, the point of 
 this is just to provide something to which we can compare the `inlabru` model fit.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-
 fit2.gam <- gam(count ~ s(x, k = 10) + offset(log(exposure)), family = poisson(), data = cd)
 ```
 
@@ -103,7 +101,6 @@ immediately below it if you are not familiar with GAMs.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-
 summary(fit2.gam)
 ```
 
@@ -138,7 +135,7 @@ ggplot(dat4pred2) +
   geom_point(aes(x = x, y = count),cd)
 ```
 
-Now try fitting an SPDE model with `inlabru`
+Fitting an SPDE model with inlabru
 -----------------------------------
 Make mesh.
 
@@ -151,7 +148,6 @@ mesh1D <- inla.mesh.1d(x, boundary = "free")
 
 
 ```{r fig.show="hide"}
-
 ggplot() + gg(mesh1D) + xlim(0,55)
 ```
 
@@ -180,13 +176,10 @@ pass it the 1D mesh that we created above, ``mesh1D`.
 the_spde <- inla.spde2.pcmatern(mesh1D,
                                 prior.range=c(1, 0.01),
                                 prior.sigma=c(10, 0.01))
+
 comp <- count ~ field(map = x, model = the_spde) + Intercept
 
-```{r results="hide",warning=FALSE,message=FALSE}
-
 fit2.bru <- bru(comp, cd, family = "poisson", options = list(E = cd$exposure))
-
-```{r results="hide",warning=FALSE,message=FALSE}
 
 summary(fit2.bru)
 ```
@@ -230,7 +223,6 @@ ggplot() +
 Compare the `inlabru` fit to the `gam` fit:
 
 ```{r fig.show="hide"}
-
 ggplot() + 
   gg(pred2.bru) +
   geom_point(data = cd , aes(x = x,y = count/exposure), cex = 2) + 
@@ -252,7 +244,6 @@ to be plotted, you can type
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-
 names(fit2.bru$marginals.fixed)
 ```
 
@@ -260,7 +251,6 @@ This does not tell you about the SPDE parameters, and if you type
 
 
 ```{r warning=FALSE,message=FALSE}
-
 names(fit2.bru$marginals.random)
 ```
 
@@ -275,7 +265,6 @@ and so it is easier to view the log of the variance)
 
 
 ```{r warning=FALSE,message=FALSE}
-
 spde.range <- spde.posterior(fit2.bru, "field", what = "range")
 spde.logvar <- spde.posterior(fit2.bru, "field", what = "log.variance")
 
@@ -289,198 +278,6 @@ funcitons as follows:
 
 
 ```{r warning=FALSE,message=FALSE}
-
 plot(spde.posterior(fit2.bru, "field", what="matern.correlation"))
 plot(spde.posterior(fit2.bru, "field", what="matern.covariance"))
 ```
-
-Modelling random fields on 2D domains
-=========================================================
-We will now construct a 2D model, generate a sample of a
-random field, and attempt to recover the field from observations at a few locations.
-Tomorrow, we will look into more general mesh constructions that adapt to irregular domains.
-
-First, we build a high resolution mesh for the true field, using low level INLA functions
-
-```{r }
-bnd <- spoly(data.frame(lon = c(0, 10, 10, 0), lat = c(0, 0, 10, 10)),
-             crs=inla.CRS("longlat"))
-mesh_fine <- inla.mesh.2d(boundary = bnd, max.edge = 0.2)
-plot(mesh_fine)
-
-# Note: the priors here will not be used in estimation
-matern_fine <-
-  inla.spde2.pcmatern(mesh_fine, 
-                      prior.sigma = c(1, 0.01), 
-                      prior.range = c(1, 0.01))
-true_range <- 4
-true_sigma <- 1
-true_Q <- inla.spde.precision(matern_fine, theta=log(c(true_range, true_sigma)))
-```
-
-What is the pointwise standard deviation of the field? Along straight boundaries,
-the variance is twice the target variance. At corners the variance is 4 times as large.
-
-```{r results="hide"}
-
-true_sd <- diag(inla.qinv(true_Q))^0.5
-ggplot() + gg(mesh_fine, col=true_sd)
-```
-
-Generate a sample from the model:
-
-```{r }
-true_field <- inla.qsample(1, true_Q)[,1]
-
-truth <- expand.grid(lon=seq(0, 10, length=100),
-                     lat=seq(0, 10, length=100))
-truth$field <- inla.mesh.project(mesh_fine,
-                                 loc = as.matrix(truth),
-                                 field = true_field)
-coordinates(truth) <- c("lon", "lat")
-truth <- as(truth, "SpatialPixelsDataFrame")
-
-pl_truth <- ggplot() +
-              gg(truth, mapping=aes_string("lon","lat",fill="field")) +
-              coord_equal() +
-              ggtitle("True field")
-pl_truth
-
-## Or with another colour scale:
-csc <- colsc(truth$field)
-multiplot(pl_truth, pl_truth + csc, cols = 2)
-```
-
-Extract observations from some random locations:
-
-```{r }
-n <- 200
-mydata <- data.frame(lon = runif(n, 0, 10), lat = runif(n, 0, 10))
-mydata$observed <- inla.mesh.project(mesh_fine,
-                                     loc = as.matrix(mydata),
-                                     field = true_field) + rnorm(n, sd = 0.4)
-coordinates(mydata) <- c("lon", "lat")
-plot(mydata)
-```
-
-Estimating the field
-----------
-
-```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
-```
-
-Construct a mesh covering the data:
-
-```{r }
-mesh <- inla.mesh.2d(boundary = bnd, max.edge = 0.5)
-plot(mesh)
-```
-
-Construct an SPDE model object for a Matern model:
-
-```{r }
-matern <-
-  inla.spde2.pcmatern(mesh, 
-                      prior.sigma = c(10, 0.01), 
-                      prior.range = c(1, 0.01))
-```
-
-Specify the model components:
-
-```{r }
-cmp <- observed ~ field(map = coordinates,
-                        model = matern) +
-                  Intercept
-```
-
-Fit the model and inspect the results:
-
-```{r warning=FALSE,message=FALSE,results="hide"}
-
-fit <- bru(cmp, mydata, family="gaussian")
-summary(fit)
-INLA:::summary.inla(fit)
-```
-
-Predict the field on a lattice, and generate
-a single realisation from the posterior distribution:
-
-```{r warning=FALSE,message=FALSE}
-
-pix <- pixels(mesh, nx = 200, ny = 200)
-pred <- predict(fit, pix,
-                ~ field + Intercept)
-samp <- generate(fit, pix,
-                ~ field + Intercept,
-                n.samples = 1)
-pred$sample <- samp[[1]]
-```
-
-Compare the truth to the estimated field
-(posterior mean and a sample from the posterior distribution):
-
-
-```{r results="hide",warning=FALSE,message=FALSE, pfig.height=5,fig.width=12}
-
-pl_posterior_mean <- ggplot() + 
-  gg(pred) + 
-  gg(bnd) +
-  ggtitle("Posterior mean") + 
-  coord_fixed()
-pl_posterior_sample <- ggplot() + 
-  gg(pred, mapping=aes_string(x="x", y="y", fill="sample")) + 
-  gg(bnd) +
-  ggtitle("Posterior sample") + 
-  coord_fixed()
-
-# Common colour scale for the truth and estimate:
-csc <- colsc(truth$field, pred$mean, pred$sample)
-multiplot(pl_truth + csc,
-          pl_posterior_mean + csc,
-          pl_posterior_sample + csc,
-          cols = 3)
-```
-
-Plot the SPDE parameter and fixed effect parameter posteriors.
-
-
-```{r results="hide",warning=FALSE,message=FALSE}
-
-int.plot <- plot(fit, "Intercept")
-spde.range <- spde.posterior(fit, "field", what = "range")
-spde.logvar <- spde.posterior(fit, "field", what = "log.variance")
-range.plot <- plot(spde.range)
-var.plot <- plot(spde.logvar)
-
-multiplot(range.plot, var.plot, int.plot)
-```
-
-Look at the correlation function if you want to:
-
-
-```{r eval=TRUE,warning=FALSE,message=FALSE}
-
-corplot <- plot(spde.posterior(fit, "field", what = "matern.correlation"))
-covplot <- plot(spde.posterior(fit, "field", what = "matern.covariance"))
-multiplot(covplot, corplot)
-```
-
-You can plot the median, lower 95% and upper 95% density surfaces as follows (assuming
-that the predicted intensity is in object `pred`).
-
-
-```{r results="hide",warning=FALSE,message=FALSE}
-
-csc <- colsc(pred@data["median"],
-             pred@data["q0.025"],
-             pred@data["q0.975"]) ## Common colour scale from SpatialPixelsDataFrame
-
-gmedian <- ggplot() + gg(pred["median"]) + coord_equal() + csc
-glower95 <- ggplot() + gg(pred["q0.025"]) + coord_equal() + csc + theme(legend.position = "none")
-gupper95 <- ggplot() + gg(pred["q0.975"]) + coord_equal() + csc + theme(legend.position = "none")
-
-multiplot(gmedian, glower95, gupper95, 
-          layout = matrix(c(1,1,2,3), byrow = TRUE, ncol = 2))
-```
-
-

@@ -11,8 +11,10 @@ navbar:
       href: index.html
     - text: "vignettes"
       menu:
-      -  text: Fitting a 1D random field
+      -  text: Random fields
          href: articles/web/random_fields.html
+      -  text: Random fields in 2D
+         href: articles/web/random_fields_2d.html
       -  text: LGCPs - An example in one dimension
          href: articles/web/1d_lgcp.html
       -  text: LGCPs - A spatial example
