@@ -1,4 +1,4 @@
-context("1D LGCP fitting and prediction")
+context("1D LGCP fitting and prediction (test_lgcp_1d.R)")
 library(INLA)
 
 data(Poisson2_1D)
@@ -6,8 +6,8 @@ x <- seq(0, 55, length = 50)
 mesh1D <- inla.mesh.1d(x, boundary = "free")
 matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150,0.75), prior.sigma = c(0.1,0.75))
 mdl <- x ~ spde1D(map = x, model = matern) + Intercept
-init.tutorial()
-fit <- lgcp(mdl, pts2, ips = ipoints(c(0,55), 50, name = "x"))
+fit <- lgcp(mdl, pts2, ips = ipoints(c(0,55), 50, name = "x"), 
+            options = list(control.inla = list(int.strategy = "eb")))
 
 
 test_that("1D LGCP fitting: Result object", {
@@ -25,10 +25,7 @@ test_that("1D LGCP fitting: INLA random field", {
 })
 
 test_that("1D LGCP fitting: predicted random field", {
-
-  warning("This test needs to be improved by passing a seed to inla.posterior.sample()")
-
-  pr <- predict(fit, data.frame(x = mesh1D$loc),  ~ spde1D, n.samples = 500)
+  pr <- predict(fit, data.frame(x = mesh1D$loc),  ~ spde1D, n.samples = 100, seed = 84354)
   expect_equal(pr$mean, fit$summary.random$spde1D$mean, tolerance = hitol)
   expect_equal(pr$sd, fit$summary.random$spde1D$sd, tolerance = hitol)
   
@@ -36,10 +33,8 @@ test_that("1D LGCP fitting: predicted random field", {
 
 
 test_that("1D LGCP fitting: predicted intensity integral", {
-  
-  warning("This test needs to be improved by passing a seed to inla.posterior.sample()")
   ips <- ipoints(c(0,55), 100, name = "x")
-  Lambda <- predict(fit, ips, ~ sum(weight * exp(spde1D + Intercept)), n.samples = 500)
+  Lambda <- predict(fit, ips, ~ sum(weight * exp(spde1D + Intercept)), n.samples = 100, seed = 4354)
   expect_equal(Lambda$mean, 131.5858, tolerance = hitol)
   expect_equal(Lambda$sd, 12.37687, tolerance = 1)
   
