@@ -1,6 +1,6 @@
 ---
-title: "LGCPs - An example in two dimensions"
-author: "David Borchers"
+title: "LGCPs - Multiple Likekelihoods"
+author: "Fabian E. Bachl"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -73,15 +73,12 @@ cmp <- coordinates ~ mySmoothMajor(map = coordinates, model = matern) +
                      mySmoothMinor(map = coordinates, model = matern) + 
                      Intercept
 
-cmp <- coordinates ~ mySmoothMajor(model = "linear") + 
-                     mySmoothMinor(model = "linear") + 
-                     Intercept
 ```
 
 Given these components we define the linear predictor for each of the likelihoods
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 fml.major = coordinates ~ mySmoothMajor + Intercept
-fml.minor = coordinates ~ mySmoothMajor + Intercept
+fml.minor = coordinates ~ mySmoothMinor + Intercept
 ```
 
 Setting up the cox process integration points is easy in this example. Both nest types were observed within the same window.
@@ -95,5 +92,5 @@ lik_major = like("cp", formula = fml.minor, components = cmp, data = gorillas$ne
 ```
 ... which we provide to the ´bru´ function.
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-jfit = bru(cmp, lik_major, lik_minor)
+jfit = bru(cmp, lik_major, lik_minor, options = list(max.iter = 1))
 ```
