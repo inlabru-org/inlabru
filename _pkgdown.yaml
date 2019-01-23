@@ -12,17 +12,17 @@ navbar:
     - text: "vignettes"
       menu:
       -  text: Fitting a 1D random field
-         href: articles/random_fields.html
+         href: articles/web/random_fields.html
       -  text: LGCPs - An example in one dimension
-         href: articles/1d_lgcp.html
+         href: articles/web/1d_lgcp.html
       -  text: LGCPs - A spatial example
-         href: articles/2d_lgcp.html
+         href: articles/web/2d_lgcp.html
       -  text: LGCPs - A spatial example with covariates
-         href: articles/2d_lgcp_covars.html
+         href: articles/web/2d_lgcp_covars.html
       -  text: LGCPs - Plot sampling
-         href: articles/2d_lgcp_plotsampling.html
+         href: articles/web/2d_lgcp_plotsampling.html
       -  text: LGCPs - Distance sampling
-         href: articles/2d_lgcp_distancesampling.html
+         href: articles/web/2d_lgcp_distancesampling.html
     - text: data sets
       icon: fa-database
       menu:
