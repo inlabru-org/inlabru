@@ -46,8 +46,33 @@ devtools::install_github("fbachl/inlabru", ref="devel")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows you how fit a simple spatial Log Gaussian Cox Process (LGCP)
+and predicts its intensity:
 
 ```{r example}
-## basic example code
+# Load libraries
+library(inlabru)
+library(INLA)
+
+# Load the data
+data(gorillas, package = "inlabru")
+
+# Construct latent model components
+matern <- inla.spde2.pcmatern(gorillas$mesh, 
+                              prior.sigma = c(0.1, 0.01), 
+                              prior.range = c(5, 0.01))
+cmp <- coordinates ~ mySmooth(map = coordinates,
+                              model = matern) +
+                          Intercept
+# Fit LGCP model
+fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+
+# Predict Gorilla nest intensity
+lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+
+# Plot the result
+ggplot() + 
+  gg(lambda) +
+  gg(gorillas$nests, color = "red", size = 0.2) +
+  coord_equal()
 ```
