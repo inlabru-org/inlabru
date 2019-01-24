@@ -6,7 +6,7 @@ if (exists("check_result")){
   print(str(check_result))
   
   system("echo '------------------------------ checkdir contents --------------------------------------'")
-  list.files(check_result$checkdir)
+  print(list.files(check_result$checkdir))
   
   system("echo '------------------------------ exit status --------------------------------------------'")
   exit_status = length(check_result$errors) + length(check_result$warnings) + length(check_result$notes)
