@@ -1,13 +1,13 @@
-context("2D LGCP fitting and prediction: Plot sampling")
+context("2D LGCP fitting and prediction - Plot sampling (test_lgcp_2d_plotsampling.R)")
 library(INLA)
 data(gorillas, package = "inlabru")
-init.tutorial()
 
 test_that("2D LGCP fitting and prediction: Plot sampling", {
   matern <- inla.spde2.pcmatern(gorillas$mesh, prior.sigma = c(0.1, 0.01), prior.range = c(5, 0.01))
   
   cmp <- coordinates ~ my.spde(map = coordinates, model = matern) 
-  fit <- lgcp(cmp, gorillas$plotsample$nests, samplers = gorillas$plotsample$plots) 
+  fit <- lgcp(cmp, gorillas$plotsample$nests, samplers = gorillas$plotsample$plots, 
+              options = list(control.inla = list(int.strategy = "eb"))) 
   
   expect_equal(sum(fit$sppa$lhoods[[1]]$ips$weight), 7.095665, tolerance = midtol)
   expect_equal(fit$summary.fixed["Intercept","mean"], 1.796279, tolerance = midtol)

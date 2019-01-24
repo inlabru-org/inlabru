@@ -1,4 +1,4 @@
-context("Latent models - 2D SPDE - Group parameter")
+context("Latent models - 2D SPDE - Group parameter (test_latent_spde2D.R)")
 library(INLA)
 
 latent_spde2D_group_testdata <- function() {
@@ -16,7 +16,7 @@ latent_spde2D_group_testdata <- function() {
                                 prior.sigma = c(0.1, 0.01), 
                                 prior.range = c(10000, 0.01))
   
-  warning('Using workaround for known bug (fixed in new backend)')
+  print('--- Using workaround for known bug (fixed in new backend) ---')
   season = mrsea$points$season 
   
   cmp <- coordinates + season ~ mySmooth(map = coordinates, model = matern, group = season, ngroup = 2) + Intercept
@@ -33,10 +33,10 @@ data <- latent_spde2D_group_testdata()
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   
   # Check Intercept
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -9.231591, midtol)
+  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -9.231591, hitol)
   
   # Check SPDE
-  expect_equal(data$fit$summary.random$mySmooth$mean[c(1,250,550)], c(-1.2750692, -1.9794945, 0.7566357), midtol)
+  expect_equal(data$fit$summary.random$mySmooth$mean[c(1,250,550)], c(-1.2750692, -1.9794945, 0.7566357), hitol)
   
 })
 

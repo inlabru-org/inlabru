@@ -1,12 +1,12 @@
-context("2D LGCP fitting and prediction: Covariates")
+context("2D LGCP fitting and prediction - Covariates (test_lgcp_2d_covars.R)")
 library(INLA)
 data(gorillas, package = "inlabru")
-init.tutorial()
 
 test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
   mdl <- coordinates ~ veg(map = gorillas$gcov$vegetation, model = "factor") - Intercept 
   fit <- lgcp(mdl, gorillas$nests, samplers = gorillas$boundary, domain = list(coordinates = gorillas$mesh),
-               options = list(control.fixed = list(expand.factor.strategy = "inla")))
+               options = list(control.inla = list(int.strategy = "eb"),
+                              control.fixed = list(expand.factor.strategy = "inla")))
   
   expect_equal(fit$summary.fixed[,"mean"], c(4.269611,2.219120,1.557980,4.455956,3.590849,4.175845), tolerance = lowtol)
   expect_equal(fit$summary.fixed[,"sd"], c(0.57677865,0.11041125,0.22336546,0.04484612,0.21299094,0.21800205), tolerance = lowtol)
@@ -26,7 +26,8 @@ test_that("2D LGCP fitting: Continuous covariate (as function)", {
   } 
 
   mdl <- coordinates ~ beta.elev(map = f.elev(x,y), model = "linear") + Intercept
-  fit <- lgcp(mdl, gorillas$nests, samplers = gorillas$boundary) 
+  fit <- lgcp(mdl, gorillas$nests, samplers = gorillas$boundary,
+              options = list(control.inla = list(int.strategy = "eb"))) 
   
   expect_equal(fit$summary.fixed["beta.elev","mean"], 0.003249187, tolerance = lowtol)
   expect_equal(fit$summary.fixed["beta.elev","sd"], 0.0002526346, tolerance = lowtol)

@@ -1,5 +1,5 @@
 FROM ubuntu:18.04
-MAINTAINER bakaniko
+MAINTAINER fbachl
 ## Based on https://rtask.thinkr.fr/blog/installation-of-r-3-5-on-ubuntu-18-04-lts-and-tips-for-spatial-packages/
 
 # CONFIGURE TIMEZONE
@@ -27,7 +27,7 @@ RUN apt-get -y install software-properties-common
 RUN apt-get -y install libssl-dev
 
 # Install GEOSPATIAL UBUNTU PACKAGES
-RUN apt-get -y install libgdal-dev libproj-dev libgeos-dev libudunits2-dev libv8-dev libcairo2-dev libnetcdf-dev
+RUN apt-get -y install libgdal-dev libproj-dev libgeos-dev libudunits2-dev libv8-dev libcairo2-dev libnetcdf-dev libgeos++-dev
 
 # INSTALL R
 RUN apt-get -y install r-base r-base-core r-recommended
@@ -43,9 +43,11 @@ RUN apt-get -y install r-cran-rgl
 RUN R -e "install.packages(c('roxygen2'), repos='https://cran.rstudio.com/')"
 RUN R -e "install.packages(c('devtools'), repos='https://cran.rstudio.com/')"
 
-
 ## inlabru requirements (except INLA)
 RUN R -e "install.packages(setdiff(c('rgdal', 'rgeos', 'sp', 'testthat', 'ggmap', 'rgl', 'sphereplot', 'raster', 'dplyr', 'maptools', 'mgcv', 'shiny', 'spatstat', 'spatstat.data', 'RColorBrewer', 'graphics', 'knitr', 'rmarkdown'), installed.packages()[,1]))"
+
+## Pkgdown
+RUN R -e "install.packages('pkgdown')"
 
 ## INLA
 RUN R -e "install.packages('INLA', repos=c(getOption('repos'), INLA='https://inla.r-inla-download.org/R/stable'), dep=TRUE)"

@@ -1,12 +1,5 @@
-context("2D LGCP fitting and prediction")
+context("2D LGCP fitting and prediction (test_lgcp_2d.R)")
 library(INLA)
-
-
-#data(gorillas, package = "inlabru")
-#matern <- inla.spde2.pcmatern(gorillas$mesh, prior.sigma = c(0.1, 0.01), prior.range = c(5, 0.01))
-#cmp <- coordinates ~ mySmooth(map = coordinates,model = matern) +Intercept
-#init.tutorial()
-#fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
 
 data <- gorillas_lgcp_2d_testdata()
 
@@ -45,9 +38,8 @@ test_that("2D LGCP fitting: INLA random field", {
 
 test_that("2D LGCP fitting: predicted intensity integral", {
   
-  warning("This test needs to be improved by passing a seed to inla.posterior.sample()")
   ips = ipoints(data$gorillas$boundary, data$gorillas$mesh)
-  Lambda <- predict(data$fit, ips, ~ sum(weight * exp(mySmooth + Intercept)), n.samples = 500) 
+  Lambda <- predict(data$fit, ips, ~ sum(weight * exp(mySmooth + Intercept)), n.samples = 500, seed = 5657) 
   
   expect_equal(Lambda$mean, 647.4751, tolerance = hitol)
   expect_equal(Lambda$sd, 25.54122, tolerance = hitol)
@@ -66,7 +58,11 @@ test_that("2D LGCP fitting: predicted intensity integral", {
 
 
 test_that("Supplying domain definition", {
-  fit_dom <- lgcp(data$cmp, data$gorillas$nests, samplers = data$gorillas$boundary, domain = list(coordinates = data$gorillas$mesh))
+  fit_dom <- lgcp(data$cmp, 
+                  data$gorillas$nests, 
+                  samplers = data$gorillas$boundary, 
+                  domain = list(coordinates = data$gorillas$mesh),
+                  options = list(control.inla = list(int.strategy = "eb")))
   
   expect_equal(fit_dom$summary.fixed["Intercept","mean"], data$fit$summary.fixed["Intercept","mean"], tolerance = midtol)
   expect_equal(fit_dom$summary.fixed["Intercept","sd"], data$fit$summary.fixed["Intercept","sd"], tolerance = midtol)

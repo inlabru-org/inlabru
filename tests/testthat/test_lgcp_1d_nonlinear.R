@@ -1,9 +1,8 @@
-context("Distance sampling (non-linear predictor for hazard rate)")
+context("1D LGCP fitting and prediction - nonlinear (test_lgcp_1d_nonlinear.R)")
 library(INLA)
 data(mexdolphin, package = "inlabru")
-init.tutorial()
 
-test_that("Distance sampling (non-linear predictor for hazard rate)", {
+test_that("Mexdolphin: Hazard rate detection function", {
   
   hr = function(distance, lsig){ 1-exp(-(distance/(exp(lsig)))^-1) }
   
@@ -14,7 +13,8 @@ test_that("Distance sampling (non-linear predictor for hazard rate)", {
   fit = lgcp(components = cmp, 
               mexdolphin$points,
               ips = ips,
-              formula = formula)
+              formula = formula,
+              options = list(control.inla = list(int.strategy = "eb")))
   
   # plot(hr(ips$distance, fit$summary.fixed["lsig", "mean"]))
   expect_equal(fit$summary.fixed["lsig", "mean"], 1.038281, tolerance = lowtol)

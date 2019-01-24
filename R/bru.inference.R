@@ -966,9 +966,11 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
       ##                           as.factor(do.call(rbind, track)$effect),
       ##                           identity),
       ##                        function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
-      cat(paste0("Max deviation from previous: ", signif(100*max(dev),3),"% of SD [stop if: <",100*max.dev,"%]\n"))
+      if ( iinla.verbose ) {
+        cat(paste0("Max deviation from previous: ", signif(100*max(dev),3),"% of SD [stop if: <",100*max.dev,"%]\n"))
+      }
       interrupt = all( dev < max.dev)
-      if (interrupt) {cat("Convergence criterion met, stopping INLA iteration.")}
+      if (interrupt && iinla.verbose) {cat("Convergence criterion met, stopping INLA iteration.")}
     } else {
       cat("\n")
     }
