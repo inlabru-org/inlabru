@@ -1,4 +1,4 @@
-context("test-fixed_effects.R")
+context("Latent models - fixed effects (test_latent_fixed_effects.R)")
 
 test_that("basic intercept model", {
   mycomp <- y ~ 1
