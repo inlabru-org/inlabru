@@ -33,10 +33,10 @@ data <- latent_spde2D_group_testdata()
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   
   # Check Intercept
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -9.231591, midtol)
+  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -9.231591, hitol)
   
   # Check SPDE
-  expect_equal(data$fit$summary.random$mySmooth$mean[c(1,250,550)], c(-1.2750692, -1.9794945, 0.7566357), midtol)
+  expect_equal(data$fit$summary.random$mySmooth$mean[c(1,250,550)], c(-1.2750692, -1.9794945, 0.7566357), hitol)
   
 })
 
