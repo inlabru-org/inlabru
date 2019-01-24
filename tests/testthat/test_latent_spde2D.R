@@ -3,6 +3,8 @@ library(INLA)
 
 latent_spde2D_group_testdata <- function() {
   
+  set.seed(123)
+  
   # Load and reduce data set
   data(mrsea)
   mrsea$points = mrsea$points[mrsea$points$season==1 | mrsea$points$season==2,]
