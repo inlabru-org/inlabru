@@ -258,24 +258,36 @@ component.character = function(object,
   component
 }
 
-# Picks a default mesh givevn the type of model and parameters provided
-make.default.mesh = function(component, model, model.type, fvals){
+# Picks a default mesh given the type of model and parameters provided
+make.default.mesh = function(component, model, model.type, fvals = NULL){
   
-  miss.msg = "component '%s' (type '%s') requires argument '%s'. Check out f() for additional information on this argument."
+  miss.msg = paste0("component '%s' (type '%s') requires argument '%s'. ",
+                    "Check out f() for additional information on this argument.")
   
   if ( model.type %in% c("linear", "clinear") ) {
     mesh = NA
   }
   else if ( model.type %in% c("iid") ) {
-    if ( missing(fvals$n) ) { stop(sprintf(miss.msg, component$label, model.type, "n")) }
+    if ( is.null(fvals$n) ) {
+      stop(sprintf(miss.msg, component$label,
+                   model.type, "n"))
+      }
     mesh = INLA::inla.mesh.1d(1:fvals$n)
   }
   else if ( model.type %in% c("seasonal") ) {
-    if ( missing(fvals$season.length) ) { stop(sprintf(miss.msg, component$label, model.type, "season.length")) }
+    if ( is.null(fvals$season.length) ) {
+      stop(sprintf(miss.msg, component$label,
+                   model.type, "season.length"))
+    }
     mesh = INLA::inla.mesh.1d(1:fvals$season.length)
   }
   else if ( model.type %in% c("rw1", "rw2", "ar", "ar1", "ou") ) {
-    if ( missing(fvals$values) ) { stop(sprintf(miss.msg, component$label, model.type, "values")) }
+    # TODO: Check that equal/unequal spacing in these models works
+    #       in the desired way, and document what this means.
+    if ( is.null(fvals$values) ) {
+      stop(sprintf(miss.msg, component$label,
+                   model.type, "values"))
+    }
     mesh = INLA::inla.mesh.1d(sort(unique(fvals$values)))
   }
   else if ( model.type %in% c("spde") ) {
