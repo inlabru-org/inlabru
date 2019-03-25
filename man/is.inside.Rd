@@ -20,7 +20,7 @@ Single column matrix of Boolean values indicating if a point is inside the mesh.
 Query if a point is inside the mesh boundary
 }
 \examples{
-\donttest{
+\dontrun{
 if (require("INLA", quietly = TRUE)) {
 # Load Gorilla data
 

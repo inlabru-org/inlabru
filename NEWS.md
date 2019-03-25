@@ -4,6 +4,8 @@
 
 * Add package unit testing
 
+* New backend code to make extended feature support easier
+
 # inlabru 2.1.9
 
 * Remove unused VignetteBuilder entry from DESCRIPTION
