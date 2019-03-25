@@ -41,3 +41,45 @@ test_that("Component construction: linear model", {
   }
   
 })
+
+
+
+test_that("Component construction: default mesh/mapping construction", {
+  
+  # Only check the following if the new backend is present
+  if (!exists("make.default.mesh")) {
+    skip("Test non-functional using old backend.")
+  } else {
+    
+    cmp <- list(label = "testlabel")
+    class(cmp) = c("component","list")
+    
+    # Check for failure/success on valid/invalid inputs
+    expect_error(make.default.mesh(cmp, model = NULL, model.type = "iid",
+                                   fvals = NULL))
+    expect_error(make.default.mesh(cmp, model = NULL, model.type = "iid",
+                                   fvals = list()))
+    expect_error(make.default.mesh(cmp, model = NULL, model.type = "iid",
+                                   fvals = list(n = 2)),
+                 NA)
+    
+    expect_error(make.default.mesh(cmp, model = NULL, model.type = "seasonal",
+                                   fvals = NULL))
+    expect_error(make.default.mesh(cmp, model = NULL, model.type = "seasonal",
+                                   fvals = list()))
+    expect_error(make.default.mesh(cmp, model = NULL, model.type = "seasonal",
+                                   fvals = list(season.length = 2)),
+                 NA)
+    
+    for (model.type in c("rw1", "rw2", "ar", "ar1", "ou")) {
+      expect_error(make.default.mesh(cmp, model = NULL, model.type = model.type,
+                                     fvals = NULL))
+      expect_error(make.default.mesh(cmp, model = NULL, model.type = model.type,
+                                     fvals = list()))
+      expect_error(make.default.mesh(cmp, model = NULL, model.type = model.type,
+                                     fvals = list(values = 1:2)),
+                   NA)
+    }
+  }
+  
+})

@@ -744,13 +744,14 @@ plot.prediction_old = function(..., property = "median") {
       }
     }
     
-    # Workaround for non-visible bindings
+    # Workaround for non-visible bindings error during CRAN check
     x = NULL
     y = NULL
     xend = NULL
     yend = NULL
     sdy = NULL
     cvy = NULL
+    effect = NULL
     
     plt = ggplot() +  geom_violin(data = df, aes(x=as.numeric(effect),y = x, weight = y, fill=effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
       geom_text(data = qtl, aes(x=xend, y=y, label = fmt(y)), size = txt_size, family = "", vjust = -0.5, hjust = 1.1) + 

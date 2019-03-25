@@ -53,6 +53,7 @@ makepoly=function(start,width,height) {
 #'  }.
 #'  
 #' @examples
+#'
 #' \donttest{
 #' # Some features require the raster package
 #' if (require("raster", quietly = TRUE)) {
@@ -117,6 +118,7 @@ plotsample = function(spdf,boundary,x.ppn=0.25,y.ppn=0.25,nx=5,ny=5){
 #' @return A \code{SpatialPolygonsDataFrame} with counts in each plot contained in slot @data$n.
 #'
 #' @examples
+#'
 #' \donttest{
 #' # Some features require the raster package
 #' if (require("raster", quietly = TRUE)) {
