@@ -48,7 +48,7 @@ nlinla.epunkt = function(model, data, result = NULL) {
   dfdata = data.frame(data) # data as data.frame (may have been supplied as Spatial* object)
   if ( is.null(result) ){
     df = data.frame(matrix(0, nrow = nrow(dfdata), ncol = length(model$effects)))
-    colnames(df) = elabels(model)
+    colnames(df) = names(model$effects)
     df
   } else if ( !inherits(result, "inla") & is.data.frame(result) ) {
     # If result contains only a single row data frame repeat it to match the data

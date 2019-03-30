@@ -52,4 +52,5 @@ Depends:
     methods,
     ggplot2,
 Additional_repositories: https://inla.r-inla-download.org/R/testing
+Encoding: UTF-8
 RoxygenNote: 6.1.1

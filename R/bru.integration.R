@@ -37,6 +37,7 @@
 #' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
 #' 
 #' @examples
+#' 
 #' \donttest{
 #' if (require("INLA", quietly = TRUE)) {
 #' 
@@ -45,10 +46,12 @@
 #' ips = ipoints(c(0,10), 50, name = "myDim")
 #' plot(ips)
 #' 
+#' 
 #' # Create integration points for the two intervals [0,3] and [5,10]
 #' 
 #' ips = ipoints(matrix(c(0,3, 5,10), nrow = 2, byrow = TRUE), 50)
 #' plot(ips)
+#' 
 #' 
 #' # Convert a 1D mesh into integration points
 #' mesh = inla.mesh.1d(seq(0,10,by = 1))
@@ -247,6 +250,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
 #' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of multidimensional integration points and their weights
 #' 
 #' @examples
+#'
 #' \donttest{
 #' # ipoints needs INLA
 #' if (require("INLA", quietly = TRUE)) {
@@ -336,7 +340,7 @@ ipmaker = function(samplers, domain, dnames, model = NULL, data = NULL) {
   
   # Fill missing domain definitions using meshes from effects where map equals the domain name
   meshes = list()
-  for (e in effect(model)) {meshes[[paste0(as.character(e$map), collapse ="")]] = e$mesh}
+  for (e in model$effects) {meshes[[paste0(as.character(e$map), collapse ="")]] = e$mesh}
   for ( nm in dnames) {
     if ( is.null(domain[[nm]]) ) { domain[[nm]] = meshes[[nm]] }
   }
@@ -532,6 +536,7 @@ vertex.projection.1d = function(points, mesh, group = NULL, column = "weight", s
 #' @return A \code{data.frame} of integrals, one for each level of the cross product of all dimensions not being integrated over.
 #' 
 #' @examples 
+#' 
 #' \donttest{
 #' # ipoints needs INLA
 #' if (require("INLA", quietly = TRUE)) {

@@ -33,15 +33,15 @@ install.packages("inlabru")
 You can install the latest bugfix release of inlabru from [GitHub](https://github.com/) with:
 
 ```{r gh-bugfix-installation, eval = FALSE}
-# install.packages("devtools")
-devtools::install_github("fbachl/inlabru", ref="master")
+# install.packages("remotes")
+remotes::install_github("fbachl/inlabru", ref="master")
 ```
 
 You can install the development version of inlabru from [GitHub](https://github.com/) with:
 
 ```{r gh-installation, eval = FALSE}
-# install.packages("devtools")
-devtools::install_github("fbachl/inlabru", ref="devel")
+# install.packages("remotes")
+remotes::install_github("fbachl/inlabru", ref="devel")
 ```
 
 ## Example

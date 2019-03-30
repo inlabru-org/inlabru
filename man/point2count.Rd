@@ -21,6 +21,7 @@ Converts a plot sample with locations of each point within each plot, into a plo
 sample with only the count within each plot.
 }
 \examples{
+
 \donttest{
 # Some features require the raster package
 if (require("raster", quietly = TRUE)) {
