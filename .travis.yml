@@ -10,8 +10,15 @@ language: minimal
 cache: packages
 
 before_install:
+  # Determine which branch we are building
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
+  # Clone the repo and check out the branch
+  - git clone https://github.com/fbachl/inlabru.git
+  - cd inlabru
+  - git checkout $(BRANCH)
   - docker --version
-  - docker run --name my_ubuntu -v /$(pwd):/home/work -it -d fbachl/inlabru:latest /bin/bash
+  - docker run --name my_ubuntu -v /$(pwd)/inlabru:/home/work -it -d fbachl/inlabru:latest /bin/bash
   - docker ps
   - docker container ls --all
 
@@ -29,4 +36,5 @@ install:
 script:
   # We need to be in inst/misc directory because travis_wait generates a file that R CHECK will complain about.
   - cd inst/misc
+  - exit
   - travis_wait 60 sleep infinity & docker exec -it my_ubuntu Rscript "/home/work/inst/misc/travis_checks.R"
