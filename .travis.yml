@@ -16,7 +16,7 @@ before_install:
   # Clone the repo and check out the branch
   - git clone https://github.com/fbachl/inlabru.git
   - cd inlabru
-  - git checkout $(BRANCH)
+  - git checkout $BRANCH
   - docker --version
   - docker run --name my_ubuntu -v /$(pwd)/inlabru:/home/work -it -d fbachl/inlabru:latest /bin/bash
   - docker ps
