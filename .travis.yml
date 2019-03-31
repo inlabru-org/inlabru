@@ -38,5 +38,4 @@ install:
 script:
   # We need to be in inst/misc directory because travis_wait generates a file that R CHECK will complain about.
   - cd inst/misc
-  - exit
   - travis_wait 60 sleep infinity & docker exec -it my_ubuntu Rscript "/home/work/inst/misc/travis_checks.R"
