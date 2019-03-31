@@ -1,7 +1,4 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
 sudo: required
-# dist: xenial
 
 services:
   - docker
@@ -21,10 +18,10 @@ before_install:
   # Run docker
   - docker --version
   - docker run --name my_ubuntu -v /$(pwd)/inlabru:/home/work -it -d fbachl/inlabru:latest /bin/bash
-  - docker ps
-  - docker container ls --all
 
 install:
+  - docker ps
+  - docker container ls --all
   - docker exec -it my_ubuntu ls -al /home
   - docker exec -it my_ubuntu ls -al /home/work
   - docker exec -it my_ubuntu whoami
