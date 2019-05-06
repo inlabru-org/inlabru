@@ -9,7 +9,7 @@ REPOS=\
 
 #RDEVEL_URL=https://stat.ethz.ch/R/daily/R-devel.tar.gz
 
-RDEVEL_VERSION=R-3.5.1
+RDEVEL_VERSION=R-3.5.2
 
 RDEVEL_FILENAME=$(RDEVEL_VERSION).tar.gz
 RDEVEL_URL=https://cran.r-project.org/src/base/R-3/$(RDEVEL_FILENAME)
@@ -25,7 +25,7 @@ RR=$(BIN_DIR)/R
 RRscript=$(BIN_DIR)/Rscript
 
 default:
-	@echo "Usage: Rdev-install CMD"
+	@echo "Usage: ./Makefile.Rdev CMD"
 	@echo ""
 	@echo "   CMD should be one of"
 	@echo "       download"
@@ -38,6 +38,8 @@ default:
 	@echo "       packages-INLA (install INLA)"
 	@echo "       packages-depends (install inlabru 'Depends' packages)"
 	@echo "       packages-suggests (install inlabru 'Suggests' packages)"
+	@echo ""
+	@echo "       ./Makefile.Rdev RDEVEL_VERSION=R-3.5.2 CMD"
 
 
 download:
@@ -45,19 +47,27 @@ download:
 	cd $(SRC_ROOT_DIR) && \
 	    curl -O $(RDEVEL_URL) && \
 	    tar xzvf $(RDEVEL_FILENAME)
+	echo "Next step: configure"
 
 configure:
 	cd $(SRC_DIR) && \
-	./configure --prefix="$(INSTALL_DIR)"
+	./configure --prefix="$(INSTALL_DIR)" --enable-R-shlib
+	echo "Next steps: make, make-check, install"
 
 make:
 	make -j -C $(SRC_DIR)
+	echo "Next steps: make-check, install"
+
+clean:
+	make -j -C $(SRC_DIR) clean
 
 make-check:
 	make -C $(SRC_DIR) check
+	echo "Next step: install"
 
 install:
 	make -C $(SRC_DIR) install
+	echo "Next steps: packages-all, or -INLA, -depends, -suggests"
 
 
 packages-repos:
@@ -70,9 +80,12 @@ packages-all:
 packages-INLA:
 	mkdir -p $(LIB_DIR)
 	$(RRscript) -e "install.packages('INLA', lib = '$(LIB_DIR)', repos=c($(REPOS)), dependencies = TRUE)"
+	echo "Next steps: packages-all, or (-INLA), -depends, -suggests"
 packages-depends:
 	mkdir -p $(LIB_DIR)
 	$(RRscript) -e "install.packages(c($(PKG_DEP)), lib = '$(LIB_DIR)', repos=c($(REPOS)), dependencies = TRUE)"
+	echo "Next steps: packages-all, or -INLA, (-depends), -suggests"
 packages-suggests:
 	mkdir -p $(LIB_DIR)
 	$(RRscript) -e "install.packages(c($(PKG_SUG)), lib = '$(LIB_DIR)', repos=c($(REPOS)), dependencies = TRUE)"
+	echo "Next steps: packages-all, or -INLA, -depends, (-suggests)"
