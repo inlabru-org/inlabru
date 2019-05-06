@@ -6,6 +6,9 @@ PKG_SUG='testthat', 'ggmap', 'rgl', 'sphereplot', 'raster', 'dplyr', 'maptools',
 REPOS=\
   CRAN='https://www.stats.bris.ac.uk/R/',\
   INLA='https://inla.r-inla-download.org/R/testing'
+SYSTEM_LIB_DEV=\
+  tcl8.6-dev tk8.6-dev \
+  libx11-dev libmagick++-dev libgit2-dev libssh2-1-dev
 
 #RDEVEL_URL=https://stat.ethz.ch/R/daily/R-devel.tar.gz
 
@@ -29,6 +32,7 @@ default:
 	@echo ""
 	@echo "   CMD should be one of"
 	@echo "       download"
+	@echo "       prepare"
 	@echo "       configure"
 	@echo "       make"
 	@echo "       make-check"
@@ -50,8 +54,7 @@ download:
 	echo "Next step: configure"
 
 prepare:
-	sudo aptitude install tcl8.6-dev tk8.6-dev \
-		libx11-dev libmagick++-dev libgit2-dev libssh2-1-dev
+	sudo aptitude install $(SYSTEM_LIB_DEV)
 
 configure:
 	cd $(SRC_DIR) && \
