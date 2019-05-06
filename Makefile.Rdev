@@ -8,7 +8,8 @@ REPOS=\
   INLA='https://inla.r-inla-download.org/R/testing'
 SYSTEM_LIB_DEV=\
   tcl8.6-dev tk8.6-dev \
-  libx11-dev libmagick++-dev libgit2-dev libssh2-1-dev
+  libx11-dev libmagick++-dev libgit2-dev libssh2-1-dev \
+  libfftw3-dev
 
 #RDEVEL_URL=https://stat.ethz.ch/R/daily/R-devel.tar.gz
 
