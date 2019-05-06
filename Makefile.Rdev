@@ -49,6 +49,10 @@ download:
 	    tar xzvf $(RDEVEL_FILENAME)
 	echo "Next step: configure"
 
+prepare:
+	sudo aptitude install tcl8.6-dev tk8.6-dev \
+		libx11-dev libmagick++-dev libgit2-dev libssh2-1-dev
+
 configure:
 	cd $(SRC_DIR) && \
 	./configure --prefix="$(INSTALL_DIR)" --enable-R-shlib
@@ -77,6 +81,10 @@ packages-repos:
 packages-all:
 	mkdir -p $(LIB_DIR)
 	$(RRscript) -e "install.packages(c('INLA', $(PKG_DEP), $(PKG_SUG)), lib = '$(LIB_DIR)', repos=c($(REPOS)), dependencies = TRUE)"
+packages-INLAnodep:
+	mkdir -p $(LIB_DIR)
+	$(RRscript) -e "install.packages('INLA', lib = '$(LIB_DIR)', repos=c($(REPOS)), dependencies = FALSE)"
+	echo "Next steps: packages-all, or (-INLA), -depends, -suggests"
 packages-INLA:
 	mkdir -p $(LIB_DIR)
 	$(RRscript) -e "install.packages('INLA', lib = '$(LIB_DIR)', repos=c($(REPOS)), dependencies = TRUE)"
