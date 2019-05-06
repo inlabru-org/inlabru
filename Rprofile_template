@@ -1,0 +1,17 @@
+# Add this to your ~/.Rprofile file
+
+local({
+    r <- getOption("repos")
+    r["INLA"] <- "https://inla.r-inla-download.org/R/testing"
+    options(repos = r)
+})
+
+local({
+    ver <- paste0("R-", R.version$major, ".", R.version$minor)
+    p <- R.home()
+    # Check if path is like "/home/flindgre/local/R-3.5.2/lib/R"
+    if (length(grep(paste0("/local/", ver, "/lib/R"), p) == 1)) {
+      new_lib <- gsub("/local/.*/lib/R", paste0("/local/", ver, "/Rlib"), p)
+      .libPaths(new_lib)
+    }
+})
