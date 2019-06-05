@@ -20,7 +20,7 @@ latent_spde2D_group_testdata <- function() {
                                 prior.sigma = c(0.1, 0.01), 
                                 prior.range = c(10000, 0.01))
   
-  print('--- Using workaround for known bug (fixed in new backend) ---')
+  print('--- Using workaround for known bug (*NOT* fixed in new backend) ---')
   season = mrsea$points$season 
   
   cmp <- coordinates + season ~
