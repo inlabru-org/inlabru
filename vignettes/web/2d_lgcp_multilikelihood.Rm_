@@ -1,0 +1,96 @@
+---
+title: "LGCPs - Multiple Likekelihoods"
+author: "Fabian E. Bachl"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Introduction
+----------------
+For this vignette we are going to be working with the inlabru's ´gorillas´ dataset which was originally obtained from 
+the `R` package `spatstat`. The data set contains two types of gorillas nests which are marked as either major or minor. We will set up a multi-likelihood model for these nests which creates two spatial LGCPs that share a common intercept but have employ different spatial smoothers.
+
+
+Setting things up
+----------------
+
+Load libraries
+```{r results="hide",warning=FALSE,message=FALSE}
+library(inlabru)
+library(INLA)
+```
+
+Use empricial Bayes in order to speed things up a little bit:
+```{r results="hide",warning=FALSE,message=FALSE}
+init.tutorial()
+```
+
+
+Get the data
+-----------------------------------
+For the next few practicals we are going to be working with a dataset obtained from 
+the `R` package `spatstat`, which contains the locations of 647 gorilla nests. We load the 
+dataset like this:
+
+```{r }
+data(gorillas, package = "inlabru")
+```
+
+Plot the nests and visualize the group membership (major/minor) by color:
+
+```{r results="hide",warning=FALSE,message=FALSE}
+ggplot() + gg(gorillas$mesh) + 
+           gg(gorillas$nests, aes(color=group)) + 
+           gg(gorillas$boundary) + 
+           coord_fixed() +
+           ggtitle("Gorillas nests and group membership")
+```
+
+
+Fiting the model
+-----------------------------------
+
+First, we define all components that enter the joint model. That is, the intercept that is common to both LGCPs and
+the two different spatial smoothers, one for each nest group.
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+matern <- inla.spde2.pcmatern(gorillas$mesh, 
+                              prior.sigma = c(0.1, 0.01), 
+                              prior.range = c(5, 0.01))
+
+cmp <- coordinates ~ mySmoothMajor(map = coordinates, model = matern) + 
+                     mySmoothMinor(map = coordinates, model = matern) + 
+                     Intercept
+
+```
+
+Given these components we define the linear predictor for each of the likelihoods
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+fml.major = coordinates ~ mySmoothMajor + Intercept
+fml.minor = coordinates ~ mySmoothMinor + Intercept
+```
+
+Setting up the cox process integration points is easy in this example. Both nest types were observed within the same window.
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+ips = ipoints(gorillas$boundary)
+```
+Lastly, we define the two likelihoods...
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+lik_minor = like("cp", formula = fml.major, components = cmp, data = gorillas$nests, ips = ips)
+lik_major = like("cp", formula = fml.minor, components = cmp, data = gorillas$nests, ips = ips)
+```
+... which we provide to the ´bru´ function.
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+jfit = bru(cmp, lik_major, lik_minor, options = list(max.iter = 1))
+```

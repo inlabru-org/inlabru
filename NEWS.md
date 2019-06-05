@@ -4,7 +4,7 @@
 
 * Add package unit testing
 
-* Extensive backend code rewrite to enable easier feature extensions
+* New backend code to make extended feature support easier
 
 # inlabru 2.1.9
 

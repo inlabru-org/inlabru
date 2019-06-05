@@ -1,0 +1,220 @@
+---
+title: "LGCPs - An example in two dimensions"
+author: "David Borchers"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Introduction
+----------------
+For this vignette we are going to be working with a dataset obtained from 
+the `R` package `spatstat`. We will set up a two-dimensional LGCP to estimate Gorilla abundance.
+
+
+Setting things up
+----------------
+
+Load libraries
+```{r results="hide",warning=FALSE,message=FALSE}
+library(inlabru)
+library(INLA)
+library(mgcv)
+```
+
+Use empricial Bayes in order to speed things up a little bit:
+```{r results="hide",warning=FALSE,message=FALSE}
+init.tutorial()
+```
+
+
+Get the data
+-----------------------------------
+For the next few practicals we are going to be working with a dataset obtained from 
+the `R` package `spatstat`, which contains the locations of 647 gorilla nests. We load the 
+dataset like this:
+
+```{r }
+data(gorillas, package = "inlabru")
+```
+
+This dataset is a list containing a number of `R` objects, including the locations of the 
+nests, the boundary of the survey area and an `INLA` mesh - see `help(gorillas)` for 
+details. Extract the the objects we need from the list, into other objects, so that we 
+don't have to keep typing '`gorillas$`':
+
+```{r }
+nests <- gorillas$nests
+mesh <- gorillas$mesh
+boundary <- gorillas$boundary
+```
+
+Plot the points (the nests(. (The `ggplot2` function `coord_fixed()` sets the aspect ratio, 
+which defaults to 1.)
+
+```{r results="hide",warning=FALSE,message=FALSE}
+ggplot() + gg(mesh) + 
+           gg(nests) + 
+           gg(boundary) + 
+           coord_fixed() + 
+           ggtitle("Points")
+```
+
+
+Fiting the model
+-----------------------------------
+
+Fit an LGCP model to the locations of the gorilla nests, predict on the survey region,
+and produce a plot of the estimated density - which should look like the 
+plot shown below.
+
+Recall that the steps to specifying, fitting and predicting are:
+
+1. Specify a model, comprising (for 2D models) `coordinates` on the left of `~` and 
+an SPDE `+ Intercept` on the right. Please use the SPDE prior specification stated below.
+
+2. Call `lgcp( )`, passing it (with 2D models) the model components, the `SpatialPointsDataFrame` 
+containing the observed points and the `SpatialPolygonsDataFrame` defining the survey boundary
+using the `samplers` argument.
+
+3. Call `predict( )`, passing it the fitted model from 2., locations at which to predict and
+an appropriate predictor spcification. The locations at which to predict should be a 
+`SpatialPixelsDataFrame` covering the mesh obtained by calling  `pixels(mesh)`.
+
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+matern <- inla.spde2.pcmatern(mesh, 
+                              prior.sigma = c(0.1, 0.01), 
+                              prior.range = c(5, 0.01))
+
+cmp <- coordinates ~ mySmooth(map = coordinates,
+                              model = matern) +
+                          Intercept
+
+fit <- lgcp(cmp, nests, samplers = boundary)
+```
+
+Predicting intensity
+-----------------------------------
+
+You should get a plot like that below (the command below assumes that the prediction
+is in an object called `lambda`):
+
+```{r results="hide",warning=FALSE,message=FALSE, pfig.height=5,fig.width=12}
+lambda <- predict(fit, pixels(mesh), ~ exp(mySmooth + Intercept))
+loglambda <- predict(fit, pixels(mesh), ~ mySmooth + Intercept)
+
+pl1 <- ggplot() + 
+        gg(lambda) + 
+        gg(boundary) + 
+        ggtitle("LGCP fit to Points", subtitle = "(Response Scale)") + 
+        coord_fixed() 
+
+pl2 <- ggplot() + 
+        gg(loglambda) + 
+        gg(boundary) + 
+        ggtitle("LGCP fit to Points", subtitle = "(Linear Predictor Scale)") + 
+        coord_fixed() 
+
+multiplot(pl1, pl2, cols = 2)
+```
+
+You can plot the median, lower 95% and upper 95% density surfaces as follows (assuming
+that the predicted intensity is in object `lambda`).
+
+```{r warning=FALSE,message=FALSE}
+gmedian <- ggplot() + gg(lambda["median"]) + coord_equal()
+glower95 <- ggplot() + gg(lambda["q0.025"]) + coord_equal()
+gupper95 <- ggplot() + gg(lambda["q0.975"]) + coord_equal()
+
+multiplot(gmedian, glower95, gupper95, 
+          layout = matrix(c(1,1,2,3), byrow = TRUE, ncol = 2))
+```
+
+
+SPDE parameters 
+-----------------------------------
+
+Plot the SPDE parameter and fixed effect parameter posteriors.
+
+```{r results="hide",warning=FALSE,message=FALSE}
+int.plot <- plot(fit, "Intercept")
+spde.range <- spde.posterior(fit, "mySmooth", what = "range")
+spde.logvar <- spde.posterior(fit, "mySmooth", what = "log.variance")
+range.plot <- plot(spde.range)
+var.plot <- plot(spde.logvar)
+
+multiplot(range.plot, var.plot, int.plot)
+```
+
+Look at the correlation function if you want to:
+
+```{r eval=TRUE,warning=FALSE,message=FALSE}
+corplot <- plot(spde.posterior(fit, "mySmooth", what = "matern.correlation"))
+covplot <- plot(spde.posterior(fit, "mySmooth", what = "matern.covariance"))
+multiplot(covplot, corplot)
+```
+
+
+Estimating Abundance
+-----------------------------------
+
+Finally, estimate abundance using the `predict` function. As a first step we need an estimate
+ for the integrated lambda. The integration `weight` values are containted in the `ipoints`
+ output. 
+ 
+
+```{r eval=TRUE,warning=FALSE,message=FALSE,echo=TRUE}
+
+Lambda <- predict(fit, ipoints(boundary, mesh), ~ sum(weight * exp(mySmooth + Intercept))) 
+Lambda
+```
+
+Given some generous interval boundaries (500, 800) for lambda we can estimate the posterior abundance distribution via
+
+
+```{r,warning=FALSE,message=FALSE,echo=TRUE}
+
+Nest <- predict(fit, ipoints(boundary, mesh), 
+                ~ data.frame(N = 500:800,
+                             dpois(500:800,
+                                   lambda = sum(weight * exp(mySmooth + Intercept)))))
+```
+
+Get its quantiles via
+
+```{r,warning=FALSE,message=FALSE,echo=TRUE}
+
+inla.qmarginal(c(0.025, 0.5, 0.975), marginal = list(x=Nest$N, y = Nest$mean))
+```
+
+... the mean via
+
+```{r,warning=FALSE,message=FALSE,echo=TRUE}
+
+inla.emarginal(identity, marginal = list(x=Nest$N, y = Nest$mean))
+```
+
+and plot posteriors:
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+
+Nest$plugin_estimate <- dpois(Nest$N, lambda=Lambda$mean)
+ggplot(data = Nest) +
+  geom_line(aes(x = N, y = mean, colour = "Posterior")) +
+  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
+```
+
+The true number of nests in 647; the mean and median of the posterior 
+distribution of abundance should be close to this if you have not done anything 
+wrong!

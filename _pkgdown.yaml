@@ -1,0 +1,133 @@
+title: inlabru
+url: http://www.inlabru.org
+template:
+  params:
+    bootswatch: flatly
+
+
+navbar:
+  left:
+    - icon: fa-home
+      href: index.html
+    - text: "vignettes"
+      menu:
+      -  text: Random fields
+         href: articles/web/random_fields.html
+      -  text: Random fields in 2D
+         href: articles/web/random_fields_2d.html
+      -  text: LGCPs - An example in one dimension
+         href: articles/web/1d_lgcp.html
+      -  text: LGCPs - A spatial example
+         href: articles/web/2d_lgcp.html
+      -  text: LGCPs - A spatial example with covariates
+         href: articles/web/2d_lgcp_covars.html
+      -  text: LGCPs - Plot sampling
+         href: articles/web/2d_lgcp_plotsampling.html
+      -  text: LGCPs - Distance sampling
+         href: articles/web/2d_lgcp_distancesampling.html
+    - text: data sets
+      icon: fa-database
+      menu:
+      -  text: Gorilla nests
+         href: reference/gorillas.html
+      -  text: Pantropical dolphins
+         href: reference/mexdolphin.html
+      -  text: Seal pups
+         href: reference/seals.html
+      -  text: MRSea
+         href: reference/MRSea.html
+      -  text: Shrimp
+         href: reference/shrimp.html
+      -  text: Simulated animal groups
+         href: reference/toygroups.html
+      -  text: Simulated 1D homogeneous Poisson process 
+         href: reference/Poisson1_1D.html
+      -  text: Simulated 1D inhomogeneous Poisson process 1 
+         href: reference/Poisson2_1D.html
+      -  text: Simulated 1D inhomogeneous Poisson process 2
+         href: reference/Poisson3_1D.html
+    - icon: fa-file-code-o 
+      text: "functions"
+      href: reference/index.html
+    - text: "workshops"
+      icon: fa-university
+      href: https://sites.google.com/inlabru.org/inlabru/workshops
+    - text: "publications"
+      icon: fa-book
+      href: articles/web/publications.html
+      
+  right:
+    - text: "faq"
+      icon: fa-question-circle-o
+      href: articles/faq.html
+    - icon: fa-newspaper-o
+      text: "changes"
+      href: news/index.html
+    - icon: fa-question-circle-o
+      text: "github"
+      href: https://github.com/fbachl/inlabru/
+
+reference:
+  - title: Plotting - Basics
+    desc: ~
+    contents:
+      - '`gmap`'
+      - '`multiplot`'
+
+  - title: Plotting - Geomes
+    desc: ~
+    contents:
+      - starts_with("gg")
+      
+  - title: Plotting - RGL
+    desc: ~
+    contents:
+      - '`globe`'
+      - starts_with("glp")
+      
+  - title: Inference
+    desc: ~
+    contents:
+      - '`init.tutorial`'
+      - '`bru`'
+      - '`bru.options`'
+      - '`bru.components`'
+      - '`lgcp`'
+      - '`like`'
+      - '`generate.bru`'
+      - '`predict.bru`'
+      - '`summary.bru`'
+      - '`generate.inla`'
+      - '`predict.inla`'
+      - '`spde.posterior`'
+      - '`sample.lgcp`'
+      
+  - title: Integration
+    desc: ~
+    contents:
+      - '`ipoints`'
+      - '`cprod`'
+      - '`int`'
+      
+  - title: Helpers for spatial data 
+    desc: ~
+    contents:
+      - '`spoly`'
+      - '`sline`'
+      - '`stransform`'
+      - '`vertices`'
+      - '`pixels`'
+      - '`spatial.to.ppp`'
+      
+  - title: Misc
+    desc: ~
+    contents:
+      - '`point2count`'
+      - '`plotsample`'
+      - '`devel.cvmeasure`'
+  
+  - title: All
+    desc: ~
+    contents:
+      - matches("^[a-zA-Z0-9_]*$")
+

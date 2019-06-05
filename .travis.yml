@@ -1,7 +1,4 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
 sudo: required
-# dist: xenial
 
 services:
   - docker
@@ -10,12 +7,21 @@ language: minimal
 cache: packages
 
 before_install:
+  # Determine which branch we are building
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
+  # Clone the repo and check out the branch
+  - git clone https://github.com/fbachl/inlabru.git
+  - cd inlabru
+  - git checkout $BRANCH
+  - cd ..
+  # Run docker
   - docker --version
-  - docker run --name my_ubuntu -v /$(pwd):/home/work -it -d fbachl/inlabru:latest /bin/bash
-  - docker ps
-  - docker container ls --all
+  - docker run --name my_ubuntu -v /$(pwd)/inlabru:/home/work -it -d fbachl/inlabru:latest /bin/bash
 
 install:
+  - docker ps
+  - docker container ls --all
   - docker exec -it my_ubuntu ls -al /home
   - docker exec -it my_ubuntu ls -al /home/work
   - docker exec -it my_ubuntu whoami

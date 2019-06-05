@@ -7,8 +7,10 @@ latent_spde2D_group_testdata <- function() {
   
   # Load and reduce data set
   data(mrsea)
-  mrsea$points = mrsea$points[mrsea$points$season==1 | mrsea$points$season==2,]
-  mrsea$samplers = mrsea$samplers[mrsea$samplers$season==1 | mrsea$samplers$season==2,]
+  mrsea$points = mrsea$points[mrsea$points$season==1 |
+                                mrsea$points$season==2, ]
+  mrsea$samplers = mrsea$samplers[mrsea$samplers$season==1 |
+                                    mrsea$samplers$season==2, ]
   
   # Integration points
   ips <- ipoints(mrsea$samplers, group = "season")
@@ -18,14 +20,14 @@ latent_spde2D_group_testdata <- function() {
                                 prior.sigma = c(0.1, 0.01), 
                                 prior.range = c(10000, 0.01))
   
-#  print('--- Using workaround for known bug (fixed in new backend) ---')
-#  season = mrsea$points$season 
+  print('--- Using workaround for known bug (fixed in new backend) ---')
+  season = mrsea$points$season 
   
-  cmp <- coordinates + season ~ mySmooth(map = coordinates,
-                                         model = matern,
-                                         group = season,
-                                         ngroup = 2) + Intercept
-  fit <- lgcp(cmp, mrsea$points, ips = ips, options = list(control.inla = list(int.strategy = "eb")))
+  cmp <- coordinates + season ~
+    mySmooth(map = coordinates, model = matern,
+             group = season, ngroup = 2) + Intercept
+  fit <- lgcp(cmp, mrsea$points, ips = ips,
+              options = list(control.inla = list(int.strategy = "eb")))
   
   list(mrsea = mrsea,
        matern = matern,
