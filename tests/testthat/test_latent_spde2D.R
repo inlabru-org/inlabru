@@ -21,7 +21,7 @@ latent_spde2D_group_testdata <- function() {
                                 prior.range = c(10000, 0.01))
   
   print('--- Using workaround for known bug (*NOT* fixed in new backend) ---')
-  season = mrsea$points$season 
+#  season = mrsea$points$season 
   
   cmp <- coordinates + season ~
     mySmooth(map = coordinates, model = matern,
