@@ -1,3 +1,7 @@
+# inlabru 2.1.10
+
+* Fix internal sampling bug due to INLA changes
+
 # inlabru 2.1.9
 
 * Remove unused VignetteBuilder entry from DESCRIPTION

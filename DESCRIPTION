@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Spatial Inference using Integrated Nested Laplace Approximation
-Version: 2.1.9
+Version: 2.1.10
 Authors@R: c(
   person("Fabian E.", "Bachl", email = "bachlfab@gmail.com", role = c("aut", "cre"),
          comment = "Fabian Bachl wrote the main code"),
