@@ -1,10 +1,14 @@
-# inlabru 2.1.9.999
+# inlabru 2.1.10.999
 
-* Fix bug for posterior sampling due to INLA interface change
+* Add random seed option for posterior sampling
 
 * Add package unit testing
 
 * New backend code to make extended feature support easier
+
+# inlabru 2.1.10
+
+* Fix internal sampling bug due to INLA changes
 
 # inlabru 2.1.9
 

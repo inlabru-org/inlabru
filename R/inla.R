@@ -145,12 +145,14 @@ inla.posterior.sample.structured = function(result, n, seed = 0L){
 
   # Workaround for older versions of INLA
   if ("hyper.user.scale" %in% formalArgs(INLA::inla.posterior.sample)) {
-    samples = INLA::inla.posterior.sample(n, result, seed = seed)
+    samples = INLA::inla.posterior.sample(n = n,
+                                          result = result,
+                                          seed = seed)
   } else {
     samples = INLA::inla.posterior.sample(n = n,
                                           result = result,
-                                          intern = FALSE,
-                                          seed = seed)
+                                          seed = seed,
+                                          intern = FALSE)
   }
   
   ssmpl = list()
