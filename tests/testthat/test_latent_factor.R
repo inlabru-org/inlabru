@@ -10,7 +10,9 @@ test_that("bru: factor component", {
   input.df$y <- c(rep(1, 100), rep(-2, 100)) + rnorm(200, mean=0, sd=0.1)
   
   # Fit the model
-  fit = bru(y ~ fac(map = x, model = "factor") - Intercept, "gaussian", input.df)
+  fit = bru(y ~ fac(map = x, model = "factor") - Intercept,
+            family = "gaussian",
+            data = input.df)
   
   # Check fixed effect results
   expect_equal(fit$summary.fixed[1, "mean"], 1.009040, midtol)

@@ -138,6 +138,7 @@ component.formula = function(object, ...) {
 #' @param n EXPERIMENTAL
 #' @param season.length EXPERIMENTAL
 #' @param group EXPERIMENTAL
+#' @param replicate EXPERIMENTAL
 #' @param values EXPERIMENTAL
 #' @param A.msk Boolean vector for masking (deactivating) columns of the A-matrix
 #' @param ... EXPERIMENTAL
@@ -160,17 +161,17 @@ component.formula = function(object, ...) {
 #' }
 #' }
 
-component.character = function(object,
-                             data,
-                             model,
-                             map,
-                             n = NULL,
-                             season.length = NULL,
-                             group = NULL,
-                             replicate = NULL,
-                             values = NULL,
-                             A.msk = NULL,
-                             ...){
+component.character <- function(object,
+                                data,
+                                model,
+                                map,
+                                n = NULL,
+                                season.length = NULL,
+                                group = NULL,
+                                replicate = NULL,
+                                values = NULL,
+                                A.msk = NULL,
+                                ...){
   
   # INLA models:
   # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper, 
@@ -252,6 +253,7 @@ component.character = function(object,
     # Only a small handful of component$f elements are actually accessed
     # by inlabru code.
 ##    fvals <- do.call(INLA::f, f.args, envir = parent.frame())
+    fvals <- NULL
     component$f = NULL
     
     # Second part of the SPDE model trick above

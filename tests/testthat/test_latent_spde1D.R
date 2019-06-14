@@ -3,7 +3,6 @@ library(INLA)
 
 latent_spde1D_testdata <- function() {
   data(Poisson2_1D)
-  cd <- 
   x <- seq(0, 55, length = 50)
   mesh1D <- inla.mesh.1d(x, boundary = "free")
   
@@ -12,7 +11,8 @@ latent_spde1D_testdata <- function() {
                                   prior.sigma=c(10, 0.01))
   
   cmp <- count ~ field(map = x, model = matern) + Intercept
-  fit <- bru(cmp, countdata2, family = "poisson", options = list(E = countdata2$exposure))
+  fit <- bru(cmp, data = countdata2, family = "poisson",
+             options = list(E = countdata2$exposure))
   
   list(data = countdata2,
        matern = matern,

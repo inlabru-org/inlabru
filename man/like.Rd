@@ -9,11 +9,18 @@ like(family, formula = . ~ ., data = NULL, components = NULL,
   ips = NULL, domain = NULL, options = list())
 }
 \arguments{
-\item{family}{A character identifying a valid \link[INLA]{inla} likelihood. Alternatively 'cp' for Cox processes.}
+\item{family}{A string identifying a valid \link[INLA]{inla} likelihood family. The default is
+\code{gaussian} with identity link. In addition to the likelihoods provided
+by inla (see \code{inla.models()$likelihood}) inlabru supports fitting Cox
+processes via \code{family = "cp"}.
+As an alternative to \code{\link{bru}}, the \code{\link{lgcp}} function provides
+a convenient interface to fitting Cox processes.}
 
-\item{formula}{a \link{formula} where the right hand side expression defines the predictor used in the optimization.}
+\item{formula}{a \link{formula} where the right hand side expression defines
+the predictor used in the optimization.}
 
-\item{data}{Likelihood-specific data.}
+\item{data}{Likelihood-specific data, as a \code{data.frame} or \code{SpatialPoints[DataFrame]}
+object.}
 
 \item{components}{Components.}
 

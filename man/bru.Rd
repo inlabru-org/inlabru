@@ -4,25 +4,18 @@
 \alias{bru}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
-bru(components = y ~ Intercept, family = NULL, data = NULL, ...,
-  options = list())
+bru(components = y ~ Intercept, ..., data = NULL, options = list())
 }
 \arguments{
-\item{components}{a \link{formula} describing the latent components. See
+\item{components}{A \link{formula}-like specification of latent components.
+Also used to define a default linear additive predictor.  See
 \link{component} for details.}
 
-\item{family}{A string indicating the likelihood family. The default is
-\code{gaussian} with identity link. In addition to the likelihoods provided
-by inla (see \code{inla.models()$likelihood}) inlabru supports fitting Cox
-processes via \code{family = "cp"}. The latter requires contructing a
-likelihood using the \link{like} function and providing it via the ...
-parameter list. As an alternative to bru, the \link{lgcp} function provides
-a convenient interface to fitting Cox processes. See details.}
+\item{...}{Likelihoods, each constructed by a calling \code{\link{like}}, or named
+parameters that can be passed to a single \code{\link{like}} call.}
 
-\item{data}{A data.frame or SpatialPoints[DataFrame] object. See details.}
-
-\item{...}{Additional likelihoods, each constructed by a calling \link{like}.
-See details.}
+\item{data}{A data.frame or SpatialPoints[DataFrame] object, used as default
+data object for likelihood objects with no data of their own.}
 
 \item{options}{A list of name and value pairs that are either interpretable
 by \link{bru.options} or valid inla parameters. See \link{bru.options} for
@@ -55,12 +48,6 @@ This method is a wrapper for \link[INLA]{inla} and provides
       available by using the \code{cp} family or (even easier) by using the
       \link{lgcp} function.
   }
-}
-\details{
-family and ... must either be parameters to \link{like}, or
-  \code{lhood} objects constructed by \link{like}. \code{data} must either be
-  an \code{lhood} object, a data container, or \code{NULL}. If \code{NULL},
-  data must be supplied through direct calls to \link{like}.
 }
 \examples{
 \donttest{
