@@ -23,11 +23,11 @@ caveats about some of the \code{control.*} inla options.}
 }
 \value{
 bru returns an object of class "bru". A \code{bru} object inherits
-  from \link[INLA]{inla} (see the inla documentation for its properties) and
+  from \code{INLA::inla} (see the inla documentation for its properties) and
   adds additional information stored in the \code{sppa} field.
 }
 \description{
-This method is a wrapper for \link[INLA]{inla} and provides
+This method is a wrapper for \code{INLA::inla} and provides
   multiple enhancements.
 
   \itemize{
@@ -58,7 +58,7 @@ input.df <- data.frame(x=cos(1:10))
 input.df <- within(input.df, y <- 5 + 2*x + rnorm(10, mean=0, sd=0.1))
 
 # Fit a Gaussian likelihood model
-fit <- bru(y ~ x + Intercept, "gaussian", input.df)
+fit <- bru(y ~ x + Intercept, family = "gaussian", data = input.df)
 
 # Obtain summary
 fit$summary.fixed

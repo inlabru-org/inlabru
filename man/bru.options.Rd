@@ -17,30 +17,30 @@ to run inference.}
 
 \item{max.iter}{maximum number of inla iterations}
 
-\item{offset}{the usual \link[INLA]{inla} offset. If a nonlinear formula is
+\item{offset}{the usual \code{INLA::inla} offset. If a nonlinear formula is
 used, the resulting Taylor approximation constant will be added to this
 automatically.}
 
 \item{result}{An \code{inla} object returned from previous calls of
-\link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a
+\code{INLA::inla}, \link{bru} or \link{lgcp}. This will be used as a
 starting point for further improvement of the approximate posterior.}
 
-\item{E}{\link[INLA]{inla} 'poisson' likelihood exposure parameter}
+\item{E}{\code{INLA::inla} 'poisson' likelihood exposure parameter}
 
-\item{Ntrials}{\link[INLA]{inla} 'binomial' likelihood parameter}
+\item{Ntrials}{\code{INLA::inla} 'binomial' likelihood parameter}
 
-\item{control.compute}{INLA option, See \link[INLA]{control.compute}}
+\item{control.compute}{INLA option, See \code{INLA::control.compute}}
 
-\item{control.inla}{INLA option, See \link[INLA]{control.inla}}
+\item{control.inla}{INLA option, See \code{INLA::control.inla}}
 
-\item{control.fixed}{INLA option, See \link[INLA]{control.fixed}. Warning:
+\item{control.fixed}{INLA option, See \code{INLA::control.fixed}. Warning:
 due to how inlabru currently constructs the \code{inla()}, the \code{mean},
 \code{prec}, \code{mean.intercept}, and \code{prec.intercept} will have no
 effect. Until a more elegant alterative has been implemented, use explicit
 \code{mean.linear} and \code{prec.linear} specifications in each
 \code{model="linear"} component instead.}
 
-\item{...}{Additional options passed on to \link[INLA]{inla}}
+\item{...}{Additional options passed on to \code{INLA::inla}}
 }
 \description{
 Additional \link{bru} options

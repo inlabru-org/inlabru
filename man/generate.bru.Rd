@@ -41,7 +41,8 @@ input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
 
 # Fit the model
 
-fit <- bru(y ~ xeff(map = x, model = "linear"), "gaussian", input.df)
+fit <- bru(y ~ xeff(map = x, model = "linear"),
+           family = "gaussian", data = input.df)
 summary(fit)
 
 # Generate samples for some predefined x

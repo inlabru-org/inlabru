@@ -15,9 +15,10 @@
 
 generate = function(object, ...){ UseMethod("generate") }
 
+
 #' @title Convenient model fitting using (iterated) INLA
 #'
-#' @description This method is a wrapper for \link[INLA]{inla} and provides
+#' @description This method is a wrapper for \code{INLA::inla} and provides
 #'   multiple enhancements.
 #'
 #'   \itemize{
@@ -55,7 +56,7 @@ generate = function(object, ...){ UseMethod("generate") }
 #'   caveats about some of the \code{control.*} inla options.
 #'
 #' @return bru returns an object of class "bru". A \code{bru} object inherits
-#'   from \link[INLA]{inla} (see the inla documentation for its properties) and
+#'   from \code{INLA::inla} (see the inla documentation for its properties) and
 #'   adds additional information stored in the \code{sppa} field.
 #'
 #' @example inst/examples/bru.R
@@ -104,11 +105,6 @@ bru <- function(components = y ~ Intercept,
     if ( is.null(lhoods[[k]]$response) ) { lhoods[[k]]$response = all.vars(update(components, .~0)) }
   }
   
-  # Create joint stackmaker
-  stk = function(xx, mdl, result) {
-    do.call(inla.stack.mjoin, lapply(lhoods, function(lh) { stackmaker.like(lh)(bru.model, result) }))
-  }
-  
   # Set max interations to 1 if all likelihood formulae are linear 
   if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) { options$max.iter <- 1 }
   
@@ -120,7 +116,8 @@ bru <- function(components = y ~ Intercept,
     result <- do.call(iinla,
                       list(data,
                            bru.model,
-                           stk,
+                           lhoods,
+ #                          stk,
                            family = family,
                            n = options$max.iter,
                            offset = options$offset,
@@ -147,7 +144,7 @@ bru <- function(components = y ~ Intercept,
 #' 
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #' 
-#' @param family A string identifying a valid \link[INLA]{inla} likelihood family. The default is
+#' @param family A string identifying a valid \code{INLA::inla} likelihood family. The default is
 #'   \code{gaussian} with identity link. In addition to the likelihoods provided
 #'   by inla (see \code{inla.models()$likelihood}) inlabru supports fitting Cox
 #'   processes via \code{family = "cp"}.
@@ -160,7 +157,7 @@ bru <- function(components = y ~ Intercept,
 #' @param components Components.
 #' @param mesh An inla.mesh object.
 #' @param E Exposure parameter for family = 'poisson' passed on to
-#'   \link[INLA]{inla}. Special case if family is 'cp': rescale all integration
+#'   \code{INLA::inla}. Special case if family is 'cp': rescale all integration
 #'   weights by E. Default taken from \code{options$E}.
 #' @param Ntrials A vector containing the number of trials for the 'binomial'
 #'  likelihood. Default value is rep(1, n.data).
@@ -251,29 +248,29 @@ like <- function(family, formula = . ~ ., data = NULL, components = NULL,
   lh
 }
 
-stackmaker.like = function(lhood) {
-  
-  env = new.env() ; env$lhood = lhood
-  
-  # Special inlabru likelihoods
+single_stackmaker = function(model, lhood, result) {
   if (lhood$family == "cp") {
-    sm <- function(model, result) {
-      INLA::inla.stack(
-        make.stack(points = lhood$data, model = model, expr = lhood$expr, y = 1,
-                   E = 0, result = result),
-        make.stack(points = lhood$ips, model = model, expr = lhood$expr, y = 0,
-                   E = lhood$E * lhood$ips$weight, offset = 0, result = result)
-      )
-    }
+    INLA::inla.stack(
+      make.stack(points = lhood$data, model = model, expr = lhood$expr, y = 1,
+                 E = 0, result = result),
+      make.stack(points = lhood$ips, model = model, expr = lhood$expr, y = 0,
+                 E = lhood$E * lhood$ips$weight, offset = 0, result = result)
+    )
   } else {
-    sm <- function(model, result) {
-      make.stack(points = lhood$data, model = model, expr = lhood$expr,
-                 y = as.data.frame(lhood$data)[, lhood$response],
-                 E = lhood$E, Ntrials = lhood$Ntrials, result = result)
-    }
+    make.stack(points = lhood$data, model = model, expr = lhood$expr,
+               y = as.data.frame(lhood$data)[, lhood$response],
+               E = lhood$E, Ntrials = lhood$Ntrials, result = result)
   }
-  environment(sm) = env
-  sm
+}
+
+joint_stackmaker <- function(model, lhoods, result) {
+  do.call(inla.stack.mjoin,
+          lapply(lhoods,
+                 function(lh) {
+                   single_stackmaker(model, lh, result)
+                 }
+          )
+  )
 }
 
 
@@ -290,23 +287,23 @@ stackmaker.like = function(lhood) {
 #' @param run If TRUE, run inference. Otherwise only return configuration needed
 #'   to run inference.
 #' @param max.iter maximum number of inla iterations
-#' @param offset the usual \link[INLA]{inla} offset. If a nonlinear formula is
+#' @param offset the usual \code{INLA::inla} offset. If a nonlinear formula is
 #'   used, the resulting Taylor approximation constant will be added to this
 #'   automatically.
 #' @param result An \code{inla} object returned from previous calls of
-#'   \link[INLA]{inla}, \link{bru} or \link{lgcp}. This will be used as a
+#'   \code{INLA::inla}, \link{bru} or \link{lgcp}. This will be used as a
 #'   starting point for further improvement of the approximate posterior.
-#' @param E \link[INLA]{inla} 'poisson' likelihood exposure parameter
-#' @param Ntrials \link[INLA]{inla} 'binomial' likelihood parameter
-#' @param control.compute INLA option, See \link[INLA]{control.compute}
-#' @param control.inla INLA option, See \link[INLA]{control.inla}
-#' @param control.fixed INLA option, See \link[INLA]{control.fixed}. Warning:
+#' @param E \code{INLA::inla} 'poisson' likelihood exposure parameter
+#' @param Ntrials \code{INLA::inla} 'binomial' likelihood parameter
+#' @param control.compute INLA option, See \code{INLA::control.compute}
+#' @param control.inla INLA option, See \code{INLA::control.inla}
+#' @param control.fixed INLA option, See \code{INLA::control.fixed}. Warning:
 #'   due to how inlabru currently constructs the \code{inla()}, the \code{mean},
 #'   \code{prec}, \code{mean.intercept}, and \code{prec.intercept} will have no
 #'   effect. Until a more elegant alterative has been implemented, use explicit
 #'   \code{mean.linear} and \code{prec.linear} specifications in each
 #'   \code{model="linear"} component instead.
-#' @param ... Additional options passed on to \link[INLA]{inla}
+#' @param ... Additional options passed on to \code{INLA::inla}
 #'
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}> and Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
@@ -821,25 +818,30 @@ summarize = function(data, x = NULL, cbind.only = FALSE) {
 
 
 
-# Iterated INLA
-# 
-# This is a wrapper for iterated runs of \link[INLA]{inla}. Before each run the \code{stackmaker} function is used to
-# set up the \link{inla.stack} for the next iteration. For this purpose \code{stackmaker} is called given the
-# \code{data} and \code{model} arguments. The \code{data} argument is the usual data provided to \link[INLA]{inla}
-# while \link{model} provides more information than just the usual inla formula. 
-# 
-# @aliases iinla
-# @export
-# @param data A data.frame
-# @param model A \link{model} object
-# @param stackmaker A function creating a stack from data and a model
-# @param n Number of \link[INLA]{inla} iterations
-# @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
-# @param ... Arguments passed on to \link[INLA]{inla}
-# @return An \link[INLA]{inla} object
+#' Iterated INLA
+#' 
+#' This is an internal wrapper for iterated runs of \code{INLA::inla}. Before each run the
+#' \code{joint_stackmaker} function is used to set up the \code{INLA::inla.stack} for
+#' the next iteration. 
+#' 
+#' @aliases iinla
+#' @export
+#' @param data A data.frame
+#' @param model A \link{bru_model} object
+#' @param lhoods A list of likelihood objects from \code{\link{like}}
+#' @param n Number of \code{INLA::inla} iterations
+#' @param result A previous inla result, to be used as starting point
+#' @param family A vector of inla likelihood family names
+#' @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
+#' @param offset An additional predictor offset 
+#' @param inla.options A list of further arguments passed on to \code{INLA::inla}
+#'   Some \code{control.*} arguments are partially overridden, according to
+#'   internal inlabru method requirements.
+#' @return An \code{INLA::inla} object
+#' @keywords internal
 
 
-iinla = function(data, model, stackmaker, n = 10, result = NULL, 
+iinla = function(data, model, lhoods, n = 10, result = NULL, 
                  family,
                  iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"), 
                  offset = NULL, inla.options){
@@ -852,18 +854,30 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
   
   # Set old result
   old.result = result
-  
+
+  # Initialise required local options 
+  if (is.null(inla.options$control.mode)) {
+    inla.options$control.mode <- list()
+  }
+  if (is.null(inla.options$control.predictor)) {
+    inla.options$control.predictor <- list()
+  }
+  inla.options$control.predictor$compute <- TRUE
+
   # Inital stack
-  stk = stackmaker(data, model, result)
-  
+  stk <- joint_stackmaker(model, lhoods, result)
+  stk.data <- INLA::inla.stack.data(stk)
+  inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
+
   k = 1
   interrupt = FALSE
   
-  while ( (k <= n) & !interrupt ) {
+  while ((k <= n) & !interrupt) {
     
     # When running multiple times propagate theta
-    if ( k>1 ) {
-      inla.options[["control.mode"]] = list(restart = TRUE, theta = result$mode$theta)
+    if (k > 1) {
+      inla.options[["control.mode"]]$restart <- TRUE
+      inla.options[["control.mode"]]$theta <- result$mode$theta
     }
     
     # Verbose
@@ -873,14 +887,12 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     if ( k > 1 ) { old.result = result } 
     result = NULL
     
-    stk.data <- INLA::inla.stack.data(stk)
     icall <- expression(
       result <- tryCatch(
         do.call(inla,
                 c(list(formula = update.formula(model$formula, BRU.response ~ .),
                        data = c(stk.data, list.data(model$formula)),
                        family = family,
-                       control.predictor = list(A = INLA::inla.stack.A(stk), compute = TRUE),
                        E = stk.data[["BRU.E"]],
                        Ntrials = stk.data[["BRU.Ntrials"]],
                        offset = stk.data[["BRU.offset"]] + offset),
@@ -935,7 +947,11 @@ iinla = function(data, model, stackmaker, n = 10, result = NULL,
     }
     
     # Update stack given current result
-    if ( n > 1 & k < n) { stk = stackmaker(data, model, result) }
+    if ( n > 1 & k < n) {
+      stk <- joint_stackmaker(model, lhoods, result)
+      stk.data <- INLA::inla.stack.data(stk)
+      inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
+    }
     
     # Stopping criterion
     if ( k>1 ){
