@@ -245,16 +245,16 @@ component.character <- function(object,
       f.args[["replicate"]] <- substitute(replicate)
     }
     
-    # Call f and store the results
-    # TODO: Investigate what outputs from INLA::f require data, and access that
-    # information with some other method. ::f should only be called by INLA,
-    # and never by inlabru, since it sets up temporary files that will not be
-    # removed, and requires data not available at this point!
-    # Only a small handful of component$f elements are actually accessed
-    # by inlabru code.
-##    fvals <- do.call(INLA::f, f.args, envir = parent.frame())
-    fvals <- NULL
-    component$f = NULL
+    # These values were previously initialised by an INLA::f call, but ::f
+    # should only be called by INLA, and never by inlabru, since it sets up
+    # temporary files that will not be removed, and also requires data not
+    # available at this point!  Until multi-stage model initialisation is
+    # implemented, require the user to explicitly provide these values.
+    fvals <- list(n = n,
+                  season.length = season.length,
+                  values = values,
+                  ...)
+    component$f <- fvals
     
     # Second part of the SPDE model trick above
     # TODO: generalise group and replicate handling for all models
@@ -269,8 +269,16 @@ component.character <- function(object,
     component$mesh = make.default.mesh(component, model, model.type, fvals)
 
     # Set ngroup and nrep gefaults
-    if (is.null(component$f$ngroup)) { component$ngroup = 1 } else { component$ngroup = component$f$ngroup }
-    if (is.null(component$f$nrep)) { component$nrep = 1 } else { component$nrep = component$f$nrep }
+    if (is.null(component$f$ngroup)) {
+      component$ngroup <- 1
+    } else {
+      component$ngroup <- component$f$ngroup
+    }
+    if (is.null(component$f$nrep)) {
+      component$nrep <- 1
+    } else {
+      component$nrep <- component$f$nrep
+    }
     
   }
 
