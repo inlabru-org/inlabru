@@ -4,10 +4,10 @@ RDEVEL_VERSION ?= R-3.6.0
 
 PKG_DEP='sp', 'ggplot2', 'rgdal', 'rgeos'
 PKG_SUG='testthat', 'ggmap', 'rgl', 'sphereplot', 'raster', 'dplyr', 'maptools', \
-  'shiny', 'spatstat', 'spatstat.data', 'RColorBrewer'
+  'shiny', 'spatstat', 'spatstat.data', 'RColorBrewer', 'knitr', 'rmarkdown'
 REPOS=\
-  CRAN='https://www.stats.bris.ac.uk/R/',\
-  INLA='https://inla.r-inla-download.org/R/testing'
+  INLA='https://inla.r-inla-download.org/R/testing',\
+  CRAN='https://cloud.r-project.org/'
 SYSTEM_LIB_DEV=\
   tcl8.6-dev tk8.6-dev \
   libx11-dev libmagick++-dev libgit2-dev libssh2-1-dev \
