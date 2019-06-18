@@ -14,8 +14,7 @@
 #' @param dist A vector of distances at which to calculate the
 #'     covariances/correlations
 #' @param log.range A scalar or a list (mean, sd), such as produced by
-#'     inla.spde.result(...)$summary.log.range.nominal[[1]][ c("mean",
-#'     "sd")]
+#'     \code{inla.spde.result(...)$summary.log.range.nominal[[1]][c("mean","sd")]}
 #' @param log.variance Either \code{NULL}, a scalar, or vector of the
 #'     same type as for log.range. When \code{NULL}, the correlations
 #'     are calculated instead of the covariances.
@@ -80,10 +79,10 @@ materncov.bands = function(manifold, dist, log.range,
     if (!is.character(manifold)) {
         if (inherits(manifold, "inla.mesh") ||
             inherits(manifold, "inla.mesh.1d")) {
-            if ((manifold == "S1") && is.null(S1.L)) {
-                S1.L <- diff(manifold$interval)
-            }
-            manifold <- manifold$manifold
+          if ((manifold$manifold == "S1") && is.null(S1.L)) {
+            S1.L <- diff(manifold$interval)
+          }
+          manifold <- manifold$manifold
         }
     }
     if (manifold == "R1") {

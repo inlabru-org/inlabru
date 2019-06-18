@@ -5,8 +5,8 @@
 \title{inlabru latent model component construction using parameters}
 \usage{
 \method{component}{character}(object, data, model, map, n = NULL,
-  season.length = NULL, group = NULL, values = NULL, A.msk = NULL,
-  ...)
+  season.length = NULL, group = NULL, replicate = NULL,
+  values = NULL, A.msk = NULL, ...)
 }
 \arguments{
 \item{object}{A string giving the component its name}
@@ -22,6 +22,8 @@
 \item{season.length}{EXPERIMENTAL}
 
 \item{group}{EXPERIMENTAL}
+
+\item{replicate}{EXPERIMENTAL}
 
 \item{values}{EXPERIMENTAL}
 

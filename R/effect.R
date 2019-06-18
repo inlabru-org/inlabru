@@ -138,6 +138,7 @@ component.formula = function(object, ...) {
 #' @param n EXPERIMENTAL
 #' @param season.length EXPERIMENTAL
 #' @param group EXPERIMENTAL
+#' @param replicate EXPERIMENTAL
 #' @param values EXPERIMENTAL
 #' @param A.msk Boolean vector for masking (deactivating) columns of the A-matrix
 #' @param ... EXPERIMENTAL
@@ -160,16 +161,17 @@ component.formula = function(object, ...) {
 #' }
 #' }
 
-component.character = function(object,
-                             data,
-                             model,
-                             map,
-                             n = NULL,
-                             season.length = NULL,
-                             group = NULL,
-                             values = NULL,
-                             A.msk = NULL,
-                             ...){
+component.character <- function(object,
+                                data,
+                                model,
+                                map,
+                                n = NULL,
+                                season.length = NULL,
+                                group = NULL,
+                                replicate = NULL,
+                                values = NULL,
+                                A.msk = NULL,
+                                ...){
   
   # INLA models:
   # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper, 
@@ -194,6 +196,7 @@ component.character = function(object,
                 map = substitute(map),
                 mesh = NA,
                 group.char = as.character(substitute(group)), # Name of the data column holding the group index
+                replicate.char = as.character(substitute(replicate)), # Name of the data column holding the replicate index
                 values = values,
                 A.msk = A.msk,
                 model = model,
@@ -217,11 +220,11 @@ component.character = function(object,
     # Remove parameters inlabru supports but INLA doesn't
     fcall = fcall[!(names(fcall) %in% c("map","A.msk", "mesh"))]
     
-    # For SPDE models we need a little nasty trick
-    if ( model.type %in% c("spde") ) {
-      #tmp = NA
-      #fcall$group = as.symbol("tmp") 
-    }
+#    # For SPDE models we need a little nasty trick
+#   if ( model.type %in% c("spde") ) {
+#     #tmp = NA
+#     #fcall$group = as.symbol("tmp") 
+#   }
     
     # Arguments to f as list
     f.args = as.list(fcall[2:length(fcall)])
@@ -233,11 +236,28 @@ component.character = function(object,
       fcall$model = NULL
     }
     
-    # Call f and store the results
-    fvals = do.call(INLA::f, f.args, envir = parent.frame()) 
-    component$f = fvals
+    # Protect arguments that may need access to actual data
+    # TODO: make a more general system, that also handles ngroup etc.
+    if ("group" %in% names(f.args)) {
+      f.args[["group"]] <- substitute(group)
+    }
+    if ("replicate" %in% names(f.args)) {
+      f.args[["replicate"]] <- substitute(replicate)
+    }
+    
+    # These values were previously initialised by an INLA::f call, but ::f
+    # should only be called by INLA, and never by inlabru, since it sets up
+    # temporary files that will not be removed, and also requires data not
+    # available at this point!  Until multi-stage model initialisation is
+    # implemented, require the user to explicitly provide these values.
+    fvals <- list(n = n,
+                  season.length = season.length,
+                  values = values,
+                  ...)
+    component$f <- fvals
     
     # Second part of the SPDE model trick above
+    # TODO: generalise group and replicate handling for all models
     if ( model.type %in% c("spde") ) { 
       fcall$group = as.symbol(paste0(label, ".group"))
     }
@@ -249,8 +269,16 @@ component.character = function(object,
     component$mesh = make.default.mesh(component, model, model.type, fvals)
 
     # Set ngroup and nrep gefaults
-    if (is.null(component$f$ngroup)) { component$ngroup = 1 } else { component$ngroup = component$f$ngroup }
-    if (is.null(component$f$nrep)) { component$nrep = 1 } else { component$nrep = component$f$nrep }
+    if (is.null(component$f$ngroup)) {
+      component$ngroup <- 1
+    } else {
+      component$ngroup <- component$f$ngroup
+    }
+    if (is.null(component$f$nrep)) {
+      component$nrep <- 1
+    } else {
+      component$nrep <- component$f$nrep
+    }
     
   }
 

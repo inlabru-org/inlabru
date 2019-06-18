@@ -16,8 +16,7 @@ materncov.bands(manifold, dist, log.range, log.variance = NULL,
 covariances/correlations}
 
 \item{log.range}{A scalar or a list (mean, sd), such as produced by
-inla.spde.result(...)$summary.log.range.nominal[[1]][ c("mean",
-"sd")]}
+\code{inla.spde.result(...)$summary.log.range.nominal[[1]][c("mean","sd")]}}
 
 \item{log.variance}{Either \code{NULL}, a scalar, or vector of the
 same type as for log.range. When \code{NULL}, the correlations

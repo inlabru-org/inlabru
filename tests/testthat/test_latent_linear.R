@@ -8,7 +8,8 @@ test_that("bru: linear component", {
   input.df <- data.frame(x=cos(1:100))
   input.df <- within(input.df, y <- 5 + 2*x + rnorm(100, mean=0, sd=0.1))
 
-  fit = bru(y ~ myLin(map = x, model = "linear") + Intercept, "gaussian", input.df)
+  fit = bru(y ~ myLin(map = x, model = "linear") + Intercept,
+            family = "gaussian", data = input.df)
   
   expect_equal(fit$summary.fixed["myLin", "mean"], 2.02, midtol)
   expect_equal(fit$summary.fixed["myLin", "sd"], 0.0126, midtol)

@@ -1,9 +1,10 @@
-# Internal \link{inlabru} model structure
-# 
-# See \link{make.model}.
-# 
-# @name model
-#NULL
+#' Internal \link{inlabru} model structure
+#' 
+#' See \link{make.model}.
+#' 
+#' @name bru_model
+#' @keywords internal
+NULL
 
 
 ##########################################################################
@@ -15,51 +16,56 @@ evaluate = function(...){UseMethod("evaluate")}
 
 ##########################################################################
 # Constructor
-##########################################################################
+##########################################################################'
 
-# Create an inlabru \link{model} from a formula
-# 
-# The \link{inlabru} syntax for model forulae is different from what \link{inla} considers a valid.
-# In inla most of the effects are defined by adding an f(...) expression to the formula. 
-# In \link{inlabru} the f is replaced by an arbitrary (exception: 'offset') string that will
-# determine the label of the effect. For instance
-# 
-# \code{y ~ f(myspde, ...)}
-# 
-# is equivalent to
-# 
-# \code{y ~ myspde(...)}
-# 
-# A disadvantage of the inla way is that there is no clear separation between the name of the covariate
-# and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
-# use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-# \link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
-# like the first argument of the f function, e.g.
-# 
-# \code{y ~ f(temperature, model = 'fixed')}
-# 
-# is equivalent to
-# 
-# \code{y ~ temperature(map = temperature, model = fixed)}
-# as well as
-# \code{y ~ temperature(model = fixed)}
-# 
-# On the other hand, map can also be a function mapping, e.g the \link{coordinates} function of the
-# \link{sp} package :
-# 
-# \code{y ~ mySPDE(map = coordinates, ...)}
-#
-# Morevover, \code{map} can be any expression that evaluate within your data as an environment.
-# For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'a+b' by
-# setting \code{map} in the following way:
-# 
-# \code{y ~ myEffect(map = sin(a+b))} 
-#
-#
-# @export
-# @param fml A formula
-# @return A \link{model} object
-# 
+#' Create an inlabru model object from a component formula
+#' 
+#' The \link{inlabru} syntax for model forulae is different from what \code{INLA::inla} considers a valid.
+#' In inla most of the effects are defined by adding an \code{f(...)} expression to the formula. 
+#' In \link{inlabru} the \code{f} is replaced by an arbitrary (exception: \code{offset}) string that will
+#' determine the label of the effect. See Details for further information.
+#' 
+#' @details
+#' For instance
+#' 
+#' \code{y ~ f(myspde, ...)}
+#' 
+#' in INLA is equivalent to
+#' 
+#' \code{y ~ myspde(...)}
+#'
+#' in inlabru.
+#'  
+#' A disadvantage of the inla way is that there is no clear separation between the name of the covariate
+#' and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
+#' use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
+#' \link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
+#' like the first argument of the f function, e.g.
+#' 
+#' \code{y ~ f(temperature, model = 'fixed')}
+#' 
+#' is equivalent to
+#' 
+#' \code{y ~ temperature(map = temperature, model = fixed)}
+#' as well as
+#' \code{y ~ temperature(model = fixed)}
+#' 
+#' On the other hand, map can also be a function mapping, e.g the \link{coordinates} function of the
+#' \link{sp} package :
+#' 
+#' \code{y ~ mySPDE(map = coordinates, ...)}
+#'
+#' Morevover, \code{map} can be any expression that evaluate within your data as an environment.
+#' For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'a+b' by
+#' setting \code{map} in the following way:
+#' 
+#' \code{y ~ myEffect(map = sin(a+b))} 
+#'
+#'
+#' @export
+#' @param fml A component specification formula
+#' @return A \link{bru_model} object
+#' @keywords internal
 
 make.model = function(components){
   
@@ -84,7 +90,7 @@ make.model = function(components){
   
   # Make model
   mdl = list(effects = effects, formula = formula)
-  class(mdl) = c("model","list")
+  class(mdl) = c("bru_model","list")
   return(mdl)
 }
 
