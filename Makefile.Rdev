@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+RDEVEL_VERSION ?= R-3.6.0
+
 PKG_DEP='sp', 'ggplot2', 'rgdal', 'rgeos'
 PKG_SUG='testthat', 'ggmap', 'rgl', 'sphereplot', 'raster', 'dplyr', 'maptools', \
   'shiny', 'spatstat', 'spatstat.data', 'RColorBrewer'
@@ -11,12 +13,14 @@ SYSTEM_LIB_DEV=\
   libx11-dev libmagick++-dev libgit2-dev libssh2-1-dev \
   libfftw3-dev bwidget
 
-#RDEVEL_URL=https://stat.ethz.ch/R/daily/R-devel.tar.gz
-
-RDEVEL_VERSION=R-3.5.2
-
 RDEVEL_FILENAME=$(RDEVEL_VERSION).tar.gz
-RDEVEL_URL=https://cran.r-project.org/src/base/R-3/$(RDEVEL_FILENAME)
+ifeq (R-devel,$(RDEVEL_VERSION))
+  RDEVEL_URL_ROOT=https://stat.ethz.ch/R/daily/
+else
+  RDEVEL_URL_ROOT=https://cran.r-project.org/src/base/R-3/
+endif
+RDEVEL_URL=$(RDEVEL_URL_ROOT)$(RDEVEL_FILENAME)
+
 ROOT_DIR=$(HOME)/local/$(RDEVEL_VERSION)
 
 SRC_ROOT_DIR=$(HOME)/local/src
@@ -44,7 +48,8 @@ default:
 	@echo "       packages-depends (install inlabru 'Depends' packages)"
 	@echo "       packages-suggests (install inlabru 'Suggests' packages)"
 	@echo ""
-	@echo "       ./Makefile.Rdev RDEVEL_VERSION=R-3.5.2 CMD"
+	@echo "Examples: ./Makefile.Rdev RDEVEL_VERSION=R-3.5.2 CMD"
+	@echo "          ./Makefile.Rdev RDEVEL_VERSION=R-devel CMD"
 
 
 download:
