@@ -1,8 +1,6 @@
 context("Latent models - 2D SPDE - Group parameter (test_latent_spde2D.R)")
-library(INLA)
 
 latent_spde2D_group_testdata <- function() {
-  
   set.seed(123)
   
   # Load and reduce data set
@@ -40,13 +38,14 @@ latent_spde2D_group_testdata <- function() {
        fit = fit)
 }
 
-data <- latent_spde2D_group_testdata()
-
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
+  skip_on_cran()
+  library(INLA)
+  data <- latent_spde2D_group_testdata()
   
   # Check Intercept
   expect_equal(data$fit$summary.fixed["Intercept", "mean"], -9.231591, hitol)
-  
+
   # Check SPDE
   expect_equal(data$fit$summary.random$mySmooth$mean[c(1,250,550)],
                c(-1.27410, -1.96819, 0.7479571), hitol)

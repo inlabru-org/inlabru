@@ -1,5 +1,4 @@
 context("Latent models - 1D SPDE (test_latent_spde1D.R)")
-library(INLA)
 
 latent_spde1D_testdata <- function() {
   data(Poisson2_1D)
@@ -20,15 +19,17 @@ latent_spde1D_testdata <- function() {
        fit = fit)
 }
 
-data <- latent_spde1D_testdata()
-
 test_that("Latent models: SPDE 1D", {
+  skip_on_cran()
+  library(INLA)
+  data <- latent_spde1D_testdata()
   
   # Check Intercept
   expect_equal(data$fit$summary.fixed["Intercept", "mean"], 5.982867, midtol)
   
   # Check SPDE
-  expect_equal(data$fit$summary.random$field$mean[c(1,25,50)], c(-5.195488, -4.480026, -7.150024), midtol)
+  expect_equal(data$fit$summary.random$field$mean[c(1,25,50)],
+               c(-5.195488, -4.480026, -7.150024), midtol)
   
 })
 
