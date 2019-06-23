@@ -273,7 +273,6 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     ips$weight <- ips$weight * data$weight[idx[, 1]]
   }
 
-
   if (!is.null(group)) {
     ips <- cbind(ips, as.data.frame(data)[idx[, 1], group, drop = FALSE])
   }
@@ -499,8 +498,8 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   }
 
   # Construct integration weights
-  weight <- rep(INLA::inla.mesh.fem(mesh, order = 0)$ta / nB, each = nB)
-
+  weight <- rep(INLA::inla.mesh.fem(mesh, order = 1)$ta / nB, each = nB)
+  
   # Filter away point outside integration domain boundary:
   mesh_bnd <- INLA::inla.mesh.create(boundary = bnd)
   ok <- INLA::inla.mesh.projector(mesh_bnd, loc = loc)$proj$ok
@@ -543,7 +542,7 @@ int.polygon <- function(mesh, loc, group = NULL) {
       if (!is.null(mesh_inter)) {
         inter <- list(
           loc = mesh_inter$loc,
-          weight = INLA::inla.mesh.fem(mesh_inter, order = 0)$va
+          weight = INLA::inla.mesh.fem(mesh_inter, order = 1)$va
         )
       }
     }

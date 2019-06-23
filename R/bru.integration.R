@@ -152,7 +152,7 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, proj
     }
 
     ips <- vertices(region)
-    ips$weight <- INLA::inla.mesh.fem(region, order = 0)$va
+    ips$weight <- INLA::inla.mesh.fem(region, order = 1)$va
 
     # backtransform
     if (!is.null(region$crs) && !(is.na(region$crs@projargs))) {
