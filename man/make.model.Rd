@@ -14,7 +14,7 @@ A \link{bru_model} object
 }
 \description{
 The \link{inlabru} syntax for model forulae is different from what \code{INLA::inla} considers a valid.
-In inla most of the effects are defined by adding an \code{f(...)} expression to the formula. 
+In inla most of the effects are defined by adding an \code{f(...)} expression to the formula.
 In \link{inlabru} the \code{f} is replaced by an arbitrary (exception: \code{offset}) string that will
 determine the label of the effect. See Details for further information.
 }
@@ -28,7 +28,7 @@ in INLA is equivalent to
 \code{y ~ myspde(...)}
 
 in inlabru.
- 
+
 A disadvantage of the inla way is that there is no clear separation between the name of the covariate
 and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
 use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose

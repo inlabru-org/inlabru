@@ -25,7 +25,7 @@ mapping. The default mapping is \code{aes_string(x = "long", y = "lat", group = 
 A \link{geom_polygon} return value.
 }
 \description{
-Uses the fortitfy() function to turn the SpatialPolygons objects into a data.frame. Then 
+Uses the fortitfy() function to turn the SpatialPolygons objects into a data.frame. Then
 calls \link{geom_polygon} to plot the polygons.
 }
 \examples{

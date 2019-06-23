@@ -28,7 +28,7 @@ lgcp(components, data, samplers = NULL, domain = NULL, ips = NULL,
 An \link{bru} object
 }
 \description{
-This function performs inference on a LGCP observed via points residing possibly multiple dimensions. 
+This function performs inference on a LGCP observed via points residing possibly multiple dimensions.
 These dimensions are defined via the left hand side of the formula provided via the model parameter.
 The left hand side determines the intensity function that is assumed to drive the LGCP. This may include
 effects that lead to a thinning (filtering) of the point process. By default, the log intensity is assumed
@@ -48,35 +48,35 @@ assumed that all of the LGCP's dimensions have been observed completely.
 data(gorillas, package = "inlabru")
 
 # Plot the Gorilla nests, the mesh and the survey boundary
-ggplot() + 
-  gg(gorillas$mesh) + 
-  gg(gorillas$nests) + 
-  gg(gorillas$boundary) + 
+ggplot() +
+  gg(gorillas$mesh) +
+  gg(gorillas$nests) +
+  gg(gorillas$boundary) +
   coord_fixed()
 
 if (require("INLA", quietly = TRUE)) {
-# Define SPDE prior
-matern <- inla.spde2.pcmatern(gorillas$mesh, 
-                              prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(5, 0.01))
+  # Define SPDE prior
+  matern <- inla.spde2.pcmatern(gorillas$mesh,
+    prior.sigma = c(0.1, 0.01),
+    prior.range = c(5, 0.01)
+  )
 
-# Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
-cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+  # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
+  cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 
-# Fit the model
-fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+  # Fit the model
+  fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
 
-# Predict the spatial intensity surface
-lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+  # Predict the spatial intensity surface
+  lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
 
-# Plot the intensity
-ggplot() + 
-  gg(lambda) +
-  gg(gorillas$mesh) + 
-  gg(gorillas$nests) + 
-  gg(gorillas$boundary) + 
-  coord_fixed()
-
+  # Plot the intensity
+  ggplot() +
+    gg(lambda) +
+    gg(gorillas$mesh) +
+    gg(gorillas$nests) +
+    gg(gorillas$boundary) +
+    coord_fixed()
 }
 }
 

@@ -21,9 +21,8 @@ data(seals)
 This is a single transect of an aereal photo seal pup survey in the Greenland Sea
 }
 \examples{
- data(seals)
- ggplot() + gg(seals$mesh) + gg(seals$points)
- 
+data(seals)
+ggplot() + gg(seals$mesh) + gg(seals$points)
 }
 \references{
 Oigard, T. A. (2013) From pup production to quotas: current status of harp seals in the Greenland Sea.

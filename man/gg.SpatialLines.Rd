@@ -10,9 +10,9 @@
 \item{data}{A SpatialLines object.}
 
 \item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
-mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], 
-y = coordnames(data)[2], 
-xend = paste0("end.", coordnames(data)[1]), 
+mapping. The default mapping is \code{aes_string(x = coordnames(data)[1],
+y = coordnames(data)[2],
+xend = paste0("end.", coordnames(data)[1]),
 yend = paste0("end.", coordnames(data)[2]))}.}
 
 \item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}

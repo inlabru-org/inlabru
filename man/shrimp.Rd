@@ -7,7 +7,7 @@
 \format{A list of objects:
  \describe{
    \item{\code{haul}:}{ A \code{SpatialPointsDataFrame} object containing haul locations}
-   \item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation 
+   \item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation
    mesh (a type of discretization of continuous space) covering the haul locations.}
    \describe{
       \item{\code{catch}}{Catch in Kg.}
@@ -26,14 +26,14 @@ Blue and red shrimp in the Western Mediterranean Sea.
 }
 \examples{
 \donttest{
-data(shrimp, package="inlabru")
+data(shrimp, package = "inlabru")
 ggplot() +
-  gg(shrimp$mesh) + 
-  gg(shrimp$hauls) + 
+  gg(shrimp$mesh) +
+  gg(shrimp$hauls) +
   coord_equal()
- }
+}
 }
 \references{
-Pennino, M. G., Paradinas, I., Munoz, F., Illian, J.,Quilez-Lopez, A., Bellido, J.M., Conesa, 
+Pennino, M. G., Paradinas, I., Munoz, F., Illian, J.,Quilez-Lopez, A., Bellido, J.M., Conesa,
 D. Accounting for preferential sampling in species distribution models. Ecology and Evolution,  In Press.
 }

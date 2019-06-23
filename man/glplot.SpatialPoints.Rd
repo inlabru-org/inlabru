@@ -16,7 +16,7 @@
 \item{...}{Parameters passed on to rgl.points()}
 }
 \description{
-This function will calculate the cartesian coordinates of the points provided 
+This function will calculate the cartesian coordinates of the points provided
 and use rgl.points() in order to render them.
 }
 \examples{

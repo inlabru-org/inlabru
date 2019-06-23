@@ -1,10 +1,14 @@
-# inlabru 2.1.10.999
+# inlabru 2.1.11.999
 
 * Add random seed option for posterior sampling
 
 * Add package unit testing
 
 * New backend code to make extended feature support easier
+
+# inlabru 2.1.11
+
+* Add CITATION file
 
 # inlabru 2.1.10
 

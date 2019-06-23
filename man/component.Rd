@@ -12,11 +12,11 @@ component(object, ...)
 \item{...}{Arguments passed on to \link{component.formula} or \link{component.character}}
 }
 \description{
-Similar to glm(), gam() and inla() \link{bru} uses formula objects to describe response data and latent 
-(unknonw) components of the model to be fitted. However, in addition to the syntax compatible with 
+Similar to glm(), gam() and inla() \link{bru} uses formula objects to describe response data and latent
+(unknonw) components of the model to be fitted. However, in addition to the syntax compatible with
 \link[INLA]{inla}, bru components offer addtitional functionality which facilitates modeling.
 
-In inlabru, latent components can be constructed using R formulae or explicit parameter. For background 
+In inlabru, latent components can be constructed using R formulae or explicit parameter. For background
 information on the formulae inlabru accepts please see \link{component.formula}. For more details on the
 model parameters and how inlabru employs INLA's \code{f} function please see \link{component.character}
 }

@@ -16,7 +16,7 @@
 \item{...}{Parameters passed on to plot.inla.mesh()}
 }
 \description{
-This function transforms the mesh to 3D cartesian coordinates and uses 
+This function transforms the mesh to 3D cartesian coordinates and uses
 inla.plot.mesh() with \code{rgl=TRUE} to plot the result.
 }
 \examples{

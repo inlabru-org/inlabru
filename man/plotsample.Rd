@@ -8,10 +8,10 @@ plotsample(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5,
   ny = 5)
 }
 \arguments{
-\item{spdf}{A \code{SpatialPointsDataFrame} defining the points that are to be sampled 
+\item{spdf}{A \code{SpatialPointsDataFrame} defining the points that are to be sampled
 by the plot sample.}
 
-\item{boundary}{A \code{SpatialPolygonsDataFrame} defining the survey boundary within which 
+\item{boundary}{A \code{SpatialPolygonsDataFrame} defining the survey boundary within which
 the  points occur.}
 
 \item{x.ppn}{The proportion of the x=axis that is to be included in the plots.}
@@ -25,9 +25,9 @@ the  points occur.}
 \value{
 A list with three components:
  \describe{
-   \item{\code{plots}:}{ A \code{SpatialPolygonsDataFrame} object containing the plots that were 
+   \item{\code{plots}:}{ A \code{SpatialPolygonsDataFrame} object containing the plots that were
    sampled.}
-   \item{\code{dets}:}{ A \code{SpatialPointsDataFrame} object containing the locations of the 
+   \item{\code{dets}:}{ A \code{SpatialPointsDataFrame} object containing the locations of the
    points within the plots.}
    \item{\code{counts}:}{ A \code{dataframe} containing the following columns
    \describe{
@@ -46,11 +46,9 @@ Creates a plot sample on a regular grid with a random start location.
 \donttest{
 # Some features require the raster package
 if (require("raster", quietly = TRUE)) {
-
-data(gorillas, package = "inlabru")
-plotpts = plotsample(gorillas$nests,gorillas$boundary,x.ppn=0.4,y.ppn=0.4,nx=5,ny=5)
-ggplot() +gg(plotpts$plots) +gg(plotpts$dets,pch="+",cex=2) +gg(gorillas$boundary)
-
+  data(gorillas, package = "inlabru")
+  plotpts <- plotsample(gorillas$nests, gorillas$boundary, x.ppn = 0.4, y.ppn = 0.4, nx = 5, ny = 5)
+  ggplot() + gg(plotpts$plots) + gg(plotpts$dets, pch = "+", cex = 2) + gg(gorillas$boundary)
 }
 }
 

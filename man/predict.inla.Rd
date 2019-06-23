@@ -15,9 +15,9 @@
 A \code{prediction} object.
 }
 \description{
-Takes a fitted inla object produced by the function inla() and produces predictions given a 
-new set of values for the model covariates or the original values used for the model fit. 
-The predictions can be based on any R expression that is valid given these values/covariates 
+Takes a fitted inla object produced by the function inla() and produces predictions given a
+new set of values for the model covariates or the original values used for the model fit.
+The predictions can be based on any R expression that is valid given these values/covariates
 and the posterior of the estimated effects.
 }
 \examples{
@@ -25,24 +25,24 @@ and the posterior of the estimated effects.
 # Some features use the INLA package.
 if (require("INLA", quietly = TRUE)) {
 
-# Generate some data
+  # Generate some data
 
-input.df <- data.frame(x=cos(1:10))
-input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+  input.df <- data.frame(x = cos(1:10))
+  input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
 
-# Fit a Gaussian likelihood model
+  # Fit a Gaussian likelihood model
 
-formula = y ~ x
-fit <- inla(formula, "gaussian", data = input.df, control.compute=list(config = TRUE))
+  formula <- y ~ x
+  fit <- inla(formula, "gaussian", data = input.df, control.compute = list(config = TRUE))
 
-# Estimate posterior statistics of exp(x), where x is the fixed effect.
+  # Estimate posterior statistics of exp(x), where x is the fixed effect.
 
-xpost = predict(fit, NULL, ~ exp(x))
-xpost
-plot(xpost)
-
+  xpost <- predict(fit, NULL, ~ exp(x))
+  xpost
+  plot(xpost)
 }
 }
+
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>

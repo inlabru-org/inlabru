@@ -14,7 +14,7 @@
 
 \item{formula}{A formula determining which effects to sample from and how to combine them analytically.}
 
-\item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. 
+\item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics.
 The default is rather low but provides a quick approximate result.}
 
 \item{seed}{Random number genreator seed passed on to \code{inla.posterior.sample}}
@@ -25,7 +25,7 @@ The default is rather low but provides a quick approximate result.}
 List of generated samples
 }
 \description{
-Takes a fitted \code{bru} object produced by the function \link{bru}() and produces samples given 
+Takes a fitted \code{bru} object produced by the function \link{bru}() and produces samples given
 a new set of values for the model covariates or the original values used for the model fit. The
 samples can be based on any R expression that is valid given these values/covariates and the joint
 posterior of the estimated random effects.

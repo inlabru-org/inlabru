@@ -26,7 +26,7 @@ Obtain covariate
 
 
 It is not unusual for a random effect act on a transformation of a covariate. In other frameworks this
-would mean that the transformed covariate would have to be calculated in advance and added to the 
+would mean that the transformed covariate would have to be calculated in advance and added to the
 data frame that is usually provided via the \code{data} parameter. inlabru provides the option to do
 this transformation automatically. For instance, one might be interested in the effect of a covariate
 \eqn{x^2}. In inla and other frameworks this would require to add a column \code{xsquared} to the
@@ -34,7 +34,7 @@ input data frame and use the formula
 
 \itemize{\item{\code{formula = y ~ f(xsquared, model = "linear")},}}
 
-In inlabru this can be achived using two ways of using the \code{map} parameter. 
+In inlabru this can be achived using two ways of using the \code{map} parameter.
 
 \itemize{
 \item{\code{components = y ~ psi(map = x^2, model = "linear")}}
@@ -46,14 +46,14 @@ In inlabru this can be achived using two ways of using the \code{map} parameter.
 In the first example inlabru will interpret the map parameter as an expression to be evaluated within
 the data provided. Since \eqn{x} is a knonwn covariate it will know how to calculate it. The second
 example is an expression as well but it uses a function alled \code{mySquareFun}. This function is
-defined by user but has wo be accessible within the work space when setting up the compoonents. 
+defined by user but has wo be accessible within the work space when setting up the compoonents.
 The third example provides the function \code{myOtherSquareFun} directly and not within an expression.
-In this case, inlabru will call the function using the data provided via the  \code{data} parameter. 
-inlabru expects that the output of this function is a data.frame with "psi" being the name of the 
-single existing column. For instance, 
+In this case, inlabru will call the function using the data provided via the  \code{data} parameter.
+inlabru expects that the output of this function is a data.frame with "psi" being the name of the
+single existing column. For instance,
 
 \code{myOtherSquareFun = function(data) {
-                            data = data[,"x", drop = FALSE] ; 
+                            data = data[,"x", drop = FALSE] ;
                             colnames(data) = "psi" ;
                             return(data)}}
 }
@@ -63,9 +63,9 @@ single existing column. For instance,
 
 When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
 surface temperature or elevation. Although it is straight forward to add this data to the input
-data frame or write a covariate function like in the previous section there is an even more 
-convenient way in inlabru. Spatial covariates are often stored as \code{SpatialPixelDataFrame}, 
-\code{SpatialPixelDataFrame} or \code{RasterLayer} objects. These can be provided directly via 
+data frame or write a covariate function like in the previous section there is an even more
+convenient way in inlabru. Spatial covariates are often stored as \code{SpatialPixelDataFrame},
+\code{SpatialPixelDataFrame} or \code{RasterLayer} objects. These can be provided directly via
 the map parameter if the input data is a \code{SpatialPointsDataFrame}. inlabru will automatically
 evaluate and/or interpolate the coariate at your data locations when using code like
 
@@ -76,9 +76,9 @@ evaluate and/or interpolate the coariate at your data locations when using code 
 
 
 A common spatial modelling component when using inla are SPDE models. An important feature of
-inlabru is that it will automatically calculate the so called A-matrix which maps SPDE 
+inlabru is that it will automatically calculate the so called A-matrix which maps SPDE
 values at the mesh vertices to values at the data locations. For this purpose, the map parameter
-can be se to \code{coordinates}, which is the \code{sp} package function that extracts point 
+can be se to \code{coordinates}, which is the \code{sp} package function that extracts point
 coordinates from the SpatialPointsDataFrame that was provided as input to bru. The code for
 this would look as follows:
 

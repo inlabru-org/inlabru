@@ -17,7 +17,7 @@ spde.posterior(result, name, what = "range")
 A \code{prediction} object.
 }
 \description{
-Calculate posterior distribution of the range, log(range), variance, or log(variance) 
+Calculate posterior distribution of the range, log(range), variance, or log(variance)
 parameter of a model's SPDE component. Can also plot Matern correlation or covariance function.
 \code{inla.spde.result}.
 }

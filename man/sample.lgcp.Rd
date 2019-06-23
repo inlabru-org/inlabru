@@ -68,30 +68,28 @@ Using the "sliced-spherical" strategy can help in this case.
 \donttest{
 # The INLA package is required
 if (require("INLA", quietly = TRUE)) {
-
-vertices = seq(0, 3, by = 0.1)
-mesh = inla.mesh.1d(vertices)
-loglambda = 5-0.5*vertices
-pts = sample.lgcp(mesh, loglambda)
-pts$y = 0
-plot(vertices, exp(loglambda), type = "l", ylim = c(0,150))
-points(pts, pch = "|" )
-
+  vertices <- seq(0, 3, by = 0.1)
+  mesh <- inla.mesh.1d(vertices)
+  loglambda <- 5 - 0.5 * vertices
+  pts <- sample.lgcp(mesh, loglambda)
+  pts$y <- 0
+  plot(vertices, exp(loglambda), type = "l", ylim = c(0, 150))
+  points(pts, pch = "|")
 }
 }
 
 \donttest{
 # The INLA package is required
 if (require("INLA", quietly = TRUE)) {
-
-data("gorillas", package = "inlabru")
-pts = sample.lgcp(gorillas$mesh,
-                  loglambda = 1.5,
-                  samplers = gorillas$boundary)
-ggplot() + gg(gorillas$mesh) + gg(pts)
-
+  data("gorillas", package = "inlabru")
+  pts <- sample.lgcp(gorillas$mesh,
+    loglambda = 1.5,
+    samplers = gorillas$boundary
+  )
+  ggplot() + gg(gorillas$mesh) + gg(pts)
 }
 }
+
 }
 \author{
 Daniel Simpson <\email{dp.simpson@gmail.com}> (base rectangle and spherical algorithms),

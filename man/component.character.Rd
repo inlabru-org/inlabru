@@ -41,17 +41,18 @@ is unique to inlabru.
 \examples{
 \donttest{
 if (require("INLA", quietly = TRUE)) {
-    
-# As an example, let us create a linear component. Here ,the component is 
-# called "myEffectOfX" while the covariate the component acts on is called "x":
 
-eff = component("myEffectOfX", model = "linear", map = x)
-summary(eff)
+  # As an example, let us create a linear component. Here ,the component is
+  # called "myEffectOfX" while the covariate the component acts on is called "x":
 
-# A more complicated component:
-eff = component("myEffectOfX", model = inla.spde2.matern(inla.mesh.1d(1:10)), map = x)
+  eff <- component("myEffectOfX", model = "linear", map = x)
+  summary(eff)
+
+  # A more complicated component:
+  eff <- component("myEffectOfX", model = inla.spde2.matern(inla.mesh.1d(1:10)), map = x)
 }
 }
+
 }
 \seealso{
 Other Component constructor: \code{\link{component.formula}},

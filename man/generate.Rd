@@ -15,7 +15,7 @@ generate(object, ...)
 The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
 }
 \description{
-Generic function for sampling for fitted models. The function invokes particular methods 
+Generic function for sampling for fitted models. The function invokes particular methods
 which depend on the class of the first argument.
 }
 \examples{

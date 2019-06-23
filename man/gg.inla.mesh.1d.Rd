@@ -30,23 +30,24 @@ of a 1D mesh.
 # Some features use the INLA package.
 if (require("INLA", quietly = TRUE)) {
 
-# Load INLA
+  # Load INLA
 
-library(INLA)
+  library(INLA)
 
-# Create a 1D mesh
+  # Create a 1D mesh
 
-mesh = inla.mesh.1d(seq(0,10,by=0.5))
+  mesh <- inla.mesh.1d(seq(0, 10, by = 0.5))
 
-# Plot it
+  # Plot it
 
-ggplot() + gg(mesh)
+  ggplot() + gg(mesh)
 
-# Plot it using a different shape and size for the mesh nodes
+  # Plot it using a different shape and size for the mesh nodes
 
-ggplot() + gg(mesh, shape = "|", size = 5)
+  ggplot() + gg(mesh, shape = "|", size = 5)
+}
+}
 
-}}
 }
 \seealso{
 Other geomes for meshes: \code{\link{gg.inla.mesh}},

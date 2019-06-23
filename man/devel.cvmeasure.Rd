@@ -115,7 +115,7 @@ vm.int
 }
 }
 \references{
-Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017. 
+Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017.
 Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales.
 \url{https://arxiv.org/abs/1604.06013}
 }

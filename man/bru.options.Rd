@@ -50,11 +50,10 @@ Additional \link{bru} options
 \donttest{
 
 # Generate default bru options
-opts = bru.options()
+opts <- bru.options()
 
 # Print them:
 opts
-
 }
 
 }

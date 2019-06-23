@@ -15,7 +15,7 @@
 A \link{geom_tile} value.
 }
 \description{
-Coerces input SpatialGridDataFrame to SpatialPixelsDataFrame and calls 
+Coerces input SpatialGridDataFrame to SpatialPixelsDataFrame and calls
 gg.SpatialPixelDataFrame to plot it.
 }
 \examples{
