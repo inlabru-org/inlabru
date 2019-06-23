@@ -84,3 +84,4 @@ Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
   \code{\link{gg.SpatialPoints}}, \code{\link{gg}},
   \code{\link{gm}}
 }
+\concept{geomes for spatial data}

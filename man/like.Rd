@@ -5,8 +5,8 @@
 \title{Likelihood construction for usage with \link{bru}}
 \usage{
 like(family, formula = . ~ ., data = NULL, components = NULL,
-  mesh = NULL, E = NULL, Ntrials = NULL, samplers = NULL, ips = NULL,
-  domain = NULL, options = list())
+  mesh = NULL, E = NULL, Ntrials = NULL, samplers = NULL,
+  ips = NULL, domain = NULL, options = list())
 }
 \arguments{
 \item{family}{A character identifying a valid \link[INLA]{inla} likelihood. Alternatively 'cp' for Cox processes.}

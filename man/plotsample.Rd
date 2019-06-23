@@ -4,7 +4,8 @@
 \alias{plotsample}
 \title{Create a plot sample.}
 \usage{
-plotsample(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 5)
+plotsample(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5,
+  ny = 5)
 }
 \arguments{
 \item{spdf}{A \code{SpatialPointsDataFrame} defining the points that are to be sampled 

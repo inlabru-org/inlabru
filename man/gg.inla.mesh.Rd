@@ -79,3 +79,4 @@ ggplot() +
 Other geomes for meshes: \code{\link{gg.inla.mesh.1d}},
   \code{\link{gg}}, \code{\link{gm}}
 }
+\concept{geomes for meshes}
