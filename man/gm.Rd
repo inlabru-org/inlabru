@@ -51,3 +51,7 @@ Other geomes for meshes: \code{\link{gg.inla.mesh.1d}},
 Other geomes for Raster data: \code{\link{gg.RasterLayer}},
   \code{\link{gg}}
 }
+\concept{geomes for Raster data}
+\concept{geomes for inla and inlabru predictions}
+\concept{geomes for meshes}
+\concept{geomes for spatial data}

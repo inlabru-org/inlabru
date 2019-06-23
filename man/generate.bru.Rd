@@ -4,7 +4,8 @@
 \alias{generate.bru}
 \title{Sampling based on bru posteriors}
 \usage{
-\method{generate}{bru}(object, data, formula = NULL, n.samples = 100, ...)
+\method{generate}{bru}(object, data, formula = NULL, n.samples = 100,
+  ...)
 }
 \arguments{
 \item{object}{A \code{bru} object obtained by calling \link{bru}.}
@@ -70,3 +71,4 @@ plot(do.call(rbind, smp))
 Other sample generators: \code{\link{generate.inla}},
   \code{\link{generate}}
 }
+\concept{sample generators}

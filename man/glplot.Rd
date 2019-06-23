@@ -44,3 +44,4 @@ Other inlabru RGL tools: \code{\link{globe}},
   \code{\link{glplot.SpatialPoints}},
   \code{\link{glplot.inla.mesh}}
 }
+\concept{inlabru RGL tools}

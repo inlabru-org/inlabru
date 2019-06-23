@@ -4,8 +4,8 @@
 \alias{sample.lgcp}
 \title{Sample from an inhomogeneous Poisson process}
 \usage{
-sample.lgcp(mesh, loglambda, strategy = NULL, R = NULL, samplers = NULL,
-  ignore.CRS = FALSE)
+sample.lgcp(mesh, loglambda, strategy = NULL, R = NULL,
+  samplers = NULL, ignore.CRS = FALSE)
 }
 \arguments{
 \item{mesh}{An \link[INLA]{inla.mesh} object}

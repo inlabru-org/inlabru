@@ -18,6 +18,4 @@ The form of the value returned by vertices() depends on the class of its argumen
 }
 \description{
 This is a generic function. The outcome depends on the \code{object} provided
-
-Vertices
 }

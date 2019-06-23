@@ -74,3 +74,4 @@ Other geomes for spatial data: \code{\link{gg.SpatialLines}},
   \code{\link{gg.SpatialPolygons}}, \code{\link{gg}},
   \code{\link{gm}}
 }
+\concept{geomes for spatial data}

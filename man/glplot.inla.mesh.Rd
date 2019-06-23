@@ -47,3 +47,4 @@ Other inlabru RGL tools: \code{\link{globe}},
   \code{\link{glplot.SpatialLines}},
   \code{\link{glplot.SpatialPoints}}, \code{\link{glplot}}
 }
+\concept{inlabru RGL tools}

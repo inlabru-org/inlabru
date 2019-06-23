@@ -1,3 +1,7 @@
+# inlabru 2.1.11
+
+* Add CITATION file
+
 # inlabru 2.1.10
 
 * Fix internal sampling bug due to INLA changes
