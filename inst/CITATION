@@ -1,0 +1,33 @@
+citHeader("To cite excursions in publications use:")
+
+bibentry(bibtype = "Article",
+  title = "{inlabru}: an {R} package for Bayesian spatial modelling from ecological survey data",
+  author = c(person(given = "Fabian E.",
+                    family = "Bachl"),
+             person(given = "Finn",
+                    family = "Lindgren"),
+             person(given = "David L.",
+                    family = "Borchers"),
+             person(given = "Janine B.",
+                    family = "Illian")),
+  year = "2019",
+  journal = "Methods in Ecology and Evolution",
+  volume = "10",
+  pages = "760--766",
+  doi = "10.1111/2041-210X.13168",
+  publisher = "British Ecological Society",
+  textVersion  =
+      paste0("Fabian E. Bachl, Finn Lindgren, David L. Borchers, and Janine B. Illian (2019), ",
+             "inlabru: an R package for Bayesian spatial modelling ",
+             "from ecological survey data, ",
+             "Methods in Ecology and Evolution, British Ecological Society, 10, 760--766, ",
+             "doi:10.1111/2041-210X.13168.")
+)
+
+#  @Manual{,
+#    title = {inlabru: Spatial Inference using Integrated Nested Laplace Approximation},
+#    author = {Fabian E. Bachl and Finn Lindgren},
+#    year = {2019},
+#    note = {http://www.inlabru.org,},
+#  }
+
