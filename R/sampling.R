@@ -59,32 +59,28 @@
 #' \donttest{
 #' # The INLA package is required
 #' if (require("INLA", quietly = TRUE)) {
-#'
-#' vertices = seq(0, 3, by = 0.1)
-#' mesh = inla.mesh.1d(vertices)
-#' loglambda = 5-0.5*vertices
-#' pts = sample.lgcp(mesh, loglambda)
-#' pts$y = 0
-#' plot(vertices, exp(loglambda), type = "l", ylim = c(0,150))
-#' points(pts, pch = "|" )
-#'
+#'   vertices <- seq(0, 3, by = 0.1)
+#'   mesh <- inla.mesh.1d(vertices)
+#'   loglambda <- 5 - 0.5 * vertices
+#'   pts <- sample.lgcp(mesh, loglambda)
+#'   pts$y <- 0
+#'   plot(vertices, exp(loglambda), type = "l", ylim = c(0, 150))
+#'   points(pts, pch = "|")
 #' }
 #' }
 #'
-#' @examples
 #' \donttest{
 #' # The INLA package is required
 #' if (require("INLA", quietly = TRUE)) {
-#'
-#' data("gorillas", package = "inlabru")
-#' pts = sample.lgcp(gorillas$mesh,
-#'                   loglambda = 1.5,
-#'                   samplers = gorillas$boundary)
-#' ggplot() + gg(gorillas$mesh) + gg(pts)
-#'
+#'   data("gorillas", package = "inlabru")
+#'   pts <- sample.lgcp(gorillas$mesh,
+#'     loglambda = 1.5,
+#'     samplers = gorillas$boundary
+#'   )
+#'   ggplot() + gg(gorillas$mesh) + gg(pts)
 #' }
 #' }
-
+#'
 sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = NULL,
                         ignore.CRS = FALSE) {
   requireINLA()
@@ -184,7 +180,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     strategy <- match.arg(strategy, strategies)
 
     if (is.geocent) {
-      space.R <- mean(rowSums(mesh$loc ^ 2) ^ 0.5)
+      space.R <- mean(rowSums(mesh$loc^2)^0.5)
       if (is.null(input.crs.list$units)) {
         space.units <- "m"
       } else {
@@ -232,7 +228,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           area.mesh$graph$tv,
           fem = 0,
           output = "ta"
-        )$ta * area.R ^ 2
+        )$ta * area.R^2
 
         loglambda_tri <- matrix(loglambda[mesh$graph$tv], nrow(mesh$graph$tv), ncol(mesh$graph$tv))
         loglambda_max <- apply(loglambda_tri, 1, max)
@@ -254,7 +250,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
             (mesh$loc[mesh$graph$tv[triangle, 3], , drop = FALSE] -
               mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE]) * points[, 2]
           if (is.geocent) {
-            points <- points / rowSums(points ^ 2) ^ 0.5
+            points <- points / rowSums(points^2)^0.5
           }
         }
 
@@ -314,7 +310,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         }
       } else if (strategy == "spherical") {
         # Simulate number of points
-        area <- 4 * pi * area.R ^ 2
+        area <- 4 * pi * area.R^2
         lambda_max <- max(loglambda)
         Npoints <- rpois(n = 1, lambda = area * exp(lambda_max))
         if (Npoints > 5000000) {
@@ -329,7 +325,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           z <- runif(n = Npoints, min = -1, max = 1)
           # Choose t uniformly distributed on [0, 2*pi).
           t <- runif(n = Npoints, min = 0, max = 2 * pi)
-          r <- sqrt(1 - z ^ 2)
+          r <- sqrt(1 - z^2)
           x <- r * cos(t)
           y <- r * sin(t)
 
@@ -358,7 +354,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         }
         slat.range <- pmax(-1, pmin(1, sin(lat.range * pi / 180)))
         radlon.range <- lon.range * pi / 180
-        area <- (4 * pi * area.R ^ 2) * lon.rel * lat.rel
+        area <- (4 * pi * area.R^2) * lon.rel * lat.rel
 
         lambda_max <- max(loglambda)
         Npoints <- rpois(n = 1, lambda = area * exp(lambda_max))
@@ -380,7 +376,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           z <- runif(n = n.points, min = slat.range[1], max = slat.range[2]) # transforms into latitude
           # Choose t uniformly distributed on [0, 2*pi).
           angle <- runif(n = n.points, min = radlon.range[1], max = radlon.range[2])
-          r <- sqrt(1 - z ^ 2)
+          r <- sqrt(1 - z^2)
           x <- r * cos(angle)
           y <- r * sin(angle)
 
