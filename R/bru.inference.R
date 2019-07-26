@@ -226,6 +226,7 @@ like <- function(family, formula = . ~ ., data = NULL, components = NULL,
     }
 
     if (is.null(ips)) {
+      # TODO: split ipmaker into one domain extractor, and one integration point constructor
       ips <- ipmaker(samplers, domain = domain, dnames = bru.model$dim.names, data = data, model = bru.model)
     }
 

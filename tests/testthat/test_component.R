@@ -5,28 +5,33 @@ test_that("Component construction: linear model", {
   if (!exists("component")) {
     skip("Test non-functional using old backend.")
   } else {
-    cmp <- component(~ beta(map = x, model = "linear"))[[1]]
+    cmp <- component(~ beta(main = x, model = "linear", values = 1))[[1]]
 
     expect_equal(cmp$label, "beta")
-    expect_equal(cmp$model, "linear")
-    expect_equal(as.character(cmp$map), "x")
+    expect_equal(cmp$main$model, "linear")
+    expect_equal(as.character(cmp$main$input$input), "x")
 
     # Covariate mapping
     df <- data.frame(x = 1:10)
-    expect_equal(map(cmp, data = df), 1:10)
+    expect_equal(input_eval(cmp, part = "main", data = df), 1:10)
 
+    # TODO: The following must be preceeded by an auto-model initialisation based on
+    
     # Index generator
-    idx <- index(cmp, data = df)
+    # likelihood data.
+    idx <- index_eval(cmp)
     expect_is(idx, "data.frame")
-    expect_equal(colnames(idx), "beta")
-    expect_equal(idx$beta, 1:10)
+    expect_equal(colnames(idx)[1], "beta")
+    expect_equal(colnames(idx)[2], "beta.group")
+    expect_equal(colnames(idx)[3], "beta.repl")
+    expect_equal(idx$beta, 1)
 
     # A-matrix
-    A <- amatrix(cmp, data = df)
+    A <- amatrix_eval(cmp, data = df)
     expect_is(A, "ddiMatrix")
     expect_equal(nrow(A), 10)
-    expect_equal(ncol(A), 10)
-    expect_equal(diag(A), rep(1, 10))
+    expect_equal(ncol(A), 1)
+    expect_equal(as.vector(A), 1:10)
 
     # Value
     v <- value(cmp, data = df, state = 2)

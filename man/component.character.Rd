@@ -4,20 +4,21 @@
 \alias{component.character}
 \title{inlabru latent model component construction using parameters}
 \usage{
-\method{component}{character}(object, data, model, map, n = NULL,
-  season.length = NULL, group = NULL, replicate = NULL,
-  values = NULL, A.msk = NULL, ...)
+\method{component}{character}(object, main = NULL, model = NULL,
+  mapper = NULL, main_layer = NULL, main_selector = NULL, n = NULL,
+  values = NULL, season.length = NULL, weights = NULL,
+  weights_layer = NULL, group = NULL, group_layer = NULL,
+  control.group = NULL, replicate = NULL, replicate_layer = NULL,
+  A.msk = NULL, map = NULL, mesh = NULL, ...)
 }
 \arguments{
 \item{object}{A string giving the component its name}
 
-\item{data}{EXPERIMENTAL}
-
 \item{model}{Either one of "offset", "factor", "linear" or a model accepted by INLA's \code{f} function}
 
-\item{map}{EXPERIMENTAL}
-
 \item{n}{EXPERIMENTAL}
+
+\item{values}{EXPERIMENTAL}
 
 \item{season.length}{EXPERIMENTAL}
 
@@ -25,11 +26,13 @@
 
 \item{replicate}{EXPERIMENTAL}
 
-\item{values}{EXPERIMENTAL}
-
 \item{A.msk}{Boolean vector for masking (deactivating) columns of the A-matrix}
 
+\item{map}{EXPERIMENTAL}
+
 \item{...}{EXPERIMENTAL}
+
+\item{data}{EXPERIMENTAL}
 }
 \value{
 An component object
@@ -38,6 +41,9 @@ An component object
 This function is inlabru's equivalent to INLA's \code{f} function but adds functionality that
 is unique to inlabru.
 }
+\details{
+Deprecated: \code{map} (now \code{main}), \code{mesh} (now \code{mapper})
+}
 \examples{
 \donttest{
 if (require("INLA", quietly = TRUE)) {
@@ -45,14 +51,15 @@ if (require("INLA", quietly = TRUE)) {
   # As an example, let us create a linear component. Here ,the component is
   # called "myEffectOfX" while the covariate the component acts on is called "x":
 
-  eff <- component("myEffectOfX", model = "linear", map = x)
+  eff <- component("myEffectOfX", main = x, model = "linear")
   summary(eff)
 
   # A more complicated component:
-  eff <- component("myEffectOfX", model = inla.spde2.matern(inla.mesh.1d(1:10)), map = x)
+  eff <- component("myEffectOfX",
+                   main = x,
+                   model = inla.spde2.matern(inla.mesh.1d(1:10)))
 }
 }
-
 }
 \seealso{
 Other Component constructor: \code{\link{component.formula}},

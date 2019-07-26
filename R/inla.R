@@ -1,3 +1,9 @@
+bru_standardise_names <- function(x) {
+  vapply(x, gsub("[-() ]", "_", x = x, fixed = FALSE), "name")
+}
+
+
+
 #' Prediction from fitted inla model
 #'
 #' Takes a fitted inla object produced by the function inla() and produces predictions given a
@@ -109,7 +115,7 @@ extract.summary <- function(result, property) {
   }
 
   for (label in rownames(result$summary.hyperpar)) {
-    new.label <- gsub(" ", "_", x = label, fixed = TRUE)
+    new.label <- bru_standardise_names(label)
     ret[[new.label]] <- result$summary.hyperpar[label, property]
   }
 
@@ -201,12 +207,7 @@ inla.posterior.sample.structured <- function(result, n, seed = 0L) {
       ## Sanitize the variable names; replace problems with "_".
       ## Needs to handle whatever INLA uses to describe the hyperparameters.
       ## Known to include " " and "-" and potentially "(" and ")".
-      names(smpl.hyperpar) <-
-        vapply(
-          names(smpl.hyperpar),
-          function(nm) gsub("[-() ]", "_", x = nm, fixed = FALSE),
-          "name"
-        )
+      names(smpl.hyperpar) <- bru_standardise_names(names(smpl.hyperpar))
     }
     ssmpl[[i]] <- c(vals, smpl.hyperpar)
   }
