@@ -4,9 +4,9 @@
 \alias{like}
 \title{Likelihood construction for usage with \link{bru}}
 \usage{
-like(family, formula = . ~ ., data = NULL, components = NULL,
-  mesh = NULL, E = NULL, Ntrials = NULL, samplers = NULL,
-  ips = NULL, domain = NULL, options = list())
+like(family, formula = . ~ ., data = NULL, mesh = NULL, E = NULL,
+  Ntrials = NULL, samplers = NULL, ips = NULL, domain = NULL,
+  options = list())
 }
 \arguments{
 \item{family}{A string identifying a valid \code{INLA::inla} likelihood family. The default is
@@ -21,8 +21,6 @@ the predictor used in the optimization.}
 
 \item{data}{Likelihood-specific data, as a \code{data.frame} or \code{SpatialPoints[DataFrame]}
 object.}
-
-\item{components}{Components.}
 
 \item{mesh}{An inla.mesh object.}
 
@@ -41,6 +39,8 @@ Default taken from \code{options$Ntrials}.}
 \item{domain}{Named list of domain definitions.}
 
 \item{options}{list of global options overriding \link{bru.options}}
+
+\item{components}{Components.}
 }
 \value{
 A likelihood configuration which can be used to parameterize \link{bru}.

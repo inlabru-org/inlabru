@@ -5,7 +5,7 @@
 \alias{evaluate}
 \title{Evaluate or sample from a posterior result given a model and locations}
 \usage{
-\method{evaluate}{model}(model, result, points, predictor = NULL,
+\method{evaluate}{model}(model, result, data, predictor = NULL,
   property = "mode", n = 1, seed = 0L)
 }
 \arguments{
@@ -13,7 +13,7 @@
 
 \item{result}{Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.}
 
-\item{points}{Locations and covariates needed to evaluate the model.}
+\item{data}{Locations and covariates needed to evaluate the model.}
 
 \item{predictor}{A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects. In case of a formula the right hand side is used for evaluation.}
 

@@ -70,10 +70,11 @@ evaluate <- function(...) {
 #'
 #' @export
 #' @param components A component specification formula
+#' @param lhoods A list of one or more \code{lhood} objects
 #' @return A \link{bru_model} object
 #' @keywords internal
 
-make.model <- function(components) {
+make.model <- function(components, lhoods) {
 
   # Automatically add Intercept and -1 to components unless -1 is in components formula
   components <- auto.intercept(components)
@@ -82,7 +83,7 @@ make.model <- function(components) {
   env <- environment(components)
 
   # Create effects
-  effects <- component(components)
+  effects <- component(components, lhoods)
 
   # Create joint formula that will be used by inla
   formula <- y ~ -1
@@ -112,7 +113,7 @@ make.model <- function(components) {
 #' @export
 #' @param model An \link{inlabru} \link{model}
 #' @param result Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.
-#' @param points Locations and covariates needed to evaluate the model.
+#' @param data Locations and covariates needed to evaluate the model.
 #' @param predictor A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects. In case of a formula the right hand side is used for evaluation.
 #' @param property Property of the model components to obtain value from.
 #' Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
@@ -121,12 +122,12 @@ make.model <- function(components) {
 #' @keywords internal
 evaluate.model <- function(model,
                            result,
-                           points,
+                           data,
                            predictor = NULL,
                            property = "mode",
                            n = 1,
                            seed = 0L) {
-  data <- points # Within the evaluation make points available via the name "data"
+#  data <- points # Within the evaluation make points available via the name "data"
 
 
   if (inherits(predictor, "formula")) {
@@ -154,7 +155,7 @@ evaluate.model <- function(model,
   }
 
   # Pre-calculate projection matrices
-  As <- lapply(model$effects, amatrix, points)
+  As <- lapply(model$effects, amatrix_eval, data)
 
   for (k in 1:n) {
     # Discard variables we do not need
@@ -168,7 +169,7 @@ evaluate.model <- function(model,
       if (is.data.frame(sm[[label]])) {
         sm[[label]] <- sm[[label]]$value
       }
-      sm[[label]] <- value(model$effects[[label]], data = points,
+      sm[[label]] <- value(model$effects[[label]], data = data,
                            state = sm[[label]], A = As[[label]])
     }
 

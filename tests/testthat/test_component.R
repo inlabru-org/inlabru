@@ -5,7 +5,10 @@ test_that("Component construction: linear model", {
   if (!exists("component")) {
     skip("Test non-functional using old backend.")
   } else {
-    cmp <- component(~ beta(main = x, model = "linear", values = 1))[[1]]
+    df <- data.frame(x = 1:10)
+
+    cmp <- component(~ beta(main = x, model = "linear", values = 1),
+                     lhoods = list(data = df))[[1]]
 
     expect_equal(cmp$label, "beta")
     expect_equal(cmp$main$model, "linear")

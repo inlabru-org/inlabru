@@ -26,7 +26,7 @@
 
 \item{replicate}{EXPERIMENTAL}
 
-\item{A.msk}{Boolean vector for masking (deactivating) columns of the A-matrix}
+\item{A.msk}{Boolean vector for masking (FALSE=deactivate) columns of the A-matrix}
 
 \item{map}{EXPERIMENTAL}
 

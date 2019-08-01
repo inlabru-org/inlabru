@@ -4,10 +4,12 @@
 \alias{make.model}
 \title{Create an inlabru model object from a component formula}
 \usage{
-make.model(components)
+make.model(components, lhoods)
 }
 \arguments{
 \item{components}{A component specification formula}
+
+\item{lhoods}{A list of one or more \code{lhood} objects}
 }
 \value{
 A \link{bru_model} object

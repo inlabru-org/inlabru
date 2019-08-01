@@ -20,6 +20,10 @@ input_eval <- function(...) {
 index_eval <- function(...) {
   UseMethod("index_eval")
 }
+#' @rdname add_mappers.component
+add_mappers <- function(...) {
+  UseMethod("add_mappers")
+}
 
 
 
@@ -122,7 +126,7 @@ component <- function(object, ...) {
 #' # Equivalent shortcuts:
 #' eff <- component(~ myLinearEffectOfX(x, model = "linear"))
 #' eff <- component(~ myLinearEffectOfX(x))
-component.formula <- function(object, ...) {
+component.formula <- function(object, lhoods, ...) {
   code <- code.components(object)
   parsed <- lapply(code, function(x) parse(text = x))
   components <- lapply(parsed,
@@ -132,6 +136,47 @@ component.formula <- function(object, ...) {
                        })
   names(components) <- lapply(components, function(x) x$label)
   class(components) <- c("component_list", "list")
+  add_mappers(components, lhoods = lhoods)
+}
+
+add_mappers.component <- function(component, lhoods) {
+  component$main <- add_mapper(component$main, lhoods = lhoods, env = component$env)
+  component$group <- add_mapper(component$group, lhoods = lhoods, env = component$env)
+  component$replicate <- add_mapper(component$replicate, lhoods = lhoods, env = component$env)
+  
+  if (component$main$type %in% c("offset")) {
+  } else if (component$main$type %in% c("factor")) {
+  } else {
+    
+    fcall <- component$fcall
+    
+    # Set ngroup and nrep defaults
+    if (is.null(component$group$n)) {
+      fcall[["ngroup"]] <- 1
+    } else {
+      fcall[["ngroup"]] <- component$group$n
+    }
+    if (is.null(component$replicate$n)) {
+      fcall[["nrep"]] <- 1
+    } else {
+      fcall[["nrep"]] <- component$replicate$n
+    }
+    
+    # Generate the formula that will be presented to INLA
+    component$inla.formula <-
+      as.formula(paste0("~ . + ",
+                        paste0(deparse(fcall),
+                               collapse = "\n")))
+    
+    component$fcall <- fcall
+  }
+  
+  component
+}
+add_mappers.component_list <- function(components, lhoods) {
+  for (k in seq_along(components)) {
+    components[[k]] <- add_mappers(components[[k]], lhoods)
+  }
   components
 }
 
@@ -175,8 +220,46 @@ bru_subcomponent <- function(input = NULL,
          season.length = season.length,
          weights = weights)
   class(subcomponent) <- c("bru_subcomponent", "list")
+  
   subcomponent
 }
+
+add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
+{
+  if (is.null(subcomp[["mapper"]])) {
+    if (!is.null(lhoods)) {
+      inp <- lapply(lhoods,
+                    function(lh) input_eval(subcomp$input,
+                                            data = lh$data,
+                                            env = env,
+                                            label = subcomp$input$label,
+                                            null.on.fail = TRUE))
+      # Check for
+      # 1) All NULL; OK, set to 1
+      # 2) Some NULL; exclude NULL results
+      # TODO: Check for vector/matrix/coordinate inconsistency
+      null.results <- vapply(inp, function(x) is.null(x), TRUE)
+      if (all(null.results)) {
+        inp_values <- 1
+      } else if (any(null.results)) {
+        inp_values <- sort(unique(unlist(inp[!null.results])), na.last = NA)
+      } else {
+        inp_values <- sort(unique(unlist(inp)), na.last = NA)
+      }
+      if (length(inp_values) < 1) {
+        subcomp$n <- 1
+        subcomp$values <- NULL
+        inp_values <- NULL
+      }
+      subcomp <- make_mapper(subcomp,
+                             label,
+                             input_values = inp_values,
+                             strict = TRUE)
+    }
+  }
+  subcomp
+}
+
 
 #' inlabru latent model component construction using parameters
 #'
@@ -196,7 +279,7 @@ bru_subcomponent <- function(input = NULL,
 #' @param group EXPERIMENTAL
 #' @param replicate EXPERIMENTAL
 #' @param values EXPERIMENTAL
-#' @param A.msk Boolean vector for masking (deactivating) columns of the A-matrix
+#' @param A.msk Boolean vector for masking (FALSE=deactivate) columns of the A-matrix
 #' @param ... EXPERIMENTAL
 #' @return An component object
 #' 
@@ -274,7 +357,7 @@ component.character <- function(object,
     }
     group_model <- control.group$model
   } else {
-    group_model <- NULL
+    group_model <- "exchangeable"
   }
 
   if (is.null(main_layer)) {
@@ -299,6 +382,8 @@ component.character <- function(object,
     }
   }
 
+  env <- parent.frame()
+  
   # Default component (to be filled)
   component <- list(
     label = label,
@@ -336,7 +421,7 @@ component.character <- function(object,
       n = NULL,
       model = "iid"),
     A.msk = A.msk,
-    env = parent.frame()
+    env = env
   )
   
   # Main bit
@@ -402,46 +487,7 @@ component.character <- function(object,
       as.formula(paste0("~ . + ",
                         as.character(parse(text = deparse(fcall)))))
     
-    ## TODO: All the below needs to be in the second pass.
-    
-    # Set the default mesh used for interpolation
-    # TODO: Adjust this for a first and second pass of initalisation
-    component$main <-
-      make_mapper(component$main,
-                  label,
-                  input_values = NULL,
-                  strict = FALSE)
-    component$group <-
-      make_mapper(component$group,
-                  paste(label, "group"),
-                  input_values = NULL,
-                  strict = FALSE)
-    component$replicate <-
-      make_mapper(component$replicate,
-                  paste(label, "replicate"),
-                  input_values = NULL,
-                  strict = FALSE)
-    
-    # Set ngroup and nrep defaults
-    if (is.null(component$group$n)) {
-      fcall[["ngroup"]] <- 1
-    } else {
-      fcall[["ngroup"]] <- component$group$n
-    }
-    if (is.null(component$replicate$n)) {
-      fcall[["nrep"]] <- 1
-    } else {
-      fcall[["nrep"]] <- component$replicate$n
-    }
-
-    # Generate the formula that will be presented to INLA
-    component$inla.formula <-
-      as.formula(paste0("~ . + ",
-                        paste0(deparse(fcall),
-                               collapse = "\n")))
-    
     component$fcall <- fcall
-    
   }
 
   class(component) <- c("component", "list")
@@ -460,56 +506,46 @@ make_mapper <- function(subcomp,
     "Check out f() for additional information on this argument."
   )
 
+  if ((subcomp[["type"]] %in% c("spde")) &&
+      is.null(subcomp[["mapper"]])) {
+    subcomp[["mapper"]] <- subcomp[["model"]]$mesh
+  }
   if (!is.null(subcomp[["mapper"]])) {
     if (inherits(subcomp[["mapper"]], "inla.mesh.1d")) {
       subcomp$n <- subcomp[["mapper"]]$m
+      subcomp$values <- subcomp[["mapper"]]$loc
     } else if (inherits(subcomp[["mapper"]], "inla.mesh")) {
       subcomp$n <- subcomp[["mapper"]]$n
+      subcomp$values <- seq_len(subcomp$n)
+    } else {
+      stop(paste0("Unknown mapper of type '",
+                  paste0(class(subcomp[["mapper"]]), collapse = ", "),
+                  "' for ", label))
     }
-  } else if (subcomp[["type"]] %in% c("spde")) {
-    subcomp$mapper <- subcomp[["model"]]$mesh
-    subcomp$n <- subcomp[["model"]]$n.spde
   } else if (subcomp[["type"]] %in% "linear") {
     subcomp$n <- 1
     subcomp$values <- 1
-  } else if (subcomp[["type"]] %in% c("iid", "exchangeable")) {
-    if (is.null(subcomp[["n"]])) {
-      if (strict) {
-        stop(sprintf(
-          miss.msg, label,
-          subcomp[["type"]], "n"
-        ))
-      }
-    } else {
-      subcomp$mapper <- INLA::inla.mesh.1d(seq_len(subcomp[["n"]]))
-    }
-  }
-  else if (subcomp[["type"]] %in% c("seasonal")) {
-    if (is.null(subcomp[["season.length"]])) {
-      if (strict) {
-        stop(sprintf(
-          miss.msg, label,
-          subcomp[["type"]], "season.length"
-        ))
-      }
-    } else {
-      subcomp$mapper <- INLA::inla.mesh.1d(seq_len(subcomp[["season.length"]]))
-    }
   } else {
-    if (!is.null(subcomp[["values"]])) {
-      subcomp$mapper <- INLA::inla.mesh.1d(sort(unique(subcomp[["values"]])))
-      subcomp$n <- subcomp$mapper$n
-      subcomp$values <- subcomp$mapper$loc
-    } else if (!is.null(input_values)) {
-      subcomp$mapper <- INLA::inla.mesh.1d(sort(unique(input_values),
-                                                na.last = NA))
-      subcomp$n <- subcomp$mapper$n
-      subcomp$values <- subcomp$mapper$loc
-    } else if (strict) {
-      stop(sprintf(
-        miss.msg, label,
-        subcomp[["type"]], "values"
-      ))
+    if (is.null(subcomp[["values"]])) {
+      if (!is.null(input_values)) {
+        subcomp[["values"]] <- sort(unique(input_values), na.last = NA)
+      }
+    }
+    if (is.null(subcomp[["n"]])) {
+      if (is.null(subcomp[["values"]])) {
+        stop(paste0("No mapper, no n, and no values given for ", label))
+      }
+      subcomp[["n"]] <- length(subcomp[["values"]])
+    } else if (is.null(subcomp[["values"]])) {
+      subcomp[["values"]] <- seq_len(subcomp[["n"]])
+    } else {
+      if (subcomp[["n"]] != length(subcomp[["values"]])) {
+        stop(paste0("Size mismatch, n=", subcomp[["n"]], " != length(values)=",
+                    length(subcomp[["values"]]), " for label ", label))
+      }
+    }
+    if (length(subcomp[["values"]]) > 1) {
+      subcomp$mapper <- INLA::inla.mesh.1d(subcomp[["values"]])
     }
   }
 
@@ -741,10 +777,10 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
     if (subcomp$n > 1) {
       stop(paste0("Missing mapper (NULL) for subcomponent '", subcomp$label, "'"))
     }
-    A <- Matrix::Diagonal(1, 1.0)
+    A <- Matrix::Matrix(1.0, nrow(data), 1)
   } else {
     stop(paste0("Unsupported mapper of class '",
-                paste0(class(component$main$mapper), collapse = "', '"), "'",
+                paste0(class(subcomp$mapper), collapse = "', '"), "'",
                 " for subcomponent '", subcomp$label, "'"))
   }
   
@@ -779,11 +815,18 @@ amatrix_eval.component <- function(component, data, ...) {
                            INLA::inla.row.kron(A.group, A.main))
   
   # Mask columns of A
+  # TODO: check what this feature is intended for!
   if (!is.null(component$A.msk)) {
-    A <- A[, as.logical(component$A.msk), drop = FALSE]
+    A[, as.logical(component$A.msk)] <- 0.0
   }
-
+  
   A
+}
+
+#' @export
+
+amatrix_eval.component_list <- function(components, data, ...) {
+  lapply(components, function(x) amatrix_eval(x, data = data, ...))
 }
 
 #' Obtain covariate
@@ -891,7 +934,8 @@ input_eval.component_list <-
 
 
 
-input_eval.bru_input <- function(input, data, env = NULL, label = NULL, ...) {
+input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
+                                 null.on.fail = FALSE, ...) {
 
   # Evaluate the map with the data as an environment
   if (is.null(env)) {
@@ -910,11 +954,14 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL, ...) {
   # 2) If we obtain a SpatialGridDataFrame extract the values of that data
   #    frame at the point locations using the over() function
   # 3) Else we obtain a vector and return as-is. This happens when input
-  #    references a column of the data points
+  #    references a column of the data points, or some other complete expression
   
   n <- nrow(as.data.frame(data))
 
   if (is.null(emap)) {
+    if (null.on.fail) {
+      return(NULL)
+    }
     val <- rep(1, n)
   } else if (is.function(emap)) {
     # Allow but detect failures:
@@ -1014,16 +1061,15 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL, ...) {
 
 #' Obtain indices
 #'
-#' Idexes into to the components
+#' Indexes into to the components
 #'
 #' @aliases index_eval.component
 #' @export
 #' @method index_eval component
 #' @keywords internal
 #' @param component An component.
-#' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations. If null, return the component's map.
 #' @param ... Unused.
-#' @return a data.frame of indices or list of indices into the components latent variables
+#' @return a list of indices into the components latent variables
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>,
 #'   Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
@@ -1044,13 +1090,19 @@ index_eval.component <- function(component, ...) {
   main <- component$main$values
   group <- seq_len(g.n)
   repl <- seq_len(r.n)
-  idx <- data.frame(
+  idx <- list(
     main = rep(main, times = g.n * r.n),
     group = rep(rep(group, each = length(main)),
                 times = r.n),
     repl = rep(repl, each = length(main) * g.n)
   )
-  colnames(idx) <- paste0(component$label, c("", ".group", ".repl"))
+  names(idx) <- paste0(component$label, c("", ".group", ".repl"))
   idx
 }
 
+
+#' @export
+
+index_eval.component_list <- function(components, data, ...) {
+  do.call(c, lapply(components, function(x) index_eval(x, ...)))
+}

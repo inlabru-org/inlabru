@@ -13,11 +13,9 @@ index_eval(...)
 \item{...}{Unused.}
 
 \item{component}{An component.}
-
-\item{data}{A \code{data.frame} or Spatial* object of covariates and/or point locations. If null, return the component's map.}
 }
 \value{
-a data.frame of indices or list of indices into the components latent variables
+a list of indices into the components latent variables
 }
 \description{
 Idexes into to the components

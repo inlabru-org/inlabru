@@ -51,8 +51,6 @@ generate <- function(object, ...) {
 #'   \link{component} for details.
 #' @param ... Likelihoods, each constructed by a calling \code{\link{like}}, or named
 #'   parameters that can be passed to a single \code{\link{like}} call.
-#' @param data A data.frame or SpatialPoints[DataFrame] object, used as default
-#'   data object for likelihood objects with no data of their own.
 #' @param options A list of name and value pairs that are either interpretable
 #'   by \link{bru.options} or valid inla parameters. See \link{bru.options} for
 #'   caveats about some of the \code{control.*} inla options.
@@ -66,72 +64,54 @@ generate <- function(object, ...) {
 
 bru <- function(components = y ~ Intercept,
                 ...,
-                data = NULL,
                 options = list()) {
   requireINLA()
 
   # Update default options
   options <- do.call(bru.options, options)
 
-  # Turn model components into internal bru model
-  bru.model <- make.model(components)
-
-  dot_is_lhood <- vapply(list(...), function(lh) inherits(lh, "lhood"), TRUE)
+  lhoods <- list(...)
+  dot_is_lhood <- vapply(lhoods, function(lh) inherits(lh, "lhood"), TRUE)
   if (any(dot_is_lhood)) {
     if (!all(dot_is_lhood)) {
       stop("Cannot mix like() parameters with 'lhood' objects.")
     }
-    lhoods <- list(...)
   } else {
-    lhoods <- list(like(..., data = data, options = options))
-    family <- NULL
+    if (is.null(lhoods[["formula"]])) {
+      lhoods[["formula"]] <- . ~ .
+    }
+    if (as.character(lhoods[["formula"]])[2] == ".") {
+      lhoods[["formula"]] <- update(lhoods[["formula"]],
+                                    as.formula(paste0(paste0(all.vars(update(
+                                      components, . ~ 0)),
+                                      collapse = " + "),
+                                      " ~ .")))
+    }
+    lhoods <- list(do.call(like, c(lhoods, list(options = options))))
   }
 
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
   }
 
-  # If a likelihood was provided without data/response, update according to bru's
-  # arguments `data` and LHS of components
-
-  for (k in seq_along(lhoods)) {
-    # Check if likelihood has data attached to it. If not, attach the 'data' argument or break if not available
-    if (is.null(lhoods[[k]]$data)) {
-      if (is.null(data)) {
-        stop(paste0("Likelihood ", k, " has no data attached to it and no data was supplied to bru()."))
-      }
-      lhoods[[k]]$data <- data
-    }
-    if (is.null(lhoods[[k]]$components)) {
-      lhoods[[k]]$components <- components
-    }
-    if (is.null(lhoods[[k]]$response)) {
-      lhoods[[k]]$response <- all.vars(update(components, . ~ 0))
-    }
-  }
-
-  # Set max interations to 1 if all likelihood formulae are linear
+  # Turn model components into internal bru model
+  bru.model <- make.model(components, lhoods)
+  
+  
+  # Set max iterations to 1 if all likelihood formulae are linear
   if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) {
     options$max.iter <- 1
   }
 
-  # Extract the family of each likelihood
-  family <- vapply(seq_along(lhoods), function(k) lhoods[[k]]$inla.family, "family")
-
   # Run iterated INLA
   if (options$run) {
-    result <- do.call(
-      iinla,
-      list(data,
-        bru.model,
-        lhoods,
-        #                          stk,
-        family = family,
-        n = options$max.iter,
-        offset = options$offset,
-        result = options$result,
-        inla.options = options$inla.options
-      )
+    result <- iinla(
+      model = bru.model,
+      lhoods = lhoods,
+      n = options$max.iter,
+      offset = options$offset,
+      result = options$result,
+      inla.options = options$inla.options
     )
   } else {
     result <- list()
@@ -181,7 +161,7 @@ bru <- function(components = y ~ Intercept,
 #'
 #' @example inst/examples/like.R
 
-like <- function(family, formula = . ~ ., data = NULL, components = NULL,
+like <- function(family, formula = . ~ ., data = NULL,
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  options = list()) {
@@ -202,7 +182,9 @@ like <- function(family, formula = . ~ ., data = NULL, components = NULL,
 
   # Set response name
   response <- all.vars(update(formula, . ~ 0))
-  if (response[1] == ".") response <- NULL
+  if (response[1] == ".") {
+    stop("Missing response variable names")
+  }
 
   if (is.null(E)) {
     E <- options$E
@@ -217,17 +199,12 @@ like <- function(family, formula = . ~ ., data = NULL, components = NULL,
       stop("You called like() with family='cp' but no 'data' argument was supplied.")
     }
     # if ( is.null(samplers) ) { stop("You called like() with family='cp' but no 'samplers' argument was supplied.") }
-    bru.model <- make.model(components)
-    if (as.character(formula)[2] == ".") {
-      bru.model$dim.names <- all.vars(update(components, . ~ 0))
-    }
-    else {
-      bru.model$dim.names <- all.vars(update(formula, . ~ 0))
-    }
 
     if (is.null(ips)) {
-      # TODO: split ipmaker into one domain extractor, and one integration point constructor
-      ips <- ipmaker(samplers, domain = domain, dnames = bru.model$dim.names, data = data, model = bru.model)
+      # TODO: split ipmaker into one domain extractor (or not; should force
+      # explicit domain specification!), and one integration point constructor
+      ips <- ipmaker(samplers, domain = domain, dnames = response, data = data,
+                     model = bru.model)
     }
 
     inla.family <- "poisson"
@@ -460,12 +437,20 @@ lgcp <- function(components,
                  formula = . ~ .,
                  E = NULL,
                  options = list()) {
+  # If formula response missing, copy from components
+  if (as.character(formula)[2] == ".") {
+    formula <- update(formula,
+                      as.formula(paste0(paste0(all.vars(update(
+                        components, . ~ 0)),
+                        collapse = " + "),
+                        " ~ .")))
+  }
   lik <- like("cp",
     formula = formula, data = data, samplers = samplers,
-    components = components, E = E, ips = ips, domain = domain,
+    E = E, ips = ips, domain = domain,
     options = options
   )
-  result <- bru(components, lik, options = options)
+  bru(components, lik, options = options)
 }
 
 
@@ -906,7 +891,6 @@ summarize <- function(data, x = NULL, cbind.only = FALSE) {
 #' @param lhoods A list of likelihood objects from \code{\link{like}}
 #' @param n Number of \code{INLA::inla} iterations
 #' @param result A previous inla result, to be used as starting point
-#' @param family A vector of inla likelihood family names
 #' @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
 #' @param offset An additional predictor offset
 #' @param inla.options A list of further arguments passed on to \code{INLA::inla}
@@ -916,8 +900,7 @@ summarize <- function(data, x = NULL, cbind.only = FALSE) {
 #' @keywords internal
 
 
-iinla <- function(data, model, lhoods, n = 10, result = NULL,
-                  family,
+iinla <- function(model, lhoods, n = 10, result = NULL,
                   iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"),
                   offset = NULL, inla.options) {
 
@@ -939,6 +922,9 @@ iinla <- function(data, model, lhoods, n = 10, result = NULL,
   }
   inla.options$control.predictor$compute <- TRUE
 
+  # Extract the family of each likelihood
+  family <- vapply(seq_along(lhoods), function(k) lhoods[[k]]$inla.family, "family")
+  
   # Inital stack
   stk <- joint_stackmaker(model, lhoods, result)
   stk.data <- INLA::inla.stack.data(stk)

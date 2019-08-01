@@ -4,13 +4,11 @@
 \alias{iinla}
 \title{Iterated INLA}
 \usage{
-iinla(data, model, lhoods, n = 10, result = NULL, family,
+iinla(model, lhoods, n = 10, result = NULL,
   iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"),
   offset = NULL, inla.options)
 }
 \arguments{
-\item{data}{A data.frame}
-
 \item{model}{A \link{bru_model} object}
 
 \item{lhoods}{A list of likelihood objects from \code{\link{like}}}
@@ -19,8 +17,6 @@ iinla(data, model, lhoods, n = 10, result = NULL, family,
 
 \item{result}{A previous inla result, to be used as starting point}
 
-\item{family}{A vector of inla likelihood family names}
-
 \item{iinla.verbose}{If TRUE, be verbose (use verbose=TRUE to make INLA verbose)}
 
 \item{offset}{An additional predictor offset}
@@ -28,6 +24,8 @@ iinla(data, model, lhoods, n = 10, result = NULL, family,
 \item{inla.options}{A list of further arguments passed on to \code{INLA::inla}
 Some \code{control.*} arguments are partially overridden, according to
 internal inlabru method requirements.}
+
+\item{data}{A data.frame}
 }
 \value{
 An \code{INLA::inla} object

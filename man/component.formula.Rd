@@ -4,7 +4,7 @@
 \alias{component.formula}
 \title{inlabru latent model component construction using formulae}
 \usage{
-\method{component}{formula}(object, ...)
+\method{component}{formula}(object, lhoods, ...)
 }
 \arguments{
 \item{object}{A formula describing latent model components.}
