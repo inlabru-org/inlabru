@@ -464,7 +464,7 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}> and Finn Lindgren <\email{finn.lindgren@@gmail.com}>
 #' @keywords internal
 
-int.polygon = function(mesh, loc, group = NULL){
+int.polygon = function(mesh, loc, group = NULL,nsub = NULL){
   
   if ( is.null(group) ) { group = rep(1, nrow(loc)) }
   ipsl <- list()
@@ -478,7 +478,7 @@ int.polygon = function(mesh, loc, group = NULL){
     method <- "stable"
     inter <- list(loc = matrix(0, 0, 3), weight = numeric(0))
     if (method == "stable") {
-      inter <- make_stable_integration_points(mesh, bnd)
+      inter <- make_stable_integration_points(mesh, bnd,nsub = nsub)
     } else {
       # Create intersection mesh
       mesh_inter <- intersection_mesh(mesh, bnd)

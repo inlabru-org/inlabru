@@ -76,7 +76,7 @@
 #' }
 #' }
 
-ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, project) {
+ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, project,nsub = NULL) {
   
   pregroup = NULL
   
@@ -215,7 +215,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
         domain = stransform(domain, crs = CRS("+proj=cea +units=km"))
     }
     
-    ips = int.polygon(domain, loc = polyloc[,1:2], group = polyloc[,3])
+    ips = int.polygon(domain, loc = polyloc[,1:2], group = polyloc[,3],nsub = nsub)
     df = data.frame(region@data[ips$group, pregroup, drop = FALSE],
                     weight = ips[,"weight"])
     ips = SpatialPointsDataFrame(ips[,c("x","y")], data = df, match.ID = FALSE)
