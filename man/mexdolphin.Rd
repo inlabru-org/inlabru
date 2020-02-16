@@ -22,9 +22,6 @@
 \source{
 Library \code{dsm}.
 }
-\usage{
-mexdolphin
-}
 \description{
 This a version of the \code{mexdolphins} dataset from the package \code{dsm}, reformatted
 as point process data for use with \code{inlabru}. The data are from a combination of several NOAA 
