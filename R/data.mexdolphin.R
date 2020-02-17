@@ -7,7 +7,6 @@
 #' of groups of dolphins wre detected. The group size was recorded, as well as the Beaufort sea state at 
 #' the time of the observation.
 #' 
-#' @usage mexdolphin
 #' 
 #' @format A list of objects:
 #'  \describe{

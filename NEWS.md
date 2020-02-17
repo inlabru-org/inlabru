@@ -1,3 +1,7 @@
+# inlabru 2.1.13
+
+* Fix CRAN complaint regarding documentation
+
 # inlabru 2.1.12
 
 * Workaround an integration points error for old (ca pre-2018) INLA versions

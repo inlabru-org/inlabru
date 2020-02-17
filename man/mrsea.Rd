@@ -19,9 +19,6 @@
 \source{
 Library \code{MRSea}.
 }
-\usage{
-mrsea
-}
 \description{
 Data imported from package MRSea, see http://creem2.st-andrews.ac.uk/software/
 }

@@ -8,7 +8,6 @@
 #' @export
 #' @param points A SpatialPoints[DataFrame] object describing the point pattern.
 #' @param samplers A SpatialPolygons[DataFrame] object describing the observation window.
-#' @param ... arguments passed on to \link{predict}
 #' @return A spatstat \code{spatstat} \code{ppp} object
 #' 
 #' @examples 
