@@ -18,7 +18,7 @@ index_eval(...)
 a list of indices into the components latent variables
 }
 \description{
-Idexes into to the components
+Indexes into to the components
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>,

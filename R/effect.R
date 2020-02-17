@@ -126,14 +126,18 @@ component <- function(object, ...) {
 #' # Equivalent shortcuts:
 #' eff <- component(~ myLinearEffectOfX(x, model = "linear"))
 #' eff <- component(~ myLinearEffectOfX(x))
-component.formula <- function(object, lhoods, ...) {
+component.formula <- function(object, lhoods, envir = NULL, ...) {
+  if (is.null(envir)) {
+    envir <- environment(object)
+  }
   code <- code.components(object)
   parsed <- lapply(code, function(x) parse(text = x))
   components <- lapply(parsed,
                        function(component.expression) {
                          eval(component.expression,
-                              envir = environment(object))
+                              envir = envir)
                        })
+  environment(components) <- envir
   names(components) <- lapply(components, function(x) x$label)
   class(components) <- c("component_list", "list")
   add_mappers(components, lhoods = lhoods)
@@ -161,12 +165,21 @@ add_mappers.component <- function(component, lhoods) {
     } else {
       fcall[["nrep"]] <- component$replicate$n
     }
+
+    if (is.null(component$main$values)) {
+      fcall <- fcall[!("values" %in% names(fcall))]
+    } else {
+      values_name <- paste0("BRU_", component$label, "_values")
+      fcall[["values"]] <- as.symbol(values_name)
+      assign(values_name, component$main$values, envir = component$env_extra)
+    }
     
     # Generate the formula that will be presented to INLA
     component$inla.formula <-
       as.formula(paste0("~ . + ",
                         paste0(deparse(fcall),
-                               collapse = "\n")))
+                               collapse = "\n")),
+                 env = component$env)
     
     component$fcall <- fcall
   }
@@ -206,7 +219,12 @@ bru_subcomponent <- function(input = NULL,
                         "log1exp", "logdist"))) {
     type <- "specialnonlinear"
   } else if (is.character(model)) {
-    type <- model
+    if (model == "factor") {
+      type <- "factor"
+      model <- "iid"
+    } else {
+      type <- model
+    }
   } else {
     type <- "unknown"
   }
@@ -331,6 +349,7 @@ component.character <- function(object,
                                 map = NULL,
                                 # mesh -> mapper
                                 mesh = NULL,
+                                envir_extra = NULL,
                                 ...) {
 
   # INLA models:
@@ -350,6 +369,9 @@ component.character <- function(object,
     #       which can only be autodetected in a data-aware pass.
     model <- "linear"
   }
+  
+  # Force evaluation of explicit inputs
+  force(values)
 
   if (!is.null(substitute(group))) {
     if (is.null(control.group)) {
@@ -382,7 +404,10 @@ component.character <- function(object,
     }
   }
 
-  env <- parent.frame()
+  envir <- parent.frame()
+  if (is.null(envir_extra)) {
+    envir_extra <- new.env(envir)
+  }
   
   # Default component (to be filled)
   component <- list(
@@ -396,7 +421,7 @@ component.character <- function(object,
       mapper = mapper,
       model = model,
       n = n,
-      values = substitute(values),
+      values = values,
       season.length = season.length,
       weights =
         if (is.null(substitute(weights))) {
@@ -421,23 +446,32 @@ component.character <- function(object,
       n = NULL,
       model = "iid"),
     A.msk = A.msk,
-    env = env
+    env = envir,
+    env_extra = envir_extra
   )
   
   # Main bit
   if (component$main$type %in% c("offset")) {
-    component$inla.formula <- as.formula(paste0("~ . + offset(offset)"))
-  } else if (component$main$type %in% c("factor")) {
-    component$inla.formula <- as.formula(paste0("~ . + ", label))
-  }
-  else {
+    component$inla.formula <- as.formula(paste0("~ . + offset(offset)"),
+                                         env = envir)
+  } else {
     # Construct a call to the f function from the parameters provided
     # Ultimately, this call will be converted to the model formula presented to INLA
     fcall <- sys.call()
     fcall[[1]] <- "f"
     fcall[[2]] <- as.symbol(label)
-    fcall[["model"]] <- as.symbol(model)
-    
+    names(fcall)[2] <- ""
+    if (names(fcall)[3] == "") {
+      # 'main' is the only parameter allowed to be nameless,
+      # and only if it's the first parameter (position 3 in this fcall)
+      names(fcall)[3] <- "main"
+    }
+
+    # Store model name or object in the environment
+    model_name <- paste0("BRU_", label, "_main_model")
+    fcall[["model"]] <- as.symbol(model_name)
+    assign(model_name, component$main$model, envir = envir_extra)
+
     # Remove parameters inlabru supports but INLA doesn't,
     # and substitute parameters that inlabru will transform
     fcall <- fcall[!(names(fcall) %in% c("main",
@@ -461,7 +495,6 @@ component.character <- function(object,
     # TODO: make a more general system, that also handles ngroup etc.
     suffixes <- list("group" = "group",
                      "replicate" = "repl",
-                     "values" = "values",
                      "weights" = "weights")
     for (arg in names(suffixes)) {
       if (arg %in% names(fcall)) {
@@ -480,12 +513,20 @@ component.character <- function(object,
     if (!is.null(season.length)) {
       fcall[["season.length"]] <- season.length
     }
-#    # TODO: This is a temporary compatibility:
-#    fcall[["values"]] <- as.symbol(paste0(label, ".values"))
-    
+
+    # Make sure 'values' is setup properly.
+    if (is.null(component$main$values)) {
+      fcall <- fcall[!("values" %in% names(fcall))]
+    } else {
+      values_name <- paste0("BRU_", label, "_values")
+      fcall[["values"]] <- as.symbol(values_name)
+      assign(values_name, component$main$values, envir = component$env_extra)
+    }
+
     component$inla.formula <-
       as.formula(paste0("~ . + ",
-                        as.character(parse(text = deparse(fcall)))))
+                        as.character(parse(text = deparse(fcall)))),
+                 env = envir)
     
     component$fcall <- fcall
   }
@@ -506,15 +547,19 @@ make_mapper <- function(subcomp,
     "Check out f() for additional information on this argument."
   )
 
-  if ((subcomp[["type"]] %in% c("spde")) &&
-      is.null(subcomp[["mapper"]])) {
-    subcomp[["mapper"]] <- subcomp[["model"]]$mesh
+  if (is.null(subcomp[["mapper"]])) {
+    if (subcomp[["type"]] %in% c("spde")) {
+      subcomp[["mapper"]] <- subcomp[["model"]]$mesh
+    }
   }
   if (!is.null(subcomp[["mapper"]])) {
     if (inherits(subcomp[["mapper"]], "inla.mesh.1d")) {
       subcomp$n <- subcomp[["mapper"]]$m
       subcomp$values <- subcomp[["mapper"]]$loc
     } else if (inherits(subcomp[["mapper"]], "inla.mesh")) {
+      subcomp$n <- subcomp[["mapper"]]$n
+      subcomp$values <- seq_len(subcomp$n)
+    } else if (inherits(subcomp[["mapper"]], "bru_factor_mapper")) {
       subcomp$n <- subcomp[["mapper"]]$n
       subcomp$values <- seq_len(subcomp$n)
     } else {
@@ -526,6 +571,8 @@ make_mapper <- function(subcomp,
     subcomp$n <- 1
     subcomp$values <- 1
   } else {
+    # No mapper; construct based on input values
+    # TODO: add factor mapper construction
     if (is.null(subcomp[["values"]])) {
       if (!is.null(input_values)) {
         subcomp[["values"]] <- sort(unique(input_values), na.last = NA)
@@ -561,7 +608,7 @@ make_mapper <- function(subcomp,
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
-code.components <- function(components) {
+code.components <- function(components, add = "") {
   fname <- "component"
   tms <- terms(components)
   codes <- attr(tms, "term.labels")
@@ -588,25 +635,35 @@ code.components <- function(components) {
       label <- code
       is.fixed <- TRUE
     }
-
+    
     # Make code
     if (is.fixed) {
-      codes[[k]] <- sprintf("%s(\"%s\", main = %s, model = 'linear')",
-                            fname, label, label)
-    }
-    else if (is.offset) {
-      codes[[k]] <-
-        gsub(paste0(label, "("),
-             paste0(fname, "(\"", label, "\", model = \"offset\", main = "),
-             code, fixed = TRUE)
+      codes[[k]] <- paste0(fname, '("', label, '", main = ', label,
+                           ', model = "linear"',
+                           add, ')')
     }
     else {
-      codes[[k]] <- gsub(paste0(label, "("),
-                         paste0(fname, "(\"", label, "\", "),
-                         code, fixed = TRUE)
+      # Add extra code before final bracket
+      ix <- max(gregexpr(")", text = code, fixed = TRUE)[[1]])
+      code <-
+        paste0(substr(code, 1, ix - 1),
+               add,
+               substr(code, ix, nchar(code)))
+      
+      if (is.offset) {
+        codes[[k]] <-
+          gsub(paste0(label, "("),
+               paste0(fname, "(\"", label, "\", model = \"offset\", main = "),
+               code, fixed = TRUE)
+      }
+      else {
+        codes[[k]] <- gsub(paste0(label, "("),
+                           paste0(fname, "(\"", label, "\", "),
+                           code, fixed = TRUE)
+      }
     }
   }
-
+  
   codes
 }
 
@@ -689,47 +746,39 @@ value.component <- function(component, data, state, A = NULL, ...) {
     state <- state[[component$label]]
   }
 
-  # Obtain covariates
-  main_input <- input_eval(component, part = "main", data = data, env = component$env)
-  group_input <- input_eval(component, part = "group", data = data, env = component$env)
-  repl_input <- input_eval(component, part = "repl", data = data, env = component$env)
-  weights_input <- input_eval(component, part = "weights", data = data, env = component$env)
-
-  if (is.data.frame(main_input)) {
-    message("'main_input' is a data.frame! This code should be moved to input_eval.bru_input().")
-    if (component$label %in% names(main_input)) {
-      main_input <- main_input[, component$label, drop = TRUE]
-    } else {
-      main_input <- main_input[, 1, drop = TRUE]
-    }
-  }
+#  # Obtain covariates
+#  main_input <- input_eval(component, part = "main", data = data, env = component$env)
+#  group_input <- input_eval(component, part = "group", data = data, env = component$env)
+#  repl_input <- input_eval(component, part = "repl", data = data, env = component$env)
+#  weights_input <- input_eval(component, part = "weights", data = data, env = component$env)
+#
+#  if (is.data.frame(main_input)) {
+#    message("'main_input' is a data.frame! This code should be moved to input_eval.bru_input().")
+#    if (component$label %in% names(main_input)) {
+#      main_input <- main_input[, component$label, drop = TRUE]
+#    } else {
+#      main_input <- main_input[, 1, drop = TRUE]
+#    }
+#  }
 
   # Make A-matrix (if not provided)
   if (is.null(A)) {
-    A <- amatrix(component, data)
+    A <- amatrix_eval(component, data)
   }
 
   # Determine component depending on the type of latent model
-  if (component$type %in% c("linear", "clinear")) {
-    values <- A %*% (state * mapped)
+  if (component$main$type %in% c("offset")) {
+    values <- input_eval(component, part = "main", data = data, env = component$env)
   }
-  else if (component$type %in% c("offset")) {
-    values <- A %*% mapped
-  }
-  else if (component$type %in% c("factor")) {
-    values <- A %*% state[mapped]
-  }
-  else if (component$type %in% c("iid", "seasonal")) {
-    values <- A %*% state[mapped]
-  }
-  else if (component$type %in% c("rw1", "rw2", "ar", "ar1", "ou")) {
+#  else if (component$type %in% c("factor")) {
+#    values <- A %*% state[mapped]
+#  }
+  else {
     values <- A %*% state
   }
-  else if (component$type %in% c("spde")) {
-    values <- A %*% state
-  } else {
-    stop(paste0("Evaluation of ", component$type, " not implemented."))
-  }
+#  else {
+#    stop(paste0("Evaluation of ", component$type, " not implemented."))
+#  }
 
   as.vector(values)
 }
@@ -767,6 +816,12 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
       val <- as.matrix(val)
     }
     A <- INLA::inla.spde.make.A(subcomp$mapper, loc = val, weights = weights)
+  } else if (inherits(subcomp$mapper, c("bru_factor_mapper"))) {
+    val <- input_eval(subcomp$input, data, env = env)
+    # TODO: construct A-matrices for factor components
+    warning("factor mapping not implemented in amatrix_eval.bru_component")
+    A <- NULL
+    # INLA::inla.spde.make.A(subcomp$mapper, loc = val, weights = weights)
   } else if (subcomp$model %in% c("linear", "clinear")) {
     val <- input_eval(subcomp$input, data, env = env)
     A <- Matrix::sparseMatrix(i = seq_len(nrow(data)),
@@ -1103,6 +1158,6 @@ index_eval.component <- function(component, ...) {
 
 #' @export
 
-index_eval.component_list <- function(components, data, ...) {
-  do.call(c, lapply(components, function(x) index_eval(x, ...)))
+index_eval.component_list <- function(components, ...) {
+  lapply(components, function(x) index_eval(x, ...))
 }

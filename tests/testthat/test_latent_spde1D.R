@@ -3,9 +3,9 @@ context("Latent models - 1D SPDE (test_latent_spde1D.R)")
 latent_spde1D_testdata <- function() {
   data(Poisson2_1D)
   x <- seq(0, 55, length = 50)
-  mesh1D <- inla.mesh.1d(x, boundary = "free")
+  mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
 
-  matern <- inla.spde2.pcmatern(mesh1D,
+  matern <- INLA::inla.spde2.pcmatern(mesh1D,
     prior.range = c(1, 0.01),
     prior.sigma = c(10, 0.01)
   )

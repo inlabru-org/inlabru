@@ -1,6 +1,8 @@
-# Create a stack from a model, points and prediction alues
+# Create a stack from a model, data and prediction values
+# 
+# # TODO: make sure data is allowed to be a list with unequal length vectors
 
-make.stack <- function(points,
+make.stack <- function(data,
                        model,
                        y,
                        E = 1,
@@ -13,37 +15,37 @@ make.stack <- function(points,
 
   # Observations y
   if (length(y) == 1) {
-    y <- rep(y, nrow(as.data.frame(points)))
+    y <- rep(y, nrow(as.data.frame(data)))
   }
 
   # Expectation parameter E
   if (length(E) == 1) {
-    E <- rep(E, nrow(as.data.frame(points)))
+    E <- rep(E, nrow(as.data.frame(data)))
   }
 
   # Ntrials
   if (length(Ntrials) == 1) {
-    Ntrials <- rep(Ntrials, nrow(as.data.frame(points)))
+    Ntrials <- rep(Ntrials, nrow(as.data.frame(data)))
   }
 
 
   # Projection matrices (A) and mesh index effects
-  A <- lapply(model$effects, amatrix.component, points)
-  effects <- lapply(model$effects, index.component, points)
+  A <- amatrix_eval(model$effects, data)
+  effects <- index_eval(model$effects)
 
 
   # Taylor approximation
   if (!is.null(expr)) {
-    rw <- nlinla.reweight(A, model, points, expr, result)
+    rw <- nlinla.reweight(A, model, data, expr, result)
     A <- rw$A
     taylor.offset <- rw$const
   } else {
     taylor.offset <- 0
   }
 
-  # The weirdest workaround ever. Without this, there are convergence problems on ubuntu but not on MacOS ?!?!?!
-  A <- c(A, list(1))
-  effects <- c(effects, list(WORKAROUND = runif(dim(A[[1]])[1])))
+#  # The weirdest workaround ever. Without this, there are convergence problems on ubuntu but not on MacOS ?!?!?!
+#  A <- c(A, list(1))
+#  effects <- c(effects, list(WORKAROUND = runif(dim(A[[1]])[1])))
 
   # Create and return stack
   stk <- INLA::inla.stack(

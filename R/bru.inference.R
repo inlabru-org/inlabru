@@ -80,13 +80,7 @@ bru <- function(components = y ~ Intercept,
     if (is.null(lhoods[["formula"]])) {
       lhoods[["formula"]] <- . ~ .
     }
-    if (as.character(lhoods[["formula"]])[2] == ".") {
-      lhoods[["formula"]] <- update(lhoods[["formula"]],
-                                    as.formula(paste0(paste0(all.vars(update(
-                                      components, . ~ 0)),
-                                      collapse = " + "),
-                                      " ~ .")))
-    }
+    lhoods[["formula"]] <- auto_copy_response(lhoods[["formula"]], components)
     lhoods <- list(do.call(like, c(lhoods, list(options = options))))
   }
 
@@ -250,17 +244,17 @@ single_stackmaker <- function(model, lhood, result) {
   if (lhood$family == "cp") {
     INLA::inla.stack(
       make.stack(
-        points = lhood$data, model = model, expr = lhood$expr, y = 1,
+        data = lhood$data, model = model, expr = lhood$expr, y = 1,
         E = 0, result = result
       ),
       make.stack(
-        points = lhood$ips, model = model, expr = lhood$expr, y = 0,
+        data = lhood$ips, model = model, expr = lhood$expr, y = 0,
         E = lhood$E * lhood$ips$weight, offset = 0, result = result
       )
     )
   } else {
     make.stack(
-      points = lhood$data, model = model, expr = lhood$expr,
+      data = lhood$data, model = model, expr = lhood$expr,
       y = as.data.frame(lhood$data)[, lhood$response],
       E = lhood$E, Ntrials = lhood$Ntrials, result = result
     )
@@ -437,20 +431,18 @@ lgcp <- function(components,
                  formula = . ~ .,
                  E = NULL,
                  options = list()) {
-  # If formula response missing, copy from components
-  if (as.character(formula)[2] == ".") {
-    formula <- update(formula,
-                      as.formula(paste0(paste0(all.vars(update(
-                        components, . ~ 0)),
-                        collapse = " + "),
-                        " ~ .")))
-  }
-  lik <- like("cp",
-    formula = formula, data = data, samplers = samplers,
-    E = E, ips = ips, domain = domain,
-    options = options
-  )
-  bru(components, lik, options = options)
+#  # If formula response missing, copy from components
+#  formula <- auto_copy_response(formula, components)
+#  lik <- like(family = "cp",
+#    formula = formula, data = data, samplers = samplers,
+#    E = E, ips = ips, domain = domain,
+#    options = options
+#  )
+  bru(components,
+      family = "cp",
+      formula = formula, data = data, samplers = samplers,
+      E = E, ips = ips, domain = domain,
+      options = options)
 }
 
 
@@ -722,7 +714,7 @@ generate.bru <- function(object,
   }
 
   vals <- evaluate.model(
-    model = object$sppa$model, result = object, points = data,
+    model = object$sppa$model, result = object, data = data,
     property = "sample", n = n.samples, predictor = formula, seed = seed
   )
 }
@@ -952,21 +944,29 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
     }
     result <- NULL
 
+    inla.formula <- update.formula(model$formula, BRU.response ~ .)
+    inla.data <-
+      c(stk.data,
+        do.call(c, c(lapply(model$effects,
+                            function(xx) as.list(xx$env_extra)),
+                     use.names = FALSE)))
+#        list.data(model$formula))
     icall <- expression(
       result <- tryCatch(
         do.call(
           inla,
           c(
             list(
-              formula = update.formula(model$formula, BRU.response ~ .),
-              data = c(stk.data, list.data(model$formula)),
+              formula = inla.formula,
+              data = inla.data,
               family = family,
               E = stk.data[["BRU.E"]],
               Ntrials = stk.data[["BRU.Ntrials"]],
               offset = stk.data[["BRU.offset"]] + offset
             ),
             inla.options
-          )
+          ),
+          envir = environment(model$effects)
         ),
         error = warning
       )
@@ -1065,7 +1065,7 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
 
 auto.intercept <- function(components) {
   env <- environment(components)
-
+  
   tm <- terms(components)
   # Check for -1/+0 and +/- Intercept/NULL
   # Required modification:
@@ -1078,7 +1078,7 @@ auto.intercept <- function(components) {
   #  F    T     0     Impossible
   #  F    F     1     +Intercept-1
   #  F    F     0     -1
-
+  
   # Convert list(var1,var2) call to vector of variable names.
   # ([-1] removes "list"!)
   var_names <- as.character(attr(tm, "variables"))[-1]
@@ -1108,6 +1108,62 @@ auto.intercept <- function(components) {
 }
 
 
+auto_linear_formula <- function(formula, components) {
+  if (as.character(formula)[
+    length(as.character(formula))] != ".") {
+    return(formula)
+  }
+  
+  # No RHS; construct from components
+
+  components <- auto.intercept(components)
+  tm <- terms(components)
+  
+  var_names <- attr(tm, "term.labels")
+  # Trim component options
+  var_names <- gsub(pattern = "^([^\\(]*)\\(.*",
+                    replacement = "\\1",
+                    x = var_names)
+  if (length(attr(tm, "offset")) > 0) {
+    var_names <- c(var_names,
+                   as.character(attr(tm, "variables"))[-1][attr(tm, "offset")])
+  }
+  formula <- update.formula(components,
+                            paste0(". ~ ",
+                                   paste0(var_names, collapse = " + ")))
+  environment(formula) <- environment(components)
+  formula
+}
+
+
+auto_copy_response <- function(formula, components) {
+  if ((length(as.character(formula)) == 3) &&
+      (as.character(formula)[2] != ".")) {
+    # Already has response; do nothing
+    return(formula)
+  }
+  env <- environment(formula)
+  tm_cm <- terms(components)
+  LHS <- as.formula(paste0(
+    as.character(attr(tm_cm, "variables"))[-1][attr(tm_cm, "response")],
+    " ~ ."))
+  if (as.character(formula)[
+    length(as.character(formula))] == ".") {
+    # No formula RHS
+    formula <- LHS
+  } else {
+    tm_fm <- terms(formula)
+    if ((attr(tm_fm, "response") == 0) ||
+        (as.character(attr(tm_fm, "variables"))[-1][attr(tm_fm, "response")] == "."))
+    {
+      formula <- update(formula, LHS)
+    }
+  }
+  environment(formula) <- env
+  formula
+}
+
+
 # Returns a formula's environemnt as a list. Removes all variable that are of type
 # inla, function or formula. Also removes all variables that are not variables of the formula.
 list.data <- function(formula) {
@@ -1118,11 +1174,15 @@ list.data <- function(formula) {
   # Remove previous inla results. For some reason these slow down the next INLA call.
   elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
 
-  # Remove functions. This can cause problems as well.
-  elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
+#  # Remove functions. This can cause problems as well.
+#  elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
 
-  # Remove formulae. This can cause problems as well.
-  elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
+#  # Remove formulae. This can cause problems as well.
+#  elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
 
-  elist <- elist[names(elist) %in% all.vars(formula)]
+  # The formula expression is too general for this to be reliable:
+  #  # Keep only purse formula variables
+  #  elist <- elist[names(elist) %in% all.vars(formula)]
+  
+  elist
 }
