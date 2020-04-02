@@ -12,7 +12,7 @@ glplot(object, ...)
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-glplot is a generic function for renders various kinds of spatial objects, i.e. Spatial* data 
+glplot is a generic function for renders various kinds of spatial objects, i.e. Spatial* data
 and inla.mesh objects. The function invokes particular methods which depend on the class of the first argument.
 }
 \examples{

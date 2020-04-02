@@ -22,7 +22,7 @@ the spatial object provided. Then calls ggmap() to plot the map.
 This function requires the `ggmap` package.
 }
 \examples{
-\donttest{
+\dontrun{
 # Load the Gorilla data
 data(gorillas, package = "inlabru")
  

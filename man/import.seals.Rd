@@ -22,7 +22,7 @@ will only extract one of the survey transects.
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
 
-Load seal data  
+Load seal data
 Turn seal data into spatial object
 To avoid confusion I remove the x-y coordinates created by Martin
 Change CRS

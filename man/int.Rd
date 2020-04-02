@@ -19,26 +19,30 @@ A \code{data.frame} of integrals, one for each level of the cross product of all
 \description{
 A typical task in statistical inference to integrate a (multivariate) function along one or
 more dimensions of its domain. For this purpose, the function is evaluated at some points
-in the domain and the values are summed up using weights that depend on the area being 
+in the domain and the values are summed up using weights that depend on the area being
 integrated over. This function performs the weighting and summation conditional for each level
-of the dimensions that are not integrated over. The parameter \code{dims} states the the 
+of the dimensions that are not integrated over. The parameter \code{dims} states the the
 dimensions to integrate over. The set of dimensions that are held fixed is the set difference
 of all column names in \code{data} and the dimensions stated by \code{dims}.
 }
 \examples{
+
 \donttest{
 # ipoints needs INLA
 if (require("INLA", quietly = TRUE)) {
-# Create integration points in two dimensions, x and y
+  # Create integration points in two dimensions, x and y
 
-ips = cprod(ipoints(c(0,10), 10, name = "x"),
-            ipoints(c(1,5), 10, name = "y"))
+  ips <- cprod(
+    ipoints(c(0, 10), 10, name = "x"),
+    ipoints(c(1, 5), 10, name = "y")
+  )
 
-# The sizes of the domains are 10 and 4 for x and y, respectively.
-# Integrating f(x,y) = 1 along x and y should result in the total
-# domain size 40
+  # The sizes of the domains are 10 and 4 for x and y, respectively.
+  # Integrating f(x,y) = 1 along x and y should result in the total
+  # domain size 40
 
-int(ips, rep(1, nrow(ips)), c("x","y"))
+  int(ips, rep(1, nrow(ips)), c("x", "y"))
 }
 }
+
 }

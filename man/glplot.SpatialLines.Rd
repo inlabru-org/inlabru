@@ -14,7 +14,7 @@
 \item{...}{Parameters passed on to rgl.linestrips().}
 }
 \description{
-This function will calculate a cartesian representation of the lines provided 
+This function will calculate a cartesian representation of the lines provided
 and use rgl.linestrip() in order to render them.
 }
 \examples{

@@ -15,7 +15,7 @@
 List of generated samples
 }
 \description{
-Takes a fitted \code{inla} object produced by \code{INLA::inla()} and produces samples given 
+Takes a fitted \code{inla} object produced by \code{INLA::inla()} and produces samples given
 a new set of values for the model covariates or the original values used for the model fit. The
 samples can be based on any R expression that is valid given these values/covariates and the joint
 posterior of the estimated random effects.
@@ -25,24 +25,24 @@ posterior of the estimated random effects.
 # Some features use the INLA package.
 if (require("INLA", quietly = TRUE)) {
 
-# Generate some data
+  # Generate some data
 
-input.df <- data.frame(x=cos(1:10))
-input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+  input.df <- data.frame(x = cos(1:10))
+  input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
 
-# Fit a Gaussian likelihood model
+  # Fit a Gaussian likelihood model
 
-formula = y ~ x
-fit <- inla(formula, "gaussian", data = input.df, control.compute=list(config = TRUE))
+  formula <- y ~ x
+  fit <- inla(formula, "gaussian", data = input.df, control.compute = list(config = TRUE))
 
-# Generate samples from the posterior distribution of exp(x), where x is the fixed effect.
+  # Generate samples from the posterior distribution of exp(x), where x is the fixed effect.
 
-xpost = generate(fit, NULL, ~ exp(x), n.samples = 2)
-xpost
-plot(xpost[[1]])
-
+  xpost <- generate(fit, NULL, ~ exp(x), n.samples = 2)
+  xpost
+  plot(xpost[[1]])
 }
 }
+
 }
 \seealso{
 \link{predict.inla}

@@ -11,7 +11,7 @@
 \item{data}{A SpatialPixelsDataFrame object.}
 
 \item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
-mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], 
+mapping. The default mapping is \code{aes_string(x = coordnames(data)[1],
 y = coordnames(data)[2], fill = names(data)[[1]])}.}
 
 \item{alpha}{Character array identifying the data column used for tile transparency.}

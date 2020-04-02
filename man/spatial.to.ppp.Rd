@@ -10,8 +10,6 @@ spatial.to.ppp(points, samplers)
 \item{points}{A SpatialPoints[DataFrame] object describing the point pattern.}
 
 \item{samplers}{A SpatialPolygons[DataFrame] object describing the observation window.}
-
-\item{...}{arguments passed on to \link{predict}}
 }
 \value{
 A spatstat \code{spatstat} \code{ppp} object
@@ -37,4 +35,5 @@ class(gp)
 
 plot(gp)
 }
+
 }

@@ -1,0 +1,112 @@
+---
+title: "LGCPs - An example in space and time"
+author: "Fabian E. Bachl"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Introduction
+----------------
+For this vignette we are going to be working with a dataset obtained from 
+the `R` package `MRSea`. We will set up a LGCP with a spatio-temporal SPDE model to estimate species distribution.
+
+
+Setting things up
+----------------
+
+Load libraries
+```{r results="hide",warning=FALSE,message=FALSE}
+library(inlabru)
+library(INLA)
+```
+
+Use empricial Bayes in order to speed things up a little bit:
+```{r results="hide",warning=FALSE,message=FALSE}
+init.tutorial()
+```
+
+
+Get the data
+-----------------------------------
+Load the dataset:
+
+```{r }
+data(mrsea, package = "inlabru")
+```
+
+The points (representing animals) and the sampling regions of this dataset are associated with a season. Let's have a look at the observed points and sampling regions for all seasons:
+
+```{r results="hide",warning=FALSE,message=FALSE}
+ggplot() + gg(mrsea$mesh) +
+           gg(mrsea$boundary) + 
+           gg(mrsea$samplers) +
+           gg(mrsea$points, size = 0.5) + 
+           coord_fixed() + 
+           facet_wrap(~ season) +
+           ggtitle("MRSea observation seasons")
+```
+
+Integration points
+-----------------------------------
+
+Because our model will take time (season) into account we have to construct the integration points for the LGCP accordingly. Using the ´group´ parameter we can let the ´ipoints´ function know that we would like to construct the integration points for each season inteprendently. Note that omitting this step would simply aggregate all sampling regions over time.
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+ips <- ipoints(mrsea$samplers, group = "season")
+```
+Plot the integration points:
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+ggplot() + gg(ips, aes(color = season)) + facet_wrap(~season) + coord_equal()
+```
+
+Fitting the model
+-----------------------------------
+
+Fit an LGCP model to the locations of the animals. In this example we will employ a spatio-temporal SPDE. Note how the ´group´ and ´ngroup´ parameters are employed to let the SPDE model know about the name of the time dimension (season) and the total number of distinct points in time. 
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+matern <- inla.spde2.pcmatern(mrsea$mesh, 
+                              prior.sigma = c(0.1, 0.01), 
+                              prior.range = c(10000, 0.01))
+
+season = mrsea$points$season # Workaround for known bug (fixed in new backend)
+
+cmp <- coordinates + season ~ mySmooth(map = coordinates,
+                              model = matern, group = season, ngroup = 4) +
+                          Intercept
+
+fit <- lgcp(cmp, mrsea$points, ips = ips)
+```
+
+Predict and plot the intensity for all seasons:
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+ppxl <- pixels(mrsea$mesh, mask = mrsea$boundary)
+ppxl1 <- SpatialPixelsDataFrame(ppxl, data = data.frame(season = rep(1, nrow(data.frame(ppxl)))))
+ppxl2 <- SpatialPixelsDataFrame(ppxl, data = data.frame(season = rep(2, nrow(data.frame(ppxl)))))
+ppxl3 <- SpatialPixelsDataFrame(ppxl, data = data.frame(season = rep(3, nrow(data.frame(ppxl)))))
+ppxl4 <- SpatialPixelsDataFrame(ppxl, data = data.frame(season = rep(4, nrow(data.frame(ppxl)))))
+
+lambda1 <- predict(fit, ppxl1, ~ exp(mySmooth + Intercept))
+lambda2 <- predict(fit, ppxl2, ~ exp(mySmooth + Intercept))
+lambda3 <- predict(fit, ppxl3, ~ exp(mySmooth + Intercept))
+lambda4 <- predict(fit, ppxl4, ~ exp(mySmooth + Intercept))
+
+pl1 <- ggplot() + gg(lambda1, aes(fill=mean)) + gg(mrsea$points[mrsea$points$season == 1,], size = 0.3) + coord_equal()
+pl2 <- ggplot() + gg(lambda2, aes(fill=mean)) + gg(mrsea$points[mrsea$points$season == 2,], size = 0.3) + coord_equal()
+pl3 <- ggplot() + gg(lambda3, aes(fill=mean)) + gg(mrsea$points[mrsea$points$season == 3,], size = 0.3) + coord_equal()
+pl4 <- ggplot() + gg(lambda4, aes(fill=mean)) + gg(mrsea$points[mrsea$points$season == 4,], size = 0.3) + coord_equal()
+
+multiplot(pl1, pl2, pl3, pl4, cols = 2)
+```

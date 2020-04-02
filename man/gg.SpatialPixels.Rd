@@ -24,7 +24,7 @@ Uses \link{geom_point} to plot the pixel centers.
 data(gorillas)
 
 # Turn elevation covariate into SpatialPixels
-pxl = SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
+pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
 
 # Plot the pixel centers
 ggplot() + gg(pxl, size = 0.1)

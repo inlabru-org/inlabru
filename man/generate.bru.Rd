@@ -5,7 +5,7 @@
 \title{Sampling based on bru posteriors}
 \usage{
 \method{generate}{bru}(object, data, formula = NULL, n.samples = 100,
-  ...)
+  seed = 0L, ...)
 }
 \arguments{
 \item{object}{A \code{bru} object obtained by calling \link{bru}.}
@@ -14,8 +14,10 @@
 
 \item{formula}{A formula determining which effects to sample from and how to combine them analytically.}
 
-\item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. 
+\item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics.
 The default is rather low but provides a quick approximate result.}
+
+\item{seed}{Random number genreator seed passed on to \code{inla.posterior.sample}}
 
 \item{...}{additional, unused arguments.}
 }
@@ -23,7 +25,7 @@ The default is rather low but provides a quick approximate result.}
 List of generated samples
 }
 \description{
-Takes a fitted \code{bru} object produced by the function \link{bru}() and produces samples given 
+Takes a fitted \code{bru} object produced by the function \link{bru}() and produces samples given
 a new set of values for the model covariates or the original values used for the model fit. The
 samples can be based on any R expression that is valid given these values/covariates and the joint
 posterior of the estimated random effects.
@@ -39,7 +41,8 @@ input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
 
 # Fit the model
 
-fit <- bru(y ~ xeff(map = x, model = "linear"), "gaussian", input.df)
+fit <- bru(y ~ xeff(map = x, model = "linear"),
+           family = "gaussian", data = input.df)
 summary(fit)
 
 # Generate samples for some predefined x

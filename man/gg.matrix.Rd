@@ -21,9 +21,8 @@ Creates a tile geom for plotting a matrix
 }
 \examples{
 
-A = matrix(runif(100), nrow = 10)
+A <- matrix(runif(100), nrow = 10)
 ggplot() + gg(A)
-
 }
 \seealso{
 Other geomes for inla and inlabru predictions: \code{\link{gg.data.frame}},

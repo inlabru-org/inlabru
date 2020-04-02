@@ -18,9 +18,10 @@ Converts the vertices of an \code{inla.mesh} object into a \code{SpatialPointsDa
 \examples{
 \donttest{
 data("mrsea")
-vrt = vertices(mrsea$mesh)
+vrt <- vertices(mrsea$mesh)
 ggplot() + gg(mrsea$mesh) + gg(vrt, color = "red")
 }
+
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>

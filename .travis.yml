@@ -1,24 +1,38 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+sudo: required
 
-group: travis_latest
-language: R
-sudo: false
+services:
+  - docker
+
+language: minimal
 cache: packages
 
-r:
-# - oldrel
- - release
-# - devel
+before_install:
+  # Determine which branch we are building
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
+  # Clone the repo and check out the branch
+  - git clone https://github.com/fbachl/inlabru.git
+  - cd inlabru
+  - git checkout $BRANCH
+  - cd ..
+  # Run docker
+  - docker --version
+  - docker run --name my_ubuntu -v /$(pwd)/inlabru:/home/work -it -d fbachl/inlabru:latest /bin/bash
 
-addons:
-  apt:
-    packages:
-      - libgeos-dev
-      - libproj-dev
-      - libgdal-dev
-
-# r_build_args: --resave-data
-
-# r_check_args: --as-cran --run-donttest --timings
-
-r_check_args: --as-cran --timings
+install:
+  - docker ps
+  - docker container ls --all
+  - docker exec -it my_ubuntu ls -al /home
+  - docker exec -it my_ubuntu ls -al /home/work
+  - docker exec -it my_ubuntu whoami
+  - docker exec -it my_ubuntu R -e ".libPaths()"
+  - docker exec -it my_ubuntu R -e "getwd()"
+  - docker exec -it my_ubuntu R -e "devtools::session_info()"
+  - docker exec -it my_ubuntu ls /usr/local/lib/R/site-library
+  - docker exec -it my_ubuntu ls /usr/lib/R/site-library
+  - docker exec -it my_ubuntu ls /usr/lib/R/library
+  
+script:
+  # We need to be in inst/misc directory because travis_wait generates a file that R CHECK will complain about.
+  - cd inst/misc
+  - travis_wait 60 sleep infinity & docker exec -it my_ubuntu Rscript "/home/work/inst/misc/travis_checks.R"

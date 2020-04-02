@@ -24,7 +24,7 @@
 Concatenation of a \link{geom_line} value and optionally a \link{geom_ribbon} value.
 }
 \description{
-This geom serves to visualize \code{prediction} objects which usually results from a call to 
+This geom serves to visualize \code{prediction} objects which usually results from a call to
 \link{predict.bru}. Predictions objects provide summary statistics (mean, median, sd, ...) for
 one or more random variables. For single variables (or if requested so by setting \code{bar = TRUE}),
 a boxplot-style geom is constructed to show the statistics. For multivariate predictions the
@@ -44,7 +44,7 @@ input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
 
 # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
-fit <- bru(y ~ x, "gaussian", input.df)
+fit <- bru(y ~ x, family = "gaussian", data = input.df)
 
 # Predict posterior statistics of 'x'
 

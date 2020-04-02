@@ -45,7 +45,7 @@ pcmatern <- inla.spde2.pcmatern(gorillas$mesh,
                                 prior.range = c(5, 0.01))
 
 cmp <- coordinates ~ vegetation(map = gorillas$gcov$vegetation, model = "factor") +
-  spde(map = coordinates, model = pcmatern, mesh = gorillas$mesh) -
+  spde(map = coordinates, model = pcmatern) -
   Intercept
 
 fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
@@ -115,7 +115,7 @@ vm.int
 }
 }
 \references{
-Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017. 
+Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017.
 Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales.
 \url{https://arxiv.org/abs/1604.06013}
 }

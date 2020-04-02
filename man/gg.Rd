@@ -16,7 +16,7 @@ The form of the value returned by gg depends on the class of its argument. See t
 }
 \description{
 gg is a generic function for generating geomes from various kinds of spatial objects, e.g. Spatial* data,
-meshes, Raster objects and inla/inlabru predictions. The function invokes particular methods which depend 
+meshes, Raster objects and inla/inlabru predictions. The function invokes particular methods which depend
 on the \link{class} of the first argument.
 }
 \examples{
