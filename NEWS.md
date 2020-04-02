@@ -1,10 +1,14 @@
-# inlabru 2.1.12.999
+# inlabru 2.1.13.999
 
 * Add random seed option for posterior sampling
 
 * Add package unit testing
 
 * New backend code to make extended feature support easier
+
+# inlabru 2.1.13
+
+* Fix CRAN complaint regarding documentation
 
 # inlabru 2.1.12
 
