@@ -461,7 +461,7 @@ integration_weight_construction <- function(mesh, inter) {
 #' @param nsub number of subdivision points along each triangle edge, giving
 #'    \code{(nsub + 1)^2} proto-integration points used to compute
 #'   the vertex weights
-#'   (default \code{9}, giving 100 proto-integration points)
+#'   (default \code{NULL=9}, giving 100 proto-integration points)
 #' @return \code{list} with elements \code{loc} and \code{weight} with
 #'   one integration point for each mesh vertex of triangles overlapping
 #'   the integration domain
@@ -517,10 +517,12 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 #' @param mesh An inla.mesh object
 #' @param loc Locations defining the polygons
 #' @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
+#' @param method Which integration method to use
+#' @param ... Arguments passed to the different integration methods (\code{ipoints})
 #' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}> and Finn Lindgren <\email{finn.lindgren@@gmail.com}>
 #' @keywords internal
 
-int.polygon = function(mesh, loc, group = NULL, nsub = NULL){
+int.polygon <- function(mesh, loc, group = NULL, method = "stable", ...){
   if (is.null(group)) {
     group <- rep(1, nrow(loc))
   }
@@ -532,10 +534,9 @@ int.polygon = function(mesh, loc, group = NULL, nsub = NULL){
     # Combine polygon with mesh boundary to get mesh covering the intersection.
     bnd <- INLA::inla.mesh.segment(loc = gloc, is.bnd = TRUE)
 
-    method <- "stable"
     inter <- list(loc = matrix(0, 0, 3), weight = numeric(0))
     if (method == "stable") {
-      inter <- make_stable_integration_points(mesh, bnd,nsub = nsub)
+      inter <- make_stable_integration_points(mesh, bnd, ...)
     } else {
       # Create intersection mesh
       mesh_inter <- intersection_mesh(mesh, bnd)

@@ -33,6 +33,7 @@
 #' @param name Character array stating the name of the domains dimension(s)
 #' @param group Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged by the projection.
 #' @param project If TRUE, project the integration points to mesh vertices
+#' @param ... Arguments passed to the integration methods (through the function \code{int.polygon})
 #'
 #' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
 #'
@@ -79,8 +80,8 @@
 #' }
 #' }
 #'
-ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, project, nsub = NULL) {
-  pregroup = NULL
+ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, project, ...) {
+  pregroup <- NULL
   
   # If region is null treat domain as the region definition
   if (is.null(region)) {
@@ -223,7 +224,7 @@ ipoints = function(region = NULL, domain = NULL, name = "x", group = NULL, proje
         domain <- stransform(domain, crs = CRS("+proj=cea +units=km"))
       }
     }
-    ips = int.polygon(domain, loc = polyloc[, 1:2], group = polyloc[, 3], nsub = nsub)
+    ips <- int.polygon(domain, loc = polyloc[, 1:2], group = polyloc[, 3], ...)
     df <- data.frame(region@data[ips$group, pregroup, drop = FALSE],
       weight = ips[, "weight"]
     )
