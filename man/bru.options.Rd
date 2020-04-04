@@ -6,7 +6,8 @@
 \usage{
 bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
   result = NULL, E = 1, Ntrials = 1, control.compute = list(),
-  control.inla = list(), control.fixed = list(), ...)
+  control.inla = list(), control.fixed = list(),
+  int.args = list(method = "stable", nsub = NULL), ...)
 }
 \arguments{
 \item{mesh}{An \code{inla.mesh} object for spatial models without SPDE
@@ -39,6 +40,9 @@ due to how inlabru currently constructs the \code{inla()}, the \code{mean},
 effect. Until a more elegant alterative has been implemented, use explicit
 \code{mean.linear} and \code{prec.linear} specifications in each
 \code{model="linear"} component instead.}
+
+\item{int.args}{List of arguments passed all the way to the integration method
+\code{ipoints} and \code{int.polygon} for 'cp' family models}
 
 \item{...}{Additional options passed on to \code{INLA::inla}}
 }
