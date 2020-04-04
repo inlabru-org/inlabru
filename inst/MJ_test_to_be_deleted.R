@@ -43,11 +43,6 @@ win <- spatstat::owin(range(region.coords[,1]),range(region.coords[,2]))
 lg.s = spatstat::rpoispp(lambda=1,win=win)
 obs = sp::SpatialPoints(cbind(x=lg.s$x,y=lg.s$y))
 
-#lg.s <- spatstat::rLGCP('matern', mu = 0,nu=1,win=win)
-#Lam = attr(lg.s, 'Lambda')
-#rf.s = log(Lam$v)
-#fields::image.plot(rf.s)
-
 # Just use default matern prior
 matern = INLA::inla.spde2.matern(mesh)
 
@@ -55,10 +50,20 @@ matern = INLA::inla.spde2.matern(mesh)
 cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 
 # Fit default model
+set.seed(123)
 mod_default = lgcp(cmp,data = obs,samplers = region.polygon)
+set.seed(1234)
+mod_default_2 = lgcp(cmp,data = obs,samplers = region.polygon)
+all.equal(mod_default$summary.fixed,mod_default_2$summary.fixed)
+
+# Unfortunatly, I am not able to get reproducable results running lgcp, so the 
+# below comparison does not make sense, but I include it anyway.
+# IS there a way to get reprocucable results with lgcp? I can't find an appropriate
+# seed argumentinl
 
 # Fit model with nsub_20
-mod_nsub_20 = lgcp(cmp,data= obs, samplers = region.polygon,options=nsub_20_options)
+set.seed(123)
+mod_nsub_20 = lgcp(cmp,data= obs, samplers = region.polygon,options=bru.options(nsub_20_options))
 
 mod_default$summary.fixed
 mod_nsub_20$summary.fixed
@@ -85,34 +90,3 @@ range(mod_nsub_20$summary.random$mySmooth$sd)
 #> range(mod_nsub_20$summary.random$mySmooth$sd)
 #[1] 0.2011438 0.7526814
 
-
-# Predict the spatial intensity surfaces
-# increasing the number of samples to make sure differences are not due to randomness in sampling
-lambda_default <- predict(mod_default, pixels(mesh), ~ exp(mySmooth + Intercept),n.samples = 10000)
-lambda_nsub_20 <- predict(mod_nsub_20, pixels(mesh), ~ exp(mySmooth + Intercept),n.samples = 10000)
-
-# Summaries of the mean fields. Just showing that these are different
-summary(lambda_default$mean)
-summary(lambda_nsub_20$mean)
-#> summary(lambda_default$mean)
-#Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#0.8642  0.8779  0.8868  0.8990  0.9134  0.9863 
-#> summary(lambda_nsub_20$mean)
-#Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#0.8701  0.8863  0.8937  0.9081  0.9182  1.0390 
-
-
-# Visualizing how different these mean fields may be 
-lambda_mean_diff = lambda_default
-lambda_mean_diff$diffmean = lambda_default$mean - lambda_nsub_20$mean
-
-lim = max(abs(range(lambda_mean_diff$diffmean)))
-
-gg1 = ggplot()+  gg(lambda_default)+gg(region.polygon)+gg(mesh)+gg(obs) + ggtitle("Mean field default")
-gg2 = ggplot()+  gg(lambda_nsub_20)+gg(region.polygon)+gg(mesh)+gg(obs) + ggtitle("Mean field nsub_20")
-gg3 = ggplot()+  gg(lambda_mean_diff,aes(fill=diffmean))+gg(region.polygon)+gg(mesh)+gg(obs) +
-  scale_fill_gradientn(colors = c("red","white","green"),limits = c(-lim,lim)) +
-  ggtitle("Mean field difference (default - nsub_20)")
-
-gridExtra::grid.arrange(gg1,gg2,gg3,ncol=2)
-  
