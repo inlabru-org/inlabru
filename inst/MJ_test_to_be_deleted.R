@@ -12,18 +12,18 @@ region.points = sp::SpatialPoints(coords=region.coords)
 region.polygon = sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(coords=region.coords)),'0')))
 mesh = INLA::inla.mesh.2d(loc.domain = region.points,max.edge = 1,offset = 1)
 
-nsub_20_options = list(int.args=list(method="stable",nsub=19))
-
+nsub_20_int_args = list(method="stable",nsub=10)
+nsub_20_options = bru.options(int.args = nsub_20_int_args)
 
 # Default integration scheme
 ips_default <- ipoints(region = region.polygon,domain = mesh)
 ggplot()+gg(region.polygon)+gg(mesh)  + gg(ips_default, aes(size = weight))
 
 # More points spread in each triangle as part of the stable integration method than default (nsub=9)
-ips_nsub20 <- ipoints(region = region.polygon,domain = mesh,int.args = nsub_20_options$int.args)
+ips_nsub20 <- ipoints(region = region.polygon,domain = mesh,int.args = nsub_20_int_args)
 #ggplot()+gg(region.polygon)+gg(mesh)  + gg(ips_nsub20, aes(size = weight))
 
-# Checking that integration poitns are identical
+# Checking that integration points are identical
 all.equal(coordinates(ips_default),coordinates(ips_nsub20))
 
 # Plotting the difference between the methods
@@ -52,18 +52,22 @@ cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 # Fit default model
 set.seed(123)
 mod_default = lgcp(cmp,data = obs,samplers = region.polygon)
-set.seed(1234)
+
+# Checking reproducability
+set.seed(123)
 mod_default_2 = lgcp(cmp,data = obs,samplers = region.polygon)
 all.equal(mod_default$summary.fixed,mod_default_2$summary.fixed)
 
 # Unfortunatly, I am not able to get reproducable results running lgcp, so the 
 # below comparison does not make sense, but I include it anyway.
 # IS there a way to get reprocucable results with lgcp? I can't find an appropriate
-# seed argumentinl
+# seed argument which can be passed to lgcp() through bru.options or similar
 
 # Fit model with nsub_20
 set.seed(123)
-mod_nsub_20 = lgcp(cmp,data= obs, samplers = region.polygon,options=bru.options(nsub_20_options))
+mod_nsub_20 = lgcp(cmp,data= obs, samplers = region.polygon,options=nsub_20_options)
+mod_nsub_20 = lgcp(cmp,data= obs, samplers = region.polygon,options=bru.options())
+
 
 mod_default$summary.fixed
 mod_nsub_20$summary.fixed
