@@ -10,7 +10,8 @@
 \alias{countdata3a}
 \alias{countdata3b}
 \title{1-Dimensional NonHomogeneous Poisson example.}
-\format{The data contain the following \code{R} objects:
+\format{
+The data contain the following \code{R} objects:
  \describe{
    \item{\code{lambda3_1D}:}{ A function defining the intensity function of a
    nonhomogeneous Poisson process. Note that this function is only defined on
@@ -27,7 +28,8 @@
      \item{\code{count}}{ The number of detections in the cell.}
      \item{\code{exposure}}{ The width of the cell.}
    }
- }}
+ }
+}
 \usage{
 data(Poisson3_1D)
 }

@@ -4,8 +4,7 @@
 \alias{sline}
 \title{Convert data frame to SpatialLinesDataFrame}
 \usage{
-sline(data, start.cols, end.cols, crs = CRS(as.character(NA)),
-  to.crs = NULL)
+sline(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.crs = NULL)
 }
 \arguments{
 \item{data}{A data.frame}

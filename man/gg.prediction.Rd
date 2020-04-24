@@ -4,8 +4,7 @@
 \alias{gg.prediction}
 \title{Geom for predictions}
 \usage{
-\method{gg}{prediction}(data, mapping = NULL, ribbon = TRUE,
-  alpha = 0.3, bar = FALSE, ...)
+\method{gg}{prediction}(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar = FALSE, ...)
 }
 \arguments{
 \item{data}{A prediction object, usually the result of a \link{predict.bru} call.}
@@ -90,7 +89,7 @@ plot(xipost)
 
 # This type of plot will show a ribbon around the mean, which viszualizes the upper and lower
 # quantiles mentioned above (2.5 and 97.5\%). Plotting the ribbon can be turned of using the
-# \\code{ribbon} parameter
+# \code{ribbon} parameter
 
 ggplot() + gg(xipost, ribbon = FALSE)
 
@@ -104,8 +103,10 @@ ggplot() +
 }
 }
 \seealso{
-Other geomes for inla and inlabru predictions: \code{\link{gg.data.frame}},
-  \code{\link{gg.matrix}}, \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for inla and inlabru predictions: 
+\code{\link{gg.data.frame}()},
+\code{\link{gg.matrix}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for inla and inlabru predictions}

@@ -4,9 +4,19 @@
 \alias{component.character}
 \title{inlabru latent model component construction using parameters}
 \usage{
-\method{component}{character}(object, data, model, map, n = NULL,
-  season.length = NULL, group = NULL, replicate = NULL,
-  values = NULL, A.msk = NULL, ...)
+\method{component}{character}(
+  object,
+  data,
+  model,
+  map,
+  n = NULL,
+  season.length = NULL,
+  group = NULL,
+  replicate = NULL,
+  values = NULL,
+  A.msk = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{A string giving the component its name}
@@ -55,8 +65,9 @@ if (require("INLA", quietly = TRUE)) {
 
 }
 \seealso{
-Other Component constructor: \code{\link{component.formula}},
-  \code{\link{component}}
+Other Component constructor: 
+\code{\link{component.formula}()},
+\code{\link{component}()}
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>

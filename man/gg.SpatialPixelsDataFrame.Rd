@@ -4,8 +4,7 @@
 \alias{gg.SpatialPixelsDataFrame}
 \title{Geom for SpatialPixelsDataFrame objects}
 \usage{
-\method{gg}{SpatialPixelsDataFrame}(data, mapping = NULL, alpha = NULL,
-  crs = NULL, mask = NULL, ...)
+\method{gg}{SpatialPixelsDataFrame}(data, mapping = NULL, alpha = NULL, crs = NULL, mask = NULL, ...)
 }
 \arguments{
 \item{data}{A SpatialPixelsDataFrame object.}
@@ -77,11 +76,13 @@ ggplot() + gg(mexdolphin$points, aes(size = size))
 }
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
-  \code{\link{gg.SpatialLines}},
-  \code{\link{gg.SpatialPixels}},
-  \code{\link{gg.SpatialPoints}},
-  \code{\link{gg.SpatialPolygons}}, \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for spatial data: 
+\code{\link{gg.SpatialGridDataFrame}()},
+\code{\link{gg.SpatialLines}()},
+\code{\link{gg.SpatialPixels}()},
+\code{\link{gg.SpatialPoints}()},
+\code{\link{gg.SpatialPolygons}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for spatial data}

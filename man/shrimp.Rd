@@ -4,7 +4,8 @@
 \name{shrimp}
 \alias{shrimp}
 \title{Blue and red shrimp in the Western Mediterranean Sea}
-\format{A list of objects:
+\format{
+A list of objects:
  \describe{
    \item{\code{haul}:}{ A \code{SpatialPointsDataFrame} object containing haul locations}
    \item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation
@@ -14,7 +15,8 @@
       \item{\code{landing}}{Landing in Kg.}
       \item{\code{depth}}{Mean depth of the fishery haul.}
     }
- }}
+ }
+}
 \source{
 Pennino, Maria Grazia. Personal communication.
 }

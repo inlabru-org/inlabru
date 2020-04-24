@@ -4,8 +4,7 @@
 \alias{predict.bru}
 \title{Prediction from fitted bru model}
 \usage{
-\method{predict}{bru}(object, data = NULL, formula = NULL,
-  n.samples = 100, seed = 0L, ...)
+\method{predict}{bru}(object, data = NULL, formula = NULL, n.samples = 100, seed = 0L, ...)
 }
 \arguments{
 \item{object}{An object obtained by calling \link{bru} or \link{lgcp}.}
@@ -83,7 +82,7 @@ plot(rbind(icpt, exp.icpt), bar = TRUE)
 # The intercept is special in the sense that it does not depend on other variables
 # or covariates. However, this is not true for the smooth spatial effects 'mySmooth'.
 # In order to predict 'mySmooth' we have to define where (in space) to predict. For
-# this purpose, the second argument of the predict function can take \\code{data.frame}
+# this purpose, the second argument of the predict function can take \code{data.frame}
 # objects as well as Spatial objects. For instance, we might want to predict
 # 'mySmooth' at the locations of the mesh vertices. Using
 

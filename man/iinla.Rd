@@ -4,9 +4,17 @@
 \alias{iinla}
 \title{Iterated INLA}
 \usage{
-iinla(data, model, lhoods, n = 10, result = NULL, family,
+iinla(
+  data,
+  model,
+  lhoods,
+  n = 10,
+  result = NULL,
+  family,
   iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"),
-  offset = NULL, inla.options)
+  offset = NULL,
+  inla.options
+)
 }
 \arguments{
 \item{data}{A data.frame}

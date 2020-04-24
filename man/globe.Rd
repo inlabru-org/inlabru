@@ -4,8 +4,16 @@
 \alias{globe}
 \title{Plot a globe using rgl}
 \usage{
-globe(R = 1, R.grid = 1.05, specular = "black", axes = FALSE,
-  box = FALSE, xlab = "", ylab = "", zlab = "")
+globe(
+  R = 1,
+  R.grid = 1.05,
+  specular = "black",
+  axes = FALSE,
+  box = FALSE,
+  xlab = "",
+  ylab = "",
+  zlab = ""
+)
 }
 \arguments{
 \item{R}{Radius of the globe}
@@ -53,8 +61,10 @@ glplot(mexdolphin$points)
 }
 }
 \seealso{
-Other inlabru RGL tools: \code{\link{glplot.SpatialLines}},
-  \code{\link{glplot.SpatialPoints}},
-  \code{\link{glplot.inla.mesh}}, \code{\link{glplot}}
+Other inlabru RGL tools: 
+\code{\link{glplot.SpatialLines}()},
+\code{\link{glplot.SpatialPoints}()},
+\code{\link{glplot.inla.mesh}()},
+\code{\link{glplot}()}
 }
 \concept{inlabru RGL tools}

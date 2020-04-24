@@ -75,8 +75,9 @@ eff <- component(~ myLinearEffectOfX(map = x, model = "linear"))
 summary(eff[[1]])
 }
 \seealso{
-Other Component constructor: \code{\link{component.character}},
-  \code{\link{component}}
+Other Component constructor: 
+\code{\link{component.character}()},
+\code{\link{component}()}
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>

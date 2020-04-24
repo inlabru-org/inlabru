@@ -4,9 +4,19 @@
 \alias{like}
 \title{Likelihood construction for usage with \link{bru}}
 \usage{
-like(family, formula = . ~ ., data = NULL, components = NULL,
-  mesh = NULL, E = NULL, Ntrials = NULL, samplers = NULL,
-  ips = NULL, domain = NULL, options = list())
+like(
+  family,
+  formula = . ~ .,
+  data = NULL,
+  components = NULL,
+  mesh = NULL,
+  E = NULL,
+  Ntrials = NULL,
+  samplers = NULL,
+  ips = NULL,
+  domain = NULL,
+  options = list()
+)
 }
 \arguments{
 \item{family}{A string identifying a valid \code{INLA::inla} likelihood family. The default is

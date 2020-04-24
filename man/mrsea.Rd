@@ -4,7 +4,8 @@
 \name{mrsea}
 \alias{mrsea}
 \title{Marine renewables strategic environmental assessment}
-\format{A list of objects:
+\format{
+A list of objects:
  \describe{
    \item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
    XXXXX.}
@@ -15,7 +16,8 @@
    \item{\code{boundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
    survey region.}
    \item{\code{covar}:}{ An \code{SpatialPointsDataFrame} containing sea depth estimates.}
- }}
+ }
+}
 \source{
 Library \code{MRSea}.
 }

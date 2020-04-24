@@ -4,8 +4,10 @@
 \alias{import.seals}
 \title{Seal pup edata import}
 \usage{
-import.seals(sealfile = "WestIce2012.csv",
-  icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif")
+import.seals(
+  sealfile = "WestIce2012.csv",
+  icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif"
+)
 }
 \arguments{
 \item{sealfile}{Character pointing to the file containing the seal counts and photo locations}

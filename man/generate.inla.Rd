@@ -47,8 +47,9 @@ if (require("INLA", quietly = TRUE)) {
 \seealso{
 \link{predict.inla}
 
-Other sample generators: \code{\link{generate.bru}},
-  \code{\link{generate}}
+Other sample generators: 
+\code{\link{generate.bru}()},
+\code{\link{generate}()}
 }
 \author{
 Finn Lindgren <\email{finn.lindgren@gmail.com}>

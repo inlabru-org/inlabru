@@ -25,8 +25,10 @@ A <- matrix(runif(100), nrow = 10)
 ggplot() + gg(A)
 }
 \seealso{
-Other geomes for inla and inlabru predictions: \code{\link{gg.data.frame}},
-  \code{\link{gg.prediction}}, \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for inla and inlabru predictions: 
+\code{\link{gg.data.frame}()},
+\code{\link{gg.prediction}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for inla and inlabru predictions}
