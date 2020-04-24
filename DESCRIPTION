@@ -25,6 +25,7 @@ Description: Facilitates spatial modeling using integrated nested Laplace approx
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.1.0
+Encoding: UTF-8
 Depends:
     ggplot2,
     methods,
@@ -54,4 +55,3 @@ Suggests:
     spatstat.data,
     sphereplot,
     testthat
-Encoding: UTF-8
