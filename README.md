@@ -9,11 +9,10 @@
 Status](https://travis-ci.org/fbachl/inlabru.svg?branch=devel)](https://travis-ci.org/fbachl/inlabru)
 [![CRAN
 Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
-[![R build
-status](https://github.com/fbachl/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/fbachl/inlabru/actions)
-[![R code coverage
-status](https://github.com/fbachl/inlabru/workflows/test-coverage/badge.svg)](https://github.com/fbachl/inlabru/actions)
-\[<!-- badges: end -->
+<!--
+[![R build status](https://github.com/fbachl/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/fbachl/inlabru/actions)
+[![R code coverage status](https://github.com/fbachl/inlabru/workflows/test-coverage/badge.svg)](https://github.com/fbachl/inlabru/actions)
+--> <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
 modeling using integrated nested Laplace approximation via the [R-INLA
@@ -55,17 +54,10 @@ This is a basic example which shows you how fit a simple spatial Log
 Gaussian Cox Process (LGCP) and predicts its intensity:
 
 ``` r
+if (interactive()) {
 # Load libraries
 library(inlabru)
-#> Loading required package: sp
-#> Loading required package: ggplot2
 library(INLA)
-#> Loading required package: Matrix
-#> Loading required package: parallel
-#> Loading required package: foreach
-#> This is INLA_20.04.18 built 2020-04-24 13:46:03 UTC.
-#> See www.r-inla.org/contact-us for how to get help.
-#> To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
 
 # Load the data
@@ -90,6 +82,5 @@ ggplot() +
   gg(lambda) +
   gg(gorillas$nests, color = "red", size = 0.2) +
   coord_equal()
+}
 ```
-
-<img src="man/figures/README-example-1.png" width="100%" />

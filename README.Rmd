@@ -18,9 +18,11 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![Travis Build Status](https://travis-ci.org/fbachl/inlabru.svg?branch=devel)](https://travis-ci.org/fbachl/inlabru)
 [![CRAN Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
+<!--
 [![R build status](https://github.com/fbachl/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/fbachl/inlabru/actions)
 [![R code coverage status](https://github.com/fbachl/inlabru/workflows/test-coverage/badge.svg)](https://github.com/fbachl/inlabru/actions)
-[<!-- badges: end -->
+-->
+<!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial modeling using integrated nested Laplace approximation via the [R-INLA package](http://www.r-inla.org). Additionally, implements a log Gaussian Cox process likelihood for modeling univariate and spatial point processes based on ecological survey data. See Yuan Yuan, 
 Fabian E. Bachl, Finn Lindgren, David L. Borchers, Janine B. Illian, Stephen T. Buckland, Havard Rue, 
@@ -54,6 +56,7 @@ This is a basic example which shows you how fit a simple spatial Log Gaussian Co
 and predicts its intensity:
 
 ```{r example}
+if (interactive()) {
 # Load libraries
 library(inlabru)
 library(INLA)
@@ -81,4 +84,5 @@ ggplot() +
   gg(lambda) +
   gg(gorillas$nests, color = "red", size = 0.2) +
   coord_equal()
+}
 ```
