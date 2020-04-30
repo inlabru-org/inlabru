@@ -12,8 +12,9 @@ region.points = sp::SpatialPoints(coords=region.coords)
 region.polygon = sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(coords=region.coords)),'0')))
 mesh = INLA::inla.mesh.2d(loc.domain = region.points,max.edge = 1,offset = 1)
 
-nsub_400_options = list(int.args=list(method="stable",nsub=19))
-
+nsub_400_options = list(int.args=list(method="stable",nsub=19),
+                        num.threads=1, blas.num.threads=1)
+reproduce_options = list(num.threads=1, blas.num.threads=1)
 
 # Default integration scheme
 ips_default <- ipoints(region = region.polygon,domain = mesh)
@@ -52,60 +53,71 @@ cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 # Fit default model
 set.seed(123)
 start_default = proc.time()
-mod_default = lgcp(cmp,data = obs,samplers = region.polygon)
+mod_default = lgcp(cmp,data = obs,samplers = region.polygon,options=reproduce_options)
 proc.time()-start_default
 #user  system elapsed 
-#5.052   5.866   1.665 
+#1.953   0.353   2.306 
 
 
 # Checking reproducability
 set.seed(123)
-mod_default_2 = lgcp(cmp,data = obs,samplers = region.polygon)
+mod_default_2 = lgcp(cmp,data = obs,samplers = region.polygon,options=reproduce_options)
 all.equal(mod_default$summary.fixed,mod_default_2$summary.fixed)
+#TRUE
 
-# Unfortunatly, I am not able to get reproducable results running lgcp, so the 
-# below comparison does not make sense, but I include it anyway.
-# IS there a way to get reprocucable results with lgcp? I can't find an appropriate
-# seed argument which can be passed to lgcp() through bru.options or similar
-
-# Fit model with nsub_20
+# Fit model with nsub_400
 set.seed(123)
 start_400 = proc.time()
 mod_nsub_400 = lgcp(cmp,data= obs, samplers = region.polygon,options=nsub_400_options)
 proc.time()-start_400
 #user  system elapsed 
-#4.868   6.659   1.772 
+#1.998   0.377   2.375 
 
-nsub_900_options = list(int.args=list(method="stable",nsub=29))
+# Fit with nsub_900
+nsub_900_options = list(int.args=list(method="stable",nsub=29),
+                        num.threads=1, blas.num.threads=1)
 set.seed(123)
 start_900 = proc.time()
 mod_nsub_900 = lgcp(cmp,data= obs, samplers = region.polygon,options=nsub_900_options)
 proc.time()-start_900
 #user  system elapsed 
-#5.258   5.621   2.129 
+#2.385   0.473   2.856 
 
 mod_default$summary.fixed
 mod_nsub_400$summary.fixed
+mod_nsub_900$summary.fixed
+
 #> mod_default$summary.fixed
-#mean        sd 0.025quant   0.5quant 0.975quant       mode        kld
-#Intercept -0.141376 0.4902942 -0.8431297 -0.1280812  0.4278482 -0.1093226 0.07765077
+#mean        sd 0.025quant   0.5quant 0.975quant       mode         kld
+#Intercept -0.1356498 0.2237671  -0.598403 -0.1270052  0.2777677 -0.1095957 2.06608e-05
 #> mod_nsub_400$summary.fixed
-#mean        sd 0.025quant   0.5quant 0.975quant       mode        kld
-#Intercept -0.1414562 0.4934652 -0.8422086 -0.1281776  0.4319441 -0.1094175 0.09025917
+#mean        sd 0.025quant   0.5quant 0.975quant       mode         kld
+#Intercept -0.1357184 0.2237489 -0.5984426 -0.1270741  0.2776714 -0.1096651 2.05794e-05
+#> mod_nsub_900$summary.fixed
+#mean        sd 0.025quant   0.5quant 0.975quant       mode          kld
+#Intercept -0.1357376 0.2237433  -0.598453 -0.1270934  0.2776439 -0.1096847 2.055263e-05
 
 
 range(mod_default$summary.random$mySmooth$mean)
 range(mod_nsub_400$summary.random$mySmooth$mean)
+range(mod_nsub_900$summary.random$mySmooth$mean)
+
 #> range(mod_default$summary.random$mySmooth$mean)
-#[1] -0.05809279  0.08567435
+#[1] -0.01471897  0.03742867
 #> range(mod_nsub_400$summary.random$mySmooth$mean)
-#[1] -0.05841278  0.08915449
+#[1] -0.01471391  0.03736488
+#> range(mod_nsub_900$summary.random$mySmooth$mean)
+#[1] -0.01471252  0.03734367
 
 
 range(mod_default$summary.random$mySmooth$sd)
 range(mod_nsub_400$summary.random$mySmooth$sd)
+range(mod_nsub_900$summary.random$mySmooth$sd)
+
 #> range(mod_default$summary.random$mySmooth$sd)
-#[1] 0.2039991 0.7429675
+#[1] 0.06702159 0.27098332
 #> range(mod_nsub_400$summary.random$mySmooth$sd)
-#[1] 0.2011438 0.7526814
+#[1] 0.0681257 0.2708596
+#> range(mod_nsub_900$summary.random$mySmooth$sd)
+#[1] 0.06157466 0.27083319
 
