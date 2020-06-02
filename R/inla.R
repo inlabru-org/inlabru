@@ -1,5 +1,5 @@
 bru_standardise_names <- function(x) {
-  vapply(x, gsub("[-() ]", "_", x = x, fixed = FALSE), "name")
+  vapply(x, function(x) gsub("[-() ]", "_", x = x, fixed = FALSE), "name")
 }
 
 
