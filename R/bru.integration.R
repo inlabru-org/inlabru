@@ -195,7 +195,7 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, proj
                                          data = data.frame(weight = rep(1, length(region))),
                                          match.ID = FALSE
       )
-    } else if (is.null(region@data[["weight"]]) {
+    } else if (is.null(region@data[["weight"]])) {
       region@data[["weight"]] <- 1
     }
     
