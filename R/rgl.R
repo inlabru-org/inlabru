@@ -96,8 +96,9 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
     object <- ll
   }
 
-  object <- spTransform(object, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
+  object <- spTransform(object, CRSobj = CRS("+proj=geocent +ellps=sphere"))
   cc <- coordinates(object)
+  cc <- cc / rowSums(cc^2)^0.5
   requireNamespace("rgl")
   rgl::rgl.points(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
 }
