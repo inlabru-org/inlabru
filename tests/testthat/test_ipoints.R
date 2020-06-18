@@ -1,5 +1,7 @@
 context("Integration point construction (test_ipoints.R)")
-library(INLA)
+library(rgdal)
+rgdal::set_rgdal_show_exportToProj4_warnings(FALSE)
+rgdal::set_thin_PROJ6_warnings(TRUE)
 
 test_that("1D integration points can be generated", {
   ips <- ipoints(c(0, 10), 3, name = "myDim")
@@ -28,6 +30,7 @@ test_that("conversion of 1D mesh to integration points", {
 
 test_that("conversion of SpatialPolygon to integration points", {
   data(gorillas, package = "inlabru")
+  gorillas <- gorillas_update_CRS_to_PROJ6(gorillas)
   ips <- ipoints(gorillas$boundary)
 
   expect_is(ips, "SpatialPointsDataFrame")
@@ -38,6 +41,7 @@ test_that("conversion of SpatialPolygon to integration points", {
 
 test_that("conversion of SpatialPolygon to integration points when domain is defined via a mesh", {
   data(gorillas, package = "inlabru")
+  gorillas <- gorillas_update_CRS_to_PROJ6(gorillas)
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
 
   expect_is(ips, "SpatialPointsDataFrame")
@@ -47,6 +51,7 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
 
 test_that("conversion of 2D mesh to integration points", {
   data(gorillas, package = "inlabru")
+  gorillas <- gorillas_update_CRS_to_PROJ6(gorillas)
   ips <- ipoints(gorillas$mesh)
 
   expect_is(ips, "SpatialPointsDataFrame")

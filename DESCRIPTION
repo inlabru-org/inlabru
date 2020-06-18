@@ -42,7 +42,7 @@ Suggests:
     dplyr,
     ggmap,
     graphics,
-    INLA,
+    INLA (>= 20.06.18),
     knitr,
     maptools,
     mgcv,

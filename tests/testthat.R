@@ -4,6 +4,7 @@
 if (require("INLA", quietly = TRUE)) {
   library(testthat)
   library(INLA)
+  library(rgdal)
 
   test_check("inlabru")
 }
