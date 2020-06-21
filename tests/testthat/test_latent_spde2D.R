@@ -28,7 +28,11 @@ latent_spde2D_group_testdata <- function() {
   # domain is represented in metres, and has been seen to produce
   # different results on different systems (e.g. Travis CI).
   # Transform m to km:
-  crs_km <- inla.CRS("+proj=utm +zone=32 +ellps=WGS84 +units=km")
+#  if (inla.has_PROJ6()) {
+#    crs_km <- inla.crs_set_lengthunit(mrsea$mesh$crs, "kilometres")
+#  } else {
+    crs_km <- inla.CRS("+proj=utm +zone=32 +ellps=WGS84 +units=km")
+#  }
   mrsea$mesh <- inla.spTransform(mrsea$mesh, crs_km)
   mrsea$samplers <- sp::spTransform(mrsea$samplers, crs_km)
 
