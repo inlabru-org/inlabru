@@ -7,8 +7,12 @@
 \usage{
 input_eval(...)
 
-\method{input_eval}{component}(component, part = c("main", "group",
-  "replicate", "weights"), data, ...)
+\method{input_eval}{component}(
+  component,
+  part = c("main", "group", "replicate", "weights"),
+  data,
+  ...
+)
 }
 \arguments{
 \item{...}{Unused.}

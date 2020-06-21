@@ -5,8 +5,15 @@
 \alias{evaluate}
 \title{Evaluate or sample from a posterior result given a model and locations}
 \usage{
-\method{evaluate}{model}(model, result, data, predictor = NULL,
-  property = "mode", n = 1, seed = 0L)
+\method{evaluate}{model}(
+  model,
+  result,
+  data,
+  predictor = NULL,
+  property = "mode",
+  n = 1,
+  seed = 0L
+)
 }
 \arguments{
 \item{model}{An \link{inlabru} \link{model}}

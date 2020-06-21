@@ -4,10 +4,21 @@
 \alias{gg.inla.mesh}
 \title{Geom for inla.mesh objects}
 \usage{
-\method{gg}{inla.mesh}(data, color = NULL, alpha = NULL,
-  edge.color = "grey", interior = TRUE, int.color = "blue",
-  exterior = TRUE, ext.color = "black", crs = NULL, mask = NULL,
-  nx = 500, ny = 500, ...)
+\method{gg}{inla.mesh}(
+  data,
+  color = NULL,
+  alpha = NULL,
+  edge.color = "grey",
+  interior = TRUE,
+  int.color = "blue",
+  exterior = TRUE,
+  ext.color = "black",
+  crs = NULL,
+  mask = NULL,
+  nx = 500,
+  ny = 500,
+  ...
+)
 }
 \arguments{
 \item{data}{An \link[INLA]{inla.mesh} object.}
@@ -76,7 +87,9 @@ ggplot() +
 }
 }
 \seealso{
-Other geomes for meshes: \code{\link{gg.inla.mesh.1d}},
-  \code{\link{gg}}, \code{\link{gm}}
+Other geomes for meshes: 
+\code{\link{gg.inla.mesh.1d}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for meshes}

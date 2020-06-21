@@ -4,7 +4,8 @@
 \name{gorillas}
 \alias{gorillas}
 \title{Gorilla nesting sites}
-\format{The data are a list that contains these elements:
+\format{
+The data are a list that contains these elements:
  \describe{
    \item{\code{nests}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
    the gorilla nests.}
@@ -38,7 +39,8 @@
      \item{\code{nests}}{ A \code{SpatialPointsDataFrame} giving the locations of each detected nest.}
    }
    }
- }}
+ }
+}
 \source{
 Library \code{spatstat}.
 }

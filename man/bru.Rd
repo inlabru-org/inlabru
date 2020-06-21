@@ -74,7 +74,7 @@ fit$summary.fixed
   
 # An important addition to the INLA methodology is bru's ability to use
 # non-linear predictors. Such a predictor can be formulated via like()'s 
-# \\code{formula} parameter. For instance
+# \code{formula} parameter. For instance
 
 if (require("INLA", quietly = TRUE)) {
     

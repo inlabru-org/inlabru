@@ -39,9 +39,10 @@ glplot(mexdolphin$points)
 }
 }
 \seealso{
-Other inlabru RGL tools: \code{\link{globe}},
-  \code{\link{glplot.SpatialLines}},
-  \code{\link{glplot.SpatialPoints}},
-  \code{\link{glplot.inla.mesh}}
+Other inlabru RGL tools: 
+\code{\link{globe}()},
+\code{\link{glplot.SpatialLines}()},
+\code{\link{glplot.SpatialPoints}()},
+\code{\link{glplot.inla.mesh}()}
 }
 \concept{inlabru RGL tools}

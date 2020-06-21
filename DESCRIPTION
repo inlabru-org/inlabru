@@ -52,4 +52,4 @@ Depends:
     methods,
     ggplot2,
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0

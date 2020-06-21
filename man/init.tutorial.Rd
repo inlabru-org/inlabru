@@ -20,7 +20,7 @@ bo <- bru.options()
 bo$inla.options$control.inla
 
 # Now, let's run init.tutorial() to make empirical Bayes the default
-# integration method when \\code{bru} calls \\code{inla}
+# integration method when \code{bru} calls \code{inla}
 
 init.tutorial()
 

@@ -4,9 +4,19 @@
 \alias{bru.options}
 \title{Additional \link{bru} options}
 \usage{
-bru.options(mesh = NULL, run = TRUE, max.iter = 10, offset = 0,
-  result = NULL, E = 1, Ntrials = 1, control.compute = list(),
-  control.inla = list(), control.fixed = list(), ...)
+bru.options(
+  mesh = NULL,
+  run = TRUE,
+  max.iter = 10,
+  offset = 0,
+  result = NULL,
+  E = 1,
+  Ntrials = 1,
+  control.compute = list(),
+  control.inla = list(),
+  control.fixed = list(),
+  ...
+)
 }
 \arguments{
 \item{mesh}{An \code{inla.mesh} object for spatial models without SPDE

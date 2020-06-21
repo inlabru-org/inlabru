@@ -4,8 +4,7 @@
 \alias{gg.RasterLayer}
 \title{Geom for RasterLayer objects}
 \usage{
-\method{gg}{RasterLayer}(data, mapping = aes_string(x = "x", y = "y",
-  fill = "layer"), ...)
+\method{gg}{RasterLayer}(data, mapping = aes_string(x = "x", y = "y", fill = "layer"), ...)
 }
 \arguments{
 \item{data}{A RasterLayer object.}
@@ -42,7 +41,8 @@ if (require("spatstat.data", quietly = TRUE) &&
 }
 }
 \seealso{
-Other geomes for Raster data: \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for Raster data: 
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for Raster data}

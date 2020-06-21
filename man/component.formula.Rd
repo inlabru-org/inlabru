@@ -4,7 +4,7 @@
 \alias{component.formula}
 \title{inlabru latent model component construction using formulae}
 \usage{
-\method{component}{formula}(object, lhoods, ...)
+\method{component}{formula}(object, lhoods, envir = NULL, ...)
 }
 \arguments{
 \item{object}{A formula describing latent model components.}
@@ -78,8 +78,9 @@ eff <- component(~ myLinearEffectOfX(x, model = "linear"))
 eff <- component(~ myLinearEffectOfX(x))
 }
 \seealso{
-Other Component constructor: \code{\link{component.character}},
-  \code{\link{component}}
+Other Component constructor: 
+\code{\link{component.character}()},
+\code{\link{component}()}
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>

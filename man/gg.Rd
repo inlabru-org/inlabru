@@ -30,22 +30,29 @@ data(gorillas, package = "inlabru")
 ggplot() + gg(gorillas$boundary) + gg(gorillas$nests)
 }
 \seealso{
-Other geomes for inla and inlabru predictions: \code{\link{gg.data.frame}},
-  \code{\link{gg.matrix}}, \code{\link{gg.prediction}},
-  \code{\link{gm}}
+Other geomes for inla and inlabru predictions: 
+\code{\link{gg.data.frame}()},
+\code{\link{gg.matrix}()},
+\code{\link{gg.prediction}()},
+\code{\link{gm}()}
 
-Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
-  \code{\link{gg.SpatialLines}},
-  \code{\link{gg.SpatialPixelsDataFrame}},
-  \code{\link{gg.SpatialPixels}},
-  \code{\link{gg.SpatialPoints}},
-  \code{\link{gg.SpatialPolygons}}, \code{\link{gm}}
+Other geomes for spatial data: 
+\code{\link{gg.SpatialGridDataFrame}()},
+\code{\link{gg.SpatialLines}()},
+\code{\link{gg.SpatialPixelsDataFrame}()},
+\code{\link{gg.SpatialPixels}()},
+\code{\link{gg.SpatialPoints}()},
+\code{\link{gg.SpatialPolygons}()},
+\code{\link{gm}()}
 
-Other geomes for meshes: \code{\link{gg.inla.mesh.1d}},
-  \code{\link{gg.inla.mesh}}, \code{\link{gm}}
+Other geomes for meshes: 
+\code{\link{gg.inla.mesh.1d}()},
+\code{\link{gg.inla.mesh}()},
+\code{\link{gm}()}
 
-Other geomes for Raster data: \code{\link{gg.RasterLayer}},
-  \code{\link{gm}}
+Other geomes for Raster data: 
+\code{\link{gg.RasterLayer}()},
+\code{\link{gm}()}
 }
 \concept{geomes for Raster data}
 \concept{geomes for inla and inlabru predictions}

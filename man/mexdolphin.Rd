@@ -4,7 +4,8 @@
 \name{mexdolphin}
 \alias{mexdolphin}
 \title{Pan-tropical spotted dolphins in the Gulf of Mexico}
-\format{A list of objects:
+\format{
+A list of objects:
  \describe{
    \item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
    detected dolphin groups, with their size as an attribute.}
@@ -18,7 +19,8 @@
    \emph{simulated} population of dolphin groups. The population was simulated from a 'code{inlabru}
    model fitted to the actual survey data. Note that the simulated data do not have any associated
    size information.}
- }}
+ }
+}
 \source{
 Library \code{dsm}.
 }

@@ -4,9 +4,15 @@
 \alias{iinla}
 \title{Iterated INLA}
 \usage{
-iinla(model, lhoods, n = 10, result = NULL,
+iinla(
+  model,
+  lhoods,
+  n = 10,
+  result = NULL,
   iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"),
-  offset = NULL, inla.options)
+  offset = NULL,
+  inla.options
+)
 }
 \arguments{
 \item{model}{A \link{bru_model} object}

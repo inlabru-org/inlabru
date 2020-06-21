@@ -70,7 +70,7 @@ plot(xipost)
 
 # This type of plot will show a ribbon around the mean, which viszualizes the upper and lower
 # quantiles mentioned above (2.5 and 97.5\%). Plotting the ribbon can be turned of using the
-# \\code{ribbon} parameter
+# \code{ribbon} parameter
 
 ggplot() + gg(xipost, ribbon = FALSE)
 
@@ -84,8 +84,10 @@ ggplot() +
 }
 }
 \seealso{
-Other geomes for inla and inlabru predictions: \code{\link{gg.matrix}},
-  \code{\link{gg.prediction}}, \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for inla and inlabru predictions: 
+\code{\link{gg.matrix}()},
+\code{\link{gg.prediction}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for inla and inlabru predictions}

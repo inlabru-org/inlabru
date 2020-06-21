@@ -4,7 +4,7 @@
 \alias{code.components}
 \title{Convert components to R code}
 \usage{
-code.components(components)
+code.components(components, add = "")
 }
 \arguments{
 \item{components}{A \link{formula} describing latent model components.}

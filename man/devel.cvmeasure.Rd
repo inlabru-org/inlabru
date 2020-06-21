@@ -4,8 +4,7 @@
 \alias{devel.cvmeasure}
 \title{Variance and correlations measures for prediction components}
 \usage{
-devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL,
-  mesh = NULL)
+devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL, mesh = NULL)
 }
 \arguments{
 \item{joint}{A joint \code{prediction} of two latent model components.}

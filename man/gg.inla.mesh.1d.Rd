@@ -4,8 +4,7 @@
 \alias{gg.inla.mesh.1d}
 \title{Geom for inla.mesh.1d objects}
 \usage{
-\method{gg}{inla.mesh.1d}(data, mapping = aes_string("x", "y"), y = 0,
-  shape = 4, ...)
+\method{gg}{inla.mesh.1d}(data, mapping = aes_string("x", "y"), y = 0, shape = 4, ...)
 }
 \arguments{
 \item{data}{An inla.mesh.1d object.}
@@ -50,7 +49,9 @@ if (require("INLA", quietly = TRUE)) {
 
 }
 \seealso{
-Other geomes for meshes: \code{\link{gg.inla.mesh}},
-  \code{\link{gg}}, \code{\link{gm}}
+Other geomes for meshes: 
+\code{\link{gg.inla.mesh}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for meshes}

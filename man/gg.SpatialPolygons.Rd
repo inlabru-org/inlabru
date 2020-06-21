@@ -4,8 +4,7 @@
 \alias{gg.SpatialPolygons}
 \title{Geom for SpatialPolygons objects}
 \usage{
-\method{gg}{SpatialPolygons}(data, mapping = NULL, crs = NULL,
-  color = "black", alpha = NULL, ...)
+\method{gg}{SpatialPolygons}(data, mapping = NULL, crs = NULL, color = "black", alpha = NULL, ...)
 }
 \arguments{
 \item{data}{A SpatialPolygons object.}
@@ -77,11 +76,13 @@ ggplot() + gg(mexdolphin$points, aes(size = size))
 }
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
-  \code{\link{gg.SpatialLines}},
-  \code{\link{gg.SpatialPixelsDataFrame}},
-  \code{\link{gg.SpatialPixels}},
-  \code{\link{gg.SpatialPoints}}, \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for spatial data: 
+\code{\link{gg.SpatialGridDataFrame}()},
+\code{\link{gg.SpatialLines}()},
+\code{\link{gg.SpatialPixelsDataFrame}()},
+\code{\link{gg.SpatialPixels}()},
+\code{\link{gg.SpatialPoints}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for spatial data}

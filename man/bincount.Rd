@@ -4,8 +4,15 @@
 \alias{bincount}
 \title{1D LGCP bin count simulation and comparison with data}
 \usage{
-bincount(result, predictor, observations, breaks, nint = 20,
-  probs = c(0.025, 0.5, 0.975), ...)
+bincount(
+  result,
+  predictor,
+  observations,
+  breaks,
+  nint = 20,
+  probs = c(0.025, 0.5, 0.975),
+  ...
+)
 }
 \arguments{
 \item{result}{A result object from a \link{bru} or \link{lgcp} call}

@@ -21,8 +21,9 @@ information on the formulae inlabru accepts please see \link{component.formula}.
 model parameters and how inlabru employs INLA's \code{f} function please see \link{component.character}
 }
 \seealso{
-Other Component constructor: \code{\link{component.character}},
-  \code{\link{component.formula}}
+Other Component constructor: 
+\code{\link{component.character}()},
+\code{\link{component.formula}()}
 }
 \author{
 Fabian E. Bachl <\email{bachlfab@gmail.com}>
