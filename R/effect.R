@@ -126,6 +126,7 @@ component <- function(object, ...) {
 #' # Equivalent shortcuts:
 #' eff <- component(~ myLinearEffectOfX(x, model = "linear"))
 #' eff <- component(~ myLinearEffectOfX(x))
+
 component.formula <- function(object, lhoods, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)

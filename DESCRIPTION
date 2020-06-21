@@ -42,7 +42,7 @@ Suggests:
     spatstat.data,
     RColorBrewer,
     graphics,
-    INLA,
+    INLA (>= 20.06.18),
     knitr,
     rmarkdown
 Depends:
@@ -53,3 +53,4 @@ Depends:
     ggplot2,
 Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.1.0
+Encoding: UTF-8

@@ -178,7 +178,7 @@ evaluate.model <- function(model,
     if (is.null(predictor)) {
       smp[[k]] <- data.frame(sm)
     } else {
-      envir <- c(sm, as.list(data.frame(points)), fml.envir,
+      envir <- c(sm, as.list(data.frame(data)), fml.envir,
                  as.list(environment(model$formula)))
       smp[[k]] <- eval(predictor, envir = envir)
     }

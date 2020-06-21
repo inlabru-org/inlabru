@@ -1,6 +1,7 @@
 context("2D LGCP fitting and prediction - Covariates (test_lgcp_2d_covars.R)")
 library(INLA)
 data(gorillas, package = "inlabru")
+gorillas <- gorillas_update_CRS(gorillas)
 
 test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
   mdl <- coordinates ~ veg(map = gorillas$gcov$vegetation, model = "factor") - Intercept

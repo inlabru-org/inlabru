@@ -186,16 +186,19 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, proj
     }
 
     ips <- int.slines(region, domain, group = group)
-  } else if (inherits(region, "SpatialPolygons")) {
+  } else if (inherits(region, "SpatialPolygons") ||
+             inherits(region, "SpatialPolygonsDataFrame")) {
 
     # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
     if (class(region)[1] == "SpatialPolygons") {
       region <- SpatialPolygonsDataFrame(region,
-        data = data.frame(weight = rep(1, length(region))),
-        match.ID = FALSE
+                                         data = data.frame(weight = rep(1, length(region))),
+                                         match.ID = FALSE
       )
+    } else if (is.null(region@data[["weight"]])) {
+      region@data[["weight"]] <- 1
     }
-
+    
     cnames <- coordnames(region)
     p4s <- proj4string(region)
 

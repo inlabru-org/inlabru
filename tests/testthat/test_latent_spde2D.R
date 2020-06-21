@@ -1,10 +1,24 @@
 context("Latent models - 2D SPDE - Group parameter (test_latent_spde2D.R)")
 
+mrsea_rebuild_CRS <-function(x) {
+  disable_PROJ6_warnings()
+  if (inla.has_PROJ6()) {
+    x$points <- rebuild_CRS(x$points)
+    x$samplers <- rebuild_CRS(x$samplers)
+    x$mesh$crs <- rebuild_CRS(x$mesh$crs)
+    x$boundary <- rebuild_CRS(x$boundary)
+    x$covar <- rebuild_CRS(x$covar)
+  }
+  x
+}
+
 latent_spde2D_group_testdata <- function() {
+  disable_PROJ6_warnings()
   set.seed(123)
 
   # Load and reduce data set
   data(mrsea)
+  mrsea <- mrsea_rebuild_CRS(mrsea)
   mrsea$points <- mrsea$points[mrsea$points$season == 1 |
     mrsea$points$season == 2, ]
   mrsea$samplers <- mrsea$samplers[mrsea$samplers$season == 1 |
@@ -47,6 +61,7 @@ latent_spde2D_group_testdata <- function() {
 
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_on_cran()
+  disable_PROJ6_warnings()
   library(INLA)
   data <- latent_spde2D_group_testdata()
 

@@ -33,7 +33,7 @@ test_that("2D LGCP fitting: predicted random field", {
     tolerance = hitol
   )
   expect_equal(pr$sd[c(2, 215, 656, 1010)],
-    c(0.0000000, 0.6629913, 0.9822118, 1.2876455),
+    c(1.5174210, 0.6629913, 0.9822118, 1.2876455),
     tolerance = hitol
   )
 })

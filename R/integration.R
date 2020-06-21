@@ -253,15 +253,23 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   coordinates(ep3d) <- c("X1", "X2", "Z")
   proj4string(ep3d) <- proj4string(data)
 
-  sp3d <- spTransform(sp3d, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
-  ep3d <- spTransform(ep3d, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
-  mp3d <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2, proj4string = CRS("+proj=geocent +ellps=sphere +R=1.00"))
-
-  ips <- coordinates(spTransform(mp3d, CRS(proj4string(data))))[, c(1, 2)]
-  w <- spDists(coordinates(spTransform(sp3d, CRSobj = CRS("+proj=longlat")))[, c(1, 2)],
-    coordinates(spTransform(ep3d, CRSobj = CRS("+proj=longlat")))[, c(1, 2)],
-    diagonal = TRUE, longlat = TRUE
-  )
+  if (is.na(proj4string(data))) {
+    ips <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2)
+    w <- rowSums((coordinates(ep3d) - coordinates(sp3d))^2)^0.5
+  } else {
+    # Has proj4string
+    longlat.crs <- CRS("+proj=longlat +ellps=WGS84")
+    geocentric.crs <- CRS("+proj=geocent +ellps=WGS84")
+    sp3d <- spTransform(sp3d, CRSobj = geocentric.crs)
+    ep3d <- spTransform(ep3d, CRSobj = geocentric.crs)
+    mp3d <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2,
+                          proj4string = geocentric.crs)
+    
+    ips <- coordinates(spTransform(mp3d, CRS(proj4string(data))))[, c(1, 2)]
+    w <- spDists(coordinates(spTransform(sp3d, CRSobj = longlat.crs))[, c(1, 2)],
+                 coordinates(spTransform(ep3d, CRSobj = longlat.crs))[, c(1, 2)],
+                 diagonal = TRUE, longlat = TRUE)
+  }
 
   # Wrap everything up and perform projection according to distance and given group argument
   ips <- data.frame(ips)
