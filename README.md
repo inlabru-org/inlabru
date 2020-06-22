@@ -37,7 +37,7 @@ You can install the latest bugfix release of inlabru from
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("fbachl/inlabru", ref="master")
+remotes::install_github("fbachl/inlabru", ref="stable")
 ```
 
 You can install the development version of inlabru from
