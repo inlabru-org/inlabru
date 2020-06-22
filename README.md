@@ -62,6 +62,7 @@ library(ggplot2)
 
 # Load the data
 data(gorillas, package = "inlabru")
+# If you have PROJ6/GDAL3, you will here need to update the CRS information; see separate code below
 
 # Construct latent model components
 matern <- inla.spde2.pcmatern(gorillas$mesh, 
@@ -83,4 +84,26 @@ ggplot() +
   gg(gorillas$nests, color = "red", size = 0.2) +
   coord_equal()
 }
+```
+
+If you have an R installation with PROJ6/GDAL3 and INLA \>= 18.06.18,
+you will need to update the CRS information in the gorillas data after
+reading it in:
+
+``` r
+gorillas_update_CRS <- function(gorillas) {
+  if (inla.has_PROJ6()) {
+    gorillas$nests <- rebuild_CRS(gorillas$nests)
+    gorillas$boundary <- rebuild_CRS(gorillas$boundary)
+    gorillas$mesh$crs <- rebuild_CRS(gorillas$mesh$crs)
+    for (name in names(gorillas$gcov)) {
+      gorillas$gcov[[name]] <- rebuild_CRS(gorillas$gcov[[name]])
+    }
+    for (name in names(gorillas$plotsample)) {
+      gorillas$plotsample[[name]] <- rebuild_CRS(gorillas$plotsample[[name]])
+    }
+  }
+  gorillas
+}
+gorillas <- gorillas_update_CRS(gorillas)
 ```
