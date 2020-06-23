@@ -542,7 +542,7 @@ value.component <- function(component, data, state, A = NULL, ...) {
 amatrix.component <- function(component, data, ...) {
   if (component$type %in% c("spde")) {
     if (component$map == "coordinates") {
-      if (is.na(proj4string(data)) | is.null(component$mesh$crs)) {
+      if (crs_is_null(sp_get_crs(data))) {
         loc <- data
       } else {
         loc <- stransform(data, crs = component$mesh$crs)

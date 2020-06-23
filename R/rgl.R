@@ -92,13 +92,12 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
     ll <- data.frame(object)
     ll$TMP.ZCOORD <- 0
     coordinates(ll) <- c(coordnames(object), "TMP.ZCOORD")
-    proj4string(ll) <- CRS(proj4string(object))
+    proj4string(ll) <- INLA::inla.sp_get_crs(object)
     object <- ll
   }
 
-  object <- spTransform(object, CRSobj = CRS("+proj=geocent +ellps=sphere"))
+  object <- INLA::inla.spTransform(object, CRSobj = INLA::inla.CRS("sphere"))
   cc <- coordinates(object)
-  cc <- cc / rowSums(cc^2)^0.5
   requireNamespace("rgl")
   rgl::rgl.points(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
 }
@@ -129,11 +128,11 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 
   coordinates(sp) <- c("x", "y", "z")
   coordinates(ep) <- c("x", "y", "z")
-  proj4string(sp) <- CRS(proj4string(object))
-  proj4string(ep) <- CRS(proj4string(object))
+  proj4string(sp) <- INLA::inla.sp_get_crs(object)
+  proj4string(ep) <- INLA::inla.sp_get_crs(object)
 
-  sp <- spTransform(sp, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
-  ep <- spTransform(ep, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
+  sp <- INLA::inla.spTransform(sp, CRSobj = INLA::inla.CRS("sphere"))
+  ep <- INLA::inla.spTransform(ep, CRSobj = INLA::inla.CRS("sphere"))
 
   cs <- coordinates(sp)
   ce <- coordinates(ep)
@@ -172,7 +171,7 @@ glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
     colnames(ll) <- c("x", "y", "z")
     coordinates(ll) <- c("x", "y", "z")
     proj4string(ll) <- object$crs
-    ll <- spTransform(ll, CRSobj = CRS("+proj=geocent +ellps=sphere +R=1.00"))
+    ll <- INLA::inla.spTransform(ll, CRSobj = INLA::inla.CRS("sphere"))
     object$loc <- coordinates(ll)
   }
 

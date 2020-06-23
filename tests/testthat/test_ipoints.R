@@ -30,7 +30,7 @@ test_that("conversion of 1D mesh to integration points", {
 
 test_that("conversion of SpatialPolygon to integration points", {
   data(gorillas, package = "inlabru")
-  gorillas <- gorillas_update_CRS_to_PROJ6(gorillas)
+  gorillas <- gorillas_update_CRS(gorillas)
   ips <- ipoints(gorillas$boundary)
 
   expect_is(ips, "SpatialPointsDataFrame")
@@ -41,7 +41,7 @@ test_that("conversion of SpatialPolygon to integration points", {
 
 test_that("conversion of SpatialPolygon to integration points when domain is defined via a mesh", {
   data(gorillas, package = "inlabru")
-  gorillas <- gorillas_update_CRS_to_PROJ6(gorillas)
+  gorillas <- gorillas_update_CRS(gorillas)
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
 
   expect_is(ips, "SpatialPointsDataFrame")
@@ -51,7 +51,7 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
 
 test_that("conversion of 2D mesh to integration points", {
   data(gorillas, package = "inlabru")
-  gorillas <- gorillas_update_CRS_to_PROJ6(gorillas)
+  gorillas <- gorillas_update_CRS(gorillas)
   ips <- ipoints(gorillas$mesh)
 
   expect_is(ips, "SpatialPointsDataFrame")
@@ -61,9 +61,10 @@ test_that("conversion of 2D mesh to integration points", {
 
 test_that("SpatialLinesDataFrame to integration points using grouping parameter", {
   data(mrsea, package = "inlabru")
+  mrsea <- mrsea_rebuild_CRS(mrsea)
   ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
 
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)), c("weight", "vertex", "season", "x", "y", "optional"))
-  expect_equal(floor(sum(ips$weight)), 2288791)
+  expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
 })

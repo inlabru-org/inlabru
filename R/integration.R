@@ -243,29 +243,30 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   }
 
   # Determine integration points along lines
-
+  crs <- INLA::inla.sp_get_crs(data)
+  
   sp3d <- within(data.frame(sp), Z <- 0)
   colnames(sp3d) <- c("X1", "X2", "Z")
   coordinates(sp3d) <- c("X1", "X2", "Z")
-  proj4string(sp3d) <- proj4string(data)
+  proj4string(sp3d) <- crs
   ep3d <- within(data.frame(ep), Z <- 0)
   colnames(ep3d) <- c("X1", "X2", "Z")
   coordinates(ep3d) <- c("X1", "X2", "Z")
-  proj4string(ep3d) <- proj4string(data)
+  proj4string(ep3d) <- crs
 
-  if (is.na(proj4string(data))) {
+  if (crs_is_null(crs)) {
     ips <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2)
     w <- rowSums((coordinates(ep3d) - coordinates(sp3d))^2)^0.5
   } else {
-    # Has proj4string
-    longlat.crs <- CRS("+proj=longlat +ellps=WGS84")
-    geocentric.crs <- CRS("+proj=geocent +ellps=WGS84")
+    # Has CRS
+    longlat.crs <- INLA::inla.CRS("longlat_globe")
+    geocentric.crs <- INLA::inla.CRS("globe")
     sp3d <- spTransform(sp3d, CRSobj = geocentric.crs)
     ep3d <- spTransform(ep3d, CRSobj = geocentric.crs)
     mp3d <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2,
                           proj4string = geocentric.crs)
     
-    ips <- coordinates(spTransform(mp3d, CRS(proj4string(data))))[, c(1, 2)]
+    ips <- coordinates(spTransform(mp3d, crs))[, c(1, 2)]
     w <- spDists(coordinates(spTransform(sp3d, CRSobj = longlat.crs))[, c(1, 2)],
                  coordinates(spTransform(ep3d, CRSobj = longlat.crs))[, c(1, 2)],
                  diagonal = TRUE, longlat = TRUE)
@@ -287,10 +288,12 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
 
   coordinates(ips) <- c("x", "y")
   if (!is.null(coordnames(data))) coordnames(ips) <- coordnames(data)
-  proj4string(ips) <- proj4string(data)
+  proj4string(ips) <- crs
 
   # Project to mesh vertices
-  if (project & !is.null(mesh)) ips <- vertex.projection(ips, mesh, columns = "weight", group = group)
+  if (project & !is.null(mesh)) {
+    ips <- vertex.projection(ips, mesh, columns = "weight", group = group)
+  }
 
   ips
 }

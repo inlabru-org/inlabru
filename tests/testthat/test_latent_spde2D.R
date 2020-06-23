@@ -1,16 +1,5 @@
 context("Latent models - 2D SPDE - Group parameter (test_latent_spde2D.R)")
 
-mrsea_rebuild_CRS <-function(x) {
-  if (inla.has_PROJ6()) {
-    x$points <- rebuild_CRS(x$points)
-    x$samplers <- rebuild_CRS(x$samplers)
-    x$mesh$crs <- rebuild_CRS(x$mesh$crs)
-    x$boundary <- rebuild_CRS(x$boundary)
-    x$covar <- rebuild_CRS(x$covar)
-  }
-  x
-}
-
 latent_spde2D_group_testdata <- function() {
   set.seed(123)
 
@@ -49,12 +38,14 @@ latent_spde2D_group_testdata <- function() {
     options = list(control.inla = list(int.strategy = "eb"))
   )
 
+  data <-
   list(
     mrsea = mrsea,
     matern = matern,
     cmp = cmp,
     fit = fit
   )
+  data
 }
 
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
