@@ -71,7 +71,6 @@ plot(do.call(rbind, smp))
 \link{predict.bru}
 
 Other sample generators: 
-\code{\link{generate.inla}()},
 \code{\link{generate}()}
 }
 \concept{sample generators}

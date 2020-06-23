@@ -58,3 +58,17 @@ gorillas_lgcp_2d_testdata <- function() {
     fit = fit
   )
 }
+
+
+mrsea_rebuild_CRS <-function(x) {
+  disable_PROJ6_warnings()
+  if (inla.has_PROJ6()) {
+    x$points <- rebuild_CRS(x$points)
+    x$samplers <- rebuild_CRS(x$samplers)
+    x$mesh$crs <- rebuild_CRS(x$mesh$crs)
+    x$boundary <- rebuild_CRS(x$boundary)
+    x$covar <- rebuild_CRS(x$covar)
+  }
+  x
+}
+

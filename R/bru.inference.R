@@ -1064,6 +1064,7 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
 
 
 auto.intercept <- function(components) {
+  show_call_stack()
   env <- environment(components)
   
   tm <- terms(components)
@@ -1099,9 +1100,9 @@ auto.intercept <- function(components) {
       )
     }
   } else if (attr(tm, "intercept")) {
-    components <- update.formula(components, . ~ . + Intercept - 1)
+    components <- update.formula(components, . ~ . + Intercept(1) + 1)
   } else {
-    components <- update.formula(components, . ~ . - 1)
+    components <- update.formula(components, . ~ . + 1)
   }
   environment(components) <- env
   components

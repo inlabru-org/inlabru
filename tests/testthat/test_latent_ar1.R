@@ -26,6 +26,7 @@ latent_ar1_testdata <- function() {
   )
 }
 
+old <- function() {
 fit <- latent_ar1_testdata()
 
 cbind(
@@ -63,19 +64,24 @@ cbind(
   fit$fit_inla[[2]]$summary.random$time$mean,
   fit$fit_inla[[3]]$summary.random$time$mean
 )
-
+}
 
 test_that("Latent models: AR1 bru ordering", {
   skip_on_cran()
   library(INLA)
   data <- latent_ar1_testdata()
   
-  # Check Intercept
-  expect_equal(data$fit[[1]]$summary.fixed["Intercept", "mean"], 5.982867, midtol)
-  
-  # Check SPDE
+  # Check AR1
   expect_equal(
-    data$fit$summary.random$field$mean[c(1, 25, 50)],
-    c(-5.195488, -4.480026, -7.150024), midtol
+    data$fit[[1]]$summary.random$time$mean,
+    c(1, 2, 1, 2, 4), midtol
+  )
+  expect_equal(
+    data$fit[[2]]$summary.random$time$mean,
+    c(1, 2, 1, 2, 4), midtol
+  )
+  expect_equal(
+    data$fit[[3]]$summary.random$time$mean,
+    c(1, 2, 1, 2, 4), midtol
   )
 })
