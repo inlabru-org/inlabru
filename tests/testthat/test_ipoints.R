@@ -69,5 +69,5 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
 
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)), c("weight", "vertex", "season", "x", "y", "optional"))
-  expect_equal(floor(sum(ips$weight)), 2288791)
+  expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
 })

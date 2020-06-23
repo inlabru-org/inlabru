@@ -10,7 +10,7 @@ latent_spde1D_testdata <- function() {
     prior.sigma = c(10, 0.01)
   )
 
-  cmp <- count ~ field(map = x, model = matern) + Intercept
+  cmp <- count ~ field(main = x, model = matern) + Intercept
   fit <- bru(cmp,
     data = countdata2, family = "poisson",
     options = list(E = countdata2$exposure)

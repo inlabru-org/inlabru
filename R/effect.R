@@ -462,7 +462,7 @@ component.character <- function(object,
     fcall[[1]] <- "f"
     fcall[[2]] <- as.symbol(label)
     names(fcall)[2] <- ""
-    if (names(fcall)[3] == "") {
+    if (is.null(names(fcall)) || (names(fcall)[3] == "")) {
       # 'main' is the only parameter allowed to be nameless,
       # and only if it's the first parameter (position 3 in this fcall)
       names(fcall)[3] <- "main"
@@ -1033,10 +1033,10 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       val <- as.data.frame(val)
       coordinates(val) <- seq_len(ncol(val))
       # Allow proj4string failures:
-      p4s <- tryCatch(proj4string(data),
+      data_crs <- tryCatch(sp_get_crs(data),
                       error = function(e) {})
-      if (!is.null(p4s)) {
-        proj4string(val) <- CRS(p4s)
+      if (!crs_is_null(data_crs)) {
+        proj4string(val) <- data_crs
       }
     }
   }

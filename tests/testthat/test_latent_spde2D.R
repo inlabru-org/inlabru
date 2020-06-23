@@ -43,12 +43,14 @@ latent_spde2D_group_testdata <- function() {
     options = list(control.inla = list(int.strategy = "eb"))
   )
 
+  data <-
   list(
     mrsea = mrsea,
     matern = matern,
     cmp = cmp,
     fit = fit
   )
+  data
 }
 
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {

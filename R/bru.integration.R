@@ -146,7 +146,7 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, proj
     if (!is.null(domain)) stop("Integration region provided as 2D and domain is not NULL.")
 
     # transform to equal area projection
-    if (!is.null(region$crs) && !(is.na(region$crs@projargs))) {
+    if (!crs_is_null(region$crs)) {
       crs <- region$crs
       region <- stransform(region, crs = CRS("+proj=cea +units=km"))
     }
@@ -155,7 +155,7 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, proj
     ips$weight <- INLA::inla.mesh.fem(region, order = 1)$va
 
     # backtransform
-    if (!is.null(region$crs) && !(is.na(region$crs@projargs))) {
+    if (!crs_is_null(region$crs)) {
       ips <- stransform(ips, crs = crs)
     }
   } else if (inherits(region, "inla.mesh.1d")) {
@@ -200,10 +200,10 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, proj
     }
     
     cnames <- coordnames(region)
-    p4s <- proj4string(region)
-
+    region_crs <- INLA::inla.sp_get_crs(region)
+    
     # Convert region and domain to equal area CRS
-    if (!is.null(domain$crs) && !is.na(domain$crs@projargs)) {
+    if (!crs_is_null(domain$crs)) {
       region <- stransform(region, crs = CRS("+proj=cea +units=km"))
     }
 
@@ -220,22 +220,23 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, proj
     if (is.null(domain)) {
       max.edge <- max(diff(range(polyloc[, 1])), diff(range(polyloc[, 2]))) / 20
       domain <- INLA::inla.mesh.2d(boundary = region, max.edge = max.edge)
-      domain$crs <- CRS(proj4string(region))
+      domain$crs <- INLA::inla.sp_get_crs(region)
     } else {
-      if (!is.null(domain$crs) && !is.na(domain$crs@projargs)) {
+      if (!crs_is_null(domain$crs)) {
         domain <- stransform(domain, crs = CRS("+proj=cea +units=km"))
       }
     }
+    domain_crs <- domain$crs
 
     ips <- int.polygon(domain, loc = polyloc[, 1:2], group = polyloc[, 3])
     df <- data.frame(region@data[ips$group, pregroup, drop = FALSE],
       weight = ips[, "weight"]
     )
     ips <- SpatialPointsDataFrame(ips[, c("x", "y")], data = df, match.ID = FALSE)
-    proj4string(ips) <- proj4string(region)
+    proj4string(ips) <- domain_crs
 
-    if (!is.na(p4s)) {
-      ips <- stransform(ips, crs = CRS(p4s))
+    if (!crs_is_null(region_crs)) {
+      ips <- stransform(ips, crs = region_crs)
     }
   }
 
@@ -368,7 +369,7 @@ ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL) {
     if (!(nm %in% names(domain)) & !is.null(data) & !(nm %in% names(samplers))) {
       if (nm == "coordinates") {
         domain[["coordinates"]] <- INLA::inla.mesh.2d(loc.domain = coordinates(data), max.edge = diff(range(coordinates(data)[, 1])) / 10)
-        domain[["coordinates"]]$crs <- INLA::inla.CRS(proj4string(data))
+        domain[["coordinates"]]$crs <- INLA::inla.sp_get_crs(data)
       } else {
         domain[[nm]] <- range(data[[nm]])
       }
@@ -435,7 +436,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     data$vertex <- as.numeric(names(w.by))
 
     ret <- SpatialPointsDataFrame(coords,
-      proj4string = CRS(proj4string(points)),
+      proj4string = INLA::inla.sp_get_crs(points),
       data = data,
       match.ID = FALSE
     )
@@ -465,7 +466,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     idx <- as.list(data.frame(points)[, group, drop = FALSE])
     ret <- by(points, idx, fn)
     ret <- do.call(rbind, ret)
-    proj4string(ret) <- proj4string(points)
+    proj4string(ret) <- INLA::inla.sp_get_crs(points)
   }
   ret
 }
