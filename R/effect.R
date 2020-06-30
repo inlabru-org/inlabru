@@ -260,12 +260,36 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
       null.results <- vapply(inp, function(x) is.null(x), TRUE)
       if (all(null.results)) {
         inp_values <- 1
-      } else if (any(null.results)) {
-        inp_values <- sort(unique(unlist(inp[!null.results])), na.last = NA)
+        n_values <- 1
       } else {
-        inp_values <- sort(unique(unlist(inp)), na.last = NA)
+        if (any(null.results)) {
+          inp_ <- inp[!null.results]
+        } else {
+          inp_ <- inp
+        }
+        is_spatial <- vapply(inp_, function(x) inherits(x, "Spatial"), TRUE)
+        is_matrix <- vapply(inp_, function(x) is.matrix(x), TRUE)
+        if (any(is_spatial)) {
+          if(!all(is_spatial)) {
+            stop("Inconsistent input types; spatial and non-spatial")
+          }
+          warning("TODO: Ensure spatial input objects use the same CRS")
+          inp_values <- unique(do.call(rbind,
+                                       lapply(inp_,
+                                              function(x) coordinates(x))))
+          n_values <- nrow(inp_values)
+        } else if (any(is_matrix)) {
+          if (!all(is_matrix)) {
+            stop("Inconsistent input types; matrix and non-matrix")
+          }
+          inp_values <- unique(do.call(rbind, inp_))
+          n_values <- nrow(inp_values)
+        } else {
+          inp_values <- sort(unique(unlist(inp_)), na.last = NA)
+          n_values <- length(inp_values)
+        }
       }
-      if (length(inp_values) < 1) {
+      if (n_values < 1) {
         subcomp$n <- 1
         subcomp$values <- NULL
         inp_values <- NULL
@@ -605,12 +629,11 @@ make_mapper <- function(subcomp,
 #' @aliases code.components
 #' @keywords internal
 #' @param components A \link{formula} describing latent model components.
-#' @param fname Chracter setting the name of the function that will interpret the components.
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
 code.components <- function(components, add = "") {
-  fname <- "component"
+  fname <- "inlabru:::component.character"
   tms <- terms(components)
   codes <- attr(tms, "term.labels")
 

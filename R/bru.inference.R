@@ -197,8 +197,10 @@ like <- function(family, formula = . ~ ., data = NULL,
     if (is.null(ips)) {
       # TODO: split ipmaker into one domain extractor (or not; should force
       # explicit domain specification!), and one integration point constructor
+      message("ipmaker can't really work here unless it doesn't need the predictor information")
+      warning("ipmaker can't really work here unless it doesn't need the predictor information")
       ips <- ipmaker(samplers, domain = domain, dnames = response, data = data,
-                     model = bru.model)
+                     model = NULL)
     }
 
     inla.family <- "poisson"
@@ -1088,14 +1090,14 @@ auto.intercept <- function(components) {
   inter_term <- grep("^Intercept[\\($]*", attr(tm, "term.labels"))
   if (length(inter_var) > 0) {
     if (length(inter_term) > 0) {
-      components <- update.formula(components, . ~ . - 1)
+      components <- update.formula(components, . ~ . + 1)
     } else {
       components <- update.formula(
         components,
         as.formula(paste0(
           ". ~ . - ",
           var_names[inter_var],
-          " -1"
+          " +1"
         ))
       )
     }

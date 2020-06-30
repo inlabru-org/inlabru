@@ -48,6 +48,7 @@ gorillas_lgcp_2d_testdata <- function() {
 
   fit <- lgcp(cmp, gorillas$nests,
     samplers = gorillas$boundary,
+    domain = list(coordinates = gorillas$mesh),
     options = list(control.inla = list(int.strategy = "eb"))
   )
 
