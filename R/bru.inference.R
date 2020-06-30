@@ -199,8 +199,14 @@ like <- function(family, formula = . ~ ., data = NULL,
       # explicit domain specification!), and one integration point constructor
       message("ipmaker can't really work here unless it doesn't need the predictor information")
       warning("ipmaker can't really work here unless it doesn't need the predictor information")
-      ips <- ipmaker(samplers, domain = domain, dnames = response, data = data,
-                     model = NULL)
+      ips <- ipmaker(
+        samplers,
+        domain = domain,
+        dnames = response,
+        data = data,
+        model = NULL,
+        int.args = options$int.args
+      )
     }
 
     inla.family <- "poisson"
@@ -305,6 +311,8 @@ joint_stackmaker <- function(model, lhoods, result) {
 #'   effect. Until a more elegant alterative has been implemented, use explicit
 #'   \code{mean.linear} and \code{prec.linear} specifications in each
 #'   \code{model="linear"} component instead.
+#' @param int.args List of arguments passed all the way to the integration method
+#' \code{ipoints} and \code{int.polygon} for 'cp' family models
 #' @param ... Additional options passed on to \code{INLA::inla}
 #'
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}> and Finn Lindgren \email{finn.lindgren@@gmail.com}
@@ -330,6 +338,7 @@ bru.options <- function(mesh = NULL,
                         control.compute = list(),
                         control.inla = list(),
                         control.fixed = list(),
+                        int.args = list(method = "stable",nsub = NULL),
                         ...) {
   control.compute <-
     override_config_defaults(

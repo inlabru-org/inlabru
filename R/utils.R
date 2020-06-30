@@ -50,3 +50,10 @@ crs_is_null <- function(crs) {
     is.na(crs)
   }
 }
+
+ensure_crs <- function(crs) {
+  if (crs_is_null(crs)) {
+    crs <- sp::CRS(NA_character_)
+  }
+  crs
+}
