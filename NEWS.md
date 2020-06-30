@@ -6,6 +6,9 @@
 
 * New backend code to make extended feature support easier
 
+* New int.args option to control spatial integration resolution,
+  thanks to Martin Jullum (martinju)
+
 # inlabru 2.1.13
 
 * Fix CRAN complaint regarding documentation

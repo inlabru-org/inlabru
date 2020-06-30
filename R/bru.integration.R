@@ -33,6 +33,7 @@
 #' @param name Character array stating the name of the domains dimension(s)
 #' @param group Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged by the projection.
 #' @param project If TRUE, project the integration points to mesh vertices
+#' @param int.args List of arguments passed to \code{int.polygon}
 #'
 #' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
 #'
@@ -79,7 +80,9 @@
 #' }
 #' }
 #'
-ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, project) {
+
+ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, project, 
+                    int.args = list(method = "stable", nsub = NULL)) {
   pregroup <- NULL
 
   # If region is null treat domain as the region definition
@@ -226,14 +229,15 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, proj
         domain <- stransform(domain, crs = CRS("+proj=cea +units=km"))
       }
     }
-    domain_crs <- domain$crs
-
-    ips <- int.polygon(domain, loc = polyloc[, 1:2], group = polyloc[, 3])
+    domain_crs <- ensure_crs(domain$crs)
+    
+    ips <- int.polygon(domain, loc = polyloc[, 1:2], group = polyloc[, 3], 
+                       method = int.args$method, nsub = int.args$nsub)
     df <- data.frame(region@data[ips$group, pregroup, drop = FALSE],
       weight = ips[, "weight"]
     )
-    ips <- SpatialPointsDataFrame(ips[, c("x", "y")], data = df, match.ID = FALSE)
-    proj4string(ips) <- domain_crs
+    ips <- SpatialPointsDataFrame(ips[, c("x", "y")], data = df,
+                                  match.ID = FALSE, proj4string = domain_crs)
 
     if (!crs_is_null(region_crs)) {
       ips <- stransform(ips, crs = region_crs)
@@ -347,10 +351,12 @@ cprod <- function(...) {
 # @param samplers A Spatial[Points/Lines/Polygons]DataFrame objects
 # @param points A SpatialPoints[DataFrame] object
 # @param config An integration configuration. See \link{iconfig}
+# @param int.args List of arguments passed on to \code{ipoints}
 # @return Integration points
 
 
-ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL) {
+ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL, 
+                    int.args = list(method="stable",nsub=NULL)) {
 
   # Fill missing domain definitions using meshes from effects where map equals the domain name
   meshes <- list()
@@ -393,13 +399,13 @@ ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL) {
   if (length(missing.dims > 0)) stop(paste0("Domain definitions missing for dimensions: ", paste0(missing.dims, collapse = ", ")))
 
   if (spatial) {
-    ips <- ipoints(samplers, domain$coordinates, project = TRUE, group = samp.dim)
+    ips <- ipoints(samplers, domain$coordinates, project = TRUE, group = samp.dim, int.args = int.args)
   } else {
     ips <- NULL
   }
 
 
-  lips <- lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm))
+  lips <- lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
   ips <- do.call(cprod, c(list(ips), lips))
 }
 
