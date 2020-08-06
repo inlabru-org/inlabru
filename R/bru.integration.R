@@ -239,7 +239,7 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, proj
     ips <- SpatialPointsDataFrame(ips[, c("x", "y")], data = df,
                                   match.ID = FALSE, proj4string = domain_crs)
 
-    if (!crs_is_null(region_crs)) {
+    if (!crs_is_null(domain_crs) && !crs_is_null(region_crs)) {
       ips <- stransform(ips, crs = region_crs)
     }
   }
