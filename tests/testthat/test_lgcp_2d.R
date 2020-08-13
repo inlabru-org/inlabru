@@ -3,27 +3,32 @@ library(INLA)
 
 test_that("2D LGCP fitting", {
   
+  options <- list(control.inla = list(int.strategy = "eb",
+                                      h = 0.005),
+                  num.threads = 1)
+  
   data <- gorillas_lgcp_2d_testdata()
 
   expect_is(data$fit, "bru")
 
   # test_that("2D LGCP fitting: INLA intercept", {
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], 1.121929, tolerance = midtol)
-  expect_equal(data$fit$summary.fixed["Intercept", "sd"], 0.5799173, tolerance = midtol)
+  expect_equal(data$fit$summary.fixed["Intercept", "mean"], 1.121929, tolerance = hitol)
+  expect_equal(data$fit$summary.fixed["Intercept", "sd"], 0.5799173, tolerance = hitol)
 
+  index <- c(1, 456, 789, 1058, 1479)
   # test_that("2D LGCP fitting: INLA random field", {
-  expect_equal(data$fit$summary.random$mySmooth$mean[c(1, 456, 789, 1058, 1479)],
-    c(-2.0224597, 0.3874104, -0.4473572, 0.4019972, -1.7000660),
-    tolerance = midtol
+  expect_equal(data$fit$summary.random$mySmooth$mean[index],
+               c(-2.0259879,  0.3891452, -0.4462794,  0.4028431, -1.7016834),
+               tolerance = midtol
   )
-  expect_equal(data$fit$summary.random$mySmooth$sd[c(1, 436, 759, 1158, 1279)],
-    c(1.5924485, 0.8243210, 0.8209047, 0.7928983, 1.0671142),
-    tolerance = midtol
+  expect_equal(data$fit$summary.random$mySmooth$sd[index],
+    c(1.5934275, 0.8846649, 0.8297741, 0.7842688, 1.0545877),
+    tolerance = hitol
   )
 
   # test_that("2D LGCP fitting: predicted random field", {
-  loc <- SpatialPoints(gorillas$mesh$loc[, c(1, 2)])
-  proj4string(loc) <- INLA::inla.sp_get_crs(gorillas$nests)
+  loc <- SpatialPoints(data$gorillas$mesh$loc[, c(1, 2)])
+  proj4string(loc) <- INLA::inla.sp_get_crs(data$gorillas$nests)
   pr <- predict(data$fit, loc, ~mySmooth, n.samples = 500, seed = 5657L)
   expect_equal(pr$mean[c(1, 255, 778, 1000)],
     c(-2.057675, -1.766163, -1.512785, -1.488362),
@@ -45,7 +50,8 @@ test_that("2D LGCP fitting", {
 
   # test_that("Supplying integration points instead of samplers", {
   ips <- ipoints(data$gorillas$boundary, data$gorillas$mesh)
-  fit_ips <- lgcp(data$cmp, data$gorillas$nests, ips = ips)
+  fit_ips <- lgcp(data$cmp, data$gorillas$nests, ips = ips,
+                  options = options)
 
   expect_equal(fit_ips$summary.fixed["Intercept", "mean"],
     data$fit$summary.fixed["Intercept", "mean"],
@@ -69,7 +75,7 @@ test_that("2D LGCP fitting", {
     data$gorillas$nests,
     samplers = data$gorillas$boundary,
     domain = list(coordinates = data$gorillas$mesh),
-    options = list(control.inla = list(int.strategy = "eb"))
+    options = options
   )
 
   expect_equal(fit_dom$summary.fixed["Intercept", "mean"],

@@ -1,6 +1,8 @@
 context("Latent models - 2D SPDE - Group parameter (test_latent_spde2D.R)")
 
-latent_spde2D_group_testdata <- function() {
+latent_spde2D_group_testdata <- function(num.threads = 1,
+                                         tolerance = NULL,
+                                         h = 0.005) {
   disable_PROJ6_warnings()
   set.seed(123)
 
@@ -19,7 +21,7 @@ latent_spde2D_group_testdata <- function() {
 #  if (inla.has_PROJ6()) {
     crs_km <- inla.crs_set_lengthunit(mrsea$mesh$crs, "km")
 #  } else {
-#    crs_km <- inla.CRS("+proj=utm +zone=32 +ellps=WGS84 +units=km")
+    crs_km <- inla.CRS("+proj=utm +zone=32 +ellps=WGS84 +units=km")
 #  }
   mrsea$mesh <- inla.spTransform(mrsea$mesh, crs_km)
   mrsea$samplers <- sp::spTransform(mrsea$samplers, crs_km)
@@ -40,7 +42,10 @@ latent_spde2D_group_testdata <- function() {
   ) + Intercept(1)
   fit <- lgcp(cmp, mrsea$points,
     ips = ips,
-    options = list(control.inla = list(int.strategy = "eb"))
+    options = list(control.inla = list(int.strategy = "eb",
+                                       tolerance = tolerance,
+                                       h = h),
+                   num.threads = num.threads)
   )
 
   data <-
@@ -58,18 +63,18 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   disable_PROJ6_warnings()
   library(INLA)
   library(PROJ6INLA200618)
-  data <- latent_spde2D_group_testdata()
+  data <- latent_spde2D_group_testdata(num.threads = 1, h = 0.005)
 
   # Check Intercept
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -9.231591, hitol)
+  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -9.231591, midtol)
 
   # Check SPDE
   expect_equal(
     data$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    c(-1.27410, -1.96819, 0.7479571), hitol
+    c(-1.27410, -1.96819, 0.7479571), midtol
   )
   expect_equal(
     data$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
-    c(1.439, 1.635, 0.935), hitol
+    c(1.439, 1.635, 0.935), midtol
   )
 })
