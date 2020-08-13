@@ -39,7 +39,9 @@ gorillas_lgcp_2d_testdata <- function() {
 
   fit <- lgcp(cmp, gorillas$nests,
     samplers = gorillas$boundary,
-    options = list(control.inla = list(int.strategy = "eb"))
+    options = list(control.inla = list(int.strategy = "eb",
+                                       h = 0.005),
+                   num.threads = 1)
   )
 
   list(

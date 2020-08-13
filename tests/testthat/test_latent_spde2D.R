@@ -1,6 +1,8 @@
 context("Latent models - 2D SPDE - Group parameter (test_latent_spde2D.R)")
 
-latent_spde2D_group_testdata <- function() {
+latent_spde2D_group_testdata <- function(num.threads = 1,
+                                         tolerance = NULL,
+                                         h = 0.005) {
   set.seed(123)
 
   # Load and reduce data set
@@ -35,7 +37,10 @@ latent_spde2D_group_testdata <- function() {
   ) + Intercept
   fit <- lgcp(cmp, mrsea$points,
     ips = ips,
-    options = list(control.inla = list(int.strategy = "eb"))
+    options = list(control.inla = list(int.strategy = "eb",
+                                       tolerance = tolerance,
+                                       h = h),
+                   num.threads = num.threads)
   )
 
   data <-
@@ -51,18 +56,18 @@ latent_spde2D_group_testdata <- function() {
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_on_cran()
   library(INLA)
-  data <- latent_spde2D_group_testdata()
+  data <- latent_spde2D_group_testdata(num.threads = 1, h = 0.005)
 
   # Check Intercept
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -9.231591, hitol)
+  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -9.231591, midtol)
 
   # Check SPDE
   expect_equal(
     data$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    c(-1.27410, -1.96819, 0.7479571), hitol
+    c(-1.27410, -1.96819, 0.7479571), midtol
   )
   expect_equal(
     data$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
-    c(1.439, 1.635, 0.935), hitol
+    c(1.439, 1.635, 0.935), midtol
   )
 })
