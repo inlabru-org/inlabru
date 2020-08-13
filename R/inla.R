@@ -172,9 +172,13 @@ inla.posterior.sample.structured <- function(result, n, seed = 0L) {
     }
 
     # For fixed effects that were modeled via factors we attach an extra vector holding the samples
-    fac.names <- names(result$model$effects)[unlist(lapply(result$model$effects, function(e) {
-      e$model == "factor"
-    }))]
+    fac.names <- names(result$model$effects)[
+      vapply(result$model$effects,
+             function(e) {
+               identical(e$model, "factor")
+             },
+             TRUE)
+      ]
     for (name in fac.names) {
       vals[[name]] <- smpl.latent[startsWith(rownames(smpl.latent), name), ]
       names(vals[[name]]) <- lapply(names(vals[[name]]), function(nm) {
