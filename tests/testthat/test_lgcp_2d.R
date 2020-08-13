@@ -9,7 +9,7 @@ test_that("2D LGCP fitting", {
   
   data <- gorillas_lgcp_2d_testdata()
 
-  expect_is(data$fit, "bru")
+  expect_s3_class(data$fit, "bru")
 
   # test_that("2D LGCP fitting: INLA intercept", {
   expect_equal(data$fit$summary.fixed["Intercept", "mean"], 1.121929, tolerance = hitol)
