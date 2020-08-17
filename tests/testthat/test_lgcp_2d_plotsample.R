@@ -11,8 +11,9 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   matern <- inla.spde2.pcmatern(gorillas$mesh, prior.sigma = c(0.1, 0.01), prior.range = c(5, 0.01))
 
   cmp <- coordinates ~ my.spde(main = coordinates, model = matern)
-  fit <- lgcp(cmp, gorillas$plotsample$nests,
+  fit <- lgcp(cmp, data = gorillas$plotsample$nests,
     samplers = gorillas$plotsample$plots,
+    domain = list(coordinates = gorillas$mesh),
     options = options
   )
 

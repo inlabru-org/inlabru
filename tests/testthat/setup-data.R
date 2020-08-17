@@ -44,7 +44,7 @@ gorillas_lgcp_2d_testdata <- function() {
   gorillas <- gorillas_update_CRS(gorillas)
   
   matern <- inla.spde2.pcmatern(gorillas$mesh, prior.sigma = c(0.1, 0.01), prior.range = c(5, 0.01))
-  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept
+  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept(1)
 
   fit <- lgcp(cmp, gorillas$nests,
     samplers = gorillas$boundary,

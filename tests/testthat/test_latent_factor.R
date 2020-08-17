@@ -6,11 +6,12 @@ test_that("bru: factor component", {
   set.seed(123)
 
   # Factorial data
-  input.df <- data.frame(x = c(rep("Alpha", 100), rep("Beta", 100)))
+  input.df <- data.frame(x = factor(c(rep("Alpha", 100), rep("Beta", 100))))
   input.df$y <- c(rep(1, 100), rep(-2, 100)) + rnorm(200, mean = 0, sd = 0.1)
 
   # Fit the model
-  fit <- bru(y ~ fac(main = x, model = "factor") - Intercept,
+  fit <- bru(components = ~ -1 + fac(main = x, model = "factor"),
+             formula = y ~ fac,
     family = "gaussian",
     data = input.df
   )

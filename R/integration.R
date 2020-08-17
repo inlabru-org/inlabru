@@ -247,12 +247,10 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   
   sp3d <- within(data.frame(sp), Z <- 0)
   colnames(sp3d) <- c("X1", "X2", "Z")
-  coordinates(sp3d) <- c("X1", "X2", "Z")
-  proj4string(sp3d) <- crs
+  sp3d <- SpatialPoints(sp3d, proj4string = crs)
   ep3d <- within(data.frame(ep), Z <- 0)
   colnames(ep3d) <- c("X1", "X2", "Z")
-  coordinates(ep3d) <- c("X1", "X2", "Z")
-  proj4string(ep3d) <- crs
+  ep3d <- SpatialPoints(ep3d, proj4string = crs)
 
   if (crs_is_null(crs)) {
     ips <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2)
@@ -266,15 +264,15 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     mp3d <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2,
                           proj4string = geocentric.crs)
     
-    ips <- coordinates(spTransform(mp3d, crs))[, c(1, 2)]
-    w <- spDists(coordinates(spTransform(sp3d, CRSobj = longlat.crs))[, c(1, 2)],
-                 coordinates(spTransform(ep3d, CRSobj = longlat.crs))[, c(1, 2)],
+    ips <- coordinates(spTransform(mp3d, crs))
+    w <- spDists(coordinates(spTransform(sp3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
+                 coordinates(spTransform(ep3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
                  diagonal = TRUE, longlat = TRUE)
   }
 
   # Wrap everything up and perform projection according to distance and given group argument
   ips <- data.frame(ips)
-  colnames(ips) <- c("x", "y")
+  colnames(ips) <- c("x", "y", "z")
 
   # Weights
   ips <- cbind(ips, weight = w)
@@ -286,9 +284,16 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     ips <- cbind(ips, as.data.frame(data)[idx[, 1], group, drop = FALSE])
   }
 
-  coordinates(ips) <- c("x", "y")
-  if (!is.null(coordnames(data))) coordnames(ips) <- coordnames(data)
-  proj4string(ips) <- crs
+  ips <- SpatialPointsDataFrame(ips[, 1:3, drop = FALSE],
+                                data = ips[, -(1:3), drop = FALSE],
+                                proj4string = crs)
+  if (!is.null(coordnames(data))) {
+    name <- coordnames(data)
+    if (length(name) < 3) {
+      name <- c(name, "coordinateZ")
+    }
+    coordnames(ips) <- name
+  }
 
   # Project to mesh vertices
   if (project & !is.null(mesh)) {
@@ -570,7 +575,7 @@ int.polygon <- function(mesh, loc, group = NULL, method = "stable", ...){
     colnames(ips) <- c("x", "y")
     ips$weight <- loc_weight$weight[ok]
 
-    ips$group <- g
+    ips$group <- rep(g, nrow(ips))
     ipsl <- c(ipsl, list(ips))
   }
 

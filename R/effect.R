@@ -145,9 +145,35 @@ component.formula <- function(object, lhoods, envir = NULL, ...) {
 }
 
 add_mappers.component <- function(component, lhoods) {
-  component$main <- add_mapper(component$main, lhoods = lhoods, env = component$env)
-  component$group <- add_mapper(component$group, lhoods = lhoods, env = component$env)
-  component$replicate <- add_mapper(component$replicate, lhoods = lhoods, env = component$env)
+  # Filter out lhoods that don't use/support the component
+  keep_lh <-
+    vapply(lhoods,
+           function(lh, label) {
+             if (!is.null(lh[["include_components"]])) {
+               label %in% setdiff(lh[["include_components"]],
+                                  lh[["exclude_components"]])
+             } else {
+               label %in% setdiff(label,
+                                  lh[["exclude_components"]])
+             }
+           },
+           TRUE,
+           label = component$label)
+  lh <- lhoods[keep_lh]
+  component$label
+  
+  component$main <- add_mapper(component$main,
+                               label = component$label,
+                               lhoods = lh,
+                               env = component$env)
+  component$group <- add_mapper(component$group,
+                                label = component$label,
+                                lhoods = lh,
+                                env = component$env)
+  component$replicate <- add_mapper(component$replicate,
+                                    label = component$label,
+                                    lhoods = lh,
+                                    env = component$env)
   
   if (component$main$type %in% c("offset")) {
   } else if (component$main$type %in% c("factor")) {
@@ -273,7 +299,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
           if(!all(is_spatial)) {
             stop("Inconsistent input types; spatial and non-spatial")
           }
-          warning("TODO: Ensure spatial input objects use the same CRS")
+          message("TODO: Ensure spatial input objects use the same CRS")
           inp_values <- unique(do.call(rbind,
                                        lapply(inp_,
                                               function(x) coordinates(x))))
@@ -856,7 +882,7 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
     if (subcomp$n > 1) {
       stop(paste0("Missing mapper (NULL) for subcomponent '", subcomp$label, "'"))
     }
-    A <- Matrix::Matrix(1.0, nrow(data), 1)
+    A <- Matrix::Matrix(1.0, nrow(as.data.frame(data)), 1)
   } else {
     stop(paste0("Unsupported mapper of class '",
                 paste0(class(subcomp$mapper), collapse = "', '"), "'",
@@ -1072,7 +1098,27 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
         } else {
           input[["layer"]]
         }
-      val <- over(data, emap)[, layer, drop = TRUE]
+      if (is.character(layer)) {
+        if (!(layer %in% names(emap))) {
+          stop(
+            paste0("Input layer name '",
+                   layer,
+                   "' doesn't match available variable names.\n",
+                   "Available names are '",
+                   paste0(names(emap), collapse = "', '"),
+                   "'.\n",
+                   "Use *_layer for the input component to specify a valid name."
+            )
+          )
+        }
+      } else if (is.numeric(layer)) {
+        if ((layer < 1) || (layer > ncol(emap))) {
+          stop(paste0("Input layer nr ", layer,
+                      " is not in the valid range, [",
+                      1, ", ", ncol(emap)))
+        }
+      }
+      val <- sp::over(data, emap)[, layer, drop = TRUE]
     } else {
       layer <- data[[input$selector]]
       val <- numeric(n)

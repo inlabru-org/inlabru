@@ -68,6 +68,7 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
   ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
 
   expect_is(ips, "SpatialPointsDataFrame")
-  expect_equal(colnames(data.frame(ips)), c("weight", "vertex", "season", "x", "y", "optional"))
+  expect_equal(colnames(data.frame(ips)),
+               c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional"))
   expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
 })

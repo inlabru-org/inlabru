@@ -149,6 +149,14 @@ bru <- function(components = y ~ Intercept,
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides \code{samplers}.
 #' @param domain Named list of domain definitions.
+#' @param include Character vector of component labels that are needed by the
+#'   predictor expression; Default: NULL (include all components that are not
+#'   explicitly excluded)
+#' @param exclude Character vector of component labels that are not used by the
+#'   predictor expression. The exclusion list is applied to the list
+#'   as determined by the `include` parameter; Default: NULL (do not remove
+#'   any components from the inclusion list)
+#'   on the `include` parameter). 
 #' @param options list of global options overriding \link{bru.options}
 #'
 #' @return A likelihood configuration which can be used to parameterize \link{bru}.
@@ -158,6 +166,7 @@ bru <- function(components = y ~ Intercept,
 like <- function(family, formula = . ~ ., data = NULL,
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
+                 include = NULL, exclude = NULL,
                  options = list()) {
   options <- do.call(bru.options, options)
 
@@ -239,7 +248,9 @@ like <- function(family, formula = . ~ ., data = NULL,
     inla.family = inla.family,
     ips = ips,
     domain = domain,
-    drange = drange
+    drange = drange,
+    include_components = include,
+    exclude_components = exclude
   )
 
   class(lh) <- c("lhood", "list")
