@@ -1,4 +1,4 @@
-#' Generate samples from fitted bru and inla models
+#' Generate samples from fitted bru models
 #'
 #' @description
 #'
@@ -706,6 +706,7 @@ predict.bru <- function(object,
 #' @return List of generated samples
 #' @seealso \link{predict.bru}
 #' @example inst/examples/generate.bru.R
+#' @rdname generate
 
 generate.bru <- function(object,
                          data,
@@ -1086,7 +1087,6 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
 
 
 auto.intercept <- function(components) {
-  show_call_stack()
   env <- environment(components)
   
   tm <- terms(components)

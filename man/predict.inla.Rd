@@ -20,9 +20,10 @@ A \code{prediction} object.
 List of generated samples
 }
 \description{
-This method is no longer supported. Please see \code{\link{predict.bru}} instead.
+This method is not supported for plain inla objects. Please see \code{\link{predict.bru}} instead.
 
-This method is no longer supported. Please see \code{\link{generate.bru}} instead.
+This method is not supported for plain inla objects. Please see \code{\link{generate.bru}} instead.
+See https://github.com/fbachl/inlabru/issues/78 for more information.
 }
 \seealso{
 \code{\link{predict.inla}}

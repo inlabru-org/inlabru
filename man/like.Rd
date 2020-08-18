@@ -14,6 +14,8 @@ like(
   samplers = NULL,
   ips = NULL,
   domain = NULL,
+  include = NULL,
+  exclude = NULL,
   options = list()
 )
 }
@@ -46,6 +48,16 @@ Default taken from \code{options$Ntrials}.}
 \item{ips}{Integration points for 'cp' family. Overrides \code{samplers}.}
 
 \item{domain}{Named list of domain definitions.}
+
+\item{include}{Character vector of component labels that are needed by the
+predictor expression; Default: NULL (include all components that are not
+explicitly excluded)}
+
+\item{exclude}{Character vector of component labels that are not used by the
+predictor expression. The exclusion list is applied to the list
+as determined by the `include` parameter; Default: NULL (do not remove
+any components from the inclusion list)
+on the `include` parameter).}
 
 \item{options}{list of global options overriding \link{bru.options}}
 

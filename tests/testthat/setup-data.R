@@ -34,6 +34,19 @@ gorillas_update_CRS <- function(gorillas) {
     for (name in names(gorillas$plotsample)) {
       gorillas$plotsample[[name]] <- rebuild_CRS(gorillas$plotsample[[name]])
     }
+    crs <- sp::CRS(SRS_string = wkt(gorillas$mesh$crs))
+    gorillas$nests <- spTransform(gorillas$nests, crs)
+    gorillas$boundary <- spTransform(gorillas$boundary, crs)
+    gorillas$mesh <- inla.spTransform(gorillas$mesh, crs)
+    for (name in names(gorillas$gcov)) {
+      gorillas$gcov[[name]] <-
+        SpatialPixelsDataFrame(coordinates(gorillas$gcov[[name]]),
+                               data = as.data.frame(gorillas$gcov[[name]]),
+                               proj4string = crs)
+    }
+    for (name in names(gorillas$plotsample)) {
+      gorillas$plotsample[[name]] <- spTransform(gorillas$plotsample[[name]], crs)
+    }
   }
   gorillas
 }

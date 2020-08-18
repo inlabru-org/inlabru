@@ -144,6 +144,24 @@ component.formula <- function(object, lhoods, envir = NULL, ...) {
   add_mappers(components, lhoods = lhoods)
 }
 
+
+
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param component PARAM_DESCRIPTION
+#' @param lhoods PARAM_DESCRIPTION
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples 
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname add_mappers.component
+#' @keywords internal
+#' @export 
+
 add_mappers.component <- function(component, lhoods) {
   # Filter out lhoods that don't use/support the component
   keep_lh <-

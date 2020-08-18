@@ -13,7 +13,11 @@ test_that("bru: factor component", {
   fit <- bru(components = ~ -1 + fac(main = x, model = "factor"),
              formula = y ~ fac,
     family = "gaussian",
-    data = input.df
+    data = input.df,
+    options = list(control.inla = list(int.strategy = "eb",
+                                       h = 0.005),
+                   num.threads = 1,
+                   control.fixed = list(expand.factor.strategy = "inla"))
   )
 
   # Check fixed effect results

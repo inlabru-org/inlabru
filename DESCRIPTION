@@ -23,34 +23,35 @@ Description: Facilitates spatial modeling using integrated nested Laplace approx
   Fabian E. Bachl, Finn Lindgren, David L. Borchers, Janine B. Illian, Stephen T. Buckland, Havard Rue, 
   Tim Gerrodette (2017), <arXiv:1604.06013>.
 License: GPL (>= 2)
+Additional_repositories: https://inla.r-inla-download.org/R/testing
+RoxygenNote: 7.1.1
+Encoding: UTF-8
+Depends:
+    ggplot2,
+    methods,
+    R (>= 3.3),
+    sp,
+    stats
 Imports:
-  rgdal,
-  rgeos,
-  utils,
-  Matrix
+    Matrix,
+    rgdal,
+    rgeos,
+    utils
 Suggests:
-    testthat,
-    ggmap,
-    rgl,
-    sphereplot,
-    raster,
+    covr,
     dplyr,
-    maptools,
-    mgcv,
-    shiny,
-    spatstat,
-    spatstat.data,
-    RColorBrewer,
+    ggmap,
     graphics,
     INLA (>= 20.06.18),
     knitr,
-    rmarkdown
-Depends:
-    R (>= 3.3),
-    sp,
-    stats,
-    methods,
-    ggplot2,
-Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.1.0
-Encoding: UTF-8
+    maptools,
+    mgcv,
+    raster,
+    RColorBrewer,
+    rgl,
+    rmarkdown,
+    shiny,
+    spatstat,
+    spatstat.data,
+    sphereplot,
+    testthat
