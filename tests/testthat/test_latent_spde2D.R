@@ -3,7 +3,6 @@ context("Latent models - 2D SPDE - Group parameter (test_latent_spde2D.R)")
 latent_spde2D_group_testdata <- function(num.threads = 1,
                                          tolerance = NULL,
                                          h = 0.005) {
-  disable_PROJ6_warnings()
   set.seed(123)
 
   # Load and reduce data set

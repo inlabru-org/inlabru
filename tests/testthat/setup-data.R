@@ -77,7 +77,6 @@ gorillas_lgcp_2d_testdata <- function() {
 
 
 mrsea_rebuild_CRS <-function(x) {
-  disable_PROJ6_warnings()
   if (inla.has_PROJ6()) {
     x$points <- rebuild_CRS(x$points)
     x$samplers <- rebuild_CRS(x$samplers)
