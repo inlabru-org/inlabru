@@ -29,7 +29,8 @@ test_that("1D LGCP fitting", {
   expect_equal(fit$summary.random$spde1D$mean[c(1, 27, 50)], c(-0.46315457, 0.09792757, -3.25164489), tolerance = midtol)
   expect_equal(fit$summary.random$spde1D$sd[c(2, 32, 29)], c(0.5887868, 0.4267676, 0.4288160), tolerance = midtol)
 
-  pr <- predict(fit, data.frame(x = mesh1D$loc), ~spde1D, n.samples = 100, seed = 84354)
+  pr <- predict(fit, data = data.frame(x = mesh1D$loc), formula = ~spde1D,
+                n.samples = 100, seed = 84354)
   expect_equal(pr$mean, fit$summary.random$spde1D$mean, tolerance = hitol)
   expect_equal(pr$sd, fit$summary.random$spde1D$sd, tolerance = hitol)
 

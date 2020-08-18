@@ -437,7 +437,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     }
 
     data <- data.frame(data)
-    coords <- mesh$loc[as.numeric(names(w.by)), c(1, 2)]
+    coords <- mesh$loc[as.numeric(names(w.by)), , drop = FALSE]
     data$vertex <- as.numeric(names(w.by))
 
     ret <- SpatialPointsDataFrame(coords,
@@ -461,17 +461,17 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     }
   } else {
     fn <- function(X) {
-      coordinates(X) <- coordnames(points)
       ret <- vertex.projection(X, mesh, columns = columns)
       for (g in group) {
         ret[[g]] <- X[[g]][1]
       }
       ret
     }
-    idx <- as.list(data.frame(points)[, group, drop = FALSE])
-    ret <- by(points, idx, fn)
+   ret <- lapply(unique(points[[group]]),
+                  function(x) {
+                    fn(points[points[[group]] == x, , drop = FALSE])
+                  })
     ret <- do.call(rbind, ret)
-    proj4string(ret) <- INLA::inla.sp_get_crs(points)
   }
   ret
 }

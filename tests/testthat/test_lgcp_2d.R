@@ -2,6 +2,7 @@ context("2D LGCP fitting and prediction (test_lgcp_2d.R)")
 library(INLA)
 
 test_that("2D LGCP fitting", {
+  disable_PROJ6_warnings()
   
   options <- list(control.inla = list(int.strategy = "eb",
                                       h = 0.005),
@@ -27,8 +28,8 @@ test_that("2D LGCP fitting", {
   )
 
   # test_that("2D LGCP fitting: predicted random field", {
-  loc <- SpatialPoints(data$gorillas$mesh$loc[, c(1, 2)])
-  proj4string(loc) <- INLA::inla.sp_get_crs(data$gorillas$nests)
+  loc <- SpatialPoints(data$gorillas$mesh$loc[, c(1, 2)],
+                       proj4string = INLA::inla.sp_get_crs(data$gorillas$nests))
   pr <- predict(data$fit, loc, ~mySmooth, n.samples = 500, seed = 5657L)
   expect_equal(pr$mean[c(1, 255, 778, 1000)],
     c(-2.057675, -1.766163, -1.512785, -1.488362),

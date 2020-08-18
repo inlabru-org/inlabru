@@ -1,3 +1,12 @@
+disable_PROJ6_warnings <- function() {
+  library(rgdal)
+  if (inla.has_PROJ6()) {
+    rgdal::set_rgdal_show_exportToProj4_warnings(FALSE)
+    rgdal::set_thin_PROJ6_warnings(TRUE)
+  }
+}
+
+
 basic_intercept_testdata <- function() {
   set.seed(123)
   data.frame(
@@ -25,6 +34,19 @@ gorillas_update_CRS <- function(gorillas) {
     for (name in names(gorillas$plotsample)) {
       gorillas$plotsample[[name]] <- rebuild_CRS(gorillas$plotsample[[name]])
     }
+    crs <- sp::CRS(SRS_string = wkt(gorillas$mesh$crs))
+    gorillas$nests <- spTransform(gorillas$nests, crs)
+    gorillas$boundary <- spTransform(gorillas$boundary, crs)
+    gorillas$mesh <- inla.spTransform(gorillas$mesh, crs)
+    for (name in names(gorillas$gcov)) {
+      gorillas$gcov[[name]] <-
+        SpatialPixelsDataFrame(coordinates(gorillas$gcov[[name]]),
+                               data = as.data.frame(gorillas$gcov[[name]]),
+                               proj4string = crs)
+    }
+    for (name in names(gorillas$plotsample)) {
+      gorillas$plotsample[[name]] <- spTransform(gorillas$plotsample[[name]], crs)
+    }
   }
   gorillas
 }
@@ -39,6 +61,7 @@ gorillas_lgcp_2d_testdata <- function() {
 
   fit <- lgcp(cmp, gorillas$nests,
     samplers = gorillas$boundary,
+    domain = list(coordinates = gorillas$mesh),
     options = list(control.inla = list(int.strategy = "eb",
                                        h = 0.005),
                    num.threads = 1)
@@ -52,7 +75,9 @@ gorillas_lgcp_2d_testdata <- function() {
   )
 }
 
+
 mrsea_rebuild_CRS <-function(x) {
+  disable_PROJ6_warnings()
   if (inla.has_PROJ6()) {
     x$points <- rebuild_CRS(x$points)
     x$samplers <- rebuild_CRS(x$samplers)

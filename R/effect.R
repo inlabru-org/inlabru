@@ -147,7 +147,7 @@ component.formula <- function(object, ...) {
 #' @param group EXPERIMENTAL
 #' @param replicate EXPERIMENTAL
 #' @param values EXPERIMENTAL
-#' @param A.msk Boolean vector for masking (deactivating) columns of the A-matrix
+#' @param A.msk Boolean vector for masking (FALSE=deactivate) columns of the A-matrix
 #' @param ... EXPERIMENTAL
 #' @return An component object
 #'
@@ -160,14 +160,16 @@ component.formula <- function(object, ...) {
 #'   # As an example, let us create a linear component. Here ,the component is
 #'   # called "myEffectOfX" while the covariate the component acts on is called "x":
 #'
-#'   eff <- component("myEffectOfX", model = "linear", map = x)
+#'   eff <- component("myEffectOfX", map = x, model = "linear")
 #'   summary(eff)
 #'
 #'   # A more complicated component:
-#'   eff <- component("myEffectOfX", model = inla.spde2.matern(inla.mesh.1d(1:10)), map = x)
+#'   eff <- component("myEffectOfX",
+#'                    map = x,
+#'                    model = inla.spde2.matern(inla.mesh.1d(1:10)))
 #' }
 #' }
-#'
+
 component.character <- function(object,
                                 data,
                                 model,
@@ -352,12 +354,11 @@ make.default.mesh <- function(component, model, model.type, fvals = NULL) {
 #' @aliases code.components
 #' @keywords internal
 #' @param components A \link{formula} describing latent model components.
-#' @param fname Chracter setting the name of the function that will interpret the components.
 #' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
 #'
 
 code.components <- function(components) {
-  fname <- "component"
+  fname <- "inlabru:::component.character"
   tms <- terms(components)
   codes <- attr(tms, "term.labels")
 
@@ -389,10 +390,15 @@ code.components <- function(components) {
       codes[[k]] <- sprintf("%s(\"%s\", map = %s, model = 'linear')", fname, label, label)
     }
     else if (is.offset) {
-      codes[[k]] <- gsub(paste0(label, "("), paste0(fname, "(\"", label, "\", model = \"offset\", map = "), code, fixed = TRUE)
+      codes[[k]] <-
+        gsub(paste0(label, "("),
+             paste0(fname, "(\"", label, "\", model = \"offset\", map = "),
+             code, fixed = TRUE)
     }
     else {
-      codes[[k]] <- gsub(paste0(label, "("), paste0(fname, "(\"", label, "\", "), code, fixed = TRUE)
+      codes[[k]] <- gsub(paste0(label, "("),
+                    paste0(fname, "(\"", label, "\", "),
+                    code, fixed = TRUE)
     }
   }
 

@@ -10,7 +10,6 @@ iinla(
   lhoods,
   n = 10,
   result = NULL,
-  family,
   iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"),
   offset = NULL,
   inla.options
@@ -26,8 +25,6 @@ iinla(
 \item{n}{Number of \code{INLA::inla} iterations}
 
 \item{result}{A previous inla result, to be used as starting point}
-
-\item{family}{A vector of inla likelihood family names}
 
 \item{iinla.verbose}{If TRUE, be verbose (use verbose=TRUE to make INLA verbose)}
 

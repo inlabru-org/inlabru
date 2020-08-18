@@ -12,7 +12,11 @@ test_that("bru: factor component", {
   # Fit the model
   fit <- bru(y ~ fac(map = x, model = "factor") - Intercept,
     family = "gaussian",
-    data = input.df
+    data = input.df,
+    options = list(control.inla = list(int.strategy = "eb",
+                                       h = 0.005),
+                   num.threads = 1,
+                   control.fixed = list(expand.factor.strategy = "inla"))
   )
 
   # Check fixed effect results

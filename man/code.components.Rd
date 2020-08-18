@@ -8,8 +8,6 @@ code.components(components)
 }
 \arguments{
 \item{components}{A \link{formula} describing latent model components.}
-
-\item{fname}{Chracter setting the name of the function that will interpret the components.}
 }
 \description{
 Convert components to R code

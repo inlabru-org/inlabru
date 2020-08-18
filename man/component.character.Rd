@@ -37,7 +37,7 @@
 
 \item{values}{EXPERIMENTAL}
 
-\item{A.msk}{Boolean vector for masking (deactivating) columns of the A-matrix}
+\item{A.msk}{Boolean vector for masking (FALSE=deactivate) columns of the A-matrix}
 
 \item{...}{EXPERIMENTAL}
 }
@@ -55,14 +55,15 @@ if (require("INLA", quietly = TRUE)) {
   # As an example, let us create a linear component. Here ,the component is
   # called "myEffectOfX" while the covariate the component acts on is called "x":
 
-  eff <- component("myEffectOfX", model = "linear", map = x)
+  eff <- component("myEffectOfX", map = x, model = "linear")
   summary(eff)
 
   # A more complicated component:
-  eff <- component("myEffectOfX", model = inla.spde2.matern(inla.mesh.1d(1:10)), map = x)
+  eff <- component("myEffectOfX",
+                   map = x,
+                   model = inla.spde2.matern(inla.mesh.1d(1:10)))
 }
 }
-
 }
 \seealso{
 Other Component constructor: 

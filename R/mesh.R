@@ -1,4 +1,4 @@
-# Needed for registerin S4 methods, e.g. vertices()
+# Needed for registering S4 methods, e.g. vertices()
 setClass("inla.mesh")
 
 
@@ -116,7 +116,7 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #' }
 #'
 vertices.inla.mesh <- function(object) {
-  if (is.null(object$crs)) {
+  if (crs_is_null(object$crs)) {
     object$crs <- CRS("")
   }
 
@@ -127,9 +127,10 @@ vertices.inla.mesh <- function(object) {
   if (all(vrt[, 3] == 0)) {
     vrt <- vrt[, 1:2]
   }
-  coordinates(vrt) <- colnames(vrt)
-  vrt <- SpatialPointsDataFrame(vrt, data = data.frame(vertex = 1:nrow(object$loc)))
-  proj4string(vrt) <- object$crs
+  vrt <- SpatialPoints(vrt, proj4string = object$crs)
+  vrt <- SpatialPointsDataFrame(vrt,
+                                data = data.frame(vertex = seq_len(nrow(object$loc))),
+                                proj4string = object$crs)
 
   vrt # return
 }

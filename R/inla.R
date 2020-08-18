@@ -1,42 +1,22 @@
+bru_standardise_names <- function(x) {
+  vapply(x, function(x) gsub("[-() ]", "_", x = x, fixed = FALSE), "name")
+}
+
+
+
 #' Prediction from fitted inla model
 #'
-#' Takes a fitted inla object produced by the function inla() and produces predictions given a
-#' new set of values for the model covariates or the original values used for the model fit.
-#' The predictions can be based on any R expression that is valid given these values/covariates
-#' and the posterior of the estimated effects.
+#' This method is not supported for plain inla objects. Please see \code{\link{predict.bru}} instead.
 #'
 #' @aliases predict.inla
 #' @export
 #' @param object A \code{bru} object obtained by calling \link{bru} or \link{lgcp}.
 #' @param ... Arguments passed on to \link{predict.bru}.
 #' @return A \code{prediction} object.
-#'
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
-#'
-#' @examples
-#' \donttest{
-#' # Some features use the INLA package.
-#' if (require("INLA", quietly = TRUE)) {
-#'
-#'   # Generate some data
-#'
-#'   input.df <- data.frame(x = cos(1:10))
-#'   input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
-#'
-#'   # Fit a Gaussian likelihood model
-#'
-#'   formula <- y ~ x
-#'   fit <- inla(formula, "gaussian", data = input.df, control.compute = list(config = TRUE))
-#'
-#'   # Estimate posterior statistics of exp(x), where x is the fixed effect.
-#'
-#'   xpost <- predict(fit, NULL, ~ exp(x))
-#'   xpost
-#'   plot(xpost)
-#' }
-#' }
-#'
+#' @seealso \code{\link{predict.inla}}
+#' @keywords internal
 predict.inla <- function(object, ...) {
+  stop("predict() is not supported for plain inla objects. See https://github.com/fbachl/inlabru/issues/78")
   object$sppa$model <- make.model(object$.args$formula)
   class(object) <- c("bru", class(object))
   predict(object, ...)
@@ -44,49 +24,26 @@ predict.inla <- function(object, ...) {
 
 
 
-#' Sampling based on bru posteriors
+#' Sampling based on inla posteriors
 #'
 #' @description
-#' Takes a fitted \code{inla} object produced by \code{INLA::inla()} and produces samples given
-#' a new set of values for the model covariates or the original values used for the model fit. The
-#' samples can be based on any R expression that is valid given these values/covariates and the joint
-#' posterior of the estimated random effects.
-#'
+#' This method is not supported for plain inla objects. Please see \code{\link{generate.bru}} instead.
+#' See https://github.com/fbachl/inlabru/issues/78 for more information.
 #' @aliases generate.inla
+#' @rdname predict.inla
 #' @export
-#' @family sample generators
+#' @seealso \code{\link{generate.inla}}
 #' @param object An \code{inla} object obtained by calling \code{INLA::inla()}.
 #' @param ... additional arguments passed on to\link{generate.bru}.
 #'
 #' @return List of generated samples
-#' @seealso \link{predict.inla}
+#' @seealso \code{\link{predict.bru}}
 #'
 #' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
-#' @examples
-#' \donttest{
-#' # Some features use the INLA package.
-#' if (require("INLA", quietly = TRUE)) {
-#'
-#'   # Generate some data
-#'
-#'   input.df <- data.frame(x = cos(1:10))
-#'   input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
-#'
-#'   # Fit a Gaussian likelihood model
-#'
-#'   formula <- y ~ x
-#'   fit <- inla(formula, "gaussian", data = input.df, control.compute = list(config = TRUE))
-#'
-#'   # Generate samples from the posterior distribution of exp(x), where x is the fixed effect.
-#'
-#'   xpost <- generate(fit, NULL, ~ exp(x), n.samples = 2)
-#'   xpost
-#'   plot(xpost[[1]])
-#' }
-#' }
-#'
+#' @keywords internal
 generate.inla <- function(object,
                           ...) {
+  stop("generate() is no longer supported for plain inla objects. See https://github.com/fbachl/inlabru/issues/78")
   object$sppa$model <- make.model(object$.args$formula)
   class(object) <- c("bru", class(object))
   generate(object, ...)
@@ -109,7 +66,7 @@ extract.summary <- function(result, property) {
   }
 
   for (label in rownames(result$summary.hyperpar)) {
-    new.label <- gsub(" ", "_", x = label, fixed = TRUE)
+    new.label <- bru_standardise_names(label)
     ret[[new.label]] <- result$summary.hyperpar[label, property]
   }
 
@@ -205,12 +162,7 @@ inla.posterior.sample.structured <- function(result, n, seed = 0L) {
       ## Sanitize the variable names; replace problems with "_".
       ## Needs to handle whatever INLA uses to describe the hyperparameters.
       ## Known to include " " and "-" and potentially "(" and ")".
-      names(smpl.hyperpar) <-
-        vapply(
-          names(smpl.hyperpar),
-          function(nm) gsub("[-() ]", "_", x = nm, fixed = FALSE),
-          "name"
-        )
+      names(smpl.hyperpar) <- bru_standardise_names(names(smpl.hyperpar))
     }
     ssmpl[[i]] <- c(vals, smpl.hyperpar)
   }

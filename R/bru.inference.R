@@ -1,4 +1,4 @@
-#' Generate samples from fitted bru and inla models
+#' Generate samples from fitted bru models
 #'
 #' @description
 #'
@@ -115,23 +115,15 @@ bru <- function(components = y ~ Intercept,
     options$max.iter <- 1
   }
 
-  # Extract the family of each likelihood
-  family <- vapply(seq_along(lhoods), function(k) lhoods[[k]]$inla.family, "family")
-
   # Run iterated INLA
   if (options$run) {
-    result <- do.call(
-      iinla,
-      list(data,
-        bru.model,
-        lhoods,
-        #                          stk,
-        family = family,
-        n = options$max.iter,
-        offset = options$offset,
-        result = options$result,
-        inla.options = options$inla.options
-      )
+    result <- iinla(
+      model = bru.model,
+      lhoods = lhoods,
+      n = options$max.iter,
+      offset = options$offset,
+      result = options$result,
+      inla.options = options$inla.options
     )
   } else {
     result <- list()
@@ -704,12 +696,13 @@ predict.bru <- function(object,
 #' @param formula A formula determining which effects to sample from and how to combine them analytically.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics.
 #'                  The default is rather low but provides a quick approximate result.
-#' @param seed Random number genreator seed passed on to \code{inla.posterior.sample}
+#' @param seed Random number generator seed passed on to \code{inla.posterior.sample}
 #' @param ... additional, unused arguments.
 #'
 #' @return List of generated samples
 #' @seealso \link{predict.bru}
 #' @example inst/examples/generate.bru.R
+#' @rdname generate
 
 generate.bru <- function(object,
                          data,
@@ -909,7 +902,6 @@ summarize <- function(data, x = NULL, cbind.only = FALSE) {
 #' @param lhoods A list of likelihood objects from \code{\link{like}}
 #' @param n Number of \code{INLA::inla} iterations
 #' @param result A previous inla result, to be used as starting point
-#' @param family A vector of inla likelihood family names
 #' @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
 #' @param offset An additional predictor offset
 #' @param inla.options A list of further arguments passed on to \code{INLA::inla}
@@ -920,7 +912,6 @@ summarize <- function(data, x = NULL, cbind.only = FALSE) {
 
 
 iinla <- function(data, model, lhoods, n = 10, result = NULL,
-                  family,
                   iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"),
                   offset = NULL, inla.options) {
 
@@ -942,6 +933,9 @@ iinla <- function(data, model, lhoods, n = 10, result = NULL,
   }
   inla.options$control.predictor$compute <- TRUE
 
+  # Extract the family of each likelihood
+  family <- vapply(seq_along(lhoods), function(k) lhoods[[k]]$inla.family, "family")
+  
   # Inital stack
   stk <- joint_stackmaker(model, lhoods, result)
   stk.data <- INLA::inla.stack.data(stk)
