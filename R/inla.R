@@ -6,7 +6,7 @@ bru_standardise_names <- function(x) {
 
 #' Prediction from fitted inla model
 #'
-#' This method is no longer supported. Please see \code{\link{predict.bru}} instead.
+#' This method is not supported for plain inla objects. Please see \code{\link{predict.bru}} instead.
 #'
 #' @aliases predict.inla
 #' @export
@@ -16,7 +16,7 @@ bru_standardise_names <- function(x) {
 #' @seealso \code{\link{predict.inla}}
 #' @keywords internal
 predict.inla <- function(object, ...) {
-  stop("predict() is no longer supported for plain inla objects.")
+  stop("predict() is not supported for plain inla objects. See https://github.com/fbachl/inlabru/issues/78")
   object$sppa$model <- make.model(object$.args$formula)
   class(object) <- c("bru", class(object))
   predict(object, ...)
@@ -27,8 +27,8 @@ predict.inla <- function(object, ...) {
 #' Sampling based on inla posteriors
 #'
 #' @description
-#' This method is no longer supported. Please see \code{\link{generate.bru}} instead.
-#'
+#' This method is not supported for plain inla objects. Please see \code{\link{generate.bru}} instead.
+#' See https://github.com/fbachl/inlabru/issues/78 for more information.
 #' @aliases generate.inla
 #' @rdname predict.inla
 #' @export
@@ -43,7 +43,7 @@ predict.inla <- function(object, ...) {
 #' @keywords internal
 generate.inla <- function(object,
                           ...) {
-  stop("generate() is no longer supported for plain inla objects.")
+  stop("generate() is no longer supported for plain inla objects. See https://github.com/fbachl/inlabru/issues/78")
   object$sppa$model <- make.model(object$.args$formula)
   class(object) <- c("bru", class(object))
   generate(object, ...)

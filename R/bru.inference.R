@@ -1086,7 +1086,6 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
 
 
 auto.intercept <- function(components) {
-  show_call_stack()
   env <- environment(components)
   
   tm <- terms(components)
