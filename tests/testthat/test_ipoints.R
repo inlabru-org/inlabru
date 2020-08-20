@@ -64,11 +64,20 @@ test_that("conversion of 2D mesh to integration points", {
 test_that("SpatialLinesDataFrame to integration points using grouping parameter", {
   disable_PROJ6_warnings()
   data(mrsea, package = "inlabru")
-  mrsea <- mrsea_rebuild_CRS(mrsea)
+  mrsea <- mrsea_rebuild_CRS(mrsea, use_km = FALSE)
   ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
 
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)),
                c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional"))
+  expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
+
+  data(mrsea, package = "inlabru")
+  mrsea <- mrsea_rebuild_CRS(mrsea, use_km = TRUE)
+  ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
+  
+  expect_is(ips, "SpatialPointsDataFrame")
+  expect_equal(colnames(data.frame(ips)),
+               c("weight", "vertex", "season", "x", "y", "z", "optional"))
   expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
 })

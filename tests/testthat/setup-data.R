@@ -76,8 +76,7 @@ gorillas_lgcp_2d_testdata <- function() {
 }
 
 
-mrsea_rebuild_CRS <-function(x) {
-  disable_PROJ6_warnings()
+mrsea_rebuild_CRS <-function(x, use_km = FALSE) {
   if (inla.has_PROJ6()) {
     x$points <- rebuild_CRS(x$points)
     x$samplers <- rebuild_CRS(x$samplers)
@@ -85,6 +84,18 @@ mrsea_rebuild_CRS <-function(x) {
     x$boundary <- rebuild_CRS(x$boundary)
     x$covar <- rebuild_CRS(x$covar)
   }
+  if (use_km) {
+    # The estimation is numerically unreliable when the spatial
+    # domain is represented in metres, and has been seen to produce
+    # different results on different systems (e.g. Travis CI).
+    # Transform m to km:
+    crs_km <- inla.crs_set_lengthunit(x$mesh$crs, "km")
+    x$mesh <- inla.spTransform(x$mesh, crs_km)
+    x$samplers <- sp::spTransform(x$samplers, crs_km)
+    x$points <- sp::spTransform(x$points, crs_km)
+    x$boundary <- sp::spTransform(x$boundary, crs_km)
+    x$covar <- sp::spTransform(x$covar, crs_km)
+  }  
   x
 }
 
