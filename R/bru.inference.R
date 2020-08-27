@@ -633,7 +633,10 @@ summary.bru <- function(object, ...) {
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction.
 #' @param formula A formula determining which effects to predict and how to combine them.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
-#' @param seed Random number genreator seed passed on to \code{inla.posterior.sample}
+#' @param seed Random number generator seed passed on to \code{inla.posterior.sample}
+#' @param num.threads Specification of desired number of threads for parallel
+#' computations. Default NULL, leaves it up to INLA.
+#' When seed != 0, overridden to "1:1"
 #' @param ... ignored arguments (S3 generic compatibility).
 #'
 #' @return a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
@@ -644,6 +647,7 @@ predict.bru <- function(object,
                         formula = NULL,
                         n.samples = 100,
                         seed = 0L,
+                        num.threads = NULL,
                         ...) {
 
   # Convert data into list, data.frame or a Spatial object if not provided as such
@@ -654,7 +658,12 @@ predict.bru <- function(object,
     data <- vertices(data)
   }
 
-  vals <- generate.bru(object, data, formula = formula, n.samples = n.samples, seed = seed)
+  vals <- generate.bru(object,
+                       data,
+                       formula = formula,
+                       n.samples = n.samples,
+                       seed = seed,
+                       num.threads = num.threads)
 
   # Summarize
 
@@ -703,6 +712,9 @@ predict.bru <- function(object,
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics.
 #'                  The default is rather low but provides a quick approximate result.
 #' @param seed Random number generator seed passed on to \code{inla.posterior.sample}
+#' @param num.threads Specification of desired number of threads for parallel
+#' computations. Default NULL, leaves it up to INLA.
+#' When seed != 0, overridden to "1:1"
 #' @param ... additional, unused arguments.
 #'
 #' @return List of generated samples
@@ -715,6 +727,7 @@ generate.bru <- function(object,
                          formula = NULL,
                          n.samples = 100,
                          seed = 0L,
+                         num.threads = NULL,
                          ...) {
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(data)) {

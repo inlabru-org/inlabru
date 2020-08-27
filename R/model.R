@@ -112,6 +112,11 @@ make.model <- function(components) {
 # @param predictor A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects. In case of a formula the right hand side is used for evaluation.
 # @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
 # @param n Number of samples to draw.
+# @param seed If seed != 0L, the random seed
+# @param num.threads Specification of desired number of threads for parallel
+# computations. Default NULL, leaves it up to INLA.
+# When seed != 0, overridden to "1:1"
+# 
 #
 evaluate.model <- function(model,
                            result,
@@ -119,7 +124,8 @@ evaluate.model <- function(model,
                            predictor = NULL,
                            property = "mode",
                            n = 1,
-                           seed = 0L) {
+                           seed = 0L,
+                           num.threads = NULL) {
   data <- points # Within the evaluation make points available via the name "data"
 
 
@@ -132,7 +138,8 @@ evaluate.model <- function(model,
 
   # Do we otain our values from sampling or from a property of a summary?
   if (property == "sample") {
-    smp <- inla.posterior.sample.structured(result, n = n, seed = seed)
+    smp <- inla.posterior.sample.structured(result, n = n, seed = seed,
+                                            num.threads = num.threads)
   } else {
     result$model <- model
     smp <- rep(list(extract.summary(result, property)), n)
