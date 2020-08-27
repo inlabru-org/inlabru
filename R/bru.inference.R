@@ -266,12 +266,14 @@ single_stackmaker <- function(model, lhood, result) {
     INLA::inla.stack(
       make.stack(
         points = lhood$data, model = model, expr = lhood$expr, y = 1,
-        E = 0, result = result
+        E = 0, result = result,
       ),
       make.stack(
         points = lhood$ips, model = model, expr = lhood$expr, y = 0,
         E = lhood$E * lhood$ips$weight, offset = 0, result = result
-      )
+      ),
+      # Make sure components with zero derivative are kept:
+      remove.unused = FALSE
     )
   } else {
     make.stack(
@@ -285,11 +287,15 @@ single_stackmaker <- function(model, lhood, result) {
 joint_stackmaker <- function(model, lhoods, result) {
   do.call(
     inla.stack.mjoin,
-    lapply(
-      lhoods,
-      function(lh) {
-        single_stackmaker(model, lh, result)
-      }
+    c(
+      lapply(
+        lhoods,
+        function(lh) {
+          single_stackmaker(model, lh, result)
+        }
+      ),
+      # Make sure components with zero derivative are kept:
+      remove.unused = FALSE
     )
   )
 }
