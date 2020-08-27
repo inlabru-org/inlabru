@@ -64,7 +64,7 @@ gorillas_lgcp_2d_testdata <- function() {
     domain = list(coordinates = gorillas$mesh),
     options = list(control.inla = list(int.strategy = "eb",
                                        h = 0.005),
-                   num.threads = 1)
+                   num.threads = "1:1")
   )
 
   list(

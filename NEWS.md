@@ -1,5 +1,9 @@
 # inlabru 2.1.13.999
 
+* Keep components with zero derivative in the linearisation
+
+* PROJ6 support
+
 * Add random seed option for posterior sampling
 
 * Add package unit testing

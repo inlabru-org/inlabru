@@ -39,7 +39,9 @@ covdata.import <- function(dframe, colname, data) {
   A <- INLA::inla.spde.make.A(data$mesh, loc = covloc)
   stack <- INLA::inla.stack(
     data = list(y = dframe[, colname]), A = list(A, 1),
-    effects = list(spde = 1:spde.mdl$n.spde, m = rep(1, nrow(dframe)))
+    effects = list(spde = 1:spde.mdl$n.spde, m = rep(1, nrow(dframe))),
+    # Make sure components with zero derivative are kept:
+    remove.unused = FALSE
   )
 
   result <- INLA::inla(

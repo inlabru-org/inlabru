@@ -118,6 +118,10 @@ make.model <- function(components, lhoods) {
 #' @param property Property of the model components to obtain value from.
 #' Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
 #' @param n Number of samples to draw.
+# @param seed If seed != 0L, the random seed
+# @param num.threads Specification of desired number of threads for parallel
+# computations. Default NULL, leaves it up to INLA.
+# When seed != 0, overridden to "1:1"
 #' 
 #' @keywords internal
 evaluate.model <- function(model,
@@ -126,10 +130,9 @@ evaluate.model <- function(model,
                            predictor = NULL,
                            property = "mode",
                            n = 1,
-                           seed = 0L) {
-#  data <- points # Within the evaluation make points available via the name "data"
-
-
+                           seed = 0L,
+                           num.threads = NULL) {
+  
   if (inherits(predictor, "formula")) {
     fml.envir <- as.list(environment(predictor))
     predictor <- parse(text = as.character(predictor)[length(as.character(predictor))])
@@ -139,7 +142,8 @@ evaluate.model <- function(model,
 
   # Do we otain our values from sampling or from a property of a summary?
   if (property == "sample") {
-    smp <- inla.posterior.sample.structured(result, n = n, seed = seed)
+    smp <- inla.posterior.sample.structured(result, n = n, seed = seed,
+                                            num.threads = num.threads)
   } else {
     result$model <- model
     smp <- rep(list(extract.summary(result, property)), n)

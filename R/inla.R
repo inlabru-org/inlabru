@@ -99,21 +99,26 @@ extract.summary <- function(result, property) {
 ##          in the first sample
 ##
 
-inla.posterior.sample.structured <- function(result, n, seed = 0L) {
-
+inla.posterior.sample.structured <- function(result, n, seed = NULL,
+                                             num.threads = NULL, ...) {
+  if (!is.null(seed) && (seed != 0L)) {
+    num.threads <- "1:1"
+  }
   # Workaround for older versions of INLA
   if ("hyper.user.scale" %in% formalArgs(INLA::inla.posterior.sample)) {
     samples <- INLA::inla.posterior.sample(
       n = n,
       result = result,
-      seed = seed
+      seed = seed,
+      num.threads = num.threads
     )
   } else {
     samples <- INLA::inla.posterior.sample(
       n = n,
       result = result,
       seed = seed,
-      intern = FALSE
+      intern = FALSE,
+      num.threads = num.threads
     )
   }
 

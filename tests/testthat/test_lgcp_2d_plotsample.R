@@ -4,7 +4,7 @@ library(INLA)
 test_that("2D LGCP fitting and prediction: Plot sampling", {
   options <- list(control.inla = list(int.strategy = "eb",
                                       h = 0.005),
-                  num.threads = 1)
+                  num.threads = "1:1")
   data(gorillas, package = "inlabru")
   gorillas <- gorillas_update_CRS(gorillas)
 

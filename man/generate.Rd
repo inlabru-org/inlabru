@@ -7,7 +7,15 @@
 \usage{
 generate(object, ...)
 
-\method{generate}{bru}(object, data, formula = NULL, n.samples = 100, seed = 0L, ...)
+\method{generate}{bru}(
+  object,
+  data,
+  formula = NULL,
+  n.samples = 100,
+  seed = 0L,
+  num.threads = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{A \code{bru} object obtained by calling \link{bru}.}
@@ -21,7 +29,11 @@ generate(object, ...)
 \item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics.
 The default is rather low but provides a quick approximate result.}
 
-\item{seed}{Random number genreator seed passed on to \code{inla.posterior.sample}}
+\item{seed}{Random number generator seed passed on to \code{inla.posterior.sample}}
+
+\item{num.threads}{Specification of desired number of threads for parallel
+computations. Default NULL, leaves it up to INLA.
+When seed != 0, overridden to "1:1"}
 }
 \value{
 The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.

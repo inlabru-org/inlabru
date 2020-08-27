@@ -6,27 +6,35 @@ test_that("2D LGCP fitting", {
   
   options <- list(control.inla = list(int.strategy = "eb",
                                       h = 0.005),
-                  num.threads = 1)
+                  num.threads = "1:1")
   
   data <- gorillas_lgcp_2d_testdata()
 
   expect_s3_class(data$fit, "bru")
 
   # test_that("2D LGCP fitting: INLA intercept", {
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], 1.121929, tolerance = hitol)
-  expect_equal(data$fit$summary.fixed["Intercept", "sd"], 0.5799173, tolerance = hitol)
+  expect_equal(data$fit$summary.fixed["Intercept", "mean"], 1.121929, tolerance = midtol)
+  expect_equal(data$fit$summary.fixed["Intercept", "sd"], 0.5799173, tolerance = midtol)
 
   index <- c(1, 456, 789, 1058, 1479)
   # test_that("2D LGCP fitting: INLA random field", {
   expect_equal(data$fit$summary.random$mySmooth$mean[index],
-               c(-2.0259879,  0.3891452, -0.4462794,  0.4028431, -1.7016834),
-               tolerance = midtol
+               c(-2.0212259, 0.3862700, -0.4485562, 0.4033954, -1.7001208),
+               tolerance = lowtol
   )
   expect_equal(data$fit$summary.random$mySmooth$sd[index],
-    c(1.5934275, 0.8846649, 0.8297741, 0.7842688, 1.0545877),
-    tolerance = hitol
+               c(1.5936344, 0.8840181, 0.8289204, 0.7830659, 1.0539057),
+               tolerance = lowtol
   )
-
+  expect_equal(data$fit$summary.hyperpar["Range for mySmooth", "mean"],
+               2.117453,
+               tolerance = lowtol
+  )
+  expect_equal(data$fit$summary.hyperpar["Stdev for mySmooth", "mean"],
+               1.105217,
+               tolerance = lowtol
+  )
+  
   # test_that("2D LGCP fitting: predicted random field", {
   loc <- SpatialPoints(data$gorillas$mesh$loc[, c(1, 2)],
                        proj4string = INLA::inla.sp_get_crs(data$gorillas$nests))
@@ -56,19 +64,19 @@ test_that("2D LGCP fitting", {
 
   expect_equal(fit_ips$summary.fixed["Intercept", "mean"],
     data$fit$summary.fixed["Intercept", "mean"],
-    tolerance = midtol
+    tolerance = lowtol
   )
   expect_equal(fit_ips$summary.fixed["Intercept", "sd"],
     data$fit$summary.fixed["Intercept", "sd"],
-    tolerance = hitol
+    tolerance = lowtol
   )
   expect_equal(fit_ips$summary.random$mySmooth$mean,
     data$fit$summary.random$mySmooth$mean,
-    tolerance = midtol
+    tolerance = lowtol
   )
   expect_equal(fit_ips$summary.random$mySmooth$sd,
     data$fit$summary.random$mySmooth$sd,
-    tolerance = hitol
+    tolerance = lowtol
   )
 
   # test_that("Supplying domain definition", {
@@ -81,18 +89,18 @@ test_that("2D LGCP fitting", {
 
   expect_equal(fit_dom$summary.fixed["Intercept", "mean"],
     data$fit$summary.fixed["Intercept", "mean"],
-    tolerance = midtol
+    tolerance = lowtol
   )
   expect_equal(fit_dom$summary.fixed["Intercept", "sd"],
     data$fit$summary.fixed["Intercept", "sd"],
-    tolerance = midtol
+    tolerance = lowtol
   )
   expect_equal(fit_dom$summary.random$mySmooth$mean,
     data$fit$summary.random$mySmooth$mean,
-    tolerance = midtol
+    tolerance = lowtol
   )
   expect_equal(fit_dom$summary.random$mySmooth$sd,
     data$fit$summary.random$mySmooth$sd,
-    tolerance = midtol
+    tolerance = lowtol
   )
 })

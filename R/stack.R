@@ -57,7 +57,9 @@ make.stack <- function(data,
     ),
     A = A,
     tag = tag,
-    effects = effects
+    effects = effects,
+    # Make sure latent components with zero-derivatives aren't removed:
+    remove.unused = FALSE 
   )
   stk
 }

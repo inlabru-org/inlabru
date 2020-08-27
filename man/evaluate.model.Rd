@@ -12,7 +12,8 @@
   predictor = NULL,
   property = "mode",
   n = 1,
-  seed = 0L
+  seed = 0L,
+  num.threads = NULL
 )
 }
 \arguments{
