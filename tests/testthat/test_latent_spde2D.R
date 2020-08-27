@@ -1,6 +1,6 @@
 context("Latent models - 2D SPDE - Group parameter (test_latent_spde2D.R)")
 
-latent_spde2D_group_testdata <- function(num.threads = 1,
+latent_spde2D_group_testdata <- function(num.threads = "1:1",
                                          tolerance = NULL,
                                          h = 0.005) {
   set.seed(123)
@@ -49,18 +49,18 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_on_cran()
   disable_PROJ6_warnings()
   library(INLA)
-  data <- latent_spde2D_group_testdata(num.threads = 1, h = 0.005)
+  data <- latent_spde2D_group_testdata(num.threads = "1:1", h = 0.005)
 
   # Check Intercept
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -9.231591, midtol)
+  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -8.8628, midtol)
 
   # Check SPDE
   expect_equal(
     data$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    c(-1.27410, -1.96819, 0.7479571), midtol
+    c(-0.8247674, -2.3758650, 0.9492320), midtol
   )
   expect_equal(
     data$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
-    c(1.439, 1.635, 0.935), midtol
+    c(0.9502163, 1.1058397, 0.6451496), midtol
   )
 })

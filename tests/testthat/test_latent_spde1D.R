@@ -33,7 +33,7 @@ test_that("Latent models: SPDE 1D", {
   data <- latent_spde1D_testdata()
 
   # Check Intercept
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], 5.982867, midtol)
+  expect_equal(data$fit$summary.fixed["Intercept", "mean"], 5.684758, midtol)
 
   # Check SPDE
   expect_equal(
