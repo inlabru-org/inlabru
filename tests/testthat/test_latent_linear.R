@@ -1,6 +1,7 @@
 context("Latent models - linear (test_latent_linear.R)")
 
 test_that("bru: linear component", {
+  skip_on_cran()
 
   # Seed influences data as well as predict()!
   set.seed(123)

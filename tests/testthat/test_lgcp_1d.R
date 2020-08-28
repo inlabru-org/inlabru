@@ -5,11 +5,13 @@ test_data <- function() {
   data(Poisson2_1D)
   x <- seq(0, 55, length = 50)
   mesh1D <- inla.mesh.1d(x, boundary = "free")
-  matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150, 0.75), prior.sigma = c(0.1, 0.75))
+  matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150, 0.75),
+                                prior.sigma = c(0.1, 0.75))
   mdl <- x ~ spde1D(map = x, model = matern) + Intercept
   fit <- lgcp(mdl, pts2,
               ips = ipoints(c(0, 55), 50, name = "x"),
-              options = list(control.inla = list(int.strategy = "eb"))
+              options = list(control.inla = list(int.strategy = "eb"),
+                             num.threads = "1:1")
   )
   list(mesh1D = mesh1D,
        fit = fit)
@@ -17,6 +19,8 @@ test_data <- function() {
 
 
 test_that("1D LGCP fitting", {
+  skip_on_cran()
+  
   result <- test_data()
   mesh1D <- result$mesh1D
   fit <- result$fit
