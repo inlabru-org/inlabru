@@ -310,15 +310,6 @@ make.default.mesh <- function(component, model, model.type, fvals = NULL) {
   if (model.type %in% c("linear", "clinear")) {
     mesh <- NA
   }
-  else if (model.type %in% c("iid")) {
-    if (is.null(fvals$n)) {
-      stop(sprintf(
-        miss.msg, component$label,
-        model.type, "n"
-      ))
-    }
-    mesh <- INLA::inla.mesh.1d(1:fvals$n)
-  }
   else if (model.type %in% c("seasonal")) {
     if (is.null(fvals$season.length)) {
       stop(sprintf(
@@ -343,7 +334,16 @@ make.default.mesh <- function(component, model, model.type, fvals = NULL) {
     mesh <- model$mesh
   }
   else {
-    stop(paste0("component type '", model.type, "' not implemented."))
+    # For now, handle general models with an integer mesh mapping.
+    # if (model.type %in% c("iid")) {
+    if (is.null(fvals$n)) {
+      stop(sprintf(
+        miss.msg, component$label,
+        model.type, "n"
+      ))
+    }
+    mesh <- INLA::inla.mesh.1d(1:fvals$n)
+    #  else   stop(paste0("component type '", model.type, "' not implemented."))
   }
 
   mesh
