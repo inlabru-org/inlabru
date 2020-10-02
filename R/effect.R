@@ -268,6 +268,7 @@ component.character <- function(object,
     # available at this point!  Until multi-stage model initialisation is
     # implemented, require the user to explicitly provide these values.
     fvals <- list(
+      model = model,
       n = n,
       season.length = season.length,
       values = values,
