@@ -251,6 +251,8 @@ component.character <- function(object,
     if ("copy" %in% names(f.args)) {
       f.args[["copy"]] <- NULL
       fcall$model <- NULL
+    } else {
+      fcall$model <- substitute(model)
     }
 
     # Protect arguments that may need access to actual data
@@ -268,7 +270,6 @@ component.character <- function(object,
     # available at this point!  Until multi-stage model initialisation is
     # implemented, require the user to explicitly provide these values.
     fvals <- list(
-      model = model,
       n = n,
       season.length = season.length,
       values = values,
