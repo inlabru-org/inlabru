@@ -359,7 +359,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
 #' @method component character
 #' @param object A string giving the component its name
 #' @param data EXPERIMENTAL
-#' @param model Either one of "offset", "factor", "linear" or a model accepted by INLA's \code{f} function
+#' @param model Either one of "offset", "factor", "linear" or a model accepted
+#' by INLA's \code{f} function. If set to NULL, then "linear" is used.
 #' @param map EXPERIMENTAL
 #' @param n EXPERIMENTAL
 #' @param season.length EXPERIMENTAL
@@ -558,6 +559,8 @@ component.character <- function(object,
       ### Should postprocess components to link them together.
       fcall[["copy"]] <- NULL
       fcall$model <- NULL
+    } else {
+      fcall$model <- substitute(model)
     }
 
     # Replace arguments that will be evaluated by a mapper
