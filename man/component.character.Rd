@@ -7,7 +7,7 @@
 \method{component}{character}(
   object,
   data,
-  model,
+  model = NULL,
   map,
   n = NULL,
   season.length = NULL,
@@ -23,7 +23,8 @@
 
 \item{data}{EXPERIMENTAL}
 
-\item{model}{Either one of "offset", "factor", "linear" or a model accepted by INLA's \code{f} function}
+\item{model}{Either one of "offset", "factor", "linear" or a model accepted
+by INLA's \code{f} function. If set to NULL, then "linear" is used.}
 
 \item{map}{EXPERIMENTAL}
 
