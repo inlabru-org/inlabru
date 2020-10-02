@@ -140,7 +140,8 @@ component.formula <- function(object, ...) {
 #' @method component character
 #' @param object A string giving the component its name
 #' @param data EXPERIMENTAL
-#' @param model Either one of "offset", "factor", "linear" or a model accepted by INLA's \code{f} function
+#' @param model Either one of "offset", "factor", "linear" or a model accepted
+#' by INLA's \code{f} function. If set to NULL, then "linear" is used.
 #' @param map EXPERIMENTAL
 #' @param n EXPERIMENTAL
 #' @param season.length EXPERIMENTAL
@@ -172,7 +173,7 @@ component.formula <- function(object, ...) {
 
 component.character <- function(object,
                                 data,
-                                model,
+                                model = NULL,
                                 map,
                                 n = NULL,
                                 season.length = NULL,
@@ -194,6 +195,9 @@ component.character <- function(object,
   # The label
   label <- object
 
+  if (is.null(model)) {
+    model <- "linear"
+  }
   # Model type as character
   model.type <- model
   if (inherits(model, "inla.spde")) {
