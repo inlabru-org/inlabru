@@ -86,7 +86,7 @@ make.model <- function(components, lhoods) {
   effects <- component(components, lhoods)
 
   # Create joint formula that will be used by inla
-  formula <- y ~ -1
+  formula <- BRU_response ~ -1
   for (fm in lapply(effects, function(eff) {
     eff$inla.formula
   })) {
