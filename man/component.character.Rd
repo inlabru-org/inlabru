@@ -31,7 +31,8 @@
 \arguments{
 \item{object}{A string giving the component its name}
 
-\item{model}{Either one of "offset", "factor", "linear" or a model accepted by INLA's \code{f} function}
+\item{model}{Either one of "offset", "factor", "linear" or a model accepted
+by INLA's \code{f} function. If set to NULL, then "linear" is used.}
 
 \item{n}{EXPERIMENTAL}
 

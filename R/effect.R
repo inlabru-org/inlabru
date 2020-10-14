@@ -194,7 +194,6 @@ add_mappers.component <- function(component, lhoods) {
                                     env = component$env)
   
   if (component$main$type %in% c("offset")) {
-  } else if (component$main$type %in% c("factor")) {
   } else {
     
     fcall <- component$fcall
@@ -313,6 +312,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
         }
         is_spatial <- vapply(inp_, function(x) inherits(x, "Spatial"), TRUE)
         is_matrix <- vapply(inp_, function(x) is.matrix(x), TRUE)
+        is_factor <- vapply(inp_, function(x) is.factor(x), TRUE)
         if (any(is_spatial)) {
           if(!all(is_spatial)) {
             stop("Inconsistent input types; spatial and non-spatial")
@@ -328,6 +328,13 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
           }
           inp_values <- unique(do.call(rbind, inp_))
           n_values <- nrow(inp_values)
+        } else if (any(is_factor)) {
+          if (!all(is_factor)) {
+            stop("Inconsistent input types; factor and non-factor")
+          }
+          inp_values <- sort(unique(do.call(c, lapply(inp_, as.character))),
+                             na.last = NA)
+          n_values <- length(inp_values)
         } else {
           inp_values <- sort(unique(unlist(inp_)), na.last = NA)
           n_values <- length(inp_values)
@@ -540,8 +547,8 @@ component.character <- function(object,
     # Store model name or object in the environment
     model_name <- paste0("BRU_", label, "_main_model")
     fcall[["model"]] <- as.symbol(model_name)
-    assign(model_name, component$main$model, envir = envir_extra)
-
+    assign(model_name, component$main$model, envir = component$env_extra)
+    
     # Remove parameters inlabru supports but INLA doesn't,
     # and substitute parameters that inlabru will transform
     fcall <- fcall[!(names(fcall) %in% c("main",
@@ -559,8 +566,6 @@ component.character <- function(object,
       ### Should postprocess components to link them together.
       fcall[["copy"]] <- NULL
       fcall$model <- NULL
-    } else {
-      fcall$model <- substitute(model)
     }
 
     # Replace arguments that will be evaluated by a mapper
@@ -594,7 +599,17 @@ component.character <- function(object,
       fcall[["values"]] <- as.symbol(values_name)
       assign(values_name, component$main$values, envir = component$env_extra)
     }
-
+    
+    # Setup factor precision parameter
+    if (model == "factor") {
+      # TODO: allow configuration of the precision
+      factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
+      fcall[["hyper"]] <- as.symbol(factor_hyper_name)
+      assign(factor_hyper_name,
+             list(prec = list(initial = log(1e-6), fixed = TRUE)),
+             envir = component$env_extra)
+    }
+    
     component$inla.formula <-
       as.formula(paste0("~ . + ",
                         as.character(parse(text = deparse(fcall)))),
@@ -644,10 +659,15 @@ make_mapper <- function(subcomp,
     subcomp$values <- 1
   } else {
     # No mapper; construct based on input values
-    # TODO: add factor mapper construction
     if (is.null(subcomp[["values"]])) {
       if (!is.null(input_values)) {
-        subcomp[["values"]] <- sort(unique(input_values), na.last = NA)
+        if (is.factor(input_values)) {
+          subcomp[["values"]] <- levels(input_values)
+        } else if (is.character(input_values)) {
+          subcomp[["values"]] <- unique(input_values)
+        } else {
+          subcomp[["values"]] <- sort(unique(input_values), na.last = NA)
+        }
       }
     }
     if (is.null(subcomp[["n"]])) {
@@ -663,8 +683,26 @@ make_mapper <- function(subcomp,
                     length(subcomp[["values"]]), " for label ", label))
       }
     }
-    if (length(subcomp[["values"]]) > 1) {
-      subcomp$mapper <- INLA::inla.mesh.1d(subcomp[["values"]])
+    if (is.factor(subcomp[["values"]]) ||
+        is.character(subcomp[["values"]])) {
+      if (is.factor(subcomp[["values"]])) {
+        subcomp$mapper <- list(levels = levels(subcomp[["values"]]))
+      } else {
+        subcomp$mapper <- list(levels = unique(subcomp[["values"]]))
+      }
+      if (subcomp[["type"]] == "factor") {
+        subcomp[["values"]] <- subcomp[["mapper"]][["levels"]][-1L]
+        subcomp$mapper$factor_mapping <- "contrast"
+      } else {
+        subcomp[["values"]] <- subcomp[["mapper"]][["levels"]]
+        subcomp$mapper$factor_mapping <- "full"
+      }
+      subcomp$n <- length(subcomp[["values"]])
+      class(subcomp$mapper) <- c("bru_factor_mapper", "list")
+    } else {
+      if (length(subcomp[["values"]]) > 1) {
+        subcomp$mapper <- INLA::inla.mesh.1d(subcomp[["values"]])
+      }
     }
   }
 
@@ -840,11 +878,7 @@ value.component <- function(component, data, state, A = NULL, ...) {
   # Determine component depending on the type of latent model
   if (component$main$type %in% c("offset")) {
     values <- input_eval(component, part = "main", data = data, env = component$env)
-  }
-#  else if (component$type %in% c("factor")) {
-#    values <- A %*% state[mapped]
-#  }
-  else {
+  } else {
     values <- A %*% state
   }
 #  else {
@@ -889,11 +923,37 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
     A <- INLA::inla.spde.make.A(subcomp$mapper, loc = val, weights = weights)
   } else if (inherits(subcomp$mapper, c("bru_factor_mapper"))) {
     val <- input_eval(subcomp$input, data, env = env)
-    # TODO: construct A-matrices for factor components
-    warning("factor mapping not implemented in amatrix_eval.bru_component")
-    A <- NULL
-    # INLA::inla.spde.make.A(subcomp$mapper, loc = val, weights = weights)
-  } else if (subcomp$model %in% c("linear", "clinear")) {
+    if (is.factor(val)) {
+      if (!identical(levels(val), subcomp$mapper$levels)) {
+        val <- factor(as.character(val), levels = subcomp$mapper$levels)
+      }
+    } else if (is.factor(val)) {
+      val <- factor(val, levels = subcomp$mapper$levels)
+    } else {
+      stop("factor mapping present but non-factor input data found")
+    }
+    if (subcomp$mapper$factor_mapping == "full") {
+      val <- as.numeric(val)
+    } else if (subcomp$mapper$factor_mapping == "contrast") {
+      val <- as.numeric(val) - 1L
+    } else {
+      stop("Unknown factor mapping '", subcomp$mapper$factor_mapping , "'.")  
+    }
+    ok <- !is.na(val)
+    ok[which(ok)] <- (val[ok] > 0L)
+    if ((length(weights) == 1) &&
+        (length(weights) < length(val))) {
+      A <- Matrix::sparseMatrix(i = which(ok),
+                                j = val[ok],
+                                x = rep(weights, sum(ok)),
+                                dims = c(nrow(data), subcomp$n))
+    } else {
+      A <- Matrix::sparseMatrix(i = which(ok),
+                                j = val[ok],
+                                x = weights[ok],
+                                dims = c(nrow(data), subcomp$n))
+    }
+    } else if (subcomp$model %in% c("linear", "clinear")) {
     val <- input_eval(subcomp$input, data, env = env)
     A <- Matrix::sparseMatrix(i = seq_len(nrow(data)),
                               j = rep(1, nrow(data)),
