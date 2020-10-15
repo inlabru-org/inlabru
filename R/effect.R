@@ -263,7 +263,7 @@ bru_subcomponent <- function(input = NULL,
                         "log1exp", "logdist"))) {
     type <- "specialnonlinear"
   } else if (is.character(model)) {
-    if (model == "factor") {
+    if (identical(model, "factor")) {
       type <- "factor"
       model <- "iid"
     } else {
@@ -557,7 +557,11 @@ component.character <- function(object,
                                          "replicate_mapper",
                                          "A.msk",
                                          "map",
-                                         "mesh"))]
+                                         "mesh",
+                                         "main_layer",
+                                         "group_layer",
+                                         "replicate_layer",
+                                         "weights_layer"))]
 
     # A trick for "Copy" models
     if ("copy" %in% names(fcall)) {
@@ -601,7 +605,7 @@ component.character <- function(object,
     }
     
     # Setup factor precision parameter
-    if (model == "factor") {
+    if (identical(model, "factor")) {
       # TODO: allow configuration of the precision
       factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
       fcall[["hyper"]] <- as.symbol(factor_hyper_name)
