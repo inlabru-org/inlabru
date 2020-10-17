@@ -166,7 +166,10 @@ bru <- function(components = y ~ Intercept,
 #'  Default taken from \code{options$Ntrials}.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides \code{samplers}.
-#' @param domain Named list of domain definitions.
+#' @param domain Named list of integration function domain definitions. Either
+#'   and \code{inla.mesh.1d} or \code{inla.mesh} object specifying the locations
+#'   for integration point locations, or a single scalar indicating how many 1D
+#'   integration points to use.
 #' @param options list of global options overriding \link{bru.options}
 #'
 #' @return A likelihood configuration which can be used to parameterize \link{bru}.

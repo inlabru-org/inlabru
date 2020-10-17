@@ -48,7 +48,10 @@ Default taken from \code{options$Ntrials}.}
 
 \item{ips}{Integration points for 'cp' family. Overrides \code{samplers}.}
 
-\item{domain}{Named list of domain definitions.}
+\item{domain}{Named list of integration function domain definitions. Either
+and \code{inla.mesh.1d} or \code{inla.mesh} object specifying the locations
+for integration point locations, or a single scalar indicating how many 1D
+integration points to use.}
 
 \item{options}{list of global options overriding \link{bru.options}}
 }

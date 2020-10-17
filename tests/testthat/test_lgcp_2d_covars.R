@@ -10,17 +10,22 @@ test_that("2D LGCP fitting", {
 
   mdl <- coordinates ~ veg(map = gorillas$gcov$vegetation, model = "factor") - Intercept
   fit <- lgcp(mdl, gorillas$nests,
-    samplers = gorillas$boundary, domain = list(coordinates = gorillas$mesh),
+    samplers = gorillas$boundary,
+    domain = list(coordinates = gorillas$mesh),
     options = list(
       control.inla = list(int.strategy = "eb",
                           h = 0.005),
-      num.threads = 1,
+      num.threads = "1:1",
       control.fixed = list(expand.factor.strategy = "inla")
     )
   )
 
-  expect_equal(fit$summary.fixed[, "mean"], c(4.269611, 2.219120, 1.557980, 4.455956, 3.590849, 4.175845), tolerance = lowtol)
-  expect_equal(fit$summary.fixed[, "sd"], c(0.57677865, 0.11041125, 0.22336546, 0.04484612, 0.21299094, 0.21800205), tolerance = lowtol)
+  expect_equal(fit$summary.fixed[, "mean"],
+               c(4.269611, 2.219120, 1.557980, 4.455956, 3.590849, 4.175845),
+               tolerance = lowtol)
+  expect_equal(fit$summary.fixed[, "sd"],
+               c(0.57677865, 0.11041125, 0.22336546, 0.04484612, 0.21299094, 0.21800205),
+               tolerance = lowtol)
 
   # test_that("2D LGCP fitting: Continuous covariate (as function)", {
   elev <- gorillas$gcov$elevation
@@ -29,15 +34,16 @@ test_that("2D LGCP fitting", {
   mdl2 <- coordinates ~ beta.elev(map = elev, model = "linear") + Intercept
   fit2 <- lgcp(mdl2, gorillas$nests,
     samplers = gorillas$boundary,
+    domain = list(coordinates = gorillas$mesh),
     options = list(control.inla = list(int.strategy = "eb",
                                        h = 0.005),
-                   num.threads = 1)
+                   num.threads = "1:1")
   )
 
-  expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.003249187, tolerance = lowtol)
-  expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.0002526346, tolerance = lowtol)
-  expect_equal(fit2$summary.fixed["Intercept", "mean"], 3.498229, tolerance = lowtol)
-  expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.05654166, tolerance = lowtol)
+  expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004189785, tolerance = lowtol)
+  expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.0002467927, tolerance = lowtol)
+  expect_equal(fit2$summary.fixed["Intercept", "mean"], 3.069782, tolerance = lowtol)
+  expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.05587129, tolerance = lowtol)
 
   f.elev <- function(x, y) {
     spp <- SpatialPoints(data.frame(x = x, y = y),
@@ -50,15 +56,16 @@ test_that("2D LGCP fitting", {
   mdl3 <- coordinates ~ beta.elev(map = f.elev(x, y), model = "linear") + Intercept
   fit3 <- lgcp(mdl3, gorillas$nests,
                samplers = gorillas$boundary,
+               domain = list(coordinates = gorillas$mesh),
                options = list(control.inla = list(int.strategy = "eb",
                                                   h = 0.005),
-                              num.threads = 1)
+                              num.threads = "1:1")
   )
   
-  expect_equal(fit3$summary.fixed["beta.elev", "mean"], 0.003249187, tolerance = lowtol)
-  expect_equal(fit3$summary.fixed["beta.elev", "sd"], 0.0002526346, tolerance = lowtol)
-  expect_equal(fit3$summary.fixed["Intercept", "mean"], 3.498229, tolerance = lowtol)
-  expect_equal(fit3$summary.fixed["Intercept", "sd"], 0.05654166, tolerance = lowtol)
-  
+  expect_equal(fit3$summary.fixed["beta.elev", "mean"], 0.004189785, tolerance = lowtol)
+  expect_equal(fit3$summary.fixed["beta.elev", "sd"], 0.0002467927, tolerance = lowtol)
+  expect_equal(fit3$summary.fixed["Intercept", "mean"], 3.069782, tolerance = lowtol)
+  expect_equal(fit3$summary.fixed["Intercept", "sd"], 0.05587129, tolerance = lowtol)
+
   
   })
