@@ -51,15 +51,26 @@ test_that("bru: factor component", {
 #    fit$summary.random$fac2
 #  )
 
-  # Check fixed effect results
-#  expect_equal(fit$summary.fixed[1, "mean"], 1.009040, midtol)
-#  expect_equal(fit$summary.fixed[1, "sd"], 0.009721, midtol)
-#  expect_equal(fit$summary.fixed[2, "mean"], -2.01075, midtol)
-#  expect_equal(fit$summary.fixed[2, "sd"], 0.009721, midtol)
-
+  # Check factoreffect results
+  expect_equal(fit$summary.random$fac1$mean,
+               c(-3.072353, -1.092120),
+               midtol)
+  expect_equal(fit$summary.random$fac1$sd,
+               c(0.04371715, 0.05016696),
+               midtol)
+  expect_equal(fit$summary.random$fac2$mean,
+               c(1.213684, -1.723465,
+                 1.310543, -1.671742,  1.302144, -1.700765,  1.271106),
+               midtol)
+  expect_equal(fit$summary.random$fac2$sd,
+               c(0.5222028, 0.5208762,
+                 0.5213029, 0.5213029, 0.5213029, 0.5213029, 0.5213029),
+               midtol)
+  
   # Check if prediction works
   pr <- predict(fit, data.frame(x1 = factor(c("Alpha", "Beta", "Mu")),
                                 x2 = factor(c("Delta", "Delta", "Gamma"))),
                 ~ fac1 + fac2, seed = 1)
-#  expect_equal(pr[, "mean"], c(2.008706, -1.010480), hitol)
+  expect_equal(pr[, "mean"], c(1.168671, -1.904676, -2.857816), midtol)
+  expect_equal(pr[, "sd"], c(0.5027916, 0.5041648, 0.5058944), midtol)
 })
