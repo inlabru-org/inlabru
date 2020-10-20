@@ -29,9 +29,12 @@ nlinla.taylor <- function(expr, epunkt, data, env) {
     colnames(ngrd) <- effects
     return(list(gradient = ngrd, const = nconst))
   } else {
-    blk <- round(1:nrow(epunkt) / 1000)
-    qq <- by(1:nrow(epunkt), blk, function(idx) {
-      nlinla.taylor(expr, epunkt[idx, ], data[idx, ], env)
+    blk <- floor((seq_len(nrow(epunkt)) - 1L) / 1000)
+    qq <- by(seq_len(nrow(epunkt)), blk, function(idx) {
+      nlinla.taylor(expr,
+                    epunkt[idx, , drop = FALSE],
+                    data[idx, , drop = FALSE],
+                    env)
     })
     nconst <- do.call(c, lapply(qq, function(x) {
       x$const
