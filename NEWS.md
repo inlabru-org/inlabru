@@ -1,4 +1,4 @@
-# inlabru 2.1.13.999
+# inlabru 2.1.14.900
 
 * Improved factor support; Either as "contrast with the 1st level", via the
   special "factor" model, or all levels with model "iid". Further options
