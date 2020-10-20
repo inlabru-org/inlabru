@@ -5,7 +5,6 @@
 \title{Iterated INLA}
 \usage{
 iinla(
-  data,
   model,
   lhoods,
   n = 10,
@@ -16,8 +15,6 @@ iinla(
 )
 }
 \arguments{
-\item{data}{A data.frame}
-
 \item{model}{A \link{bru_model} object}
 
 \item{lhoods}{A list of likelihood objects from \code{\link{like}}}
@@ -33,6 +30,8 @@ iinla(
 \item{inla.options}{A list of further arguments passed on to \code{INLA::inla}
 Some \code{control.*} arguments are partially overridden, according to
 internal inlabru method requirements.}
+
+\item{data}{A data.frame}
 }
 \value{
 An \code{INLA::inla} object

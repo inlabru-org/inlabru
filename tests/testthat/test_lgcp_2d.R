@@ -20,19 +20,19 @@ test_that("2D LGCP fitting", {
   # test_that("2D LGCP fitting: INLA random field", {
   expect_equal(data$fit$summary.random$mySmooth$mean[index],
                c(-2.0212259, 0.3862700, -0.4485562, 0.4033954, -1.7001208),
-               tolerance = lowtol
+               tolerance = midtol
   )
   expect_equal(data$fit$summary.random$mySmooth$sd[index],
                c(1.5936344, 0.8840181, 0.8289204, 0.7830659, 1.0539057),
-               tolerance = lowtol
+               tolerance = midtol
   )
   expect_equal(data$fit$summary.hyperpar["Range for mySmooth", "mean"],
                2.117453,
-               tolerance = lowtol
+               tolerance = midtol
   )
   expect_equal(data$fit$summary.hyperpar["Stdev for mySmooth", "mean"],
                1.105217,
-               tolerance = lowtol
+               tolerance = midtol
   )
   
   # test_that("2D LGCP fitting: predicted random field", {

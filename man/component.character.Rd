@@ -6,29 +6,37 @@
 \usage{
 \method{component}{character}(
   object,
-  data,
+  main = NULL,
   model = NULL,
-  map,
+  mapper = NULL,
+  main_layer = NULL,
+  main_selector = NULL,
   n = NULL,
-  season.length = NULL,
-  group = NULL,
-  replicate = NULL,
   values = NULL,
+  season.length = NULL,
+  weights = NULL,
+  weights_layer = NULL,
+  group = NULL,
+  group_layer = NULL,
+  control.group = NULL,
+  replicate = NULL,
+  replicate_layer = NULL,
   A.msk = NULL,
+  map = NULL,
+  mesh = NULL,
+  envir_extra = NULL,
   ...
 )
 }
 \arguments{
 \item{object}{A string giving the component its name}
 
-\item{data}{EXPERIMENTAL}
-
 \item{model}{Either one of "offset", "factor", "linear" or a model accepted
 by INLA's \code{f} function. If set to NULL, then "linear" is used.}
 
-\item{map}{EXPERIMENTAL}
-
 \item{n}{EXPERIMENTAL}
+
+\item{values}{EXPERIMENTAL}
 
 \item{season.length}{EXPERIMENTAL}
 
@@ -36,11 +44,13 @@ by INLA's \code{f} function. If set to NULL, then "linear" is used.}
 
 \item{replicate}{EXPERIMENTAL}
 
-\item{values}{EXPERIMENTAL}
-
 \item{A.msk}{Boolean vector for masking (FALSE=deactivate) columns of the A-matrix}
 
+\item{map}{EXPERIMENTAL}
+
 \item{...}{EXPERIMENTAL}
+
+\item{data}{EXPERIMENTAL}
 }
 \value{
 An component object
@@ -49,6 +59,9 @@ An component object
 This function is inlabru's equivalent to INLA's \code{f} function but adds functionality that
 is unique to inlabru.
 }
+\details{
+Deprecated: \code{map} (now \code{main}), \code{mesh} (now \code{mapper})
+}
 \examples{
 \donttest{
 if (require("INLA", quietly = TRUE)) {
@@ -56,12 +69,12 @@ if (require("INLA", quietly = TRUE)) {
   # As an example, let us create a linear component. Here ,the component is
   # called "myEffectOfX" while the covariate the component acts on is called "x":
 
-  eff <- component("myEffectOfX", map = x, model = "linear")
+  eff <- component("myEffectOfX", main = x, model = "linear")
   summary(eff)
 
   # A more complicated component:
   eff <- component("myEffectOfX",
-                   map = x,
+                   main = x,
                    model = inla.spde2.matern(inla.mesh.1d(1:10)))
 }
 }

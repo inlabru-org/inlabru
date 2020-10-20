@@ -4,16 +4,19 @@
 \alias{make.model}
 \title{Create an inlabru model object from a component formula}
 \usage{
-make.model(components)
+make.model(components, lhoods)
 }
 \arguments{
-\item{fml}{A component specification formula}
+\item{components}{A component specification formula}
+
+\item{lhoods}{A list of one or more \code{lhood} objects}
 }
 \value{
 A \link{bru_model} object
 }
 \description{
-The \link{inlabru} syntax for model forulae is different from what \code{INLA::inla} considers a valid.
+The \link{inlabru} syntax for model formulae is different from what
+\code{INLA::inla} considers a valid.
 In inla most of the effects are defined by adding an \code{f(...)} expression to the formula.
 In \link{inlabru} the \code{f} is replaced by an arbitrary (exception: \code{offset}) string that will
 determine the label of the effect. See Details for further information.
@@ -32,26 +35,34 @@ in inlabru.
 A disadvantage of the inla way is that there is no clear separation between the name of the covariate
 and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
 use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-\link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
-like the first argument of the f function, e.g.
+\link{inlabru} provides the new \code{main} agument. For convenience, the \code{main} argument can be used
+like the first argument of the f function, e.g., and is the first argument of the component definition.
 
-\code{y ~ f(temperature, model = 'fixed')}
+\code{y ~ f(temperature, model = 'linear')}
 
 is equivalent to
 
-\code{y ~ temperature(map = temperature, model = fixed)}
+\code{y ~ temperature(temperature, model = 'linear')}
+and
+\code{y ~ temperature(main = temperature, model = 'linear')}
 as well as
-\code{y ~ temperature(model = fixed)}
+\code{y ~ temperature(model = 'linear')}
+which sets \code{main = temperature}.
 
 On the other hand, map can also be a function mapping, e.g the \link{coordinates} function of the
 \link{sp} package :
 
-\code{y ~ mySPDE(map = coordinates, ...)}
+\code{y ~ mySPDE(coordinates, ...)}
 
-Morevover, \code{map} can be any expression that evaluate within your data as an environment.
-For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'a+b' by
+This exctract the coordinates from the data object, and maps it to the latent
+field via the information given in the \code{mapper}, which by default is
+extracted from the \code{model} object, in the case of \code{spde} model
+objects.
+
+Morevover, \code{main} can be any expression that evaluates within your data as an environment.
+For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'sin(a+b)' by
 setting \code{map} in the following way:
 
-\code{y ~ myEffect(map = sin(a+b))}
+\code{y ~ myEffect(sin(a+b))}
 }
 \keyword{internal}

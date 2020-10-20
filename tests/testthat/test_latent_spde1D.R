@@ -10,13 +10,13 @@ latent_spde1D_testdata <- function() {
     prior.sigma = c(10, 0.01)
   )
 
-  cmp <- count ~ field(map = x, model = matern) + Intercept
-  # This model is sensitive to the integration strategy; "eb" is too smooth.
-  fit <- bru(cmp,
+  cmp <- count ~ field(main = x, model = matern) + Intercept
+    # This model is sensitive to the integration strategy; "eb" is too smooth.
+fit <- bru(cmp,
     data = countdata2, family = "poisson",
     options = list(E = countdata2$exposure,
                    control.inla = list(h = 0.005),
-                   num.threads = 1)
+                   num.threads = "1:1")
   )
 
   list(
@@ -33,7 +33,7 @@ test_that("Latent models: SPDE 1D", {
   data <- latent_spde1D_testdata()
 
   # Check Intercept
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], 5.695985, midtol)
+  expect_equal(data$fit$summary.fixed["Intercept", "mean"], 5.684758, midtol)
 
   # Check SPDE
   expect_equal(

@@ -4,7 +4,7 @@
 \alias{bru}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
-bru(components = y ~ Intercept, ..., data = NULL, options = list())
+bru(components = y ~ Intercept, ..., options = list())
 }
 \arguments{
 \item{components}{A \link{formula}-like specification of latent components.
@@ -13,9 +13,6 @@ Also used to define a default linear additive predictor.  See
 
 \item{...}{Likelihoods, each constructed by a calling \code{\link{like}}, or named
 parameters that can be passed to a single \code{\link{like}} call.}
-
-\item{data}{A data.frame or SpatialPoints[DataFrame] object, used as default
-data object for likelihood objects with no data of their own.}
 
 \item{options}{A list of name and value pairs that are either interpretable
 by \link{bru.options} or valid inla parameters. See \link{bru.options} for

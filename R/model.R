@@ -7,22 +7,18 @@
 NULL
 
 
-##########################################################################
-# GENERICS
-##########################################################################
+# GENERICS ----
 
 evaluate <- function(...) {
   UseMethod("evaluate")
 }
 
-
-##########################################################################
-# Constructor
-##########################################################################'
+# Constructor ----
 
 #' Create an inlabru model object from a component formula
 #'
-#' The \link{inlabru} syntax for model forulae is different from what \code{INLA::inla} considers a valid.
+#' The \link{inlabru} syntax for model formulae is different from what
+#' \code{INLA::inla} considers a valid.
 #' In inla most of the effects are defined by adding an \code{f(...)} expression to the formula.
 #' In \link{inlabru} the \code{f} is replaced by an arbitrary (exception: \code{offset}) string that will
 #' determine the label of the effect. See Details for further information.
@@ -41,35 +37,44 @@ evaluate <- function(...) {
 #' A disadvantage of the inla way is that there is no clear separation between the name of the covariate
 #' and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
 #' use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-#' \link{inlabru} provides the new \code{map} agument. For convenience, the map argument ca be used
-#' like the first argument of the f function, e.g.
+#' \link{inlabru} provides the new \code{main} agument. For convenience, the \code{main} argument can be used
+#' like the first argument of the f function, e.g., and is the first argument of the component definition.
 #'
-#' \code{y ~ f(temperature, model = 'fixed')}
+#' \code{y ~ f(temperature, model = 'linear')}
 #'
 #' is equivalent to
 #'
-#' \code{y ~ temperature(map = temperature, model = fixed)}
+#' \code{y ~ temperature(temperature, model = 'linear')}
+#' and
+#' \code{y ~ temperature(main = temperature, model = 'linear')}
 #' as well as
-#' \code{y ~ temperature(model = fixed)}
+#' \code{y ~ temperature(model = 'linear')}
+#' which sets \code{main = temperature}.
 #'
 #' On the other hand, map can also be a function mapping, e.g the \link{coordinates} function of the
 #' \link{sp} package :
 #'
-#' \code{y ~ mySPDE(map = coordinates, ...)}
+#' \code{y ~ mySPDE(coordinates, ...)}
+#' 
+#' This exctract the coordinates from the data object, and maps it to the latent
+#' field via the information given in the \code{mapper}, which by default is
+#' extracted from the \code{model} object, in the case of \code{spde} model
+#' objects.
 #'
-#' Morevover, \code{map} can be any expression that evaluate within your data as an environment.
-#' For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'a+b' by
+#' Morevover, \code{main} can be any expression that evaluates within your data as an environment.
+#' For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'sin(a+b)' by
 #' setting \code{map} in the following way:
 #'
-#' \code{y ~ myEffect(map = sin(a+b))}
+#' \code{y ~ myEffect(sin(a+b))}
 #'
 #'
 #' @export
-#' @param fml A component specification formula
+#' @param components A component specification formula
+#' @param lhoods A list of one or more \code{lhood} objects
 #' @return A \link{bru_model} object
 #' @keywords internal
 
-make.model <- function(components) {
+make.model <- function(components, lhoods) {
 
   # Automatically add Intercept and -1 to components unless -1 is in components formula
   components <- auto.intercept(components)
@@ -78,10 +83,10 @@ make.model <- function(components) {
   env <- environment(components)
 
   # Create effects
-  effects <- component(components)
+  effects <- component(components, lhoods)
 
   # Create joint formula that will be used by inla
-  formula <- y ~ -1
+  formula <- BRU_response ~ -1
   for (fm in lapply(effects, function(eff) {
     eff$inla.formula
   })) {
@@ -102,33 +107,32 @@ make.model <- function(components) {
 
 
 
-# Evaluate or sample from a posterior result given a model and locations
-#
-# @aliases evaluate.model evaluate
-# @export
-# @param model An \link{inlabru} \link{model}
-# @param result Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.
-# @param points Locations and covariates needed to evaluate the model.
-# @param predictor A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects. In case of a formula the right hand side is used for evaluation.
-# @param property Property of the model compnents to obtain value from. Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
-# @param n Number of samples to draw.
+#' Evaluate or sample from a posterior result given a model and locations
+#'
+#' @aliases evaluate.model evaluate
+#' @export
+#' @param model An \link{inlabru} \link{model}
+#' @param result Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.
+#' @param data Locations and covariates needed to evaluate the model.
+#' @param predictor A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects. In case of a formula the right hand side is used for evaluation.
+#' @param property Property of the model components to obtain value from.
+#' Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
+#' @param n Number of samples to draw.
 # @param seed If seed != 0L, the random seed
 # @param num.threads Specification of desired number of threads for parallel
 # computations. Default NULL, leaves it up to INLA.
 # When seed != 0, overridden to "1:1"
-# 
-#
+#' 
+#' @keywords internal
 evaluate.model <- function(model,
                            result,
-                           points,
+                           data,
                            predictor = NULL,
                            property = "mode",
                            n = 1,
                            seed = 0L,
                            num.threads = NULL) {
-  data <- points # Within the evaluation make points available via the name "data"
-
-
+  
   if (inherits(predictor, "formula")) {
     fml.envir <- as.list(environment(predictor))
     predictor <- parse(text = as.character(predictor)[length(as.character(predictor))])
@@ -155,21 +159,22 @@ evaluate.model <- function(model,
   }
 
   # Pre-calculate projection matrices
-  As <- lapply(model$effects, amatrix, points)
+  As <- lapply(model$effects, amatrix_eval, data)
 
   for (k in 1:n) {
     # Discard variables we do not need
     sm <- smp[[k]][vars]
 
-    # Evaluate effects. Note that the expression may only contain hyper parameters in which case there
-    # are no effects to evaluate.
+    # Evaluate effects. Note that the expression may only contain hyper
+    # parameters in which case there are no effects to evaluate.
     enm <- intersect(names(sm), names(model$effects))
 
     for (label in enm) {
       if (is.data.frame(sm[[label]])) {
         sm[[label]] <- sm[[label]]$value
       }
-      sm[[label]] <- value(model$effects[[label]], data = points, state = sm[[label]], A = As[[label]])
+      sm[[label]] <- value(model$effects[[label]], data = data,
+                           state = sm[[label]], A = As[[label]])
     }
 
     # If no predictor is provided simply return the samples.
@@ -177,7 +182,8 @@ evaluate.model <- function(model,
     if (is.null(predictor)) {
       smp[[k]] <- data.frame(sm)
     } else {
-      envir <- c(sm, as.list(data.frame(points)), fml.envir, as.list(environment(model$formula)))
+      envir <- c(sm, as.list(data.frame(data)), fml.envir,
+                 as.list(environment(model$formula)))
       smp[[k]] <- eval(predictor, envir = envir)
     }
   }

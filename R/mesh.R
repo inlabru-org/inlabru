@@ -128,8 +128,10 @@ vertices.inla.mesh <- function(object) {
     vrt <- vrt[, 1:2]
   }
   vrt <- SpatialPoints(vrt, proj4string = object$crs)
-  vrt <- SpatialPointsDataFrame(vrt,
-                                data = data.frame(vertex = seq_len(nrow(object$loc))))
+  vrt <- SpatialPointsDataFrame(
+    vrt,
+    data = data.frame(vertex = seq_len(nrow(object$loc)))
+  )
 
   vrt # return
 }
