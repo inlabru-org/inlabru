@@ -1,6 +1,7 @@
 context("Latent models - factor (test_latent_factor.R)")
 
 test_that("bru: factor component", {
+  testthat::skip("Test of latent factors disabled in current devel version")
 
   # Seed influences data as well as predict()!
   set.seed(123)
