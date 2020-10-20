@@ -957,17 +957,17 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
                                 x = weights[ok],
                                 dims = c(nrow(data), subcomp$n))
     }
-    } else if (subcomp$model %in% c("linear", "clinear")) {
+  } else if (subcomp$model %in% c("linear", "clinear")) {
     val <- input_eval(subcomp$input, data, env = env)
-    A <- Matrix::sparseMatrix(i = seq_len(nrow(data)),
-                              j = rep(1, nrow(data)),
+    A <- Matrix::sparseMatrix(i = seq_len(NROW(data)),
+                              j = rep(1, NROW(data)),
                               x = val * weights,
-                              dims = c(nrow(data), subcomp$n))
+                              dims = c(NROW(data), subcomp$n))
   } else if (is.null(subcomp$mapper)) {
     if (subcomp$n > 1) {
       stop(paste0("Missing mapper (NULL) for subcomponent '", subcomp$label, "'"))
     }
-    A <- Matrix::Matrix(1.0, nrow(as.data.frame(data)), 1)
+    A <- Matrix::Matrix(1.0, NROW(data), 1)
   } else {
     stop(paste0("Unsupported mapper of class '",
                 paste0(class(subcomp$mapper), collapse = "', '"), "'",
