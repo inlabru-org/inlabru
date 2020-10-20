@@ -206,13 +206,13 @@ like <- function(family, formula = . ~ ., data = NULL,
     if (is.null(ips)) {
       # TODO: split ipmaker into one domain extractor (or not; should force
       # explicit domain specification!), and one integration point constructor
-      message("ipmaker can't really work here unless it doesn't need the predictor information")
-      warning("ipmaker can't really work here unless it doesn't need the predictor information")
+#      message("ipmaker can't really work here unless it doesn't need the predictor information")
+#      warning("ipmaker can't really work here unless it doesn't need the predictor information")
       ips <- ipmaker(
         samplers,
         domain = domain,
         dnames = response,
-        data = data,
+        data = NULL,
         model = NULL,
         int.args = options$int.args
       )
