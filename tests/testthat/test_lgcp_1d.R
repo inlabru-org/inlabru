@@ -57,14 +57,14 @@ test_data_discrete <- function() {
   mesh1D <- inla.mesh.1d(x, boundary = "free")
   matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150, 0.75),
                                 prior.sigma = c(0.1, 0.75))
-  mdl <- x ~ spde1D(map = x, model = matern) + Intercept
+  mdl <- x ~ spde1D(main = x, model = matern) + Intercept
   fit <- lgcp(mdl, data = pts2,
               domain = list(x = mesh1D),
               options = list(control.inla = list(int.strategy = "eb"),
                              num.threads = "1:1")
   )
   fit2 <- lgcp(mdl, data = pts2,
-              domain = list(x = (0:55)*0.1),
+              domain = list(x = (0:55)),
               options = list(control.inla = list(int.strategy = "eb"),
                              num.threads = "1:1")
   )
