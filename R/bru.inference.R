@@ -51,8 +51,6 @@ generate <- function(object, ...) {
 #'   \link{component} for details.
 #' @param ... Likelihoods, each constructed by a calling \code{\link{like}}, or named
 #'   parameters that can be passed to a single \code{\link{like}} call.
-#' @param data A data.frame or SpatialPoints[DataFrame] object, used as default
-#'   data object for likelihood objects with no data of their own.
 #' @param options A list of name and value pairs that are either interpretable
 #'   by \link{bru.options} or valid inla parameters. See \link{bru.options} for
 #'   caveats about some of the \code{control.*} inla options.
@@ -66,51 +64,35 @@ generate <- function(object, ...) {
 
 bru <- function(components = y ~ Intercept,
                 ...,
-                data = NULL,
                 options = list()) {
   requireINLA()
 
   # Update default options
   options <- do.call(bru.options, options)
 
-  # Turn model components into internal bru model
-  bru.model <- make.model(components)
-
-  dot_is_lhood <- vapply(list(...), function(lh) inherits(lh, "lhood"), TRUE)
+  lhoods <- list(...)
+  dot_is_lhood <- vapply(lhoods, function(lh) inherits(lh, "lhood"), TRUE)
   if (any(dot_is_lhood)) {
     if (!all(dot_is_lhood)) {
       stop("Cannot mix like() parameters with 'lhood' objects.")
     }
-    lhoods <- list(...)
   } else {
-    lhoods <- list(like(..., data = data, options = options))
-    family <- NULL
+    if (is.null(lhoods[["formula"]])) {
+      lhoods[["formula"]] <- . ~ .
+    }
+    lhoods[["formula"]] <- auto_copy_response(lhoods[["formula"]], components)
+    lhoods <- list(do.call(like, c(lhoods, list(options = options))))
   }
 
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
   }
 
-  # If a likelihood was provided without data/response, update according to bru's
-  # arguments `data` and LHS of components
-
-  for (k in seq_along(lhoods)) {
-    # Check if likelihood has data attached to it. If not, attach the 'data' argument or break if not available
-    if (is.null(lhoods[[k]]$data)) {
-      if (is.null(data)) {
-        stop(paste0("Likelihood ", k, " has no data attached to it and no data was supplied to bru()."))
-      }
-      lhoods[[k]]$data <- data
-    }
-    if (is.null(lhoods[[k]]$components)) {
-      lhoods[[k]]$components <- components
-    }
-    if (is.null(lhoods[[k]]$response)) {
-      lhoods[[k]]$response <- all.vars(update(components, . ~ 0))
-    }
-  }
-
-  # Set max interations to 1 if all likelihood formulae are linear
+  # Turn model components into internal bru model
+  bru.model <- make.model(components, lhoods)
+  
+  
+  # Set max iterations to 1 if all likelihood formulae are linear
   if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) {
     options$max.iter <- 1
   }
@@ -166,19 +148,25 @@ bru <- function(components = y ~ Intercept,
 #'  Default taken from \code{options$Ntrials}.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides \code{samplers}.
-#' @param domain Named list of integration function domain definitions. Either
-#'   and \code{inla.mesh.1d} or \code{inla.mesh} object specifying the locations
-#'   for integration point locations, or a single scalar indicating how many 1D
-#'   integration points to use.
+#' @param domain Named list of domain definitions.
+#' @param include Character vector of component labels that are needed by the
+#'   predictor expression; Default: NULL (include all components that are not
+#'   explicitly excluded)
+#' @param exclude Character vector of component labels that are not used by the
+#'   predictor expression. The exclusion list is applied to the list
+#'   as determined by the `include` parameter; Default: NULL (do not remove
+#'   any components from the inclusion list)
+#'   on the `include` parameter). 
 #' @param options list of global options overriding \link{bru.options}
 #'
 #' @return A likelihood configuration which can be used to parameterize \link{bru}.
 #'
 #' @example inst/examples/like.R
 
-like <- function(family, formula = . ~ ., data = NULL, components = NULL,
+like <- function(family, formula = . ~ ., data = NULL,
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
+                 include = NULL, exclude = NULL,
                  options = list()) {
   options <- do.call(bru.options, options)
 
@@ -197,7 +185,9 @@ like <- function(family, formula = . ~ ., data = NULL, components = NULL,
 
   # Set response name
   response <- all.vars(update(formula, . ~ 0))
-  if (response[1] == ".") response <- NULL
+  if (response[1] == ".") {
+    stop("Missing response variable names")
+  }
 
   if (is.null(E)) {
     E <- options$E
@@ -212,17 +202,20 @@ like <- function(family, formula = . ~ ., data = NULL, components = NULL,
       stop("You called like() with family='cp' but no 'data' argument was supplied.")
     }
     # if ( is.null(samplers) ) { stop("You called like() with family='cp' but no 'samplers' argument was supplied.") }
-    bru.model <- make.model(components)
-    if (as.character(formula)[2] == ".") {
-      bru.model$dim.names <- all.vars(update(components, . ~ 0))
-    }
-    else {
-      bru.model$dim.names <- all.vars(update(formula, . ~ 0))
-    }
 
     if (is.null(ips)) {
-      ips <- ipmaker(samplers, domain = domain, dnames = bru.model$dim.names, data = data, model = bru.model,
-                     int.args = options$int.args)
+      # TODO: split ipmaker into one domain extractor (or not; should force
+      # explicit domain specification!), and one integration point constructor
+      message("ipmaker can't really work here unless it doesn't need the predictor information")
+      warning("ipmaker can't really work here unless it doesn't need the predictor information")
+      ips <- ipmaker(
+        samplers,
+        domain = domain,
+        dnames = response,
+        data = data,
+        model = NULL,
+        int.args = options$int.args
+      )
     }
 
     inla.family <- "poisson"
@@ -255,7 +248,9 @@ like <- function(family, formula = . ~ ., data = NULL, components = NULL,
     inla.family = inla.family,
     ips = ips,
     domain = domain,
-    drange = drange
+    drange = drange,
+    include_components = include,
+    exclude_components = exclude
   )
 
   class(lh) <- c("lhood", "list")
@@ -268,11 +263,11 @@ single_stackmaker <- function(model, lhood, result) {
   if (lhood$family == "cp") {
     INLA::inla.stack(
       make.stack(
-        points = lhood$data, model = model, expr = lhood$expr, y = 1,
-        E = 0, result = result,
+        data = lhood$data, model = model, expr = lhood$expr, y = 1,
+        E = 0, result = result
       ),
       make.stack(
-        points = lhood$ips, model = model, expr = lhood$expr, y = 0,
+        data = lhood$ips, model = model, expr = lhood$expr, y = 0,
         E = lhood$E * lhood$ips$weight, offset = 0, result = result
       ),
       # Make sure components with zero derivative are kept:
@@ -280,7 +275,7 @@ single_stackmaker <- function(model, lhood, result) {
     )
   } else {
     make.stack(
-      points = lhood$data, model = model, expr = lhood$expr,
+      data = lhood$data, model = model, expr = lhood$expr,
       y = as.data.frame(lhood$data)[, lhood$response],
       E = lhood$E, Ntrials = lhood$Ntrials, result = result
     )
@@ -464,12 +459,18 @@ lgcp <- function(components,
                  formula = . ~ .,
                  E = NULL,
                  options = list()) {
-  lik <- like("cp",
-    formula = formula, data = data, samplers = samplers,
-    components = components, E = E, ips = ips, domain = domain,
-    options = options
-  )
-  result <- bru(components, lik, options = options)
+#  # If formula response missing, copy from components
+#  formula <- auto_copy_response(formula, components)
+#  lik <- like(family = "cp",
+#    formula = formula, data = data, samplers = samplers,
+#    E = E, ips = ips, domain = domain,
+#    options = options
+#  )
+  bru(components,
+      family = "cp",
+      formula = formula, data = data, samplers = samplers,
+      E = E, ips = ips, domain = domain,
+      options = options)
 }
 
 
@@ -755,7 +756,7 @@ generate.bru <- function(object,
   }
 
   vals <- evaluate.model(
-    model = object$sppa$model, result = object, points = data,
+    model = object$sppa$model, result = object, data = data,
     property = "sample", n = n.samples, predictor = formula, seed = seed
   )
 }
@@ -933,7 +934,7 @@ summarize <- function(data, x = NULL, cbind.only = FALSE) {
 #' @keywords internal
 
 
-iinla <- function(data, model, lhoods, n = 10, result = NULL,
+iinla <- function(model, lhoods, n = 10, result = NULL,
                   iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"),
                   offset = NULL, inla.options) {
 
@@ -985,21 +986,29 @@ iinla <- function(data, model, lhoods, n = 10, result = NULL,
     }
     result <- NULL
 
+    inla.formula <- update.formula(model$formula, BRU.response ~ .)
+    inla.data <-
+      c(stk.data,
+        do.call(c, c(lapply(model$effects,
+                            function(xx) as.list(xx$env_extra)),
+                     use.names = FALSE)))
+#        list.data(model$formula))
     icall <- expression(
       result <- tryCatch(
         do.call(
           inla,
           c(
             list(
-              formula = update.formula(model$formula, BRU.response ~ .),
-              data = c(stk.data, list.data(model$formula)),
+              formula = inla.formula,
+              data = inla.data,
               family = family,
               E = stk.data[["BRU.E"]],
               Ntrials = stk.data[["BRU.Ntrials"]],
               offset = stk.data[["BRU.offset"]] + offset
             ),
             inla.options
-          )
+          ),
+          envir = environment(model$effects)
         ),
         error = warning
       )
@@ -1098,7 +1107,7 @@ iinla <- function(data, model, lhoods, n = 10, result = NULL,
 
 auto.intercept <- function(components) {
   env <- environment(components)
-
+  
   tm <- terms(components)
   # Check for -1/+0 and +/- Intercept/NULL
   # Required modification:
@@ -1111,7 +1120,7 @@ auto.intercept <- function(components) {
   #  F    T     0     Impossible
   #  F    F     1     +Intercept-1
   #  F    F     0     -1
-
+  
   # Convert list(var1,var2) call to vector of variable names.
   # ([-1] removes "list"!)
   var_names <- as.character(attr(tm, "variables"))[-1]
@@ -1120,24 +1129,80 @@ auto.intercept <- function(components) {
   inter_term <- grep("^Intercept[\\($]*", attr(tm, "term.labels"))
   if (length(inter_var) > 0) {
     if (length(inter_term) > 0) {
-      components <- update.formula(components, . ~ . - 1)
+      components <- update.formula(components, . ~ . + 1)
     } else {
       components <- update.formula(
         components,
         as.formula(paste0(
           ". ~ . - ",
           var_names[inter_var],
-          " -1"
+          " +1"
         ))
       )
     }
   } else if (attr(tm, "intercept")) {
-    components <- update.formula(components, . ~ . + Intercept - 1)
+    components <- update.formula(components, . ~ . + Intercept + 1)
   } else {
-    components <- update.formula(components, . ~ . - 1)
+    components <- update.formula(components, . ~ . + 1)
   }
   environment(components) <- env
   components
+}
+
+
+auto_linear_formula <- function(formula, components) {
+  if (as.character(formula)[
+    length(as.character(formula))] != ".") {
+    return(formula)
+  }
+  
+  # No RHS; construct from components
+
+  components <- auto.intercept(components)
+  tm <- terms(components)
+  
+  var_names <- attr(tm, "term.labels")
+  # Trim component options
+  var_names <- gsub(pattern = "^([^\\(]*)\\(.*",
+                    replacement = "\\1",
+                    x = var_names)
+  if (length(attr(tm, "offset")) > 0) {
+    var_names <- c(var_names,
+                   as.character(attr(tm, "variables"))[-1][attr(tm, "offset")])
+  }
+  formula <- update.formula(components,
+                            paste0(". ~ ",
+                                   paste0(var_names, collapse = " + ")))
+  environment(formula) <- environment(components)
+  formula
+}
+
+
+auto_copy_response <- function(formula, components) {
+  if ((length(as.character(formula)) == 3) &&
+      (as.character(formula)[2] != ".")) {
+    # Already has response; do nothing
+    return(formula)
+  }
+  env <- environment(formula)
+  tm_cm <- terms(components)
+  LHS <- as.formula(paste0(
+    as.character(attr(tm_cm, "variables"))[-1][attr(tm_cm, "response")],
+    " ~ ."))
+  if (as.character(formula)[
+    length(as.character(formula))] == ".") {
+    # No formula RHS
+    formula <- LHS
+  } else {
+    tm_fm <- terms(formula)
+    if ((attr(tm_fm, "response") == 0) ||
+        (as.character(attr(tm_fm, "variables"))[-1][attr(tm_fm, "response")] == "."))
+    {
+      formula <- update(formula, LHS)
+    }
+  }
+  environment(formula) <- env
+  formula
 }
 
 
@@ -1151,11 +1216,15 @@ list.data <- function(formula) {
   # Remove previous inla results. For some reason these slow down the next INLA call.
   elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
 
-  # Remove functions. This can cause problems as well.
-  elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
+#  # Remove functions. This can cause problems as well.
+#  elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
 
-  # Remove formulae. This can cause problems as well.
-  elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
+#  # Remove formulae. This can cause problems as well.
+#  elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
 
-  elist <- elist[names(elist) %in% all.vars(formula)]
+  # The formula expression is too general for this to be reliable:
+  #  # Keep only purse formula variables
+  #  elist <- elist[names(elist) %in% all.vars(formula)]
+  
+  elist
 }

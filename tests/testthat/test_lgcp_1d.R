@@ -7,7 +7,7 @@ test_data <- function() {
   mesh1D <- inla.mesh.1d(x, boundary = "free")
   matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150, 0.75),
                                 prior.sigma = c(0.1, 0.75))
-  mdl <- x ~ spde1D(map = x, model = matern) + Intercept
+  mdl <- x ~ spde1D(main = x, model = matern) + Intercept
   fit <- lgcp(mdl, pts2,
               ips = ipoints(c(0, 55), 50, name = "x"),
               options = list(control.inla = list(int.strategy = "eb"),

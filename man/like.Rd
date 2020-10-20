@@ -8,13 +8,14 @@ like(
   family,
   formula = . ~ .,
   data = NULL,
-  components = NULL,
   mesh = NULL,
   E = NULL,
   Ntrials = NULL,
   samplers = NULL,
   ips = NULL,
   domain = NULL,
+  include = NULL,
+  exclude = NULL,
   options = list()
 )
 }
@@ -31,8 +32,6 @@ the predictor used in the optimization.}
 
 \item{data}{Likelihood-specific data, as a \code{data.frame} or \code{SpatialPoints[DataFrame]}
 object.}
-
-\item{components}{Components.}
 
 \item{mesh}{An inla.mesh object.}
 
@@ -53,7 +52,19 @@ and \code{inla.mesh.1d} or \code{inla.mesh} object specifying the locations
 for integration point locations, or a single scalar indicating how many 1D
 integration points to use.}
 
+\item{include}{Character vector of component labels that are needed by the
+predictor expression; Default: NULL (include all components that are not
+explicitly excluded)}
+
+\item{exclude}{Character vector of component labels that are not used by the
+predictor expression. The exclusion list is applied to the list
+as determined by the `include` parameter; Default: NULL (do not remove
+any components from the inclusion list)
+on the `include` parameter).}
+
 \item{options}{list of global options overriding \link{bru.options}}
+
+\item{components}{Components.}
 }
 \value{
 A likelihood configuration which can be used to parameterize \link{bru}.

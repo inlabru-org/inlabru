@@ -55,40 +55,7 @@ remotes::install_github("fbachl/inlabru", ref="devel")
 This is a basic example which shows you how fit a simple spatial Log Gaussian Cox Process (LGCP)
 and predicts its intensity:
 
-```{r example}
-if (interactive()) {
-# Load libraries
-library(inlabru)
-library(INLA)
-library(ggplot2)
-
-# Load the data
-data(gorillas, package = "inlabru")
-# If you have PROJ6/GDAL3, you will here need to update the CRS information; see separate code below
-
-# Construct latent model components
-matern <- inla.spde2.pcmatern(gorillas$mesh, 
-                              prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(5, 0.01))
-cmp <- coordinates ~ mySmooth(map = coordinates,
-                              model = matern) +
-                          Intercept
-# Fit LGCP model
-fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
-            options = list(control.inla = list(int.strategy = "eb")))
-
-# Predict Gorilla nest intensity
-lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
-
-# Plot the result
-ggplot() + 
-  gg(lambda) +
-  gg(gorillas$nests, color = "red", size = 0.2) +
-  coord_equal()
-}
-```
-If you have an R installation with PROJ6/GDAL3 and INLA >= 18.06.18, you will need to update the CRS information in the gorillas data after reading it in:
-```{r update_CRS,eval = FALSE}
+```{r update_CRS_code,eval=TRUE,echo=FALSE}
 gorillas_update_CRS <- function(gorillas) {
   if (inla.has_PROJ6()) {
     gorillas$nests <- rebuild_CRS(gorillas$nests)
@@ -103,6 +70,46 @@ gorillas_update_CRS <- function(gorillas) {
   }
   gorillas
 }
+```
+
+```{r example}
+if (interactive()) {
+# Load libraries
+library(inlabru)
+library(INLA)
+library(ggplot2)
+
+# Load the data
+data(gorillas, package = "inlabru")
+# If you have PROJ6/GDAL3, you will here need to update the CRS information;
+# see separate function below
 gorillas <- gorillas_update_CRS(gorillas)
+
+# Construct latent model components
+matern <- inla.spde2.pcmatern(gorillas$mesh, 
+                              prior.sigma = c(0.1, 0.01), 
+                              prior.range = c(5, 0.01))
+cmp <- coordinates ~ mySmooth(main = coordinates,
+                              model = matern) +
+                          Intercept
+# Fit LGCP model
+fit <- lgcp(cmp,
+            data = gorillas$nests,
+            samplers = gorillas$boundary,
+            domain = list(coordinates = gorillas$mesh),
+            options = list(control.inla = list(int.strategy = "eb")))
+
+# Predict Gorilla nest intensity
+lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+
+# Plot the result
+ggplot() + 
+  gg(lambda) +
+  gg(gorillas$nests, color = "red", size = 0.2) +
+  coord_equal()
+}
+```
+If you have an R installation with PROJ6/GDAL3 and INLA >= 20.06.18, you will need to update the CRS information in the gorillas data after reading it in:
+```{r ref.label="update_CRS_code",eval = FALSE}
 ```
 

@@ -1,5 +1,9 @@
 # inlabru 2.1.13.999
 
+* Interface restructuring to support new features while keeping most
+  backwards compatibility. Change "map=" to "main=" or unnamed first argument;
+  Since "main" is the first parameter, it doesn't need to be a named argument.
+
 * Keep components with zero derivative in the linearisation
 
 * PROJ6 support

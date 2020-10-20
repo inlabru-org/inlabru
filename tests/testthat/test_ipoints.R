@@ -66,7 +66,7 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
   data(mrsea, package = "inlabru")
   mrsea <- mrsea_rebuild_CRS(mrsea, use_km = FALSE)
   ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
-
+  
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)),
                c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional"))

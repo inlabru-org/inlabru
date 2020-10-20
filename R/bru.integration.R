@@ -390,6 +390,7 @@ cprod <- function(...) {
 
 ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL, 
                     int.args = list(method="stable",nsub=NULL)) {
+# TODO: Automatic domain extraction should be done by a separate function.
 
   # Fill missing domain definitions using meshes from effects where map equals the domain name
   meshes <- list()

@@ -62,17 +62,22 @@ library(ggplot2)
 
 # Load the data
 data(gorillas, package = "inlabru")
-# If you have PROJ6/GDAL3, you will here need to update the CRS information; see separate code below
+# If you have PROJ6/GDAL3, you will here need to update the CRS information;
+# see separate function below
+gorillas <- gorillas_update_CRS(gorillas)
 
 # Construct latent model components
 matern <- inla.spde2.pcmatern(gorillas$mesh, 
                               prior.sigma = c(0.1, 0.01), 
                               prior.range = c(5, 0.01))
-cmp <- coordinates ~ mySmooth(map = coordinates,
+cmp <- coordinates ~ mySmooth(main = coordinates,
                               model = matern) +
                           Intercept
 # Fit LGCP model
-fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
+fit <- lgcp(cmp,
+            data = gorillas$nests,
+            samplers = gorillas$boundary,
+            domain = list(coordinates = gorillas$mesh),
             options = list(control.inla = list(int.strategy = "eb")))
 
 # Predict Gorilla nest intensity
@@ -86,7 +91,7 @@ ggplot() +
 }
 ```
 
-If you have an R installation with PROJ6/GDAL3 and INLA \>= 18.06.18,
+If you have an R installation with PROJ6/GDAL3 and INLA \>= 20.06.18,
 you will need to update the CRS information in the gorillas data after
 reading it in:
 
@@ -105,5 +110,4 @@ gorillas_update_CRS <- function(gorillas) {
   }
   gorillas
 }
-gorillas <- gorillas_update_CRS(gorillas)
 ```

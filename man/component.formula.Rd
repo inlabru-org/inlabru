@@ -4,7 +4,7 @@
 \alias{component.formula}
 \title{inlabru latent model component construction using formulae}
 \usage{
-\method{component}{formula}(object, ...)
+\method{component}{formula}(object, lhoods, envir = NULL, ...)
 }
 \arguments{
 \item{object}{A formula describing latent model components.}
@@ -73,6 +73,9 @@ On the other hand, predict may be used to only look at a transformation of the r
 
 eff <- component(~ myLinearEffectOfX(map = x, model = "linear"))
 summary(eff[[1]])
+# Equivalent shortcuts:
+eff <- component(~ myLinearEffectOfX(x, model = "linear"))
+eff <- component(~ myLinearEffectOfX(x))
 }
 \seealso{
 Other Component constructor: 
