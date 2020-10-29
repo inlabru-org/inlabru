@@ -9,7 +9,7 @@ refine.inla.mesh(mesh, refine = list(max.edge = 1))
 \arguments{
 \item{mesh}{an inla.mesh object}
 
-\item{refine}{A list of refinement options passed on to \link[INLA]{inla.mesh.create}}
+\item{refine}{A list of refinement options passed on to \link[INLA:inla.mesh.create]{inla.mesh.create}}
 }
 \value{
 mesh A refined inla.mesh object
@@ -18,6 +18,7 @@ mesh A refined inla.mesh object
 Refine an inla.mesh object
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
+#'
 }
 \keyword{internal}

@@ -16,6 +16,6 @@ and \code{weight}, integration weights}
 Project integration weights onto mesh nodes
 }
 \author{
-Finn Lindgren <\email{finn.lindgren@gmail.com}>
+Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \keyword{internal}

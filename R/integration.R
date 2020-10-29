@@ -8,7 +8,7 @@
 #' @param filter.zero.length Filter out segments with zero length? (Bool)
 #' @param ... argments to int.quadrature
 #' @return List of start and end points resulting from splitting the given lines
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 #' @keywords internal
 split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 
@@ -69,7 +69,7 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 # @param scheme Integration scheme (gaussian or equdistant)
 # @param n Number of integration points
 # @return List with integration poins (ips), weights (w) and weights including line length (wl)
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
 int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points = 1, geometry = "euc", coords = NULL) {
   if (is.null(colnames(sp)) & !is.null(coords)) {
@@ -359,10 +359,10 @@ join_segm <- function(...) {
 
 #' Construct the intersection mesh of a mesh and a polygon
 #'
-#' @param mesh \code{inla.mesh} object to be intersected
-#' @param poly \code{inla.mesh.segment} object with a closed polygon
+#' @param mesh `inla.mesh` object to be intersected
+#' @param poly `inla.mesh.segment` object with a closed polygon
 #'   to intersect with the mesh
-#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 intersection_mesh <- function(mesh, poly) {
   if (ncol(poly$loc) < 3) {
@@ -435,9 +435,9 @@ intersection_mesh <- function(mesh, poly) {
 #' Project integration weights onto mesh nodes
 #'
 #' @param mesh Mesh on which to integrate
-#' @param integ \code{list} of \code{loc}, integration points,
-#'   and \code{weight}, integration weights
-#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @param integ `list` of `loc`, integration points,
+#'   and `weight`, integration weights
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 integration_weight_projection <- function(mesh, integ) {
   # Project points onto the mesh
@@ -453,14 +453,14 @@ integration_weight_projection <- function(mesh, integ) {
 #' Basic robust integration weights for mesh/polygon intersections
 #'
 #' @param mesh Mesh on which to integrate
-#' @param bnd \code{inla.mesh.segment} defining the integration domain
+#' @param bnd `inla.mesh.segment` defining the integration domain
 #' @param nsub number of subdivision points along each triangle edge, giving
-#'    \code{(nsub + 1)^2} proto-integration points used to compute
+#'    `(nsub + 1)^2` proto-integration points used to compute
 #'   the vertex weights
-#'   (default \code{NULL=9}, giving 100 integration points for each triangle)
-#' @return \code{list} with elements \code{loc} and \code{weight} with
+#'   (default `NULL=9`, giving 100 integration points for each triangle)
+#' @return `list` with elements `loc` and `weight` with
 #'   integration points for the intersection of the mesh and polygon
-#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   # Construct a barycentric grid of subdivision triangle midpoints
@@ -513,8 +513,8 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 #' @param loc Locations defining the polygons
 #' @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
 #' @param method Which integration method to use
-#' @param ... Arguments passed to the low level integration method (\code{make_stable_integration_points})
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}> and Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
+#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 
 int.polygon <- function(mesh, loc, group = NULL, method = "stable", ...){

@@ -11,40 +11,40 @@ bru(components = y ~ Intercept, ..., options = list())
 Also used to define a default linear additive predictor.  See
 \link{component} for details.}
 
-\item{...}{Likelihoods, each constructed by a calling \code{\link{like}}, or named
-parameters that can be passed to a single \code{\link{like}} call.}
+\item{...}{Likelihoods, each constructed by a calling \code{\link[=like]{like()}}, or named
+parameters that can be passed to a single \code{\link[=like]{like()}} call.}
 
 \item{options}{A list of name and value pairs that are either interpretable
 by \link{bru.options} or valid inla parameters. See \link{bru.options} for
-caveats about some of the \code{control.*} inla options.}
+caveats about some of the \verb{control.*} inla options.}
 }
 \value{
 bru returns an object of class "bru". A \code{bru} object inherits
-  from \code{INLA::inla} (see the inla documentation for its properties) and
-  adds additional information stored in the \code{sppa} field.
+from \code{INLA::inla} (see the inla documentation for its properties) and
+adds additional information stored in the \code{sppa} field.
 }
 \description{
 This method is a wrapper for \code{INLA::inla} and provides
-  multiple enhancements.
+multiple enhancements.
 
-  \itemize{
-    \item
-      Easy usage of spatial covariates and automatic construction
-      of inla projection matrices for (spatial) SPDE models. This feature is
-      accessible via the \code{components} parameter. Practical examples on how
-      to use spatial data by means of the components parameter can also be found
-      by looking at the \link{lgcp} function's documentation.
-    \item
-      Constructing multiple likelihoods is straight forward. See \link{like} for more
-      information on how to provide additional likelihoods to \code{bru} using
-      the \code{...} parameter list.
-    \item
-      Support for non-linear predictors. See example below.
-    \item
-      Log Gaussian Cox process (LGCP) inference is
-      available by using the \code{cp} family or (even easier) by using the
-      \link{lgcp} function.
-  }
+\itemize{
+\item
+Easy usage of spatial covariates and automatic construction
+of inla projection matrices for (spatial) SPDE models. This feature is
+accessible via the \code{components} parameter. Practical examples on how
+to use spatial data by means of the components parameter can also be found
+by looking at the \link{lgcp} function's documentation.
+\item
+Constructing multiple likelihoods is straight forward. See \link{like} for more
+information on how to provide additional likelihoods to \code{bru} using
+the \code{...} parameter list.
+\item
+Support for non-linear predictors. See example below.
+\item
+Log Gaussian Cox process (LGCP) inference is
+available by using the \code{cp} family or (even easier) by using the
+\link{lgcp} function.
+}
 }
 \examples{
 \donttest{
@@ -90,5 +90,5 @@ fit$summary.fixed
 }
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }

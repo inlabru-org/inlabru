@@ -17,7 +17,7 @@ setClass("inla.mesh")
 #' @param loc Points in space stored either as data.frame, a two-column matrix of x and y coordinates or a SpatialPoints object.
 #' @param mesh.coords Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.
 #' @return Single column matrix of Boolean values indicating if a point is inside the mesh.
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 #' @examples
 #' \dontrun{
@@ -59,7 +59,7 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
 # @param mask.mesh Mask points outside mesh, default: TRUE
 # @param mesh.coords Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.
 # @return inside Boolean, TRUE if inside polygon
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
 is.inside.polygon <- function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TRUE) {
   if (!is.null(mesh.coords) & is.data.frame(loc)) {
@@ -80,7 +80,7 @@ is.inside.polygon <- function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = T
 
 #' Vertices
 #'
-#' This is a generic function. The outcome depends on the \code{object} provided
+#' This is a generic function. The outcome depends on the `object` provided
 #'
 #' @name vertices
 #' @exportMethod vertices
@@ -97,16 +97,16 @@ setGeneric("vertices", valueClass = "SpatialPointsDataFrame", function(object) {
 setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mesh(object))
 
 
-#' @title Extract vertex locations from an \code{inla.mesh}
+#' @title Extract vertex locations from an `inla.mesh`
 #'
-#' @description Converts the vertices of an \code{inla.mesh} object into a \code{SpatialPointsDataFrame}.
+#' @description Converts the vertices of an `inla.mesh` object into a `SpatialPointsDataFrame`.
 #'
 #' @aliases vertices.inla.mesh
 #' @export
-#' @param object An \code{inla.mesh} object.
-#' @return A SpatialPointsDataFrame of mesh vertex locations. The \code{vrt} column indicates the internal vertex id.
+#' @param object An `inla.mesh` object.
+#' @return A SpatialPointsDataFrame of mesh vertex locations. The `vrt` column indicates the internal vertex id.
 #'
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 #' @examples
 #' \donttest{
@@ -137,20 +137,20 @@ vertices.inla.mesh <- function(object) {
 }
 
 
-#' @title Generate \code{SpatialPixels} covering an \code{inla.mesh}
+#' @title Generate `SpatialPixels` covering an `inla.mesh`
 #'
-#' @description Generate \code{SpatialPixels} covering an \code{inla.mesh}
+#' @description Generate `SpatialPixels` covering an `inla.mesh`
 #'
 #' @aliases pixels
 #' @export
 #'
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param mesh An \code{inla.mesh} object
+#' @param mesh An `inla.mesh` object
 #' @param nx Number of pixels in x direction
 #' @param ny Number of pixels in y direction
-#' @param mask If logical and TRUE, remove pixels that are outside the mesh. If \code{mask} is a \code{Spatial} object, only return pixels covered by this object.
-#' @return \code{SpatialPixels} covering the mesh
+#' @param mask If logical and TRUE, remove pixels that are outside the mesh. If `mask` is a `Spatial` object, only return pixels covered by this object.
+#' @return `SpatialPixels` covering the mesh
 #'
 #' @examples
 #' \donttest{
@@ -203,7 +203,7 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
 # @param loc Locations using the coordinate system of the mesh
 # @return tri Triangle indices
 # @examples \\dontrun{}
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
 triangle <- function(mesh, loc) {
   mcross <- function(a, b) {
@@ -248,10 +248,10 @@ triangle <- function(mesh, loc) {
 #' @keywords internal
 #'
 #' @param mesh an inla.mesh object
-#' @param refine A list of refinement options passed on to \link[INLA]{inla.mesh.create}
+#' @param refine A list of refinement options passed on to [inla.mesh.create][INLA::inla.mesh.create]
 #' @return mesh A refined inla.mesh object
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
-#'
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' #'
 
 refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
   rmesh <- INLA::inla.mesh.create(loc = mesh$loc, interior = INLA::inla.mesh.interior(mesh), boundary = INLA::inla.mesh.boundary(mesh), refine = refine)
@@ -268,8 +268,7 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
 #' @param mesh an inla.mesh object
 #' @param n number of splitting recursions
 #' @return mesh A refined inla.mesh object
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
-#'
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 
 tsplit.inla.mesh <- function(mesh, n = 1) {
   n <- 1

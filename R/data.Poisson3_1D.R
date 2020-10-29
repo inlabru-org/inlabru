@@ -9,22 +9,22 @@
 #'
 #' @usage data(Poisson3_1D)
 #'
-#' @format The data contain the following \code{R} objects:
+#' @format The data contain the following `R` objects:
 #'  \describe{
-#'    \item{\code{lambda3_1D}:}{ A function defining the intensity function of a
+#'    \item{`lambda3_1D`:}{ A function defining the intensity function of a
 #'    nonhomogeneous Poisson process. Note that this function is only defined on
 #'    the interval (0,55).}
-#'    \item{\code{E_nc3a}}{ The expected counts of gridded data for the wider bins (10 bins).}
-#'    \item{\code{E_nc3b}}{ The expected counts of gridded data for the wider bins (20 bins).}
-#'    \item{\code{pts3}}{ The locations of the observed points (a data frame with one column, named \code{x}).}
-#'    \item{\code{countdata3a}}{ A data frame with three columns, containing the count data for the
+#'    \item{`E_nc3a`}{ The expected counts of gridded data for the wider bins (10 bins).}
+#'    \item{`E_nc3b`}{ The expected counts of gridded data for the wider bins (20 bins).}
+#'    \item{`pts3`}{ The locations of the observed points (a data frame with one column, named `x`).}
+#'    \item{`countdata3a`}{ A data frame with three columns, containing the count data for the
 #'    10-interval case:}
-#'    \item{\code{countdata3b}}{ A data frame with three columns, containing the count data for the
+#'    \item{`countdata3b`}{ A data frame with three columns, containing the count data for the
 #'    20-interval case:}
 #'    \describe{
-#'      \item{\code{x}}{ The grid cell midpoint.}
-#'      \item{\code{count}}{ The number of detections in the cell.}
-#'      \item{\code{exposure}}{ The width of the cell.}
+#'      \item{`x`}{ The grid cell midpoint.}
+#'      \item{`count`}{ The number of detections in the cell.}
+#'      \item{`exposure`}{ The width of the cell.}
 #'    }
 #'  }
 #'

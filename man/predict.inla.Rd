@@ -20,19 +20,19 @@ A \code{prediction} object.
 List of generated samples
 }
 \description{
-This method is not supported for plain inla objects. Please see \code{\link{predict.bru}} instead.
+This method is not supported for plain inla objects. Please see \code{\link[=predict.bru]{predict.bru()}} instead.
 
-This method is not supported for plain inla objects. Please see \code{\link{generate.bru}} instead.
+This method is not supported for plain inla objects. Please see \code{\link[=generate.bru]{generate.bru()}} instead.
 See https://github.com/fbachl/inlabru/issues/78 for more information.
 }
 \seealso{
-\code{\link{predict.inla}}
+\code{\link[=predict.inla]{predict.inla()}}
 
-\code{\link{generate.inla}}
+\code{\link[=generate.inla]{generate.inla()}}
 
-\code{\link{predict.bru}}
+\code{\link[=predict.bru]{predict.bru()}}
 }
 \author{
-Finn Lindgren <\email{finn.lindgren@gmail.com}>
+Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \keyword{internal}

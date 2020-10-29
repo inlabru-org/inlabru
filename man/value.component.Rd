@@ -30,6 +30,6 @@ Calculates a latent component given some data and the state of the component's i
 TODO: Improve speed for iterated calls by making 'mapped' a parameter
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \keyword{internal}

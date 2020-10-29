@@ -9,32 +9,32 @@
 #' @keywords internal
 #'
 #' @param manifold Either "R1", "S1", "R2", or "S2", from
-#'     \code{mesh$manifold}, or a full \code{inla.mesh} or
-#'     \code{inla.mesh.1d} object.
+#'     `mesh$manifold`, or a full `inla.mesh` or
+#'     `inla.mesh.1d` object.
 #' @param dist A vector of distances at which to calculate the
 #'     covariances/correlations
 #' @param log.range A scalar or a list (mean, sd), such as produced by
-#'     \code{inla.spde.result(...)$summary.log.range.nominal[[1]][c("mean","sd")]}
-#' @param log.variance Either \code{NULL}, a scalar, or vector of the
-#'     same type as for log.range. When \code{NULL}, the correlations
+#'     `inla.spde.result(...)$summary.log.range.nominal[[1]][c("mean","sd")]`
+#' @param log.variance Either `NULL`, a scalar, or vector of the
+#'     same type as for log.range. When `NULL`, the correlations
 #'     are calculated instead of the covariances.
 #' @param alpha The SPDE operator order. Default 2.
 #' @param quantile The target credible probability. Default 0.95.
 #' @param n The number of parameter combinations to use for the
 #'     approximation. Default 64.
-#' @param S1.L For \code{manifold} \code{"S1"}, give the length of the
+#' @param S1.L For `manifold` `"S1"`, give the length of the
 #'     cyclic interval
-#' @return A list with estimated covariance or correlation (when \code{log.variance} is
-#'     \code{NULL}) functions:
-#' \item{lower}{An approximate lower bound for the \code{quantile} credible region}
+#' @return A list with estimated covariance or correlation (when `log.variance` is
+#'     `NULL`) functions:
+#' \item{lower}{An approximate lower bound for the `quantile` credible region}
 #' \item{median}{The function for for the approximate median parameters quantile}
-#' \item{upper}{An approximate upper bound for the \code{quantile} credible region}
+#' \item{upper}{An approximate upper bound for the `quantile` credible region}
 #'
 #' @details
 #' Uses a Gaussian assumption for the internal model parameters, and finds a region in parameter
-#' space with approximately \code{quantile} probability.
+#' space with approximately `quantile` probability.
 #'
-#' @author Finn Lindgren <\email{Finn.Lindgren@@ed.ac.uk}>
+#' @author Finn Lindgren \email{Finn.Lindgren@@ed.ac.uk}
 
 materncov.bands <- function(manifold, dist, log.range,
                             log.variance = NULL, alpha = 2,
@@ -166,17 +166,17 @@ materncov.bands <- function(manifold, dist, log.range,
 #' @description
 #' Calculate posterior distribution of the range, log(range), variance, or log(variance)
 #' parameter of a model's SPDE component. Can also plot Matern correlation or covariance function.
-#' \code{inla.spde.result}.
+#' `inla.spde.result`.
 #'
-#' @param result An object inheriting from \code{inla}.
-#' @param name Character stating the name of the SPDE effect, see \code{names(result$summary.random)}.
+#' @param result An object inheriting from `inla`.
+#' @param name Character stating the name of the SPDE effect, see `names(result$summary.random)`.
 #' @param what One of "range", "log.range", "variance", "log.variance", "matern.correlation" or "matern.covariance".
-#' @return A \code{prediction} object.
+#' @return A `prediction` object.
 #'
 #' @export
 #' @example inst/examples/spde.posterior.R
 #'
-#' @author Finn Lindgren <\email{Finn.Lindgren@@ed.ac.uk}>
+#' @author Finn Lindgren \email{Finn.Lindgren@@ed.ac.uk}
 
 spde.posterior <- function(result, name, what = "range") {
   spdespec <- result$sppa$model$effects[[name]]$model

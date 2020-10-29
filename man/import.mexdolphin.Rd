@@ -18,6 +18,6 @@ mexdolphin <- import.mexdolphin()
 }
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \keyword{internal}

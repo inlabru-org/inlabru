@@ -72,5 +72,5 @@ opts
 
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}> and Finn Lindgren \email{finn.lindgren@gmail.com}
+Fabian E. Bachl \email{bachlfab@gmail.com} and Finn Lindgren \email{finn.lindgren@gmail.com}
 }

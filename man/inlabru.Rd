@@ -18,5 +18,5 @@ to \code{ggplot2}, e.g. the \link{gg} function. For educational purposes some si
 as well, e.g. \link{Poisson1_1D}, \link{Poisson2_1D}, \link{Poisson2_1D} and \link{toygroups}.
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }

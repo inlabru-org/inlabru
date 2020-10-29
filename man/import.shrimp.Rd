@@ -13,6 +13,6 @@ The \link{shrimp} data set
 Load \code{shrimp} data stored as file \code{gamba.Rdata} and construct spatial object
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \keyword{internal}

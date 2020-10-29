@@ -18,9 +18,9 @@ lgcp(
 \arguments{
 \item{components}{A formula describing the latent components}
 
-\item{data}{A data frame or SpatialPoints[DataFrame] object}
+\item{data}{A data frame or SpatialPoints\link{DataFrame} object}
 
-\item{samplers}{A data frame or Spatial[Points/Lines/Polygons]DataFrame objects}
+\item{samplers}{A data frame or Spatial\link{Points/Lines/Polygons}DataFrame objects}
 
 \item{domain}{Named list of domain definitions}
 

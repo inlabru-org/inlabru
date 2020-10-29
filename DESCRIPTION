@@ -55,3 +55,4 @@ Suggests:
     spatstat.data,
     sphereplot,
     testthat
+Roxygen: list(markdown = TRUE)

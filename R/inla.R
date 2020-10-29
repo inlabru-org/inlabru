@@ -6,14 +6,14 @@ bru_standardise_names <- function(x) {
 
 #' Prediction from fitted inla model
 #'
-#' This method is not supported for plain inla objects. Please see \code{\link{predict.bru}} instead.
+#' This method is not supported for plain inla objects. Please see [predict.bru()] instead.
 #'
 #' @aliases predict.inla
 #' @export
-#' @param object A \code{bru} object obtained by calling \link{bru} or \link{lgcp}.
-#' @param ... Arguments passed on to \link{predict.bru}.
-#' @return A \code{prediction} object.
-#' @seealso \code{\link{predict.inla}}
+#' @param object A `bru` object obtained by calling [bru] or [lgcp].
+#' @param ... Arguments passed on to [predict.bru].
+#' @return A `prediction` object.
+#' @seealso [predict.inla()]
 #' @keywords internal
 predict.inla <- function(object, ...) {
   stop("predict() is not supported for plain inla objects. See https://github.com/fbachl/inlabru/issues/78")
@@ -27,19 +27,19 @@ predict.inla <- function(object, ...) {
 #' Sampling based on inla posteriors
 #'
 #' @description
-#' This method is not supported for plain inla objects. Please see \code{\link{generate.bru}} instead.
+#' This method is not supported for plain inla objects. Please see [generate.bru()] instead.
 #' See https://github.com/fbachl/inlabru/issues/78 for more information.
 #' @aliases generate.inla
 #' @rdname predict.inla
 #' @export
-#' @seealso \code{\link{generate.inla}}
-#' @param object An \code{inla} object obtained by calling \code{INLA::inla()}.
-#' @param ... additional arguments passed on to\link{generate.bru}.
+#' @seealso [generate.inla()]
+#' @param object An `inla` object obtained by calling `INLA::inla()`.
+#' @param ... additional arguments passed on to[generate.bru].
 #'
 #' @return List of generated samples
-#' @seealso \code{\link{predict.bru}}
+#' @seealso [predict.bru()]
 #'
-#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 generate.inla <- function(object,
                           ...) {
@@ -198,7 +198,7 @@ extract.entries <- function(name, smpl) {
 # @param new.name The name to be used for the expanded observation matrix,
 #        possibly the same as an old name. (default "BRU.response")
 # @return a list of modified stacks with multicolumn observations
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}> and Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
 #
 
 inla.stack.mexpand <- function(...,
@@ -255,7 +255,7 @@ inla.stack.mexpand <- function(...,
 # @aliases inla.stack.e
 # @param ... observation vectors
 # @return e observation vector
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
 inla.stack.e <- function(...) {
   stop("This function is obsolete and should not be used.")

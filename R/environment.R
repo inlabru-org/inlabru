@@ -31,7 +31,7 @@ requireINLA <- function() {
 #' @export
 #'
 #' @return NULL
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 #' @examples
 #' \dontrun{
@@ -44,7 +44,7 @@ requireINLA <- function() {
 #' bo$inla.options$control.inla
 #'
 #' # Now, let's run init.tutorial() to make empirical Bayes the default
-#' # integration method when \code{bru} calls \code{inla}
+#' # integration method when `bru` calls `inla`
 #'
 #' init.tutorial()
 #'
@@ -91,7 +91,7 @@ logentry <- function(txt) {
 #' @details
 #' \itemize{
 #'   \item Atomic values override defaults.
-#'   \item \code{NULL} values are replaced by defaults.
+#'   \item `NULL` values are replaced by defaults.
 #'   \item Missing elements of an option list are set to the default values.
 #' }
 #'

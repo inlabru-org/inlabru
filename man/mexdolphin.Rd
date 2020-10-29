@@ -6,20 +6,20 @@
 \title{Pan-tropical spotted dolphins in the Gulf of Mexico}
 \format{
 A list of objects:
- \describe{
-   \item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
-   detected dolphin groups, with their size as an attribute.}
-   \item{\code{samplers}:}{ A \code{SpatialLinesDataFrame} object containing the transect lines
-   that were surveyed.}
-   \item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation
-   mesh (a type of discretization of continuous space) covering the survey region.}
-   \item{\code{ppoly}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
-   survey region.}
-   \item{\code{simulated}:}{ A \code{SpatialPointsDataFrame} object containing the locations of a
-   \emph{simulated} population of dolphin groups. The population was simulated from a 'code{inlabru}
-   model fitted to the actual survey data. Note that the simulated data do not have any associated
-   size information.}
- }
+\describe{
+\item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
+detected dolphin groups, with their size as an attribute.}
+\item{\code{samplers}:}{ A \code{SpatialLinesDataFrame} object containing the transect lines
+that were surveyed.}
+\item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation
+mesh (a type of discretization of continuous space) covering the survey region.}
+\item{\code{ppoly}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
+survey region.}
+\item{\code{simulated}:}{ A \code{SpatialPointsDataFrame} object containing the locations of a
+\emph{simulated} population of dolphin groups. The population was simulated from a 'code{inlabru}
+model fitted to the actual survey data. Note that the simulated data do not have any associated
+size information.}
+}
 }
 \source{
 Library \code{dsm}.

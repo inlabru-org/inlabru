@@ -13,14 +13,14 @@
 #' @aliases bincount
 #' @export
 #' @importFrom graphics hist
-#' @param result A result object from a \link{bru} or \link{lgcp} call
-#' @param predictor A formula describing the prediction of a 1D LGCP via \link{predict}.
+#' @param result A result object from a [bru] or [lgcp] call
+#' @param predictor A formula describing the prediction of a 1D LGCP via [predict].
 #' @param observations A vector of observed values
 #' @param breaks A vector of bin boundaries
 #' @param nint Number of integration points per bin. Increase this if the bins are wide and
 #' @param probs numeric vector of probabilities with values in [0,1]
-#' @param ... arguments passed on to \link{predict}
-#' @return An \code{data.frame} with a ggplot attribute \code{ggp}
+#' @param ... arguments passed on to [predict]
+#' @return An `data.frame` with a ggplot attribute `ggp`
 #'
 #' @examples
 #'
@@ -135,17 +135,17 @@ bincount <- function(result, predictor, observations, breaks, nint = 20, probs =
 #'
 #' @aliases devel.cvmeasure
 #' @export
-#' @param joint A joint \code{prediction} of two latent model components.
-#' @param prediction1 A \code{prediction} of first component.
-#' @param prediction2 A \code{prediction} of the first component.
+#' @param joint A joint `prediction` of two latent model components.
+#' @param prediction1 A `prediction` of first component.
+#' @param prediction2 A `prediction` of the first component.
 #' @param samplers A SpatialPolygon object describing the area for which to compute the cummulative variance measure.
-#' @param mesh The \code{inla.mesh} for which the prediction was performed (required for cummulative Vmeasure).
+#' @param mesh The `inla.mesh` for which the prediction was performed (required for cummulative Vmeasure).
 #' @return Variance and correlations measures.
 #'
 #' @references
 #' Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017.
 #' Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales.
-#' \url{https://arxiv.org/abs/1604.06013}
+#' <https://arxiv.org/abs/1604.06013>
 #'
 #' @example inst/examples/devel.cvmeasure.R
 

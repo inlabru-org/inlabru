@@ -35,7 +35,7 @@ No value, used for plotting side effect.
 Creates a textured sphere and lon/lat coordinate annotations.
 }
 \details{
-This funciton requires the `rgl` and `sphereplot` packages.
+This funciton requires the \code{rgl} and \code{sphereplot} packages.
 }
 \examples{
 \donttest{

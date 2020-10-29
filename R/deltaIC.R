@@ -1,9 +1,9 @@
-#' @title Summarise DIC and WAIC from \code{lgcp} objects.
+#' @title Summarise DIC and WAIC from `lgcp` objects.
 #'
 #' @description
 #' Calculates DIC and WAIC differences and produces an ordered summary.
 #'
-#' @param ... Comma-separated objects inheriting from class \code{inla} and obtained from a run of \link[INLA]{inla}, \link{bru} or \link{lgcp}
+#' @param ... Comma-separated objects inheriting from class `inla` and obtained from a run of [inla][INLA::inla], [bru] or [lgcp]
 #' @param criterion If 'DIC', plots DIC differences; If 'WAIC', plots WAIC differences.
 #'
 #' @return A data frame with each row containing the model name, DIC, WAIC, deltaDIC, and

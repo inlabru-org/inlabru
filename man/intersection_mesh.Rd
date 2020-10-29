@@ -16,6 +16,6 @@ to intersect with the mesh}
 Construct the intersection mesh of a mesh and a polygon
 }
 \author{
-Finn Lindgren <\email{finn.lindgren@gmail.com}>
+Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \keyword{internal}

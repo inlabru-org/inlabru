@@ -1,24 +1,24 @@
 #' @name mrsea
 #' @title Marine renewables strategic environmental assessment
 #' @docType data
-#' @description Data imported from package MRSea, see http://creem2.st-andrews.ac.uk/software/
+#' @description Data imported from package MRSea, see <http://creem2.st-andrews.ac.uk/software/>
 #'
 #' @usage data(mrsea)
 #'
 #' @format A list of objects:
 #'  \describe{
-#'    \item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
+#'    \item{`points`:}{ A `SpatialPointsDataFrame` object containing the locations of
 #'    XXXXX.}
-#'    \item{\code{samplers}:}{ A \code{SpatialLinesDataFrame} object containing the transect lines
+#'    \item{`samplers`:}{ A `SpatialLinesDataFrame` object containing the transect lines
 #'    that were surveyed.}
-#'    \item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation
+#'    \item{`mesh`:}{ An `inla.mesh` object containing a Delaunay triangulation
 #'    mesh (a type of discretization of continuous space) covering the survey region.}
-#'    \item{\code{boundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
+#'    \item{`boundary`:}{ An `SpatialPolygonsDataFrame` object defining the boundary of the
 #'    survey region.}
-#'    \item{\code{covar}:}{ An \code{SpatialPointsDataFrame} containing sea depth estimates.}
+#'    \item{`covar`:}{ An `SpatialPointsDataFrame` containing sea depth estimates.}
 #'  }
 #' @source
-#' Library \code{MRSea}.
+#' Library `MRSea`.
 #'
 #' @references
 #'
@@ -32,16 +32,16 @@ NULL
 #' MRSea data import
 #'
 #'
-#' Load \link{mrsea} survey data from MRSea package and convert to spatial formats defined by the \link{sp} package.
+#' Load [mrsea] survey data from MRSea package and convert to spatial formats defined by the [sp] package.
 #'
 #' @aliases import.mrsea
 #' @keywords internal
-#' @return The \link{mrsea} data set
+#' @return The [mrsea] data set
 #' @examples
 #' \dontrun{
 #' mrsea <- import.mrsea()
 #' }
-#' @author Lindesay Scott-Hayward <\email{lass@@st-andrews.ac.uk}>
+#' @author Lindesay Scott-Hayward \email{lass@@st-andrews.ac.uk}
 #'
 
 import.mrsea <- function() {
@@ -148,7 +148,7 @@ io_mrsea.getDataDir <- function() {
 # @export
 # @return NULL
 # @examples \\dontrun{io_mrsea.pkgdata.save();}
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 #
 
 io_mrsea.pkgdata.save <- function() {

@@ -23,19 +23,19 @@ the  points occur.}
 }
 \value{
 A list with three components:
- \describe{
-   \item{\code{plots}:}{ A \code{SpatialPolygonsDataFrame} object containing the plots that were
-   sampled.}
-   \item{\code{dets}:}{ A \code{SpatialPointsDataFrame} object containing the locations of the
-   points within the plots.}
-   \item{\code{counts}:}{ A \code{dataframe} containing the following columns
-   \describe{
-   \item{\code{x}:}{The x-coordinates of the centres of the plots within the boundary.}
-   \item{\code{y}:}{The y-coordinates of the centres of the plots within the boundary.}
-   \item{\code{n}:}{The numbers of points in each plot.}
-   \item{\code{area}:}{The areas of the plots within the boundary}
-   }}
- }.
+\describe{
+\item{\code{plots}:}{ A \code{SpatialPolygonsDataFrame} object containing the plots that were
+sampled.}
+\item{\code{dets}:}{ A \code{SpatialPointsDataFrame} object containing the locations of the
+points within the plots.}
+\item{\code{counts}:}{ A \code{dataframe} containing the following columns
+\describe{
+\item{\code{x}:}{The x-coordinates of the centres of the plots within the boundary.}
+\item{\code{y}:}{The y-coordinates of the centres of the plots within the boundary.}
+\item{\code{n}:}{The numbers of points in each plot.}
+\item{\code{area}:}{The areas of the plots within the boundary}
+}}
+}.
 }
 \description{
 Creates a plot sample on a regular grid with a random start location.

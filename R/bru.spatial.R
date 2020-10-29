@@ -18,9 +18,11 @@ sfill <- function(data, where = NULL) {
     dpoints <- dpoints[!is.na(vals), ]
     vals <- vals[!is.na(vals)]
 
-    data.ow <- spatstat::owin(range(coordinates(dpoints)[, 1]), range(coordinates(dpoints)[, 2]))
+    data.ow <- spatstat::owin(range(coordinates(dpoints)[, 1]),
+                              range(coordinates(dpoints)[, 2]))
     data.ppp <- spatstat::as.ppp(coordinates(dpoints), data.ow)
-    where.ow <- spatstat::owin(range(coordinates(where)[, 1]), range(coordinates(where)[, 2]))
+    where.ow <- spatstat::owin(range(coordinates(where)[, 1]),
+                               range(coordinates(where)[, 2]))
     where.ppp <- spatstat::as.ppp(coordinates(where), where.ow)
 
     nn <- spatstat::nncross(where.ppp, data.ppp)[, "which"]
@@ -36,21 +38,21 @@ sfill <- function(data, where = NULL) {
 #'
 #' A line in 2D space is defined by a start and an and point, each associated with 2D coordinates.
 #' This function takes a /code{data.frame} as input and assumes that each row defines a line in space.
-#' In order to do so, the data frame must have at least four columns and the \code{start.cols} and
-#' \code{end.cols} parameters must be used to point out the names of the columns that define
+#' In order to do so, the data frame must have at least four columns and the `start.cols` and
+#' `end.cols` parameters must be used to point out the names of the columns that define
 #' the start and end coordinates of the line. The data is then converted to a
-#' \code{SpatialLinesDataFrame} \code{DF}. If a coordinate reference system \code{crs} is provided
-#' it is attached to \code{DF}. If also \code{to.crs} is provided, the coordinate system of \code{DF}
+#' `SpatialLinesDataFrame` `DF`. If a coordinate reference system `crs` is provided
+#' it is attached to `DF`. If also `to.crs` is provided, the coordinate system of `DF`
 #' is transfromed accordingly. Additional columns of the input data, e.g. covariates,
-#' are retained and attached to \code{DF}.
+#' are retained and attached to `DF`.
 #'
 #'
 #' @aliases sline
 #' @export
 #' @param data A data.frame
-#' @param start.cols Character array poitning out the columns of \code{data} that hold the start points of the lines
-#' @param end.cols Character array poitning out the columns of \code{data} that hold the end points of the lines
-#' @param crs Coordinate reference system of the original \code{data}
+#' @param start.cols Character array poitning out the columns of `data` that hold the start points of the lines
+#' @param end.cols Character array poitning out the columns of `data` that hold the end points of the lines
+#' @param crs Coordinate reference system of the original `data`
 #' @param to.crs Coordinate reference system for the SpatialLines ouput.
 #' @return SpatialLinesDataFrame
 #'
@@ -103,12 +105,12 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
 #' A polygon can be described as a sequence of points defining the polygon's boundary.
 #' When given such a sequence (anti clockwise!) this function creates a
 #' SpatialPolygonsDataFrame holding the polygon decribed. By default, the
-#' first two columns of \code{data} are assumed to define the x and y coordinates
-#' of the points. This behavior can ba changed using the \code{cols} parameter, which
+#' first two columns of `data` are assumed to define the x and y coordinates
+#' of the points. This behavior can ba changed using the `cols` parameter, which
 #' points out the names of the columns holding the coordinates. The coordinate
-#' reference system of the resulting spatial polygon can be set via the \code{crs}
+#' reference system of the resulting spatial polygon can be set via the `crs`
 #' paraemter. Posterior conversion to a different CRS is supported using the
-#' \code{to.crs} parameter.
+#' `to.crs` parameter.
 #'
 #' @aliases spoly
 #' @export
@@ -149,10 +151,10 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(as.character(NA)),
 
 #' Coordinate transformation for spatial objects
 #'
-#' This is a wrapper for the \link[sp]{spTransform} function provided by the \code{sp} package.
+#' This is a wrapper for the [spTransform][sp::spTransform] function provided by the `sp` package.
 #' Given a spatial object (or a list thereof) it will transform the coordinate system according
-#' to the parameter \code{crs}. In addition to the usual spatial objects this function is
-#' also capables of transforming \link[INLA]{inla.mesh} objects that are equipped with a coordinate
+#' to the parameter `crs`. In addition to the usual spatial objects this function is
+#' also capables of transforming [inla.mesh][INLA::inla.mesh] objects that are equipped with a coordinate
 #' system.#'
 #' @aliases stransform
 #' @export
@@ -185,7 +187,7 @@ stransform <- function(splist, crs) {
           splist[[k]] <- sp::spTransform(splist[[k]], crs)
           # coordnames(splist[[k]]) = cn
         } else if (inherits(splist[[k]], "inla.mesh")) {
-          splist[[k]] <- INLA::inla.spTransform(splist[[k]], CRSobj = crs)
+          splist[[k]] <- fm_spTransform(splist[[k]], CRSobj = crs)
         }
       }
     } else {

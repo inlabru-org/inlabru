@@ -21,7 +21,7 @@ This function takes a RasterLayer object, converts it into a SpatialPixelsDataFr
 uses \link{geom_tile} to plot the data.
 }
 \details{
-This function requires the `raster` package.
+This function requires the \code{raster} package.
 }
 \examples{
 # Some features require the raster and spatstat.data packages.

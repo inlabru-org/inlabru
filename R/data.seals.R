@@ -7,13 +7,13 @@
 #'
 #' @format The data contain these objects:
 #'  \describe{
-#'    \item{\code{points}:}{ A \code{SpatialPointsDataFrame} Center locations of the photos}
-#'    \item{\code{mesh}:}{ An \code{inla.mesh} enclosing the plane's transect}
-#'    \item{\code{ice.data}:}{ An \code{SpatialPointsDataFrame} with MODIS ice concentration estimates}
-#'    \item{\code{ice.cv}:}{ An \code{covdata} object with interpolated ice coverage data}
+#'    \item{`points`:}{ A `SpatialPointsDataFrame` Center locations of the photos}
+#'    \item{`mesh`:}{ An `inla.mesh` enclosing the plane's transect}
+#'    \item{`ice.data`:}{ An `SpatialPointsDataFrame` with MODIS ice concentration estimates}
+#'    \item{`ice.cv`:}{ An `covdata` object with interpolated ice coverage data}
 #'  }
 #' @source
-#' Martin Jullum <\email{Martin.Jullum@@nr.no}>
+#' Martin Jullum \email{Martin.Jullum@@nr.no}
 #'
 #' @references
 #' Oigard, T. A. (2013) From pup production to quotas: current status of harp seals in the Greenland Sea.
@@ -29,7 +29,7 @@ NULL
 
 #' Seal pup edata import
 #'
-#' Generate \code{Spatial} objects from raw seal pup survey data (not inlcuded in \link{inlabru}). Note that this function
+#' Generate `Spatial` objects from raw seal pup survey data (not inlcuded in [inlabru]). Note that this function
 #' will only extract one of the survey transects.
 #'
 #' @aliases import.seals
@@ -37,8 +37,8 @@ NULL
 #' @importFrom utils read.csv
 #' @param sealfile Character pointing to the file containing the seal counts and photo locations
 #' @param icefile Character pointing to the .tif file containing the ice sheet covariate
-#' @return The \link{seals} data set
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @return The [seals] data set
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 import.seals <- function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif") {

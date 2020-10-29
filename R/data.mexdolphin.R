@@ -1,8 +1,8 @@
 #' @name mexdolphin
 #' @title Pan-tropical spotted dolphins in the Gulf of Mexico
 #' @docType data
-#' @description This a version of the \code{mexdolphins} dataset from the package \code{dsm}, reformatted
-#' as point process data for use with \code{inlabru}. The data are from a combination of several NOAA
+#' @description This a version of the `mexdolphins` dataset from the package `dsm`, reformatted
+#' as point process data for use with `inlabru`. The data are from a combination of several NOAA
 #' shipboard surveys conducted on pan-tropical spotted dolphins in the Gulf of Mexico. 47 observations
 #' of groups of dolphins wre detected. The group size was recorded, as well as the Beaufort sea state at
 #' the time of the observation.
@@ -11,21 +11,21 @@
 #'
 #' @format A list of objects:
 #'  \describe{
-#'    \item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
+#'    \item{`points`:}{ A `SpatialPointsDataFrame` object containing the locations of
 #'    detected dolphin groups, with their size as an attribute.}
-#'    \item{\code{samplers}:}{ A \code{SpatialLinesDataFrame} object containing the transect lines
+#'    \item{`samplers`:}{ A `SpatialLinesDataFrame` object containing the transect lines
 #'    that were surveyed.}
-#'    \item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation
+#'    \item{`mesh`:}{ An `inla.mesh` object containing a Delaunay triangulation
 #'    mesh (a type of discretization of continuous space) covering the survey region.}
-#'    \item{\code{ppoly}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
+#'    \item{`ppoly`:}{ An `SpatialPolygonsDataFrame` object defining the boundary of the
 #'    survey region.}
-#'    \item{\code{simulated}:}{ A \code{SpatialPointsDataFrame} object containing the locations of a
-#'    \emph{simulated} population of dolphin groups. The population was simulated from a 'code{inlabru}
+#'    \item{`simulated`:}{ A `SpatialPointsDataFrame` object containing the locations of a
+#'    *simulated* population of dolphin groups. The population was simulated from a 'code{inlabru}
 #'    model fitted to the actual survey data. Note that the simulated data do not have any associated
 #'    size information.}
 #'  }
 #' @source
-#' Library \code{dsm}.
+#' Library `dsm`.
 #'
 #' @references
 #' Halpin, P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K. Urian,
@@ -52,16 +52,16 @@ NULL
 #' Mexdolphin data import
 #'
 #'
-#' Load \code{mexdolphins} survey data from \code{dsm} package and convert to spatial formats defined by the \link{sp} package.
+#' Load `mexdolphins` survey data from `dsm` package and convert to spatial formats defined by the [sp] package.
 #'
 #' @aliases import.mexdolphin
 #' @keywords internal
-#' @return The \link{mexdolphin} data set
+#' @return The [mexdolphin] data set
 #' @examples
 #' \dontrun{
 #' mexdolphin <- import.mexdolphin()
 #' }
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 

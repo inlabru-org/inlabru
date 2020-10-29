@@ -14,7 +14,7 @@ component(object, ...)
 \description{
 Similar to glm(), gam() and inla() \link{bru} uses formula objects to describe response data and latent
 (unknonw) components of the model to be fitted. However, in addition to the syntax compatible with
-\link[INLA]{inla}, bru components offer addtitional functionality which facilitates modeling.
+\link[INLA:inla]{inla}, bru components offer addtitional functionality which facilitates modeling.
 
 In inlabru, latent components can be constructed using R formulae or explicit parameter. For background
 information on the formulae inlabru accepts please see \link{component.formula}. For more details on the
@@ -26,6 +26,6 @@ Other Component constructor:
 \code{\link{component.formula}()}
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \concept{Component constructor}

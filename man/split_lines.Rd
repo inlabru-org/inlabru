@@ -24,6 +24,6 @@ List of start and end points resulting from splitting the given lines
 Split lines at mesh edges
 }
 \author{
-Fabian E. Bachl <\email{f.e.bachl@bath.ac.uk}>
+Fabian E. Bachl \email{f.e.bachl@bath.ac.uk}
 }
 \keyword{internal}

@@ -21,6 +21,6 @@ An A-matrix.
 Constructs the A-matrix for a given component and and some data
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \keyword{internal}

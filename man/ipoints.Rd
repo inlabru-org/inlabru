@@ -97,5 +97,5 @@ if (require("INLA", quietly = TRUE)) {
 
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }

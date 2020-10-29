@@ -8,20 +8,20 @@
 #'
 #' @usage data(Poisson2_1D)
 #'
-#' @format The data contain the following \code{R} objects:
+#' @format The data contain the following `R` objects:
 #'  \describe{
-#'    \item{\code{lambda2_1D}:}{ A function defining the intensity function of a
+#'    \item{`lambda2_1D`:}{ A function defining the intensity function of a
 #'    nonhomogeneous Poisson process. Note that this function is only defined on
 #'    the interval (0,55).}
-#'    \item{\code{cov2_1D}:}{ A function that gives what we will call a
+#'    \item{`cov2_1D`:}{ A function that gives what we will call a
 #'    'habitat suitability' covariate in 1D space.}
-#'    \item{\code{E_nc2}}{ The expected counts of the gridded data.}
-#'    \item{\code{pts2}}{ The locations of the observed points (a data frame with one column, named \code{x}).}
-#'    \item{\code{countdata2}}{ A data frame with three columns, containing the count data:}
+#'    \item{`E_nc2`}{ The expected counts of the gridded data.}
+#'    \item{`pts2`}{ The locations of the observed points (a data frame with one column, named `x`).}
+#'    \item{`countdata2`}{ A data frame with three columns, containing the count data:}
 #'    \describe{
-#'      \item{\code{x}}{ The grid cell midpoint.}
-#'      \item{\code{count}}{ The number of detections in the cell.}
-#'      \item{\code{exposure}}{ The width of the cell.}
+#'      \item{`x`}{ The grid cell midpoint.}
+#'      \item{`count`}{ The number of detections in the cell.}
+#'      \item{`exposure`}{ The width of the cell.}
 #'    }
 #'  }
 #'
