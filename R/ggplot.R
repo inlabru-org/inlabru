@@ -555,7 +555,7 @@ gg.inla.mesh <- function(data,
       stop("Geom not implemented for spherical meshes (manifold = S2)")
     }
     if (!is.null(crs)) {
-      data <- INLA::inla.spTransform(data, CRSobj = crs)
+      data <- fm_spTransform(data, CRSobj = crs)
     }
 
     df <- rbind(

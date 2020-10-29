@@ -80,7 +80,7 @@ import.seals <- function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.
   bnd <- INLA::inla.nonconvex.hull(coordinates(seals), resolution = 170, convex = 0.5)
   bnd2 <- INLA::inla.nonconvex.hull(coordinates(seals), resolution = 100, convex = 0.7)
   mesh <- INLA::inla.mesh.2d(boundary = list(bnd, bnd2), max.edge = c(0.2, 3))
-  mesh$crs <- INLA::inla.CRS(projargs = CRS(target.p4s))
+  mesh$crs <- fm_CRS(projargs = CRS(target.p4s))
   # ggplot() + gg(mesh) + gg(seals) + coord_equal()
   # mesh$n
 

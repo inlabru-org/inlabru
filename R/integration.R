@@ -257,8 +257,8 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     w <- rowSums((coordinates(ep3d) - coordinates(sp3d))^2)^0.5
   } else {
     # Has CRS
-    longlat.crs <- INLA::inla.CRS("longlat_globe")
-    geocentric.crs <- INLA::inla.CRS("globe")
+    longlat.crs <- fm_CRS("longlat_globe")
+    geocentric.crs <- fm_CRS("globe")
     sp3d <- spTransform(sp3d, CRSobj = geocentric.crs)
     ep3d <- spTransform(ep3d, CRSobj = geocentric.crs)
     mp3d <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2,
