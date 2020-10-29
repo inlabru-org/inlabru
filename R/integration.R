@@ -243,7 +243,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   }
 
   # Determine integration points along lines
-  crs <- INLA::inla.sp_get_crs(data)
+  crs <- fm_sp_get_crs(data)
   
   sp3d <- within(data.frame(sp), Z <- 0)
   colnames(sp3d) <- c("X1", "X2", "Z")
@@ -252,7 +252,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   colnames(ep3d) <- c("X1", "X2", "Z")
   ep3d <- SpatialPoints(ep3d, proj4string = crs)
 
-  if (crs_is_null(crs)) {
+  if (fm_crs_is_null(crs)) {
     ips <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2)
     w <- rowSums((coordinates(ep3d) - coordinates(sp3d))^2)^0.5
   } else {

@@ -1170,7 +1170,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       # Allow proj4string failures:
       data_crs <- tryCatch(sp_get_crs(data),
                       error = function(e) {})
-      if (!crs_is_null(data_crs)) {
+      if (!fm_crs_is_null(data_crs)) {
         proj4string(val) <- data_crs
       }
     }

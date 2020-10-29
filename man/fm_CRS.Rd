@@ -95,9 +95,8 @@ names(fm_wkt_predef())
 }
 }
 \seealso{
-\code{\link[sp:CRS-class]{sp::CRS()}}, \code{\link[=crs_wkt]{crs_wkt()}},
-\code{\link[=fm_sp_get_crs]{fm_sp_get_crs()}}
-\code{\link[=plot.CRS]{plot.CRS()}}, \code{\link[=fm_identical_CRS]{fm_identical_CRS()}}
+\code{\link[sp:CRS-class]{sp::CRS()}}, \code{\link{fm_crs_wkt}},
+\code{\link[=fm_sp_get_crs]{fm_sp_get_crs()}}, \code{\link[=fm_identical_CRS]{fm_identical_CRS()}}
 }
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}

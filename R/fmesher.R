@@ -103,9 +103,27 @@ fm_sp_get_crs <- function(x) {
     return(NULL)
   }
   if (fm_has_PROJ6()) {
-    suppressWarnings(crs <- CRS(SRS_string = sp::wkt(x)))
+    suppressWarnings(crs <- sp::CRS(SRS_string = sp::wkt(x)))
   } else {
-    crs <- CRS(proj4string(x))
+    crs <- sp::CRS(proj4string(x))
+  }
+  crs
+}
+
+fm_crs_is_null <- function(crs) {
+  if (is.null(crs)) {
+    TRUE
+  } else if (fm_has_PROJ6()) {
+    wkt <- fm_crs_get_wkt(crs)
+    is.null(wkt)
+  } else {
+    is.na(crs)
+  }
+}
+
+fm_ensure_crs <- function(crs) {
+  if (fm_crs_is_null(crs)) {
+    crs <- sp::CRS(NA_character_)
   }
   crs
 }
@@ -113,11 +131,10 @@ fm_sp_get_crs <- function(x) {
 
 
 
-
 #' @title Handling CRS/WKT
 #' @description Get and set CRS object or WKT string properties.
 #' @export
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 
 fm_wkt_is_geocent <- function(wkt) {
   if (is.null(wkt) || identical(wkt, "")) {
@@ -161,7 +178,7 @@ fm_wkt_is_geocent <- function(wkt) {
 }
 
 #' @export
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 
 fm_crs_is_geocent <- function(crs) {
   if (fm_has_PROJ6()) {
@@ -175,7 +192,7 @@ fm_crs_is_geocent <- function(crs) {
 }
 
 
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 #' @export
 
 fm_wkt_get_ellipsoid_radius <- function(wkt) {
@@ -207,7 +224,7 @@ fm_wkt_get_ellipsoid_radius <- function(wkt) {
   as.numeric(ellipsoid[["params"]][[2]])
 }
 
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 #' @export
 
 fm_crs_get_ellipsoid_radius <- function(crs) {
@@ -217,7 +234,7 @@ fm_crs_get_ellipsoid_radius <- function(crs) {
 }
 
 
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 #' @export
 
 fm_wkt_set_ellipsoid_radius <- function(wkt, radius) {
@@ -266,7 +283,7 @@ fm_wkt_set_ellipsoid_radius <- function(wkt, radius) {
   fm_wkt_tree_as_wkt(wt)
 }
 
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 #' @export
 
 fm_crs_set_ellipsoid_radius <- function(crs, radius) {
@@ -348,9 +365,8 @@ fm_crs_set_ellipsoid_radius <- function(crs, radius) {
 #' containing at least one element: \item{crs }{The basic `sp::CRS`
 #' object}
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @seealso [sp::CRS()], [crs_wkt()],
-#' [fm_sp_get_crs()]
-#' [plot.CRS()], [fm_identical_CRS()]
+#' @seealso [sp::CRS()], [`fm_crs_wkt`],
+#' [fm_sp_get_crs()], [fm_identical_CRS()]
 #' @examples
 #'
 #' if (require(rgdal)) {
@@ -773,8 +789,8 @@ fm_CRSargs_as_list <- function(x, ...) {
 #' }
 #' @export
 #' @seealso [fm_sp_get_crs()]
-#' @aliases crs_wkt
-#' @rdname crs_wkt
+#' @aliases fm_crs_wkt
+#' @rdname fm_crs_wkt
 
 fm_wkt_unit_params <- function() {
   params <- list(
@@ -806,7 +822,7 @@ fm_wkt_unit_params <- function() {
 }
 
 #' @export
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 #' @return For `fm_wkt_get_lengthunit`, a
 #' list of length units used in the wkt string, excluding the ellipsoid radius
 #' unit.
@@ -845,7 +861,7 @@ fm_wkt_get_lengthunit <- function(wkt) {
 }
 
 #' @export
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 #' @return For `fm_wkt_set_lengthunit`, a
 #' WKT2 string with altered length units.
 #' Note that the length unit for the ellipsoid radius is unchanged.
@@ -886,7 +902,7 @@ fm_wkt_set_lengthunit <- function(wkt, unit, params = NULL) {
 
 #' @return For `fm_crs_get_wkt`, WKT2 string.
 #' @export
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 
 fm_crs_get_wkt <- function(crs) {
   fm_requires_PROJ6("fm_crs_get_wkt")
@@ -907,7 +923,7 @@ fm_crs_get_wkt <- function(crs) {
 #' unit. (For legacy PROJ4 code, the raw units from the proj4string are
 #' returned, if present.)
 #' @export
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 
 fm_crs_get_lengthunit <- function(crs) {
   if (fm_has_PROJ6()) {
@@ -930,7 +946,7 @@ fm_crs_get_lengthunit <- function(crs) {
 #' altered length units.
 #' Note that the length unit for the ellipsoid radius is unchanged.
 #' @export
-#' @rdname crs_wkt
+#' @rdname fm_crs_wkt
 
 fm_crs_set_lengthunit <- function(crs, unit, params = NULL) {
   if (inherits(crs, "inla.CRS")) {

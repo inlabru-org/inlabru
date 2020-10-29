@@ -8,7 +8,7 @@
 \alias{fm_wkt_set_ellipsoid_radius}
 \alias{fm_crs_set_ellipsoid_radius}
 \alias{fm_wkt_unit_params}
-\alias{crs_wkt}
+\alias{fm_crs_wkt}
 \alias{fm_wkt_get_lengthunit}
 \alias{fm_wkt_set_lengthunit}
 \alias{fm_crs_get_wkt}
