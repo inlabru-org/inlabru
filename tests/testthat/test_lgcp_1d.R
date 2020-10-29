@@ -85,8 +85,10 @@ test_that("1D LGCP fitting", {
   expect_equal(fit$summary.fixed["Intercept", "mean"], 1.08959, tolerance = midtol)
   expect_equal(fit$summary.fixed["Intercept", "sd"], 0.4206289, tolerance = midtol)
   
-  expect_equal(fit$summary.random$spde1D$mean[c(1, 27, 50)], c(-0.46315457, 0.09792757, -3.25164489), tolerance = midtol)
-  expect_equal(fit$summary.random$spde1D$sd[c(2, 32, 29)], c(0.5887868, 0.4267676, 0.4288160), tolerance = midtol)
+  expect_equal(fit$summary.random$spde1D$mean[c(1, 27, 50)],
+               c(-0.4619925,  0.2925785, -1.7602729), tolerance = midtol)
+  expect_equal(fit$summary.random$spde1D$sd[c(2, 32, 29)],
+               c(0.5905830, 0.4206042, 0.4219461), tolerance = midtol)
   
   pr <- predict(fit, data = data.frame(x = mesh1D$loc), formula = ~spde1D,
                 n.samples = 100, seed = 84354)

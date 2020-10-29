@@ -81,8 +81,27 @@
 #' }
 #'
 
-ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, project, 
-                    int.args = list(method = "stable", nsub = NULL)) {
+ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
+                    int.args = NULL,
+                    project = NULL) {
+  int.args.default <- list(method = "stable", nsub = NULL)
+  if (is.null(int.args)) {
+    int.args <- list()
+  }
+  missing.args <- setdiff(names(int.args.default), names(int.args))
+  int.args[missing.args] <- int.args.default[missing.args]
+
+  if (!is.null(project)) {
+    if (project && !identical(int.args$method, "stable")) {
+      stop("ipoints(project=TRUE) is deprecated, and int.args$methods != 'stable'")
+    } else if (!project && identical(int.args$method, "stable")) {
+      stop("ipoints(project=FALSE) is deprecated, and int.args$methods == 'stable'")
+    }
+      warning("ipoints(project=", ifelse(project, "TRUE", "FALSE"),
+              ") is deprecated. Will use int.args$method = '",
+              int.args[["method"]])
+  }
+
   pregroup <- NULL
   
   # If region is null treat domain as the region definition
@@ -220,7 +239,8 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL, proj
       region$weight <- 1
     }
     
-    ips <- int.slines(region, domain, group = group)
+    ips <- int.slines(region, domain, group = group,
+                      project = identical(int.args[["method"]], "stable"))
   } else if (inherits(region, "SpatialPolygons") ||
              inherits(region, "SpatialPolygonsDataFrame")) {
     
