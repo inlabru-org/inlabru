@@ -25,7 +25,7 @@ bincount(
 
 \item{nint}{Number of integration points per bin. Increase this if the bins are wide and}
 
-\item{probs}{numeric vector of probabilities with values in [0,1]}
+\item{probs}{numeric vector of probabilities with values in \link{0,1}}
 
 \item{...}{arguments passed on to \link{predict}}
 }

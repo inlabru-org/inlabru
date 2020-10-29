@@ -14,7 +14,7 @@
 \description{
 Similar to glm(), gam() and inla() \link{bru} uses formula objects to describe response data and latent
 (unknonw) components of the model to be fitted. However, in addition to the syntax compatible with
-\link[INLA]{inla}, bru components offer addtitional functionality which facilitates modeling.
+\link[INLA:inla]{inla}, bru components offer addtitional functionality which facilitates modeling.
 }
 \details{
 \link{bru} will understand formulae describing fixed effect models just like the other methods. For instance, the
@@ -45,7 +45,7 @@ In INLA, a simple random effect model would be expressed as
 
 \itemize{\item{\code{formula = y ~ f(x, model = "linear")},}}
 
-where \link[INLA]{f} is the inla specific function to set up random effects of all kinds. The underlying
+where \link[INLA:f]{f} is the inla specific function to set up random effects of all kinds. The underlying
 predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
 \code{x} as the random effect's name. bru allows to rewrite this formula in order to explicitly state
 the name of the random effect and the name of the associated. This is achived by replacing \code{f}
@@ -58,7 +58,7 @@ bru offers. The formula parameters of both, \link{bru} and the prediction method
 are interpreted in the mathematical sense. For instance, \code{predict} may be used to analyze the
 an analytical combination of the covariate \eqn{x} and the intercept using
 
-\itemize{\item{\code{predict(fit, data.frame(x=1)), ~ exp(x + Intercept)}.}}
+\itemize{\item{\verb{predict(fit, data.frame(x=1)), ~ exp(x + Intercept)}.}}
 
 On the other hand, predict may be used to only look at a transformation of the random effect \eqn{\psi}
 
@@ -71,7 +71,7 @@ On the other hand, predict may be used to only look at a transformation of the r
 # called "x". Note that a list of components is returned because the
 # formula may define multiple components
 
-eff <- component(~ myLinearEffectOfX(map = x, model = "linear"))
+eff <- component(~ myLinearEffectOfX(main = x, model = "linear"))
 summary(eff[[1]])
 # Equivalent shortcuts:
 eff <- component(~ myLinearEffectOfX(x, model = "linear"))
@@ -83,6 +83,6 @@ Other Component constructor:
 \code{\link{component}()}
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \concept{Component constructor}

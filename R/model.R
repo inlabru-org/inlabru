@@ -1,6 +1,6 @@
-#' Internal \link{inlabru} model structure
+#' Internal [inlabru] model structure
 #'
-#' See \link{make.model}.
+#' See [make.model].
 #'
 #' @name bru_model
 #' @keywords internal
@@ -17,61 +17,61 @@ evaluate <- function(...) {
 
 #' Create an inlabru model object from a component formula
 #'
-#' The \link{inlabru} syntax for model formulae is different from what
-#' \code{INLA::inla} considers a valid.
-#' In inla most of the effects are defined by adding an \code{f(...)} expression to the formula.
-#' In \link{inlabru} the \code{f} is replaced by an arbitrary (exception: \code{offset}) string that will
+#' The [inlabru] syntax for model formulae is different from what
+#' `INLA::inla` considers a valid.
+#' In inla most of the effects are defined by adding an `f(...)` expression to the formula.
+#' In [inlabru] the `f` is replaced by an arbitrary (exception: `offset`) string that will
 #' determine the label of the effect. See Details for further information.
 #'
 #' @details
 #' For instance
 #'
-#' \code{y ~ f(myspde, ...)}
+#' `y ~ f(myspde, ...)`
 #'
 #' in INLA is equivalent to
 #'
-#' \code{y ~ myspde(...)}
+#' `y ~ myspde(...)`
 #'
 #' in inlabru.
 #'
 #' A disadvantage of the inla way is that there is no clear separation between the name of the covariate
 #' and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
 #' use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-#' \link{inlabru} provides the new \code{main} agument. For convenience, the \code{main} argument can be used
+#' [inlabru] provides the new `main` agument. For convenience, the `main` argument can be used
 #' like the first argument of the f function, e.g., and is the first argument of the component definition.
 #'
-#' \code{y ~ f(temperature, model = 'linear')}
+#' `y ~ f(temperature, model = 'linear')`
 #'
 #' is equivalent to
 #'
-#' \code{y ~ temperature(temperature, model = 'linear')}
+#' `y ~ temperature(temperature, model = 'linear')`
 #' and
-#' \code{y ~ temperature(main = temperature, model = 'linear')}
+#' `y ~ temperature(main = temperature, model = 'linear')`
 #' as well as
-#' \code{y ~ temperature(model = 'linear')}
-#' which sets \code{main = temperature}.
+#' `y ~ temperature(model = 'linear')`
+#' which sets `main = temperature`.
 #'
-#' On the other hand, map can also be a function mapping, e.g the \link{coordinates} function of the
-#' \link{sp} package :
+#' On the other hand, map can also be a function mapping, e.g the [coordinates] function of the
+#' [sp] package :
 #'
-#' \code{y ~ mySPDE(coordinates, ...)}
+#' `y ~ mySPDE(coordinates, ...)`
 #' 
 #' This exctract the coordinates from the data object, and maps it to the latent
-#' field via the information given in the \code{mapper}, which by default is
-#' extracted from the \code{model} object, in the case of \code{spde} model
+#' field via the information given in the `mapper`, which by default is
+#' extracted from the `model` object, in the case of `spde` model
 #' objects.
 #'
-#' Morevover, \code{main} can be any expression that evaluates within your data as an environment.
+#' Morevover, `main` can be any expression that evaluates within your data as an environment.
 #' For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'sin(a+b)' by
-#' setting \code{map} in the following way:
+#' setting `map` in the following way:
 #'
-#' \code{y ~ myEffect(sin(a+b))}
+#' `y ~ myEffect(sin(a+b))`
 #'
 #'
 #' @export
 #' @param components A component specification formula
-#' @param lhoods A list of one or more \code{lhood} objects
-#' @return A \link{bru_model} object
+#' @param lhoods A list of one or more `lhood` objects
+#' @return A [bru_model] object
 #' @keywords internal
 
 make.model <- function(components, lhoods) {
@@ -111,12 +111,12 @@ make.model <- function(components, lhoods) {
 #'
 #' @aliases evaluate.model evaluate
 #' @export
-#' @param model An \link{inlabru} \link{model}
-#' @param result Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.
+#' @param model An [inlabru] [model]
+#' @param result Posterior of an [inla], [bru] or [lgcp] run.
 #' @param data Locations and covariates needed to evaluate the model.
-#' @param predictor A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects. In case of a formula the right hand side is used for evaluation.
+#' @param predictor A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (`NULL`) returns a `data.frame` containing the sampled effects. In case of a formula the right hand side is used for evaluation.
 #' @param property Property of the model components to obtain value from.
-#' Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).
+#' Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see `n` parameter).
 #' @param n Number of samples to draw.
 # @param seed If seed != 0L, the random seed
 # @param num.threads Specification of desired number of threads for parallel

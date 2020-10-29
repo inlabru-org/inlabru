@@ -1,48 +1,48 @@
 #' @name gorillas
 #' @title Gorilla nesting sites
 #' @docType data
-#' @description This is the \code{gorillas} dataset from the package \code{spatstat}, reformatted
-#' as point process data for use with \code{inlabru}.
+#' @description This is the `gorillas` dataset from the package `spatstat`, reformatted
+#' as point process data for use with `inlabru`.
 #'
 #' @usage data(gorillas)
 #'
 #' @format The data are a list that contains these elements:
 #'  \describe{
-#'    \item{\code{nests}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
+#'    \item{`nests`:}{ A `SpatialPointsDataFrame` object containing the locations of
 #'    the gorilla nests.}
-#'    \item{\code{boundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary
+#'    \item{`boundary`:}{ An `SpatialPolygonsDataFrame` object defining the boundary
 #'    of the region that was searched for the nests.}
-#'    \item{\code{mesh}:}{ An \code{inla.mesh} object containing a mesh that can be used
-#'    with function \code{lgcp} to fit a LGCP to the nest data.}
-#'    \item{\code{gcov}:}{ A list of SpatialGridDataFrame objects, one for each of these spatial covariates:
+#'    \item{`mesh`:}{ An `inla.mesh` object containing a mesh that can be used
+#'    with function `lgcp` to fit a LGCP to the nest data.}
+#'    \item{`gcov`:}{ A list of SpatialGridDataFrame objects, one for each of these spatial covariates:
 #'     \describe{
-#'       \item{\code{aspect}}{ Compass direction of the terrain slope. Categorical, with levels
+#'       \item{`aspect`}{ Compass direction of the terrain slope. Categorical, with levels
 #'       N, NE, E, SE, S, SW, W and NW, which are coded as integers 1 to 8.}
-#'       \item{\code{elevation}}{ Digital elevation of terrain, in metres.}
-#'       \item{\code{heat}}{ Heat Load Index at each point on the surface (Beer's aspect),
+#'       \item{`elevation`}{ Digital elevation of terrain, in metres.}
+#'       \item{`heat`}{ Heat Load Index at each point on the surface (Beer's aspect),
 #'       discretised. Categorical with values Warmest (Beer's aspect between 0 and 0.999),
 #'       Moderate (Beer's aspect between 1 and 1.999), Coolest (Beer's aspect equals 2). These are
 #'       coded as integers 1, 2 and 3, in that order.}
-#'       \item{\code{slopangle}}{ Terrain slope, in degrees.}
-#'       \item{\code{slopetype}}{ Type of slope. Categorical, with values Valley, Toe (toe slope),
+#'       \item{`slopangle`}{ Terrain slope, in degrees.}
+#'       \item{`slopetype`}{ Type of slope. Categorical, with values Valley, Toe (toe slope),
 #'       Flat, Midslope, Upper and Ridge. These are coded as integers 1 to 6.}
-#'       \item{\code{vegetation}}{ Vegetation type: a categorical variable with 6 levels coded as
+#'       \item{`vegetation`}{ Vegetation type: a categorical variable with 6 levels coded as
 #'       integers 1 to 6 (in order of increasing expected habitat suitability)}
-#'       \item{\code{waterdist}}{ Euclidean distance from nearest water body, in metres.}
+#'       \item{`waterdist`}{ Euclidean distance from nearest water body, in metres.}
 #'     }
 #'    }
-#'    \item{\code{plotsample}}{Plot sample of gorilla nests, sampling 9x9 over the region, with 60\% coverage. Components:
+#'    \item{`plotsample`}{Plot sample of gorilla nests, sampling 9x9 over the region, with 60\% coverage. Components:
 #'    \describe{
-#'      \item{\code{counts}}{ A SpatialPointsDataFrame frame with elements \code{x}, \code{y}, \code{count},
-#'      \code{exposure}, being the x- and y-coordinates of the centre of each plot, the count in each
+#'      \item{`counts`}{ A SpatialPointsDataFrame frame with elements `x`, `y`, `count`,
+#'      `exposure`, being the x- and y-coordinates of the centre of each plot, the count in each
 #'      plot and the area of each plot.}
-#'      \item{\code{plots}}{ A \code{SpatialPolygonsDataFrame} defining the individual plot boundaries.}
-#'      \item{\code{nests}}{ A \code{SpatialPointsDataFrame} giving the locations of each detected nest.}
+#'      \item{`plots`}{ A `SpatialPolygonsDataFrame` defining the individual plot boundaries.}
+#'      \item{`nests`}{ A `SpatialPointsDataFrame` giving the locations of each detected nest.}
 #'    }
 #'    }
 #'  }
 #' @source
-#' Library \code{spatstat}.
+#' Library `spatstat`.
 #'
 #'
 #' @references
@@ -73,7 +73,7 @@ NULL
 #' @aliases import.gorillas
 #' @keywords internal
 #' @importFrom utils data
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>, David L. Borchers <\email{dlb@@st-andrews.ac.uk}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, David L. Borchers \email{dlb@@st-andrews.ac.uk}
 #' @return gorilla data
 
 import.gorillas <- function() {
@@ -84,7 +84,7 @@ import.gorillas <- function() {
   # Load Gorilla data from spatstat
   gorillas <- NULL
   gorillas.extra <- NULL
-  data(gorillas, package = "spatstat", envir = environment())
+  data(gorillas, package = "spatstat.data", envir = environment())
 
   # Create SpatialPoints representing nest locations
   nests <- as.data.frame(gorillas)
@@ -96,8 +96,8 @@ import.gorillas <- function() {
 
   #' Build mesh
   bnd <- INLA::inla.mesh.segment(loc = data.frame(gorillas$window$bdry[[1]]))
-  mesh <- INLA::inla.mesh.2d(interior = bnd, max.edge = 222) # ! With higher max.edge we run into various INLA errors/warnings
-  mesh$crs <- INLA::inla.CRS(proj4string(nests))
+  mesh <- INLA::inla.mesh.2d(interior = bnd, max.edge = 222,
+                             crs = fm_sp_get_crs(nests)) # ! With higher max.edge we run into various INLA errors/warnings
 
   #' Turn covariates int SpatialGridDataFrame
   gcov <- list()

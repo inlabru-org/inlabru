@@ -13,7 +13,7 @@
 
 \item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.}
 
-\item{alpha}{The ribbons numeric alpha level in [0,1].}
+\item{alpha}{The ribbons numeric alpha level in \link{0,1}.}
 
 \item{bar}{If TRUE plot boxplot-style summary for each variable.}
 

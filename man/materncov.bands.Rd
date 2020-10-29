@@ -42,23 +42,23 @@ cyclic interval}
 }
 \value{
 A list with estimated covariance or correlation (when \code{log.variance} is
-    \code{NULL}) functions:
+\code{NULL}) functions:
 \item{lower}{An approximate lower bound for the \code{quantile} credible region}
 \item{median}{The function for for the approximate median parameters quantile}
 \item{upper}{An approximate upper bound for the \code{quantile} credible region}
 }
 \description{
 Evaluate the covariance function for an inla.spde
-    objectPlots the posterior distribution of the range,
-    log(range), variance, or log(variance) parameter of a model's
-    SPDE component. Can also plot Matern correlation or covariance
-    function.
+objectPlots the posterior distribution of the range,
+log(range), variance, or log(variance) parameter of a model's
+SPDE component. Can also plot Matern correlation or covariance
+function.
 }
 \details{
 Uses a Gaussian assumption for the internal model parameters, and finds a region in parameter
 space with approximately \code{quantile} probability.
 }
 \author{
-Finn Lindgren <\email{Finn.Lindgren@ed.ac.uk}>
+Finn Lindgren \email{Finn.Lindgren@ed.ac.uk}
 }
 \keyword{internal}

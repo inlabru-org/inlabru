@@ -7,13 +7,13 @@
 #'
 #' @format A list of objects:
 #'  \describe{
-#'    \item{\code{haul}:}{ A \code{SpatialPointsDataFrame} object containing haul locations}
-#'    \item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation
+#'    \item{`haul`:}{ A `SpatialPointsDataFrame` object containing haul locations}
+#'    \item{`mesh`:}{ An `inla.mesh` object containing a Delaunay triangulation
 #'    mesh (a type of discretization of continuous space) covering the haul locations.}
 #'    \describe{
-#'       \item{\code{catch}}{Catch in Kg.}
-#'       \item{\code{landing}}{Landing in Kg.}
-#'       \item{\code{depth}}{Mean depth of the fishery haul.}
+#'       \item{`catch`}{Catch in Kg.}
+#'       \item{`landing`}{Landing in Kg.}
+#'       \item{`depth`}{Mean depth of the fishery haul.}
 #'     }
 #'  }
 #' @source
@@ -36,12 +36,12 @@ NULL
 #' Shrimp data import
 #'
 #'
-#' Load \code{shrimp} data stored as file \code{gamba.Rdata} and construct spatial object
+#' Load `shrimp` data stored as file `gamba.Rdata` and construct spatial object
 #'
 #' @aliases import.shrimp
 #' @keywords internal
-#' @return The \link{shrimp} data set
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @return The [shrimp] data set
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 import.shrimp <- function() {

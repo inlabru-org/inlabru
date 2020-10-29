@@ -13,6 +13,6 @@ code.components(components, add = "")
 Convert components to R code
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \keyword{internal}

@@ -44,7 +44,7 @@ List of generated samples
 Generic function for sampling for fitted models. The function invokes particular methods
 which depend on the class of the first argument.
 
-Takes a fitted \code{bru} object produced by the function \link{bru}() and produces samples given
+Takes a fitted \code{bru} object produced by the function \url{bru} and produces samples given
 a new set of values for the model covariates or the original values used for the model fit. The
 samples can be based on any R expression that is valid given these values/covariates and the joint
 posterior of the estimated random effects.

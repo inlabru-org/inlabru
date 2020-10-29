@@ -21,7 +21,7 @@ a list of indices into the components latent variables
 Indexes into to the components
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>,
-  Finn Lindgren \email{finn.lindgren@gmail.com}
+Fabian E. Bachl \email{bachlfab@gmail.com},
+Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \keyword{internal}

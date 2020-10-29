@@ -24,7 +24,7 @@ like(
 \code{gaussian} with identity link. In addition to the likelihoods provided
 by inla (see \code{inla.models()$likelihood}) inlabru supports fitting Cox
 processes via \code{family = "cp"}.
-As an alternative to \code{\link{bru}}, the \code{\link{lgcp}} function provides
+As an alternative to \code{\link[=bru]{bru()}}, the \code{\link[=lgcp]{lgcp()}} function provides
 a convenient interface to fitting Cox processes.}
 
 \item{formula}{a \link{formula} where the right hand side expression defines
@@ -58,9 +58,9 @@ explicitly excluded)}
 
 \item{exclude}{Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list
-as determined by the `include` parameter; Default: NULL (do not remove
+as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)
-on the `include` parameter).}
+on the \code{include} parameter).}
 
 \item{options}{list of global options overriding \link{bru.options}}
 
@@ -129,5 +129,5 @@ multiplot(p1, p2, pj)
 }
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }

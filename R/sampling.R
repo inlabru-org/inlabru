@@ -1,59 +1,59 @@
 #' Sample from an inhomogeneous Poisson process
 #'
 #' This function provides point samples from one- and two-dimensional inhomogeneous Poisson processes. The
-#' log intensity has to be provided via its values at the nodes of an \code{inla.mesh.1d} or
-#' \code{inla.mesh} object. In between mesh nodes the log intensity is assumed to be linear.
+#' log intensity has to be provided via its values at the nodes of an `inla.mesh.1d` or
+#' `inla.mesh` object. In between mesh nodes the log intensity is assumed to be linear.
 #'
-#' For 2D processes on a sphere the \code{R} parameter can be used to adjust to sphere's radius implied by
-#' the mesh. If the intensity is very high the standard \code{strategy} "spherical" can cause memory issues.
+#' For 2D processes on a sphere the `R` parameter can be used to adjust to sphere's radius implied by
+#' the mesh. If the intensity is very high the standard `strategy` "spherical" can cause memory issues.
 #' Using the "sliced-spherical" strategy can help in this case.
 #'
 #' @aliases sample.lgcp
 #' @export
 #'
-#' @param mesh An \link[INLA]{inla.mesh} object
+#' @param mesh An [inla.mesh][INLA::inla.mesh] object
 #' @param loglambda vector or matrix; A vector of log intensities at the mesh vertices
 #'   (for higher order basis functions, e.g.
-#'   for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis
-#'   function weights rather than the values at the \code{mesh$n} vertices)
+#'   for `inla.mesh.1d` meshes, `loglambda` should be given as `mesh$m` basis
+#'   function weights rather than the values at the `mesh$n` vertices)
 #'   A single scalar is expanded to a vector of the appropriate length.
 #'   If a matrix is supplied, one process sample for each column is produced.
-#' @param strategy Only relevant for 2D meshes. One of \code{'triangulated'}, \code{'rectangle'},
-#'   \code{'sliced-spherical'}, \code{'spherical'}. The \code{'rectangle'} method is only valid for
+#' @param strategy Only relevant for 2D meshes. One of `'triangulated'`, `'rectangle'`,
+#'   `'sliced-spherical'`, `'spherical'`. The `'rectangle'` method is only valid for
 #'   CRS-less flat 2D meshes.
-#'   If \code{NULL} or \code{'auto'}, the the likely fastest method is chosen;
-#'   \code{'rectangle'} for flat 2D meshes with no CRS,
-#'   \code{'sliced-spherical'} for CRS \code{'longlat'} meshes, and
-#'   \code{'triangulated'} for all other meshes.
+#'   If `NULL` or `'auto'`, the the likely fastest method is chosen;
+#'   `'rectangle'` for flat 2D meshes with no CRS,
+#'   `'sliced-spherical'` for CRS `'longlat'` meshes, and
+#'   `'triangulated'` for all other meshes.
 #' @param R Numerical value only applicable to spherical and geographical meshes. It is interpreted as
-#'   \code{R} is the equivalent Earth radius, in km, used to scale the lambda intensity.
+#'   `R` is the equivalent Earth radius, in km, used to scale the lambda intensity.
 #'     For CRS enabled meshes, the default is 6371. For CRS-less spherical meshes, the default is 1.
 #' @param samplers A `SpatialPolygonsDataFrame` or `inla.mesh` object.
 #'   Simulated points that fall outside these polygons are discarded.
-#' @param ignore.CRS logical; if \code{TRUE}, ignore any CRS information in the mesh. Default \code{FALSE}.
-#'   This affects \code{R} and the permitted values for \code{strategy}.
+#' @param ignore.CRS logical; if `TRUE`, ignore any CRS information in the mesh. Default `FALSE`.
+#'   This affects `R` and the permitted values for `strategy`.
 #'
-#' @return A \code{data.frame} (1D case),
+#' @return A `data.frame` (1D case),
 #'   SpatialPoints (2D flat and 3D spherical surface cases)
 #'   SpatialPointsDataFrame (2D/3D surface cases with multiple samples).
-#'   For multiple samples, the \code{data.frame} output has a
-#'   column \code{'sample'} giving the index for each sample.
+#'   For multiple samples, the `data.frame` output has a
+#'   column `'sample'` giving the index for each sample.
 #' object of point locations.
 #'
 #' @details
 #' \itemize{
 #' \item For crs-less meshes on R2: Lambda is interpreted in the raw coordinate system. Output has an NA CRS.
-#' \item For crs-less meshes on S2: Lambda with raw units, after scaling the mesh to radius \code{R}, if specified.
+#' \item For crs-less meshes on S2: Lambda with raw units, after scaling the mesh to radius `R`, if specified.
 #'   Output is given on the same domain as the mesh, with an NA CRS.
 #' \item For crs meshes on R2: Lambda is interpreted as per km^2, after scaling the globe to the Earth radius 6371 km,
-#'   or \code{R}, if specified. Output given in the same CRS as the mesh.
+#'   or `R`, if specified. Output given in the same CRS as the mesh.
 #' \item For crs meshes on S2: Lambda is interpreted as per km^2, after scaling the globe to the Earth radius 6371 km,
-#'   or \code{R}, if specified. Output given in the same CRS as the mesh.
+#'   or `R`, if specified. Output given in the same CRS as the mesh.
 #' }
 #'
-#' @author Daniel Simpson <\email{dp.simpson@@gmail.com}> (base rectangle and spherical algorithms),
-#' Fabian E. Bachl <\email{bachlfab@@gmail.com}> (inclusion in inlabru, sliced spherical sampling),
-#' Finn Lindgren <\email{finn.lindgren@@gmail.com}> (extended CRS support, triangulated sampling)
+#' @author Daniel Simpson \email{dp.simpson@@gmail.com} (base rectangle and spherical algorithms),
+#' Fabian E. Bachl \email{bachlfab@@gmail.com} (inclusion in inlabru, sliced spherical sampling),
+#' Finn Lindgren \email{finn.lindgren@@gmail.com} (extended CRS support, triangulated sampling)
 #'
 #' @examples
 #' \donttest{

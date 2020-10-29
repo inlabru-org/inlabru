@@ -17,7 +17,7 @@ iinla(
 \arguments{
 \item{model}{A \link{bru_model} object}
 
-\item{lhoods}{A list of likelihood objects from \code{\link{like}}}
+\item{lhoods}{A list of likelihood objects from \code{\link[=like]{like()}}}
 
 \item{n}{Number of \code{INLA::inla} iterations}
 
@@ -28,7 +28,7 @@ iinla(
 \item{offset}{An additional predictor offset}
 
 \item{inla.options}{A list of further arguments passed on to \code{INLA::inla}
-Some \code{control.*} arguments are partially overridden, according to
+Some \verb{control.*} arguments are partially overridden, according to
 internal inlabru method requirements.}
 
 \item{data}{A data.frame}

@@ -19,9 +19,9 @@ Helper function for setting option variables and lists.
 }
 \details{
 \itemize{
-  \item Atomic values override defaults.
-  \item \code{NULL} values are replaced by defaults.
-  \item Missing elements of an option list are set to the default values.
+\item Atomic values override defaults.
+\item \code{NULL} values are replaced by defaults.
+\item Missing elements of an option list are set to the default values.
 }
 }
 \examples{

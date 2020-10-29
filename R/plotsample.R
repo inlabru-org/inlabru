@@ -30,9 +30,9 @@ makepoly <- function(start, width, height) {
 #' @description
 #' Creates a plot sample on a regular grid with a random start location.
 #'
-#' @param spdf A \code{SpatialPointsDataFrame} defining the points that are to be sampled
+#' @param spdf A `SpatialPointsDataFrame` defining the points that are to be sampled
 #' by the plot sample.
-#' @param boundary A \code{SpatialPolygonsDataFrame} defining the survey boundary within which
+#' @param boundary A `SpatialPolygonsDataFrame` defining the survey boundary within which
 #' the  points occur.
 #' @param x.ppn The proportion of the x=axis that is to be included in the plots.
 #' @param y.ppn The proportion of the y=axis that is to be included in the plots.
@@ -41,16 +41,16 @@ makepoly <- function(start, width, height) {
 #'
 #' @return A list with three components:
 #'  \describe{
-#'    \item{\code{plots}:}{ A \code{SpatialPolygonsDataFrame} object containing the plots that were
+#'    \item{`plots`:}{ A `SpatialPolygonsDataFrame` object containing the plots that were
 #'    sampled.}
-#'    \item{\code{dets}:}{ A \code{SpatialPointsDataFrame} object containing the locations of the
+#'    \item{`dets`:}{ A `SpatialPointsDataFrame` object containing the locations of the
 #'    points within the plots.}
-#'    \item{\code{counts}:}{ A \code{dataframe} containing the following columns
+#'    \item{`counts`:}{ A `dataframe` containing the following columns
 #'    \describe{
-#'    \item{\code{x}:}{The x-coordinates of the centres of the plots within the boundary.}
-#'    \item{\code{y}:}{The y-coordinates of the centres of the plots within the boundary.}
-#'    \item{\code{n}:}{The numbers of points in each plot.}
-#'    \item{\code{area}:}{The areas of the plots within the boundary}
+#'    \item{`x`:}{The x-coordinates of the centres of the plots within the boundary.}
+#'    \item{`y`:}{The y-coordinates of the centres of the plots within the boundary.}
+#'    \item{`n`:}{The numbers of points in each plot.}
+#'    \item{`area`:}{The areas of the plots within the boundary}
 #'    }}
 #'  }.
 #'
@@ -114,12 +114,12 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
 #' Converts a plot sample with locations of each point within each plot, into a plot
 #' sample with only the count within each plot.
 #'
-#' @param plots A \code{SpatialPolygonsDataFrame} object containing the plots that were
+#' @param plots A `SpatialPolygonsDataFrame` object containing the plots that were
 #'    sampled.
-#' @param dets A \code{SpatialPointsDataFrame} object containing the locations of the
+#' @param dets A `SpatialPointsDataFrame` object containing the locations of the
 #'    points within the plots.
 #'
-#' @return A \code{SpatialPolygonsDataFrame} with counts in each plot contained in slot @data$n.
+#' @return A `SpatialPolygonsDataFrame` with counts in each plot contained in slot @data$n.
 #'
 #' @examples
 #'

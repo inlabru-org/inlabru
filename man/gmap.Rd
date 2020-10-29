@@ -19,7 +19,7 @@ Uses get_map() to query map services like Google Maps for a region centered arou
 the spatial object provided. Then calls ggmap() to plot the map.
 }
 \details{
-This function requires the `ggmap` package.
+This function requires the \code{ggmap} package.
 }
 \examples{
 \dontrun{

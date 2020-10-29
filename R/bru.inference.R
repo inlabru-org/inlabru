@@ -20,44 +20,44 @@ generate <- function(object, ...) {
 
 #' @title Convenient model fitting using (iterated) INLA
 #'
-#' @description This method is a wrapper for \code{INLA::inla} and provides
+#' @description This method is a wrapper for `INLA::inla` and provides
 #'   multiple enhancements.
 #'
 #'   \itemize{
 #'     \item
 #'       Easy usage of spatial covariates and automatic construction
 #'       of inla projection matrices for (spatial) SPDE models. This feature is
-#'       accessible via the \code{components} parameter. Practical examples on how
+#'       accessible via the `components` parameter. Practical examples on how
 #'       to use spatial data by means of the components parameter can also be found
-#'       by looking at the \link{lgcp} function's documentation.
+#'       by looking at the [lgcp] function's documentation.
 #'     \item
-#'       Constructing multiple likelihoods is straight forward. See \link{like} for more
-#'       information on how to provide additional likelihoods to \code{bru} using
-#'       the \code{...} parameter list.
+#'       Constructing multiple likelihoods is straight forward. See [like] for more
+#'       information on how to provide additional likelihoods to `bru` using
+#'       the `...` parameter list.
 #'     \item
 #'       Support for non-linear predictors. See example below.
 #'     \item
 #'       Log Gaussian Cox process (LGCP) inference is
-#'       available by using the \code{cp} family or (even easier) by using the
-#'       \link{lgcp} function.
+#'       available by using the `cp` family or (even easier) by using the
+#'       [lgcp] function.
 #'   }
 #' @aliases bru
 #' @export
 #'
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param components A \link{formula}-like specification of latent components.
+#' @param components A [formula]-like specification of latent components.
 #'   Also used to define a default linear additive predictor.  See
-#'   \link{component} for details.
-#' @param ... Likelihoods, each constructed by a calling \code{\link{like}}, or named
-#'   parameters that can be passed to a single \code{\link{like}} call.
+#'   [component] for details.
+#' @param ... Likelihoods, each constructed by a calling [like()], or named
+#'   parameters that can be passed to a single [like()] call.
 #' @param options A list of name and value pairs that are either interpretable
-#'   by \link{bru.options} or valid inla parameters. See \link{bru.options} for
-#'   caveats about some of the \code{control.*} inla options.
+#'   by [bru.options] or valid inla parameters. See [bru.options] for
+#'   caveats about some of the `control.*` inla options.
 #'
-#' @return bru returns an object of class "bru". A \code{bru} object inherits
-#'   from \code{INLA::inla} (see the inla documentation for its properties) and
-#'   adds additional information stored in the \code{sppa} field.
+#' @return bru returns an object of class "bru". A `bru` object inherits
+#'   from `INLA::inla` (see the inla documentation for its properties) and
+#'   adds additional information stored in the `sppa` field.
 #'
 #' @example inst/examples/bru.R
 #'
@@ -121,37 +121,34 @@ bru <- function(components = y ~ Intercept,
 }
 
 
-#' Likelihood construction for usage with \link{bru}
+#' Likelihood construction for usage with [bru]
 #'
 #' @aliases like
 #' @export
 #'
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param family A string identifying a valid \code{INLA::inla} likelihood family. The default is
-#'   \code{gaussian} with identity link. In addition to the likelihoods provided
-#'   by inla (see \code{inla.models()$likelihood}) inlabru supports fitting Cox
-#'   processes via \code{family = "cp"}.
-#'   As an alternative to \code{\link{bru}}, the \code{\link{lgcp}} function provides
+#' @param family A string identifying a valid `INLA::inla` likelihood family. The default is
+#'   `gaussian` with identity link. In addition to the likelihoods provided
+#'   by inla (see `inla.models()$likelihood`) inlabru supports fitting Cox
+#'   processes via `family = "cp"`.
+#'   As an alternative to [bru()], the [lgcp()] function provides
 #'   a convenient interface to fitting Cox processes.
-#' @param formula a \link{formula} where the right hand side expression defines
+#' @param formula a [formula] where the right hand side expression defines
 #'   the predictor used in the optimization.
-#' @param data Likelihood-specific data, as a \code{data.frame} or \code{SpatialPoints[DataFrame]}
+#' @param data Likelihood-specific data, as a `data.frame` or `SpatialPoints[DataFrame]`
 #'   object.
 #' @param components Components.
 #' @param mesh An inla.mesh object.
 #' @param E Exposure parameter for family = 'poisson' passed on to
-#'   \code{INLA::inla}. Special case if family is 'cp': rescale all integration
-#'   weights by E. Default taken from \code{options$E}.
+#'   `INLA::inla`. Special case if family is 'cp': rescale all integration
+#'   weights by E. Default taken from `options$E`.
 #' @param Ntrials A vector containing the number of trials for the 'binomial'
 #'  likelihood. Default value is rep(1, n.data).
-#'  Default taken from \code{options$Ntrials}.
+#'  Default taken from `options$Ntrials`.
 #' @param samplers Integration domain for 'cp' family.
-#' @param ips Integration points for 'cp' family. Overrides \code{samplers}.
-#' @param domain Named list of integration function domain definitions. Either
-#' an \code{inla.mesh.1d} or \code{inla.mesh} object specifying the locations
-#' for integration point locations, or a single scalar indicating how many 1D
-#' integration points to use.
+#' @param ips Integration points for 'cp' family. Overrides `samplers`.
+#' @param domain Named list of domain definitions.
 #' @param include Character vector of component labels that are needed by the
 #'   predictor expression; Default: NULL (include all components that are not
 #'   explicitly excluded)
@@ -160,9 +157,9 @@ bru <- function(components = y ~ Intercept,
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
 #'   on the `include` parameter). 
-#' @param options list of global options overriding \link{bru.options}
+#' @param options list of global options overriding [bru.options]
 #'
-#' @return A likelihood configuration which can be used to parameterize \link{bru}.
+#' @return A likelihood configuration which can be used to parameterize [bru].
 #'
 #' @example inst/examples/like.R
 
@@ -305,37 +302,37 @@ joint_stackmaker <- function(model, lhoods, result) {
 
 
 
-#' Additional \link{bru} options
+#' Additional [bru] options
 #'
 #' @aliases bru.options
 #' @export
 #'
-#' @param mesh An \code{inla.mesh} object for spatial models without SPDE
+#' @param mesh An `inla.mesh` object for spatial models without SPDE
 #'   components. Mostly used for successive spatial predictions.
 #' @param run If TRUE, run inference. Otherwise only return configuration needed
 #'   to run inference.
 #' @param max.iter maximum number of inla iterations
-#' @param offset the usual \code{INLA::inla} offset. If a nonlinear formula is
+#' @param offset the usual `INLA::inla` offset. If a nonlinear formula is
 #'   used, the resulting Taylor approximation constant will be added to this
 #'   automatically.
-#' @param result An \code{inla} object returned from previous calls of
-#'   \code{INLA::inla}, \link{bru} or \link{lgcp}. This will be used as a
+#' @param result An `inla` object returned from previous calls of
+#'   `INLA::inla`, [bru] or [lgcp]. This will be used as a
 #'   starting point for further improvement of the approximate posterior.
-#' @param E \code{INLA::inla} 'poisson' likelihood exposure parameter
-#' @param Ntrials \code{INLA::inla} 'binomial' likelihood parameter
-#' @param control.compute INLA option, See \code{INLA::control.compute}
-#' @param control.inla INLA option, See \code{INLA::control.inla}
-#' @param control.fixed INLA option, See \code{INLA::control.fixed}. Warning:
-#'   due to how inlabru currently constructs the \code{inla()}, the \code{mean},
-#'   \code{prec}, \code{mean.intercept}, and \code{prec.intercept} will have no
+#' @param E `INLA::inla` 'poisson' likelihood exposure parameter
+#' @param Ntrials `INLA::inla` 'binomial' likelihood parameter
+#' @param control.compute INLA option, See `INLA::control.compute`
+#' @param control.inla INLA option, See `INLA::control.inla`
+#' @param control.fixed INLA option, See `INLA::control.fixed`. Warning:
+#'   due to how inlabru currently constructs the `inla()`, the `mean`,
+#'   `prec`, `mean.intercept`, and `prec.intercept` will have no
 #'   effect. Until a more elegant alterative has been implemented, use explicit
-#'   \code{mean.linear} and \code{prec.linear} specifications in each
-#'   \code{model="linear"} component instead.
+#'   `mean.linear` and `prec.linear` specifications in each
+#'   `model="linear"` component instead.
 #' @param int.args List of arguments passed all the way to the integration method
-#' \code{ipoints} and \code{int.polygon} for 'cp' family models
-#' @param ... Additional options passed on to \code{INLA::inla}
+#' `ipoints` and `int.polygon` for 'cp' family models
+#' @param ... Additional options passed on to `INLA::inla`
 #'
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}> and Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 #' @examples
 #'
@@ -409,11 +406,11 @@ bru.options <- function(mesh = NULL,
 #' @param data A data frame or SpatialPoints[DataFrame] object
 #' @param samplers A data frame or Spatial[Points/Lines/Polygons]DataFrame objects
 #' @param domain Named list of domain definitions
-#' @param ips Integration points (overrides \code{samplers})
-#' @param formula If NULL, the linear combination implied by the \code{components} is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
+#' @param ips Integration points (overrides `samplers`)
+#' @param formula If NULL, the linear combination implied by the `components` is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
 #' @param E Single numeric used rescale all integration weights by a fixed factor
-#' @param options See \link{bru.options}
-#' @return An \link{bru} object
+#' @param options See [bru.options]
+#' @return An [bru] object
 #' @examples
 #'
 #' \donttest{
@@ -518,14 +515,14 @@ summary.lgcp <- function(object, ...) {
 }
 
 
-#' Summary for a \link{bru} fit
+#' Summary for a [bru] fit
 #'
 #' Takes a fitted bru object produced by bru() or lgcp() and creates various summaries from it.
 #'
 #' @aliases summary.bru
 #' @export
 #' @method summary bru
-#' @param object An object obtained from a \link{bru} or \link{lgcp} call
+#' @param object An object obtained from a [bru] or [lgcp] call
 #' @param ... ignored arguments
 #' @example inst/examples/bru.R
 #'
@@ -623,7 +620,7 @@ summary.bru <- function(object, ...) {
 
 #' Prediction from fitted bru model
 #'
-#' Takes a fitted \code{bru} object produced by the function \link{bru}() and produces predictions given
+#' Takes a fitted `bru` object produced by the function [bru]() and produces predictions given
 #' a new set of values for the model covariates or the original values used for the model fit. The
 #' predictions can be based on any R expression that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
@@ -632,15 +629,15 @@ summary.bru <- function(object, ...) {
 #' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
 #' value drawn in course of estimating the statistics.
 #'
-#' Internally, this method calls \link{generate.bru} in order to draw samples from the model.
+#' Internally, this method calls [generate.bru] in order to draw samples from the model.
 #'
 #' @aliases predict.bru
 #' @export
-#' @param object An object obtained by calling \link{bru} or \link{lgcp}.
+#' @param object An object obtained by calling [bru] or [lgcp].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction.
 #' @param formula A formula determining which effects to predict and how to combine them.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
-#' @param seed Random number generator seed passed on to \code{inla.posterior.sample}
+#' @param seed Random number generator seed passed on to `inla.posterior.sample`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
@@ -705,7 +702,7 @@ predict.bru <- function(object,
 #' Sampling based on bru posteriors
 #'
 #' @description
-#' Takes a fitted \code{bru} object produced by the function \link{bru}() and produces samples given
+#' Takes a fitted `bru` object produced by the function [bru]() and produces samples given
 #' a new set of values for the model covariates or the original values used for the model fit. The
 #' samples can be based on any R expression that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
@@ -713,19 +710,19 @@ predict.bru <- function(object,
 #' @aliases generate.bru
 #' @export
 #' @family sample generators
-#' @param object A \code{bru} object obtained by calling \link{bru}.
+#' @param object A `bru` object obtained by calling [bru].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for sampling.
 #' @param formula A formula determining which effects to sample from and how to combine them analytically.
 #' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics.
 #'                  The default is rather low but provides a quick approximate result.
-#' @param seed Random number generator seed passed on to \code{inla.posterior.sample}
+#' @param seed Random number generator seed passed on to `inla.posterior.sample`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
 #' @param ... additional, unused arguments.
 #'
 #' @return List of generated samples
-#' @seealso \link{predict.bru}
+#' @seealso [predict.bru]
 #' @example inst/examples/generate.bru.R
 #' @rdname generate
 
@@ -917,23 +914,23 @@ summarize <- function(data, x = NULL, cbind.only = FALSE) {
 
 #' Iterated INLA
 #'
-#' This is an internal wrapper for iterated runs of \code{INLA::inla}. Before each run the
-#' \code{joint_stackmaker} function is used to set up the \code{INLA::inla.stack} for
+#' This is an internal wrapper for iterated runs of `INLA::inla`. Before each run the
+#' `joint_stackmaker` function is used to set up the `INLA::inla.stack` for
 #' the next iteration.
 #'
 #' @aliases iinla
 #' @export
 #' @param data A data.frame
-#' @param model A \link{bru_model} object
-#' @param lhoods A list of likelihood objects from \code{\link{like}}
-#' @param n Number of \code{INLA::inla} iterations
+#' @param model A [bru_model] object
+#' @param lhoods A list of likelihood objects from [like()]
+#' @param n Number of `INLA::inla` iterations
 #' @param result A previous inla result, to be used as starting point
 #' @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
 #' @param offset An additional predictor offset
-#' @param inla.options A list of further arguments passed on to \code{INLA::inla}
-#'   Some \code{control.*} arguments are partially overridden, according to
+#' @param inla.options A list of further arguments passed on to `INLA::inla`
+#'   Some `control.*` arguments are partially overridden, according to
 #'   internal inlabru method requirements.
-#' @return An \code{INLA::inla} object
+#' @return An `INLA::inla` object
 #' @keywords internal
 
 

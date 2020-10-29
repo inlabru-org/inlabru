@@ -3,39 +3,39 @@
 #' @description
 #' This function generates points in one or two dimensions with a weight attached to each point.
 #' The weighted sum of a function evaluated at these points is the integral of that function approximated
-#' by linear basis functions. The parameter \code{region} describes the area(s) integrated over.
+#' by linear basis functions. The parameter `region` describes the area(s) integrated over.
 #'
-#' In case of a single dimension \code{region} is supposed to be a two-column \code{matrix} where
+#' In case of a single dimension `region` is supposed to be a two-column `matrix` where
 #' each row describes the start and end point of the interval to integrate over. In the two-dimensional
-#' case \code{region} can be either a \code{SpatialPolygon}, an \code{inla.mesh} or a
-#' \code{SpatialLinesDataFrame} describing the area to integrate over. If a \code{SpatialLineDataFrame}
+#' case `region` can be either a `SpatialPolygon`, an `inla.mesh` or a
+#' `SpatialLinesDataFrame` describing the area to integrate over. If a `SpatialLineDataFrame`
 #' is provided it has to have a column called 'weight' in order to indicate the width of the line.
 #'
-#' The domain parameter is an \code{inla.mesh.1d} or \code{inla.mesh} object that can be employed to
+#' The domain parameter is an `inla.mesh.1d` or `inla.mesh` object that can be employed to
 #' project the integration points to the vertices of the mesh. This reduces the final number of
 #' integration points and reduces the computational cost of the integration. The projection can also
 #' prevent numerical issues in spatial LGCP models where each observed point is ideally surrounded
 #' by three integration point sitting at the coresponding mesh vertices. For convenience, the
-#' \code{domain} parameter can also be a single integer setting the number of equally spaced integration
+#' `domain` parameter can also be a single integer setting the number of equally spaced integration
 #' points in the one-dimensional case.
 #'
 #' @aliases ipoints
 #' @export
 #'
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 #' @param region Description of the integration region boundary.
-#' In 1D either a vector of two numerics or a two-column matrix where each row describes an interval.
-#' In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a weight column defining the width of the line.
-#' @param domain In 1D a single numeric setting the number of integration points or an \code{inla.mesh.1d}
-#' defining the locations to project the integration points to. In 2D \code{domain} has to be an
-#' \code{inla.mesh} object describing the projection and granularity of the integration.
+#' In 1D either a vector of two numerics or a two-column matrix where each row describes and interval.
+#' In 2D either a `SpatialPolygon` or a `SpatialLinesDataFrame` with a weight column defining the width of the line.
+#' @param domain In 1D a single numeric setting the numer of integration points or an `inla.mesh.1d`
+#' defining the locations to project the integration points to. In 2D `domain` has to be an
+#' `inla.mesh` object describing the projection and granularity of the integration.
 #' @param name Character array stating the name of the domains dimension(s)
-#' @param group Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged by the projection.
+#' @param group Column names of the `region` object (if applicable) for which the integration points are calculated independently and not merged by the projection.
 #' @param project If TRUE, project the integration points to mesh vertices
-#' @param int.args List of arguments passed to \code{int.polygon}
+#' @param int.args List of arguments passed to `int.polygon`
 #'
-#' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
+#' @return A `data.frame` or `SpatialPointsDataFrame` of 1D and 2D integration points, respectively.
 #'
 #' @examples
 #'
@@ -133,13 +133,13 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
     if (is.null(dim(region))) {
       region <- matrix(region, nrow = 1)
     }
-    
+
     if (ncol(region) == 1) {
       ips <- data.frame(x = region[, 1], weight = 1)
       colnames(ips) <- c(name, "weight")
     } else {
       ips <- list()
-      
+
       for (j in 1:nrow(region)) {
         subregion <- region[j, ]
         
@@ -191,25 +191,25 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
         }
         
       }
-      
+
       ips <- do.call(rbind, ips)
     }
   } else if (inherits(region, "inla.mesh")) {
-    
+
     # If domain is provided: break
     if (!is.null(domain)) stop("Integration region provided as 2D and domain is not NULL.")
-    
+
     # transform to equal area projection
-    if (!crs_is_null(region$crs)) {
+    if (!fm_crs_is_null(region$crs)) {
       crs <- region$crs
       region <- stransform(region, crs = CRS("+proj=cea +units=km"))
     }
-    
+
     ips <- vertices(region)
     ips$weight <- INLA::inla.mesh.fem(region, order = 1)$va
-    
+
     # backtransform
-    if (!crs_is_null(region$crs)) {
+    if (!fm_crs_is_null(region$crs)) {
       ips <- stransform(ips, crs = crs)
     }
   } else if (inherits(region, "inla.mesh.1d")) {
@@ -224,15 +224,15 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
       warning("The integration points provided have no weight column. Setting weights to 1.")
       region$weight <- 1
     }
-    
+
     ips <- region
   } else if (inherits(region, "SpatialLines") || inherits(region, "SpatialLinesDataFrame")) {
-    
+
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
     if (class(region)[1] == "SpatialLines") {
       region <- SpatialLinesDataFrame(region, data = data.frame(weight = rep(1, length(region))))
     }
-    
+
     # Set weights to 1 if not provided
     if (!("weight" %in% names(region))) {
       warning("The integration points provided have no weight column. Setting weights to 1.")
@@ -243,7 +243,7 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
                       project = identical(int.args[["method"]], "stable"))
   } else if (inherits(region, "SpatialPolygons") ||
              inherits(region, "SpatialPolygonsDataFrame")) {
-    
+
     # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
     if (class(region)[1] == "SpatialPolygons") {
       region <- SpatialPolygonsDataFrame(region,
@@ -255,13 +255,13 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
     }
     
     cnames <- coordnames(region)
-    region_crs <- INLA::inla.sp_get_crs(region)
+    region_crs <- fm_sp_get_crs(region)
     
     # Convert region and domain to equal area CRS
-    if (!crs_is_null(domain$crs)) {
-      region <- stransform(region, crs = CRS("+proj=cea +units=km"))
+    if (!fm_crs_is_null(domain$crs)) {
+      region <- stransform(region, crs = sp::CRS("+proj=cea +units=km"))
     }
-    
+
     polyloc <- do.call(rbind, lapply(
       1:length(region),
       function(k) cbind(
@@ -270,19 +270,19 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
         group = k
       )
     ))
-    
+
     # If domain is NULL, make a mesh with the polygons as boundary
     if (is.null(domain)) {
       warning("Computing integration points from polygon; specify a mesh for better numerical control.")
       max.edge <- max(diff(range(polyloc[, 1])), diff(range(polyloc[, 2]))) / 20
       domain <- INLA::inla.mesh.2d(boundary = region, max.edge = max.edge)
-      domain$crs <- INLA::inla.sp_get_crs(region)
+      domain$crs <- fm_sp_get_crs(region)
     } else {
-      if (!crs_is_null(domain$crs)) {
+      if (!fm_crs_is_null(domain$crs)) {
         domain <- stransform(domain, crs = CRS("+proj=cea +units=km"))
       }
     }
-    domain_crs <- ensure_crs(domain$crs)
+    domain_crs <- fm_ensure_crs(domain$crs)
     
     ips <- int.polygon(domain, loc = polyloc[, 1:2], group = polyloc[, 3], 
                        method = int.args$method, nsub = int.args$nsub)
@@ -291,12 +291,12 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
     )
     ips <- SpatialPointsDataFrame(ips[, c("x", "y")], data = df,
                                   match.ID = FALSE, proj4string = domain_crs)
-    
-    if (!crs_is_null(domain_crs) && !crs_is_null(region_crs)) {
+
+    if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(region_crs)) {
       ips <- stransform(ips, crs = region_crs)
     }
   }
-  
+
   ips
 }
 
@@ -310,10 +310,10 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
 #' @aliases cprod
 #' @export
 #'
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param ... \code{data.frame} or \code{SpatialPointsDataFrame} objects, each one usually obtained by a call to the \link{ipoints} function.
-#' @return A \code{data.frame} or \code{SpatialPointsDataFrame} of multidimensional integration points and their weights
+#' @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
+#' @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
 #'
 #' @examples
 #'
@@ -422,7 +422,7 @@ ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL,
       domain[[nm]] <- meshes[[nm]]
     }
   }
-  
+
   # Fill missing domain definitions with data ranges
   for (nm in dnames) {
     if (!(nm %in% names(domain)) & !is.null(data) & !(nm %in% names(samplers))) {
@@ -432,7 +432,7 @@ ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL,
         domain[["coordinates"]] <-
           INLA::inla.mesh.2d(loc.domain = coordinates(data),
                              max.edge = diff(range(coordinates(data)[, 1])) / 10)
-        domain[["coordinates"]]$crs <- INLA::inla.sp_get_crs(data)
+        domain[["coordinates"]]$crs <- fmsp_get_crs(data)
       } else {
         domain[[nm]] <- range(data[[nm]])
       }
@@ -445,13 +445,13 @@ ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL,
   } else {
     spatial <- FALSE
   }
-  
+
   # Dimensions provided via samplers (except "coordinates")
   samp.dim <- intersect(names(samplers), dnames)
-  
+
   # Dimensions provided via domain but not via samplers
   nosamp.dim <- setdiff(names(domain), c(samp.dim, "coordinates"))
-  
+
   # Check if a domain definition is missing
   missing.dims <- setdiff(dnames, c(names(domain), samp.dim))
   if (length(missing.dims > 0)) {
@@ -503,7 +503,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     data$vertex <- as.numeric(names(w.by))
 
     ret <- SpatialPointsDataFrame(coords,
-      proj4string = INLA::inla.sp_get_crs(points),
+      proj4string = fm_sp_get_crs(points),
       data = data,
       match.ID = FALSE
     )
@@ -617,16 +617,16 @@ vertex.projection.1d <- function(points, mesh, group = NULL, column = "weight", 
 #' more dimensions of its domain. For this purpose, the function is evaluated at some points
 #' in the domain and the values are summed up using weights that depend on the area being
 #' integrated over. This function performs the weighting and summation conditional for each level
-#' of the dimensions that are not integrated over. The parameter \code{dims} states the the
+#' of the dimensions that are not integrated over. The parameter `dims` states the the
 #' dimensions to integrate over. The set of dimensions that are held fixed is the set difference
-#' of all column names in \code{data} and the dimensions stated by \code{dims}.
+#' of all column names in `data` and the dimensions stated by `dims`.
 #'
 #' @aliases int
 #' @export
-#' @param data A \code{data.frame} or \code{Spatial} object. Has to have a \code{weight} column with numeric values.
+#' @param data A `data.frame` or `Spatial` object. Has to have a `weight` column with numeric values.
 #' @param values Numerical values to be summed up, usually the result of function evaluations.
-#' @param dims Column names (dimension names) of the \code{data} object to integrate over.
-#' @return A \code{data.frame} of integrals, one for each level of the cross product of all dimensions not being integrated over.
+#' @param dims Column names (dimension names) of the `data` object to integrate over.
+#' @return A `data.frame` of integrals, one for each level of the cross product of all dimensions not being integrated over.
 #'
 #' @examples
 #'

@@ -92,7 +92,7 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
     ll <- data.frame(object)
     ll$TMP.ZCOORD <- 0
     coordinates(ll) <- c(coordnames(object), "TMP.ZCOORD")
-    proj4string(ll) <- INLA::inla.sp_get_crs(object)
+    proj4string(ll) <- fm_sp_get_crs(object)
     object <- ll
   }
 
@@ -128,8 +128,8 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 
   coordinates(sp) <- c("x", "y", "z")
   coordinates(ep) <- c("x", "y", "z")
-  proj4string(sp) <- INLA::inla.sp_get_crs(object)
-  proj4string(ep) <- INLA::inla.sp_get_crs(object)
+  proj4string(sp) <- fm_sp_get_crs(object)
+  proj4string(ep) <- fm_sp_get_crs(object)
 
   sp <- INLA::inla.spTransform(sp, CRSobj = INLA::inla.CRS("sphere"))
   ep <- INLA::inla.spTransform(ep, CRSobj = INLA::inla.CRS("sphere"))
@@ -149,7 +149,7 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 #' Visualize SpatialPoints using RGL
 #'
 #' This function transforms the mesh to 3D cartesian coordinates and uses
-#' inla.plot.mesh() with \code{rgl=TRUE} to plot the result.
+#' inla.plot.mesh() with `rgl=TRUE` to plot the result.
 #'
 #' @export
 #' @name glplot.inla.mesh

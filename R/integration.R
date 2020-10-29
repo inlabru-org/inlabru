@@ -8,7 +8,7 @@
 #' @param filter.zero.length Filter out segments with zero length? (Bool)
 #' @param ... argments to int.quadrature
 #' @return List of start and end points resulting from splitting the given lines
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 #' @keywords internal
 split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 
@@ -69,7 +69,7 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 # @param scheme Integration scheme (gaussian or equdistant)
 # @param n Number of integration points
 # @return List with integration poins (ips), weights (w) and weights including line length (wl)
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
 int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points = 1, geometry = "euc", coords = NULL) {
   if (is.null(colnames(sp)) & !is.null(coords)) {
@@ -243,7 +243,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   }
 
   # Determine integration points along lines
-  crs <- INLA::inla.sp_get_crs(data)
+  crs <- fm_sp_get_crs(data)
   
   sp3d <- within(data.frame(sp), Z <- 0)
   colnames(sp3d) <- c("X1", "X2", "Z")
@@ -252,7 +252,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   colnames(ep3d) <- c("X1", "X2", "Z")
   ep3d <- SpatialPoints(ep3d, proj4string = crs)
 
-  if (crs_is_null(crs)) {
+  if (fm_crs_is_null(crs)) {
     ips <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2)
     w <- rowSums((coordinates(ep3d) - coordinates(sp3d))^2)^0.5
   } else {
@@ -359,10 +359,10 @@ join_segm <- function(...) {
 
 #' Construct the intersection mesh of a mesh and a polygon
 #'
-#' @param mesh \code{inla.mesh} object to be intersected
-#' @param poly \code{inla.mesh.segment} object with a closed polygon
+#' @param mesh `inla.mesh` object to be intersected
+#' @param poly `inla.mesh.segment` object with a closed polygon
 #'   to intersect with the mesh
-#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 intersection_mesh <- function(mesh, poly) {
   if (ncol(poly$loc) < 3) {
@@ -432,39 +432,19 @@ intersection_mesh <- function(mesh, poly) {
   mesh_subset
 }
 
-#' Safe(?) way to construct integration weights for mesh/polygon intersections
+#' Project integration weights onto mesh nodes
 #'
 #' @param mesh Mesh on which to integrate
-#' @param inter \code{list} of \code{loc}, integration points,
-#'   and \code{weight}, integration weights
-#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @param integ `list` of `loc`, integration points,
+#'   and `weight`, integration weights
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
-integration_weight_construction <- function(mesh, inter) {
-  # Safe mesh for point lookups
-  all_edges <- INLA::inla.mesh.segment(
-    loc = mesh$loc,
-    idx = cbind(
-      as.vector(t(mesh$graph$tv)),
-      as.vector(t(mesh$graph$tv[, c(2, 3, 1), drop = FALSE]))
-    ),
-    is.bnd = FALSE
-  )
-  mesh_cover <- INLA::inla.mesh.create(
-    loc = mesh$loc,
-    interior = list(all_edges),
-    extend = TRUE
-  )
+integration_weight_projection <- function(mesh, integ) {
+  # Project points onto the mesh
+  proj <- INLA::inla.mesh.projector(mesh, loc = integ$loc)
 
-  proj_cover <- INLA::inla.mesh.projector(mesh_cover,
-    loc = inter$loc
-  )
-  # Remove points not in the original 'mesh'
-  A <- proj_cover$proj$A[, mesh_cover$idx$loc, drop = FALSE]
-  # Renormalise
-  A <- A / Matrix::rowSums(A)
-
-  # Convert integration weights from intersection mesh points to original mesh points
-  weight <- as.vector(as.vector(inter$weight) %*% A)
+  # Convert integration weights to mesh points
+  weight <- as.vector(as.vector(integ$weight) %*% proj$proj$A)
 
   list(loc = mesh$loc, weight = weight)
 }
@@ -473,15 +453,14 @@ integration_weight_construction <- function(mesh, inter) {
 #' Basic robust integration weights for mesh/polygon intersections
 #'
 #' @param mesh Mesh on which to integrate
-#' @param bnd \code{inla.mesh.segment} defining the integration domain
+#' @param bnd `inla.mesh.segment` defining the integration domain
 #' @param nsub number of subdivision points along each triangle edge, giving
-#'    \code{(nsub + 1)^2} proto-integration points used to compute
+#'    `(nsub + 1)^2` proto-integration points used to compute
 #'   the vertex weights
-#'   (default \code{NULL=9}, giving 100 proto-integration points)
-#' @return \code{list} with elements \code{loc} and \code{weight} with
-#'   one integration point for each mesh vertex of triangles overlapping
-#'   the integration domain
-#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#'   (default `NULL=9`, giving 100 integration points for each triangle)
+#' @return `list` with elements `loc` and `weight` with
+#'   integration points for the intersection of the mesh and polygon
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   # Construct a barycentric grid of subdivision triangle midpoints
@@ -516,7 +495,7 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   # Construct integration weights
   weight <- rep(INLA::inla.mesh.fem(mesh, order = 1)$ta / nB, each = nB)
   
-  # Filter away point outside integration domain boundary:
+  # Filter away points outside integration domain boundary:
   mesh_bnd <- INLA::inla.mesh.create(boundary = bnd)
   ok <- INLA::inla.mesh.projector(mesh_bnd, loc = loc)$proj$ok
 
@@ -533,9 +512,9 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 #' @param mesh An inla.mesh object
 #' @param loc Locations defining the polygons
 #' @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
-#' @param method Which integration method to use ('stable' (default), or 'basic')
-#' @param ... Arguments passed to the low level integration method (\code{make_stable_integration_points})
-#' @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}> and Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @param method Which integration method to use
+#' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
+#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 
 int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...){
@@ -551,31 +530,21 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...){
 
     # Combine polygon with mesh boundary to get mesh covering the intersection.
     bnd <- INLA::inla.mesh.segment(loc = gloc, is.bnd = TRUE)
+    integ <- make_stable_integration_points(mesh, bnd, ...)
 
-    inter <- list(loc = matrix(0, 0, 3), weight = numeric(0))
-    if (method == "stable") {
-      inter <- make_stable_integration_points(mesh, bnd, ...)
-    } else {
-      # Create intersection mesh
-      mesh_inter <- intersection_mesh(mesh, bnd)
-      if (!is.null(mesh_inter)) {
-        inter <- list(
-          loc = mesh_inter$loc,
-          weight = INLA::inla.mesh.fem(mesh_inter, order = 1)$va
-        )
-      }
+    if (method %in% c("stable")) {
+      # Project integration points and weights to mesh nodes
+      integ <- integration_weight_projection(mesh, integ)
     }
 
-    # Compute integration locations and weights
-    loc_weight <- integration_weight_construction(mesh, inter)
-
+    # Keep points inside the mesh with positive weights
     ok <-
-      INLA::inla.mesh.project(mesh, loc_weight$loc)$ok &
-        (loc_weight$weight > 0)
+      INLA::inla.mesh.project(mesh, integ$loc)$ok &
+        (integ$weight > 0)
 
-    ips <- data.frame(loc_weight$loc[ok, 1:2, drop = FALSE])
+    ips <- data.frame(integ$loc[ok, 1:2, drop = FALSE])
     colnames(ips) <- c("x", "y")
-    ips$weight <- loc_weight$weight[ok]
+    ips$weight <- integ$weight[ok]
 
     ips$group <- rep(g, nrow(ips))
     ipsl <- c(ipsl, list(ips))

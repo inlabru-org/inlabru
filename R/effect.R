@@ -33,18 +33,18 @@ add_mappers <- function(...) {
 #'
 #' @description
 #'
-#' Similar to glm(), gam() and inla() \link{bru} uses formula objects to describe response data and latent
+#' Similar to glm(), gam() and inla() [bru] uses formula objects to describe response data and latent
 #' (unknonw) components of the model to be fitted. However, in addition to the syntax compatible with
-#' \link[INLA]{inla}, bru components offer addtitional functionality which facilitates modeling.
+#' [inla][INLA::inla], bru components offer addtitional functionality which facilitates modeling.
 #'
 #' In inlabru, latent components can be constructed using R formulae or explicit parameter. For background
-#' information on the formulae inlabru accepts please see \link{component.formula}. For more details on the
-#' model parameters and how inlabru employs INLA's \code{f} function please see \link{component.character}
+#' information on the formulae inlabru accepts please see [component.formula]. For more details on the
+#' model parameters and how inlabru employs INLA's `f` function please see [component.character]
 #'
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @family Component constructor
 #' @param object A formula or a label (character)
-#' @param ... Arguments passed on to \link{component.formula} or \link{component.character}
+#' @param ... Arguments passed on to [component.formula] or [component.character]
 #' @export
 
 component <- function(object, ...) {
@@ -56,15 +56,15 @@ component <- function(object, ...) {
 #'
 #' @description
 #'
-#' Similar to glm(), gam() and inla() \link{bru} uses formula objects to describe response data and latent
+#' Similar to glm(), gam() and inla() [bru] uses formula objects to describe response data and latent
 #' (unknonw) components of the model to be fitted. However, in addition to the syntax compatible with
-#' \link[INLA]{inla}, bru components offer addtitional functionality which facilitates modeling.
+#' [inla][INLA::inla], bru components offer addtitional functionality which facilitates modeling.
 #'
 #' @details
 #'
-#' \link{bru} will understand formulae describing fixed effect models just like the other methods. For instance, the
-#' formula \code{y ~ x} will fit the linear combination of an effect named \code{x} and an intercept to
-#' the response \code{y} with respect to the likelihood family stated when calling \link{bru}. Mathematically,
+#' [bru] will understand formulae describing fixed effect models just like the other methods. For instance, the
+#' formula `y ~ x` will fit the linear combination of an effect named `x` and an intercept to
+#' the response `y` with respect to the likelihood family stated when calling [bru]. Mathematically,
 #' the linear predictor \eqn{\eta} would be written down as
 #'
 #' \deqn{\eta = \beta * x + c,}
@@ -72,48 +72,48 @@ component <- function(object, ...) {
 #' where:
 #'
 #' \itemize{
-#' \item{\eqn{c} }{is the \emph{intercept}}
-#' \item{\eqn{x }}{is a \emph{covariate}}
-#' \item{\eqn{\beta} }{is a \emph{random variable} associated with \eqn{x} and}
-#' \item{\eqn{\psi = \beta * x }}{ is called the \emph{random effect} of \eqn{x}}
+#' \item{\eqn{c} }{is the *intercept*}
+#' \item{\eqn{x }}{is a *covariate*}
+#' \item{\eqn{\beta} }{is a *random variable* associated with \eqn{x} and}
+#' \item{\eqn{\psi = \beta * x }}{ is called the *random effect* of \eqn{x}}
 #' }
 #'
 #' A problem that arises when using this kind of R formula is that it does not clearly relect the mathematical
 #' formula. For instance, when providing the formula to inla, the resulting object will refer to the random
-#' effect \eqn{\psi = \beta * x } as \code{x}. Hence, it is not clear if \code{x} refers to the covariate
+#' effect \eqn{\psi = \beta * x } as `x`. Hence, it is not clear if `x` refers to the covariate
 #' or the effect of the covariate.
 #'
 #' @section Naming random effects:
 #'
 #' In INLA, a simple random effect model would be expressed as
 #'
-#' \itemize{\item{\code{formula = y ~ f(x, model = "linear")},}}
+#' \itemize{\item{`formula = y ~ f(x, model = "linear")`,}}
 #'
-#' where \link[INLA]{f} is the inla specific function to set up random effects of all kinds. The underlying
+#' where [f][INLA::f] is the inla specific function to set up random effects of all kinds. The underlying
 #' predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
-#' \code{x} as the random effect's name. bru allows to rewrite this formula in order to explicitly state
-#' the name of the random effect and the name of the associated. This is achived by replacing \code{f}
+#' `x` as the random effect's name. bru allows to rewrite this formula in order to explicitly state
+#' the name of the random effect and the name of the associated. This is achived by replacing `f`
 #' with an arbitrary name that we wish to assign to the effect, e.g.
 #'
-#' \itemize{\item{\code{components = y ~ psi(x, model = "linear")}.}}
+#' \itemize{\item{`components = y ~ psi(x, model = "linear")`.}}
 #'
 #' Being able to discriminate between \eqn{x} and \eqn{\psi} is relevant because of two functionalities
-#' bru offers. The formula parameters of both, \link{bru} and the prediction method \link{predict.bru}
-#' are interpreted in the mathematical sense. For instance, \code{predict} may be used to analyze the
+#' bru offers. The formula parameters of both, [bru] and the prediction method [predict.bru]
+#' are interpreted in the mathematical sense. For instance, `predict` may be used to analyze the
 #' an analytical combination of the covariate \eqn{x} and the intercept using
 #'
-#' \itemize{\item{\code{predict(fit, data.frame(x=1)), ~ exp(x + Intercept)}.}}
+#' \itemize{\item{`predict(fit, data.frame(x=1)), ~ exp(x + Intercept)`.}}
 #'
 #' On the other hand, predict may be used to only look at a transformation of the random effect \eqn{\psi}
 #'
-#' \itemize{\item{\code{predict(fit, NULL, ~ exp(psi))}.}}
+#' \itemize{\item{`predict(fit, NULL, ~ exp(psi))`.}}
 #'
 #' @aliases component.formula
 #' @export
 #' @family Component constructor
 #' @param object A formula describing latent model components.
 #' @param ... Ignored arguments (S3 compatibility)
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 #' @examples
 #' # As an example, let us create a linear component. Here, the component is
@@ -121,7 +121,7 @@ component <- function(object, ...) {
 #' # called "x". Note that a list of components is returned because the
 #' # formula may define multiple components
 #'
-#' eff <- component(~ myLinearEffectOfX(map = x, model = "linear"))
+#' eff <- component(~ myLinearEffectOfX(main = x, model = "linear"))
 #' summary(eff[[1]])
 #' # Equivalent shortcuts:
 #' eff <- component(~ myLinearEffectOfX(x, model = "linear"))
@@ -357,7 +357,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
 
 #' inlabru latent model component construction using parameters
 #'
-#' This function is inlabru's equivalent to INLA's \code{f} function but adds functionality that
+#' This function is inlabru's equivalent to INLA's `f` function but adds functionality that
 #' is unique to inlabru.
 #'
 #' @aliases component.character
@@ -367,7 +367,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
 #' @param object A string giving the component its name
 #' @param data EXPERIMENTAL
 #' @param model Either one of "offset", "factor", "linear" or a model accepted
-#' by INLA's \code{f} function. If set to NULL, then "linear" is used.
+#' by INLA's `f` function. If set to NULL, then "linear" is used.
 #' @param map EXPERIMENTAL
 #' @param n EXPERIMENTAL
 #' @param season.length EXPERIMENTAL
@@ -379,9 +379,9 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
 #' @return An component object
 #' 
 #' @details 
-#' Deprecated: \code{map} (now \code{main}), \code{mesh} (now \code{mapper})
+#' Deprecated: `map` (now `main`), `mesh` (now `mapper`)
 #'
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 #' @examples
 #' \donttest{
@@ -717,8 +717,8 @@ make_mapper <- function(subcomp,
 #'
 #' @aliases code.components
 #' @keywords internal
-#' @param components A \link{formula} describing latent model components.
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @param components A [formula] describing latent model components.
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 code.components <- function(components, add = "") {
@@ -792,7 +792,7 @@ code.components <- function(components, add = "") {
 #' @keywords internal
 #' @param object An component.
 #' @param ... ignored.
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 summary.component <- function(object, ...) {
@@ -817,7 +817,7 @@ summary.component <- function(object, ...) {
 #' @method print summary.component
 #' @keywords internal
 #' @param x A 'summary.component' object.
-#' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.component
 
 print.summary.component <- function(x, ...) {
@@ -843,12 +843,12 @@ print.summary.component <- function(x, ...) {
 #' @method value component
 #' @keywords internal
 #' @param component An component.
-#' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations.
+#' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
 #' @param state Either a numeric vector or a list with a numeric entry whose name is equal to the name parameter.
 #' @param A A matrix overriding the default projection matrix.
 #' @param ... Unused.
 #' @return A numeric vector of component values
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 
@@ -905,10 +905,10 @@ value.component <- function(component, data, state, A = NULL, ...) {
 #' @method amatrix_eval component
 #' @keywords internal
 #' @param component An component.
-#' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations.
+#' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
 #' @param ... Unused.
 #' @return An A-matrix.
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
@@ -988,10 +988,10 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
 #' @method amatrix_eval component
 #' @keywords internal
 #' @param component An component.
-#' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations.
+#' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
 #' @param ... Unused.
 #' @return An A-matrix.
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 amatrix_eval.component <- function(component, data, ...) {
@@ -1025,28 +1025,29 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #'
 #' It is not unusual for a random effect act on a transformation of a covariate. In other frameworks this
 #' would mean that the transformed covariate would have to be calculated in advance and added to the
-#' data frame that is usually provided via the \code{data} parameter. inlabru provides the option to do
+#' data frame that is usually provided via the `data` parameter. inlabru provides the option to do
 #' this transformation automatically. For instance, one might be interested in the effect of a covariate
-#' \eqn{x^2}. In inla and other frameworks this would require to add a column \code{xsquared} to the
+#' \eqn{x^2}. In inla and other frameworks this would require to add a column `xsquared` to the
 #' input data frame and use the formula
 #'
-#' \itemize{\item{\code{formula = y ~ f(xsquared, model = "linear")},}}
+#' \itemize{\item{`formula = y ~ f(xsquared, model = "linear")`,}}
 #'
-#' In inlabru this can be achived using two ways of using the \code{map} parameter.
+#' In inlabru this can be achived using two ways of using the `main` parameter
+#' (`map` in version 2.1.13 and earlier).
 #'
 #' \itemize{
-#' \item{\code{components = y ~ psi(map = x^2, model = "linear")}}
-#' \item{\code{components = y ~ psi(map = mySquareFun(x), model = "linear")},}
-#' \item{\code{components = y ~ psi(map = myOtherSquareFun, model = "linear")},}
+#' \item{`components = y ~ psi(main = x^2, model = "linear")`}
+#' \item{`components = y ~ psi(main = mySquareFun(x), model = "linear")`,}
+#' \item{`components = y ~ psi(main = myOtherSquareFun, model = "linear")`,}
 #'
 #' }
 #'
 #' In the first example inlabru will interpret the map parameter as an expression to be evaluated within
 #' the data provided. Since \eqn{x} is a knonwn covariate it will know how to calculate it. The second
-#' example is an expression as well but it uses a function alled \code{mySquareFun}. This function is
+#' example is an expression as well but it uses a function alled `mySquareFun`. This function is
 #' defined by user but has wo be accessible within the work space when setting up the compoonents.
-#' The third example provides the function \code{myOtherSquareFun} directly and not within an expression.
-#' In this case, inlabru will call the function using the data provided via the  \code{data} parameter.
+#' The third example provides the function `myOtherSquareFun` directly and not within an expression.
+#' In this case, inlabru will call the function using the data provided via the  `data` parameter.
 #' inlabru expects that the output of this function is a data.frame with "psi" being the name of the
 #' single existing column. For instance,
 #'
@@ -1060,35 +1061,35 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #' When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
 #' surface temperature or elevation. Although it is straight forward to add this data to the input
 #' data frame or write a covariate function like in the previous section there is an even more
-#' convenient way in inlabru. Spatial covariates are often stored as \code{SpatialPixelDataFrame},
-#' \code{SpatialPixelDataFrame} or \code{RasterLayer} objects. These can be provided directly via
-#' the map parameter if the input data is a \code{SpatialPointsDataFrame}. inlabru will automatically
+#' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelDataFrame`,
+#' `SpatialPixelDataFrame` or `RasterLayer` objects. These can be provided directly via
+#' the map parameter if the input data is a `SpatialPointsDataFrame`. inlabru will automatically
 #' evaluate and/or interpolate the coariate at your data locations when using code like
 #'
-#' \itemize{\item{\code{components = y ~ psi(mySpatialPixels, model = "linear")}.}}
+#' \itemize{\item{`components = y ~ psi(mySpatialPixels, model = "linear")`.}}
 #'
 #' @section Coordinates:
 #'
 #' A common spatial modelling component when using inla are SPDE models. An important feature of
 #' inlabru is that it will automatically calculate the so called A-matrix which maps SPDE
 #' values at the mesh vertices to values at the data locations. For this purpose, the map parameter
-#' can be se to \code{coordinates}, which is the \code{sp} package function that extracts point
+#' can be se to `coordinates`, which is the `sp` package function that extracts point
 #' coordinates from the SpatialPointsDataFrame that was provided as input to bru. The code for
 #' this would look as follows:
 #'
-#' \itemize{\item{\code{components = y ~ mySPDE(map = coordinates, model = inla.spde2.matern(...))}.}}
+#' \itemize{\item{`components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))`.}}
 #'
 #' @aliases input_eval.component
 #' @export
 #' @method input_eval component
 #' @keywords internal
 #' @param component An component.
-#' @param part The input part to evaluate; \code{'main'}, \code{'group'},
-#'   \code{'replicate'}, \code{'weights'}
-#' @param data A \code{data.frame} or Spatial* object of covariates and/or point locations. If null, return the component's map.
+#' @param part The input part to evaluate; `'main'`, `'group'`,
+#'   `'replicate'`, `'weights'`
+#' @param data A `data.frame` or Spatial* object of covariates and/or point locations. If null, return the component's map.
 #' @param ... Unused.
 #' @return An vector or a coordinate matrix
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 input_eval.component <- function(component,
@@ -1169,7 +1170,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       # Allow proj4string failures:
       data_crs <- tryCatch(sp_get_crs(data),
                       error = function(e) {})
-      if (!crs_is_null(data_crs)) {
+      if (!fm_crs_is_null(data_crs)) {
         proj4string(val) <- data_crs
       }
     }
@@ -1280,7 +1281,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 #' @param component An component.
 #' @param ... Unused.
 #' @return a list of indices into the components latent variables
-#' @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>,
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com},
 #'   Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 

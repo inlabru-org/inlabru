@@ -21,6 +21,6 @@ int.polygon(mesh, loc, group = NULL, method = NULL, ...)
 Integration points for polygons inside an inla.mesh
 }
 \author{
-Fabian E. Bachl <\email{f.e.bachl@bath.ac.uk}> and Finn Lindgren <\email{finn.lindgren@gmail.com}>
+Fabian E. Bachl \email{f.e.bachl@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \keyword{internal}

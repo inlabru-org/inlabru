@@ -85,6 +85,6 @@ Other Component constructor:
 \code{\link{component}()}
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \concept{Component constructor}

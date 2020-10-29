@@ -18,6 +18,6 @@ mrsea <- import.mrsea()
 }
 }
 \author{
-Lindesay Scott-Hayward <\email{lass@st-andrews.ac.uk}>
+Lindesay Scott-Hayward \email{lass@st-andrews.ac.uk}
 }
 \keyword{internal}

@@ -42,12 +42,13 @@ input data frame and use the formula
 
 \itemize{\item{\code{formula = y ~ f(xsquared, model = "linear")},}}
 
-In inlabru this can be achived using two ways of using the \code{map} parameter.
+In inlabru this can be achived using two ways of using the \code{main} parameter
+(\code{map} in version 2.1.13 and earlier).
 
 \itemize{
-\item{\code{components = y ~ psi(map = x^2, model = "linear")}}
-\item{\code{components = y ~ psi(map = mySquareFun(x), model = "linear")},}
-\item{\code{components = y ~ psi(map = myOtherSquareFun, model = "linear")},}
+\item{\code{components = y ~ psi(main = x^2, model = "linear")}}
+\item{\code{components = y ~ psi(main = mySquareFun(x), model = "linear")},}
+\item{\code{components = y ~ psi(main = myOtherSquareFun, model = "linear")},}
 
 }
 
@@ -90,10 +91,10 @@ can be se to \code{coordinates}, which is the \code{sp} package function that ex
 coordinates from the SpatialPointsDataFrame that was provided as input to bru. The code for
 this would look as follows:
 
-\itemize{\item{\code{components = y ~ mySPDE(map = coordinates, model = inla.spde2.matern(...))}.}}
+\itemize{\item{\code{components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))}.}}
 }
 
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \keyword{internal}
