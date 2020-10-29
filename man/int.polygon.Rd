@@ -13,7 +13,7 @@ int.polygon(mesh, loc, group = NULL, method = NULL, ...)
 
 \item{group}{If loc defines multiple polygons then this is the ID of the group for each location in loc}
 
-\item{method}{Which integration method to use ('stable' (default), or 'basic')}
+\item{method}{Which integration method to use}
 
 \item{...}{Arguments passed to the low level integration method (\code{make_stable_integration_points})}
 }

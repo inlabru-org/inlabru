@@ -31,8 +31,7 @@ test_that("conversion of SpatialPolygon to integration points", {
   disable_PROJ6_warnings()
   data(gorillas, package = "inlabru")
   gorillas <- gorillas_update_CRS(gorillas)
-  ips <- ipoints(gorillas$boundary,
-                 domain = gorillas$mesh)
+  suppressWarnings(ips <- ipoints(gorillas$boundary))
 
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(names(ips), "weight")
@@ -44,13 +43,13 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
   disable_PROJ6_warnings()
   data(gorillas, package = "inlabru")
   gorillas <- gorillas_update_CRS(gorillas)
-  ips2 <- ipoints(gorillas$boundary, gorillas$mesh,
-                 int.args = list(method = "basic"))
+  ips <- ipoints(gorillas$boundary, gorillas$mesh)
 
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)), c("weight", "x", "y", "optional"))
-  c(sum(ips$weight), sum(ipoints(gorillas$boundary)$weight))
-  expect_equal(sum(ips$weight), sum(ipoints(gorillas$boundary)$weight), tolerance = lowtol)
+  expect_equal(sum(ips$weight),
+               sum(suppressWarnings(ipoints(gorillas$boundary))$weight),
+               tolerance = midtol)
 })
 
 test_that("conversion of 2D mesh to integration points", {

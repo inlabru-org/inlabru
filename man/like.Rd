@@ -47,10 +47,7 @@ Default taken from \code{options$Ntrials}.}
 
 \item{ips}{Integration points for 'cp' family. Overrides \code{samplers}.}
 
-\item{domain}{Named list of integration function domain definitions. Either
-an \code{inla.mesh.1d} or \code{inla.mesh} object specifying the locations
-for integration point locations, or a single scalar indicating how many 1D
-integration points to use.}
+\item{domain}{Named list of domain definitions.}
 
 \item{include}{Character vector of component labels that are needed by the
 predictor expression; Default: NULL (include all components that are not

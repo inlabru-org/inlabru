@@ -99,7 +99,8 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
     }
       warning("ipoints(project=", ifelse(project, "TRUE", "FALSE"),
               ") is deprecated. Will use int.args$method = '",
-              int.args[["method"]])
+              int.args[["method"]],
+              "' instead.")
   }
 
   pregroup <- NULL
@@ -396,8 +397,8 @@ cprod <- function(...) {
 #   2) For each group simplify with respect to mesh-dimensions, e.g. space
 #   3) Merge
 #
-#   Dependencies (iDistance):
-#   int.points(), int.polygon(), int.1d(), int.expand(), recurse.rbind()
+#   Local dependencies:
+#   int.polygon()
 #
 # @aliases ipoints
 # @export
@@ -409,7 +410,7 @@ cprod <- function(...) {
 
 
 ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL, 
-                    int.args = list(method="stable",nsub=NULL)) {
+                    int.args = list(method = "stable", nsub = NULL)) {
 # TODO: Automatic domain extraction should be done by a separate function.
 
   # Fill missing domain definitions using meshes from effects where map equals the domain name
@@ -461,7 +462,8 @@ ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL,
   }
 
   if (spatial) {
-    ips <- ipoints(samplers, domain$coordinates, project = TRUE, group = samp.dim, int.args = int.args)
+    ips <- ipoints(samplers, domain$coordinates,
+                   group = samp.dim, int.args = int.args)
   } else {
     ips <- NULL
   }

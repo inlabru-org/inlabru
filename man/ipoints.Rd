@@ -15,10 +15,10 @@ ipoints(
 }
 \arguments{
 \item{region}{Description of the integration region boundary.
-In 1D either a vector of two numerics or a two-column matrix where each row describes an interval.
+In 1D either a vector of two numerics or a two-column matrix where each row describes and interval.
 In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a weight column defining the width of the line.}
 
-\item{domain}{In 1D a single numeric setting the number of integration points or an \code{inla.mesh.1d}
+\item{domain}{In 1D a single numeric setting the numer of integration points or an \code{inla.mesh.1d}
 defining the locations to project the integration points to. In 2D \code{domain} has to be an
 \code{inla.mesh} object describing the projection and granularity of the integration.}
 
