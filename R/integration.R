@@ -432,39 +432,19 @@ intersection_mesh <- function(mesh, poly) {
   mesh_subset
 }
 
-#' Safe(?) way to construct integration weights for mesh/polygon intersections
+#' Project integration weights onto mesh nodes
 #'
 #' @param mesh Mesh on which to integrate
-#' @param inter \code{list} of \code{loc}, integration points,
+#' @param integ \code{list} of \code{loc}, integration points,
 #'   and \code{weight}, integration weights
 #' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
 #' @keywords internal
-integration_weight_construction <- function(mesh, inter) {
-  # Safe mesh for point lookups
-  all_edges <- INLA::inla.mesh.segment(
-    loc = mesh$loc,
-    idx = cbind(
-      as.vector(t(mesh$graph$tv)),
-      as.vector(t(mesh$graph$tv[, c(2, 3, 1), drop = FALSE]))
-    ),
-    is.bnd = FALSE
-  )
-  mesh_cover <- INLA::inla.mesh.create(
-    loc = mesh$loc,
-    interior = list(all_edges),
-    extend = TRUE
-  )
+integration_weight_projection <- function(mesh, integ) {
+  # Project points onto the mesh
+  proj <- INLA::inla.mesh.projector(mesh, loc = integ$loc)
 
-  proj_cover <- INLA::inla.mesh.projector(mesh_cover,
-    loc = inter$loc
-  )
-  # Remove points not in the original 'mesh'
-  A <- proj_cover$proj$A[, mesh_cover$idx$loc, drop = FALSE]
-  # Renormalise
-  A <- A / Matrix::rowSums(A)
-
-  # Convert integration weights from intersection mesh points to original mesh points
-  weight <- as.vector(as.vector(inter$weight) %*% A)
+  # Convert integration weights to mesh points
+  weight <- as.vector(as.vector(integ$weight) %*% proj$proj$A)
 
   list(loc = mesh$loc, weight = weight)
 }
@@ -477,10 +457,9 @@ integration_weight_construction <- function(mesh, inter) {
 #' @param nsub number of subdivision points along each triangle edge, giving
 #'    \code{(nsub + 1)^2} proto-integration points used to compute
 #'   the vertex weights
-#'   (default \code{NULL=9}, giving 100 proto-integration points)
+#'   (default \code{NULL=9}, giving 100 integration points for each triangle)
 #' @return \code{list} with elements \code{loc} and \code{weight} with
-#'   one integration point for each mesh vertex of triangles overlapping
-#'   the integration domain
+#'   integration points for the intersection of the mesh and polygon
 #' @author Finn Lindgren <\email{finn.lindgren@@gmail.com}>
 #' @keywords internal
 make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
@@ -516,7 +495,7 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   # Construct integration weights
   weight <- rep(INLA::inla.mesh.fem(mesh, order = 1)$ta / nB, each = nB)
   
-  # Filter away point outside integration domain boundary:
+  # Filter away points outside integration domain boundary:
   mesh_bnd <- INLA::inla.mesh.create(boundary = bnd)
   ok <- INLA::inla.mesh.projector(mesh_bnd, loc = loc)$proj$ok
 
@@ -549,31 +528,21 @@ int.polygon <- function(mesh, loc, group = NULL, method = "stable", ...){
 
     # Combine polygon with mesh boundary to get mesh covering the intersection.
     bnd <- INLA::inla.mesh.segment(loc = gloc, is.bnd = TRUE)
+    integ <- make_stable_integration_points(mesh, bnd, ...)
 
-    inter <- list(loc = matrix(0, 0, 3), weight = numeric(0))
-    if (method == "stable") {
-      inter <- make_stable_integration_points(mesh, bnd, ...)
-    } else {
-      # Create intersection mesh
-      mesh_inter <- intersection_mesh(mesh, bnd)
-      if (!is.null(mesh_inter)) {
-        inter <- list(
-          loc = mesh_inter$loc,
-          weight = INLA::inla.mesh.fem(mesh_inter, order = 1)$va
-        )
-      }
+    if (method %in% c("stable")) {
+      # Project integration points and weights to mesh nodes
+      integ <- integration_weight_projection(mesh, integ)
     }
 
-    # Compute integration locations and weights
-    loc_weight <- integration_weight_construction(mesh, inter)
-
+    # Keep points inside the mesh with positive weights
     ok <-
-      INLA::inla.mesh.project(mesh, loc_weight$loc)$ok &
-        (loc_weight$weight > 0)
+      INLA::inla.mesh.project(mesh, integ$loc)$ok &
+        (integ$weight > 0)
 
-    ips <- data.frame(loc_weight$loc[ok, 1:2, drop = FALSE])
+    ips <- data.frame(integ$loc[ok, 1:2, drop = FALSE])
     colnames(ips) <- c("x", "y")
-    ips$weight <- loc_weight$weight[ok]
+    ips$weight <- integ$weight[ok]
 
     ips$group <- rep(g, nrow(ips))
     ipsl <- c(ipsl, list(ips))
