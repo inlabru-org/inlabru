@@ -528,6 +528,8 @@ summary.lgcp <- function(object, ...) {
 #'
 
 summary.bru <- function(object, ...) {
+  message("The current summary.bru(...) method is outdated and will be replaced.\n",
+  "For the moment, you may prefer the output from INLA:::summary.inla(...) as an alternative.")
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
   for (k in 1:length(object$sppa$lhoods)) {
     lh <- object$sppa$lhoods[[k]]
@@ -571,10 +573,10 @@ summary.bru <- function(object, ...) {
       signif(range(sm[, c(4, 6)])[1]), " : ",
       signif(range(sm[, c(4, 6)])[2]), "]"
     ))
-    if (nm %in% names(object$model$mesh)) {
+    if (inherits(object$model$effects[[nm]]$main$mapper, "inla.mesh")) {
       cat(paste0(
         ", and area = ",
-        signif(sum(Matrix::diag(INLA::inla.mesh.fem(object$model$mesh[[nm]])$c0)))
+        signif(sum(INLA::inla.mesh.fem(object$model$effects[[nm]]$main$mapper)$va))
       ))
     }
     cat("\n")
@@ -604,8 +606,8 @@ summary.bru <- function(object, ...) {
   cat("\n")
   for (nm in names(object$sppa$model$effects)) {
     eff <- object$sppa$model$effects[[nm]]
-    if (eff$model == "spde2") {
-      hyp <- INLA::inla.spde.result(object, nm, eff$inla.spde)
+    if (identical(eff[["main"]][["type"]], "spde")) {
+      hyp <- INLA::inla.spde.result(object, nm, eff$main$model)
       cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
       df <- rbind(
         marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"),
@@ -616,6 +618,8 @@ summary.bru <- function(object, ...) {
       print(df)
     }
   }
+  message("The current summary.bru(...) method is outdated and will be replaced.\n",
+          "Until then, you may prefer the output from INLA:::summary.inla(...) as an alternative.")
 }
 
 #' Prediction from fitted bru model
