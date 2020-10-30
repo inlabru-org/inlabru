@@ -528,8 +528,6 @@ summary.lgcp <- function(object, ...) {
 #'
 
 summary.bru <- function(object, ...) {
-  message("The current summary.bru(...) method is outdated and will be replaced.\n",
-  "For the moment, you may prefer the output from INLA:::summary.inla(...) as an alternative.")
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
   for (k in 1:length(object$sppa$lhoods)) {
     lh <- object$sppa$lhoods[[k]]
