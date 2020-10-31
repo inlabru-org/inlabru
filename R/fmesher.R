@@ -1,3 +1,5 @@
+#' @importFrom sp coordinates proj4string `proj4string<-`
+
 #' @title PROJ6 detection
 #' @description Detect whether PROJ6 is available
 #'
@@ -64,12 +66,22 @@ fm_fallback_PROJ6 <- function(fun) {
   }
 }
 
+#' @param fun The name of the function that requires PROJ6. Default: NULL,
+#' which uses the name of the calling function.
 #' @details `fm_requires_PROJ6` is called to give an error when PROJ6
 #' is required but not available
 #' @rdname fm_has_PROJ6
 
-fm_requires_PROJ6 <- function(fun) {
+fm_requires_PROJ6 <- function(fun = NULL) {
   if (!fm_has_PROJ6()) {
+    if (is.null(fun)) {
+      fun <- sys.call(-1L)
+      if (is.null(fun)) {
+        fun <- ""
+      } else {
+        fun <- as.character(sys.call(-1L))[[1]]
+      }
+    }
     stop(paste0(
       "'",
       fun,
@@ -228,12 +240,13 @@ fm_wkt_get_ellipsoid_radius <- function(wkt) {
 #' @export
 
 fm_crs_get_ellipsoid_radius <- function(crs) {
-  fm_requires_PROJ6("fm_crs_get_ellipsoid_radius")
+  fm_requires_PROJ6()
 
   fm_wkt_get_ellipsoid_radius(fm_crs_get_wkt(crs))
 }
 
 
+#' @param radius numeric; The new radius value
 #' @rdname fm_crs_wkt
 #' @export
 
@@ -287,7 +300,7 @@ fm_wkt_set_ellipsoid_radius <- function(wkt, radius) {
 #' @export
 
 fm_crs_set_ellipsoid_radius <- function(crs, radius) {
-  fm_requires_PROJ6("fm_crs_set_ellipsoid_radius")
+  fm_requires_PROJ6()
 
   wkt <- fm_crs_get_wkt(crs)
   wkt <- fm_wkt_set_ellipsoid_radius(wkt, radius)
@@ -410,7 +423,7 @@ fm_CRS <- function(projargs = NULL, doCheckCRSArgs = TRUE,
       } else {
         warning("'fm_CRS' should be given a SRS_string for PROJ6 or a known keyword for a predefined string given in projargs. Using fallback PROJ4 method.")
         if (!is.null(args)) {
-          x <- CRS(projargs, doCheckCRSArgs = doCheckCRSArgs)
+          x <- sp::CRS(projargs, doCheckCRSArgs = doCheckCRSArgs)
           if (typeof(args) != "list") {
             stop("'args' must be NULL or a list of name=value pairs.")
           }
@@ -429,11 +442,11 @@ fm_CRS <- function(projargs = NULL, doCheckCRSArgs = TRUE,
       if (!is.null(projargs)) {
         warning("SRS_string specified. Ignoring non-null projargs.")
       }
-      x <- CRS(SRS_string = SRS_string, doCheckCRSArgs = doCheckCRSArgs)
+      x <- sp::CRS(SRS_string = SRS_string, doCheckCRSArgs = doCheckCRSArgs)
     } else if (inherits(projargs, "CRS")) {
       x <- projargs
     } else {
-      x <- CRS(NA_character_, doCheckCRSArgs = doCheckCRSArgs)
+      x <- sp::CRS(NA_character_, doCheckCRSArgs = doCheckCRSArgs)
     }
   } else {
     # PROJ4
@@ -453,7 +466,7 @@ fm_CRS <- function(projargs = NULL, doCheckCRSArgs = TRUE,
       if (projargs %in% names(predef)) {
         projargs <- predef[[projargs]]
       }
-      x <- CRS(projargs, doCheckCRSArgs = doCheckCRSArgs)
+      x <- sp::CRS(projargs, doCheckCRSArgs = doCheckCRSArgs)
     } else if (inherits(projargs, "CRS")) {
       x <- projargs
     } else {
@@ -470,7 +483,7 @@ fm_CRS <- function(projargs = NULL, doCheckCRSArgs = TRUE,
       for (name in names(args)) {
         xargs[[name]] <- args[[name]]
       }
-      x <- CRS(fm_list_as_CRSargs(xargs), doCheckCRSArgs = doCheckCRSArgs)
+      x <- sp::CRS(fm_list_as_CRSargs(xargs), doCheckCRSArgs = doCheckCRSArgs)
     }
   }
 
@@ -523,7 +536,7 @@ fm_wkt_predef <- function() {
 #' @export
 
 fm_wkt_as_wkt_tree <- function(x, ...) {
-  fm_requires_PROJ6("fm_wkt_as_wkt_tree")
+  fm_requires_PROJ6()
 
   # Basic parsing of WKT string
   # ITEM[Param1, Param2, ...]
@@ -568,11 +581,12 @@ fm_wkt_as_wkt_tree <- function(x, ...) {
   item
 }
 
+#' @param pretty logical; If TRUE, use pretty formatting. Default: FALSE
 #' @rdname wkt_tree
 #' @export
 
 fm_wkt_tree_as_wkt <- function(x, pretty = FALSE, ...) {
-  fm_requires_PROJ6("fm_wkt_tree_as_wkt")
+  fm_requires_PROJ6()
 
   construct_item <- function(x, level) {
     paste0(
@@ -658,12 +672,12 @@ fm_wkt_tree_set_item <- function(x, item_tree, duplicate = 1) {
 
 
 fm_CRS_as_list <- function(x, ...) {
-  inla.not_for_PROJ6("fm_CRS_as_list")
+  fm_not_for_PROJ6("fm_CRS_as_list")
   fm_CRSargs_as_list(fm_CRSargs(x))
 }
 
 fm_list_as_CRS <- function(x, ...) {
-  inla.not_for_PROJ6("fm_list_as_CRS")
+  fm_not_for_PROJ6("fm_list_as_CRS")
   fm_CRS(args = x)
 }
 
@@ -704,7 +718,7 @@ fm_list_as_CRS <- function(x, ...) {
 #'   print(fm_CRSargs(crs2))
 #' }
 fm_CRSargs <- function(x, ...) {
-  inla.not_for_PROJ6("fm_CRSargs")
+  fm_not_for_PROJ6("fm_CRSargs")
 
   if (inherits(x, "inla.CRS")) {
     x <- x[["crs"]]
@@ -738,7 +752,7 @@ fm_list_as_CRSargs <- function(x, ...) {
 #' @return For `fm_CRSargs_as_list()`, a list of name=value pairs from CRS proj4 string
 #' @rdname fm_CRSargs
 fm_CRSargs_as_list <- function(x, ...) {
-  inla.not_for_PROJ6("fm_CRSargs_as_list")
+  fm_not_for_PROJ6("fm_CRSargs_as_list")
 
   if (is.na(x)) {
     return(list())
@@ -905,7 +919,7 @@ fm_wkt_set_lengthunit <- function(wkt, unit, params = NULL) {
 #' @rdname fm_crs_wkt
 
 fm_crs_get_wkt <- function(crs) {
-  fm_requires_PROJ6("fm_crs_get_wkt")
+  fm_requires_PROJ6()
 
   if (inherits(crs, "inla.CRS")) {
     crs <- crs[["crs"]]
@@ -1227,14 +1241,21 @@ fm_internal_update_crs <- function(crs, newcrs, mismatch.allowed) {
     newcrs
   } else {
     if (!mismatch.allowed && !identical(crs, newcrs)) {
-      show(crs)
-      show(newcrs)
+      methods::show(crs)
+      methods::show(newcrs)
       stop("CRS information mismatch.")
     }
     crs
   }
 }
 
+
+#' @title Chack if two CRS objects are identical
+#' @param crs0,crs1 Two `sp::CRS` or `inla.CRS` objects to be compared.
+#' @param crsonly logical. If `TRUE` and any of `crs0` and `crs1` are `inla.CRS`
+#' objects, extract and compare only the `sp::CRS` objects. Default: `FALSE`
+#' @export
+#' @keywords internal
 
 fm_identical_CRS <- function(crs0, crs1, crsonly = FALSE) {
   if (!crsonly) {
@@ -1252,7 +1273,7 @@ fm_identical_CRS <- function(crs0, crs1, crsonly = FALSE) {
 
 #' Handle transformation of various inla objects according to coordinate
 #' reference systems of sp::CRS or INLA::inla.CRS class.
-#' 
+#'
 #' @param x
 #' The object that should be transformed from it's current CRS to a new CRS
 #' @param crs0
@@ -1336,18 +1357,18 @@ fm_spTransform.default <- function(x, crs0, crs1, passthrough = FALSE, ...) {
         crs1crs <- crs1
         crs1oblique <- NULL
       }
-      x <- SpatialPoints(x[ok, , drop = FALSE], proj4string = crs0crs)
+      x <- sp::SpatialPoints(x[ok, , drop = FALSE], proj4string = crs0crs)
       if (do_work_on_sphere) {
         if (!onsphere_0) {
           if (sphere_radius_0 != 1) {
-            x <- spTransform(x, longlat_0)
-            proj4string(x) <- CRS(NA_character_) # Reset CRS to avoid warning
+            x <- sp::spTransform(x, longlat_0)
+            proj4string(x) <- sp::CRS(NA_character_) # Reset CRS to avoid warning
             proj4string(x) <- longlat_norm
           }
-          x <- spTransform(x, crs_sphere)
+          x <- sp::spTransform(x, crs_sphere)
         }
         if (!is.null(crs0oblique)) {
-          x <- SpatialPoints(fm_crs_transform_oblique(coordinates(x),
+          x <- sp::SpatialPoints(fm_crs_transform_oblique(coordinates(x),
             crs0oblique,
             to.oblique = FALSE
           ),
@@ -1356,7 +1377,7 @@ fm_spTransform.default <- function(x, crs0, crs1, passthrough = FALSE, ...) {
         }
 
         if (!is.null(crs1oblique)) {
-          x <- SpatialPoints(fm_crs_transform_oblique(coordinates(x),
+          x <- sp::SpatialPoints(fm_crs_transform_oblique(coordinates(x),
             crs1oblique,
             to.oblique = TRUE
           ),
@@ -1364,13 +1385,13 @@ fm_spTransform.default <- function(x, crs0, crs1, passthrough = FALSE, ...) {
           )
         }
         if (sphere_radius_1 != 1) {
-          x <- spTransform(x, longlat_norm)
-          proj4string(x) <- CRS(NA_character_) # Reset CRS to avoid warning
+          x <- sp::spTransform(x, longlat_norm)
+          proj4string(x) <- sp::CRS(NA_character_) # Reset CRS to avoid warning
           proj4string(x) <- longlat_1
         }
       }
 
-      x <- spTransform(x, crs1crs)
+      x <- sp::spTransform(x, crs1crs)
 
       if (!all(ok)) {
         xx[ok, ] <- coordinates(x)
@@ -1422,13 +1443,13 @@ fm_spTransform.default <- function(x, crs0, crs1, passthrough = FALSE, ...) {
       }
       if (inherits(crs0, "inla.CRS")) {
         if (!onsphere) {
-          x <- spTransform(
-            SpatialPoints(x[ok, , drop = FALSE], proj4string = crs0$crs),
+          x <- sp::spTransform(
+            sp::SpatialPoints(x[ok, , drop = FALSE], proj4string = crs0$crs),
             fm_CRS("sphere")
           )
         }
         if (!is.null(crs0$oblique)) {
-          x <- SpatialPoints(fm_crs_transform_oblique(coordinates(x),
+          x <- sp::SpatialPoints(fm_crs_transform_oblique(coordinates(x),
             crs0$oblique,
             to.oblique = FALSE
           ),
@@ -1437,23 +1458,23 @@ fm_spTransform.default <- function(x, crs0, crs1, passthrough = FALSE, ...) {
         }
         onshpere <- TRUE
       } else {
-        x <- SpatialPoints(x[ok, , drop = FALSE], proj4string = crs0)
+        x <- sp::SpatialPoints(x[ok, , drop = FALSE], proj4string = crs0)
       }
       if (inherits(crs1, "inla.CRS")) {
         if (!onsphere) {
-          x <- spTransform(x, fm_CRS("sphere"))
+          x <- sp::spTransform(x, fm_CRS("sphere"))
         }
         if (!is.null(crs1$oblique)) {
-          x <- SpatialPoints(fm_crs_transform_oblique(coordinates(x),
+          x <- sp::SpatialPoints(fm_crs_transform_oblique(coordinates(x),
             crs1$oblique,
             to.oblique = TRUE
           ),
           proj4string = fm_CRS("sphere")
           )
         }
-        x <- spTransform(x, crs1$crs)
+        x <- sp::spTransform(x, crs1$crs)
       } else {
-        x <- spTransform(x, crs1)
+        x <- sp::spTransform(x, crs1)
       }
       if (!all(ok)) {
         xx[ok, ] <- coordinates(x)
@@ -1485,7 +1506,7 @@ fm_spTransform.SpatialPoints <- function(x, CRSobj, passthrough = FALSE, ...) {
     ok1 <- (!missing(CRSobj) && !is.null(CRSobj) &&
       (inherits(CRSobj, "CRS") && !is.null(fm_crs_get_wkt(CRSobj))))
     if (ok0 && ok1) {
-      invisible(SpatialPoints(fm_spTransform(
+      invisible(sp::SpatialPoints(fm_spTransform(
         coordinates(x),
         crs_x,
         CRSobj
@@ -1494,14 +1515,14 @@ fm_spTransform.SpatialPoints <- function(x, CRSobj, passthrough = FALSE, ...) {
       ))
     } else if (ok1) { ## Know: !ok0 && ok1
       if (!passthrough) {
-        stop("Invalid origin CRS for SpatialPoints")
+        stop("Invalid origin CRS for sp::SpatialPoints")
       }
-      invisible(SpatialPoints(coordinates(x), proj4string = CRSobj))
+      invisible(sp::SpatialPoints(coordinates(x), proj4string = CRSobj))
     } else { ## Know: (ok0 || !ok0) && !ok1
       if (!passthrough) {
-        stop("Invalid target CRS for SpatialPoints")
+        stop("Invalid target CRS for sp::SpatialPoints")
       }
-      invisible(SpatialPoints(coordinates(x), proj4string = fm_CRS()))
+      invisible(sp::SpatialPoints(coordinates(x), proj4string = fm_CRS()))
     }
   } else {
     # PROJ4
@@ -1509,23 +1530,23 @@ fm_spTransform.SpatialPoints <- function(x, CRSobj, passthrough = FALSE, ...) {
     ok1 <- (!missing(CRSobj) && !is.null(CRSobj) &&
       (inherits(CRSobj, "CRS") && !is.na(fm_CRSargs(CRSobj))))
     if (ok0 && ok1) {
-      invisible(SpatialPoints(fm_spTransform(
+      invisible(sp::SpatialPoints(fm_spTransform(
         coordinates(x),
-        CRS(proj4string(x)),
+        sp::CRS(sp::proj4string(x)),
         CRSobj
       ),
       proj4string = CRSobj
       ))
     } else if (ok1) { ## Know: !ok0 && ok1
       if (!passthrough) {
-        stop("Invalid origin CRS for SpatialPoints")
+        stop("Invalid origin CRS for sp::SpatialPoints")
       }
-      invisible(SpatialPoints(coordinates(x), proj4string = CRSobj))
+      invisible(sp::SpatialPoints(coordinates(x), proj4string = CRSobj))
     } else { ## Know: (ok0 || !ok0) && !ok1
       if (!passthrough) {
-        stop("Invalid target CRS for SpatialPoints")
+        stop("Invalid target CRS for sp::SpatialPoints")
       }
-      invisible(SpatialPoints(coordinates(x), proj4string = fm_CRS()))
+      invisible(sp::SpatialPoints(coordinates(x), proj4string = fm_CRS()))
     }
   }
 }
@@ -1541,10 +1562,10 @@ fm_spTransform.SpatialPointsDataFrame <- function(x,
   ok1 <- (!missing(CRSobj) && !is.null(CRSobj) &&
     (inherits(CRSobj, "CRS") && !is.null(fm_crs_get_wkt(CRSobj))))
   if (!ok1 && !passthrough) {
-    stop("Invalid target CRS for SpatialPointsDataFrame")
+    stop("Invalid target CRS for sp::SpatialPointsDataFrame")
   }
 
-  x_no_df <- SpatialPoints(coordinates(x),
+  x_no_df <- sp::SpatialPoints(coordinates(x),
     proj4string = fm_sp_get_crs(x)
   )
   x_no_df <- fm_spTransform(x_no_df,
@@ -1552,12 +1573,12 @@ fm_spTransform.SpatialPointsDataFrame <- function(x,
     passthrough = passthrough
   )
   if (ok1) {
-    invisible(SpatialPointsDataFrame(coordinates(x_no_df),
+    invisible(sp::SpatialPointsDataFrame(coordinates(x_no_df),
       proj4string = CRSobj,
       data = x@data
     ))
   } else {
-    invisible(SpatialPointsDataFrame(coordinates(x_no_df),
+    invisible(sp::SpatialPointsDataFrame(coordinates(x_no_df),
       proj4string = fm_CRS(),
       data = x@data
     ))

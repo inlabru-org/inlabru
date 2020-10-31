@@ -16,7 +16,11 @@ fm_not_for_PROJ4(fun)
 
 fm_fallback_PROJ6(fun)
 
-fm_requires_PROJ6(fun)
+fm_requires_PROJ6(fun = NULL)
+}
+\arguments{
+\item{fun}{The name of the function that requires PROJ6. Default: NULL,
+which uses the name of the calling function.}
 }
 \value{
 For \code{fm_has_PROJ6}, logical;

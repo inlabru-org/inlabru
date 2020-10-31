@@ -20,6 +20,8 @@ fm_wkt_tree_set_item(x, item_tree, duplicate = 1)
 
 \item{\dots}{Unused}
 
+\item{pretty}{logical; If TRUE, use pretty formatting. Default: FALSE}
+
 \item{item}{character vector with item labels identifying a parameter item
 entry.}
 
