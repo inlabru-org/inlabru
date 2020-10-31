@@ -671,11 +671,16 @@ fm_wkt_tree_set_item <- function(x, item_tree, duplicate = 1) {
 
 
 
+#' @export
+#' @rdname fm_CRSargs
 fm_CRS_as_list <- function(x, ...) {
   fm_not_for_PROJ6("fm_CRS_as_list")
   fm_CRSargs_as_list(fm_CRSargs(x))
 }
 
+
+#' @export
+#' @rdname fm_CRSargs
 fm_list_as_CRS <- function(x, ...) {
   fm_not_for_PROJ6("fm_list_as_CRS")
   fm_CRS(args = x)
@@ -683,10 +688,10 @@ fm_list_as_CRS <- function(x, ...) {
 
 #' Show expanded CRS arguments
 #'
-#' Wrapper for `sp::CRS` and `inla.CRS` objects to extract the
+#' Wrappers for `sp::CRS` and `inla.CRS` objects to handle the
 #' coordinate reference system argument string.
-#' Should no longer be used with PROJ6/rgdal3;
-#' see [fm_crs_get_wkt()]
+#' These methods should no longer be used with PROJ6/rgdal3;
+#' see [fm_crs_get_wkt()] for a new approach.
 #'
 #' @aliases fm_CRSargs fm_CRS_as_list fm_CRSargs_as_list fm_list_as_CRS
 #' fm_list_as_CRSargs
@@ -704,6 +709,8 @@ fm_list_as_CRS <- function(x, ...) {
 #' For `fm_list_as_CRS`, a `CRS` or `inla.CRS` object.
 #' @author Finn Lindgren <finn.lindgren@@gmail.com>
 #' @seealso [rgdal::CRSargs()], [fm_CRS()]
+#' @export
+#' @keywords internal
 #' @examples
 #'
 #' if (require(rgdal)) {
@@ -751,6 +758,7 @@ fm_list_as_CRSargs <- function(x, ...) {
 
 #' @return For `fm_CRSargs_as_list()`, a list of name=value pairs from CRS proj4 string
 #' @rdname fm_CRSargs
+#' @export
 fm_CRSargs_as_list <- function(x, ...) {
   fm_not_for_PROJ6("fm_CRSargs_as_list")
 
@@ -1666,7 +1674,7 @@ fm_internal_sp2segment_join <- function(inp, grp = NULL, closed = TRUE) {
       out.grp <- c(out.grp, inp.grp)
     }
   }
-  inla.mesh.segment(
+  INLA::inla.mesh.segment(
     loc = out.loc, idx = out.idx, grp = out.grp, is.bnd = FALSE,
     crs = crs
   )
@@ -1696,7 +1704,7 @@ fm_as_inla_mesh_segment.SpatialPoints <-
     } else {
       idx <- seq_len(n)
     }
-    inla.mesh.segment(
+    INLA::inla.mesh.segment(
       loc = loc, idx = idx, grp = grp, is.bnd = is.bnd,
       crs = crs
     )
@@ -1718,7 +1726,7 @@ fm_as_inla_mesh_segment.Line <-
     } else {
       idx <- seq_len(n)
     }
-    inla.mesh.segment(loc = loc, idx = idx, is.bnd = FALSE, crs = crs)
+    INLA::inla.mesh.segment(loc = loc, idx = idx, is.bnd = FALSE, crs = crs)
   }
 
 fm_as_inla_mesh_segment.Lines <-
@@ -1806,5 +1814,5 @@ fm_as_inla_mesh_segment.Polygon <-
     } else {
       idx <- c(1L:n, 1L)
     }
-    inla.mesh.segment(loc = loc, idx = idx, is.bnd = TRUE, crs = crs)
+    INLA::inla.mesh.segment(loc = loc, idx = idx, is.bnd = TRUE, crs = crs)
   }
