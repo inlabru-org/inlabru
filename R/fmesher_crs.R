@@ -22,18 +22,15 @@ fm_has_PROJ6 <- function() {
 #' features even though PROJ6 is available
 #' @rdname fm_has_PROJ6
 
-fm_not_for_PROJ6 <- function(fun) {
+fm_not_for_PROJ6 <- function(fun = NULL) {
   if (fm_has_PROJ6()) {
-    stack <- sys.calls()
-    stack <- lapply(as.list(stack), function(x) as.character(deparse(x)))
+    fun <- fn_caller_name(1, fun)
+    msg <- fn_call_stack(1)
     warning(paste0(
       "'",
       fun,
-      "' should not be used with PROJ6 and rgdal v3\n",
-      "Call stack for developer debugging:\n",
-      paste0(lapply(stack, function(x) substr(x, 1, 70)),
-        collapse = "\n"
-      )
+      "()' should not be used with PROJ6 and rgdal v3\n",
+      msg
     ))
   }
 }
@@ -42,29 +39,32 @@ fm_not_for_PROJ6 <- function(fun) {
 #' calling methods that are only available for PROJ6
 #' @rdname fm_has_PROJ6
 
-fm_not_for_PROJ4 <- function(fun) {
+fm_not_for_PROJ4 <- function(fun = NULL) {
   if (!fm_has_PROJ6()) {
+    fun <- fn_caller_name(1, fun)
     stop(paste0(
       "'",
       fun,
-      "' is not supported for PROJ4"
+      "()' is not supported for PROJ4"
     ))
   }
 }
 
 #' @details `fm_fallback_PROJ6` is called to warn about falling back
-#' to using old PROJ4 methods when a RPOJ6 method hasn't been implemented
+#' to using old PROJ4 methods when a PROJ6 method hasn't been implemented
 #' @rdname fm_has_PROJ6
 
-fm_fallback_PROJ6 <- function(fun) {
+fm_fallback_PROJ6 <- function(fun = NULL) {
   if (fm_has_PROJ6()) {
+    fun <- fn_caller_name(1, fun)
     warning(paste0(
       "'",
       fun,
-      "' method for PROJ6 not implemented. Falling back to PROJ4."
+      "()' method for PROJ6 not implemented. Falling back to PROJ4."
     ))
   }
 }
+
 
 #' @param fun The name of the function that requires PROJ6. Default: NULL,
 #' which uses the name of the calling function.
@@ -74,14 +74,7 @@ fm_fallback_PROJ6 <- function(fun) {
 
 fm_requires_PROJ6 <- function(fun = NULL) {
   if (!fm_has_PROJ6()) {
-    if (is.null(fun)) {
-      fun <- sys.call(-1L)
-      if (is.null(fun)) {
-        fun <- ""
-      } else {
-        fun <- as.character(sys.call(-1L))[[1]]
-      }
-    }
+    fun <- fn_caller_name(which = 1, override = fun)
     stop(paste0(
       "'",
       fun,
@@ -674,7 +667,7 @@ fm_wkt_tree_set_item <- function(x, item_tree, duplicate = 1) {
 #' @export
 #' @rdname fm_CRSargs
 fm_CRS_as_list <- function(x, ...) {
-  fm_not_for_PROJ6("fm_CRS_as_list")
+  fm_not_for_PROJ6()
   fm_CRSargs_as_list(fm_CRSargs(x))
 }
 
@@ -682,7 +675,7 @@ fm_CRS_as_list <- function(x, ...) {
 #' @export
 #' @rdname fm_CRSargs
 fm_list_as_CRS <- function(x, ...) {
-  fm_not_for_PROJ6("fm_list_as_CRS")
+  fm_not_for_PROJ6()
   fm_CRS(args = x)
 }
 
@@ -725,7 +718,7 @@ fm_list_as_CRS <- function(x, ...) {
 #'   print(fm_CRSargs(crs2))
 #' }
 fm_CRSargs <- function(x, ...) {
-  fm_not_for_PROJ6("fm_CRSargs")
+  fm_not_for_PROJ6()
 
   if (inherits(x, "inla.CRS")) {
     x <- x[["crs"]]
@@ -760,7 +753,7 @@ fm_list_as_CRSargs <- function(x, ...) {
 #' @rdname fm_CRSargs
 #' @export
 fm_CRSargs_as_list <- function(x, ...) {
-  fm_not_for_PROJ6("fm_CRSargs_as_list")
+  fm_not_for_PROJ6()
 
   if (is.na(x)) {
     return(list())
