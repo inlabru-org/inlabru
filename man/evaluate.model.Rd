@@ -2,7 +2,6 @@
 % Please edit documentation in R/model.R
 \name{evaluate.model}
 \alias{evaluate.model}
-\alias{evaluate}
 \title{Evaluate or sample from a posterior result given a model and locations}
 \usage{
 \method{evaluate}{model}(
@@ -17,9 +16,9 @@
 )
 }
 \arguments{
-\item{model}{An \link{inlabru} \link{model}}
+\item{model}{An \link{bru} model}
 
-\item{result}{Posterior of an \link{inla}, \link{bru} or \link{lgcp} run.}
+\item{result}{Posterior of an \link{bru} or \link{lgcp} run.}
 
 \item{data}{Locations and covariates needed to evaluate the model.}
 
@@ -29,6 +28,12 @@
 Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).}
 
 \item{n}{Number of samples to draw.}
+
+\item{seed}{If seed != 0L, the random seed}
+
+\item{num.threads}{Specification of desired number of threads for parallel
+computations. Default NULL, leaves it up to INLA.
+When seed != 0, overridden to "1:1"}
 }
 \description{
 Evaluate or sample from a posterior result given a model and locations

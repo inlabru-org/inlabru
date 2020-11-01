@@ -9,3 +9,4 @@
 ^vignettes/web$
 ^codecov\.yml$
 ^\.github$
+^tmp/

@@ -138,7 +138,6 @@ bru <- function(components = y ~ Intercept,
 #'   the predictor used in the optimization.
 #' @param data Likelihood-specific data, as a `data.frame` or `SpatialPoints[DataFrame]`
 #'   object.
-#' @param components Components.
 #' @param mesh An inla.mesh object.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
@@ -403,8 +402,8 @@ bru.options <- function(mesh = NULL,
 #' @aliases lgcp
 #' @export
 #' @param components A formula describing the latent components
-#' @param data A data frame or SpatialPoints[DataFrame] object
-#' @param samplers A data frame or Spatial[Points/Lines/Polygons]DataFrame objects
+#' @param data A data frame or `SpatialPoints(DataFrame)` object
+#' @param samplers A data frame or `Spatial[Points/Lines/Polygons]DataFrame` objects
 #' @param domain Named list of domain definitions
 #' @param ips Integration points (overrides `samplers`)
 #' @param formula If NULL, the linear combination implied by the `components` is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.

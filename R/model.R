@@ -109,19 +109,18 @@ make.model <- function(components, lhoods) {
 
 #' Evaluate or sample from a posterior result given a model and locations
 #'
-#' @aliases evaluate.model evaluate
 #' @export
-#' @param model An [inlabru] [model]
-#' @param result Posterior of an [inla], [bru] or [lgcp] run.
+#' @param model An [bru] model
+#' @param result Posterior of an [bru] or [lgcp] run.
 #' @param data Locations and covariates needed to evaluate the model.
 #' @param predictor A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (`NULL`) returns a `data.frame` containing the sampled effects. In case of a formula the right hand side is used for evaluation.
 #' @param property Property of the model components to obtain value from.
 #' Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see `n` parameter).
 #' @param n Number of samples to draw.
-# @param seed If seed != 0L, the random seed
-# @param num.threads Specification of desired number of threads for parallel
-# computations. Default NULL, leaves it up to INLA.
-# When seed != 0, overridden to "1:1"
+#' @param seed If seed != 0L, the random seed
+#' @param num.threads Specification of desired number of threads for parallel
+#' computations. Default NULL, leaves it up to INLA.
+#' When seed != 0, overridden to "1:1"
 #' 
 #' @keywords internal
 evaluate.model <- function(model,

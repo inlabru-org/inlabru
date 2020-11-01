@@ -18,8 +18,8 @@
 #' @param observations A vector of observed values
 #' @param breaks A vector of bin boundaries
 #' @param nint Number of integration points per bin. Increase this if the bins are wide and
-#' @param probs numeric vector of probabilities with values in [0,1]
-#' @param ... arguments passed on to [predict]
+#' @param probs numeric vector of probabilities with values in `[0,1]`
+#' @param \dots arguments passed on to [predict.bru]
 #' @return An `data.frame` with a ggplot attribute `ggp`
 #'
 #' @examples

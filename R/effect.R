@@ -5,18 +5,27 @@
 value <- function(...) {
   UseMethod("value")
 }
+#' Construct A-matrix
+#'
+#' Constructs the A-matrix for components and data
 #' @export
-#' @rdname amatrix_eval.component
+#' @rdname amatrix_eval
 amatrix_eval <- function(...) {
   UseMethod("amatrix_eval")
 }
+#' Obtain covariate values
+#'
 #' @export
-#' @rdname input_eval.component
+#' @rdname input_eval
 input_eval <- function(...) {
   UseMethod("input_eval")
 }
+#' Obtain indices
+#'
+#' Indexes into to the components
+#'
 #' @export
-#' @rdname index_eval.component
+#' @rdname index_eval
 index_eval <- function(...) {
   UseMethod("index_eval")
 }
@@ -62,10 +71,8 @@ component <- function(object, ...) {
 }
 
 
-#' @aliases component.character
 #' @family component constructors
 #' @export
-#' @method component character
 #' @param main = NULL
 #' main takes an R expression that evaluates to where the latent variables should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 #'   Arguments starting with weights, group, replicate behave similarly to main, but for the corresponding features of `INLA::f()`.
@@ -424,7 +431,8 @@ component.character <- function(object,
 #'
 #' \itemize{\item{`predict(fit, NULL, ~ exp(psi))`.}}
 #'
-#' @aliases component.formula
+#' @param lhoods TODO: document
+#' @param envir TODO: document
 #' @export
 #' @family component constructors
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
@@ -845,7 +853,6 @@ code.components <- function(components, add = "") {
 
 #' Summarize an component
 #'
-#' @aliases summary.component
 #' @export
 #' @method summary component
 #' @keywords internal
@@ -871,9 +878,7 @@ summary.component <- function(object, ...) {
 
 #' Print the summary of an component
 #'
-#' @aliases print.summary.component
 #' @export
-#' @method print summary.component
 #' @keywords internal
 #' @param x A 'summary.component' object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
@@ -897,9 +902,7 @@ print.summary.component <- function(x, ...) {
 #'
 #' TODO: Improve speed for iterated calls by making 'mapped' a parameter
 #'
-#' @aliases value.component
 #' @export
-#' @method value component
 #' @keywords internal
 #' @param component An component.
 #' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
@@ -955,20 +958,14 @@ value.component <- function(component, data, state, A = NULL, ...) {
 
 
 
-#' Construct A-matrix
-#'
-#' Constructs the A-matrix for a given component and and some data
-#'
-#' @aliases amatrix_eval.component
 #' @export
-#' @method amatrix_eval component
 #' @keywords internal
 #' @param component An component.
 #' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
 #' @param ... Unused.
 #' @return An A-matrix.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
+#' @rdname amatrix_eval
 
 amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
   ## TODO: Check for offset component
@@ -1038,20 +1035,14 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
 
 
 
-#' Construct A-matrix
-#'
-#' Constructs the A-matrix for a given component and and some data
-#'
-#' @aliases amatrix_eval.component
 #' @export
-#' @method amatrix_eval component
 #' @keywords internal
 #' @param component An component.
 #' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
 #' @param ... Unused.
 #' @return An A-matrix.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
+#' @rdname amatrix_eval
 
 amatrix_eval.component <- function(component, data, ...) {
   ## TODO: Check for offset component
@@ -1073,13 +1064,12 @@ amatrix_eval.component <- function(component, data, ...) {
 }
 
 #' @export
+#' @rdname amatrix_eval
 
 amatrix_eval.component_list <- function(components, data, ...) {
   lapply(components, function(x) amatrix_eval(x, data = data, ...))
 }
 
-#' Obtain covariate
-#'
 #' @section Simple covariates and the map parameter:
 #'
 #' It is not unusual for a random effect act on a transformation of a covariate. In other frameworks this
@@ -1138,9 +1128,7 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #'
 #' \itemize{\item{`components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))`.}}
 #'
-#' @aliases input_eval.component
 #' @export
-#' @method input_eval component
 #' @keywords internal
 #' @param component An component.
 #' @param part The input part to evaluate; `'main'`, `'group'`,
@@ -1149,7 +1137,7 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #' @param ... Unused.
 #' @return An vector or a coordinate matrix
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
+#' @rdname input_eval
 
 input_eval.component <- function(component,
                                  part = c("main", "group", "replicate", "weights"),
@@ -1167,6 +1155,7 @@ input_eval.component <- function(component,
 }
 
 #' @export
+#' @rdname input_eval
 
 input_eval.component_list <-
   function(components,
@@ -1182,7 +1171,8 @@ input_eval.component_list <-
 
 
 
-
+#' @export
+#' @rdname input_eval
 
 input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
                                  null.on.fail = FALSE, ...) {
@@ -1329,20 +1319,14 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 
 
 
-#' Obtain indices
-#'
-#' Indexes into to the components
-#'
-#' @aliases index_eval.component
 #' @export
-#' @method index_eval component
 #' @keywords internal
 #' @param component An component.
 #' @param ... Unused.
 #' @return a list of indices into the components latent variables
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com},
 #'   Finn Lindgren \email{finn.lindgren@@gmail.com}
-#'
+#' @rdname index_eval
 
 index_eval.component <- function(component, ...) {
   g.n <-
@@ -1372,6 +1356,7 @@ index_eval.component <- function(component, ...) {
 
 
 #' @export
+#' @rdname index_eval
 
 index_eval.component_list <- function(components, ...) {
   lapply(components, function(x) index_eval(x, ...))

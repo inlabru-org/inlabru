@@ -13,11 +13,11 @@
 
 \item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.}
 
-\item{alpha}{The ribbons numeric alpha level in \link{0,1}.}
+\item{alpha}{The ribbons numeric alpha level in \verb{[0,1]}.}
 
 \item{bar}{If TRUE plot boxplot-style summary for each variable.}
 
-\item{...}{Arguments passed on to \link{geom_line}.}
+\item{\dots}{Arguments passed on to \link{geom_line}.}
 }
 \value{
 Concatenation of a \link{geom_line} value and optionally a \link{geom_ribbon} value.

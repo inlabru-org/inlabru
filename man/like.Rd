@@ -60,8 +60,6 @@ any components from the inclusion list)
 on the \code{include} parameter).}
 
 \item{options}{list of global options overriding \link{bru.options}}
-
-\item{components}{Components.}
 }
 \value{
 A likelihood configuration which can be used to parameterize \link{bru}.

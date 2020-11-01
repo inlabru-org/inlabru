@@ -97,6 +97,10 @@ Likely doesn't work at the moment, and I've found no examples that use it.}
 \item{mesh}{Deprecated. Use \code{mapper} instead.}
 
 \item{envir_extra}{TODO: check/fix this parameter.}
+
+\item{lhoods}{TODO: document}
+
+\item{envir}{TODO: document}
 }
 \description{
 Similar to \code{glm()}, \code{gam()} and \code{inla()}, \link{bru} models can be constructed via

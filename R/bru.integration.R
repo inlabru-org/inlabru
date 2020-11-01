@@ -377,7 +377,7 @@ ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL,
         domain[["coordinates"]] <-
           INLA::inla.mesh.2d(loc.domain = coordinates(data),
                              max.edge = diff(range(coordinates(data)[, 1])) / 10)
-        domain[["coordinates"]]$crs <- fmsp_get_crs(data)
+        domain[["coordinates"]]$crs <- fm_sp_get_crs(data)
       } else {
         domain[[nm]] <- range(data[[nm]])
       }
