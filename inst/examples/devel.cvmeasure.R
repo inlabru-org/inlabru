@@ -10,18 +10,19 @@ data("gorillas", package = "inlabru")
 library(RColorBrewer)
 
 # Fit a model with two components:
-# 1) A spatial smoothe SPDE 
+# 1) A spatial smooth SPDE 
 # 2) A spatial covariate effect (vegetation)
 
 pcmatern <- inla.spde2.pcmatern(gorillas$mesh, 
                                 prior.sigma = c(0.1, 0.01), 
                                 prior.range = c(5, 0.01))
 
-cmp <- coordinates ~ vegetation(map = gorillas$gcov$vegetation, model = "factor") +
-  spde(map = coordinates, model = pcmatern) -
+cmp <- coordinates ~ vegetation(gorillas$gcov$vegetation, model = "factor") +
+  spde(coordinates, model = pcmatern) -
   Intercept
 
-fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
+            domain = list(coordinates = gorillas$mesh))
 
 # Predict SPDE and vegetation at the mesh vertex locations
 

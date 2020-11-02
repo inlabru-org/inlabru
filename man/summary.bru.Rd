@@ -34,8 +34,8 @@ if (require("INLA", quietly = TRUE)) {
   
 # Alternatively, we can use the like() function to construct the likelihood:
 
-lik = like(family = "gaussian", data = input.df)
-fit <- bru(y ~ x + Intercept, lik)
+lik = like(family = "gaussian", formula = y ~ x + Intercept, data = input.df)
+fit <- bru(~ x + Intercept(1), lik)
 fit$summary.fixed
 
 }
@@ -48,7 +48,8 @@ if (require("INLA", quietly = TRUE)) {
     
 z = 2
 input.df <- within(input.df, y <- 5 + exp(z)*x + rnorm(10, mean=0, sd=0.1))
-lik = like(family = "gaussian", data = input.df, formula = y ~ exp(z)*x + Intercept, E = 10000)
+lik = like(family = "gaussian", data = input.df,
+           formula = y ~ exp(z)*x + Intercept, E = 10000)
 fit <- bru( ~ z + Intercept, lik)
 
 # Check the result (z posterior should be around 2)
