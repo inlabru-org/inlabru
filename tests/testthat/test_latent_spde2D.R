@@ -63,4 +63,5 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
     data$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
     c(0.9502163, 1.1058397, 0.6451496), midtol
   )
+  expect_error(spde.posterior(data$fit, "mySmooth", what = "range"), NA)
 })
