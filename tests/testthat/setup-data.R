@@ -23,8 +23,9 @@ basic_fixed_effect_testdata <- function() {
 }
 
 
-gorillas_update_CRS <- function(gorillas) {
-  if (inla.has_PROJ6()) {
+gorillas_update_CRS <- function(gorillas, force = FALSE) {
+  # Data object has already been updated.
+  if (force && inla.has_PROJ6()) {
     gorillas$nests <- rebuild_CRS(gorillas$nests)
     gorillas$boundary <- rebuild_CRS(gorillas$boundary)
     gorillas$mesh$crs <- rebuild_CRS(gorillas$mesh$crs)
@@ -37,7 +38,7 @@ gorillas_update_CRS <- function(gorillas) {
     crs <- sp::CRS(SRS_string = wkt(gorillas$mesh$crs))
     gorillas$nests <- spTransform(gorillas$nests, crs)
     gorillas$boundary <- spTransform(gorillas$boundary, crs)
-    gorillas$mesh <- inla.spTransform(gorillas$mesh, crs)
+    gorillas$mesh <- fm_spTransform(gorillas$mesh, crs)
     for (name in names(gorillas$gcov)) {
       gorillas$gcov[[name]] <-
         SpatialPixelsDataFrame(coordinates(gorillas$gcov[[name]]),
