@@ -55,17 +55,22 @@ This is a basic example which shows you how fit a simple spatial Log
 Gaussian Cox Process (LGCP) and predicts its intensity:
 
 ``` r
-if (interactive()) {
 # Load libraries
+options("rgdal_show_exportToProj4_warnings"="none")
 library(inlabru)
+#> Loading required package: ggplot2
+#> Loading required package: sp
 library(INLA)
+#> Loading required package: Matrix
+#> Loading required package: parallel
+#> Loading required package: foreach
+#> This is INLA_99.99.9999 built 2020-10-28 14:12:33 UTC.
+#>  - See www.r-inla.org/contact-us for how to get help.
+#>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
 
 # Load the data
 data(gorillas, package = "inlabru")
-# If you have PROJ6/GDAL3, you will here need to update the CRS information;
-# see separate function below
-gorillas <- gorillas_update_CRS(gorillas)
 
 # Construct latent model components
 matern <- inla.spde2.pcmatern(gorillas$mesh, 
@@ -80,6 +85,7 @@ fit <- lgcp(cmp,
             samplers = gorillas$boundary,
             domain = list(coordinates = gorillas$mesh),
             options = list(control.inla = list(int.strategy = "eb")))
+#> TODO: Ensure spatial input objects use the same CRS
 
 # Predict Gorilla nest intensity
 lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
@@ -88,27 +94,12 @@ lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
 ggplot() + 
   gg(lambda) +
   gg(gorillas$nests, color = "red", size = 0.2) +
-  coord_equal()
-}
+  coord_equal() +
+  ggtitle("Nest intensity per km squared")
 ```
 
-If you have an R installation with PROJ6/GDAL3 and INLA \>= 20.06.18,
-you will need to update the CRS information in the gorillas data after
-reading it in:
-
-``` r
-gorillas_update_CRS <- function(gorillas) {
-  if (inla.has_PROJ6()) {
-    gorillas$nests <- rebuild_CRS(gorillas$nests)
-    gorillas$boundary <- rebuild_CRS(gorillas$boundary)
-    gorillas$mesh$crs <- rebuild_CRS(gorillas$mesh$crs)
-    for (name in names(gorillas$gcov)) {
-      gorillas$gcov[[name]] <- rebuild_CRS(gorillas$gcov[[name]])
-    }
-    for (name in names(gorillas$plotsample)) {
-      gorillas$plotsample[[name]] <- rebuild_CRS(gorillas$plotsample[[name]])
-    }
-  }
-  gorillas
-}
-```
+<img src="man/figures/README-example-1.png" width="100%" /> If you have
+an R installation with PROJ6/GDAL3, and INLA \>= 20.06.18, and loading
+old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
+method on them before they are fully usable. The `gorillas` object in
+inlabru has been updated, but not yet the other stored data sets.
