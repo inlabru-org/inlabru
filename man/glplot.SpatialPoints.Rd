@@ -21,7 +21,8 @@ and use rgl.points() in order to render them.
 }
 \examples{
 \donttest{
-if (require("rgl", quietly = TRUE) &&
+if (bru_safe_inla() &&
+    require("rgl", quietly = TRUE) &&
     require("sphereplot", quietly = TRUE)) {
 
 # Load pantropoical dolphin data

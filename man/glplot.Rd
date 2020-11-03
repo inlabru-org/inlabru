@@ -17,7 +17,8 @@ and inla.mesh objects. The function invokes particular methods which depend on t
 }
 \examples{
 \donttest{
-if (require("rgl", quietly = TRUE) &&
+if (bru_safe_inla() &&
+    require("rgl", quietly = TRUE) &&
     require("sphereplot", quietly = TRUE)) {
 
 # Load pantropoical dolphin data

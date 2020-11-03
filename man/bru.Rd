@@ -48,7 +48,7 @@ available by using the \code{cp} family or (even easier) by using the
 }
 \examples{
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
 
 # Simulate some covariates x and observations y
 input.df <- data.frame(x=cos(1:10))
@@ -62,7 +62,7 @@ fit$summary.fixed
 }
 
   
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
   
 # Alternatively, we can use the like() function to construct the likelihood:
 
@@ -76,7 +76,7 @@ fit$summary.fixed
 # non-linear predictors. Such a predictor can be formulated via like()'s 
 # \code{formula} parameter. For instance
 
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
     
 z = 2
 input.df <- within(input.df, y <- 5 + exp(z)*x + rnorm(10, mean=0, sd=0.1))

@@ -1,5 +1,5 @@
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
   
 # The like function's main purpose is to set up models with multiple likelihoods. 
 # The following example generates some random covariates which are observed through

@@ -1,5 +1,5 @@
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
   
 # Load Gorilla data
 
@@ -13,9 +13,9 @@ library(RColorBrewer)
 # 1) A spatial smooth SPDE 
 # 2) A spatial covariate effect (vegetation)
 
-pcmatern <- inla.spde2.pcmatern(gorillas$mesh, 
-                                prior.sigma = c(0.1, 0.01), 
-                                prior.range = c(5, 0.01))
+  pcmatern <- INLA::inla.spde2.pcmatern(gorillas$mesh, 
+                                        prior.sigma = c(0.1, 0.01), 
+                                        prior.range = c(5, 0.01))
 
 cmp <- coordinates ~ vegetation(gorillas$gcov$vegetation, model = "factor") +
   spde(coordinates, model = pcmatern) -
