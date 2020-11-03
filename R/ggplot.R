@@ -483,7 +483,7 @@ gg.SpatialPixelsDataFrame <- function(data,
 #'
 #' # Load Gorilla data
 #'
-#' data(gorillas)
+#' data(gorillas, package = "inlabru")
 #'
 #' # Turn elevation covariate into SpatialPixels
 #' pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))

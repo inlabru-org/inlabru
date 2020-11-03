@@ -413,6 +413,7 @@ bru.options <- function(mesh = NULL,
 #' @examples
 #'
 #' \donttest{
+#' if (bru_safe_inla()) {
 #'
 #' # Load the Gorilla data
 #' data(gorillas, package = "inlabru")
@@ -424,9 +425,8 @@ bru.options <- function(mesh = NULL,
 #'   gg(gorillas$boundary) +
 #'   coord_fixed()
 #'
-#' if (require("INLA", quietly = TRUE)) {
 #'   # Define SPDE prior
-#'   matern <- inla.spde2.pcmatern(gorillas$mesh,
+#'   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
 #'     prior.sigma = c(0.1, 0.01),
 #'     prior.range = c(5, 0.01)
 #'   )
@@ -435,7 +435,8 @@ bru.options <- function(mesh = NULL,
 #'   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #'
 #'   # Fit the model
-#'   fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+#'   fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
+#'               domain = list(coordinates = gorillas$mesh))
 #'
 #'   # Predict the spatial intensity surface
 #'   lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))

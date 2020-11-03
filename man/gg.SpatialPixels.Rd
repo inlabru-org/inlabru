@@ -21,7 +21,7 @@ Uses \link{geom_point} to plot the pixel centers.
 
 # Load Gorilla data
 
-data(gorillas)
+data(gorillas, package = "inlabru")
 
 # Turn elevation covariate into SpatialPixels
 pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
