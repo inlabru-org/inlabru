@@ -1,8 +1,7 @@
 context("1D LGCP fitting and prediction (test_lgcp_1d.R)")
-library(INLA)
 
 test_data <- function() {
-  data(Poisson2_1D)
+  data(Poisson2_1D, package = "inlabru")
   x <- seq(0, 55, length = 50)
   mesh1D <- inla.mesh.1d(x, boundary = "free")
   matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150, 0.75),
@@ -20,6 +19,7 @@ test_data <- function() {
 
 test_that("1D LGCP fitting", {
   skip_on_cran()
+  skip_if_not(bru_safe_inla())
   
   result <- test_data()
   mesh1D <- result$mesh1D

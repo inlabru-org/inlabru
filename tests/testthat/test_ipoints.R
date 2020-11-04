@@ -30,7 +30,6 @@ test_that("conversion of 1D mesh to integration points", {
 test_that("conversion of SpatialPolygon to integration points", {
   disable_PROJ6_warnings()
   data(gorillas, package = "inlabru")
-  gorillas <- gorillas_update_CRS(gorillas)
   ips <- ipoints(gorillas$boundary)
 
   expect_is(ips, "SpatialPointsDataFrame")
@@ -42,7 +41,6 @@ test_that("conversion of SpatialPolygon to integration points", {
 test_that("conversion of SpatialPolygon to integration points when domain is defined via a mesh", {
   disable_PROJ6_warnings()
   data(gorillas, package = "inlabru")
-  gorillas <- gorillas_update_CRS(gorillas)
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
 
   expect_is(ips, "SpatialPointsDataFrame")
@@ -53,7 +51,6 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
 test_that("conversion of 2D mesh to integration points", {
   disable_PROJ6_warnings()
   data(gorillas, package = "inlabru")
-  gorillas <- gorillas_update_CRS(gorillas)
   ips <- ipoints(gorillas$mesh)
 
   expect_is(ips, "SpatialPointsDataFrame")

@@ -6,7 +6,7 @@ latent_spde2D_group_testdata <- function(num.threads = "1:1",
   set.seed(123)
 
   # Load and reduce data set
-  data(mrsea)
+  data(mrsea, package = "inlabru")
   mrsea <- mrsea_rebuild_CRS(mrsea, use_km = TRUE)
   mrsea$points <- mrsea$points[mrsea$points$season == 1 |
     mrsea$points$season == 2, ]
@@ -17,7 +17,7 @@ latent_spde2D_group_testdata <- function(num.threads = "1:1",
   ips <- ipoints(mrsea$samplers, domain = mrsea$mesh, group = "season")
 
   # Run the model
-  matern <- inla.spde2.pcmatern(mrsea$mesh,
+  matern <- INLA::inla.spde2.pcmatern(mrsea$mesh,
     prior.sigma = c(0.1, 0.01),
     prior.range = c(10, 0.01)
   )
@@ -48,7 +48,7 @@ latent_spde2D_group_testdata <- function(num.threads = "1:1",
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_on_cran()
   disable_PROJ6_warnings()
-  library(INLA)
+  skip_if_not(bru_safe_inla())
   data <- latent_spde2D_group_testdata(num.threads = "1:1", h = 0.005)
 
   # Check Intercept

@@ -1,7 +1,7 @@
 context("Latent models - 1D SPDE (test_latent_spde1D.R)")
 
 latent_spde1D_testdata <- function() {
-  data(Poisson2_1D)
+  data(Poisson2_1D, package = "inlabru")
   x <- seq(0, 55, length = 50)
   mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
 
@@ -29,7 +29,7 @@ fit <- bru(cmp,
 
 test_that("Latent models: SPDE 1D", {
   skip_on_cran()
-  library(INLA)
+  skip_if_not(bru_safe_inla())
   data <- latent_spde1D_testdata()
 
   # Check Intercept

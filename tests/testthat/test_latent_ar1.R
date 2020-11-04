@@ -68,7 +68,7 @@ cbind(
 
 test_that("Latent models: AR1 bru ordering", {
   skip_on_cran()
-  library(INLA)
+  skip_if_not(bru_safe_inla())
   data <- latent_ar1_testdata()
   
   # Check AR1

@@ -1,12 +1,11 @@
 context("2D LGCP fitting and prediction - Covariates (test_lgcp_2d_covars.R)")
-library(INLA)
 
 test_that("2D LGCP fitting", {
   disable_PROJ6_warnings()
+  skip_if_not(bru_safe_inla())
   
   # test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
   data(gorillas, package = "inlabru")
-  gorillas <- gorillas_update_CRS(gorillas)
 
   mdl <- coordinates ~ veg(main = gorillas$gcov$vegetation,
                            main_layer = "vegetation",
