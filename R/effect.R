@@ -1067,14 +1067,14 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
         i = which(ok),
         j = val[ok],
         x = rep(weights, sum(ok)),
-        dims = c(nrow(data), subcomp$n)
+        dims = c(NROW(data), subcomp$n)
       )
     } else {
       A <- Matrix::sparseMatrix(
         i = which(ok),
         j = val[ok],
         x = weights[ok],
-        dims = c(nrow(data), subcomp$n)
+        dims = c(NROW(data), subcomp$n)
       )
     }
   } else if (subcomp$model %in% c("linear", "clinear")) {
