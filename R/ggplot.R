@@ -18,10 +18,19 @@ pixelplot.mesh <- function(...) {
 #' @param ... Arguments passed on to get_map().
 #' @return a ggplot object
 #'
-#' @example inst/examples/gmap.R
+#' @examples
+#' \dontrun{
+#' # Load the Gorilla data
+#' data(gorillas, package = "inlabru")
+#' 
+#' # Create a base map centered around the nests and plot the boundary as well as the nests
+#' gmap(gorillas$nests, maptype = "satellite") + 
+#'   gm(gorillas$boundary) + 
+#'   gm(gorillas$nests, color = "white", size = 0.5)
+#' }
 
 gmap <- function(data, ...) {
-  data <- spTransform(data, CRS("+proj=longlat"))
+  data <- sp::spTransform(data, sp::CRS("+proj=longlat"))
   df <- cbind(coordinates(data), data@data)
 
   # Figure out a sensible bounding box (range of data plus 30%)

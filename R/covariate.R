@@ -65,8 +65,12 @@ covdata.import <- function(dframe, colname, data) {
 # @aliases plot.covdata
 # @export
 # @param covdata A covariate data set
-# @examples \\dontrun{data(sst); plot.covariate(sst, time = 1)}
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @examples
+# \dontrun{
+# data(sst, package = "inlabru")
+# plot.covariate(sst, time = 1)
+# }
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
 plot.covdata <- function(covdata, time = 1, fun = NULL, ...) {
   if (is.null(covdata$geometry)) {
