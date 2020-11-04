@@ -50,7 +50,7 @@ ggplot() + gg(xpost)
 # of multiple variables:
 
 xipost = predict(fit, data = NULL,
-                 formula = ~ rbind(Intercept, x))
+                 formula = ~ c(Intercept = Intercept, x = x))
 xipost
 
 # If we still want a plot in the previous style we have to set the bar parameter to TRUE
