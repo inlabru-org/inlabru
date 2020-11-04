@@ -21,9 +21,9 @@ dimension has no weights attached to it all weights are assumend to be 1.
 
 \donttest{
 # ipoints needs INLA
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
-  ips1 <- ipoints(c(0, 8), name = "myDim")
+  ips1 <- ipoints(c(0, 8), 17, name = "myDim")
   ips2 <- ipoints(as.integer(c(1, 2, 3)), name = "myDiscreteDim")
 
   # Calculate the cross product

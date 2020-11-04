@@ -320,9 +320,9 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
 #'
 #' \donttest{
 #' # ipoints needs INLA
-#' if (require("INLA", quietly = TRUE)) {
+#' if (bru_safe_inla()) {
 #'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
-#'   ips1 <- ipoints(c(0, 8), name = "myDim")
+#'   ips1 <- ipoints(c(0, 8), 17, name = "myDim")
 #'   ips2 <- ipoints(as.integer(c(1, 2, 3)), name = "myDiscreteDim")
 #'
 #'   # Calculate the cross product
