@@ -1,5 +1,5 @@
 iinla.env <- new.env()
-iinla.env$log <- sprintf("inlabru @ %s", date())
+iinla.env$log <- paste0(Sys.time(), ": inlabru start")
 
 .onAttach <- function(libname, pkgname) {
   iinla.env$log_active <- FALSE
@@ -64,22 +64,18 @@ init.tutorial <- function() {
 #'
 #' @description Retrieve, add, and/or print log messages
 #'
-#' @param txt character; log message. Default: NULL, to retrieve the log
+#' @param txt character; log message.
 #' @param verbose logical; if `TRUE`, print the log message on screen with
 #' `message(txt)`. Default: `iinla.getOptions("iinla.verbose")`
 #' @details The log message is stored if the log is active, see
 #' [bru_log_active()]
-#' @return If `txt` is `NULL`, returns the entire log. Otherwise, invisibly
-#' returns the log message.
+#' @return `bru_log` invisibly returns the added log message.
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and Finn Lindgren
 #' \email{finn.lindgren@@gmail.com}
 
-bru_log <- function(txt = NULL, verbose = NULL) {
-  if (is.null(txt)) {
-    return(sprintf(iinla.env$log))
-  }
+bru_log <- function(txt, verbose = NULL) {
   if (is.null(verbose)) {
     verbose <- iinla.getOption("iinla.verbose")
   }
@@ -94,14 +90,37 @@ bru_log <- function(txt = NULL, verbose = NULL) {
 }
 
 
-#' inlabru log activation
-#' 
-#' Query and set the log activation status for inlabru
+#' @param pretty logical; If `TRUE`, return a single string with the log
+#' messages separated and terminated by line feeds, suitable for `cat()`.
+#' If `FALSE`, return the raw log as a vector of strings. Default: `TRUE`
+#' @export
+#' @rdname bru_log
+
+bru_log_get <- function(pretty = TRUE) {
+  if (pretty) {
+    paste0(paste0(iinla.env$log, collapse = "\n"), "\n")
+  } else {
+    iinla.env
+  }
+}
+
+
 #' @param activation logical; whether to activate (`TRUE`) or deactivate
 #' (`FALSE`) the inlabru logging system. Default: NULL, to keep the current
 #' activation state
-#' @return Returns the previous activation state
+#' @return `bru_log_active` returns the previous activation state
 #' @export
+#' @examples
+#' code_runner <- function() {
+#'   oa <- bru_log_active(TRUE)
+#'   on.exit(bru_log_active(oa))
+#'   bru_log("Test message")
+#' }
+#' bru_log_active()
+#' code_runner()
+#' cat(bru_log_get())
+#' bru_log_active()
+#' @rdname bru_log
 
 bru_log_active <- function(activation = NULL) {
   current <- iinla.env$log_active
@@ -110,6 +129,14 @@ bru_log_active <- function(activation = NULL) {
     iinla.env$log_active <- activation
   }
   current
+}
+#' @details `bru_log_reset` clears the log
+#' @export
+#' @rdname bru_log
+
+bru_log_reset <- function() {
+  iinla.env$log <- paste0(Sys.time(), ": inlabru log reset")
+  invisible(iinla.env$log)
 }
 
 #' Merge defaults with overriding options

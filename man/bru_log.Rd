@@ -2,19 +2,37 @@
 % Please edit documentation in R/environment.R
 \name{bru_log}
 \alias{bru_log}
+\alias{bru_log_get}
+\alias{bru_log_active}
+\alias{bru_log_reset}
 \title{inlabru log messages}
 \usage{
-bru_log(txt = NULL, verbose = NULL)
+bru_log(txt, verbose = NULL)
+
+bru_log_get(pretty = TRUE)
+
+bru_log_active(activation = NULL)
+
+bru_log_reset()
 }
 \arguments{
-\item{txt}{character; log message. Default: NULL, to retrieve the log}
+\item{txt}{character; log message.}
 
 \item{verbose}{logical; if \code{TRUE}, print the log message on screen with
 \code{message(txt)}. Default: \code{iinla.getOptions("iinla.verbose")}}
+
+\item{pretty}{logical; If \code{TRUE}, return a single string with the log
+messages separated and terminated by line feeds, suitable for \code{cat()}.
+If \code{FALSE}, return the raw log as a vector of strings. Default: \code{TRUE}}
+
+\item{activation}{logical; whether to activate (\code{TRUE}) or deactivate
+(\code{FALSE}) the inlabru logging system. Default: NULL, to keep the current
+activation state}
 }
 \value{
-If \code{txt} is \code{NULL}, returns the entire log. Otherwise, invisibly
-returns the log message.
+\code{bru_log} invisibly returns the added log message.
+
+\code{bru_log_active} returns the previous activation state
 }
 \description{
 Retrieve, add, and/or print log messages
@@ -22,6 +40,19 @@ Retrieve, add, and/or print log messages
 \details{
 The log message is stored if the log is active, see
 \code{\link[=bru_log_active]{bru_log_active()}}
+
+\code{bru_log_reset} clears the log
+}
+\examples{
+code_runner <- function() {
+  oa <- bru_log_active(TRUE)
+  on.exit(bru_log_active(oa))
+  bru_log("Test message")
+}
+bru_log_active()
+code_runner()
+cat(bru_log_get())
+bru_log_active()
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com} and Finn Lindgren
