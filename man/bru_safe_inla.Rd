@@ -28,4 +28,5 @@ if (bru_safe_inla()) {
   # Run inla dependent calculations
 }
 }
+
 }

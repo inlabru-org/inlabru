@@ -27,7 +27,8 @@ data(gorillas, package = "inlabru")
 pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
 
 # Plot the pixel centers
-ggplot() + gg(pxl, size = 0.1)
+ggplot() +
+  gg(pxl, size = 0.1)
 }
 \seealso{
 Other geomes for spatial data: 

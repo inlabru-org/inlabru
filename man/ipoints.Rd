@@ -79,19 +79,26 @@ if (require("INLA", quietly = TRUE)) {
 
   data(gorillas, package = "inlabru")
   ips <- ipoints(gorillas$boundary)
-  ggplot() + gg(gorillas$boundary) + gg(ips, aes(size = weight))
+  ggplot() +
+    gg(gorillas$boundary) +
+    gg(ips, aes(size = weight))
 
 
   #' Project integration points to mesh vertices
 
   ips <- ipoints(gorillas$boundary, domain = gorillas$mesh)
-  ggplot() + gg(gorillas$mesh) + gg(gorillas$boundary) + gg(ips, aes(size = weight))
+  ggplot() +
+    gg(gorillas$mesh) +
+    gg(gorillas$boundary) +
+    gg(ips, aes(size = weight))
 
 
   # Turn a 2D mesh into integration points
 
   ips <- ipoints(gorillas$mesh)
-  ggplot() + gg(gorillas$boundary) + gg(ips, aes(size = weight))
+  ggplot() +
+    gg(gorillas$boundary) +
+    gg(ips, aes(size = weight))
 }
 }
 

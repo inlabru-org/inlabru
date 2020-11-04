@@ -48,7 +48,8 @@ spl <- sline(lns,
 )
 
 # Plot the lines
-ggplot() + gg(spl)
+ggplot() +
+  gg(spl)
 }
 
 }

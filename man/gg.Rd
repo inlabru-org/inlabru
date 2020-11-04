@@ -27,7 +27,9 @@ data(gorillas, package = "inlabru")
 
 # Invoke ggplot and add geomes for the Gorilla nests and the survey boundary
 
-ggplot() + gg(gorillas$boundary) + gg(gorillas$nests)
+ggplot() +
+  gg(gorillas$boundary) +
+  gg(gorillas$nests)
 }
 \seealso{
 Other geomes for inla and inlabru predictions: 

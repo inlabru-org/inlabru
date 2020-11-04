@@ -2,6 +2,7 @@ iinla.env <- new.env()
 iinla.env$log <- sprintf("inlabru @ %s", date())
 
 .onAttach <- function(libname, pkgname) {
+  iinla.env$log_active <- FALSE
   if (length(find.package("INLA", quiet = TRUE)) == 0) {
     iinla.env$inla.installed <- FALSE
   } else {
@@ -59,29 +60,56 @@ init.tutorial <- function() {
   iinla.setOption("control.compute", list(list(config = TRUE, dic = TRUE, waic = TRUE)))
 }
 
-# @title Print inlabru log
-#
-# @description Print inlabru log
-#
-# @aliases bru.log
-# @export
-#
-# @author Fabian E. Bachl <\email{bachlfab@@gmail.com}>
-#
+#' @title inlabru log messages
+#'
+#' @description Retrieve, add, and/or print log messages
+#'
+#' @param txt character; log message. Default: NULL, to retrieve the log
+#' @param verbose logical; if `TRUE`, print the log message on screen with
+#' `message(txt)`. Default: `iinla.getOptions("iinla.verbose")`
+#' @details The log message is stored if the log is active, see
+#' [bru_log_active()]
+#' @return If `txt` is `NULL`, returns the entire log. Otherwise, invisibly
+#' returns the log message.
+#' @export
+#'
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and Finn Lindgren
+#' \email{finn.lindgren@@gmail.com}
 
-bru.log <- function() {
-  sprintf(iinla.env$log)
-}
-
-msg <- function(txt) {
-  if (iinla.getOption("iinla.verbose")) {
-    cat(paste0(txt, "\n"))
+bru_log <- function(txt = NULL, verbose = NULL) {
+  if (is.null(txt)) {
+    return(sprintf(iinla.env$log))
   }
-  logentry(txt)
+  if (is.null(verbose)) {
+    verbose <- iinla.getOption("iinla.verbose")
+  }
+  if (isTRUE(verbose)) {
+    message(txt)
+  }
+  msg <- paste0(Sys.time(), ": ", txt)
+  if (iinla.env$log_active) {
+    iinla.env$log <- c(iinla.env$log, msg)
+  }
+  invisible(msg)
 }
 
-logentry <- function(txt) {
-  iinla.env$log <- c(iinla.env$log, paste0(Sys.time(), ": ", txt))
+
+#' inlabru log activation
+#' 
+#' Query and set the log activation status for inlabru
+#' @param activation logical; whether to activate (`TRUE`) or deactivate
+#' (`FALSE`) the inlabru logging system. Default: NULL, to keep the current
+#' activation state
+#' @return Returns the previous activation state
+#' @export
+
+bru_log_active <- function(activation = NULL) {
+  current <- iinla.env$log_active
+  if (!is.null(activation)) {
+    stopifnot(is.logical(activation))
+    iinla.env$log_active <- activation
+  }
+  current
 }
 
 #' Merge defaults with overriding options

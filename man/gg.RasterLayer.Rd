@@ -37,7 +37,8 @@ if (require("spatstat.data", quietly = TRUE) &&
 
   # Plot the elevation
 
-  ggplot() + gg(elev)
+  ggplot() +
+    gg(elev)
 }
 }
 \seealso{

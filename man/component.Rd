@@ -186,10 +186,12 @@ if (require("INLA", quietly = TRUE)) {
 
   # A more complicated component:
   eff <- component("myEffectOfX",
-                   main = x,
-                   model = inla.spde2.matern(inla.mesh.1d(1:10)))
+    main = x,
+    model = inla.spde2.matern(inla.mesh.1d(1:10))
+  )
 }
 }
+
 # As an example, let us create a linear component. Here, the component is
 # called "myLinearEffectOfX" while the covariate the component acts on is
 # called "x". Note that a list of components is returned because the

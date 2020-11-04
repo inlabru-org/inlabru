@@ -983,10 +983,8 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
       inla.options[["control.mode"]]$theta <- result$mode$theta
     }
 
-    # Verbose
-    if (iinla.verbose) {
-      cat(paste0("iinla() iteration"), k, "[ max:", n, "].")
-    }
+    bru_log(paste0("iinla: Iteration ", k, "[ max:", n, "]"),
+            iinla.verbose)
 
     # Return previous result if inla crashes, e.g. when connection to server is lost
     if (k > 1) {
@@ -1029,25 +1027,26 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
     eval(icall)
 
     if (is.character(result)) {
-      stop(paste0("INLA returned message: ", result))
+      bru_log(paste0("iinla: INLA returned message: ", result))
+      stop(paste0("iinla: INLA returned message: ", result))
     }
 
     n.retry <- 0
     max.retry <- 10
     while ((is.null(result) | length(result) == 5) & (n.retry <= max.retry)) {
-      msg("INLA crashed or returned NULL. Waiting for 60 seconds and trying again.")
+      bru_log("iinla: INLA crashed or returned NULL. Waiting for 60 seconds and trying again.",
+              iinla.verbose)
       Sys.sleep(60)
       eval(icall)
       n.retry <- n.retry + 1
     }
     if ((is.null(result) | length(result) == 5)) {
-      msg(sprintf("The computation failed %d times. Giving up and returning last successfully obtained result.", n.retry - 1))
+      bru_log(sprintf("iinla: The computation failed %d times. Giving up and returning last successfully obtained result.", n.retry - 1),
+              iinla.verbose)
       return(old.result)
     }
 
-    if (iinla.verbose) {
-      cat(" Done. ")
-    }
+    bru_log("iinla: Done. ", iinla.verbose)
 
     # Extract values tracked for estimating convergence
     if (n > 1 & k <= n) {
@@ -1098,15 +1097,13 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
       ##                           as.factor(do.call(rbind, track)$effect),
       ##                           identity),
       ##                        function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
-      if (iinla.verbose) {
-        cat(paste0("Max deviation from previous: ", signif(100 * max(dev), 3), "% of SD [stop if: <", 100 * max.dev, "%]\n"))
-      }
+      bru_log(paste0("iinla: Max deviation from previous: ", signif(100 * max(dev), 3), "% of SD [stop if: <", 100 * max.dev, "%]"),
+              iinla.verbose)
       interrupt <- all(dev < max.dev)
-      if (interrupt && iinla.verbose) {
-        cat("Convergence criterion met, stopping INLA iteration.")
+      if (interrupt) {
+        bru_log("iinla: Convergence criterion met, stopping INLA iteration.",
+                iinla.verbose)
       }
-    } else {
-      cat("\n")
     }
     k <- k + 1
   }

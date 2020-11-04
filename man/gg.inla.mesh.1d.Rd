@@ -39,11 +39,13 @@ if (require("INLA", quietly = TRUE)) {
 
   # Plot it
 
-  ggplot() + gg(mesh)
+  ggplot() +
+    gg(mesh)
 
   # Plot it using a different shape and size for the mesh nodes
 
-  ggplot() + gg(mesh, shape = "|", size = 5)
+  ggplot() +
+    gg(mesh, shape = "|", size = 5)
 }
 }
 

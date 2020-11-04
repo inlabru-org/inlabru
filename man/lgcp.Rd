@@ -53,15 +53,15 @@ assumed that all of the LGCP's dimensions have been observed completely.
 \donttest{
 if (bru_safe_inla()) {
 
-# Load the Gorilla data
-data(gorillas, package = "inlabru")
+  # Load the Gorilla data
+  data(gorillas, package = "inlabru")
 
-# Plot the Gorilla nests, the mesh and the survey boundary
-ggplot() +
-  gg(gorillas$mesh) +
-  gg(gorillas$nests) +
-  gg(gorillas$boundary) +
-  coord_fixed()
+  # Plot the Gorilla nests, the mesh and the survey boundary
+  ggplot() +
+    gg(gorillas$mesh) +
+    gg(gorillas$nests) +
+    gg(gorillas$boundary) +
+    coord_fixed()
 
   # Define SPDE prior
   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
@@ -73,8 +73,10 @@ ggplot() +
   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 
   # Fit the model
-  fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
-              domain = list(coordinates = gorillas$mesh))
+  fit <- lgcp(cmp, gorillas$nests,
+    samplers = gorillas$boundary,
+    domain = list(coordinates = gorillas$mesh)
+  )
 
   # Predict the spatial intensity surface
   lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))

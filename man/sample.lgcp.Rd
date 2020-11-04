@@ -91,7 +91,9 @@ if (require("INLA", quietly = TRUE)) {
     loglambda = 1.5,
     samplers = gorillas$boundary
   )
-  ggplot() + gg(gorillas$mesh) + gg(pts)
+  ggplot() +
+    gg(gorillas$mesh) +
+    gg(pts)
 }
 }
 

@@ -29,7 +29,11 @@ Data imported from package MRSea, see \url{http://creem2.st-andrews.ac.uk/softwa
 }
 \examples{
 data(mrsea)
-ggplot() + gg(mrsea$mesh) + gg(mrsea$samplers) + gg(mrsea$points) + gg(mrsea$boundary)
+ggplot() +
+  gg(mrsea$mesh) +
+  gg(mrsea$samplers) +
+  gg(mrsea$points) +
+  gg(mrsea$boundary)
 }
 \references{
 NONE YET

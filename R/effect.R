@@ -742,8 +742,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
 
 
 # Defines a default mapper given the type of model and parameters provided
-# Checks subcomp$mapper, model$mesh (for spde models), mapping$values,
-# input_values or mapping$n, in that order.
+# Checks subcomp$mapper, subcomp$model$mesh (for spde models), subcomp$values,
+# input_values or subcomp$n, in that order.
 make_mapper <- function(subcomp,
                         label,
                         input_values = NULL,
@@ -766,8 +766,12 @@ make_mapper <- function(subcomp,
       subcomp$n <- subcomp[["mapper"]]$n
       subcomp$values <- seq_len(subcomp$n)
     } else if (inherits(subcomp[["mapper"]], "bru_mapper_factor")) {
-      subcomp$n <- subcomp[["mapper"]]$n
-      subcomp$values <- seq_len(subcomp$n)
+      if (identical(subcomp[["mapper"]]$factor_mapping, "contrast")) {
+        subcomp[["values"]] <- subcomp[["mapper"]][["levels"]][-1L]
+      } else {
+        subcomp[["values"]] <- subcomp[["mapper"]][["levels"]]
+      }
+      subcomp$n <- length(subcomp[["values"]])
     } else {
       stop(paste0(
         "Unknown mapper of type '",

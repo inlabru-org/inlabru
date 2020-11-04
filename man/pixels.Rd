@@ -25,7 +25,9 @@ Generate \code{SpatialPixels} covering an \code{inla.mesh}
 \donttest{
 data("mrsea")
 pxl <- pixels(mrsea$mesh, nx = 50, ny = 50)
-ggplot() + gg(pxl) + gg(mrsea$mesh)
+ggplot() +
+  gg(pxl) +
+  gg(mrsea$mesh)
 }
 
 }
