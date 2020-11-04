@@ -115,7 +115,8 @@ bincount <- function(result, predictor, observations, breaks, nint = 20, probs =
   )
   pint$inside <- (pint$counts >= pint[[miname]]) & (pint$counts <= pint[[mxname]])
 
-  ggp <- ggplot() + geom_crossbar(data = pint, mapping = aes_string(x = "mid", y = mdname, ymin = miname, ymax = mxname, fill = "inside", color = "inside"), show.legend = FALSE) +
+  ggp <- ggplot() +
+    geom_crossbar(data = pint, mapping = aes_string(x = "mid", y = mdname, ymin = miname, ymax = mxname, fill = "inside", color = "inside"), show.legend = FALSE) +
     geom_point(data = pint, mapping = aes_string(x = "mid", y = mdname), shape = 95, size = 3, color = "blue") +
     geom_point(data = pint, mapping = aes_string(x = "mid", y = "counts"), shape = 20, size = 2) +
     xlab(all.vars(update.formula(predictor, ~.0))) +

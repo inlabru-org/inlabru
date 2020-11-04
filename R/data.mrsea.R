@@ -26,7 +26,11 @@
 #'
 #' @examples
 #' data(mrsea)
-#' ggplot() + gg(mrsea$mesh) + gg(mrsea$samplers) + gg(mrsea$points) + gg(mrsea$boundary)
+#' ggplot() +
+#'   gg(mrsea$mesh) +
+#'   gg(mrsea$samplers) +
+#'   gg(mrsea$points) +
+#'   gg(mrsea$boundary)
 NULL
 
 #' MRSea data import

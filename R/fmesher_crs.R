@@ -1555,9 +1555,9 @@ fm_spTransform.SpatialPoints <- function(x, CRSobj, passthrough = FALSE, ...) {
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.SpatialPointsDataFrame <- function(x,
-                                                    CRSobj,
-                                                    passthrough = FALSE,
-                                                    ...) {
+                                                  CRSobj,
+                                                  passthrough = FALSE,
+                                                  ...) {
   fm_requires_PROJ6()
 
   ok1 <- (!missing(CRSobj) && !is.null(CRSobj) &&

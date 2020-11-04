@@ -90,8 +90,8 @@ bru <- function(components = y ~ Intercept,
 
   # Turn model components into internal bru model
   bru.model <- make.model(components, lhoods)
-  
-  
+
+
   # Set max iterations to 1 if all likelihood formulae are linear
   if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) {
     options$max.iter <- 1
@@ -155,7 +155,7 @@ bru <- function(components = y ~ Intercept,
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#'   on the `include` parameter). 
+#'   on the `include` parameter).
 #' @param options list of global options overriding [bru.options]
 #'
 #' @return A likelihood configuration which can be used to parameterize [bru].
@@ -205,8 +205,8 @@ like <- function(family, formula = . ~ ., data = NULL,
     if (is.null(ips)) {
       # TODO: split ipmaker into one domain extractor (or not; should force
       # explicit domain specification!), and one integration point constructor
-#      message("ipmaker can't really work here unless it doesn't need the predictor information")
-#      warning("ipmaker can't really work here unless it doesn't need the predictor information")
+      #      message("ipmaker can't really work here unless it doesn't need the predictor information")
+      #      warning("ipmaker can't really work here unless it doesn't need the predictor information")
       ips <- ipmaker(
         samplers,
         domain = domain,
@@ -354,7 +354,7 @@ bru.options <- function(mesh = NULL,
                         control.compute = list(),
                         control.inla = list(),
                         control.fixed = list(),
-                        int.args = list(method = "stable",nsub = NULL),
+                        int.args = list(method = "stable", nsub = NULL),
                         ...) {
   control.compute <-
     override_config_defaults(
@@ -415,15 +415,15 @@ bru.options <- function(mesh = NULL,
 #' \donttest{
 #' if (bru_safe_inla()) {
 #'
-#' # Load the Gorilla data
-#' data(gorillas, package = "inlabru")
+#'   # Load the Gorilla data
+#'   data(gorillas, package = "inlabru")
 #'
-#' # Plot the Gorilla nests, the mesh and the survey boundary
-#' ggplot() +
-#'   gg(gorillas$mesh) +
-#'   gg(gorillas$nests) +
-#'   gg(gorillas$boundary) +
-#'   coord_fixed()
+#'   # Plot the Gorilla nests, the mesh and the survey boundary
+#'   ggplot() +
+#'     gg(gorillas$mesh) +
+#'     gg(gorillas$nests) +
+#'     gg(gorillas$boundary) +
+#'     coord_fixed()
 #'
 #'   # Define SPDE prior
 #'   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
@@ -435,8 +435,10 @@ bru.options <- function(mesh = NULL,
 #'   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #'
 #'   # Fit the model
-#'   fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
-#'               domain = list(coordinates = gorillas$mesh))
+#'   fit <- lgcp(cmp, gorillas$nests,
+#'     samplers = gorillas$boundary,
+#'     domain = list(coordinates = gorillas$mesh)
+#'   )
 #'
 #'   # Predict the spatial intensity surface
 #'   lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
@@ -459,18 +461,19 @@ lgcp <- function(components,
                  formula = . ~ .,
                  E = NULL,
                  options = list()) {
-#  # If formula response missing, copy from components
-#  formula <- auto_copy_response(formula, components)
-#  lik <- like(family = "cp",
-#    formula = formula, data = data, samplers = samplers,
-#    E = E, ips = ips, domain = domain,
-#    options = options
-#  )
+  #  # If formula response missing, copy from components
+  #  formula <- auto_copy_response(formula, components)
+  #  lik <- like(family = "cp",
+  #    formula = formula, data = data, samplers = samplers,
+  #    E = E, ips = ips, domain = domain,
+  #    options = options
+  #  )
   bru(components,
-      family = "cp",
-      formula = formula, data = data, samplers = samplers,
-      E = E, ips = ips, domain = domain,
-      options = options)
+    family = "cp",
+    formula = formula, data = data, samplers = samplers,
+    E = E, ips = ips, domain = domain,
+    options = options
+  )
 }
 
 
@@ -616,8 +619,10 @@ summary.bru <- function(object, ...) {
       print(df)
     }
   }
-  message("The current summary.bru(...) method is outdated and will be replaced.\n",
-          "Until then, you may prefer the output from INLA:::summary.inla(...) as an alternative.")
+  message(
+    "The current summary.bru(...) method is outdated and will be replaced.\n",
+    "Until then, you may prefer the output from INLA:::summary.inla(...) as an alternative."
+  )
 }
 
 #' Prediction from fitted bru model
@@ -665,11 +670,12 @@ predict.bru <- function(object,
   }
 
   vals <- generate.bru(object,
-                       data,
-                       formula = formula,
-                       n.samples = n.samples,
-                       seed = seed,
-                       num.threads = num.threads)
+    data,
+    formula = formula,
+    n.samples = n.samples,
+    seed = seed,
+    num.threads = num.threads
+  )
 
   # Summarize
 
@@ -960,7 +966,7 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
 
   # Extract the family of each likelihood
   family <- vapply(seq_along(lhoods), function(k) lhoods[[k]]$inla.family, "family")
-  
+
   # Inital stack
   stk <- joint_stackmaker(model, lhoods, result)
   stk.data <- INLA::inla.stack.data(stk)
@@ -990,11 +996,16 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
 
     inla.formula <- update.formula(model$formula, BRU.response ~ .)
     inla.data <-
-      c(stk.data,
-        do.call(c, c(lapply(model$effects,
-                            function(xx) as.list(xx$env_extra)),
-                     use.names = FALSE)))
-#        list.data(model$formula))
+      c(
+        stk.data,
+        do.call(c, c(lapply(
+          model$effects,
+          function(xx) as.list(xx$env_extra)
+        ),
+        use.names = FALSE
+        ))
+      )
+    #        list.data(model$formula))
     icall <- expression(
       result <- tryCatch(
         do.call(
@@ -1109,7 +1120,7 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
 
 auto.intercept <- function(components) {
   env <- environment(components)
-  
+
   tm <- terms(components)
   # Check for -1/+0 and +/- Intercept/NULL
   # Required modification:
@@ -1122,7 +1133,7 @@ auto.intercept <- function(components) {
   #  F    T     0     Impossible
   #  F    F     1     +Intercept-1
   #  F    F     0     -1
-  
+
   # Convert list(var1,var2) call to vector of variable names.
   # ([-1] removes "list"!)
   var_names <- as.character(attr(tm, "variables"))[-1]
@@ -1154,27 +1165,36 @@ auto.intercept <- function(components) {
 
 auto_linear_formula <- function(formula, components) {
   if (as.character(formula)[
-    length(as.character(formula))] != ".") {
+    length(as.character(formula))
+  ] != ".") {
     return(formula)
   }
-  
+
   # No RHS; construct from components
 
   components <- auto.intercept(components)
   tm <- terms(components)
-  
+
   var_names <- attr(tm, "term.labels")
   # Trim component options
-  var_names <- gsub(pattern = "^([^\\(]*)\\(.*",
-                    replacement = "\\1",
-                    x = var_names)
+  var_names <- gsub(
+    pattern = "^([^\\(]*)\\(.*",
+    replacement = "\\1",
+    x = var_names
+  )
   if (length(attr(tm, "offset")) > 0) {
-    var_names <- c(var_names,
-                   as.character(attr(tm, "variables"))[-1][attr(tm, "offset")])
+    var_names <- c(
+      var_names,
+      as.character(attr(tm, "variables"))[-1][attr(tm, "offset")]
+    )
   }
-  formula <- update.formula(components,
-                            paste0(". ~ ",
-                                   paste0(var_names, collapse = " + ")))
+  formula <- update.formula(
+    components,
+    paste0(
+      ". ~ ",
+      paste0(var_names, collapse = " + ")
+    )
+  )
   environment(formula) <- environment(components)
   formula
 }
@@ -1182,7 +1202,7 @@ auto_linear_formula <- function(formula, components) {
 
 auto_copy_response <- function(formula, components) {
   if ((length(as.character(formula)) == 3) &&
-      (as.character(formula)[2] != ".")) {
+    (as.character(formula)[2] != ".")) {
     # Already has response; do nothing
     return(formula)
   }
@@ -1190,16 +1210,17 @@ auto_copy_response <- function(formula, components) {
   tm_cm <- terms(components)
   LHS <- as.formula(paste0(
     as.character(attr(tm_cm, "variables"))[-1][attr(tm_cm, "response")],
-    " ~ ."))
+    " ~ ."
+  ))
   if (as.character(formula)[
-    length(as.character(formula))] == ".") {
+    length(as.character(formula))
+  ] == ".") {
     # No formula RHS
     formula <- LHS
   } else {
     tm_fm <- terms(formula)
     if ((attr(tm_fm, "response") == 0) ||
-        (as.character(attr(tm_fm, "variables"))[-1][attr(tm_fm, "response")] == "."))
-    {
+      (as.character(attr(tm_fm, "variables"))[-1][attr(tm_fm, "response")] == ".")) {
       formula <- update(formula, LHS)
     }
   }
@@ -1218,15 +1239,15 @@ list.data <- function(formula) {
   # Remove previous inla results. For some reason these slow down the next INLA call.
   elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
 
-#  # Remove functions. This can cause problems as well.
-#  elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
+  #  # Remove functions. This can cause problems as well.
+  #  elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
 
-#  # Remove formulae. This can cause problems as well.
-#  elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
+  #  # Remove formulae. This can cause problems as well.
+  #  elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
 
   # The formula expression is too general for this to be reliable:
   #  # Keep only purse formula variables
   #  elist <- elist[names(elist) %in% all.vars(formula)]
-  
+
   elist
 }

@@ -30,16 +30,21 @@ gorillas_lgcp_2d_testdata <- function() {
   data(gorillas, package = "inlabru")
 
   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
-                                      prior.sigma = c(0.1, 0.01),
-                                      prior.range = c(5, 0.01))
+    prior.sigma = c(0.1, 0.01),
+    prior.range = c(5, 0.01)
+  )
   cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept(1)
 
   fit <- lgcp(cmp, gorillas$nests,
     samplers = gorillas$boundary,
     domain = list(coordinates = gorillas$mesh),
-    options = list(control.inla = list(int.strategy = "eb",
-                                       h = 0.005),
-                   num.threads = "1:1")
+    options = list(
+      control.inla = list(
+        int.strategy = "eb",
+        h = 0.005
+      ),
+      num.threads = "1:1"
+    )
   )
 
   list(
@@ -51,7 +56,7 @@ gorillas_lgcp_2d_testdata <- function() {
 }
 
 
-mrsea_rebuild_CRS <-function(x, use_km = FALSE) {
+mrsea_rebuild_CRS <- function(x, use_km = FALSE) {
   if (fm_has_PROJ6()) {
     x$points <- rebuild_CRS(x$points)
     x$samplers <- rebuild_CRS(x$samplers)
@@ -70,7 +75,6 @@ mrsea_rebuild_CRS <-function(x, use_km = FALSE) {
     x$points <- sp::spTransform(x$points, crs_km)
     x$boundary <- sp::spTransform(x$boundary, crs_km)
     x$covar <- sp::spTransform(x$covar, crs_km)
-  }  
+  }
   x
 }
-

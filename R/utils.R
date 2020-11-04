@@ -1,8 +1,8 @@
 #' Load INLA safely for examples and tests
-#' 
+#'
 #' Loads the INLA package with `requireNamespace("INLA", quietly = TRUE)`, and
 #' optionally checks and sets the multicore `num.threads` INLA option.
-#' 
+#'
 #' @param multicore logical; if `TRUE`, multiple cores are allowed, and the
 #' INLA `num.threads` option is not checked or altered. Default: FALSE, multicore
 #' not allowed (used for examples and unit tests).
@@ -11,14 +11,14 @@
 #' `quietly` argument. Default: TRUE.
 #' @export
 #' @return logical; `TRUE` if INLA was loaded safely, otherwise FALSE
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' if (bru_safe_inla()) {
 #'   # Run inla dependent calculations
 #' }
 #' }
-
+#'
 bru_safe_inla <- function(multicore = FALSE, quietly = TRUE) {
   if (requireNamespace("INLA", quietly = TRUE)) {
     if (!multicore) {
@@ -27,8 +27,10 @@ bru_safe_inla <- function(multicore = FALSE, quietly = TRUE) {
         message(paste0("Current num.threads is '", n.t, "'."))
       }
       if (!identical(n.t, "1:1")) {
-        message(paste0("Setting INLA option num.threads to '1:1'.",
-                       " Previous value '", n.t, "'."))
+        message(paste0(
+          "Setting INLA option num.threads to '1:1'.",
+          " Previous value '", n.t, "'."
+        ))
         INLA::inla.setOption(num.threads = "1:1")
       } else {
         if (!quietly) {

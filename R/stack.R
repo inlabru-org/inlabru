@@ -1,5 +1,5 @@
 # Create a stack from a model, data and prediction values
-# 
+#
 # # TODO: make sure data is allowed to be a list with unequal length vectors
 
 make.stack <- function(data,
@@ -43,9 +43,9 @@ make.stack <- function(data,
     taylor.offset <- 0
   }
 
-#  # The weirdest workaround ever. Without this, there are convergence problems on ubuntu but not on MacOS ?!?!?!
-#  A <- c(A, list(1))
-#  effects <- c(effects, list(WORKAROUND = runif(dim(A[[1]])[1])))
+  #  # The weirdest workaround ever. Without this, there are convergence problems on ubuntu but not on MacOS ?!?!?!
+  #  A <- c(A, list(1))
+  #  effects <- c(effects, list(WORKAROUND = runif(dim(A[[1]])[1])))
 
   # Create and return stack
   stk <- INLA::inla.stack(
@@ -59,7 +59,7 @@ make.stack <- function(data,
     tag = tag,
     effects = effects,
     # Make sure latent components with zero-derivatives aren't removed:
-    remove.unused = FALSE 
+    remove.unused = FALSE
   )
   stk
 }

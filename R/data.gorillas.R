@@ -59,13 +59,18 @@
 #' # extract all the objects, for convenience:
 #'
 #' # plot all the nests, mesh and boundary
-#' ggplot() + gg(gorillas$mesh) + gg(gorillas$boundary) + gg(gorillas$nests)
+#' ggplot() +
+#'   gg(gorillas$mesh) +
+#'   gg(gorillas$boundary) +
+#'   gg(gorillas$nests)
 #'
 #' # Plot the elevation covariate
 #' plot(gorillas$gcov$elevation)
 #'
 #' # Plot the plot sample
-#' ggplot() + gg(gorillas$plotsample$plots) + gg(gorillas$plotsample$nests)
+#' ggplot() +
+#'   gg(gorillas$plotsample$plots) +
+#'   gg(gorillas$plotsample$nests)
 NULL
 
 #' Gorilla data import
@@ -95,12 +100,15 @@ import.gorillas <- function() {
 
   #' Turn the observation window into spatial polygon
   boundary <- spoly(as.data.frame(gorillas$window$bdry[[1]]),
-                    crs = crs)
+    crs = crs
+  )
 
   #' Build mesh
   bnd <- INLA::inla.sp2segment(boundary)
-  mesh <- INLA::inla.mesh.2d(interior = bnd, max.edge = 222,
-                             crs = crs) # ! With higher max.edge we run into various INLA errors/warnings
+  mesh <- INLA::inla.mesh.2d(
+    interior = bnd, max.edge = 222,
+    crs = crs
+  ) # ! With higher max.edge we run into various INLA errors/warnings
 
   #' Turn covariates int SpatialGridDataFrame
   gcov <- list()
@@ -137,7 +145,8 @@ import.gorillas <- function() {
   # Create a plot sampling data set
   set.seed(121)
   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
-                        x.ppn = 0.6, y.ppn = 0.6, nx = 5.4, ny = 5.4)
+    x.ppn = 0.6, y.ppn = 0.6, nx = 5.4, ny = 5.4
+  )
   counts <- point2count(plotpts$plots, plotpts$dets)
   x <- coordinates(counts)[, 1]
   y <- coordinates(counts)[, 2]
@@ -171,7 +180,7 @@ import.gorillas <- function() {
 }
 
 
-#save.gorillas <- function() {
+# save.gorillas <- function() {
 #  gorillas <- import.gorillas()
 #  save("gorillas", file = paste0(system.file("data", package = "inlabru"), "/gorillas.RData"))
-#}
+# }

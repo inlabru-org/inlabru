@@ -135,12 +135,14 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
 
     # For fixed effects that were modeled via factors we attach an extra vector holding the samples
     fac.names <- names(result$model$effects)[
-      vapply(result$model$effects,
-             function(e) {
-               identical(e$model, "factor")
-             },
-             TRUE)
-      ]
+      vapply(
+        result$model$effects,
+        function(e) {
+          identical(e$model, "factor")
+        },
+        TRUE
+      )
+    ]
     for (name in fac.names) {
       vals[[name]] <- smpl.latent[startsWith(rownames(smpl.latent), name), ]
       names(vals[[name]]) <- lapply(names(vals[[name]]), function(nm) {
@@ -357,12 +359,14 @@ plotmarginal.inla <- function(result, varname = "Intercept", link = function(x) 
     inner.marg <- data.frame(x = inner.x, y = INLA::inla.dmarginal(inner.x, marg))
 
     df <- data.frame(marg)
-    ggplot(data = df, aes_string(x = "x", y = "y")) + geom_path() +
+    ggplot(data = df, aes_string(x = "x", y = "y")) +
+      geom_path() +
       geom_ribbon(ymin = 0, aes_string(ymax = "y"), alpha = 0.1) +
       geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
       geom_segment(x = uq, y = 0, xend = uq, yend = uqy) +
       geom_ribbon(data = inner.marg, ymin = 0, aes_string(ymax = "y"), alpha = 0.1) +
-      xlab(ovarname) + ylab("pdf")
+      xlab(ovarname) +
+      ylab("pdf")
   } else {
     df <- result$summary.random[[varname]]
     colnames(df) <- c("ID", "mean", "sd", "lower", "mid", "upper", "mode", "kld")

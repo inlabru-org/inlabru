@@ -16,8 +16,10 @@
 #' \donttest{
 #' # Generate some data
 #' input.df <- data.frame(x = cos(1:10))
-#' input.df <- within(input.df,
-#'   y <- ceiling(5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)))
+#' input.df <- within(
+#'   input.df,
+#'   y <- ceiling(5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
+#' )
 #'
 #' # Fit two models
 #' fit <- bru(y ~ x, family = "gaussian", data = input.df)

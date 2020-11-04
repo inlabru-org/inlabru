@@ -31,10 +31,12 @@ nlinla.taylor <- function(expr, epunkt, data, env) {
   } else {
     blk <- floor((seq_len(nrow(epunkt)) - 1L) / 1000)
     qq <- by(seq_len(nrow(epunkt)), blk, function(idx) {
-      nlinla.taylor(expr,
-                    epunkt[idx, , drop = FALSE],
-                    data[idx, , drop = FALSE],
-                    env)
+      nlinla.taylor(
+        expr,
+        epunkt[idx, , drop = FALSE],
+        data[idx, , drop = FALSE],
+        env
+      )
     })
     nconst <- do.call(c, lapply(qq, function(x) {
       x$const

@@ -30,8 +30,10 @@ test_that("conversion of 1D mesh to integration points", {
 test_that("conversion of SpatialPolygon to integration points", {
   disable_PROJ6_warnings()
   data(gorillas, package = "inlabru")
-  expect_warning(ips <- ipoints(gorillas$boundary),
-                 "Computing integration points from polygon")
+  expect_warning(
+    ips <- ipoints(gorillas$boundary),
+    "Computing integration points from polygon"
+  )
 
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(names(ips), "weight")
@@ -43,14 +45,17 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
   disable_PROJ6_warnings()
   data(gorillas, package = "inlabru")
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
-  expect_warning(ips_nodomain <- ipoints(gorillas$boundary),
-                 "Computing integration points from polygon")
-  
+  expect_warning(
+    ips_nodomain <- ipoints(gorillas$boundary),
+    "Computing integration points from polygon"
+  )
+
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)), c("weight", "x", "y", "optional"))
   expect_equal(sum(ips$weight),
-               sum(ips_nodomain$weight),
-               tolerance = midtol)
+    sum(ips_nodomain$weight),
+    tolerance = midtol
+  )
 })
 
 test_that("conversion of 2D mesh to integration points", {
@@ -67,21 +72,29 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
   disable_PROJ6_warnings()
   data(mrsea, package = "inlabru")
   mrsea <- mrsea_rebuild_CRS(mrsea, use_km = FALSE)
-  expect_warning(ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
-                 "export to PROJ failed: generic error of unknown origin")
-  
+  expect_warning(
+    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
+    "export to PROJ failed: generic error of unknown origin"
+  )
+
   expect_is(ips, "SpatialPointsDataFrame")
-  expect_equal(colnames(data.frame(ips)),
-               c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional"))
+  expect_equal(
+    colnames(data.frame(ips)),
+    c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional")
+  )
   expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
 
   data(mrsea, package = "inlabru")
   mrsea <- mrsea_rebuild_CRS(mrsea, use_km = TRUE)
-  expect_warning(ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
-                 "export to PROJ failed: generic error of unknown origin")
-  
+  expect_warning(
+    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
+    "export to PROJ failed: generic error of unknown origin"
+  )
+
   expect_is(ips, "SpatialPointsDataFrame")
-  expect_equal(colnames(data.frame(ips)),
-               c("weight", "vertex", "season", "x", "y", "z", "optional"))
+  expect_equal(
+    colnames(data.frame(ips)),
+    c("weight", "vertex", "season", "x", "y", "z", "optional")
+  )
   expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
 })

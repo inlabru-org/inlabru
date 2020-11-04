@@ -1,8 +1,10 @@
 context("Latent models - fixed effects (test_latent_fixed_effects.R)")
 
 test_that("basic intercept model", {
-  options <- list(control.inla = list(h = 0.005),
-                  num.threads = "1:1")
+  options <- list(
+    control.inla = list(h = 0.005),
+    num.threads = "1:1"
+  )
   mycomp <- y ~ 1
   mydata <- basic_intercept_testdata()
   fit <- bru(mycomp,
@@ -15,8 +17,10 @@ test_that("basic intercept model", {
 })
 
 test_that("basic fixed effect model", {
-  options <- list(control.inla = list(h = 0.005),
-                  num.threads = "1:1")
+  options <- list(
+    control.inla = list(h = 0.005),
+    num.threads = "1:1"
+  )
   mycomp <- y ~ 1 + x1
   mydata <- basic_fixed_effect_testdata()
   fit <- bru(mycomp,
@@ -29,8 +33,10 @@ test_that("basic fixed effect model", {
 })
 
 test_that("basic fixed effect model, order relevance", {
-  options <- list(control.inla = list(h = 0.005),
-                  num.threads = "1:1")
+  options <- list(
+    control.inla = list(h = 0.005),
+    num.threads = "1:1"
+  )
   mydata <- basic_fixed_effect_testdata()
   mycomp1 <- y ~ Intercept + x1
   fit1 <- bru(mycomp1,

@@ -244,7 +244,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
 
   # Determine integration points along lines
   crs <- fm_sp_get_crs(data)
-  
+
   sp3d <- within(data.frame(sp), Z <- 0)
   colnames(sp3d) <- c("X1", "X2", "Z")
   sp3d <- SpatialPoints(sp3d, proj4string = crs)
@@ -261,13 +261,17 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     geocentric.crs <- fm_CRS("globe")
     sp3d <- spTransform(sp3d, CRSobj = geocentric.crs)
     ep3d <- spTransform(ep3d, CRSobj = geocentric.crs)
-    mp3d <- SpatialPoints((coordinates(sp3d) + coordinates(ep3d)) / 2,
-                          proj4string = geocentric.crs)
-    
+    mp3d <- SpatialPoints(
+      (coordinates(sp3d) + coordinates(ep3d)) / 2,
+      proj4string = geocentric.crs
+    )
+
     ips <- coordinates(spTransform(mp3d, crs))
-    w <- spDists(coordinates(spTransform(sp3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
-                 coordinates(spTransform(ep3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
-                 diagonal = TRUE, longlat = TRUE)
+    w <- spDists(
+      coordinates(spTransform(sp3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
+      coordinates(spTransform(ep3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
+      diagonal = TRUE, longlat = TRUE
+    )
   }
 
   # Wrap everything up and perform projection according to distance and given group argument
@@ -284,9 +288,11 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     ips <- cbind(ips, as.data.frame(data)[idx[, 1], group, drop = FALSE])
   }
 
-  ips <- SpatialPointsDataFrame(ips[, 1:3, drop = FALSE],
-                                data = ips[, -(1:3), drop = FALSE],
-                                proj4string = crs)
+  ips <- SpatialPointsDataFrame(
+    ips[, 1:3, drop = FALSE],
+    data = ips[, -(1:3), drop = FALSE],
+    proj4string = crs
+  )
   if (!is.null(coordnames(data))) {
     name <- coordnames(data)
     if (length(name) < 3) {
@@ -494,7 +500,7 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 
   # Construct integration weights
   weight <- rep(INLA::inla.mesh.fem(mesh, order = 1)$ta / nB, each = nB)
-  
+
   # Filter away points outside integration domain boundary:
   mesh_bnd <- INLA::inla.mesh.create(boundary = bnd)
   ok <- INLA::inla.mesh.projector(mesh_bnd, loc = loc)$proj$ok
@@ -517,12 +523,12 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 #' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 
-int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...){
+int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
   if (is.null(group)) {
     group <- rep(1, nrow(loc))
   }
   method <- match.arg(method, c("stable", "basic"))
-  
+
   ipsl <- list()
   # print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
   for (g in unique(group)) {

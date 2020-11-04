@@ -28,20 +28,24 @@ latent_spde2D_group_testdata <- function(num.threads = "1:1",
     group = season, ngroup = 2
   ) + Intercept(1)
   fit <- lgcp(cmp, mrsea$points,
-              ips = ips,
-              options = list(control.inla = list(int.strategy = "eb",
-                                                 tolerance = tolerance,
-                                                 h = h),
-                             num.threads = num.threads)
+    ips = ips,
+    options = list(
+      control.inla = list(
+        int.strategy = "eb",
+        tolerance = tolerance,
+        h = h
+      ),
+      num.threads = num.threads
+    )
   )
 
   data <-
-  list(
-    mrsea = mrsea,
-    matern = matern,
-    cmp = cmp,
-    fit = fit
-  )
+    list(
+      mrsea = mrsea,
+      matern = matern,
+      cmp = cmp,
+      fit = fit
+    )
   data
 }
 
@@ -50,8 +54,11 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   disable_PROJ6_warnings()
   skip_if_not(bru_safe_inla())
   expect_warning(
-    {data <- latent_spde2D_group_testdata(num.threads = "1:1", h = 0.005)},
-    "export to PROJ failed: generic error of unknown origin")
+    {
+      data <- latent_spde2D_group_testdata(num.threads = "1:1", h = 0.005)
+    },
+    "export to PROJ failed: generic error of unknown origin"
+  )
 
   # Check Intercept
   expect_equal(data$fit$summary.fixed["Intercept", "mean"], -8.8628, midtol)

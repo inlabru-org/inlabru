@@ -22,13 +22,13 @@ pixelplot.mesh <- function(...) {
 #' \dontrun{
 #' # Load the Gorilla data
 #' data(gorillas, package = "inlabru")
-#' 
+#'
 #' # Create a base map centered around the nests and plot the boundary as well as the nests
-#' gmap(gorillas$nests, maptype = "satellite") + 
-#'   gm(gorillas$boundary) + 
+#' gmap(gorillas$nests, maptype = "satellite") +
+#'   gm(gorillas$boundary) +
 #'   gm(gorillas$nests, color = "white", size = 0.5)
 #' }
-
+#'
 gmap <- function(data, ...) {
   data <- sp::spTransform(data, sp::CRS("+proj=longlat"))
   df <- cbind(coordinates(data), data@data)
@@ -73,7 +73,9 @@ gmap <- function(data, ...) {
 #'
 #' # Invoke ggplot and add geomes for the Gorilla nests and the survey boundary
 #'
-#' ggplot() + gg(gorillas$boundary) + gg(gorillas$nests)
+#' ggplot() +
+#'   gg(gorillas$boundary) +
+#'   gg(gorillas$nests)
 gg <- function(data, ...) {
   UseMethod("gg")
 }
@@ -121,7 +123,8 @@ gm <- function(data, ...) {
 #' @examples
 #'
 #' A <- matrix(runif(100), nrow = 10)
-#' ggplot() + gg(A)
+#' ggplot() +
+#'   gg(A)
 gg.matrix <- function(data, mapping = NULL, ...) {
   A <- as.matrix(data)
   grd <- expand.grid(row = 1:nrow(A), column = 1:ncol(A))
@@ -498,7 +501,8 @@ gg.SpatialPixelsDataFrame <- function(data,
 #' pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
 #'
 #' # Plot the pixel centers
-#' ggplot() + gg(pxl, size = 0.1)
+#' ggplot() +
+#'   gg(pxl, size = 0.1)
 gg.SpatialPixels <- function(data, ...) {
   gg(SpatialPoints(data), ...)
 }
@@ -637,11 +641,13 @@ gg.inla.mesh <- function(data,
 #'
 #'   # Plot it
 #'
-#'   ggplot() + gg(mesh)
+#'   ggplot() +
+#'     gg(mesh)
 #'
 #'   # Plot it using a different shape and size for the mesh nodes
 #'
-#'   ggplot() + gg(mesh, shape = "|", size = 5)
+#'   ggplot() +
+#'     gg(mesh, shape = "|", size = 5)
 #' }
 #' }
 #'
@@ -683,7 +689,8 @@ gg.inla.mesh.1d <- function(data, mapping = aes_string("x", "y"), y = 0, shape =
 #'
 #'   # Plot the elevation
 #'
-#'   ggplot() + gg(elev)
+#'   ggplot() +
+#'     gg(elev)
 #' }
 gg.RasterLayer <- function(data, mapping = aes_string(x = "x", y = "y", fill = "layer"), ...) {
   requireNamespace("raster")
@@ -742,7 +749,8 @@ plot.bru <- function(x, ...) {
 #' @example inst/examples/gg.prediction.R
 
 plot.prediction <- function(x, y = NULL, ...) {
-  ggplot() + gg(x, ...)
+  ggplot() +
+    gg(x, ...)
 }
 
 plot.prediction_old <- function(..., property = "median") {
@@ -758,15 +766,16 @@ plot.prediction_old <- function(..., property = "median") {
       data.frame(effect = pnames[[k]], x = apr$x, y = 0.1 * apr$y / max(apr$y))
     }))
 
-    qtl <- do.call(rbind, lapply(1:length(args), function(k)
+    qtl <- do.call(rbind, lapply(1:length(args), function(k) {
       data.frame(
         y = args[[k]]$quantiles,
         yend = args[[k]]$quantiles,
         x = k, xend = k + 0.5,
         effect = pnames[[k]]
-      )))
+      )
+    }))
 
-    expec <- do.call(rbind, lapply(1:length(args), function(k)
+    expec <- do.call(rbind, lapply(1:length(args), function(k) {
       data.frame(
         y = args[[k]]$mean,
         yend = args[[k]]$mean,
@@ -774,22 +783,25 @@ plot.prediction_old <- function(..., property = "median") {
         sdy = args[[k]]$sd,
         cvy = args[[k]]$cv,
         effect = pnames[[k]]
-      )))
+      )
+    }))
 
-    sdev <- do.call(rbind, lapply(1:length(args), function(k)
+    sdev <- do.call(rbind, lapply(1:length(args), function(k) {
       data.frame(
         y = args[[k]]$mean + args[[k]]$sd,
         yend = args[[k]]$mean - args[[k]]$sd,
         x = k - 0.28, xend = k - 0.28,
         effect = pnames[[k]]
-      )))
+      )
+    }))
 
-    jit <- do.call(rbind, lapply(1:length(args), function(k)
+    jit <- do.call(rbind, lapply(1:length(args), function(k) {
       data.frame(
         y = INLA::inla.rmarginal(5000, args[[k]]),
         n = 500,
         effect = pnames[[k]]
-      )))
+      )
+    }))
 
     txt_size <- (5 / 14) * theme_get()$text$size
 
@@ -813,7 +825,8 @@ plot.prediction_old <- function(..., property = "median") {
     cvy <- NULL
     effect <- NULL
 
-    plt <- ggplot() + geom_violin(data = df, aes(x = as.numeric(effect), y = x, weight = y, fill = effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
+    plt <- ggplot() +
+      geom_violin(data = df, aes(x = as.numeric(effect), y = x, weight = y, fill = effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
       geom_text(data = qtl, aes(x = xend, y = y, label = fmt(y)), size = txt_size, family = "", vjust = -0.5, hjust = 1.1) +
       geom_text(data = expec, aes(x = xend, y = y, label = paste0(fmt(y), " +/- ", fmt(sdy), " [", round(100 * cvy), "%]")), size = txt_size, family = "", vjust = -0.5, angle = 90) +
       geom_segment(data = qtl, aes(x = x, xend = xend, y = y, yend = yend), linetype = 1, alpha = 0.2) +
@@ -893,8 +906,10 @@ plot.prediction_old <- function(..., property = "median") {
 #'
 #' @examples
 #' df <- data.frame(x = 1:10, y = 1:10, z = 11:20)
-#' pl1 <- ggplot(data = df) + geom_line(mapping = aes(x, y), color = "red")
-#' pl2 <- ggplot(data = df) + geom_line(mapping = aes(x, z), color = "blue")
+#' pl1 <- ggplot(data = df) +
+#'   geom_line(mapping = aes(x, y), color = "red")
+#' pl2 <- ggplot(data = df) +
+#'   geom_line(mapping = aes(x, z), color = "blue")
 #' multiplot(pl1, pl2, cols = 2)
 #' @export
 #

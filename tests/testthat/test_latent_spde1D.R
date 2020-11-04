@@ -11,12 +11,14 @@ latent_spde1D_testdata <- function() {
   )
 
   cmp <- count ~ field(main = x, model = matern) + Intercept
-    # This model is sensitive to the integration strategy; "eb" is too smooth.
-fit <- bru(cmp,
+  # This model is sensitive to the integration strategy; "eb" is too smooth.
+  fit <- bru(cmp,
     data = countdata2, family = "poisson",
-    options = list(E = countdata2$exposure,
-                   control.inla = list(h = 0.005),
-                   num.threads = "1:1")
+    options = list(
+      E = countdata2$exposure,
+      control.inla = list(h = 0.005),
+      num.threads = "1:1"
+    )
   )
 
   list(

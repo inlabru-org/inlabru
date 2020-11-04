@@ -19,9 +19,12 @@ fn_caller_name <- function(which = 0L, override = NULL) {
 
 fn_call_stack <- function(start = 0L, ...) {
   stack <- sys.calls()
-  stack <- lapply(as.list(stack),
-                  function(x) as.character(deparse(x)))[
-                    seq_len(max(0, length(stack) - (abs(start) + 1L)))]
+  stack <- lapply(
+    as.list(stack),
+    function(x) as.character(deparse(x))
+  )[
+    seq_len(max(0, length(stack) - (abs(start) + 1L)))
+  ]
   if (length(stack) > 0) {
     msg <-
       paste0(
@@ -33,22 +36,26 @@ fn_call_stack <- function(start = 0L, ...) {
             stack,
             function(x) {
               paste0(
-                vapply(x,
-                       function(x) {
-                         if (nchar(x) > 80) {
-                           paste0(
-                             substr(x, 1, 74),
-                             " [...]")
-                         } else {
-                           x
-                         }
-                       },
-                       ""),
+                vapply(
+                  x,
+                  function(x) {
+                    if (nchar(x) > 80) {
+                      paste0(
+                        substr(x, 1, 74),
+                        " [...]"
+                      )
+                    } else {
+                      x
+                    }
+                  },
+                  ""
+                ),
                 collapse = paste0("\n   ")
               )
             }
           ),
-          collapse = "\n")
+          collapse = "\n"
+        )
       )
   } else {
     msg <- paste0("Call stack: Empty")

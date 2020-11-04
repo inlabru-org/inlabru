@@ -51,7 +51,7 @@ add_mappers <- function(...) {
 #' allow all model components to be defined in a single line of code, but the
 #' definitions can optionally be split up into separate component definitions.
 #' See Details for more information.
-#' 
+#'
 #' The `component` methods all rely on the [component.character()] method, that
 #' defines a model component with a given label/name. This method is normally
 #' the only method that user code might directly access, since the
@@ -88,7 +88,7 @@ component <- function(object, ...) {
 #' layer/variable to extract from a covariate data object given in `main`
 #' (Default: The effect component name, if it exists i the covariate object,
 #' otherwise the first column of the covariate data frame)
-#' 
+#'
 #' The `_selector` is character name of a variable whose contents determines which layer to
 #' extract from a covariate for each data point. Overrides the `layer`.
 #' (Default: NULL)
@@ -113,7 +113,7 @@ component <- function(object, ...) {
 #' passed directly on to `INLA:f`
 # Replicate model parameters
 #' @param replicate,replicate_layer
-#'Optional specification of indices for an independent
+#' Optional specification of indices for an independent
 #' replication model. Same syntax as for `main`
 #' @param A.msk TODO: check/fix/deprecate this parameter.
 #' Likely doesn't work at the moment, and I've found no examples that use it.
@@ -121,10 +121,10 @@ component <- function(object, ...) {
 #' @param map Deprecated. Use `main` instead.
 #' @param mesh Deprecated. Use `mapper` instead.
 #' @param envir_extra TODO: check/fix this parameter.
-#' 
+#'
 #' @details The `component.character` method is inlabru's equivalent to INLA's
 #' `f` function but adds functionality that is unique to inlabru.
-#' 
+#'
 #' @family component constructors
 #' @rdname component
 #'
@@ -140,11 +140,12 @@ component <- function(object, ...) {
 #'
 #'   # A more complicated component:
 #'   eff <- component("myEffectOfX",
-#'                    main = x,
-#'                    model = inla.spde2.matern(inla.mesh.1d(1:10)))
+#'     main = x,
+#'     model = inla.spde2.matern(inla.mesh.1d(1:10))
+#'   )
 #' }
 #' }
-
+#'
 component.character <- function(object,
                                 # Main model parameters
                                 main = NULL, # This must be kept as 1st arg.
@@ -173,7 +174,7 @@ component.character <- function(object,
                                 mesh = NULL,
                                 envir_extra = NULL,
                                 ...) {
-  
+
   # INLA models:
   # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper,
   #            besagproper2, fgn, fgn2, ar1, ar1c, ar, ou, generic, generic0, generic1, generic2, generic3, spde,
@@ -182,19 +183,19 @@ component.character <- function(object,
   #
   # Supported:
   # btypes = c("offset", "factor", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
-  
+
   # The label
   label <- object
-  
+
   if (is.null(model)) {
     # TODO: may need a special marker to autodetect factor variables,
     #       which can only be autodetected in a data-aware pass.
     model <- "linear"
   }
-  
+
   # Force evaluation of explicit inputs
   force(values)
-  
+
   if (!is.null(substitute(group))) {
     if (is.null(control.group)) {
       control.group <- INLA::inla.set.control.group.default()
@@ -203,11 +204,11 @@ component.character <- function(object,
   } else {
     group_model <- "exchangeable"
   }
-  
+
   if (is.null(main_layer)) {
     main_layer <- label
   }
-  
+
   if (!is.null(substitute(map))) {
     if (is.null(substitute(main))) {
       main <- substitute(map)
@@ -216,7 +217,7 @@ component.character <- function(object,
       warning("Deprecated 'map' overridden by 'main'.")
     }
   }
-  
+
   if (!is.null(mesh)) {
     if (is.null(mapper)) {
       mapper <- mesh
@@ -225,21 +226,22 @@ component.character <- function(object,
       warning("Deprecated 'mesh' overridden by 'mapper'.")
     }
   }
-  
+
   envir <- parent.frame()
   if (is.null(envir_extra)) {
     envir_extra <- new.env(envir)
   }
-  
+
   # Default component (to be filled)
   component <- list(
     label = label,
     inla.formula = NULL,
     main = bru_subcomponent(
       input = bru_input(substitute(main),
-                        label = label,
-                        layer = main_layer,
-                        selector = main_selector),
+        label = label,
+        layer = main_layer,
+        selector = main_selector
+      ),
       mapper = mapper,
       model = model,
       n = n,
@@ -250,32 +252,39 @@ component.character <- function(object,
           NULL
         } else {
           bru_input(substitute(weights),
-                    label = paste0(label, ".weights"),
-                    layer = weights_layer)
-        }),
+            label = paste0(label, ".weights"),
+            layer = weights_layer
+          )
+        }
+    ),
     group = bru_subcomponent(
       input = bru_input(substitute(group),
-                        label = paste0(label, ".group"),
-                        layer = group_layer),
+        label = paste0(label, ".group"),
+        layer = group_layer
+      ),
       mapper = NULL,
       n = NULL,
-      model = group_model),
+      model = group_model
+    ),
     replicate = bru_subcomponent(
       input = bru_input(substitute(replicate),
-                        label = paste0(label, ".repl"),
-                        layer = replicate_layer),
+        label = paste0(label, ".repl"),
+        layer = replicate_layer
+      ),
       mapper = NULL,
       n = NULL,
-      model = "iid"),
+      model = "iid"
+    ),
     A.msk = A.msk,
     env = envir,
     env_extra = envir_extra
   )
-  
+
   # Main bit
   if (component$main$type %in% c("offset")) {
     component$inla.formula <- as.formula(paste0("~ . + offset(offset)"),
-                                         env = envir)
+      env = envir
+    )
   } else {
     # Construct a call to the f function from the parameters provided
     # Ultimately, this call will be converted to the model formula presented to INLA
@@ -288,26 +297,28 @@ component.character <- function(object,
       # and only if it's the first parameter (position 3 in this fcall)
       names(fcall)[3] <- "main"
     }
-    
+
     # Store model name or object in the environment
     model_name <- paste0("BRU_", label, "_main_model")
     fcall[["model"]] <- as.symbol(model_name)
     assign(model_name, component$main$model, envir = component$env_extra)
-    
+
     # Remove parameters inlabru supports but INLA doesn't,
     # and substitute parameters that inlabru will transform
-    fcall <- fcall[!(names(fcall) %in% c("main",
-                                         "mapper",
-                                         "group_mapper",
-                                         "replicate_mapper",
-                                         "A.msk",
-                                         "map",
-                                         "mesh",
-                                         "main_layer",
-                                         "group_layer",
-                                         "replicate_layer",
-                                         "weights_layer"))]
-    
+    fcall <- fcall[!(names(fcall) %in% c(
+      "main",
+      "mapper",
+      "group_mapper",
+      "replicate_mapper",
+      "A.msk",
+      "map",
+      "mesh",
+      "main_layer",
+      "group_layer",
+      "replicate_layer",
+      "weights_layer"
+    ))]
+
     # A trick for "Copy" models
     if ("copy" %in% names(fcall)) {
       ### TODO:
@@ -316,18 +327,20 @@ component.character <- function(object,
       fcall[["copy"]] <- NULL
       fcall$model <- NULL
     }
-    
+
     # Replace arguments that will be evaluated by a mapper
     # TODO: make a more general system, that also handles ngroup etc.
-    suffixes <- list("group" = "group",
-                     "replicate" = "repl",
-                     "weights" = "weights")
+    suffixes <- list(
+      "group" = "group",
+      "replicate" = "repl",
+      "weights" = "weights"
+    )
     for (arg in names(suffixes)) {
       if (arg %in% names(fcall)) {
         fcall[[arg]] <- as.symbol(paste0(label, ".", suffixes[[arg]]))
       }
     }
-    
+
     # These values were previously initialised by an INLA::f call, but ::f
     # should only be called by INLA, and never by inlabru, since it sets up
     # temporary files that will not be removed, and also requires data not
@@ -339,7 +352,7 @@ component.character <- function(object,
     if (!is.null(season.length)) {
       fcall[["season.length"]] <- season.length
     }
-    
+
     # Make sure 'values' is setup properly.
     if (is.null(component$main$values)) {
       fcall <- fcall[!("values" %in% names(fcall))]
@@ -348,25 +361,29 @@ component.character <- function(object,
       fcall[["values"]] <- as.symbol(values_name)
       assign(values_name, component$main$values, envir = component$env_extra)
     }
-    
+
     # Setup factor precision parameter
     if (identical(model, "factor")) {
       # TODO: allow configuration of the precision
       factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
       fcall[["hyper"]] <- as.symbol(factor_hyper_name)
       assign(factor_hyper_name,
-             list(prec = list(initial = log(1e-6), fixed = TRUE)),
-             envir = component$env_extra)
+        list(prec = list(initial = log(1e-6), fixed = TRUE)),
+        envir = component$env_extra
+      )
     }
-    
+
     component$inla.formula <-
-      as.formula(paste0("~ . + ",
-                        as.character(parse(text = deparse(fcall)))),
-                 env = envir)
-    
+      as.formula(paste0(
+        "~ . + ",
+        as.character(parse(text = deparse(fcall)))
+      ),
+      env = envir
+      )
+
     component$fcall <- fcall
   }
-  
+
   class(component) <- c("component", "list")
   component
 }
@@ -449,18 +466,20 @@ component.character <- function(object,
 #' # Equivalent shortcuts:
 #' eff <- component(~ myLinearEffectOfX(x, model = "linear"))
 #' eff <- component(~ myLinearEffectOfX(x))
-
 component.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)
   }
   code <- code.components(object)
   parsed <- lapply(code, function(x) parse(text = x))
-  components <- lapply(parsed,
-                       function(component.expression) {
-                         eval(component.expression,
-                              envir = envir)
-                       })
+  components <- lapply(
+    parsed,
+    function(component.expression) {
+      eval(component.expression,
+        envir = envir
+      )
+    }
+  )
   environment(object) <- envir
   component.list(components, lhoods = lhoods, envir = envir)
 }
@@ -489,52 +508,59 @@ component.list <- function(object, lhoods = NULL, envir = NULL, ...) {
 #' @param lhoods PARAM_DESCRIPTION
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
-#' @examples 
+#' @examples
 #' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
+#' if (interactive()) {
+#'   # EXAMPLE1
+#' }
 #' }
 #' @rdname add_mappers.component
 #' @keywords internal
-#' @export 
+#' @export
 
 add_mappers.component <- function(component, lhoods) {
   # Filter out lhoods that don't use/support the component
   keep_lh <-
     vapply(lhoods,
-           function(lh, label) {
-             if (!is.null(lh[["include_components"]])) {
-               label %in% setdiff(lh[["include_components"]],
-                                  lh[["exclude_components"]])
-             } else {
-               label %in% setdiff(label,
-                                  lh[["exclude_components"]])
-             }
-           },
-           TRUE,
-           label = component$label)
+      function(lh, label) {
+        if (!is.null(lh[["include_components"]])) {
+          label %in% setdiff(
+            lh[["include_components"]],
+            lh[["exclude_components"]]
+          )
+        } else {
+          label %in% setdiff(
+            label,
+            lh[["exclude_components"]]
+          )
+        }
+      },
+      TRUE,
+      label = component$label
+    )
   lh <- lhoods[keep_lh]
   component$label
-  
+
   component$main <- add_mapper(component$main,
-                               label = component$label,
-                               lhoods = lh,
-                               env = component$env)
+    label = component$label,
+    lhoods = lh,
+    env = component$env
+  )
   component$group <- add_mapper(component$group,
-                                label = component$label,
-                                lhoods = lh,
-                                env = component$env)
+    label = component$label,
+    lhoods = lh,
+    env = component$env
+  )
   component$replicate <- add_mapper(component$replicate,
-                                    label = component$label,
-                                    lhoods = lh,
-                                    env = component$env)
-  
+    label = component$label,
+    lhoods = lh,
+    env = component$env
+  )
+
   if (component$main$type %in% c("offset")) {
   } else {
-    
     fcall <- component$fcall
-    
+
     # Set ngroup and nrep defaults
     if (is.null(component$group$n)) {
       fcall[["ngroup"]] <- 1
@@ -554,17 +580,21 @@ add_mappers.component <- function(component, lhoods) {
       fcall[["values"]] <- as.symbol(values_name)
       assign(values_name, component$main$values, envir = component$env_extra)
     }
-    
+
     # Generate the formula that will be presented to INLA
     component$inla.formula <-
-      as.formula(paste0("~ . + ",
-                        paste0(deparse(fcall),
-                               collapse = "\n")),
-                 env = component$env)
-    
+      as.formula(paste0(
+        "~ . + ",
+        paste0(deparse(fcall),
+          collapse = "\n"
+        )
+      ),
+      env = component$env
+      )
+
     component$fcall <- fcall
   }
-  
+
   component
 }
 add_mappers.component_list <- function(components, lhoods) {
@@ -575,10 +605,12 @@ add_mappers.component_list <- function(components, lhoods) {
 }
 
 bru_input <- function(input, label = NULL, layer = NULL, selector = NULL) {
-  inp <- list(input = input,
-              label = label,
-              layer = layer,
-              selector = selector)
+  inp <- list(
+    input = input,
+    label = label,
+    layer = layer,
+    selector = selector
+  )
   class(inp) <- c("bru_input", "list")
   inp
 }
@@ -595,9 +627,13 @@ bru_subcomponent <- function(input = NULL,
     type <- "spde"
   } else if (inherits(model, "inla.rgeneric")) {
     type <- "rgeneric"
-  } else if (inherits(model,
-                      c("clinear", "sigm", "revsigm",
-                        "log1exp", "logdist"))) {
+  } else if (inherits(
+    model,
+    c(
+      "clinear", "sigm", "revsigm",
+      "log1exp", "logdist"
+    )
+  )) {
     type <- "specialnonlinear"
   } else if (is.character(model)) {
     if (identical(model, "factor")) {
@@ -610,29 +646,35 @@ bru_subcomponent <- function(input = NULL,
     type <- "unknown"
   }
   subcomponent <-
-    list(input = input,
-         mapper = mapper,
-         model = model,
-         type = type,
-         n = n,
-         values = values,
-         season.length = season.length,
-         weights = weights)
+    list(
+      input = input,
+      mapper = mapper,
+      model = model,
+      type = type,
+      n = n,
+      values = values,
+      season.length = season.length,
+      weights = weights
+    )
   class(subcomponent) <- c("bru_subcomponent", "list")
-  
+
   subcomponent
 }
 
-add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
-{
+add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
   if (is.null(subcomp[["mapper"]])) {
     if (!is.null(lhoods)) {
-      inp <- lapply(lhoods,
-                    function(lh) input_eval(subcomp$input,
-                                            data = lh$data,
-                                            env = env,
-                                            label = subcomp$input$label,
-                                            null.on.fail = TRUE))
+      inp <- lapply(
+        lhoods,
+        function(lh) {
+          input_eval(subcomp$input,
+            data = lh$data,
+            env = env,
+            label = subcomp$input$label,
+            null.on.fail = TRUE
+          )
+        }
+      )
       # Check for
       # 1) All NULL; OK, set to 1
       # 2) Some NULL; exclude NULL results
@@ -651,13 +693,17 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
         is_matrix <- vapply(inp_, function(x) is.matrix(x), TRUE)
         is_factor <- vapply(inp_, function(x) is.factor(x), TRUE)
         if (any(is_spatial)) {
-          if(!all(is_spatial)) {
+          if (!all(is_spatial)) {
             stop("Inconsistent input types; spatial and non-spatial")
           }
           message("TODO: Ensure spatial input objects use the same CRS")
-          inp_values <- unique(do.call(rbind,
-                                       lapply(inp_,
-                                              function(x) coordinates(x))))
+          inp_values <- unique(do.call(
+            rbind,
+            lapply(
+              inp_,
+              function(x) coordinates(x)
+            )
+          ))
           n_values <- nrow(inp_values)
         } else if (any(is_matrix)) {
           if (!all(is_matrix)) {
@@ -670,7 +716,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
             stop("Inconsistent input types; factor and non-factor")
           }
           inp_values <- sort(unique(do.call(c, lapply(inp_, as.character))),
-                             na.last = NA)
+            na.last = NA
+          )
           n_values <- length(inp_values)
         } else {
           inp_values <- sort(unique(unlist(inp_)), na.last = NA)
@@ -683,9 +730,10 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
         inp_values <- NULL
       }
       subcomp <- make_mapper(subcomp,
-                             label,
-                             input_values = inp_values,
-                             strict = TRUE)
+        label,
+        input_values = inp_values,
+        strict = TRUE
+      )
     }
   }
   subcomp
@@ -721,9 +769,11 @@ make_mapper <- function(subcomp,
       subcomp$n <- subcomp[["mapper"]]$n
       subcomp$values <- seq_len(subcomp$n)
     } else {
-      stop(paste0("Unknown mapper of type '",
-                  paste0(class(subcomp[["mapper"]]), collapse = ", "),
-                  "' for ", label))
+      stop(paste0(
+        "Unknown mapper of type '",
+        paste0(class(subcomp[["mapper"]]), collapse = ", "),
+        "' for ", label
+      ))
     }
   } else if (subcomp[["type"]] %in% "linear") {
     subcomp$n <- 1
@@ -750,12 +800,14 @@ make_mapper <- function(subcomp,
       subcomp[["values"]] <- seq_len(subcomp[["n"]])
     } else {
       if (subcomp[["n"]] != length(subcomp[["values"]])) {
-        stop(paste0("Size mismatch, n=", subcomp[["n"]], " != length(values)=",
-                    length(subcomp[["values"]]), " for label ", label))
+        stop(paste0(
+          "Size mismatch, n=", subcomp[["n"]], " != length(values)=",
+          length(subcomp[["values"]]), " for label ", label
+        ))
       }
     }
     if (is.factor(subcomp[["values"]]) ||
-        is.character(subcomp[["values"]])) {
+      is.character(subcomp[["values"]])) {
       if (is.factor(subcomp[["values"]])) {
         subcomp$mapper <- list(levels = levels(subcomp[["values"]]))
       } else {
@@ -815,35 +867,43 @@ code.components <- function(components, add = "") {
       label <- code
       is.fixed <- TRUE
     }
-    
+
     # Make code
     if (is.fixed) {
-      codes[[k]] <- paste0(fname, '("', label, '", main = ', label,
-                           ', model = "linear"',
-                           add, ')')
+      codes[[k]] <- paste0(
+        fname, '("', label, '", main = ', label,
+        ', model = "linear"',
+        add, ")"
+      )
     }
     else {
       # Add extra code before final bracket
       ix <- max(gregexpr(")", text = code, fixed = TRUE)[[1]])
       code <-
-        paste0(substr(code, 1, ix - 1),
-               add,
-               substr(code, ix, nchar(code)))
-      
+        paste0(
+          substr(code, 1, ix - 1),
+          add,
+          substr(code, ix, nchar(code))
+        )
+
       if (is.offset) {
         codes[[k]] <-
           gsub(paste0(label, "("),
-               paste0(fname, "(\"", label, "\", model = \"offset\", main = "),
-               code, fixed = TRUE)
+            paste0(fname, "(\"", label, "\", model = \"offset\", main = "),
+            code,
+            fixed = TRUE
+          )
       }
       else {
         codes[[k]] <- gsub(paste0(label, "("),
-                           paste0(fname, "(\"", label, "\", "),
-                           code, fixed = TRUE)
+          paste0(fname, "(\"", label, "\", "),
+          code,
+          fixed = TRUE
+        )
       }
     }
   }
-  
+
   codes
 }
 
@@ -921,20 +981,20 @@ value.component <- function(component, data, state, A = NULL, ...) {
     state <- state[[component$label]]
   }
 
-#  # Obtain covariates
-#  main_input <- input_eval(component, part = "main", data = data, env = component$env)
-#  group_input <- input_eval(component, part = "group", data = data, env = component$env)
-#  repl_input <- input_eval(component, part = "repl", data = data, env = component$env)
-#  weights_input <- input_eval(component, part = "weights", data = data, env = component$env)
-#
-#  if (is.data.frame(main_input)) {
-#    message("'main_input' is a data.frame! This code should be moved to input_eval.bru_input().")
-#    if (component$label %in% names(main_input)) {
-#      main_input <- main_input[, component$label, drop = TRUE]
-#    } else {
-#      main_input <- main_input[, 1, drop = TRUE]
-#    }
-#  }
+  #  # Obtain covariates
+  #  main_input <- input_eval(component, part = "main", data = data, env = component$env)
+  #  group_input <- input_eval(component, part = "group", data = data, env = component$env)
+  #  repl_input <- input_eval(component, part = "repl", data = data, env = component$env)
+  #  weights_input <- input_eval(component, part = "weights", data = data, env = component$env)
+  #
+  #  if (is.data.frame(main_input)) {
+  #    message("'main_input' is a data.frame! This code should be moved to input_eval.bru_input().")
+  #    if (component$label %in% names(main_input)) {
+  #      main_input <- main_input[, component$label, drop = TRUE]
+  #    } else {
+  #      main_input <- main_input[, 1, drop = TRUE]
+  #    }
+  #  }
 
   # Make A-matrix (if not provided)
   if (is.null(A)) {
@@ -947,9 +1007,9 @@ value.component <- function(component, data, state, A = NULL, ...) {
   } else {
     values <- A %*% state
   }
-#  else {
-#    stop(paste0("Evaluation of ", component$type, " not implemented."))
-#  }
+  #  else {
+  #    stop(paste0("Evaluation of ", component$type, " not implemented."))
+  #  }
 
   as.vector(values)
 }
@@ -969,9 +1029,9 @@ value.component <- function(component, data, state, A = NULL, ...) {
 
 amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
   ## TODO: Check for offset component
-  
+
   val <- input_eval(subcomp$input, data, env = env)
-  
+
   if (!is.null(subcomp$weights)) {
     weights <- input_eval(subcomp$weights, data, env = env)
   } else {
@@ -997,38 +1057,46 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
     } else if (subcomp$mapper$factor_mapping == "contrast") {
       val <- as.numeric(val) - 1L
     } else {
-      stop("Unknown factor mapping '", subcomp$mapper$factor_mapping , "'.")  
+      stop("Unknown factor mapping '", subcomp$mapper$factor_mapping, "'.")
     }
     ok <- !is.na(val)
     ok[which(ok)] <- (val[ok] > 0L)
     if ((length(weights) == 1) &&
-        (length(weights) < length(val))) {
-      A <- Matrix::sparseMatrix(i = which(ok),
-                                j = val[ok],
-                                x = rep(weights, sum(ok)),
-                                dims = c(nrow(data), subcomp$n))
+      (length(weights) < length(val))) {
+      A <- Matrix::sparseMatrix(
+        i = which(ok),
+        j = val[ok],
+        x = rep(weights, sum(ok)),
+        dims = c(nrow(data), subcomp$n)
+      )
     } else {
-      A <- Matrix::sparseMatrix(i = which(ok),
-                                j = val[ok],
-                                x = weights[ok],
-                                dims = c(nrow(data), subcomp$n))
+      A <- Matrix::sparseMatrix(
+        i = which(ok),
+        j = val[ok],
+        x = weights[ok],
+        dims = c(nrow(data), subcomp$n)
+      )
     }
   } else if (subcomp$model %in% c("linear", "clinear")) {
-    A <- Matrix::sparseMatrix(i = seq_len(NROW(data)),
-                              j = rep(1, NROW(data)),
-                              x = val * weights,
-                              dims = c(NROW(data), subcomp$n))
+    A <- Matrix::sparseMatrix(
+      i = seq_len(NROW(data)),
+      j = rep(1, NROW(data)),
+      x = val * weights,
+      dims = c(NROW(data), subcomp$n)
+    )
   } else if (is.null(subcomp$mapper)) {
     if (subcomp$n > 1) {
       stop(paste0("Missing mapper (NULL) for subcomponent '", subcomp$label, "'"))
     }
     A <- Matrix::Matrix(1.0, NROW(data), 1)
   } else {
-    stop(paste0("Unsupported mapper of class '",
-                paste0(class(subcomp$mapper), collapse = "', '"), "'",
-                " for subcomponent '", subcomp$label, "'"))
+    stop(paste0(
+      "Unsupported mapper of class '",
+      paste0(class(subcomp$mapper), collapse = "', '"), "'",
+      " for subcomponent '", subcomp$label, "'"
+    ))
   }
-  
+
   A
 }
 
@@ -1045,20 +1113,22 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
 
 amatrix_eval.component <- function(component, data, ...) {
   ## TODO: Check for offset component
-  
+
   A.main <- amatrix_eval(component$main, data, component$env)
   A.group <- amatrix_eval(component$group, data, component$env)
   A.repl <- amatrix_eval(component$replicate, data, component$env)
-  
-  A <- INLA::inla.row.kron(A.repl,
-                           INLA::inla.row.kron(A.group, A.main))
-  
+
+  A <- INLA::inla.row.kron(
+    A.repl,
+    INLA::inla.row.kron(A.group, A.main)
+  )
+
   # Mask columns of A
   # TODO: check what this feature is intended for!
   if (!is.null(component$A.msk)) {
     A[, as.logical(component$A.msk)] <- 0.0
   }
-  
+
   A
 }
 
@@ -1145,10 +1215,12 @@ input_eval.component <- function(component,
   part <- match.arg(part)
   if (part %in% "weights") {
     val <- input_eval(component[["main"]]$weights, data, component$env,
-                      label = paste(component$label, "(main, weights)"), ...)
+      label = paste(component$label, "(main, weights)"), ...
+    )
   } else {
     val <- input_eval(component[[part]]$input, data, component$env,
-                      label = paste0(component$label, " (", part, ")"), ...)
+      label = paste0(component$label, " (", part, ")"), ...
+    )
   }
   val
 }
@@ -1160,8 +1232,7 @@ input_eval.component_list <-
   function(components,
            part = c("main", "group", "replicate", "weights"),
            data,
-           ...)
-  {
+           ...) {
     part <- match.arg(part)
     result <- lapply(components, function(x) input_eval(x, part = part, data = data, ...))
     names(result) <- names(components)
@@ -1179,12 +1250,14 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   # Evaluate the map with the data as an environment
   if (is.null(env)) {
     emap <- tryCatch(eval(input$input, envir = data.frame(data), enclos = parent.frame()),
-                     error = function(e) {})
+      error = function(e) {}
+    )
   } else {
     emap <- tryCatch(eval(input$input, envir = data.frame(data), enclos = env),
-                     error = function(e) {})
+      error = function(e) {}
+    )
   }
-    
+
   # 0) Eval failed. map everything to 1. This happens for automatically
   #    added Intercept, and for some components that cannot be evaluated
   #    based on the data, e.g. missing columns for a certain likelihood in a
@@ -1194,7 +1267,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   #    frame at the point locations using the over() function
   # 3) Else we obtain a vector and return as-is. This happens when input
   #    references a column of the data points, or some other complete expression
-  
+
   n <- nrow(as.data.frame(data))
 
   if (is.null(emap)) {
@@ -1205,7 +1278,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   } else if (is.function(emap)) {
     # Allow but detect failures:
     val <- tryCatch(emap(data),
-                    error = function(e) {})
+      error = function(e) {}
+    )
     if (is.null(val)) {
       # TODO: figure out if we need to do something else in this case.
       # Returning NULL seems like a good way to keep track of these failures
@@ -1217,14 +1291,15 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       coordinates(val) <- seq_len(ncol(val))
       # Allow proj4string failures:
       data_crs <- tryCatch(fm_sp_get_crs(data),
-                      error = function(e) {})
+        error = function(e) {}
+      )
       if (!fm_crs_is_null(data_crs)) {
         proj4string(val) <- data_crs
       }
     }
   }
   else if (inherits(emap, "SpatialGridDataFrame") |
-           inherits(emap, "SpatialPixelsDataFrame")) {
+    inherits(emap, "SpatialPixelsDataFrame")) {
     if (is.null(input[["selector"]])) {
       layer <-
         if (is.null(input[["layer"]])) {
@@ -1235,21 +1310,24 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       if (is.character(layer)) {
         if (!(layer %in% names(emap))) {
           stop(
-            paste0("Input layer name '",
-                   layer,
-                   "' doesn't match available variable names.\n",
-                   "Available names are '",
-                   paste0(names(emap), collapse = "', '"),
-                   "'.\n",
-                   "Use *_layer for the input component to specify a valid name."
+            paste0(
+              "Input layer name '",
+              layer,
+              "' doesn't match available variable names.\n",
+              "Available names are '",
+              paste0(names(emap), collapse = "', '"),
+              "'.\n",
+              "Use *_layer for the input component to specify a valid name."
             )
           )
         }
       } else if (is.numeric(layer)) {
         if ((layer < 1) || (layer > ncol(emap))) {
-          stop(paste0("Input layer nr ", layer,
-                      " is not in the valid range, [",
-                      1, ", ", ncol(emap)))
+          stop(paste0(
+            "Input layer nr ", layer,
+            " is not in the valid range, [",
+            1, ", ", ncol(emap)
+          ))
         }
       }
       val <- sp::over(data, emap)[, layer, drop = TRUE]
@@ -1257,13 +1335,15 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       layer <- data[[input$selector]]
       val <- numeric(n)
       for (l in unique(layer)) {
-        val[layer == l] <- over(data[layer == l, , drop = FALSE],
-                                emap)[, l, drop = TRUE]
+        val[layer == l] <- over(
+          data[layer == l, , drop = FALSE],
+          emap
+        )[, l, drop = TRUE]
       }
     }
   } else if ((input$label == "offset") &&
-           is.numeric(emap) &&
-           (length(emap) == 1)) {
+    is.numeric(emap) &&
+    (length(emap) == 1)) {
     val <- rep(emap, n)
   } else {
     val <- emap
@@ -1278,8 +1358,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   # to fix that by filling in nearest neighbor values.
   # # TODO: Check how to deal with this fully in the case of multilikelihood models
   if (any(is.na(as.data.frame(val))) &&
-      (inherits(emap, "SpatialGridDataFrame") ||
-       inherits(emap, "SpatialPixelsDataFrame"))) {
+    (inherits(emap, "SpatialGridDataFrame") ||
+      inherits(emap, "SpatialPixelsDataFrame"))) {
     warning(sprintf(
       "Map '%s' has returned NA values. As it is a SpatialGridDataFrame I will try to fix this by filling in values of spatially nearest neighbors. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
       deparse(input$input), label
@@ -1292,13 +1372,14 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       ok <- (rowSums(nok) == 0)
     }
     dst <- rgeos::gDistance(SpatialPoints(data[ok, , drop = FALSE]),
-                            SpatialPoints(data[!ok, , drop = FALSE]),
-                            byid = TRUE)
+      SpatialPoints(data[!ok, , drop = FALSE]),
+      byid = TRUE
+    )
     nn <- apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
     if (is.null(ncol(val))) {
       val[!ok] <- val[ok][nn]
     } else {
-      val[nok] <- val[ok, , drop = FALSE][nn, , drop = FALSE][nok[!ok,]]
+      val[nok] <- val[ok, , drop = FALSE][nn, , drop = FALSE][nok[!ok, ]]
     }
   }
 
@@ -1346,7 +1427,8 @@ index_eval.component <- function(component, ...) {
   idx <- list(
     main = rep(main, times = g.n * r.n),
     group = rep(rep(group, each = length(main)),
-                times = r.n),
+      times = r.n
+    ),
     repl = rep(repl, each = length(main) * g.n)
   )
   names(idx) <- paste0(component$label, c("", ".group", ".repl"))

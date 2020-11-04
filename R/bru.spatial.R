@@ -18,11 +18,15 @@ sfill <- function(data, where = NULL) {
     dpoints <- dpoints[!is.na(vals), ]
     vals <- vals[!is.na(vals)]
 
-    data.ow <- spatstat::owin(range(coordinates(dpoints)[, 1]),
-                              range(coordinates(dpoints)[, 2]))
+    data.ow <- spatstat::owin(
+      range(coordinates(dpoints)[, 1]),
+      range(coordinates(dpoints)[, 2])
+    )
     data.ppp <- spatstat::as.ppp(coordinates(dpoints), data.ow)
-    where.ow <- spatstat::owin(range(coordinates(where)[, 1]),
-                               range(coordinates(where)[, 2]))
+    where.ow <- spatstat::owin(
+      range(coordinates(where)[, 1]),
+      range(coordinates(where)[, 2])
+    )
     where.ppp <- spatstat::as.ppp(coordinates(where), where.ow)
 
     nn <- spatstat::nncross(where.ppp, data.ppp)[, "which"]
@@ -73,7 +77,8 @@ sfill <- function(data, where = NULL) {
 #' )
 #'
 #' # Plot the lines
-#' ggplot() + gg(spl)
+#' ggplot() +
+#'   gg(spl)
 #' }
 #'
 sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.crs = NULL) {
@@ -132,7 +137,8 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
 #' pol <- spoly(pts)
 #'
 #' # Plot it!
-#' ggplot() + gg(pol)
+#' ggplot() +
+#'   gg(pol)
 #' }
 #'
 spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(NA_character_), to.crs = NULL) {
@@ -173,8 +179,12 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(NA_character_), to
 #' # Compare original and transformed mesh
 #'
 #' multiplot(
-#'   ggplot() + gg(gorillas$mesh) + ggtitle("Original mesh"),
-#'   ggplot() + gg(tmesh) + ggtitle("Transformed mesh")
+#'   ggplot() +
+#'     gg(gorillas$mesh) +
+#'     ggtitle("Original mesh"),
+#'   ggplot() +
+#'     gg(tmesh) +
+#'     ggtitle("Transformed mesh")
 #' )
 #' }
 #'

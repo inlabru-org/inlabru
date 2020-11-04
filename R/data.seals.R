@@ -24,7 +24,9 @@
 #'
 #' @examples
 #' data(seals)
-#' ggplot() + gg(seals$mesh) + gg(seals$points)
+#' ggplot() +
+#'   gg(seals$mesh) +
+#'   gg(seals$points)
 NULL
 
 #' Seal pup edata import

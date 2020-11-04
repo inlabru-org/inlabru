@@ -77,7 +77,9 @@
 #'     loglambda = 1.5,
 #'     samplers = gorillas$boundary
 #'   )
-#'   ggplot() + gg(gorillas$mesh) + gg(pts)
+#'   ggplot() +
+#'     gg(gorillas$mesh) +
+#'     gg(pts)
 #' }
 #' }
 #'

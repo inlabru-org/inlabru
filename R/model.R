@@ -55,7 +55,7 @@ evaluate <- function(...) {
 #' [sp] package :
 #'
 #' `y ~ mySPDE(coordinates, ...)`
-#' 
+#'
 #' This exctract the coordinates from the data object, and maps it to the latent
 #' field via the information given in the `mapper`, which by default is
 #' extracted from the `model` object, in the case of `spde` model
@@ -126,7 +126,7 @@ make.model <- function(components, lhoods) {
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
-#' 
+#'
 #' @keywords internal
 evaluate.model <- function(model,
                            result,
@@ -136,7 +136,6 @@ evaluate.model <- function(model,
                            n = 1,
                            seed = 0L,
                            num.threads = NULL) {
-  
   if (inherits(predictor, "formula")) {
     fml.envir <- as.list(environment(predictor))
     predictor <- parse(text = as.character(predictor)[length(as.character(predictor))])
@@ -146,8 +145,10 @@ evaluate.model <- function(model,
 
   # Do we obtain our values from sampling or from a property of a summary?
   if (property == "sample") {
-    smp <- inla.posterior.sample.structured(result, n = n, seed = seed,
-                                            num.threads = num.threads)
+    smp <- inla.posterior.sample.structured(result,
+      n = n, seed = seed,
+      num.threads = num.threads
+    )
   } else {
     result$model <- model
     smp <- rep(list(extract.summary(result, property)), n)
@@ -180,8 +181,10 @@ evaluate.model <- function(model,
         sm[[label]] <- sm[[label]]$value
       }
       if (!is.null(data)) {
-        sm[[label]] <- value(model$effects[[label]], data = data,
-                             state = sm[[label]], A = As[[label]])
+        sm[[label]] <- value(model$effects[[label]],
+          data = data,
+          state = sm[[label]], A = As[[label]]
+        )
       }
     }
 
@@ -189,8 +192,10 @@ evaluate.model <- function(model,
     # Otherwise evaluate predictor with each sample as an environment
     if (is.null(predictor)) {
       if (is.null(data)) {
-        stop(paste0("Both data and predictor are NULL.",
-                    " Don't know what to predict."))
+        stop(paste0(
+          "Both data and predictor are NULL.",
+          " Don't know what to predict."
+        ))
       } else {
         smp[[k]] <- data.frame(sm)
       }
@@ -199,8 +204,10 @@ evaluate.model <- function(model,
       # of the effects, under the same name.
       # TODO: make latent variables consistently available, under special
       # names.
-      envir <- c(sm, as.list(data.frame(data)), fml.envir,
-                 as.list(environment(model$formula)))
+      envir <- c(
+        sm, as.list(data.frame(data)), fml.envir,
+        as.list(environment(model$formula))
+      )
       smp[[k]] <- eval(predictor, envir = envir)
     }
   }

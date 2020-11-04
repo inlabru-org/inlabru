@@ -163,12 +163,12 @@ iinla.getOption <- function(
 
 iinla.setOption <- function(...) {
   iinla.setOption.core <- function(option = c(
-                                       "control.compute",
-                                       "control.inla",
-                                       "iinla.verbose",
-                                       "control.fixed"
-                                     ),
-                                     value) {
+                                     "control.compute",
+                                     "control.inla",
+                                     "iinla.verbose",
+                                     "control.fixed"
+                                   ),
+                                   value) {
     envir <- iinla.env
     option <- match.arg(option, several.ok = FALSE)
     if (!exists("iinla.options", envir = envir)) {
