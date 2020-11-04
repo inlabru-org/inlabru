@@ -11,6 +11,8 @@ Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org
 status](https://github.com/fbachl/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/fbachl/inlabru/actions)
 [![R code coverage
 status](https://github.com/fbachl/inlabru/workflows/test-coverage/badge.svg)](https://github.com/fbachl/inlabru/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/fbachl/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/fbachl/inlabru?branch=devel)
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
