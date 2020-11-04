@@ -15,7 +15,7 @@ test_that("1D integration points can be generated", {
 
 test_that("conversion of 1D mesh to integration points", {
   disable_PROJ6_warnings()
-  mesh <- inla.mesh.1d(seq(0, 10, by = 1))
+  mesh <- INLA::inla.mesh.1d(seq(0, 10, by = 1))
   ips <- ipoints(mesh, name = "time")
 
   expect_is(ips, "data.frame")

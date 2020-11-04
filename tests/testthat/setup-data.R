@@ -1,7 +1,7 @@
 disable_PROJ6_warnings <- function() {
   options("rgdal_show_exportToProj4_warnings" = "none")
   requireNamespace("rgdal")
-  if (inla.has_PROJ6()) {
+  if (fm_has_PROJ6()) {
     rgdal::set_rgdal_show_exportToProj4_warnings(FALSE)
     rgdal::set_thin_PROJ6_warnings(TRUE)
   }
@@ -52,7 +52,7 @@ gorillas_lgcp_2d_testdata <- function() {
 
 
 mrsea_rebuild_CRS <-function(x, use_km = FALSE) {
-  if (inla.has_PROJ6()) {
+  if (fm_has_PROJ6()) {
     x$points <- rebuild_CRS(x$points)
     x$samplers <- rebuild_CRS(x$samplers)
     x$mesh$crs <- rebuild_CRS(x$mesh$crs)
@@ -64,8 +64,8 @@ mrsea_rebuild_CRS <-function(x, use_km = FALSE) {
     # domain is represented in metres, and has been seen to produce
     # different results on different systems (e.g. Travis CI).
     # Transform m to km:
-    crs_km <- inla.crs_set_lengthunit(x$mesh$crs, "km")
-    x$mesh <- inla.spTransform(x$mesh, crs_km)
+    crs_km <- fm_crs_set_lengthunit(x$mesh$crs, "km")
+    x$mesh <- fm_spTransform(x$mesh, crs_km)
     x$samplers <- sp::spTransform(x$samplers, crs_km)
     x$points <- sp::spTransform(x$points, crs_km)
     x$boundary <- sp::spTransform(x$boundary, crs_km)
