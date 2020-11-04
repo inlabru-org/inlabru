@@ -694,7 +694,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
 
 
 # Defines a default mapper given the type of model and parameters provided
-# Checks mapping$mapper, model$mesh (for spde models), mapping$values,
+# Checks subcomp$mapper, model$mesh (for spde models), mapping$values,
 # input_values or mapping$n, in that order.
 make_mapper <- function(subcomp,
                         label,
@@ -717,7 +717,7 @@ make_mapper <- function(subcomp,
     } else if (inherits(subcomp[["mapper"]], "inla.mesh")) {
       subcomp$n <- subcomp[["mapper"]]$n
       subcomp$values <- seq_len(subcomp$n)
-    } else if (inherits(subcomp[["mapper"]], "bru_factor_mapper")) {
+    } else if (inherits(subcomp[["mapper"]], "bru_mapper_factor")) {
       subcomp$n <- subcomp[["mapper"]]$n
       subcomp$values <- seq_len(subcomp$n)
     } else {
@@ -769,7 +769,7 @@ make_mapper <- function(subcomp,
         subcomp$mapper$factor_mapping <- "full"
       }
       subcomp$n <- length(subcomp[["values"]])
-      class(subcomp$mapper) <- c("bru_factor_mapper", "list")
+      class(subcomp$mapper) <- c("bru_mapper_factor", "list")
     } else {
       if (length(subcomp[["values"]]) > 1) {
         subcomp$mapper <- INLA::inla.mesh.1d(subcomp[["values"]])
@@ -982,7 +982,7 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
       val <- as.matrix(val)
     }
     A <- INLA::inla.spde.make.A(subcomp$mapper, loc = val, weights = weights)
-  } else if (inherits(subcomp$mapper, c("bru_factor_mapper"))) {
+  } else if (inherits(subcomp$mapper, c("bru_mapper_factor"))) {
     if (is.factor(val)) {
       if (!identical(levels(val), subcomp$mapper$levels)) {
         val <- factor(as.character(val), levels = subcomp$mapper$levels)
