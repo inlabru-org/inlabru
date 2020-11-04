@@ -517,10 +517,12 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 #' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 
-int.polygon <- function(mesh, loc, group = NULL, method = "stable", ...){
+int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...){
   if (is.null(group)) {
     group <- rep(1, nrow(loc))
   }
+  method <- match.arg(method, c("stable", "basic"))
+  
   ipsl <- list()
   # print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
   for (g in unique(group)) {

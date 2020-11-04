@@ -9,4 +9,5 @@
 ^vignettes/web$
 ^codecov\.yml$
 ^\.github$
-^tmp/
+^tmp$
+^check$

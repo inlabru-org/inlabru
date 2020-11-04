@@ -4,7 +4,7 @@
 \alias{int.polygon}
 \title{Integration points for polygons inside an inla.mesh}
 \usage{
-int.polygon(mesh, loc, group = NULL, method = "stable", ...)
+int.polygon(mesh, loc, group = NULL, method = NULL, ...)
 }
 \arguments{
 \item{mesh}{An inla.mesh object}

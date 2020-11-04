@@ -9,8 +9,8 @@ ipoints(
   domain = NULL,
   name = "x",
   group = NULL,
-  project,
-  int.args = list(method = "stable", nsub = NULL)
+  int.args = NULL,
+  project = NULL
 )
 }
 \arguments{
@@ -26,9 +26,9 @@ defining the locations to project the integration points to. In 2D \code{domain}
 
 \item{group}{Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged by the projection.}
 
-\item{project}{If TRUE, project the integration points to mesh vertices}
-
 \item{int.args}{List of arguments passed to \code{int.polygon}}
+
+\item{project}{If TRUE, project the integration points to mesh vertices}
 }
 \value{
 A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.

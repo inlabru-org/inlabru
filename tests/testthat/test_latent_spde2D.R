@@ -49,7 +49,9 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_on_cran()
   disable_PROJ6_warnings()
   skip_if_not(bru_safe_inla())
-  data <- latent_spde2D_group_testdata(num.threads = "1:1", h = 0.005)
+  expect_warning(
+    {data <- latent_spde2D_group_testdata(num.threads = "1:1", h = 0.005)},
+    "export to PROJ failed: generic error of unknown origin")
 
   # Check Intercept
   expect_equal(data$fit$summary.fixed["Intercept", "mean"], -8.8628, midtol)
