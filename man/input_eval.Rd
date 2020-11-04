@@ -3,7 +3,9 @@
 \name{input_eval}
 \alias{input_eval}
 \alias{input_eval.component}
-\title{Obtain covariate}
+\alias{input_eval.component_list}
+\alias{input_eval.bru_input}
+\title{Obtain covariate values}
 \usage{
 input_eval(...)
 
@@ -13,6 +15,15 @@ input_eval(...)
   data,
   ...
 )
+
+\method{input_eval}{component_list}(
+  components,
+  part = c("main", "group", "replicate", "weights"),
+  data,
+  ...
+)
+
+\method{input_eval}{bru_input}(input, data, env = NULL, label = NULL, null.on.fail = FALSE, ...)
 }
 \arguments{
 \item{...}{Unused.}
@@ -28,7 +39,7 @@ input_eval(...)
 An vector or a coordinate matrix
 }
 \description{
-Obtain covariate
+Obtain covariate values
 }
 \section{Simple covariates and the map parameter}{
 

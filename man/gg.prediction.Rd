@@ -13,11 +13,11 @@
 
 \item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.}
 
-\item{alpha}{The ribbons numeric alpha level in \link{0,1}.}
+\item{alpha}{The ribbons numeric alpha level in \verb{[0,1]}.}
 
 \item{bar}{If TRUE plot boxplot-style summary for each variable.}
 
-\item{...}{Arguments passed on to \link{geom_line}.}
+\item{\dots}{Arguments passed on to \link{geom_line}.}
 }
 \value{
 Concatenation of a \link{geom_line} value and optionally a \link{geom_ribbon} value.
@@ -36,6 +36,7 @@ Note: \code{gg.prediction} also understands the format of INLA-style posterior s
 }
 \examples{
 \donttest{
+if (bru_safe_inla()) {
 # Generate some data
 
 input.df <- data.frame(x=cos(1:10))
@@ -47,7 +48,7 @@ fit <- bru(y ~ x, family = "gaussian", data = input.df)
 
 # Predict posterior statistics of 'x'
 
-xpost = predict(fit, formula = ~ x)
+xpost <- predict(fit, data = NULL, formula = ~ x)
 
 # The statistics include mean, standard deviation, the 2.5\% quantile, the median,
 # the 97.5\% quantile, minimum and maximum sample drawn from the posterior as well as
@@ -60,15 +61,16 @@ xpost
 ggplot() + gg(xpost)
 
 
-# The predict function can also be used to simulatenneously estimate posteriors
+# The predict function can also be used to simulataneously estimate posteriors
 # of multiple variables:
 
-xipost = predict(fit, formula = ~ data.frame(post = c(Intercept, x)))
+xipost = predict(fit, data = NULL,
+                 formula = ~ c(Intercept = Intercept, x = x))
 xipost
 
 # If we still want a plot in the previous style we have to set the bar parameter to TRUE
 
-rownames(xipost) = c("Intercept","x")
+# rownames(xipost) = c("Intercept","x")
 p1 = ggplot() + gg(xipost, bar = TRUE)
 p1
 
@@ -100,6 +102,7 @@ ggplot() +
   gg(xipost) +
   gg(xipost, mapping = aes(y = median), ribbon = FALSE, color = "red")
 
+}
 }
 }
 \seealso{

@@ -23,7 +23,7 @@ parameter of a model's SPDE component. Can also plot Matern correlation or covar
 }
 \examples{
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
 
 # Load 1D Poisson process data
 
@@ -39,7 +39,7 @@ ggplot(pts2) +
 # Fit an LGCP model with  and SPDE component
 
 x <- seq(0, 55, length = 20)
-mesh1D <- inla.mesh.1d(x, boundary = "free")
+mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
 mdl <- x ~ spde1D(map = x, model = inla.spde2.matern(mesh1D)) + Intercept
 fit <- lgcp(mdl, pts2, domain = list(x = c(0,55)))
 

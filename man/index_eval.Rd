@@ -3,11 +3,14 @@
 \name{index_eval}
 \alias{index_eval}
 \alias{index_eval.component}
+\alias{index_eval.component_list}
 \title{Obtain indices}
 \usage{
 index_eval(...)
 
 \method{index_eval}{component}(component, ...)
+
+\method{index_eval}{component_list}(components, ...)
 }
 \arguments{
 \item{...}{Unused.}

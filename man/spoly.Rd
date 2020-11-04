@@ -7,7 +7,7 @@
 spoly(
   data,
   cols = colnames(data)[1:2],
-  crs = CRS(as.character(NA)),
+  crs = CRS(NA_character_),
   to.crs = NULL
 )
 }
@@ -43,7 +43,7 @@ pts <- data.frame(
 )
 
 # Convert to SpatialPolygonsDataFrame
-pol <- spoly(pts, crs = CRS(as.character(NA)))
+pol <- spoly(pts)
 
 # Plot it!
 ggplot() + gg(pol)

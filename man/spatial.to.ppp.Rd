@@ -7,9 +7,9 @@
 spatial.to.ppp(points, samplers)
 }
 \arguments{
-\item{points}{A SpatialPoints\link{DataFrame} object describing the point pattern.}
+\item{points}{A \code{SpatialPoints[DataFrame]} object describing the point pattern.}
 
-\item{samplers}{A SpatialPolygons\link{DataFrame} object describing the observation window.}
+\item{samplers}{A \code{SpatialPolygons[DataFrame]} object describing the observation window.}
 }
 \value{
 A spatstat \code{spatstat} \code{ppp} object

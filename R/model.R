@@ -109,19 +109,23 @@ make.model <- function(components, lhoods) {
 
 #' Evaluate or sample from a posterior result given a model and locations
 #'
-#' @aliases evaluate.model evaluate
 #' @export
-#' @param model An [inlabru] [model]
-#' @param result Posterior of an [inla], [bru] or [lgcp] run.
+#' @param model An [bru] model
+#' @param result Posterior of an [bru] or [lgcp] run.
 #' @param data Locations and covariates needed to evaluate the model.
-#' @param predictor A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (`NULL`) returns a `data.frame` containing the sampled effects. In case of a formula the right hand side is used for evaluation.
+#' @param predictor A formula or an expression to be evaluated given the
+#' posterior or for each sample thereof. The default (`NULL`) returns a
+#' `data.frame` containing the sampled effects. In case of a formula the right
+#' hand side is used for evaluation.
 #' @param property Property of the model components to obtain value from.
-#' Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see `n` parameter).
+#' Default: "mode". Other options are "mean", "0.025quant", "0.975quant",
+#' "sd" and "sample". In case of "sample" you will obtain samples from the
+#' posterior (see `n` parameter).
 #' @param n Number of samples to draw.
-# @param seed If seed != 0L, the random seed
-# @param num.threads Specification of desired number of threads for parallel
-# computations. Default NULL, leaves it up to INLA.
-# When seed != 0, overridden to "1:1"
+#' @param seed If seed != 0L, the random seed
+#' @param num.threads Specification of desired number of threads for parallel
+#' computations. Default NULL, leaves it up to INLA.
+#' When seed != 0, overridden to "1:1"
 #' 
 #' @keywords internal
 evaluate.model <- function(model,
@@ -140,7 +144,7 @@ evaluate.model <- function(model,
     fml.envir <- list()
   }
 
-  # Do we otain our values from sampling or from a property of a summary?
+  # Do we obtain our values from sampling or from a property of a summary?
   if (property == "sample") {
     smp <- inla.posterior.sample.structured(result, n = n, seed = seed,
                                             num.threads = num.threads)
@@ -158,8 +162,10 @@ evaluate.model <- function(model,
     vars <- intersect(names(smp[[1]]), all.vars(predictor))
   }
 
-  # Pre-calculate projection matrices
-  As <- lapply(model$effects, amatrix_eval, data)
+  if (!is.null(data)) {
+    # Pre-calculate projection matrices
+    As <- lapply(model$effects, amatrix_eval, data)
+  }
 
   for (k in 1:n) {
     # Discard variables we do not need
@@ -173,15 +179,26 @@ evaluate.model <- function(model,
       if (is.data.frame(sm[[label]])) {
         sm[[label]] <- sm[[label]]$value
       }
-      sm[[label]] <- value(model$effects[[label]], data = data,
-                           state = sm[[label]], A = As[[label]])
+      if (!is.null(data)) {
+        sm[[label]] <- value(model$effects[[label]], data = data,
+                             state = sm[[label]], A = As[[label]])
+      }
     }
 
     # If no predictor is provided simply return the samples.
     # Otherwise evaluate predictor with each sample as an environment
     if (is.null(predictor)) {
-      smp[[k]] <- data.frame(sm)
+      if (is.null(data)) {
+        stop(paste0("Both data and predictor are NULL.",
+                    " Don't know what to predict."))
+      } else {
+        smp[[k]] <- data.frame(sm)
+      }
     } else {
+      # If data is NULL, the latent variables will be present in sm _instead_
+      # of the effects, under the same name.
+      # TODO: make latent variables consistently available, under special
+      # names.
       envir <- c(sm, as.list(data.frame(data)), fml.envir,
                  as.list(environment(model$formula)))
       smp[[k]] <- eval(predictor, envir = envir)

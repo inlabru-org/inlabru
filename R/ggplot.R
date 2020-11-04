@@ -168,9 +168,9 @@ gg.data.frame <- function(...) {
 #' @param data A prediction object, usually the result of a [predict.bru] call.
 #' @param mapping a set of aesthetic mappings created by [aes] or [aes_]. These are passed on to [geom_line].
 #' @param ribbon If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.
-#' @param alpha The ribbons numeric alpha level in [0,1].
+#' @param alpha The ribbons numeric alpha level in `[0,1]`.
 #' @param bar If TRUE plot boxplot-style summary for each variable.
-#' @param ... Arguments passed on to [geom_line].
+#' @param \dots Arguments passed on to [geom_line].
 #' @return Concatenation of a [geom_line] value and optionally a [geom_ribbon] value.
 #' @family geomes for inla and inlabru predictions
 #' @example inst/examples/gg.prediction.R
@@ -483,7 +483,7 @@ gg.SpatialPixelsDataFrame <- function(data,
 #'
 #' # Load Gorilla data
 #'
-#' data(gorillas)
+#' data(gorillas, package = "inlabru")
 #'
 #' # Turn elevation covariate into SpatialPixels
 #' pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
@@ -555,7 +555,7 @@ gg.inla.mesh <- function(data,
       stop("Geom not implemented for spherical meshes (manifold = S2)")
     }
     if (!is.null(crs)) {
-      data <- INLA::inla.spTransform(data, CRSobj = crs)
+      data <- fm_spTransform(data, CRSobj = crs)
     }
 
     df <- rbind(

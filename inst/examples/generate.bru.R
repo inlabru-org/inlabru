@@ -1,5 +1,5 @@
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
   
 # Generate data for a simple linear model
 

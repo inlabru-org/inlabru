@@ -129,13 +129,13 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
 #' )
 #'
 #' # Convert to SpatialPolygonsDataFrame
-#' pol <- spoly(pts, crs = CRS(as.character(NA)))
+#' pol <- spoly(pts)
 #'
 #' # Plot it!
 #' ggplot() + gg(pol)
 #' }
 #'
-spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(as.character(NA)), to.crs = NULL) {
+spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(NA_character_), to.crs = NULL) {
   po <- Polygon(data[, cols], hole = FALSE)
   pos <- Polygons(list(po), ID = "tmp")
   predpoly <- SpatialPolygons(list(pos), proj4string = crs)

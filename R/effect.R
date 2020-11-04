@@ -5,18 +5,27 @@
 value <- function(...) {
   UseMethod("value")
 }
+#' Construct A-matrix
+#'
+#' Constructs the A-matrix for components and data
 #' @export
-#' @rdname amatrix_eval.component
+#' @rdname amatrix_eval
 amatrix_eval <- function(...) {
   UseMethod("amatrix_eval")
 }
+#' Obtain covariate values
+#'
 #' @export
-#' @rdname input_eval.component
+#' @rdname input_eval
 input_eval <- function(...) {
   UseMethod("input_eval")
 }
+#' Obtain indices
+#'
+#' Indexes into to the components
+#'
 #' @export
-#' @rdname index_eval.component
+#' @rdname index_eval
 index_eval <- function(...) {
   UseMethod("index_eval")
 }
@@ -33,23 +42,337 @@ add_mappers <- function(...) {
 #'
 #' @description
 #'
-#' Similar to glm(), gam() and inla() [bru] uses formula objects to describe response data and latent
-#' (unknonw) components of the model to be fitted. However, in addition to the syntax compatible with
-#' [inla][INLA::inla], bru components offer addtitional functionality which facilitates modeling.
+#' Similar to `glm()`, `gam()` and `inla()`, [bru] models can be constructed via
+#' a formula-like syntax, where each latent effect is specified. However, in
+#' addition to the parts of the syntax compatible with `INLA::inla`, `bru`
+#' components offer additional functionality which facilitates modelling, and
+#' the predictor expression can be specified separately, allowing more complex
+#' and non-linear predictors to be defined. The formula syntax is just a way to
+#' allow all model components to be defined in a single line of code, but the
+#' definitions can optionally be split up into separate component definitions.
+#' See Details for more information.
+#' 
+#' The `component` methods all rely on the [component.character()] method, that
+#' defines a model component with a given label/name. This method is normally
+#' the only method that user code might directly access, since the
+#' `component.formula` and other methods are called inside [bru()] instead.
 #'
-#' In inlabru, latent components can be constructed using R formulae or explicit parameter. For background
-#' information on the formulae inlabru accepts please see [component.formula]. For more details on the
-#' model parameters and how inlabru employs INLA's `f` function please see [component.character]
-#'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#' @family Component constructor
-#' @param object A formula or a label (character)
-#' @param ... Arguments passed on to [component.formula] or [component.character]
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
+#' Finn Lindgren \email{Finn.Lindgren@@gmail.com}
+#' @family component constructors
+#' @param object A formula (for `component.formula`), a character label
+#' (for `component.character`), or a list of component objects
+#' (for `component.list`; not yet supported as `bru` input (TODO)).
+#' @param \dots Arguments passed on to the methods
 #' @export
 
 component <- function(object, ...) {
   UseMethod("component")
 }
+
+
+#' @family component constructors
+#' @export
+#' @param main = NULL
+#' main takes an R expression that evaluates to where the latent variables should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
+#'   Arguments starting with weights, group, replicate behave similarly to main, but for the corresponding features of `INLA::f()`.
+#' @param model Either one of "offset", "factor", "linear" or a model name or
+#' object accepted by INLA's `f` function. If set to NULL, then "linear" is used.
+#' @param mapper
+#' Information about how to do the mapping from the values evaluated in `main`,
+#' and to the latent variables. Auto-detects spde model objects in model and
+#' extracts the mesh object to use as the mapper, and auto-generates mappers
+#' for indexed models. (Default: NULL, for auto-determination)
+#' @param main_layer,main_selector
+#' The `_layer` is a numeric index or character name of which
+#' layer/variable to extract from a covariate data object given in `main`
+#' (Default: The effect component name, if it exists i the covariate object,
+#' otherwise the first column of the covariate data frame)
+#' 
+#' The `_selector` is character name of a variable whose contents determines which layer to
+#' extract from a covariate for each data point. Overrides the `layer`.
+#' (Default: NULL)
+#' (TODO: check if _selector is already supported for weight, group, and
+#' replicate as well, and if so add them)
+#' @param n The number of latent variables in the model. Should be auto-detected
+#' for most or all models (Default: NULL, for auto-detection).
+#' An error is given if it can't figure it out by itself.
+#' @param values Specifies for what covariate/index values INLA should build
+#' the latent model. Normally generated internally based on the mapping details.
+#' (Default: NULL, for auto-determination)
+#' @param season.length Passed on to `INLA::f()` for model `"seasonal"`
+#' (TODO: check if this parameter is actually needed anymore)
+# Weights
+#' @param weights,weights_layer
+#' Optional specification of effect scaling weights.
+#' Same syntax as for `main`.
+# Group model parameters
+#' @param group,group_layer
+#' Optional specification of kronecker/group model indexing.
+#' @param control.group `list` of kronecker/group model parameters, currently
+#' passed directly on to `INLA:f`
+# Replicate model parameters
+#' @param replicate,replicate_layer
+#'Optional specification of indices for an independent
+#' replication model. Same syntax as for `main`
+#' @param A.msk TODO: check/fix/deprecate this parameter.
+#' Likely doesn't work at the moment, and I've found no examples that use it.
+# Deprecated parameters
+#' @param map Deprecated. Use `main` instead.
+#' @param mesh Deprecated. Use `mapper` instead.
+#' @param envir_extra TODO: check/fix this parameter.
+#' 
+#' @details The `component.character` method is inlabru's equivalent to INLA's
+#' `f` function but adds functionality that is unique to inlabru.
+#' 
+#' @family component constructors
+#' @rdname component
+#'
+#' @examples
+#' \donttest{
+#' if (require("INLA", quietly = TRUE)) {
+#'
+#'   # As an example, let us create a linear component. Here ,the component is
+#'   # called "myEffectOfX" while the covariate the component acts on is called "x":
+#'
+#'   eff <- component("myEffectOfX", main = x, model = "linear")
+#'   summary(eff)
+#'
+#'   # A more complicated component:
+#'   eff <- component("myEffectOfX",
+#'                    main = x,
+#'                    model = inla.spde2.matern(inla.mesh.1d(1:10)))
+#' }
+#' }
+
+component.character <- function(object,
+                                # Main model parameters
+                                main = NULL, # This must be kept as 1st arg.
+                                model = NULL,
+                                mapper = NULL,
+                                main_layer = NULL,
+                                main_selector = NULL,
+                                n = NULL,
+                                values = NULL,
+                                season.length = NULL,
+                                # Weights
+                                weights = NULL,
+                                weights_layer = NULL,
+                                # Group model parameters
+                                group = NULL,
+                                group_layer = NULL,
+                                control.group = NULL,
+                                # Replicate model parameters
+                                replicate = NULL,
+                                replicate_layer = NULL,
+                                A.msk = NULL,
+                                # Deprecated parameters
+                                # map -> main
+                                map = NULL,
+                                # mesh -> mapper
+                                mesh = NULL,
+                                envir_extra = NULL,
+                                ...) {
+  
+  # INLA models:
+  # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper,
+  #            besagproper2, fgn, fgn2, ar1, ar1c, ar, ou, generic, generic0, generic1, generic2, generic3, spde,
+  #            spde2, spde3, iid1d, iid2d, iid3d, iid4d, iid5d, 2diid, z, rw2d, rw2diid, slm, matern2d, copy,
+  #            clinear, sigm, revsigm, log1exp, logdist)
+  #
+  # Supported:
+  # btypes = c("offset", "factor", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
+  
+  # The label
+  label <- object
+  
+  if (is.null(model)) {
+    # TODO: may need a special marker to autodetect factor variables,
+    #       which can only be autodetected in a data-aware pass.
+    model <- "linear"
+  }
+  
+  # Force evaluation of explicit inputs
+  force(values)
+  
+  if (!is.null(substitute(group))) {
+    if (is.null(control.group)) {
+      control.group <- INLA::inla.set.control.group.default()
+    }
+    group_model <- control.group$model
+  } else {
+    group_model <- "exchangeable"
+  }
+  
+  if (is.null(main_layer)) {
+    main_layer <- label
+  }
+  
+  if (!is.null(substitute(map))) {
+    if (is.null(substitute(main))) {
+      main <- substitute(map)
+      warning("Use of 'map' is deprecated and may be disabled; use 'main' instead.")
+    } else {
+      warning("Deprecated 'map' overridden by 'main'.")
+    }
+  }
+  
+  if (!is.null(mesh)) {
+    if (is.null(mapper)) {
+      mapper <- mesh
+      warning("Use of 'mesh' is deprecated and may be disabled; use 'mapper' instead.")
+    } else {
+      warning("Deprecated 'mesh' overridden by 'mapper'.")
+    }
+  }
+  
+  envir <- parent.frame()
+  if (is.null(envir_extra)) {
+    envir_extra <- new.env(envir)
+  }
+  
+  # Default component (to be filled)
+  component <- list(
+    label = label,
+    inla.formula = NULL,
+    main = bru_subcomponent(
+      input = bru_input(substitute(main),
+                        label = label,
+                        layer = main_layer,
+                        selector = main_selector),
+      mapper = mapper,
+      model = model,
+      n = n,
+      values = values,
+      season.length = season.length,
+      weights =
+        if (is.null(substitute(weights))) {
+          NULL
+        } else {
+          bru_input(substitute(weights),
+                    label = paste0(label, ".weights"),
+                    layer = weights_layer)
+        }),
+    group = bru_subcomponent(
+      input = bru_input(substitute(group),
+                        label = paste0(label, ".group"),
+                        layer = group_layer),
+      mapper = NULL,
+      n = NULL,
+      model = group_model),
+    replicate = bru_subcomponent(
+      input = bru_input(substitute(replicate),
+                        label = paste0(label, ".repl"),
+                        layer = replicate_layer),
+      mapper = NULL,
+      n = NULL,
+      model = "iid"),
+    A.msk = A.msk,
+    env = envir,
+    env_extra = envir_extra
+  )
+  
+  # Main bit
+  if (component$main$type %in% c("offset")) {
+    component$inla.formula <- as.formula(paste0("~ . + offset(offset)"),
+                                         env = envir)
+  } else {
+    # Construct a call to the f function from the parameters provided
+    # Ultimately, this call will be converted to the model formula presented to INLA
+    fcall <- sys.call()
+    fcall[[1]] <- "f"
+    fcall[[2]] <- as.symbol(label)
+    names(fcall)[2] <- ""
+    if (is.null(names(fcall)) || (names(fcall)[3] == "")) {
+      # 'main' is the only parameter allowed to be nameless,
+      # and only if it's the first parameter (position 3 in this fcall)
+      names(fcall)[3] <- "main"
+    }
+    
+    # Store model name or object in the environment
+    model_name <- paste0("BRU_", label, "_main_model")
+    fcall[["model"]] <- as.symbol(model_name)
+    assign(model_name, component$main$model, envir = component$env_extra)
+    
+    # Remove parameters inlabru supports but INLA doesn't,
+    # and substitute parameters that inlabru will transform
+    fcall <- fcall[!(names(fcall) %in% c("main",
+                                         "mapper",
+                                         "group_mapper",
+                                         "replicate_mapper",
+                                         "A.msk",
+                                         "map",
+                                         "mesh",
+                                         "main_layer",
+                                         "group_layer",
+                                         "replicate_layer",
+                                         "weights_layer"))]
+    
+    # A trick for "Copy" models
+    if ("copy" %in% names(fcall)) {
+      ### TODO:
+      ### Check this. Where is the copy information stored and used?
+      ### Should postprocess components to link them together.
+      fcall[["copy"]] <- NULL
+      fcall$model <- NULL
+    }
+    
+    # Replace arguments that will be evaluated by a mapper
+    # TODO: make a more general system, that also handles ngroup etc.
+    suffixes <- list("group" = "group",
+                     "replicate" = "repl",
+                     "weights" = "weights")
+    for (arg in names(suffixes)) {
+      if (arg %in% names(fcall)) {
+        fcall[[arg]] <- as.symbol(paste0(label, ".", suffixes[[arg]]))
+      }
+    }
+    
+    # These values were previously initialised by an INLA::f call, but ::f
+    # should only be called by INLA, and never by inlabru, since it sets up
+    # temporary files that will not be removed, and also requires data not
+    # available at this point!  Until multi-stage model initialisation is
+    # implemented, require the user to explicitly provide these values.
+    if (!is.null(component$main$n)) {
+      fcall[["n"]] <- component$main$n
+    }
+    if (!is.null(season.length)) {
+      fcall[["season.length"]] <- season.length
+    }
+    
+    # Make sure 'values' is setup properly.
+    if (is.null(component$main$values)) {
+      fcall <- fcall[!("values" %in% names(fcall))]
+    } else {
+      values_name <- paste0("BRU_", label, "_values")
+      fcall[["values"]] <- as.symbol(values_name)
+      assign(values_name, component$main$values, envir = component$env_extra)
+    }
+    
+    # Setup factor precision parameter
+    if (identical(model, "factor")) {
+      # TODO: allow configuration of the precision
+      factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
+      fcall[["hyper"]] <- as.symbol(factor_hyper_name)
+      assign(factor_hyper_name,
+             list(prec = list(initial = log(1e-6), fixed = TRUE)),
+             envir = component$env_extra)
+    }
+    
+    component$inla.formula <-
+      as.formula(paste0("~ . + ",
+                        as.character(parse(text = deparse(fcall)))),
+                 env = envir)
+    
+    component$fcall <- fcall
+  }
+  
+  class(component) <- c("component", "list")
+  component
+}
+
+
+
 
 
 #' inlabru latent model component construction using formulae
@@ -108,12 +431,12 @@ component <- function(object, ...) {
 #'
 #' \itemize{\item{`predict(fit, NULL, ~ exp(psi))`.}}
 #'
-#' @aliases component.formula
+#' @param lhoods TODO: document
+#' @param envir TODO: document
 #' @export
-#' @family Component constructor
-#' @param object A formula describing latent model components.
-#' @param ... Ignored arguments (S3 compatibility)
+#' @family component constructors
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @rdname component
 #'
 #' @examples
 #' # As an example, let us create a linear component. Here, the component is
@@ -127,7 +450,7 @@ component <- function(object, ...) {
 #' eff <- component(~ myLinearEffectOfX(x, model = "linear"))
 #' eff <- component(~ myLinearEffectOfX(x))
 
-component.formula <- function(object, lhoods, envir = NULL, ...) {
+component.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)
   }
@@ -138,10 +461,24 @@ component.formula <- function(object, lhoods, envir = NULL, ...) {
                          eval(component.expression,
                               envir = envir)
                        })
-  environment(components) <- envir
-  names(components) <- lapply(components, function(x) x$label)
-  class(components) <- c("component_list", "list")
-  add_mappers(components, lhoods = lhoods)
+  environment(object) <- envir
+  component.list(components, lhoods = lhoods, envir = envir)
+}
+
+#' @export
+#' @rdname component
+component.list <- function(object, lhoods = NULL, envir = NULL, ...) {
+  stopifnot(all(vapply(object, function(x) inherits(x, "component"), TRUE)))
+  if (is.null(envir)) {
+    envir <- environment(object)
+  }
+  names(object) <- lapply(object, function(x) x$label)
+  class(object) <- c("component_list", "list")
+  environment(object) <- envir
+  if (!is.null(lhoods)) {
+    object <- add_mappers(object, lhoods = lhoods)
+  }
+  object
 }
 
 
@@ -355,279 +692,9 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL)
 }
 
 
-#' inlabru latent model component construction using parameters
-#'
-#' This function is inlabru's equivalent to INLA's `f` function but adds functionality that
-#' is unique to inlabru.
-#'
-#' @aliases component.character
-#' @family Component constructor
-#' @export
-#' @method component character
-#' @param object A string giving the component its name
-#' @param data EXPERIMENTAL
-#' @param model Either one of "offset", "factor", "linear" or a model accepted
-#' by INLA's `f` function. If set to NULL, then "linear" is used.
-#' @param map EXPERIMENTAL
-#' @param n EXPERIMENTAL
-#' @param season.length EXPERIMENTAL
-#' @param group EXPERIMENTAL
-#' @param replicate EXPERIMENTAL
-#' @param values EXPERIMENTAL
-#' @param A.msk Boolean vector for masking (FALSE=deactivate) columns of the A-matrix
-#' @param ... EXPERIMENTAL
-#' @return An component object
-#' 
-#' @details 
-#' Deprecated: `map` (now `main`), `mesh` (now `mapper`)
-#'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
-#' @examples
-#' \donttest{
-#' if (require("INLA", quietly = TRUE)) {
-#'
-#'   # As an example, let us create a linear component. Here ,the component is
-#'   # called "myEffectOfX" while the covariate the component acts on is called "x":
-#'
-#'   eff <- component("myEffectOfX", main = x, model = "linear")
-#'   summary(eff)
-#'
-#'   # A more complicated component:
-#'   eff <- component("myEffectOfX",
-#'                    main = x,
-#'                    model = inla.spde2.matern(inla.mesh.1d(1:10)))
-#' }
-#' }
-
-component.character <- function(object,
-                                # Main model parameters
-                                main = NULL, # This must be kept as 1st arg.
-                                model = NULL,
-                                mapper = NULL,
-                                main_layer = NULL,
-                                main_selector = NULL,
-                                n = NULL,
-                                values = NULL,
-                                season.length = NULL,
-                                # Weights
-                                weights = NULL,
-                                weights_layer = NULL,
-                                # Group model parameters
-                                group = NULL,
-                                group_layer = NULL,
-                                control.group = NULL,
-                                # Replicate model parameters
-                                replicate = NULL,
-                                replicate_layer = NULL,
-                                A.msk = NULL,
-                                # Deprecated parameters
-                                # map -> main
-                                map = NULL,
-                                # mesh -> mapper
-                                mesh = NULL,
-                                envir_extra = NULL,
-                                ...) {
-
-  # INLA models:
-  # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper,
-  #            besagproper2, fgn, fgn2, ar1, ar1c, ar, ou, generic, generic0, generic1, generic2, generic3, spde,
-  #            spde2, spde3, iid1d, iid2d, iid3d, iid4d, iid5d, 2diid, z, rw2d, rw2diid, slm, matern2d, copy,
-  #            clinear, sigm, revsigm, log1exp, logdist)
-  #
-  # Supported:
-  # btypes = c("offset", "factor", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
-
-  # The label
-  label <- object
-  
-  if (is.null(model)) {
-    # TODO: may need a special marker to autodetect factor variables,
-    #       which can only be autodetected in a data-aware pass.
-    model <- "linear"
-  }
-  
-  # Force evaluation of explicit inputs
-  force(values)
-
-  if (!is.null(substitute(group))) {
-    if (is.null(control.group)) {
-      control.group <- INLA::inla.set.control.group.default()
-    }
-    group_model <- control.group$model
-  } else {
-    group_model <- "exchangeable"
-  }
-
-  if (is.null(main_layer)) {
-    main_layer <- label
-  }
-
-  if (!is.null(substitute(map))) {
-    if (is.null(substitute(main))) {
-      main <- substitute(map)
-      warning("Use of 'map' is deprecated and may be disabled; use 'main' instead.")
-    } else {
-      warning("Deprecated 'map' overridden by 'main'.")
-    }
-  }
-
-  if (!is.null(mesh)) {
-    if (is.null(mapper)) {
-      mapper <- mesh
-      warning("Use of 'mesh' is deprecated and may be disabled; use 'mapper' instead.")
-    } else {
-      warning("Deprecated 'mesh' overridden by 'mapper'.")
-    }
-  }
-
-  envir <- parent.frame()
-  if (is.null(envir_extra)) {
-    envir_extra <- new.env(envir)
-  }
-  
-  # Default component (to be filled)
-  component <- list(
-    label = label,
-    inla.formula = NULL,
-    main = bru_subcomponent(
-      input = bru_input(substitute(main),
-                        label = label,
-                        layer = main_layer,
-                        selector = main_selector),
-      mapper = mapper,
-      model = model,
-      n = n,
-      values = values,
-      season.length = season.length,
-      weights =
-        if (is.null(substitute(weights))) {
-          NULL
-        } else {
-          bru_input(substitute(weights),
-                    label = paste0(label, ".weights"),
-                    layer = weights_layer)
-        }),
-    group = bru_subcomponent(
-      input = bru_input(substitute(group),
-                        label = paste0(label, ".group"),
-                        layer = group_layer),
-      mapper = NULL,
-      n = NULL,
-      model = group_model),
-    replicate = bru_subcomponent(
-      input = bru_input(substitute(replicate),
-                        label = paste0(label, ".repl"),
-                        layer = replicate_layer),
-      mapper = NULL,
-      n = NULL,
-      model = "iid"),
-    A.msk = A.msk,
-    env = envir,
-    env_extra = envir_extra
-  )
-  
-  # Main bit
-  if (component$main$type %in% c("offset")) {
-    component$inla.formula <- as.formula(paste0("~ . + offset(offset)"),
-                                         env = envir)
-  } else {
-    # Construct a call to the f function from the parameters provided
-    # Ultimately, this call will be converted to the model formula presented to INLA
-    fcall <- sys.call()
-    fcall[[1]] <- "f"
-    fcall[[2]] <- as.symbol(label)
-    names(fcall)[2] <- ""
-    if (is.null(names(fcall)) || (names(fcall)[3] == "")) {
-      # 'main' is the only parameter allowed to be nameless,
-      # and only if it's the first parameter (position 3 in this fcall)
-      names(fcall)[3] <- "main"
-    }
-
-    # Store model name or object in the environment
-    model_name <- paste0("BRU_", label, "_main_model")
-    fcall[["model"]] <- as.symbol(model_name)
-    assign(model_name, component$main$model, envir = component$env_extra)
-    
-    # Remove parameters inlabru supports but INLA doesn't,
-    # and substitute parameters that inlabru will transform
-    fcall <- fcall[!(names(fcall) %in% c("main",
-                                         "mapper",
-                                         "group_mapper",
-                                         "replicate_mapper",
-                                         "A.msk",
-                                         "map",
-                                         "mesh",
-                                         "main_layer",
-                                         "group_layer",
-                                         "replicate_layer",
-                                         "weights_layer"))]
-
-    # A trick for "Copy" models
-    if ("copy" %in% names(fcall)) {
-      ### TODO:
-      ### Check this. Where is the copy information stored and used?
-      ### Should postprocess components to link them together.
-      fcall[["copy"]] <- NULL
-      fcall$model <- NULL
-    }
-
-    # Replace arguments that will be evaluated by a mapper
-    # TODO: make a more general system, that also handles ngroup etc.
-    suffixes <- list("group" = "group",
-                     "replicate" = "repl",
-                     "weights" = "weights")
-    for (arg in names(suffixes)) {
-      if (arg %in% names(fcall)) {
-        fcall[[arg]] <- as.symbol(paste0(label, ".", suffixes[[arg]]))
-      }
-    }
-
-    # These values were previously initialised by an INLA::f call, but ::f
-    # should only be called by INLA, and never by inlabru, since it sets up
-    # temporary files that will not be removed, and also requires data not
-    # available at this point!  Until multi-stage model initialisation is
-    # implemented, require the user to explicitly provide these values.
-    if (!is.null(component$main$n)) {
-      fcall[["n"]] <- component$main$n
-    }
-    if (!is.null(season.length)) {
-      fcall[["season.length"]] <- season.length
-    }
-
-    # Make sure 'values' is setup properly.
-    if (is.null(component$main$values)) {
-      fcall <- fcall[!("values" %in% names(fcall))]
-    } else {
-      values_name <- paste0("BRU_", label, "_values")
-      fcall[["values"]] <- as.symbol(values_name)
-      assign(values_name, component$main$values, envir = component$env_extra)
-    }
-    
-    # Setup factor precision parameter
-    if (identical(model, "factor")) {
-      # TODO: allow configuration of the precision
-      factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
-      fcall[["hyper"]] <- as.symbol(factor_hyper_name)
-      assign(factor_hyper_name,
-             list(prec = list(initial = log(1e-6), fixed = TRUE)),
-             envir = component$env_extra)
-    }
-    
-    component$inla.formula <-
-      as.formula(paste0("~ . + ",
-                        as.character(parse(text = deparse(fcall)))),
-                 env = envir)
-    
-    component$fcall <- fcall
-  }
-
-  class(component) <- c("component", "list")
-  component
-}
 
 # Defines a default mapper given the type of model and parameters provided
-# Checks mapping$mapper, model$mesh (for spde models), mapping$values,
+# Checks subcomp$mapper, model$mesh (for spde models), mapping$values,
 # input_values or mapping$n, in that order.
 make_mapper <- function(subcomp,
                         label,
@@ -650,7 +717,7 @@ make_mapper <- function(subcomp,
     } else if (inherits(subcomp[["mapper"]], "inla.mesh")) {
       subcomp$n <- subcomp[["mapper"]]$n
       subcomp$values <- seq_len(subcomp$n)
-    } else if (inherits(subcomp[["mapper"]], "bru_factor_mapper")) {
+    } else if (inherits(subcomp[["mapper"]], "bru_mapper_factor")) {
       subcomp$n <- subcomp[["mapper"]]$n
       subcomp$values <- seq_len(subcomp$n)
     } else {
@@ -702,7 +769,7 @@ make_mapper <- function(subcomp,
         subcomp$mapper$factor_mapping <- "full"
       }
       subcomp$n <- length(subcomp[["values"]])
-      class(subcomp$mapper) <- c("bru_factor_mapper", "list")
+      class(subcomp$mapper) <- c("bru_mapper_factor", "list")
     } else {
       if (length(subcomp[["values"]]) > 1) {
         subcomp$mapper <- INLA::inla.mesh.1d(subcomp[["values"]])
@@ -786,7 +853,6 @@ code.components <- function(components, add = "") {
 
 #' Summarize an component
 #'
-#' @aliases summary.component
 #' @export
 #' @method summary component
 #' @keywords internal
@@ -812,9 +878,7 @@ summary.component <- function(object, ...) {
 
 #' Print the summary of an component
 #'
-#' @aliases print.summary.component
 #' @export
-#' @method print summary.component
 #' @keywords internal
 #' @param x A 'summary.component' object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
@@ -838,9 +902,7 @@ print.summary.component <- function(x, ...) {
 #'
 #' TODO: Improve speed for iterated calls by making 'mapped' a parameter
 #'
-#' @aliases value.component
 #' @export
-#' @method value component
 #' @keywords internal
 #' @param component An component.
 #' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
@@ -896,37 +958,31 @@ value.component <- function(component, data, state, A = NULL, ...) {
 
 
 
-#' Construct A-matrix
-#'
-#' Constructs the A-matrix for a given component and and some data
-#'
-#' @aliases amatrix_eval.component
 #' @export
-#' @method amatrix_eval component
 #' @keywords internal
 #' @param component An component.
 #' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
 #' @param ... Unused.
 #' @return An A-matrix.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
+#' @rdname amatrix_eval
 
 amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
   ## TODO: Check for offset component
-
+  
+  val <- input_eval(subcomp$input, data, env = env)
+  
   if (!is.null(subcomp$weights)) {
     weights <- input_eval(subcomp$weights, data, env = env)
   } else {
     weights <- 1.0
   }
   if (inherits(subcomp$mapper, c("inla.mesh", "inla.mesh.1d"))) {
-    val <- input_eval(subcomp$input, data, env = env)
     if (!is.matrix(val) & !inherits(val, "Spatial")) {
       val <- as.matrix(val)
     }
     A <- INLA::inla.spde.make.A(subcomp$mapper, loc = val, weights = weights)
-  } else if (inherits(subcomp$mapper, c("bru_factor_mapper"))) {
-    val <- input_eval(subcomp$input, data, env = env)
+  } else if (inherits(subcomp$mapper, c("bru_mapper_factor"))) {
     if (is.factor(val)) {
       if (!identical(levels(val), subcomp$mapper$levels)) {
         val <- factor(as.character(val), levels = subcomp$mapper$levels)
@@ -958,7 +1014,6 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
                                 dims = c(nrow(data), subcomp$n))
     }
   } else if (subcomp$model %in% c("linear", "clinear")) {
-    val <- input_eval(subcomp$input, data, env = env)
     A <- Matrix::sparseMatrix(i = seq_len(NROW(data)),
                               j = rep(1, NROW(data)),
                               x = val * weights,
@@ -979,20 +1034,14 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
 
 
 
-#' Construct A-matrix
-#'
-#' Constructs the A-matrix for a given component and and some data
-#'
-#' @aliases amatrix_eval.component
 #' @export
-#' @method amatrix_eval component
 #' @keywords internal
 #' @param component An component.
 #' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
 #' @param ... Unused.
 #' @return An A-matrix.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
+#' @rdname amatrix_eval
 
 amatrix_eval.component <- function(component, data, ...) {
   ## TODO: Check for offset component
@@ -1014,13 +1063,12 @@ amatrix_eval.component <- function(component, data, ...) {
 }
 
 #' @export
+#' @rdname amatrix_eval
 
 amatrix_eval.component_list <- function(components, data, ...) {
   lapply(components, function(x) amatrix_eval(x, data = data, ...))
 }
 
-#' Obtain covariate
-#'
 #' @section Simple covariates and the map parameter:
 #'
 #' It is not unusual for a random effect act on a transformation of a covariate. In other frameworks this
@@ -1079,9 +1127,7 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #'
 #' \itemize{\item{`components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))`.}}
 #'
-#' @aliases input_eval.component
 #' @export
-#' @method input_eval component
 #' @keywords internal
 #' @param component An component.
 #' @param part The input part to evaluate; `'main'`, `'group'`,
@@ -1090,7 +1136,7 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #' @param ... Unused.
 #' @return An vector or a coordinate matrix
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
+#' @rdname input_eval
 
 input_eval.component <- function(component,
                                  part = c("main", "group", "replicate", "weights"),
@@ -1108,6 +1154,7 @@ input_eval.component <- function(component,
 }
 
 #' @export
+#' @rdname input_eval
 
 input_eval.component_list <-
   function(components,
@@ -1123,7 +1170,8 @@ input_eval.component_list <-
 
 
 
-
+#' @export
+#' @rdname input_eval
 
 input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
                                  null.on.fail = FALSE, ...) {
@@ -1168,7 +1216,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       val <- as.data.frame(val)
       coordinates(val) <- seq_len(ncol(val))
       # Allow proj4string failures:
-      data_crs <- tryCatch(sp_get_crs(data),
+      data_crs <- tryCatch(fm_sp_get_crs(data),
                       error = function(e) {})
       if (!fm_crs_is_null(data_crs)) {
         proj4string(val) <- data_crs
@@ -1270,20 +1318,14 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 
 
 
-#' Obtain indices
-#'
-#' Indexes into to the components
-#'
-#' @aliases index_eval.component
 #' @export
-#' @method index_eval component
 #' @keywords internal
 #' @param component An component.
 #' @param ... Unused.
 #' @return a list of indices into the components latent variables
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com},
 #'   Finn Lindgren \email{finn.lindgren@@gmail.com}
-#'
+#' @rdname index_eval
 
 index_eval.component <- function(component, ...) {
   g.n <-
@@ -1313,6 +1355,7 @@ index_eval.component <- function(component, ...) {
 
 
 #' @export
+#' @rdname index_eval
 
 index_eval.component_list <- function(components, ...) {
   lapply(components, function(x) index_eval(x, ...))

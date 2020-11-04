@@ -16,12 +16,10 @@ knitr::opts_chunk$set(
 # inlabru
 
 <!-- badges: start -->
-[![Travis Build Status](https://travis-ci.org/fbachl/inlabru.svg?branch=devel)](https://travis-ci.org/fbachl/inlabru)
 [![CRAN Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
-<!--
 [![R build status](https://github.com/fbachl/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/fbachl/inlabru/actions)
 [![R code coverage status](https://github.com/fbachl/inlabru/workflows/test-coverage/badge.svg)](https://github.com/fbachl/inlabru/actions)
--->
+[![Codecov test coverage](https://codecov.io/gh/fbachl/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/fbachl/inlabru?branch=devel)
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial modeling using integrated nested Laplace approximation via the [R-INLA package](http://www.r-inla.org). Additionally, implements a log Gaussian Cox process likelihood for modeling univariate and spatial point processes based on ecological survey data. See Yuan Yuan, 
@@ -55,35 +53,15 @@ remotes::install_github("fbachl/inlabru", ref="devel")
 This is a basic example which shows you how fit a simple spatial Log Gaussian Cox Process (LGCP)
 and predicts its intensity:
 
-```{r update_CRS_code,eval=TRUE,echo=FALSE}
-gorillas_update_CRS <- function(gorillas) {
-  if (inla.has_PROJ6()) {
-    gorillas$nests <- rebuild_CRS(gorillas$nests)
-    gorillas$boundary <- rebuild_CRS(gorillas$boundary)
-    gorillas$mesh$crs <- rebuild_CRS(gorillas$mesh$crs)
-    for (name in names(gorillas$gcov)) {
-      gorillas$gcov[[name]] <- rebuild_CRS(gorillas$gcov[[name]])
-    }
-    for (name in names(gorillas$plotsample)) {
-      gorillas$plotsample[[name]] <- rebuild_CRS(gorillas$plotsample[[name]])
-    }
-  }
-  gorillas
-}
-```
-
 ```{r example}
-if (interactive()) {
 # Load libraries
+options("rgdal_show_exportToProj4_warnings"="none")
 library(inlabru)
 library(INLA)
 library(ggplot2)
 
 # Load the data
 data(gorillas, package = "inlabru")
-# If you have PROJ6/GDAL3, you will here need to update the CRS information;
-# see separate function below
-gorillas <- gorillas_update_CRS(gorillas)
 
 # Construct latent model components
 matern <- inla.spde2.pcmatern(gorillas$mesh, 
@@ -106,10 +84,7 @@ lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
 ggplot() + 
   gg(lambda) +
   gg(gorillas$nests, color = "red", size = 0.2) +
-  coord_equal()
-}
+  coord_equal() +
+  ggtitle("Nest intensity per km squared")
 ```
-If you have an R installation with PROJ6/GDAL3 and INLA >= 20.06.18, you will need to update the CRS information in the gorillas data after reading it in:
-```{r ref.label="update_CRS_code",eval = FALSE}
-```
-
+If you have an R installation with PROJ6/GDAL3, and INLA >= 20.06.18, and loading old spatial objects, you may need to apply the `rgdal::rebuild_CRS()` method on them before they are fully usable. The `gorillas` object in inlabru has been updated, but not yet the other stored data sets.

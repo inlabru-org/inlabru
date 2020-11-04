@@ -89,15 +89,18 @@ import.gorillas <- function() {
   # Create SpatialPoints representing nest locations
   nests <- as.data.frame(gorillas)
   coordinates(nests) <- c("x", "y")
-  proj4string(nests) <- CRS("+proj=utm +zone=32N +datum=WGS84") # from the Gorillas help file
+  crs <- sp::CRS("+proj=utm +zone=32N +datum=WGS84") # from the Gorillas help file
+  crs_km <- sp::CRS("+proj=utm +zone=32N +datum=WGS84 +units=km")
+  proj4string(nests) <- crs
 
   #' Turn the observation window into spatial polygon
-  boundary <- spoly(gorillas$window$bdry, crs = CRS("+proj=utm +zone=32N +datum=WGS84"))
+  boundary <- spoly(as.data.frame(gorillas$window$bdry[[1]]),
+                    crs = crs)
 
   #' Build mesh
-  bnd <- INLA::inla.mesh.segment(loc = data.frame(gorillas$window$bdry[[1]]))
+  bnd <- INLA::inla.sp2segment(boundary)
   mesh <- INLA::inla.mesh.2d(interior = bnd, max.edge = 222,
-                             crs = fm_sp_get_crs(nests)) # ! With higher max.edge we run into various INLA errors/warnings
+                             crs = crs) # ! With higher max.edge we run into various INLA errors/warnings
 
   #' Turn covariates int SpatialGridDataFrame
   gcov <- list()
@@ -106,6 +109,9 @@ import.gorillas <- function() {
     proj4string(gcov[[nm]]) <- proj4string(nests)
     coordnames(gcov[[nm]]) <- c("x", "y")
     names(gcov[[nm]]) <- nm
+    if (is.character(gcov[[nm]][[nm]])) {
+      gcov[[nm]][[nm]] <- as.factor(gcov[[nm]][[nm]])
+    }
   }
 
   #' Hack: change CRS units of the covariates to km
@@ -114,7 +120,7 @@ import.gorillas <- function() {
     attributes(ga)$cellcentre.offset <- attributes(ga)$cellcentre.offset / 1000
     attributes(ga)$cellsize <- attributes(ga)$cellsize / 1000
     attributes(gcov[[nm]])$grid <- ga
-    attributes(gcov[[nm]])$proj4string <- CRS("+proj=utm +zone=32N +datum=WGS84 +units=km")
+    attributes(gcov[[nm]])$proj4string <- crs_km
   }
 
 
@@ -126,18 +132,20 @@ import.gorillas <- function() {
     gcov = gcov
   )
 
-  gorillas <- stransform(gorillas, CRS("+proj=utm +zone=32N +datum=WGS84 +units=km"))
+  gorillas <- stransform(gorillas, crs_km)
 
   # Create a plot sampling data set
   set.seed(121)
-  plotpts <- plotsample(gorillas$nests, gorillas$boundary, x.ppn = 0.6, y.ppn = 0.6, nx = 5.4, ny = 5.4)
+  plotpts <- plotsample(gorillas$nests, gorillas$boundary,
+                        x.ppn = 0.6, y.ppn = 0.6, nx = 5.4, ny = 5.4)
   counts <- point2count(plotpts$plots, plotpts$dets)
   x <- coordinates(counts)[, 1]
   y <- coordinates(counts)[, 2]
   count <- counts@data$n
 
   # Make gam data frame
-  gnestcount_9x9_60pc <- data.frame(x = x, y = y, count = count, exposure = counts$area)
+  gnestcount_9x9_60pc <-
+    data.frame(x = x, y = y, count = count, exposure = counts$area)
   gnestplots_9x9_60pc <- plotpts$plots
   gnestdets_9x9_60pc <- plotpts$dets
   sample_9x9_60pc <- list(
@@ -151,8 +159,7 @@ import.gorillas <- function() {
 
   # Make the count data frame spatial
   coordinates(gorillas$plotsample$counts) <- c("x", "y")
-  proj4string(gorillas$plotsample$counts) <- CRS(proj4string(gorillas$nests))
-
+  proj4string(gorillas$plotsample$counts) <- crs
 
   # Extrapolate covariate
   pxl <- pixels(gorillas$mesh, mask = FALSE, nx = 220, ny = 180)
@@ -164,7 +171,7 @@ import.gorillas <- function() {
 }
 
 
-save.gorillas <- function() {
-  gorillas <- import.gorillas()
-  save("gorillas", file = paste0(system.file("data", package = "inlabru"), "/gorillas.RData"))
-}
+#save.gorillas <- function() {
+#  gorillas <- import.gorillas()
+#  save("gorillas", file = paste0(system.file("data", package = "inlabru"), "/gorillas.RData"))
+#}

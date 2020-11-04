@@ -138,7 +138,6 @@ bru <- function(components = y ~ Intercept,
 #'   the predictor used in the optimization.
 #' @param data Likelihood-specific data, as a `data.frame` or `SpatialPoints[DataFrame]`
 #'   object.
-#' @param components Components.
 #' @param mesh An inla.mesh object.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
@@ -403,8 +402,8 @@ bru.options <- function(mesh = NULL,
 #' @aliases lgcp
 #' @export
 #' @param components A formula describing the latent components
-#' @param data A data frame or SpatialPoints[DataFrame] object
-#' @param samplers A data frame or Spatial[Points/Lines/Polygons]DataFrame objects
+#' @param data A data frame or `SpatialPoints(DataFrame)` object
+#' @param samplers A data frame or `Spatial[Points/Lines/Polygons]DataFrame` objects
 #' @param domain Named list of domain definitions
 #' @param ips Integration points (overrides `samplers`)
 #' @param formula If NULL, the linear combination implied by the `components` is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
@@ -414,6 +413,7 @@ bru.options <- function(mesh = NULL,
 #' @examples
 #'
 #' \donttest{
+#' if (bru_safe_inla()) {
 #'
 #' # Load the Gorilla data
 #' data(gorillas, package = "inlabru")
@@ -425,9 +425,8 @@ bru.options <- function(mesh = NULL,
 #'   gg(gorillas$boundary) +
 #'   coord_fixed()
 #'
-#' if (require("INLA", quietly = TRUE)) {
 #'   # Define SPDE prior
-#'   matern <- inla.spde2.pcmatern(gorillas$mesh,
+#'   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
 #'     prior.sigma = c(0.1, 0.01),
 #'     prior.range = c(5, 0.01)
 #'   )
@@ -436,7 +435,8 @@ bru.options <- function(mesh = NULL,
 #'   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #'
 #'   # Fit the model
-#'   fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+#'   fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
+#'               domain = list(coordinates = gorillas$mesh))
 #'
 #'   # Predict the spatial intensity surface
 #'   lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
@@ -571,10 +571,10 @@ summary.bru <- function(object, ...) {
       signif(range(sm[, c(4, 6)])[1]), " : ",
       signif(range(sm[, c(4, 6)])[2]), "]"
     ))
-    if (nm %in% names(object$model$mesh)) {
+    if (inherits(object$model$effects[[nm]]$main$mapper, "inla.mesh")) {
       cat(paste0(
         ", and area = ",
-        signif(sum(Matrix::diag(INLA::inla.mesh.fem(object$model$mesh[[nm]])$c0)))
+        signif(sum(INLA::inla.mesh.fem(object$model$effects[[nm]]$main$mapper)$va))
       ))
     }
     cat("\n")
@@ -604,8 +604,8 @@ summary.bru <- function(object, ...) {
   cat("\n")
   for (nm in names(object$sppa$model$effects)) {
     eff <- object$sppa$model$effects[[nm]]
-    if (eff$model == "spde2") {
-      hyp <- INLA::inla.spde.result(object, nm, eff$inla.spde)
+    if (identical(eff[["main"]][["type"]], "spde")) {
+      hyp <- INLA::inla.spde.result(object, nm, eff$main$model)
       cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
       df <- rbind(
         marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"),
@@ -616,6 +616,8 @@ summary.bru <- function(object, ...) {
       print(df)
     }
   }
+  message("The current summary.bru(...) method is outdated and will be replaced.\n",
+          "Until then, you may prefer the output from INLA:::summary.inla(...) as an alternative.")
 }
 
 #' Prediction from fitted bru model

@@ -2,27 +2,37 @@
 % Please edit documentation in R/effect.R
 \name{amatrix_eval}
 \alias{amatrix_eval}
+\alias{amatrix_eval.bru_subcomponent}
 \alias{amatrix_eval.component}
+\alias{amatrix_eval.component_list}
 \title{Construct A-matrix}
 \usage{
 amatrix_eval(...)
 
+\method{amatrix_eval}{bru_subcomponent}(subcomp, data, env = NULL, ...)
+
 \method{amatrix_eval}{component}(component, data, ...)
+
+\method{amatrix_eval}{component_list}(components, data, ...)
 }
 \arguments{
 \item{...}{Unused.}
 
-\item{component}{An component.}
-
 \item{data}{A \code{data.frame} or Spatial* object of covariates and/or point locations.}
+
+\item{component}{An component.}
 }
 \value{
 An A-matrix.
+
+An A-matrix.
 }
 \description{
-Constructs the A-matrix for a given component and and some data
+Constructs the A-matrix for components and data
 }
 \author{
+Fabian E. Bachl \email{bachlfab@gmail.com}
+
 Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \keyword{internal}

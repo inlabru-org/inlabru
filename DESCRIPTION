@@ -51,6 +51,7 @@ Suggests:
     rgl,
     rmarkdown,
     shiny,
+    sn,
     spatstat,
     spatstat.data,
     sphereplot,

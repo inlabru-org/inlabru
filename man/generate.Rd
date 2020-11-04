@@ -51,7 +51,7 @@ posterior of the estimated random effects.
 }
 \examples{
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
   
 # Generate data for a simple linear model
 
@@ -87,7 +87,7 @@ plot(do.call(rbind, smp))
 }
 }
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
   
 # Generate data for a simple linear model
 

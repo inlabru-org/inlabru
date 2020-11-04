@@ -23,9 +23,10 @@ This data set serves to teach the concept of modelling species that gather in gr
 the grouping behaviour depends on space.
 }
 \examples{
+\donttest{
 # Load the data
 
-data("toygroups")
+data("toygroups", package = "inlabru")
 
 # The data set is a simulation of animal groups residing in a 1D space. Their
 # locations in x-space are sampled from a Cox process with intensity
@@ -47,4 +48,5 @@ ggplot(toygroups$groups) +
 
 ggplot(toygroups$df.rate) +
   geom_line(aes(x,rate))
+}
 }

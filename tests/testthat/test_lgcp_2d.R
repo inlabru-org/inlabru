@@ -2,6 +2,7 @@ context("2D LGCP fitting and prediction (test_lgcp_2d.R)")
 
 test_that("2D LGCP fitting", {
   skip_on_cran()
+  skip_if_not(bru_safe_inla())
   disable_PROJ6_warnings()
   
   options <- list(control.inla = list(int.strategy = "eb",

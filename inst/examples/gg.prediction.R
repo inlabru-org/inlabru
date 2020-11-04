@@ -1,4 +1,5 @@
 \donttest{
+if (bru_safe_inla()) {
 # Generate some data
 
 input.df <- data.frame(x=cos(1:10))
@@ -10,7 +11,7 @@ fit <- bru(y ~ x, family = "gaussian", data = input.df)
 
 # Predict posterior statistics of 'x'
 
-xpost = predict(fit, formula = ~ x)
+xpost <- predict(fit, data = NULL, formula = ~ x)
 
 # The statistics include mean, standard deviation, the 2.5% quantile, the median,
 # the 97.5% quantile, minimum and maximum sample drawn from the posterior as well as
@@ -23,15 +24,16 @@ xpost
 ggplot() + gg(xpost)
 
 
-# The predict function can also be used to simulatenneously estimate posteriors
+# The predict function can also be used to simulataneously estimate posteriors
 # of multiple variables:
 
-xipost = predict(fit, formula = ~ data.frame(post = c(Intercept, x)))
+xipost = predict(fit, data = NULL,
+                 formula = ~ c(Intercept = Intercept, x = x))
 xipost
 
 # If we still want a plot in the previous style we have to set the bar parameter to TRUE
 
-rownames(xipost) = c("Intercept","x")
+# rownames(xipost) = c("Intercept","x")
 p1 = ggplot() + gg(xipost, bar = TRUE)
 p1
 
@@ -63,4 +65,5 @@ ggplot() +
   gg(xipost) +
   gg(xipost, mapping = aes(y = median), ribbon = FALSE, color = "red")
 
+}
 }

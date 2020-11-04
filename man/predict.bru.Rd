@@ -49,8 +49,8 @@ Internally, this method calls \link{generate.bru} in order to draw samples from 
 }
 \examples{
 \donttest{
-if (require("INLA", quietly = TRUE)) {
-
+if (bru_safe_inla()) {
+    
 # Load the Gorilla data
 
 data(gorillas, package ="inlabru")
@@ -65,16 +65,17 @@ ggplot() +
 
 # Define SPDE prior
 
-matern <- inla.spde2.pcmatern(gorillas$mesh,
-                              prior.sigma = c(0.1, 0.01),
-                              prior.range = c(5, 0.01))
+matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+                                    prior.sigma = c(0.1, 0.01),
+                                    prior.range = c(5, 0.01))
 
 # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 
-cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept
 
 # Fit the model
-fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
+            domain = list(coordinates = gorillas$mesh))
 
 # Once we obtain a fitted model the predict function can serve various purposes. 
 # The most basic one is to determine posterior statistics of a univariate

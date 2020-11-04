@@ -155,8 +155,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     if (ignore.CRS) {
       mesh$crs <- NULL
     }
-    input.crs <- INLA::inla.CRS(INLA::inla.CRSargs(mesh$crs))
-    input.crs.list <- INLA::inla.as.list.CRSargs(INLA::inla.CRSargs(input.crs))
+    input.crs <- fm_CRS(fm_CRSargs(mesh$crs))
+    input.crs.list <- fm_CRSargs_as_list(fm_CRSargs(input.crs))
     use.crs <- !is.null(input.crs.list$proj) && !ignore.CRS
     is.geocent <- (mesh$manifold == "S2")
 
@@ -186,12 +186,12 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       } else {
         space.units <- input.crs.list$units
       }
-      internal.crs <- INLA::inla.CRS("sphere", args = list(a = 1, b = 1, units = "m"))
+      internal.crs <- fm_CRS("sphere", args = list(a = 1, b = 1, units = "m"))
       mesh$loc <- mesh$loc / space.R
       mesh$crs <- internal.crs
     } else {
       if (use.crs) {
-        internal.crs <- INLA::inla.CRS("sphere", args = list(a = 1, b = 1, units = "m"))
+        internal.crs <- fm_CRS("sphere", args = list(a = 1, b = 1, units = "m"))
       } else {
         internal.crs <- CRS(as.character(NA))
         mesh$crs <- NULL
@@ -218,7 +218,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (is.geocent) {
           area.mesh <- mesh
         } else if (use.crs) {
-          area.mesh <- INLA::inla.spTransform(mesh, CRSobj = internal.crs)
+          area.mesh <- fm_spTransform(mesh, CRSobj = internal.crs)
         } else {
           area.mesh <- mesh
           area.R <- 1
@@ -416,7 +416,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
 
     if (is.geocent) {
       if (length(ret) > 0) {
-        ret <- sp::spTransform(ret, INLA::inla.CRS("sphere", args = list(a = space.R, b = space.R, units = "m")))
+        ret <- sp::spTransform(ret, fm_CRS("sphere", args = list(a = space.R, b = space.R, units = "m")))
       } else if (multi.samples) {
         ret <- SpatialPointsDataFrame(matrix(0, 1, 3), data = data.frame(sample = 1))[-1]
       } else {

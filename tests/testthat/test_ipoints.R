@@ -30,8 +30,8 @@ test_that("conversion of 1D mesh to integration points", {
 test_that("conversion of SpatialPolygon to integration points", {
   disable_PROJ6_warnings()
   data(gorillas, package = "inlabru")
-  gorillas <- gorillas_update_CRS(gorillas)
-  suppressWarnings(ips <- ipoints(gorillas$boundary))
+  expect_warning(ips <- ipoints(gorillas$boundary),
+                 "Computing integration points from polygon")
 
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(names(ips), "weight")
@@ -42,20 +42,20 @@ test_that("conversion of SpatialPolygon to integration points", {
 test_that("conversion of SpatialPolygon to integration points when domain is defined via a mesh", {
   disable_PROJ6_warnings()
   data(gorillas, package = "inlabru")
-  gorillas <- gorillas_update_CRS(gorillas)
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
-
+  expect_warning(ips_nodomain <- ipoints(gorillas$boundary),
+                 "Computing integration points from polygon")
+  
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)), c("weight", "x", "y", "optional"))
   expect_equal(sum(ips$weight),
-               sum(suppressWarnings(ipoints(gorillas$boundary))$weight),
+               sum(ips_nodomain$weight),
                tolerance = midtol)
 })
 
 test_that("conversion of 2D mesh to integration points", {
   disable_PROJ6_warnings()
   data(gorillas, package = "inlabru")
-  gorillas <- gorillas_update_CRS(gorillas)
   ips <- ipoints(gorillas$mesh)
 
   expect_is(ips, "SpatialPointsDataFrame")
@@ -67,7 +67,8 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
   disable_PROJ6_warnings()
   data(mrsea, package = "inlabru")
   mrsea <- mrsea_rebuild_CRS(mrsea, use_km = FALSE)
-  ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
+  expect_warning(ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
+                 "export to PROJ failed: generic error of unknown origin")
   
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)),
@@ -76,7 +77,8 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
 
   data(mrsea, package = "inlabru")
   mrsea <- mrsea_rebuild_CRS(mrsea, use_km = TRUE)
-  ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
+  expect_warning(ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
+                 "export to PROJ failed: generic error of unknown origin")
   
   expect_is(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)),

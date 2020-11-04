@@ -1,4 +1,6 @@
 \donttest{
+if (bru_safe_inla()) {
+    
 # Load Gorilla data
 data("gorillas", package = "inlabru")
 
@@ -25,4 +27,5 @@ xcoord = gorillas$mesh$loc[,1]
 ggplot() + 
   gg(gorillas$mesh, color = (xcoord-580), mask = gorillas$boundary) +
   gg(gorillas$boundary)
+}
 }
