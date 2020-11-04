@@ -969,20 +969,20 @@ value.component <- function(component, data, state, A = NULL, ...) {
 
 amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
   ## TODO: Check for offset component
-
+  
+  val <- input_eval(subcomp$input, data, env = env)
+  
   if (!is.null(subcomp$weights)) {
     weights <- input_eval(subcomp$weights, data, env = env)
   } else {
     weights <- 1.0
   }
   if (inherits(subcomp$mapper, c("inla.mesh", "inla.mesh.1d"))) {
-    val <- input_eval(subcomp$input, data, env = env)
     if (!is.matrix(val) & !inherits(val, "Spatial")) {
       val <- as.matrix(val)
     }
     A <- INLA::inla.spde.make.A(subcomp$mapper, loc = val, weights = weights)
   } else if (inherits(subcomp$mapper, c("bru_factor_mapper"))) {
-    val <- input_eval(subcomp$input, data, env = env)
     if (is.factor(val)) {
       if (!identical(levels(val), subcomp$mapper$levels)) {
         val <- factor(as.character(val), levels = subcomp$mapper$levels)
@@ -1014,7 +1014,6 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
                                 dims = c(nrow(data), subcomp$n))
     }
   } else if (subcomp$model %in% c("linear", "clinear")) {
-    val <- input_eval(subcomp$input, data, env = env)
     A <- Matrix::sparseMatrix(i = seq_len(NROW(data)),
                               j = rep(1, NROW(data)),
                               x = val * weights,

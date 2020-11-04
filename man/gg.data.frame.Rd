@@ -29,7 +29,7 @@ fit <- bru(y ~ x, family = "gaussian", data = input.df)
 
 # Predict posterior statistics of 'x'
 
-xpost <- predict(fit, data = input.df, formula = ~ x)
+xpost <- predict(fit, data = NULL, formula = ~ x)
 
 # The statistics include mean, standard deviation, the 2.5\% quantile, the median,
 # the 97.5\% quantile, minimum and maximum sample drawn from the posterior as well as
@@ -43,11 +43,10 @@ ggplot() + gg(xpost)
 
 
 # The predict function can also be used to simulataneously estimate posteriors
-# of multiple variables: (TODO:check the code; unclear what the documented behaviour is meant to be)
-# (Likely intended to extract the latent variables, not the effects)
+# of multiple variables:
 
-xipost = predict(fit, data = input.df,
-                 formula = ~ cbind(N=1, N2=2, data.frame(post1 = c(Intercept=Intercept, x=x))))
+xipost = predict(fit, data = NULL,
+                 formula = ~ rbind(Intercept, x))
 xipost
 
 # If we still want a plot in the previous style we have to set the bar parameter to TRUE

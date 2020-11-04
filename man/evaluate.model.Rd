@@ -22,10 +22,15 @@
 
 \item{data}{Locations and covariates needed to evaluate the model.}
 
-\item{predictor}{A formula or an expression to be evaluated given the posterior or for each sample thereof. The default (\code{NULL}) returns a \code{data.frame} containing the sampled effects. In case of a formula the right hand side is used for evaluation.}
+\item{predictor}{A formula or an expression to be evaluated given the
+posterior or for each sample thereof. The default (\code{NULL}) returns a
+\code{data.frame} containing the sampled effects. In case of a formula the right
+hand side is used for evaluation.}
 
 \item{property}{Property of the model components to obtain value from.
-Default: "mode". Other options are "mean", "0.025quant", "0.975quant", "sd" and "sample". In case of "sample" you will obtain samples from the posterior (see \code{n} parameter).}
+Default: "mode". Other options are "mean", "0.025quant", "0.975quant",
+"sd" and "sample". In case of "sample" you will obtain samples from the
+posterior (see \code{n} parameter).}
 
 \item{n}{Number of samples to draw.}
 
