@@ -31,6 +31,7 @@ gmap(gorillas$nests, maptype = "satellite") +
   gm(gorillas$boundary) +
   gm(gorillas$nests, color = "white", size = 0.5)
 }
+
 }
 \seealso{
 Other geomes for inla and inlabru predictions: 
