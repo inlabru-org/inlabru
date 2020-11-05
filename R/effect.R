@@ -780,8 +780,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
 
 
 # Defines a default mapper given the type of model and parameters provided
-# Checks subcomp$mapper, subcomp$model$mesh (for spde models), subcomp$values,
-# input_values or subcomp$n, in that order.
+# Checks subcomp$mapper, subcomp$model$mesh (for spde models), subcomp$n,
+# subcomp$values, or input_values, in that order.
 make_mapper <- function(subcomp,
                         label,
                         input_values = NULL,
@@ -807,12 +807,18 @@ make_mapper <- function(subcomp,
     subcomp[["mapper"]] <- bru_mapper_linear()
   } else {
     # No mapper; construct based on input values
-    if (!is.null(subcomp[["values"]])) {
+    if (!is.null(subcomp[["n"]])) {
+      if (!is.null(subcomp[["values"]])) {
+        warning(
+          "Both 'n' and 'values' provided. Ignoring 'values'",
+          immediate. = TRUE
+        )
+      }
+      values <- seq_len(subcomp[["n"]])
+    } else if (!is.null(subcomp[["values"]])) {
       values <- subcomp[["values"]]
     } else if (!is.null(input_values)) {
       values <- input_values
-    } else if (!is.null(subcomp[["n"]])) {
-      values <- seq_len(subcomp[["n"]])
     } else {
       stop(paste0("No mapper, no n, and no values given for ", label))
     }
@@ -830,7 +836,11 @@ make_mapper <- function(subcomp,
       if (length(values) > 1) {
         subcomp$mapper <- bru_mapper(INLA::inla.mesh.1d(values))
       } else {
-        subcomp$mapper <- bru_mapper_const()
+        if (all(values == 1)) {
+          subcomp$mapper <- bru_mapper_const()
+        } else {
+          subcomp$mapper <- bru_mapper_linear()
+        }
       }
     }
   }
@@ -842,7 +852,7 @@ make_mapper <- function(subcomp,
       subcomp[["n"]] != mapper_n) {
       stop(paste0(
         "Size mismatch, n=", subcomp[["n"]], " != ibm_n()=",
-        mapper_n, " for label ", label
+        mapper_n, " mapper for label ", label
       ))
     }
     subcomp[["n"]] <- mapper_n
