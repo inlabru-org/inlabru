@@ -941,6 +941,7 @@ bru_mapper.default <- function(mapper, ...) {
 #' @param \dots Arguments passed on to other methods
 #' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
 #' @seealso [bru_mapper()]
+#' @name bru_mapper_methods
 #' @rdname bru_mapper_methods
 ibm_n.inla.mesh <- function(mapper, ...) {
   mapper$n
