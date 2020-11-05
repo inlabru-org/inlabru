@@ -2,51 +2,30 @@
 % Please edit documentation in R/effect.R
 \name{bru_mapper}
 \alias{bru_mapper}
-\alias{bru_mapper_n}
-\alias{bru_mapper_values}
-\alias{bru_mapper_amatrix}
+\alias{ibm_n}
+\alias{ibm_values}
+\alias{ibm_amatrix}
 \alias{bru_mapper.default}
-\alias{bru_mapper_n.inla.mesh}
-\alias{bru_mapper_values.inla.mesh}
-\alias{bru_mapper_amatrix.inla.mesh}
-\alias{bru_mapper_n.inla.mesh.1d}
-\alias{bru_mapper_values.inla.mesh.1d}
-\alias{bru_mapper_amatrix.inla.mesh.1d}
+\alias{bru_mapper_linear}
+\alias{bru_mapper_const}
 \alias{bru_mapper_factor}
-\alias{bru_mapper_n.bru_mapper_factor}
-\alias{bru_mapper_values.bru_mapper_factor}
-\alias{bru_mapper_amatrix.bru_mapper_factor}
 \title{Methods for \code{bru_mapper} objects}
 \usage{
 bru_mapper(...)
 
-bru_mapper_n(mapper, ...)
+ibm_n(mapper, ...)
 
-bru_mapper_values(mapper, ...)
+ibm_values(mapper, ...)
 
-bru_mapper_amatrix(mapper, input, ...)
+ibm_amatrix(mapper, input, ...)
 
 \method{bru_mapper}{default}(mapper, ...)
 
-\method{bru_mapper_n}{inla.mesh}(mapper, ...)
+bru_mapper_linear(...)
 
-\method{bru_mapper_values}{inla.mesh}(mapper, ...)
-
-\method{bru_mapper_amatrix}{inla.mesh}(mapper, input, ...)
-
-\method{bru_mapper_n}{inla.mesh.1d}(mapper, ...)
-
-\method{bru_mapper_values}{inla.mesh.1d}(mapper, ...)
-
-\method{bru_mapper_amatrix}{inla.mesh.1d}(mapper, input, ...)
+bru_mapper_const(...)
 
 bru_mapper_factor(values, factor_mapping, ...)
-
-\method{bru_mapper_n}{bru_mapper_factor}(mapper, ...)
-
-\method{bru_mapper_values}{bru_mapper_factor}(mapper, ...)
-
-\method{bru_mapper_amatrix}{bru_mapper_factor}(mapper, input, ...)
 }
 \arguments{
 \item{\dots}{Arguments passed on to other methods}
@@ -74,15 +53,18 @@ inherits from \code{bru_mapper}.
 }
 
 \itemize{
-\item \code{bru_mapper_n} Generic.
+\item \code{ibm_n} Generic.
 }
 
 \itemize{
-\item \code{bru_mapper_values} Generic.
+\item \code{ibm_values} Generic.
 }
 
 \itemize{
-\item \code{bru_mapper_amatrix} Generic. Implementations must return a (sparse) matrix of size \code{NROW(input)}
-by \code{bru_mapper_n(mapper)}
+\item \code{ibm_amatrix} Generic. Implementations must return a (sparse) matrix of size \code{NROW(input)}
+by \code{ibm_n(mapper)}
 }
+}
+\seealso{
+\link{bru_mapper_methods} for specific method implementations.
 }
