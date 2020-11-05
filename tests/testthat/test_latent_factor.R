@@ -30,7 +30,7 @@ test_that("bru: factor component", {
   # Fit the model
   fit <- bru(
     components = ~ Intercept(main = 1) +
-      fac1(main = x1, model = "factor") +
+      fac1(main = x1, model = "factor_contrast") +
       fac2(main = x2, model = "iid"),
     formula = y ~ Intercept + fac1 + fac2,
     family = "gaussian",
@@ -41,8 +41,23 @@ test_that("bru: factor component", {
         int.strategy = "eb",
         h = 0.005
       ),
-      num.threads = "1:1",
-      control.fixed = list(expand.factor.strategy = "inla")
+      num.threads = "1:1"
+    )
+  )
+  fit2 <- bru(
+    components = ~
+    fac1(main = x1, model = "factor_full") +
+      fac2(main = x2, model = "iid"),
+    formula = y ~ fac1 + fac2,
+    family = "gaussian",
+    data = input.df,
+    options = list(
+      verbose = FALSE,
+      control.inla = list(
+        int.strategy = "eb",
+        h = 0.005
+      ),
+      num.threads = "1:1"
     )
   )
 

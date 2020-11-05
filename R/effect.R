@@ -114,7 +114,7 @@ component <- function(object, ...) {
 #' @param main = NULL
 #' main takes an R expression that evaluates to where the latent variables should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 #'   Arguments starting with weights, group, replicate behave similarly to main, but for the corresponding features of `INLA::f()`.
-#' @param model Either one of "offset", "factor", "linear" or a model name or
+#' @param model Either one of "offset", "factor_full", "factor_contrast", "linear" or a model name or
 #' object accepted by INLA's `f` function. If set to NULL, then "linear" is used.
 #' @param mapper
 #' Information about how to do the mapping from the values evaluated in `main`,
@@ -220,7 +220,7 @@ component.character <- function(object,
   #            clinear, sigm, revsigm, log1exp, logdist)
   #
   # Supported:
-  # btypes = c("offset", "factor", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
+  # btypes = c("offset", "factor_full", "factor_contrast", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
 
   # The label
   label <- object
@@ -401,14 +401,16 @@ component.character <- function(object,
     }
 
     # Setup factor precision parameter
-    if (identical(model, "factor")) {
-      # TODO: allow configuration of the precision
-      factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
-      fcall[["hyper"]] <- as.symbol(factor_hyper_name)
-      assign(factor_hyper_name,
-        list(prec = list(initial = log(1e-6), fixed = TRUE)),
-        envir = component$env_extra
-      )
+    if (identical(component$main$type, "factor")) {
+      if (is.null(fcall[["hyper"]])) {
+        # TODO: allow configuration of the precision via prec_linear
+        factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
+        fcall[["hyper"]] <- as.symbol(factor_hyper_name)
+        assign(factor_hyper_name,
+               list(prec = list(initial = log(1e-6), fixed = TRUE)),
+               envir = component$env_extra
+        )
+      }
     }
 
     component$inla.formula <-
@@ -661,6 +663,7 @@ bru_subcomponent <- function(input = NULL,
                              season.length = NULL,
                              weights = NULL) {
   type <- model
+  factor_mapping <- NULL
   if (inherits(model, "inla.spde")) {
     type <- "spde"
   } else if (inherits(model, "inla.rgeneric")) {
@@ -675,8 +678,23 @@ bru_subcomponent <- function(input = NULL,
     type <- "specialnonlinear"
   } else if (is.character(model)) {
     if (identical(model, "factor")) {
-      type <- "factor"
+      model <- "factor_contrast"
+      warning(paste0(
+        "Deprecated model 'factor'. Please use 'factor_full' or ",
+        "'factor_contrast' instead.\n",
+        "Defaulting to 'factor_contrast' that matches the old 'factor' model."
+      ),
+      immediate. = TRUE
+      )
+    }
+    if (identical(model, "factor_full")) {
       model <- "iid"
+      type <- "factor"
+      factor_mapping <- "full"
+    } else if (identical(model, "factor_contrast")) {
+      model <- "iid"
+      type <- "factor"
+      factor_mapping <- "contrast"
     } else {
       type <- model
     }
@@ -692,7 +710,8 @@ bru_subcomponent <- function(input = NULL,
       n = n,
       values = values,
       season.length = season.length,
-      weights = weights
+      weights = weights,
+      factor_mapping = factor_mapping
     )
   class(subcomponent) <- c("bru_subcomponent", "list")
 
@@ -826,10 +845,7 @@ make_mapper <- function(subcomp,
     if (is.factor(values) || is.character(values)) {
       subcomp$mapper <- bru_mapper_factor(
         values,
-        ifelse(identical(subcomp[["type"]], "factor"),
-          "contrast",
-          "full"
-        )
+        factor_mapping = subcomp[["factor_mapping"]]
       )
     } else {
       values <- sort(unique(values), na.last = NA)
@@ -1047,7 +1063,7 @@ bru_mapper_factor <- function(values, factor_mapping, ...) {
   stopifnot(
     is.factor(values) || is.character(values)
   )
-  factor_mapping <- match.arg(factor_mapping, c("contrast", "full"))
+  factor_mapping <- match.arg(factor_mapping, c("full", "contrast"))
   if (is.factor(values)) {
     mapper <- list(
       levels = levels(values),
