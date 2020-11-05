@@ -796,9 +796,11 @@ make_mapper <- function(subcomp,
     }
   }
   if (!is.null(subcomp[["mapper"]])) {
-    if (inherits(subcomp[["mapper"]], "inla.mesh.1d") ||
+    if (
+      inherits(subcomp[["mapper"]], "inla.mesh.1d") ||
         inherits(subcomp[["mapper"]], "inla.mesh") ||
-        inherits(subcomp[["mapper"]], "bru_mapper")) {
+        inherits(subcomp[["mapper"]], "bru_mapper")
+    ) {
       subcomp[["mapper"]] <- bru_mapper(subcomp[["mapper"]])
       subcomp$n <- bru_mapper_n(subcomp[["mapper"]])
       subcomp$values <- bru_mapper_values(subcomp[["mapper"]])
@@ -840,12 +842,17 @@ make_mapper <- function(subcomp,
         ))
       }
     }
-    if (is.factor(subcomp[["values"]]) ||
-        is.character(subcomp[["values"]])) {
-      subcomp$mapper <- bru_mapper_factor(subcomp[["values"]],
-                                          ifelse(identical(subcomp[["type"]], "factor"),
-                                                 "contrast",
-                                                 "full"))
+    if (
+      is.factor(subcomp[["values"]]) ||
+        is.character(subcomp[["values"]])
+    ) {
+      subcomp$mapper <- bru_mapper_factor(
+        subcomp[["values"]],
+        ifelse(identical(subcomp[["type"]], "factor"),
+          "contrast",
+          "full"
+        )
+      )
       subcomp$n <- bru_mapper_n(subcomp[["mapper"]])
       subcomp$values <- bru_mapper_values(subcomp[["mapper"]])
     } else {
@@ -985,11 +992,15 @@ bru_mapper_factor <- function(values, factor_mapping, ...) {
   )
   factor_mapping <- match.arg(factor_mapping, c("contrast", "full"))
   if (is.factor(values)) {
-    mapper <- list(levels = levels(values),
-                   factor_mapping = factor_mapping)
+    mapper <- list(
+      levels = levels(values),
+      factor_mapping = factor_mapping
+    )
   } else {
-    mapper <- list(levels = unique(values),
-                   factor_mapping = factor_mapping)
+    mapper <- list(
+      levels = unique(values),
+      factor_mapping = factor_mapping
+    )
   }
   class(mapper) <- c("bru_mapper_factor", "bru_mapper", "list")
   mapper
@@ -1034,7 +1045,7 @@ bru_mapper_amatrix.bru_mapper_factor <- function(mapper, input, ...) {
   )
   A
 }
-  
+
 # OPERATORS ----
 
 

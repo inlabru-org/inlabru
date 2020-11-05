@@ -110,7 +110,7 @@ gg <- function(data, ...) {
 #'   gm(gorillas$boundary) +
 #'   gm(gorillas$nests, color = "white", size = 0.5)
 #' }
-
+#'
 gm <- function(data, ...) {
   gg(data, crs = CRS("+proj=longlat"), ...)
 }
