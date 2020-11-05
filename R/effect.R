@@ -34,6 +34,43 @@ add_mappers <- function(...) {
   UseMethod("add_mappers")
 }
 
+#' Methods for `bru_mapper` objects
+#'
+#' @details
+#' * `bru_mapper` Generic mapper S3 constructor. Default constructor only
+#' adds `bru_mapper` to the class definition, unless the `mapper` input already
+#' inherits from `bru_mapper`.
+#' @param \dots Arguments passed on to other methods
+#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
+#' @export
+#' @rdname bru_mapper
+bru_mapper <- function(...) {
+  UseMethod("bru_mapper")
+}
+#' @details
+#' * `bru_mapper_n` Generic.
+#' @export
+#' @rdname bru_mapper
+bru_mapper_n <- function(mapper, ...) {
+  UseMethod("bru_mapper_n")
+}
+#' @details
+#' * `bru_mapper_values` Generic.
+#' @export
+#' @rdname bru_mapper
+bru_mapper_values <- function(mapper, ...) {
+  UseMethod("bru_mapper_values")
+}
+#' @details
+#' * `bru_mapper_amatrix` Generic. Implementations must return a (sparse) matrix of size `NROW(input)`
+#' by `bru_mapper_n(mapper)`
+#' @param input The values for which to produce a mapping matrix
+#' @export
+#' @rdname bru_mapper
+bru_mapper_amatrix <- function(mapper, input, ...) {
+  UseMethod("bru_mapper_amatrix")
+}
+
 
 
 # CONSTRUCTORS ----
@@ -759,19 +796,12 @@ make_mapper <- function(subcomp,
     }
   }
   if (!is.null(subcomp[["mapper"]])) {
-    if (inherits(subcomp[["mapper"]], "inla.mesh.1d")) {
-      subcomp$n <- subcomp[["mapper"]]$m
-      subcomp$values <- subcomp[["mapper"]]$loc
-    } else if (inherits(subcomp[["mapper"]], "inla.mesh")) {
-      subcomp$n <- subcomp[["mapper"]]$n
-      subcomp$values <- seq_len(subcomp$n)
-    } else if (inherits(subcomp[["mapper"]], "bru_mapper_factor")) {
-      if (identical(subcomp[["mapper"]]$factor_mapping, "contrast")) {
-        subcomp[["values"]] <- subcomp[["mapper"]][["levels"]][-1L]
-      } else {
-        subcomp[["values"]] <- subcomp[["mapper"]][["levels"]]
-      }
-      subcomp$n <- length(subcomp[["values"]])
+    if (inherits(subcomp[["mapper"]], "inla.mesh.1d") ||
+        inherits(subcomp[["mapper"]], "inla.mesh") ||
+        inherits(subcomp[["mapper"]], "bru_mapper")) {
+      subcomp[["mapper"]] <- bru_mapper(subcomp[["mapper"]])
+      subcomp$n <- bru_mapper_n(subcomp[["mapper"]])
+      subcomp$values <- bru_mapper_values(subcomp[["mapper"]])
     } else {
       stop(paste0(
         "Unknown mapper of type '",
@@ -811,24 +841,18 @@ make_mapper <- function(subcomp,
       }
     }
     if (is.factor(subcomp[["values"]]) ||
-      is.character(subcomp[["values"]])) {
-      if (is.factor(subcomp[["values"]])) {
-        subcomp$mapper <- list(levels = levels(subcomp[["values"]]))
-      } else {
-        subcomp$mapper <- list(levels = unique(subcomp[["values"]]))
-      }
-      if (subcomp[["type"]] == "factor") {
-        subcomp[["values"]] <- subcomp[["mapper"]][["levels"]][-1L]
-        subcomp$mapper$factor_mapping <- "contrast"
-      } else {
-        subcomp[["values"]] <- subcomp[["mapper"]][["levels"]]
-        subcomp$mapper$factor_mapping <- "full"
-      }
-      subcomp$n <- length(subcomp[["values"]])
-      class(subcomp$mapper) <- c("bru_mapper_factor", "list")
+        is.character(subcomp[["values"]])) {
+      subcomp$mapper <- bru_mapper_factor(subcomp[["values"]],
+                                          ifelse(identical(subcomp[["type"]], "factor"),
+                                                 "contrast",
+                                                 "full"))
+      subcomp$n <- bru_mapper_n(subcomp[["mapper"]])
+      subcomp$values <- bru_mapper_values(subcomp[["mapper"]])
     } else {
       if (length(subcomp[["values"]]) > 1) {
-        subcomp$mapper <- INLA::inla.mesh.1d(subcomp[["values"]])
+        subcomp$mapper <- bru_mapper(INLA::inla.mesh.1d(subcomp[["values"]]))
+        subcomp$n <- bru_mapper_n(subcomp[["mapper"]])
+        subcomp$values <- bru_mapper_values(subcomp[["mapper"]])
       }
     }
   }
@@ -911,7 +935,106 @@ code.components <- function(components, add = "") {
   codes
 }
 
+# MAPPERS ----
 
+#' @rdname bru_mapper
+bru_mapper.default <- function(mapper, ...) {
+  if (!inherits(mapper, "bru_mapper")) {
+    class(mapper) <- c("bru_mapper", class(mapper))
+  }
+  mapper
+}
+
+#' @rdname bru_mapper
+bru_mapper_n.inla.mesh <- function(mapper, ...) {
+  mapper$n
+}
+#' @rdname bru_mapper
+bru_mapper_values.inla.mesh <- function(mapper, ...) {
+  seq_len(mapper$n)
+}
+#' @rdname bru_mapper
+bru_mapper_amatrix.inla.mesh <- function(mapper, input, ...) {
+  if (!is.matrix(input) && !inherits(input, "Spatial")) {
+    val <- as.matrix(val)
+  }
+  INLA::inla.spde.make.A(mapper, loc = input)
+}
+
+#' @rdname bru_mapper
+bru_mapper_n.inla.mesh.1d <- function(mapper, ...) {
+  mapper$m
+}
+#' @rdname bru_mapper
+bru_mapper_values.inla.mesh.1d <- function(mapper, ...) {
+  mapper$loc
+}
+#' @rdname bru_mapper
+bru_mapper_amatrix.inla.mesh.1d <- function(mapper, input, ...) {
+  INLA::inla.spde.make.A(mapper, loc = input)
+}
+
+#' @param values Input values calculated by [input_eval.bru_input()]
+#' @param factor_mapping character; selects the type of factor mapping.
+#' * `'contrast'` for leaving out the first factor level.
+#' * `'full'` for keeping all levels.
+#' @rdname bru_mapper
+bru_mapper_factor <- function(values, factor_mapping, ...) {
+  stopifnot(
+    is.factor(values) || is.character(values)
+  )
+  factor_mapping <- match.arg(factor_mapping, c("contrast", "full"))
+  if (is.factor(values)) {
+    mapper <- list(levels = levels(values),
+                   factor_mapping = factor_mapping)
+  } else {
+    mapper <- list(levels = unique(values),
+                   factor_mapping = factor_mapping)
+  }
+  class(mapper) <- c("bru_mapper_factor", "bru_mapper", "list")
+  mapper
+}
+
+#' @rdname bru_mapper
+bru_mapper_n.bru_mapper_factor <- function(mapper, ...) {
+  length(bru_mapper_values(mapper))
+}
+#' @rdname bru_mapper
+bru_mapper_values.bru_mapper_factor <- function(mapper, ...) {
+  if (identical(mapper$factor_mapping, "contrast")) {
+    mapper$levels[-1L]
+  } else {
+    mapper$levels
+  }
+}
+
+#' @rdname bru_mapper
+bru_mapper_amatrix.bru_mapper_factor <- function(mapper, input, ...) {
+  if (is.factor(input)) {
+    if (!identical(levels(input), mapper$levels)) {
+      input <- factor(as.character(input), levels = mapper$levels)
+    }
+  } else {
+    input <- factor(input, levels = mapper$levels)
+  }
+  if (mapper$factor_mapping == "full") {
+    input <- as.numeric(input)
+  } else if (mapper$factor_mapping == "contrast") {
+    input <- as.numeric(input) - 1L
+  } else {
+    stop("Unknown factor mapping '", mapper$factor_mapping, "'.")
+  }
+  ok <- !is.na(input)
+  ok[which(ok)] <- (input[ok] > 0L)
+  A <- Matrix::sparseMatrix(
+    i = which(ok),
+    j = input[ok],
+    x = rep(1.0, sum(ok)),
+    dims = c(NROW(input), bru_mapper_n(mapper))
+  )
+  A
+}
+  
 # OPERATORS ----
 
 
@@ -1041,58 +1164,20 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
   } else {
     weights <- 1.0
   }
-  if (inherits(subcomp$mapper, c("inla.mesh", "inla.mesh.1d"))) {
-    if (!is.matrix(val) & !inherits(val, "Spatial")) {
-      val <- as.matrix(val)
-    }
-    A <- INLA::inla.spde.make.A(subcomp$mapper, loc = val, weights = weights)
-  } else if (inherits(subcomp$mapper, c("bru_mapper_factor"))) {
-    if (is.factor(val)) {
-      if (!identical(levels(val), subcomp$mapper$levels)) {
-        val <- factor(as.character(val), levels = subcomp$mapper$levels)
-      }
-    } else if (is.factor(val)) {
-      val <- factor(val, levels = subcomp$mapper$levels)
-    } else {
-      stop("factor mapping present but non-factor input data found")
-    }
-    if (subcomp$mapper$factor_mapping == "full") {
-      val <- as.numeric(val)
-    } else if (subcomp$mapper$factor_mapping == "contrast") {
-      val <- as.numeric(val) - 1L
-    } else {
-      stop("Unknown factor mapping '", subcomp$mapper$factor_mapping, "'.")
-    }
-    ok <- !is.na(val)
-    ok[which(ok)] <- (val[ok] > 0L)
-    if ((length(weights) == 1) &&
-      (length(weights) < length(val))) {
-      A <- Matrix::sparseMatrix(
-        i = which(ok),
-        j = val[ok],
-        x = rep(weights, sum(ok)),
-        dims = c(NROW(data), subcomp$n)
-      )
-    } else {
-      A <- Matrix::sparseMatrix(
-        i = which(ok),
-        j = val[ok],
-        x = weights[ok],
-        dims = c(NROW(data), subcomp$n)
-      )
-    }
+  if (inherits(subcomp$mapper, "bru_mapper")) {
+    A <- weights * bru_mapper_amatrix(subcomp[["mapper"]], input = val)
   } else if (subcomp$model %in% c("linear", "clinear")) {
-    A <- Matrix::sparseMatrix(
+    A <- weights * Matrix::sparseMatrix(
       i = seq_len(NROW(data)),
       j = rep(1, NROW(data)),
-      x = val * weights,
+      x = val,
       dims = c(NROW(data), subcomp$n)
     )
   } else if (is.null(subcomp$mapper)) {
     if (subcomp$n > 1) {
       stop(paste0("Missing mapper (NULL) for subcomponent '", subcomp$label, "'"))
     }
-    A <- Matrix::Matrix(1.0, NROW(data), 1)
+    A <- weights * Matrix::Matrix(1.0, NROW(data), 1)
   } else {
     stop(paste0(
       "Unsupported mapper of class '",
