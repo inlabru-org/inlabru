@@ -1,10 +1,5 @@
 # GENERICS ----
 
-#' @export
-#' @rdname value.component
-value <- function(...) {
-  UseMethod("value")
-}
 #' Construct A-matrix
 #'
 #' Constructs the A-matrix for components and data
@@ -1164,66 +1159,6 @@ print.summary.component <- function(x, ...) {
     cat(name, ":", "\t", x[[name]], "\n", sep = "")
   }
   invisible(x)
-}
-
-
-
-#' Evaluate an component
-#'
-#' Calculates a latent component given some data and the state of the component's internal random variables.
-#'
-#' TODO: Improve speed for iterated calls by making 'mapped' a parameter
-#'
-#' @export
-#' @keywords internal
-#' @param component An component.
-#' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
-#' @param state Either a numeric vector or a list with a numeric entry whose name is equal to the name parameter.
-#' @param A A matrix overriding the default projection matrix.
-#' @param ... Unused.
-#' @return A numeric vector of component values
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
-
-
-value.component <- function(component, data, state, A = NULL, ...) {
-
-  # Convenience: extract state if a list of states was provided
-  if (is.list(state) & !is.data.frame(state)) {
-    state <- state[[component$label]]
-  }
-
-  #  # Obtain covariates
-  #  main_input <- input_eval(component, part = "main", data = data, env = component$env)
-  #  group_input <- input_eval(component, part = "group", data = data, env = component$env)
-  #  repl_input <- input_eval(component, part = "repl", data = data, env = component$env)
-  #  weights_input <- input_eval(component, part = "weights", data = data, env = component$env)
-  #
-  #  if (is.data.frame(main_input)) {
-  #    message("'main_input' is a data.frame! This code should be moved to input_eval.bru_input().")
-  #    if (component$label %in% names(main_input)) {
-  #      main_input <- main_input[, component$label, drop = TRUE]
-  #    } else {
-  #      main_input <- main_input[, 1, drop = TRUE]
-  #    }
-  #  }
-
-  # Make A-matrix (if not provided)
-  if (is.null(A)) {
-    A <- amatrix_eval(component, data)
-  }
-
-  # Determine component depending on the type of latent model
-  if (component$main$type %in% c("offset")) {
-    values <- input_eval(component, part = "main", data = data, env = component$env)
-  } else {
-    values <- A %*% state
-  }
-  #  else {
-  #    stop(paste0("Evaluation of ", component$type, " not implemented."))
-  #  }
-
-  as.vector(values)
 }
 
 

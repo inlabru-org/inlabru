@@ -175,7 +175,7 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
         name <- unlist(names(result$summary.random[k]))
         model <- result$model.random[k]
         if (!(model == "Constrained linear")) {
-          vals[[name]] <- data.frame(ID = result$summary.random[[name]]$ID, value = extract.entries(name, smpl.latent))
+          vals[[name]] <- extract.entries(name, smpl.latent)
         }
         else {
           vals[[name]] <- smpl.hyperpar[paste0(paste0("Beta_intern for ", name), " -- in user scale")]

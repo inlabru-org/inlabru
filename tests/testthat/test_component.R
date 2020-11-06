@@ -33,59 +33,24 @@ test_that("Component construction: linear model", {
   expect_equal(as.vector(A), 1:10)
 
   # Value
-  v <- value(cmp, data = df, state = 2)
-  expect_equal(v, 2 * df$x)
+  v <- evaluate_effect(cmp, data = df, state = 2)
+  expect_equivalent(v, 2 * df$x)
 
-  v <- value(cmp, data = df, state = list(beta = 2))
-  expect_equal(v, 2 * df$x)
+  v <- evaluate_effect(cmp, data = df, state = 2, A)
+  expect_equivalent(v, 2 * df$x)
 
-  v <- value(cmp, data = df, state = list(beta = 2), A = A)
-  expect_equal(v, 2 * df$x)
+  cmps <- component(list(cmp))
+  v <- evaluate_effect(cmps, data = df, state = list(list(beta = 2)))
+  expect_equivalent(v[[1]][["beta"]], 2 * df$x)
+
+  v <- evaluate_effect(cmps,
+    data = df,
+    state = list(list(beta = 2)),
+    A = list(beta = A)
+  )
+  expect_equivalent(v[[1]][["beta"]], 2 * df$x)
 })
 
-test_that("Component construction: linear model with component list", {
-  df <- data.frame(x = 1:10)
-
-  cmp <- component(list(component("beta", main = x, model = "linear", values = 1)),
-    lhoods = list(data = df)
-  )[[1]]
-
-  expect_equal(cmp$label, "beta")
-  expect_equal(cmp$main$model, "linear")
-  expect_equal(as.character(cmp$main$input$input), "x")
-
-  # Covariate mapping
-  df <- data.frame(x = 1:10)
-  expect_equal(input_eval(cmp, part = "main", data = df), 1:10)
-
-  # TODO: The following must be preceeded by an auto-model initialisation based on
-
-  # Index generator
-  # likelihood data.
-  idx <- index_eval(cmp)
-  expect_is(idx, "list")
-  expect_equal(names(idx)[1], "beta")
-  expect_equal(names(idx)[2], "beta.group")
-  expect_equal(names(idx)[3], "beta.repl")
-  expect_equal(idx$beta, 1)
-
-  # A-matrix
-  A <- amatrix_eval(cmp, data = df)
-  expect_is(A, "dgCMatrix")
-  expect_equal(nrow(A), 10)
-  expect_equal(ncol(A), 1)
-  expect_equal(as.vector(A), 1:10)
-
-  # Value
-  v <- value(cmp, data = df, state = 2)
-  expect_equal(v, 2 * df$x)
-
-  v <- value(cmp, data = df, state = list(beta = 2))
-  expect_equal(v, 2 * df$x)
-
-  v <- value(cmp, data = df, state = list(beta = 2), A = A)
-  expect_equal(v, 2 * df$x)
-})
 
 
 

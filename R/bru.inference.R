@@ -764,7 +764,7 @@ generate.bru <- function(object,
     formula <- object$sppa$lhoods[["default"]]$formula
   }
 
-  vals <- evaluate.model(
+  vals <- evaluate_model(
     model = object$sppa$model, result = object, data = data,
     property = "sample", n = n.samples, predictor = formula, seed = seed
   )
