@@ -752,6 +752,10 @@ generate.bru <- function(object,
 
   # If data is provided as list, generate data automatically for each dimension stated in this list
   if (class(data)[1] == "list") {
+    # Todo: check if this feature works at all.
+    warning(paste0("Attempting to convert data list into gridded data.\n",
+                   "This probably doesn't work.\n",
+                   "Please contact the package developers if you use this feature."))
     lhs.names <- names(data)
     add.pts <- lapply(lhs.names, function(nm) {
       ipoints(object$sppa$lhoods$default$drange[[nm]], name = nm)
@@ -764,6 +768,7 @@ generate.bru <- function(object,
     formula <- object$sppa$lhoods[["default"]]$formula
   }
 
+  # TODO: clarify the output format, and use the format parameter
   vals <- evaluate_model(
     model = object$sppa$model, result = object, data = data,
     property = "sample", n = n.samples, predictor = formula, seed = seed

@@ -6,8 +6,15 @@
 \usage{
 expand_labels(labels, expand, suffix)
 }
+\arguments{
+\item{labels}{character vector; original labels}
+
+\item{expand}{character vector; subset of labels to expand}
+
+\item{suffix}{character; the suffix to add to the labels selected by \code{expand}}
+}
 \value{
-a vector of labels with suffix appended
+a vector of labels with suffix appended to the selected labels
 }
 \description{
 Expand labels

@@ -49,7 +49,11 @@ bru_safe_inla <- function(multicore = FALSE, quietly = TRUE) {
 
 
 #' Expand labels
-#' @return a vector of labels with suffix appended
+#' 
+#' @param labels character vector; original labels
+#' @param expand character vector; subset of labels to expand
+#' @param suffix character; the suffix to add to the labels selected by `expand`
+#' @return a vector of labels with suffix appended to the selected labels
 expand_labels <- function(labels, expand, suffix) {
   labels[labels %in% expand] <- paste0(labels[labels %in% expand], suffix)
 }
@@ -64,7 +68,7 @@ extract_matrixlist_column <- function(thelist, col) {
   )
 }
 
-extract_vectorlist_column <- function(mthelist) {
+extract_vectorlist_column <- function(thelist) {
   vapply(
     names(thelist),
     function(x) {
