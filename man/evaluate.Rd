@@ -15,6 +15,8 @@ evaluate_model(
   model,
   result,
   data,
+  state = NULL,
+  A = NULL,
   predictor = NULL,
   property = "mode",
   format = NULL,
@@ -26,7 +28,6 @@ evaluate_model(
 evaluate_state(
   model,
   result,
-  data,
   property = "mode",
   n = 1,
   seed = 0L,
@@ -50,6 +51,12 @@ evaluate_predictor(model, data, state, effects, predictor, format = "auto")
 
 \item{data}{A \code{list}, \code{data.frame}, or \code{Spatial*DataFrame}, with coordinates
 and covariates needed to evaluate the model.}
+
+\item{state}{A list where each element is a named list of latent state
+information, as produced by \code{\link[=evaluate_state]{evaluate_state()}}}
+
+\item{A}{A matrix overriding the default projection matrix or matrices
+(named list of matrices for \code{evaluate_effect.component_list})}
 
 \item{predictor}{Either a formula or expression}
 
@@ -82,12 +89,6 @@ When seed != 0, overridden to "1:1"}
 \item{...}{Unused.}
 
 \item{component}{An component.}
-
-\item{state}{A list where each element is a named list of latent state
-information, as produced by \code{\link[=evaluate_state]{evaluate_state()}}}
-
-\item{A}{A matrix overriding the default projection matrix or matrices
-(named list of matrices for \code{evaluate_effect.component_list})}
 
 \item{effects}{A list where each element is named list of evaluated effects,
 as computed by \code{\link[=evaluate_effect.component_list]{evaluate_effect.component_list()}}}

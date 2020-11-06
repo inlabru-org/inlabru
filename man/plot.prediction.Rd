@@ -33,7 +33,7 @@ fit <- bru(y ~ x, family = "gaussian", data = input.df)
 
 # Predict posterior statistics of 'x'
 
-xpost <- predict(fit, data = NULL, formula = ~ x)
+xpost <- predict(fit, data = NULL, formula = ~ x_latent)
 
 # The statistics include mean, standard deviation, the 2.5\% quantile, the median,
 # the 97.5\% quantile, minimum and maximum sample drawn from the posterior as well as
@@ -50,12 +50,12 @@ ggplot() + gg(xpost)
 # of multiple variables:
 
 xipost = predict(fit, data = NULL,
-                 formula = ~ c(Intercept = Intercept, x = x))
+                 formula = ~ c(Intercept = Intercept_latent,
+                               x = x_latent))
 xipost
 
 # If we still want a plot in the previous style we have to set the bar parameter to TRUE
 
-# rownames(xipost) = c("Intercept","x")
 p1 = ggplot() + gg(xipost, bar = TRUE)
 p1
 

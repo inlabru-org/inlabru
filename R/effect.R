@@ -477,11 +477,16 @@ component.character <- function(object,
 #' are interpreted in the mathematical sense. For instance, `predict` may be used to analyze the
 #' an analytical combination of the covariate \eqn{x} and the intercept using
 #'
-#' \itemize{\item{`predict(fit, data.frame(x=1)), ~ exp(x + Intercept)`.}}
+#' \itemize{\item{`predict(fit, data.frame(x=2)), ~ exp(psi + Intercept)`.}}
+#' 
+#' which corresponds to the mathematical expression \eqn{\exp(x \beta + c)}.
 #'
-#' On the other hand, predict may be used to only look at a transformation of the random effect \eqn{\psi}
+#' On the other hand, predict may be used to only look at a transformation of
+#' the latent variable \eqn{\beta_\psi}
 #'
-#' \itemize{\item{`predict(fit, NULL, ~ exp(psi))`.}}
+#' \itemize{\item{`predict(fit, NULL, ~ exp(psi_latent))`.}}
+#' 
+#' #' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
 #'
 #' @param lhoods TODO: document
 #' @param envir TODO: document

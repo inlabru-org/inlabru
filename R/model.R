@@ -134,25 +134,31 @@ make.model <- function(components, lhoods) {
 evaluate_model <- function(model,
                            result,
                            data,
+                           state = NULL,
+                           A = NULL,
                            predictor = NULL,
                            property = "mode",
                            format = NULL,
                            n = 1,
                            seed = 0L,
                            num.threads = NULL) {
-  if (inherits(predictor, "formula")) {
-    fml.envir <- as.list(environment(predictor))
-    predictor <- parse(text = as.character(predictor)[length(as.character(predictor))])
-  } else {
-    fml.envir <- list()
-  }
-
-  state <- evaluate_state(model, result = result, data = data,
+  if (is.null(state) && !is.null(result)) {
+    state <- evaluate_state(model, result = result,
                           property = property,
                           n = n, seed = seed, num.threads = num.threads)
-  A <- amatrix_eval(model$effects, data = data)
-  effects <- evaluate_effect(model$effects, data = data,
-                             state = state, A = A)
+  }
+  if (is.null(state)) {
+    stop("Not enough information to evaluate model states.")
+  }
+  if (is.null(A) && !is.null(data)) {
+    A <- amatrix_eval(model$effects, data = data)
+  }
+  if (is.null(A)) {
+    effects <- NULL
+  } else {
+    effects <- evaluate_effect(model$effects, data = data,
+                               state = state, A = A)
+  }
   
   if (is.null(predictor)) {
     return(effects)
@@ -170,7 +176,6 @@ evaluate_model <- function(model,
 #' @rdname evaluate
 evaluate_state <- function(model,
                            result,
-                           data,
                            property = "mode",
                            n = 1,
                            seed = 0L,
@@ -351,6 +356,7 @@ evaluate_predictor <- function(model,
       }
       if (identical(format, "matrix")) {
         result <- matrix(0.0, NROW(result_), n)
+        rownames(result) <- row.names(as.matrix(result_))
       } else if (identical(format, "list")) {
         result <- vector("list", n)
       }
