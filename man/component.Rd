@@ -48,7 +48,7 @@ component(object, ...)
 main takes an R expression that evaluates to where the latent variables should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 Arguments starting with weights, group, replicate behave similarly to main, but for the corresponding features of \code{INLA::f()}.}
 
-\item{model}{Either one of "offset", "factor", "linear" or a model name or
+\item{model}{Either one of "offset", "factor_full", "factor_contrast", "linear" or a model name or
 object accepted by INLA's \code{f} function. If set to NULL, then "linear" is used.}
 
 \item{mapper}{Information about how to do the mapping from the values evaluated in \code{main},

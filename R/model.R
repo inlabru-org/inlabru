@@ -150,8 +150,8 @@ evaluate.model <- function(model,
       num.threads = num.threads
     )
   } else {
-    result$model <- model
-    smp <- rep(list(extract.summary(result, property)), n)
+    n <- 1
+    smp <- list(extract_property(result, property))
   }
 
   # Which effects do we want? Remove effect from model that are not required for the evaluation
@@ -168,7 +168,7 @@ evaluate.model <- function(model,
     As <- lapply(model$effects, amatrix_eval, data)
   }
 
-  for (k in 1:n) {
+  for (k in seq_len(n)) {
     # Discard variables we do not need
     sm <- smp[[k]][vars]
 
@@ -218,4 +218,135 @@ evaluate.model <- function(model,
   } else {
     smp[[1]]
   }
+}
+
+
+#' Evaluate component effects or expressions
+#'
+#' Evaluate component effects or expressions, based on a bru model and one or
+#' several states of the latent variables and hyperparameters.
+#'
+#' @param states A named list of latent state information. Each element should
+#' be a data.frame where each column is a state vector for the named latent
+#' component or hyperparameter, or a single vector for each component.
+#' @param data If `NULL`, the `A` input must be non-`NULL`
+#' @param predictor Either `NULL`, a formula, or expression
+#' @param A A named list of precomputed A matrices for each model component
+#' @return If `predictor` is `NULL`, a list of the same format as `states`, but
+#' containing effect values. If predictor is a formula or expression, a single data.frame
+#' is returned, where each column contains the evaluated predictor expression
+#' for a state.
+evaluate_model <- function(model,
+                           states,
+                           data = NULL,
+                           predictor = NULL,
+                           A = NULL) {
+  stopifnot(inherits(model, "bru_model"))
+  if (!is.null(predictor)) {
+    pred.envir <- as.list(environment(predictor))
+  }
+  if (inherits(predictor, "formula")) {
+    predictor <- parse(text = as.character(predictor)[length(as.character(predictor))])
+  }
+
+  # TODO: check if a subset of the variables is enough
+  vars <- names(states)
+  n <- NCOL(states[[1]])
+
+  if (is.null(A)) {
+    A <- list()
+  }
+  effect_values <- list()
+  for (label in intersect(vars, names(model$effects))) {
+    if (is.null(A) || is.null(A[[label]])) {
+      A[[label]] <- amatrix_eval(model$effects[label], data = data)
+    }
+    effect_values[[label]] <- value(
+      model$effects[[label]],
+      data = data,
+      state = states[[label]],
+      A = A[[label]]
+    )
+  }
+
+  if (is.null(predictor)) {
+    return(effect_values)
+  }
+
+  # Rename component states to label_latent
+  component_labels <- intersect(names(states), names(model$effects))
+  names(states) <-
+    vapply(
+      names(states),
+      function(x) {
+        if (x %in% component_labels) {
+          paste0(x, "_latent")
+        } else {
+          x
+        }
+      },
+      "_"
+    )
+
+  n <- NCOL(states[[1]])
+  for (k in seq_len(n)) {
+    if (n == 1) {
+      envir <- c(
+        vapply(
+          names(effect_values),
+          function(x) {
+            list(as.vector(effect_values[[x]]))
+          },
+          list(1)
+        ),
+        vapply(
+          names(states),
+          function(x) {
+            list(as.vector(states[[x]]))
+          },
+          list(1)
+        ),
+        as.list(data.frame(data)),
+        pred.envir,
+        as.list(environment(model$formula))
+      )
+    } else {
+      envir <- c(
+        vapply(
+          names(effect_values),
+          function(x) {
+            list(as.vector(effect_values[[x]][, k]))
+          },
+          list(1)
+        ),
+        vapply(
+          names(states),
+          function(x) {
+            list(as.vector(states[[x]][, k]))
+          },
+          list(1)
+        ),
+        as.list(data.frame(data)),
+        pred.envir,
+        as.list(environment(model$formula))
+      )
+    }
+    result_ <- eval(predictor, envir = envir)
+    if (k == 1) {
+      if (is.data.frame(result_)) {
+        result_type <- "list"
+        result <- vector("list", n)
+      } else {
+        result_type <- "matrix"
+        result <- matrix(0.0, NROW(result_), n)
+      }
+    }
+    if (result_type == "list") {
+      result[[k]] <- result_
+    } else {
+      result[, k] <- result_
+    }
+  }
+
+  result
 }

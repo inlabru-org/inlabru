@@ -71,7 +71,7 @@ bru <- function(components = y ~ Intercept,
   options <- do.call(bru.options, options)
 
   lhoods <- list(...)
-  dot_is_lhood <- vapply(lhoods, function(lh) inherits(lh, "lhood"), TRUE)
+  dot_is_lhood <- vapply(lhoods, function(lh) inherits(lh, "bru_like"), TRUE)
   if (any(dot_is_lhood)) {
     if (!all(dot_is_lhood)) {
       stop("Cannot mix like() parameters with 'lhood' objects.")
@@ -83,6 +83,7 @@ bru <- function(components = y ~ Intercept,
     lhoods[["formula"]] <- auto_copy_response(lhoods[["formula"]], components)
     lhoods <- list(do.call(like, c(lhoods, list(options = options))))
   }
+  class(lhoods) <- c("bru_like_list", "list")
 
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
@@ -252,7 +253,7 @@ like <- function(family, formula = . ~ ., data = NULL,
     exclude_components = exclude
   )
 
-  class(lh) <- c("lhood", "list")
+  class(lh) <- c("bru_like", "list")
 
   # Return likelihood
   lh

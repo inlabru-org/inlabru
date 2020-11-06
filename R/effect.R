@@ -407,8 +407,8 @@ component.character <- function(object,
         factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
         fcall[["hyper"]] <- as.symbol(factor_hyper_name)
         assign(factor_hyper_name,
-               list(prec = list(initial = log(1e-6), fixed = TRUE)),
-               envir = component$env_extra
+          list(prec = list(initial = log(1e-6), fixed = TRUE)),
+          envir = component$env_extra
         )
       }
     }
