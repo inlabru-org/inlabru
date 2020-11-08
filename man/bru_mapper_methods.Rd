@@ -62,4 +62,3 @@ Implementation methods for mapper objects
 \seealso{
 \code{\link[=bru_mapper]{bru_mapper()}}
 }
-\concept{\code{bru_mapper} methods}

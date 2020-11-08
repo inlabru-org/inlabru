@@ -1083,7 +1083,6 @@ bru_mapper_factor <- function(values, factor_mapping, ...) {
 ibm_n.bru_mapper_factor <- function(mapper, ...) {
   length(ibm_values(mapper))
 }
-#' @family `bru_mapper` methods
 #' @rdname bru_mapper_methods
 ibm_values.bru_mapper_factor <- function(mapper, ...) {
   if (identical(mapper$factor_mapping, "contrast")) {
