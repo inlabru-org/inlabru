@@ -5,7 +5,6 @@ test_that("2D LGCP fitting", {
   skip_if_not(bru_safe_inla())
   disable_PROJ6_warnings()
 
-  # Needed for reproducible predict()
   set.seed(123L)
 
   options <- list(
@@ -72,6 +71,7 @@ test_that("2D LGCP fitting", {
   loc <- SpatialPoints(gorillas$mesh$loc[, c(1, 2)],
     proj4string = INLA::inla.sp_get_crs(gorillas$nests)
   )
+  set.seed(123L)
   pr <- predict(fit, loc, ~mySmooth, n.samples = 5, seed = 5657L)
   expect_equal(
     pr$mean[c(1, 255, 778, 1000)],
@@ -86,6 +86,7 @@ test_that("2D LGCP fitting", {
 
   # test_that("2D LGCP fitting: predicted intensity integral", {
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
+  set.seed(123L)
   Lambda <- predict(fit, ips, ~ sum(weight * exp(mySmooth + Intercept)),
     n.samples = 5, seed = 5657L
   )
