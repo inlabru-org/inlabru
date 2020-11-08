@@ -146,7 +146,8 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
       result = result,
       seed = seed,
       intern = FALSE,
-      num.threads = num.threads
+      num.threads = num.threads,
+      parallel.configs = FALSE
     )
   }
 
