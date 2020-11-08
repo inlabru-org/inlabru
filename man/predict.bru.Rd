@@ -29,7 +29,7 @@
 computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"}
 
-\item{...}{ignored arguments (S3 generic compatibility).}
+\item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
 }
 \value{
 a data.frame or Spatial* object with predicted mean values and other summary statistics attached.

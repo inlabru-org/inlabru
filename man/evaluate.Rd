@@ -22,7 +22,8 @@ evaluate_model(
   format = NULL,
   n = 1,
   seed = 0L,
-  num.threads = NULL
+  num.threads = NULL,
+  ...
 )
 
 evaluate_state(
@@ -31,7 +32,8 @@ evaluate_state(
   property = "mode",
   n = 1,
   seed = 0L,
-  num.threads = NULL
+  num.threads = NULL,
+  ...
 )
 
 evaluate_effect(...)
@@ -86,12 +88,14 @@ Default: "auto"}
 computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"}
 
-\item{...}{Unused.}
+\item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
 
 \item{component}{An component.}
 
 \item{effects}{A list where each element is named list of evaluated effects,
 as computed by \code{\link[=evaluate_effect.component_list]{evaluate_effect.component_list()}}}
+
+\item{...}{Unused.}
 }
 \value{
 A numeric vector of the component effect values

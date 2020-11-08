@@ -688,7 +688,7 @@ summary.bru <- function(object, ...) {
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
-#' @param ... ignored arguments (S3 generic compatibility).
+#' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #'
 #' @return a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
 #' @example inst/examples/predict.bru.R
@@ -714,7 +714,8 @@ predict.bru <- function(object,
     formula = formula,
     n.samples = n.samples,
     seed = seed,
-    num.threads = num.threads
+    num.threads = num.threads,
+    ...
   )
 
   # Summarize
@@ -816,7 +817,8 @@ generate.bru <- function(object,
   vals <- evaluate_model(
     model = object$sppa$model, result = object, data = data,
     property = "sample", n = n.samples, predictor = formula, seed = seed,
-    num.threads = num.threads
+    num.threads = num.threads,
+    ...
   )
 }
 

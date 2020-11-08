@@ -72,7 +72,8 @@ test_that("2D LGCP fitting", {
     proj4string = INLA::inla.sp_get_crs(gorillas$nests)
   )
   set.seed(123L)
-  pr <- predict(fit, loc, ~mySmooth, n.samples = 5, seed = 5657L)
+  pr <- predict(fit, loc, ~mySmooth, n.samples = 5, seed = 5657L,
+                num.threads = "1:1", parallel.configs = FALSE)
   expect_equal(
     pr$mean[c(1, 255, 778, 1000)],
     c(-2.7279196, -1.7653978, -1.7801908, -0.6127033),
@@ -88,7 +89,8 @@ test_that("2D LGCP fitting", {
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
   set.seed(123L)
   Lambda <- predict(fit, ips, ~ sum(weight * exp(mySmooth + Intercept)),
-    n.samples = 5, seed = 5657L
+    n.samples = 5, seed = 5657L,
+    num.threads = "1:1", parallel.configs = FALSE
   )
 
   expect_equal(

@@ -127,6 +127,7 @@ make.model <- function(components, lhoods) {
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
+#' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #'
 #' @keywords internal
 #' @aliases  evaluate
@@ -141,12 +142,14 @@ evaluate_model <- function(model,
                            format = NULL,
                            n = 1,
                            seed = 0L,
-                           num.threads = NULL) {
+                           num.threads = NULL,
+                           ...) {
   if (is.null(state) && !is.null(result)) {
     state <- evaluate_state(model,
       result = result,
       property = property,
-      n = n, seed = seed, num.threads = num.threads
+      n = n, seed = seed, num.threads = num.threads,
+      ...
     )
   }
   if (is.null(state)) {
@@ -185,12 +188,14 @@ evaluate_state <- function(model,
                            property = "mode",
                            n = 1,
                            seed = 0L,
-                           num.threads = NULL) {
+                           num.threads = NULL,
+                           ...) {
   # Evaluate random states, or a single property
   if (property == "sample") {
     state <- inla.posterior.sample.structured(result,
       n = n, seed = seed,
-      num.threads = num.threads
+      num.threads = num.threads,
+      ...
     )
   } else {
     state <- list(extract_property(result, property))
