@@ -18,7 +18,13 @@ test_that("bru: linear component", {
   expect_equal(fit$summary.fixed["myLin", "mean"], 2.02, midtol)
   expect_equal(fit$summary.fixed["myLin", "sd"], 0.0126, midtol)
 
-  pr <- predict(fit, data.frame(x = c(1, 2)), ~ myLin + 1, seed = 1)
+  pr <- predict(
+    fit,
+    data.frame(x = c(1, 2)),
+    ~ myLin + 1,
+    n.samples = 5,
+    seed = 1L
+  )
 
-  expect_equal(pr[, "mean"], c(3.019780, 5.039559), midtol)
+  expect_equal(pr[, "mean"], c(3.005013, 5.010026), midtol)
 })

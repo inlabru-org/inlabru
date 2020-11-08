@@ -815,7 +815,8 @@ generate.bru <- function(object,
   # TODO: clarify the output format, and use the format parameter
   vals <- evaluate_model(
     model = object$sppa$model, result = object, data = data,
-    property = "sample", n = n.samples, predictor = formula, seed = seed
+    property = "sample", n = n.samples, predictor = formula, seed = seed,
+    num.threads = num.threads
   )
 }
 

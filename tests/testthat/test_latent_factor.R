@@ -1,6 +1,8 @@
 context("Latent models - factor (test_latent_factor.R)")
 
 test_that("bru: factor component", {
+  skip_on_cran()
+  skip_if_not(bru_safe_inla())
 
   # Seed influences data as well as predict()!
   set.seed(123)
@@ -33,22 +35,6 @@ test_that("bru: factor component", {
       fac1(main = x1, model = "factor_contrast") +
       fac2(main = x2, model = "iid"),
     formula = y ~ Intercept + fac1 + fac2,
-    family = "gaussian",
-    data = input.df,
-    options = list(
-      verbose = FALSE,
-      control.inla = list(
-        int.strategy = "eb",
-        h = 0.005
-      ),
-      num.threads = "1:1"
-    )
-  )
-  fit2 <- bru(
-    components = ~
-    fac1(main = x1, model = "factor_full") +
-      fac2(main = x2, model = "iid"),
-    formula = y ~ fac1 + fac2,
     family = "gaussian",
     data = input.df,
     options = list(
@@ -102,13 +88,16 @@ test_that("bru: factor component", {
   )
 
   # Check if prediction works
-  pr <- predict(fit, data.frame(
-    x1 = factor(c("Alpha", "Beta", "Mu")),
-    x2 = factor(c("Delta", "Delta", "Gamma"))
-  ),
-  ~ fac1 + fac2,
-  seed = 1
+  pr <- predict(
+    fit,
+    data.frame(
+      x1 = factor(c("Alpha", "Beta", "Mu")),
+      x2 = factor(c("Delta", "Delta", "Gamma"))
+    ),
+    ~ fac1 + fac2,
+    n.samples = 5,
+    seed = 1
   )
-  expect_equal(pr[, "mean"], c(1.168671, -1.904676, -2.857816), midtol)
-  expect_equal(pr[, "sd"], c(0.5027916, 0.5041648, 0.5058944), midtol)
+  expect_equal(pr[, "mean"], c(1.137234, -1.941325, -2.878998), midtol)
+  expect_equal(pr[, "sd"], c(0.5700744, 0.5840021, 0.5656757), midtol)
 })
