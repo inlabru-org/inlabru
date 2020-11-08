@@ -143,9 +143,11 @@ evaluate_model <- function(model,
                            seed = 0L,
                            num.threads = NULL) {
   if (is.null(state) && !is.null(result)) {
-    state <- evaluate_state(model, result = result,
-                          property = property,
-                          n = n, seed = seed, num.threads = num.threads)
+    state <- evaluate_state(model,
+      result = result,
+      property = property,
+      n = n, seed = seed, num.threads = num.threads
+    )
   }
   if (is.null(state)) {
     stop("Not enough information to evaluate model states.")
@@ -156,18 +158,22 @@ evaluate_model <- function(model,
   if (is.null(A)) {
     effects <- NULL
   } else {
-    effects <- evaluate_effect(model$effects, data = data,
-                               state = state, A = A)
+    effects <- evaluate_effect(model$effects,
+      data = data,
+      state = state, A = A
+    )
   }
-  
+
   if (is.null(predictor)) {
     return(effects)
   }
-  
-  values <- evaluate_predictor(model, data = data,
-                               state = state, effects = effects,
-                               predictor = predictor, format = format)
-  
+
+  values <- evaluate_predictor(model,
+    data = data,
+    state = state, effects = effects,
+    predictor = predictor, format = format
+  )
+
   values
 }
 
@@ -183,13 +189,13 @@ evaluate_state <- function(model,
   # Evaluate random states, or a single property
   if (property == "sample") {
     state <- inla.posterior.sample.structured(result,
-                                              n = n, seed = seed,
-                                              num.threads = num.threads
+      n = n, seed = seed,
+      num.threads = num.threads
     )
   } else {
     state <- list(extract_property(result, property))
   }
-  
+
   state
 }
 
@@ -231,14 +237,14 @@ evaluate_effect.component <- function(component, data, state, A = NULL, ...) {
   if (is.null(A)) {
     A <- amatrix_eval(component, data)
   }
-  
+
   # Determine component depending on the type of latent model
   if (component$main$type %in% c("offset")) {
     values <- input_eval(component, part = "main", data = data, env = component$env)
   } else {
     values <- A %*% state
   }
-  
+
   as.matrix(values)
 }
 
@@ -321,13 +327,17 @@ evaluate_predictor <- function(model,
   if (inherits(predictor, "formula")) {
     predictor <- parse(text = as.character(predictor)[length(as.character(predictor))])
   }
-  
+
   common_vars <- c(
-    if (is.list(data)) {data} else {as.data.frame(data)},
+    if (is.list(data)) {
+      data
+    } else {
+      as.data.frame(data)
+    },
     as.list(pred.envir),
     as.list(environment(model$formula))
   )
-    
+
   n <- length(state)
   for (k in seq_len(n)) {
     state_k <- state[[k]]
@@ -337,7 +347,7 @@ evaluate_predictor <- function(model,
       names(model$effects),
       suffix = "_latent"
     )
-    
+
     envir <- c(
       effects[[k]],
       state_k,

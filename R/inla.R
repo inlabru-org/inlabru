@@ -1,12 +1,12 @@
 #' Standardise inla hyperparameter names
-#' 
+#'
 #' The inla hyperparameter output uses parameter names that can include
 #' whitespace and special characters. This function replaces those characters
 #' with underscores.
-#' 
+#'
 #' @param x character vector; names to be standardised
 #' @returns A character vector with standardised names
-#' @examples 
+#' @examples
 #' bru_standardise_names("Precision for the Gaussian observations")
 #' @export
 bru_standardise_names <- function(x) {

@@ -1615,6 +1615,8 @@ fm_crs_detect_manifold <- function(crs) {
   manifold
 }
 
+#' @export
+#' @rdname fm_spTransform
 fm_spTransform.inla.mesh <- function(x, CRSobj, passthrough = FALSE, ...) {
   x$loc <- fm_spTransform(x$loc, x$crs, CRSobj, passthrough = passthrough)
   x$manifold <- fm_crs_detect_manifold(CRSobj)

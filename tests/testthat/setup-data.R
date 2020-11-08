@@ -26,34 +26,6 @@ basic_fixed_effect_testdata <- function() {
 
 
 
-gorillas_lgcp_2d_testdata <- function() {
-  data(gorillas, package = "inlabru")
-
-  matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
-    prior.sigma = c(0.1, 0.01),
-    prior.range = c(5, 0.01)
-  )
-  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept(1)
-
-  fit <- lgcp(cmp, gorillas$nests,
-    samplers = gorillas$boundary,
-    domain = list(coordinates = gorillas$mesh),
-    options = list(
-      control.inla = list(
-        int.strategy = "eb",
-        h = 0.005
-      ),
-      num.threads = "1:1"
-    )
-  )
-
-  list(
-    gorillas = gorillas,
-    matern = matern,
-    cmp = cmp,
-    fit = fit
-  )
-}
 
 
 mrsea_rebuild_CRS <- function(x, use_km = FALSE) {

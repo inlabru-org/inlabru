@@ -515,7 +515,9 @@ ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL,
 # @param points A SpatialPointsDataFrame object
 # @param mesh An inla.mesh object
 # @param columns A character array of the points columns which whall be projected
-# @param group Character array identifying columns in \code{points}. These coloumns are interpreted as factors and the projection is performed independently for eah combination of factor levels.
+# @param group Character array identifying columns in \code{points}. These
+# colouns are interpreted as factors and the projection is performed
+# independently for each combination of factor levels.
 # @return SpatialPointsDataFrame of mesh vertices with projected data attached
 
 vertex.projection <- function(points, mesh, columns = names(points), group = NULL, fill = NULL) {
@@ -542,7 +544,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     )
     coordnames(ret) <- coordnames(points)
 
-    # If null is not not NULL, add vertices to which no data was projected
+    # If fill is not NULL, add vertices to which no data was projected
     # and set their projected data according to `fill`
 
     if (!is.null(fill)) {
@@ -574,7 +576,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
 }
 
 
-# Project data to mesh vertices under the assumption of lineariity
+# Project data to mesh vertices under the assumption of linearity
 #
 #
 # @aliases vertex.projection
@@ -582,7 +584,9 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
 # @param points A SpatialPointsDataFrame object
 # @param mesh An inla.mesh object
 # @param columns A character array of the points columns which whall be projected
-# @param group Character array identifying columns in \code{points}. These coloumns are interpreted as factors and the projection is performed independently for eah combination of factor levels.
+# @param group Character array identifying columns in \code{points}. These
+# columns are interpreted as factors and the projection is performed
+# independently for each combination of factor levels.
 # @return SpatialPointsDataFrame of mesh vertices with projected data attached
 # @example
 #

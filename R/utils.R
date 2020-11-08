@@ -49,7 +49,7 @@ bru_safe_inla <- function(multicore = FALSE, quietly = TRUE) {
 
 
 #' Expand labels
-#' 
+#'
 #' @param labels character vector; original labels
 #' @param expand character vector; subset of labels to expand
 #' @param suffix character; the suffix to add to the labels selected by `expand`

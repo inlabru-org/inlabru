@@ -7,6 +7,7 @@
 \alias{fm_spTransform.SpatialPointsDataFrame}
 \alias{fm_spTransform.inla.mesh.lattice}
 \alias{fm_spTransform.inla.mesh.segment}
+\alias{fm_spTransform.inla.mesh}
 \title{Handle transformation of various inla objects according to coordinate
 reference systems of sp::CRS or INLA::inla.CRS class.}
 \usage{
@@ -21,6 +22,8 @@ fm_spTransform(x, ...)
 \method{fm_spTransform}{inla.mesh.lattice}(x, CRSobj, passthrough = FALSE, ...)
 
 \method{fm_spTransform}{inla.mesh.segment}(x, CRSobj, passthrough = FALSE, ...)
+
+\method{fm_spTransform}{inla.mesh}(x, CRSobj, passthrough = FALSE, ...)
 }
 \arguments{
 \item{x}{The object that should be transformed from it's current CRS to a new CRS}
