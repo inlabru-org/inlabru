@@ -4,7 +4,7 @@ test_that("2D LGCP fitting", {
   skip_on_cran()
   skip_if_not(bru_safe_inla())
   disable_PROJ6_warnings()
-  
+
   # Needed for reproducible predict()
   set.seed(123L)
 
@@ -35,25 +35,36 @@ test_that("2D LGCP fitting", {
   expect_s3_class(fit, "bru")
 
   # test_that("2D LGCP fitting: INLA intercept", {
-  expect_equal(fit$summary.fixed["Intercept", "mean"], 1.121929, tolerance = midtol)
-  expect_equal(fit$summary.fixed["Intercept", "sd"], 0.5799173, tolerance = midtol)
+  expect_equal(
+    fit$summary.fixed["Intercept", "mean"],
+    1.121929,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["Intercept", "sd"],
+    0.5799173,
+    tolerance = midtol)
 
   index <- c(1, 456, 789, 1058, 1479)
   # test_that("2D LGCP fitting: INLA random field", {
-  expect_equal(fit$summary.random$mySmooth$mean[index],
-    c(-2.0212259, 0.3862700, -0.4485562, 0.4033954, -1.7001208),
+  expect_equal(
+    fit$summary.random$mySmooth$mean[index],
+    c(-2.0223348, 0.3871943, -0.4476642, 0.4025956, -1.7001911),
     tolerance = midtol
   )
-  expect_equal(fit$summary.random$mySmooth$sd[index],
-    c(1.5936344, 0.8840181, 0.8289204, 0.7830659, 1.0539057),
+  expect_equal(
+    fit$summary.random$mySmooth$sd[index],
+    c(1.5929190, 0.8838858, 0.8288531, 0.7831668, 1.0536828),
     tolerance = midtol
   )
-  expect_equal(fit$summary.hyperpar["Range for mySmooth", "mean"],
-    2.117453,
+  expect_equal(
+    fit$summary.hyperpar["Range for mySmooth", "mean"],
+    2.118071,
     tolerance = midtol
   )
-  expect_equal(fit$summary.hyperpar["Stdev for mySmooth", "mean"],
-    1.105217,
+  expect_equal(
+    fit$summary.hyperpar["Stdev for mySmooth", "mean"],
+    1.10536,
     tolerance = midtol
   )
 
@@ -62,13 +73,15 @@ test_that("2D LGCP fitting", {
     proj4string = INLA::inla.sp_get_crs(gorillas$nests)
   )
   pr <- predict(fit, loc, ~mySmooth, n.samples = 5, seed = 5657L)
-  expect_equal(pr$mean[c(1, 255, 778, 1000)],
+  expect_equal(
+    pr$mean[c(1, 255, 778, 1000)],
     c(-2.7279196, -1.7653978, -1.7801908, -0.6127033),
     tolerance = midtol
   )
-  expect_equal(pr$sd[c(2, 215, 656, 1010)],
+  expect_equal(
+    pr$sd[c(2, 215, 656, 1010)],
     c(0.5892231, 0.4663549, 1.0070714, 1.2699464),
-    tolerance = hitol
+    tolerance = midtol
   )
 
   # test_that("2D LGCP fitting: predicted intensity integral", {
@@ -77,8 +90,16 @@ test_that("2D LGCP fitting", {
     n.samples = 5, seed = 5657L
   )
 
-  expect_equal(Lambda$mean, 661.779, tolerance = midtol)
-  expect_equal(Lambda$sd, 17.43592, tolerance = midtol)
+  expect_equal(
+    Lambda$mean,
+    661.779,
+    tolerance = midtol
+  )
+  expect_equal(
+    Lambda$sd,
+    17.43592,
+    tolerance = midtol
+  )
 
   # test_that("Supplying integration points instead of samplers&domains", {
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
@@ -89,19 +110,23 @@ test_that("2D LGCP fitting", {
     options = options
   )
 
-  expect_equal(fit_ips$summary.fixed["Intercept", "mean"],
+  expect_equal(
+    fit_ips$summary.fixed["Intercept", "mean"],
     fit$summary.fixed["Intercept", "mean"],
     tolerance = lowtol
   )
-  expect_equal(fit_ips$summary.fixed["Intercept", "sd"],
+  expect_equal(
+    fit_ips$summary.fixed["Intercept", "sd"],
     fit$summary.fixed["Intercept", "sd"],
     tolerance = lowtol
   )
-  expect_equal(fit_ips$summary.random$mySmooth$mean,
+  expect_equal(
+    fit_ips$summary.random$mySmooth$mean,
     fit$summary.random$mySmooth$mean,
     tolerance = lowtol
   )
-  expect_equal(fit_ips$summary.random$mySmooth$sd,
+  expect_equal(
+    fit_ips$summary.random$mySmooth$sd,
     fit$summary.random$mySmooth$sd,
     tolerance = lowtol
   )
