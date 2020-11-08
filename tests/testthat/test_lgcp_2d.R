@@ -4,6 +4,9 @@ test_that("2D LGCP fitting", {
   skip_on_cran()
   skip_if_not(bru_safe_inla())
   disable_PROJ6_warnings()
+  
+  # Needed for reproducible predict()
+  set.seed(123L)
 
   options <- list(
     control.inla = list(

@@ -3,8 +3,8 @@ context("1D LGCP fitting and prediction (test_lgcp_1d.R)")
 test_data <- function() {
   data(Poisson2_1D, package = "inlabru")
   x <- seq(0, 55, length = 50)
-  mesh1D <- inla.mesh.1d(x, boundary = "free")
-  matern <- inla.spde2.pcmatern(mesh1D,
+  mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
+  matern <- INLA::inla.spde2.pcmatern(mesh1D,
     prior.range = c(150, 0.75),
     prior.sigma = c(0.1, 0.75)
   )
@@ -30,6 +30,9 @@ test_that("1D LGCP fitting", {
   result <- test_data()
   mesh1D <- result$mesh1D
   fit <- result$fit
+  
+  # Needed for reproducible predict
+  set.seed(123L)
 
   expect_is(fit, "bru")
 
@@ -62,8 +65,8 @@ test_data_discrete <- function() {
   xx <- ceiling(pts2$x)
   data <- data.frame(x = rep(xx, xx))
   x <- seq(0, 55, length = 56)
-  mesh1D <- inla.mesh.1d(x, boundary = "free")
-  matern <- inla.spde2.pcmatern(mesh1D,
+  mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
+  matern <- INLA::inla.spde2.pcmatern(mesh1D,
     prior.range = c(150, 0.75),
     prior.sigma = c(0.1, 0.75)
   )
@@ -93,11 +96,15 @@ test_data_discrete <- function() {
 
 test_that("1D LGCP fitting", {
   skip_on_cran()
+  skip_if_not(bru_safe_inla())
 
   result <- test_data_discrete()
   mesh1D <- result$mesh1D
   fit <- result$fit
 
+  # Needed for reproducible predict
+  set.seed(123L)
+  
   expect_is(fit, "bru")
 
   expect_equal(fit$summary.fixed["Intercept", "mean"], 1.08959, tolerance = midtol)
