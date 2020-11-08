@@ -20,7 +20,18 @@ test_that("Mexdolphin: Hazard rate detection function", {
     options = list(control.inla = list(int.strategy = "eb"))
   )
 
-  # plot(hr(ips$distance, fit$summary.fixed["lsig", "mean"]))
+  #  ggplot(data.frame(distance = c(
+  #    mexdolphin$points$distance,
+  #    -mexdolphin$points$distance))) +
+  #    geom_density(aes(distance, after_stat(count))) +
+  #    geom_line(aes(distance, est),
+  #              data = data.frame(distance = seq(-8,8, by = 0.01)) %>%
+  #                mutate(est = hr(abs(distance),
+  #                                fit$summary.fixed["lsig","mean"]) *
+  #                         exp(fit$summary.fixed["Intercept","mean"])))
+  #
+  #  plot(ips$distance, hr(ips$distance, fit$summary.fixed["lsig", "mean"]))
+
   expect_equal(fit$summary.fixed["lsig", "mean"], 1.038281, tolerance = lowtol)
   expect_equal(fit$summary.fixed["lsig", "sd"], 0.5183252, tolerance = lowtol)
   expect_equal(fit$summary.fixed["Intercept", "mean"], 2.325408, tolerance = lowtol)

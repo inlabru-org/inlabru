@@ -1,3 +1,14 @@
+#' Standardise inla hyperparameter names
+#'
+#' The inla hyperparameter output uses parameter names that can include
+#' whitespace and special characters. This function replaces those characters
+#' with underscores.
+#'
+#' @param x character vector; names to be standardised
+#' @returns A character vector with standardised names
+#' @examples
+#' bru_standardise_names("Precision for the Gaussian observations")
+#' @export
 bru_standardise_names <- function(x) {
   vapply(x, function(x) gsub("[-() ]", "_", x = x, fixed = FALSE), "name")
 }
@@ -53,8 +64,16 @@ generate.inla <- function(object,
 
 
 
-
-extract.summary <- function(result, property) {
+#' Extract a summary property from all results of an inla result
+#'
+#' @param result an `inla` result object
+#' @param property character;
+#' @return named list for each estimated fixed effect coefficient,
+#' random effect vector, and hyperparameter. The hyperparameter names are
+#' standardised with [bru_standardise_names()]
+#' @keywords internal
+extract_property <- function(result, property) {
+  stopifnot(inherits(result, "inla"))
   ret <- list()
 
   for (label in rownames(result$summary.fixed)) {
@@ -71,18 +90,27 @@ extract.summary <- function(result, property) {
   }
 
 
+  fac.names <- names(result$model$effects)[
+    vapply(
+      result$model$effects,
+      function(e) {
+        identical(e$type, "factor")
+      },
+      TRUE
+    )
+  ]
+  # TODO: Consider whether to extract/convert effect$type == "factor" models
+  # from random effects into fixed effects
+  #
+  # Old code:
   # For factors we add a data.frame with column names equivalent to the factor levels
-  fac.names <- names(result$model$effects)[unlist(lapply(result$model$effects, function(e) {
-    e$model == "factor"
-  }))]
-  for (name in fac.names) {
-    tmp <- unlist(ret[startsWith(names(ret), name)])
-    names(tmp) <- lapply(names(tmp), function(nm) {
-      substring(nm, nchar(name) + 1)
-    })
-    ret[[name]] <- tmp
-  }
-
+  #    for (name in fac.names) {
+  #      tmp <- unlist(ret[startsWith(names(ret), name)])
+  #      names(tmp) <- lapply(names(tmp), function(nm) {
+  #        substring(nm, nchar(name) + 1)
+  #      })
+  #      ret[[name]] <- tmp
+  #    }
 
   ret
 }
@@ -158,7 +186,7 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
         name <- unlist(names(result$summary.random[k]))
         model <- result$model.random[k]
         if (!(model == "Constrained linear")) {
-          vals[[name]] <- data.frame(ID = result$summary.random[[name]]$ID, value = extract.entries(name, smpl.latent))
+          vals[[name]] <- extract.entries(name, smpl.latent)
         }
         else {
           vals[[name]] <- smpl.hyperpar[paste0(paste0("Beta_intern for ", name), " -- in user scale")]

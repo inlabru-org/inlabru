@@ -71,7 +71,7 @@ bru <- function(components = y ~ Intercept,
   options <- do.call(bru.options, options)
 
   lhoods <- list(...)
-  dot_is_lhood <- vapply(lhoods, function(lh) inherits(lh, "lhood"), TRUE)
+  dot_is_lhood <- vapply(lhoods, function(lh) inherits(lh, "bru_like"), TRUE)
   if (any(dot_is_lhood)) {
     if (!all(dot_is_lhood)) {
       stop("Cannot mix like() parameters with 'lhood' objects.")
@@ -83,6 +83,7 @@ bru <- function(components = y ~ Intercept,
     lhoods[["formula"]] <- auto_copy_response(lhoods[["formula"]], components)
     lhoods <- list(do.call(like, c(lhoods, list(options = options))))
   }
+  class(lhoods) <- c("bru_like_list", "list")
 
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
@@ -217,7 +218,60 @@ like <- function(family, formula = . ~ ., data = NULL,
       )
     }
 
+    if (length(E) > 1) {
+      warning("Exposure/effort parameter E should be a scalar for likelihood 'cp'.")
+    }
+
+    ips_is_Spatial <- inherits(ips, "Spatial")
+    if (ips_is_Spatial) {
+      ips_coordnames <- sp::coordnames(ips)
+      ips_crs <- fm_sp_get_crs(ips)
+    }
+    data_is_Spatial <- inherits(data, "Spatial")
+    if (data_is_Spatial) {
+      data_coordnames <- sp::coordnames(data)
+      data_crs <- fm_sp_get_crs(data)
+      if (ips_is_Spatial) {
+        new_coordnames <- data_coordnames[seq_len(min(
+          length(ips_coordnames),
+          length(data_coordnames)
+        ))]
+        ips_coordnames <- paste(
+          "BRU_dummy_coordinate_",
+          seq_along(ips_coordnames)
+        )
+        data_coordnames <- paste(
+          "BRU_dummy_coordinate_",
+          seq_along(data_coordnames)
+        )
+        ips_coordnames[seq_along(new_coordnames)] <- new_coordnames
+        data_coordnames[seq_along(new_coordnames)] <- new_coordnames
+        coordnames(ips) <- ips_coordnames
+        coordnames(data) <- data_coordnames
+
+        # TODO: check that the crs info is the same
+      }
+    }
+    data <- as.data.frame(data)
+    ips <- as.data.frame(ips)
+    dim_names <- intersect(names(data), names(ips))
+    data <- rbind(
+      cbind(data[dim_names], BRU_E = 0, BRU_response_cp = 1),
+      cbind(ips[dim_names], BRU_E = E * ips[["weight"]], BRU_response_cp = 0)
+    )
+    if (ips_is_Spatial) {
+      non_coordnames <- setdiff(names(data), data_coordnames)
+      data <- sp::SpatialPointsDataFrame(
+        coords = data[new_coordnames],
+        data = data[non_coordnames],
+        proj4string = data_crs,
+        match.ID = FALSE
+      )
+    }
+
+    response <- "BRU_response_cp"
     inla.family <- "poisson"
+    E <- data[["BRU_E"]]
   }
 
   # Calculate data ranges
@@ -245,40 +299,24 @@ like <- function(family, formula = . ~ ., data = NULL,
     expr = expr,
     response = response,
     inla.family = inla.family,
-    ips = ips,
     domain = domain,
     drange = drange,
     include_components = include,
     exclude_components = exclude
   )
 
-  class(lh) <- c("lhood", "list")
+  class(lh) <- c("bru_like", "list")
 
   # Return likelihood
   lh
 }
 
 single_stackmaker <- function(model, lhood, result) {
-  if (lhood$family == "cp") {
-    INLA::inla.stack(
-      make.stack(
-        data = lhood$data, model = model, expr = lhood$expr, y = 1,
-        E = 0, result = result
-      ),
-      make.stack(
-        data = lhood$ips, model = model, expr = lhood$expr, y = 0,
-        E = lhood$E * lhood$ips$weight, offset = 0, result = result
-      ),
-      # Make sure components with zero derivative are kept:
-      remove.unused = FALSE
-    )
-  } else {
-    make.stack(
-      data = lhood$data, model = model, expr = lhood$expr,
-      y = as.data.frame(lhood$data)[, lhood$response],
-      E = lhood$E, Ntrials = lhood$Ntrials, result = result
-    )
-  }
+  make.stack(
+    data = lhood$data, model = model, expr = lhood$expr,
+    y = lhood$data[[lhood$response]],
+    E = lhood$E, Ntrials = lhood$Ntrials, result = result
+  )
 }
 
 joint_stackmaker <- function(model, lhoods, result) {
@@ -486,6 +524,7 @@ lgcp <- function(components,
 
 summary.lgcp <- function(object, ...) {
   result <- object
+  warning("The summary.lgcp() method probably doesn't work with the current devel inlabru version!")
 
   cat("### LGCP Summary #################################################################################\n\n")
 
@@ -498,7 +537,7 @@ summary.lgcp <- function(object, ...) {
     cat(paste0("Coordinate system: ", proj4string(result$sppa$points), "\n"))
   }
 
-  cat(paste0("Total integration weight: ", sum(result$ips$weight)), "\n")
+  cat(paste0("Total integration mass, E*weight: ", sum(result$sppa$lhoods[[1]]$E)), "\n")
 
   cat("\n--- Dimensions -----------\n\n")
   icfg <- result$iconfig
@@ -531,6 +570,7 @@ summary.lgcp <- function(object, ...) {
 #'
 
 summary.bru <- function(object, ...) {
+  warning("The summary.bru() method probably doesn't work with the current devel inlabru version!")
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
   for (k in 1:length(object$sppa$lhoods)) {
     lh <- object$sppa$lhoods[[k]]
@@ -751,6 +791,15 @@ generate.bru <- function(object,
 
   # If data is provided as list, generate data automatically for each dimension stated in this list
   if (class(data)[1] == "list") {
+    # Todo: check if this feature works at all.
+    # TODO: add method ipoints.list to handle this;
+    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code from
+    # generate()
+    warning(paste0(
+      "Attempting to convert data list into gridded data.\n",
+      "This probably doesn't work.\n",
+      "Please contact the package developers if you use this feature."
+    ))
     lhs.names <- names(data)
     add.pts <- lapply(lhs.names, function(nm) {
       ipoints(object$sppa$lhoods$default$drange[[nm]], name = nm)
@@ -763,7 +812,8 @@ generate.bru <- function(object,
     formula <- object$sppa$lhoods[["default"]]$formula
   }
 
-  vals <- evaluate.model(
+  # TODO: clarify the output format, and use the format parameter
+  vals <- evaluate_model(
     model = object$sppa$model, result = object, data = data,
     property = "sample", n = n.samples, predictor = formula, seed = seed
   )

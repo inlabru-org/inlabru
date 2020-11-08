@@ -1,10 +1,5 @@
 # GENERICS ----
 
-#' @export
-#' @rdname value.component
-value <- function(...) {
-  UseMethod("value")
-}
 #' Construct A-matrix
 #'
 #' Constructs the A-matrix for components and data
@@ -407,8 +402,8 @@ component.character <- function(object,
         factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
         fcall[["hyper"]] <- as.symbol(factor_hyper_name)
         assign(factor_hyper_name,
-               list(prec = list(initial = log(1e-6), fixed = TRUE)),
-               envir = component$env_extra
+          list(prec = list(initial = log(1e-6), fixed = TRUE)),
+          envir = component$env_extra
         )
       }
     }
@@ -482,11 +477,16 @@ component.character <- function(object,
 #' are interpreted in the mathematical sense. For instance, `predict` may be used to analyze the
 #' an analytical combination of the covariate \eqn{x} and the intercept using
 #'
-#' \itemize{\item{`predict(fit, data.frame(x=1)), ~ exp(x + Intercept)`.}}
+#' \itemize{\item{`predict(fit, data.frame(x=2)), ~ exp(psi + Intercept)`.}}
 #'
-#' On the other hand, predict may be used to only look at a transformation of the random effect \eqn{\psi}
+#' which corresponds to the mathematical expression \eqn{\exp(x \beta + c)}.
 #'
-#' \itemize{\item{`predict(fit, NULL, ~ exp(psi))`.}}
+#' On the other hand, predict may be used to only look at a transformation of
+#' the latent variable \eqn{\beta_\psi}
+#'
+#' \itemize{\item{`predict(fit, NULL, ~ exp(psi_latent))`.}}
+#'
+#' #' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
 #'
 #' @param lhoods TODO: document
 #' @param envir TODO: document
@@ -1164,66 +1164,6 @@ print.summary.component <- function(x, ...) {
     cat(name, ":", "\t", x[[name]], "\n", sep = "")
   }
   invisible(x)
-}
-
-
-
-#' Evaluate an component
-#'
-#' Calculates a latent component given some data and the state of the component's internal random variables.
-#'
-#' TODO: Improve speed for iterated calls by making 'mapped' a parameter
-#'
-#' @export
-#' @keywords internal
-#' @param component An component.
-#' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
-#' @param state Either a numeric vector or a list with a numeric entry whose name is equal to the name parameter.
-#' @param A A matrix overriding the default projection matrix.
-#' @param ... Unused.
-#' @return A numeric vector of component values
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
-
-
-value.component <- function(component, data, state, A = NULL, ...) {
-
-  # Convenience: extract state if a list of states was provided
-  if (is.list(state) & !is.data.frame(state)) {
-    state <- state[[component$label]]
-  }
-
-  #  # Obtain covariates
-  #  main_input <- input_eval(component, part = "main", data = data, env = component$env)
-  #  group_input <- input_eval(component, part = "group", data = data, env = component$env)
-  #  repl_input <- input_eval(component, part = "repl", data = data, env = component$env)
-  #  weights_input <- input_eval(component, part = "weights", data = data, env = component$env)
-  #
-  #  if (is.data.frame(main_input)) {
-  #    message("'main_input' is a data.frame! This code should be moved to input_eval.bru_input().")
-  #    if (component$label %in% names(main_input)) {
-  #      main_input <- main_input[, component$label, drop = TRUE]
-  #    } else {
-  #      main_input <- main_input[, 1, drop = TRUE]
-  #    }
-  #  }
-
-  # Make A-matrix (if not provided)
-  if (is.null(A)) {
-    A <- amatrix_eval(component, data)
-  }
-
-  # Determine component depending on the type of latent model
-  if (component$main$type %in% c("offset")) {
-    values <- input_eval(component, part = "main", data = data, env = component$env)
-  } else {
-    values <- A %*% state
-  }
-  #  else {
-  #    stop(paste0("Evaluation of ", component$type, " not implemented."))
-  #  }
-
-  as.vector(values)
 }
 
 

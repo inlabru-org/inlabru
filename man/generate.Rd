@@ -60,7 +60,7 @@ input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
 
 # Fit the model
 
-fit <- bru(y ~ xeff(map = x, model = "linear"),
+fit <- bru(y ~ xeff(main = x, model = "linear"),
            family = "gaussian", data = input.df)
 summary(fit)
 
@@ -71,8 +71,8 @@ smp = generate(fit, df, ~ xeff + Intercept, n.samples = 10)
 
 # Plot the resulting realizations
 
-plot(df$x, smp[[1]], type = "l")
-for (k in 2:length(smp)) points(df$x, smp[[k]], type = "l")
+plot(df$x, smp[,1], type = "l")
+for (k in 2:ncol(smp)) points(df$x, smp[,k], type = "l")
 
 # We can also draw samples form the joint posterior
 
@@ -96,7 +96,7 @@ input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
 
 # Fit the model
 
-fit <- bru(y ~ xeff(map = x, model = "linear"),
+fit <- bru(y ~ xeff(main = x, model = "linear"),
            family = "gaussian", data = input.df)
 summary(fit)
 
@@ -107,8 +107,8 @@ smp = generate(fit, df, ~ xeff + Intercept, n.samples = 10)
 
 # Plot the resulting realizations
 
-plot(df$x, smp[[1]], type = "l")
-for (k in 2:length(smp)) points(df$x, smp[[k]], type = "l")
+plot(df$x, smp[,1], type = "l")
+for (k in 2:ncol(smp)) points(df$x, smp[,k], type = "l")
 
 # We can also draw samples form the joint posterior
 

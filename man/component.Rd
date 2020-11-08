@@ -48,7 +48,7 @@ component(object, ...)
 main takes an R expression that evaluates to where the latent variables should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 Arguments starting with weights, group, replicate behave similarly to main, but for the corresponding features of \code{INLA::f()}.}
 
-\item{model}{Either one of "offset", "factor", "linear" or a model name or
+\item{model}{Either one of "offset", "factor_full", "factor_contrast", "linear" or a model name or
 object accepted by INLA's \code{f} function. If set to NULL, then "linear" is used.}
 
 \item{mapper}{Information about how to do the mapping from the values evaluated in \code{main},
@@ -167,11 +167,16 @@ bru offers. The formula parameters of both, \link{bru} and the prediction method
 are interpreted in the mathematical sense. For instance, \code{predict} may be used to analyze the
 an analytical combination of the covariate \eqn{x} and the intercept using
 
-\itemize{\item{\verb{predict(fit, data.frame(x=1)), ~ exp(x + Intercept)}.}}
+\itemize{\item{\verb{predict(fit, data.frame(x=2)), ~ exp(psi + Intercept)}.}}
 
-On the other hand, predict may be used to only look at a transformation of the random effect \eqn{\psi}
+which corresponds to the mathematical expression \eqn{\exp(x \beta + c)}.
 
-\itemize{\item{\code{predict(fit, NULL, ~ exp(psi))}.}}
+On the other hand, predict may be used to only look at a transformation of
+the latent variable \eqn{\beta_\psi}
+
+\itemize{\item{\code{predict(fit, NULL, ~ exp(psi_latent))}.}}
+
+#' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
 }
 
 \examples{

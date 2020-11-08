@@ -81,16 +81,15 @@ fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
 # The most basic one is to determine posterior statistics of a univariate
 # random variable in the model, e.g. the intercept
 
-icpt <- predict(fit, NULL, ~ Intercept)
-rownames(icpt) = "Intercept"
+icpt <- predict(fit, NULL, ~ c(Intercept = Intercept_latent))
 plot(icpt)
 
 # The formula argument can take any expression that is valid within the model, for
 # instance a non-linear transformation of a random variable
 
-exp.icpt <- predict(fit, NULL, ~ exp(Intercept))
-rownames(exp.icpt) = "exp(Intercept)"
-plot(rbind(icpt, exp.icpt), bar = TRUE)
+exp.icpt <- predict(fit, NULL, ~ c("Intercept" = Intercept_latent,
+                                   "exp(Intercept)" = exp(Intercept_latent)))
+plot(exp.icpt, bar = TRUE)
 
 # The intercept is special in the sense that it does not depend on other variables
 # or covariates. However, this is not true for the smooth spatial effects 'mySmooth'.
@@ -131,12 +130,12 @@ ggplot() + gg(gorillas$mesh, color = mySmooth$mean)
 # SpatialPixels object covering the mesh
 
 pxl = pixels(gorillas$mesh)
-mySmooth = predict(fit, pxl, ~ mySmooth)
+mySmooth2 = predict(fit, pxl, ~ mySmooth)
 
 # This will give us a SpatialPixelDataFrame with the columns we are looking for
 
-head(mySmooth)
-ggplot() + gg(mySmooth)
+head(mySmooth2)
+ggplot() + gg(mySmooth2)
 
 }
 }
