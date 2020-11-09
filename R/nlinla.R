@@ -86,3 +86,82 @@ nlinla.reweight <- function(A, model, data, expr, result) {
   }
   return(list(A = A, const = ae$const))
 }
+
+
+# Linearisation ----
+
+#' Compute inlabru model linearisation information
+#' 
+#' @export
+#' @rdname compute_linearisation
+bru_compute_linearisation <- function(...) {
+  UseMethod("compute_linearisation")
+}
+#' @export
+#' @rdname compute_linearisation
+bru_compute_linearisation.bru_component <- function(cmp,
+                                               data,
+                                               state,
+                                               A,
+                                               ...) {
+}
+#' @export
+#' @rdname compute_linearisation
+bru_compute_linearisation.bru_like <- function(lhood,
+                                               model,
+                                               data,
+                                               state,
+                                               A,
+                                               ...) {
+  # TODO: filter out the unused effects/latent for the likelihood
+  effects <- evaluate_effect(model[["effects"]], data = NULL,
+                             state = state, A = A, state = state)
+  stopifnot(!is.null(lhood$expr)) # Check details for purely linear models
+  pred0 <- evaluate_predictor(model, data = data, state, effects, lhood$expr,
+                              format = "matrix")
+  # Compute derivatives for each component
+  B <- list()
+  eps <- 1e-5 # TODO: set more intelligently
+  # Both of these loops could be parallelised, in principle.
+  for (cmp in names(model[["effects"]])) {
+    for (k in seq_len(NROW(state[[cmp]]))) {
+      if (allow_latent || !all(A[[cmp]][,k] == 0.0)) {
+        state_eps <- state
+        state_eps[[1]][[cmp]][k] <- state[[1]][[cmp]][k] + eps
+        # TODO:
+        # Option: filter out the data and effect rows for which
+        # the rows of A have some non-zeros, or all if allow_combinations
+        # Option: compute predictor for multiple different states. This requires
+        # constructing multiple states and corresponding effects before calling
+        # evaluate_predictor
+        effects_eps <- effects
+        effects_eps[[1]][,k] <- evaluate_effect(model[["effects"]][[cmp]],
+                                                data = NULL,
+                                                state = state_eps[[1]][[cmp]],
+                                                A = A[[cmp]])
+        pred_eps <- evaluate_predictor(model,
+                                       data = data,
+                                       state_eps,
+                                       effects = effects_eps,
+                                       predictor = lhood$expr,
+                                       format = "matrix")
+        # TODO: handle the sparseness efficiently
+        B[[cmp]][,k] <- (pred_eps - pred0) / eps
+      }
+    }
+  }
+  # TODO: compute offset
+  list(A = B, offset = offset)
+}
+#' @export
+#' @rdname compute_linearisation
+bru_compute_linearisation.bru_like_list <- function(lhoods, A, ...) {
+  lapply(lhoods, function(x) bru_compute_linearisation(x,
+                                                       A = x[["A"]],
+                                                       ...))
+}
+#' @export
+#' @rdname compute_linearisation
+bru_compute_linearisation.bru_model <- function(model, lhoods, ...) {
+  bru_compute_linearisation(lhoods, model = model, ...)
+}
