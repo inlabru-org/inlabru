@@ -30,11 +30,11 @@ basic_fixed_effect_testdata <- function() {
 
 mrsea_rebuild_CRS <- function(x, use_km = FALSE) {
   if (fm_has_PROJ6()) {
-    x$points <- rebuild_CRS(x$points)
-    x$samplers <- rebuild_CRS(x$samplers)
-    x$mesh$crs <- rebuild_CRS(x$mesh$crs)
-    x$boundary <- rebuild_CRS(x$boundary)
-    x$covar <- rebuild_CRS(x$covar)
+    x$points <- sp::rebuild_CRS(x$points)
+    x$samplers <- sp::rebuild_CRS(x$samplers)
+    x$mesh$crs <- sp::rebuild_CRS(x$mesh$crs)
+    x$boundary <- sp::rebuild_CRS(x$boundary)
+    x$covar <- sp::rebuild_CRS(x$covar)
   }
   if (use_km) {
     # The estimation is numerically unreliable when the spatial

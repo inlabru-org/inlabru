@@ -122,7 +122,8 @@ fm_crs_is_null <- function(crs) {
     wkt <- fm_crs_get_wkt(crs)
     is.null(wkt)
   } else {
-    is.na(crs)
+#    is.na(crs)
+    is.na(crs@projargs) && is.null(comment(crs))
   }
 }
 
