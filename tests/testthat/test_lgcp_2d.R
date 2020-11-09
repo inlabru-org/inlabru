@@ -37,34 +37,34 @@ test_that("2D LGCP fitting", {
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
     1.121178,
-    tolerance = lowtol
+    tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
     0.5797879,
-    tolerance = lowtol)
+    tolerance = midtol)
 
   index <- c(1, 456, 789, 1058, 1479)
   # test_that("2D LGCP fitting: INLA random field", {
   expect_equal(
     fit$summary.random$mySmooth$mean[index],
     c(-2.0223348, 0.3871943, -0.4476642, 0.4025956, -1.7001911),
-    tolerance = lowtol
+    tolerance = midtol
   )
   expect_equal(
     fit$summary.random$mySmooth$sd[index],
     c(1.5929190, 0.8838858, 0.8288531, 0.7831668, 1.0536828),
-    tolerance = lowtol
+    tolerance = midtol
   )
   expect_equal(
     fit$summary.hyperpar["Range for mySmooth", "mean"],
     2.118071,
-    tolerance = lowtol
+    tolerance = midtol
   )
   expect_equal(
     fit$summary.hyperpar["Stdev for mySmooth", "mean"],
     1.10536,
-    tolerance = lowtol
+    tolerance = midtol
   )
 
   # test_that("2D LGCP fitting: predicted random field", {
@@ -74,15 +74,17 @@ test_that("2D LGCP fitting", {
   set.seed(123L)
   pr <- predict(fit, loc, ~mySmooth, n.samples = 5, seed = 5657L,
                 num.threads = "1:1", parallel.configs = FALSE)
+  # Prediction variability includes reordeing differences, so need large
+  # tolerances unless n.samples is large
   expect_equal(
     pr$mean[c(1, 255, 778, 1000)],
     c(-2.7279196, -1.7653978, -1.7801908, -0.6127033),
-    tolerance = lowtol
+    tolerance = 1
   )
   expect_equal(
     pr$sd[c(2, 215, 656, 1010)],
     c(0.5892231, 0.4663549, 1.0070714, 1.2699464),
-    tolerance = lowtol
+    tolerance = 1
   )
 
   # test_that("2D LGCP fitting: predicted intensity integral", {
@@ -96,12 +98,12 @@ test_that("2D LGCP fitting", {
   expect_equal(
     Lambda$mean,
     661.778959876,
-    tolerance = lowtol
+    tolerance = 25
   )
   expect_equal(
     Lambda$sd,
     17.43591842821,
-    tolerance = lowtol
+    tolerance = 0.5
   )
 
   # test_that("Supplying integration points instead of samplers&domains", {
