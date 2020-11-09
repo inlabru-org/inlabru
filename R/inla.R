@@ -28,9 +28,6 @@ bru_standardise_names <- function(x) {
 #' @keywords internal
 predict.inla <- function(object, ...) {
   stop("predict() is not supported for plain inla objects. See https://github.com/fbachl/inlabru/issues/78")
-  object$sppa$model <- make.model(object$.args$formula)
-  class(object) <- c("bru", class(object))
-  predict(object, ...)
 }
 
 
@@ -55,9 +52,6 @@ predict.inla <- function(object, ...) {
 generate.inla <- function(object,
                           ...) {
   stop("generate() is no longer supported for plain inla objects. See https://github.com/fbachl/inlabru/issues/78")
-  object$sppa$model <- make.model(object$.args$formula)
-  class(object) <- c("bru", class(object))
-  generate(object, ...)
 }
 
 

@@ -25,7 +25,7 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
     options = options
   )
 
-  expect_equal(sum(fit$sppa$lhoods[[1]]$E), 7.095665, tolerance = midtol)
+  expect_equal(sum(fit$bru_info$lhoods[[1]]$E), 7.095665, tolerance = midtol)
   expect_equal(fit$summary.fixed["Intercept", "mean"], 1.796279, tolerance = midtol)
   expect_equal(fit$summary.fixed["Intercept", "sd"], 0.5221979, tolerance = midtol)
   expect_equal(fit$summary.random$my.spde$mean[c(1, 100, 300)], c(-1.566168, 1.177564, -1.584715), tolerance = midtol)

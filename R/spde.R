@@ -179,7 +179,7 @@ materncov.bands <- function(manifold, dist, log.range,
 #' @author Finn Lindgren \email{Finn.Lindgren@@ed.ac.uk}
 
 spde.posterior <- function(result, name, what = "range") {
-  spdespec <- result$sppa$model$effects[[name]]$main$model
+  spdespec <- result$bru_info$model$effects[[name]]$main$model
   spderesult <- INLA::inla.spde.result(result, name, spdespec)
 
   if (what == "matern.correlation" || what == "matern.covariance") {
@@ -196,7 +196,7 @@ spde.posterior <- function(result, name, what = "range") {
     if (what == "matern.correlation") {
       corr <- TRUE
       ylab <- "Matern Correlation"
-      out <- materncov.bands(result$sppa$model$effects[[name]]$main$mapper,
+      out <- materncov.bands(result$bru_info$model$effects[[name]]$main$mapper,
         dist = x,
         log.range = log.range,
         log.variance = NULL,
@@ -205,7 +205,7 @@ spde.posterior <- function(result, name, what = "range") {
     } else {
       corr <- FALSE
       ylab <- "Matern Covariance"
-      out <- materncov.bands(result$sppa$model$effects[[name]]$main$mapper,
+      out <- materncov.bands(result$bru_info$model$effects[[name]]$main$mapper,
         dist = x,
         log.range = log.range,
         log.variance = log.variance,
