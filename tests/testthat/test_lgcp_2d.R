@@ -95,13 +95,13 @@ test_that("2D LGCP fitting", {
 
   expect_equal(
     Lambda$mean,
-    661.779,
-    tolerance = midtol
+    661.778959876,
+    tolerance = lowtol
   )
   expect_equal(
     Lambda$sd,
-    17.43592,
-    tolerance = midtol
+    17.43591842821,
+    tolerance = lowtol
   )
 
   # test_that("Supplying integration points instead of samplers&domains", {
