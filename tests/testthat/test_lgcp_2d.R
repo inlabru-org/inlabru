@@ -36,35 +36,35 @@ test_that("2D LGCP fitting", {
   # test_that("2D LGCP fitting: INLA intercept", {
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    1.121929,
-    tolerance = midtol
+    1.121178,
+    tolerance = lowtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.5799173,
-    tolerance = midtol)
+    0.5797879,
+    tolerance = lowtol)
 
   index <- c(1, 456, 789, 1058, 1479)
   # test_that("2D LGCP fitting: INLA random field", {
   expect_equal(
     fit$summary.random$mySmooth$mean[index],
     c(-2.0223348, 0.3871943, -0.4476642, 0.4025956, -1.7001911),
-    tolerance = midtol
+    tolerance = lowtol
   )
   expect_equal(
     fit$summary.random$mySmooth$sd[index],
     c(1.5929190, 0.8838858, 0.8288531, 0.7831668, 1.0536828),
-    tolerance = midtol
+    tolerance = lowtol
   )
   expect_equal(
     fit$summary.hyperpar["Range for mySmooth", "mean"],
     2.118071,
-    tolerance = midtol
+    tolerance = lowtol
   )
   expect_equal(
     fit$summary.hyperpar["Stdev for mySmooth", "mean"],
     1.10536,
-    tolerance = midtol
+    tolerance = lowtol
   )
 
   # test_that("2D LGCP fitting: predicted random field", {
@@ -77,12 +77,12 @@ test_that("2D LGCP fitting", {
   expect_equal(
     pr$mean[c(1, 255, 778, 1000)],
     c(-2.7279196, -1.7653978, -1.7801908, -0.6127033),
-    tolerance = midtol
+    tolerance = lowtol
   )
   expect_equal(
     pr$sd[c(2, 215, 656, 1010)],
     c(0.5892231, 0.4663549, 1.0070714, 1.2699464),
-    tolerance = midtol
+    tolerance = lowtol
   )
 
   # test_that("2D LGCP fitting: predicted intensity integral", {
