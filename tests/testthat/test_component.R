@@ -33,18 +33,23 @@ test_that("Component construction: linear model", {
   expect_equal(as.vector(A), 1:10)
 
   # Value
-  v <- evaluate_effect(cmp, data = df, state = 2)
+  v <- evaluate_effect_single(cmp, data = df, state = 2)
   expect_equivalent(v, 2 * df$x)
 
-  v <- evaluate_effect(cmp, data = df, state = 2, A)
+  v <- evaluate_effect_single(cmp, data = df, state = 2, A)
   expect_equivalent(v, 2 * df$x)
 
   cmps <- component(list(cmp))
-  v <- evaluate_effect(cmps, data = df, state = list(list(beta = 2)))
+  v <- evaluate_effect_multi(
+    cmps,
+    data = df,
+    state = list(list(beta = 2))
+  )
   expect_equivalent(v[[1]][["beta"]], 2 * df$x)
 
-  v <- evaluate_effect(cmps,
-    data = df,
+  v <- evaluate_effect_multi(
+    cmps,
+    data = NULL,
     state = list(list(beta = 2)),
     A = list(beta = A)
   )

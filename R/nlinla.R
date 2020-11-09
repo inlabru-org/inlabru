@@ -50,7 +50,7 @@ nlinla.taylor <- function(expr, epunkt, data, env) {
 
 nlinla.epunkt <- function(model, data, result = NULL) {
   # This function determines the current point around which
-  # to perform the taylo approximation
+  # to perform the taylor approximation
   # (1) If result is NULL set all all effects to 0
   # (2) If result is a data.frame, use the entries as to where to approximate
   # (3) if result is an inla object, use these estimates as to where to approximate
@@ -113,42 +113,80 @@ bru_compute_linearisation.bru_like <- function(lhood,
                                                state,
                                                A,
                                                ...) {
+  allow_latent <- lhood[["allow_latent"]]
+  allow_combine <- lhood[["allow_combine"]]
   # TODO: filter out the unused effects/latent for the likelihood
-  effects <- evaluate_effect(model[["effects"]], data = NULL,
-                             state = state, A = A, state = state)
+  # TODO: if linear, just need to copy the A matrices and return
+  effects <- evaluate_effect_single(
+    model[["effects"]],
+    state = state,
+    data = NULL,
+    A = A
+  )
   stopifnot(!is.null(lhood$expr)) # Check details for purely linear models
-  pred0 <- evaluate_predictor(model, data = data, state, effects, lhood$expr,
-                              format = "matrix")
+  pred0 <- evaluate_predictor(
+    model,
+    state = list(state),
+    data = data,
+    effects = list(effects),
+    predictor = lhood$expr,
+    format = "matrix"
+  )
   # Compute derivatives for each component
   B <- list()
   eps <- 1e-5 # TODO: set more intelligently
   # Both of these loops could be parallelised, in principle.
   for (cmp in names(model[["effects"]])) {
+    triplets <- list(
+      i = integer(0),
+      j = integer(0),
+      x = numeric(0)
+    )
     for (k in seq_len(NROW(state[[cmp]]))) {
-      if (allow_latent || !all(A[[cmp]][,k] == 0.0)) {
+      row_subset <- which(A[[cmp]][, k] != 0.0)
+      if (allow_latent || (length(row_subset) > 0)) {
         state_eps <- state
-        state_eps[[1]][[cmp]][k] <- state[[1]][[cmp]][k] + eps
+        state_eps[[cmp]][k] <- state[[cmp]][k] + eps
         # TODO:
         # Option: filter out the data and effect rows for which
-        # the rows of A have some non-zeros, or all if allow_combinations
+        # the rows of A have some non-zeros, or all if allow_combine
         # Option: compute predictor for multiple different states. This requires
         # constructing multiple states and corresponding effects before calling
         # evaluate_predictor
-        effects_eps <- effects
-        effects_eps[[1]][,k] <- evaluate_effect(model[["effects"]][[cmp]],
-                                                data = NULL,
-                                                state = state_eps[[1]][[cmp]],
-                                                A = A[[cmp]])
-        pred_eps <- evaluate_predictor(model,
-                                       data = data,
-                                       state_eps,
-                                       effects = effects_eps,
-                                       predictor = lhood$expr,
-                                       format = "matrix")
-        # TODO: handle the sparseness efficiently
-        B[[cmp]][,k] <- (pred_eps - pred0) / eps
+        if (allow_latent || allow_combine) {
+          # TODO: Allow some grouping specification to allow subsetting even
+          # when allow_combine is TRUE
+          row_subset <- seq_len(NROW(A[[cmp]]))
+        }
+        effects_eps <- effects[row_subset, , drop = FALSE]
+        effects_eps[row_subset, k] <- evaluate_effect_single(
+          model[["effects"]][[cmp]],
+          state = state_eps[[cmp]],
+          data = NULL,
+          A = A[[cmp]][row_subset, , drop = FALSE]
+        )
+        pred_eps <- evaluate_predictor(
+          model,
+          state = list(state_eps),
+          data = data[row_subset, , drop = FALSE],
+          effects = list(effects_eps),
+          predictor = lhood$expr,
+          format = "matrix"
+        )
+        # Store sparse triplet information
+        values <- (pred_eps - pred0)
+        nonzero <- (values != 0.0) # Detect exact (non)zeros
+        triplets$i <- c(triplets$i, row_subset[nonzero])
+        triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
+        triplets$x <- c(triplets$x, values[nonzero] / eps)
       }
     }
+    B[[cmp]] <- Matrix::sparseMatrix(
+      i = triplets$i,
+      j = triplets$j,
+      x = triplets$x,
+      dims = c(NROW(pred0), NROW(state[[cmp]]))
+    )
   }
   # TODO: compute offset
   list(A = B, offset = offset)
