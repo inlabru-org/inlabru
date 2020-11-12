@@ -250,13 +250,16 @@ triangle <- function(mesh, loc) {
 #' @keywords internal
 #'
 #' @param mesh an inla.mesh object
-#' @param refine A list of refinement options passed on to [inla.mesh.create][INLA::inla.mesh.create]
+#' @param refine A list of refinement options passed on to
+#' `INLA::inla.mesh.create`
 #' @return mesh A refined inla.mesh object
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#' #'
 
 refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
-  rmesh <- INLA::inla.mesh.create(loc = mesh$loc, interior = INLA::inla.mesh.interior(mesh), boundary = INLA::inla.mesh.boundary(mesh), refine = refine)
+  rmesh <- INLA::inla.mesh.create(loc = mesh$loc,
+                                  interior = INLA::inla.mesh.interior(mesh),
+                                  boundary = INLA::inla.mesh.boundary(mesh),
+                                  refine = refine)
   return(rmesh)
 }
 

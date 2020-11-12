@@ -142,7 +142,7 @@ ibm_amatrix <- function(mapper, input, ...) {
 #'
 #' \itemize{\item{`predict(fit, NULL, ~ exp(psi_latent))`.}}
 #'
-#' #' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
+#' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
 #'
 #' @param object The object to operate on
 #' @param lhoods A list of `bru_like` objects

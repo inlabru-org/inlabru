@@ -50,7 +50,7 @@ nlinla.taylor <- function(expr, epunkt, data, env) {
 
 nlinla.epunkt <- function(model, data, result = NULL) {
   # This function determines the current point around which
-  # to perform the taylo approximation
+  # to perform the taylor approximation
   # (1) If result is NULL set all all effects to 0
   # (2) If result is a data.frame, use the entries as to where to approximate
   # (3) if result is an inla object, use these estimates as to where to approximate
@@ -85,4 +85,123 @@ nlinla.reweight <- function(A, model, data, expr, result) {
     }
   }
   return(list(A = A, const = ae$const))
+}
+
+
+# Linearisation ----
+
+#' Compute inlabru model linearisation information
+#' 
+#' @export
+#' @rdname compute_linearisation
+bru_compute_linearisation <- function(...) {
+  UseMethod("compute_linearisation")
+}
+#' @export
+#' @rdname compute_linearisation
+bru_compute_linearisation.bru_component <- function(cmp,
+                                               data,
+                                               state,
+                                               A,
+                                               ...) {
+}
+#' @export
+#' @rdname compute_linearisation
+bru_compute_linearisation.bru_like <- function(lhood,
+                                               model,
+                                               data,
+                                               state,
+                                               A,
+                                               ...) {
+  allow_latent <- lhood[["allow_latent"]]
+  allow_combine <- lhood[["allow_combine"]]
+  included <- parse_inclusion(names(model[["effects"]]),
+                              lhood[["include_components"]],
+                              lhood[["exclude_components"]])
+  # TODO: If linear, just need to copy the A matrices and return
+  effects <- evaluate_effect_single(
+    model[["effects"]][included],
+    state = state,
+    data = NULL,
+    A = A
+  )
+  stopifnot(!is.null(lhood$expr)) # Check details for purely linear models
+  pred0 <- evaluate_predictor(
+    model,
+    state = list(state),
+    data = data,
+    effects = list(effects),
+    predictor = lhood$expr,
+    format = "matrix"
+  )
+  # Compute derivatives for each component
+  B <- list()
+  eps <- 1e-5 # TODO: set more intelligently
+  # Both of these loops could be parallelised, in principle.
+  for (cmp in included) {
+    triplets <- list(
+      i = integer(0),
+      j = integer(0),
+      x = numeric(0)
+    )
+    for (k in seq_len(NROW(state[[cmp]]))) {
+      row_subset <- which(A[[cmp]][, k] != 0.0)
+      if (allow_latent || (length(row_subset) > 0)) {
+        state_eps <- state
+        state_eps[[cmp]][k] <- state[[cmp]][k] + eps
+        # TODO:
+        # Option: filter out the data and effect rows for which
+        # the rows of A have some non-zeros, or all if allow_combine
+        # Option: compute predictor for multiple different states. This requires
+        # constructing multiple states and corresponding effects before calling
+        # evaluate_predictor
+        if (allow_latent || allow_combine) {
+          # TODO: Allow some grouping specification to allow subsetting even
+          # when allow_combine is TRUE
+          row_subset <- seq_len(NROW(A[[cmp]]))
+        }
+        effects_eps <- effects[row_subset, , drop = FALSE]
+        effects_eps[row_subset, k] <- evaluate_effect_single(
+          model[["effects"]][[cmp]],
+          state = state_eps[[cmp]],
+          data = NULL,
+          A = A[[cmp]][row_subset, , drop = FALSE]
+        )
+        pred_eps <- evaluate_predictor(
+          model,
+          state = list(state_eps),
+          data = data[row_subset, , drop = FALSE],
+          effects = list(effects_eps),
+          predictor = lhood$expr,
+          format = "matrix"
+        )
+        # Store sparse triplet information
+        values <- (pred_eps - pred0)
+        nonzero <- (values != 0.0) # Detect exact (non)zeros
+        triplets$i <- c(triplets$i, row_subset[nonzero])
+        triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
+        triplets$x <- c(triplets$x, values[nonzero] / eps)
+      }
+    }
+    B[[cmp]] <- Matrix::sparseMatrix(
+      i = triplets$i,
+      j = triplets$j,
+      x = triplets$x,
+      dims = c(NROW(pred0), NROW(state[[cmp]]))
+    )
+  }
+  # TODO: compute offset
+  list(A = B, offset = offset)
+}
+#' @export
+#' @rdname compute_linearisation
+bru_compute_linearisation.bru_like_list <- function(lhoods, A, ...) {
+  lapply(lhoods, function(x) bru_compute_linearisation(x,
+                                                       A = x[["A"]],
+                                                       ...))
+}
+#' @export
+#' @rdname compute_linearisation
+bru_compute_linearisation.bru_model <- function(model, lhoods, ...) {
+  bru_compute_linearisation(lhoods, model = model, ...)
 }

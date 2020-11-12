@@ -57,7 +57,7 @@ generate <- function(object, ...) {
 #'
 #' @return bru returns an object of class "bru". A `bru` object inherits
 #'   from `INLA::inla` (see the inla documentation for its properties) and
-#'   adds additional information stored in the `sppa` field.
+#'   adds additional information stored in the `bru_info` field.
 #'
 #' @example inst/examples/bru.R
 #'
@@ -113,10 +113,10 @@ bru <- function(components = y ~ Intercept,
   }
 
   ## Create result object ##
-  result$sppa$method <- "bru"
-  result$sppa$lhoods <- lhoods
-  result$sppa$model <- bru.model
-  result$sppa$mesh <- options$mesh
+  result$bru_info$method <- "bru"
+  result$bru_info$lhoods <- lhoods
+  result$bru_info$model <- bru.model
+  result$bru_info$mesh <- options$mesh
   class(result) <- c("bru", class(result))
   return(result)
 }
@@ -552,13 +552,13 @@ summary.lgcp <- function(object, ...) {
   cat(paste0("Predictor: log(lambda) = ", as.character(result$model$expr), "\n"))
 
   cat("\n--- Points & Samplers ----\n\n")
-  cat(paste0("Number of points: ", nrow(result$sppa$points)), "\n")
-  if (inherits(result$sppa$points, "Spatial")) {
-    cat(paste0("Coordinate names: ", paste0(coordnames(result$sppa$points), collapse = ", ")), "\n")
-    cat(paste0("Coordinate system: ", proj4string(result$sppa$points), "\n"))
+  cat(paste0("Number of points: ", nrow(result$bru_info$points)), "\n")
+  if (inherits(result$bru_info$points, "Spatial")) {
+    cat(paste0("Coordinate names: ", paste0(coordnames(result$bru_info$points), collapse = ", ")), "\n")
+    cat(paste0("Coordinate system: ", proj4string(result$bru_info$points), "\n"))
   }
 
-  cat(paste0("Total integration mass, E*weight: ", sum(result$sppa$lhoods[[1]]$E)), "\n")
+  cat(paste0("Total integration mass, E*weight: ", sum(result$bru_info$lhoods[[1]]$E)), "\n")
 
   cat("\n--- Dimensions -----------\n\n")
   icfg <- result$iconfig
@@ -593,12 +593,12 @@ summary.lgcp <- function(object, ...) {
 summary.bru <- function(object, ...) {
   warning("The summary.bru() method probably doesn't work with the current devel inlabru version!")
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
-  for (k in 1:length(object$sppa$lhoods)) {
-    lh <- object$sppa$lhoods[[k]]
-    cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(object$sppa$lhoods)[[k]], lh$family, class(lh$data), deparse(lh$formula)))
+  for (k in 1:length(object$bru_info$lhoods)) {
+    lh <- object$bru_info$lhoods[[k]]
+    cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(object$bru_info$lhoods)[[k]], lh$family, class(lh$data), deparse(lh$formula)))
   }
 
-  # rownames(df) = names(object$sppa$lhoods)
+  # rownames(df) = names(object$bru_info$lhoods)
   # print(df)
 
   cat("\n--- Criteria -------------------------------------------------------------------------------------\n\n")
@@ -666,8 +666,8 @@ summary.bru <- function(object, ...) {
   }
 
   cat("\n")
-  for (nm in names(object$sppa$model$effects)) {
-    eff <- object$sppa$model$effects[[nm]]
+  for (nm in names(object$bru_info$model$effects)) {
+    eff <- object$bru_info$model$effects[[nm]]
     if (identical(eff[["main"]][["type"]], "spde")) {
       hyp <- INLA::inla.spde.result(object, nm, eff$main$model)
       cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
@@ -844,19 +844,19 @@ generate.bru <- function(object,
     ))
     lhs.names <- names(data)
     add.pts <- lapply(lhs.names, function(nm) {
-      ipoints(object$sppa$lhoods$default$drange[[nm]], name = nm)
+      ipoints(object$bru_info$lhoods$default$drange[[nm]], name = nm)
     })
     data <- do.call(cprod, add.pts)
   }
 
   # Turn formula into an expression
   if (is.null(formula)) {
-    formula <- object$sppa$lhoods[["default"]]$formula
+    formula <- object$bru_info$lhoods[["default"]]$formula
   }
 
   # TODO: clarify the output format, and use the format parameter
   vals <- evaluate_model(
-    model = object$sppa$model, result = object, data = data,
+    model = object$bru_info$model, result = object, data = data,
     property = "sample", n = n.samples, predictor = formula, seed = seed,
     num.threads = num.threads,
     include = include, exclude = exclude,

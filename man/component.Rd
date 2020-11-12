@@ -169,7 +169,7 @@ the latent variable \eqn{\beta_\psi}
 
 \itemize{\item{\code{predict(fit, NULL, ~ exp(psi_latent))}.}}
 
-#' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
+which corresponds to the mathematical expression \eqn{\exp(\beta)}.
 }
 
 \examples{

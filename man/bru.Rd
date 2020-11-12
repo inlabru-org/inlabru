@@ -21,7 +21,7 @@ caveats about some of the \verb{control.*} inla options.}
 \value{
 bru returns an object of class "bru". A \code{bru} object inherits
 from \code{INLA::inla} (see the inla documentation for its properties) and
-adds additional information stored in the \code{sppa} field.
+adds additional information stored in the \code{bru_info} field.
 }
 \description{
 This method is a wrapper for \code{INLA::inla} and provides
