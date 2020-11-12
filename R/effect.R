@@ -125,8 +125,6 @@ component <- function(object, ...) {
 #' The `_selector` is character name of a variable whose contents determines which layer to
 #' extract from a covariate for each data point. Overrides the `layer`.
 #' (Default: NULL)
-#' (TODO: check if _selector is already supported for weight, group, and
-#' replicate as well, and if so add them)
 #' @param n The number of latent variables in the model. Should be auto-detected
 #' for most or all models (Default: NULL, for auto-detection).
 #' An error is given if it can't figure it out by itself.
@@ -134,7 +132,7 @@ component <- function(object, ...) {
 #' the latent model. Normally generated internally based on the mapping details.
 #' (Default: NULL, for auto-determination)
 #' @param season.length Passed on to `INLA::f()` for model `"seasonal"`
-#' (TODO: check if this parameter is actually needed anymore)
+#' (TODO: check if this parameter is still fully handled)
 # Weights
 #' @param weights,weights_layer,weights_selector
 #' Optional specification of effect scaling weights.

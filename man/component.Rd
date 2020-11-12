@@ -68,9 +68,7 @@ otherwise the first column of the covariate data frame)
 
 The \verb{_selector} is character name of a variable whose contents determines which layer to
 extract from a covariate for each data point. Overrides the \code{layer}.
-(Default: NULL)
-(TODO: check if _selector is already supported for weight, group, and
-replicate as well, and if so add them)}
+(Default: NULL)}
 
 \item{n}{The number of latent variables in the model. Should be auto-detected
 for most or all models (Default: NULL, for auto-detection).
@@ -81,7 +79,7 @@ the latent model. Normally generated internally based on the mapping details.
 (Default: NULL, for auto-determination)}
 
 \item{season.length}{Passed on to \code{INLA::f()} for model \code{"seasonal"}
-(TODO: check if this parameter is actually needed anymore)}
+(TODO: check if this parameter is still fully handled)}
 
 \item{weights, weights_layer, weights_selector}{Optional specification of effect scaling weights.
 Same syntax as for \code{main}.}
