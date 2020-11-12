@@ -36,7 +36,7 @@
 #'   geom_point(aes(x), y = 0, pch = "|", cex = 4) +
 #'   coord_fixed(ratio = 1)
 #'
-#' #' Fit an LGCP model
+#' # Fit an LGCP model
 #' x <- seq(0, 55, length = 50)
 #' mesh1D <- inla.mesh.1d(x, boundary = "free")
 #' mdl <- x ~ spde1D(map = x, model = inla.spde2.matern(mesh1D)) + Intercept # SOLUTION

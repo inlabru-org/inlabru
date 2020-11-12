@@ -75,14 +75,24 @@ make.model <- function(components, lhoods) {
   env <- environment(components)
 
   # Complete the component definitions based on data
-  components <- component(components, lhoods)
+  components <- component_list(components, lhoods)
 
   # Create joint formula that will be used by inla
   formula <- BRU_response ~ -1
-  for (fm in lapply(components, function(eff) {
-    eff$inla.formula
-  })) {
-    formula <- update.formula(formula, fm)
+  included <- character(0)
+  for (lh in lhoods) {
+    included <- union(included,
+                      parse_inclusion(
+                        names(components),
+                        include = lh[["include_components"]],
+                        exclude = lh[["exclude_components"]]
+                      )
+                      )
+  }
+  components <- components[included]
+  
+  for (cmp in included) {
+    formula <- update.formula(formula, components[[cmp]]$inla.formula)
   }
 
   # Restore environment
