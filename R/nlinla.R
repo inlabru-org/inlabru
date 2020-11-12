@@ -115,10 +115,12 @@ bru_compute_linearisation.bru_like <- function(lhood,
                                                ...) {
   allow_latent <- lhood[["allow_latent"]]
   allow_combine <- lhood[["allow_combine"]]
-  # TODO: filter out the unused effects/latent for the likelihood
-  # TODO: if linear, just need to copy the A matrices and return
+  included <- parse_inclusion(names(model[["effects"]]),
+                              lhood[["include_components"]],
+                              lhood[["exclude_components"]])
+  # TODO: If linear, just need to copy the A matrices and return
   effects <- evaluate_effect_single(
-    model[["effects"]],
+    model[["effects"]][included],
     state = state,
     data = NULL,
     A = A
@@ -136,7 +138,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
   B <- list()
   eps <- 1e-5 # TODO: set more intelligently
   # Both of these loops could be parallelised, in principle.
-  for (cmp in names(model[["effects"]])) {
+  for (cmp in included) {
     triplets <- list(
       i = integer(0),
       j = integer(0),
