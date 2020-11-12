@@ -551,6 +551,17 @@ component.list <- function(object, lhoods = NULL, envir = NULL, ...) {
 }
 
 
+#' @export
+#' @rdname component
+`[.component_list` <- function(x, i) {
+  env <- environment(x)
+  object <- NextMethod()
+  class(object) <- c("component_list", "list")
+  environment(object) <- env
+  object
+}
+
+
 
 #' @title FUNCTION_TITLE
 #' @description FUNCTION_DESCRIPTION
@@ -573,17 +584,11 @@ add_mappers.component <- function(component, lhoods) {
   keep_lh <-
     vapply(lhoods,
       function(lh, label) {
-        if (!is.null(lh[["include_components"]])) {
-          label %in% setdiff(
-            lh[["include_components"]],
-            lh[["exclude_components"]]
-          )
-        } else {
-          label %in% setdiff(
-            label,
-            lh[["exclude_components"]]
-          )
-        }
+        label %in% parse_inclusion(
+          label,
+          lh[["include_components"]],
+          lh[["exclude_components"]]
+        )
       },
       TRUE,
       label = component$label

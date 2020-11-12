@@ -5,6 +5,7 @@
 \alias{component.character}
 \alias{component.formula}
 \alias{component.list}
+\alias{[.component_list}
 \title{inlabru latent model component construction}
 \usage{
 component(object, ...)
@@ -41,6 +42,8 @@ component(object, ...)
 \method{component}{formula}(object, lhoods = NULL, envir = NULL, ...)
 
 \method{component}{list}(object, lhoods = NULL, envir = NULL, ...)
+
+\method{[}{component_list}(x, i)
 }
 \arguments{
 \item{object}{A formula (for \code{component.formula}), a character label

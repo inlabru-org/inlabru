@@ -122,6 +122,26 @@ bru <- function(components = y ~ Intercept,
 }
 
 
+#' Parse inclusion of component labels in a predictor expression
+#' @param thenames Set of labels to restrict
+#' @param include Character vector of component labels that are needed by the
+#'   predictor expression; Default: NULL (include all components that are not
+#'   explicitly excluded)
+#' @param exclude Character vector of component labels that are not used by the
+#'   predictor expression. The exclusion list is applied to the list
+#'   as determined by the `include` parameter; Default: NULL (do not remove
+#'   any components from the inclusion list)
+#' @keywords internal
+parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
+  if (!is.null(include)) {
+    intersect(thenames, setdiff(include, exclude))
+  } else {
+    setdiff(thenames, exclude)
+  }
+}
+
+
+
 #' Likelihood construction for usage with [bru]
 #'
 #' @aliases like
@@ -315,7 +335,9 @@ single_stackmaker <- function(model, lhood, result) {
   make.stack(
     data = lhood$data, model = model, expr = lhood$expr,
     y = lhood$data[[lhood$response]],
-    E = lhood$E, Ntrials = lhood$Ntrials, result = result
+    E = lhood$E, Ntrials = lhood$Ntrials, result = result,
+    include = lhood[["include_components"]],
+    exclude = lhood[["exclude_components"]]
   )
 }
 
@@ -688,6 +710,14 @@ summary.bru <- function(object, ...) {
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
+#' @param include Character vector of component labels that are needed by the
+#'   predictor expression; Default: NULL (include all components that are not
+#'   explicitly excluded)
+#' @param exclude Character vector of component labels that are not used by the
+#'   predictor expression. The exclusion list is applied to the list
+#'   as determined by the `include` parameter; Default: NULL (do not remove
+#'   any components from the inclusion list)
+#'   on the `include` parameter).
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #'
 #' @return a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
@@ -699,6 +729,8 @@ predict.bru <- function(object,
                         n.samples = 100,
                         seed = 0L,
                         num.threads = NULL,
+                        include = NULL,
+                        exclude = NULL,
                         ...) {
 
   # Convert data into list, data.frame or a Spatial object if not provided as such
@@ -715,6 +747,8 @@ predict.bru <- function(object,
     n.samples = n.samples,
     seed = seed,
     num.threads = num.threads,
+    include = include,
+    exclude = exclude,
     ...
   )
 
@@ -768,6 +802,14 @@ predict.bru <- function(object,
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
+#' @param include Character vector of component labels that are needed by the
+#'   predictor expression; Default: NULL (include all components that are not
+#'   explicitly excluded)
+#' @param exclude Character vector of component labels that are not used by the
+#'   predictor expression. The exclusion list is applied to the list
+#'   as determined by the `include` parameter; Default: NULL (do not remove
+#'   any components from the inclusion list)
+#'   on the `include` parameter).
 #' @param ... additional, unused arguments.
 #'
 #' @return List of generated samples
@@ -781,6 +823,8 @@ generate.bru <- function(object,
                          n.samples = 100,
                          seed = 0L,
                          num.threads = NULL,
+                         include = NULL,
+                         exclude = NULL,
                          ...) {
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(data)) {
@@ -818,6 +862,7 @@ generate.bru <- function(object,
     model = object$sppa$model, result = object, data = data,
     property = "sample", n = n.samples, predictor = formula, seed = seed,
     num.threads = num.threads,
+    include = include, exclude = exclude,
     ...
   )
 }
