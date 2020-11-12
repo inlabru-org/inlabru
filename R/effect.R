@@ -1411,16 +1411,24 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       # that are likely to happen for multilikelihood models; A component only
       # needs to be evaluable for at least one of the likelihoods.
     } else if (identical(as.character(input$input), "coordinates")) {
-      # Return SpatialPoints instead of a matrix
-      val <- as.data.frame(val)
-      coordinates(val) <- seq_len(ncol(val))
-      # Allow proj4string failures:
-      data_crs <- tryCatch(fm_sp_get_crs(data),
-        error = function(e) {}
+      tryCatch(
+        {
+          # Return SpatialPoints instead of a matrix
+          val <- as.data.frame(val)
+          coordinates(val) <- seq_len(ncol(val))
+          # Allow proj4string failures:
+          data_crs <- tryCatch(fm_sp_get_crs(data),
+                               error = function(e) {}
+          )
+          if (!fm_crs_is_null(data_crs)) {
+            proj4string(val) <- data_crs
+          }
+          val
+        },
+        error = function(e) {
+          NULL
+        }
       )
-      if (!fm_crs_is_null(data_crs)) {
-        proj4string(val) <- data_crs
-      }
     }
   }
   else if (inherits(emap, "SpatialGridDataFrame") |
@@ -1432,40 +1440,13 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
         } else {
           input[["layer"]]
         }
-      if (is.character(layer)) {
-        if (!(layer %in% names(emap))) {
-          stop(
-            paste0(
-              "Input layer name '",
-              layer,
-              "' doesn't match available variable names.\n",
-              "Available names are '",
-              paste0(names(emap), collapse = "', '"),
-              "'.\n",
-              "Use *_layer for the input component to specify a valid name."
-            )
-          )
-        }
-      } else if (is.numeric(layer)) {
-        if ((layer < 1) || (layer > ncol(emap))) {
-          stop(paste0(
-            "Input layer nr ", layer,
-            " is not in the valid range, [",
-            1, ", ", ncol(emap)
-          ))
-        }
-      }
-      val <- sp::over(data, emap)[, layer, drop = TRUE]
-    } else {
-      layer <- data[[input$selector]]
-      val <- numeric(n)
-      for (l in unique(layer)) {
-        val[layer == l] <- over(
-          data[layer == l, , drop = FALSE],
-          emap
-        )[, l, drop = TRUE]
-      }
     }
+    val <- eval_SpatialDF(
+      emap,
+      data,
+      layer = layer,
+      selector = input[["selector"]]
+    )
   } else if ((input$label == "offset") &&
     is.numeric(emap) &&
     (length(emap) == 1)) {
@@ -1480,32 +1461,25 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   }
 
   # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
-  # to fix that by filling in nearest neighbor values.
+  # to fix that by filling in nearest neighbour values.
   # # TODO: Check how to deal with this fully in the case of multilikelihood models
+  # Answer: should respect the lhood "include/exclude" info for the component list
   if (any(is.na(as.data.frame(val))) &&
     (inherits(emap, "SpatialGridDataFrame") ||
       inherits(emap, "SpatialPixelsDataFrame"))) {
-    warning(sprintf(
-      "A model input '%s' has returned NA values. Attempting to fill in spatially. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
-      deparse(input$input), label
-    ))
-
-    if (is.null(ncol(val))) {
-      ok <- !is.na(val)
-    } else {
-      nok <- is.na(val)
-      ok <- (rowSums(nok) == 0)
-    }
-    dst <- rgeos::gDistance(SpatialPoints(data[ok, , drop = FALSE]),
-      SpatialPoints(data[!ok, , drop = FALSE]),
-      byid = TRUE
+    warning(
+      paste0(
+        "Model input '",
+        deparse(input$input),
+        "' for '", label, "' returned some NA values.\n",
+        "Attempting to fill in spatially by nearest available value.\n",
+        "To avoid this basic covariate imputation, supply complete data."
+      )
     )
-    nn <- apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
-    if (is.null(ncol(val))) {
-      val[!ok] <- val[ok][nn]
-    } else {
-      val[nok] <- val[ok, , drop = FALSE][nn, , drop = FALSE][nok[!ok, ]]
-    }
+    
+    val <- bru_fill_missing(data = emap, where = data, values = values,
+                            layer = layer, selector = input[["selector"]],
+                            batch_size = NULL)
   }
 
   # Check for NA values.
