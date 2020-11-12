@@ -136,16 +136,16 @@ component <- function(object, ...) {
 #' @param season.length Passed on to `INLA::f()` for model `"seasonal"`
 #' (TODO: check if this parameter is actually needed anymore)
 # Weights
-#' @param weights,weights_layer
+#' @param weights,weights_layer,weights_selector
 #' Optional specification of effect scaling weights.
 #' Same syntax as for `main`.
 # Group model parameters
-#' @param group,group_layer
+#' @param group,group_mapper,group_layer,group_selector
 #' Optional specification of kronecker/group model indexing.
 #' @param control.group `list` of kronecker/group model parameters, currently
 #' passed directly on to `INLA:f`
 # Replicate model parameters
-#' @param replicate,replicate_layer
+#' @param replicate,replicate_mapper,replicate_layer,replicate_selector
 #' Optional specification of indices for an independent
 #' replication model. Same syntax as for `main`
 #' @param A.msk TODO: check/fix/deprecate this parameter.
@@ -192,13 +192,18 @@ component.character <- function(object,
                                 # Weights
                                 weights = NULL,
                                 weights_layer = NULL,
+                                weights_selector = NULL,
                                 # Group model parameters
                                 group = NULL,
+                                group_mapper = NULL,
                                 group_layer = NULL,
+                                group_selector = NULL,
                                 control.group = NULL,
                                 # Replicate model parameters
                                 replicate = NULL,
+                                replicate_mapper = NULL,
                                 replicate_layer = NULL,
+                                replicate_selector = NULL,
                                 A.msk = NULL,
                                 # Deprecated parameters
                                 # map -> main
@@ -286,25 +291,28 @@ component.character <- function(object,
         } else {
           bru_input(substitute(weights),
             label = paste0(label, ".weights"),
-            layer = weights_layer
+            layer = weights_layer,
+            selector = weights_selector
           )
         }
     ),
     group = bru_subcomponent(
       input = bru_input(substitute(group),
         label = paste0(label, ".group"),
-        layer = group_layer
+        layer = group_layer,
+        selector = group_selector
       ),
-      mapper = NULL,
+      mapper = group_mapper,
       n = NULL,
       model = group_model
     ),
     replicate = bru_subcomponent(
       input = bru_input(substitute(replicate),
         label = paste0(label, ".repl"),
-        layer = replicate_layer
+        layer = replicate_layer,
+        selector = replicate_selector
       ),
-      mapper = NULL,
+      mapper = replicate_mapper,
       n = NULL,
       model = "iid"
     ),
@@ -349,7 +357,11 @@ component.character <- function(object,
       "main_layer",
       "group_layer",
       "replicate_layer",
-      "weights_layer"
+      "weights_layer",
+      "main_selector",
+      "group_selector",
+      "replicate_selector",
+      "weights_selector"
     ))]
 
     # A trick for "Copy" models
@@ -719,7 +731,19 @@ bru_subcomponent <- function(input = NULL,
 }
 
 add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
-  if (is.null(subcomp[["mapper"]])) {
+  if (!is.null(subcomp[["mapper"]])) {
+    if (!inherits(
+      subcomp[["mapper"]],
+      c("bru_mapper", "inla.mesh", "inla.mesh.1d")
+    )) {
+      stop(paste0(
+        "Unknown mapper of type '",
+        paste0(class(subcomp[["mapper"]]), collapse = ", "),
+        "' for ", label
+      ))
+    }
+    subcomp[["mapper"]] <- bru_mapper(subcomp[["mapper"]])
+  } else {
     if (!is.null(lhoods)) {
       inp <- lapply(
         lhoods,
@@ -793,6 +817,19 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
       )
     }
   }
+  if (!is.null(subcomp[["mapper"]])) {
+    # Check internal consistency of user specified n and the mapper:
+    mapper_n <- ibm_n(subcomp[["mapper"]])
+    if (!is.null(subcomp[["n"]]) &&
+        subcomp[["n"]] != mapper_n) {
+      stop(paste0(
+        "Size mismatch, n=", subcomp[["n"]], " != ibm_n()=",
+        mapper_n, " mapper for label ", label
+      ))
+    }
+    subcomp[["n"]] <- mapper_n
+    subcomp[["values"]] <- ibm_values(subcomp[["mapper"]])
+  }
   subcomp
 }
 
@@ -843,38 +880,23 @@ make_mapper <- function(subcomp,
     }
 
     if (is.factor(values) || is.character(values)) {
-      subcomp$mapper <- bru_mapper_factor(
+      subcomp[["mapper"]] <- bru_mapper_factor(
         values,
         factor_mapping = subcomp[["factor_mapping"]]
       )
     } else {
       values <- sort(unique(values), na.last = NA)
       if (length(values) > 1) {
-        subcomp$mapper <- bru_mapper(INLA::inla.mesh.1d(values))
+        subcomp[["mapper"]] <- bru_mapper(INLA::inla.mesh.1d(values))
       } else {
         if (all(values == 1)) {
-          subcomp$mapper <- bru_mapper_const()
+          subcomp[["mapper"]] <- bru_mapper_const()
         } else {
-          subcomp$mapper <- bru_mapper_linear()
+          subcomp[["mapper"]] <- bru_mapper_linear()
         }
       }
     }
   }
-
-  if (!is.null(subcomp[["mapper"]])) {
-    # Check internal consistency of user specified n and the mapper:
-    mapper_n <- ibm_n(subcomp[["mapper"]])
-    if (!is.null(subcomp[["n"]]) &&
-      subcomp[["n"]] != mapper_n) {
-      stop(paste0(
-        "Size mismatch, n=", subcomp[["n"]], " != ibm_n()=",
-        mapper_n, " mapper for label ", label
-      ))
-    }
-    subcomp[["n"]] <- mapper_n
-    subcomp[["values"]] <- ibm_values(subcomp[["mapper"]])
-  }
-
   subcomp
 }
 
@@ -955,6 +977,7 @@ code.components <- function(components, add = "") {
 
 # MAPPERS ----
 
+#' @export
 #' @rdname bru_mapper
 bru_mapper.default <- function(mapper, ...) {
   if (!inherits(mapper, "bru_mapper")) {
@@ -998,6 +1021,7 @@ ibm_amatrix.inla.mesh.1d <- function(mapper, input, ...) {
   INLA::inla.spde.make.A(mapper, loc = input)
 }
 
+#' @export
 #' @rdname bru_mapper
 bru_mapper_linear <- function(...) {
   mapper <- list()
@@ -1026,6 +1050,7 @@ ibm_amatrix.bru_mapper_linear <- function(mapper, input, ...) {
   A
 }
 
+#' @export
 #' @rdname bru_mapper
 bru_mapper_const <- function(...) {
   mapper <- list()
@@ -1058,6 +1083,7 @@ ibm_amatrix.bru_mapper_const <- function(mapper, input, ...) {
 #' @param factor_mapping character; selects the type of factor mapping.
 #' * `'contrast'` for leaving out the first factor level.
 #' * `'full'` for keeping all levels.
+#' @export
 #' @rdname bru_mapper
 bru_mapper_factor <- function(values, factor_mapping, ...) {
   stopifnot(
@@ -1188,12 +1214,12 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
   } else {
     weights <- 1.0
   }
-  if (inherits(subcomp$mapper, "bru_mapper")) {
+  if (inherits(subcomp[["mapper"]], "bru_mapper")) {
     A <- weights * ibm_amatrix(subcomp[["mapper"]], input = val)
   } else {
     stop(paste0(
       "Unsupported mapper of class '",
-      paste0(class(subcomp$mapper), collapse = "', '"), "'",
+      paste0(class(subcomp[["mapper"]]), collapse = "', '"), "'",
       " for subcomponent '", subcomp$label, "'"
     ))
   }
@@ -1462,7 +1488,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
     (inherits(emap, "SpatialGridDataFrame") ||
       inherits(emap, "SpatialPixelsDataFrame"))) {
     warning(sprintf(
-      "Map '%s' has returned NA values. As it is a SpatialGridDataFrame I will try to fix this by filling in values of spatially nearest neighbors. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
+      "A model input '%s' has returned NA values. Attempting to fill in spatially. In the future, please design your 'map=' argument as to return non-NA for all points in your model domain/mesh. Note that this can also significantly increase time needed for inference/prediction!",
       deparse(input$input), label
     ))
 
@@ -1486,7 +1512,10 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 
   # Check for NA values.
   if (any(is.na(as.data.frame(val)))) {
-    # TODO: remove this check and make sure NAs are handled properly elsewhere
+    # TODO: remove this check and make sure NAs are handled properly elsewhere,
+    # if possible. Problem: treating NA as "no effect" can have negative side
+    # effects. For spatial covariates, can be handled by infill, but a general
+    # solution doesn't exist, so not sure how to deal with this.
     stop(sprintf(
       "Input '%s' of component '%s' has returned NA values. Please design your 
                  argument as to return non-NA for all points in your model domain/mesh.",
@@ -1510,27 +1539,16 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 #' @rdname index_eval
 
 index_eval.component <- function(component, ...) {
-  g.n <-
-    if (is.null(component$group$n)) {
-      1
-    } else {
-      component$group$n
-    }
-  r.n <-
-    if (is.null(component$replicate$n)) {
-      1
-    } else {
-      component$replicate$n
-    }
   main <- component$main$values
-  group <- seq_len(g.n)
-  repl <- seq_len(r.n)
+  group <- component$group$values
+  replicate <- component$replicate$values
+  m.n <- length(main)
+  g.n <- length(group)
+  r.n <- length(replicate)
   idx <- list(
     main = rep(main, times = g.n * r.n),
-    group = rep(rep(group, each = length(main)),
-      times = r.n
-    ),
-    repl = rep(repl, each = length(main) * g.n)
+    group = rep(rep(group, each = m.n), times = r.n),
+    repl = rep(replicate, each = m.n * g.n)
   )
   names(idx) <- paste0(component$label, c("", ".group", ".repl"))
   idx
