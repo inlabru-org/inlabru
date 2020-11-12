@@ -2,7 +2,7 @@ context("Component construction (test_component.R)")
 test_that("Component construction: linear model", {
   df <- data.frame(x = 1:10)
 
-  cmp <- component(~ beta(main = x, model = "linear", values = 1),
+  cmp <- component_list(~ beta(main = x, model = "linear", values = 1),
     lhoods = list(data = df)
   )[[1]]
 
@@ -39,7 +39,7 @@ test_that("Component construction: linear model", {
   v <- evaluate_effect(cmp, data = df, state = 2, A)
   expect_equivalent(v, 2 * df$x)
 
-  cmps <- component(list(cmp))
+  cmps <- component_list(list(cmp))
   v <- evaluate_effect(cmps, data = df, state = list(list(beta = 2)))
   expect_equivalent(v[[1]][["beta"]], 2 * df$x)
 

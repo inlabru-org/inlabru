@@ -3,12 +3,9 @@
 \name{component}
 \alias{component}
 \alias{component.character}
-\alias{component.formula}
-\alias{component.list}
-\alias{[.component_list}
-\title{inlabru latent model component construction}
+\title{Latent model component construction}
 \usage{
-component(object, ...)
+component(...)
 
 \method{component}{character}(
   object,
@@ -38,19 +35,9 @@ component(object, ...)
   envir_extra = NULL,
   ...
 )
-
-\method{component}{formula}(object, lhoods = NULL, envir = NULL, ...)
-
-\method{component}{list}(object, lhoods = NULL, envir = NULL, ...)
-
-\method{[}{component_list}(x, i)
 }
 \arguments{
-\item{object}{A formula (for \code{component.formula}), a character label
-(for \code{component.character}), or a list of component objects
-(for \code{component.list}; not yet supported as \code{bru} input (TODO)).}
-
-\item{\dots}{Arguments passed on to the methods}
+\item{object}{The object to operate on}
 
 \item{main}{= NULL
 main takes an R expression that evaluates to where the latent variables should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
@@ -104,9 +91,12 @@ Likely doesn't work at the moment, and I've found no examples that use it.}
 
 \item{envir_extra}{TODO: check/fix this parameter.}
 
-\item{lhoods}{TODO: document}
+\item{lhoods}{A list of \code{bru_like} objects}
 
-\item{envir}{TODO: document}
+\item{envir}{An evaluation environment to override the evaluation
+environment}
+
+\item{\code{\dots}}{Parameters passed on to other methods}
 }
 \description{
 Similar to \code{glm()}, \code{gam()} and \code{inla()}, \link{bru} models can be constructed via
@@ -120,18 +110,12 @@ definitions can optionally be split up into separate component definitions.
 See Details for more information.
 
 The \code{component} methods all rely on the \code{\link[=component.character]{component.character()}} method, that
-defines a model component with a given label/name. This method is normally
-the only method that user code might directly access, since the
-\code{component.formula} and other methods are called inside \code{\link[=bru]{bru()}} instead.
-
-Similar to glm(), gam() and inla() \link{bru} uses formula objects to describe response data and latent
-(unknonw) components of the model to be fitted. However, in addition to the syntax compatible with
-\link[INLA:inla]{inla}, bru components offer addtitional functionality which facilitates modeling.
+defines a model component with a given label/name. The user usually
+doesn't need to call these methods directly, but can instead supply a
+formula expression that can be interpreted by the \code{\link[=component_list.formula]{component_list.formula()}}
+method, called inside \code{\link[=bru]{bru()}}.
 }
 \details{
-The \code{component.character} method is inlabru's equivalent to INLA's
-\code{f} function but adds functionality that is unique to inlabru.
-
 \link{bru} will understand formulae describing fixed effect models just like the other methods. For instance, the
 formula \code{y ~ x} will fit the linear combination of an effect named \code{x} and an intercept to
 the response \code{y} with respect to the likelihood family stated when calling \link{bru}. Mathematically,
@@ -152,6 +136,9 @@ A problem that arises when using this kind of R formula is that it does not clea
 formula. For instance, when providing the formula to inla, the resulting object will refer to the random
 effect \eqn{\psi = \beta * x } as \code{x}. Hence, it is not clear if \code{x} refers to the covariate
 or the effect of the covariate.
+
+The \code{component.character} method is inlabru's equivalent to INLA's
+\code{f} function but adds functionality that is unique to inlabru.
 }
 \section{Naming random effects}{
 
@@ -186,6 +173,18 @@ the latent variable \eqn{\beta_\psi}
 }
 
 \examples{
+# As an example, let us create a linear component. Here, the component is
+# called "myLinearEffectOfX" while the covariate the component acts on is
+# called "x". Note that a list of components is returned because the
+# formula may define multiple components
+
+eff <- component_list(~ myLinearEffectOfX(main = x, model = "linear"))
+summary(eff[[1]])
+# Equivalent shortcuts:
+eff <- component_list(~ myLinearEffectOfX(x, model = "linear"))
+eff <- component_list(~ myLinearEffectOfX(x))
+# Individual component
+eff <- component("myLinearEffectOfX", main = x, model = "linear")
 \donttest{
 if (require("INLA", quietly = TRUE)) {
 
@@ -203,21 +202,13 @@ if (require("INLA", quietly = TRUE)) {
 }
 }
 
-# As an example, let us create a linear component. Here, the component is
-# called "myLinearEffectOfX" while the covariate the component acts on is
-# called "x". Note that a list of components is returned because the
-# formula may define multiple components
-
-eff <- component(~ myLinearEffectOfX(main = x, model = "linear"))
-summary(eff[[1]])
-# Equivalent shortcuts:
-eff <- component(~ myLinearEffectOfX(x, model = "linear"))
-eff <- component(~ myLinearEffectOfX(x))
+}
+\seealso{
+Other component constructors: 
+\code{\link{component_list}()}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com} and
 Finn Lindgren \email{Finn.Lindgren@gmail.com}
-
-Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \concept{component constructors}

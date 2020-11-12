@@ -71,10 +71,10 @@ ibm_amatrix <- function(mapper, input, ...) {
 
 # CONSTRUCTORS ----
 
-#' inlabru latent model component construction
+#' Latent model component construction
 #'
 #' @description
-#'
+#' 
 #' Similar to `glm()`, `gam()` and `inla()`, [bru] models can be constructed via
 #' a formula-like syntax, where each latent effect is specified. However, in
 #' addition to the parts of the syntax compatible with `INLA::inla`, `bru`
@@ -86,25 +86,96 @@ ibm_amatrix <- function(mapper, input, ...) {
 #' See Details for more information.
 #'
 #' The `component` methods all rely on the [component.character()] method, that
-#' defines a model component with a given label/name. This method is normally
-#' the only method that user code might directly access, since the
-#' `component.formula` and other methods are called inside [bru()] instead.
+#' defines a model component with a given label/name. The user usually
+#' doesn't need to call these methods directly, but can instead supply a
+#' formula expression that can be interpreted by the [component_list.formula()]
+#' method, called inside [bru()].
+#'
+#' @details
+#'
+#' [bru] will understand formulae describing fixed effect models just like the other methods. For instance, the
+#' formula `y ~ x` will fit the linear combination of an effect named `x` and an intercept to
+#' the response `y` with respect to the likelihood family stated when calling [bru]. Mathematically,
+#' the linear predictor \eqn{\eta} would be written down as
+#'
+#' \deqn{\eta = \beta * x + c,}
+#'
+#' where:
+#'
+#' \itemize{
+#' \item{\eqn{c} }{is the *intercept*}
+#' \item{\eqn{x }}{is a *covariate*}
+#' \item{\eqn{\beta} }{is a *random variable* associated with \eqn{x} and}
+#' \item{\eqn{\psi = \beta * x }}{ is called the *random effect* of \eqn{x}}
+#' }
+#'
+#' A problem that arises when using this kind of R formula is that it does not clearly relect the mathematical
+#' formula. For instance, when providing the formula to inla, the resulting object will refer to the random
+#' effect \eqn{\psi = \beta * x } as `x`. Hence, it is not clear if `x` refers to the covariate
+#' or the effect of the covariate.
+#'
+#' @section Naming random effects:
+#'
+#' In INLA, a simple random effect model would be expressed as
+#'
+#' \itemize{\item{`formula = y ~ f(x, model = "linear")`,}}
+#'
+#' where [f][INLA::f] is the inla specific function to set up random effects of all kinds. The underlying
+#' predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
+#' `x` as the random effect's name. bru allows to rewrite this formula in order to explicitly state
+#' the name of the random effect and the name of the associated. This is achived by replacing `f`
+#' with an arbitrary name that we wish to assign to the effect, e.g.
+#'
+#' \itemize{\item{`components = y ~ psi(x, model = "linear")`.}}
+#'
+#' Being able to discriminate between \eqn{x} and \eqn{\psi} is relevant because of two functionalities
+#' bru offers. The formula parameters of both, [bru] and the prediction method [predict.bru]
+#' are interpreted in the mathematical sense. For instance, `predict` may be used to analyze the
+#' an analytical combination of the covariate \eqn{x} and the intercept using
+#'
+#' \itemize{\item{`predict(fit, data.frame(x=2)), ~ exp(psi + Intercept)`.}}
+#'
+#' which corresponds to the mathematical expression \eqn{\exp(x \beta + c)}.
+#'
+#' On the other hand, predict may be used to only look at a transformation of
+#' the latent variable \eqn{\beta_\psi}
+#'
+#' \itemize{\item{`predict(fit, NULL, ~ exp(psi_latent))`.}}
+#'
+#' #' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
+#'
+#' @param object The object to operate on
+#' @param lhoods A list of `bru_like` objects
+#' @param envir An evaluation environment to override the evaluation
+#' environment
+#' @param \code{\dots} Parameters passed on to other methods
+#' 
+#' @rdname component
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
 #' Finn Lindgren \email{Finn.Lindgren@@gmail.com}
 #' @family component constructors
-#' @param object A formula (for `component.formula`), a character label
-#' (for `component.character`), or a list of component objects
-#' (for `component.list`; not yet supported as `bru` input (TODO)).
-#' @param \dots Arguments passed on to the methods
 #' @export
+#'
+#' @examples
+#' # As an example, let us create a linear component. Here, the component is
+#' # called "myLinearEffectOfX" while the covariate the component acts on is
+#' # called "x". Note that a list of components is returned because the
+#' # formula may define multiple components
+#'
+#' eff <- component_list(~ myLinearEffectOfX(main = x, model = "linear"))
+#' summary(eff[[1]])
+#' # Equivalent shortcuts:
+#' eff <- component_list(~ myLinearEffectOfX(x, model = "linear"))
+#' eff <- component_list(~ myLinearEffectOfX(x))
+#' # Individual component
+#' eff <- component("myLinearEffectOfX", main = x, model = "linear")
 
-component <- function(object, ...) {
+component <- function(...) {
   UseMethod("component")
 }
 
 
-#' @family component constructors
 #' @export
 #' @param main = NULL
 #' main takes an R expression that evaluates to where the latent variables should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
@@ -156,7 +227,6 @@ component <- function(object, ...) {
 #' @details The `component.character` method is inlabru's equivalent to INLA's
 #' `f` function but adds functionality that is unique to inlabru.
 #'
-#' @family component constructors
 #' @rdname component
 #'
 #' @examples
@@ -435,75 +505,32 @@ component.character <- function(object,
 
 
 
+#' Methods for inlabru component lists
+#' 
+#' Constructor methods for inlabru component lists. Syntax details are given in
+#' [component()].
+#' 
+#' @param \code{\dots} Parameters passed on to other methods
+#' @family component contructors
+#' @export
+#' @rdname component_list
+component_list <- function(...) {
+  UseMethod("component_list")
+}
 
-
-#' inlabru latent model component construction using formulae
-#'
-#' @description
-#'
-#' Similar to glm(), gam() and inla() [bru] uses formula objects to describe response data and latent
-#' (unknonw) components of the model to be fitted. However, in addition to the syntax compatible with
-#' [inla][INLA::inla], bru components offer addtitional functionality which facilitates modeling.
-#'
 #' @details
-#'
-#' [bru] will understand formulae describing fixed effect models just like the other methods. For instance, the
-#' formula `y ~ x` will fit the linear combination of an effect named `x` and an intercept to
-#' the response `y` with respect to the likelihood family stated when calling [bru]. Mathematically,
-#' the linear predictor \eqn{\eta} would be written down as
-#'
-#' \deqn{\eta = \beta * x + c,}
-#'
-#' where:
-#'
-#' \itemize{
-#' \item{\eqn{c} }{is the *intercept*}
-#' \item{\eqn{x }}{is a *covariate*}
-#' \item{\eqn{\beta} }{is a *random variable* associated with \eqn{x} and}
-#' \item{\eqn{\psi = \beta * x }}{ is called the *random effect* of \eqn{x}}
-#' }
-#'
-#' A problem that arises when using this kind of R formula is that it does not clearly relect the mathematical
-#' formula. For instance, when providing the formula to inla, the resulting object will refer to the random
-#' effect \eqn{\psi = \beta * x } as `x`. Hence, it is not clear if `x` refers to the covariate
-#' or the effect of the covariate.
-#'
-#' @section Naming random effects:
-#'
-#' In INLA, a simple random effect model would be expressed as
-#'
-#' \itemize{\item{`formula = y ~ f(x, model = "linear")`,}}
-#'
-#' where [f][INLA::f] is the inla specific function to set up random effects of all kinds. The underlying
-#' predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
-#' `x` as the random effect's name. bru allows to rewrite this formula in order to explicitly state
-#' the name of the random effect and the name of the associated. This is achived by replacing `f`
-#' with an arbitrary name that we wish to assign to the effect, e.g.
-#'
-#' \itemize{\item{`components = y ~ psi(x, model = "linear")`.}}
-#'
-#' Being able to discriminate between \eqn{x} and \eqn{\psi} is relevant because of two functionalities
-#' bru offers. The formula parameters of both, [bru] and the prediction method [predict.bru]
-#' are interpreted in the mathematical sense. For instance, `predict` may be used to analyze the
-#' an analytical combination of the covariate \eqn{x} and the intercept using
-#'
-#' \itemize{\item{`predict(fit, data.frame(x=2)), ~ exp(psi + Intercept)`.}}
-#'
-#' which corresponds to the mathematical expression \eqn{\exp(x \beta + c)}.
-#'
-#' On the other hand, predict may be used to only look at a transformation of
-#' the latent variable \eqn{\beta_\psi}
-#'
-#' \itemize{\item{`predict(fit, NULL, ~ exp(psi_latent))`.}}
-#'
-#' #' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
-#'
-#' @param lhoods TODO: document
-#' @param envir TODO: document
+#' * `component_list.formula`: Convert a component formula
+#' into a `component_list` object
+#' 
+#' @param object The object to operate on
+#' @param lhoods A list of `bru_like` objects
+#' @param envir An evaluation environment to override the evaluation
+#' environment
 #' @export
 #' @family component constructors
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#' @rdname component
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
+#' Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname component_list
 #'
 #' @examples
 #' # As an example, let us create a linear component. Here, the component is
@@ -511,12 +538,14 @@ component.character <- function(object,
 #' # called "x". Note that a list of components is returned because the
 #' # formula may define multiple components
 #'
-#' eff <- component(~ myLinearEffectOfX(main = x, model = "linear"))
+#' eff <- component_list(~ myLinearEffectOfX(main = x, model = "linear"))
 #' summary(eff[[1]])
 #' # Equivalent shortcuts:
-#' eff <- component(~ myLinearEffectOfX(x, model = "linear"))
-#' eff <- component(~ myLinearEffectOfX(x))
-component.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
+#' eff <- component_list(~ myLinearEffectOfX(x, model = "linear"))
+#' eff <- component_list(~ myLinearEffectOfX(x))
+#' # Individual component
+#' eff <- component("myLinearEffectOfX", main = x, model = "linear")
+component_list.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)
   }
@@ -526,21 +555,43 @@ component.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
     parsed,
     function(component.expression) {
       eval(component.expression,
-        envir = envir
+           envir = envir
       )
     }
   )
   environment(object) <- envir
-  component.list(components, lhoods = lhoods, envir = envir)
+  component_list(components, lhoods = lhoods, envir = envir)
 }
 
+
+
+
+
+#' @details
+#' * `component_list.list`: Combine a list of components and/or component formulas
+#' into a `component_list` object
 #' @export
-#' @rdname component
-component.list <- function(object, lhoods = NULL, envir = NULL, ...) {
-  stopifnot(all(vapply(object, function(x) inherits(x, "component"), TRUE)))
+#' @rdname component_list
+component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)
   }
+  if (any(vapply(object, function(x) inherits(x, "formula"), TRUE))) {
+    object <-
+      do.call(
+        c,
+        lapply(object,
+               function(x) {
+                 if (inherits(x, "formula")) {
+                   component_list(x, lhoods = lhoods, envir = envir)
+                 } else {
+                   list(x)
+                 }
+               }
+        )
+      )
+  }
+  stopifnot(all(vapply(object, function(x) inherits(x, "component"), TRUE)))
   names(object) <- lapply(object, function(x) x$label)
   class(object) <- c("component_list", "list")
   environment(object) <- envir
@@ -551,8 +602,12 @@ component.list <- function(object, lhoods = NULL, envir = NULL, ...) {
 }
 
 
+
+
 #' @export
-#' @rdname component
+#' @param x `component_list` object from which to extract element(s)
+#' @param i indices specifying elements to extract
+#' @rdname component_list
 `[.component_list` <- function(x, i) {
   env <- environment(x)
   object <- NextMethod()
@@ -560,6 +615,8 @@ component.list <- function(object, lhoods = NULL, envir = NULL, ...) {
   environment(object) <- env
   object
 }
+
+
 
 
 

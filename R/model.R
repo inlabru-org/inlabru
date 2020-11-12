@@ -75,19 +75,28 @@ make.model <- function(components, lhoods) {
   env <- environment(components)
 
   # Create effects
-  effects <- component(components, lhoods)
+  effects <- component_list(components, lhoods)
 
   # Create joint formula that will be used by inla
   formula <- BRU_response ~ -1
-  for (fm in lapply(effects, function(eff) {
-    eff$inla.formula
-  })) {
-    formula <- update.formula(formula, fm)
+  included <- character(0)
+  for (lh in lhoods) {
+    included <- union(included,
+                      parse_inclusion(
+                        names(effects),
+                        include = lh[["include_components"]],
+                        exclude = lh[["exclude_components"]]
+                      )
+                      )
+  }
+  effects <- effects[included]
+  
+  for (eff in included) {
+    formula <- update.formula(formula, effects[[eff]]$inla.formula)
   }
 
   # Restore environment
   environment(formula) <- env
-
 
   # Make model
   mdl <- list(effects = effects, formula = formula)
