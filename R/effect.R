@@ -1477,9 +1477,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       )
     )
     
-    val <- bru_fill_missing(data = emap, where = data, values = values,
-                            layer = layer, selector = input[["selector"]],
-                            batch_size = NULL)
+    val <- bru_fill_missing(data = emap, where = data, values = val,
+                            layer = layer, selector = input[["selector"]])
   }
 
   # Check for NA values.
