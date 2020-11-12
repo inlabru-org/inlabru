@@ -44,8 +44,7 @@ explicitly excluded)}
 \item{exclude}{Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
-any components from the inclusion list)
-on the \code{include} parameter).}
+any components from the inclusion list)}
 }
 \value{
 The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.

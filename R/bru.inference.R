@@ -176,7 +176,6 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#'   on the `include` parameter).
 #' @param options list of global options overriding [bru.options]
 #'
 #' @return A likelihood configuration which can be used to parameterize [bru].
@@ -717,7 +716,6 @@ summary.bru <- function(object, ...) {
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#'   on the `include` parameter).
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #'
 #' @return a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
@@ -809,7 +807,6 @@ predict.bru <- function(object,
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#'   on the `include` parameter).
 #' @param ... additional, unused arguments.
 #'
 #' @return List of generated samples

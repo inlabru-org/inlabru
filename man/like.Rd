@@ -56,8 +56,7 @@ explicitly excluded)}
 \item{exclude}{Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
-any components from the inclusion list)
-on the \code{include} parameter).}
+any components from the inclusion list)}
 
 \item{options}{list of global options overriding \link{bru.options}}
 }

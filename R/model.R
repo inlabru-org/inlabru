@@ -134,7 +134,6 @@ make.model <- function(components, lhoods) {
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#'   on the `include` parameter).
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #'
 #' @keywords internal
