@@ -92,21 +92,30 @@ nlinla.reweight <- function(A, model, data, expr, result) {
 
 #' Compute inlabru model linearisation information
 #' 
+#' @param \dots Parameters passed on to other methods
 #' @export
-#' @rdname compute_linearisation
+#' @rdname bru_compute_linearisation
 bru_compute_linearisation <- function(...) {
   UseMethod("compute_linearisation")
 }
+
+#' @param cmp A [bru_component] object
+#' @param data Input data
+#' @param state The state information, as a list of named vectors
+#' @param A Precomputed A-matrix for the component
 #' @export
-#' @rdname compute_linearisation
+#' @rdname bru_compute_linearisation
 bru_compute_linearisation.bru_component <- function(cmp,
-                                               data,
-                                               state,
-                                               A,
-                                               ...) {
+                                                    data,
+                                                    state,
+                                                    A,
+                                                    ...) {
 }
+
+#' @param lhood A `bru_like` object
+#' @param model A `bru_model` object
 #' @export
-#' @rdname compute_linearisation
+#' @rdname bru_compute_linearisation
 bru_compute_linearisation.bru_like <- function(lhood,
                                                model,
                                                data,
@@ -193,15 +202,17 @@ bru_compute_linearisation.bru_like <- function(lhood,
   # TODO: compute offset
   list(A = B, offset = offset)
 }
+
+#' @param lhoods A `bru_like_list` object
 #' @export
-#' @rdname compute_linearisation
+#' @rdname bru_compute_linearisation
 bru_compute_linearisation.bru_like_list <- function(lhoods, A, ...) {
   lapply(lhoods, function(x) bru_compute_linearisation(x,
                                                        A = x[["A"]],
                                                        ...))
 }
 #' @export
-#' @rdname compute_linearisation
+#' @rdname bru_compute_linearisation
 bru_compute_linearisation.bru_model <- function(model, lhoods, ...) {
   bru_compute_linearisation(lhoods, model = model, ...)
 }

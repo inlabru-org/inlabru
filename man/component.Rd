@@ -2,6 +2,7 @@
 % Please edit documentation in R/effect.R
 \name{component}
 \alias{component}
+\alias{bru_component}
 \alias{component.character}
 \title{Latent model component construction}
 \usage{
@@ -37,7 +38,9 @@ component(...)
 )
 }
 \arguments{
-\item{object}{The object to operate on}
+\item{\dots}{Parameters passed on to other methods}
+
+\item{object}{A character label for the component}
 
 \item{main}{= NULL
 main takes an R expression that evaluates to where the latent variables should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
@@ -90,13 +93,6 @@ Likely doesn't work at the moment, and I've found no examples that use it.}
 \item{mesh}{Deprecated. Use \code{mapper} instead.}
 
 \item{envir_extra}{TODO: check/fix this parameter.}
-
-\item{lhoods}{A list of \code{bru_like} objects}
-
-\item{envir}{An evaluation environment to override the evaluation
-environment}
-
-\item{\code{\dots}}{Parameters passed on to other methods}
 }
 \description{
 Similar to \code{glm()}, \code{gam()} and \code{inla()}, \link{bru} models can be constructed via

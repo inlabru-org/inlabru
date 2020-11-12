@@ -18,6 +18,23 @@ bru_compute_linearisation(...)
 
 \method{bru_compute_linearisation}{bru_model}(model, lhoods, ...)
 }
+\arguments{
+\item{\dots}{Parameters passed on to other methods}
+
+\item{cmp}{A \link{bru_component} object}
+
+\item{data}{Input data}
+
+\item{state}{The state information, as a list of named vectors}
+
+\item{A}{Precomputed A-matrix for the component}
+
+\item{lhood}{A \code{bru_like} object}
+
+\item{model}{A \code{bru_model} object}
+
+\item{lhoods}{A \code{bru_like_list} object}
+}
 \description{
 Compute inlabru model linearisation information
 }

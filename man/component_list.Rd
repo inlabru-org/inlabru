@@ -2,6 +2,7 @@
 % Please edit documentation in R/effect.R
 \name{component_list}
 \alias{component_list}
+\alias{bru_component_list}
 \alias{component_list.formula}
 \alias{component_list.list}
 \alias{[.component_list}
@@ -16,9 +17,11 @@ component_list(...)
 \method{[}{component_list}(x, i)
 }
 \arguments{
+\item{\dots}{Parameters passed on to other methods}
+
 \item{object}{The object to operate on}
 
-\item{lhoods}{A list of \code{bru_like} objects}
+\item{lhoods}{A \code{bru_like_list} object}
 
 \item{envir}{An evaluation environment to override the evaluation
 environment}
@@ -26,8 +29,6 @@ environment}
 \item{x}{\code{component_list} object from which to extract element(s)}
 
 \item{i}{indices specifying elements to extract}
-
-\item{\code{\dots}}{Parameters passed on to other methods}
 }
 \description{
 Constructor methods for inlabru component lists. Syntax details are given in

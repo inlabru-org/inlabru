@@ -144,13 +144,10 @@ ibm_amatrix <- function(mapper, input, ...) {
 #'
 #' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
 #'
-#' @param object The object to operate on
-#' @param lhoods A list of `bru_like` objects
-#' @param envir An evaluation environment to override the evaluation
-#' environment
-#' @param \code{\dots} Parameters passed on to other methods
+#' @param \dots Parameters passed on to other methods
 #' 
 #' @rdname component
+#' @aliases bru_component
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
 #' Finn Lindgren \email{Finn.Lindgren@@gmail.com}
@@ -177,6 +174,7 @@ component <- function(...) {
 
 
 #' @export
+#' @param object A character label for the component
 #' @param main = NULL
 #' main takes an R expression that evaluates to where the latent variables should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 #'   Arguments starting with weights, group, replicate behave similarly to main, but for the corresponding features of `INLA::f()`.
@@ -228,6 +226,7 @@ component <- function(...) {
 #' `f` function but adds functionality that is unique to inlabru.
 #'
 #' @rdname component
+#' @alias bru_component
 #'
 #' @examples
 #' \donttest{
@@ -510,8 +509,9 @@ component.character <- function(object,
 #' Constructor methods for inlabru component lists. Syntax details are given in
 #' [component()].
 #' 
-#' @param \code{\dots} Parameters passed on to other methods
+#' @param \dots Parameters passed on to other methods
 #' @family component contructors
+#' @aliases bru_component_list
 #' @export
 #' @rdname component_list
 component_list <- function(...) {
@@ -523,7 +523,7 @@ component_list <- function(...) {
 #' into a `component_list` object
 #' 
 #' @param object The object to operate on
-#' @param lhoods A list of `bru_like` objects
+#' @param lhoods A `bru_like_list` object
 #' @param envir An evaluation environment to override the evaluation
 #' environment
 #' @export
