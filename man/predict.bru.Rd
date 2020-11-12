@@ -11,6 +11,8 @@
   n.samples = 100,
   seed = 0L,
   num.threads = NULL,
+  include = NULL,
+  exclude = NULL,
   ...
 )
 }
@@ -28,6 +30,15 @@
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"}
+
+\item{include}{Character vector of component labels that are needed by the
+predictor expression; Default: NULL (include all components that are not
+explicitly excluded)}
+
+\item{exclude}{Character vector of component labels that are not used by the
+predictor expression. The exclusion list is applied to the list
+as determined by the \code{include} parameter; Default: NULL (do not remove
+any components from the inclusion list)}
 
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
 }

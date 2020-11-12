@@ -10,8 +10,12 @@ make.stack <- function(data,
                        offset = 0,
                        expr = NULL,
                        result = NULL,
-                       tag = "BRU.stack") {
-
+                       tag = "BRU.stack",
+                       include = NULL,
+                       exclude = NULL) {
+  included <- parse_inclusion(names(model$effects),
+                              include = include,
+                              exclude = exclude)
 
   # Observations y
   if (length(y) == 1) {
@@ -30,8 +34,8 @@ make.stack <- function(data,
 
 
   # Projection matrices (A) and mesh index effects
-  A <- amatrix_eval(model$effects, data)
-  effects <- index_eval(model$effects)
+  A <- amatrix_eval(model$effects[included], data)
+  effects <- index_eval(model$effects[included])
 
 
   # Taylor approximation

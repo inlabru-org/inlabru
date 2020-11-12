@@ -5,6 +5,7 @@
 \alias{component.character}
 \alias{component.formula}
 \alias{component.list}
+\alias{[.component_list}
 \title{inlabru latent model component construction}
 \usage{
 component(object, ...)
@@ -21,11 +22,16 @@ component(object, ...)
   season.length = NULL,
   weights = NULL,
   weights_layer = NULL,
+  weights_selector = NULL,
   group = NULL,
+  group_mapper = NULL,
   group_layer = NULL,
+  group_selector = NULL,
   control.group = NULL,
   replicate = NULL,
+  replicate_mapper = NULL,
   replicate_layer = NULL,
+  replicate_selector = NULL,
   A.msk = NULL,
   map = NULL,
   mesh = NULL,
@@ -36,6 +42,8 @@ component(object, ...)
 \method{component}{formula}(object, lhoods = NULL, envir = NULL, ...)
 
 \method{component}{list}(object, lhoods = NULL, envir = NULL, ...)
+
+\method{[}{component_list}(x, i)
 }
 \arguments{
 \item{object}{A formula (for \code{component.formula}), a character label
@@ -63,9 +71,7 @@ otherwise the first column of the covariate data frame)
 
 The \verb{_selector} is character name of a variable whose contents determines which layer to
 extract from a covariate for each data point. Overrides the \code{layer}.
-(Default: NULL)
-(TODO: check if _selector is already supported for weight, group, and
-replicate as well, and if so add them)}
+(Default: NULL)}
 
 \item{n}{The number of latent variables in the model. Should be auto-detected
 for most or all models (Default: NULL, for auto-detection).
@@ -76,17 +82,17 @@ the latent model. Normally generated internally based on the mapping details.
 (Default: NULL, for auto-determination)}
 
 \item{season.length}{Passed on to \code{INLA::f()} for model \code{"seasonal"}
-(TODO: check if this parameter is actually needed anymore)}
+(TODO: check if this parameter is still fully handled)}
 
-\item{weights, weights_layer}{Optional specification of effect scaling weights.
+\item{weights, weights_layer, weights_selector}{Optional specification of effect scaling weights.
 Same syntax as for \code{main}.}
 
-\item{group, group_layer}{Optional specification of kronecker/group model indexing.}
+\item{group, group_mapper, group_layer, group_selector}{Optional specification of kronecker/group model indexing.}
 
 \item{control.group}{\code{list} of kronecker/group model parameters, currently
 passed directly on to \code{INLA:f}}
 
-\item{replicate, replicate_layer}{Optional specification of indices for an independent
+\item{replicate, replicate_mapper, replicate_layer, replicate_selector}{Optional specification of indices for an independent
 replication model. Same syntax as for \code{main}}
 
 \item{A.msk}{TODO: check/fix/deprecate this parameter.

@@ -14,6 +14,8 @@ generate(object, ...)
   n.samples = 100,
   seed = 0L,
   num.threads = NULL,
+  include = NULL,
+  exclude = NULL,
   ...
 )
 }
@@ -34,6 +36,15 @@ The default is rather low but provides a quick approximate result.}
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"}
+
+\item{include}{Character vector of component labels that are needed by the
+predictor expression; Default: NULL (include all components that are not
+explicitly excluded)}
+
+\item{exclude}{Character vector of component labels that are not used by the
+predictor expression. The exclusion list is applied to the list
+as determined by the \code{include} parameter; Default: NULL (do not remove
+any components from the inclusion list)}
 }
 \value{
 The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.

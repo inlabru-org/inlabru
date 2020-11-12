@@ -127,6 +127,13 @@ make.model <- function(components, lhoods) {
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
+#' @param include Character vector of component labels that are needed by the
+#'   predictor expression; Default: NULL (include all components that are not
+#'   explicitly excluded)
+#' @param exclude Character vector of component labels that are not used by the
+#'   predictor expression. The exclusion list is applied to the list
+#'   as determined by the `include` parameter; Default: NULL (do not remove
+#'   any components from the inclusion list)
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #' @details * `evaluate_model` is a wrapper to evaluate model state, A-matrices,
 #' effects, and predictor, all in one call.
@@ -144,7 +151,11 @@ evaluate_model <- function(model,
                            n = 1,
                            seed = 0L,
                            num.threads = NULL,
+                           include = NULL,
+                           exclude = NULL,
                            ...) {
+  included <- parse_inclusion(names(model$effects), include, exclude)
+  
   if (is.null(state) && !is.null(result)) {
     state <- evaluate_state(model,
       result = result,
@@ -157,13 +168,13 @@ evaluate_model <- function(model,
     stop("Not enough information to evaluate model states.")
   }
   if (is.null(A) && !is.null(data)) {
-    A <- amatrix_eval(model$effects, data = data)
+    A <- amatrix_eval(model$effects[included], data = data)
   }
   if (is.null(A)) {
     effects <- NULL
   } else {
     effects <- evaluate_effect_multi(
-      model$effects,
+      model$effects[included],
       state = state,
       data = data,
       A = A
