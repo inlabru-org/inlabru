@@ -22,7 +22,7 @@ test_that("bru: factor component", {
   # the coefficient of variation and the variance.
 
 
-  # The predict function can also be used to simulataneously estimate posteriors
+  # The predict function can also be used to simultaneously estimate posteriors
   # of multiple variables:
 
   xipost <- generate(fit,
