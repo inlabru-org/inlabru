@@ -134,7 +134,7 @@ bru_info.character <- function(method,
     inlabru_version <-
       tryCatch(
         {
-          utils::packageVersion("inlabru")
+          getNamespaceVersion("inlabru")
         },
         error = function(e) {
           "unknown"
@@ -145,7 +145,7 @@ bru_info.character <- function(method,
     INLA_version <-
       tryCatch(
         {
-          utils::packageVersion("INLA")
+          getNamespaceVersion("INLA")
         },
         error = function(e) {
           "unknown"
