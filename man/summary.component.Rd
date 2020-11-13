@@ -2,27 +2,35 @@
 % Please edit documentation in R/effect.R
 \name{summary.component}
 \alias{summary.component}
-\alias{print.summary.component}
-\title{Summarize an component}
+\alias{summary.component_list}
+\alias{print.summary_component}
+\alias{print.summary_component_list}
+\title{Summarise components}
 \usage{
 \method{summary}{component}(object, ...)
 
-\method{print}{summary.component}(x, ...)
+\method{summary}{component_list}(object, ...)
+
+\method{print}{summary_component}(x, ...)
+
+\method{print}{summary_component_list}(x, ...)
 }
 \arguments{
-\item{object}{An component.}
+\item{object}{A \code{component} or \code{component_list}.}
 
 \item{...}{ignored.}
 
-\item{x}{A 'summary.component' object.}
+\item{x}{A summary object to be printed.}
 }
 \description{
-Summarize an component
-
-Print the summary of an component
+Summarise components
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}
+
+Fabian E. Bachl \email{bachlfab@gmail.com}
+
+Finn Lindgren \email{finn.lindgren@gmail.com}
 
 Finn Lindgren \email{finn.lindgren@gmail.com}
 }
