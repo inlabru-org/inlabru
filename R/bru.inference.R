@@ -20,14 +20,141 @@ generate <- function(object, ...) {
 bru_check_object_bru <- function(object) {
   if (is.null(object[["bru_info"]])) {
     if (is.null(object[["sppa"]])) {
-      warning("bru object contains neither current `bru_info` or old `sppa` information")
+      stop("bru object contains neither current `bru_info` or old `sppa` information")
     } else {
       warning("Old style bru object detected. Attempting to update it.")
       object[["bru_info"]] <- object[["sppa"]]
       object[["sppa"]] <- NULL
     }
   }
+  if (!is.list(object[["bru_info"]])) {
+    stop("bru_info part of the object can't be converted to `bru_info`; not a list")
+  }
+  if (!inherits(object[["bru_info"]], "bru_info")) {
+    class(object[["bru_info"]]) <- c("bru_info", "list")
+  }
+  if (is.null(object[["bru_info"]][["inlabru_version"]])) {
+    object[["bru_info"]][["inlabru_version"]] <- "unknown"
+  }
+  if (is.null(object[["bru_info"]][["INLA_version"]])) {
+    object[["bru_info"]][["INLA_version"]] <- "unknown"
+  }
   object
+}
+
+#' Methods for bru_info objects
+#' @export
+#' @method summary bru_info
+#' @param object Object to operate on
+#' @param \dots Arguments passed on to other methods
+#' @rdname bru_info
+summary.bru_info <- function(object, ...) {
+  result <- list(
+    inlabru_version = object[["inlabru_version"]],
+    INLA_version = object[["INLA_version"]],
+    components =
+      lapply(
+        object[["model"]][["effects"]],
+        function(x) {
+          list(
+            label = x[["label"]],
+            main_type = x[["main"]][["type"]]
+          )
+        }
+      ),
+    lhoods =
+      lapply(
+        object[["lhoods"]],
+        function(x) {
+          list(
+            family = x[["family"]],
+            data_class = class(x[["data"]]),
+            predictor = deparse(x[["formula"]])
+          )
+        }
+      )
+  )
+  class(result) <- c("summary_bru_info", "list")
+  result
+}
+#' Summary for bru_info objects
+#' @export
+#' @param x A `summary_bru_info` object to be printed
+#' @rdname bru_info
+print.summary_bru_info <- function(x, ...) {
+  cat(paste0("inlabru version: ", x$inlabru_version, "\n"))
+  cat(paste0("INLA version: ", x$INLA_version, "\n"))
+  cat(paste0("Components:\n"))
+  for (cmp in x$components) {
+    cat(sprintf("  %s: Main model type '%s'\n",
+                cmp$label,
+                cmp$main_type))
+  }
+  cat(paste0("Likelihoods:\n"))
+  for (lh in x$lhoods) {
+    cat(sprintf(
+      "  Family: '%s'\n    Data class: %s\n    Formula: %s\n",
+      lh$family,
+      paste0("'", lh$data_class, "'", collapse = ", "),
+      if (length(lh$predictor) > 1) {
+        paste0("\n      ", paste0(lh$predictor, collapse = "\n        "))
+      } else {
+        lh$predictor
+      }
+    ))
+  }
+}
+
+#' @export
+#' @rdname bru_info
+bru_info <- function(...) {
+  UseMethod("bru_info")
+}
+
+#' @export
+#' @param method character; The type of estimation method used
+#' @param inlabru_version character; inlabru package version. Default: NULL, for
+#' automatically detecting the version
+#' @param INLA_version character; INLA package version. Default: NULL, for
+#' automatically detecting the version
+#' @rdname bru_info
+bru_info.character <- function(method,
+                               ...,
+                               inlabru_version = NULL,
+                               INLA_version = NULL) {
+  if (is.null(inlabru_version)) {
+    inlabru_version <-
+      tryCatch(
+        {utils::packageVersion("inlabru")},
+        error = function(e) {
+          "unknown"
+        }
+      )
+  }
+  if (is.null(INLA_version)) {
+    INLA_version <-
+      tryCatch(
+        {utils::packageVersion("INLA")},
+        error = function(e) {
+          "unknown"
+        }
+      )
+  }
+  object <- list(
+    method = method,
+    ...,
+    inlabru_version = inlabru_version,
+    INLA_version = INLA_version
+  )
+  class(object) <- c("bru_info", "list")
+  object
+}
+
+#' @export
+#' @rdname bru_info
+bru_info.bru <- function(object, ...) {
+  object <- bru_check_object_bru(object)
+  object[["bru_info"]]
 }
 
 
@@ -126,12 +253,12 @@ bru <- function(components = y ~ Intercept,
   }
 
   ## Create result object ##
-  result$bru_info$method <- "bru"
-  result$bru_info$package_version <- packageVersion("inlabru")
-  result$bru_info$lhoods <- lhoods
-  result$bru_info$model <- bru.model
-  result$bru_info$mesh <- options$mesh
-  class(result$bru_info) <- c("bru_info", class(result$bru_info))
+  result$bru_info <- bru_info(
+    method = "bru",
+    lhoods = lhoods,
+    model = bru.model,
+    mesh = options$mesh
+  )
   class(result) <- c("bru", class(result))
   return(result)
 }
