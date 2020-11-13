@@ -8,15 +8,18 @@
 \alias{ibm_n.inla.mesh.1d}
 \alias{ibm_values.inla.mesh.1d}
 \alias{ibm_amatrix.inla.mesh.1d}
+\alias{ibm_n.bru_mapper_index}
+\alias{ibm_values.bru_mapper_index}
+\alias{ibm_amatrix.bru_mapper_index}
 \alias{ibm_n.bru_mapper_linear}
 \alias{ibm_values.bru_mapper_linear}
 \alias{ibm_amatrix.bru_mapper_linear}
-\alias{ibm_n.bru_mapper_const}
-\alias{ibm_values.bru_mapper_const}
-\alias{ibm_amatrix.bru_mapper_const}
 \alias{ibm_n.bru_mapper_factor}
 \alias{ibm_values.bru_mapper_factor}
 \alias{ibm_amatrix.bru_mapper_factor}
+\alias{ibm_n.bru_mapper_offset}
+\alias{ibm_values.bru_mapper_offset}
+\alias{ibm_amatrix.bru_mapper_offset}
 \title{Implementation methods for mapper objects}
 \usage{
 \method{ibm_n}{inla.mesh}(mapper, ...)
@@ -31,23 +34,29 @@
 
 \method{ibm_amatrix}{inla.mesh.1d}(mapper, input, ...)
 
+\method{ibm_n}{bru_mapper_index}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_index}(mapper, ...)
+
+\method{ibm_amatrix}{bru_mapper_index}(mapper, input, ...)
+
 \method{ibm_n}{bru_mapper_linear}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_linear}(mapper, ...)
 
 \method{ibm_amatrix}{bru_mapper_linear}(mapper, input, ...)
 
-\method{ibm_n}{bru_mapper_const}(mapper, ...)
-
-\method{ibm_values}{bru_mapper_const}(mapper, ...)
-
-\method{ibm_amatrix}{bru_mapper_const}(mapper, input, ...)
-
 \method{ibm_n}{bru_mapper_factor}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_factor}(mapper, ...)
 
 \method{ibm_amatrix}{bru_mapper_factor}(mapper, input, ...)
+
+\method{ibm_n}{bru_mapper_offset}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_offset}(mapper, ...)
+
+\method{ibm_amatrix}{bru_mapper_offset}(mapper, input, ...)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}

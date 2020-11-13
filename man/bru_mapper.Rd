@@ -6,9 +6,10 @@
 \alias{ibm_values}
 \alias{ibm_amatrix}
 \alias{bru_mapper.default}
+\alias{bru_mapper_index}
 \alias{bru_mapper_linear}
-\alias{bru_mapper_const}
 \alias{bru_mapper_factor}
+\alias{bru_mapper_offset}
 \title{Methods for \code{bru_mapper} objects}
 \usage{
 bru_mapper(...)
@@ -21,11 +22,13 @@ ibm_amatrix(mapper, input, ...)
 
 \method{bru_mapper}{default}(mapper, ...)
 
+bru_mapper_index(n = 1L, ...)
+
 bru_mapper_linear(...)
 
-bru_mapper_const(...)
-
 bru_mapper_factor(values, factor_mapping, ...)
+
+bru_mapper_offset(...)
 }
 \arguments{
 \item{\dots}{Arguments passed on to other methods}

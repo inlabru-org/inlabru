@@ -1,13 +1,5 @@
 
-nlinla.taylor <- function(expr, epunkt, data, env) {
-  if ("offset" %in% names(epunkt)) {
-    stop("One of your model components is an offset. 
-          However, you are using a non-linear predictor (formula),
-          which would set the respective term to zero. 
-          Please remove the offset component and add its value
-          to the predictor formula.")
-  }
-
+nlinla.taylor <- function(expr, epunkt, data, env, offsets = c()) {
   if (nrow(epunkt) <= 1000) {
     effects <- colnames(epunkt)
     df <- as.data.frame(data)
@@ -16,17 +8,22 @@ nlinla.taylor <- function(expr, epunkt, data, env) {
     myenv <- new.env()
     invisible(lapply(colnames(wh), function(x) myenv[[x]] <- wh[, x]))
     invisible(lapply(setdiff(names(env), names(myenv)), function(x) myenv[[x]] <- env[[x]]))
-    tmp <- numericDeriv(expr[[1]], effects, rho = myenv)
+    active <- setdiff(effects, offsets)
+    tmp <- numericDeriv(expr[[1]], active, rho = myenv)
     gra <- attr(tmp, "gradient")
-    nr <- nrow(gra)
-    ngrd <- matrix(NA, nrow = nr, ncol = length(effects))
-    for (k in 1:length(effects)) {
+    nr <- NROW(gra)
+    ngrd <- matrix(0.0, nrow = nr, ncol = length(active))
+    colnames(ngrd) <- active
+    for (k in seq_along(active)) {
       # as.matrix required since diag() will not work if gra has single entry
-      ngrd[, k] <- diag(as.matrix(gra[, ((k - 1) * nr + 1):(k * nr), drop = FALSE]))
+      ngrd[, k] <- diag(as.matrix(
+        gra[, ((k - 1) * nr + 1):(k * nr), drop = FALSE]
+      ))
     }
-    nconst <- as.vector(tmp) - rowSums(ngrd * epunkt)
-    ngrd <- data.frame(ngrd)
-    colnames(ngrd) <- effects
+    nconst <- as.vector(tmp) - Matrix::rowSums(
+      ngrd * as.matrix(epunkt[, active, drop = FALSE])
+    )
+    ngrd <- as.data.frame(ngrd)
     return(list(gradient = ngrd, const = nconst))
   } else {
     blk <- floor((seq_len(nrow(epunkt)) - 1L) / 1000)
@@ -55,12 +52,12 @@ nlinla.epunkt <- function(model, data, result = NULL) {
   # (2) If result is a data.frame, use the entries as to where to approximate
   # (3) if result is an inla object, use these estimates as to where to approximate
 
-  dfdata <- data.frame(data) # data as data.frame (may have been supplied as Spatial* object)
+  dfdata <- as.data.frame(data) # data as data.frame (may have been supplied as Spatial* object)
   if (is.null(result)) {
     df <- data.frame(matrix(0, nrow = nrow(dfdata), ncol = length(model$effects)))
     colnames(df) <- names(model$effects)
     df
-  } else if (!inherits(result, "inla") & is.data.frame(result)) {
+  } else if (!inherits(result, "inla") && is.data.frame(result)) {
     # If result contains only a single row data frame repeat it to match the data
     if ((nrow(result) == 1) & (nrow(dfdata) > 1)) {
       result <- result[rep(1, nrow(dfdata)), , drop = FALSE]
@@ -76,13 +73,16 @@ nlinla.epunkt <- function(model, data, result = NULL) {
 }
 
 nlinla.reweight <- function(A, model, data, expr, result) {
+  offsets <- names(model$effects)[vapply(
+    model$effects,
+    function(x) identical(x$type, "offset"),
+    TRUE
+  )]
   epkt <- nlinla.epunkt(model, data, result = result)
-  ae <- nlinla.taylor(expr, epkt, data, environment(model$formula))
-  for (k in 1:length(A)) {
-    nm <- names(A)[k]
-    if (!(is.null(nm) || nm == "")) {
-      A[[k]] <- A[[k]] * ae$gradient[[nm]]
-    }
+  ae <- nlinla.taylor(expr, epkt, data, environment(model$formula),
+                      offsets = offsets)
+  for (nm in setdiff(names(A), offsets)) {
+    A[[nm]] <- A[[nm]] * ae$gradient[[nm]]
   }
   return(list(A = A, const = ae$const))
 }

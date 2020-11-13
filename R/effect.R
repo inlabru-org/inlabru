@@ -226,7 +226,7 @@ component <- function(...) {
 #' `f` function but adds functionality that is unique to inlabru.
 #'
 #' @rdname component
-#' @alias bru_component
+#' @aliases bru_component
 #'
 #' @examples
 #' \donttest{
@@ -390,9 +390,12 @@ component.character <- function(object,
 
   # Main bit
   if (component$main$type %in% c("offset")) {
-    component$inla.formula <- as.formula(paste0("~ . + offset(offset)"),
+    component$inla.formula <- as.formula(paste0("~ . + offset(", label, ")"),
       env = envir
     )
+    component$main$mapper <- bru_mapper_offset()
+    component$group$mapper <- bru_mapper_index(1L)
+    component$replicate$mapper <- bru_mapper_index(1L)
   } else {
     # Construct a call to the f function from the parameters provided
     # Ultimately, this call will be converted to the model formula presented to INLA
@@ -651,7 +654,6 @@ add_mappers.component <- function(component, lhoods) {
       label = component$label
     )
   lh <- lhoods[keep_lh]
-  component$label
 
   component$main <- add_mapper(component$main,
     label = component$label,
@@ -669,31 +671,30 @@ add_mappers.component <- function(component, lhoods) {
     env = component$env
   )
 
-  if (component$main$type %in% c("offset")) {
+  fcall <- component$fcall
+  
+  # Set ngroup and nrep defaults
+  if (is.null(component$group$n)) {
+    fcall[["ngroup"]] <- 1
   } else {
-    fcall <- component$fcall
+    fcall[["ngroup"]] <- component$group$n
+  }
+  if (is.null(component$replicate$n)) {
+    fcall[["nrep"]] <- 1
+  } else {
+    fcall[["nrep"]] <- component$replicate$n
+  }
+  
+  if (is.null(component$main$values)) {
+    fcall <- fcall[!("values" %in% names(fcall))]
+  } else {
+    values_name <- paste0("BRU_", component$label, "_values")
+    fcall[["values"]] <- as.symbol(values_name)
+    assign(values_name, component$main$values, envir = component$env_extra)
+  }
 
-    # Set ngroup and nrep defaults
-    if (is.null(component$group$n)) {
-      fcall[["ngroup"]] <- 1
-    } else {
-      fcall[["ngroup"]] <- component$group$n
-    }
-    if (is.null(component$replicate$n)) {
-      fcall[["nrep"]] <- 1
-    } else {
-      fcall[["nrep"]] <- component$replicate$n
-    }
-
-    if (is.null(component$main$values)) {
-      fcall <- fcall[!("values" %in% names(fcall))]
-    } else {
-      values_name <- paste0("BRU_", component$label, "_values")
-      fcall[["values"]] <- as.symbol(values_name)
-      assign(values_name, component$main$values, envir = component$env_extra)
-    }
-
-    # Generate the formula that will be presented to INLA
+  if (!identical(component[["main"]][["type"]], "offset")) {
+    # Update the formula that will be presented to INLA
     component$inla.formula <-
       as.formula(paste0(
         "~ . + ",
@@ -703,9 +704,9 @@ add_mappers.component <- function(component, lhoods) {
       ),
       env = component$env
       )
-
-    component$fcall <- fcall
   }
+
+  component$fcall <- fcall
 
   component
 }
@@ -921,6 +922,8 @@ make_mapper <- function(subcomp,
     subcomp[["mapper"]] <- bru_mapper(subcomp[["mapper"]])
   } else if (subcomp[["type"]] %in% c("linear", "clinear")) {
     subcomp[["mapper"]] <- bru_mapper_linear()
+  } else if (subcomp[["type"]] %in% c("offset")) {
+    subcomp[["mapper"]] <- bru_mapper_offset()
   } else {
     # No mapper; construct based on input values
     if (!is.null(subcomp[["n"]])) {
@@ -950,7 +953,7 @@ make_mapper <- function(subcomp,
         subcomp[["mapper"]] <- bru_mapper(INLA::inla.mesh.1d(values))
       } else {
         if (all(values == 1)) {
-          subcomp[["mapper"]] <- bru_mapper_const()
+          subcomp[["mapper"]] <- bru_mapper_linear()
         } else {
           subcomp[["mapper"]] <- bru_mapper_linear()
         }
@@ -1081,6 +1084,36 @@ ibm_amatrix.inla.mesh.1d <- function(mapper, input, ...) {
   INLA::inla.spde.make.A(mapper, loc = input)
 }
 
+
+#' @export
+#' @rdname bru_mapper
+bru_mapper_index <- function(n = 1L, ...) {
+  mapper <- list(
+    n = n
+  )
+  class(mapper) <- c("bru_mapper_index", "bru_mapper", "list")
+  mapper
+}
+
+#' @rdname bru_mapper_methods
+ibm_n.bru_mapper_index <- function(mapper, ...) {
+  mapper$n
+}
+#' @rdname bru_mapper_methods
+ibm_values.bru_mapper_index <- function(mapper, ...) {
+  seq_len(mapper$n)
+}
+#' @rdname bru_mapper_methods
+ibm_amatrix.bru_mapper_index <- function(mapper, input, ...) {
+  ok <- !is.na(input)
+  Matrix::sparseMatrix(
+    i = which(ok),
+    j = input[ok],
+    x = rep(1, sum(ok)),
+    dims = c(NROW(input), ibm_n(mapper))
+  )
+}
+
 #' @export
 #' @rdname bru_mapper
 bru_mapper_linear <- function(...) {
@@ -1110,34 +1143,6 @@ ibm_amatrix.bru_mapper_linear <- function(mapper, input, ...) {
   A
 }
 
-#' @export
-#' @rdname bru_mapper
-bru_mapper_const <- function(...) {
-  mapper <- list()
-  class(mapper) <- c("bru_mapper_linear", "bru_mapper", "list")
-  mapper
-}
-
-#' @rdname bru_mapper_methods
-ibm_n.bru_mapper_const <- function(mapper, ...) {
-  1L
-}
-#' @rdname bru_mapper_methods
-ibm_values.bru_mapper_const <- function(mapper, ...) {
-  1.0
-}
-
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_const <- function(mapper, input, ...) {
-  ok <- !is.na(input)
-  A <- Matrix::sparseMatrix(
-    i = which(ok),
-    j = rep(1, sum(ok)),
-    x = rep(1, sum(ok)),
-    dims = c(NROW(input), ibm_n(mapper))
-  )
-  A
-}
 
 #' @param values Input values calculated by [input_eval.bru_input()]
 #' @param factor_mapping character; selects the type of factor mapping.
@@ -1204,6 +1209,40 @@ ibm_amatrix.bru_mapper_factor <- function(mapper, input, ...) {
   )
   A
 }
+
+
+
+#' @param values Input values calculated by [input_eval.bru_input()]
+#' @export
+#' @rdname bru_mapper
+bru_mapper_offset <- function(...) {
+    mapper <- list()
+  class(mapper) <- c("bru_mapper_offset", "bru_mapper", "list")
+  mapper
+}
+
+#' @rdname bru_mapper_methods
+ibm_n.bru_mapper_offset <- function(mapper, ...) {
+  0L
+}
+#' @rdname bru_mapper_methods
+ibm_values.bru_mapper_offset <- function(mapper, ...) {
+  NULL
+}
+
+#' @rdname bru_mapper_methods
+ibm_amatrix.bru_mapper_offset <- function(mapper, input, ...) {
+  ok <- !is.na(input)
+  ok[which(ok)] <- (input[ok] > 0L)
+  A <- Matrix::sparseMatrix(
+    i = which(ok),
+    j = rep(1L, sum(ok)),
+    x = input[ok],
+    dims = c(NROW(input), 1L)
+  )
+  A
+}
+
 
 # OPERATORS ----
 

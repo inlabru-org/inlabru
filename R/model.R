@@ -79,8 +79,10 @@ make.model <- function(components, lhoods) {
 
   # Create joint formula that will be used by inla
   formula <- BRU_response ~ -1
+  linear <- TRUE
   included <- character(0)
   for (lh in lhoods) {
+    linear <- linear && lh[["linear"]]
     included <- union(included,
                       parse_inclusion(
                         names(components),
@@ -89,10 +91,12 @@ make.model <- function(components, lhoods) {
                       )
                       )
   }
-  components <- components[included]
-  
+
   for (cmp in included) {
+    if (linear ||
+        !identical(components[[cmp]][["main"]][["type"]], "offset")) {
     formula <- update.formula(formula, components[[cmp]]$inla.formula)
+    }
   }
 
   # Restore environment
@@ -279,7 +283,7 @@ evaluate_effect_single.component <- function(component, state, data, A = NULL, .
 
   # Determine component depending on the type of latent model
   if (component$main$type %in% c("offset")) {
-    values <- input_eval(component, part = "main", data = data, env = component$env)
+    values <- A
   } else {
     values <- A %*% state
   }

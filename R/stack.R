@@ -16,7 +16,13 @@ make.stack <- function(data,
   included <- parse_inclusion(names(model$effects),
                               include = include,
                               exclude = exclude)
-
+  offsets <- names(model$effects)[vapply(
+    model$effects,
+    function(x) identical(x$type, "offset"),
+    TRUE
+  )]
+  included <- setdiff(included, offsets)
+  
   # Observations y
   if (length(y) == 1) {
     y <- rep(y, nrow(as.data.frame(data)))
