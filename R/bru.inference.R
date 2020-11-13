@@ -131,6 +131,7 @@ bru <- function(components = y ~ Intercept,
   result$bru_info$lhoods <- lhoods
   result$bru_info$model <- bru.model
   result$bru_info$mesh <- options$mesh
+  class(result$bru_info) <- c("bru_info", class(result$bru_info))
   class(result) <- c("bru", class(result))
   return(result)
 }
