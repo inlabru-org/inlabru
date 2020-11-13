@@ -1,9 +1,9 @@
 # inlabru 2.1.14.900
 
 * Improved factor support; Either as "contrast with the 1st level", via the
-  special "factor" model, or all levels with model "iid". Further options
-  planned (e.g. a simpler options to fix the precition parameter).  The
-  estimated coefficients appear as random effects in the inla output.
+  special "factor_contrast" model, or all levels with model "factor_full".
+  Further options planned (e.g. a simpler options to fix the precision
+  parameter).  The estimated coefficients appear as random effects in the inla output.
 
 * Interface restructuring to support new features while keeping most
   backwards compatibility. Change "map=" to "main=" or unnamed first argument;

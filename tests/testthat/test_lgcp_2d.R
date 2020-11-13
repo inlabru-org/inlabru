@@ -42,7 +42,8 @@ test_that("2D LGCP fitting", {
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
     0.5797879,
-    tolerance = midtol)
+    tolerance = midtol
+  )
 
   index <- c(1, 456, 789, 1058, 1479)
   # test_that("2D LGCP fitting: INLA random field", {
@@ -72,8 +73,10 @@ test_that("2D LGCP fitting", {
     proj4string = INLA::inla.sp_get_crs(gorillas$nests)
   )
   set.seed(123L)
-  pr <- predict(fit, loc, ~mySmooth, n.samples = 5, seed = 5657L,
-                num.threads = "1:1", parallel.configs = FALSE)
+  pr <- predict(fit, loc, ~mySmooth,
+    n.samples = 5, seed = 5657L,
+    num.threads = "1:1", parallel.configs = FALSE
+  )
   # Prediction variability includes reordeing differences, so need large
   # tolerances unless n.samples is large
   expect_equal(

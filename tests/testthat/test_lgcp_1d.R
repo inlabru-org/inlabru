@@ -30,7 +30,7 @@ test_that("1D LGCP fitting", {
   result <- test_data()
   mesh1D <- result$mesh1D
   fit <- result$fit
-  
+
   # Needed for reproducible predict
   set.seed(123L)
 
@@ -104,7 +104,7 @@ test_that("1D LGCP fitting", {
 
   # Needed for reproducible predict
   set.seed(123L)
-  
+
   expect_is(fit, "bru")
 
   expect_equal(fit$summary.fixed["Intercept", "mean"], 1.08959, tolerance = midtol)

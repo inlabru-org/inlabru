@@ -256,10 +256,12 @@ triangle <- function(mesh, loc) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 
 refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
-  rmesh <- INLA::inla.mesh.create(loc = mesh$loc,
-                                  interior = INLA::inla.mesh.interior(mesh),
-                                  boundary = INLA::inla.mesh.boundary(mesh),
-                                  refine = refine)
+  rmesh <- INLA::inla.mesh.create(
+    loc = mesh$loc,
+    interior = INLA::inla.mesh.interior(mesh),
+    boundary = INLA::inla.mesh.boundary(mesh),
+    refine = refine
+  )
   return(rmesh)
 }
 

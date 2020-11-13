@@ -83,19 +83,20 @@ make.model <- function(components, lhoods) {
   included <- character(0)
   for (lh in lhoods) {
     linear <- linear && lh[["linear"]]
-    included <- union(included,
-                      parse_inclusion(
-                        names(components),
-                        include = lh[["include_components"]],
-                        exclude = lh[["exclude_components"]]
-                      )
-                      )
+    included <- union(
+      included,
+      parse_inclusion(
+        names(components),
+        include = lh[["include_components"]],
+        exclude = lh[["exclude_components"]]
+      )
+    )
   }
 
   for (cmp in included) {
     if (linear ||
-        !identical(components[[cmp]][["main"]][["type"]], "offset")) {
-    formula <- update.formula(formula, components[[cmp]]$inla.formula)
+      !identical(components[[cmp]][["main"]][["type"]], "offset")) {
+      formula <- update.formula(formula, components[[cmp]]$inla.formula)
     }
   }
 
@@ -169,7 +170,7 @@ evaluate_model <- function(model,
                            exclude = NULL,
                            ...) {
   included <- parse_inclusion(names(model$effects), include, exclude)
-  
+
   if (is.null(state) && !is.null(result)) {
     state <- evaluate_state(model,
       result = result,

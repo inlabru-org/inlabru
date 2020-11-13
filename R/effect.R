@@ -74,7 +74,7 @@ ibm_amatrix <- function(mapper, input, ...) {
 #' Latent model component construction
 #'
 #' @description
-#' 
+#'
 #' Similar to `glm()`, `gam()` and `inla()`, [bru] models can be constructed via
 #' a formula-like syntax, where each latent effect is specified. However, in
 #' addition to the parts of the syntax compatible with `INLA::inla`, `bru`
@@ -145,7 +145,7 @@ ibm_amatrix <- function(mapper, input, ...) {
 #' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
 #'
 #' @param \dots Parameters passed on to other methods
-#' 
+#'
 #' @rdname component
 #' @aliases bru_component
 #'
@@ -167,7 +167,6 @@ ibm_amatrix <- function(mapper, input, ...) {
 #' eff <- component_list(~ myLinearEffectOfX(x))
 #' # Individual component
 #' eff <- component("myLinearEffectOfX", main = x, model = "linear")
-
 component <- function(...) {
   UseMethod("component")
 }
@@ -508,10 +507,10 @@ component.character <- function(object,
 
 
 #' Methods for inlabru component lists
-#' 
+#'
 #' Constructor methods for inlabru component lists. Syntax details are given in
 #' [component()].
-#' 
+#'
 #' @param \dots Parameters passed on to other methods
 #' @family component contructors
 #' @aliases bru_component_list
@@ -524,7 +523,7 @@ component_list <- function(...) {
 #' @details
 #' * `component_list.formula`: Convert a component formula
 #' into a `component_list` object
-#' 
+#'
 #' @param object The object to operate on
 #' @param lhoods A `bru_like_list` object
 #' @param envir An evaluation environment to override the evaluation
@@ -558,7 +557,7 @@ component_list.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
     parsed,
     function(component.expression) {
       eval(component.expression,
-           envir = envir
+        envir = envir
       )
     }
   )
@@ -583,14 +582,15 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
     object <-
       do.call(
         c,
-        lapply(object,
-               function(x) {
-                 if (inherits(x, "formula")) {
-                   component_list(x, lhoods = lhoods, envir = envir)
-                 } else {
-                   list(x)
-                 }
-               }
+        lapply(
+          object,
+          function(x) {
+            if (inherits(x, "formula")) {
+              component_list(x, lhoods = lhoods, envir = envir)
+            } else {
+              list(x)
+            }
+          }
         )
       )
   }
@@ -672,7 +672,7 @@ add_mappers.component <- function(component, lhoods) {
   )
 
   fcall <- component$fcall
-  
+
   # Set ngroup and nrep defaults
   if (is.null(component$group$n)) {
     fcall[["ngroup"]] <- 1
@@ -684,7 +684,7 @@ add_mappers.component <- function(component, lhoods) {
   } else {
     fcall[["nrep"]] <- component$replicate$n
   }
-  
+
   if (is.null(component$main$values)) {
     fcall <- fcall[!("values" %in% names(fcall))]
   } else {
@@ -882,7 +882,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
     # Check internal consistency of user specified n and the mapper:
     mapper_n <- ibm_n(subcomp[["mapper"]])
     if (!is.null(subcomp[["n"]]) &&
-        subcomp[["n"]] != mapper_n) {
+      subcomp[["n"]] != mapper_n) {
       stop(paste0(
         "Size mismatch, n=", subcomp[["n"]], " != ibm_n()=",
         mapper_n, " mapper for label ", label
@@ -1217,7 +1217,7 @@ ibm_amatrix.bru_mapper_factor <- function(mapper, input, ...) {
 #' @export
 #' @rdname bru_mapper
 bru_mapper_offset <- function(...) {
-    mapper <- list()
+  mapper <- list()
   class(mapper) <- c("bru_mapper_offset", "bru_mapper", "list")
   mapper
 }
@@ -1520,7 +1520,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
           coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
           data_crs <- tryCatch(fm_sp_get_crs(data),
-                               error = function(e) {}
+            error = function(e) {}
           )
           if (!fm_crs_is_null(data_crs)) {
             proj4string(val) <- data_crs
@@ -1578,9 +1578,11 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
         "To avoid this basic covariate imputation, supply complete data."
       )
     )
-    
-    val <- bru_fill_missing(data = emap, where = data, values = val,
-                            layer = layer, selector = input[["selector"]])
+
+    val <- bru_fill_missing(
+      data = emap, where = data, values = val,
+      layer = layer, selector = input[["selector"]]
+    )
   }
 
   # Check for NA values.

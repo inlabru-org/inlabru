@@ -80,7 +80,8 @@ nlinla.reweight <- function(A, model, data, expr, result) {
   )]
   epkt <- nlinla.epunkt(model, data, result = result)
   ae <- nlinla.taylor(expr, epkt, data, environment(model$formula),
-                      offsets = offsets)
+    offsets = offsets
+  )
   for (nm in setdiff(names(A), offsets)) {
     A[[nm]] <- A[[nm]] * ae$gradient[[nm]]
   }
@@ -91,7 +92,7 @@ nlinla.reweight <- function(A, model, data, expr, result) {
 # Linearisation ----
 
 #' Compute inlabru model linearisation information
-#' 
+#'
 #' @param \dots Parameters passed on to other methods
 #' @export
 #' @rdname bru_compute_linearisation
@@ -124,9 +125,11 @@ bru_compute_linearisation.bru_like <- function(lhood,
                                                ...) {
   allow_latent <- lhood[["allow_latent"]]
   allow_combine <- lhood[["allow_combine"]]
-  included <- parse_inclusion(names(model[["effects"]]),
-                              lhood[["include_components"]],
-                              lhood[["exclude_components"]])
+  included <- parse_inclusion(
+    names(model[["effects"]]),
+    lhood[["include_components"]],
+    lhood[["exclude_components"]]
+  )
   # TODO: If linear, just need to copy the A matrices and return
   effects <- evaluate_effect_single(
     model[["effects"]][included],
@@ -207,9 +210,12 @@ bru_compute_linearisation.bru_like <- function(lhood,
 #' @export
 #' @rdname bru_compute_linearisation
 bru_compute_linearisation.bru_like_list <- function(lhoods, A, ...) {
-  lapply(lhoods, function(x) bru_compute_linearisation(x,
-                                                       A = x[["A"]],
-                                                       ...))
+  lapply(lhoods, function(x) {
+    bru_compute_linearisation(x,
+      A = x[["A"]],
+      ...
+    )
+  })
 }
 #' @export
 #' @rdname bru_compute_linearisation

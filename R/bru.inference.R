@@ -86,9 +86,11 @@ print.summary_bru_info <- function(x, ...) {
   cat(paste0("INLA version: ", x$INLA_version, "\n"))
   cat(paste0("Components:\n"))
   for (cmp in x$components) {
-    cat(sprintf("  %s: Main model type '%s'\n",
-                cmp$label,
-                cmp$main_type))
+    cat(sprintf(
+      "  %s: Main model type '%s'\n",
+      cmp$label,
+      cmp$main_type
+    ))
   }
   cat(paste0("Likelihoods:\n"))
   for (lh in x$lhoods) {
@@ -97,11 +99,12 @@ print.summary_bru_info <- function(x, ...) {
       lh$family,
       paste0("'", lh$data_class, "'", collapse = ", "),
       if (length(lh$predictor) > 1) {
-        paste0("\n        ",
-               paste0(
-                 lh$predictor,
-                 collapse = "\n        "
-               )
+        paste0(
+          "\n        ",
+          paste0(
+            lh$predictor,
+            collapse = "\n        "
+          )
         )
       } else {
         lh$predictor
@@ -130,7 +133,9 @@ bru_info.character <- function(method,
   if (is.null(inlabru_version)) {
     inlabru_version <-
       tryCatch(
-        {utils::packageVersion("inlabru")},
+        {
+          utils::packageVersion("inlabru")
+        },
         error = function(e) {
           "unknown"
         }
@@ -139,7 +144,9 @@ bru_info.character <- function(method,
   if (is.null(INLA_version)) {
     INLA_version <-
       tryCatch(
-        {utils::packageVersion("INLA")},
+        {
+          utils::packageVersion("INLA")
+        },
         error = function(e) {
           "unknown"
         }
@@ -988,7 +995,7 @@ generate.bru <- function(object,
   else if (inherits(data, "formula")) {
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }
-  
+
   # If data is provided as list, generate data automatically for each dimension stated in this list
   if (class(data)[1] == "list") {
     # Todo: check if this feature works at all.

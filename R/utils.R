@@ -133,13 +133,19 @@ check_selector <- function(data, where, layer, selector) {
 }
 
 eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
-  stopifnot(inherits(data,
-                     c("SpatialPixelsDataFrame",
-                       "SpatialGridDataFrame")))
+  stopifnot(inherits(
+    data,
+    c(
+      "SpatialPixelsDataFrame",
+      "SpatialGridDataFrame"
+    )
+  ))
   if (is.null(layer) && is.null(selector)) {
     layer <- 1
   }
-  if (!isTRUE({msg <- check_selector(data, where, layer, selector)})) {
+  if (!isTRUE({
+    msg <- check_selector(data, where, layer, selector)
+  })) {
     stop(msg)
   }
   if (is.null(selector)) {
@@ -159,7 +165,7 @@ eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
   }
   val
 }
-  
+
 
 # Fill in missing values in Spatial grids
 # @param data A SpatialPointsDataFrame, SpatialPixelsDataFrame, or a
@@ -170,18 +176,24 @@ eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
 # `FALSE`
 # @param layer,selector Specifies what data column or columns from which to
 # extract data, see [component()] for details.
-# @param batch_size 
+# @param batch_size
 # @export
 bru_fill_missing <- function(data, where, values,
                              layer = NULL, selector = NULL,
                              batch_size = 1000) {
-  stopifnot(inherits(data,
-                     c("SpatialPixelsDataFrame",
-                       "SpatialGridDataFrame")))
+  stopifnot(inherits(
+    data,
+    c(
+      "SpatialPixelsDataFrame",
+      "SpatialGridDataFrame"
+    )
+  ))
   if (is.null(layer) && is.null(selector)) {
     layer <- 1
   }
-  if (!isTRUE({msg <- check_selector(data, where, layer, selector)})) {
+  if (!isTRUE({
+    msg <- check_selector(data, where, layer, selector)
+  })) {
     stop(msg)
   }
   if (inherits(where, "Spatial")) {
@@ -191,7 +203,7 @@ bru_fill_missing <- function(data, where, values,
       warning("'data' and 'where' for spatial infilling have different CRS")
     }
   }
-  
+
   if (!is.null(selector)) {
     selection <- where[[selector]]
     selector_notok <- is.na(selection)
@@ -226,22 +238,21 @@ bru_fill_missing <- function(data, where, values,
   data_notok <- is.na(data[[layer]])
   data_ok <- which(!data_notok)
   data_notok <- which(data_notok)
-  
+
   batch_size <- 200
   for (batch in seq_len(ceiling(length(notok) / batch_size))) {
     subset <- notok[seq((batch - 1) * batch_size,
-                        min(length(notok), batch * batch_size),
-                        by = 1)]
+      min(length(notok), batch * batch_size),
+      by = 1
+    )]
     dst <- rgeos::gDistance(
       sp::SpatialPoints(data[data_ok, , drop = FALSE]),
       sp::SpatialPoints(where[subset, , drop = FALSE]),
       byid = TRUE
     )
-    
+
     nn <- apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
     values[subset] <- data[[layer]][data_ok[nn]]
   }
   values
 }
-
-

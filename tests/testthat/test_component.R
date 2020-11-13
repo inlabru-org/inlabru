@@ -61,8 +61,9 @@ test_that("Component construction: linear model", {
 test_that("Component construction: offset", {
   cmp <- component_list(~ something(a, model = "offset"))
   val <- evaluate_effect_single(cmp[["something"]],
-                                data = data.frame(a = 11:15),
-                                state = NULL)
+    data = data.frame(a = 11:15),
+    state = NULL
+  )
   expect_equivalent(
     val,
     11:15

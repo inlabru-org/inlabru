@@ -1,7 +1,7 @@
 test_that("bru: factor component", {
   skip_on_cran()
   skip_if_not(bru_safe_inla())
-  
+
   # Required for reproducible predict() and generate() output.
   set.seed(1234L)
 
@@ -14,8 +14,10 @@ test_that("bru: factor component", {
 
   # Predict posterior statistics of 'x'
 
-  xpost <- predict(fit, data = NULL, formula = ~x_latent,
-                   n.samples = 5, seed = 12345L)
+  xpost <- predict(fit,
+    data = NULL, formula = ~x_latent,
+    n.samples = 5, seed = 12345L
+  )
 
   # The statistics include mean, standard deviation, the 2.5% quantile, the median,
   # the 97.5% quantile, minimum and maximum sample drawn from the posterior as well as
