@@ -1085,6 +1085,7 @@ ibm_amatrix.inla.mesh.1d <- function(mapper, input, ...) {
 }
 
 
+#' @param n Size of a model for `bru_mapper_index`
 #' @export
 #' @rdname bru_mapper
 bru_mapper_index <- function(n = 1L, ...) {

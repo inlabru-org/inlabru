@@ -37,6 +37,8 @@ bru_mapper_offset(...)
 
 \item{input}{The values for which to produce a mapping matrix}
 
+\item{n}{Size of a model for \code{bru_mapper_index}}
+
 \item{values}{Input values calculated by \code{\link[=input_eval.bru_input]{input_eval.bru_input()}}}
 
 \item{factor_mapping}{character; selects the type of factor mapping.
