@@ -93,11 +93,16 @@ print.summary_bru_info <- function(x, ...) {
   cat(paste0("Likelihoods:\n"))
   for (lh in x$lhoods) {
     cat(sprintf(
-      "  Family: '%s'\n    Data class: %s\n    Formula: %s\n",
+      "  Family: '%s'\n    Data class: %s\n    Predictor: %s\n",
       lh$family,
       paste0("'", lh$data_class, "'", collapse = ", "),
       if (length(lh$predictor) > 1) {
-        paste0("\n      ", paste0(lh$predictor, collapse = "\n        "))
+        paste0("\n        ",
+               paste0(
+                 lh$predictor,
+                 collapse = "\n        "
+               )
+        )
       } else {
         lh$predictor
       }
