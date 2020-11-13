@@ -37,17 +37,4 @@ test_that("bru: factor component", {
 
   expect_equal(is.matrix(xipost), TRUE)
   expect_equal(rownames(xipost), c("Intercept", "x"))
-
-  xipost <- predict(fit,
-    data = NULL,
-    formula = ~ c(
-      Intercept = Intercept_latent,
-      x = x_latent
-    ),
-    n.samples = 5,
-    seed = 12345L
-  )
-
-  expect_equal(is.data.frame(xipost), TRUE)
-  expect_equal(rownames(xipost), c("Intercept", "x"))
 })

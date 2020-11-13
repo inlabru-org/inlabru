@@ -17,6 +17,19 @@ generate <- function(object, ...) {
   UseMethod("generate")
 }
 
+bru_check_object_bru <- function(object) {
+  if (is.null(object[["bru_info"]])) {
+    if (is.null(object[["sppa"]])) {
+      warning("bru object contains neither current `bru_info` or old `sppa` information")
+    } else {
+      warning("Old style bru object detected. Attempting to update it.")
+      object[["bru_info"]] <- object[["sppa"]]
+      object[["sppa"]] <- NULL
+    }
+  }
+  object
+}
+
 
 #' @title Convenient model fitting using (iterated) INLA
 #'
@@ -591,6 +604,8 @@ summary.lgcp <- function(object, ...) {
 #'
 
 summary.bru <- function(object, ...) {
+  object <- bru_check_object_bru(object)
+
   warning("The summary.bru() method probably doesn't work with the current devel inlabru version!")
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
   for (k in 1:length(object$bru_info$lhoods)) {
@@ -730,6 +745,7 @@ predict.bru <- function(object,
                         include = NULL,
                         exclude = NULL,
                         ...) {
+  object <- bru_check_object_bru(object)
 
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(data)) {
@@ -823,6 +839,8 @@ generate.bru <- function(object,
                          include = NULL,
                          exclude = NULL,
                          ...) {
+  object <- bru_check_object_bru(object)
+
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(data)) {
     data <- as.list(setNames(data, data))
