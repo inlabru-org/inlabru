@@ -674,19 +674,15 @@ lgcp <- function(components,
                  formula = . ~ .,
                  E = NULL,
                  options = list()) {
-  #  # If formula response missing, copy from components
-  #  formula <- auto_copy_response(formula, components)
-  #  lik <- like(family = "cp",
-  #    formula = formula, data = data, samplers = samplers,
-  #    E = E, ips = ips, domain = domain,
-  #    options = options
-  #  )
-  bru(components,
+  # If formula response missing, copy from components (for formula input)
+  formula <- auto_copy_response(formula, components)
+  lik <- like(
     family = "cp",
     formula = formula, data = data, samplers = samplers,
     E = E, ips = ips, domain = domain,
     options = options
   )
+  bru(components, lik, options = options)
 }
 
 
@@ -1467,6 +1463,9 @@ auto_linear_formula <- function(formula, components) {
 
 
 auto_copy_response <- function(formula, components) {
+  if (!inherits(components, "formula")) {
+    return(formula)
+  }
   if ((length(as.character(formula)) == 3) &&
     (as.character(formula)[2] != ".")) {
     # Already has response; do nothing
