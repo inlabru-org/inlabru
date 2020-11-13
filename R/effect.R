@@ -596,6 +596,17 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
   }
   stopifnot(all(vapply(object, function(x) inherits(x, "component"), TRUE)))
   names(object) <- lapply(object, function(x) x$label)
+  if (anyDuplicated(names(object))) {
+    warning(paste0(
+      "Duplicated component labels detected: ",
+      paste0(
+        "'",
+        sort(unique(names(object)[duplicated(names(object))])),
+        "'",
+        collapse = ", "
+      )
+    ))
+  }
   class(object) <- c("component_list", "list")
   environment(object) <- envir
   if (!is.null(lhoods)) {
@@ -1248,47 +1259,87 @@ ibm_amatrix.bru_mapper_offset <- function(mapper, input, ...) {
 # OPERATORS ----
 
 
-#' Summarize an component
+#' Summarise components
 #'
 #' @export
 #' @method summary component
 #' @keywords internal
-#' @param object An component.
+#' @param object A `component` or `component_list`.
 #' @param ... ignored.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 summary.component <- function(object, ...) {
-  eff <- list(
+  result <- list(
     "Label" = object$label,
-    "Type" = object$type,
     "Main" = sprintf(
-      "%s [class: %s]",
-      deparse(object$main$input),
-      class(object$main$input)
+      "input '%s',\ttype '%s'",
+      deparse(object[["main"]][["input"]][["input"]]),
+      object[["main"]][["type"]]
     ),
+    "Group" = 
+      if (!is.null(object[["group"]][["input"]][["input"]])) {
+        sprintf(
+          "input '%s',\ttype '%s'",
+          deparse(object[["group"]][["input"]][["input"]]),
+          object[["group"]][["type"]]
+        )
+      } else {
+        NULL
+      },
+    "Replicate" = 
+      if (!is.null(object[["replicate"]][["input"]][["input"]])) {
+        sprintf(
+          "input '%s',\ttype '%s'",
+          deparse(object[["replicate"]][["input"]][["input"]]),
+          object[["replicate"]][["type"]]
+        )
+      } else {
+        NULL
+      },
     "INLA formula" = as.character(object$inla.formula)
   )
-  class(eff) <- c("summary.component", "list")
-  eff
+  class(result) <- c("summary_component", "list")
+  result
 }
 
-#' Print the summary of an component
-#'
 #' @export
-#' @keywords internal
-#' @param x A 'summary.component' object.
+#' @method summary component_list
+#' @param ... ignored.
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @rdname summary.component
+
+summary.component_list <- function(object, ...) {
+  result <- lapply(
+    object,
+    summary
+  )
+  class(result) <- c("summary_component_list", "list")
+  result
+}
+
+#' @export
+#' @param x A 'summary_component' object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.component
 
-print.summary.component <- function(x, ...) {
+print.summary_component <- function(x, ...) {
   for (name in names(x)) {
-    # Split TAB character to attempt proper printing in RStudio,
-    # but even though this makes a difference on the command line,
-    # there's no component when inside the function. /FL
-    cat(name, ":", "\t", x[[name]], "\n", sep = "")
+    if (!is.null(x[[name]])) {
+      cat(name, ":", "\t", x[[name]], "\n", sep = "")
+    }
   }
   invisible(x)
+}
+
+#' @export
+#' @param x A summary object to be printed.
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname summary.component
+
+print.summary_component_list <- function(x, ...) {
+  lapply(x, print)
+  invisible(x)          
 }
 
 

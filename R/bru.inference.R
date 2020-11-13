@@ -674,174 +674,19 @@ lgcp <- function(components,
                  formula = . ~ .,
                  E = NULL,
                  options = list()) {
-  #  # If formula response missing, copy from components
-  #  formula <- auto_copy_response(formula, components)
-  #  lik <- like(family = "cp",
-  #    formula = formula, data = data, samplers = samplers,
-  #    E = E, ips = ips, domain = domain,
-  #    options = options
-  #  )
-  bru(components,
+  # If formula response missing, copy from components (for formula input)
+  formula <- auto_copy_response(formula, components)
+  lik <- like(
     family = "cp",
     formula = formula, data = data, samplers = samplers,
     E = E, ips = ips, domain = domain,
     options = options
   )
+  bru(components, lik, options = options)
 }
 
 
-# Summarise a LGCP object
 #
-# @aliases summary.lgcp
-# @export
-# @param object A result object obtained from a lgcp() run
-# @param ... ignored arguments (S3 generic compatibility)
-
-summary.lgcp <- function(object, ...) {
-  result <- object
-  warning("The summary.lgcp() method probably doesn't work with the current devel inlabru version!")
-
-  cat("### LGCP Summary #################################################################################\n\n")
-
-  cat(paste0("Predictor: log(lambda) = ", as.character(result$model$expr), "\n"))
-
-  cat("\n--- Points & Samplers ----\n\n")
-  cat(paste0("Number of points: ", nrow(result$bru_info$points)), "\n")
-  if (inherits(result$bru_info$points, "Spatial")) {
-    cat(paste0("Coordinate names: ", paste0(coordnames(result$bru_info$points), collapse = ", ")), "\n")
-    cat(paste0("Coordinate system: ", proj4string(result$bru_info$points), "\n"))
-  }
-
-  cat(paste0("Total integration mass, E*weight: ", sum(result$bru_info$lhoods[[1]]$E)), "\n")
-
-  cat("\n--- Dimensions -----------\n\n")
-  icfg <- result$iconfig
-  invisible(lapply(names(icfg), function(nm) {
-    cat(paste0(
-      "  ", nm, " [", icfg[[nm]]$class, "]",
-      ": ",
-      "n = ", icfg[[nm]]$n.points,
-      ", min = ", icfg[[nm]]$min,
-      ", max = ", icfg[[nm]]$max,
-      ", cardinality = ", signif(icfg[[nm]]$max - icfg[[nm]]$min),
-      "\n"
-    ))
-  }))
-
-  summary.bru(result)
-}
-
-
-#' Summary for a [bru] fit
-#'
-#' Takes a fitted bru object produced by bru() or lgcp() and creates various summaries from it.
-#'
-#' @aliases summary.bru
-#' @export
-#' @method summary bru
-#' @param object An object obtained from a [bru] or [lgcp] call
-#' @param ... ignored arguments
-#' @example inst/examples/bru.R
-#'
-
-summary.bru <- function(object, ...) {
-  object <- bru_check_object_bru(object)
-
-  warning("The summary.bru() method probably doesn't work with the current devel inlabru version!")
-  cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
-  for (k in 1:length(object$bru_info$lhoods)) {
-    lh <- object$bru_info$lhoods[[k]]
-    cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(object$bru_info$lhoods)[[k]], lh$family, class(lh$data), deparse(lh$formula)))
-  }
-
-  # rownames(df) = names(object$bru_info$lhoods)
-  # print(df)
-
-  cat("\n--- Criteria -------------------------------------------------------------------------------------\n\n")
-  cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", object$waic$waic), "\n"))
-  cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", object$dic$dic), "\n"))
-
-  cat("\n--- Fixed effects -------------------------------------------------------------------------------- \n\n")
-
-  if (nrow(object$summary.fixed) > 0) {
-    fe <- object$summary.fixed
-    fe$kld <- NULL
-    fe$signif <- sign(fe[, "0.025quant"]) == sign(fe[, "0.975quant"])
-    print(fe)
-  } else {
-    cat("None.\n")
-  }
-
-  cat("\n--- Random effects ------------------------------------------------------------------------------- \n\n")
-  for (nm in names(object$summary.random)) {
-    sm <- object$summary.random[[nm]]
-    cat(paste0(nm, " ranges: "))
-    cat(paste0(
-      "mean = [",
-      signif(range(sm$mean)[1]), ", ",
-      signif(range(sm$mean)[2]), "]"
-    ))
-    cat(paste0(
-      ", sd = [",
-      signif(range(sm$sd)[1]), ", ",
-      signif(range(sm$sd)[2]), "]"
-    ))
-    cat(paste0(
-      ", quantiles = [",
-      signif(range(sm[, c(4, 6)])[1]), " : ",
-      signif(range(sm[, c(4, 6)])[2]), "]"
-    ))
-    if (inherits(object$model$effects[[nm]]$main$mapper, "inla.mesh")) {
-      cat(paste0(
-        ", and area = ",
-        signif(sum(INLA::inla.mesh.fem(object$model$effects[[nm]]$main$mapper)$va))
-      ))
-    }
-    cat("\n")
-  }
-  if (length(names(object$summary.random)) == 0) {
-    cat("None.\n")
-  }
-
-  cat("\n--- All hyper parameters (internal representation) ----------------------------------------------- \n\n")
-  # cat(paste0("  ", paste(rownames(object$summary.hyperpar), collapse = ", "), "\n"))
-  print(object$summary.hyperpar)
-
-
-  marginal.summary <- function(m, name) {
-    df <- data.frame(
-      param = name,
-      mean = INLA::inla.emarginal(identity, m)
-    )
-    df$var <- INLA::inla.emarginal(function(x) {
-      (x - df$mean)^2
-    }, m)
-    df$sd <- sqrt(df$var)
-    df[c("lq", "median", "uq")] <- INLA::inla.qmarginal(c(0.025, 0.5, 0.975), m)
-    df
-  }
-
-  cat("\n")
-  for (nm in names(object$bru_info$model$effects)) {
-    eff <- object$bru_info$model$effects[[nm]]
-    if (identical(eff[["main"]][["type"]], "spde")) {
-      hyp <- INLA::inla.spde.result(object, nm, eff$main$model)
-      cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
-      df <- rbind(
-        marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"),
-        marginal.summary(hyp$marginals.log.range.nominal$range.nominal.1, "log.range"),
-        marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
-        marginal.summary(hyp$marginals.log.variance.nominal$variance.nominal.1, "log.variance")
-      )
-      print(df)
-    }
-  }
-  message(
-    "The current summary.bru(...) method is outdated and will be replaced.\n",
-    "Until then, you may prefer the output from INLA:::summary.inla(...) as an alternative."
-  )
-}
-
 #' Prediction from fitted bru model
 #'
 #' Takes a fitted `bru` object produced by the function [bru]() and produces predictions given
@@ -1467,6 +1312,9 @@ auto_linear_formula <- function(formula, components) {
 
 
 auto_copy_response <- function(formula, components) {
+  if (!inherits(components, "formula")) {
+    return(formula)
+  }
   if ((length(as.character(formula)) == 3) &&
     (as.character(formula)[2] != ".")) {
     # Already has response; do nothing
@@ -1516,4 +1364,235 @@ list.data <- function(formula) {
   #  elist <- elist[names(elist) %in% all.vars(formula)]
 
   elist
+}
+
+
+
+
+
+
+# Summary methods ----
+
+#  Summarise a LGCP object
+#
+# @export
+# @param object A result object obtained from a lgcp() run
+# @param ... ignored arguments (S3 generic compatibility)
+
+summary.lgcp <- function(object, ...) {
+  result <- object
+  warning("The summary.lgcp() method probably doesn't work with the current devel inlabru version!")
+  
+  cat("### LGCP Summary #################################################################################\n\n")
+  
+  cat(paste0("Predictor: log(lambda) = ", as.character(result$model$expr), "\n"))
+  
+  cat("\n--- Points & Samplers ----\n\n")
+  cat(paste0("Number of points: ", nrow(result$bru_info$points)), "\n")
+  if (inherits(result$bru_info$points, "Spatial")) {
+    cat(paste0("Coordinate names: ", paste0(coordnames(result$bru_info$points), collapse = ", ")), "\n")
+    cat(paste0("Coordinate system: ", proj4string(result$bru_info$points), "\n"))
+  }
+  
+  cat(paste0("Total integration mass, E*weight: ", sum(result$bru_info$lhoods[[1]]$E)), "\n")
+  
+  cat("\n--- Dimensions -----------\n\n")
+  icfg <- result$iconfig
+  invisible(lapply(names(icfg), function(nm) {
+    cat(paste0(
+      "  ", nm, " [", icfg[[nm]]$class, "]",
+      ": ",
+      "n = ", icfg[[nm]]$n.points,
+      ", min = ", icfg[[nm]]$min,
+      ", max = ", icfg[[nm]]$max,
+      ", cardinality = ", signif(icfg[[nm]]$max - icfg[[nm]]$min),
+      "\n"
+    ))
+  }))
+  
+  summary.bru(result)
+}
+
+
+#' Summary for an inlabru fit
+#'
+#' Takes a fitted `bru` object produced by [bru()] or [lgcp()] and creates
+#' various summaries from it.
+#'
+#' @export
+#' @method summary bru 
+#' @param object An object obtained from a [bru()] or [lgcp()] call
+#' @param \dots ignored arguments
+#' @example inst/examples/bru.R
+#'
+
+summary.bru <- function(object, ...) {
+  object <- bru_check_object_bru(object)
+  
+  result <- list(
+    bru_info = summary(object[["bru_info"]])
+  )
+  
+  result$WAIC <- object[["waic"]][["waic"]]
+  result$DIC <- object[["dic"]][["dic"]]
+
+  result$inla <- NextMethod("summary", object)
+  result[["inla"]][["call"]] <- NULL
+  
+  class(result) <- c("summary_bru", "list")
+  return(result)
+
+  marginal.summary <- function(m, name) {
+    df <- data.frame(
+      param = name,
+      mean = INLA::inla.emarginal(identity, m)
+    )
+    df$var <- INLA::inla.emarginal(function(x) {
+      (x - df$mean)^2
+    }, m)
+    df$sd <- sqrt(df$var)
+    df[c("lq", "median", "uq")] <- INLA::inla.qmarginal(c(0.025, 0.5, 0.975), m)
+    df
+  }
+  
+  cat("\n")
+  for (nm in names(object$bru_info$model$effects)) {
+    eff <- object$bru_info$model$effects[[nm]]
+    if (identical(eff[["main"]][["type"]], "spde")) {
+      hyp <- INLA::inla.spde.result(object, nm, eff$main$model)
+      cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
+      df <- rbind(
+        marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"),
+        marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
+        marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
+      )
+      print(df)
+    }
+  }
+  message(
+    "The current summary.bru(...) method is outdated and will be replaced.\n",
+    "Until then, you may prefer the output from INLA:::summary.inla(...) as an alternative."
+  )
+  class(result) <- c("summary_bru", "list")
+  result
+}
+
+
+#' @export
+#' @param x An `summary_bru2` object
+#' @rdname summary.bru
+
+print.summary_bru <- function(x, ...) {
+  print(x$bru_info)
+  print(x$inla)
+  return(x)
+}
+
+
+
+
+
+
+
+#' Old summary for an inlabru fit
+#'
+#' Takes a fitted `bru` object produced by [bru()] or [lgcp()] and creates
+#' various summaries from it.
+#'
+#' @export
+#' @param object An object obtained from a [bru()] or [lgcp()] call
+#' @param \dots ignored arguments
+#' @example inst/examples/bru.R
+#'
+
+summary_bru <- function(object, ...) {
+  .Deprecated(new = "summary")
+  
+  cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
+  for (k in 1:length(object$bru_info$lhoods)) {
+    lh <- object$bru_info$lhoods[[k]]
+    cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(object$bru_info$lhoods)[[k]], lh$family, class(lh$data), deparse(lh$formula)))
+  }
+  
+  # rownames(df) = names(object$bru_info$lhoods)
+  # print(df)
+  
+  cat("\n--- Criteria -------------------------------------------------------------------------------------\n\n")
+  cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", object$waic$waic), "\n"))
+  cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", object$dic$dic), "\n"))
+  
+  cat("\n--- Fixed effects -------------------------------------------------------------------------------- \n\n")
+  
+  if (nrow(object$summary.fixed) > 0) {
+    fe <- object$summary.fixed
+    fe$kld <- NULL
+    fe$signif <- sign(fe[, "0.025quant"]) == sign(fe[, "0.975quant"])
+    print(fe)
+  } else {
+    cat("None.\n")
+  }
+  
+  cat("\n--- Random effects ------------------------------------------------------------------------------- \n\n")
+  for (nm in names(object$summary.random)) {
+    sm <- object$summary.random[[nm]]
+    cat(paste0(nm, " ranges: "))
+    cat(paste0(
+      "mean = [",
+      signif(range(sm$mean)[1]), ", ",
+      signif(range(sm$mean)[2]), "]"
+    ))
+    cat(paste0(
+      ", sd = [",
+      signif(range(sm$sd)[1]), ", ",
+      signif(range(sm$sd)[2]), "]"
+    ))
+    cat(paste0(
+      ", quantiles = [",
+      signif(range(sm[, c(4, 6)])[1]), " : ",
+      signif(range(sm[, c(4, 6)])[2]), "]"
+    ))
+    if (inherits(object$model$effects[[nm]]$main$mapper, "inla.mesh")) {
+      cat(paste0(
+        ", and area = ",
+        signif(sum(INLA::inla.mesh.fem(object$model$effects[[nm]]$main$mapper)$va))
+      ))
+    }
+    cat("\n")
+  }
+  if (length(names(object$summary.random)) == 0) {
+    cat("None.\n")
+  }
+  
+  cat("\n--- All hyper parameters (internal representation) ----------------------------------------------- \n\n")
+  # cat(paste0("  ", paste(rownames(object$summary.hyperpar), collapse = ", "), "\n"))
+  print(object$summary.hyperpar)
+  
+  
+  marginal.summary <- function(m, name) {
+    df <- data.frame(
+      param = name,
+      mean = INLA::inla.emarginal(identity, m)
+    )
+    df$var <- INLA::inla.emarginal(function(x) {
+      (x - df$mean)^2
+    }, m)
+    df$sd <- sqrt(df$var)
+    df[c("lq", "median", "uq")] <- INLA::inla.qmarginal(c(0.025, 0.5, 0.975), m)
+    df
+  }
+  
+  cat("\n")
+  for (nm in names(object$bru_info$model$effects)) {
+    eff <- object$bru_info$model$effects[[nm]]
+    if (identical(eff[["main"]][["type"]], "spde")) {
+      hyp <- INLA::inla.spde.result(object, nm, eff$main$model)
+      cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
+      df <- rbind(
+        marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"),
+        marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
+        marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
+      )
+      print(df)
+    }
+  }
 }
