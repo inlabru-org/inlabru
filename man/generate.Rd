@@ -9,7 +9,7 @@ generate(object, ...)
 
 \method{generate}{bru}(
   object,
-  data,
+  data = NULL,
   formula = NULL,
   n.samples = 100,
   seed = 0L,

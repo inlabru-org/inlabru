@@ -127,6 +127,7 @@ bru <- function(components = y ~ Intercept,
 
   ## Create result object ##
   result$bru_info$method <- "bru"
+  result$bru_info$package_version <- packageVersion("inlabru")
   result$bru_info$lhoods <- lhoods
   result$bru_info$model <- bru.model
   result$bru_info$mesh <- options$mesh
@@ -549,7 +550,7 @@ lgcp <- function(components,
 }
 
 
-# Summarize a LGCP object
+# Summarise a LGCP object
 #
 # @aliases summary.lgcp
 # @export
@@ -754,9 +755,12 @@ predict.bru <- function(object,
   else if (inherits(data, "inla.mesh")) {
     data <- vertices(data)
   }
+  else if (inherits(data, "formula")) {
+    stop("Formula supplied as data to predict.bru(). Please check your argument order/names.")
+  }
 
   vals <- generate.bru(object,
-    data,
+    data = data,
     formula = formula,
     n.samples = n.samples,
     seed = seed,
@@ -766,7 +770,7 @@ predict.bru <- function(object,
     ...
   )
 
-  # Summarize
+  # Summarise
 
   if (is.data.frame(vals[[1]])) {
     vals.names <- names(vals[[1]])
@@ -775,7 +779,7 @@ predict.bru <- function(object,
     smy <- list()
 
     for (nm in estim) {
-      smy[[nm]] <- summarize(lapply(vals, function(v) v[[nm]]), x = vals[[1]][, covar, drop = FALSE])
+      smy[[nm]] <- bru_summarise(lapply(vals, function(v) v[[nm]]), x = vals[[1]][, covar, drop = FALSE])
     }
     vals <- smy
     is.annot <- vapply(names(vals), function(v) all(vals[[v]]$sd == 0), TRUE)
@@ -789,7 +793,7 @@ predict.bru <- function(object,
     if (length(vals) == 1) vals <- vals[[1]]
   } else {
     # if ( nrow(vals[[1]]) == nrow(data) ) { add.x = vals[[1]][,covar,drop=FALSE] } else { add.x = NULL }
-    vals <- summarize(vals, x = data)
+    vals <- bru_summarise(vals, x = data)
   }
 
   if (!inherits(vals, "Spatial")) class(vals) <- c("prediction", class(vals))
@@ -831,7 +835,7 @@ predict.bru <- function(object,
 #' @rdname generate
 
 generate.bru <- function(object,
-                         data,
+                         data = NULL,
                          formula = NULL,
                          n.samples = 100,
                          seed = 0L,
@@ -848,7 +852,10 @@ generate.bru <- function(object,
   else if (inherits(data, "inla.mesh")) {
     data <- vertices(data)
   }
-
+  else if (inherits(data, "formula")) {
+    stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
+  }
+  
   # If data is provided as list, generate data automatically for each dimension stated in this list
   if (class(data)[1] == "list") {
     # Todo: check if this feature works at all.
@@ -978,16 +985,15 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0
 }
 
 
-# Summarize and annotate data
+# Summarise and annotate data
 #
-# @aliases summarize
 # @export
 # @param data A list of samples, each either numeric or a \code{data.frame}
 # @param x A \code{data.frame} of data columns that should be added to the summary data frame
 # @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
 # @return A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
 
-summarize <- function(data, x = NULL, cbind.only = FALSE) {
+bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
   if (is.list(data)) {
     data <- do.call(cbind, data)
   }
