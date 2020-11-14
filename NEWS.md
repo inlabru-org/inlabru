@@ -1,3 +1,7 @@
+# inlabru 2.1.14.901
+
+* Method for updating old stored estimation objects
+
 # inlabru 2.1.14.900
 
 * Improved factor support; Either as "contrast with the 1st level", via the

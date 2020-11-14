@@ -9,29 +9,16 @@
 \usage{
 input_eval(...)
 
-\method{input_eval}{component}(
-  component,
-  part = c("main", "group", "replicate", "weights"),
-  data,
-  ...
-)
+\method{input_eval}{component}(component, data, ...)
 
-\method{input_eval}{component_list}(
-  components,
-  part = c("main", "group", "replicate", "weights"),
-  data,
-  ...
-)
+\method{input_eval}{component_list}(components, data, ...)
 
 \method{input_eval}{bru_input}(input, data, env = NULL, label = NULL, null.on.fail = FALSE, ...)
 }
 \arguments{
 \item{...}{Unused.}
 
-\item{component}{An component.}
-
-\item{part}{The input part to evaluate; \code{'main'}, \code{'group'},
-\code{'replicate'}, \code{'weights'}}
+\item{component}{A component.}
 
 \item{data}{A \code{data.frame} or Spatial* object of covariates and/or point locations. If null, return the component's map.}
 }

@@ -21,23 +21,59 @@ bru_check_object_bru <- function(object) {
   if (is.null(object[["bru_info"]])) {
     if (is.null(object[["sppa"]])) {
       stop("bru object contains neither current `bru_info` or old `sppa` information")
-    } else {
-      warning("Old style bru object detected. Attempting to update it.")
-      object[["bru_info"]] <- object[["sppa"]]
-      object[["sppa"]] <- NULL
     }
+    object[["bru_info"]] <- object[["sppa"]]
+    object[["sppa"]] <- NULL
+    old <- TRUE
+  } else {
+    old <- FALSE
   }
-  if (!is.list(object[["bru_info"]])) {
+  object[["bru_info"]] <- bru_info_upgrade(object[["bru_info"]], old = old)
+  object
+}
+
+bru_info_upgrade <- function(object, old = FALSE) {
+  if (!is.list(object)) {
     stop("bru_info part of the object can't be converted to `bru_info`; not a list")
   }
-  if (!inherits(object[["bru_info"]], "bru_info")) {
-    class(object[["bru_info"]]) <- c("bru_info", "list")
+  if (!inherits(object, "bru_info")) {
+    old <- TRUE
+    class(object) <- c("bru_info", "list")
   }
-  if (is.null(object[["bru_info"]][["inlabru_version"]])) {
-    object[["bru_info"]][["inlabru_version"]] <- "unknown"
+  ver <- getNamespaceVersion("inlabru")
+  if (is.null(object[["inlabru_version"]])) {
+    object[["inlabru_version"]] <- "0.0.0"
+    old <- TRUE
   }
-  if (is.null(object[["bru_info"]][["INLA_version"]])) {
-    object[["bru_info"]][["INLA_version"]] <- "unknown"
+  old_ver <- object[["inlabru_version"]]
+  if (old || (utils::compareVersion(ver, old_ver) > 0)) {
+    warning(
+      "Old bru_info object version ",
+      old_ver,
+      " detected. Attempting upgrade."
+    )
+
+    message("Detected bru_info version ", old_ver)
+    if (utils::compareVersion("2.1.14.901", old_ver) > 0) {
+      message("Upgrading bru_info to 2.1.14.901")
+      # Ensure INLA_version stored
+      if (is.null(object[["INLA_version"]])) {
+        object[["INLA_version"]] <- "0.0.0"
+      }
+      # Check for component$mapper as a bru_mapper_multi
+      for (k in seq_along(object[["model"]][["effects"]])) {
+        cmp <- object[["model"]][["effects"]][[k]]
+        cmp[["mapper"]] <-
+          bru_mapper_multi(list(
+            main = cmp$main$mapper,
+            group = cmp$group$mapper,
+            replicate = cmp$replicate$mapper
+          ))
+        object[["model"]][["effects"]][[k]] <- cmp
+      }
+      object[["inlabru_version"]] <- "2.1.14.901"
+    }
+    object[["inlabru_version"]] <- ver
   }
   object
 }
@@ -1382,20 +1418,20 @@ list.data <- function(formula) {
 summary.lgcp <- function(object, ...) {
   result <- object
   warning("The summary.lgcp() method probably doesn't work with the current devel inlabru version!")
-  
+
   cat("### LGCP Summary #################################################################################\n\n")
-  
+
   cat(paste0("Predictor: log(lambda) = ", as.character(result$model$expr), "\n"))
-  
+
   cat("\n--- Points & Samplers ----\n\n")
   cat(paste0("Number of points: ", nrow(result$bru_info$points)), "\n")
   if (inherits(result$bru_info$points, "Spatial")) {
     cat(paste0("Coordinate names: ", paste0(coordnames(result$bru_info$points), collapse = ", ")), "\n")
     cat(paste0("Coordinate system: ", proj4string(result$bru_info$points), "\n"))
   }
-  
+
   cat(paste0("Total integration mass, E*weight: ", sum(result$bru_info$lhoods[[1]]$E)), "\n")
-  
+
   cat("\n--- Dimensions -----------\n\n")
   icfg <- result$iconfig
   invisible(lapply(names(icfg), function(nm) {
@@ -1409,7 +1445,7 @@ summary.lgcp <- function(object, ...) {
       "\n"
     ))
   }))
-  
+
   summary.bru(result)
 }
 
@@ -1420,7 +1456,7 @@ summary.lgcp <- function(object, ...) {
 #' various summaries from it.
 #'
 #' @export
-#' @method summary bru 
+#' @method summary bru
 #' @param object An object obtained from a [bru()] or [lgcp()] call
 #' @param \dots ignored arguments
 #' @example inst/examples/bru.R
@@ -1428,17 +1464,17 @@ summary.lgcp <- function(object, ...) {
 
 summary.bru <- function(object, ...) {
   object <- bru_check_object_bru(object)
-  
+
   result <- list(
     bru_info = summary(object[["bru_info"]])
   )
-  
+
   result$WAIC <- object[["waic"]][["waic"]]
   result$DIC <- object[["dic"]][["dic"]]
 
   result$inla <- NextMethod("summary", object)
   result[["inla"]][["call"]] <- NULL
-  
+
   class(result) <- c("summary_bru", "list")
   return(result)
 
@@ -1454,7 +1490,7 @@ summary.bru <- function(object, ...) {
     df[c("lq", "median", "uq")] <- INLA::inla.qmarginal(c(0.025, 0.5, 0.975), m)
     df
   }
-  
+
   cat("\n")
   for (nm in names(object$bru_info$model$effects)) {
     eff <- object$bru_info$model$effects[[nm]]
@@ -1507,22 +1543,22 @@ print.summary_bru <- function(x, ...) {
 
 summary_bru <- function(object, ...) {
   .Deprecated(new = "summary")
-  
+
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
   for (k in 1:length(object$bru_info$lhoods)) {
     lh <- object$bru_info$lhoods[[k]]
     cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(object$bru_info$lhoods)[[k]], lh$family, class(lh$data), deparse(lh$formula)))
   }
-  
+
   # rownames(df) = names(object$bru_info$lhoods)
   # print(df)
-  
+
   cat("\n--- Criteria -------------------------------------------------------------------------------------\n\n")
   cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", object$waic$waic), "\n"))
   cat(paste0("Deviance Information Criterion (DIC): \t\t", sprintf("%1.3e", object$dic$dic), "\n"))
-  
+
   cat("\n--- Fixed effects -------------------------------------------------------------------------------- \n\n")
-  
+
   if (nrow(object$summary.fixed) > 0) {
     fe <- object$summary.fixed
     fe$kld <- NULL
@@ -1531,7 +1567,7 @@ summary_bru <- function(object, ...) {
   } else {
     cat("None.\n")
   }
-  
+
   cat("\n--- Random effects ------------------------------------------------------------------------------- \n\n")
   for (nm in names(object$summary.random)) {
     sm <- object$summary.random[[nm]]
@@ -1562,12 +1598,12 @@ summary_bru <- function(object, ...) {
   if (length(names(object$summary.random)) == 0) {
     cat("None.\n")
   }
-  
+
   cat("\n--- All hyper parameters (internal representation) ----------------------------------------------- \n\n")
   # cat(paste0("  ", paste(rownames(object$summary.hyperpar), collapse = ", "), "\n"))
   print(object$summary.hyperpar)
-  
-  
+
+
   marginal.summary <- function(m, name) {
     df <- data.frame(
       param = name,
@@ -1580,7 +1616,7 @@ summary_bru <- function(object, ...) {
     df[c("lq", "median", "uq")] <- INLA::inla.qmarginal(c(0.025, 0.5, 0.975), m)
     df
   }
-  
+
   cat("\n")
   for (nm in names(object$bru_info$model$effects)) {
     eff <- object$bru_info$model$effects[[nm]]

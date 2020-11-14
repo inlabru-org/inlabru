@@ -95,6 +95,8 @@ If \code{TRUE}, equivalent to \code{1L}. If \code{FALSE}, equivalent to \code{0L
 For \verb{[.bru_mapper_multi}, whether to extract an individual mapper when \code{i}
 identifies a single element.
 Default: \code{TRUE}}
+
+\item{value}{a character vector of up to the same length as x}
 }
 \value{
 \itemize{
@@ -110,6 +112,13 @@ sub-mappers list
 }
 \description{
 Implementation methods for mapper objects
+}
+\details{
+\itemize{
+\item \code{ibm_amatrix} for \code{bru_mapper_multi} requires an input data list
+of named inputs, and that the sub-mapper mappers are named, see
+\code{\link[=names.bru_mapper_multi]{names.bru_mapper_multi()}}
+}
 }
 \seealso{
 \code{\link[=bru_mapper]{bru_mapper()}}

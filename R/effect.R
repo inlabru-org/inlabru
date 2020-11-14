@@ -175,8 +175,10 @@ component <- function(...) {
 #' @export
 #' @param object A character label for the component
 #' @param main = NULL
-#' main takes an R expression that evaluates to where the latent variables should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
-#'   Arguments starting with weights, group, replicate behave similarly to main, but for the corresponding features of `INLA::f()`.
+#' main takes an R expression that evaluates to where the latent variables
+#' should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
+#' Arguments starting with weights, group, replicate behave similarly to main,
+#' but for the corresponding features of `INLA::f()`.
 #' @param model Either one of "offset", "factor_full", "factor_contrast", "linear" or a model name or
 #' object accepted by INLA's `f` function. If set to NULL, then "linear" is used.
 #' @param mapper
@@ -341,7 +343,8 @@ component.character <- function(object,
     label = label,
     inla.formula = NULL,
     main = bru_subcomponent(
-      input = bru_input(substitute(main),
+      input = bru_input(
+        substitute(main),
         label = label,
         layer = main_layer,
         selector = main_selector
@@ -350,20 +353,11 @@ component.character <- function(object,
       model = model,
       n = n,
       values = values,
-      season.length = season.length,
-      weights =
-        if (is.null(substitute(weights))) {
-          NULL
-        } else {
-          bru_input(substitute(weights),
-            label = paste0(label, ".weights"),
-            layer = weights_layer,
-            selector = weights_selector
-          )
-        }
+      season.length = season.length
     ),
     group = bru_subcomponent(
-      input = bru_input(substitute(group),
+      input = bru_input(
+        substitute(group),
         label = paste0(label, ".group"),
         layer = group_layer,
         selector = group_selector
@@ -373,7 +367,8 @@ component.character <- function(object,
       model = group_model
     ),
     replicate = bru_subcomponent(
-      input = bru_input(substitute(replicate),
+      input = bru_input(
+        substitute(replicate),
         label = paste0(label, ".repl"),
         layer = replicate_layer,
         selector = replicate_selector
@@ -382,6 +377,17 @@ component.character <- function(object,
       n = NULL,
       model = "iid"
     ),
+    weights =
+      if (is.null(substitute(weights))) {
+        NULL
+      } else {
+        bru_input(
+          substitute(weights),
+          label = paste0(label, ".weights"),
+          layer = weights_layer,
+          selector = weights_selector
+        )
+      },
     A.msk = A.msk,
     env = envir,
     env_extra = envir_extra
@@ -395,6 +401,13 @@ component.character <- function(object,
     component$main$mapper <- bru_mapper_offset()
     component$group$mapper <- bru_mapper_index(1L)
     component$replicate$mapper <- bru_mapper_index(1L)
+    # Add multi-mapper
+    component[["mapper"]] <-
+      bru_mapper_multi(list(
+        main = component$main$mapper,
+        group = component$group$mapper,
+        replicate = component$replicate$mapper
+      ))
   } else {
     # Construct a call to the f function from the parameters provided
     # Ultimately, this call will be converted to the model formula presented to INLA
@@ -681,6 +694,13 @@ add_mappers.component <- function(component, lhoods) {
     lhoods = lh,
     env = component$env
   )
+  # Add multi-mapper
+  component[["mapper"]] <-
+    bru_mapper_multi(list(
+      main = component$main$mapper,
+      group = component$group$mapper,
+      replicate = component$replicate$mapper
+    ))
 
   fcall <- component$fcall
 
@@ -744,8 +764,7 @@ bru_subcomponent <- function(input = NULL,
                              model = NULL,
                              n = NULL,
                              values = NULL,
-                             season.length = NULL,
-                             weights = NULL) {
+                             season.length = NULL) {
   type <- model
   factor_mapping <- NULL
   if (inherits(model, "inla.spde")) {
@@ -794,7 +813,6 @@ bru_subcomponent <- function(input = NULL,
       n = n,
       values = values,
       season.length = season.length,
-      weights = weights,
       factor_mapping = factor_mapping
     )
   class(subcomponent) <- c("bru_subcomponent", "list")
@@ -1334,17 +1352,27 @@ ibm_values.bru_mapper_multi <- function(mapper, multi = 0L, ...) {
   }
 }
 
+#' @details
+#' * `ibm_amatrix` for `bru_mapper_multi` requires an input data list
+#' of named inputs, and that the sub-mapper mappers are named, see
+#' [names.bru_mapper_multi()]
 #' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
-  A <- 
-    lapply(mapper[["mappers"]], function(x) {
-      ibm_amatrix(x, multi = multi - 1)
-    })
+  A <-
+    lapply(
+      names(mapper[["mappers"]]),
+      function(x) {
+        ibm_amatrix(mapper[["mappers"]][[x]],
+          input = input[[x]],
+          multi = multi - 1
+        )
+      }
+    )
   if (multi < 1) {
     # Combine the matrices (A1, A2, A3) -> rowkron(A3, rowkron(A2, A1))
     A_ <- A[[1]]
-    for (k in seq_len(mapper[["n"]] - 1)) {
+    for (k in seq_len(length(mapper[["mappers"]]) - 1)) {
       A_ <- INLA::inla.row.kron(A[[k + 1]], A_)
     }
     return(A_)
@@ -1393,6 +1421,7 @@ ibm_amatrix.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
   names(x[["mappers"]])
 }
 
+#' @param value a character vector of up to the same length as x
 #' @export
 #' @rdname bru_mapper_methods
 `names<-.bru_mapper_multi` <- function(x, value) {
@@ -1425,7 +1454,7 @@ summary.component <- function(object, ...) {
       deparse(object[["main"]][["input"]][["input"]]),
       object[["main"]][["type"]]
     ),
-    "Group" = 
+    "Group" =
       if (!is.null(object[["group"]][["input"]][["input"]])) {
         sprintf(
           "input '%s',\ttype '%s'",
@@ -1435,7 +1464,7 @@ summary.component <- function(object, ...) {
       } else {
         NULL
       },
-    "Replicate" = 
+    "Replicate" =
       if (!is.null(object[["replicate"]][["input"]][["input"]])) {
         sprintf(
           "input '%s',\ttype '%s'",
@@ -1487,44 +1516,9 @@ print.summary_component <- function(x, ...) {
 
 print.summary_component_list <- function(x, ...) {
   lapply(x, print)
-  invisible(x)          
+  invisible(x)
 }
 
-
-
-
-
-#' @export
-#' @keywords internal
-#' @param component An component.
-#' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
-#' @param ... Unused.
-#' @return An A-matrix.
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#' @rdname amatrix_eval
-
-amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
-  ## TODO: Check for offset component
-
-  val <- input_eval(subcomp$input, data, env = env)
-
-  if (!is.null(subcomp$weights)) {
-    weights <- input_eval(subcomp$weights, data, env = env)
-  } else {
-    weights <- 1.0
-  }
-  if (inherits(subcomp[["mapper"]], "bru_mapper")) {
-    A <- weights * ibm_amatrix(subcomp[["mapper"]], input = val)
-  } else {
-    stop(paste0(
-      "Unsupported mapper of class '",
-      paste0(class(subcomp[["mapper"]]), collapse = "', '"), "'",
-      " for subcomponent '", subcomp$label, "'"
-    ))
-  }
-
-  A
-}
 
 
 
@@ -1538,16 +1532,12 @@ amatrix_eval.bru_subcomponent <- function(subcomp, data, env = NULL, ...) {
 #' @rdname amatrix_eval
 
 amatrix_eval.component <- function(component, data, ...) {
-  ## TODO: Check for offset component
+  val <- input_eval(component, data)
+  A <- ibm_amatrix(component$mapper, input = val)
 
-  A.main <- amatrix_eval(component$main, data, component$env)
-  A.group <- amatrix_eval(component$group, data, component$env)
-  A.repl <- amatrix_eval(component$replicate, data, component$env)
-
-  A <- INLA::inla.row.kron(
-    A.repl,
-    INLA::inla.row.kron(A.group, A.main)
-  )
+  if (!is.null(val[["weights"]])) {
+    A <- val[["weights"]] * A
+  }
 
   # Mask columns of A
   # TODO: check what this feature is intended for!
@@ -1625,9 +1615,7 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #'
 #' @export
 #' @keywords internal
-#' @param component An component.
-#' @param part The input part to evaluate; `'main'`, `'group'`,
-#'   `'replicate'`, `'weights'`
+#' @param component A component.
 #' @param data A `data.frame` or Spatial* object of covariates and/or point locations. If null, return the component's map.
 #' @param ... Unused.
 #' @return An vector or a coordinate matrix
@@ -1635,18 +1623,30 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #' @rdname input_eval
 
 input_eval.component <- function(component,
-                                 part = c("main", "group", "replicate", "weights"),
                                  data,
                                  ...) {
-  part <- match.arg(part)
-  if (part %in% "weights") {
-    val <- input_eval(component[["main"]]$weights, data, component$env,
-      label = paste(component$label, "(main, weights)"), ...
-    )
-  } else {
-    val <- input_eval(component[[part]]$input, data, component$env,
-      label = paste0(component$label, " (", part, ")"), ...
-    )
+  val <- list()
+  # The names should be a subset of main, group, replicate
+  part_names <- names(component[["mapper"]])
+  for (part in part_names) {
+    val[[part]] <-
+      input_eval(
+        component[[part]]$input,
+        data,
+        env = component$env,
+        label = part,
+        ...
+      )
+  }
+  if (!is.null(component[["weights"]])) {
+    val[["weights"]] <-
+      input_eval(
+        component[["weights"]],
+        data,
+        env = component$env,
+        label = paste(component$label, "(weights)"),
+        ...
+      )
   }
   val
 }
@@ -1656,12 +1656,10 @@ input_eval.component <- function(component,
 
 input_eval.component_list <-
   function(components,
-           part = c("main", "group", "replicate", "weights"),
            data,
            ...) {
     part <- match.arg(part)
-    result <- lapply(components, function(x) input_eval(x, part = part, data = data, ...))
-    names(result) <- names(components)
+    result <- lapply(components, function(x) input_eval(x, data = data, ...))
     result
   }
 
@@ -1807,24 +1805,14 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 #' @keywords internal
 #' @param component An component.
 #' @param ... Unused.
-#' @return a list of indices into the components latent variables
+#' @return a list of inla-compatible indices into the latent variables
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com},
 #'   Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname index_eval
 
 index_eval.component <- function(component, ...) {
-  main <- component$main$values
-  group <- component$group$values
-  replicate <- component$replicate$values
-  m.n <- length(main)
-  g.n <- length(group)
-  r.n <- length(replicate)
-  idx <- list(
-    main = rep(main, times = g.n * r.n),
-    group = rep(rep(group, each = m.n), times = r.n),
-    repl = rep(replicate, each = m.n * g.n)
-  )
-  names(idx) <- paste0(component$label, c("", ".group", ".repl"))
+  idx <- ibm_values(component[["mapper"]], multi = 1)
+  names(idx) <- paste0(component[["label"]], c("", ".group", ".repl"))
   idx
 }
 

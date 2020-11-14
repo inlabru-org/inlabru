@@ -40,7 +40,7 @@ make.stack <- function(data,
   }
 
 
-  # Projection matrices (A) and mesh index effects
+  # Projection matrices (A) and inla-compatible indices
   A <- amatrix_eval(model$effects[included], data)
   effects <- index_eval(model$effects[included])
 

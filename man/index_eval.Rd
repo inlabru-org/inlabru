@@ -18,7 +18,7 @@ index_eval(...)
 \item{component}{An component.}
 }
 \value{
-a list of indices into the components latent variables
+a list of inla-compatible indices into the latent variables
 }
 \description{
 Indexes into to the components

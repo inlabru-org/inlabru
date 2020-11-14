@@ -12,12 +12,15 @@ test_that("Component construction: linear model", {
 
   # Covariate mapping
   df <- data.frame(x = 1:10)
-  expect_equal(input_eval(cmp, part = "main", data = df), 1:10)
+  expect_equal(
+    input_eval(cmp, data = df),
+    list(
+      main = 1:10,
+      group = rep(1, 10),
+      replicate = rep(1, 10)
+    )
+  )
 
-  # TODO: The following must be preceeded by an auto-model initialisation based on
-
-  # Index generator
-  # likelihood data.
   idx <- index_eval(cmp)
   expect_is(idx, "list")
   expect_equal(names(idx)[1], "beta")
@@ -36,7 +39,7 @@ test_that("Component construction: linear model", {
   v <- evaluate_effect_single(cmp, data = df, state = 2)
   expect_equivalent(v, 2 * df$x)
 
-  v <- evaluate_effect_single(cmp, data = df, state = 2, A)
+  v <- evaluate_effect_single(cmp, data = df, state = 2, A = A)
   expect_equivalent(v, 2 * df$x)
 
   cmps <- component_list(list(cmp))
