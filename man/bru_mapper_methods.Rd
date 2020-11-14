@@ -20,6 +20,12 @@
 \alias{ibm_n.bru_mapper_offset}
 \alias{ibm_values.bru_mapper_offset}
 \alias{ibm_amatrix.bru_mapper_offset}
+\alias{ibm_n.bru_mapper_multi}
+\alias{ibm_values.bru_mapper_multi}
+\alias{ibm_amatrix.bru_mapper_multi}
+\alias{[.bru_mapper_multi}
+\alias{names.bru_mapper_multi}
+\alias{names<-.bru_mapper_multi}
 \title{Implementation methods for mapper objects}
 \usage{
 \method{ibm_n}{inla.mesh}(mapper, ...)
@@ -57,6 +63,18 @@
 \method{ibm_values}{bru_mapper_offset}(mapper, ...)
 
 \method{ibm_amatrix}{bru_mapper_offset}(mapper, input, ...)
+
+\method{ibm_n}{bru_mapper_multi}(mapper, multi = 0L, ...)
+
+\method{ibm_values}{bru_mapper_multi}(mapper, multi = 0L, ...)
+
+\method{ibm_amatrix}{bru_mapper_multi}(mapper, input, multi = 0L, ...)
+
+\method{[}{bru_mapper_multi}(x, i, drop = TRUE)
+
+\method{names}{bru_mapper_multi}(x)
+
+\method{names}{bru_mapper_multi}(x) <- value
 }
 \arguments{
 \item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}
@@ -64,6 +82,31 @@
 \item{\dots}{Arguments passed on to other methods}
 
 \item{input}{The values for which to produce a mapping matrix}
+
+\item{multi}{integer or logical;
+If positive, the number of levels to recurse in a \code{bru_multi_mapper}.
+If \code{TRUE}, equivalent to \code{1L}. If \code{FALSE}, equivalent to \code{0L}.}
+
+\item{x}{object from which to extract element(s)}
+
+\item{i}{indices specifying element(s) to extract}
+
+\item{drop}{logical;
+For \verb{[.bru_mapper_multi}, whether to extract an individual mapper when \code{i}
+identifies a single element.
+Default: \code{TRUE}}
+}
+\value{
+\itemize{
+\item \code{[}-indexing a \code{bru_mapper_multi} extracts a subset
+\code{bru_mapper_multi} object (for drop \code{FALSE}) or an individual sub-mapper
+(for drop \code{TRUE}, and \code{i} identifies a single element)
+}
+
+\itemize{
+\item The \code{names()} method for \code{bru_mapper_multi} returns the names from the
+sub-mappers list
+}
 }
 \description{
 Implementation methods for mapper objects

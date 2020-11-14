@@ -1065,15 +1065,18 @@ bru_mapper.default <- function(mapper, ...) {
 #' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
 #' @seealso [bru_mapper()]
 #' @name bru_mapper_methods
+#' @export
 #' @rdname bru_mapper_methods
 ibm_n.inla.mesh <- function(mapper, ...) {
   mapper$n
 }
+#' @export
 #' @rdname bru_mapper_methods
 ibm_values.inla.mesh <- function(mapper, ...) {
   seq_len(mapper$n)
 }
 #' @param input The values for which to produce a mapping matrix
+#' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.inla.mesh <- function(mapper, input, ...) {
   if (!is.matrix(input) && !inherits(input, "Spatial")) {
@@ -1082,14 +1085,17 @@ ibm_amatrix.inla.mesh <- function(mapper, input, ...) {
   INLA::inla.spde.make.A(mapper, loc = input)
 }
 
+#' @export
 #' @rdname bru_mapper_methods
 ibm_n.inla.mesh.1d <- function(mapper, ...) {
   mapper$m
 }
+#' @export
 #' @rdname bru_mapper_methods
 ibm_values.inla.mesh.1d <- function(mapper, ...) {
   mapper$loc
 }
+#' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.inla.mesh.1d <- function(mapper, input, ...) {
   INLA::inla.spde.make.A(mapper, loc = input)
@@ -1107,14 +1113,17 @@ bru_mapper_index <- function(n = 1L, ...) {
   mapper
 }
 
+#' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_index <- function(mapper, ...) {
   mapper$n
 }
+#' @export
 #' @rdname bru_mapper_methods
 ibm_values.bru_mapper_index <- function(mapper, ...) {
   seq_len(mapper$n)
 }
+#' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.bru_mapper_index <- function(mapper, input, ...) {
   ok <- !is.na(input)
@@ -1134,15 +1143,18 @@ bru_mapper_linear <- function(...) {
   mapper
 }
 
+#' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_linear <- function(mapper, ...) {
   1L
 }
+#' @export
 #' @rdname bru_mapper_methods
 ibm_values.bru_mapper_linear <- function(mapper, ...) {
   1.0
 }
 
+#' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.bru_mapper_linear <- function(mapper, input, ...) {
   ok <- !is.na(input)
@@ -1182,10 +1194,12 @@ bru_mapper_factor <- function(values, factor_mapping, ...) {
   mapper
 }
 
+#' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_factor <- function(mapper, ...) {
   length(ibm_values(mapper))
 }
+#' @export
 #' @rdname bru_mapper_methods
 ibm_values.bru_mapper_factor <- function(mapper, ...) {
   if (identical(mapper$factor_mapping, "contrast")) {
@@ -1195,6 +1209,7 @@ ibm_values.bru_mapper_factor <- function(mapper, ...) {
   }
 }
 
+#' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.bru_mapper_factor <- function(mapper, input, ...) {
   if (is.factor(input)) {
@@ -1233,15 +1248,18 @@ bru_mapper_offset <- function(...) {
   mapper
 }
 
+#' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_offset <- function(mapper, ...) {
   0L
 }
+#' @export
 #' @rdname bru_mapper_methods
 ibm_values.bru_mapper_offset <- function(mapper, ...) {
   NULL
 }
 
+#' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.bru_mapper_offset <- function(mapper, input, ...) {
   ok <- !is.na(input)
@@ -1254,6 +1272,136 @@ ibm_amatrix.bru_mapper_offset <- function(mapper, input, ...) {
   )
   A
 }
+
+
+
+#' @param values Input values calculated by [input_eval.bru_input()]
+#' @param mappers A list of `bru_mapper` objects
+#' (TODO: add an `as.bru_mapper` generic to hook conversion methods onto)
+#' @export
+#' @rdname bru_mapper
+bru_mapper_multi <- function(mappers, ...) {
+  mapper <- list(
+    mappers = mappers,
+    n_multi = lapply(mappers, function(x) {
+      ibm_n(x)
+    }),
+    values_multi = lapply(mappers, function(x) {
+      ibm_values(x)
+    })
+  )
+  mapper[["n"]] <- prod(unlist(mapper[["n_multi"]]))
+  class(mapper) <- c("bru_mapper_multi", "bru_mapper", "list")
+  mapper
+}
+
+#' @param multi integer or logical;
+#' If positive, the number of levels to recurse in a `bru_multi_mapper`.
+#' If `TRUE`, equivalent to `1L`. If `FALSE`, equivalent to `0L`.
+#' @export
+#' @rdname bru_mapper_methods
+ibm_n.bru_mapper_multi <- function(mapper, multi = 0L, ...) {
+  if (multi > 1) {
+    lapply(mapper[["mappers"]], function(x) {
+      ibm_n(x, multi = multi - 1)
+    })
+  } else if (multi == 1) {
+    mapper[["n_multi"]]
+  } else {
+    mapper[["n"]]
+  }
+}
+#' @export
+#' @rdname bru_mapper_methods
+ibm_values.bru_mapper_multi <- function(mapper, multi = 0L, ...) {
+  if (multi > 1) {
+    lapply(mapper[["mappers"]], function(x) {
+      ibm_values(x, multi = multi - 1)
+    })
+  } else if (multi == 1) {
+    # Expand indices/values. First sub-mapper varies fastest
+    as.list(
+      do.call(
+        expand.grid,
+        c(
+          mapper[["values_multi"]],
+          list(stringsAsFactors = FALSE)
+        )
+      )
+    )
+  } else {
+    seq_len(mapper[["n"]])
+  }
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_amatrix.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
+  A <- 
+    lapply(mapper[["mappers"]], function(x) {
+      ibm_amatrix(x, multi = multi - 1)
+    })
+  if (multi < 1) {
+    # Combine the matrices (A1, A2, A3) -> rowkron(A3, rowkron(A2, A1))
+    A_ <- A[[1]]
+    for (k in seq_len(mapper[["n"]] - 1)) {
+      A_ <- INLA::inla.row.kron(A[[k + 1]], A_)
+    }
+    return(A_)
+  }
+  A
+}
+
+#' @return
+#' * `[`-indexing a `bru_mapper_multi` extracts a subset
+#'   `bru_mapper_multi` object (for drop `FALSE`) or an individual sub-mapper
+#'   (for drop `TRUE`, and `i` identifies a single element)
+#' @export
+#' @param x object from which to extract element(s)
+#' @param i indices specifying element(s) to extract
+#' @param drop logical;
+#' For `[.bru_mapper_multi`, whether to extract an individual mapper when `i`
+#' identifies a single element.
+#' Default: `TRUE`
+#' @rdname bru_mapper_methods
+`[.bru_mapper_multi` <- function(x, i, drop = TRUE) {
+  if (is.logical(i)) {
+    i <- which(i)
+  }
+  if (drop && (length(i) == 1) && (i > 0)) {
+    mapper <- x[["mappers"]][[i]]
+  } else if (length(i) == 0) {
+    mapper <- NULL
+  } else {
+    mapper <- list(
+      mappers = x[["mappers"]][i],
+      n_multi = x[["n_multi"]][i],
+      values_multi = x[["value_multi"]][i]
+    )
+    mapper[["n"]] <- prod(unlist(mapper[["n_multi"]]))
+    class(mapper) <- c("bru_mapper_multi", "bru_mapper", "list")
+  }
+  mapper
+}
+
+#' @return
+#' * The `names()` method for `bru_mapper_multi` returns the names from the
+#' sub-mappers list
+#' @export
+#' @rdname bru_mapper_methods
+`names.bru_mapper_multi` <- function(x) {
+  names(x[["mappers"]])
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+`names<-.bru_mapper_multi` <- function(x, value) {
+  names(x[["mappers"]]) <- value
+  names(x[["n_multi"]]) <- value
+  names(x[["values_multi"]]) <- value
+  x
+}
+
 
 
 # OPERATORS ----

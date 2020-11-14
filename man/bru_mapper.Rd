@@ -10,6 +10,7 @@
 \alias{bru_mapper_linear}
 \alias{bru_mapper_factor}
 \alias{bru_mapper_offset}
+\alias{bru_mapper_multi}
 \title{Methods for \code{bru_mapper} objects}
 \usage{
 bru_mapper(...)
@@ -29,6 +30,8 @@ bru_mapper_linear(...)
 bru_mapper_factor(values, factor_mapping, ...)
 
 bru_mapper_offset(...)
+
+bru_mapper_multi(mappers, ...)
 }
 \arguments{
 \item{\dots}{Arguments passed on to other methods}
@@ -46,6 +49,9 @@ bru_mapper_offset(...)
 \item \code{'contrast'} for leaving out the first factor level.
 \item \code{'full'} for keeping all levels.
 }}
+
+\item{mappers}{A list of \code{bru_mapper} objects
+(TODO: add an \code{as.bru_mapper} generic to hook conversion methods onto)}
 }
 \description{
 Methods for \code{bru_mapper} objects
