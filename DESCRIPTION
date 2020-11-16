@@ -36,7 +36,8 @@ Imports:
     Matrix,
     rgdal,
     rgeos,
-    utils
+    utils,
+    withr
 Suggests:
     covr,
     dplyr,

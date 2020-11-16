@@ -1,8 +1,30 @@
-disable_PROJ6_warnings <- function() {
-  options("rgdal_show_exportToProj4_warnings" = "none")
-  requireNamespace("rgdal")
+#' Disable PROJ4/6 warnings
+#' 
+#' To be used within package tests. Restores state on exit.
+#' 
+#' @param envir environment for exit handlers
+#' @export
+#' @keywords internal
+disable_PROJ6_warnings <- function(envir = parent.frame()) {
+  withr::local_options(
+    list("rgdal_show_exportToProj4_warnings" = "none"),
+    envir
+  )
+  requireNamespace("rgdal", quietly = TRUE)
   if (fm_has_PROJ6()) {
+    old1 <- rgdal::get_rgdal_show_exportToProj4_warnings()
     rgdal::set_rgdal_show_exportToProj4_warnings(FALSE)
+    withr::defer(
+      rgdal::set_rgdal_show_exportToProj4_warnings(old1),
+      envir = envir
+    )
+
+    old2 <- rgdal::get_thin_PROJ6_warnings()
+    rgdal::set_thin_PROJ6_warnings(TRUE)
+    withr::defer(
+      rgdal::set_thin_PROJ6_warnings(old2),
+      envir = envir
+    )
     rgdal::set_thin_PROJ6_warnings(TRUE)
   }
 }
@@ -17,6 +39,7 @@ basic_intercept_testdata <- function() {
 }
 
 basic_fixed_effect_testdata <- function() {
+  set.seed(123)
   cbind(
     basic_intercept_testdata(),
     data.frame(x1 = rnorm(100))
