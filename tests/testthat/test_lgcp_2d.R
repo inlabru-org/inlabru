@@ -1,5 +1,3 @@
-context("2D LGCP fitting and prediction (test_lgcp_2d.R)")
-
 test_that("2D LGCP fitting", {
   skip_on_cran()
   skip_if_not(bru_safe_inla())
@@ -11,8 +9,7 @@ test_that("2D LGCP fitting", {
     control.inla = list(
       int.strategy = "eb",
       h = 0.005
-    ),
-    num.threads = "1:1"
+    )
   )
 
   data(gorillas, package = "inlabru")
@@ -75,7 +72,7 @@ test_that("2D LGCP fitting", {
   set.seed(123L)
   pr <- predict(fit, loc, ~mySmooth,
     n.samples = 5, seed = 5657L,
-    num.threads = "1:1", parallel.configs = FALSE
+    parallel.configs = FALSE
   )
   # Prediction variability includes reordeing differences, so need large
   # tolerances unless n.samples is large
@@ -95,7 +92,7 @@ test_that("2D LGCP fitting", {
   set.seed(123L)
   Lambda <- predict(fit, ips, ~ sum(weight * exp(mySmooth + Intercept)),
     n.samples = 5, seed = 5657L,
-    num.threads = "1:1", parallel.configs = FALSE
+    parallel.configs = FALSE
   )
 
   expect_equal(

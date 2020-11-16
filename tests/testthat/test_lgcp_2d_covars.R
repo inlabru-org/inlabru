@@ -1,5 +1,3 @@
-context("2D LGCP fitting and prediction - Covariates (test_lgcp_2d_covars.R)")
-
 test_that("2D LGCP fitting", {
   disable_PROJ6_warnings()
   skip_if_not(bru_safe_inla())
@@ -19,9 +17,7 @@ test_that("2D LGCP fitting", {
       control.inla = list(
         int.strategy = "eb",
         h = 0.005
-      ),
-      num.threads = "1:1",
-      control.fixed = list(expand.factor.strategy = "inla")
+      )
     )
   )
 
@@ -50,8 +46,7 @@ test_that("2D LGCP fitting", {
       control.inla = list(
         int.strategy = "eb",
         h = 0.005
-      ),
-      num.threads = "1:1"
+      )
     )
   )
 
@@ -77,8 +72,7 @@ test_that("2D LGCP fitting", {
       control.inla = list(
         int.strategy = "eb",
         h = 0.005
-      ),
-      num.threads = "1:1"
+      )
     )
   )
 

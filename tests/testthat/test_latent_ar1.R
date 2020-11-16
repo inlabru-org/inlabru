@@ -1,5 +1,3 @@
-context("Latent models - AR1 (test_latent_ar1.R)")
-
 latent_ar1_testdata <- function() {
   data1 <- data.frame(
     time = c(1, 2, 3, 5, 4),
@@ -81,14 +79,17 @@ test_that("Latent models: AR1 bru ordering", {
   # Check AR1
   expect_equal(
     data$fit[[1]]$summary.random$time$mean,
-    c(1, 2, 1, 2, 4), midtol
+    c(1, 2, 1, 2, 4),
+    tolerance = midtol
   )
   expect_equal(
     data$fit[[2]]$summary.random$time$mean,
-    c(1, 2, 1, 2, 4), midtol
+    c(1, 2, 1, 2, 4),
+    tolerance = midtol
   )
   expect_equal(
     data$fit[[3]]$summary.random$time$mean,
-    c(1, 2, 1, 2, 4), midtol
+    c(1, 2, 1, 2, 4), 
+    tolerance = midtol
   )
 })

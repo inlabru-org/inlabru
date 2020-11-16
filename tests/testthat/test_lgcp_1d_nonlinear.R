@@ -1,5 +1,3 @@
-context("1D LGCP fitting and prediction - nonlinear (test_lgcp_1d_nonlinear.R)")
-
 test_that("Mexdolphin: Hazard rate detection function", {
   skip_if_not(bru_safe_inla())
   data(mexdolphin, package = "inlabru")

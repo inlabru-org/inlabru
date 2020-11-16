@@ -1,5 +1,3 @@
-context("Latent models - linear (test_latent_linear.R)")
-
 test_that("bru: linear component", {
   skip_on_cran()
   skip_if_not(bru_safe_inla())
@@ -15,8 +13,8 @@ test_that("bru: linear component", {
     options = list(num.threads = "1:1")
   )
 
-  expect_equal(fit$summary.fixed["myLin", "mean"], 2.02, midtol)
-  expect_equal(fit$summary.fixed["myLin", "sd"], 0.0126, midtol)
+  expect_equal(fit$summary.fixed["myLin", "mean"], 2.002273, tolerance = midtol)
+  expect_equal(fit$summary.fixed["myLin", "sd"], 0.01323361, tolerance = midtol)
 
   pr <- predict(
     fit,
@@ -26,5 +24,5 @@ test_that("bru: linear component", {
     seed = 1L
   )
 
-  expect_equal(pr[, "mean"], c(3.005013, 5.010026), midtol)
+  expect_equal(pr[, "mean"], c(3.005013, 5.010026), tolerance = midtol)
 })

@@ -1,5 +1,3 @@
-context("Latent models - factor (test_latent_factor.R)")
-
 test_that("bru: factor component", {
   skip_on_cran()
   skip_if_not(bru_safe_inla())
@@ -63,12 +61,12 @@ test_that("bru: factor component", {
   expect_equal(
     fit$summary.random$fac1$mean,
     c(-3.072353, -1.092120),
-    midtol
+    tolerance = midtol
   )
   expect_equal(
     fit$summary.random$fac1$sd,
     c(0.04371715, 0.05016696),
-    midtol
+    tolerance = midtol
   )
   expect_equal(
     fit$summary.random$fac2$mean,
@@ -76,7 +74,7 @@ test_that("bru: factor component", {
       1.213684, -1.723465,
       1.310543, -1.671742, 1.302144, -1.700765, 1.271106
     ),
-    midtol
+    tolerance = midtol
   )
   expect_equal(
     fit$summary.random$fac2$sd,
@@ -84,7 +82,7 @@ test_that("bru: factor component", {
       0.5222028, 0.5208762,
       0.5213029, 0.5213029, 0.5213029, 0.5213029, 0.5213029
     ),
-    midtol
+    tolerance = midtol
   )
 
   # Check if prediction works
@@ -98,6 +96,14 @@ test_that("bru: factor component", {
     n.samples = 5,
     seed = 1
   )
-  expect_equal(pr[, "mean"], c(1.137234, -1.941325, -2.878998), midtol)
-  expect_equal(pr[, "sd"], c(0.5700744, 0.5840021, 0.5656757), midtol)
+  expect_equal(
+    pr[, "mean"],
+    c(1.137234, -1.941325, -2.878998),
+    tolerance = midtol
+  )
+  expect_equal(
+    pr[, "sd"],
+    c(0.5700744, 0.5840021, 0.5656757),
+    tolerance = midtol
+  )
 })

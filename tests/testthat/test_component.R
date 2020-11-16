@@ -1,4 +1,3 @@
-context("Component construction (test_component.R)")
 test_that("Component construction: linear model", {
   df <- data.frame(x = 1:10)
 
@@ -22,7 +21,7 @@ test_that("Component construction: linear model", {
   )
 
   idx <- index_eval(cmp)
-  expect_is(idx, "list")
+  expect_type(idx, "list")
   expect_equal(names(idx)[1], "beta")
   expect_equal(names(idx)[2], "beta.group")
   expect_equal(names(idx)[3], "beta.repl")
@@ -30,17 +29,17 @@ test_that("Component construction: linear model", {
 
   # A-matrix
   A <- amatrix_eval(cmp, data = df)
-  expect_is(A, "dgCMatrix")
+  expect_s4_class(A, "dgCMatrix")
   expect_equal(nrow(A), 10)
   expect_equal(ncol(A), 1)
   expect_equal(as.vector(A), 1:10)
 
   # Value
   v <- evaluate_effect_single(cmp, data = df, state = 2)
-  expect_equivalent(v, 2 * df$x)
+  expect_equal(v, 2 * df$x, ignore_attr = TRUE)
 
   v <- evaluate_effect_single(cmp, data = df, state = 2, A = A)
-  expect_equivalent(v, 2 * df$x)
+  expect_equal(v, 2 * df$x, ignore_attr = TRUE)
 
   cmps <- component_list(list(cmp))
   v <- evaluate_effect_multi(
@@ -48,7 +47,7 @@ test_that("Component construction: linear model", {
     data = df,
     state = list(list(beta = 2))
   )
-  expect_equivalent(v[[1]][["beta"]], 2 * df$x)
+  expect_equal(v[[1]][["beta"]], 2 * df$x, ignore_attr = TRUE)
 
   v <- evaluate_effect_multi(
     cmps,
@@ -56,7 +55,7 @@ test_that("Component construction: linear model", {
     state = list(list(beta = 2)),
     A = list(beta = A)
   )
-  expect_equivalent(v[[1]][["beta"]], 2 * df$x)
+  expect_equal(v[[1]][["beta"]], 2 * df$x, ignore_attr = TRUE)
 })
 
 
@@ -67,9 +66,10 @@ test_that("Component construction: offset", {
     data = data.frame(a = 11:15),
     state = NULL
   )
-  expect_equivalent(
+  expect_equal(
     val,
-    11:15
+    11:15,
+    ignore_attr = TRUE
   )
 })
 

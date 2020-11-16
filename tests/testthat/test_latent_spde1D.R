@@ -1,5 +1,3 @@
-context("Latent models - 1D SPDE (test_latent_spde1D.R)")
-
 latent_spde1D_testdata <- function() {
   data(Poisson2_1D, package = "inlabru")
   x <- seq(0, 55, length = 50)
@@ -16,8 +14,7 @@ latent_spde1D_testdata <- function() {
     data = countdata2, family = "poisson",
     options = list(
       E = countdata2$exposure,
-      control.inla = list(h = 0.005),
-      num.threads = "1:1"
+      control.inla = list(h = 0.005)
     )
   )
 
@@ -35,11 +32,16 @@ test_that("Latent models: SPDE 1D", {
   data <- latent_spde1D_testdata()
 
   # Check Intercept
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], 5.684758, midtol)
+  expect_equal(
+    data$fit$summary.fixed["Intercept", "mean"],
+    5.684758,
+    tolerance = midtol
+  )
 
   # Check SPDE
   expect_equal(
     data$fit$summary.random$field$mean[c(1, 25, 50)],
-    c(-4.916781, -4.285672, -6.837233), midtol
+    c(-4.916781, -4.285672, -6.837233),
+    tolerance = midtol
   )
 })

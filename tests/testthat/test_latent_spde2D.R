@@ -1,6 +1,4 @@
-context("Latent models - 2D SPDE - Group parameter (test_latent_spde2D.R)")
-
-latent_spde2D_group_testdata <- function(num.threads = "1:1",
+latent_spde2D_group_testdata <- function(num.threads = NULL,
                                          tolerance = NULL,
                                          h = 0.005) {
   set.seed(123)
@@ -55,22 +53,28 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_if_not(bru_safe_inla())
   expect_warning(
     {
-      data <- latent_spde2D_group_testdata(num.threads = "1:1", h = 0.005)
+      data <- latent_spde2D_group_testdata(h = 0.005)
     },
     "export to PROJ failed: generic error of unknown origin"
   )
 
   # Check Intercept
-  expect_equal(data$fit$summary.fixed["Intercept", "mean"], -8.8628, midtol)
+  expect_equal(
+    data$fit$summary.fixed["Intercept", "mean"],
+    -8.8628,
+    tolerance = midtol
+  )
 
   # Check SPDE
   expect_equal(
     data$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    c(-0.8247674, -2.3758650, 0.9492320), midtol
+    c(-0.8247674, -2.3758650, 0.9492320),
+    tolerance = midtol
   )
   expect_equal(
     data$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
-    c(0.9502163, 1.1058397, 0.6451496), midtol
+    c(0.9502163, 1.1058397, 0.6451496),
+    tolerance = midtol
   )
   expect_error(spde.posterior(data$fit, "mySmooth", what = "range"), NA)
 })
