@@ -2,16 +2,20 @@
 
 * Method for updating old stored estimation objects
 
+* System for supplying mappings between latent models and evaluated effects
+  via `bru_mapper` objects
+
 # inlabru 2.1.14.900
 
 * Improved factor support; Either as "contrast with the 1st level", via the
-  special "factor_contrast" model, or all levels with model "factor_full".
+  special `"factor_contrast"` model, or all levels with model `"factor_full"`.
   Further options planned (e.g. a simpler options to fix the precision
-  parameter).  The estimated coefficients appear as random effects in the inla output.
+  parameter).  The estimated coefficients appear as random effects in the
+  `inla()` output.
 
 * Interface restructuring to support new features while keeping most
-  backwards compatibility. Change "map=" to "main=" or unnamed first argument;
-  Since "main" is the first parameter, it doesn't need to be a named argument.
+  backwards compatibility. Change `map=` to `main=` or unnamed first argument;
+  Since `main` is the first parameter, it doesn't need to be a named argument.
 
 * Keep components with zero derivative in the linearisation
 
@@ -24,7 +28,7 @@
 * New backend code to make extended feature support easier
 
 * New int.args option to control spatial integration resolution,
-  thanks to Martin Jullum (martinju)
+  thanks to Martin Jullum (`martinju`)
 
 # inlabru 2.1.13
 
@@ -53,7 +57,7 @@
 * Prevent int.polygon from integrating outside the mesh domain,
   and generally more robust integration scheme construction.
 
-* Fix bru() to like() parameter logic. (Thanks to Peter Vesk for bug example)
+* Fix `bru()` to `like()` parameter logic. (Thanks to Peter Vesk for bug example)
 
 # inlabru 2.1.7
 
