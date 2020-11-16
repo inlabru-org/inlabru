@@ -1,7 +1,8 @@
+local_bru_testthat_setup()
+
 test_that("2D LGCP fitting", {
   skip_on_cran()
-  skip_if_not(bru_safe_inla())
-  disable_PROJ6_warnings()
+  local_bru_safe_inla()
 
   set.seed(123L)
 

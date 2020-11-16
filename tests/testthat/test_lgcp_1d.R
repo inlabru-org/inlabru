@@ -1,3 +1,5 @@
+local_bru_testthat_setup()
+
 test_data <- function() {
   data(Poisson2_1D, package = "inlabru")
   x <- seq(0, 55, length = 50)
@@ -22,7 +24,7 @@ test_data <- function() {
 
 test_that("1D LGCP fitting", {
   skip_on_cran()
-  skip_if_not(bru_safe_inla())
+  local_bru_safe_inla()
 
   result <- test_data()
   mesh1D <- result$mesh1D
@@ -111,7 +113,7 @@ test_data_discrete <- function() {
 
 test_that("1D LGCP fitting", {
   skip_on_cran()
-  skip_if_not(bru_safe_inla())
+  local_bru_safe_inla()
 
   result <- test_data_discrete()
   mesh1D <- result$mesh1D

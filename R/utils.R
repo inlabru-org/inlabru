@@ -8,7 +8,7 @@
 #' not allowed (used for examples and unit tests).
 #' @param quietly logical; if `TRUE`, prints diagnostic messages. A message is
 #' always printed if the INLA `num.threads` option is altered, regardless of the
-#' `quietly` argument. Default: TRUE.
+#' `quietly` argument. Default: FALSE.
 #' @export
 #' @return logical; `TRUE` if INLA was loaded safely, otherwise FALSE
 #'
@@ -19,7 +19,7 @@
 #' }
 #' }
 #'
-bru_safe_inla <- function(multicore = FALSE, quietly = TRUE) {
+bru_safe_inla <- function(multicore = FALSE, quietly = FALSE) {
   if (requireNamespace("INLA", quietly = TRUE)) {
     if (!multicore) {
       n.t <- INLA::inla.getOption("num.threads")
@@ -27,10 +27,12 @@ bru_safe_inla <- function(multicore = FALSE, quietly = TRUE) {
         message(paste0("Current num.threads is '", n.t, "'."))
       }
       if (!identical(n.t, "1:1")) {
-        message(paste0(
-          "Setting INLA option num.threads to '1:1'.",
-          " Previous value '", n.t, "'."
-        ))
+        if (!quietly) {
+          message(paste0(
+            "Setting INLA option num.threads to '1:1'.",
+            " Previous value '", n.t, "'."
+          ))
+        }
         INLA::inla.setOption(num.threads = "1:1")
       } else {
         if (!quietly) {

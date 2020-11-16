@@ -1,6 +1,8 @@
+local_bru_testthat_setup()
+
 test_that("bru: linear component", {
   skip_on_cran()
-  skip_if_not(bru_safe_inla())
+  local_bru_safe_inla()
 
   # Seed influences data as well as predict()!
   set.seed(123)

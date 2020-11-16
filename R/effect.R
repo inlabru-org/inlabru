@@ -865,9 +865,23 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
         is_factor <- vapply(inp_, function(x) is.factor(x), TRUE)
         if (any(is_spatial)) {
           if (!all(is_spatial)) {
-            stop("Inconsistent input types; spatial and non-spatial")
+            stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
           }
-          message("TODO: Ensure spatial input objects use the same CRS")
+          inconsistent_crs <- FALSE
+          inp_crs <- lapply(inp_, fm_sp_get_crs)
+          if (fm_has_PROJ6()) {
+            crs_info <- lapply(inp_crs, fm_crs_get_wkt)
+            null_crs <- vapply(crs_info, is.null, logical(1))
+            inconsistent_crs <-
+              (length(unique(unlist(crs_info))) > 1) ||
+              (any(null_crs) && !all(null_crs))
+          } else {
+            crs_info <- vapply(inp_crs, fm_CRSargs, "")
+            inconsistent_crs <- length(unique(crs_info)) > 1
+          }
+          if (inconsistent_crs) {
+            stop("Inconsistent spatial CRS information. Unable to infer mapper information.")
+          }
           inp_values <- unique(do.call(
             rbind,
             lapply(

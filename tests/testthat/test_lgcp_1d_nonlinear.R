@@ -1,5 +1,8 @@
+local_bru_testthat_setup()
+
 test_that("Mexdolphin: Hazard rate detection function", {
-  skip_if_not(bru_safe_inla())
+  skip_on_cran()
+  local_bru_safe_inla()
   data(mexdolphin, package = "inlabru")
 
   hr <- function(distance, lsig) {

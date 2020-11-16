@@ -1,6 +1,8 @@
+local_bru_testthat_setup()
+
 test_that("bru: factor component", {
   skip_on_cran()
-  skip_if_not(bru_safe_inla())
+  local_bru_safe_inla()
 
   # Required for reproducible predict() and generate() output.
   set.seed(1234L)

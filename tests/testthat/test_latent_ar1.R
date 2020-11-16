@@ -1,3 +1,5 @@
+local_bru_testthat_setup()
+
 latent_ar1_testdata <- function() {
   data1 <- data.frame(
     time = c(1, 2, 3, 5, 4),
@@ -73,7 +75,7 @@ old <- function() {
 
 test_that("Latent models: AR1 bru ordering", {
   skip_on_cran()
-  skip_if_not(bru_safe_inla())
+  local_bru_safe_inla()
   data <- latent_ar1_testdata()
 
   # Check AR1

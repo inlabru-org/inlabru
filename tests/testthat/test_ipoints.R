@@ -1,5 +1,7 @@
+local_bru_testthat_setup()
+
 test_that("1D integration points can be generated", {
-  disable_PROJ6_warnings()
+  local_bru_safe_inla()
   ips <- ipoints(c(0, 10), 3, name = "myDim")
 
   expect_s3_class(ips, "data.frame")
@@ -12,7 +14,7 @@ test_that("1D integration points can be generated", {
 
 
 test_that("conversion of 1D mesh to integration points", {
-  disable_PROJ6_warnings()
+  local_bru_safe_inla()
   mesh <- INLA::inla.mesh.1d(seq(0, 10, by = 1))
   ips <- ipoints(mesh, name = "time")
 
@@ -26,7 +28,7 @@ test_that("conversion of 1D mesh to integration points", {
 })
 
 test_that("conversion of SpatialPolygon to integration points", {
-  disable_PROJ6_warnings()
+  local_bru_safe_inla()
   data(gorillas, package = "inlabru")
   expect_warning(
     ips <- ipoints(gorillas$boundary),
@@ -40,7 +42,7 @@ test_that("conversion of SpatialPolygon to integration points", {
 })
 
 test_that("conversion of SpatialPolygon to integration points when domain is defined via a mesh", {
-  disable_PROJ6_warnings()
+  local_bru_safe_inla()
   data(gorillas, package = "inlabru")
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
   expect_warning(
@@ -57,7 +59,7 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
 })
 
 test_that("conversion of 2D mesh to integration points", {
-  disable_PROJ6_warnings()
+  local_bru_safe_inla()
   data(gorillas, package = "inlabru")
   ips <- ipoints(gorillas$mesh)
 
@@ -67,9 +69,9 @@ test_that("conversion of 2D mesh to integration points", {
 })
 
 test_that("SpatialLinesDataFrame to integration points using grouping parameter", {
-  disable_PROJ6_warnings()
+  local_bru_safe_inla()
   data(mrsea, package = "inlabru")
-  mrsea <- mrsea_rebuild_CRS(mrsea, use_km = FALSE)
+  mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = FALSE)
   expect_warning(
     ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
     "export to PROJ failed: generic error of unknown origin"
@@ -83,7 +85,7 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
   expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
 
   data(mrsea, package = "inlabru")
-  mrsea <- mrsea_rebuild_CRS(mrsea, use_km = TRUE)
+  mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = TRUE)
   expect_warning(
     ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
     "export to PROJ failed: generic error of unknown origin"

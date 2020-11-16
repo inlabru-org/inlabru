@@ -1,3 +1,5 @@
+local_bru_testthat_setup()
+
 latent_spde2D_group_testdata <- function(num.threads = NULL,
                                          tolerance = NULL,
                                          h = 0.005) {
@@ -5,7 +7,7 @@ latent_spde2D_group_testdata <- function(num.threads = NULL,
 
   # Load and reduce data set
   data(mrsea, package = "inlabru")
-  mrsea <- mrsea_rebuild_CRS(mrsea, use_km = TRUE)
+  mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = TRUE)
   mrsea$points <- mrsea$points[mrsea$points$season == 1 |
     mrsea$points$season == 2, ]
   mrsea$samplers <- mrsea$samplers[mrsea$samplers$season == 1 |
@@ -49,8 +51,7 @@ latent_spde2D_group_testdata <- function(num.threads = NULL,
 
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_on_cran()
-  disable_PROJ6_warnings()
-  skip_if_not(bru_safe_inla())
+  local_bru_safe_inla()
   expect_warning(
     {
       data <- latent_spde2D_group_testdata(h = 0.005)
