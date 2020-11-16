@@ -64,7 +64,7 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: parallel
 #> Loading required package: foreach
-#> This is INLA_99.99.9999 built 2020-10-28 14:12:33 UTC.
+#> This is INLA_99.99.9999 built 2020-11-16 11:55:26 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
@@ -85,7 +85,6 @@ fit <- lgcp(cmp,
             samplers = gorillas$boundary,
             domain = list(coordinates = gorillas$mesh),
             options = list(control.inla = list(int.strategy = "eb")))
-#> TODO: Ensure spatial input objects use the same CRS
 
 # Predict Gorilla nest intensity
 lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
