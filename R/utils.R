@@ -4,8 +4,10 @@
 #' optionally checks and sets the multicore `num.threads` INLA option.
 #'
 #' @param multicore logical; if `TRUE`, multiple cores are allowed, and the
-#' INLA `num.threads` option is not checked or altered. Default: FALSE, multicore
-#' not allowed (used for examples and unit tests).
+#' INLA `num.threads` option is not checked or altered.
+#' If `FALSE`, forces `num.threads="1:1"`. Default: NULL, checks
+#' if running in testthat or non-interactively, in which case sets
+#' `multicore=FALSE`, otherwise `TRUE`.
 #' @param quietly logical; if `TRUE`, prints diagnostic messages. A message is
 #' always printed if the INLA `num.threads` option is altered, regardless of the
 #' `quietly` argument. Default: FALSE.
@@ -19,8 +21,12 @@
 #' }
 #' }
 #'
-bru_safe_inla <- function(multicore = FALSE, quietly = FALSE) {
+bru_safe_inla <- function(multicore = NULL,
+                          quietly = FALSE) {
   if (requireNamespace("INLA", quietly = TRUE)) {
+    multicore <-
+      !identical(Sys.getenv("TESTTHAT"), "true") ||
+      interactive() 
     if (!multicore) {
       n.t <- INLA::inla.getOption("num.threads")
       if (!quietly) {
@@ -43,7 +49,7 @@ bru_safe_inla <- function(multicore = FALSE, quietly = FALSE) {
     TRUE
   } else {
     if (!quietly) {
-      print("INLA not loaded safely.")
+      message("INLA not loaded safely.")
     }
     FALSE
   }
