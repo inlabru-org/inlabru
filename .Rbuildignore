@@ -11,3 +11,5 @@
 ^\.github$
 ^tmp$
 ^check$
+^_pkgdown\.yml$
+^pkgdown$
