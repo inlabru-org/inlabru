@@ -77,8 +77,7 @@ bincount <- function(result, predictor, observations, breaks, nint = 20, probs =
   points$bin <- rep(1:nbins, each = nint)
 
   # Sampler
-  smp <- generate(result, points, predictor, ...)
-  smp <- do.call(cbind, smp)
+  smp <- generate(result, points, predictor, ..., format = "matrix")
 
   # Integrate per bin
   smp <- ip$wl * smp
