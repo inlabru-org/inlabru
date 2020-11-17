@@ -1367,19 +1367,35 @@ ibm_values.bru_mapper_multi <- function(mapper, multi = 0L, ...) {
 }
 
 #' @details
-#' * `ibm_amatrix` for `bru_mapper_multi` requires an input data list
-#' of named inputs, and that the sub-mapper mappers are named, see
-#' [names.bru_mapper_multi()]
+#' * `ibm_amatrix` for `bru_mapper_multi` accepts a list with
+#' named entries, or a list with unnamed but ordered elements.
+#' The names must match the sub-mappers, see [names.bru_mapper_multi()].
+#' Each list element should take a format accepted by the corresponding
+#' sub-mapper. In case each element is a vector, the input can be given as a
+#' data.frame with named columns, a matrix with named columns, or a matrix
+#' with unnamed but ordered columns.
 #' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
+  by_number <- FALSE
+  if (is.matrix(input)) {
+    if (is.null(colnames(input))) {
+      by_number <- TRUE
+    }
+    input <- as.data.frame(input)
+  }
+  if (by_number || is.null(names(input))) {
+    indexing <- seq_along(mapper[["mappers"]])
+  } else {
+    indexing <- names(mapper[["mappers"]])
+  }
   A <-
     lapply(
-      names(mapper[["mappers"]]),
+      indexing,
       function(x) {
         ibm_amatrix(mapper[["mappers"]][[x]],
-          input = input[[x]],
-          multi = multi - 1
+                    input = input[[x]],
+                    multi = multi - 1
         )
       }
     )

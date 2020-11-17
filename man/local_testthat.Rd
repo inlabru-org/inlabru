@@ -87,8 +87,9 @@ see also \code{\link[=bru_safe_inla]{bru_safe_inla()}}
 
 \item \code{local_bru_testthat_setup}: Initialise environment for tests.
 Disables PROJ4/PROJ6 warnings, and assigns tolerance variables.
-Do \emph{not} call \code{\link[=local_bru_safe_inla]{local_bru_safe_inla()}}, since that may invoke a skip and
-should be called in each test that relies on INLA.
+To be called either at the top of a testfile, or inside tests.
+Does \emph{not} call \code{\link[=local_bru_safe_inla]{local_bru_safe_inla()}}, since that may invoke a skip and
+should be called inside each test that relies on INLA.
 }}
 
 \keyword{internal}

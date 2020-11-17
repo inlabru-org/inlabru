@@ -115,9 +115,13 @@ Implementation methods for mapper objects
 }
 \details{
 \itemize{
-\item \code{ibm_amatrix} for \code{bru_mapper_multi} requires an input data list
-of named inputs, and that the sub-mapper mappers are named, see
-\code{\link[=names.bru_mapper_multi]{names.bru_mapper_multi()}}
+\item \code{ibm_amatrix} for \code{bru_mapper_multi} accepts a list with
+named entries, or a list with unnamed but ordered elements.
+The names must match the sub-mappers, see \code{\link[=names.bru_mapper_multi]{names.bru_mapper_multi()}}.
+Each list element should take a format accepted by the corresponding
+sub-mapper. In case each element is a vector, the input can be given as a
+data.frame with named columns, a matrix with named columns, or a matrix
+with unnamed but ordered columns.
 }
 }
 \seealso{
