@@ -6,6 +6,8 @@
 \alias{ibm_values}
 \alias{ibm_amatrix}
 \alias{bru_mapper.default}
+\alias{bru_mapper.inla.mesh}
+\alias{bru_mapper.inla.mesh.1d}
 \alias{bru_mapper_index}
 \alias{bru_mapper_linear}
 \alias{bru_mapper_factor}
@@ -23,6 +25,10 @@ ibm_amatrix(mapper, input, ...)
 
 \method{bru_mapper}{default}(mapper, ...)
 
+\method{bru_mapper}{inla.mesh}(mesh, ...)
+
+\method{bru_mapper}{inla.mesh.1d}(mesh, indexed = NULL, ...)
+
 bru_mapper_index(n = 1L, ...)
 
 bru_mapper_linear(...)
@@ -39,6 +45,15 @@ bru_mapper_multi(mappers, ...)
 \item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}
 
 \item{input}{The values for which to produce a mapping matrix}
+
+\item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
+
+\item{indexed}{logical; If \code{TRUE}, the \code{ibm_values()} output will be the
+integer indexing sequence for the latent variables (needed for \code{spde} models).
+If \code{FALSE}, the knot
+locations are returned (useful as an interpolator for \code{rw2} models
+and similar).
+Default: \code{NULL}, to force user specification of this parameter}
 
 \item{n}{Size of a model for \code{bru_mapper_index}}
 
@@ -75,6 +90,8 @@ inherits from \code{bru_mapper}.
 \item \code{ibm_amatrix} Generic. Implementations must return a (sparse) matrix of size \code{NROW(input)}
 by \code{ibm_n(mapper)}
 }
+
+\code{bru_mapper.default} adds the "bru_mapper" class to an object
 }
 \seealso{
 \link{bru_mapper_methods} for specific method implementations.

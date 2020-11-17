@@ -2,12 +2,12 @@
 % Please edit documentation in R/effect.R
 \name{bru_mapper_methods}
 \alias{bru_mapper_methods}
-\alias{ibm_n.inla.mesh}
-\alias{ibm_values.inla.mesh}
-\alias{ibm_amatrix.inla.mesh}
-\alias{ibm_n.inla.mesh.1d}
-\alias{ibm_values.inla.mesh.1d}
-\alias{ibm_amatrix.inla.mesh.1d}
+\alias{ibm_n.bru_mapper_inla_mesh_2d}
+\alias{ibm_values.bru_mapper_inla_mesh_2d}
+\alias{ibm_amatrix.bru_mapper_inla_mesh_2d}
+\alias{ibm_n.bru_mapper_inla_mesh_1d}
+\alias{ibm_values.bru_mapper_inla_mesh_1d}
+\alias{ibm_amatrix.bru_mapper_inla_mesh_1d}
 \alias{ibm_n.bru_mapper_index}
 \alias{ibm_values.bru_mapper_index}
 \alias{ibm_amatrix.bru_mapper_index}
@@ -28,17 +28,17 @@
 \alias{names<-.bru_mapper_multi}
 \title{Implementation methods for mapper objects}
 \usage{
-\method{ibm_n}{inla.mesh}(mapper, ...)
+\method{ibm_n}{bru_mapper_inla_mesh_2d}(mapper, ...)
 
-\method{ibm_values}{inla.mesh}(mapper, ...)
+\method{ibm_values}{bru_mapper_inla_mesh_2d}(mapper, ...)
 
-\method{ibm_amatrix}{inla.mesh}(mapper, input, ...)
+\method{ibm_amatrix}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
 
-\method{ibm_n}{inla.mesh.1d}(mapper, ...)
+\method{ibm_n}{bru_mapper_inla_mesh_1d}(mapper, ...)
 
-\method{ibm_values}{inla.mesh.1d}(mapper, ...)
+\method{ibm_values}{bru_mapper_inla_mesh_1d}(mapper, ...)
 
-\method{ibm_amatrix}{inla.mesh.1d}(mapper, input, ...)
+\method{ibm_amatrix}{bru_mapper_inla_mesh_1d}(mapper, input, ...)
 
 \method{ibm_n}{bru_mapper_index}(mapper, ...)
 

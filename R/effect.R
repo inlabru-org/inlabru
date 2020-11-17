@@ -24,7 +24,11 @@ input_eval <- function(...) {
 index_eval <- function(...) {
   UseMethod("index_eval")
 }
-#' @rdname add_mappers.component
+#' @title Add component input/latent mappers
+#' @description Add missing mappers between input data and latent variables,
+#' based on likelihood data
+#' @export
+#' @rdname add_mappers
 add_mappers <- function(...) {
   UseMethod("add_mappers")
 }
@@ -647,7 +651,6 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
 
 
 
-#' @title FUNCTION_TITLE
 #' @description FUNCTION_DESCRIPTION
 #' @param component PARAM_DESCRIPTION
 #' @param lhoods PARAM_DESCRIPTION
@@ -659,7 +662,7 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
 #'   # EXAMPLE1
 #' }
 #' }
-#' @rdname add_mappers.component
+#' @rdname add_mappers
 #' @keywords internal
 #' @export
 
@@ -741,6 +744,8 @@ add_mappers.component <- function(component, lhoods) {
 
   component
 }
+#' @export
+#' @rdname add_mappers
 add_mappers.component_list <- function(components, lhoods) {
   for (k in seq_along(components)) {
     components[[k]] <- add_mappers(components[[k]], lhoods)
@@ -804,6 +809,13 @@ bru_subcomponent <- function(input = NULL,
   } else {
     type <- "unknown"
   }
+  if (!is.null(mapper)) {
+    if (!inherits(mapper, "bru_mapper")) {
+      stop("Unknown mapper class '",
+           paste0(class(mapper), collapse = ", "),
+           "'")
+    }
+  }
   subcomponent <-
     list(
       input = input,
@@ -822,17 +834,13 @@ bru_subcomponent <- function(input = NULL,
 
 add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
   if (!is.null(subcomp[["mapper"]])) {
-    if (!inherits(
-      subcomp[["mapper"]],
-      c("bru_mapper", "inla.mesh", "inla.mesh.1d")
-    )) {
+    if (!inherits(subcomp[["mapper"]], "bru_mapper")) {      
       stop(paste0(
         "Unknown mapper of type '",
         paste0(class(subcomp[["mapper"]]), collapse = ", "),
         "' for ", label
       ))
     }
-    subcomp[["mapper"]] <- bru_mapper(subcomp[["mapper"]])
   } else {
     if (!is.null(lhoods)) {
       inp <- lapply(
@@ -948,14 +956,20 @@ make_mapper <- function(subcomp,
                         strict = TRUE) {
   if (is.null(subcomp[["mapper"]])) {
     if (subcomp[["type"]] %in% c("spde")) {
-      subcomp[["mapper"]] <- subcomp[["model"]]$mesh
+      if (inherits(subcomp[["model"]]$mesh, "inla.mesh")) {
+        subcomp[["mapper"]] <- bru_mapper(subcomp[["model"]]$mesh)
+      } else if (inherits(subcomp[["model"]]$mesh, "inla.mesh.1d")) {
+        subcomp[["mapper"]] <-
+          bru_mapper(subcomp[["model"]]$mesh, indexed = TRUE)
+      } else {
+        stop(paste0("Unknown SPDE mesh class '",
+                    paste0(class(subcomp[["model"]]$mesh), collapse = ", "),
+                    "' for ", label, ". Please specify a mapper manually instead."))
+      }
     }
   }
   if (!is.null(subcomp[["mapper"]])) {
-    if (!inherits(
-      subcomp[["mapper"]],
-      c("bru_mapper", "inla.mesh", "inla.mesh.1d")
-    )) {
+    if (!inherits(subcomp[["mapper"]], "bru_mapper")) {
       stop(paste0(
         "Unknown mapper of type '",
         paste0(class(subcomp[["mapper"]]), collapse = ", "),
@@ -993,7 +1007,8 @@ make_mapper <- function(subcomp,
     } else {
       values <- sort(unique(values), na.last = NA)
       if (length(values) > 1) {
-        subcomp[["mapper"]] <- bru_mapper(INLA::inla.mesh.1d(values))
+        subcomp[["mapper"]] <- bru_mapper(INLA::inla.mesh.1d(values),
+                                          indexed = FALSE)
       } else {
         if (all(values == 1)) {
           subcomp[["mapper"]] <- bru_mapper_linear()
@@ -1083,6 +1098,7 @@ code.components <- function(components, add = "") {
 
 # MAPPERS ----
 
+#' @details `bru_mapper.default` adds the "bru_mapper" class to an object
 #' @export
 #' @rdname bru_mapper
 bru_mapper.default <- function(mapper, ...) {
@@ -1092,6 +1108,20 @@ bru_mapper.default <- function(mapper, ...) {
   mapper
 }
 
+#' @param mesh An `inla.mesh.1d` or `inla.mesh.2d` object to use as a mapper
+#' @param indexed logical; If `TRUE`, the `ibm_values()` output will be the
+#' integer indexing sequence for the latent variables. If `FALSE`, the knot
+#' locations are returned (useful as an interpolator for `rw2` models
+#' and similar).
+#' Default: `TRUE`
+#' @export
+#' @rdname bru_mapper
+bru_mapper.inla.mesh <- function(mesh, ...) {
+  mapper <- list(mesh = mesh)
+  class(mapper) <- c("bru_mapper_inla_mesh_2d", "list")
+  bru_mapper.default(mapper)
+}
+
 #' Implementation methods for mapper objects
 #' @param \dots Arguments passed on to other methods
 #' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
@@ -1099,38 +1129,60 @@ bru_mapper.default <- function(mapper, ...) {
 #' @name bru_mapper_methods
 #' @export
 #' @rdname bru_mapper_methods
-ibm_n.inla.mesh <- function(mapper, ...) {
-  mapper$n
+ibm_n.bru_mapper_inla_mesh_2d <- function(mapper, ...) {
+  mapper[["mesh"]]$n
 }
 #' @export
 #' @rdname bru_mapper_methods
-ibm_values.inla.mesh <- function(mapper, ...) {
-  seq_len(mapper$n)
+ibm_values.bru_mapper_inla_mesh_2d <- function(mapper, ...) {
+  seq_len(mapper[["mesh"]]$n)
 }
 #' @param input The values for which to produce a mapping matrix
 #' @export
 #' @rdname bru_mapper_methods
-ibm_amatrix.inla.mesh <- function(mapper, input, ...) {
+ibm_amatrix.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
   if (!is.matrix(input) && !inherits(input, "Spatial")) {
     val <- as.matrix(val)
   }
-  INLA::inla.spde.make.A(mapper, loc = input)
+  INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
+}
+
+#' @param indexed logical; If `TRUE`, the `ibm_values()` output will be the
+#' integer indexing sequence for the latent variables (needed for `spde` models).
+#' If `FALSE`, the knot
+#' locations are returned (useful as an interpolator for `rw2` models
+#' and similar).
+#' Default: `NULL`, to force user specification of this parameter
+#' @export
+#' @rdname bru_mapper
+bru_mapper.inla.mesh.1d <- function(mesh, indexed = NULL, ...) {
+  if (is.null(indexed)) {
+    stop("indexed=TRUE/FALSE needs to be specified to convert inla.mesh.1d to a bru_mapper")
+  }
+  mapper <- list(mesh = mesh,
+                 indexed = indexed)
+  class(mapper) <- c("bru_mapper_inla_mesh_1d", "list")
+  bru_mapper.default(mapper)
 }
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_n.inla.mesh.1d <- function(mapper, ...) {
-  mapper$m
+ibm_n.bru_mapper_inla_mesh_1d <- function(mapper, ...) {
+  mapper[["mesh"]]$m
 }
 #' @export
 #' @rdname bru_mapper_methods
-ibm_values.inla.mesh.1d <- function(mapper, ...) {
-  mapper$loc
+ibm_values.bru_mapper_inla_mesh_1d <- function(mapper, ...) {
+  if (mapper[["indexed"]]) {
+    seq_len(mapper[["mesh"]]$m)
+  } else {
+    mapper[["mesh"]]$loc
+  }
 }
 #' @export
 #' @rdname bru_mapper_methods
-ibm_amatrix.inla.mesh.1d <- function(mapper, input, ...) {
-  INLA::inla.spde.make.A(mapper, loc = input)
+ibm_amatrix.bru_mapper_inla_mesh_1d <- function(mapper, input, ...) {
+  INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
 }
 
 
