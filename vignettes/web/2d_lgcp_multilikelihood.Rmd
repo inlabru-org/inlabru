@@ -1,0 +1,166 @@
+---
+title: "LGCPs - Multiple Likelihoods"
+author: "Fabian E. Bachl and Finn Lindgren"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+inlabru::local_disable_PROJ6_warnings()
+```
+
+Introduction
+----------------
+For this vignette we are going to be working with the inlabru's ´gorillas´ dataset which was originally obtained from 
+the `R` package `spatstat`. The data set contains two types of gorillas nests which are marked as either major or minor. We will set up a multi-likelihood model for these nests which creates two spatial LGCPs that share a common intercept but have employ different spatial smoothers.
+
+
+Setting things up
+----------------
+
+Load libraries
+```{r results="hide",warning=FALSE,message=FALSE}
+library(inlabru)
+library(INLA)
+```
+
+Use empricial Bayes in order to speed things up a little bit:
+```{r results="hide",warning=FALSE,message=FALSE}
+init.tutorial()
+```
+
+
+Get the data
+-----------------------------------
+For the next few practicals we are going to be working with a dataset obtained from 
+the `R` package `spatstat`, which contains the locations of 647 gorilla nests. We load the 
+dataset like this:
+
+```{r }
+data(gorillas, package = "inlabru")
+```
+
+Plot the nests and visualize the group membership (major/minor) by color:
+
+```{r results="hide",warning=FALSE,message=FALSE}
+ggplot() + gg(gorillas$mesh) + 
+           gg(gorillas$nests, aes(color=group)) + 
+           gg(gorillas$boundary) + 
+           coord_fixed() +
+           ggtitle("Gorilla nests and group membership")
+```
+First, we separate the data into the major and minor nests:
+```{r}
+major_nests <- gorillas$nests[gorillas$nests$group == "major",,drop=FALSE]
+minor_nests <- gorillas$nests[gorillas$nests$group == "minor",,drop=FALSE]
+```
+
+Fiting the model
+-----------------------------------
+
+First, we define all components that enter the joint model. That is, the intercept that is common to both LGCPs and
+the two different spatial smoothers, one for each nest group.
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+matern <- inla.spde2.pcmatern(gorillas$mesh, 
+                              prior.sigma = c(0.1, 0.01), 
+                              prior.range = c(5, 0.01))
+
+cmp <- ~
+  SMajor(coordinates, model = matern) + 
+  SMinor(coordinates, model = matern) + 
+  Intercept
+
+```
+
+Given these components we define the linear predictor for each of the likelihoods
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+fml.major = coordinates ~ SMajor + Intercept
+fml.minor = coordinates ~ SMinor + Intercept
+```
+
+Setting up the cox process integration points is easy in this example.
+Both nest types were observed within the same window.
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+ips = ipoints(gorillas$boundary, domain = gorillas$mesh)
+```
+Lastly, we define the two likelihoods for the Major and Minor data subsets
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+lik_major = like("cp", formula = fml.major, ips = ips,
+                 data = major_nests)
+lik_minor = like("cp", formula = fml.minor, ips = ips,
+                 data = minor_nests)
+```
+... which we provide to the ´bru´ function.
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+fit_joint = bru(cmp, lik_major, lik_minor, options = list(max.iter = 1))
+```
+When running individual likelihoods with a common component set, all components
+will still be "estimated" (according to their priors), which is wasteful.
+When defining the likelihoods, we can tell inlabru which components are actually
+involved:
+```{r,results="hide",message=FALSE}
+lik_major = like("cp", formula = fml.major, ips = ips,
+                 data = major_nests,
+                 include = c("Intercept", "SMajor"))
+lik_minor = like("cp", formula = fml.minor, ips = ips,
+                 data = minor_nests,
+                 include = c("Intercept", "SMinor"))
+fit_major = bru(cmp, lik_major, options = list(max.iter = 1))
+fit_minor = bru(cmp, lik_minor, options = list(max.iter = 1))
+```
+We can also run the joint analysis using these modified likelihood definitions
+```{r results="hide",message=FALSE,echo=TRUE}
+fit_joint = bru(cmp, lik_major, lik_minor, options = list(max.iter = 1))
+```
+
+Summary:
+```{r}
+summary(fit_joint)
+```
+If we instead want separate intercepts but a common spatial effect, we change the components and formula. Since we're using a linear predictor expression we can leave out the expression part and replace it by a dot. The `include` argument is used to determine which components to include.
+```{r,results="hide",message=FALSE}
+cmp <- ~ Smooth(coordinates, model = matern) + IMajor(1) + IMinor(1)
+lik_major = like("cp", formula = coordinates ~ ., ips = ips,
+                 data = major_nests,
+                 include = c("IMajor", "Smooth"))
+lik_minor = like("cp", formula = coordinates ~ ., ips = ips,
+                 data = minor_nests,
+                 include = c("IMinor", "Smooth"))
+fit_joint = bru(cmp, lik_major, lik_minor, options = list(max.iter = 1))
+```
+Summary:
+```{r}
+summary(fit_joint)
+```
+
+Finally, let's add the individual fields back in: 
+```{r,results="hide",message=FALSE}
+cmp <- ~
+  Smooth(coordinates, model = matern) +
+  IMajor(1) +
+  IMinor(1) +
+  SMajor(coordinates, model = matern) + 
+  SMinor(coordinates, model = matern)
+lik_major = like("cp", formula = coordinates ~ .,
+                 ips = ips,
+                 data = major_nests,
+                 include = c("IMajor", "Smooth", "SMajor"))
+lik_minor = like("cp", formula = coordinates ~ .,
+                 ips = ips,
+                 data = minor_nests,
+                 include = c("IMinor", "Smooth", "SMinor"))
+fit_joint = bru(cmp, lik_major, lik_minor)
+```
+Summary:
+```{r}
+summary(fit_joint)
+```
