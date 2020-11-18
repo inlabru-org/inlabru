@@ -1310,7 +1310,7 @@ auto_intercept <- function(components) {
         as.formula(paste0(
           ". ~ . - ",
           var_names[inter_var],
-          " +1"
+          " -1"
         ))
       )
     }
