@@ -1315,7 +1315,7 @@ auto_intercept <- function(components) {
       )
     }
   } else if (attr(tm, "intercept")) {
-    components <- update.formula(components, . ~ . + Intercept + 1)
+    components <- update.formula(components, . ~ . + Intercept(1) + 1)
   } else {
     components <- update.formula(components, . ~ . + 1)
   }
