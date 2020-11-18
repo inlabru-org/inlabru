@@ -196,7 +196,7 @@ spde.posterior <- function(result, name, what = "range") {
     if (what == "matern.correlation") {
       corr <- TRUE
       ylab <- "Matern Correlation"
-      out <- materncov.bands(result$bru_info$model$effects[[name]]$main$mapper,
+      out <- materncov.bands(result$bru_info$model$effects[[name]]$main$mapper$mesh,
         dist = x,
         log.range = log.range,
         log.variance = NULL,
@@ -205,7 +205,7 @@ spde.posterior <- function(result, name, what = "range") {
     } else {
       corr <- FALSE
       ylab <- "Matern Covariance"
-      out <- materncov.bands(result$bru_info$model$effects[[name]]$main$mapper,
+      out <- materncov.bands(result$bru_info$model$effects[[name]]$main$mapper$mesh,
         dist = x,
         log.range = log.range,
         log.variance = log.variance,

@@ -1,13 +1,6 @@
-#' Internal [inlabru] model structure
-#'
-#' See [make.model].
-#'
-#' @name bru_model
-#' @keywords internal
-NULL
 
 
-#' Create an inlabru model object from a component formula
+#' Create an inlabru model object from model components
 #'
 #' The [inlabru] syntax for model formulae is different from what
 #' `INLA::inla` considers a valid.
@@ -66,7 +59,7 @@ NULL
 #' @return A [bru_model] object
 #' @keywords internal
 
-make_model <- function(components, lhoods) {
+bru_model <- function(components, lhoods) {
   stopifnot(inherits(components, "component_list"))
 
   # Back up environment

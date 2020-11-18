@@ -284,7 +284,7 @@ bru <- function(components = ~ Intercept(1),
   components <- component_list(components)
 
   # Turn model components into internal bru model
-  bru.model <- make_model(components, lhoods)
+  bru.model <- bru_model(components, lhoods)
 
   # Set max iterations to 1 if all likelihood formulae are linear
   if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) {
@@ -1329,13 +1329,14 @@ auto_additive_formula <- function(formula, components) {
   if (as.character(formula)[length(as.character(formula))] != ".") {
     return(formula)
   }
+  stopifnot(inherits(components, "component_list"))
 
   env <- environment(formula)
   formula <- update.formula(
     formula,
     paste0(
       ". ~ ",
-      paste0(component_names, collapse = " + ")
+      paste0(names(component), collapse = " + ")
     )
   )
   environment(formula) <- env

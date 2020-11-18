@@ -27,6 +27,7 @@ index_eval <- function(...) {
 #' @title Add component input/latent mappers
 #' @description Add missing mappers between input data and latent variables,
 #' based on likelihood data
+#' @param \dots Parameters passed on to other methods
 #' @export
 #' @rdname add_mappers
 add_mappers <- function(...) {
@@ -674,7 +675,7 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
 #' @keywords internal
 #' @export
 
-add_mappers.component <- function(component, lhoods) {
+add_mappers.component <- function(component, lhoods, ...) {
   # Filter out lhoods that don't use/support the component
   keep_lh <-
     vapply(lhoods,
@@ -754,7 +755,7 @@ add_mappers.component <- function(component, lhoods) {
 }
 #' @export
 #' @rdname add_mappers
-add_mappers.component_list <- function(components, lhoods) {
+add_mappers.component_list <- function(components, lhoods, ...) {
   for (k in seq_along(components)) {
     components[[k]] <- add_mappers(components[[k]], lhoods)
   }

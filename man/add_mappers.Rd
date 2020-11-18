@@ -8,11 +8,13 @@
 \usage{
 add_mappers(...)
 
-\method{add_mappers}{component}(component, lhoods)
+\method{add_mappers}{component}(component, lhoods, ...)
 
-\method{add_mappers}{component_list}(components, lhoods)
+\method{add_mappers}{component_list}(components, lhoods, ...)
 }
 \arguments{
+\item{\dots}{Parameters passed on to other methods}
+
 \item{component}{PARAM_DESCRIPTION}
 
 \item{lhoods}{PARAM_DESCRIPTION}
