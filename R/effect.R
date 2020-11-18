@@ -821,9 +821,11 @@ bru_subcomponent <- function(input = NULL,
   }
   if (!is.null(mapper)) {
     if (!inherits(mapper, "bru_mapper")) {
-      stop("Unknown mapper class '",
-           paste0(class(mapper), collapse = ", "),
-           "'")
+      stop(
+        "Unknown mapper class '",
+        paste0(class(mapper), collapse = ", "),
+        "'"
+      )
     }
   }
   subcomponent <-
@@ -844,13 +846,20 @@ bru_subcomponent <- function(input = NULL,
 
 add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
   if (!is.null(subcomp[["mapper"]])) {
-    if (!inherits(subcomp[["mapper"]], "bru_mapper")) {      
+    if (!inherits(subcomp[["mapper"]], "bru_mapper")) {
       stop(paste0(
         "Unknown mapper of type '",
         paste0(class(subcomp[["mapper"]]), collapse = ", "),
         "' for ", label
       ))
     }
+  } else if (is.null(subcomp[["input"]][["input"]])) {
+    # Used for automatic group and replicate mappers
+    subcomp <- make_mapper(subcomp,
+      label,
+      input_values = 1,
+      strict = TRUE
+    )
   } else {
     if (!is.null(lhoods)) {
       inp <- lapply(
@@ -865,11 +874,21 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
         }
       )
       # Check for
-      # 1) All NULL; OK, set to 1
+      # 1) All NULL; Deprecated unless input is NULL. Since version 2.1.14,
+      #              intercepts should be notated explicitly with label(1)
       # 2) Some NULL; exclude NULL results
       # TODO: Check for vector/matrix/coordinate inconsistency
       null.results <- vapply(inp, function(x) is.null(x), TRUE)
       if (all(null.results)) {
+        warning(paste0(
+          "All covariate evaluations are NULL; an intercept component was likely intended.\n",
+          "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
+          "  Use explicit notation '+ ", label, "(1)' instead",
+          if (identical(label, "Intercept")) {
+            " (or '+1' for '+ Intercept(1)')"
+          },
+          "."
+        ))
         inp_values <- 1
         n_values <- 1
       } else {
@@ -892,7 +911,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
             null_crs <- vapply(crs_info, is.null, logical(1))
             inconsistent_crs <-
               (length(unique(unlist(crs_info))) > 1) ||
-              (any(null_crs) && !all(null_crs))
+                (any(null_crs) && !all(null_crs))
           } else {
             crs_info <- vapply(inp_crs, fm_CRSargs, "")
             inconsistent_crs <- length(unique(crs_info)) > 1
@@ -972,9 +991,11 @@ make_mapper <- function(subcomp,
         subcomp[["mapper"]] <-
           bru_mapper(subcomp[["model"]]$mesh, indexed = TRUE)
       } else {
-        stop(paste0("Unknown SPDE mesh class '",
-                    paste0(class(subcomp[["model"]]$mesh), collapse = ", "),
-                    "' for ", label, ". Please specify a mapper manually instead."))
+        stop(paste0(
+          "Unknown SPDE mesh class '",
+          paste0(class(subcomp[["model"]]$mesh), collapse = ", "),
+          "' for ", label, ". Please specify a mapper manually instead."
+        ))
       }
     }
   }
@@ -1018,7 +1039,8 @@ make_mapper <- function(subcomp,
       values <- sort(unique(values), na.last = NA)
       if (length(values) > 1) {
         subcomp[["mapper"]] <- bru_mapper(INLA::inla.mesh.1d(values),
-                                          indexed = FALSE)
+          indexed = FALSE
+        )
       } else {
         if (all(values == 1)) {
           subcomp[["mapper"]] <- bru_mapper_linear()
@@ -1043,14 +1065,16 @@ code.components <- function(components, add = "") {
   fname <- "inlabru:::component.character"
   # If rhs is "~1", make sure there's at least one component to parse
   # and that offsets show up in "factors"
-  tms <- terms(update.formula(components, .~ . + BRU_DUMMY_COMPONENT + 1))
+  tms <- terms(update.formula(components, . ~ . + BRU_DUMMY_COMPONENT + 1))
   codes <- attr(tms, "term.labels")
 
   # Check for offset()
   offset_idx <- attr(tms, "offset")
   if (length(offset_idx) > 0) {
-    isoff <- as.vector(unlist(lapply(rownames(attr(tms, "factors")),
-                                     function(s) substr(s, 1, 6) == "offset")))
+    isoff <- as.vector(unlist(lapply(
+      rownames(attr(tms, "factors")),
+      function(s) substr(s, 1, 6) == "offset"
+    )))
     if (!any(isoff)) {
       stop("Internal error: multiple offsets indicated but none extracted")
     }
@@ -1181,8 +1205,10 @@ bru_mapper.inla.mesh.1d <- function(mesh, indexed = NULL, ...) {
   if (is.null(indexed)) {
     stop("indexed=TRUE/FALSE needs to be specified to convert inla.mesh.1d to a bru_mapper")
   }
-  mapper <- list(mesh = mesh,
-                 indexed = indexed)
+  mapper <- list(
+    mesh = mesh,
+    indexed = indexed
+  )
   class(mapper) <- c("bru_mapper_inla_mesh_1d", "list")
   bru_mapper.default(mapper)
 }
@@ -1468,8 +1494,8 @@ ibm_amatrix.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
       indexing,
       function(x) {
         ibm_amatrix(mapper[["mappers"]][[x]],
-                    input = input[[x]],
-                    multi = multi - 1
+          input = input[[x]],
+          multi = multi - 1
         )
       }
     )

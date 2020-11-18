@@ -269,8 +269,10 @@ bru <- function(components = ~ Intercept(1),
       lhoods[["formula"]] <- . ~ .
     }
     if (inherits(components, "formula")) {
-      lhoods[["formula"]] <- auto_response(lhoods[["formula"]],
-                                           extract_response(components))
+      lhoods[["formula"]] <- auto_response(
+        lhoods[["formula"]],
+        extract_response(components)
+      )
     }
     lhoods <- list(do.call(like, c(lhoods, list(options = options))))
   }
@@ -279,7 +281,7 @@ bru <- function(components = ~ Intercept(1),
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
   }
-  
+
   # Turn input into a list of components (from existing list, or a special formula)
   components <- component_list(components)
 
@@ -344,15 +346,18 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param family A string identifying a valid `INLA::inla` likelihood family. The default is
+#' @param formula a [formula] where the right hand side is a general R
+#'   expression defines the predictor used in the model.
+#' @param family A string identifying a valid `INLA::inla` likelihood family.
+#' The default is
 #'   `gaussian` with identity link. In addition to the likelihoods provided
-#'   by inla (see `inla.models()$likelihood`) inlabru supports fitting Cox
+#'   by inla (see `names(INLA::inla.models()$likelihood)`)
+#'   inlabru supports fitting latent Gaussian Cox
 #'   processes via `family = "cp"`.
 #'   As an alternative to [bru()], the [lgcp()] function provides
 #'   a convenient interface to fitting Cox processes.
-#' @param formula a [formula] where the right hand side expression defines
-#'   the predictor used in the optimization.
-#' @param data Likelihood-specific data, as a `data.frame` or `SpatialPoints[DataFrame]`
+#' @param data Likelihood-specific data, as a `data.frame` or
+#' `SpatialPoints[DataFrame]`
 #'   object.
 #' @param mesh An inla.mesh object.
 #' @param E Exposure parameter for family = 'poisson' passed on to
@@ -377,7 +382,7 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'
 #' @example inst/examples/like.R
 
-like <- function(family, formula = . ~ ., data = NULL,
+like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
@@ -1467,8 +1472,10 @@ summary.bru <- function(object, ...) {
   result$WAIC <- object[["waic"]][["waic"]]
   result$DIC <- object[["dic"]][["dic"]]
 
-  result$inla <- NextMethod("summary", object)
-  result[["inla"]][["call"]] <- NULL
+  if (inherits(object, "inla")) {
+    result$inla <- NextMethod("summary", object)
+    result[["inla"]][["call"]] <- NULL
+  }
 
   class(result) <- c("summary_bru", "list")
   return(result)

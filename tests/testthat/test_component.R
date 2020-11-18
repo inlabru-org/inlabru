@@ -1,8 +1,9 @@
 test_that("Component construction: linear model", {
   df <- data.frame(x = 1:10)
 
-  cmp <- component_list(~ beta(main = x, model = "linear", values = 1),
-    lhoods = list(data = df)
+  cmp <- component_list(
+    ~ beta(main = x, model = "linear", values = 1),
+    lhoods = list(list(data = df))
   )[[1]]
 
   expect_equal(cmp$label, "beta")
@@ -77,36 +78,71 @@ test_that("Component construction: offset", {
 
 
 test_that("Component construction: default mesh/mapping construction", {
-
   lik <- like("gaussian",
-              formula = y ~ .,
-              data = data.frame(x = c(1, 1.5, 2, 3, 4), y = 11:15),
-              include="effect")
-  
+    formula = y ~ .,
+    data = data.frame(x = c(1, 1.5, 2, 3, 4), y = 11:15),
+    include = "effect"
+  )
+
   cmp1 <- component_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
-  
+
   cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
 
   mesh1 <- INLA::inla.mesh.1d(lik$data$x)
   expect_error(
-      component_list(
-        ~ effect(x, model = "rw2", mapper = mesh1) - 1),
-      regexp = "Unknown mapper"
+    component_list(
+      ~ effect(x, model = "rw2", mapper = mesh1) - 1
+    ),
+    regexp = "Unknown mapper"
   )
 
   cmp1 <- component_list(
-    ~ effect(x, model = "rw2",
-             mapper = bru_mapper(mesh1, indexed = FALSE)) - 1)
+    ~ effect(x,
+      model = "rw2",
+      mapper = bru_mapper(mesh1, indexed = FALSE)
+    ) - 1
+  )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
 
   cmp1 <- component_list(
-    ~ effect(x, model = "rw2",
-             mapper = bru_mapper(mesh1, indexed = TRUE)) - 1)
+    ~ effect(x,
+      model = "rw2",
+      mapper = bru_mapper(mesh1, indexed = TRUE)
+    ) - 1
+  )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, seq_along(lik$data$x))
+})
+
+
+
+test_that("Component construction: unsafe intercepts", {
+  cmp <- component_list(~ something_unknown - 1)
+  lik <- like(formula = response ~ ., data = data.frame(response = 1:5))
+  expect_warning(
+    {
+      model <- bru_model(cmp, list(lik))
+    },
+    "All covariate evaluations are NULL"
+  )
+})
+
+test_that("Component construction: deprecated arguments", {
+  expect_warning(
+    component_list(~ something(map = a)),
+    "Use of 'map' is deprecated"
+  )
+  expect_warning(
+    bru(~ something(map = a),
+      formula = response ~ .,
+      data = data.frame(a = 1:5),
+      options = list(run = FALSE)
+    ),
+    "Use of 'map' is deprecated"
+  )
 })

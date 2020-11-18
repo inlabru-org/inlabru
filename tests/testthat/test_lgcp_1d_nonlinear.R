@@ -9,7 +9,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
     1 - exp(-(distance / (exp(lsig)))^-1)
   }
 
-  cmp <- ~ lsig + Intercept
+  cmp <- ~ lsig(1) + Intercept(1)
   formula <- distance ~ log(hr(distance, lsig)) + Intercept
   ips <- ipoints(INLA::inla.mesh.1d(seq(0, 8, by = 0.1)), name = "distance")
 

@@ -40,7 +40,7 @@ test_that("2D LGCP fitting", {
     main = elev,
     main_layer = "elevation",
     model = "linear"
-  ) + Intercept
+  ) + Intercept(1)
   fit2 <- lgcp(mdl2, gorillas$nests,
     samplers = gorillas$boundary,
     domain = list(coordinates = gorillas$mesh),
@@ -66,7 +66,7 @@ test_that("2D LGCP fitting", {
     return(v$elevation)
   }
 
-  mdl3 <- coordinates ~ beta.elev(main = f.elev(x, y), model = "linear") + Intercept
+  mdl3 <- coordinates ~ beta.elev(main = f.elev(x, y), model = "linear") + Intercept(1)
   fit3 <- lgcp(mdl3, gorillas$nests,
     samplers = gorillas$boundary,
     domain = list(coordinates = gorillas$mesh),

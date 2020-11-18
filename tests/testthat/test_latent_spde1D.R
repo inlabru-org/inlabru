@@ -11,7 +11,7 @@ latent_spde1D_testdata <- function() {
     prior.sigma = c(10, 0.01)
   )
 
-  cmp <- count ~ field(main = x, model = matern) + Intercept
+  cmp <- count ~ field(main = x, model = matern) + Intercept(1)
   # This model is sensitive to the integration strategy; "eb" is too smooth.
   fit <- bru(cmp,
     data = countdata2, family = "poisson",

@@ -5,8 +5,8 @@
 \title{Likelihood construction for usage with \link{bru}}
 \usage{
 like(
-  family,
   formula = . ~ .,
+  family = "gaussian",
   data = NULL,
   mesh = NULL,
   E = NULL,
@@ -20,17 +20,20 @@ like(
 )
 }
 \arguments{
-\item{family}{A string identifying a valid \code{INLA::inla} likelihood family. The default is
+\item{formula}{a \link{formula} where the right hand side is a general R
+expression defines the predictor used in the model.}
+
+\item{family}{A string identifying a valid \code{INLA::inla} likelihood family.
+The default is
 \code{gaussian} with identity link. In addition to the likelihoods provided
-by inla (see \code{inla.models()$likelihood}) inlabru supports fitting Cox
+by inla (see \code{names(INLA::inla.models()$likelihood)})
+inlabru supports fitting latent Gaussian Cox
 processes via \code{family = "cp"}.
 As an alternative to \code{\link[=bru]{bru()}}, the \code{\link[=lgcp]{lgcp()}} function provides
 a convenient interface to fitting Cox processes.}
 
-\item{formula}{a \link{formula} where the right hand side expression defines
-the predictor used in the optimization.}
-
-\item{data}{Likelihood-specific data, as a \code{data.frame} or \code{SpatialPoints[DataFrame]}
+\item{data}{Likelihood-specific data, as a \code{data.frame} or
+\code{SpatialPoints[DataFrame]}
 object.}
 
 \item{mesh}{An inla.mesh object.}
