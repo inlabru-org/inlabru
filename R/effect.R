@@ -574,7 +574,8 @@ component_list.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)
   }
-  # Automatically add Intercept and remove -1 unless -1 is in components formula
+  # Automatically add Intercept and remove -1 unless -1
+  # or -Intercept is in components formula
   object <- auto_intercept(object)
 
   code <- code.components(object)
@@ -1040,16 +1041,24 @@ make_mapper <- function(subcomp,
 
 code.components <- function(components, add = "") {
   fname <- "inlabru:::component.character"
-  tms <- terms(components)
+  # If rhs is "~1", make sure there's at least one component to parse
+  # and that offsets show up in "factors"
+  tms <- terms(update.formula(components, .~ . + BRU_DUMMY_COMPONENT + 1))
   codes <- attr(tms, "term.labels")
 
   # Check for offset()
-  isoff <- as.vector(unlist(lapply(rownames(attr(tms, "factors")), function(s) substr(s, 1, 6) == "offset")))
-  if (any(isoff)) {
-    codes[[length(codes) + 1]] <- rownames(attr(tms, "factors"))[isoff]
+  offset_idx <- attr(tms, "offset")
+  if (length(offset_idx) > 0) {
+    isoff <- as.vector(unlist(lapply(rownames(attr(tms, "factors")),
+                                     function(s) substr(s, 1, 6) == "offset")))
+    if (!any(isoff)) {
+      stop("Internal error: multiple offsets indicated but none extracted")
+    }
+    codes <- c(codes, rownames(attr(tms, "factors"))[isoff])
   }
+  codes <- codes[codes != "BRU_DUMMY_COMPONENT"]
 
-  for (k in 1:length(codes)) {
+  for (k in seq_along(codes)) {
     code <- codes[[k]]
 
     # Function syntax or fixed component?
@@ -1086,8 +1095,12 @@ code.components <- function(components, add = "") {
 
       if (is.offset) {
         codes[[k]] <-
-          gsub(paste0(label, "("),
-            paste0(fname, "(\"", label, "\", model = \"offset\", main = "),
+          gsub(
+            paste0(label, "("),
+            paste0(
+              fname, '("', label, '"',
+              ', model = "offset", main = '
+            ),
             code,
             fixed = TRUE
           )
