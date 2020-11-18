@@ -250,7 +250,7 @@ bru_info.bru <- function(object, ...) {
 #' @example inst/examples/bru.R
 #'
 
-bru <- function(components = y ~ Intercept,
+bru <- function(components = ~ Intercept(1),
                 ...,
                 options = list()) {
   requireINLA()
@@ -268,7 +268,10 @@ bru <- function(components = y ~ Intercept,
     if (is.null(lhoods[["formula"]])) {
       lhoods[["formula"]] <- . ~ .
     }
-    lhoods[["formula"]] <- auto_copy_response(lhoods[["formula"]], components)
+    if (inherits(components, "formula")) {
+      lhoods[["formula"]] <- auto_response(lhoods[["formula"]],
+                                           extract_response(components))
+    }
     lhoods <- list(do.call(like, c(lhoods, list(options = options))))
   }
   class(lhoods) <- c("bru_like_list", "list")
@@ -276,10 +279,12 @@ bru <- function(components = y ~ Intercept,
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
   }
+  
+  # Turn input into a list of components (from existing list, or a special formula)
+  components <- component_list(components)
 
   # Turn model components into internal bru model
-  bru.model <- make.model(components, lhoods)
-
+  bru.model <- make_model(components, lhoods)
 
   # Set max iterations to 1 if all likelihood formulae are linear
   if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) {
@@ -711,7 +716,10 @@ lgcp <- function(components,
                  E = NULL,
                  options = list()) {
   # If formula response missing, copy from components (for formula input)
-  formula <- auto_copy_response(formula, components)
+  if (inherits(components, "formula")) {
+    response <- extract_response(components)
+    formula <- auto_response(formula, response)
+  }
   lik <- like(
     family = "cp",
     formula = formula, data = data, samplers = samplers,
@@ -1265,7 +1273,13 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
 }
 
 
-auto.intercept <- function(components) {
+auto_intercept <- function(components) {
+  if (!inherits(components, "formula")) {
+    if (inherits(components, "component_list")) {
+      return(components)
+    }
+    stop("components must be a formula to auto-add an intercept component")
+  }
   env <- environment(components)
 
   tm <- terms(components)
@@ -1310,45 +1324,36 @@ auto.intercept <- function(components) {
 }
 
 
-auto_linear_formula <- function(formula, components) {
-  if (as.character(formula)[
-    length(as.character(formula))
-  ] != ".") {
+# If missing RHS, set to the sum of the component names
+auto_additive_formula <- function(formula, components) {
+  if (as.character(formula)[length(as.character(formula))] != ".") {
     return(formula)
   }
 
-  # No RHS; construct from components
-
-  components <- auto.intercept(components)
-  tm <- terms(components)
-
-  var_names <- attr(tm, "term.labels")
-  # Trim component options
-  var_names <- gsub(
-    pattern = "^([^\\(]*)\\(.*",
-    replacement = "\\1",
-    x = var_names
-  )
-  if (length(attr(tm, "offset")) > 0) {
-    var_names <- c(
-      var_names,
-      as.character(attr(tm, "variables"))[-1][attr(tm, "offset")]
-    )
-  }
+  env <- environment(formula)
   formula <- update.formula(
-    components,
+    formula,
     paste0(
       ". ~ ",
-      paste0(var_names, collapse = " + ")
+      paste0(component_names, collapse = " + ")
     )
   )
-  environment(formula) <- environment(components)
+  environment(formula) <- env
   formula
 }
 
-
-auto_copy_response <- function(formula, components) {
-  if (!inherits(components, "formula")) {
+# Extract the LHS of a formula, as response ~ .
+extract_response <- function(formula) {
+  stopifnot(inherits(formula, "formula"))
+  if (length(as.character(formula)) == 3) {
+    as.formula(paste0(as.character(formula)[2], " ~ ."))
+  } else {
+    . ~ .
+  }
+}
+# If response missing, add one
+auto_response <- function(formula, response) {
+  if (!inherits(formula, "formula")) {
     return(formula)
   }
   if ((length(as.character(formula)) == 3) &&
@@ -1357,29 +1362,18 @@ auto_copy_response <- function(formula, components) {
     return(formula)
   }
   env <- environment(formula)
-  tm_cm <- terms(components)
-  LHS <- as.formula(paste0(
-    as.character(attr(tm_cm, "variables"))[-1][attr(tm_cm, "response")],
-    " ~ ."
-  ))
-  if (as.character(formula)[
-    length(as.character(formula))
-  ] == ".") {
+  if (as.character(formula)[length(as.character(formula))] == ".") {
     # No formula RHS
-    formula <- LHS
+    formula <- response
   } else {
-    tm_fm <- terms(formula)
-    if ((attr(tm_fm, "response") == 0) ||
-      (as.character(attr(tm_fm, "variables"))[-1][attr(tm_fm, "response")] == ".")) {
-      formula <- update(formula, LHS)
-    }
+    formula <- update.formula(formula, response)
   }
   environment(formula) <- env
   formula
 }
 
 
-# Returns a formula's environemnt as a list. Removes all variable that are of type
+# Returns a formula's environment as a list. Removes all variable that are of type
 # inla, function or formula. Also removes all variables that are not variables of the formula.
 list.data <- function(formula) {
 

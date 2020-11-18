@@ -65,8 +65,7 @@ Default: \code{NULL}, to force user specification of this parameter}
 \item \code{'full'} for keeping all levels.
 }}
 
-\item{mappers}{A list of \code{bru_mapper} objects
-(TODO: add an \code{as.bru_mapper} generic to hook conversion methods onto)}
+\item{mappers}{A list of \code{bru_mapper} objects}
 }
 \description{
 Methods for \code{bru_mapper} objects
@@ -79,19 +78,30 @@ inherits from \code{bru_mapper}.
 }
 
 \itemize{
-\item \code{ibm_n} Generic.
+\item \code{ibm_n} Generic. Implementations must return the size of the latent vector
+being mapped to.
 }
 
 \itemize{
-\item \code{ibm_values} Generic.
+\item \code{ibm_values} Generic. Implementations must return a vector that
+is interpretable by an \code{INLA::f(..., values = ...)} specification, and
+has length \code{\link[=ibm_n]{ibm_n()}}.
 }
 
 \itemize{
-\item \code{ibm_amatrix} Generic. Implementations must return a (sparse) matrix of size \code{NROW(input)}
+\item \code{ibm_amatrix} Generic.
+Implementations must return a (sparse) matrix of size \code{NROW(input)}
+(except for the \code{bru_mapper_multi} method)
 by \code{ibm_n(mapper)}
 }
 
-\code{bru_mapper.default} adds the "bru_mapper" class to an object
+\itemize{
+\item \code{bru_mapper.default} adds the "bru_mapper" class to an object
+}
+
+\itemize{
+\item \code{bru_mapper_multi} constructs a kronecker product mapping
+}
 }
 \seealso{
 \link{bru_mapper_methods} for specific method implementations.

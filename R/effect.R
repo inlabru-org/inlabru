@@ -48,21 +48,26 @@ bru_mapper <- function(...) {
   UseMethod("bru_mapper")
 }
 #' @details
-#' * `ibm_n` Generic.
+#' * `ibm_n` Generic. Implementations must return the size of the latent vector
+#' being mapped to.
 #' @export
 #' @rdname bru_mapper
 ibm_n <- function(mapper, ...) {
   UseMethod("ibm_n")
 }
 #' @details
-#' * `ibm_values` Generic.
+#' * `ibm_values` Generic. Implementations must return a vector that
+#' is interpretable by an `INLA::f(..., values = ...)` specification, and
+#' has length [ibm_n()].
 #' @export
 #' @rdname bru_mapper
 ibm_values <- function(mapper, ...) {
   UseMethod("ibm_values")
 }
 #' @details
-#' * `ibm_amatrix` Generic. Implementations must return a (sparse) matrix of size `NROW(input)`
+#' * `ibm_amatrix` Generic.
+#' Implementations must return a (sparse) matrix of size `NROW(input)`
+#' (except for the `bru_mapper_multi` method)
 #' by `ibm_n(mapper)`
 #' @param input The values for which to produce a mapping matrix
 #' @export
@@ -568,6 +573,9 @@ component_list.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)
   }
+  # Automatically add Intercept and remove -1 unless -1 is in components formula
+  object <- auto_intercept(object)
+
   code <- code.components(object)
   parsed <- lapply(code, function(x) parse(text = x))
   components <- lapply(
@@ -1098,7 +1106,7 @@ code.components <- function(components, add = "") {
 
 # MAPPERS ----
 
-#' @details `bru_mapper.default` adds the "bru_mapper" class to an object
+#' @details * `bru_mapper.default` adds the "bru_mapper" class to an object
 #' @export
 #' @rdname bru_mapper
 bru_mapper.default <- function(mapper, ...) {
@@ -1361,7 +1369,7 @@ ibm_amatrix.bru_mapper_offset <- function(mapper, input, ...) {
 
 #' @param values Input values calculated by [input_eval.bru_input()]
 #' @param mappers A list of `bru_mapper` objects
-#' (TODO: add an `as.bru_mapper` generic to hook conversion methods onto)
+#' @details * `bru_mapper_multi` constructs a kronecker product mapping
 #' @export
 #' @rdname bru_mapper
 bru_mapper_multi <- function(mappers, ...) {

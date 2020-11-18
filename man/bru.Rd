@@ -4,7 +4,7 @@
 \alias{bru}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
-bru(components = y ~ Intercept, ..., options = list())
+bru(components = ~Intercept(1), ..., options = list())
 }
 \arguments{
 \item{components}{A \link{formula}-like specification of latent components.

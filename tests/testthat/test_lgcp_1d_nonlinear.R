@@ -11,7 +11,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
 
   cmp <- ~ lsig + Intercept
   formula <- distance ~ log(hr(distance, lsig)) + Intercept
-  ips <- ipoints(inla.mesh.1d(seq(0, 8, by = 0.1)), name = "distance")
+  ips <- ipoints(INLA::inla.mesh.1d(seq(0, 8, by = 0.1)), name = "distance")
 
   fit <- lgcp(
     components = cmp,

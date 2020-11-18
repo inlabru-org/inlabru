@@ -61,15 +61,13 @@ NULL
 #'
 #'
 #' @export
-#' @param components A component specification formula
+#' @param components A [component_list] object
 #' @param lhoods A list of one or more `lhood` objects
 #' @return A [bru_model] object
 #' @keywords internal
 
-make.model <- function(components, lhoods) {
-
-  # Automatically add Intercept and -1 to components unless -1 is in components formula
-  components <- auto.intercept(components)
+make_model <- function(components, lhoods) {
+  stopifnot(inherits(components, "component_list"))
 
   # Back up environment
   env <- environment(components)
