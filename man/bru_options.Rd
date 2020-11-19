@@ -18,7 +18,7 @@ as.bru_options(x = NULL)
 
 bru_options_default()
 
-bru_options_check(options)
+bru_options_check(options, ignore_null = TRUE)
 
 bru_options_get(name = NULL, include_default = TRUE)
 
@@ -37,6 +37,8 @@ objects. Options specified later override the previous options.}
 \item{x}{An object to be converted to an \code{bru_options} object.}
 
 \item{options}{An \code{bru_options} object to be checked}
+
+\item{ignore_null}{Ignore missing or NULL options.}
 
 \item{name}{Either \code{NULL}, or single option name string, or character vector
 or list with option names,
@@ -148,7 +150,7 @@ if (interactive()) {
 }
 \dontrun{
 if (interactive()) {
-  bru_options_check(bru_options(invalid = "something"))
+  bru_options_check(bru_options(bru_max_iter = "text"))
 }
 }
 \dontrun{

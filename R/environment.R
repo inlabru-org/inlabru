@@ -321,25 +321,28 @@ bru_options_inla <- function(options) {
 #' @details `bru_options_check` checks for valid contents of an `bru_options`
 #' object
 #' @param options An `bru_options` object to be checked
+#' @param ignore_null Ignore missing or NULL options.
 #' @return `bru_options_check()` returns a `logical`; `TRUE` if the object
 #'   contains valid options for use by other functions
 #' @details `bru_options_check()` produces warnings for invalid options.
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
-#'   bru_options_check(bru_options(invalid = "something"))
+#'   bru_options_check(bru_options(bru_max_iter = "text"))
 #' }
 #' }
 #' @export
 #' @rdname bru_options
 
-bru_options_check <- function(options) {
+bru_options_check <- function(options, ignore_null = TRUE) {
   options <- as.bru_options(options)
   ok <- TRUE
   # Check valid max_iter
   if (is.null(options[["bru_max_iter"]])) {
-    ok <- FALSE
-    warning("'max_iter' should be a positive integer, not NULL.")
+    if (!ignore_null) {
+      ok <- FALSE
+      warning("'bru_max_iter' should be a positive integer, not NULL.")
+    }
   } else if (!is.numeric(options[["bru_max_iter"]]) ||
              !(options[["bru_max_iter"]] > 0)) {
     ok <- FALSE
