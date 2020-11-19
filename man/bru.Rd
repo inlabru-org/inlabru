@@ -14,9 +14,8 @@ Also used to define a default linear additive predictor.  See
 \item{...}{Likelihoods, each constructed by a calling \code{\link[=like]{like()}}, or named
 parameters that can be passed to a single \code{\link[=like]{like()}} call.}
 
-\item{options}{A list of name and value pairs that are either interpretable
-by \link{bru.options} or valid inla parameters. See \link{bru.options} for
-caveats about some of the \verb{control.*} inla options.}
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
 }
 \value{
 bru returns an object of class "bru". A \code{bru} object inherits

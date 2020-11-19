@@ -4,15 +4,7 @@
 \alias{iinla}
 \title{Iterated INLA}
 \usage{
-iinla(
-  model,
-  lhoods,
-  n = 10,
-  result = NULL,
-  iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"),
-  offset = NULL,
-  inla.options
-)
+iinla(model, lhoods, n = 10, result = NULL, offset = 0, options)
 }
 \arguments{
 \item{model}{A \link{bru_model} object}
@@ -23,15 +15,14 @@ iinla(
 
 \item{result}{A previous inla result, to be used as starting point}
 
-\item{iinla.verbose}{If TRUE, be verbose (use verbose=TRUE to make INLA verbose)}
-
 \item{offset}{An additional predictor offset}
 
-\item{inla.options}{A list of further arguments passed on to \code{INLA::inla}
-Some \verb{control.*} arguments are partially overridden, according to
-internal inlabru method requirements.}
+\item{options}{A \code{bru_options} object.}
 
 \item{data}{A data.frame}
+
+\item{bru_verbose}{If TRUE, be verbose (use the inla option verbose=TRUE to
+make INLA itself verbose)}
 }
 \value{
 An \code{INLA::inla} object

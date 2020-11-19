@@ -1,64 +1,552 @@
-iinla.env <- new.env()
-iinla.env$log <- paste0(Sys.time(), ": inlabru start")
+#' @include 0_inlabru_envir.R
 
-.onAttach <- function(libname, pkgname) {
-  iinla.env$log_active <- FALSE
-  if (length(find.package("INLA", quiet = TRUE)) == 0) {
-    iinla.env$inla.installed <- FALSE
+#' @title Get access to the internal environment
+#' @details The environment is defined in aaaaa.R which is loaded first.
+#' @keywords internal
+bru_env_get <- function() {
+  pkg_envir <- parent.env(environment())
+  envir <- get0(".inlabru_envir", envir = pkg_envir)
+  if (!is.environment(envir)) {
+    stop("Something went wrong: cannot find internal .inlabru_envir environment.")
+  }
+  envir
+}
+
+
+# Documentation would clash with base .onLoad documentation
+# @title Initialise log storage and global options
+# @param libname a character string giving the library directory where the
+#   package defining the namespace was found.
+# @param pkgname a character string giving the name of the package.
+# @aliases namespace_hooks
+# @keywords internal
+# @rdname namespace_hooks
+.onLoad <- function(libname, pkgname) {
+  bru_log_reset()
+  bru_log_message("inlabru loaded", allow_verbose = FALSE)
+  bru_log_message("Clear override options", allow_verbose = FALSE)
+  bru_options_reset()
+}
+
+
+
+
+# inlabru log methods ----
+
+#' @title inlabru log message methods
+#' @description Resets the inlabru log object
+#' @details `bru_log_reset()` clears the log contents.
+#' @examples
+#' \dontrun{
+#' if (interactive()) {
+#'   # EXAMPLE1
+#' }
+#' }
+#' @export
+#' @rdname bru_log
+
+bru_log_reset <- function() {
+  envir <- bru_env_get()
+  envir$log <- character(0)
+  invisible(NULL)
+}
+
+
+#' @param pretty logical; If `TRUE`, return a single string with the log
+#' messages separated and terminated by line feeds, suitable for `cat()`.
+#' If `FALSE`, return the raw log as a vector of strings. Default: `TRUE`
+#' @return `bru_log_get` RETURN_VALUE
+#' @export
+#' @rdname bru_log
+
+bru_log_get <- function(pretty = TRUE) {
+  if (pretty) {
+    paste0(paste0(bru_env_get()[["log"]], collapse = "\n"), "\n")
   } else {
-    iinla.env$inla.installed <- TRUE
+    bru_env_get()[["log"]]
   }
 }
 
-requireINLA <- function() {
-  tc <- tryCatch(attachNamespace("INLA"), error = function(x) {})
-  # if ( iinla.env$inla.installed ) {
-  # if (!isNamespaceLoaded("INLA")) {
-  #   attachNamespace("INLA")
-  # }
 
-  # } else {
-  #  stop("This function requires INLA to be installed. Please consult www.r-inla.org on how to install INLA. After installing INLA please reload inlabru.")
-  # }
+#' @param ... Zero or more objects passed on to [`base::.makeMessage()`]
+#' @param domain Domain for translations, passed on to [`base::.makeMessage()`]
+#' @param appendLF logical; whether to add a newline to the message. Only
+#'   used for verbose output.
+#' @param verbosity numeric value describing the verbosity level of the message
+#' @param allow_verbose Whether to allow verbose output. Must be set to FALSE
+#' until the options object has been initialised.
+#' @param verbose logical, numeric, or `NULL`; local override for verbose
+#' output. If `NULL`, the global option `bru_verbose` or default value is used.
+#' If `FALSE`, no messages are printed. If `TRUE`, messages with `verbosity`
+#' \eqn{\leq 1}{<=1}
+#' are printed. If numeric, messages with `verbosity` \eqn{\leq}{<=} `verbose` are
+#' printed.
+#' @param verbose_store Same as `verbose`, but controlling what messages are
+#' stored in the global log object. Can be controlled via the `bru_verbose_store`
+#' with [bru_options_set()].
+#' @return
+#' * `bru_log_message` OUTPUT_DESCRIPTION
+#' @details
+#' * `bru_log_message` DETAILS
+#' @examples
+#' \dontrun{
+#' if (interactive()) {
+#'   # EXAMPLE1
+#' }
+#' }
+#' @export
+#' @rdname bru_log
+
+bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
+                           verbosity = 1,
+                           allow_verbose = TRUE, verbose = NULL,
+                           verbose_store = NULL) {
+  if (allow_verbose) {
+    if ((!is.null(verbose) && (verbose >= verbosity)) ||
+        bru_options_get("bru_verbose", include_default = TRUE) >= verbosity) {
+      message(..., domain = domain, appendLF = appendLF)
+    }
+  }
+  if ((!is.null(verbose_store) && (verbose_store >= verbosity)) ||
+      !allow_verbose ||
+      bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity) {
+    envir <- bru_env_get()
+    envir$log <- c(
+      envir$log,
+      .makeMessage(Sys.time(), ": ", ...,
+                   domain = domain,
+                   appendLF = FALSE
+      )
+    )
+  }
+  invisible()
 }
 
 
 
-#' @title Global setting for tutorial sessions
+# Options methods ----
+
+#' @title Create or update an options objects
+#' @description Create a new options object, or merge information from several
+#'   objects.
 #'
-#' @description Increases verbosity and sets the inference strategy to empirical Bayes.
-#'
-#' @aliases init.tutorial
-#' @export
-#'
-#' @return NULL
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#'   The `_get`, `_set`, and `_reset` functions operate on a global
+#'   package options override object. In many cases, setting options in
+#'   specific calls to [bru()] is recommended instead.
+#' @param ... Named options, optionally started by one or more [`bru_options`]
+#' objects. Options specified later override the previous options.
+#' @return `bru_options()` returns an `bru_options` object.
+#' @details For `bru_options` and `bru_options_set`, recognised options are:
+#' \describe{
+#' \item{bru_verbose}{logical or numeric; if `TRUE`, log messages of `verbosity`
+#' \eqn{\leq 1} are printed by [bru_log_message()]. If numeric, log messages
+#' of
+#' verbosity \eqn{\leq} are printed. Default `FALSE`}
+#' \item{bru_verbose_stored}{logical or numeric; if `TRUE`, log messages of
+#' `verbosity` \eqn{\leq 1} are stored by [bru_log_message()]. If numeric,
+#' log messages of verbosity \eqn{\leq} are stored. Default: 1}
+#' }
 #'
 #' @examples
 #' \dontrun{
-#' # Note: Only run this if you want to change the inlabru options for this session
+#' if (interactive()) {
+#'   # Combine global and user options:
+#'   options1 <- bru_options(bru_options_get(), bru_verbose = TRUE)
+#'   # Create a proto-options object in two equivalent ways:
+#'   options2 <- as.bru_options(bru_verbose = TRUE)
+#'   options2 <- as.bru_options(list(bru_verbose = TRUE))
+#'   # Combine options objects:
+#'   options3 <- bru_options(options1, options2)
+#' }
+#' }
+#' @export
+#' @rdname bru_options
+
+bru_options <- function(...) {
+  new_bru_options <- function() {
+    options <- list()
+    class(options) <- c("bru_options", "list")
+    options
+  }
+  
+  input_options <- list(...)
+
+  options <- new_bru_options()
+  for (k in seq_along(input_options)) {
+    if (inherits(input_options[[k]], "bru_options")) {
+      options <- modifyList(options, input_options[[k]], keep.null = TRUE)
+    } else {
+      options <- modifyList(options, input_options[k], keep.null = TRUE)
+    }
+  }
+    
+  options
+}
+
+#' @param x An object to be converted to an `bru_options` object.
+#' @return For `as.bru_options()`, `NULL` or no input returns an empty
+#' `bru_options` object, a `list` is converted via `bru_options(...)`,
+#' and `bru_options` input is passed through. Other types of input generates
+#' an error.
 #'
-#' # Determine current bru default:
-#' bo <- bru.options()
+#' @export
+#' @rdname bru_options
+
+as.bru_options <- function(x = NULL) {
+  if (inherits(x, "bru_options")) {
+    x
+  } else if (is.null(x)) {
+    bru_options()
+  } else if (is.list(x)) {
+    do.call(bru_options, x)
+  } else {
+    stop("Unable coerce object to 'bru_options'")
+  }
+}
+
+#' @return `bru_options_default()` returns an `bru_options` object containing
+#'   default options.
+#' @examples
+#' \dontrun{
+#' if (interactive()) {
+#'   # EXAMPLE1
+#' }
+#' }
+#' @export
+#' @rdname bru_options
+
+bru_options_default <- function() {
+  bru_options(
+    # inlabru options
+    bru_verbose = FALSE,
+    bru_verbose_store = 1,
+    bru_max_iter = 10,
+    bru_run = TRUE,
+    bru_int_args = list(method = "stable"), # nsub: NULL
+    # bru_result: NULL
+    # inla options
+    E = 1,
+    Ntrials = 1,
+    control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
+    control.inla = list(int.strategy = "auto"),
+    control.fixed = list(expand.factor.strategy = "inla")
+  )
+}
+
+
+bru_options_deprecated <- function(args) {
+  stopifnot(inherits(args, "bru_options"))
+  cl <- class(args)
+  deprecated_args <- c(
+    mesh = "",
+    run = "bru_run",
+    max.iter = "bru_max_iter",
+    result = "bru_result",
+    int.args = "int.args"
+  )
+  names_args <- names(args)
+  deprecated_args <-
+    deprecated_args[intersect(names_args, names(deprecated_args))]
+  if (any(nzchar(names(deprecated_args)) == 0)) {
+    warning(paste0(
+      "Ignoring deprecated global options '",
+      paste0(names(deprecated_args)[nzchar(names(deprecated_args)) == 0], collapse = "', '"),
+      "'."
+    ))
+    names_args <- setdiff(
+      names_args,
+      names(deprecated_args)[nzchar(names(deprecated_args)) == 0]
+    )
+    deprecated_args <- deprecated_args[nzchar(names(deprecated_args)) > 0]
+    args <- args[names_args]
+  }
+  if (length(deprecated_args) > 0) {
+    warning(paste0(
+      "Converting deprecated global option(s) '",
+      paste0(names(deprecated_args), collapse = "', '"),
+      "' to new option(s) '",
+      paste0(deprecated_args, collapse = "', '"),
+      "'."
+    ))
+    names_args[names_args %in% names(deprecated_args)] <- deprecated_args
+    names(args) <- names_args
+  }
+  class(args) <- cl
+  args
+}
+
+
+#' Additional [bru] options
+#' 
+#' Construct a `bru_options` object including the default and global options,
+#' and converting deprecated option names.
+#' 
+#' @param \dots Options passed on to [as.bru_options()]
 #'
-#' # By default, INLA's integration strategy is set to the INLA default 'auto':
-#' bo$inla.options$control.inla
+#' @aliases bru_call_options
+#' @export
 #'
-#' # Now, let's run init.tutorial() to make empirical Bayes the default
-#' # integration method when `bru` calls `inla`
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
-#' init.tutorial()
+#' @examples
 #'
-#' # Check if it worked:
-#' bru.options()$inla.options$control.inla
+#' \donttest{
+#'
+#' opts <- bru_call_options()
+#'
+#' # Print them:
+#' opts
 #' }
 #'
-init.tutorial <- function() {
-  cat("Setting defaults for tutorial session. \n")
-  iinla.setOption("iinla.verbose", list(TRUE))
-  iinla.setOption("control.inla", list(list(int.strategy = "eb")))
-  iinla.setOption("control.compute", list(list(config = TRUE, dic = TRUE, waic = TRUE)))
+bru_call_options <- function(...) {
+  opt <- as.bru_options(...)
+  opt <- bru_options_deprecated(opt)
+  opt <- bru_options(bru_options_get(), opt)
+  bru_options_check(opt)
+  opt
 }
+
+
+# Extract non-bru options
+bru_options_inla <- function(options) {
+  stopifnot(inherits(options, "bru_options"))
+  cl <- class(options)
+  options <- options[!grepl("^bru_", names(options))]
+  class(options) <- cl
+  options
+}
+
+
+
+#' @details `bru_options_check` checks for valid contents of an `bru_options`
+#' object
+#' @param options An `bru_options` object to be checked
+#' @return `bru_options_check()` returns a `logical`; `TRUE` if the object
+#'   contains valid options for use by other functions
+#' @details `bru_options_check()` produces warnings for invalid options.
+#' @examples
+#' \dontrun{
+#' if (interactive()) {
+#'   bru_options_check(bru_options(invalid = "something"))
+#' }
+#' }
+#' @export
+#' @rdname bru_options
+
+bru_options_check <- function(options) {
+  options <- as.bru_options(options)
+  ok <- TRUE
+  # Check valid max_iter
+  if (is.null(options[["bru_max_iter"]])) {
+    ok <- FALSE
+    warning("'max_iter' should be a positive integer, not NULL.")
+  } else if (!is.numeric(options[["bru_max_iter"]]) ||
+             !(options[["bru_max_iter"]] > 0)) {
+    ok <- FALSE
+    warning("'bru_max_iter' should be a positive integer.")
+  }
+  
+  ok
+}
+
+
+
+#' @param name Either `NULL`, or single option name string, or character vector
+#'  or list with option names,
+#'   Default: NULL
+#' @param include_default logical; If `TRUE`, the default options are included
+#'   together with the global override options. Default: `TRUE`
+#' @return `bru_options_get` returns either an [`bru_options`] object, for
+#'   `name == NULL`, the contents of single option, if `name` is a options name
+#'   string, or a named list of option contents, if `name` is a list of option
+#'   name strings.
+#'
+#' @examples
+#' \dontrun{
+#' if (interactive()) {
+#'   # EXAMPLE1
+#' }
+#' }
+#' @export
+#' @rdname bru_options
+
+bru_options_get <- function(name = NULL, include_default = TRUE) {
+  if (include_default) {
+    default <- bru_options_default()
+  } else {
+    default <- bru_options()
+  }
+  global <- bru_env_get()$options
+  options <- bru_options(default, global)
+  if (is.null(name)) {
+    return(options)
+  }
+  if (is.list(name)) {
+    mget(unlist(name), as.environment(options))
+  } else {
+    options[[name]]
+  }
+}
+
+
+#' @details `bru_options_set()` is used to set global package options.
+#' @return `bru_options_set()` returns a copy of the global options, invisibly.
+#' @seealso [bru_options()], [bru_options_default()], [bru_options_get()]
+#' 
+#' @details
+#' * bru_run If TRUE, run inference. Otherwise only return configuration needed
+#'   to run inference.
+#' * nru_max_iter maximum number of inla iterations
+#' * offset the usual `INLA::inla` offset. If a nonlinear formula is
+#'   used, the resulting Taylor approximation constant will be added to this
+#'   automatically.
+#' * bru_result An `inla` object returned from previous calls of
+#'   `INLA::inla`, [bru] or [lgcp]. This will be used as a
+#'   starting point for further improvement of the approximate posterior.
+#' * E `INLA::inla` 'poisson' likelihood exposure parameter
+#' * Ntrials `INLA::inla` 'binomial' likelihood parameter
+#' * control.compute INLA option, See `INLA::control.compute`
+#' * control.inla INLA option, See `INLA::control.inla`
+#' * control.fixed INLA option, See `INLA::control.fixed`. Warning:
+#'   due to how inlabru currently constructs the `inla()`, the `mean`,
+#'   `prec`, `mean.intercept`, and `prec.intercept` will have no
+#'   effect. Until a more elegant alternative has been implemented, use explicit
+#'   `mean.linear` and `prec.linear` specifications in each
+#'   `model="linear"` component instead.
+#' * bru_int_args List of arguments passed all the way to the integration method
+#' `ipoints` and `int.polygon` for 'cp' family models
+#' * All options not starting with `bru_` are passed on to `inla()`, sometimes
+#' after altering according to the needs of the inlabru method.
+#' 
+#' @examples
+#' \dontrun{
+#' if (interactive()) {
+#'   bru_options_set(
+#'     bru_verbose = TRUE,
+#'     verbose = TRUE
+#'   )
+#' }
+#' }
+#' @export
+#' @rdname bru_options
+
+bru_options_set <- function(...) {
+  envir <- bru_env_get()
+  envir$options <- bru_options(envir$options, ...)
+  invisible(bru_options_get())
+}
+
+#' @details `bru_options_reset()` clears the global option overrides.
+#' @export
+#' @rdname bru_options
+
+bru_options_reset <- function() {
+  envir <- bru_env_get()
+  envir$options <- bru_options()
+  invisible(bru_options_get())
+}
+
+
+
+#' @title Print inlabru options
+#' @param x An [`bru_options`] object to be printed
+#' @param legend logical; If `TRUE`, include explanatory text, Default: `TRUE`
+#' @param include_global logical; If `TRUE`, include global override options
+#' @param include_default logical; If `TRUE`, include default options
+#' @param ... Further parameters, currently ignored
+#'
+#' @examples
+#' if (interactive()) {
+#'   options <- bru_options(verbose = TRUE)
+#'
+#'   # Don't print options only set in default:
+#'   print(options, include_default = FALSE)
+#'
+#'   # Only include options set in the object:
+#'   print(options, include_default = FALSE, include_global = FALSE)
+#' }
+#' @method print bru_options
+#' @export
+#' @rdname print.bru_options
+
+print.bru_options <- function(x,
+                             legend = TRUE,
+                             include_global = TRUE,
+                             include_default = TRUE,
+                             ...) {
+  traverse <- function(combined, default, global, options, prefix = "") {
+    for (name in sort(names(combined))) {
+      if (is.list(combined[[name]])) {
+        cat(paste0(prefix, name, " =\n"))
+        traverse(
+          combined[[name]], default[[name]],
+          global[[name]], options[[name]],
+          prefix = paste0(prefix, "  ")
+        )
+      } else {
+        cat(paste0(
+          prefix,
+          name, " = ",
+          if (is.null(combined[[name]])) {
+            "NULL"
+          } else {
+            combined[[name]]
+          },
+          " (",
+          if (
+            !is.null(default[[name]]) &&
+            (default[[name]] == combined[[name]])
+          ) {
+            "default"
+          } else if (
+            !is.null(global[[name]]) &&
+            (global[[name]] == combined[[name]])
+          ) {
+            "global"
+          } else if (
+            !is.null(options[[name]]) &&
+            (options[[name]] == combined[[name]])
+          ) {
+            "user"
+          } else {
+            "unknown"
+          },
+          ")\n"
+        ))
+      }
+    }
+  }
+  if (include_default) {
+    default <- bru_options_default()
+  } else {
+    default <- bru_options()
+  }
+  if (include_global) {
+    global <- bru_options_get(include_default = FALSE)
+  } else {
+    global <- bru_options()
+  }
+  combined <- bru_options(default, global, x)
+  
+  if (legend) {
+    cat("Legend:\n")
+    if (include_default) {
+      cat("  default = first set in the default options\n")
+    }
+    if (include_global) {
+      cat("  global = first set in the global override object\n")
+    }
+    cat("  user = first set in the object\n")
+  }
+  cat("Options for inlabru:\n")
+  traverse(combined, default, global, x, prefix = "  ")
+  invisible(x)
+}
+
+
+
+
+# Old log methods ----
 
 #' @title inlabru log messages
 #'
@@ -66,7 +554,7 @@ init.tutorial <- function() {
 #'
 #' @param txt character; log message.
 #' @param verbose logical; if `TRUE`, print the log message on screen with
-#' `message(txt)`. Default: `iinla.getOptions("iinla.verbose")`
+#' `message(txt)`. Default: `bru_options_get("bru_verbose")`
 #' @details The log message is stored if the log is active, see
 #' [bru_log_active()]
 #' @return `bru_log` invisibly returns the added log message.
@@ -77,31 +565,9 @@ init.tutorial <- function() {
 
 bru_log <- function(txt, verbose = NULL) {
   if (is.null(verbose)) {
-    verbose <- iinla.getOption("iinla.verbose")
+    verbose <- bru_options_get("bru_verbose")
   }
-  if (isTRUE(verbose)) {
-    message(txt)
-  }
-  msg <- paste0(Sys.time(), ": ", txt)
-  if (iinla.env$log_active) {
-    iinla.env$log <- c(iinla.env$log, msg)
-  }
-  invisible(msg)
-}
-
-
-#' @param pretty logical; If `TRUE`, return a single string with the log
-#' messages separated and terminated by line feeds, suitable for `cat()`.
-#' If `FALSE`, return the raw log as a vector of strings. Default: `TRUE`
-#' @export
-#' @rdname bru_log
-
-bru_log_get <- function(pretty = TRUE) {
-  if (pretty) {
-    paste0(paste0(iinla.env$log, collapse = "\n"), "\n")
-  } else {
-    iinla.env
-  }
+  bru_log_message(txt, verbose = verbose)
 }
 
 
@@ -123,99 +589,37 @@ bru_log_get <- function(pretty = TRUE) {
 #' @rdname bru_log
 
 bru_log_active <- function(activation = NULL) {
-  current <- iinla.env$log_active
+  current <- bru_options_get("bru_verbose_store")
   if (!is.null(activation)) {
-    stopifnot(is.logical(activation))
-    iinla.env$log_active <- activation
+    bru_options_set("bru_verbose_store" = activation)
   }
   current
 }
-#' @details `bru_log_reset` clears the log
+
+
+# Old options methods ----
+
+#' @details * `iinla.getOption` is deprecated. Use `bru_option_get` instead.
 #' @export
-#' @rdname bru_log
-
-bru_log_reset <- function() {
-  iinla.env$log <- paste0(Sys.time(), ": inlabru log reset")
-  invisible(iinla.env$log)
-}
-
-#' Merge defaults with overriding options
-#'
-#' Helper function for setting option variables and lists.
-#'
-#' @details
-#' \itemize{
-#'   \item Atomic values override defaults.
-#'   \item `NULL` values are replaced by defaults.
-#'   \item Missing elements of an option list are set to the default values.
-#' }
-#'
-#' @param options An atomic element or a list with named entries.
-#' @param defaults An atomic element or a list with named entries.
-#' @return The merged option(s).
-#'
-#' @keywords internal
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#'
-#' @examples
-#' def <- list(iterations = 10, method = "newton")
-#' inlabru:::override_config_defaults(list(iterations = 20, verbose = TRUE), def)
-override_config_defaults <- function(options, defaults) {
-  if (is.null(options)) {
-    return(defaults)
-  }
-  if (!is.list(options)) {
-    return(options)
-  }
-  for (name in names(options)) {
-    defaults[[name]] <- options[[name]]
-  }
-  defaults
-}
-
-iinla.getOption <- function(
-                            option = c(
-                              "control.compute",
-                              "control.inla",
-                              "iinla.verbose",
-                              "control.fixed"
-                            )) {
-  if (missing(option)) {
-    stop("argument is required.")
-  }
-  envir <- iinla.env
-  option <- match.arg(option, several.ok = TRUE)
-  if (exists("iinla.options", envir = envir)) {
-    opt <- get("iinla.options", envir = envir)
+#' @rdname bru_options
+iinla.getOption <- function(name = NULL) {
+  if (identical(name, "iinla.verbose")) {
+    new_option <- "bru_verbose"
   } else {
-    opt <- list()
+    new_option <- name
   }
-
-  default.opt <-
-    list(
-      iinla.verbose = FALSE,
-      control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
-      control.inla = list(int.strategy = "auto"),
-      control.fixed = list(expand.factor.strategy = "inla")
-    )
-  res <- c()
-  for (i in 1:length(option)) {
-    if (option[i] %in% names(opt)) {
-      res[[option[i]]] <- override_config_defaults(
-        opt[[option[i]]],
-        default.opt[[option[i]]]
-      )
-    } else {
-      res[[option[i]]] <- default.opt[[option[i]]]
-    }
-  }
-  if (length(res) == 1) {
-    res <- res[[1]]
-  }
-  return(res)
+  .Deprecated(
+    paste0('bru_options_get("', new_option, '")'),
+    old = deparse(sys.call(sys.parent()))
+  )
+  res <- bru_options_get(new_option)
+  res
 }
 
 
+#' @details * `iinla.setOption` is deprecated. Use `bru_option_set` instead.
+#' @export
+#' @rdname bru_options
 iinla.setOption <- function(...) {
   iinla.setOption.core <- function(option = c(
                                      "control.compute",
@@ -223,36 +627,89 @@ iinla.setOption <- function(...) {
                                      "iinla.verbose",
                                      "control.fixed"
                                    ),
-                                   value) {
-    envir <- iinla.env
-    option <- match.arg(option, several.ok = FALSE)
-    if (!exists("iinla.options", envir = envir)) {
-      assign("iinla.options", list(), envir = envir)
-    }
-    if (is.character(value)) {
-      eval(parse(text = paste("iinla.options$", option,
-        "=", shQuote(value),
-        sep = ""
-      )), envir = envir)
+                                   value,
+                                   option_value_alternating = TRUE) {
+    if (identical(option, "iinla.verbose")) {
+      new_option <- "bru_verbose"
     } else {
-      eval(parse(text = paste("iinla.options$", option,
-        "=", ifelse(is.null(value), "NULL", value),
-        sep = ""
-      )), envir = envir)
+      new_option <- option
     }
-    return(invisible())
+    if (option_value_alternating) {
+      .Deprecated(
+        paste0("bru_options_get(", new_option, " = value)"),
+        old = paste0('iinla.setOption("', option, '", value)')
+      )
+    } else {
+      .Deprecated(
+        paste0("bru_options_get(", new_option, " = value)"),
+        old = paste0("iinla.setOption(", option, " = value)")
+      )
+    }
+    setting <- list(value)
+    names(setting) <- new_option
+    do.call(bru_options_set, setting)
   }
   called <- list(...)
   len <- length(names(called))
   if (len > 0L) {
     for (i in 1L:len) {
-      do.call(iinla.setOption.core, args = list(
-        names(called)[i],
-        called[[i]]
-      ))
+      do.call(
+        iinla.setOption.core,
+        args = list(
+          names(called)[i],
+          called[[i]],
+          option_value_alternating = FALSE
+        )
+      )
     }
   } else {
-    iinla.setOption.core(...)
+    iinla.setOption.core(..., option_value_alternating = TRUE)
   }
   return(invisible())
+}
+
+
+
+# Utils ----
+
+
+requireINLA <- function(quietly = FALSE) {
+tryCatch(requireNamespace("INLA", quietly = quietly), error = function(x) {})
+}
+
+
+#' @title Global setting for tutorial sessions
+#'
+#' @description Increases verbosity and sets the inference strategy to empirical Bayes.
+#'
+#' @aliases init.tutorial
+#' @export
+#'
+#' @return NULL
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#'
+#' @examples
+#' \dontrun{
+#' # Note: Only run this if you want to change the inlabru options for this session
+#'
+#' # Determine current bru defaults:
+#' bo <- bru_options_get()
+#'
+#' # By default, INLA's integration strategy is set to the INLA default 'auto':
+#' bo$control.inla
+#'
+#' # Now, let's run init.tutorial() to make empirical Bayes the default
+#' # integration method when `bru` calls `inla`
+#'
+#' init.tutorial()
+#'
+#' # Check if it worked:
+#' bru_options_get("control.inla")
+#' }
+#'
+init.tutorial <- function() {
+  message("Setting defaults for tutorial session.")
+  bru_options_set(bru_verbose = TRUE)
+  bru_options_set(control.inla = list(int.strategy = "eb"))
+  bru_options_set(control.compute = list(dic = TRUE, waic = TRUE))
 }

@@ -30,7 +30,7 @@ lgcp(
 
 \item{E}{Single numeric used rescale all integration weights by a fixed factor}
 
-\item{options}{See \link{bru.options}}
+\item{options}{See \code{\link[=bru_options_set]{bru_options_set()}}}
 }
 \value{
 An \link{bru} object

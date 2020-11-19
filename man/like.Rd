@@ -61,7 +61,8 @@ predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
 
-\item{options}{list of global options overriding \link{bru.options}}
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
 }
 \value{
 A likelihood configuration which can be used to parameterize \link{bru}.

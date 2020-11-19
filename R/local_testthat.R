@@ -168,11 +168,17 @@ local_bru_safe_inla <- function(multicore = FALSE,
   if (requireNamespace("INLA", quietly = TRUE)) {
     # Save the num.threads option so it can be restored
     old <- INLA::inla.getOption("num.threads")
+    old_opt <- bru_options_get("num.threads")
     withr::defer(
       INLA::inla.setOption(num.threads = old),
       envir
     )
+    withr::defer(
+      bru_options_set(num.threads = old_opt),
+      envir
+    )
   }
+  bru_options_set(num.threads = "1:1")
   testthat::skip_if_not(bru_safe_inla(multicore = multicore, quietly = quietly))
 }
 

@@ -141,7 +141,7 @@ test_that("Component construction: deprecated arguments", {
     bru(~ something(map = a),
       formula = response ~ .,
       data = data.frame(a = 1:5),
-      options = list(run = FALSE)
+      options = list(bru_run = FALSE)
     ),
     "Use of 'map' is deprecated"
   )

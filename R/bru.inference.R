@@ -239,9 +239,8 @@ bru_info.bru <- function(object, ...) {
 #'   [component] for details.
 #' @param ... Likelihoods, each constructed by a calling [like()], or named
 #'   parameters that can be passed to a single [like()] call.
-#' @param options A list of name and value pairs that are either interpretable
-#'   by [bru.options] or valid inla parameters. See [bru.options] for
-#'   caveats about some of the `control.*` inla options.
+#' @param options A [bru_options] options object or a list of options passed
+#' on to [bru_options()]
 #'
 #' @return bru returns an object of class "bru". A `bru` object inherits
 #'   from `INLA::inla` (see the inla documentation for its properties) and
@@ -256,7 +255,7 @@ bru <- function(components = ~ Intercept(1),
   requireINLA()
 
   # Update default options
-  options <- do.call(bru.options, options)
+  options <- bru_call_options(options)
 
   lhoods <- list(...)
   dot_is_lhood <- vapply(lhoods, function(lh) inherits(lh, "bru_like"), TRUE)
@@ -290,18 +289,18 @@ bru <- function(components = ~ Intercept(1),
 
   # Set max iterations to 1 if all likelihood formulae are linear
   if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) {
-    options$max.iter <- 1
+    options$bru_max_iter <- 1
   }
 
   # Run iterated INLA
-  if (options$run) {
+  if (options$bru_run) {
     result <- iinla(
       model = bru.model,
       lhoods = lhoods,
-      n = options$max.iter,
-      offset = options$offset,
-      result = options$result,
-      inla.options = options$inla.options
+      n = options$bru_max_iter,
+      offset = options$bru_offset,
+      result = options$bru_result,
+      options = options
     )
   } else {
     result <- list()
@@ -312,7 +311,7 @@ bru <- function(components = ~ Intercept(1),
     method = "bru",
     lhoods = lhoods,
     model = bru.model,
-    mesh = options$mesh
+    options = options
   )
   class(result) <- c("bru", class(result))
   return(result)
@@ -376,7 +375,8 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#' @param options list of global options overriding [bru.options]
+#' @param options A [bru_options] options object or a list of options passed
+#' on to [bru_options()]
 #'
 #' @return A likelihood configuration which can be used to parameterize [bru].
 #'
@@ -387,7 +387,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
                  options = list()) {
-  options <- do.call(bru.options, options)
+  options <- bru_call_options(options)
 
   # Some defaults
   inla.family <- family
@@ -433,7 +433,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
         dnames = response,
         data = NULL,
         model = NULL,
-        int.args = options$int.args
+        int.args = options$bru_int_args
       )
     }
 
@@ -560,88 +560,6 @@ joint_stackmaker <- function(model, lhoods, result) {
 
 
 
-#' Additional [bru] options
-#'
-#' @aliases bru.options
-#' @export
-#'
-#' @param mesh An `inla.mesh` object for spatial models without SPDE
-#'   components. Mostly used for successive spatial predictions.
-#' @param run If TRUE, run inference. Otherwise only return configuration needed
-#'   to run inference.
-#' @param max.iter maximum number of inla iterations
-#' @param offset the usual `INLA::inla` offset. If a nonlinear formula is
-#'   used, the resulting Taylor approximation constant will be added to this
-#'   automatically.
-#' @param result An `inla` object returned from previous calls of
-#'   `INLA::inla`, [bru] or [lgcp]. This will be used as a
-#'   starting point for further improvement of the approximate posterior.
-#' @param E `INLA::inla` 'poisson' likelihood exposure parameter
-#' @param Ntrials `INLA::inla` 'binomial' likelihood parameter
-#' @param control.compute INLA option, See `INLA::control.compute`
-#' @param control.inla INLA option, See `INLA::control.inla`
-#' @param control.fixed INLA option, See `INLA::control.fixed`. Warning:
-#'   due to how inlabru currently constructs the `inla()`, the `mean`,
-#'   `prec`, `mean.intercept`, and `prec.intercept` will have no
-#'   effect. Until a more elegant alterative has been implemented, use explicit
-#'   `mean.linear` and `prec.linear` specifications in each
-#'   `model="linear"` component instead.
-#' @param int.args List of arguments passed all the way to the integration method
-#' `ipoints` and `int.polygon` for 'cp' family models
-#' @param ... Additional options passed on to `INLA::inla`
-#'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and Finn Lindgren \email{finn.lindgren@@gmail.com}
-#'
-#' @examples
-#'
-#' \donttest{
-#'
-#' # Generate default bru options
-#' opts <- bru.options()
-#'
-#' # Print them:
-#' opts
-#' }
-#'
-bru.options <- function(mesh = NULL,
-                        run = TRUE,
-                        max.iter = 10,
-                        offset = 0,
-                        result = NULL,
-                        E = 1,
-                        Ntrials = 1,
-                        control.compute = list(),
-                        control.inla = list(),
-                        control.fixed = list(),
-                        int.args = list(method = "stable", nsub = NULL),
-                        ...) {
-  control.compute <-
-    override_config_defaults(
-      control.compute,
-      iinla.getOption("control.compute")
-    )
-  control.inla <-
-    override_config_defaults(
-      control.inla,
-      iinla.getOption("control.inla")
-    )
-  control.fixed <-
-    override_config_defaults(
-      control.fixed,
-      iinla.getOption("control.fixed")
-    )
-
-  args <- as.list(environment())
-  args$control.compute <- NULL
-  args$control.inla <- NULL
-  args$control.fixed <- NULL
-  args$inla.options <- list(...)
-  args$inla.options$control.compute <- control.compute
-  args$inla.options$control.inla <- control.inla
-  args$inla.options$control.fixed <- control.fixed
-
-  args
-}
 
 #' Log Gaussian Cox process (LGCP) inference using INLA
 #'
@@ -667,7 +585,7 @@ bru.options <- function(mesh = NULL,
 #' @param ips Integration points (overrides `samplers`)
 #' @param formula If NULL, the linear combination implied by the `components` is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
 #' @param E Single numeric used rescale all integration weights by a fixed factor
-#' @param options See [bru.options]
+#' @param options See [bru_options_set()]
 #' @return An [bru] object
 #' @examples
 #'
@@ -1086,21 +1004,21 @@ bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
 #' @param lhoods A list of likelihood objects from [like()]
 #' @param n Number of `INLA::inla` iterations
 #' @param result A previous inla result, to be used as starting point
-#' @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
+#' @param bru_verbose If TRUE, be verbose (use the inla option verbose=TRUE to
+#' make INLA itself verbose)
 #' @param offset An additional predictor offset
-#' @param inla.options A list of further arguments passed on to `INLA::inla`
-#'   Some `control.*` arguments are partially overridden, according to
-#'   internal inlabru method requirements.
+#' @param options A `bru_options` object.
 #' @return An `INLA::inla` object
 #' @keywords internal
 
 
 iinla <- function(model, lhoods, n = 10, result = NULL,
-                  iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"),
-                  offset = NULL, inla.options) {
+                  offset = 0, options) {
 
   # # Default number of maximum iterations
   # if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
+  
+  inla.options <- bru_options_inla(options)
 
   # Track variables?
   track <- list()
@@ -1109,16 +1027,21 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
   old.result <- result
 
   # Initialise required local options
-  if (is.null(inla.options$control.mode)) {
-    inla.options$control.mode <- list()
-  }
-  if (is.null(inla.options$control.predictor)) {
-    inla.options$control.predictor <- list()
-  }
-  inla.options$control.predictor$compute <- TRUE
+  offset <- if (is.null(offset)) {0} else {offset}
+  inla.options <- modifyList(
+    inla.options,
+    list(
+      control.mode = list(),
+      control.predictor = list(compute = TRUE)
+    )
+  )
 
   # Extract the family of each likelihood
-  family <- vapply(seq_along(lhoods), function(k) lhoods[[k]]$inla.family, "family")
+  family <- vapply(
+    seq_along(lhoods),
+    function(k) lhoods[[k]]$inla.family,
+    "family"
+  )
 
   # Inital stack
   stk <- joint_stackmaker(model, lhoods, result)
@@ -1136,9 +1059,10 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
       inla.options[["control.mode"]]$theta <- result$mode$theta
     }
 
-    bru_log(
+    bru_log_message(
       paste0("iinla: Iteration ", k, "[ max:", n, "]"),
-      iinla.verbose
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store
     )
 
     # Return previous result if inla crashes, e.g. when connection to server is lost
@@ -1159,21 +1083,25 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
         ))
       )
     #        list.data(model$formula))
+    
+    inla.options <- 
+      modifyList(
+        inla.options,
+        list(
+          formula = inla.formula,
+          data = inla.data,
+          family = family,
+          E = stk.data[["BRU.E"]],
+          Ntrials = stk.data[["BRU.Ntrials"]],
+          offset = stk.data[["BRU.offset"]] + offset
+        )
+      )
+
     icall <- expression(
       result <- tryCatch(
         do.call(
-          inla,
-          c(
-            list(
-              formula = inla.formula,
-              data = inla.data,
-              family = family,
-              E = stk.data[["BRU.E"]],
-              Ntrials = stk.data[["BRU.Ntrials"]],
-              offset = stk.data[["BRU.offset"]] + offset
-            ),
-            inla.options
-          ),
+          INLA::inla,
+          inla.options,
           envir = environment(model$effects)
         ),
         error = warning
@@ -1182,30 +1110,40 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
     eval(icall)
 
     if (is.character(result)) {
-      bru_log(paste0("iinla: INLA returned message: ", result))
+      bru_log_message(
+        paste0("iinla: INLA returned message: ", result),
+        verbose = FALSE,
+        verbose_store = options$bru_verbose_store
+      )
       stop(paste0("iinla: INLA returned message: ", result))
     }
 
     n.retry <- 0
     max.retry <- 10
     while ((is.null(result) | length(result) == 5) & (n.retry <= max.retry)) {
-      bru_log(
+      bru_log_message(
         "iinla: INLA crashed or returned NULL. Waiting for 60 seconds and trying again.",
-        iinla.verbose
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store
       )
       Sys.sleep(60)
       eval(icall)
       n.retry <- n.retry + 1
     }
     if ((is.null(result) | length(result) == 5)) {
-      bru_log(
+      bru_log_message(
         sprintf("iinla: The computation failed %d times. Giving up and returning last successfully obtained result.", n.retry - 1),
-        iinla.verbose
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store
       )
       return(old.result)
     }
 
-    bru_log("iinla: Done. ", iinla.verbose)
+    bru_log_message(
+      "iinla: Done. ",
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store
+    )
 
     # Extract values tracked for estimating convergence
     if (n > 1 & k <= n) {
@@ -1256,15 +1194,19 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
       ##                           as.factor(do.call(rbind, track)$effect),
       ##                           identity),
       ##                        function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
-      bru_log(
-        paste0("iinla: Max deviation from previous: ", signif(100 * max(dev), 3), "% of SD [stop if: <", 100 * max.dev, "%]"),
-        iinla.verbose
+      bru_log_message(
+        paste0("iinla: Max deviation from previous: ",
+               signif(100 * max(dev), 3),
+               "% of SD [stop if: <", 100 * max.dev, "%]"),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store
       )
       interrupt <- all(dev < max.dev)
       if (interrupt) {
-        bru_log(
+        bru_log_message(
           "iinla: Convergence criterion met, stopping INLA iteration.",
-          iinla.verbose
+          verbose = options$bru_verbose,
+          verbose_store = options$bru_verbose_store
         )
       }
     }
