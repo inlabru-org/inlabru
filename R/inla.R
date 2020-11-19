@@ -174,18 +174,21 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
     }
 
 
-    # Extract simulated latent variables. If the model is "clinear", however, extract the realisations
-    # from the hyperpar field.
+    # Extract simulated latent variables.
+    # If the model is "clinear", however, we might extract the realisations
+    # from the hyperpar field. TODO: check if all the special models now have
+    # their results available as latent random effects, and avoid special code,
+    # since the hyperpar name definition has changed
     if (length(result$summary.random) > 0) {
       for (k in 1:length(result$summary.random)) {
         name <- unlist(names(result$summary.random[k]))
         model <- result$model.random[k]
-        if (!(model == "Constrained linear")) {
-          vals[[name]] <- extract.entries(name, smpl.latent)
-        }
-        else {
-          vals[[name]] <- smpl.hyperpar[paste0(paste0("Beta_intern for ", name), " -- in user scale")]
-        }
+#        if (!(model == "Constrained linear")) {
+        vals[[name]] <- extract.entries(name, smpl.latent)
+#        }
+#        else {
+#         vals[[name]] <- smpl.hyperpar[paste0("Beta for ", name)]
+#        }
       }
     }
     if (length(smpl.hyperpar) > 0) {
