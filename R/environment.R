@@ -337,16 +337,30 @@ bru_options_inla <- function(options) {
 bru_options_check <- function(options, ignore_null = TRUE) {
   options <- as.bru_options(options)
   ok <- TRUE
-  # Check valid max_iter
-  if (is.null(options[["bru_max_iter"]])) {
-    if (!ignore_null) {
-      ok <- FALSE
-      warning("'bru_max_iter' should be a positive integer, not NULL.")
+  are_null <- vapply(options, is.null, TRUE)
+  if (!ignore_null) {
+    disallowed_null <-
+      intersect(
+        names(options),
+        c("bru_max_iter")
+      )
+    disallowed_null <- disallowed_null[are_null[disallowed_null]]
+    if (length(disallowed_null) > 0) {
+      warning(paste0(
+        paste0("'", disallowed_null, "'", collapse = ", "),
+        " should not be set to NULL."
+      ))
     }
-  } else if (!is.numeric(options[["bru_max_iter"]]) ||
-             !(options[["bru_max_iter"]] > 0)) {
-    ok <- FALSE
-    warning("'bru_max_iter' should be a positive integer.")
+  }
+  for (name in names(options)[!are_null]) {
+    # Check valid max_iter
+    opt <- options[[name]]
+    if (name == "bru_max_iter") {
+      if (!is.numeric(opt) || !(opt > 0)) {
+        ok <- FALSE
+        warning("'bru_max_iter' should be a positive integer.")
+      }
+    }
   }
   
   ok
@@ -393,8 +407,11 @@ bru_options_get <- function(name = NULL, include_default = TRUE) {
 
 
 #' @details `bru_options_set()` is used to set global package options.
-#' @return `bru_options_set()` returns a copy of the global options, invisibly.
+#' @return `bru_options_set()` returns a copy of the global override options,
+#' invisibly (as `bru_options_get(include_default = FALSE)`).
 #' @seealso [bru_options()], [bru_options_default()], [bru_options_get()]
+#' @param .reset For `bru_options_set`, logical indicating if the global override
+#' options list should be emptied before setting the new option(s).
 #' 
 #' @details
 #' * bru_run If TRUE, run inference. Otherwise only return configuration needed
@@ -433,10 +450,14 @@ bru_options_get <- function(name = NULL, include_default = TRUE) {
 #' @export
 #' @rdname bru_options
 
-bru_options_set <- function(...) {
+bru_options_set <- function(..., .reset = FALSE) {
   envir <- bru_env_get()
-  envir$options <- bru_options(envir$options, ...)
-  invisible(bru_options_get())
+  if (.reset) {
+    envir$options <- bru_options(...)
+  } else {
+    envir$options <- bru_options(envir$options, ...)
+  }
+  invisible(bru_options_get(include_default = FALSE))
 }
 
 #' @details `bru_options_reset()` clears the global option overrides.
@@ -446,7 +467,7 @@ bru_options_set <- function(...) {
 bru_options_reset <- function() {
   envir <- bru_env_get()
   envir$options <- bru_options()
-  invisible(bru_options_get())
+  invisible(bru_options_get(include_default = FALSE))
 }
 
 

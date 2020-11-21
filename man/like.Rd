@@ -16,6 +16,8 @@ like(
   domain = NULL,
   include = NULL,
   exclude = NULL,
+  allow_latent = FALSE,
+  allow_combine = FALSE,
   options = list()
 )
 }
@@ -60,6 +62,13 @@ explicitly excluded)}
 predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
+
+\item{allow_latent}{logical. If \code{TRUE}, the latent state of each component is
+directly available to the predictor expression, with a \verb{_latent} suffix.}
+
+\item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
+involve several rows of the input data to influence the same row.
+(TODO: review what's needed to allow the result to also be of a different size)}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}

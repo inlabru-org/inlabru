@@ -448,3 +448,58 @@ evaluate_predictor <- function(model,
 
   result
 }
+
+
+
+
+
+
+#' Compute all A-matrices
+#' 
+#' Computes the A matrices for included components for each model likelihood
+#' 
+#' @param model A `bru_model` object 
+#' @param lhoods A `bru__like_list` object 
+#' @rdname evaluate_A
+evaluate_A <- function(model, lhoods) {
+  stopifnot(inherits(model, "bru_model"))
+  lapply(
+    lhoods,
+    function(lh) {
+      included <- parse_inclusion(
+        names(model[["effects"]]),
+        lh[["include_components"]],
+        lh[["exclude_components"]]
+      )
+      
+      amatrix_eval(model$effects[included], data = lh[["data"]])
+    }
+  )
+}
+
+#' Compute all index values
+#' 
+#' Computes the index values matrices for included components
+#' 
+#' @param model A `bru_model` object 
+#' @param lhoods A `bru__like_list` object 
+#' @rdname evaluate_index
+evaluate_index <- function(model, lhoods) {
+  stopifnot(inherits(model, "bru_model"))
+  included <- 
+    unique(do.call(
+      c,
+      lapply(
+        lhoods,
+        function(lh) {
+          parse_inclusion(
+            names(model[["effects"]]),
+            lh[["include_components"]],
+            lh[["exclude_components"]]
+          )
+        }
+      )
+    ))
+      
+  index_eval(model[["effects"]][included])
+}

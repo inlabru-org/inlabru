@@ -22,7 +22,7 @@ bru_options_check(options, ignore_null = TRUE)
 
 bru_options_get(name = NULL, include_default = TRUE)
 
-bru_options_set(...)
+bru_options_set(..., .reset = FALSE)
 
 bru_options_reset()
 
@@ -46,6 +46,9 @@ Default: NULL}
 
 \item{include_default}{logical; If \code{TRUE}, the default options are included
 together with the global override options. Default: \code{TRUE}}
+
+\item{.reset}{For \code{bru_options_set}, logical indicating if the global override
+options list should be emptied before setting the new option(s).}
 }
 \value{
 \code{bru_options()} returns an \code{bru_options} object.
@@ -66,7 +69,8 @@ contains valid options for use by other functions
 string, or a named list of option contents, if \code{name} is a list of option
 name strings.
 
-\code{bru_options_set()} returns a copy of the global options, invisibly.
+\code{bru_options_set()} returns a copy of the global override options,
+invisibly (as \code{bru_options_get(include_default = FALSE)}).
 }
 \description{
 Create a new options object, or merge information from several

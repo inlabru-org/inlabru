@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlinla.R
 \name{bru_compute_linearisation}
 \alias{bru_compute_linearisation}
-\alias{bru_compute_linearisation.bru_component}
+\alias{bru_compute_linearisation.component}
 \alias{bru_compute_linearisation.bru_like}
 \alias{bru_compute_linearisation.bru_like_list}
 \alias{bru_compute_linearisation.bru_model}
@@ -10,28 +10,48 @@
 \usage{
 bru_compute_linearisation(...)
 
-\method{bru_compute_linearisation}{bru_component}(cmp, data, state, A, ...)
+\method{bru_compute_linearisation}{component}(
+  cmp,
+  model,
+  lhood_expr,
+  data,
+  state,
+  A,
+  effects,
+  pred0,
+  allow_latent,
+  allow_combine,
+  eps,
+  ...
+)
 
 \method{bru_compute_linearisation}{bru_like}(lhood, model, data, state, A, ...)
 
-\method{bru_compute_linearisation}{bru_like_list}(lhoods, A, ...)
+\method{bru_compute_linearisation}{bru_like_list}(lhoods, model, state, A, ...)
 
-\method{bru_compute_linearisation}{bru_model}(model, lhoods, ...)
+\method{bru_compute_linearisation}{bru_model}(model, lhoods, state, A, ...)
 }
 \arguments{
 \item{\dots}{Parameters passed on to other methods}
 
 \item{cmp}{A \link{bru_component} object}
 
+\item{model}{A \code{bru_model} object}
+
 \item{data}{Input data}
 
 \item{state}{The state information, as a list of named vectors}
 
-\item{A}{Precomputed A-matrix for the component}
+\item{A}{A-matrix information:
+\itemize{
+\item For \code{bru_component}: Precomputed A-matrix for the component
+\item For \code{bru_like}: A list of named A-matrices for the components in the
+likelihood for the component
+\item For \code{bru_like_list}: A list, where each element is a list of named
+A-matrices.
+}}
 
 \item{lhood}{A \code{bru_like} object}
-
-\item{model}{A \code{bru_model} object}
 
 \item{lhoods}{A \code{bru_like_list} object}
 }

@@ -4,6 +4,7 @@
 \alias{local_testthat}
 \alias{local_testthat_assign}
 \alias{local_testthat_tolerances}
+\alias{local_bru_options_set}
 \alias{local_set_PROJ6_warnings}
 \alias{local_get_rgdal_options}
 \alias{local_disable_PROJ6_warnings}
@@ -20,6 +21,8 @@ local_testthat_tolerances(
   tolerances = c(1e-05, 0.01, 0.1),
   envir = parent.frame()
 )
+
+local_bru_options_set(..., .reset = FALSE, envir = parent.frame())
 
 local_set_PROJ6_warnings(proj4 = FALSE, thin = TRUE, envir = parent.frame())
 
@@ -46,6 +49,9 @@ local_bru_testthat_setup(envir = parent.frame())
 
 \item{tolerances}{numeric vector of length 3; \verb{[lowtol, midtol, hitol]}}
 
+\item{.reset}{For \code{local_bru_options_set}, logical indicating if the global
+override options list should be emptied before setting the new option(s).}
+
 \item{proj4}{logical; whether to show PROJ4 conversion warnings. Default \code{FALSE}}
 
 \item{thin}{logical; whether to show only a thinned version of rgdal PROJ6
@@ -59,8 +65,15 @@ not allowed (used for examples and unit tests).}
 always printed if the INLA \code{num.threads} option is altered, regardless of the
 \code{quietly} argument. Default: TRUE.}
 }
+\value{
+\code{local_bru_options_set()} returns a copy of the global override
+options (not including the defaults), invisibly.
+}
 \description{
 Local helper functions for package unit tests
+}
+\details{
+\code{local_bru_options_set()} is used to set global package options.
 }
 \section{Functions}{
 \itemize{
@@ -72,6 +85,8 @@ interactively.
 Assign local tolerance variables. Useful for easy cleanup
 of global workspace with \code{withr::deferred_run()} when running tests
 interactively.
+
+\item \code{local_bru_options_set}: Calls \code{\link[=bru_options_set]{bru_options_set()}} in a reversible way
 
 \item \code{local_set_PROJ6_warnings}: Disable PROJ4/6 warnings.
 To be used within package tests. Restores state on exit.
@@ -92,4 +107,20 @@ Does \emph{not} call \code{\link[=local_bru_safe_inla]{local_bru_safe_inla()}}, 
 should be called inside each test that relies on INLA.
 }}
 
+\examples{
+my_fun <- function(val) {
+  local_bru_options_set(bru_verbose = val)
+  bru_options_get("bru_verbose")
+}
+# Inside the function, the bru_verbose option is changed.
+# Outside the function, the bru_verbose option is unchanged.
+print(my_fun(TRUE))
+print(bru_options_get("bru_verbose"))
+print(my_fun(FALSE))
+print(bru_options_get("bru_verbose"))
+
+}
+\seealso{
+\code{\link[=bru_options_set]{bru_options_set()}}, \code{\link[=bru_options_default]{bru_options_default()}}, \code{\link[=bru_options_get]{bru_options_get()}}
+}
 \keyword{internal}

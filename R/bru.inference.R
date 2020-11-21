@@ -375,6 +375,11 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
+#' @param allow_latent logical. If `TRUE`, the latent state of each component is
+#' directly available to the predictor expression, with a `_latent` suffix.
+#' @param allow_combine logical; If `TRUE`, the predictor expression may
+#' involve several rows of the input data to influence the same row.
+#' (TODO: review what's needed to allow the result to also be of a different size)
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #'
@@ -386,6 +391,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
+                 allow_latent = FALSE, allow_combine = FALSE,
                  options = list()) {
   options <- bru_call_options(options)
 
@@ -521,7 +527,9 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     domain = domain,
     drange = drange,
     include_components = include,
-    exclude_components = exclude
+    exclude_components = exclude,
+    allow_latent = allow_latent,
+    allow_combine = allow_combine
   )
 
   class(lh) <- c("bru_like", "list")
