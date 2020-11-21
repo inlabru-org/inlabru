@@ -2,15 +2,17 @@
 #'
 #' @description
 #'
-#' Generic function for sampling for fitted models. The function invokes particular methods
-#' which depend on the class of the first argument.
+#' Generic function for sampling for fitted models. The function invokes
+#' particular methods which depend on the class of the first argument.
 #'
 #' @name generate
 #' @export
 #' @family sample generators
 #' @param object a fitted model.
 #' @param ... additional arguments affecting the samples produced.
-#' @return The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
+#' @return The form of the value returned by gg depends on the class of its
+#' argument. See the documentation of the particular methods for details of
+#' what is produced by that method.
 #' @example inst/examples/generate.bru.R
 
 generate <- function(object, ...) {
@@ -275,7 +277,7 @@ bru <- function(components = ~ Intercept(1),
     }
     lhoods <- list(do.call(like, c(lhoods, list(options = options))))
   }
-  class(lhoods) <- c("bru_like_list", "list")
+  lhoods <- like_list(lhoods)
 
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
@@ -426,20 +428,15 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     if (is.null(data)) {
       stop("You called like() with family='cp' but no 'data' argument was supplied.")
     }
-    # if ( is.null(samplers) ) { stop("You called like() with family='cp' but no 'samplers' argument was supplied.") }
 
     if (is.null(ips)) {
-      # TODO: split ipmaker into one domain extractor (or not; should force
-      # explicit domain specification!), and one integration point constructor
-      #      message("ipmaker can't really work here unless it doesn't need the predictor information")
-      #      warning("ipmaker can't really work here unless it doesn't need the predictor information")
       ips <- ipmaker(
         samplers,
         domain = domain,
         dnames = response,
         data = NULL,
         model = NULL,
-        int.args = options$bru_int_args
+        int.args = options[["bru_int_args"]]
       )
     }
 
@@ -538,6 +535,64 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   lh
 }
 
+
+#' @details
+#' * `like_list`: Combine a `bru_like` likelihoods
+#' into a `bru_like_list` object
+#' @param \dots For `like_list.bru_like`, one or more `bru_like` objects
+#' @export
+#' @rdname like
+like_list <- function(...) {
+  UseMethod("like_list")
+}
+
+#' @details
+#' * `like_list.list`: Combine a list of `bru_like` likelihoods
+#' into a `bru_like_list` object
+#' @param object A list of `bru_like` objects
+#' @param envir An optional environment for the new `bru_like_list` object
+#' @export
+#' @rdname like
+like_list.list <- function(object, envir = NULL, ...) {
+  if (is.null(envir)) {
+    envir <- environment(object)
+  }
+  if (any(vapply(object, function(x) !inherits(x, "bru_like"), TRUE))) {
+    stop("All list elements must be of class 'bru_like'.")
+  }
+  
+  class(object) <- c("bru_like_list", "list")
+  environment(object) <- envir
+  object
+}
+
+#' @details
+#' * `like_list.bru_like`: Combine several `bru_like` likelihoods
+#' into a `bru_like_list` object
+#' @export
+#' @rdname like
+like_list.bru_like <- function(..., envir = NULL) {
+  like_list(list(...), envir = envir)
+}
+
+#' @export
+#' @param x `bru_like_list` object from which to extract element(s)
+#' @param i indices specifying elements to extract
+#' @rdname like
+`[.bru_like_list` <- function(x, i) {
+  env <- environment(x)
+  object <- NextMethod()
+  class(object) <- c("bru_like_list", "list")
+  environment(object) <- env
+  object
+}
+
+
+
+
+
+
+
 single_stackmaker <- function(model, lhood, result) {
   make.stack(
     data = lhood$data, model = model, expr = lhood$expr,
@@ -571,17 +626,22 @@ joint_stackmaker <- function(model, lhoods, result) {
 
 #' Log Gaussian Cox process (LGCP) inference using INLA
 #'
-#' This function performs inference on a LGCP observed via points residing possibly multiple dimensions.
-#' These dimensions are defined via the left hand side of the formula provided via the model parameter.
-#' The left hand side determines the intensity function that is assumed to drive the LGCP. This may include
-#' effects that lead to a thinning (filtering) of the point process. By default, the log intensity is assumed
-#' to be a linear combination of the effects defined by the formula's RHS. More sofisticated models, e.g.
-#' non-linear thinning, can be achieved by using the predictor argument. The latter requires multiple runs
-#' of INLA for improving the required approximation of the predictor. In many applications
-#' the LGCP is only observed through subsets of the dimensions the process is living in. For example, spatial
-#' point realizations may only be known in sub-areas of the modeled space. These observed subsets of the LGCP
-#' domain are called samplers and can be provided via the respective parameter. If samplers is NULL it is
-#' assumed that all of the LGCP's dimensions have been observed completely.
+#' This function performs inference on a LGCP observed via points residing
+#' possibly multiple dimensions. These dimensions are defined via the left
+#' hand side of the formula provided via the model parameter.
+#' The left hand side determines the intensity function that is assumed to
+#' drive the LGCP. This may include effects that lead to a thinning (filtering)
+#' of the point process. By default, the log intensity is assumed to be a linear
+#' combination of the effects defined by the formula's RHS. More sofisticated
+#' models, e.g. non-linear thinning, can be achieved by using the predictor
+#' argument. The latter requires multiple runs of INLA for improving the
+#' required approximation of the predictor. In many applications the LGCP is
+#' only observed through subsets of the dimensions the process is living in.
+#' For example, spatial point realizations may only be known in sub-areas of
+#' the modelled space. These observed subsets of the LGCP
+#' domain are called samplers and can be provided via the respective parameter.
+#' If samplers is NULL it is assumed that all of the LGCP's dimensions have
+#' been observed completely.
 #'
 #'
 #' @aliases lgcp
@@ -591,7 +651,11 @@ joint_stackmaker <- function(model, lhoods, result) {
 #' @param samplers A data frame or `Spatial[Points/Lines/Polygons]DataFrame` objects
 #' @param domain Named list of domain definitions
 #' @param ips Integration points (overrides `samplers`)
-#' @param formula If NULL, the linear combination implied by the `components` is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
+#' @param formula If NULL, the linear combination implied by the `components`
+#' is used as a predictor for the point location intensity. If a (possibly
+#' non-linear) expression is provided the respective Taylor approximation is
+#' used as a predictor. Multiple runs if INLA are then required for a better
+#' approximation of the posterior.
 #' @param E Single numeric used rescale all integration weights by a fixed factor
 #' @param options See [bru_options_set()]
 #' @return An [bru] object
@@ -616,7 +680,8 @@ joint_stackmaker <- function(model, lhoods, result) {
 #'     prior.range = c(5, 0.01)
 #'   )
 #'
-#'   # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
+#'   # Define domain of the LGCP as well as the model components (spatial SPDE
+#'   # effect and Intercept)
 #'   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #'
 #'   # Fit the model
@@ -664,23 +729,31 @@ lgcp <- function(components,
 #
 #' Prediction from fitted bru model
 #'
-#' Takes a fitted `bru` object produced by the function [bru]() and produces predictions given
-#' a new set of values for the model covariates or the original values used for the model fit. The
-#' predictions can be based on any R expression that is valid given these values/covariates and the joint
+#' Takes a fitted `bru` object produced by the function [bru]() and produces
+#' predictions given a new set of values for the model covariates or the
+#' original values used for the model fit. The predictions can be based on any
+#' R expression that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
 #'
-#' Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
-#' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
+#' Mean value predictions are accompanied by the standard errors, upper and
+#' lower 2.5% quantiles, the
+#' median, variance, coefficient of variation as well as the variance and
+#' minimum and maximum sample
 #' value drawn in course of estimating the statistics.
 #'
-#' Internally, this method calls [generate.bru] in order to draw samples from the model.
+#' Internally, this method calls [generate.bru()] in order to draw samples from
+#' the model.
 #'
 #' @aliases predict.bru
 #' @export
 #' @param object An object obtained by calling [bru] or [lgcp].
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction.
-#' @param formula A formula determining which effects to predict and how to combine them.
-#' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for 
+#' the prediction.
+#' @param formula A formula determining which effects to predict and how to
+#' combine them.
+#' @param n.samples Integer setting the number of samples to draw in order to
+#' calculate the posterior statistics. The default is rather low but provides
+#' a quick approximate result.
 #' @param seed Random number generator seed passed on to `inla.posterior.sample`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
@@ -694,7 +767,8 @@ lgcp <- function(components,
 #'   any components from the inclusion list)
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #'
-#' @return a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
+#' @return a data.frame or Spatial* object with predicted mean values and other
+#' summary statistics attached.
 #' @example inst/examples/predict.bru.R
 
 predict.bru <- function(object,
@@ -739,7 +813,14 @@ predict.bru <- function(object,
     smy <- list()
 
     for (nm in estim) {
-      smy[[nm]] <- bru_summarise(lapply(vals, function(v) v[[nm]]), x = vals[[1]][, covar, drop = FALSE])
+      smy[[nm]] <-
+        bru_summarise(
+          lapply(
+            vals,
+            function(v) v[[nm]]
+          ),
+          x = vals[[1]][, covar, drop = FALSE]
+        )
     }
     vals <- smy
     is.annot <- vapply(names(vals), function(v) all(vals[[v]]$sd == 0), TRUE)
@@ -752,7 +833,6 @@ predict.bru <- function(object,
 
     if (length(vals) == 1) vals <- vals[[1]]
   } else {
-    # if ( nrow(vals[[1]]) == nrow(data) ) { add.x = vals[[1]][,covar,drop=FALSE] } else { add.x = NULL }
     vals <- bru_summarise(vals, x = data)
   }
 
@@ -763,20 +843,24 @@ predict.bru <- function(object,
 #' Sampling based on bru posteriors
 #'
 #' @description
-#' Takes a fitted `bru` object produced by the function [bru]() and produces samples given
-#' a new set of values for the model covariates or the original values used for the model fit. The
-#' samples can be based on any R expression that is valid given these values/covariates and the joint
+#' Takes a fitted `bru` object produced by the function [bru]() and produces
+#' samples given a new set of values for the model covariates or the original
+#' values used for the model fit. The samples can be based on any R expression
+#' that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
 #'
 #' @aliases generate.bru
 #' @export
 #' @family sample generators
 #' @param object A `bru` object obtained by calling [bru].
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for sampling.
-#' @param formula A formula determining which effects to sample from and how to combine them analytically.
-#' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics.
-#'                  The default is rather low but provides a quick approximate result.
-#' @param seed Random number generator seed passed on to `inla.posterior.sample`
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
+#' sampling.
+#' @param formula A formula determining which effects to sample from and how to
+#' combine them analytically.
+#' @param n.samples Integer setting the number of samples to draw in order to
+#' calculate the posterior statistics.
+#' The default, 100, is rather low but provides a quick approximate result.
+#' @param seed Random number generator seed passed on to `INLA::inla.posterior.sample`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
@@ -816,7 +900,8 @@ generate.bru <- function(object,
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }
 
-  # If data is provided as list, generate data automatically for each dimension stated in this list
+  # If data is provided as list, generate data automatically for each dimension
+  # stated in this list
   if (class(data)[1] == "list") {
     # Todo: check if this feature works at all.
     # TODO: add method ipoints.list to handle this;
@@ -857,14 +942,17 @@ generate.bru <- function(object,
 # @export
 # @param dfun A function returning a density for given x
 # @param sfun A function providing samples from a posterior
-# @param x Inital domain on which to perform the estimation. This will be adjusted as more samples are generated.
-# @param samples An initial set of samples. Not required but will be used to estimate the inital domain \code{x} if \code{x} is \code{NULL}
+# @param x Inital domain on which to perform the estimation. This will be
+# adjusted as more samples are generated.
+# @param samples An initial set of samples. Not required but will be used to
+# estimate the inital domain \code{x} if \code{x} is \code{NULL}
 # @param mcerr Monte Carlo error at which to stop the chain
 # @param n Inital number of samples. This will be doubled for each iteration.
-# @param discrete St this to \code{TRUE} if the density is only defined for integer \code{x}
+# @param discrete Set this to \code{TRUE} if the density is only defined for integer \code{x}
 # @param verbose Be verbose?
 
-montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.01, n = 100, discrete = FALSE, verbose = FALSE) {
+montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
+                                 mcerr = 0.01, n = 100, discrete = FALSE, verbose = FALSE) {
   xmaker <- function(hpd) {
     mid <- (hpd[2] + hpd[1]) / 2
     rg <- (hpd[2] - hpd[1]) / 2
@@ -928,7 +1016,7 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0
       converged <- TRUE
     }
     else {
-      lest <- 0.5 * (est + lest)
+      lest <- (est + lest) / 2
     }
   }
 

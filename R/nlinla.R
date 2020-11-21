@@ -101,6 +101,8 @@ bru_compute_linearisation <- function(...) {
 }
 
 #' @param cmp A [bru_component] object
+#' @param model A [bru_model] object
+#' @param lhood_expr A predictor expression
 #' @param data Input data
 #' @param state The state information, as a list of named vectors
 #' @param A A-matrix information:
@@ -109,6 +111,15 @@ bru_compute_linearisation <- function(...) {
 #' likelihood for the component
 #' * For `bru_like_list`: A list, where each element is a list of named
 #' A-matrices.
+#' @param effects 
+#' * For `bru_component`:
+#' Precomputed effect data.frame for all components involved in the likelihood
+#' expression
+#' @param pred0 Precomputed predictor for the given state
+#' @param allow_latent logical. If `TRUE`, the latent state of each component is
+#' directly available to the predictor expression, with a `_latent` suffix.
+#' @param allow_combine logical; If `TRUE`, the predictor expression may
+#' involve several rows of the input data to influence the same row.
 #' @export
 #' @rdname bru_compute_linearisation
 bru_compute_linearisation.component <- function(cmp,
@@ -194,6 +205,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
                                                data,
                                                state,
                                                A,
+                                               eps,
                                                ...) {
   allow_latent <- lhood[["allow_latent"]]
   allow_combine <- lhood[["allow_combine"]]
@@ -219,7 +231,6 @@ bru_compute_linearisation.bru_like <- function(lhood,
   )
   # Compute derivatives for each noon-offset component
   B <- list()
-  eps <- 1e-5 # TODO: set more intelligently
   offset <- pred0
   # Either this loop or the internal bru_component specific loop
   # can in principle be parallelised.
@@ -253,9 +264,16 @@ bru_compute_linearisation.bru_like <- function(lhood,
 }
 
 #' @param lhoods A `bru_like_list` object
+#' @param eps The finite difference step size
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_like_list <- function(lhoods, model, state, A, ...) {
+bru_compute_linearisation.bru_like_list <- function(
+  lhoods,
+  model,
+  state,
+  A,
+  eps = 1e-5, # TODO: set more intelligently
+  ...) {
   lapply(seq_along(lhoods), function(idx) {
     x <- lhoods[[idx]]
     bru_compute_linearisation(
@@ -264,6 +282,7 @@ bru_compute_linearisation.bru_like_list <- function(lhoods, model, state, A, ...
       data = x[["data"]],
       state = state,
       A = A[[idx]],
+      eps = eps,
       ...
     )
   })

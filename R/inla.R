@@ -290,16 +290,23 @@ inla.stack.e <- function(...) {
 }
 
 
-# Join stacks intended to be run with different likelihoods
-#
-# @param ... List of stacks that contain vector observations
-#            (existing multilikelihood observation matrices are also permitted)
-# @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
-#        If a single string, this is assumed for all the stacks. (default "BRU.response")
-# @param new.name The name to be used for the expanded observation matrix,
-#        possibly the same as an old name. (default "BRU.response")
-# @aliases inla.stack.mjoin
-#
+#' Join stacks intended to be run with different likelihoods
+#'
+#' @param ... List of stacks that contain vector observations
+#'            (existing multi-likelihood observation matrices are also permitted)
+#' @param compress If `TRUE`, compress the model by removing duplicated rows of
+#' effects, replacing the corresponding A-matrix columns with a single column
+#' containing the sum.
+#' @param remove.unused	If `TRUE`, compress the model by removing rows of
+#' effects corresponding to all-zero columns in the A matrix (and removing those columns).
+#' @param old.names A vector of strings with the names of the observation
+#'   vector/matrix for each stack.
+#'   If a single string, this is assumed for all the stacks. (default "BRU.response")
+#' @param new.name The name to be used for the expanded observation matrix,
+#'        possibly the same as an old name. (default "BRU.response")
+#' @export
+#' @rdname inla.stack.mjoin
+#'
 
 inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
                              old.names = "BRU.response", new.name = "BRU.response") {
@@ -311,50 +318,7 @@ inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
 }
 
 
-# Retrieve data from stack.
-# Obsolete. Do not use. Exposure vector stacking is handled automatically by inla.stack
-#
-# The special "BRU.response" object should have been constructed before, via inla.stack.mjoin.
-# Since all the work to setup the stack properly was already done by inla.stack.mjoin,
-# this function just passes its arguments through to INLA::inla.stack.data
-#
-# @aliases inla.stack.mdata
-# @param stack The stack to extract data from
-# @param ... Additional named objects to add to the list of data objects.
-#            Typically used for spde model objects.
-# @return A list of data and effect vectors/matrices, and optional extra objects
-#
 
-inla.stack.mdata <- function(stack, ...) {
-  warning("inla.stack.mdata: This function is obsolete and should not be used.")
-  INLA::inla.stack.data(stack, ...)
-}
-
-# Combine stacks by adding up predictors "horizontally".
-# Only the data section from the first stack is preserved.
-# Only the tag information from the data section first stack is preserved.
-# TODO: The effects tag information is not computed.
-# NOTE: This function appears to be unused.
-#
-# @aliases inla.stack.add
-#
-
-inla.stack.add <- function(..., compress = TRUE, remove.unused = TRUE) {
-  stacks <- list(...)
-  stack <- INLA::inla.stack.sum(
-    data = INLA::inla.stack.LHS(stacks[[1]]),
-    A = lapply(stacks, function(x) {
-      INLA::inla.stack.A(x)
-    }),
-    effects = lapply(stacks, function(x) {
-      INLA::inla.stack.RHS(x)
-    }),
-    compress = compress, remove.unused = remove.unused
-  )
-  stack$data$index <- stacks[[1]]$data$index
-  stack$effects$index <- NULL
-  stack
-}
 
 
 

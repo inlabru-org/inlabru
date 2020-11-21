@@ -645,6 +645,8 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
 
 
 
+
+
 #' @export
 #' @param x `component_list` object from which to extract element(s)
 #' @param i indices specifying elements to extract
@@ -1457,7 +1459,10 @@ ibm_values.bru_mapper_multi <- function(mapper, multi = 0L, ...) {
         expand.grid,
         c(
           mapper[["values_multi"]],
-          list(stringsAsFactors = FALSE)
+          list(
+            KEEP.OUT.ATTRS = FALSE,
+            stringsAsFactors = FALSE
+          )
         )
       )
     )

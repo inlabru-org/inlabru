@@ -2,6 +2,10 @@
 % Please edit documentation in R/bru.inference.R
 \name{like}
 \alias{like}
+\alias{like_list}
+\alias{like_list.list}
+\alias{like_list.bru_like}
+\alias{[.bru_like_list}
 \title{Likelihood construction for usage with \link{bru}}
 \usage{
 like(
@@ -20,6 +24,14 @@ like(
   allow_combine = FALSE,
   options = list()
 )
+
+like_list(...)
+
+\method{like_list}{list}(object, envir = NULL, ...)
+
+\method{like_list}{bru_like}(..., envir = NULL)
+
+\method{[}{bru_like_list}(x, i)
 }
 \arguments{
 \item{formula}{a \link{formula} where the right hand side is a general R
@@ -72,12 +84,38 @@ involve several rows of the input data to influence the same row.
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
+
+\item{\dots}{For \code{like_list.bru_like}, one or more \code{bru_like} objects}
+
+\item{object}{A list of \code{bru_like} objects}
+
+\item{envir}{An optional environment for the new \code{bru_like_list} object}
+
+\item{x}{\code{bru_like_list} object from which to extract element(s)}
+
+\item{i}{indices specifying elements to extract}
 }
 \value{
 A likelihood configuration which can be used to parameterize \link{bru}.
 }
 \description{
 Likelihood construction for usage with \link{bru}
+}
+\details{
+\itemize{
+\item \code{like_list}: Combine a \code{bru_like} likelihoods
+into a \code{bru_like_list} object
+}
+
+\itemize{
+\item \code{like_list.list}: Combine a list of \code{bru_like} likelihoods
+into a \code{bru_like_list} object
+}
+
+\itemize{
+\item \code{like_list.bru_like}: Combine several \code{bru_like} likelihoods
+into a \code{bru_like_list} object
+}
 }
 \examples{
 \donttest{

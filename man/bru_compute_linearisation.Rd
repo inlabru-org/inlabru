@@ -25,9 +25,9 @@ bru_compute_linearisation(...)
   ...
 )
 
-\method{bru_compute_linearisation}{bru_like}(lhood, model, data, state, A, ...)
+\method{bru_compute_linearisation}{bru_like}(lhood, model, data, state, A, eps, ...)
 
-\method{bru_compute_linearisation}{bru_like_list}(lhoods, model, state, A, ...)
+\method{bru_compute_linearisation}{bru_like_list}(lhoods, model, state, A, eps = 1e-05, ...)
 
 \method{bru_compute_linearisation}{bru_model}(model, lhoods, state, A, ...)
 }
@@ -37,6 +37,8 @@ bru_compute_linearisation(...)
 \item{cmp}{A \link{bru_component} object}
 
 \item{model}{A \code{bru_model} object}
+
+\item{lhood_expr}{A predictor expression}
 
 \item{data}{Input data}
 
@@ -50,6 +52,22 @@ likelihood for the component
 \item For \code{bru_like_list}: A list, where each element is a list of named
 A-matrices.
 }}
+
+\item{effects}{\itemize{
+\item For \code{bru_component}:
+Precomputed effect data.frame for all components involved in the likelihood
+expression
+}}
+
+\item{pred0}{Precomputed predictor for the given state}
+
+\item{allow_latent}{logical. If \code{TRUE}, the latent state of each component is
+directly available to the predictor expression, with a \verb{_latent} suffix.}
+
+\item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
+involve several rows of the input data to influence the same row.}
+
+\item{eps}{The finite difference step size}
 
 \item{lhood}{A \code{bru_like} object}
 

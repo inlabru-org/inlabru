@@ -54,10 +54,6 @@ make.stack <- function(data,
     taylor.offset <- 0
   }
 
-  #  # The weirdest workaround ever. Without this, there are convergence problems on ubuntu but not on MacOS ?!?!?!
-  #  A <- c(A, list(1))
-  #  effects <- c(effects, list(WORKAROUND = runif(dim(A[[1]])[1])))
-
   # Create and return stack
   stk <- INLA::inla.stack(
     data = list(
