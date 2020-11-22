@@ -40,8 +40,7 @@ component(...)
 
 \item{object}{A character label for the component}
 
-\item{main}{= NULL
-main takes an R expression that evaluates to where the latent variables
+\item{main}{\code{main} takes an R expression that evaluates to where the latent variables
 should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 Arguments starting with weights, group, replicate behave similarly to main,
 but for the corresponding features of \code{INLA::f()}.}
@@ -176,13 +175,14 @@ which corresponds to the mathematical expression \eqn{\exp(\beta)}.
 # called "x". Note that a list of components is returned because the
 # formula may define multiple components
 
-eff <- component_list(~ myLinearEffectOfX(main = x, model = "linear"))
-summary(eff[[1]])
+cmp <- component_list(~ myLinearEffectOfX(main = x, model = "linear"))
+summary(cmp)
 # Equivalent shortcuts:
-eff <- component_list(~ myLinearEffectOfX(x, model = "linear"))
-eff <- component_list(~ myLinearEffectOfX(x))
+cmp <- component_list(~ myLinearEffectOfX(x, model = "linear"))
+cmp <- component_list(~ myLinearEffectOfX(x))
 # Individual component
-eff <- component("myLinearEffectOfX", main = x, model = "linear")
+cmp <- component("myLinearEffectOfX", main = x, model = "linear")
+summary(cmp)
 \donttest{
 if (require("INLA", quietly = TRUE)) {
 

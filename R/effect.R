@@ -170,13 +170,14 @@ ibm_amatrix <- function(mapper, input, ...) {
 #' # called "x". Note that a list of components is returned because the
 #' # formula may define multiple components
 #'
-#' eff <- component_list(~ myLinearEffectOfX(main = x, model = "linear"))
-#' summary(eff[[1]])
+#' cmp <- component_list(~ myLinearEffectOfX(main = x, model = "linear"))
+#' summary(cmp)
 #' # Equivalent shortcuts:
-#' eff <- component_list(~ myLinearEffectOfX(x, model = "linear"))
-#' eff <- component_list(~ myLinearEffectOfX(x))
+#' cmp <- component_list(~ myLinearEffectOfX(x, model = "linear"))
+#' cmp <- component_list(~ myLinearEffectOfX(x))
 #' # Individual component
-#' eff <- component("myLinearEffectOfX", main = x, model = "linear")
+#' cmp <- component("myLinearEffectOfX", main = x, model = "linear")
+#' summary(cmp)
 component <- function(...) {
   UseMethod("component")
 }
@@ -184,8 +185,8 @@ component <- function(...) {
 
 #' @export
 #' @param object A character label for the component
-#' @param main = NULL
-#' main takes an R expression that evaluates to where the latent variables
+#' @param main
+#' `main` takes an R expression that evaluates to where the latent variables
 #' should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 #' Arguments starting with weights, group, replicate behave similarly to main,
 #' but for the corresponding features of `INLA::f()`.
