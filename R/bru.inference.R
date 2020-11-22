@@ -1230,17 +1230,14 @@ iinla <- function(model, lhoods, result = NULL, options) {
         )
       )
 
-    icall <- expression(
-      result <- tryCatch(
-        do.call(
-          INLA::inla,
-          inla.options,
-          envir = environment(model$effects)
-        ),
-        error = warning
-      )
+    result <- tryCatch(
+      do.call(
+        INLA::inla,
+        inla.options,
+        envir = environment(model$effects)
+      ),
+      error = warning
     )
-    eval(icall)
 
     if (is.character(result)) {
       bru_log_message(
@@ -1251,21 +1248,9 @@ iinla <- function(model, lhoods, result = NULL, options) {
       stop(paste0("iinla: INLA returned message: ", result))
     }
 
-    n.retry <- 0
-    max.retry <- 10
-    while ((is.null(result) | length(result) == 5) & (n.retry <= max.retry)) {
-      bru_log_message(
-        "iinla: INLA crashed or returned NULL. Waiting for 60 seconds and trying again.",
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store
-      )
-      Sys.sleep(60)
-      eval(icall)
-      n.retry <- n.retry + 1
-    }
     if ((is.null(result) | length(result) == 5)) {
       bru_log_message(
-        sprintf("iinla: The computation failed %d times. Giving up and returning last successfully obtained result.", n.retry - 1),
+        sprintf("iinla: The computation failed. Giving up and returning last successfully obtained result."),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store
       )

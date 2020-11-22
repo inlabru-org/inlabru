@@ -11,6 +11,7 @@ component(...)
 \method{component}{character}(
   object,
   main = NULL,
+  ...,
   model = NULL,
   mapper = NULL,
   main_layer = NULL,
@@ -31,10 +32,7 @@ component(...)
   replicate_layer = NULL,
   replicate_selector = NULL,
   A.msk = NULL,
-  map = NULL,
-  mesh = NULL,
-  envir_extra = NULL,
-  ...
+  envir_extra = NULL
 )
 }
 \arguments{
@@ -90,10 +88,6 @@ replication model. Same syntax as for \code{main}}
 \item{A.msk}{TODO: check/fix/deprecate this parameter.
 Likely doesn't work at the moment, and I've found no examples that use it.}
 
-\item{map}{Deprecated. Use \code{main} instead.}
-
-\item{mesh}{Deprecated. Use \code{mapper} instead.}
-
 \item{envir_extra}{TODO: check/fix this parameter.}
 }
 \description{
@@ -137,6 +131,12 @@ or the effect of the covariate.
 
 The \code{component.character} method is inlabru's equivalent to INLA's
 \code{f} function but adds functionality that is unique to inlabru.
+
+Deprecated parameters:
+\itemize{
+\item map: Use \code{main} instead.
+\item mesh: Use \code{mapper} instead.
+}
 }
 \section{Naming random effects}{
 

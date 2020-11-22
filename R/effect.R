@@ -229,12 +229,14 @@ component <- function(...) {
 #' @param A.msk TODO: check/fix/deprecate this parameter.
 #' Likely doesn't work at the moment, and I've found no examples that use it.
 # Deprecated parameters
-#' @param map Deprecated. Use `main` instead.
-#' @param mesh Deprecated. Use `mapper` instead.
 #' @param envir_extra TODO: check/fix this parameter.
 #'
 #' @details The `component.character` method is inlabru's equivalent to INLA's
 #' `f` function but adds functionality that is unique to inlabru.
+#' 
+#' Deprecated parameters:
+#' * map: Use `main` instead.
+#' * mesh: Use `mapper` instead.
 #'
 #' @rdname component
 #' @aliases bru_component
@@ -260,6 +262,7 @@ component <- function(...) {
 component.character <- function(object,
                                 # Main model parameters
                                 main = NULL, # This must be kept as 1st arg.
+                                ..., # Prevent partial matching
                                 model = NULL,
                                 mapper = NULL,
                                 main_layer = NULL,
@@ -283,13 +286,7 @@ component.character <- function(object,
                                 replicate_layer = NULL,
                                 replicate_selector = NULL,
                                 A.msk = NULL,
-                                # Deprecated parameters
-                                # map -> main
-                                map = NULL,
-                                # mesh -> mapper
-                                mesh = NULL,
-                                envir_extra = NULL,
-                                ...) {
+                                envir_extra = NULL) {
 
   # INLA models:
   # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper,
@@ -325,18 +322,22 @@ component.character <- function(object,
     main_layer <- label
   }
 
-  if (!is.null(substitute(map))) {
+  
+  if ("map" %in% names(sys.call())) {
+    #    if (!is.null(substitute(map))) {
     if (is.null(substitute(main))) {
-      main <- substitute(map)
-      warning("Use of 'map' is deprecated and may be disabled; use 'main' instead.")
+      main <- sys.call()[["map"]]
+      warning("Use of 'map' is deprecated and may be disabled; use 'main' instead.",
+              immediate. = TRUE)
     } else {
-      warning("Deprecated 'map' overridden by 'main'.")
+      warning("Deprecated 'map' overridden by 'main'.",
+              immediate. = TRUE)
     }
   }
 
-  if (!is.null(mesh)) {
+  if ("mesh" %in% names(sys.call())) {
     if (is.null(mapper)) {
-      mapper <- mesh
+      mapper <- list(...)[["mesh"]]
       warning("Use of 'mesh' is deprecated and may be disabled; use 'mapper' instead.")
     } else {
       warning("Deprecated 'mesh' overridden by 'mapper'.")
