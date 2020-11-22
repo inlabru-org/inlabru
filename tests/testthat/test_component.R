@@ -1,3 +1,5 @@
+local_bru_testthat_setup()
+
 test_that("Component construction: linear model", {
   df <- data.frame(x = 1:10)
 

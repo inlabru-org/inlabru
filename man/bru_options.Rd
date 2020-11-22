@@ -81,49 +81,12 @@ package options override object. In many cases, setting options in
 specific calls to \code{\link[=bru]{bru()}} is recommended instead.
 }
 \details{
-For \code{bru_options} and \code{bru_options_set}, recognised options are:
-\describe{
-\item{bru_verbose}{logical or numeric; if \code{TRUE}, log messages of \code{verbosity}
-\eqn{\leq 1} are printed by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric, log messages
-of
-verbosity \eqn{\leq} are printed. Default \code{FALSE}}
-\item{bru_verbose_stored}{logical or numeric; if \code{TRUE}, log messages of
-\code{verbosity} \eqn{\leq 1} are stored by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric,
-log messages of verbosity \eqn{\leq} are stored. Default: 1}
-}
-
 \code{bru_options_check} checks for valid contents of an \code{bru_options}
 object
 
 \code{bru_options_check()} produces warnings for invalid options.
 
 \code{bru_options_set()} is used to set global package options.
-
-\itemize{
-\item bru_run If TRUE, run inference. Otherwise only return configuration needed
-to run inference.
-\item nru_max_iter maximum number of inla iterations
-\item offset the usual \code{INLA::inla} offset. If a nonlinear formula is
-used, the resulting Taylor approximation constant will be added to this
-automatically.
-\item bru_result An \code{inla} object returned from previous calls of
-\code{INLA::inla}, \link{bru} or \link{lgcp}. This will be used as a
-starting point for further improvement of the approximate posterior.
-\item E \code{INLA::inla} 'poisson' likelihood exposure parameter
-\item Ntrials \code{INLA::inla} 'binomial' likelihood parameter
-\item control.compute INLA option, See \code{INLA::control.compute}
-\item control.inla INLA option, See \code{INLA::control.inla}
-\item control.fixed INLA option, See \code{INLA::control.fixed}. Warning:
-due to how inlabru currently constructs the \code{inla()}, the \code{mean},
-\code{prec}, \code{mean.intercept}, and \code{prec.intercept} will have no
-effect. Until a more elegant alternative has been implemented, use explicit
-\code{mean.linear} and \code{prec.linear} specifications in each
-\code{model="linear"} component instead.
-\item bru_int_args List of arguments passed all the way to the integration method
-\code{ipoints} and \code{int.polygon} for 'cp' family models
-\item All options not starting with \code{bru_} are passed on to \code{inla()}, sometimes
-after altering according to the needs of the inlabru method.
-}
 
 \code{bru_options_reset()} clears the global option overrides.
 
@@ -135,6 +98,39 @@ after altering according to the needs of the inlabru method.
 \item \code{iinla.setOption} is deprecated. Use \code{bru_option_set} instead.
 }
 }
+\section{Valid options}{
+
+For \code{bru_options} and \code{bru_options_set}, recognised options are:
+\describe{
+\item{bru_verbose}{logical or numeric; if \code{TRUE}, log messages of \code{verbosity}
+\eqn{\leq 1} are printed by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric, log messages
+of
+verbosity \eqn{\leq} are printed. Default \code{FALSE}}
+\item{bru_verbose_stored}{logical or numeric; if \code{TRUE}, log messages of
+\code{verbosity} \eqn{\leq 1} are stored by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric,
+log messages of verbosity \eqn{\leq} are stored. Default: 1}
+\item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
+to run inference.}
+\item{bru_max_iter}{maximum number of inla iterations}
+\item{bru_result}{An \code{inla} object returned from previous calls of
+\code{INLA::inla}, \link{bru} or \link{lgcp}. This will be used as a
+starting point for further improvement of the approximate posterior.}
+\item{bru_int_args}{List of arguments passed all the way to the
+integration method \code{ipoints} and \code{int.polygon} for 'cp' family models}
+\item{\code{inla()} options}{
+All options not starting with \code{bru_} are passed on to \code{inla()}, sometimes
+after altering according to the needs of the inlabru method.
+Warning:
+Due to how inlabru currently constructs the \code{inla()} call, the \code{mean},
+\code{prec}, \code{mean.intercept}, and \code{prec.intercept} settings in
+\code{control.fixed} will have no
+effect. Until a more elegant alternative has been implemented, use explicit
+\code{mean.linear} and \code{prec.linear} specifications in each
+\code{model="linear"} component instead.
+}
+}
+}
+
 \examples{
 \dontrun{
 if (interactive()) {

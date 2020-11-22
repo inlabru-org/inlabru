@@ -68,7 +68,12 @@ nlinla.epunkt <- function(model, data, result = NULL) {
     }
     return(result)
   } else {
-    evaluate_model(model, result = result, data = data, property = "mean")[[1]]
+    state <- evaluate_state(
+      model,
+      result = result,
+      property = "mean"
+    )
+    evaluate_model(model, state = state, data = data)[[1]]
   }
 }
 

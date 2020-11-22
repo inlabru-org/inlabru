@@ -260,10 +260,15 @@ bru <- function(components = ~ Intercept(1),
   options <- bru_call_options(options)
 
   lhoods <- list(...)
-  dot_is_lhood <- vapply(lhoods, function(lh) inherits(lh, "bru_like"), TRUE)
-  if (any(dot_is_lhood)) {
-    if (!all(dot_is_lhood)) {
-      stop("Cannot mix like() parameters with 'lhood' objects.")
+  dot_is_lhood <- vapply(lhoods,
+                         function(lh) inherits(lh, "bru_like"),
+                         TRUE)
+  dot_is_lhood_list <- vapply(lhoods,
+                              function(lh) inherits(lh, "bru_like_list"),
+                              TRUE)
+  if (any(dot_is_lhood | dot_is_lhood_list)) {
+    if (!all(dot_is_lhood | dot_is_lhood_list)) {
+      stop("Cannot mix like() parameters with 'bru_like' and `bru_like_list` objects.")
     }
   } else {
     if (is.null(lhoods[["formula"]])) {
@@ -276,8 +281,15 @@ bru <- function(components = ~ Intercept(1),
       )
     }
     lhoods <- list(do.call(like, c(lhoods, list(options = options))))
+    dot_is_lhood <- TRUE
+    dot_is_lhood_list <- FALSE
   }
-  lhoods <- like_list(lhoods)
+  if (any(dot_is_lhood_list)) {
+    lhoods <- like_list(c(lhoods[dot_is_lhood],
+                          do.call(c, lhoods[dot_is_lhood_list])))
+  } else {
+    lhoods <- like_list(lhoods)
+  }
 
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
@@ -937,14 +949,25 @@ generate.bru <- function(object,
     formula <- object$bru_info$lhoods[["default"]]$formula
   }
 
-  # TODO: clarify the output format, and use the format parameter
-  vals <- evaluate_model(
-    model = object$bru_info$model, result = object, data = data,
-    property = "sample", n = n.samples, predictor = formula, seed = seed,
+  state <- evaluate_state(
+    object$bru_info$model,
+    result = object,
+    property = "sample",
+    n = n.samples,
+    seed = seed,
     num.threads = num.threads,
-    include = include, exclude = exclude,
     ...
   )
+  # TODO: clarify the output format, and use the format parameter
+  vals <- evaluate_model(
+    model = object$bru_info$model,
+    state = state,
+    data = data,
+    predictor = formula,
+    include = include,
+    exclude = exclude
+  )
+  vals
 }
 
 
@@ -1143,10 +1166,8 @@ iinla <- function(model, lhoods, result = NULL, options) {
     "family"
   )
 
-  # Inital stack
-  linearisation_method <- match.arg(options[["bru_linearisation_method"]],
-                                    c("legacy", "pandemic"))
-  if (identical(linearisation_method, "legacy")) {
+  # Initial stack
+  if (identical(options$bru_method$taylor, "legacy")) {
     stk <- joint_stackmaker(model, lhoods, result)
   } else {
     idx <- evaluate_index(model, lhoods)
@@ -1172,7 +1193,7 @@ iinla <- function(model, lhoods, result = NULL, options) {
     }
 
     bru_log_message(
-      paste0("iinla: Iteration ", k, "[ max:", options$bru_max_iter, "]"),
+      paste0("iinla: Iteration ", k, " [max:", options$bru_max_iter, "]"),
       verbose = options$bru_verbose,
       verbose_store = options$bru_verbose_store
     )
@@ -1251,15 +1272,9 @@ iinla <- function(model, lhoods, result = NULL, options) {
       return(old.result)
     }
 
-    bru_log_message(
-      "iinla: Done. ",
-      verbose = options$bru_verbose,
-      verbose_store = options$bru_verbose_store
-    )
-
     # Extract values tracked for estimating convergence
     if (options$bru_max_iter > 1 & k <= options$bru_max_iter) {
-      # Note: The number of fixed effets may be zero, and strong
+      # Note: The number of fixed effects may be zero, and strong
       # non-linearities that don't necessarily affect the fixed
       # effects may appear in the random effects, so we need to
       # track all of them.
@@ -1292,11 +1307,41 @@ iinla <- function(model, lhoods, result = NULL, options) {
 
     # Update stack given current result
     if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
-      if (identical(linearisation_method, "legacy")) {
+      if (identical(options$bru_method$taylor, "legacy")) {
         stk <- joint_stackmaker(model, lhoods, result)
       } else {
         state <- evaluate_state(model, lhoods = lhoods, result = result,
                                 property = "mean")[[1]]
+        did_backtrack <- FALSE
+        if (identical(options$bru_method$backtrack, "basic")) {
+          lin_pred <- lapply(
+            lin,
+            function(x) {
+              as.vector(
+                x$offset + Matrix::rowSums(do.call(
+                  cbind,
+                  lapply(names(x$A), function(xx) {
+                    x[["A"]][[xx]] %*% state[[xx]]
+                  }
+                  )
+                )))
+            }
+          )
+          nonlin_pred <- lapply(
+            lhoods,
+            function(lh) {
+              as.vector(
+                evaluate_model(model = model,
+                               data = lh[["data"]],
+                               state = list(state),
+                               A = A,
+                               predictor = bru_like_expr(lh),
+                               format = "matrix")
+              )
+            }
+          )
+          did_backtrack <- FALSE
+        }
         lin <- bru_compute_linearisation(model, lhoods = lhoods, state = state,
                                          A = A)
         stk <- bru_make_stack(lhoods, lin, idx)
@@ -1307,8 +1352,7 @@ iinla <- function(model, lhoods, result = NULL, options) {
 
     # Stopping criterion
     if (k > 1) {
-      ## TODO: Make max.dev a configurable option.
-      max.dev <- 0.01
+      max.dev <- options$bru_method$stop_at_max_rel_deviation
       dev <- abs(track[[k - 1]]$mean - track[[k]]$mean) / track[[k]]$sd
       ## do.call(c, lapply(by(do.call(rbind, track),
       ##                           as.factor(do.call(rbind, track)$effect),
@@ -1319,7 +1363,8 @@ iinla <- function(model, lhoods, result = NULL, options) {
                signif(100 * max(dev), 3),
                "% of SD [stop if: <", 100 * max.dev, "%]"),
         verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store
+        verbose_store = options$bru_verbose_store,
+        verbosity = 1
       )
       interrupt <- all(dev < max.dev)
       if (interrupt) {

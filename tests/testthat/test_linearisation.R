@@ -20,15 +20,6 @@ test_that("Linearisation", {
     )
   model <- bru_model(component_list(cmp, lhoods), lhoods)
 
-#  fit <- bru(
-#    components = cmp,
-#    formula = form,
-#    data = data,
-#    options = list(control.inla = list(int.strategy = "eb"),
-#                   bru_verbose = TRUE)
-#  )
-  
-  
   
   idx <- evaluate_index(model, lhoods)
   A <- evaluate_A(model, lhoods)
@@ -60,5 +51,14 @@ test_that("Linearisation", {
     )
   
   expect_s3_class(stk0, "inla.data.stack")
-  
+
+  fit <- bru(
+    components = cmp,
+    lhoods,
+    options = list(control.inla = list(int.strategy = "eb"),
+                   bru_verbose = TRUE,
+                   bru_method = list(taylor = "pandemic",
+                                     backtrack = "basic"))
+  )
+
 })

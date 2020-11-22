@@ -136,7 +136,8 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' @param ... Named options, optionally started by one or more [`bru_options`]
 #' objects. Options specified later override the previous options.
 #' @return `bru_options()` returns an `bru_options` object.
-#' @details For `bru_options` and `bru_options_set`, recognised options are:
+#' @section Valid options:
+#' For `bru_options` and `bru_options_set`, recognised options are:
 #' \describe{
 #' \item{bru_verbose}{logical or numeric; if `TRUE`, log messages of `verbosity`
 #' \eqn{\leq 1} are printed by [bru_log_message()]. If numeric, log messages
@@ -145,6 +146,26 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' \item{bru_verbose_stored}{logical or numeric; if `TRUE`, log messages of
 #' `verbosity` \eqn{\leq 1} are stored by [bru_log_message()]. If numeric,
 #' log messages of verbosity \eqn{\leq} are stored. Default: 1}
+#' \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
+#'   to run inference.}
+#' \item{bru_max_iter}{maximum number of inla iterations}
+#' \item{bru_result}{An `inla` object returned from previous calls of
+#'   `INLA::inla`, [bru] or [lgcp]. This will be used as a
+#'   starting point for further improvement of the approximate posterior.}
+#' \item{bru_int_args}{List of arguments passed all the way to the
+#' integration method `ipoints` and `int.polygon` for 'cp' family models}
+#' \item{`inla()` options}{
+#' All options not starting with `bru_` are passed on to `inla()`, sometimes
+#' after altering according to the needs of the inlabru method.
+
+#' Warning:
+#'   Due to how inlabru currently constructs the `inla()` call, the `mean`,
+#'   `prec`, `mean.intercept`, and `prec.intercept` settings in
+#'   `control.fixed` will have no
+#'   effect. Until a more elegant alternative has been implemented, use explicit
+#'   `mean.linear` and `prec.linear` specifications in each
+#'   `model="linear"` component instead.
+#' }
 #' }
 #'
 #' @examples
@@ -223,7 +244,11 @@ bru_options_default <- function() {
     bru_max_iter = 10,
     bru_run = TRUE,
     bru_int_args = list(method = "stable"), # nsub: NULL
-    bru_linearisation_method = "pandemic",
+    bru_method = list(
+      taylor = "pandemic",
+      backtrack = "none",
+      stop_at_max_rel_deviation = 0.01
+    ),
     # bru_result: NULL
     # inla options
     E = 1,
@@ -422,31 +447,6 @@ bru_options_get <- function(name = NULL, include_default = TRUE) {
 #' @seealso [bru_options()], [bru_options_default()], [bru_options_get()]
 #' @param .reset For `bru_options_set`, logical indicating if the global override
 #' options list should be emptied before setting the new option(s).
-#' 
-#' @details
-#' * bru_run If TRUE, run inference. Otherwise only return configuration needed
-#'   to run inference.
-#' * nru_max_iter maximum number of inla iterations
-#' * offset the usual `INLA::inla` offset. If a nonlinear formula is
-#'   used, the resulting Taylor approximation constant will be added to this
-#'   automatically.
-#' * bru_result An `inla` object returned from previous calls of
-#'   `INLA::inla`, [bru] or [lgcp]. This will be used as a
-#'   starting point for further improvement of the approximate posterior.
-#' * E `INLA::inla` 'poisson' likelihood exposure parameter
-#' * Ntrials `INLA::inla` 'binomial' likelihood parameter
-#' * control.compute INLA option, See `INLA::control.compute`
-#' * control.inla INLA option, See `INLA::control.inla`
-#' * control.fixed INLA option, See `INLA::control.fixed`. Warning:
-#'   due to how inlabru currently constructs the `inla()`, the `mean`,
-#'   `prec`, `mean.intercept`, and `prec.intercept` will have no
-#'   effect. Until a more elegant alternative has been implemented, use explicit
-#'   `mean.linear` and `prec.linear` specifications in each
-#'   `model="linear"` component instead.
-#' * bru_int_args List of arguments passed all the way to the integration method
-#' `ipoints` and `int.polygon` for 'cp' family models
-#' * All options not starting with `bru_` are passed on to `inla()`, sometimes
-#' after altering according to the needs of the inlabru method.
 #' 
 #' @examples
 #' \dontrun{
