@@ -40,31 +40,31 @@ test_that("Mexdolphin: Hazard rate detection function", {
 })
 
 
-timings <- function() {
-  local_bru_options_set(bru_verbose = FALSE)
-  microbenchmark::microbenchmark(
-    legacy = {
-      local_bru_options_set(bru_linearisation_method = "legacy")
-      fit <- lgcp(
-        components = cmp,
-        mexdolphin$points,
-        ips = ips,
-        formula = formula,
-        options = list(control.inla = list(int.strategy = "eb"))
-      )
-    },
-    pandemic = {
-      local_bru_options_set(bru_linearisation_method = "pandemic")
-      fit <- lgcp(
-        components = cmp,
-        mexdolphin$points,
-        ips = ips,
-        formula = formula,
-        options = list(control.inla = list(int.strategy = "eb"))
-      )
-    }
-  )
-}
+# timings <- function() {
+#   local_bru_options_set(bru_verbose = FALSE)
+#   microbenchmark::microbenchmark(
+#     legacy = {
+#       local_bru_options_set(bru_linearisation_method = "legacy")
+#       fit <- lgcp(
+#         components = cmp,
+#         mexdolphin$points,
+#         ips = ips,
+#         formula = formula,
+#         options = list(control.inla = list(int.strategy = "eb"))
+#       )
+#     },
+#     pandemic = {
+#       local_bru_options_set(bru_linearisation_method = "pandemic")
+#       fit <- lgcp(
+#         components = cmp,
+#         mexdolphin$points,
+#         ips = ips,
+#         formula = formula,
+#         options = list(control.inla = list(int.strategy = "eb"))
+#       )
+#     }
+#   )
+# }
 
 # Unit: seconds
 # expr      min       lq     mean   median       uq      max neval cld

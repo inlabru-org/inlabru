@@ -93,7 +93,7 @@ bru_make_stack <- function(...) {
 #' @param idx Output from [evaluate_index()]
 #' @export
 #' @rdname bru_make_stack
-bru_make_stack.bru_like <- function(lhood, lin, idx) {
+bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
   INLA::inla.stack(
     list(
       BRU.response = lhood$data[[lhood$response]],
@@ -109,7 +109,7 @@ bru_make_stack.bru_like <- function(lhood, lin, idx) {
 #' @param lhoods A `bru_like_list` object
 #' @export
 #' @rdname bru_make_stack
-bru_make_stack.bru_like_list <- function(lhoods, lin, idx) {
+bru_make_stack.bru_like_list <- function(lhoods, lin, idx, ...) {
   stks <-
     lapply(
       seq_along(lhoods),

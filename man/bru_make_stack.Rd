@@ -8,9 +8,9 @@
 \usage{
 bru_make_stack(...)
 
-\method{bru_make_stack}{bru_like}(lhood, lin, idx)
+\method{bru_make_stack}{bru_like}(lhood, lin, idx, ...)
 
-\method{bru_make_stack}{bru_like_list}(lhoods, lin, idx)
+\method{bru_make_stack}{bru_like_list}(lhoods, lin, idx, ...)
 }
 \arguments{
 \item{\dots}{Arguments passed on to other methods}
