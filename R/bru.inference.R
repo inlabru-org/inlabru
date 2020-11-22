@@ -299,8 +299,6 @@ bru <- function(components = ~ Intercept(1),
     result <- iinla(
       model = bru.model,
       lhoods = lhoods,
-      n = options$bru_max_iter,
-      offset = options$bru_offset,
       result = options$bru_result,
       options = options
     )
@@ -587,6 +585,20 @@ like_list.bru_like <- function(..., envir = NULL) {
   object
 }
 
+
+bru_like_expr <- function(lhood, components) {
+  if (!is.null(lhood[["expr"]])) {
+    lhood[["expr"]]
+  } else {
+    included <-
+      parse_inclusion(
+        names(components),
+        include = lhood[["include_components"]],
+        exclude = lhood[["exclude_components"]]
+      )
+    parse(text = paste0(included, collapse = " + "))
+  }
+}
 
 
 
@@ -919,8 +931,9 @@ generate.bru <- function(object,
     data <- do.call(cprod, add.pts)
   }
 
-  # Turn formula into an expression
+  # Turn formula into an expression (in evaluate_model)
   if (is.null(formula)) {
+    stop("TODO: Automatic formula selection is not implemented")
     formula <- object$bru_info$lhoods[["default"]]$formula
   }
 
@@ -1098,22 +1111,14 @@ bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
 #' @param data A data.frame
 #' @param model A [bru_model] object
 #' @param lhoods A list of likelihood objects from [like()]
-#' @param n Number of `INLA::inla` iterations
-#' @param result A previous inla result, to be used as starting point
-#' @param bru_verbose If TRUE, be verbose (use the inla option verbose=TRUE to
-#' make INLA itself verbose)
-#' @param offset An additional predictor offset
+#' @param result A previous inla result, to be used as starting point, or
+#' `NULL`
 #' @param options A `bru_options` object.
 #' @return An `INLA::inla` object
 #' @keywords internal
 
 
-iinla <- function(model, lhoods, n = 10, result = NULL,
-                  offset = 0, options) {
-
-  # # Default number of maximum iterations
-  # if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
-  
+iinla <- function(model, lhoods, result = NULL, options) {
   inla.options <- bru_options_inla(options)
 
   # Track variables?
@@ -1123,7 +1128,6 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
   old.result <- result
 
   # Initialise required local options
-  offset <- if (is.null(offset)) {0} else {offset}
   inla.options <- modifyList(
     inla.options,
     list(
@@ -1140,14 +1144,26 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
   )
 
   # Inital stack
-  stk <- joint_stackmaker(model, lhoods, result)
+  linearisation_method <- match.arg(options[["bru_linearisation_method"]],
+                                    c("legacy", "pandemic"))
+  if (identical(linearisation_method, "legacy")) {
+    stk <- joint_stackmaker(model, lhoods, result)
+  } else {
+    idx <- evaluate_index(model, lhoods)
+    A <- evaluate_A(model, lhoods)
+    state <- evaluate_state(model, lhoods = lhoods, result = result,
+                            property = "mode")[[1]]
+    lin <- bru_compute_linearisation(model, lhoods = lhoods, state = state,
+                                     A = A)
+    stk <- bru_make_stack(lhoods, lin, idx)
+  }
   stk.data <- INLA::inla.stack.data(stk)
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
-
+  
   k <- 1
   interrupt <- FALSE
 
-  while ((k <= n) & !interrupt) {
+  while ((k <= options$bru_max_iter) & !interrupt) {
 
     # When running multiple times propagate theta
     if (k > 1) {
@@ -1156,7 +1172,7 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
     }
 
     bru_log_message(
-      paste0("iinla: Iteration ", k, "[ max:", n, "]"),
+      paste0("iinla: Iteration ", k, "[ max:", options$bru_max_iter, "]"),
       verbose = options$bru_verbose,
       verbose_store = options$bru_verbose_store
     )
@@ -1189,7 +1205,7 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
           family = family,
           E = stk.data[["BRU.E"]],
           Ntrials = stk.data[["BRU.Ntrials"]],
-          offset = stk.data[["BRU.offset"]] + offset
+          offset = stk.data[["BRU.offset"]]
         )
       )
 
@@ -1242,7 +1258,7 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
     )
 
     # Extract values tracked for estimating convergence
-    if (n > 1 & k <= n) {
+    if (options$bru_max_iter > 1 & k <= options$bru_max_iter) {
       # Note: The number of fixed effets may be zero, and strong
       # non-linearities that don't necessarily affect the fixed
       # effects may appear in the random effects, so we need to
@@ -1275,8 +1291,16 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
     }
 
     # Update stack given current result
-    if (n > 1 & k < n) {
-      stk <- joint_stackmaker(model, lhoods, result)
+    if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
+      if (identical(linearisation_method, "legacy")) {
+        stk <- joint_stackmaker(model, lhoods, result)
+      } else {
+        state <- evaluate_state(model, lhoods = lhoods, result = result,
+                                property = "mean")[[1]]
+        lin <- bru_compute_linearisation(model, lhoods = lhoods, state = state,
+                                         A = A)
+        stk <- bru_make_stack(lhoods, lin, idx)
+      }
       stk.data <- INLA::inla.stack.data(stk)
       inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
     }

@@ -119,7 +119,8 @@ bru_model <- function(components, lhoods) {
 #' @param property Property of the model components to obtain value from.
 #' Default: "mode". Other options are "mean", "0.025quant", "0.975quant",
 #' "sd" and "sample". In case of "sample" you will obtain samples from the
-#' posterior (see `n` parameter).
+#' posterior (see `n` parameter). If `result` is `NULL`, all-zero vectors are
+#' returned for each component.
 #' @param format character; determines the storage format of predictor output.
 #' Available options:
 #' * `"auto"` If the first evaluated result is a vector or single-column matrix,
@@ -221,6 +222,11 @@ evaluate_state <- function(model,
       num.threads = num.threads,
       ...
     )
+  } else if (is.null(result)) {
+    state <- list(lapply(model[["effects"]],
+                         function(x) {
+                           rep(0.0, ibm_n(x[["mapper"]]))
+                         }))
   } else {
     state <- list(extract_property(result, property))
   }

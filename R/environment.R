@@ -223,6 +223,7 @@ bru_options_default <- function() {
     bru_max_iter = 10,
     bru_run = TRUE,
     bru_int_args = list(method = "stable"), # nsub: NULL
+    bru_linearisation_method = "pandemic",
     # bru_result: NULL
     # inla options
     E = 1,
@@ -306,6 +307,15 @@ bru_call_options <- function(...) {
   opt
 }
 
+
+# Extract bru options
+bru_options_bru <- function(options) {
+  stopifnot(inherits(options, "bru_options"))
+  cl <- class(options)
+  options <- options[grepl("^bru_", names(options))]
+  class(options) <- cl
+  options
+}
 
 # Extract non-bru options
 bru_options_inla <- function(options) {

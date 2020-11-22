@@ -168,9 +168,7 @@ bru_compute_linearisation.component <- function(cmp,
         row_subset <- seq_len(NROW(A))
       }
       effects_eps <- effects[row_subset, , drop = FALSE]
-      effects_eps[row_subset, label] <-
-        effects_eps[row_subset, label] +
-        A[row_subset, k] * eps
+      effects_eps[, label] <- effects_eps[, label] + A[row_subset, k] * eps
       
       pred_eps <- evaluate_predictor(
         model,
@@ -181,7 +179,7 @@ bru_compute_linearisation.component <- function(cmp,
         format = "matrix"
       )
       # Store sparse triplet information
-      values <- (pred_eps - pred0)
+      values <- (pred_eps - pred0[row_subset])
       nonzero <- (values != 0.0) # Detect exact (non)zeros
       triplets$i <- c(triplets$i, row_subset[nonzero])
       triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
@@ -220,13 +218,15 @@ bru_compute_linearisation.bru_like <- function(lhood,
     data = NULL,
     A = A
   )
-  stopifnot(!is.null(lhood$expr)) # Check details for purely linear models
+
+  lhood_expr <- bru_like_expr(lhood, model[["effects"]])
+  
   pred0 <- evaluate_predictor(
     model,
     state = list(state),
     data = data,
     effects = list(effects),
-    predictor = lhood$expr,
+    predictor = lhood_expr,
     format = "matrix"
   )
   # Compute derivatives for each noon-offset component
@@ -244,7 +244,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
           bru_compute_linearisation(
             model[["effects"]][[label]],
             model = model,
-            lhood_expr = lhood[["expr"]],
+            lhood_expr = lhood_expr,
             data = data,
             state = state,
             A = A[[label]],

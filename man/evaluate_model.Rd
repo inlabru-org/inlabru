@@ -50,7 +50,8 @@ hand side is used for evaluation.}
 \item{property}{Property of the model components to obtain value from.
 Default: "mode". Other options are "mean", "0.025quant", "0.975quant",
 "sd" and "sample". In case of "sample" you will obtain samples from the
-posterior (see \code{n} parameter).}
+posterior (see \code{n} parameter). If \code{result} is \code{NULL}, all-zero vectors are
+returned for each component.}
 
 \item{format}{character; determines the storage format of predictor output.
 Available options:

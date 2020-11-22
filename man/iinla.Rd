@@ -4,25 +4,19 @@
 \alias{iinla}
 \title{Iterated INLA}
 \usage{
-iinla(model, lhoods, n = 10, result = NULL, offset = 0, options)
+iinla(model, lhoods, result = NULL, options)
 }
 \arguments{
 \item{model}{A \link{bru_model} object}
 
 \item{lhoods}{A list of likelihood objects from \code{\link[=like]{like()}}}
 
-\item{n}{Number of \code{INLA::inla} iterations}
-
-\item{result}{A previous inla result, to be used as starting point}
-
-\item{offset}{An additional predictor offset}
+\item{result}{A previous inla result, to be used as starting point, or
+\code{NULL}}
 
 \item{options}{A \code{bru_options} object.}
 
 \item{data}{A data.frame}
-
-\item{bru_verbose}{If TRUE, be verbose (use the inla option verbose=TRUE to
-make INLA itself verbose)}
 }
 \value{
 An \code{INLA::inla} object
