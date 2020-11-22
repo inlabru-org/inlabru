@@ -1033,7 +1033,9 @@ make_mapper <- function(subcomp,
       stop(paste0("No mapper, no n, and no values given for ", label))
     }
 
-    if (is.factor(values) || is.character(values)) {
+    if (is.factor(values) ||
+        is.character(values) ||
+        (subcomp[["type"]] %in% "factor")) {
       subcomp[["mapper"]] <- bru_mapper_factor(
         values,
         factor_mapping = subcomp[["factor_mapping"]]
@@ -1310,18 +1312,20 @@ ibm_amatrix.bru_mapper_linear <- function(mapper, input, ...) {
 #' @export
 #' @rdname bru_mapper
 bru_mapper_factor <- function(values, factor_mapping, ...) {
-  stopifnot(
-    is.factor(values) || is.character(values)
-  )
   factor_mapping <- match.arg(factor_mapping, c("full", "contrast"))
   if (is.factor(values)) {
     mapper <- list(
       levels = levels(values),
       factor_mapping = factor_mapping
     )
-  } else {
+  } else if (is.character(values)) {
     mapper <- list(
       levels = unique(values),
+      factor_mapping = factor_mapping
+    )
+  } else {
+    mapper <- list(
+      levels = as.character(sort(unique(values))),
       factor_mapping = factor_mapping
     )
   }
