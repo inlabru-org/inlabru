@@ -101,3 +101,4 @@ Collate:
     'spde.R'
     'stack.R'
     'utils.R'
+VignetteBuilder: knitr
