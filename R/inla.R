@@ -365,6 +365,8 @@ plotmarginal.inla <- function(result, varname = NULL, link = function(x) {
       geom_ribbon(aes_string(ymin = "lower", ymax = "upper"), alpha = 0.1) +
       geom_line() +
       geom_point() +
+      geom_line(aes_string("ID", "mean"), col = 2) +
+      geom_line(aes_string("ID", "mid"), col = 2, lty = 2) +
       ylab("mode and quantiles") + xlab(paste0(varname, " ID"))
   }
 }
