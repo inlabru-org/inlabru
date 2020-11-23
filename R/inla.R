@@ -360,6 +360,13 @@ plotmarginal.inla <- function(result, varname = NULL, link = function(x) {
   } else {
     df <- result$summary.random[[varname]]
     colnames(df) <- c("ID", "mean", "sd", "lower", "mid", "upper", "mode", "kld")
+    df$mean <- link(df$mean)
+    h <- 1e-6
+    df$sd <- link(df$sd) * abs((link(df$mean + h) - link(df$mean - h)) / (2 * h))
+    df$lower <- link(df$lower)
+    df$mid <- link(df$mid)
+    df$upper <- link(df$upper)
+    df$mode <- link(df$mode)
     p <- ggplot(df, aes_string("ID", "mode"))
     p +
       geom_ribbon(aes_string(ymin = "lower", ymax = "upper"), alpha = 0.1) +

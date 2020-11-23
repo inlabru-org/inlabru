@@ -246,7 +246,7 @@ bru_options_default <- function() {
     bru_int_args = list(method = "stable"), # nsub: NULL
     bru_method = list(
       taylor = "pandemic",
-      backtrack = "none",
+      backtrack = "basic",
       stop_at_max_rel_deviation = 0.01
     ),
     # bru_result: NULL

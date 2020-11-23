@@ -33,10 +33,10 @@ test_that("Mexdolphin: Hazard rate detection function", {
   #
   #  plot(ips$distance, hr(ips$distance, fit$summary.fixed["lsig", "mean"]))
 
-  expect_equal(fit$summary.fixed["lsig", "mean"], 1.038281, tolerance = lowtol)
-  expect_equal(fit$summary.fixed["lsig", "sd"], 0.5183252, tolerance = lowtol)
-  expect_equal(fit$summary.fixed["Intercept", "mean"], 2.325408, tolerance = lowtol)
-  expect_equal(fit$summary.fixed["Intercept", "sd"], 0.2900139, tolerance = lowtol)
+  expect_equal(fit$summary.fixed["lsig", "mean"], 1.038281, tolerance = midtol)
+  expect_equal(fit$summary.fixed["lsig", "sd"], 0.5183252, tolerance = midtol)
+  expect_equal(fit$summary.fixed["Intercept", "mean"], 2.325408, tolerance = midtol)
+  expect_equal(fit$summary.fixed["Intercept", "sd"], 0.2900139, tolerance = midtol)
 })
 
 

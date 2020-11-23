@@ -14,10 +14,7 @@ test_that("Latent models: RW2 mapping", {
   cmp1 <- obs ~ time(time, model = "rw2", values = 2^(0:4),
                      constr = FALSE, scale.model = TRUE) - Intercept
   fit1 <- bru(cmp1, data = data1, family = "gaussian")
-  
-  fit1$summary.hyperpar
-  fit1$summary.random$time
-  
+
   expect_equal(
     fit1$summary.random$time$mean,
     c(1.631781, 1.895681, 1.025671, 3.959789, 1.841140),

@@ -2,9 +2,12 @@
 % Please edit documentation in R/bru.inference.R
 \name{bru}
 \alias{bru}
+\alias{bru_rerun}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
 bru(components = ~Intercept(1), ..., options = list())
+
+bru_rerun(result, options = list())
 }
 \arguments{
 \item{components}{A \link{formula}-like specification of latent components.
@@ -16,6 +19,8 @@ parameters that can be passed to a single \code{\link[=like]{like()}} call.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
+
+\item{result}{A previous estimation object of class \code{bru}}
 }
 \value{
 bru returns an object of class "bru". A \code{bru} object inherits
@@ -43,6 +48,11 @@ Support for non-linear predictors. See example below.
 Log Gaussian Cox process (LGCP) inference is
 available by using the \code{cp} family or (even easier) by using the
 \link{lgcp} function.
+}
+}
+\details{
+\itemize{
+\item \code{bru_rerun} Continue the optimisation from a previously computed estimate.
 }
 }
 \examples{

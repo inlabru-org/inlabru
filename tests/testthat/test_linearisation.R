@@ -56,7 +56,7 @@ test_that("Linearisation", {
     components = cmp,
     lhoods,
     options = list(control.inla = list(int.strategy = "eb"),
-                   bru_verbose = TRUE,
+                   bru_verbose = FALSE,
                    bru_method = list(taylor = "pandemic",
                                      backtrack = "basic"))
   )
