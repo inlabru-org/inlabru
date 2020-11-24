@@ -1493,14 +1493,17 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   }
   old.result <- result
   
+  do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
+  if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
+    A <- evaluate_A(model, lhoods)
+    lin <- bru_compute_linearisation(
+      model,
+      lhoods = lhoods,
+      state = state,
+      A = A
+    )
+  }
   # Initial stack
-  A <- evaluate_A(model, lhoods)
-  lin <- bru_compute_linearisation(
-    model,
-    lhoods = lhoods,
-    state = state,
-    A = A
-  )
   if (identical(options$bru_method$taylor, "legacy")) {
     stk <- joint_stackmaker(model, lhoods, state = list(state))
   } else {
@@ -1637,22 +1640,26 @@ iinla <- function(model, lhoods, initial = NULL, options) {
                             property = "mode"
     )[[1]]
     if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
-      line_search <- bru_line_search(
-        model = model,
-        lhoods = lhoods,
-        lin = lin,
-        state0 = state0,
-        state = state,
-        A = A,
-        options = options
-      )
-      state <- line_search[["state"]]
-      lin <- bru_compute_linearisation(
-        model,
-        lhoods = lhoods,
-        state = state,
-        A = A
-      )
+      if (do_line_search) {
+        line_search <- bru_line_search(
+          model = model,
+          lhoods = lhoods,
+          lin = lin,
+          state0 = state0,
+          state = state,
+          A = A,
+          options = options
+        )
+        state <- line_search[["state"]]
+      }
+      if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
+        lin <- bru_compute_linearisation(
+          model,
+          lhoods = lhoods,
+          state = state,
+          A = A
+        )
+      }
       if (identical(options$bru_method$taylor, "legacy")) {
         stk <- joint_stackmaker(model, lhoods, state = list(state))
       } else {
