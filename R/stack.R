@@ -75,9 +75,9 @@ make.stack <- function(data,
 
 
 #' Build an inla data stack from linearisation information
-#' 
+#'
 #' Combine linearisation for multiple likelihoods
-#' 
+#'
 #' @param \dots Arguments passed on to other methods
 #' @export
 #' @rdname bru_make_stack
@@ -105,7 +105,7 @@ bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
     effects = idx[names(lin$A)]
   )
 }
-  
+
 #' @param lhoods A `bru_like_list` object
 #' @export
 #' @rdname bru_make_stack
@@ -121,13 +121,12 @@ bru_make_stack.bru_like_list <- function(lhoods, lin, idx, ...) {
         )
       }
     )
-  
+
   stk <-
     do.call(
       inlabru::inla.stack.mjoin,
       c(stks, list(compress = TRUE, remove.unused = FALSE))
     )
-  
+
   stk
 }
-

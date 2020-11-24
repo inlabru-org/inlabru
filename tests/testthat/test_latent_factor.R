@@ -3,10 +3,10 @@ local_bru_testthat_setup()
 test_that("bru: factor component", {
   skip_on_cran()
   local_bru_safe_inla()
-  
+
   # Seed influences data as well as predict()!
   set.seed(123)
-  
+
   # Factor models
   input.df <- data.frame(
     x1 = factor(rep(c("Alpha", "Beta", "Mu"), c(70, 60, 70))),
@@ -19,7 +19,7 @@ test_that("bru: factor component", {
     c(1, -2, 0)[as.numeric(input.df$x1)] +
     c(1, -2, 1, -2, 1, -2, 1)[as.numeric(input.df$x2)] +
     rnorm(200, mean = 0, sd = 0.1)
-  
+
   # Fit the model
   fit <- bru(
     components = ~ Intercept(main = 1) +
@@ -37,7 +37,7 @@ test_that("bru: factor component", {
       num.threads = "1:1"
     )
   )
-  
+
   #  fit0$summary.hyperpar
   #  fit$summary.hyperpar
   #  rbind(
@@ -49,7 +49,7 @@ test_that("bru: factor component", {
   #    fit$summary.random$fac1,
   #    fit$summary.random$fac2
   #  )
-  
+
   # Check factoreffect results
   expect_equal(
     fit$summary.random$fac1$mean,
@@ -77,7 +77,7 @@ test_that("bru: factor component", {
     ),
     tolerance = midtol
   )
-  
+
   # Check if prediction works
   pr <- predict(
     fit,
@@ -105,18 +105,18 @@ test_that("bru: factor component", {
 test_that("bru: indexed factor component", {
   skip_on_cran()
   local_bru_safe_inla()
-  
+
   # Seed influences data as well as predict()!
   set.seed(123)
-  
+
   # Factor models
   input.df <- data.frame(
-    x3 = rep(c(1,2,3,4), times = 2)
+    x3 = rep(c(1, 2, 3, 4), times = 2)
   )
   input.df$y <-
     c(11, 12, 13, 14)[input.df$x3] +
     rnorm(8, mean = 0, sd = 0.1)
-  
+
   # Fit the model
   fit <- bru(
     components = ~ Intercept(main = 1) +
@@ -132,8 +132,8 @@ test_that("bru: indexed factor component", {
       )
     )
   )
-  
-  
+
+
   # Check factor effect results
   expect_equal(
     fit$summary.random$fac3$mean,

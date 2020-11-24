@@ -260,12 +260,16 @@ bru <- function(components = ~ Intercept(1),
   options <- bru_call_options(options)
 
   lhoods <- list(...)
-  dot_is_lhood <- vapply(lhoods,
-                         function(lh) inherits(lh, "bru_like"),
-                         TRUE)
-  dot_is_lhood_list <- vapply(lhoods,
-                              function(lh) inherits(lh, "bru_like_list"),
-                              TRUE)
+  dot_is_lhood <- vapply(
+    lhoods,
+    function(lh) inherits(lh, "bru_like"),
+    TRUE
+  )
+  dot_is_lhood_list <- vapply(
+    lhoods,
+    function(lh) inherits(lh, "bru_like_list"),
+    TRUE
+  )
   if (any(dot_is_lhood | dot_is_lhood_list)) {
     if (!all(dot_is_lhood | dot_is_lhood_list)) {
       stop("Cannot mix like() parameters with 'bru_like' and `bru_like_list` objects.")
@@ -285,8 +289,10 @@ bru <- function(components = ~ Intercept(1),
     dot_is_lhood_list <- FALSE
   }
   if (any(dot_is_lhood_list)) {
-    lhoods <- like_list(c(lhoods[dot_is_lhood],
-                          do.call(c, lhoods[dot_is_lhood_list])))
+    lhoods <- like_list(c(
+      lhoods[dot_is_lhood],
+      do.call(c, lhoods[dot_is_lhood_list])
+    ))
   } else {
     lhoods <- like_list(lhoods)
   }
@@ -312,7 +318,7 @@ bru <- function(components = ~ Intercept(1),
     lhoods = lhoods,
     options = options
   )
-  
+
   # Run iterated INLA
   if (options$bru_run) {
     result <- iinla(
@@ -342,8 +348,10 @@ bru_rerun <- function(result, options = list()) {
   stopifnot(inherits(result, "bru"))
   info <- result[["bru_info"]]
   info[["options"]] <- bru_call_options(
-    bru_options(info[["options"]],
-                as.bru_options(options))
+    bru_options(
+      info[["options"]],
+      as.bru_options(options)
+    )
   )
 
   result <- iinla(
@@ -352,7 +360,7 @@ bru_rerun <- function(result, options = list()) {
     result = result,
     options = info[["options"]]
   )
-  
+
   # Add bru information to the result
   result$bru_info <- info
   class(result) <- c("bru", class(result))
@@ -600,7 +608,7 @@ like_list.list <- function(object, envir = NULL, ...) {
   if (any(vapply(object, function(x) !inherits(x, "bru_like"), TRUE))) {
     stop("All list elements must be of class 'bru_like'.")
   }
-  
+
   class(object) <- c("bru_like_list", "list")
   environment(object) <- envir
   object
@@ -801,7 +809,7 @@ lgcp <- function(components,
 #' @aliases predict.bru
 #' @export
 #' @param object An object obtained by calling [bru] or [lgcp].
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for 
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' the prediction.
 #' @param formula A formula determining which effects to predict and how to
 #' combine them.
@@ -1165,9 +1173,9 @@ lin_predictor <- function(lin, state) {
             cbind,
             lapply(names(x$A), function(xx) {
               x[["A"]][[xx]] %*% state[[xx]]
-            }
-            )
-          )))
+            })
+          ))
+        )
       }
     )
   )
@@ -1179,12 +1187,14 @@ nonlin_predictor <- function(model, lhoods, state, A) {
       lhoods,
       function(lh) {
         as.vector(
-          evaluate_model(model = model,
-                         data = lh[["data"]],
-                         state = list(state),
-                         A = A,
-                         predictor = bru_like_expr(lh, model[["effects"]]),
-                         format = "matrix")
+          evaluate_model(
+            model = model,
+            data = lh[["data"]],
+            state = list(state),
+            A = A,
+            predictor = bru_like_expr(lh, model[["effects"]]),
+            format = "matrix"
+          )
         )
       }
     )
@@ -1223,7 +1233,7 @@ bru_line_search <- function(model,
       )
     )
   }
-  
+
   fact <- options$bru_method$factor
   pred_norm <- function(delta) {
     if (any(!is.finite(delta))) {
@@ -1232,16 +1242,16 @@ bru_line_search <- function(model,
       sum(delta^2)^0.5
     }
   }
-  
+
   state1 <- state
   lin_pred0 <- lin_predictor(lin, state0)
   lin_pred1 <- lin_predictor(lin, state1)
   nonlin_pred <- nonlin_predictor(model, lhoods, state1, A)
   step_scaling <- 1
-  
+
   norm01 <- pred_norm(lin_pred1 - lin_pred0)
   norm1 <- pred_norm(nonlin_pred - lin_pred1)
-  
+
   do_finite <-
     any(c("all", "finite") %in% options$bru_method$search)
   do_contract <-
@@ -1250,7 +1260,7 @@ bru_line_search <- function(model,
     any(c("all", "expand") %in% options$bru_method$search)
   do_optimise <-
     any(c("all", "optimise") %in% options$bru_method$search)
-  
+
   finite_active <- 0
   contract_active <- 0
   expand_active <- 0
@@ -1260,7 +1270,7 @@ bru_line_search <- function(model,
     norm0 <- pred_norm(nonlin_pred - lin_pred0)
 
     while ((do_finite && nonfin) ||
-           (do_contract && (norm0 > norm01 * fact))) {
+      (do_contract && (norm0 > norm01 * fact))) {
       if (do_finite && nonfin) {
         finite_active <- finite_active - 1
       } else {
@@ -1273,9 +1283,11 @@ bru_line_search <- function(model,
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
 
       bru_log_message(
-        paste0("iinla: Step rescaling: ",
-               signif(100 * step_scaling, 3),
-               "%, Contract"),
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 3),
+          "%, Contract"
+        ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
         verbosity = 3
@@ -1286,10 +1298,10 @@ bru_line_search <- function(model,
       }
     }
   }
-  
+
   if (do_expand &&
-      finite_active == 0 &&
-      contract_active == 0) {
+    finite_active == 0 &&
+    contract_active == 0) {
     overstep <- FALSE
     norm0 <- pred_norm(nonlin_pred - lin_pred0)
     norm1 <- pred_norm(nonlin_pred - lin_pred1)
@@ -1297,7 +1309,7 @@ bru_line_search <- function(model,
       expand_active <- expand_active + 1
       step_scaling <- step_scaling * fact
       state <- scale_state(state0, state1, step_scaling)
-      
+
       nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
       norm1_prev <- norm1
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
@@ -1306,14 +1318,16 @@ bru_line_search <- function(model,
         (norm1 > norm1_prev) || !is.finite(norm1)
 
       bru_log_message(
-        paste0("iinla: Step rescaling: ",
-               signif(100 * step_scaling, 3),
-               "%, Expand"),
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 3),
+          "%, Expand"
+        ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
         verbosity = 3
       )
-      
+
       if (step_scaling > 2^10) {
         break
       }
@@ -1324,18 +1338,20 @@ bru_line_search <- function(model,
       state <- scale_state(state0, state1, step_scaling)
       nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
-      
+
       bru_log_message(
-        paste0("iinla: Step rescaling: ",
-               signif(100 * step_scaling, 3),
-               "%, Overstep"),
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 3),
+          "%, Overstep"
+        ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
         verbosity = 3
       )
     }
   }
-  
+
   if (do_optimise) {
     lin_pred <- lin_predictor(lin, state)
     delta_lin <- (lin_pred1 - lin_pred0)
@@ -1355,17 +1371,19 @@ bru_line_search <- function(model,
     state_opt <- scale_state(state0, state1, step_scaling_opt)
     nonlin_pred_opt <- nonlin_predictor(model, lhoods, state_opt, A)
     norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
-    
+
     if (norm1_opt < norm1) {
       step_scaling <- step_scaling_opt
       state <- state_opt
       nonlin_pred <- nonlin_pred_opt
       norm1 <- norm1_opt
-      
+
       bru_log_message(
-        paste0("iinla: Step rescaling: ",
-               signif(100 * step_scaling, 4),
-               "%, Optimisation"),
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 4),
+          "%, Optimisation"
+        ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
         verbosity = 3
@@ -1375,13 +1393,15 @@ bru_line_search <- function(model,
 
   active <-
     (finite_active + contract_active + expand_active != 0) ||
-    (abs(step_scaling - 1) > 0.001)
-  
+      (abs(step_scaling - 1) > 0.001)
+
   if (active && (options$bru_verbose <= 2)) {
     bru_log_message(
-      paste0("iinla: Step rescaling: ",
-             signif(100 * step_scaling, 3),
-             "%"),
+      paste0(
+        "iinla: Step rescaling: ",
+        signif(100 * step_scaling, 3),
+        "%"
+      ),
       verbose = options$bru_verbose,
       verbose_store = options$bru_verbose_store,
       verbosity = 2
@@ -1445,28 +1465,32 @@ iinla <- function(model, lhoods, result = NULL, options) {
   } else {
     idx <- evaluate_index(model, lhoods)
     A <- evaluate_A(model, lhoods)
-    state <- evaluate_state(model, lhoods = lhoods,
-                            result = result,
-                            property = "mode")[[1]]
-    lin <- bru_compute_linearisation(model, lhoods = lhoods, state = state,
-                                     A = A)
+    state <- evaluate_state(model,
+      lhoods = lhoods,
+      result = result,
+      property = "mode"
+    )[[1]]
+    lin <- bru_compute_linearisation(model,
+      lhoods = lhoods, state = state,
+      A = A
+    )
     stk <- bru_make_stack(lhoods, lin, idx)
   }
   stk.data <- INLA::inla.stack.data(stk)
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
-  
+
   k <- 1
   interrupt <- FALSE
   line_search <- list(active = FALSE, step_scaling = 1, state = state)
 
-  
+
   while ((k <= options$bru_max_iter) & !interrupt) {
     if ((!is.null(result) && !is.null(result$mode))) {
       previous_x <- result$mode$x
     } else {
       previous_x <- 0
     }
-    
+
     # When running multiple times propagate theta
     if ((k > 1) || (!is.null(result) && !is.null(result$mode))) {
       inla.options[["control.mode"]]$restart <- TRUE
@@ -1499,8 +1523,8 @@ iinla <- function(model, lhoods, result = NULL, options) {
         ))
       )
     #        list.data(model$formula))
-    
-    inla.options <- 
+
+    inla.options <-
       modifyList(
         inla.options,
         list(
@@ -1579,8 +1603,10 @@ iinla <- function(model, lhoods, result = NULL, options) {
         stk <- joint_stackmaker(model, lhoods, result)
       } else {
         state0 <- state
-        state <- evaluate_state(model, lhoods = lhoods, result = result,
-                                property = "mode")[[1]]
+        state <- evaluate_state(model,
+          lhoods = lhoods, result = result,
+          property = "mode"
+        )[[1]]
         line_search <- bru_line_search(
           model = model,
           lhoods = lhoods,
@@ -1591,8 +1617,10 @@ iinla <- function(model, lhoods, result = NULL, options) {
           options = options
         )
         state <- line_search[["state"]]
-        lin <- bru_compute_linearisation(model, lhoods = lhoods, state = state,
-                                         A = A)
+        lin <- bru_compute_linearisation(model,
+          lhoods = lhoods, state = state,
+          A = A
+        )
         stk <- bru_make_stack(lhoods, lin, idx)
       }
       stk.data <- INLA::inla.stack.data(stk)
@@ -1608,9 +1636,11 @@ iinla <- function(model, lhoods, result = NULL, options) {
       ##                           identity),
       ##                        function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
       bru_log_message(
-        paste0("iinla: Max deviation from previous: ",
-               signif(100 * max(dev), 3),
-               "% of SD [stop if: <", 100 * max.dev, "%]"),
+        paste0(
+          "iinla: Max deviation from previous: ",
+          signif(100 * max(dev), 3),
+          "% of SD [stop if: <", 100 * max.dev, "%]"
+        ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
         verbosity = 1

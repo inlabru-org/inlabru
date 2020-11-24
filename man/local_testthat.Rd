@@ -118,7 +118,6 @@ print(my_fun(TRUE))
 print(bru_options_get("bru_verbose"))
 print(my_fun(FALSE))
 print(bru_options_get("bru_verbose"))
-
 }
 \seealso{
 \code{\link[=bru_options_set]{bru_options_set()}}, \code{\link[=bru_options_default]{bru_options_default()}}, \code{\link[=bru_options_get]{bru_options_get()}}

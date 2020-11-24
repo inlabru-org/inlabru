@@ -116,7 +116,7 @@ bru_compute_linearisation <- function(...) {
 #' likelihood for the component
 #' * For `bru_like_list`: A list, where each element is a list of named
 #' A-matrices.
-#' @param effects 
+#' @param effects
 #' * For `bru_component`:
 #' Precomputed effect data.frame for all components involved in the likelihood
 #' expression
@@ -174,7 +174,7 @@ bru_compute_linearisation.component <- function(cmp,
       }
       effects_eps <- effects[row_subset, , drop = FALSE]
       effects_eps[, label] <- effects_eps[, label] + A[row_subset, k] * eps
-      
+
       pred_eps <- evaluate_predictor(
         model,
         state = list(state_eps),
@@ -225,7 +225,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
   )
 
   lhood_expr <- bru_like_expr(lhood, model[["effects"]])
-  
+
   pred0 <- evaluate_predictor(
     model,
     state = list(state),
@@ -273,12 +273,12 @@ bru_compute_linearisation.bru_like <- function(lhood,
 #' @export
 #' @rdname bru_compute_linearisation
 bru_compute_linearisation.bru_like_list <- function(
-  lhoods,
-  model,
-  state,
-  A,
-  eps = 1e-5, # TODO: set more intelligently
-  ...) {
+                                                    lhoods,
+                                                    model,
+                                                    state,
+                                                    A,
+                                                    eps = 1e-5, # TODO: set more intelligently
+                                                    ...) {
   lapply(seq_along(lhoods), function(idx) {
     x <- lhoods[[idx]]
     bru_compute_linearisation(
@@ -298,5 +298,3 @@ bru_compute_linearisation.bru_like_list <- function(
 bru_compute_linearisation.bru_model <- function(model, lhoods, state, A, ...) {
   bru_compute_linearisation(lhoods, model = model, state = state, A = A, ...)
 }
-
-

@@ -98,24 +98,24 @@ bru_log_get <- function(pretty = TRUE) {
 #' @rdname bru_log
 
 bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
-                           verbosity = 1,
-                           allow_verbose = TRUE, verbose = NULL,
-                           verbose_store = NULL) {
+                            verbosity = 1,
+                            allow_verbose = TRUE, verbose = NULL,
+                            verbose_store = NULL) {
   if (allow_verbose) {
     if ((!is.null(verbose) && (verbose >= verbosity)) ||
-        bru_options_get("bru_verbose", include_default = TRUE) >= verbosity) {
+      bru_options_get("bru_verbose", include_default = TRUE) >= verbosity) {
       message(..., domain = domain, appendLF = appendLF)
     }
   }
   if ((!is.null(verbose_store) && (verbose_store >= verbosity)) ||
-      !allow_verbose ||
-      bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity) {
+    !allow_verbose ||
+    bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity) {
     envir <- bru_env_get()
     envir$log <- c(
       envir$log,
       .makeMessage(Sys.time(), ": ", ...,
-                   domain = domain,
-                   appendLF = FALSE
+        domain = domain,
+        appendLF = FALSE
       )
     )
   }
@@ -205,7 +205,7 @@ bru_options <- function(...) {
     class(options) <- c("bru_options", "list")
     options
   }
-  
+
   input_options <- list(...)
 
   options <- new_bru_options()
@@ -216,7 +216,7 @@ bru_options <- function(...) {
       options <- modifyList(options, input_options[k], keep.null = TRUE)
     }
   }
-    
+
   options
 }
 
@@ -320,10 +320,10 @@ bru_options_deprecated <- function(args) {
 
 
 #' Additional [bru] options
-#' 
+#'
 #' Construct a `bru_options` object including the default and global options,
 #' and converting deprecated option names.
-#' 
+#'
 #' @param \dots Options passed on to [as.bru_options()]
 #'
 #' @aliases bru_call_options
@@ -414,7 +414,7 @@ bru_options_check <- function(options, ignore_null = TRUE) {
       }
     }
   }
-  
+
   ok
 }
 
@@ -464,7 +464,7 @@ bru_options_get <- function(name = NULL, include_default = TRUE) {
 #' @seealso [bru_options()], [bru_options_default()], [bru_options_get()]
 #' @param .reset For `bru_options_set`, logical indicating if the global override
 #' options list should be emptied before setting the new option(s).
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
@@ -521,10 +521,10 @@ bru_options_reset <- function() {
 #' @rdname print.bru_options
 
 print.bru_options <- function(x,
-                             legend = TRUE,
-                             include_global = TRUE,
-                             include_default = TRUE,
-                             ...) {
+                              legend = TRUE,
+                              include_global = TRUE,
+                              include_default = TRUE,
+                              ...) {
   traverse <- function(combined, default, global, options, prefix = "") {
     for (name in sort(names(combined))) {
       if (is.list(combined[[name]])) {
@@ -546,17 +546,17 @@ print.bru_options <- function(x,
           " (",
           if (
             !is.null(default[[name]]) &&
-            (default[[name]] == combined[[name]])
+              (default[[name]] == combined[[name]])
           ) {
             "default"
           } else if (
             !is.null(global[[name]]) &&
-            (global[[name]] == combined[[name]])
+              (global[[name]] == combined[[name]])
           ) {
             "global"
           } else if (
             !is.null(options[[name]]) &&
-            (options[[name]] == combined[[name]])
+              (options[[name]] == combined[[name]])
           ) {
             "user"
           } else {
@@ -578,7 +578,7 @@ print.bru_options <- function(x,
     global <- bru_options()
   }
   combined <- bru_options(default, global, x)
-  
+
   if (legend) {
     cat("Legend:\n")
     if (include_default) {
@@ -725,7 +725,7 @@ iinla.setOption <- function(...) {
 
 
 requireINLA <- function(quietly = FALSE) {
-tryCatch(requireNamespace("INLA", quietly = quietly), error = function(x) {})
+  tryCatch(requireNamespace("INLA", quietly = quietly), error = function(x) {})
 }
 
 
