@@ -18,7 +18,8 @@ test_that("Mexdolphin: Hazard rate detection function", {
     mexdolphin$points,
     ips = ips,
     formula = form,
-    options = list(control.inla = list(int.strategy = "eb"))
+    options = list(control.inla = list(int.strategy = "eb"),
+                   bru_result=list(lsig = -1))
   )
 
   #  ggplot(data.frame(distance = c(

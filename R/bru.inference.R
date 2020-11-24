@@ -1461,6 +1461,7 @@ iinla <- function(model, lhoods, result = NULL, options) {
     # Set old result
     old.result <- result
     stk <- joint_stackmaker(model, lhoods, result)
+    state <- NULL
   } else {
     old.result <- result
     idx <- evaluate_index(model, lhoods)
@@ -1474,14 +1475,14 @@ iinla <- function(model, lhoods, result = NULL, options) {
       )[[1]]
     } else if (is.list(result)) {
       state <- result[intersect(names(model[["effects"]]), names(result))]
-      for (idx in names(model[["effects"]])) {
-        if (is.null(state[[idx]])) {
-          state[[idx]] <- rep(0, ibm_n(model[["effects"]][[idx]][["mapper"]]))
-        } else if (length(state[[idx]]) == 1) {
-          state[[idx]] <-
+      for (lab in names(model[["effects"]])) {
+        if (is.null(state[[lab]])) {
+          state[[lab]] <- rep(0, ibm_n(model[["effects"]][[lab]][["mapper"]]))
+        } else if (length(state[[lab]]) == 1) {
+          state[[lab]] <-
             rep(
-              state[[idx]],
-              ibm_n(model[["effects"]][[idx]][["mapper"]])
+              state[[lab]],
+              ibm_n(model[["effects"]][[lab]][["mapper"]])
             )
         }
       }
@@ -1501,7 +1502,7 @@ iinla <- function(model, lhoods, result = NULL, options) {
 
   k <- 1
   interrupt <- FALSE
-  line_search <- list(active = FALSE, step_scaling = 1, state = NULL)
+  line_search <- list(active = FALSE, step_scaling = 1, state = state)
 
 
   while ((k <= options$bru_max_iter) & !interrupt) {
