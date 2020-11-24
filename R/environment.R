@@ -103,13 +103,15 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
                             verbose_store = NULL) {
   if (allow_verbose) {
     if ((!is.null(verbose) && (verbose >= verbosity)) ||
-      bru_options_get("bru_verbose", include_default = TRUE) >= verbosity) {
+      (is.null(verbose) &&
+       bru_options_get("bru_verbose", include_default = TRUE) >= verbosity)) {
       message(..., domain = domain, appendLF = appendLF)
     }
   }
   if ((!is.null(verbose_store) && (verbose_store >= verbosity)) ||
     !allow_verbose ||
-    bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity) {
+    (is.null(verbose_store) &&
+     bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity)) {
     envir <- bru_env_get()
     envir$log <- c(
       envir$log,
