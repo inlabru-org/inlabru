@@ -105,7 +105,8 @@ For \code{bru_options} and \code{bru_options_set}, recognised options are:
 \item{bru_verbose}{logical or numeric; if \code{TRUE}, log messages of \code{verbosity}
 \eqn{\leq 1} are printed by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric, log messages
 of
-verbosity \eqn{\leq} are printed. Default \code{FALSE}}
+verbosity \eqn{\leq} are printed. For line search details, set \code{bru_verbose=2} or \code{3}.
+Default: 0}
 \item{bru_verbose_stored}{logical or numeric; if \code{TRUE}, log messages of
 \code{verbosity} \eqn{\leq 1} are stored by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric,
 log messages of verbosity \eqn{\leq} are stored. Default: 1}
@@ -113,7 +114,8 @@ log messages of verbosity \eqn{\leq} are stored. Default: 1}
 to run inference.}
 \item{bru_max_iter}{maximum number of inla iterations}
 \item{bru_result}{An \code{inla} object returned from previous calls of
-\code{INLA::inla}, \link{bru} or \link{lgcp}. This will be used as a
+\code{INLA::inla}, \link{bru} or \link{lgcp}, or a list of named vectors of starting
+values for the latent variables. This will be used as a
 starting point for further improvement of the approximate posterior.}
 \item{bru_int_args}{List of arguments passed all the way to the
 integration method \code{ipoints} and \code{int.polygon} for 'cp' family models}

@@ -142,7 +142,8 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' \item{bru_verbose}{logical or numeric; if `TRUE`, log messages of `verbosity`
 #' \eqn{\leq 1} are printed by [bru_log_message()]. If numeric, log messages
 #' of
-#' verbosity \eqn{\leq} are printed. Default `FALSE`}
+#' verbosity \eqn{\leq} are printed. For line search details, set `bru_verbose=2` or `3`.
+#' Default: 0}
 #' \item{bru_verbose_stored}{logical or numeric; if `TRUE`, log messages of
 #' `verbosity` \eqn{\leq 1} are stored by [bru_log_message()]. If numeric,
 #' log messages of verbosity \eqn{\leq} are stored. Default: 1}
@@ -150,7 +151,8 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #'   to run inference.}
 #' \item{bru_max_iter}{maximum number of inla iterations}
 #' \item{bru_result}{An `inla` object returned from previous calls of
-#'   `INLA::inla`, [bru] or [lgcp]. This will be used as a
+#'   `INLA::inla`, [bru] or [lgcp], or a list of named vectors of starting
+#'   values for the latent variables. This will be used as a
 #'   starting point for further improvement of the approximate posterior.}
 #' \item{bru_int_args}{List of arguments passed all the way to the
 #' integration method `ipoints` and `int.polygon` for 'cp' family models}
@@ -255,7 +257,7 @@ as.bru_options <- function(x = NULL) {
 bru_options_default <- function() {
   bru_options(
     # inlabru options
-    bru_verbose = FALSE,
+    bru_verbose = 0,
     bru_verbose_store = 1,
     bru_max_iter = 10,
     bru_run = TRUE,

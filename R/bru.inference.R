@@ -324,7 +324,7 @@ bru <- function(components = ~ Intercept(1),
     result <- iinla(
       model = info[["model"]],
       lhoods = info[["lhoods"]],
-      result = options$bru_result,
+      result = options[["bru_result"]],
       options = info[["options"]]
     )
   } else {
@@ -1440,9 +1440,6 @@ iinla <- function(model, lhoods, result = NULL, options) {
   # Track variables?
   track <- list()
 
-  # Set old result
-  old.result <- result
-
   # Initialise required local options
   inla.options <- modifyList(
     inla.options,
@@ -1461,15 +1458,38 @@ iinla <- function(model, lhoods, result = NULL, options) {
 
   # Initial stack
   if (identical(options$bru_method$taylor, "legacy")) {
+    # Set old result
+    old.result <- result
     stk <- joint_stackmaker(model, lhoods, result)
   } else {
+    old.result <- result
     idx <- evaluate_index(model, lhoods)
     A <- evaluate_A(model, lhoods)
-    state <- evaluate_state(model,
-      lhoods = lhoods,
-      result = result,
-      property = "mode"
-    )[[1]]
+    if (is.null(result) || inherits(result, "bru")) {
+      # Set old result
+      state <- evaluate_state(model,
+                              lhoods = lhoods,
+                              result = result,
+                              property = "mode"
+      )[[1]]
+    } else if (is.list(result)) {
+      state <- result[intersect(names(model[["effects"]]), names(result))]
+      for (idx in names(model[["effects"]])) {
+        if (is.null(state[[idx]])) {
+          state[[idx]] <- rep(0, ibm_n(model[["effects"]][[idx]][["mapper"]]))
+        } else if (length(state[[idx]]) == 1) {
+          state[[idx]] <-
+            rep(
+              state[[idx]],
+              ibm_n(model[["effects"]][[idx]][["mapper"]])
+            )
+        }
+      }
+      result <- NULL
+      old.result <- NULL
+    } else {
+      stop("Unknown previous result information class")
+    }
     lin <- bru_compute_linearisation(model,
       lhoods = lhoods, state = state,
       A = A
@@ -1481,7 +1501,7 @@ iinla <- function(model, lhoods, result = NULL, options) {
 
   k <- 1
   interrupt <- FALSE
-  line_search <- list(active = FALSE, step_scaling = 1, state = state)
+  line_search <- list(active = FALSE, step_scaling = 1, state = NULL)
 
 
   while ((k <= options$bru_max_iter) & !interrupt) {
