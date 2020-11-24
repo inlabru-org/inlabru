@@ -52,13 +52,19 @@ test_that("Linearisation", {
   
   expect_s3_class(stk0, "inla.data.stack")
 
-  fit <- bru(
-    components = cmp,
-    lhoods,
-    options = list(control.inla = list(int.strategy = "eb"),
-                   bru_verbose = FALSE,
-                   bru_method = list(taylor = "pandemic",
-                                     backtrack = "basic"))
+  expect_error(
+    {
+      fit <- bru(
+        components = cmp,
+        lhoods,
+        options = list(control.inla = list(int.strategy = "eb"),
+                       bru_verbose = FALSE,
+                       bru_method = list(taylor = "pandemic",
+                                         search = "all")
+        )
+      )
+    },
+    NA
   )
 
 })

@@ -154,6 +154,22 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #'   starting point for further improvement of the approximate posterior.}
 #' \item{bru_int_args}{List of arguments passed all the way to the
 #' integration method `ipoints` and `int.polygon` for 'cp' family models}
+#' \item{bru_method}{List of arguments controlling the iterative inlabru method:
+#' \describe{
+#' \item{taylor}{Either 'legacy' (for the pre-2.1.15 method) or 'pandemic'
+#' (default, from version 2.1.15).}
+#' \item{search}{Either 'all' (default), to use all available line search
+#' methods, or one or more of
+#' 'finite' (reduce step size until predictor is finite),
+#' 'contract' (decrease step size until trust hypersphere reached)
+#' 'expand' (increase step size until no improvement),
+#' 'optimise' (fast approximate error norm minimisation).
+#' To disable line search, set to an empty vector. Line search is not
+#' available for `taylor="legacy"`.}
+#' \item{factor}{Numeric, \eqn{> 1} determining the line search step scaling
+#' multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
+#' }
+#' }
 #' \item{`inla()` options}{
 #' All options not starting with `bru_` are passed on to `inla()`, sometimes
 #' after altering according to the needs of the inlabru method.
@@ -246,7 +262,8 @@ bru_options_default <- function() {
     bru_int_args = list(method = "stable"), # nsub: NULL
     bru_method = list(
       taylor = "pandemic",
-      backtrack = "basic",
+      search = "all",
+      factor = (1 + sqrt(5)) / 2,
       stop_at_max_rel_deviation = 0.01
     ),
     # bru_result: NULL
