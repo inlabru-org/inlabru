@@ -2,6 +2,12 @@
 
 # inlabru 2.1.15
 
+* New options system
+
+* New faster linearisation method
+
+* New line search method to make the nonlinear inla iterations robust
+
 # inlabru 2.1.14.901
 
 * Method for updating old stored estimation objects
