@@ -102,7 +102,8 @@ bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
       BRU.offset = as.vector(lin$offset)
     ),
     A = lin$A,
-    effects = idx[names(lin$A)]
+    effects = idx[names(lin$A)],
+    remove.unused = FALSE
   )
 }
 
