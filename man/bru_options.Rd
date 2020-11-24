@@ -113,7 +113,7 @@ log messages of verbosity \eqn{\leq} are stored. Default: 1}
 \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
 to run inference.}
 \item{bru_max_iter}{maximum number of inla iterations}
-\item{bru_result}{An \code{inla} object returned from previous calls of
+\item{bru_initial}{An \code{inla} object returned from previous calls of
 \code{INLA::inla}, \link{bru} or \link{lgcp}, or a list of named vectors of starting
 values for the latent variables. This will be used as a
 starting point for further improvement of the approximate posterior.}

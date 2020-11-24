@@ -9,7 +9,7 @@ make.stack <- function(data,
                        Ntrials = 1,
                        offset = 0,
                        expr = NULL,
-                       result = NULL,
+                       state = NULL,
                        tag = "BRU.stack",
                        include = NULL,
                        exclude = NULL) {
@@ -47,7 +47,7 @@ make.stack <- function(data,
 
   # Taylor approximation
   if (!is.null(expr)) {
-    rw <- nlinla.reweight(A, model, data, expr, result)
+    rw <- nlinla.reweight(A, model, data, expr, state = state)
     A <- rw$A
     taylor.offset <- rw$const
   } else {

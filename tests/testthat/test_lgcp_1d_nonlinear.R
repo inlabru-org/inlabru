@@ -12,14 +12,12 @@ test_that("Mexdolphin: Hazard rate detection function", {
   cmp <- ~ lsig(1) + Intercept(1)
   form <- distance ~ log(hr(distance, lsig)) + Intercept
   ips <- ipoints(INLA::inla.mesh.1d(seq(0, 8, by = 0.1)), name = "distance")
-
-  fit <- lgcp(
     components = cmp,
     mexdolphin$points,
     ips = ips,
     formula = form,
     options = list(control.inla = list(int.strategy = "eb"),
-                   bru_result=list(lsig = -1))
+                   bru_initial=list(lsig = -1))
   )
 
   #  ggplot(data.frame(distance = c(

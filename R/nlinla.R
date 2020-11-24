@@ -45,7 +45,7 @@ nlinla.taylor <- function(expr, epunkt, data, env, offsets = c()) {
   }
 }
 
-nlinla.epunkt <- function(model, data, result = NULL) {
+nlinla.epunkt <- function(model, data, state = NULL) {
   # This function determines the current point around which
   # to perform the taylor approximation
   # (1) If result is NULL set all all effects to 0
@@ -53,37 +53,22 @@ nlinla.epunkt <- function(model, data, result = NULL) {
   # (3) if result is an inla object, use these estimates as to where to approximate
 
   dfdata <- as.data.frame(data) # data as data.frame (may have been supplied as Spatial* object)
-  if (is.null(result)) {
+  if (is.null(state)) {
     df <- data.frame(matrix(0, nrow = nrow(dfdata), ncol = length(model$effects)))
     colnames(df) <- names(model$effects)
     df
-  } else if (!inherits(result, "inla") && is.data.frame(result)) {
-    # If result contains only a single row data frame repeat it to match the data
-    if ((nrow(result) == 1) & (nrow(dfdata) > 1)) {
-      result <- result[rep(1, nrow(dfdata)), , drop = FALSE]
-    }
-    # Check if all variables have been supplied. Those that aren't are set to 0
-    for (eff in setdiff(names(model$effects), names(result))) {
-      result[[eff]] <- 0
-    }
-    return(result)
   } else {
-    state <- evaluate_state(
-      model,
-      result = result,
-      property = "mean"
-    )
     evaluate_model(model, state = state, data = data)[[1]]
   }
 }
 
-nlinla.reweight <- function(A, model, data, expr, result) {
+nlinla.reweight <- function(A, model, data, expr, state) {
   offsets <- names(model$effects)[vapply(
     model$effects,
     function(x) identical(x$type, "offset"),
     TRUE
   )]
-  epkt <- nlinla.epunkt(model, data, result = result)
+  epkt <- nlinla.epunkt(model, data, state = state)
   ae <- nlinla.taylor(expr, epkt, data, environment(model$formula),
     offsets = offsets
   )

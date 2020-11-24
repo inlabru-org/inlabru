@@ -324,7 +324,6 @@ bru <- function(components = ~ Intercept(1),
     result <- iinla(
       model = info[["model"]],
       lhoods = info[["lhoods"]],
-      result = options[["bru_result"]],
       options = info[["options"]]
     )
   } else {
@@ -357,7 +356,7 @@ bru_rerun <- function(result, options = list()) {
   result <- iinla(
     model = info[["model"]],
     lhoods = info[["lhoods"]],
-    result = result,
+    initial = result,
     options = info[["options"]]
   )
 
@@ -655,24 +654,25 @@ bru_like_expr <- function(lhood, components) {
 
 
 
-single_stackmaker <- function(model, lhood, result) {
+single_stackmaker <- function(model, lhood, state) {
   make.stack(
     data = lhood$data, model = model, expr = lhood$expr,
     y = lhood$data[[lhood$response]],
-    E = lhood$E, Ntrials = lhood$Ntrials, result = result,
+    E = lhood$E, Ntrials = lhood$Ntrials,
+    state = state,
     include = lhood[["include_components"]],
     exclude = lhood[["exclude_components"]]
   )
 }
 
-joint_stackmaker <- function(model, lhoods, result) {
+joint_stackmaker <- function(model, lhoods, state) {
   do.call(
     inla.stack.mjoin,
     c(
       lapply(
         lhoods,
         function(lh) {
-          single_stackmaker(model, lh, result)
+          single_stackmaker(model, lh, state)
         }
       ),
       # Make sure components with zero derivative are kept:
@@ -1427,14 +1427,15 @@ bru_line_search <- function(model,
 #' @param data A data.frame
 #' @param model A [bru_model] object
 #' @param lhoods A list of likelihood objects from [like()]
-#' @param result A previous inla result, to be used as starting point, or
-#' `NULL`
+#' @param initial A previous `bru` result or a list of named latent variable
+#' initial states (missing elements are set to zero), to be used as starting
+#' point, or `NULL`. If non-null, overrides `options$bru_initial`
 #' @param options A `bru_options` object.
 #' @return An `INLA::inla` object
 #' @keywords internal
 
 
-iinla <- function(model, lhoods, result = NULL, options) {
+iinla <- function(model, lhoods, initial = NULL, options) {
   inla.options <- bru_options_inla(options)
 
   # Track variables?
@@ -1448,7 +1449,7 @@ iinla <- function(model, lhoods, result = NULL, options) {
       control.predictor = list(compute = TRUE)
     )
   )
-
+  
   # Extract the family of each likelihood
   family <- vapply(
     seq_along(lhoods),
@@ -1456,41 +1457,48 @@ iinla <- function(model, lhoods, result = NULL, options) {
     "family"
   )
 
+  initial <-
+    if (is.null(initial)) {
+      options[["bru_initial"]]
+    } else {
+      initial
+    }
+  result <- NULL
+  if (is.null(initial) || inherits(initial, "bru")) {
+    # Set old result
+    state <- evaluate_state(model,
+                            lhoods = lhoods,
+                            result = initial,
+                            property = "mode"
+    )[[1]]
+    if (inherits(initial, "bru")) {
+      result <- initial
+    }
+  } else if (is.list(initial)) {
+    state <- initial[intersect(names(model[["effects"]]), names(initial))]
+    for (lab in names(model[["effects"]])) {
+      if (is.null(state[[lab]])) {
+        state[[lab]] <- rep(0, ibm_n(model[["effects"]][[lab]][["mapper"]]))
+      } else if (length(state[[lab]]) == 1) {
+        state[[lab]] <-
+          rep(
+            state[[lab]],
+            ibm_n(model[["effects"]][[lab]][["mapper"]])
+          )
+      }
+    }
+    result <- NULL
+  } else {
+    stop("Unknown previous result information class")
+  }
+  old.result <- result
+  
   # Initial stack
   if (identical(options$bru_method$taylor, "legacy")) {
-    # Set old result
-    old.result <- result
-    stk <- joint_stackmaker(model, lhoods, result)
-    state <- NULL
+    stk <- joint_stackmaker(model, lhoods, state = list(state))
   } else {
-    old.result <- result
     idx <- evaluate_index(model, lhoods)
     A <- evaluate_A(model, lhoods)
-    if (is.null(result) || inherits(result, "bru")) {
-      # Set old result
-      state <- evaluate_state(model,
-                              lhoods = lhoods,
-                              result = result,
-                              property = "mode"
-      )[[1]]
-    } else if (is.list(result)) {
-      state <- result[intersect(names(model[["effects"]]), names(result))]
-      for (lab in names(model[["effects"]])) {
-        if (is.null(state[[lab]])) {
-          state[[lab]] <- rep(0, ibm_n(model[["effects"]][[lab]][["mapper"]]))
-        } else if (length(state[[lab]]) == 1) {
-          state[[lab]] <-
-            rep(
-              state[[lab]],
-              ibm_n(model[["effects"]][[lab]][["mapper"]])
-            )
-        }
-      }
-      result <- NULL
-      old.result <- NULL
-    } else {
-      stop("Unknown previous result information class")
-    }
     lin <- bru_compute_linearisation(model,
       lhoods = lhoods, state = state,
       A = A
@@ -1530,9 +1538,7 @@ iinla <- function(model, lhoods, result = NULL, options) {
     )
 
     # Return previous result if inla crashes, e.g. when connection to server is lost
-    if (k > 1) {
-      old.result <- result
-    }
+    old.result <- result
     result <- NULL
 
     inla.formula <- update.formula(model$formula, BRU.response ~ .)
@@ -1622,27 +1628,30 @@ iinla <- function(model, lhoods, result = NULL, options) {
     }
 
     # Update stack given current result
+    state0 <- state
+    state <- evaluate_state(model,
+                            lhoods = lhoods,
+                            result = result,
+                            property = "mode"
+    )[[1]]
     if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
+      line_search <- bru_line_search(
+        model = model,
+        lhoods = lhoods,
+        lin = lin,
+        state0 = state0,
+        state = state,
+        A = A,
+        options = options
+      )
+      state <- line_search[["state"]]
       if (identical(options$bru_method$taylor, "legacy")) {
-        stk <- joint_stackmaker(model, lhoods, result)
+        stk <- joint_stackmaker(model, lhoods, state = list(state))
       } else {
-        state0 <- state
-        state <- evaluate_state(model,
-          lhoods = lhoods, result = result,
-          property = "mode"
-        )[[1]]
-        line_search <- bru_line_search(
-          model = model,
+        lin <- bru_compute_linearisation(
+          model,
           lhoods = lhoods,
-          lin = lin,
-          state0 = state0,
           state = state,
-          A = A,
-          options = options
-        )
-        state <- line_search[["state"]]
-        lin <- bru_compute_linearisation(model,
-          lhoods = lhoods, state = state,
           A = A
         )
         stk <- bru_make_stack(lhoods, lin, idx)

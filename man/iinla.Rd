@@ -4,15 +4,16 @@
 \alias{iinla}
 \title{Iterated INLA}
 \usage{
-iinla(model, lhoods, result = NULL, options)
+iinla(model, lhoods, initial = NULL, options)
 }
 \arguments{
 \item{model}{A \link{bru_model} object}
 
 \item{lhoods}{A list of likelihood objects from \code{\link[=like]{like()}}}
 
-\item{result}{A previous inla result, to be used as starting point, or
-\code{NULL}}
+\item{initial}{A previous \code{bru} result or a list of named latent variable
+initial states (missing elements are set to zero), to be used as starting
+point, or \code{NULL}. If non-null, overrides \code{options$bru_initial}}
 
 \item{options}{A \code{bru_options} object.}
 

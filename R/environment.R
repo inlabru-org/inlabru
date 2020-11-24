@@ -150,7 +150,7 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
 #'   to run inference.}
 #' \item{bru_max_iter}{maximum number of inla iterations}
-#' \item{bru_result}{An `inla` object returned from previous calls of
+#' \item{bru_initial}{An `inla` object returned from previous calls of
 #'   `INLA::inla`, [bru] or [lgcp], or a list of named vectors of starting
 #'   values for the latent variables. This will be used as a
 #'   starting point for further improvement of the approximate posterior.}
@@ -268,7 +268,7 @@ bru_options_default <- function() {
       factor = (1 + sqrt(5)) / 2,
       stop_at_max_rel_deviation = 0.01
     ),
-    # bru_result: NULL
+    # bru_initial: NULL
     # inla options
     E = 1,
     Ntrials = 1,
@@ -286,7 +286,8 @@ bru_options_deprecated <- function(args) {
     mesh = "",
     run = "bru_run",
     max.iter = "bru_max_iter",
-    result = "bru_result",
+    result = "bru_initial",
+    bru_result = "bru_initial",
     int.args = "int.args"
   )
   names_args <- names(args)
