@@ -1202,7 +1202,7 @@ nonlin_predictor <- function(model, lhoods, state, A) {
 }
 scale_state <- function(state0, state1, scaling_factor) {
   new_state <- lapply(
-    seq_along(state0),
+    names(state0),
     function(idx) {
       state0[[idx]] + (state1[[idx]] - state0[[idx]]) * scaling_factor
     }
@@ -1504,13 +1504,13 @@ iinla <- function(model, lhoods, result = NULL, options) {
   interrupt <- FALSE
   line_search <- list(active = FALSE, step_scaling = 1, state = state)
 
+  if ((!is.null(result) && !is.null(result$mode))) {
+    previous_x <- result$mode$x
+  } else {
+    previous_x <- 0 # TODO: construct from the initial linearisation state instead
+  }
 
   while ((k <= options$bru_max_iter) & !interrupt) {
-    if ((!is.null(result) && !is.null(result$mode))) {
-      previous_x <- result$mode$x
-    } else {
-      previous_x <- 0
-    }
 
     # When running multiple times propagate theta
     if ((k > 1) || (!is.null(result) && !is.null(result$mode))) {
@@ -1519,7 +1519,10 @@ iinla <- function(model, lhoods, result = NULL, options) {
       inla.options[["control.mode"]]$x <-
         previous_x + (result$mode$x - previous_x) * line_search[["step_scaling"]]
     }
-
+    if ((!is.null(result) && !is.null(result$mode))) {
+      previous_x <- result$mode$x
+    }
+    
     bru_log_message(
       paste0("iinla: Iteration ", k, " [max:", options$bru_max_iter, "]"),
       verbose = options$bru_verbose,
