@@ -1494,15 +1494,17 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   old.result <- result
   
   # Initial stack
+  A <- evaluate_A(model, lhoods)
+  lin <- bru_compute_linearisation(
+    model,
+    lhoods = lhoods,
+    state = state,
+    A = A
+  )
   if (identical(options$bru_method$taylor, "legacy")) {
     stk <- joint_stackmaker(model, lhoods, state = list(state))
   } else {
     idx <- evaluate_index(model, lhoods)
-    A <- evaluate_A(model, lhoods)
-    lin <- bru_compute_linearisation(model,
-      lhoods = lhoods, state = state,
-      A = A
-    )
     stk <- bru_make_stack(lhoods, lin, idx)
   }
   stk.data <- INLA::inla.stack.data(stk)
@@ -1645,15 +1647,15 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         options = options
       )
       state <- line_search[["state"]]
+      lin <- bru_compute_linearisation(
+        model,
+        lhoods = lhoods,
+        state = state,
+        A = A
+      )
       if (identical(options$bru_method$taylor, "legacy")) {
         stk <- joint_stackmaker(model, lhoods, state = list(state))
       } else {
-        lin <- bru_compute_linearisation(
-          model,
-          lhoods = lhoods,
-          state = state,
-          A = A
-        )
         stk <- bru_make_stack(lhoods, lin, idx)
       }
       stk.data <- INLA::inla.stack.data(stk)
