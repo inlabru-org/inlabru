@@ -102,3 +102,4 @@ Collate:
     'stack.R'
     'utils.R'
 VignetteBuilder: knitr
+BuildVignettes: true

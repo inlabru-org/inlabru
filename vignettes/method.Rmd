@@ -1,0 +1,163 @@
+---
+title: "Iterative INLA method"
+output:
+  - rmarkdown::pdf_document
+  - rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Iterative INLA method}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+header-includes:
+  - \newcommand{\bm}[1]{\boldsymbol{#1}}
+  - \newcommand{\wt}[1]{\widetilde{#1}}
+  - \newcommand{\ol}[1]{\overline{#1}}
+  - \newcommand{\wh}[1]{\widehat{#1}}
+  - \DeclareMathOperator*{\argmax}{arg\,max}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(inlabru)
+```
+
+## The INLA method for linear predictors
+
+The INLA method is used to compute fast approximative posterior distribution
+for Bayesian generalised additive models. The hierarchical structure of such a 
+model with latent Gaussian components $\bm{u}$, covariance parameters
+$\bm{\theta}$, and measured response variables $\bm{y}$, can be written as
+$$
+\begin{aligned}
+\bm{\theta} &\sim p(\bm{\theta}) \\
+\bm{u}|\bm{\theta} &\sim \mathcal{N}\!\left(\bm{\mu}_u, \bm{Q}(\bm{\theta})^{-1}\right) \\
+\bm{\eta}(\bm{u}) &= \bm{A}\bm{u} \\
+\bm{y}|\bm{u},\bm{\theta} & \sim p(\bm{y}|\bm{\eta}(\bm{u}),\bm{\theta})
+\end{aligned}
+$$
+where typically each linear predictor element, $\eta_i(\bm{u})$, is linked to a
+location parameter of the distribution for observation $y_i$, for each $i$,
+via a (non-linear) link function. In the R-INLA implementation, the observations
+are assumed to be conditionally independent, given $\bm{\eta}$ and $\bm{\theta}$.
+
+## Approximate INLA for non-linear predictors
+
+The premise for the inlabru method for non-linear predictors is to build on
+the existing implementation, and only add a linearisation step. The properties of
+the resulting approximation will depend on the nature of the non-linearity.
+
+Let $\wt{\bm{\eta}}(\bm{u})$ be a non-linear predictor, and let
+$\ol{\bm{\eta}}(\bm{u})$ be the 1st order Taylor approximation at $\bm{u}_0$,
+$$
+\ol{\bm{\eta}}(\bm{u})
+= \wt{\bm{\eta}}(\bm{u}_0) + \bm{B}(\bm{u} - \bm{u}_0)
+= \left[\wt{\bm{\eta}}(\bm{u}_0) - \bm{B}\bm{u}_0\right] + \bm{B}\bm{u}
+,
+$$
+where $\bm{B}$ is the derivative matrix for the non-linear predictor, evaluated
+at $\bm{u}_0$.
+
+The non-linear observation model
+$p(\bm{y}|g^{-1}[\wt{\bm{\eta}}(\bm{u})],\bm{\theta})$
+is approximated by replacing the non-linear predictor with its linearisation,
+so that the linearised model is defined by
+$$
+\ol{p}(\bm{y}|\bm{u},\bm{\theta})
+=
+p(\bm{y}|\ol{\bm{\eta}}(\bm{u}),\bm{\theta})
+=
+p(\bm{y}|g^{-1}[\ol{\bm{\eta}}(\bm{u})],\bm{\theta})
+\approx
+p(\bm{y}|g^{-1}[\wt{\bm{\eta}}(\bm{u})],\bm{\theta})
+=
+p(\bm{y}|\wt{\bm{\eta}}(\bm{u}),\bm{\theta})
+=
+\wt{p}(\bm{y}|\bm{u},\bm{\theta})
+$$
+The non-linear model posterior is factorised as
+$$
+\wt{p}(\bm{\theta},\bm{u}|\bm{y}) = \wt{p}(\bm{\theta}|\bm{y})\wt{p}(\bm{u}|\bm{y},\bm{\theta}),
+$$
+and the linear model approximation is factorised as
+$$
+\ol{p}(\bm{\theta},\bm{u}|\bm{y}) = \ol{p}(\bm{\theta}|\bm{y})\ol{p}(\bm{u}|\bm{y},\bm{\theta}) .
+$$
+
+### Fixed point iteration
+
+The remaining step of the approximation is how to choose the linearisation
+point $\bm{u}_0$. We start by
+introducing a functional $f(\ol{p}_{\bm{v}})$ of the posterior
+distribution linearised at $\bm{v}$,
+that generates a latent field configuration. We then seek a fix point of the
+functional, so that $\bm{u}_0=f(\ol{p}_{\bm{u}_0})$.
+Potential choices for $f(\cdot)$ include the posterior expectation
+$\ol{E}(\bm{u}|\bm{y})$ and the "Empirical Bayes conditional mode",
+$$
+f(\ol{p}_{\bm{v}})=\argmax_{\bm{u}} \ol{p}_{\bm{v}}(\bm{u}|\bm{y},\wh{\bm{\theta}}),
+$$
+where $\wh{\bm{\theta}}=\argmax_{\bm{\theta}} \ol{p}_{\bm{v}}(\bm{\theta}|\bm{y})$.
+
+Note: In `inlabru` version 2.1.15, 
+$$
+f(\ol{p}_{\bm{v}})=\left\{\argmax_{u_i} \ol{p}_{\bm{v}}(u_i|\bm{y}),\,i=1,\dots,n\right\},
+$$
+is used. This is likely to change.
+
+One key to the fix point iteration is that the observation model is linked to
+$\bm{u}$ only through the non-linear predictor $\wt{\bm{\eta}}(\bm{u})$.
+
+0. Let $\bm{u}_0$ be an initial linearisation point for the latent variables.
+1. Compute the predictor linearisation at $\bm{u}_0$,
+2. Compute the linearised INLA posterior $\ol{p}(\bm{\theta}|\bm{y})$
+3. Let $\bm{u}_1=f(\ol{p}_{\bm{u}_0})$ be the initial candidate for new
+   linearisation point.
+4. Let $\bm{u}_\alpha=(1-\alpha)\bm{u}_0+\alpha\bm{u}_1$, and find the value
+   $\alpha$ that minimises $\|\wt{\eta}(\bm{u}_\alpha)-\ol{\eta}(\bm{u}_1)\|$.
+5. Set the linearisation point equal to $\bm{u}_\alpha$ and repeat from step 1,
+   unless the iteration has converged to a given tolerance.
+
+#### Line search
+
+In step 4, an approximate line search can be used, that avoids many potentially
+expensive evaluations of the non-linear predictor. We evaluate
+$\wt{\bm{\eta}}_1=\wt{\bm{\eta}}(\bm{u}_1)$ and make use of the linearised predictor
+information. Let $\wt{\bm{\eta}}_\alpha=\wt{\bm{\eta}}(\bm{u}_\alpha)$ and $\ol{\bm{\eta}}_\alpha=\ol{\bm{\eta}}(\bm{u}_\alpha)=(1-\alpha)\wt{\bm{\eta}}(\bm{u}_0)+\alpha\ol{\bm{\eta}}(\bm{u}_1)$.
+An exact line search would minimise $\|\wt{\bm{\eta}}_\alpha-\ol{\bm{\eta}}_1\|$. 
+Instead, we define a quadratic approximation to the
+non-linear predictor as a function of $\alpha$,
+$$
+\breve{\bm{\eta}}_\alpha =
+\ol{\bm{\eta}}_\alpha + \alpha^2 (\wt{\bm{\eta}}_1 - \ol{\bm{\eta}}_1)
+$$
+and minimise the quartic polynomial in $\alpha$,
+$$
+\begin{aligned}
+\|\breve{\bm{\eta}}_\alpha-\ol{\bm{\eta}}_1\|^2
+&=
+\| (1-\alpha)(\ol{\bm{\eta}}_1 - \ol{\bm{\eta}}_0) + \alpha^2 (\wt{\bm{\eta}}_1 - \ol{\bm{\eta}}_1) \|^2
+.
+\end{aligned}
+$$
+If initial expansion and contraction steps are carried out, leading to an initial
+guess of $\alpha=\gamma^k$, where $\gamma>1$ is a scaling factor and $k$ is the
+(signed) number of expansions and contractions, the quadratic expression is replaced by
+$$
+\begin{aligned}
+\|\breve{\bm{\eta}}_\alpha-\ol{\bm{\eta}}_1\|^2
+&=
+\| (1-\alpha)(\ol{\bm{\eta}}_1 - \ol{\bm{\eta}}_0) + \frac{\alpha^2}{\gamma^k} (\wt{\bm{\eta}}_{\gamma^k} - \ol{\bm{\eta}}_{\gamma^k}) \|^2
+,
+\end{aligned}
+$$
+which is minimised on the interval $\alpha\in[\gamma^{k-1},\gamma^{k+1}]$.
+
+
+A potential improvement of step 4 might be to also take into account the prior
+distribution for $\bm{u}$ as a minimisation penalty, to avoid moving further than
+would be indicated by a full likelihood optimisation.
