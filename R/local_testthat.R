@@ -44,7 +44,7 @@ local_testthat_tolerances <- function(tolerances = c(1e-5, 1e-2, 1e-1),
 #' @seealso [bru_options_set()], [bru_options_default()], [bru_options_get()]
 #' @param .reset For `local_bru_options_set`, logical indicating if the global
 #' override options list should be emptied before setting the new option(s).
-#' 
+#'
 #' @examples
 #' my_fun <- function(val) {
 #'   local_bru_options_set(bru_verbose = val)
@@ -56,7 +56,6 @@ local_testthat_tolerances <- function(tolerances = c(1e-5, 1e-2, 1e-1),
 #' print(bru_options_get("bru_verbose"))
 #' print(my_fun(FALSE))
 #' print(bru_options_get("bru_verbose"))
-#' 
 #' @export
 #' @describeIn local_testthat Calls [bru_options_set()] in a reversible way
 

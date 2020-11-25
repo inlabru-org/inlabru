@@ -105,18 +105,36 @@ For \code{bru_options} and \code{bru_options_set}, recognised options are:
 \item{bru_verbose}{logical or numeric; if \code{TRUE}, log messages of \code{verbosity}
 \eqn{\leq 1} are printed by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric, log messages
 of
-verbosity \eqn{\leq} are printed. Default \code{FALSE}}
+verbosity \eqn{\leq} are printed. For line search details, set \code{bru_verbose=2} or \code{3}.
+Default: 0}
 \item{bru_verbose_stored}{logical or numeric; if \code{TRUE}, log messages of
 \code{verbosity} \eqn{\leq 1} are stored by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric,
 log messages of verbosity \eqn{\leq} are stored. Default: 1}
 \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
 to run inference.}
 \item{bru_max_iter}{maximum number of inla iterations}
-\item{bru_result}{An \code{inla} object returned from previous calls of
-\code{INLA::inla}, \link{bru} or \link{lgcp}. This will be used as a
+\item{bru_initial}{An \code{inla} object returned from previous calls of
+\code{INLA::inla}, \link{bru} or \link{lgcp}, or a list of named vectors of starting
+values for the latent variables. This will be used as a
 starting point for further improvement of the approximate posterior.}
 \item{bru_int_args}{List of arguments passed all the way to the
 integration method \code{ipoints} and \code{int.polygon} for 'cp' family models}
+\item{bru_method}{List of arguments controlling the iterative inlabru method:
+\describe{
+\item{taylor}{Either 'legacy' (for the pre-2.1.15 method) or 'pandemic'
+(default, from version 2.1.15).}
+\item{search}{Either 'all' (default), to use all available line search
+methods, or one or more of
+'finite' (reduce step size until predictor is finite),
+'contract' (decrease step size until trust hypersphere reached)
+'expand' (increase step size until no improvement),
+'optimise' (fast approximate error norm minimisation).
+To disable line search, set to an empty vector. Line search is not
+available for \code{taylor="legacy"}.}
+\item{factor}{Numeric, \eqn{> 1} determining the line search step scaling
+multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
+}
+}
 \item{\code{inla()} options}{
 All options not starting with \code{bru_} are passed on to \code{inla()}, sometimes
 after altering according to the needs of the inlabru method.

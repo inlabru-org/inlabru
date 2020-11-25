@@ -211,10 +211,12 @@ evaluate_state <- function(model,
       ...
     )
   } else if (is.null(result)) {
-    state <- list(lapply(model[["effects"]],
-                         function(x) {
-                           rep(0.0, ibm_n(x[["mapper"]]))
-                         }))
+    state <- list(lapply(
+      model[["effects"]],
+      function(x) {
+        rep(0.0, ibm_n(x[["mapper"]]))
+      }
+    ))
   } else {
     state <- list(extract_property(result, property))
   }
@@ -449,11 +451,11 @@ evaluate_predictor <- function(model,
 
 
 #' Compute all A-matrices
-#' 
+#'
 #' Computes the A matrices for included components for each model likelihood
-#' 
-#' @param model A `bru_model` object 
-#' @param lhoods A `bru__like_list` object 
+#'
+#' @param model A `bru_model` object
+#' @param lhoods A `bru__like_list` object
 #' @rdname evaluate_A
 evaluate_A <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
@@ -465,22 +467,22 @@ evaluate_A <- function(model, lhoods) {
         lh[["include_components"]],
         lh[["exclude_components"]]
       )
-      
+
       amatrix_eval(model$effects[included], data = lh[["data"]])
     }
   )
 }
 
 #' Compute all index values
-#' 
+#'
 #' Computes the index values matrices for included components
-#' 
-#' @param model A `bru_model` object 
-#' @param lhoods A `bru__like_list` object 
+#'
+#' @param model A `bru_model` object
+#' @param lhoods A `bru__like_list` object
 #' @rdname evaluate_index
 evaluate_index <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
-  included <- 
+  included <-
     unique(do.call(
       c,
       lapply(
@@ -494,6 +496,6 @@ evaluate_index <- function(model, lhoods) {
         }
       )
     ))
-      
+
   index_eval(model[["effects"]][included])
 }

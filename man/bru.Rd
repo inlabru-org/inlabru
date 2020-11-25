@@ -98,7 +98,7 @@ fit <- bru( ~ z(1) + Intercept(1), lik)
 # Check the result (z posterior should be around 2)
 fit$summary.fixed
 }
-  
+
 }
 }
 \author{

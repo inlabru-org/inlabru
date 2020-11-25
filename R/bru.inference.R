@@ -260,12 +260,16 @@ bru <- function(components = ~ Intercept(1),
   options <- bru_call_options(options)
 
   lhoods <- list(...)
-  dot_is_lhood <- vapply(lhoods,
-                         function(lh) inherits(lh, "bru_like"),
-                         TRUE)
-  dot_is_lhood_list <- vapply(lhoods,
-                              function(lh) inherits(lh, "bru_like_list"),
-                              TRUE)
+  dot_is_lhood <- vapply(
+    lhoods,
+    function(lh) inherits(lh, "bru_like"),
+    TRUE
+  )
+  dot_is_lhood_list <- vapply(
+    lhoods,
+    function(lh) inherits(lh, "bru_like_list"),
+    TRUE
+  )
   if (any(dot_is_lhood | dot_is_lhood_list)) {
     if (!all(dot_is_lhood | dot_is_lhood_list)) {
       stop("Cannot mix like() parameters with 'bru_like' and `bru_like_list` objects.")
@@ -285,8 +289,10 @@ bru <- function(components = ~ Intercept(1),
     dot_is_lhood_list <- FALSE
   }
   if (any(dot_is_lhood_list)) {
-    lhoods <- like_list(c(lhoods[dot_is_lhood],
-                          do.call(c, lhoods[dot_is_lhood_list])))
+    lhoods <- like_list(c(
+      lhoods[dot_is_lhood],
+      do.call(c, lhoods[dot_is_lhood_list])
+    ))
   } else {
     lhoods <- like_list(lhoods)
   }
@@ -312,13 +318,12 @@ bru <- function(components = ~ Intercept(1),
     lhoods = lhoods,
     options = options
   )
-  
+
   # Run iterated INLA
   if (options$bru_run) {
     result <- iinla(
       model = info[["model"]],
       lhoods = info[["lhoods"]],
-      result = options$bru_result,
       options = info[["options"]]
     )
   } else {
@@ -342,17 +347,19 @@ bru_rerun <- function(result, options = list()) {
   stopifnot(inherits(result, "bru"))
   info <- result[["bru_info"]]
   info[["options"]] <- bru_call_options(
-    bru_options(info[["options"]],
-                as.bru_options(options))
+    bru_options(
+      info[["options"]],
+      as.bru_options(options)
+    )
   )
 
   result <- iinla(
     model = info[["model"]],
     lhoods = info[["lhoods"]],
-    result = result,
+    initial = result,
     options = info[["options"]]
   )
-  
+
   # Add bru information to the result
   result$bru_info <- info
   class(result) <- c("bru", class(result))
@@ -600,7 +607,7 @@ like_list.list <- function(object, envir = NULL, ...) {
   if (any(vapply(object, function(x) !inherits(x, "bru_like"), TRUE))) {
     stop("All list elements must be of class 'bru_like'.")
   }
-  
+
   class(object) <- c("bru_like_list", "list")
   environment(object) <- envir
   object
@@ -647,24 +654,25 @@ bru_like_expr <- function(lhood, components) {
 
 
 
-single_stackmaker <- function(model, lhood, result) {
+single_stackmaker <- function(model, lhood, state) {
   make.stack(
     data = lhood$data, model = model, expr = lhood$expr,
     y = lhood$data[[lhood$response]],
-    E = lhood$E, Ntrials = lhood$Ntrials, result = result,
+    E = lhood$E, Ntrials = lhood$Ntrials,
+    state = state,
     include = lhood[["include_components"]],
     exclude = lhood[["exclude_components"]]
   )
 }
 
-joint_stackmaker <- function(model, lhoods, result) {
+joint_stackmaker <- function(model, lhoods, state) {
   do.call(
     inla.stack.mjoin,
     c(
       lapply(
         lhoods,
         function(lh) {
-          single_stackmaker(model, lh, result)
+          single_stackmaker(model, lh, state)
         }
       ),
       # Make sure components with zero derivative are kept:
@@ -801,7 +809,7 @@ lgcp <- function(components,
 #' @aliases predict.bru
 #' @export
 #' @param object An object obtained by calling [bru] or [lgcp].
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for 
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' the prediction.
 #' @param formula A formula determining which effects to predict and how to
 #' combine them.
@@ -1165,9 +1173,9 @@ lin_predictor <- function(lin, state) {
             cbind,
             lapply(names(x$A), function(xx) {
               x[["A"]][[xx]] %*% state[[xx]]
-            }
-            )
-          )))
+            })
+          ))
+        )
       }
     )
   )
@@ -1179,26 +1187,232 @@ nonlin_predictor <- function(model, lhoods, state, A) {
       lhoods,
       function(lh) {
         as.vector(
-          evaluate_model(model = model,
-                         data = lh[["data"]],
-                         state = list(state),
-                         A = A,
-                         predictor = bru_like_expr(lh, model[["effects"]]),
-                         format = "matrix")
+          evaluate_model(
+            model = model,
+            data = lh[["data"]],
+            state = list(state),
+            A = A,
+            predictor = bru_like_expr(lh, model[["effects"]]),
+            format = "matrix"
+          )
         )
       }
     )
   )
 }
-scale_state <- function(state0, state, scaling_factor) {
+scale_state <- function(state0, state1, scaling_factor) {
   new_state <- lapply(
-    seq_along(state0),
+    names(state0),
     function(idx) {
-      state0[[idx]] + (state[[idx]] - state0[[idx]]) * scaling_factor
+      state0[[idx]] + (state1[[idx]] - state0[[idx]]) * scaling_factor
     }
   )
   names(new_state) <- names(state0)
   new_state
+}
+
+line_search_optimisation_target <- function(x, param) {
+  (x - 1)^2 * param[1] + 2 * (x - 1) * x^2 * param[2] + x^4 * param[3]
+}
+
+
+
+bru_line_search <- function(model,
+                            lhoods,
+                            lin,
+                            state0,
+                            state,
+                            A,
+                            options) {
+  if (length(options$bru_method$search) == 0) {
+    return(
+      list(
+        active = FALSE,
+        step_scaling = 1,
+        state = state
+      )
+    )
+  }
+
+  fact <- options$bru_method$factor
+  pred_norm <- function(delta) {
+    if (any(!is.finite(delta))) {
+      Inf
+    } else {
+      sum(delta^2)^0.5
+    }
+  }
+
+  state1 <- state
+  lin_pred0 <- lin_predictor(lin, state0)
+  lin_pred1 <- lin_predictor(lin, state1)
+  nonlin_pred <- nonlin_predictor(model, lhoods, state1, A)
+  step_scaling <- 1
+
+  norm01 <- pred_norm(lin_pred1 - lin_pred0)
+  norm1 <- pred_norm(nonlin_pred - lin_pred1)
+
+  do_finite <-
+    any(c("all", "finite") %in% options$bru_method$search)
+  do_contract <-
+    any(c("all", "contract") %in% options$bru_method$search)
+  do_expand <-
+    any(c("all", "expand") %in% options$bru_method$search)
+  do_optimise <-
+    any(c("all", "optimise") %in% options$bru_method$search)
+
+  finite_active <- 0
+  contract_active <- 0
+  expand_active <- 0
+
+  if (do_finite || do_contract) {
+    nonfin <- any(!is.finite(nonlin_pred))
+    norm0 <- pred_norm(nonlin_pred - lin_pred0)
+
+    while ((do_finite && nonfin) ||
+      (do_contract && (norm0 > norm01 * fact))) {
+      if (do_finite && nonfin) {
+        finite_active <- finite_active - 1
+      } else {
+        contract_active <- contract_active - 1
+      }
+      step_scaling <- step_scaling / fact
+      state <- scale_state(state0, state1, step_scaling)
+      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      nonfin <- any(!is.finite(nonlin_pred))
+      norm0 <- pred_norm(nonlin_pred - lin_pred0)
+
+      bru_log_message(
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 3),
+          "%, Contract"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+
+      if (step_scaling < 2^-10) {
+        break
+      }
+    }
+  }
+
+  if (do_expand &&
+    finite_active == 0 &&
+    contract_active == 0) {
+    overstep <- FALSE
+    norm0 <- pred_norm(nonlin_pred - lin_pred0)
+    norm1 <- pred_norm(nonlin_pred - lin_pred1)
+    while (!overstep && (norm0 < norm01)) {
+      expand_active <- expand_active + 1
+      step_scaling <- step_scaling * fact
+      state <- scale_state(state0, state1, step_scaling)
+
+      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      norm1_prev <- norm1
+      norm0 <- pred_norm(nonlin_pred - lin_pred0)
+      norm1 <- pred_norm(nonlin_pred - lin_pred1)
+      overstep <-
+        (norm1 > norm1_prev) || !is.finite(norm1)
+
+      bru_log_message(
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 3),
+          "%, Expand"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+
+      if (step_scaling > 2^10) {
+        break
+      }
+    }
+    if (((step_scaling > 1) && overstep) || !is.finite(norm1)) {
+      expand_active <- expand_active - 1
+      step_scaling <- step_scaling / fact
+      state <- scale_state(state0, state1, step_scaling)
+      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      norm1 <- pred_norm(nonlin_pred - lin_pred1)
+
+      bru_log_message(
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 3),
+          "%, Overstep"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+    }
+  }
+
+  if (do_optimise) {
+    lin_pred <- lin_predictor(lin, state)
+    delta_lin <- (lin_pred1 - lin_pred0)
+    delta_nonlin <- (nonlin_pred - lin_pred) / step_scaling^2
+    alpha <-
+      optimise(
+        line_search_optimisation_target,
+        step_scaling * c(1 / fact, fact),
+        param = c(
+          sum(delta_lin^2),
+          sum(delta_lin * delta_nonlin),
+          sum(delta_nonlin^2)
+        )
+      )
+
+    step_scaling_opt <- alpha$minimum
+    state_opt <- scale_state(state0, state1, step_scaling_opt)
+    nonlin_pred_opt <- nonlin_predictor(model, lhoods, state_opt, A)
+    norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
+
+    if (norm1_opt < norm1) {
+      step_scaling <- step_scaling_opt
+      state <- state_opt
+      nonlin_pred <- nonlin_pred_opt
+      norm1 <- norm1_opt
+
+      bru_log_message(
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 4),
+          "%, Optimisation"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+    }
+  }
+
+  active <-
+    (finite_active + contract_active + expand_active != 0) ||
+      (abs(step_scaling - 1) > 0.001)
+
+  if (active && (options$bru_verbose <= 2)) {
+    bru_log_message(
+      paste0(
+        "iinla: Step rescaling: ",
+        signif(100 * step_scaling, 3),
+        "%"
+      ),
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store,
+      verbosity = 2
+    )
+  }
+
+  list(
+    active = active,
+    step_scaling = step_scaling,
+    state = state
+  )
 }
 
 
@@ -1213,21 +1427,19 @@ scale_state <- function(state0, state, scaling_factor) {
 #' @param data A data.frame
 #' @param model A [bru_model] object
 #' @param lhoods A list of likelihood objects from [like()]
-#' @param result A previous inla result, to be used as starting point, or
-#' `NULL`
+#' @param initial A previous `bru` result or a list of named latent variable
+#' initial states (missing elements are set to zero), to be used as starting
+#' point, or `NULL`. If non-null, overrides `options$bru_initial`
 #' @param options A `bru_options` object.
 #' @return An `INLA::inla` object
 #' @keywords internal
 
 
-iinla <- function(model, lhoods, result = NULL, options) {
+iinla <- function(model, lhoods, initial = NULL, options) {
   inla.options <- bru_options_inla(options)
 
   # Track variables?
   track <- list()
-
-  # Set old result
-  old.result <- result
 
   # Initialise required local options
   inla.options <- modifyList(
@@ -1237,7 +1449,7 @@ iinla <- function(model, lhoods, result = NULL, options) {
       control.predictor = list(compute = TRUE)
     )
   )
-
+  
   # Extract the family of each likelihood
   family <- vapply(
     seq_along(lhoods),
@@ -1245,43 +1457,85 @@ iinla <- function(model, lhoods, result = NULL, options) {
     "family"
   )
 
+  initial <-
+    if (is.null(initial)) {
+      options[["bru_initial"]]
+    } else {
+      initial
+    }
+  result <- NULL
+  if (is.null(initial) || inherits(initial, "bru")) {
+    # Set old result
+    state <- evaluate_state(model,
+                            lhoods = lhoods,
+                            result = initial,
+                            property = "mode"
+    )[[1]]
+    if (inherits(initial, "bru")) {
+      result <- initial
+    }
+  } else if (is.list(initial)) {
+    state <- initial[intersect(names(model[["effects"]]), names(initial))]
+    for (lab in names(model[["effects"]])) {
+      if (is.null(state[[lab]])) {
+        state[[lab]] <- rep(0, ibm_n(model[["effects"]][[lab]][["mapper"]]))
+      } else if (length(state[[lab]]) == 1) {
+        state[[lab]] <-
+          rep(
+            state[[lab]],
+            ibm_n(model[["effects"]][[lab]][["mapper"]])
+          )
+      }
+    }
+    result <- NULL
+  } else {
+    stop("Unknown previous result information class")
+  }
+  old.result <- result
+  
+  do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
+  if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
+    A <- evaluate_A(model, lhoods)
+    lin <- bru_compute_linearisation(
+      model,
+      lhoods = lhoods,
+      state = state,
+      A = A
+    )
+  }
   # Initial stack
   if (identical(options$bru_method$taylor, "legacy")) {
-    stk <- joint_stackmaker(model, lhoods, result)
+    stk <- joint_stackmaker(model, lhoods, state = list(state))
   } else {
     idx <- evaluate_index(model, lhoods)
-    A <- evaluate_A(model, lhoods)
-    state <- evaluate_state(model, lhoods = lhoods, result = result,
-                            property = "mode")[[1]]
-    lin <- bru_compute_linearisation(model, lhoods = lhoods, state = state,
-                                     A = A)
     stk <- bru_make_stack(lhoods, lin, idx)
-    
-    lin_pred0 <- lin_predictor(lin, state)
-    nonlin_pred0 <- nonlin_predictor(model, lhoods, state, A)
   }
   stk.data <- INLA::inla.stack.data(stk)
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
-  
+
   k <- 1
   interrupt <- FALSE
-  step_scaling <- 1
-  
+  line_search <- list(active = FALSE, step_scaling = 1, state = state)
+
+  if ((!is.null(result) && !is.null(result$mode))) {
+    previous_x <- result$mode$x
+  } else {
+    previous_x <- 0 # TODO: construct from the initial linearisation state instead
+  }
+
   while ((k <= options$bru_max_iter) & !interrupt) {
-    if ((!is.null(result) && !is.null(result$mode))) {
-      previous_x <- result$mode$x
-    } else {
-      previous_x <- 0
-    }
-    
+
     # When running multiple times propagate theta
     if ((k > 1) || (!is.null(result) && !is.null(result$mode))) {
       inla.options[["control.mode"]]$restart <- TRUE
       inla.options[["control.mode"]]$theta <- result$mode$theta
       inla.options[["control.mode"]]$x <-
-        previous_x + (result$mode$x - previous_x) * step_scaling
+        previous_x + (result$mode$x - previous_x) * line_search[["step_scaling"]]
     }
-
+    if ((!is.null(result) && !is.null(result$mode))) {
+      previous_x <- result$mode$x
+    }
+    
     bru_log_message(
       paste0("iinla: Iteration ", k, " [max:", options$bru_max_iter, "]"),
       verbose = options$bru_verbose,
@@ -1289,9 +1543,7 @@ iinla <- function(model, lhoods, result = NULL, options) {
     )
 
     # Return previous result if inla crashes, e.g. when connection to server is lost
-    if (k > 1) {
-      old.result <- result
-    }
+    old.result <- result
     result <- NULL
 
     inla.formula <- update.formula(model$formula, BRU.response ~ .)
@@ -1306,8 +1558,8 @@ iinla <- function(model, lhoods, result = NULL, options) {
         ))
       )
     #        list.data(model$formula))
-    
-    inla.options <- 
+
+    inla.options <-
       modifyList(
         inla.options,
         list(
@@ -1381,47 +1633,36 @@ iinla <- function(model, lhoods, result = NULL, options) {
     }
 
     # Update stack given current result
+    state0 <- state
+    state <- evaluate_state(model,
+                            lhoods = lhoods,
+                            result = result,
+                            property = "mode"
+    )[[1]]
     if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
+      if (do_line_search) {
+        line_search <- bru_line_search(
+          model = model,
+          lhoods = lhoods,
+          lin = lin,
+          state0 = state0,
+          state = state,
+          A = A,
+          options = options
+        )
+        state <- line_search[["state"]]
+      }
+      if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
+        lin <- bru_compute_linearisation(
+          model,
+          lhoods = lhoods,
+          state = state,
+          A = A
+        )
+      }
       if (identical(options$bru_method$taylor, "legacy")) {
-        stk <- joint_stackmaker(model, lhoods, result)
+        stk <- joint_stackmaker(model, lhoods, state = list(state))
       } else {
-        state0 <- state
-        state <- evaluate_state(model, lhoods = lhoods, result = result,
-                                property = "mean")[[1]]
-        did_backtrack <- FALSE
-        step_scaling <- 1
-        if (identical(options$bru_method$backtrack, "basic")) {
-          lin_pred <- lin_predictor(lin, state)
-          nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
-          state_scaled <- state
-          nonlin_pred_scaled <- nonlin_pred
-          while (sum((nonlin_pred_scaled - lin_pred0)^2)^0.5
-                 > sum((lin_pred - lin_pred0)^2)^0.5 * 1.5) {
-            step_scaling <- step_scaling * 0.5
-            state_scaled <- scale_state(state0, state, step_scaling)
-            nonlin_pred_scaled <- nonlin_predictor(model, lhoods, state_scaled, A)
-            if (step_scaling < 2^-4) {
-              break
-            }
-          }
-
-          state <- state_scaled
-          lin_pred0 <- lin_predictor(lin, state_scaled)
-          did_backtrack <- step_scaling < 1
-          if (did_backtrack) {
-            bru_log_message(
-              paste0("iinla: Step backtracking rescaling: ",
-                     signif(100 * step_scaling, 3),
-                     "%"),
-              verbose = options$bru_verbose,
-              verbose_store = options$bru_verbose_store,
-              verbosity = 1
-            )
-            
-          }
-        }
-        lin <- bru_compute_linearisation(model, lhoods = lhoods, state = state,
-                                         A = A)
         stk <- bru_make_stack(lhoods, lin, idx)
       }
       stk.data <- INLA::inla.stack.data(stk)
@@ -1437,14 +1678,16 @@ iinla <- function(model, lhoods, result = NULL, options) {
       ##                           identity),
       ##                        function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
       bru_log_message(
-        paste0("iinla: Max deviation from previous: ",
-               signif(100 * max(dev), 3),
-               "% of SD [stop if: <", 100 * max.dev, "%]"),
+        paste0(
+          "iinla: Max deviation from previous: ",
+          signif(100 * max(dev), 3),
+          "% of SD [stop if: <", 100 * max.dev, "%]"
+        ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
         verbosity = 1
       )
-      interrupt <- all(dev < max.dev) && !did_backtrack
+      interrupt <- all(dev < max.dev) && (!line_search[["active"]])
       if (interrupt) {
         bru_log_message(
           "iinla: Convergence criterion met, stopping INLA iteration.",

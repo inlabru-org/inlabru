@@ -234,7 +234,7 @@ component <- function(...) {
 #'
 #' @details The `component.character` method is inlabru's equivalent to INLA's
 #' `f` function but adds functionality that is unique to inlabru.
-#' 
+#'
 #' Deprecated parameters:
 #' * map: Use `main` instead.
 #' * mesh: Use `mapper` instead.
@@ -323,16 +323,18 @@ component.character <- function(object,
     main_layer <- label
   }
 
-  
+
   if ("map" %in% names(sys.call())) {
     #    if (!is.null(substitute(map))) {
     if (is.null(substitute(main))) {
       main <- sys.call()[["map"]]
       warning("Use of 'map' is deprecated and may be disabled; use 'main' instead.",
-              immediate. = TRUE)
+        immediate. = TRUE
+      )
     } else {
       warning("Deprecated 'map' overridden by 'main'.",
-              immediate. = TRUE)
+        immediate. = TRUE
+      )
     }
   }
 
@@ -1035,8 +1037,8 @@ make_mapper <- function(subcomp,
     }
 
     if (is.factor(values) ||
-        is.character(values) ||
-        (subcomp[["type"]] %in% "factor")) {
+      is.character(values) ||
+      (subcomp[["type"]] %in% "factor")) {
       subcomp[["mapper"]] <- bru_mapper_factor(
         values,
         factor_mapping = subcomp[["factor_mapping"]]

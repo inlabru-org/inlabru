@@ -9,7 +9,7 @@ make.stack <- function(data,
                        Ntrials = 1,
                        offset = 0,
                        expr = NULL,
-                       result = NULL,
+                       state = NULL,
                        tag = "BRU.stack",
                        include = NULL,
                        exclude = NULL) {
@@ -47,7 +47,7 @@ make.stack <- function(data,
 
   # Taylor approximation
   if (!is.null(expr)) {
-    rw <- nlinla.reweight(A, model, data, expr, result)
+    rw <- nlinla.reweight(A, model, data, expr, state = state)
     A <- rw$A
     taylor.offset <- rw$const
   } else {
@@ -75,9 +75,9 @@ make.stack <- function(data,
 
 
 #' Build an inla data stack from linearisation information
-#' 
+#'
 #' Combine linearisation for multiple likelihoods
-#' 
+#'
 #' @param \dots Arguments passed on to other methods
 #' @export
 #' @rdname bru_make_stack
@@ -102,10 +102,11 @@ bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
       BRU.offset = as.vector(lin$offset)
     ),
     A = lin$A,
-    effects = idx[names(lin$A)]
+    effects = idx[names(lin$A)],
+    remove.unused = FALSE
   )
 }
-  
+
 #' @param lhoods A `bru_like_list` object
 #' @export
 #' @rdname bru_make_stack
@@ -121,13 +122,12 @@ bru_make_stack.bru_like_list <- function(lhoods, lin, idx, ...) {
         )
       }
     )
-  
+
   stk <-
     do.call(
       inlabru::inla.stack.mjoin,
       c(stks, list(compress = TRUE, remove.unused = FALSE))
     )
-  
+
   stk
 }
-

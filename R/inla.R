@@ -183,12 +183,12 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
       for (k in 1:length(result$summary.random)) {
         name <- unlist(names(result$summary.random[k]))
         model <- result$model.random[k]
-#        if (!(model == "Constrained linear")) {
+        #        if (!(model == "Constrained linear")) {
         vals[[name]] <- extract.entries(name, smpl.latent)
-#        }
-#        else {
-#         vals[[name]] <- smpl.hyperpar[paste0("Beta for ", name)]
-#        }
+        #        }
+        #        else {
+        #         vals[[name]] <- smpl.hyperpar[paste0("Beta for ", name)]
+        #        }
       }
     }
     if (length(smpl.hyperpar) > 0) {

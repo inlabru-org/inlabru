@@ -98,24 +98,26 @@ bru_log_get <- function(pretty = TRUE) {
 #' @rdname bru_log
 
 bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
-                           verbosity = 1,
-                           allow_verbose = TRUE, verbose = NULL,
-                           verbose_store = NULL) {
+                            verbosity = 1,
+                            allow_verbose = TRUE, verbose = NULL,
+                            verbose_store = NULL) {
   if (allow_verbose) {
     if ((!is.null(verbose) && (verbose >= verbosity)) ||
-        bru_options_get("bru_verbose", include_default = TRUE) >= verbosity) {
+      (is.null(verbose) &&
+       bru_options_get("bru_verbose", include_default = TRUE) >= verbosity)) {
       message(..., domain = domain, appendLF = appendLF)
     }
   }
   if ((!is.null(verbose_store) && (verbose_store >= verbosity)) ||
-      !allow_verbose ||
-      bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity) {
+    !allow_verbose ||
+    (is.null(verbose_store) &&
+     bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity)) {
     envir <- bru_env_get()
     envir$log <- c(
       envir$log,
       .makeMessage(Sys.time(), ": ", ...,
-                   domain = domain,
-                   appendLF = FALSE
+        domain = domain,
+        appendLF = FALSE
       )
     )
   }
@@ -142,18 +144,36 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' \item{bru_verbose}{logical or numeric; if `TRUE`, log messages of `verbosity`
 #' \eqn{\leq 1} are printed by [bru_log_message()]. If numeric, log messages
 #' of
-#' verbosity \eqn{\leq} are printed. Default `FALSE`}
+#' verbosity \eqn{\leq} are printed. For line search details, set `bru_verbose=2` or `3`.
+#' Default: 0}
 #' \item{bru_verbose_stored}{logical or numeric; if `TRUE`, log messages of
 #' `verbosity` \eqn{\leq 1} are stored by [bru_log_message()]. If numeric,
 #' log messages of verbosity \eqn{\leq} are stored. Default: 1}
 #' \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
 #'   to run inference.}
 #' \item{bru_max_iter}{maximum number of inla iterations}
-#' \item{bru_result}{An `inla` object returned from previous calls of
-#'   `INLA::inla`, [bru] or [lgcp]. This will be used as a
+#' \item{bru_initial}{An `inla` object returned from previous calls of
+#'   `INLA::inla`, [bru] or [lgcp], or a list of named vectors of starting
+#'   values for the latent variables. This will be used as a
 #'   starting point for further improvement of the approximate posterior.}
 #' \item{bru_int_args}{List of arguments passed all the way to the
 #' integration method `ipoints` and `int.polygon` for 'cp' family models}
+#' \item{bru_method}{List of arguments controlling the iterative inlabru method:
+#' \describe{
+#' \item{taylor}{Either 'legacy' (for the pre-2.1.15 method) or 'pandemic'
+#' (default, from version 2.1.15).}
+#' \item{search}{Either 'all' (default), to use all available line search
+#' methods, or one or more of
+#' 'finite' (reduce step size until predictor is finite),
+#' 'contract' (decrease step size until trust hypersphere reached)
+#' 'expand' (increase step size until no improvement),
+#' 'optimise' (fast approximate error norm minimisation).
+#' To disable line search, set to an empty vector. Line search is not
+#' available for `taylor="legacy"`.}
+#' \item{factor}{Numeric, \eqn{> 1} determining the line search step scaling
+#' multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
+#' }
+#' }
 #' \item{`inla()` options}{
 #' All options not starting with `bru_` are passed on to `inla()`, sometimes
 #' after altering according to the needs of the inlabru method.
@@ -189,7 +209,7 @@ bru_options <- function(...) {
     class(options) <- c("bru_options", "list")
     options
   }
-  
+
   input_options <- list(...)
 
   options <- new_bru_options()
@@ -200,7 +220,7 @@ bru_options <- function(...) {
       options <- modifyList(options, input_options[k], keep.null = TRUE)
     }
   }
-    
+
   options
 }
 
@@ -239,17 +259,18 @@ as.bru_options <- function(x = NULL) {
 bru_options_default <- function() {
   bru_options(
     # inlabru options
-    bru_verbose = FALSE,
+    bru_verbose = 0,
     bru_verbose_store = 1,
     bru_max_iter = 10,
     bru_run = TRUE,
     bru_int_args = list(method = "stable"), # nsub: NULL
     bru_method = list(
       taylor = "pandemic",
-      backtrack = "basic",
+      search = "all",
+      factor = (1 + sqrt(5)) / 2,
       stop_at_max_rel_deviation = 0.01
     ),
-    # bru_result: NULL
+    # bru_initial: NULL
     # inla options
     E = 1,
     Ntrials = 1,
@@ -267,7 +288,8 @@ bru_options_deprecated <- function(args) {
     mesh = "",
     run = "bru_run",
     max.iter = "bru_max_iter",
-    result = "bru_result",
+    result = "bru_initial",
+    bru_result = "bru_initial",
     int.args = "int.args"
   )
   names_args <- names(args)
@@ -303,10 +325,10 @@ bru_options_deprecated <- function(args) {
 
 
 #' Additional [bru] options
-#' 
+#'
 #' Construct a `bru_options` object including the default and global options,
 #' and converting deprecated option names.
-#' 
+#'
 #' @param \dots Options passed on to [as.bru_options()]
 #'
 #' @aliases bru_call_options
@@ -397,7 +419,7 @@ bru_options_check <- function(options, ignore_null = TRUE) {
       }
     }
   }
-  
+
   ok
 }
 
@@ -447,7 +469,7 @@ bru_options_get <- function(name = NULL, include_default = TRUE) {
 #' @seealso [bru_options()], [bru_options_default()], [bru_options_get()]
 #' @param .reset For `bru_options_set`, logical indicating if the global override
 #' options list should be emptied before setting the new option(s).
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
@@ -504,10 +526,10 @@ bru_options_reset <- function() {
 #' @rdname print.bru_options
 
 print.bru_options <- function(x,
-                             legend = TRUE,
-                             include_global = TRUE,
-                             include_default = TRUE,
-                             ...) {
+                              legend = TRUE,
+                              include_global = TRUE,
+                              include_default = TRUE,
+                              ...) {
   traverse <- function(combined, default, global, options, prefix = "") {
     for (name in sort(names(combined))) {
       if (is.list(combined[[name]])) {
@@ -529,17 +551,17 @@ print.bru_options <- function(x,
           " (",
           if (
             !is.null(default[[name]]) &&
-            (default[[name]] == combined[[name]])
+              (default[[name]] == combined[[name]])
           ) {
             "default"
           } else if (
             !is.null(global[[name]]) &&
-            (global[[name]] == combined[[name]])
+              (global[[name]] == combined[[name]])
           ) {
             "global"
           } else if (
             !is.null(options[[name]]) &&
-            (options[[name]] == combined[[name]])
+              (options[[name]] == combined[[name]])
           ) {
             "user"
           } else {
@@ -561,7 +583,7 @@ print.bru_options <- function(x,
     global <- bru_options()
   }
   combined <- bru_options(default, global, x)
-  
+
   if (legend) {
     cat("Legend:\n")
     if (include_default) {
@@ -708,7 +730,7 @@ iinla.setOption <- function(...) {
 
 
 requireINLA <- function(quietly = FALSE) {
-tryCatch(requireNamespace("INLA", quietly = quietly), error = function(x) {})
+  tryCatch(requireNamespace("INLA", quietly = quietly), error = function(x) {})
 }
 
 
