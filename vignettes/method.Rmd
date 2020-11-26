@@ -1,8 +1,8 @@
 ---
 title: "Iterative INLA method"
 output:
-  - rmarkdown::pdf_document
   - rmarkdown::html_vignette
+  - rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{Iterative INLA method}
   %\VignetteEngine{knitr::rmarkdown}
@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, include = FALSE}
 library(inlabru)
 ```
 
@@ -42,8 +42,9 @@ $$
 $$
 where typically each linear predictor element, $\eta_i(\bm{u})$, is linked to a
 location parameter of the distribution for observation $y_i$, for each $i$,
-via a (non-linear) link function. In the R-INLA implementation, the observations
-are assumed to be conditionally independent, given $\bm{\eta}$ and $\bm{\theta}$.
+via a (non-linear) link function $g^{-1}(\cdot)$. In the R-INLA implementation,
+the observations are assumed to be conditionally independent, given $\bm{\eta}$
+and $\bm{\theta}$.
 
 ## Approximate INLA for non-linear predictors
 
@@ -140,18 +141,18 @@ $$
 \begin{aligned}
 \|\breve{\bm{\eta}}_\alpha-\ol{\bm{\eta}}_1\|^2
 &=
-\| (1-\alpha)(\ol{\bm{\eta}}_1 - \ol{\bm{\eta}}_0) + \alpha^2 (\wt{\bm{\eta}}_1 - \ol{\bm{\eta}}_1) \|^2
+\| (\alpha-1)(\ol{\bm{\eta}}_1 - \ol{\bm{\eta}}_0) + \alpha^2 (\wt{\bm{\eta}}_1 - \ol{\bm{\eta}}_1) \|^2
 .
 \end{aligned}
 $$
 If initial expansion and contraction steps are carried out, leading to an initial
-guess of $\alpha=\gamma^k$, where $\gamma>1$ is a scaling factor and $k$ is the
+guess of $\alpha=\gamma^k$, where $\gamma>1$ is a scaling factor (see `?bru_options`, `bru_method$factor`) and $k$ is the
 (signed) number of expansions and contractions, the quadratic expression is replaced by
 $$
 \begin{aligned}
 \|\breve{\bm{\eta}}_\alpha-\ol{\bm{\eta}}_1\|^2
 &=
-\| (1-\alpha)(\ol{\bm{\eta}}_1 - \ol{\bm{\eta}}_0) + \frac{\alpha^2}{\gamma^k} (\wt{\bm{\eta}}_{\gamma^k} - \ol{\bm{\eta}}_{\gamma^k}) \|^2
+\| (\alpha-1)(\ol{\bm{\eta}}_1 - \ol{\bm{\eta}}_0) + \frac{\alpha^2}{\gamma^{2k}} (\wt{\bm{\eta}}_{\gamma^k} - \ol{\bm{\eta}}_{\gamma^k}) \|^2
 ,
 \end{aligned}
 $$
