@@ -521,56 +521,52 @@ bru_options_reset <- function() {
 #'   # Only include options set in the object:
 #'   print(options, include_default = FALSE, include_global = FALSE)
 #' }
-#' @method print bru_options
+#' @method summary bru_options
 #' @export
-#' @rdname print.bru_options
-
-print.bru_options <- function(x,
-                              legend = TRUE,
-                              include_global = TRUE,
-                              include_default = TRUE,
-                              ...) {
-  traverse <- function(combined, default, global, options, prefix = "") {
+#' @rdname summary.bru_options
+summary.bru_options <- function(x,
+                                legend = TRUE,
+                                include_global = TRUE,
+                                include_default = TRUE,
+                                ...) {
+  traverse <- function(combined, default, global, options) {
+    result <- list()
     for (name in sort(names(combined))) {
       if (is.list(combined[[name]])) {
-        cat(paste0(prefix, name, " =\n"))
-        traverse(
-          combined[[name]], default[[name]],
-          global[[name]], options[[name]],
-          prefix = paste0(prefix, "  ")
+        result[[name]] <- list(
+          is_list = TRUE,
+          value = traverse(
+            combined[[name]], default[[name]],
+            global[[name]], options[[name]]
+          )
         )
       } else {
-        cat(paste0(
-          prefix,
-          name, " = ",
-          if (is.null(combined[[name]])) {
-            "NULL"
-          } else {
-            combined[[name]]
-          },
-          " (",
-          if (
-            !is.null(default[[name]]) &&
+        result[[name]] <- list(
+          is_list = FALSE,
+          value = if (is.null(combined[[name]])) {"NULL"} else {combined[[name]]},
+          origin = 
+            if (
+              !is.null(default[[name]]) &&
               (default[[name]] == combined[[name]])
-          ) {
-            "default"
-          } else if (
-            !is.null(global[[name]]) &&
+            ) {
+              "default"
+            } else if (
+              !is.null(global[[name]]) &&
               (global[[name]] == combined[[name]])
-          ) {
-            "global"
-          } else if (
-            !is.null(options[[name]]) &&
+            ) {
+              "global"
+            } else if (
+              !is.null(options[[name]]) &&
               (options[[name]] == combined[[name]])
-          ) {
-            "user"
-          } else {
-            "unknown"
-          },
-          ")\n"
-        ))
+            ) {
+              "user"
+            } else {
+              "unknown"
+            }
+        )
       }
     }
+    result
   }
   if (include_default) {
     default <- bru_options_default()
@@ -583,21 +579,59 @@ print.bru_options <- function(x,
     global <- bru_options()
   }
   combined <- bru_options(default, global, x)
-
+  
   if (legend) {
+    legend <- c(
+      "default = value from the default options",
+      "global  = value from the global override object",
+      "user    = value from the user override object"
+    )
+  } else {
+    legend <- NULL
+  }
+  result <- list(
+    legend = legend,
+    value = traverse(combined, default, global, x)
+  )
+  class(result) <- c("summary_bru_options", "list")
+  result
+}
+
+#' @export
+#' @rdname summary.bru_options
+print.summary_bru_options <- function(x, ...) {
+  traverse <- function(tree, prefix = "") {
+    for (name in sort(names(tree))) {
+      if (tree[[name]]$is_list) {
+        cat(paste0(prefix, name, " =\n"))
+        traverse(
+          tree[[name]]$value,
+          prefix = paste0(prefix, "\t")
+        )
+      } else {
+        cat(paste0(
+          prefix,
+          name, " =\t",
+          tree[[name]]$value,
+          "\t(",
+          tree[[name]]$origin,
+          ")\n"
+        ))
+      }
+    }
+  }
+  
+  if (!is.null(x[["legend"]])) {
     cat("Legend:\n")
-    if (include_default) {
-      cat("  default = first set in the default options\n")
-    }
-    if (include_global) {
-      cat("  global = first set in the global override object\n")
-    }
-    cat("  user = first set in the object\n")
+    cat(paste0("  ", x[["legend"]], collapse = "\n"))
   }
   cat("Options for inlabru:\n")
-  traverse(combined, default, global, x, prefix = "  ")
+  traverse(x[["value"]], prefix = "  ")
   invisible(x)
 }
+
+
+
 
 
 

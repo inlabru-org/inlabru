@@ -2,14 +2,14 @@
 % Please edit documentation in R/effect.R
 \name{bru_mapper_methods}
 \alias{bru_mapper_methods}
+\alias{ibm_n.default}
+\alias{ibm_values.default}
+\alias{ibm_amatrix.bru_mapper_inla_mesh_2d}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
 \alias{ibm_values.bru_mapper_inla_mesh_2d}
-\alias{ibm_amatrix.bru_mapper_inla_mesh_2d}
 \alias{ibm_n.bru_mapper_inla_mesh_1d}
 \alias{ibm_values.bru_mapper_inla_mesh_1d}
 \alias{ibm_amatrix.bru_mapper_inla_mesh_1d}
-\alias{ibm_n.bru_mapper_index}
-\alias{ibm_values.bru_mapper_index}
 \alias{ibm_amatrix.bru_mapper_index}
 \alias{ibm_n.bru_mapper_linear}
 \alias{ibm_values.bru_mapper_linear}
@@ -28,6 +28,12 @@
 \alias{names<-.bru_mapper_multi}
 \title{Implementation methods for mapper objects}
 \usage{
+\method{ibm_n}{default}(mapper, ...)
+
+\method{ibm_values}{default}(mapper, ...)
+
+\method{ibm_amatrix}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
+
 \method{ibm_n}{bru_mapper_inla_mesh_2d}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_inla_mesh_2d}(mapper, ...)
@@ -39,10 +45,6 @@
 \method{ibm_values}{bru_mapper_inla_mesh_1d}(mapper, ...)
 
 \method{ibm_amatrix}{bru_mapper_inla_mesh_1d}(mapper, input, ...)
-
-\method{ibm_n}{bru_mapper_index}(mapper, ...)
-
-\method{ibm_values}{bru_mapper_index}(mapper, ...)
 
 \method{ibm_amatrix}{bru_mapper_index}(mapper, input, ...)
 
@@ -111,9 +113,24 @@ sub-mappers list
 }
 }
 \description{
-Implementation methods for mapper objects
+A \code{bru_mapper} sub-class implementation must provide an
+\code{ibm_matrix()} method. If the model size 'n' and definition
+values 'values' are stored in the object itself, default methods are
+available (see Details). Otherwise the
+\code{ibm_n()} and \code{ibm_values()} methods also need to be provided.
 }
 \details{
+\itemize{
+\item The default \code{ibm_n()} method returns a non-null element 'n' from the
+mapper object, and gives an error if it doesn't exist.
+}
+
+\itemize{
+\item The default \code{ibm_values()} method returns a non-null element
+'values' from the mapper object, and \code{seq_len(ibm_n(mapper))} if
+it doesn't exist.
+}
+
 \itemize{
 \item \code{ibm_amatrix} for \code{bru_mapper_multi} accepts a list with
 named entries, or a list with unnamed but ordered elements.

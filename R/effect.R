@@ -1162,6 +1162,58 @@ bru_mapper.default <- function(mapper, ...) {
   mapper
 }
 
+
+#' Implementation methods for mapper objects
+#' 
+#' A `bru_mapper` sub-class implementation must provide an
+#' `ibm_matrix()` method. If the model size 'n' and definition
+#' values 'values' are stored in the object itself, default methods are
+#' available (see Details). Otherwise the
+#' `ibm_n()` and `ibm_values()` methods also need to be provided.
+#' 
+#' @param \dots Arguments passed on to other methods
+#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
+#' @seealso [bru_mapper()]
+#' @name bru_mapper_methods
+#' 
+#' @details
+#' * The default `ibm_n()` method returns a non-null element 'n' from the
+#' mapper object, and gives an error if it doesn't exist.
+#' @export
+#' @rdname bru_mapper_methods
+ibm_n.default <- function(mapper, ...) {
+  if (!is.null(mapper[["n"]])) {
+    mapper[["n"]]
+  } else {
+    stop("Default 'ibm_n()' method called but mapper doesn't have an 'n' element.")
+  }
+}
+
+#' @details
+#' * The default `ibm_values()` method returns a non-null element
+#' 'values' from the mapper object, and `seq_len(ibm_n(mapper))` if
+#' it doesn't exist.
+#' @export
+#' @rdname bru_mapper_methods
+ibm_values.default <- function(mapper, ...) {
+  if (!is.null(mapper[["values"]])) {
+    mapper[["values"]]
+  } else {
+    seq_len(ibm_n(mapper))
+  }
+}
+#' @param input The values for which to produce a mapping matrix
+#' @export
+#' @rdname bru_mapper_methods
+ibm_amatrix.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
+  if (!is.matrix(input) && !inherits(input, "Spatial")) {
+    val <- as.matrix(val)
+  }
+  INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
+}
+
+
+
 #' @param mesh An `inla.mesh.1d` or `inla.mesh.2d` object to use as a mapper
 #' @param indexed logical; If `TRUE`, the `ibm_values()` output will be the
 #' integer indexing sequence for the latent variables. If `FALSE`, the knot
@@ -1176,11 +1228,6 @@ bru_mapper.inla.mesh <- function(mesh, ...) {
   bru_mapper.default(mapper)
 }
 
-#' Implementation methods for mapper objects
-#' @param \dots Arguments passed on to other methods
-#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
-#' @seealso [bru_mapper()]
-#' @name bru_mapper_methods
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_inla_mesh_2d <- function(mapper, ...) {
@@ -1253,16 +1300,6 @@ bru_mapper_index <- function(n = 1L, ...) {
   mapper
 }
 
-#' @export
-#' @rdname bru_mapper_methods
-ibm_n.bru_mapper_index <- function(mapper, ...) {
-  mapper$n
-}
-#' @export
-#' @rdname bru_mapper_methods
-ibm_values.bru_mapper_index <- function(mapper, ...) {
-  seq_len(mapper$n)
-}
 #' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.bru_mapper_index <- function(mapper, input, ...) {

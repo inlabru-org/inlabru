@@ -59,3 +59,38 @@ test_that("Multi-mapper bru input", {
   expect_equal(fit1$summary.random, fit3$summary.random)
   expect_equal(fit1$summary.random, fit4$summary.random)
 })
+
+test_that("User defined mappers", {
+  # User defined mapper objects
+  
+  bm_test <- function(n, ...) {
+    m <- list(n = n)
+    class(m) <- c("bm_test", "bru_mapper")
+    m
+  }
+  ibm_n.bm_test <- function(mapper,...){
+    mapper$n
+  }
+  ibm_values.bm_test <- function(mapper,...){
+    seq_len(mapper$n)
+  }
+  ibm_amatrix.bm_test <- function(mapper, input, ...){
+    message("---- IBM_AMATRIX ----")
+    Matrix::sparseMatrix(i = seq_along(input),
+                         j = input,
+                         x = rep(2, length(input)),
+                         dims = c(length(input), mapper$n)
+    )
+  }
+  
+  m <- bm_test(n = 20)
+  cmp <- y ~ -1 + indep(x, model = "iid", mapper = m)
+  mydata <- data.frame(y = rnorm(15) + 2*(1:15), x = 1:15)
+
+  skip_on_cran()
+  local_bru_safe_inla()
+  
+  expect_message({fit <- bru(cmp, data = mydata, family = "gaussian")},
+                 "---- IBM_AMATRIX ----")
+  
+}
