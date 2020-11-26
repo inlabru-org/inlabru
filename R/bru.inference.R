@@ -1572,30 +1572,34 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         )
       )
 
-    result <- tryCatch(
-      do.call(
-        INLA::inla,
-        inla.options,
-        envir = environment(model$effects)
-      ),
-      error = warning
+    result <- try_callstack(
+        do.call(
+          INLA::inla,
+          inla.options,
+          envir = environment(model$effects)
+        )
     )
-
-    if (is.character(result)) {
+    
+    if (inherits(result, "try-error")) {
       bru_log_message(
-        paste0("iinla: INLA returned message: ", result),
+        paste0("iinla: Problem in inla: ", result),
         verbose = FALSE,
         verbose_store = options$bru_verbose_store
       )
-      stop(paste0("iinla: INLA returned message: ", result))
-    }
-
-    if ((is.null(result) | length(result) == 5)) {
+      warning(
+        paste0("iinla: Problem in inla: ", result),
+        immediate. = TRUE
+      )
       bru_log_message(
-        sprintf("iinla: The computation failed. Giving up and returning last successfully obtained result."),
-        verbose = options$bru_verbose,
+        paste0("iinla: Giving up and returning last successfully obtained result."),
+        verbose = TRUE,
         verbose_store = options$bru_verbose_store
       )
+      old.result$error <- result
+      old.result$stack <- stk
+      old.result$model <- model
+      old.result$iinla$track <- do.call(rbind, track)
+      class(old.result) <- c("iinla", "inla", "list")
       return(old.result)
     }
 

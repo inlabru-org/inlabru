@@ -24,8 +24,11 @@ fm_has_PROJ6 <- function() {
 
 fm_not_for_PROJ6 <- function(fun = NULL) {
   if (fm_has_PROJ6()) {
-    fun <- fn_caller_name(1, fun)
-    msg <- fn_call_stack(1)
+    fun <- fm_caller_name(1, fun)
+    msg <- paste0(
+      "Call stack:\n",
+      paste0(fm_call_stack(end = 1), collapse = "\n")
+    )
     warning(paste0(
       "'",
       fun,
@@ -41,7 +44,7 @@ fm_not_for_PROJ6 <- function(fun = NULL) {
 
 fm_not_for_PROJ4 <- function(fun = NULL) {
   if (!fm_has_PROJ6()) {
-    fun <- fn_caller_name(1, fun)
+    fun <- fm_caller_name(1, fun)
     stop(paste0(
       "'",
       fun,
@@ -56,7 +59,7 @@ fm_not_for_PROJ4 <- function(fun = NULL) {
 
 fm_fallback_PROJ6 <- function(fun = NULL) {
   if (fm_has_PROJ6()) {
-    fun <- fn_caller_name(1, fun)
+    fun <- fm_caller_name(1, fun)
     warning(paste0(
       "'",
       fun,
@@ -74,7 +77,7 @@ fm_fallback_PROJ6 <- function(fun = NULL) {
 
 fm_requires_PROJ6 <- function(fun = NULL) {
   if (!fm_has_PROJ6()) {
-    fun <- fn_caller_name(which = 1, override = fun)
+    fun <- fm_caller_name(which = 1, override = fun)
     stop(paste0(
       "'",
       fun,
