@@ -1595,11 +1595,15 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         verbose = TRUE,
         verbose_store = options$bru_verbose_store
       )
+      if (is.null(old.result)) {
+        old.result <- list()
+        class(old.result) <- c("iinla", "list")
+      } else {
+        class(old.result) <- c("iinla", "inla", "list")
+      }
       old.result$error <- result
-      old.result$stack <- stk
-      old.result$model <- model
-      old.result$iinla$track <- do.call(rbind, track)
-      class(old.result) <- c("iinla", "inla", "list")
+      old.result$iinla_stack <- stk
+      old.result$iinla_track <- do.call(rbind, track)
       return(old.result)
     }
 
@@ -1702,9 +1706,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     }
     k <- k + 1
   }
-  result$stack <- stk
-  result$model <- model
-  result$iinla$track <- do.call(rbind, track)
+  result$iinla_stack <- stk
+  result$iinla_track <- do.call(rbind, track)
   class(result) <- c("iinla", "inla", "list")
   return(result)
 }
