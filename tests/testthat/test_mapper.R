@@ -93,4 +93,4 @@ test_that("User defined mappers", {
   expect_message({fit <- bru(cmp, data = mydata, family = "gaussian")},
                  "---- IBM_AMATRIX ----")
   
-}
+})

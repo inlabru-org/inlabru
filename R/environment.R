@@ -505,7 +505,8 @@ bru_options_reset <- function() {
 
 
 #' @title Print inlabru options
-#' @param x An [`bru_options`] object to be printed
+#' @param object A [bru_options] object to be summarised
+#' @param x A `summary_bru_options` object to be printed
 #' @param legend logical; If `TRUE`, include explanatory text, Default: `TRUE`
 #' @param include_global logical; If `TRUE`, include global override options
 #' @param include_default logical; If `TRUE`, include default options
@@ -524,12 +525,12 @@ bru_options_reset <- function() {
 #' @method summary bru_options
 #' @export
 #' @rdname summary.bru_options
-summary.bru_options <- function(x,
+summary.bru_options <- function(object,
                                 legend = TRUE,
                                 include_global = TRUE,
                                 include_default = TRUE,
                                 ...) {
-  traverse <- function(combined, default, global, options) {
+  traverse <- function(combined, default, global, object) {
     result <- list()
     for (name in sort(names(combined))) {
       if (is.list(combined[[name]])) {
@@ -537,7 +538,7 @@ summary.bru_options <- function(x,
           is_list = TRUE,
           value = traverse(
             combined[[name]], default[[name]],
-            global[[name]], options[[name]]
+            global[[name]], object[[name]]
           )
         )
       } else {
@@ -556,8 +557,8 @@ summary.bru_options <- function(x,
             ) {
               "global"
             } else if (
-              !is.null(options[[name]]) &&
-              (options[[name]] == combined[[name]])
+              !is.null(object[[name]]) &&
+              (object[[name]] == combined[[name]])
             ) {
               "user"
             } else {
@@ -578,7 +579,7 @@ summary.bru_options <- function(x,
   } else {
     global <- bru_options()
   }
-  combined <- bru_options(default, global, x)
+  combined <- bru_options(default, global, object)
   
   if (legend) {
     legend <- c(
@@ -591,7 +592,7 @@ summary.bru_options <- function(x,
   }
   result <- list(
     legend = legend,
-    value = traverse(combined, default, global, x)
+    value = traverse(combined, default, global, object)
   )
   class(result) <- c("summary_bru_options", "list")
   result

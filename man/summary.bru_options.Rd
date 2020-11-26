@@ -5,12 +5,18 @@
 \alias{print.summary_bru_options}
 \title{Print inlabru options}
 \usage{
-\method{summary}{bru_options}(x, legend = TRUE, include_global = TRUE, include_default = TRUE, ...)
+\method{summary}{bru_options}(
+  object,
+  legend = TRUE,
+  include_global = TRUE,
+  include_default = TRUE,
+  ...
+)
 
 \method{print}{summary_bru_options}(x, ...)
 }
 \arguments{
-\item{x}{An \code{\link{bru_options}} object to be printed}
+\item{object}{A \link{bru_options} object to be summarised}
 
 \item{legend}{logical; If \code{TRUE}, include explanatory text, Default: \code{TRUE}}
 
@@ -19,6 +25,8 @@
 \item{include_default}{logical; If \code{TRUE}, include default options}
 
 \item{...}{Further parameters, currently ignored}
+
+\item{x}{A \code{summary_bru_options} object to be printed}
 }
 \description{
 Print inlabru options
