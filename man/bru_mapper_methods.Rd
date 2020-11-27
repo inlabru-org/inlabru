@@ -4,6 +4,7 @@
 \alias{bru_mapper_methods}
 \alias{ibm_n.default}
 \alias{ibm_values.default}
+\alias{ibm_amatrix.default}
 \alias{ibm_amatrix.bru_mapper_inla_mesh_2d}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
 \alias{ibm_values.bru_mapper_inla_mesh_2d}
@@ -31,6 +32,8 @@
 \method{ibm_n}{default}(mapper, ...)
 
 \method{ibm_values}{default}(mapper, ...)
+
+\method{ibm_amatrix}{default}(mapper, ...)
 
 \method{ibm_amatrix}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
 
@@ -129,6 +132,11 @@ mapper object, and gives an error if it doesn't exist.
 \item The default \code{ibm_values()} method returns a non-null element
 'values' from the mapper object, and \code{seq_len(ibm_n(mapper))} if
 it doesn't exist.
+}
+
+\itemize{
+\item The default \code{ibm_amatrix()} method calls the \code{ibm_amatrix} element function
+of the object if it exists.
 }
 
 \itemize{

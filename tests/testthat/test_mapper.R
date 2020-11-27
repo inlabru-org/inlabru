@@ -63,23 +63,20 @@ test_that("Multi-mapper bru input", {
 test_that("User defined mappers", {
   # User defined mapper objects
   
-  bm_test <- function(n, ...) {
-    m <- list(n = n)
-    class(m) <- c("bm_test", "bru_mapper")
-    m
-  }
-  ibm_n.bm_test <- function(mapper,...){
-    mapper$n
-  }
-  ibm_values.bm_test <- function(mapper,...){
-    seq_len(mapper$n)
-  }
   ibm_amatrix.bm_test <- function(mapper, input, ...){
     message("---- IBM_AMATRIX ----")
     Matrix::sparseMatrix(i = seq_along(input),
                          j = input,
                          x = rep(2, length(input)),
                          dims = c(length(input), mapper$n)
+    )
+  }
+  
+  bm_test <- function(n, ...) {
+    bru_mapper(
+      list(n = n),
+      ibm_amatrix = ibm_amatrix.bm_test,
+      new_class = "bm_test"
     )
   }
   

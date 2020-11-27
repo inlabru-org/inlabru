@@ -37,9 +37,8 @@ add_mappers <- function(...) {
 #' Methods for `bru_mapper` objects
 #'
 #' @details
-#' * `bru_mapper` Generic mapper S3 constructor. Default constructor only
-#' adds `bru_mapper` to the class definition, unless the `mapper` input already
-#' inherits from `bru_mapper`.
+#' * `bru_mapper` Generic mapper S3 constructor. See below for details of the
+#' default constructor that can be used to define new mappers in user code.
 #' @param \dots Arguments passed on to other methods
 #' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
 #' @export
@@ -222,7 +221,7 @@ component <- function(...) {
 #' @param group,group_mapper,group_layer,group_selector
 #' Optional specification of kronecker/group model indexing.
 #' @param control.group `list` of kronecker/group model parameters, currently
-#' passed directly on to `INLA:f`
+#' passed directly on to `INLA::f`
 # Replicate model parameters
 #' @param replicate,replicate_mapper,replicate_layer,replicate_selector
 #' Optional specification of indices for an independent
@@ -1152,12 +1151,38 @@ code.components <- function(components, add = "") {
 
 # MAPPERS ----
 
-#' @details * `bru_mapper.default` adds the "bru_mapper" class to an object
+#' @details * `bru_mapper.default` adds the "bru_mapper" class and `new_class`
+#' to an object,
+#' and optionally adds the mapper method functions as elements. This is
+#' currently needed for user-defined mapper object classes to avoid namespace
+#' issues.
+#' @param ibm_n An `ibm_n` method function
+#' @param ibm_values An `ibm_values` method function
+#' @param ibm_amatrix An `ibm_amatrix` method function
+#' @param new_class If non-`NULL`, this is added at the front of the class definition
+#'
 #' @export
 #' @rdname bru_mapper
-bru_mapper.default <- function(mapper, ...) {
+bru_mapper.default <- function(mapper,
+                               ibm_n = NULL,
+                               ibm_values = NULL,
+                               ibm_amatrix = NULL,
+                               new_class = NULL,
+                               ...) {
   if (!inherits(mapper, "bru_mapper")) {
     class(mapper) <- c("bru_mapper", class(mapper))
+  }
+  if (!is.null(new_class) && !inherits(mapper, new_class)) {
+    class(mapper) <- c(new_class, class(mapper))
+  }
+  if (!is.null(ibm_n)) {
+    mapper[["ibm_n"]] <- ibm_n
+  }
+  if (!is.null(ibm_values)) {
+    mapper[["ibm_values"]] <- ibm_values
+  }
+  if (!is.null(ibm_amatrix)) {
+    mapper[["ibm_amatrix"]] <- ibm_amatrix
   }
   mapper
 }
@@ -1182,7 +1207,9 @@ bru_mapper.default <- function(mapper, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n.default <- function(mapper, ...) {
-  if (!is.null(mapper[["n"]])) {
+  if (!is.null(mapper[["ibm_n"]])) {
+    mapper[["ibm_n"]](mapper, ...)
+  } else if (!is.null(mapper[["n"]])) {
     mapper[["n"]]
   } else {
     stop("Default 'ibm_n()' method called but mapper doesn't have an 'n' element.")
@@ -1196,12 +1223,31 @@ ibm_n.default <- function(mapper, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_values.default <- function(mapper, ...) {
-  if (!is.null(mapper[["values"]])) {
+  if (!is.null(mapper[["ibm_values"]])) {
+    mapper[["ibm_values"]](mapper, ...)
+  } else if (!is.null(mapper[["values"]])) {
     mapper[["values"]]
   } else {
     seq_len(ibm_n(mapper))
   }
 }
+
+#' @details
+#' * The default `ibm_amatrix()` method calls the `ibm_amatrix` element function
+#' of the object if it exists.
+#' @export
+#' @rdname bru_mapper_methods
+ibm_amatrix.default <- function(mapper, ...) {
+  if (!is.null(mapper[["ibm_amatrix"]])) {
+    mapper[["ibm_amatrix"]](mapper, ...)
+  } else {
+    stop("Default 'ibm_amatrix()' method called but mapper doesn't have an 'ibm_amatrix' element.")
+  }
+}
+
+
+
+
 #' @param input The values for which to produce a mapping matrix
 #' @export
 #' @rdname bru_mapper_methods

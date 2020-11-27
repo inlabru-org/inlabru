@@ -79,7 +79,7 @@ Same syntax as for \code{main}.}
 \item{group, group_mapper, group_layer, group_selector}{Optional specification of kronecker/group model indexing.}
 
 \item{control.group}{\code{list} of kronecker/group model parameters, currently
-passed directly on to \code{INLA:f}}
+passed directly on to \code{INLA::f}}
 
 \item{replicate, replicate_mapper, replicate_layer, replicate_selector}{Optional specification of indices for an independent
 replication model. Same syntax as for \code{main}}

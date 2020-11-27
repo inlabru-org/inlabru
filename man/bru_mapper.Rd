@@ -23,7 +23,14 @@ ibm_values(mapper, ...)
 
 ibm_amatrix(mapper, input, ...)
 
-\method{bru_mapper}{default}(mapper, ...)
+\method{bru_mapper}{default}(
+  mapper,
+  ibm_n = NULL,
+  ibm_values = NULL,
+  ibm_amatrix = NULL,
+  new_class = NULL,
+  ...
+)
 
 \method{bru_mapper}{inla.mesh}(mesh, ...)
 
@@ -45,6 +52,14 @@ bru_mapper_multi(mappers, ...)
 \item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}
 
 \item{input}{The values for which to produce a mapping matrix}
+
+\item{ibm_n}{An \code{ibm_n} method function}
+
+\item{ibm_values}{An \code{ibm_values} method function}
+
+\item{ibm_amatrix}{An \code{ibm_amatrix} method function}
+
+\item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
@@ -72,9 +87,8 @@ Methods for \code{bru_mapper} objects
 }
 \details{
 \itemize{
-\item \code{bru_mapper} Generic mapper S3 constructor. Default constructor only
-adds \code{bru_mapper} to the class definition, unless the \code{mapper} input already
-inherits from \code{bru_mapper}.
+\item \code{bru_mapper} Generic mapper S3 constructor. See below for details of the
+default constructor that can be used to define new mappers in user code.
 }
 
 \itemize{
@@ -96,7 +110,11 @@ by \code{ibm_n(mapper)}
 }
 
 \itemize{
-\item \code{bru_mapper.default} adds the "bru_mapper" class to an object
+\item \code{bru_mapper.default} adds the "bru_mapper" class and \code{new_class}
+to an object,
+and optionally adds the mapper method functions as elements. This is
+currently needed for user-defined mapper object classes to avoid namespace
+issues.
 }
 
 \itemize{
