@@ -63,8 +63,17 @@ test_that("Multi-mapper bru input", {
 test_that("User defined mappers", {
   # User defined mapper objects
   
+  ibm_amatrix_bm_test <- function(mapper, input, ...){
+    message("---- IBM_AMATRIX from element ----")
+    Matrix::sparseMatrix(i = seq_along(input),
+                         j = input,
+                         x = rep(2, length(input)),
+                         dims = c(length(input), mapper$n)
+    )
+  }
+  
   ibm_amatrix.bm_test <- function(mapper, input, ...){
-    message("---- IBM_AMATRIX ----")
+    message("---- IBM_AMATRIX from namespace ----")
     Matrix::sparseMatrix(i = seq_along(input),
                          j = input,
                          x = rep(2, length(input)),
@@ -75,7 +84,7 @@ test_that("User defined mappers", {
   bm_test <- function(n, ...) {
     bru_mapper(
       list(n = n),
-      ibm_amatrix = ibm_amatrix.bm_test,
+      ibm_amatrix = ibm_amatrix_bm_test,
       new_class = "bm_test"
     )
   }
@@ -87,7 +96,12 @@ test_that("User defined mappers", {
   skip_on_cran()
   local_bru_safe_inla()
   
-  expect_message({fit <- bru(cmp, data = mydata, family = "gaussian")},
-                 "---- IBM_AMATRIX ----")
+  if (interactive()) {
+    expect_message({fit <- bru(cmp, data = mydata, family = "gaussian")},
+                   "---- IBM_AMATRIX from namespace ----")
+  } else {
+    expect_message({fit <- bru(cmp, data = mydata, family = "gaussian")},
+                   "---- IBM_AMATRIX from element ----")
+  }
   
 })
