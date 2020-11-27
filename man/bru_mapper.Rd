@@ -25,10 +25,10 @@ ibm_amatrix(mapper, input, ...)
 
 \method{bru_mapper}{default}(
   mapper,
+  new_class = NULL,
   ibm_n = NULL,
   ibm_values = NULL,
   ibm_amatrix = NULL,
-  new_class = NULL,
   ...
 )
 
@@ -49,17 +49,19 @@ bru_mapper_multi(mappers, ...)
 \arguments{
 \item{\dots}{Arguments passed on to other methods}
 
-\item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}
+\item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}.
+For the default \code{bru_mapper} method, a list that will be converted to a
+\code{bru_mapper} object by adding class information and (optional) methods.}
 
 \item{input}{The values for which to produce a mapping matrix}
+
+\item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
 \item{ibm_n}{An \code{ibm_n} method function}
 
 \item{ibm_values}{An \code{ibm_values} method function}
 
 \item{ibm_amatrix}{An \code{ibm_amatrix} method function}
-
-\item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
@@ -111,10 +113,10 @@ by \code{ibm_n(mapper)}
 
 \itemize{
 \item \code{bru_mapper.default} adds the "bru_mapper" class and \code{new_class}
-to an object,
-and optionally adds the mapper method functions as elements. This is
-currently needed for user-defined mapper object classes to avoid namespace
-issues.
+to an object. If provided, mapper method functions are added to an environment
+\code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_values}, and
+\code{ibm_amatrix} look for these functions first, and otherwise call \code{UseMethod()}.
+reached.
 }
 
 \itemize{

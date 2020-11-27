@@ -40,7 +40,9 @@ add_mappers <- function(...) {
 #' * `bru_mapper` Generic mapper S3 constructor. See below for details of the
 #' default constructor that can be used to define new mappers in user code.
 #' @param \dots Arguments passed on to other methods
-#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
+#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`.
+#' For the default `bru_mapper` method, a list that will be converted to a
+#' `bru_mapper` object by adding class information and (optional) methods.
 #' @export
 #' @seealso [bru_mapper_methods] for specific method implementations.
 #' @rdname bru_mapper
@@ -53,7 +55,11 @@ bru_mapper <- function(...) {
 #' @export
 #' @rdname bru_mapper
 ibm_n <- function(mapper, ...) {
-  UseMethod("ibm_n")
+  if (!is.null(mapper[[".envir"]][["ibm_n"]])) {
+    mapper[[".envir"]][["ibm_n"]](mapper, ...)
+  } else {
+    UseMethod("ibm_n")
+  }
 }
 #' @details
 #' * `ibm_values` Generic. Implementations must return a vector that
@@ -62,7 +68,11 @@ ibm_n <- function(mapper, ...) {
 #' @export
 #' @rdname bru_mapper
 ibm_values <- function(mapper, ...) {
-  UseMethod("ibm_values")
+  if (!is.null(mapper[[".envir"]][["ibm_values"]])) {
+    mapper[[".envir"]][["ibm_values"]](mapper, ...)
+  } else {
+    UseMethod("ibm_values")
+  }
 }
 #' @details
 #' * `ibm_amatrix` Generic.
@@ -73,7 +83,11 @@ ibm_values <- function(mapper, ...) {
 #' @export
 #' @rdname bru_mapper
 ibm_amatrix <- function(mapper, input, ...) {
-  UseMethod("ibm_amatrix")
+  if (!is.null(mapper[[".envir"]][["ibm_amatrix"]])) {
+    mapper[[".envir"]][["ibm_amatrix"]](mapper, input, ...)
+  } else {
+    UseMethod("ibm_amatrix")
+  }
 }
 
 
@@ -1152,22 +1166,22 @@ code.components <- function(components, add = "") {
 # MAPPERS ----
 
 #' @details * `bru_mapper.default` adds the "bru_mapper" class and `new_class`
-#' to an object,
-#' and optionally adds the mapper method functions as elements. This is
-#' currently needed for user-defined mapper object classes to avoid namespace
-#' issues.
+#' to an object. If provided, mapper method functions are added to an environment
+#' `.envir` in the object.  The generic methods `ibm_n`, `ibm_values`, and
+#' `ibm_amatrix` look for these functions first, and otherwise call `UseMethod()`.
+#' reached.
+#' @param new_class If non-`NULL`, this is added at the front of the class definition
 #' @param ibm_n An `ibm_n` method function
 #' @param ibm_values An `ibm_values` method function
 #' @param ibm_amatrix An `ibm_amatrix` method function
-#' @param new_class If non-`NULL`, this is added at the front of the class definition
 #'
 #' @export
 #' @rdname bru_mapper
 bru_mapper.default <- function(mapper,
+                               new_class = NULL,
                                ibm_n = NULL,
                                ibm_values = NULL,
                                ibm_amatrix = NULL,
-                               new_class = NULL,
                                ...) {
   if (!inherits(mapper, "bru_mapper")) {
     class(mapper) <- c("bru_mapper", class(mapper))
@@ -1175,14 +1189,17 @@ bru_mapper.default <- function(mapper,
   if (!is.null(new_class) && !inherits(mapper, new_class)) {
     class(mapper) <- c(new_class, class(mapper))
   }
+  if (is.null(mapper[[".envir"]])) {
+    mapper$.envir <- new.env()
+  }
   if (!is.null(ibm_n)) {
-    mapper[["ibm_n"]] <- ibm_n
+    assign("ibm_n", ibm_n, envir = mapper[[".envir"]])
   }
   if (!is.null(ibm_values)) {
-    mapper[["ibm_values"]] <- ibm_values
+    assign("ibm_values", ibm_values, envir = mapper[[".envir"]])
   }
   if (!is.null(ibm_amatrix)) {
-    mapper[["ibm_amatrix"]] <- ibm_amatrix
+    assign("ibm_amatrix", ibm_amatrix, envir = mapper[[".envir"]])
   }
   mapper
 }
@@ -1207,9 +1224,7 @@ bru_mapper.default <- function(mapper,
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n.default <- function(mapper, ...) {
-  if (!is.null(mapper[["ibm_n"]])) {
-    mapper[["ibm_n"]](mapper, ...)
-  } else if (!is.null(mapper[["n"]])) {
+  if (!is.null(mapper[["n"]])) {
     mapper[["n"]]
   } else {
     stop("Default 'ibm_n()' method called but mapper doesn't have an 'n' element.")
@@ -1223,9 +1238,7 @@ ibm_n.default <- function(mapper, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_values.default <- function(mapper, ...) {
-  if (!is.null(mapper[["ibm_values"]])) {
-    mapper[["ibm_values"]](mapper, ...)
-  } else if (!is.null(mapper[["values"]])) {
+  if (!is.null(mapper[["values"]])) {
     mapper[["values"]]
   } else {
     seq_len(ibm_n(mapper))
@@ -1238,11 +1251,10 @@ ibm_values.default <- function(mapper, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.default <- function(mapper, ...) {
-  if (!is.null(mapper[["ibm_amatrix"]])) {
-    mapper[["ibm_amatrix"]](mapper, ...)
-  } else {
-    stop("Default 'ibm_amatrix()' method called but mapper doesn't have an 'ibm_amatrix' element.")
-  }
+  stop(paste0(
+    "Missing implementation of 'ibm_amatrix()' for mapper of class '",
+    class(mapper)[1], "'."
+  ))
 }
 
 

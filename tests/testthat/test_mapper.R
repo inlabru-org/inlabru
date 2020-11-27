@@ -62,32 +62,25 @@ test_that("Multi-mapper bru input", {
 
 
 # Define in outer environment:
-ibm_amatrix.bm_test <- function(mapper, input, ...){
-  message("---- IBM_AMATRIX from namespace ----")
-  Matrix::sparseMatrix(i = seq_along(input),
-                       j = input,
-                       x = rep(2, length(input)),
-                       dims = c(length(input), mapper$n)
-  )
-}
+
 
 test_that("User defined mappers", {
   # User defined mapper objects
   
-  ibm_amatrix_bm_test <- function(mapper, input, ...){
-    message("---- IBM_AMATRIX from element ----")
+  ibm_amatrix.bm_test <- function(mapper, input, ...){
+    message("---- IBM_AMATRIX from inner environment ----")
     Matrix::sparseMatrix(i = seq_along(input),
                          j = input,
                          x = rep(2, length(input)),
                          dims = c(length(input), mapper$n)
     )
   }
-  
+
   bm_test <- function(n, ...) {
     bru_mapper(
       list(n = n),
-      ibm_amatrix = ibm_amatrix_bm_test,
-      new_class = "bm_test"
+      new_class = "bm_test",
+      ibm_amatrix = ibm_amatrix.bm_test
     )
   }
   
@@ -98,16 +91,9 @@ test_that("User defined mappers", {
   skip_on_cran()
   local_bru_safe_inla()
   
-  if (interactive()) {
-    expect_message({fit <- bru(cmp, data = mydata, family = "gaussian")},
-                   "---- IBM_AMATRIX from namespace ----",
-                   label = "Interactive bru() call"
-                   )
-  } else {
-    expect_message({fit <- bru(cmp, data = mydata, family = "gaussian")},
-                   "---- IBM_AMATRIX from element ----",
-                   label = "Non-interactive bru() call"
-    )
-  }
-  
+  expect_message({fit <- bru(cmp, data = mydata, family = "gaussian")},
+                 "---- IBM_AMATRIX from inner environment ----",
+                 label = "Non-interactive bru() call"
+  )
+
 })
