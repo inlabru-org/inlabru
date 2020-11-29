@@ -282,6 +282,7 @@ component <- function(...) {
 component.character <- function(object,
                                 # Main model parameters
                                 main = NULL, # This must be kept as 1st arg.
+                                weights = NULL, # This must be kept as 2nd arg.
                                 ..., # Prevent partial matching
                                 model = NULL,
                                 mapper = NULL,
@@ -293,7 +294,6 @@ component.character <- function(object,
                                 # Copy feature
                                 copy = NULL,
                                 # Weights
-                                weights = NULL,
                                 weights_layer = NULL,
                                 weights_selector = NULL,
                                 # Group model parameters
@@ -436,10 +436,13 @@ component.character <- function(object,
   fcall[[1]] <- "f"
   fcall[[2]] <- as.symbol(label)
   names(fcall)[2] <- ""
-  if (is.null(names(fcall)) || (names(fcall)[3] == "")) {
-    # 'main' is the only regular parameter allowed to be nameless,
-    # and only if it's the first parameter (position 3 in this fcall)
+  # 'main' and 'weights' are the only regular parameter allowed to be nameless,
+  # and only if they are the first parameters (position 3 and 4 in fcall)
+  if (is.null(names(fcall)) || identical(names(fcall)[3], "")) {
     names(fcall)[3] <- "main"
+  }
+  if (is.null(names(fcall)) || identical(names(fcall)[4], "")) {
+    names(fcall)[4] <- "weights"
   }
   unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% "")
   if (length(unnamed_arguments) > 0) {
@@ -448,7 +451,7 @@ component.character <- function(object,
     # in the INLA call instead, which isn't very informative.
     stop(paste0(
       "Unnamed arguments detected in component '", label, "'.\n",
-      "  Only the 'main' parameter may be unnamed.\n",
+      "  Only 'main' and 'weights' parameters may be unnamed.\n",
       "  Unnamed arguments at position(s) ",
       paste0(unnamed_arguments, collapse = ", ")
     ))
@@ -464,9 +467,10 @@ component.character <- function(object,
     #    assign(model_name, component$copy, envir = component$env_extra)
 
     # Remove parameters inlabru supports but INLA doesn't,
-    # and substitute parameters that inlabru will transform
+    # or handles differently (weights)
     fcall <- fcall[!(names(fcall) %in% c(
       "main",
+      "weights",
       "mapper",
       "group_mapper",
       "replicate_mapper",
@@ -485,7 +489,6 @@ component.character <- function(object,
 
     # Replace arguments that will be evaluated by a mapper
     suffixes <- list(
-      "weights" = "weights"
     )
     for (arg in names(suffixes)) {
       if (arg %in% names(fcall)) {
@@ -526,6 +529,7 @@ component.character <- function(object,
     # and substitute parameters that inlabru will transform
     fcall <- fcall[!(names(fcall) %in% c(
       "main",
+      "weights",
       "mapper",
       "group_mapper",
       "replicate_mapper",
@@ -546,8 +550,7 @@ component.character <- function(object,
     # TODO: make a more general system, that also handles ngroup etc.
     suffixes <- list(
       "group" = "group",
-      "replicate" = "repl",
-      "weights" = "weights"
+      "replicate" = "repl"
     )
     for (arg in names(suffixes)) {
       if (arg %in% names(fcall)) {
