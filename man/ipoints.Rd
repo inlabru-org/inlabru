@@ -7,7 +7,7 @@
 ipoints(
   region = NULL,
   domain = NULL,
-  name = "x",
+  name = NULL,
   group = NULL,
   int.args = NULL,
   project = NULL
@@ -22,9 +22,13 @@ In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a we
 defining the locations to project the integration points to. In 2D \code{domain} has to be an
 \code{inla.mesh} object describing the projection and granularity of the integration.}
 
-\item{name}{Character array stating the name of the domains dimension(s)}
+\item{name}{Character array stating the name of the domains dimension(s).
+If \code{NULL}, the names are taken from coordinate names from \code{region} for
+\verb{Spatial*} objects, otherwise "x", "y", "coordinateZ" for 2D regions and
+\code{"x"} for 1D regions}
 
-\item{group}{Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged by the projection.}
+\item{group}{Column names of the \code{region} object (if applicable) for which
+the integration points are calculated independently and not merged by the projection.}
 
 \item{int.args}{List of arguments passed to \code{int.polygon}}
 
@@ -104,5 +108,6 @@ if (require("INLA", quietly = TRUE)) {
 
 }
 \author{
-Fabian E. Bachl \email{bachlfab@gmail.com}
+Fabian E. Bachl \email{bachlfab@gmail.com} and
+\email{finn.lindgren@gmail.com}
 }

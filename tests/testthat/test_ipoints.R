@@ -82,7 +82,7 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
     colnames(data.frame(ips)),
     c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional")
   )
-  expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
+  expect_equal(sum(ips$weight) / 2293712, 1, tolerance = midtol)
 
   data(mrsea, package = "inlabru")
   mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = TRUE)
@@ -94,7 +94,7 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(
     colnames(data.frame(ips)),
-    c("weight", "vertex", "season", "x", "y", "z", "optional")
+    c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional")
   )
-  expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
+  expect_equal(sum(ips$weight) / 2293.712, 1, tolerance = midtol)
 })

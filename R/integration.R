@@ -276,6 +276,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
 
   # Wrap everything up and perform projection according to distance and given group argument
   ips <- data.frame(ips)
+  # Temporary names
   colnames(ips) <- c("x", "y", "z")
 
   # Weights

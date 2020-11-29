@@ -22,7 +22,8 @@
 #' @aliases ipoints
 #' @export
 #'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
+#' \email{finn.lindgren@@gmail.com}
 #'
 #' @param region Description of the integration region boundary.
 #' In 1D either a vector of two numerics or a two-column matrix where each row describes and interval.
@@ -30,8 +31,12 @@
 #' @param domain In 1D a single numeric setting the numer of integration points or an `inla.mesh.1d`
 #' defining the locations to project the integration points to. In 2D `domain` has to be an
 #' `inla.mesh` object describing the projection and granularity of the integration.
-#' @param name Character array stating the name of the domains dimension(s)
-#' @param group Column names of the `region` object (if applicable) for which the integration points are calculated independently and not merged by the projection.
+#' @param name Character array stating the name of the domains dimension(s).
+#' If `NULL`, the names are taken from coordinate names from `region` for
+#' `Spatial*` objects, otherwise "x", "y", "coordinateZ" for 2D regions and
+#' `"x"` for 1D regions
+#' @param group Column names of the `region` object (if applicable) for which
+#' the integration points are calculated independently and not merged by the projection.
 #' @param project If TRUE, project the integration points to mesh vertices
 #' @param int.args List of arguments passed to `int.polygon`
 #'
@@ -87,7 +92,8 @@
 #' }
 #' }
 #'
-ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
+#' @importFrom sp coordnames coordinates
+ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
                     project = NULL) {
   int.args.default <- list(method = "stable", nsub = NULL)
@@ -116,7 +122,7 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
   # If region is null treat domain as the region definition
   if (is.null(region)) {
     if (is.null(domain)) {
-      stop("regio and domain can not be NULL at the same time.")
+      stop("region and domain can not be NULL at the same time.")
     }
     else {
       region <- domain
@@ -133,14 +139,19 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
   }
 
   else if (is.integer(region)) {
+    if (is.null(name)) {
+      name <- "x"
+    }
     ips <- data.frame(
       x = region,
       weight = rep(1, length(region))
     )
     colnames(ips) <- c(name, "weight")
-  }
+  } else if (is.numeric(region)) {
+    if (is.null(name)) {
+      name <- "x"
+    }
 
-  else if (is.numeric(region)) {
     if (is.null(dim(region))) {
       region <- matrix(region, nrow = 1)
     }
@@ -213,7 +224,11 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
       ips <- do.call(rbind, ips)
     }
   } else if (inherits(region, "inla.mesh")) {
-
+    coord_names <- c("x", "y", "coordinateZ")
+    if (!is.null(name)) {
+      coord_names[seq_along(name)] <- name
+    }
+    
     # If domain is provided: break
     if (!is.null(domain)) stop("Integration region provided as 2D and domain is not NULL.")
 
@@ -230,7 +245,11 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
     if (!fm_crs_is_null(region$crs)) {
       ips <- stransform(ips, crs = crs)
     }
+    coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else if (inherits(region, "inla.mesh.1d")) {
+    if (is.null(name)) {
+      name <- "x"
+    }
     ips <- data.frame(x = region$loc)
     colnames(ips) <- name
     ips$weight <- Matrix::diag(INLA::inla.mesh.fem(region)$c0)
@@ -261,6 +280,15 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
       group = group,
       project = identical(int.args[["method"]], "stable")
     )
+    
+    coord_names <- c("x", "y", "coordinateZ")
+    if (!is.null(coordnames(region))) {
+      coord_names[seq_along(coordnames(region))] <- coordnames(region)
+    } else if (!is.null(name)) {
+      coord_names[seq_along(name)] <- name
+    }
+    coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
+    
   } else if (inherits(region, "SpatialPolygons") ||
     inherits(region, "SpatialPolygonsDataFrame")) {
 
@@ -321,6 +349,15 @@ ipoints <- function(region = NULL, domain = NULL, name = "x", group = NULL,
     if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(region_crs)) {
       ips <- stransform(ips, crs = region_crs)
     }
+    
+    coord_names <- c("x", "y", "coordinateZ")
+    if (!is.null(coordnames(region))) {
+      coord_names[seq_along(coordnames(region))] <- coordnames(region)
+    } else if (!is.null(name)) {
+      coord_names[seq_along(name)] <- name
+    }
+    coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
+    
   }
 
   ips
