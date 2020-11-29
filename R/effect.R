@@ -449,6 +449,9 @@ component.character <- function(object,
     }
     unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% "")
     if (length(unnamed_arguments) > 0) {
+      # Without this check, R gives the error
+      #   'In str2lang(s) : parsing result not of length one, but 0'
+      # in the INLA call instead, which isn't very informative.
       stop(paste0(
         "Unnamed arguments detected in component '", label, "'.\n",
         "  Only the 'main' parameter may be unnamed.\n",
