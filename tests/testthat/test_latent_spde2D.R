@@ -1,5 +1,70 @@
 local_bru_testthat_setup()
 
+
+test_that("Georeferenced data with sp", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  set.seed(123)
+  mydata <- expand.grid(
+    Easting = seq(5, 45, by = 20),
+    Northing = seq(10, 30, by = 10),
+    KEEP.OUT.ATTRS = FALSE
+  )
+  mydata[["obs"]] <- (mydata$Easting - 20) / 10 + rnorm(NROW(mydata))
+  coordinates(mydata) <- c("Easting", "Northing")
+  
+  mesh <- INLA::inla.mesh.2d(
+    loc = mydata,
+    offset = 5,
+    max.edge = 4,
+    n = 16
+  )
+
+  matern <- INLA::inla.spde2.pcmatern(
+    mesh,
+    prior.sigma = c(10, 0.01),
+    prior.range = c(4, 0.01)
+  )
+
+  # Check that mistaken empty or unnamed arguments are detected  
+  cmp <- obs ~ Intercept(1) + field(coordinates, model = matern, )
+  component_list(cmp)
+  expect_error(
+    component_list(cmp),
+    "Unnamed arguments detected in component .* position\\(s\\) 3"
+  )
+  
+  cmp <- obs ~ Intercept(1) + field(coordinates, model = matern)
+  
+  fit <- bru(
+    cmp, 
+    data = mydata,
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
+  )
+  
+  # Check Intercept
+  expect_equal(
+    fit$summary.fixed["Intercept", "mean"],
+    0.5398535,
+    tolerance = midtol
+  )
+  
+  # Check SPDE
+  expect_equal(
+    fit$summary.random$field$mean[mesh$idx$loc[1:3]],
+    c(-2.6003077, -0.2699909, 3.5188725),
+    tolerance = midtol
+  )
+})
+
+
+
+
 latent_spde2D_group_testdata <- function(num.threads = NULL,
                                          tolerance = NULL,
                                          h = 0.005) {

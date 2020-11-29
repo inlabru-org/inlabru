@@ -443,9 +443,18 @@ component.character <- function(object,
     fcall[[2]] <- as.symbol(label)
     names(fcall)[2] <- ""
     if (is.null(names(fcall)) || (names(fcall)[3] == "")) {
-      # 'main' is the only parameter allowed to be nameless,
+      # 'main' is the only regular parameter allowed to be nameless,
       # and only if it's the first parameter (position 3 in this fcall)
       names(fcall)[3] <- "main"
+    }
+    unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% "")
+    if (length(unnamed_arguments) > 0) {
+      stop(paste0(
+        "Unnamed arguments detected in component '", label, "'.\n",
+        "  Only the 'main' parameter may be unnamed.\n",
+        "  Unnamed arguments at position(s) ",
+        paste0(unnamed_arguments, collapse = ", ")
+      ))
     }
 
     # Store model name or object in the environment
