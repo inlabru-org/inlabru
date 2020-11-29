@@ -80,6 +80,16 @@ bru_info_upgrade <- function(object, old = FALSE) {
   object
 }
 
+
+get_component_type <- function(x, part, components) {
+  if (is.null(x[["copy"]])) {
+    x[[part]][["type"]]
+  } else {
+    components[[x[["copy"]]]][[part]][["type"]]
+  }
+}
+
+
 #' Methods for bru_info objects
 #' @export
 #' @method summary bru_info
@@ -96,7 +106,19 @@ summary.bru_info <- function(object, ...) {
         function(x) {
           list(
             label = x[["label"]],
-            main_type = x[["main"]][["type"]]
+            copy_of = x[["copy"]],
+            main_type = get_component_type(
+              x, "main",
+              object[["model"]][["effects"]]
+            ),
+            group_type = get_component_type(
+              x, "group",
+              object[["model"]][["effects"]]
+            ),
+            replicate_type = get_component_type(
+              x, "replicate",
+              object[["model"]][["effects"]]
+            )
           )
         }
       ),
@@ -124,11 +146,24 @@ print.summary_bru_info <- function(x, ...) {
   cat(paste0("INLA version: ", x$INLA_version, "\n"))
   cat(paste0("Components:\n"))
   for (cmp in x$components) {
-    cat(sprintf(
-      "  %s: Main model type '%s'\n",
-      cmp$label,
-      cmp$main_type
-    ))
+    if (!is.null(cmp$copy_of)) {
+      cat(sprintf(
+        "  %s: Copy of '%s' (types main='%s', group='%s', replicate='%s)\n",
+        cmp$label,
+        cmp$copy_of,
+        cmp$main_type,
+        cmp$group_type,
+        cmp$replicate_type
+      ))
+    } else {
+      cat(sprintf(
+        "  %s: Model types main='%s', group='%s', replicate='%s'\n",
+        cmp$label,
+        cmp$main_type,
+        cmp$group_type,
+        cmp$replicate_type
+      ))
+    }
   }
   cat(paste0("Likelihoods:\n"))
   for (lh in x$lhoods) {
@@ -1449,7 +1484,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       control.predictor = list(compute = TRUE)
     )
   )
-  
+
   # Extract the family of each likelihood
   family <- vapply(
     seq_along(lhoods),
@@ -1467,9 +1502,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   if (is.null(initial) || inherits(initial, "bru")) {
     # Set old result
     state <- evaluate_state(model,
-                            lhoods = lhoods,
-                            result = initial,
-                            property = "mode"
+      lhoods = lhoods,
+      result = initial,
+      property = "mode"
     )[[1]]
     if (inherits(initial, "bru")) {
       result <- initial
@@ -1492,7 +1527,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     stop("Unknown previous result information class")
   }
   old.result <- result
-  
+
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
     A <- evaluate_A(model, lhoods)
@@ -1535,7 +1570,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     if ((!is.null(result) && !is.null(result$mode))) {
       previous_x <- result$mode$x
     }
-    
+
     bru_log_message(
       paste0("iinla: Iteration ", k, " [max:", options$bru_max_iter, "]"),
       verbose = options$bru_verbose,
@@ -1573,13 +1608,13 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       )
 
     result <- try_callstack(
-        do.call(
-          INLA::inla,
-          inla.options,
-          envir = environment(model$effects)
-        )
+      do.call(
+        INLA::inla,
+        inla.options,
+        envir = environment(model$effects)
+      )
     )
-    
+
     if (inherits(result, "try-error")) {
       bru_log_message(
         paste0("iinla: Problem in inla: ", result),
@@ -1643,9 +1678,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     # Update stack given current result
     state0 <- state
     state <- evaluate_state(model,
-                            lhoods = lhoods,
-                            result = result,
-                            property = "mode"
+      lhoods = lhoods,
+      result = result,
+      property = "mode"
     )[[1]]
     if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
       if (do_line_search) {

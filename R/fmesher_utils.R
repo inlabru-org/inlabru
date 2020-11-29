@@ -83,8 +83,10 @@ try_callstack <- function(expr) {
     assign("error_stack", value = stack, envir = try_envir)
   }
   result <- try(
-    withCallingHandlers(expr,
-                        error=error_fun),
+    withCallingHandlers(
+      expr,
+      error = error_fun
+    ),
     silent = TRUE
   )
   if (inherits(result, "try-error")) {
@@ -95,4 +97,3 @@ try_callstack <- function(expr) {
   }
   invisible(result)
 }
-

@@ -13,7 +13,7 @@ test_that("Georeferenced data with sp", {
   )
   mydata[["obs"]] <- (mydata$Easting - 20) / 10 + rnorm(NROW(mydata))
   coordinates(mydata) <- c("Easting", "Northing")
-  
+
   mesh <- INLA::inla.mesh.2d(
     loc = mydata,
     offset = 5,
@@ -27,17 +27,17 @@ test_that("Georeferenced data with sp", {
     prior.range = c(4, 0.01)
   )
 
-  # Check that mistaken empty or unnamed arguments are detected  
+  # Check that mistaken empty or unnamed arguments are detected
   cmp <- obs ~ Intercept(1) + field(coordinates, model = matern, )
   expect_error(
     component_list(cmp),
     "Unnamed arguments detected in component .* position\\(s\\) 3"
   )
-  
+
   cmp <- obs ~ Intercept(1) + field(coordinates, model = matern)
-  
+
   fit <- bru(
-    cmp, 
+    cmp,
     data = mydata,
     options = list(
       control.inla = list(
@@ -45,14 +45,14 @@ test_that("Georeferenced data with sp", {
       )
     )
   )
-  
+
   # Check Intercept
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
     0.5398535,
     tolerance = midtol
   )
-  
+
   # Check SPDE
   expect_equal(
     fit$summary.random$field$mean[mesh$idx$loc[1:3]],
@@ -72,7 +72,7 @@ latent_spde2D_group_testdata <- function() {
   mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = TRUE)
   coordnames(mrsea$points) <- c("Easting", "Northing")
   coordnames(mrsea$samplers) <- c("Easting", "Northing")
-  
+
   mrsea$points <- mrsea$points[mrsea$points$season %in% c(1, 2), ]
   mrsea$samplers <- mrsea$samplers[mrsea$samplers$season %in% c(1, 2), ]
 
@@ -85,7 +85,8 @@ latent_spde2D_group_testdata <- function() {
     prior.range = c(10, 0.01)
   )
 
-  cmp <- coordinates + season ~
+  cmp <-
+    coordinates + season ~
     mySmooth(
       main = coordinates, model = matern,
       group = season, ngroup = 2

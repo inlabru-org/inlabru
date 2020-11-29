@@ -104,14 +104,14 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
   if (allow_verbose) {
     if ((!is.null(verbose) && (verbose >= verbosity)) ||
       (is.null(verbose) &&
-       bru_options_get("bru_verbose", include_default = TRUE) >= verbosity)) {
+        bru_options_get("bru_verbose", include_default = TRUE) >= verbosity)) {
       message(..., domain = domain, appendLF = appendLF)
     }
   }
   if ((!is.null(verbose_store) && (verbose_store >= verbosity)) ||
     !allow_verbose ||
     (is.null(verbose_store) &&
-     bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity)) {
+      bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity)) {
     envir <- bru_env_get()
     envir$log <- c(
       envir$log,
@@ -544,21 +544,25 @@ summary.bru_options <- function(object,
       } else {
         result[[name]] <- list(
           is_list = FALSE,
-          value = if (is.null(combined[[name]])) {"NULL"} else {combined[[name]]},
-          origin = 
+          value = if (is.null(combined[[name]])) {
+            "NULL"
+          } else {
+            combined[[name]]
+          },
+          origin =
             if (
               !is.null(default[[name]]) &&
-              (default[[name]] == combined[[name]])
+                (default[[name]] == combined[[name]])
             ) {
               "default"
             } else if (
               !is.null(global[[name]]) &&
-              (global[[name]] == combined[[name]])
+                (global[[name]] == combined[[name]])
             ) {
               "global"
             } else if (
               !is.null(object[[name]]) &&
-              (object[[name]] == combined[[name]])
+                (object[[name]] == combined[[name]])
             ) {
               "user"
             } else {
@@ -580,7 +584,7 @@ summary.bru_options <- function(object,
     global <- bru_options()
   }
   combined <- bru_options(default, global, object)
-  
+
   if (legend) {
     legend <- c(
       "default = value from the default options",
@@ -621,7 +625,7 @@ print.summary_bru_options <- function(x, ...) {
       }
     }
   }
-  
+
   if (!is.null(x[["legend"]])) {
     cat("Legend:\n")
     cat(paste0("  ", x[["legend"]], collapse = "\n"))

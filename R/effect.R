@@ -227,6 +227,12 @@ component <- function(...) {
 #' (Default: NULL, for auto-determination)
 #' @param season.length Passed on to `INLA::f()` for model `"seasonal"`
 #' (TODO: check if this parameter is still fully handled)
+# Copy feature
+#' @param copy character; label of other component that this component should
+#' be a copy of. If the `fixed = FALSE`, a scaling constant is estimated, via a
+#' hyperparameter. If `fixed = TRUE`, the component scaling is fixed, by
+#' default to 1; for fixed scaling, it's more efficient to express the scaling
+#' in the predictor expression instead of making a copy component.
 # Weights
 #' @param weights,weights_layer,weights_selector
 #' Optional specification of effect scaling weights.
@@ -284,6 +290,8 @@ component.character <- function(object,
                                 n = NULL,
                                 values = NULL,
                                 season.length = NULL,
+                                # Copy feature
+                                copy = NULL,
                                 # Weights
                                 weights = NULL,
                                 weights_layer = NULL,
@@ -314,7 +322,7 @@ component.character <- function(object,
   # The label
   label <- object
 
-  if (is.null(model)) {
+  if (is.null(model) && is.null(copy)) {
     # TODO: may need a special marker to autodetect factor variables,
     #       which can only be autodetected in a data-aware pass.
     model <- "linear"
@@ -415,13 +423,86 @@ component.character <- function(object,
           selector = weights_selector
         )
       },
+    copy = copy,
     A.msk = A.msk,
     env = envir,
     env_extra = envir_extra
   )
 
   # Main bit
-  if (component$main$type %in% c("offset")) {
+  # Construct a call to the f function from the parameters provided
+  # Ultimately, this call will be converted to the model formula presented to INLA
+  fcall <- sys.call()
+  fcall[[1]] <- "f"
+  fcall[[2]] <- as.symbol(label)
+  names(fcall)[2] <- ""
+  if (is.null(names(fcall)) || (names(fcall)[3] == "")) {
+    # 'main' is the only regular parameter allowed to be nameless,
+    # and only if it's the first parameter (position 3 in this fcall)
+    names(fcall)[3] <- "main"
+  }
+  unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% "")
+  if (length(unnamed_arguments) > 0) {
+    # Without this check, R gives the error
+    #   'In str2lang(s) : parsing result not of length one, but 0'
+    # in the INLA call instead, which isn't very informative.
+    stop(paste0(
+      "Unnamed arguments detected in component '", label, "'.\n",
+      "  Only the 'main' parameter may be unnamed.\n",
+      "  Unnamed arguments at position(s) ",
+      paste0(unnamed_arguments, collapse = ", ")
+    ))
+  }
+
+  # Special and general cases:
+  if (!is.null(copy)) {
+    # inla copy feature
+
+    # Store copy-model name or object in the environment
+    #    model_name <- paste0("BRU_", label, "_copy_model")
+    #    fcall[["copy"]] <- component$copy # as.symbol(model_name)
+    #    assign(model_name, component$copy, envir = component$env_extra)
+
+    # Remove parameters inlabru supports but INLA doesn't,
+    # and substitute parameters that inlabru will transform
+    fcall <- fcall[!(names(fcall) %in% c(
+      "main",
+      "mapper",
+      "group_mapper",
+      "replicate_mapper",
+      "A.msk",
+      "map",
+      "mesh",
+      "main_layer",
+      "group_layer",
+      "replicate_layer",
+      "weights_layer",
+      "main_selector",
+      "group_selector",
+      "replicate_selector",
+      "weights_selector"
+    ))]
+
+    # Replace arguments that will be evaluated by a mapper
+    suffixes <- list(
+      "weights" = "weights"
+    )
+    for (arg in names(suffixes)) {
+      if (arg %in% names(fcall)) {
+        fcall[[arg]] <- as.symbol(paste0(label, ".", suffixes[[arg]]))
+      }
+    }
+
+    component$inla.formula <-
+      as.formula(paste0(
+        "~ . + ",
+        as.character(parse(text = deparse(fcall)))
+      ),
+      env = envir
+      )
+
+    component$fcall <- fcall
+  } else if (component$main$type %in% c("offset")) {
     component$inla.formula <- as.formula(paste0("~ . + offset(", label, ")"),
       env = envir
     )
@@ -436,30 +517,6 @@ component.character <- function(object,
         replicate = component$replicate$mapper
       ))
   } else {
-    # Construct a call to the f function from the parameters provided
-    # Ultimately, this call will be converted to the model formula presented to INLA
-    fcall <- sys.call()
-    fcall[[1]] <- "f"
-    fcall[[2]] <- as.symbol(label)
-    names(fcall)[2] <- ""
-    if (is.null(names(fcall)) || (names(fcall)[3] == "")) {
-      # 'main' is the only regular parameter allowed to be nameless,
-      # and only if it's the first parameter (position 3 in this fcall)
-      names(fcall)[3] <- "main"
-    }
-    unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% "")
-    if (length(unnamed_arguments) > 0) {
-      # Without this check, R gives the error
-      #   'In str2lang(s) : parsing result not of length one, but 0'
-      # in the INLA call instead, which isn't very informative.
-      stop(paste0(
-        "Unnamed arguments detected in component '", label, "'.\n",
-        "  Only the 'main' parameter may be unnamed.\n",
-        "  Unnamed arguments at position(s) ",
-        paste0(unnamed_arguments, collapse = ", ")
-      ))
-    }
-
     # Store model name or object in the environment
     model_name <- paste0("BRU_", label, "_main_model")
     fcall[["model"]] <- as.symbol(model_name)
@@ -484,15 +541,6 @@ component.character <- function(object,
       "replicate_selector",
       "weights_selector"
     ))]
-
-    # A trick for "Copy" models
-    if ("copy" %in% names(fcall)) {
-      ### TODO:
-      ### Check this. Where is the copy information stored and used?
-      ### Should postprocess components to link them together.
-      fcall[["copy"]] <- NULL
-      fcall$model <- NULL
-    }
 
     # Replace arguments that will be evaluated by a mapper
     # TODO: make a more general system, that also handles ngroup etc.
@@ -788,8 +836,15 @@ add_mappers.component <- function(component, lhoods, ...) {
 #' @export
 #' @rdname add_mappers
 add_mappers.component_list <- function(components, lhoods, ...) {
-  for (k in seq_along(components)) {
+  is_copy <- vapply(components, function(x) !is.null(x[["copy"]]), TRUE)
+  for (k in which(!is_copy)) {
     components[[k]] <- add_mappers(components[[k]], lhoods)
+  }
+  for (k in which(is_copy)) {
+    if (is.null(components[[k]][["copy"]])) {
+      stop("")
+    }
+    components[[k]]$mapper <- components[[components[[k]][["copy"]]]][["mapper"]]
   }
   components
 }
@@ -1218,18 +1273,18 @@ bru_mapper.default <- function(mapper,
 
 
 #' Implementation methods for mapper objects
-#' 
+#'
 #' A `bru_mapper` sub-class implementation must provide an
 #' `ibm_matrix()` method. If the model size 'n' and definition
 #' values 'values' are stored in the object itself, default methods are
 #' available (see Details). Otherwise the
 #' `ibm_n()` and `ibm_values()` methods also need to be provided.
-#' 
+#'
 #' @param \dots Arguments passed on to other methods
 #' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
 #' @seealso [bru_mapper()]
 #' @name bru_mapper_methods
-#' 
+#'
 #' @details
 #' * The default `ibm_n()` method returns a non-null element 'n' from the
 #' mapper object, and gives an error if it doesn't exist.
@@ -1699,12 +1754,12 @@ ibm_amatrix.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
 summary.component <- function(object, ...) {
   result <- list(
     "Label" = object$label,
-    "Main" = sprintf(
+    "  Main" = sprintf(
       "input '%s',\ttype '%s'",
       deparse(object[["main"]][["input"]][["input"]]),
       object[["main"]][["type"]]
     ),
-    "Group" =
+    "  Group" =
       if (!is.null(object[["group"]][["input"]][["input"]])) {
         sprintf(
           "input '%s',\ttype '%s'",
@@ -1714,7 +1769,7 @@ summary.component <- function(object, ...) {
       } else {
         NULL
       },
-    "Replicate" =
+    "  Replicate" =
       if (!is.null(object[["replicate"]][["input"]][["input"]])) {
         sprintf(
           "input '%s',\ttype '%s'",
@@ -1724,8 +1779,11 @@ summary.component <- function(object, ...) {
       } else {
         NULL
       },
-    "INLA formula" = as.character(object$inla.formula)
+    "  INLA formula" = as.character(object$inla.formula)
   )
+  if (!is.null(object[["copy"]])) {
+    result[["Copy"]] <- sprintf("Copy of component '%s'", object[["copy"]])
+  }
   class(result) <- c("summary_component", "list")
   result
 }

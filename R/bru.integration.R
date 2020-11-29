@@ -228,7 +228,7 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
     if (!is.null(name)) {
       coord_names[seq_along(name)] <- name
     }
-    
+
     # If domain is provided: break
     if (!is.null(domain)) stop("Integration region provided as 2D and domain is not NULL.")
 
@@ -280,7 +280,7 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
       group = group,
       project = identical(int.args[["method"]], "stable")
     )
-    
+
     coord_names <- c("x", "y", "coordinateZ")
     if (!is.null(coordnames(region))) {
       coord_names[seq_along(coordnames(region))] <- coordnames(region)
@@ -288,7 +288,6 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
       coord_names[seq_along(name)] <- name
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
-    
   } else if (inherits(region, "SpatialPolygons") ||
     inherits(region, "SpatialPolygonsDataFrame")) {
 
@@ -349,7 +348,7 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
     if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(region_crs)) {
       ips <- stransform(ips, crs = region_crs)
     }
-    
+
     coord_names <- c("x", "y", "coordinateZ")
     if (!is.null(coordnames(region))) {
       coord_names[seq_along(coordnames(region))] <- coordnames(region)
@@ -357,7 +356,6 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
       coord_names[seq_along(name)] <- name
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
-    
   }
 
   ips

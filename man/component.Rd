@@ -19,6 +19,7 @@ component(...)
   n = NULL,
   values = NULL,
   season.length = NULL,
+  copy = NULL,
   weights = NULL,
   weights_layer = NULL,
   weights_selector = NULL,
@@ -72,6 +73,12 @@ the latent model. Normally generated internally based on the mapping details.
 
 \item{season.length}{Passed on to \code{INLA::f()} for model \code{"seasonal"}
 (TODO: check if this parameter is still fully handled)}
+
+\item{copy}{character; label of other component that this component should
+be a copy of. If the \code{fixed = FALSE}, a scaling constant is estimated, via a
+hyperparameter. If \code{fixed = TRUE}, the component scaling is fixed, by
+default to 1; for fixed scaling, it's more efficient to express the scaling
+in the predictor expression instead of making a copy component.}
 
 \item{weights, weights_layer, weights_selector}{Optional specification of effect scaling weights.
 Same syntax as for \code{main}.}

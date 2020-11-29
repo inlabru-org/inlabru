@@ -175,7 +175,7 @@ local_mrsea_rebuild_CRS <- function(x, use_km = FALSE) {
     x$mesh <- fm_spTransform(x$mesh, crs_km)
     x$samplers <- sp::spTransform(x$samplers, crs_km)
     x$samplers$weight <- x$samplers$weight / 1000
-      x$points <- sp::spTransform(x$points, crs_km)
+    x$points <- sp::spTransform(x$points, crs_km)
     x$boundary <- sp::spTransform(x$boundary, crs_km)
     x$covar <- sp::spTransform(x$covar, crs_km)
   }
