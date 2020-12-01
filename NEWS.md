@@ -1,5 +1,9 @@
 # inlabru (development version)
 
+* Support for the INLA "copy" feature, `comp2(input, copy = "comp1")`
+
+* Allow component weights to be an unnamed parameter, `comp(input, weights, ...)`
+
 # inlabru 2.1.15
 
 * New options system

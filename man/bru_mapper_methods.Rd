@@ -5,9 +5,9 @@
 \alias{ibm_n.default}
 \alias{ibm_values.default}
 \alias{ibm_amatrix.default}
-\alias{ibm_amatrix.bru_mapper_inla_mesh_2d}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
 \alias{ibm_values.bru_mapper_inla_mesh_2d}
+\alias{ibm_amatrix.bru_mapper_inla_mesh_2d}
 \alias{ibm_n.bru_mapper_inla_mesh_1d}
 \alias{ibm_values.bru_mapper_inla_mesh_1d}
 \alias{ibm_amatrix.bru_mapper_inla_mesh_1d}
@@ -34,8 +34,6 @@
 \method{ibm_values}{default}(mapper, ...)
 
 \method{ibm_amatrix}{default}(mapper, ...)
-
-\method{ibm_amatrix}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
 
 \method{ibm_n}{bru_mapper_inla_mesh_2d}(mapper, ...)
 

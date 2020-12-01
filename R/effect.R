@@ -1330,16 +1330,6 @@ ibm_amatrix.default <- function(mapper, ...) {
 
 
 
-#' @param input The values for which to produce a mapping matrix
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
-  if (!is.matrix(input) && !inherits(input, "Spatial")) {
-    val <- as.matrix(val)
-  }
-  INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
-}
-
 
 
 #' @param mesh An `inla.mesh.1d` or `inla.mesh.2d` object to use as a mapper
@@ -1371,7 +1361,7 @@ ibm_values.bru_mapper_inla_mesh_2d <- function(mapper, ...) {
 #' @rdname bru_mapper_methods
 ibm_amatrix.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
   if (!is.matrix(input) && !inherits(input, "Spatial")) {
-    val <- as.matrix(val)
+    input <- as.matrix(input)
   }
   INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
 }
