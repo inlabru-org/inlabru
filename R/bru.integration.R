@@ -172,11 +172,26 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     stop("Unable to determine integration domain definition")
   }
 
-  if (is_1d && !is.null(samplers) && !is.null(domain) && is.numeric(domain) && length(domain) == 1) {
+  if (is_1d && !is.null(samplers) && !is.null(domain) &&
+      is.numeric(domain) && length(domain) == 1) {
     int.args[["nsub1"]] <- domain
     domain <- NULL
     int.args[["method"]] <- "direct"
   }
+  if (is_2d && !is.null(samplers) && !is.null(domain) &&
+      is.numeric(domain) && length(domain) == 1) {
+    int.args[["nsub2"]] <- domain
+    domain <- NULL
+    int.args[["method"]] <- "direct"
+  }
+
+  # Do this check and transfer once more
+  if (is.null(domain) &&
+      inherits(samplers, c("inla.mesh.1d", "inla.mesh"))) {
+    domain <- samplers
+    samplers <- NULL
+  }
+  
   
   if (is_1d && is.null(name)) {
     name <- "x"
@@ -275,7 +290,9 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     ips <- do.call(rbind, ips)
-  } else if (inherits(domain, "inla.mesh") && is.null(samplers)) {
+  } else if (inherits(domain, "inla.mesh") &&
+             is.null(samplers) &&
+             identical(int.args[["method"]], "stable")) {
     coord_names <- c("x", "y", "coordinateZ")
     if (!is.null(name)) {
       coord_names[seq_along(name)] <- name
@@ -309,10 +326,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
     if (class(samplers)[1] == "SpatialLines") {
-      samplers <- SpatialLinesDataFrame(samplers, data = data.frame(weight = rep(1, length(samplers))))
+      samplers <- SpatialLinesDataFrame(
+        samplers,
+        data = data.frame(weight = rep(1, length(samplers)))
+      )
     }
 
-    # Set weights to 1 if not provided
+    # Set weight to 1 if not provided
     if (!("weight" %in% names(samplers))) {
       warning("The integration points provided have no weight column. Setting weights to 1.")
       samplers$weight <- 1
@@ -330,8 +350,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       coord_names[seq_along(name)] <- name
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
-  } else if (inherits(samplers, "SpatialPolygons") ||
-    inherits(samplers, "SpatialPolygonsDataFrame")) {
+  } else if (is_2d &&
+             (inherits(samplers, c("SpatialPolygons",
+                                   "SpatialPolygonsDataFrame")) ||
+              is.null(samplers))) {
+    if (is.null(samplers)) {
+      stop("Direct integration scheme for mesh domain with no samplers is not yet implemented.")
+    }
 
     # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
     if (class(samplers)[1] == "SpatialPolygons") {
@@ -351,6 +376,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers <- stransform(samplers, crs = sp::CRS("+proj=cea +units=km"))
     }
 
+    # TODO: this doesn't handle holes properly.
     polyloc <- do.call(rbind, lapply(
       1:length(samplers),
       function(k) {
