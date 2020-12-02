@@ -40,7 +40,7 @@
 #' @param domain Either
 #' * when `region` is a 1D interval(s) definition only, `domain` can be
 #'   a single integer for the number of integration points to place in each 1D
-#'   interval, overriding `int.args[["nsub"]]`, and otherwise
+#'   interval, overriding `int.args[["nsub1"]]`, and otherwise
 #' * when `region` is `NULL`, `domain` can be a numeric vector of points,
 #'   each given integration weight 1 (and no additional points are added
 #'   in between),
@@ -111,13 +111,19 @@
 ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
                     project = NULL) {
-  int.args.default <- list(method = "stable", nsub = NULL)
+  int.args.default <- list(method = "stable", nsub1 = 30, nsub2 = 9)
   if (is.null(int.args)) {
     int.args <- list()
   }
   missing.args <- setdiff(names(int.args.default), names(int.args))
   int.args[missing.args] <- int.args.default[missing.args]
-
+  if (!is.null(int.args[["nsub"]])) {
+    int.args[["nsub1"]] <- int.args[["nsub"]]
+  }
+  if (!is.null(int.args[["nsub"]])) {
+    int.args[["nsub2"]] <- int.args[["nsub"]]
+  }
+  
   if (!is.null(project)) {
     if (project && !identical(int.args$method, "stable")) {
       stop("ipoints(project=TRUE) is deprecated, and int.args$methods != 'stable'")
@@ -167,9 +173,9 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   }
 
   if (is_1d && !is.null(samplers) && !is.null(domain) && is.numeric(domain) && length(domain) == 1) {
-    int.args$nsub <- domain
+    int.args[["nsub1"]] <- domain
     domain <- NULL
-    int.args$method <- "direct"
+    int.args[["method"]] <- "direct"
   }
   
   if (is_1d && is.null(name)) {
@@ -197,9 +203,6 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                       weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0))
     colnames(ips) <- c(name, "weight")
   } else if (is_1d) {
-    if (is.null(int.args$nsub)) {
-      int.args$nsub <- 30
-    }
 
     domain_range <-
       if (inherits(domain, "inla.mesh.1d")) {
@@ -230,17 +233,18 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     if (domain$degree >= 2) {
       warning("Integration points projected onto knots may lead to instability for degree >= 2 basis functions.")
     }
+    nsub <- int.args[["nsub1"]]
     u <- rep(
-      (seq_len(int.args$nsub) - 0.5) / int.args$nsub,
+      (seq_len(nsub) - 0.5) / nsub,
       domain$n - 1
     )
     int_loc <-
-      domain$loc[rep(seq_len(domain$n - 1), each = int.args$nsub)] * (1 - u) +
-      domain$loc[rep(seq_len(domain$n - 1) + 1, each = int.args$nsub)] * u
+      domain$loc[rep(seq_len(domain$n - 1), each = nsub)] * (1 - u) +
+      domain$loc[rep(seq_len(domain$n - 1) + 1, each = nsub)] * u
     int_w <-
-      (domain$loc[rep(seq_len(domain$n - 1) + 1, each = int.args$nsub)] -
-         domain$loc[rep(seq_len(domain$n - 1), each = int.args$nsub)]) /
-      int.args$nsub
+      (domain$loc[rep(seq_len(domain$n - 1) + 1, each = nsub)] -
+         domain$loc[rep(seq_len(domain$n - 1), each = nsub)]) /
+      nsub
     
     for (j in 1:nrow(samplers)) {
       subsamplers <- samplers[j, ]
@@ -373,7 +377,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     ips <- int.polygon(domain,
       loc = polyloc[, 1:2], group = polyloc[, 3],
-      method = int.args$method, nsub = int.args$nsub
+      method = int.args$method, nsub = int.args$nsub2
     )
     df <- data.frame(samplers@data[ips$group, pregroup, drop = FALSE],
       weight = ips[, "weight"]

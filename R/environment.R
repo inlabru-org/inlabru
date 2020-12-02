@@ -157,7 +157,15 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #'   values for the latent variables. This will be used as a
 #'   starting point for further improvement of the approximate posterior.}
 #' \item{bru_int_args}{List of arguments passed all the way to the
-#' integration method `ipoints` and `int.polygon` for 'cp' family models}
+#' integration method `ipoints` and `int.polygon` for 'cp' family models;
+#' \describe{
+#' \item{method}{"stable" or "direct". For "stable" (default) integration points
+#' are aggregated to mesh vertices.}
+#' \item{nsub1}{Number of integration points per knot interval in 1D. Default 30.}
+#' \item{nsub2}{Number of integration points along a triangle edge for 2D. Default 9.}
+#' \item{nsub}{Deprecated parameter that overrides `nsub1` and `nsub2` if set. Default `NULL`.}
+#' }
+#' }
 #' \item{bru_method}{List of arguments controlling the iterative inlabru method:
 #' \describe{
 #' \item{taylor}{Either 'legacy' (for the pre-2.1.15 method) or 'pandemic'
@@ -263,7 +271,7 @@ bru_options_default <- function() {
     bru_verbose_store = 1,
     bru_max_iter = 10,
     bru_run = TRUE,
-    bru_int_args = list(method = "stable"), # nsub: NULL
+    bru_int_args = list(method = "stable", nsub1 = 30, nsub2 = 9),
     bru_method = list(
       taylor = "pandemic",
       search = "all",

@@ -519,7 +519,7 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 #' @param mesh An inla.mesh object
 #' @param loc Locations defining the polygons
 #' @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
-#' @param method Which integration method to use
+#' @param method Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")
 #' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
 #' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
@@ -528,7 +528,7 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
   if (is.null(group)) {
     group <- rep(1, nrow(loc))
   }
-  method <- match.arg(method, c("stable", "basic"))
+  method <- match.arg(method, c("stable", "direct"))
 
   ipsl <- list()
   # print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
