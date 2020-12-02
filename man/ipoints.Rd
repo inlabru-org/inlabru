@@ -5,7 +5,7 @@
 \title{Generate integration points}
 \usage{
 ipoints(
-  region = NULL,
+  samplers = NULL,
   domain = NULL,
   name = NULL,
   group = NULL,
@@ -14,8 +14,9 @@ ipoints(
 )
 }
 \arguments{
-\item{region}{Description of the integration region boundary.
-In 1D, a two-column matrix where each row describes an interval, or \code{NULL}
+\item{samplers}{Description of the integration region boundary.
+In 1D, a length 2 vector or two-column matrix where each row describes an interval,
+or \code{NULL}
 In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a \code{weight} column
 defining the width of the a transect line, and optionally further columns used by the
 \code{group} argument, or \code{NULL}.  When \code{domain} is \code{NULL}, \code{region} may also
@@ -45,9 +46,6 @@ the integration points are calculated independently and not merged by the projec
 \item{int.args}{List of arguments passed to \code{int.polygon}}
 
 \item{project}{If TRUE, project the integration points to mesh vertices}
-
-\item{samplers}{A \verb{Spatial[Points/Lines/Polygons]DataFrame} object, or a
-two-column matrix of 1D integration intervals}
 }
 \value{
 A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
@@ -55,11 +53,11 @@ A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration po
 \description{
 This function generates points in one or two dimensions with a weight attached to each point.
 The weighted sum of a function evaluated at these points is the integral of that function approximated
-by linear basis functions. The parameter \code{region} describes the area(s) integrated over.
+by linear basis functions. The parameter \code{samplers} describes the area(s) integrated over.
 
-In case of a single dimension \code{region} is supposed to be a two-column \code{matrix} where
+In case of a single dimension \code{samplers} is supposed to be a two-column \code{matrix} where
 each row describes the start and end point of the interval to integrate over. In the two-dimensional
-case \code{region} can be either a \code{SpatialPolygon}, an \code{inla.mesh} or a
+case \code{samplers} can be either a \code{SpatialPolygon}, an \code{inla.mesh} or a
 \code{SpatialLinesDataFrame} describing the area to integrate over. If a \code{SpatialLineDataFrame}
 is provided it has to have a column called 'weight' in order to indicate the width of the line.
 
@@ -67,7 +65,11 @@ The domain parameter is an \code{inla.mesh.1d} or \code{inla.mesh} object that c
 project the integration points to the vertices of the mesh. This reduces the final number of
 integration points and reduces the computational cost of the integration. The projection can also
 prevent numerical issues in spatial LGCP models where each observed point is ideally surrounded
-by three integration point sitting at the coresponding mesh vertices. For convenience, the
+by three integration point sitting at the corresponding mesh vertices. This is controlled
+by \code{int.args$method="stable"} (default) or \code{"direct"}, where the latter uses the integration
+points directly, without aggregating to the mesh vertices.
+
+For convenience, the
 \code{domain} parameter can also be a single integer setting the number of equally spaced integration
 points in the one-dimensional case.
 }

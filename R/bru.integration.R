@@ -3,11 +3,11 @@
 #' @description
 #' This function generates points in one or two dimensions with a weight attached to each point.
 #' The weighted sum of a function evaluated at these points is the integral of that function approximated
-#' by linear basis functions. The parameter `region` describes the area(s) integrated over.
+#' by linear basis functions. The parameter `samplers` describes the area(s) integrated over.
 #'
-#' In case of a single dimension `region` is supposed to be a two-column `matrix` where
+#' In case of a single dimension `samplers` is supposed to be a two-column `matrix` where
 #' each row describes the start and end point of the interval to integrate over. In the two-dimensional
-#' case `region` can be either a `SpatialPolygon`, an `inla.mesh` or a
+#' case `samplers` can be either a `SpatialPolygon`, an `inla.mesh` or a
 #' `SpatialLinesDataFrame` describing the area to integrate over. If a `SpatialLineDataFrame`
 #' is provided it has to have a column called 'weight' in order to indicate the width of the line.
 #'
@@ -15,7 +15,11 @@
 #' project the integration points to the vertices of the mesh. This reduces the final number of
 #' integration points and reduces the computational cost of the integration. The projection can also
 #' prevent numerical issues in spatial LGCP models where each observed point is ideally surrounded
-#' by three integration point sitting at the coresponding mesh vertices. For convenience, the
+#' by three integration point sitting at the corresponding mesh vertices. This is controlled
+#' by `int.args$method="stable"` (default) or `"direct"`, where the latter uses the integration
+#' points directly, without aggregating to the mesh vertices.
+#' 
+#' For convenience, the
 #' `domain` parameter can also be a single integer setting the number of equally spaced integration
 #' points in the one-dimensional case.
 #'
@@ -25,10 +29,9 @@
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
 #' \email{finn.lindgren@@gmail.com}
 #'
-#' @param samplers A `Spatial[Points/Lines/Polygons]DataFrame` object, or a
-#' two-column matrix of 1D integration intervals
-#' @param region Description of the integration region boundary.
-#' In 1D, a two-column matrix where each row describes an interval, or `NULL`
+#' @param samplers Description of the integration region boundary.
+#' In 1D, a length 2 vector or two-column matrix where each row describes an interval,
+#' or `NULL`
 #' In 2D either a `SpatialPolygon` or a `SpatialLinesDataFrame` with a `weight` column
 #' defining the width of the a transect line, and optionally further columns used by the
 #' `group` argument, or `NULL`.  When `domain` is `NULL`, `region` may also
@@ -105,7 +108,7 @@
 #' }
 #'
 #' @importFrom sp coordnames coordinates
-ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
+ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
                     project = NULL) {
   int.args.default <- list(method = "stable", nsub = NULL)
@@ -130,16 +133,16 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
   }
   
   if (is.null(domain) &&
-      inherits(region, c("inla.mesh.1d", "inla.mesh"))) {
-    domain <- region
-    region <- NULL
+      inherits(samplers, c("inla.mesh.1d", "inla.mesh"))) {
+    domain <- samplers
+    samplers <- NULL
   }
 
   is_2d <-
     (
-      !is.null(region) &&
+      !is.null(samplers) &&
         inherits(
-          region,
+          samplers,
           c(
             "SpatialPoints",
             "SpatialPointsDataFrame",
@@ -153,8 +156,8 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
     inherits(domain, "inla.mesh")
   is_1d <- !is_2d &&
     (
-      (!is.null(region) &&
-         is.numeric(region)) ||
+      (!is.null(samplers) &&
+         is.numeric(samplers)) ||
       (!is.null(domain) &&
          (is.numeric(domain) ||
             inherits(domain, "inla.mesh.1d")))
@@ -163,7 +166,7 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
     stop("Unable to determine integration domain definition")
   }
 
-  if (is_1d && !is.null(region) && !is.null(domain) && is.numeric(domain) && length(domain) == 1) {
+  if (is_1d && !is.null(samplers) && !is.null(domain) && is.numeric(domain) && length(domain) == 1) {
     int.args$nsub <- domain
     domain <- NULL
     int.args$method <- "direct"
@@ -175,16 +178,20 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
   
   pregroup <- NULL
 
-  if (is.data.frame(region)) {
-    if (!("weight" %in% names(region))) {
-      region$weight <- 1
+  if (is.data.frame(samplers)) {
+    if (!("weight" %in% names(samplers))) {
+      samplers$weight <- 1
     }
-    ips <- region
-  } else if (is_1d && is.null(region) && is.numeric(domain)) {
+    ips <- samplers
+  } else if (is_1d && is.null(samplers) && is.numeric(domain)) {
     ips <- data.frame(x = as.vector(domain),
                       weight = 1)
     colnames(ips) <- c(name, "weight")
-  } else if (is_1d && is.null(region) && inherits(domain, "inla.mesh.1d") &&
+  } else if (is_1d && is.null(domain) && is.integer(samplers)) {
+    ips <- data.frame(x = as.vector(samplers),
+                      weight = 1)
+    colnames(ips) <- c(name, "weight")
+  } else if (is_1d && is.null(samplers) && inherits(domain, "inla.mesh.1d") &&
              identical(int.args[["method"]], "stable")) {
     ips <- data.frame(x = domain$loc,
                       weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0))
@@ -201,24 +208,24 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
         NULL
       }
     
-    if (is.null(region)) {
-      region <- matrix(domain_range, 1, 2)
+    if (is.null(samplers)) {
+      samplers <- matrix(domain_range, 1, 2)
     } else {
-      if (is.null(dim(region))) {
-        region <- matrix(region, nrow = 1)
+      if (is.null(dim(samplers))) {
+        samplers <- matrix(samplers, nrow = 1)
       }
-      if (ncol(region) != 2) {
+      if (ncol(samplers) != 2) {
         stop("Interval description matrix must have 2 elements or be a 2-column matrix.")
       }
       if (is.null(domain)) {
-        domain <- INLA::inla.mesh.1d(sort(unique(as.vector(region))))
+        domain <- INLA::inla.mesh.1d(sort(unique(as.vector(samplers))))
       }
     }
-    # Now region is a 2-column matrix, and domain is an `inla.mesh.1d` object.
+    # Now samplers is a 2-column matrix, and domain is an `inla.mesh.1d` object.
 
     ips <- list()
 
-    # Integrate over each region subinterval, with nsub integration points
+    # Integrate over each samplers subinterval, with nsub integration points
     # per domain knot interval
     if (domain$degree >= 2) {
       warning("Integration points projected onto knots may lead to instability for degree >= 2 basis functions.")
@@ -235,16 +242,16 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
          domain$loc[rep(seq_len(domain$n - 1), each = int.args$nsub)]) /
       int.args$nsub
     
-    for (j in 1:nrow(region)) {
-      subregion <- region[j, ]
+    for (j in 1:nrow(samplers)) {
+      subsamplers <- samplers[j, ]
 
       if (identical(int.args[["method"]], "stable")) {
         A_w <- INLA::inla.spde.make.A(domain,
                                       int_loc,
                                       weights =
                                         int_w *
-                                        (int_loc >= min(subregion)) *
-                                        (int_loc <= max(subregion))
+                                        (int_loc >= min(subsamplers)) *
+                                        (int_loc <= max(subsamplers))
         )
         ips[[j]] <- data.frame(
           loc = domain$loc,
@@ -252,8 +259,8 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
         )
       } else {
         inside <-
-          (int_loc >= min(subregion)) &
-          (int_loc <= max(subregion))
+          (int_loc >= min(subsamplers)) &
+          (int_loc <= max(subsamplers))
         
         ips[[j]] <- data.frame(
           loc = int_loc[inside],
@@ -264,7 +271,7 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     ips <- do.call(rbind, ips)
-  } else if (inherits(domain, "inla.mesh") && is.null(region)) {
+  } else if (inherits(domain, "inla.mesh") && is.null(samplers)) {
     coord_names <- c("x", "y", "coordinateZ")
     if (!is.null(name)) {
       coord_names[seq_along(name)] <- name
@@ -273,7 +280,7 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
     # transform to equal area projection
     if (!fm_crs_is_null(domain$crs)) {
       crs <- domain$crs
-      region <- stransform(domain, crs = CRS("+proj=cea +units=km"))
+      samplers <- stransform(domain, crs = CRS("+proj=cea +units=km"))
     }
 
     ips <- vertices(domain)
@@ -284,68 +291,68 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
       ips <- stransform(ips, crs = crs)
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
-  } else if (class(region) == "SpatialPoints") {
-    ips <- region
+  } else if (class(samplers) == "SpatialPoints") {
+    ips <- samplers
     ips$weight <- 1
-  } else if (class(region) == "SpatialPointsDataFrame") {
-    if (!("weight" %in% names(region))) {
+  } else if (class(samplers) == "SpatialPointsDataFrame") {
+    if (!("weight" %in% names(samplers))) {
       warning("The integration points provided have no weight column. Setting weights to 1.")
-      region$weight <- 1
+      samplers$weight <- 1
     }
 
-    ips <- region
-  } else if (inherits(region, "SpatialLines") || inherits(region, "SpatialLinesDataFrame")) {
+    ips <- samplers
+  } else if (inherits(samplers, "SpatialLines") || inherits(samplers, "SpatialLinesDataFrame")) {
 
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
-    if (class(region)[1] == "SpatialLines") {
-      region <- SpatialLinesDataFrame(region, data = data.frame(weight = rep(1, length(region))))
+    if (class(samplers)[1] == "SpatialLines") {
+      samplers <- SpatialLinesDataFrame(samplers, data = data.frame(weight = rep(1, length(samplers))))
     }
 
     # Set weights to 1 if not provided
-    if (!("weight" %in% names(region))) {
+    if (!("weight" %in% names(samplers))) {
       warning("The integration points provided have no weight column. Setting weights to 1.")
-      region$weight <- 1
+      samplers$weight <- 1
     }
 
-    ips <- int.slines(region, domain,
+    ips <- int.slines(samplers, domain,
       group = group,
       project = identical(int.args[["method"]], "stable")
     )
 
     coord_names <- c("x", "y", "coordinateZ")
-    if (!is.null(coordnames(region))) {
-      coord_names[seq_along(coordnames(region))] <- coordnames(region)
+    if (!is.null(coordnames(samplers))) {
+      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
     } else if (!is.null(name)) {
       coord_names[seq_along(name)] <- name
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
-  } else if (inherits(region, "SpatialPolygons") ||
-    inherits(region, "SpatialPolygonsDataFrame")) {
+  } else if (inherits(samplers, "SpatialPolygons") ||
+    inherits(samplers, "SpatialPolygonsDataFrame")) {
 
     # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
-    if (class(region)[1] == "SpatialPolygons") {
-      region <- SpatialPolygonsDataFrame(region,
-        data = data.frame(weight = rep(1, length(region))),
+    if (class(samplers)[1] == "SpatialPolygons") {
+      samplers <- SpatialPolygonsDataFrame(samplers,
+        data = data.frame(weight = rep(1, length(samplers))),
         match.ID = FALSE
       )
-    } else if (is.null(region@data[["weight"]])) {
-      region@data[["weight"]] <- 1
+    } else if (is.null(samplers@data[["weight"]])) {
+      samplers@data[["weight"]] <- 1
     }
 
-    cnames <- coordnames(region)
-    region_crs <- fm_sp_get_crs(region)
+    cnames <- coordnames(samplers)
+    samplers_crs <- fm_sp_get_crs(samplers)
 
-    # Convert region and domain to equal area CRS
+    # Convert samplers and domain to equal area CRS
     if (!fm_crs_is_null(domain$crs)) {
-      region <- stransform(region, crs = sp::CRS("+proj=cea +units=km"))
+      samplers <- stransform(samplers, crs = sp::CRS("+proj=cea +units=km"))
     }
 
     polyloc <- do.call(rbind, lapply(
-      1:length(region),
+      1:length(samplers),
       function(k) {
         cbind(
-          x = rev(coordinates(region@polygons[[k]]@Polygons[[1]])[, 1]),
-          y = rev(coordinates(region@polygons[[k]]@Polygons[[1]])[, 2]),
+          x = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[, 1]),
+          y = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[, 2]),
           group = k
         )
       }
@@ -355,8 +362,8 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
     if (is.null(domain)) {
       warning("Computing integration points from polygon; specify a mesh for better numerical control.")
       max.edge <- max(diff(range(polyloc[, 1])), diff(range(polyloc[, 2]))) / 20
-      domain <- INLA::inla.mesh.2d(boundary = region, max.edge = max.edge)
-      domain$crs <- fm_sp_get_crs(region)
+      domain <- INLA::inla.mesh.2d(boundary = samplers, max.edge = max.edge)
+      domain$crs <- fm_sp_get_crs(samplers)
     } else {
       if (!fm_crs_is_null(domain$crs)) {
         domain <- stransform(domain, crs = CRS("+proj=cea +units=km"))
@@ -368,7 +375,7 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
       loc = polyloc[, 1:2], group = polyloc[, 3],
       method = int.args$method, nsub = int.args$nsub
     )
-    df <- data.frame(region@data[ips$group, pregroup, drop = FALSE],
+    df <- data.frame(samplers@data[ips$group, pregroup, drop = FALSE],
       weight = ips[, "weight"]
     )
     ips <- SpatialPointsDataFrame(ips[, c("x", "y")],
@@ -376,13 +383,13 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
       match.ID = FALSE, proj4string = domain_crs
     )
 
-    if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(region_crs)) {
-      ips <- stransform(ips, crs = region_crs)
+    if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(samplers_crs)) {
+      ips <- stransform(ips, crs = samplers_crs)
     }
 
     coord_names <- c("x", "y", "coordinateZ")
-    if (!is.null(coordnames(region))) {
-      coord_names[seq_along(coordnames(region))] <- coordnames(region)
+    if (!is.null(coordnames(samplers))) {
+      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
     } else if (!is.null(name)) {
       coord_names[seq_along(name)] <- name
     }
@@ -415,8 +422,8 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
 #' # ipoints needs INLA
 #' if (bru_safe_inla()) {
 #'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
-#'   ips1 <- ipoints(c(0, 8), 17, name = "myDim")
-#'   ips2 <- ipoints(as.integer(c(1, 2, 3)), name = "myDiscreteDim")
+#'   ips1 <- ipoints(rbind(c(0, 3), c(3, 8)), 17, name = "myDim")
+#'   ips2 <- ipoints(domain = c(1, 2, 4), name = "myDiscreteDim")
 #'
 #'   # Calculate the cross product
 #'   ips <- cprod(ips1, ips2)
