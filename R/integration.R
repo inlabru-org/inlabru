@@ -439,21 +439,36 @@ intersection_mesh <- function(mesh, poly) {
   mesh_subset
 }
 
-#' Project integration weights onto mesh nodes
+#' Aggregate integration weights onto mesh nodes
 #'
 #' @param mesh Mesh on which to integrate
 #' @param integ `list` of `loc`, integration points,
-#'   and `weight`, integration weights
+#'   and `weight`, integration weights,
+#'   or a `SpatialPointsDataFrame`. Only the coordinates and `weigh` column
+#'   are handled.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
-integration_weight_projection <- function(mesh, integ) {
+#' @export
+integration_weight_aggregation <- function(mesh, integ) {
+  if (inherits(integ, "SpatialPointsDataFrame")) {
+    loc <- coordinates(integ)
+  } else {
+    loc <- integ$loc
+  }
   # Project points onto the mesh
-  proj <- INLA::inla.mesh.projector(mesh, loc = integ$loc)
+  proj <- INLA::inla.mesh.projector(mesh, loc = loc)
 
   # Convert integration weights to mesh points
   weight <- as.vector(as.vector(integ$weight) %*% proj$proj$A)
 
-  list(loc = mesh$loc, weight = weight)
+  if (inherits(integ, "SpatialPointsDataFrame")) {
+    sp::SpatialPointsDataFrame(mesh$loc,
+                               data = data.frame(weight = weight),
+                               proj4string = fm_sp_get_crs(integ),
+                               match.ID = FALSE)
+  } else {
+    list(loc = mesh$loc, weight = weight)
+  }
 }
 
 
@@ -541,7 +556,7 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
 
     if (method %in% c("stable")) {
       # Project integration points and weights to mesh nodes
-      integ <- integration_weight_projection(mesh, integ)
+      integ <- integration_weight_aggregation(mesh, integ)
     }
 
     # Keep points inside the mesh with positive weights
