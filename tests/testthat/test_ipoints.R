@@ -8,8 +8,9 @@ test_that("1D integration points can be generated", {
   expect_equal(nrow(ips), 3)
   expect_equal(ncol(ips), 2)
   expect_equal(names(ips), c("myDim", "weight"))
-  expect_equal(as.numeric(ips[1, ]), c(0, 2.5))
-  expect_equal(as.numeric(ips[2, ]), c(5, 5))
+  expect_equal(as.numeric(ips[1, ]), c(5/3, 10/3))
+  expect_equal(as.numeric(ips[2, ]), c(15/3, 10/3))
+  expect_equal(as.numeric(ips[3, ]), c(25/3, 10/3))
 })
 
 
@@ -65,7 +66,7 @@ test_that("conversion of 2D mesh to integration points", {
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)), c("vertex", "weight", "x", "y", "optional"))
-  expect_equal(sum(ips$weight), 27.65967, tolerance = lowtol)
+  expect_equal(sum(ips$weight), 27.64229, tolerance = lowtol)
 })
 
 test_that("SpatialLinesDataFrame to integration points using grouping parameter", {

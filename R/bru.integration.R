@@ -25,12 +25,24 @@
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
 #' \email{finn.lindgren@@gmail.com}
 #'
+#' @param samplers A `Spatial[Points/Lines/Polygons]DataFrame` object, or a
+#' two-column matrix of 1D integration intervals
 #' @param region Description of the integration region boundary.
-#' In 1D either a vector of two numerics or a two-column matrix where each row describes and interval.
-#' In 2D either a `SpatialPolygon` or a `SpatialLinesDataFrame` with a weight column defining the width of the line.
-#' @param domain In 1D a single numeric setting the numer of integration points or an `inla.mesh.1d`
-#' defining the locations to project the integration points to. In 2D `domain` has to be an
-#' `inla.mesh` object describing the projection and granularity of the integration.
+#' In 1D, a two-column matrix where each row describes an interval, or `NULL`
+#' In 2D either a `SpatialPolygon` or a `SpatialLinesDataFrame` with a `weight` column
+#' defining the width of the a transect line, and optionally further columns used by the
+#' `group` argument, or `NULL`.  When `domain` is `NULL`, `region` may also
+#' be an `inla.mesh.1d` or `inla.mesh` object, that is then treated as a `domain`
+#' argument instead.
+#' @param domain Either
+#' * when `region` is a 1D interval(s) definition only, `domain` can be
+#'   a single integer for the number of integration points to place in each 1D
+#'   interval, overriding `int.args[["nsub"]]`, and otherwise
+#' * when `region` is `NULL`, `domain` can be a numeric vector of points,
+#'   each given integration weight 1 (and no additional points are added
+#'   in between),
+#' * an `inla.mesh.1d` object for continuous 1D integration, or
+#' * an `inla.mesh.2d` object for continuous 2D integration.
 #' @param name Character array stating the name of the domains dimension(s).
 #' If `NULL`, the names are taken from coordinate names from `region` for
 #' `Spatial*` objects, otherwise "x", "y", "coordinateZ" for 2D regions and
@@ -116,143 +128,162 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
       "' instead."
     )
   }
-
-  pregroup <- NULL
-
-  # If region is null treat domain as the region definition
-  if (is.null(region)) {
-    if (is.null(domain)) {
-      stop("region and domain can not be NULL at the same time.")
-    }
-    else {
-      region <- domain
-      domain <- NULL
-    }
+  
+  if (is.null(domain) &&
+      inherits(region, c("inla.mesh.1d", "inla.mesh"))) {
+    domain <- region
+    region <- NULL
   }
 
+  is_2d <-
+    (
+      !is.null(region) &&
+        inherits(
+          region,
+          c(
+            "SpatialPoints",
+            "SpatialPointsDataFrame",
+            "SpatialPolygons",
+            "SpatialPolygonsDataFrame",
+            "SpatialLines",
+            "SpatialLinesDataFrame"
+          )
+        )
+    ) ||
+    inherits(domain, "inla.mesh")
+  is_1d <- !is_2d &&
+    (
+      (!is.null(region) &&
+         is.numeric(region)) ||
+      (!is.null(domain) &&
+         (is.numeric(domain) ||
+            inherits(domain, "inla.mesh.1d")))
+    )
+  if (!is_1d && !is_2d) {
+    stop("Unable to determine integration domain definition")
+  }
+
+  if (is_1d && !is.null(region) && !is.null(domain) && is.numeric(domain) && length(domain) == 1) {
+    int.args$nsub <- domain
+    domain <- NULL
+    int.args$method <- "direct"
+  }
+  
+  if (is_1d && is.null(name)) {
+    name <- "x"
+  }
+  
+  pregroup <- NULL
 
   if (is.data.frame(region)) {
     if (!("weight" %in% names(region))) {
       region$weight <- 1
     }
     ips <- region
-  }
-
-  else if (is.integer(region)) {
-    if (is.null(name)) {
-      name <- "x"
-    }
-    ips <- data.frame(
-      x = region,
-      weight = rep(1, length(region))
-    )
+  } else if (is_1d && is.null(region) && is.numeric(domain)) {
+    ips <- data.frame(x = as.vector(domain),
+                      weight = 1)
     colnames(ips) <- c(name, "weight")
-  } else if (is.numeric(region)) {
-    if (is.null(name)) {
-      name <- "x"
+  } else if (is_1d && is.null(region) && inherits(domain, "inla.mesh.1d") &&
+             identical(int.args[["method"]], "stable")) {
+    ips <- data.frame(x = domain$loc,
+                      weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0))
+    colnames(ips) <- c(name, "weight")
+  } else if (is_1d) {
+    if (is.null(int.args$nsub)) {
+      int.args$nsub <- 30
     }
 
-    if (is.null(dim(region))) {
-      region <- matrix(region, nrow = 1)
-    }
-
-    if (ncol(region) == 1) {
-      ips <- data.frame(x = region[, 1], weight = 1)
-      colnames(ips) <- c(name, "weight")
-    } else {
-      ips <- list()
-
-      for (j in 1:nrow(region)) {
-        subregion <- region[j, ]
-
-        # If domain is a single numeric set domain to a 1D mesh with n=domain vertices and boundary according to region
-        if (is.null(domain)) {
-          stop("The number of domain integration points, or a full mesh specification, must be provided")
-        }
-        else if (is.numeric(domain)) {
-          # Integrate over the specified interval
-          subdomain <- INLA::inla.mesh.1d(seq(min(subregion),
-            max(subregion),
-            length.out = domain
-          ))
-
-          fem <- INLA::inla.mesh.1d.fem(subdomain)
-          ips[[j]] <- data.frame(
-            loc = subdomain$loc,
-            weight = Matrix::diag(fem$c0)
-          )
-          colnames(ips[[j]]) <- c(name, "weight")
-        }
-        else if (inherits(domain, "inla.mesh.1d")) {
-          # Integrate over the region subinterval, with nsub integration points
-          # per knot interval
-          if (domain$degree >= 2) {
-            warning("Integration points projected onto knots may lead to instability for degree >= 2 basis functions.")
-          }
-          if (is.null(int.args$nsub)) {
-            int.args$nsub <- 30
-          }
-          u <- rep(
-            (seq_len(int.args$nsub) - 0.5) / int.args$nsub,
-            domain$n - 1
-          )
-          int_loc <-
-            domain$loc[rep(seq_len(domain$n - 1), each = int.args$nsub)] * (1 - u) +
-            domain$loc[rep(seq_len(domain$n) + 1, each = int.args$nsub)] * u
-          int_w <-
-            (domain$loc[rep(seq_len(domain$n) + 1, each = int.args$nsub)] -
-              domain$loc[rep(seq_len(domain$n - 1), each = int.args$nsub)]) /
-              int.args$nsub
-          A_w <- INLA::inla.spde.make.A(domain,
-            int_loc,
-            weights =
-              int_w *
-                (int_loc >= min(region)) *
-                (int_loc <= max(region))
-          )
-          colSums(A_w)
-          ips[[j]] <- data.frame(
-            loc = domain$loc,
-            weight = colSums(A_w)
-          )
-          colnames(ips[[j]]) <- c(name, "weights")
-        } else {
-          stop("Unknown integration domain specification")
-        }
+    domain_range <-
+      if (inherits(domain, "inla.mesh.1d")) {
+        domain$interval
+      } else {
+        NULL
       }
-
-      ips <- do.call(rbind, ips)
+    
+    if (is.null(region)) {
+      region <- matrix(domain_range, 1, 2)
+    } else {
+      if (is.null(dim(region))) {
+        region <- matrix(region, nrow = 1)
+      }
+      if (ncol(region) != 2) {
+        stop("Interval description matrix must have 2 elements or be a 2-column matrix.")
+      }
+      if (is.null(domain)) {
+        domain <- INLA::inla.mesh.1d(sort(unique(as.vector(region))))
+      }
     }
-  } else if (inherits(region, "inla.mesh")) {
+    # Now region is a 2-column matrix, and domain is an `inla.mesh.1d` object.
+
+    ips <- list()
+
+    # Integrate over each region subinterval, with nsub integration points
+    # per domain knot interval
+    if (domain$degree >= 2) {
+      warning("Integration points projected onto knots may lead to instability for degree >= 2 basis functions.")
+    }
+    u <- rep(
+      (seq_len(int.args$nsub) - 0.5) / int.args$nsub,
+      domain$n - 1
+    )
+    int_loc <-
+      domain$loc[rep(seq_len(domain$n - 1), each = int.args$nsub)] * (1 - u) +
+      domain$loc[rep(seq_len(domain$n - 1) + 1, each = int.args$nsub)] * u
+    int_w <-
+      (domain$loc[rep(seq_len(domain$n - 1) + 1, each = int.args$nsub)] -
+         domain$loc[rep(seq_len(domain$n - 1), each = int.args$nsub)]) /
+      int.args$nsub
+    
+    for (j in 1:nrow(region)) {
+      subregion <- region[j, ]
+
+      if (identical(int.args[["method"]], "stable")) {
+        A_w <- INLA::inla.spde.make.A(domain,
+                                      int_loc,
+                                      weights =
+                                        int_w *
+                                        (int_loc >= min(subregion)) *
+                                        (int_loc <= max(subregion))
+        )
+        ips[[j]] <- data.frame(
+          loc = domain$loc,
+          weight = colSums(A_w)
+        )
+      } else {
+        inside <-
+          (int_loc >= min(subregion)) &
+          (int_loc <= max(subregion))
+        
+        ips[[j]] <- data.frame(
+          loc = int_loc[inside],
+          weight = int_w[inside]
+        )
+      }
+      colnames(ips[[j]]) <- c(name, "weight")
+    }
+
+    ips <- do.call(rbind, ips)
+  } else if (inherits(domain, "inla.mesh") && is.null(region)) {
     coord_names <- c("x", "y", "coordinateZ")
     if (!is.null(name)) {
       coord_names[seq_along(name)] <- name
     }
 
-    # If domain is provided: break
-    if (!is.null(domain)) stop("Integration region provided as 2D and domain is not NULL.")
-
     # transform to equal area projection
-    if (!fm_crs_is_null(region$crs)) {
-      crs <- region$crs
-      region <- stransform(region, crs = CRS("+proj=cea +units=km"))
+    if (!fm_crs_is_null(domain$crs)) {
+      crs <- domain$crs
+      region <- stransform(domain, crs = CRS("+proj=cea +units=km"))
     }
 
-    ips <- vertices(region)
-    ips$weight <- INLA::inla.mesh.fem(region, order = 1)$va
+    ips <- vertices(domain)
+    ips$weight <- INLA::inla.mesh.fem(domain, order = 1)$va
 
     # backtransform
-    if (!fm_crs_is_null(region$crs)) {
+    if (!fm_crs_is_null(domain$crs)) {
       ips <- stransform(ips, crs = crs)
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
-  } else if (inherits(region, "inla.mesh.1d")) {
-    if (is.null(name)) {
-      name <- "x"
-    }
-    ips <- data.frame(x = region$loc)
-    colnames(ips) <- name
-    ips$weight <- Matrix::diag(INLA::inla.mesh.fem(region)$c0)
   } else if (class(region) == "SpatialPoints") {
     ips <- region
     ips$weight <- 1
@@ -356,6 +387,8 @@ ipoints <- function(region = NULL, domain = NULL, name = NULL, group = NULL,
       coord_names[seq_along(name)] <- name
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
+  } else {
+    stop("No integration handling code reached; please notify the package developer.")
   }
 
   ips
@@ -462,49 +495,18 @@ cprod <- function(...) {
 #
 # @aliases ipoints
 # @export
-# @param samplers A Spatial[Points/Lines/Polygons]DataFrame objects
-# @param points A SpatialPoints[DataFrame] object
-# @param config An integration configuration. See \link{iconfig}
+# @param samplers A `Spatial[Points/Lines/Polygons]DataFrame` object
+# @param domain A list of named integration definitions, each either a numeric
+# vector of points given integration weight 1, an `inla.mesh.1d` object, or an
+# `inla.mesh.2d` object. Only those domains that are not given in the `samplers`
+# data.frame are used, plus the coordinates object, used for the spatial aspect
+# of the `samplers` object.
 # @param int.args List of arguments passed on to \code{ipoints}
 # @return Integration points
 
 
-ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL,
+ipmaker <- function(samplers, domain, dnames,
                     int.args = list(method = "stable", nsub = NULL)) {
-  # TODO: Automatic domain extraction should be done by a separate function.
-
-  # Fill missing domain definitions using meshes from effects where map equals the domain name
-  meshes <- list()
-  for (e in model$effects) {
-    meshes[[paste0(as.character(e$map), collapse = "")]] <- e$mesh
-  }
-  for (nm in dnames) {
-    if (is.null(domain[[nm]])) {
-      domain[[nm]] <- meshes[[nm]]
-    }
-  }
-
-  # Fill missing domain definitions with data ranges
-  for (nm in dnames) {
-    if (!(nm %in% names(domain)) & !is.null(data) & !(nm %in% names(samplers))) {
-      stop(paste0(
-        "No mesh or mapper information found for domain '", nm, "'.\n",
-        "Specify one with  domain = list(", nm, " = ...), as documented in ?like"
-      ))
-      if (nm == "coordinates") {
-        domain[["coordinates"]] <-
-          INLA::inla.mesh.2d(
-            loc.domain = coordinates(data),
-            max.edge = diff(range(coordinates(data)[, 1])) / 10
-          )
-        domain[["coordinates"]]$crs <- fm_sp_get_crs(data)
-      } else {
-        domain[[nm]] <- range(data[[nm]])
-      }
-    }
-  }
-
-
   if ("coordinates" %in% dnames) {
     spatial <- TRUE
   } else {
@@ -525,6 +527,13 @@ ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL,
       paste0(missing.dims, collapse = ", ")
     ))
   }
+  extra.dims <- setdiff(names(domain), c(samp.dim, nosamp.dim))
+  if (length(missing.dims > 0)) {
+    warning(paste0(
+      "Unexpected extra domain defintions: ",
+      paste0(extra.dims, collapse = ", ")
+    ))
+  }
 
   if (spatial) {
     ips <- ipoints(samplers, domain$coordinates,
@@ -533,7 +542,6 @@ ipmaker <- function(samplers, domain, dnames, model = NULL, data = NULL,
   } else {
     ips <- NULL
   }
-
 
   lips <- lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
   ips <- do.call(cprod, c(list(ips), lips))

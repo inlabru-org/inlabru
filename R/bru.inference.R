@@ -513,11 +513,9 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 
     if (is.null(ips)) {
       ips <- ipmaker(
-        samplers,
+        samplers = samplers,
         domain = domain,
         dnames = response,
-        data = NULL,
-        model = NULL,
         int.args = options[["bru_int_args"]]
       )
     }

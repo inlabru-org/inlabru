@@ -15,12 +15,24 @@ ipoints(
 }
 \arguments{
 \item{region}{Description of the integration region boundary.
-In 1D either a vector of two numerics or a two-column matrix where each row describes and interval.
-In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a weight column defining the width of the line.}
+In 1D, a two-column matrix where each row describes an interval, or \code{NULL}
+In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a \code{weight} column
+defining the width of the a transect line, and optionally further columns used by the
+\code{group} argument, or \code{NULL}.  When \code{domain} is \code{NULL}, \code{region} may also
+be an \code{inla.mesh.1d} or \code{inla.mesh} object, that is then treated as a \code{domain}
+argument instead.}
 
-\item{domain}{In 1D a single numeric setting the numer of integration points or an \code{inla.mesh.1d}
-defining the locations to project the integration points to. In 2D \code{domain} has to be an
-\code{inla.mesh} object describing the projection and granularity of the integration.}
+\item{domain}{Either
+\itemize{
+\item when \code{region} is a 1D interval(s) definition only, \code{domain} can be
+a single integer for the number of integration points to place in each 1D
+interval, overriding \code{int.args[["nsub"]]}, and otherwise
+\item when \code{region} is \code{NULL}, \code{domain} can be a numeric vector of points,
+each given integration weight 1 (and no additional points are added
+in between),
+\item an \code{inla.mesh.1d} object for continuous 1D integration, or
+\item an \code{inla.mesh.2d} object for continuous 2D integration.
+}}
 
 \item{name}{Character array stating the name of the domains dimension(s).
 If \code{NULL}, the names are taken from coordinate names from \code{region} for
@@ -33,6 +45,9 @@ the integration points are calculated independently and not merged by the projec
 \item{int.args}{List of arguments passed to \code{int.polygon}}
 
 \item{project}{If TRUE, project the integration points to mesh vertices}
+
+\item{samplers}{A \verb{Spatial[Points/Lines/Polygons]DataFrame} object, or a
+two-column matrix of 1D integration intervals}
 }
 \value{
 A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
