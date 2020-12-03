@@ -16,14 +16,38 @@ test_that("bru: factor component", {
 
   # Predict posterior statistics of 'x'
 
-  xpost <- predict(fit,
-    data = NULL, formula = ~x_latent,
-    n.samples = 5, seed = 12345L
+  xpost <- predict(
+    fit,
+    data = NULL,
+    formula = ~x_latent,
+    n.samples = 5,
+    seed = 12345L
+  )
+
+  xpost2 <- predict(
+    fit,
+    data = NULL,
+    formula = ~ {
+      tmp <- c(
+        a = x_latent,
+        b = exp(x_latent)
+      )
+      c(tmp, a_b = sum(tmp), c = as.vector(diff(tmp)))
+    },
+    n.samples = 5,
+    seed = 12345L
   )
 
   # The statistics include mean, standard deviation, the 2.5% quantile, the median,
   # the 97.5% quantile, minimum and maximum sample drawn from the posterior as well as
   # the coefficient of variation and the variance.
+
+  expect_equal(is.data.frame(xpost), TRUE)
+  expect_equal(nrow(xpost), 1)
+
+  expect_equal(is.data.frame(xpost2), TRUE)
+  expect_equal(nrow(xpost2), 4)
+  expect_equal(rownames(xpost2), c("a", "b", "a_b", "c"))
 
 
   # The predict function can also be used to simultaneously estimate posteriors

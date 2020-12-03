@@ -139,9 +139,10 @@ test_that("Polygon integration with holes", {
   ipA4$test <- "A4"
   
   if (FALSE) {
-    ggplot() + gg(m) + gg(plyA)
+    pl <- ggplot() + gg(m) + gg(plyA)
+    pl
     
-    ggplot() + gg(m) + gg(plyA) +
+    pl +
       gg(ipA1, mapping = aes(col = weight, size = weight)) +
       gg(ipA2, mapping = aes(col = weight, size = weight)) +
       gg(ipA3, mapping = aes(col = weight, size = weight)) +
