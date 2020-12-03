@@ -18,7 +18,8 @@ int.polygon(mesh, loc, group = NULL, method = NULL, ...)
 \item{...}{Arguments passed to the low level integration method (\code{make_stable_integration_points})}
 }
 \description{
-Integration points for polygons inside an inla.mesh
+This method doesn't handle polygons with holes. Use \code{\link[=bru_int_polygon]{bru_int_polygon()}}
+instead.
 }
 \author{
 Fabian E. Bachl \email{f.e.bachl@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@gmail.com}

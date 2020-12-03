@@ -376,7 +376,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers <- stransform(samplers, crs = sp::CRS("+proj=cea +units=km"))
     }
 
-    # TODO: this doesn't handle holes properly.
+    # This old code doesn't handle holes properly.
     polyloc <- do.call(rbind, lapply(
       1:length(samplers),
       function(k) {
@@ -387,6 +387,18 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         )
       }
     ))
+    
+    # This handles holes
+    poly_segm <- INLA::inla.sp2segment(samplers, join = FALSE)
+    poly_segm <- lapply(
+      seq_along(poly_segm),
+      function(k) {
+        segm <- poly_segm[[k]]
+        segm[["grp"]] <- rep(k, NROW(segm[["idx"]]))
+        segm[["is.bnd"]] <- TRUE
+        segm
+      }
+    )
 
     # If domain is NULL, make a mesh with the polygons as boundary
     if (is.null(domain)) {
@@ -401,12 +413,22 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
     domain_crs <- fm_ensure_crs(domain$crs)
 
-    ips <- int.polygon(domain,
-      loc = polyloc[, 1:2], group = polyloc[, 3],
-      method = int.args$method, nsub = int.args$nsub2
-    )
+    if (identical(int.args[["poly_method"]], "legacy")) {
+      ips <- int.polygon(domain,
+                         loc = polyloc[, 1:2], group = polyloc[, 3],
+                         method = int.args$method, nsub = int.args$nsub2
+      )
+    } else {
+      ips <- bru_int_polygon(
+        domain,
+        poly_segm,
+        method = int.args$method,
+        nsub = int.args$nsub2
+      )
+    }
+    
     df <- data.frame(samplers@data[ips$group, pregroup, drop = FALSE],
-      weight = ips[, "weight"]
+      weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
     )
     ips <- SpatialPointsDataFrame(ips[, c("x", "y")],
       data = df,

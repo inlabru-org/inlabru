@@ -99,3 +99,38 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
   )
   expect_equal(sum(ips$weight) / 2293.712, 1, tolerance = midtol)
 })
+
+
+test_that("Polygon integration with holes", {
+  local_bru_safe_inla()
+  
+  ply <- sp::SpatialPolygons(list(
+    sp::Polygons(
+      list(
+        sp::Polygon(matrix(c(0,3,3,0, 0,0, 3, 3), 4, 2), hole = FALSE),
+        sp::Polygon(matrix(c(1,2,2,1, 1,1, 2, 2), 4, 2), hole = TRUE)
+      ),
+      ID = "A"
+    )
+  ))
+  
+  bnd <- INLA::inla.sp2segment(ply)
+  m <- INLA::inla.mesh.2d(
+    loc.domain = bnd$loc,
+    max.edge = 1
+    )
+  ggplot() + gg(m) + gg(ply)
+  ip1 <- ipoints(ply, m, int.args = list(poly_method = "legacy", method = "direct"))
+  ip2 <- ipoints(ply, m, int.args = list(poly_method = "legacy", method = "stable"))
+  ip3 <- ipoints(ply, m, int.args = list(method = "direct"))
+  ip4 <- ipoints(ply, m, int.args = list(method = "stable"))
+#  plot(coordinates(ip1), cex = ip1$weight * 10)
+#  plot(coordinates(ip2), cex = ip2$weight * 10)
+#  plot(coordinates(ip3), cex = ip3$weight * 10)
+#  plot(coordinates(ip4), cex = ip4$weight * 10)
+  
+  expect_equal(sum(ip3$weight), 8, tolerance = midtol)
+  expect_equal(sum(ip4$weight), 8, tolerance = midtol)
+  
+
+})
