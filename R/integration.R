@@ -460,14 +460,16 @@ integration_weight_aggregation <- function(mesh, integ) {
 
   # Convert integration weights to mesh points
   weight <- as.vector(as.vector(integ$weight) %*% proj$proj$A)
+  
+  ok <- weight > 0
 
   if (inherits(integ, "SpatialPointsDataFrame")) {
-    sp::SpatialPointsDataFrame(mesh$loc,
-                               data = data.frame(weight = weight),
+    sp::SpatialPointsDataFrame(mesh$loc[ok, , drop = FALSE],
+                               data = data.frame(weight = weight[ok]),
                                proj4string = fm_sp_get_crs(integ),
                                match.ID = FALSE)
   } else {
-    list(loc = mesh$loc, weight = weight)
+    list(loc = mesh$loc[ok, , drop = FALSE], weight = weight[ok])
   }
 }
 
@@ -528,9 +530,10 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 }
 
 #' Integration points for polygons inside an inla.mesh
+#' 
+#' This method doesn't handle polygons with holes. Use [bru_int_polygon()]
+#' instead.
 #'
-#' @aliases int.polygon
-#' @export
 #' @param mesh An inla.mesh object
 #' @param loc Locations defining the polygons
 #' @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
@@ -544,33 +547,82 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
     group <- rep(1, nrow(loc))
   }
   method <- match.arg(method, c("stable", "direct"))
-
+  
   ipsl <- list()
   # print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
   for (g in unique(group)) {
     gloc <- loc[group == g, , drop = FALSE]
-
+    
     # Combine polygon with mesh boundary to get mesh covering the intersection.
     bnd <- INLA::inla.mesh.segment(loc = gloc, is.bnd = TRUE)
     integ <- make_stable_integration_points(mesh, bnd, ...)
+    
+    if (method %in% c("stable")) {
+      # Project integration points and weights to mesh nodes
+      integ <- integration_weight_aggregation(mesh, integ)
+    }
+    
+    # Keep points inside the mesh with positive weights
+    ok <-
+      INLA::inla.mesh.project(mesh, integ$loc)$ok &
+      (integ$weight > 0)
+    
+    ips <- data.frame(integ$loc[ok, 1:2, drop = FALSE])
+    colnames(ips) <- c("x", "y")
+    ips$weight <- integ$weight[ok]
+    
+    ips$group <- rep(g, nrow(ips))
+    ipsl <- c(ipsl, list(ips))
+  }
+  
+  do.call(rbind, ipsl)
+}
+
+
+
+#' Integration points for polygons inside an inla.mesh
+#'
+#' @export
+#' @param mesh An inla.mesh object
+#' @param polylist A list of `inla.mesh.segment` objects
+#' @param method Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")
+#' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @keywords internal
+
+bru_int_polygon <- function(mesh, polylist, method = NULL, ...) {
+  method <- match.arg(method, c("stable", "direct"))
+  
+  ipsl <- list()
+  # print(paste0("Number of polygons to integrate over: ", length(polylist) ))
+  for (g in seq_along(polylist)) {
+    poly <- polylist[[g]]
+    
+    # Combine polygon with mesh boundary to get mesh covering the intersection.
+    integ <- make_stable_integration_points(mesh, poly, ...)
+    
+    # Keep points inside the mesh with positive weights
+    ok <-
+      INLA::inla.mesh.project(mesh, integ$loc)$ok &
+      (integ$weight > 0)
+    
+    integ <- list(loc = integ$loc[ok, 1:2, drop = FALSE],
+                  weight = integ$weight[ok])
 
     if (method %in% c("stable")) {
       # Project integration points and weights to mesh nodes
       integ <- integration_weight_aggregation(mesh, integ)
     }
 
-    # Keep points inside the mesh with positive weights
-    ok <-
-      INLA::inla.mesh.project(mesh, integ$loc)$ok &
-        (integ$weight > 0)
+    ips <- data.frame(
+      x = integ$loc[, 1],
+      y = integ$loc[, 2],
+      weight = integ$weight,
+      group = g
+    )
 
-    ips <- data.frame(integ$loc[ok, 1:2, drop = FALSE])
-    colnames(ips) <- c("x", "y")
-    ips$weight <- integ$weight[ok]
-
-    ips$group <- rep(g, nrow(ips))
     ipsl <- c(ipsl, list(ips))
   }
-
+  
   do.call(rbind, ipsl)
 }
