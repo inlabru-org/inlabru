@@ -104,7 +104,7 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
 test_that("Polygon integration with holes", {
   local_bru_safe_inla()
   
-  ply <- sp::SpatialPolygons(list(
+  plyA <- sp::SpatialPolygons(list(
     sp::Polygons(
       list(
         sp::Polygon(matrix(c(0,3,3,0, 0,0, 3, 3), 4, 2), hole = FALSE),
@@ -113,33 +113,66 @@ test_that("Polygon integration with holes", {
       ID = "A"
     )
   ))
-  ply2 <- sp::SpatialPolygons(list(
+  plyB <- sp::SpatialPolygons(list(
     sp::Polygons(
       list(
         sp::Polygon(matrix(c(0,3,3,0, 0,0, 3, 3), 4, 2), hole = FALSE),
         sp::Polygon(matrix(c(1,1,2,2, 1,2, 2, 1), 4, 2), hole = TRUE)
       ),
-      ID = "A"
+      ID = "B"
     )
   ))
   
-  bnd <- INLA::inla.sp2segment(ply)
+  bndA <- INLA::inla.sp2segment(plyA)
   m <- INLA::inla.mesh.2d(
-    loc.domain = bnd$loc,
+    loc.domain = bndA$loc,
     max.edge = 1
     )
-  ggplot() + gg(m) + gg(ply)
-  ip1 <- ipoints(ply, m, int.args = list(poly_method = "legacy", method = "direct"))
-  ip2 <- ipoints(ply, m, int.args = list(poly_method = "legacy", method = "stable"))
-  ip3 <- ipoints(ply, m, int.args = list(method = "direct"))
-  ip4 <- ipoints(ply, m, int.args = list(method = "stable"))
-#  plot(coordinates(ip1), cex = ip1$weight * 10)
-#  plot(coordinates(ip2), cex = ip2$weight * 10)
-#  plot(coordinates(ip3), cex = ip3$weight * 10)
-#  plot(coordinates(ip4), cex = ip4$weight * 10)
+  ipA1 <- ipoints(plyA, m, int.args = list(poly_method = "legacy", method = "direct"))
+  ipA2 <- ipoints(plyA, m, int.args = list(poly_method = "legacy", method = "stable"))
+  ipA3 <- ipoints(plyA, m, int.args = list(method = "direct"))
+  ipA4 <- ipoints(plyA, m, int.args = list(method = "stable"))
+  ipB1 <- ipoints(plyB, m, int.args = list(poly_method = "legacy", method = "direct"))
+  ipB2 <- ipoints(plyB, m, int.args = list(poly_method = "legacy", method = "stable"))
+  ipB3 <- ipoints(plyB, m, int.args = list(method = "direct"))
+  ipB4 <- ipoints(plyB, m, int.args = list(method = "stable"))
+  ipA1$test <- "A1"
+  ipA2$test <- "A2"
+  ipA3$test <- "A3"
+  ipA4$test <- "A4"
+  ipB1$test <- "B1"
+  ipB2$test <- "B2"
+  ipB3$test <- "B3"
+  ipB4$test <- "B4"
   
-  expect_equal(sum(ip3$weight), 8, tolerance = midtol)
-  expect_equal(sum(ip4$weight), 8, tolerance = midtol)
+  if (FALSE) {
+    ggplot() + gg(m) + gg(plyA)
+    ggplot() + gg(m) + gg(plyB)
+    
+    ggplot() + gg(m) + gg(plyA) +
+      gg(ipA1, mapping = aes_string(size = "weight")) +
+      gg(ipA2, mapping = aes_string(size = "weight")) +
+      gg(ipA3, mapping = aes_string(size = "weight")) +
+      gg(ipA4, mapping = aes_string(size = "weight")) +
+      facet_wrap(vars(test))
+    
+    ggplot() + gg(m) + gg(plyB) +
+      gg(ipB1, mapping = aes_string(size = "weight")) +
+      gg(ipB2, mapping = aes_string(size = "weight")) +
+      gg(ipB3, mapping = aes_string(size = "weight")) +
+      gg(ipB4, mapping = aes_string(size = "weight")) +
+      facet_wrap(vars(test))
+  }
   
-
+  expect_equal(sum(ipA1$weight), 9, tolerance = midtol)
+  expect_equal(sum(ipA2$weight), 9, tolerance = midtol)
+  expect_equal(sum(ipB1$weight), 9, tolerance = midtol)
+  expect_equal(sum(ipB2$weight), 9, tolerance = midtol)
+  
+  expect_equal(sum(ipA3$weight), 8, tolerance = midtol)
+  expect_equal(sum(ipA4$weight), 8, tolerance = midtol)
+  expect_equal(sum(ipB3$weight), 8, tolerance = midtol)
+  expect_equal(sum(ipB4$weight), 8, tolerance = midtol)
+  
+  
 })
