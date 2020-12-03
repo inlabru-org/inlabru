@@ -389,7 +389,8 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @param color Filling color for the polygons.
 #' @param alpha Alpha level for polygon filling.
 #' @param ... Arguments passed on to [geom_polygon].
-#' @return A [geom_polygon] return value.
+#' @return If [ggpolypath] is available a [ggpolypath::geom_polypath] object.  
+#' Otherwise a [geom_polygon] return value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R
 
@@ -410,8 +411,12 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, color = "black"
   if (!is.null(mapping)) {
     dmap <- modifyList(dmap, mapping)
   }
-
-  geom_polygon(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+  
+  if (requireNamespace("ggpolypath", quietly = TRUE)) {
+    ggpolypath::geom_polypath(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+  } else {
+    geom_polygon(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+  }
 }
 
 #' Geom for SpatialGridDataFrame objects
