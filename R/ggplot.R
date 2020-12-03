@@ -389,7 +389,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @param color Filling color for the polygons.
 #' @param alpha Alpha level for polygon filling.
 #' @param ... Arguments passed on to [geom_polygon].
-#' @return If [ggpolypath] is available a [ggpolypath::geom_polypath] object.  
+#' @return If ggpolypath is available a geom_polypath object.  
 #' Otherwise a [geom_polygon] return value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R

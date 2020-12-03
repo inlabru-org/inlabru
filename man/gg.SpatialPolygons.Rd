@@ -21,7 +21,7 @@ mapping. The default mapping is \code{aes_string(x = "long", y = "lat", group = 
 \item{...}{Arguments passed on to \link{geom_polygon}.}
 }
 \value{
-If \link{ggpolypath} is available a \link[ggpolypath:geom_polypath]{ggpolypath::geom_polypath} object.
+If ggpolypath is available a geom_polypath object.
 Otherwise a \link{geom_polygon} return value.
 }
 \description{
