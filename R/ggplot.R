@@ -374,7 +374,8 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 
 #' Geom for SpatialPolygons objects
 #'
-#' Uses the fortitfy() function to turn the SpatialPolygons objects into a data.frame. Then
+#' Uses the `fortify()` function to turn the `SpatialPolygons` objects into a
+#' `data.frame`. Then
 #' calls [geom_polygon] to plot the polygons.
 #'
 #'
@@ -389,7 +390,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @param color Filling color for the polygons.
 #' @param alpha Alpha level for polygon filling.
 #' @param ... Arguments passed on to [geom_polygon].
-#' @return If ggpolypath is available a geom_polypath object.  
+#' @return If `ggpolypath` is available a `ggpolypath::geom_polypath` object.  
 #' Otherwise a [geom_polygon] return value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R
@@ -399,8 +400,12 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, color = "black"
     data <- spTransform(data, crs)
   }
   df <- fortify(data)
-  dmap <- aes_string(x = "long", y = "lat", group = "group")
-
+  if (requireNamespace("ggpolypath", quietly = TRUE)) {
+    dmap <- aes_string(x = "long", y = "lat", group = "group")
+  } else {
+    dmap <- aes_string(x = "long", y = "lat", group = "id", subgroup = "hole")
+  }
+  
   if (!("alpha" %in% names(dmap)) & is.null(alpha)) {
     alpha <- 0.1
   }

@@ -113,6 +113,15 @@ test_that("Polygon integration with holes", {
       ID = "A"
     )
   ))
+  ply2 <- sp::SpatialPolygons(list(
+    sp::Polygons(
+      list(
+        sp::Polygon(matrix(c(0,3,3,0, 0,0, 3, 3), 4, 2), hole = FALSE),
+        sp::Polygon(matrix(c(1,1,2,2, 1,2, 2, 1), 4, 2), hole = TRUE)
+      ),
+      ID = "A"
+    )
+  ))
   
   bnd <- INLA::inla.sp2segment(ply)
   m <- INLA::inla.mesh.2d(
