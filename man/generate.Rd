@@ -27,8 +27,9 @@ generate(object, ...)
 \item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for
 sampling.}
 
-\item{formula}{A formula determining which effects to sample from and how to
-combine them analytically.}
+\item{formula}{A formula defining an R expression to evaluate for each generated
+sample. If \code{NULL}, the latent and hyperparameter states are returned
+as named list elements.}
 
 \item{n.samples}{Integer setting the number of samples to draw in order to
 calculate the posterior statistics.

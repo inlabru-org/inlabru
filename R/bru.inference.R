@@ -844,8 +844,9 @@ lgcp <- function(components,
 #' @param object An object obtained by calling [bru] or [lgcp].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' the prediction.
-#' @param formula A formula determining which effects to predict and how to
-#' combine them.
+#' @param formula A formula defining an R expression to evaluate for each generated
+#' sample. If `NULL`, the latent and hyperparameter states are generated
+#' as named list elements.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics. The default is rather low but provides
 #' a quick approximate result.
@@ -917,22 +918,36 @@ predict.bru <- function(object,
           x = vals[[1]][, covar, drop = FALSE]
         )
     }
-    vals <- smy
-    is.annot <- vapply(names(vals), function(v) all(vals[[v]]$sd == 0), TRUE)
-    annot <- do.call(cbind, lapply(vals[is.annot], function(v) v[, 1]))
-    vals <- vals[!is.annot]
+    is.annot <- vapply(names(smy), function(v) all(smy[[v]]$sd == 0), TRUE)
+    annot <- do.call(cbind, lapply(smy[is.annot], function(v) v[, 1]))
+    smy <- smy[!is.annot]
     if (!is.null(annot)) {
-      vals <- lapply(vals, function(v) cbind(data.frame(annot), v))
+      smy <- lapply(smy, function(v) cbind(data.frame(annot), v))
     }
 
 
-    if (length(vals) == 1) vals <- vals[[1]]
+    if (length(smy) == 1) smy <- smy[[1]]
+  } else if (is.list(vals[[1]])) {
+    vals.names <- names(vals[[1]])
+    if (any(vals.names == "")) {
+      warning("Some generated list elements are unnamed")
+    }
+    smy <- list()
+    for (nm in vals.names) {
+      smy[[nm]] <-
+        bru_summarise(
+          lapply(
+            vals,
+            function(v) v[[nm]]
+          )
+        )
+    }
   } else {
-    vals <- bru_summarise(vals, x = data)
+    smy <- bru_summarise(vals, x = data)
   }
 
-  if (!inherits(vals, "Spatial")) class(vals) <- c("prediction", class(vals))
-  vals
+  if (!inherits(vals, "Spatial")) class(smy) <- c("prediction", class(smy))
+  smy
 }
 
 #' Sampling based on bru posteriors
@@ -950,8 +965,9 @@ predict.bru <- function(object,
 #' @param object A `bru` object obtained by calling [bru].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' sampling.
-#' @param formula A formula determining which effects to sample from and how to
-#' combine them analytically.
+#' @param formula A formula defining an R expression to evaluate for each generated
+#' sample. If `NULL`, the latent and hyperparameter states are returned
+#' as named list elements.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics.
 #' The default, 100, is rather low but provides a quick approximate result.
@@ -1014,12 +1030,6 @@ generate.bru <- function(object,
     data <- do.call(cprod, add.pts)
   }
 
-  # Turn formula into an expression (in evaluate_model)
-  if (is.null(formula)) {
-    stop("TODO: Automatic formula selection is not implemented")
-    formula <- object$bru_info$lhoods[["default"]]$formula
-  }
-
   state <- evaluate_state(
     object$bru_info$model,
     result = object,
@@ -1029,16 +1039,20 @@ generate.bru <- function(object,
     num.threads = num.threads,
     ...
   )
-  # TODO: clarify the output format, and use the format parameter
-  vals <- evaluate_model(
-    model = object$bru_info$model,
-    state = state,
-    data = data,
-    predictor = formula,
-    include = include,
-    exclude = exclude
-  )
-  vals
+  if (is.null(formula)) {
+    state
+  } else {
+    # TODO: clarify the output format, and use the format parameter
+    vals <- evaluate_model(
+      model = object$bru_info$model,
+      state = state,
+      data = data,
+      predictor = formula,
+      include = include,
+      exclude = exclude
+    )
+    vals
+  }
 }
 
 
