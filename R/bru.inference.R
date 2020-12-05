@@ -946,7 +946,7 @@ predict.bru <- function(object,
     smy <- bru_summarise(vals, x = data)
   }
 
-  if (!inherits(vals, "Spatial")) class(smy) <- c("prediction", class(smy))
+  if (!inherits(smy, "Spatial")) class(smy) <- c("prediction", class(smy))
   smy
 }
 
