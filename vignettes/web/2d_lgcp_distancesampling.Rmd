@@ -111,12 +111,13 @@ cmp = ~ mySPDE(main = coordinates, model = matern) +
 ```
 
 ... and the formula, which describes how these components are combined to 
-form the linear predictor (remembering that we need an offset!):
+form the linear predictor (remembering that we need an offset due to the unknown
+direction of the detections!):
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 formula = coordinates + distance ~ mySPDE +
                                   log(hn(distance, lsig)) + 
-                                  Intercept
+                                  Intercept + log(2)
 ```
 
 Then fit the model, passing both the components and the formula 
@@ -182,7 +183,7 @@ out that you need lots of posterior samples, e.g. 2,000 to smooth out the Monte 
 error in the posterior, and this takes a little while to compute:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo=TRUE}
-Ns = seq(50, 900, by = 1)
+Ns = seq(50, 450, by = 1)
 Nest <- predict(fit, predpts, 
                 ~ data.frame(N = Ns,
                              density = dpois(Ns, 
@@ -209,7 +210,7 @@ Solution:
 ```{r, results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 formula1 = coordinates + distance ~ mySPDE +
   log(hr(distance, lsig)) + 
-  Intercept
+  Intercept + log(2)
 
 fit1 = lgcp(components = cmp, 
            mexdolphin$points,
@@ -245,7 +246,7 @@ predpts = ipoints(mexdolphin$ppoly, mexdolphin$mesh)
 Lambda1 <- predict(fit1, predpts, ~ sum(weight * exp(mySPDE + Intercept))) 
 Lambda1
 
-Ns = seq(50, 950, by = 1)
+Ns = seq(50, 650, by = 1)
 Nest1 <- predict(
   fit1,
   predpts, 
