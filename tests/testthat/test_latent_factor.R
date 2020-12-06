@@ -33,8 +33,7 @@ test_that("bru: factor component", {
       control.inla = list(
         int.strategy = "eb",
         h = 0.005
-      ),
-      num.threads = "1:1"
+      )
     )
   )
 

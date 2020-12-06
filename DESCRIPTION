@@ -81,6 +81,7 @@ Collate:
     'data.shrimp.R'
     'data.toygroups.R'
     'deltaIC.R'
+    'dsdata.R'
     'dsmdata.R'
     'dsmdata.tools.R'
     'effect.R'

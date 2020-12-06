@@ -325,7 +325,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   } else if (inherits(samplers, "SpatialLines") || inherits(samplers, "SpatialLinesDataFrame")) {
 
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
-    if (class(samplers)[1] == "SpatialLines") {
+    if (inherits(samplers, "SpatialLines") &&
+        !inherits(samplers, "SpatialLinesDataFrame")) {
       samplers <- SpatialLinesDataFrame(
         samplers,
         data = data.frame(weight = rep(1, length(samplers)))
@@ -334,11 +335,12 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     # Set weight to 1 if not provided
     if (!("weight" %in% names(samplers))) {
-      warning("The integration points provided have no weight column. Setting weights to 1.")
       samplers$weight <- 1
     }
 
-    ips <- int.slines(samplers, domain,
+    ips <- int.slines(
+      samplers,
+      domain,
       group = group,
       project = identical(int.args[["method"]], "stable")
     )

@@ -86,7 +86,7 @@ anything), as follows:
 
 
 ```{r warning=FALSE,message=FALSE}
-mdl1 <- coordinates ~ veg(map = gcov$vegetation, model = "factor") - Intercept 
+mdl1 <- coordinates ~ veg(gcov$vegetation, main_layer = "vegetation", model = "factor_full") - Intercept 
 ```
 
 Notes:
@@ -99,12 +99,8 @@ is removed with `- Intercept`.)
 
 Fit the model as usual:
 
-The `expand.factor.strategy` needs to be set explicitly
-on some systems but not on others; debugging is in progress!
-
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
-fit1 <- lgcp(mdl1, nests, samplers = boundary, domain = list(coordinates = mesh),
-             options = list(control.fixed = list(expand.factor.strategy = "inla")))
+fit1 <- lgcp(mdl1, nests, samplers = boundary, domain = list(coordinates = mesh))
 ```
 
 Predict the intensity, and plot the median intensity surface. (In older versions, predicting takes some
@@ -146,13 +142,13 @@ the vegetation covariate, using an SPDE:
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
 pcmatern <- inla.spde2.pcmatern(mesh, 
                                 prior.sigma = c(0.1, 0.01), 
-                                prior.range = c(5, 0.01))
+                                prior.range = c(0.1, 0.01))
 
-mdl2 <- coordinates ~ veg(map = gcov$vegetation, model = "factor") - Intercept +
-                      mySmooth(map = coordinates, model = pcmatern) 
+mdl2 <- coordinates ~ -1 +
+  veg(gcov$vegetation, main_layer = "vegetation", model = "factor_full") +
+  mySmooth(coordinates, model = pcmatern) 
 
-fit2 <- lgcp(mdl2, nests, samplers = boundary,
-             options = list(control.fixed = list(expand.factor.strategy = "inla")))
+fit2 <- lgcp(mdl2, nests, samplers = boundary, domain = list(coordinates = mesh))
 ```
 
 And plot the median intensity surface
@@ -214,8 +210,8 @@ between models on the basis of DIC, using 'deltaIC()'.
 
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
 
-mdl3 <- coordinates ~ mySmooth(map = coordinates, model = pcmatern) + Intercept
-fit3 <- lgcp(mdl3, nests, samplers = boundary)
+mdl3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept(1)
+fit3 <- lgcp(mdl3, nests, samplers = boundary, domain = list(coordinates = mesh))
 
 int3 <- predict(fit3, df, ~ exp(mySmooth + Intercept))
 
@@ -244,16 +240,10 @@ ggplot() +
   coord_fixed()
 ```
 
-Plot the fixed effect posteriors. First get their names - from `$marginals.fixed` of the fitted object, 
-which contains the fixed effect marginal distribution data
-
+Plot the effect posteriors. For `veg` we plot a summary of the distribution.
 
 ```{r warning=FALSE,message=FALSE,eval=TRUE}
-fn <- names(fit2$marginals.fixed)
-fn
-flist <- vector("list",length(fn))
-for(i in 1:length(fn)) flist[[i]] <- plot(fit2, fn[i])
-multiplot(flist[[1]], flist[[2]], flist[[3]], flist[[4]], flist[[5]], flist[[6]], cols=3)
+plot(fit2, "veg")
 ```
 
 Use `spde.posterior( )` to obtain and then plot the SPDE parameter posteriors and the 
@@ -291,26 +281,22 @@ ggplot() +
 ```
 
 The elevation variable here is of class 'SpatialGridDataFrame'. In order for inlabru to
-be able to use this to evaluate elevation at any point in the survey region, we need to
-function that interpolates the elevation at any point. Fortunately the 'sp' package
-has powerful functions to do this. We use these in the function below to create the 
-function we needd.
+be able to use this to evaluate elevation at any point in the survey region, we
+need to make sure that the data grid doesn't have missing values where values are
+needed to compute the point process likelihood, which includes all mesh vertices
+belonging to triangles partially overlapping the survey region.
+If missing values are found, an attempt is made to impute them by using the
+nearest non-missing value, by calling the `bru_fill_missing()` function.
+To avoid repeated evaluation of the filling method, it is recommended that
+you call that function in your own code first, so you can inspect the result to
+make sure no unwanted artefacts were introduced.
+
+An alternative method of providing spatial covariate input is to define an
+evaluation function taking the coordinates as input, e.g.
+`my_covariate(x,y)`.
 
 
-```{r results="hide",warning=FALSE,message=FALSE}
-f.elev <- function(x,y) {
-  # turn coordinates into SpatialPoints object:
-  spp <- SpatialPoints(data.frame(x=x,y=y)) 
-  # attach the appropriate coordinate reference system (CRS)
-  proj4string(spp) <- CRS(proj4string(elev))
-  # Extract elevation values at spp coords, from our elev SpatialGridDataFrame
-  v <- over(spp, elev) 
-  v[is.na(v)] <- 0 # NAs are a problem! Remove them
-  return(v$elevation)
-} 
-```
-
-For brevity we are not going to consider models with elevatoin only, with elevation
+For brevity we are not going to consider models with elevation only, with elevation
 and a SPDE, and with SPDE only. We will just fit one with elevation and SPDE.
 We create our model to pass to lgcp thus:
 
@@ -318,34 +304,20 @@ We create our model to pass to lgcp thus:
 ```{r results="hide",warning=FALSE,message=FALSE}
 matern <- inla.spde2.pcmatern(mesh, 
                               prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(5, 0.01))
+                              prior.range = c(0.1, 0.01))
 
-emdl <- coordinates ~ beta.elev(map = f.elev(x,y), model = "linear") +
-                      mySmooth(map = coordinates, model = matern) + Intercept
+emdl <- coordinates ~
+  elevation(gcov$elevation, model = "linear") +
+  mySmooth(map = coordinates, model = matern) +
+  Intercept(1)
 ```
 
-Note how the elevation effect is defined. When we had a factor effect we specified it 
-like this
-
-
-```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
-veg(map = gcov$vegetation, model = "factor")
-```
-
-whereas we specify a continuous effect like this:
-
-
-```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
-beta.elev(map = f.elev(x,y), model = "linear")
-```
-
-We also now include an intercept term.
+Note how the elevation effect is defined. Since we named the component the same as the internal variable we want to extract from the spatial grid, we don't have to specify it with `main_layer="elevation"`.
+We also now included an intercept term.
 
 The model is fitted in the usual way:
-
-
 ```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
-efit <- lgcp(emdl, nests, samplers = boundary) 
+efit <- lgcp(emdl, nests, samplers = boundary, domain = list(coordinates = mesh)) 
 ```
 
 Summary and model selection
@@ -353,7 +325,6 @@ Summary and model selection
 
 ```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
 summary(efit)
-INLA:::summary.inla(efit)
 deltaIC(fit1,fit2,fit3,efit)
 ```
 
@@ -361,7 +332,7 @@ Predict and plot the density
 
 
 ```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
-e.int <- predict(efit, pixels(mesh), ~ exp(mySmooth + beta.elev + Intercept))
+e.int <- predict(efit, pixels(mesh), ~ exp(mySmooth + elevation + Intercept))
 
 ggplot() + 
   gg(e.int) + 
@@ -382,10 +353,10 @@ appropriate text in place of '??' below.
 e.lp <- predict(efit, coordinates ~ ??) # elevation effect and SPDE effect
 e.lp.elev <- predict(efit, coordinates ~ ??) # elevation effect only
 e.lp.spde <- predict(efit, coordinates ~ ??) # SPDE effect only
-
+```
 ```{r warning=FALSE,message=FALSE,eval=TRUE,echo=TRUE}
-e.lp <- predict(efit, pixels(mesh),  ~ mySmooth + beta.elev) # SOLUTION
-e.lp.elev <- predict(efit, pixels(mesh), ~ beta.elev)
+e.lp <- predict(efit, pixels(mesh),  ~ mySmooth + elevation) # SOLUTION
+e.lp.elev <- predict(efit, pixels(mesh), ~ elevation)
 e.lp.spde <- predict(efit, pixels(mesh), ~ mySmooth)
 ```
 
@@ -448,15 +419,19 @@ in the prediction object, for easier plotting.
 
 ```{r fig.show="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 Lambda <- predict(efit, ipoints(boundary, mesh),
-                  ~ sum(weight * exp(mySmooth + beta.elev + Intercept)))
+                  ~ sum(weight * exp(mySmooth + elevation + Intercept)))
 Lambda
 
 Nest.e <- predict(
   efit,
   ipoints(boundary, mesh), 
-  ~ data.frame(N = 500:800,
-               density = dpois(500:800,
-                               lambda = sum(weight * exp(mySmooth + beta.elev + Intercept)))))
+#  ~ data.frame(N = 500:800,
+#               density = dpois(500:800,
+#                               lambda = sum(weight * exp(mySmooth + elevation + Intercept)))),
+  ~ dpois(500:800,
+          lambda = sum(weight * exp(mySmooth + elevation + Intercept))),
+  n.samples = 500)
+Nest.e <- cbind(data.frame(N = 500:800), Nest.e)
 ```
 
 Plot in the same way as in previous practicals
@@ -484,7 +459,10 @@ z <- cov2_1D(ss)
 x <- seq(1, 55, length = 100)
 mesh <- inla.mesh.1d(x, degree = 1)
 
-mdl <- x ~ beta_z(map = cov2_1D(x), model = "linear") + spde1D(map=x, model = inla.spde2.matern(mesh)) + Intercept
+mdl <- x ~
+  beta_z(cov2_1D(x), model = "linear") +
+  spde1D(x, model = inla.spde2.matern(mesh)) +
+  Intercept(1)
 
 fitcov1D <- lgcp(mdl, pts2, domain = list(x = mesh))
 pr.df <- data.frame(x = x)

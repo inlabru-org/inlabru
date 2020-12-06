@@ -217,23 +217,57 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
 
   # Extract start and end coordinates
   qq <- coordinates(data)
-  sp <- do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x) - 1), ]))))
-  ep <- do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))))
-
-  idx <- do.call(rbind, lapply(1:length(qq), function(k) do.call(cbind, lapply(qq[[k]], function(x) rep(k, nrow(x) - 1)))))
+  sp <- do.call(
+    rbind,
+    lapply(
+      qq,
+      function(k) {
+        do.call(
+          rbind,
+          lapply(k, function(x) x[1:(nrow(x) - 1), , drop = FALSE])
+        )
+      }
+    )
+  )
+  ep <- do.call(
+    rbind,
+    lapply(
+      qq,
+      function(k) {
+        do.call(
+          rbind,
+          lapply(k, function(x) x[2:(nrow(x)), , drop = FALSE])
+        )
+      }
+    )
+  )
+  
+  idx <- do.call(
+    rbind,
+    lapply(
+      seq_along(qq),
+      function(k) {
+        do.call(
+          cbind,
+          lapply(qq[[k]], function(x) rep(k, nrow(x) - 1))
+        )
+      }
+    )
+  )
   idx <- cbind(idx, idx)
 
   if (!is.null(mesh)) {
     # Filter out points outside the mesh...
     loc <- as.matrix(rbind(sp, ep))
-    t1 <- INLA::inla.fmesher.smorg(loc = mesh$loc, tv = mesh$graph$tv, points2mesh = as.matrix(data.frame(sp, z = 0)))$p2m.t
-    t2 <- INLA::inla.fmesher.smorg(loc = mesh$loc, tv = mesh$graph$tv, points2mesh = as.matrix(data.frame(ep, z = 0)))$p2m.t
-    if (any(t1 == 0) | any(t2 == 0)) {
+    proj1 <- INLA::inla.mesh.projector(mesh, loc = as.matrix(sp))
+    proj2 <- INLA::inla.mesh.projector(mesh, loc = as.matrix(ep))
+    ok <- (proj1$proj$ok & proj2$proj$ok)
+    if (!all(ok)) {
       warning("Found spatial lines with start or end point ouside of the mesh. Omitting.")
     }
-    sp <- sp[!((t1 == 0) | (t2 == 0)), ]
-    ep <- ep[!((t1 == 0) | (t2 == 0)), ]
-    idx <- idx[!((t1 == 0) | (t2 == 0)), ]
+    sp <- sp[ok, , drop = FALSE]
+    ep <- ep[ok, , drop = FALSE]
+    idx <- idx[ok, , drop = FALSE]
 
     # Split at mesh edges
     line.spl <- split_lines(mesh, sp, ep, TRUE)
@@ -460,14 +494,15 @@ integration_weight_aggregation <- function(mesh, integ) {
 
   # Convert integration weights to mesh points
   weight <- as.vector(as.vector(integ$weight) %*% proj$proj$A)
-  
+
   ok <- weight > 0
 
   if (inherits(integ, "SpatialPointsDataFrame")) {
     sp::SpatialPointsDataFrame(mesh$loc[ok, , drop = FALSE],
-                               data = data.frame(weight = weight[ok]),
-                               proj4string = fm_sp_get_crs(integ),
-                               match.ID = FALSE)
+      data = data.frame(weight = weight[ok]),
+      proj4string = fm_sp_get_crs(integ),
+      match.ID = FALSE
+    )
   } else {
     list(loc = mesh$loc[ok, , drop = FALSE], weight = weight[ok])
   }
@@ -530,7 +565,7 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 }
 
 #' Integration points for polygons inside an inla.mesh
-#' 
+#'
 #' This method doesn't handle polygons with holes. Use [bru_int_polygon()]
 #' instead.
 #'
@@ -547,34 +582,34 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
     group <- rep(1, nrow(loc))
   }
   method <- match.arg(method, c("stable", "direct"))
-  
+
   ipsl <- list()
   # print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
   for (g in unique(group)) {
     gloc <- loc[group == g, , drop = FALSE]
-    
+
     # Combine polygon with mesh boundary to get mesh covering the intersection.
     bnd <- INLA::inla.mesh.segment(loc = gloc, is.bnd = TRUE)
     integ <- make_stable_integration_points(mesh, bnd, ...)
-    
+
     if (method %in% c("stable")) {
       # Project integration points and weights to mesh nodes
       integ <- integration_weight_aggregation(mesh, integ)
     }
-    
+
     # Keep points inside the mesh with positive weights
     ok <-
       INLA::inla.mesh.project(mesh, integ$loc)$ok &
-      (integ$weight > 0)
-    
+        (integ$weight > 0)
+
     ips <- data.frame(integ$loc[ok, 1:2, drop = FALSE])
     colnames(ips) <- c("x", "y")
     ips$weight <- integ$weight[ok]
-    
+
     ips$group <- rep(g, nrow(ips))
     ipsl <- c(ipsl, list(ips))
   }
-  
+
   do.call(rbind, ipsl)
 }
 
@@ -592,22 +627,24 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
 
 bru_int_polygon <- function(mesh, polylist, method = NULL, ...) {
   method <- match.arg(method, c("stable", "direct"))
-  
+
   ipsl <- list()
   # print(paste0("Number of polygons to integrate over: ", length(polylist) ))
   for (g in seq_along(polylist)) {
     poly <- polylist[[g]]
-    
+
     # Combine polygon with mesh boundary to get mesh covering the intersection.
     integ <- make_stable_integration_points(mesh, poly, ...)
-    
+
     # Keep points inside the mesh with positive weights
     ok <-
       INLA::inla.mesh.project(mesh, integ$loc)$ok &
-      (integ$weight > 0)
-    
-    integ <- list(loc = integ$loc[ok, 1:2, drop = FALSE],
-                  weight = integ$weight[ok])
+        (integ$weight > 0)
+
+    integ <- list(
+      loc = integ$loc[ok, 1:2, drop = FALSE],
+      weight = integ$weight[ok]
+    )
 
     if (method %in% c("stable")) {
       # Project integration points and weights to mesh nodes
@@ -623,6 +660,6 @@ bru_int_polygon <- function(mesh, polylist, method = NULL, ...) {
 
     ipsl <- c(ipsl, list(ips))
   }
-  
+
   do.call(rbind, ipsl)
 }

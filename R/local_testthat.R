@@ -206,7 +206,9 @@ local_bru_safe_inla <- function(multicore = FALSE,
       envir
     )
   }
-  local_bru_options_set(num.threads = "1:1", envir = envir)
+  if (!multicore) {
+    local_bru_options_set(num.threads = "1:1", envir = envir)
+  }
   testthat::skip_if_not(bru_safe_inla(multicore = multicore, quietly = quietly))
 }
 
