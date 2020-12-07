@@ -10,10 +10,11 @@ test_that("bru: clinear component", {
   input.df <- data.frame(x = cos(1:100))
   input.df <- within(input.df, y <- 5 + 2 * x + rnorm(100, mean = 0, sd = 0.1))
 
-  fit <- bru(y ~ myLin(main = x, model = "clinear", range = c(0, Inf)) +
-    Intercept(1),
-  family = "gaussian", data = input.df,
-  options = list(num.threads = "1:1")
+  fit <- bru(
+    y ~ myLin(main = x, model = "clinear", range = c(0, Inf)) +
+      Intercept(1),
+    family = "gaussian",
+    data = input.df
   )
 
   expect_equal(fit$summary.random[["myLin"]][1, "mean"], 2.002517, tolerance = midtol)

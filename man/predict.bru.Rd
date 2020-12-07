@@ -22,8 +22,9 @@
 \item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for
 the prediction.}
 
-\item{formula}{A formula determining which effects to predict and how to
-combine them.}
+\item{formula}{A formula defining an R expression to evaluate for each generated
+sample. If \code{NULL}, the latent and hyperparameter states are generated
+as named list elements.}
 
 \item{n.samples}{Integer setting the number of samples to draw in order to
 calculate the posterior statistics. The default is rather low but provides

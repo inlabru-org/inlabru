@@ -104,14 +104,14 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
   if (allow_verbose) {
     if ((!is.null(verbose) && (verbose >= verbosity)) ||
       (is.null(verbose) &&
-       bru_options_get("bru_verbose", include_default = TRUE) >= verbosity)) {
+        bru_options_get("bru_verbose", include_default = TRUE) >= verbosity)) {
       message(..., domain = domain, appendLF = appendLF)
     }
   }
   if ((!is.null(verbose_store) && (verbose_store >= verbosity)) ||
     !allow_verbose ||
     (is.null(verbose_store) &&
-     bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity)) {
+      bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity)) {
     envir <- bru_env_get()
     envir$log <- c(
       envir$log,
@@ -157,7 +157,15 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #'   values for the latent variables. This will be used as a
 #'   starting point for further improvement of the approximate posterior.}
 #' \item{bru_int_args}{List of arguments passed all the way to the
-#' integration method `ipoints` and `int.polygon` for 'cp' family models}
+#' integration method `ipoints` and `int.polygon` for 'cp' family models;
+#' \describe{
+#' \item{method}{"stable" or "direct". For "stable" (default) integration points
+#' are aggregated to mesh vertices.}
+#' \item{nsub1}{Number of integration points per knot interval in 1D. Default 30.}
+#' \item{nsub2}{Number of integration points along a triangle edge for 2D. Default 9.}
+#' \item{nsub}{Deprecated parameter that overrides `nsub1` and `nsub2` if set. Default `NULL`.}
+#' }
+#' }
 #' \item{bru_method}{List of arguments controlling the iterative inlabru method:
 #' \describe{
 #' \item{taylor}{Either 'legacy' (for the pre-2.1.15 method) or 'pandemic'
@@ -263,7 +271,7 @@ bru_options_default <- function() {
     bru_verbose_store = 1,
     bru_max_iter = 10,
     bru_run = TRUE,
-    bru_int_args = list(method = "stable"), # nsub: NULL
+    bru_int_args = list(method = "stable", nsub1 = 30, nsub2 = 9),
     bru_method = list(
       taylor = "pandemic",
       search = "all",
@@ -505,7 +513,8 @@ bru_options_reset <- function() {
 
 
 #' @title Print inlabru options
-#' @param x An [`bru_options`] object to be printed
+#' @param object A [bru_options] object to be summarised
+#' @param x A `summary_bru_options` object to be printed
 #' @param legend logical; If `TRUE`, include explanatory text, Default: `TRUE`
 #' @param include_global logical; If `TRUE`, include global override options
 #' @param include_default logical; If `TRUE`, include default options
@@ -521,56 +530,56 @@ bru_options_reset <- function() {
 #'   # Only include options set in the object:
 #'   print(options, include_default = FALSE, include_global = FALSE)
 #' }
-#' @method print bru_options
+#' @method summary bru_options
 #' @export
-#' @rdname print.bru_options
-
-print.bru_options <- function(x,
-                              legend = TRUE,
-                              include_global = TRUE,
-                              include_default = TRUE,
-                              ...) {
-  traverse <- function(combined, default, global, options, prefix = "") {
+#' @rdname summary.bru_options
+summary.bru_options <- function(object,
+                                legend = TRUE,
+                                include_global = TRUE,
+                                include_default = TRUE,
+                                ...) {
+  traverse <- function(combined, default, global, object) {
+    result <- list()
     for (name in sort(names(combined))) {
       if (is.list(combined[[name]])) {
-        cat(paste0(prefix, name, " =\n"))
-        traverse(
-          combined[[name]], default[[name]],
-          global[[name]], options[[name]],
-          prefix = paste0(prefix, "  ")
+        result[[name]] <- list(
+          is_list = TRUE,
+          value = traverse(
+            combined[[name]], default[[name]],
+            global[[name]], object[[name]]
+          )
         )
       } else {
-        cat(paste0(
-          prefix,
-          name, " = ",
-          if (is.null(combined[[name]])) {
+        result[[name]] <- list(
+          is_list = FALSE,
+          value = if (is.null(combined[[name]])) {
             "NULL"
           } else {
             combined[[name]]
           },
-          " (",
-          if (
-            !is.null(default[[name]]) &&
-              (default[[name]] == combined[[name]])
-          ) {
-            "default"
-          } else if (
-            !is.null(global[[name]]) &&
-              (global[[name]] == combined[[name]])
-          ) {
-            "global"
-          } else if (
-            !is.null(options[[name]]) &&
-              (options[[name]] == combined[[name]])
-          ) {
-            "user"
-          } else {
-            "unknown"
-          },
-          ")\n"
-        ))
+          origin =
+            if (
+              !is.null(default[[name]]) &&
+                (default[[name]] == combined[[name]])
+            ) {
+              "default"
+            } else if (
+              !is.null(global[[name]]) &&
+                (global[[name]] == combined[[name]])
+            ) {
+              "global"
+            } else if (
+              !is.null(object[[name]]) &&
+                (object[[name]] == combined[[name]])
+            ) {
+              "user"
+            } else {
+              "unknown"
+            }
+        )
       }
     }
+    result
   }
   if (include_default) {
     default <- bru_options_default()
@@ -582,22 +591,60 @@ print.bru_options <- function(x,
   } else {
     global <- bru_options()
   }
-  combined <- bru_options(default, global, x)
+  combined <- bru_options(default, global, object)
 
   if (legend) {
+    legend <- c(
+      "default = value from the default options",
+      "global  = value from the global override object",
+      "user    = value from the user override object"
+    )
+  } else {
+    legend <- NULL
+  }
+  result <- list(
+    legend = legend,
+    value = traverse(combined, default, global, object)
+  )
+  class(result) <- c("summary_bru_options", "list")
+  result
+}
+
+#' @export
+#' @rdname summary.bru_options
+print.summary_bru_options <- function(x, ...) {
+  traverse <- function(tree, prefix = "") {
+    for (name in sort(names(tree))) {
+      if (tree[[name]]$is_list) {
+        cat(paste0(prefix, name, " =\n"))
+        traverse(
+          tree[[name]]$value,
+          prefix = paste0(prefix, "\t")
+        )
+      } else {
+        cat(paste0(
+          prefix,
+          name, " =\t",
+          tree[[name]]$value,
+          "\t(",
+          tree[[name]]$origin,
+          ")\n"
+        ))
+      }
+    }
+  }
+
+  if (!is.null(x[["legend"]])) {
     cat("Legend:\n")
-    if (include_default) {
-      cat("  default = first set in the default options\n")
-    }
-    if (include_global) {
-      cat("  global = first set in the global override object\n")
-    }
-    cat("  user = first set in the object\n")
+    cat(paste0("  ", x[["legend"]], collapse = "\n"))
   }
   cat("Options for inlabru:\n")
-  traverse(combined, default, global, x, prefix = "  ")
+  traverse(x[["value"]], prefix = "  ")
   invisible(x)
 }
+
+
+
 
 
 

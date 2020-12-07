@@ -1,10 +1,10 @@
 ---
-title: "LGCPs - Multiple Likekelihoods"
+title: "LGCPs - Multiple Likelihoods"
 author: "Fabian E. Bachl"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{LGCPs - Multiple Likelihoods}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,6 +14,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"),
+                      fig.height=3,fig.width=4)
 ```
 
 Introduction
@@ -66,31 +68,84 @@ the two different spatial smoothers, one for each nest group.
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 matern <- inla.spde2.pcmatern(gorillas$mesh, 
-                              prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(5, 0.01))
+                              prior.range = c(0.1, 0.01),
+                              prior.sigma = c(1, 0.01))
 
-cmp <- coordinates ~ mySmoothMajor(map = coordinates, model = matern) + 
-                     mySmoothMinor(map = coordinates, model = matern) + 
-                     Intercept
+cmp <- ~
+  Common(coordinates, model = matern) + 
+  Difference(coordinates, model = matern) + 
+  Intercept(1)
 
 ```
 
-Given these components we define the linear predictor for each of the likelihoods
+Given these components we define the linear predictor for each of the likelihoods.
+(Using "." indicates a pure additive model, and one can use include/exclude
+options for `like()` to indicate which components are actively involved in each model.)
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-fml.major = coordinates ~ mySmoothMajor + Intercept
-fml.minor = coordinates ~ mySmoothMinor + Intercept
+fml.major = coordinates ~ Intercept + Common + Difference/2
+fml.minor = coordinates ~ Intercept + Common - Difference/2
 ```
 
 Setting up the cox process integration points is easy in this example. Both nest types were observed within the same window.
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ips = ipoints(gorillas$boundary)
+ips = ipoints(gorillas$boundary, gorillas$mesh)
 ```
 Lastly, we define the two likelihoods...
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-lik_minor = like("cp", formula = fml.major, components = cmp, data = gorillas$nests, ips = ips)
-lik_major = like("cp", formula = fml.minor, components = cmp, data = gorillas$nests, ips = ips)
+lik_minor = like("cp", formula = fml.major,
+                 data = gorillas$nests[gorillas$nests$group == "major",],
+                 ips = ips)
+lik_major = like("cp", formula = fml.minor,
+                 data = gorillas$nests[gorillas$nests$group == "minor",],
+                 ips = ips)
 ```
 ... which we provide to the ´bru´ function.
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-jfit = bru(cmp, lik_major, lik_minor, options = list(max.iter = 1))
+jfit = bru(cmp, lik_major, lik_minor,
+           options = list(control.inla = list(int.strategy = "eb"),
+                          bru_max_iter = 1))
+```
+
+```{r, warning=FALSE,fig.width=8}
+library(patchwork)
+pl.major <- ggplot() +
+  gg(gorillas$mesh,
+     mask = gorillas$boundary,
+     col = exp(jfit$summary.random$Common$mean))
+pl.minor <- ggplot() +
+  gg(gorillas$mesh,
+     mask = gorillas$boundary,
+     col = exp(jfit$summary.random$Difference$mean))
+(pl.major + scale_fill_continuous(trans = "log")) +
+  (pl.minor + scale_fill_continuous(trans = "log")) &
+  theme(legend.position = "right")
+```
+
+```{r, warning=FALSE}
+jfit0 <- jfit
+jfit <- bru_rerun(jfit)
+```
+
+
+```{r, warning=FALSE,fig.width=8}
+library(patchwork)
+pl.major <- ggplot() +
+  gg(gorillas$mesh,
+     mask = gorillas$boundary,
+     col = exp(jfit$summary.random$Common$mean))
+pl.minor <- ggplot() +
+  gg(gorillas$mesh,
+     mask = gorillas$boundary,
+     col = exp(jfit$summary.random$Difference$mean))
+(pl.major + scale_fill_continuous(trans = "log")) +
+  (pl.minor + scale_fill_continuous(trans = "log")) &
+  theme(legend.position = "right")
+```
+
+```{r}
+summary(jfit0)
+```
+
+```{r}
+summary(jfit)
 ```

@@ -9,8 +9,10 @@ test_data <- function() {
     prior.sigma = c(0.1, 0.75)
   )
   mdl <- x ~ spde1D(main = x, model = matern) + Intercept(1)
-  fit <- lgcp(mdl, pts2,
-    ips = ipoints(c(0, 55), 50, name = "x"),
+  fit <- lgcp(
+    mdl,
+    pts2,
+    domain = list(x = mesh1D),
     options = list(
       control.inla = list(int.strategy = "eb")
     )
@@ -71,8 +73,8 @@ test_that("1D LGCP fitting", {
   # predicted intensity integral
   ips <- ipoints(c(0, 55), 100, name = "x")
   Lambda <- predict(fit, ips, ~ sum(weight * exp(spde1D + Intercept)), n.samples = 100, seed = 4354)
-  expect_equal(Lambda$mean, 131.5858, tolerance = hitol)
-  expect_equal(Lambda$sd, 12.37687, tolerance = 1)
+  expect_equal(Lambda$mean, 131.0741, tolerance = hitol)
+  expect_equal(Lambda$sd, 11.35888, tolerance = 1)
 })
 
 

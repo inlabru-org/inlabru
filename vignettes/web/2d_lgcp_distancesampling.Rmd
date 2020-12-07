@@ -84,7 +84,7 @@ ggplot(data.frame(mexdolphin$points)) +
   geom_point(aes(x = distance), y = 0, pch = "|", cex = 4)
 ```
 
-We need to define a lf-normal detection probability function. This must take distance as its first
+We need to define a half-normal detection probability function. This must take distance as its first
 arguent and the linear predictor of the sigma parameter (which we will call `lsig`) as its second:
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
@@ -106,27 +106,31 @@ We need to now separately define the components of the model
 (the SPDE, the Intercept and the detection function parameter `lsig`)
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
-cmp = ~ mySPDE(map = coordinates, model = matern) + 
-             lsig + Intercept
+cmp = ~ mySPDE(main = coordinates, model = matern) + 
+             lsig(1) + Intercept(1)
 ```
 
 ... and the formula, which describes how these components are combined to 
-form the linear predictor (remembering that we need an offset!):
+form the linear predictor (remembering that we need an offset due to the unknown
+direction of the detections!):
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 formula = coordinates + distance ~ mySPDE +
                                   log(hn(distance, lsig)) + 
-                                  log(1/W) +
-                                  Intercept
+                                  Intercept + log(2)
 ```
 
 Then fit the model, passing both the components and the formula 
-(previously the formula was consturcted invisibly by `inlabru`):
+(previously the formula was constructed invisibly by `inlabru`),
+and specify integration domains for the spatial and distance dimensions:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 fit = lgcp(components = cmp, 
            mexdolphin$points,
            samplers = mexdolphin$samplers,
+           domain = list(
+             coordinates = mesh,
+             distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
            formula = formula)
 ```
 
@@ -141,7 +145,7 @@ spde.logvar <- spde.posterior(fit, "mySPDE", what = "log.variance"); plot(spde.l
 Predict spatial intensity, and plot it:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
-pxl = pixels(mesh, nx = 50, ny = 100)
+pxl = pixels(mesh, nx = 100, ny = 50)
 pr.int <- predict(fit, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() + gg(pr.int) + gg(mexdolphin$ppoly) + 
@@ -159,7 +163,7 @@ Predict detection function and plot it, to generate a plot like that below
 distdf <- data.frame(distance = seq(0,8,length=100))
 dfun <- predict(fit, distdf, ~ hn(distance,lsig))
 plot(dfun)
-
+```
 ```{r results="hide",warning=FALSE,message=FALSE, echo = FALSE, eval=TRUE, fig.width=10, fig.heigth=4}
 distdf <- data.frame(distance = seq(0,8,length=100))
 dfun <- predict(fit, distdf, ~ hn(distance,lsig))
@@ -175,7 +179,7 @@ Lambda
 ```
 
 and including the randomness about the expected number. In this case, it turns
-out that you need lots of posterio samples, e.g. 2,000 to smooth out the Monte Carlo
+out that you need lots of posterior samples, e.g. 2,000 to smooth out the Monte Carlo
 error in the posterior, and this takes a little while to compute:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo=TRUE}
@@ -183,7 +187,8 @@ Ns = seq(50, 450, by = 1)
 Nest <- predict(fit, predpts, 
                 ~ data.frame(N = Ns,
                              density = dpois(Ns, 
-                                             lambda = sum(weight * exp(mySPDE + Intercept)))),n=1000)
+                                             lambda = sum(weight * exp(mySPDE + Intercept)))),
+                n.samples = 2000)
 
 Nest$plugin_estimate <- dpois(Nest$N, lambda=Lambda$mean)
 ggplot(data = Nest) +
@@ -205,12 +210,15 @@ Solution:
 ```{r, results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 formula1 = coordinates + distance ~ mySPDE +
   log(hr(distance, lsig)) + 
-  log(1/W) +
-  Intercept
+  Intercept + log(2)
 
 fit1 = lgcp(components = cmp, 
            mexdolphin$points,
            samplers = mexdolphin$samplers,
+           domain = list(
+             coordinates = mesh,
+             distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))
+           ),
            formula = formula1)
 ```
 Plots:
@@ -219,7 +227,7 @@ Plots:
 spde.range <- spde.posterior(fit1, "mySPDE", what = "range"); plot(spde.range)
 spde.logvar <- spde.posterior(fit1, "mySPDE", what = "log.variance"); plot(spde.logvar)
 
-pxl = pixels(mesh, nx = 50, ny = 100)
+pxl = pixels(mesh, nx = 100, ny = 50)
 pr.int1 <- predict(fit1, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() + gg(pr.int1) + gg(mexdolphin$ppoly) + 
@@ -239,10 +247,15 @@ Lambda1 <- predict(fit1, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda1
 
 Ns = seq(50, 650, by = 1)
-Nest1 <- predict(fit1, predpts, 
-                ~ data.frame(N = Ns,
-                             density = dpois(Ns, 
-                                             lambda = sum(weight * exp(mySPDE + Intercept)))),n=2000)
+Nest1 <- predict(
+  fit1,
+  predpts, 
+  ~ data.frame(
+    N = Ns,
+    density = dpois(Ns, 
+                    lambda = sum(weight * exp(mySPDE + Intercept)))),
+  n.samples = 2000
+)
 
 Nest1$plugin_estimate <- dpois(Nest1$N, lambda=Lambda1$mean)
 ggplot(data = Nest1) +
@@ -277,9 +290,10 @@ Half-normal first
 
 ```{r,results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 formula = distance ~ log(hn(distance, lsig)) + Intercept
-cmp = ~ lsig + Intercept 
+cmp = ~ lsig(1) + Intercept(1)
 dfit = lgcp(components = cmp, 
-           mexdolphin$points, 
+           mexdolphin$points,
+           domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
            formula = formula)
 detfun = predict(dfit, distdf, ~ hn(distance, lsig))
 ```
@@ -291,6 +305,7 @@ formula1 = distance ~ log(hr(distance, lsig)) + Intercept
 cmp = ~ lsig + Intercept 
 dfit1 = lgcp(components = cmp, 
             mexdolphin$points, 
+           domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
             formula = formula1)
 detfun1 = predict(dfit1, distdf, ~ hr(distance, lsig))
 ```

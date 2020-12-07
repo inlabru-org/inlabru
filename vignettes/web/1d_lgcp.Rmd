@@ -1,6 +1,6 @@
 ---
 title: "LGCPs - An example in one dimension"
-author: "David Borchers"
+author: "David Borchers and Finn Lindgren"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -74,15 +74,15 @@ mesh1D <- inla.mesh.1d(x, boundary = "free")
 Make a 1D SPDE model:
 ```{r results="hide",warning=FALSE,message=FALSE}
 matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150,0.75), prior.sigma = c(0.1,0.75))
-mdl <- x ~ spde1D(map = x, model = matern) + Intercept
+mdl <- x ~ spde1D(x, model = matern) + Intercept(1)
 ```
 
-Here we want to fit to the actual points, and the `inlabru` function that does this is called `lgcp` (for 'Log Gaussian Cox Process'). The `ips' and `domain` parameters are optional, one or the other or neither can be used. If neither are used, `lgcp` will infer the boundary of the `x` domain by using the upper and lower limits of the `x` column in `pts2`. Here are three ways of doing the same thing:
+Here we want to fit to the actual points, and the `inlabru` function that does this is called `lgcp` (for 'Log Gaussian Cox Process'). The `ips' and `domain` parameters are optional, one or the other can be used.
+Here are two ways of doing the same thing:
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 fit.spde <- lgcp(mdl, pts2, ips = ipoints(c(0,55), 50, name = "x"))
 fita.spde <- lgcp(mdl, pts2, domain = list(x = mesh1D))
-fitb.spde <- lgcp(mdl, pts2)
 ```
 
 SPDE parameters 

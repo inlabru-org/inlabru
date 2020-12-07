@@ -59,3 +59,44 @@ test_that("Multi-mapper bru input", {
   expect_equal(fit1$summary.random, fit3$summary.random)
   expect_equal(fit1$summary.random, fit4$summary.random)
 })
+
+
+# Define in outer environment:
+
+
+test_that("User defined mappers", {
+  # User defined mapper objects
+
+  ibm_amatrix.bm_test <- function(mapper, input, ...) {
+    message("---- IBM_AMATRIX from inner environment ----")
+    Matrix::sparseMatrix(
+      i = seq_along(input),
+      j = input,
+      x = rep(2, length(input)),
+      dims = c(length(input), mapper$n)
+    )
+  }
+
+  bm_test <- function(n, ...) {
+    bru_mapper(
+      list(n = n),
+      new_class = "bm_test",
+      ibm_amatrix = ibm_amatrix.bm_test
+    )
+  }
+
+  m <- bm_test(n = 20)
+  cmp <- y ~ -1 + indep(x, model = "iid", mapper = m)
+  mydata <- data.frame(y = rnorm(15) + 2 * (1:15), x = 1:15)
+
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  expect_message(
+    {
+      fit <- bru(cmp, data = mydata, family = "gaussian")
+    },
+    "---- IBM_AMATRIX from inner environment ----",
+    label = "Non-interactive bru() call"
+  )
+})

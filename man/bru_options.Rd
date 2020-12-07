@@ -118,7 +118,15 @@ to run inference.}
 values for the latent variables. This will be used as a
 starting point for further improvement of the approximate posterior.}
 \item{bru_int_args}{List of arguments passed all the way to the
-integration method \code{ipoints} and \code{int.polygon} for 'cp' family models}
+integration method \code{ipoints} and \code{int.polygon} for 'cp' family models;
+\describe{
+\item{method}{"stable" or "direct". For "stable" (default) integration points
+are aggregated to mesh vertices.}
+\item{nsub1}{Number of integration points per knot interval in 1D. Default 30.}
+\item{nsub2}{Number of integration points along a triangle edge for 2D. Default 9.}
+\item{nsub}{Deprecated parameter that overrides \code{nsub1} and \code{nsub2} if set. Default \code{NULL}.}
+}
+}
 \item{bru_method}{List of arguments controlling the iterative inlabru method:
 \describe{
 \item{taylor}{Either 'legacy' (for the pre-2.1.15 method) or 'pandemic'

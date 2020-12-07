@@ -10,9 +10,10 @@ test_that("bru: linear component", {
   input.df <- data.frame(x = cos(1:100))
   input.df <- within(input.df, y <- 5 + 2 * x + rnorm(100, mean = 0, sd = 0.1))
 
-  fit <- bru(y ~ myLin(main = x, model = "linear") + Intercept(1),
-    family = "gaussian", data = input.df,
-    options = list(num.threads = "1:1")
+  fit <- bru(
+    y ~ myLin(main = x, model = "linear") + Intercept(1),
+    family = "gaussian",
+    data = input.df
   )
 
   expect_equal(fit$summary.fixed["myLin", "mean"], 2.002273, tolerance = midtol)

@@ -80,6 +80,16 @@ bru_info_upgrade <- function(object, old = FALSE) {
   object
 }
 
+
+get_component_type <- function(x, part, components) {
+  if (is.null(x[["copy"]])) {
+    x[[part]][["type"]]
+  } else {
+    components[[x[["copy"]]]][[part]][["type"]]
+  }
+}
+
+
 #' Methods for bru_info objects
 #' @export
 #' @method summary bru_info
@@ -96,7 +106,19 @@ summary.bru_info <- function(object, ...) {
         function(x) {
           list(
             label = x[["label"]],
-            main_type = x[["main"]][["type"]]
+            copy_of = x[["copy"]],
+            main_type = get_component_type(
+              x, "main",
+              object[["model"]][["effects"]]
+            ),
+            group_type = get_component_type(
+              x, "group",
+              object[["model"]][["effects"]]
+            ),
+            replicate_type = get_component_type(
+              x, "replicate",
+              object[["model"]][["effects"]]
+            )
           )
         }
       ),
@@ -124,11 +146,24 @@ print.summary_bru_info <- function(x, ...) {
   cat(paste0("INLA version: ", x$INLA_version, "\n"))
   cat(paste0("Components:\n"))
   for (cmp in x$components) {
-    cat(sprintf(
-      "  %s: Main model type '%s'\n",
-      cmp$label,
-      cmp$main_type
-    ))
+    if (!is.null(cmp$copy_of)) {
+      cat(sprintf(
+        "  %s: Copy of '%s' (types main='%s', group='%s', replicate='%s)\n",
+        cmp$label,
+        cmp$copy_of,
+        cmp$main_type,
+        cmp$group_type,
+        cmp$replicate_type
+      ))
+    } else {
+      cat(sprintf(
+        "  %s: Model types main='%s', group='%s', replicate='%s'\n",
+        cmp$label,
+        cmp$main_type,
+        cmp$group_type,
+        cmp$replicate_type
+      ))
+    }
   }
   cat(paste0("Likelihoods:\n"))
   for (lh in x$lhoods) {
@@ -478,11 +513,9 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 
     if (is.null(ips)) {
       ips <- ipmaker(
-        samplers,
+        samplers = samplers,
         domain = domain,
         dnames = response,
-        data = NULL,
-        model = NULL,
         int.args = options[["bru_int_args"]]
       )
     }
@@ -811,8 +844,9 @@ lgcp <- function(components,
 #' @param object An object obtained by calling [bru] or [lgcp].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' the prediction.
-#' @param formula A formula determining which effects to predict and how to
-#' combine them.
+#' @param formula A formula defining an R expression to evaluate for each generated
+#' sample. If `NULL`, the latent and hyperparameter states are generated
+#' as named list elements.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics. The default is rather low but provides
 #' a quick approximate result.
@@ -884,22 +918,36 @@ predict.bru <- function(object,
           x = vals[[1]][, covar, drop = FALSE]
         )
     }
-    vals <- smy
-    is.annot <- vapply(names(vals), function(v) all(vals[[v]]$sd == 0), TRUE)
-    annot <- do.call(cbind, lapply(vals[is.annot], function(v) v[, 1]))
-    vals <- vals[!is.annot]
+    is.annot <- vapply(names(smy), function(v) all(smy[[v]]$sd == 0), TRUE)
+    annot <- do.call(cbind, lapply(smy[is.annot], function(v) v[, 1]))
+    smy <- smy[!is.annot]
     if (!is.null(annot)) {
-      vals <- lapply(vals, function(v) cbind(data.frame(annot), v))
+      smy <- lapply(smy, function(v) cbind(data.frame(annot), v))
     }
 
 
-    if (length(vals) == 1) vals <- vals[[1]]
+    if (length(smy) == 1) smy <- smy[[1]]
+  } else if (is.list(vals[[1]])) {
+    vals.names <- names(vals[[1]])
+    if (any(vals.names == "")) {
+      warning("Some generated list elements are unnamed")
+    }
+    smy <- list()
+    for (nm in vals.names) {
+      smy[[nm]] <-
+        bru_summarise(
+          lapply(
+            vals,
+            function(v) v[[nm]]
+          )
+        )
+    }
   } else {
-    vals <- bru_summarise(vals, x = data)
+    smy <- bru_summarise(vals, x = data)
   }
 
-  if (!inherits(vals, "Spatial")) class(vals) <- c("prediction", class(vals))
-  vals
+  if (!inherits(smy, "Spatial")) class(smy) <- c("prediction", class(smy))
+  smy
 }
 
 #' Sampling based on bru posteriors
@@ -917,8 +965,9 @@ predict.bru <- function(object,
 #' @param object A `bru` object obtained by calling [bru].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' sampling.
-#' @param formula A formula determining which effects to sample from and how to
-#' combine them analytically.
+#' @param formula A formula defining an R expression to evaluate for each generated
+#' sample. If `NULL`, the latent and hyperparameter states are returned
+#' as named list elements.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics.
 #' The default, 100, is rather low but provides a quick approximate result.
@@ -981,12 +1030,6 @@ generate.bru <- function(object,
     data <- do.call(cprod, add.pts)
   }
 
-  # Turn formula into an expression (in evaluate_model)
-  if (is.null(formula)) {
-    stop("TODO: Automatic formula selection is not implemented")
-    formula <- object$bru_info$lhoods[["default"]]$formula
-  }
-
   state <- evaluate_state(
     object$bru_info$model,
     result = object,
@@ -996,16 +1039,20 @@ generate.bru <- function(object,
     num.threads = num.threads,
     ...
   )
-  # TODO: clarify the output format, and use the format parameter
-  vals <- evaluate_model(
-    model = object$bru_info$model,
-    state = state,
-    data = data,
-    predictor = formula,
-    include = include,
-    exclude = exclude
-  )
-  vals
+  if (is.null(formula)) {
+    state
+  } else {
+    # TODO: clarify the output format, and use the format parameter
+    vals <- evaluate_model(
+      model = object$bru_info$model,
+      state = state,
+      data = data,
+      predictor = formula,
+      include = include,
+      exclude = exclude
+    )
+    vals
+  }
 }
 
 
@@ -1449,7 +1496,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       control.predictor = list(compute = TRUE)
     )
   )
-  
+
   # Extract the family of each likelihood
   family <- vapply(
     seq_along(lhoods),
@@ -1467,9 +1514,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   if (is.null(initial) || inherits(initial, "bru")) {
     # Set old result
     state <- evaluate_state(model,
-                            lhoods = lhoods,
-                            result = initial,
-                            property = "mode"
+      lhoods = lhoods,
+      result = initial,
+      property = "mode"
     )[[1]]
     if (inherits(initial, "bru")) {
       result <- initial
@@ -1492,7 +1539,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     stop("Unknown previous result information class")
   }
   old.result <- result
-  
+
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
     A <- evaluate_A(model, lhoods)
@@ -1535,7 +1582,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     if ((!is.null(result) && !is.null(result$mode))) {
       previous_x <- result$mode$x
     }
-    
+
     bru_log_message(
       paste0("iinla: Iteration ", k, " [max:", options$bru_max_iter, "]"),
       verbose = options$bru_verbose,
@@ -1572,30 +1619,38 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         )
       )
 
-    result <- tryCatch(
+    result <- try_callstack(
       do.call(
         INLA::inla,
         inla.options,
         envir = environment(model$effects)
-      ),
-      error = warning
+      )
     )
 
-    if (is.character(result)) {
+    if (inherits(result, "try-error")) {
       bru_log_message(
-        paste0("iinla: INLA returned message: ", result),
+        paste0("iinla: Problem in inla: ", result),
         verbose = FALSE,
         verbose_store = options$bru_verbose_store
       )
-      stop(paste0("iinla: INLA returned message: ", result))
-    }
-
-    if ((is.null(result) | length(result) == 5)) {
+      warning(
+        paste0("iinla: Problem in inla: ", result),
+        immediate. = TRUE
+      )
       bru_log_message(
-        sprintf("iinla: The computation failed. Giving up and returning last successfully obtained result."),
-        verbose = options$bru_verbose,
+        paste0("iinla: Giving up and returning last successfully obtained result."),
+        verbose = TRUE,
         verbose_store = options$bru_verbose_store
       )
+      if (is.null(old.result)) {
+        old.result <- list()
+        class(old.result) <- c("iinla", "list")
+      } else {
+        class(old.result) <- c("iinla", "inla", "list")
+      }
+      old.result$error <- result
+      old.result$iinla_stack <- stk
+      old.result$iinla_track <- do.call(rbind, track)
       return(old.result)
     }
 
@@ -1635,9 +1690,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     # Update stack given current result
     state0 <- state
     state <- evaluate_state(model,
-                            lhoods = lhoods,
-                            result = result,
-                            property = "mode"
+      lhoods = lhoods,
+      result = result,
+      property = "mode"
     )[[1]]
     if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
       if (do_line_search) {
@@ -1698,9 +1753,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     }
     k <- k + 1
   }
-  result$stack <- stk
-  result$model <- model
-  result$iinla$track <- do.call(rbind, track)
+  result$iinla_stack <- stk
+  result$iinla_track <- do.call(rbind, track)
   class(result) <- c("iinla", "inla", "list")
   return(result)
 }

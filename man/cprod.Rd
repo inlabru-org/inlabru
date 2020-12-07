@@ -23,8 +23,8 @@ dimension has no weights attached to it all weights are assumend to be 1.
 # ipoints needs INLA
 if (bru_safe_inla()) {
   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
-  ips1 <- ipoints(c(0, 8), 17, name = "myDim")
-  ips2 <- ipoints(as.integer(c(1, 2, 3)), name = "myDiscreteDim")
+  ips1 <- ipoints(rbind(c(0, 3), c(3, 8)), 17, name = "myDim")
+  ips2 <- ipoints(domain = c(1, 2, 4), name = "myDiscreteDim")
 
   # Calculate the cross product
   ips <- cprod(ips1, ips2)
