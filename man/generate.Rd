@@ -24,14 +24,18 @@ generate(object, ...)
 
 \item{...}{additional, unused arguments.}
 
-\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for sampling.}
+\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for
+sampling.}
 
-\item{formula}{A formula determining which effects to sample from and how to combine them analytically.}
+\item{formula}{A formula defining an R expression to evaluate for each generated
+sample. If \code{NULL}, the latent and hyperparameter states are returned
+as named list elements.}
 
-\item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics.
-The default is rather low but provides a quick approximate result.}
+\item{n.samples}{Integer setting the number of samples to draw in order to
+calculate the posterior statistics.
+The default, 100, is rather low but provides a quick approximate result.}
 
-\item{seed}{Random number generator seed passed on to \code{inla.posterior.sample}}
+\item{seed}{Random number generator seed passed on to \code{INLA::inla.posterior.sample}}
 
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
@@ -47,17 +51,20 @@ as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
 }
 \value{
-The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
+The form of the value returned by gg depends on the class of its
+argument. See the documentation of the particular methods for details of
+what is produced by that method.
 
 List of generated samples
 }
 \description{
-Generic function for sampling for fitted models. The function invokes particular methods
-which depend on the class of the first argument.
+Generic function for sampling for fitted models. The function invokes
+particular methods which depend on the class of the first argument.
 
-Takes a fitted \code{bru} object produced by the function \url{bru} and produces samples given
-a new set of values for the model covariates or the original values used for the model fit. The
-samples can be based on any R expression that is valid given these values/covariates and the joint
+Takes a fitted \code{bru} object produced by the function \url{bru} and produces
+samples given a new set of values for the model covariates or the original
+values used for the model fit. The samples can be based on any R expression
+that is valid given these values/covariates and the joint
 posterior of the estimated random effects.
 }
 \examples{

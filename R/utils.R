@@ -24,9 +24,11 @@
 bru_safe_inla <- function(multicore = NULL,
                           quietly = FALSE) {
   if (requireNamespace("INLA", quietly = TRUE)) {
-    multicore <-
-      !identical(Sys.getenv("TESTTHAT"), "true") ||
-      interactive() 
+    if (is.null(multicore)) {
+      multicore <-
+        !identical(Sys.getenv("TESTTHAT"), "true") ||
+        interactive()
+    }
     if (!multicore) {
       n.t <- INLA::inla.getOption("num.threads")
       if (!quietly) {

@@ -7,7 +7,7 @@ test_that("bru: factor component", {
   # Seed influences data as well as predict()!
   set.seed(123)
 
-  # Factorial data
+  # Factor models
   input.df <- data.frame(
     x1 = factor(rep(c("Alpha", "Beta", "Mu"), c(70, 60, 70))),
     x2 = factor(rep(
@@ -19,15 +19,6 @@ test_that("bru: factor component", {
     c(1, -2, 0)[as.numeric(input.df$x1)] +
     c(1, -2, 1, -2, 1, -2, 1)[as.numeric(input.df$x2)] +
     rnorm(200, mean = 0, sd = 0.1)
-
-  # Fit the model
-  #  fit0 <- inla(formula = y ~ 1 + x1 + f(x2, model = "iid"),
-  #             family = "gaussian",
-  #             data = input.df,
-  #             control.inla = list(int.strategy = "eb",
-  #                                 h = 0.005),
-  #             num.threads = "1:1"
-  #  )
 
   # Fit the model
   fit <- bru(
@@ -42,8 +33,7 @@ test_that("bru: factor component", {
       control.inla = list(
         int.strategy = "eb",
         h = 0.005
-      ),
-      num.threads = "1:1"
+      )
     )
   )
 
@@ -106,6 +96,52 @@ test_that("bru: factor component", {
   expect_equal(
     pr[, "sd"],
     c(0.5700744, 0.5840021, 0.5656757),
+    tolerance = midtol
+  )
+})
+
+
+test_that("bru: indexed factor component", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  # Seed influences data as well as predict()!
+  set.seed(123)
+
+  # Factor models
+  input.df <- data.frame(
+    x3 = rep(c(1, 2, 3, 4), times = 2)
+  )
+  input.df$y <-
+    c(11, 12, 13, 14)[input.df$x3] +
+    rnorm(8, mean = 0, sd = 0.1)
+
+  # Fit the model
+  fit <- bru(
+    components = ~ Intercept(main = 1) +
+      fac3(main = x3, model = "factor_contrast"),
+    formula = y ~ Intercept + fac3,
+    family = "gaussian",
+    data = input.df,
+    options = list(
+      verbose = FALSE,
+      control.inla = list(
+        int.strategy = "eb",
+        h = 0.005
+      )
+    )
+  )
+
+
+  # Check factor effect results
+  expect_equal(
+    fit$summary.random$fac3$mean,
+    c(1.095837, 2.122574, 2.961865),
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.random$fac3$sd,
+    c(0.07778122, 0.07778122, 0.07778122),
     tolerance = midtol
   )
 })

@@ -91,7 +91,7 @@ test_that("Latent models: AR1 bru ordering", {
   )
   expect_equal(
     data$fit[[3]]$summary.random$time$mean,
-    c(1, 2, 1, 2, 4), 
+    c(1, 2, 1, 2, 4),
     tolerance = midtol
   )
 })

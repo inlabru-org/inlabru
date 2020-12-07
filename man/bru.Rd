@@ -2,9 +2,12 @@
 % Please edit documentation in R/bru.inference.R
 \name{bru}
 \alias{bru}
+\alias{bru_rerun}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
-bru(components = y ~ Intercept, ..., options = list())
+bru(components = ~Intercept(1), ..., options = list())
+
+bru_rerun(result, options = list())
 }
 \arguments{
 \item{components}{A \link{formula}-like specification of latent components.
@@ -14,9 +17,10 @@ Also used to define a default linear additive predictor.  See
 \item{...}{Likelihoods, each constructed by a calling \code{\link[=like]{like()}}, or named
 parameters that can be passed to a single \code{\link[=like]{like()}} call.}
 
-\item{options}{A list of name and value pairs that are either interpretable
-by \link{bru.options} or valid inla parameters. See \link{bru.options} for
-caveats about some of the \verb{control.*} inla options.}
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
+
+\item{result}{A previous estimation object of class \code{bru}}
 }
 \value{
 bru returns an object of class "bru". A \code{bru} object inherits
@@ -44,6 +48,11 @@ Support for non-linear predictors. See example below.
 Log Gaussian Cox process (LGCP) inference is
 available by using the \code{cp} family or (even easier) by using the
 \link{lgcp} function.
+}
+}
+\details{
+\itemize{
+\item \code{bru_rerun} Continue the optimisation from a previously computed estimate.
 }
 }
 \examples{
@@ -74,20 +83,22 @@ fit$summary.fixed
   
 # An important addition to the INLA methodology is bru's ability to use
 # non-linear predictors. Such a predictor can be formulated via like()'s 
-# \code{formula} parameter. For instance
+# \code{formula} parameter. The z(1) notation is needed to ensure that
+# the z component should be interpreted as single latent variable and not
+# a covariate:
 
 if (bru_safe_inla()) {
     
 z = 2
 input.df <- within(input.df, y <- 5 + exp(z)*x + rnorm(10, mean=0, sd=0.1))
 lik = like(family = "gaussian", data = input.df,
-           formula = y ~ exp(z)*x + Intercept, E = 10000)
-fit <- bru( ~ z + Intercept, lik)
+           formula = y ~ exp(z)*x + Intercept)
+fit <- bru( ~ z(1) + Intercept(1), lik)
 
 # Check the result (z posterior should be around 2)
 fit$summary.fixed
 }
-  
+
 }
 }
 \author{

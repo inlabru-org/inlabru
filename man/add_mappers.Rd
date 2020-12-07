@@ -3,13 +3,18 @@
 \name{add_mappers}
 \alias{add_mappers}
 \alias{add_mappers.component}
-\title{FUNCTION_TITLE}
+\alias{add_mappers.component_list}
+\title{Add component input/latent mappers}
 \usage{
 add_mappers(...)
 
-\method{add_mappers}{component}(component, lhoods)
+\method{add_mappers}{component}(component, lhoods, ...)
+
+\method{add_mappers}{component_list}(components, lhoods, ...)
 }
 \arguments{
+\item{\dots}{Parameters passed on to other methods}
+
 \item{component}{PARAM_DESCRIPTION}
 
 \item{lhoods}{PARAM_DESCRIPTION}
@@ -18,6 +23,9 @@ add_mappers(...)
 OUTPUT_DESCRIPTION
 }
 \description{
+Add missing mappers between input data and latent variables,
+based on likelihood data
+
 FUNCTION_DESCRIPTION
 }
 \details{

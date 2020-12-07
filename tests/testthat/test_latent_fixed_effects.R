@@ -17,7 +17,8 @@ test_that("basic intercept model", {
   expect_equal(
     fit$summary.fixed["Intercept", ]$mean,
     0.090405156,
-    tolerance = lowtol)
+    tolerance = lowtol
+  )
 })
 
 test_that("basic fixed effect model", {

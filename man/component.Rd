@@ -11,6 +11,8 @@ component(...)
 \method{component}{character}(
   object,
   main = NULL,
+  weights = NULL,
+  ...,
   model = NULL,
   mapper = NULL,
   main_layer = NULL,
@@ -18,7 +20,7 @@ component(...)
   n = NULL,
   values = NULL,
   season.length = NULL,
-  weights = NULL,
+  copy = NULL,
   weights_layer = NULL,
   weights_selector = NULL,
   group = NULL,
@@ -31,10 +33,7 @@ component(...)
   replicate_layer = NULL,
   replicate_selector = NULL,
   A.msk = NULL,
-  map = NULL,
-  mesh = NULL,
-  envir_extra = NULL,
-  ...
+  envir_extra = NULL
 )
 }
 \arguments{
@@ -42,11 +41,13 @@ component(...)
 
 \item{object}{A character label for the component}
 
-\item{main}{= NULL
-main takes an R expression that evaluates to where the latent variables
+\item{main}{\code{main} takes an R expression that evaluates to where the latent variables
 should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 Arguments starting with weights, group, replicate behave similarly to main,
 but for the corresponding features of \code{INLA::f()}.}
+
+\item{weights, weights_layer, weights_selector}{Optional specification of effect scaling weights.
+Same syntax as for \code{main}.}
 
 \item{model}{Either one of "offset", "factor_full", "factor_contrast", "linear" or a model name or
 object accepted by INLA's \code{f} function. If set to NULL, then "linear" is used.}
@@ -76,23 +77,22 @@ the latent model. Normally generated internally based on the mapping details.
 \item{season.length}{Passed on to \code{INLA::f()} for model \code{"seasonal"}
 (TODO: check if this parameter is still fully handled)}
 
-\item{weights, weights_layer, weights_selector}{Optional specification of effect scaling weights.
-Same syntax as for \code{main}.}
+\item{copy}{character; label of other component that this component should
+be a copy of. If the \code{fixed = FALSE}, a scaling constant is estimated, via a
+hyperparameter. If \code{fixed = TRUE}, the component scaling is fixed, by
+default to 1; for fixed scaling, it's more efficient to express the scaling
+in the predictor expression instead of making a copy component.}
 
 \item{group, group_mapper, group_layer, group_selector}{Optional specification of kronecker/group model indexing.}
 
 \item{control.group}{\code{list} of kronecker/group model parameters, currently
-passed directly on to \code{INLA:f}}
+passed directly on to \code{INLA::f}}
 
 \item{replicate, replicate_mapper, replicate_layer, replicate_selector}{Optional specification of indices for an independent
 replication model. Same syntax as for \code{main}}
 
 \item{A.msk}{TODO: check/fix/deprecate this parameter.
 Likely doesn't work at the moment, and I've found no examples that use it.}
-
-\item{map}{Deprecated. Use \code{main} instead.}
-
-\item{mesh}{Deprecated. Use \code{mapper} instead.}
 
 \item{envir_extra}{TODO: check/fix this parameter.}
 }
@@ -137,6 +137,12 @@ or the effect of the covariate.
 
 The \code{component.character} method is inlabru's equivalent to INLA's
 \code{f} function but adds functionality that is unique to inlabru.
+
+Deprecated parameters:
+\itemize{
+\item map: Use \code{main} instead.
+\item mesh: Use \code{mapper} instead.
+}
 }
 \section{Naming random effects}{
 
@@ -176,13 +182,14 @@ which corresponds to the mathematical expression \eqn{\exp(\beta)}.
 # called "x". Note that a list of components is returned because the
 # formula may define multiple components
 
-eff <- component_list(~ myLinearEffectOfX(main = x, model = "linear"))
-summary(eff[[1]])
+cmp <- component_list(~ myLinearEffectOfX(main = x, model = "linear"))
+summary(cmp)
 # Equivalent shortcuts:
-eff <- component_list(~ myLinearEffectOfX(x, model = "linear"))
-eff <- component_list(~ myLinearEffectOfX(x))
+cmp <- component_list(~ myLinearEffectOfX(x, model = "linear"))
+cmp <- component_list(~ myLinearEffectOfX(x))
 # Individual component
-eff <- component("myLinearEffectOfX", main = x, model = "linear")
+cmp <- component("myLinearEffectOfX", main = x, model = "linear")
+summary(cmp)
 \donttest{
 if (require("INLA", quietly = TRUE)) {
 

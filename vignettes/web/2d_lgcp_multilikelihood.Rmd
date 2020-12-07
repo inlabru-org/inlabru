@@ -1,10 +1,10 @@
 ---
 title: "LGCPs - Multiple Likelihoods"
-author: "Fabian E. Bachl and Finn Lindgren"
+author: "Fabian E. Bachl"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{LGCPs - Multiple Likelihoods}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,7 +14,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-inlabru::local_disable_PROJ6_warnings()
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"),
+                      fig.height=3,fig.width=4)
 ```
 
 Introduction
@@ -55,13 +56,9 @@ ggplot() + gg(gorillas$mesh) +
            gg(gorillas$nests, aes(color=group)) + 
            gg(gorillas$boundary) + 
            coord_fixed() +
-           ggtitle("Gorilla nests and group membership")
+           ggtitle("Gorillas nests and group membership")
 ```
-First, we separate the data into the major and minor nests:
-```{r}
-major_nests <- gorillas$nests[gorillas$nests$group == "major",,drop=FALSE]
-minor_nests <- gorillas$nests[gorillas$nests$group == "minor",,drop=FALSE]
-```
+
 
 Fiting the model
 -----------------------------------
@@ -71,96 +68,84 @@ the two different spatial smoothers, one for each nest group.
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 matern <- inla.spde2.pcmatern(gorillas$mesh, 
-                              prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(5, 0.01))
+                              prior.range = c(0.1, 0.01),
+                              prior.sigma = c(1, 0.01))
 
 cmp <- ~
-  SMajor(coordinates, model = matern) + 
-  SMinor(coordinates, model = matern) + 
-  Intercept
+  Common(coordinates, model = matern) + 
+  Difference(coordinates, model = matern) + 
+  Intercept(1)
 
 ```
 
-Given these components we define the linear predictor for each of the likelihoods
+Given these components we define the linear predictor for each of the likelihoods.
+(Using "." indicates a pure additive model, and one can use include/exclude
+options for `like()` to indicate which components are actively involved in each model.)
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-fml.major = coordinates ~ SMajor + Intercept
-fml.minor = coordinates ~ SMinor + Intercept
+fml.major = coordinates ~ Intercept + Common + Difference/2
+fml.minor = coordinates ~ Intercept + Common - Difference/2
 ```
 
-Setting up the cox process integration points is easy in this example.
-Both nest types were observed within the same window.
+Setting up the cox process integration points is easy in this example. Both nest types were observed within the same window.
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ips = ipoints(gorillas$boundary, domain = gorillas$mesh)
+ips = ipoints(gorillas$boundary, gorillas$mesh)
 ```
-Lastly, we define the two likelihoods for the Major and Minor data subsets
+Lastly, we define the two likelihoods...
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-lik_major = like("cp", formula = fml.major, ips = ips,
-                 data = major_nests)
-lik_minor = like("cp", formula = fml.minor, ips = ips,
-                 data = minor_nests)
+lik_minor = like("cp", formula = fml.major,
+                 data = gorillas$nests[gorillas$nests$group == "major",],
+                 ips = ips)
+lik_major = like("cp", formula = fml.minor,
+                 data = gorillas$nests[gorillas$nests$group == "minor",],
+                 ips = ips)
 ```
 ... which we provide to the ´bru´ function.
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-fit_joint = bru(cmp, lik_major, lik_minor, options = list(max.iter = 1))
-```
-When running individual likelihoods with a common component set, all components
-will still be "estimated" (according to their priors), which is wasteful.
-When defining the likelihoods, we can tell inlabru which components are actually
-involved:
-```{r,results="hide",message=FALSE}
-lik_major = like("cp", formula = fml.major, ips = ips,
-                 data = major_nests,
-                 include = c("Intercept", "SMajor"))
-lik_minor = like("cp", formula = fml.minor, ips = ips,
-                 data = minor_nests,
-                 include = c("Intercept", "SMinor"))
-fit_major = bru(cmp, lik_major, options = list(max.iter = 1))
-fit_minor = bru(cmp, lik_minor, options = list(max.iter = 1))
-```
-We can also run the joint analysis using these modified likelihood definitions
-```{r results="hide",message=FALSE,echo=TRUE}
-fit_joint = bru(cmp, lik_major, lik_minor, options = list(max.iter = 1))
+jfit = bru(cmp, lik_major, lik_minor,
+           options = list(control.inla = list(int.strategy = "eb"),
+                          bru_max_iter = 1))
 ```
 
-Summary:
-```{r}
-summary(fit_joint)
-```
-If we instead want separate intercepts but a common spatial effect, we change the components and formula. Since we're using a linear predictor expression we can leave out the expression part and replace it by a dot. The `include` argument is used to determine which components to include.
-```{r,results="hide",message=FALSE}
-cmp <- ~ Smooth(coordinates, model = matern) + IMajor(1) + IMinor(1)
-lik_major = like("cp", formula = coordinates ~ ., ips = ips,
-                 data = major_nests,
-                 include = c("IMajor", "Smooth"))
-lik_minor = like("cp", formula = coordinates ~ ., ips = ips,
-                 data = minor_nests,
-                 include = c("IMinor", "Smooth"))
-fit_joint = bru(cmp, lik_major, lik_minor, options = list(max.iter = 1))
-```
-Summary:
-```{r}
-summary(fit_joint)
+```{r, warning=FALSE,fig.width=8}
+library(patchwork)
+pl.major <- ggplot() +
+  gg(gorillas$mesh,
+     mask = gorillas$boundary,
+     col = exp(jfit$summary.random$Common$mean))
+pl.minor <- ggplot() +
+  gg(gorillas$mesh,
+     mask = gorillas$boundary,
+     col = exp(jfit$summary.random$Difference$mean))
+(pl.major + scale_fill_continuous(trans = "log")) +
+  (pl.minor + scale_fill_continuous(trans = "log")) &
+  theme(legend.position = "right")
 ```
 
-Finally, let's add the individual fields back in: 
-```{r,results="hide",message=FALSE}
-cmp <- ~
-  Smooth(coordinates, model = matern) +
-  IMajor(1) +
-  IMinor(1) +
-  SMajor(coordinates, model = matern) + 
-  SMinor(coordinates, model = matern)
-lik_major = like("cp", formula = coordinates ~ .,
-                 ips = ips,
-                 data = major_nests,
-                 include = c("IMajor", "Smooth", "SMajor"))
-lik_minor = like("cp", formula = coordinates ~ .,
-                 ips = ips,
-                 data = minor_nests,
-                 include = c("IMinor", "Smooth", "SMinor"))
-fit_joint = bru(cmp, lik_major, lik_minor)
+```{r, warning=FALSE}
+jfit0 <- jfit
+jfit <- bru_rerun(jfit)
 ```
-Summary:
+
+
+```{r, warning=FALSE,fig.width=8}
+library(patchwork)
+pl.major <- ggplot() +
+  gg(gorillas$mesh,
+     mask = gorillas$boundary,
+     col = exp(jfit$summary.random$Common$mean))
+pl.minor <- ggplot() +
+  gg(gorillas$mesh,
+     mask = gorillas$boundary,
+     col = exp(jfit$summary.random$Difference$mean))
+(pl.major + scale_fill_continuous(trans = "log")) +
+  (pl.minor + scale_fill_continuous(trans = "log")) &
+  theme(legend.position = "right")
+```
+
 ```{r}
-summary(fit_joint)
+summary(jfit0)
+```
+
+```{r}
+summary(jfit)
 ```

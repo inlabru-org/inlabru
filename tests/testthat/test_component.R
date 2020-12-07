@@ -1,8 +1,11 @@
+local_bru_testthat_setup()
+
 test_that("Component construction: linear model", {
   df <- data.frame(x = 1:10)
 
-  cmp <- component_list(~ beta(main = x, model = "linear", values = 1),
-    lhoods = list(data = df)
+  cmp <- component_list(
+    ~ beta(main = x, model = "linear", values = 1),
+    lhoods = list(list(data = df))
   )[[1]]
 
   expect_equal(cmp$label, "beta")
@@ -76,59 +79,72 @@ test_that("Component construction: offset", {
 
 
 
-# test_that("Component construction: default mesh/mapping construction", {
-#
-#   cmp <- list(label = "testlabel")
-#   class(cmp) <- c("component", "list")
-#
-#   # Check for failure/success on valid/invalid inputs
-#   expect_error(make.default.mesh(cmp,
-#                                  model = NULL, model.type = "iid",
-#                                  fvals = NULL
-#   ))
-#   expect_error(make.default.mesh(cmp,
-#                                  model = NULL, model.type = "iid",
-#                                  fvals = list()
-#   ))
-#   expect_error(
-#     make.default.mesh(cmp,
-#                       model = NULL, model.type = "iid",
-#                       fvals = list(n = 2)
-#     ),
-#     NA
-#   )
-#
-#   expect_error(make.default.mesh(cmp,
-#                                  model = NULL, model.type = "seasonal",
-#                                  fvals = NULL
-#   ))
-#   expect_error(make.default.mesh(cmp,
-#                                  model = NULL, model.type = "seasonal",
-#                                  fvals = list()
-#   ))
-#   expect_error(
-#     make.default.mesh(cmp,
-#                       model = NULL, model.type = "seasonal",
-#                       fvals = list(season.length = 2)
-#     ),
-#     NA
-#   )
-#
-#   for (model.type in c("rw1", "rw2", "ar", "ar1", "ou")) {
-#     expect_error(make.default.mesh(cmp,
-#                                    model = NULL, model.type = model.type,
-#                                    fvals = NULL
-#     ))
-#     expect_error(make.default.mesh(cmp,
-#                                    model = NULL, model.type = model.type,
-#                                    fvals = list()
-#     ))
-#     expect_error(
-#       make.default.mesh(cmp,
-#                         model = NULL, model.type = model.type,
-#                         fvals = list(values = 1:2)
-#       ),
-#       NA
-#     )
-#   }
-# })
+test_that("Component construction: default mesh/mapping construction", {
+  lik <- like("gaussian",
+    formula = y ~ .,
+    data = data.frame(x = c(1, 1.5, 2, 3, 4), y = 11:15),
+    include = "effect"
+  )
+
+  cmp1 <- component_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
+  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
+
+  cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
+  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
+
+  mesh1 <- INLA::inla.mesh.1d(lik$data$x)
+  expect_error(
+    component_list(
+      ~ effect(x, model = "rw2", mapper = mesh1) - 1
+    ),
+    regexp = "Unknown mapper"
+  )
+
+  cmp1 <- component_list(
+    ~ effect(x,
+      model = "rw2",
+      mapper = bru_mapper(mesh1, indexed = FALSE)
+    ) - 1
+  )
+  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
+
+  cmp1 <- component_list(
+    ~ effect(x,
+      model = "rw2",
+      mapper = bru_mapper(mesh1, indexed = TRUE)
+    ) - 1
+  )
+  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, seq_along(lik$data$x))
+})
+
+
+
+test_that("Component construction: unsafe intercepts", {
+  cmp <- component_list(~ something_unknown - 1)
+  lik <- like(formula = response ~ ., data = data.frame(response = 1:5))
+  expect_warning(
+    {
+      model <- bru_model(cmp, list(lik))
+    },
+    "All covariate evaluations are NULL"
+  )
+})
+
+test_that("Component construction: deprecated arguments", {
+  expect_warning(
+    component_list(~ something(map = a)),
+    "Use of 'map' is deprecated"
+  )
+  expect_warning(
+    bru(~ something(map = a),
+      formula = response ~ .,
+      data = data.frame(a = 1:5),
+      options = list(bru_run = FALSE)
+    ),
+    "Use of 'map' is deprecated"
+  )
+})

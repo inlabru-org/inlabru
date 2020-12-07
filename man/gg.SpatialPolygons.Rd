@@ -21,10 +21,12 @@ mapping. The default mapping is \code{aes_string(x = "long", y = "lat", group = 
 \item{...}{Arguments passed on to \link{geom_polygon}.}
 }
 \value{
-A \link{geom_polygon} return value.
+If \code{ggpolypath} is available a \code{ggpolypath::geom_polypath} object.
+Otherwise a \link{geom_polygon} return value.
 }
 \description{
-Uses the fortitfy() function to turn the SpatialPolygons objects into a data.frame. Then
+Uses the \code{fortify()} function to turn the \code{SpatialPolygons} objects into a
+\code{data.frame}. Then
 calls \link{geom_polygon} to plot the polygons.
 }
 \examples{

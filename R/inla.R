@@ -174,18 +174,21 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
     }
 
 
-    # Extract simulated latent variables. If the model is "clinear", however, extract the realisations
-    # from the hyperpar field.
+    # Extract simulated latent variables.
+    # If the model is "clinear", however, we might extract the realisations
+    # from the hyperpar field. TODO: check if all the special models now have
+    # their results available as latent random effects, and avoid special code,
+    # since the hyperpar name definition has changed
     if (length(result$summary.random) > 0) {
       for (k in 1:length(result$summary.random)) {
         name <- unlist(names(result$summary.random[k]))
         model <- result$model.random[k]
-        if (!(model == "Constrained linear")) {
-          vals[[name]] <- extract.entries(name, smpl.latent)
-        }
-        else {
-          vals[[name]] <- smpl.hyperpar[paste0(paste0("Beta_intern for ", name), " -- in user scale")]
-        }
+        #        if (!(model == "Constrained linear")) {
+        vals[[name]] <- extract.entries(name, smpl.latent)
+        #        }
+        #        else {
+        #         vals[[name]] <- smpl.hyperpar[paste0("Beta for ", name)]
+        #        }
       }
     }
     if (length(smpl.hyperpar) > 0) {
@@ -287,16 +290,23 @@ inla.stack.e <- function(...) {
 }
 
 
-# Join stacks intended to be run with different likelihoods
-#
-# @param ... List of stacks that contain vector observations
-#            (existing multilikelihood observation matrices are also permitted)
-# @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
-#        If a single string, this is assumed for all the stacks. (default "BRU.response")
-# @param new.name The name to be used for the expanded observation matrix,
-#        possibly the same as an old name. (default "BRU.response")
-# @aliases inla.stack.mjoin
-#
+#' Join stacks intended to be run with different likelihoods
+#'
+#' @param ... List of stacks that contain vector observations
+#'            (existing multi-likelihood observation matrices are also permitted)
+#' @param compress If `TRUE`, compress the model by removing duplicated rows of
+#' effects, replacing the corresponding A-matrix columns with a single column
+#' containing the sum.
+#' @param remove.unused	If `TRUE`, compress the model by removing rows of
+#' effects corresponding to all-zero columns in the A matrix (and removing those columns).
+#' @param old.names A vector of strings with the names of the observation
+#'   vector/matrix for each stack.
+#'   If a single string, this is assumed for all the stacks. (default "BRU.response")
+#' @param new.name The name to be used for the expanded observation matrix,
+#'        possibly the same as an old name. (default "BRU.response")
+#' @export
+#' @rdname inla.stack.mjoin
+#'
 
 inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
                              old.names = "BRU.response", new.name = "BRU.response") {
@@ -308,54 +318,11 @@ inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
 }
 
 
-# Retrieve data from stack.
-# Obsolete. Do not use. Exposure vector stacking is handled automatically by inla.stack
-#
-# The special "BRU.response" object should have been constructed before, via inla.stack.mjoin.
-# Since all the work to setup the stack properly was already done by inla.stack.mjoin,
-# this function just passes its arguments through to INLA::inla.stack.data
-#
-# @aliases inla.stack.mdata
-# @param stack The stack to extract data from
-# @param ... Additional named objects to add to the list of data objects.
-#            Typically used for spde model objects.
-# @return A list of data and effect vectors/matrices, and optional extra objects
-#
-
-inla.stack.mdata <- function(stack, ...) {
-  warning("inla.stack.mdata: This function is obsolete and should not be used.")
-  INLA::inla.stack.data(stack, ...)
-}
-
-# Combine stacks by adding up predictors "horizontally".
-# Only the data section from the first stack is preserved.
-# Only the tag information from the data section first stack is preserved.
-# TODO: The effects tag information is not computed.
-# NOTE: This function appears to be unused.
-#
-# @aliases inla.stack.add
-#
-
-inla.stack.add <- function(..., compress = TRUE, remove.unused = TRUE) {
-  stacks <- list(...)
-  stack <- INLA::inla.stack.sum(
-    data = INLA::inla.stack.LHS(stacks[[1]]),
-    A = lapply(stacks, function(x) {
-      INLA::inla.stack.A(x)
-    }),
-    effects = lapply(stacks, function(x) {
-      INLA::inla.stack.RHS(x)
-    }),
-    compress = compress, remove.unused = remove.unused
-  )
-  stack$data$index <- stacks[[1]]$data$index
-  stack$effects$index <- NULL
-  stack
-}
 
 
 
-plotmarginal.inla <- function(result, varname = "Intercept", link = function(x) {
+
+plotmarginal.inla <- function(result, varname = NULL, link = function(x) {
                                 x
                               }, add = FALSE, ggp = TRUE, lwd = 3, ...) {
   vars <- variables.inla(result)
@@ -393,9 +360,21 @@ plotmarginal.inla <- function(result, varname = "Intercept", link = function(x) 
   } else {
     df <- result$summary.random[[varname]]
     colnames(df) <- c("ID", "mean", "sd", "lower", "mid", "upper", "mode", "kld")
+    df$mean <- link(df$mean)
+    h <- 1e-6
+    df$sd <- link(df$sd) * abs((link(df$mean + h) - link(df$mean - h)) / (2 * h))
+    df$lower <- link(df$lower)
+    df$mid <- link(df$mid)
+    df$upper <- link(df$upper)
+    df$mode <- link(df$mode)
     p <- ggplot(df, aes_string("ID", "mode"))
-    p + geom_crossbar(aes_string(ymin = "lower", ymax = "upper")) +
-      ylab("mod and quantiles") + xlab(paste0(varname, " ID"))
+    p +
+      geom_ribbon(aes_string(ymin = "lower", ymax = "upper"), alpha = 0.1) +
+      geom_line() +
+      geom_point() +
+      geom_line(aes_string("ID", "mean"), col = 2) +
+      geom_line(aes_string("ID", "mid"), col = 2, lty = 2) +
+      ylab("mode and quantiles") + xlab(paste0(varname, " ID"))
   }
 }
 

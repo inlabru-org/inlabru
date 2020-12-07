@@ -92,18 +92,17 @@ test_that("2D LGCP fitting", {
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
   set.seed(123L)
   Lambda <- predict(fit, ips, ~ sum(weight * exp(mySmooth + Intercept)),
-    n.samples = 5, seed = 5657L,
-    parallel.configs = FALSE
+    n.samples = 10, seed = 5657L
   )
 
   expect_equal(
     Lambda$mean,
-    661.778959876,
-    tolerance = 25
+    650.6227,
+    tolerance = 0.1
   )
   expect_equal(
     Lambda$sd,
-    17.43591842821,
+    24.07925,
     tolerance = 0.5
   )
 

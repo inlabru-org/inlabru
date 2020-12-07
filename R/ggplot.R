@@ -374,7 +374,8 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 
 #' Geom for SpatialPolygons objects
 #'
-#' Uses the fortitfy() function to turn the SpatialPolygons objects into a data.frame. Then
+#' Uses the `fortify()` function to turn the `SpatialPolygons` objects into a
+#' `data.frame`. Then
 #' calls [geom_polygon] to plot the polygons.
 #'
 #'
@@ -389,7 +390,8 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @param color Filling color for the polygons.
 #' @param alpha Alpha level for polygon filling.
 #' @param ... Arguments passed on to [geom_polygon].
-#' @return A [geom_polygon] return value.
+#' @return If `ggpolypath` is available a `ggpolypath::geom_polypath` object.  
+#' Otherwise a [geom_polygon] return value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R
 
@@ -398,8 +400,12 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, color = "black"
     data <- spTransform(data, crs)
   }
   df <- fortify(data)
-  dmap <- aes_string(x = "long", y = "lat", group = "group")
-
+  if (requireNamespace("ggpolypath", quietly = TRUE)) {
+    dmap <- aes_string(x = "long", y = "lat", group = "group")
+  } else {
+    dmap <- aes_string(x = "long", y = "lat", group = "id", subgroup = "hole")
+  }
+  
   if (!("alpha" %in% names(dmap)) & is.null(alpha)) {
     alpha <- 0.1
   }
@@ -410,8 +416,12 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, color = "black"
   if (!is.null(mapping)) {
     dmap <- modifyList(dmap, mapping)
   }
-
-  geom_polygon(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+  
+  if (requireNamespace("ggpolypath", quietly = TRUE)) {
+    ggpolypath::geom_polypath(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+  } else {
+    geom_polygon(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+  }
 }
 
 #' Geom for SpatialGridDataFrame objects
@@ -480,10 +490,6 @@ gg.SpatialPixelsDataFrame <- function(data,
   if (!is.null(alpha)) dmap <- modifyList(dmap, aes_string(alpha = alpha))
   gm <- geom_tile(data = df, mapping = dmap, ...)
 
-  # If data is not discrete (factor), add default color palette
-  # if (!inherits(data[[deparse(dmap$fill)]], "factor")) {
-  #  gm = c(gm, scale_fill_gradientn(colours = bru.pal()))
-  # }
   gm
 }
 

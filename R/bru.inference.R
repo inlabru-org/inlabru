@@ -2,15 +2,17 @@
 #'
 #' @description
 #'
-#' Generic function for sampling for fitted models. The function invokes particular methods
-#' which depend on the class of the first argument.
+#' Generic function for sampling for fitted models. The function invokes
+#' particular methods which depend on the class of the first argument.
 #'
 #' @name generate
 #' @export
 #' @family sample generators
 #' @param object a fitted model.
 #' @param ... additional arguments affecting the samples produced.
-#' @return The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
+#' @return The form of the value returned by gg depends on the class of its
+#' argument. See the documentation of the particular methods for details of
+#' what is produced by that method.
 #' @example inst/examples/generate.bru.R
 
 generate <- function(object, ...) {
@@ -78,6 +80,16 @@ bru_info_upgrade <- function(object, old = FALSE) {
   object
 }
 
+
+get_component_type <- function(x, part, components) {
+  if (is.null(x[["copy"]])) {
+    x[[part]][["type"]]
+  } else {
+    components[[x[["copy"]]]][[part]][["type"]]
+  }
+}
+
+
 #' Methods for bru_info objects
 #' @export
 #' @method summary bru_info
@@ -94,7 +106,19 @@ summary.bru_info <- function(object, ...) {
         function(x) {
           list(
             label = x[["label"]],
-            main_type = x[["main"]][["type"]]
+            copy_of = x[["copy"]],
+            main_type = get_component_type(
+              x, "main",
+              object[["model"]][["effects"]]
+            ),
+            group_type = get_component_type(
+              x, "group",
+              object[["model"]][["effects"]]
+            ),
+            replicate_type = get_component_type(
+              x, "replicate",
+              object[["model"]][["effects"]]
+            )
           )
         }
       ),
@@ -122,11 +146,24 @@ print.summary_bru_info <- function(x, ...) {
   cat(paste0("INLA version: ", x$INLA_version, "\n"))
   cat(paste0("Components:\n"))
   for (cmp in x$components) {
-    cat(sprintf(
-      "  %s: Main model type '%s'\n",
-      cmp$label,
-      cmp$main_type
-    ))
+    if (!is.null(cmp$copy_of)) {
+      cat(sprintf(
+        "  %s: Copy of '%s' (types main='%s', group='%s', replicate='%s)\n",
+        cmp$label,
+        cmp$copy_of,
+        cmp$main_type,
+        cmp$group_type,
+        cmp$replicate_type
+      ))
+    } else {
+      cat(sprintf(
+        "  %s: Model types main='%s', group='%s', replicate='%s'\n",
+        cmp$label,
+        cmp$main_type,
+        cmp$group_type,
+        cmp$replicate_type
+      ))
+    }
   }
   cat(paste0("Likelihoods:\n"))
   for (lh in x$lhoods) {
@@ -239,9 +276,8 @@ bru_info.bru <- function(object, ...) {
 #'   [component] for details.
 #' @param ... Likelihoods, each constructed by a calling [like()], or named
 #'   parameters that can be passed to a single [like()] call.
-#' @param options A list of name and value pairs that are either interpretable
-#'   by [bru.options] or valid inla parameters. See [bru.options] for
-#'   caveats about some of the `control.*` inla options.
+#' @param options A [bru_options] options object or a list of options passed
+#' on to [bru_options()]
 #'
 #' @return bru returns an object of class "bru". A `bru` object inherits
 #'   from `INLA::inla` (see the inla documentation for its properties) and
@@ -250,63 +286,117 @@ bru_info.bru <- function(object, ...) {
 #' @example inst/examples/bru.R
 #'
 
-bru <- function(components = y ~ Intercept,
+bru <- function(components = ~ Intercept(1),
                 ...,
                 options = list()) {
   requireINLA()
 
   # Update default options
-  options <- do.call(bru.options, options)
+  options <- bru_call_options(options)
 
   lhoods <- list(...)
-  dot_is_lhood <- vapply(lhoods, function(lh) inherits(lh, "bru_like"), TRUE)
-  if (any(dot_is_lhood)) {
-    if (!all(dot_is_lhood)) {
-      stop("Cannot mix like() parameters with 'lhood' objects.")
+  dot_is_lhood <- vapply(
+    lhoods,
+    function(lh) inherits(lh, "bru_like"),
+    TRUE
+  )
+  dot_is_lhood_list <- vapply(
+    lhoods,
+    function(lh) inherits(lh, "bru_like_list"),
+    TRUE
+  )
+  if (any(dot_is_lhood | dot_is_lhood_list)) {
+    if (!all(dot_is_lhood | dot_is_lhood_list)) {
+      stop("Cannot mix like() parameters with 'bru_like' and `bru_like_list` objects.")
     }
   } else {
     if (is.null(lhoods[["formula"]])) {
       lhoods[["formula"]] <- . ~ .
     }
-    lhoods[["formula"]] <- auto_copy_response(lhoods[["formula"]], components)
+    if (inherits(components, "formula")) {
+      lhoods[["formula"]] <- auto_response(
+        lhoods[["formula"]],
+        extract_response(components)
+      )
+    }
     lhoods <- list(do.call(like, c(lhoods, list(options = options))))
+    dot_is_lhood <- TRUE
+    dot_is_lhood_list <- FALSE
   }
-  class(lhoods) <- c("bru_like_list", "list")
+  if (any(dot_is_lhood_list)) {
+    lhoods <- like_list(c(
+      lhoods[dot_is_lhood],
+      do.call(c, lhoods[dot_is_lhood_list])
+    ))
+  } else {
+    lhoods <- like_list(lhoods)
+  }
 
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
   }
 
-  # Turn model components into internal bru model
-  bru.model <- make.model(components, lhoods)
+  # Turn input into a list of components (from existing list, or a special formula)
+  components <- component_list(components)
 
+  # Turn model components into internal bru model
+  bru.model <- bru_model(components, lhoods)
 
   # Set max iterations to 1 if all likelihood formulae are linear
   if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) {
-    options$max.iter <- 1
+    options$bru_max_iter <- 1
   }
 
+  info <- bru_info(
+    method = "bru",
+    model = bru.model,
+    lhoods = lhoods,
+    options = options
+  )
+
   # Run iterated INLA
-  if (options$run) {
+  if (options$bru_run) {
     result <- iinla(
-      model = bru.model,
-      lhoods = lhoods,
-      n = options$max.iter,
-      offset = options$offset,
-      result = options$result,
-      inla.options = options$inla.options
+      model = info[["model"]],
+      lhoods = info[["lhoods"]],
+      options = info[["options"]]
     )
   } else {
     result <- list()
   }
 
-  ## Create result object ##
-  result$bru_info <- bru_info(
-    method = "bru",
-    lhoods = lhoods,
-    model = bru.model,
-    mesh = options$mesh
+  # Add bru information to the result
+  result$bru_info <- info
+  class(result) <- c("bru", class(result))
+  return(result)
+}
+
+
+#' @details
+#' * `bru_rerun` Continue the optimisation from a previously computed estimate.
+#' @param result A previous estimation object of class `bru`
+#'
+#' @rdname bru
+#' @export
+bru_rerun <- function(result, options = list()) {
+  stopifnot(inherits(result, "bru"))
+  info <- result[["bru_info"]]
+  info[["options"]] <- bru_call_options(
+    bru_options(
+      info[["options"]],
+      as.bru_options(options)
+    )
   )
+
+  result <- iinla(
+    model = info[["model"]],
+    lhoods = info[["lhoods"]],
+    initial = result,
+    options = info[["options"]]
+  )
+
+  # Add bru information to the result
+  result$bru_info <- info
   class(result) <- c("bru", class(result))
   return(result)
 }
@@ -339,15 +429,18 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param family A string identifying a valid `INLA::inla` likelihood family. The default is
+#' @param formula a [formula] where the right hand side is a general R
+#'   expression defines the predictor used in the model.
+#' @param family A string identifying a valid `INLA::inla` likelihood family.
+#' The default is
 #'   `gaussian` with identity link. In addition to the likelihoods provided
-#'   by inla (see `inla.models()$likelihood`) inlabru supports fitting Cox
+#'   by inla (see `names(INLA::inla.models()$likelihood)`)
+#'   inlabru supports fitting latent Gaussian Cox
 #'   processes via `family = "cp"`.
 #'   As an alternative to [bru()], the [lgcp()] function provides
 #'   a convenient interface to fitting Cox processes.
-#' @param formula a [formula] where the right hand side expression defines
-#'   the predictor used in the optimization.
-#' @param data Likelihood-specific data, as a `data.frame` or `SpatialPoints[DataFrame]`
+#' @param data Likelihood-specific data, as a `data.frame` or
+#' `SpatialPoints[DataFrame]`
 #'   object.
 #' @param mesh An inla.mesh object.
 #' @param E Exposure parameter for family = 'poisson' passed on to
@@ -366,18 +459,25 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#' @param options list of global options overriding [bru.options]
+#' @param allow_latent logical. If `TRUE`, the latent state of each component is
+#' directly available to the predictor expression, with a `_latent` suffix.
+#' @param allow_combine logical; If `TRUE`, the predictor expression may
+#' involve several rows of the input data to influence the same row.
+#' (TODO: review what's needed to allow the result to also be of a different size)
+#' @param options A [bru_options] options object or a list of options passed
+#' on to [bru_options()]
 #'
 #' @return A likelihood configuration which can be used to parameterize [bru].
 #'
 #' @example inst/examples/like.R
 
-like <- function(family, formula = . ~ ., data = NULL,
+like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
+                 allow_latent = FALSE, allow_combine = FALSE,
                  options = list()) {
-  options <- do.call(bru.options, options)
+  options <- bru_call_options(options)
 
   # Some defaults
   inla.family <- family
@@ -410,20 +510,13 @@ like <- function(family, formula = . ~ ., data = NULL,
     if (is.null(data)) {
       stop("You called like() with family='cp' but no 'data' argument was supplied.")
     }
-    # if ( is.null(samplers) ) { stop("You called like() with family='cp' but no 'samplers' argument was supplied.") }
 
     if (is.null(ips)) {
-      # TODO: split ipmaker into one domain extractor (or not; should force
-      # explicit domain specification!), and one integration point constructor
-      #      message("ipmaker can't really work here unless it doesn't need the predictor information")
-      #      warning("ipmaker can't really work here unless it doesn't need the predictor information")
       ips <- ipmaker(
-        samplers,
+        samplers = samplers,
         domain = domain,
         dnames = response,
-        data = NULL,
-        model = NULL,
-        int.args = options$int.args
+        int.args = options[["bru_int_args"]]
       )
     }
 
@@ -511,7 +604,9 @@ like <- function(family, formula = . ~ ., data = NULL,
     domain = domain,
     drange = drange,
     include_components = include,
-    exclude_components = exclude
+    exclude_components = exclude,
+    allow_latent = allow_latent,
+    allow_combine = allow_combine
   )
 
   class(lh) <- c("bru_like", "list")
@@ -520,24 +615,97 @@ like <- function(family, formula = . ~ ., data = NULL,
   lh
 }
 
-single_stackmaker <- function(model, lhood, result) {
+
+#' @details
+#' * `like_list`: Combine a `bru_like` likelihoods
+#' into a `bru_like_list` object
+#' @param \dots For `like_list.bru_like`, one or more `bru_like` objects
+#' @export
+#' @rdname like
+like_list <- function(...) {
+  UseMethod("like_list")
+}
+
+#' @details
+#' * `like_list.list`: Combine a list of `bru_like` likelihoods
+#' into a `bru_like_list` object
+#' @param object A list of `bru_like` objects
+#' @param envir An optional environment for the new `bru_like_list` object
+#' @export
+#' @rdname like
+like_list.list <- function(object, envir = NULL, ...) {
+  if (is.null(envir)) {
+    envir <- environment(object)
+  }
+  if (any(vapply(object, function(x) !inherits(x, "bru_like"), TRUE))) {
+    stop("All list elements must be of class 'bru_like'.")
+  }
+
+  class(object) <- c("bru_like_list", "list")
+  environment(object) <- envir
+  object
+}
+
+#' @details
+#' * `like_list.bru_like`: Combine several `bru_like` likelihoods
+#' into a `bru_like_list` object
+#' @export
+#' @rdname like
+like_list.bru_like <- function(..., envir = NULL) {
+  like_list(list(...), envir = envir)
+}
+
+#' @export
+#' @param x `bru_like_list` object from which to extract element(s)
+#' @param i indices specifying elements to extract
+#' @rdname like
+`[.bru_like_list` <- function(x, i) {
+  env <- environment(x)
+  object <- NextMethod()
+  class(object) <- c("bru_like_list", "list")
+  environment(object) <- env
+  object
+}
+
+
+bru_like_expr <- function(lhood, components) {
+  if (!is.null(lhood[["expr"]])) {
+    lhood[["expr"]]
+  } else {
+    included <-
+      parse_inclusion(
+        names(components),
+        include = lhood[["include_components"]],
+        exclude = lhood[["exclude_components"]]
+      )
+    parse(text = paste0(included, collapse = " + "))
+  }
+}
+
+
+
+
+
+
+single_stackmaker <- function(model, lhood, state) {
   make.stack(
     data = lhood$data, model = model, expr = lhood$expr,
     y = lhood$data[[lhood$response]],
-    E = lhood$E, Ntrials = lhood$Ntrials, result = result,
+    E = lhood$E, Ntrials = lhood$Ntrials,
+    state = state,
     include = lhood[["include_components"]],
     exclude = lhood[["exclude_components"]]
   )
 }
 
-joint_stackmaker <- function(model, lhoods, result) {
+joint_stackmaker <- function(model, lhoods, state) {
   do.call(
     inla.stack.mjoin,
     c(
       lapply(
         lhoods,
         function(lh) {
-          single_stackmaker(model, lh, result)
+          single_stackmaker(model, lh, state)
         }
       ),
       # Make sure components with zero derivative are kept:
@@ -550,102 +718,25 @@ joint_stackmaker <- function(model, lhoods, result) {
 
 
 
-#' Additional [bru] options
-#'
-#' @aliases bru.options
-#' @export
-#'
-#' @param mesh An `inla.mesh` object for spatial models without SPDE
-#'   components. Mostly used for successive spatial predictions.
-#' @param run If TRUE, run inference. Otherwise only return configuration needed
-#'   to run inference.
-#' @param max.iter maximum number of inla iterations
-#' @param offset the usual `INLA::inla` offset. If a nonlinear formula is
-#'   used, the resulting Taylor approximation constant will be added to this
-#'   automatically.
-#' @param result An `inla` object returned from previous calls of
-#'   `INLA::inla`, [bru] or [lgcp]. This will be used as a
-#'   starting point for further improvement of the approximate posterior.
-#' @param E `INLA::inla` 'poisson' likelihood exposure parameter
-#' @param Ntrials `INLA::inla` 'binomial' likelihood parameter
-#' @param control.compute INLA option, See `INLA::control.compute`
-#' @param control.inla INLA option, See `INLA::control.inla`
-#' @param control.fixed INLA option, See `INLA::control.fixed`. Warning:
-#'   due to how inlabru currently constructs the `inla()`, the `mean`,
-#'   `prec`, `mean.intercept`, and `prec.intercept` will have no
-#'   effect. Until a more elegant alterative has been implemented, use explicit
-#'   `mean.linear` and `prec.linear` specifications in each
-#'   `model="linear"` component instead.
-#' @param int.args List of arguments passed all the way to the integration method
-#' `ipoints` and `int.polygon` for 'cp' family models
-#' @param ... Additional options passed on to `INLA::inla`
-#'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and Finn Lindgren \email{finn.lindgren@@gmail.com}
-#'
-#' @examples
-#'
-#' \donttest{
-#'
-#' # Generate default bru options
-#' opts <- bru.options()
-#'
-#' # Print them:
-#' opts
-#' }
-#'
-bru.options <- function(mesh = NULL,
-                        run = TRUE,
-                        max.iter = 10,
-                        offset = 0,
-                        result = NULL,
-                        E = 1,
-                        Ntrials = 1,
-                        control.compute = list(),
-                        control.inla = list(),
-                        control.fixed = list(),
-                        int.args = list(method = "stable", nsub = NULL),
-                        ...) {
-  control.compute <-
-    override_config_defaults(
-      control.compute,
-      iinla.getOption("control.compute")
-    )
-  control.inla <-
-    override_config_defaults(
-      control.inla,
-      iinla.getOption("control.inla")
-    )
-  control.fixed <-
-    override_config_defaults(
-      control.fixed,
-      iinla.getOption("control.fixed")
-    )
-
-  args <- as.list(environment())
-  args$control.compute <- NULL
-  args$control.inla <- NULL
-  args$control.fixed <- NULL
-  args$inla.options <- list(...)
-  args$inla.options$control.compute <- control.compute
-  args$inla.options$control.inla <- control.inla
-  args$inla.options$control.fixed <- control.fixed
-
-  args
-}
 
 #' Log Gaussian Cox process (LGCP) inference using INLA
 #'
-#' This function performs inference on a LGCP observed via points residing possibly multiple dimensions.
-#' These dimensions are defined via the left hand side of the formula provided via the model parameter.
-#' The left hand side determines the intensity function that is assumed to drive the LGCP. This may include
-#' effects that lead to a thinning (filtering) of the point process. By default, the log intensity is assumed
-#' to be a linear combination of the effects defined by the formula's RHS. More sofisticated models, e.g.
-#' non-linear thinning, can be achieved by using the predictor argument. The latter requires multiple runs
-#' of INLA for improving the required approximation of the predictor. In many applications
-#' the LGCP is only observed through subsets of the dimensions the process is living in. For example, spatial
-#' point realizations may only be known in sub-areas of the modeled space. These observed subsets of the LGCP
-#' domain are called samplers and can be provided via the respective parameter. If samplers is NULL it is
-#' assumed that all of the LGCP's dimensions have been observed completely.
+#' This function performs inference on a LGCP observed via points residing
+#' possibly multiple dimensions. These dimensions are defined via the left
+#' hand side of the formula provided via the model parameter.
+#' The left hand side determines the intensity function that is assumed to
+#' drive the LGCP. This may include effects that lead to a thinning (filtering)
+#' of the point process. By default, the log intensity is assumed to be a linear
+#' combination of the effects defined by the formula's RHS. More sofisticated
+#' models, e.g. non-linear thinning, can be achieved by using the predictor
+#' argument. The latter requires multiple runs of INLA for improving the
+#' required approximation of the predictor. In many applications the LGCP is
+#' only observed through subsets of the dimensions the process is living in.
+#' For example, spatial point realizations may only be known in sub-areas of
+#' the modelled space. These observed subsets of the LGCP
+#' domain are called samplers and can be provided via the respective parameter.
+#' If samplers is NULL it is assumed that all of the LGCP's dimensions have
+#' been observed completely.
 #'
 #'
 #' @aliases lgcp
@@ -655,9 +746,13 @@ bru.options <- function(mesh = NULL,
 #' @param samplers A data frame or `Spatial[Points/Lines/Polygons]DataFrame` objects
 #' @param domain Named list of domain definitions
 #' @param ips Integration points (overrides `samplers`)
-#' @param formula If NULL, the linear combination implied by the `components` is used as a predictor for the point location intensity. If a (possibly non-linear) expression is provided the respective Taylor approximation is used as a predictor. Multiple runs if INLA are then required for a better approximation of the posterior.
+#' @param formula If NULL, the linear combination implied by the `components`
+#' is used as a predictor for the point location intensity. If a (possibly
+#' non-linear) expression is provided the respective Taylor approximation is
+#' used as a predictor. Multiple runs if INLA are then required for a better
+#' approximation of the posterior.
 #' @param E Single numeric used rescale all integration weights by a fixed factor
-#' @param options See [bru.options]
+#' @param options See [bru_options_set()]
 #' @return An [bru] object
 #' @examples
 #'
@@ -680,7 +775,8 @@ bru.options <- function(mesh = NULL,
 #'     prior.range = c(5, 0.01)
 #'   )
 #'
-#'   # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
+#'   # Define domain of the LGCP as well as the model components (spatial SPDE
+#'   # effect and Intercept)
 #'   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #'
 #'   # Fit the model
@@ -711,7 +807,10 @@ lgcp <- function(components,
                  E = NULL,
                  options = list()) {
   # If formula response missing, copy from components (for formula input)
-  formula <- auto_copy_response(formula, components)
+  if (inherits(components, "formula")) {
+    response <- extract_response(components)
+    formula <- auto_response(formula, response)
+  }
   lik <- like(
     family = "cp",
     formula = formula, data = data, samplers = samplers,
@@ -725,23 +824,32 @@ lgcp <- function(components,
 #
 #' Prediction from fitted bru model
 #'
-#' Takes a fitted `bru` object produced by the function [bru]() and produces predictions given
-#' a new set of values for the model covariates or the original values used for the model fit. The
-#' predictions can be based on any R expression that is valid given these values/covariates and the joint
+#' Takes a fitted `bru` object produced by the function [bru]() and produces
+#' predictions given a new set of values for the model covariates or the
+#' original values used for the model fit. The predictions can be based on any
+#' R expression that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
 #'
-#' Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
-#' median, variance, coefficient of variation as well as the variance and minimum and maximum sample
+#' Mean value predictions are accompanied by the standard errors, upper and
+#' lower 2.5% quantiles, the
+#' median, variance, coefficient of variation as well as the variance and
+#' minimum and maximum sample
 #' value drawn in course of estimating the statistics.
 #'
-#' Internally, this method calls [generate.bru] in order to draw samples from the model.
+#' Internally, this method calls [generate.bru()] in order to draw samples from
+#' the model.
 #'
 #' @aliases predict.bru
 #' @export
 #' @param object An object obtained by calling [bru] or [lgcp].
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for the prediction.
-#' @param formula A formula determining which effects to predict and how to combine them.
-#' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
+#' the prediction.
+#' @param formula A formula defining an R expression to evaluate for each generated
+#' sample. If `NULL`, the latent and hyperparameter states are generated
+#' as named list elements.
+#' @param n.samples Integer setting the number of samples to draw in order to
+#' calculate the posterior statistics. The default is rather low but provides
+#' a quick approximate result.
 #' @param seed Random number generator seed passed on to `inla.posterior.sample`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
@@ -755,7 +863,8 @@ lgcp <- function(components,
 #'   any components from the inclusion list)
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #'
-#' @return a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
+#' @return a data.frame or Spatial* object with predicted mean values and other
+#' summary statistics attached.
 #' @example inst/examples/predict.bru.R
 
 predict.bru <- function(object,
@@ -800,44 +909,69 @@ predict.bru <- function(object,
     smy <- list()
 
     for (nm in estim) {
-      smy[[nm]] <- bru_summarise(lapply(vals, function(v) v[[nm]]), x = vals[[1]][, covar, drop = FALSE])
+      smy[[nm]] <-
+        bru_summarise(
+          lapply(
+            vals,
+            function(v) v[[nm]]
+          ),
+          x = vals[[1]][, covar, drop = FALSE]
+        )
     }
-    vals <- smy
-    is.annot <- vapply(names(vals), function(v) all(vals[[v]]$sd == 0), TRUE)
-    annot <- do.call(cbind, lapply(vals[is.annot], function(v) v[, 1]))
-    vals <- vals[!is.annot]
+    is.annot <- vapply(names(smy), function(v) all(smy[[v]]$sd == 0), TRUE)
+    annot <- do.call(cbind, lapply(smy[is.annot], function(v) v[, 1]))
+    smy <- smy[!is.annot]
     if (!is.null(annot)) {
-      vals <- lapply(vals, function(v) cbind(data.frame(annot), v))
+      smy <- lapply(smy, function(v) cbind(data.frame(annot), v))
     }
 
 
-    if (length(vals) == 1) vals <- vals[[1]]
+    if (length(smy) == 1) smy <- smy[[1]]
+  } else if (is.list(vals[[1]])) {
+    vals.names <- names(vals[[1]])
+    if (any(vals.names == "")) {
+      warning("Some generated list elements are unnamed")
+    }
+    smy <- list()
+    for (nm in vals.names) {
+      smy[[nm]] <-
+        bru_summarise(
+          lapply(
+            vals,
+            function(v) v[[nm]]
+          )
+        )
+    }
   } else {
-    # if ( nrow(vals[[1]]) == nrow(data) ) { add.x = vals[[1]][,covar,drop=FALSE] } else { add.x = NULL }
-    vals <- bru_summarise(vals, x = data)
+    smy <- bru_summarise(vals, x = data)
   }
 
-  if (!inherits(vals, "Spatial")) class(vals) <- c("prediction", class(vals))
-  vals
+  if (!inherits(smy, "Spatial")) class(smy) <- c("prediction", class(smy))
+  smy
 }
 
 #' Sampling based on bru posteriors
 #'
 #' @description
-#' Takes a fitted `bru` object produced by the function [bru]() and produces samples given
-#' a new set of values for the model covariates or the original values used for the model fit. The
-#' samples can be based on any R expression that is valid given these values/covariates and the joint
+#' Takes a fitted `bru` object produced by the function [bru]() and produces
+#' samples given a new set of values for the model covariates or the original
+#' values used for the model fit. The samples can be based on any R expression
+#' that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
 #'
 #' @aliases generate.bru
 #' @export
 #' @family sample generators
 #' @param object A `bru` object obtained by calling [bru].
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for sampling.
-#' @param formula A formula determining which effects to sample from and how to combine them analytically.
-#' @param n.samples Integer setting the number of samples to draw in order to calculate the posterior statistics.
-#'                  The default is rather low but provides a quick approximate result.
-#' @param seed Random number generator seed passed on to `inla.posterior.sample`
+#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
+#' sampling.
+#' @param formula A formula defining an R expression to evaluate for each generated
+#' sample. If `NULL`, the latent and hyperparameter states are returned
+#' as named list elements.
+#' @param n.samples Integer setting the number of samples to draw in order to
+#' calculate the posterior statistics.
+#' The default, 100, is rather low but provides a quick approximate result.
+#' @param seed Random number generator seed passed on to `INLA::inla.posterior.sample`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
@@ -877,7 +1011,8 @@ generate.bru <- function(object,
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }
 
-  # If data is provided as list, generate data automatically for each dimension stated in this list
+  # If data is provided as list, generate data automatically for each dimension
+  # stated in this list
   if (class(data)[1] == "list") {
     # Todo: check if this feature works at all.
     # TODO: add method ipoints.list to handle this;
@@ -895,19 +1030,29 @@ generate.bru <- function(object,
     data <- do.call(cprod, add.pts)
   }
 
-  # Turn formula into an expression
-  if (is.null(formula)) {
-    formula <- object$bru_info$lhoods[["default"]]$formula
-  }
-
-  # TODO: clarify the output format, and use the format parameter
-  vals <- evaluate_model(
-    model = object$bru_info$model, result = object, data = data,
-    property = "sample", n = n.samples, predictor = formula, seed = seed,
+  state <- evaluate_state(
+    object$bru_info$model,
+    result = object,
+    property = "sample",
+    n = n.samples,
+    seed = seed,
     num.threads = num.threads,
-    include = include, exclude = exclude,
     ...
   )
+  if (is.null(formula)) {
+    state
+  } else {
+    # TODO: clarify the output format, and use the format parameter
+    vals <- evaluate_model(
+      model = object$bru_info$model,
+      state = state,
+      data = data,
+      predictor = formula,
+      include = include,
+      exclude = exclude
+    )
+    vals
+  }
 }
 
 
@@ -918,14 +1063,17 @@ generate.bru <- function(object,
 # @export
 # @param dfun A function returning a density for given x
 # @param sfun A function providing samples from a posterior
-# @param x Inital domain on which to perform the estimation. This will be adjusted as more samples are generated.
-# @param samples An initial set of samples. Not required but will be used to estimate the inital domain \code{x} if \code{x} is \code{NULL}
+# @param x Inital domain on which to perform the estimation. This will be
+# adjusted as more samples are generated.
+# @param samples An initial set of samples. Not required but will be used to
+# estimate the inital domain \code{x} if \code{x} is \code{NULL}
 # @param mcerr Monte Carlo error at which to stop the chain
 # @param n Inital number of samples. This will be doubled for each iteration.
-# @param discrete St this to \code{TRUE} if the density is only defined for integer \code{x}
+# @param discrete Set this to \code{TRUE} if the density is only defined for integer \code{x}
 # @param verbose Be verbose?
 
-montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0.01, n = 100, discrete = FALSE, verbose = FALSE) {
+montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
+                                 mcerr = 0.01, n = 100, discrete = FALSE, verbose = FALSE) {
   xmaker <- function(hpd) {
     mid <- (hpd[2] + hpd[1]) / 2
     rg <- (hpd[2] - hpd[1]) / 2
@@ -989,7 +1137,7 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL, mcerr = 0
       converged <- TRUE
     }
     else {
-      lest <- 0.5 * (est + lest)
+      lest <- (est + lest) / 2
     }
   }
 
@@ -1060,6 +1208,261 @@ bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
 
 
 
+
+lin_predictor <- function(lin, state) {
+  do.call(
+    c,
+    lapply(
+      lin,
+      function(x) {
+        as.vector(
+          x$offset + Matrix::rowSums(do.call(
+            cbind,
+            lapply(names(x$A), function(xx) {
+              x[["A"]][[xx]] %*% state[[xx]]
+            })
+          ))
+        )
+      }
+    )
+  )
+}
+nonlin_predictor <- function(model, lhoods, state, A) {
+  do.call(
+    c,
+    lapply(
+      lhoods,
+      function(lh) {
+        as.vector(
+          evaluate_model(
+            model = model,
+            data = lh[["data"]],
+            state = list(state),
+            A = A,
+            predictor = bru_like_expr(lh, model[["effects"]]),
+            format = "matrix"
+          )
+        )
+      }
+    )
+  )
+}
+scale_state <- function(state0, state1, scaling_factor) {
+  new_state <- lapply(
+    names(state0),
+    function(idx) {
+      state0[[idx]] + (state1[[idx]] - state0[[idx]]) * scaling_factor
+    }
+  )
+  names(new_state) <- names(state0)
+  new_state
+}
+
+line_search_optimisation_target <- function(x, param) {
+  (x - 1)^2 * param[1] + 2 * (x - 1) * x^2 * param[2] + x^4 * param[3]
+}
+
+
+
+bru_line_search <- function(model,
+                            lhoods,
+                            lin,
+                            state0,
+                            state,
+                            A,
+                            options) {
+  if (length(options$bru_method$search) == 0) {
+    return(
+      list(
+        active = FALSE,
+        step_scaling = 1,
+        state = state
+      )
+    )
+  }
+
+  fact <- options$bru_method$factor
+  pred_norm <- function(delta) {
+    if (any(!is.finite(delta))) {
+      Inf
+    } else {
+      sum(delta^2)^0.5
+    }
+  }
+
+  state1 <- state
+  lin_pred0 <- lin_predictor(lin, state0)
+  lin_pred1 <- lin_predictor(lin, state1)
+  nonlin_pred <- nonlin_predictor(model, lhoods, state1, A)
+  step_scaling <- 1
+
+  norm01 <- pred_norm(lin_pred1 - lin_pred0)
+  norm1 <- pred_norm(nonlin_pred - lin_pred1)
+
+  do_finite <-
+    any(c("all", "finite") %in% options$bru_method$search)
+  do_contract <-
+    any(c("all", "contract") %in% options$bru_method$search)
+  do_expand <-
+    any(c("all", "expand") %in% options$bru_method$search)
+  do_optimise <-
+    any(c("all", "optimise") %in% options$bru_method$search)
+
+  finite_active <- 0
+  contract_active <- 0
+  expand_active <- 0
+
+  if (do_finite || do_contract) {
+    nonfin <- any(!is.finite(nonlin_pred))
+    norm0 <- pred_norm(nonlin_pred - lin_pred0)
+
+    while ((do_finite && nonfin) ||
+      (do_contract && (norm0 > norm01 * fact))) {
+      if (do_finite && nonfin) {
+        finite_active <- finite_active - 1
+      } else {
+        contract_active <- contract_active - 1
+      }
+      step_scaling <- step_scaling / fact
+      state <- scale_state(state0, state1, step_scaling)
+      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      nonfin <- any(!is.finite(nonlin_pred))
+      norm0 <- pred_norm(nonlin_pred - lin_pred0)
+
+      bru_log_message(
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 3),
+          "%, Contract"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+
+      if (step_scaling < 2^-10) {
+        break
+      }
+    }
+  }
+
+  if (do_expand &&
+    finite_active == 0 &&
+    contract_active == 0) {
+    overstep <- FALSE
+    norm0 <- pred_norm(nonlin_pred - lin_pred0)
+    norm1 <- pred_norm(nonlin_pred - lin_pred1)
+    while (!overstep && (norm0 < norm01)) {
+      expand_active <- expand_active + 1
+      step_scaling <- step_scaling * fact
+      state <- scale_state(state0, state1, step_scaling)
+
+      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      norm1_prev <- norm1
+      norm0 <- pred_norm(nonlin_pred - lin_pred0)
+      norm1 <- pred_norm(nonlin_pred - lin_pred1)
+      overstep <-
+        (norm1 > norm1_prev) || !is.finite(norm1)
+
+      bru_log_message(
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 3),
+          "%, Expand"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+
+      if (step_scaling > 2^10) {
+        break
+      }
+    }
+    if (((step_scaling > 1) && overstep) || !is.finite(norm1)) {
+      expand_active <- expand_active - 1
+      step_scaling <- step_scaling / fact
+      state <- scale_state(state0, state1, step_scaling)
+      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      norm1 <- pred_norm(nonlin_pred - lin_pred1)
+
+      bru_log_message(
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 3),
+          "%, Overstep"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+    }
+  }
+
+  if (do_optimise) {
+    lin_pred <- lin_predictor(lin, state)
+    delta_lin <- (lin_pred1 - lin_pred0)
+    delta_nonlin <- (nonlin_pred - lin_pred) / step_scaling^2
+    alpha <-
+      optimise(
+        line_search_optimisation_target,
+        step_scaling * c(1 / fact, fact),
+        param = c(
+          sum(delta_lin^2),
+          sum(delta_lin * delta_nonlin),
+          sum(delta_nonlin^2)
+        )
+      )
+
+    step_scaling_opt <- alpha$minimum
+    state_opt <- scale_state(state0, state1, step_scaling_opt)
+    nonlin_pred_opt <- nonlin_predictor(model, lhoods, state_opt, A)
+    norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
+
+    if (norm1_opt < norm1) {
+      step_scaling <- step_scaling_opt
+      state <- state_opt
+      nonlin_pred <- nonlin_pred_opt
+      norm1 <- norm1_opt
+
+      bru_log_message(
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling, 4),
+          "%, Optimisation"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+    }
+  }
+
+  active <-
+    (finite_active + contract_active + expand_active != 0) ||
+      (abs(step_scaling - 1) > 0.001)
+
+  if (active && (options$bru_verbose <= 2)) {
+    bru_log_message(
+      paste0(
+        "iinla: Step rescaling: ",
+        signif(100 * step_scaling, 3),
+        "%"
+      ),
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store,
+      verbosity = 2
+    )
+  }
+
+  list(
+    active = active,
+    step_scaling = step_scaling,
+    state = state
+  )
+}
+
+
 #' Iterated INLA
 #'
 #' This is an internal wrapper for iterated runs of `INLA::inla`. Before each run the
@@ -1071,67 +1474,123 @@ bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
 #' @param data A data.frame
 #' @param model A [bru_model] object
 #' @param lhoods A list of likelihood objects from [like()]
-#' @param n Number of `INLA::inla` iterations
-#' @param result A previous inla result, to be used as starting point
-#' @param iinla.verbose If TRUE, be verbose (use verbose=TRUE to make INLA verbose)
-#' @param offset An additional predictor offset
-#' @param inla.options A list of further arguments passed on to `INLA::inla`
-#'   Some `control.*` arguments are partially overridden, according to
-#'   internal inlabru method requirements.
+#' @param initial A previous `bru` result or a list of named latent variable
+#' initial states (missing elements are set to zero), to be used as starting
+#' point, or `NULL`. If non-null, overrides `options$bru_initial`
+#' @param options A `bru_options` object.
 #' @return An `INLA::inla` object
 #' @keywords internal
 
 
-iinla <- function(model, lhoods, n = 10, result = NULL,
-                  iinla.verbose = inlabru:::iinla.getOption("iinla.verbose"),
-                  offset = NULL, inla.options) {
-
-  # # Default number of maximum iterations
-  # if ( !is.null(model$expr) && is.null(n) ) { n = 10 } else { if (is.null(n)) {n = 1} }
+iinla <- function(model, lhoods, initial = NULL, options) {
+  inla.options <- bru_options_inla(options)
 
   # Track variables?
   track <- list()
 
-  # Set old result
-  old.result <- result
-
   # Initialise required local options
-  if (is.null(inla.options$control.mode)) {
-    inla.options$control.mode <- list()
-  }
-  if (is.null(inla.options$control.predictor)) {
-    inla.options$control.predictor <- list()
-  }
-  inla.options$control.predictor$compute <- TRUE
+  inla.options <- modifyList(
+    inla.options,
+    list(
+      control.mode = list(),
+      control.predictor = list(compute = TRUE)
+    )
+  )
 
   # Extract the family of each likelihood
-  family <- vapply(seq_along(lhoods), function(k) lhoods[[k]]$inla.family, "family")
+  family <- vapply(
+    seq_along(lhoods),
+    function(k) lhoods[[k]]$inla.family,
+    "family"
+  )
 
-  # Inital stack
-  stk <- joint_stackmaker(model, lhoods, result)
+  initial <-
+    if (is.null(initial)) {
+      options[["bru_initial"]]
+    } else {
+      initial
+    }
+  result <- NULL
+  if (is.null(initial) || inherits(initial, "bru")) {
+    # Set old result
+    state <- evaluate_state(model,
+      lhoods = lhoods,
+      result = initial,
+      property = "mode"
+    )[[1]]
+    if (inherits(initial, "bru")) {
+      result <- initial
+    }
+  } else if (is.list(initial)) {
+    state <- initial[intersect(names(model[["effects"]]), names(initial))]
+    for (lab in names(model[["effects"]])) {
+      if (is.null(state[[lab]])) {
+        state[[lab]] <- rep(0, ibm_n(model[["effects"]][[lab]][["mapper"]]))
+      } else if (length(state[[lab]]) == 1) {
+        state[[lab]] <-
+          rep(
+            state[[lab]],
+            ibm_n(model[["effects"]][[lab]][["mapper"]])
+          )
+      }
+    }
+    result <- NULL
+  } else {
+    stop("Unknown previous result information class")
+  }
+  old.result <- result
+
+  do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
+  if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
+    A <- evaluate_A(model, lhoods)
+    lin <- bru_compute_linearisation(
+      model,
+      lhoods = lhoods,
+      state = state,
+      A = A
+    )
+  }
+  # Initial stack
+  if (identical(options$bru_method$taylor, "legacy")) {
+    stk <- joint_stackmaker(model, lhoods, state = list(state))
+  } else {
+    idx <- evaluate_index(model, lhoods)
+    stk <- bru_make_stack(lhoods, lin, idx)
+  }
   stk.data <- INLA::inla.stack.data(stk)
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
 
   k <- 1
   interrupt <- FALSE
+  line_search <- list(active = FALSE, step_scaling = 1, state = state)
 
-  while ((k <= n) & !interrupt) {
+  if ((!is.null(result) && !is.null(result$mode))) {
+    previous_x <- result$mode$x
+  } else {
+    previous_x <- 0 # TODO: construct from the initial linearisation state instead
+  }
+
+  while ((k <= options$bru_max_iter) & !interrupt) {
 
     # When running multiple times propagate theta
-    if (k > 1) {
+    if ((k > 1) || (!is.null(result) && !is.null(result$mode))) {
       inla.options[["control.mode"]]$restart <- TRUE
       inla.options[["control.mode"]]$theta <- result$mode$theta
+      inla.options[["control.mode"]]$x <-
+        previous_x + (result$mode$x - previous_x) * line_search[["step_scaling"]]
+    }
+    if ((!is.null(result) && !is.null(result$mode))) {
+      previous_x <- result$mode$x
     }
 
-    bru_log(
-      paste0("iinla: Iteration ", k, "[ max:", n, "]"),
-      iinla.verbose
+    bru_log_message(
+      paste0("iinla: Iteration ", k, " [max:", options$bru_max_iter, "]"),
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store
     )
 
     # Return previous result if inla crashes, e.g. when connection to server is lost
-    if (k > 1) {
-      old.result <- result
-    }
+    old.result <- result
     result <- NULL
 
     inla.formula <- update.formula(model$formula, BRU.response ~ .)
@@ -1146,57 +1605,58 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
         ))
       )
     #        list.data(model$formula))
-    icall <- expression(
-      result <- tryCatch(
-        do.call(
-          inla,
-          c(
-            list(
-              formula = inla.formula,
-              data = inla.data,
-              family = family,
-              E = stk.data[["BRU.E"]],
-              Ntrials = stk.data[["BRU.Ntrials"]],
-              offset = stk.data[["BRU.offset"]] + offset
-            ),
-            inla.options
-          ),
-          envir = environment(model$effects)
-        ),
-        error = warning
+
+    inla.options <-
+      modifyList(
+        inla.options,
+        list(
+          formula = inla.formula,
+          data = inla.data,
+          family = family,
+          E = stk.data[["BRU.E"]],
+          Ntrials = stk.data[["BRU.Ntrials"]],
+          offset = stk.data[["BRU.offset"]]
+        )
+      )
+
+    result <- try_callstack(
+      do.call(
+        INLA::inla,
+        inla.options,
+        envir = environment(model$effects)
       )
     )
-    eval(icall)
 
-    if (is.character(result)) {
-      bru_log(paste0("iinla: INLA returned message: ", result))
-      stop(paste0("iinla: INLA returned message: ", result))
-    }
-
-    n.retry <- 0
-    max.retry <- 10
-    while ((is.null(result) | length(result) == 5) & (n.retry <= max.retry)) {
-      bru_log(
-        "iinla: INLA crashed or returned NULL. Waiting for 60 seconds and trying again.",
-        iinla.verbose
+    if (inherits(result, "try-error")) {
+      bru_log_message(
+        paste0("iinla: Problem in inla: ", result),
+        verbose = FALSE,
+        verbose_store = options$bru_verbose_store
       )
-      Sys.sleep(60)
-      eval(icall)
-      n.retry <- n.retry + 1
-    }
-    if ((is.null(result) | length(result) == 5)) {
-      bru_log(
-        sprintf("iinla: The computation failed %d times. Giving up and returning last successfully obtained result.", n.retry - 1),
-        iinla.verbose
+      warning(
+        paste0("iinla: Problem in inla: ", result),
+        immediate. = TRUE
       )
+      bru_log_message(
+        paste0("iinla: Giving up and returning last successfully obtained result."),
+        verbose = TRUE,
+        verbose_store = options$bru_verbose_store
+      )
+      if (is.null(old.result)) {
+        old.result <- list()
+        class(old.result) <- c("iinla", "list")
+      } else {
+        class(old.result) <- c("iinla", "inla", "list")
+      }
+      old.result$error <- result
+      old.result$iinla_stack <- stk
+      old.result$iinla_track <- do.call(rbind, track)
       return(old.result)
     }
 
-    bru_log("iinla: Done. ", iinla.verbose)
-
     # Extract values tracked for estimating convergence
-    if (n > 1 & k <= n) {
-      # Note: The number of fixed effets may be zero, and strong
+    if (options$bru_max_iter > 1 & k <= options$bru_max_iter) {
+      # Note: The number of fixed effects may be zero, and strong
       # non-linearities that don't necessarily affect the fixed
       # effects may appear in the random effects, so we need to
       # track all of them.
@@ -1228,44 +1688,85 @@ iinla <- function(model, lhoods, n = 10, result = NULL,
     }
 
     # Update stack given current result
-    if (n > 1 & k < n) {
-      stk <- joint_stackmaker(model, lhoods, result)
+    state0 <- state
+    state <- evaluate_state(model,
+      lhoods = lhoods,
+      result = result,
+      property = "mode"
+    )[[1]]
+    if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
+      if (do_line_search) {
+        line_search <- bru_line_search(
+          model = model,
+          lhoods = lhoods,
+          lin = lin,
+          state0 = state0,
+          state = state,
+          A = A,
+          options = options
+        )
+        state <- line_search[["state"]]
+      }
+      if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
+        lin <- bru_compute_linearisation(
+          model,
+          lhoods = lhoods,
+          state = state,
+          A = A
+        )
+      }
+      if (identical(options$bru_method$taylor, "legacy")) {
+        stk <- joint_stackmaker(model, lhoods, state = list(state))
+      } else {
+        stk <- bru_make_stack(lhoods, lin, idx)
+      }
       stk.data <- INLA::inla.stack.data(stk)
       inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
     }
 
     # Stopping criterion
     if (k > 1) {
-      ## TODO: Make max.dev a configurable option.
-      max.dev <- 0.01
+      max.dev <- options$bru_method$stop_at_max_rel_deviation
       dev <- abs(track[[k - 1]]$mean - track[[k]]$mean) / track[[k]]$sd
       ## do.call(c, lapply(by(do.call(rbind, track),
       ##                           as.factor(do.call(rbind, track)$effect),
       ##                           identity),
       ##                        function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
-      bru_log(
-        paste0("iinla: Max deviation from previous: ", signif(100 * max(dev), 3), "% of SD [stop if: <", 100 * max.dev, "%]"),
-        iinla.verbose
+      bru_log_message(
+        paste0(
+          "iinla: Max deviation from previous: ",
+          signif(100 * max(dev), 3),
+          "% of SD [stop if: <", 100 * max.dev, "%]"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 1
       )
-      interrupt <- all(dev < max.dev)
+      interrupt <- all(dev < max.dev) && (!line_search[["active"]])
       if (interrupt) {
-        bru_log(
+        bru_log_message(
           "iinla: Convergence criterion met, stopping INLA iteration.",
-          iinla.verbose
+          verbose = options$bru_verbose,
+          verbose_store = options$bru_verbose_store
         )
       }
     }
     k <- k + 1
   }
-  result$stack <- stk
-  result$model <- model
-  result$iinla$track <- do.call(rbind, track)
+  result$iinla_stack <- stk
+  result$iinla_track <- do.call(rbind, track)
   class(result) <- c("iinla", "inla", "list")
   return(result)
 }
 
 
-auto.intercept <- function(components) {
+auto_intercept <- function(components) {
+  if (!inherits(components, "formula")) {
+    if (inherits(components, "component_list")) {
+      return(components)
+    }
+    stop("components must be a formula to auto-add an intercept component")
+  }
   env <- environment(components)
 
   tm <- terms(components)
@@ -1296,12 +1797,12 @@ auto.intercept <- function(components) {
         as.formula(paste0(
           ". ~ . - ",
           var_names[inter_var],
-          " +1"
+          " -1"
         ))
       )
     }
   } else if (attr(tm, "intercept")) {
-    components <- update.formula(components, . ~ . + Intercept + 1)
+    components <- update.formula(components, . ~ . + Intercept(1) + 1)
   } else {
     components <- update.formula(components, . ~ . + 1)
   }
@@ -1310,45 +1811,37 @@ auto.intercept <- function(components) {
 }
 
 
-auto_linear_formula <- function(formula, components) {
-  if (as.character(formula)[
-    length(as.character(formula))
-  ] != ".") {
+# If missing RHS, set to the sum of the component names
+auto_additive_formula <- function(formula, components) {
+  if (as.character(formula)[length(as.character(formula))] != ".") {
     return(formula)
   }
+  stopifnot(inherits(components, "component_list"))
 
-  # No RHS; construct from components
-
-  components <- auto.intercept(components)
-  tm <- terms(components)
-
-  var_names <- attr(tm, "term.labels")
-  # Trim component options
-  var_names <- gsub(
-    pattern = "^([^\\(]*)\\(.*",
-    replacement = "\\1",
-    x = var_names
-  )
-  if (length(attr(tm, "offset")) > 0) {
-    var_names <- c(
-      var_names,
-      as.character(attr(tm, "variables"))[-1][attr(tm, "offset")]
-    )
-  }
+  env <- environment(formula)
   formula <- update.formula(
-    components,
+    formula,
     paste0(
       ". ~ ",
-      paste0(var_names, collapse = " + ")
+      paste0(names(component), collapse = " + ")
     )
   )
-  environment(formula) <- environment(components)
+  environment(formula) <- env
   formula
 }
 
-
-auto_copy_response <- function(formula, components) {
-  if (!inherits(components, "formula")) {
+# Extract the LHS of a formula, as response ~ .
+extract_response <- function(formula) {
+  stopifnot(inherits(formula, "formula"))
+  if (length(as.character(formula)) == 3) {
+    as.formula(paste0(as.character(formula)[2], " ~ ."))
+  } else {
+    . ~ .
+  }
+}
+# If response missing, add one
+auto_response <- function(formula, response) {
+  if (!inherits(formula, "formula")) {
     return(formula)
   }
   if ((length(as.character(formula)) == 3) &&
@@ -1357,29 +1850,18 @@ auto_copy_response <- function(formula, components) {
     return(formula)
   }
   env <- environment(formula)
-  tm_cm <- terms(components)
-  LHS <- as.formula(paste0(
-    as.character(attr(tm_cm, "variables"))[-1][attr(tm_cm, "response")],
-    " ~ ."
-  ))
-  if (as.character(formula)[
-    length(as.character(formula))
-  ] == ".") {
+  if (as.character(formula)[length(as.character(formula))] == ".") {
     # No formula RHS
-    formula <- LHS
+    formula <- response
   } else {
-    tm_fm <- terms(formula)
-    if ((attr(tm_fm, "response") == 0) ||
-      (as.character(attr(tm_fm, "variables"))[-1][attr(tm_fm, "response")] == ".")) {
-      formula <- update(formula, LHS)
-    }
+    formula <- update.formula(formula, response)
   }
   environment(formula) <- env
   formula
 }
 
 
-# Returns a formula's environemnt as a list. Removes all variable that are of type
+# Returns a formula's environment as a list. Removes all variable that are of type
 # inla, function or formula. Also removes all variables that are not variables of the formula.
 list.data <- function(formula) {
 
@@ -1472,8 +1954,10 @@ summary.bru <- function(object, ...) {
   result$WAIC <- object[["waic"]][["waic"]]
   result$DIC <- object[["dic"]][["dic"]]
 
-  result$inla <- NextMethod("summary", object)
-  result[["inla"]][["call"]] <- NULL
+  if (inherits(object, "inla")) {
+    result$inla <- NextMethod("summary", object)
+    result[["inla"]][["call"]] <- NULL
+  }
 
   class(result) <- c("summary_bru", "list")
   return(result)

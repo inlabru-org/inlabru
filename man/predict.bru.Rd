@@ -19,11 +19,16 @@
 \arguments{
 \item{object}{An object obtained by calling \link{bru} or \link{lgcp}.}
 
-\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for the prediction.}
+\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for
+the prediction.}
 
-\item{formula}{A formula determining which effects to predict and how to combine them.}
+\item{formula}{A formula defining an R expression to evaluate for each generated
+sample. If \code{NULL}, the latent and hyperparameter states are generated
+as named list elements.}
 
-\item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.}
+\item{n.samples}{Integer setting the number of samples to draw in order to
+calculate the posterior statistics. The default is rather low but provides
+a quick approximate result.}
 
 \item{seed}{Random number generator seed passed on to \code{inla.posterior.sample}}
 
@@ -43,20 +48,25 @@ any components from the inclusion list)}
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
 }
 \value{
-a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
+a data.frame or Spatial* object with predicted mean values and other
+summary statistics attached.
 }
 \description{
-Takes a fitted \code{bru} object produced by the function \url{bru} and produces predictions given
-a new set of values for the model covariates or the original values used for the model fit. The
-predictions can be based on any R expression that is valid given these values/covariates and the joint
+Takes a fitted \code{bru} object produced by the function \url{bru} and produces
+predictions given a new set of values for the model covariates or the
+original values used for the model fit. The predictions can be based on any
+R expression that is valid given these values/covariates and the joint
 posterior of the estimated random effects.
 }
 \details{
-Mean value predictions are accompanied by the standard errors, upper and lower 2.5\% quantiles, the
-median, variance, coefficient of variation as well as the variance and minimum and maximum sample
+Mean value predictions are accompanied by the standard errors, upper and
+lower 2.5\% quantiles, the
+median, variance, coefficient of variation as well as the variance and
+minimum and maximum sample
 value drawn in course of estimating the statistics.
 
-Internally, this method calls \link{generate.bru} in order to draw samples from the model.
+Internally, this method calls \code{\link[=generate.bru]{generate.bru()}} in order to draw samples from
+the model.
 }
 \examples{
 \donttest{

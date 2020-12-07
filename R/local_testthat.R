@@ -38,6 +38,38 @@ local_testthat_tolerances <- function(tolerances = c(1e-5, 1e-2, 1e-1),
 
 
 
+#' @details `local_bru_options_set()` is used to set global package options.
+#' @return `local_bru_options_set()` returns a copy of the global override
+#' options (not including the defaults), invisibly.
+#' @seealso [bru_options_set()], [bru_options_default()], [bru_options_get()]
+#' @param .reset For `local_bru_options_set`, logical indicating if the global
+#' override options list should be emptied before setting the new option(s).
+#'
+#' @examples
+#' my_fun <- function(val) {
+#'   local_bru_options_set(bru_verbose = val)
+#'   bru_options_get("bru_verbose")
+#' }
+#' # Inside the function, the bru_verbose option is changed.
+#' # Outside the function, the bru_verbose option is unchanged.
+#' print(my_fun(TRUE))
+#' print(bru_options_get("bru_verbose"))
+#' print(my_fun(FALSE))
+#' print(bru_options_get("bru_verbose"))
+#' @export
+#' @describeIn local_testthat Calls [bru_options_set()] in a reversible way
+
+local_bru_options_set <- function(...,
+                                  .reset = FALSE,
+                                  envir = parent.frame()) {
+  old_opt <- bru_options_get(include_default = FALSE)
+  withr::defer(bru_options_set(old_opt, .reset = TRUE), envir = envir)
+  bru_options_set(..., .reset = .reset)
+  invisible(old_opt)
+}
+
+
+
 #' @describeIn local_testthat Disable PROJ4/6 warnings.
 #' To be used within package tests. Restores state on exit.
 #'
@@ -142,6 +174,7 @@ local_mrsea_rebuild_CRS <- function(x, use_km = FALSE) {
     crs_km <- fm_crs_set_lengthunit(x$mesh$crs, "km")
     x$mesh <- fm_spTransform(x$mesh, crs_km)
     x$samplers <- sp::spTransform(x$samplers, crs_km)
+    x$samplers$weight <- x$samplers$weight / 1000
     x$points <- sp::spTransform(x$points, crs_km)
     x$boundary <- sp::spTransform(x$boundary, crs_km)
     x$covar <- sp::spTransform(x$covar, crs_km)
@@ -172,6 +205,9 @@ local_bru_safe_inla <- function(multicore = FALSE,
       INLA::inla.setOption(num.threads = old),
       envir
     )
+  }
+  if (!multicore) {
+    local_bru_options_set(num.threads = "1:1", envir = envir)
   }
   testthat::skip_if_not(bru_safe_inla(multicore = multicore, quietly = quietly))
 }

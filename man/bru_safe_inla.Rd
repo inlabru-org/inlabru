@@ -4,12 +4,14 @@
 \alias{bru_safe_inla}
 \title{Load INLA safely for examples and tests}
 \usage{
-bru_safe_inla(multicore = FALSE, quietly = FALSE)
+bru_safe_inla(multicore = NULL, quietly = FALSE)
 }
 \arguments{
 \item{multicore}{logical; if \code{TRUE}, multiple cores are allowed, and the
-INLA \code{num.threads} option is not checked or altered. Default: FALSE, multicore
-not allowed (used for examples and unit tests).}
+INLA \code{num.threads} option is not checked or altered.
+If \code{FALSE}, forces \code{num.threads="1:1"}. Default: NULL, checks
+if running in testthat or non-interactively, in which case sets
+\code{multicore=FALSE}, otherwise \code{TRUE}.}
 
 \item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. A message is
 always printed if the INLA \code{num.threads} option is altered, regardless of the

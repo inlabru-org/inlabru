@@ -30,7 +30,7 @@ gap.in.segments.f <- function(seg = NULL, geometry = "euc") {
   gap
 }
 
-# ----------------------------------------------------------
+
 
 define.blocks.f <- function(seg = NULL, covar.col = NULL, geometry = "euc") {
   #
@@ -79,7 +79,7 @@ define.blocks.f <- function(seg = NULL, covar.col = NULL, geometry = "euc") {
   seg
 }
 
-# -------------------------------------------------------
+
 
 get.blocks.f <- function(seg = NULL, geometry = "euc") {
   #
@@ -123,7 +123,7 @@ get.blocks.f <- function(seg = NULL, geometry = "euc") {
   blocks
 }
 
-# -------------------------------------------------------
+
 
 add.labels.to.obs.f <- function(dists = NULL, obs = NULL, seg = NULL) {
   #
@@ -151,7 +151,7 @@ add.labels.to.obs.f <- function(dists = NULL, obs = NULL, seg = NULL) {
   dists
 }
 
-# -------------------------------------------------------
+
 
 combine.dsmdata.f <- function(blocks = NULL, dists = NULL) {
   #
@@ -210,7 +210,7 @@ combine.dsmdata.f <- function(blocks = NULL, dists = NULL) {
   all
 }
 
-# -------------------------------------------------------
+
 
 get.direction.unit.f <- function(data = NULL, is.blocks = T, geometry = "euc") {
 
@@ -270,7 +270,7 @@ get.direction.unit.f <- function(data = NULL, is.blocks = T, geometry = "euc") {
   unit
 }
 
-# -------------------------------------------------------
+
 
 get.direction.segment.f <- function(data = NULL, geometry = "euc") {
 
@@ -373,7 +373,7 @@ get.direction.segment.f <- function(data = NULL, geometry = "euc") {
 }
 
 
-# -------------------------------------------------------
+
 
 start.end.points.segments.f <- function(seg = NULL, use.tran = FALSE, tran = NULL, geometry = "euc") {
   #
@@ -470,7 +470,7 @@ start.end.points.segments.f <- function(seg = NULL, use.tran = FALSE, tran = NUL
   seg
 } # End of function
 
-# -----------------------------------
+
 
 get.quadrant.f <- function(start.x, start.y, end.x, end.y, tol = 0.0000001) {
   # Get the quadrant of the points
@@ -509,7 +509,7 @@ get.quadrant.f <- function(start.x, start.y, end.x, end.y, tol = 0.0000001) {
 }
 
 
-# -----------------------------------------------
+
 
 euc.distance.f <- function(x1, y1, x2, y2) {
   # Calculate the Euclidean distance between two points, (x1,y1) and (x2,y2)
@@ -522,7 +522,6 @@ euc.distance.f <- function(x1, y1, x2, y2) {
   hypot
 }
 
-# -------------------------------------------------
 
 geo.distance.f <- function(lon1, lat1, lon2, lat2) {
   # This function calculates distance in km between two points following
@@ -547,7 +546,7 @@ geo.distance.f <- function(lon1, lat1, lon2, lat2) {
   posdist
 }
 
-# ---------------------------------------------------------------
+
 
 get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
 
@@ -565,7 +564,7 @@ get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
   triangle
 }
 
-# ------------------------------------------------------------------
+
 
 generate.obs.location.f <- function(seg = NULL, dists = NULL, geometry = "euc", do.plot = F) {
   #
@@ -618,7 +617,6 @@ generate.obs.location.f <- function(seg = NULL, dists = NULL, geometry = "euc", 
   new.sgt
 }
 
-# ---------------------------------
 
 get.point.along.segment.f <- function(x1, y1, x2, y2, quad = NULL, seg.angle) {
 
@@ -702,7 +700,7 @@ get.point.along.segment.f <- function(x1, y1, x2, y2, quad = NULL, seg.angle) {
   new.coords
 }
 
-# --------------------------------------------------------------
+
 
 get.coords.f <- function(quad = NULL, alpha = NULL, new.x = NULL, new.y = NULL, pd = NULL, side = NULL) {
 
@@ -791,7 +789,7 @@ get.coords.f <- function(quad = NULL, alpha = NULL, new.x = NULL, new.y = NULL, 
   sgt.coord
 }
 
-# ------------------------------
+
 
 get.hypot.f <- function(side1, side2) {
   # Get the length of the hypotenuse of triangle with sides of length side1 and side2
@@ -799,7 +797,7 @@ get.hypot.f <- function(side1, side2) {
   hyp
 }
 
-# -------------------------------
+
 
 # plot.segment.f <- function(x1,y1,x2,y2) {
 #   # Plots segment defined by (x1,y1) and (x2,y2)
@@ -815,7 +813,7 @@ get.hypot.f <- function(side1, side2) {
 #
 # }
 
-# ---------------------------------------------------------------------
+
 
 what.angle.f <- function(dy = NULL, dx = NULL, quad = NULL) {
 

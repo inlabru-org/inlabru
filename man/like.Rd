@@ -2,11 +2,15 @@
 % Please edit documentation in R/bru.inference.R
 \name{like}
 \alias{like}
+\alias{like_list}
+\alias{like_list.list}
+\alias{like_list.bru_like}
+\alias{[.bru_like_list}
 \title{Likelihood construction for usage with \link{bru}}
 \usage{
 like(
-  family,
   formula = . ~ .,
+  family = "gaussian",
   data = NULL,
   mesh = NULL,
   E = NULL,
@@ -16,21 +20,34 @@ like(
   domain = NULL,
   include = NULL,
   exclude = NULL,
+  allow_latent = FALSE,
+  allow_combine = FALSE,
   options = list()
 )
+
+like_list(...)
+
+\method{like_list}{list}(object, envir = NULL, ...)
+
+\method{like_list}{bru_like}(..., envir = NULL)
+
+\method{[}{bru_like_list}(x, i)
 }
 \arguments{
-\item{family}{A string identifying a valid \code{INLA::inla} likelihood family. The default is
+\item{formula}{a \link{formula} where the right hand side is a general R
+expression defines the predictor used in the model.}
+
+\item{family}{A string identifying a valid \code{INLA::inla} likelihood family.
+The default is
 \code{gaussian} with identity link. In addition to the likelihoods provided
-by inla (see \code{inla.models()$likelihood}) inlabru supports fitting Cox
+by inla (see \code{names(INLA::inla.models()$likelihood)})
+inlabru supports fitting latent Gaussian Cox
 processes via \code{family = "cp"}.
 As an alternative to \code{\link[=bru]{bru()}}, the \code{\link[=lgcp]{lgcp()}} function provides
 a convenient interface to fitting Cox processes.}
 
-\item{formula}{a \link{formula} where the right hand side expression defines
-the predictor used in the optimization.}
-
-\item{data}{Likelihood-specific data, as a \code{data.frame} or \code{SpatialPoints[DataFrame]}
+\item{data}{Likelihood-specific data, as a \code{data.frame} or
+\code{SpatialPoints[DataFrame]}
 object.}
 
 \item{mesh}{An inla.mesh object.}
@@ -58,13 +75,47 @@ predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
 
-\item{options}{list of global options overriding \link{bru.options}}
+\item{allow_latent}{logical. If \code{TRUE}, the latent state of each component is
+directly available to the predictor expression, with a \verb{_latent} suffix.}
+
+\item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
+involve several rows of the input data to influence the same row.
+(TODO: review what's needed to allow the result to also be of a different size)}
+
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
+
+\item{\dots}{For \code{like_list.bru_like}, one or more \code{bru_like} objects}
+
+\item{object}{A list of \code{bru_like} objects}
+
+\item{envir}{An optional environment for the new \code{bru_like_list} object}
+
+\item{x}{\code{bru_like_list} object from which to extract element(s)}
+
+\item{i}{indices specifying elements to extract}
 }
 \value{
 A likelihood configuration which can be used to parameterize \link{bru}.
 }
 \description{
 Likelihood construction for usage with \link{bru}
+}
+\details{
+\itemize{
+\item \code{like_list}: Combine a \code{bru_like} likelihoods
+into a \code{bru_like_list} object
+}
+
+\itemize{
+\item \code{like_list.list}: Combine a list of \code{bru_like} likelihoods
+into a \code{bru_like_list} object
+}
+
+\itemize{
+\item \code{like_list.bru_like}: Combine several \code{bru_like} likelihoods
+into a \code{bru_like_list} object
+}
 }
 \examples{
 \donttest{

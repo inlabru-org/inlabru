@@ -8,8 +8,9 @@ test_that("1D integration points can be generated", {
   expect_equal(nrow(ips), 3)
   expect_equal(ncol(ips), 2)
   expect_equal(names(ips), c("myDim", "weight"))
-  expect_equal(as.numeric(ips[1, ]), c(0, 2.5))
-  expect_equal(as.numeric(ips[2, ]), c(5, 5))
+  expect_equal(as.numeric(ips[1, ]), c(5/3, 10/3))
+  expect_equal(as.numeric(ips[2, ]), c(15/3, 10/3))
+  expect_equal(as.numeric(ips[3, ]), c(25/3, 10/3))
 })
 
 
@@ -65,7 +66,7 @@ test_that("conversion of 2D mesh to integration points", {
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(data.frame(ips)), c("vertex", "weight", "x", "y", "optional"))
-  expect_equal(sum(ips$weight), 27.65967, tolerance = lowtol)
+  expect_equal(sum(ips$weight), 27.64229, tolerance = lowtol)
 })
 
 test_that("SpatialLinesDataFrame to integration points using grouping parameter", {
@@ -82,7 +83,7 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
     colnames(data.frame(ips)),
     c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional")
   )
-  expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
+  expect_equal(sum(ips$weight) / 2293712, 1, tolerance = midtol)
 
   data(mrsea, package = "inlabru")
   mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = TRUE)
@@ -94,7 +95,64 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(
     colnames(data.frame(ips)),
-    c("weight", "vertex", "season", "x", "y", "z", "optional")
+    c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional")
   )
-  expect_equal(sum(ips$weight) / 2288791, 1, tolerance = midtol)
+  expect_equal(sum(ips$weight) / 2293.712, 1, tolerance = midtol)
+})
+
+
+test_that("Polygon integration with holes", {
+  local_bru_safe_inla()
+  
+  plyA <- sp::SpatialPolygons(list(
+    sp::Polygons(
+      list(
+        sp::Polygon(matrix(c(0,3,3,0, 0,0, 3, 3), 4, 2), hole = FALSE),
+        sp::Polygon(matrix(c(1,2,2,1, 1,1, 2, 2), 4, 2), hole = TRUE)
+      ),
+      ID = "A"
+    )
+  ))
+  plyB <- sp::SpatialPolygons(list(
+    sp::Polygons(
+      list(
+        sp::Polygon(matrix(c(0,3,3,0, 0,0, 3, 3), 4, 2), hole = FALSE),
+        sp::Polygon(matrix(c(1,1,2,2, 1,2, 2, 1), 4, 2), hole = TRUE)
+      ),
+      ID = "A"
+    )
+  ))
+  expect_equal(plyA, plyB)
+  
+  bndA <- INLA::inla.sp2segment(plyA)
+  m <- INLA::inla.mesh.2d(
+    loc.domain = bndA$loc,
+    max.edge = 1
+    )
+  ipA1 <- ipoints(plyA, m, int.args = list(poly_method = "legacy", method = "direct"))
+  ipA2 <- ipoints(plyA, m, int.args = list(poly_method = "legacy", method = "stable"))
+  ipA3 <- ipoints(plyA, m, int.args = list(method = "direct"))
+  ipA4 <- ipoints(plyA, m, int.args = list(method = "stable"))
+  ipA1$test <- "A1"
+  ipA2$test <- "A2"
+  ipA3$test <- "A3"
+  ipA4$test <- "A4"
+  
+  if (FALSE) {
+    pl <- ggplot() + gg(m) + gg(plyA)
+    pl
+    
+    pl +
+      gg(ipA1, mapping = aes(col = weight, size = weight)) +
+      gg(ipA2, mapping = aes(col = weight, size = weight)) +
+      gg(ipA3, mapping = aes(col = weight, size = weight)) +
+      gg(ipA4, mapping = aes(col = weight, size = weight)) +
+      facet_wrap(vars(test))
+  }
+  
+  expect_equal(sum(ipA1$weight), 9, tolerance = midtol)
+  expect_equal(sum(ipA2$weight), 9, tolerance = midtol)
+  
+  expect_equal(sum(ipA3$weight), 8, tolerance = midtol)
+  expect_equal(sum(ipA4$weight), 8, tolerance = midtol)
 })

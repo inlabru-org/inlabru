@@ -4,7 +4,7 @@ author: "David Borchers"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{LGCPs - Plot sampling}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,6 +14,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"),
+                      fig.height=3,fig.width=4)
+#knitr::opts_chunk$set(dpi=300)
 ```
 
 Introduction
@@ -60,6 +63,7 @@ The `gorillas` data also contains a plot sample subset which covers 60% of the s
 
 ```{r }
 sample <- gorillas$plotsample
+```
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 plotdets <- ggplot() + gg(boundary) + gg(sample$plots) + 
@@ -103,35 +107,49 @@ the function `lgcp( )`:
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-cmp <- coordinates ~ my.spde(map = coordinates, 
-                             model = matern) 
+cmp <- coordinates ~ my.spde(coordinates, model = matern) 
 
-fit <- lgcp(cmp, sample$nests, samplers = sample$plots)
+fit <- lgcp(cmp, sample$nests, samplers = sample$plots, domain = list(coordinates = mesh))
 ```
 
 
 Plot the density surface from your fitted model
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-lambda.sample <- predict(fit, pixels(mesh), ~ exp(my.spde + Intercept))
+lambda.sample <- predict(fit, pixels(mesh, mask = boundary), ~ exp(my.spde + Intercept))
 ```
 
 ```{r warning=FALSE,message=FALSE}
 lambda.sample.plot <- ggplot() + 
-                        gg(lambda.sample) + 
-                        gg(sample$plots) + 
-                        gg(boundary, col = "yellow") + 
-                        coord_fixed() + 
-                        theme(legend.position = "bottom")
+  gg(lambda.sample) + 
+  gg(sample$plots) + 
+  gg(boundary, col = "yellow") + 
+  coord_fixed()
 
 lambda.sample.plot
 ```
 
 
-Estimate the integrated intensity lambda.
+Estimate the integrated intensity lambda. We compute both the overall integrated
+intensity, representative of an imagined new realisation of the point process,
+and the conditional expectation that takes the actually observed nests into account,
+by recognising that we have complete information in the surveyed plots. 
 ```{r results="hide",warning=FALSE,message=FALSE}
 Lambda <- predict(fit, ipoints(boundary, mesh), ~ sum(weight * exp(my.spde + Intercept)))
-Lambda
+Lambda.empirical <- predict(
+  fit,
+  rbind(
+    cbind(ipoints(boundary, mesh), data.frame(all = TRUE)),
+    cbind(ipoints(sample$plots, mesh), data.frame(all = FALSE))
+    ),
+  ~ (sum(weight * exp(my.spde + Intercept) * all) -
+       sum(weight * exp(my.spde + Intercept) * !all) +
+       nrow(sample$nests))
+)
+rbind(
+  Lambda,
+  Lambda.empirical
+)
 ```
 
 
@@ -140,34 +158,48 @@ fit, if you kept it. Plot the intensity surface and estimate the integrated inte
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 
-fit.all <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
-lambda.all <- predict(fit.all, pixels(mesh), ~ exp(my.spde + Intercept))
+fit.all <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
+                domain = list(coordinates = mesh))
+lambda.all <- predict(fit.all, pixels(mesh, mask = boundary), ~ exp(my.spde + Intercept))
 Lambda.all <- predict(fit.all,  ipoints(boundary, mesh), ~ sum(weight * exp(my.spde + Intercept)))
 ```
 
 Your plot should look like this:
 
 
-```{r results="hide",warning=FALSE,message=FALSE,fig.height=5,fig.width=11, echo=FALSE}
-lambda.all.plot <- ggplot() + gg(lambda.all) + 
-                                gg(sample$plots) + 
-                                gg(boundary, col = "yellow") + 
-                                coord_fixed() + 
-                                theme(legend.position = "bottom")
+```{r results="hide",warning=FALSE,message=FALSE, echo=FALSE}
+lambda.all.plot <- ggplot() +
+  gg(lambda.all) + 
+  gg(sample$plots) + 
+  gg(boundary, col = "yellow") + 
+  coord_fixed()
+
 lambda.all.plot
 ```
 
-And `Lambda.all` should be close to
+The values `Lambda.empirical`, `Lambda`, and `Lambda.all` should be close
+to each other if the plot samples
+gave sufficient information for the overall prediction:
 
 ```{r }
-Lambda
+rbind(
+  Lambda,
+  Lambda.empirical,
+  Lambda.all,
+  Lambda.all.empirical =
+    c(nrow(gorillas$nests), 0, rep(nrow(gorillas$nests),3), rep(NA, 4))
+)
 ```
 
 Now, let's compare the results
 
 
-```{r results="hide",warning=FALSE,message=FALSE,fig.height=5,fig.width=11}
-multiplot(lambda.sample.plot, lambda.all.plot, cols = 2)
+```{r results="hide",warning=FALSE,message=FALSE,fig.width=7}
+library(patchwork)
+lambda.sample.plot + lambda.all.plot +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "left") &
+  scale_fill_continuous(limits = range(c(0, 340)))
 ```
 
-Do you understand the reason for the differences in the posteriors of the two abundance estimates?
+Do you understand the reason for the differences in the posteriors of the abundance estimates?

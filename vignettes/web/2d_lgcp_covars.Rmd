@@ -347,8 +347,6 @@ elev(f.elev(x,y), model = "linear")
 We also now include an intercept term.
 
 The model is fitted in the usual way:
-
-
 ```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
 efit <- lgcp(emdl, nests, samplers = boundary, domain = list(coordinates = mesh)) 
 ```
@@ -358,7 +356,6 @@ Summary and model selection
 
 ```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
 summary(efit)
-INLA:::summary.inla(efit)
 deltaIC(fit1,fit2,fit3,efit)
 ```
 
@@ -489,8 +486,10 @@ z <- cov2_1D(ss)
 x <- seq(1, 55, length = 100)
 mesh <- inla.mesh.1d(x, degree = 1)
 
-mdl <- x ~ beta_z(cov2_1D(x), model = "linear") +
-  spde1D(x, model = inla.spde2.matern(mesh)) + Intercept
+mdl <- x ~
+  beta_z(cov2_1D(x), model = "linear") +
+  spde1D(x, model = inla.spde2.matern(mesh)) +
+  Intercept(1)
 
 fitcov1D <- lgcp(mdl, pts2, domain = list(x = mesh))
 pr.df <- data.frame(x = x)

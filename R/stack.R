@@ -9,7 +9,7 @@ make.stack <- function(data,
                        Ntrials = 1,
                        offset = 0,
                        expr = NULL,
-                       result = NULL,
+                       state = NULL,
                        tag = "BRU.stack",
                        include = NULL,
                        exclude = NULL) {
@@ -47,16 +47,12 @@ make.stack <- function(data,
 
   # Taylor approximation
   if (!is.null(expr)) {
-    rw <- nlinla.reweight(A, model, data, expr, result)
+    rw <- nlinla.reweight(A, model, data, expr, state = state)
     A <- rw$A
     taylor.offset <- rw$const
   } else {
     taylor.offset <- 0
   }
-
-  #  # The weirdest workaround ever. Without this, there are convergence problems on ubuntu but not on MacOS ?!?!?!
-  #  A <- c(A, list(1))
-  #  effects <- c(effects, list(WORKAROUND = runif(dim(A[[1]])[1])))
 
   # Create and return stack
   stk <- INLA::inla.stack(
@@ -72,5 +68,66 @@ make.stack <- function(data,
     # Make sure latent components with zero-derivatives aren't removed:
     remove.unused = FALSE
   )
+  stk
+}
+
+
+
+
+#' Build an inla data stack from linearisation information
+#'
+#' Combine linearisation for multiple likelihoods
+#'
+#' @param \dots Arguments passed on to other methods
+#' @export
+#' @rdname bru_make_stack
+bru_make_stack <- function(...) {
+  UseMethod("bru_make_stack")
+}
+
+#' @param lhood A `bru_like` object
+#' @param lin Linearisation information
+#' * For `.bru_like`, a linearisation information list with elements
+#' `A` and `offset`
+#' * For `.bru_like_list`, a list of linearisation information lists
+#' @param idx Output from [evaluate_index()]
+#' @export
+#' @rdname bru_make_stack
+bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
+  INLA::inla.stack(
+    list(
+      BRU.response = lhood$data[[lhood$response]],
+      BRU.E = lhood[["E"]],
+      BRU.Ntrials = lhood[["Ntrials"]],
+      BRU.offset = as.vector(lin$offset)
+    ),
+    A = lin$A,
+    effects = idx[names(lin$A)],
+    remove.unused = FALSE
+  )
+}
+
+#' @param lhoods A `bru_like_list` object
+#' @export
+#' @rdname bru_make_stack
+bru_make_stack.bru_like_list <- function(lhoods, lin, idx, ...) {
+  stks <-
+    lapply(
+      seq_along(lhoods),
+      function(lh_idx) {
+        bru_make_stack(
+          lhoods[[lh_idx]],
+          lin = lin[[lh_idx]],
+          idx
+        )
+      }
+    )
+
+  stk <-
+    do.call(
+      inlabru::inla.stack.mjoin,
+      c(stks, list(compress = TRUE, remove.unused = FALSE))
+    )
+
   stk
 }

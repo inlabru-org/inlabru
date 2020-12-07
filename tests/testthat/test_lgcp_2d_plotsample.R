@@ -5,9 +5,10 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   local_bru_safe_inla()
 
   options <- list(
+    bru_verbose = TRUE,
+    verbose = TRUE,
     control.inla = list(
-      int.strategy = "eb",
-      h = 0.005
+      int.strategy = "eb"
     )
   )
   data(gorillas, package = "inlabru")

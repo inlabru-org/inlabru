@@ -13,11 +13,11 @@ Increases verbosity and sets the inference strategy to empirical Bayes.
 \dontrun{
 # Note: Only run this if you want to change the inlabru options for this session
 
-# Determine current bru default:
-bo <- bru.options()
+# Determine current bru defaults:
+bo <- bru_options_get()
 
 # By default, INLA's integration strategy is set to the INLA default 'auto':
-bo$inla.options$control.inla
+bo$control.inla
 
 # Now, let's run init.tutorial() to make empirical Bayes the default
 # integration method when `bru` calls `inla`
@@ -25,7 +25,7 @@ bo$inla.options$control.inla
 init.tutorial()
 
 # Check if it worked:
-bru.options()$inla.options$control.inla
+bru_options_get("control.inla")
 }
 
 }

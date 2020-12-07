@@ -1,3 +1,17 @@
+# inlabru (development version)
+
+* Support for the INLA "copy" feature, `comp2(input, copy = "comp1")`
+
+* Allow component weights to be an unnamed parameter, `comp(input, weights, ...)`
+
+# inlabru 2.1.15
+
+* New options system
+
+* New faster linearisation method
+
+* New line search method to make the nonlinear inla iterations robust
+
 # inlabru 2.1.14.901
 
 * Method for updating old stored estimation objects
