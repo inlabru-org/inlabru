@@ -44,14 +44,14 @@ ggplot() +
   gg(mexdolphin$samplers) +
   gg(mexdolphin$points, aes(size = size), color = "red") +
   coord_equal()
-  
+
 gmap(mexdolphin$depth) +
   gm(mexdolphin$ppoly, color = "blue") +
   gm(mexdolphin$samplers) +
   gm(mexdolphin$points, aes(size = size), color = "red")
-  
+
 gmap(mexdolphin$depth) +
-  gm(mexdolphin$depth, aes(col=depth)) +
+  gm(mexdolphin$depth, aes(col = depth)) +
   gm(mexdolphin$ppoly)
 }
 }
