@@ -391,34 +391,58 @@ evaluate_predictor <- function(model,
   if (inherits(predictor, "formula")) {
     predictor <- parse(text = as.character(predictor)[length(as.character(predictor))])
   }
-
-  common_vars <- c(
-    if (is.list(data)) {
-      data
+  formula.envir <- environment(model$formula)
+  enclos <-
+    if (!is.null(pred.envir)) {
+      pred.envir
+    } else if (!is.null(formula.envir)) {
+      formula.envir
     } else {
-      as.data.frame(data)
-    },
-    as.list(pred.envir),
-    as.list(environment(model$formula))
-  )
+      parent.frame()
+    }
+
+  envir <- new.env(parent = enclos)
+  # Find .data. first,
+  # then data variables,
+  # then pred.envir variables (via enclos),
+  # then formula.envir (via enclos if pred.envir is NULL):
+  #  for (nm in names(pred.envir)) {
+  #    assign(nm, pred.envir[[nm]], envir = envir)
+  #  }
+  if (is.list(data)) {
+    for (nm in names(data)) {
+      assign(nm, data[[nm]], envir = envir)
+    }
+  } else {
+    data_df <- as.data.frame(data)
+    for (nm in names(data_df)) {
+      assign(nm, data_df[[nm]], envir = envir)
+    }
+  }
+  assign(".data.", data, envir = envir)
+
+  # Rename component states from label to label_latent
+  state_names <- as.list(expand_labels(
+    names(state[[1]]),
+    names(model$effects),
+    suffix = "_latent"
+  ))
+  names(state_names) <- names(state[[1]])
+
+  # Remove problematic objects:
+  problems <- c(".Random.seed")
+  remove(list = intersect(names(envir), problems), envir = envir)
 
   n <- length(state)
   for (k in seq_len(n)) {
-    state_k <- state[[k]]
-    # Rename component states from label to label_latent
-    names(state_k) <- expand_labels(
-      names(state_k),
-      names(model$effects),
-      suffix = "_latent"
-    )
+    for (nm in names(state[[k]])) {
+      assign(state_names[[nm]], state[[k]][[nm]], envir = envir)
+    }
+    for (nm in names(effects[[k]])) {
+      assign(nm, effects[[k]][[nm]], envir = envir)
+    }
 
-    envir <- c(
-      effects[[k]],
-      state_k,
-      common_vars
-    )
-
-    result_ <- eval(predictor, envir = envir)
+    result_ <- eval(predictor, envir = envir, enclos = enclos)
     if (k == 1) {
       if (identical(format, "auto")) {
         if (is.vector(result_) ||

@@ -12,14 +12,14 @@ test_that("bru: factor component", {
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
-  fit <- bru(y ~ x + z(1:10, model="iid"), family = "gaussian", data = input.df)
+  fit <- bru(y ~ x + z(1:10, model = "iid"), family = "gaussian", data = input.df)
 
   # Predict posterior statistics of 'x'
 
   xpost <- predict(
     fit,
     data = NULL,
-    formula = ~x_latent,
+    formula = ~ x_latent + fit$summary.random$z$mean[1],
     n.samples = 5,
     seed = 12345L
   )
@@ -37,7 +37,7 @@ test_that("bru: factor component", {
     n.samples = 5,
     seed = 12345L
   )
-  
+
   xpost3 <- predict(
     fit,
     data = NULL,
@@ -51,7 +51,7 @@ test_that("bru: factor component", {
     n.samples = 5,
     seed = 12345L
   )
-  
+
   # The statistics include mean, standard deviation, the 2.5% quantile, the median,
   # the 97.5% quantile, minimum and maximum sample drawn from the posterior as well as
   # the coefficient of variation and the variance.

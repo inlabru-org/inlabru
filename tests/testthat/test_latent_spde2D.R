@@ -59,6 +59,67 @@ test_that("Georeferenced data with sp", {
     c(-2.6003077, -0.2699909, 3.5188725),
     tolerance = midtol
   )
+
+
+  # Check that explicit access to the data object works
+  cmp <- obs ~ Intercept(1) + field(coordinates(.data.), model = matern)
+
+  fit <- bru(
+    cmp,
+    data = mydata,
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
+  )
+
+  # Check Intercept
+  expect_equal(
+    fit$summary.fixed["Intercept", "mean"],
+    0.5398535,
+    tolerance = midtol
+  )
+
+  # Check SPDE
+  expect_equal(
+    fit$summary.random$field$mean[mesh$idx$loc[1:3]],
+    c(-2.6003077, -0.2699909, 3.5188725),
+    tolerance = midtol
+  )
+
+
+  # Check that explicit access to the data object works
+  cmp <- obs ~ Intercept(1) + field(cbind(
+    as.data.frame(.data.)$Easting,
+    as.data.frame(.data.)$Northing
+  ),
+  model = matern
+  )
+
+  fit <- bru(
+    cmp,
+    data = mydata,
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
+  )
+
+  # Check Intercept
+  expect_equal(
+    fit$summary.fixed["Intercept", "mean"],
+    0.5398535,
+    tolerance = midtol
+  )
+
+  # Check SPDE
+  expect_equal(
+    fit$summary.random$field$mean[mesh$idx$loc[1:3]],
+    c(-2.6003077, -0.2699909, 3.5188725),
+    tolerance = midtol
+  )
 })
 
 

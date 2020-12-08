@@ -488,8 +488,7 @@ component.character <- function(object,
     ))]
 
     # Replace arguments that will be evaluated by a mapper
-    suffixes <- list(
-    )
+    suffixes <- list()
     for (arg in names(suffixes)) {
       if (arg %in% names(fcall)) {
         fcall[[arg]] <- as.symbol(paste0(label, ".", suffixes[[arg]]))
@@ -1972,16 +1971,29 @@ input_eval.component_list <-
 input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
                                  null.on.fail = FALSE, ...) {
 
-  # Evaluate the map with the data as an environment
-  if (is.null(env)) {
-    emap <- tryCatch(eval(input$input, envir = data.frame(data), enclos = parent.frame()),
-      error = function(e) {}
-    )
+  # Evaluate the map with the data in an environment
+  enclos <-
+    if (is.null(env)) {
+      parent.frame()
+    } else {
+      env
+    }
+  envir <- new.env(parent = enclos)
+  if (is.list(data)) {
+    for (nm in names(data)) {
+      assign(nm, data[[nm]], envir = envir)
+    }
   } else {
-    emap <- tryCatch(eval(input$input, envir = data.frame(data), enclos = env),
-      error = function(e) {}
-    )
+    data_df <- as.data.frame(data)
+    for (nm in names(data_df)) {
+      assign(nm, data_df[[nm]], envir = envir)
+    }
   }
+  assign(".data.", data, envir = envir)
+
+  emap <- tryCatch(eval(input$input, envir = envir, enclos = enclos),
+    error = function(e) {}
+  )
 
   # 0) Eval failed. map everything to 1. This happens for automatically
   #    added Intercept, and for some components that cannot be evaluated

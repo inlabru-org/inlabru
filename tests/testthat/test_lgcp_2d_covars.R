@@ -12,7 +12,8 @@ test_that("2D LGCP fitting", {
     main_layer = "vegetation",
     model = "iid"
   ) - Intercept
-  fit <- lgcp(mdl, gorillas$nests,
+  fit <- lgcp(
+    mdl, gorillas$nests,
     samplers = gorillas$boundary,
     domain = list(coordinates = gorillas$mesh),
     options = list(
