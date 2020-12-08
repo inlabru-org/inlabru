@@ -8,9 +8,9 @@ test_that("1D integration points can be generated", {
   expect_equal(nrow(ips), 3)
   expect_equal(ncol(ips), 2)
   expect_equal(names(ips), c("myDim", "weight"))
-  expect_equal(as.numeric(ips[1, ]), c(5/3, 10/3))
-  expect_equal(as.numeric(ips[2, ]), c(15/3, 10/3))
-  expect_equal(as.numeric(ips[3, ]), c(25/3, 10/3))
+  expect_equal(as.numeric(ips[1, ]), c(5 / 3, 10 / 3))
+  expect_equal(as.numeric(ips[2, ]), c(15 / 3, 10 / 3))
+  expect_equal(as.numeric(ips[3, ]), c(25 / 3, 10 / 3))
 })
 
 
@@ -103,12 +103,12 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
 
 test_that("Polygon integration with holes", {
   local_bru_safe_inla()
-  
+
   plyA <- sp::SpatialPolygons(list(
     sp::Polygons(
       list(
-        sp::Polygon(matrix(c(0,3,3,0, 0,0, 3, 3), 4, 2), hole = FALSE),
-        sp::Polygon(matrix(c(1,2,2,1, 1,1, 2, 2), 4, 2), hole = TRUE)
+        sp::Polygon(matrix(c(0, 3, 3, 0, 0, 0, 3, 3), 4, 2), hole = FALSE),
+        sp::Polygon(matrix(c(1, 2, 2, 1, 1, 1, 2, 2), 4, 2), hole = TRUE)
       ),
       ID = "A"
     )
@@ -116,19 +116,19 @@ test_that("Polygon integration with holes", {
   plyB <- sp::SpatialPolygons(list(
     sp::Polygons(
       list(
-        sp::Polygon(matrix(c(0,3,3,0, 0,0, 3, 3), 4, 2), hole = FALSE),
-        sp::Polygon(matrix(c(1,1,2,2, 1,2, 2, 1), 4, 2), hole = TRUE)
+        sp::Polygon(matrix(c(0, 3, 3, 0, 0, 0, 3, 3), 4, 2), hole = FALSE),
+        sp::Polygon(matrix(c(1, 1, 2, 2, 1, 2, 2, 1), 4, 2), hole = TRUE)
       ),
       ID = "A"
     )
   ))
   expect_equal(plyA, plyB)
-  
+
   bndA <- INLA::inla.sp2segment(plyA)
   m <- INLA::inla.mesh.2d(
     loc.domain = bndA$loc,
     max.edge = 1
-    )
+  )
   ipA1 <- ipoints(plyA, m, int.args = list(poly_method = "legacy", method = "direct"))
   ipA2 <- ipoints(plyA, m, int.args = list(poly_method = "legacy", method = "stable"))
   ipA3 <- ipoints(plyA, m, int.args = list(method = "direct"))
@@ -137,11 +137,13 @@ test_that("Polygon integration with holes", {
   ipA2$test <- "A2"
   ipA3$test <- "A3"
   ipA4$test <- "A4"
-  
+
   if (FALSE) {
-    pl <- ggplot() + gg(m) + gg(plyA)
+    pl <- ggplot() +
+      gg(m) +
+      gg(plyA)
     pl
-    
+
     pl +
       gg(ipA1, mapping = aes(col = weight, size = weight)) +
       gg(ipA2, mapping = aes(col = weight, size = weight)) +
@@ -149,10 +151,10 @@ test_that("Polygon integration with holes", {
       gg(ipA4, mapping = aes(col = weight, size = weight)) +
       facet_wrap(vars(test))
   }
-  
+
   expect_equal(sum(ipA1$weight), 9, tolerance = midtol)
   expect_equal(sum(ipA2$weight), 9, tolerance = midtol)
-  
+
   expect_equal(sum(ipA3$weight), 8, tolerance = midtol)
   expect_equal(sum(ipA4$weight), 8, tolerance = midtol)
 })

@@ -241,7 +241,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
       }
     )
   )
-  
+
   idx <- do.call(
     rbind,
     lapply(

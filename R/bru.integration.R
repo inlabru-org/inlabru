@@ -18,7 +18,7 @@
 #' by three integration point sitting at the corresponding mesh vertices. This is controlled
 #' by `int.args$method="stable"` (default) or `"direct"`, where the latter uses the integration
 #' points directly, without aggregating to the mesh vertices.
-#' 
+#'
 #' For convenience, the
 #' `domain` parameter can also be a single integer setting the number of equally spaced integration
 #' points in the one-dimensional case.
@@ -123,7 +123,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   if (!is.null(int.args[["nsub"]])) {
     int.args[["nsub2"]] <- int.args[["nsub"]]
   }
-  
+
   if (!is.null(project)) {
     if (project && !identical(int.args$method, "stable")) {
       stop("ipoints(project=TRUE) is deprecated, and int.args$methods != 'stable'")
@@ -137,9 +137,9 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       "' instead."
     )
   }
-  
+
   if (is.null(domain) &&
-      inherits(samplers, c("inla.mesh.1d", "inla.mesh"))) {
+    inherits(samplers, c("inla.mesh.1d", "inla.mesh"))) {
     domain <- samplers
     samplers <- NULL
   }
@@ -159,13 +159,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
           )
         )
     ) ||
-    inherits(domain, "inla.mesh")
+      inherits(domain, "inla.mesh")
   is_1d <- !is_2d &&
     (
       (!is.null(samplers) &&
-         is.numeric(samplers)) ||
-      (!is.null(domain) &&
-         (is.numeric(domain) ||
+        is.numeric(samplers)) ||
+        (!is.null(domain) &&
+          (is.numeric(domain) ||
             inherits(domain, "inla.mesh.1d")))
     )
   if (!is_1d && !is_2d) {
@@ -173,13 +173,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   }
 
   if (is_1d && !is.null(samplers) && !is.null(domain) &&
-      is.numeric(domain) && length(domain) == 1) {
+    is.numeric(domain) && length(domain) == 1) {
     int.args[["nsub1"]] <- domain
     domain <- NULL
     int.args[["method"]] <- "direct"
   }
   if (is_2d && !is.null(samplers) && !is.null(domain) &&
-      is.numeric(domain) && length(domain) == 1) {
+    is.numeric(domain) && length(domain) == 1) {
     int.args[["nsub2"]] <- domain
     domain <- NULL
     int.args[["method"]] <- "direct"
@@ -187,16 +187,16 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
   # Do this check and transfer once more
   if (is.null(domain) &&
-      inherits(samplers, c("inla.mesh.1d", "inla.mesh"))) {
+    inherits(samplers, c("inla.mesh.1d", "inla.mesh"))) {
     domain <- samplers
     samplers <- NULL
   }
-  
-  
+
+
   if (is_1d && is.null(name)) {
     name <- "x"
   }
-  
+
   pregroup <- NULL
 
   if (is.data.frame(samplers)) {
@@ -205,27 +205,32 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
     ips <- samplers
   } else if (is_1d && is.null(samplers) && is.numeric(domain)) {
-    ips <- data.frame(x = as.vector(domain),
-                      weight = 1)
+    ips <- data.frame(
+      x = as.vector(domain),
+      weight = 1
+    )
     colnames(ips) <- c(name, "weight")
   } else if (is_1d && is.null(domain) && is.integer(samplers)) {
-    ips <- data.frame(x = as.vector(samplers),
-                      weight = 1)
+    ips <- data.frame(
+      x = as.vector(samplers),
+      weight = 1
+    )
     colnames(ips) <- c(name, "weight")
   } else if (is_1d && is.null(samplers) && inherits(domain, "inla.mesh.1d") &&
-             identical(int.args[["method"]], "stable")) {
-    ips <- data.frame(x = domain$loc,
-                      weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0))
+    identical(int.args[["method"]], "stable")) {
+    ips <- data.frame(
+      x = domain$loc,
+      weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0)
+    )
     colnames(ips) <- c(name, "weight")
   } else if (is_1d) {
-
     domain_range <-
       if (inherits(domain, "inla.mesh.1d")) {
         domain$interval
       } else {
         NULL
       }
-    
+
     if (is.null(samplers)) {
       samplers <- matrix(domain_range, 1, 2)
     } else {
@@ -258,19 +263,19 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       domain$loc[rep(seq_len(domain$n - 1) + 1, each = nsub)] * u
     int_w <-
       (domain$loc[rep(seq_len(domain$n - 1) + 1, each = nsub)] -
-         domain$loc[rep(seq_len(domain$n - 1), each = nsub)]) /
-      nsub
-    
+        domain$loc[rep(seq_len(domain$n - 1), each = nsub)]) /
+        nsub
+
     for (j in 1:nrow(samplers)) {
       subsamplers <- samplers[j, ]
 
       if (identical(int.args[["method"]], "stable")) {
         A_w <- INLA::inla.spde.make.A(domain,
-                                      int_loc,
-                                      weights =
-                                        int_w *
-                                        (int_loc >= min(subsamplers)) *
-                                        (int_loc <= max(subsamplers))
+          int_loc,
+          weights =
+            int_w *
+              (int_loc >= min(subsamplers)) *
+              (int_loc <= max(subsamplers))
         )
         ips[[j]] <- data.frame(
           loc = domain$loc,
@@ -279,8 +284,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       } else {
         inside <-
           (int_loc >= min(subsamplers)) &
-          (int_loc <= max(subsamplers))
-        
+            (int_loc <= max(subsamplers))
+
         ips[[j]] <- data.frame(
           loc = int_loc[inside],
           weight = int_w[inside]
@@ -291,8 +296,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     ips <- do.call(rbind, ips)
   } else if (inherits(domain, "inla.mesh") &&
-             is.null(samplers) &&
-             identical(int.args[["method"]], "stable")) {
+    is.null(samplers) &&
+    identical(int.args[["method"]], "stable")) {
     coord_names <- c("x", "y", "coordinateZ")
     if (!is.null(name)) {
       coord_names[seq_along(name)] <- name
@@ -326,7 +331,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
     if (inherits(samplers, "SpatialLines") &&
-        !inherits(samplers, "SpatialLinesDataFrame")) {
+      !inherits(samplers, "SpatialLinesDataFrame")) {
       samplers <- SpatialLinesDataFrame(
         samplers,
         data = data.frame(weight = rep(1, length(samplers)))
@@ -353,9 +358,11 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else if (is_2d &&
-             (inherits(samplers, c("SpatialPolygons",
-                                   "SpatialPolygonsDataFrame")) ||
-              is.null(samplers))) {
+    (inherits(samplers, c(
+      "SpatialPolygons",
+      "SpatialPolygonsDataFrame"
+    )) ||
+      is.null(samplers))) {
     if (is.null(samplers)) {
       stop("Direct integration scheme for mesh domain with no samplers is not yet implemented.")
     }
@@ -389,7 +396,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         )
       }
     ))
-    
+
     # This handles holes
     poly_segm <- INLA::inla.sp2segment(samplers, join = FALSE)
     poly_segm <- lapply(
@@ -417,8 +424,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     if (identical(int.args[["poly_method"]], "legacy")) {
       ips <- int.polygon(domain,
-                         loc = polyloc[, 1:2], group = polyloc[, 3],
-                         method = int.args$method, nsub = int.args$nsub2
+        loc = polyloc[, 1:2], group = polyloc[, 3],
+        method = int.args$method, nsub = int.args$nsub2
       )
     } else {
       ips <- bru_int_polygon(
@@ -428,7 +435,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         nsub = int.args$nsub2
       )
     }
-    
+
     df <- data.frame(samplers@data[ips$group, pregroup, drop = FALSE],
       weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
     )

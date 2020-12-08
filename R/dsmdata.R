@@ -72,5 +72,3 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   class(dset) <- c("dsdata", "list")
   return(dset)
 }
-
-
