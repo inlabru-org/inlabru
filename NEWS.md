@@ -4,6 +4,10 @@
 
 * Allow component weights to be an unnamed parameter, `comp(input, weights, ...)`
 
+* Direct access to the data objects in component inputs and predictor
+  expressions, as `.data.`, allowing e.g. `covar(fun(.data.), ...)` for a complex
+  covariate extractor method `fun()`
+
 # inlabru 2.1.15
 
 * New options system
