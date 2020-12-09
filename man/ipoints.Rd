@@ -19,16 +19,16 @@ In 1D, a length 2 vector or two-column matrix where each row describes an interv
 or \code{NULL}
 In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a \code{weight} column
 defining the width of the a transect line, and optionally further columns used by the
-\code{group} argument, or \code{NULL}.  When \code{domain} is \code{NULL}, \code{region} may also
+\code{group} argument, or \code{NULL}.  When \code{domain} is \code{NULL}, \code{samplers} may also
 be an \code{inla.mesh.1d} or \code{inla.mesh} object, that is then treated as a \code{domain}
 argument instead.}
 
 \item{domain}{Either
 \itemize{
-\item when \code{region} is a 1D interval(s) definition only, \code{domain} can be
+\item when \code{samplers} is a 1D interval(s) definition only, \code{domain} can be
 a single integer for the number of integration points to place in each 1D
 interval, overriding \code{int.args[["nsub1"]]}, and otherwise
-\item when \code{region} is \code{NULL}, \code{domain} can be a numeric vector of points,
+\item when \code{samplers} is \code{NULL}, \code{domain} can be a numeric vector of points,
 each given integration weight 1 (and no additional points are added
 in between),
 \item an \code{inla.mesh.1d} object for continuous 1D integration, or
@@ -36,16 +36,29 @@ in between),
 }}
 
 \item{name}{Character array stating the name of the domains dimension(s).
-If \code{NULL}, the names are taken from coordinate names from \code{region} for
+If \code{NULL}, the names are taken from coordinate names from \code{samplers} for
 \verb{Spatial*} objects, otherwise "x", "y", "coordinateZ" for 2D regions and
 \code{"x"} for 1D regions}
 
-\item{group}{Column names of the \code{region} object (if applicable) for which
-the integration points are calculated independently and not merged by the projection.}
+\item{group}{Column names of the \code{samplers} object (if applicable) for which
+the integration points are calculated independently and not merged when
+aggregating to mesh nodes.}
 
-\item{int.args}{List of arguments passed to \code{int.polygon}}
+\item{int.args}{List of arguments passed to \code{bru_int_polygon}.
+\itemize{
+\item \code{method}: "stable" (to aggregate integration weights onto mesh nodes)
+or "direct" (to construct a within triangle/segment integration scheme
+without aggregating onto mesh nodes)
+\item \code{nsub1}, \code{nsub2}: integers controlling the number of internal integration
+points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
+Points per knot segment: \code{nsub1}
+\item \code{poly_method}: if set to "legacy", selects an old polygon integration method
+that doesn't handle holes. Currently only used for debugging purposes.
+}}
 
-\item{project}{If TRUE, project the integration points to mesh vertices}
+\item{project}{Deprecated in favour of \code{int.args(method=...)}.
+If TRUE, aggregate the integration points to mesh vertices. Default:
+\code{project = (identical(int.args$method, "stable"))}}
 }
 \value{
 A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.

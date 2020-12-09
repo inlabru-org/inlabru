@@ -34,26 +34,37 @@
 #' or `NULL`
 #' In 2D either a `SpatialPolygon` or a `SpatialLinesDataFrame` with a `weight` column
 #' defining the width of the a transect line, and optionally further columns used by the
-#' `group` argument, or `NULL`.  When `domain` is `NULL`, `region` may also
+#' `group` argument, or `NULL`.  When `domain` is `NULL`, `samplers` may also
 #' be an `inla.mesh.1d` or `inla.mesh` object, that is then treated as a `domain`
 #' argument instead.
 #' @param domain Either
-#' * when `region` is a 1D interval(s) definition only, `domain` can be
+#' * when `samplers` is a 1D interval(s) definition only, `domain` can be
 #'   a single integer for the number of integration points to place in each 1D
 #'   interval, overriding `int.args[["nsub1"]]`, and otherwise
-#' * when `region` is `NULL`, `domain` can be a numeric vector of points,
+#' * when `samplers` is `NULL`, `domain` can be a numeric vector of points,
 #'   each given integration weight 1 (and no additional points are added
 #'   in between),
 #' * an `inla.mesh.1d` object for continuous 1D integration, or
 #' * an `inla.mesh.2d` object for continuous 2D integration.
 #' @param name Character array stating the name of the domains dimension(s).
-#' If `NULL`, the names are taken from coordinate names from `region` for
+#' If `NULL`, the names are taken from coordinate names from `samplers` for
 #' `Spatial*` objects, otherwise "x", "y", "coordinateZ" for 2D regions and
 #' `"x"` for 1D regions
-#' @param group Column names of the `region` object (if applicable) for which
-#' the integration points are calculated independently and not merged by the projection.
-#' @param project If TRUE, project the integration points to mesh vertices
-#' @param int.args List of arguments passed to `int.polygon`
+#' @param group Column names of the `samplers` object (if applicable) for which
+#' the integration points are calculated independently and not merged when
+#' aggregating to mesh nodes.
+#' @param int.args List of arguments passed to `bru_int_polygon`.
+#' * `method`: "stable" (to aggregate integration weights onto mesh nodes)
+#'   or "direct" (to construct a within triangle/segment integration scheme
+#'   without aggregating onto mesh nodes)
+#' * `nsub1`, `nsub2`: integers controlling the number of internal integration
+#'   points before aggregation. Points per triangle: `(nsub2+1)^2`.
+#'   Points per knot segment: `nsub1`
+#' * `poly_method`: if set to "legacy", selects an old polygon integration method
+#'   that doesn't handle holes. Currently only used for debugging purposes. 
+#' @param project Deprecated in favour of `int.args(method=...)`.
+#' If TRUE, aggregate the integration points to mesh vertices. Default:
+#' `project = (identical(int.args$method, "stable"))`
 #'
 #' @return A `data.frame` or `SpatialPointsDataFrame` of 1D and 2D integration points, respectively.
 #'

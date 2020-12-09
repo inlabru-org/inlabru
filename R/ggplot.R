@@ -1,6 +1,6 @@
 # DEPRECATED
 pixelplot.mesh <- function(...) {
-  stop("function removed from inlabru")
+  .Deprecated("gg.inla.mesh")
 }
 
 
