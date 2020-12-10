@@ -135,8 +135,8 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #'   The `_get`, `_set`, and `_reset` functions operate on a global
 #'   package options override object. In many cases, setting options in
 #'   specific calls to [bru()] is recommended instead.
-#' @param ... Named options, optionally started by one or more [`bru_options`]
-#' objects. Options specified later override the previous options.
+#' @param ... A collection of named options, optionally including one or more
+#' [`bru_options`] objects. Options specified later override the previous options.
 #' @return `bru_options()` returns an `bru_options` object.
 #' @section Valid options:
 #' For `bru_options` and `bru_options_set`, recognised options are:

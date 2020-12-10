@@ -31,8 +31,8 @@ iinla.getOption(name = NULL)
 iinla.setOption(...)
 }
 \arguments{
-\item{...}{Named options, optionally started by one or more \code{\link{bru_options}}
-objects. Options specified later override the previous options.}
+\item{...}{A collection of named options, optionally including one or more
+\code{\link{bru_options}} objects. Options specified later override the previous options.}
 
 \item{x}{An object to be converted to an \code{bru_options} object.}
 
