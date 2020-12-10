@@ -158,3 +158,50 @@ test_that("Polygon integration with holes", {
   expect_equal(sum(ipA3$weight), 8, tolerance = midtol)
   expect_equal(sum(ipA4$weight), 8, tolerance = midtol)
 })
+
+
+test_that("Integration line splitting", {
+  local_bru_safe_inla()
+  
+  mesh <- INLA::inla.mesh.2d(
+    loc.domain = cbind(0, 0),
+    offset = 2,
+    max.edge = 0.5
+  )
+  
+  expect_error(
+    {
+      sl <- split_lines(
+        mesh,
+        sp = rbind(c(-1, 0), c(-1, 1)),
+        ep = rbind(c(1, 0), c(1, 1))
+      )
+    },
+    NA
+  )
+  
+  # Check issue #63 (problem for single line input), fixed
+  expect_error(
+    {
+      sl <- split_lines(
+        mesh,
+        sp = cbind(-1, 0),
+        ep = cbind(1, 0)
+      )
+    },
+    NA
+  )
+  
+  # Check if empty input is ok
+  expect_error(
+    {
+      sl <- split_lines(
+        mesh,
+        sp = matrix(0, 0, 2),
+        ep = matrix(0, 0, 2)
+      )
+    },
+    NA
+  )
+  
+})

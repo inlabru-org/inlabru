@@ -12,45 +12,70 @@
 #' @keywords internal
 split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 
-  # locations for splitting
-  loc <- as.matrix(rbind(sp, ep))
-  idx <- 1:dim(sp)[1]
+  idx <- seq_len(NROW(sp))
+  if (NROW(sp) > 0) {
+    # Filter out segments not on the mesh
+    t1 <- INLA::inla.fmesher.smorg(
+      loc = mesh$loc, tv = mesh$graph$tv,
+      points2mesh = as.matrix(data.frame(sp, z = 0))
+    )$p2m.t
+    t2 <- INLA::inla.fmesher.smorg(
+      loc = mesh$loc, tv = mesh$graph$tv,
+      points2mesh = as.matrix(data.frame(ep, z = 0))
+    )$p2m.t
+    # if (any(t1==0) | any(t2==0)) { warning("points outside boundary! filtering...")}
+    sp <- sp[!((t1 == 0) | (t2 == 0)), , drop = FALSE]
+    ep <- ep[!((t1 == 0) | (t2 == 0)), , drop = FALSE]
+    idx <- idx[!((t1 == 0) | (t2 == 0))]
+  }
+  
+  if (NROW(sp) == 0) {
+    return(list(
+      sp = sp, ep = ep,
+      split.origin = NULL,
+      idx = idx,
+      split.loc = NULL
+    ))
+  }
 
-  # Filter out segments not on the mesh
-  t1 <- INLA::inla.fmesher.smorg(loc = mesh$loc, tv = mesh$graph$tv, points2mesh = as.matrix(data.frame(sp, z = 0)))$p2m.t
-  t2 <- INLA::inla.fmesher.smorg(loc = mesh$loc, tv = mesh$graph$tv, points2mesh = as.matrix(data.frame(ep, z = 0)))$p2m.t
-  # if (any(t1==0) | any(t2==0)) { warning("points outside boundary! filtering...")}
-  sp <- sp[!((t1 == 0) | (t2 == 0)), ]
-  ep <- ep[!((t1 == 0) | (t2 == 0)), ]
-  idx <- idx[!((t1 == 0) | (t2 == 0))]
   loc <- as.matrix(rbind(sp, ep))
-
-  # Split them segments into parts
-  if (dim(loc)[2] == 2) {
-    loc <- cbind(loc, rep(0, dim(loc)[1]))
+  
+  # Split the segments into parts
+  if (NCOL(loc) == 2) {
+    loc <- cbind(loc, rep(0, NROW(loc)))
   }
   np <- dim(sp)[1]
-  sp.idx <- t(rbind(1:np, np + 1:np))
-  splt <- INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, splitlines = list(loc = loc, idx = sp.idx))
+  sp.idx <- t(rbind(seq_len(np), np + seq_len(np)))
+  splt <- INLA::inla.fmesher.smorg(
+    mesh$loc, mesh$graph$tv,
+    splitlines = list(loc = loc, idx = sp.idx)
+  )
   # plot(data$mesh)
   # points(loc)
   # points(splt$split.loc,col="blue)
 
-  sp <- splt$split.loc[splt$split.idx[, 1], 1:dim(sp)[2]] # Start point of new segments
-  ep <- splt$split.loc[splt$split.idx[, 2], 1:dim(ep)[2]] # End points of new segments
+  # Start points of new segments
+  sp <- splt$split.loc[splt$split.idx[, 1], seq_len(dim(sp)[2]), drop = FALSE]
+  # End points of new segments
+  ep <- splt$split.loc[splt$split.idx[, 2], seq_len(dim(ep)[2]), drop = FALSE]
   idx <- idx[splt$split.idx[, 1]]
   origin <- splt$split.origin
 
   # Filter out zero length segments
   if (filter.zero.length) {
     sl <- apply((ep - sp)^2, MARGIN = 1, sum)
-    sp <- sp[!(sl == 0), ]
-    ep <- ep[!(sl == 0), ]
+    sp <- sp[!(sl == 0), , drop = FALSE]
+    ep <- ep[!(sl == 0), , drop = FALSE]
     origin <- origin[!(sl == 0)]
     idx <- idx[!(sl == 0)]
   }
 
-  return(list(sp = sp, ep = ep, split.origin = origin, idx = idx, split.loc = splt$split.loc))
+  return(list(
+    sp = sp, ep = ep,
+    split.origin = origin,
+    idx = idx,
+    split.loc = splt$split.loc
+  ))
 }
 
 
