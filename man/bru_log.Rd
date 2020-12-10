@@ -10,7 +10,7 @@
 \usage{
 bru_log_reset()
 
-bru_log_get(pretty = TRUE)
+bru_log_get(pretty = FALSE)
 
 bru_log_message(
   ...,
@@ -28,8 +28,9 @@ bru_log_active(activation = NULL)
 }
 \arguments{
 \item{pretty}{logical; If \code{TRUE}, return a single string with the log
-messages separated and terminated by line feeds, suitable for \code{cat()}.
-If \code{FALSE}, return the raw log as a vector of strings. Default: \code{TRUE}}
+messages separated and terminated by line feeds, suitable for \code{cat(...)}.
+If \code{FALSE}, return the raw log as a vector of strings, suitable for
+\code{cat(..., sep = "\\n")}. Default: \code{FALSE}}
 
 \item{...}{Zero or more objects passed on to \code{\link[base:message]{base::.makeMessage()}}}
 

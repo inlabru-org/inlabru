@@ -53,13 +53,14 @@ bru_log_reset <- function() {
 
 
 #' @param pretty logical; If `TRUE`, return a single string with the log
-#' messages separated and terminated by line feeds, suitable for `cat()`.
-#' If `FALSE`, return the raw log as a vector of strings. Default: `TRUE`
+#' messages separated and terminated by line feeds, suitable for `cat(...)`.
+#' If `FALSE`, return the raw log as a vector of strings, suitable for
+#' `cat(..., sep = "\n")`. Default: `FALSE`
 #' @return `bru_log_get` RETURN_VALUE
 #' @export
 #' @rdname bru_log
 
-bru_log_get <- function(pretty = TRUE) {
+bru_log_get <- function(pretty = FALSE) {
   if (pretty) {
     paste0(paste0(bru_env_get()[["log"]], collapse = "\n"), "\n")
   } else {

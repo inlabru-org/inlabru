@@ -1484,7 +1484,23 @@ bru_line_search <- function(model,
 
 iinla <- function(model, lhoods, initial = NULL, options) {
   inla.options <- bru_options_inla(options)
-
+  
+  initial_log_length <- length(bru_log_get())
+  # Local utility method for collecting information object:
+  collect_misc_info <- function(...) {
+    list(
+      log = if (initial_log_length <= 0) {
+        bru_log_get()
+      } else {
+        bru_log_get()[-seq_len(initial_log_length)]
+      },
+      state = state,
+      inla_stack = stk,
+      track = do.call(rbind, track),
+      ...
+    )
+  }
+  
   # Track variables?
   track <- list()
 
@@ -1648,9 +1664,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       } else {
         class(old.result) <- c("iinla", "inla", "list")
       }
+
+      old.result[["bru_iinla"]] <- collect_misc_info()
       old.result$error <- result
-      old.result$iinla_stack <- stk
-      old.result$iinla_track <- do.call(rbind, track)
       return(old.result)
     }
 
@@ -1753,9 +1769,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     }
     k <- k + 1
   }
-  result$iinla_stack <- stk
-  result$iinla_track <- do.call(rbind, track)
-  class(result) <- c("iinla", "inla", "list")
+  
+  result[["bru_iinla"]] <- collect_misc_info()
+  class(result) <- c("iinla", class(result))
   return(result)
 }
 
