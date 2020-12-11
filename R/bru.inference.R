@@ -307,7 +307,12 @@ bru <- function(components = ~ Intercept(1),
   )
   if (any(dot_is_lhood | dot_is_lhood_list)) {
     if (!all(dot_is_lhood | dot_is_lhood_list)) {
-      stop("Cannot mix like() parameters with 'bru_like' and `bru_like_list` objects.")
+      stop(paste0(
+        "Cannot mix like() parameters with 'bru_like' and `bru_like_list` objects.",
+        "\n  Check if the argument(s) ",
+        paste0("'", names(lhoods)[!(dot_is_lhood | dot_is_lhood_list)], "'", collapse = ", "),
+        " were meant to be given to a call to 'like()',\n  or in the 'options' list argument instead."
+      ))
     }
   } else {
     if (is.null(lhoods[["formula"]])) {
