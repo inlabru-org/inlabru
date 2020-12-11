@@ -543,7 +543,12 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
           length(ips_coordnames),
           length(data_coordnames)
         ))]
-        ips_coordnames <- paste(
+        new_coordnames[new_coordnames %in% ""] <-
+          paste0(
+            "BRU_dummy_coordinate_",
+            seq_along(new_coordnames)
+          )[new_coordnames %in% ""]
+        ips_coordnames <- paste0(
           "BRU_dummy_coordinate_",
           seq_along(ips_coordnames)
         )

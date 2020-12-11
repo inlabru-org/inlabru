@@ -31,8 +31,7 @@ test_that("bru: factor component", {
     options = list(
       verbose = FALSE,
       control.inla = list(
-        int.strategy = "eb",
-        h = 0.005
+        int.strategy = "eb"
       )
     )
   )
@@ -74,7 +73,7 @@ test_that("bru: factor component", {
       0.5222028, 0.5208762,
       0.5213029, 0.5213029, 0.5213029, 0.5213029, 0.5213029
     ),
-    tolerance = midtol
+    tolerance = hitol
   )
 
   # Check if prediction works
@@ -96,7 +95,7 @@ test_that("bru: factor component", {
   expect_equal(
     pr[, "sd"],
     c(0.5700744, 0.5840021, 0.5656757),
-    tolerance = midtol
+    tolerance = hitol
   )
 })
 
