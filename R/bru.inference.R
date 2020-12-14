@@ -831,6 +831,38 @@ lgcp <- function(components,
 }
 
 
+
+
+expand_to_dataframe <- function(x, data = NULL) {
+  if (is.null(data)) {
+    data <- data.frame(matrix(nrow = NROW(x), ncol = 0))
+  }
+  only_x <- setdiff(names(x), names(data))
+  if (length(only_x) < length(names(x))) {
+    x <- x[!(names(x) %in% names(data))]
+  }
+  if (inherits(x, "SpatialPoints") &&
+      !inherits(x, "SpatialPointsDataFrame")) {
+    result <- sp::SpatialPointsDataFrame(x, data = data)
+  } else if (inherits(x, "SpatialPixels") &&
+             !inherits(x, "SpatialPixelsDataFrame")) {
+    result <- sp::SpatialPixelsDataFrame(x, data = data)
+  } else if (inherits(x, "SpatialGrid") &&
+             !inherits(x, "SpatialGridDataFrame")) {
+    result <- sp::SpatialGridDataFrame(x, data = data)
+  } else if (inherits(x, "SpatialLines") &&
+             !inherits(x, "SpatialLinesDataFrame")) {
+    result <- sp::SpatialLinesDataFrame(x, data = data)
+  } else if (inherits(x, "SpatialPolygons") &&
+             !inherits(x, "SpatialPolygonsDataFrame")) {
+    result <- sp::SpatialPolygonsDataFrame(x, data = data)
+  } else {
+    result <- cbind(x, data)
+  }
+  result
+}
+
+
 #
 #' Prediction from fitted bru model
 #'
@@ -916,6 +948,7 @@ predict.bru <- function(object,
 
   # Summarise
 
+  data <- expand_to_dataframe(data)
   if (is.data.frame(vals[[1]])) {
     vals.names <- names(vals[[1]])
     covar <- intersect(vals.names, names(data))
@@ -923,7 +956,7 @@ predict.bru <- function(object,
     smy <- list()
 
     for (nm in estim) {
-      tmp <-
+      smy[[nm]] <-
         bru_summarise(
           lapply(
             vals,
@@ -931,14 +964,6 @@ predict.bru <- function(object,
           ),
           x = vals[[1]][, covar, drop = FALSE]
         )
-      if (!drop &&
-          inherits(data, "Spatial") &&
-          (NROW(data) == NROW(tmp))) {
-        smy[[nm]] <- data
-        smy[[nm]]@data <- tmp
-      } else {
-        smy[[nm]] <- tmp
-      }
     }
     is.annot <- vapply(names(smy), function(v) all(smy[[v]]$sd == 0), TRUE)
     annot <- do.call(cbind, lapply(smy[is.annot], function(v) v[, 1]))
@@ -946,8 +971,20 @@ predict.bru <- function(object,
     if (!is.null(annot)) {
       smy <- lapply(smy, function(v) cbind(data.frame(annot), v))
     }
-
-
+    
+    if (!drop) {
+      smy <- lapply(
+        smy,
+        function(tmp) {
+          if (NROW(data) == NROW(tmp)) {
+            expand_to_dataframe(data, tmp)
+          } else {
+            tmp
+          }
+        }
+      )
+    }
+    
     if (length(smy) == 1) smy <- smy[[1]]
   } else if (is.list(vals[[1]])) {
     vals.names <- names(vals[[1]])
@@ -964,21 +1001,17 @@ predict.bru <- function(object,
           )
         )
       if (!drop &&
-          inherits(data, "Spatial") &&
           (NROW(data) == NROW(tmp))) {
-        smy[[nm]] <- data
-        smy[[nm]]@data <- tmp
+        smy[[nm]] <- expand_to_dataframe(data, tmp)
       } else {
         smy[[nm]] <- tmp
       }
     }
   } else {
-    tmp <- bru_summarise(vals, x = data)
+    tmp <- bru_summarise(vals)
     if (!drop &&
-        inherits(data, "Spatial") &&
         (NROW(data) == NROW(tmp))) {
-      smy <- data
-      smy@data <- tmp
+      smy <- expand_to_dataframe(data, tmp)
     } else {
       smy <- tmp
     }
@@ -1220,25 +1253,7 @@ bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
     smy$var <- smy$sd^2
   }
   if (!is.null(x)) {
-    if (inherits(x, "Spatial")) {
-      if (nrow(coordinates(x)) == nrow(smy)) {
-        if (class(x) == "SpatialPoints") {
-          smy <- SpatialPointsDataFrame(x, data = smy)
-        }
-        else if (class(x) == "SpatialPixels") {
-          smy <- SpatialPixelsDataFrame(x, data = smy)
-        }
-        else {
-          x@data <- cbind(x@data, smy)
-          smy <- x
-        }
-      }
-    }
-    else {
-      if ((nrow(smy) == nrow(x))) {
-        smy <- cbind(x, smy)
-      }
-    }
+    smy <- expand_to_dataframe(x, smy)
   }
   return(smy)
 }
