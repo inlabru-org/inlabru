@@ -149,8 +149,9 @@ vertices.inla.mesh <- function(object) {
 #' @param mesh An `inla.mesh` object
 #' @param nx Number of pixels in x direction
 #' @param ny Number of pixels in y direction
-#' @param mask If logical and TRUE, remove pixels that are outside the mesh. If `mask` is a `Spatial` object, only return pixels covered by this object.
-#' @return `SpatialPixels` covering the mesh
+#' @param mask If logical and TRUE, remove pixels that are outside the mesh.
+#' If `mask` is a `Spatial` object, only return pixels covered by this object.
+#' @return `SpatialPixelsDataFrame` covering the mesh
 #'
 #' @examples
 #' \donttest{
@@ -173,16 +174,10 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
     y <- ny
   }
 
-  lattice <- INLA::inla.mesh.lattice(x = x, y = y)
-  pixels <- data.frame(x = lattice$loc[, 1], y = lattice$loc[, 2])
-
+  pixels <- expand.grid(x = x, y = y)
   coordinates(pixels) <- c("x", "y")
-
   if (!is.null(mesh$crs)) {
-    pixels <- SpatialPixels(pixels, proj4string = mesh$crs)
-  }
-  else {
-    pixels <- SpatialPixels(pixels)
+    proj4string(pixels) <- mesh$crs
   }
 
   if (is.logical(mask)) {
@@ -190,8 +185,14 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
       pixels <- pixels[is.inside(mesh, coordinates(pixels))]
     }
   } else {
-    pixels <- pixels[!is.na(sp::over(pixels, mask)), ]
+    pixels <- pixels[!is.na(sp::over(pixels, mask))]
   }
+
+  pixels <- sp::SpatialPixelsDataFrame(
+    pixels,
+    data = data.frame(matrix(nrow = NROW(pixels), ncol = 0))
+  )
+  
   pixels
 }
 

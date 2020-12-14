@@ -178,6 +178,17 @@ local_mrsea_rebuild_CRS <- function(x, use_km = FALSE) {
     x$points <- sp::spTransform(x$points, crs_km)
     x$boundary <- sp::spTransform(x$boundary, crs_km)
     x$covar <- sp::spTransform(x$covar, crs_km)
+    x$points$Effort <- x$points$Effort / 1000
+    x$points$mid.x <- x$points$mid.x / 1000
+    x$points$mid.y <- x$points$mid.y / 1000
+    x$points$start.x <- x$points$start.x / 1000
+    x$points$start.y <- x$points$start.y / 1000
+    x$points$end.x <- x$points$end.x / 1000
+    x$points$end.y <- x$points$end.y / 1000
+    x$points$distance <- x$points$distance / 1000
+    x$samplers$Effort <- x$samplers$Effort / 1000
+    x$samplers$mid.x <- x$samplers$mid.x / 1000
+    x$samplers$mid.y <- x$samplers$mid.y / 1000
   }
   x
 }

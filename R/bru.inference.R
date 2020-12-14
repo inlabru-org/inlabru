@@ -871,6 +871,9 @@ lgcp <- function(components,
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
+#' @param drop logical; If `keep=FALSE`, `data` is a `Spatial*DataFrame`, and the
+#' prediciton summary has the same number of rows as `data`, then the output is
+#' a `Spatial*DataFrame` object. Default `FALSE`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #'
 #' @return a data.frame or Spatial* object with predicted mean values and other
@@ -885,6 +888,7 @@ predict.bru <- function(object,
                         num.threads = NULL,
                         include = NULL,
                         exclude = NULL,
+                        drop = FALSE,
                         ...) {
   object <- bru_check_object_bru(object)
 
@@ -919,7 +923,7 @@ predict.bru <- function(object,
     smy <- list()
 
     for (nm in estim) {
-      smy[[nm]] <-
+      tmp <-
         bru_summarise(
           lapply(
             vals,
@@ -927,6 +931,14 @@ predict.bru <- function(object,
           ),
           x = vals[[1]][, covar, drop = FALSE]
         )
+      if (!drop &&
+          inherits(data, "Spatial") &&
+          (NROW(data) == NROW(tmp))) {
+        smy[[nm]] <- data
+        smy[[nm]]@data <- tmp
+      } else {
+        smy[[nm]] <- tmp
+      }
     }
     is.annot <- vapply(names(smy), function(v) all(smy[[v]]$sd == 0), TRUE)
     annot <- do.call(cbind, lapply(smy[is.annot], function(v) v[, 1]))
@@ -944,16 +956,32 @@ predict.bru <- function(object,
     }
     smy <- list()
     for (nm in vals.names) {
-      smy[[nm]] <-
+      tmp <-
         bru_summarise(
           lapply(
             vals,
             function(v) v[[nm]]
           )
         )
+      if (!drop &&
+          inherits(data, "Spatial") &&
+          (NROW(data) == NROW(tmp))) {
+        smy[[nm]] <- data
+        smy[[nm]]@data <- tmp
+      } else {
+        smy[[nm]] <- tmp
+      }
     }
   } else {
-    smy <- bru_summarise(vals, x = data)
+    tmp <- bru_summarise(vals, x = data)
+    if (!drop &&
+        inherits(data, "Spatial") &&
+        (NROW(data) == NROW(tmp))) {
+      smy <- data
+      smy@data <- tmp
+    } else {
+      smy <- tmp
+    }
   }
 
   if (!inherits(smy, "Spatial")) class(smy) <- c("prediction", class(smy))

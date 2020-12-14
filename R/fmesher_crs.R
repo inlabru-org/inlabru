@@ -893,6 +893,22 @@ fm_wkt_set_lengthunit <- function(wkt, unit, params = NULL) {
     if (wt[["label"]] == "LENGTHUNIT") {
       wt[["params"]] <- unit
     } else if (wt[["label"]] != "ELLIPSOID") {
+      if ((wt[["label"]] == "PARAMETER") &&
+        (wt[["params"]][[1]] %in% c('"False easting"', '"False northing"'))) {
+        orig_unit <- (wt[["params"]][[3]][["params"]][[1]])
+        new_unit <- (unit[[1]])
+        if (orig_unit != new_unit) {
+          if (orig_unit == '"metre"' && new_unit == '"kilometre"') {
+            wt[["params"]][[2]] <-
+              as.character(as.numeric(wt[["params"]][[2]]) / 1000)
+          } else if (orig_unit == '"kilometre"' && new_unit == '"metre"') {
+            wt[["params"]][[2]] <-
+              as.character(as.numeric(wt[["params"]][[2]]) * 1000)
+          } else {
+            warning("False easting/northing could not be properly converted.")
+          }
+        }
+      }
       for (k in seq_along(wt$param)) {
         if (is.list(wt[["params"]][[k]])) {
           wt[["params"]][[k]] <- convert(wt[["params"]][[k]], unit)

@@ -12,7 +12,11 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  dev = "png",
+  dev.args = list(type = "cairo-png"),
+  fig.width = 7,
+  fig.height = 5
 )
 ```
 
@@ -44,7 +48,7 @@ This is precisely what `init.tutorial` does:
 print(init.tutorial)
 ```
 
-`iinla.verbose=TRUE` prints iterated inla progression information
+`bru_verbose=TRUE` prints iterated inla progression information
 
 `int.strategy="eb"` limits INLA to Empirical Bayes so that the
 examples run faster; no posterior integration over $\theta$ is performed.

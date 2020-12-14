@@ -12,7 +12,11 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  dev = "png",
+  dev.args = list(type = "cairo-png"),
+  fig.width = 7,
+  fig.height = 5
 )
 ```
 
@@ -97,11 +101,11 @@ matern <- inla.spde2.pcmatern(mesh,
                               prior.sigma = c(0.1, 0.01), 
                               prior.range = c(5, 0.01))
 
-cmp <- coordinates ~ mySmooth(map = coordinates,
+cmp <- coordinates ~ mySmooth(coordinates,
                               model = matern) +
                           Intercept
 
-fit <- lgcp(cmp, nests, samplers = boundary)
+fit <- lgcp(cmp, nests, samplers = boundary, domain = list(coordinates = mesh))
 ```
 
 Predicting intensity
@@ -110,18 +114,24 @@ Predicting intensity
 You should get a plot like that below (the command below assumes that the prediction
 is in an object called `lambda`):
 
-```{r results="hide",warning=FALSE,message=FALSE, pfig.height=5,fig.width=12}
-lambda <- predict(fit, pixels(mesh), ~ exp(mySmooth + Intercept))
-loglambda <- predict(fit, pixels(mesh), ~ mySmooth + Intercept)
+```{r results="hide",warning=FALSE,message=FALSE, fig.height=4,fig.width=9}
+pred <- predict(
+  fit,
+  pixels(mesh, mask = gorillas$boundary),
+  ~ data.frame(
+    lambda = exp(mySmooth + Intercept),
+    loglambda = mySmooth + Intercept
+  )
+)
 
 pl1 <- ggplot() + 
-        gg(lambda) + 
+        gg(pred$lambda) + 
         gg(boundary) + 
         ggtitle("LGCP fit to Points", subtitle = "(Response Scale)") + 
         coord_fixed() 
 
 pl2 <- ggplot() + 
-        gg(loglambda) + 
+        gg(pred$loglambda) + 
         gg(boundary) + 
         ggtitle("LGCP fit to Points", subtitle = "(Linear Predictor Scale)") + 
         coord_fixed() 
@@ -132,13 +142,13 @@ multiplot(pl1, pl2, cols = 2)
 You can plot the median, lower 95% and upper 95% density surfaces as follows (assuming
 that the predicted intensity is in object `lambda`).
 
-```{r warning=FALSE,message=FALSE}
-gmedian <- ggplot() + gg(lambda["median"]) + coord_equal()
-glower95 <- ggplot() + gg(lambda["q0.025"]) + coord_equal()
-gupper95 <- ggplot() + gg(lambda["q0.975"]) + coord_equal()
-
-multiplot(gmedian, glower95, gupper95, 
-          layout = matrix(c(1,1,2,3), byrow = TRUE, ncol = 2))
+```{r warning=FALSE,message=FALSE,fig.width=9,fig.height=4}
+ggplot() +
+  gg(cbind(pred$lambda, data.frame(property = "q0.500")), aes(fill = median)) +
+  gg(cbind(pred$lambda, data.frame(property = "q0.025")), aes(fill = q0.025)) +
+  gg(cbind(pred$lambda, data.frame(property = "q0.975")), aes(fill = q0.975)) +
+  coord_equal() +
+  facet_wrap(~ property)
 ```
 
 
@@ -170,21 +180,21 @@ Estimating Abundance
 -----------------------------------
 
 Finally, estimate abundance using the `predict` function. As a first step we need an estimate
- for the integrated lambda. The integration `weight` values are containted in the `ipoints`
+ for the integrated lambda. The integration `weight` values are contained in the `ipoints`
  output. 
  
 
 ```{r eval=TRUE,warning=FALSE,message=FALSE,echo=TRUE}
-
-Lambda <- predict(fit, ipoints(boundary, mesh), ~ sum(weight * exp(mySmooth + Intercept))) 
+Lambda <- predict(
+  fit,
+  ipoints(boundary, mesh),
+  ~ sum(weight * exp(mySmooth + Intercept))
+)
 Lambda
 ```
 
 Given some generous interval boundaries (500, 800) for lambda we can estimate the posterior abundance distribution via
-
-
 ```{r,warning=FALSE,message=FALSE,echo=TRUE}
-
 Nest <- predict(fit, ipoints(boundary, mesh), 
                 ~ data.frame(N = 500:800,
                              dpois(500:800,
@@ -194,21 +204,14 @@ Nest <- predict(fit, ipoints(boundary, mesh),
 Get its quantiles via
 
 ```{r,warning=FALSE,message=FALSE,echo=TRUE}
-
 inla.qmarginal(c(0.025, 0.5, 0.975), marginal = list(x=Nest$N, y = Nest$mean))
 ```
-
 ... the mean via
-
 ```{r,warning=FALSE,message=FALSE,echo=TRUE}
-
 inla.emarginal(identity, marginal = list(x=Nest$N, y = Nest$mean))
 ```
-
 and plot posteriors:
-
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-
 Nest$plugin_estimate <- dpois(Nest$N, lambda=Lambda$mean)
 ggplot(data = Nest) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +
