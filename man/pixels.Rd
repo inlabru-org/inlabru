@@ -13,10 +13,11 @@ pixels(mesh, nx = 150, ny = 150, mask = TRUE)
 
 \item{ny}{Number of pixels in y direction}
 
-\item{mask}{If logical and TRUE, remove pixels that are outside the mesh. If \code{mask} is a \code{Spatial} object, only return pixels covered by this object.}
+\item{mask}{If logical and TRUE, remove pixels that are outside the mesh.
+If \code{mask} is a \code{Spatial} object, only return pixels covered by this object.}
 }
 \value{
-\code{SpatialPixels} covering the mesh
+\code{SpatialPixelsDataFrame} covering the mesh
 }
 \description{
 Generate \code{SpatialPixels} covering an \code{inla.mesh}

@@ -13,6 +13,7 @@
   num.threads = NULL,
   include = NULL,
   exclude = NULL,
+  drop = FALSE,
   ...
 )
 }
@@ -44,6 +45,10 @@ explicitly excluded)}
 predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
+
+\item{drop}{logical; If \code{keep=FALSE}, \code{data} is a \code{Spatial*DataFrame}, and the
+prediciton summary has the same number of rows as \code{data}, then the output is
+a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
 
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
 }
