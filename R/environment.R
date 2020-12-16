@@ -561,17 +561,17 @@ summary.bru_options <- function(object,
           origin =
             if (
               !is.null(default[[name]]) &&
-                (default[[name]] == combined[[name]])
+                identical(default[[name]], combined[[name]])
             ) {
               "default"
             } else if (
               !is.null(global[[name]]) &&
-                (global[[name]] == combined[[name]])
+                identical(global[[name]], combined[[name]])
             ) {
               "global"
             } else if (
               !is.null(object[[name]]) &&
-                (object[[name]] == combined[[name]])
+                identical(object[[name]], combined[[name]])
             ) {
               "user"
             } else {

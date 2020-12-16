@@ -233,4 +233,8 @@ local_bru_safe_inla <- function(multicore = FALSE,
 local_bru_testthat_setup <- function(envir = parent.frame()) {
   local_disable_PROJ6_warnings(envir = envir)
   local_testthat_tolerances(envir = envir)
+  local_bru_options_set(
+    control.compute = list(dic = FALSE, waic = FALSE),
+    envir = envir
+  )
 }
