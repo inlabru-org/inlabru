@@ -61,20 +61,57 @@ test_that("Component copy feature", {
     x1 = rep(1:4, times = 2),
     x2 = rep(c(1, 2), each = 4)
   )
-  mydata <- within(mydata, y <- rpois(8, exp(x1^0.5 + x2^0.5 * 2 - 1)))
-
-  cmp <- y ~ -1 + x1(x1, model = "rw2", scale.model = TRUE) + x2(x2, copy = "x1", fixed = FALSE)
-
-  fit_bru <- bru(cmp, family = "poisson", data = mydata)
-
+  mydata <- within(mydata, {
+    y <- rpois(8, exp(x1^0.5 + x2^0.5 * 2 - 1))
+  })
+  
   inlaform <- y ~ -1 +
     f(x1, model = "rw2", values = 1:4, scale.model = TRUE) +
     f(x2, copy = "x1", fixed = FALSE)
   fit <- INLA::inla(formula = inlaform, data = mydata, family = "poisson")
-
+  
+  cmp <- y ~ -1 + x1(x1, model = "rw2", scale.model = TRUE) + x2(x2, copy = "x1", fixed = FALSE)
+  fit_bru <- bru(cmp, family = "poisson", data = mydata)
+  
   expect_equal(
     fit_bru$summary.hyperpar,
     fit$summary.hyperpar,
     tolerance = midtol
   )
+})
+
+test_that("Component copy feature with group", {
+  skip_on_cran()
+  local_bru_safe_inla()
+  
+  n <- c(40, 20)
+  mydata <- data.frame(
+    x1 = rep(seq_len(n[1]), times = n[2]),
+    x2 = rep(seq_len(n[2]), each = n[1])
+  )
+  mydata <- rbind(mydata, mydata)
+  mydata <- within(mydata, {
+    z <- rep(c(1, 2), times = length(x1) / 2)
+    z2 <- rep(c(1, 2), each = length(x1) / 2)
+  })
+  mydata <- within(mydata, {
+    y <- rpois(prod(n), exp(x1^0.5 + x2^0.5 * 2  + (z + z2 - 3) / 2 - 1))
+  })
+  
+  inlaform <- y ~ -1 +
+    f(x1, model = "rw2", values = seq_len(n[1]), scale.model = TRUE, group = z) +
+    f(x2, copy = "x1", fixed = FALSE, group = z2)
+  fit <- INLA::inla(formula = inlaform, data = mydata, family = "poisson")
+  
+  cmp <- ~ -1 + x1(x1, model = "rw2", scale.model = TRUE, group = z) +
+    x2(x2, copy = "x1", fixed = FALSE, group = z2)
+  fit_bru <- bru(cmp, formula = y ~ x1 + x2, family = "poisson", data = mydata,
+                 options = list(bru_max_iter = 1))
+  
+  expect_equal(
+    fit_bru$summary.hyperpar,
+    fit$summary.hyperpar,
+    tolerance = midtol
+  )
+  
 })

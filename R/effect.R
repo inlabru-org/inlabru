@@ -488,7 +488,10 @@ component.character <- function(object,
     ))]
 
     # Replace arguments that will be evaluated by a mapper
-    suffixes <- list()
+    suffixes <- list(
+      "group" = "group",
+      "replicate" = "repl"
+    )
     for (arg in names(suffixes)) {
       if (arg %in% names(fcall)) {
         fcall[[arg]] <- as.symbol(paste0(label, ".", suffixes[[arg]]))
