@@ -4,15 +4,13 @@
 \alias{gg.SpatialPixelsDataFrame}
 \title{Geom for SpatialPixelsDataFrame objects}
 \usage{
-\method{gg}{SpatialPixelsDataFrame}(data, mapping = NULL, alpha = NULL,
-  crs = NULL, mask = NULL, ...)
+\method{gg}{SpatialPixelsDataFrame}(data, mapping = NULL, alpha = NULL, crs = NULL, mask = NULL, ...)
 }
 \arguments{
 \item{data}{A SpatialPixelsDataFrame object.}
 
 \item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
-mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], 
-y = coordnames(data)[2], fill = names(data)[[1]])}.}
+mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], y = coordnames(data)[2], fill = names(data)[[1]])}.}
 
 \item{alpha}{Character array identifying the data column used for tile transparency.}
 
@@ -77,11 +75,13 @@ ggplot() + gg(mexdolphin$points, aes(size = size))
 }
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
-  \code{\link{gg.SpatialLines}},
-  \code{\link{gg.SpatialPixels}},
-  \code{\link{gg.SpatialPoints}},
-  \code{\link{gg.SpatialPolygons}}, \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for spatial data: 
+\code{\link{gg.SpatialGridDataFrame}()},
+\code{\link{gg.SpatialLines}()},
+\code{\link{gg.SpatialPixels}()},
+\code{\link{gg.SpatialPoints}()},
+\code{\link{gg.SpatialPolygons}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for spatial data}

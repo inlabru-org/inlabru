@@ -4,15 +4,17 @@
 \name{toygroups}
 \alias{toygroups}
 \title{Simulated 1D animal group locations and group sizes}
-\format{The data are a list that contains these elements:
- \describe{
-   \item{\code{groups}:}{ A \code{data.frame} of group locations \code{x} and size \code{size}}
-   \item{\code{df.size}:}{ IGNORE THIS }
-   \item{\code{df.intensity}:}{ A \code{data.frame} with Poisson process 
-     intensity \code{d.lambda} at locations \code{x}}
-   \item{\code{df.rate}:}{ A \code{data.frame} the locations \code{x} and associated \code{rate} which
-     parameterized the exponential distribution from which the group sizes were drawn.}
- }}
+\format{
+The data are a list that contains these elements:
+\describe{
+\item{\code{groups}:}{ A \code{data.frame} of group locations \code{x} and size \code{size}}
+\item{\code{df.size}:}{ IGNORE THIS }
+\item{\code{df.intensity}:}{ A \code{data.frame} with Poisson process
+intensity \code{d.lambda} at locations \code{x}}
+\item{\code{df.rate}:}{ A \code{data.frame} the locations \code{x} and associated \code{rate} which
+parameterized the exponential distribution from which the group sizes were drawn.}
+}
+}
 \usage{
 data(toygroups)
 }
@@ -21,9 +23,10 @@ This data set serves to teach the concept of modelling species that gather in gr
 the grouping behaviour depends on space.
 }
 \examples{
+\donttest{
 # Load the data
 
-data("toygroups")
+data("toygroups", package = "inlabru")
 
 # The data set is a simulation of animal groups residing in a 1D space. Their
 # locations in x-space are sampled from a Cox process with intensity
@@ -45,4 +48,5 @@ ggplot(toygroups$groups) +
 
 ggplot(toygroups$df.rate) +
   geom_line(aes(x,rate))
+}
 }

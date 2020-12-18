@@ -17,17 +17,18 @@ spde.posterior(result, name, what = "range")
 A \code{prediction} object.
 }
 \description{
-Calculate posterior distribution of the range, log(range), variance, or log(variance) 
+Calculate posterior distribution of the range, log(range), variance, or log(variance)
 parameter of a model's SPDE component. Can also plot Matern correlation or covariance function.
 \code{inla.spde.result}.
 }
 \examples{
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
 
 # Load 1D Poisson process data
 
 data(Poisson2_1D, package = "inlabru")
+  
 
 # Take a look at the point (and frequency) data
 
@@ -39,9 +40,9 @@ ggplot(pts2) +
 # Fit an LGCP model with  and SPDE component
 
 x <- seq(0, 55, length = 20)
-mesh1D <- inla.mesh.1d(x, boundary = "free")
-mdl <- x ~ spde1D(map = x, model = inla.spde2.matern(mesh1D)) + Intercept
-fit <- lgcp(mdl, pts2, domain = list(x = c(0,55)))
+mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
+mdl <- x ~ spde1D(x, model = INLA::inla.spde2.matern(mesh1D)) + Intercept
+fit <- lgcp(mdl, data = pts2, domain = list(x = mesh1D))
 
 # Calculate and plot the posterior range 
 
@@ -77,5 +78,5 @@ plot(matcov)
 }
 }
 \author{
-Finn Lindgren <\email{Finn.Lindgren@ed.ac.uk}>
+Finn Lindgren \email{Finn.Lindgren@ed.ac.uk}
 }

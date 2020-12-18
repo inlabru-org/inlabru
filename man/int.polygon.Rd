@@ -4,7 +4,7 @@
 \alias{int.polygon}
 \title{Integration points for polygons inside an inla.mesh}
 \usage{
-int.polygon(mesh, loc, group = NULL)
+int.polygon(mesh, loc, group = NULL, method = NULL, ...)
 }
 \arguments{
 \item{mesh}{An inla.mesh object}
@@ -12,11 +12,16 @@ int.polygon(mesh, loc, group = NULL)
 \item{loc}{Locations defining the polygons}
 
 \item{group}{If loc defines multiple polygons then this is the ID of the group for each location in loc}
+
+\item{method}{Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")}
+
+\item{...}{Arguments passed to the low level integration method (\code{make_stable_integration_points})}
 }
 \description{
-Integration points for polygons inside an inla.mesh
+This method doesn't handle polygons with holes. Use \code{\link[=bru_int_polygon]{bru_int_polygon()}}
+instead.
 }
 \author{
-Fabian E. Bachl <\email{f.e.bachl@bath.ac.uk}> and Finn Lindgren <\email{finn.lindgren@gmail.com}>
+Fabian E. Bachl \email{f.e.bachl@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \keyword{internal}

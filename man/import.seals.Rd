@@ -4,8 +4,10 @@
 \alias{import.seals}
 \title{Seal pup edata import}
 \usage{
-import.seals(sealfile = "WestIce2012.csv",
-  icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif")
+import.seals(
+  sealfile = "WestIce2012.csv",
+  icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif"
+)
 }
 \arguments{
 \item{sealfile}{Character pointing to the file containing the seal counts and photo locations}
@@ -20,9 +22,9 @@ Generate \code{Spatial} objects from raw seal pup survey data (not inlcuded in \
 will only extract one of the survey transects.
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 
-Load seal data  
+Load seal data
 Turn seal data into spatial object
 To avoid confusion I remove the x-y coordinates created by Martin
 Change CRS

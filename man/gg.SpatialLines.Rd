@@ -10,10 +10,7 @@
 \item{data}{A SpatialLines object.}
 
 \item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
-mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], 
-y = coordnames(data)[2], 
-xend = paste0("end.", coordnames(data)[1]), 
-yend = paste0("end.", coordnames(data)[2]))}.}
+mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], y = coordnames(data)[2], xend = paste0("end.", coordnames(data)[1]), yend = paste0("end.", coordnames(data)[2]))}.}
 
 \item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
 
@@ -74,11 +71,13 @@ ggplot() + gg(mexdolphin$points, aes(size = size))
 }
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
-  \code{\link{gg.SpatialPixelsDataFrame}},
-  \code{\link{gg.SpatialPixels}},
-  \code{\link{gg.SpatialPoints}},
-  \code{\link{gg.SpatialPolygons}}, \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for spatial data: 
+\code{\link{gg.SpatialGridDataFrame}()},
+\code{\link{gg.SpatialPixelsDataFrame}()},
+\code{\link{gg.SpatialPixels}()},
+\code{\link{gg.SpatialPoints}()},
+\code{\link{gg.SpatialPolygons}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for spatial data}

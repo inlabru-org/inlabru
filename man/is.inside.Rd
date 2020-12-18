@@ -20,24 +20,25 @@ Single column matrix of Boolean values indicating if a point is inside the mesh.
 Query if a point is inside the mesh boundary
 }
 \examples{
-\donttest{
+\dontrun{
 if (require("INLA", quietly = TRUE)) {
-# Load Gorilla data
+  # Load Gorilla data
 
-data("gorillas", package = "inlabru")
+  data("gorillas", package = "inlabru")
 
-# Check if all Gorilla nests are inside the mesh
+  # Check if all Gorilla nests are inside the mesh
 
-all(is.inside(gorillas$mesh, gorillas$nests))
+  all(is.inside(gorillas$mesh, gorillas$nests))
 
-# Also works for locations not stored as SpatialPoints object
+  # Also works for locations not stored as SpatialPoints object
 
-loc = coordinates(gorillas$nests)
-all(is.inside(gorillas$mesh, loc))
+  loc <- coordinates(gorillas$nests)
+  all(is.inside(gorillas$mesh, loc))
 }
 }
+
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }
 \keyword{internal}

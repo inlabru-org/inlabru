@@ -21,20 +21,23 @@ Uses \link{geom_point} to plot the pixel centers.
 
 # Load Gorilla data
 
-data(gorillas)
+data(gorillas, package = "inlabru")
 
 # Turn elevation covariate into SpatialPixels
-pxl = SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
+pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
 
 # Plot the pixel centers
-ggplot() + gg(pxl, size = 0.1)
+ggplot() +
+  gg(pxl, size = 0.1)
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
-  \code{\link{gg.SpatialLines}},
-  \code{\link{gg.SpatialPixelsDataFrame}},
-  \code{\link{gg.SpatialPoints}},
-  \code{\link{gg.SpatialPolygons}}, \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for spatial data: 
+\code{\link{gg.SpatialGridDataFrame}()},
+\code{\link{gg.SpatialLines}()},
+\code{\link{gg.SpatialPixelsDataFrame}()},
+\code{\link{gg.SpatialPoints}()},
+\code{\link{gg.SpatialPolygons}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for spatial data}

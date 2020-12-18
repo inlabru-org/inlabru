@@ -2,48 +2,37 @@
 % Please edit documentation in R/inla.R
 \name{predict.inla}
 \alias{predict.inla}
+\alias{generate.inla}
 \title{Prediction from fitted inla model}
 \usage{
 \method{predict}{inla}(object, ...)
+
+\method{generate}{inla}(object, ...)
 }
 \arguments{
-\item{object}{A \code{bru} object obtained by calling \link{bru} or \link{lgcp}.}
+\item{object}{An \code{inla} object obtained by calling \code{INLA::inla()}.}
 
-\item{...}{Arguments passed on to \link{predict.bru}.}
+\item{...}{additional arguments passed on to\link{generate.bru}.}
 }
 \value{
 A \code{prediction} object.
+
+List of generated samples
 }
 \description{
-Takes a fitted inla object produced by the function inla() and produces predictions given a 
-new set of values for the model covariates or the original values used for the model fit. 
-The predictions can be based on any R expression that is valid given these values/covariates 
-and the posterior of the estimated effects.
+This method is not supported for plain inla objects. Please see \code{\link[=predict.bru]{predict.bru()}} instead.
+
+This method is not supported for plain inla objects. Please see \code{\link[=generate.bru]{generate.bru()}} instead.
+See https://github.com/fbachl/inlabru/issues/78 for more information.
 }
-\examples{
-\donttest{
-# Some features use the INLA package.
-if (require("INLA", quietly = TRUE)) {
+\seealso{
+\code{\link[=predict.inla]{predict.inla()}}
 
-# Generate some data
+\code{\link[=generate.inla]{generate.inla()}}
 
-input.df <- data.frame(x=cos(1:10))
-input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
-
-# Fit a Gaussian likelihood model
-
-formula = y ~ x
-fit <- inla(formula, "gaussian", data = input.df, control.compute=list(config = TRUE))
-
-# Estimate posterior statistics of exp(x), where x is the fixed effect.
-
-xpost = predict(fit, NULL, ~ exp(x))
-xpost
-plot(xpost)
-
-}
-}
+\code{\link[=predict.bru]{predict.bru()}}
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Finn Lindgren \email{finn.lindgren@gmail.com}
 }
+\keyword{internal}

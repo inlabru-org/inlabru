@@ -4,8 +4,16 @@
 \alias{globe}
 \title{Plot a globe using rgl}
 \usage{
-globe(R = 1, R.grid = 1.05, specular = "black", axes = FALSE,
-  box = FALSE, xlab = "", ylab = "", zlab = "")
+globe(
+  R = 1,
+  R.grid = 1.05,
+  specular = "black",
+  axes = FALSE,
+  box = FALSE,
+  xlab = "",
+  ylab = "",
+  zlab = ""
+)
 }
 \arguments{
 \item{R}{Radius of the globe}
@@ -27,11 +35,12 @@ No value, used for plotting side effect.
 Creates a textured sphere and lon/lat coordinate annotations.
 }
 \details{
-This funciton requires the `rgl` and `sphereplot` packages.
+This funciton requires the \code{rgl} and \code{sphereplot} packages.
 }
 \examples{
 \donttest{
-if (require("rgl", quietly = TRUE) &&
+if (bru_safe_inla() &&
+    require("rgl", quietly = TRUE) &&
     require("sphereplot", quietly = TRUE)) {
 
 # Load pantropoical dolphin data
@@ -53,8 +62,10 @@ glplot(mexdolphin$points)
 }
 }
 \seealso{
-Other inlabru RGL tools: \code{\link{glplot.SpatialLines}},
-  \code{\link{glplot.SpatialPoints}},
-  \code{\link{glplot.inla.mesh}}, \code{\link{glplot}}
+Other inlabru RGL tools: 
+\code{\link{glplot.SpatialLines}()},
+\code{\link{glplot.SpatialPoints}()},
+\code{\link{glplot.inla.mesh}()},
+\code{\link{glplot}()}
 }
 \concept{inlabru RGL tools}

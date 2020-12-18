@@ -2,96 +2,105 @@
 % Please edit documentation in R/bru.inference.R
 \name{bru}
 \alias{bru}
+\alias{bru_rerun}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
-bru(components = y ~ Intercept, family = NULL, data = NULL, ...,
-  options = list())
+bru(components = ~Intercept(1), ..., options = list())
+
+bru_rerun(result, options = list())
 }
 \arguments{
-\item{components}{a \link{formula} describing the latent components. See \link{bru.components} for details.}
+\item{components}{A \link{formula}-like specification of latent components.
+Also used to define a default linear additive predictor.  See
+\link{component} for details.}
 
-\item{family}{A string indicating the likelihood family. The default is \code{gaussian} with 
-identity link. In addition to the likelihoods provided by inla 
-(see \code{inla.models()$likelihood}) inlabru supports fitting Cox processes 
-via \code{family = "cp"}. The latter requires contructing a likelihood using the \link{like}
-function and providing it via the ... parameter list. As an alternative to bru, the \link{lgcp} 
-function provides a convenient interface to fitting Cox processes. See details.}
+\item{...}{Likelihoods, each constructed by a calling \code{\link[=like]{like()}}, or named
+parameters that can be passed to a single \code{\link[=like]{like()}} call.}
 
-\item{data}{A data.frame or SpatialPoints[DataFrame] object. See details.}
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
 
-\item{...}{Additional likelihoods, each constructed by a calling \link{like}. See details.}
-
-\item{options}{A list of name and value pairs that are either interpretable by \link{bru.options} 
-or valid inla parameters.}
+\item{result}{A previous estimation object of class \code{bru}}
 }
 \value{
-bru returns an object of class "bru". A \code{bru} object inherits from \link[INLA]{inla} 
-        (see the inla documentation for its properties) and adds additional information stored 
-        in the \code{sppa} field.
+bru returns an object of class "bru". A \code{bru} object inherits
+from \code{INLA::inla} (see the inla documentation for its properties) and
+adds additional information stored in the \code{bru_info} field.
 }
 \description{
-This method is a wrapper for \link[INLA]{inla} and provides multiple enhancements. 
+This method is a wrapper for \code{INLA::inla} and provides
+multiple enhancements.
 
 \itemize{
-\item{Easy usage of spatial covariates and automatic construction of inla projection matrices for (spatial) SPDE models. 
-      This feature is accessible via the \code{components} parameter.
-      Practical examples on how to use spatial data by means of the components parameter can also be found by looking at the \link{lgcp}
-      function's documentation.}
-\item{Constructing multiple likelihoods is straight forward. See \link{like} for more information on how to provide additional
-      likelihoods to \code{bru} using the ... parameter list.}
-\item{Support for non-linear predictors. See example below.}
-\item{Log Gaussian Cox process (LGCP) inference is available by using the \code{cp} family or (even easier) by using the 
-      \link{lgcp} function.}
+\item
+Easy usage of spatial covariates and automatic construction
+of inla projection matrices for (spatial) SPDE models. This feature is
+accessible via the \code{components} parameter. Practical examples on how
+to use spatial data by means of the components parameter can also be found
+by looking at the \link{lgcp} function's documentation.
+\item
+Constructing multiple likelihoods is straight forward. See \link{like} for more
+information on how to provide additional likelihoods to \code{bru} using
+the \code{...} parameter list.
+\item
+Support for non-linear predictors. See example below.
+\item
+Log Gaussian Cox process (LGCP) inference is
+available by using the \code{cp} family or (even easier) by using the
+\link{lgcp} function.
 }
 }
 \details{
-family and ... must either be parameters to \link{like}, or \code{lhood} objects constructed by \link{like}.
-         \code{data} must either be an \code{lhood} object, a data container, or \code{NULL}. If \code{NULL},
-         data must be supplied through direct calls to \link{like}.
+\itemize{
+\item \code{bru_rerun} Continue the optimisation from a previously computed estimate.
+}
 }
 \examples{
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
 
 # Simulate some covariates x and observations y
 input.df <- data.frame(x=cos(1:10))
 input.df <- within(input.df, y <- 5 + 2*x + rnorm(10, mean=0, sd=0.1))
 
 # Fit a Gaussian likelihood model
-fit <- bru(y ~ x + Intercept, "gaussian", input.df)
+fit <- bru(y ~ x + Intercept, family = "gaussian", data = input.df)
 
 # Obtain summary
 fit$summary.fixed
 }
 
   
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
   
 # Alternatively, we can use the like() function to construct the likelihood:
 
-lik = like(family = "gaussian", data = input.df)
-fit <- bru(y ~ x + Intercept, lik)
+lik = like(family = "gaussian", formula = y ~ x + Intercept, data = input.df)
+fit <- bru(~ x + Intercept(1), lik)
 fit$summary.fixed
 
 }
   
 # An important addition to the INLA methodology is bru's ability to use
 # non-linear predictors. Such a predictor can be formulated via like()'s 
-# \\code{formula} parameter. For instance
+# \code{formula} parameter. The z(1) notation is needed to ensure that
+# the z component should be interpreted as single latent variable and not
+# a covariate:
 
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
     
 z = 2
 input.df <- within(input.df, y <- 5 + exp(z)*x + rnorm(10, mean=0, sd=0.1))
-lik = like(family = "gaussian", data = input.df, formula = y ~ exp(z)*x + Intercept, E = 10000)
-fit <- bru( ~ z + Intercept, lik)
+lik = like(family = "gaussian", data = input.df,
+           formula = y ~ exp(z)*x + Intercept)
+fit <- bru( ~ z(1) + Intercept(1), lik)
 
 # Check the result (z posterior should be around 2)
 fit$summary.fixed
 }
-  
+
 }
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com}
 }

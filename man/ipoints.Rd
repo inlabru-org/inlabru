@@ -4,23 +4,61 @@
 \alias{ipoints}
 \title{Generate integration points}
 \usage{
-ipoints(region = NULL, domain = NULL, name = "x", group = NULL,
-  project)
+ipoints(
+  samplers = NULL,
+  domain = NULL,
+  name = NULL,
+  group = NULL,
+  int.args = NULL,
+  project = NULL
+)
 }
 \arguments{
-\item{region}{Description of the integration region boundary. 
-In 1D either a vector of two numerics or a two-column matrix where each row describes and interval. 
-In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a weight column defining the width of the line.}
+\item{samplers}{Description of the integration region boundary.
+In 1D, a length 2 vector or two-column matrix where each row describes an interval,
+or \code{NULL}
+In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a \code{weight} column
+defining the width of the a transect line, and optionally further columns used by the
+\code{group} argument, or \code{NULL}.  When \code{domain} is \code{NULL}, \code{samplers} may also
+be an \code{inla.mesh.1d} or \code{inla.mesh} object, that is then treated as a \code{domain}
+argument instead.}
 
-\item{domain}{In 1D a single numeric setting the numer of integration points or an \code{inla.mesh.1d} 
-defining the locations to project the integration points to. In 2D \code{domain} has to be an
-\code{inla.mesh} object describing the projection and granularity of the integration.}
+\item{domain}{Either
+\itemize{
+\item when \code{samplers} is a 1D interval(s) definition only, \code{domain} can be
+a single integer for the number of integration points to place in each 1D
+interval, overriding \code{int.args[["nsub1"]]}, and otherwise
+\item when \code{samplers} is \code{NULL}, \code{domain} can be a numeric vector of points,
+each given integration weight 1 (and no additional points are added
+in between),
+\item an \code{inla.mesh.1d} object for continuous 1D integration, or
+\item an \code{inla.mesh.2d} object for continuous 2D integration.
+}}
 
-\item{name}{Character array stating the name of the domains dimension(s)}
+\item{name}{Character array stating the name of the domains dimension(s).
+If \code{NULL}, the names are taken from coordinate names from \code{samplers} for
+\verb{Spatial*} objects, otherwise "x", "y", "coordinateZ" for 2D regions and
+\code{"x"} for 1D regions}
 
-\item{group}{Column names of the \code{region} object (if applicable) for which the integration points are calculated independently and not merged by the projection.}
+\item{group}{Column names of the \code{samplers} object (if applicable) for which
+the integration points are calculated independently and not merged when
+aggregating to mesh nodes.}
 
-\item{project}{If TRUE, project the integration points to mesh vertices}
+\item{int.args}{List of arguments passed to \code{bru_int_polygon}.
+\itemize{
+\item \code{method}: "stable" (to aggregate integration weights onto mesh nodes)
+or "direct" (to construct a within triangle/segment integration scheme
+without aggregating onto mesh nodes)
+\item \code{nsub1}, \code{nsub2}: integers controlling the number of internal integration
+points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
+Points per knot segment: \code{nsub1}
+\item \code{poly_method}: if set to "legacy", selects an old polygon integration method
+that doesn't handle holes. Currently only used for debugging purposes.
+}}
+
+\item{project}{Deprecated in favour of \code{int.args(method=...)}.
+If TRUE, aggregate the integration points to mesh vertices. Default:
+\code{project = (identical(int.args$method, "stable"))}}
 }
 \value{
 A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
@@ -28,62 +66,78 @@ A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration po
 \description{
 This function generates points in one or two dimensions with a weight attached to each point.
 The weighted sum of a function evaluated at these points is the integral of that function approximated
-by linear basis functions. The parameter \code{region} describes the area(s) integrated over. 
+by linear basis functions. The parameter \code{samplers} describes the area(s) integrated over.
 
-In case of a single dimension \code{region} is supposed to be a two-column \code{matrix} where
+In case of a single dimension \code{samplers} is supposed to be a two-column \code{matrix} where
 each row describes the start and end point of the interval to integrate over. In the two-dimensional
-case \code{region} can be either a \code{SpatialPolygon}, an \code{inla.mesh} or a 
+case \code{samplers} can be either a \code{SpatialPolygon}, an \code{inla.mesh} or a
 \code{SpatialLinesDataFrame} describing the area to integrate over. If a \code{SpatialLineDataFrame}
 is provided it has to have a column called 'weight' in order to indicate the width of the line.
 
-The domain parameter is an \code{inla.mesh.1d} or \code{inla.mesh} object that can be employed to 
+The domain parameter is an \code{inla.mesh.1d} or \code{inla.mesh} object that can be employed to
 project the integration points to the vertices of the mesh. This reduces the final number of
-integration points and reduces the computational cost of the integration. The projection can also 
+integration points and reduces the computational cost of the integration. The projection can also
 prevent numerical issues in spatial LGCP models where each observed point is ideally surrounded
-by three integration point sitting at the coresponding mesh vertices. For convenience, the
+by three integration point sitting at the corresponding mesh vertices. This is controlled
+by \code{int.args$method="stable"} (default) or \code{"direct"}, where the latter uses the integration
+points directly, without aggregating to the mesh vertices.
+
+For convenience, the
 \code{domain} parameter can also be a single integer setting the number of equally spaced integration
 points in the one-dimensional case.
 }
 \examples{
+
 \donttest{
 if (require("INLA", quietly = TRUE)) {
 
-# Create 50 integration points covering the dimension 'myDim' between 0 and 10. 
+  # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 
-ips = ipoints(c(0,10), 50, name = "myDim")
-plot(ips)
-
-# Create integration points for the two intervals [0,3] and [5,10]
-
-ips = ipoints(matrix(c(0,3, 5,10), nrow = 2, byrow = TRUE), 50)
-plot(ips)
-
-# Convert a 1D mesh into integration points
-mesh = inla.mesh.1d(seq(0,10,by = 1))
-ips = ipoints(mesh, name = "time")
-plot(ips)
+  ips <- ipoints(c(0, 10), 50, name = "myDim")
+  plot(ips)
 
 
-# Obtain 2D integration points from a SpatialPolygon
+  # Create integration points for the two intervals [0,3] and [5,10]
 
-data(gorillas, package = "inlabru")
-ips = ipoints(gorillas$boundary)
-ggplot() + gg(gorillas$boundary) + gg(ips, aes(size = weight))
-
-
-#' Project integration points to mesh vertices
-
-ips = ipoints(gorillas$boundary, domain = gorillas$mesh)
-ggplot() + gg(gorillas$mesh) +  gg(gorillas$boundary) + gg(ips, aes(size = weight))
+  ips <- ipoints(matrix(c(0, 3, 5, 10), nrow = 2, byrow = TRUE), 50)
+  plot(ips)
 
 
-# Turn a 2D mesh into integration points
+  # Convert a 1D mesh into integration points
+  mesh <- inla.mesh.1d(seq(0, 10, by = 1))
+  ips <- ipoints(mesh, name = "time")
+  plot(ips)
 
-ips = ipoints(gorillas$mesh)
-ggplot() + gg(gorillas$boundary) + gg(ips, aes(size = weight))
+
+  # Obtain 2D integration points from a SpatialPolygon
+
+  data(gorillas, package = "inlabru")
+  ips <- ipoints(gorillas$boundary)
+  ggplot() +
+    gg(gorillas$boundary) +
+    gg(ips, aes(size = weight))
+
+
+  #' Project integration points to mesh vertices
+
+  ips <- ipoints(gorillas$boundary, domain = gorillas$mesh)
+  ggplot() +
+    gg(gorillas$mesh) +
+    gg(gorillas$boundary) +
+    gg(ips, aes(size = weight))
+
+
+  # Turn a 2D mesh into integration points
+
+  ips <- ipoints(gorillas$mesh)
+  ggplot() +
+    gg(gorillas$boundary) +
+    gg(ips, aes(size = weight))
 }
 }
+
 }
 \author{
-Fabian E. Bachl <\email{bachlfab@gmail.com}>
+Fabian E. Bachl \email{bachlfab@gmail.com} and
+\email{finn.lindgren@gmail.com}
 }

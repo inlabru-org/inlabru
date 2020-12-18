@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Spatial Inference using Integrated Nested Laplace Approximation
-Version: 2.1.13
+Version: 2.2.0
 Authors@R: c(
   person("Fabian E.", "Bachl", email = "bachlfab@gmail.com", role = c("aut", "cre"),
          comment = "Fabian Bachl wrote the main code"),
@@ -13,7 +13,9 @@ Authors@R: c(
   person("Daniel", "Simpson", email = "dp.simpson@gmail.com", role = c("ctb"),
          comment = "Daniel Simpson wrote the basic LGCP sampling method"),
   person("Lindesay", "Scott-Howard", email ="lass@@st-andrews.ac.uk", role = c("ctb"),
-         comment = "Lindesay Scott-Howard provied MRSea data import code")
+         comment = "Lindesay Scott-Howard provided MRSea data import code"),
+  person("Seaton", "Andy", email ="andy.e.seaton@gmail.com", role = c("ctb"),
+         comment = "Andy Seaton provided testing and bugfixes")
   )
 URL: http://www.inlabru.org, 
 BugReports: https://github.com/fbachl/inlabru/issues
@@ -23,33 +25,85 @@ Description: Facilitates spatial modeling using integrated nested Laplace approx
   Fabian E. Bachl, Finn Lindgren, David L. Borchers, Janine B. Illian, Stephen T. Buckland, Havard Rue, 
   Tim Gerrodette (2017), <arXiv:1604.06013>.
 License: GPL (>= 2)
-Imports:
-  rgdal,
-  rgeos,
-  utils,
-  Matrix
-Suggests:
-    testthat,
-    ggmap,
-    rgl,
-    sphereplot,
-    raster,
-    dplyr,
-    maptools,
-    mgcv,
-    shiny,
-    spatstat,
-    spatstat.data,
-    RColorBrewer,
-    graphics,
-    INLA,
-    knitr,
-    rmarkdown
+Additional_repositories: https://inla.r-inla-download.org/R/testing
+RoxygenNote: 7.1.1
+Encoding: UTF-8
 Depends:
+    ggplot2,
+    methods,
     R (>= 3.3),
     sp,
-    stats,
-    methods,
-    ggplot2,
-Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 6.1.1
+    stats
+Imports:
+    Matrix,
+    rgdal,
+    rgeos,
+    utils,
+    withr
+Suggests:
+    covr,
+    dplyr,
+    ggmap,
+    ggpolypath,
+    graphics,
+    INLA (>= 20.06.18),
+    knitr,
+    maptools,
+    mgcv,
+    raster,
+    RColorBrewer,
+    rgl,
+    rmarkdown,
+    shiny,
+    sn,
+    spatstat,
+    spatstat.data,
+    sphereplot,
+    testthat
+Roxygen: list(markdown = TRUE)
+Config/testthat/parallel: true
+Config/testthat/edition: 3
+Collate: 
+    '0_inlabru_envir.R'
+    'bru.covariate.R'
+    'bru.gof.R'
+    'bru.inference.R'
+    'bru.integration.R'
+    'bru.spatial.R'
+    'covariate.R'
+    'data.Poisson1_1D.R'
+    'data.Poisson2_1D.R'
+    'data.Poisson3_1D.R'
+    'data.gorillas.R'
+    'data.mexdolphin.R'
+    'data.mrsea.R'
+    'data.seals.R'
+    'data.shrimp.R'
+    'data.toygroups.R'
+    'deltaIC.R'
+    'dsdata.R'
+    'dsmdata.R'
+    'dsmdata.tools.R'
+    'effect.R'
+    'environment.R'
+    'fmesher_crs.R'
+    'fmesher_utils.R'
+    'ggplot.R'
+    'inla.R'
+    'inlabru.R'
+    'integration.R'
+    'local_testthat.R'
+    'mesh.R'
+    'model.R'
+    'nlinla.R'
+    'plotsample.R'
+    'prediction.R'
+    'rgl.R'
+    'sampling.R'
+    'shapefile.R'
+    'spatstat.R'
+    'spde.R'
+    'stack.R'
+    'utils.R'
+VignetteBuilder: knitr
+BuildVignettes: true

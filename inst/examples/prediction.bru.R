@@ -1,11 +1,13 @@
 \donttest{
+if (bru_safe_inla()) {
+
 # Generate some data
 input.df <- data.frame(x=cos(1:10))
 input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
 
 # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
-fit <- bru(y ~ x, "gaussian", input.df)
+fit <- bru(y ~ x, family = "gaussian", data = input.df)
 
 # Predict posterior statistics of 'x'
 
@@ -38,4 +40,5 @@ xipost
 rownames(xipost) = c("x","Intercept")
 ggplot() + gg(xipost, bar = TRUE)
                  
+}
 }

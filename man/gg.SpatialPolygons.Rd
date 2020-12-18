@@ -4,8 +4,7 @@
 \alias{gg.SpatialPolygons}
 \title{Geom for SpatialPolygons objects}
 \usage{
-\method{gg}{SpatialPolygons}(data, mapping = NULL, crs = NULL,
-  color = "black", alpha = NULL, ...)
+\method{gg}{SpatialPolygons}(data, mapping = NULL, crs = NULL, color = "black", alpha = NULL, ...)
 }
 \arguments{
 \item{data}{A SpatialPolygons object.}
@@ -22,10 +21,12 @@ mapping. The default mapping is \code{aes_string(x = "long", y = "lat", group = 
 \item{...}{Arguments passed on to \link{geom_polygon}.}
 }
 \value{
-A \link{geom_polygon} return value.
+If \code{ggpolypath} is available a \code{ggpolypath::geom_polypath} object.
+Otherwise a \link{geom_polygon} return value.
 }
 \description{
-Uses the fortitfy() function to turn the SpatialPolygons objects into a data.frame. Then 
+Uses the \code{fortify()} function to turn the \code{SpatialPolygons} objects into a
+\code{data.frame}. Then
 calls \link{geom_polygon} to plot the polygons.
 }
 \examples{
@@ -77,11 +78,13 @@ ggplot() + gg(mexdolphin$points, aes(size = size))
 }
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialGridDataFrame}},
-  \code{\link{gg.SpatialLines}},
-  \code{\link{gg.SpatialPixelsDataFrame}},
-  \code{\link{gg.SpatialPixels}},
-  \code{\link{gg.SpatialPoints}}, \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for spatial data: 
+\code{\link{gg.SpatialGridDataFrame}()},
+\code{\link{gg.SpatialLines}()},
+\code{\link{gg.SpatialPixelsDataFrame}()},
+\code{\link{gg.SpatialPixels}()},
+\code{\link{gg.SpatialPoints}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for spatial data}

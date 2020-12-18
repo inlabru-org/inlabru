@@ -4,8 +4,7 @@
 \alias{gg.RasterLayer}
 \title{Geom for RasterLayer objects}
 \usage{
-\method{gg}{RasterLayer}(data, mapping = aes_string(x = "x", y = "y",
-  fill = "layer"), ...)
+\method{gg}{RasterLayer}(data, mapping = aes_string(x = "x", y = "y", fill = "layer"), ...)
 }
 \arguments{
 \item{data}{A RasterLayer object.}
@@ -22,28 +21,29 @@ This function takes a RasterLayer object, converts it into a SpatialPixelsDataFr
 uses \link{geom_tile} to plot the data.
 }
 \details{
-This function requires the `raster` package.
+This function requires the \code{raster} package.
 }
 \examples{
 # Some features require the raster and spatstat.data packages.
 if (require("spatstat.data", quietly = TRUE) &&
-    require("raster", quietly = TRUE)) {
+  require("raster", quietly = TRUE)) {
 
-# Load Gorilla data
-data("gorillas", package = "spatstat.data")
+  # Load Gorilla data
+  data("gorillas", package = "spatstat.data")
 
-# Convert elevation covariate to RasterLayer
+  # Convert elevation covariate to RasterLayer
 
-elev = as(gorillas.extra$elevation, "RasterLayer")
+  elev <- as(gorillas.extra$elevation, "RasterLayer")
 
-# Plot the elevation
+  # Plot the elevation
 
-ggplot() + gg(elev)
-
+  ggplot() +
+    gg(elev)
 }
 }
 \seealso{
-Other geomes for Raster data: \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for Raster data: 
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for Raster data}

@@ -1,3 +1,56 @@
+# inlabru 2.2.0
+
+* Support for the INLA "copy" feature, `comp2(input, copy = "comp1")`
+
+* Allow component weights to be an unnamed parameter, `comp(input, weights, ...)`
+
+* Direct access to the data objects in component inputs and predictor
+  expressions, as `.data.`, allowing e.g. `covar(fun(.data.), ...)` for a complex
+  covariate extractor method `fun()`
+  
+* Partial support for spherical manifold meshes
+
+* Uses INLA integration strategy "eb" for initial nonlinear iterations, and a
+  specified integration strategy only for the final iteration, so that the
+  computations are faster, and always used the conditional latent mode as
+  linearisation point.
+
+# inlabru 2.1.15
+
+* New options system
+
+* New faster linearisation method
+
+* New line search method to make the nonlinear inla iterations robust
+
+* Method for updating old stored estimation objects
+
+* System for supplying mappings between latent models and evaluated effects
+  via `bru_mapper` objects
+
+* Improved factor support; Either as "contrast with the 1st level", via the
+  special `"factor_contrast"` model, or all levels with model `"factor_full"`.
+  Further options planned (e.g. a simpler options to fix the precision
+  parameter).  The estimated coefficients appear as random effects in the
+  `inla()` output.
+
+* Interface restructuring to support new features while keeping most
+  backwards compatibility. Change `map=` to `main=` or unnamed first argument;
+  Since `main` is the first parameter, it doesn't need to be a named argument.
+
+* Keep components with zero derivative in the linearisation
+
+* PROJ6 support
+
+* Add random seed option for posterior sampling
+
+* Add package unit testing
+
+* New backend code to make extended feature support easier
+
+* New int.args option to control spatial integration resolution,
+  thanks to Martin Jullum (`martinju`)
+
 # inlabru 2.1.13
 
 * Fix CRAN complaint regarding documentation
@@ -25,7 +78,7 @@
 * Prevent int.polygon from integrating outside the mesh domain,
   and generally more robust integration scheme construction.
 
-* Fix bru() to like() parameter logic. (Thanks to Peter Vesk for bug example)
+* Fix `bru()` to `like()` parameter logic. (Thanks to Peter Vesk for bug example)
 
 # inlabru 2.1.7
 

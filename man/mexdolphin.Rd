@@ -3,49 +3,65 @@
 \docType{data}
 \name{mexdolphin}
 \alias{mexdolphin}
-\title{Pan-tropical spotted dolphins in the Gulf of Mexico.}
-\format{A list of objects:
- \describe{
-   \item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of 
-   detected dolphin groups, with their size as an attribute.}
-   \item{\code{samplers}:}{ A \code{SpatialLinesDataFrame} object containing the transect lines
-   that were surveyed.}
-   \item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation 
-   mesh (a type of discretization of continuous space) covering the survey region.}
-   \item{\code{ppoly}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the 
-   survey region.}
-   \item{\code{simulated}:}{ A \code{SpatialPointsDataFrame} object containing the locations of a 
-   \emph{simulated} population of dolphin groups. The population was simulated from a 'code{inlabru}
-   model fitted to the actual survey data. Note that the simulated data do not have any associated
-   size information.}
- }}
+\title{Pan-tropical spotted dolphins in the Gulf of Mexico}
+\format{
+A list of objects:
+\describe{
+\item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
+detected dolphin groups, with their size as an attribute.}
+\item{\code{samplers}:}{ A \code{SpatialLinesDataFrame} object containing the transect lines
+that were surveyed.}
+\item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation
+mesh (a type of discretization of continuous space) covering the survey region.}
+\item{\code{ppoly}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
+survey region.}
+\item{\code{simulated}:}{ A \code{SpatialPointsDataFrame} object containing the locations of a
+\emph{simulated} population of dolphin groups. The population was simulated from a 'code{inlabru}
+model fitted to the actual survey data. Note that the simulated data do not have any associated
+size information.}
+}
+}
 \source{
 Library \code{dsm}.
 }
+\usage{
+data(mexdolphin)
+}
 \description{
 This a version of the \code{mexdolphins} dataset from the package \code{dsm}, reformatted
-as point process data for use with \code{inlabru}. The data are from a combination of several NOAA 
-shipboard surveys conducted on pan-tropical spotted dolphins in the Gulf of Mexico. 47 observations 
-of groups of dolphins wre detected. The group size was recorded, as well as the Beaufort sea state at 
-the time of the observation.
+as point process data for use with \code{inlabru}. The data are from a combination of several NOAA
+shipboard surveys conducted on pan-tropical spotted dolphins in the Gulf of Mexico. 47 observations
+of groups of dolphins wre detected. The group size was recorded, as well as the Beaufort sea state at
+the time of the observation. Transect width is 16 km, i.e. maximal detection
+distance 8 km (transect half-width 8 km).
 }
 \examples{
 \donttest{
- data(mexdolphin, package="inlabru")
- plot(mexdolphin$mesh,edge.color="lightgray",draw.segments=FALSE) # draw mesh
- plot(mexdolphin$ppoly,add=TRUE) # add survey region boundary
- plot(mexdolphin$samplers,col="blue",add=TRUE) # draw transects (in and out of survey region)
- grsize = attributes(mexdolphin$points)$data[,"size"] # Get group size data
- plot(mexdolphin$points,pch=19,col="red",cex=log(grsize/30),add=TRUE)
- }
+data(mexdolphin, package = "inlabru")
+ggplot() +
+  gg(mexdolphin$mesh) +
+  gg(mexdolphin$ppoly, color = "blue") +
+  gg(mexdolphin$samplers) +
+  gg(mexdolphin$points, aes(size = size), color = "red") +
+  coord_equal()
+
+gmap(mexdolphin$depth) +
+  gm(mexdolphin$ppoly, color = "blue") +
+  gm(mexdolphin$samplers) +
+  gm(mexdolphin$points, aes(size = size), color = "red")
+
+gmap(mexdolphin$depth) +
+  gm(mexdolphin$depth, aes(col = depth)) +
+  gm(mexdolphin$ppoly)
+}
 }
 \references{
-Halpin, P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K. Urian, 
-E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D. Hyrenbach. 2009. 
-OBIS-SEAMAP: The world data center for marine mammal, sea bird, and sea turtle distributions. 
+Halpin, P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K. Urian,
+E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D. Hyrenbach. 2009.
+OBIS-SEAMAP: The world data center for marine mammal, sea bird, and sea turtle distributions.
 Oceanography 22(2):104-115
 
-NOAA Southeast Fisheries Science Center. 1996. Report of a Cetacean Survey of Oceanic and 
-Selected Continental Shelf Waters of the Northern Gulf of Mexico aboard NOAA Ship Oregon II 
+NOAA Southeast Fisheries Science Center. 1996. Report of a Cetacean Survey of Oceanic and
+Selected Continental Shelf Waters of the Northern Gulf of Mexico aboard NOAA Ship Oregon II
 (Cruise 220)
 }

@@ -4,8 +4,7 @@
 \alias{gg.inla.mesh.1d}
 \title{Geom for inla.mesh.1d objects}
 \usage{
-\method{gg}{inla.mesh.1d}(data, mapping = aes_string("x", "y"), y = 0,
-  shape = 4, ...)
+\method{gg}{inla.mesh.1d}(data, mapping = aes_string("x", "y"), y = 0, shape = 4, ...)
 }
 \arguments{
 \item{data}{An inla.mesh.1d object.}
@@ -30,26 +29,31 @@ of a 1D mesh.
 # Some features use the INLA package.
 if (require("INLA", quietly = TRUE)) {
 
-# Load INLA
+  # Load INLA
 
-library(INLA)
+  library(INLA)
 
-# Create a 1D mesh
+  # Create a 1D mesh
 
-mesh = inla.mesh.1d(seq(0,10,by=0.5))
+  mesh <- inla.mesh.1d(seq(0, 10, by = 0.5))
 
-# Plot it
+  # Plot it
 
-ggplot() + gg(mesh)
+  ggplot() +
+    gg(mesh)
 
-# Plot it using a different shape and size for the mesh nodes
+  # Plot it using a different shape and size for the mesh nodes
 
-ggplot() + gg(mesh, shape = "|", size = 5)
+  ggplot() +
+    gg(mesh, shape = "|", size = 5)
+}
+}
 
-}}
 }
 \seealso{
-Other geomes for meshes: \code{\link{gg.inla.mesh}},
-  \code{\link{gg}}, \code{\link{gm}}
+Other geomes for meshes: 
+\code{\link{gg.inla.mesh}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for meshes}

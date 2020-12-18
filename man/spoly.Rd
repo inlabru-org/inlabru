@@ -4,8 +4,12 @@
 \alias{spoly}
 \title{Convert a data.frame of boundary points into a SpatialPolgonsDataFrame}
 \usage{
-spoly(data, cols = colnames(data)[1:2], crs = CRS(as.character(NA)),
-  to.crs = NULL)
+spoly(
+  data,
+  cols = colnames(data)[1:2],
+  crs = CRS(NA_character_),
+  to.crs = NULL
+)
 }
 \arguments{
 \item{data}{A data.frame of points describing the boundary of the polygon}
@@ -21,7 +25,7 @@ SpatialPolygonsDataFrame
 }
 \description{
 A polygon can be described as a sequence of points defining the polygon's boundary.
-When given such a sequence (anti clockwise!) this function creates a 
+When given such a sequence (anti clockwise!) this function creates a
 SpatialPolygonsDataFrame holding the polygon decribed. By default, the
 first two columns of \code{data} are assumed to define the x and y coordinates
 of the points. This behavior can ba changed using the \code{cols} parameter, which
@@ -33,13 +37,17 @@ paraemter. Posterior conversion to a different CRS is supported using the
 \examples{
 \donttest{
 # Create data frame of boundary points (anti clockwise!)
-pts = data.frame(x = c(1,2,1.7,1.3),
-                 y = c(1,1,2,2))
+pts <- data.frame(
+  x = c(1, 2, 1.7, 1.3),
+  y = c(1, 1, 2, 2)
+)
 
 # Convert to SpatialPolygonsDataFrame
-pol = spoly(pts, crs = CRS(as.character(NA)))
+pol <- spoly(pts)
 
 # Plot it!
-ggplot() + gg(pol)
+ggplot() +
+  gg(pol)
 }
+
 }

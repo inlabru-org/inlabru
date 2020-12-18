@@ -2,58 +2,67 @@
 % Please edit documentation in R/bru.inference.R
 \name{summary.bru}
 \alias{summary.bru}
-\title{Summary for a \link{bru} fit}
+\alias{print.summary_bru}
+\title{Summary for an inlabru fit}
 \usage{
 \method{summary}{bru}(object, ...)
+
+\method{print}{summary_bru}(x, ...)
 }
 \arguments{
-\item{object}{An object obtained from a \link{bru} or \link{lgcp} call}
+\item{object}{An object obtained from a \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}} call}
 
-\item{...}{ignored arguments}
+\item{\dots}{ignored arguments}
+
+\item{x}{An \code{summary_bru2} object}
 }
 \description{
-Takes a fitted bru object produced by bru() or lgcp() and creates various summaries from it.
+Takes a fitted \code{bru} object produced by \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}} and creates
+various summaries from it.
 }
 \examples{
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
 
 # Simulate some covariates x and observations y
 input.df <- data.frame(x=cos(1:10))
 input.df <- within(input.df, y <- 5 + 2*x + rnorm(10, mean=0, sd=0.1))
 
 # Fit a Gaussian likelihood model
-fit <- bru(y ~ x + Intercept, "gaussian", input.df)
+fit <- bru(y ~ x + Intercept, family = "gaussian", data = input.df)
 
 # Obtain summary
 fit$summary.fixed
 }
 
   
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
   
 # Alternatively, we can use the like() function to construct the likelihood:
 
-lik = like(family = "gaussian", data = input.df)
-fit <- bru(y ~ x + Intercept, lik)
+lik = like(family = "gaussian", formula = y ~ x + Intercept, data = input.df)
+fit <- bru(~ x + Intercept(1), lik)
 fit$summary.fixed
 
 }
   
 # An important addition to the INLA methodology is bru's ability to use
 # non-linear predictors. Such a predictor can be formulated via like()'s 
-# \\code{formula} parameter. For instance
+# \code{formula} parameter. The z(1) notation is needed to ensure that
+# the z component should be interpreted as single latent variable and not
+# a covariate:
 
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
     
 z = 2
 input.df <- within(input.df, y <- 5 + exp(z)*x + rnorm(10, mean=0, sd=0.1))
-lik = like(family = "gaussian", data = input.df, formula = y ~ exp(z)*x + Intercept, E = 10000)
-fit <- bru( ~ z + Intercept, lik)
+lik = like(family = "gaussian", data = input.df,
+           formula = y ~ exp(z)*x + Intercept)
+fit <- bru( ~ z(1) + Intercept(1), lik)
 
 # Check the result (z posterior should be around 2)
 fit$summary.fixed
 }
-  
+
 }
 }

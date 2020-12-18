@@ -4,27 +4,36 @@
 \name{mrsea}
 \alias{mrsea}
 \title{Marine renewables strategic environmental assessment}
-\format{A list of objects:
- \describe{
-   \item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of 
-   XXXXX.}
-   \item{\code{samplers}:}{ A \code{SpatialLinesDataFrame} object containing the transect lines
-   that were surveyed.}
-   \item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation 
-   mesh (a type of discretization of continuous space) covering the survey region.}
-   \item{\code{boundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the 
-   survey region.}
-   \item{\code{covar}:}{ An \code{SpatialPointsDataFrame} containing sea depth estimates.}
- }}
+\format{
+A list of objects:
+\describe{
+\item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
+XXXXX.}
+\item{\code{samplers}:}{ A \code{SpatialLinesDataFrame} object containing the transect lines
+that were surveyed.}
+\item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation
+mesh (a type of discretization of continuous space) covering the survey region.}
+\item{\code{boundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
+survey region.}
+\item{\code{covar}:}{ An \code{SpatialPointsDataFrame} containing sea depth estimates.}
+}
+}
 \source{
 Library \code{MRSea}.
 }
+\usage{
+data(mrsea)
+}
 \description{
-Data imported from package MRSea, see http://creem2.st-andrews.ac.uk/software/
+Data imported from package MRSea, see \url{http://creem2.st-andrews.ac.uk/software/}
 }
 \examples{
- data(mrsea)
- ggplot() + gg(mrsea$mesh) + gg(mrsea$samplers) + gg(mrsea$points) + gg(mrsea$boundary)
+data(mrsea)
+ggplot() +
+  gg(mrsea$mesh) +
+  gg(mrsea$samplers) +
+  gg(mrsea$points) +
+  gg(mrsea$boundary)
 }
 \references{
 NONE YET

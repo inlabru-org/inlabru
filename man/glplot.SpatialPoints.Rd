@@ -16,12 +16,13 @@
 \item{...}{Parameters passed on to rgl.points()}
 }
 \description{
-This function will calculate the cartesian coordinates of the points provided 
+This function will calculate the cartesian coordinates of the points provided
 and use rgl.points() in order to render them.
 }
 \examples{
 \donttest{
-if (require("rgl", quietly = TRUE) &&
+if (bru_safe_inla() &&
+    require("rgl", quietly = TRUE) &&
     require("sphereplot", quietly = TRUE)) {
 
 # Load pantropoical dolphin data
@@ -43,8 +44,10 @@ glplot(mexdolphin$points)
 }
 }
 \seealso{
-Other inlabru RGL tools: \code{\link{globe}},
-  \code{\link{glplot.SpatialLines}},
-  \code{\link{glplot.inla.mesh}}, \code{\link{glplot}}
+Other inlabru RGL tools: 
+\code{\link{globe}()},
+\code{\link{glplot.SpatialLines}()},
+\code{\link{glplot.inla.mesh}()},
+\code{\link{glplot}()}
 }
 \concept{inlabru RGL tools}

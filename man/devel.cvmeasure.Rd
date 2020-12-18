@@ -4,8 +4,7 @@
 \alias{devel.cvmeasure}
 \title{Variance and correlations measures for prediction components}
 \usage{
-devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL,
-  mesh = NULL)
+devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL, mesh = NULL)
 }
 \arguments{
 \item{joint}{A joint \code{prediction} of two latent model components.}
@@ -26,7 +25,7 @@ Calculates local and integrated variance and correlation measures as introduced 
 }
 \examples{
 \donttest{
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla()) {
   
 # Load Gorilla data
 
@@ -37,18 +36,19 @@ data("gorillas", package = "inlabru")
 library(RColorBrewer)
 
 # Fit a model with two components:
-# 1) A spatial smoothe SPDE 
+# 1) A spatial smooth SPDE 
 # 2) A spatial covariate effect (vegetation)
 
-pcmatern <- inla.spde2.pcmatern(gorillas$mesh, 
-                                prior.sigma = c(0.1, 0.01), 
-                                prior.range = c(5, 0.01))
+  pcmatern <- INLA::inla.spde2.pcmatern(gorillas$mesh, 
+                                        prior.sigma = c(0.1, 0.01), 
+                                        prior.range = c(5, 0.01))
 
-cmp <- coordinates ~ vegetation(map = gorillas$gcov$vegetation, model = "factor") +
-  spde(map = coordinates, model = pcmatern, mesh = gorillas$mesh) -
+cmp <- coordinates ~ vegetation(gorillas$gcov$vegetation, model = "factor") +
+  spde(coordinates, model = pcmatern) -
   Intercept
 
-fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
+            domain = list(coordinates = gorillas$mesh))
 
 # Predict SPDE and vegetation at the mesh vertex locations
 
@@ -115,7 +115,7 @@ vm.int
 }
 }
 \references{
-Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017. 
+Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017.
 Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales.
 \url{https://arxiv.org/abs/1604.06013}
 }

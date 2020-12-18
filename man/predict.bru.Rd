@@ -4,40 +4,79 @@
 \alias{predict.bru}
 \title{Prediction from fitted bru model}
 \usage{
-\method{predict}{bru}(object, data = NULL, formula = NULL,
-  n.samples = 100, ...)
+\method{predict}{bru}(
+  object,
+  data = NULL,
+  formula = NULL,
+  n.samples = 100,
+  seed = 0L,
+  num.threads = NULL,
+  include = NULL,
+  exclude = NULL,
+  drop = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{An object obtained by calling \link{bru} or \link{lgcp}.}
 
-\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for the prediction.}
+\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for
+the prediction.}
 
-\item{formula}{A formula determining which effects to predict and how to combine them.}
+\item{formula}{A formula defining an R expression to evaluate for each generated
+sample. If \code{NULL}, the latent and hyperparameter states are generated
+as named list elements.}
 
-\item{n.samples}{Integer setting the number of samples to draw in order to calculate the posterior statistics. The default is rather low but provides a quick approximate result.}
+\item{n.samples}{Integer setting the number of samples to draw in order to
+calculate the posterior statistics. The default is rather low but provides
+a quick approximate result.}
 
-\item{...}{ignored arguments (S3 generic compatibility).}
+\item{seed}{Random number generator seed passed on to \code{inla.posterior.sample}}
+
+\item{num.threads}{Specification of desired number of threads for parallel
+computations. Default NULL, leaves it up to INLA.
+When seed != 0, overridden to "1:1"}
+
+\item{include}{Character vector of component labels that are needed by the
+predictor expression; Default: NULL (include all components that are not
+explicitly excluded)}
+
+\item{exclude}{Character vector of component labels that are not used by the
+predictor expression. The exclusion list is applied to the list
+as determined by the \code{include} parameter; Default: NULL (do not remove
+any components from the inclusion list)}
+
+\item{drop}{logical; If \code{keep=FALSE}, \code{data} is a \code{Spatial*DataFrame}, and the
+prediciton summary has the same number of rows as \code{data}, then the output is
+a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
+
+\item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
 }
 \value{
-a data.frame or Spatial* object with predicted mean values and other summary statistics attached.
+a data.frame or Spatial* object with predicted mean values and other
+summary statistics attached.
 }
 \description{
-Takes a fitted \code{bru} object produced by the function \link{bru}() and produces predictions given 
-a new set of values for the model covariates or the original values used for the model fit. The
-predictions can be based on any R expression that is valid given these values/covariates and the joint 
+Takes a fitted \code{bru} object produced by the function \url{bru} and produces
+predictions given a new set of values for the model covariates or the
+original values used for the model fit. The predictions can be based on any
+R expression that is valid given these values/covariates and the joint
 posterior of the estimated random effects.
- 
-Mean value predictions are accompanied by the standard errors, upper and lower 2.5% quantiles, the
-median, variance, coefficient of variation as well as the variance and minimum and maximum sample
-value drawn in course of estimating the statistics.
 }
 \details{
-Internally, this method calls \link{generate.bru} in order to draw samples from the model.
+Mean value predictions are accompanied by the standard errors, upper and
+lower 2.5\% quantiles, the
+median, variance, coefficient of variation as well as the variance and
+minimum and maximum sample
+value drawn in course of estimating the statistics.
+
+Internally, this method calls \code{\link[=generate.bru]{generate.bru()}} in order to draw samples from
+the model.
 }
 \examples{
 \donttest{
-if (require("INLA", quietly = TRUE)) {
-
+if (bru_safe_inla()) {
+    
 # Load the Gorilla data
 
 data(gorillas, package ="inlabru")
@@ -52,36 +91,36 @@ ggplot() +
 
 # Define SPDE prior
 
-matern <- inla.spde2.pcmatern(gorillas$mesh,
-                              prior.sigma = c(0.1, 0.01),
-                              prior.range = c(5, 0.01))
+matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+                                    prior.sigma = c(0.1, 0.01),
+                                    prior.range = c(5, 0.01))
 
 # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 
-cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept
 
 # Fit the model
-fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
+            domain = list(coordinates = gorillas$mesh))
 
 # Once we obtain a fitted model the predict function can serve various purposes. 
 # The most basic one is to determine posterior statistics of a univariate
 # random variable in the model, e.g. the intercept
 
-icpt <- predict(fit, NULL, ~ Intercept)
-rownames(icpt) = "Intercept"
+icpt <- predict(fit, NULL, ~ c(Intercept = Intercept_latent))
 plot(icpt)
 
 # The formula argument can take any expression that is valid within the model, for
 # instance a non-linear transformation of a random variable
 
-exp.icpt <- predict(fit, NULL, ~ exp(Intercept))
-rownames(exp.icpt) = "exp(Intercept)"
-plot(rbind(icpt, exp.icpt), bar = TRUE)
+exp.icpt <- predict(fit, NULL, ~ c("Intercept" = Intercept_latent,
+                                   "exp(Intercept)" = exp(Intercept_latent)))
+plot(exp.icpt, bar = TRUE)
 
 # The intercept is special in the sense that it does not depend on other variables
 # or covariates. However, this is not true for the smooth spatial effects 'mySmooth'.
 # In order to predict 'mySmooth' we have to define where (in space) to predict. For
-# this purpose, the second argument of the predict function can take \\code{data.frame}
+# this purpose, the second argument of the predict function can take \code{data.frame}
 # objects as well as Spatial objects. For instance, we might want to predict
 # 'mySmooth' at the locations of the mesh vertices. Using
 
@@ -117,12 +156,12 @@ ggplot() + gg(gorillas$mesh, color = mySmooth$mean)
 # SpatialPixels object covering the mesh
 
 pxl = pixels(gorillas$mesh)
-mySmooth = predict(fit, pxl, ~ mySmooth)
+mySmooth2 = predict(fit, pxl, ~ mySmooth)
 
 # This will give us a SpatialPixelDataFrame with the columns we are looking for
 
-head(mySmooth)
-ggplot() + gg(mySmooth)
+head(mySmooth2)
+ggplot() + gg(mySmooth2)
 
 }
 }

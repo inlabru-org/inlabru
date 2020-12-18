@@ -12,19 +12,18 @@ make_stable_integration_points(mesh, bnd, nsub = NULL)
 \item{bnd}{\code{inla.mesh.segment} defining the integration domain}
 
 \item{nsub}{number of subdivision points along each triangle edge, giving
- \code{(nsub + 1)^2} proto-integration points used to compute
+\code{(nsub + 1)^2} proto-integration points used to compute
 the vertex weights
-(default \code{9}, giving 100 proto-integration points)}
+(default \code{NULL=9}, giving 100 integration points for each triangle)}
 }
 \value{
 \code{list} with elements \code{loc} and \code{weight} with
-  one integration point for each mesh vertex of triangles overlapping
-  the integration domain
+integration points for the intersection of the mesh and polygon
 }
 \description{
 Basic robust integration weights for mesh/polygon intersections
 }
 \author{
-Finn Lindgren <\email{finn.lindgren@gmail.com}>
+Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \keyword{internal}

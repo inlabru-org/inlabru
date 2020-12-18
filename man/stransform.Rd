@@ -15,10 +15,10 @@ stransform(splist, crs)
 List of Spatial* objects
 }
 \description{
-This is a wrapper for the \link{spTransform} function provided by the \code{sp} package.
+This is a wrapper for the \link[sp:spTransform]{spTransform} function provided by the \code{sp} package.
 Given a spatial object (or a list thereof) it will transform the coordinate system according
 to the parameter \code{crs}. In addition to the usual spatial objects this function is
-also capables of transforming \link[INLA]{inla.mesh} objects that are equipped with a coordinate
+also capables of transforming \link[INLA:inla.mesh.create]{inla.mesh} objects that are equipped with a coordinate
 system.#'
 }
 \examples{
@@ -27,11 +27,18 @@ system.#'
 data("gorillas", package = "inlabru")
 
 # Take the mesh and transform it to latitude/longitude
-tmesh = stransform(gorillas$mesh, crs = CRS("+proj=longlat"))
+tmesh <- stransform(gorillas$mesh, crs = CRS("+proj=longlat"))
 
 # Compare original and transformed mesh
 
-multiplot(ggplot() + gg(gorillas$mesh) + ggtitle("Original mesh"),
-          ggplot() + gg(tmesh) + ggtitle("Transformed mesh"))
-}         
+multiplot(
+  ggplot() +
+    gg(gorillas$mesh) +
+    ggtitle("Original mesh"),
+  ggplot() +
+    gg(tmesh) +
+    ggtitle("Transformed mesh")
+)
+}
+
 }

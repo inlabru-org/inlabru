@@ -1,6 +1,6 @@
 \donttest{
-if (require("INLA", quietly = TRUE)) {
-
+if (bru_safe_inla()) {
+    
 # Load the Gorilla data
 
 data(gorillas, package ="inlabru")
@@ -15,31 +15,31 @@ ggplot() +
 
 # Define SPDE prior
 
-matern <- inla.spde2.pcmatern(gorillas$mesh,
-                              prior.sigma = c(0.1, 0.01),
-                              prior.range = c(5, 0.01))
+matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+                                    prior.sigma = c(0.1, 0.01),
+                                    prior.range = c(5, 0.01))
 
 # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 
-cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept
 
 # Fit the model
-fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary)
+fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
+            domain = list(coordinates = gorillas$mesh))
 
 # Once we obtain a fitted model the predict function can serve various purposes. 
 # The most basic one is to determine posterior statistics of a univariate
 # random variable in the model, e.g. the intercept
 
-icpt <- predict(fit, NULL, ~ Intercept)
-rownames(icpt) = "Intercept"
+icpt <- predict(fit, NULL, ~ c(Intercept = Intercept_latent))
 plot(icpt)
 
 # The formula argument can take any expression that is valid within the model, for
 # instance a non-linear transformation of a random variable
 
-exp.icpt <- predict(fit, NULL, ~ exp(Intercept))
-rownames(exp.icpt) = "exp(Intercept)"
-plot(rbind(icpt, exp.icpt), bar = TRUE)
+exp.icpt <- predict(fit, NULL, ~ c("Intercept" = Intercept_latent,
+                                   "exp(Intercept)" = exp(Intercept_latent)))
+plot(exp.icpt, bar = TRUE)
 
 # The intercept is special in the sense that it does not depend on other variables
 # or covariates. However, this is not true for the smooth spatial effects 'mySmooth'.
@@ -80,12 +80,12 @@ ggplot() + gg(gorillas$mesh, color = mySmooth$mean)
 # SpatialPixels object covering the mesh
 
 pxl = pixels(gorillas$mesh)
-mySmooth = predict(fit, pxl, ~ mySmooth)
+mySmooth2 = predict(fit, pxl, ~ mySmooth)
 
 # This will give us a SpatialPixelDataFrame with the columns we are looking for
 
-head(mySmooth)
-ggplot() + gg(mySmooth)
+head(mySmooth2)
+ggplot() + gg(mySmooth2)
 
 }
 }

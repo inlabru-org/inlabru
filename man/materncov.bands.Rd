@@ -4,8 +4,16 @@
 \alias{materncov.bands}
 \title{Matern correlation or covariance function approximate credible bands.}
 \usage{
-materncov.bands(manifold, dist, log.range, log.variance = NULL,
-  alpha = 2, quantile = 0.95, n = 64, S1.L = NULL)
+materncov.bands(
+  manifold,
+  dist,
+  log.range,
+  log.variance = NULL,
+  alpha = 2,
+  quantile = 0.95,
+  n = 64,
+  S1.L = NULL
+)
 }
 \arguments{
 \item{manifold}{Either "R1", "S1", "R2", or "S2", from
@@ -16,8 +24,7 @@ materncov.bands(manifold, dist, log.range, log.variance = NULL,
 covariances/correlations}
 
 \item{log.range}{A scalar or a list (mean, sd), such as produced by
-inla.spde.result(...)$summary.log.range.nominal[[1]][ c("mean",
-"sd")]}
+\code{inla.spde.result(...)$summary.log.range.nominal[[1]][c("mean","sd")]}}
 
 \item{log.variance}{Either \code{NULL}, a scalar, or vector of the
 same type as for log.range. When \code{NULL}, the correlations
@@ -35,23 +42,23 @@ cyclic interval}
 }
 \value{
 A list with estimated covariance or correlation (when \code{log.variance} is
-    \code{NULL}) functions:
+\code{NULL}) functions:
 \item{lower}{An approximate lower bound for the \code{quantile} credible region}
 \item{median}{The function for for the approximate median parameters quantile}
 \item{upper}{An approximate upper bound for the \code{quantile} credible region}
 }
 \description{
 Evaluate the covariance function for an inla.spde
-    objectPlots the posterior distribution of the range,
-    log(range), variance, or log(variance) parameter of a model's
-    SPDE component. Can also plot Matern correlation or covariance
-    function.
+objectPlots the posterior distribution of the range,
+log(range), variance, or log(variance) parameter of a model's
+SPDE component. Can also plot Matern correlation or covariance
+function.
 }
 \details{
 Uses a Gaussian assumption for the internal model parameters, and finds a region in parameter
 space with approximately \code{quantile} probability.
 }
 \author{
-Finn Lindgren <\email{Finn.Lindgren@ed.ac.uk}>
+Finn Lindgren \email{Finn.Lindgren@ed.ac.uk}
 }
 \keyword{internal}

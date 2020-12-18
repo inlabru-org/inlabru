@@ -10,9 +10,9 @@
 # @examples \\dontrun{}
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-make.covdata = function(mesh, values, mesh.coords, time.coords){
-  covdata = list(mesh=mesh, values=values, mesh.coords=mesh.coords, time.coords=time.coords)
-  class(covdata) = c("covdata","list")
+make.covdata <- function(mesh, values, mesh.coords, time.coords) {
+  covdata <- list(mesh = mesh, values = values, mesh.coords = mesh.coords, time.coords = time.coords)
+  class(covdata) <- c("covdata", "list")
   return(covdata)
 }
 
@@ -30,26 +30,31 @@ make.covdata = function(mesh, values, mesh.coords, time.coords){
 # @examples \\dontrun{}
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-covdata.import = function(dframe, colname, data){
-  
-  covloc = as.matrix(dframe[,data$mesh.coords])
-  scale = max(abs(dframe[,colname]))
-  dframe[,colname] = dframe[,colname]/scale
-  
-  spde.mdl = INLA::inla.spde2.matern(mesh = data$mesh, alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.1)
-  A = INLA::inla.spde.make.A(data$mesh, loc = covloc)
-  stack = INLA::inla.stack(data=list(y = dframe[,colname]), A=list(A,1), 
-                     effects = list(spde=1:spde.mdl$n.spde, m = rep(1,nrow(dframe))))
-  
-  result = INLA::inla( formula = y ~ f(spde, model = spde.mdl) -1, 
-                       family = "gaussian",
-                       data = INLA::inla.stack.data(stack),
-                       control.predictor = list(A = INLA::inla.stack.A(stack)),
-                       verbose = FALSE)
-        
-  value = scale * result$summary.random$spde[,"mode", drop = FALSE]
-  
-  depth = make.covdata(mesh = data$mesh, values = value, mesh.coords = data$mesh.coords, time.coords = NULL)
+covdata.import <- function(dframe, colname, data) {
+  covloc <- as.matrix(dframe[, data$mesh.coords])
+  scale <- max(abs(dframe[, colname]))
+  dframe[, colname] <- dframe[, colname] / scale
+
+  spde.mdl <- INLA::inla.spde2.matern(mesh = data$mesh, alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.1)
+  A <- INLA::inla.spde.make.A(data$mesh, loc = covloc)
+  stack <- INLA::inla.stack(
+    data = list(y = dframe[, colname]), A = list(A, 1),
+    effects = list(spde = 1:spde.mdl$n.spde, m = rep(1, nrow(dframe))),
+    # Make sure components with zero derivative are kept:
+    remove.unused = FALSE
+  )
+
+  result <- INLA::inla(
+    formula = y ~ f(spde, model = spde.mdl) - 1,
+    family = "gaussian",
+    data = INLA::inla.stack.data(stack),
+    control.predictor = list(A = INLA::inla.stack.A(stack)),
+    verbose = FALSE
+  )
+
+  value <- scale * result$summary.random$spde[, "mode", drop = FALSE]
+
+  depth <- make.covdata(mesh = data$mesh, values = value, mesh.coords = data$mesh.coords, time.coords = NULL)
 }
 
 
@@ -60,12 +65,18 @@ covdata.import = function(dframe, colname, data){
 # @aliases plot.covdata
 # @export
 # @param covdata A covariate data set
-# @examples \\dontrun{data(sst); plot.covariate(sst, time = 1)}
-# @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
+# @examples
+# \dontrun{
+# data(sst, package = "inlabru")
+# plot.covariate(sst, time = 1)
+# }
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
-plot.covdata = function(covdata, time = 1, fun=NULL, ...){
-  if (is.null(covdata$geometry)) { covdata$geometry = "euc" }
-  col = covdata$values[, time]
+plot.covdata <- function(covdata, time = 1, fun = NULL, ...) {
+  if (is.null(covdata$geometry)) {
+    covdata$geometry <- "euc"
+  }
+  col <- covdata$values[, time]
   pixelplot.mesh(data = covdata, col = col, ...)
 }
 
@@ -82,18 +93,22 @@ plot.covdata = function(covdata, time = 1, fun=NULL, ...){
 # @examples \\dontrun{data(sst); plot.covariate(sst, time = 1)}
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-make.covariate = function(cdata, method = NULL, ...){
-
-    if ( class(cdata)[1] == "covdata") { 
-      if ( is.null(method) ) { method = get.value }
-      return( function(loc){ method(cdata, loc) } )
-    }  
-
-    else if (class(cdata)[1] == "SpatialPolygonsDataFrame") {
-      if ( is.null(method) ) { method = shapefile.to.covariate }
-      return( method(cdata, ...) )
+make.covariate <- function(cdata, method = NULL, ...) {
+  if (class(cdata)[1] == "covdata") {
+    if (is.null(method)) {
+      method <- get.value
     }
-  
+    return(function(loc) {
+      method(cdata, loc)
+    })
+  }
+
+  else if (class(cdata)[1] == "SpatialPolygonsDataFrame") {
+    if (is.null(method)) {
+      method <- shapefile.to.covariate
+    }
+    return(method(cdata, ...))
+  }
 }
 
 
@@ -108,22 +123,22 @@ make.covariate = function(cdata, method = NULL, ...){
 # @examples \\dontrun{data(sst); get.value(sst,loc=data.frame(lon=-110,lat=0,year=1986))}
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-get.value = function(covariate,loc){
-  times = unique(loc[,covariate$time.coords])
-  values = numeric(length=nrow(loc))
-  if (length(times)>0) {
-    for (t in times){
-      msk = loc[,covariate$time.coords]==t
-      A = INLA::inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[msk,covariate$mesh.coords]))
-      inside = is.inside(covariate$mesh, loc = loc[,covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
-      values[msk] = as.vector(A%*%covariate$values[,as.character(t)])
-      values[msk & !inside] = NA
+get.value <- function(covariate, loc) {
+  times <- unique(loc[, covariate$time.coords])
+  values <- numeric(length = nrow(loc))
+  if (length(times) > 0) {
+    for (t in times) {
+      msk <- loc[, covariate$time.coords] == t
+      A <- INLA::inla.spde.make.A(covariate$mesh, loc = as.matrix(loc[msk, covariate$mesh.coords]))
+      inside <- is.inside(covariate$mesh, loc = loc[, covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
+      values[msk] <- as.vector(A %*% covariate$values[, as.character(t)])
+      values[msk & !inside] <- NA
     }
   } else {
-    A = INLA::inla.spde.make.A(covariate$mesh,loc=as.matrix(loc[,covariate$mesh.coords]))
-    inside = is.inside(covariate$mesh, loc = loc[,covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
-    values = as.vector(A%*%covariate$values[,1])
-    values[!inside] = NA
+    A <- INLA::inla.spde.make.A(covariate$mesh, loc = as.matrix(loc[, covariate$mesh.coords]))
+    inside <- is.inside(covariate$mesh, loc = loc[, covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
+    values <- as.vector(A %*% covariate$values[, 1])
+    values[!inside] <- NA
   }
   return(values)
 }
@@ -138,10 +153,12 @@ get.value = function(covariate,loc){
 # @examples \\dontrun{data(sst); get.max(sst)}
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-get.max = function(covariate,loc=NULL){
-  if (is.null(loc)){ return(max(as.vector(covariate$values))) }
+get.max <- function(covariate, loc = NULL) {
+  if (is.null(loc)) {
+    return(max(as.vector(covariate$values)))
+  }
   else {
-    vals = get.value(covariate,loc)
+    vals <- get.value(covariate, loc)
     return(max(vals))
   }
 }
@@ -156,10 +173,12 @@ get.max = function(covariate,loc=NULL){
 # @examples \\dontrun{data(sst); get.min(sst)}
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-get.min = function(covariate,loc=NULL){
-  if (is.null(loc)){ return(max(as.vector(covariate$values))) }
+get.min <- function(covariate, loc = NULL) {
+  if (is.null(loc)) {
+    return(max(as.vector(covariate$values)))
+  }
   else {
-    vals = get.value(covariate,loc)
+    vals <- get.value(covariate, loc)
     return(min(vals))
   }
 }
@@ -175,11 +194,11 @@ get.min = function(covariate,loc=NULL){
 # @examples \\dontrun{data(sst); get.min(sst)}
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-get.tmean = function(covariate,loc=NULL){
-  tm = apply(covariate$values,MARGIN=1,mean)
-  loc2 = loc[,covariate$mesh.coords,drop=FALSE]
-  A = INLA::inla.spde.make.A(covariate$mesh,loc=as.matrix(loc2))
-  values = as.vector(A%*%tm)
+get.tmean <- function(covariate, loc = NULL) {
+  tm <- apply(covariate$values, MARGIN = 1, mean)
+  loc2 <- loc[, covariate$mesh.coords, drop = FALSE]
+  A <- INLA::inla.spde.make.A(covariate$mesh, loc = as.matrix(loc2))
+  values <- as.vector(A %*% tm)
   return(values)
 }
 
@@ -201,27 +220,28 @@ get.tmean = function(covariate,loc=NULL){
 # @examples \\dontrun{data(sst); get.smean(sst)}
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-get.smean = function(covariate,loc=NULL,weights=NULL){
-  sm <- numeric(length=ifelse(is.null(loc), 0, dim(loc)[1]))
-  
+get.smean <- function(covariate, loc = NULL, weights = NULL) {
+  sm <- numeric(length = ifelse(is.null(loc), 0, dim(loc)[1]))
+
   if (is.null(weights)) {
     weights <- rep(1, covariate$mesh$n)
   }
-  weights <- weights * Matrix::diag(INLA::inla.mesh.fem(covariate$mesh, order=1)$c0)
+  weights <- weights * Matrix::diag(INLA::inla.mesh.fem(covariate$mesh, order = 1)$c0)
   weights <- weights / sum(weights)
-  
+
   loc2 <- data.frame(covariate$mesh$loc[, 1:length(covariate$mesh.coords),
-                                        drop=FALSE])
+    drop = FALSE
+  ])
   colnames(loc2) <- covariate$mesh.coords
-  
-  if (is.null(covariate$time.coords)){
+
+  if (is.null(covariate$time.coords)) {
     values <- get.value(covariate, loc2)
     sm <- sum(values * weights)
   } else {
-    for (t in unique(loc[,covariate$time.coords])){
+    for (t in unique(loc[, covariate$time.coords])) {
       loc2[[covariate$time.coords]] <- t
       values <- get.value(covariate, loc2)
-      sm[loc[covariate$time.coords]==t] <- sum(values * weights)
+      sm[loc[covariate$time.coords] == t] <- sum(values * weights)
     }
   }
   return(sm)
@@ -241,12 +261,12 @@ get.smean = function(covariate,loc=NULL,weights=NULL){
 # @examples \\dontrun{data(sst); get.min(sst)}
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-get.mean = function(covariate,loc=NULL, timepoints=NULL, weights=NULL){
+get.mean <- function(covariate, loc = NULL, timepoints = NULL, weights = NULL) {
   if (is.null(timepoints)) {
     timepoints <- as.numeric(unique(colnames(covariate$values)))
   }
   loc <- data.frame(time = timepoints)
   colnames(loc) <- covariate$time.coords
-  values <- get.smean(covariate, loc=loc, weights=weights)
+  values <- get.smean(covariate, loc = loc, weights = weights)
   return(mean(values))
 }

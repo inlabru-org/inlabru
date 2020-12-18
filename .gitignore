@@ -1,3 +1,6 @@
 .Rhistory
 .Rproj.user
 inst/doc
+tmp
+check
+docs

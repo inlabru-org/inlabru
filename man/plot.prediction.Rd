@@ -21,6 +21,7 @@ Generates a base ggplot2 using \link{ggplot} and adds a geom for input \code{x} 
 }
 \examples{
 \donttest{
+if (bru_safe_inla()) {
 # Generate some data
 
 input.df <- data.frame(x=cos(1:10))
@@ -28,11 +29,11 @@ input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
 
 # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
-fit <- bru(y ~ x, "gaussian", input.df)
+fit <- bru(y ~ x, family = "gaussian", data = input.df)
 
 # Predict posterior statistics of 'x'
 
-xpost = predict(fit, formula = ~ x)
+xpost <- predict(fit, data = NULL, formula = ~ x_latent)
 
 # The statistics include mean, standard deviation, the 2.5\% quantile, the median,
 # the 97.5\% quantile, minimum and maximum sample drawn from the posterior as well as
@@ -45,15 +46,16 @@ xpost
 ggplot() + gg(xpost)
 
 
-# The predict function can also be used to simulatenneously estimate posteriors
+# The predict function can also be used to simulataneously estimate posteriors
 # of multiple variables:
 
-xipost = predict(fit, formula = ~ data.frame(post = c(Intercept, x)))
+xipost = predict(fit, data = NULL,
+                 formula = ~ c(Intercept = Intercept_latent,
+                               x = x_latent))
 xipost
 
 # If we still want a plot in the previous style we have to set the bar parameter to TRUE
 
-rownames(xipost) = c("Intercept","x")
 p1 = ggplot() + gg(xipost, bar = TRUE)
 p1
 
@@ -74,7 +76,7 @@ plot(xipost)
 
 # This type of plot will show a ribbon around the mean, which viszualizes the upper and lower
 # quantiles mentioned above (2.5 and 97.5\%). Plotting the ribbon can be turned of using the
-# \\code{ribbon} parameter
+# \code{ribbon} parameter
 
 ggplot() + gg(xipost, ribbon = FALSE)
 
@@ -85,5 +87,6 @@ ggplot() +
   gg(xipost) +
   gg(xipost, mapping = aes(y = median), ribbon = FALSE, color = "red")
 
+}
 }
 }

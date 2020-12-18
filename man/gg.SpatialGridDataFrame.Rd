@@ -15,7 +15,7 @@
 A \link{geom_tile} value.
 }
 \description{
-Coerces input SpatialGridDataFrame to SpatialPixelsDataFrame and calls 
+Coerces input SpatialGridDataFrame to SpatialPixelsDataFrame and calls
 gg.SpatialPixelDataFrame to plot it.
 }
 \examples{
@@ -67,11 +67,13 @@ ggplot() + gg(mexdolphin$points, aes(size = size))
 }
 }
 \seealso{
-Other geomes for spatial data: \code{\link{gg.SpatialLines}},
-  \code{\link{gg.SpatialPixelsDataFrame}},
-  \code{\link{gg.SpatialPixels}},
-  \code{\link{gg.SpatialPoints}},
-  \code{\link{gg.SpatialPolygons}}, \code{\link{gg}},
-  \code{\link{gm}}
+Other geomes for spatial data: 
+\code{\link{gg.SpatialLines}()},
+\code{\link{gg.SpatialPixelsDataFrame}()},
+\code{\link{gg.SpatialPixels}()},
+\code{\link{gg.SpatialPoints}()},
+\code{\link{gg.SpatialPolygons}()},
+\code{\link{gg}()},
+\code{\link{gm}()}
 }
 \concept{geomes for spatial data}

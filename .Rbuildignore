@@ -1,3 +1,4 @@
+^_pkgdown\.yaml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
@@ -5,3 +6,11 @@
 ^README-.*\.png$
 ^cran-comments\.md$
 ^docs$
+^vignettes/web$
+^codecov\.yml$
+^\.github$
+^tmp$
+^check$
+^_pkgdown\.yml$
+^pkgdown$
+^vignettes/articles$

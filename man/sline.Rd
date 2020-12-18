@@ -4,8 +4,7 @@
 \alias{sline}
 \title{Convert data frame to SpatialLinesDataFrame}
 \usage{
-sline(data, start.cols, end.cols, crs = CRS(as.character(NA)),
-  to.crs = NULL)
+sline(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.crs = NULL)
 }
 \arguments{
 \item{data}{A data.frame}
@@ -22,11 +21,11 @@ sline(data, start.cols, end.cols, crs = CRS(as.character(NA)),
 SpatialLinesDataFrame
 }
 \description{
-A line in 2D space is defined by a start and an and point, each associated with 2D coordinates. 
+A line in 2D space is defined by a start and an and point, each associated with 2D coordinates.
 This function takes a /code{data.frame} as input and assumes that each row defines a line in space.
 In order to do so, the data frame must have at least four columns and the \code{start.cols} and
 \code{end.cols} parameters must be used to point out the names of the columns that define
-the start and end coordinates of the line. The data is then converted to a 
+the start and end coordinates of the line. The data is then converted to a
 \code{SpatialLinesDataFrame} \code{DF}. If a coordinate reference system \code{crs} is provided
 it is attached to \code{DF}. If also \code{to.crs} is provided, the coordinate system of \code{DF}
 is transfromed accordingly. Additional columns of the input data, e.g. covariates,
@@ -35,16 +34,22 @@ are retained and attached to \code{DF}.
 \examples{
 
 \donttest{
-# Create a data frame defining three lines 
-lns = data.frame(xs = c(1,2,3), ys = c(1,1,1), # start points
-                 xe = c(2,3,4), ye = c(2,2,2)) # end points
+# Create a data frame defining three lines
+lns <- data.frame(
+  xs = c(1, 2, 3), ys = c(1, 1, 1), # start points
+  xe = c(2, 3, 4), ye = c(2, 2, 2)
+) # end points
 
 
 # Conversion to SpatialLinesDataFrame without CRS
-spl = sline(lns, start.cols = c("xs","ys"), 
-            end.cols = c("xe","ye"))
+spl <- sline(lns,
+  start.cols = c("xs", "ys"),
+  end.cols = c("xe", "ye")
+)
 
 # Plot the lines
-ggplot() + gg(spl)
+ggplot() +
+  gg(spl)
 }
+
 }

@@ -12,12 +12,13 @@ glplot(object, ...)
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-glplot is a generic function for renders various kinds of spatial objects, i.e. Spatial* data 
+glplot is a generic function for renders various kinds of spatial objects, i.e. Spatial* data
 and inla.mesh objects. The function invokes particular methods which depend on the class of the first argument.
 }
 \examples{
 \donttest{
-if (require("rgl", quietly = TRUE) &&
+if (bru_safe_inla() &&
+    require("rgl", quietly = TRUE) &&
     require("sphereplot", quietly = TRUE)) {
 
 # Load pantropoical dolphin data
@@ -39,9 +40,10 @@ glplot(mexdolphin$points)
 }
 }
 \seealso{
-Other inlabru RGL tools: \code{\link{globe}},
-  \code{\link{glplot.SpatialLines}},
-  \code{\link{glplot.SpatialPoints}},
-  \code{\link{glplot.inla.mesh}}
+Other inlabru RGL tools: 
+\code{\link{globe}()},
+\code{\link{glplot.SpatialLines}()},
+\code{\link{glplot.SpatialPoints}()},
+\code{\link{glplot.inla.mesh}()}
 }
 \concept{inlabru RGL tools}
