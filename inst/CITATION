@@ -1,4 +1,4 @@
-citHeader("To cite excursions in publications use:")
+citHeader("To cite inlabru in publications use:")
 
 bibentry(bibtype = "Article",
   title = "{inlabru}: an {R} package for Bayesian spatial modelling from ecological survey data",
@@ -16,12 +16,35 @@ bibentry(bibtype = "Article",
   pages = "760--766",
   doi = "10.1111/2041-210X.13168",
   publisher = "British Ecological Society",
-  textVersion  =
+  textVersion =
       paste0("Fabian E. Bachl, Finn Lindgren, David L. Borchers, and Janine B. Illian (2019), ",
              "inlabru: an R package for Bayesian spatial modelling ",
              "from ecological survey data, ",
              "Methods in Ecology and Evolution, British Ecological Society, 10, 760--766, ",
              "doi:10.1111/2041-210X.13168.")
+)
+
+citEntry(entry = "Article",
+  header = "Related methodology papers:",
+  author = "Yuan, Yuan and Bachl, Fabian E. and Lindgren, Finn and Borchers, David L. and Illian, Janine B. and Buckland, Stephen T. and Rue, Håvard and Gerrodette, Tim",
+  doi = "10.1214/17-AOAS1078",
+  fjournal = "Annals of Applied Statistics",
+  journal = "Ann. Appl. Stat.",
+  month = "12",
+  number = "4",
+  pages = "2270--2297",
+  publisher = "The Institute of Mathematical Statistics",
+  title = "Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales",
+  url = "https://doi.org/10.1214/17-AOAS1078",
+  volume = "11",
+  year = "2017",
+  textVersion =
+      paste0("Yuan Yuan, Fabian E. Bachl, Finn Lindgren, David L. Borchers, ",
+             "Janine B. Illian, Stephen T. Buckland, Håvard Rue, and Tim Gerrodette (2017), ",
+             "Point process models for spatio-temporal distance sampling data ",
+             "from a large-scale survey of blue whales",
+             "Annals of Applied Statistics, 11, 2270--2297, ",
+             "doi:10.1214/17-AOAS1078.")
 )
 
 #  @Manual{,

@@ -19,10 +19,13 @@ The goal of [inlabru](http://inlabru.org) is to facilitate spatial
 modeling using integrated nested Laplace approximation via the [R-INLA
 package](http://www.r-inla.org). Additionally, implements a log Gaussian
 Cox process likelihood for modeling univariate and spatial point
-processes based on ecological survey data. See Yuan Yuan, Fabian E.
-Bachl, Finn Lindgren, David L. Borchers, Janine B. Illian, Stephen T.
-Buckland, Havard Rue, Tim Gerrodette (2017),
-[arXiv](https://arxiv.org/abs/1604.06013).
+processes based on ecological survey data. See Fabian E. Bachl, Finn
+Lindgren, David L. Borchers, and Janine B. Illian (2019), inlabru: an R
+package for Bayesian spatial modelling from ecological survey data,
+Methods in Ecology and Evolution, British Ecological Society, 10,
+760–766,
+[doi:10.1111/2041-210X.13168](https://doi.org/10.1111/2041-210X.13168),
+and `citation("inlabru")`.
 
 ## Installation
 
@@ -64,9 +67,10 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: parallel
 #> Loading required package: foreach
-#> This is INLA_99.99.9999 built 2020-11-16 11:55:26 UTC.
+#> This is INLA_20.12.10 built 2020-12-10 22:22:29 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
+#>  - Save 264.3Mb of storage running 'inla.prune()'
 library(ggplot2)
 
 # Load the data
@@ -76,9 +80,7 @@ data(gorillas, package = "inlabru")
 matern <- inla.spde2.pcmatern(gorillas$mesh, 
                               prior.sigma = c(0.1, 0.01), 
                               prior.range = c(5, 0.01))
-cmp <- coordinates ~ mySmooth(main = coordinates,
-                              model = matern) +
-                          Intercept
+cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 # Fit LGCP model
 fit <- lgcp(cmp,
             data = gorillas$nests,
@@ -98,7 +100,7 @@ ggplot() +
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" /> If you have
-an R installation with PROJ6/GDAL3, and INLA \>= 20.06.18, and loading
+an R installation with PROJ6/GDAL3, and INLA &gt;= 20.06.18, and loading
 old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
 method on them before they are fully usable. The `gorillas` object in
 inlabru has been updated, but not yet the other stored data sets.
