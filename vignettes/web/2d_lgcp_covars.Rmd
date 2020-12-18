@@ -25,7 +25,6 @@ Set things up
 library(INLA)
 library(inlabru)
 library(RColorBrewer)
-init.tutorial()
 ```
 
 Introduction

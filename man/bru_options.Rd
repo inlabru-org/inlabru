@@ -8,8 +8,6 @@
 \alias{bru_options_get}
 \alias{bru_options_set}
 \alias{bru_options_reset}
-\alias{iinla.getOption}
-\alias{iinla.setOption}
 \title{Create or update an options objects}
 \usage{
 bru_options(...)
@@ -25,10 +23,6 @@ bru_options_get(name = NULL, include_default = TRUE)
 bru_options_set(..., .reset = FALSE)
 
 bru_options_reset()
-
-iinla.getOption(name = NULL)
-
-iinla.setOption(...)
 }
 \arguments{
 \item{...}{A collection of named options, optionally including one or more
@@ -89,14 +83,6 @@ object
 \code{bru_options_set()} is used to set global package options.
 
 \code{bru_options_reset()} clears the global option overrides.
-
-\itemize{
-\item \code{iinla.getOption} is deprecated. Use \code{bru_option_get} instead.
-}
-
-\itemize{
-\item \code{iinla.setOption} is deprecated. Use \code{bru_option_set} instead.
-}
 }
 \section{Valid options}{
 
