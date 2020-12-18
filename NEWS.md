@@ -7,6 +7,8 @@
 * Direct access to the data objects in component inputs and predictor
   expressions, as `.data.`, allowing e.g. `covar(fun(.data.), ...)` for a complex
   covariate extractor method `fun()`
+  
+* Partial support for spherical manifold meshes
 
 # inlabru 2.1.15
 
@@ -16,14 +18,10 @@
 
 * New line search method to make the nonlinear inla iterations robust
 
-# inlabru 2.1.14.901
-
 * Method for updating old stored estimation objects
 
 * System for supplying mappings between latent models and evaluated effects
   via `bru_mapper` objects
-
-# inlabru 2.1.14.900
 
 * Improved factor support; Either as "contrast with the 1st level", via the
   special `"factor_contrast"` model, or all levels with model `"factor_full"`.
