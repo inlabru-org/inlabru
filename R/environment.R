@@ -784,8 +784,12 @@ requireINLA <- function(quietly = FALSE) {
 
 #' @title Global setting for tutorial sessions
 #'
-#' @description Increases verbosity and sets the inference strategy to empirical Bayes.
-#'
+#' @description Deprecated function. Use [bru_options_set()] to set specific
+#' options instead instead.  In versions <= 2.1.15, this function set the INLA
+#' integration strategy to "eb" to speed up calculations. This is normally not
+#' needed since version 2.2.0, since the only the final iteration will use
+#' other than "eb".
+#' 
 #' @aliases init.tutorial
 #' @export
 #'
@@ -799,12 +803,6 @@ requireINLA <- function(quietly = FALSE) {
 #' # Determine current bru defaults:
 #' bo <- bru_options_get()
 #'
-#' # By default, INLA's integration strategy is set to the INLA default 'auto':
-#' bo$control.inla
-#'
-#' # Now, let's run init.tutorial() to make empirical Bayes the default
-#' # integration method when `bru` calls `inla`
-#'
 #' init.tutorial()
 #'
 #' # Check if it worked:
@@ -812,8 +810,10 @@ requireINLA <- function(quietly = FALSE) {
 #' }
 #'
 init.tutorial <- function() {
+  .Deprecated("bru_options_set(bru_verbose = TRUE, control.compute = list(dic = TRUE, waic = TRUE))")
   message("Setting defaults for tutorial session.")
-  bru_options_set(bru_verbose = TRUE)
-  bru_options_set(control.inla = list(int.strategy = "eb"))
-  bru_options_set(control.compute = list(dic = TRUE, waic = TRUE))
+  local_bru_options_set(
+    bru_verbose = TRUE,
+    control.compute = list(dic = TRUE, waic = TRUE)
+  )
 }

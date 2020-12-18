@@ -36,19 +36,13 @@ library(inlabru)
 library(INLA)
 ```
 
-Use empricial Bayes in order to speed things up a little bit:
-```{r results="hide",warning=FALSE,message=FALSE}
-init.tutorial()
-```
-
-
 Get the data
 -----------------------------------------------------------------
  
 We'll start by loading the data and extracting the mesh (for convenience).
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-data(mexdolphin)
+data(mexdolphin, package = "inlabru")
 mesh = mexdolphin$mesh
 ```
 

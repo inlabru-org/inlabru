@@ -57,6 +57,9 @@ test_that("Component copy feature", {
   skip_on_cran()
   local_bru_safe_inla()
 
+  # Seed influences data as well as predict()!
+  set.seed(123L)
+
   mydata <- data.frame(
     x1 = rep(1:4, times = 2),
     x2 = rep(c(1, 2), each = 4)
@@ -84,6 +87,9 @@ test_that("Component copy feature with group", {
   skip_on_cran()
   local_bru_safe_inla()
   
+  # Seed influences data as well as predict()!
+  set.seed(123L)
+
   n <- c(16, 8)
   mydata <- data.frame(
     x1 = rep(seq_len(n[1]), times = n[2]),
@@ -113,7 +119,7 @@ test_that("Component copy feature with group", {
   expect_equal(
     fit_bru$summary.hyperpar,
     fit$summary.hyperpar,
-    tolerance = midtol
+    tolerance = hitol
   )
   
 })

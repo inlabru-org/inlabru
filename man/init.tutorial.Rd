@@ -7,7 +7,11 @@
 init.tutorial()
 }
 \description{
-Increases verbosity and sets the inference strategy to empirical Bayes.
+Deprecated function. Use \code{\link[=bru_options_set]{bru_options_set()}} to set specific
+options instead instead.  In versions <= 2.1.15, this function set the INLA
+integration strategy to "eb" to speed up calculations. This is normally not
+needed since version 2.2.0, since the only the final iteration will use
+other than "eb".
 }
 \examples{
 \dontrun{
@@ -15,12 +19,6 @@ Increases verbosity and sets the inference strategy to empirical Bayes.
 
 # Determine current bru defaults:
 bo <- bru_options_get()
-
-# By default, INLA's integration strategy is set to the INLA default 'auto':
-bo$control.inla
-
-# Now, let's run init.tutorial() to make empirical Bayes the default
-# integration method when `bru` calls `inla`
 
 init.tutorial()
 

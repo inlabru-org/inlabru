@@ -1639,7 +1639,16 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     previous_x <- 0 # TODO: construct from the initial linearisation state instead
   }
 
-  while ((k <= options$bru_max_iter) & !interrupt) {
+  do_final_integration <- (options$bru_max_iter == 1)
+  while (!interrupt) {
+    if ((k >= options$bru_max_iter) && !do_final_integration) {
+      do_final_integration <- TRUE
+      bru_log_message(
+        "iinla: Maximum iterations reached, running final INLA integration.",
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store
+      )
+    }
 
     # When running multiple times propagate theta
     if ((k > 1) || (!is.null(result) && !is.null(result$mode))) {
@@ -1675,7 +1684,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       )
     #        list.data(model$formula))
 
-    inla.options <-
+    inla.options.merged <-
       modifyList(
         inla.options,
         list(
@@ -1687,11 +1696,25 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           offset = stk.data[["BRU.offset"]]
         )
       )
+    if (!do_final_integration) {
+      # Compute the minimal amount required
+      inla.options.merged <-
+        modifyList(
+          inla.options.merged,
+          list(
+            control.inla = list(int.strategy = "eb"),
+            control.compute = list(config = FALSE,
+                                   dic = FALSE,
+                                   waic = FALSE),
+            control.predictor = list(compute = FALSE)
+          )
+        )
+    }
 
     result <- try_callstack(
       do.call(
         INLA::inla,
-        inla.options,
+        inla.options.merged,
         envir = environment(model$effects)
       )
     )
@@ -1707,7 +1730,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         immediate. = TRUE
       )
       bru_log_message(
-        paste0("iinla: Giving up and returning last successfully obtained result."),
+        paste0("iinla: Giving up and returning last successfully obtained result for diagnostic purposes."),
         verbose = TRUE,
         verbose_store = options$bru_verbose_store
       )
@@ -1756,45 +1779,50 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       }
     }
 
-    # Update stack given current result
-    state0 <- state
-    state <- evaluate_state(model,
-      lhoods = lhoods,
-      result = result,
-      property = "mode"
-    )[[1]]
-    if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
-      if (do_line_search) {
-        line_search <- bru_line_search(
-          model = model,
-          lhoods = lhoods,
-          lin = lin,
-          state0 = state0,
-          state = state,
-          A = A,
-          options = options
-        )
-        state <- line_search[["state"]]
+    # Only update the linearisation state after the non-final "eb" iterations:
+    if (!do_final_integration) {
+      # Update stack given current result
+      state0 <- state
+      state <- evaluate_state(model,
+                              lhoods = lhoods,
+                              result = result,
+                              property = "mode"
+      )[[1]]
+      if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
+        if (do_line_search) {
+          line_search <- bru_line_search(
+            model = model,
+            lhoods = lhoods,
+            lin = lin,
+            state0 = state0,
+            state = state,
+            A = A,
+            options = options
+          )
+          state <- line_search[["state"]]
+        }
+        if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
+          lin <- bru_compute_linearisation(
+            model,
+            lhoods = lhoods,
+            state = state,
+            A = A
+          )
+        }
+        if (identical(options$bru_method$taylor, "legacy")) {
+          stk <- joint_stackmaker(model, lhoods, state = list(state))
+        } else {
+          stk <- bru_make_stack(lhoods, lin, idx)
+        }
+        stk.data <- INLA::inla.stack.data(stk)
+        inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
       }
-      if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
-        lin <- bru_compute_linearisation(
-          model,
-          lhoods = lhoods,
-          state = state,
-          A = A
-        )
-      }
-      if (identical(options$bru_method$taylor, "legacy")) {
-        stk <- joint_stackmaker(model, lhoods, state = list(state))
-      } else {
-        stk <- bru_make_stack(lhoods, lin, idx)
-      }
-      stk.data <- INLA::inla.stack.data(stk)
-      inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
     }
 
-    # Stopping criterion
-    if (k > 1) {
+    # Stopping criteria
+    if (do_final_integration || (k >= options$bru_max_iter)) {
+      interrupt <- TRUE
+    } else if (!interrupt && (k > 1)) {
       max.dev <- options$bru_method$stop_at_max_rel_deviation
       dev <- abs(track[[k - 1]]$mean - track[[k]]$mean) / track[[k]]$sd
       ## do.call(c, lapply(by(do.call(rbind, track),
@@ -1811,10 +1839,10 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         verbose_store = options$bru_verbose_store,
         verbosity = 1
       )
-      interrupt <- all(dev < max.dev) && (!line_search[["active"]])
-      if (interrupt) {
+      do_final_integration <- all(dev < max.dev) && (!line_search[["active"]])
+      if (do_final_integration) {
         bru_log_message(
-          "iinla: Convergence criterion met, stopping INLA iteration.",
+          "iinla: Convergence criterion met, running final INLA integration.",
           verbose = options$bru_verbose,
           verbose_store = options$bru_verbose_store
         )
