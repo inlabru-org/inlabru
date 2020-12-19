@@ -1898,8 +1898,8 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #' When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
 #' surface temperature or elevation. Although it is straight forward to add this data to the input
 #' data frame or write a covariate function like in the previous section there is an even more
-#' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelDataFrame`,
-#' `SpatialPixelDataFrame` or `RasterLayer` objects. These can be provided directly via
+#' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelsDataFrame`,
+#' `SpatialPixelsDataFrame` or `RasterLayer` objects. These can be provided directly via
 #' the map parameter if the input data is a `SpatialPointsDataFrame`. inlabru will automatically
 #' evaluate and/or interpolate the coariate at your data locations when using code like
 #'

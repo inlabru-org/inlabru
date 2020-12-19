@@ -1,5 +1,7 @@
 # inlabru (development version)
 
+* Fixed issue with `predict()` logic for converting output to `Spatial*DataFrame`
+
 # inlabru 2.2.1
 
 * Fixed code regression bug for function input of covariates

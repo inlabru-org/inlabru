@@ -841,10 +841,7 @@ expand_to_dataframe <- function(x, data = NULL) {
   if (length(only_x) < length(names(x))) {
     x <- x[!(names(x) %in% names(data))]
   }
-  if (inherits(x, "SpatialPoints") &&
-      !inherits(x, "SpatialPointsDataFrame")) {
-    result <- sp::SpatialPointsDataFrame(x, data = data)
-  } else if (inherits(x, "SpatialPixels") &&
+  if (inherits(x, "SpatialPixels") &&
              !inherits(x, "SpatialPixelsDataFrame")) {
     result <- sp::SpatialPixelsDataFrame(x, data = data)
   } else if (inherits(x, "SpatialGrid") &&
@@ -856,6 +853,10 @@ expand_to_dataframe <- function(x, data = NULL) {
   } else if (inherits(x, "SpatialPolygons") &&
              !inherits(x, "SpatialPolygonsDataFrame")) {
     result <- sp::SpatialPolygonsDataFrame(x, data = data)
+  } else if (inherits(x, "SpatialPoints") &&
+             !inherits(x, "SpatialPointsDataFrame")) {
+    # Other classes inherit from SpatialPoints, so need to be handled first
+    result <- sp::SpatialPointsDataFrame(x, data = data)
   } else {
     result <- cbind(x, data)
   }
