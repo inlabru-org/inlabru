@@ -972,7 +972,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
       null.results <- vapply(inp, function(x) is.null(x), TRUE)
       if (all(null.results)) {
         warning(paste0(
-          "All covariate evaluations are NULL; an intercept component was likely intended.\n",
+          "All covariate evaluations for '", label, 
+          "' are NULL; an intercept component was likely intended.\n",
           "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
           "  Use explicit notation '+ ", label, "(1)' instead",
           if (identical(label, "Intercept")) {

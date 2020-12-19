@@ -180,7 +180,7 @@ eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
 # Fill in missing values in Spatial grids
 # @param data A SpatialPointsDataFrame, SpatialPixelsDataFrame, or a
 # SpatialGridDataFrame containg data to use for filling
-# @param data A, matrix, data.frame, or SpatialPoints or
+# @param where A, matrix, data.frame, or SpatialPoints or
 # SpatialPointsDataFrame, containing the locations of the evaluated values
 # @param values A vector of values to be filled in where `is.na(values)` is
 # `FALSE`
@@ -212,6 +212,11 @@ bru_fill_missing <- function(data, where, values,
     if (!fm_identical_CRS(data_crs, where_crs)) {
       warning("'data' and 'where' for spatial infilling have different CRS")
     }
+    where_coord <- sp::coordinates(where)
+  } else {
+    data_crs <- sp::CRS(NA_character_)
+    where_crs <- sp::CRS(NA_character_)
+    where_coord <- where
   }
 
   if (!is.null(selector)) {
@@ -233,7 +238,10 @@ bru_fill_missing <- function(data, where, values,
       values[selection == l] <-
         bru_fill_missing(
           data = data,
-          where = where[selection == l, , drop = FALSE],
+          where = sp::SpatialPoints(
+            where_coord[selection == l, , drop = FALSE],
+            proj4string = where_crs
+          ),
           values = values[selection == l],
           layer = l,
           batch_size = batch_size
@@ -256,8 +264,8 @@ bru_fill_missing <- function(data, where, values,
       by = 1
     )]
     dst <- rgeos::gDistance(
-      sp::SpatialPoints(data[data_ok, , drop = FALSE]),
-      sp::SpatialPoints(where[subset, , drop = FALSE]),
+      sp::SpatialPoints(data[data_ok, , drop = FALSE], proj4string = data_crs),
+      sp::SpatialPoints(where_coord[subset, , drop = FALSE], proj4string = where_crs),
       byid = TRUE
     )
 
