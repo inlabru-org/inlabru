@@ -1,5 +1,7 @@
 # inlabru (development version)
 
+* Fixed code regression bug for function input of covariates
+
 # inlabru 2.2.0
 
 * Support for the INLA "copy" feature, `comp2(input, copy = "comp1")`
