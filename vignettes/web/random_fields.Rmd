@@ -30,33 +30,14 @@ library(inlabru)
 library(mgcv)
 ```
 
-Set default INLA values for tutorial session,
-and make a shortcut to a nicer colour scale:
-
-
+Make a shortcut to a nicer colour scale:
 ```{r results="hide",warning=FALSE,message=FALSE}
-init.tutorial()
 colsc <- function(...) {
   scale_fill_gradientn(colours = rev(RColorBrewer::brewer.pal(11,"RdYlBu")),
                        limits = range(..., na.rm=TRUE))
 }
 ```
 
-This is precisely what `init.tutorial` does:
-
-```{r echo=FALSE}
-print(init.tutorial)
-```
-
-`bru_verbose=TRUE` prints iterated inla progression information
-
-`int.strategy="eb"` limits INLA to Empirical Bayes so that the
-examples run faster; no posterior integration over $\theta$ is performed.
-See `?INLA::control.inla` for some more information.
-
-The `control.compute` options turn on information needed for posterior sampling, and
-tells INLA to compute DIC and WAIC. See `?INLA::control.compute` for more information.
-Fitting to 1-dimensional gridded data (counts)
 
 Get the data
 -----------------------------------

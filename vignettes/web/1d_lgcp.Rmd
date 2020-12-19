@@ -22,8 +22,7 @@ knitr::opts_chunk$set(
 
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=FALSE}
-
-options(width=100) # sets width of ouput window
+options(width=100) # sets width of output window
 ```
 
 Introduction
@@ -41,12 +40,6 @@ library(inlabru)
 library(INLA)
 library(mgcv)
 ```
-
-Use empricial Bayes in order to speed things up a little bit:
-```{r results="hide",warning=FALSE,message=FALSE}
-init.tutorial()
-```
-
 
 
 Get the data

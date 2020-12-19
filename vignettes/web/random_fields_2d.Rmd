@@ -29,11 +29,9 @@ library(inlabru)
 library(mgcv)
 ```
 
-Set default INLA values for tutorial session,
-and make a shortcut to a nicer colour scale:
+Make a shortcut to a nicer colour scale:
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-init.tutorial()
 colsc <- function(...) {
   scale_fill_gradientn(colours = rev(RColorBrewer::brewer.pal(11,"RdYlBu")),
                        limits = range(..., na.rm=TRUE))

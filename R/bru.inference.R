@@ -2111,16 +2111,14 @@ print.summary_bru <- function(x, ...) {
 
 
 
-#' Old summary for an inlabru fit
-#'
+#' @describeIn inlabru-deprecated Old summary for an inlabru fit.
+#' 
 #' Takes a fitted `bru` object produced by [bru()] or [lgcp()] and creates
 #' various summaries from it.
 #'
 #' @export
 #' @param object An object obtained from a [bru()] or [lgcp()] call
-#' @param \dots ignored arguments
-#' @example inst/examples/bru.R
-#'
+#' @param \dots arguments passed on to other methods or ignored
 
 summary_bru <- function(object, ...) {
   .Deprecated(new = "summary")

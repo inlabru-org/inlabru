@@ -703,9 +703,9 @@ bru_log_active <- function(activation = NULL) {
 
 # Old options methods ----
 
-#' @details * `iinla.getOption` is deprecated. Use `bru_option_get` instead.
+#' @describeIn inlabru-deprecated Use `bru_option_get` instead.
+#' @param name character; an option name
 #' @export
-#' @rdname bru_options
 iinla.getOption <- function(name = NULL) {
   if (identical(name, "iinla.verbose")) {
     new_option <- "bru_verbose"
@@ -721,9 +721,8 @@ iinla.getOption <- function(name = NULL) {
 }
 
 
-#' @details * `iinla.setOption` is deprecated. Use `bru_option_set` instead.
+#' @describeIn inlabru-deprecated Use `bru_option_set` instead.
 #' @export
-#' @rdname bru_options
 iinla.setOption <- function(...) {
   iinla.setOption.core <- function(option = c(
                                      "control.compute",
@@ -782,9 +781,9 @@ requireINLA <- function(quietly = FALSE) {
 }
 
 
-#' @title Global setting for tutorial sessions
-#'
-#' @description Deprecated function. Use [bru_options_set()] to set specific
+#' @describeIn inlabru-deprecated Global setting for tutorial sessions.
+#' 
+#' Use [bru_options_set()] to set specific
 #' options instead instead.  In versions <= 2.1.15, this function set the INLA
 #' integration strategy to "eb" to speed up calculations. This is normally not
 #' needed since version 2.2.0, since the only the final iteration will use
@@ -808,7 +807,7 @@ requireINLA <- function(quietly = FALSE) {
 #' # Check if it worked:
 #' bru_options_get("control.inla")
 #' }
-#'
+
 init.tutorial <- function() {
   .Deprecated("bru_options_set(bru_verbose = TRUE, control.compute = list(dic = TRUE, waic = TRUE))")
   message("Setting defaults for tutorial session.")

@@ -25,7 +25,6 @@ Set things up
 library(INLA)
 library(inlabru)
 library(RColorBrewer)
-init.tutorial()
 ```
 
 Introduction
@@ -153,8 +152,10 @@ pcmatern <- inla.spde2.pcmatern(mesh,
                                 prior.sigma = c(0.1, 0.01), 
                                 prior.range = c(5, 0.01))
 
-mdl2 <- coordinates ~ vegetation(gcov$vegetation, model = "factor_full") - Intercept +
-                      mySmooth(map = coordinates, model = pcmatern) 
+mdl2 <- coordinates ~
+  -1 +
+  vegetation(gcov$vegetation, model = "factor_full") +
+  mySmooth(coordinates, model = pcmatern) 
 
 fit2 <- lgcp(mdl2, nests, samplers = boundary, domain = list(coordinates = mesh))
 ```
@@ -183,12 +184,10 @@ Lambda2
 ```
 
 Look at the contributions to the linear predictor from the SPDE and from vegetation:
-
-
 ```{r warning=FALSE,message=FALSE,eval=TRUE}
-lp2 <- predict(fit2, df, ~ mySmooth+vegetation)
-lp2.spde <- predict(fit2, df, ~ mySmooth)
-lp2.veg <- predict(fit2, df, ~ vegetation)
+lp2 <- predict(fit2, df, ~ list(smooth_veg = mySmooth+vegetation,
+                                smooth = mySmooth,
+                                veg = vegetation))
 ```
 
 The function `scale_fill_gradientn` sets the scale 
@@ -197,16 +196,16 @@ components being plotted (medians are plotted by default).
 
 
 ```{r warning=FALSE,message=FALSE,eval=TRUE}
-lprange <- range(lp2$median,lp2.veg$median,lp2.spde$median)
+lprange <- range(lp2$smooth_veg$median,lp2$smooth$median,lp2$veg$median)
 csc <- scale_fill_gradientn(colours = brewer.pal(9,"YlOrRd"), limits = lprange)
 
-plot.lp2 <- ggplot() + gg(lp2) + csc + theme(legend.position = "bottom") +
+plot.lp2 <- ggplot() + gg(lp2$smooth_veg) + csc + theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) + ggtitle("mySmooth + vegetation") + coord_equal()
 
-plot.lp2.spde <- ggplot() + gg(lp2.spde) + csc + theme(legend.position = "bottom") +
+plot.lp2.spde <- ggplot() + gg(lp2$smooth) + csc + theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) + ggtitle("mySmooth") + coord_equal()
 
-plot.lp2.veg <- ggplot() + gg(lp2.veg) + csc + theme(legend.position = "bottom") +
+plot.lp2.veg <- ggplot() + gg(lp2$veg) + csc + theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) + ggtitle("vegetation") + coord_equal()
 
 multiplot(plot.lp2, plot.lp2.spde, plot.lp2.veg, cols = 3)
@@ -219,13 +218,13 @@ between models on the basis of DIC, using 'deltaIC()'.
 
 
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
-
-mdl3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept
+mdl3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept(1)
 fit3 <- lgcp(mdl3,
              data = nests,
              samplers = boundary,
              domain = list(coordinates = mesh))
-
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
 int3 <- predict(fit3, df, ~ exp(mySmooth + Intercept))
 
 ggplot() + 
@@ -233,8 +232,11 @@ ggplot() +
   gg(boundary, alpha = 0) + 
   gg(nests) +
   coord_equal()
-
-Lambda3 <- predict(fit3, ipoints(boundary, mesh), ~ sum(weight * exp(mySmooth + Intercept)))
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
+Lambda3 <- predict(fit3,
+                   ipoints(boundary, mesh),
+                   ~ sum(weight * exp(mySmooth + Intercept)))
 Lambda3
 
 deltaIC(fit1, fit2, fit3)
@@ -258,11 +260,9 @@ which contains the fixed effect marginal distribution data
 
 
 ```{r warning=FALSE,message=FALSE,eval=TRUE}
-fn <- names(fit2$marginals.random$vegetation)
-fn
-flist <- vector("list",length(fn))
-for(i in 1:length(fn)) flist[[i]] <- plot(fit2, fn[i])
-multiplot(flist[[1]], flist[[2]], flist[[3]], flist[[4]], flist[[5]], flist[[6]], cols=3)
+flist <- vector("list", NROW(fit2$summary.random$vegetation))
+for(i in seq_along(flist)) flist[[i]] <- plot(fit2, "vegetation", index = i)
+multiplot(plotlist = flist, cols=3)
 ```
 
 Use `spde.posterior( )` to obtain and then plot the SPDE parameter posteriors and the 
@@ -367,7 +367,7 @@ Predict and plot the density
 
 
 ```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
-e.int <- predict(efit, pixels(mesh), ~ exp(mySmooth + elev + Intercept))
+e.int <- predict(efit, pixels(mesh, mask = boundary), ~ exp(mySmooth + elev + Intercept))
 
 ggplot() + 
   gg(e.int) + 
@@ -380,19 +380,12 @@ Now look at the elevation and SPDE effects in space. Leave out the Intercept
 because it swamps the spatial effects of elevation and the SPDE in the 
 plots and we are interested in comparing the effects of elevation and the SPDE.
 
-First we need to predict on the linear predictor scale. Do this by putting the 
-appropriate text in place of '??' below. 
- 
-
-```{r warning=FALSE,message=FALSE,eval=FALSE}
-e.lp <- predict(efit, coordinates ~ ??) # elevation effect and SPDE effect
-e.lp.elev <- predict(efit, coordinates ~ ??) # elevation effect only
-e.lp.spde <- predict(efit, coordinates ~ ??) # SPDE effect only
-```
+First we need to predict on the linear predictor scale.
 ```{r warning=FALSE,message=FALSE,eval=TRUE,echo=TRUE}
-e.lp <- predict(efit, pixels(mesh),  ~ mySmooth + elev) # SOLUTION
-e.lp.elev <- predict(efit, pixels(mesh), ~ elev)
-e.lp.spde <- predict(efit, pixels(mesh), ~ mySmooth)
+e.lp <- predict(efit, pixels(mesh, mask = boundary), 
+  ~ list(smooth_elev = mySmooth + elev,
+         elev = elev,
+         smooth = mySmooth))
 ```
 
 The code below, which is very similar to that used for the vegetation factor
@@ -400,18 +393,19 @@ variable, produces the plots we want.
 
 
 ```{r warning=FALSE,message=FALSE,eval=TRUE, fig.height=5, fig.width=13}
-lprange <- range(e.lp$mean, e.lp.elev$mean, e.lp.spde$mean)
+lprange <- range(e.lp$smooth_elev$mean, e.lp$elev$mean, e.lp$smooth$mean)
 
 library(RColorBrewer)
 csc <- scale_fill_gradientn(colours = brewer.pal(9,"YlOrRd"), limits = lprange)
 
-plot.e.lp <- ggplot() + gg(e.lp) + csc + theme(legend.position = "bottom") +
+plot.e.lp <- ggplot() + gg(e.lp$smooth_elev, mask = boundary) +
+  csc + theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) + ggtitle("SPDE + elevation") + coord_equal()
 
-plot.e.lp.spde <- ggplot() + gg(e.lp.spde) + csc + theme(legend.position = "bottom") +
+plot.e.lp.spde <- ggplot() + gg(e.lp$smooth, mask = boundary) + csc + theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) + ggtitle("SPDE") + coord_equal()
 
-plot.e.lp.elev <- ggplot() + gg(e.lp.elev) + csc + theme(legend.position = "bottom")+
+plot.e.lp.elev <- ggplot() + gg(e.lp$elev, mask = boundary) + csc + theme(legend.position = "bottom")+
   gg(boundary, alpha = 0) + ggtitle("elevation") + coord_equal()
 
 multiplot(plot.e.lp, 
@@ -425,11 +419,9 @@ Adapt the code used for the vegetation factor to do this.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-fn <- names(efit$marginals.fixed)
-flist <- vector("list",length(fn))
-for(i in 1:length(fn)) flist[[i]] <- plot(efit,fn[i])
-
-multiplot(flist[[1]], flist[[2]], cols = 2)
+flist <- vector("list", NROW(efit$summary.fixed))
+for(i in seq_along(flist)) flist[[i]] <- plot(efit, rownames(efit$summary.fixed)[i])
+multiplot(plotlist = flist, cols=2)
 ```
 
 Plot the SPDE parameter posteriors and the Matern correlation and covariance functions
@@ -460,15 +452,16 @@ Lambda
 Nest.e <- predict(
   efit,
   ipoints(boundary, mesh), 
-  ~ data.frame(N = 500:800,
-               density = dpois(500:800,
-                               lambda = sum(weight * exp(mySmooth + elev + Intercept)))))
+  ~ data.frame(N = 200:1000,
+               density = dpois(200:1000,
+                               lambda = sum(weight * exp(mySmooth + elev + Intercept)))),
+  n.samples = 2000)
 ```
 
 Plot in the same way as in previous practicals
 
 ```{r }
-Nest.e$plugin_estimate <- dpois(Nest.e$N, lambda=Lambda$mean)
+Nest.e$plugin_estimate <- dpois(Nest.e$N, lambda=Lambda$median)
 ggplot(data = Nest.e) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +
   geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
@@ -497,14 +490,15 @@ mdl <- x ~
 
 fitcov1D <- lgcp(mdl, pts2, domain = list(x = mesh))
 pr.df <- data.frame(x = x)
-prcov1D <- predict(fitcov1D, pr.df,  ~ exp(beta_z + spde1D + Intercept))
-prcov1Dfx <- predict(fitcov1D, pr.df,  ~ exp(beta_z + Intercept))
-prcov1Dspde <- predict(fitcov1D, pr.df, ~ exp(spde1D))
+prcov1D <- predict(fitcov1D, pr.df, 
+                   ~ list(total = exp(beta_z + spde1D + Intercept),
+                          fx = exp(beta_z + Intercept),
+                          spde = exp(spde1D)))
 
 ggplot() +
-  gg(prcov1D, color = "red") +
-  geom_line(aes(x=prcov1Dspde$x,y=prcov1Dspde$median),col="blue",lwd=1.25) +
-  geom_line(aes(x=prcov1Dfx$x,y=prcov1Dfx$median),col="green",lwd=1.25) +
+  gg(prcov1D$total, color = "red") +
+  geom_line(aes(x=prcov1D$spde$x,y=prcov1D$spde$median),col="blue",lwd=1.25) +
+  geom_line(aes(x=prcov1D$fx$x,y=prcov1D$fx$median),col="green",lwd=1.25) +
   geom_point(data=pts2,aes(x=x), y=0.2,shape="|",cex=4) +
   xlab(expression(bold(s))) +
   ylab(expression(hat(lambda)(bold(s))~~"and its components")) +

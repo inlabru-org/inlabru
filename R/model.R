@@ -386,7 +386,7 @@ evaluate_predictor <- function(model,
                                predictor,
                                format = "auto") {
   stopifnot(inherits(model, "bru_model"))
-  format <- match.arg(format, c("auto", "data.frame", "matrix", "list"))
+  format <- match.arg(format, c("auto", "matrix", "list"))
   pred.envir <- environment(predictor)
   if (inherits(predictor, "formula")) {
     predictor <- parse(text = as.character(predictor)[length(as.character(predictor))])
@@ -445,8 +445,8 @@ evaluate_predictor <- function(model,
     result_ <- eval(predictor, envir = envir, enclos = enclos)
     if (k == 1) {
       if (identical(format, "auto")) {
-        if (is.vector(result_) ||
-          (is.matrix(result_) && (NCOL(result_) == 1))) {
+        if ((is.vector(result_) && !is.list(result_)) ||
+             (is.matrix(result_) && (NCOL(result_) == 1))) {
           format <- "matrix"
         } else {
           format <- "list"

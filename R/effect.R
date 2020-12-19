@@ -1212,7 +1212,7 @@ code.components <- function(components, add = "") {
 
       if (is.offset) {
         codes[[k]] <-
-          gsub(
+          sub(
             paste0(label, "("),
             paste0(
               fname, '("', label, '"',
@@ -1223,7 +1223,7 @@ code.components <- function(components, add = "") {
           )
       }
       else {
-        codes[[k]] <- gsub(paste0(label, "("),
+        codes[[k]] <- sub(paste0(label, "("),
           paste0(fname, "(\"", label, "\", "),
           code,
           fixed = TRUE

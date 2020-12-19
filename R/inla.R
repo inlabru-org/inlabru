@@ -321,24 +321,40 @@ inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
 
 
 
-
-plotmarginal.inla <- function(result, varname = NULL, link = function(x) {
+plotmarginal.inla <- function(result,
+                              varname = NULL,
+                              index = NULL,
+                              link = function(x) {
                                 x
-                              }, add = FALSE, ggp = TRUE, lwd = 3, ...) {
+                              },
+                              add = FALSE,
+                              ggp = TRUE,
+                              lwd = 3,
+                              ...) {
   vars <- variables.inla(result)
   ovarname <- varname
   if (paste0("Beta for ", varname) %in% rownames(vars)) {
     varname <- paste0("Beta for ", varname)
   }
 
-  if (varname %in% c(result$names.fixed, rownames(result$summary.hyperpar))) {
-    if (vars[varname, "type"] == "fixed") {
+  if (varname %in% c(result$names.fixed, rownames(result$summary.hyperpar)) ||
+      (!is.null(index) && (varname %in% names(result$summary.random)))) {
+    if (varname %in% rownames(vars) &&
+        vars[varname, "type"] == "fixed") {
       marg <- INLA::inla.tmarginal(link, result$marginals.fixed[[varname]])
     }
-    else if (vars[varname, "type"] == "random") {
-      marg <- INLA::inla.tmarginal(link, result$marginals.random[[varname]])
+    else if (varname %in% names(result$summary.random)) {
+      marg <- INLA::inla.tmarginal(link, result$marginals.random[[varname]][[index]])
+      ovarname <- paste0(ovarname, " ", index)
+      if (ovarname %in% rownames(vars) ) {
+        if (!identical(vars[ovarname, "ID"], as.character(index - 1))) {
+          # Use factor level name
+          ovarname <- vars[ovarname, "ID"]
+        }
+      }
     }
-    else if (vars[varname, "type"] == "hyperpar") {
+    else if (varname %in% rownames(vars) &&
+             vars[varname, "type"] == "hyperpar") {
       marg <- INLA::inla.tmarginal(link, result$marginals.hyperpar[[varname]])
     }
     uq <- INLA::inla.qmarginal(0.975, marg)

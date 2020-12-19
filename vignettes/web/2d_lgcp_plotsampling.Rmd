@@ -38,11 +38,6 @@ library(INLA)
 library(mgcv)
 ```
 
-Use empricial Bayes in order to speed things up a little bit:
-```{r results="hide",warning=FALSE,message=FALSE}
-init.tutorial()
-```
-
 Get the data
 -----------------------------------
 
