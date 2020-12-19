@@ -2090,7 +2090,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
         "' for '", label, "' returned some NA values.\n",
         "Attempting to fill in spatially by nearest available value.\n",
         "To avoid this basic covariate imputation, supply complete data."
-      )
+      ),
+      immediate. = TRUE
     )
 
     val <- bru_fill_missing(
