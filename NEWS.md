@@ -1,3 +1,5 @@
+# inlabru (development version)
+
 # inlabru 2.2.1
 
 * Fixed code regression bug for function input of covariates
