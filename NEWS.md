@@ -1,3 +1,5 @@
+# inlabru (development version)
+
 # inlabru 2.2.2
 
 * Fixed issue with `predict()` logic for converting output to `Spatial*DataFrame`
