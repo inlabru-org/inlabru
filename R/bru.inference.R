@@ -1641,6 +1641,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   }
 
   do_final_integration <- (options$bru_max_iter == 1)
+  do_final_theta_no_restart <- FALSE
   while (!interrupt) {
     if ((k >= options$bru_max_iter) && !do_final_integration) {
       do_final_integration <- TRUE
@@ -1697,7 +1698,18 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           offset = stk.data[["BRU.offset"]]
         )
       )
-    if (!do_final_integration) {
+    if (do_final_integration) {
+      if (do_final_theta_no_restart) {
+        # Compute the minimal amount required
+        inla.options.merged <-
+          modifyList(
+            inla.options.merged,
+            list(
+              control.mode = list(restart = FALSE)
+            )
+          )
+      }
+    } else {
       # Compute the minimal amount required
       inla.options.merged <-
         modifyList(
@@ -1842,8 +1854,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       )
       do_final_integration <- all(dev < max.dev) && (!line_search[["active"]])
       if (do_final_integration) {
+        do_final_theta_no_restart <- TRUE
         bru_log_message(
-          "iinla: Convergence criterion met, running final INLA integration.",
+          "iinla: Convergence criterion met, running final INLA integration with known theta mode.",
           verbose = options$bru_verbose,
           verbose_store = options$bru_verbose_store
         )
