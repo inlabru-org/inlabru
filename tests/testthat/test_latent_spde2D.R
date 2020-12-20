@@ -120,6 +120,11 @@ test_that("Georeferenced data with sp", {
     c(-2.6003077, -0.2699909, 3.5188725),
     tolerance = midtol
   )
+
+  pred_df <- pixels(mesh)
+  expect_s4_class(pred_df, "SpatialPixelsDataFrame")
+  pred <- predict(fit, pred_df, ~ exp(Intercept + field), n.samples = 5)
+  expect_s4_class(pred, "SpatialPixelsDataFrame")
 })
 
 

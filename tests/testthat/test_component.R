@@ -130,7 +130,7 @@ test_that("Component construction: unsafe intercepts", {
     {
       model <- bru_model(cmp, list(lik))
     },
-    "All covariate evaluations are NULL"
+    "All covariate evaluations for 'something_unknown' are NULL"
   )
 })
 

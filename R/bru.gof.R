@@ -95,7 +95,9 @@ bincount <- function(result, predictor, observations, breaks, nint = 20, probs =
     cdff <- function(p) pbinom(xx, size = nobs, prob = p)
     zz <- apply(qq[k, , drop = FALSE], MARGIN = 2, cdff)
     zz <- apply(zz, MARGIN = 1, mean)
-    pint[[k]] <- approx(zz, xx, xout = probs, rule = 2)$y
+    # Suppress warnings about duplicate zz values; these may appear in the
+    # tails, with zz==0 or zz==1. 
+    pint[[k]] <- suppressWarnings(approx(zz, xx, xout = probs, rule = 2)$y)
   }
   pint <- data.frame(do.call(rbind, pint))
   colnames(pint) <- paste0("q", probs)

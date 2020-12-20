@@ -458,56 +458,7 @@ component.character <- function(object,
   }
 
   # Special and general cases:
-  if (!is.null(copy)) {
-    # inla copy feature
-
-    # Store copy-model name or object in the environment
-    #    model_name <- paste0("BRU_", label, "_copy_model")
-    #    fcall[["copy"]] <- component$copy # as.symbol(model_name)
-    #    assign(model_name, component$copy, envir = component$env_extra)
-
-    # Remove parameters inlabru supports but INLA doesn't,
-    # or handles differently (weights)
-    fcall <- fcall[!(names(fcall) %in% c(
-      "main",
-      "weights",
-      "mapper",
-      "group_mapper",
-      "replicate_mapper",
-      "A.msk",
-      "map",
-      "mesh",
-      "main_layer",
-      "group_layer",
-      "replicate_layer",
-      "weights_layer",
-      "main_selector",
-      "group_selector",
-      "replicate_selector",
-      "weights_selector"
-    ))]
-
-    # Replace arguments that will be evaluated by a mapper
-    suffixes <- list(
-      "group" = "group",
-      "replicate" = "repl"
-    )
-    for (arg in names(suffixes)) {
-      if (arg %in% names(fcall)) {
-        fcall[[arg]] <- as.symbol(paste0(label, ".", suffixes[[arg]]))
-      }
-    }
-
-    component$inla.formula <-
-      as.formula(paste0(
-        "~ . + ",
-        as.character(parse(text = deparse(fcall)))
-      ),
-      env = envir
-      )
-
-    component$fcall <- fcall
-  } else if (component$main$type %in% c("offset")) {
+  if (component$main$type %in% c("offset")) {
     component$inla.formula <- as.formula(paste0("~ . + offset(", label, ")"),
       env = envir
     )
@@ -522,10 +473,17 @@ component.character <- function(object,
         replicate = component$replicate$mapper
       ))
   } else {
-    # Store model name or object in the environment
-    model_name <- paste0("BRU_", label, "_main_model")
-    fcall[["model"]] <- as.symbol(model_name)
-    assign(model_name, component$main$model, envir = component$env_extra)
+    if (!is.null(copy)) {
+      # Store copy-model name or object in the environment
+      #    model_name <- paste0("BRU_", label, "_copy_model")
+      #    fcall[["copy"]] <- component$copy # as.symbol(model_name)
+      #    assign(model_name, component$copy, envir = component$env_extra)
+    } else {
+      # Store model name or object in the environment
+      model_name <- paste0("BRU_", label, "_main_model")
+      fcall[["model"]] <- as.symbol(model_name)
+      assign(model_name, component$main$model, envir = component$env_extra)
+    }
 
     # Remove parameters inlabru supports but INLA doesn't,
     # and substitute parameters that inlabru will transform
@@ -560,40 +518,42 @@ component.character <- function(object,
       }
     }
 
-    # These values were previously initialised by an INLA::f call, but ::f
-    # should only be called by INLA, and never by inlabru, since it sets up
-    # temporary files that will not be removed, and also requires data not
-    # available at this point!  Until multi-stage model initialisation is
-    # implemented, require the user to explicitly provide these values.
-    if (!is.null(component$main$n)) {
-      fcall[["n"]] <- component$main$n
-    }
-    if (!is.null(season.length)) {
-      fcall[["season.length"]] <- season.length
-    }
-
-    # Make sure 'values' is setup properly.
-    if (is.null(component$main$values)) {
-      fcall <- fcall[!("values" %in% names(fcall))]
-    } else {
-      values_name <- paste0("BRU_", label, "_values")
-      fcall[["values"]] <- as.symbol(values_name)
-      assign(values_name, component$main$values, envir = component$env_extra)
-    }
-
-    # Setup factor precision parameter
-    if (identical(component$main$type, "factor")) {
-      if (is.null(fcall[["hyper"]])) {
-        # TODO: allow configuration of the precision via prec_linear
-        factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
-        fcall[["hyper"]] <- as.symbol(factor_hyper_name)
-        assign(factor_hyper_name,
-          list(prec = list(initial = log(1e-6), fixed = TRUE)),
-          envir = component$env_extra
-        )
+    if (is.null(copy)) {
+      # These values were previously initialised by an INLA::f call, but ::f
+      # should only be called by INLA, and never by inlabru, since it sets up
+      # temporary files that will not be removed, and also requires data not
+      # available at this point!  Until multi-stage model initialisation is
+      # implemented, require the user to explicitly provide these values.
+      if (!is.null(component$main$n)) {
+        fcall[["n"]] <- component$main$n
+      }
+      if (!is.null(season.length)) {
+        fcall[["season.length"]] <- season.length
+      }
+      
+      # Make sure 'values' is setup properly.
+      if (is.null(component$main$values)) {
+        fcall <- fcall[!("values" %in% names(fcall))]
+      } else {
+        values_name <- paste0("BRU_", label, "_values")
+        fcall[["values"]] <- as.symbol(values_name)
+        assign(values_name, component$main$values, envir = component$env_extra)
+      }
+      
+      # Setup factor precision parameter
+      if (identical(component$main$type, "factor")) {
+        if (is.null(fcall[["hyper"]])) {
+          # TODO: allow configuration of the precision via prec_linear
+          factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
+          fcall[["hyper"]] <- as.symbol(factor_hyper_name)
+          assign(factor_hyper_name,
+                 list(prec = list(initial = log(1e-6), fixed = TRUE)),
+                 envir = component$env_extra
+          )
+        }
       }
     }
-
+    
     component$inla.formula <-
       as.formula(paste0(
         "~ . + ",
@@ -601,7 +561,7 @@ component.character <- function(object,
       ),
       env = envir
       )
-
+    
     component$fcall <- fcall
   }
 
@@ -972,7 +932,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
       null.results <- vapply(inp, function(x) is.null(x), TRUE)
       if (all(null.results)) {
         warning(paste0(
-          "All covariate evaluations are NULL; an intercept component was likely intended.\n",
+          "All covariate evaluations for '", label, 
+          "' are NULL; an intercept component was likely intended.\n",
           "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
           "  Use explicit notation '+ ", label, "(1)' instead",
           if (identical(label, "Intercept")) {
@@ -1898,8 +1859,8 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #' When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
 #' surface temperature or elevation. Although it is straight forward to add this data to the input
 #' data frame or write a covariate function like in the previous section there is an even more
-#' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelDataFrame`,
-#' `SpatialPixelDataFrame` or `RasterLayer` objects. These can be provided directly via
+#' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelsDataFrame`,
+#' `SpatialPixelsDataFrame` or `RasterLayer` objects. These can be provided directly via
 #' the map parameter if the input data is a `SpatialPointsDataFrame`. inlabru will automatically
 #' evaluate and/or interpolate the coariate at your data locations when using code like
 #'
@@ -2089,7 +2050,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
         "' for '", label, "' returned some NA values.\n",
         "Attempting to fill in spatially by nearest available value.\n",
         "To avoid this basic covariate imputation, supply complete data."
-      )
+      ),
+      immediate. = TRUE
     )
 
     val <- bru_fill_missing(

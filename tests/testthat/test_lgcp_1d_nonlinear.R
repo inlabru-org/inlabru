@@ -44,9 +44,9 @@ test_that("Mexdolphin: Hazard rate detection function", {
 })
 
 
-# timings <- function(times = 10) {
+# timings <- function() {
 #   local_bru_options_set(bru_verbose = FALSE)
-#   microbenchmark::microbenchmark(
+#   bench::mark(
 #     legacy = {
 #       local_bru_options_set(bru_linearisation_method = "legacy")
 #       fit <- lgcp(
@@ -54,7 +54,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
 #         mexdolphin$points,
 #         ips = ips,
 #         formula = form,
-#         options = list(control.inla = list(int.strategy = "eb"))
+#         options = list(control.inla = list(int.strategy = "auto"))
 #       )
 #     },
 #     pandemic = {
@@ -64,14 +64,20 @@ test_that("Mexdolphin: Hazard rate detection function", {
 #         mexdolphin$points,
 #         ips = ips,
 #         formula = form,
-#         options = list(control.inla = list(int.strategy = "eb"))
+#         options = list(control.inla = list(int.strategy = "auto"))
 #       )
 #     },
-#     times = times
+#     check = FALSE,
+#     min_iterations = 2
 #   )
 # }
-#
-# timings(times = 10)
+# 
+# timings()
+# # A tibble: 2 x 13
+# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time         gc              
+# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <list>       <list>          
+#   1 legacy        1.36s    1.39s     0.722        NA     2.17     2     6      2.77s <NULL> <NULL> <bch:tm [2]> <tibble [2 × 3]>
+#   2 pandemic      1.36s    1.37s     0.732        NA     2.19     2     6      2.73s <NULL> <NULL> <bch:tm [2]> <tibble [2 × 3]>
 #
 # Unit: seconds
 # expr      min       lq     mean   median       uq      max neval cld

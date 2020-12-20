@@ -9,7 +9,9 @@
 \arguments{
 \item{x}{a fitted \link{bru} model.}
 
-\item{...}{A character naming the effect to plot, e.g. "Intercept".}
+\item{...}{A character naming the effect to plot, e.g. "Intercept". For random
+effects, adding \code{index = ...} plots the density for a single component of the
+latent model.}
 }
 \value{
 an object of class \code{gg}

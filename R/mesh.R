@@ -185,6 +185,9 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
       pixels <- pixels[is.inside(mesh, coordinates(pixels))]
     }
   } else {
+    if (inherits(mask, "SpatialPolygonsDataFrame")) {
+      mask <- as(mask, "SpatialPolygons")
+    }
     pixels <- pixels[!is.na(sp::over(pixels, mask))]
   }
 
