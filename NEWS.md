@@ -1,6 +1,12 @@
-# inlabru (development version)
+# inlabru 2.2.2
 
 * Fixed issue with `predict()` logic for converting output to `Spatial*DataFrame`
+
+* Use `control.mode=list(restart=FALSE)` in the final inla run for nonlinear
+  models, to avoid an unnecessary optimisation.
+
+* Fix issues in `pixels()` and ¬bru_fill_missing()` for `Spatial*DataFrame`
+  objects with ncol=0 data frame parts.
 
 # inlabru 2.2.1
 
