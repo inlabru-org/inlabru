@@ -61,11 +61,12 @@ Plot the points (the nests(. (The `ggplot2` function `coord_fixed()` sets the as
 which defaults to 1.)
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-ggplot() + gg(mesh) + 
-           gg(nests) + 
-           gg(boundary) + 
-           coord_fixed() + 
-           ggtitle("Points")
+ggplot() +
+  gg(mesh) +
+  gg(nests) +
+  gg(boundary) +
+  coord_fixed() +
+  ggtitle("Points")
 ```
 
 
@@ -91,13 +92,15 @@ an appropriate predictor spcification. The locations at which to predict should 
 
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-matern <- inla.spde2.pcmatern(mesh, 
-                              prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(5, 0.01))
+matern <- inla.spde2.pcmatern(mesh,
+  prior.sigma = c(0.1, 0.01),
+  prior.range = c(5, 0.01)
+)
 
 cmp <- coordinates ~ mySmooth(coordinates,
-                              model = matern) +
-                          Intercept
+  model = matern
+) +
+  Intercept
 
 fit <- lgcp(cmp, nests, samplers = boundary, domain = list(coordinates = mesh))
 ```
@@ -118,17 +121,17 @@ pred <- predict(
   )
 )
 
-pl1 <- ggplot() + 
-        gg(pred$lambda) + 
-        gg(boundary) + 
-        ggtitle("LGCP fit to Points", subtitle = "(Response Scale)") + 
-        coord_fixed() 
+pl1 <- ggplot() +
+  gg(pred$lambda) +
+  gg(boundary) +
+  ggtitle("LGCP fit to Points", subtitle = "(Response Scale)") +
+  coord_fixed()
 
-pl2 <- ggplot() + 
-        gg(pred$loglambda) + 
-        gg(boundary) + 
-        ggtitle("LGCP fit to Points", subtitle = "(Linear Predictor Scale)") + 
-        coord_fixed() 
+pl2 <- ggplot() +
+  gg(pred$loglambda) +
+  gg(boundary) +
+  ggtitle("LGCP fit to Points", subtitle = "(Linear Predictor Scale)") +
+  coord_fixed()
 
 multiplot(pl1, pl2, cols = 2)
 ```
@@ -142,7 +145,7 @@ ggplot() +
   gg(cbind(pred$lambda, data.frame(property = "q0.025")), aes(fill = q0.025)) +
   gg(cbind(pred$lambda, data.frame(property = "q0.975")), aes(fill = q0.975)) +
   coord_equal() +
-  facet_wrap(~ property)
+  facet_wrap(~property)
 ```
 
 
@@ -189,24 +192,29 @@ Lambda
 
 Given some generous interval boundaries (500, 800) for lambda we can estimate the posterior abundance distribution via
 ```{r,warning=FALSE,message=FALSE,echo=TRUE}
-Nest <- predict(fit, ipoints(boundary, mesh), 
-                ~ data.frame(N = 500:800,
-                             dpois(500:800,
-                                   lambda = sum(weight * exp(mySmooth + Intercept)))))
+Nest <- predict(
+  fit, ipoints(boundary, mesh),
+  ~ data.frame(
+    N = 500:800,
+    dpois(500:800,
+      lambda = sum(weight * exp(mySmooth + Intercept))
+    )
+  )
+)
 ```
 
 Get its quantiles via
 
 ```{r,warning=FALSE,message=FALSE,echo=TRUE}
-inla.qmarginal(c(0.025, 0.5, 0.975), marginal = list(x=Nest$N, y = Nest$mean))
+inla.qmarginal(c(0.025, 0.5, 0.975), marginal = list(x = Nest$N, y = Nest$mean))
 ```
 ... the mean via
 ```{r,warning=FALSE,message=FALSE,echo=TRUE}
-inla.emarginal(identity, marginal = list(x=Nest$N, y = Nest$mean))
+inla.emarginal(identity, marginal = list(x = Nest$N, y = Nest$mean))
 ```
 and plot posteriors:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-Nest$plugin_estimate <- dpois(Nest$N, lambda=Lambda$mean)
+Nest$plugin_estimate <- dpois(Nest$N, lambda = Lambda$mean)
 ggplot(data = Nest) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +
   geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))

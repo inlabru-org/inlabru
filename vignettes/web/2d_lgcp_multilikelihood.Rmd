@@ -48,11 +48,12 @@ data(gorillas, package = "inlabru")
 Plot the nests and visualize the group membership (major/minor) by color:
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-ggplot() + gg(gorillas$mesh) + 
-           gg(gorillas$nests, aes(color=group)) + 
-           gg(gorillas$boundary) + 
-           coord_fixed() +
-           ggtitle("Gorillas nests and group membership")
+ggplot() +
+  gg(gorillas$mesh) +
+  gg(gorillas$nests, aes(color = group)) +
+  gg(gorillas$boundary) +
+  coord_fixed() +
+  ggtitle("Gorillas nests and group membership")
 ```
 
 
@@ -63,55 +64,64 @@ First, we define all components that enter the joint model. That is, the interce
 the two different spatial smoothers, one for each nest group.
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-matern <- inla.spde2.pcmatern(gorillas$mesh, 
-                              prior.range = c(0.1, 0.01),
-                              prior.sigma = c(1, 0.01))
+matern <- inla.spde2.pcmatern(gorillas$mesh,
+  prior.range = c(0.1, 0.01),
+  prior.sigma = c(1, 0.01)
+)
 
 cmp <- ~
-  Common(coordinates, model = matern) + 
-  Difference(coordinates, model = matern) + 
+  Common(coordinates, model = matern) +
+  Difference(coordinates, model = matern) +
   Intercept(1)
-
 ```
 
 Given these components we define the linear predictor for each of the likelihoods.
 (Using "." indicates a pure additive model, and one can use include/exclude
 options for `like()` to indicate which components are actively involved in each model.)
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-fml.major = coordinates ~ Intercept + Common + Difference/2
-fml.minor = coordinates ~ Intercept + Common - Difference/2
+fml.major <- coordinates ~ Intercept + Common + Difference / 2
+fml.minor <- coordinates ~ Intercept + Common - Difference / 2
 ```
 
 Setting up the cox process integration points is easy in this example. Both nest types were observed within the same window.
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ips = ipoints(gorillas$boundary, gorillas$mesh)
+ips <- ipoints(gorillas$boundary, gorillas$mesh)
 ```
 Lastly, we define the two likelihoods...
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-lik_minor = like("cp", formula = fml.major,
-                 data = gorillas$nests[gorillas$nests$group == "major",],
-                 ips = ips)
-lik_major = like("cp", formula = fml.minor,
-                 data = gorillas$nests[gorillas$nests$group == "minor",],
-                 ips = ips)
+lik_minor <- like("cp",
+  formula = fml.major,
+  data = gorillas$nests[gorillas$nests$group == "major", ],
+  ips = ips
+)
+lik_major <- like("cp",
+  formula = fml.minor,
+  data = gorillas$nests[gorillas$nests$group == "minor", ],
+  ips = ips
+)
 ```
 ... which we provide to the ´bru´ function.
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-jfit = bru(cmp, lik_major, lik_minor,
-           options = list(control.inla = list(int.strategy = "eb"),
-                          bru_max_iter = 1))
+jfit <- bru(cmp, lik_major, lik_minor,
+  options = list(
+    control.inla = list(int.strategy = "eb"),
+    bru_max_iter = 1
+  )
+)
 ```
 
 ```{r, warning=FALSE,fig.width=8}
 library(patchwork)
 pl.major <- ggplot() +
   gg(gorillas$mesh,
-     mask = gorillas$boundary,
-     col = exp(jfit$summary.random$Common$mean))
+    mask = gorillas$boundary,
+    col = exp(jfit$summary.random$Common$mean)
+  )
 pl.minor <- ggplot() +
   gg(gorillas$mesh,
-     mask = gorillas$boundary,
-     col = exp(jfit$summary.random$Difference$mean))
+    mask = gorillas$boundary,
+    col = exp(jfit$summary.random$Difference$mean)
+  )
 (pl.major + scale_fill_continuous(trans = "log")) +
   (pl.minor + scale_fill_continuous(trans = "log")) &
   theme(legend.position = "right")
@@ -127,12 +137,14 @@ jfit <- bru_rerun(jfit)
 library(patchwork)
 pl.major <- ggplot() +
   gg(gorillas$mesh,
-     mask = gorillas$boundary,
-     col = exp(jfit$summary.random$Common$mean))
+    mask = gorillas$boundary,
+    col = exp(jfit$summary.random$Common$mean)
+  )
 pl.minor <- ggplot() +
   gg(gorillas$mesh,
-     mask = gorillas$boundary,
-     col = exp(jfit$summary.random$Difference$mean))
+    mask = gorillas$boundary,
+    col = exp(jfit$summary.random$Difference$mean)
+  )
 (pl.major + scale_fill_continuous(trans = "log")) +
   (pl.minor + scale_fill_continuous(trans = "log")) &
   theme(legend.position = "right")

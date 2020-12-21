@@ -33,8 +33,10 @@ Make a shortcut to a nicer colour scale:
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 colsc <- function(...) {
-  scale_fill_gradientn(colours = rev(RColorBrewer::brewer.pal(11,"RdYlBu")),
-                       limits = range(..., na.rm=TRUE))
+  scale_fill_gradientn(
+    colours = rev(RColorBrewer::brewer.pal(11, "RdYlBu")),
+    limits = range(..., na.rm = TRUE)
+  )
 }
 ```
 
@@ -49,44 +51,53 @@ First, we build a high resolution mesh for the true field, using low level INLA 
 
 ```{r }
 bnd <- spoly(data.frame(lon = c(0, 10, 10, 0), lat = c(0, 0, 10, 10)),
-             crs=inla.CRS("longlat"))
+  crs = inla.CRS("longlat")
+)
 mesh_fine <- inla.mesh.2d(boundary = bnd, max.edge = 0.2)
-ggplot() + gg(mesh_fine) + coord_equal()
+ggplot() +
+  gg(mesh_fine) +
+  coord_equal()
 
 # Note: the priors here will not be used in estimation
 matern_fine <-
-  inla.spde2.pcmatern(mesh_fine, 
-                      prior.sigma = c(1, 0.01), 
-                      prior.range = c(1, 0.01))
+  inla.spde2.pcmatern(mesh_fine,
+    prior.sigma = c(1, 0.01),
+    prior.range = c(1, 0.01)
+  )
 true_range <- 4
 true_sigma <- 1
-true_Q <- inla.spde.precision(matern_fine, theta=log(c(true_range, true_sigma)))
+true_Q <- inla.spde.precision(matern_fine, theta = log(c(true_range, true_sigma)))
 ```
 What is the pointwise standard deviation of the field? Along straight boundaries,
 the variance is twice the target variance. At corners the variance is 4 times as large.
 
 ```{r results="hide"}
 true_sd <- diag(inla.qinv(true_Q))^0.5
-ggplot() + gg(mesh_fine, col=true_sd) + coord_equal()
+ggplot() +
+  gg(mesh_fine, col = true_sd) +
+  coord_equal()
 ```
 
 Generate a sample from the model:
 
 ```{r }
-true_field <- inla.qsample(1, true_Q)[,1]
+true_field <- inla.qsample(1, true_Q)[, 1]
 
-truth <- expand.grid(lon=seq(0, 10, length=100),
-                     lat=seq(0, 10, length=100))
+truth <- expand.grid(
+  lon = seq(0, 10, length = 100),
+  lat = seq(0, 10, length = 100)
+)
 truth$field <- inla.mesh.project(mesh_fine,
-                                 loc = as.matrix(truth),
-                                 field = true_field)
+  loc = as.matrix(truth),
+  field = true_field
+)
 coordinates(truth) <- c("lon", "lat")
 truth <- as(truth, "SpatialPixelsDataFrame")
 
 pl_truth <- ggplot() +
-              gg(truth, mapping=aes_string("lon","lat",fill="field")) +
-              coord_equal() +
-              ggtitle("True field")
+  gg(truth, mapping = aes_string("lon", "lat", fill = "field")) +
+  coord_equal() +
+  ggtitle("True field")
 pl_truth
 
 ## Or with another colour scale:
@@ -100,10 +111,12 @@ Extract observations from some random locations:
 n <- 200
 mydata <- data.frame(lon = runif(n, 0, 10), lat = runif(n, 0, 10))
 mydata$observed <- inla.mesh.project(mesh_fine,
-                                     loc = as.matrix(mydata),
-                                     field = true_field) + rnorm(n, sd = 0.4)
+  loc = as.matrix(mydata),
+  field = true_field
+) + rnorm(n, sd = 0.4)
 coordinates(mydata) <- c("lon", "lat")
-ggplot() + gg(mydata)
+ggplot() +
+  gg(mydata)
 ```
 
 Estimating the field
@@ -113,30 +126,35 @@ Construct a mesh covering the data:
 
 ```{r }
 mesh <- inla.mesh.2d(boundary = bnd, max.edge = 0.5)
-ggplot() + gg(mesh) + coord_equal()
+ggplot() +
+  gg(mesh) +
+  coord_equal()
 ```
 
 Construct an SPDE model object for a Matern model:
 
 ```{r }
 matern <-
-  inla.spde2.pcmatern(mesh, 
-                      prior.sigma = c(10, 0.01), 
-                      prior.range = c(1, 0.01))
+  inla.spde2.pcmatern(mesh,
+    prior.sigma = c(10, 0.01),
+    prior.range = c(1, 0.01)
+  )
 ```
 
 Specify the model components:
 
 ```{r }
-cmp <- observed ~ field(map = coordinates,
-                        model = matern) +
-                  Intercept
+cmp <- observed ~ field(
+  map = coordinates,
+  model = matern
+) +
+  Intercept
 ```
 
 Fit the model and inspect the results:
 
 ```{r warning=FALSE,message=FALSE,results="hide"}
-fit <- bru(cmp, mydata, family="gaussian")
+fit <- bru(cmp, mydata, family = "gaussian")
 summary(fit)
 INLA:::summary.inla(fit)
 ```
@@ -146,11 +164,14 @@ a single realisation from the posterior distribution:
 
 ```{r warning=FALSE,message=FALSE}
 pix <- pixels(mesh, nx = 200, ny = 200)
-pred <- predict(fit, pix,
-                ~ field + Intercept)
+pred <- predict(
+  fit, pix,
+  ~ field + Intercept
+)
 samp <- generate(fit, pix,
-                ~ field + Intercept,
-                n.samples = 1)
+  ~ field + Intercept,
+  n.samples = 1
+)
 pred$sample <- samp[[1]]
 ```
 
@@ -159,23 +180,24 @@ Compare the truth to the estimated field
 
 
 ```{r results="hide",warning=FALSE,message=FALSE, pfig.height=5,fig.width=12}
-pl_posterior_mean <- ggplot() + 
-  gg(pred) + 
+pl_posterior_mean <- ggplot() +
+  gg(pred) +
   gg(bnd) +
-  ggtitle("Posterior mean") + 
+  ggtitle("Posterior mean") +
   coord_fixed()
-pl_posterior_sample <- ggplot() + 
-  gg(pred, mapping=aes_string(x="x", y="y", fill="sample")) + 
+pl_posterior_sample <- ggplot() +
+  gg(pred, mapping = aes_string(x = "x", y = "y", fill = "sample")) +
   gg(bnd) +
-  ggtitle("Posterior sample") + 
+  ggtitle("Posterior sample") +
   coord_fixed()
 
 # Common colour scale for the truth and estimate:
 csc <- colsc(truth$field, pred$mean, pred$sample)
 multiplot(pl_truth + csc,
-          pl_posterior_mean + csc,
-          pl_posterior_sample + csc,
-          cols = 3)
+  pl_posterior_mean + csc,
+  pl_posterior_sample + csc,
+  cols = 3
+)
 ```
 
 Plot the SPDE parameter and fixed effect parameter posteriors.
@@ -205,16 +227,28 @@ that the predicted intensity is in object `pred`).
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-csc <- colsc(pred@data["median"],
-             pred@data["q0.025"],
-             pred@data["q0.975"]) ## Common colour scale from SpatialPixelsDataFrame
+csc <- colsc(
+  pred@data["median"],
+  pred@data["q0.025"],
+  pred@data["q0.975"]
+) ## Common colour scale from SpatialPixelsDataFrame
 
-gmedian <- ggplot() + gg(pred["median"]) + coord_equal() + csc
-glower95 <- ggplot() + gg(pred["q0.025"]) + coord_equal() + csc + theme(legend.position = "none")
-gupper95 <- ggplot() + gg(pred["q0.975"]) + coord_equal() + csc + theme(legend.position = "none")
+gmedian <- ggplot() +
+  gg(pred["median"]) +
+  coord_equal() +
+  csc
+glower95 <- ggplot() +
+  gg(pred["q0.025"]) +
+  coord_equal() +
+  csc +
+  theme(legend.position = "none")
+gupper95 <- ggplot() +
+  gg(pred["q0.975"]) +
+  coord_equal() +
+  csc +
+  theme(legend.position = "none")
 
-multiplot(gmedian, glower95, gupper95, 
-          layout = matrix(c(1,1,2,3), byrow = TRUE, ncol = 2))
+multiplot(gmedian, glower95, gupper95,
+  layout = matrix(c(1, 1, 2, 3), byrow = TRUE, ncol = 2)
+)
 ```
-
-

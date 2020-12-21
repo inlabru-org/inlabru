@@ -41,19 +41,22 @@ Load the dataset:
 
 ```{r }
 data(mrsea, package = "inlabru")
-suppressWarnings({mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = TRUE)})
+suppressWarnings({
+  mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = TRUE)
+})
 ```
 
 The points (representing animals) and the sampling regions of this dataset are associated with a season. Let's have a look at the observed points and sampling regions for all seasons:
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-ggplot() + gg(mrsea$mesh) +
-           gg(mrsea$boundary) + 
-           gg(mrsea$samplers) +
-           gg(mrsea$points, size = 0.5) + 
-           coord_fixed() + 
-           facet_wrap(~ season) +
-           ggtitle("MRSea observation seasons")
+ggplot() +
+  gg(mrsea$mesh) +
+  gg(mrsea$boundary) +
+  gg(mrsea$samplers) +
+  gg(mrsea$points, size = 0.5) +
+  coord_fixed() +
+  facet_wrap(~season) +
+  ggtitle("MRSea observation seasons")
 ```
 
 Integration points
@@ -66,7 +69,10 @@ ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
 ```
 Plot the integration points:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ggplot() + gg(ips, aes(color = season)) + facet_wrap(~season) + coord_equal()
+ggplot() +
+  gg(ips, aes(color = season)) +
+  facet_wrap(~season) +
+  coord_equal()
 ```
 
 Fitting the model
@@ -75,13 +81,15 @@ Fitting the model
 Fit an LGCP model to the locations of the animals. In this example we will employ a spatio-temporal SPDE. Note how the `group` and `ngroup` parameters are employed to let the SPDE model know about the name of the time dimension (season) and the total number of distinct points in time. 
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-matern <- inla.spde2.pcmatern(mrsea$mesh, 
-                              prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(10, 0.01))
+matern <- inla.spde2.pcmatern(mrsea$mesh,
+  prior.sigma = c(0.1, 0.01),
+  prior.range = c(10, 0.01)
+)
 
 cmp <- coordinates + season ~ mySmooth(coordinates,
-                              model = matern, group = season, ngroup = 4) +
-                          Intercept
+  model = matern, group = season, ngroup = 4
+) +
+  Intercept
 
 fit <- lgcp(cmp, mrsea$points, ips = ips)
 ```
@@ -98,7 +106,7 @@ lambda1 <- predict(fit, ppxl_all, ~ data.frame(season = season, lambda = exp(myS
 pl1 <- ggplot() +
   gg(lambda1, aes(fill = mean)) +
   gg(mrsea$points, size = 0.3) +
-  facet_wrap(~ season) +
+  facet_wrap(~season) +
   coord_equal()
 pl1
 ```

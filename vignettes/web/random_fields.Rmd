@@ -33,8 +33,10 @@ library(mgcv)
 Make a shortcut to a nicer colour scale:
 ```{r results="hide",warning=FALSE,message=FALSE}
 colsc <- function(...) {
-  scale_fill_gradientn(colours = rev(RColorBrewer::brewer.pal(11,"RdYlBu")),
-                       limits = range(..., na.rm=TRUE))
+  scale_fill_gradientn(
+    colours = rev(RColorBrewer::brewer.pal(11, "RdYlBu")),
+    limits = range(..., na.rm = TRUE)
+  )
 }
 ```
 
@@ -57,7 +59,9 @@ Take a look at the count data.
 
 ```{r warning=FALSE,message=FALSE}
 cd
-ggplot(cd) + geom_point(aes(x, y = count)) + ylim(0, max(cd$count))
+ggplot(cd) +
+  geom_point(aes(x, y = count)) +
+  ylim(0, max(cd$count))
 ```
 
 _Tip_: `RStudio > Help > Cheatsheets > Data visualisation with ggplot2` is a useful 
@@ -94,7 +98,7 @@ First make vectors of x-values and associated (equal) exposures:
 
 ```{r }
 xs <- seq(0, 55, length = 100)
-exposures <- rep(cd$exposure[1], 100) 
+exposures <- rep(cd$exposure[1], 100)
 ```
 
 and put them in a data frame:
@@ -114,10 +118,10 @@ Ploting the fit and the data using the `ggplot2` commands below should give you 
 plot shown below
 
 ```{r }
-ggplot(dat4pred2) + 
-  geom_line(aes(x = x,y = gam), lty = 2) + 
+ggplot(dat4pred2) +
+  geom_line(aes(x = x, y = gam), lty = 2) +
   ylim(0, max(dat4pred2$gam, cd$count)) +
-  geom_point(aes(x = x, y = count),cd)
+  geom_point(aes(x = x, y = count), cd)
 ```
 
 Fitting an SPDE model with inlabru
@@ -133,7 +137,9 @@ mesh1D <- inla.mesh.1d(x, boundary = "free")
 
 
 ```{r fig.show="hide"}
-ggplot() + gg(mesh1D) + xlim(0,55)
+ggplot() +
+  gg(mesh1D) +
+  xlim(0, 55)
 ```
 
 ### Using function `bru( )` to fit to count data
@@ -159,8 +165,9 @@ pass it the 1D mesh that we created above, ``mesh1D`.
 
 ```{r }
 the_spde <- inla.spde2.pcmatern(mesh1D,
-                                prior.range=c(1, 0.01),
-                                prior.sigma=c(10, 0.01))
+  prior.range = c(1, 0.01),
+  prior.sigma = c(10, 0.01)
+)
 
 comp <- count ~ field(map = x, model = the_spde) + Intercept
 
@@ -174,7 +181,7 @@ Predict the values at the x points used for mesh
 
 ```{r }
 x4pred <- data.frame(x = xs)
-pred2.bru <- predict(fit2.bru, x4pred, x ~ exp(field+Intercept), n.samples=1000)
+pred2.bru <- predict(fit2.bru, x4pred, x ~ exp(field + Intercept), n.samples = 1000)
 ```
 
 Let's do a plot to compare the fitted model to the true model. The expected counts 
@@ -189,7 +196,7 @@ predictions on the count scale as well.)
 
 
 ```{r }
-true.lambda <- data.frame(x = cd$x, y = E_nc2/cd$exposure)
+true.lambda <- data.frame(x = cd$x, y = E_nc2 / cd$exposure)
 ```
 
 These `ggplot2` commands should generate the plot shown below. It shows the true 
@@ -198,21 +205,23 @@ and the fitted intensity function as a red curve, with 95% credible intervals
 shown as a light red band about the curve.
 
 ```{r }
-ggplot() + 
-  gg(pred2.bru) + 
-  geom_point(data = cd, aes(x = x, y = count/cd$exposure), cex = 2) + 
-  geom_point(data = true.lambda, aes(x, y), pch="_", cex = 9, col = "blue") +
-  xlab("x") + ylab("Intensity")
+ggplot() +
+  gg(pred2.bru) +
+  geom_point(data = cd, aes(x = x, y = count / cd$exposure), cex = 2) +
+  geom_point(data = true.lambda, aes(x, y), pch = "_", cex = 9, col = "blue") +
+  xlab("x") +
+  ylab("Intensity")
 ```
 
 Compare the `inlabru` fit to the `gam` fit:
 
 ```{r fig.show="hide"}
-ggplot() + 
+ggplot() +
   gg(pred2.bru) +
-  geom_point(data = cd , aes(x = x,y = count/exposure), cex = 2) + 
-  geom_line(data = dat4pred2, aes(x, gam/exposure), lty = 2) + 
-  xlab("x") + ylab("Intensity") 
+  geom_point(data = cd, aes(x = x, y = count / exposure), cex = 2) +
+  geom_line(data = dat4pred2, aes(x, gam / exposure), lty = 2) +
+  xlab("x") +
+  ylab("Intensity")
 ```
 
 ### Looking at the posterior distributions
@@ -263,6 +272,6 @@ funcitons as follows:
 
 
 ```{r warning=FALSE,message=FALSE}
-plot(spde.posterior(fit2.bru, "field", what="matern.correlation"))
-plot(spde.posterior(fit2.bru, "field", what="matern.covariance"))
+plot(spde.posterior(fit2.bru, "field", what = "matern.correlation"))
+plot(spde.posterior(fit2.bru, "field", what = "matern.covariance"))
 ```
