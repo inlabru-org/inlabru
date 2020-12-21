@@ -8,9 +8,7 @@
 #' If `FALSE`, forces `num.threads="1:1"`. Default: NULL, checks
 #' if running in testthat or non-interactively, in which case sets
 #' `multicore=FALSE`, otherwise `TRUE`.
-#' @param quietly logical; if `TRUE`, prints diagnostic messages. A message is
-#' always printed if the INLA `num.threads` option is altered, regardless of the
-#' `quietly` argument. Default: FALSE.
+#' @param quietly logical; if `TRUE`, prints diagnostic messages. Default: FALSE.
 #' @export
 #' @return logical; `TRUE` if INLA was loaded safely, otherwise FALSE
 #'

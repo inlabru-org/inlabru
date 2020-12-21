@@ -13,9 +13,7 @@ If \code{FALSE}, forces \code{num.threads="1:1"}. Default: NULL, checks
 if running in testthat or non-interactively, in which case sets
 \code{multicore=FALSE}, otherwise \code{TRUE}.}
 
-\item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. A message is
-always printed if the INLA \code{num.threads} option is altered, regardless of the
-\code{quietly} argument. Default: FALSE.}
+\item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. Default: FALSE.}
 }
 \value{
 logical; \code{TRUE} if INLA was loaded safely, otherwise FALSE
