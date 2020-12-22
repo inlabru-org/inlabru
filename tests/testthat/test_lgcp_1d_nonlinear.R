@@ -19,7 +19,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
     ips = ips,
     formula = form,
     options = list(
-      bru_verbose = 3,
+      bru_verbose = 0,
       control.inla = list(int.strategy = "auto"),
       bru_initial = list(lsig = -1)
     )

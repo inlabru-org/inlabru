@@ -20,11 +20,21 @@ point, or \code{NULL}. If non-null, overrides \code{options$bru_initial}}
 \item{data}{A data.frame}
 }
 \value{
-An \code{INLA::inla} object
+An \code{iinla} object that inherits from \code{INLA::inla}, with an
+added field \code{bru_iinla} with elements
+\describe{
+\item{log}{The diagnostic log messages produced by the run}
+\item{states}{The list of linearisation points, one for each inla run}
+\item{inla_stack}{The \code{inla.stack} object from the final inla run}
+\item{track}{A list of convergence tracking vectors}
+}
+If an inla run is aborted by an error, the returned object also contains
+an element \code{error} with the error object.
 }
 \description{
-This is an internal wrapper for iterated runs of \code{INLA::inla}. Before each run the
-\code{joint_stackmaker} function is used to set up the \code{INLA::inla.stack} for
-the next iteration.
+This is an internal wrapper for iterated runs of \code{INLA::inla}.
+For nonlinear models, a linearisation is done with
+\code{bru_compute_linearisation}, with a line search method between each
+iteration. The \code{INLA::inla.stack} information is setup by \code{\link[=bru_make_stack]{bru_make_stack()}}.
 }
 \keyword{internal}

@@ -1517,11 +1517,35 @@ bru_line_search <- function(model,
 }
 
 
+latent_names <- function(state) {
+  nm <- lapply(
+    names(state),
+    function(x) {
+      if (length(state[[x]]) == 1) {
+        x
+      } else {
+        paste0(x, ".", seq_len(length(state[[x]])))
+      }
+    })
+  names(nm) <- names(state)
+  nm
+}
+tidy_tracker <- function(state, value_name = "value") {
+  df <- data.frame(
+    effect = latent_names(state),
+    value = unlist(state)
+  )
+  names(df) <- c("effect", value_name)
+  df
+}
+
+
 #' Iterated INLA
 #'
-#' This is an internal wrapper for iterated runs of `INLA::inla`. Before each run the
-#' `joint_stackmaker` function is used to set up the `INLA::inla.stack` for
-#' the next iteration.
+#' This is an internal wrapper for iterated runs of `INLA::inla`.
+#' For nonlinear models, a linearisation is done with
+#' `bru_compute_linearisation`, with a line search method between each
+#' iteration. The `INLA::inla.stack` information is setup by [bru_make_stack()].
 #'
 #' @aliases iinla
 #' @export
@@ -1532,7 +1556,16 @@ bru_line_search <- function(model,
 #' initial states (missing elements are set to zero), to be used as starting
 #' point, or `NULL`. If non-null, overrides `options$bru_initial`
 #' @param options A `bru_options` object.
-#' @return An `INLA::inla` object
+#' @return An `iinla` object that inherits from `INLA::inla`, with an
+#' added field `bru_iinla` with elements
+#' \describe{
+#' \item{log}{The diagnostic log messages produced by the run}
+#' \item{states}{The list of linearisation points, one for each inla run}
+#' \item{inla_stack}{The `inla.stack` object from the final inla run}
+#' \item{track}{A list of convergence tracking vectors}
+#' }
+#' If an inla run is aborted by an error, the returned object also contains
+#' an element `error` with the error object.
 #' @keywords internal
 
 
@@ -1548,16 +1581,27 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       } else {
         bru_log_get()[-seq_len(initial_log_length)]
       },
-      state = state,
+      states = states,
       inla_stack = stk,
-      track = do.call(rbind, track),
+      track = if (is.null(original_track) ||
+                  setequal(names(original_track), names(track[[1]]))) {
+        do.call(rbind, c(list(original_track), track))
+      } else {
+        track <- do.call(rbind, track)
+        original_names <- names(original_track)
+        new_names <- names(track)
+        for (nn in setdiff(new_names, original_names)) {
+          original_track[[nn]] <- NA
+        }
+        for (nn in setdiff(original_names, new_names)) {
+          track[[nn]] <- NA
+        }
+        rbind(original_track, track)
+      },
       ...
     )
   }
   
-  # Track variables?
-  track <- list()
-
   # Initialise required local options
   inla.options <- modifyList(
     inla.options,
@@ -1582,12 +1626,18 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     }
   result <- NULL
   if (is.null(initial) || inherits(initial, "bru")) {
-    # Set old result
-    state <- evaluate_state(model,
-      lhoods = lhoods,
-      result = initial,
-      property = "mode"
-    )[[1]]
+    if (!is.null(initial[["bru_iinla"]][["states"]])) {
+      states <- initial[["bru_iinla"]][["states"]]
+      # The last linearisation point will be used again:
+      states <- c(states, states[length(states)])
+    } else {
+      # Set old result
+      states <- evaluate_state(model,
+                               lhoods = lhoods,
+                               result = initial,
+                               property = "mode"
+      )
+    }
     if (inherits(initial, "bru")) {
       result <- initial
     }
@@ -1604,25 +1654,41 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           )
       }
     }
+    states <- list(state)
     result <- NULL
   } else {
     stop("Unknown previous result information class")
   }
   old.result <- result
 
+  # Track variables
+  track <- list()
+  if (is.null(old.result[["bru_iinla"]][["track"]])) {
+    original_track <- NULL
+    track_size <- 0
+  } else {
+    original_track <- old.result[["bru_iinla"]][["track"]]
+    track_size <- max(original_track[["iteration"]])
+  }
+  
+  
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
     A <- evaluate_A(model, lhoods)
     lin <- bru_compute_linearisation(
       model,
       lhoods = lhoods,
-      state = state,
+      state = states[[length(states)]],
       A = A
     )
   }
   # Initial stack
   if (identical(options$bru_method$taylor, "legacy")) {
-    stk <- joint_stackmaker(model, lhoods, state = list(state))
+    stk <- joint_stackmaker(
+      model,
+      lhoods,
+      state = list(states[[length(states)]])
+    )
   } else {
     idx <- evaluate_index(model, lhoods)
     stk <- bru_make_stack(lhoods, lin, idx)
@@ -1632,7 +1698,11 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
   k <- 1
   interrupt <- FALSE
-  line_search <- list(active = FALSE, step_scaling = 1, state = state)
+  line_search <- list(
+    active = FALSE,
+    step_scaling = 1,
+    state = states[[length(states)]]
+  )
 
   if ((!is.null(result) && !is.null(result$mode))) {
     previous_x <- result$mode$x
@@ -1750,8 +1820,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       if (is.null(old.result)) {
         old.result <- list()
         class(old.result) <- c("iinla", "list")
-      } else {
-        class(old.result) <- c("iinla", "inla", "list")
+      } else if (!inherits(old.result, "iinla")) {
+        class(old.result) <- c("iinla", class(old.result))
       }
 
       old.result[["bru_iinla"]] <- collect_misc_info()
@@ -1765,13 +1835,18 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       # non-linearities that don't necessarily affect the fixed
       # effects may appear in the random effects, so we need to
       # track all of them.
-      track[[k]] <- data.frame(effect = NULL, iteration = NULL, mean = NULL, sd = NULL)
+      track[[k]] <- data.frame(effect = NULL,
+                               iteration = NULL,
+                               mean = NULL,
+                               mode = NULL,
+                               sd = NULL)
       if (!is.null(result$summary.fixed) && (nrow(result$summary.fixed) > 0)) {
         track[[k]] <-
           data.frame(
             effect = rownames(result$summary.fixed),
-            iteration = rep(k, nrow(result$summary.fixed)),
+            iteration = rep(track_size + k, nrow(result$summary.fixed)),
             mean = result$summary.fixed[, "mean"],
+            mode = result$summary.fixed[, "mode"],
             sd = result$summary.fixed[, "sd"]
           )
       }
@@ -1784,8 +1859,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             track[[k]],
             data.frame(
               effect = rownames(joined.random),
-              iteration = rep(k, nrow(joined.random)),
+              iteration = rep(track_size + k, nrow(joined.random)),
               mean = joined.random[, "mean"],
+              mode = joined.random[, "mode"],
               sd = joined.random[, "sd"]
             )
           )
@@ -1795,13 +1871,13 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     # Only update the linearisation state after the non-final "eb" iterations:
     if (!do_final_integration) {
       # Update stack given current result
-      state0 <- state
+      state0 <- states[[length(states)]]
       state <- evaluate_state(model,
                               lhoods = lhoods,
                               result = result,
                               property = "mode"
       )[[1]]
-      if ((options$bru_max_iter > 1) & (k < options$bru_max_iter)) {
+      if ((options$bru_max_iter > 1)) {
         if (do_line_search) {
           line_search <- bru_line_search(
             model = model,
@@ -1830,6 +1906,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         stk.data <- INLA::inla.stack.data(stk)
         inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
       }
+      # Store the state
+      states <- c(states, list(state))
     }
 
     # Stopping criteria
@@ -1837,7 +1915,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       interrupt <- TRUE
     } else if (!interrupt && (k > 1)) {
       max.dev <- options$bru_method$stop_at_max_rel_deviation
-      dev <- abs(track[[k - 1]]$mean - track[[k]]$mean) / track[[k]]$sd
+      dev <- abs(track[[k - 1]]$mode - track[[k]]$mode) / track[[k]]$sd
       ## do.call(c, lapply(by(do.call(rbind, track),
       ##                           as.factor(do.call(rbind, track)$effect),
       ##                           identity),
