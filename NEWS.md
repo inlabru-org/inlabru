@@ -10,7 +10,7 @@
 * Use `control.mode=list(restart=FALSE)` in the final inla run for nonlinear
   models, to avoid an unnecessary optimisation.
 
-* Fix issues in `pixels()` and ¬bru_fill_missing()` for `Spatial*DataFrame`
+* Fix issues in `pixels()` and `bru_fill_missing()` for `Spatial*DataFrame`
   objects with ncol=0 data frame parts.
 
 # inlabru 2.2.1
