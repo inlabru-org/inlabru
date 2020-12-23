@@ -10,7 +10,25 @@
 #' bru_standardise_names("Precision for the Gaussian observations")
 #' @export
 bru_standardise_names <- function(x) {
-  vapply(x, function(x) gsub("[-() ]", "_", x = x, fixed = FALSE), "name")
+  new_names <- vapply(
+    x,
+    function(x) {
+      gsub("[-() ]", "_", x = x, fixed = FALSE)
+    },
+    "name"
+  )
+  not_ok <- grepl("__", x = new_names)
+  while (any(not_ok)) {
+    new_names[not_ok] <- vapply(
+      new_names[not_ok],
+      function(x) {
+        gsub("__", "_", x = x, fixed = FALSE)
+      },
+      "name"
+    )
+    not_ok <- grepl("__", x = new_names)
+  }
+  new_names
 }
 
 
@@ -58,18 +76,60 @@ generate.inla <- function(object,
 
 
 
+inla_result_latent_idx <- function(result) {
+  do.call(
+    c,
+    lapply(result$misc$configs$contents$tag,
+           function(x) {
+             idx <- 
+               list(
+                 result$misc$configs$contents$start[
+                   result$misc$configs$contents$tag == x
+                 ] -1 + seq_len(
+                   result$misc$configs$contents$length[
+                     result$misc$configs$contents$tag == x
+                   ]
+                 )
+               )
+             names(idx) = x
+             idx
+           }
+    )
+  )
+}
+
 #' Extract a summary property from all results of an inla result
 #'
 #' @param result an `inla` result object
-#' @param property character;
+#' @param property character; "mean", "sd", "mode", or some other column
+#' identifier for inla result `$summary.fixed`, `$summary.random$label`, and
+#' `$summary.hyperpar`, or "joint_mode". For "joint_mode", the joint latent mode
+#' is extracted, and the joint hyperparameter mode, in the internal scale.
+#' @param internal_hyperpar logical; if `TRUE`, use internal scale for
+#' hyperparamter properties. Default is `FALSE`, except when `property` is
+#' "joint_mode" which forces `internal_hyperpar=TRUE`.
 #' @return named list for each estimated fixed effect coefficient,
 #' random effect vector, and hyperparameter. The hyperparameter names are
 #' standardised with [bru_standardise_names()]
 #' @keywords internal
-extract_property <- function(result, property) {
+extract_property <- function(result, property,
+                             internal_hyperpar = FALSE) {
   stopifnot(inherits(result, "inla"))
   ret <- list()
 
+  if (property == "joint_mode") {
+    mode_idx <- inla_result_latent_idx(result)
+    for (label in c(rownames(result$summary.fixed),
+                    names(result$summary.random))) {
+      ret[[label]] <- result$mode$x[mode_idx[[label]]]
+    }
+    theta_names <- bru_standardise_names(result$mode$theta.tags)
+    for (idx in seq_along(theta_names)) {
+      ret[[theta_names[idx]]] <- result$mode$theta[idx]
+    }
+    return(ret)
+  }
+  
   for (label in rownames(result$summary.fixed)) {
     ret[[label]] <- result$summary.fixed[label, property]
   }
@@ -78,11 +138,17 @@ extract_property <- function(result, property) {
     ret[[label]] <- result$summary.random[[label]][, property]
   }
 
-  for (label in rownames(result$summary.hyperpar)) {
-    new.label <- bru_standardise_names(label)
-    ret[[new.label]] <- result$summary.hyperpar[label, property]
+  if (internal_hyperpar) {
+    for (label in rownames(result$internal.summary.hyperpar)) {
+      new.label <- bru_standardise_names(label)
+      ret[[new.label]] <- result$internal.summary.hyperpar[label, property]
+    }
+  } else {
+    for (label in rownames(result$summary.hyperpar)) {
+      new.label <- bru_standardise_names(label)
+      ret[[new.label]] <- result$summary.hyperpar[label, property]
+    }
   }
-
 
   fac.names <- names(result$model$effects)[
     vapply(

@@ -1635,7 +1635,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       states <- evaluate_state(model,
                                lhoods = lhoods,
                                result = initial,
-                               property = "mode"
+                               property = "joint_mode"
       )
     }
     if (inherits(initial, "bru")) {
@@ -1781,12 +1781,14 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       }
     } else {
       # Compute the minimal amount required
+      # Note: configs = TRUE only because latent indexing into mode$x is
+      #   defined in configs$contents
       inla.options.merged <-
         modifyList(
           inla.options.merged,
           list(
             control.inla = list(int.strategy = "eb"),
-            control.compute = list(config = FALSE,
+            control.compute = list(config = TRUE,
                                    dic = FALSE,
                                    waic = FALSE),
             control.predictor = list(compute = FALSE)
@@ -1835,37 +1837,21 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       # non-linearities that don't necessarily affect the fixed
       # effects may appear in the random effects, so we need to
       # track all of them.
-      track[[k]] <- data.frame(effect = NULL,
-                               iteration = NULL,
-                               mean = NULL,
-                               mode = NULL,
-                               sd = NULL)
-      if (!is.null(result$summary.fixed) && (nrow(result$summary.fixed) > 0)) {
-        track[[k]] <-
+      result_mode <- evaluate_state(model, result, property = "joint_mode")[[1]]
+      result_sd <- evaluate_state(model, result, property = "sd",
+                                  internal_hyperpar = TRUE)[[1]]
+      result_names <- latent_names(result_mode)
+      track_df <- list()
+      for (label in names(result_mode)) {
+        track_df[[label]] <-
           data.frame(
-            effect = rownames(result$summary.fixed),
-            iteration = rep(track_size + k, nrow(result$summary.fixed)),
-            mean = result$summary.fixed[, "mean"],
-            mode = result$summary.fixed[, "mode"],
-            sd = result$summary.fixed[, "sd"]
+            effect = result_names[[label]],
+            iteration = track_size + k,
+            mode = result_mode[[label]],
+            sd = result_sd[[label]]
           )
       }
-      if (!is.null(result$summary.random) &&
-        (length(result$summary.random) > 0)) {
-        ## This wastes memory temporarily.
-        joined.random <- do.call(rbind, result$summary.random)
-        track[[k]] <-
-          rbind(
-            track[[k]],
-            data.frame(
-              effect = rownames(joined.random),
-              iteration = rep(track_size + k, nrow(joined.random)),
-              mean = joined.random[, "mean"],
-              mode = joined.random[, "mode"],
-              sd = joined.random[, "sd"]
-            )
-          )
-      }
+      track[[k]] <- do.call(rbind, track_df)
     }
 
     # Only update the linearisation state after the non-final "eb" iterations:
@@ -1873,9 +1859,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       # Update stack given current result
       state0 <- states[[length(states)]]
       state <- evaluate_state(model,
-                              lhoods = lhoods,
                               result = result,
-                              property = "mode"
+                              property = "joint_mode"
       )[[1]]
       if ((options$bru_max_iter > 1)) {
         if (do_line_search) {

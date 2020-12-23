@@ -121,7 +121,7 @@ form the linear predictor (remembering that we need an offset due to the unknown
 direction of the detections!):
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
-formula <- coordinates + distance ~ mySPDE +
+form <- coordinates + distance ~ mySPDE +
   log(hn(distance, lsig)) +
   Intercept + log(2)
 ```
@@ -139,7 +139,7 @@ fit <- lgcp(
     coordinates = mesh,
     distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))
   ),
-  formula = formula
+  formula = form
 )
 ```
 

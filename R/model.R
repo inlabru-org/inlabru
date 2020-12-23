@@ -194,6 +194,9 @@ evaluate_model <- function(model,
 #' "sd" and "sample". In case of "sample" you will obtain samples from the
 #' posterior (see `n` parameter). If `result` is `NULL`, all-zero vectors are
 #' returned for each component.
+#' @param internal_hyperpar logical; If `TRUE`, return hyperparameter properties
+#' on the internal scale. Currently ignored when `property="sample"`.
+#' Default is `FALSE`.
 #' @export
 #' @rdname evaluate_model
 evaluate_state <- function(model,
@@ -202,6 +205,7 @@ evaluate_state <- function(model,
                            n = 1,
                            seed = 0L,
                            num.threads = NULL,
+                           internal_hyperpar = FALSE,
                            ...) {
   # Evaluate random states, or a single property
   if (property == "sample") {
@@ -218,7 +222,11 @@ evaluate_state <- function(model,
       }
     ))
   } else {
-    state <- list(extract_property(result, property))
+    state <- list(extract_property(
+      result = result,
+      property = property,
+      internal_hyperpar = internal_hyperpar
+    ))
   }
 
   state

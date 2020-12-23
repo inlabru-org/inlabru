@@ -98,17 +98,17 @@ distribution linearised at $\bm{v}$,
 that generates a latent field configuration. We then seek a fix point of the
 functional, so that $\bm{u}_0=f(\ol{p}_{\bm{u}_0})$.
 Potential choices for $f(\cdot)$ include the posterior expectation
-$\ol{E}(\bm{u}|\bm{y})$ and the "Empirical Bayes conditional mode" (used from version 2.2.0^[
+$\ol{E}(\bm{u}|\bm{y})$ and the "Empirical Bayes conditional mode",
+$$
+f(\ol{p}_{\bm{v}})=\argmax_{\bm{u}} \ol{p}_{\bm{v}}(\bm{u}|\bm{y},\wh{\bm{\theta}}),
+$$
+where $\wh{\bm{\theta}}=\argmax_{\bm{\theta}} \ol{p}_{\bm{v}}(\bm{\theta}|\bm{y})$
+(used in `inlabru` from version 2.2.3^[
 Note: In `inlabru` version 2.1.15, 
 $$
 f(\ol{p}_{\bm{v}})=\left\{\argmax_{u_i} \ol{p}_{\bm{v}}(u_i|\bm{y}),\,i=1,\dots,n\right\},
 $$
-was used, which caused problems for some nonlinear models.]),
-$$
-f(\ol{p}_{\bm{v}})=\argmax_{\bm{u}} \ol{p}_{\bm{v}}(\bm{u}|\bm{y},\wh{\bm{\theta}}),
-$$
-where $\wh{\bm{\theta}}=\argmax_{\bm{\theta}} \ol{p}_{\bm{v}}(\bm{\theta}|\bm{y})$.
-
+was used, which caused problems for some nonlinear models.])
 One key to the fix point iteration is that the observation model is linked to
 $\bm{u}$ only through the non-linear predictor $\wt{\bm{\eta}}(\bm{u})$.
 

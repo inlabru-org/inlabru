@@ -1,5 +1,8 @@
 # inlabru (development version)
 
+* Properly extract the joint latent conditional mode instead of the
+  marginal latent conditional mode
+
 # inlabru 2.2.2
 
 * Fixed issue with `predict()` logic for converting output to `Spatial*DataFrame`
@@ -28,7 +31,7 @@
 
 * Uses INLA integration strategy "eb" for initial nonlinear iterations, and a
   specified integration strategy only for the final iteration, so that the
-  computations are faster, and always used the conditional latent mode as
+  computations are faster, and uses the conditional latent mode as
   linearisation point.
 
 # inlabru 2.1.15
