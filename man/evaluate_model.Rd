@@ -24,6 +24,7 @@ evaluate_state(
   n = 1,
   seed = 0L,
   num.threads = NULL,
+  internal_hyperpar = FALSE,
   ...
 )
 }
@@ -79,6 +80,10 @@ returned for each component.}
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"}
+
+\item{internal_hyperpar}{logical; If \code{TRUE}, return hyperparameter properties
+on the internal scale. Currently ignored when \code{property="sample"}.
+Default is \code{FALSE}.}
 }
 \description{
 Evaluate or sample from a posterior result given a model and locations

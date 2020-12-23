@@ -1,4 +1,4 @@
-# inlabru 2.2.3
+# inlabru 2.2.4
 
 * Properly extract the joint latent conditional mode instead of the
   marginal latent conditional mode
@@ -10,7 +10,7 @@
 * Use `control.mode=list(restart=FALSE)` in the final inla run for nonlinear
   models, to avoid an unnecessary optimisation.
 
-* Fix issues in `pixels()` and ¬bru_fill_missing()` for `Spatial*DataFrame`
+* Fix issues in `pixels()` and `bru_fill_missing()` for `Spatial*DataFrame`
   objects with ncol=0 data frame parts.
 
 # inlabru 2.2.1
