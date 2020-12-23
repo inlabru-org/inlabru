@@ -89,13 +89,14 @@ object
 For \code{bru_options} and \code{bru_options_set}, recognised options are:
 \describe{
 \item{bru_verbose}{logical or numeric; if \code{TRUE}, log messages of \code{verbosity}
-\eqn{\leq 1} are printed by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric, log messages
+\eqn{\le 1} are printed by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric, log messages
 of
-verbosity \eqn{\leq} are printed. For line search details, set \code{bru_verbose=2} or \code{3}.
-Default: 0}
-\item{bru_verbose_stored}{logical or numeric; if \code{TRUE}, log messages of
-\code{verbosity} \eqn{\leq 1} are stored by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric,
-log messages of verbosity \eqn{\leq} are stored. Default: 1}
+verbosity \eqn{\le}\code{bru_verbose} are printed.
+For line search details, set \code{bru_verbose=2} or \code{3}.
+Default: 0, to not print any messages}
+\item{bru_verbose_store}{logical or numeric; if \code{TRUE}, log messages of
+\code{verbosity} \eqn{\le 1} are stored by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric,
+log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all messages.}
 \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
 to run inference.}
 \item{bru_max_iter}{maximum number of inla iterations}

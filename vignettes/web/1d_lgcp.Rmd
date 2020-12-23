@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=FALSE}
-options(width=100) # sets width of output window
+options(width = 100) # sets width of output window
 ```
 
 Introduction
@@ -39,6 +39,7 @@ Load libraries
 library(inlabru)
 library(INLA)
 library(mgcv)
+library(ggplot2)
 ```
 
 
@@ -53,9 +54,9 @@ Take a look at the point (and frequency) data
 
 
 ```{r fig.width=10, fig.heigth=4}
-ggplot(pts2) + 
-  geom_histogram(aes(x = x), binwidth = 55/20, boundary = 0, fill = NA, color = "black") +
-  geom_point(aes(x), y = 0, pch = "|", cex = 4) + 
+ggplot(pts2) +
+  geom_histogram(aes(x = x), binwidth = 55 / 20, boundary = 0, fill = NA, color = "black") +
+  geom_point(aes(x), y = 0, pch = "|", cex = 4) +
   coord_fixed(ratio = 1)
 ```
 
@@ -64,21 +65,21 @@ Fiting the model
 Build a 1D mesh: 
 
 ```{r }
-x <- seq(0, 55, length = 50)
+x <- seq(0, 55, length.out = 50)
 mesh1D <- inla.mesh.1d(x, boundary = "free")
 ```
 
 Make a 1D SPDE model:
 ```{r results="hide",warning=FALSE,message=FALSE}
-matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150,0.75), prior.sigma = c(0.1,0.75))
+matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150, 0.75), prior.sigma = c(0.1, 0.75))
 mdl <- x ~ spde1D(x, model = matern) + Intercept(1)
 ```
 
-Here we want to fit to the actual points, and the `inlabru` function that does this is called `lgcp` (for 'Log Gaussian Cox Process'). The `ips' and `domain` parameters are optional, one or the other can be used.
+Here we want to fit to the actual points, and the `inlabru` function that does this is called `lgcp` (for 'Log Gaussian Cox Process'). The `ips` and `domain` parameters are optional, one or the other can be used.
 Here are two ways of doing the same thing:
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-fit.spde <- lgcp(mdl, pts2, ips = ipoints(c(0,55), 50, name = "x"))
+fit.spde <- lgcp(mdl, pts2, ips = ipoints(c(0, 55), 50, name = "x"))
 fita.spde <- lgcp(mdl, pts2, domain = list(x = mesh1D))
 ```
 
@@ -91,7 +92,8 @@ the `plot` function. To see the PDF for the range parameter, for example:
 
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE,fig.height=3, fig.width=7}
-post.range = spde.posterior(fit.spde,name="spde1D",what="range"); plot(post.range)
+post.range <- spde.posterior(fit.spde, name = "spde1D", what = "range")
+plot(post.range)
 ```
 
 Look at the help file for `spde.posterior` and then plot the posterior for the log of the SPDE range parameter, the 
@@ -100,10 +102,14 @@ between what is plotted for the range and variance parameters, and for the covar
 (which involves both these parameters).
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE, eval=FALSE}
-post.log.range = spde.posterior(fit.spde,name="spde1D",what="log.range");plot(post.log.range) # SOLUTION
-post.variance = spde.posterior(fit.spde,name="spde1D",what="variance"); plot(post.variance) # SOLUTION
-post.log.variance = spde.posterior(fit.spde,name="spde1D",what="log.variance"); plot(post.log.variance) # SOLUTION
-post.matcorr = spde.posterior(fit.spde,name="spde1D",what="matern.correlation");plot(post.matcorr) # SOLUTION
+post.log.range <- spde.posterior(fit.spde, name = "spde1D", what = "log.range")
+plot(post.log.range) # SOLUTION
+post.variance <- spde.posterior(fit.spde, name = "spde1D", what = "variance")
+plot(post.variance) # SOLUTION
+post.log.variance <- spde.posterior(fit.spde, name = "spde1D", what = "log.variance")
+plot(post.log.variance) # SOLUTION
+post.matcorr <- spde.posterior(fit.spde, name = "spde1D", what = "matern.correlation")
+plot(post.matcorr) # SOLUTION
 ```
 
 You can get a feel for sensitivity to priors by specifying different priors and looking at the posterior plots.
@@ -116,7 +122,7 @@ scale (i.e. the intensity function $\lambda(s)$), we call `predict` thus:
 
 ```{r }
 predf <- data.frame(x = seq(0, 55, by = 1)) # Set up a data frame of explanatory values at which to predict
-pred_spde <- predict(fit.spde, predf,  ~ exp(spde1D + Intercept))
+pred_spde <- predict(fit.spde, predf, ~ exp(spde1D + Intercept))
 ```
 
 while to predict on the linear predictor scale (i.e. that of the log intensity, 
@@ -129,8 +135,8 @@ pred_spde_lp <- predict(fit.spde, predf, ~ spde1D + Intercept)
 here's how to plot the prediction and 95% credible interval:
 
 ```{r }
-plot(pred_spde, color = "red") + 
-  geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) + 
+plot(pred_spde, color = "red") +
+  geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) +
   xlab("x") + ylab("Intensity")
 ```
 
@@ -141,16 +147,16 @@ that was used in simulating these data. In order to plot this, we make a data fr
 of `x`-values to get a nice smooth plot (150 values).
 
 ```{r }
-xs <- seq(0,55,length=150)
-true.lambda <- data.frame(x=xs, y=lambda2_1D(xs))
+xs <- seq(0, 55, length = 150)
+true.lambda <- data.frame(x = xs, y = lambda2_1D(xs))
 ```
 
 Plot the fitted and true intensity functions:
 
 ```{r fig.show="hide"}
-plot(pred_spde, color = "red") + 
-  geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) + 
-  geom_line(data=true.lambda, aes(x,y)) +
+plot(pred_spde, color = "red") +
+  geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) +
+  geom_line(data = true.lambda, aes(x, y)) +
   xlab("x") + ylab("Intensity")
 ```
 
@@ -164,10 +170,12 @@ The credible intervals are shown as red rectangles, the mean fitted value as a s
 horizontal blue line, and the observed data as black points:
 
 ```{r }
-bc <- bincount(result = fit.spde, 
-              observations = pts2, 
-              breaks = seq(0,max(pts2),length = 12), 
-              predictor = x ~ exp(spde1D + Intercept))
+bc <- bincount(
+  result = fit.spde,
+  observations = pts2,
+  breaks = seq(0, max(pts2), length = 12),
+  predictor = x ~ exp(spde1D + Intercept)
+)
 
 attributes(bc)$ggp
 ```
@@ -181,7 +189,7 @@ locations `x` weighted by a particular weight. The locations `x` and their weigh
 are constructed using the `ipoints` function
 
 ```{r }
-ips <- ipoints(c(0,55), 100, name = "x")
+ips <- ipoints(c(0, 55), 100, name = "x")
 head(ips)
 Lambda <- predict(fit.spde, ips, ~ sum(weight * exp(spde1D + Intercept)))
 ```
@@ -205,10 +213,15 @@ To include this we need to modify `predict( )` as follows:
 
 
 ```{r }
-Nest <- predict(fit.spde, ips, 
-                 ~ data.frame(N = 50:250, 
-                              dpois = dpois(50:250,
-                                            lambda = sum(weight * exp(spde1D + Intercept)))))
+Nest <- predict(
+  fit.spde, ips,
+  ~ data.frame(
+    N = 50:250,
+    dpois = dpois(50:250,
+      lambda = sum(weight * exp(spde1D + Intercept))
+    )
+  )
+)
 ```
 
 This calculates the same statistics as were calculated for `Lambda`, but for evey value of `N` from 50 to 250, 
@@ -228,7 +241,7 @@ Compare `Lambda` to `Nest` by plotting:
 First calculate the posterior conditional on the mean of `Lambda`
 
 ```{r }
-Nest$plugin_estimate <- dpois(Nest$N, lambda=Lambda$mean)
+Nest$plugin_estimate <- dpois(Nest$N, lambda = Lambda$mean)
 ```
 
 Then plot it and the unconditional posterior
@@ -253,18 +266,18 @@ and the true intensity.
 cd2 <- countdata2
 fit2.gam <- gam(count ~ s(x, k = 10) + offset(log(exposure)), family = poisson(), data = cd2)
 dat4pred <- data.frame(x = seq(0, 55, length = 100), exposure = rep(cd2$exposure[1], 100))
-pred2.gam <- predict(fit2.gam, newdata = dat4pred, type="response")
-dat4pred2 <- cbind(dat4pred, gam = pred2.gam)  # SOLUTION
+pred2.gam <- predict(fit2.gam, newdata = dat4pred, type = "response")
+dat4pred2 <- cbind(dat4pred, gam = pred2.gam) # SOLUTION
 ```
 
-You should get a plot like this (thick line is the true intensity, the thin solid line the inlabru fit, the dshed line the GAM fit:
+You should get a plot like this (thick line is the true intensity, the thin
+solid line the inlabru fit, the dashed line the GAM fit:
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE,eval=TRUE}
-plot(pred_spde) +  
-  geom_point(data = pts2, aes(x = x),y = 0, pch = "|", cex = 2) + 
-  geom_line(data = dat4pred2, aes(x, gam/exposure), lty = 2) + 
-  geom_line(data = true.lambda, aes(x, y), lwd=1.5) + 
-  geom_point(data = cd2, aes(x, y = count/exposure)) + 
+plot(pred_spde) +
+  geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) +
+  geom_line(data = dat4pred2, aes(x, gam / exposure), lty = 2) +
+  geom_line(data = true.lambda, aes(x, y), lwd = 1.5) +
+  geom_point(data = cd2, aes(x, y = count / exposure)) +
   ylab("Intensity") + xlab("x") # SOLUTION
 ```
-

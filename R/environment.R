@@ -79,8 +79,8 @@ bru_log_get <- function(pretty = FALSE) {
 #' @param verbose logical, numeric, or `NULL`; local override for verbose
 #' output. If `NULL`, the global option `bru_verbose` or default value is used.
 #' If `FALSE`, no messages are printed. If `TRUE`, messages with `verbosity`
-#' \eqn{\leq 1}{<=1}
-#' are printed. If numeric, messages with `verbosity` \eqn{\leq}{<=} `verbose` are
+#' \eqn{\le 1}{<=1}
+#' are printed. If numeric, messages with `verbosity` \eqn{\le}{<=} `verbose` are
 #' printed.
 #' @param verbose_store Same as `verbose`, but controlling what messages are
 #' stored in the global log object. Can be controlled via the `bru_verbose_store`
@@ -143,13 +143,14 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' For `bru_options` and `bru_options_set`, recognised options are:
 #' \describe{
 #' \item{bru_verbose}{logical or numeric; if `TRUE`, log messages of `verbosity`
-#' \eqn{\leq 1} are printed by [bru_log_message()]. If numeric, log messages
+#' \eqn{\le 1} are printed by [bru_log_message()]. If numeric, log messages
 #' of
-#' verbosity \eqn{\leq} are printed. For line search details, set `bru_verbose=2` or `3`.
-#' Default: 0}
-#' \item{bru_verbose_stored}{logical or numeric; if `TRUE`, log messages of
-#' `verbosity` \eqn{\leq 1} are stored by [bru_log_message()]. If numeric,
-#' log messages of verbosity \eqn{\leq} are stored. Default: 1}
+#' verbosity \eqn{\le}`bru_verbose` are printed.
+#' For line search details, set `bru_verbose=2` or `3`.
+#' Default: 0, to not print any messages}
+#' \item{bru_verbose_store}{logical or numeric; if `TRUE`, log messages of
+#' `verbosity` \eqn{\le 1} are stored by [bru_log_message()]. If numeric,
+#' log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all messages.}
 #' \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
 #'   to run inference.}
 #' \item{bru_max_iter}{maximum number of inla iterations}
@@ -269,7 +270,7 @@ bru_options_default <- function() {
   bru_options(
     # inlabru options
     bru_verbose = 0,
-    bru_verbose_store = 1,
+    bru_verbose_store = Inf,
     bru_max_iter = 10,
     bru_run = TRUE,
     bru_int_args = list(method = "stable", nsub1 = 30, nsub2 = 9),
