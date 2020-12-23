@@ -1,3 +1,5 @@
+# inlabru (development version)
+
 # inlabru 2.2.4
 
 * Properly extract the joint latent conditional mode instead of the
