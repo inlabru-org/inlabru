@@ -200,7 +200,7 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
       seed = seed,
       num.threads = num.threads
     )
-  } else {
+  } else if ("parallel.configs" %in% formalArgs(INLA::inla.posterior.sample)) {
     samples <- INLA::inla.posterior.sample(
       n = n,
       result = result,
@@ -209,8 +209,16 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
       num.threads = num.threads,
       parallel.configs = FALSE
     )
+  } else {
+    samples <- INLA::inla.posterior.sample(
+      n = n,
+      result = result,
+      seed = seed,
+      intern = FALSE,
+      num.threads = num.threads
+    )
   }
-
+  
   ssmpl <- list()
   for (i in 1:length(samples)) {
     smpl.latent <- samples[[i]]$latent
