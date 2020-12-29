@@ -17,15 +17,16 @@ ggplot() +
 
 matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
                                     prior.sigma = c(0.1, 0.01),
-                                    prior.range = c(5, 0.01))
+                                    prior.range = c(0.01, 0.01))
 
 # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 
-cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept
+cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept(1)
 
-# Fit the model
+# Fit the model, with "eb" instead of full Bayes
 fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
-            domain = list(coordinates = gorillas$mesh))
+            domain = list(coordinates = gorillas$mesh),
+            options = list(control.inla = list(int.strategy = "eb")))
 
 # Once we obtain a fitted model the predict function can serve various purposes. 
 # The most basic one is to determine posterior statistics of a univariate
