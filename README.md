@@ -79,7 +79,7 @@ data(gorillas, package = "inlabru")
 # Construct latent model components
 matern <- inla.spde2.pcmatern(gorillas$mesh, 
                               prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(5, 0.01))
+                              prior.range = c(0.01, 0.01))
 cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 # Fit LGCP model
 fit <- lgcp(cmp,

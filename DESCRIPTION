@@ -18,7 +18,7 @@ Authors@R: c(
          comment = "Andy Seaton provided testing and bugfixes")
   )
 URL: http://www.inlabru.org, 
-BugReports: https://github.com/fbachl/inlabru/issues
+BugReports: https://github.com/inlabru-org/inlabru/issues
 Description: Facilitates spatial modeling using integrated nested Laplace approximation via the 
   INLA package (<http://www.r-inla.org>). Additionally, implements a log Gaussian Cox process likelihood for 
   modeling univariate and spatial point processes based on ecological survey data. See Yuan Yuan, 
