@@ -50,6 +50,7 @@ Suggests:
     knitr,
     maptools,
     mgcv,
+    patchwork,
     raster,
     RColorBrewer,
     rgl,
