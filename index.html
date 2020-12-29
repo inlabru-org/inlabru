@@ -98,7 +98,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/fbachl/inlabru/">
+  <a href="https://github.com/inlabru-org/inlabru/">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -162,7 +162,7 @@
 <span class="co"># Construct latent model components</span>
 <span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, 
                               prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>, 
-                              prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0.01</span><span class="op">)</span><span class="op">)</span>
+                              prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.01</span><span class="op">)</span><span class="op">)</span>
 <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="co"># Fit LGCP model</span>
 <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>,
@@ -191,9 +191,9 @@
 <ul class="list-unstyled">
 <li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=inlabru">https://​cloud.r-project.org/​package=inlabru</a>
 </li>
-<li>Browse source code at <br><a href="https://github.com/fbachl/inlabru/">https://​github.com/​fbachl/​inlabru/​</a>
+<li>Browse source code at <br><a href="https://github.com/inlabru-org/inlabru/">https://​github.com/​inlabru-org/​inlabru/​</a>
 </li>
-<li>Report a bug at <br><a href="https://github.com/fbachl/inlabru/issues">https://​github.com/​fbachl/​inlabru/​issues</a>
+<li>Report a bug at <br><a href="https://github.com/inlabru-org/inlabru/issues">https://​github.com/​inlabru-org/​inlabru/​issues</a>
 </li>
 </ul>
 </div>
