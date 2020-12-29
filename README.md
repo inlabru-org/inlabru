@@ -8,11 +8,11 @@
 [![CRAN
 Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
 [![R build
-status](https://github.com/fbachl/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/fbachl/inlabru/actions)
+status](https://github.com/inlabru-org/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![R code coverage
-status](https://github.com/fbachl/inlabru/workflows/test-coverage/badge.svg)](https://github.com/fbachl/inlabru/actions)
+status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![Codecov test
-coverage](https://codecov.io/gh/fbachl/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/fbachl/inlabru?branch=devel)
+coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/inlabru-org/inlabru?branch=devel)
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
@@ -37,19 +37,19 @@ install.packages("inlabru")
 ```
 
 You can install the latest bugfix release of inlabru from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/inlabru-org/inlabru) with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("fbachl/inlabru", ref="stable")
+remotes::install_github("inlabru-org/inlabru", ref="stable")
 ```
 
 You can install the development version of inlabru from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/inlabru-org/inlabru) with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("fbachl/inlabru", ref="devel")
+remotes::install_github("inlabru-org/inlabru", ref="devel")
 ```
 
 ## Example
