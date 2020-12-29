@@ -75,17 +75,18 @@ if (bru_safe_inla()) {
   # Define SPDE prior
   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
     prior.sigma = c(0.1, 0.01),
-    prior.range = c(5, 0.01)
+    prior.range = c(0.01, 0.01)
   )
 
   # Define domain of the LGCP as well as the model components (spatial SPDE
   # effect and Intercept)
   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 
-  # Fit the model
+  # Fit the model (with int.strategy="eb" to make the example take less time)
   fit <- lgcp(cmp, gorillas$nests,
     samplers = gorillas$boundary,
-    domain = list(coordinates = gorillas$mesh)
+    domain = list(coordinates = gorillas$mesh),
+    options = list(control.inla = list(int.strategy = "eb"))
   )
 
   # Predict the spatial intensity surface
