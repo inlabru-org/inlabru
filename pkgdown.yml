@@ -1,0 +1,17 @@
+pandoc: 2.7.3
+pkgdown: 1.6.1
+pkgdown_sha: ~
+articles:
+  method: method.html
+  web/1d_lgcp: 1d_lgcp.html
+  web/2d_lgcp: 2d_lgcp.html
+  web/2d_lgcp_covars: 2d_lgcp_covars.html
+  web/2d_lgcp_distancesampling: 2d_lgcp_distancesampling.html
+  web/2d_lgcp_multilikelihood: 2d_lgcp_multilikelihood.html
+  web/2d_lgcp_plotsampling: 2d_lgcp_plotsampling.html
+  web/2d_lgcp_spatiotemporal: 2d_lgcp_spatiotemporal.html
+  web/publications: publications.html
+  web/random_fields: random_fields.html
+  web/random_fields_2d: random_fields_2d.html
+last_built: 2020-12-29T16:10Z
+
