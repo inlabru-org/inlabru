@@ -15,45 +15,52 @@ library(RColorBrewer)
 
   pcmatern <- INLA::inla.spde2.pcmatern(gorillas$mesh, 
                                         prior.sigma = c(0.1, 0.01), 
-                                        prior.range = c(5, 0.01))
-
-cmp <- coordinates ~ vegetation(gorillas$gcov$vegetation, model = "factor") +
+                                        prior.range = c(0.01, 0.01))
+  
+cmp <- coordinates ~ vegetation(gorillas$gcov$vegetation, model = "factor_contrast") +
   spde(coordinates, model = pcmatern) -
-  Intercept
+  Intercept(1)
 
 fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
-            domain = list(coordinates = gorillas$mesh))
+            domain = list(coordinates = gorillas$mesh),
+            options = list(control.inla = list(int.strategy = "eb")))
 
 # Predict SPDE and vegetation at the mesh vertex locations
 
-vrt = vertices(gorillas$mesh)
-joint <- predict(fit, vrt,  ~ spde + vegetation)
-field <- predict(fit, vrt, ~ spde)
-veg <- predict(fit, vrt, ~ vegetation)
+vrt <- vertices(gorillas$mesh)
+pred <- predict(
+  fit,
+  vrt,
+  ~ list(
+    joint = spde + vegetation,
+    field = spde,
+    veg = vegetation
+  )
+)
 
 # Plot component mean 
 
-multiplot(ggplot() + gg(gorillas$mesh, color = joint$mean) + 
+multiplot(ggplot() + gg(gorillas$mesh, color = pred$joint$mean) + 
             coord_equal() + theme(legend.position= "bottom"),
-          ggplot() + gg(gorillas$mesh, color = field$mean) + 
+          ggplot() + gg(gorillas$mesh, color = pred$field$mean) + 
             coord_equal() + theme(legend.position= "bottom"),
-          ggplot() + gg(gorillas$mesh, color = veg$mean) + 
+          ggplot() + gg(gorillas$mesh, color = pred$veg$mean) + 
             coord_equal() + theme(legend.position = "bottom"),
           cols = 3)
 
 # Plot component variance 
 
-multiplot(ggplot() + gg(gorillas$mesh, color = joint$var) + 
+multiplot(ggplot() + gg(gorillas$mesh, color = pred$joint$var) + 
             coord_equal() + theme(legend.position = "bottom"),
-          ggplot() + gg(gorillas$mesh, color = field$var) + 
+          ggplot() + gg(gorillas$mesh, color = pred$field$var) + 
             coord_equal() + theme(legend.position = "bottom"),
-          ggplot() + gg(gorillas$mesh, color = veg$var) + 
+          ggplot() + gg(gorillas$mesh, color = pred$veg$var) + 
             coord_equal() + theme(legend.position = "bottom"),
           cols = 3)
 
 # Calculate variance and correlation measure
 
-vm <- devel.cvmeasure(joint, field, veg)
+vm <- devel.cvmeasure(pred$joint, pred$field, pred$veg)
 lprange <- range(vm$var.joint, vm$var1,vm$var2)
 
 # Variance contribution of the components
@@ -80,7 +87,7 @@ ggplot() + gg(gorillas$mesh, color = vm$cor)
 
 # Variance and correlation integrated over space
 
-vm.int <- devel.cvmeasure(joint, field, veg, 
+vm.int <- devel.cvmeasure(pred$joint, pred$field, pred$veg, 
                           samplers = ipoints(gorillas$boundary, gorillas$mesh),
                           mesh = gorillas$mesh)
 vm.int

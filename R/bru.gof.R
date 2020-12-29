@@ -161,7 +161,7 @@ devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, me
     ((joint - a - b) / (2 * sqrt(a * b)))
   }
   cor <- corr(joint$var, prediction1$var, prediction2$var)
-  if (any((cor > 1) | (cor < (-1)))) {
+  if (any((cor > 1) | (cor < (-1)), na.rm = TRUE)) {
     cor[(cor > 1) | (cor < (-1))] <- NA
   }
   joint$cor <- cor
