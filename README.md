@@ -27,6 +27,11 @@ Methods in Ecology and Evolution, British Ecological Society, 10,
 [doi:10.1111/2041-210X.13168](https://doi.org/10.1111/2041-210X.13168),
 and `citation("inlabru")`.
 
+The [inlabru.org](http://inlabru.org) website has links to old tutorials
+with code examples for versions up to 2.1.13. Updated version of these
+tutorials, as well as new examples, can currently be found under
+Articles on the <https://inlabru-org.github.io/inlabru/> website.
+
 ## Installation
 
 You can install the current [CRAN](https://CRAN.R-project.org) version
