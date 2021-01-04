@@ -7,7 +7,7 @@
 \method{plot}{bru}(x, ...)
 }
 \arguments{
-\item{x}{a fitted \link{bru} model.}
+\item{x}{a fitted \code{\link[=bru]{bru()}} model.}
 
 \item{...}{A character naming the effect to plot, e.g. "Intercept". For random
 effects, adding \code{index = ...} plots the density for a single component of the
@@ -17,7 +17,7 @@ latent model.}
 an object of class \code{gg}
 }
 \description{
-\link{bru} uses \link[INLA:inla]{inla} to fit models. The latter estimates the posterior densities of
+\code{\link[=bru]{bru()}} uses \code{INLA::inla()} to fit models. The latter estimates the posterior densities of
 all random effects in the model. This function serves to access and plot the posterior
 densities in a convenient way.
 }

@@ -720,14 +720,14 @@ gg.RasterLayer <- function(data, mapping = aes_string(x = "x", y = "y", fill = "
 #'
 #' @description
 #'
-#' [bru] uses [inla][INLA::inla] to fit models. The latter estimates the posterior densities of
+#' [bru()] uses `INLA::inla()` to fit models. The latter estimates the posterior densities of
 #' all random effects in the model. This function serves to access and plot the posterior
 #' densities in a convenient way.
 #'
 #' @method plot bru
 #' @export
 #' @import ggplot2
-#' @param x a fitted [bru] model.
+#' @param x a fitted [bru()] model.
 #' @param ... A character naming the effect to plot, e.g. "Intercept". For random
 #' effects, adding `index = ...` plots the density for a single component of the
 #' latent model.
