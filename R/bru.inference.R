@@ -184,6 +184,7 @@ print.summary_bru_info <- function(x, ...) {
       }
     ))
   }
+  invisible(x)
 }
 
 #' @export
@@ -2180,7 +2181,7 @@ summary.bru <- function(object, ...) {
 print.summary_bru <- function(x, ...) {
   print(x$bru_info)
   print(x$inla)
-  return(x)
+  invisible(x)
 }
 
 
