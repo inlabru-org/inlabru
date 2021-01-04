@@ -205,11 +205,11 @@ various summaries from it.</p>
 </div><div class='output co'>#&gt; <span class='warning'>Warning: All covariate evaluations for 'Intercept' are NULL; an intercept component was likely intended.</span>
 #&gt; <span class='warning'>  Implicit latent intercept component specification is deprecated since version 2.1.14.</span>
 #&gt; <span class='warning'>  Use explicit notation '+ Intercept(1)' instead (or '+1' for '+ Intercept(1)').</span></div><div class='output co'>#&gt;               mean         sd 0.025quant 0.5quant 0.975quant     mode
-#&gt; x         2.103494 0.05068425   2.002071 2.103493   2.204754 2.103496
-#&gt; Intercept 4.967623 0.03587693   4.895838 4.967623   5.039293 4.967625
+#&gt; x         2.103494 0.05068401   2.002071 2.103493   2.204754 2.103496
+#&gt; Intercept 4.967623 0.03587676   4.895838 4.967623   5.039293 4.967625
 #&gt;                    kld
-#&gt; x         0.0001309009
-#&gt; Intercept 0.0001302854</div><div class='input'>
+#&gt; x         0.0001311699
+#&gt; Intercept 0.0001305539</div><div class='input'>
   
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
   
@@ -221,11 +221,11 @@ various summaries from it.</p>
 
 <span class='op'>}</span>
 </div><div class='output co'>#&gt;               mean         sd 0.025quant 0.5quant 0.975quant     mode
-#&gt; x         2.103494 0.05068169   2.002075 2.103493   2.204752 2.103496
-#&gt; Intercept 4.967623 0.03587512   4.895840 4.967623   5.039291 4.967625
+#&gt; x         2.103494 0.05068052   2.002076 2.103493    2.20475 2.103496
+#&gt; Intercept 4.967623 0.03587430   4.895842 4.967623    5.03929 4.967625
 #&gt;                    kld
-#&gt; x         0.0001338941
-#&gt; Intercept 0.0001332659</div><div class='input'>  
+#&gt; x         0.0001352049
+#&gt; Intercept 0.0001345693</div><div class='input'>  
 <span class='co'># An important addition to the INLA methodology is bru's ability to use</span>
 <span class='co'># non-linear predictors. Such a predictor can be formulated via like()'s </span>
 <span class='co'># \code{formula} parameter. The z(1) notation is needed to ensure that</span>
@@ -243,12 +243,12 @@ various summaries from it.</p>
 <span class='co'># Check the result (z posterior should be around 2)</span>
 <span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt;               mean          sd 0.025quant 0.5quant 0.975quant     mode
-#&gt; z         2.000260 0.006927968   1.986466 2.000259   2.014036 2.000260
-#&gt; Intercept 4.989346 0.033896338   4.921525 4.989345   5.057058 4.989347
+</div><div class='output co'>#&gt;               mean         sd 0.025quant 0.5quant 0.975quant     mode
+#&gt; z         2.000260 0.00692749   1.986467 2.000259   2.014036 2.000260
+#&gt; Intercept 4.989346 0.03389367   4.921529 4.989345   5.057055 4.989348
 #&gt;                    kld
-#&gt; z         0.0001012271
-#&gt; Intercept 0.0001312824</div><div class='input'>
+#&gt; z         0.0001047077
+#&gt; Intercept 0.0001357955</div><div class='input'>
 <span class='co'># }</span>
 </div></pre>
   </div>

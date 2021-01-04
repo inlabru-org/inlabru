@@ -115,7 +115,7 @@
       <h1 data-toc-skip>Random Fields in One Dimension</h1>
                         <h4 class="author">Finn Lindgren</h4>
             
-            <h4 class="date">2021-01-03</h4>
+            <h4 class="date">2021-01-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/random_fields.Rmd"><code>vignettes/web/random_fields.Rmd</code></a></small>
       <div class="hidden name"><code>random_fields.Rmd</code></div>
@@ -249,10 +249,10 @@
 <span class="co">#&gt;     Data class: 'data.frame'</span>
 <span class="co">#&gt;     Predictor: count ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.09, Running = 0.253, Post = 0.0947, Total = 1.44 </span>
+<span class="co">#&gt;     Pre = 1.15, Running = 0.246, Post = 0.101, Total = 1.49 </span>
 <span class="co">#&gt; Fixed effects:</span>
-<span class="co">#&gt;            mean   sd 0.025quant 0.5quant 0.975quant  mode   kld</span>
-<span class="co">#&gt; Intercept 5.682 6.69     -0.102    2.098     22.774 1.378 0.003</span>
+<span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode   kld</span>
+<span class="co">#&gt; Intercept 5.685 6.694     -0.103    2.098     22.786 1.379 0.003</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
@@ -260,7 +260,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Model hyperparameters:</span>
 <span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant   mode</span>
-<span class="co">#&gt; Range for field 45.775 39.020      5.860   35.186     152.28 16.982</span>
+<span class="co">#&gt; Range for field 45.780 39.032      5.858   35.187     152.33 16.978</span>
 <span class="co">#&gt; Stdev for field  0.593  0.318      0.224    0.513       1.43  0.398</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Expected number of effective parameters(stdev): 4.26(1.44)</span>
@@ -275,20 +275,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Marginal log-Likelihood:  -38.84 </span>
 <span class="co">#&gt; Posterior marginals for the linear predictor and</span>
-<span class="co">#&gt;  the fitted values are computed</span>
-<span class="co">#&gt; 2.2.4.9000</span>
-<span class="co">#&gt; 20.12.10</span>
-<span class="co">#&gt; field</span>
-<span class="co">#&gt; spde</span>
-<span class="co">#&gt; exchangeable</span>
-<span class="co">#&gt; iid</span>
-<span class="co">#&gt; Intercept</span>
-<span class="co">#&gt; linear</span>
-<span class="co">#&gt; exchangeable</span>
-<span class="co">#&gt; iid</span>
-<span class="co">#&gt; poisson</span>
-<span class="co">#&gt; data.frame</span>
-<span class="co">#&gt; count ~ .</span></code></pre></div>
+<span class="co">#&gt;  the fitted values are computed</span></code></pre></div>
 <p>Predict the values at the x points used for mesh (the data argument must be a data frame, see <code><a href="../../reference/predict.bru.html">?predict.bru</a></code>):</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xs</span><span class="op">)</span>
