@@ -77,7 +77,9 @@ fit <- lgcp(cmp,
             options = list(control.inla = list(int.strategy = "eb")))
 
 # Predict Gorilla nest intensity
-lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+lambda <- predict(fit,
+                  pixels(gorillas$mesh, mask = gorillas$boundary),
+                  ~ exp(mySmooth + Intercept))
 
 # Plot the result
 ggplot() + 
