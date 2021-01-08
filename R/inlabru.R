@@ -5,7 +5,7 @@
 #' @details
 #'
 #' `inlabru` facilitates Bayesian spatial modeling using integrated nested Laplace approximations. It
-#' is heavily based on R-inla (<http://www.r-inla.org>) but adds additional modeling abilities.
+#' is heavily based on R-inla (<https://www.r-inla.org>) but adds additional modeling abilities.
 #' Tutorials and more information can be found at <http://www.inlabru.org/>.
 #'
 #' The main function for inference using inlabru is [bru]. For point process inference [lgcp] is

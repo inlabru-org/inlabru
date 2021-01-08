@@ -8,7 +8,7 @@ Convenient model fitting using (iterated) INLA.
 }
 \details{
 \code{inlabru} facilitates Bayesian spatial modeling using integrated nested Laplace approximations. It
-is heavily based on R-inla (\url{http://www.r-inla.org}) but adds additional modeling abilities.
+is heavily based on R-inla (\url{https://www.r-inla.org}) but adds additional modeling abilities.
 Tutorials and more information can be found at \url{http://www.inlabru.org/}.
 
 The main function for inference using inlabru is \link{bru}. For point process inference \link{lgcp} is

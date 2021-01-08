@@ -17,11 +17,11 @@ coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
 modeling using integrated nested Laplace approximation via the [R-INLA
-package](http://www.r-inla.org). Additionally, implements a log Gaussian
-Cox process likelihood for modeling univariate and spatial point
-processes based on ecological survey data. See Fabian E. Bachl, Finn
-Lindgren, David L. Borchers, and Janine B. Illian (2019), inlabru: an R
-package for Bayesian spatial modelling from ecological survey data,
+package](https://www.r-inla.org). Additionally, implements a log
+Gaussian Cox process likelihood for modeling univariate and spatial
+point processes based on ecological survey data. See Fabian E. Bachl,
+Finn Lindgren, David L. Borchers, and Janine B. Illian (2019), inlabru:
+an R package for Bayesian spatial modelling from ecological survey data,
 Methods in Ecology and Evolution, British Ecological Society, 10,
 760–766,
 [doi:10.1111/2041-210X.13168](https://doi.org/10.1111/2041-210X.13168),
