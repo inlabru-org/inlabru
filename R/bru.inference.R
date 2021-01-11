@@ -859,6 +859,8 @@ expand_to_dataframe <- function(x, data = NULL) {
              !inherits(x, "SpatialPointsDataFrame")) {
     # Other classes inherit from SpatialPoints, so need to be handled first
     result <- sp::SpatialPointsDataFrame(x, data = data)
+  } else if (inherits(x, "Spatial")) {
+    result <- sp::cbind.Spatial(x, data)
   } else {
     result <- cbind(x, data)
   }
