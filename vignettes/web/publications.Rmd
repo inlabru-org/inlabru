@@ -2,7 +2,7 @@
 title: "Publications"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Publications}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,9 +15,18 @@ knitr::opts_chunk$set(
 ```
 ## Articles
 
+- **Fabian E. Bachl, Finn Lindgren, David L. Borchers, and Janine B. Illian** (2019),
+             *inlabru: an R package for Bayesian spatial modelling from ecological survey data*,
+             _Methods in Ecology and Evolution_, British Ecological Society, 10, 760--766,
+             [doi:10.1111/2041-210X.13168](https://doi.org/10.1111/2041-210X.13168).
 
-- **Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette**  
-*Point process models for spatio-temporal distance sampling data* [[arXiv](https://arxiv.org/abs/1604.06013), [PDF](https://arxiv.org/pdf/1604.06013v2.pdf)]
+- **Yuan Yuan, Fabian E. Bachl, Finn Lindgren, David L. Borchers,
+  Janine B. Illian, Stephen T. Buckland, Håvard Rue, and Tim Gerrodette** (2017),
+             *Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales*,
+             _Annals of Applied Statistics_, 11, 2270--2297,
+             [doi:10.1214/17-AOAS1078](https://doi.org/10.1214/17-AOAS1078),
+             [[arXiv](https://arxiv.org/abs/1604.06013),
+             [PDF](https://arxiv.org/pdf/1604.06013v2.pdf)].
 
 
 ## Presentations
@@ -30,22 +39,22 @@ knitr::opts_chunk$set(
 - **F. E. Bachl @ Autumn meeting for latent Gaussian Models**, Trondheim, Norway, September 17-18  
 *Live inlabru demo* [[HTML](https://www.google.com/url?q=https%3A%2F%2Fdl.dropboxusercontent.com%2Fu%2F74451253%2Finlabru%2Finlabru.html&sa=D&sntz=1&usg=AFQjCNFQct0aNW5V2ps6m7CB2-stTauW-Q), [R](https://www.google.com/url?q=https%3A%2F%2Fdl.dropboxusercontent.com%2Fu%2F74451253%2Finlabru%2Finlabru.R&sa=D&sntz=1&usg=AFQjCNHsbVYuUyaoZHUXVQBDGIMkr83kCA)]
 
-- **F. E. Bachl  @ The Fifth Workshop on Bayesian Inference for Latent Gaussian Models with Applications**, Bath, UK, 14-16 September  
+- **F. E. Bachl  @ The Fifth Workshop on Bayesian Inference for Latent Gaussian Models with Applications**, Bath, UK, 14-16 September 2016  
 *Approximate non-linear thinning and probabilistic marks for log Gaussian Cox process models in INLA* [[Abstract](https://www.google.com/url?q=https%3A%2F%2Fdl.dropboxusercontent.com%2Fu%2F74451253%2Finlabru%2Fpublications%2Flgm2016_abstract.pdf&sa=D&sntz=1&usg=AFQjCNGhN3iVYqUGR4FwvYPdsT4JAfIl3g), [Slides](https://www.google.com/url?q=https%3A%2F%2Fdl.dropboxusercontent.com%2Fu%2F74451253%2Finlabru%2Fpublications%2Fbachl_lgm2016_talk.pdf&sa=D&sntz=1&usg=AFQjCNHTGeNCpIcZBeTrYm1oJSnoPmOeqg)]
 
-- **F. E. Bachl @ Smoegen Workshop**, Smoegen, August 15-18  
+- **F. E. Bachl @ Smoegen Workshop**, Smoegen, August 15-18  2016
 *Approximate non-linear thinning and probabilistic marks for log Gaussian Cox process models in INLA* [[Abstract](https://www.google.com/url?q=https%3A%2F%2Fdl.dropboxusercontent.com%2Fu%2F74451253%2Finlabru%2Fpublications%2Fsmoegen2016_abstract.pdf&sa=D&sntz=1&usg=AFQjCNEAYpQ30N-OwrS1xfRKbLizzjZezw), [Slides](https://www.google.com/url?q=https%3A%2F%2Fdl.dropboxusercontent.com%2Fu%2F74451253%2Finlabru%2Fpublications%2Fbachl_smoegen2016_talk.pdf&sa=D&sntz=1&usg=AFQjCNF_G2s4VzBEU5tibofzEflKCGixTQ)]
 
 - **F. E. Bachl @ NOAA San Diego**, USA, August 2016  
 *Spatial point process models for distance sampling surveys of animals that occur in groups* [[Slides](https://www.google.com/url?q=https%3A%2F%2Fdl.dropboxusercontent.com%2Fu%2F74451253%2Finlabru%2Fpublications%2Fbachl_noaa2016_talk.pdf&sa=D&sntz=1&usg=AFQjCNHyOVV7fBHF7NqcdqfhSgABbOleiw)]
 
-- **D. L. Borchers @ The International Environmetrics Society Conference 2016**, Edinburgh, UK, 18-22 July  
+- **D. L. Borchers @ The International Environmetrics Society Conference 2016**, Edinburgh, UK, 18-22 July 2016
 *Wildlife survey models: thinned spatial point processes with unknown thinning probabilities*
 
-- **Y. Yuan @ International Statistical Ecology Conference (ISEC 2016)**, Seattle, USA, June 28th – July 1st.  
+- **Y. Yuan @ International Statistical Ecology Conference (ISEC 2016)**, Seattle, USA, June 28th – July 1st, 2016.  
 *Poster: Point process models for spatio-temporal distance sampling data* [[Abstract](http://www.google.com/url?q=http%3A%2F%2Fsynergy.st-andrews.ac.uk%2Fessmod%2Ffiles%2F2016%2F11%2FYYisecabstract.pdf&sa=D&sntz=1&usg=AFQjCNFJKY2l0JXueR--7GQ-LK-IzsxIsQ)]
 
-- **F. E. Bachl @ International Statistical Ecology Conference (ISEC 2016)**, Seattle, USA, June 28th – July 1st.  
+- **F. E. Bachl @ International Statistical Ecology Conference (ISEC 2016)**, Seattle, USA, June 28th – July 1st, 2016.  
 *Spatial point process models for distance sampling surveys of animals that occur in groups* [[Abstract](https://www.google.com/url?q=https%3A%2F%2Fdl.dropboxusercontent.com%2Fu%2F74451253%2Finlabru%2Fpublications%2Fisec2016_abstract.pdf&sa=D&sntz=1&usg=AFQjCNHPu0l7SRW7cGE4iMk3GgXILinOCw), [Slides](https://www.google.com/url?q=https%3A%2F%2Fdl.dropboxusercontent.com%2Fu%2F74451253%2Finlabru%2Fpublications%2Fbachl_isec2016_talk.pdf&sa=D&sntz=1&usg=AFQjCNHbFvZBjtMRmzoNzYSQreRzMZrzgg)]
 
 - **Y. Yuan @ National Centre for Statistical Ecology Conference**, Falmouth, UK, July 2015  

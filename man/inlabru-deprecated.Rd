@@ -60,6 +60,7 @@ init.tutorial()
 # Check if it worked:
 bru_options_get("control.inla")
 }
+
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}

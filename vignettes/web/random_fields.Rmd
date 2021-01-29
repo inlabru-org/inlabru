@@ -1,10 +1,10 @@
 ---
-title: "Random Fields"
+title: "Random Fields in One Dimension"
 author: "Finn Lindgren"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Random Fields in One Dimension}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -67,7 +67,7 @@ ggplot(cd) +
 _Tip_: `RStudio > Help > Cheatsheets > Data visualisation with ggplot2` is a useful 
 reference for `ggplot2` syntax.
 
-Fiting a Generalised Additive Model (GAM)
+Fitting a Generalised Additive Model (GAM)
 -----------------------------------
 If you're not familiar with GAMs and the syntax of `gam` don't worry, the point of 
 this is just to provide something to which we can compare the `inlabru` model fit.

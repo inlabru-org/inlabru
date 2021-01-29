@@ -8,24 +8,29 @@
 [![CRAN
 Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
 [![R build
-status](https://github.com/fbachl/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/fbachl/inlabru/actions)
+status](https://github.com/inlabru-org/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![R code coverage
-status](https://github.com/fbachl/inlabru/workflows/test-coverage/badge.svg)](https://github.com/fbachl/inlabru/actions)
+status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![Codecov test
-coverage](https://codecov.io/gh/fbachl/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/fbachl/inlabru?branch=devel)
+coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/inlabru-org/inlabru?branch=devel)
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
 modeling using integrated nested Laplace approximation via the [R-INLA
-package](http://www.r-inla.org). Additionally, implements a log Gaussian
-Cox process likelihood for modeling univariate and spatial point
-processes based on ecological survey data. See Fabian E. Bachl, Finn
-Lindgren, David L. Borchers, and Janine B. Illian (2019), inlabru: an R
-package for Bayesian spatial modelling from ecological survey data,
+package](https://www.r-inla.org). Additionally, implements a log
+Gaussian Cox process likelihood for modeling univariate and spatial
+point processes based on ecological survey data. See Fabian E. Bachl,
+Finn Lindgren, David L. Borchers, and Janine B. Illian (2019), inlabru:
+an R package for Bayesian spatial modelling from ecological survey data,
 Methods in Ecology and Evolution, British Ecological Society, 10,
 760–766,
 [doi:10.1111/2041-210X.13168](https://doi.org/10.1111/2041-210X.13168),
 and `citation("inlabru")`.
+
+The [inlabru.org](http://inlabru.org) website has links to old tutorials
+with code examples for versions up to 2.1.13. Updated version of these
+tutorials, as well as new examples, can currently be found under
+Articles on the <https://inlabru-org.github.io/inlabru/> website.
 
 ## Installation
 
@@ -37,19 +42,19 @@ install.packages("inlabru")
 ```
 
 You can install the latest bugfix release of inlabru from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/inlabru-org/inlabru) with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("fbachl/inlabru", ref="stable")
+remotes::install_github("inlabru-org/inlabru", ref="stable")
 ```
 
 You can install the development version of inlabru from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/inlabru-org/inlabru) with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("fbachl/inlabru", ref="devel")
+remotes::install_github("inlabru-org/inlabru", ref="devel")
 ```
 
 ## Example
@@ -79,7 +84,7 @@ data(gorillas, package = "inlabru")
 # Construct latent model components
 matern <- inla.spde2.pcmatern(gorillas$mesh, 
                               prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(5, 0.01))
+                              prior.range = c(0.01, 0.01))
 cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 # Fit LGCP model
 fit <- lgcp(cmp,
@@ -89,7 +94,9 @@ fit <- lgcp(cmp,
             options = list(control.inla = list(int.strategy = "eb")))
 
 # Predict Gorilla nest intensity
-lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+lambda <- predict(fit,
+                  pixels(gorillas$mesh, mask = gorillas$boundary),
+                  ~ exp(mySmooth + Intercept))
 
 # Plot the result
 ggplot() + 

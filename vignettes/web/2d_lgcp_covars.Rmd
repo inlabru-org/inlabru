@@ -4,19 +4,23 @@ author: "David Borchers"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{LGCPs - Spatial covariates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
+.cache_dir <- file.path("cache", "2d_lgcp_covars")
+.vignette_recompute <- !file.exists(.cache_dir)
+.vignette_cache <- 
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   dev = "png",
   dev.args = list(type = "cairo-png"),
   fig.width = 7,
-  fig.height = 5
+  fig.height = 5,
+  eval = TRUE
 )
 ```
 Set things up
@@ -107,9 +111,14 @@ mdl1alt <- coordinates ~ vegetation(gcov$vegetation, model = "factor_contrast") 
 ```
 
 Fit the model as usual:
-
-```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
+```{r results='hide',warning=FALSE,message=FALSE,eval=!.vignette_recompute,echo=FALSE}
+fit1 <- readRDS(fit1, file.path("cache"))
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=.vignette_recompute}
 fit1 <- lgcp(mdl1, nests, samplers = boundary, domain = list(coordinates = mesh))
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=.vignette_recompute,echo=FALSE}
+saveRDS(fit1, file.path("cache"))
 ```
 
 Predict the intensity, and plot the median intensity surface. (In older versions, predicting takes some
@@ -121,7 +130,7 @@ a `SpatialPixelsDataFrame` or a `data.frame`. We can use the `inlabru` function 
 a `SpatialPixelsDataFrame` only within the boundary, using its `mask` argument, as shown below.
 
 
-```{r warning=FALSE,message=FALSE,eval=TRUE}
+```{r warning=FALSE,message=FALSE}
 df <- pixels(mesh, mask = boundary)
 int1 <- predict(fit1, data = df, ~ exp(vegetation))
 
@@ -137,7 +146,7 @@ is in this vegetation. But there are substantial patches of predicted high densi
 that have no nests, and some areas of predicted low density that have nests. What 
 about the estimated abundance (there are really 647 nests there):
 
-```{r warning=FALSE,message=FALSE,eval=TRUE}
+```{r warning=FALSE,message=FALSE}
 ips <- ipoints(boundary, mesh)
 Lambda1 <- predict(fit1, ips, ~ sum(weight * exp(vegetation)))
 Lambda1
@@ -148,7 +157,7 @@ Lets try to `explain` the pattern in nest distribution that is not captured by
 the vegetation covariate, using an SPDE:
 
 
-```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
+```{r results='hide',warning=FALSE,message=FALSE}
 pcmatern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(5, 0.01)
@@ -164,7 +173,7 @@ fit2 <- lgcp(mdl2, nests, samplers = boundary, domain = list(coordinates = mesh)
 
 And plot the median intensity surface
 
-```{r warning=FALSE,message=FALSE,eval=TRUE}
+```{r warning=FALSE,message=FALSE}
 df <- pixels(mesh, mask = boundary)
 int2 <- predict(fit2, df, ~ exp(mySmooth + vegetation))
 
@@ -178,7 +187,7 @@ ggplot() +
 ... and the expected integrated intensity (mean of abundance)
 
 
-```{r warning=FALSE,message=FALSE,eval=TRUE}
+```{r warning=FALSE,message=FALSE}
 Lambda2 <- predict(
   fit2,
   ipoints(boundary, mesh),
@@ -188,7 +197,7 @@ Lambda2
 ```
 
 Look at the contributions to the linear predictor from the SPDE and from vegetation:
-```{r warning=FALSE,message=FALSE,eval=TRUE}
+```{r warning=FALSE,message=FALSE}
 lp2 <- predict(fit2, df, ~ list(
   smooth_veg = mySmooth + vegetation,
   smooth = mySmooth,
@@ -201,7 +210,7 @@ for the plot legend. Here we set it to span the range of the three linear predic
 components being plotted (medians are plotted by default).
 
 
-```{r warning=FALSE,message=FALSE,eval=TRUE}
+```{r warning=FALSE,message=FALSE}
 lprange <- range(lp2$smooth_veg$median, lp2$smooth$median, lp2$veg$median)
 csc <- scale_fill_gradientn(colours = brewer.pal(9, "YlOrRd"), limits = lprange)
 
@@ -238,7 +247,7 @@ Do we need vegetation at all? Fit a model with only an SPDE + Intercept, and cho
 between models on the basis of DIC, using 'deltaIC()'.
 
 
-```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
+```{r results='hide',warning=FALSE,message=FALSE}
 mdl3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept(1)
 fit3 <- lgcp(mdl3,
   data = nests,
@@ -246,7 +255,7 @@ fit3 <- lgcp(mdl3,
   domain = list(coordinates = mesh)
 )
 ```
-```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
+```{r results='hide',warning=FALSE,message=FALSE}
 int3 <- predict(fit3, df, ~ exp(mySmooth + Intercept))
 
 ggplot() +
@@ -255,7 +264,7 @@ ggplot() +
   gg(nests) +
   coord_equal()
 ```
-```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
+```{r results='hide',warning=FALSE,message=FALSE}
 Lambda3 <- predict(
   fit3,
   ipoints(boundary, mesh),
@@ -271,7 +280,7 @@ deltaIC(fit1, fit2, fit3)
 We are going with Model `fit2`. Lets look at the spatial distribution of the 
 coefficient of variation
 
-```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
+```{r results="hide",warning=FALSE,message=FALSE}
 ggplot() +
   gg(int2["cv"]) +
   gg(boundary, alpha = 0) +
@@ -283,7 +292,7 @@ Plot the vegetation "fixed effect" posteriors. First get their names - from `$ma
 which contains the fixed effect marginal distribution data
 
 
-```{r warning=FALSE,message=FALSE,eval=TRUE}
+```{r warning=FALSE,message=FALSE}
 flist <- vector("list", NROW(fit2$summary.random$vegetation))
 for (i in seq_along(flist)) flist[[i]] <- plot(fit2, "vegetation", index = i)
 multiplot(plotlist = flist, cols = 3)
@@ -376,14 +385,14 @@ elev(f.elev(x, y), model = "linear")
 We also now include an intercept term.
 
 The model is fitted in the usual way:
-```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
+```{r results="hide",warning=FALSE,message=FALSE}
 efit <- lgcp(emdl, nests, samplers = boundary, domain = list(coordinates = mesh))
 ```
 
 Summary and model selection
 
 
-```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
+```{r results="hide",warning=FALSE,message=FALSE}
 summary(efit)
 deltaIC(fit1, fit2, fit3, efit)
 ```
@@ -391,7 +400,7 @@ deltaIC(fit1, fit2, fit3, efit)
 Predict and plot the density
 
 
-```{r results="hide",warning=FALSE,message=FALSE,eval=TRUE}
+```{r results="hide",warning=FALSE,message=FALSE}
 e.int <- predict(efit, pixels(mesh, mask = boundary), ~ exp(mySmooth + elev + Intercept))
 
 ggplot() +
@@ -406,7 +415,7 @@ because it swamps the spatial effects of elevation and the SPDE in the
 plots and we are interested in comparing the effects of elevation and the SPDE.
 
 First we need to predict on the linear predictor scale.
-```{r warning=FALSE,message=FALSE,eval=TRUE,echo=TRUE}
+```{r warning=FALSE,message=FALSE,echo=TRUE}
 e.lp <- predict(
   efit, pixels(mesh, mask = boundary),
   ~ list(
@@ -421,7 +430,7 @@ The code below, which is very similar to that used for the vegetation factor
 variable, produces the plots we want.
 
 
-```{r warning=FALSE,message=FALSE,eval=TRUE, fig.height=5, fig.width=13}
+```{r warning=FALSE,message=FALSE, fig.height=5, fig.width=13}
 lprange <- range(e.lp$smooth_elev$mean, e.lp$elev$mean, e.lp$smooth$mean)
 
 library(RColorBrewer)

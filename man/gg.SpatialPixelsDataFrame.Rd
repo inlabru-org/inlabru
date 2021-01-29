@@ -4,15 +4,13 @@
 \alias{gg.SpatialPixelsDataFrame}
 \title{Geom for SpatialPixelsDataFrame objects}
 \usage{
-\method{gg}{SpatialPixelsDataFrame}(data, mapping = NULL, alpha = NULL, crs = NULL, mask = NULL, ...)
+\method{gg}{SpatialPixelsDataFrame}(data, mapping = NULL, crs = NULL, mask = NULL, ...)
 }
 \arguments{
 \item{data}{A SpatialPixelsDataFrame object.}
 
 \item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
 mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], y = coordnames(data)[2], fill = names(data)[[1]])}.}
-
-\item{alpha}{Character array identifying the data column used for tile transparency.}
 
 \item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
 
@@ -32,15 +30,16 @@ Coerces input SpatialPixelsDataFrame to data.frame and uses \link{geom_tile} to 
 
 data("gorillas", package = "inlabru")
 
-# Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame. 
+# Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.
 # The same syntax applies to SpatialGridDataFrame objects.
 
-ggplot() + gg(gorillas$gcov$elevation)
+ggplot() +
+  gg(gorillas$gcov$elevation)
 
 # Add Gorilla survey boundary and nest sightings
 
-ggplot() + 
-  gg(gorillas$gcov$elevation) + 
+ggplot() +
+  gg(gorillas$gcov$elevation) +
   gg(gorillas$boundary) +
   gg(gorillas$nests)
 
@@ -50,28 +49,30 @@ data("mexdolphin")
 
 # Plot the pantropiical survey boundary, ship transects and dolphin sightings
 
-ggplot() + 
+ggplot() +
   gg(mexdolphin$ppoly) + # survey boundary as SpatialPolygon
   gg(mexdolphin$samplers) + # ship transects as SpatialLines
-  gg(mexdolphin$points)  # dolphin sightings as SpatialPoints
+  gg(mexdolphin$points) # dolphin sightings as SpatialPoints
 
 # Change color
 
-ggplot() + 
+ggplot() +
   gg(mexdolphin$ppoly, color = "green") + # survey boundary as SpatialPolygon
   gg(mexdolphin$samplers, color = "red") + # ship transects as SpatialLines
-  gg(mexdolphin$points, color = "blue")  # dolphin sightings as SpatialPoints
+  gg(mexdolphin$points, color = "blue") # dolphin sightings as SpatialPoints
 
 
 # Visualize data annotations: line width by segment number
 
 names(mexdolphin$samplers) # 'seg' holds the segment number
-ggplot() + gg(mexdolphin$samplers, aes(color = seg))
+ggplot() +
+  gg(mexdolphin$samplers, aes(color = seg))
 
 # Visualize data annotations: point size by dolphin group size
 
 names(mexdolphin$points) # 'size' holds the group size
-ggplot() + gg(mexdolphin$points, aes(size = size))
+ggplot() +
+  gg(mexdolphin$points, aes(size = size))
 }
 }
 \seealso{

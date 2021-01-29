@@ -96,7 +96,7 @@ bincount <- function(result, predictor, observations, breaks, nint = 20, probs =
     zz <- apply(qq[k, , drop = FALSE], MARGIN = 2, cdff)
     zz <- apply(zz, MARGIN = 1, mean)
     # Suppress warnings about duplicate zz values; these may appear in the
-    # tails, with zz==0 or zz==1. 
+    # tails, with zz==0 or zz==1.
     pint[[k]] <- suppressWarnings(approx(zz, xx, xout = probs, rule = 2)$y)
   }
   pint <- data.frame(do.call(rbind, pint))
@@ -161,7 +161,7 @@ devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, me
     ((joint - a - b) / (2 * sqrt(a * b)))
   }
   cor <- corr(joint$var, prediction1$var, prediction2$var)
-  if (any((cor > 1) | (cor < (-1)))) {
+  if (any((cor > 1) | (cor < (-1)), na.rm = TRUE)) {
     cor[(cor > 1) | (cor < (-1))] <- NA
   }
   joint$cor <- cor

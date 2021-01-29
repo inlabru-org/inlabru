@@ -184,6 +184,7 @@ print.summary_bru_info <- function(x, ...) {
       }
     ))
   }
+  invisible(x)
 }
 
 #' @export
@@ -782,17 +783,18 @@ joint_stackmaker <- function(model, lhoods, state) {
 #'   # Define SPDE prior
 #'   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
 #'     prior.sigma = c(0.1, 0.01),
-#'     prior.range = c(5, 0.01)
+#'     prior.range = c(0.01, 0.01)
 #'   )
 #'
 #'   # Define domain of the LGCP as well as the model components (spatial SPDE
 #'   # effect and Intercept)
 #'   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
 #'
-#'   # Fit the model
+#'   # Fit the model (with int.strategy="eb" to make the example take less time)
 #'   fit <- lgcp(cmp, gorillas$nests,
 #'     samplers = gorillas$boundary,
-#'     domain = list(coordinates = gorillas$mesh)
+#'     domain = list(coordinates = gorillas$mesh),
+#'     options = list(control.inla = list(int.strategy = "eb"))
 #'   )
 #'
 #'   # Predict the spatial intensity surface
@@ -842,21 +844,23 @@ expand_to_dataframe <- function(x, data = NULL) {
     x <- x[!(names(x) %in% names(data))]
   }
   if (inherits(x, "SpatialPixels") &&
-             !inherits(x, "SpatialPixelsDataFrame")) {
+    !inherits(x, "SpatialPixelsDataFrame")) {
     result <- sp::SpatialPixelsDataFrame(x, data = data)
   } else if (inherits(x, "SpatialGrid") &&
-             !inherits(x, "SpatialGridDataFrame")) {
+    !inherits(x, "SpatialGridDataFrame")) {
     result <- sp::SpatialGridDataFrame(x, data = data)
   } else if (inherits(x, "SpatialLines") &&
-             !inherits(x, "SpatialLinesDataFrame")) {
+    !inherits(x, "SpatialLinesDataFrame")) {
     result <- sp::SpatialLinesDataFrame(x, data = data)
   } else if (inherits(x, "SpatialPolygons") &&
-             !inherits(x, "SpatialPolygonsDataFrame")) {
+    !inherits(x, "SpatialPolygonsDataFrame")) {
     result <- sp::SpatialPolygonsDataFrame(x, data = data)
   } else if (inherits(x, "SpatialPoints") &&
-             !inherits(x, "SpatialPointsDataFrame")) {
+    !inherits(x, "SpatialPointsDataFrame")) {
     # Other classes inherit from SpatialPoints, so need to be handled first
     result <- sp::SpatialPointsDataFrame(x, data = data)
+  } else if (inherits(x, "Spatial")) {
+    result <- sp::cbind.Spatial(x, data)
   } else {
     result <- cbind(x, data)
   }
@@ -972,7 +976,7 @@ predict.bru <- function(object,
     if (!is.null(annot)) {
       smy <- lapply(smy, function(v) cbind(data.frame(annot), v))
     }
-    
+
     if (!drop) {
       smy <- lapply(
         smy,
@@ -985,7 +989,7 @@ predict.bru <- function(object,
         }
       )
     }
-    
+
     if (length(smy) == 1) smy <- smy[[1]]
   } else if (is.list(vals[[1]])) {
     vals.names <- names(vals[[1]])
@@ -1002,7 +1006,7 @@ predict.bru <- function(object,
           )
         )
       if (!drop &&
-          (NROW(data) == NROW(tmp))) {
+        (NROW(data) == NROW(tmp))) {
         smy[[nm]] <- expand_to_dataframe(data, tmp)
       } else {
         smy[[nm]] <- tmp
@@ -1011,7 +1015,7 @@ predict.bru <- function(object,
   } else {
     tmp <- bru_summarise(vals)
     if (!drop &&
-        (NROW(data) == NROW(tmp))) {
+      (NROW(data) == NROW(tmp))) {
       smy <- expand_to_dataframe(data, tmp)
     } else {
       smy <- tmp
@@ -1526,7 +1530,8 @@ latent_names <- function(state) {
       } else {
         paste0(x, ".", seq_len(length(state[[x]])))
       }
-    })
+    }
+  )
   names(nm) <- names(state)
   nm
 }
@@ -1571,7 +1576,7 @@ tidy_tracker <- function(state, value_name = "value") {
 
 iinla <- function(model, lhoods, initial = NULL, options) {
   inla.options <- bru_options_inla(options)
-  
+
   initial_log_length <- length(bru_log_get())
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
@@ -1584,7 +1589,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       states = states,
       inla_stack = stk,
       track = if (is.null(original_track) ||
-                  setequal(names(original_track), names(track[[1]]))) {
+        setequal(names(original_track), names(track[[1]]))) {
         do.call(rbind, c(list(original_track), track))
       } else {
         track <- do.call(rbind, track)
@@ -1601,7 +1606,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       ...
     )
   }
-  
+
   # Initialise required local options
   inla.options <- modifyList(
     inla.options,
@@ -1633,9 +1638,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     } else {
       # Set old result
       states <- evaluate_state(model,
-                               lhoods = lhoods,
-                               result = initial,
-                               property = "joint_mode"
+        lhoods = lhoods,
+        result = initial,
+        property = "joint_mode"
       )
     }
     if (inherits(initial, "bru")) {
@@ -1670,8 +1675,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     original_track <- old.result[["bru_iinla"]][["track"]]
     track_size <- max(original_track[["iteration"]])
   }
-  
-  
+
+
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
     A <- evaluate_A(model, lhoods)
@@ -1788,9 +1793,11 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           inla.options.merged,
           list(
             control.inla = list(int.strategy = "eb"),
-            control.compute = list(config = TRUE,
-                                   dic = FALSE,
-                                   waic = FALSE),
+            control.compute = list(
+              config = TRUE,
+              dic = FALSE,
+              waic = FALSE
+            ),
             control.predictor = list(compute = FALSE)
           )
         )
@@ -1838,8 +1845,10 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       # effects may appear in the random effects, so we need to
       # track all of them.
       result_mode <- evaluate_state(model, result, property = "joint_mode")[[1]]
-      result_sd <- evaluate_state(model, result, property = "sd",
-                                  internal_hyperpar = TRUE)[[1]]
+      result_sd <- evaluate_state(model, result,
+        property = "sd",
+        internal_hyperpar = TRUE
+      )[[1]]
       result_names <- latent_names(result_mode)
       track_df <- list()
       for (label in names(result_mode)) {
@@ -1859,8 +1868,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       # Update stack given current result
       state0 <- states[[length(states)]]
       state <- evaluate_state(model,
-                              result = result,
-                              property = "joint_mode"
+        result = result,
+        property = "joint_mode"
       )[[1]]
       if ((options$bru_max_iter > 1)) {
         if (do_line_search) {
@@ -1927,7 +1936,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     }
     k <- k + 1
   }
-  
+
   result[["bru_iinla"]] <- collect_misc_info()
   class(result) <- c("iinla", class(result))
   return(result)
@@ -2179,7 +2188,7 @@ summary.bru <- function(object, ...) {
 print.summary_bru <- function(x, ...) {
   print(x$bru_info)
   print(x$inla)
-  return(x)
+  invisible(x)
 }
 
 
@@ -2189,7 +2198,7 @@ print.summary_bru <- function(x, ...) {
 
 
 #' @describeIn inlabru-deprecated Old summary for an inlabru fit.
-#' 
+#'
 #' Takes a fitted `bru` object produced by [bru()] or [lgcp()] and creates
 #' various summaries from it.
 #'
