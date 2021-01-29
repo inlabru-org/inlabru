@@ -1,5 +1,11 @@
 # inlabru 2.2.5
 
+* Vignette corrections
+
+* Documentation improvements
+
+* Fix minor in Spatial* object handling and plotting
+
 # inlabru 2.2.4
 
 * Properly extract the joint latent conditional mode instead of the
