@@ -11,7 +11,6 @@
 #' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 #' @keywords internal
 split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
-
   idx <- seq_len(NROW(sp))
   if (NROW(sp) > 0) {
     # Filter out segments not on the mesh
@@ -28,7 +27,7 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
     ep <- ep[!((t1 == 0) | (t2 == 0)), , drop = FALSE]
     idx <- idx[!((t1 == 0) | (t2 == 0))]
   }
-  
+
   if (NROW(sp) == 0) {
     return(list(
       sp = sp, ep = ep,
@@ -39,7 +38,7 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
   }
 
   loc <- as.matrix(rbind(sp, ep))
-  
+
   # Split the segments into parts
   if (NCOL(loc) == 2) {
     loc <- cbind(loc, rep(0, NROW(loc)))

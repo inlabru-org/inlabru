@@ -195,7 +195,7 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
     pixels,
     data = data.frame(matrix(nrow = NROW(pixels), ncol = 0))
   )
-  
+
   pixels
 }
 

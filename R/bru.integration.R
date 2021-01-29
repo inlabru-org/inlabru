@@ -61,7 +61,7 @@
 #'   points before aggregation. Points per triangle: `(nsub2+1)^2`.
 #'   Points per knot segment: `nsub1`
 #' * `poly_method`: if set to "legacy", selects an old polygon integration method
-#'   that doesn't handle holes. Currently only used for debugging purposes. 
+#'   that doesn't handle holes. Currently only used for debugging purposes.
 #' @param project Deprecated in favour of `int.args(method=...)`.
 #' If TRUE, aggregate the integration points to mesh vertices. Default:
 #' `project = (identical(int.args$method, "stable"))`

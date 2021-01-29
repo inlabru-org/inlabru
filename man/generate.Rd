@@ -70,74 +70,74 @@ posterior of the estimated random effects.
 \examples{
 \donttest{
 if (bru_safe_inla()) {
-  
-# Generate data for a simple linear model
 
-input.df <- data.frame(x=cos(1:10))
-input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+  # Generate data for a simple linear model
 
-# Fit the model
+  input.df <- data.frame(x = cos(1:10))
+  input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
 
-fit <- bru(y ~ xeff(main = x, model = "linear"),
-           family = "gaussian", data = input.df)
-summary(fit)
+  # Fit the model
 
-# Generate samples for some predefined x
+  fit <- bru(y ~ xeff(main = x, model = "linear"),
+    family = "gaussian", data = input.df
+  )
+  summary(fit)
 
-df = data.frame(x = seq(-4, 4, by = 0.1))
-smp = generate(fit, df, ~ xeff + Intercept, n.samples = 10)
+  # Generate samples for some predefined x
 
-# Plot the resulting realizations
+  df <- data.frame(x = seq(-4, 4, by = 0.1))
+  smp <- generate(fit, df, ~ xeff + Intercept, n.samples = 10)
 
-plot(df$x, smp[,1], type = "l")
-for (k in 2:ncol(smp)) points(df$x, smp[,k], type = "l")
+  # Plot the resulting realizations
 
-# We can also draw samples form the joint posterior
+  plot(df$x, smp[, 1], type = "l")
+  for (k in 2:ncol(smp)) points(df$x, smp[, k], type = "l")
 
-df = data.frame(x = 1)
-smp = generate(fit, df, ~ data.frame(xeff, Intercept), n.samples = 10)
-smp[[1]]
+  # We can also draw samples form the joint posterior
 
-# ... and plot them
+  df <- data.frame(x = 1)
+  smp <- generate(fit, df, ~ data.frame(xeff, Intercept), n.samples = 10)
+  smp[[1]]
 
-plot(do.call(rbind, smp))
+  # ... and plot them
 
+  plot(do.call(rbind, smp))
 }
 }
 \donttest{
 if (bru_safe_inla()) {
-  
-# Generate data for a simple linear model
 
-input.df <- data.frame(x=cos(1:10))
-input.df <- within(input.df, y <- 5 + 2*cos(1:10) + rnorm(10, mean=0, sd=0.1))
+  # Generate data for a simple linear model
 
-# Fit the model
+  input.df <- data.frame(x = cos(1:10))
+  input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
 
-fit <- bru(y ~ xeff(main = x, model = "linear"),
-           family = "gaussian", data = input.df)
-summary(fit)
+  # Fit the model
 
-# Generate samples for some predefined x
+  fit <- bru(y ~ xeff(main = x, model = "linear"),
+    family = "gaussian", data = input.df
+  )
+  summary(fit)
 
-df = data.frame(x = seq(-4, 4, by = 0.1))
-smp = generate(fit, df, ~ xeff + Intercept, n.samples = 10)
+  # Generate samples for some predefined x
 
-# Plot the resulting realizations
+  df <- data.frame(x = seq(-4, 4, by = 0.1))
+  smp <- generate(fit, df, ~ xeff + Intercept, n.samples = 10)
 
-plot(df$x, smp[,1], type = "l")
-for (k in 2:ncol(smp)) points(df$x, smp[,k], type = "l")
+  # Plot the resulting realizations
 
-# We can also draw samples form the joint posterior
+  plot(df$x, smp[, 1], type = "l")
+  for (k in 2:ncol(smp)) points(df$x, smp[, k], type = "l")
 
-df = data.frame(x = 1)
-smp = generate(fit, df, ~ data.frame(xeff, Intercept), n.samples = 10)
-smp[[1]]
+  # We can also draw samples form the joint posterior
 
-# ... and plot them
+  df <- data.frame(x = 1)
+  smp <- generate(fit, df, ~ data.frame(xeff, Intercept), n.samples = 10)
+  smp[[1]]
 
-plot(do.call(rbind, smp))
+  # ... and plot them
 
+  plot(do.call(rbind, smp))
 }
 }
 }

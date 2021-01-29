@@ -454,7 +454,7 @@ evaluate_predictor <- function(model,
     if (k == 1) {
       if (identical(format, "auto")) {
         if ((is.vector(result_) && !is.list(result_)) ||
-             (is.matrix(result_) && (NCOL(result_) == 1))) {
+          (is.matrix(result_) && (NCOL(result_) == 1))) {
           format <- "matrix"
         } else {
           format <- "list"

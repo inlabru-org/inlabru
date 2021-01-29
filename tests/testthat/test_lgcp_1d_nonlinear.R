@@ -71,11 +71,11 @@ test_that("Mexdolphin: Hazard rate detection function", {
 #     min_iterations = 2
 #   )
 # }
-# 
+#
 # timings()
 # # A tibble: 2 x 13
-# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time         gc              
-# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <list>       <list>          
+# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time         gc
+# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <list>       <list>
 #   1 legacy        1.36s    1.39s     0.722        NA     2.17     2     6      2.77s <NULL> <NULL> <bch:tm [2]> <tibble [2 × 3]>
 #   2 pandemic      1.36s    1.37s     0.732        NA     2.19     2     6      2.73s <NULL> <NULL> <bch:tm [2]> <tibble [2 × 3]>
 #

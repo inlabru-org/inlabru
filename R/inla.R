@@ -79,21 +79,22 @@ generate.inla <- function(object,
 inla_result_latent_idx <- function(result) {
   do.call(
     c,
-    lapply(result$misc$configs$contents$tag,
-           function(x) {
-             idx <- 
-               list(
-                 result$misc$configs$contents$start[
-                   result$misc$configs$contents$tag == x
-                 ] -1 + seq_len(
-                   result$misc$configs$contents$length[
-                     result$misc$configs$contents$tag == x
-                   ]
-                 )
-               )
-             names(idx) = x
-             idx
-           }
+    lapply(
+      result$misc$configs$contents$tag,
+      function(x) {
+        idx <-
+          list(
+            result$misc$configs$contents$start[
+              result$misc$configs$contents$tag == x
+            ] - 1 + seq_len(
+              result$misc$configs$contents$length[
+                result$misc$configs$contents$tag == x
+              ]
+            )
+          )
+        names(idx) <- x
+        idx
+      }
     )
   )
 }
@@ -119,8 +120,10 @@ extract_property <- function(result, property,
 
   if (property == "joint_mode") {
     mode_idx <- inla_result_latent_idx(result)
-    for (label in c(rownames(result$summary.fixed),
-                    names(result$summary.random))) {
+    for (label in c(
+      rownames(result$summary.fixed),
+      names(result$summary.random)
+    )) {
       ret[[label]] <- result$mode$x[mode_idx[[label]]]
     }
     theta_names <- bru_standardise_names(result$mode$theta.tags)
@@ -129,7 +132,7 @@ extract_property <- function(result, property,
     }
     return(ret)
   }
-  
+
   for (label in rownames(result$summary.fixed)) {
     ret[[label]] <- result$summary.fixed[label, property]
   }
@@ -218,7 +221,7 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
       num.threads = num.threads
     )
   }
-  
+
   ssmpl <- list()
   for (i in 1:length(samples)) {
     smpl.latent <- samples[[i]]$latent
@@ -412,15 +415,15 @@ plotmarginal.inla <- function(result,
   }
 
   if (varname %in% c(result$names.fixed, rownames(result$summary.hyperpar)) ||
-      (!is.null(index) && (varname %in% names(result$summary.random)))) {
+    (!is.null(index) && (varname %in% names(result$summary.random)))) {
     if (varname %in% rownames(vars) &&
-        vars[varname, "type"] == "fixed") {
+      vars[varname, "type"] == "fixed") {
       marg <- INLA::inla.tmarginal(link, result$marginals.fixed[[varname]])
     }
     else if (varname %in% names(result$summary.random)) {
       marg <- INLA::inla.tmarginal(link, result$marginals.random[[varname]][[index]])
       ovarname <- paste0(ovarname, " ", index)
-      if (ovarname %in% rownames(vars) ) {
+      if (ovarname %in% rownames(vars)) {
         if (!identical(vars[ovarname, "ID"], as.character(index - 1))) {
           # Use factor level name
           ovarname <- vars[ovarname, "ID"]
@@ -428,7 +431,7 @@ plotmarginal.inla <- function(result,
       }
     }
     else if (varname %in% rownames(vars) &&
-             vars[varname, "type"] == "hyperpar") {
+      vars[varname, "type"] == "hyperpar") {
       marg <- INLA::inla.tmarginal(link, result$marginals.hyperpar[[varname]])
     }
     uq <- INLA::inla.qmarginal(0.975, marg)

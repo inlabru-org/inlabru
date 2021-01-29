@@ -530,30 +530,35 @@ component.character <- function(object,
       if (!is.null(season.length)) {
         fcall[["season.length"]] <- season.length
       }
-      
+
       # Make sure 'values' is setup properly.
       if (is.null(component$main$values)) {
         fcall <- fcall[!("values" %in% names(fcall))]
       } else {
         values_name <- paste0("BRU_", label, "_values")
         fcall[["values"]] <- as.symbol(values_name)
-        assign(values_name, component$main$values, envir = component$env_extra)
+        assign(
+          values_name,
+          component$main$values,
+          envir = component$env_extra
+        )
       }
-      
+
       # Setup factor precision parameter
       if (identical(component$main$type, "factor")) {
         if (is.null(fcall[["hyper"]])) {
           # TODO: allow configuration of the precision via prec_linear
           factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
           fcall[["hyper"]] <- as.symbol(factor_hyper_name)
-          assign(factor_hyper_name,
-                 list(prec = list(initial = log(1e-6), fixed = TRUE)),
-                 envir = component$env_extra
+          assign(
+            factor_hyper_name,
+            list(prec = list(initial = log(1e-6), fixed = TRUE)),
+            envir = component$env_extra
           )
         }
       }
     }
-    
+
     component$inla.formula <-
       as.formula(paste0(
         "~ . + ",
@@ -561,7 +566,7 @@ component.character <- function(object,
       ),
       env = envir
       )
-    
+
     component$fcall <- fcall
   }
 
@@ -932,7 +937,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
       null.results <- vapply(inp, function(x) is.null(x), TRUE)
       if (all(null.results)) {
         warning(paste0(
-          "All covariate evaluations for '", label, 
+          "All covariate evaluations for '", label,
           "' are NULL; an intercept component was likely intended.\n",
           "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
           "  Use explicit notation '+ ", label, "(1)' instead",

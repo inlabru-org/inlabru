@@ -783,13 +783,13 @@ requireINLA <- function(quietly = FALSE) {
 
 
 #' @describeIn inlabru-deprecated Global setting for tutorial sessions.
-#' 
+#'
 #' Use [bru_options_set()] to set specific
 #' options instead instead.  In versions <= 2.1.15, this function set the INLA
 #' integration strategy to "eb" to speed up calculations. This is normally not
 #' needed since version 2.2.0, since the only the final iteration will use
 #' other than "eb".
-#' 
+#'
 #' @aliases init.tutorial
 #' @export
 #'
@@ -808,7 +808,7 @@ requireINLA <- function(quietly = FALSE) {
 #' # Check if it worked:
 #' bru_options_get("control.inla")
 #' }
-
+#'
 init.tutorial <- function() {
   .Deprecated("bru_options_set(bru_verbose = TRUE, control.compute = list(dic = TRUE, waic = TRUE))")
   message("Setting defaults for tutorial session.")
