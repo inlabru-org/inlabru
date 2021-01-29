@@ -4,15 +4,13 @@
 \alias{gg.SpatialPixelsDataFrame}
 \title{Geom for SpatialPixelsDataFrame objects}
 \usage{
-\method{gg}{SpatialPixelsDataFrame}(data, mapping = NULL, alpha = NULL, crs = NULL, mask = NULL, ...)
+\method{gg}{SpatialPixelsDataFrame}(data, mapping = NULL, crs = NULL, mask = NULL, ...)
 }
 \arguments{
 \item{data}{A SpatialPixelsDataFrame object.}
 
 \item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
 mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], y = coordnames(data)[2], fill = names(data)[[1]])}.}
-
-\item{alpha}{Character array identifying the data column used for tile transparency.}
 
 \item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
 

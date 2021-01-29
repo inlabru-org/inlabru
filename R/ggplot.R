@@ -456,7 +456,6 @@ gg.SpatialGridDataFrame <- function(data, ...) {
 #' @param mapping Aesthetic mappings created by [aes] or [aes_] used to update the default
 #'                mapping. The default mapping is `aes_string(x = coordnames(data)[1],
 #'                y = coordnames(data)[2], fill = names(data)[[1]])`.
-#' @param alpha Character array identifying the data column used for tile transparency.
 #' @param crs A [CRS] object defining the coordinate system to project the data to before plotting.
 #' @param mask A SpatialPolygon defining the region that is plotted.
 #' @param ... Arguments passed on to [geom_tile].
@@ -466,7 +465,6 @@ gg.SpatialGridDataFrame <- function(data, ...) {
 
 gg.SpatialPixelsDataFrame <- function(data,
                                       mapping = NULL,
-                                      alpha = NULL,
                                       crs = NULL,
                                       mask = NULL, ...) {
   if (!is.null(crs)) {
@@ -478,16 +476,22 @@ gg.SpatialPixelsDataFrame <- function(data,
 
   df <- as.data.frame(data)
 
-  dmap <- aes_string(
-    x = coordnames(data)[1],
-    y = coordnames(data)[2],
-    fill = names(data)[[1]]
-  )
+  if (length(names(data)) == 0) {
+    dmap <- aes_string(
+      x = coordnames(data)[1],
+      y = coordnames(data)[2]
+    )
+  } else {
+    dmap <- aes_string(
+      x = coordnames(data)[1],
+      y = coordnames(data)[2],
+      fill = names(data)[[1]]
+    )
+  }
 
   if (!is.null(mapping)) {
     dmap <- modifyList(dmap, mapping)
   }
-  if (!is.null(alpha)) dmap <- modifyList(dmap, aes_string(alpha = alpha))
   gm <- geom_tile(data = df, mapping = dmap, ...)
 
   gm
