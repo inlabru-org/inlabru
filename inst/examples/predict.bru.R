@@ -1,92 +1,100 @@
 \donttest{
 if (bru_safe_inla()) {
-    
-# Load the Gorilla data
 
-data(gorillas, package ="inlabru")
+  # Load the Gorilla data
 
-# Plot the Gorilla nests, the mesh and the survey boundary
+  data(gorillas, package = "inlabru")
 
-ggplot() +
-  gg(gorillas$mesh) +
-  gg(gorillas$nests) +
-  gg(gorillas$boundary) +
-  coord_fixed()
+  # Plot the Gorilla nests, the mesh and the survey boundary
 
-# Define SPDE prior
+  ggplot() +
+    gg(gorillas$mesh) +
+    gg(gorillas$nests) +
+    gg(gorillas$boundary) +
+    coord_fixed()
 
-matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
-                                    prior.sigma = c(0.1, 0.01),
-                                    prior.range = c(0.01, 0.01))
+  # Define SPDE prior
 
-# Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
+  matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+    prior.sigma = c(0.1, 0.01),
+    prior.range = c(0.01, 0.01)
+  )
 
-cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept(1)
+  # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 
-# Fit the model, with "eb" instead of full Bayes
-fit <- lgcp(cmp, gorillas$nests, samplers = gorillas$boundary,
-            domain = list(coordinates = gorillas$mesh),
-            options = list(control.inla = list(int.strategy = "eb")))
+  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept(1)
 
-# Once we obtain a fitted model the predict function can serve various purposes. 
-# The most basic one is to determine posterior statistics of a univariate
-# random variable in the model, e.g. the intercept
+  # Fit the model, with "eb" instead of full Bayes
+  fit <- lgcp(cmp, gorillas$nests,
+    samplers = gorillas$boundary,
+    domain = list(coordinates = gorillas$mesh),
+    options = list(control.inla = list(int.strategy = "eb"))
+  )
 
-icpt <- predict(fit, NULL, ~ c(Intercept = Intercept_latent))
-plot(icpt)
+  # Once we obtain a fitted model the predict function can serve various purposes.
+  # The most basic one is to determine posterior statistics of a univariate
+  # random variable in the model, e.g. the intercept
 
-# The formula argument can take any expression that is valid within the model, for
-# instance a non-linear transformation of a random variable
+  icpt <- predict(fit, NULL, ~ c(Intercept = Intercept_latent))
+  plot(icpt)
 
-exp.icpt <- predict(fit, NULL, ~ c("Intercept" = Intercept_latent,
-                                   "exp(Intercept)" = exp(Intercept_latent)))
-plot(exp.icpt, bar = TRUE)
+  # The formula argument can take any expression that is valid within the model, for
+  # instance a non-linear transformation of a random variable
 
-# The intercept is special in the sense that it does not depend on other variables
-# or covariates. However, this is not true for the smooth spatial effects 'mySmooth'.
-# In order to predict 'mySmooth' we have to define where (in space) to predict. For
-# this purpose, the second argument of the predict function can take \code{data.frame}
-# objects as well as Spatial objects. For instance, we might want to predict
-# 'mySmooth' at the locations of the mesh vertices. Using
+  exp.icpt <- predict(fit, NULL, ~ c(
+    "Intercept" = Intercept_latent,
+    "exp(Intercept)" = exp(Intercept_latent)
+  ))
+  plot(exp.icpt, bar = TRUE)
 
-vrt = vertices(gorillas$mesh)
+  # The intercept is special in the sense that it does not depend on other variables
+  # or covariates. However, this is not true for the smooth spatial effects 'mySmooth'.
+  # In order to predict 'mySmooth' we have to define where (in space) to predict. For
+  # this purpose, the second argument of the predict function can take \code{data.frame}
+  # objects as well as Spatial objects. For instance, we might want to predict
+  # 'mySmooth' at the locations of the mesh vertices. Using
 
-# we obtain these vertices as a SpatialPointsDataFrame
+  vrt <- vertices(gorillas$mesh)
 
-ggplot() + gg(gorillas$mesh) + gg(vrt, color = "red")
+  # we obtain these vertices as a SpatialPointsDataFrame
 
-# Predicting 'mySmooth' at these locations works as follows
+  ggplot() +
+    gg(gorillas$mesh) +
+    gg(vrt, color = "red")
 
-mySmooth = predict(fit, vrt, ~ mySmooth)
+  # Predicting 'mySmooth' at these locations works as follows
 
-# Note that just like the input also the output will be a SpatialPointsDataFrame
-# and that the predicted statistics are simply added as columns
+  mySmooth <- predict(fit, vrt, ~mySmooth)
 
-class(mySmooth)
-head(vrt)
-head(mySmooth)
+  # Note that just like the input also the output will be a SpatialPointsDataFrame
+  # and that the predicted statistics are simply added as columns
 
-# Plotting the mean, for instance, at the mesh node is straight forward
+  class(mySmooth)
+  head(vrt)
+  head(mySmooth)
 
-ggplot() + 
-  gg(gorillas$mesh) + 
-  gg(mySmooth, aes(color = mean), size = 3)
+  # Plotting the mean, for instance, at the mesh node is straight forward
 
-# However, we are often interested in a spatial field and thus a linear interpolation,
-# which can be achieved by using the gg mechanism for meshes
+  ggplot() +
+    gg(gorillas$mesh) +
+    gg(mySmooth, aes(color = mean), size = 3)
 
-ggplot() + gg(gorillas$mesh, color = mySmooth$mean)
+  # However, we are often interested in a spatial field and thus a linear interpolation,
+  # which can be achieved by using the gg mechanism for meshes
 
-# Alternatively, we can predict the spatial field at a grid of locations, e.g. a
-# SpatialPixels object covering the mesh
+  ggplot() +
+    gg(gorillas$mesh, color = mySmooth$mean)
 
-pxl = pixels(gorillas$mesh)
-mySmooth2 = predict(fit, pxl, ~ mySmooth)
+  # Alternatively, we can predict the spatial field at a grid of locations, e.g. a
+  # SpatialPixels object covering the mesh
 
-# This will give us a SpatialPixelDataFrame with the columns we are looking for
+  pxl <- pixels(gorillas$mesh)
+  mySmooth2 <- predict(fit, pxl, ~mySmooth)
 
-head(mySmooth2)
-ggplot() + gg(mySmooth2)
+  # This will give us a SpatialPixelDataFrame with the columns we are looking for
 
+  head(mySmooth2)
+  ggplot() +
+    gg(mySmooth2)
 }
 }

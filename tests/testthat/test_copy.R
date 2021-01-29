@@ -67,15 +67,15 @@ test_that("Component copy feature", {
   mydata <- within(mydata, {
     y <- rpois(8, exp(x1^0.5 + x2^0.5 * 2 - 1))
   })
-  
+
   inlaform <- y ~ -1 +
     f(x1, model = "rw2", values = 1:4, scale.model = TRUE) +
     f(x2, copy = "x1", fixed = FALSE)
   fit <- INLA::inla(formula = inlaform, data = mydata, family = "poisson")
-  
+
   cmp <- y ~ -1 + x1(x1, model = "rw2", scale.model = TRUE) + x2(x2, copy = "x1", fixed = FALSE)
   fit_bru <- bru(cmp, family = "poisson", data = mydata)
-  
+
   expect_equal(
     fit_bru$summary.hyperpar,
     fit$summary.hyperpar,
@@ -86,7 +86,7 @@ test_that("Component copy feature", {
 test_that("Component copy feature with group", {
   skip_on_cran()
   local_bru_safe_inla()
-  
+
   # Seed influences data as well as predict()!
   set.seed(123L)
 
@@ -101,25 +101,30 @@ test_that("Component copy feature with group", {
     z2 <- rep(c(1, 2), each = length(x1) / 2)
   })
   mydata <- within(mydata, {
-    y <- rpois(prod(n), exp(x1/n[1]*4 + x2/n[1]*4 * 2  + (z + z2 - 3) / 2 - 1))
+    y <- rpois(prod(n), exp(x1 / n[1] * 4 + x2 / n[1] * 4 * 2 + (z + z2 - 3) / 2 - 1))
   })
-  
+
   inlaform <- y ~ -1 +
     f(x1, model = "rw1", values = seq_len(n[1]), scale.model = TRUE, group = z) +
     f(x2, copy = "x1", fixed = FALSE, group = z2)
-  fit <- INLA::inla(formula = inlaform, data = mydata, family = "poisson",
-                    control.inla = list(int.strategy = "eb"))
-  
+  fit <- INLA::inla(
+    formula = inlaform, data = mydata, family = "poisson",
+    control.inla = list(int.strategy = "eb")
+  )
+
   cmp <- ~ -1 + x1(x1, model = "rw1", scale.model = TRUE, group = z) +
     x2(x2, copy = "x1", fixed = FALSE, group = z2)
-  fit_bru <- bru(cmp, formula = y ~ x1 + x2, family = "poisson", data = mydata,
-                 options = list(bru_max_iter = 1,
-                                control.inla = list(int.strategy = "eb")))
-  
+  fit_bru <- bru(cmp,
+    formula = y ~ x1 + x2, family = "poisson", data = mydata,
+    options = list(
+      bru_max_iter = 1,
+      control.inla = list(int.strategy = "eb")
+    )
+  )
+
   expect_equal(
     fit_bru$summary.hyperpar,
     fit$summary.hyperpar,
     tolerance = hitol
   )
-  
 })

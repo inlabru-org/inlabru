@@ -59,33 +59,36 @@ to plot the interpolation.
 \examples{
 \donttest{
 if (bru_safe_inla()) {
-    
-# Load Gorilla data
-data("gorillas", package = "inlabru")
 
-# Plot mesh using default edge colors
+  # Load Gorilla data
+  data("gorillas", package = "inlabru")
 
-ggplot() + gg(gorillas$mesh)
+  # Plot mesh using default edge colors
 
-# Don't show interior and exterior boundaries
+  ggplot() +
+    gg(gorillas$mesh)
 
-ggplot() + gg(gorillas$mesh, interior = FALSE, exterior = FALSE)
+  # Don't show interior and exterior boundaries
 
-# Change the edge colors
+  ggplot() +
+    gg(gorillas$mesh, interior = FALSE, exterior = FALSE)
 
-ggplot() + gg(gorillas$mesh, 
-              edge.color = "green",
-              int.color = "black",
-              ext.color = "blue"
-              )
+  # Change the edge colors
 
-# Use the x-coordinate of the vertices to colorize the triangles and
-# mask the plotted area by the survey boundary, i.e. only plot the inside
+  ggplot() +
+    gg(gorillas$mesh,
+      edge.color = "green",
+      int.color = "black",
+      ext.color = "blue"
+    )
 
-xcoord = gorillas$mesh$loc[,1]
-ggplot() + 
-  gg(gorillas$mesh, color = (xcoord-580), mask = gorillas$boundary) +
-  gg(gorillas$boundary)
+  # Use the x-coordinate of the vertices to colorize the triangles and
+  # mask the plotted area by the survey boundary, i.e. only plot the inside
+
+  xcoord <- gorillas$mesh$loc[, 1]
+  ggplot() +
+    gg(gorillas$mesh, color = (xcoord - 580), mask = gorillas$boundary) +
+    gg(gorillas$boundary)
 }
 }
 }

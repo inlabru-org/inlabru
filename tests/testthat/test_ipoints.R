@@ -162,13 +162,13 @@ test_that("Polygon integration with holes", {
 
 test_that("Integration line splitting", {
   local_bru_safe_inla()
-  
+
   mesh <- INLA::inla.mesh.2d(
     loc.domain = cbind(0, 0),
     offset = 2,
     max.edge = 0.5
   )
-  
+
   expect_error(
     {
       sl <- split_lines(
@@ -179,7 +179,7 @@ test_that("Integration line splitting", {
     },
     NA
   )
-  
+
   # Check issue #63 (problem for single line input), fixed
   expect_error(
     {
@@ -191,7 +191,7 @@ test_that("Integration line splitting", {
     },
     NA
   )
-  
+
   # Check if empty input is ok
   expect_error(
     {
@@ -203,5 +203,4 @@ test_that("Integration line splitting", {
     },
     NA
   )
-  
 })
