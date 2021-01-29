@@ -75,7 +75,7 @@ to plot the interpolation." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.4.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.5.9000</span>
       </span>
     </div>
 
@@ -258,33 +258,36 @@ to plot the interpolation.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-    
-<span class='co'># Load Gorilla data</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"gorillas"</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>
 
-<span class='co'># Plot mesh using default edge colors</span>
+  <span class='co'># Load Gorilla data</span>
+  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"gorillas"</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span>
+  <span class='co'># Plot mesh using default edge colors</span>
 
-<span class='co'># Don't show interior and exterior boundaries</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>, interior <span class='op'>=</span> <span class='cn'>FALSE</span>, exterior <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+  <span class='co'># Don't show interior and exterior boundaries</span>
 
-<span class='co'># Change the edge colors</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>, interior <span class='op'>=</span> <span class='cn'>FALSE</span>, exterior <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>, 
-              edge.color <span class='op'>=</span> <span class='st'>"green"</span>,
-              int.color <span class='op'>=</span> <span class='st'>"black"</span>,
-              ext.color <span class='op'>=</span> <span class='st'>"blue"</span>
-              <span class='op'>)</span>
+  <span class='co'># Change the edge colors</span>
 
-<span class='co'># Use the x-coordinate of the vertices to colorize the triangles and</span>
-<span class='co'># mask the plotted area by the survey boundary, i.e. only plot the inside</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>,
+      edge.color <span class='op'>=</span> <span class='st'>"green"</span>,
+      int.color <span class='op'>=</span> <span class='st'>"black"</span>,
+      ext.color <span class='op'>=</span> <span class='st'>"blue"</span>
+    <span class='op'>)</span>
 
-<span class='va'>xcoord</span> <span class='op'>=</span> <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>$</span><span class='va'>loc</span><span class='op'>[</span>,<span class='fl'>1</span><span class='op'>]</span>
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>, color <span class='op'>=</span> <span class='op'>(</span><span class='va'>xcoord</span><span class='op'>-</span><span class='fl'>580</span><span class='op'>)</span>, mask <span class='op'>=</span> <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span>
+  <span class='co'># Use the x-coordinate of the vertices to colorize the triangles and</span>
+  <span class='co'># mask the plotted area by the survey boundary, i.e. only plot the inside</span>
+
+  <span class='va'>xcoord</span> <span class='op'>&lt;-</span> <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>$</span><span class='va'>loc</span><span class='op'>[</span>, <span class='fl'>1</span><span class='op'>]</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>, color <span class='op'>=</span> <span class='op'>(</span><span class='va'>xcoord</span> <span class='op'>-</span> <span class='fl'>580</span><span class='op'>)</span>, mask <span class='op'>=</span> <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span>
 <span class='op'>}</span>
 </div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='img'><img src='gg.inla.mesh-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></pre>

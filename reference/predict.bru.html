@@ -76,7 +76,7 @@ posterior of the estimated random effects." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.4.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.5.9000</span>
       </span>
     </div>
 
@@ -263,94 +263,102 @@ the model.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-    
-<span class='co'># Load the Gorilla data</span>
 
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gorillas</span>, package <span class='op'>=</span><span class='st'>"inlabru"</span><span class='op'>)</span>
+  <span class='co'># Load the Gorilla data</span>
 
-<span class='co'># Plot the Gorilla nests, the mesh and the survey boundary</span>
+  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gorillas</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/coord_fixed.html'>coord_fixed</a></span><span class='op'>(</span><span class='op'>)</span>
+  <span class='co'># Plot the Gorilla nests, the mesh and the survey boundary</span>
 
-<span class='co'># Define SPDE prior</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/coord_fixed.html'>coord_fixed</a></span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='va'>matern</span> <span class='op'>&lt;-</span> <span class='fu'>INLA</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html'>inla.spde2.pcmatern</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>,
-                                    prior.sigma <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.01</span><span class='op'>)</span>,
-                                    prior.range <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.01</span>, <span class='fl'>0.01</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='co'># Define SPDE prior</span>
 
-<span class='co'># Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)</span>
+  <span class='va'>matern</span> <span class='op'>&lt;-</span> <span class='fu'>INLA</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html'>inla.spde2.pcmatern</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>,
+    prior.sigma <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.01</span><span class='op'>)</span>,
+    prior.range <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.01</span>, <span class='fl'>0.01</span><span class='op'>)</span>
+  <span class='op'>)</span>
 
-<span class='va'>cmp</span> <span class='op'>&lt;-</span> <span class='va'>coordinates</span> <span class='op'>~</span> <span class='fu'>mySmooth</span><span class='op'>(</span>main <span class='op'>=</span> <span class='va'>coordinates</span>, model <span class='op'>=</span> <span class='va'>matern</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>Intercept</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
+  <span class='co'># Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)</span>
 
-<span class='co'># Fit the model, with "eb" instead of full Bayes</span>
-<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lgcp.html'>lgcp</a></span><span class='op'>(</span><span class='va'>cmp</span>, <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>, samplers <span class='op'>=</span> <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span>,
-            domain <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>coordinates <span class='op'>=</span> <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span>,
-            options <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>control.inla <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int.strategy <span class='op'>=</span> <span class='st'>"eb"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='va'>cmp</span> <span class='op'>&lt;-</span> <span class='va'>coordinates</span> <span class='op'>~</span> <span class='fu'>mySmooth</span><span class='op'>(</span>main <span class='op'>=</span> <span class='va'>coordinates</span>, model <span class='op'>=</span> <span class='va'>matern</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>Intercept</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
 
-<span class='co'># Once we obtain a fitted model the predict function can serve various purposes. </span>
-<span class='co'># The most basic one is to determine posterior statistics of a univariate</span>
-<span class='co'># random variable in the model, e.g. the intercept</span>
+  <span class='co'># Fit the model, with "eb" instead of full Bayes</span>
+  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lgcp.html'>lgcp</a></span><span class='op'>(</span><span class='va'>cmp</span>, <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>,
+    samplers <span class='op'>=</span> <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span>,
+    domain <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>coordinates <span class='op'>=</span> <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span>,
+    options <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>control.inla <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int.strategy <span class='op'>=</span> <span class='st'>"eb"</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='op'>)</span>
 
-<span class='va'>icpt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>, <span class='cn'>NULL</span>, <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>Intercept <span class='op'>=</span> <span class='va'>Intercept_latent</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>icpt</span><span class='op'>)</span>
+  <span class='co'># Once we obtain a fitted model the predict function can serve various purposes.</span>
+  <span class='co'># The most basic one is to determine posterior statistics of a univariate</span>
+  <span class='co'># random variable in the model, e.g. the intercept</span>
 
-<span class='co'># The formula argument can take any expression that is valid within the model, for</span>
-<span class='co'># instance a non-linear transformation of a random variable</span>
+  <span class='va'>icpt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>, <span class='cn'>NULL</span>, <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>Intercept <span class='op'>=</span> <span class='va'>Intercept_latent</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>icpt</span><span class='op'>)</span>
 
-<span class='va'>exp.icpt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>, <span class='cn'>NULL</span>, <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Intercept"</span> <span class='op'>=</span> <span class='va'>Intercept_latent</span>,
-                                   <span class='st'>"exp(Intercept)"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>Intercept_latent</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>exp.icpt</span>, bar <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+  <span class='co'># The formula argument can take any expression that is valid within the model, for</span>
+  <span class='co'># instance a non-linear transformation of a random variable</span>
 
-<span class='co'># The intercept is special in the sense that it does not depend on other variables</span>
-<span class='co'># or covariates. However, this is not true for the smooth spatial effects 'mySmooth'.</span>
-<span class='co'># In order to predict 'mySmooth' we have to define where (in space) to predict. For</span>
-<span class='co'># this purpose, the second argument of the predict function can take \code{data.frame}</span>
-<span class='co'># objects as well as Spatial objects. For instance, we might want to predict</span>
-<span class='co'># 'mySmooth' at the locations of the mesh vertices. Using</span>
+  <span class='va'>exp.icpt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>, <span class='cn'>NULL</span>, <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+    <span class='st'>"Intercept"</span> <span class='op'>=</span> <span class='va'>Intercept_latent</span>,
+    <span class='st'>"exp(Intercept)"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>Intercept_latent</span><span class='op'>)</span>
+  <span class='op'>)</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>exp.icpt</span>, bar <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
-<span class='va'>vrt</span> <span class='op'>=</span> <span class='fu'><a href='vertices.html'>vertices</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span>
+  <span class='co'># The intercept is special in the sense that it does not depend on other variables</span>
+  <span class='co'># or covariates. However, this is not true for the smooth spatial effects 'mySmooth'.</span>
+  <span class='co'># In order to predict 'mySmooth' we have to define where (in space) to predict. For</span>
+  <span class='co'># this purpose, the second argument of the predict function can take \code{data.frame}</span>
+  <span class='co'># objects as well as Spatial objects. For instance, we might want to predict</span>
+  <span class='co'># 'mySmooth' at the locations of the mesh vertices. Using</span>
 
-<span class='co'># we obtain these vertices as a SpatialPointsDataFrame</span>
+  <span class='va'>vrt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vertices.html'>vertices</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>vrt</span>, color <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>
+  <span class='co'># we obtain these vertices as a SpatialPointsDataFrame</span>
 
-<span class='co'># Predicting 'mySmooth' at these locations works as follows</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>vrt</span>, color <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>
 
-<span class='va'>mySmooth</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>, <span class='va'>vrt</span>, <span class='op'>~</span> <span class='va'>mySmooth</span><span class='op'>)</span>
+  <span class='co'># Predicting 'mySmooth' at these locations works as follows</span>
 
-<span class='co'># Note that just like the input also the output will be a SpatialPointsDataFrame</span>
-<span class='co'># and that the predicted statistics are simply added as columns</span>
+  <span class='va'>mySmooth</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>, <span class='va'>vrt</span>, <span class='op'>~</span><span class='va'>mySmooth</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='va'>mySmooth</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>vrt</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>mySmooth</span><span class='op'>)</span>
+  <span class='co'># Note that just like the input also the output will be a SpatialPointsDataFrame</span>
+  <span class='co'># and that the predicted statistics are simply added as columns</span>
 
-<span class='co'># Plotting the mean, for instance, at the mesh node is straight forward</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='va'>mySmooth</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>vrt</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>mySmooth</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span> <span class='op'>+</span> 
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mySmooth</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>color <span class='op'>=</span> <span class='va'>mean</span><span class='op'>)</span>, size <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+  <span class='co'># Plotting the mean, for instance, at the mesh node is straight forward</span>
 
-<span class='co'># However, we are often interested in a spatial field and thus a linear interpolation,</span>
-<span class='co'># which can be achieved by using the gg mechanism for meshes</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mySmooth</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>color <span class='op'>=</span> <span class='va'>mean</span><span class='op'>)</span>, size <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>, color <span class='op'>=</span> <span class='va'>mySmooth</span><span class='op'>$</span><span class='va'>mean</span><span class='op'>)</span>
+  <span class='co'># However, we are often interested in a spatial field and thus a linear interpolation,</span>
+  <span class='co'># which can be achieved by using the gg mechanism for meshes</span>
 
-<span class='co'># Alternatively, we can predict the spatial field at a grid of locations, e.g. a</span>
-<span class='co'># SpatialPixels object covering the mesh</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>, color <span class='op'>=</span> <span class='va'>mySmooth</span><span class='op'>$</span><span class='va'>mean</span><span class='op'>)</span>
 
-<span class='va'>pxl</span> <span class='op'>=</span> <span class='fu'><a href='pixels.html'>pixels</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span>
-<span class='va'>mySmooth2</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>, <span class='va'>pxl</span>, <span class='op'>~</span> <span class='va'>mySmooth</span><span class='op'>)</span>
+  <span class='co'># Alternatively, we can predict the spatial field at a grid of locations, e.g. a</span>
+  <span class='co'># SpatialPixels object covering the mesh</span>
 
-<span class='co'># This will give us a SpatialPixelDataFrame with the columns we are looking for</span>
+  <span class='va'>pxl</span> <span class='op'>&lt;-</span> <span class='fu'><a href='pixels.html'>pixels</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span>
+  <span class='va'>mySmooth2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>, <span class='va'>pxl</span>, <span class='op'>~</span><span class='va'>mySmooth</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>mySmooth2</span><span class='op'>)</span>
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mySmooth2</span><span class='op'>)</span>
+  <span class='co'># This will give us a SpatialPixelDataFrame with the columns we are looking for</span>
 
+  <span class='fu'><a href='https://rdrr.io/pkg/raster/man/headtail.html'>head</a></span><span class='op'>(</span><span class='va'>mySmooth2</span><span class='op'>)</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mySmooth2</span><span class='op'>)</span>
 <span class='op'>}</span>
 </div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='img'><img src='predict.bru-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></pre>
