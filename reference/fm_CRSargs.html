@@ -226,7 +226,7 @@ name/value pairs.</p>
   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'>fm_CRSargs</span><span class='op'>(</span><span class='va'>crs1</span><span class='op'>)</span><span class='op'>)</span>
   <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'>fm_CRSargs</span><span class='op'>(</span><span class='va'>crs2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Use of old predefined projection 'longlat' is deprecated. Converting to 'longlat_norm'</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in CRS definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in CRS definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Use of old predefined projection 'longlat' is deprecated. Converting to 'longlat_norm'</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
 #&gt; <span class='warning'>Call stack:</span>
 #&gt; <span class='warning'>1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
 #&gt; <span class='warning'>2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
@@ -297,7 +297,7 @@ name/value pairs.</p>
 #&gt; <span class='warning'>24: eval(expr, envir, enclos)</span>
 #&gt; <span class='warning'>25: fm_CRSargs(crs0)</span>
 #&gt; <span class='warning'>26: fm_not_for_PROJ6()</span>
-#&gt; <span class='warning'>27: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in CRS definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in CRS definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs_as_list()' should not be used with PROJ6 and rgdal v3</span>
+#&gt; <span class='warning'>27: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs_as_list()' should not be used with PROJ6 and rgdal v3</span>
 #&gt; <span class='warning'>Call stack:</span>
 #&gt; <span class='warning'>1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
 #&gt; <span class='warning'>2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
@@ -439,7 +439,7 @@ name/value pairs.</p>
 #&gt; <span class='warning'>24: eval(expr, envir, enclos)</span>
 #&gt; <span class='warning'>25: fm_list_as_CRS(lst)</span>
 #&gt; <span class='warning'>26: fm_not_for_PROJ6()</span>
-#&gt; <span class='warning'>27: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRS' should be given a SRS_string for PROJ6 or a known keyword for a predefined string given in projargs. Using fallback PROJ4 method.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in CRS definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in CRS definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRS_as_list()' should not be used with PROJ6 and rgdal v3</span>
+#&gt; <span class='warning'>27: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRS' should be given a SRS_string for PROJ6 or a known keyword for a predefined string given in projargs. Using fallback PROJ4 method.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRS_as_list()' should not be used with PROJ6 and rgdal v3</span>
 #&gt; <span class='warning'>Call stack:</span>
 #&gt; <span class='warning'>1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
 #&gt; <span class='warning'>2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
@@ -658,7 +658,7 @@ name/value pairs.</p>
 #&gt; <span class='warning'>27: fm_CRSargs_as_list(fm_CRSargs(x))</span>
 #&gt; <span class='warning'>28: fm_CRSargs(x)</span>
 #&gt; <span class='warning'>29: fm_not_for_PROJ6()</span>
-#&gt; <span class='warning'>30: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in CRS definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in CRS definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in CRS definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in CRS definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
+#&gt; <span class='warning'>30: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
 #&gt; <span class='warning'>Call stack:</span>
 #&gt; <span class='warning'>1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
 #&gt; <span class='warning'>2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
@@ -730,7 +730,7 @@ name/value pairs.</p>
 #&gt; <span class='warning'>25: print(fm_CRSargs(crs0))</span>
 #&gt; <span class='warning'>26: fm_CRSargs(crs0)</span>
 #&gt; <span class='warning'>27: fm_not_for_PROJ6()</span>
-#&gt; <span class='warning'>28: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in CRS definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in CRS definition</span></div><div class='output co'>#&gt; [1] "+proj=longlat +R=1 +no_defs"</div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
+#&gt; <span class='warning'>28: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; [1] "+proj=longlat +R=1 +no_defs"</div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
 #&gt; <span class='warning'>Call stack:</span>
 #&gt; <span class='warning'>1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
 #&gt; <span class='warning'>2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
@@ -874,7 +874,7 @@ name/value pairs.</p>
 #&gt; <span class='warning'>25: print(fm_CRSargs(crs2))</span>
 #&gt; <span class='warning'>26: fm_CRSargs(crs2)</span>
 #&gt; <span class='warning'>27: fm_not_for_PROJ6()</span>
-#&gt; <span class='warning'>28: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in CRS definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in CRS definition</span></div><div class='output co'>#&gt; [1] "+proj=longlat +R=1 +no_defs"</div></pre>
+#&gt; <span class='warning'>28: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; [1] "+proj=longlat +R=1 +no_defs"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

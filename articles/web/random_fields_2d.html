@@ -118,7 +118,7 @@
       <h1 data-toc-skip>Random Fields in 2D</h1>
                         <h4 class="author">Finn Lindgren</h4>
             
-            <h4 class="date">2021-01-11</h4>
+            <h4 class="date">2021-01-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/random_fields_2d.Rmd"><code>vignettes/web/random_fields_2d.Rmd</code></a></small>
       <div class="hidden name"><code>random_fields_2d.Rmd</code></div>
@@ -155,10 +155,10 @@
 <span class="co">#&gt; Warning in inla.CRS("longlat"): Use of old predefined projection 'longlat' is</span>
 <span class="co">#&gt; deprecated. Converting to 'longlat_norm'</span>
 <span class="co">#&gt; Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj</span>
-<span class="co">#&gt; = prefer_proj): Discarded ellps unknown in CRS definition: +proj=longlat +R=1</span>
+<span class="co">#&gt; = prefer_proj): Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1</span>
 <span class="co">#&gt; +no_defs +type=crs</span>
 <span class="co">#&gt; Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =</span>
-<span class="co">#&gt; prefer_proj): Discarded datum unknown in CRS definition</span>
+<span class="co">#&gt; prefer_proj): Discarded datum unknown in Proj4 definition</span>
 <span class="va">mesh_fine</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.2d.html">inla.mesh.2d</a></span><span class="op">(</span>boundary <span class="op">=</span> <span class="va">bnd</span>, max.edge <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">mesh_fine</span><span class="op">)</span> <span class="op">+</span>
