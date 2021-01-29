@@ -1,3 +1,5 @@
+# inlabru (development version)
+
 # inlabru 2.2.5
 
 * Vignette corrections
