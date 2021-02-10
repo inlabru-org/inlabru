@@ -352,12 +352,30 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   if (is.null(cnames)) {
     cnames <- c("x", "y")
   }
-  sp <- do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x) - 1), ]))))
-  ep <- do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))))
+  sp <- do.call(rbind, lapply(
+    qq,
+    function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x) - 1), ]))
+  ))
+  ep <- do.call(rbind, lapply(
+    qq,
+    function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))
+  ))
   colnames(sp) <- cnames
   colnames(ep) <- paste0("end.", cnames)
-  df <- data.frame(cbind(sp, ep), data@data)
-
+  df <- data.frame(
+    cbind(sp, ep),
+    data@data[
+      rep(
+        seq_len(NROW(data)),
+        times = vapply(
+          qq,
+          FUN = function(x) {
+            NROW(x[[1]]) - 1
+          },
+          0
+        )
+      ), , drop = FALSE]
+  )
   dmap <- aes_string(
     x = cnames[1],
     y = cnames[2],
