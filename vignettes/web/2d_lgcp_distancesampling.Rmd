@@ -172,16 +172,22 @@ ggplot() +
   coord_equal()
 ```
 
-Predict detection function and plot it, to generate a plot like that below
+Predict the detection function and plot it, to generate a plot like the one below.
+Here, we should make sure that it doesn't try to evaluate the effects of
+components that can't be evaluated using the given input data. Here, we're only
+providing distances and no spatial coordinates, so we cannot evaluate the
+spatial random field in this `predict()` call. We can specify this by providing
+a vector of component names to include in the prediction calculations, here only
+"lsig", with `include = "lsig"`. See `?predict.bru` for more information.
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=FALSE}
 distdf <- data.frame(distance = seq(0, 8, length = 100))
-dfun <- predict(fit, distdf, ~ hn(distance, lsig))
+dfun <- predict(fit, distdf, ~ hn(distance, lsig), include = "lsig")
 plot(dfun)
 ```
 ```{r results="hide",warning=FALSE,message=FALSE, echo = FALSE, eval=TRUE, fig.width=10, fig.heigth=4}
 distdf <- data.frame(distance = seq(0, 8, length = 100))
-dfun <- predict(fit, distdf, ~ hn(distance, lsig))
+dfun <- predict(fit, distdf, ~ hn(distance, lsig), include = "lsig")
 plot(dfun)
 ```
 
