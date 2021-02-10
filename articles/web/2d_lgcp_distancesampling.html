@@ -118,7 +118,7 @@
       <h1 data-toc-skip>LGCPs - Distance sampling</h1>
                         <h4 class="author">David Borchers</h4>
             
-            <h4 class="date">2021-01-29</h4>
+            <h4 class="date">2021-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/2d_lgcp_distancesampling.Rmd"><code>vignettes/web/2d_lgcp_distancesampling.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_distancesampling.Rmd</code></div>
@@ -243,10 +243,10 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-11-1.png" width="960"></p>
-<p>Predict detection function and plot it, to generate a plot like that below</p>
+<p>Predict the detection function and plot it, to generate a plot like the one below. Here, we should make sure that it doesn’t try to evaluate the effects of components that can’t be evaluated using the given input data. Here, we’re only providing distances and no spatial coordinates, so we cannot evaluate the spatial random field in this <code><a href="https://rdrr.io/pkg/raster/man/predict.html">predict()</a></code> call. We can specify this by providing a vector of component names to include in the prediction calculations, here only “lsig”, with <code>include = "lsig"</code>. See <code><a href="../../reference/predict.bru.html">?predict.bru</a></code> for more information.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">distdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
-<span class="va">dfun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hn</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span><span class="op">)</span>
+<span class="va">dfun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hn</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span>, include <span class="op">=</span> <span class="st">"lsig"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">dfun</span><span class="op">)</span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-13-1.png" width="960"></p>
 <p>We can look at the posterior for expected number of dolphins as usual:</p>
@@ -335,10 +335,10 @@
 <span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin    smax        cv</span>
-<span class="co">#&gt; 1 274.1469 78.86227 151.2587 259.4778 452.2551 90.37894 618.638 0.2876643</span>
+<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
+<span class="co">#&gt; 1 273.1127 91.97772 134.6983 245.2083 468.1023 120.3578 616.6629 0.3367757</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 6219.258</span>
+<span class="co">#&gt; 1 8459.901</span>
 
 <span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
@@ -365,8 +365,8 @@
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit</span><span class="op">)</span>
 <span class="co">#&gt;   Model      DIC Delta.DIC</span>
-<span class="co">#&gt; 1  fit1 774.5818  0.000000</span>
-<span class="co">#&gt; 2   fit 776.5630  1.981211</span>
+<span class="co">#&gt; 1  fit1 774.5803  0.000000</span>
+<span class="co">#&gt; 2   fit 776.6437  2.063399</span>
 
 <span class="co"># Look at the goodness-of-fit of the two models in the distance dimension</span>
 <span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span>
@@ -417,8 +417,8 @@
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">dfit1</span>, <span class="va">dfit</span><span class="op">)</span>
 <span class="co">#&gt;   Model       DIC Delta.DIC</span>
-<span class="co">#&gt; 1 dfit1 -75.10825  0.000000</span>
-<span class="co">#&gt; 2  dfit -73.07133  2.036922</span></code></pre></div>
+<span class="co">#&gt; 1 dfit1 -75.10825   0.00000</span>
+<span class="co">#&gt; 2  dfit -73.07133   2.03692</span></code></pre></div>
 <p>Plot both lines on histogram of observations First scale lines to have same area as that of histogram Half-normal:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">hnline</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">distance</span>, p <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">mean</span>, lower <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">q0.025</span>, upper <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">q0.975</span><span class="op">)</span>
