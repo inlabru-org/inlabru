@@ -7,20 +7,23 @@
 \method{gg}{SpatialLines}(data, mapping = NULL, crs = NULL, ...)
 }
 \arguments{
-\item{data}{A SpatialLines object.}
+\item{data}{A \code{SpatialLines} or \code{SpatialLinesDataFrame} object.}
 
-\item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
+\item{mapping}{Aesthetic mappings created by \code{ggplot2::aes} or \code{ggplot2::aes_}
+used to update the default
 mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], y = coordnames(data)[2], xend = paste0("end.", coordnames(data)[1]), yend = paste0("end.", coordnames(data)[2]))}.}
 
-\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
+\item{crs}{A \code{CRS} object defining the coordinate system to project the data
+to before plotting.}
 
-\item{...}{Arguments passed on to \link{geom_segment}.}
+\item{...}{Arguments passed on to \code{ggplot2::geom_segment}.}
 }
 \value{
-A \link{geom_segment} return value.
+A `geom_segment`` return value.
 }
 \description{
-Extracts start and end points of the lines and calls \link{geom_segment} to plot  lines between them.
+Extracts start and end points of the lines and calls \code{geom_segment} to plot
+lines between them.
 }
 \examples{
 \donttest{
