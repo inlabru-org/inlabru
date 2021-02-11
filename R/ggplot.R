@@ -324,21 +324,24 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 #'
 #' @description
 #'
-#' Extracts start and end points of the lines and calls [geom_segment] to plot  lines between them.
+#' Extracts start and end points of the lines and calls `geom_segment` to plot
+#' lines between them.
 #'
 #' @aliases gg.SpatialLines
 #' @name gg.SpatialLines
 #' @export
 #' @import ggplot2
-#' @param data A SpatialLines object.
-#' @param mapping Aesthetic mappings created by [aes] or [aes_] used to update the default
+#' @param data A `SpatialLines` or `SpatialLinesDataFrame` object.
+#' @param mapping Aesthetic mappings created by `ggplot2::aes` or `ggplot2::aes_`
+#'                used to update the default
 #'                mapping. The default mapping is `aes_string(x = coordnames(data)[1],
 #'                y = coordnames(data)[2],
 #'                xend = paste0("end.", coordnames(data)[1]),
 #'                yend = paste0("end.", coordnames(data)[2]))`.
-#' @param crs A [CRS] object defining the coordinate system to project the data to before plotting.
-#' @param ... Arguments passed on to [geom_segment].
-#' @return A [geom_segment] return value.
+#' @param crs A `CRS` object defining the coordinate system to project the data
+#'   to before plotting.
+#' @param ... Arguments passed on to `ggplot2::geom_segment`.
+#' @return A `geom_segment`` return value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R
 
@@ -352,12 +355,34 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   if (is.null(cnames)) {
     cnames <- c("x", "y")
   }
-  sp <- do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x) - 1), ]))))
-  ep <- do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))))
+  sp <- do.call(rbind, lapply(
+    qq,
+    function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x) - 1), ]))
+  ))
+  ep <- do.call(rbind, lapply(
+    qq,
+    function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))
+  ))
   colnames(sp) <- cnames
   colnames(ep) <- paste0("end.", cnames)
-  df <- data.frame(cbind(sp, ep), data@data)
-
+  if (!inherits(data, "SpatialLinesDataFrame")) {
+    df <- data.frame(cbind(sp, ep))
+  } else {
+    df <- data.frame(
+      cbind(sp, ep),
+      data@data[
+        rep(
+          seq_len(NROW(data)),
+          times = vapply(
+            qq,
+            FUN = function(x) {
+              NROW(x[[1]]) - 1
+            },
+            0
+          )
+        ), , drop = FALSE]
+    )
+  }
   dmap <- aes_string(
     x = cnames[1],
     y = cnames[2],
