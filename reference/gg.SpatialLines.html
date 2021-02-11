@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Geom for SpatialLines objects — gg.SpatialLines" />
-<meta property="og:description" content="Extracts start and end points of the lines and calls geom_segment to plot  lines between them." />
+<meta property="og:description" content="Extracts start and end points of the lines and calls geom_segment to plot
+lines between them." />
 
 
 
@@ -72,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.6.9000</span>
       </span>
     </div>
 
@@ -162,7 +163,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Extracts start and end points of the lines and calls <a href='https://ggplot2.tidyverse.org/reference/geom_segment.html'>geom_segment</a> to plot  lines between them.</p>
+    <p>Extracts start and end points of the lines and calls <code>geom_segment</code> to plot
+lines between them.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for SpatialLines</span>
@@ -173,26 +175,28 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>A SpatialLines object.</p></td>
+      <td><p>A <code>SpatialLines</code> or <code>SpatialLinesDataFrame</code> object.</p></td>
     </tr>
     <tr>
       <th>mapping</th>
-      <td><p>Aesthetic mappings created by <a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a> or <a href='https://ggplot2.tidyverse.org/reference/aes_.html'>aes_</a> used to update the default
+      <td><p>Aesthetic mappings created by <code><a href='https://ggplot2.tidyverse.org/reference/aes.html'>ggplot2::aes</a></code> or <code><a href='https://ggplot2.tidyverse.org/reference/aes_.html'>ggplot2::aes_</a></code>
+used to update the default
 mapping. The default mapping is <code><a href='https://ggplot2.tidyverse.org/reference/aes_.html'>aes_string(x = coordnames(data)[1], y = coordnames(data)[2], xend = paste0("end.", coordnames(data)[1]), yend = paste0("end.", coordnames(data)[2]))</a></code>.</p></td>
     </tr>
     <tr>
       <th>crs</th>
-      <td><p>A <a href='http://rgdal.r-forge.r-project.org/reference/CRS-class.html'>CRS</a> object defining the coordinate system to project the data to before plotting.</p></td>
+      <td><p>A <code>CRS</code> object defining the coordinate system to project the data
+to before plotting.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Arguments passed on to <a href='https://ggplot2.tidyverse.org/reference/geom_segment.html'>geom_segment</a>.</p></td>
+      <td><p>Arguments passed on to <code><a href='https://ggplot2.tidyverse.org/reference/geom_segment.html'>ggplot2::geom_segment</a></code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <a href='https://ggplot2.tidyverse.org/reference/geom_segment.html'>geom_segment</a> return value.</p>
+    <p>A `geom_segment`` return value.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other geomes for spatial data: 
