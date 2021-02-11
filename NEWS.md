@@ -1,4 +1,9 @@
-# inlabru (development version)
+# inlabru 2.2.6
+
+* Add `predict(..., include)` discussion to distance sampling vignette, for
+  handling non-spatial prediction in spatial models.
+  
+* Fix bugs in `gg.SpatialLines`
 
 # inlabru 2.2.5
 
@@ -6,7 +11,7 @@
 
 * Documentation improvements
 
-* Fix minor in Spatial* object handling and plotting
+* Fix minor bug in `Spatial*` object handling and plotting
 
 # inlabru 2.2.4
 
