@@ -1,3 +1,5 @@
+# inlabru (development version)
+
 # inlabru 2.2.6
 
 * Add `predict(..., include)` discussion to distance sampling vignette, for
