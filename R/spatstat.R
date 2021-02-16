@@ -30,9 +30,9 @@
 spatial.to.ppp <- function(points, samplers) {
   bnd <- samplers@polygons[[1]]@Polygons[[1]]@coords
   bnd <- bnd[1:(nrow(bnd) - 1), ]
-  gp <- spatstat::ppp(
+  gp <- spatstat.geom::ppp(
     x = coordinates(points)[, 1],
     y = coordinates(points)[, 2],
-    window = spatstat::owin(poly = list(x = rev(bnd[, 1]), y = rev(bnd[, 2])))
+    window = spatstat.geom::owin(poly = list(x = rev(bnd[, 1]), y = rev(bnd[, 2])))
   )
 }

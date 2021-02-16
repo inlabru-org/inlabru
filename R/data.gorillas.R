@@ -83,9 +83,6 @@ NULL
 
 import.gorillas <- function() {
 
-  # Explicitly load spatstat
-  # library(spatstat)
-
   # Load Gorilla data from spatstat
   gorillas <- NULL
   gorillas.extra <- NULL

@@ -57,7 +57,8 @@ Suggests:
     rmarkdown,
     shiny,
     sn,
-    spatstat,
+    spatstat.geom,
+    spatstat.core,
     spatstat.data,
     sphereplot,
     testthat
