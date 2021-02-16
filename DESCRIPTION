@@ -60,6 +60,7 @@ Suggests:
     spatstat.geom,
     spatstat.core,
     spatstat.data,
+    spatstat (>= 2.0-0),
     sphereplot,
     testthat
 Roxygen: list(markdown = TRUE)

@@ -42,13 +42,13 @@ plot and the area of each plot.}
 }
 }
 \source{
-Library \code{spatstat}.
+Library \code{spatstat.data}.
 }
 \usage{
 data(gorillas)
 }
 \description{
-This is the \code{gorillas} dataset from the package \code{spatstat}, reformatted
+This is the \code{gorillas} dataset from the package \code{spatstat.data}, reformatted
 as point process data for use with \code{inlabru}.
 }
 \examples{

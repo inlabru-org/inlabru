@@ -8,6 +8,8 @@
 # @return Spatial object
 
 sfill <- function(data, where = NULL) {
+  check_spatstat("spatstat.geom")
+  
   if (is.null(where)) {
     where <- data
   }
