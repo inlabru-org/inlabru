@@ -158,37 +158,32 @@ local_basic_fixed_effect_testdata <- function() {
 
 #' @export
 #' @rdname local_testthat
-local_mrsea_rebuild_CRS <- function(x, use_km = FALSE) {
-  if (fm_has_PROJ6()) {
-    x$points <- sp::rebuild_CRS(x$points)
-    x$samplers <- sp::rebuild_CRS(x$samplers)
-    x$mesh$crs <- sp::rebuild_CRS(x$mesh$crs)
-    x$boundary <- sp::rebuild_CRS(x$boundary)
-    x$covar <- sp::rebuild_CRS(x$covar)
-  }
-  if (use_km) {
-    # The estimation is numerically unreliable when the spatial
-    # domain is represented in metres, and has been seen to produce
-    # different results on different systems (e.g. Travis CI).
-    # Transform m to km:
-    crs_km <- fm_crs_set_lengthunit(x$mesh$crs, "km")
-    x$mesh <- fm_spTransform(x$mesh, crs_km)
-    x$samplers <- sp::spTransform(x$samplers, crs_km)
-    x$samplers$weight <- x$samplers$weight / 1000
-    x$points <- sp::spTransform(x$points, crs_km)
-    x$boundary <- sp::spTransform(x$boundary, crs_km)
-    x$covar <- sp::spTransform(x$covar, crs_km)
-    x$points$Effort <- x$points$Effort / 1000
-    x$points$mid.x <- x$points$mid.x / 1000
-    x$points$mid.y <- x$points$mid.y / 1000
-    x$points$start.x <- x$points$start.x / 1000
-    x$points$start.y <- x$points$start.y / 1000
-    x$points$end.x <- x$points$end.x / 1000
-    x$points$end.y <- x$points$end.y / 1000
-    x$points$distance <- x$points$distance / 1000
-    x$samplers$Effort <- x$samplers$Effort / 1000
-    x$samplers$mid.x <- x$samplers$mid.x / 1000
-    x$samplers$mid.y <- x$samplers$mid.y / 1000
+local_mrsea_convert <- function(x, use_km = FALSE) {
+  # The estimation is numerically unreliable when the spatial
+  # domain is represented in metres, and has been seen to produce
+  # different results on different systems (e.g. Travis CI).
+
+  # The data is stored in km scale
+  if (!use_km) {
+    # Transform km to m:
+    crs_m <- fm_crs_set_lengthunit(x$mesh$crs, "m")
+    x$mesh <- fm_spTransform(x$mesh, crs_m)
+    x$samplers <- sp::spTransform(x$samplers, crs_m)
+    x$samplers$weight <- x$samplers$weight * 1000
+    x$points <- sp::spTransform(x$points, crs_m)
+    x$boundary <- sp::spTransform(x$boundary, crs_m)
+    x$covar <- sp::spTransform(x$covar, crs_m)
+    x$points$Effort <- x$points$Effort * 1000
+    x$points$mid.x <- x$points$mid.x * 1000
+    x$points$mid.y <- x$points$mid.y * 1000
+    x$points$start.x <- x$points$start.x * 1000
+    x$points$start.y <- x$points$start.y * 1000
+    x$points$end.x <- x$points$end.x * 1000
+    x$points$end.y <- x$points$end.y * 1000
+    x$points$distance <- x$points$distance * 1000
+    x$samplers$Effort <- x$samplers$Effort * 1000
+    x$samplers$mid.x <- x$samplers$mid.x * 1000
+    x$samplers$mid.y <- x$samplers$mid.y * 1000
   }
   x
 }

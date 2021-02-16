@@ -69,10 +69,10 @@ test_that("conversion of 2D mesh to integration points", {
   expect_equal(sum(ips$weight), 27.64229, tolerance = lowtol)
 })
 
-test_that("SpatialLinesDataFrame to integration points using grouping parameter", {
+test_that("SLDF in metres to integration points using grouping parameter", {
   local_bru_safe_inla()
   data(mrsea, package = "inlabru")
-  mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = FALSE)
+  mrsea <- local_mrsea_convert(mrsea, use_km = FALSE)
   expect_warning(
     ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
     "export to PROJ failed: generic error of unknown origin"
@@ -83,10 +83,15 @@ test_that("SpatialLinesDataFrame to integration points using grouping parameter"
     colnames(data.frame(ips)),
     c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional")
   )
+  # Should be a factor 1000 relative to the kilometre scale, since both schemes us
+  # CRS information to convert to km, but the weight information is in metres here
   expect_equal(sum(ips$weight) / 2293712, 1, tolerance = midtol)
+})
 
+test_that("SLDF in kilometres to integration points using grouping parameter", {
+  local_bru_safe_inla()
   data(mrsea, package = "inlabru")
-  mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = TRUE)
+  mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
   expect_warning(
     ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
     "export to PROJ failed: generic error of unknown origin"

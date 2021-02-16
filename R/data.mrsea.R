@@ -35,9 +35,11 @@ NULL
 
 #' MRSea data import
 #'
-#'
-#' Load [mrsea] survey data from MRSea package and convert to spatial formats defined by the [sp] package.
-#'
+#' Load mrsea survey data from the MRSea package and convert to spatial formats defined by the [sp] package.
+#' Requires the MRSea package from <https://github.com/lindesaysh/MRSea>, and
+#' is normally only run by the package maintainer. For regular inlabru use of the data,
+#' use `data("MRSea", package = "inlabru")`, which does not require the MRSea package.
+#' 
 #' @aliases import.mrsea
 #' @keywords internal
 #' @return The [mrsea] data set
@@ -49,6 +51,10 @@ NULL
 #'
 
 import.mrsea <- function() {
+  
+  if (!requireNamespace("MRSea", quietly = TRUE)) {
+    stop("This package development function require the MRSea package from https://github.com/lindesaysh/MRSea")
+  }
 
   # library(MRSea)
   predict.data.re <- NULL
@@ -62,12 +68,9 @@ import.mrsea <- function() {
 
   # Some housekeeping to change the name labels to the right format and correct the effort unit to match
   # the coordinate information.
-  names(dis.data.re)[1:2] <- c("Transect.Label", "Transect.label")
-  names(dis.data.re)[8:9] <- c("x", "y")
-  names(dis.data.re)[5] <- c("Sample.Label")
-
-  # change Effort column to same units as coordinates
-  dis.data.re$Effort <- dis.data.re$length * 1000
+  # Effort should have same units as coordinates:
+  # 2021-02-16 the original data was stored in km units in MRSea
+  dis.data.re <- mrseanames2dsmnames(dis.data.re)
 
   segdata <- dis.data.re[, c(
     "Transect.Label", "Transect.label", "season", "impact", "depth", "Sample.Label",
@@ -77,51 +80,51 @@ import.mrsea <- function() {
 
   # effort, object and distance.
   # Not taken x and y as these are segement mid points not detection locations
-  distdata <- dis.data.re[, c("object", "distance", "Effort")]
-  distdata <- na.omit(distdata)
-  distdata$size <- rep(1, nrow(distdata))
+  distdata <- makedistdata(dis.data.re)
 
   # obsdata
-  obsdata <- na.omit(dis.data.re)
-  obsdata <- obsdata[, c("object", "Sample.Label", "distance", "Effort")]
-  obsdata$size <- rep(1, nrow(obsdata))
-
-  preddata <- predict.data.re
-  colnames(preddata)[c(2, 3)] <- c("x", "y")
+  obsdata <- makeobsdata(dis.data.re)
+  
+  # 2021-02-16 the original data was stored in metres units in MRSea; convert
+  preddata <- makepreddata(predict.data.re)
 
   dsmdata <- list(obsdata = obsdata, distdata = distdata, segdata = segdata, preddata = preddata)
   dset <- import.dsmdata(dsmdata, covar.col = 5)
 
   # Depth data to the data set
 
-  depth <- predict.data.re[(predict.data.re$season == 1) & (predict.data.re$impact == 0), c("x.pos", "y.pos", "depth")]
-  colnames(depth) <- c("x", "y", "depth")
-
+  depth <- makecovardata(predict.data.re)
 
   ############ NEW FORMAT USING sp objects ##############
+  
+  crs <- CRS("+proj=utm +zone=32 +units=km")
 
   # Transects lines
   lns <- subset(dset$effort, is.na(det))
   class(lns) <- "data.frame"
-  lns <- sline(lns, c("start.x", "start.y"), c("end.x", "end.y"), crs = CRS("+proj=utm +zone=32"))
-  lns$weight <- 500
+  lns <- sline(lns, c("start.x", "start.y"), c("end.x", "end.y"), crs = crs)
+  lns$weight <- lns$Effort
 
   # Detections
-  pts <- subset(dset$effort, !is.na(det))[c("x", "y", "season", "distance")]
+  pts <- subset(dset$effort, !is.na(det))
   class(pts) <- "data.frame"
   coordinates(pts) <- c("x", "y")
-  proj4string(pts) <- CRS("+proj=utm +zone=32")
+  proj4string(pts) <- crs
 
   # Mesh
   mesh <- dset$mesh
-  mesh$crs <- fm_CRS("+proj=utm +zone=32")
+  mesh$crs <- crs
 
 
   # Boundary
-  boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2], CRS("+proj=utm +zone=32"))
+  boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
+                    cols = c(1, 2),
+                    crs = crs)
 
   # Covariates
-  covar <- SpatialPointsDataFrame(depth[, 1:2], data = depth[, 3, drop = FALSE], proj4string = CRS("+proj=utm +zone=32"))
+  covar <- SpatialPointsDataFrame(depth[, 1:2],
+                                  data = depth[, 3, drop = FALSE],
+                                  proj4string = crs)
 
   # Remove `distance` column from transects
   lns$distance <- NULL
@@ -135,31 +138,8 @@ import.mrsea <- function() {
   )
 }
 
-
-# INTERNAL DATA STORAGE
-io_mrsea.getDataDir <- function() {
-  return(system.file("data", package = "inlabru"))
-}
-
-
-# Regenerate \link{mrsea} data and store it to \code{mrsea.RData}
-#
-# Uses \code{\link{io_mrsea.pkgdata.load}} to load the data and stores
-# the result to mrsea.RData. Thereby the data that is distributed with
-# our package is generated.
-#
-# @aliases io_mrsea.pkgdata.save
-# @export
-# @return NULL
-# @examples \\dontrun{io_mrsea.pkgdata.save();}
-# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
-#
-
-io_mrsea.pkgdata.save <- function() {
-  ## save the data we will include in the R package
-  mrsea <- import.mrsea()
-  save(mrsea, file = paste0(io_mrsea.getDataDir(), "/mrsea.RData"))
-}
+# mrsea <- import.mrsea()
+# use_data(mrsea)
 
 mrseanames2dsmnames <- function(data) {
   nam <- names(data)
@@ -171,13 +151,27 @@ mrseanames2dsmnames <- function(data) {
   names(data)[id] <- c("Transect.Label", "Transect.label", "x", "y", "Sample.Label")
   # make sure effort column is same unit as coordinate system
   data$Effort <- data$length
+  # At 2021-01-16, the distances were stored in metres, so need to convert
+  data$distance <- data$distance / 1000
   return(data)
 }
 # ---------------------------------------------------------------------
-prednamechange <- function(data) {
+makepreddata <- function(data) {
   id <- c(grep("x.pos", colnames(data)), grep("y.pos", colnames(data)))
   names(data)[id] <- c("x", "y")
+  # 2021-02-16 the original data was stored in metres units in MRSea; convert:
+  data$x <- data$x / 1000
+  data$y <- data$y / 1000
   return(data)
+}
+makecovardata <- function(data) {
+  depth <- data[(data$season == 1) &
+                  (data$impact == 0),
+                c("x.pos", "y.pos", "depth")]
+  colnames(depth) <- c("x", "y", "depth")
+  data$x <- data$x / 1000
+  data$y <- data$y / 1000
+  data
 }
 # ---------------------------------------------------------------------
 makedistdata <- function(data) {

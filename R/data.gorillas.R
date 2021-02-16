@@ -179,7 +179,5 @@ import.gorillas <- function() {
 }
 
 
-# save.gorillas <- function() {
-#  gorillas <- import.gorillas()
-#  save("gorillas", file = paste0(system.file("data", package = "inlabru"), "/gorillas.RData"))
-# }
+# gorillas <- import.gorillas()
+# use_data(gorillas)

@@ -135,7 +135,7 @@ latent_spde2D_group_testdata <- function() {
 
   # Load and reduce data set
   data(mrsea, package = "inlabru")
-  mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = TRUE)
+  mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
   coordnames(mrsea$points) <- c("Easting", "Northing")
   coordnames(mrsea$samplers) <- c("Easting", "Northing")
 
@@ -166,14 +166,12 @@ latent_spde2D_group_testdata <- function() {
     )
   )
 
-  data <-
-    list(
-      mrsea = mrsea,
-      matern = matern,
-      cmp = cmp,
-      fit = fit
-    )
-  data
+  list(
+    mrsea = mrsea,
+    matern = matern,
+    cmp = cmp,
+    fit = fit
+  )
 }
 
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
@@ -181,28 +179,28 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   local_bru_safe_inla()
   expect_warning(
     {
-      data <- latent_spde2D_group_testdata()
+      data_ <- latent_spde2D_group_testdata()
     },
     "export to PROJ failed: generic error of unknown origin"
   )
 
   # Check Intercept
   expect_equal(
-    data$fit$summary.fixed["Intercept", "mean"],
-    -1.957,
+    data_$fit$summary.fixed["Intercept", "mean"],
+    -2.124763,
     tolerance = midtol
   )
 
   # Check SPDE
   expect_equal(
-    data$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    c(-0.8247674, -2.3758650, 0.9492320),
+    data_$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
+    c(-1.1956173, -0.0543984, 0.8847306),
     tolerance = midtol
   )
   expect_equal(
-    data$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
-    c(0.9502163, 1.1058397, 0.6451496),
+    data_$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
+    c(1.183890, 1.567462, 0.782277),
     tolerance = midtol
   )
-  expect_error(spde.posterior(data$fit, "mySmooth", what = "range"), NA)
+  expect_error(spde.posterior(data_$fit, "mySmooth", what = "range"), NA)
 })
