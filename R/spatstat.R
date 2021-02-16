@@ -19,7 +19,7 @@ check_spatstat <- function(pkg = "spatstat.geom") {
       ))
     }
   } else {
-    spst_ver <- try(packageVersion("spatstat"), silent = TRUE)
+    spst_ver <- try(utils::packageVersion("spatstat"), silent = TRUE)
     if (!inherits(spst_ver, "try-error") && spst_ver < "2.0-0") {
       warning(paste0(
         "You have an old version of 'spatstat' installed which is incompatible with '",

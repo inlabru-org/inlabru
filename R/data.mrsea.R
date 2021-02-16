@@ -52,7 +52,8 @@ NULL
 
 import.mrsea <- function() {
   
-  if (!requireNamespace("MRSea", quietly = TRUE)) {
+  pkg <- "MRSea"
+  if (!requireNamespace(pkg, quietly = TRUE)) {
     stop("This package development function require the MRSea package from https://github.com/lindesaysh/MRSea")
   }
 
