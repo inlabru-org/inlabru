@@ -16,7 +16,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v1
         with:
-          r-version: "release"
+          r-version: "oldrel"
 
       - uses: r-lib/actions/setup-pandoc@v1
 
