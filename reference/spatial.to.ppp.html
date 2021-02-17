@@ -191,19 +191,27 @@ and the window. Lastly, the ppp() function is called to create the <code>ppp</co
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># \donttest{</span>
-<span class='co'># Load Gorilla data</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'><a href='http://spatstat.org/'>"spatstat.geom"</a></span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='co'># Load Gorilla data</span>
 
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"gorillas"</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"gorillas"</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>
 
-<span class='co'># Use nest locations and survey boundary to create a spatstat ppp object</span>
+  <span class='co'># Use nest locations and survey boundary to create a spatstat ppp object</span>
 
-<span class='va'>gp</span> <span class='op'>&lt;-</span> <span class='fu'>spatial.to.ppp</span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>, <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: data contain duplicated points</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='va'>gp</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "ppp"</div><div class='input'>
-<span class='co'># Plot it</span>
+  <span class='va'>gp</span> <span class='op'>&lt;-</span> <span class='fu'>spatial.to.ppp</span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>, <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='va'>gp</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>gp</span><span class='op'>)</span>
-</div><div class='img'><img src='spatial.to.ppp-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+  <span class='co'># Plot it</span>
+
+  <span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>gp</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='message'>Loading required package: spatstat.geom</span></div><div class='output co'>#&gt; <span class='message'>spatstat.geom 1.65-5</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘spatstat.geom’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:raster’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    area, rotate, shift</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:inlabru’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    vertices</span></div><div class='output co'>#&gt; <span class='warning'>Warning: You have an old version of 'spatstat' installed which is incompatible with 'spatstat.geom'. Please update 'spatstat' (or uninstall it).</span>
+#&gt; <span class='warning'>Note: 'spatstat' is being upgraded at the moment; this message will be relevant after it transitions to CRAN.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: data contain duplicated points</span></div><div class='img'><img src='spatial.to.ppp-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 
 </div></pre>
   </div>

@@ -213,11 +213,13 @@ method, called inside <code><a href='bru.html'>bru()</a></code>.</p>
   group_mapper <span class='op'>=</span> <span class='cn'>NULL</span>,
   group_layer <span class='op'>=</span> <span class='cn'>NULL</span>,
   group_selector <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ngroup <span class='op'>=</span> <span class='cn'>NULL</span>,
   control.group <span class='op'>=</span> <span class='cn'>NULL</span>,
   replicate <span class='op'>=</span> <span class='cn'>NULL</span>,
   replicate_mapper <span class='op'>=</span> <span class='cn'>NULL</span>,
   replicate_layer <span class='op'>=</span> <span class='cn'>NULL</span>,
   replicate_selector <span class='op'>=</span> <span class='cn'>NULL</span>,
+  nrep <span class='op'>=</span> <span class='cn'>NULL</span>,
   A.msk <span class='op'>=</span> <span class='cn'>NULL</span>,
   envir_extra <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
@@ -293,7 +295,7 @@ default to 1; for fixed scaling, it's more efficient to express the scaling
 in the predictor expression instead of making a copy component.</p></td>
     </tr>
     <tr>
-      <th>group, group_mapper, group_layer, group_selector</th>
+      <th>group, group_mapper, group_layer, group_selector, ngroup</th>
       <td><p>Optional specification of kronecker/group model indexing.</p></td>
     </tr>
     <tr>
@@ -302,7 +304,7 @@ in the predictor expression instead of making a copy component.</p></td>
 passed directly on to <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f</a></code></p></td>
     </tr>
     <tr>
-      <th>replicate, replicate_mapper, replicate_layer, replicate_selector</th>
+      <th>replicate, replicate_mapper, replicate_layer, replicate_selector, nrep</th>
       <td><p>Optional specification of indices for an independent
 replication model. Same syntax as for <code>main</code></p></td>
     </tr>
