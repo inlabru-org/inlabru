@@ -1,3 +1,5 @@
+# inlabru (development version)
+
 # inlabru 2.2.7
 
 * Add support for `ngroup` and `nrep` in component definitions
