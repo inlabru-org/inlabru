@@ -88,7 +88,7 @@ lgcp function.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.6.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.7.9000</span>
       </span>
     </div>
 
@@ -259,11 +259,11 @@ adds additional information stored in the <code>bru_info</code> field.</p>
 </div><div class='output co'>#&gt; <span class='warning'>Warning: All covariate evaluations for 'Intercept' are NULL; an intercept component was likely intended.</span>
 #&gt; <span class='warning'>  Implicit latent intercept component specification is deprecated since version 2.1.14.</span>
 #&gt; <span class='warning'>  Use explicit notation '+ Intercept(1)' instead (or '+1' for '+ Intercept(1)').</span></div><div class='output co'>#&gt;               mean         sd 0.025quant 0.5quant 0.975quant     mode
-#&gt; x         2.027702 0.05358638   1.920469 2.027701   2.134762 2.027704
-#&gt; Intercept 4.959783 0.03792644   4.883894 4.959783   5.035549 4.959785
+#&gt; x         2.027702 0.05358652   1.920469 2.027701   2.134762 2.027704
+#&gt; Intercept 4.959784 0.03792653   4.883894 4.959783   5.035549 4.959785
 #&gt;                    kld
-#&gt; x         0.0001322931
-#&gt; Intercept 0.0001317381</div><div class='input'>
+#&gt; x         0.0001321455
+#&gt; Intercept 0.0001315905</div><div class='input'>
 
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
 
@@ -274,11 +274,11 @@ adds additional information stored in the <code>bru_info</code> field.</p>
   <span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span>
 <span class='op'>}</span>
 </div><div class='output co'>#&gt;               mean         sd 0.025quant 0.5quant 0.975quant     mode
-#&gt; x         2.027702 0.05358439   1.920472 2.027701   2.134760 2.027704
-#&gt; Intercept 4.959784 0.03792503   4.883897 4.959783   5.035548 4.959785
+#&gt; x         2.027702 0.05359134   1.920462 2.027700   2.134767 2.027704
+#&gt; Intercept 4.959783 0.03792995   4.883889 4.959783   5.035553 4.959785
 #&gt;                    kld
-#&gt; x         0.0001344970
-#&gt; Intercept 0.0001339327</div><div class='input'>
+#&gt; x         0.0001268693
+#&gt; Intercept 0.0001263355</div><div class='input'>
 <span class='co'># An important addition to the INLA methodology is bru's ability to use</span>
 <span class='co'># non-linear predictors. Such a predictor can be formulated via like()'s</span>
 <span class='co'># \code{formula} parameter. The z(1) notation is needed to ensure that</span>
@@ -298,11 +298,11 @@ adds additional information stored in the <code>bru_info</code> field.</p>
   <span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span>
 <span class='op'>}</span>
 </div><div class='output co'>#&gt;               mean          sd 0.025quant 0.5quant 0.975quant     mode
-#&gt; z         1.998340 0.006842026   1.984719 1.998340   2.011944 1.998340
-#&gt; Intercept 5.035335 0.033352543   4.968603 5.035334   5.101960 5.035336
+#&gt; z         1.998340 0.006841808   1.984719 1.998340   2.011944 1.998340
+#&gt; Intercept 5.035335 0.033351328   4.968605 5.035334   5.101958 5.035336
 #&gt;                    kld
-#&gt; z         9.850687e-05
-#&gt; Intercept 1.286564e-04</div><div class='input'><span class='co'># }</span>
+#&gt; z         0.0001000602
+#&gt; Intercept 0.0001306830</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -315,7 +315,7 @@ adds additional information stored in the <code>bru_info</code> field.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Fabian E. Bachl, Finn Lindgren.</p>
+  <p>Developed by Finn Lindgren, Fabian E. Bachl.</p>
 </div>
 
 <div class="pkgdown">

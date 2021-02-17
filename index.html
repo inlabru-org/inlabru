@@ -35,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.6.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.7.9000</span>
       </span>
     </div>
 
@@ -154,10 +154,10 @@
 <span class="co">#&gt; Loading required package: Matrix</span>
 <span class="co">#&gt; Loading required package: parallel</span>
 <span class="co">#&gt; Loading required package: foreach</span>
-<span class="co">#&gt; This is INLA_20.12.10 built 2020-12-10 22:22:29 UTC.</span>
+<span class="co">#&gt; This is INLA_21.01.26 built 2021-02-16 18:31:08 UTC.</span>
 <span class="co">#&gt;  - See www.r-inla.org/contact-us for how to get help.</span>
 <span class="co">#&gt;  - To enable PARDISO sparse library; see inla.pardiso()</span>
-<span class="co">#&gt;  - Save 264.3Mb of storage running 'inla.prune()'</span>
+<span class="co">#&gt;  - Save 274Mb of storage running 'inla.prune()'</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 
 <span class="co"># Load the data</span>
@@ -186,7 +186,7 @@
   <span class="fu"><a href="reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>, color <span class="op">=</span> <span class="st">"red"</span>, size <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Nest intensity per km squared"</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-example-1.png" width="100%"> If you have an R installation with PROJ6/GDAL3, and INLA &gt;= 20.06.18, and loading old spatial objects, you may need to apply the <code>rgdal::rebuild_CRS()</code> method on them before they are fully usable. The <code>gorillas</code> object in inlabru has been updated, but not yet the other stored data sets.</p>
+<p><img src="reference/figures/README-example-1.png" width="100%"> If you have an R installation with PROJ6/GDAL3, and INLA &gt;= 20.06.18, and loading old spatial objects, you may need to apply the <code>rgdal::rebuild_CRS()</code> method on them before they are fully usable. The data objects in <code>inlabru</code> have been updated, so should not need this conversion anymore.</p>
 </div>
 </div>
   </div>
@@ -218,9 +218,9 @@
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Fabian E. Bachl <br><small class="roles"> Author, maintainer </small>  <br><small>(Fabian Bachl wrote the main code)</small>
+<li>Finn Lindgren <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-5833-2011" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> <br><small>(Finn Lindgren continued development of the main code)</small>
 </li>
-<li>Finn Lindgren <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-5833-2011" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> <br><small>(Finn Lindgren wrote code for SPDE posterior plotting, and continued development of the main code)</small>
+<li>Fabian E. Bachl <br><small class="roles"> Author </small>  <br><small>(Fabian Bachl wrote the main code)</small>
 </li>
 <li><a href="authors.html">All authors...</a></li>
 </ul>
@@ -240,7 +240,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Fabian E. Bachl, Finn Lindgren.</p>
+  <p>Developed by Finn Lindgren, Fabian E. Bachl.</p>
 </div>
 
 <div class="pkgdown">
