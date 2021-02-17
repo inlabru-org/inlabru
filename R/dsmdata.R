@@ -58,19 +58,42 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
 
 
 
-  # Prediction data to mesh
-  loc <- as.matrix(preddata[, c("x", "y")])
-  seg <- INLA::inla.nonconvex.hull(
+  # Automated mesh construction
+  loc <- rbind(
+    as.matrix(segdata[, c("start.x", "start.y")]),
+    as.matrix(segdata[, c("end.x", "end.y")]),
+    as.matrix(preddata[, c("x", "y")]),
+    as.matrix(newdata[, c("mid.x", "mid.y")]),
+    as.matrix(newdata[, c("x", "y")])
+  )
+  ok <- rowSums(is.na(loc)) == 0
+  loc <- loc[ok, , drop = FALSE]
+  inner <- INLA::inla.nonconvex.hull(
     loc,
-    convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 100
+    convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20,
+    resolution =
+      ceiling(c(
+        min(4, max(1, diff(range(loc[, 1]))/diff(range(loc[, 2])))),
+        min(4, max(1, diff(range(loc[, 2]))/diff(range(loc[, 1]))))
+      ) * 120)
   )
-  mesh <- INLA::inla.mesh.create(
-    interior = seg,
-    refine = list(max.edge = (min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 10)),
-    cutoff = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 50
+  outer <- INLA::inla.nonconvex.hull(
+    loc,
+    convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 2,
+    resolution =
+      ceiling(c(
+        min(4, max(1, diff(range(loc[, 1]))/diff(range(loc[, 2])))),
+        min(4, max(1, diff(range(loc[, 2]))/diff(range(loc[, 1]))))
+      ) * 120)
   )
-
-
+  mesh <- INLA::inla.mesh.2d(
+    boundary = list(inner, outer),
+    max.edge = c(
+      min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 10,
+      min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 2
+    ),
+    cutoff = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20
+  )
 
   dset <- list(effort = newdata, mesh = mesh)
   class(dset) <- c("dsdata", "list")

@@ -187,19 +187,19 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   # Check Intercept
   expect_equal(
     data_$fit$summary.fixed["Intercept", "mean"],
-    -2.124763,
+    -2.206082,
     tolerance = midtol
   )
 
   # Check SPDE
   expect_equal(
     data_$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    c(-1.1956173, -0.0543984, 0.8847306),
+    c(-0.1739665, 0.9392643, 2.2423229),
     tolerance = midtol
   )
   expect_equal(
     data_$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
-    c(1.183890, 1.567462, 0.782277),
+    c(1.9784044, 0.7738195, 0.5835616),
     tolerance = midtol
   )
   expect_error(spde.posterior(data_$fit, "mySmooth", what = "range"), NA)
