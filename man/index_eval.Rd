@@ -15,7 +15,7 @@ index_eval(...)
 \arguments{
 \item{...}{Unused.}
 
-\item{component}{An component.}
+\item{component}{A component.}
 }
 \value{
 a list of inla-compatible indices into the latent variables

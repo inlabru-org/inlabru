@@ -238,12 +238,12 @@ component <- function(...) {
 #' Optional specification of effect scaling weights.
 #' Same syntax as for `main`.
 # Group model parameters
-#' @param group,group_mapper,group_layer,group_selector
+#' @param group,group_mapper,group_layer,group_selector,ngroup
 #' Optional specification of kronecker/group model indexing.
 #' @param control.group `list` of kronecker/group model parameters, currently
 #' passed directly on to `INLA::f`
 # Replicate model parameters
-#' @param replicate,replicate_mapper,replicate_layer,replicate_selector
+#' @param replicate,replicate_mapper,replicate_layer,replicate_selector,nrep
 #' Optional specification of indices for an independent
 #' replication model. Same syntax as for `main`
 #' @param A.msk TODO: check/fix/deprecate this parameter.
@@ -301,12 +301,14 @@ component.character <- function(object,
                                 group_mapper = NULL,
                                 group_layer = NULL,
                                 group_selector = NULL,
+                                ngroup = NULL,
                                 control.group = NULL,
                                 # Replicate model parameters
                                 replicate = NULL,
                                 replicate_mapper = NULL,
                                 replicate_layer = NULL,
                                 replicate_selector = NULL,
+                                nrep = NULL,
                                 A.msk = NULL,
                                 envir_extra = NULL) {
 
@@ -372,7 +374,23 @@ component.character <- function(object,
   if (is.null(envir_extra)) {
     envir_extra <- new.env(envir)
   }
-
+  
+  # Convert ngroup and nrep to bru_mapper info
+  if (!is.null(ngroup)) {
+    if (!is.null(group_mapper)) {
+      stop("At most one of 'ngroup' and 'group_mapper' should be supplied.")
+    }
+    group_mapper <- bru_mapper_index(ngroup)
+    ngroup <- NULL
+  }
+  if (!is.null(nrep)) {
+    if (!is.null(replicate_mapper)) {
+      stop("At most one of 'nrep' and 'replicate_mapper' should be supplied.")
+    }
+    replicate_mapper <- bru_mapper_index(nrep)
+    nrep <- NULL
+  }
+  
   # Default component (to be filled)
   component <- list(
     label = label,
@@ -507,7 +525,7 @@ component.character <- function(object,
     ))]
 
     # Replace arguments that will be evaluated by a mapper
-    # TODO: make a more general system, that also handles ngroup etc.
+    # TODO: make a more general system
     suffixes <- list(
       "group" = "group",
       "replicate" = "repl"
@@ -744,17 +762,20 @@ add_mappers.component <- function(component, lhoods, ...) {
   component$main <- add_mapper(component$main,
     label = component$label,
     lhoods = lh,
-    env = component$env
+    env = component$env,
+    require_indexed = FALSE
   )
   component$group <- add_mapper(component$group,
     label = component$label,
     lhoods = lh,
-    env = component$env
+    env = component$env,
+    require_indexed = TRUE
   )
   component$replicate <- add_mapper(component$replicate,
     label = component$label,
     lhoods = lh,
-    env = component$env
+    env = component$env,
+    require_indexed = TRUE
   )
   # Add multi-mapper
   component[["mapper"]] <-
@@ -900,7 +921,8 @@ bru_subcomponent <- function(input = NULL,
   subcomponent
 }
 
-add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
+add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
+                       require_indexed = FALSE) {
   if (!is.null(subcomp[["mapper"]])) {
     if (!inherits(subcomp[["mapper"]], "bru_mapper")) {
       stop(paste0(
@@ -914,7 +936,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
     subcomp <- make_mapper(subcomp,
       label,
       input_values = 1,
-      strict = TRUE
+      strict = TRUE,
+      require_indexed = require_indexed
     )
   } else {
     if (!is.null(lhoods)) {
@@ -1011,7 +1034,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
       subcomp <- make_mapper(subcomp,
         label,
         input_values = inp_values,
-        strict = TRUE
+        strict = TRUE,
+        require_indexed = require_indexed
       )
     }
   }
@@ -1039,7 +1063,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL) {
 make_mapper <- function(subcomp,
                         label,
                         input_values = NULL,
-                        strict = TRUE) {
+                        strict = TRUE,
+                        require_indexed = FALSE) {
   if (is.null(subcomp[["mapper"]])) {
     if (subcomp[["type"]] %in% c("spde")) {
       if (inherits(subcomp[["model"]]$mesh, "inla.mesh")) {
@@ -1097,9 +1122,11 @@ make_mapper <- function(subcomp,
     } else {
       values <- sort(unique(values), na.last = NA)
       if (length(values) > 1) {
-        subcomp[["mapper"]] <- bru_mapper(INLA::inla.mesh.1d(values),
-          indexed = FALSE
-        )
+        subcomp[["mapper"]] <-
+          bru_mapper(
+            INLA::inla.mesh.1d(values),
+            indexed = require_indexed
+          )
       } else {
         if (all(values == 1)) {
           subcomp[["mapper"]] <- bru_mapper_linear()
@@ -1793,7 +1820,7 @@ print.summary_component_list <- function(x, ...) {
 
 #' @export
 #' @keywords internal
-#' @param component An component.
+#' @param component A component.
 #' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
 #' @param ... Unused.
 #' @return An A-matrix.
@@ -2086,7 +2113,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 
 #' @export
 #' @keywords internal
-#' @param component An component.
+#' @param component A component.
 #' @param ... Unused.
 #' @return a list of inla-compatible indices into the latent variables
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com},
