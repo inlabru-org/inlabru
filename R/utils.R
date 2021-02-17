@@ -272,3 +272,46 @@ bru_fill_missing <- function(data, where, values,
   }
   values
 }
+
+
+
+
+# Resave data
+resave_package_data <- function() {
+  name_list <- c("gorillas", "mexdolphin", "mrsea",
+            "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
+            "seals", "shrimp", "toygroups")
+  for (name in name_list) {
+    message(paste0("Data: ", name))
+    env <- new.env()
+    data(list = name, package = "inlabru", envir = env)
+
+    # Find paths
+    new_path <- file.path("data", paste0(name, ".rda"))
+    old_path <- file.path("data", paste0(name, ".RData"))
+    if (!file.exists(old_path)) {
+      old_path <- new_path
+    }
+    
+    old_info <- file.info(old_path)
+    if (length(names(env)) == 1) {
+      eval(
+        parse(text = paste0("usethis::use_data(",
+                            paste0(names(env), collapse = ", "),
+                            ", compress = 'xz', overwrite = TRUE)")),
+        envir = env
+      )
+    } else {
+      eval(
+        parse(text = paste0("save(",
+                            paste0(names(env), collapse = ", "),
+                            ", file = '",
+                            new_path,
+                            "', compress = 'xz')")),
+        envir = env
+      )
+    }
+    new_info <- file.info(new_path)
+    browser()
+  }
+}
