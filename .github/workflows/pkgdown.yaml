@@ -7,9 +7,10 @@ name: pkgdown
 
 jobs:
   pkgdown:
-    runs-on: macOS-latest
+    runs-on: "ubuntu-20.04"
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      RSPM: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
     steps:
       - uses: actions/checkout@v2
 
@@ -42,7 +43,10 @@ jobs:
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
           sudo apt install \
             libharfbuzz-dev \
-            libfribidi-dev
+            libfribidi-dev \
+            libpng-dev \
+            libtiff-dev \
+            libjpeg-dev
 
       - name: Install X11 dependencies on MacOS
         if: runner.os == 'macOS'
