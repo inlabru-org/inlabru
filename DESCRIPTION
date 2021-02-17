@@ -1,23 +1,23 @@
 Package: inlabru
 Type: Package
 Title: Spatial Inference using Integrated Nested Laplace Approximation
-Version: 2.2.6
+Version: 2.2.7
 Authors@R: c(
-  person("Fabian E.", "Bachl", email = "bachlfab@gmail.com", role = c("aut", "cre"),
-         comment = "Fabian Bachl wrote the main code"),
-  person("Finn", "Lindgren", email = "Finn.Lindgren@ed.ac.uk", role = c("aut"),
+  person("Finn", "Lindgren", email = "finn.lindgren@gmail.com", role = c("aut", "cre"),
          comment = c(ORCID = "0000-0002-5833-2011",
-                     "Finn Lindgren wrote code for SPDE posterior plotting, and continued development of the main code")),
-  person("David L.", "Borchers", email = "dlb@st-andrews.ac.uk", role = c("ctb"),
+                     "Finn Lindgren continued development of the main code")),
+  person("Fabian E.", "Bachl", email = "bachlfab@gmail.com", role = c("aut"),
+         comment = "Fabian Bachl wrote the main code"),
+  person("David L.", "Borchers", email = "dlb@st-andrews.ac.uk", role = c("ctb", "dtc"),
          comment = "David Borchers wrote code for Gorilla data import and sampling, multiplot tool"),
   person("Daniel", "Simpson", email = "dp.simpson@gmail.com", role = c("ctb"),
          comment = "Daniel Simpson wrote the basic LGCP sampling method"),
-  person("Lindesay", "Scott-Howard", email ="lass@@st-andrews.ac.uk", role = c("ctb"),
+  person("Lindesay", "Scott-Howard", email = "lass@st-andrews.ac.uk", role = c("ctb", "dtc"),
          comment = "Lindesay Scott-Howard provided MRSea data import code"),
-  person("Seaton", "Andy", email ="andy.e.seaton@gmail.com", role = c("ctb"),
+  person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
          comment = "Andy Seaton provided testing and bugfixes")
   )
-URL: http://www.inlabru.org, 
+URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/
 BugReports: https://github.com/inlabru-org/inlabru/issues
 Description: Facilitates spatial modeling using integrated nested Laplace approximation via the 
   INLA package (<https://www.r-inla.org>). Additionally, implements a log Gaussian Cox process likelihood for 
@@ -57,8 +57,10 @@ Suggests:
     rmarkdown,
     shiny,
     sn,
-    spatstat,
+    spatstat.geom,
+    spatstat.core,
     spatstat.data,
+    spatstat,
     sphereplot,
     testthat
 Roxygen: list(markdown = TRUE)

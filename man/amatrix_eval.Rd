@@ -15,7 +15,7 @@ amatrix_eval(...)
 \arguments{
 \item{...}{Unused.}
 
-\item{component}{An component.}
+\item{component}{A component.}
 
 \item{data}{A \code{data.frame} or Spatial* object of covariates and/or point locations.}
 }

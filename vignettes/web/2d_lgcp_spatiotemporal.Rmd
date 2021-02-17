@@ -37,13 +37,10 @@ library(INLA)
 
 Get the data
 -----------------------------------
-Load the dataset:
+Load the dataset, that has coordinates in UTM in kilometres:
 
 ```{r }
 data(mrsea, package = "inlabru")
-suppressWarnings({
-  mrsea <- local_mrsea_rebuild_CRS(mrsea, use_km = TRUE)
-})
 ```
 
 The points (representing animals) and the sampling regions of this dataset are associated with a season. Let's have a look at the observed points and sampling regions for all seasons:

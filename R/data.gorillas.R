@@ -1,7 +1,7 @@
 #' @name gorillas
 #' @title Gorilla nesting sites
 #' @docType data
-#' @description This is the `gorillas` dataset from the package `spatstat`, reformatted
+#' @description This is the `gorillas` dataset from the package `spatstat.data`, reformatted
 #' as point process data for use with `inlabru`.
 #'
 #' @usage data(gorillas)
@@ -42,7 +42,7 @@
 #'    }
 #'  }
 #' @source
-#' Library `spatstat`.
+#' Library `spatstat.data`.
 #'
 #'
 #' @references
@@ -82,9 +82,8 @@ NULL
 #' @return gorilla data
 
 import.gorillas <- function() {
-
-  # Explicitly load spatstat
-  # library(spatstat)
+  
+  if (!check_spatstat("spatstat.data")) 
 
   # Load Gorilla data from spatstat
   gorillas <- NULL
@@ -180,7 +179,5 @@ import.gorillas <- function() {
 }
 
 
-# save.gorillas <- function() {
-#  gorillas <- import.gorillas()
-#  save("gorillas", file = paste0(system.file("data", package = "inlabru"), "/gorillas.RData"))
-# }
+# gorillas <- import.gorillas()
+# use_data(gorillas)

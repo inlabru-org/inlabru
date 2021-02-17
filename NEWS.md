@@ -1,3 +1,10 @@
+# inlabru 2.2.7
+
+* Add support for `ngroup` and `nrep` in component definitions
+
+* Updated `mexdolphin` and `mrsea` data sets, with consistent km units and
+  improved mesh designs
+
 # inlabru 2.2.6
 
 * Add `predict(..., include)` discussion to distance sampling vignette, for

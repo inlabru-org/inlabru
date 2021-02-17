@@ -10,7 +10,7 @@
 \alias{local_disable_PROJ6_warnings}
 \alias{local_basic_intercept_testdata}
 \alias{local_basic_fixed_effect_testdata}
-\alias{local_mrsea_rebuild_CRS}
+\alias{local_mrsea_convert}
 \alias{local_bru_safe_inla}
 \alias{local_bru_testthat_setup}
 \title{Unit test helpers}
@@ -34,7 +34,7 @@ local_basic_intercept_testdata()
 
 local_basic_fixed_effect_testdata()
 
-local_mrsea_rebuild_CRS(x, use_km = FALSE)
+local_mrsea_convert(x, use_km = FALSE)
 
 local_bru_safe_inla(multicore = FALSE, quietly = TRUE, envir = parent.frame())
 

@@ -8,6 +8,8 @@
 # @return Spatial object
 
 sfill <- function(data, where = NULL) {
+  check_spatstat("spatstat.geom")
+  
   if (is.null(where)) {
     where <- data
   }
@@ -18,18 +20,18 @@ sfill <- function(data, where = NULL) {
     dpoints <- dpoints[!is.na(vals), ]
     vals <- vals[!is.na(vals)]
 
-    data.ow <- spatstat::owin(
+    data.ow <- spatstat.geom::owin(
       range(coordinates(dpoints)[, 1]),
       range(coordinates(dpoints)[, 2])
     )
-    data.ppp <- spatstat::as.ppp(coordinates(dpoints), data.ow)
-    where.ow <- spatstat::owin(
+    data.ppp <- spatstat.geom::as.ppp(coordinates(dpoints), data.ow)
+    where.ow <- spatstat.geom::owin(
       range(coordinates(where)[, 1]),
       range(coordinates(where)[, 2])
     )
-    where.ppp <- spatstat::as.ppp(coordinates(where), where.ow)
+    where.ppp <- spatstat.geom::as.ppp(coordinates(where), where.ow)
 
-    nn <- spatstat::nncross(where.ppp, data.ppp)[, "which"]
+    nn <- spatstat.geom::nncross(where.ppp, data.ppp)[, "which"]
     vallist[[k]] <- vals[nn]
   }
   ret <- data.frame(do.call(data.frame, vallist))

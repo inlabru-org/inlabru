@@ -27,11 +27,13 @@ component(...)
   group_mapper = NULL,
   group_layer = NULL,
   group_selector = NULL,
+  ngroup = NULL,
   control.group = NULL,
   replicate = NULL,
   replicate_mapper = NULL,
   replicate_layer = NULL,
   replicate_selector = NULL,
+  nrep = NULL,
   A.msk = NULL,
   envir_extra = NULL
 )
@@ -83,12 +85,12 @@ hyperparameter. If \code{fixed = TRUE}, the component scaling is fixed, by
 default to 1; for fixed scaling, it's more efficient to express the scaling
 in the predictor expression instead of making a copy component.}
 
-\item{group, group_mapper, group_layer, group_selector}{Optional specification of kronecker/group model indexing.}
+\item{group, group_mapper, group_layer, group_selector, ngroup}{Optional specification of kronecker/group model indexing.}
 
 \item{control.group}{\code{list} of kronecker/group model parameters, currently
 passed directly on to \code{INLA::f}}
 
-\item{replicate, replicate_mapper, replicate_layer, replicate_selector}{Optional specification of indices for an independent
+\item{replicate, replicate_mapper, replicate_layer, replicate_selector, nrep}{Optional specification of indices for an independent
 replication model. Same syntax as for \code{main}}
 
 \item{A.msk}{TODO: check/fix/deprecate this parameter.

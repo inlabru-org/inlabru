@@ -68,7 +68,5 @@ import.shrimp <- function() {
   return(shrimp)
 }
 
-save.shrimp <- function() {
-  shrimp <- import.shrimp()
-  save("shrimp", file = paste0(system.file("data", package = "inlabru"), "/shrimp.RData"), compression_level = 9)
-}
+# shrimp <- import.shrimp()
+# use_data(shrimp)

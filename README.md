@@ -72,10 +72,10 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: parallel
 #> Loading required package: foreach
-#> This is INLA_20.12.10 built 2020-12-10 22:22:29 UTC.
+#> This is INLA_21.01.26 built 2021-02-16 18:31:08 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
-#>  - Save 264.3Mb of storage running 'inla.prune()'
+#>  - Save 274Mb of storage running 'inla.prune()'
 library(ggplot2)
 
 # Load the data
@@ -109,5 +109,5 @@ ggplot() +
 <img src="man/figures/README-example-1.png" width="100%" /> If you have
 an R installation with PROJ6/GDAL3, and INLA &gt;= 20.06.18, and loading
 old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
-method on them before they are fully usable. The `gorillas` object in
-inlabru has been updated, but not yet the other stored data sets.
+method on them before they are fully usable. The data objects in
+`inlabru` have been updated, so should not need this conversion anymore.

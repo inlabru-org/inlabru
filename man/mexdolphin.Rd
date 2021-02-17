@@ -44,6 +44,10 @@ ggplot() +
   gg(mexdolphin$samplers) +
   gg(mexdolphin$points, aes(size = size), color = "red") +
   coord_equal()
+  
+ggplot() +
+  gg(mexdolphin$mesh, col = mexdolphin$lambda, mask = mexdolphin$ppoly) +
+  coord_equal()
 
 gmap(mexdolphin$depth) +
   gm(mexdolphin$ppoly, color = "blue") +
