@@ -2,7 +2,7 @@
 % Please edit documentation in R/environment.R
 \name{bru_call_options}
 \alias{bru_call_options}
-\title{Additional \link{bru} options}
+\title{Additional bru options}
 \usage{
 bru_call_options(...)
 }

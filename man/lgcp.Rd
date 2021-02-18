@@ -37,7 +37,7 @@ approximation of the posterior.}
 \item{options}{See \code{\link[=bru_options_set]{bru_options_set()}}}
 }
 \value{
-An \link{bru} object
+An \code{\link[=bru]{bru()}} object
 }
 \description{
 This function performs inference on a LGCP observed via points residing

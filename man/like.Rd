@@ -6,7 +6,7 @@
 \alias{like_list.list}
 \alias{like_list.bru_like}
 \alias{[.bru_like_list}
-\title{Likelihood construction for usage with \link{bru}}
+\title{Likelihood construction for usage with \code{\link[=bru]{bru()}}}
 \usage{
 like(
   formula = . ~ .,
@@ -34,7 +34,7 @@ like_list(...)
 \method{[}{bru_like_list}(x, i)
 }
 \arguments{
-\item{formula}{a \link{formula} where the right hand side is a general R
+\item{formula}{a \code{formula} where the right hand side is a general R
 expression defines the predictor used in the model.}
 
 \item{family}{A string identifying a valid \code{INLA::inla} likelihood family.
@@ -96,10 +96,10 @@ on to \code{\link[=bru_options]{bru_options()}}}
 \item{i}{indices specifying elements to extract}
 }
 \value{
-A likelihood configuration which can be used to parameterize \link{bru}.
+A likelihood configuration which can be used to parameterize \code{\link[=bru]{bru()}}.
 }
 \description{
-Likelihood construction for usage with \link{bru}
+Likelihood construction for usage with \code{\link[=bru]{bru()}}
 }
 \details{
 \itemize{

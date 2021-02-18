@@ -98,7 +98,7 @@ ibm_amatrix <- function(mapper, input, ...) {
 #'
 #' @description
 #'
-#' Similar to `glm()`, `gam()` and `inla()`, [bru] models can be constructed via
+#' Similar to `glm()`, `gam()` and `inla()`, [bru()] models can be constructed via
 #' a formula-like syntax, where each latent effect is specified. However, in
 #' addition to the parts of the syntax compatible with `INLA::inla`, `bru`
 #' components offer additional functionality which facilitates modelling, and
@@ -116,9 +116,9 @@ ibm_amatrix <- function(mapper, input, ...) {
 #'
 #' @details
 #'
-#' [bru] will understand formulae describing fixed effect models just like the other methods. For instance, the
+#' [bru()] will understand formulae describing fixed effect models just like the other methods. For instance, the
 #' formula `y ~ x` will fit the linear combination of an effect named `x` and an intercept to
-#' the response `y` with respect to the likelihood family stated when calling [bru]. Mathematically,
+#' the response `y` with respect to the likelihood family stated when calling [bru()]. Mathematically,
 #' the linear predictor \eqn{\eta} would be written down as
 #'
 #' \deqn{\eta = \beta * x + c,}
@@ -152,7 +152,7 @@ ibm_amatrix <- function(mapper, input, ...) {
 #' \itemize{\item{`components = y ~ psi(x, model = "linear")`.}}
 #'
 #' Being able to discriminate between \eqn{x} and \eqn{\psi} is relevant because of two functionalities
-#' bru offers. The formula parameters of both, [bru] and the prediction method [predict.bru]
+#' bru offers. The formula parameters of both, [bru()] and the prediction method [predict.bru]
 #' are interpreted in the mathematical sense. For instance, `predict` may be used to analyze the
 #' an analytical combination of the covariate \eqn{x} and the intercept using
 #'

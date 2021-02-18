@@ -39,8 +39,8 @@ bru_standardise_names <- function(x) {
 #'
 #' @aliases predict.inla
 #' @export
-#' @param object A `bru` object obtained by calling [bru] or [lgcp].
-#' @param ... Arguments passed on to [predict.bru].
+#' @param object A `bru` object obtained by calling [bru()] or [lgcp()].
+#' @param ... Arguments passed on to [predict.bru()].
 #' @return A `prediction` object.
 #' @seealso [predict.inla()]
 #' @keywords internal

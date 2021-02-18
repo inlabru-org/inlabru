@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggplot.R
 \name{plot.bru}
 \alias{plot.bru}
-\title{Plot method for posterior marginals estimated by \link{bru}}
+\title{Plot method for posterior marginals estimated by bru}
 \usage{
 \method{plot}{bru}(x, ...)
 }

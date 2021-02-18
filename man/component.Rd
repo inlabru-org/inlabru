@@ -99,7 +99,7 @@ Likely doesn't work at the moment, and I've found no examples that use it.}
 \item{envir_extra}{TODO: check/fix this parameter.}
 }
 \description{
-Similar to \code{glm()}, \code{gam()} and \code{inla()}, \link{bru} models can be constructed via
+Similar to \code{glm()}, \code{gam()} and \code{inla()}, \code{\link[=bru]{bru()}} models can be constructed via
 a formula-like syntax, where each latent effect is specified. However, in
 addition to the parts of the syntax compatible with \code{INLA::inla}, \code{bru}
 components offer additional functionality which facilitates modelling, and
@@ -116,9 +116,9 @@ formula expression that can be interpreted by the \code{\link[=component_list.fo
 method, called inside \code{\link[=bru]{bru()}}.
 }
 \details{
-\link{bru} will understand formulae describing fixed effect models just like the other methods. For instance, the
+\code{\link[=bru]{bru()}} will understand formulae describing fixed effect models just like the other methods. For instance, the
 formula \code{y ~ x} will fit the linear combination of an effect named \code{x} and an intercept to
-the response \code{y} with respect to the likelihood family stated when calling \link{bru}. Mathematically,
+the response \code{y} with respect to the likelihood family stated when calling \code{\link[=bru]{bru()}}. Mathematically,
 the linear predictor \eqn{\eta} would be written down as
 
 \deqn{\eta = \beta * x + c,}
@@ -162,7 +162,7 @@ with an arbitrary name that we wish to assign to the effect, e.g.
 \itemize{\item{\code{components = y ~ psi(x, model = "linear")}.}}
 
 Being able to discriminate between \eqn{x} and \eqn{\psi} is relevant because of two functionalities
-bru offers. The formula parameters of both, \link{bru} and the prediction method \link{predict.bru}
+bru offers. The formula parameters of both, \code{\link[=bru]{bru()}} and the prediction method \link{predict.bru}
 are interpreted in the mathematical sense. For instance, \code{predict} may be used to analyze the
 an analytical combination of the covariate \eqn{x} and the intercept using
 

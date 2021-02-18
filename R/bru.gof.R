@@ -13,13 +13,13 @@
 #' @aliases bincount
 #' @export
 #' @importFrom graphics hist
-#' @param result A result object from a [bru] or [lgcp] call
-#' @param predictor A formula describing the prediction of a 1D LGCP via [predict].
+#' @param result A result object from a [bru()] or [lgcp()] call
+#' @param predictor A formula describing the prediction of a 1D LGCP via [predict()].
 #' @param observations A vector of observed values
 #' @param breaks A vector of bin boundaries
 #' @param nint Number of integration points per bin. Increase this if the bins are wide and
 #' @param probs numeric vector of probabilities with values in `[0,1]`
-#' @param \dots arguments passed on to [predict.bru]
+#' @param \dots arguments passed on to [predict.bru()]
 #' @return An `data.frame` with a ggplot attribute `ggp`
 #'
 #' @examples

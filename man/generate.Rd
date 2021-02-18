@@ -20,7 +20,7 @@ generate(object, ...)
 )
 }
 \arguments{
-\item{object}{A \code{bru} object obtained by calling \link{bru}.}
+\item{object}{A \code{bru} object obtained by calling \code{\link[=bru]{bru()}}.}
 
 \item{...}{additional, unused arguments.}
 
@@ -61,7 +61,7 @@ List of generated samples
 Generic function for sampling for fitted models. The function invokes
 particular methods which depend on the class of the first argument.
 
-Takes a fitted \code{bru} object produced by the function \url{bru} and produces
+Takes a fitted \code{bru} object produced by the function \code{\link[=bru]{bru()}} and produces
 samples given a new set of values for the model covariates or the original
 values used for the model fit. The samples can be based on any R expression
 that is valid given these values/covariates and the joint

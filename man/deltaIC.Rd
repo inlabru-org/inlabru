@@ -7,7 +7,8 @@
 deltaIC(..., criterion = "DIC")
 }
 \arguments{
-\item{...}{Comma-separated objects inheriting from class \code{inla} and obtained from a run of \link[INLA:inla]{inla}, \link{bru} or \link{lgcp}}
+\item{...}{Comma-separated objects inheriting from class \code{inla} and obtained
+from a run of \code{INLA::inla()}, \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}}
 
 \item{criterion}{If 'DIC', plots DIC differences; If 'WAIC', plots WAIC differences.}
 }

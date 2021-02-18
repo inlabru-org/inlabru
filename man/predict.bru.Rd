@@ -18,7 +18,7 @@
 )
 }
 \arguments{
-\item{object}{An object obtained by calling \link{bru} or \link{lgcp}.}
+\item{object}{An object obtained by calling \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}.}
 
 \item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for
 the prediction.}
@@ -57,7 +57,7 @@ a data.frame or Spatial* object with predicted mean values and other
 summary statistics attached.
 }
 \description{
-Takes a fitted \code{bru} object produced by the function \url{bru} and produces
+Takes a fitted \code{bru} object produced by the function \url{bru()} and produces
 predictions given a new set of values for the model covariates or the
 original values used for the model fit. The predictions can be based on any
 R expression that is valid given these values/covariates and the joint
