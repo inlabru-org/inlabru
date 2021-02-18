@@ -41,7 +41,7 @@
 
 <meta property="og:title" content="Geom for predictions — gg.prediction" />
 <meta property="og:description" content="This geom serves to visualize prediction objects which usually results from a call to
-predict.bru. Predictions objects provide summary statistics (mean, median, sd, ...) for
+predict.bru(). Predictions objects provide summary statistics (mean, median, sd, ...) for
 one or more random variables. For single variables (or if requested so by setting bar = TRUE),
 a boxplot-style geom is constructed to show the statistics. For multivariate predictions the
 mean of each variable (y-axis) is plotted agains the row number of the varriable in the prediction
@@ -171,11 +171,11 @@ fit$summary.fixed for an inla object fit" />
 
     <div class="ref-description">
     <p>This geom serves to visualize <code>prediction</code> objects which usually results from a call to
-<a href='predict.bru.html'>predict.bru</a>. Predictions objects provide summary statistics (mean, median, sd, ...) for
+<code><a href='predict.bru.html'>predict.bru()</a></code>. Predictions objects provide summary statistics (mean, median, sd, ...) for
 one or more random variables. For single variables (or if requested so by setting <code>bar = TRUE</code>),
 a boxplot-style geom is constructed to show the statistics. For multivariate predictions the
 mean of each variable (y-axis) is plotted agains the row number of the varriable in the prediction
-data frame (x-axis) using <a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a>. In addition, a <a href='https://ggplot2.tidyverse.org/reference/geom_ribbon.html'>geom_ribbon</a> is used to show
+data frame (x-axis) using <code>geom_line</code>. In addition, a <code>geom_ribbon</code> is used to show
 the confidence interval.</p>
 <p>Note: <code>gg.prediction</code> also understands the format of INLA-style posterior summaries, e.g.
 <code>fit$summary.fixed</code> for an inla object <code>fit</code></p>
@@ -189,11 +189,11 @@ the confidence interval.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>A prediction object, usually the result of a <a href='predict.bru.html'>predict.bru</a> call.</p></td>
+      <td><p>A prediction object, usually the result of a <code><a href='predict.bru.html'>predict.bru()</a></code> call.</p></td>
     </tr>
     <tr>
       <th>mapping</th>
-      <td><p>a set of aesthetic mappings created by <a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a> or <a href='https://ggplot2.tidyverse.org/reference/aes_.html'>aes_</a>. These are passed on to <a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a>.</p></td>
+      <td><p>a set of aesthetic mappings created by <code>aes</code> or <code>aes_</code>. These are passed on to <a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a>.</p></td>
     </tr>
     <tr>
       <th>ribbon</th>
@@ -209,13 +209,13 @@ the confidence interval.</p>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Arguments passed on to <a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a>.</p></td>
+      <td><p>Arguments passed on to <code>geom_line</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Concatenation of a <a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a> value and optionally a <a href='https://ggplot2.tidyverse.org/reference/geom_ribbon.html'>geom_ribbon</a> value.</p>
+    <p>Concatenation of a <code>geom_line</code> value and optionally a <code>geom_ribbon</code> value.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other geomes for inla and inlabru predictions: 

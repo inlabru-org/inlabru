@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Latent model component construction — component" />
-<meta property="og:description" content="Similar to glm(), gam() and inla(), bru models can be constructed via
+<meta property="og:description" content="Similar to glm(), gam() and inla(), bru() models can be constructed via
 a formula-like syntax, where each latent effect is specified. However, in
 addition to the parts of the syntax compatible with INLA::inla, bru
 components offer additional functionality which facilitates modelling, and
@@ -175,7 +175,7 @@ method, called inside bru()." />
     </div>
 
     <div class="ref-description">
-    <p>Similar to <code><a href='https://rdrr.io/r/stats/glm.html'>glm()</a></code>, <code>gam()</code> and <code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>inla()</a></code>, <a href='bru.html'>bru</a> models can be constructed via
+    <p>Similar to <code><a href='https://rdrr.io/r/stats/glm.html'>glm()</a></code>, <code>gam()</code> and <code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>inla()</a></code>, <code><a href='bru.html'>bru()</a></code> models can be constructed via
 a formula-like syntax, where each latent effect is specified. However, in
 addition to the parts of the syntax compatible with <code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>INLA::inla</a></code>, <code>bru</code>
 components offer additional functionality which facilitates modelling, and
@@ -321,9 +321,9 @@ Likely doesn't work at the moment, and I've found no examples that use it.</p></
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><a href='bru.html'>bru</a> will understand formulae describing fixed effect models just like the other methods. For instance, the
+    <p><code><a href='bru.html'>bru()</a></code> will understand formulae describing fixed effect models just like the other methods. For instance, the
 formula <code>y ~ x</code> will fit the linear combination of an effect named <code>x</code> and an intercept to
-the response <code>y</code> with respect to the likelihood family stated when calling <a href='bru.html'>bru</a>. Mathematically,
+the response <code>y</code> with respect to the likelihood family stated when calling <code><a href='bru.html'>bru()</a></code>. Mathematically,
 the linear predictor \(\eta\) would be written down as</p>
 <p>$$\eta = \beta * x + c,$$</p>
 <p>where:</p>
@@ -365,7 +365,7 @@ with an arbitrary name that we wish to assign to the effect, e.g.</p>
 </ul>
 
 <p>Being able to discriminate between \(x\) and \(\psi\) is relevant because of two functionalities
-bru offers. The formula parameters of both, <a href='bru.html'>bru</a> and the prediction method <a href='predict.bru.html'>predict.bru</a>
+bru offers. The formula parameters of both, <code><a href='bru.html'>bru()</a></code> and the prediction method <a href='predict.bru.html'>predict.bru</a>
 are interpreted in the mathematical sense. For instance, <code>predict</code> may be used to analyze the
 an analytical combination of the covariate \(x\) and the intercept using</p>
 <ul>
