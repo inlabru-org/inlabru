@@ -57,7 +57,7 @@ a data.frame or Spatial* object with predicted mean values and other
 summary statistics attached.
 }
 \description{
-Takes a fitted \code{bru} object produced by the function \url{bru()} and produces
+Takes a fitted \code{bru} object produced by the function \code{\link[=bru]{bru()}} and produces
 predictions given a new set of values for the model covariates or the
 original values used for the model fit. The predictions can be based on any
 R expression that is valid given these values/covariates and the joint

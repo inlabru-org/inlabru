@@ -871,7 +871,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #
 #' Prediction from fitted bru model
 #'
-#' Takes a fitted `bru` object produced by the function [bru()]() and produces
+#' Takes a fitted `bru` object produced by the function [bru()] and produces
 #' predictions given a new set of values for the model covariates or the
 #' original values used for the model fit. The predictions can be based on any
 #' R expression that is valid given these values/covariates and the joint
