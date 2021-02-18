@@ -1666,7 +1666,7 @@ ibm_amatrix.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
     # Combine the matrices (A1, A2, A3) -> rowkron(A3, rowkron(A2, A1))
     A_ <- A[[1]]
     for (k in seq_len(length(mapper[["mappers"]]) - 1)) {
-      A_ <- INLA::inla.row.kron(A[[k + 1]], A_)
+      A_ <- row_kron(A[[k + 1]], A_)
     }
     return(A_)
   }

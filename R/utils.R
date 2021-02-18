@@ -315,3 +315,100 @@ resave_package_data <- function() {
     browser()
   }
 }
+
+
+#' Row-wise Kronecker products
+#'
+#' Takes two Matrices and computes the row-wise Kronecker product.  Optionally
+#' applies row-wise weights and/or applies an additional 0/1 row-wise Kronecker
+#' matrix product.
+#'
+#' @param M1 A matrix that can be transformed into a sparse Matrix.
+#' @param M2 A matrix that can be transformed into a sparse Matrix.
+#' @param repl An optional index vector.  For each entry, specifies which
+#' replicate the row belongs to, in the sense used in
+#' `INLA::inla.spde.make.A`
+#' @param n.repl The maximum replicate index, in the sense used in
+#' `INLA::inla.spde.make.A()`.
+#' @param weights Optional scaling weights to be applied row-wise to the
+#' resulting matrix.
+#' @return A `Matrix::sparseMatrix` object.
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @export row_kron
+row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
+  M1 <- as(as(as(M1, "CsparseMatrix"), "dgCMatrix"), "dgTMatrix")
+  M2 <- as(as(as(M2, "CsparseMatrix"), "dgCMatrix"), "dgTMatrix")
+  n <- nrow(M1)
+  if (is.null(repl)) {
+    repl <- rep(1L, n)
+  }
+  if (is.null(n.repl)) {
+    n.repl <- max(repl)
+  }
+  if (is.null(weights)) {
+    weights <- rep(1, n)
+  } else if (length(weights) == 1L) {
+    weights <- rep(weights[1], n)
+  }
+  
+  ## TODO: Check robustness for all-zero rows.
+  ## TODO: Maybe move big sparseMatrix call outside the loop.
+  ## TODO: Automatically choose M1 or M2 for looping.
+  
+  n1 <- (as.vector(Matrix::sparseMatrix(
+    i = 1L + M1@i, j = rep(1L, length(M1@i)),
+    x = 1L, dims = c(n, 1)
+  )))
+  n2 <- (as.vector(Matrix::sparseMatrix(
+    i = 1L + M2@i, j = rep(1L, length(M2@i)),
+    x = 1L, dims = c(n, 1)
+  )))
+  
+  M <- (Matrix::sparseMatrix(
+    i = integer(0), j = integer(0), x = numeric(0),
+    dims = c(n, ncol(M2) * ncol(M1) * n.repl)
+  ))
+  n1 <- n1[1L + M1@i]
+  for (k in unique(n1)) {
+    sub <- which(n1 == k)
+    n.sub <- length(sub)
+    
+    i.sub <- 1L + M1@i[sub]
+    j.sub <- 1L + M1@j[sub]
+    o1 <- order(i.sub, j.sub)
+    jj <- rep(seq_len(k), times = n.sub / k)
+    i.sub <- i.sub[o1]
+    j.sub <- (Matrix::sparseMatrix(
+      i = i.sub,
+      j = jj,
+      x = j.sub[o1],
+      dims = c(n, k)
+    ))
+    x.sub <- (Matrix::sparseMatrix(
+      i = i.sub,
+      j = jj,
+      x = weights[i.sub] * M1@x[sub][o1],
+      dims = c(n, k)
+    ))
+    sub2 <- which(is.element(1L + M2@i, i.sub))
+    
+    if (length(sub2) > 0) {
+      i <- 1L + M2@i[sub2]
+      ii <- rep(i, times = k)
+      repl.i <- repl[ii]
+      
+      M <- (M +
+              Matrix::sparseMatrix(
+                i = ii,
+                j = (1L + rep(M2@j[sub2], times = k) +
+                       ncol(M2) * (as.vector(j.sub[i, ]) - 1L) +
+                       ncol(M2) * ncol(M1) * (repl.i - 1L)),
+                x = (rep(M2@x[sub2], times = k) *
+                       as.vector(x.sub[i, ])),
+                dims = c(n, ncol(M2) * ncol(M1) * n.repl)
+              ))
+    }
+  }
+
+  return(M)
+}
