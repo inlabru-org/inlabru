@@ -175,20 +175,45 @@ eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
 }
 
 
-# Fill in missing values in Spatial grids
-# @param data A SpatialPointsDataFrame, SpatialPixelsDataFrame, or a
-# SpatialGridDataFrame containg data to use for filling
-# @param where A, matrix, data.frame, or SpatialPoints or
-# SpatialPointsDataFrame, containing the locations of the evaluated values
-# @param values A vector of values to be filled in where `is.na(values)` is
-# `FALSE`
-# @param layer,selector Specifies what data column or columns from which to
-# extract data, see [component()] for details.
-# @param batch_size
-# @export
+#' Fill in missing values in Spatial grids
+#' 
+#' Computes nearest-available-value imputation for missing values in space
+#' 
+#' @param data A SpatialPointsDataFrame, SpatialPixelsDataFrame, or a
+#' SpatialGridDataFrame containg data to use for filling
+#' @param where A, matrix, data.frame, or SpatialPoints or
+#' SpatialPointsDataFrame, containing the locations of the evaluated values
+#' @param values A vector of values to be filled in where `is.na(values)` is
+#' `TRUE`
+#' @param layer,selector Specifies what data column or columns from which to
+#' extract data, see [component()] for details.
+#' @param batch_size Size of nearest-neighbour calculation blocks, to limit the
+#' memory and computational complexity.
+#' @return An infilled vector of values
+#' @export
+#' @examples
+#' \dontrun{
+#' if (bru_safe_inla()) {
+#' 
+#' points <-
+#'   sp::SpatialPointsDataFrame(
+#'     matrix(1:6, 3, 2),
+#'     data = data.frame(val = c(NA, NA, NA))
+#'   )
+#' input_coord <- expand.grid(x = 0:7, y = 0:7)
+#' input <- 
+#'   sp::SpatialPixelsDataFrame(
+#'     input_coord,
+#'     data = data.frame(val = as.vector(input_coord$y))
+#'   )    
+#' points$val <- bru_fill_missing(input, points, points$val)
+#' print(points)
+#' 
+#' }
+#' }
 bru_fill_missing <- function(data, where, values,
                              layer = NULL, selector = NULL,
-                             batch_size = 1000) {
+                             batch_size = 500) {
   stopifnot(inherits(
     data,
     c(
@@ -205,8 +230,8 @@ bru_fill_missing <- function(data, where, values,
     stop(msg)
   }
   if (inherits(where, "Spatial")) {
-    data_crs <- INLA::inla.sp_get_crs(data)
-    where_crs <- INLA::inla.sp_get_crs(where)
+    data_crs <- fm_sp_get_crs(data)
+    where_crs <- fm_sp_get_crs(where)
     if (!fm_identical_CRS(data_crs, where_crs)) {
       warning("'data' and 'where' for spatial infilling have different CRS")
     }
@@ -216,7 +241,7 @@ bru_fill_missing <- function(data, where, values,
     where_crs <- sp::CRS(NA_character_)
     where_coord <- where
   }
-
+  
   if (!is.null(selector)) {
     selection <- where[[selector]]
     selector_notok <- is.na(selection)
@@ -247,32 +272,30 @@ bru_fill_missing <- function(data, where, values,
     }
     return(values)
   }
-
+  
   notok <- is.na(values)
   ok <- which(!notok)
   notok <- which(notok)
   data_notok <- is.na(data[[layer]])
   data_ok <- which(!data_notok)
   data_notok <- which(data_notok)
-
-  batch_size <- 200
+  
   for (batch in seq_len(ceiling(length(notok) / batch_size))) {
     subset <- notok[seq((batch - 1) * batch_size,
-      min(length(notok), batch * batch_size),
-      by = 1
+                        min(length(notok), batch * batch_size),
+                        by = 1
     )]
     dst <- rgeos::gDistance(
       sp::SpatialPoints(data[data_ok, , drop = FALSE], proj4string = data_crs),
       sp::SpatialPoints(where_coord[subset, , drop = FALSE], proj4string = where_crs),
       byid = TRUE
     )
-
+    
     nn <- apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
     values[subset] <- data[[layer]][data_ok[nn]]
   }
   values
 }
-
 
 
 
