@@ -200,10 +200,10 @@
 <code class="sourceCode R"><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">ips</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 647.0055 24.97884 595.9569 647.8107 693.6585 584.4842 705.4049 0.03860685</span>
+<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
+<span class="co">#&gt; 1 651.7462 24.85604 605.0935 650.2233 700.7556 601.0058 702.5776 0.0381376</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 623.9427</span></code></pre></div>
+<span class="co">#&gt; 1 617.8225</span></code></pre></div>
 </div>
 <div id="a-model-with-vegetation-type-and-a-spde-type-smoother" class="section level4">
 <h4 class="hasAnchor">
@@ -240,10 +240,10 @@
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">vegetation</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda2</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975    smin     smax         cv</span>
-<span class="co">#&gt; 1 647.0269 27.35173 602.7577 648.3604 706.5053 587.396 733.7622 0.04227295</span>
+<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin    smax         cv</span>
+<span class="co">#&gt; 1 651.5609 28.35073 596.9862 649.6147 712.5212 585.6533 723.413 0.04351202</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 748.1173</span></code></pre></div>
+<span class="co">#&gt; 1 803.7639</span></code></pre></div>
 <p>Look at the contributions to the linear predictor from the SPDE and from vegetation:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
@@ -369,7 +369,7 @@
   <span class="co"># Extract elevation values at spp coords, from our elev SpatialGridDataFrame</span>
   <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">over</a></span><span class="op">(</span><span class="va">spp</span>, <span class="va">elev</span><span class="op">)</span>
   <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-    <span class="va">v</span><span class="op">$</span><span class="va">elevation</span> <span class="op">&lt;-</span> <span class="fu">inlabru</span><span class="fu">:::</span><span class="fu">bru_fill_missing</span><span class="op">(</span><span class="va">elev</span>, <span class="va">spp</span>, <span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span>
+    <span class="va">v</span><span class="op">$</span><span class="va">elevation</span> <span class="op">&lt;-</span> <span class="fu">inlabru</span><span class="fu">:::</span><span class="fu"><a href="../../reference/bru_fill_missing.html">bru_fill_missing</a></span><span class="op">(</span><span class="va">elev</span>, <span class="va">spp</span>, <span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span>
   <span class="op">}</span>
   <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
@@ -482,10 +482,10 @@
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
-<span class="co">#&gt; 1 755.2671 428.7422 418.9492 636.3027 1917.895 381.5676 3108.934 0.5676696</span>
+<span class="co">#&gt;       mean       sd  q0.025   median   q0.975     smin     smax        cv</span>
+<span class="co">#&gt; 1 810.8417 367.0723 435.822 689.2643 1663.234 433.5187 2127.073 0.4527053</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 183819.9</span>
+<span class="co">#&gt; 1 134742.1</span>
 
 <span class="va">Nest.e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>,
