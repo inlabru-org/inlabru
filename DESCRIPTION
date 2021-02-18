@@ -31,7 +31,7 @@ Encoding: UTF-8
 Depends:
     ggplot2,
     methods,
-    R (>= 3.3),
+    R (>= 3.5),
     sp,
     stats
 Imports:
