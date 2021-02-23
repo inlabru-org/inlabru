@@ -194,7 +194,7 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   # Check SPDE
   expect_equal(
     data_$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    c(-0.1739665, 0.9392643, 2.2423229),
+    c(-0.1618776, 0.7721959, 2.0314753),
     tolerance = midtol
   )
   expect_equal(
