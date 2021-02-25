@@ -28,9 +28,9 @@ Methods in Ecology and Evolution, British Ecological Society, 10,
 and `citation("inlabru")`.
 
 The [inlabru.org](http://inlabru.org) website has links to old tutorials
-with code examples for versions up to 2.1.13. Updated version of these
-tutorials, as well as new examples, can currently be found under
-Articles on the <https://inlabru-org.github.io/inlabru/> website.
+with code examples for versions up to 2.1.13. For later versions,
+updated versions of these tutorials, as well as new examples, can be
+found at <https://inlabru-org.github.io/inlabru/articles/>
 
 ## Installation
 
@@ -70,12 +70,12 @@ library(inlabru)
 #> Loading required package: sp
 library(INLA)
 #> Loading required package: Matrix
-#> Loading required package: parallel
 #> Loading required package: foreach
-#> This is INLA_21.01.26 built 2021-02-16 18:31:08 UTC.
+#> Loading required package: parallel
+#> This is INLA_21.02.23 built 2021-02-23 20:58:45 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
-#>  - Save 274Mb of storage running 'inla.prune()'
+#>  - Save 273.9Mb of storage running 'inla.prune()'
 library(ggplot2)
 
 # Load the data
