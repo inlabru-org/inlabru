@@ -1,4 +1,4 @@
-# inlabru (development version)
+# inlabru 2.2.8
 
 * Add `_eval` suffix feature for `generate.bru` and `predict.bru`, that
   provides a general evaluator function for each component, allowing evaluation
