@@ -262,7 +262,11 @@ any components from the inclusion list)</p></td>
     <tr>
       <th>allow_latent</th>
       <td><p>logical. If <code>TRUE</code>, the latent state of each component is
-directly available to the predictor expression, with a <code>_latent</code> suffix.</p></td>
+directly available to the predictor expression, with a <code>_latent</code> suffix.
+This also makes evaluator functions with suffix <code>_eval</code> available, taking
+parameters <code>main</code>, <code>group</code>, and <code>replicate</code>, taking values for where to
+evaluate the component effect that are different than those defined in the
+component definition itself.</p></td>
     </tr>
     <tr>
       <th>allow_combine</th>

@@ -163,6 +163,13 @@
 <h1 class="page-header" data-toc-text="development version">
 <a href="#inlabru-development-version" class="anchor"></a>inlabru (development version)<small> Unreleased </small>
 </h1>
+<ul>
+<li>
+<p>Add <code>_eval</code> suffix feature for <code>generate.bru</code> and <code>predict.bru</code>, that provides a general evaluator function for each component, allowing evaluation of e.g. nonlinear effects of spatial covariates as a function of the covariate value instead of the by the spatial evaluator used in the component definition. For example, with <code>components = ~ covar(spatial_grid_df, model = "rw1")</code>, the prediction expression can have <code>~ covar_eval(covariate)</code>, where <code>covariate</code> is a data column in the prediction data object.</p>
+<p>For components with <code>group</code> and <code>replicate</code> features, these also need to be provided to the <code>_eval</code> function, with <code>..._eval(..., group = ..., replicate = ...)</code></p>
+<p>This feature is built on top of the <code>_latent</code> suffix feature, that gives direct access to the latent state variables of a component, so in order to use <code>_eval</code> in the model predictor itself, you must use <code><a href="../reference/like.html">like(..., allow_latent = TRUE)</a></code> in the model definition.</p>
+</li>
+</ul>
 </div>
     <div id="inlabru-227" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.7">

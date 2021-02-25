@@ -203,7 +203,12 @@ the prediction.</p></td>
       <th>formula</th>
       <td><p>A formula defining an R expression to evaluate for each generated
 sample. If <code>NULL</code>, the latent and hyperparameter states are generated
-as named list elements.</p></td>
+as named list elements. In addition to the component names (that give the effect
+of each component evaluated for the input data), the suffix <code>_latent</code> can be used
+to directly access the latent state for a component, and the suffix <code>_eval</code>
+can be used to evaluate a component at other input values than the expressions
+defined in the component definition itself, e.g. <code>field_eval(cbind(x,y))</code> for a
+component defined with <code>field(coordinates, ...)</code>.</p></td>
     </tr>
     <tr>
       <th>n.samples</th>
