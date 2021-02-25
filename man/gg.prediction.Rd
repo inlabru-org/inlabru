@@ -7,9 +7,9 @@
 \method{gg}{prediction}(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar = FALSE, ...)
 }
 \arguments{
-\item{data}{A prediction object, usually the result of a \link{predict.bru} call.}
+\item{data}{A prediction object, usually the result of a \code{\link[=predict.bru]{predict.bru()}} call.}
 
-\item{mapping}{a set of aesthetic mappings created by \link{aes} or \link{aes_}. These are passed on to \link{geom_line}.}
+\item{mapping}{a set of aesthetic mappings created by \code{aes} or \code{aes_}. These are passed on to \link{geom_line}.}
 
 \item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.}
 
@@ -17,18 +17,18 @@
 
 \item{bar}{If TRUE plot boxplot-style summary for each variable.}
 
-\item{\dots}{Arguments passed on to \link{geom_line}.}
+\item{\dots}{Arguments passed on to \code{geom_line}.}
 }
 \value{
-Concatenation of a \link{geom_line} value and optionally a \link{geom_ribbon} value.
+Concatenation of a \code{geom_line} value and optionally a \code{geom_ribbon} value.
 }
 \description{
 This geom serves to visualize \code{prediction} objects which usually results from a call to
-\link{predict.bru}. Predictions objects provide summary statistics (mean, median, sd, ...) for
+\code{\link[=predict.bru]{predict.bru()}}. Predictions objects provide summary statistics (mean, median, sd, ...) for
 one or more random variables. For single variables (or if requested so by setting \code{bar = TRUE}),
 a boxplot-style geom is constructed to show the statistics. For multivariate predictions the
 mean of each variable (y-axis) is plotted agains the row number of the varriable in the prediction
-data frame (x-axis) using \link{geom_line}. In addition, a \link{geom_ribbon} is used to show
+data frame (x-axis) using \code{geom_line}. In addition, a \code{geom_ribbon} is used to show
 the confidence interval.
 
 Note: \code{gg.prediction} also understands the format of INLA-style posterior summaries, e.g.

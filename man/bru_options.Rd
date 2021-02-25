@@ -101,7 +101,7 @@ log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all messa
 to run inference.}
 \item{bru_max_iter}{maximum number of inla iterations}
 \item{bru_initial}{An \code{inla} object returned from previous calls of
-\code{INLA::inla}, \link{bru} or \link{lgcp}, or a list of named vectors of starting
+\code{INLA::inla}, \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}, or a list of named vectors of starting
 values for the latent variables. This will be used as a
 starting point for further improvement of the approximate posterior.}
 \item{bru_int_args}{List of arguments passed all the way to the

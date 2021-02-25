@@ -20,7 +20,7 @@ generate(object, ...)
 )
 }
 \arguments{
-\item{object}{A \code{bru} object obtained by calling \link{bru}.}
+\item{object}{A \code{bru} object obtained by calling \code{\link[=bru]{bru()}}.}
 
 \item{...}{additional, unused arguments.}
 
@@ -29,7 +29,12 @@ sampling.}
 
 \item{formula}{A formula defining an R expression to evaluate for each generated
 sample. If \code{NULL}, the latent and hyperparameter states are returned
-as named list elements.}
+as named list elements. In addition to the component names (that give the effect
+of each component evaluated for the input data), the suffix \verb{_latent} can be used
+to directly access the latent state for a component, and the suffix \verb{_eval}
+can be used to evaluate a component at other input values than the expressions
+defined in the component definition itself, e.g. \code{field_eval(cbind(x,y))} for a
+component defined with \code{field(coordinates, ...)}.}
 
 \item{n.samples}{Integer setting the number of samples to draw in order to
 calculate the posterior statistics.
@@ -61,7 +66,7 @@ List of generated samples
 Generic function for sampling for fitted models. The function invokes
 particular methods which depend on the class of the first argument.
 
-Takes a fitted \code{bru} object produced by the function \url{bru} and produces
+Takes a fitted \code{bru} object produced by the function \code{\link[=bru]{bru()}} and produces
 samples given a new set of values for the model covariates or the original
 values used for the model fit. The samples can be based on any R expression
 that is valid given these values/covariates and the joint

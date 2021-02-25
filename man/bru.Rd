@@ -10,9 +10,9 @@ bru(components = ~Intercept(1), ..., options = list())
 bru_rerun(result, options = list())
 }
 \arguments{
-\item{components}{A \link{formula}-like specification of latent components.
+\item{components}{A \code{formula}-like specification of latent components.
 Also used to define a default linear additive predictor.  See
-\link{component} for details.}
+\code{\link[=component]{component()}} for details.}
 
 \item{...}{Likelihoods, each constructed by a calling \code{\link[=like]{like()}}, or named
 parameters that can be passed to a single \code{\link[=like]{like()}} call.}

@@ -93,7 +93,7 @@ gg <- function(data, ...) {
 #' @name gm
 #' @export
 #' @param data an object for which to generate a geom.
-#' @param ... Arguments passed on to [gg].
+#' @param ... Arguments passed on to [gg()].
 #' @return The form of the value returned by gm depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
 #' @family geomes for inla and inlabru predictions
 #' @family geomes for spatial data
@@ -156,8 +156,8 @@ gg.matrix <- function(data, mapping = NULL, ...) {
 #' @name gg.data.frame
 #' @export
 #' @import ggplot2
-#' @param ... Arguments passed on to [gg.prediction].
-#' @return Concatenation of a [geom_line] value and optionally a [geom_ribbon] value.
+#' @param ... Arguments passed on to [gg.prediction()].
+#' @return Concatenation of a `geom_line` value and optionally a `geom_ribbon` value.
 #' @family geomes for inla and inlabru predictions
 #' @example inst/examples/gg.prediction.R
 
@@ -171,11 +171,11 @@ gg.data.frame <- function(...) {
 #' @description
 #'
 #' This geom serves to visualize `prediction` objects which usually results from a call to
-#' [predict.bru]. Predictions objects provide summary statistics (mean, median, sd, ...) for
+#' [predict.bru()]. Predictions objects provide summary statistics (mean, median, sd, ...) for
 #' one or more random variables. For single variables (or if requested so by setting `bar = TRUE`),
 #' a boxplot-style geom is constructed to show the statistics. For multivariate predictions the
 #' mean of each variable (y-axis) is plotted agains the row number of the varriable in the prediction
-#' data frame (x-axis) using [geom_line]. In addition, a [geom_ribbon] is used to show
+#' data frame (x-axis) using `geom_line`. In addition, a `geom_ribbon` is used to show
 #' the confidence interval.
 #'
 #' Note: `gg.prediction` also understands the format of INLA-style posterior summaries, e.g.
@@ -186,13 +186,13 @@ gg.data.frame <- function(...) {
 #' @export
 #' @import ggplot2
 #' @importFrom utils modifyList
-#' @param data A prediction object, usually the result of a [predict.bru] call.
-#' @param mapping a set of aesthetic mappings created by [aes] or [aes_]. These are passed on to [geom_line].
+#' @param data A prediction object, usually the result of a [predict.bru()] call.
+#' @param mapping a set of aesthetic mappings created by `aes` or `aes_`. These are passed on to [geom_line].
 #' @param ribbon If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.
 #' @param alpha The ribbons numeric alpha level in `[0,1]`.
 #' @param bar If TRUE plot boxplot-style summary for each variable.
-#' @param \dots Arguments passed on to [geom_line].
-#' @return Concatenation of a [geom_line] value and optionally a [geom_ribbon] value.
+#' @param \dots Arguments passed on to `geom_line`.
+#' @return Concatenation of a `geom_line` value and optionally a `geom_ribbon` value.
 #' @family geomes for inla and inlabru predictions
 #' @example inst/examples/gg.prediction.R
 
@@ -745,7 +745,7 @@ gg.RasterLayer <- function(data, mapping = aes_string(x = "x", y = "y", fill = "
   geom_tile(data = df, mapping = mapping, ...)
 }
 
-#' Plot method for posterior marginals estimated by [bru]
+#' Plot method for posterior marginals estimated by bru
 #'
 #' @description
 #'

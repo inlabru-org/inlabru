@@ -15,9 +15,9 @@ bincount(
 )
 }
 \arguments{
-\item{result}{A result object from a \link{bru} or \link{lgcp} call}
+\item{result}{A result object from a \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}} call}
 
-\item{predictor}{A formula describing the prediction of a 1D LGCP via \link{predict}.}
+\item{predictor}{A formula describing the prediction of a 1D LGCP via \code{\link[=predict]{predict()}}.}
 
 \item{observations}{A vector of observed values}
 
@@ -27,7 +27,7 @@ bincount(
 
 \item{probs}{numeric vector of probabilities with values in \verb{[0,1]}}
 
-\item{\dots}{arguments passed on to \link{predict.bru}}
+\item{\dots}{arguments passed on to \code{\link[=predict.bru]{predict.bru()}}}
 }
 \value{
 An \code{data.frame} with a ggplot attribute \code{ggp}

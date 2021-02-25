@@ -9,7 +9,7 @@ gm(data, ...)
 \arguments{
 \item{data}{an object for which to generate a geom.}
 
-\item{...}{Arguments passed on to \link{gg}.}
+\item{...}{Arguments passed on to \code{\link[=gg]{gg()}}.}
 }
 \value{
 The form of the value returned by gm depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.

@@ -80,6 +80,9 @@ test_that("Component construction: offset", {
 
 
 test_that("Component construction: default mesh/mapping construction", {
+  skip_on_cran()
+  local_bru_safe_inla()
+  
   lik <- like("gaussian",
     formula = y ~ .,
     data = data.frame(x = c(1, 1.5, 2, 3, 4), y = 11:15),

@@ -155,7 +155,7 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #'   to run inference.}
 #' \item{bru_max_iter}{maximum number of inla iterations}
 #' \item{bru_initial}{An `inla` object returned from previous calls of
-#'   `INLA::inla`, [bru] or [lgcp], or a list of named vectors of starting
+#'   `INLA::inla`, [bru()] or [lgcp()], or a list of named vectors of starting
 #'   values for the latent variables. This will be used as a
 #'   starting point for further improvement of the approximate posterior.}
 #' \item{bru_int_args}{List of arguments passed all the way to the
@@ -334,7 +334,7 @@ bru_options_deprecated <- function(args) {
 }
 
 
-#' Additional [bru] options
+#' Additional bru options
 #'
 #' Construct a `bru_options` object including the default and global options,
 #' and converting deprecated option names.

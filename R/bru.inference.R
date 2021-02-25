@@ -272,9 +272,9 @@ bru_info.bru <- function(object, ...) {
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param components A [formula]-like specification of latent components.
+#' @param components A `formula`-like specification of latent components.
 #'   Also used to define a default linear additive predictor.  See
-#'   [component] for details.
+#'   [component()] for details.
 #' @param ... Likelihoods, each constructed by a calling [like()], or named
 #'   parameters that can be passed to a single [like()] call.
 #' @param options A [bru_options] options object or a list of options passed
@@ -428,14 +428,14 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 
 
 
-#' Likelihood construction for usage with [bru]
+#' Likelihood construction for usage with [bru()]
 #'
 #' @aliases like
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param formula a [formula] where the right hand side is a general R
+#' @param formula a `formula` where the right hand side is a general R
 #'   expression defines the predictor used in the model.
 #' @param family A string identifying a valid `INLA::inla` likelihood family.
 #' The default is
@@ -467,13 +467,17 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'   any components from the inclusion list)
 #' @param allow_latent logical. If `TRUE`, the latent state of each component is
 #' directly available to the predictor expression, with a `_latent` suffix.
+#' This also makes evaluator functions with suffix `_eval` available, taking
+#' parameters `main`, `group`, and `replicate`, taking values for where to
+#' evaluate the component effect that are different than those defined in the
+#' component definition itself.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
 #' (TODO: review what's needed to allow the result to also be of a different size)
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #'
-#' @return A likelihood configuration which can be used to parameterize [bru].
+#' @return A likelihood configuration which can be used to parameterize [bru()].
 #'
 #' @example inst/examples/like.R
 
@@ -764,7 +768,7 @@ joint_stackmaker <- function(model, lhoods, state) {
 #' approximation of the posterior.
 #' @param E Single numeric used rescale all integration weights by a fixed factor
 #' @param options See [bru_options_set()]
-#' @return An [bru] object
+#' @return An [bru()] object
 #' @examples
 #'
 #' \donttest{
@@ -871,7 +875,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #
 #' Prediction from fitted bru model
 #'
-#' Takes a fitted `bru` object produced by the function [bru]() and produces
+#' Takes a fitted `bru` object produced by the function [bru()] and produces
 #' predictions given a new set of values for the model covariates or the
 #' original values used for the model fit. The predictions can be based on any
 #' R expression that is valid given these values/covariates and the joint
@@ -888,12 +892,17 @@ expand_to_dataframe <- function(x, data = NULL) {
 #'
 #' @aliases predict.bru
 #' @export
-#' @param object An object obtained by calling [bru] or [lgcp].
+#' @param object An object obtained by calling [bru()] or [lgcp()].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' the prediction.
 #' @param formula A formula defining an R expression to evaluate for each generated
 #' sample. If `NULL`, the latent and hyperparameter states are generated
-#' as named list elements.
+#' as named list elements. In addition to the component names (that give the effect
+#' of each component evaluated for the input data), the suffix `_latent` can be used
+#' to directly access the latent state for a component, and the suffix `_eval`
+#' can be used to evaluate a component at other input values than the expressions
+#' defined in the component definition itself, e.g. `field_eval(cbind(x,y))` for a
+#' component defined with `field(coordinates, ...)`.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics. The default is rather low but provides
 #' a quick approximate result.
@@ -1029,7 +1038,7 @@ predict.bru <- function(object,
 #' Sampling based on bru posteriors
 #'
 #' @description
-#' Takes a fitted `bru` object produced by the function [bru]() and produces
+#' Takes a fitted `bru` object produced by the function [bru()] and produces
 #' samples given a new set of values for the model covariates or the original
 #' values used for the model fit. The samples can be based on any R expression
 #' that is valid given these values/covariates and the joint
@@ -1038,12 +1047,17 @@ predict.bru <- function(object,
 #' @aliases generate.bru
 #' @export
 #' @family sample generators
-#' @param object A `bru` object obtained by calling [bru].
+#' @param object A `bru` object obtained by calling [bru()].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' sampling.
 #' @param formula A formula defining an R expression to evaluate for each generated
 #' sample. If `NULL`, the latent and hyperparameter states are returned
-#' as named list elements.
+#' as named list elements. In addition to the component names (that give the effect
+#' of each component evaluated for the input data), the suffix `_latent` can be used
+#' to directly access the latent state for a component, and the suffix `_eval`
+#' can be used to evaluate a component at other input values than the expressions
+#' defined in the component definition itself, e.g. `field_eval(cbind(x,y))` for a
+#' component defined with `field(coordinates, ...)`.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics.
 #' The default, 100, is rather low but provides a quick approximate result.

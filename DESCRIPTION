@@ -1,18 +1,23 @@
 Package: inlabru
 Type: Package
 Title: Spatial Inference using Integrated Nested Laplace Approximation
-Version: 2.2.7
+Version: 2.2.8
 Authors@R: c(
-  person("Finn", "Lindgren", email = "finn.lindgren@gmail.com", role = c("aut", "cre"),
+  person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
+         role = c("aut", "cre", "cph"),
          comment = c(ORCID = "0000-0002-5833-2011",
                      "Finn Lindgren continued development of the main code")),
-  person("Fabian E.", "Bachl", email = "bachlfab@gmail.com", role = c("aut"),
+  person("Fabian E.", "Bachl", email = "bachlfab@gmail.com",
+         role = c("aut", "cph"),
          comment = "Fabian Bachl wrote the main code"),
-  person("David L.", "Borchers", email = "dlb@st-andrews.ac.uk", role = c("ctb", "dtc"),
+  person("David L.", "Borchers", email = "dlb@st-andrews.ac.uk",
+         role = c("ctb", "dtc", "cph"),
          comment = "David Borchers wrote code for Gorilla data import and sampling, multiplot tool"),
-  person("Daniel", "Simpson", email = "dp.simpson@gmail.com", role = c("ctb"),
+  person("Daniel", "Simpson", email = "dp.simpson@gmail.com",
+         role = c("ctb", "cph"),
          comment = "Daniel Simpson wrote the basic LGCP sampling method"),
-  person("Lindesay", "Scott-Howard", email = "lass@st-andrews.ac.uk", role = c("ctb", "dtc"),
+  person("Lindesay", "Scott-Howard", email = "lass@st-andrews.ac.uk",
+         role = c("ctb", "dtc", "cph"),
          comment = "Lindesay Scott-Howard provided MRSea data import code"),
   person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
          comment = "Andy Seaton provided testing and bugfixes")
@@ -31,8 +36,8 @@ Encoding: UTF-8
 Depends:
     ggplot2,
     methods,
-    R (>= 3.3),
-    sp,
+    R (>= 3.5),
+    sp (>= 1.4-2),
     stats
 Imports:
     Matrix,

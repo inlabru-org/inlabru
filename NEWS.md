@@ -1,3 +1,22 @@
+# inlabru 2.2.8
+
+* Add `_eval` suffix feature for `generate.bru` and `predict.bru`, that
+  provides a general evaluator function for each component, allowing evaluation
+  of e.g. nonlinear effects of spatial covariates as a function of the covariate
+  value instead of the by the spatial evaluator used in the component definition.
+  For example, with `components = ~ covar(spatial_grid_df, model = "rw1")`, the
+  prediction expression can have `~ covar_eval(covariate)`, where `covariate`
+  is a data column in the prediction data object.
+  
+  For components with `group` and `replicate` features, these also need to be
+  provided to the `_eval` function, with
+  `..._eval(..., group = ..., replicate = ...)`
+  
+  This feature is built on top of the `_latent` suffix feature, that gives
+  direct access to the latent state variables of a component, so in order to
+  use `_eval` in the model predictor itself, you must use
+  `like(..., allow_latent = TRUE)` in the model definition.
+
 # inlabru 2.2.7
 
 * Add support for `ngroup` and `nrep` in component definitions
