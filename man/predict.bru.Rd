@@ -25,7 +25,12 @@ the prediction.}
 
 \item{formula}{A formula defining an R expression to evaluate for each generated
 sample. If \code{NULL}, the latent and hyperparameter states are generated
-as named list elements.}
+as named list elements. In addition to the component names (that give the effect
+of each component evaluated for the input data), the suffix \verb{_latent} can be used
+to directly access the latent state for a component, and the suffix \verb{_eval}
+can be used to evaluate a component at other input values than the expressions
+defined in the component definition itself, e.g. \code{field_eval(cbind(x,y))} for a
+component defined with \code{field(coordinates, ...)}.}
 
 \item{n.samples}{Integer setting the number of samples to draw in order to
 calculate the posterior statistics. The default is rather low but provides

@@ -467,6 +467,10 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'   any components from the inclusion list)
 #' @param allow_latent logical. If `TRUE`, the latent state of each component is
 #' directly available to the predictor expression, with a `_latent` suffix.
+#' This also makes evaluator functions with suffix `_eval` available, taking
+#' parameters `main`, `group`, and `replicate`, taking values for where to
+#' evaluate the component effect that are different than those defined in the
+#' component definition itself.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
 #' (TODO: review what's needed to allow the result to also be of a different size)
@@ -893,7 +897,12 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' the prediction.
 #' @param formula A formula defining an R expression to evaluate for each generated
 #' sample. If `NULL`, the latent and hyperparameter states are generated
-#' as named list elements.
+#' as named list elements. In addition to the component names (that give the effect
+#' of each component evaluated for the input data), the suffix `_latent` can be used
+#' to directly access the latent state for a component, and the suffix `_eval`
+#' can be used to evaluate a component at other input values than the expressions
+#' defined in the component definition itself, e.g. `field_eval(cbind(x,y))` for a
+#' component defined with `field(coordinates, ...)`.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics. The default is rather low but provides
 #' a quick approximate result.
@@ -1043,7 +1052,12 @@ predict.bru <- function(object,
 #' sampling.
 #' @param formula A formula defining an R expression to evaluate for each generated
 #' sample. If `NULL`, the latent and hyperparameter states are returned
-#' as named list elements.
+#' as named list elements. In addition to the component names (that give the effect
+#' of each component evaluated for the input data), the suffix `_latent` can be used
+#' to directly access the latent state for a component, and the suffix `_eval`
+#' can be used to evaluate a component at other input values than the expressions
+#' defined in the component definition itself, e.g. `field_eval(cbind(x,y))` for a
+#' component defined with `field(coordinates, ...)`.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics.
 #' The default, 100, is rather low but provides a quick approximate result.
