@@ -11,8 +11,11 @@ vignette: >
 
 ```{r setup, include = FALSE}
 .cache_dir <- file.path("cache", "2d_lgcp_covars")
-.vignette_recompute <- !file.exists(.cache_dir)
-.vignette_cache <- 
+.cache_recompute <- !file.exists(.cache_dir)
+if (.cache_recompute) {
+  dir.create(.cache_dir, recursive = TRUE)
+}
+.vignette_cache <- FALSE
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -89,12 +92,13 @@ ggplot() +
 It seems that vegetation type might be a good predictor because nearly all the nests fall in 
 vegetation type `Primary`. So we construct a model with vegetation type as a fixed effect.
 To do this, we need to tell 'lgcp' how to find the vegetation type at any point in
-space, and we do this by creating a fixed effect that we call `veg` (we could call it
+space, and we do this by creating model components with a fixed effect that we
+call `vegetation` (we could call it
 anything), as follows:
 
 
 ```{r warning=FALSE,message=FALSE}
-mdl1 <- coordinates ~ vegetation(gcov$vegetation, model = "factor_full") - Intercept
+comp1 <- coordinates ~ vegetation(gcov$vegetation, model = "factor_full") - 1
 ```
 
 Notes:
@@ -107,18 +111,22 @@ an intercept. Instead, we can either use `model="factor_full"` without an interc
 or `model="factor_contrast"`, which does remove the first level.
 
 ```{r warning=FALSE,message=FALSE}
-mdl1alt <- coordinates ~ vegetation(gcov$vegetation, model = "factor_contrast") + Intercept
+comp1alt <- coordinates ~ vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(1)
 ```
 
 Fit the model as usual:
-```{r results='hide',warning=FALSE,message=FALSE,eval=!.vignette_recompute,echo=FALSE}
-fit1 <- readRDS(fit1, file.path("cache"))
+```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
+fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(coordinates = mesh))
 ```
-```{r results='hide',warning=FALSE,message=FALSE,eval=.vignette_recompute}
-fit1 <- lgcp(mdl1, nests, samplers = boundary, domain = list(coordinates = mesh))
-```
-```{r results='hide',warning=FALSE,message=FALSE,eval=.vignette_recompute,echo=FALSE}
-saveRDS(fit1, file.path("cache"))
+```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
+.cache_file <- file.path(.cache_dir, "fit1.rds")
+if ((!.cache_recompute) &&
+    file.exists(.cache_file)) {
+  fit1 <- readRDS(file = .cache_file)
+} else {
+  fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(coordinates = mesh))
+  saveRDS(fit1, .cache_file)
+}
 ```
 
 Predict the intensity, and plot the median intensity surface. (In older versions, predicting takes some
@@ -163,12 +171,23 @@ pcmatern <- inla.spde2.pcmatern(mesh,
   prior.range = c(5, 0.01)
 )
 
-mdl2 <- coordinates ~
+comp2 <- coordinates ~
 -1 +
   vegetation(gcov$vegetation, model = "factor_full") +
   mySmooth(coordinates, model = pcmatern)
-
-fit2 <- lgcp(mdl2, nests, samplers = boundary, domain = list(coordinates = mesh))
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
+fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(coordinates = mesh))
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
+.cache_file <- file.path(.cache_dir, "fit2.rds")
+if ((!.cache_recompute) &&
+    file.exists(.cache_file)) {
+  fit2 <- readRDS(file = .cache_file)
+} else {
+  fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(coordinates = mesh))
+  saveRDS(fit2, .cache_file)
+}
 ```
 
 And plot the median intensity surface
@@ -247,14 +266,26 @@ Do we need vegetation at all? Fit a model with only an SPDE + Intercept, and cho
 between models on the basis of DIC, using 'deltaIC()'.
 
 
-```{r results='hide',warning=FALSE,message=FALSE}
-mdl3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept(1)
-fit3 <- lgcp(mdl3,
+```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
+comp3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept(1)
+fit3 <- lgcp(comp3,
   data = nests,
   samplers = boundary,
   domain = list(coordinates = mesh)
 )
 ```
+```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
+comp3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept(1)
+.cache_file <- file.path(.cache_dir, "fit3.rds")
+if ((!.cache_recompute) &&
+    file.exists(.cache_file)) {
+  fit3 <- readRDS(file = .cache_file)
+} else {
+  fit3 <- lgcp(comp3, nests, samplers = boundary, domain = list(coordinates = mesh))
+  saveRDS(fit3, .cache_file)
+}
+```
+
 ```{r results='hide',warning=FALSE,message=FALSE}
 int3 <- predict(fit3, df, ~ exp(mySmooth + Intercept))
 
@@ -357,7 +388,7 @@ f.elev <- function(x, y) {
 }
 ```
 
-For brevity we are not going to consider models with elevatoin only, with elevation
+For brevity we are not going to consider models with elevation only, with elevation
 and a SPDE, and with SPDE only. We will just fit one with elevation and SPDE.
 We create our model to pass to lgcp thus:
 
@@ -368,8 +399,8 @@ matern <- inla.spde2.pcmatern(mesh,
   prior.range = c(5, 0.01)
 )
 
-emdl <- coordinates ~ elev(f.elev(x, y), model = "linear") +
-  mySmooth(coordinates, model = matern) + Intercept
+ecomp <- coordinates ~ elev(f.elev(x, y), model = "linear") +
+  mySmooth(coordinates, model = matern) + Intercept(1)
 ```
 
 Note how the elevation effect is defined. When we used the `Spatial` grid
@@ -385,8 +416,18 @@ elev(f.elev(x, y), model = "linear")
 We also now include an intercept term.
 
 The model is fitted in the usual way:
-```{r results="hide",warning=FALSE,message=FALSE}
-efit <- lgcp(emdl, nests, samplers = boundary, domain = list(coordinates = mesh))
+```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
+efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(coordinates = mesh))
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
+.cache_file <- file.path(.cache_dir, "efit.rds")
+if ((!.cache_recompute) &&
+    file.exists(.cache_file)) {
+  efit <- readRDS(file = .cache_file)
+} else {
+  efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(coordinates = mesh))
+  saveRDS(efit, .cache_file)
+}
 ```
 
 Summary and model selection
@@ -473,7 +514,9 @@ Adapt the code used for the vegetation factor to do this.
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 flist <- vector("list", NROW(efit$summary.fixed))
-for (i in seq_along(flist)) flist[[i]] <- plot(efit, rownames(efit$summary.fixed)[i])
+for (i in seq_along(flist)) {
+  flist[[i]] <- plot(efit, rownames(efit$summary.fixed)[i])
+}
 multiplot(plotlist = flist, cols = 2)
 ```
 
@@ -526,6 +569,35 @@ ggplot(data = Nest.e) +
   geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
 ```
 
+### Non-spatial evaluation of the covariate effect
+
+The previous examples of posterior prediction focused on spatial prediction.
+From `inlabru` version 2.2.8, a feauture is available for overriding the
+component input value specification from the component definition. Each model
+component can be evaluated directly, for arbitrary values by functions named by
+adding the suffix `_eval` to the end of the component name in the predictor
+expression. Since the elevation effect in this model is linear, the resulting plot isn't very interesting, but the same method can be applied to non-linear effects as well, and combined into general R expressions: 
+
+```{r}
+elev.pred <- predict(
+  efit,
+  data = data.frame(elevation = seq(0, 100, length.out = 1000)),
+  formula = ~ elev_eval(elevation)
+)
+
+ggplot(elev.pred) +
+  geom_line(aes(elevation, mean)) +
+  geom_ribbon(aes(elevation,
+                  ymin = q0.025,
+                  ymax = q0.975),
+              alpha = 0.2) +
+  geom_ribbon(aes(elevation,
+                  ymin = mean - 1 * sd,
+                  ymax = mean + 1 * sd),
+              alpha = 0.2)
+```
+
+
 A 1D Example
 ----------------
 Try fitting a 1-dimensional model to the point data in the `inlabru` dataset 
@@ -542,12 +614,12 @@ z <- cov2_1D(ss)
 x <- seq(1, 55, length = 100)
 mesh <- inla.mesh.1d(x, degree = 1)
 
-mdl <- x ~
-beta_z(cov2_1D(x), model = "linear") +
+comp <- x ~
+  beta_z(cov2_1D(x), model = "linear") +
   spde1D(x, model = inla.spde2.matern(mesh)) +
   Intercept(1)
 
-fitcov1D <- lgcp(mdl, pts2, domain = list(x = mesh))
+fitcov1D <- lgcp(comp, pts2, domain = list(x = mesh))
 pr.df <- data.frame(x = x)
 prcov1D <- predict(
   fitcov1D, pr.df,
