@@ -177,16 +177,17 @@ calls <a href='https://ggplot2.tidyverse.org/reference/geom_polygon.html'>geom_p
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>A SpatialPolygons object.</p></td>
+      <td><p>A <code>SpatialPolygons</code> object.</p></td>
     </tr>
     <tr>
       <th>mapping</th>
-      <td><p>Aesthetic mappings created by <a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a> or <a href='https://ggplot2.tidyverse.org/reference/aes_.html'>aes_</a> used to update the default
-mapping. The default mapping is <code><a href='https://ggplot2.tidyverse.org/reference/aes_.html'>aes_string(x = "long", y = "lat", group = "group")</a></code>.</p></td>
+      <td><p>Aesthetic mappings created by <code>aes</code> or <code>aes_</code> used to update the default
+mapping. The default mapping is
+<code><a href='https://ggplot2.tidyverse.org/reference/aes_.html'>aes_string(x = "long", y = "lat", group = "group")</a></code>.</p></td>
     </tr>
     <tr>
       <th>crs</th>
-      <td><p>A <a href='http://rgdal.r-forge.r-project.org/reference/CRS-class.html'>CRS</a> object defining the coordinate system to project the data to before plotting.</p></td>
+      <td><p>A <code>CRS</code> object defining the coordinate system to project the data to before plotting.</p></td>
     </tr>
     <tr>
       <th>color</th>
@@ -198,14 +199,18 @@ mapping. The default mapping is <code><a href='https://ggplot2.tidyverse.org/ref
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Arguments passed on to <a href='https://ggplot2.tidyverse.org/reference/geom_polygon.html'>geom_polygon</a>.</p></td>
+      <td><p>Arguments passed on to <code>geom_polypath</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If <code>ggpolypath</code> is available a <code><a href='https://rdrr.io/pkg/ggpolypath/man/geom_polypath.html'>ggpolypath::geom_polypath</a></code> object.
-Otherwise a <a href='https://ggplot2.tidyverse.org/reference/geom_polygon.html'>geom_polygon</a> return value.</p>
+    <p>A <code><a href='https://rdrr.io/pkg/ggpolypath/man/geom_polypath.html'>ggpolypath::geom_polypath</a></code> object.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Requires the <code>ggpolypath</code> package to ensure proper plotting, since
+the <code>ggplot::geom_polygon</code> function doesn't always handle geometries with
+holes properly.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other geomes for spatial data: 
