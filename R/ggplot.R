@@ -408,19 +408,25 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @name gg.SpatialPolygons
 #' @export
 #' @import ggplot2
-#' @param data A SpatialPolygons object.
-#' @param mapping Aesthetic mappings created by [aes] or [aes_] used to update the default
-#'                mapping. The default mapping is `aes_string(x = "long", y = "lat", group = "group")`.
-#' @param crs A [CRS] object defining the coordinate system to project the data to before plotting.
+#' @param data A `SpatialPolygons` object.
+#' @param mapping Aesthetic mappings created by `aes` or `aes_` used to update the default
+#'                mapping. The default mapping is
+#'                `aes_string(x = "long", y = "lat", group = "group")`.
+#' @param crs A `CRS` object defining the coordinate system to project the data to before plotting.
 #' @param color Filling color for the polygons.
 #' @param alpha Alpha level for polygon filling.
-#' @param ... Arguments passed on to [geom_polygon].
-#' @return If `ggpolypath` is available a `ggpolypath::geom_polypath` object.
-#' Otherwise a [geom_polygon] return value.
+#' @param ... Arguments passed on to [geom_polypath].
+#' @return A `ggpolypath::geom_polypath` object.
+#' @details Requires the `ggpolypath` package to ensure proper plotting, since
+#'   the `ggplot::geom_polygon` function doesn't always handle geometries with
+#'   holes properly.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R
 
 gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, color = "black", alpha = NULL, ...) {
+  if (!requireNamespace("ggpolypath", quietly = TRUE)) {
+    stop("The 'ggpolypath' package is required for SpatialPolygons plotting, but it is not installed.")
+  }
   if (!is.null(crs)) {
     data <- spTransform(data, crs)
   }
