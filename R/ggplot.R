@@ -415,7 +415,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @param crs A `CRS` object defining the coordinate system to project the data to before plotting.
 #' @param color Filling color for the polygons.
 #' @param alpha Alpha level for polygon filling.
-#' @param ... Arguments passed on to [geom_polypath].
+#' @param ... Arguments passed on to `geom_polypath`.
 #' @return A `ggpolypath::geom_polypath` object.
 #' @details Requires the `ggpolypath` package to ensure proper plotting, since
 #'   the `ggplot::geom_polygon` function doesn't always handle geometries with

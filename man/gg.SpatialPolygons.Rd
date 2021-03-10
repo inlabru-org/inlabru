@@ -19,7 +19,7 @@ mapping. The default mapping is
 
 \item{alpha}{Alpha level for polygon filling.}
 
-\item{...}{Arguments passed on to \link{geom_polypath}.}
+\item{...}{Arguments passed on to \code{geom_polypath}.}
 }
 \value{
 A \code{ggpolypath::geom_polypath} object.
