@@ -103,14 +103,18 @@ test_that("bru: factor component", {
   xpost4 <- generate(
     fit,
     data = NULL,
-    formula = ~ c(z_eval(c(1,2,11,12)), z_eval(c(1,2,11,12))),
+    formula = ~ c(z_eval(c(1, 2, 11, 12, 12)),
+                  z_eval(c(1, 2, 11, 12, 12))),
     n.samples = 5,
     seed = 12345L
   )
   
-  # The first four rows should equal the last 4 rows.
-  expect_equal(xpost4[1:4, , drop = FALSE],
-               xpost4[5:8, , drop = FALSE])
+  # The first four rows should equal the last 5 rows.
+  expect_equal(xpost4[1:5, , drop = FALSE],
+               xpost4[6:10, , drop = FALSE])
+  # The index 12 values should be equal.
+  expect_equal(xpost4[4, , drop = FALSE],
+               xpost4[5, , drop = FALSE])
   # The columns should all be different
   expect_equal(sum(xpost4[, 1] == xpost4[, 2]),
                0)
