@@ -173,6 +173,8 @@
 
 <span class='fu'>ibm_amatrix</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='va'>input</span>, <span class='va'>...</span><span class='op'>)</span>
 
+<span class='fu'>ibm_valid_input</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='va'>input</span>, <span class='va'>...</span><span class='op'>)</span>
+
 <span class='co'># S3 method for default</span>
 <span class='fu'>bru_mapper</span><span class='op'>(</span>
   <span class='va'>mapper</span>,
@@ -180,6 +182,7 @@
   ibm_n <span class='op'>=</span> <span class='cn'>NULL</span>,
   ibm_values <span class='op'>=</span> <span class='cn'>NULL</span>,
   ibm_amatrix <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ibm_valid_input <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
 <span class='op'>)</span>
 
@@ -214,7 +217,7 @@ For the default <code>bru_mapper</code> method, a list that will be converted to
     </tr>
     <tr>
       <th>input</th>
-      <td><p>The values for which to produce a mapping matrix</p></td>
+      <td><p>The values for which to produce validity information</p></td>
     </tr>
     <tr>
       <th>new_class</th>
@@ -231,6 +234,10 @@ For the default <code>bru_mapper</code> method, a list that will be converted to
     <tr>
       <th>ibm_amatrix</th>
       <td><p>An <code>ibm_amatrix</code> method function</p></td>
+    </tr>
+    <tr>
+      <th>ibm_valid_input</th>
+      <td><p>An <code>ibm_valid_input</code> method function</p></td>
     </tr>
     <tr>
       <th>mesh</th>
@@ -293,10 +300,16 @@ by <code>ibm_n(mapper)</code></p></li>
 </ul>
 
 <ul>
+<li><p><code>ibm_valid_input</code> Generic.
+Implementations must return a logical vector of length <code><a href='https://rdrr.io/r/base/nrow.html'>NROW(input)</a></code></p></li>
+</ul>
+
+<ul>
 <li><p><code>bru_mapper.default</code> adds the "bru_mapper" class and <code>new_class</code>
 to an object. If provided, mapper method functions are added to an environment
-<code>.envir</code> in the object.  The generic methods <code>ibm_n</code>, <code>ibm_values</code>, and
-<code>ibm_amatrix</code> look for these functions first, and otherwise call <code><a href='https://rdrr.io/r/base/UseMethod.html'>UseMethod()</a></code>.
+<code>.envir</code> in the object.  The generic methods <code>ibm_n</code>, <code>ibm_values</code>,
+<code>ibm_amatrix</code>, and <code>ibm_valid_input</code> look for these functions first,
+and otherwise call <code><a href='https://rdrr.io/r/base/UseMethod.html'>UseMethod()</a></code>.
 reached.</p></li>
 </ul>
 
@@ -308,6 +321,16 @@ reached.</p></li>
 
     <div class='dont-index'><p><a href='bru_mapper_methods.html'>bru_mapper_methods</a> for specific method implementations.</p></div>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>mapper</span> <span class='op'>&lt;-</span> <span class='fu'>bru_mapper_index</span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span>
+<span class='fu'>ibm_amatrix</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>3</span>,<span class='fl'>4</span>,<span class='fl'>5</span>,<span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 5 x 5 sparse Matrix of class "dgCMatrix"
+#&gt;               
+#&gt; [1,] 1 . . . .
+#&gt; [2,] . . 1 . .
+#&gt; [3,] . . . 1 .
+#&gt; [4,] . . . . 1
+#&gt; [5,] . 1 . . .</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
