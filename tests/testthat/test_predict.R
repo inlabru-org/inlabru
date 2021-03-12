@@ -7,8 +7,10 @@ test_that("bru: factor component", {
   # Required for reproducible predict() and generate() output.
   set.seed(1234L)
 
-  input.df <- data.frame(x = cos(1:10), zz = 1:10)
-  input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
+  input.df <- data.frame(x = cos(1:10), zz = rep(c(1, 10), each = 5))
+  input.df <- within(input.df, y <- 5 + 2 * cos(1:10) +
+                       rnorm(10, mean = 0, sd = 1)[zz] +
+                       rnorm(10, mean = 0, sd = 0.1))
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
@@ -118,5 +120,20 @@ test_that("bru: factor component", {
   # The columns should all be different
   expect_equal(sum(xpost4[, 1] == xpost4[, 2]),
                0)
+
+  
+  xpost5 <- predict(
+    fit,
+    data = NULL,
+    formula = ~ z_eval(c(1, 11)) * Precision_for_z^0.5,
+    n.samples = 500,
+    seed = 12345L
+  )
+
+  # sd for z(11) should be close to 1
+  expect_equal(mean(xpost5[2, "sd"]),
+               1,
+               tolerance = hitol)
+  
   
 })
