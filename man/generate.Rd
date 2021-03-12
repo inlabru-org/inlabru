@@ -34,7 +34,9 @@ of each component evaluated for the input data), the suffix \verb{_latent} can b
 to directly access the latent state for a component, and the suffix \verb{_eval}
 can be used to evaluate a component at other input values than the expressions
 defined in the component definition itself, e.g. \code{field_eval(cbind(x,y))} for a
-component defined with \code{field(coordinates, ...)}.}
+component defined with \code{field(coordinates, ...)}. For "iid" models with
+\code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to generate new realisations for
+indices greater than \code{n}.}
 
 \item{n.samples}{Integer setting the number of samples to draw in order to
 calculate the posterior statistics.

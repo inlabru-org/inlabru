@@ -7,12 +7,13 @@ test_that("bru: factor component", {
   # Required for reproducible predict() and generate() output.
   set.seed(1234L)
 
-  input.df <- data.frame(x = cos(1:10))
+  input.df <- data.frame(x = cos(1:10), zz = 1:10)
   input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
-  fit <- bru(y ~ x + z(1:10, model = "iid"), family = "gaussian", data = input.df)
+  fit <- bru(y ~ x + z(zz, model = "iid", mapper = bru_mapper_index(10)),
+             family = "gaussian", data = input.df)
 
   # Predict posterior statistics of 'x'
 
@@ -86,7 +87,7 @@ test_that("bru: factor component", {
   xpost4 <- predict(
     fit,
     data = NULL,
-    formula = ~ z_eval((1:10)/2),
+    formula = ~ z_eval(1:10),
     n.samples = 5,
     seed = 12345L
   )
@@ -98,6 +99,20 @@ test_that("bru: factor component", {
     n.samples = 5,
     seed = 12345L
   )
+
+  xpost4 <- generate(
+    fit,
+    data = NULL,
+    formula = ~ c(z_eval(c(1,2,11,12)), z_eval(c(1,2,11,12))),
+    n.samples = 5,
+    seed = 12345L
+  )
   
+  # The first four rows should equal the last 4 rows.
+  expect_equal(xpost4[1:4, , drop = FALSE],
+               xpost4[5:8, , drop = FALSE])
+  # The columns should all be different
+  expect_equal(sum(xpost4[, 1] == xpost4[, 2]),
+               0)
   
 })

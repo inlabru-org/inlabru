@@ -46,6 +46,9 @@ add_mappers <- function(...) {
 #' @export
 #' @seealso [bru_mapper_methods] for specific method implementations.
 #' @rdname bru_mapper
+#' @examples 
+#' mapper <- bru_mapper_index(5)
+#' ibm_amatrix(mapper, c(1,3,4,5,2))
 bru_mapper <- function(...) {
   UseMethod("bru_mapper")
 }
@@ -87,6 +90,19 @@ ibm_amatrix <- function(mapper, input, ...) {
     mapper[[".envir"]][["ibm_amatrix"]](mapper, input, ...)
   } else {
     UseMethod("ibm_amatrix")
+  }
+}
+#' @details
+#' * `ibm_valid_input` Generic.
+#' Implementations must return a logical vector of length `NROW(input)`
+#' @param input The values for which to produce validity information
+#' @export
+#' @rdname bru_mapper
+ibm_valid_input <- function(mapper, input, ...) {
+  if (!is.null(mapper[[".envir"]][["ibm_valid_input"]])) {
+    mapper[[".envir"]][["ibm_valid_input"]](mapper, input, ...)
+  } else {
+    UseMethod("ibm_valid_input")
   }
 }
 
@@ -1232,13 +1248,15 @@ code.components <- function(components, add = "") {
 
 #' @details * `bru_mapper.default` adds the "bru_mapper" class and `new_class`
 #' to an object. If provided, mapper method functions are added to an environment
-#' `.envir` in the object.  The generic methods `ibm_n`, `ibm_values`, and
-#' `ibm_amatrix` look for these functions first, and otherwise call `UseMethod()`.
+#' `.envir` in the object.  The generic methods `ibm_n`, `ibm_values`,
+#' `ibm_amatrix`, and `ibm_valid_input` look for these functions first,
+#' and otherwise call `UseMethod()`.
 #' reached.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
 #' @param ibm_n An `ibm_n` method function
 #' @param ibm_values An `ibm_values` method function
 #' @param ibm_amatrix An `ibm_amatrix` method function
+#' @param ibm_valid_input An `ibm_valid_input` method function
 #'
 #' @export
 #' @rdname bru_mapper
@@ -1247,6 +1265,7 @@ bru_mapper.default <- function(mapper,
                                ibm_n = NULL,
                                ibm_values = NULL,
                                ibm_amatrix = NULL,
+                               ibm_valid_input = NULL,
                                ...) {
   if (!inherits(mapper, "bru_mapper")) {
     class(mapper) <- c("bru_mapper", class(mapper))
@@ -1265,6 +1284,9 @@ bru_mapper.default <- function(mapper,
   }
   if (!is.null(ibm_amatrix)) {
     assign("ibm_amatrix", ibm_amatrix, envir = mapper[[".envir"]])
+  }
+  if (!is.null(ibm_valid_input)) {
+    assign("ibm_valid_input", ibm_valid_input, envir = mapper[[".envir"]])
   }
   mapper
 }
@@ -1321,6 +1343,15 @@ ibm_amatrix.default <- function(mapper, ...) {
     class(mapper)[1], "'."
   ))
 }
+
+#' @details
+#' * The default `ibm_valid_input()` method returns an all-TRUE logical vector.
+#' @export
+#' @rdname bru_mapper_methods
+ibm_valid_input.default <- function(mapper, input, ...) {
+  rep(TRUE, NROW(input))
+}
+
 
 
 
@@ -1415,12 +1446,20 @@ bru_mapper_index <- function(n = 1L, ...) {
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_index <- function(mapper, input, ...) {
+ibm_valid_input.bru_mapper_index <- function(mapper, input, ...) {
   ok <- !is.na(input)
+  ok[ok] <- (input[ok] >= 1) & (input[ok] <= ibm_n(mapper))
+  ok
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_amatrix.bru_mapper_index <- function(mapper, input, ...) {
+  ok <- which(ibm_valid_input(mapper, input, ...))
   Matrix::sparseMatrix(
-    i = which(ok),
+    i = ok,
     j = input[ok],
-    x = rep(1, sum(ok)),
+    x = rep(1, length(ok)),
     dims = c(NROW(input), ibm_n(mapper))
   )
 }
@@ -1657,8 +1696,8 @@ ibm_amatrix.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
       indexing,
       function(x) {
         ibm_amatrix(mapper[["mappers"]][[x]],
-          input = input[[x]],
-          multi = multi - 1
+                    input = input[[x]],
+                    multi = multi - 1
         )
       }
     )
@@ -1671,6 +1710,50 @@ ibm_amatrix.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
     return(A_)
   }
   A
+}
+
+#' @details
+#' * `ibm_valid_input` for `bru_mapper_multi` accepts a list with
+#' named entries, or a list with unnamed but ordered elements.
+#' The names must match the sub-mappers, see [names.bru_mapper_multi()].
+#' Each list element should take a format accepted by the corresponding
+#' sub-mapper. In case each element is a vector, the input can be given as a
+#' data.frame with named columns, a matrix with named columns, or a matrix
+#' with unnamed but ordered columns.
+#' @export
+#' @rdname bru_mapper_methods
+ibm_valid_input.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
+  by_number <- FALSE
+  if (is.matrix(input)) {
+    if (is.null(colnames(input))) {
+      by_number <- TRUE
+    }
+    input <- as.data.frame(input)
+  }
+  if (by_number || is.null(names(input))) {
+    indexing <- seq_along(mapper[["mappers"]])
+  } else {
+    indexing <- names(mapper[["mappers"]])
+  }
+  validity <-
+    lapply(
+      indexing,
+      function(x) {
+        ibm_valid_input(mapper[["mappers"]][[x]],
+                        input = input[[x]],
+                        multi = multi - 1
+        )
+      }
+    )
+  if (multi < 1) {
+    # Combine the vectors (v1, v2, v3) -> v1 & v2 & v3
+    validity_ <- validity[[1]]
+    for (k in seq_len(length(mapper[["mappers"]]) - 1)) {
+      validity_ <- validity_ & validity[[k + 1]]
+    }
+    return(validity_)
+  }
+  validity
 }
 
 #' @return
