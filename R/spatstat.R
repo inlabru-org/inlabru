@@ -20,8 +20,7 @@ check_spatstat <- function(pkg = "spatstat.geom") {
       warning(paste0(
         "You have an old version of 'spatstat' installed which is incompatible with '",
         pkg,
-        "'. Please update 'spatstat' (or uninstall it).",
-        "\nNote: 'spatstat' is being upgraded at the moment; this message will be relevant after it transitions to CRAN."
+        "'. Please update 'spatstat' (or uninstall it)."
       ))
     }
   }
