@@ -200,10 +200,10 @@
 <code class="sourceCode R"><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">ips</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
-<span class="co">#&gt;       mean     sd  q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 649.0079 26.771 599.717 645.7164 700.6016 593.0238 709.2617 0.04124912</span>
+<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
+<span class="co">#&gt; 1 644.5887 24.29667 603.8394 643.7331 693.5458 586.1541 698.5735 0.03769329</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 716.6867</span></code></pre></div>
+<span class="co">#&gt; 1 590.3282</span></code></pre></div>
 </div>
 <div id="a-model-with-vegetation-type-and-a-spde-type-smoother" class="section level4">
 <h4 class="hasAnchor">
@@ -240,10 +240,10 @@
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">vegetation</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda2</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975    smin    smax         cv</span>
-<span class="co">#&gt; 1 651.1098 26.62551 602.6918 650.9975 704.6362 592.693 718.633 0.04089251</span>
+<span class="co">#&gt;       mean       sd   q0.025  median   q0.975     smin     smax         cv</span>
+<span class="co">#&gt; 1 651.1745 24.65487 606.4278 649.891 698.2833 595.7199 711.0069 0.03786215</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 708.9177</span></code></pre></div>
+<span class="co">#&gt; 1 607.8624</span></code></pre></div>
 <p>Look at the contributions to the linear predictor from the SPDE and from vegetation:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
@@ -484,10 +484,10 @@
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
-<span class="co">#&gt; 1 770.9571 377.6936 437.1158 614.4239 1814.818 430.9304 1931.125 0.4899022</span>
+<span class="co">#&gt;       mean       sd   q0.025   median  q0.975     smin     smax        cv</span>
+<span class="co">#&gt; 1 769.6617 347.9639 436.4478 645.4876 1790.21 409.4587 2273.947 0.4520998</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 142652.5</span>
+<span class="co">#&gt; 1 121078.9</span>
 
 <span class="va">Nest.e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>,
