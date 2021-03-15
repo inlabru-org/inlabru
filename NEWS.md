@@ -117,7 +117,7 @@
   models, to avoid an unnecessary optimisation.
 
 * Fix issues in `pixels()` and `bru_fill_missing()` for `Spatial*DataFrame`
-  objects with ncol=0 data frame parts.
+  objects with `ncol=0` data frame parts.
 
 # inlabru 2.2.1
 
@@ -173,7 +173,7 @@
 
 * New backend code to make extended feature support easier
 
-* New int.args option to control spatial integration resolution,
+* New `int.args` option to control spatial integration resolution,
   thanks to Martin Jullum (`martinju`)
 
 # inlabru 2.1.13
@@ -194,13 +194,13 @@
 
 # inlabru 2.1.9
 
-* Remove unused VignetteBuilder entry from DESCRIPTION
+* Remove unused `VignetteBuilder` entry from `DESCRIPTION`
 
 # inlabru 2.1.8
 
 * Update default options
 
-* Prevent int.polygon from integrating outside the mesh domain,
+* Prevent `int.polygon` from integrating outside the mesh domain,
   and generally more robust integration scheme construction.
 
 * Fix `bru()` to `like()` parameter logic. (Thanks to Peter Vesk for bug example)
