@@ -1,6 +1,6 @@
 Package: inlabru
 Type: Package
-Title: Bayesian Latent Gaussian Modelling using Integrated Nested Laplace Approximations
+Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
 Version: 2.2.8.9000
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",

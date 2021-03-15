@@ -17,13 +17,19 @@ coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
 modeling using integrated nested Laplace approximation via the [R-INLA
-package](https://www.r-inla.org). Additionally, implements a log
-Gaussian Cox process likelihood for modeling univariate and spatial
-point processes based on ecological survey data. See Fabian E. Bachl,
-Finn Lindgren, David L. Borchers, and Janine B. Illian (2019), inlabru:
-an R package for Bayesian spatial modelling from ecological survey data,
-Methods in Ecology and Evolution, British Ecological Society, 10,
-760–766,
+package](https://www.r-inla.org). Additionally, extends the GAM-like
+model class to more general nonlinear predictor expressions, and
+implements a log Gaussian Cox process likelihood for modeling univariate
+and spatial point processes based on ecological survey data. Model
+components are specified with general inputs and mapping methods to the
+latent variables, and the predictors are specified via general R
+expressions, with separate expressions for each observation likelihood
+model in multi-likelihood models. A prediction method based on fast
+Monte Carlo sampling allows posterior prediction of general expressions
+of the latent variables. See Fabian E. Bachl, Finn Lindgren, David L.
+Borchers, and Janine B. Illian (2019), inlabru: an R package for
+Bayesian spatial modelling from ecological survey data, Methods in
+Ecology and Evolution, British Ecological Society, 10, 760–766,
 [doi:10.1111/2041-210X.13168](https://doi.org/10.1111/2041-210X.13168),
 and `citation("inlabru")`.
 
@@ -72,10 +78,9 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_21.02.23 built 2021-02-23 20:58:45 UTC.
+#> This is INLA_21.03.14-3 built 2021-03-14 09:05:27 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
-#>  - Save 273.9Mb of storage running 'inla.prune()'
 library(ggplot2)
 
 # Load the data

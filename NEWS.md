@@ -1,5 +1,68 @@
 # inlabru (development version)
 
+## Breaking changes since version 2.1.13
+
+* The model component argument `map` has been deprecated. Use `main` to specify
+  the main component input, `~ elev(main = elevation, model = "rw2")`.
+  Unlike the old `map` argument, `main` is the first one, so the shorter version
+  `~ elev(elevation, model = "rw2")` also works.
+
+* Intercept-like components should now have explicit inputs, e.g. `~ Intercept(1)`
+  to avoid accidental confusion with other variables.
+  
+* The argument list for `bru()` has been simplified, so that all arguments except
+  `components` and `options` must either be outputs from calls to `like()`, or
+  arguments that can be sent to a single `like()` call.
+  
+* The option setting system has been replaced with a more coherent system;
+  see `?bru_options()` for details.
+  
+* The `samplers` and `domain` system for `lgcp` models is now stricter, and
+  requires explicit `domain` definitions for all the point process dimensions.
+  Alternatively, user-defined integration schemes can be supplied via the `ips`
+  argument.
+
+## New features since version 2.1.13
+
+* The model component input arguments `main`, `group`, `replicate`, and `weights`
+  can now take general R expressions using the data inputs. Special cases are detected:
+  `SpatialPixels/GridDataFrame` objects are evaluated at spatial locations if
+  the input data is a `SpatialPointsDataFrame` object. Functions are evaluated
+  on the data object, e.g. `field(coordinates, model = spde)`
+
+* The component arguments `mapper`, `group_mapper`, and `replicate_mapper` can be
+  used for precise control of the mapping between inputs and latent variables.
+  See `?bru_mapper` for more details. Mapper information is automatically extracted
+  from `INLA::inla.spde2.pcmatern()` model objects.
+  
+* The R-INLA `weights` and `copy` features are now supported.
+
+* The predictor expressions can access the data object directly via `.data.`
+
+* If data from several rows can affect the same output row, the `allow_combine = TRUE`
+  argument must be supplied to `like()`
+
+* The `include` and `exclude` arguments to `like()`, `generate()`, and `predict()`
+  can be used to specify which components are used for a given likelihood model
+  or predictor expression. This can be used to prevent evaluation of components
+  that are invalid for a likelihood or predictor.
+  
+* Predictor expressions can access the latent state of a model component directly,
+  by adding the suffix `_latent` to the component name, e.g. `name_latent`.
+  For `like()`, this requires
+  `allow_latent = TRUE` to activate the needed linearisation code for this.
+  
+* Predictor expressions can evaluate component effects for arbitrary inputs by
+  adding the suffix `_eval` to access special evaluator functions, e.g.
+  `name_eval(1:10)`. This is useful for evaluating the 1D effect of spatial covariates.
+  See the NEWS item for version 2.2.8 for further details.
+
+* The internal system for predictor linearisation and iterated INLA inference
+  has been reweritten to be faster and more robust
+  
+* See the NEWS entries for versions 2.1.14 to 2.2.8 for further details on new
+  features and bug fixes
+
 # inlabru 2.2.8
 
 * Add `_eval` suffix feature for `generate.bru` and `predict.bru`, that
