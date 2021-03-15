@@ -20,7 +20,8 @@
 ## R CMD check results
 
 With the new version, 2.3.0, there were no ERRORs or WARNINGs on the test systems,
-except for a spurious "orphaned package" message on R-hub, see below.
+except for a spurious "Suggests orphaned package: ggmap" message on R-hub, and
+windows on github but not win-builder; see below for details.
 
 There was 1 NOTE:
 
