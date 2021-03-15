@@ -42,13 +42,14 @@ jobs:
 
       - name: Query dependencies
         run: |
+          install.packages("Matrix")
           install.packages('remotes')
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
           print(remotes::dev_package_deps(dependencies = TRUE))
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
-      - name: Cache R packages
+      - name: Restore R package cache
         if: runner.os != 'Windows'
         uses: actions/cache@v2
         with:
@@ -82,7 +83,7 @@ jobs:
         run: |
           sessionInfo()
           print(getNamespaceVersion("Matrix"))
-          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran", "--no-examples"), error_on = "warning", check_dir = "check")
+          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
 
       - name: Upload check results
