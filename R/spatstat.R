@@ -1,31 +1,26 @@
 # Internal checker for spatstat packages
-# From Adrian Baddeley and Ege Rubak
+# Adapted from Adrian Baddeley and Ege Rubak
 check_spatstat <- function(pkg = "spatstat.geom") {
   if (!requireNamespace(pkg, quietly = TRUE)) {
     caller_name <- fm_caller_name(1)
-    if (identical(caller_name, "")) {
-      stop(paste0(
-        "package '",
-        pkg,
-        "' required; please install it (or the full spatstat package) first"
-      ))
-    } else {
-      stop(paste0(
-        "package '",
-        pkg,
-        "' required by '",
-        caller_name,
-        "'; please install it (or the full spatstat package) first"
-      ))
-    }
+    stop(paste0(
+      "package '",
+      pkg,
+      "' required",
+      if (identical(caller_name, "")) {
+        ""
+      } else {
+        paste0(" by '", caller_name, "'")
+      },
+      "; please install it (or the full spatstat package) first"
+    ))
   } else {
     spst_ver <- try(utils::packageVersion("spatstat"), silent = TRUE)
     if (!inherits(spst_ver, "try-error") && spst_ver < "2.0-0") {
       warning(paste0(
         "You have an old version of 'spatstat' installed which is incompatible with '",
         pkg,
-        "'. Please update 'spatstat' (or uninstall it).",
-        "\nNote: 'spatstat' is being upgraded at the moment; this message will be relevant after it transitions to CRAN."
+        "'. Please update 'spatstat' (or uninstall it)."
       ))
     }
   }

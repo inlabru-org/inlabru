@@ -7,27 +7,32 @@
 \method{gg}{SpatialPolygons}(data, mapping = NULL, crs = NULL, color = "black", alpha = NULL, ...)
 }
 \arguments{
-\item{data}{A SpatialPolygons object.}
+\item{data}{A \code{SpatialPolygons} object.}
 
-\item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
-mapping. The default mapping is \code{aes_string(x = "long", y = "lat", group = "group")}.}
+\item{mapping}{Aesthetic mappings created by \code{aes} or \code{aes_} used to update the default
+mapping. The default mapping is
+\code{aes_string(x = "long", y = "lat", group = "group")}.}
 
-\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
+\item{crs}{A \code{CRS} object defining the coordinate system to project the data to before plotting.}
 
 \item{color}{Filling color for the polygons.}
 
 \item{alpha}{Alpha level for polygon filling.}
 
-\item{...}{Arguments passed on to \link{geom_polygon}.}
+\item{...}{Arguments passed on to \code{geom_polypath}.}
 }
 \value{
-If \code{ggpolypath} is available a \code{ggpolypath::geom_polypath} object.
-Otherwise a \link{geom_polygon} return value.
+A \code{ggpolypath::geom_polypath} object.
 }
 \description{
 Uses the \code{fortify()} function to turn the \code{SpatialPolygons} objects into a
 \code{data.frame}. Then
 calls \link{geom_polygon} to plot the polygons.
+}
+\details{
+Requires the \code{ggpolypath} package to ensure proper plotting, since
+the \code{ggplot::geom_polygon} function doesn't always handle geometries with
+holes properly.
 }
 \examples{
 \donttest{

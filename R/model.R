@@ -448,8 +448,12 @@ evaluate_predictor <- function(model,
   eval_fun_factory <-
     function(.comp, .envir, .enclos) {
       .is_offset <- .comp$main$type %in% c("offset")
+      .is_iid <- .comp$main$type %in% c("iid")
       .mapper <- .comp$mapper
       .label <- paste0(.comp$label, "_latent")
+      .iid_precision <- paste0("Precision_for_", .comp$label)
+      .iid_cache <- list()
+      .iid_cache_index <- NULL
       eval_fun <- function(main, group = NULL, replicate = NULL, .state = NULL) {
         if (is.null(group)) {
           group <- rep(1, NROW(main))
@@ -474,6 +478,38 @@ evaluate_predictor <- function(model,
                            enclos = .enclos)
           }
           .values <- .A %*% .state
+          if (.is_iid) {
+            ok <- ibm_valid_input(
+              .mapper,
+              input = list(
+                main = main,
+                group = group,
+                replicate = replicate
+              )
+            )
+            if (any(!ok)) {
+              .cache_state_index <- eval(parse(text = ".cache_state_index"),
+                                         envir = .envir,
+                                         enclos = .enclos)
+              if (!identical(.cache_state_index, .iid_cache_index)) {
+                .iid_cache_index <<- .cache_state_index
+                .iid_cache <<- list()
+              }
+              key <- as.character(main[!ok])
+              not_cached <- !(key %in% names(.iid_cache))
+              if (any(not_cached)) {
+                .prec <- eval(parse(text = .iid_precision),
+                              envir = .envir,
+                              enclos = .enclos)
+                for (k in unique(key[not_cached])) {
+                  .iid_cache[k] <<- rnorm(1, mean = 0, sd = .prec^-0.5)
+                }
+              }
+              .values[!ok] <- vapply(key,
+                                     function(k) .iid_cache[[k]],
+                                     0.0)
+            }
+          }
         }
         
         as.matrix(.values)
@@ -493,6 +529,9 @@ evaluate_predictor <- function(model,
 
   n <- length(state)
   for (k in seq_len(n)) {
+    # Keep track of the iteration index so the iid cache can be invalidated
+    assign(".cache_state_index", k, envir = envir)
+
     for (nm in names(state[[k]])) {
       assign(state_names[[nm]], state[[k]][[nm]], envir = envir)
     }

@@ -902,7 +902,9 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' to directly access the latent state for a component, and the suffix `_eval`
 #' can be used to evaluate a component at other input values than the expressions
 #' defined in the component definition itself, e.g. `field_eval(cbind(x,y))` for a
-#' component defined with `field(coordinates, ...)`.
+#' component defined with `field(coordinates, ...)`. For "iid" models with
+#' `mapper = bru_mapper_index(n)`, `rnorm()` is used to generate new realisations for
+#' indices greater than `n`.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics. The default is rather low but provides
 #' a quick approximate result.
@@ -1057,7 +1059,9 @@ predict.bru <- function(object,
 #' to directly access the latent state for a component, and the suffix `_eval`
 #' can be used to evaluate a component at other input values than the expressions
 #' defined in the component definition itself, e.g. `field_eval(cbind(x,y))` for a
-#' component defined with `field(coordinates, ...)`.
+#' component defined with `field(coordinates, ...)`. For "iid" models with
+#' `mapper = bru_mapper_index(n)`, `rnorm()` is used to generate new realisations for
+#' indices greater than `n`.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics.
 #' The default, 100, is rather low but provides a quick approximate result.

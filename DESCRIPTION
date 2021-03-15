@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
-Title: Spatial Inference using Integrated Nested Laplace Approximation
-Version: 2.2.8
+Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
+Version: 2.3.0
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -24,11 +24,18 @@ Authors@R: c(
   )
 URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/
 BugReports: https://github.com/inlabru-org/inlabru/issues
-Description: Facilitates spatial modeling using integrated nested Laplace approximation via the 
-  INLA package (<https://www.r-inla.org>). Additionally, implements a log Gaussian Cox process likelihood for 
-  modeling univariate and spatial point processes based on ecological survey data. See Yuan Yuan, 
-  Fabian E. Bachl, Finn Lindgren, David L. Borchers, Janine B. Illian, Stephen T. Buckland, Havard Rue, 
-  Tim Gerrodette (2017), <arXiv:1604.06013>.
+Description: Facilitates spatial and general latent Gaussian modeling using
+  integrated nested Laplace approximation via the INLA package (<https://www.r-inla.org>).
+  Additionally, extends the GAM-like model class to more general nonlinear predictor
+  expressions, and implements a log Gaussian Cox process likelihood for 
+  modeling univariate and spatial point processes based on ecological survey data.
+  Model components are specified with general inputs and mapping methods to the
+  latent variables, and the predictors are specified via general R expressions,
+  with separate expressions for each observation likelihood model in
+  multi-likelihood models. A prediction method based on fast Monte Carlo sampling
+  allows posterior prediction of general expressions of the latent variables.
+  Ecology-focused introduction in Bachl, Lindgren, Borchers, and Illian (2019)
+  <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.1.1
@@ -65,7 +72,7 @@ Suggests:
     spatstat.geom,
     spatstat.core,
     spatstat.data,
-    spatstat,
+    spatstat (>= 2.0-0),
     sphereplot,
     testthat
 Roxygen: list(markdown = TRUE)

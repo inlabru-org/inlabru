@@ -38,7 +38,7 @@ Creates a textured sphere and lon/lat coordinate annotations.
 This funciton requires the \code{rgl} and \code{sphereplot} packages.
 }
 \examples{
-\donttest{
+\dontrun{
 if (bru_safe_inla() &&
   require("rgl", quietly = TRUE) &&
   require("sphereplot", quietly = TRUE)) {

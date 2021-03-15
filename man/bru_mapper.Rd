@@ -5,6 +5,7 @@
 \alias{ibm_n}
 \alias{ibm_values}
 \alias{ibm_amatrix}
+\alias{ibm_valid_input}
 \alias{bru_mapper.default}
 \alias{bru_mapper.inla.mesh}
 \alias{bru_mapper.inla.mesh.1d}
@@ -23,12 +24,15 @@ ibm_values(mapper, ...)
 
 ibm_amatrix(mapper, input, ...)
 
+ibm_valid_input(mapper, input, ...)
+
 \method{bru_mapper}{default}(
   mapper,
   new_class = NULL,
   ibm_n = NULL,
   ibm_values = NULL,
   ibm_amatrix = NULL,
+  ibm_valid_input = NULL,
   ...
 )
 
@@ -53,7 +57,7 @@ bru_mapper_multi(mappers, ...)
 For the default \code{bru_mapper} method, a list that will be converted to a
 \code{bru_mapper} object by adding class information and (optional) methods.}
 
-\item{input}{The values for which to produce a mapping matrix}
+\item{input}{The values for which to produce validity information}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
@@ -62,6 +66,8 @@ For the default \code{bru_mapper} method, a list that will be converted to a
 \item{ibm_values}{An \code{ibm_values} method function}
 
 \item{ibm_amatrix}{An \code{ibm_amatrix} method function}
+
+\item{ibm_valid_input}{An \code{ibm_valid_input} method function}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
@@ -112,16 +118,26 @@ by \code{ibm_n(mapper)}
 }
 
 \itemize{
+\item \code{ibm_valid_input} Generic.
+Implementations must return a logical vector of length \code{NROW(input)}
+}
+
+\itemize{
 \item \code{bru_mapper.default} adds the "bru_mapper" class and \code{new_class}
 to an object. If provided, mapper method functions are added to an environment
-\code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_values}, and
-\code{ibm_amatrix} look for these functions first, and otherwise call \code{UseMethod()}.
+\code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_values},
+\code{ibm_amatrix}, and \code{ibm_valid_input} look for these functions first,
+and otherwise call \code{UseMethod()}.
 reached.
 }
 
 \itemize{
 \item \code{bru_mapper_multi} constructs a kronecker product mapping
 }
+}
+\examples{
+mapper <- bru_mapper_index(5)
+ibm_amatrix(mapper, c(1,3,4,5,2))
 }
 \seealso{
 \link{bru_mapper_methods} for specific method implementations.

@@ -16,7 +16,7 @@ glplot is a generic function for renders various kinds of spatial objects, i.e. 
 and inla.mesh objects. The function invokes particular methods which depend on the class of the first argument.
 }
 \examples{
-\donttest{
+\dontrun{
 if (bru_safe_inla() &&
   require("rgl", quietly = TRUE) &&
   require("sphereplot", quietly = TRUE)) {

@@ -5,12 +5,14 @@
 \alias{ibm_n.default}
 \alias{ibm_values.default}
 \alias{ibm_amatrix.default}
+\alias{ibm_valid_input.default}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
 \alias{ibm_values.bru_mapper_inla_mesh_2d}
 \alias{ibm_amatrix.bru_mapper_inla_mesh_2d}
 \alias{ibm_n.bru_mapper_inla_mesh_1d}
 \alias{ibm_values.bru_mapper_inla_mesh_1d}
 \alias{ibm_amatrix.bru_mapper_inla_mesh_1d}
+\alias{ibm_valid_input.bru_mapper_index}
 \alias{ibm_amatrix.bru_mapper_index}
 \alias{ibm_n.bru_mapper_linear}
 \alias{ibm_values.bru_mapper_linear}
@@ -24,6 +26,7 @@
 \alias{ibm_n.bru_mapper_multi}
 \alias{ibm_values.bru_mapper_multi}
 \alias{ibm_amatrix.bru_mapper_multi}
+\alias{ibm_valid_input.bru_mapper_multi}
 \alias{[.bru_mapper_multi}
 \alias{names.bru_mapper_multi}
 \alias{names<-.bru_mapper_multi}
@@ -34,6 +37,8 @@
 \method{ibm_values}{default}(mapper, ...)
 
 \method{ibm_amatrix}{default}(mapper, ...)
+
+\method{ibm_valid_input}{default}(mapper, input, ...)
 
 \method{ibm_n}{bru_mapper_inla_mesh_2d}(mapper, ...)
 
@@ -46,6 +51,8 @@
 \method{ibm_values}{bru_mapper_inla_mesh_1d}(mapper, ...)
 
 \method{ibm_amatrix}{bru_mapper_inla_mesh_1d}(mapper, input, ...)
+
+\method{ibm_valid_input}{bru_mapper_index}(mapper, input, ...)
 
 \method{ibm_amatrix}{bru_mapper_index}(mapper, input, ...)
 
@@ -72,6 +79,8 @@
 \method{ibm_values}{bru_mapper_multi}(mapper, multi = 0L, ...)
 
 \method{ibm_amatrix}{bru_mapper_multi}(mapper, input, multi = 0L, ...)
+
+\method{ibm_valid_input}{bru_mapper_multi}(mapper, input, multi = 0L, ...)
 
 \method{[}{bru_mapper_multi}(x, i, drop = TRUE)
 
@@ -138,7 +147,21 @@ of the object if it exists.
 }
 
 \itemize{
+\item The default \code{ibm_valid_input()} method returns an all-TRUE logical vector.
+}
+
+\itemize{
 \item \code{ibm_amatrix} for \code{bru_mapper_multi} accepts a list with
+named entries, or a list with unnamed but ordered elements.
+The names must match the sub-mappers, see \code{\link[=names.bru_mapper_multi]{names.bru_mapper_multi()}}.
+Each list element should take a format accepted by the corresponding
+sub-mapper. In case each element is a vector, the input can be given as a
+data.frame with named columns, a matrix with named columns, or a matrix
+with unnamed but ordered columns.
+}
+
+\itemize{
+\item \code{ibm_valid_input} for \code{bru_mapper_multi} accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see \code{\link[=names.bru_mapper_multi]{names.bru_mapper_multi()}}.
 Each list element should take a format accepted by the corresponding
