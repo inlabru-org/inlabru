@@ -20,7 +20,7 @@ This function transforms the mesh to 3D cartesian coordinates and uses
 inla.plot.mesh() with \code{rgl=TRUE} to plot the result.
 }
 \examples{
-\donttest{
+\dontrun{
 if (bru_safe_inla() &&
   require("rgl", quietly = TRUE) &&
   require("sphereplot", quietly = TRUE)) {

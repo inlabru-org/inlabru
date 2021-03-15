@@ -1,4 +1,4 @@
-\donttest{
+\dontrun{
 if (bru_safe_inla() &&
   require("rgl", quietly = TRUE) &&
   require("sphereplot", quietly = TRUE)) {

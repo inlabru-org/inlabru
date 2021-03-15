@@ -18,7 +18,7 @@ This function will calculate a cartesian representation of the lines provided
 and use rgl.linestrip() in order to render them.
 }
 \examples{
-\donttest{
+\dontrun{
 if (bru_safe_inla() &&
   require("rgl", quietly = TRUE) &&
   require("sphereplot", quietly = TRUE)) {

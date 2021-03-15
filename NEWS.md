@@ -1,4 +1,4 @@
-# inlabru (development version)
+# inlabru 2.3.0
 
 ## Breaking changes since version 2.1.13
 
@@ -58,7 +58,7 @@
   See the NEWS item for version 2.2.8 for further details.
 
 * The internal system for predictor linearisation and iterated INLA inference
-  has been reweritten to be faster and more robust
+  has been rewritten to be faster and more robust
   
 * See the NEWS entries for versions 2.1.14 to 2.2.8 for further details on new
   features and bug fixes
@@ -117,7 +117,7 @@
   models, to avoid an unnecessary optimisation.
 
 * Fix issues in `pixels()` and `bru_fill_missing()` for `Spatial*DataFrame`
-  objects with ncol=0 data frame parts.
+  objects with `ncol=0` data frame parts.
 
 # inlabru 2.2.1
 
@@ -173,7 +173,7 @@
 
 * New backend code to make extended feature support easier
 
-* New int.args option to control spatial integration resolution,
+* New `int.args` option to control spatial integration resolution,
   thanks to Martin Jullum (`martinju`)
 
 # inlabru 2.1.13
@@ -194,13 +194,13 @@
 
 # inlabru 2.1.9
 
-* Remove unused VignetteBuilder entry from DESCRIPTION
+* Remove unused `VignetteBuilder` entry from `DESCRIPTION`
 
 # inlabru 2.1.8
 
 * Update default options
 
-* Prevent int.polygon from integrating outside the mesh domain,
+* Prevent `int.polygon` from integrating outside the mesh domain,
   and generally more robust integration scheme construction.
 
 * Fix `bru()` to `like()` parameter logic. (Thanks to Peter Vesk for bug example)

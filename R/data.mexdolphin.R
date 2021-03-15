@@ -51,7 +51,9 @@
 #' ggplot() +
 #'   gg(mexdolphin$mesh, col = mexdolphin$lambda, mask = mexdolphin$ppoly) +
 #'   coord_equal()
-#'
+#' }
+#' \dontrun{
+#' if (requireNamespace("ggmap", quietly = TRUE)) {
 #' gmap(mexdolphin$depth) +
 #'   gm(mexdolphin$ppoly, color = "blue") +
 #'   gm(mexdolphin$samplers) +
@@ -60,6 +62,7 @@
 #' gmap(mexdolphin$depth) +
 #'   gm(mexdolphin$depth, aes(col = depth)) +
 #'   gm(mexdolphin$ppoly)
+#' }
 #' }
 NULL
 

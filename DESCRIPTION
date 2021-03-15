@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.2.8.9000
+Version: 2.3.0
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -34,7 +34,8 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   with separate expressions for each observation likelihood model in
   multi-likelihood models. A prediction method based on fast Monte Carlo sampling
   allows posterior prediction of general expressions of the latent variables.
-  Ecology-focused introduction in Bachl et al. (2019) <doi:10.1111/2041-210X.13168>.
+  Ecology-focused introduction in Bachl, Lindgren, Borchers, and Illian (2019)
+  <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.1.1
@@ -46,7 +47,7 @@ Depends:
     sp (>= 1.4-2),
     stats
 Imports:
-    Matrix (>= 1.3-0),
+    Matrix,
     rgdal,
     rgeos,
     utils,
