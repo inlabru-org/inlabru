@@ -16,3 +16,4 @@
 ^vignettes/articles$
 ^doc$
 ^Meta$
+^CRAN-RELEASE$
