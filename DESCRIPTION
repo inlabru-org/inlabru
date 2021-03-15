@@ -34,7 +34,8 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   with separate expressions for each observation likelihood model in
   multi-likelihood models. A prediction method based on fast Monte Carlo sampling
   allows posterior prediction of general expressions of the latent variables.
-  Ecology-focused introduction in Bachl et al. (2019) <doi:10.1111/2041-210X.13168>.
+  Ecology-focused introduction in Bachl, Lindgren, Borchers, and Illian (2019)
+  <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.1.1

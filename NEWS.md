@@ -58,7 +58,7 @@
   See the NEWS item for version 2.2.8 for further details.
 
 * The internal system for predictor linearisation and iterated INLA inference
-  has been reweritten to be faster and more robust
+  has been rewritten to be faster and more robust
   
 * See the NEWS entries for versions 2.1.14 to 2.2.8 for further details on new
   features and bug fixes
