@@ -11,7 +11,7 @@
 #' @aliases sample.lgcp
 #' @export
 #'
-#' @param mesh An [inla.mesh][INLA::inla.mesh] object
+#' @param mesh An `INLA::inla.mesh` object
 #' @param loglambda vector or matrix; A vector of log intensities at the mesh vertices
 #'   (for higher order basis functions, e.g.
 #'   for `inla.mesh.1d` meshes, `loglambda` should be given as `mesh$m` basis
