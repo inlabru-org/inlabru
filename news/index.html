@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.8.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0.9000</span>
       </span>
     </div>
 
@@ -163,6 +163,11 @@
 <h1 class="page-header" data-toc-text="development version">
 <a href="#inlabru-development-version" class="anchor"></a>inlabru (development version)<small> Unreleased </small>
 </h1>
+</div>
+    <div id="inlabru-230" class="section level1">
+<h1 class="page-header" data-toc-text="2.3.0">
+<a href="#inlabru-230" class="anchor"></a>inlabru 2.3.0<small> Unreleased </small>
+</h1>
 <div id="breaking-changes-since-version-2113" class="section level2">
 <h2 class="hasAnchor">
 <a href="#breaking-changes-since-version-2113" class="anchor"></a>Breaking changes since version 2.1.13</h2>
@@ -186,7 +191,7 @@
 <li><p>The <code>include</code> and <code>exclude</code> arguments to <code><a href="../reference/like.html">like()</a></code>, <code><a href="../reference/generate.html">generate()</a></code>, and <code><a href="https://rdrr.io/pkg/raster/man/predict.html">predict()</a></code> can be used to specify which components are used for a given likelihood model or predictor expression. This can be used to prevent evaluation of components that are invalid for a likelihood or predictor.</p></li>
 <li><p>Predictor expressions can access the latent state of a model component directly, by adding the suffix <code>_latent</code> to the component name, e.g. <code>name_latent</code>. For <code><a href="../reference/like.html">like()</a></code>, this requires <code>allow_latent = TRUE</code> to activate the needed linearisation code for this.</p></li>
 <li><p>Predictor expressions can evaluate component effects for arbitrary inputs by adding the suffix <code>_eval</code> to access special evaluator functions, e.g. <code>name_eval(1:10)</code>. This is useful for evaluating the 1D effect of spatial covariates. See the NEWS item for version 2.2.8 for further details.</p></li>
-<li><p>The internal system for predictor linearisation and iterated INLA inference has been reweritten to be faster and more robust</p></li>
+<li><p>The internal system for predictor linearisation and iterated INLA inference has been rewritten to be faster and more robust</p></li>
 <li><p>See the NEWS entries for versions 2.1.14 to 2.2.8 for further details on new features and bug fixes</p></li>
 </ul>
 </div>
@@ -246,7 +251,7 @@
 <ul>
 <li><p>Fixed issue with <code><a href="https://rdrr.io/pkg/raster/man/predict.html">predict()</a></code> logic for converting output to <code>Spatial*DataFrame</code></p></li>
 <li><p>Use <code>control.mode=list(restart=FALSE)</code> in the final inla run for nonlinear models, to avoid an unnecessary optimisation.</p></li>
-<li><p>Fix issues in <code><a href="../reference/pixels.html">pixels()</a></code> and <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> for <code>Spatial*DataFrame</code> objects with ncol=0 data frame parts.</p></li>
+<li><p>Fix issues in <code><a href="../reference/pixels.html">pixels()</a></code> and <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> for <code>Spatial*DataFrame</code> objects with <code>ncol=0</code> data frame parts.</p></li>
 </ul>
 </div>
     <div id="inlabru-221" class="section level1">
@@ -286,7 +291,7 @@
 <li><p>Add random seed option for posterior sampling</p></li>
 <li><p>Add package unit testing</p></li>
 <li><p>New backend code to make extended feature support easier</p></li>
-<li><p>New int.args option to control spatial integration resolution, thanks to Martin Jullum (<code>martinju</code>)</p></li>
+<li><p>New <code>int.args</code> option to control spatial integration resolution, thanks to Martin Jullum (<code>martinju</code>)</p></li>
 </ul>
 </div>
     <div id="inlabru-2113" class="section level1">
@@ -326,7 +331,8 @@
 <a href="#inlabru-219" class="anchor"></a>inlabru 2.1.9<small> 2018-07-24 </small>
 </h1>
 <ul>
-<li>Remove unused VignetteBuilder entry from DESCRIPTION</li>
+<li>Remove unused <code>VignetteBuilder</code> entry from <code>DESCRIPTION</code>
+</li>
 </ul>
 </div>
     <div id="inlabru-218" class="section level1">
@@ -335,7 +341,7 @@
 </h1>
 <ul>
 <li><p>Update default options</p></li>
-<li><p>Prevent int.polygon from integrating outside the mesh domain, and generally more robust integration scheme construction.</p></li>
+<li><p>Prevent <code>int.polygon</code> from integrating outside the mesh domain, and generally more robust integration scheme construction.</p></li>
 <li><p>Fix <code><a href="../reference/bru.html">bru()</a></code> to <code><a href="../reference/like.html">like()</a></code> parameter logic. (Thanks to Peter Vesk for bug example)</p></li>
 </ul>
 </div>
