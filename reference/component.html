@@ -355,7 +355,7 @@ or the effect of the covariate.</p>
 <li><p><code>formula = y ~ f(x, model = "linear")</code>,</p></li>
 </ul>
 
-<p>where <a href='https://rdrr.io/pkg/INLA/man/f.html'>f</a> is the inla specific function to set up random effects of all kinds. The underlying
+<p>where <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>f()</a></code> is the inla specific function to set up random effects of all kinds. The underlying
 predictor would again be \(\eta = \beta * x + c\) but the result of fitting the model would state
 <code>x</code> as the random effect's name. bru allows to rewrite this formula in order to explicitly state
 the name of the random effect and the name of the associated. This is achived by replacing <code>f</code>
