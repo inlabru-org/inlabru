@@ -14,7 +14,7 @@ sample.lgcp(
 )
 }
 \arguments{
-\item{mesh}{An \link[INLA:inla.mesh.create]{inla.mesh} object}
+\item{mesh}{An \code{INLA::inla.mesh} object}
 
 \item{loglambda}{vector or matrix; A vector of log intensities at the mesh vertices
 (for higher order basis functions, e.g.

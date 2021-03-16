@@ -153,7 +153,7 @@ In INLA, a simple random effect model would be expressed as
 
 \itemize{\item{\code{formula = y ~ f(x, model = "linear")},}}
 
-where \link[INLA:f]{f} is the inla specific function to set up random effects of all kinds. The underlying
+where \code{f()} is the inla specific function to set up random effects of all kinds. The underlying
 predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
 \code{x} as the random effect's name. bru allows to rewrite this formula in order to explicitly state
 the name of the random effect and the name of the associated. This is achived by replacing \code{f}
