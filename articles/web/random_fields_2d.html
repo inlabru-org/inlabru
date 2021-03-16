@@ -118,7 +118,7 @@
       <h1 data-toc-skip>Random Fields in 2D</h1>
                         <h4 class="author">Finn Lindgren</h4>
             
-            <h4 class="date">2021-03-15</h4>
+            <h4 class="date">2021-03-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/random_fields_2d.Rmd"><code>vignettes/web/random_fields_2d.Rmd</code></a></small>
       <div class="hidden name"><code>random_fields_2d.Rmd</code></div>
@@ -241,11 +241,7 @@
   <span class="op">)</span></code></pre></div>
 <p>Specify the model components:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">observed</span> <span class="op">~</span> <span class="fu">field</span><span class="op">(</span>
-  map <span class="op">=</span> <span class="va">coordinates</span>,
-  model <span class="op">=</span> <span class="va">matern</span>
-<span class="op">)</span> <span class="op">+</span>
-  <span class="va">Intercept</span></code></pre></div>
+<code class="sourceCode R"><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">observed</span> <span class="op">~</span> <span class="fu">field</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
 <p>Fit the model and inspect the results:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">mydata</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span>

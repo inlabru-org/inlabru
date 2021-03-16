@@ -118,7 +118,7 @@
       <h1 data-toc-skip>LGCPs - An example in one dimension</h1>
                         <h4 class="author">David Borchers and Finn Lindgren</h4>
             
-            <h4 class="date">2021-03-15</h4>
+            <h4 class="date">2021-03-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/1d_lgcp.Rmd"><code>vignettes/web/1d_lgcp.Rmd</code></a></small>
       <div class="hidden name"><code>1d_lgcp.Rmd</code></div>
@@ -251,8 +251,8 @@
 <p>You can look at the abundance estimate by typing</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Lambda</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv      var</span>
-<span class="co">#&gt; 1 130.5211 12.02897 110.5145 129.8557 156.1795 103.3012 159.9865 0.09216111 144.6962</span></code></pre></div>
+<span class="co">#&gt;       mean       sd   q0.025  median  q0.975     smin     smax        cv      var</span>
+<span class="co">#&gt; 1 133.0334 14.11738 109.2434 131.688 160.533 104.5155 183.0597 0.1061191 199.3005</span></code></pre></div>
 <ul>
 <li>
 <code>mean</code> is the posterior mean abundance.</li>
@@ -280,23 +280,23 @@
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html">head</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">)</span>
 <span class="co">#&gt;    N         mean           sd       q0.025       median       q0.975         smin         smax</span>
-<span class="co">#&gt; 1 50 3.726948e-11 2.892024e-10 1.772426e-21 9.334000e-16 1.487611e-10 4.717812e-24 2.859533e-09</span>
-<span class="co">#&gt; 2 51 7.605344e-11 5.838809e-10 5.195631e-21 2.364527e-15 3.161425e-10 1.466501e-23 5.767643e-09</span>
-<span class="co">#&gt; 3 52 1.522962e-10 1.156242e-09 1.493784e-20 5.874727e-15 6.589543e-10 4.470860e-23 1.140955e-08</span>
-<span class="co">#&gt; 4 53 2.993895e-10 2.246669e-09 4.213834e-20 1.432052e-14 1.347619e-09 1.337295e-22 2.214451e-08</span>
-<span class="co">#&gt; 5 54 5.780005e-10 4.285025e-09 1.166707e-19 3.426194e-14 2.705037e-09 3.925955e-22 4.218382e-08</span>
-<span class="co">#&gt; 6 55 1.096291e-09 8.024979e-09 3.171683e-19 8.048155e-14 5.331171e-09 1.131604e-21 7.889631e-08</span>
+<span class="co">#&gt; 1 50 4.053448e-11 2.900155e-10 3.468948e-22 3.489921e-16 1.349468e-10 4.173649e-25 2.804131e-09</span>
+<span class="co">#&gt; 2 51 8.282426e-11 5.862349e-10 1.035105e-21 8.950305e-16 2.874987e-10 1.326196e-24 5.657992e-09</span>
+<span class="co">#&gt; 3 52 1.660680e-10 1.162341e-09 3.029276e-21 2.251267e-15 6.007266e-10 4.133008e-24 1.119678e-08</span>
+<span class="co">#&gt; 4 53 3.268751e-10 2.261363e-09 8.698038e-21 5.555761e-15 1.231533e-09 1.263724e-23 2.173959e-08</span>
+<span class="co">#&gt; 5 54 6.318462e-10 4.318566e-09 2.451244e-20 1.345681e-14 2.477982e-09 3.792454e-23 4.142779e-08</span>
+<span class="co">#&gt; 6 55 1.199874e-09 8.098303e-09 6.782403e-20 3.200162e-14 4.895332e-09 1.117428e-22 7.751099e-08</span>
 <span class="co">#&gt;         cv          var</span>
-<span class="co">#&gt; 1 7.759763 8.363802e-20</span>
-<span class="co">#&gt; 2 7.677245 3.409168e-19</span>
-<span class="co">#&gt; 3 7.592060 1.336896e-18</span>
-<span class="co">#&gt; 4 7.504169 5.047523e-18</span>
-<span class="co">#&gt; 5 7.413531 1.836144e-17</span>
-<span class="co">#&gt; 6 7.320116 6.440029e-17</span></code></pre></div>
+<span class="co">#&gt; 1 7.154786 8.410900e-20</span>
+<span class="co">#&gt; 2 7.078057 3.436713e-19</span>
+<span class="co">#&gt; 3 6.999184 1.351036e-18</span>
+<span class="co">#&gt; 4 6.918123 5.113760e-18</span>
+<span class="co">#&gt; 5 6.834838 1.865002e-17</span>
+<span class="co">#&gt; 6 6.749292 6.558251e-17</span></code></pre></div>
 <p>We compute the 95% prediction interval and the median as follows</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1]  99.35851 128.85126 160.97500</span></code></pre></div>
+<span class="co">#&gt; [1]  98.9351 129.6000 163.7986</span></code></pre></div>
 <p>Compare <code>Lambda</code> to <code>Nest</code> by plotting: First calculate the posterior conditional on the mean of <code>Lambda</code></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Nest</span><span class="op">$</span><span class="va">plugin_estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html">dpois</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, lambda <span class="op">=</span> <span class="va">Lambda</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></code></pre></div>

@@ -118,7 +118,7 @@
       <h1 data-toc-skip>LGCPs - Distance sampling</h1>
                         <h4 class="author">David Borchers</h4>
             
-            <h4 class="date">2021-03-15</h4>
+            <h4 class="date">2021-03-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/2d_lgcp_distancesampling.Rmd"><code>vignettes/web/2d_lgcp_distancesampling.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_distancesampling.Rmd</code></div>
@@ -335,10 +335,10 @@
 <span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
-<span class="co">#&gt; 1 308.2539 105.4041 169.6429 291.7795 548.3106 136.1278 727.4185 0.3419391</span>
+<span class="co">#&gt;       mean      sd   q0.025   median   q0.975     smin     smax        cv</span>
+<span class="co">#&gt; 1 298.5163 90.3905 179.2334 288.2139 532.2778 160.1985 698.7648 0.3027992</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 11110.02</span>
+<span class="co">#&gt; 1 8170.442</span>
 
 <span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
@@ -365,8 +365,8 @@
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit</span><span class="op">)</span>
 <span class="co">#&gt;   Model      DIC Delta.DIC</span>
-<span class="co">#&gt; 1  fit1 769.9671  0.000000</span>
-<span class="co">#&gt; 2   fit 772.0932  2.126062</span>
+<span class="co">#&gt; 1  fit1 769.9712  0.000000</span>
+<span class="co">#&gt; 2   fit 772.0926  2.121402</span>
 
 <span class="co"># Look at the goodness-of-fit of the two models in the distance dimension</span>
 <span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span>
@@ -405,7 +405,7 @@
 <p>Half-normal next</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">formula1</span> <span class="op">&lt;-</span> <span class="va">distance</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu">hr</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="va">Intercept</span>
-<span class="va">cmp</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="va">lsig</span> <span class="op">+</span> <span class="va">Intercept</span>
+<span class="va">cmp</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="fu">lsig</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="va">dfit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span>
   components <span class="op">=</span> <span class="va">cmp</span>,
   <span class="va">mexdolphin</span><span class="op">$</span><span class="va">points</span>,

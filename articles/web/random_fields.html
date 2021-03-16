@@ -118,7 +118,7 @@
       <h1 data-toc-skip>Random Fields in One Dimension</h1>
                         <h4 class="author">Finn Lindgren</h4>
             
-            <h4 class="date">2021-03-15</h4>
+            <h4 class="date">2021-03-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/random_fields.Rmd"><code>vignettes/web/random_fields.Rmd</code></a></small>
       <div class="hidden name"><code>random_fields.Rmd</code></div>
@@ -216,34 +216,30 @@
 <div id="using-function-bru-to-fit-to-count-data" class="section level3">
 <h3 class="hasAnchor">
 <a href="#using-function-bru-to-fit-to-count-data" class="anchor"></a>Using function <code>bru( )</code> to fit to count data</h3>
-<p>We need to speficy an model in order to fit it. This can be done inside the call to <code><a href="../../reference/bru.html">bru( )</a></code> but that is a bit messy, so we’ll store it in <code>mdl</code> first and then pass that to <code><a href="../../reference/bru.html">bru( )</a></code>.</p>
-<p>Our response variable in the data frame <code>cd</code> is called <code>count</code> so the model specification needs to have that on the left of the <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code>. The right has to have <code>+ Intercept</code> (all the models we use have intercepts), and because we want to fit a Gaussian random field (GRF), it must have a GCRF specification. In <code>inlabru</code> the GRF specification is a function, which allows the GRF to be calculated at any point in space while <code>inlabru</code> is doing its calculations.</p>
-<p>The user gets to name the GRF function. The syntax is ‘myname(map = …, model= …)’, where:</p>
+<p>We need to specify model components and a model formula in order to fit it. This can be done inside the call to <code><a href="../../reference/bru.html">bru( )</a></code> but that is a bit messy, so we’ll store it in <code>comp</code> first and then pass that to <code><a href="../../reference/bru.html">bru( )</a></code>.</p>
+<p>Our response variable in the data frame <code>cd</code> is called <code>count</code> so the model specification needs to have that on the left of the <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code>. We add an intercept component with <code>+ Intercept(1)</code> on the right hand side (all the models we use have intercepts), and because we want to fit a Gaussian random field (GRF), it must have a GRF specification. In <code>inlabru</code> the GRF specification is a function, which allows the GRF to be calculated at any point in space while <code>inlabru</code> is doing its calculations.</p>
+<p>The user gets to name the GRF function. The syntax is ‘myname(input, model= …)’, where:</p>
 <ul>
 <li>‘myname’ is whatever you want to call the GRF (we called it <code>field</code> below);</li>
 <li>
-<code>map=</code> specifies the dimension in which the GRF or SPDE ‘lives’. Here we are working in one dimension, and we called that dimension <code>x</code> when we set up the data set.</li>
+<code>input</code> specifies the coordinates in which the GRF or SPDE ‘lives’. Here we are working in one dimension, and we called that dimension <code>x</code> when we set up the data set.</li>
 <li>
 <code>model=</code> designates the type of effect, here an SPDE model object from the <code>INLA</code> function <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html">inla.spde2.pcmatern( )</a></code>, which requires a mesh to be passed to it, so we pass it the 1D mesh that we created above, `<code>mesh1D</code>.</li>
 </ul>
+<p>For models that only adds the model components, we don’t need to specify a separate predictor formula. Instead, we can provide the name of the output to the left of the <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code> in the component specification.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">the_spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh1D</span>,
   prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span>,
   prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">0.01</span><span class="op">)</span>
 <span class="op">)</span>
 
-<span class="va">comp</span> <span class="op">&lt;-</span> <span class="va">count</span> <span class="op">~</span> <span class="fu">field</span><span class="op">(</span>map <span class="op">=</span> <span class="va">x</span>, model <span class="op">=</span> <span class="va">the_spde</span><span class="op">)</span> <span class="op">+</span> <span class="va">Intercept</span>
+<span class="va">comp</span> <span class="op">&lt;-</span> <span class="va">count</span> <span class="op">~</span> <span class="fu">field</span><span class="op">(</span><span class="va">x</span>, model <span class="op">=</span> <span class="va">the_spde</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 
 <span class="va">fit2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">comp</span>, <span class="va">cd</span>, family <span class="op">=</span> <span class="st">"poisson"</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>E <span class="op">=</span> <span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Warning in inlabru:::component.character("field", map = x, model = the_spde):</span>
-<span class="co">#&gt; Use of 'map' is deprecated and may be disabled; use 'main' instead.</span>
-<span class="co">#&gt; Warning in add_mapper(component$main, label = component$label, lhoods = lh, : All covariate evaluations for 'Intercept' are NULL; an intercept component was likely intended.</span>
-<span class="co">#&gt;   Implicit latent intercept component specification is deprecated since version 2.1.14.</span>
-<span class="co">#&gt;   Use explicit notation '+ Intercept(1)' instead (or '+1' for '+ Intercept(1)').</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.3.0.9000</span>
-<span class="co">#&gt; INLA version: 21.03.14-3</span>
+<span class="co">#&gt; INLA version: 21.03.16</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   field: Model types main='spde', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   Intercept: Model types main='linear', group='exchangeable', replicate='iid'</span>
@@ -252,7 +248,7 @@
 <span class="co">#&gt;     Data class: 'data.frame'</span>
 <span class="co">#&gt;     Predictor: count ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 0.964, Running = 0.208, Post = 0.11, Total = 1.28 </span>
+<span class="co">#&gt;     Pre = 0.941, Running = 0.225, Post = 0.101, Total = 1.27 </span>
 <span class="co">#&gt; Fixed effects:</span>
 <span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode   kld</span>
 <span class="co">#&gt; Intercept 5.677 6.684     -0.101    2.097     22.755 1.376 0.003</span>
