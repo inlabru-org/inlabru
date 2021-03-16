@@ -343,7 +343,7 @@ Half-normal next
 
 ```{r,results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 formula1 <- distance ~ log(hr(distance, lsig)) + Intercept
-cmp <- ~ lsig + Intercept
+cmp <- ~ lsig(1) + Intercept(1)
 dfit1 <- lgcp(
   components = cmp,
   mexdolphin$points,

@@ -144,11 +144,7 @@ matern <-
 Specify the model components:
 
 ```{r }
-cmp <- observed ~ field(
-  map = coordinates,
-  model = matern
-) +
-  Intercept
+cmp <- observed ~ field(coordinates, model = matern) + Intercept(1)
 ```
 
 Fit the model and inspect the results:
