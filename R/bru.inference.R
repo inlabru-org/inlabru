@@ -290,7 +290,7 @@ bru_info.bru <- function(object, ...) {
 bru <- function(components = ~ Intercept(1),
                 ...,
                 options = list()) {
-  requireINLA()
+  stopifnot(bru_safe_inla())
 
   # Update default options
   options <- bru_call_options(options)

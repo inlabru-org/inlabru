@@ -723,7 +723,7 @@ fm_list_as_CRS <- function(x, ...) {
 #' @keywords internal
 #' @examples
 #'
-#' if (require(rgdal)) {
+#' if (require(rgdal) && !fm_has_PROJ6()) {
 #'   crs0 <- fm_CRS("longlat")
 #'   p4s <- fm_CRSargs(crs0)
 #'   lst <- fm_CRSargs_as_list(p4s)

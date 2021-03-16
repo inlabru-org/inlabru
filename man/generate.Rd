@@ -76,7 +76,7 @@ posterior of the estimated random effects.
 }
 \examples{
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla(multicore = FALSE)) {
 
   # Generate data for a simple linear model
 
@@ -112,7 +112,7 @@ if (bru_safe_inla()) {
 }
 }
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla(multicore = FALSE)) {
 
   # Generate data for a simple linear model
 

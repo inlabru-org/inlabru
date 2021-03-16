@@ -777,10 +777,6 @@ iinla.setOption <- function(...) {
 # Utils ----
 
 
-requireINLA <- function(quietly = FALSE) {
-  tryCatch(requireNamespace("INLA", quietly = quietly), error = function(x) {})
-}
-
 
 #' @describeIn inlabru-deprecated Global setting for tutorial sessions.
 #'

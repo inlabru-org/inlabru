@@ -1,5 +1,5 @@
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla(multicore = FALSE)) {
 
   # Simulate some covariates x and observations y
   input.df <- data.frame(x = cos(1:10))
@@ -13,7 +13,7 @@ if (bru_safe_inla()) {
 }
 
 
-if (bru_safe_inla()) {
+if (bru_safe_inla(multicore = FALSE)) {
 
   # Alternatively, we can use the like() function to construct the likelihood:
 
@@ -28,7 +28,7 @@ if (bru_safe_inla()) {
 # the z component should be interpreted as single latent variable and not
 # a covariate:
 
-if (bru_safe_inla()) {
+if (bru_safe_inla(multicore = FALSE)) {
   z <- 2
   input.df <- within(input.df, y <- 5 + exp(z) * x + rnorm(10, mean = 0, sd = 0.1))
   lik <- like(
