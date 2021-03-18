@@ -118,7 +118,7 @@
       <h1 data-toc-skip>LGCPs - Distance sampling</h1>
                         <h4 class="author">David Borchers</h4>
             
-            <h4 class="date">2021-03-16</h4>
+            <h4 class="date">2021-03-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/2d_lgcp_distancesampling.Rmd"><code>vignettes/web/2d_lgcp_distancesampling.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_distancesampling.Rmd</code></div>
@@ -335,10 +335,10 @@
 <span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
-<span class="co">#&gt; 1 311.0045 88.15976 178.0424 307.6954 515.9473 145.0805 641.7885 0.2834678</span>
+<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin    smax       cv</span>
+<span class="co">#&gt; 1 308.9726 88.88555 176.1667 290.0329 480.7403 139.6093 667.374 0.287681</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 7772.144</span>
+<span class="co">#&gt; 1 7900.641</span>
 
 <span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
@@ -364,9 +364,9 @@
 <a href="#comparing-the-models" class="anchor"></a>Comparing the models</h2>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit</span><span class="op">)</span>
-<span class="co">#&gt;   Model     DIC Delta.DIC</span>
-<span class="co">#&gt; 1  fit1 769.970  0.000000</span>
-<span class="co">#&gt; 2   fit 772.093  2.122965</span>
+<span class="co">#&gt;   Model      DIC Delta.DIC</span>
+<span class="co">#&gt; 1  fit1 769.9251   0.00000</span>
+<span class="co">#&gt; 2   fit 772.1386   2.21348</span>
 
 <span class="co"># Look at the goodness-of-fit of the two models in the distance dimension</span>
 <span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span>
@@ -418,7 +418,7 @@
 <code class="sourceCode R"><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">dfit1</span>, <span class="va">dfit</span><span class="op">)</span>
 <span class="co">#&gt;   Model       DIC Delta.DIC</span>
 <span class="co">#&gt; 1 dfit1 -75.10825  0.000000</span>
-<span class="co">#&gt; 2  dfit -73.07133  2.036916</span></code></pre></div>
+<span class="co">#&gt; 2  dfit -73.07132  2.036932</span></code></pre></div>
 <p>Plot both lines on histogram of observations First scale lines to have same area as that of histogram Half-normal:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">hnline</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">distance</span>, p <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">mean</span>, lower <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">q0.025</span>, upper <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">q0.975</span><span class="op">)</span>
