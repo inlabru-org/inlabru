@@ -111,7 +111,7 @@ test_that("User defined mappers", {
 
 test_that("User defined mappers 2", {
   # .S3method was unavailable in R 3.6!
-  skip_if_not(utils::compareVersion("4", R.version()$major) <= 0)
+  skip_if_not(utils::compareVersion("4", R.Version()$major) <= 0)
   
   # User defined mapper objects
   
