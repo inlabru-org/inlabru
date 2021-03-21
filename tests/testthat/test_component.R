@@ -142,6 +142,8 @@ test_that("Component construction: deprecated arguments", {
     component_list(~ something(map = a)),
     "Use of 'map' is deprecated"
   )
+  skip_on_cran()
+  local_bru_safe_inla()
   expect_warning(
     bru(~ something(map = a),
       formula = response ~ .,
