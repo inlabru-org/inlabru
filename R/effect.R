@@ -1250,8 +1250,9 @@ code.components <- function(components, add = "") {
 #' to an object. If provided, mapper method functions are added to an environment
 #' `.envir` in the object.  The generic methods `ibm_n`, `ibm_values`,
 #' `ibm_amatrix`, and `ibm_valid_input` look for these functions first,
-#' and otherwise call `UseMethod()`.
-#' reached.
+#' and otherwise call `UseMethod()`.  This is an alternative to using `.S3method()`
+#' to register the methods, e.g.
+#' `.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)`.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
 #' @param ibm_n An `ibm_n` method function
 #' @param ibm_values An `ibm_values` method function

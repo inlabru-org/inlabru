@@ -127,8 +127,9 @@ Implementations must return a logical vector of length \code{NROW(input)}
 to an object. If provided, mapper method functions are added to an environment
 \code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_values},
 \code{ibm_amatrix}, and \code{ibm_valid_input} look for these functions first,
-and otherwise call \code{UseMethod()}.
-reached.
+and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
+to register the methods, e.g.
+\code{.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)}.
 }
 
 \itemize{
