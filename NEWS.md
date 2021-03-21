@@ -1,3 +1,5 @@
+# inlabru (development version)
+
 # inlabru 2.3.1
 
 * Documentation and dependency updates for CRAN compatibility
