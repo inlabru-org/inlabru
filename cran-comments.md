@@ -7,33 +7,20 @@
 * R-hub, R devel
 
 ## Submission notes
-* Feature and bugfix release 2.3.0
-* New maintainer: Finn Lindgren <finn.lindgren@gmail.com>
-* CRAN check NOTEs and WARNs for old version 2.1.13 have been addressed:
-  - NOTE and WARN spatstat dependencies; fixed
-  - NOTE Rd xrefs; major documentation overhaul
-  - Additional_repositories used for non-CRAN Suggested package INLA
-* Extensive unit testing has been added, allowing cross-platform inlabru+INLA
-  testing on github, and skipping some tests on CRAN to avoid long-running tests
-  and problematic INLA installs.
+* Bugfix release 2.3.1
+* CRAN checks for old version, 2.3.0:
+  - ERROR: examples that relied on PROJ6 or later now check if PROJ6 is available
+  - NOTE: Rd xrefs; remaining unavaiable xrefs have been removed
+  - WARN: Error in readRDS; package-unrelated problem with the CRAN system
+          for Check: Rd cross-references
+* Checks for new version, 2.3.1:
+  - NOTE: Additional_repositories used for non-CRAN Suggested package INLA
 
 ## R CMD check results
 
-With the new version, 2.3.0, there were no ERRORs or WARNINGs on the test systems,
+With the new version, 2.3.1, there were no ERRORs or WARNINGs on the test systems,
 except for a spurious "Suggests orphaned package: ggmap" message on R-hub, and
 windows on github but not win-builder; see below for details.
-
-There was 1 NOTE:
-
-* checking CRAN incoming feasibility ... NOTE
-  Maintainer: 'Finn Lindgren <finn.lindgren@gmail.com>'
-
-  New maintainer:
-    Finn Lindgren <finn.lindgren@gmail.com>
-  Old maintainer(s):
-    Fabian E. Bachl <bachlfab@gmail.com>
-
-Finn Lindgren is now doing the package development and package maintenance.
 
 Comments:
 
