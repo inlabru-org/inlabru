@@ -577,7 +577,7 @@ gg.SpatialPixels <- function(data, ...) {
 #' @name gg.inla.mesh
 #' @export
 #' @import ggplot2
-#' @param data An [inla.mesh][INLA::inla.mesh] object.
+#' @param data An `INLA::inla.mesh` object.
 #' @param color A vector of scalar values to fill the mesh with colors. The length of the vector mus correspond to the number of mesh vertices.
 #' @param alpha A vector of scalar values setting the alpha value of the colors provided.
 #' @param edge.color Color of the mesh edges.

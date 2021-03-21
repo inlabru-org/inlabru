@@ -82,7 +82,7 @@ the model.
 }
 \examples{
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla(multicore = FALSE)) {
 
   # Load the Gorilla data
 

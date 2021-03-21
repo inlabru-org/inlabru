@@ -11,7 +11,7 @@
 #' @aliases sample.lgcp
 #' @export
 #'
-#' @param mesh An [inla.mesh][INLA::inla.mesh] object
+#' @param mesh An `INLA::inla.mesh` object
 #' @param loglambda vector or matrix; A vector of log intensities at the mesh vertices
 #'   (for higher order basis functions, e.g.
 #'   for `inla.mesh.1d` meshes, `loglambda` should be given as `mesh$m` basis
@@ -58,9 +58,9 @@
 #' @examples
 #' \donttest{
 #' # The INLA package is required
-#' if (require("INLA", quietly = TRUE)) {
+#' if (bru_safe_inla(quietly = TRUE)) {
 #'   vertices <- seq(0, 3, by = 0.1)
-#'   mesh <- inla.mesh.1d(vertices)
+#'   mesh <- INLA::inla.mesh.1d(vertices)
 #'   loglambda <- 5 - 0.5 * vertices
 #'   pts <- sample.lgcp(mesh, loglambda)
 #'   pts$y <- 0
@@ -70,8 +70,8 @@
 #' }
 #'
 #' \donttest{
-#' # The INLA package is required
-#' if (require("INLA", quietly = TRUE)) {
+#' # The INLA package and PROJ6 are required
+#' if (bru_safe_inla(quietly = TRUE) && fm_has_PROJ6()) {
 #'   data("gorillas", package = "inlabru")
 #'   pts <- sample.lgcp(gorillas$mesh,
 #'     loglambda = 1.5,
@@ -85,7 +85,7 @@
 #'
 sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = NULL,
                         ignore.CRS = FALSE) {
-  requireINLA()
+  stopifnot(bru_safe_inla())
   if (inherits(mesh, "inla.mesh.1d")) {
     xmin <- mesh$interval[1]
     xmax <- mesh$interval[2]

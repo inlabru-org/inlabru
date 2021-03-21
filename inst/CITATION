@@ -21,7 +21,7 @@ bibentry(bibtype = "Article",
              "inlabru: an R package for Bayesian spatial modelling ",
              "from ecological survey data, ",
              "Methods in Ecology and Evolution, British Ecological Society, 10, 760--766, ",
-             "doi:10.1111/2041-210X.13168.")
+             "doi:10.1111/2041-210X.13168")
 )
 
 citEntry(entry = "Article",
@@ -35,7 +35,7 @@ citEntry(entry = "Article",
   pages = "2270--2297",
   publisher = "The Institute of Mathematical Statistics",
   title = "Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales",
-  url = "https://doi.org/10.1214/17-AOAS1078",
+  doi = "10.1214/17-AOAS1078",
   volume = "11",
   year = "2017",
   textVersion =
@@ -44,13 +44,13 @@ citEntry(entry = "Article",
              "Point process models for spatio-temporal distance sampling data ",
              "from a large-scale survey of blue whales",
              "Annals of Applied Statistics, 11, 2270--2297, ",
-             "doi:10.1214/17-AOAS1078.")
+             "doi:10.1214/17-AOAS1078")
 )
 
 #  @Manual{,
 #    title = {inlabru: Spatial Inference using Integrated Nested Laplace Approximation},
 #    author = {Fabian E. Bachl and Finn Lindgren},
 #    year = {2019},
-#    note = {http://www.inlabru.org,},
+#    note = {http://www.inlabru.org}
 #  }
 

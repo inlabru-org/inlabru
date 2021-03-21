@@ -66,7 +66,7 @@ test_that("Multi-mapper bru input", {
 
 test_that("User defined mappers", {
   # User defined mapper objects
-
+  
   ibm_amatrix.bm_test <- function(mapper, input, ...) {
     message("---- IBM_AMATRIX from inner environment ----")
     Matrix::sparseMatrix(
@@ -76,7 +76,7 @@ test_that("User defined mappers", {
       dims = c(length(input), mapper$n)
     )
   }
-
+  
   bm_test <- function(n, ...) {
     bru_mapper(
       list(n = n),
@@ -84,19 +84,74 @@ test_that("User defined mappers", {
       ibm_amatrix = ibm_amatrix.bm_test
     )
   }
-
+  
   m <- bm_test(n = 20)
   cmp <- y ~ -1 + indep(x, model = "iid", mapper = m)
   mydata <- data.frame(y = rnorm(15) + 2 * (1:15), x = 1:15)
-
+  expect_message(
+    {
+      ibm_amatrix(m, mydata$x)
+    },
+    "---- IBM_AMATRIX from inner environment ----",
+    label = "ibm_amatrix generic call"
+  )
+  
   skip_on_cran()
   local_bru_safe_inla()
-
+  
   expect_message(
     {
       fit <- bru(cmp, data = mydata, family = "gaussian")
     },
     "---- IBM_AMATRIX from inner environment ----",
+    label = "Non-interactive bru() call"
+  )
+})
+
+
+test_that("User defined mappers 2", {
+  # .S3method was unavailable in R 3.6!
+  skip_if_not(utils::compareVersion("4", R.Version()$major) <= 0)
+  
+  # User defined mapper objects
+  
+  ibm_amatrix.bm_test <- function(mapper, input, ...) {
+    message("---- IBM_AMATRIX from inner environment 2 ----")
+    Matrix::sparseMatrix(
+      i = seq_along(input),
+      j = input,
+      x = rep(2, length(input)),
+      dims = c(length(input), mapper$n)
+    )
+  }
+  .S3method("ibm_amatrix", "bm_test", ibm_amatrix.bm_test)
+  
+  bm_test <- function(n, ...) {
+    bru_mapper(
+      list(n = n),
+      new_class = "bm_test"
+    )
+  }
+  
+  m <- bm_test(n = 20)
+  cmp <- y ~ -1 + indep(x, model = "iid", mapper = m)
+  mydata <- data.frame(y = rnorm(15) + 2 * (1:15), x = 1:15)
+  expect_message(
+    {
+      ibm_amatrix(m, mydata$x)
+    },
+    "---- IBM_AMATRIX from inner environment 2 ----",
+    label = "ibm_amatrix generic call"
+  )
+
+  skip_on_cran()
+  local_bru_safe_inla()
+  
+  expect_message(
+    {
+      fit <- bru(cmp, data = mydata, family = "gaussian")
+    },
+    "---- IBM_AMATRIX from inner environment 2 ----",
     label = "Non-interactive bru() call"
   )
 })

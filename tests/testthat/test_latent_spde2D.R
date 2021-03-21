@@ -177,6 +177,8 @@ latent_spde2D_group_testdata <- function() {
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(fm_has_PROJ6())
+  
   expect_warning(
     {
       data_ <- latent_spde2D_group_testdata()

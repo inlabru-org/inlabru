@@ -14,7 +14,7 @@ sample.lgcp(
 )
 }
 \arguments{
-\item{mesh}{An \link[INLA:inla.mesh.create]{inla.mesh} object}
+\item{mesh}{An \code{INLA::inla.mesh} object}
 
 \item{loglambda}{vector or matrix; A vector of log intensities at the mesh vertices
 (for higher order basis functions, e.g.
@@ -72,9 +72,9 @@ or \code{R}, if specified. Output given in the same CRS as the mesh.
 \examples{
 \donttest{
 # The INLA package is required
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla(quietly = TRUE)) {
   vertices <- seq(0, 3, by = 0.1)
-  mesh <- inla.mesh.1d(vertices)
+  mesh <- INLA::inla.mesh.1d(vertices)
   loglambda <- 5 - 0.5 * vertices
   pts <- sample.lgcp(mesh, loglambda)
   pts$y <- 0
@@ -84,8 +84,8 @@ if (require("INLA", quietly = TRUE)) {
 }
 
 \donttest{
-# The INLA package is required
-if (require("INLA", quietly = TRUE)) {
+# The INLA package and PROJ6 are required
+if (bru_safe_inla(quietly = TRUE) && fm_has_PROJ6()) {
   data("gorillas", package = "inlabru")
   pts <- sample.lgcp(gorillas$mesh,
     loglambda = 1.5,

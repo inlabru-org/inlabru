@@ -1,5 +1,5 @@
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla(multicore = FALSE)) {
 
   # Generate some data
   input.df <- data.frame(x = cos(1:10))

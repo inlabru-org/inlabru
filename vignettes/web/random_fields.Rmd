@@ -143,25 +143,29 @@ ggplot() +
 ```
 
 ### Using function `bru( )` to fit to count data
-We need to speficy an model in order to fit it. This can be done inside the call
-to `bru( )` but that is a bit messy, so we'll store it in `mdl` first and then pass
+We need to specify model components and a model formula in order to fit it.
+This can be done inside the call
+to `bru( )` but that is a bit messy, so we'll store it in `comp` first and then pass
 that to `bru( )`.
 
 Our response variable in the data frame `cd` is called `count` so the model specification
-needs to have that on the left of the `~`. The right has to have `+ Intercept` (all the 
+needs to have that on the left of the `~`. We add an intercept component with
+`+ Intercept(1)` on the right hand side (all the 
 models we use have intercepts), and because we want to fit a Gaussian random field (GRF),
-it must have a GCRF specification. In `inlabru` the GRF specification is a function, which 
+it must have a GRF specification. In `inlabru` the GRF specification is a function, which 
 allows the GRF to be calculated at any point in space while `inlabru` is doing its calculations. 
 
-The user gets to name the GRF function. The syntax is 'myname(map = ..., model= ...)',
+The user gets to name the GRF function. The syntax is 'myname(input, model= ...)',
 where:
 
 * 'myname' is whatever you want to call the GRF (we called it `field` below);
-* `map=` specifies the dimension in which the GRF or SPDE 'lives'. Here we are working in one
-dimension, and we called that dimension `x` when we set up the data set.
+* `input` specifies the coordinates in which the GRF or SPDE 'lives'. Here we are working in one dimension, and we called that dimension `x` when we set up the data set.
 * `model=` designates the type of effect, here an SPDE model object from the 
 `INLA` function `inla.spde2.pcmatern( )`, which requires a mesh to be passed to it, so we 
 pass it the 1D mesh that we created above, ``mesh1D`.
+
+For models that only adds the model components, we don't need to specify a separate
+predictor formula. Instead, we can provide the name of the output to the left of the `~` in the component specification.
 
 ```{r }
 the_spde <- inla.spde2.pcmatern(mesh1D,
@@ -169,7 +173,7 @@ the_spde <- inla.spde2.pcmatern(mesh1D,
   prior.sigma = c(10, 0.01)
 )
 
-comp <- count ~ field(map = x, model = the_spde) + Intercept
+comp <- count ~ field(x, model = the_spde) + Intercept(1)
 
 fit2.bru <- bru(comp, cd, family = "poisson", options = list(E = cd$exposure))
 

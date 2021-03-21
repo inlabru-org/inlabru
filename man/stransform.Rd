@@ -18,7 +18,7 @@ List of Spatial* objects
 This is a wrapper for the \link[sp:spTransform]{spTransform} function provided by the \code{sp} package.
 Given a spatial object (or a list thereof) it will transform the coordinate system according
 to the parameter \code{crs}. In addition to the usual spatial objects this function is
-also capables of transforming \link[INLA:inla.mesh.create]{inla.mesh} objects that are equipped with a coordinate
+also capables of transforming \code{INLA::inla.mesh} objects that are equipped with a coordinate
 system.#'
 }
 \examples{

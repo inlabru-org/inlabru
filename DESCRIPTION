@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.3.0
+Version: 2.3.1
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -44,11 +44,11 @@ Depends:
     ggplot2,
     methods,
     R (>= 3.5),
-    sp (>= 1.4-2),
+    sp (>= 1.4-5),
     stats
 Imports:
     Matrix,
-    rgdal,
+    rgdal (>= 1.5.8),
     rgeos,
     utils,
     withr
