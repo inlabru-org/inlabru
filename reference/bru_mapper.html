@@ -309,8 +309,9 @@ Implementations must return a logical vector of length <code><a href='https://rd
 to an object. If provided, mapper method functions are added to an environment
 <code>.envir</code> in the object.  The generic methods <code>ibm_n</code>, <code>ibm_values</code>,
 <code>ibm_amatrix</code>, and <code>ibm_valid_input</code> look for these functions first,
-and otherwise call <code><a href='https://rdrr.io/r/base/UseMethod.html'>UseMethod()</a></code>.
-reached.</p></li>
+and otherwise call <code><a href='https://rdrr.io/r/base/UseMethod.html'>UseMethod()</a></code>.  This is an alternative to using <code><a href='https://rdrr.io/r/base/S3method.html'>.S3method()</a></code>
+to register the methods, e.g.
+<code><a href='https://rdrr.io/r/base/S3method.html'>.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)</a></code>.</p></li>
 </ul>
 
 <ul>
