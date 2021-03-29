@@ -75,10 +75,14 @@ test_that("SLDF in metres to integration points using grouping parameter", {
 
   data(mrsea, package = "inlabru")
   mrsea <- local_mrsea_convert(mrsea, use_km = FALSE)
-  expect_warning(
-    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
-    "export to PROJ failed: generic error of unknown origin"
+  suppressWarnings(
+    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
   )
+  # # For rgdal 1.5-23, we had this version
+  #  expect_warning(
+  #    ...,
+  #    "export to PROJ failed: generic error of unknown origin"
+  #  )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(
@@ -96,9 +100,8 @@ test_that("SLDF in kilometres to integration points using grouping parameter", {
 
   data(mrsea, package = "inlabru")
   mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
-  expect_warning(
-    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
-    "export to PROJ failed: generic error of unknown origin"
+  suppressWarnings(
+    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
   )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")

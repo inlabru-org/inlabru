@@ -179,12 +179,11 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   local_bru_safe_inla()
   skip_if_not(fm_has_PROJ6())
   
-  expect_warning(
-    {
-      data_ <- latent_spde2D_group_testdata()
-    },
-    "export to PROJ failed: generic error of unknown origin"
+  suppressWarnings(
+   data_ <- latent_spde2D_group_testdata()
   )
+  # For rgdal 1.5-23:
+  # "export to PROJ failed: generic error of unknown origin"
 
   # Check Intercept
   expect_equal(
