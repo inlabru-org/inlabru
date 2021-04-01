@@ -290,7 +290,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         )
         ips[[j]] <- data.frame(
           loc = domain$loc,
-          weight = colSums(A_w)
+          weight = Matrix::colSums(A_w)
         )
       } else {
         inside <-

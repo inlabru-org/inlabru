@@ -115,7 +115,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         points <- runif(n = Npoints, min = xmin, max = xmax)
         proj <- INLA::inla.mesh.project(mesh, points)
         if (length(loglambda) == 1) {
-          lambda_ratio <- exp(as.vector(rowSums(proj$A) * loglambda) - wmax)
+          lambda_ratio <- exp(as.vector(Matrix::rowSums(proj$A) * loglambda) - wmax)
         } else {
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - wmax)
         }
