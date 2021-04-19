@@ -118,7 +118,7 @@
       <h1 data-toc-skip>Random Fields in 2D</h1>
                         <h4 class="author">Finn Lindgren</h4>
             
-            <h4 class="date">2021-04-01</h4>
+            <h4 class="date">2021-04-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/random_fields_2d.Rmd"><code>vignettes/web/random_fields_2d.Rmd</code></a></small>
       <div class="hidden name"><code>random_fields_2d.Rmd</code></div>
@@ -213,13 +213,16 @@
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">200</span>
 <span class="va">mydata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>, lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span>
-<span class="va">mydata</span><span class="op">$</span><span class="va">observed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.project.html">inla.mesh.project</a></span><span class="op">(</span><span class="va">mesh_fine</span>,
-  loc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/as.matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">mydata</span><span class="op">)</span>,
-  field <span class="op">=</span> <span class="va">true_field</span>
-<span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span>, sd <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span>
+<span class="va">mydata</span><span class="op">$</span><span class="va">observed</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.project.html">inla.mesh.project</a></span><span class="op">(</span>
+    <span class="va">mesh_fine</span>,
+    loc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/as.matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">mydata</span><span class="op">)</span>,
+    field <span class="op">=</span> <span class="va">true_field</span>
+  <span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span>, sd <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/xyFromCell.html">coordinates</a></span><span class="op">(</span><span class="va">mydata</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"lon"</span>, <span class="st">"lat"</span><span class="op">)</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">mydata</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">mydata</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>col <span class="op">=</span> <span class="va">observed</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_2d_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
 </div>
 <div id="estimating-the-field" class="section level2">
@@ -245,8 +248,7 @@
 <p>Fit the model and inspect the results:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">mydata</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
-<span class="fu">INLA</span><span class="fu">:::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/summary.html">summary.inla</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></code></pre></div>
 <p>Predict the field on a lattice, and generate a single realisation from the posterior distribution:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pix</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, nx <span class="op">=</span> <span class="fl">200</span>, ny <span class="op">=</span> <span class="fl">200</span><span class="op">)</span>
@@ -258,7 +260,7 @@
   <span class="op">~</span> <span class="va">field</span> <span class="op">+</span> <span class="va">Intercept</span>,
   n.samples <span class="op">=</span> <span class="fl">1</span>
 <span class="op">)</span>
-<span class="va">pred</span><span class="op">$</span><span class="va">sample</span> <span class="op">&lt;-</span> <span class="va">samp</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></code></pre></div>
+<span class="va">pred</span><span class="op">$</span><span class="va">sample</span> <span class="op">&lt;-</span> <span class="va">samp</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></code></pre></div>
 <p>Compare the truth to the estimated field (posterior mean and a sample from the posterior distribution):</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pl_posterior_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
