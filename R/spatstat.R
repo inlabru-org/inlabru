@@ -39,7 +39,6 @@ check_spatstat <- function(pkg = "spatstat.geom") {
 #' @return A spatstat `spatstat` `ppp` object
 #'
 #' @examples
-#'
 #' \donttest{
 #' if (require("spatstat.geom")) {
 #'   # Load Gorilla data

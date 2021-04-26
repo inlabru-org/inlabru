@@ -9,70 +9,73 @@
 \arguments{
 \item{data}{A SpatialPixelsDataFrame object.}
 
-\item{mapping}{Aesthetic mappings created by \link{aes} or \link{aes_} used to update the default
-mapping. The default mapping is \code{aes_string(x = coordnames(data)[1], y = coordnames(data)[2], fill = names(data)[[1]])}.}
+\item{mapping}{Aesthetic mappings created by \code{aes} used to update the default
+mapping. The default mapping is \code{ggplot2::aes(x = .data[[coordnames(data)[1]]], y = .data[[coordnames(data)[2]]], fill = .data[[names(data)[[1]]]])}.}
 
 \item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
 
 \item{mask}{A SpatialPolygon defining the region that is plotted.}
 
-\item{...}{Arguments passed on to \link{geom_tile}.}
+\item{...}{Arguments passed on to \code{geom_tile}.}
 }
 \value{
-A \link{geom_tile} return value.
+A \code{geom_tile} return value.
 }
 \description{
-Coerces input SpatialPixelsDataFrame to data.frame and uses \link{geom_tile} to plot it.
+Coerces input SpatialPixelsDataFrame to data.frame and uses \code{geom_tile} to plot it.
+Requires the \code{ggplot2} package.
 }
 \examples{
 \donttest{
-# Load Gorilla data
+  if (require(ggplot2, quietly = TRUE)) {
+    # Load Gorilla data
 
-data("gorillas", package = "inlabru")
+    data("gorillas", package = "inlabru")
 
-# Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.
-# The same syntax applies to SpatialGridDataFrame objects.
+    # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.
+    # The same syntax applies to SpatialGridDataFrame objects.
 
-ggplot() +
-  gg(gorillas$gcov$elevation)
+    ggplot() +
+      gg(gorillas$gcov$elevation)
 
-# Add Gorilla survey boundary and nest sightings
+    # Add Gorilla survey boundary and nest sightings
 
-ggplot() +
-  gg(gorillas$gcov$elevation) +
-  gg(gorillas$boundary) +
-  gg(gorillas$nests)
+    ggplot() +
+      gg(gorillas$gcov$elevation) +
+      gg(gorillas$boundary) +
+      gg(gorillas$nests)
 
-# Load pantropical dolphin data
+    # Load pantropical dolphin data
 
-data("mexdolphin")
+    data("mexdolphin")
 
-# Plot the pantropiical survey boundary, ship transects and dolphin sightings
+    # Plot the pantropiical survey boundary, ship transects and dolphin sightings
 
-ggplot() +
-  gg(mexdolphin$ppoly) + # survey boundary as SpatialPolygon
-  gg(mexdolphin$samplers) + # ship transects as SpatialLines
-  gg(mexdolphin$points) # dolphin sightings as SpatialPoints
+    ggplot() +
+      gg(mexdolphin$ppoly) + # survey boundary as SpatialPolygon
+      gg(mexdolphin$samplers) + # ship transects as SpatialLines
+      gg(mexdolphin$points) # dolphin sightings as SpatialPoints
 
-# Change color
+    # Change color
 
-ggplot() +
-  gg(mexdolphin$ppoly, color = "green") + # survey boundary as SpatialPolygon
-  gg(mexdolphin$samplers, color = "red") + # ship transects as SpatialLines
-  gg(mexdolphin$points, color = "blue") # dolphin sightings as SpatialPoints
+    ggplot() +
+      gg(mexdolphin$ppoly, color = "green") + # survey boundary as SpatialPolygon
+      gg(mexdolphin$samplers, color = "red") + # ship transects as SpatialLines
+      gg(mexdolphin$points, color = "blue") # dolphin sightings as SpatialPoints
 
 
-# Visualize data annotations: line width by segment number
+    # Visualize data annotations: line width by segment number
 
-names(mexdolphin$samplers) # 'seg' holds the segment number
-ggplot() +
-  gg(mexdolphin$samplers, aes(color = seg))
+    names(mexdolphin$samplers) # 'seg' holds the segment number
+    ggplot() +
+      gg(mexdolphin$samplers, aes(color = seg))
 
-# Visualize data annotations: point size by dolphin group size
+    # Visualize data annotations: point size by dolphin group size
 
-names(mexdolphin$points) # 'size' holds the group size
-ggplot() +
-  gg(mexdolphin$points, aes(size = size))
+    names(mexdolphin$points) # 'size' holds the group size
+    ggplot() +
+      gg(mexdolphin$points, aes(size = size))
+  }
 }
 }
 \seealso{

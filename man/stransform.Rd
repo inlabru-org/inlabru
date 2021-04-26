@@ -31,6 +31,7 @@ tmesh <- stransform(gorillas$mesh, crs = CRS("+proj=longlat"))
 
 # Compare original and transformed mesh
 
+if (require(ggplot2, quietly = TRUE)) {
 multiplot(
   ggplot() +
     gg(gorillas$mesh) +
@@ -39,6 +40,7 @@ multiplot(
     gg(tmesh) +
     ggtitle("Transformed mesh")
 )
+}
 }
 
 }

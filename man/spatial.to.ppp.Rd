@@ -20,7 +20,6 @@ function uses a SpatialPoints object and a SpatialPolygon object to generate the
 and the window. Lastly, the ppp() function is called to create the \code{ppp} object.
 }
 \examples{
-
 \donttest{
 if (require("spatstat.geom")) {
   # Load Gorilla data

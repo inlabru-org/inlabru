@@ -23,18 +23,20 @@ This function requires the \code{ggmap} package.
 }
 \examples{
 \dontrun{
-# Load the Gorilla data
-data(gorillas, package = "inlabru")
+if (require("ggplot2", quietly = TRUE)) {
+  # Load the Gorilla data
+  data(gorillas, package = "inlabru")
 
-# Create a base map centered around the nests and plot the boundary as well
-# as the nests
-ggplot() +
-  gg(gorillas$boundary) +
-  gg(gorillas$nests, color = "white", size = 0.5)
-if (requireNamespace("ggmap", quietly = TRUE)) {
-  gmap(gorillas$nests, maptype = "satellite") +
-  gm(gorillas$boundary) +
-  gm(gorillas$nests, color = "white", size = 0.5)
+  # Create a base map centered around the nests and plot the boundary as well
+  # as the nests
+  ggplot() +
+    gg(gorillas$boundary) +
+    gg(gorillas$nests, color = "white", size = 0.5)
+  if (requireNamespace("ggmap", quietly = TRUE)) {
+    gmap(gorillas$nests, maptype = "satellite") +
+      gm(gorillas$boundary) +
+      gm(gorillas$nests, color = "white", size = 0.5)
+  }
 }
 }
 }

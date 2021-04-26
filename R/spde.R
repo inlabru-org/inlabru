@@ -226,8 +226,8 @@ spde.posterior <- function(result, name, what = "range") {
       variance = spderesult$marginals.variance.nominal[[1]],
       log.variance = spderesult$marginals.log.variance.nominal[[1]]
     )
-    if (is.null(marg)) stop("Invalid varname: ", what, ". must be one of 'range', 
-                           'log.range',  'variance',  'log.variance', 
+    if (is.null(marg)) stop("Invalid varname: ", what, ". must be one of 'range',
+                           'log.range',  'variance',  'log.variance',
                            'matern.correlation', matern.covariance")
 
     med <- INLA::inla.qmarginal(0.5, marg)

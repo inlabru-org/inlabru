@@ -36,6 +36,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, include = FALSE}
 library(inlabru)
+library(ggplot2)
 ```
 
 See the `method` vignette for details of the general `inlabru` method.

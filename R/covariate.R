@@ -54,7 +54,7 @@ covdata.import <- function(dframe, colname, data) {
 
   value <- scale * result$summary.random$spde[, "mode", drop = FALSE]
 
-  depth <- make.covdata(mesh = data$mesh, values = value, mesh.coords = data$mesh.coords, time.coords = NULL)
+  make.covdata(mesh = data$mesh, values = value, mesh.coords = data$mesh.coords, time.coords = NULL)
 }
 
 
@@ -229,7 +229,7 @@ get.smean <- function(covariate, loc = NULL, weights = NULL) {
   weights <- weights * Matrix::diag(INLA::inla.mesh.fem(covariate$mesh, order = 1)$c0)
   weights <- weights / sum(weights)
 
-  loc2 <- data.frame(covariate$mesh$loc[, 1:length(covariate$mesh.coords),
+  loc2 <- data.frame(covariate$mesh$loc[, seq_len(length(covariate$mesh.coords)),
     drop = FALSE
   ])
   colnames(loc2) <- covariate$mesh.coords

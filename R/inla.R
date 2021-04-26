@@ -223,7 +223,7 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
   }
 
   ssmpl <- list()
-  for (i in 1:length(samples)) {
+  for (i in seq_along(samples)) {
     smpl.latent <- samples[[i]]$latent
     smpl.hyperpar <- samples[[i]]$hyperpar
     vals <- list()
@@ -257,7 +257,7 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
     # their results available as latent random effects, and avoid special code,
     # since the hyperpar name definition has changed
     if (length(result$summary.random) > 0) {
-      for (k in 1:length(result$summary.random)) {
+      for (k in seq_along(result$summary.random)) {
         name <- unlist(names(result$summary.random[k]))
         model <- result$model.random[k]
         #        if (!(model == "Constrained linear")) {
@@ -322,7 +322,7 @@ inla.stack.mexpand <- function(...,
   ))
   y.offset <- c(0, cumsum(y.cols))
   y.cols.total <- sum(y.cols)
-  for (j in 1:length(stacks)) {
+  for (j in seq_along(stacks)) {
     LHS <- INLA::inla.stack.LHS(stacks[[j]])
     RHS <- INLA::inla.stack.RHS(stacks[[j]])
     A <- INLA::inla.stack.A(stacks[[j]])
@@ -408,6 +408,7 @@ plotmarginal.inla <- function(result,
                               ggp = TRUE,
                               lwd = 3,
                               ...) {
+  requireNamespace("ggplot2")
   vars <- variables.inla(result)
   ovarname <- varname
   if (paste0("Beta for ", varname) %in% rownames(vars)) {
@@ -442,14 +443,17 @@ plotmarginal.inla <- function(result,
     inner.marg <- data.frame(x = inner.x, y = INLA::inla.dmarginal(inner.x, marg))
 
     df <- data.frame(marg)
-    ggplot(data = df, aes_string(x = "x", y = "y")) +
-      geom_path() +
-      geom_ribbon(ymin = 0, aes_string(ymax = "y"), alpha = 0.1) +
-      geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
-      geom_segment(x = uq, y = 0, xend = uq, yend = uqy) +
-      geom_ribbon(data = inner.marg, ymin = 0, aes_string(ymax = "y"), alpha = 0.1) +
-      xlab(ovarname) +
-      ylab("pdf")
+    ggplot2::ggplot(data = df, ggplot2::aes(x = .data[["x"]], y = .data[["y"]])) +
+      ggplot2::geom_path() +
+      ggplot2::geom_ribbon(ymin = 0, ggplot2::aes(ymax = .data[["y"]]), alpha = 0.1) +
+      ggplot2::geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
+      ggplot2::geom_segment(x = uq, y = 0, xend = uq, yend = uqy) +
+      ggplot2::geom_ribbon(
+        data = inner.marg, ymin = 0,
+        ggplot2::aes(ymax = .data[["y"]]), alpha = 0.1
+      ) +
+      ggplot2::xlab(ovarname) +
+      ggplot2::ylab("pdf")
   } else {
     df <- result$summary.random[[varname]]
     colnames(df) <- c("ID", "mean", "sd", "lower", "mid", "upper", "mode", "kld")
@@ -460,14 +464,18 @@ plotmarginal.inla <- function(result,
     df$mid <- link(df$mid)
     df$upper <- link(df$upper)
     df$mode <- link(df$mode)
-    p <- ggplot(df, aes_string("ID", "mode"))
+    p <- ggplot2::ggplot(df, ggplot2::aes(.data[["ID"]], .data[["mode"]]))
     p +
-      geom_ribbon(aes_string(ymin = "lower", ymax = "upper"), alpha = 0.1) +
-      geom_line() +
-      geom_point() +
-      geom_line(aes_string("ID", "mean"), col = 2) +
-      geom_line(aes_string("ID", "mid"), col = 2, lty = 2) +
-      ylab("mode and quantiles") + xlab(paste0(varname, " ID"))
+      ggplot2::geom_ribbon(ggplot2::aes(
+        ymin = .data[["lower"]],
+        ymax = .data[["upper"]]
+      ), alpha = 0.1) +
+      ggplot2::geom_line() +
+      ggplot2::geom_point() +
+      ggplot2::geom_line(ggplot2::aes(y = .data[["mean"]]), col = 2) +
+      ggplot2::geom_line(ggplot2::aes(y = .data[["mid"]]), col = 2, lty = 2) +
+      ggplot2::ylab("mode and quantiles") +
+      ggplot2::xlab(paste0(varname, " ID"))
   }
 }
 

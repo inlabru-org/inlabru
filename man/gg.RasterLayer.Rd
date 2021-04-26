@@ -4,29 +4,34 @@
 \alias{gg.RasterLayer}
 \title{Geom for RasterLayer objects}
 \usage{
-\method{gg}{RasterLayer}(data, mapping = aes_string(x = "x", y = "y", fill = "layer"), ...)
+\method{gg}{RasterLayer}(
+  data,
+  mapping = ggplot2::aes(x = .data[["x"]], y = .data[["y"]], fill = .data[["layer"]]),
+  ...
+)
 }
 \arguments{
 \item{data}{A RasterLayer object.}
 
-\item{mapping}{aesthetic mappings created by \link{aes} or \link{aes_}. These are passed on to \link{geom_tile}.}
+\item{mapping}{aesthetic mappings created by \code{aes}. These are passed on to \code{geom_tile}.}
 
-\item{...}{Arguments passed on to \link{geom_tile}.}
+\item{...}{Arguments passed on to \code{geom_tile}.}
 }
 \value{
-An object returned by \link{geom_tile}
+An object returned by \code{geom_tile}
 }
 \description{
-This function takes a RasterLayer object, converts it into a SpatialPixelsDataFrame and
-uses \link{geom_tile} to plot the data.
+This function takes a RasterLayer object, converts it into a
+\code{SpatialPixelsDataFrame} and uses \code{geom_tile} to plot the data.
 }
 \details{
-This function requires the \code{raster} package.
+This function requires the \code{raster} and \code{ggplot2} packages.
 }
 \examples{
 # Some features require the raster and spatstat.data packages.
 if (require("spatstat.data", quietly = TRUE) &&
-  require("raster", quietly = TRUE)) {
+  require("raster", quietly = TRUE) &&
+  require("ggplot2", quietly = TRUE)) {
 
   # Load Gorilla data
   data("gorillas", package = "spatstat.data")

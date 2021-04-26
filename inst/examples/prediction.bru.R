@@ -1,5 +1,6 @@
 \donttest{
-if (bru_safe_inla(multicore = FALSE)) {
+if (bru_safe_inla(multicore = FALSE) &&
+    require(ggplot2, quietly = TRUE)) {
 
   # Generate some data
   input.df <- data.frame(x = cos(1:10))
@@ -24,7 +25,7 @@ if (bru_safe_inla(multicore = FALSE)) {
   xpost
 
   # For a single variable like 'x' the default plotting method invoked by gg() will
-  # show these statisics in a fashion similar to a box plot:
+  # show these statistics in a fashion similar to a box plot:
 
   ggplot() +
     gg(xpost)

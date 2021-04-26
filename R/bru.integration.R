@@ -69,9 +69,9 @@
 #' @return A `data.frame` or `SpatialPointsDataFrame` of 1D and 2D integration points, respectively.
 #'
 #' @examples
-#'
 #' \donttest{
-#' if (require("INLA", quietly = TRUE)) {
+#' if (require("INLA", quietly = TRUE) &&
+#'     require("ggplot2", quietly = TRUE)) {
 #'
 #'   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 #'
@@ -277,7 +277,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         domain$loc[rep(seq_len(domain$n - 1), each = nsub)]) /
         nsub
 
-    for (j in 1:nrow(samplers)) {
+    for (j in seq_len(nrow(samplers))) {
       subsamplers <- samplers[j, ]
 
       if (identical(int.args[["method"]], "stable")) {
@@ -398,7 +398,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     # This old code doesn't handle holes properly.
     polyloc <- do.call(rbind, lapply(
-      1:length(samplers),
+      seq_len(length(samplers)),
       function(k) {
         cbind(
           x = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[, 1]),
@@ -489,7 +489,6 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
 #'
 #' @examples
-#'
 #' \donttest{
 #' # ipoints needs INLA
 #' if (bru_safe_inla()) {
@@ -570,7 +569,7 @@ cprod <- function(...) {
 #   3) Merge
 #
 #   Local dependencies:
-#   int.polygon()
+#     `int.polygon()`
 #
 # @aliases ipoints
 # @export
@@ -648,7 +647,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     tri <- res$p2m.t
 
     data <- list()
-    for (k in 1:length(columns)) {
+    for (k in seq_along(columns)) {
       cn <- columns[k]
       nw <- points@data[, columns] * res$p2m.b
       w.by <- by(as.vector(nw), as.vector(mesh$graph$tv[tri, ]), sum, simplify = TRUE)
@@ -762,7 +761,7 @@ vertex.projection.1d <- function(points, mesh, group = NULL, column = "weight", 
 
   # Fill
   if (!is.null(fill)) {
-    miss <- setdiff(1:length(mesh$loc), ips$vertex)
+    miss <- setdiff(seq_len(length(mesh$loc)), ips$vertex)
     mips <- data.frame(vertex = miss, x = mesh$loc[miss])
     mips[, column] <- fill
     ips <- rbind(ips, merge(mips, ips[, group, drop = FALSE]))
@@ -790,7 +789,6 @@ vertex.projection.1d <- function(points, mesh, group = NULL, column = "weight", 
 #' @return A `data.frame` of integrals, one for each level of the cross product of all dimensions not being integrated over.
 #'
 #' @examples
-#'
 #' \donttest{
 #' # ipoints needs INLA
 #' if (require("INLA", quietly = TRUE)) {

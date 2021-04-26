@@ -46,9 +46,9 @@ add_mappers <- function(...) {
 #' @export
 #' @seealso [bru_mapper_methods] for specific method implementations.
 #' @rdname bru_mapper
-#' @examples 
+#' @examples
 #' mapper <- bru_mapper_index(5)
-#' ibm_amatrix(mapper, c(1,3,4,5,2))
+#' ibm_amatrix(mapper, c(1, 3, 4, 5, 2))
 bru_mapper <- function(...) {
   UseMethod("bru_mapper")
 }
@@ -390,7 +390,7 @@ component.character <- function(object,
   if (is.null(envir_extra)) {
     envir_extra <- new.env(envir)
   }
-  
+
   # Convert ngroup and nrep to bru_mapper info
   if (!is.null(ngroup)) {
     if (!is.null(group_mapper)) {
@@ -406,7 +406,7 @@ component.character <- function(object,
     replicate_mapper <- bru_mapper_index(nrep)
     nrep <- NULL
   }
-  
+
   # Default component (to be filled)
   component <- list(
     label = label,
@@ -1697,8 +1697,8 @@ ibm_amatrix.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
       indexing,
       function(x) {
         ibm_amatrix(mapper[["mappers"]][[x]],
-                    input = input[[x]],
-                    multi = multi - 1
+          input = input[[x]],
+          multi = multi - 1
         )
       }
     )
@@ -1741,8 +1741,8 @@ ibm_valid_input.bru_mapper_multi <- function(mapper, input, multi = 0L, ...) {
       indexing,
       function(x) {
         ibm_valid_input(mapper[["mappers"]][[x]],
-                        input = input[[x]],
-                        multi = multi - 1
+          input = input[[x]],
+          multi = multi - 1
         )
       }
     )
@@ -2072,7 +2072,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   assign(".data.", data, envir = envir)
 
   emap <- tryCatch(eval(input$input, envir = envir, enclos = enclos),
-    error = function(e) {}
+    error = function(e) {
+    }
   )
 
   # 0) Eval failed. map everything to 1. This happens for automatically
@@ -2095,7 +2096,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   } else if (is.function(emap)) {
     # Allow but detect failures:
     val <- tryCatch(emap(data),
-      error = function(e) {}
+      error = function(e) {
+      }
     )
     if (is.null(val)) {
       # TODO: figure out if we need to do something else in this case.
@@ -2104,13 +2106,14 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       # needs to be evaluable for at least one of the likelihoods.
     } else if (identical(as.character(input$input), "coordinates")) {
       tryCatch(
-        {
+        expr = {
           # Return SpatialPoints instead of a matrix
           val <- as.data.frame(val)
           coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
           data_crs <- tryCatch(fm_sp_get_crs(data),
-            error = function(e) {}
+            error = function(e) {
+            }
           )
           if (!fm_crs_is_null(data_crs)) {
             proj4string(val) <- data_crs
@@ -2183,7 +2186,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
     # effects. For spatial covariates, can be handled by infill, but a general
     # solution doesn't exist, so not sure how to deal with this.
     stop(sprintf(
-      "Input '%s' of component '%s' has returned NA values. Please design your 
+      "Input '%s' of component '%s' has returned NA values. Please design your
                  argument as to return non-NA for all points in your model domain/mesh.",
       as.character(input$input)[[1]], label
     ))

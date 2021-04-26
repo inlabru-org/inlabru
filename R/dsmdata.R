@@ -46,7 +46,12 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   # Generate location for detections if location missing
   # Use do.plot=T to see the location generated for each detection
   if (!("x" %in% colnames(distdata))) {
-    det.new.coords <- generate.obs.location.f(seg = segdata, dists = distdata, geometry = "euc", do.plot = F)
+    det.new.coords <- generate.obs.location.f(
+      seg = segdata,
+      dists = distdata,
+      geometry = "euc",
+      do.plot = FALSE
+    )
     # det.new.coords[1:3, ]
     distdata <- cbind(distdata, det.new.coords)
   }
@@ -73,8 +78,8 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20,
     resolution =
       ceiling(c(
-        min(4, max(1, diff(range(loc[, 1]))/diff(range(loc[, 2])))),
-        min(4, max(1, diff(range(loc[, 2]))/diff(range(loc[, 1]))))
+        min(4, max(1, diff(range(loc[, 1])) / diff(range(loc[, 2])))),
+        min(4, max(1, diff(range(loc[, 2])) / diff(range(loc[, 1]))))
       ) * 120)
   )
   outer <- INLA::inla.nonconvex.hull(
@@ -82,8 +87,8 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 2,
     resolution =
       ceiling(c(
-        min(4, max(1, diff(range(loc[, 1]))/diff(range(loc[, 2])))),
-        min(4, max(1, diff(range(loc[, 2]))/diff(range(loc[, 1]))))
+        min(4, max(1, diff(range(loc[, 1])) / diff(range(loc[, 2])))),
+        min(4, max(1, diff(range(loc[, 2])) / diff(range(loc[, 1]))))
       ) * 120)
   )
   mesh <- INLA::inla.mesh.2d(

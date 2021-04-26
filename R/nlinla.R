@@ -257,8 +257,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
 #' @param eps The finite difference step size
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_like_list <- function(
-                                                    lhoods,
+bru_compute_linearisation.bru_like_list <- function(lhoods,
                                                     model,
                                                     state,
                                                     A,

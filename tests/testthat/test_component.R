@@ -82,7 +82,7 @@ test_that("Component construction: offset", {
 test_that("Component construction: default mesh/mapping construction", {
   skip_on_cran()
   local_bru_safe_inla()
-  
+
   lik <- like("gaussian",
     formula = y ~ .,
     data = data.frame(x = c(1, 1.5, 2, 3, 4), y = 11:15),
@@ -130,7 +130,7 @@ test_that("Component construction: unsafe intercepts", {
   cmp <- component_list(~ something_unknown - 1)
   lik <- like(formula = response ~ ., data = data.frame(response = 1:5))
   expect_warning(
-    {
+    object = {
       model <- bru_model(cmp, list(lik))
     },
     "All covariate evaluations for 'something_unknown' are NULL"

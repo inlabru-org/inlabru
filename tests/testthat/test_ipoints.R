@@ -182,7 +182,7 @@ test_that("Integration line splitting", {
   )
 
   expect_error(
-    {
+    object = {
       sl <- split_lines(
         mesh,
         sp = rbind(c(-1, 0), c(-1, 1)),
@@ -194,7 +194,7 @@ test_that("Integration line splitting", {
 
   # Check issue #63 (problem for single line input), fixed
   expect_error(
-    {
+    object = {
       sl <- split_lines(
         mesh,
         sp = cbind(-1, 0),
@@ -206,7 +206,7 @@ test_that("Integration line splitting", {
 
   # Check if empty input is ok
   expect_error(
-    {
+    object = {
       sl <- split_lines(
         mesh,
         sp = matrix(0, 0, 2),

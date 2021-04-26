@@ -52,6 +52,7 @@ This is the \code{gorillas} dataset from the package \code{spatstat.data}, refor
 as point process data for use with \code{inlabru}.
 }
 \examples{
+if (require(ggplot2, quietly = TRUE)) {
 data(gorillas, package = "inlabru") # get the data
 # extract all the objects, for convenience:
 
@@ -68,6 +69,7 @@ plot(gorillas$gcov$elevation)
 ggplot() +
   gg(gorillas$plotsample$plots) +
   gg(gorillas$plotsample$nests)
+}
 }
 \references{
 Funwi-Gabga, N. (2008) A pastoralist survey and fire impact assessment in the Kagwene Gorilla

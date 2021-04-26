@@ -45,9 +45,11 @@ pts <- data.frame(
 # Convert to SpatialPolygonsDataFrame
 pol <- spoly(pts)
 
+if (require(ggplot2, quietly = TRUE)) {
 # Plot it!
 ggplot() +
   gg(pol)
+}
 }
 
 }

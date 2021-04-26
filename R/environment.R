@@ -347,7 +347,6 @@ bru_options_deprecated <- function(args) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 #' @examples
-#'
 #' \donttest{
 #'
 #' opts <- bru_call_options()

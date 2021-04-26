@@ -107,8 +107,9 @@ if (bru_safe_inla(multicore = FALSE)) {
   smp[[1]]
 
   # ... and plot them
-
-  plot(do.call(rbind, smp))
+  if (require(ggplot2, quietly = TRUE)) {
+    plot(do.call(rbind, smp))
+  }
 }
 }
 \donttest{
@@ -143,8 +144,9 @@ if (bru_safe_inla(multicore = FALSE)) {
   smp[[1]]
 
   # ... and plot them
-
-  plot(do.call(rbind, smp))
+  if (require(ggplot2, quietly = TRUE)) {
+    plot(do.call(rbind, smp))
+  }
 }
 }
 }

@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 [![CRAN Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
 [![R build status](https://github.com/inlabru-org/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![R code coverage status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
+[![lintr status](https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![Codecov test coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/inlabru-org/inlabru?branch=devel)
 <!-- badges: end -->
 
@@ -98,4 +99,7 @@ ggplot() +
   coord_equal() +
   ggtitle("Nest intensity per km squared")
 ```
-If you have an R installation with PROJ6/GDAL3, and INLA >= 20.06.18, and loading old spatial objects, you may need to apply the `rgdal::rebuild_CRS()` method on them before they are fully usable. The data objects in `inlabru` have been updated, so should not need this conversion anymore.
+If you have an R installation with PROJ6/GDAL3, and INLA >= 20.06.18, and
+loading old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
+method on them before they are fully usable. The data objects in `inlabru` have
+been updated, so should not need this conversion anymore.

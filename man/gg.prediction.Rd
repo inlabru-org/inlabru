@@ -9,7 +9,7 @@
 \arguments{
 \item{data}{A prediction object, usually the result of a \code{\link[=predict.bru]{predict.bru()}} call.}
 
-\item{mapping}{a set of aesthetic mappings created by \code{aes} or \code{aes_}. These are passed on to \link{geom_line}.}
+\item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed on to \code{geom_line}.}
 
 \item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.}
 
@@ -33,10 +33,12 @@ the confidence interval.
 
 Note: \code{gg.prediction} also understands the format of INLA-style posterior summaries, e.g.
 \code{fit$summary.fixed} for an inla object \code{fit}
+
+Requires the \code{ggplot2} package.
 }
 \examples{
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
   # Generate some data
 
   input.df <- data.frame(x = cos(1:10))

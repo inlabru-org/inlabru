@@ -58,9 +58,9 @@ If samplers is NULL it is assumed that all of the LGCP's dimensions have
 been observed completely.
 }
 \examples{
-
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla() &&
+    require(ggplot2, quietly = TRUE)) {
 
   # Load the Gorilla data
   data(gorillas, package = "inlabru")

@@ -212,7 +212,8 @@ combine.dsmdata.f <- function(blocks = NULL, dists = NULL) {
 
 
 
-get.direction.unit.f <- function(data = NULL, is.blocks = T, geometry = "euc") {
+get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
+                                 geometry = "euc") {
 
   # NOTE: old param: data=data
 
@@ -566,7 +567,8 @@ get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
 
 
 
-generate.obs.location.f <- function(seg = NULL, dists = NULL, geometry = "euc", do.plot = F) {
+generate.obs.location.f <- function(seg = NULL, dists = NULL, geometry = "euc",
+                                    do.plot = FALSE) {
   #
   # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
   # same for dists=distance.data

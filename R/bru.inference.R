@@ -207,7 +207,7 @@ bru_info.character <- function(method,
   if (is.null(inlabru_version)) {
     inlabru_version <-
       tryCatch(
-        {
+        expr = {
           getNamespaceVersion("inlabru")
         },
         error = function(e) {
@@ -218,7 +218,7 @@ bru_info.character <- function(method,
   if (is.null(INLA_version)) {
     INLA_version <-
       tryCatch(
-        {
+        expr = {
           getNamespaceVersion("INLA")
         },
         error = function(e) {
@@ -770,9 +770,9 @@ joint_stackmaker <- function(model, lhoods, state) {
 #' @param options See [bru_options_set()]
 #' @return An [bru()] object
 #' @examples
-#'
 #' \donttest{
-#' if (bru_safe_inla()) {
+#' if (bru_safe_inla() &&
+#'     require(ggplot2, quietly = TRUE)) {
 #'
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
@@ -1110,8 +1110,8 @@ generate.bru <- function(object,
   if (class(data)[1] == "list") {
     # Todo: check if this feature works at all.
     # TODO: add method ipoints.list to handle this;
-    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code from
-    # generate()
+    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code
+    # from generate()
     warning(paste0(
       "Attempting to convert data list into gridded data.\n",
       "This probably doesn't work.\n",
@@ -1168,19 +1168,20 @@ generate.bru <- function(object,
 
 montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
                                  mcerr = 0.01, n = 100, discrete = FALSE, verbose = FALSE) {
+  .Deprecated()
   xmaker <- function(hpd) {
     mid <- (hpd[2] + hpd[1]) / 2
     rg <- (hpd[2] - hpd[1]) / 2
-    x <- seq(mid - 1.2 * rg, mid + 1.2 * rg, length.out = 256)
+    seq(mid - 1.2 * rg, mid + 1.2 * rg, length.out = 256)
   }
   xmaker2 <- function(hpd) {
-    x <- seq(hpd[1], hpd[2], length.out = 256)
+    seq(hpd[1], hpd[2], length.out = 256)
   }
 
-  inital.xmaker <- function(smp) {
+  initial.xmaker <- function(smp) {
     mid <- median(smp)
     rg <- (quantile(smp, 0.975) - quantile(smp, 0.25)) / 2
-    x <- seq(mid - 3 * rg, mid + 3 * rg, length.out = 256)
+    seq(mid - 3 * rg, mid + 3 * rg, length.out = 256)
   }
 
   # Inital samples
@@ -1190,7 +1191,7 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 
   # Inital HPD
   if (is.null(x)) {
-    x <- inital.xmaker(as.vector(unlist(samples)))
+    x <- initial.xmaker(as.vector(unlist(samples)))
   }
 
   # Round x if needed
@@ -1262,7 +1263,7 @@ bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
   }
   if (cbind.only) {
     smy <- data.frame(data)
-    colnames(smy) <- paste0("sample.", 1:ncol(smy))
+    colnames(smy) <- paste0("sample.", seq_len(ncol(smy)))
   } else {
     smy <- data.frame(
       apply(data, MARGIN = 1, mean, na.rm = TRUE),
@@ -2073,14 +2074,14 @@ list.data <- function(formula) {
   elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
 
   #  # Remove functions. This can cause problems as well.
-  #  elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
+  #  # elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
 
   #  # Remove formulae. This can cause problems as well.
-  #  elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
+  #  # elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
 
   # The formula expression is too general for this to be reliable:
   #  # Keep only purse formula variables
-  #  elist <- elist[names(elist) %in% all.vars(formula)]
+  #  # elist <- elist[names(elist) %in% all.vars(formula)]
 
   elist
 }
@@ -2228,13 +2229,10 @@ summary_bru <- function(object, ...) {
   .Deprecated(new = "summary")
 
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
-  for (k in 1:length(object$bru_info$lhoods)) {
+  for (k in seq_along(object$bru_info$lhoods)) {
     lh <- object$bru_info$lhoods[[k]]
     cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(object$bru_info$lhoods)[[k]], lh$family, class(lh$data), deparse(lh$formula)))
   }
-
-  # rownames(df) = names(object$bru_info$lhoods)
-  # print(df)
 
   cat("\n--- Criteria -------------------------------------------------------------------------------------\n\n")
   cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", object$waic$waic), "\n"))
@@ -2283,7 +2281,6 @@ summary_bru <- function(object, ...) {
   }
 
   cat("\n--- All hyper parameters (internal representation) ----------------------------------------------- \n\n")
-  # cat(paste0("  ", paste(rownames(object$summary.hyperpar), collapse = ", "), "\n"))
   print(object$summary.hyperpar)
 
 

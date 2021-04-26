@@ -23,6 +23,7 @@ if the coordinate system is latitude/longitude.
 }
 \examples{
 \dontrun{
+if (require("ggplot2", quietly = TRUE)) {
 # Load the Gorilla data
 data(gorillas, package = "inlabru")
 
@@ -30,6 +31,7 @@ data(gorillas, package = "inlabru")
 gmap(gorillas$nests, maptype = "satellite") +
   gm(gorillas$boundary) +
   gm(gorillas$nests, color = "white", size = 0.5)
+}
 }
 
 }

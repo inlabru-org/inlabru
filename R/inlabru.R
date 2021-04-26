@@ -18,7 +18,7 @@
 #' The general model specification details is documented in [component()] and [like()].
 #' Posterior quantities beyond the basic summaries can be calculated with
 #' a `predict()` method, documented in [predict.bru()].
-#' 
+#'
 #' The package comes with multiple real world data sets, namely [gorillas],
 #' [mexdolphin], [seals]. Plotting these data sets is straight forward using inlabru's extensions
 #' to `ggplot2`, e.g. the [gg()] function. For educational purposes some simulated data sets are available

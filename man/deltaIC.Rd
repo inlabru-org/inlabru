@@ -20,7 +20,6 @@ deltaWAIC.
 Calculates DIC and WAIC differences and produces an ordered summary.
 }
 \examples{
-
 \donttest{
 # Generate some data
 input.df <- data.frame(x = cos(1:10))

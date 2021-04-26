@@ -24,6 +24,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, include = FALSE}
 library(inlabru)
+library(ggplot2)
 ```
 
 ## The INLA method for linear predictors

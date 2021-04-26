@@ -13,7 +13,6 @@
 #' @export
 #'
 #' @examples
-#'
 #' \donttest{
 #' # Generate some data
 #' input.df <- data.frame(x = cos(1:10))

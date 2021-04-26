@@ -20,16 +20,17 @@ meshes, Raster objects and inla/inlabru predictions. The function invokes partic
 on the \link{class} of the first argument.
 }
 \examples{
+if (require("ggplot2", quietly = TRUE)) {
+  # Load Gorilla data
 
-# Load Gorilla data
+  data(gorillas, package = "inlabru")
 
-data(gorillas, package = "inlabru")
+  # Invoke ggplot and add geomes for the Gorilla nests and the survey boundary
 
-# Invoke ggplot and add geomes for the Gorilla nests and the survey boundary
-
-ggplot() +
-  gg(gorillas$boundary) +
-  gg(gorillas$nests)
+  ggplot() +
+    gg(gorillas$boundary) +
+    gg(gorillas$nests)
+}
 }
 \seealso{
 Other geomes for inla and inlabru predictions: 

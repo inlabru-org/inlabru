@@ -15,9 +15,12 @@ Concatenation of a \code{geom_line} value and optionally a \code{geom_ribbon} va
 \description{
 This geom constructor will simply call \link{gg.prediction} for the data provided.
 }
+\details{
+Requires the \code{ggplot2} package.
+}
 \examples{
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
   # Generate some data
 
   input.df <- data.frame(x = cos(1:10))

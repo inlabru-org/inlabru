@@ -20,11 +20,12 @@ an object of class \code{gg}
 \code{\link[=bru]{bru()}} uses \code{INLA::inla()} to fit models. The latter estimates the posterior densities of
 all random effects in the model. This function serves to access and plot the posterior
 densities in a convenient way.
+
+Requires the \code{ggplot2} package.
 }
 \examples{
-
 \dontrun{
-
+if (require("ggplot2", quietly = TRUE)) {
 # Generate some data and fit a simple model
 input.df <- data.frame(x = cos(1:10))
 input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
@@ -33,6 +34,7 @@ summary(fit)
 
 # Plot the posterior of the model's x-effect
 plot(fit, "x")
+}
 }
 
 }

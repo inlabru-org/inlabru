@@ -474,8 +474,9 @@ evaluate_predictor <- function(model,
         } else {
           if (is.null(.state)) {
             .state <- eval(parse(text = .label),
-                           envir = .envir,
-                           enclos = .enclos)
+              envir = .envir,
+              enclos = .enclos
+            )
           }
           .values <- .A %*% .state
           if (.is_iid) {
@@ -489,8 +490,9 @@ evaluate_predictor <- function(model,
             )
             if (any(!ok)) {
               .cache_state_index <- eval(parse(text = ".cache_state_index"),
-                                         envir = .envir,
-                                         enclos = .enclos)
+                envir = .envir,
+                enclos = .enclos
+              )
               if (!identical(.cache_state_index, .iid_cache_index)) {
                 .iid_cache_index <<- .cache_state_index
                 .iid_cache <<- list()
@@ -499,27 +501,30 @@ evaluate_predictor <- function(model,
               not_cached <- !(key %in% names(.iid_cache))
               if (any(not_cached)) {
                 .prec <- eval(parse(text = .iid_precision),
-                              envir = .envir,
-                              enclos = .enclos)
+                  envir = .envir,
+                  enclos = .enclos
+                )
                 for (k in unique(key[not_cached])) {
                   .iid_cache[k] <<- rnorm(1, mean = 0, sd = .prec^-0.5)
                 }
               }
-              .values[!ok] <- vapply(key,
-                                     function(k) .iid_cache[[k]],
-                                     0.0)
+              .values[!ok] <- vapply(
+                key,
+                function(k) .iid_cache[[k]],
+                0.0
+              )
             }
           }
         }
-        
+
         as.matrix(.values)
       }
       eval_fun
     }
   for (nm in names(eval_names)) {
     assign(eval_names[[nm]],
-           eval_fun_factory(model$effects[[nm]], .envir = envir, .enclos = enclos),
-           envir = envir
+      eval_fun_factory(model$effects[[nm]], .envir = envir, .enclos = enclos),
+      envir = envir
     )
   }
 
