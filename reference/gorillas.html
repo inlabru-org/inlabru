@@ -217,7 +217,8 @@ in the Kagwene Sanctuary, Cameroon. Stochastic Environmental Research and Risk A
 26 (6), 793-811.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gorillas</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span> <span class='co'># get the data</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gorillas</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span> <span class='co'># get the data</span>
 <span class='co'># extract all the objects, for convenience:</span>
 
 <span class='co'># plot all the nests, mesh and boundary</span>
@@ -225,15 +226,16 @@ in the Kagwene Sanctuary, Cameroon. Stochastic Environmental Research and Risk A
   <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span> <span class='op'>+</span>
   <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span>
   <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='img'><img src='gorillas-1.png' alt='' width='700' height='433' /></div><div class='input'>
+
 <span class='co'># Plot the elevation covariate</span>
 <span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>gcov</span><span class='op'>$</span><span class='va'>elevation</span><span class='op'>)</span>
-</div><div class='img'><img src='gorillas-2.png' alt='' width='700' height='433' /></div><div class='input'>
+
 <span class='co'># Plot the plot sample</span>
 <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
   <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>plotsample</span><span class='op'>$</span><span class='va'>plots</span><span class='op'>)</span> <span class='op'>+</span>
   <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>plotsample</span><span class='op'>$</span><span class='va'>nests</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='img'><img src='gorillas-3.png' alt='' width='700' height='433' /></div></pre>
+<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='img'><img src='gorillas-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='gorillas-2.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

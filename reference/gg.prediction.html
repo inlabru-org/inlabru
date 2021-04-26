@@ -48,7 +48,8 @@ mean of each variable (y-axis) is plotted agains the row number of the varriable
 data frame (x-axis) using geom_line. In addition, a geom_ribbon is used to show
 the confidence interval.
 Note: gg.prediction also understands the format of INLA-style posterior summaries, e.g.
-fit$summary.fixed for an inla object fit" />
+fit$summary.fixed for an inla object fit
+Requires the ggplot2 package." />
 
 
 
@@ -179,6 +180,7 @@ data frame (x-axis) using <code>geom_line</code>. In addition, a <code>geom_ribb
 the confidence interval.</p>
 <p>Note: <code>gg.prediction</code> also understands the format of INLA-style posterior summaries, e.g.
 <code>fit$summary.fixed</code> for an inla object <code>fit</code></p>
+<p>Requires the <code>ggplot2</code> package.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for prediction</span>
@@ -193,7 +195,7 @@ the confidence interval.</p>
     </tr>
     <tr>
       <th>mapping</th>
-      <td><p>a set of aesthetic mappings created by <code>aes</code> or <code>aes_</code>. These are passed on to <a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a>.</p></td>
+      <td><p>a set of aesthetic mappings created by <code>aes</code>. These are passed on to <code>geom_line</code>.</p></td>
     </tr>
     <tr>
       <th>ribbon</th>
@@ -226,7 +228,7 @@ the confidence interval.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>&amp;&amp;</span> <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='co'># Generate some data</span>
 
   <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>

@@ -328,7 +328,8 @@ into a <code>bru_like_list</code> object</p></li>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>&amp;&amp;</span>
+    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
 
   <span class='co'># The like function's main purpose is to set up models with multiple likelihoods.</span>
   <span class='co'># The following example generates some random covariates which are observed through</span>
@@ -368,7 +369,7 @@ into a <code>bru_like_list</code> object</p></li>
 
   <span class='co'># The union of effects of both models gives the components needed to run bru</span>
 
-  <span class='va'>jcmp</span> <span class='op'>&lt;-</span> <span class='op'>~</span> <span class='va'>x</span> <span class='op'>+</span> <span class='va'>z</span> <span class='op'>+</span> <span class='va'>Intercept</span>
+  <span class='va'>jcmp</span> <span class='op'>&lt;-</span> <span class='op'>~</span> <span class='va'>x</span> <span class='op'>+</span> <span class='va'>z</span> <span class='op'>+</span> <span class='fu'>Intercept</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
   <span class='va'>jfit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>jcmp</span>, <span class='va'>lik1</span>, <span class='va'>lik2</span><span class='op'>)</span>
 
   <span class='co'># Compare the estimates</span>
@@ -388,9 +389,7 @@ into a <code>bru_like_list</code> object</p></li>
 
   <span class='fu'><a href='multiplot.html'>multiplot</a></span><span class='op'>(</span><span class='va'>p1</span>, <span class='va'>p2</span>, <span class='va'>pj</span><span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: All covariate evaluations for 'Intercept' are NULL; an intercept component was likely intended.</span>
-#&gt; <span class='warning'>  Implicit latent intercept component specification is deprecated since version 2.1.14.</span>
-#&gt; <span class='warning'>  Use explicit notation '+ Intercept(1)' instead (or '+1' for '+ Intercept(1)').</span></div><div class='img'><img src='like-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+</div><div class='img'><img src='like-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

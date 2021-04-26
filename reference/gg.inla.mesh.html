@@ -42,8 +42,9 @@
 <meta property="og:title" content="Geom for inla.mesh objects — gg.inla.mesh" />
 <meta property="og:description" content="This function extracts the graph of an inla.mesh object and uses geom_line to visualize
 the graph's edges. Alternatively, if the color argument is provided, interpolates the colors
-across for a set of SpatialPixels covering the mesh area and calls gg.SpatialPixelDataFrame()
-to plot the interpolation." />
+across for a set of SpatialPixels covering the mesh area and calls gg.SpatialPixelsDataFrame()
+to plot the interpolation.
+Requires the ggplot2 package." />
 
 
 
@@ -165,10 +166,11 @@ to plot the interpolation." />
     </div>
 
     <div class="ref-description">
-    <p>This function extracts the graph of an inla.mesh object and uses <a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a> to visualize
+    <p>This function extracts the graph of an inla.mesh object and uses <code>geom_line</code> to visualize
 the graph's edges. Alternatively, if the <code>color</code> argument is provided, interpolates the colors
-across for a set of SpatialPixels covering the mesh area and calls gg.SpatialPixelDataFrame()
-to plot the interpolation.</p>
+across for a set of SpatialPixels covering the mesh area and calls <code><a href='gg.SpatialPixelsDataFrame.html'>gg.SpatialPixelsDataFrame()</a></code>
+to plot the interpolation.
+Requires the <code>ggplot2</code> package.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for inla.mesh</span>
@@ -247,7 +249,8 @@ to plot the interpolation.</p>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a> return values or, if the color argument is used, the values of gg.SpatialPixelDataFrame().</p>
+    <p><code>geom_line</code> return values or, if the color argument is used, the
+values of <code><a href='gg.SpatialPixelsDataFrame.html'>gg.SpatialPixelsDataFrame()</a></code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other geomes for meshes: 
@@ -257,7 +260,7 @@ to plot the interpolation.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>&amp;&amp;</span> <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
 
   <span class='co'># Load Gorilla data</span>
   <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"gorillas"</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>

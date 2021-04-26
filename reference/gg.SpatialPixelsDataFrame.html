@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Geom for SpatialPixelsDataFrame objects — gg.SpatialPixelsDataFrame" />
-<meta property="og:description" content="Coerces input SpatialPixelsDataFrame to data.frame and uses geom_tile to plot it." />
+<meta property="og:description" content="Coerces input SpatialPixelsDataFrame to data.frame and uses geom_tile to plot it.
+Requires the ggplot2 package." />
 
 
 
@@ -162,7 +163,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Coerces input SpatialPixelsDataFrame to data.frame and uses <a href='https://ggplot2.tidyverse.org/reference/geom_tile.html'>geom_tile</a> to plot it.</p>
+    <p>Coerces input SpatialPixelsDataFrame to data.frame and uses <code>geom_tile</code> to plot it.
+Requires the <code>ggplot2</code> package.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for SpatialPixelsDataFrame</span>
@@ -177,8 +179,8 @@
     </tr>
     <tr>
       <th>mapping</th>
-      <td><p>Aesthetic mappings created by <a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a> or <a href='https://ggplot2.tidyverse.org/reference/aes_.html'>aes_</a> used to update the default
-mapping. The default mapping is <code><a href='https://ggplot2.tidyverse.org/reference/aes_.html'>aes_string(x = coordnames(data)[1], y = coordnames(data)[2], fill = names(data)[[1]])</a></code>.</p></td>
+      <td><p>Aesthetic mappings created by <code>aes</code> used to update the default
+mapping. The default mapping is <code><a href='https://ggplot2.tidyverse.org/reference/aes.html'>ggplot2::aes(x = .data[[coordnames(data)[1]]], y = .data[[coordnames(data)[2]]], fill = .data[[names(data)[[1]]]])</a></code>.</p></td>
     </tr>
     <tr>
       <th>crs</th>
@@ -190,13 +192,13 @@ mapping. The default mapping is <code><a href='https://ggplot2.tidyverse.org/ref
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Arguments passed on to <a href='https://ggplot2.tidyverse.org/reference/geom_tile.html'>geom_tile</a>.</p></td>
+      <td><p>Arguments passed on to <code>geom_tile</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <a href='https://ggplot2.tidyverse.org/reference/geom_tile.html'>geom_tile</a> return value.</p>
+    <p>A <code>geom_tile</code> return value.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other geomes for spatial data: 
@@ -210,58 +212,56 @@ mapping. The default mapping is <code><a href='https://ggplot2.tidyverse.org/ref
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='co'># Load Gorilla data</span>
+  <span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='co'># Load Gorilla data</span>
 
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"gorillas"</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>
+    <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"gorillas"</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>
 
-<span class='co'># Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.</span>
-<span class='co'># The same syntax applies to SpatialGridDataFrame objects.</span>
+    <span class='co'># Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.</span>
+    <span class='co'># The same syntax applies to SpatialGridDataFrame objects.</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>gcov</span><span class='op'>$</span><span class='va'>elevation</span><span class='op'>)</span>
-</div><div class='img'><img src='gg.SpatialPixelsDataFrame-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Add Gorilla survey boundary and nest sightings</span>
+    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>gcov</span><span class='op'>$</span><span class='va'>elevation</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>gcov</span><span class='op'>$</span><span class='va'>elevation</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='img'><img src='gg.SpatialPixelsDataFrame-2.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Load pantropical dolphin data</span>
+    <span class='co'># Add Gorilla survey boundary and nest sightings</span>
 
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"mexdolphin"</span><span class='op'>)</span>
+    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>gcov</span><span class='op'>$</span><span class='va'>elevation</span><span class='op'>)</span> <span class='op'>+</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span><span class='op'>)</span>
 
-<span class='co'># Plot the pantropiical survey boundary, ship transects and dolphin sightings</span>
+    <span class='co'># Load pantropical dolphin data</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>ppoly</span><span class='op'>)</span> <span class='op'>+</span> <span class='co'># survey boundary as SpatialPolygon</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>samplers</span><span class='op'>)</span> <span class='op'>+</span> <span class='co'># ship transects as SpatialLines</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>points</span><span class='op'>)</span> <span class='co'># dolphin sightings as SpatialPoints</span>
-</div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='img'><img src='gg.SpatialPixelsDataFrame-3.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Change color</span>
+    <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"mexdolphin"</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>ppoly</span>, color <span class='op'>=</span> <span class='st'>"green"</span><span class='op'>)</span> <span class='op'>+</span> <span class='co'># survey boundary as SpatialPolygon</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>samplers</span>, color <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span> <span class='op'>+</span> <span class='co'># ship transects as SpatialLines</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>points</span>, color <span class='op'>=</span> <span class='st'>"blue"</span><span class='op'>)</span> <span class='co'># dolphin sightings as SpatialPoints</span>
-</div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='img'><img src='gg.SpatialPixelsDataFrame-4.png' alt='' width='700' height='433' /></div><div class='input'>
+    <span class='co'># Plot the pantropiical survey boundary, ship transects and dolphin sightings</span>
 
-<span class='co'># Visualize data annotations: line width by segment number</span>
+    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>ppoly</span><span class='op'>)</span> <span class='op'>+</span> <span class='co'># survey boundary as SpatialPolygon</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>samplers</span><span class='op'>)</span> <span class='op'>+</span> <span class='co'># ship transects as SpatialLines</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>points</span><span class='op'>)</span> <span class='co'># dolphin sightings as SpatialPoints</span>
 
-<span class='fu'><a href='https://rdrr.io/pkg/raster/man/names.html'>names</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>samplers</span><span class='op'>)</span> <span class='co'># 'seg' holds the segment number</span>
-</div><div class='output co'>#&gt; [1] "mid.x"      "mid.y"      "Effort"     "trans"      "depth"     
-#&gt; [6] "seg"        "quadrant.r" "angle.r"    "strat"     </div><div class='input'><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>samplers</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>color <span class='op'>=</span> <span class='va'>seg</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='img'><img src='gg.SpatialPixelsDataFrame-5.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Visualize data annotations: point size by dolphin group size</span>
+    <span class='co'># Change color</span>
 
-<span class='fu'><a href='https://rdrr.io/pkg/raster/man/names.html'>names</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>points</span><span class='op'>)</span> <span class='co'># 'size' holds the group size</span>
-</div><div class='output co'>#&gt;  [1] "mid.x"      "mid.y"      "Effort"     "trans"      "depth"     
-#&gt;  [6] "seg"        "quadrant.r" "angle.r"    "start.x"    "start.y"   
-#&gt; [11] "end.x"      "end.y"      "det"        "size"       "distance"  
-#&gt; [16] "detected"   "beaufort"   "latitude"   "longitude"  "strat"     </div><div class='input'><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>points</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>size <span class='op'>=</span> <span class='va'>size</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='img'><img src='gg.SpatialPixelsDataFrame-6.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>ppoly</span>, color <span class='op'>=</span> <span class='st'>"green"</span><span class='op'>)</span> <span class='op'>+</span> <span class='co'># survey boundary as SpatialPolygon</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>samplers</span>, color <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span> <span class='op'>+</span> <span class='co'># ship transects as SpatialLines</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>points</span>, color <span class='op'>=</span> <span class='st'>"blue"</span><span class='op'>)</span> <span class='co'># dolphin sightings as SpatialPoints</span>
+
+
+    <span class='co'># Visualize data annotations: line width by segment number</span>
+
+    <span class='fu'><a href='https://rdrr.io/pkg/raster/man/names.html'>names</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>samplers</span><span class='op'>)</span> <span class='co'># 'seg' holds the segment number</span>
+    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>samplers</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>color <span class='op'>=</span> <span class='va'>seg</span><span class='op'>)</span><span class='op'>)</span>
+
+    <span class='co'># Visualize data annotations: point size by dolphin group size</span>
+
+    <span class='fu'><a href='https://rdrr.io/pkg/raster/man/names.html'>names</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>points</span><span class='op'>)</span> <span class='co'># 'size' holds the group size</span>
+    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+      <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>mexdolphin</span><span class='op'>$</span><span class='va'>points</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>size <span class='op'>=</span> <span class='va'>size</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='img'><img src='gg.SpatialPixelsDataFrame-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

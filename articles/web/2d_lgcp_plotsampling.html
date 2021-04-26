@@ -118,7 +118,7 @@
       <h1 data-toc-skip>LGCPs - Plot sampling</h1>
                         <h4 class="author">David Borchers</h4>
             
-            <h4 class="date">2021-04-19</h4>
+            <h4 class="date">2021-04-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/2d_lgcp_plotsampling.Rmd"><code>vignettes/web/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -139,7 +139,8 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org">inlabru</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span></code></pre></div>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></code></pre></div>
 </div>
 <div id="get-the-data" class="section level2">
 <h2 class="hasAnchor">
@@ -243,14 +244,14 @@
     <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 635.8594 44.41051 560.6292 631.6318 717.2110 531.1808 755.7952 0.06984329</span>
-<span class="co">#&gt; 2 631.8901 33.05886 576.2515 630.9648 692.4493 572.0432 705.6021 0.05231743</span>
-<span class="co">#&gt; 3 649.7677 25.20153 602.2015 649.1049 691.1600 594.9337 729.1105 0.03878544</span>
+<span class="co">#&gt; 1 639.9820 47.27887 562.6464 633.2850 743.0755 549.6999 795.3129 0.07387531</span>
+<span class="co">#&gt; 2 635.0446 35.44598 578.4995 631.2524 719.7041 562.3465 738.5989 0.05581652</span>
+<span class="co">#&gt; 3 647.0527 23.23780 601.6928 647.2488 688.0591 591.4622 703.1282 0.03591331</span>
 <span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA       NA         NA</span>
 <span class="co">#&gt;         var</span>
-<span class="co">#&gt; 1 1972.2935</span>
-<span class="co">#&gt; 2 1092.8884</span>
-<span class="co">#&gt; 3  635.1169</span>
+<span class="co">#&gt; 1 2235.2919</span>
+<span class="co">#&gt; 2 1256.4176</span>
+<span class="co">#&gt; 3  539.9956</span>
 <span class="co">#&gt; 4        NA</span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
