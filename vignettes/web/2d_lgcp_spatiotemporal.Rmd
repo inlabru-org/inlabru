@@ -33,6 +33,7 @@ Load libraries
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(inlabru)
 library(INLA)
+library(ggplot2)
 ```
 
 Get the data

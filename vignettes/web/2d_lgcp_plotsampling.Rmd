@@ -36,6 +36,7 @@ Load libraries
 library(inlabru)
 library(INLA)
 library(mgcv)
+library(ggplot2)
 ```
 
 Get the data
