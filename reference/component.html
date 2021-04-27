@@ -334,7 +334,7 @@ the linear predictor \(\eta\) would be written down as</p>
 <li><p>\(\psi = \beta * x \) is called the <em>random effect</em> of \(x\)</p></li>
 </ul>
 
-<p>A problem that arises when using this kind of R formula is that it does not clearly relect the mathematical
+<p>A problem that arises when using this kind of R formula is that it does not clearly reflect the mathematical
 formula. For instance, when providing the formula to inla, the resulting object will refer to the random
 effect \(\psi = \beta * x \) as <code>x</code>. Hence, it is not clear if <code>x</code> refers to the covariate
 or the effect of the covariate.</p>
@@ -358,28 +358,28 @@ or the effect of the covariate.</p>
 <p>where <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>f()</a></code> is the inla specific function to set up random effects of all kinds. The underlying
 predictor would again be \(\eta = \beta * x + c\) but the result of fitting the model would state
 <code>x</code> as the random effect's name. bru allows to rewrite this formula in order to explicitly state
-the name of the random effect and the name of the associated. This is achived by replacing <code>f</code>
+the name of the random effect and the name of the associated covariate. This is achieved by replacing <code>f</code>
 with an arbitrary name that we wish to assign to the effect, e.g.</p>
 <ul>
 <li><p><code>components = y ~ psi(x, model = "linear")</code>.</p></li>
 </ul>
 
 <p>Being able to discriminate between \(x\) and \(\psi\) is relevant because of two functionalities
-bru offers. The formula parameters of both, <code><a href='bru.html'>bru()</a></code> and the prediction method <a href='predict.bru.html'>predict.bru</a>
+bru offers. The formula parameters of both <code><a href='bru.html'>bru()</a></code> and the prediction method <a href='predict.bru.html'>predict.bru</a>
 are interpreted in the mathematical sense. For instance, <code>predict</code> may be used to analyze the
-an analytical combination of the covariate \(x\) and the intercept using</p>
+analytical combination of the covariate \(x\) and the intercept using</p>
 <ul>
 <li><p><code>predict(fit, data.frame(x=2)), ~ exp(psi + Intercept)</code>.</p></li>
 </ul>
 
-<p>which corresponds to the mathematical expression \(\exp(x \beta + c)\).</p>
+<p>which corresponds to the mathematical expression e <sup>&#946; + c</sup>.</p>
 <p>On the other hand, predict may be used to only look at a transformation of
 the latent variable \(\beta_\psi\)</p>
 <ul>
 <li><p><code><a href='https://rdrr.io/r/stats/predict.html'>predict(fit, NULL, ~ exp(psi_latent))</a></code>.</p></li>
 </ul>
 
-<p>which corresponds to the mathematical expression \(\exp(\beta)\).</p>
+<p>which corresponds to the mathematical expression e <sup>&#946;</sup>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other component constructors: 
