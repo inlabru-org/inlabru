@@ -148,7 +148,7 @@ ibm_valid_input <- function(mapper, input, ...) {
 #' \item{\eqn{\psi = \beta * x }}{ is called the *random effect* of \eqn{x}}
 #' }
 #'
-#' A problem that arises when using this kind of R formula is that it does not clearly relect the mathematical
+#' A problem that arises when using this kind of R formula is that it does not clearly reflect the mathematical
 #' formula. For instance, when providing the formula to inla, the resulting object will refer to the random
 #' effect \eqn{\psi = \beta * x } as `x`. Hence, it is not clear if `x` refers to the covariate
 #' or the effect of the covariate.
@@ -162,26 +162,26 @@ ibm_valid_input <- function(mapper, input, ...) {
 #' where `f()` is the inla specific function to set up random effects of all kinds. The underlying
 #' predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
 #' `x` as the random effect's name. bru allows to rewrite this formula in order to explicitly state
-#' the name of the random effect and the name of the associated. This is achived by replacing `f`
+#' the name of the random effect and the name of the associated covariate. This is achieved by replacing `f`
 #' with an arbitrary name that we wish to assign to the effect, e.g.
 #'
 #' \itemize{\item{`components = y ~ psi(x, model = "linear")`.}}
 #'
 #' Being able to discriminate between \eqn{x} and \eqn{\psi} is relevant because of two functionalities
-#' bru offers. The formula parameters of both, [bru()] and the prediction method [predict.bru]
+#' bru offers. The formula parameters of both [bru()] and the prediction method [predict.bru]
 #' are interpreted in the mathematical sense. For instance, `predict` may be used to analyze the
-#' an analytical combination of the covariate \eqn{x} and the intercept using
+#' analytical combination of the covariate \eqn{x} and the intercept using
 #'
 #' \itemize{\item{`predict(fit, data.frame(x=2)), ~ exp(psi + Intercept)`.}}
 #'
-#' which corresponds to the mathematical expression \eqn{\exp(x \beta + c)}.
+#' which corresponds to the mathematical expression \ifelse{html}{\out{e <sup>&#946; + c</sup>}}{\eqn{e^{x \beta + c}}}.
 #'
 #' On the other hand, predict may be used to only look at a transformation of
 #' the latent variable \eqn{\beta_\psi}
 #'
 #' \itemize{\item{`predict(fit, NULL, ~ exp(psi_latent))`.}}
 #'
-#' which corresponds to the mathematical expression \eqn{\exp(\beta)}.
+#' which corresponds to the mathematical expression \ifelse{html}{\out{e <sup>&#946;</sup>}}{\eqn{e^{\beta}}}.
 #'
 #' @param \dots Parameters passed on to other methods
 #'
