@@ -162,7 +162,7 @@ ibm_valid_input <- function(mapper, input, ...) {
 #' where `f()` is the inla specific function to set up random effects of all kinds. The underlying
 #' predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
 #' `x` as the random effect's name. bru allows to rewrite this formula in order to explicitly state
-#' the name of the random effect and the name of the associated. This is achived by replacing `f`
+#' the name of the random effect and the name of the associated covariate. This is achived by replacing `f`
 #' with an arbitrary name that we wish to assign to the effect, e.g.
 #'
 #' \itemize{\item{`components = y ~ psi(x, model = "linear")`.}}
