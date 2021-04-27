@@ -174,14 +174,14 @@ ibm_valid_input <- function(mapper, input, ...) {
 #'
 #' \itemize{\item{`predict(fit, data.frame(x=2)), ~ exp(psi + Intercept)`.}}
 #'
-#' which corresponds to the mathematical expression \eqn{e^{x \beta + c}}.
+#' which corresponds to the mathematical expression \ifelse{html}{\out{e <sup>&#946; + c</sup>}}{\eqn{e^{x \beta + c}}}.
 #'
 #' On the other hand, predict may be used to only look at a transformation of
 #' the latent variable \eqn{\beta_\psi}
 #'
 #' \itemize{\item{`predict(fit, NULL, ~ exp(psi_latent))`.}}
 #'
-#' which corresponds to the mathematical expression \eqn{e^{\beta}}.
+#' which corresponds to the mathematical expression \ifelse{html}{\out{e <sup>&#946;</sup>}}{\eqn{e^{\beta}}}.
 #'
 #' @param \dots Parameters passed on to other methods
 #'
