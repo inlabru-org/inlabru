@@ -215,10 +215,14 @@ bru_fill_missing <- function(data, where, values,
   stopifnot(inherits(
     data,
     c(
+      "SpatialPointsDataFrame",
       "SpatialPixelsDataFrame",
       "SpatialGridDataFrame"
     )
   ))
+  if (inherits(data, "SpatialGridDataFrame")) {
+    data <- as(data, "SpatialPixelsDataFrame")
+  }
   if (is.null(layer) && is.null(selector)) {
     layer <- 1
   }

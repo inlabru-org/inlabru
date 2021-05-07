@@ -155,3 +155,7 @@ test_that("User defined mappers 2", {
     label = "Non-interactive bru() call"
   )
 })
+
+
+
+

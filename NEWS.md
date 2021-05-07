@@ -1,5 +1,8 @@
 # inlabru (development version)
 
+* Fix support for `SpatialPointsDataFrame` and `SpatialGridDataFrame` input
+  to `bru_fill_missing()`
+
 # inlabru 2.3.1
 
 * Documentation and dependency updates for CRAN compatibility
