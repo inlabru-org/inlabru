@@ -118,7 +118,7 @@
       <h1 data-toc-skip>LGCPs - Multiple Likelihoods</h1>
                         <h4 class="author">Fabian E. Bachl</h4>
             
-            <h4 class="date">2021-05-07</h4>
+            <h4 class="date">2021-05-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/2d_lgcp_multilikelihood.Rmd"><code>vignettes/web/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -249,10 +249,10 @@
 <span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
 <span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 2.16, Running = 82.6, Post = 0.694, Total = 85.5 </span>
+<span class="co">#&gt;     Pre = 2.37, Running = 92.7, Post = 0.78, Total = 95.8 </span>
 <span class="co">#&gt; Fixed effects:</span>
-<span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span>
-<span class="co">#&gt; Intercept -0.293 1.387     -3.019   -0.293      2.426 -0.291   0</span>
+<span class="co">#&gt;             mean   sd 0.025quant 0.5quant 0.975quant   mode kld</span>
+<span class="co">#&gt; Intercept -0.284 1.34     -2.917   -0.284      2.342 -0.283   0</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
@@ -260,23 +260,23 @@
 <span class="co">#&gt;    Difference SPDE2 model</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Model hyperparameters:</span>
-<span class="co">#&gt;                         mean       sd 0.025quant 0.5quant 0.975quant  mode</span>
-<span class="co">#&gt; Range for Common       2.976    0.588      2.011    2.909      4.315 2.775</span>
-<span class="co">#&gt; Stdev for Common       2.047    0.336      1.483    2.014      2.800 1.943</span>
-<span class="co">#&gt; Range for Difference 185.519 2816.593      0.163    2.749    792.388 0.278</span>
-<span class="co">#&gt; Stdev for Difference   0.102    0.077      0.014    0.084      0.299 0.042</span>
+<span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span>
+<span class="co">#&gt; Range for Common     2.958 0.601      2.001    2.879      4.346 2.719</span>
+<span class="co">#&gt; Stdev for Common     2.045 0.341      1.486    2.005      2.820 1.920</span>
+<span class="co">#&gt; Range for Difference 1.020 1.360      0.158    0.616      4.339 0.319</span>
+<span class="co">#&gt; Stdev for Difference 0.108 0.082      0.015    0.088      0.318 0.045</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Expected number of effective parameters(stdev): 80.29(0.00)</span>
-<span class="co">#&gt; Number of equivalent replicates : 35.13 </span>
+<span class="co">#&gt; Expected number of effective parameters(stdev): 81.05(0.00)</span>
+<span class="co">#&gt; Number of equivalent replicates : 34.81 </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: -3882.14</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -37436.23</span>
-<span class="co">#&gt; Effective number of parameters .....................: 86.49</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: -3881.58</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -37435.67</span>
+<span class="co">#&gt; Effective number of parameters .....................: 87.32</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: -3800.57</span>
-<span class="co">#&gt; Effective number of parameters .................: 153.23</span>
+<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: -3799.00</span>
+<span class="co">#&gt; Effective number of parameters .................: 154.77</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Marginal log-Likelihood:  1896.74 </span>
+<span class="co">#&gt; Marginal log-Likelihood:  1896.63 </span>
 <span class="co">#&gt; Posterior marginals for the linear predictor and</span>
 <span class="co">#&gt;  the fitted values are computed</span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -295,10 +295,10 @@
 <span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
 <span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.82, Running = 61.6, Post = 0.318, Total = 63.7 </span>
+<span class="co">#&gt;     Pre = 2.11, Running = 78.4, Post = 0.423, Total = 80.9 </span>
 <span class="co">#&gt; Fixed effects:</span>
-<span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span>
-<span class="co">#&gt; Intercept -0.27 1.267      -2.76    -0.27      2.213 -0.268   0</span>
+<span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span>
+<span class="co">#&gt; Intercept -0.328 1.496     -3.268   -0.328      2.605 -0.327   0</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
@@ -307,22 +307,22 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Model hyperparameters:</span>
 <span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span>
-<span class="co">#&gt; Range for Common     2.944 0.601      2.033    2.848      4.367 2.643</span>
-<span class="co">#&gt; Stdev for Common     2.039 0.340      1.500    1.992      2.828 1.885</span>
-<span class="co">#&gt; Range for Difference 2.745 4.215      0.223    1.512     12.834 0.560</span>
-<span class="co">#&gt; Stdev for Difference 0.142 0.095      0.025    0.121      0.381 0.071</span>
+<span class="co">#&gt; Range for Common     3.007 0.598      1.983    2.957      4.324 2.864</span>
+<span class="co">#&gt; Stdev for Common     2.074 0.348      1.466    2.049      2.830 2.003</span>
+<span class="co">#&gt; Range for Difference 1.694 1.958      0.111    1.098      6.876 0.299</span>
+<span class="co">#&gt; Stdev for Difference 0.139 0.097      0.022    0.117      0.385 0.065</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Expected number of effective parameters(stdev): 82.77(0.00)</span>
-<span class="co">#&gt; Number of equivalent replicates : 34.08 </span>
+<span class="co">#&gt; Expected number of effective parameters(stdev): 80.78(0.00)</span>
+<span class="co">#&gt; Number of equivalent replicates : 34.92 </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: -3882.99</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -37437.08</span>
-<span class="co">#&gt; Effective number of parameters .....................: 89.22</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: -3884.44</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -37438.52</span>
+<span class="co">#&gt; Effective number of parameters .....................: 87.12</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: -3797.27</span>
-<span class="co">#&gt; Effective number of parameters .................: 159.07</span>
+<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: -3801.20</span>
+<span class="co">#&gt; Effective number of parameters .................: 155.23</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Marginal log-Likelihood:  1896.96 </span>
+<span class="co">#&gt; Marginal log-Likelihood:  1897.44 </span>
 <span class="co">#&gt; Posterior marginals for the linear predictor and</span>
 <span class="co">#&gt;  the fitted values are computed</span></code></pre></div>
 </div>

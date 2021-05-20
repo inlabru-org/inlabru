@@ -118,7 +118,7 @@
       <h1 data-toc-skip>LGCPs - An example in two dimensions</h1>
                         <h4 class="author">David Borchers</h4>
             
-            <h4 class="date">2021-05-07</h4>
+            <h4 class="date">2021-05-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/2d_lgcp.Rmd"><code>vignettes/web/2d_lgcp.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp.Rmd</code></div>
@@ -256,9 +256,9 @@
 <span class="op">)</span>
 <span class="va">Lambda</span>
 <span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 646.8487 28.43395 591.7782 648.2466 699.6748 588.9306 725.4648 0.04395765</span>
+<span class="co">#&gt; 1 651.5955 24.81721 607.7196 648.5063 703.5776 597.1467 706.1932 0.03808684</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 808.4893</span></code></pre></div>
+<span class="co">#&gt; 1 615.8941</span></code></pre></div>
 <p>Given some generous interval boundaries (500, 800) for lambda we can estimate the posterior abundance distribution via</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Nest</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
@@ -273,11 +273,11 @@
 <p>Get its quantiles via</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 585.0077 653.7232 723.2479</span></code></pre></div>
+<span class="co">#&gt; [1] 584.2885 649.5767 722.1943</span></code></pre></div>
 <p>… the mean via</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html">inla.emarginal</a></span><span class="op">(</span><span class="va">identity</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 653.8093</span></code></pre></div>
+<span class="co">#&gt; [1] 650.6115</span></code></pre></div>
 <p>and plot posteriors:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Nest</span><span class="op">$</span><span class="va">plugin_estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html">dpois</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, lambda <span class="op">=</span> <span class="va">Lambda</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span>
