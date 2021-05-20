@@ -1323,7 +1323,7 @@ fm_identical_CRS <- function(crs0, crs1, crsonly = FALSE) {
 #' @param \dots
 #' Potential additional arguments
 #' @seealso [fm_CRS()]
-#'
+#' @export
 fm_spTransform <- function(x, ...) {
   UseMethod("fm_spTransform")
 }
