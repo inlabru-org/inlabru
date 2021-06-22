@@ -60,20 +60,3 @@ test_that("Component construction: unsafe intercepts, data is list", {
     "All covariate evaluations for 'something_unknown' are NULL"
   )
 })
-
-test_that("Component construction: deprecated arguments", {
-  expect_warning(
-    component_list(~ something(map = a)),
-    "Use of 'map' is deprecated"
-  )
-  skip_on_cran()
-  local_bru_safe_inla()
-  expect_warning(
-    bru(~ something(map = a),
-        formula = response ~ .,
-        data = list(a = 1:5),
-        options = list(bru_run = FALSE)
-    ),
-    "Use of 'map' is deprecated"
-  )
-})
