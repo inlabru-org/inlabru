@@ -48,8 +48,8 @@ state.
 }
 
 \itemize{
-\item \code{evaluate_effect_single.component_list}: A data.frame of evaluated component
-effect values
+\item \code{evaluate_effect_single.component_list}: A list of evaluated
+component effect values
 }
 
 \itemize{
@@ -58,8 +58,8 @@ of evaluated component effects.
 }
 
 \itemize{
-\item \code{evaluate_effect_multi.component_list}: A list of data.frames of
-evaluated component effects, one data.frame for each state
+\item \code{evaluate_effect_multi.component_list}: A list of lists of
+evaluated component effects, one list for each state
 }
 }
 \description{
