@@ -138,8 +138,12 @@ bru_compute_linearisation.component <- function(cmp,
   assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
 
   if (assume_rowwise) {
-    if ((NROW(A) == 1) && (NROW(pred0) > 1)) {
-      A <- Matrix::kronecker(rep(1, NROW(pred0)), A)
+    if (NROW(A) == 1) {
+      if (NROW(pred0) > 1) {
+        A <- Matrix::kronecker(rep(1, NROW(pred0)), A)
+      } else if (is.data.frame(data)) {
+        A <- Matrix::kronecker(rep(1, NROW(data)), A)
+      }
     }
   }
 
@@ -248,6 +252,19 @@ bru_compute_linearisation.bru_like <- function(lhood,
     predictor = lhood_expr,
     format = "matrix"
   )
+  if (lhood[["linear"]]) {
+    # If linear, can check if the predictor is a scalar or vector,
+    # and possibly expand to full size
+    if (length(pred0) == 1) {
+      if (is.data.frame(data) ||
+          inherits(data, c("SpatialPointsDataFrame",
+                           "SpatialPolygonsDataFrame",
+                           "SpatialLinesDataFrame"))) {
+        pred0 <- rep(pred0, NROW(data))
+      }
+    }
+  }
+
   # Compute derivatives for each non-offset component
   B <- list()
   offset <- pred0
@@ -258,8 +275,12 @@ bru_compute_linearisation.bru_like <- function(lhood,
       if (lhood[["linear"]]) {
         # If linear, just need to copy the non-offset A matrix,
         # and possibly expand to full size
-        if ((NROW(A[[label]]) == 1) && (NROW(offset) > 1)) {
-          B[[label]] <- Matrix::kronecker(rep(1, NROW(offset)), A[[label]])
+        if (NROW(A[[label]]) == 1) {
+          if (NROW(offset) > 1) {
+            B[[label]] <- Matrix::kronecker(rep(1, NROW(offset)), A[[label]])
+          } else {
+            B[[label]] <- A[[label]]
+          }
         } else {
           B[[label]] <- A[[label]]
         }

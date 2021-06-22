@@ -3,6 +3,9 @@
 * Fix support for `SpatialPointsDataFrame` and `SpatialGridDataFrame` input
   to `bru_fill_missing()`
 
+* Allow `list()` data input, and predictors where the size of
+  data/effect/predictor/response aren't equal
+
 # inlabru 2.3.1
 
 * Documentation and dependency updates for CRAN compatibility
