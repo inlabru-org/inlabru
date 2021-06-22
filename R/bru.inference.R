@@ -621,7 +621,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     include_components = include,
     exclude_components = exclude,
     allow_latent = allow_latent,
-    allow_combine = allow_combine
+    allow_combine = allow_combine || (is.list(data) && !is.data.frame(data))
   )
 
   class(lh) <- c("bru_like", "list")

@@ -18,8 +18,8 @@ test_that("Component construction: linear model", {
     input_eval(cmp, data = df),
     list(
       main = 1:10,
-      group = rep(1, 10),
-      replicate = rep(1, 10)
+      group = 1,
+      replicate = 1
     )
   )
 

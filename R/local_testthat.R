@@ -29,7 +29,7 @@ local_testthat_assign <- function(x, values, envir = parent.frame()) {
 #' Assign local tolerance variables. Useful for easy cleanup
 #' of global workspace with `withr::deferred_run()` when running tests
 #' interactively.
-local_testthat_tolerances <- function(tolerances = c(1e-5, 1e-2, 1e-1),
+local_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
                                       envir = parent.frame()) {
   local_testthat_assign("lowtol", tolerances[1], envir = envir)
   local_testthat_assign("midtol", tolerances[2], envir = envir)

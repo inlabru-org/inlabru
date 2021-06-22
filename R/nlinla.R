@@ -103,7 +103,7 @@ bru_compute_linearisation <- function(...) {
 #' A-matrices.
 #' @param effects
 #' * For `bru_component`:
-#' Precomputed effect data.frame for all components involved in the likelihood
+#' Precomputed effect list for all components involved in the likelihood
 #' expression
 #' @param pred0 Precomputed predictor for the given state
 #' @param allow_latent logical. If `TRUE`, the latent state of each component is
@@ -135,6 +135,14 @@ bru_compute_linearisation.component <- function(cmp,
     ))
   }
 
+  assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
+
+  if (assume_rowwise) {
+    if ((NROW(A) == 1) && (NROW(pred0) > 1)) {
+      A <- Matrix::kronecker(rep(1, NROW(pred0)), A)
+    }
+  }
+
   label <- cmp[["label"]]
   triplets <- list(
     i = integer(0),
@@ -152,26 +160,47 @@ bru_compute_linearisation.component <- function(cmp,
       # Option: compute predictor for multiple different states. This requires
       # constructing multiple states and corresponding effects before calling
       # evaluate_predictor
-      if (allow_latent || allow_combine) {
-        # TODO: Allow some grouping specification to allow subsetting even
-        # when allow_combine is TRUE
-        row_subset <- seq_len(NROW(A))
-      }
-      effects_eps <- effects[row_subset, , drop = FALSE]
-      effects_eps[, label] <- effects_eps[, label] + A[row_subset, k] * eps
 
+      if (assume_rowwise) {
+        effects_eps <- list()
+        for (label_loop in names(effects)) {
+          if (NROW(effects[[label_loop]]) == 1) {
+            effects_eps[[label_loop]] <-
+              rep(effects[[label_loop]], length(row_subset))
+          } else {
+            effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
+          }
+        }
+        effects_eps[[label]] <- effects_eps[[label]] + A[row_subset, k] * eps
+      } else {
+        effects_eps <- effects
+        effects_eps[[label]] <- effects_eps[[label]] + A[, k] * eps
+      }
       pred_eps <- evaluate_predictor(
         model,
         state = list(state_eps),
-        data = data[row_subset, , drop = FALSE],
+        data =
+          if (assume_rowwise) {
+            data[row_subset, , drop = FALSE]
+          } else {
+            data
+          },
         effects = list(effects_eps),
         predictor = lhood_expr,
         format = "matrix"
       )
       # Store sparse triplet information
-      values <- (pred_eps - pred0[row_subset])
+      if (assume_rowwise) {
+        values <- (pred_eps - pred0[row_subset])
+      } else {
+        values <- (pred_eps - pred0)
+      }
       nonzero <- (values != 0.0) # Detect exact (non)zeros
-      triplets$i <- c(triplets$i, row_subset[nonzero])
+      if (assume_rowwise) {
+        triplets$i <- c(triplets$i, row_subset[nonzero])
+      } else {
+        triplets$i <- c(triplets$i, which(nonzero))
+      }
       triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
       triplets$x <- c(triplets$x, values[nonzero] / eps)
     }
@@ -219,16 +248,21 @@ bru_compute_linearisation.bru_like <- function(lhood,
     predictor = lhood_expr,
     format = "matrix"
   )
-  # Compute derivatives for each noon-offset component
+  # Compute derivatives for each non-offset component
   B <- list()
   offset <- pred0
   # Either this loop or the internal bru_component specific loop
   # can in principle be parallelised.
   for (label in included) {
     if (!identical(model[["effects"]][[label]][["main"]][["type"]], "offset")) {
-      # If linear, just need to copy the non-offset A matrix
       if (lhood[["linear"]]) {
-        B[[label]] <- A[[label]]
+        # If linear, just need to copy the non-offset A matrix,
+        # and possibly expand to full size
+        if ((NROW(A[[label]]) == 1) && (NROW(offset) > 1)) {
+          B[[label]] <- Matrix::kronecker(rep(1, NROW(offset)), A[[label]])
+        } else {
+          B[[label]] <- A[[label]]
+        }
       } else {
         B[[label]] <-
           bru_compute_linearisation(

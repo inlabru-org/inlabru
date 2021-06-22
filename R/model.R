@@ -284,12 +284,12 @@ evaluate_effect_single.component <- function(component, state, data, A = NULL, .
     values <- A %*% state
   }
 
-  as.matrix(values)
+  as.vector(as.matrix(values))
 }
 
 
-#' @return * `evaluate_effect_single.component_list`: A data.frame of evaluated component
-#' effect values
+#' @return * `evaluate_effect_single.component_list`: A list of evaluated
+#' component effect values
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
@@ -307,7 +307,7 @@ evaluate_effect_single.component_list <- function(components, state, data,
       A = A[[label]]
     )
   }
-  as.data.frame(result)
+  result
 }
 
 #' @return * `evaluate_effect_multi.component`: A list of numeric vectors
@@ -335,8 +335,8 @@ evaluate_effect_multi.component <- function(component, state, data,
 }
 
 
-#' @return * `evaluate_effect_multi.component_list`: A list of data.frames of
-#' evaluated component effects, one data.frame for each state
+#' @return * `evaluate_effect_multi.component_list`: A list of lists of
+#' evaluated component effects, one list for each state
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal

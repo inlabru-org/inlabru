@@ -17,7 +17,7 @@ test_that("bru: linear component", {
   )
 
   expect_equal(fit$summary.fixed["myLin", "mean"], 2.002273, tolerance = midtol)
-  expect_equal(fit$summary.fixed["myLin", "sd"], 0.01323361, tolerance = midtol)
+  expect_equal(fit$summary.fixed["myLin", "sd"], 0.01323361, tolerance = hitol)
 
   pr <- predict(
     fit,
