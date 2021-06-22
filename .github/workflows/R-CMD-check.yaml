@@ -6,6 +6,7 @@ on:
       - devel
       - stable
       - release/*
+      - feature/*
   pull_request:
     branches:
       - devel
@@ -70,7 +71,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install --cask xquartz
-      
+
       - name: Install dependencies
         run: |
           remotes::install_cran("Matrix")
