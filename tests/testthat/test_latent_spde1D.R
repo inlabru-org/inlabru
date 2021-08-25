@@ -37,14 +37,14 @@ test_that("Latent models: SPDE 1D", {
   # Check Intercept
   expect_equal(
     data$fit$summary.fixed["Intercept", "mean"],
-    5.684758,
+    5.437118,
     tolerance = midtol
   )
 
   # Check SPDE
   expect_equal(
     data$fit$summary.random$field$mean[c(1, 25, 50)],
-    c(-4.916781, -4.285672, -6.837233),
+    c(-4.874364, -4.215024, -6.952447),
     tolerance = midtol
   )
 })

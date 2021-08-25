@@ -369,7 +369,19 @@ resave_package_data <- function() {
 row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
   M1 <- as(as(as(M1, "CsparseMatrix"), "dgCMatrix"), "dgTMatrix")
   M2 <- as(as(as(M2, "CsparseMatrix"), "dgCMatrix"), "dgTMatrix")
-  n <- nrow(M1)
+  n1 <- nrow(M1)
+  n2 <- nrow(M2)
+  if ((n1 == 1) && (n2 > 1)) {
+    M1 <- Matrix::kronecker(rep(1, n2), M1)
+    n <- n2
+  } else if ((n1 > 1) && (n2 == 1)) {
+    M2 <- Matrix::kronecker(rep(1, n1), M2)
+    n <- n1
+  } else if (n1 != n2) {
+    stop(paste0("Size mismatch for row.kron, (n1, n2) = (", n1, ", ", n2, ")"))
+  } else {
+    n <- n1
+  }
   if (is.null(repl)) {
     repl <- rep(1L, n)
   }

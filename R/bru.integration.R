@@ -208,8 +208,6 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     name <- "x"
   }
 
-  pregroup <- NULL
-
   if (is.data.frame(samplers)) {
     if (!("weight" %in% names(samplers))) {
       samplers$weight <- 1
@@ -447,7 +445,9 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       )
     }
 
-    df <- data.frame(samplers@data[ips$group, pregroup, drop = FALSE],
+
+    df <- data.frame(
+      samplers@data[ips$group, group, drop = FALSE],
       weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
     )
     ips <- SpatialPointsDataFrame(ips[, c("x", "y")],

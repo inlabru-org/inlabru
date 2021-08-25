@@ -39,18 +39,18 @@ test_that("1D LGCP fitting", {
 
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    1.08959,
+    1.054191,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.4206289,
+    0.4200777,
     tolerance = midtol
   )
 
   expect_equal(
     fit$summary.random$spde1D$mean[c(1, 27, 50)],
-    c(-0.46315457, 0.09792757, -3.25164489),
+    c(-0.4146421,  0.1373841, -3.2198098),
     tolerance = midtol
   )
   expect_equal(
@@ -128,23 +128,23 @@ test_that("1D LGCP fitting", {
 
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    1.08959,
+    1.077507,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.4206289,
+    0.4175773,
     tolerance = hitol
   )
 
   expect_equal(
     fit$summary.random$spde1D$mean[c(1, 27, 50)],
-    c(-0.4619925, 0.2925785, -1.7602729),
+    c(-0.4477744,  0.3068381, -1.7472893),
     tolerance = midtol
   )
   expect_equal(
     fit$summary.random$spde1D$sd[c(2, 32, 29)],
-    c(0.5905830, 0.4206042, 0.4219461),
+    c(0.5955588, 0.4271677, 0.4283714),
     tolerance = midtol
   )
 

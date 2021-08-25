@@ -2028,6 +2028,8 @@ input_eval.component <- function(component,
         ...
       )
   }
+  # Any potential length mismatches must be handled by bru_mapper_multi, since
+  # e.g. main might take a list() input object.
   val
 }
 
@@ -2086,13 +2088,18 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   # 3) Else we obtain a vector and return as-is. This happens when input
   #    references a column of the data points, or some other complete expression
 
-  n <- nrow(as.data.frame(data))
+# ## Need to handle varying input lengths.
+# ## auto-expansion of scalars needs to happen elsewhere, where it's needed,
+# ## e.g. when using component A-matrices to construct a default linear model
+# ## A matrix.
+#  n <- nrow(as.data.frame(data))
 
   if (is.null(emap)) {
     if (null.on.fail) {
       return(NULL)
     }
-    val <- rep(1, n)
+#    val <- rep(1, n)
+    val <- 1
   } else if (is.function(emap)) {
     # Allow but detect failures:
     val <- tryCatch(emap(data),
@@ -2142,18 +2149,19 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       layer = layer,
       selector = input[["selector"]]
     )
-  } else if ((input$label == "offset") &&
-    is.numeric(emap) &&
-    (length(emap) == 1)) {
-    val <- rep(emap, n)
+#  } else if ((input$label == "offset") &&
+#    is.numeric(emap) &&
+#    (length(emap) == 1)) {
+#    val <- rep(emap, n)
   } else {
     val <- emap
   }
 
-  # Always return as many rows as data has
-  if (is.vector(val) && (length(val) == 1) && (n > 1)) {
-    val <- rep(val, n)
-  }
+# ## Need to allow different sizes; K %*% effect needs to have same length as response, but the input and effect effect itself doesn't.
+#  # Always return as many rows as data has
+#  if (is.vector(val) && (length(val) == 1) && (n > 1)) {
+#    val <- rep(val, n)
+#  }
 
   # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
   # to fix that by filling in nearest neighbour values.
