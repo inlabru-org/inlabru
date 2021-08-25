@@ -87,22 +87,6 @@ test_that("bru: factor component", {
 
   # Evaluate effect with _eval feature
 
-  xpost4 <- predict(
-    fit,
-    data = NULL,
-    formula = ~ z_eval(1:10),
-    n.samples = 5,
-    seed = 12345L
-  )
-
-  xpost4 <- predict(
-    fit,
-    data = NULL,
-    formula = ~ x_eval(1:10),
-    n.samples = 5,
-    seed = 12345L
-  )
-
   xpost4 <- generate(
     fit,
     data = NULL,
