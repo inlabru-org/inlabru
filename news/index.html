@@ -166,6 +166,7 @@
 <ul>
 <li><p>Fix support for <code>SpatialPointsDataFrame</code> and <code>SpatialGridDataFrame</code> input to <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code></p></li>
 <li><p>Allow <code><a href="https://rdrr.io/r/base/list.html">list()</a></code> data input, and predictors where the size of data/effect/predictor/response aren’t equal</p></li>
+<li><p>Add <code>bru_mapper_collect</code> class for handling sequential collections of mappers, including collections where all but the first mapper is hidden from the <code><a href="https://rdrr.io/pkg/INLA/man/f.html">INLA::f()</a></code> arguments <code>n</code> and <code>values</code>, as needed to support e.g. “bym2” models.</p></li>
 </ul>
 </div>
     <div id="inlabru-231" class="section level1">

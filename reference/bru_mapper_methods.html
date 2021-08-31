@@ -174,13 +174,13 @@ available (see Details). Otherwise the
     </div>
 
     <pre class="usage"># S3 method for default
-ibm_n(mapper, ...)
+ibm_n(mapper, inla_f = FALSE, ...)
 
 # S3 method for default
-ibm_values(mapper, ...)
+ibm_values(mapper, inla_f = FALSE, ...)
 
 # S3 method for default
-ibm_amatrix(mapper, ...)
+ibm_amatrix(mapper, inla_f = FALSE, ...)
 
 # S3 method for default
 ibm_valid_input(mapper, input, ...)
@@ -237,16 +237,16 @@ ibm_values(mapper, ...)
 ibm_amatrix(mapper, input, ...)
 
 # S3 method for bru_mapper_multi
-ibm_n(mapper, multi = 0L, ...)
+ibm_n(mapper, inla_f = FALSE, multi = 0L, ...)
 
 # S3 method for bru_mapper_multi
-ibm_values(mapper, multi = 0L, ...)
+ibm_values(mapper, inla_f = FALSE, multi = 0L, ...)
 
 # S3 method for bru_mapper_multi
-ibm_amatrix(mapper, input, multi = 0L, ...)
+ibm_amatrix(mapper, input, inla_f = FALSE, multi = 0L, ...)
 
 # S3 method for bru_mapper_multi
-ibm_valid_input(mapper, input, multi = 0L, ...)
+ibm_valid_input(mapper, input, inla_f = FALSE, multi = 0L, ...)
 
 # S3 method for bru_mapper_multi
 [(x, i, drop = TRUE)
@@ -255,6 +255,27 @@ ibm_valid_input(mapper, input, multi = 0L, ...)
 names(x)
 
 # S3 method for bru_mapper_multi
+names(x) &lt;- value
+
+# S3 method for bru_mapper_collect
+ibm_n(mapper, inla_f = FALSE, multi = 0L, ...)
+
+# S3 method for bru_mapper_collect
+ibm_values(mapper, inla_f = FALSE, multi = 0L, ...)
+
+# S3 method for bru_mapper_collect
+ibm_amatrix(mapper, input, inla_f = FALSE, multi = 0L, ...)
+
+# S3 method for bru_mapper_collect
+ibm_valid_input(mapper, input, inla_f = FALSE, multi = 0L, ...)
+
+# S3 method for bru_mapper_collect
+[(x, i, drop = TRUE)
+
+# S3 method for bru_mapper_collect
+names(x)
+
+# S3 method for bru_mapper_collect
 names(x) &lt;- value</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -275,7 +296,7 @@ names(x) &lt;- value</pre>
     <tr>
       <th>multi</th>
       <td><p>integer or logical;
-If positive, the number of levels to recurse in a <code>bru_multi_mapper</code>.
+If positive, the number of levels to recurse in a <code>bru_collect_mapper</code>.
 If <code>TRUE</code>, equivalent to <code>1L</code>. If <code>FALSE</code>, equivalent to <code>0L</code>.</p></td>
     </tr>
     <tr>
@@ -289,8 +310,9 @@ If <code>TRUE</code>, equivalent to <code>1L</code>. If <code>FALSE</code>, equi
     <tr>
       <th>drop</th>
       <td><p>logical;
-For <code>[.bru_mapper_multi</code>, whether to extract an individual mapper when <code>i</code>
-identifies a single element.
+For <code>[.bru_mapper_collect</code>, whether to extract an individual mapper when
+<code>i</code> identifies a single element. If <code>FALSE</code>, a list of sub-mappers is
+returned (suitable e.g. for creating a new <code>bru_mapper_collect</code> object).
 Default: <code>TRUE</code></p></td>
     </tr>
     <tr>
@@ -313,12 +335,24 @@ Default: <code>TRUE</code></p></td>
 sub-mappers list</p></li>
 </ul>
 
+<ul>
+<li><p><code><a href='https://rdrr.io/r/base/Extract.html'>[</a></code>-indexing a <code>bru_mapper_collect</code> extracts a subset
+<code>bru_mapper_collect</code> object (for drop <code>FALSE</code>) or an individual sub-mapper
+(for drop <code>TRUE</code>, and <code>i</code> identifies a single element)</p></li>
+</ul>
+
+<ul>
+<li><p>The <code><a href='https://rdrr.io/r/base/names.html'>names()</a></code> method for <code>bru_mapper_collect</code> returns the names from the
+sub-mappers list</p></li>
+</ul>
+
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     
 <ul>
 <li><p>The default <code><a href='bru_mapper.html'>ibm_n()</a></code> method returns a non-null element 'n' from the
-mapper object, and gives an error if it doesn't exist.</p></li>
+mapper object, and gives an error if it doesn't exist. If <code>inla_f=TRUE</code>,
+first checks for a 'n_inla' element.</p></li>
 </ul>
 
 <ul>
@@ -328,8 +362,8 @@ it doesn't exist.</p></li>
 </ul>
 
 <ul>
-<li><p>The default <code><a href='bru_mapper.html'>ibm_amatrix()</a></code> method calls the <code>ibm_amatrix</code> element function
-of the object if it exists.</p></li>
+<li><p>The default <code><a href='bru_mapper.html'>ibm_amatrix()</a></code> gives an error message.
+Mapper classes must implement their own <code>ibm_amatrix</code> method.</p></li>
 </ul>
 
 <ul>
@@ -350,6 +384,26 @@ with unnamed but ordered columns.</p></li>
 <li><p><code>ibm_valid_input</code> for <code>bru_mapper_multi</code> accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see <code>names.bru_mapper_multi()</code>.
+Each list element should take a format accepted by the corresponding
+sub-mapper. In case each element is a vector, the input can be given as a
+data.frame with named columns, a matrix with named columns, or a matrix
+with unnamed but ordered columns.</p></li>
+</ul>
+
+<ul>
+<li><p><code>ibm_amatrix</code> for <code>bru_mapper_collect</code> accepts a list with
+named entries, or a list with unnamed but ordered elements.
+The names must match the sub-mappers, see <code>names.bru_mapper_collect()</code>.
+Each list element should take a format accepted by the corresponding
+sub-mapper. In case each element is a vector, the input can be given as a
+data.frame with named columns, a matrix with named columns, or a matrix
+with unnamed but ordered columns.</p></li>
+</ul>
+
+<ul>
+<li><p><code>ibm_valid_input</code> for <code>bru_mapper_collect</code> accepts a list with
+named entries, or a list with unnamed but ordered elements.
+The names must match the sub-mappers, see <code>names.bru_mapper_collect()</code>.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix

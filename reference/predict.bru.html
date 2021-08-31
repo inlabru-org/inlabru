@@ -201,16 +201,10 @@ the prediction.</p></td>
     </tr>
     <tr>
       <th>formula</th>
-      <td><p>A formula defining an R expression to evaluate for each generated
-sample. If <code>NULL</code>, the latent and hyperparameter states are generated
-as named list elements. In addition to the component names (that give the effect
-of each component evaluated for the input data), the suffix <code>_latent</code> can be used
-to directly access the latent state for a component, and the suffix <code>_eval</code>
-can be used to evaluate a component at other input values than the expressions
-defined in the component definition itself, e.g. <code>field_eval(cbind(x,y))</code> for a
-component defined with <code>field(coordinates, ...)</code>. For "iid" models with
-<code>mapper = bru_mapper_index(n)</code>, <code><a href='https://rdrr.io/r/stats/Normal.html'>rnorm()</a></code> is used to generate new realisations for
-indices greater than <code>n</code>.</p></td>
+      <td><p>A formula where the right hand side defines an R expression
+to evaluate for each generated sample. If <code>NULL</code>, the latent and
+hyperparameter states are returned as named list elements.
+See Details for more information.</p></td>
     </tr>
     <tr>
       <th>n.samples</th>
@@ -266,6 +260,15 @@ minimum and maximum sample
 value drawn in course of estimating the statistics.</p>
 <p>Internally, this method calls <code><a href='generate.html'>generate.bru()</a></code> in order to draw samples from
 the model.</p>
+<p>In addition to the component names (that give the effect
+of each component evaluated for the input data), the suffix <code>_latent</code>
+variable name can be used to directly access the latent state for a component,
+and the suffix function <code>_eval</code> can be used to evaluate a component at
+other input values than the expressions defined in the component definition
+itself, e.g. <code>field_eval(cbind(x, y))</code> for a component that was defined with
+<code>field(coordinates, ...)</code> (see also <code><a href='component_eval.html'>component_eval()</a></code>).</p>
+<p>For "iid" models with <code>mapper = bru_mapper_index(n)</code>, <code><a href='https://rdrr.io/r/stats/Normal.html'>rnorm()</a></code> is used to
+generate new realisations for indices greater than <code>n</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>

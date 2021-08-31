@@ -201,8 +201,11 @@ the "matrix" format is used, otherwise "list".</p></li>
 expression for a state.</p></li>
 <li><p><code>"list"</code> A list where each column contains the evaluated predictor
 expression for a state.</p></li>
-</ul>
-
+</ul></td>
+    </tr>
+    <tr>
+      <th>inla_f</th>
+      <td><p>logical</p>
 <p>Default: "auto"</p></td>
     </tr>
     </table>
@@ -210,6 +213,11 @@ expression for a state.</p></li>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A list or matrix is returned, as specified by <code>format</code></p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>For each component, e.g. "name", the state values are available as
+<code>name_latent</code>, and arbitrary evaluation can be done with <code>name_eval(...)</code>, see
+<code><a href='component_eval.html'>component_eval()</a></code>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

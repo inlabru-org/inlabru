@@ -167,24 +167,16 @@
 
     <pre class="usage"><span class='fu'>bru_mapper</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>ibm_n</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>ibm_n</span><span class='op'>(</span><span class='va'>mapper</span>, inla_f <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>ibm_values</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>ibm_values</span><span class='op'>(</span><span class='va'>mapper</span>, inla_f <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>ibm_amatrix</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='va'>input</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>ibm_amatrix</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='va'>input</span>, inla_f <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>ibm_valid_input</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='va'>input</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>ibm_valid_input</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='va'>input</span>, inla_f <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>bru_mapper</span><span class='op'>(</span>
-  <span class='va'>mapper</span>,
-  new_class <span class='op'>=</span> <span class='cn'>NULL</span>,
-  ibm_n <span class='op'>=</span> <span class='cn'>NULL</span>,
-  ibm_values <span class='op'>=</span> <span class='cn'>NULL</span>,
-  ibm_amatrix <span class='op'>=</span> <span class='cn'>NULL</span>,
-  ibm_valid_input <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span>
+<span class='fu'>bru_mapper</span><span class='op'>(</span><span class='va'>mapper</span>, new_class <span class='op'>=</span> <span class='cn'>NULL</span>, methods <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for inla.mesh</span>
 <span class='fu'>bru_mapper</span><span class='op'>(</span><span class='va'>mesh</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -200,7 +192,9 @@
 
 <span class='fu'>bru_mapper_offset</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>bru_mapper_multi</span><span class='op'>(</span><span class='va'>mappers</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>bru_mapper_multi</span><span class='op'>(</span><span class='va'>mappers</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>bru_mapper_collect</span><span class='op'>(</span><span class='va'>mappers</span>, hidden <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -216,6 +210,15 @@ For the default <code>bru_mapper</code> method, a list that will be converted to
 <code>bru_mapper</code> object by adding class information and (optional) methods.</p></td>
     </tr>
     <tr>
+      <th>inla_f</th>
+      <td><p>logical; when <code>TRUE</code> in <code>ibm_n</code>, <code>ibm_values</code>, and
+<code>ibm_amatrix</code> methods, these must result in values compatible with <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f(...)</a></code>
+an specification and corresponding <code><a href='https://rdrr.io/pkg/INLA/man/inla.stack.html'>INLA::inla.stack(...)</a></code> constructions.
+Implementations do not normally need to do anything different, except
+for mappers of the type needed for hidden multicomponent models such
+as "bym2", which can be handled by <code>bru_mapper_collect</code>.</p></td>
+    </tr>
+    <tr>
       <th>input</th>
       <td><p>The values for which to produce validity information</p></td>
     </tr>
@@ -224,20 +227,8 @@ For the default <code>bru_mapper</code> method, a list that will be converted to
       <td><p>If non-<code>NULL</code>, this is added at the front of the class definition</p></td>
     </tr>
     <tr>
-      <th>ibm_n</th>
-      <td><p>An <code>ibm_n</code> method function</p></td>
-    </tr>
-    <tr>
-      <th>ibm_values</th>
-      <td><p>An <code>ibm_values</code> method function</p></td>
-    </tr>
-    <tr>
-      <th>ibm_amatrix</th>
-      <td><p>An <code>ibm_amatrix</code> method function</p></td>
-    </tr>
-    <tr>
-      <th>ibm_valid_input</th>
-      <td><p>An <code>ibm_valid_input</code> method function</p></td>
+      <th>methods, </th>
+      <td><p>optional <code>list</code> of named method definitions; See Details.</p></td>
     </tr>
     <tr>
       <th>mesh</th>
@@ -271,6 +262,15 @@ Default: <code>NULL</code>, to force user specification of this parameter</p></t
       <th>mappers</th>
       <td><p>A list of <code>bru_mapper</code> objects</p></td>
     </tr>
+    <tr>
+      <th>hidden</th>
+      <td><p><code>logical</code>, set to <code>TRUE</code> to flag that the mapper is to be used
+as a first level input mapper for <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f()</a></code> in a model that requires making
+only the first mapper visible to <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f()</a></code> and <code><a href='https://rdrr.io/pkg/INLA/man/inla.stack.html'>INLA::inla.stack()</a></code>, such
+as for "bym2" models, as activated by the <code>inla_f</code> argument to <code>ibm_n</code>,
+<code>ibm_values</code>, and <code>ibm_amatrix</code>. Set to <code>FALSE</code> to always access the full
+mapper, e.g. for <code>rgeneric</code> models</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -288,27 +288,33 @@ being mapped to.</p></li>
 
 <ul>
 <li><p><code>ibm_values</code> Generic. Implementations must return a vector that
-is interpretable by an <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f(..., values = ...)</a></code> specification, and
-has length <code>ibm_n()</code>.</p></li>
+would be interpretable by an <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f(..., values = ...)</a></code> specification.</p></li>
 </ul>
 
 <ul>
 <li><p><code>ibm_amatrix</code> Generic.
 Implementations must return a (sparse) matrix of size <code><a href='https://rdrr.io/r/base/nrow.html'>NROW(input)</a></code>
-(except for the <code>bru_mapper_multi</code> method)
+(except for the <code>bru_mapper_multi</code> and <code>bru_mapper_collect</code> methods,
+that require <code><a href='https://rdrr.io/r/base/list.html'>list()</a></code> inputs, and the input size is determined by the
+combined inputs)
 by <code>ibm_n(mapper)</code></p></li>
 </ul>
 
 <ul>
 <li><p><code>ibm_valid_input</code> Generic.
-Implementations must return a logical vector of length <code><a href='https://rdrr.io/r/base/nrow.html'>NROW(input)</a></code></p></li>
+Implementations must return a logical vector of length <code><a href='https://rdrr.io/r/base/nrow.html'>NROW(input)</a></code> (
+or for <code>bru_mapper_multi</code> and <code>bru_mapper_collect</code> a list of such
+vectors)</p></li>
 </ul>
 
 <ul>
 <li><p><code>bru_mapper.default</code> adds the "bru_mapper" class and <code>new_class</code>
 to an object. If provided, mapper method functions are added to an environment
-<code>.envir</code> in the object.  The generic methods <code>ibm_n</code>, <code>ibm_values</code>,
-<code>ibm_amatrix</code>, and <code>ibm_valid_input</code> look for these functions first,
+<code>.envir</code> in the object.  The generic methods <code>ibm_n</code>, <code>ibm_n_inla</code>,
+<code>ibm_values</code>, <code>ibm_values_inla</code>,
+<code>ibm_amatrix</code>, <code>ibm_amatrix_inla</code>,
+<code>ibm_valid_input</code>, and <code>ibm_valid_input_inla</code> look for these
+functions first,
 and otherwise call <code><a href='https://rdrr.io/r/base/UseMethod.html'>UseMethod()</a></code>.  This is an alternative to using <code><a href='https://rdrr.io/r/base/S3method.html'>.S3method()</a></code>
 to register the methods, e.g.
 <code><a href='https://rdrr.io/r/base/S3method.html'>.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)</a></code>.</p></li>
@@ -316,6 +322,10 @@ to register the methods, e.g.
 
 <ul>
 <li><p><code>bru_mapper_multi</code> constructs a kronecker product mapping</p></li>
+</ul>
+
+<ul>
+<li><p><code>bru_mapper_collect</code> constructs concatenated collection mapping</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

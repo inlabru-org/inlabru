@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create a plot sample. — plotsample • inlabru</title>
+<title>Evaluate component values in predictor expressions — component_eval • inlabru</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Create a plot sample. — plotsample" />
-<meta property="og:description" content="Creates a plot sample on a regular grid with a random start location." />
+<meta property="og:title" content="Evaluate component values in predictor expressions — component_eval" />
+<meta property="og:description" content="In predictor expressions, name_eval(...) can be used to evaluate
+the effect of a component called &quot;name&quot;." />
 
 
 
@@ -156,80 +157,62 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create a plot sample.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/inlabru-org/inlabru/blob/master/R/plotsample.R'><code>R/plotsample.R</code></a></small>
-    <div class="hidden name"><code>plotsample.Rd</code></div>
+    <h1>Evaluate component values in predictor expressions</h1>
+    <small class="dont-index">Source: <a href='https://github.com/inlabru-org/inlabru/blob/master/R/model.R'><code>R/model.R</code></a></small>
+    <div class="hidden name"><code>component_eval.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Creates a plot sample on a regular grid with a random start location.</p>
+    <p>In predictor expressions, <code>name_eval(...)</code> can be used to evaluate
+the effect of a component called "name".</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotsample</span><span class='op'>(</span><span class='va'>spdf</span>, <span class='va'>boundary</span>, x.ppn <span class='op'>=</span> <span class='fl'>0.25</span>, y.ppn <span class='op'>=</span> <span class='fl'>0.25</span>, nx <span class='op'>=</span> <span class='fl'>5</span>, ny <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>component_eval</span><span class='op'>(</span><span class='va'>main</span>, group <span class='op'>=</span> <span class='cn'>NULL</span>, replicate <span class='op'>=</span> <span class='cn'>NULL</span>, .state <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>spdf</th>
-      <td><p>A <code>SpatialPointsDataFrame</code> defining the points that are to be sampled
-by the plot sample.</p></td>
+      <th>main, group, replicate</th>
+      <td><p>Specification of where to evaluate a component.
+The three inputs are passed on to the respective <code>bru_mapper</code> methods.</p></td>
     </tr>
     <tr>
-      <th>boundary</th>
-      <td><p>A <code>SpatialPolygonsDataFrame</code> defining the survey boundary within which
-the  points occur.</p></td>
-    </tr>
-    <tr>
-      <th>x.ppn</th>
-      <td><p>The proportion of the x=axis that is to be included in the plots.</p></td>
-    </tr>
-    <tr>
-      <th>y.ppn</th>
-      <td><p>The proportion of the y=axis that is to be included in the plots.</p></td>
-    </tr>
-    <tr>
-      <th>nx</th>
-      <td><p>The number of plots in the x-dimension.</p></td>
-    </tr>
-    <tr>
-      <th>ny</th>
-      <td><p>The number of plots in the y-dimension.</p></td>
+      <th>.state</th>
+      <td><p>The internal component state. Normally supplied automatically
+by the internal methods for evaluating inlabru predictor expressions.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list with three components:</p><dl>
-<dt><code>plots</code>:</dt><dd><p>A <code>SpatialPolygonsDataFrame</code> object containing the plots that were
-sampled.</p></dd>
-<dt><code>dets</code>:</dt><dd><p>A <code>SpatialPointsDataFrame</code> object containing the locations of the
-points within the plots.</p></dd>
-<dt><code>counts</code>:</dt><dd><p>A <code>dataframe</code> containing the following columns
-<dl>
-<dt><code>x</code>:</dt><dd><p>The x-coordinates of the centres of the plots within the boundary.</p></dd>
-<dt><code>y</code>:</dt><dd><p>The y-coordinates of the centres of the plots within the boundary.</p></dd>
-<dt><code>n</code>:</dt><dd><p>The numbers of points in each plot.</p></dd>
-<dt><code>area</code>:</dt><dd><p>The areas of the plots within the boundary</p></dd></dl></p></dd>
-
-</dl><p>.</p>
+    <p>A vector of values for a component</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='co'># Some features require the raster package</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'><a href='https://rspatial.org/raster'>"raster"</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>&amp;&amp;</span>
-  <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'><a href='https://ggplot2.tidyverse.org'>"ggplot2"</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gorillas</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>
-  <span class='va'>plotpts</span> <span class='op'>&lt;-</span> <span class='fu'>plotsample</span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>, <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span>,
-    x.ppn <span class='op'>=</span> <span class='fl'>0.4</span>, y.ppn <span class='op'>=</span> <span class='fl'>0.4</span>, nx <span class='op'>=</span> <span class='fl'>5</span>, ny <span class='op'>=</span> <span class='fl'>5</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='va'>mesh</span> <span class='op'>&lt;-</span> <span class='fu'>INLA</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.mesh.2d.html'>inla.mesh.2d</a></span><span class='op'>(</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>,
+    offset <span class='op'>=</span> <span class='fl'>2</span>, max.edge <span class='op'>=</span> <span class='fl'>0.25</span>
   <span class='op'>)</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>plotpts</span><span class='op'>$</span><span class='va'>plots</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>plotpts</span><span class='op'>$</span><span class='va'>dets</span>, pch <span class='op'>=</span> <span class='st'>"+"</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span>
+  <span class='va'>spde</span> <span class='op'>&lt;-</span> <span class='fu'>INLA</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html'>inla.spde2.pcmatern</a></span><span class='op'>(</span><span class='va'>mesh</span>,
+    prior.range <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.01</span><span class='op'>)</span>,
+    prior.sigma <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>0.01</span><span class='op'>)</span>
+  <span class='op'>)</span>
+  <span class='va'>data</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPointsDataFrame</a></span><span class='op'>(</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span>, <span class='fl'>5</span>, <span class='fl'>2</span><span class='op'>)</span>,
+    data <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='op'>)</span>
+  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='op'>-</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'>field</span><span class='op'>(</span><span class='va'>coordinates</span>, model <span class='op'>=</span> <span class='va'>spde</span><span class='op'>)</span>,
+    family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>data</span>
+  <span class='op'>)</span>
+  <span class='va'>pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
+    <span class='va'>fit</span>,
+    data <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>0.5</span>, y <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>,
+    formula <span class='op'>=</span> <span class='op'>~</span> <span class='fu'>field_eval</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: CRS object has comment, which is lost in output</span></div><div class='output co'>#&gt; <span class='message'>Loading required namespace: rgeos</span></div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='img'><img src='plotsample-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
-
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
