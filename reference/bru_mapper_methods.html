@@ -180,7 +180,7 @@ ibm_n(mapper, inla_f = FALSE, ...)
 ibm_values(mapper, inla_f = FALSE, ...)
 
 # S3 method for default
-ibm_amatrix(mapper, inla_f = FALSE, ...)
+ibm_amatrix(mapper, input, inla_f = FALSE, ...)
 
 # S3 method for default
 ibm_valid_input(mapper, input, ...)
@@ -284,6 +284,15 @@ names(x) &lt;- value</pre>
     <tr>
       <th>mapper</th>
       <td><p>A mapper S3 object, normally inheriting from <code>bru_mapper</code></p></td>
+    </tr>
+    <tr>
+      <th>inla_f</th>
+      <td><p>logical; when <code>TRUE</code> in <code>ibm_n</code>, <code>ibm_values</code>, and
+<code>ibm_amatrix</code> methods, these must result in values compatible with <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f(...)</a></code>
+an specification and corresponding <code><a href='https://rdrr.io/pkg/INLA/man/inla.stack.html'>INLA::inla.stack(...)</a></code> constructions.
+Implementations do not normally need to do anything different, except
+for mappers of the type needed for hidden multicomponent models such
+as "bym2", which can be handled by <code>bru_mapper_collect</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>

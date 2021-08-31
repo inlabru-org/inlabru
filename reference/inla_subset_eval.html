@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Build an inla data stack from linearisation information — bru_make_stack • inlabru</title>
+<title>Obtain inla index subset information — inla_subset_eval • inlabru</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Build an inla data stack from linearisation information — bru_make_stack" />
-<meta property="og:description" content="Combine linearisation for multiple likelihoods" />
+<meta property="og:title" content="Obtain inla index subset information — inla_subset_eval" />
+<meta property="og:description" content="Subsets for INLA::f() compatible indexing" />
 
 
 
@@ -156,52 +156,36 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Build an inla data stack from linearisation information</h1>
-    <small class="dont-index">Source: <a href='https://github.com/inlabru-org/inlabru/blob/master/R/stack.R'><code>R/stack.R</code></a></small>
-    <div class="hidden name"><code>bru_make_stack.Rd</code></div>
+    <h1>Obtain inla index subset information</h1>
+    <small class="dont-index">Source: <a href='https://github.com/inlabru-org/inlabru/blob/master/R/effect.R'><code>R/effect.R</code></a></small>
+    <div class="hidden name"><code>inla_subset_eval.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Combine linearisation for multiple likelihoods</p>
+    <p>Subsets for <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f()</a></code> compatible indexing</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bru_make_stack</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>inla_subset_eval</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
 
-<span class='co'># S3 method for bru_like</span>
-<span class='fu'>bru_make_stack</span><span class='op'>(</span><span class='va'>lhood</span>, <span class='va'>lin</span>, <span class='va'>idx</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for bru_like_list</span>
-<span class='fu'>bru_make_stack</span><span class='op'>(</span><span class='va'>lhoods</span>, <span class='va'>lin</span>, <span class='va'>idx</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='co'># S3 method for component_list</span>
+<span class='fu'>inla_subset_eval</span><span class='op'>(</span><span class='va'>components</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>...</th>
-      <td><p>Arguments passed on to other methods</p></td>
+      <td><p>Unused.</p></td>
     </tr>
     <tr>
-      <th>lhood</th>
-      <td><p>A <code>bru_like</code> object</p></td>
-    </tr>
-    <tr>
-      <th>lin</th>
-      <td><p>Linearisation information</p><ul>
-<li><p>For <code>.bru_like</code>, a linearisation information list with elements
-<code>A</code> and <code>offset</code></p></li>
-<li><p>For <code>.bru_like_list</code>, a list of linearisation information lists</p></li>
-</ul></td>
-    </tr>
-    <tr>
-      <th>idx</th>
-      <td><p>Output from <code><a href='evaluate_index.html'>evaluate_index(...)</a></code></p></td>
-    </tr>
-    <tr>
-      <th>lhoods</th>
-      <td><p>A <code>bru_like_list</code> object</p></td>
+      <th>components</th>
+      <td><p>A component list.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Finn Lindgren <a href='mailto:finn.lindgren@gmail.com'>finn.lindgren@gmail.com</a></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
