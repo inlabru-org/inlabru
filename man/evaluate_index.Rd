@@ -4,12 +4,14 @@
 \alias{evaluate_index}
 \title{Compute all index values}
 \usage{
-evaluate_index(model, lhoods)
+evaluate_index(model, lhoods, inla_f)
 }
 \arguments{
 \item{model}{A \code{bru_model} object}
 
 \item{lhoods}{A \code{bru__like_list} object}
+
+\item{inla_f}{logical}
 }
 \description{
 Computes the index values matrices for included components

@@ -8,9 +8,9 @@
 \usage{
 index_eval(...)
 
-\method{index_eval}{component}(component, ...)
+\method{index_eval}{component}(component, inla_f, ...)
 
-\method{index_eval}{component_list}(components, ...)
+\method{index_eval}{component_list}(components, inla_f, ...)
 }
 \arguments{
 \item{...}{Unused.}
@@ -18,7 +18,8 @@ index_eval(...)
 \item{component}{A component.}
 }
 \value{
-a list of inla-compatible indices into the latent variables
+a list of indices into the latent variables compatible with the
+component mapper.
 }
 \description{
 Indexes into to the components

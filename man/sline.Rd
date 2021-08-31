@@ -47,9 +47,9 @@ spl <- sline(lns,
 )
 
 if (require(ggplot2, quietly = TRUE)) {
-# Plot the lines
-ggplot() +
-  gg(spl)
+  # Plot the lines
+  ggplot() +
+    gg(spl)
 }
 }
 

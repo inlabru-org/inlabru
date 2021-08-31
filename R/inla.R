@@ -411,17 +411,13 @@ plotmarginal.inla <- function(result,
   requireNamespace("ggplot2")
   vars <- variables.inla(result)
   ovarname <- varname
-  if (paste0("Beta for ", varname) %in% rownames(vars)) {
-    varname <- paste0("Beta for ", varname)
-  }
 
   if (varname %in% c(result$names.fixed, rownames(result$summary.hyperpar)) ||
     (!is.null(index) && (varname %in% names(result$summary.random)))) {
     if (varname %in% rownames(vars) &&
       vars[varname, "type"] == "fixed") {
       marg <- INLA::inla.tmarginal(link, result$marginals.fixed[[varname]])
-    }
-    else if (varname %in% names(result$summary.random)) {
+    } else if (varname %in% names(result$summary.random)) {
       marg <- INLA::inla.tmarginal(link, result$marginals.random[[varname]][[index]])
       ovarname <- paste0(ovarname, " ", index)
       if (ovarname %in% rownames(vars)) {
@@ -430,8 +426,7 @@ plotmarginal.inla <- function(result,
           ovarname <- vars[ovarname, "ID"]
         }
       }
-    }
-    else if (varname %in% rownames(vars) &&
+    } else if (varname %in% rownames(vars) &&
       vars[varname, "type"] == "hyperpar") {
       marg <- INLA::inla.tmarginal(link, result$marginals.hyperpar[[varname]])
     }
@@ -445,7 +440,11 @@ plotmarginal.inla <- function(result,
     df <- data.frame(marg)
     ggplot2::ggplot(data = df, ggplot2::aes(x = .data[["x"]], y = .data[["y"]])) +
       ggplot2::geom_path() +
-      ggplot2::geom_ribbon(ymin = 0, ggplot2::aes(ymax = .data[["y"]]), alpha = 0.1) +
+      ggplot2::geom_ribbon(
+        ymin = 0,
+        ggplot2::aes(ymax = .data[["y"]]),
+        alpha = 0.1
+      ) +
       ggplot2::geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
       ggplot2::geom_segment(x = uq, y = 0, xend = uq, yend = uqy) +
       ggplot2::geom_ribbon(

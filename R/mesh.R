@@ -111,11 +111,11 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #' @examples
 #' \donttest{
 #' if (require(ggplot2, quietly = TRUE)) {
-#' data("mrsea", package = "inlabru")
-#' vrt <- vertices(mrsea$mesh)
-#' ggplot() +
-#'   gg(mrsea$mesh) +
-#'   gg(vrt, color = "red")
+#'   data("mrsea", package = "inlabru")
+#'   vrt <- vertices(mrsea$mesh)
+#'   ggplot() +
+#'     gg(mrsea$mesh) +
+#'     gg(vrt, color = "red")
 #' }
 #' }
 #'
@@ -158,11 +158,11 @@ vertices.inla.mesh <- function(object) {
 #' @examples
 #' \donttest{
 #' if (require(ggplot2, quietly = TRUE)) {
-#' data("mrsea", package = "inlabru")
-#' pxl <- pixels(mrsea$mesh, nx = 50, ny = 50, mask = mrsea$boundary)
-#' ggplot() +
-#'   gg(pxl, fill = "grey", alpha = 0.5) +
-#'   gg(mrsea$mesh)
+#'   data("mrsea", package = "inlabru")
+#'   pxl <- pixels(mrsea$mesh, nx = 50, ny = 50, mask = mrsea$boundary)
+#'   ggplot() +
+#'     gg(pxl, fill = "grey", alpha = 0.5) +
+#'     gg(mrsea$mesh)
 #' }
 #' }
 #'
@@ -308,8 +308,7 @@ tsplit.inla.mesh <- function(mesh, n = 1) {
 
   if (n == 1) {
     return(mesh2)
-  }
-  else {
+  } else {
     return(tsplit.inla.mesh(mesh2, n - 1))
   }
 }

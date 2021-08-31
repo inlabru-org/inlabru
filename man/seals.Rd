@@ -24,10 +24,10 @@ This is a single transect of an aereal photo seal pup survey in the Greenland Se
 }
 \examples{
 if (require(ggplot2, quietly = TRUE)) {
-data(seals, package = "inlabru")
-ggplot() +
-  gg(seals$mesh) +
-  gg(seals$points)
+  data(seals, package = "inlabru")
+  ggplot() +
+    gg(seals$mesh) +
+    gg(seals$points)
 }
 }
 \references{

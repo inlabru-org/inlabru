@@ -470,7 +470,7 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' This also makes evaluator functions with suffix `_eval` available, taking
 #' parameters `main`, `group`, and `replicate`, taking values for where to
 #' evaluate the component effect that are different than those defined in the
-#' component definition itself.
+#' component definition itself (see [component_eval()]).
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
 #' (TODO: review what's needed to allow the result to also be of a different size)
@@ -772,7 +772,7 @@ joint_stackmaker <- function(model, lhoods, state) {
 #' @examples
 #' \donttest{
 #' if (bru_safe_inla() &&
-#'     require(ggplot2, quietly = TRUE)) {
+#'   require(ggplot2, quietly = TRUE)) {
 #'
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
@@ -895,16 +895,10 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' @param object An object obtained by calling [bru()] or [lgcp()].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' the prediction.
-#' @param formula A formula defining an R expression to evaluate for each generated
-#' sample. If `NULL`, the latent and hyperparameter states are generated
-#' as named list elements. In addition to the component names (that give the effect
-#' of each component evaluated for the input data), the suffix `_latent` can be used
-#' to directly access the latent state for a component, and the suffix `_eval`
-#' can be used to evaluate a component at other input values than the expressions
-#' defined in the component definition itself, e.g. `field_eval(cbind(x,y))` for a
-#' component defined with `field(coordinates, ...)`. For "iid" models with
-#' `mapper = bru_mapper_index(n)`, `rnorm()` is used to generate new realisations for
-#' indices greater than `n`.
+#' @param formula A formula where the right hand side defines an R expression
+#' to evaluate for each generated sample. If `NULL`, the latent and
+#' hyperparameter states are returned as named list elements.
+#' See Details for more information.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics. The default is rather low but provides
 #' a quick approximate result.
@@ -923,6 +917,17 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' prediciton summary has the same number of rows as `data`, then the output is
 #' a `Spatial*DataFrame` object. Default `FALSE`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
+#' @details
+#' In addition to the component names (that give the effect
+#' of each component evaluated for the input data), the suffix `_latent`
+#' variable name can be used to directly access the latent state for a component,
+#' and the suffix function `_eval` can be used to evaluate a component at
+#' other input values than the expressions defined in the component definition
+#' itself, e.g. `field_eval(cbind(x, y))` for a component that was defined with
+#' `field(coordinates, ...)` (see also [component_eval()]).
+#'
+#' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
+#' generate new realisations for indices greater than `n`.
 #'
 #' @return a data.frame or Spatial* object with predicted mean values and other
 #' summary statistics attached.
@@ -943,11 +948,9 @@ predict.bru <- function(object,
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(data)) {
     data <- as.list(setNames(data, data))
-  }
-  else if (inherits(data, "inla.mesh")) {
+  } else if (inherits(data, "inla.mesh")) {
     data <- vertices(data)
-  }
-  else if (inherits(data, "formula")) {
+  } else if (inherits(data, "formula")) {
     stop("Formula supplied as data to predict.bru(). Please check your argument order/names.")
   }
 
@@ -1052,16 +1055,10 @@ predict.bru <- function(object,
 #' @param object A `bru` object obtained by calling [bru()].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' sampling.
-#' @param formula A formula defining an R expression to evaluate for each generated
-#' sample. If `NULL`, the latent and hyperparameter states are returned
-#' as named list elements. In addition to the component names (that give the effect
-#' of each component evaluated for the input data), the suffix `_latent` can be used
-#' to directly access the latent state for a component, and the suffix `_eval`
-#' can be used to evaluate a component at other input values than the expressions
-#' defined in the component definition itself, e.g. `field_eval(cbind(x,y))` for a
-#' component defined with `field(coordinates, ...)`. For "iid" models with
-#' `mapper = bru_mapper_index(n)`, `rnorm()` is used to generate new realisations for
-#' indices greater than `n`.
+#' @param formula A formula where the right hand side defines an R expression
+#' to evaluate for each generated sample. If `NULL`, the latent and
+#' hyperparameter states are returned as named list elements.
+#' See Details for more information.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics.
 #' The default, 100, is rather low but provides a quick approximate result.
@@ -1077,6 +1074,17 @@ predict.bru <- function(object,
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
 #' @param ... additional, unused arguments.
+#' @details
+#' In addition to the component names (that give the effect
+#' of each component evaluated for the input data), the suffix `_latent`
+#' variable name can be used to directly access the latent state for a component,
+#' and the suffix function `_eval` can be used to evaluate a component at
+#' other input values than the expressions defined in the component definition
+#' itself, e.g. `field_eval(cbind(x, y))` for a component that was defined with
+#' `field(coordinates, ...)` (see also [component_eval()]).
+#'
+#' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
+#' generate new realisations for indices greater than `n`.
 #'
 #' @return List of generated samples
 #' @seealso [predict.bru]
@@ -1097,11 +1105,9 @@ generate.bru <- function(object,
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(data)) {
     data <- as.list(setNames(data, data))
-  }
-  else if (inherits(data, "inla.mesh")) {
+  } else if (inherits(data, "inla.mesh")) {
     data <- vertices(data)
-  }
-  else if (inherits(data, "formula")) {
+  } else if (inherits(data, "formula")) {
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }
 
@@ -1230,8 +1236,7 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
     # Convergence?
     if (err < mcerr) {
       converged <- TRUE
-    }
-    else {
+    } else {
       lest <- (est + lest) / 2
     }
   }
@@ -1698,7 +1703,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
-    A <- evaluate_A(model, lhoods)
+    A <- evaluate_A(model, lhoods, inla_f = FALSE) # Access the full states
     lin <- bru_compute_linearisation(
       model,
       lhoods = lhoods,
@@ -1714,7 +1719,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       state = list(states[[length(states)]])
     )
   } else {
-    idx <- evaluate_index(model, lhoods)
+    idx <- evaluate_index(model, lhoods, inla_f = TRUE)
     stk <- bru_make_stack(lhoods, lin, idx)
   }
   stk.data <- INLA::inla.stack.data(stk)

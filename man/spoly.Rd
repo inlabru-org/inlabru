@@ -46,9 +46,9 @@ pts <- data.frame(
 pol <- spoly(pts)
 
 if (require(ggplot2, quietly = TRUE)) {
-# Plot it!
-ggplot() +
-  gg(pol)
+  # Plot it!
+  ggplot() +
+    gg(pol)
 }
 }
 

@@ -382,8 +382,12 @@ evaluate_effect_multi.component_list <- function(components, state, data,
 #' expression for a state.
 #' * `"list"` A list where each column contains the evaluated predictor
 #' expression for a state.
+#' @param inla_f logical
 #'
 #' Default: "auto"
+#' @details For each component, e.g. "name", the state values are available as
+#' `name_latent`, and arbitrary evaluation can be done with `name_eval(...)`, see
+#' [component_eval()].
 #' @return A list or matrix is returned, as specified by `format`
 #' @keywords internal
 #' @rdname evaluate_predictor
@@ -454,7 +458,9 @@ evaluate_predictor <- function(model,
       .iid_precision <- paste0("Precision_for_", .comp$label)
       .iid_cache <- list()
       .iid_cache_index <- NULL
-      eval_fun <- function(main, group = NULL, replicate = NULL, .state = NULL) {
+      eval_fun <- function(main, group = NULL,
+                           replicate = NULL,
+                           .state = NULL) {
         if (is.null(group)) {
           group <- rep(1, NROW(main))
         }
@@ -573,6 +579,52 @@ evaluate_predictor <- function(model,
 
 
 
+#' Evaluate component values in predictor expressions
+#'
+#' In predictor expressions, `name_eval(...)` can be used to evaluate
+#' the effect of a component called "name".
+#'
+#' @param main,group,replicate Specification of where to evaluate a component.
+#'   The three inputs are passed on to the respective `bru_mapper` methods.
+#' @param .state The internal component state. Normally supplied automatically
+#' by the internal methods for evaluating inlabru predictor expressions.
+#' @return A vector of values for a component
+#' @aliases component_eval
+#' @examples
+#' \dontrun{
+#' if (bru_safe_inla()) {
+#'   mesh <- INLA::inla.mesh.2d(
+#'     cbind(0, 0),
+#'     offset = 2, max.edge = 0.25
+#'   )
+#'   spde <- INLA::inla.spde2.pcmatern(mesh,
+#'     prior.range = c(0.1, 0.01),
+#'     prior.sigma = c(2, 0.01)
+#'   )
+#'   data <- sp::SpatialPointsDataFrame(
+#'     matrix(runif(10), 5, 2),
+#'     data = data.frame(y = rnorm(5))
+#'   )
+#'   fit <- bru(y ~ -1 + field(coordinates, model = spde),
+#'     family = "gaussian", data = data
+#'   )
+#'   pred <- predict(
+#'     fit,
+#'     data = data.frame(x = 0.5, y = 0.5),
+#'     formula = ~ field_eval(cbind(x, y))
+#'   )
+#' }
+#' }
+component_eval <- function(main,
+                           group = NULL,
+                           replicate = NULL,
+                           .state = NULL) {
+  stop(paste0(
+    "In your predictor expression, use the literal name of a component instead\n",
+    "of 'component_eval(...)', not eval_fun.  See ?component_eval for more information."
+  ))
+}
+
 
 
 
@@ -582,8 +634,9 @@ evaluate_predictor <- function(model,
 #'
 #' @param model A `bru_model` object
 #' @param lhoods A `bru__like_list` object
+#' @param inla_f logical
 #' @rdname evaluate_A
-evaluate_A <- function(model, lhoods) {
+evaluate_A <- function(model, lhoods, inla_f) {
   stopifnot(inherits(model, "bru_model"))
   lapply(
     lhoods,
@@ -594,7 +647,10 @@ evaluate_A <- function(model, lhoods) {
         lh[["exclude_components"]]
       )
 
-      amatrix_eval(model$effects[included], data = lh[["data"]])
+      amatrix_eval(model$effects[included],
+        data = lh[["data"]],
+        inla_f = inla_f
+      )
     }
   )
 }
@@ -605,8 +661,9 @@ evaluate_A <- function(model, lhoods) {
 #'
 #' @param model A `bru_model` object
 #' @param lhoods A `bru__like_list` object
+#' @param inla_f logical
 #' @rdname evaluate_index
-evaluate_index <- function(model, lhoods) {
+evaluate_index <- function(model, lhoods, inla_f) {
   stopifnot(inherits(model, "bru_model"))
   included <-
     unique(do.call(
@@ -623,5 +680,5 @@ evaluate_index <- function(model, lhoods) {
       )
     ))
 
-  index_eval(model[["effects"]][included])
+  index_eval(model[["effects"]][included], inla_f = inla_f)
 }

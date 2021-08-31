@@ -24,10 +24,10 @@
 #'
 #' @examples
 #' if (require(ggplot2, quietly = TRUE)) {
-#' data(seals, package = "inlabru")
-#' ggplot() +
-#'   gg(seals$mesh) +
-#'   gg(seals$points)
+#'   data(seals, package = "inlabru")
+#'   ggplot() +
+#'     gg(seals$mesh) +
+#'     gg(seals$points)
 #' }
 NULL
 

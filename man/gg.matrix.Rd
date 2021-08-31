@@ -24,9 +24,9 @@ Requires the \code{ggplot2} package.
 }
 \examples{
 if (require("ggplot2", quietly = TRUE)) {
-A <- matrix(runif(100), nrow = 10)
-ggplot() +
-  gg(A)
+  A <- matrix(runif(100), nrow = 10)
+  ggplot() +
+    gg(A)
 }
 }
 \seealso{

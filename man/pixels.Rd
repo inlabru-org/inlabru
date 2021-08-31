@@ -25,11 +25,11 @@ Generate \code{SpatialPixels} covering an \code{inla.mesh}
 \examples{
 \donttest{
 if (require(ggplot2, quietly = TRUE)) {
-data("mrsea", package = "inlabru")
-pxl <- pixels(mrsea$mesh, nx = 50, ny = 50, mask = mrsea$boundary)
-ggplot() +
-  gg(pxl, fill = "grey", alpha = 0.5) +
-  gg(mrsea$mesh)
+  data("mrsea", package = "inlabru")
+  pxl <- pixels(mrsea$mesh, nx = 50, ny = 50, mask = mrsea$boundary)
+  ggplot() +
+    gg(pxl, fill = "grey", alpha = 0.5) +
+    gg(mrsea$mesh)
 }
 }
 

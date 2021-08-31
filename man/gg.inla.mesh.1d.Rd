@@ -35,7 +35,7 @@ Requires the \code{ggplot2} package.
 \donttest{
 # Some features use the INLA package.
 if (require("INLA", quietly = TRUE) &&
-    require("ggplot2", quietly = TRUE)) {
+  require("ggplot2", quietly = TRUE)) {
 
   # Create a 1D mesh
 

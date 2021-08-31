@@ -50,7 +50,7 @@ test_that("1D LGCP fitting", {
 
   expect_equal(
     fit$summary.random$spde1D$mean[c(1, 27, 50)],
-    c(-0.4146421,  0.1373841, -3.2198098),
+    c(-0.4146421, 0.1373841, -3.2198098),
     tolerance = midtol
   )
   expect_equal(
@@ -139,7 +139,7 @@ test_that("1D LGCP fitting", {
 
   expect_equal(
     fit$summary.random$spde1D$mean[c(1, 27, 50)],
-    c(-0.4477744,  0.3068381, -1.7472893),
+    c(-0.4477744, 0.3068381, -1.7472893),
     tolerance = midtol
   )
   expect_equal(

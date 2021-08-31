@@ -5,6 +5,10 @@
 
 * Allow `list()` data input, and predictors where the size of
   data/effect/predictor/response aren't equal
+  
+* Add `bru_mapper_collect` class for handling sequential collections of
+  mappers, including collections where all but the first mapper is hidden from the
+  `INLA::f()` arguments `n` and `values`, as needed to support e.g. "bym2" models.
 
 # inlabru 2.3.1
 

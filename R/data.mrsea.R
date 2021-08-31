@@ -26,12 +26,12 @@
 #'
 #' @examples
 #' if (require(ggplot2, quietly = TRUE)) {
-#' data(mrsea)
-#' ggplot() +
-#'   gg(mrsea$mesh) +
-#'   gg(mrsea$samplers) +
-#'   gg(mrsea$points) +
-#'   gg(mrsea$boundary)
+#'   data(mrsea)
+#'   ggplot() +
+#'     gg(mrsea$mesh) +
+#'     gg(mrsea$samplers) +
+#'     gg(mrsea$points) +
+#'     gg(mrsea$boundary)
 #' }
 NULL
 

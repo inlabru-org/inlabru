@@ -78,9 +78,9 @@ sfill <- function(data, where = NULL) {
 #' )
 #'
 #' if (require(ggplot2, quietly = TRUE)) {
-#' # Plot the lines
-#' ggplot() +
-#'   gg(spl)
+#'   # Plot the lines
+#'   ggplot() +
+#'     gg(spl)
 #' }
 #' }
 #'
@@ -140,9 +140,9 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
 #' pol <- spoly(pts)
 #'
 #' if (require(ggplot2, quietly = TRUE)) {
-#' # Plot it!
-#' ggplot() +
-#'   gg(pol)
+#'   # Plot it!
+#'   ggplot() +
+#'     gg(pol)
 #' }
 #' }
 #'
@@ -184,14 +184,14 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(NA_character_), to
 #' # Compare original and transformed mesh
 #'
 #' if (require(ggplot2, quietly = TRUE)) {
-#' multiplot(
-#'   ggplot() +
-#'     gg(gorillas$mesh) +
-#'     ggtitle("Original mesh"),
-#'   ggplot() +
-#'     gg(tmesh) +
-#'     ggtitle("Transformed mesh")
-#' )
+#'   multiplot(
+#'     ggplot() +
+#'       gg(gorillas$mesh) +
+#'       ggtitle("Original mesh"),
+#'     ggplot() +
+#'       gg(tmesh) +
+#'       ggtitle("Transformed mesh")
+#'   )
 #' }
 #' }
 #'

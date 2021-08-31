@@ -19,8 +19,7 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   detdata.dsdata <- function(data, detection = NULL, ...) {
     if (is.null(detection)) {
       return(data$effort[as.detection(data)[, "start"], ])
-    }
-    else {
+    } else {
       return(data$effort[detection[, "start"], ])
     }
   }

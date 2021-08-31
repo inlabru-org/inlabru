@@ -177,8 +177,7 @@ glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
 
   if (is.null(col)) {
     plot(object, rgl = TRUE, add = add, ...)
-  }
-  else {
+  } else {
     plot(object, rgl = TRUE, add = add, col = col, ...)
   }
 }

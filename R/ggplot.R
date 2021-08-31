@@ -111,13 +111,13 @@ gg <- function(data, ...) {
 #' @examples
 #' \dontrun{
 #' if (require("ggplot2", quietly = TRUE)) {
-#' # Load the Gorilla data
-#' data(gorillas, package = "inlabru")
+#'   # Load the Gorilla data
+#'   data(gorillas, package = "inlabru")
 #'
-#' # Create a base map centered around the nests and plot the boundary as well as the nests
-#' gmap(gorillas$nests, maptype = "satellite") +
-#'   gm(gorillas$boundary) +
-#'   gm(gorillas$nests, color = "white", size = 0.5)
+#'   # Create a base map centered around the nests and plot the boundary as well as the nests
+#'   gmap(gorillas$nests, maptype = "satellite") +
+#'     gm(gorillas$boundary) +
+#'     gm(gorillas$nests, color = "white", size = 0.5)
 #' }
 #' }
 #'
@@ -143,9 +143,9 @@ gm <- function(data, ...) {
 #' @importFrom rlang .data
 #' @examples
 #' if (require("ggplot2", quietly = TRUE)) {
-#' A <- matrix(runif(100), nrow = 10)
-#' ggplot() +
-#'   gg(A)
+#'   A <- matrix(runif(100), nrow = 10)
+#'   ggplot() +
+#'     gg(A)
 #' }
 gg.matrix <- function(data, mapping = NULL, ...) {
   requireNamespace("ggplot2")
@@ -626,16 +626,16 @@ gg.SpatialPixelsDataFrame <- function(data,
 #' @family geomes for spatial data
 #' @examples
 #' if (require("ggplot2", quietly = TRUE)) {
-#' # Load Gorilla data
+#'   # Load Gorilla data
 #'
-#' data(gorillas, package = "inlabru")
+#'   data(gorillas, package = "inlabru")
 #'
-#' # Turn elevation covariate into SpatialPixels
-#' pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
+#'   # Turn elevation covariate into SpatialPixels
+#'   pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
 #'
-#' # Plot the pixel centers
-#' ggplot() +
-#'   gg(pxl, size = 0.1)
+#'   # Plot the pixel centers
+#'   ggplot() +
+#'     gg(pxl, size = 0.1)
 #' }
 gg.SpatialPixels <- function(data, ...) {
   gg(SpatialPoints(data), ...)
@@ -773,7 +773,7 @@ gg.inla.mesh <- function(data,
 #' \donttest{
 #' # Some features use the INLA package.
 #' if (require("INLA", quietly = TRUE) &&
-#'     require("ggplot2", quietly = TRUE)) {
+#'   require("ggplot2", quietly = TRUE)) {
 #'
 #'   # Create a 1D mesh
 #'
@@ -865,14 +865,14 @@ gg.RasterLayer <- function(data, mapping = ggplot2::aes(x = .data[["x"]], y = .d
 #' @examples
 #' \dontrun{
 #' if (require("ggplot2", quietly = TRUE)) {
-#' # Generate some data and fit a simple model
-#' input.df <- data.frame(x = cos(1:10))
-#' input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
-#' fit <- bru(y ~ x, family = "gaussian", data = input.df)
-#' summary(fit)
+#'   # Generate some data and fit a simple model
+#'   input.df <- data.frame(x = cos(1:10))
+#'   input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
+#'   fit <- bru(y ~ x, family = "gaussian", data = input.df)
+#'   summary(fit)
 #'
-#' # Plot the posterior of the model's x-effect
-#' plot(fit, "x")
+#'   # Plot the posterior of the model's x-effect
+#'   plot(fit, "x")
 #' }
 #' }
 #'
@@ -989,9 +989,7 @@ plot.prediction_old <- function(..., property = "median") {
     # This still causes a warning since the violin plot does not like the width argument
     # suppressWarnings(print(plt))
     return(plt)
-  }
-
-  else if (attr(data, "type") == "0d") {
+  } else if (attr(data, "type") == "0d") {
     dnames <- colnames(data)
     ggp <- ggplot2::ggplot()
 
@@ -1021,9 +1019,7 @@ plot.prediction_old <- function(..., property = "median") {
     }
 
     ggp
-  }
-
-  else if (attr(data, "type") == "1d") {
+  } else if (attr(data, "type") == "1d") {
     data <- do.call(
       rbind,
       lapply(
@@ -1058,10 +1054,7 @@ plot.prediction_old <- function(..., property = "median") {
 
     # Plot graph
     ggp
-  }
-
-
-  else if (attr(data, "type") == "spatial") {
+  } else if (attr(data, "type") == "spatial") {
     # ggplot() + gg.col(ggopts$data, color = data$mean) + scale_fill_gradientn(colours = topo.colors(100))
     pixelplot.mesh(mesh = ggopts$mesh, col = data[, property], property = property, ...)
   }
@@ -1087,12 +1080,12 @@ plot.prediction_old <- function(..., property = "median") {
 #'
 #' @examples
 #' if (require("ggplot2", quietly = TRUE)) {
-#' df <- data.frame(x = 1:10, y = 1:10, z = 11:20)
-#' pl1 <- ggplot(data = df) +
-#'   geom_line(mapping = aes(x, y), color = "red")
-#' pl2 <- ggplot(data = df) +
-#'   geom_line(mapping = aes(x, z), color = "blue")
-#' multiplot(pl1, pl2, cols = 2)
+#'   df <- data.frame(x = 1:10, y = 1:10, z = 11:20)
+#'   pl1 <- ggplot(data = df) +
+#'     geom_line(mapping = aes(x, y), color = "red")
+#'   pl2 <- ggplot(data = df) +
+#'     geom_line(mapping = aes(x, z), color = "blue")
+#'   multiplot(pl1, pl2, cols = 2)
 #' }
 #' @export
 #

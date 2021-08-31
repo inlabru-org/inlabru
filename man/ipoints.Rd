@@ -89,7 +89,7 @@ points in the one-dimensional case.
 \examples{
 \donttest{
 if (require("INLA", quietly = TRUE) &&
-    require("ggplot2", quietly = TRUE)) {
+  require("ggplot2", quietly = TRUE)) {
 
   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 

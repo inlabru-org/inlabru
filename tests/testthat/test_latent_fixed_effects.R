@@ -9,9 +9,9 @@ test_that("basic intercept model", {
   mycomp <- y ~ 1
   mydata <- local_basic_intercept_testdata()
   fit <- bru(mycomp,
-             family = "normal",
-             data = mydata,
-             options = options
+    family = "normal",
+    data = mydata,
+    options = options
   )
 
   expect_equal(
@@ -34,9 +34,9 @@ test_that("basic intercept model, spatial data", {
   coordinates(mydata) <- c("coord1", "coord2")
 
   fit <- bru(mycomp,
-             family = "normal",
-             data = mydata,
-             options = options
+    family = "normal",
+    data = mydata,
+    options = options
   )
 
   expect_equal(

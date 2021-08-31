@@ -51,7 +51,7 @@ In inlabru this can be achived using two ways of using the \code{main} parameter
 }
 
 In the first example inlabru will interpret the map parameter as an expression to be evaluated within
-the data provided. Since \eqn{x} is a knonwn covariate it will know how to calculate it. The second
+the data provided. Since \eqn{x} is a known covariate it will know how to calculate it. The second
 example is an expression as well but it uses a function alled \code{mySquareFun}. This function is
 defined by user but has wo be accessible within the work space when setting up the compoonents.
 The third example provides the function \code{myOtherSquareFun} directly and not within an expression.

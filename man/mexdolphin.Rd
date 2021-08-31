@@ -38,22 +38,22 @@ distance 8 km (transect half-width 8 km).
 \examples{
 \donttest{
 if (require("ggplot2", quietly = TRUE)) {
-data(mexdolphin, package = "inlabru")
-ggplot() +
-  gg(mexdolphin$mesh) +
-  gg(mexdolphin$ppoly, color = "blue") +
-  gg(mexdolphin$samplers) +
-  gg(mexdolphin$points, aes(size = size), color = "red") +
-  coord_equal()
+  data(mexdolphin, package = "inlabru")
+  ggplot() +
+    gg(mexdolphin$mesh) +
+    gg(mexdolphin$ppoly, color = "blue") +
+    gg(mexdolphin$samplers) +
+    gg(mexdolphin$points, aes(size = size), color = "red") +
+    coord_equal()
 
-ggplot() +
-  gg(mexdolphin$mesh, col = mexdolphin$lambda, mask = mexdolphin$ppoly) +
-  coord_equal()
+  ggplot() +
+    gg(mexdolphin$mesh, col = mexdolphin$lambda, mask = mexdolphin$ppoly) +
+    coord_equal()
 }
 }
 \dontrun{
-if (requireNamespace("ggmap", quietly = TRUE),
-    require("ggplot2", quietly = TRUE)) {
+if (requireNamespace("ggmap", quietly = TRUE) &&
+  require("ggplot2", quietly = TRUE)) {
   gmap(mexdolphin$depth) +
     gm(mexdolphin$ppoly, color = "blue") +
     gm(mexdolphin$samplers) +

@@ -223,8 +223,7 @@ get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
   if (is.blocks) {
     data$Unit <- data$Block.Label
     name.label <- "Block.Label"
-  }
-  else {
+  } else {
     data$Unit <- data$Transect.Label
     name.label <- "Transect.Label"
   }

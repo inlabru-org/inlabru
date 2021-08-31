@@ -110,8 +110,7 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
     len <- function(x) {
       abs(x)
     }
-  }
-  else {
+  } else {
     n.lines <- dim(sp)[1]
     len <- function(x) {
       apply(x^2, MARGIN = 1, function(y) {
@@ -127,8 +126,7 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
         # weights
         w <- rep(1, n.lines)
         wl <- w * len(ep - sp)
-      }
-      else if (geometry == "geo") {
+      } else if (geometry == "geo") {
         stop("Geometry geo not supported")
       }
 
@@ -171,13 +169,10 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
 
       # Index of line a point comes from
       line.idx <- c(1:n.lines, 1:n.lines)
-    }
-
-    else {
+    } else {
       stop("Gaussian quadrature with n>3 not implemented")
     }
-  }
-  else if (scheme == "twosided-gaussian") {
+  } else if (scheme == "twosided-gaussian") {
     if (geometry == "geo") {
       stop("Geometry geo not supported")
     }
@@ -187,8 +182,7 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
     w <- 0.5 * rbind(ips1$w, ips2$w)
     wl <- 0.5 * rbind(ips1$wl, ips2$wl)
     line.idx <- rbind(ips1$line.idx, ips2$line.idx)
-  }
-  else if (scheme == "equidistant") {
+  } else if (scheme == "equidistant") {
     if (geometry == "geo") {
       stop("Geometry geo not supported")
     }
@@ -204,8 +198,7 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
     wl <- w * (len(ep - sp)[rep(1:n.lines, n.points)])
     # Index of line a point comes from
     line.idx <- rep(1:n.lines, n.points)
-  }
-  else if (scheme == "trapezoid") {
+  } else if (scheme == "trapezoid") {
     if (geometry == "geo") {
       stop("Geometry geo not supported")
     }
@@ -223,8 +216,7 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
     wl <- w * (len(ep - sp)[rep(1:n.lines, n.points)])
     # Index of line a point comes from
     line.idx <- rep(1:n.lines, n.points)
-  }
-  else if (scheme == "fixed") {
+  } else if (scheme == "fixed") {
     ips <- data.frame(tmp = sp)
     # colnames(ips) = coords
     w <- rep(1, length(sp))

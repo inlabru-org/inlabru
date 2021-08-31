@@ -23,7 +23,7 @@ test_that("Component construction: linear model", {
     )
   )
 
-  idx <- index_eval(cmp)
+  idx <- index_eval(cmp, inla_f = FALSE)
   expect_type(idx, "list")
   expect_equal(names(idx)[1], "beta")
   expect_equal(names(idx)[2], "beta.group")
@@ -31,7 +31,7 @@ test_that("Component construction: linear model", {
   expect_equal(idx$beta, 1)
 
   # A-matrix
-  A <- amatrix_eval(cmp, data = df)
+  A <- amatrix_eval(cmp, data = df, inla_f = FALSE)
   expect_s4_class(A, "dgCMatrix")
   expect_equal(nrow(A), 10)
   expect_equal(ncol(A), 1)

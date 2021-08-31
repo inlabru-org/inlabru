@@ -29,12 +29,12 @@ Data imported from package MRSea, see \url{http://creem2.st-andrews.ac.uk/softwa
 }
 \examples{
 if (require(ggplot2, quietly = TRUE)) {
-data(mrsea)
-ggplot() +
-  gg(mrsea$mesh) +
-  gg(mrsea$samplers) +
-  gg(mrsea$points) +
-  gg(mrsea$boundary)
+  data(mrsea)
+  ggplot() +
+    gg(mrsea$mesh) +
+    gg(mrsea$samplers) +
+    gg(mrsea$points) +
+    gg(mrsea$boundary)
 }
 }
 \references{

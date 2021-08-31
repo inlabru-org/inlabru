@@ -257,9 +257,11 @@ bru_compute_linearisation.bru_like <- function(lhood,
     # and possibly expand to full size
     if (length(pred0) == 1) {
       if (is.data.frame(data) ||
-          inherits(data, c("SpatialPointsDataFrame",
-                           "SpatialPolygonsDataFrame",
-                           "SpatialLinesDataFrame"))) {
+        inherits(data, c(
+          "SpatialPointsDataFrame",
+          "SpatialPolygonsDataFrame",
+          "SpatialLinesDataFrame"
+        ))) {
         pred0 <- rep(pred0, NROW(data))
       }
     }

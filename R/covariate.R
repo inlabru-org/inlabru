@@ -101,9 +101,7 @@ make.covariate <- function(cdata, method = NULL, ...) {
     return(function(loc) {
       method(cdata, loc)
     })
-  }
-
-  else if (class(cdata)[1] == "SpatialPolygonsDataFrame") {
+  } else if (class(cdata)[1] == "SpatialPolygonsDataFrame") {
     if (is.null(method)) {
       method <- shapefile.to.covariate
     }
@@ -156,8 +154,7 @@ get.value <- function(covariate, loc) {
 get.max <- function(covariate, loc = NULL) {
   if (is.null(loc)) {
     return(max(as.vector(covariate$values)))
-  }
-  else {
+  } else {
     vals <- get.value(covariate, loc)
     return(max(vals))
   }
@@ -176,8 +173,7 @@ get.max <- function(covariate, loc = NULL) {
 get.min <- function(covariate, loc = NULL) {
   if (is.null(loc)) {
     return(max(as.vector(covariate$values)))
-  }
-  else {
+  } else {
     vals <- get.value(covariate, loc)
     return(min(vals))
   }

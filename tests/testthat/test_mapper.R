@@ -81,7 +81,9 @@ test_that("User defined mappers", {
     bru_mapper(
       list(n = n),
       new_class = "bm_test",
-      ibm_amatrix = ibm_amatrix.bm_test
+      methods = list(
+        ibm_amatrix = ibm_amatrix.bm_test
+      )
     )
   }
 
@@ -158,4 +160,70 @@ test_that("User defined mappers 2", {
 
 
 
+test_that("mapper collection bru input", {
+  skip_on_cran()
+  local_bru_safe_inla()
+  set.seed(1234L)
 
+  mapper <- bru_mapper_collect(
+    list(
+      u = bru_mapper_index(4),
+      v = bru_mapper_index(4)
+    ),
+    hidden = TRUE
+  )
+  expect_equal(ibm_n(mapper), 8)
+  expect_equal(ibm_n(mapper, inla_f = TRUE), 4)
+  expect_equal(ibm_n(mapper, multi = 1), list(u = 4, v = 4))
+  expect_equal(ibm_values(mapper), seq_len(8))
+  expect_equal(ibm_values(mapper, inla_f = TRUE), seq_len(4))
+  expect_equal(
+    as.data.frame(ibm_values(mapper, multi = 1)),
+    list(u = seq_len(4), v = seq_len(4)),
+    ignore_attr = TRUE
+  )
+
+  list_data <- list(u = 1:3, v = 2:4)
+  A <- Matrix::bdiag(
+    Matrix::sparseMatrix(
+      i = 1:3,
+      j = 1:3,
+      x = 1,
+      dims = c(3, 4)
+    ),
+    Matrix::sparseMatrix(
+      i = 1:3,
+      j = 2:4,
+      x = 1,
+      dims = c(3, 4)
+    )
+  )
+  A <- as(A, "dgTMatrix")
+  expect_equal(ibm_amatrix(mapper, list_data), A)
+
+  data <- data.frame(val = 1:3, y = 1:3)
+
+  cmp1 <- y ~
+  -1 +
+    indep(list(val),
+      model = "bym",
+      mapper = mapper,
+      graph = Matrix::Diagonal(4) + 1
+    )
+  fit1 <- bru(cmp1, family = "gaussian", data = data)
+
+  cmp2 <- y ~
+  -1 +
+    indep(list(val),
+      model = "bym",
+      n = 4,
+      graph = Matrix::Diagonal(4) + 1
+    )
+  fit2 <- bru(cmp2, family = "gaussian", data = data)
+
+  expect_equal(
+    fit1$summary.hyperpar,
+    fit2$summary.hyperpar,
+    tolerance = lowtol
+  )
+})

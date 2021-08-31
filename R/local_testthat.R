@@ -230,6 +230,7 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
   local_testthat_tolerances(envir = envir)
   local_bru_options_set(
     control.compute = list(dic = FALSE, waic = FALSE),
+    inla.mode = "classic",
     envir = envir
   )
 }

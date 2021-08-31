@@ -80,7 +80,7 @@ directly available to the predictor expression, with a \verb{_latent} suffix.
 This also makes evaluator functions with suffix \verb{_eval} available, taking
 parameters \code{main}, \code{group}, and \code{replicate}, taking values for where to
 evaluate the component effect that are different than those defined in the
-component definition itself.}
+component definition itself (see \code{\link[=component_eval]{component_eval()}}).}
 
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
 involve several rows of the input data to influence the same row.
