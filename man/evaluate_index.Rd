@@ -4,14 +4,18 @@
 \alias{evaluate_index}
 \title{Compute all index values}
 \usage{
-evaluate_index(model, lhoods, inla_f)
+evaluate_index(model, lhoods)
 }
 \arguments{
 \item{model}{A \code{bru_model} object}
 
 \item{lhoods}{A \code{bru__like_list} object}
-
-\item{inla_f}{logical}
+}
+\value{
+A named list of \code{idx_full} and \code{idx_inla},
+named list of indices, and \code{inla_subset}, and \code{inla_subset},
+a named list of logical subset specifications for extracting the \code{INLA::f()}
+compatible index subsets.
 }
 \description{
 Computes the index values matrices for included components

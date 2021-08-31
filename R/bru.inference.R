@@ -1719,7 +1719,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       state = list(states[[length(states)]])
     )
   } else {
-    idx <- evaluate_index(model, lhoods, inla_f = TRUE)
+    idx <- evaluate_index(model, lhoods)
     stk <- bru_make_stack(lhoods, lin, idx)
   }
   stk.data <- INLA::inla.stack.data(stk)

@@ -24,6 +24,15 @@ input_eval <- function(...) {
 index_eval <- function(...) {
   UseMethod("index_eval")
 }
+#' Obtain inla index subset information
+#'
+#' Subsets for `INLA::f()` compatible indexing
+#'
+#' @export
+#' @rdname inla_subset_eval
+inla_subset_eval <- function(...) {
+  UseMethod("inla_subset_eval")
+}
 #' @title Add component input/latent mappers
 #' @description Add missing mappers between input data and latent variables,
 #' based on likelihood data
@@ -74,6 +83,8 @@ ibm_n <- function(mapper, inla_f = FALSE, ...) {
 #' @details
 #' * `ibm_values` Generic. Implementations must return a vector that
 #' would be interpretable by an `INLA::f(..., values = ...)` specification.
+#' The exception is the method for `bru_mapper_multi`, that returns a
+#' multi-column data frame
 #' @export
 #' @rdname bru_mapper
 ibm_values <- function(mapper, inla_f = FALSE, ...) {
@@ -99,6 +110,24 @@ ibm_amatrix <- function(mapper, input, inla_f = FALSE, ...) {
       mapper, input, inla_f = inla_f, ...)
   } else {
     UseMethod("ibm_amatrix")
+  }
+}
+#' @details
+#' * `ibm_inla_subset` Generic.
+#' Implementations must return a logical vector of `TRUE/FALSE` for
+#' the subset such that, given the full A matrix and values output,
+#' `A[, subset, drop = FALSE]` and `values[subset]`
+#' (or `values[subset, , drop = FALSE]` for data.frame values) are equal
+#' to the `inla_f = TRUE` version of A and values. The default method uses
+#' the `ibm_values` output to construct the subset indexing.
+#' @export
+#' @rdname bru_mapper
+ibm_inla_subset <- function(mapper, ...) {
+  if (!is.null(mapper[[".envir"]][["ibm_inla_subset"]])) {
+    mapper[[".envir"]][["ibm_inla_subset"]](
+      mapper, ...)
+  } else {
+    UseMethod("ibm_inla_subset")
   }
 }
 #' @details
@@ -1488,6 +1517,33 @@ ibm_amatrix.default <- function(mapper, input, inla_f = FALSE, ...) {
 }
 
 #' @details
+#' * The default `ibm_inla_subset` method uses
+#' the `ibm_values` output to construct the inla subset indexing, passing
+#' extra arguments such as `multi` on to the methods (this means it supports
+#' both regular vector values and `multi=1` data.frame values).
+#' @export
+#' @rdname bru_mapper
+ibm_inla_subset.default <- function(mapper, ...) {
+  values_full <- ibm_values(mapper, inla_f = FALSE, ...)
+  values_inla <- ibm_values(mapper, inla_f = TRUE, ...)
+  if (is.data.frame(values_full)) {
+    subset <- logical(NROW(values_full))
+    subset[
+      plyr::match_df(
+        cbind(
+          .inla_subset = seq_len(NROW(values_full)),
+          values_full),
+        values_inla,
+        on = names(values_full))[[".inla_subset"]]
+    ] <- TRUE
+  } else {
+    subset <- base::match(values_full, values_inla, nomatch = 0) > 0
+  }
+  subset
+}
+
+
+#' @details
 #' * The default `ibm_valid_input()` method returns an all-TRUE logical vector.
 #' @export
 #' @rdname bru_mapper_methods
@@ -1836,7 +1892,7 @@ ibm_values.bru_mapper_multi <- function(mapper, inla_f = FALSE, multi = 0L, ...)
     })
   } else if (multi == 1) {
     # Expand indices/values. First sub-mapper varies fastest
-    as.list(
+    as.data.frame(
       do.call(
         expand.grid,
         c(
@@ -2650,4 +2706,15 @@ index_eval.component <- function(component, inla_f, ...) {
 
 index_eval.component_list <- function(components, inla_f, ...) {
   lapply(components, function(x) index_eval(x, inla_f = inla_f, ...))
+}
+
+#' @export
+#' @keywords internal
+#' @param components A component list.
+#' @param ... Unused.
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname inla_subset_eval
+
+inla_subset_eval.component_list <- function(components, ...) {
+  lapply(components, function(x) ibm_inla_subset(x[["mapper"]], multi = 1))
 }

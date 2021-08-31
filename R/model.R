@@ -661,9 +661,12 @@ evaluate_A <- function(model, lhoods, inla_f) {
 #'
 #' @param model A `bru_model` object
 #' @param lhoods A `bru__like_list` object
-#' @param inla_f logical
+#' @return A named list of `idx_full` and `idx_inla`,
+#' named list of indices, and `inla_subset`, and `inla_subset`,
+#' a named list of logical subset specifications for extracting the `INLA::f()`
+#' compatible index subsets.
 #' @rdname evaluate_index
-evaluate_index <- function(model, lhoods, inla_f) {
+evaluate_index <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
   included <-
     unique(do.call(
@@ -680,5 +683,9 @@ evaluate_index <- function(model, lhoods, inla_f) {
       )
     ))
 
-  index_eval(model[["effects"]][included], inla_f = inla_f)
+  list(
+    idx_full = index_eval(model[["effects"]][included], inla_f = FALSE),
+    idx_inla = index_eval(model[["effects"]][included], inla_f = TRUE),
+    inla_subset = inla_subset_eval(model[["effects"]][included])
+  )
 }

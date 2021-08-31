@@ -25,7 +25,7 @@ test_that("Linearisation", {
   model <- bru_model(component_list(cmp, lhoods), lhoods)
 
 
-  idx <- evaluate_index(model, lhoods, inla_f = TRUE)
+  idx <- evaluate_index(model, lhoods)
   A <- evaluate_A(model, lhoods, inla_f = FALSE)
   lin0 <- bru_compute_linearisation.bru_model(model, lhoods,
     state = list(Int_y = 0, Int_z = 0, x = 0), A = A
@@ -48,13 +48,9 @@ test_that("Linearisation", {
             BRU.offset = as.vector(lin0[[lh_idx]]$offset)
           ),
           A = lapply(names(lin_A), function(nm) {
-            if (length(idx[[nm]][[nm]]) < NCOL(lin_A[[nm]])) {
-              lin_A[[nm]][, seq_along(idx[[nm]][[nm]]), drop = FALSE]
-            } else {
-              lin_A[[nm]]
-            }
+            lin_A[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
           }),
-          effects = idx[names(lin0[[lh_idx]]$A)]
+          effects = idx[["idx_inla"]][names(lin0[[lh_idx]]$A)]
         )
       }
     )
@@ -64,6 +60,8 @@ test_that("Linearisation", {
       inlabru::inla.stack.mjoin,
       c(stks0, list(compress = TRUE, remove.unused = FALSE))
     )
+
+  stk0_ <- bru_make_stack.bru_like_list(lhoods, lin0, idx)
 
   expect_s3_class(stk0, "inla.data.stack")
 

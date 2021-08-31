@@ -33,6 +33,8 @@ library(INLA)
 library(inlabru)
 library(RColorBrewer)
 library(ggplot2)
+
+bru_options_set(inla.mode = "experimental")
 ```
 
 Introduction
@@ -194,10 +196,10 @@ And plot the median intensity surface
 
 ```{r warning=FALSE,message=FALSE}
 df <- pixels(mesh, mask = boundary)
-int2 <- predict(fit2, df, ~ exp(mySmooth + vegetation))
+int2 <- predict(fit2, df, ~ exp(mySmooth + vegetation), n.samples = 1000)
 
 ggplot() +
-  gg(int2) +
+  gg(int2, aes(fill = q0.025)) +
   gg(boundary, alpha = 0, lwd = 2) +
   gg(nests) +
   coord_equal()
@@ -295,7 +297,7 @@ ggplot() +
   gg(nests) +
   coord_equal()
 ```
-```{r results='hide',warning=FALSE,message=FALSE}
+```{r warning=FALSE,message=FALSE}
 Lambda3 <- predict(
   fit3,
   ipoints(boundary, mesh),
@@ -433,7 +435,7 @@ if ((!.cache_recompute) &&
 Summary and model selection
 
 
-```{r results="hide",warning=FALSE,message=FALSE}
+```{r warning=FALSE,message=FALSE}
 summary(efit)
 deltaIC(fit1, fit2, fit3, efit)
 ```

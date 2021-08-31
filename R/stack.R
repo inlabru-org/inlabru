@@ -90,27 +90,21 @@ bru_make_stack <- function(...) {
 #' * For `.bru_like`, a linearisation information list with elements
 #' `A` and `offset`
 #' * For `.bru_like_list`, a list of linearisation information lists
-#' @param idx Output from `evaluate_index(..., inla_f = TRUE)`
+#' @param idx Output from `evaluate_index(...)`
 #' @export
 #' @rdname bru_make_stack
 bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
-  INLA::inla.stack(
+    INLA::inla.stack(
     list(
       BRU.response = lhood$data[[lhood$response]],
       BRU.E = lhood[["E"]],
       BRU.Ntrials = lhood[["Ntrials"]],
       BRU.offset = as.vector(lin$offset)
     ),
-    # TODO: Add roper check that the reduced matrix has size
-    # matching ibm_n(..., inla_f = TRUE)
     A = lapply(names(lin$A), function(nm) {
-      if (length(idx[[nm]][[nm]]) < NCOL(lin$A[[nm]])) {
-        lin$A[[nm]][, seq_along(idx[[nm]][[nm]]), drop = FALSE]
-      } else {
-        lin$A[[nm]]
-      }
+      lin$A[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
     }),
-    effects = idx[names(lin$A)],
+    effects = idx[["idx_inla"]][names(lin$A)],
     remove.unused = FALSE
   )
 }
@@ -124,13 +118,18 @@ bru_make_stack.bru_like_list <- function(lhoods, lin, idx, ...) {
       seq_along(lhoods),
       function(lh_idx) {
         bru_make_stack(
-          lhoods[[lh_idx]],
+          lhood = lhoods[[lh_idx]],
           lin = lin[[lh_idx]],
-          idx
+          idx = idx
         )
       }
     )
 
+  # TODO: Either fix the check in inla that removes n&values information from
+  # model="linear" input in INLA::f(), making it unable to handle all-NA linear
+  # effect specifications (arguably, that check is wrong, since it doesn't need
+  # that information for linear components), or remove all-but one unused value
+  # above or in bru_make_stack.bru_like, and keep using remove.unused=FALSE here.
   stk <-
     do.call(
       inlabru::inla.stack.mjoin,

@@ -5,8 +5,10 @@
 \alias{ibm_n}
 \alias{ibm_values}
 \alias{ibm_amatrix}
+\alias{ibm_inla_subset}
 \alias{ibm_valid_input}
 \alias{bru_mapper.default}
+\alias{ibm_inla_subset.default}
 \alias{bru_mapper.inla.mesh}
 \alias{bru_mapper.inla.mesh.1d}
 \alias{bru_mapper_index}
@@ -25,9 +27,13 @@ ibm_values(mapper, inla_f = FALSE, ...)
 
 ibm_amatrix(mapper, input, inla_f = FALSE, ...)
 
+ibm_inla_subset(mapper, ...)
+
 ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{bru_mapper}{default}(mapper, new_class = NULL, methods = NULL, ...)
+
+\method{ibm_inla_subset}{default}(mapper, ...)
 
 \method{bru_mapper}{inla.mesh}(mesh, ...)
 
@@ -110,6 +116,8 @@ being mapped to.
 \itemize{
 \item \code{ibm_values} Generic. Implementations must return a vector that
 would be interpretable by an \code{INLA::f(..., values = ...)} specification.
+The exception is the method for \code{bru_mapper_multi}, that returns a
+multi-column data frame
 }
 
 \itemize{
@@ -119,6 +127,16 @@ Implementations must return a (sparse) matrix of size \code{NROW(input)}
 that require \code{list()} inputs, and the input size is determined by the
 combined inputs)
 by \code{ibm_n(mapper)}
+}
+
+\itemize{
+\item \code{ibm_inla_subset} Generic.
+Implementations must return a logical vector of \code{TRUE/FALSE} for
+the subset such that, given the full A matrix and values output,
+\code{A[, subset, drop = FALSE]} and \code{values[subset]}
+(or \code{values[subset, , drop = FALSE]} for data.frame values) are equal
+to the \code{inla_f = TRUE} version of A and values. The default method uses
+the \code{ibm_values} output to construct the subset indexing.
 }
 
 \itemize{
@@ -139,6 +157,13 @@ functions first,
 and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
 to register the methods, e.g.
 \code{.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)}.
+}
+
+\itemize{
+\item The default \code{ibm_inla_subset} method uses
+the \code{ibm_values} output to construct the inla subset indexing, passing
+extra arguments such as \code{multi} on to the methods (this means it supports
+both regular vector values and \code{multi=1} data.frame values).
 }
 
 \itemize{
