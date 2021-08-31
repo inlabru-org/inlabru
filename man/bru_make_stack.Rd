@@ -24,7 +24,7 @@ bru_make_stack(...)
 \item For \code{.bru_like_list}, a list of linearisation information lists
 }}
 
-\item{idx}{Output from \link{evaluate_index(..., inla_f = TRUE)}}
+\item{idx}{Output from \code{evaluate_index(..., inla_f = TRUE)}}
 
 \item{lhoods}{A \code{bru_like_list} object}
 }

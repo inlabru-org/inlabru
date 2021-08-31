@@ -43,7 +43,7 @@
 
 \method{ibm_values}{default}(mapper, inla_f = FALSE, ...)
 
-\method{ibm_amatrix}{default}(mapper, inla_f = FALSE, ...)
+\method{ibm_amatrix}{default}(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_valid_input}{default}(mapper, input, ...)
 
@@ -111,6 +111,13 @@
 }
 \arguments{
 \item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}
+
+\item{inla_f}{logical; when \code{TRUE} in \code{ibm_n}, \code{ibm_values}, and
+\code{ibm_amatrix} methods, these must result in values compatible with \code{INLA::f(...)}
+an specification and corresponding \code{INLA::inla.stack(...)} constructions.
+Implementations do not normally need to do anything different, except
+for mappers of the type needed for hidden multicomponent models such
+as "bym2", which can be handled by \code{bru_mapper_collect}.}
 
 \item{\dots}{Arguments passed on to other methods}
 

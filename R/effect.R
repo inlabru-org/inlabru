@@ -1433,6 +1433,12 @@ bru_mapper.default <- function(mapper,
 #'
 #' @param \dots Arguments passed on to other methods
 #' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
+#' @param inla_f logical; when `TRUE` in `ibm_n`, `ibm_values`, and
+#' `ibm_amatrix` methods, these must result in values compatible with `INLA::f(...)`
+#' an specification and corresponding `INLA::inla.stack(...)` constructions.
+#' Implementations do not normally need to do anything different, except
+#' for mappers of the type needed for hidden multicomponent models such
+#' as "bym2", which can be handled by `bru_mapper_collect`.
 #' @seealso [bru_mapper()]
 #' @name bru_mapper_methods
 #'
@@ -1474,7 +1480,7 @@ ibm_values.default <- function(mapper, inla_f = FALSE, ...) {
 #' Mapper classes must implement their own `ibm_amatrix` method.
 #' @export
 #' @rdname bru_mapper_methods
-ibm_amatrix.default <- function(mapper, inla_f = FALSE, ...) {
+ibm_amatrix.default <- function(mapper, input, inla_f = FALSE, ...) {
   stop(paste0(
     "Missing implementation of 'ibm_amatrix()' for mapper of class '",
     class(mapper)[1], "'."

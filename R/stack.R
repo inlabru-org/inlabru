@@ -90,7 +90,7 @@ bru_make_stack <- function(...) {
 #' * For `.bru_like`, a linearisation information list with elements
 #' `A` and `offset`
 #' * For `.bru_like_list`, a list of linearisation information lists
-#' @param idx Output from [evaluate_index(..., inla_f = TRUE)]
+#' @param idx Output from `evaluate_index(..., inla_f = TRUE)`
 #' @export
 #' @rdname bru_make_stack
 bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
@@ -101,6 +101,8 @@ bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
       BRU.Ntrials = lhood[["Ntrials"]],
       BRU.offset = as.vector(lin$offset)
     ),
+    # TODO: Add roper check that the reduced matrix has size
+    # matching ibm_n(..., inla_f = TRUE)
     A = lapply(names(lin$A), function(nm) {
       if (length(idx[[nm]][[nm]]) < NCOL(lin$A[[nm]])) {
         lin$A[[nm]][, seq_along(idx[[nm]][[nm]]), drop = FALSE]
