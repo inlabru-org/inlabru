@@ -60,7 +60,7 @@ Suggests:
     ggplot2,
     ggpolypath,
     graphics,
-    INLA (>= 20.06.18),
+    INLA (>= 21.08.31),
     knitr,
     maptools,
     mgcv,
