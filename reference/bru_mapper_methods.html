@@ -287,9 +287,9 @@ names(x) &lt;- value</pre>
     </tr>
     <tr>
       <th>inla_f</th>
-      <td><p>logical; when <code>TRUE</code> in <code>ibm_n</code>, <code>ibm_values</code>, and
-<code>ibm_amatrix</code> methods, these must result in values compatible with <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f(...)</a></code>
+      <td><p>logical; when <code>TRUE</code> in <code>ibm_n</code> and <code>ibm_values</code>, these must result in values compatible with <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f(...)</a></code>
 an specification and corresponding <code><a href='https://rdrr.io/pkg/INLA/man/inla.stack.html'>INLA::inla.stack(...)</a></code> constructions.
+For <code>ibm_amatrix</code> methods, it may influence how the input data is interpreted.
 Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by <code>bru_mapper_collect</code>.</p></td>
@@ -406,7 +406,9 @@ The names must match the sub-mappers, see <code>names.bru_mapper_collect()</code
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix
-with unnamed but ordered columns.</p></li>
+with unnamed but ordered columns. When <code>inla_f=TRUE</code> and <code>hidden=TRUE</code> in
+the mapper definition, the input format should instead match that of
+the first, non-hidden, sub-mapper.</p></li>
 </ul>
 
 <ul>
