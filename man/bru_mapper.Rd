@@ -126,7 +126,8 @@ Implementations must return a (sparse) matrix of size \code{NROW(input)}
 (except for the \code{bru_mapper_multi} and \code{bru_mapper_collect} methods,
 that require \code{list()} inputs, and the input size is determined by the
 combined inputs)
-by \code{ibm_n(mapper)}
+by \code{ibm_n(mapper, inla_f = FALSE)}. The \code{inla_f=TRUE} argument should only affect
+the allowed type of input format.
 }
 
 \itemize{

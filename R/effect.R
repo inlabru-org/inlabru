@@ -100,7 +100,8 @@ ibm_values <- function(mapper, inla_f = FALSE, ...) {
 #' (except for the `bru_mapper_multi` and `bru_mapper_collect` methods,
 #' that require `list()` inputs, and the input size is determined by the
 #' combined inputs)
-#' by `ibm_n(mapper)`
+#' by `ibm_n(mapper, inla_f = FALSE)`. The `inla_f=TRUE` argument should only affect
+#' the allowed type of input format.
 #' @param input The values for which to produce a mapping matrix
 #' @export
 #' @rdname bru_mapper
@@ -1245,43 +1246,20 @@ make_mapper <- function(subcomp,
     subcomp[["mapper"]] <- bru_mapper_linear()
   } else if (subcomp[["type"]] %in% c("offset")) {
     subcomp[["mapper"]] <- bru_mapper_offset()
-  } else if (is.list(input_values) &&
-    !is.data.frame(input_values)) {
+  } else if (subcomp[["model"]] %in% c("bym", "bym2")) {
     # No mapper; construct based on input values
-    mappers <- list()
-    mappers[[1]] <-
+    mappers <- list(
       make_submapper(
         subcomp_n = subcomp[["n"]],
         subcomp_values = subcomp[["values"]],
-        input_values = input_values[[1]],
+        input_values = input_values,
         label = paste0(subcomp[["label"]], " part 1"),
         subcomp_type = subcomp[["type"]],
         subcomp_factor_mapping = subcomp[["factor_mapping"]],
         require_indexed = require_indexed
-      )
-    if (subcomp[["model"]] %in% c("bym2")) {
-      mappers <- rep(mappers, 2)
-      names(mappers) <- c("u", "v")
-      if (!is.null(names(input_values))) {
-        if (names(input_values)[1] != "u") {
-          stop("Name mismatch; the first bym2 component must be unnamed, or named 'u'.")
-        }
-      }
-    } else {
-      for (i in seq_len(length(input_values))[-1]) {
-        mappers[[i]] <-
-          make_submapper(
-            subcomp_n = NULL,
-            subcomp_values = NULL,
-            input_values = input_values[[i]],
-            label = paste0(subcomp[["label"]], " part ", i),
-            subcomp_type = NULL,
-            subcomp_factor_mapping = NULL,
-            require_indexed = require_indexed
-          )
-      }
-      names(mappers) <- names(input_values)
-    }
+      ))
+    mappers[[2]] <- mappers[[1]]
+    names(mappers) <- c("u", "v")
     subcomp[["mapper"]] <-
       bru_mapper_collect(mappers, hidden = TRUE)
   } else {
@@ -1462,9 +1440,9 @@ bru_mapper.default <- function(mapper,
 #'
 #' @param \dots Arguments passed on to other methods
 #' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
-#' @param inla_f logical; when `TRUE` in `ibm_n`, `ibm_values`, and
-#' `ibm_amatrix` methods, these must result in values compatible with `INLA::f(...)`
+#' @param inla_f logical; when `TRUE` in `ibm_n` and `ibm_values`, these must result in values compatible with `INLA::f(...)`
 #' an specification and corresponding `INLA::inla.stack(...)` constructions.
+#' For `ibm_amatrix` methods, it may influence how the input data is interpreted.
 #' Implementations do not normally need to do anything different, except
 #' for mappers of the type needed for hidden multicomponent models such
 #' as "bym2", which can be handled by `bru_mapper_collect`.
@@ -2147,50 +2125,48 @@ ibm_values.bru_mapper_collect <- function(mapper, inla_f = FALSE, multi = 0L, ..
 #' Each list element should take a format accepted by the corresponding
 #' sub-mapper. In case each element is a vector, the input can be given as a
 #' data.frame with named columns, a matrix with named columns, or a matrix
-#' with unnamed but ordered columns.
+#' with unnamed but ordered columns. When `inla_f=TRUE` and `hidden=TRUE` in
+#' the mapper definition, the input format should instead match that of
+#' the first, non-hidden, sub-mapper.
 #' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, multi = 0L, ...) {
   if (mapper[["hidden"]] && inla_f) {
-    A <- ibm_amatrix(mapper[["mappers"]][[1]],
-      input = input[[1]],
-      multi = multi - 1
-    )
+    input <- list(input)
+  }
+  if (is.null(names(input))) {
+    indexing <- seq_len(length(mapper[["mappers"]]))
+    A <-
+      lapply(
+        indexing,
+        function(x) {
+          ibm_amatrix(mapper[["mappers"]][[x]],
+                      input = if (x <= length(input)) {
+                        input[[x]]
+                      } else {
+                        NULL
+                      },
+                      multi = multi - 1
+          )
+        }
+      )
   } else {
-    if (is.null(names(input))) {
-      indexing <- seq_len(length(mapper[["mappers"]]))
-      A <-
-        lapply(
-          indexing,
-          function(x) {
-            ibm_amatrix(mapper[["mappers"]][[x]],
-              input = if (x <= length(input)) {
-                input[[x]]
-              } else {
-                NULL
-              },
-              multi = multi - 1
-            )
-          }
-        )
-    } else {
-      indexing <- names(mapper[["mappers"]])
-      A <-
-        lapply(
-          indexing,
-          function(x) {
-            ibm_amatrix(mapper[["mappers"]][[x]],
-              input = input[[x]],
-              multi = multi - 1
-            )
-          }
-        )
-    }
-    if (multi < 1) {
-      # Combine the matrices (A1, A2, A3, ...) -> bdiag(A1, A2, A3, ...)
-      A_ <- Matrix::.bdiag(A)
-      return(A_)
-    }
+    indexing <- names(mapper[["mappers"]])
+    A <-
+      lapply(
+        indexing,
+        function(x) {
+          ibm_amatrix(mapper[["mappers"]][[x]],
+                      input = input[[x]],
+                      multi = multi - 1
+          )
+        }
+      )
+  }
+  if (multi < 1) {
+    # Combine the matrices (A1, A2, A3, ...) -> bdiag(A1, A2, A3, ...)
+    A_ <- Matrix::.bdiag(A)
+    return(A_)
   }
   A
 }
@@ -2208,7 +2184,7 @@ ibm_amatrix.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, multi 
 ibm_valid_input.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, multi = 0L, ...) {
   if (mapper[["hidden"]] && inla_f) {
     validity <- ibm_valid_input(mapper[["mappers"]][[1]],
-      input = input[[1]],
+      input = input,
       multi = multi - 1
     )
   } else {
@@ -2392,7 +2368,7 @@ print.summary_component_list <- function(x, ...) {
 
 amatrix_eval.component <- function(component, data, ...) {
   val <- input_eval(component, data)
-  A <- ibm_amatrix(component$mapper, input = val)
+  A <- ibm_amatrix(component$mapper, input = val, ...)
 
   if (!is.null(val[["weights"]])) {
     A <- val[["weights"]] * A

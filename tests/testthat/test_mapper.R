@@ -200,12 +200,18 @@ test_that("mapper collection bru input", {
   )
   A <- as(A, "dgTMatrix")
   expect_equal(ibm_amatrix(mapper, list_data), A)
+  expect_equal(as(ibm_amatrix(mapper, list_data[["u"]], inla_f = TRUE)[
+    , ibm_inla_subset(mapper), drop = FALSE],
+    "dgTMatrix"),
+    as(A[seq_along(list_data[["u"]]),
+         ibm_inla_subset(mapper),
+         drop = FALSE], "dgTMatrix"))
 
   data <- data.frame(val = 1:3, y = 1:3)
 
   cmp1 <- y ~
   -1 +
-    indep(list(val),
+    indep(val,
       model = "bym",
       mapper = mapper,
       graph = Matrix::Diagonal(4) + 1
@@ -214,7 +220,7 @@ test_that("mapper collection bru input", {
 
   cmp2 <- y ~
   -1 +
-    indep(list(val),
+    indep(val,
       model = "bym",
       n = 4,
       graph = Matrix::Diagonal(4) + 1

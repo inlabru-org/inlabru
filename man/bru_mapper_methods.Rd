@@ -112,9 +112,9 @@
 \arguments{
 \item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}
 
-\item{inla_f}{logical; when \code{TRUE} in \code{ibm_n}, \code{ibm_values}, and
-\code{ibm_amatrix} methods, these must result in values compatible with \code{INLA::f(...)}
+\item{inla_f}{logical; when \code{TRUE} in \code{ibm_n} and \code{ibm_values}, these must result in values compatible with \code{INLA::f(...)}
 an specification and corresponding \code{INLA::inla.stack(...)} constructions.
+For \code{ibm_amatrix} methods, it may influence how the input data is interpreted.
 Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by \code{bru_mapper_collect}.}
@@ -218,7 +218,9 @@ The names must match the sub-mappers, see \code{\link[=names.bru_mapper_collect]
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix
-with unnamed but ordered columns.
+with unnamed but ordered columns. When \code{inla_f=TRUE} and \code{hidden=TRUE} in
+the mapper definition, the input format should instead match that of
+the first, non-hidden, sub-mapper.
 }
 
 \itemize{

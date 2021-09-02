@@ -1703,7 +1703,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
-    A <- evaluate_A(model, lhoods, inla_f = FALSE) # Access the full states
+    A <- evaluate_A(model, lhoods, inla_f = TRUE) # Input is inla::f-compatible
     lin <- bru_compute_linearisation(
       model,
       lhoods = lhoods,
