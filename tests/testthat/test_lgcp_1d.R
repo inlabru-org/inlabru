@@ -40,23 +40,23 @@ test_that("1D LGCP fitting", {
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
     1.054191,
-    tolerance = midtol
+    tolerance = hitol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
     0.4200777,
-    tolerance = midtol
+    tolerance = hitol
   )
 
   expect_equal(
     fit$summary.random$spde1D$mean[c(1, 27, 50)],
     c(-0.4146421, 0.1373841, -3.2198098),
-    tolerance = midtol
+    tolerance = hitol
   )
   expect_equal(
     fit$summary.random$spde1D$sd[c(2, 32, 29)],
     c(0.5887868, 0.4267676, 0.4288160),
-    tolerance = midtol
+    tolerance = hitol
   )
 
   pr <- predict(fit,

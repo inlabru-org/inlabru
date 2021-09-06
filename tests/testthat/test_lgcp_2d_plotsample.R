@@ -5,8 +5,6 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   local_bru_safe_inla()
 
   options <- list(
-    bru_verbose = TRUE,
-    verbose = TRUE,
     control.inla = list(
       int.strategy = "eb"
     )
@@ -44,11 +42,11 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   expect_equal(
     fit$summary.random$my.spde$mean[c(1, 100, 300)],
     c(-1.566168, 1.177564, -1.584715),
-    tolerance = midtol
+    tolerance = hitol
   )
   expect_equal(
     fit$summary.random$my.spde$sd[c(1, 100, 300)],
     c(1.3523279, 0.6516389, 1.2547961),
-    tolerance = midtol
+    tolerance = hitol
   )
 })
