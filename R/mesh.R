@@ -3,8 +3,8 @@ setClass("inla.mesh")
 
 
 # GENERICS
-# refine = function(...){UseMethod("refine")}
-# tsplit = function(...){UseMethod("tsplit")}
+# refine = function(...) {UseMethod("refine")}
+# tsplit = function(...) {UseMethod("tsplit")}
 
 
 #' Query if a point is inside the mesh boundary

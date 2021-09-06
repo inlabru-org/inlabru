@@ -55,7 +55,7 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   # @return list with spatial points, spatial lines and a mesh
   # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-  # as.spatial.dsdata = function(dset, cnames, crs){
+  # as.spatial.dsdata = function(dset, cnames, crs)
 
   # Extract detections and convert to SpatialPointsDataFrame
   points <- SpatialPointsDataFrame(
