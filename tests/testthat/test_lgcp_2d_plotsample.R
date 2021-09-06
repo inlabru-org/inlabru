@@ -26,27 +26,27 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
 
   expect_equal(
     sum(fit$bru_info$lhoods[[1]]$E),
-    7.095665,
-    tolerance = midtol
+    7.096605,
+    tolerance = lowtol
   )
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.fixed["Intercept", "mean"],
-    1.796279,
-    tolerance = midtol
+    tolerance = midtol,
+    style = "serialize"
   )
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.fixed["Intercept", "sd"],
-    0.5221979,
-    tolerance = midtol
+    tolerance = midtol,
+    style = "serialize"
   )
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.random$my.spde$mean[c(1, 100, 300)],
-    c(-1.566168, 1.177564, -1.584715),
-    tolerance = hitol
+    tolerance = midtol,
+    style = "serialize"
   )
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.random$my.spde$sd[c(1, 100, 300)],
-    c(1.3523279, 0.6516389, 1.2547961),
-    tolerance = hitol
+    tolerance = midtol,
+    style = "serialize"
   )
 })

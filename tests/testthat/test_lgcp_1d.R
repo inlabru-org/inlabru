@@ -137,15 +137,15 @@ test_that("1D LGCP fitting", {
     tolerance = hitol
   )
 
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.random$spde1D$mean[c(1, 27, 50)],
-    c(-0.4477744, 0.3068381, -1.7472893),
-    tolerance = midtol
+    tolerance = midtol,
+    style = "serialize"
   )
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.random$spde1D$sd[c(2, 32, 29)],
-    c(0.5955588, 0.4271677, 0.4283714),
-    tolerance = midtol
+    tolerance = midtol,
+    style = "serialize"
   )
 
   pr <- predict(fit,
