@@ -39,12 +39,12 @@ test_that("1D LGCP fitting", {
 
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    1.054191,
+    1.054199,
     tolerance = hitol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.4200777,
+    0.4200817,
     tolerance = hitol
   )
 
@@ -85,23 +85,16 @@ test_data_discrete <- function() {
   data(Poisson2_1D)
   xx <- ceiling(pts2$x)
   data <- data.frame(x = rep(xx, xx))
-  x <- seq(0, 55, length = 56)
+  x <- seq(1, 55, length = 55)
   mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
   matern <- INLA::inla.spde2.pcmatern(mesh1D,
-    prior.range = c(150, 0.75),
-    prior.sigma = c(0.1, 0.75)
+    prior.range = c(0.01, 0.01),
+    prior.sigma = c(1, 0.01)
   )
   mdl <- x ~ spde1D(main = x, model = matern) + Intercept(1)
   fit <- lgcp(mdl,
     data = pts2,
-    domain = list(x = mesh1D),
-    options = list(
-      control.inla = list(int.strategy = "eb")
-    )
-  )
-  fit2 <- lgcp(mdl,
-    data = pts2,
-    domain = list(x = (0:55)),
+    domain = list(x = x),
     options = list(
       control.inla = list(int.strategy = "eb")
     )
@@ -126,15 +119,15 @@ test_that("1D LGCP fitting", {
 
   expect_s3_class(fit, "bru")
 
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.fixed["Intercept", "mean"],
-    1.077507,
-    tolerance = midtol
+    tolerance = midtol,
+    style = "serialize"
   )
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.fixed["Intercept", "sd"],
-    0.4175773,
-    tolerance = hitol
+    tolerance = midtol,
+    style = "serialize"
   )
 
   expect_snapshot_value(
@@ -149,11 +142,12 @@ test_that("1D LGCP fitting", {
   )
 
   pr <- predict(fit,
-    data = data.frame(x = mesh1D$loc), formula = ~spde1D,
+    data = data.frame(x = mesh1D$loc), formula = ~spde1D+Intercept,
     n.samples = 100, seed = 84354
   )
-  expect_equal(pr$mean, fit$summary.random$spde1D$mean, tolerance = hitol)
-  expect_equal(pr$sd, fit$summary.random$spde1D$sd, tolerance = hitol)
+  expect_equal(pr$mean,
+               fit$summary.random$spde1D$mean + fit$summary.fixed$mean,
+               tolerance = hitol)
 
   # predicted intensity integral
   ips <- ipoints(c(0, 55), 100, name = "x")

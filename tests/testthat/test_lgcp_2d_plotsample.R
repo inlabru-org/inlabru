@@ -30,22 +30,12 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
     tolerance = lowtol
   )
   expect_snapshot_value(
-    fit$summary.fixed["Intercept", "mean"],
+    fit$summary.fixed["Intercept", "mean"] + fit$summary.random$my.spde$mean[c(1, 100, 300)],
     tolerance = midtol,
     style = "serialize"
   )
   expect_snapshot_value(
-    fit$summary.fixed["Intercept", "sd"],
-    tolerance = midtol,
-    style = "serialize"
-  )
-  expect_snapshot_value(
-    fit$summary.random$my.spde$mean[c(1, 100, 300)],
-    tolerance = midtol,
-    style = "serialize"
-  )
-  expect_snapshot_value(
-    fit$summary.random$my.spde$sd[c(1, 100, 300)],
+    fit$summary.fixed["Intercept", "sd"] + fit$summary.random$my.spde$sd[c(1, 100, 300)],
     tolerance = midtol,
     style = "serialize"
   )
