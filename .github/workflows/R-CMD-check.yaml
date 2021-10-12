@@ -59,7 +59,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-
 
-      - name: Install system dependencies
+      - name: Install system dependencies on Linux
         if: runner.os == 'Linux'
         run: |
           while read -r cmd
@@ -67,10 +67,12 @@ jobs:
             eval sudo $cmd
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
 
-      - name: Install X11 dependencies on MacOS
+      - name: Install system dependencies on MacOS (X11, gdal)
         if: runner.os == 'macOS'
         run: |
           brew install --cask xquartz
+          brew install --cask pkg-config
+          brew install --cask gdal
 
       - name: Install dependencies
         run: |
