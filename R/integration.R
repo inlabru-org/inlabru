@@ -657,24 +657,27 @@ bru_int_polygon <- function(mesh, polylist, method = NULL, ...) {
       INLA::inla.mesh.project(mesh, integ$loc)$ok &
         (integ$weight > 0)
 
-    integ <- list(
-      loc = integ$loc[ok, 1:2, drop = FALSE],
-      weight = integ$weight[ok]
-    )
+    if (any(ok)) {
 
-    if (method %in% c("stable")) {
-      # Project integration points and weights to mesh nodes
-      integ <- integration_weight_aggregation(mesh, integ)
+      integ <- list(
+        loc = integ$loc[ok, 1:2, drop = FALSE],
+        weight = integ$weight[ok]
+      )
+
+      if (method %in% c("stable")) {
+        # Project integration points and weights to mesh nodes
+        integ <- integration_weight_aggregation(mesh, integ)
+      }
+
+      ips <- data.frame(
+        x = integ$loc[, 1],
+        y = integ$loc[, 2],
+        weight = integ$weight,
+        group = g
+      )
+
+      ipsl <- c(ipsl, list(ips))
     }
-
-    ips <- data.frame(
-      x = integ$loc[, 1],
-      y = integ$loc[, 2],
-      weight = integ$weight,
-      group = g
-    )
-
-    ipsl <- c(ipsl, list(ips))
   }
 
   do.call(rbind, ipsl)
