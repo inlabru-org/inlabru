@@ -71,8 +71,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install --cask xquartz
-          brew install --cask pkg-config
-          brew install --cask gdal
+          brew install pkg-config
+          brew install gdal
 
       - name: Install dependencies
         run: |
