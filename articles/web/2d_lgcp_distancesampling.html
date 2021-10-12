@@ -118,7 +118,7 @@
       <h1 data-toc-skip>LGCPs - Distance sampling</h1>
                         <h4 class="author">David Borchers</h4>
             
-            <h4 class="date">2021-09-08</h4>
+            <h4 class="date">2021-10-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/2d_lgcp_distancesampling.Rmd"><code>vignettes/web/2d_lgcp_distancesampling.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_distancesampling.Rmd</code></div>
@@ -336,10 +336,10 @@
 <span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
-<span class="co">#&gt; 1 318.9791 86.49441 170.0659 308.6052 480.8949 117.9284 515.6786 0.2711601</span>
+<span class="co">#&gt;      mean       sd  q0.025   median   q0.975     smin     smax        cv</span>
+<span class="co">#&gt; 1 303.619 91.53605 161.227 287.2591 492.5309 139.2434 594.6223 0.3014832</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 7481.283</span>
+<span class="co">#&gt; 1 8378.848</span>
 
 <span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
@@ -366,8 +366,8 @@
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit</span><span class="op">)</span>
 <span class="co">#&gt;   Model      DIC Delta.DIC</span>
-<span class="co">#&gt; 1  fit1 770.0351  0.000000</span>
-<span class="co">#&gt; 2   fit 772.1010  2.065897</span>
+<span class="co">#&gt; 1  fit1 770.0416  0.000000</span>
+<span class="co">#&gt; 2   fit 772.1003  2.058695</span>
 
 <span class="co"># Look at the goodness-of-fit of the two models in the distance dimension</span>
 <span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span>

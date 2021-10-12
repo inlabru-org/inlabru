@@ -118,7 +118,7 @@
       <h1 data-toc-skip>LGCPs - Spatial covariates</h1>
                         <h4 class="author">David Borchers</h4>
             
-            <h4 class="date">2021-09-08</h4>
+            <h4 class="date">2021-10-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/2d_lgcp_covars.Rmd"><code>vignettes/web/2d_lgcp_covars.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_covars.Rmd</code></div>
@@ -202,10 +202,10 @@
 <code class="sourceCode R"><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">ips</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 645.7018 26.17972 588.8877 649.1263 687.2521 572.0357 713.6363 0.04054459</span>
+<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
+<span class="co">#&gt; 1 652.5092 28.85024 604.5136 650.5502 713.5951 591.3657 735.0048 0.0442143</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 685.3776</span></code></pre></div>
+<span class="co">#&gt; 1 832.3361</span></code></pre></div>
 </div>
 <div id="a-model-with-vegetation-type-and-a-spde-type-smoother" class="section level4">
 <h4 class="hasAnchor">
@@ -243,9 +243,9 @@
 <span class="op">)</span>
 <span class="va">Lambda2</span>
 <span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 683.1349 31.31833 625.8554 682.9507 739.6851 606.3309 774.1341 0.04584502</span>
+<span class="co">#&gt; 1 684.0675 29.80221 631.4725 687.4481 742.4585 592.3291 747.9455 0.04356619</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 980.8377</span></code></pre></div>
+<span class="co">#&gt; 1 888.1719</span></code></pre></div>
 <p>Look at the contributions to the linear predictor from the SPDE and from vegetation:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
@@ -313,15 +313,15 @@
 <span class="op">)</span>
 <span class="va">Lambda3</span>
 <span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 681.7418 25.35035 639.1178 681.6585 735.2346 626.4166 752.4044 0.03718468</span>
+<span class="co">#&gt; 1 679.9784 27.06002 632.1654 679.2383 739.9313 624.9102 755.8744 0.03979542</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 642.6403</span>
+<span class="co">#&gt; 1 732.2449</span>
 
 <span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit2</span>, <span class="va">fit3</span><span class="op">)</span>
 <span class="co">#&gt;   Model       DIC Delta.DIC</span>
 <span class="co">#&gt; 1  fit2 -4827.688   0.00000</span>
-<span class="co">#&gt; 2  fit3 -4776.167  51.52024</span>
-<span class="co">#&gt; 3  fit1 -3926.487 901.20071</span></code></pre></div>
+<span class="co">#&gt; 2  fit3 -4776.167  51.52026</span>
+<span class="co">#&gt; 3  fit1 -3926.487 901.20073</span></code></pre></div>
 </div>
 <div id="cv-and-spde-parameters-for-model-2" class="section level4">
 <h4 class="hasAnchor">
@@ -406,7 +406,7 @@
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">efit</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.3.1.9000</span>
-<span class="co">#&gt; INLA version: 21.09.01</span>
+<span class="co">#&gt; INLA version: 21.10.03</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   elev: Model types main='linear', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   mySmooth: Model types main='spde', group='exchangeable', replicate='iid'</span>
@@ -416,7 +416,7 @@
 <span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
 <span class="co">#&gt;     Predictor: coordinates ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.08, Running = 39.2, Post = 0.112, Total = 40.4 </span>
+<span class="co">#&gt;     Pre = 1.02, Running = 36.9, Post = 0.107, Total = 38 </span>
 <span class="co">#&gt; Fixed effects:</span>
 <span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span>
 <span class="co">#&gt; elev      0.004 0.001      0.002    0.004      0.006 0.004   0</span>
@@ -439,14 +439,14 @@
 <span class="co">#&gt; Effective number of parameters .................: 172.29</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Marginal log-Likelihood:  2281.51 </span>
-<span class="co">#&gt; Posterior marginals for the linear predictor and</span>
-<span class="co">#&gt;  the fitted values are computed</span>
+<span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span>
+<span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span>
 <span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit2</span>, <span class="va">fit3</span>, <span class="va">efit</span><span class="op">)</span>
 <span class="co">#&gt;   Model       DIC Delta.DIC</span>
 <span class="co">#&gt; 1  fit2 -4827.688   0.00000</span>
-<span class="co">#&gt; 2  efit -4778.287  49.40087</span>
-<span class="co">#&gt; 3  fit3 -4776.167  51.52024</span>
-<span class="co">#&gt; 4  fit1 -3926.487 901.20071</span></code></pre></div>
+<span class="co">#&gt; 2  efit -4778.287  49.40089</span>
+<span class="co">#&gt; 3  fit3 -4776.167  51.52026</span>
+<span class="co">#&gt; 4  fit1 -3926.487 901.20073</span></code></pre></div>
 <p>Predict and plot the density</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">e.int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">efit</span>, <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
@@ -535,10 +535,10 @@
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975   smin     smax         cv</span>
-<span class="co">#&gt; 1 676.7799 26.10124 627.3159 676.8205 725.5813 616.69 735.6843 0.03856681</span>
+<span class="co">#&gt;       mean       sd   q0.025  median   q0.975     smin    smax         cv</span>
+<span class="co">#&gt; 1 676.2382 27.98911 629.5267 674.018 732.4172 596.5958 754.937 0.04138943</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 681.2747</span>
+<span class="co">#&gt; 1 783.3904</span>
 
 <span class="va">Nest.e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>,
