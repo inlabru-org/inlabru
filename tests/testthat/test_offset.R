@@ -1,19 +1,5 @@
 local_bru_testthat_setup()
 
-test_that("Component construction: offset", {
-  cmp <- component_list(~ something(a, model = "offset"))
-  val <- evaluate_effect_single(cmp[["something"]],
-                                data = data.frame(a = 11:15),
-                                state = NULL
-  )
-  expect_equal(
-    val,
-    11:15,
-    ignore_attr = TRUE
-  )
-})
-
-
 test_that("Linear predictor offset", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -38,12 +24,14 @@ test_that("Linear predictor offset", {
   expect_equal(
     m1$summary.fixed$mean,
     m2$summary.fixed$mean,
-    ignore_attr = TRUE
+    ignore_attr = TRUE,
+    tolerance = lowtol
   )
   expect_equal(
     m1$summary.fixed$sd,
     m2$summary.fixed$sd,
-    ignore_attr = TRUE
+    ignore_attr = TRUE,
+    tolerance = midtol
   )
 
   # Ignore option option but give error. Note the need to make the
