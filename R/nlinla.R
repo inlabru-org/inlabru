@@ -125,15 +125,6 @@ bru_compute_linearisation.component <- function(cmp,
                                                 eps,
                                                 ...) {
   label <- cmp[["label"]]
-  if (identical(cmp[["main"]][["type"]], "offset")) {
-    # Zero-column matrix, since an offset has no latent state variables.
-    return(Matrix::sparseMatrix(
-      i = c(),
-      j = c(),
-      x = c(1),
-      dims = c(NROW(pred0), 0)
-    ))
-  }
 
   assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
 
@@ -143,8 +134,19 @@ bru_compute_linearisation.component <- function(cmp,
         A <- Matrix::kronecker(rep(1, NROW(pred0)), A)
       } else if (is.data.frame(data)) {
         A <- Matrix::kronecker(rep(1, NROW(data)), A)
+        pred0 <- rep(pred0, NROW(A))
       }
     }
+  }
+
+  if (identical(cmp[["main"]][["type"]], "offset")) {
+    # Zero-column matrix, since an offset has no latent state variables.
+    return(Matrix::sparseMatrix(
+      i = c(),
+      j = c(),
+      x = c(1),
+      dims = c(NROW(pred0), 0)
+    ))
   }
 
   label <- cmp[["label"]]

@@ -535,7 +535,10 @@ component.character <- function(object,
 
   # Special and general cases:
   if (component$main$type %in% c("offset")) {
-    component$inla.formula <- as.formula(paste0("~ . + offset(", label, ")"),
+    # The offset is included either automatically for ~ . linear models,
+    # or explicitly by name in the predictor expression, so no INLA formula
+    # component is needed.
+    component$inla.formula <- as.formula(paste0("~ ."),
       env = envir
     )
     component$main$mapper <- bru_mapper_offset()
@@ -1506,6 +1509,7 @@ ibm_inla_subset.default <- function(mapper, ...) {
   values_inla <- ibm_values(mapper, inla_f = TRUE, ...)
   if (is.data.frame(values_full)) {
     subset <- logical(NROW(values_full))
+    if (length(subset) > 0) {
     subset[
       plyr::match_df(
         cbind(
@@ -1514,6 +1518,7 @@ ibm_inla_subset.default <- function(mapper, ...) {
         values_inla,
         on = names(values_full))[[".inla_subset"]]
     ] <- TRUE
+  }
   } else {
     subset <- base::match(values_full, values_inla, nomatch = 0) > 0
   }

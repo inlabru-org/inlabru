@@ -1,0 +1,57 @@
+local_bru_testthat_setup()
+
+test_that("Component construction: offset", {
+  cmp <- component_list(~ something(a, model = "offset"))
+  val <- evaluate_effect_single(cmp[["something"]],
+                                data = data.frame(a = 11:15),
+                                state = NULL
+  )
+  expect_equal(
+    val,
+    11:15,
+    ignore_attr = TRUE
+  )
+})
+
+
+test_that("Linear predictor offset", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  dat <- data.frame(
+    id = c(1:8),
+    deaths = c(5, 30, 2, 4, 5, 4, 7, 10),
+    pop = c(1000, 2300, 300, 400, 500, 700, 1000, 700)
+  )
+
+  # Used to fail
+  m1 <- bru(deaths ~ 1 + myoffset(pop, model = "offset"),
+            data = dat,
+            family = "poisson",
+            options = list(bru_verbose = TRUE))
+  m2 <- bru(~ 1 + myoffset(pop, model = "offset"),
+            formula = deaths ~ Intercept + offset(myoffset),
+          data = dat,
+          family = "poisson",
+          options = list(bru_verbose = TRUE))
+
+  expect_equal(
+    m1$summary.fixed$mean,
+    m2$summary.fixed$mean,
+    ignore_attr = TRUE
+  )
+  expect_equal(
+    m1$summary.fixed$sd,
+    m2$summary.fixed$sd,
+    ignore_attr = TRUE
+  )
+
+  # Ignore option option but give error. Note the need to make the
+  # Intercept have the right length for a non-linear model
+  expect_error(m3 <- bru(~ Intercept(rep(1, NROW(.data.))),
+                         formula = deaths ~ Intercept,
+                         data = dat,
+                         family = "poisson",
+                         options = list(offset = dat$pop,
+                                        bru_verbose = TRUE)))
+})

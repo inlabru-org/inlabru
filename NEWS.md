@@ -9,6 +9,12 @@
 * Add `bru_mapper_collect` class for handling sequential collections of
   mappers, including collections where all but the first mapper is hidden from the
   `INLA::f()` arguments `n` and `values`, as needed to support e.g. "bym2" models.
+  
+* Force explicit `model = "offset"` components instead of special options, to
+  avoid interfering with the linearisation system (Issue #123)
+  
+* Make the iterations more robust by resetting the internal INLA predictor
+  states to initial value zero at each step
 
 # inlabru 2.3.1
 

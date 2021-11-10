@@ -1631,6 +1631,12 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     )
   }
 
+  if (!is.null(inla.options[["offset"]])) {
+    stop(paste0(
+      "An offset option was specified which may interfere with the inlabru model construction.\n",
+      "Please use an explicit offset component instead; e.g. ~ myoffset(value, model = 'offset')"))
+  }
+
   # Initialise required local options
   inla.options <- modifyList(
     inla.options,
@@ -1757,6 +1763,10 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       inla.options[["control.mode"]]$theta <- result$mode$theta
       inla.options[["control.mode"]]$x <-
         previous_x + (result$mode$x - previous_x) * line_search[["step_scaling"]]
+      result_indexing <- inla_result_latent_idx(result)
+      # Reset the predictor values, to avoid spurious iteration effects.
+      inla.options[["control.mode"]]$x[result_indexing$APredictor] <- 0
+      inla.options[["control.mode"]]$x[result_indexing$Predictor] <- 0
     }
     if ((!is.null(result) && !is.null(result$mode))) {
       previous_x <- result$mode$x
