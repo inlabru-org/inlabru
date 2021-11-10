@@ -1260,7 +1260,8 @@ make_mapper <- function(subcomp,
         subcomp_type = subcomp[["type"]],
         subcomp_factor_mapping = subcomp[["factor_mapping"]],
         require_indexed = require_indexed
-      ))
+      )
+    )
     mappers[[2]] <- mappers[[1]]
     names(mappers) <- c("u", "v")
     subcomp[["mapper"]] <-
@@ -1510,15 +1511,17 @@ ibm_inla_subset.default <- function(mapper, ...) {
   if (is.data.frame(values_full)) {
     subset <- logical(NROW(values_full))
     if (length(subset) > 0) {
-    subset[
-      plyr::match_df(
-        cbind(
-          .inla_subset = seq_len(NROW(values_full)),
-          values_full),
-        values_inla,
-        on = names(values_full))[[".inla_subset"]]
-    ] <- TRUE
-  }
+      subset[
+        plyr::match_df(
+          cbind(
+            .inla_subset = seq_len(NROW(values_full)),
+            values_full
+          ),
+          values_inla,
+          on = names(values_full)
+        )[[".inla_subset"]]
+      ] <- TRUE
+    }
   } else {
     subset <- base::match(values_full, values_inla, nomatch = 0) > 0
   }
@@ -2145,13 +2148,14 @@ ibm_amatrix.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, multi 
       lapply(
         indexing,
         function(x) {
-          ibm_amatrix(mapper[["mappers"]][[x]],
-                      input = if (x <= length(input)) {
-                        input[[x]]
-                      } else {
-                        NULL
-                      },
-                      multi = multi - 1
+          ibm_amatrix(
+            mapper[["mappers"]][[x]],
+            input = if (x <= length(input)) {
+              input[[x]]
+            } else {
+              NULL
+            },
+            multi = multi - 1
           )
         }
       )
@@ -2161,9 +2165,10 @@ ibm_amatrix.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, multi 
       lapply(
         indexing,
         function(x) {
-          ibm_amatrix(mapper[["mappers"]][[x]],
-                      input = input[[x]],
-                      multi = multi - 1
+          ibm_amatrix(
+            mapper[["mappers"]][[x]],
+            input = input[[x]],
+            multi = multi - 1
           )
         }
       )

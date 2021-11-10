@@ -4,7 +4,8 @@ test_data <- function() {
   data(Poisson2_1D, package = "inlabru")
   x <- seq(0, 55, length = 50)
   mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
-  matern <- INLA::inla.spde2.pcmatern(mesh1D,
+  matern <- INLA::inla.spde2.pcmatern(
+    mesh1D,
     prior.range = c(150, 0.75),
     prior.sigma = c(0.1, 0.75)
   )
@@ -72,7 +73,13 @@ test_that("1D LGCP fitting", {
 
   # predicted intensity integral
   ips <- ipoints(c(0, 55), 100, name = "x")
-  Lambda <- predict(fit, ips, ~ sum(weight * exp(spde1D + Intercept)), n.samples = 100, seed = 4354)
+  Lambda <- predict(
+    fit,
+    ips,
+    ~ sum(weight * exp(spde1D + Intercept)),
+    n.samples = 100,
+    seed = 4354
+  )
   expect_equal(Lambda$mean, 131.0741, tolerance = hitol)
   expect_equal(Lambda$sd, 11.35888, tolerance = 1)
 })
@@ -141,13 +148,18 @@ test_that("1D LGCP fitting", {
     style = "serialize"
   )
 
-  pr <- predict(fit,
-    data = data.frame(x = mesh1D$loc), formula = ~spde1D+Intercept,
-    n.samples = 100, seed = 84354
+  pr <- predict(
+    fit,
+    data = data.frame(x = mesh1D$loc),
+    formula = ~ spde1D + Intercept,
+    n.samples = 100,
+    seed = 84354
   )
-  expect_equal(pr$mean,
-               fit$summary.random$spde1D$mean + fit$summary.fixed$mean,
-               tolerance = hitol)
+  expect_equal(
+    pr$mean,
+    fit$summary.random$spde1D$mean + fit$summary.fixed$mean,
+    tolerance = hitol
+  )
 
   # predicted intensity integral
   ips <- ipoints(c(0, 55), 100, name = "x")

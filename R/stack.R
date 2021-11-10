@@ -94,7 +94,7 @@ bru_make_stack <- function(...) {
 #' @export
 #' @rdname bru_make_stack
 bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
-    INLA::inla.stack(
+  INLA::inla.stack(
     list(
       BRU.response = lhood$data[[lhood$response]],
       BRU.E = lhood[["E"]],

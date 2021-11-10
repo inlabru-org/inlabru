@@ -658,7 +658,6 @@ bru_int_polygon <- function(mesh, polylist, method = NULL, ...) {
         (integ$weight > 0)
 
     if (any(ok)) {
-
       integ <- list(
         loc = integ$loc[ok, 1:2, drop = FALSE],
         weight = integ$weight[ok]

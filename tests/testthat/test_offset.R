@@ -11,13 +11,17 @@ test_that("Linear predictor offset", {
   )
 
   # Used to fail
-  m1 <- bru(deaths ~ 1 + myoffset(pop, model = "offset"),
-            data = dat,
-            family = "poisson")
-  m2 <- bru(~ 1 + myoffset(pop, model = "offset"),
-            formula = deaths ~ Intercept + offset(myoffset),
-          data = dat,
-          family = "poisson")
+  m1 <- bru(
+    deaths ~ 1 + myoffset(pop, model = "offset"),
+    data = dat,
+    family = "poisson"
+  )
+  m2 <- bru(
+    ~ 1 + myoffset(pop, model = "offset"),
+    formula = deaths ~ Intercept + offset(myoffset),
+    data = dat,
+    family = "poisson"
+  )
 
   expect_equal(
     m1$summary.fixed$mean,
@@ -34,9 +38,13 @@ test_that("Linear predictor offset", {
 
   # Ignore option option but give error. Note the need to make the
   # Intercept have the right length for a non-linear model
-  expect_error(m3 <- bru(~ Intercept(rep(1, NROW(.data.))),
-                         formula = deaths ~ Intercept,
-                         data = dat,
-                         family = "poisson",
-                         options = list(offset = dat$pop)))
+  expect_error(
+    m3 <- bru(
+      ~ Intercept(rep(1, NROW(.data.))),
+      formula = deaths ~ Intercept,
+      data = dat,
+      family = "poisson",
+      options = list(offset = dat$pop)
+    )
+  )
 })

@@ -1634,7 +1634,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   if (!is.null(inla.options[["offset"]])) {
     stop(paste0(
       "An offset option was specified which may interfere with the inlabru model construction.\n",
-      "Please use an explicit offset component instead; e.g. ~ myoffset(value, model = 'offset')"))
+      "Please use an explicit offset component instead; e.g. ~ myoffset(value, model = 'offset')"
+    ))
   }
 
   # Initialise required local options
