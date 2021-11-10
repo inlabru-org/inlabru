@@ -13,13 +13,11 @@ test_that("Linear predictor offset", {
   # Used to fail
   m1 <- bru(deaths ~ 1 + myoffset(pop, model = "offset"),
             data = dat,
-            family = "poisson",
-            options = list(bru_verbose = TRUE))
+            family = "poisson")
   m2 <- bru(~ 1 + myoffset(pop, model = "offset"),
             formula = deaths ~ Intercept + offset(myoffset),
           data = dat,
-          family = "poisson",
-          options = list(bru_verbose = TRUE))
+          family = "poisson")
 
   expect_equal(
     m1$summary.fixed$mean,
@@ -40,6 +38,5 @@ test_that("Linear predictor offset", {
                          formula = deaths ~ Intercept,
                          data = dat,
                          family = "poisson",
-                         options = list(offset = dat$pop,
-                                        bru_verbose = TRUE)))
+                         options = list(offset = dat$pop)))
 })
