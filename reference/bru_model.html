@@ -168,7 +168,7 @@ determine the label of the effect. See Details for further information." />
     <div class="ref-description">
     <p>The <a href='inlabru.html'>inlabru</a> syntax for model formulae is different from what
 <code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>INLA::inla</a></code> considers a valid.
-In inla most of the effects are defined by adding an <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>f(...)</a></code> expression to the formula.
+In inla most of the effects are defined by adding an <code>f(...)</code> expression to the formula.
 In <a href='inlabru.html'>inlabru</a> the <code>f</code> is replaced by an arbitrary (exception: <code>offset</code>) string that will
 determine the label of the effect. See Details for further information.</p>
     </div>
@@ -211,8 +211,8 @@ and
 as well as
 <code>y ~ temperature(model = 'linear')</code>
 which sets <code>main = temperature</code>.</p>
-<p>On the other hand, map can also be a function mapping, e.g the coordinates function of the
-sp package :</p>
+<p>On the other hand, map can also be a function mapping, e.g the <a href='https://rdrr.io/pkg/sp/man/coordinates.html'>coordinates</a> function of the
+<a href='https://rdrr.io/pkg/sp/man/00sp.html'>sp</a> package :</p>
 <p><code>y ~ mySPDE(coordinates, ...)</code></p>
 <p>This exctract the coordinates from the data object, and maps it to the latent
 field via the information given in the <code>mapper</code>, which by default is

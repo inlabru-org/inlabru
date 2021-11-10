@@ -189,31 +189,31 @@ by the internal methods for evaluating inlabru predictor expressions.</p></td>
     <p>A vector of values for a component</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>mesh</span> <span class='op'>&lt;-</span> <span class='fu'>INLA</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.mesh.2d.html'>inla.mesh.2d</a></span><span class='op'>(</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>,
-    offset <span class='op'>=</span> <span class='fl'>2</span>, max.edge <span class='op'>=</span> <span class='fl'>0.25</span>
-  <span class='op'>)</span>
-  <span class='va'>spde</span> <span class='op'>&lt;-</span> <span class='fu'>INLA</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html'>inla.spde2.pcmatern</a></span><span class='op'>(</span><span class='va'>mesh</span>,
-    prior.range <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.01</span><span class='op'>)</span>,
-    prior.sigma <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>0.01</span><span class='op'>)</span>
-  <span class='op'>)</span>
-  <span class='va'>data</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPointsDataFrame</a></span><span class='op'>(</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span>, <span class='fl'>5</span>, <span class='fl'>2</span><span class='op'>)</span>,
-    data <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='op'>)</span>
-  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='op'>-</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'>field</span><span class='op'>(</span><span class='va'>coordinates</span>, model <span class='op'>=</span> <span class='va'>spde</span><span class='op'>)</span>,
-    family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>data</span>
-  <span class='op'>)</span>
-  <span class='va'>pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
-    <span class='va'>fit</span>,
-    data <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>0.5</span>, y <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>,
-    formula <span class='op'>=</span> <span class='op'>~</span> <span class='fu'>field_eval</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='op'>)</span>
-<span class='op'>}</span>
-<span class='op'>}</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='va'>mesh</span> <span class='op'>&lt;-</span> <span class='fu'>INLA</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.mesh.2d.html'>inla.mesh.2d</a></span><span class='op'>(</span></span>
+<span class='r-in'>    <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>,</span>
+<span class='r-in'>    offset <span class='op'>=</span> <span class='fl'>2</span>, max.edge <span class='op'>=</span> <span class='fl'>0.25</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>spde</span> <span class='op'>&lt;-</span> <span class='fu'>INLA</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html'>inla.spde2.pcmatern</a></span><span class='op'>(</span><span class='va'>mesh</span>,</span>
+<span class='r-in'>    prior.range <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.01</span><span class='op'>)</span>,</span>
+<span class='r-in'>    prior.sigma <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>0.01</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>data</span> <span class='op'>&lt;-</span> <span class='fu'>sp</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPoints.html'>SpatialPointsDataFrame</a></span><span class='op'>(</span></span>
+<span class='r-in'>    <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span>, <span class='fl'>5</span>, <span class='fl'>2</span><span class='op'>)</span>,</span>
+<span class='r-in'>    data <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='op'>-</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'>field</span><span class='op'>(</span><span class='va'>coordinates</span>, model <span class='op'>=</span> <span class='va'>spde</span><span class='op'>)</span>,</span>
+<span class='r-in'>    family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>data</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span></span>
+<span class='r-in'>    <span class='va'>fit</span>,</span>
+<span class='r-in'>    data <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>0.5</span>, y <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>,</span>
+<span class='r-in'>    formula <span class='op'>=</span> <span class='op'>~</span> <span class='fu'>field_eval</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

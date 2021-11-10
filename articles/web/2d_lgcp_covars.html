@@ -118,7 +118,7 @@
       <h1 data-toc-skip>LGCPs - Spatial covariates</h1>
                         <h4 class="author">David Borchers</h4>
             
-            <h4 class="date">2021-10-12</h4>
+            <h4 class="date">2021-11-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/2d_lgcp_covars.Rmd"><code>vignettes/web/2d_lgcp_covars.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_covars.Rmd</code></div>
@@ -189,7 +189,7 @@
 <p>The <code>predidct</code> function of <code>inlabru</code> takes into its <code>data</code> argument a <code>SpatialPointsDataFrame</code>, a <code>SpatialPixelsDataFrame</code> or a <code>data.frame</code>. We can use the <code>inlabru</code> function <code>pixels</code> to generate a <code>SpatialPixelsDataFrame</code> only within the boundary, using its <code>mask</code> argument, as shown below.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span>
-<span class="va">int1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, data <span class="op">=</span> <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span>
+<span class="va">int1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, data <span class="op">=</span> <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int1</span><span class="op">)</span> <span class="op">+</span>
@@ -200,12 +200,12 @@
 <p>Not surprisingly, given that most nests are in <code>Primary</code> vegetation, the high density is in this vegetation. But there are substantial patches of predicted high density that have no nests, and some areas of predicted low density that have nests. What about the estimated abundance (there are really 647 nests there):</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>
-<span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">ips</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">ips</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
 <span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 648.5003 24.92356 607.8135 650.0284 692.5098 594.3782 720.2319 0.03843262</span>
-<span class="co">#&gt;       var</span>
-<span class="co">#&gt; 1 621.184</span></code></pre></div>
+<span class="co">#&gt; 1 644.8936 27.63256 593.0853 645.4022 694.4583 567.1524 704.6129 0.04284824</span>
+<span class="co">#&gt;        var</span>
+<span class="co">#&gt; 1 763.5582</span></code></pre></div>
 </div>
 <div id="a-model-with-vegetation-type-and-a-spde-type-smoother" class="section level4">
 <h4 class="hasAnchor">
@@ -226,7 +226,7 @@
 <p>And plot the median intensity surface</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span>
-<span class="va">int2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">vegetation</span><span class="op">)</span>, n.samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>
+<span class="va">int2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">vegetation</span><span class="op">)</span>, n.samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>
 
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">q0.025</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -236,19 +236,19 @@
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-15-1.png" width="672"></p>
 <p>… and the expected integrated intensity (mean of abundance)</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">Lambda2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">Lambda2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span>
   <span class="va">fit2</span>,
   <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>,
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">vegetation</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda2</span>
 <span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 681.5145 28.43875 627.2521 681.2297 733.0293 607.0998 766.6889 0.04172875</span>
+<span class="co">#&gt; 1 678.1926 26.07074 630.7939 677.2629 733.9808 628.4749 751.4409 0.03844149</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 808.7627</span></code></pre></div>
+<span class="co">#&gt; 1 679.6834</span></code></pre></div>
 <p>Look at the contributions to the linear predictor from the SPDE and from vegetation:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">lp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">lp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
   smooth_veg <span class="op">=</span> <span class="va">mySmooth</span> <span class="op">+</span> <span class="va">vegetation</span>,
   smooth <span class="op">=</span> <span class="va">mySmooth</span>,
   veg <span class="op">=</span> <span class="va">vegetation</span>
@@ -297,7 +297,7 @@
   domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">int3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit3</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">int3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit3</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int3</span><span class="op">)</span> <span class="op">+</span>
@@ -306,22 +306,22 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-21-1.png" width="672"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">Lambda3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">Lambda3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span>
   <span class="va">fit3</span>,
   <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>,
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda3</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 673.9218 26.52128 628.6225 671.8534 724.3516 618.2656 733.1697 0.03935365</span>
+<span class="co">#&gt;      mean       sd   q0.025   median   q0.975    smin     smax         cv</span>
+<span class="co">#&gt; 1 685.568 26.39027 631.0004 686.7197 735.8148 615.164 762.3069 0.03849402</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 703.3785</span>
+<span class="co">#&gt; 1 696.4463</span>
 
 <span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit2</span>, <span class="va">fit3</span><span class="op">)</span>
 <span class="co">#&gt;   Model       DIC Delta.DIC</span>
 <span class="co">#&gt; 1  fit2 -4827.688   0.00000</span>
-<span class="co">#&gt; 2  fit3 -4776.167  51.52029</span>
-<span class="co">#&gt; 3  fit1 -3926.487 901.20072</span></code></pre></div>
+<span class="co">#&gt; 2  fit3 -4776.167  51.52026</span>
+<span class="co">#&gt; 3  fit1 -3926.487 901.20073</span></code></pre></div>
 </div>
 <div id="cv-and-spde-parameters-for-model-2" class="section level4">
 <h4 class="hasAnchor">
@@ -337,21 +337,21 @@
 <p>Plot the vegetation “fixed effect” posteriors. First get their names - from <code>$marginals.random$vegetation</code> of the fitted object, which contains the fixed effect marginal distribution data</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span><span class="op">(</span><span class="va">flist</span><span class="op">)</span><span class="op">)</span> <span class="va">flist</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"vegetation"</span>, index <span class="op">=</span> <span class="va">i</span><span class="op">)</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span><span class="op">(</span><span class="va">flist</span><span class="op">)</span><span class="op">)</span> <span class="va">flist</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"vegetation"</span>, index <span class="op">=</span> <span class="va">i</span><span class="op">)</span>
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="va">flist</span>, cols <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-24-1.png" width="672"></p>
 <p>Use <code><a href="../../reference/spde.posterior.html">spde.posterior( )</a></code> to obtain and then plot the SPDE parameter posteriors and the Matern correlation and covariance functions for this model.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span>
 <span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span>
-<span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span>
-<span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span>
+<span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span>
+<span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span>
 
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">range.plot</span>, <span class="va">var.plot</span><span class="op">)</span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-25-1.png" width="672"></p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">corplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">covplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">corplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">covplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">covplot</span>, <span class="va">corplot</span><span class="op">)</span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-25-2.png" width="672"></p>
 </div>
@@ -374,10 +374,10 @@
 <code class="sourceCode R"><span class="va">f.elev</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># turn coordinates into SpatialPoints object:</span>
   <span class="co"># with the appropriate coordinate reference system (CRS)</span>
-  <span class="va">spp</span> <span class="op">&lt;-</span> <span class="fu">SpatialPoints</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span>, proj4string <span class="op">=</span> <span class="fu"><a href="../../reference/fm_sp_get_crs.html">fm_sp_get_crs</a></span><span class="op">(</span><span class="va">elev</span><span class="op">)</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projection.html">proj4string</a></span><span class="op">(</span><span class="va">spp</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fm_sp_get_crs.html">fm_sp_get_crs</a></span><span class="op">(</span><span class="va">elev</span><span class="op">)</span>
+  <span class="va">spp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html">SpatialPoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span>, proj4string <span class="op">=</span> <span class="fu"><a href="../../reference/fm_sp_get_crs.html">fm_sp_get_crs</a></span><span class="op">(</span><span class="va">elev</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/sp/man/is.projected.html">proj4string</a></span><span class="op">(</span><span class="va">spp</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fm_sp_get_crs.html">fm_sp_get_crs</a></span><span class="op">(</span><span class="va">elev</span><span class="op">)</span>
   <span class="co"># Extract elevation values at spp coords, from our elev SpatialGridDataFrame</span>
-  <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">over</a></span><span class="op">(</span><span class="va">spp</span>, <span class="va">elev</span><span class="op">)</span>
+  <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/over.html">over</a></span><span class="op">(</span><span class="va">spp</span>, <span class="va">elev</span><span class="op">)</span>
   <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
     <span class="va">v</span><span class="op">$</span><span class="va">elevation</span> <span class="op">&lt;-</span> <span class="fu">inlabru</span><span class="fu">:::</span><span class="fu"><a href="../../reference/bru_fill_missing.html">bru_fill_missing</a></span><span class="op">(</span><span class="va">elev</span>, <span class="va">spp</span>, <span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span>
   <span class="op">}</span>
@@ -406,7 +406,7 @@
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">efit</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.3.1.9000</span>
-<span class="co">#&gt; INLA version: 21.10.03</span>
+<span class="co">#&gt; INLA version: 21.11.01</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   elev: Model types main='linear', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   mySmooth: Model types main='spde', group='exchangeable', replicate='iid'</span>
@@ -416,7 +416,7 @@
 <span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
 <span class="co">#&gt;     Predictor: coordinates ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.02, Running = 40.1, Post = 0.117, Total = 41.3 </span>
+<span class="co">#&gt;     Pre = 1.09, Running = 37.5, Post = 0.0951, Total = 38.7 </span>
 <span class="co">#&gt; Fixed effects:</span>
 <span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span>
 <span class="co">#&gt; elev      0.004 0.001      0.002    0.004      0.006 0.004   0</span>
@@ -444,12 +444,12 @@
 <span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit2</span>, <span class="va">fit3</span>, <span class="va">efit</span><span class="op">)</span>
 <span class="co">#&gt;   Model       DIC Delta.DIC</span>
 <span class="co">#&gt; 1  fit2 -4827.688   0.00000</span>
-<span class="co">#&gt; 2  efit -4778.287  49.40091</span>
-<span class="co">#&gt; 3  fit3 -4776.167  51.52029</span>
-<span class="co">#&gt; 4  fit1 -3926.487 901.20072</span></code></pre></div>
+<span class="co">#&gt; 2  efit -4778.287  49.40088</span>
+<span class="co">#&gt; 3  fit3 -4776.167  51.52026</span>
+<span class="co">#&gt; 4  fit1 -3926.487 901.20073</span></code></pre></div>
 <p>Predict and plot the density</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">e.int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">efit</span>, <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">e.int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">efit</span>, <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">e.int</span><span class="op">)</span> <span class="op">+</span>
@@ -460,7 +460,7 @@
 <p>Now look at the elevation and SPDE effects in space. Leave out the Intercept because it swamps the spatial effects of elevation and the SPDE in the plots and we are interested in comparing the effects of elevation and the SPDE.</p>
 <p>First we need to predict on the linear predictor scale.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">e.lp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">e.lp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>, <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span>,
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
     smooth_elev <span class="op">=</span> <span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span>,
@@ -509,7 +509,7 @@
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span><span class="op">(</span><span class="va">efit</span><span class="op">$</span><span class="va">summary.fixed</span><span class="op">)</span><span class="op">)</span>
 <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span><span class="op">(</span><span class="va">flist</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">flist</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">efit</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">efit</span><span class="op">$</span><span class="va">summary.fixed</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
+  <span class="va">flist</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">efit</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">efit</span><span class="op">$</span><span class="va">summary.fixed</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="va">flist</span>, cols <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-37-1.png" width="672"></p>
@@ -518,29 +518,29 @@
 <code class="sourceCode R">
 <span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span>
 <span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span>
-<span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span>
-<span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span>
+<span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span>
+<span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span>
 
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">range.plot</span>, <span class="va">var.plot</span><span class="op">)</span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-38-1.png" width="672"></p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">corplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">covplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">corplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">covplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">covplot</span>, <span class="va">corplot</span><span class="op">)</span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-38-2.png" width="672"></p>
 <p>Also estimate abundance. The <code>data.frame</code> in the second call leads to inclusion of <code>N</code> in the prediction object, for easier plotting.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>, <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>,
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda</span>
-<span class="co">#&gt;       mean       sd  q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 678.0358 29.43523 614.827 676.2022 737.2982 609.1836 749.5777 0.04341251</span>
+<span class="co">#&gt;       mean       sd  q0.025   median   q0.975    smin     smax         cv</span>
+<span class="co">#&gt; 1 673.8562 27.08047 623.554 670.3181 730.6191 605.037 740.3049 0.04018732</span>
 <span class="co">#&gt;       var</span>
-<span class="co">#&gt; 1 866.433</span>
+<span class="co">#&gt; 1 733.352</span>
 
-<span class="va">Nest.e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
+<span class="va">Nest.e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>,
   <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>,
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
@@ -563,7 +563,7 @@
 <a href="#non-spatial-evaluation-of-the-covariate-effect" class="anchor"></a>Non-spatial evaluation of the covariate effect</h3>
 <p>The previous examples of posterior prediction focused on spatial prediction. From <code>inlabru</code> version 2.2.8, a feauture is available for overriding the component input value specification from the component definition. Each model component can be evaluated directly, for arbitrary values by functions named by adding the suffix <code>_eval</code> to the end of the component name in the predictor expression. Since the elevation effect in this model is linear, the resulting plot isn’t very interesting, but the same method can be applied to non-linear effects as well, and combined into general R expressions:</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">elev.pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">elev.pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>,
   data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>elevation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span>, length.out <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span>,
   formula <span class="op">=</span> <span class="op">~</span> <span class="fu">elev_eval</span><span class="op">(</span><span class="va">elevation</span><span class="op">)</span>
@@ -600,7 +600,7 @@
 
 <span class="va">fitcov1D</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp</span>, <span class="va">pts2</span>, domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span><span class="op">)</span>
 <span class="va">pr.df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>
-<span class="va">prcov1D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span>
+<span class="va">prcov1D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span>
   <span class="va">fitcov1D</span>, <span class="va">pr.df</span>,
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
     total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">beta_z</span> <span class="op">+</span> <span class="va">spde1D</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span>,
@@ -615,7 +615,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">prcov1D</span><span class="op">$</span><span class="va">fx</span><span class="op">$</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">prcov1D</span><span class="op">$</span><span class="va">fx</span><span class="op">$</span><span class="va">median</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"green"</span>, lwd <span class="op">=</span> <span class="fl">1.25</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pts2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">0.2</span>, shape <span class="op">=</span> <span class="st">"|"</span>, cex <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">bold</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">hat</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">bold</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="op">~</span><span class="st">"and its components"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/influence.measures.html">hat</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">bold</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="op">~</span><span class="st">"and its components"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">40</span>, y <span class="op">=</span> <span class="fl">6</span>, label <span class="op">=</span> <span class="st">"Intensity"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">40</span>, y <span class="op">=</span> <span class="fl">5.5</span>, label <span class="op">=</span> <span class="st">"z-effect"</span>, color <span class="op">=</span> <span class="st">"green"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">40</span>, y <span class="op">=</span> <span class="fl">5</span>, label <span class="op">=</span> <span class="st">"SPDE"</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></code></pre></div>

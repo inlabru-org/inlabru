@@ -184,7 +184,7 @@ paraemter. Posterior conversion to a different CRS is supported using the
     <pre class="usage"><span class='fu'>spoly</span><span class='op'>(</span>
   <span class='va'>data</span>,
   cols <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span><span class='op'>]</span>,
-  crs <span class='op'>=</span> <span class='fu'><a href='http://rgdal.r-forge.r-project.org/reference/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='cn'>NA_character_</span><span class='op'>)</span>,
+  crs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></span><span class='op'>(</span><span class='cn'>NA_character_</span><span class='op'>)</span>,
   to.crs <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
@@ -214,24 +214,26 @@ paraemter. Posterior conversion to a different CRS is supported using the
     <p>SpatialPolygonsDataFrame</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='co'># Create data frame of boundary points (anti clockwise!)</span>
-<span class='va'>pts</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
-  x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>1.7</span>, <span class='fl'>1.3</span><span class='op'>)</span>,
-  y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>2</span><span class='op'>)</span>
-<span class='op'>)</span>
-
-<span class='co'># Convert to SpatialPolygonsDataFrame</span>
-<span class='va'>pol</span> <span class='op'>&lt;-</span> <span class='fu'>spoly</span><span class='op'>(</span><span class='va'>pts</span><span class='op'>)</span>
-
-<span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='co'># Plot it!</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>pol</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='message'>Regions defined for each Polygons</span></div><div class='img'><img src='spoly-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># Create data frame of boundary points (anti clockwise!)</span></span>
+<span class='r-in'><span class='va'>pts</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span></span>
+<span class='r-in'>  x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>1.7</span>, <span class='fl'>1.3</span><span class='op'>)</span>,</span>
+<span class='r-in'>  y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Convert to SpatialPolygonsDataFrame</span></span>
+<span class='r-in'><span class='va'>pol</span> <span class='op'>&lt;-</span> <span class='fu'>spoly</span><span class='op'>(</span><span class='va'>pts</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='co'># Plot it!</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>pol</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Regions defined for each Polygons</span>
+<span class='r-plt img'><img src='spoly-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

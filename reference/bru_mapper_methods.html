@@ -287,8 +287,8 @@ names(x) &lt;- value</pre>
     </tr>
     <tr>
       <th>inla_f</th>
-      <td><p>logical; when <code>TRUE</code> in <code>ibm_n</code> and <code>ibm_values</code>, these must result in values compatible with <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f(...)</a></code>
-an specification and corresponding <code><a href='https://rdrr.io/pkg/INLA/man/inla.stack.html'>INLA::inla.stack(...)</a></code> constructions.
+      <td><p>logical; when <code>TRUE</code> in <code>ibm_n</code> and <code>ibm_values</code>, these must result in values compatible with <code>INLA::f(...)</code>
+an specification and corresponding <code>INLA::inla.stack(...)</code> constructions.
 For <code>ibm_amatrix</code> methods, it may influence how the input data is interpreted.
 Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
@@ -334,7 +334,7 @@ Default: <code>TRUE</code></p></td>
 
     
 <ul>
-<li><p><code><a href='https://rdrr.io/r/base/Extract.html'>[</a></code>-indexing a <code>bru_mapper_multi</code> extracts a subset
+<li><p><code>[</code>-indexing a <code>bru_mapper_multi</code> extracts a subset
 <code>bru_mapper_multi</code> object (for drop <code>FALSE</code>) or an individual sub-mapper
 (for drop <code>TRUE</code>, and <code>i</code> identifies a single element)</p></li>
 </ul>
@@ -345,7 +345,7 @@ sub-mappers list</p></li>
 </ul>
 
 <ul>
-<li><p><code><a href='https://rdrr.io/r/base/Extract.html'>[</a></code>-indexing a <code>bru_mapper_collect</code> extracts a subset
+<li><p><code>[</code>-indexing a <code>bru_mapper_collect</code> extracts a subset
 <code>bru_mapper_collect</code> object (for drop <code>FALSE</code>) or an individual sub-mapper
 (for drop <code>TRUE</code>, and <code>i</code> identifies a single element)</p></li>
 </ul>
@@ -366,7 +366,7 @@ first checks for a 'n_inla' element.</p></li>
 
 <ul>
 <li><p>The default <code><a href='bru_mapper.html'>ibm_values()</a></code> method returns a non-null element
-'values' from the mapper object, and <code><a href='https://rdrr.io/r/base/seq.html'>seq_len(ibm_n(mapper))</a></code> if
+'values' from the mapper object, and <code>seq_len(ibm_n(mapper))</code> if
 it doesn't exist.</p></li>
 </ul>
 

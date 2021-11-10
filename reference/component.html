@@ -376,7 +376,7 @@ analytical combination of the covariate \(x\) and the intercept using</p>
 <p>On the other hand, predict may be used to only look at a transformation of
 the latent variable \(\beta_\psi\)</p>
 <ul>
-<li><p><code><a href='https://rdrr.io/r/stats/predict.html'>predict(fit, NULL, ~ exp(psi_latent))</a></code>.</p></li>
+<li><p><code>predict(fit, NULL, ~ exp(psi_latent))</code>.</p></li>
 </ul>
 
 <p>which corresponds to the mathematical expression e <sup>&#946;</sup>.</p>
@@ -390,46 +390,49 @@ the latent variable \(\beta_\psi\)</p>
 Finn Lindgren <a href='mailto:Finn.Lindgren@gmail.com'>Finn.Lindgren@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># As an example, let us create a linear component. Here, the component is</span>
-<span class='co'># called "myLinearEffectOfX" while the covariate the component acts on is</span>
-<span class='co'># called "x". Note that a list of components is returned because the</span>
-<span class='co'># formula may define multiple components</span>
-
-<span class='va'>cmp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='component_list.html'>component_list</a></span><span class='op'>(</span><span class='op'>~</span> <span class='fu'>myLinearEffectOfX</span><span class='op'>(</span>main <span class='op'>=</span> <span class='va'>x</span>, model <span class='op'>=</span> <span class='st'>"linear"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>cmp</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Label:	myLinearEffectOfX
-#&gt;   Main:	input 'x',	type 'linear'
-#&gt;   INLA formula:	~. + f(myLinearEffectOfX, model = BRU_myLinearEffectOfX_main_model)
-#&gt; Label:	Intercept
-#&gt;   Main:	input '1',	type 'linear'
-#&gt;   INLA formula:	~. + f(Intercept, model = BRU_Intercept_main_model)</div><div class='input'><span class='co'># Equivalent shortcuts:</span>
-<span class='va'>cmp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='component_list.html'>component_list</a></span><span class='op'>(</span><span class='op'>~</span> <span class='fu'>myLinearEffectOfX</span><span class='op'>(</span><span class='va'>x</span>, model <span class='op'>=</span> <span class='st'>"linear"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>cmp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='component_list.html'>component_list</a></span><span class='op'>(</span><span class='op'>~</span> <span class='fu'>myLinearEffectOfX</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>
-<span class='co'># Individual component</span>
-<span class='va'>cmp</span> <span class='op'>&lt;-</span> <span class='fu'>component</span><span class='op'>(</span><span class='st'>"myLinearEffectOfX"</span>, main <span class='op'>=</span> <span class='va'>x</span>, model <span class='op'>=</span> <span class='st'>"linear"</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>cmp</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Label:	myLinearEffectOfX
-#&gt;   Main:	input 'x',	type 'linear'
-#&gt;   INLA formula:	~. + f(myLinearEffectOfX, model = BRU_myLinearEffectOfX_main_model)</div><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'>"INLA"</span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-
-  <span class='co'># As an example, let us create a linear component. Here ,the component is</span>
-  <span class='co'># called "myEffectOfX" while the covariate the component acts on is called "x":</span>
-
-  <span class='va'>eff</span> <span class='op'>&lt;-</span> <span class='fu'>component</span><span class='op'>(</span><span class='st'>"myEffectOfX"</span>, main <span class='op'>=</span> <span class='va'>x</span>, model <span class='op'>=</span> <span class='st'>"linear"</span><span class='op'>)</span>
-  <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>eff</span><span class='op'>)</span>
-
-  <span class='co'># A more complicated component:</span>
-  <span class='va'>eff</span> <span class='op'>&lt;-</span> <span class='fu'>component</span><span class='op'>(</span><span class='st'>"myEffectOfX"</span>,
-    main <span class='op'>=</span> <span class='va'>x</span>,
-    model <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.spde2.matern.html'>inla.spde2.matern</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html'>inla.mesh.1d</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='op'>)</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='message'>This is INLA_21.10.03 built 2021-10-03 11:08:20 UTC.</span>
-#&gt; <span class='message'> - See www.r-inla.org/contact-us for how to get help.</span>
-#&gt; <span class='message'> - To enable PARDISO sparse library; see inla.pardiso()</span></div><div class='input'><span class='co'># }</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># As an example, let us create a linear component. Here, the component is</span></span>
+<span class='r-in'><span class='co'># called "myLinearEffectOfX" while the covariate the component acts on is</span></span>
+<span class='r-in'><span class='co'># called "x". Note that a list of components is returned because the</span></span>
+<span class='r-in'><span class='co'># formula may define multiple components</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>cmp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='component_list.html'>component_list</a></span><span class='op'>(</span><span class='op'>~</span> <span class='fu'>myLinearEffectOfX</span><span class='op'>(</span>main <span class='op'>=</span> <span class='va'>x</span>, model <span class='op'>=</span> <span class='st'>"linear"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>cmp</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Label:	myLinearEffectOfX</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   Main:	input 'x',	type 'linear'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   INLA formula:	~. + f(myLinearEffectOfX, model = BRU_myLinearEffectOfX_main_model)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Label:	Intercept</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   Main:	input '1',	type 'linear'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   INLA formula:	~. + f(Intercept, model = BRU_Intercept_main_model)</span>
+<span class='r-in'><span class='co'># Equivalent shortcuts:</span></span>
+<span class='r-in'><span class='va'>cmp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='component_list.html'>component_list</a></span><span class='op'>(</span><span class='op'>~</span> <span class='fu'>myLinearEffectOfX</span><span class='op'>(</span><span class='va'>x</span>, model <span class='op'>=</span> <span class='st'>"linear"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>cmp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='component_list.html'>component_list</a></span><span class='op'>(</span><span class='op'>~</span> <span class='fu'>myLinearEffectOfX</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># Individual component</span></span>
+<span class='r-in'><span class='va'>cmp</span> <span class='op'>&lt;-</span> <span class='fu'>component</span><span class='op'>(</span><span class='st'>"myLinearEffectOfX"</span>, main <span class='op'>=</span> <span class='va'>x</span>, model <span class='op'>=</span> <span class='st'>"linear"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>cmp</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Label:	myLinearEffectOfX</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   Main:	input 'x',	type 'linear'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   INLA formula:	~. + f(myLinearEffectOfX, model = BRU_myLinearEffectOfX_main_model)</span>
+<span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'>"INLA"</span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># As an example, let us create a linear component. Here ,the component is</span></span>
+<span class='r-in'>  <span class='co'># called "myEffectOfX" while the covariate the component acts on is called "x":</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>eff</span> <span class='op'>&lt;-</span> <span class='fu'>component</span><span class='op'>(</span><span class='st'>"myEffectOfX"</span>, main <span class='op'>=</span> <span class='va'>x</span>, model <span class='op'>=</span> <span class='st'>"linear"</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>eff</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># A more complicated component:</span></span>
+<span class='r-in'>  <span class='va'>eff</span> <span class='op'>&lt;-</span> <span class='fu'>component</span><span class='op'>(</span><span class='st'>"myEffectOfX"</span>,</span>
+<span class='r-in'>    main <span class='op'>=</span> <span class='va'>x</span>,</span>
+<span class='r-in'>    model <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.spde2.matern.html'>inla.spde2.matern</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html'>inla.mesh.1d</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> This is INLA_21.11.01 built 2021-10-31 20:28:40 UTC.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  - See www.r-inla.org/contact-us for how to get help.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  - To enable PARDISO sparse library; see inla.pardiso()</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

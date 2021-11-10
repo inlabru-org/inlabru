@@ -190,24 +190,24 @@ the spatial object provided. Then calls ggmap() to plot the map.</p>
     <p>This function requires the <code>ggmap</code> package.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'><a href='https://ggplot2.tidyverse.org'>"ggplot2"</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='co'># Load the Gorilla data</span>
-  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gorillas</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>
-
-  <span class='co'># Create a base map centered around the nests and plot the boundary as well</span>
-  <span class='co'># as the nests</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>, color <span class='op'>=</span> <span class='st'>"white"</span>, size <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
-  <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ns-load.html'>requireNamespace</a></span><span class='op'>(</span><span class='st'>"ggmap"</span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-    <span class='fu'>gmap</span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>, maptype <span class='op'>=</span> <span class='st'>"satellite"</span><span class='op'>)</span> <span class='op'>+</span>
-      <span class='fu'><a href='gm.html'>gm</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span>
-      <span class='fu'><a href='gm.html'>gm</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>, color <span class='op'>=</span> <span class='st'>"white"</span>, size <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
-  <span class='op'>}</span>
-<span class='op'>}</span>
-<span class='op'>}</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'><a href='https://ggplot2.tidyverse.org'>"ggplot2"</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='co'># Load the Gorilla data</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gorillas</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Create a base map centered around the nests and plot the boundary as well</span></span>
+<span class='r-in'>  <span class='co'># as the nests</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>, color <span class='op'>=</span> <span class='st'>"white"</span>, size <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ns-load.html'>requireNamespace</a></span><span class='op'>(</span><span class='st'>"ggmap"</span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>    <span class='fu'>gmap</span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>, maptype <span class='op'>=</span> <span class='st'>"satellite"</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>      <span class='fu'><a href='gm.html'>gm</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>      <span class='fu'><a href='gm.html'>gm</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>nests</span>, color <span class='op'>=</span> <span class='st'>"white"</span>, size <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='op'>}</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

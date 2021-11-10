@@ -191,9 +191,9 @@ Retrieve, add, and/or print log messages" />
     <tr>
       <th>pretty</th>
       <td><p>logical; If <code>TRUE</code>, return a single string with the log
-messages separated and terminated by line feeds, suitable for <code><a href='https://rdrr.io/r/base/cat.html'>cat(...)</a></code>.
+messages separated and terminated by line feeds, suitable for <code>cat(...)</code>.
 If <code>FALSE</code>, return the raw log as a vector of strings, suitable for
-<code><a href='https://rdrr.io/r/base/cat.html'>cat(..., sep = "\n")</a></code>. Default: <code>FALSE</code></p></td>
+<code>cat(..., sep = "\n")</code>. Default: <code>FALSE</code></p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -220,7 +220,7 @@ until the options object has been initialised.</p></td>
     <tr>
       <th>verbose</th>
       <td><p>logical; if <code>TRUE</code>, print the log message on screen with
-<code><a href='https://rdrr.io/r/base/message.html'>message(txt)</a></code>. Default: <code><a href='bru_options.html'>bru_options_get("bru_verbose")</a></code></p></td>
+<code>message(txt)</code>. Default: <code>bru_options_get("bru_verbose")</code></p></td>
     </tr>
     <tr>
       <th>verbose_store</th>
@@ -264,26 +264,29 @@ activation state</p></td>
 <a href='mailto:finn.lindgren@gmail.com'>finn.lindgren@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='co'># EXAMPLE1</span>
-<span class='op'>}</span>
-<span class='op'>}</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='co'># EXAMPLE1</span>
-<span class='op'>}</span>
-<span class='op'>}</span>
-<span class='va'>code_runner</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>oa</span> <span class='op'>&lt;-</span> <span class='fu'>bru_log_active</span><span class='op'>(</span><span class='cn'>TRUE</span><span class='op'>)</span>
-  <span class='fu'><a href='https://rdrr.io/r/base/on.exit.html'>on.exit</a></span><span class='op'>(</span><span class='fu'>bru_log_active</span><span class='op'>(</span><span class='va'>oa</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='fu'>bru_log</span><span class='op'>(</span><span class='st'>"Test message"</span><span class='op'>)</span>
-<span class='op'>}</span>
-<span class='fu'>bru_log_active</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] Inf</div><div class='input'><span class='fu'>code_runner</span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='fu'>bru_log_get</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; 2021-10-12 16:24:06: inlabru loaded 2021-10-12 16:24:06: Clear override options 2021-10-12 16:24:10: iinla: Iteration 1 [max:1] 2021-10-12 16:24:11: iinla: Iteration 1 [max:10] 2021-10-12 16:24:11: iinla: Iteration 2 [max:10] 2021-10-12 16:24:12: iinla: Max deviation from previous: 0.295% of SD [stop if: &lt;1%] 2021-10-12 16:24:12: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2021-10-12 16:24:12: iinla: Iteration 3 [max:10] 2021-10-12 16:24:12: iinla: Iteration 1 [max:10] 2021-10-12 16:24:13: iinla: Step rescaling: 61.8%, Contract 2021-10-12 16:24:13: iinla: Step rescaling: 38.2%, Contract 2021-10-12 16:24:13: iinla: Step rescaling: 29.01%, Optimisation 2021-10-12 16:24:13: iinla: Step rescaling: 29% 2021-10-12 16:24:13: iinla: Iteration 2 [max:10] 2021-10-12 16:24:13: iinla: Step rescaling: 99.89%, Optimisation 2021-10-12 16:24:13: iinla: Step rescaling: 99.9% 2021-10-12 16:24:13: iinla: Max deviation from previous: 61000% of SD [stop if: &lt;1%] 2021-10-12 16:24:13: iinla: Iteration 3 [max:10] 2021-10-12 16:24:14: iinla: Step rescaling: 162%, Expand 2021-10-12 16:24:14: iinla: Step rescaling: 100%, Overstep 2021-10-12 16:24:14: iinla: Step rescaling: 100.7%, Optimisation 2021-10-12 16:24:14: iinla: Step rescaling: 101% 2021-10-12 16:24:14: iinla: Max deviation from previous: 228% of SD [stop if: &lt;1%] 2021-10-12 16:24:14: iinla: Iteration 4 [max:10] 2021-10-12 16:24:14: iinla: Step rescaling: 162%, Expand 2021-10-12 16:24:14: iinla: Step rescaling: 100%, Overstep 2021-10-12 16:24:14: iinla: Max deviation from previous: 1.5% of SD [stop if: &lt;1%] 2021-10-12 16:24:14: iinla: Iteration 5 [max:10] 2021-10-12 16:24:15: iinla: Max deviation from previous: 0.0469% of SD [stop if: &lt;1%] 2021-10-12 16:24:15: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2021-10-12 16:24:15: iinla: Iteration 6 [max:10] 2021-10-12 16:24:17: Test message</div><div class='input'><span class='fu'>bru_log_active</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] Inf</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='co'># EXAMPLE1</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='co'># EXAMPLE1</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'><span class='va'>code_runner</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='va'>oa</span> <span class='op'>&lt;-</span> <span class='fu'>bru_log_active</span><span class='op'>(</span><span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/base/on.exit.html'>on.exit</a></span><span class='op'>(</span><span class='fu'>bru_log_active</span><span class='op'>(</span><span class='va'>oa</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='fu'>bru_log</span><span class='op'>(</span><span class='st'>"Test message"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'><span class='fu'>bru_log_active</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] Inf</span>
+<span class='r-in'><span class='fu'>code_runner</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='fu'>bru_log_get</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2021-11-10 18:14:08: inlabru loaded 2021-11-10 18:14:08: Clear override options 2021-11-10 18:14:13: iinla: Iteration 1 [max:1] 2021-11-10 18:14:14: iinla: Iteration 1 [max:10] 2021-11-10 18:14:14: iinla: Iteration 2 [max:10] 2021-11-10 18:14:15: iinla: Max deviation from previous: 0.512% of SD [stop if: &lt;1%] 2021-11-10 18:14:15: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2021-11-10 18:14:15: iinla: Iteration 3 [max:10] 2021-11-10 18:14:16: iinla: Iteration 1 [max:10] 2021-11-10 18:14:16: iinla: Step rescaling: 61.8%, Contract 2021-11-10 18:14:16: iinla: Step rescaling: 38.2%, Contract 2021-11-10 18:14:16: iinla: Step rescaling: 28.64%, Optimisation 2021-11-10 18:14:16: iinla: Step rescaling: 28.6% 2021-11-10 18:14:16: iinla: Iteration 2 [max:10] 2021-11-10 18:14:17: iinla: Step rescaling: 99.82%, Optimisation 2021-11-10 18:14:17: iinla: Step rescaling: 99.8% 2021-11-10 18:14:17: iinla: Max deviation from previous: 64000% of SD [stop if: &lt;1%] 2021-11-10 18:14:17: iinla: Iteration 3 [max:10] 2021-11-10 18:14:17: iinla: Step rescaling: 162%, Expand 2021-11-10 18:14:17: iinla: Step rescaling: 100%, Overstep 2021-11-10 18:14:17: iinla: Step rescaling: 100.8%, Optimisation 2021-11-10 18:14:17: iinla: Step rescaling: 101% 2021-11-10 18:14:17: iinla: Max deviation from previous: 275% of SD [stop if: &lt;1%] 2021-11-10 18:14:17: iinla: Iteration 4 [max:10] 2021-11-10 18:14:18: iinla: Step rescaling: 162%, Expand 2021-11-10 18:14:18: iinla: Step rescaling: 100%, Overstep 2021-11-10 18:14:18: iinla: Max deviation from previous: 2.05% of SD [stop if: &lt;1%] 2021-11-10 18:14:18: iinla: Iteration 5 [max:10] 2021-11-10 18:14:19: iinla: Step rescaling: 162%, Expand 2021-11-10 18:14:19: iinla: Step rescaling: 100%, Overstep 2021-11-10 18:14:19: iinla: Max deviation from previous: 0.0947% of SD [stop if: &lt;1%] 2021-11-10 18:14:19: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2021-11-10 18:14:19: iinla: Iteration 6 [max:10] 2021-11-10 18:14:21: Test message</span>
+<span class='r-in'><span class='fu'>bru_log_active</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] Inf</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

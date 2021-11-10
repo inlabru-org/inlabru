@@ -252,254 +252,278 @@ Fabian E. Bachl <a href='mailto:bachlfab@gmail.com'>bachlfab@gmail.com</a> (incl
 Finn Lindgren <a href='mailto:finn.lindgren@gmail.com'>finn.lindgren@gmail.com</a> (extended CRS support, triangulated sampling)</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='co'># The INLA package is required</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span>quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>vertices</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>3</span>, by <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-  <span class='va'>mesh</span> <span class='op'>&lt;-</span> <span class='fu'>INLA</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html'>inla.mesh.1d</a></span><span class='op'>(</span><span class='va'>vertices</span><span class='op'>)</span>
-  <span class='va'>loglambda</span> <span class='op'>&lt;-</span> <span class='fl'>5</span> <span class='op'>-</span> <span class='fl'>0.5</span> <span class='op'>*</span> <span class='va'>vertices</span>
-  <span class='va'>pts</span> <span class='op'>&lt;-</span> <span class='fu'>sample.lgcp</span><span class='op'>(</span><span class='va'>mesh</span>, <span class='va'>loglambda</span><span class='op'>)</span>
-  <span class='va'>pts</span><span class='op'>$</span><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fl'>0</span>
-  <span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>vertices</span>, <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>loglambda</span><span class='op'>)</span>, type <span class='op'>=</span> <span class='st'>"l"</span>, ylim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>150</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='fu'><a href='https://rdrr.io/r/graphics/points.html'>points</a></span><span class='op'>(</span><span class='va'>pts</span>, pch <span class='op'>=</span> <span class='st'>"|"</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div><div class='img'><img src='sample.lgcp-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
-
-<span class='co'># \donttest{</span>
-<span class='co'># The INLA package and PROJ6 are required</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span>quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>&amp;&amp;</span>
-  <span class='fu'><a href='fm_has_PROJ6.html'>fm_has_PROJ6</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>&amp;&amp;</span>
-  <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"gorillas"</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span>
-  <span class='va'>pts</span> <span class='op'>&lt;-</span> <span class='fu'>sample.lgcp</span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>,
-    loglambda <span class='op'>=</span> <span class='fl'>1.5</span>,
-    samplers <span class='op'>=</span> <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span>
-  <span class='op'>)</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>pts</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
-#&gt; <span class='warning'>Call stack:</span>
-#&gt; <span class='warning'>1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
-#&gt; <span class='warning'>2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
-#&gt; <span class='warning'>       ...)</span>
-#&gt; <span class='warning'>3: build_site_local(pkg = pkg, examples = examples, run_dont_run = run_dont_run, </span>
-#&gt; <span class='warning'>       seed = seed, lazy = lazy, override = override, preview = preview, </span>
-#&gt; <span class='warning'>       devel = devel)</span>
-#&gt; <span class='warning'>4: build_reference(pkg, lazy = lazy, examples = examples, run_dont_run = run_ [...]</span>
-#&gt; <span class='warning'>       seed = seed, override = override, preview = FALSE, devel = devel)</span>
-#&gt; <span class='warning'>5: purrr::map(topics, build_reference_topic, pkg = pkg, lazy = lazy, </span>
-#&gt; <span class='warning'>       examples = examples, run_dont_run = run_dont_run)</span>
-#&gt; <span class='warning'>6: .f(.x[[i]], ...)</span>
-#&gt; <span class='warning'>7: withCallingHandlers(data_reference_topic(topic, pkg, examples = examples, </span>
-#&gt; <span class='warning'>       run_dont_run = run_dont_run), error = function(err) {</span>
-#&gt; <span class='warning'>       msg &lt;- c(paste0("Failed to parse Rd in ", topic$file_in), </span>
-#&gt; <span class='warning'>           i = err$message)</span>
-#&gt; <span class='warning'>       abort(msg, parent = err)</span>
-#&gt; <span class='warning'>   })</span>
-#&gt; <span class='warning'>8: data_reference_topic(topic, pkg, examples = examples, run_dont_run = run_d [...]</span>
-#&gt; <span class='warning'>9: run_examples(tags$tag_examples[[1]], env = new.env(parent = globalenv()), </span>
-#&gt; <span class='warning'>       topic = tools::file_path_sans_ext(topic$file_in), run_examples = examples, </span>
-#&gt; <span class='warning'>       run_dont_run = run_dont_run)</span>
-#&gt; <span class='warning'>10: highlight_examples(code, topic, env = env)</span>
-#&gt; <span class='warning'>11: downlit::evaluate_and_highlight(code, fig_save = fig_save_topic, </span>
-#&gt; <span class='warning'>       env = child_env(env))</span>
-#&gt; <span class='warning'>12: evaluate::evaluate(code, child_env(env), new_device = TRUE)</span>
-#&gt; <span class='warning'>13: evaluate_call(expr, parsed$src[[i]], envir = envir, enclos = enclos, </span>
-#&gt; <span class='warning'>       debug = debug, last = i == length(out), use_try = stop_on_error != </span>
-#&gt; <span class='warning'>           2L, keep_warning = keep_warning, keep_message = keep_message, </span>
-#&gt; <span class='warning'>       output_handler = output_handler, include_timing = include_timing)</span>
-#&gt; <span class='warning'>14: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, </span>
-#&gt; <span class='warning'>       envir, enclos)), warning = wHandler, error = eHandler, message = mHandler)))</span>
-#&gt; <span class='warning'>15: handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, envir, </span>
-#&gt; <span class='warning'>       enclos)), warning = wHandler, error = eHandler, message = mHandler))</span>
-#&gt; <span class='warning'>16: try(f, silent = TRUE)</span>
-#&gt; <span class='warning'>17: tryCatch(expr, error = function(e) {</span>
-#&gt; <span class='warning'>       call &lt;- conditionCall(e)</span>
-#&gt; <span class='warning'>       if (!is.null(call)) {</span>
-#&gt; <span class='warning'>           if (identical(call[[1L]], quote(doTryCatch))) </span>
-#&gt; <span class='warning'>               call &lt;- sys.call(-4L)</span>
-#&gt; <span class='warning'>           dcall &lt;- deparse(call)[1L]</span>
-#&gt; <span class='warning'>           prefix &lt;- paste("Error in", dcall, ": ")</span>
-#&gt; <span class='warning'>           LONG &lt;- 75L</span>
-#&gt; <span class='warning'>           sm &lt;- strsplit(conditionMessage(e), "\n")[[1L]]</span>
-#&gt; <span class='warning'>           w &lt;- 14L + nchar(dcall, type = "w") + nchar(sm[1L], type = "w")</span>
-#&gt; <span class='warning'>           if (is.na(w)) </span>
-#&gt; <span class='warning'>               w &lt;- 14L + nchar(dcall, type = "b") + nchar(sm[1L], </span>
-#&gt; <span class='warning'>                   type = "b")</span>
-#&gt; <span class='warning'>           if (w &gt; LONG) </span>
-#&gt; <span class='warning'>               prefix &lt;- paste0(prefix, "\n  ")</span>
-#&gt; <span class='warning'>       }</span>
-#&gt; <span class='warning'>       else prefix &lt;- "Error : "</span>
-#&gt; <span class='warning'>       msg &lt;- paste0(prefix, conditionMessage(e), "\n")</span>
-#&gt; <span class='warning'>       .Internal(seterrmessage(msg[1L]))</span>
-#&gt; <span class='warning'>       if (!silent &amp;&amp; isTRUE(getOption("show.error.messages"))) {</span>
-#&gt; <span class='warning'>           cat(msg, file = outFile)</span>
-#&gt; <span class='warning'>           .Internal(printDeferredWarnings())</span>
-#&gt; <span class='warning'>       }</span>
-#&gt; <span class='warning'>       invisible(structure(msg, class = "try-error", condition = e))</span>
-#&gt; <span class='warning'>   })</span>
-#&gt; <span class='warning'>18: tryCatchList(expr, classes, parentenv, handlers)</span>
-#&gt; <span class='warning'>19: tryCatchOne(expr, names, parentenv, handlers[[1L]])</span>
-#&gt; <span class='warning'>20: doTryCatch(return(expr), name, parentenv, handler)</span>
-#&gt; <span class='warning'>21: withCallingHandlers(withVisible(eval(expr, envir, enclos)), warning = wHandler, </span>
-#&gt; <span class='warning'>       error = eHandler, message = mHandler)</span>
-#&gt; <span class='warning'>22: withVisible(eval(expr, envir, enclos))</span>
-#&gt; <span class='warning'>23: eval(expr, envir, enclos)</span>
-#&gt; <span class='warning'>24: eval(expr, envir, enclos)</span>
-#&gt; <span class='warning'>25: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
-#&gt; <span class='warning'>26: fm_CRS(fm_CRSargs(mesh$crs))</span>
-#&gt; <span class='warning'>27: fm_CRSargs(mesh$crs)</span>
-#&gt; <span class='warning'>28: fm_not_for_PROJ6()</span>
-#&gt; <span class='warning'>29: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRS' should be given a SRS_string for PROJ6 or a known keyword for a predefined string given in projargs. Using fallback PROJ4 method.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs_as_list()' should not be used with PROJ6 and rgdal v3</span>
-#&gt; <span class='warning'>Call stack:</span>
-#&gt; <span class='warning'>1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
-#&gt; <span class='warning'>2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
-#&gt; <span class='warning'>       ...)</span>
-#&gt; <span class='warning'>3: build_site_local(pkg = pkg, examples = examples, run_dont_run = run_dont_run, </span>
-#&gt; <span class='warning'>       seed = seed, lazy = lazy, override = override, preview = preview, </span>
-#&gt; <span class='warning'>       devel = devel)</span>
-#&gt; <span class='warning'>4: build_reference(pkg, lazy = lazy, examples = examples, run_dont_run = run_ [...]</span>
-#&gt; <span class='warning'>       seed = seed, override = override, preview = FALSE, devel = devel)</span>
-#&gt; <span class='warning'>5: purrr::map(topics, build_reference_topic, pkg = pkg, lazy = lazy, </span>
-#&gt; <span class='warning'>       examples = examples, run_dont_run = run_dont_run)</span>
-#&gt; <span class='warning'>6: .f(.x[[i]], ...)</span>
-#&gt; <span class='warning'>7: withCallingHandlers(data_reference_topic(topic, pkg, examples = examples, </span>
-#&gt; <span class='warning'>       run_dont_run = run_dont_run), error = function(err) {</span>
-#&gt; <span class='warning'>       msg &lt;- c(paste0("Failed to parse Rd in ", topic$file_in), </span>
-#&gt; <span class='warning'>           i = err$message)</span>
-#&gt; <span class='warning'>       abort(msg, parent = err)</span>
-#&gt; <span class='warning'>   })</span>
-#&gt; <span class='warning'>8: data_reference_topic(topic, pkg, examples = examples, run_dont_run = run_d [...]</span>
-#&gt; <span class='warning'>9: run_examples(tags$tag_examples[[1]], env = new.env(parent = globalenv()), </span>
-#&gt; <span class='warning'>       topic = tools::file_path_sans_ext(topic$file_in), run_examples = examples, </span>
-#&gt; <span class='warning'>       run_dont_run = run_dont_run)</span>
-#&gt; <span class='warning'>10: highlight_examples(code, topic, env = env)</span>
-#&gt; <span class='warning'>11: downlit::evaluate_and_highlight(code, fig_save = fig_save_topic, </span>
-#&gt; <span class='warning'>       env = child_env(env))</span>
-#&gt; <span class='warning'>12: evaluate::evaluate(code, child_env(env), new_device = TRUE)</span>
-#&gt; <span class='warning'>13: evaluate_call(expr, parsed$src[[i]], envir = envir, enclos = enclos, </span>
-#&gt; <span class='warning'>       debug = debug, last = i == length(out), use_try = stop_on_error != </span>
-#&gt; <span class='warning'>           2L, keep_warning = keep_warning, keep_message = keep_message, </span>
-#&gt; <span class='warning'>       output_handler = output_handler, include_timing = include_timing)</span>
-#&gt; <span class='warning'>14: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, </span>
-#&gt; <span class='warning'>       envir, enclos)), warning = wHandler, error = eHandler, message = mHandler)))</span>
-#&gt; <span class='warning'>15: handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, envir, </span>
-#&gt; <span class='warning'>       enclos)), warning = wHandler, error = eHandler, message = mHandler))</span>
-#&gt; <span class='warning'>16: try(f, silent = TRUE)</span>
-#&gt; <span class='warning'>17: tryCatch(expr, error = function(e) {</span>
-#&gt; <span class='warning'>       call &lt;- conditionCall(e)</span>
-#&gt; <span class='warning'>       if (!is.null(call)) {</span>
-#&gt; <span class='warning'>           if (identical(call[[1L]], quote(doTryCatch))) </span>
-#&gt; <span class='warning'>               call &lt;- sys.call(-4L)</span>
-#&gt; <span class='warning'>           dcall &lt;- deparse(call)[1L]</span>
-#&gt; <span class='warning'>           prefix &lt;- paste("Error in", dcall, ": ")</span>
-#&gt; <span class='warning'>           LONG &lt;- 75L</span>
-#&gt; <span class='warning'>           sm &lt;- strsplit(conditionMessage(e), "\n")[[1L]]</span>
-#&gt; <span class='warning'>           w &lt;- 14L + nchar(dcall, type = "w") + nchar(sm[1L], type = "w")</span>
-#&gt; <span class='warning'>           if (is.na(w)) </span>
-#&gt; <span class='warning'>               w &lt;- 14L + nchar(dcall, type = "b") + nchar(sm[1L], </span>
-#&gt; <span class='warning'>                   type = "b")</span>
-#&gt; <span class='warning'>           if (w &gt; LONG) </span>
-#&gt; <span class='warning'>               prefix &lt;- paste0(prefix, "\n  ")</span>
-#&gt; <span class='warning'>       }</span>
-#&gt; <span class='warning'>       else prefix &lt;- "Error : "</span>
-#&gt; <span class='warning'>       msg &lt;- paste0(prefix, conditionMessage(e), "\n")</span>
-#&gt; <span class='warning'>       .Internal(seterrmessage(msg[1L]))</span>
-#&gt; <span class='warning'>       if (!silent &amp;&amp; isTRUE(getOption("show.error.messages"))) {</span>
-#&gt; <span class='warning'>           cat(msg, file = outFile)</span>
-#&gt; <span class='warning'>           .Internal(printDeferredWarnings())</span>
-#&gt; <span class='warning'>       }</span>
-#&gt; <span class='warning'>       invisible(structure(msg, class = "try-error", condition = e))</span>
-#&gt; <span class='warning'>   })</span>
-#&gt; <span class='warning'>18: tryCatchList(expr, classes, parentenv, handlers)</span>
-#&gt; <span class='warning'>19: tryCatchOne(expr, names, parentenv, handlers[[1L]])</span>
-#&gt; <span class='warning'>20: doTryCatch(return(expr), name, parentenv, handler)</span>
-#&gt; <span class='warning'>21: withCallingHandlers(withVisible(eval(expr, envir, enclos)), warning = wHandler, </span>
-#&gt; <span class='warning'>       error = eHandler, message = mHandler)</span>
-#&gt; <span class='warning'>22: withVisible(eval(expr, envir, enclos))</span>
-#&gt; <span class='warning'>23: eval(expr, envir, enclos)</span>
-#&gt; <span class='warning'>24: eval(expr, envir, enclos)</span>
-#&gt; <span class='warning'>25: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
-#&gt; <span class='warning'>26: fm_CRSargs_as_list(fm_CRSargs(input.crs))</span>
-#&gt; <span class='warning'>27: fm_not_for_PROJ6()</span>
-#&gt; <span class='warning'>28: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
-#&gt; <span class='warning'>Call stack:</span>
-#&gt; <span class='warning'>1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
-#&gt; <span class='warning'>2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
-#&gt; <span class='warning'>       ...)</span>
-#&gt; <span class='warning'>3: build_site_local(pkg = pkg, examples = examples, run_dont_run = run_dont_run, </span>
-#&gt; <span class='warning'>       seed = seed, lazy = lazy, override = override, preview = preview, </span>
-#&gt; <span class='warning'>       devel = devel)</span>
-#&gt; <span class='warning'>4: build_reference(pkg, lazy = lazy, examples = examples, run_dont_run = run_ [...]</span>
-#&gt; <span class='warning'>       seed = seed, override = override, preview = FALSE, devel = devel)</span>
-#&gt; <span class='warning'>5: purrr::map(topics, build_reference_topic, pkg = pkg, lazy = lazy, </span>
-#&gt; <span class='warning'>       examples = examples, run_dont_run = run_dont_run)</span>
-#&gt; <span class='warning'>6: .f(.x[[i]], ...)</span>
-#&gt; <span class='warning'>7: withCallingHandlers(data_reference_topic(topic, pkg, examples = examples, </span>
-#&gt; <span class='warning'>       run_dont_run = run_dont_run), error = function(err) {</span>
-#&gt; <span class='warning'>       msg &lt;- c(paste0("Failed to parse Rd in ", topic$file_in), </span>
-#&gt; <span class='warning'>           i = err$message)</span>
-#&gt; <span class='warning'>       abort(msg, parent = err)</span>
-#&gt; <span class='warning'>   })</span>
-#&gt; <span class='warning'>8: data_reference_topic(topic, pkg, examples = examples, run_dont_run = run_d [...]</span>
-#&gt; <span class='warning'>9: run_examples(tags$tag_examples[[1]], env = new.env(parent = globalenv()), </span>
-#&gt; <span class='warning'>       topic = tools::file_path_sans_ext(topic$file_in), run_examples = examples, </span>
-#&gt; <span class='warning'>       run_dont_run = run_dont_run)</span>
-#&gt; <span class='warning'>10: highlight_examples(code, topic, env = env)</span>
-#&gt; <span class='warning'>11: downlit::evaluate_and_highlight(code, fig_save = fig_save_topic, </span>
-#&gt; <span class='warning'>       env = child_env(env))</span>
-#&gt; <span class='warning'>12: evaluate::evaluate(code, child_env(env), new_device = TRUE)</span>
-#&gt; <span class='warning'>13: evaluate_call(expr, parsed$src[[i]], envir = envir, enclos = enclos, </span>
-#&gt; <span class='warning'>       debug = debug, last = i == length(out), use_try = stop_on_error != </span>
-#&gt; <span class='warning'>           2L, keep_warning = keep_warning, keep_message = keep_message, </span>
-#&gt; <span class='warning'>       output_handler = output_handler, include_timing = include_timing)</span>
-#&gt; <span class='warning'>14: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, </span>
-#&gt; <span class='warning'>       envir, enclos)), warning = wHandler, error = eHandler, message = mHandler)))</span>
-#&gt; <span class='warning'>15: handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, envir, </span>
-#&gt; <span class='warning'>       enclos)), warning = wHandler, error = eHandler, message = mHandler))</span>
-#&gt; <span class='warning'>16: try(f, silent = TRUE)</span>
-#&gt; <span class='warning'>17: tryCatch(expr, error = function(e) {</span>
-#&gt; <span class='warning'>       call &lt;- conditionCall(e)</span>
-#&gt; <span class='warning'>       if (!is.null(call)) {</span>
-#&gt; <span class='warning'>           if (identical(call[[1L]], quote(doTryCatch))) </span>
-#&gt; <span class='warning'>               call &lt;- sys.call(-4L)</span>
-#&gt; <span class='warning'>           dcall &lt;- deparse(call)[1L]</span>
-#&gt; <span class='warning'>           prefix &lt;- paste("Error in", dcall, ": ")</span>
-#&gt; <span class='warning'>           LONG &lt;- 75L</span>
-#&gt; <span class='warning'>           sm &lt;- strsplit(conditionMessage(e), "\n")[[1L]]</span>
-#&gt; <span class='warning'>           w &lt;- 14L + nchar(dcall, type = "w") + nchar(sm[1L], type = "w")</span>
-#&gt; <span class='warning'>           if (is.na(w)) </span>
-#&gt; <span class='warning'>               w &lt;- 14L + nchar(dcall, type = "b") + nchar(sm[1L], </span>
-#&gt; <span class='warning'>                   type = "b")</span>
-#&gt; <span class='warning'>           if (w &gt; LONG) </span>
-#&gt; <span class='warning'>               prefix &lt;- paste0(prefix, "\n  ")</span>
-#&gt; <span class='warning'>       }</span>
-#&gt; <span class='warning'>       else prefix &lt;- "Error : "</span>
-#&gt; <span class='warning'>       msg &lt;- paste0(prefix, conditionMessage(e), "\n")</span>
-#&gt; <span class='warning'>       .Internal(seterrmessage(msg[1L]))</span>
-#&gt; <span class='warning'>       if (!silent &amp;&amp; isTRUE(getOption("show.error.messages"))) {</span>
-#&gt; <span class='warning'>           cat(msg, file = outFile)</span>
-#&gt; <span class='warning'>           .Internal(printDeferredWarnings())</span>
-#&gt; <span class='warning'>       }</span>
-#&gt; <span class='warning'>       invisible(structure(msg, class = "try-error", condition = e))</span>
-#&gt; <span class='warning'>   })</span>
-#&gt; <span class='warning'>18: tryCatchList(expr, classes, parentenv, handlers)</span>
-#&gt; <span class='warning'>19: tryCatchOne(expr, names, parentenv, handlers[[1L]])</span>
-#&gt; <span class='warning'>20: doTryCatch(return(expr), name, parentenv, handler)</span>
-#&gt; <span class='warning'>21: withCallingHandlers(withVisible(eval(expr, envir, enclos)), warning = wHandler, </span>
-#&gt; <span class='warning'>       error = eHandler, message = mHandler)</span>
-#&gt; <span class='warning'>22: withVisible(eval(expr, envir, enclos))</span>
-#&gt; <span class='warning'>23: eval(expr, envir, enclos)</span>
-#&gt; <span class='warning'>24: eval(expr, envir, enclos)</span>
-#&gt; <span class='warning'>25: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
-#&gt; <span class='warning'>26: fm_CRSargs_as_list(fm_CRSargs(input.crs))</span>
-#&gt; <span class='warning'>27: fm_CRSargs(input.crs)</span>
-#&gt; <span class='warning'>28: fm_not_for_PROJ6()</span>
-#&gt; <span class='warning'>29: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Discarded datum unknown in Proj4 definition</span></div><div class='img'><img src='sample.lgcp-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># The INLA package is required</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span>quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='va'>vertices</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>3</span>, by <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>mesh</span> <span class='op'>&lt;-</span> <span class='fu'>INLA</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html'>inla.mesh.1d</a></span><span class='op'>(</span><span class='va'>vertices</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>loglambda</span> <span class='op'>&lt;-</span> <span class='fl'>5</span> <span class='op'>-</span> <span class='fl'>0.5</span> <span class='op'>*</span> <span class='va'>vertices</span></span>
+<span class='r-in'>  <span class='va'>pts</span> <span class='op'>&lt;-</span> <span class='fu'>sample.lgcp</span><span class='op'>(</span><span class='va'>mesh</span>, <span class='va'>loglambda</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>pts</span><span class='op'>$</span><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fl'>0</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>vertices</span>, <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>loglambda</span><span class='op'>)</span>, type <span class='op'>=</span> <span class='st'>"l"</span>, ylim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>150</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/graphics/points.html'>points</a></span><span class='op'>(</span><span class='va'>pts</span>, pch <span class='op'>=</span> <span class='st'>"|"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-plt img'><img src='sample.lgcp-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># The INLA package and PROJ6 are required</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span>quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>&amp;&amp;</span></span>
+<span class='r-in'>  <span class='fu'><a href='fm_has_PROJ6.html'>fm_has_PROJ6</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>&amp;&amp;</span></span>
+<span class='r-in'>  <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"gorillas"</span>, package <span class='op'>=</span> <span class='st'>"inlabru"</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>pts</span> <span class='op'>&lt;-</span> <span class='fu'>sample.lgcp</span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span>,</span>
+<span class='r-in'>    loglambda <span class='op'>=</span> <span class='fl'>1.5</span>,</span>
+<span class='r-in'>    samplers <span class='op'>=</span> <span class='va'>gorillas</span><span class='op'>$</span><span class='va'>boundary</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>gorillas</span><span class='op'>$</span><span class='va'>mesh</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>pts</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> Call stack:</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        ...)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 3: build_site_local(pkg = pkg, examples = examples, run_dont_run = run_dont_run, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        seed = seed, lazy = lazy, override = override, preview = preview, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        devel = devel)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 4: build_reference(pkg, lazy = lazy, examples = examples, run_dont_run = run_ [...]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        seed = seed, override = override, preview = FALSE, devel = devel)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 5: purrr::map(topics, build_reference_topic, pkg = pkg, lazy = lazy, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        examples = examples, run_dont_run = run_dont_run)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 6: .f(.x[[i]], ...)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 7: withCallingHandlers(data_reference_topic(topic, pkg, examples = examples, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        run_dont_run = run_dont_run), error = function(err) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        msg &lt;- c(paste0("Failed to parse Rd in ", topic$file_in), </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            i = err$message)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        abort(msg, parent = err)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>    })</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 8: data_reference_topic(topic, pkg, examples = examples, run_dont_run = run_d [...]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 9: run_examples(tags$tag_examples[[1]], env = new.env(parent = globalenv()), </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        topic = tools::file_path_sans_ext(topic$file_in), run_examples = examples, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        run_dont_run = run_dont_run)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 10: highlight_examples(code, topic, env = env)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 11: downlit::evaluate_and_highlight(code, fig_save = fig_save_topic, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        env = child_env(env))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 12: evaluate::evaluate(code, child_env(env), new_device = TRUE, output_handler [...]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 13: evaluate_call(expr, parsed$src[[i]], envir = envir, enclos = enclos, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        debug = debug, last = i == length(out), use_try = stop_on_error != </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            2L, keep_warning = keep_warning, keep_message = keep_message, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        output_handler = output_handler, include_timing = include_timing)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 14: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        envir, enclos)), warning = wHandler, error = eHandler, message = mHandler)))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 15: handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, envir, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        enclos)), warning = wHandler, error = eHandler, message = mHandler))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 16: try(f, silent = TRUE)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 17: tryCatch(expr, error = function(e) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        call &lt;- conditionCall(e)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        if (!is.null(call)) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            if (identical(call[[1L]], quote(doTryCatch))) </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                call &lt;- sys.call(-4L)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            dcall &lt;- deparse(call, nlines = 1L)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            prefix &lt;- paste("Error in", dcall, ": ")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            LONG &lt;- 75L</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            sm &lt;- strsplit(conditionMessage(e), "\n")[[1L]]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            w &lt;- 14L + nchar(dcall, type = "w") + nchar(sm[1L], type = "w")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            if (is.na(w)) </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                w &lt;- 14L + nchar(dcall, type = "b") + nchar(sm[1L], </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                    type = "b")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            if (w &gt; LONG) </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                prefix &lt;- paste0(prefix, "\n  ")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        }</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        else prefix &lt;- "Error : "</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        msg &lt;- paste0(prefix, conditionMessage(e), "\n")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        .Internal(seterrmessage(msg[1L]))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        if (!silent &amp;&amp; isTRUE(getOption("show.error.messages"))) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            cat(msg, file = outFile)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            .Internal(printDeferredWarnings())</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        }</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        invisible(structure(msg, class = "try-error", condition = e))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>    })</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 18: tryCatchList(expr, classes, parentenv, handlers)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 19: tryCatchOne(expr, names, parentenv, handlers[[1L]])</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 20: doTryCatch(return(expr), name, parentenv, handler)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 21: withCallingHandlers(withVisible(eval(expr, envir, enclos)), warning = wHandler, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        error = eHandler, message = mHandler)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 22: withVisible(eval(expr, envir, enclos))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 23: eval(expr, envir, enclos)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 24: eval(expr, envir, enclos)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 25: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 26: fm_CRS(fm_CRSargs(mesh$crs))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 27: fm_CRSargs(mesh$crs)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 28: fm_not_for_PROJ6()</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 29: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>'fm_CRS' should be given a SRS_string for PROJ6 or a known keyword for a predefined string given in projargs. Using fallback PROJ4 method.</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>'fm_CRSargs_as_list()' should not be used with PROJ6 and rgdal v3</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> Call stack:</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        ...)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 3: build_site_local(pkg = pkg, examples = examples, run_dont_run = run_dont_run, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        seed = seed, lazy = lazy, override = override, preview = preview, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        devel = devel)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 4: build_reference(pkg, lazy = lazy, examples = examples, run_dont_run = run_ [...]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        seed = seed, override = override, preview = FALSE, devel = devel)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 5: purrr::map(topics, build_reference_topic, pkg = pkg, lazy = lazy, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        examples = examples, run_dont_run = run_dont_run)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 6: .f(.x[[i]], ...)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 7: withCallingHandlers(data_reference_topic(topic, pkg, examples = examples, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        run_dont_run = run_dont_run), error = function(err) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        msg &lt;- c(paste0("Failed to parse Rd in ", topic$file_in), </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            i = err$message)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        abort(msg, parent = err)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>    })</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 8: data_reference_topic(topic, pkg, examples = examples, run_dont_run = run_d [...]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 9: run_examples(tags$tag_examples[[1]], env = new.env(parent = globalenv()), </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        topic = tools::file_path_sans_ext(topic$file_in), run_examples = examples, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        run_dont_run = run_dont_run)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 10: highlight_examples(code, topic, env = env)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 11: downlit::evaluate_and_highlight(code, fig_save = fig_save_topic, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        env = child_env(env))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 12: evaluate::evaluate(code, child_env(env), new_device = TRUE, output_handler [...]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 13: evaluate_call(expr, parsed$src[[i]], envir = envir, enclos = enclos, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        debug = debug, last = i == length(out), use_try = stop_on_error != </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            2L, keep_warning = keep_warning, keep_message = keep_message, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        output_handler = output_handler, include_timing = include_timing)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 14: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        envir, enclos)), warning = wHandler, error = eHandler, message = mHandler)))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 15: handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, envir, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        enclos)), warning = wHandler, error = eHandler, message = mHandler))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 16: try(f, silent = TRUE)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 17: tryCatch(expr, error = function(e) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        call &lt;- conditionCall(e)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        if (!is.null(call)) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            if (identical(call[[1L]], quote(doTryCatch))) </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                call &lt;- sys.call(-4L)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            dcall &lt;- deparse(call, nlines = 1L)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            prefix &lt;- paste("Error in", dcall, ": ")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            LONG &lt;- 75L</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            sm &lt;- strsplit(conditionMessage(e), "\n")[[1L]]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            w &lt;- 14L + nchar(dcall, type = "w") + nchar(sm[1L], type = "w")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            if (is.na(w)) </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                w &lt;- 14L + nchar(dcall, type = "b") + nchar(sm[1L], </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                    type = "b")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            if (w &gt; LONG) </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                prefix &lt;- paste0(prefix, "\n  ")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        }</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        else prefix &lt;- "Error : "</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        msg &lt;- paste0(prefix, conditionMessage(e), "\n")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        .Internal(seterrmessage(msg[1L]))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        if (!silent &amp;&amp; isTRUE(getOption("show.error.messages"))) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            cat(msg, file = outFile)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            .Internal(printDeferredWarnings())</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        }</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        invisible(structure(msg, class = "try-error", condition = e))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>    })</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 18: tryCatchList(expr, classes, parentenv, handlers)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 19: tryCatchOne(expr, names, parentenv, handlers[[1L]])</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 20: doTryCatch(return(expr), name, parentenv, handler)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 21: withCallingHandlers(withVisible(eval(expr, envir, enclos)), warning = wHandler, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        error = eHandler, message = mHandler)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 22: withVisible(eval(expr, envir, enclos))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 23: eval(expr, envir, enclos)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 24: eval(expr, envir, enclos)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 25: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 26: fm_CRSargs_as_list(fm_CRSargs(input.crs))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 27: fm_not_for_PROJ6()</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 28: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> Call stack:</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 2: build_site(pkg, devel = FALSE, preview = FALSE, install = FALSE, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        ...)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 3: build_site_local(pkg = pkg, examples = examples, run_dont_run = run_dont_run, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        seed = seed, lazy = lazy, override = override, preview = preview, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        devel = devel)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 4: build_reference(pkg, lazy = lazy, examples = examples, run_dont_run = run_ [...]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        seed = seed, override = override, preview = FALSE, devel = devel)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 5: purrr::map(topics, build_reference_topic, pkg = pkg, lazy = lazy, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        examples = examples, run_dont_run = run_dont_run)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 6: .f(.x[[i]], ...)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 7: withCallingHandlers(data_reference_topic(topic, pkg, examples = examples, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        run_dont_run = run_dont_run), error = function(err) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        msg &lt;- c(paste0("Failed to parse Rd in ", topic$file_in), </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            i = err$message)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        abort(msg, parent = err)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>    })</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 8: data_reference_topic(topic, pkg, examples = examples, run_dont_run = run_d [...]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 9: run_examples(tags$tag_examples[[1]], env = new.env(parent = globalenv()), </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        topic = tools::file_path_sans_ext(topic$file_in), run_examples = examples, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        run_dont_run = run_dont_run)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 10: highlight_examples(code, topic, env = env)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 11: downlit::evaluate_and_highlight(code, fig_save = fig_save_topic, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        env = child_env(env))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 12: evaluate::evaluate(code, child_env(env), new_device = TRUE, output_handler [...]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 13: evaluate_call(expr, parsed$src[[i]], envir = envir, enclos = enclos, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        debug = debug, last = i == length(out), use_try = stop_on_error != </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            2L, keep_warning = keep_warning, keep_message = keep_message, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        output_handler = output_handler, include_timing = include_timing)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 14: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        envir, enclos)), warning = wHandler, error = eHandler, message = mHandler)))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 15: handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, envir, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        enclos)), warning = wHandler, error = eHandler, message = mHandler))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 16: try(f, silent = TRUE)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 17: tryCatch(expr, error = function(e) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        call &lt;- conditionCall(e)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        if (!is.null(call)) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            if (identical(call[[1L]], quote(doTryCatch))) </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                call &lt;- sys.call(-4L)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            dcall &lt;- deparse(call, nlines = 1L)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            prefix &lt;- paste("Error in", dcall, ": ")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            LONG &lt;- 75L</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            sm &lt;- strsplit(conditionMessage(e), "\n")[[1L]]</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            w &lt;- 14L + nchar(dcall, type = "w") + nchar(sm[1L], type = "w")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            if (is.na(w)) </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                w &lt;- 14L + nchar(dcall, type = "b") + nchar(sm[1L], </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                    type = "b")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            if (w &gt; LONG) </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>                prefix &lt;- paste0(prefix, "\n  ")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        }</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        else prefix &lt;- "Error : "</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        msg &lt;- paste0(prefix, conditionMessage(e), "\n")</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        .Internal(seterrmessage(msg[1L]))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        if (!silent &amp;&amp; isTRUE(getOption("show.error.messages"))) {</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            cat(msg, file = outFile)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>            .Internal(printDeferredWarnings())</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        }</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        invisible(structure(msg, class = "try-error", condition = e))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>    })</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 18: tryCatchList(expr, classes, parentenv, handlers)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 19: tryCatchOne(expr, names, parentenv, handlers[[1L]])</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 20: doTryCatch(return(expr), name, parentenv, handler)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 21: withCallingHandlers(withVisible(eval(expr, envir, enclos)), warning = wHandler, </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>        error = eHandler, message = mHandler)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 22: withVisible(eval(expr, envir, enclos))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 23: eval(expr, envir, enclos)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 24: eval(expr, envir, enclos)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 25: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 26: fm_CRSargs_as_list(fm_CRSargs(input.crs))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 27: fm_CRSargs(input.crs)</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 28: fm_not_for_PROJ6()</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> 29: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded datum unknown in Proj4 definition</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded datum unknown in Proj4 definition</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded datum unknown in Proj4 definition</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded datum unknown in Proj4 definition</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded datum unknown in Proj4 definition</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded datum unknown in Proj4 definition</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded datum unknown in Proj4 definition</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded datum unknown in Proj4 definition</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Discarded datum unknown in Proj4 definition</span>
+<span class='r-plt img'><img src='sample.lgcp-2.png' alt='' width='700' height='433' /></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

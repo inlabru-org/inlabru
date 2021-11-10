@@ -192,67 +192,77 @@ various summaries from it.</p>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span>multicore <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-
-  <span class='co'># Simulate some covariates x and observations y</span>
-  <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>within</a></span><span class='op'>(</span><span class='va'>input.df</span>, <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fl'>5</span> <span class='op'>+</span> <span class='fl'>2</span> <span class='op'>*</span> <span class='va'>x</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>
-
-  <span class='co'># Fit a Gaussian likelihood model</span>
-  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x</span> <span class='op'>+</span> <span class='va'>Intercept</span>, family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>input.df</span><span class='op'>)</span>
-
-  <span class='co'># Obtain summary</span>
-  <span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='message'>Current num.threads is '1:1'.</span></div><div class='output co'>#&gt; <span class='message'>No num.threads change needed.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: All covariate evaluations for 'Intercept' are NULL; an intercept component was likely intended.</span>
-#&gt; <span class='warning'>  Implicit latent intercept component specification is deprecated since version 2.1.14.</span>
-#&gt; <span class='warning'>  Use explicit notation '+ Intercept(1)' instead (or '+1' for '+ Intercept(1)').</span></div><div class='output co'>#&gt;               mean         sd 0.025quant 0.5quant 0.975quant     mode
-#&gt; x         2.103494 0.05035297   2.002795 2.103493   2.204020 2.103496
-#&gt; Intercept 4.967624 0.03560688   4.896416 4.967623   5.038708 4.967626
-#&gt;                    kld
-#&gt; x         8.080201e-05
-#&gt; Intercept 8.073994e-05</div><div class='input'>
-
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span>multicore <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-
-  <span class='co'># Alternatively, we can use the like() function to construct the likelihood:</span>
-
-  <span class='va'>lik</span> <span class='op'>&lt;-</span> <span class='fu'><a href='like.html'>like</a></span><span class='op'>(</span>family <span class='op'>=</span> <span class='st'>"gaussian"</span>, formula <span class='op'>=</span> <span class='va'>y</span> <span class='op'>~</span> <span class='va'>x</span> <span class='op'>+</span> <span class='va'>Intercept</span>, data <span class='op'>=</span> <span class='va'>input.df</span><span class='op'>)</span>
-  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='op'>~</span> <span class='va'>x</span> <span class='op'>+</span> <span class='fu'>Intercept</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>, <span class='va'>lik</span><span class='op'>)</span>
-  <span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='message'>Current num.threads is '1:1'.</span></div><div class='output co'>#&gt; <span class='message'>No num.threads change needed.</span></div><div class='output co'>#&gt;               mean         sd 0.025quant 0.5quant 0.975quant     mode
-#&gt; x         2.103494 0.05034839   2.002803 2.103493   2.204011 2.103496
-#&gt; Intercept 4.967624 0.03560365   4.896421 4.967623   5.038702 4.967626
-#&gt;                    kld
-#&gt; x         8.331820e-05
-#&gt; Intercept 8.325413e-05</div><div class='input'>
-<span class='co'># An important addition to the INLA methodology is bru's ability to use</span>
-<span class='co'># non-linear predictors. Such a predictor can be formulated via like()'s</span>
-<span class='co'># \code{formula} parameter. The z(1) notation is needed to ensure that</span>
-<span class='co'># the z component should be interpreted as single latent variable and not</span>
-<span class='co'># a covariate:</span>
-
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span>multicore <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>z</span> <span class='op'>&lt;-</span> <span class='fl'>2</span>
-  <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>within</a></span><span class='op'>(</span><span class='va'>input.df</span>, <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fl'>5</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>)</span> <span class='op'>*</span> <span class='va'>x</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='va'>lik</span> <span class='op'>&lt;-</span> <span class='fu'><a href='like.html'>like</a></span><span class='op'>(</span>
-    family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>input.df</span>,
-    formula <span class='op'>=</span> <span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>)</span> <span class='op'>*</span> <span class='va'>x</span> <span class='op'>+</span> <span class='va'>Intercept</span>
-  <span class='op'>)</span>
-  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='op'>~</span> <span class='fu'>z</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>Intercept</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>, <span class='va'>lik</span><span class='op'>)</span>
-
-  <span class='co'># Check the result (z posterior should be around 2)</span>
-  <span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; <span class='message'>Current num.threads is '1:1'.</span></div><div class='output co'>#&gt; <span class='message'>No num.threads change needed.</span></div><div class='output co'>#&gt;               mean          sd 0.025quant 0.5quant 0.975quant     mode
-#&gt; z         2.000260 0.006510222   1.987253 2.000259   2.013245 2.000260
-#&gt; Intercept 4.989346 0.033630215   4.922090 4.989345   5.056484 4.989347
-#&gt;                    kld
-#&gt; z         7.997913e-05
-#&gt; Intercept 8.370059e-05</div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span>multicore <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Simulate some covariates x and observations y</span></span>
+<span class='r-in'>  <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>within</a></span><span class='op'>(</span><span class='va'>input.df</span>, <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fl'>5</span> <span class='op'>+</span> <span class='fl'>2</span> <span class='op'>*</span> <span class='va'>x</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Fit a Gaussian likelihood model</span></span>
+<span class='r-in'>  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x</span> <span class='op'>+</span> <span class='va'>Intercept</span>, family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>input.df</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Obtain summary</span></span>
+<span class='r-in'>  <span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Current num.threads is '1:1'.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> No num.threads change needed.</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>All covariate evaluations for 'Intercept' are NULL; an intercept component was likely intended.</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>   Implicit latent intercept component specification is deprecated since version 2.1.14.</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span>   Use explicit notation '+ Intercept(1)' instead (or '+1' for '+ Intercept(1)').</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> x         2.018472 0.04807582   1.922327 2.018470   2.114451 2.018473</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Intercept 5.017067 0.03399726   4.949078 5.017067   5.084938 5.017069</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                    kld</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> x         8.118404e-05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Intercept 8.111494e-05</span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span>multicore <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Alternatively, we can use the like() function to construct the likelihood:</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>lik</span> <span class='op'>&lt;-</span> <span class='fu'><a href='like.html'>like</a></span><span class='op'>(</span>family <span class='op'>=</span> <span class='st'>"gaussian"</span>, formula <span class='op'>=</span> <span class='va'>y</span> <span class='op'>~</span> <span class='va'>x</span> <span class='op'>+</span> <span class='va'>Intercept</span>, data <span class='op'>=</span> <span class='va'>input.df</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='op'>~</span> <span class='va'>x</span> <span class='op'>+</span> <span class='fu'>Intercept</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>, <span class='va'>lik</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Current num.threads is '1:1'.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> No num.threads change needed.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> x         2.018471 0.04808052   1.922319 2.018470   2.114461 2.018473</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Intercept 5.017067 0.03400058   4.949073 5.017067   5.084945 5.017069</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                    kld</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> x         7.849511e-05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Intercept 7.842822e-05</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># An important addition to the INLA methodology is bru's ability to use</span></span>
+<span class='r-in'><span class='co'># non-linear predictors. Such a predictor can be formulated via like()'s</span></span>
+<span class='r-in'><span class='co'># \code{formula} parameter. The z(1) notation is needed to ensure that</span></span>
+<span class='r-in'><span class='co'># the z component should be interpreted as single latent variable and not</span></span>
+<span class='r-in'><span class='co'># a covariate:</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span>multicore <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='va'>z</span> <span class='op'>&lt;-</span> <span class='fl'>2</span></span>
+<span class='r-in'>  <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>within</a></span><span class='op'>(</span><span class='va'>input.df</span>, <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fl'>5</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>)</span> <span class='op'>*</span> <span class='va'>x</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>lik</span> <span class='op'>&lt;-</span> <span class='fu'><a href='like.html'>like</a></span><span class='op'>(</span></span>
+<span class='r-in'>    family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>input.df</span>,</span>
+<span class='r-in'>    formula <span class='op'>=</span> <span class='va'>y</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>)</span> <span class='op'>*</span> <span class='va'>x</span> <span class='op'>+</span> <span class='va'>Intercept</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='op'>~</span> <span class='fu'>z</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>Intercept</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>, <span class='va'>lik</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Check the result (z posterior should be around 2)</span></span>
+<span class='r-in'>  <span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Current num.threads is '1:1'.</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> No num.threads change needed.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               mean          sd 0.025quant 0.5quant 0.975quant     mode</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> z         1.999145 0.006731121   1.985696 1.999145   2.012572 1.999146</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Intercept 5.014824 0.034758702   4.945311 5.014823   5.084215 5.014825</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                    kld</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> z         8.013205e-05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Intercept 8.361300e-05</span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

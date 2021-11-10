@@ -187,26 +187,27 @@ from a run of <code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>INLA::inla(
 deltaWAIC.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='co'># Generate some data</span>
-<span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>within</a></span><span class='op'>(</span>
-  <span class='va'>input.df</span>,
-  <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span><span class='op'>(</span><span class='fl'>5</span> <span class='op'>+</span> <span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>)</span>
-
-<span class='co'># Fit two models</span>
-<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x</span>, family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>input.df</span><span class='op'>)</span>
-<span class='va'>fit2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x</span>, family <span class='op'>=</span> <span class='st'>"Poisson"</span>, data <span class='op'>=</span> <span class='va'>input.df</span><span class='op'>)</span>
-
-<span class='co'># Compare DIC</span>
-
-<span class='fu'>deltaIC</span><span class='op'>(</span><span class='va'>fit</span>, <span class='va'>fit2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   Model      DIC Delta.DIC
-#&gt; 1   fit 12.85599   0.00000
-#&gt; 2  fit2 39.06164  26.20564</div><div class='input'><span class='co'># }</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># Generate some data</span></span>
+<span class='r-in'><span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>within</a></span><span class='op'>(</span></span>
+<span class='r-in'>  <span class='va'>input.df</span>,</span>
+<span class='r-in'>  <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span><span class='op'>(</span><span class='fl'>5</span> <span class='op'>+</span> <span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Fit two models</span></span>
+<span class='r-in'><span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x</span>, family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>input.df</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>fit2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x</span>, family <span class='op'>=</span> <span class='st'>"Poisson"</span>, data <span class='op'>=</span> <span class='va'>input.df</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Compare DIC</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>deltaIC</span><span class='op'>(</span><span class='va'>fit</span>, <span class='va'>fit2</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   Model       DIC Delta.DIC</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1   fit  8.435961   0.00000</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2  fit2 39.297941  30.86198</span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

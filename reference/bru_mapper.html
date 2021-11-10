@@ -217,8 +217,8 @@ For the default <code>bru_mapper</code> method, a list that will be converted to
     <tr>
       <th>inla_f</th>
       <td><p>logical; when <code>TRUE</code> in <code>ibm_n</code>, <code>ibm_values</code>, and
-<code>ibm_amatrix</code> methods, these must result in values compatible with <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f(...)</a></code>
-an specification and corresponding <code><a href='https://rdrr.io/pkg/INLA/man/inla.stack.html'>INLA::inla.stack(...)</a></code> constructions.
+<code>ibm_amatrix</code> methods, these must result in values compatible with <code>INLA::f(...)</code>
+an specification and corresponding <code>INLA::inla.stack(...)</code> constructions.
 Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by <code>bru_mapper_collect</code>.</p></td>
@@ -293,14 +293,14 @@ being mapped to.</p></li>
 
 <ul>
 <li><p><code>ibm_values</code> Generic. Implementations must return a vector that
-would be interpretable by an <code><a href='https://rdrr.io/pkg/INLA/man/f.html'>INLA::f(..., values = ...)</a></code> specification.
+would be interpretable by an <code>INLA::f(..., values = ...)</code> specification.
 The exception is the method for <code>bru_mapper_multi</code>, that returns a
 multi-column data frame</p></li>
 </ul>
 
 <ul>
 <li><p><code>ibm_amatrix</code> Generic.
-Implementations must return a (sparse) matrix of size <code><a href='https://rdrr.io/r/base/nrow.html'>NROW(input)</a></code>
+Implementations must return a (sparse) matrix of size <code>NROW(input)</code>
 (except for the <code>bru_mapper_multi</code> and <code>bru_mapper_collect</code> methods,
 that require <code><a href='https://rdrr.io/r/base/list.html'>list()</a></code> inputs, and the input size is determined by the
 combined inputs)
@@ -320,7 +320,7 @@ the <code>ibm_values</code> output to construct the subset indexing.</p></li>
 
 <ul>
 <li><p><code>ibm_valid_input</code> Generic.
-Implementations must return a logical vector of length <code><a href='https://rdrr.io/r/base/nrow.html'>NROW(input)</a></code> (
+Implementations must return a logical vector of length <code>NROW(input)</code> (
 or for <code>bru_mapper_multi</code> and <code>bru_mapper_collect</code> a list of such
 vectors)</p></li>
 </ul>
@@ -335,7 +335,7 @@ to an object. If provided, mapper method functions are added to an environment
 functions first,
 and otherwise call <code><a href='https://rdrr.io/r/base/UseMethod.html'>UseMethod()</a></code>.  This is an alternative to using <code><a href='https://rdrr.io/r/base/S3method.html'>.S3method()</a></code>
 to register the methods, e.g.
-<code><a href='https://rdrr.io/r/base/S3method.html'>.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)</a></code>.</p></li>
+<code>.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)</code>.</p></li>
 </ul>
 
 <ul>
@@ -358,15 +358,16 @@ both regular vector values and <code>multi=1</code> data.frame values).</p></li>
     <div class='dont-index'><p><a href='bru_mapper_methods.html'>bru_mapper_methods</a> for specific method implementations.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>mapper</span> <span class='op'>&lt;-</span> <span class='fu'>bru_mapper_index</span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span>
-<span class='fu'>ibm_amatrix</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>5</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; 5 x 5 sparse Matrix of class "dgCMatrix"
-#&gt;               
-#&gt; [1,] 1 . . . .
-#&gt; [2,] . . 1 . .
-#&gt; [3,] . . . 1 .
-#&gt; [4,] . . . . 1
-#&gt; [5,] . 1 . . .</div></pre>
+    <pre class="examples"><span class='r-in'><span class='va'>mapper</span> <span class='op'>&lt;-</span> <span class='fu'>bru_mapper_index</span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>ibm_amatrix</span><span class='op'>(</span><span class='va'>mapper</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>5</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5 x 5 sparse Matrix of class "dgCMatrix"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,] 1 . . . .</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,] . . 1 . .</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [3,] . . . 1 .</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [4,] . . . . 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [5,] . 1 . . .</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -118,7 +118,7 @@
       <h1 data-toc-skip>Random Fields in One Dimension</h1>
                         <h4 class="author">Finn Lindgren</h4>
             
-            <h4 class="date">2021-10-12</h4>
+            <h4 class="date">2021-11-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/random_fields.Rmd"><code>vignettes/web/random_fields.Rmd</code></a></small>
       <div class="hidden name"><code>random_fields.Rmd</code></div>
@@ -179,7 +179,7 @@
 <p>If you’re not familiar with GAMs and the syntax of <code>gam</code> don’t worry, the point of this is just to provide something to which we can compare the <code>inlabru</code> model fit.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html">gam</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">exposure</span><span class="op">)</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">cd</span><span class="op">)</span></code></pre></div>
-<p>The term <code><a href="https://rdrr.io/pkg/mgcv/man/s.html">s(x,k=10)</a></code> just specifies that as nonparametric smooth function is to be fitted to the data, with <em>no more than</em> 10 degrees of freedom (df). (The larger the df, the more wiggly the fitted curve (recall from the lecture that this is an effect of how some spline methods are defined, without discretisation dependent penalty); <code>gam</code> selects the ‘best’ df.) Notice the use of <code>offset=</code>. (Refer to slides for an explanation of <code>offset</code>.) The variable <code>exposure</code> in data frame <code>cd</code> is the size of the bin in which each count was made.</p>
+<p>The term <code>s(x,k=10)</code> just specifies that as nonparametric smooth function is to be fitted to the data, with <em>no more than</em> 10 degrees of freedom (df). (The larger the df, the more wiggly the fitted curve (recall from the lecture that this is an effect of how some spline methods are defined, without discretisation dependent penalty); <code>gam</code> selects the ‘best’ df.) Notice the use of <code>offset=</code>. (Refer to slides for an explanation of <code>offset</code>.) The variable <code>exposure</code> in data frame <code>cd</code> is the size of the bin in which each count was made.</p>
 <p>You can look at the fitted model using <code><a href="https://rdrr.io/r/base/summary.html">summary( )</a></code> as below if you want to, but you do not need to understand this output, or the code that makes the predictions immediately below it if you are not familiar with GAMs.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit2.gam</span><span class="op">)</span></code></pre></div>
@@ -192,7 +192,7 @@
 <code class="sourceCode R"><span class="va">dat4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xs</span>, exposure <span class="op">=</span> <span class="va">exposures</span><span class="op">)</span></code></pre></div>
 <p>Then predict</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pred2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2.gam</span>, newdata <span class="op">=</span> <span class="va">dat4pred</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">pred2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2.gam</span>, newdata <span class="op">=</span> <span class="va">dat4pred</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">dat4pred2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">dat4pred</span>, gam <span class="op">=</span> <span class="va">pred2.gam</span><span class="op">)</span> <span class="co"># add column for prediction in data frame</span></code></pre></div>
 <p>Ploting the fit and the data using the <code>ggplot2</code> commands below should give you the plot shown below</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -218,7 +218,7 @@
 <h3 class="hasAnchor">
 <a href="#using-function-bru-to-fit-to-count-data" class="anchor"></a>Using function <code>bru( )</code> to fit to count data</h3>
 <p>We need to specify model components and a model formula in order to fit it. This can be done inside the call to <code><a href="../../reference/bru.html">bru( )</a></code> but that is a bit messy, so we’ll store it in <code>comp</code> first and then pass that to <code><a href="../../reference/bru.html">bru( )</a></code>.</p>
-<p>Our response variable in the data frame <code>cd</code> is called <code>count</code> so the model specification needs to have that on the left of the <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code>. We add an intercept component with <code>+ Intercept(1)</code> on the right hand side (all the models we use have intercepts), and because we want to fit a Gaussian random field (GRF), it must have a GRF specification. In <code>inlabru</code> the GRF specification is a function, which allows the GRF to be calculated at any point in space while <code>inlabru</code> is doing its calculations.</p>
+<p>Our response variable in the data frame <code>cd</code> is called <code>count</code> so the model specification needs to have that on the left of the <code>~</code>. We add an intercept component with <code>+ Intercept(1)</code> on the right hand side (all the models we use have intercepts), and because we want to fit a Gaussian random field (GRF), it must have a GRF specification. In <code>inlabru</code> the GRF specification is a function, which allows the GRF to be calculated at any point in space while <code>inlabru</code> is doing its calculations.</p>
 <p>The user gets to name the GRF function. The syntax is ‘myname(input, model= …)’, where:</p>
 <ul>
 <li>‘myname’ is whatever you want to call the GRF (we called it <code>field</code> below);</li>
@@ -227,7 +227,7 @@
 <li>
 <code>model=</code> designates the type of effect, here an SPDE model object from the <code>INLA</code> function <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html">inla.spde2.pcmatern( )</a></code>, which requires a mesh to be passed to it, so we pass it the 1D mesh that we created above, `<code>mesh1D</code>.</li>
 </ul>
-<p>For models that only adds the model components, we don’t need to specify a separate predictor formula. Instead, we can provide the name of the output to the left of the <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code> in the component specification.</p>
+<p>For models that only adds the model components, we don’t need to specify a separate predictor formula. Instead, we can provide the name of the output to the left of the <code>~</code> in the component specification.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">the_spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh1D</span>,
   prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span>,
@@ -240,7 +240,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.3.1.9000</span>
-<span class="co">#&gt; INLA version: 21.10.03</span>
+<span class="co">#&gt; INLA version: 21.11.01</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   field: Model types main='spde', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   Intercept: Model types main='linear', group='exchangeable', replicate='iid'</span>
@@ -249,10 +249,10 @@
 <span class="co">#&gt;     Data class: 'data.frame'</span>
 <span class="co">#&gt;     Predictor: count ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.42, Running = 1.08, Post = 0.124, Total = 2.62 </span>
+<span class="co">#&gt;     Pre = 1.33, Running = 1.01, Post = 0.0763, Total = 2.41 </span>
 <span class="co">#&gt; Fixed effects:</span>
-<span class="co">#&gt;           mean    sd 0.025quant 0.5quant 0.975quant  mode   kld</span>
-<span class="co">#&gt; Intercept    5 6.031     -0.054    1.951     20.495 1.409 0.001</span>
+<span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode   kld</span>
+<span class="co">#&gt; Intercept 5.015 6.035     -0.049     1.96     20.509 1.418 0.001</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
@@ -260,15 +260,15 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Model hyperparameters:</span>
 <span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant   mode</span>
-<span class="co">#&gt; Range for field 47.660 39.482      6.386   37.128     155.08 18.508</span>
-<span class="co">#&gt; Stdev for field  0.602  0.342      0.214    0.515       1.50  0.392</span>
+<span class="co">#&gt; Range for field 47.659 39.479      6.387   37.128     155.07 18.510</span>
+<span class="co">#&gt; Stdev for field  0.602  0.341      0.214    0.515       1.50  0.392</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 59.63</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 76.27</span>
-<span class="co">#&gt; Effective number of parameters .....................: 4.79</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 59.61</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 76.25</span>
+<span class="co">#&gt; Effective number of parameters .....................: 4.77</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 58.06</span>
-<span class="co">#&gt; Effective number of parameters .................: 2.58</span>
+<span class="co">#&gt; Effective number of parameters .................: 2.57</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Marginal log-Likelihood:  -38.84 </span>
 <span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span>
@@ -276,7 +276,7 @@
 <p>Predict the values at the x points used for mesh (the data argument must be a data frame, see <code><a href="../../reference/predict.bru.html">?predict.bru</a></code>):</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xs</span><span class="op">)</span>
-<span class="va">pred2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="va">x4pred</span>, <span class="va">x</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">field</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span>, n.samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></code></pre></div>
+<span class="va">pred2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="va">x4pred</span>, <span class="va">x</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">field</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span>, n.samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></code></pre></div>
 <p>Let’s do a plot to compare the fitted model to the true model. The expected counts of the true model are stored in the variable <code>E_nc2</code> which comes with the dataset <code>Poisson2_1D</code>. For ease of use in plotting with <code>ggplot2</code> (which needs a data frame), we create a data frame which we call <code>true.lambda</code>, containing <code>x</code>- and <code>y</code> variables as shown below.</p>
 <p>Given that <code>inlabru</code> predictions are always on the intensity function scale, do you understand why we divide the count by <code>cd$exposure</code>? (We will in due course allow predictions on the count scale as well.)</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -303,9 +303,9 @@
 <div id="looking-at-the-posterior-distributions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#looking-at-the-posterior-distributions" class="anchor"></a>Looking at the posterior distributions</h3>
-<p>We can look at the Intercept posterior using the function <code><a href="https://rdrr.io/pkg/raster/man/plot.html">plot( )</a></code>, as below.</p>
+<p>We can look at the Intercept posterior using the function <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot( )</a></code>, as below.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"Intercept"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"Intercept"</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-19-1.png" width="672"></p>
 <p>You have to know that there is a variable called <code>Intercept</code> in order to use this function. To see what fixed effect parameters’ posterior distributions are available to be plotted, you can type</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -319,16 +319,16 @@
 <code class="sourceCode R"><span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span>
 <span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span>
 
-<span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span>
-<span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span>
+<span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span>
+<span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span>
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">range.plot</span>, <span class="va">var.plot</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-22-1.png" width="672"></p>
 <p>We can look at the posterior distributions of the Matern correlatioin and covariance funcitons as follows:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-23-1.png" width="672"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-23-2.png" width="672"></p>
 </div>
 </div>

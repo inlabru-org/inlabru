@@ -193,84 +193,86 @@
     <p>Requires the <code>ggplot2</code> package.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>&amp;&amp;</span> <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='co'># Generate some data</span>
-
-  <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>within</a></span><span class='op'>(</span><span class='va'>input.df</span>, <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fl'>5</span> <span class='op'>+</span> <span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span>
-
-  <span class='co'># Fit a model with fixed effect 'x' and intercept 'Intercept'</span>
-
-  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x</span>, family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>input.df</span><span class='op'>)</span>
-
-  <span class='co'># Predict posterior statistics of 'x'</span>
-
-  <span class='va'>xpost</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>, data <span class='op'>=</span> <span class='cn'>NULL</span>, formula <span class='op'>=</span> <span class='op'>~</span><span class='va'>x_latent</span><span class='op'>)</span>
-
-  <span class='co'># The statistics include mean, standard deviation, the 2.5% quantile, the median,</span>
-  <span class='co'># the 97.5% quantile, minimum and maximum sample drawn from the posterior as well as</span>
-  <span class='co'># the coefficient of variation and the variance.</span>
-
-  <span class='va'>xpost</span>
-
-  <span class='co'># For a single variable like 'x' the default plotting method invoked by gg() will</span>
-  <span class='co'># show these statisics in a fashion similar to a box plot:</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xpost</span><span class='op'>)</span>
-
-
-  <span class='co'># The predict function can also be used to simulataneously estimate posteriors</span>
-  <span class='co'># of multiple variables:</span>
-
-  <span class='va'>xipost</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>,
-    data <span class='op'>=</span> <span class='cn'>NULL</span>,
-    formula <span class='op'>=</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
-      Intercept <span class='op'>=</span> <span class='va'>Intercept_latent</span>,
-      x <span class='op'>=</span> <span class='va'>x_latent</span>
-    <span class='op'>)</span>
-  <span class='op'>)</span>
-  <span class='va'>xipost</span>
-
-  <span class='co'># If we still want a plot in the previous style we have to set the bar parameter to TRUE</span>
-
-  <span class='va'>p1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xipost</span>, bar <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-  <span class='va'>p1</span>
-
-  <span class='co'># Note that gg also understands the posterior estimates generated while running INLA</span>
-
-  <span class='va'>p2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span>, bar <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-  <span class='fu'><a href='multiplot.html'>multiplot</a></span><span class='op'>(</span><span class='va'>p1</span>, <span class='va'>p2</span><span class='op'>)</span>
-
-  <span class='co'># By default, if the prediction has more than one row, gg will plot the column 'mean' against</span>
-  <span class='co'># the row index. This is for instance usefuul for predicting and plotting function</span>
-  <span class='co'># but not very meaningful given the above example:</span>
-
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xipost</span><span class='op'>)</span>
-
-  <span class='co'># For ease of use we can also type</span>
-
-  <span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>xipost</span><span class='op'>)</span>
-
-  <span class='co'># This type of plot will show a ribbon around the mean, which viszualizes the upper and lower</span>
-  <span class='co'># quantiles mentioned above (2.5 and 97.5%). Plotting the ribbon can be turned of using the</span>
-  <span class='co'># \code{ribbon} parameter</span>
-
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xipost</span>, ribbon <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
-  <span class='co'># Much like the other geomes produced by gg we can adjust the plot using ggplot2 style</span>
-  <span class='co'># commands, for instance</span>
-
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xipost</span><span class='op'>)</span> <span class='op'>+</span>
-    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xipost</span>, mapping <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='va'>median</span><span class='op'>)</span>, ribbon <span class='op'>=</span> <span class='cn'>FALSE</span>, color <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div><div class='img'><img src='plot.prediction-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='plot.prediction-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>&amp;&amp;</span> <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='co'># Generate some data</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>input.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>within</a></span><span class='op'>(</span><span class='va'>input.df</span>, <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fl'>5</span> <span class='op'>+</span> <span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Fit a model with fixed effect 'x' and intercept 'Intercept'</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bru.html'>bru</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x</span>, family <span class='op'>=</span> <span class='st'>"gaussian"</span>, data <span class='op'>=</span> <span class='va'>input.df</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Predict posterior statistics of 'x'</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>xpost</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>, data <span class='op'>=</span> <span class='cn'>NULL</span>, formula <span class='op'>=</span> <span class='op'>~</span><span class='va'>x_latent</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># The statistics include mean, standard deviation, the 2.5% quantile, the median,</span></span>
+<span class='r-in'>  <span class='co'># the 97.5% quantile, minimum and maximum sample drawn from the posterior as well as</span></span>
+<span class='r-in'>  <span class='co'># the coefficient of variation and the variance.</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>xpost</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># For a single variable like 'x' the default plotting method invoked by gg() will</span></span>
+<span class='r-in'>  <span class='co'># show these statisics in a fashion similar to a box plot:</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xpost</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># The predict function can also be used to simulataneously estimate posteriors</span></span>
+<span class='r-in'>  <span class='co'># of multiple variables:</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>xipost</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>fit</span>,</span>
+<span class='r-in'>    data <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span class='r-in'>    formula <span class='op'>=</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span></span>
+<span class='r-in'>      Intercept <span class='op'>=</span> <span class='va'>Intercept_latent</span>,</span>
+<span class='r-in'>      x <span class='op'>=</span> <span class='va'>x_latent</span></span>
+<span class='r-in'>    <span class='op'>)</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>xipost</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># If we still want a plot in the previous style we have to set the bar parameter to TRUE</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>p1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xipost</span>, bar <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>p1</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Note that gg also understands the posterior estimates generated while running INLA</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>p2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>fit</span><span class='op'>$</span><span class='va'>summary.fixed</span>, bar <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='fu'><a href='multiplot.html'>multiplot</a></span><span class='op'>(</span><span class='va'>p1</span>, <span class='va'>p2</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># By default, if the prediction has more than one row, gg will plot the column 'mean' against</span></span>
+<span class='r-in'>  <span class='co'># the row index. This is for instance usefuul for predicting and plotting function</span></span>
+<span class='r-in'>  <span class='co'># but not very meaningful given the above example:</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xipost</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># For ease of use we can also type</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>xipost</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># This type of plot will show a ribbon around the mean, which viszualizes the upper and lower</span></span>
+<span class='r-in'>  <span class='co'># quantiles mentioned above (2.5 and 97.5%). Plotting the ribbon can be turned of using the</span></span>
+<span class='r-in'>  <span class='co'># \code{ribbon} parameter</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xipost</span>, ribbon <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Much like the other geomes produced by gg we can adjust the plot using ggplot2 style</span></span>
+<span class='r-in'>  <span class='co'># commands, for instance</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xipost</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>    <span class='fu'><a href='gg.html'>gg</a></span><span class='op'>(</span><span class='va'>xipost</span>, mapping <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='va'>median</span><span class='op'>)</span>, ribbon <span class='op'>=</span> <span class='cn'>FALSE</span>, color <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-plt img'><img src='plot.prediction-1.png' alt='' width='700' height='433' /></span>
+<span class='r-plt img'><img src='plot.prediction-2.png' alt='' width='700' height='433' /></span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

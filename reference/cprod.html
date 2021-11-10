@@ -188,22 +188,23 @@ dimension has no weights attached to it all weights are assumend to be 1.</p>
     <p>Fabian E. Bachl <a href='mailto:bachlfab@gmail.com'>bachlfab@gmail.com</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='co'># ipoints needs INLA</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='co'># Create integration points in dimension 'myDim' and 'myDiscreteDim'</span>
-  <span class='va'>ips1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ipoints.html'>ipoints</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>3</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>8</span><span class='op'>)</span><span class='op'>)</span>, <span class='fl'>17</span>, name <span class='op'>=</span> <span class='st'>"myDim"</span><span class='op'>)</span>
-  <span class='va'>ips2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ipoints.html'>ipoints</a></span><span class='op'>(</span>domain <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>4</span><span class='op'>)</span>, name <span class='op'>=</span> <span class='st'>"myDiscreteDim"</span><span class='op'>)</span>
-
-  <span class='co'># Calculate the cross product</span>
-  <span class='va'>ips</span> <span class='op'>&lt;-</span> <span class='fu'>cprod</span><span class='op'>(</span><span class='va'>ips1</span>, <span class='va'>ips2</span><span class='op'>)</span>
-
-  <span class='co'># Plot the integration points</span>
-  <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>ips</span><span class='op'>$</span><span class='va'>myDim</span>, <span class='va'>ips</span><span class='op'>$</span><span class='va'>myDiscreteDim</span>, cex <span class='op'>=</span> <span class='fl'>10</span> <span class='op'>*</span> <span class='va'>ips</span><span class='op'>$</span><span class='va'>weight</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div><div class='img'><img src='cprod-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># ipoints needs INLA</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='bru_safe_inla.html'>bru_safe_inla</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='co'># Create integration points in dimension 'myDim' and 'myDiscreteDim'</span></span>
+<span class='r-in'>  <span class='va'>ips1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ipoints.html'>ipoints</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>3</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>8</span><span class='op'>)</span><span class='op'>)</span>, <span class='fl'>17</span>, name <span class='op'>=</span> <span class='st'>"myDim"</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>ips2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ipoints.html'>ipoints</a></span><span class='op'>(</span>domain <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>4</span><span class='op'>)</span>, name <span class='op'>=</span> <span class='st'>"myDiscreteDim"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Calculate the cross product</span></span>
+<span class='r-in'>  <span class='va'>ips</span> <span class='op'>&lt;-</span> <span class='fu'>cprod</span><span class='op'>(</span><span class='va'>ips1</span>, <span class='va'>ips2</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># Plot the integration points</span></span>
+<span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>ips</span><span class='op'>$</span><span class='va'>myDim</span>, <span class='va'>ips</span><span class='op'>$</span><span class='va'>myDiscreteDim</span>, cex <span class='op'>=</span> <span class='fl'>10</span> <span class='op'>*</span> <span class='va'>ips</span><span class='op'>$</span><span class='va'>weight</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-plt img'><img src='cprod-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

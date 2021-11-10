@@ -167,6 +167,8 @@
 <li><p>Fix support for <code>SpatialPointsDataFrame</code> and <code>SpatialGridDataFrame</code> input to <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code></p></li>
 <li><p>Allow <code><a href="https://rdrr.io/r/base/list.html">list()</a></code> data input, and predictors where the size of data/effect/predictor/response aren’t equal</p></li>
 <li><p>Add <code>bru_mapper_collect</code> class for handling sequential collections of mappers, including collections where all but the first mapper is hidden from the <code><a href="https://rdrr.io/pkg/INLA/man/f.html">INLA::f()</a></code> arguments <code>n</code> and <code>values</code>, as needed to support e.g. “bym2” models.</p></li>
+<li><p>Force explicit <code>model = "offset"</code> components instead of special options, to avoid interfering with the linearisation system (Issue <a href='https://github.com/inlabru-org/inlabru/issues/123'>#123</a>)</p></li>
+<li><p>Make the iterations more robust by resetting the internal INLA predictor states to initial value zero at each step</p></li>
 </ul>
 </div>
     <div id="inlabru-231" class="section level1">
@@ -202,7 +204,7 @@
 <li><p>The R-INLA <code>weights</code> and <code>copy</code> features are now supported.</p></li>
 <li><p>The predictor expressions can access the data object directly via <code>.data.</code></p></li>
 <li><p>If data from several rows can affect the same output row, the <code>allow_combine = TRUE</code> argument must be supplied to <code><a href="../reference/like.html">like()</a></code></p></li>
-<li><p>The <code>include</code> and <code>exclude</code> arguments to <code><a href="../reference/like.html">like()</a></code>, <code><a href="../reference/generate.html">generate()</a></code>, and <code><a href="https://rdrr.io/pkg/raster/man/predict.html">predict()</a></code> can be used to specify which components are used for a given likelihood model or predictor expression. This can be used to prevent evaluation of components that are invalid for a likelihood or predictor.</p></li>
+<li><p>The <code>include</code> and <code>exclude</code> arguments to <code><a href="../reference/like.html">like()</a></code>, <code><a href="../reference/generate.html">generate()</a></code>, and <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> can be used to specify which components are used for a given likelihood model or predictor expression. This can be used to prevent evaluation of components that are invalid for a likelihood or predictor.</p></li>
 <li><p>Predictor expressions can access the latent state of a model component directly, by adding the suffix <code>_latent</code> to the component name, e.g. <code>name_latent</code>. For <code><a href="../reference/like.html">like()</a></code>, this requires <code>allow_latent = TRUE</code> to activate the needed linearisation code for this.</p></li>
 <li><p>Predictor expressions can evaluate component effects for arbitrary inputs by adding the suffix <code>_eval</code> to access special evaluator functions, e.g. <code>name_eval(1:10)</code>. This is useful for evaluating the 1D effect of spatial covariates. See the NEWS item for version 2.2.8 for further details.</p></li>
 <li><p>The internal system for predictor linearisation and iterated INLA inference has been rewritten to be faster and more robust</p></li>
@@ -218,7 +220,7 @@
 <li>
 <p>Add <code>_eval</code> suffix feature for <code>generate.bru</code> and <code>predict.bru</code>, that provides a general evaluator function for each component, allowing evaluation of e.g. nonlinear effects of spatial covariates as a function of the covariate value instead of the by the spatial evaluator used in the component definition. For example, with <code>components = ~ covar(spatial_grid_df, model = "rw1")</code>, the prediction expression can have <code>~ covar_eval(covariate)</code>, where <code>covariate</code> is a data column in the prediction data object.</p>
 <p>For components with <code>group</code> and <code>replicate</code> features, these also need to be provided to the <code>_eval</code> function, with <code>..._eval(..., group = ..., replicate = ...)</code></p>
-<p>This feature is built on top of the <code>_latent</code> suffix feature, that gives direct access to the latent state variables of a component, so in order to use <code>_eval</code> in the model predictor itself, you must use <code><a href="../reference/like.html">like(..., allow_latent = TRUE)</a></code> in the model definition.</p>
+<p>This feature is built on top of the <code>_latent</code> suffix feature, that gives direct access to the latent state variables of a component, so in order to use <code>_eval</code> in the model predictor itself, you must use <code>like(..., allow_latent = TRUE)</code> in the model definition.</p>
 </li>
 </ul>
 </div>
@@ -236,7 +238,7 @@
 <a href="#inlabru-226" class="anchor"></a>inlabru 2.2.6<small> Unreleased </small>
 </h1>
 <ul>
-<li><p>Add <code><a href="https://rdrr.io/pkg/raster/man/predict.html">predict(..., include)</a></code> discussion to distance sampling vignette, for handling non-spatial prediction in spatial models.</p></li>
+<li><p>Add <code>predict(..., include)</code> discussion to distance sampling vignette, for handling non-spatial prediction in spatial models.</p></li>
 <li><p>Fix bugs in <code>gg.SpatialLines</code></p></li>
 </ul>
 </div>
@@ -263,7 +265,7 @@
 <a href="#inlabru-222" class="anchor"></a>inlabru 2.2.2<small> Unreleased </small>
 </h1>
 <ul>
-<li><p>Fixed issue with <code><a href="https://rdrr.io/pkg/raster/man/predict.html">predict()</a></code> logic for converting output to <code>Spatial*DataFrame</code></p></li>
+<li><p>Fixed issue with <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> logic for converting output to <code>Spatial*DataFrame</code></p></li>
 <li><p>Use <code>control.mode=list(restart=FALSE)</code> in the final inla run for nonlinear models, to avoid an unnecessary optimisation.</p></li>
 <li><p>Fix issues in <code><a href="../reference/pixels.html">pixels()</a></code> and <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> for <code>Spatial*DataFrame</code> objects with <code>ncol=0</code> data frame parts.</p></li>
 </ul>
@@ -365,7 +367,7 @@
 </h1>
 <ul>
 <li><p>Added a <code>NEWS.md</code> file to track changes to the package.</p></li>
-<li><p>Added <code>inla</code> methods for <code><a href="https://rdrr.io/pkg/raster/man/predict.html">predict()</a></code> and <code><a href="../reference/generate.html">generate()</a></code> that convert <code>inla</code> output into <code>bru</code> objects before calling the <code>bru</code> prediction and posterior sample generator.</p></li>
+<li><p>Added <code>inla</code> methods for <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> and <code><a href="../reference/generate.html">generate()</a></code> that convert <code>inla</code> output into <code>bru</code> objects before calling the <code>bru</code> prediction and posterior sample generator.</p></li>
 <li><p>Added protection for examples requiring optional packages</p></li>
 <li><p>Fix <code>sample.lgcp</code> output formatting, extended CRS support, and more efficient sampling algorithm</p></li>
 <li><p>Avoid dense matrices for effect mapping</p></li>
