@@ -15,6 +15,9 @@
   
 * Make the iterations more robust by resetting the internal INLA predictor
   states to initial value zero at each step
+  
+* Rename the option `bru_method$stop_at_max_rel_deviation` to `bru_method$rel_tol`.
+  Automatic conversion to the new name, but a warning is given.
 
 # inlabru 2.3.1
 

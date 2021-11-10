@@ -153,7 +153,7 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all messages.}
 #' \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
 #'   to run inference.}
-#' \item{bru_max_iter}{maximum number of inla iterations}
+#' \item{bru_max_iter}{maximum number of inla iterations, default 10. Also see the `bru_method$rel_tol` option below.}
 #' \item{bru_initial}{An `inla` object returned from previous calls of
 #'   `INLA::inla`, [bru()] or [lgcp()], or a list of named vectors of starting
 #'   values for the latent variables. This will be used as a
@@ -174,14 +174,19 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' (default, from version 2.1.15).}
 #' \item{search}{Either 'all' (default), to use all available line search
 #' methods, or one or more of
-#' 'finite' (reduce step size until predictor is finite),
-#' 'contract' (decrease step size until trust hypersphere reached)
-#' 'expand' (increase step size until no improvement),
-#' 'optimise' (fast approximate error norm minimisation).
+#' \describe{
+#' \item{'finite'}{(reduce step size until predictor is finite)}
+#' \item{'contract'}{(decrease step size until trust hypersphere reached)}
+#' \item{'expand'}{(increase step size until no improvement)}
+#' \item{'optimise'}{(fast approximate error norm minimisation)}
+#' }
 #' To disable line search, set to an empty vector. Line search is not
 #' available for `taylor="legacy"`.}
 #' \item{factor}{Numeric, \eqn{> 1} determining the line search step scaling
 #' multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
+#' \item{rel_tol}{Stop the iterations when the largest change in linearisation point
+#' (the conditional latent state mode) in relation to the estimated posterior
+#' standard deviation is less than `rel_tol`. Default 0.01 (one percent).}
 #' }
 #' }
 #' \item{`inla()` options}{
@@ -278,7 +283,7 @@ bru_options_default <- function() {
       taylor = "pandemic",
       search = "all",
       factor = (1 + sqrt(5)) / 2,
-      stop_at_max_rel_deviation = 0.01
+      rel_tol = 0.01
     ),
     # bru_initial: NULL
     # inla options
@@ -292,43 +297,58 @@ bru_options_default <- function() {
 
 
 bru_options_deprecated <- function(args) {
+  handle_args <- function(args, replacements) {
+    names_args <- names(args)
+    deprecated_args <- replacements[names(replacements) %in% names_args]
+    depr_list <- vapply(deprecated_args, is.list, TRUE)
+    if (any(depr_list)) {
+      for (k in which(depr_list)) {
+        args[[names(deprecated_args[k])]] <-
+          handle_args(args[[names(deprecated_args[k])]], deprecated_args[[k]])
+      }
+    }
+    deprecated_args <- deprecated_args[!depr_list]
+    if (any(nzchar(names(deprecated_args)) == 0)) {
+      warning(paste0(
+        "Ignoring deprecated global options '",
+        paste0(names(deprecated_args)[nzchar(names(deprecated_args)) == 0], collapse = "', '"),
+        "'."
+      ))
+      names_args <- setdiff(
+        names_args,
+        names(deprecated_args)[nzchar(names(deprecated_args)) == 0]
+      )
+      deprecated_args <- deprecated_args[nzchar(names(deprecated_args)) > 0]
+      args <- args[names_args]
+    }
+    if (length(deprecated_args) > 0) {
+      warning(paste0(
+        "Converting deprecated global option(s) '",
+        paste0(names(deprecated_args), collapse = "', '"),
+        "' to new option(s) '",
+        paste0(deprecated_args, collapse = "', '"),
+        "'."
+      ))
+      names_args <- names(args)
+      names_args[names_args %in% names(deprecated_args)] <-
+        deprecated_args[names_args[names_args %in% names(deprecated_args)]]
+      names(args) <- names_args
+    }
+    args
+  }
+
   stopifnot(inherits(args, "bru_options"))
   cl <- class(args)
-  deprecated_args <- c(
+  deprecated_args <- list(
     mesh = "",
     run = "bru_run",
     max.iter = "bru_max_iter",
     result = "bru_initial",
     bru_result = "bru_initial",
-    int.args = "int.args"
+    int.args = "bru_int_args",
+    bru_method = list(stop_at_max_rel_deviation = "rel_tol")
   )
-  names_args <- names(args)
-  deprecated_args <-
-    deprecated_args[intersect(names_args, names(deprecated_args))]
-  if (any(nzchar(names(deprecated_args)) == 0)) {
-    warning(paste0(
-      "Ignoring deprecated global options '",
-      paste0(names(deprecated_args)[nzchar(names(deprecated_args)) == 0], collapse = "', '"),
-      "'."
-    ))
-    names_args <- setdiff(
-      names_args,
-      names(deprecated_args)[nzchar(names(deprecated_args)) == 0]
-    )
-    deprecated_args <- deprecated_args[nzchar(names(deprecated_args)) > 0]
-    args <- args[names_args]
-  }
-  if (length(deprecated_args) > 0) {
-    warning(paste0(
-      "Converting deprecated global option(s) '",
-      paste0(names(deprecated_args), collapse = "', '"),
-      "' to new option(s) '",
-      paste0(deprecated_args, collapse = "', '"),
-      "'."
-    ))
-    names_args[names_args %in% names(deprecated_args)] <- deprecated_args
-    names(args) <- names_args
-  }
+  args <- handle_args(args, deprecated_args)
   class(args) <- cl
   args
 }

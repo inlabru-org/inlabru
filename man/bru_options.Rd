@@ -99,7 +99,7 @@ Default: 0, to not print any messages}
 log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all messages.}
 \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
 to run inference.}
-\item{bru_max_iter}{maximum number of inla iterations}
+\item{bru_max_iter}{maximum number of inla iterations, default 10. Also see the \code{bru_method$rel_tol} option below.}
 \item{bru_initial}{An \code{inla} object returned from previous calls of
 \code{INLA::inla}, \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}, or a list of named vectors of starting
 values for the latent variables. This will be used as a
@@ -120,14 +120,19 @@ are aggregated to mesh vertices.}
 (default, from version 2.1.15).}
 \item{search}{Either 'all' (default), to use all available line search
 methods, or one or more of
-'finite' (reduce step size until predictor is finite),
-'contract' (decrease step size until trust hypersphere reached)
-'expand' (increase step size until no improvement),
-'optimise' (fast approximate error norm minimisation).
+\describe{
+\item{'finite'}{(reduce step size until predictor is finite)}
+\item{'contract'}{(decrease step size until trust hypersphere reached)}
+\item{'expand'}{(increase step size until no improvement)}
+\item{'optimise'}{(fast approximate error norm minimisation)}
+}
 To disable line search, set to an empty vector. Line search is not
 available for \code{taylor="legacy"}.}
 \item{factor}{Numeric, \eqn{> 1} determining the line search step scaling
 multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
+\item{rel_tol}{Stop the iterations when the largest change in linearisation point
+(the conditional latent state mode) in relation to the estimated posterior
+standard deviation is less than \code{rel_tol}. Default 0.01 (one percent).}
 }
 }
 \item{\code{inla()} options}{

@@ -1943,7 +1943,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     if (do_final_integration || (k >= options$bru_max_iter)) {
       interrupt <- TRUE
     } else if (!interrupt && (k > 1)) {
-      max.dev <- options$bru_method$stop_at_max_rel_deviation
+      max.dev <- options$bru_method$rel_tol
       dev <- abs(track[[k - 1]]$mode - track[[k]]$mode) / track[[k]]$sd
       ## do.call(c, lapply(by(do.call(rbind, track),
       ##                           as.factor(do.call(rbind, track)$effect),
