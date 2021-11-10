@@ -37,7 +37,7 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   )
   expect_snapshot_value(
     fit$summary.fixed["Intercept", "sd"] + fit$summary.random$my.spde$sd[c(19, 100, 212)],
-    tolerance = midtol,
+    tolerance = hitol,
     style = "serialize"
   )
 })

@@ -12,13 +12,13 @@ test_that("Linear predictor offset", {
 
   # Used to fail
   m1 <- bru(
-    deaths ~ 1 + myoffset(pop, model = "offset"),
+    deaths ~ 1 + myoffset(log(pop), model = "offset"),
     data = dat,
     family = "poisson"
   )
   m2 <- bru(
-    ~ 1 + myoffset(pop, model = "offset"),
-    formula = deaths ~ Intercept + offset(myoffset),
+    ~ 1 + myoffset(log(pop), model = "offset"),
+    formula = deaths ~ Intercept + myoffset,
     data = dat,
     family = "poisson"
   )
@@ -44,7 +44,7 @@ test_that("Linear predictor offset", {
       formula = deaths ~ Intercept,
       data = dat,
       family = "poisson",
-      options = list(offset = dat$pop)
+      options = list(offset = log(dat$pop))
     )
   )
 })
