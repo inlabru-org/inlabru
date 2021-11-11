@@ -265,7 +265,7 @@ Default: 0, to not print any messages</p></dd>
 log messages of verbosity \(\le\) are stored. Default: Inf, to store all messages.</p></dd>
 <dt>bru_run</dt><dd><p>If TRUE, run inference. Otherwise only return configuration needed
 to run inference.</p></dd>
-<dt>bru_max_iter</dt><dd><p>maximum number of inla iterations</p></dd>
+<dt>bru_max_iter</dt><dd><p>maximum number of inla iterations, default 10. Also see the <code>bru_method$rel_tol</code> option below.</p></dd>
 <dt>bru_initial</dt><dd><p>An <code>inla</code> object returned from previous calls of
 <code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>INLA::inla</a></code>, <code><a href='bru.html'>bru()</a></code> or <code><a href='lgcp.html'>lgcp()</a></code>, or a list of named vectors of starting
 values for the latent variables. This will be used as a
@@ -284,14 +284,18 @@ are aggregated to mesh vertices.</p></dd>
 (default, from version 2.1.15).</p></dd>
 <dt>search</dt><dd><p>Either 'all' (default), to use all available line search
 methods, or one or more of
-'finite' (reduce step size until predictor is finite),
-'contract' (decrease step size until trust hypersphere reached)
-'expand' (increase step size until no improvement),
-'optimise' (fast approximate error norm minimisation).
+<dl>
+<dt>'finite'</dt><dd><p>(reduce step size until predictor is finite)</p></dd>
+<dt>'contract'</dt><dd><p>(decrease step size until trust hypersphere reached)</p></dd>
+<dt>'expand'</dt><dd><p>(increase step size until no improvement)</p></dd>
+<dt>'optimise'</dt><dd><p>(fast approximate error norm minimisation)</p></dd></dl>
 To disable line search, set to an empty vector. Line search is not
 available for <code>taylor="legacy"</code>.</p></dd>
 <dt>factor</dt><dd><p>Numeric, \(&gt; 1\) determining the line search step scaling
-multiplier. Default \((1 + \sqrt{5})/2\).</p></dd></dl></p></dd>
+multiplier. Default \((1 + \sqrt{5})/2\).</p></dd>
+<dt>rel_tol</dt><dd><p>Stop the iterations when the largest change in linearisation point
+(the conditional latent state mode) in relation to the estimated posterior
+standard deviation is less than <code>rel_tol</code>. Default 0.01 (one percent).</p></dd></dl></p></dd>
 <dt><code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>inla()</a></code> options</dt><dd><p>All options not starting with <code>bru_</code> are passed on to <code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>inla()</a></code>, sometimes
 after altering according to the needs of the inlabru method.
 Warning:

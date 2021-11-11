@@ -169,6 +169,7 @@
 <li><p>Add <code>bru_mapper_collect</code> class for handling sequential collections of mappers, including collections where all but the first mapper is hidden from the <code><a href="https://rdrr.io/pkg/INLA/man/f.html">INLA::f()</a></code> arguments <code>n</code> and <code>values</code>, as needed to support e.g. “bym2” models.</p></li>
 <li><p>Force explicit <code>model = "offset"</code> components instead of special options, to avoid interfering with the linearisation system (Issue <a href='https://github.com/inlabru-org/inlabru/issues/123'>#123</a>)</p></li>
 <li><p>Make the iterations more robust by resetting the internal INLA predictor states to initial value zero at each step</p></li>
+<li><p>Rename the option <code>bru_method$stop_at_max_rel_deviation</code> to <code>bru_method$rel_tol</code>. Automatic conversion to the new name, but a warning is given.</p></li>
 </ul>
 </div>
     <div id="inlabru-231" class="section level1">
