@@ -8,7 +8,7 @@ latent_spde1D_testdata <- function() {
 
   matern <- INLA::inla.spde2.pcmatern(mesh1D,
     prior.range = c(1, 0.01),
-    prior.sigma = c(10, 0.01)
+    prior.sigma = c(1, 0.01)
   )
 
   cmp <- count ~ field(main = x, model = matern) + Intercept(1)
@@ -34,17 +34,11 @@ test_that("Latent models: SPDE 1D", {
   local_bru_safe_inla()
   data <- latent_spde1D_testdata()
 
-  # Check Intercept
+  # Check Intercept + SPDE (highly negatively correlated)
   expect_equal(
-    data$fit$summary.fixed["Intercept", "mean"],
-    5.437118,
-    tolerance = midtol
-  )
-
-  # Check SPDE
-  expect_equal(
-    data$fit$summary.random$field$mean[c(1, 25, 50)],
-    c(-4.874364, -4.215024, -6.952447),
+    data$fit$summary.fixed["Intercept", "mean"] +
+      data$fit$summary.random$field$mean[c(1, 25, 50)],
+    c(0.55439, 1.25189, -1.54505),
     tolerance = midtol
   )
 })
