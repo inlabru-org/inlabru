@@ -103,7 +103,7 @@ test_that("2D LGCP fitting", {
   expect_equal(
     Lambda$sd,
     40,
-    tolerance = hitol
+    tolerance = hitol * 5
   )
 
   # test_that("Supplying integration points instead of samplers&domains", {
