@@ -185,24 +185,27 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   )
   # For rgdal 1.5-23:
   # "export to PROJ failed: generic error of unknown origin"
+  # For rgdal 1.5-27
+  # proj_as_proj_string: GeodeticCRS::exportToPROJString() only supports metre unit
 
   # Check Intercept
   expect_equal(
     data_$fit$summary.fixed["Intercept", "mean"],
-    -2.206082,
+    -2.3875,
     tolerance = midtol
   )
 
   # Check SPDE
   expect_equal(
     data_$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    c(-0.1618776, 0.7721959, 2.0314753),
+    c(-0.186, 1.338, 2.503),
     tolerance = midtol
   )
   expect_equal(
     data_$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
-    c(1.9784044, 0.7738195, 0.5835616),
+    c(2.052, 0.757, 0.603),
     tolerance = midtol
   )
+  # No error should appear
   expect_error(spde.posterior(data_$fit, "mySmooth", what = "range"), NA)
 })
