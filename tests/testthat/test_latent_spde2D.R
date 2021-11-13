@@ -135,7 +135,7 @@ latent_spde2D_group_testdata <- function() {
   set.seed(123)
 
   # Load and reduce data set
-  data(mrsea, package = "inlabru")
+  data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
   coordnames(mrsea$points) <- c("Easting", "Northing")
   coordnames(mrsea$samplers) <- c("Easting", "Northing")

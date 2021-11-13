@@ -30,7 +30,7 @@ test_that("conversion of 1D mesh to integration points", {
 
 test_that("conversion of SpatialPolygon to integration points", {
   local_bru_safe_inla()
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
   expect_warning(
     ips <- ipoints(gorillas$boundary),
     "Computing integration points from polygon"
@@ -44,7 +44,7 @@ test_that("conversion of SpatialPolygon to integration points", {
 
 test_that("conversion of SpatialPolygon to integration points when domain is defined via a mesh", {
   local_bru_safe_inla()
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
   expect_warning(
     ips_nodomain <- ipoints(gorillas$boundary),
@@ -61,7 +61,7 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
 
 test_that("conversion of 2D mesh to integration points", {
   local_bru_safe_inla()
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
   ips <- ipoints(gorillas$mesh)
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
@@ -73,7 +73,7 @@ test_that("SLDF in metres to integration points using grouping parameter", {
   local_bru_safe_inla()
   skip_if_not(fm_has_PROJ6())
 
-  data(mrsea, package = "inlabru")
+  data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = FALSE)
   suppressWarnings(
     ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
@@ -98,7 +98,7 @@ test_that("SLDF in kilometres to integration points using grouping parameter", {
   local_bru_safe_inla()
   skip_if_not(fm_has_PROJ6())
 
-  data(mrsea, package = "inlabru")
+  data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
   suppressWarnings(
     ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")

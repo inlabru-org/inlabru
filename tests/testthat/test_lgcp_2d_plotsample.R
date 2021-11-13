@@ -9,7 +9,7 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
       int.strategy = "eb"
     )
   )
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
 
   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
     prior.sigma = c(0.1, 0.01),

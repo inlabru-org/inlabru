@@ -2,7 +2,7 @@ local_bru_testthat_setup()
 
 latent_spde1D_testdata <- function() {
   local_bru_safe_inla()
-  data(Poisson2_1D, package = "inlabru")
+  data(Poisson2_1D, package = "inlabru", envir = environment())
   x <- seq(0, 55, length = 50)
   mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
 

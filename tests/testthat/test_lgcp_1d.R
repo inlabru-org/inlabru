@@ -1,7 +1,7 @@
 local_bru_testthat_setup()
 
 test_data <- function() {
-  data(Poisson2_1D, package = "inlabru")
+  data(Poisson2_1D, package = "inlabru", envir = environment())
   x <- seq(0, 55, length = 50)
   mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
   matern <- INLA::inla.spde2.pcmatern(
@@ -89,7 +89,7 @@ test_that("1D LGCP fitting", {
 
 
 test_data_discrete <- function() {
-  data(Poisson2_1D)
+  data(Poisson2_1D, package = "inlabru", envir = environment())
   xx <- ceiling(pts2$x)
   data <- data.frame(x = rep(xx, xx))
   x <- seq(1, 55, length = 55)

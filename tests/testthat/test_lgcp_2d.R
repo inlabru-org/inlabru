@@ -13,7 +13,7 @@ test_that("2D LGCP fitting", {
     )
   )
 
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
 
   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
     prior.sigma = c(0.1, 0.01),

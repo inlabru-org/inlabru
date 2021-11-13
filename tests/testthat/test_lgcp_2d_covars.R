@@ -5,7 +5,7 @@ test_that("2D LGCP fitting", {
   local_bru_safe_inla()
 
   # test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
 
   mdl <- coordinates ~ veg(
     main = gorillas$gcov$vegetation,
