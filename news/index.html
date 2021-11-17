@@ -170,6 +170,7 @@
 <li><p>Force explicit <code>model = "offset"</code> components instead of special options, to avoid interfering with the linearisation system (Issue <a href='https://github.com/inlabru-org/inlabru/issues/123'>#123</a>)</p></li>
 <li><p>Make the iterations more robust by resetting the internal INLA predictor states to initial value zero at each step</p></li>
 <li><p>Rename the option <code>bru_method$stop_at_max_rel_deviation</code> to <code>bru_method$rel_tol</code>. Automatic conversion to the new name, but a warning is given.</p></li>
+<li><p>Add option <code>bru_method$max_step</code> to control the largest allowed line search scaling factor. See <code><a href="../reference/bru_options.html">?bru_options</a></code></p></li>
 </ul>
 </div>
     <div id="inlabru-231" class="section level1">

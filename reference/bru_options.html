@@ -265,7 +265,8 @@ Default: 0, to not print any messages</p></dd>
 log messages of verbosity \(\le\) are stored. Default: Inf, to store all messages.</p></dd>
 <dt>bru_run</dt><dd><p>If TRUE, run inference. Otherwise only return configuration needed
 to run inference.</p></dd>
-<dt>bru_max_iter</dt><dd><p>maximum number of inla iterations, default 10. Also see the <code>bru_method$rel_tol</code> option below.</p></dd>
+<dt>bru_max_iter</dt><dd><p>maximum number of inla iterations, default 10.
+Also see the <code>bru_method$rel_tol</code> and related options below.</p></dd>
 <dt>bru_initial</dt><dd><p>An <code>inla</code> object returned from previous calls of
 <code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>INLA::inla</a></code>, <code><a href='bru.html'>bru()</a></code> or <code><a href='lgcp.html'>lgcp()</a></code>, or a list of named vectors of starting
 values for the latent variables. This will be used as a
@@ -295,7 +296,9 @@ available for <code>taylor="legacy"</code>.</p></dd>
 multiplier. Default \((1 + \sqrt{5})/2\).</p></dd>
 <dt>rel_tol</dt><dd><p>Stop the iterations when the largest change in linearisation point
 (the conditional latent state mode) in relation to the estimated posterior
-standard deviation is less than <code>rel_tol</code>. Default 0.01 (one percent).</p></dd></dl></p></dd>
+standard deviation is less than <code>rel_tol</code>. Default 0.01 (one percent).</p></dd>
+<dt>max_step</dt><dd><p>The largest allowed line search step factor. Factor 1 is the
+full INLA step. Default is 2.</p></dd></dl></p></dd>
 <dt><code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>inla()</a></code> options</dt><dd><p>All options not starting with <code>bru_</code> are passed on to <code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>inla()</a></code>, sometimes
 after altering according to the needs of the inlabru method.
 Warning:
