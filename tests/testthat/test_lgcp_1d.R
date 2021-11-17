@@ -38,26 +38,26 @@ test_that("1D LGCP fitting", {
 
   expect_s3_class(fit, "bru")
 
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.fixed["Intercept", "mean"],
-    1.054199,
-    tolerance = hitol
+    tolerance = midtol,
+    style = "serialize"
   )
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.fixed["Intercept", "sd"],
-    0.4200817,
-    tolerance = hitol
+    tolerance = midtol,
+    style = "serialize"
   )
 
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.random$spde1D$mean[c(1, 27, 50)],
-    c(-0.4146421, 0.1373841, -3.2198098),
-    tolerance = hitol
+    tolerance = midtol,
+    style = "serialize"
   )
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.random$spde1D$sd[c(2, 32, 29)],
-    c(0.5887868, 0.4267676, 0.4288160),
-    tolerance = hitol
+    tolerance = midtol,
+    style = "serialize"
   )
 
   pr <- predict(fit,
