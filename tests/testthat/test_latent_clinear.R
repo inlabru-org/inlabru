@@ -24,8 +24,8 @@ test_that("bru: clinear component", {
   )
   expect_equal(
     fit$summary.random[["myLin"]][1, "sd"],
-    0.016,
-    tolerance = midtol
+    0.013,
+    tolerance = hitol
   )
 
   pr <- predict(
