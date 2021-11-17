@@ -1389,6 +1389,7 @@ bru_line_search <- function(model,
     any(c("all", "expand") %in% options$bru_method$search)
   do_optimise <-
     any(c("all", "optimise") %in% options$bru_method$search)
+  maximum_step <- options$bru_method$max_step
 
   finite_active <- 0
   contract_active <- 0
@@ -1518,6 +1519,24 @@ bru_line_search <- function(model,
         verbosity = 3
       )
     }
+  }
+
+  if (step_scaling > maximum_step) {
+    step_scaling <- maximum_step
+    state <- scale_state(state0, state1, step_scaling)
+    nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+    norm1 <- pred_norm(nonlin_pred - lin_pred1)
+
+    bru_log_message(
+      paste0(
+        "iinla: Step rescaling: ",
+        signif(100 * step_scaling, 3),
+        "%, Maximum step length"
+      ),
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store,
+      verbosity = 3
+    )
   }
 
   active <-

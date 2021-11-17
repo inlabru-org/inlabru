@@ -19,6 +19,9 @@
 * Rename the option `bru_method$stop_at_max_rel_deviation` to `bru_method$rel_tol`.
   Automatic conversion to the new name, but a warning is given.
 
+* Add option `bru_method$max_step` to control the largest allowed line search
+  scaling factor. See `?bru_options`
+  
 # inlabru 2.3.1
 
 * Documentation and dependency updates for CRAN compatibility

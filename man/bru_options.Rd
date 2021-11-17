@@ -99,7 +99,8 @@ Default: 0, to not print any messages}
 log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all messages.}
 \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
 to run inference.}
-\item{bru_max_iter}{maximum number of inla iterations, default 10. Also see the \code{bru_method$rel_tol} option below.}
+\item{bru_max_iter}{maximum number of inla iterations, default 10.
+Also see the \code{bru_method$rel_tol} and related options below.}
 \item{bru_initial}{An \code{inla} object returned from previous calls of
 \code{INLA::inla}, \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}, or a list of named vectors of starting
 values for the latent variables. This will be used as a
@@ -133,6 +134,8 @@ multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
 \item{rel_tol}{Stop the iterations when the largest change in linearisation point
 (the conditional latent state mode) in relation to the estimated posterior
 standard deviation is less than \code{rel_tol}. Default 0.01 (one percent).}
+\item{max_step}{The largest allowed line search step factor. Factor 1 is the
+full INLA step. Default is 2.}
 }
 }
 \item{\code{inla()} options}{
