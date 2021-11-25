@@ -16,6 +16,10 @@ index_eval(...)
 \item{...}{Unused.}
 
 \item{component}{A component.}
+
+\item{inla_f}{logical; when \code{TRUE}, must result in
+values compatible with \code{INLA::f(...)}
+an specification and corresponding \code{INLA::inla.stack(...)} constructions.}
 }
 \value{
 a list of indices into the latent variables compatible with the

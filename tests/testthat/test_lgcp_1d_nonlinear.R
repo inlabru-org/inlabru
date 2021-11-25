@@ -21,7 +21,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
     options = list(
       bru_verbose = 2,
       control.inla = list(int.strategy = "auto"),
-      bru_initial = list(lsig = -1)
+      bru_initial = list(lsig = -1) # A difficult starting point
     )
   )
 
@@ -45,20 +45,18 @@ test_that("Mexdolphin: Hazard rate detection function", {
 
 
 # timings <- function() {
+#   data(mexdolphin, package = "inlabru", envir = environment())
+#
+#   hr <- function(distance, lsig) {
+#     1 - exp(-(distance / (exp(lsig)))^-1)
+#   }
+#   cmp <- ~ lsig(1) + Intercept(1)
+#   form <- distance ~ log(hr(distance, lsig)) + Intercept
+#   ips <- ipoints(INLA::inla.mesh.1d(seq(0, 8, by = 0.1)), name = "distance")
 #   local_bru_options_set(bru_verbose = FALSE)
 #   bench::mark(
-#     legacy = {
-#       local_bru_options_set(bru_linearisation_method = "legacy")
-#       fit <- lgcp(
-#         components = cmp,
-#         mexdolphin$points,
-#         ips = ips,
-#         formula = form,
-#         options = list(control.inla = list(int.strategy = "auto"))
-#       )
-#     },
 #     pandemic = {
-#       local_bru_options_set(bru_linearisation_method = "pandemic")
+#       local_bru_options_set(bru_method = list(taylor = "pandemic"))
 #       fit <- lgcp(
 #         components = cmp,
 #         mexdolphin$points,

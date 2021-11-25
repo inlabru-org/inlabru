@@ -117,7 +117,7 @@ are aggregated to mesh vertices.}
 }
 \item{bru_method}{List of arguments controlling the iterative inlabru method:
 \describe{
-\item{taylor}{Either 'legacy' (for the pre-2.1.15 method) or 'pandemic'
+\item{taylor}{'pandemic'
 (default, from version 2.1.15).}
 \item{search}{Either 'all' (default), to use all available line search
 methods, or one or more of
@@ -136,6 +136,11 @@ multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
 standard deviation is less than \code{rel_tol}. Default 0.01 (one percent).}
 \item{max_step}{The largest allowed line search step factor. Factor 1 is the
 full INLA step. Default is 2.}
+\item{lin_opt_method}{Which method to use for the line search optimisation step.
+Default "onestep", using a quadratic approximation based on the value and
+gradient at zero, and the value at the current best step length guess.
+The method "full" does line optimisation on the full nonlinear predictor;
+this is slow and intended for debugging purposes only.}
 }
 }
 \item{\code{inla()} options}{

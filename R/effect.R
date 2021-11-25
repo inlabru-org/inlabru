@@ -2673,6 +2673,9 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 #' @export
 #' @keywords internal
 #' @param component A component.
+#' @param inla_f logical; when `TRUE`, must result in
+#' values compatible with `INLA::f(...)`
+#' an specification and corresponding `INLA::inla.stack(...)` constructions.
 #' @param ... Unused.
 #' @return a list of indices into the latent variables compatible with the
 #' component mapper.

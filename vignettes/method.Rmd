@@ -99,7 +99,7 @@ distribution linearised at $\bm{v}$,
 that generates a latent field configuration. We then seek a fix point of the
 functional, so that $\bm{u}_0=f(\ol{p}_{\bm{u}_0})$.
 Potential choices for $f(\cdot)$ include the posterior expectation
-$\ol{E}(\bm{u}|\bm{y})$ and the "Empirical Bayes conditional mode",
+$\ol{E}(\bm{u}|\bm{y})$ and the joint conditional mode,
 $$
 f(\ol{p}_{\bm{v}})=\argmax_{\bm{u}} \ol{p}_{\bm{v}}(\bm{u}|\bm{y},\wh{\bm{\theta}}),
 $$

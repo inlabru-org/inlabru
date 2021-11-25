@@ -702,38 +702,6 @@ bru_like_expr <- function(lhood, components) {
 
 
 
-single_stackmaker <- function(model, lhood, state) {
-  make.stack(
-    data = lhood$data, model = model, expr = lhood$expr,
-    y = lhood$data[[lhood$response]],
-    E = lhood$E, Ntrials = lhood$Ntrials,
-    state = state,
-    include = lhood[["include_components"]],
-    exclude = lhood[["exclude_components"]]
-  )
-}
-
-joint_stackmaker <- function(model, lhoods, state) {
-  do.call(
-    inla.stack.mjoin,
-    c(
-      lapply(
-        lhoods,
-        function(lh) {
-          single_stackmaker(model, lh, state)
-        }
-      ),
-      # Make sure components with zero derivative are kept:
-      remove.unused = FALSE
-    )
-  )
-}
-
-
-
-
-
-
 #' Log Gaussian Cox process (LGCP) inference using INLA
 #'
 #' This function performs inference on a LGCP observed via points residing
@@ -1344,7 +1312,33 @@ line_search_optimisation_target <- function(x, param) {
   (x - 1)^2 * param[1] + 2 * (x - 1) * x^2 * param[2] + x^4 * param[3]
 }
 
+line_search_optimisation_target_exact <- function(x, param) {
+  state <- scale_state(param$state0, param$state1, x)
+  nonlin <- nonlin_predictor(param$model, param$lhoods, state, param$A)
+  sum((nonlin - param$lin)^2 * param$weights)
+}
 
+
+# @title FUNCTION_TITLE
+# @description FUNCTION_DESCRIPTION
+# @param model PARAM_DESCRIPTION
+# @param lhoods PARAM_DESCRIPTION
+# @param lin PARAM_DESCRIPTION
+# @param state0 PARAM_DESCRIPTION
+# @param state PARAM_DESCRIPTION
+# @param A PARAM_DESCRIPTION
+# @param weights PARAM_DESCRIPTION
+# @param options PARAM_DESCRIPTION
+# @return OUTPUT_DESCRIPTION
+# @details DETAILS
+# @examples
+# \dontrun{
+# if(interactive()){
+#  #EXAMPLE1
+#  }
+# }
+# @export
+# @rdname bru_line_search
 
 bru_line_search <- function(model,
                             lhoods,
@@ -1352,6 +1346,7 @@ bru_line_search <- function(model,
                             state0,
                             state,
                             A,
+                            weights = 1,
                             options) {
   if (length(options$bru_method$search) == 0) {
     return(
@@ -1364,14 +1359,23 @@ bru_line_search <- function(model,
   }
 
   fact <- options$bru_method$factor
-  pred_norm <- function(delta) {
-    if (any(!is.finite(delta))) {
+
+  # Metrics ----
+  pred_scalprod <- function(delta1, delta2) {
+    if (any(!is.finite(delta1)) || any(!is.finite(delta2))) {
       Inf
     } else {
-      sum(delta^2)^0.5
+      sum(delta1 * delta2 * weights)
     }
   }
+  pred_norm2 <- function(delta) {
+    pred_scalprod(delta, delta)
+  }
+  pred_norm <- function(delta) {
+    pred_scalprod(delta, delta)^0.5
+  }
 
+  # Initialise ----
   state1 <- state
   lin_pred0 <- lin_predictor(lin, state0)
   lin_pred1 <- lin_predictor(lin, state1)
@@ -1395,6 +1399,7 @@ bru_line_search <- function(model,
   contract_active <- 0
   expand_active <- 0
 
+  # Contraction methods ----
   if (do_finite || do_contract) {
     nonfin <- any(!is.finite(nonlin_pred))
     norm0 <- pred_norm(nonlin_pred - lin_pred0)
@@ -1429,6 +1434,7 @@ bru_line_search <- function(model,
     }
   }
 
+  # Expansion method ----
   if (do_expand &&
     finite_active == 0 &&
     contract_active == 0) {
@@ -1462,6 +1468,7 @@ bru_line_search <- function(model,
         break
       }
     }
+    # Overstep ----
     if (((step_scaling > 1) && overstep) || !is.finite(norm1)) {
       expand_active <- expand_active - 1
       step_scaling <- step_scaling / fact
@@ -1482,6 +1489,7 @@ bru_line_search <- function(model,
     }
   }
 
+  # Optimisation method ----
   if (do_optimise) {
     lin_pred <- lin_predictor(lin, state)
     delta_lin <- (lin_pred1 - lin_pred0)
@@ -1489,13 +1497,31 @@ bru_line_search <- function(model,
     alpha <-
       optimise(
         line_search_optimisation_target,
-        step_scaling * c(1 / fact, fact),
+        step_scaling * c(1 / fact^2, fact),
         param = c(
-          sum(delta_lin^2),
-          sum(delta_lin * delta_nonlin),
-          sum(delta_nonlin^2)
+          pred_norm2(delta_lin),
+          pred_scalprod(delta_lin, delta_nonlin),
+          pred_norm2(delta_nonlin)
         )
       )
+    step_scaling_opt_approx <- alpha$minimum
+
+    if (identical(options$bru_method$line_opt_method, "full")) {
+      alpha <-
+        optimise(
+          line_search_optimisation_target_exact,
+          step_scaling * c(1 / fact^2, fact),
+          param = list(
+            lin = lin_pred1,
+            model = model,
+            lhoods = lhoods,
+            A = A,
+            state0 = state0,
+            state1 = state1,
+            weights = weights
+          )
+        )
+    }
 
     step_scaling_opt <- alpha$minimum
     state_opt <- scale_state(state0, state1, step_scaling_opt)
@@ -1512,7 +1538,14 @@ bru_line_search <- function(model,
         paste0(
           "iinla: Step rescaling: ",
           signif(100 * step_scaling, 4),
-          "%, Optimisation"
+          "%, Optimisation",
+          if (identical(options$bru_method$line_opt_method, "full")) {
+            paste0(" (Approx = ",
+                   signif(100 * step_scaling_opt_approx, 4),
+                   "%)")
+          } else {
+            NULL
+          }
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
@@ -1521,6 +1554,24 @@ bru_line_search <- function(model,
     }
   }
 
+  bru_log_message(
+    paste0(
+      "iinla: |lin1-lin0| = ",
+      signif(pred_norm(lin_pred1 - lin_pred0), 4),
+      "\n       <eta-lin1,delta>/|delta| = ",
+      signif(pred_scalprod(nonlin_pred-lin_pred1, lin_pred1 - lin_pred0) /
+               pred_norm(lin_pred1 - lin_pred0), 4),
+      "\n       |eta-lin0 - delta <delta,eta-lin0>/<delta,delta>| = ",
+      signif(pred_norm(nonlin_pred-lin_pred0 - (lin_pred1-lin_pred0) *
+                  pred_scalprod(lin_pred1-lin_pred0, nonlin_pred-lin_pred0) /
+                  pred_norm2(lin_pred1-lin_pred0)), 4)
+    ),
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 4
+  )
+
+  # Prevent long steps ----
   if (step_scaling > maximum_step) {
     step_scaling <- maximum_step
     state <- scale_state(state0, state1, step_scaling)
@@ -1578,12 +1629,23 @@ latent_names <- function(state) {
   names(nm) <- names(state)
   nm
 }
-tidy_tracker <- function(state, value_name = "value") {
+tidy_state <- function(state, value_name = "value") {
   df <- data.frame(
-    effect = latent_names(state),
-    value = unlist(state)
+    effect = rep(names(state), lengths(state)),
+    index = unlist(lapply(lengths(state), function(x) seq_len(x))),
+    THEVALUE = unlist(state)
   )
-  names(df) <- c("effect", value_name)
+  nm <- names(df)
+  nm[nm == "THEVALUE"] <- value_name
+  names(df) <- nm
+  rownames(df) <- NULL
+  df
+}
+tidy_states <- function(states, value_name = "value", id_name = "iteration") {
+  df <- lapply(states, function(x) tidy_state(x, value_name = value_name))
+  id <- rep(seq_len(length(states)), each = nrow(df[[1]]))
+  df <- do.call(rbind, df)
+  df[[id_name]] <- id
   df
 }
 
@@ -1728,7 +1790,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
 
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
-  if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
+  if (do_line_search) {
     A <- evaluate_A(model, lhoods, inla_f = TRUE) # Input is inla::f-compatible
     lin <- bru_compute_linearisation(
       model,
@@ -1738,16 +1800,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     )
   }
   # Initial stack
-  if (identical(options$bru_method$taylor, "legacy")) {
-    stk <- joint_stackmaker(
-      model,
-      lhoods,
-      state = list(states[[length(states)]])
-    )
-  } else {
-    idx <- evaluate_index(model, lhoods)
-    stk <- bru_make_stack(lhoods, lin, idx)
-  }
+  idx <- evaluate_index(model, lhoods)
+  stk <- bru_make_stack(lhoods, lin, idx)
+
   stk.data <- INLA::inla.stack.data(stk)
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
 
@@ -1765,6 +1820,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     previous_x <- 0 # TODO: construct from the initial linearisation state instead
   }
 
+  track_df <- NULL
   do_final_integration <- (options$bru_max_iter == 1)
   do_final_theta_no_restart <- FALSE
   while (!interrupt) {
@@ -1893,29 +1949,33 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     }
 
     # Extract values tracked for estimating convergence
-    if (options$bru_max_iter > 1 & k <= options$bru_max_iter) {
-      # Note: The number of fixed effects may be zero, and strong
-      # non-linearities that don't necessarily affect the fixed
-      # effects may appear in the random effects, so we need to
-      # track all of them.
-      result_mode <- evaluate_state(model, result, property = "joint_mode")[[1]]
-      result_sd <- evaluate_state(model, result,
-        property = "sd",
-        internal_hyperpar = TRUE
-      )[[1]]
-      result_names <- latent_names(result_mode)
-      track_df <- list()
-      for (label in names(result_mode)) {
-        track_df[[label]] <-
-          data.frame(
-            effect = result_names[[label]],
-            iteration = track_size + k,
-            mode = result_mode[[label]],
-            sd = result_sd[[label]]
-          )
-      }
-      track[[k]] <- do.call(rbind, track_df)
+    # Note: The number of fixed effects may be zero, and strong
+    # non-linearities that don't necessarily affect the fixed
+    # effects may appear in the random effects, so we need to
+    # track all of them.
+    result_mode <- evaluate_state(
+      model,
+      result,
+      property = "joint_mode"
+    )[[1]]
+    result_sd <- evaluate_state(
+      model,
+      result,
+      property = "sd",
+      internal_hyperpar = TRUE
+    )[[1]]
+    track_df <- list()
+    for (label in names(result_mode)) {
+      track_df[[label]] <-
+        data.frame(
+          effect = label,
+          index = seq_along(result_mode[[label]]),
+          iteration = track_size + k,
+          mode = result_mode[[label]],
+          sd = result_sd[[label]]
+        )
     }
+    track[[k]] <- do.call(rbind, track_df)
 
     # Only update the linearisation state after the non-final "eb" iterations:
     if (!do_final_integration) {
@@ -1927,6 +1987,12 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       )[[1]]
       if ((options$bru_max_iter > 1)) {
         if (do_line_search) {
+          line_weights <-
+            extract_property(
+              result = result,
+              property = "predictor_sd",
+              internal_hyperpar = FALSE
+            )^{-2}
           line_search <- bru_line_search(
             model = model,
             lhoods = lhoods,
@@ -1934,23 +2000,19 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             state0 = state0,
             state = state,
             A = A,
+            weights = line_weights,
             options = options
           )
           state <- line_search[["state"]]
         }
-        if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
-          lin <- bru_compute_linearisation(
-            model,
-            lhoods = lhoods,
-            state = state,
-            A = A
-          )
-        }
-        if (identical(options$bru_method$taylor, "legacy")) {
-          stk <- joint_stackmaker(model, lhoods, state = list(state))
-        } else {
-          stk <- bru_make_stack(lhoods, lin, idx)
-        }
+        lin <- bru_compute_linearisation(
+          model,
+          lhoods = lhoods,
+          state = state,
+          A = A
+        )
+        stk <- bru_make_stack(lhoods, lin, idx)
+
         stk.data <- INLA::inla.stack.data(stk)
         inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
       }
@@ -1987,6 +2049,11 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           verbose_store = options$bru_verbose_store
         )
       }
+    }
+    track[[k]][["new_linearisation"]] <- NA_real_
+    for (label in names(states[[1]])) {
+      track[[k]][["new_linearisation"]][track[[k]][["effect"]] == label] <-
+        unlist(states[[length(states)]][[label]])
     }
     k <- k + 1
   }

@@ -106,6 +106,8 @@ inla_result_latent_idx <- function(result) {
 #' identifier for inla result `$summary.fixed`, `$summary.random$label`, and
 #' `$summary.hyperpar`, or "joint_mode". For "joint_mode", the joint latent mode
 #' is extracted, and the joint hyperparameter mode, in the internal scale.
+#' For "predictor_sd" the posterior standard deviations of the linear predictor
+#' are returned.
 #' @param internal_hyperpar logical; if `TRUE`, use internal scale for
 #' hyperparamter properties. Default is `FALSE`, except when `property` is
 #' "joint_mode" which forces `internal_hyperpar=TRUE`.
@@ -130,6 +132,11 @@ extract_property <- function(result, property,
     for (idx in seq_along(theta_names)) {
       ret[[theta_names[idx]]] <- result$mode$theta[idx]
     }
+    return(ret)
+  } else if (property == "predictor_sd") {
+    idx <- grepl(pattern = "^APredictor",
+                 x = rownames(result$summary.linear.predict))
+    ret <- result$summary.linear.predictor$sd[idx]
     return(ret)
   }
 
