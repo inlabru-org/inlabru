@@ -281,7 +281,7 @@ are aggregated to mesh vertices.</p></dd>
 <dt>nsub</dt><dd><p>Deprecated parameter that overrides <code>nsub1</code> and <code>nsub2</code> if set. Default <code>NULL</code>.</p></dd></dl></p></dd>
 <dt>bru_method</dt><dd><p>List of arguments controlling the iterative inlabru method:
 <dl>
-<dt>taylor</dt><dd><p>Either 'legacy' (for the pre-2.1.15 method) or 'pandemic'
+<dt>taylor</dt><dd><p>'pandemic'
 (default, from version 2.1.15).</p></dd>
 <dt>search</dt><dd><p>Either 'all' (default), to use all available line search
 methods, or one or more of
@@ -298,7 +298,12 @@ multiplier. Default \((1 + \sqrt{5})/2\).</p></dd>
 (the conditional latent state mode) in relation to the estimated posterior
 standard deviation is less than <code>rel_tol</code>. Default 0.01 (one percent).</p></dd>
 <dt>max_step</dt><dd><p>The largest allowed line search step factor. Factor 1 is the
-full INLA step. Default is 2.</p></dd></dl></p></dd>
+full INLA step. Default is 2.</p></dd>
+<dt>lin_opt_method</dt><dd><p>Which method to use for the line search optimisation step.
+Default "onestep", using a quadratic approximation based on the value and
+gradient at zero, and the value at the current best step length guess.
+The method "full" does line optimisation on the full nonlinear predictor;
+this is slow and intended for debugging purposes only.</p></dd></dl></p></dd>
 <dt><code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>inla()</a></code> options</dt><dd><p>All options not starting with <code>bru_</code> are passed on to <code><a href='https://rdrr.io/pkg/INLA/man/inla.html'>inla()</a></code>, sometimes
 after altering according to the needs of the inlabru method.
 Warning:

@@ -118,7 +118,7 @@
       <h1 data-toc-skip>Random Fields in One Dimension</h1>
                         <h4 class="author">Finn Lindgren</h4>
             
-            <h4 class="date">2021-11-17</h4>
+            <h4 class="date">2021-11-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/random_fields.Rmd"><code>vignettes/web/random_fields.Rmd</code></a></small>
       <div class="hidden name"><code>random_fields.Rmd</code></div>
@@ -240,7 +240,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.3.1.9000</span>
-<span class="co">#&gt; INLA version: 21.11.16</span>
+<span class="co">#&gt; INLA version: 21.11.22</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   field: Model types main='spde', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   Intercept: Model types main='linear', group='exchangeable', replicate='iid'</span>
@@ -249,10 +249,10 @@
 <span class="co">#&gt;     Data class: 'data.frame'</span>
 <span class="co">#&gt;     Predictor: count ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.48, Running = 0.705, Post = 0.0999, Total = 2.28 </span>
+<span class="co">#&gt;     Pre = 1.27, Running = 0.677, Post = 0.0893, Total = 2.04 </span>
 <span class="co">#&gt; Fixed effects:</span>
-<span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span>
-<span class="co">#&gt; Intercept 3.523 3.484      -0.02    1.964     12.214 1.152   0</span>
+<span class="co">#&gt;           mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span>
+<span class="co">#&gt; Intercept 3.52 3.482     -0.021    1.962     12.208 1.151   0</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
@@ -260,11 +260,11 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Model hyperparameters:</span>
 <span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant   mode</span>
-<span class="co">#&gt; Range for field 41.260 28.840       7.63    34.40     116.09 20.952</span>
+<span class="co">#&gt; Range for field 41.259 28.838       7.63    34.40     116.08 20.952</span>
 <span class="co">#&gt; Stdev for field  0.606  0.338       0.22     0.52       1.50  0.398</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 59.59</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 76.23</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 76.24</span>
 <span class="co">#&gt; Effective number of parameters .....................: 4.80</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 58.01</span>
