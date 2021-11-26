@@ -1382,6 +1382,13 @@ bru_line_search <- function(model,
   nonlin_pred <- nonlin_predictor(model, lhoods, state1, A)
   step_scaling <- 1
 
+  #debug#
+  df<-data.frame(idx=seq_along(lin_pred0),
+                 lin0=lin_pred0,
+                 lin1=lin_pred1,
+                 nonlin1=nonlin_pred)
+
+
   norm01 <- pred_norm(lin_pred1 - lin_pred0)
   norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
@@ -1606,6 +1613,30 @@ bru_line_search <- function(model,
       verbosity = 2
     )
   }
+
+  df$nonlinopt <- nonlin_pred
+
+  library(ggplot2)
+  library(patchwork)
+  pl1 <- ggplot(df) +
+    geom_point(aes(lin1, (nonlin1 - lin1), col="nonlin1")) +
+    geom_abline(slope = 0,intercept=0) +
+    geom_point(aes(lin1, (nonlinopt-lin1), col="nonlinopt"))
+  pl2 <- ggplot(df) +
+    geom_point(aes(lin1, (nonlin1 - lin1) * weights^0.5, col="nonlin1")) +
+    geom_abline(slope = 0,intercept=0) +
+    geom_point(aes(lin1, (nonlinopt-lin1) * weights^0.5, col="nonlinopt"))
+  pl3 <- ggplot(df) +
+    geom_point(aes(idx, lin1, col="nonlin1")) +
+    geom_abline(slope = 0,intercept=0) +
+    geom_point(aes(idx, nonlinopt, col="nonlinopt"))
+  print(
+    ((pl1 | pl2) / pl3) +
+      plot_layout(guides = "collect") &
+      theme(legend.position = "right")
+  )
+
+  browser()
 
   list(
     active = active,
