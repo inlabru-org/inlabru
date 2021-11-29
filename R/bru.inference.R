@@ -1619,19 +1619,38 @@ bru_line_search <- function(model,
   library(ggplot2)
   library(patchwork)
   pl1 <- ggplot(df) +
-    geom_point(aes(lin1, (nonlin1 - lin1), col="nonlin1")) +
+    geom_point(aes(lin1, (lin0-lin1), col="start", shape="linear")) +
+    geom_point(aes(lin1, (nonlin1 - lin1), col="full", shape="nonlin")) +
+    geom_point(aes(lin1, (nonlinopt-lin1), col="opt", shape="nonlin")) +
     geom_abline(slope = 0,intercept=0) +
-    geom_point(aes(lin1, (nonlinopt-lin1), col="nonlinopt"))
+    scale_color_discrete(breaks = c("start", "full", "opt"))
   pl2 <- ggplot(df) +
-    geom_point(aes(lin1, (nonlin1 - lin1) * weights^0.5, col="nonlin1")) +
+    geom_point(aes(lin1, (lin0-lin1) * weights^0.5, col="start", shape="linear")) +
+    geom_point(aes(lin1, (nonlin1 - lin1) * weights^0.5, col="full", shape="nonlin")) +
+    geom_point(aes(lin1, (nonlinopt-lin1) * weights^0.5, col="opt", shape="nonlin")) +
     geom_abline(slope = 0,intercept=0) +
-    geom_point(aes(lin1, (nonlinopt-lin1) * weights^0.5, col="nonlinopt"))
+    scale_color_discrete(breaks = c("start", "full", "opt"))
   pl3 <- ggplot(df) +
-    geom_point(aes(idx, lin1, col="nonlin1")) +
+    geom_point(aes(idx, lin0, col="start", shape="linear")) +
+    geom_point(aes(idx, lin1, col="full", shape="linear")) +
+    geom_point(aes(idx, nonlin1, col="full", shape="nonlin")) +
+    geom_point(aes(idx, nonlinopt, col="opt", shape="nonlin")) +
+    geom_ribbon(aes(idx,
+                    ymin=lin1-2*weights^-0.5,
+                    ymax=lin1+2*weights^-0.5),
+                alpha = 0.1) +
     geom_abline(slope = 0,intercept=0) +
-    geom_point(aes(idx, nonlinopt, col="nonlinopt"))
+    scale_color_discrete(breaks = c("start", "full", "opt"))
+  pl4 <- ggplot(data.frame(idx = seq_along(unlist(state0)),
+                           state0 = unlist(state0),
+                           state1 = unlist(state1),
+                           state = unlist(state))) +
+    geom_point(aes(idx, state0, col="start")) +
+    geom_point(aes(idx, state1, col="full")) +
+    geom_point(aes(idx, state, col="opt")) +
+    scale_color_discrete(breaks = c("start", "full", "opt"))
   print(
-    ((pl1 | pl2) / pl3) +
+    ((pl1 | pl2) / (pl3 | pl4)) +
       plot_layout(guides = "collect") &
       theme(legend.position = "right")
   )
