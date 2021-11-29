@@ -1081,6 +1081,12 @@ generate.bru <- function(object,
 
   # If data is provided as list, generate data automatically for each dimension
   # stated in this list
+  # # TODO: remove this! This feature clashes with problems that need input
+  # data given as a list. Better to make the user cornstruct the inputs
+  # (optionally with a special ipoints function, but to some degree it's just
+  # a application of expand.grid())
+  # # TODO: Check if when removing this, all the other drange code can also
+  # safely be removed.
   if (class(data)[1] == "list") {
     # Todo: check if this feature works at all.
     # TODO: add method ipoints.list to handle this;
