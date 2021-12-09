@@ -18,9 +18,14 @@ bru_make_stack <- function(...) {
 #' @export
 #' @rdname bru_make_stack
 bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
+  if (is.null(lhood[["response_data"]])) {
+    BRU.response <- lhood$data[[lhood$response]]
+  } else {
+    BRU.response <- lhood$response_data[[lhood$response]]
+  }
   INLA::inla.stack(
     list(
-      BRU.response = lhood$response_data[[lhood$response]], # agg
+      BRU.response = BRU.response,
       BRU.E = lhood[["E"]],
       BRU.Ntrials = lhood[["Ntrials"]],
       BRU.offset = as.vector(lin$offset)

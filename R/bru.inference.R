@@ -575,11 +575,12 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       }
     }
     data <- as.data.frame(data)
-    response_data <- as.data.frame(response_data) # agg
+    if (!is.null(response_data)) {
+      warning("Ignoring non-null response_data input for 'cp' likelihood")
+    }
     ips <- as.data.frame(ips)
-    dim_names <- c(response ,intersect(names(data), names(ips))) # agg
+    dim_names <- intersect(names(data), names(ips))
     data <- rbind(
-      cbind(response_data[dim_names], BRU_E = 0, BRU_response_cp = 1), # agg
       cbind(data[dim_names], BRU_E = 0, BRU_response_cp = 1),
       cbind(ips[dim_names], BRU_E = E * ips[["weight"]], BRU_response_cp = 0)
     )
