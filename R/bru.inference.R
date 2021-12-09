@@ -482,6 +482,7 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @example inst/examples/like.R
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
+                 response_data = NULL, #agg
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
@@ -570,9 +571,11 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       }
     }
     data <- as.data.frame(data)
+    response_data <- as.data.frame(response_data) # agg
     ips <- as.data.frame(ips)
-    dim_names <- intersect(names(data), names(ips))
+    dim_names <- c(response ,intersect(names(data), names(ips))) # agg
     data <- rbind(
+      cbind(response_data[dim_names], BRU_E = 0, BRU_response_cp = 1), # agg
       cbind(data[dim_names], BRU_E = 0, BRU_response_cp = 1),
       cbind(ips[dim_names], BRU_E = E * ips[["weight"]], BRU_response_cp = 0)
     )
@@ -608,6 +611,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   lh <- list(
     family = family,
     formula = formula,
+    response_data = response_data, # agg
     data = data,
     E = E,
     Ntrials = Ntrials,

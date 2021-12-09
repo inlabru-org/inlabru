@@ -20,7 +20,7 @@ bru_make_stack <- function(...) {
 bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
   INLA::inla.stack(
     list(
-      BRU.response = lhood$data[[lhood$response]],
+      BRU.response = lhood$response_data[[lhood$response]], # agg
       BRU.E = lhood[["E"]],
       BRU.Ntrials = lhood[["Ntrials"]],
       BRU.offset = as.vector(lin$offset)
