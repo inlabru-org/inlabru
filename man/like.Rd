@@ -12,6 +12,7 @@ like(
   formula = . ~ .,
   family = "gaussian",
   data = NULL,
+  response_data = NULL,
   mesh = NULL,
   E = NULL,
   Ntrials = NULL,
@@ -50,7 +51,12 @@ a convenient interface to fitting Cox processes.}
 \code{SpatialPoints[DataFrame]}
 object.}
 
-\item{mesh}{An inla.mesh object.}
+\item{response_data}{Likelihood-specific data for models that need different
+size/format for inputs and response variables, as a \code{data.frame} or
+\code{SpatialPoints[DataFrame]}
+object.}
+
+\item{mesh}{An inla.mesh object. Obsolete.}
 
 \item{E}{Exposure parameter for family = 'poisson' passed on to
 \code{INLA::inla}. Special case if family is 'cp': rescale all integration
