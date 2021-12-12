@@ -448,7 +448,11 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @param data Likelihood-specific data, as a `data.frame` or
 #' `SpatialPoints[DataFrame]`
 #'   object.
-#' @param mesh An inla.mesh object.
+#' @param response_data Likelihood-specific data for models that need different
+#'  size/format for inputs and response variables, as a `data.frame` or
+#' `SpatialPoints[DataFrame]`
+#'   object.
+#' @param mesh An inla.mesh object. Obsolete.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
 #'   weights by E. Default taken from `options$E`.
@@ -470,10 +474,11 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' This also makes evaluator functions with suffix `_eval` available, taking
 #' parameters `main`, `group`, and `replicate`, taking values for where to
 #' evaluate the component effect that are different than those defined in the
-#' component definition itself (see [component_eval()]).
+#' component definition itself (see [component_eval()]). Default `FALSE`
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
-#' (TODO: review what's needed to allow the result to also be of a different size)
+#' Default `FALSE`, but forced to `TRUE` if `response_data` is `NULL` or
+#' `data` is a `list`
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
@@ -483,10 +488,12 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @example inst/examples/like.R
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
+                 response_data = NULL, #agg
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
-                 allow_latent = FALSE, allow_combine = FALSE,
+                 allow_latent = FALSE,
+                 allow_combine = NULL,
                  control.family = NULL,
                  options = list()) {
   options <- bru_call_options(options)
@@ -572,6 +579,9 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       }
     }
     data <- as.data.frame(data)
+    if (!is.null(response_data)) {
+      warning("Ignoring non-null response_data input for 'cp' likelihood")
+    }
     ips <- as.data.frame(ips)
     dim_names <- intersect(names(data), names(ips))
     data <- rbind(
@@ -610,6 +620,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   lh <- list(
     family = family,
     formula = formula,
+    response_data = response_data, # agg
     data = data,
     E = E,
     Ntrials = Ntrials,
@@ -623,7 +634,15 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     include_components = include,
     exclude_components = exclude,
     allow_latent = allow_latent,
-    allow_combine = allow_combine || (is.list(data) && !is.data.frame(data)),
+    allow_combine =
+      if (!is.null(response_data) ||
+          (is.list(data) && !is.data.frame(data))) {
+        TRUE
+      } else if (is.null(allow_combine)) {
+        FALSE
+      } else{
+        allow_combine
+      },
     control.family = control.family
   )
 
