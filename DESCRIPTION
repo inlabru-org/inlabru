@@ -21,7 +21,7 @@ Authors@R: c(
          comment = "Lindesay Scott-Howard provided MRSea data import code"),
   person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
          comment = "Andy Seaton provided testing and bugfixes"),
-  person("Suen", "Man Ho", email = "", role = c("ctb", "cph"),
+  person("Suen", "Man Ho", email = "M.H.Suen@sms.ed.ac.uk", role = c("ctb", "cph"),
          comment = "Man Ho Suen contributed features for aggregated responses")
   )
 URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/
