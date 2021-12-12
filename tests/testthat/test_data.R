@@ -83,15 +83,9 @@ test_that("Component construction: separate response_data input", {
 
 
   cmp1 <- component_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik1))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik1$data$x)
 
-  cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik1))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik1$data$x)
-
-  fit1 <- bru(components = cmp2, lik1)
-  fit2 <- bru(components = cmp2, lik2)
+  fit1 <- bru(components = cmp1, lik1)
+  fit2 <- bru(components = cmp1, lik2)
 
 
   cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
