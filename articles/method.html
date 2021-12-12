@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.1.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -97,7 +93,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/inlabru-org/inlabru/">
+  <a href="https://github.com/inlabru-org/inlabru/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -118,16 +114,16 @@
       <h1 data-toc-skip>Iterative INLA method</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/method.Rmd"><code>vignettes/method.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/method.Rmd" class="external-link"><code>vignettes/method.Rmd</code></a></small>
       <div class="hidden name"><code>method.Rmd</code></div>
 
     </div>
 
     
     
-<div id="the-inla-method-for-linear-predictors" class="section level2">
-<h2 class="hasAnchor">
-<a href="#the-inla-method-for-linear-predictors" class="anchor"></a>The INLA method for linear predictors</h2>
+<div class="section level2">
+<h2 id="the-inla-method-for-linear-predictors">The INLA method for linear predictors<a class="anchor" aria-label="anchor" href="#the-inla-method-for-linear-predictors"></a>
+</h2>
 <p>The INLA method is used to compute fast approximative posterior distribution for Bayesian generalised additive models. The hierarchical structure of such a model with latent Gaussian components <span class="math inline">\(\boldsymbol{u}\)</span>, covariance parameters <span class="math inline">\(\boldsymbol{\theta}\)</span>, and measured response variables <span class="math inline">\(\boldsymbol{y}\)</span>, can be written as <span class="math display">\[
 \begin{aligned}
 \boldsymbol{\theta} &amp;\sim p(\boldsymbol{\theta}) \\
@@ -137,9 +133,9 @@
 \end{aligned}
 \]</span> where typically each linear predictor element, <span class="math inline">\(\eta_i(\boldsymbol{u})\)</span>, is linked to a location parameter of the distribution for observation <span class="math inline">\(y_i\)</span>, for each <span class="math inline">\(i\)</span>, via a (non-linear) link function <span class="math inline">\(g^{-1}(\cdot)\)</span>. In the R-INLA implementation, the observations are assumed to be conditionally independent, given <span class="math inline">\(\boldsymbol{\eta}\)</span> and <span class="math inline">\(\boldsymbol{\theta}\)</span>.</p>
 </div>
-<div id="approximate-inla-for-non-linear-predictors" class="section level2">
-<h2 class="hasAnchor">
-<a href="#approximate-inla-for-non-linear-predictors" class="anchor"></a>Approximate INLA for non-linear predictors</h2>
+<div class="section level2">
+<h2 id="approximate-inla-for-non-linear-predictors">Approximate INLA for non-linear predictors<a class="anchor" aria-label="anchor" href="#approximate-inla-for-non-linear-predictors"></a>
+</h2>
 <p>The premise for the inlabru method for non-linear predictors is to build on the existing implementation, and only add a linearisation step. The properties of the resulting approximation will depend on the nature of the non-linearity.</p>
 <p>Let <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})\)</span> be a non-linear predictor, and let <span class="math inline">\(\overline{\boldsymbol{\eta}}(\boldsymbol{u})\)</span> be the 1st order Taylor approximation at <span class="math inline">\(\boldsymbol{u}_0\)</span>, <span class="math display">\[
 \overline{\boldsymbol{\eta}}(\boldsymbol{u})
@@ -164,9 +160,9 @@ p(\boldsymbol{y}|\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}),\boldsymbol{\thet
 \]</span> and the linear model approximation is factorised as <span class="math display">\[
 \overline{p}(\boldsymbol{\theta},\boldsymbol{u}|\boldsymbol{y}) = \overline{p}(\boldsymbol{\theta}|\boldsymbol{y})\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}) .
 \]</span></p>
-<div id="fixed-point-iteration" class="section level3">
-<h3 class="hasAnchor">
-<a href="#fixed-point-iteration" class="anchor"></a>Fixed point iteration</h3>
+<div class="section level3">
+<h3 id="fixed-point-iteration">Fixed point iteration<a class="anchor" aria-label="anchor" href="#fixed-point-iteration"></a>
+</h3>
 <p>The remaining step of the approximation is how to choose the linearisation point <span class="math inline">\(\boldsymbol{u}_0\)</span>. We start by introducing a functional <span class="math inline">\(f(\overline{p}_{\boldsymbol{v}})\)</span> of the posterior distribution linearised at <span class="math inline">\(\boldsymbol{v}\)</span>, that generates a latent field configuration. We then seek a fix point of the functional, so that <span class="math inline">\(\boldsymbol{u}_0=f(\overline{p}_{\boldsymbol{u}_0})\)</span>. Potential choices for <span class="math inline">\(f(\cdot)\)</span> include the posterior expectation <span class="math inline">\(\overline{E}(\boldsymbol{u}|\boldsymbol{y})\)</span> and the joint conditional mode, <span class="math display">\[
 f(\overline{p}_{\boldsymbol{v}})=\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} \overline{p}_{\boldsymbol{v}}(\boldsymbol{u}|\boldsymbol{y},\widehat{\boldsymbol{\theta}}),
 \]</span> where <span class="math inline">\(\widehat{\boldsymbol{\theta}}=\mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}} \overline{p}_{\boldsymbol{v}}(\boldsymbol{\theta}|\boldsymbol{y})\)</span> (used in <code>inlabru</code> from version 2.2.3<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>) One key to the fix point iteration is that the observation model is linked to <span class="math inline">\(\boldsymbol{u}\)</span> only through the non-linear predictor <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})\)</span>.</p>
@@ -179,9 +175,9 @@ f(\overline{p}_{\boldsymbol{v}})=\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} \ov
 <li>Let <span class="math inline">\(\boldsymbol{u}_\alpha=(1-\alpha)\boldsymbol{u}_0+\alpha\boldsymbol{u}_1\)</span>, and find the value <span class="math inline">\(\alpha\)</span> that minimises <span class="math inline">\(\|\widetilde{\eta}(\boldsymbol{u}_\alpha)-\overline{\eta}(\boldsymbol{u}_1)\|\)</span>.</li>
 <li>Set the linearisation point equal to <span class="math inline">\(\boldsymbol{u}_\alpha\)</span> and repeat from step 1, unless the iteration has converged to a given tolerance.</li>
 </ol>
-<div id="line-search" class="section level4">
-<h4 class="hasAnchor">
-<a href="#line-search" class="anchor"></a>Line search</h4>
+<div class="section level4">
+<h4 id="line-search">Line search<a class="anchor" aria-label="anchor" href="#line-search"></a>
+</h4>
 <p>In step 4, an approximate line search can be used, that avoids many potentially expensive evaluations of the non-linear predictor. We evaluate <span class="math inline">\(\widetilde{\boldsymbol{\eta}}_1=\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span> and make use of the linearised predictor information. Let <span class="math inline">\(\widetilde{\boldsymbol{\eta}}_\alpha=\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_\alpha)\)</span> and <span class="math inline">\(\overline{\boldsymbol{\eta}}_\alpha=\overline{\boldsymbol{\eta}}(\boldsymbol{u}_\alpha)=(1-\alpha)\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0)+\alpha\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span>. An exact line search would minimise <span class="math inline">\(\|\widetilde{\boldsymbol{\eta}}_\alpha-\overline{\boldsymbol{\eta}}_1\|\)</span>. Instead, we define a quadratic approximation to the non-linear predictor as a function of <span class="math inline">\(\alpha\)</span>, <span class="math display">\[
 \breve{\boldsymbol{\eta}}_\alpha =
 \overline{\boldsymbol{\eta}}_\alpha + \alpha^2 (\widetilde{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_1)
@@ -225,11 +221,13 @@ f(\overline{p}_{\boldsymbol{v}})=\left\{\mathop{\mathrm{arg\,max}}_{u_i} \overli
 
 
       <footer><div class="copyright">
-  <p>Developed by Finn Lindgren, Fabian E. Bachl.</p>
+  <p></p>
+<p>Developed by Finn Lindgren, Fabian E. Bachl.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -237,6 +235,8 @@ f(\overline{p}_{\boldsymbol{v}})=\left\{\mathop{\mathrm{arg\,max}}_{u_i} \overli
 
   
 
+
+  
 
   </body>
 </html>

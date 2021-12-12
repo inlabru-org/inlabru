@@ -1,18 +1,18 @@
 pandoc: 2.7.3
-pkgdown: 1.6.1
+pkgdown: 2.0.1
 pkgdown_sha: ~
 articles:
   linearapprox: linearapprox.html
   method: method.html
-  web/1d_lgcp: 1d_lgcp.html
-  web/2d_lgcp: 2d_lgcp.html
-  web/2d_lgcp_covars: 2d_lgcp_covars.html
-  web/2d_lgcp_distancesampling: 2d_lgcp_distancesampling.html
-  web/2d_lgcp_multilikelihood: 2d_lgcp_multilikelihood.html
-  web/2d_lgcp_plotsampling: 2d_lgcp_plotsampling.html
-  web/2d_lgcp_spatiotemporal: 2d_lgcp_spatiotemporal.html
-  web/publications: publications.html
-  web/random_fields: random_fields.html
-  web/random_fields_2d: random_fields_2d.html
-last_built: 2021-11-29T16:24Z
+  1d_lgcp: web/1d_lgcp.html
+  2d_lgcp: web/2d_lgcp.html
+  2d_lgcp_covars: web/2d_lgcp_covars.html
+  2d_lgcp_distancesampling: web/2d_lgcp_distancesampling.html
+  2d_lgcp_multilikelihood: web/2d_lgcp_multilikelihood.html
+  2d_lgcp_plotsampling: web/2d_lgcp_plotsampling.html
+  2d_lgcp_spatiotemporal: web/2d_lgcp_spatiotemporal.html
+  publications: web/publications.html
+  random_fields: web/random_fields.html
+  random_fields_2d: web/random_fields_2d.html
+last_built: 2021-12-12T21:12Z
 

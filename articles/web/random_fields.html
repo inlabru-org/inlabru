@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.1.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../../reference/index.html">Reference</a>
 </li>
@@ -97,7 +93,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/inlabru-org/inlabru/">
+  <a href="https://github.com/inlabru-org/inlabru/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -116,39 +112,39 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Random Fields in One Dimension</h1>
-                        <h4 class="author">Finn Lindgren</h4>
+                        <h4 data-toc-skip class="author">Finn Lindgren</h4>
             
-            <h4 class="date">2021-11-29</h4>
+            <h4 data-toc-skip class="date">2021-12-12</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/master/vignettes/web/random_fields.Rmd"><code>vignettes/web/random_fields.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/random_fields.Rmd" class="external-link"><code>vignettes/web/random_fields.Rmd</code></a></small>
       <div class="hidden name"><code>random_fields.Rmd</code></div>
 
     </div>
 
     
     
-<div id="setting-things-up" class="section level2">
-<h2 class="hasAnchor">
-<a href="#setting-things-up" class="anchor"></a>Setting things up</h2>
+<div class="section level2">
+<h2 id="setting-things-up">Setting things up<a class="anchor" aria-label="anchor" href="#setting-things-up"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org">inlabru</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></code></pre></div>
 <p>Make a shortcut to a nicer colour scale:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">colsc</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradientn</a></span><span class="op">(</span>
-    colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html">rev</a></span><span class="op">(</span><span class="fu">RColorBrewer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html">brewer.pal</a></span><span class="op">(</span><span class="fl">11</span>, <span class="st">"RdYlBu"</span><span class="op">)</span><span class="op">)</span>,
-    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">...</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradientn</a></span><span class="op">(</span>
+    colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu">RColorBrewer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">11</span>, <span class="st">"RdYlBu"</span><span class="op">)</span><span class="op">)</span>,
+    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">...</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
   <span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 </div>
-<div id="get-the-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get-the-data" class="anchor"></a>Get the data</h2>
+<div class="section level2">
+<h2 id="get-the-data">Get the data<a class="anchor" aria-label="anchor" href="#get-the-data"></a>
+</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">Poisson2_1D</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Poisson2_1D</span><span class="op">)</span></code></pre></div>
 <p>Put the count data in <code>cd</code> (just because ‘<code>cd</code>’ is less to type than ‘<code>countdata2</code>’.)</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cd</span> <span class="op">&lt;-</span> <span class="va">countdata2</span></code></pre></div>
@@ -167,56 +163,56 @@
 <span class="co">#&gt; 9  39.438093     4 4.639776</span>
 <span class="co">#&gt; 10 44.077869     4 4.639776</span>
 <span class="co">#&gt; 11 48.717645     4 4.639776</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">cd</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">ylim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">cd</span><span class="op">$</span><span class="va">count</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cd</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">ylim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">cd</span><span class="op">$</span><span class="va">count</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
 <p><em>Tip</em>: <code>RStudio &gt; Help &gt; Cheatsheets &gt; Data visualisation with ggplot2</code> is a useful reference for <code>ggplot2</code> syntax.</p>
 </div>
-<div id="fitting-a-generalised-additive-model-gam" class="section level2">
-<h2 class="hasAnchor">
-<a href="#fitting-a-generalised-additive-model-gam" class="anchor"></a>Fitting a Generalised Additive Model (GAM)</h2>
+<div class="section level2">
+<h2 id="fitting-a-generalised-additive-model-gam">Fitting a Generalised Additive Model (GAM)<a class="anchor" aria-label="anchor" href="#fitting-a-generalised-additive-model-gam"></a>
+</h2>
 <p>If you’re not familiar with GAMs and the syntax of <code>gam</code> don’t worry, the point of this is just to provide something to which we can compare the <code>inlabru</code> model fit.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html">gam</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">exposure</span><span class="op">)</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">cd</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">fit2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">exposure</span><span class="op">)</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">cd</span><span class="op">)</span></code></pre></div>
 <p>The term <code>s(x,k=10)</code> just specifies that as nonparametric smooth function is to be fitted to the data, with <em>no more than</em> 10 degrees of freedom (df). (The larger the df, the more wiggly the fitted curve (recall from the lecture that this is an effect of how some spline methods are defined, without discretisation dependent penalty); <code>gam</code> selects the ‘best’ df.) Notice the use of <code>offset=</code>. (Refer to slides for an explanation of <code>offset</code>.) The variable <code>exposure</code> in data frame <code>cd</code> is the size of the bin in which each count was made.</p>
-<p>You can look at the fitted model using <code><a href="https://rdrr.io/r/base/summary.html">summary( )</a></code> as below if you want to, but you do not need to understand this output, or the code that makes the predictions immediately below it if you are not familiar with GAMs.</p>
+<p>You can look at the fitted model using <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary( )</a></code> as below if you want to, but you do not need to understand this output, or the code that makes the predictions immediately below it if you are not familiar with GAMs.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit2.gam</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.gam</span><span class="op">)</span></code></pre></div>
 <p>Make a prediction data frame, get predictions and add them to the data frame First make vectors of x-values and associated (equal) exposures:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
-<span class="va">exposures</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">100</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
+<span class="va">exposures</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">100</span><span class="op">)</span></code></pre></div>
 <p>and put them in a data frame:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">dat4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xs</span>, exposure <span class="op">=</span> <span class="va">exposures</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">dat4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xs</span>, exposure <span class="op">=</span> <span class="va">exposures</span><span class="op">)</span></code></pre></div>
 <p>Then predict</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pred2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2.gam</span>, newdata <span class="op">=</span> <span class="va">dat4pred</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
-<span class="va">dat4pred2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">dat4pred</span>, gam <span class="op">=</span> <span class="va">pred2.gam</span><span class="op">)</span> <span class="co"># add column for prediction in data frame</span></code></pre></div>
+<code class="sourceCode R"><span class="va">pred2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit2.gam</span>, newdata <span class="op">=</span> <span class="va">dat4pred</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
+<span class="va">dat4pred2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">dat4pred</span>, gam <span class="op">=</span> <span class="va">pred2.gam</span><span class="op">)</span> <span class="co"># add column for prediction in data frame</span></code></pre></div>
 <p>Ploting the fit and the data using the <code>ggplot2</code> commands below should give you the plot shown below</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">dat4pred2</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">gam</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">ylim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">dat4pred2</span><span class="op">$</span><span class="va">gam</span>, <span class="va">cd</span><span class="op">$</span><span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span><span class="op">)</span>, <span class="va">cd</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dat4pred2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">gam</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">ylim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat4pred2</span><span class="op">$</span><span class="va">gam</span>, <span class="va">cd</span><span class="op">$</span><span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span><span class="op">)</span>, <span class="va">cd</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-11-1.png" width="672"></p>
 </div>
-<div id="fitting-an-spde-model-with-inlabru" class="section level2">
-<h2 class="hasAnchor">
-<a href="#fitting-an-spde-model-with-inlabru" class="anchor"></a>Fitting an SPDE model with inlabru</h2>
+<div class="section level2">
+<h2 id="fitting-an-spde-model-with-inlabru">Fitting an SPDE model with inlabru<a class="anchor" aria-label="anchor" href="#fitting-an-spde-model-with-inlabru"></a>
+</h2>
 <p>Make mesh.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="co"># this sets mesh points - try others if you like</span>
-<span class="va">mesh1D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html">inla.mesh.1d</a></span><span class="op">(</span><span class="va">x</span>, boundary <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="co"># this sets mesh points - try others if you like</span>
+<span class="va">mesh1D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html" class="external-link">inla.mesh.1d</a></span><span class="op">(</span><span class="va">x</span>, boundary <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></code></pre></div>
 <p>… and see where the mesh points are:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">mesh1D</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">xlim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span><span class="op">)</span></code></pre></div>
-<div id="using-function-bru-to-fit-to-count-data" class="section level3">
-<h3 class="hasAnchor">
-<a href="#using-function-bru-to-fit-to-count-data" class="anchor"></a>Using function <code>bru( )</code> to fit to count data</h3>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">xlim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span><span class="op">)</span></code></pre></div>
+<div class="section level3">
+<h3 id="using-function-bru-to-fit-to-count-data">Using function <code>bru( )</code> to fit to count data<a class="anchor" aria-label="anchor" href="#using-function-bru-to-fit-to-count-data"></a>
+</h3>
 <p>We need to specify model components and a model formula in order to fit it. This can be done inside the call to <code><a href="../../reference/bru.html">bru( )</a></code> but that is a bit messy, so we’ll store it in <code>comp</code> first and then pass that to <code><a href="../../reference/bru.html">bru( )</a></code>.</p>
 <p>Our response variable in the data frame <code>cd</code> is called <code>count</code> so the model specification needs to have that on the left of the <code>~</code>. We add an intercept component with <code>+ Intercept(1)</code> on the right hand side (all the models we use have intercepts), and because we want to fit a Gaussian random field (GRF), it must have a GRF specification. In <code>inlabru</code> the GRF specification is a function, which allows the GRF to be calculated at any point in space while <code>inlabru</code> is doing its calculations.</p>
 <p>The user gets to name the GRF function. The syntax is ‘myname(input, model= …)’, where:</p>
@@ -225,22 +221,22 @@
 <li>
 <code>input</code> specifies the coordinates in which the GRF or SPDE ‘lives’. Here we are working in one dimension, and we called that dimension <code>x</code> when we set up the data set.</li>
 <li>
-<code>model=</code> designates the type of effect, here an SPDE model object from the <code>INLA</code> function <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html">inla.spde2.pcmatern( )</a></code>, which requires a mesh to be passed to it, so we pass it the 1D mesh that we created above, `<code>mesh1D</code>.</li>
+<code>model=</code> designates the type of effect, here an SPDE model object from the <code>INLA</code> function <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern( )</a></code>, which requires a mesh to be passed to it, so we pass it the 1D mesh that we created above, `<code>mesh1D</code>.</li>
 </ul>
 <p>For models that only adds the model components, we don’t need to specify a separate predictor formula. Instead, we can provide the name of the output to the left of the <code>~</code> in the component specification.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">the_spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh1D</span>,
-  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span>,
-  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">0.01</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">the_spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh1D</span>,
+  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span>,
+  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">0.01</span><span class="op">)</span>
 <span class="op">)</span>
 
 <span class="va">comp</span> <span class="op">&lt;-</span> <span class="va">count</span> <span class="op">~</span> <span class="fu">field</span><span class="op">(</span><span class="va">x</span>, model <span class="op">=</span> <span class="va">the_spde</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 
-<span class="va">fit2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">comp</span>, <span class="va">cd</span>, family <span class="op">=</span> <span class="st">"poisson"</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>E <span class="op">=</span> <span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span><span class="op">)</span>
+<span class="va">fit2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">comp</span>, <span class="va">cd</span>, family <span class="op">=</span> <span class="st">"poisson"</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>E <span class="op">=</span> <span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.3.1.9000</span>
-<span class="co">#&gt; INLA version: 21.11.29</span>
+<span class="co">#&gt; INLA version: 21.12.11</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   field: Model types main='spde', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   Intercept: Model types main='linear', group='exchangeable', replicate='iid'</span>
@@ -249,10 +245,10 @@
 <span class="co">#&gt;     Data class: 'data.frame'</span>
 <span class="co">#&gt;     Predictor: count ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.5, Running = 0.713, Post = 0.103, Total = 2.32 </span>
+<span class="co">#&gt;     Pre = 0.847, Running = 0.492, Post = 0.0617, Total = 1.4 </span>
 <span class="co">#&gt; Fixed effects:</span>
-<span class="co">#&gt;            mean   sd 0.025quant 0.5quant 0.975quant  mode kld</span>
-<span class="co">#&gt; Intercept 3.528 3.49     -0.021    1.968     12.242 1.152   0</span>
+<span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span>
+<span class="co">#&gt; Intercept 3.517 3.474      -0.02    1.961     12.178 1.152   0</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
@@ -260,7 +256,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Model hyperparameters:</span>
 <span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant   mode</span>
-<span class="co">#&gt; Range for field 41.260 28.840       7.63    34.40     116.09 20.952</span>
+<span class="co">#&gt; Range for field 41.259 28.838       7.63    34.40     116.08 20.952</span>
 <span class="co">#&gt; Stdev for field  0.606  0.338       0.22     0.52       1.50  0.398</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 59.59</span>
@@ -275,60 +271,60 @@
 <span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></code></pre></div>
 <p>Predict the values at the x points used for mesh (the data argument must be a data frame, see <code><a href="../../reference/predict.bru.html">?predict.bru</a></code>):</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">x4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xs</span><span class="op">)</span>
-<span class="va">pred2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="va">x4pred</span>, <span class="va">x</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">field</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span>, n.samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">x4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xs</span><span class="op">)</span>
+<span class="va">pred2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="va">x4pred</span>, <span class="va">x</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">field</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span>, n.samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></code></pre></div>
 <p>Let’s do a plot to compare the fitted model to the true model. The expected counts of the true model are stored in the variable <code>E_nc2</code> which comes with the dataset <code>Poisson2_1D</code>. For ease of use in plotting with <code>ggplot2</code> (which needs a data frame), we create a data frame which we call <code>true.lambda</code>, containing <code>x</code>- and <code>y</code> variables as shown below.</p>
 <p>Given that <code>inlabru</code> predictions are always on the intensity function scale, do you understand why we divide the count by <code>cd$exposure</code>? (We will in due course allow predictions on the count scale as well.)</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">true.lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">cd</span><span class="op">$</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">E_nc2</span> <span class="op">/</span> <span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">true.lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">cd</span><span class="op">$</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">E_nc2</span> <span class="op">/</span> <span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span></code></pre></div>
 <p>These <code>ggplot2</code> commands should generate the plot shown below. It shows the true intensities as short horizontal blue lines, the observed intensities as black dots, and the fitted intensity function as a red curve, with 95% credible intervals shown as a light red band about the curve.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">pred2.bru</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">cd</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span> <span class="op">/</span> <span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">true.lambda</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, pch <span class="op">=</span> <span class="st">"_"</span>, cex <span class="op">=</span> <span class="fl">9</span>, col <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"x"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Intensity"</span><span class="op">)</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">cd</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span> <span class="op">/</span> <span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">true.lambda</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, pch <span class="op">=</span> <span class="st">"_"</span>, cex <span class="op">=</span> <span class="fl">9</span>, col <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"x"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Intensity"</span><span class="op">)</span>
 <span class="co">#&gt; Warning: Use of `cd$exposure` is discouraged. Use `exposure` instead.</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-17-1.png" width="672"></p>
 <p>Compare the <code>inlabru</code> fit to the <code>gam</code> fit:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">pred2.bru</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">cd</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span> <span class="op">/</span> <span class="va">exposure</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dat4pred2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">gam</span> <span class="op">/</span> <span class="va">exposure</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"x"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Intensity"</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">cd</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span> <span class="op">/</span> <span class="va">exposure</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dat4pred2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">gam</span> <span class="op">/</span> <span class="va">exposure</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"x"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Intensity"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="looking-at-the-posterior-distributions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#looking-at-the-posterior-distributions" class="anchor"></a>Looking at the posterior distributions</h3>
-<p>We can look at the Intercept posterior using the function <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot( )</a></code>, as below.</p>
+<div class="section level3">
+<h3 id="looking-at-the-posterior-distributions">Looking at the posterior distributions<a class="anchor" aria-label="anchor" href="#looking-at-the-posterior-distributions"></a>
+</h3>
+<p>We can look at the Intercept posterior using the function <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot( )</a></code>, as below.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"Intercept"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"Intercept"</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-19-1.png" width="672"></p>
 <p>You have to know that there is a variable called <code>Intercept</code> in order to use this function. To see what fixed effect parameters’ posterior distributions are available to be plotted, you can type</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/names.html">names</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">$</span><span class="va">marginals.fixed</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">$</span><span class="va">marginals.fixed</span><span class="op">)</span></code></pre></div>
 <p>This does not tell you about the SPDE parameters, and if you type</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/names.html">names</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">$</span><span class="va">marginals.random</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/raster/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">$</span><span class="va">marginals.random</span><span class="op">)</span>
 <span class="co">#&gt; [1] "field"</span></code></pre></div>
 <p>this just tells you that there is an SPDE in fit2.bru called ‘field’, it does not tell you what the associated parameter names are. The parameters that are used in estimation are cryptic – what we are interested in is the range and variance of the Matern covariance funcion, that are functions of the internal parameters. We can look at the posterior distributions of the range parameter and the log of the variance parameters as follows. (We look at the posterior of the <em>log</em> of the variance because the variance posterior is very skewed and so it is easier to view the log of the variance)</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span>
 <span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span>
 
-<span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span>
-<span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span>
+<span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span>
+<span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span>
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">range.plot</span>, <span class="va">var.plot</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-22-1.png" width="672"></p>
 <p>We can look at the posterior distributions of the Matern correlatioin and covariance funcitons as follows:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-23-1.png" width="672"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-23-2.png" width="672"></p>
 </div>
 </div>
@@ -345,11 +341,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Finn Lindgren, Fabian E. Bachl.</p>
+  <p></p>
+<p>Developed by Finn Lindgren, Fabian E. Bachl.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -357,6 +355,8 @@
 
   
 
+
+  
 
   </body>
 </html>

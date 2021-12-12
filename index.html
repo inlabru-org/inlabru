@@ -30,6 +30,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -42,18 +44,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.1.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -108,7 +104,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/inlabru-org/inlabru/">
+  <a href="https://github.com/inlabru-org/inlabru/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -125,73 +121,73 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="inlabru" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#inlabru" class="anchor"></a>inlabru</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="inlabru">inlabru<a class="anchor" aria-label="anchor" href="#inlabru"></a>
+</h1></div>
 <!-- badges: start -->
 
-<p>The goal of <a href="http://inlabru.org">inlabru</a> is to facilitate spatial modeling using integrated nested Laplace approximation via the <a href="https://www.r-inla.org">R-INLA package</a>. Additionally, extends the GAM-like model class to more general nonlinear predictor expressions, and implements a log Gaussian Cox process likelihood for modeling univariate and spatial point processes based on ecological survey data. Model components are specified with general inputs and mapping methods to the latent variables, and the predictors are specified via general R expressions, with separate expressions for each observation likelihood model in multi-likelihood models. A prediction method based on fast Monte Carlo sampling allows posterior prediction of general expressions of the latent variables. See Fabian E. Bachl, Finn Lindgren, David L. Borchers, and Janine B. Illian (2019), inlabru: an R package for Bayesian spatial modelling from ecological survey data, Methods in Ecology and Evolution, British Ecological Society, 10, 760–766, <a href="https://doi.org/10.1111/2041-210X.13168">doi:10.1111/2041-210X.13168</a>, and <code>citation("inlabru")</code>.</p>
-<p>The <a href="http://inlabru.org">inlabru.org</a> website has links to old tutorials with code examples for versions up to 2.1.13. For later versions, updated versions of these tutorials, as well as new examples, can be found at <a href="https://inlabru-org.github.io/inlabru/articles/" class="uri">https://inlabru-org.github.io/inlabru/articles/</a></p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install the current <a href="https://CRAN.R-project.org">CRAN</a> version of inlabru:</p>
+<p>The goal of <a href="http://inlabru.org" class="external-link">inlabru</a> is to facilitate spatial modeling using integrated nested Laplace approximation via the <a href="https://www.r-inla.org" class="external-link">R-INLA package</a>. Additionally, extends the GAM-like model class to more general nonlinear predictor expressions, and implements a log Gaussian Cox process likelihood for modeling univariate and spatial point processes based on ecological survey data. Model components are specified with general inputs and mapping methods to the latent variables, and the predictors are specified via general R expressions, with separate expressions for each observation likelihood model in multi-likelihood models. A prediction method based on fast Monte Carlo sampling allows posterior prediction of general expressions of the latent variables. See Fabian E. Bachl, Finn Lindgren, David L. Borchers, and Janine B. Illian (2019), inlabru: an R package for Bayesian spatial modelling from ecological survey data, Methods in Ecology and Evolution, British Ecological Society, 10, 760–766, <a href="https://doi.org/10.1111/2041-210X.13168" class="external-link">doi:10.1111/2041-210X.13168</a>, and <code>citation("inlabru")</code>.</p>
+<p>The <a href="http://inlabru.org" class="external-link">inlabru.org</a> website has links to old tutorials with code examples for versions up to 2.1.13. For later versions, updated versions of these tutorials, as well as new examples, can be found at <a href="https://inlabru-org.github.io/inlabru/articles/" class="external-link uri">https://inlabru-org.github.io/inlabru/articles/</a></p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>You can install the current <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> version of inlabru:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"inlabru"</span><span class="op">)</span></code></pre></div>
-<p>You can install the latest bugfix release of inlabru from <a href="https://github.com/inlabru-org/inlabru">GitHub</a> with:</p>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"inlabru"</span><span class="op">)</span></code></pre></div>
+<p>You can install the latest bugfix release of inlabru from <a href="https://github.com/inlabru-org/inlabru" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref<span class="op">=</span><span class="st">"stable"</span><span class="op">)</span></code></pre></div>
-<p>You can install the development version of inlabru from <a href="https://github.com/inlabru-org/inlabru">GitHub</a> with:</p>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref<span class="op">=</span><span class="st">"stable"</span><span class="op">)</span></code></pre></div>
+<p>You can install the development version of inlabru from <a href="https://github.com/inlabru-org/inlabru" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref<span class="op">=</span><span class="st">"devel"</span><span class="op">)</span></code></pre></div>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref<span class="op">=</span><span class="st">"devel"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="example" class="section level2">
-<h2 class="hasAnchor">
-<a href="#example" class="anchor"></a>Example</h2>
+<div class="section level2">
+<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+</h2>
 <p>This is a basic example which shows you how fit a simple spatial Log Gaussian Cox Process (LGCP) and predicts its intensity:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Load libraries</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span><span class="st">"rgdal_show_exportToProj4_warnings"</span><span class="op">=</span><span class="st">"none"</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org">inlabru</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"rgdal_show_exportToProj4_warnings"</span><span class="op">=</span><span class="st">"none"</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span>
 <span class="co">#&gt; Loading required package: ggplot2</span>
 <span class="co">#&gt; Loading required package: sp</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span>
 <span class="co">#&gt; Loading required package: Matrix</span>
 <span class="co">#&gt; Loading required package: foreach</span>
 <span class="co">#&gt; Loading required package: parallel</span>
 <span class="co">#&gt; This is INLA_21.04.16 built 2021-04-15 21:13:39 UTC.</span>
 <span class="co">#&gt;  - See www.r-inla.org/contact-us for how to get help.</span>
 <span class="co">#&gt;  - To enable PARDISO sparse library; see inla.pardiso()</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
 
 <span class="co"># Load the data</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span>
 
 <span class="co"># Construct latent model components</span>
-<span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, 
-                              prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>, 
-                              prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.01</span><span class="op">)</span><span class="op">)</span>
+<span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, 
+                              prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>, 
+                              prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.01</span><span class="op">)</span><span class="op">)</span>
 <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="co"># Fit LGCP model</span>
 <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>,
             data <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>,
             samplers <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,
-            domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>,
-            options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+            domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>,
+            options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Predict Gorilla nest intensity</span>
-<span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">fit</span>,
+<span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>,
                   <span class="fu"><a href="reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span>,
-                  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
+                  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Plot the result</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="reference/gg.html">gg</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>, color <span class="op">=</span> <span class="st">"red"</span>, size <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Nest intensity per km squared"</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Nest intensity per km squared"</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-example-1.png" width="100%"> If you have an R installation with PROJ6/GDAL3, and INLA &gt;= 20.06.18, and loading old spatial objects, you may need to apply the <code>rgdal::rebuild_CRS()</code> method on them before they are fully usable. The data objects in <code>inlabru</code> have been updated, so should not need this conversion anymore.</p>
 </div>
 </div>
@@ -199,59 +195,61 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=inlabru">https://​cloud.r-project.org/​package=inlabru</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/inlabru-org/inlabru/">https://​github.com/​inlabru-org/​inlabru/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/inlabru-org/inlabru/issues">https://​github.com/​inlabru-org/​inlabru/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=inlabru" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/inlabru-org/inlabru/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/inlabru-org/inlabru/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>GPL (&gt;= 2)</li>
 </ul>
 </div>
+
+
 <div class="citation">
-<h2>Citation</h2>
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html">Citing inlabru</a></li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>Finn Lindgren <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0002-5833-2011" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> <br><small>(Finn Lindgren continued development of the main code)</small>
-</li>
-<li>Fabian E. Bachl <br><small class="roles"> Author, copyright holder </small>  <br><small>(Fabian Bachl wrote the main code)</small>
-</li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="authors.html#citation">Citing inlabru</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li><a href="https://cran.r-project.org/package=inlabru"><img src="http://www.r-pkg.org/badges/version/inlabru" alt="CRAN Status"></a></li>
-<li><a href="https://github.com/inlabru-org/inlabru/actions"><img src="https://github.com/inlabru-org/inlabru/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-<li><a href="https://github.com/inlabru-org/inlabru/actions"><img src="https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg" alt="R code coverage status"></a></li>
-<li><a href="https://github.com/inlabru-org/inlabru/actions"><img src="https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg" alt="lintr status"></a></li>
-<li><a href="https://codecov.io/gh/inlabru-org/inlabru?branch=devel"><img src="https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li>Finn Lindgren <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0002-5833-2011" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Fabian E. Bachl <br><small class="roles"> Author, copyright holder </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://cran.r-project.org/package=inlabru" class="external-link"><img src="http://www.r-pkg.org/badges/version/inlabru" alt="CRAN Status"></a></li>
+<li><a href="https://github.com/inlabru-org/inlabru/actions" class="external-link"><img src="https://github.com/inlabru-org/inlabru/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://github.com/inlabru-org/inlabru/actions" class="external-link"><img src="https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg" alt="R code coverage status"></a></li>
+<li><a href="https://github.com/inlabru-org/inlabru/actions" class="external-link"><img src="https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg" alt="lintr status"></a></li>
+<li><a href="https://codecov.io/gh/inlabru-org/inlabru?branch=devel" class="external-link"><img src="https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg" alt="Codecov test coverage"></a></li>
+</ul>
 </div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Finn Lindgren, Fabian E. Bachl.</p>
+  <p></p>
+<p>Developed by Finn Lindgren, Fabian E. Bachl.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -259,6 +257,8 @@
 
   
 
+
+  
 
   </body>
 </html>
