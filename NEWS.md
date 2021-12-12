@@ -22,6 +22,10 @@
 * Add option `bru_method$max_step` to control the largest allowed line search
   scaling factor. See `?bru_options`
   
+* Add `control.family` as a direct argument to `like()`. Gives a warning if a
+  `control.family` argument is supplied to the the `options` argument of `bru()`,
+  but at least one likelihood has `control.family` information. (Issue #109)
+  
 # inlabru 2.3.1
 
 * Documentation and dependency updates for CRAN compatibility

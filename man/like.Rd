@@ -22,6 +22,7 @@ like(
   exclude = NULL,
   allow_latent = FALSE,
   allow_combine = FALSE,
+  control.family = NULL,
   options = list()
 )
 
@@ -85,6 +86,8 @@ component definition itself (see \code{\link[=component_eval]{component_eval()}}
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
 involve several rows of the input data to influence the same row.
 (TODO: review what's needed to allow the result to also be of a different size)}
+
+\item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
