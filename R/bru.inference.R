@@ -478,6 +478,7 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
 #' (TODO: review what's needed to allow the result to also be of a different size)
+#' @param control.family A optional `list` of `INLA::control.family` options
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #'
@@ -491,6 +492,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
                  allow_latent = FALSE, allow_combine = FALSE,
+                 control.family = NULL,
                  options = list()) {
   options <- bru_call_options(options)
 
@@ -630,7 +632,8 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     include_components = include,
     exclude_components = exclude,
     allow_latent = allow_latent,
-    allow_combine = allow_combine || (is.list(data) && !is.data.frame(data))
+    allow_combine = allow_combine || (is.list(data) && !is.data.frame(data)),
+    control.family = control.family
   )
 
   class(lh) <- c("bru_like", "list")
@@ -1749,6 +1752,34 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     function(k) lhoods[[k]]$inla.family,
     "family"
   )
+
+  # Extract the control.family information for each likelihood
+  if (!is.null(inla.options[["control.family"]])) {
+    if (length(inla.options[["control.family"]]) != length(lhoods)) {
+      stop("control.family supplied as option, but format doesn't match the number of likelihoods")
+    }
+    like_has_cf <- vapply(
+      seq_along(lhoods),
+      function(k) !is.null(lhoods[[k]][["control.family"]]),
+      TRUE
+    )
+    if (any(like_has_cf)) {
+      warning("Global control.family option overrides settings in likelihood(s) ",
+              paste0(which(like_has_cf)), collapse = ", ")
+    }
+  } else {
+    control.family <- lapply(
+      seq_along(lhoods),
+      function(k) {
+        if (is.null(lhoods[[k]][["control.family"]])) {
+          list()
+        } else {
+          lhoods[[k]][["control.family"]]
+        }
+      }
+    )
+    inla.options[["control.family"]] <- control.family
+  }
 
   initial <-
     if (is.null(initial)) {
