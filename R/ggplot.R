@@ -388,9 +388,14 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 
   df <- data.frame(data)
 
+  cnames <- coordnames(data)
+  if (is.null(cnames)) {
+    cnames <- names(df)[1:2]
+  }
+
   dmap <- ggplot2::aes(
-    x = .data[[coordnames(data)[1]]],
-    y = .data[[coordnames(data)[2]]]
+    x = .data[[cnames[1]]],
+    y = .data[[cnames[2]]]
   )
 
   if (!is.null(mapping)) {
@@ -515,10 +520,23 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
     data <- sp::spTransform(data, crs)
   }
   df <- ggplot2::fortify(data)
+  cnames <- coordnames(data)
+  if (is.null(cnames)) {
+    cnames <- names(df)[1:2]
+  }
   if (requireNamespace("ggpolypath", quietly = TRUE)) {
-    dmap <- ggplot2::aes(x = .data$long, y = .data$lat, group = .data$group)
+    dmap <- ggplot2::aes(
+      x = .data[[cnames[1]]],
+      y = .data[[cnames[2]]],
+      group = .data[["group"]]
+    )
   } else {
-    dmap <- ggplot2::aes(x = .data$long, y = .data$lat, group = .data$id, subgroup = .data$hole)
+    dmap <- ggplot2::aes(
+      x = .data[[cnames[1]]],
+      y = .data[[cnames[2]]],
+      group = .data[["id"]],
+      subgroup = .data[["hole"]]
+    )
   }
 
   if (!is.null(mapping)) {
