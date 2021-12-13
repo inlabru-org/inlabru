@@ -495,9 +495,10 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #'                mapping. The default mapping is
 #'                `ggplot2::aes(x = long, y = lat, group = group)`.
 #' @param crs A `CRS` object defining the coordinate system to project the data to before plotting.
-#' @param color Filling color for the polygons.
-#' @param alpha Alpha level for polygon filling.
 #' @param ... Arguments passed on to `geom_polypath`.
+#' Unless specified by the user,
+#' the arguments `colour = "black"` (polygon colour) and
+#' `alpha = 0.1` (Alpha level for polygon filling).
 #' @return A `ggpolypath::geom_polypath` object.
 #' @details Requires the `ggpolypath` package to ensure proper plotting, since
 #'   the `ggplot::geom_polygon` function doesn't always handle geometries with
@@ -505,13 +506,13 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R
 
-gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, color = "black", alpha = NULL, ...) {
+gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
   requireNamespace("ggplot2")
   if (!requireNamespace("ggpolypath", quietly = TRUE)) {
     stop("The 'ggpolypath' package is required for SpatialPolygons plotting, but it is not installed.")
   }
   if (!is.null(crs)) {
-    data <- spTransform(data, crs)
+    data <- sp::spTransform(data, crs)
   }
   df <- ggplot2::fortify(data)
   if (requireNamespace("ggpolypath", quietly = TRUE)) {
@@ -520,21 +521,26 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, color = "black"
     dmap <- ggplot2::aes(x = .data$long, y = .data$lat, group = .data$id, subgroup = .data$hole)
   }
 
-  if (!("alpha" %in% names(dmap)) & is.null(alpha)) {
-    alpha <- 0.1
-  }
-  if (!("color" %in% names(dmap)) & is.null(color)) {
-    color <- "black"
-  }
-
   if (!is.null(mapping)) {
     dmap <- modifyList(dmap, mapping)
   }
 
+  params = list(...)
+  arg = list(data = df,
+             mapping = dmap)
+
+  if (!any(names(params) %in% c("colour", "color"))) {
+    arg$colour <- "black"
+  }
+  if (!any(names(params) %in% "alpha")) {
+    arg$alpha <- 0.1
+  }
+  arg = modifyList(arg, params)
+
   if (requireNamespace("ggpolypath", quietly = TRUE)) {
-    ggpolypath::geom_polypath(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+    do.call(ggpolypath::geom_polypath, arg)
   } else {
-    ggplot2::geom_polygon(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+    do.call(gggplot2::geom_polygon, arg)
   }
 }
 
@@ -658,7 +664,9 @@ gg.SpatialPixels <- function(data, ...) {
 #' @export
 
 #' @param data An `INLA::inla.mesh` object.
-#' @param color A vector of scalar values to fill the mesh with colors. The length of the vector mus correspond to the number of mesh vertices.
+#' @param color A vector of scalar values to fill the mesh with colors.
+#' The length of the vector mus correspond to the number of mesh vertices.
+#' The alternative name `colour` is also recognised.
 #' @param alpha A vector of scalar values setting the alpha value of the colors provided.
 #' @param edge.color Color of the mesh edges.
 #' @param interior If TRUE, plot the interior boundaries of the mesh.
@@ -688,6 +696,9 @@ gg.inla.mesh <- function(data,
                          nx = 500, ny = 500,
                          ...) {
   requireNamespace("ggplot2")
+  if (is.null(color) && ("colour" %in% names(list(...)))) {
+    color <- list(...)[["colour"]]
+  }
   if (!is.null(color)) {
     px <- pixels(data, nx = nx, ny = ny)
     A <- INLA::inla.spde.make.A(data, px)
