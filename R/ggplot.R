@@ -387,11 +387,7 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
   }
 
   df <- data.frame(data)
-
-  cnames <- coordnames(data)
-  if (is.null(cnames)) {
-    cnames <- names(df)[1:2]
-  }
+  cnames <- names(df)[1:2]
 
   dmap <- ggplot2::aes(
     x = .data[[cnames[1]]],
@@ -520,10 +516,7 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
     data <- sp::spTransform(data, crs)
   }
   df <- ggplot2::fortify(data)
-  cnames <- coordnames(data)
-  if (is.null(cnames)) {
-    cnames <- names(df)[1:2]
-  }
+  cnames <- names(df)[1:2]
   if (requireNamespace("ggpolypath", quietly = TRUE)) {
     dmap <- ggplot2::aes(
       x = .data[[cnames[1]]],
