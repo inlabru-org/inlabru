@@ -218,6 +218,7 @@ test_that("mapper collection direct construction consistency", {
 
 
 test_that("mapper collection automatic construction consistency", {
+  local_bru_safe_inla()
 
   data <- data.frame(val = 1:3, y = 1:3)
 
