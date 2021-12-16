@@ -786,7 +786,7 @@ bru_like_expr <- function(lhood, components) {
 #'
 #'   # Define domain of the LGCP as well as the model components (spatial SPDE
 #'   # effect and Intercept)
-#'   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+#'   cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 #'
 #'   # Fit the model (with int.strategy="eb" to make the example take less time)
 #'   fit <- lgcp(cmp, gorillas$nests,
