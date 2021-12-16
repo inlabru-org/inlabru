@@ -584,9 +584,13 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     }
     ips <- as.data.frame(ips)
     dim_names <- intersect(names(data), names(ips))
+    response_data <- data.frame(BRU_E = c(rep(0, NROW(data)),
+                                          E * ips[["weight"]]),
+                                BRU_response_cp = c(rep(1, NROW(data)),
+                                                    rep(0, NROW(ips))))
     data <- rbind(
-      cbind(data[dim_names], BRU_E = 0, BRU_response_cp = 1),
-      cbind(ips[dim_names], BRU_E = E * ips[["weight"]], BRU_response_cp = 0)
+      data[dim_names],
+      ips[dim_names]
     )
     if (ips_is_Spatial) {
       non_coordnames <- setdiff(names(data), data_coordnames)
@@ -600,7 +604,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 
     response <- "BRU_response_cp"
     inla.family <- "poisson"
-    E <- data[["BRU_E"]]
+    E <- response_data[["BRU_E"]]
   }
 
   # Calculate data ranges
