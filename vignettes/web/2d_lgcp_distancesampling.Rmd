@@ -332,7 +332,6 @@ dfit <- lgcp(
   mexdolphin$points,
   domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
   formula = formula,
-  allow_combine = TRUE,
   options = list(bru_initial = list(lsig = 1))
 )
 detfun <- predict(dfit, distdf, ~ hn(distance, lsig))
@@ -393,8 +392,10 @@ hrline$En.upper <- hrline$upper * scale
 Combine lines in a single object for plotting
 
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-dlines <- rbind(hnline, hrline)
-dlines$model <- c(rep("Half-normal", length(hnline$En)), rep("Hazard-rate", length(hnline$En)))
+dlines <- rbind(
+  cbind(hnline, model = "Half-normal"),
+  cbind(hrline, model = "Hazard-rate")
+)
 ```
 
 Plot without the 95% credible intervals
