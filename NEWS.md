@@ -26,6 +26,9 @@
   `control.family` argument is supplied to the the `options` argument of `bru()`,
   but at least one likelihood has `control.family` information. (Issue #109)
   
+* New default option `bru_compress_cp` set to `TRUE` to compress the predictor
+  expression for `family="cp"` to use a single element for the linear predictor sum.
+  
 # inlabru 2.3.1
 
 * Documentation and dependency updates for CRAN compatibility
