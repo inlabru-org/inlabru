@@ -584,10 +584,38 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     }
     ips <- as.data.frame(ips)
     dim_names <- intersect(names(data), names(ips))
-    data <- rbind(
-      cbind(data[dim_names], BRU_E = 0, BRU_response_cp = 1),
-      cbind(ips[dim_names], BRU_E = E * ips[["weight"]], BRU_response_cp = 0)
-    )
+    if (identical(options[["bru_compress_cp"]], TRUE)) {
+      allow_combine <- TRUE
+      response_data <- data.frame(BRU_E = c(0,
+                                            E * ips[["weight"]]),
+                                  BRU_response_cp = c(NROW(data),
+                                                      rep(0, NROW(ips))))
+      if (!linear) {
+        expr_text = as.character(formula)[length(as.character(formula))]
+        expr_text <- paste0(
+          "{BRU_eta <- ", expr_text, "\n",
+          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}")
+      } else {
+        expr_text <- paste0(
+          "{BRU_eta <- BRU_EXPRESSION\n",
+          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}")
+      }
+      expr <- parse(text = expr_text)
+      data <- rbind(
+        cbind(data[dim_names], BRU_aggregate = TRUE),
+        cbind(ips[dim_names], BRU_aggregate = FALSE)
+      )
+      formula
+    } else {
+      response_data <- data.frame(BRU_E = c(rep(0, NROW(data)),
+                                            E * ips[["weight"]]),
+                                  BRU_response_cp = c(rep(1, NROW(data)),
+                                                      rep(0, NROW(ips))))
+      data <- rbind(
+        data[dim_names],
+        ips[dim_names]
+      )
+    }
     if (ips_is_Spatial) {
       non_coordnames <- setdiff(names(data), data_coordnames)
       data <- sp::SpatialPointsDataFrame(
@@ -600,7 +628,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 
     response <- "BRU_response_cp"
     inla.family <- "poisson"
-    E <- data[["BRU_E"]]
+    E <- response_data[["BRU_E"]]
   }
 
   # Calculate data ranges
@@ -706,17 +734,26 @@ like_list.bru_like <- function(..., envir = NULL) {
 
 
 bru_like_expr <- function(lhood, components) {
-  if (!is.null(lhood[["expr"]])) {
-    lhood[["expr"]]
+  if (is.null(lhood[["expr"]])) {
+    expr_text <- "BRU_EXPRESSION"
   } else {
+    expr_text <- as.character(lhood[["expr"]])
+  }
+  if (grepl(pattern = "BRU_EXPRESSION",
+            x = expr_text)) {
     included <-
       parse_inclusion(
         names(components),
         include = lhood[["include_components"]],
         exclude = lhood[["exclude_components"]]
       )
-    parse(text = paste0(included, collapse = " + "))
+    expr_text <-
+      gsub(pattern = "BRU_EXPRESSION",
+           replacement = paste0(included, collapse = " + "),
+           x = expr_text
+      )
   }
+  parse(text = expr_text)
 }
 
 
@@ -782,7 +819,7 @@ bru_like_expr <- function(lhood, components) {
 #'
 #'   # Define domain of the LGCP as well as the model components (spatial SPDE
 #'   # effect and Intercept)
-#'   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+#'   cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 #'
 #'   # Fit the model (with int.strategy="eb" to make the example take less time)
 #'   fit <- lgcp(cmp, gorillas$nests,

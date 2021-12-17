@@ -1,6 +1,6 @@
 #' 1D LGCP bin count simulation and comparison with data
 #'
-#' A common procedure of analyzing the distribution of 1D points is to chose a bdevtoinning
+#' A common procedure of analyzing the distribution of 1D points is to chose a binning
 #' and plot the data's histogram with respect to this binning. This function compares the
 #' counts that the histogram calculates to simulations from a 1D log Gaussian Cox process
 #' conditioned on the number of data samples. For each bin this results in a median number
@@ -38,7 +38,7 @@
 #'   # Fit an LGCP model
 #'   x <- seq(0, 55, length = 50)
 #'   mesh1D <- inla.mesh.1d(x, boundary = "free")
-#'   mdl <- x ~ spde1D(map = x, model = inla.spde2.matern(mesh1D)) + Intercept # SOLUTION
+#'   mdl <- x ~ spde1D(x, model = inla.spde2.matern(mesh1D)) + Intercept(1)
 #'   fit.spde <- lgcp(mdl, pts2, domain = list(x = c(0, 55)))
 #'
 #'   # Calculate bin statistics

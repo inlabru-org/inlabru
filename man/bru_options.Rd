@@ -143,6 +143,10 @@ The method "full" does line optimisation on the full nonlinear predictor;
 this is slow and intended for debugging purposes only.}
 }
 }
+\item{bru_compress_cp}{logical; when \code{TRUE}, compress the
+\eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
+part of the Poisson process likelihood (\code{family="cp"}) into a single term, with \eqn{y=n}{y=n},
+and predictor \code{mean(eta)}. Default: \code{TRUE}}
 \item{\code{inla()} options}{
 All options not starting with \code{bru_} are passed on to \code{inla()}, sometimes
 after altering according to the needs of the inlabru method.
