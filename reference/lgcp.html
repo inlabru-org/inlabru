@@ -190,7 +190,7 @@ approximation of the posterior.</p></dd>
 <span class="r-in"></span>
 <span class="r-in">  <span class="co"># Define domain of the LGCP as well as the model components (spatial SPDE</span></span>
 <span class="r-in">  <span class="co"># effect and Intercept)</span></span>
-<span class="r-in">  <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span>map <span class="op">=</span> <span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="va">Intercept</span></span>
+<span class="r-in">  <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in">  <span class="co"># Fit the model (with int.strategy="eb" to make the example take less time)</span></span>
 <span class="r-in">  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">lgcp</span><span class="op">(</span><span class="va">cmp</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>,</span>
@@ -219,10 +219,6 @@ approximation of the posterior.</p></dd>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded datum unknown in Proj4 definition</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded datum unknown in Proj4 definition</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Use of 'map' is deprecated and may be disabled; use 'main' instead.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>All covariate evaluations for 'Intercept' are NULL; an intercept component was likely intended.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>   Implicit latent intercept component specification is deprecated since version 2.1.14.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>   Use explicit notation '+ Intercept(1)' instead (or '+1' for '+ Intercept(1)').</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded datum unknown in Proj4 definition</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span>

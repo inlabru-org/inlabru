@@ -100,6 +100,7 @@
 <li><p>Rename the option <code>bru_method$stop_at_max_rel_deviation</code> to <code>bru_method$rel_tol</code>. Automatic conversion to the new name, but a warning is given.</p></li>
 <li><p>Add option <code>bru_method$max_step</code> to control the largest allowed line search scaling factor. See <code><a href="../reference/bru_options.html">?bru_options</a></code></p></li>
 <li><p>Add <code>control.family</code> as a direct argument to <code><a href="../reference/like.html">like()</a></code>. Gives a warning if a <code>control.family</code> argument is supplied to the the <code>options</code> argument of <code><a href="../reference/bru.html">bru()</a></code>, but at least one likelihood has <code>control.family</code> information. (Issue <a href="https://github.com/inlabru-org/inlabru/issues/109" class="external-link">#109</a>)</p></li>
+<li><p>New default option <code>bru_compress_cp</code> set to <code>TRUE</code> to compress the predictor expression for <code>family="cp"</code> to use a single element for the linear predictor sum.</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.3.1" id="inlabru-231">inlabru 2.3.1<small>2021-03-22</small><a class="anchor" aria-label="anchor" href="#inlabru-231"></a></h2>
