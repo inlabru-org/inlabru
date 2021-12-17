@@ -35,6 +35,7 @@ Load libraries
 library(inlabru)
 library(INLA)
 library(ggplot2)
+bru_options_set(inla.mode = "experimental")
 ```
 
 Get the data
@@ -157,7 +158,7 @@ plot(spde.logvar)
 Predict spatial intensity, and plot it:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
-pxl <- pixels(mesh, nx = 100, ny = 50)
+pxl <- pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly)
 pr.int <- predict(fit, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
@@ -181,12 +182,7 @@ spatial random field in this `predict()` call. We can specify this by providing
 a vector of component names to include in the prediction calculations, here only
 "lsig", with `include = "lsig"`. See `?predict.bru` for more information.
 
-```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=FALSE}
-distdf <- data.frame(distance = seq(0, 8, length = 100))
-dfun <- predict(fit, distdf, ~ hn(distance, lsig), include = "lsig")
-plot(dfun)
-```
-```{r results="hide",warning=FALSE,message=FALSE, echo = FALSE, eval=TRUE, fig.width=10, fig.heigth=4}
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=TRUE, fig.width=10, fig.heigth=4}
 distdf <- data.frame(distance = seq(0, 8, length = 100))
 dfun <- predict(fit, distdf, ~ hn(distance, lsig), include = "lsig")
 plot(dfun)
@@ -258,7 +254,7 @@ plot(spde.range)
 spde.logvar <- spde.posterior(fit1, "mySPDE", what = "log.variance")
 plot(spde.logvar)
 
-pxl <- pixels(mesh, nx = 100, ny = 50)
+pxl <- pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly)
 pr.int1 <- predict(fit1, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
@@ -335,7 +331,9 @@ dfit <- lgcp(
   components = cmp,
   mexdolphin$points,
   domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
-  formula = formula
+  formula = formula,
+  allow_combine = TRUE,
+  options = list(bru_initial = list(lsig = 1))
 )
 detfun <- predict(dfit, distdf, ~ hn(distance, lsig))
 ```
@@ -408,7 +406,7 @@ ggplot(data.frame(mexdolphin$points)) +
   geom_line(data = dlines, aes(x = distance, y = En, group = model, col = model))
 ```
 
-Plot with the 95% credible intervals
+Plot with the 95% credible intervals (without taking the count rescaling into account)
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 ggplot(data.frame(mexdolphin$points)) +
   geom_histogram(aes(x = distance), breaks = seq(0, 8, length = 9), alpha = 0.3) +

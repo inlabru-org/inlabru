@@ -12,6 +12,7 @@ lgcp(
   ips = NULL,
   formula = . ~ .,
   E = NULL,
+  ...,
   options = list()
 )
 }
@@ -33,6 +34,8 @@ used as a predictor. Multiple runs if INLA are then required for a better
 approximation of the posterior.}
 
 \item{E}{Single numeric used rescale all integration weights by a fixed factor}
+
+\item{\dots}{Further arguments passed on to \code{\link[=like]{like()}}}
 
 \item{options}{See \code{\link[=bru_options_set]{bru_options_set()}}}
 }
