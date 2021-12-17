@@ -14,7 +14,7 @@ status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg
 [![lintr
 status](https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![Codecov test
-coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/inlabru-org/inlabru?branch=devel)
+coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/inlabru-org/inlabru?branch=devel)
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
@@ -79,7 +79,7 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_21.12.01 built 2021-12-01 04:52:17 UTC.
+#> This is INLA_21.12.16 built 2021-12-16 11:40:12 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
