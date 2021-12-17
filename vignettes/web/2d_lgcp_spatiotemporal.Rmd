@@ -1,7 +1,7 @@
 ---
 title: "LGCPs - An example in space and time"
-author: "Fabian E. Bachl"
-date: "`r Sys.Date()`"
+author: "Fabian E. Bachl and Finn Lindgren"
+date: "Generated on `r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{LGCPs - An example in space and time}
@@ -60,7 +60,7 @@ ggplot() +
 Integration points
 -----------------------------------
 
-Because our model will take time (season) into account we have to construct the integration points for the LGCP accordingly. Using the ´group´ parameter we can let the ´ipoints´ function know that we would like to construct the integration points for each season inteprendently. Note that omitting this step would simply aggregate all sampling regions over time.
+Because our model will take time (season) into account we have to construct the integration points for the LGCP accordingly. Using the ´group´ parameter we can let the ´ipoints´ function know that we would like to construct the integration points for each season independently. Note that omitting this step would simply aggregate all sampling regions over time.
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")

@@ -1,7 +1,7 @@
 ---
 title: "LGCPs - An example in one dimension"
 author: "David Borchers and Finn Lindgren"
-date: "`r Sys.Date()`"
+date: "Generated on `r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{LGCPs - An example in one dimension}
