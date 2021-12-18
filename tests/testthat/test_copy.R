@@ -42,6 +42,7 @@ test_that("bru: inla copy feature", {
     tolerance = midtol
   )
 
+  skip_if_not_installed("sn")
   pr <- predict(
     fit,
     data.frame(x = c(0.5, 1)),

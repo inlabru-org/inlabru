@@ -160,7 +160,7 @@ test_that("User defined mappers 2", {
 
 
 
-test_that("mapper collection bru input", {
+test_that("mapper collection direct construction consistency", {
   skip_on_cran()
   local_bru_safe_inla()
   set.seed(1234L)
@@ -214,8 +214,21 @@ test_that("mapper collection bru input", {
       drop = FALSE
     ], "dgTMatrix")
   )
+})
+
+
+test_that("mapper collection automatic construction consistency", {
+  local_bru_safe_inla()
 
   data <- data.frame(val = 1:3, y = 1:3)
+
+  mapper <- bru_mapper_collect(
+    list(
+      u = bru_mapper_index(4),
+      v = bru_mapper_index(4)
+    ),
+    hidden = TRUE
+  )
 
   cmp1 <- y ~
   -1 +
@@ -224,7 +237,7 @@ test_that("mapper collection bru input", {
       mapper = mapper,
       graph = Matrix::Diagonal(4) + 1
     )
-  fit1 <- bru(cmp1, family = "gaussian", data = data)
+  # index mapper
 
   cmp2 <- y ~
   -1 +
@@ -233,11 +246,35 @@ test_that("mapper collection bru input", {
       n = 4,
       graph = Matrix::Diagonal(4) + 1
     )
-  fit2 <- bru(cmp2, family = "gaussian", data = data)
+  # inla.mesh.1d mapper
 
-  expect_equal(
-    fit1$summary.hyperpar,
-    fit2$summary.hyperpar,
-    tolerance = lowtol
-  )
+  lik <- like(formula = y ~ ., data = data)
+
+  cmp1 <- component_list(cmp1, lhoods = list(lik))
+  cmp2 <- component_list(cmp2, lhoods = list(lik))
+
+  for (inla_f in c(FALSE, TRUE)) {
+    expect_identical(
+      ibm_n(cmp1$indep$mapper, inla_f = inla_f),
+      ibm_n(cmp2$indep$mapper, inla_f = inla_f)
+    )
+    expect_identical(
+      ibm_values(cmp1$indep$mapper, inla_f = inla_f),
+      ibm_values(cmp2$indep$mapper, inla_f = inla_f)
+    )
+    if (inla_f) {
+      input <- list(main = data$val,
+                    group = rep(1, 3),
+                    replicate = rep(1, 3))
+    } else {
+      input <- list(main = list(u = data$val),
+                    group = rep(1, 3),
+                    replicate = rep(1, 3))
+    }
+    expect_identical(
+      as.matrix(ibm_amatrix(cmp1$indep$mapper, input = input, inla_f = inla_f)),
+      as.matrix(ibm_amatrix(cmp2$indep$mapper, input = input, inla_f = inla_f))
+    )
+  }
+
 })

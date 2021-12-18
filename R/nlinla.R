@@ -196,9 +196,9 @@ bru_compute_linearisation.bru_like <- function(lhood,
   # can in principle be parallelised.
   for (label in included) {
     if (!identical(model[["effects"]][[label]][["main"]][["type"]], "offset")) {
-      if (lhood[["linear"]]) {
-        # If linear, just need to copy the non-offset A matrix,
-        # and possibly expand to full size
+      if (lhood[["linear"]] && !lhood[["allow_combine"]]) {
+        # If linear and no combinations allowed, just need to copy the
+        # non-offset A matrix, and possibly expand to full size
         if (NROW(A[[label]]) == 1) {
           if (NROW(offset) > 1) {
             B[[label]] <- Matrix::kronecker(rep(1, NROW(offset)), A[[label]])

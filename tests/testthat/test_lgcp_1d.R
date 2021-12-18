@@ -173,3 +173,91 @@ test_that("1D LGCP fitting", {
   expect_equal(Lambda$mean, 131.5858, tolerance = hitol)
   expect_equal(Lambda$sd, 12.37687, tolerance = 1)
 })
+
+
+
+
+
+test_that("1D LGCP fitting, compressed format", {
+  skip_on_cran()
+  local_bru_safe_inla()
+  local_bru_options_set(
+    control.inla = list(int.strategy = "eb"),
+    control.compute = list(dic = FALSE, waic = FALSE)
+  )
+
+  data(Poisson2_1D, package = "inlabru", envir = environment())
+  x <- seq(0, 55, length = 50)
+  mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
+  matern <- INLA::inla.spde2.pcmatern(
+    mesh1D,
+    prior.range = c(1, 0.01),
+    prior.sigma = c(0.1, 0.75)
+  )
+
+  mdl <- ~ spde1D(main = x, model = matern) + Intercept(1)
+
+  fit1 <- bru(mdl,
+              like(formula = x ~ .,
+                   family = "cp",
+                   data = pts2,
+                   domain = list(x = mesh1D),
+                   options = list(bru_compress_cp = FALSE))
+  )
+  fit2 <- bru(mdl,
+              like(formula = x ~ .,
+                   family = "cp",
+                   data = pts2,
+                   domain = list(x = mesh1D),
+                   options = list(bru_compress_cp = TRUE))
+  )
+
+  expect_equal(
+    fit1$summary.hyperpar,
+    fit2$summary.hyperpar,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit1$summary.fixed,
+    fit2$summary.fixed,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit1$summary.random,
+    fit2$summary.random,
+    tolerance = midtol
+  )
+
+  fit3 <- bru(mdl,
+              like(formula = x ~ spde1D + Intercept,
+                   family = "cp",
+                   data = pts2,
+                   domain = list(x = mesh1D),
+                   options = list(bru_compress_cp = FALSE))
+  )
+  fit4 <- bru(mdl,
+              like(formula = x ~ spde1D + Intercept,
+                   family = "cp",
+                   data = pts2,
+                   domain = list(x = mesh1D),
+                   options = list(bru_compress_cp = TRUE))
+  )
+
+  expect_equal(
+    fit3$summary.hyperpar,
+    fit4$summary.hyperpar,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit3$summary.fixed,
+    fit4$summary.fixed,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit3$summary.random,
+    fit4$summary.random,
+    tolerance = midtol
+  )
+
+})
+

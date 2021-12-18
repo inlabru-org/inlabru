@@ -206,11 +206,18 @@ local_bru_safe_inla <- function(multicore = FALSE,
                                 envir = parent.frame()) {
   if (requireNamespace("INLA", quietly = TRUE)) {
     # Save the num.threads option so it can be restored
-    old <- INLA::inla.getOption("num.threads")
+    old_threads <- INLA::inla.getOption("num.threads")
     withr::defer(
-      INLA::inla.setOption(num.threads = old),
+      INLA::inla.setOption(num.threads = old_threads),
       envir
     )
+    # Save the fmesher.timeout option so it can be restored
+    old_fmesher_timeout <- INLA::inla.getOption("fmesher.timeout")
+    withr::defer(
+      INLA::inla.setOption(fmesher.timeout = old_fmesher_timeout),
+      envir
+    )
+    INLA::inla.setOption(fmesher.timeout = 30)
   }
   if (!multicore) {
     local_bru_options_set(num.threads = "1:1", envir = envir)

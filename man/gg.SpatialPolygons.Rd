@@ -4,7 +4,7 @@
 \alias{gg.SpatialPolygons}
 \title{Geom for SpatialPolygons objects}
 \usage{
-\method{gg}{SpatialPolygons}(data, mapping = NULL, crs = NULL, color = "black", alpha = NULL, ...)
+\method{gg}{SpatialPolygons}(data, mapping = NULL, crs = NULL, ...)
 }
 \arguments{
 \item{data}{A \code{SpatialPolygons} object.}
@@ -15,11 +15,10 @@ mapping. The default mapping is
 
 \item{crs}{A \code{CRS} object defining the coordinate system to project the data to before plotting.}
 
-\item{color}{Filling color for the polygons.}
-
-\item{alpha}{Alpha level for polygon filling.}
-
-\item{...}{Arguments passed on to \code{geom_polypath}.}
+\item{...}{Arguments passed on to \code{geom_polypath}.
+Unless specified by the user,
+the arguments \code{colour = "black"} (polygon colour) and
+\code{alpha = 0.1} (Alpha level for polygon filling).}
 }
 \value{
 A \code{ggpolypath::geom_polypath} object.

@@ -448,7 +448,11 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @param data Likelihood-specific data, as a `data.frame` or
 #' `SpatialPoints[DataFrame]`
 #'   object.
-#' @param mesh An inla.mesh object.
+#' @param response_data Likelihood-specific data for models that need different
+#'  size/format for inputs and response variables, as a `data.frame` or
+#' `SpatialPoints[DataFrame]`
+#'   object.
+#' @param mesh An inla.mesh object. Obsolete.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
 #'   weights by E. Default taken from `options$E`.
@@ -470,10 +474,12 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' This also makes evaluator functions with suffix `_eval` available, taking
 #' parameters `main`, `group`, and `replicate`, taking values for where to
 #' evaluate the component effect that are different than those defined in the
-#' component definition itself (see [component_eval()]).
+#' component definition itself (see [component_eval()]). Default `FALSE`
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
-#' (TODO: review what's needed to allow the result to also be of a different size)
+#' Default `FALSE`, but forced to `TRUE` if `response_data` is `NULL` or
+#' `data` is a `list`
+#' @param control.family A optional `list` of `INLA::control.family` options
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #'
@@ -482,10 +488,13 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @example inst/examples/like.R
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
+                 response_data = NULL, #agg
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
-                 allow_latent = FALSE, allow_combine = FALSE,
+                 allow_latent = FALSE,
+                 allow_combine = NULL,
+                 control.family = NULL,
                  options = list()) {
   options <- bru_call_options(options)
 
@@ -570,12 +579,43 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       }
     }
     data <- as.data.frame(data)
+    if (!is.null(response_data)) {
+      warning("Ignoring non-null response_data input for 'cp' likelihood")
+    }
     ips <- as.data.frame(ips)
     dim_names <- intersect(names(data), names(ips))
-    data <- rbind(
-      cbind(data[dim_names], BRU_E = 0, BRU_response_cp = 1),
-      cbind(ips[dim_names], BRU_E = E * ips[["weight"]], BRU_response_cp = 0)
-    )
+    if (identical(options[["bru_compress_cp"]], TRUE)) {
+      allow_combine <- TRUE
+      response_data <- data.frame(BRU_E = c(0,
+                                            E * ips[["weight"]]),
+                                  BRU_response_cp = c(NROW(data),
+                                                      rep(0, NROW(ips))))
+      if (!linear) {
+        expr_text = as.character(formula)[length(as.character(formula))]
+        expr_text <- paste0(
+          "{BRU_eta <- ", expr_text, "\n",
+          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}")
+      } else {
+        expr_text <- paste0(
+          "{BRU_eta <- BRU_EXPRESSION\n",
+          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}")
+      }
+      expr <- parse(text = expr_text)
+      data <- rbind(
+        cbind(data[dim_names], BRU_aggregate = TRUE),
+        cbind(ips[dim_names], BRU_aggregate = FALSE)
+      )
+      formula
+    } else {
+      response_data <- data.frame(BRU_E = c(rep(0, NROW(data)),
+                                            E * ips[["weight"]]),
+                                  BRU_response_cp = c(rep(1, NROW(data)),
+                                                      rep(0, NROW(ips))))
+      data <- rbind(
+        data[dim_names],
+        ips[dim_names]
+      )
+    }
     if (ips_is_Spatial) {
       non_coordnames <- setdiff(names(data), data_coordnames)
       data <- sp::SpatialPointsDataFrame(
@@ -588,7 +628,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 
     response <- "BRU_response_cp"
     inla.family <- "poisson"
-    E <- data[["BRU_E"]]
+    E <- response_data[["BRU_E"]]
   }
 
   # Calculate data ranges
@@ -608,6 +648,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   lh <- list(
     family = family,
     formula = formula,
+    response_data = response_data, # agg
     data = data,
     E = E,
     Ntrials = Ntrials,
@@ -621,7 +662,16 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     include_components = include,
     exclude_components = exclude,
     allow_latent = allow_latent,
-    allow_combine = allow_combine || (is.list(data) && !is.data.frame(data))
+    allow_combine =
+      if (!is.null(response_data) ||
+          (is.list(data) && !is.data.frame(data))) {
+        TRUE
+      } else if (is.null(allow_combine)) {
+        FALSE
+      } else{
+        allow_combine
+      },
+    control.family = control.family
   )
 
   class(lh) <- c("bru_like", "list")
@@ -684,17 +734,26 @@ like_list.bru_like <- function(..., envir = NULL) {
 
 
 bru_like_expr <- function(lhood, components) {
-  if (!is.null(lhood[["expr"]])) {
-    lhood[["expr"]]
+  if (is.null(lhood[["expr"]])) {
+    expr_text <- "BRU_EXPRESSION"
   } else {
+    expr_text <- as.character(lhood[["expr"]])
+  }
+  if (grepl(pattern = "BRU_EXPRESSION",
+            x = expr_text)) {
     included <-
       parse_inclusion(
         names(components),
         include = lhood[["include_components"]],
         exclude = lhood[["exclude_components"]]
       )
-    parse(text = paste0(included, collapse = " + "))
+    expr_text <-
+      gsub(pattern = "BRU_EXPRESSION",
+           replacement = paste0(included, collapse = " + "),
+           x = expr_text
+      )
   }
+  parse(text = expr_text)
 }
 
 
@@ -735,6 +794,7 @@ bru_like_expr <- function(lhood, components) {
 #' used as a predictor. Multiple runs if INLA are then required for a better
 #' approximation of the posterior.
 #' @param E Single numeric used rescale all integration weights by a fixed factor
+#' @param \dots Further arguments passed on to [like()]
 #' @param options See [bru_options_set()]
 #' @return An [bru()] object
 #' @examples
@@ -760,7 +820,7 @@ bru_like_expr <- function(lhood, components) {
 #'
 #'   # Define domain of the LGCP as well as the model components (spatial SPDE
 #'   # effect and Intercept)
-#'   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+#'   cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 #'
 #'   # Fit the model (with int.strategy="eb" to make the example take less time)
 #'   fit <- lgcp(cmp, gorillas$nests,
@@ -789,6 +849,7 @@ lgcp <- function(components,
                  ips = NULL,
                  formula = . ~ .,
                  E = NULL,
+                 ...,
                  options = list()) {
   # If formula response missing, copy from components (for formula input)
   if (inherits(components, "formula")) {
@@ -799,6 +860,7 @@ lgcp <- function(components,
     family = "cp",
     formula = formula, data = data, samplers = samplers,
     E = E, ips = ips, domain = domain,
+    ...,
     options = options
   )
   bru(components, lik, options = options)
@@ -1081,6 +1143,12 @@ generate.bru <- function(object,
 
   # If data is provided as list, generate data automatically for each dimension
   # stated in this list
+  # # TODO: remove this! This feature clashes with problems that need input
+  # data given as a list. Better to make the user cornstruct the inputs
+  # (optionally with a special ipoints function, but to some degree it's just
+  # a application of expand.grid())
+  # # TODO: Check if when removing this, all the other drange code can also
+  # safely be removed.
   if (class(data)[1] == "list") {
     # Todo: check if this feature works at all.
     # TODO: add method ipoints.list to handle this;
@@ -1784,6 +1852,34 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     function(k) lhoods[[k]]$inla.family,
     "family"
   )
+
+  # Extract the control.family information for each likelihood
+  if (!is.null(inla.options[["control.family"]])) {
+    if (length(inla.options[["control.family"]]) != length(lhoods)) {
+      stop("control.family supplied as option, but format doesn't match the number of likelihoods")
+    }
+    like_has_cf <- vapply(
+      seq_along(lhoods),
+      function(k) !is.null(lhoods[[k]][["control.family"]]),
+      TRUE
+    )
+    if (any(like_has_cf)) {
+      warning("Global control.family option overrides settings in likelihood(s) ",
+              paste0(which(like_has_cf)), collapse = ", ")
+    }
+  } else {
+    control.family <- lapply(
+      seq_along(lhoods),
+      function(k) {
+        if (is.null(lhoods[[k]][["control.family"]])) {
+          list()
+        } else {
+          lhoods[[k]][["control.family"]]
+        }
+      }
+    )
+    inla.options[["control.family"]] <- control.family
+  }
 
   initial <-
     if (is.null(initial)) {
