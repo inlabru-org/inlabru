@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![R build status](https://github.com/inlabru-org/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![R code coverage status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![lintr status](https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
-[![Codecov test coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/inlabru-org/inlabru?branch=devel)
+[![Codecov test coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/inlabru-org/inlabru?branch=devel)
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial modeling using integrated nested Laplace approximation via the [R-INLA package](https://www.r-inla.org).
