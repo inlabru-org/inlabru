@@ -11,8 +11,10 @@ Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org
 status](https://github.com/inlabru-org/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![R code coverage
 status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
+[![lintr
+status](https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![Codecov test
-coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/inlabru-org/inlabru?branch=devel)
+coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/inlabru-org/inlabru?branch=devel)
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
@@ -72,13 +74,12 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 # Load libraries
 options("rgdal_show_exportToProj4_warnings"="none")
 library(inlabru)
-#> Loading required package: ggplot2
 #> Loading required package: sp
 library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_21.03.14-3 built 2021-03-14 09:05:27 UTC.
+#> This is INLA_21.12.16 built 2021-12-16 11:40:12 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
@@ -92,11 +93,18 @@ matern <- inla.spde2.pcmatern(gorillas$mesh,
                               prior.range = c(0.01, 0.01))
 cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 # Fit LGCP model
-fit <- lgcp(cmp,
-            data = gorillas$nests,
-            samplers = gorillas$boundary,
-            domain = list(coordinates = gorillas$mesh),
-            options = list(control.inla = list(int.strategy = "eb")))
+# This particular bru+like combination has a shortcut function lgcp() as well
+fit <- bru(
+  components = cmp,
+  like(
+    formula = coordinates ~ .,
+    family = "cp",
+    data = gorillas$nests,
+    samplers = gorillas$boundary,
+    domain = list(coordinates = gorillas$mesh)
+  ),
+  options = list(control.inla = list(int.strategy = "eb"))
+)
 
 # Predict Gorilla nest intensity
 lambda <- predict(fit,
@@ -112,7 +120,7 @@ ggplot() +
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" /> If you have
-an R installation with PROJ6/GDAL3, and INLA &gt;= 20.06.18, and loading
+an R installation with PROJ6/GDAL3, and INLA \>= 20.06.18, and loading
 old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
 method on them before they are fully usable. The data objects in
 `inlabru` have been updated, so should not need this conversion anymore.

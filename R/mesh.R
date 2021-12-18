@@ -3,8 +3,8 @@ setClass("inla.mesh")
 
 
 # GENERICS
-# refine = function(...){UseMethod("refine")}
-# tsplit = function(...){UseMethod("tsplit")}
+# refine = function(...) {UseMethod("refine")}
+# tsplit = function(...) {UseMethod("tsplit")}
 
 
 #' Query if a point is inside the mesh boundary
@@ -110,11 +110,13 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #'
 #' @examples
 #' \donttest{
-#' data("mrsea")
-#' vrt <- vertices(mrsea$mesh)
-#' ggplot() +
-#'   gg(mrsea$mesh) +
-#'   gg(vrt, color = "red")
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   data("mrsea", package = "inlabru")
+#'   vrt <- vertices(mrsea$mesh)
+#'   ggplot() +
+#'     gg(mrsea$mesh) +
+#'     gg(vrt, color = "red")
+#' }
 #' }
 #'
 vertices.inla.mesh <- function(object) {
@@ -155,11 +157,13 @@ vertices.inla.mesh <- function(object) {
 #'
 #' @examples
 #' \donttest{
-#' data("mrsea")
-#' pxl <- pixels(mrsea$mesh, nx = 50, ny = 50, mask = mrsea$boundary)
-#' ggplot() +
-#'   gg(pxl, fill = "grey", alpha = 0.5) +
-#'   gg(mrsea$mesh)
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   data("mrsea", package = "inlabru")
+#'   pxl <- pixels(mrsea$mesh, nx = 50, ny = 50, mask = mrsea$boundary)
+#'   ggplot() +
+#'     gg(pxl, fill = "grey", alpha = 0.5) +
+#'     gg(mrsea$mesh)
+#' }
 #' }
 #'
 pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
@@ -217,7 +221,7 @@ triangle <- function(mesh, loc) {
   }
   tri <- numeric(length = dim(loc)[1])
   tv <- mesh$graph$tv
-  for (j in 1:nrow(tv)) {
+  for (j in seq_len(nrow(tv))) {
     v <- mesh$loc[tv[j, ], c(1, 2)]
 
     a <- v[1, ]
@@ -304,8 +308,7 @@ tsplit.inla.mesh <- function(mesh, n = 1) {
 
   if (n == 1) {
     return(mesh2)
-  }
-  else {
+  } else {
     return(tsplit.inla.mesh(mesh2, n - 1))
   }
 }

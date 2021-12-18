@@ -207,7 +207,7 @@ bru_info.character <- function(method,
   if (is.null(inlabru_version)) {
     inlabru_version <-
       tryCatch(
-        {
+        expr = {
           getNamespaceVersion("inlabru")
         },
         error = function(e) {
@@ -218,7 +218,7 @@ bru_info.character <- function(method,
   if (is.null(INLA_version)) {
     INLA_version <-
       tryCatch(
-        {
+        expr = {
           getNamespaceVersion("INLA")
         },
         error = function(e) {
@@ -448,7 +448,11 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @param data Likelihood-specific data, as a `data.frame` or
 #' `SpatialPoints[DataFrame]`
 #'   object.
-#' @param mesh An inla.mesh object.
+#' @param response_data Likelihood-specific data for models that need different
+#'  size/format for inputs and response variables, as a `data.frame` or
+#' `SpatialPoints[DataFrame]`
+#'   object.
+#' @param mesh An inla.mesh object. Obsolete.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
 #'   weights by E. Default taken from `options$E`.
@@ -470,10 +474,12 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' This also makes evaluator functions with suffix `_eval` available, taking
 #' parameters `main`, `group`, and `replicate`, taking values for where to
 #' evaluate the component effect that are different than those defined in the
-#' component definition itself.
+#' component definition itself (see [component_eval()]). Default `FALSE`
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
-#' (TODO: review what's needed to allow the result to also be of a different size)
+#' Default `FALSE`, but forced to `TRUE` if `response_data` is `NULL` or
+#' `data` is a `list`
+#' @param control.family A optional `list` of `INLA::control.family` options
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #'
@@ -482,10 +488,13 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @example inst/examples/like.R
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
+                 response_data = NULL, #agg
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
-                 allow_latent = FALSE, allow_combine = FALSE,
+                 allow_latent = FALSE,
+                 allow_combine = NULL,
+                 control.family = NULL,
                  options = list()) {
   options <- bru_call_options(options)
 
@@ -570,12 +579,43 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       }
     }
     data <- as.data.frame(data)
+    if (!is.null(response_data)) {
+      warning("Ignoring non-null response_data input for 'cp' likelihood")
+    }
     ips <- as.data.frame(ips)
     dim_names <- intersect(names(data), names(ips))
-    data <- rbind(
-      cbind(data[dim_names], BRU_E = 0, BRU_response_cp = 1),
-      cbind(ips[dim_names], BRU_E = E * ips[["weight"]], BRU_response_cp = 0)
-    )
+    if (identical(options[["bru_compress_cp"]], TRUE)) {
+      allow_combine <- TRUE
+      response_data <- data.frame(BRU_E = c(0,
+                                            E * ips[["weight"]]),
+                                  BRU_response_cp = c(NROW(data),
+                                                      rep(0, NROW(ips))))
+      if (!linear) {
+        expr_text = as.character(formula)[length(as.character(formula))]
+        expr_text <- paste0(
+          "{BRU_eta <- ", expr_text, "\n",
+          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}")
+      } else {
+        expr_text <- paste0(
+          "{BRU_eta <- BRU_EXPRESSION\n",
+          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}")
+      }
+      expr <- parse(text = expr_text)
+      data <- rbind(
+        cbind(data[dim_names], BRU_aggregate = TRUE),
+        cbind(ips[dim_names], BRU_aggregate = FALSE)
+      )
+      formula
+    } else {
+      response_data <- data.frame(BRU_E = c(rep(0, NROW(data)),
+                                            E * ips[["weight"]]),
+                                  BRU_response_cp = c(rep(1, NROW(data)),
+                                                      rep(0, NROW(ips))))
+      data <- rbind(
+        data[dim_names],
+        ips[dim_names]
+      )
+    }
     if (ips_is_Spatial) {
       non_coordnames <- setdiff(names(data), data_coordnames)
       data <- sp::SpatialPointsDataFrame(
@@ -588,7 +628,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 
     response <- "BRU_response_cp"
     inla.family <- "poisson"
-    E <- data[["BRU_E"]]
+    E <- response_data[["BRU_E"]]
   }
 
   # Calculate data ranges
@@ -608,6 +648,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   lh <- list(
     family = family,
     formula = formula,
+    response_data = response_data, # agg
     data = data,
     E = E,
     Ntrials = Ntrials,
@@ -621,7 +662,16 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     include_components = include,
     exclude_components = exclude,
     allow_latent = allow_latent,
-    allow_combine = allow_combine
+    allow_combine =
+      if (!is.null(response_data) ||
+          (is.list(data) && !is.data.frame(data))) {
+        TRUE
+      } else if (is.null(allow_combine)) {
+        FALSE
+      } else{
+        allow_combine
+      },
+    control.family = control.family
   )
 
   class(lh) <- c("bru_like", "list")
@@ -684,49 +734,26 @@ like_list.bru_like <- function(..., envir = NULL) {
 
 
 bru_like_expr <- function(lhood, components) {
-  if (!is.null(lhood[["expr"]])) {
-    lhood[["expr"]]
+  if (is.null(lhood[["expr"]])) {
+    expr_text <- "BRU_EXPRESSION"
   } else {
+    expr_text <- as.character(lhood[["expr"]])
+  }
+  if (grepl(pattern = "BRU_EXPRESSION",
+            x = expr_text)) {
     included <-
       parse_inclusion(
         names(components),
         include = lhood[["include_components"]],
         exclude = lhood[["exclude_components"]]
       )
-    parse(text = paste0(included, collapse = " + "))
+    expr_text <-
+      gsub(pattern = "BRU_EXPRESSION",
+           replacement = paste0(included, collapse = " + "),
+           x = expr_text
+      )
   }
-}
-
-
-
-
-
-
-single_stackmaker <- function(model, lhood, state) {
-  make.stack(
-    data = lhood$data, model = model, expr = lhood$expr,
-    y = lhood$data[[lhood$response]],
-    E = lhood$E, Ntrials = lhood$Ntrials,
-    state = state,
-    include = lhood[["include_components"]],
-    exclude = lhood[["exclude_components"]]
-  )
-}
-
-joint_stackmaker <- function(model, lhoods, state) {
-  do.call(
-    inla.stack.mjoin,
-    c(
-      lapply(
-        lhoods,
-        function(lh) {
-          single_stackmaker(model, lh, state)
-        }
-      ),
-      # Make sure components with zero derivative are kept:
-      remove.unused = FALSE
-    )
-  )
+  parse(text = expr_text)
 }
 
 
@@ -767,12 +794,13 @@ joint_stackmaker <- function(model, lhoods, state) {
 #' used as a predictor. Multiple runs if INLA are then required for a better
 #' approximation of the posterior.
 #' @param E Single numeric used rescale all integration weights by a fixed factor
+#' @param \dots Further arguments passed on to [like()]
 #' @param options See [bru_options_set()]
 #' @return An [bru()] object
 #' @examples
-#'
 #' \donttest{
-#' if (bru_safe_inla()) {
+#' if (bru_safe_inla() &&
+#'   require(ggplot2, quietly = TRUE)) {
 #'
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
@@ -792,7 +820,7 @@ joint_stackmaker <- function(model, lhoods, state) {
 #'
 #'   # Define domain of the LGCP as well as the model components (spatial SPDE
 #'   # effect and Intercept)
-#'   cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+#'   cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 #'
 #'   # Fit the model (with int.strategy="eb" to make the example take less time)
 #'   fit <- lgcp(cmp, gorillas$nests,
@@ -821,6 +849,7 @@ lgcp <- function(components,
                  ips = NULL,
                  formula = . ~ .,
                  E = NULL,
+                 ...,
                  options = list()) {
   # If formula response missing, copy from components (for formula input)
   if (inherits(components, "formula")) {
@@ -831,6 +860,7 @@ lgcp <- function(components,
     family = "cp",
     formula = formula, data = data, samplers = samplers,
     E = E, ips = ips, domain = domain,
+    ...,
     options = options
   )
   bru(components, lik, options = options)
@@ -895,16 +925,10 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' @param object An object obtained by calling [bru()] or [lgcp()].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' the prediction.
-#' @param formula A formula defining an R expression to evaluate for each generated
-#' sample. If `NULL`, the latent and hyperparameter states are generated
-#' as named list elements. In addition to the component names (that give the effect
-#' of each component evaluated for the input data), the suffix `_latent` can be used
-#' to directly access the latent state for a component, and the suffix `_eval`
-#' can be used to evaluate a component at other input values than the expressions
-#' defined in the component definition itself, e.g. `field_eval(cbind(x,y))` for a
-#' component defined with `field(coordinates, ...)`. For "iid" models with
-#' `mapper = bru_mapper_index(n)`, `rnorm()` is used to generate new realisations for
-#' indices greater than `n`.
+#' @param formula A formula where the right hand side defines an R expression
+#' to evaluate for each generated sample. If `NULL`, the latent and
+#' hyperparameter states are returned as named list elements.
+#' See Details for more information.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics. The default is rather low but provides
 #' a quick approximate result.
@@ -923,6 +947,17 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' prediciton summary has the same number of rows as `data`, then the output is
 #' a `Spatial*DataFrame` object. Default `FALSE`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
+#' @details
+#' In addition to the component names (that give the effect
+#' of each component evaluated for the input data), the suffix `_latent`
+#' variable name can be used to directly access the latent state for a component,
+#' and the suffix function `_eval` can be used to evaluate a component at
+#' other input values than the expressions defined in the component definition
+#' itself, e.g. `field_eval(cbind(x, y))` for a component that was defined with
+#' `field(coordinates, ...)` (see also [component_eval()]).
+#'
+#' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
+#' generate new realisations for indices greater than `n`.
 #'
 #' @return a data.frame or Spatial* object with predicted mean values and other
 #' summary statistics attached.
@@ -943,11 +978,9 @@ predict.bru <- function(object,
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(data)) {
     data <- as.list(setNames(data, data))
-  }
-  else if (inherits(data, "inla.mesh")) {
+  } else if (inherits(data, "inla.mesh")) {
     data <- vertices(data)
-  }
-  else if (inherits(data, "formula")) {
+  } else if (inherits(data, "formula")) {
     stop("Formula supplied as data to predict.bru(). Please check your argument order/names.")
   }
 
@@ -1052,16 +1085,10 @@ predict.bru <- function(object,
 #' @param object A `bru` object obtained by calling [bru()].
 #' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
 #' sampling.
-#' @param formula A formula defining an R expression to evaluate for each generated
-#' sample. If `NULL`, the latent and hyperparameter states are returned
-#' as named list elements. In addition to the component names (that give the effect
-#' of each component evaluated for the input data), the suffix `_latent` can be used
-#' to directly access the latent state for a component, and the suffix `_eval`
-#' can be used to evaluate a component at other input values than the expressions
-#' defined in the component definition itself, e.g. `field_eval(cbind(x,y))` for a
-#' component defined with `field(coordinates, ...)`. For "iid" models with
-#' `mapper = bru_mapper_index(n)`, `rnorm()` is used to generate new realisations for
-#' indices greater than `n`.
+#' @param formula A formula where the right hand side defines an R expression
+#' to evaluate for each generated sample. If `NULL`, the latent and
+#' hyperparameter states are returned as named list elements.
+#' See Details for more information.
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics.
 #' The default, 100, is rather low but provides a quick approximate result.
@@ -1077,6 +1104,17 @@ predict.bru <- function(object,
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
 #' @param ... additional, unused arguments.
+#' @details
+#' In addition to the component names (that give the effect
+#' of each component evaluated for the input data), the suffix `_latent`
+#' variable name can be used to directly access the latent state for a component,
+#' and the suffix function `_eval` can be used to evaluate a component at
+#' other input values than the expressions defined in the component definition
+#' itself, e.g. `field_eval(cbind(x, y))` for a component that was defined with
+#' `field(coordinates, ...)` (see also [component_eval()]).
+#'
+#' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
+#' generate new realisations for indices greater than `n`.
 #'
 #' @return List of generated samples
 #' @seealso [predict.bru]
@@ -1097,21 +1135,25 @@ generate.bru <- function(object,
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(data)) {
     data <- as.list(setNames(data, data))
-  }
-  else if (inherits(data, "inla.mesh")) {
+  } else if (inherits(data, "inla.mesh")) {
     data <- vertices(data)
-  }
-  else if (inherits(data, "formula")) {
+  } else if (inherits(data, "formula")) {
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }
 
   # If data is provided as list, generate data automatically for each dimension
   # stated in this list
+  # # TODO: remove this! This feature clashes with problems that need input
+  # data given as a list. Better to make the user cornstruct the inputs
+  # (optionally with a special ipoints function, but to some degree it's just
+  # a application of expand.grid())
+  # # TODO: Check if when removing this, all the other drange code can also
+  # safely be removed.
   if (class(data)[1] == "list") {
     # Todo: check if this feature works at all.
     # TODO: add method ipoints.list to handle this;
-    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code from
-    # generate()
+    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code
+    # from generate()
     warning(paste0(
       "Attempting to convert data list into gridded data.\n",
       "This probably doesn't work.\n",
@@ -1168,19 +1210,20 @@ generate.bru <- function(object,
 
 montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
                                  mcerr = 0.01, n = 100, discrete = FALSE, verbose = FALSE) {
+  .Deprecated()
   xmaker <- function(hpd) {
     mid <- (hpd[2] + hpd[1]) / 2
     rg <- (hpd[2] - hpd[1]) / 2
-    x <- seq(mid - 1.2 * rg, mid + 1.2 * rg, length.out = 256)
+    seq(mid - 1.2 * rg, mid + 1.2 * rg, length.out = 256)
   }
   xmaker2 <- function(hpd) {
-    x <- seq(hpd[1], hpd[2], length.out = 256)
+    seq(hpd[1], hpd[2], length.out = 256)
   }
 
-  inital.xmaker <- function(smp) {
+  initial.xmaker <- function(smp) {
     mid <- median(smp)
     rg <- (quantile(smp, 0.975) - quantile(smp, 0.25)) / 2
-    x <- seq(mid - 3 * rg, mid + 3 * rg, length.out = 256)
+    seq(mid - 3 * rg, mid + 3 * rg, length.out = 256)
   }
 
   # Inital samples
@@ -1190,7 +1233,7 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 
   # Inital HPD
   if (is.null(x)) {
-    x <- inital.xmaker(as.vector(unlist(samples)))
+    x <- initial.xmaker(as.vector(unlist(samples)))
   }
 
   # Round x if needed
@@ -1229,8 +1272,7 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
     # Convergence?
     if (err < mcerr) {
       converged <- TRUE
-    }
-    else {
+    } else {
       lest <- (est + lest) / 2
     }
   }
@@ -1262,7 +1304,7 @@ bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
   }
   if (cbind.only) {
     smy <- data.frame(data)
-    colnames(smy) <- paste0("sample.", 1:ncol(smy))
+    colnames(smy) <- paste0("sample.", seq_len(ncol(smy)))
   } else {
     smy <- data.frame(
       apply(data, MARGIN = 1, mean, na.rm = TRUE),
@@ -1338,7 +1380,33 @@ line_search_optimisation_target <- function(x, param) {
   (x - 1)^2 * param[1] + 2 * (x - 1) * x^2 * param[2] + x^4 * param[3]
 }
 
+line_search_optimisation_target_exact <- function(x, param) {
+  state <- scale_state(param$state0, param$state1, x)
+  nonlin <- nonlin_predictor(param$model, param$lhoods, state, param$A)
+  sum((nonlin - param$lin)^2 * param$weights)
+}
 
+
+# @title FUNCTION_TITLE
+# @description FUNCTION_DESCRIPTION
+# @param model PARAM_DESCRIPTION
+# @param lhoods PARAM_DESCRIPTION
+# @param lin PARAM_DESCRIPTION
+# @param state0 PARAM_DESCRIPTION
+# @param state PARAM_DESCRIPTION
+# @param A PARAM_DESCRIPTION
+# @param weights PARAM_DESCRIPTION
+# @param options PARAM_DESCRIPTION
+# @return OUTPUT_DESCRIPTION
+# @details DETAILS
+# @examples
+# \dontrun{
+# if(interactive()){
+#  #EXAMPLE1
+#  }
+# }
+# @export
+# @rdname bru_line_search
 
 bru_line_search <- function(model,
                             lhoods,
@@ -1346,6 +1414,7 @@ bru_line_search <- function(model,
                             state0,
                             state,
                             A,
+                            weights = 1,
                             options) {
   if (length(options$bru_method$search) == 0) {
     return(
@@ -1358,14 +1427,23 @@ bru_line_search <- function(model,
   }
 
   fact <- options$bru_method$factor
-  pred_norm <- function(delta) {
-    if (any(!is.finite(delta))) {
+
+  # Metrics ----
+  pred_scalprod <- function(delta1, delta2) {
+    if (any(!is.finite(delta1)) || any(!is.finite(delta2))) {
       Inf
     } else {
-      sum(delta^2)^0.5
+      sum(delta1 * delta2 * weights)
     }
   }
+  pred_norm2 <- function(delta) {
+    pred_scalprod(delta, delta)
+  }
+  pred_norm <- function(delta) {
+    pred_scalprod(delta, delta)^0.5
+  }
 
+  # Initialise ----
   state1 <- state
   lin_pred0 <- lin_predictor(lin, state0)
   lin_pred1 <- lin_predictor(lin, state1)
@@ -1383,11 +1461,13 @@ bru_line_search <- function(model,
     any(c("all", "expand") %in% options$bru_method$search)
   do_optimise <-
     any(c("all", "optimise") %in% options$bru_method$search)
+  maximum_step <- options$bru_method$max_step
 
   finite_active <- 0
   contract_active <- 0
   expand_active <- 0
 
+  # Contraction methods ----
   if (do_finite || do_contract) {
     nonfin <- any(!is.finite(nonlin_pred))
     norm0 <- pred_norm(nonlin_pred - lin_pred0)
@@ -1422,6 +1502,7 @@ bru_line_search <- function(model,
     }
   }
 
+  # Expansion method ----
   if (do_expand &&
     finite_active == 0 &&
     contract_active == 0) {
@@ -1455,6 +1536,7 @@ bru_line_search <- function(model,
         break
       }
     }
+    # Overstep ----
     if (((step_scaling > 1) && overstep) || !is.finite(norm1)) {
       expand_active <- expand_active - 1
       step_scaling <- step_scaling / fact
@@ -1475,6 +1557,7 @@ bru_line_search <- function(model,
     }
   }
 
+  # Optimisation method ----
   if (do_optimise) {
     lin_pred <- lin_predictor(lin, state)
     delta_lin <- (lin_pred1 - lin_pred0)
@@ -1482,13 +1565,31 @@ bru_line_search <- function(model,
     alpha <-
       optimise(
         line_search_optimisation_target,
-        step_scaling * c(1 / fact, fact),
+        step_scaling * c(1 / fact^2, fact),
         param = c(
-          sum(delta_lin^2),
-          sum(delta_lin * delta_nonlin),
-          sum(delta_nonlin^2)
+          pred_norm2(delta_lin),
+          pred_scalprod(delta_lin, delta_nonlin),
+          pred_norm2(delta_nonlin)
         )
       )
+    step_scaling_opt_approx <- alpha$minimum
+
+    if (identical(options$bru_method$line_opt_method, "full")) {
+      alpha <-
+        optimise(
+          line_search_optimisation_target_exact,
+          step_scaling * c(1 / fact^2, fact),
+          param = list(
+            lin = lin_pred1,
+            model = model,
+            lhoods = lhoods,
+            A = A,
+            state0 = state0,
+            state1 = state1,
+            weights = weights
+          )
+        )
+    }
 
     step_scaling_opt <- alpha$minimum
     state_opt <- scale_state(state0, state1, step_scaling_opt)
@@ -1505,13 +1606,56 @@ bru_line_search <- function(model,
         paste0(
           "iinla: Step rescaling: ",
           signif(100 * step_scaling, 4),
-          "%, Optimisation"
+          "%, Optimisation",
+          if (identical(options$bru_method$line_opt_method, "full")) {
+            paste0(" (Approx = ",
+                   signif(100 * step_scaling_opt_approx, 4),
+                   "%)")
+          } else {
+            NULL
+          }
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
         verbosity = 3
       )
     }
+  }
+
+  bru_log_message(
+    paste0(
+      "iinla: |lin1-lin0| = ",
+      signif(pred_norm(lin_pred1 - lin_pred0), 4),
+      "\n       <eta-lin1,delta>/|delta| = ",
+      signif(pred_scalprod(nonlin_pred-lin_pred1, lin_pred1 - lin_pred0) /
+               pred_norm(lin_pred1 - lin_pred0), 4),
+      "\n       |eta-lin0 - delta <delta,eta-lin0>/<delta,delta>| = ",
+      signif(pred_norm(nonlin_pred-lin_pred0 - (lin_pred1-lin_pred0) *
+                  pred_scalprod(lin_pred1-lin_pred0, nonlin_pred-lin_pred0) /
+                  pred_norm2(lin_pred1-lin_pred0)), 4)
+    ),
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 4
+  )
+
+  # Prevent long steps ----
+  if (step_scaling > maximum_step) {
+    step_scaling <- maximum_step
+    state <- scale_state(state0, state1, step_scaling)
+    nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+    norm1 <- pred_norm(nonlin_pred - lin_pred1)
+
+    bru_log_message(
+      paste0(
+        "iinla: Step rescaling: ",
+        signif(100 * step_scaling, 3),
+        "%, Maximum step length"
+      ),
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store,
+      verbosity = 3
+    )
   }
 
   active <-
@@ -1553,12 +1697,23 @@ latent_names <- function(state) {
   names(nm) <- names(state)
   nm
 }
-tidy_tracker <- function(state, value_name = "value") {
+tidy_state <- function(state, value_name = "value") {
   df <- data.frame(
-    effect = latent_names(state),
-    value = unlist(state)
+    effect = rep(names(state), lengths(state)),
+    index = unlist(lapply(lengths(state), function(x) seq_len(x))),
+    THEVALUE = unlist(state)
   )
-  names(df) <- c("effect", value_name)
+  nm <- names(df)
+  nm[nm == "THEVALUE"] <- value_name
+  names(df) <- nm
+  rownames(df) <- NULL
+  df
+}
+tidy_states <- function(states, value_name = "value", id_name = "iteration") {
+  df <- lapply(states, function(x) tidy_state(x, value_name = value_name))
+  id <- rep(seq_len(length(states)), each = nrow(df[[1]]))
+  df <- do.call(rbind, df)
+  df[[id_name]] <- id
   df
 }
 
@@ -1625,6 +1780,13 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     )
   }
 
+  if (!is.null(inla.options[["offset"]])) {
+    stop(paste0(
+      "An offset option was specified which may interfere with the inlabru model construction.\n",
+      "Please use an explicit offset component instead; e.g. ~ myoffset(value, model = 'offset')"
+    ))
+  }
+
   # Initialise required local options
   inla.options <- modifyList(
     inla.options,
@@ -1640,6 +1802,34 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     function(k) lhoods[[k]]$inla.family,
     "family"
   )
+
+  # Extract the control.family information for each likelihood
+  if (!is.null(inla.options[["control.family"]])) {
+    if (length(inla.options[["control.family"]]) != length(lhoods)) {
+      stop("control.family supplied as option, but format doesn't match the number of likelihoods")
+    }
+    like_has_cf <- vapply(
+      seq_along(lhoods),
+      function(k) !is.null(lhoods[[k]][["control.family"]]),
+      TRUE
+    )
+    if (any(like_has_cf)) {
+      warning("Global control.family option overrides settings in likelihood(s) ",
+              paste0(which(like_has_cf)), collapse = ", ")
+    }
+  } else {
+    control.family <- lapply(
+      seq_along(lhoods),
+      function(k) {
+        if (is.null(lhoods[[k]][["control.family"]])) {
+          list()
+        } else {
+          lhoods[[k]][["control.family"]]
+        }
+      }
+    )
+    inla.options[["control.family"]] <- control.family
+  }
 
   initial <-
     if (is.null(initial)) {
@@ -1696,8 +1886,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
 
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
-  if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
-    A <- evaluate_A(model, lhoods)
+  if (do_line_search) {
+    A <- evaluate_A(model, lhoods, inla_f = TRUE) # Input is inla::f-compatible
     lin <- bru_compute_linearisation(
       model,
       lhoods = lhoods,
@@ -1706,16 +1896,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     )
   }
   # Initial stack
-  if (identical(options$bru_method$taylor, "legacy")) {
-    stk <- joint_stackmaker(
-      model,
-      lhoods,
-      state = list(states[[length(states)]])
-    )
-  } else {
-    idx <- evaluate_index(model, lhoods)
-    stk <- bru_make_stack(lhoods, lin, idx)
-  }
+  idx <- evaluate_index(model, lhoods)
+  stk <- bru_make_stack(lhoods, lin, idx)
+
   stk.data <- INLA::inla.stack.data(stk)
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
 
@@ -1733,6 +1916,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     previous_x <- 0 # TODO: construct from the initial linearisation state instead
   }
 
+  track_df <- NULL
   do_final_integration <- (options$bru_max_iter == 1)
   do_final_theta_no_restart <- FALSE
   while (!interrupt) {
@@ -1751,6 +1935,10 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       inla.options[["control.mode"]]$theta <- result$mode$theta
       inla.options[["control.mode"]]$x <-
         previous_x + (result$mode$x - previous_x) * line_search[["step_scaling"]]
+      result_indexing <- inla_result_latent_idx(result)
+      # Reset the predictor values, to avoid spurious iteration effects.
+      inla.options[["control.mode"]]$x[result_indexing$APredictor] <- 0
+      inla.options[["control.mode"]]$x[result_indexing$Predictor] <- 0
     }
     if ((!is.null(result) && !is.null(result$mode))) {
       previous_x <- result$mode$x
@@ -1857,29 +2045,33 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     }
 
     # Extract values tracked for estimating convergence
-    if (options$bru_max_iter > 1 & k <= options$bru_max_iter) {
-      # Note: The number of fixed effects may be zero, and strong
-      # non-linearities that don't necessarily affect the fixed
-      # effects may appear in the random effects, so we need to
-      # track all of them.
-      result_mode <- evaluate_state(model, result, property = "joint_mode")[[1]]
-      result_sd <- evaluate_state(model, result,
-        property = "sd",
-        internal_hyperpar = TRUE
-      )[[1]]
-      result_names <- latent_names(result_mode)
-      track_df <- list()
-      for (label in names(result_mode)) {
-        track_df[[label]] <-
-          data.frame(
-            effect = result_names[[label]],
-            iteration = track_size + k,
-            mode = result_mode[[label]],
-            sd = result_sd[[label]]
-          )
-      }
-      track[[k]] <- do.call(rbind, track_df)
+    # Note: The number of fixed effects may be zero, and strong
+    # non-linearities that don't necessarily affect the fixed
+    # effects may appear in the random effects, so we need to
+    # track all of them.
+    result_mode <- evaluate_state(
+      model,
+      result,
+      property = "joint_mode"
+    )[[1]]
+    result_sd <- evaluate_state(
+      model,
+      result,
+      property = "sd",
+      internal_hyperpar = TRUE
+    )[[1]]
+    track_df <- list()
+    for (label in names(result_mode)) {
+      track_df[[label]] <-
+        data.frame(
+          effect = label,
+          index = seq_along(result_mode[[label]]),
+          iteration = track_size + k,
+          mode = result_mode[[label]],
+          sd = result_sd[[label]]
+        )
     }
+    track[[k]] <- do.call(rbind, track_df)
 
     # Only update the linearisation state after the non-final "eb" iterations:
     if (!do_final_integration) {
@@ -1891,6 +2083,12 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       )[[1]]
       if ((options$bru_max_iter > 1)) {
         if (do_line_search) {
+          line_weights <-
+            extract_property(
+              result = result,
+              property = "predictor_sd",
+              internal_hyperpar = FALSE
+            )^{-2}
           line_search <- bru_line_search(
             model = model,
             lhoods = lhoods,
@@ -1898,23 +2096,19 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             state0 = state0,
             state = state,
             A = A,
+            weights = line_weights,
             options = options
           )
           state <- line_search[["state"]]
         }
-        if (do_line_search || !identical(options$bru_method$taylor, "legacy")) {
-          lin <- bru_compute_linearisation(
-            model,
-            lhoods = lhoods,
-            state = state,
-            A = A
-          )
-        }
-        if (identical(options$bru_method$taylor, "legacy")) {
-          stk <- joint_stackmaker(model, lhoods, state = list(state))
-        } else {
-          stk <- bru_make_stack(lhoods, lin, idx)
-        }
+        lin <- bru_compute_linearisation(
+          model,
+          lhoods = lhoods,
+          state = state,
+          A = A
+        )
+        stk <- bru_make_stack(lhoods, lin, idx)
+
         stk.data <- INLA::inla.stack.data(stk)
         inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
       }
@@ -1926,7 +2120,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     if (do_final_integration || (k >= options$bru_max_iter)) {
       interrupt <- TRUE
     } else if (!interrupt && (k > 1)) {
-      max.dev <- options$bru_method$stop_at_max_rel_deviation
+      max.dev <- options$bru_method$rel_tol
       dev <- abs(track[[k - 1]]$mode - track[[k]]$mode) / track[[k]]$sd
       ## do.call(c, lapply(by(do.call(rbind, track),
       ##                           as.factor(do.call(rbind, track)$effect),
@@ -1951,6 +2145,11 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           verbose_store = options$bru_verbose_store
         )
       }
+    }
+    track[[k]][["new_linearisation"]] <- NA_real_
+    for (label in names(states[[1]])) {
+      track[[k]][["new_linearisation"]][track[[k]][["effect"]] == label] <-
+        unlist(states[[length(states)]][[label]])
     }
     k <- k + 1
   }
@@ -2073,14 +2272,14 @@ list.data <- function(formula) {
   elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
 
   #  # Remove functions. This can cause problems as well.
-  #  elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
+  #  # elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
 
   #  # Remove formulae. This can cause problems as well.
-  #  elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
+  #  # elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
 
   # The formula expression is too general for this to be reliable:
   #  # Keep only purse formula variables
-  #  elist <- elist[names(elist) %in% all.vars(formula)]
+  #  # elist <- elist[names(elist) %in% all.vars(formula)]
 
   elist
 }
@@ -2228,13 +2427,10 @@ summary_bru <- function(object, ...) {
   .Deprecated(new = "summary")
 
   cat("\n--- Likelihoods ----------------------------------------------------------------------------------\n\n")
-  for (k in 1:length(object$bru_info$lhoods)) {
+  for (k in seq_along(object$bru_info$lhoods)) {
     lh <- object$bru_info$lhoods[[k]]
     cat(sprintf("Name: '%s', family: '%s', data class: '%s', \t formula: '%s' \n", names(object$bru_info$lhoods)[[k]], lh$family, class(lh$data), deparse(lh$formula)))
   }
-
-  # rownames(df) = names(object$bru_info$lhoods)
-  # print(df)
 
   cat("\n--- Criteria -------------------------------------------------------------------------------------\n\n")
   cat(paste0("Watanabe-Akaike information criterion (WAIC): \t", sprintf("%1.3e", object$waic$waic), "\n"))
@@ -2283,7 +2479,6 @@ summary_bru <- function(object, ...) {
   }
 
   cat("\n--- All hyper parameters (internal representation) ----------------------------------------------- \n\n")
-  # cat(paste0("  ", paste(rownames(object$summary.hyperpar), collapse = ", "), "\n"))
   print(object$summary.hyperpar)
 
 

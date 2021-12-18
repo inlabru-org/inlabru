@@ -23,15 +23,18 @@
 #' Biological Conservation , 2014, 172, 29 - 36.
 #'
 #' @examples
-#' data(seals)
-#' ggplot() +
-#'   gg(seals$mesh) +
-#'   gg(seals$points)
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   data(seals, package = "inlabru")
+#'   ggplot() +
+#'     gg(seals$mesh) +
+#'     gg(seals$points)
+#' }
 NULL
 
 #' Seal pup edata import
 #'
-#' Generate `Spatial` objects from raw seal pup survey data (not inlcuded in [inlabru]). Note that this function
+#' Generate `Spatial` objects from raw seal pup survey data (not inlcuded in
+#' [inlabru]). Note that this function
 #' will only extract one of the survey transects.
 #'
 #' @aliases import.seals

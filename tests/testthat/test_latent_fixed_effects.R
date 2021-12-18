@@ -21,6 +21,31 @@ test_that("basic intercept model", {
   )
 })
 
+test_that("basic intercept model, spatial data", {
+  skip_on_cran()
+  local_bru_safe_inla()
+  options <- list(
+    control.inla = list(h = 0.005)
+  )
+  mycomp <- y ~ 1
+  mydata <- local_basic_intercept_testdata()
+  mydata$coord1 <- 11
+  mydata$coord2 <- 12
+  coordinates(mydata) <- c("coord1", "coord2")
+
+  fit <- bru(mycomp,
+    family = "normal",
+    data = mydata,
+    options = options
+  )
+
+  expect_equal(
+    fit$summary.fixed["Intercept", ]$mean,
+    0.090405156,
+    tolerance = lowtol
+  )
+})
+
 test_that("basic fixed effect model", {
   skip_on_cran()
   local_bru_safe_inla()

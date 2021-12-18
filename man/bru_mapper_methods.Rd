@@ -30,13 +30,20 @@
 \alias{[.bru_mapper_multi}
 \alias{names.bru_mapper_multi}
 \alias{names<-.bru_mapper_multi}
+\alias{ibm_n.bru_mapper_collect}
+\alias{ibm_values.bru_mapper_collect}
+\alias{ibm_amatrix.bru_mapper_collect}
+\alias{ibm_valid_input.bru_mapper_collect}
+\alias{[.bru_mapper_collect}
+\alias{names.bru_mapper_collect}
+\alias{names<-.bru_mapper_collect}
 \title{Implementation methods for mapper objects}
 \usage{
-\method{ibm_n}{default}(mapper, ...)
+\method{ibm_n}{default}(mapper, inla_f = FALSE, ...)
 
-\method{ibm_values}{default}(mapper, ...)
+\method{ibm_values}{default}(mapper, inla_f = FALSE, ...)
 
-\method{ibm_amatrix}{default}(mapper, ...)
+\method{ibm_amatrix}{default}(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_valid_input}{default}(mapper, input, ...)
 
@@ -74,29 +81,50 @@
 
 \method{ibm_amatrix}{bru_mapper_offset}(mapper, input, ...)
 
-\method{ibm_n}{bru_mapper_multi}(mapper, multi = 0L, ...)
+\method{ibm_n}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = 0L, ...)
 
-\method{ibm_values}{bru_mapper_multi}(mapper, multi = 0L, ...)
+\method{ibm_values}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = 0L, ...)
 
-\method{ibm_amatrix}{bru_mapper_multi}(mapper, input, multi = 0L, ...)
+\method{ibm_amatrix}{bru_mapper_multi}(mapper, input, inla_f = FALSE, multi = 0L, ...)
 
-\method{ibm_valid_input}{bru_mapper_multi}(mapper, input, multi = 0L, ...)
+\method{ibm_valid_input}{bru_mapper_multi}(mapper, input, inla_f = FALSE, multi = 0L, ...)
 
 \method{[}{bru_mapper_multi}(x, i, drop = TRUE)
 
 \method{names}{bru_mapper_multi}(x)
 
 \method{names}{bru_mapper_multi}(x) <- value
+
+\method{ibm_n}{bru_mapper_collect}(mapper, inla_f = FALSE, multi = 0L, ...)
+
+\method{ibm_values}{bru_mapper_collect}(mapper, inla_f = FALSE, multi = 0L, ...)
+
+\method{ibm_amatrix}{bru_mapper_collect}(mapper, input, inla_f = FALSE, multi = 0L, ...)
+
+\method{ibm_valid_input}{bru_mapper_collect}(mapper, input, inla_f = FALSE, multi = 0L, ...)
+
+\method{[}{bru_mapper_collect}(x, i, drop = TRUE)
+
+\method{names}{bru_mapper_collect}(x)
+
+\method{names}{bru_mapper_collect}(x) <- value
 }
 \arguments{
 \item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}
+
+\item{inla_f}{logical; when \code{TRUE} in \code{ibm_n} and \code{ibm_values}, these must result in values compatible with \code{INLA::f(...)}
+an specification and corresponding \code{INLA::inla.stack(...)} constructions.
+For \code{ibm_amatrix} methods, it may influence how the input data is interpreted.
+Implementations do not normally need to do anything different, except
+for mappers of the type needed for hidden multicomponent models such
+as "bym2", which can be handled by \code{bru_mapper_collect}.}
 
 \item{\dots}{Arguments passed on to other methods}
 
 \item{input}{The values for which to produce a mapping matrix}
 
 \item{multi}{integer or logical;
-If positive, the number of levels to recurse in a \code{bru_multi_mapper}.
+If positive, the number of levels to recurse in a \code{bru_collect_mapper}.
 If \code{TRUE}, equivalent to \code{1L}. If \code{FALSE}, equivalent to \code{0L}.}
 
 \item{x}{object from which to extract element(s)}
@@ -104,8 +132,9 @@ If \code{TRUE}, equivalent to \code{1L}. If \code{FALSE}, equivalent to \code{0L
 \item{i}{indices specifying element(s) to extract}
 
 \item{drop}{logical;
-For \verb{[.bru_mapper_multi}, whether to extract an individual mapper when \code{i}
-identifies a single element.
+For \verb{[.bru_mapper_collect}, whether to extract an individual mapper when
+\code{i} identifies a single element. If \code{FALSE}, a list of sub-mappers is
+returned (suitable e.g. for creating a new \code{bru_mapper_collect} object).
 Default: \code{TRUE}}
 
 \item{value}{a character vector of up to the same length as x}
@@ -121,6 +150,17 @@ Default: \code{TRUE}}
 \item The \code{names()} method for \code{bru_mapper_multi} returns the names from the
 sub-mappers list
 }
+
+\itemize{
+\item \code{[}-indexing a \code{bru_mapper_collect} extracts a subset
+\code{bru_mapper_collect} object (for drop \code{FALSE}) or an individual sub-mapper
+(for drop \code{TRUE}, and \code{i} identifies a single element)
+}
+
+\itemize{
+\item The \code{names()} method for \code{bru_mapper_collect} returns the names from the
+sub-mappers list
+}
 }
 \description{
 A \code{bru_mapper} sub-class implementation must provide an
@@ -132,7 +172,8 @@ available (see Details). Otherwise the
 \details{
 \itemize{
 \item The default \code{ibm_n()} method returns a non-null element 'n' from the
-mapper object, and gives an error if it doesn't exist.
+mapper object, and gives an error if it doesn't exist. If \code{inla_f=TRUE},
+first checks for a 'n_inla' element.
 }
 
 \itemize{
@@ -142,8 +183,8 @@ it doesn't exist.
 }
 
 \itemize{
-\item The default \code{ibm_amatrix()} method calls the \code{ibm_amatrix} element function
-of the object if it exists.
+\item The default \code{ibm_amatrix()} gives an error message.
+Mapper classes must implement their own \code{ibm_amatrix} method.
 }
 
 \itemize{
@@ -164,6 +205,28 @@ with unnamed but ordered columns.
 \item \code{ibm_valid_input} for \code{bru_mapper_multi} accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see \code{\link[=names.bru_mapper_multi]{names.bru_mapper_multi()}}.
+Each list element should take a format accepted by the corresponding
+sub-mapper. In case each element is a vector, the input can be given as a
+data.frame with named columns, a matrix with named columns, or a matrix
+with unnamed but ordered columns.
+}
+
+\itemize{
+\item \code{ibm_amatrix} for \code{bru_mapper_collect} accepts a list with
+named entries, or a list with unnamed but ordered elements.
+The names must match the sub-mappers, see \code{\link[=names.bru_mapper_collect]{names.bru_mapper_collect()}}.
+Each list element should take a format accepted by the corresponding
+sub-mapper. In case each element is a vector, the input can be given as a
+data.frame with named columns, a matrix with named columns, or a matrix
+with unnamed but ordered columns. When \code{inla_f=TRUE} and \code{hidden=TRUE} in
+the mapper definition, the input format should instead match that of
+the first, non-hidden, sub-mapper.
+}
+
+\itemize{
+\item \code{ibm_valid_input} for \code{bru_mapper_collect} accepts a list with
+named entries, or a list with unnamed but ordered elements.
+The names must match the sub-mappers, see \code{\link[=names.bru_mapper_collect]{names.bru_mapper_collect()}}.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix

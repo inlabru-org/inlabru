@@ -40,28 +40,31 @@
 #'
 #' @examples
 #' \donttest{
-#' data(mexdolphin, package = "inlabru")
-#' ggplot() +
-#'   gg(mexdolphin$mesh) +
-#'   gg(mexdolphin$ppoly, color = "blue") +
-#'   gg(mexdolphin$samplers) +
-#'   gg(mexdolphin$points, aes(size = size), color = "red") +
-#'   coord_equal()
-#'   
-#' ggplot() +
-#'   gg(mexdolphin$mesh, col = mexdolphin$lambda, mask = mexdolphin$ppoly) +
-#'   coord_equal()
+#' if (require("ggplot2", quietly = TRUE)) {
+#'   data(mexdolphin, package = "inlabru")
+#'   ggplot() +
+#'     gg(mexdolphin$mesh) +
+#'     gg(mexdolphin$ppoly, color = "blue") +
+#'     gg(mexdolphin$samplers) +
+#'     gg(mexdolphin$points, aes(size = size), color = "red") +
+#'     coord_equal()
+#'
+#'   ggplot() +
+#'     gg(mexdolphin$mesh, col = mexdolphin$lambda, mask = mexdolphin$ppoly) +
+#'     coord_equal()
+#' }
 #' }
 #' \dontrun{
-#' if (requireNamespace("ggmap", quietly = TRUE)) {
-#' gmap(mexdolphin$depth) +
-#'   gm(mexdolphin$ppoly, color = "blue") +
-#'   gm(mexdolphin$samplers) +
-#'   gm(mexdolphin$points, aes(size = size), color = "red")
+#' if (requireNamespace("ggmap", quietly = TRUE) &&
+#'   require("ggplot2", quietly = TRUE)) {
+#'   gmap(mexdolphin$depth) +
+#'     gm(mexdolphin$ppoly, color = "blue") +
+#'     gm(mexdolphin$samplers) +
+#'     gm(mexdolphin$points, aes(size = size), color = "red")
 #'
-#' gmap(mexdolphin$depth) +
-#'   gm(mexdolphin$depth, aes(col = depth)) +
-#'   gm(mexdolphin$ppoly)
+#'   gmap(mexdolphin$depth) +
+#'     gm(mexdolphin$depth, aes(col = depth)) +
+#'     gm(mexdolphin$ppoly)
 #' }
 #' }
 NULL

@@ -13,7 +13,7 @@ test_that("2D LGCP fitting", {
     )
   )
 
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
 
   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
     prior.sigma = c(0.1, 0.01),
@@ -34,12 +34,12 @@ test_that("2D LGCP fitting", {
   # test_that("2D LGCP fitting: INLA intercept", {
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    1.121178,
+    1.0912,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.5797879,
+    0.5774,
     tolerance = midtol
   )
 
@@ -47,22 +47,22 @@ test_that("2D LGCP fitting", {
   # test_that("2D LGCP fitting: INLA random field", {
   expect_equal(
     fit$summary.random$mySmooth$mean[index],
-    c(-2.0223348, 0.3871943, -0.4476642, 0.4025956, -1.7001911),
+    c(-1.7432, 0.5305, -0.2831, 0.5830, -1.4833),
     tolerance = midtol
   )
   expect_equal(
     fit$summary.random$mySmooth$sd[index],
-    c(1.5929190, 0.8838858, 0.8288531, 0.7831668, 1.0536828),
+    c(1.5914, 0.8826, 0.8273, 0.7815, 1.0522),
     tolerance = midtol
   )
   expect_equal(
     fit$summary.hyperpar["Range for mySmooth", "mean"],
-    2.118071,
+    2.1137,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.hyperpar["Stdev for mySmooth", "mean"],
-    1.10536,
+    1.1049,
     tolerance = midtol
   )
 
@@ -97,13 +97,13 @@ test_that("2D LGCP fitting", {
 
   expect_equal(
     Lambda$mean,
-    650.6227,
-    tolerance = 0.1
+    669.5,
+    tolerance = midtol
   )
   expect_equal(
     Lambda$sd,
-    24.07925,
-    tolerance = 0.5
+    40,
+    tolerance = hitol * 5
   )
 
   # test_that("Supplying integration points instead of samplers&domains", {

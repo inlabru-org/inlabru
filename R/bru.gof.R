@@ -21,41 +21,42 @@
 #' @param probs numeric vector of probabilities with values in `[0,1]`
 #' @param \dots arguments passed on to [predict.bru()]
 #' @return An `data.frame` with a ggplot attribute `ggp`
-#'
+#' @importFrom rlang .data
 #' @examples
-#'
 #' \dontrun{
+#' if (require(ggplot2)) {
+#'   # Load a point pattern
+#'   data(Poisson2_1D)
 #'
-#' # Load a point pattern
-#' data(Poisson2_1D)
+#'   # Take a look at the point (and frequency) data
 #'
-#' # Take a look at the point (and frequency) data
+#'   ggplot(pts2) +
+#'     geom_histogram(aes(x = x), binwidth = 55 / 20, boundary = 0, fill = NA, color = "black") +
+#'     geom_point(aes(x), y = 0, pch = "|", cex = 4) +
+#'     coord_fixed(ratio = 1)
 #'
-#' ggplot(pts2) +
-#'   geom_histogram(aes(x = x), binwidth = 55 / 20, boundary = 0, fill = NA, color = "black") +
-#'   geom_point(aes(x), y = 0, pch = "|", cex = 4) +
-#'   coord_fixed(ratio = 1)
+#'   # Fit an LGCP model
+#'   x <- seq(0, 55, length = 50)
+#'   mesh1D <- inla.mesh.1d(x, boundary = "free")
+#'   mdl <- x ~ spde1D(x, model = inla.spde2.matern(mesh1D)) + Intercept(1)
+#'   fit.spde <- lgcp(mdl, pts2, domain = list(x = c(0, 55)))
 #'
-#' # Fit an LGCP model
-#' x <- seq(0, 55, length = 50)
-#' mesh1D <- inla.mesh.1d(x, boundary = "free")
-#' mdl <- x ~ spde1D(map = x, model = inla.spde2.matern(mesh1D)) + Intercept # SOLUTION
-#' fit.spde <- lgcp(mdl, pts2, domain = list(x = c(0, 55)))
-#'
-#' # Calculate bin statistics
-#' bc <- bincount(
-#'   result = fit.spde,
-#'   observations = pts2,
-#'   breaks = seq(0, max(pts2), length = 12),
-#'   predictor = x ~ exp(spde1D + Intercept)
-#' )
+#'   # Calculate bin statistics
+#'   bc <- bincount(
+#'     result = fit.spde,
+#'     observations = pts2,
+#'     breaks = seq(0, max(pts2), length = 12),
+#'     predictor = x ~ exp(spde1D + Intercept)
+#'   )
 #'
 #'
-#' # Plot them!
-#' attributes(bc)$ggp
+#'   # Plot them!
+#'   attributes(bc)$ggp
+#' }
 #' }
 #'
-bincount <- function(result, predictor, observations, breaks, nint = 20, probs = c(0.025, 0.5, 0.975), ...) {
+bincount <- function(result, predictor, observations, breaks, nint = 20,
+                     probs = c(0.025, 0.5, 0.975), ...) {
 
   # Sort probabilities
   probs <- sort(probs)
@@ -84,7 +85,7 @@ bincount <- function(result, predictor, observations, breaks, nint = 20, probs =
   qq <- aggregate(smp, by = list(rep(1:nbins, each = nint)), FUN = sum, drop = TRUE)[, 2:(ncol(smp) + 1)]
 
   # Normalize bin probabilities
-  for (s in 1:ncol(smp)) {
+  for (s in seq_len(ncol(smp))) {
     qq[, s] <- qq[, s] / sum(qq[, s])
   }
 
@@ -116,12 +117,35 @@ bincount <- function(result, predictor, observations, breaks, nint = 20, probs =
   )
   pint$inside <- (pint$counts >= pint[[miname]]) & (pint$counts <= pint[[mxname]])
 
-  ggp <- ggplot() +
-    geom_crossbar(data = pint, mapping = aes_string(x = "mid", y = mdname, ymin = miname, ymax = mxname, fill = "inside", color = "inside"), show.legend = FALSE) +
-    geom_point(data = pint, mapping = aes_string(x = "mid", y = mdname), shape = 95, size = 3, color = "blue") +
-    geom_point(data = pint, mapping = aes_string(x = "mid", y = "counts"), shape = 20, size = 2) +
-    xlab(all.vars(update.formula(predictor, ~.0))) +
-    ylab("count")
+  ggp <- ggplot2::ggplot() +
+    ggplot2::geom_crossbar(
+      data = pint,
+      mapping = ggplot2::aes(
+        x = .data[["mid"]],
+        y = .data[[mdname]],
+        ymin = .data[[miname]],
+        ymax = .data[[mxname]],
+        fill = .data[["inside"]],
+        color = .data[["inside"]]
+      ),
+      show.legend = FALSE
+    ) +
+    ggplot2::geom_point(
+      data = pint, mapping = ggplot2::aes(
+        x = .data[["mid"]],
+        y = .data[[mdname]]
+      ),
+      shape = 95, size = 3, color = "blue"
+    ) +
+    ggplot2::geom_point(
+      data = pint, mapping = ggplot2::aes(
+        x = .data[["mid"]],
+        y = .data[["counts"]]
+      ),
+      shape = 20, size = 2
+    ) +
+    ggplot2::xlab(all.vars(update.formula(predictor, ~.0))) +
+    ggplot2::ylab("count")
 
   attr(pint, "ggp") <- ggp
 

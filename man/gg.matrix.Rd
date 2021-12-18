@@ -9,21 +9,25 @@
 \arguments{
 \item{data}{A \code{matrix} object.}
 
-\item{mapping}{a set of aesthetic mappings created by \link{aes} or \link{aes_}. These are passed on to \link{geom_tile}.}
+\item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed on to \code{geom_tile}.}
 
-\item{...}{Arguments passed on to \link{geom_tile}.}
+\item{...}{Arguments passed on to \code{geom_tile}.}
 }
 \value{
-A \link{geom_tile} with reversed y scale.
+A \code{geom_tile} with reversed y scale.
 }
 \description{
 Creates a tile geom for plotting a matrix
 }
+\details{
+Requires the \code{ggplot2} package.
+}
 \examples{
-
-A <- matrix(runif(100), nrow = 10)
-ggplot() +
-  gg(A)
+if (require("ggplot2", quietly = TRUE)) {
+  A <- matrix(runif(100), nrow = 10)
+  ggplot() +
+    gg(A)
+}
 }
 \seealso{
 Other geomes for inla and inlabru predictions: 

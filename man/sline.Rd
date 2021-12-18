@@ -32,7 +32,6 @@ is transfromed accordingly. Additional columns of the input data, e.g. covariate
 are retained and attached to \code{DF}.
 }
 \examples{
-
 \donttest{
 # Create a data frame defining three lines
 lns <- data.frame(
@@ -47,9 +46,11 @@ spl <- sline(lns,
   end.cols = c("xe", "ye")
 )
 
-# Plot the lines
-ggplot() +
-  gg(spl)
+if (require(ggplot2, quietly = TRUE)) {
+  # Plot the lines
+  ggplot() +
+    gg(spl)
+}
 }
 
 }

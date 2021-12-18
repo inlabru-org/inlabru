@@ -25,12 +25,14 @@
 #' NONE YET
 #'
 #' @examples
-#' data(mrsea)
-#' ggplot() +
-#'   gg(mrsea$mesh) +
-#'   gg(mrsea$samplers) +
-#'   gg(mrsea$points) +
-#'   gg(mrsea$boundary)
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   data(mrsea)
+#'   ggplot() +
+#'     gg(mrsea$mesh) +
+#'     gg(mrsea$samplers) +
+#'     gg(mrsea$points) +
+#'     gg(mrsea$boundary)
+#' }
 NULL
 
 #' MRSea data import
@@ -39,7 +41,7 @@ NULL
 #' Requires the MRSea package from <https://github.com/lindesaysh/MRSea>, and
 #' is normally only run by the package maintainer. For regular inlabru use of the data,
 #' use `data("MRSea", package = "inlabru")`, which does not require the MRSea package.
-#' 
+#'
 #' @aliases import.mrsea
 #' @keywords internal
 #' @return The [mrsea] data set
@@ -51,7 +53,6 @@ NULL
 #'
 
 import.mrsea <- function() {
-  
   pkg <- "MRSea"
   if (!requireNamespace(pkg, quietly = TRUE)) {
     stop("This package development function require the MRSea package from https://github.com/lindesaysh/MRSea")
@@ -85,7 +86,7 @@ import.mrsea <- function() {
 
   # obsdata
   obsdata <- makeobsdata(dis.data.re)
-  
+
   # 2021-02-16 the original data was stored in metres units in MRSea; convert
   preddata <- makepreddata(predict.data.re)
 
@@ -97,7 +98,7 @@ import.mrsea <- function() {
   depth <- makecovardata(predict.data.re)
 
   ############ NEW FORMAT USING sp objects ##############
-  
+
   crs <- CRS("+proj=utm +zone=32 +units=km")
 
   # Transects lines
@@ -119,13 +120,15 @@ import.mrsea <- function() {
 
   # Boundary
   boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
-                    cols = c(1, 2),
-                    crs = crs)
+    cols = c(1, 2),
+    crs = crs
+  )
 
   # Covariates
   covar <- SpatialPointsDataFrame(depth[, 1:2],
-                                  data = depth[, 3, drop = FALSE],
-                                  proj4string = crs)
+    data = depth[, 3, drop = FALSE],
+    proj4string = crs
+  )
 
   # Remove `distance` column from transects
   lns$distance <- NULL
@@ -146,7 +149,7 @@ mrseanames2dsmnames <- function(data) {
   nam <- names(data)
   cols2change <- c("transect.id", "transect.label", "x.pos", "y.pos", "segment.id")
   id <- NULL
-  for (i in 1:length(cols2change)) {
+  for (i in seq_along(cols2change)) {
     id <- c(id, grep(cols2change[i], nam))
   }
   names(data)[id] <- c("Transect.Label", "Transect.label", "x", "y", "Sample.Label")
@@ -166,9 +169,11 @@ makepreddata <- function(data) {
   return(data)
 }
 makecovardata <- function(data) {
-  depth <- data[(data$season == 1) &
-                  (data$impact == 0),
-                c("x.pos", "y.pos", "depth")]
+  depth <- data[
+    (data$season == 1) &
+      (data$impact == 0),
+    c("x.pos", "y.pos", "depth")
+  ]
   colnames(depth) <- c("x", "y", "depth")
   data$x <- data$x / 1000
   data$y <- data$y / 1000

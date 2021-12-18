@@ -9,13 +9,14 @@ test_that("bru: factor component", {
 
   input.df <- data.frame(x = cos(1:10), zz = rep(c(1, 10), each = 5))
   input.df <- within(input.df, y <- 5 + 2 * cos(1:10) +
-                       rnorm(10, mean = 0, sd = 1)[zz] +
-                       rnorm(10, mean = 0, sd = 0.1))
+    rnorm(10, mean = 0, sd = 1)[zz] +
+    rnorm(10, mean = 0, sd = 0.1))
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
   fit <- bru(y ~ x + z(zz, model = "iid", mapper = bru_mapper_index(10)),
-             family = "gaussian", data = input.df)
+    family = "gaussian", data = input.df
+  )
 
   # Predict posterior statistics of 'x'
 
@@ -82,46 +83,38 @@ test_that("bru: factor component", {
 
   expect_equal(is.matrix(xipost), TRUE)
   expect_equal(rownames(xipost), c("Intercept", "x"))
-  
-  
+
+
   # Evaluate effect with _eval feature
-  
-  xpost4 <- predict(
-    fit,
-    data = NULL,
-    formula = ~ z_eval(1:10),
-    n.samples = 5,
-    seed = 12345L
-  )
-  
-  xpost4 <- predict(
-    fit,
-    data = NULL,
-    formula = ~ x_eval(1:10),
-    n.samples = 5,
-    seed = 12345L
-  )
 
   xpost4 <- generate(
     fit,
     data = NULL,
-    formula = ~ c(z_eval(c(1, 2, 11, 12, 12)),
-                  z_eval(c(1, 2, 11, 12, 12))),
+    formula = ~ c(
+      z_eval(c(1, 2, 11, 12, 12)),
+      z_eval(c(1, 2, 11, 12, 12))
+    ),
     n.samples = 5,
     seed = 12345L
   )
-  
-  # The first four rows should equal the last 5 rows.
-  expect_equal(xpost4[1:5, , drop = FALSE],
-               xpost4[6:10, , drop = FALSE])
-  # The index 12 values should be equal.
-  expect_equal(xpost4[4, , drop = FALSE],
-               xpost4[5, , drop = FALSE])
-  # The columns should all be different
-  expect_equal(sum(xpost4[, 1] == xpost4[, 2]),
-               0)
 
-  
+  # The first four rows should equal the last 5 rows.
+  expect_equal(
+    xpost4[1:5, , drop = FALSE],
+    xpost4[6:10, , drop = FALSE]
+  )
+  # The index 12 values should be equal.
+  expect_equal(
+    xpost4[4, , drop = FALSE],
+    xpost4[5, , drop = FALSE]
+  )
+  # The columns should all be different
+  expect_equal(
+    sum(xpost4[, 1] == xpost4[, 2]),
+    0
+  )
+
+
   xpost5 <- predict(
     fit,
     data = NULL,
@@ -132,8 +125,7 @@ test_that("bru: factor component", {
 
   # sd for z(11) should be close to 1
   expect_equal(mean(xpost5[2, "sd"]),
-               1,
-               tolerance = hitol)
-  
-  
+    1,
+    tolerance = hitol
+  )
 })

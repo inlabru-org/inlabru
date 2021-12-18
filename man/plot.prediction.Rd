@@ -17,11 +17,14 @@
 an object of class \code{gg}
 }
 \description{
-Generates a base ggplot2 using \link{ggplot} and adds a geom for input \code{x} using \link{gg}.
+Generates a base ggplot2 using \code{ggplot()} and adds a geom for input \code{x} using \link{gg}.
+}
+\details{
+Requires the \code{ggplot2} package.
 }
 \examples{
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
   # Generate some data
 
   input.df <- data.frame(x = cos(1:10))

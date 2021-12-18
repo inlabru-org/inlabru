@@ -21,7 +21,7 @@ test_that("2D modelling on the globe", {
   )
   data <- within(
     data,
-    {
+    expr = {
       y <- rpois(nrow(data), exp(1 + sin(Lat / 180 * pi) * 2))
     }
   )
@@ -63,7 +63,7 @@ test_that("2D LGCP modelling on the globe", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not(fm_has_PROJ6())
-  
+
   set.seed(123L)
 
   options <- list(

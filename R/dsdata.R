@@ -19,8 +19,7 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   detdata.dsdata <- function(data, detection = NULL, ...) {
     if (is.null(detection)) {
       return(data$effort[as.detection(data)[, "start"], ])
-    }
-    else {
+    } else {
       return(data$effort[detection[, "start"], ])
     }
   }
@@ -56,7 +55,7 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   # @return list with spatial points, spatial lines and a mesh
   # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
-  # as.spatial.dsdata = function(dset, cnames, crs){
+  # as.spatial.dsdata = function(dset, cnames, crs)
 
   # Extract detections and convert to SpatialPointsDataFrame
   points <- SpatialPointsDataFrame(
@@ -70,13 +69,13 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   ep <- as.data.frame(segdata(dset)[, paste0("end.", cnames)])
   colnames(sp) <- cnames
   colnames(ep) <- cnames
-  lilist <- lapply(1:nrow(sp), function(k) {
+  lilist <- lapply(seq_len(nrow(sp)), function(k) {
     Lines(list(Line(rbind(sp[k, ], ep[k, ]))), ID = k)
   })
 
   spl <- SpatialLines(lilist, proj4string = crs)
   df <- as.data.frame(segdata(dset))[, setdiff(names(segdata(dset)), c(paste0("start.", cnames), paste0("end.", cnames)))]
-  rownames(df) <- 1:nrow(df)
+  rownames(df) <- seq_len(nrow(df))
   samplers <- SpatialLinesDataFrame(spl, data = df)
 
   # Return detections ("points") and effort ("samplers")

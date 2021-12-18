@@ -1,7 +1,7 @@
 ---
 title: "LGCPs - Multiple Likelihoods"
 author: "Fabian E. Bachl"
-date: "`r Sys.Date()`"
+date: "Generated on `r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{LGCPs - Multiple Likelihoods}
@@ -33,6 +33,7 @@ Load libraries
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(inlabru)
 library(INLA)
+library(ggplot2)
 ```
 
 Get the data

@@ -8,17 +8,22 @@
 \usage{
 index_eval(...)
 
-\method{index_eval}{component}(component, ...)
+\method{index_eval}{component}(component, inla_f, ...)
 
-\method{index_eval}{component_list}(components, ...)
+\method{index_eval}{component_list}(components, inla_f, ...)
 }
 \arguments{
 \item{...}{Unused.}
 
 \item{component}{A component.}
+
+\item{inla_f}{logical; when \code{TRUE}, must result in
+values compatible with \code{INLA::f(...)}
+an specification and corresponding \code{INLA::inla.stack(...)} constructions.}
 }
 \value{
-a list of inla-compatible indices into the latent variables
+a list of indices into the latent variables compatible with the
+component mapper.
 }
 \description{
 Indexes into to the components

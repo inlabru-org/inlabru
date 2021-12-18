@@ -21,7 +21,8 @@ knitr::opts_chunk$set(
 [![CRAN Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
 [![R build status](https://github.com/inlabru-org/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![R code coverage status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
-[![Codecov test coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://codecov.io/gh/inlabru-org/inlabru?branch=devel)
+[![lintr status](https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
+[![Codecov test coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/inlabru-org/inlabru?branch=devel)
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial modeling using integrated nested Laplace approximation via the [R-INLA package](https://www.r-inla.org).
@@ -80,11 +81,18 @@ matern <- inla.spde2.pcmatern(gorillas$mesh,
                               prior.range = c(0.01, 0.01))
 cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 # Fit LGCP model
-fit <- lgcp(cmp,
-            data = gorillas$nests,
-            samplers = gorillas$boundary,
-            domain = list(coordinates = gorillas$mesh),
-            options = list(control.inla = list(int.strategy = "eb")))
+# This particular bru+like combination has a shortcut function lgcp() as well
+fit <- bru(
+  components = cmp,
+  like(
+    formula = coordinates ~ .,
+    family = "cp",
+    data = gorillas$nests,
+    samplers = gorillas$boundary,
+    domain = list(coordinates = gorillas$mesh)
+  ),
+  options = list(control.inla = list(int.strategy = "eb"))
+)
 
 # Predict Gorilla nest intensity
 lambda <- predict(fit,
@@ -98,4 +106,7 @@ ggplot() +
   coord_equal() +
   ggtitle("Nest intensity per km squared")
 ```
-If you have an R installation with PROJ6/GDAL3, and INLA >= 20.06.18, and loading old spatial objects, you may need to apply the `rgdal::rebuild_CRS()` method on them before they are fully usable. The data objects in `inlabru` have been updated, so should not need this conversion anymore.
+If you have an R installation with PROJ6/GDAL3, and INLA >= 20.06.18, and
+loading old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
+method on them before they are fully usable. The data objects in `inlabru` have
+been updated, so should not need this conversion anymore.

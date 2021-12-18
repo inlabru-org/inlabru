@@ -9,26 +9,28 @@
 \arguments{
 \item{data}{A \link{SpatialPixels} object.}
 
-\item{...}{Arguments passed on to \link{geom_tile}.}
+\item{...}{Arguments passed on to \code{geom_tile}.}
 }
 \value{
-A \link{geom_tile} return value.
+A \code{geom_tile} return value.
 }
 \description{
-Uses \link{geom_point} to plot the pixel centers.
+Uses \code{geom_point} to plot the pixel centers.
+Requires the \code{ggplot2} package.
 }
 \examples{
+if (require("ggplot2", quietly = TRUE)) {
+  # Load Gorilla data
 
-# Load Gorilla data
+  data(gorillas, package = "inlabru")
 
-data(gorillas, package = "inlabru")
+  # Turn elevation covariate into SpatialPixels
+  pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
 
-# Turn elevation covariate into SpatialPixels
-pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
-
-# Plot the pixel centers
-ggplot() +
-  gg(pxl, size = 0.1)
+  # Plot the pixel centers
+  ggplot() +
+    gg(pxl, size = 0.1)
+}
 }
 \seealso{
 Other geomes for spatial data: 

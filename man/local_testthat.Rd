@@ -18,7 +18,7 @@
 local_testthat_assign(x, values, envir = parent.frame())
 
 local_testthat_tolerances(
-  tolerances = c(1e-05, 0.01, 0.1),
+  tolerances = c(1e-04, 0.01, 0.1),
   envir = parent.frame()
 )
 

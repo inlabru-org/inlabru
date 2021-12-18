@@ -94,7 +94,7 @@ test_that("bru: factor component", {
   )
   expect_equal(
     pr[, "sd"],
-    c(0.5700744, 0.5840021, 0.5656757),
+    c(0.4, 0.4, 0.4),
     tolerance = hitol
   )
 })

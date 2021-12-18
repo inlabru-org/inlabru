@@ -54,7 +54,7 @@ covdata.import <- function(dframe, colname, data) {
 
   value <- scale * result$summary.random$spde[, "mode", drop = FALSE]
 
-  depth <- make.covdata(mesh = data$mesh, values = value, mesh.coords = data$mesh.coords, time.coords = NULL)
+  make.covdata(mesh = data$mesh, values = value, mesh.coords = data$mesh.coords, time.coords = NULL)
 }
 
 
@@ -101,9 +101,7 @@ make.covariate <- function(cdata, method = NULL, ...) {
     return(function(loc) {
       method(cdata, loc)
     })
-  }
-
-  else if (class(cdata)[1] == "SpatialPolygonsDataFrame") {
+  } else if (class(cdata)[1] == "SpatialPolygonsDataFrame") {
     if (is.null(method)) {
       method <- shapefile.to.covariate
     }
@@ -156,8 +154,7 @@ get.value <- function(covariate, loc) {
 get.max <- function(covariate, loc = NULL) {
   if (is.null(loc)) {
     return(max(as.vector(covariate$values)))
-  }
-  else {
+  } else {
     vals <- get.value(covariate, loc)
     return(max(vals))
   }
@@ -176,8 +173,7 @@ get.max <- function(covariate, loc = NULL) {
 get.min <- function(covariate, loc = NULL) {
   if (is.null(loc)) {
     return(max(as.vector(covariate$values)))
-  }
-  else {
+  } else {
     vals <- get.value(covariate, loc)
     return(min(vals))
   }
@@ -229,7 +225,7 @@ get.smean <- function(covariate, loc = NULL, weights = NULL) {
   weights <- weights * Matrix::diag(INLA::inla.mesh.fem(covariate$mesh, order = 1)$c0)
   weights <- weights / sum(weights)
 
-  loc2 <- data.frame(covariate$mesh$loc[, 1:length(covariate$mesh.coords),
+  loc2 <- data.frame(covariate$mesh$loc[, seq_len(length(covariate$mesh.coords)),
     drop = FALSE
   ])
   colnames(loc2) <- covariate$mesh.coords

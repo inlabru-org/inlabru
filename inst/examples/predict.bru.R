@@ -1,5 +1,6 @@
 \donttest{
-if (bru_safe_inla(multicore = FALSE)) {
+if (bru_safe_inla(multicore = FALSE) &&
+    require("ggplot2", quietly = TRUE)) {
 
   # Load the Gorilla data
 

@@ -23,7 +23,7 @@ parameter of a model's SPDE component. Can also plot Matern correlation or covar
 }
 \examples{
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
 
   # Load 1D Poisson process data
 

@@ -20,18 +20,20 @@ pixelplot.mesh <- function(...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Load the Gorilla data
-#' data(gorillas, package = "inlabru")
+#' if (require("ggplot2", quietly = TRUE)) {
+#'   # Load the Gorilla data
+#'   data(gorillas, package = "inlabru")
 #'
-#' # Create a base map centered around the nests and plot the boundary as well
-#' # as the nests
-#' ggplot() +
-#'   gg(gorillas$boundary) +
-#'   gg(gorillas$nests, color = "white", size = 0.5)
-#' if (requireNamespace("ggmap", quietly = TRUE)) {
-#'   gmap(gorillas$nests, maptype = "satellite") +
-#'   gm(gorillas$boundary) +
-#'   gm(gorillas$nests, color = "white", size = 0.5)
+#'   # Create a base map centered around the nests and plot the boundary as well
+#'   # as the nests
+#'   ggplot() +
+#'     gg(gorillas$boundary) +
+#'     gg(gorillas$nests, color = "white", size = 0.5)
+#'   if (requireNamespace("ggmap", quietly = TRUE)) {
+#'     gmap(gorillas$nests, maptype = "satellite") +
+#'       gm(gorillas$boundary) +
+#'       gm(gorillas$nests, color = "white", size = 0.5)
+#'   }
 #' }
 #' }
 gmap <- function(data, ...) {
@@ -71,16 +73,17 @@ gmap <- function(data, ...) {
 #' @family geomes for Raster data
 #'
 #' @examples
+#' if (require("ggplot2", quietly = TRUE)) {
+#'   # Load Gorilla data
 #'
-#' # Load Gorilla data
+#'   data(gorillas, package = "inlabru")
 #'
-#' data(gorillas, package = "inlabru")
+#'   # Invoke ggplot and add geomes for the Gorilla nests and the survey boundary
 #'
-#' # Invoke ggplot and add geomes for the Gorilla nests and the survey boundary
-#'
-#' ggplot() +
-#'   gg(gorillas$boundary) +
-#'   gg(gorillas$nests)
+#'   ggplot() +
+#'     gg(gorillas$boundary) +
+#'     gg(gorillas$nests)
+#' }
 gg <- function(data, ...) {
   UseMethod("gg")
 }
@@ -107,13 +110,15 @@ gg <- function(data, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Load the Gorilla data
-#' data(gorillas, package = "inlabru")
+#' if (require("ggplot2", quietly = TRUE)) {
+#'   # Load the Gorilla data
+#'   data(gorillas, package = "inlabru")
 #'
-#' # Create a base map centered around the nests and plot the boundary as well as the nests
-#' gmap(gorillas$nests, maptype = "satellite") +
-#'   gm(gorillas$boundary) +
-#'   gm(gorillas$nests, color = "white", size = 0.5)
+#'   # Create a base map centered around the nests and plot the boundary as well as the nests
+#'   gmap(gorillas$nests, maptype = "satellite") +
+#'     gm(gorillas$boundary) +
+#'     gm(gorillas$nests, color = "white", size = 0.5)
+#' }
 #' }
 #'
 gm <- function(data, ...) {
@@ -125,32 +130,39 @@ gm <- function(data, ...) {
 #'
 #' Creates a tile geom for plotting a matrix
 #'
+#' Requires the `ggplot2` package.
+#'
 #' @name gg.matrix
 #' @export
-#' @import ggplot2
 #' @param data A `matrix` object.
-#' @param mapping a set of aesthetic mappings created by [aes] or [aes_]. These are passed on to [geom_tile].
-#' @param ... Arguments passed on to [geom_tile].
-#' @return A [geom_tile] with reversed y scale.
+#' @param mapping a set of aesthetic mappings created by `aes`. These are passed on to `geom_tile`.
+#' @param ... Arguments passed on to `geom_tile`.
+#' @return A `geom_tile` with reversed y scale.
 #' @family geomes for inla and inlabru predictions
 #'
+#' @importFrom rlang .data
 #' @examples
-#'
-#' A <- matrix(runif(100), nrow = 10)
-#' ggplot() +
-#'   gg(A)
+#' if (require("ggplot2", quietly = TRUE)) {
+#'   A <- matrix(runif(100), nrow = 10)
+#'   ggplot() +
+#'     gg(A)
+#' }
 gg.matrix <- function(data, mapping = NULL, ...) {
+  requireNamespace("ggplot2")
   A <- as.matrix(data)
-  grd <- expand.grid(row = 1:nrow(A), column = 1:ncol(A))
+  grd <- expand.grid(row = seq_len(nrow(A)), column = seq_len(ncol(A)))
   df <- data.frame(value = as.vector(A), grd)
 
-  dmap <- aes_string(x = "column", y = "row", fill = "value")
+  dmap <- ggplot2::aes(x = .data$column, y = .data$row, fill = .data$value)
 
   if (!is.null(mapping)) {
     dmap <- modifyList(dmap, mapping)
   }
 
-  ggp <- c(geom_tile(dmap, data = df, ...), scale_y_reverse())
+  ggp <- c(
+    ggplot2::geom_tile(dmap, data = df, ...),
+    ggplot2::scale_y_reverse()
+  )
 }
 
 
@@ -158,9 +170,10 @@ gg.matrix <- function(data, mapping = NULL, ...) {
 #'
 #' This geom constructor will simply call [gg.prediction] for the data provided.
 #'
+#' Requires the `ggplot2` package.
+#'
 #' @name gg.data.frame
 #' @export
-#' @import ggplot2
 #' @param ... Arguments passed on to [gg.prediction()].
 #' @return Concatenation of a `geom_line` value and optionally a `geom_ribbon` value.
 #' @family geomes for inla and inlabru predictions
@@ -186,13 +199,14 @@ gg.data.frame <- function(...) {
 #' Note: `gg.prediction` also understands the format of INLA-style posterior summaries, e.g.
 #' `fit$summary.fixed` for an inla object `fit`
 #'
+#' Requires the `ggplot2` package.
+#'
 #' @aliases gg.prediction
 #' @name gg.prediction
 #' @export
-#' @import ggplot2
 #' @importFrom utils modifyList
 #' @param data A prediction object, usually the result of a [predict.bru()] call.
-#' @param mapping a set of aesthetic mappings created by `aes` or `aes_`. These are passed on to [geom_line].
+#' @param mapping a set of aesthetic mappings created by `aes`. These are passed on to `geom_line`.
 #' @param ribbon If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.
 #' @param alpha The ribbons numeric alpha level in `[0,1]`.
 #' @param bar If TRUE plot boxplot-style summary for each variable.
@@ -202,6 +216,7 @@ gg.data.frame <- function(...) {
 #' @example inst/examples/gg.prediction.R
 
 gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar = FALSE, ...) {
+  requireNamespace("ggplot2")
   if (all(c("0.025quant", "0.975quant") %in% names(data))) {
     names(data)[names(data) == "0.975quant"] <- "q0.975"
     names(data)[names(data) == "0.025quant"] <- "q0.025"
@@ -226,26 +241,84 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
     )
 
     geom <- c(
-      geom_point(data = data, mapping = aes_string(x = "variable", y = "summary", color = "variable"), shape = 95, size = 0), # Fake ylab
-      geom_segment(data = data, mapping = aes_string(y = lqname, yend = uqname, x = "variable", xend = "variable", color = "variable"), size = sz)
+      ggplot2::geom_point(
+        data = data,
+        mapping = ggplot2::aes(
+          x = .data$variable,
+          y = .data$summary,
+          color = .data$variable
+        ),
+        shape = 95, size = 0
+      ), # Fake ylab
+      ggplot2::geom_segment(
+        data = data,
+        mapping = ggplot2::aes(
+          y = .data[[lqname]],
+          yend = .data[[uqname]],
+          x = .data$variable,
+          xend = .data$variable,
+          color = .data$variable
+        ),
+        size = sz
+      )
     )
 
     # Min and max sample
     if (all(c("smax", "smax") %in% names(data))) {
       geom <- c(
         geom,
-        geom_segment(data = data, mapping = aes_string(y = "smin", yend = "smax", x = "variable", xend = "variable", color = "variable"), size = 1),
-        geom_point(data = data, mapping = aes_string(x = "variable", y = "smax", color = "variable"), shape = 95, size = 5),
-        geom_point(data = data, mapping = aes_string(x = "variable", y = "smin", color = "variable"), shape = 95, size = 5)
+        ggplot2::geom_segment(
+          data = data,
+          mapping = ggplot2::aes(
+            y = .data$smin,
+            yend = .data$smax,
+            x = .data$variable,
+            xend = .data$variable,
+            color = .data$variable
+          ),
+          size = 1
+        ),
+        ggplot2::geom_point(
+          data = data,
+          mapping = ggplot2::aes(
+            x = .data$variable,
+            y = .data$smax,
+            color = .data$variable
+          ),
+          shape = 95, size = 5
+        ),
+        ggplot2::geom_point(
+          data = data,
+          mapping = ggplot2::aes(
+            x = .data$variable,
+            y = .data$smin,
+            color = .data$variable
+          ),
+          shape = 95, size = 5
+        )
       )
     }
 
     # Mean and median
     geom <- c(
       geom,
-      geom_point(data = data, mapping = aes_string(x = "variable", y = "mean"), color = "black", shape = 95, size = sz),
-      geom_point(data = data, mapping = aes_string(x = "variable", y = "median"), color = "black", shape = 20, size = med_sz),
-      coord_flip()
+      ggplot2::geom_point(
+        data = data,
+        mapping = ggplot2::aes(
+          x = .data$variable,
+          y = .data$mean
+        ),
+        color = "black", shape = 95, size = sz
+      ),
+      ggplot2::geom_point(
+        data = data,
+        mapping = ggplot2::aes(
+          x = .data$variable,
+          y = .data$median
+        ),
+        color = "black", shape = 20, size = med_sz
+      ),
+      ggplot2::coord_flip()
     )
   } else {
     if ("pdf" %in% names(data)) {
@@ -259,15 +332,15 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
       stop("Prediction has neither mean nor median or pdf as column. Don't know what to plot.")
     }
 
-    line.map <- aes_string(
-      x = names(data)[1],
-      y = y.str
+    line.map <- ggplot2::aes(
+      x = .data[[names(data)[1]]],
+      y = .data[[y.str]]
     )
 
-    ribbon.map <- aes_string(
-      x = names(data)[1],
-      ymin = lqname,
-      ymax = uqname
+    ribbon.map <- ggplot2::aes(
+      x = .data[[names(data)[1]]],
+      ymin = .data[[lqname]],
+      ymax = .data[[uqname]]
     )
 
     if (!is.null(mapping)) {
@@ -276,12 +349,12 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
 
     # Use line color for ribbon filling
     if ("colour" %in% names(line.map)) {
-      ribbon.map <- modifyList(ribbon.map, aes_string(fill = line.map[["colour"]]))
+      ribbon.map <- modifyList(ribbon.map, ggplot2::aes(fill = .data[[line.map[["colour"]]]]))
     }
 
-    geom <- geom_line(data = data, line.map, ...)
+    geom <- ggplot2::geom_line(data = data, line.map, ...)
     if (ribbon) {
-      geom <- c(geom, geom_ribbon(data = data, ribbon.map, alpha = alpha))
+      geom <- c(geom, ggplot2::geom_ribbon(data = data, ribbon.map, alpha = alpha))
     }
   }
   geom
@@ -289,40 +362,46 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
 
 #' Geom for SpatialPoints objects
 #'
-#' This function coerces the `SpatialPoints` into a `data.frame` and uses [geom_point]
-#' to plot the points.
+#' This function coerces the `SpatialPoints` into a `data.frame` and uses `geom_point`
+#' to plot the points. Requires the `ggplot2` package.
 #'
 #' @aliases gg.SpatialPoints
 #' @name gg.SpatialPoints
 #' @export
-#' @import ggplot2
 #' @param data A SpatialPoints object.
-#' @param mapping Aesthetic mappings created by [aes] or [aes_] used to update the default
-#'                mapping. The default mapping is `aes_string(x = coordnames(data)[1], y = coordnames(data)[2])`.
+#' @param mapping Aesthetic mappings created by `aes` used to update the default
+#'                mapping. The default mapping is
+#'                `ggplot2::aes(x = .data[[coordnames(data)[1]]],
+#'                 y = .data[[coordnames(data)[2]]])`.
 #' @param crs A [CRS] object defining the coordinate system to project the data to before plotting.
-#' @param ... Arguments passed on to [geom_point].
-#' @return A [geom_point] return value
+#' @param ... Arguments passed on to `geom_point`.
+#' @return A `geom_point` return value
 #' @family geomes for spatial data
 #'
 #' @example inst/examples/gg.spatial.R
 
 gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
+  requireNamespace("ggplot2")
   if (!is.null(crs)) {
     data <- spTransform(data, crs)
   }
 
-  df <- data.frame(data)
+  df <- as.data.frame(data)
+  cnames <- coordnames(data)
+  if (is.null(cnames)) {
+    cnames <- c("x", "y")
+  }
 
-  dmap <- aes_string(
-    x = coordnames(data)[1],
-    y = coordnames(data)[2]
+  dmap <- ggplot2::aes(
+    x = .data[[cnames[1]]],
+    y = .data[[cnames[2]]]
   )
 
   if (!is.null(mapping)) {
     dmap <- modifyList(dmap, mapping)
   }
 
-  geom_point(data = df, mapping = dmap, ...)
+  ggplot2::geom_point(data = df, mapping = dmap, ...)
 }
 
 #' Geom for SpatialLines objects
@@ -330,19 +409,19 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @description
 #'
 #' Extracts start and end points of the lines and calls `geom_segment` to plot
-#' lines between them.
+#' lines between them. Requires the `ggplot2` package.
 #'
 #' @aliases gg.SpatialLines
 #' @name gg.SpatialLines
 #' @export
-#' @import ggplot2
 #' @param data A `SpatialLines` or `SpatialLinesDataFrame` object.
 #' @param mapping Aesthetic mappings created by `ggplot2::aes` or `ggplot2::aes_`
 #'                used to update the default
-#'                mapping. The default mapping is `aes_string(x = coordnames(data)[1],
-#'                y = coordnames(data)[2],
-#'                xend = paste0("end.", coordnames(data)[1]),
-#'                yend = paste0("end.", coordnames(data)[2]))`.
+#'                mapping. The default mapping is
+#'                `ggplot2::aes(x = .data[[coordnames(data)[1]]],
+#'                     y = .data[[coordnames(data)[2]]],
+#'                     xend = .data[[paste0("end.", coordnames(data)[1])]],
+#'                     yend = .data[[paste0("end.", coordnames(data)[2])]])`.
 #' @param crs A `CRS` object defining the coordinate system to project the data
 #'   to before plotting.
 #' @param ... Arguments passed on to `ggplot2::geom_segment`.
@@ -351,6 +430,7 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @example inst/examples/gg.spatial.R
 
 gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
+  requireNamespace("ggplot2")
   if (!is.null(crs)) {
     data <- spTransform(data, crs)
   }
@@ -385,42 +465,44 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
             },
             0
           )
-        ), , drop = FALSE]
+        ), ,
+        drop = FALSE
+      ]
     )
   }
-  dmap <- aes_string(
-    x = cnames[1],
-    y = cnames[2],
-    xend = paste0("end.", cnames[1]),
-    yend = paste0("end.", cnames[2])
+  dmap <- ggplot2::aes(
+    x = .data[[cnames[1]]],
+    y = .data[[cnames[2]]],
+    xend = .data[[paste0("end.", cnames[1])]],
+    yend = .data[[paste0("end.", cnames[2])]]
   )
 
   if (!is.null(mapping)) {
     dmap <- modifyList(dmap, mapping)
   }
 
-  geom_segment(data = df, mapping = dmap, ...)
+  ggplot2::geom_segment(data = df, mapping = dmap, ...)
 }
 
 #' Geom for SpatialPolygons objects
 #'
-#' Uses the `fortify()` function to turn the `SpatialPolygons` objects into a
+#' Uses the `ggplot2::fortify()` function to turn the `SpatialPolygons` objects into a
 #' `data.frame`. Then
-#' calls [geom_polygon] to plot the polygons.
+#' calls `geom_polygon` to plot the polygons. Requires the `ggplot2` package.
 #'
 #'
 #' @aliases gg.SpatialPolygons
 #' @name gg.SpatialPolygons
 #' @export
-#' @import ggplot2
 #' @param data A `SpatialPolygons` object.
-#' @param mapping Aesthetic mappings created by `aes` or `aes_` used to update the default
+#' @param mapping Aesthetic mappings created by `aes` used to update the default
 #'                mapping. The default mapping is
-#'                `aes_string(x = "long", y = "lat", group = "group")`.
+#'                `ggplot2::aes(x = long, y = lat, group = group)`.
 #' @param crs A `CRS` object defining the coordinate system to project the data to before plotting.
-#' @param color Filling color for the polygons.
-#' @param alpha Alpha level for polygon filling.
 #' @param ... Arguments passed on to `geom_polypath`.
+#' Unless specified by the user,
+#' the arguments `colour = "black"` (polygon colour) and
+#' `alpha = 0.1` (Alpha level for polygon filling).
 #' @return A `ggpolypath::geom_polypath` object.
 #' @details Requires the `ggpolypath` package to ensure proper plotting, since
 #'   the `ggplot::geom_polygon` function doesn't always handle geometries with
@@ -428,50 +510,66 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R
 
-gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, color = "black", alpha = NULL, ...) {
+gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
+  requireNamespace("ggplot2")
   if (!requireNamespace("ggpolypath", quietly = TRUE)) {
     stop("The 'ggpolypath' package is required for SpatialPolygons plotting, but it is not installed.")
   }
   if (!is.null(crs)) {
-    data <- spTransform(data, crs)
+    data <- sp::spTransform(data, crs)
   }
-  df <- fortify(data)
+  df <- ggplot2::fortify(data)
+  cnames <- names(df)[1:2]
   if (requireNamespace("ggpolypath", quietly = TRUE)) {
-    dmap <- aes_string(x = "long", y = "lat", group = "group")
+    dmap <- ggplot2::aes(
+      x = .data[[cnames[1]]],
+      y = .data[[cnames[2]]],
+      group = .data[["group"]]
+    )
   } else {
-    dmap <- aes_string(x = "long", y = "lat", group = "id", subgroup = "hole")
-  }
-
-  if (!("alpha" %in% names(dmap)) & is.null(alpha)) {
-    alpha <- 0.1
-  }
-  if (!("color" %in% names(dmap)) & is.null(color)) {
-    color <- "black"
+    dmap <- ggplot2::aes(
+      x = .data[[cnames[1]]],
+      y = .data[[cnames[2]]],
+      group = .data[["id"]],
+      subgroup = .data[["hole"]]
+    )
   }
 
   if (!is.null(mapping)) {
     dmap <- modifyList(dmap, mapping)
   }
 
+  params = list(...)
+  arg = list(data = df,
+             mapping = dmap)
+
+  if (!any(names(params) %in% c("colour", "color"))) {
+    arg$colour <- "black"
+  }
+  if (!any(names(params) %in% "alpha")) {
+    arg$alpha <- 0.1
+  }
+  arg = modifyList(arg, params)
+
   if (requireNamespace("ggpolypath", quietly = TRUE)) {
-    ggpolypath::geom_polypath(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+    do.call(ggpolypath::geom_polypath, arg)
   } else {
-    geom_polygon(data = df, mapping = dmap, alpha = alpha, color = color, ...)
+    do.call(ggplot2::geom_polygon, arg)
   }
 }
 
 #' Geom for SpatialGridDataFrame objects
 #'
-#' Coerces input SpatialGridDataFrame to SpatialPixelsDataFrame and calls
-#' gg.SpatialPixelDataFrame to plot it.
+#' Coerces input `SpatialGridDataFrame` to `SpatialPixelsDataFrame` and calls
+#' [gg.SpatialPixelsDataFrame()] to plot it.
+#' Requires the `ggplot2` package.
 #'
 #' @aliases gg.SpatialGridDataFrame
 #' @name gg.SpatialGridDataFrame
 #' @export
-#' @import ggplot2
 #' @param data A SpatialGridDataFrame object.
-#' @param ... Arguments passed on to gg.SpatialPixelsDataFrame().
-#' @return A [geom_tile] value.
+#' @param ... Arguments passed on to [gg.SpatialPixelsDataFrame()].
+#' @return A `geom_tile` value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R
 
@@ -482,20 +580,20 @@ gg.SpatialGridDataFrame <- function(data, ...) {
 
 #' Geom for SpatialPixelsDataFrame objects
 #'
-#' Coerces input SpatialPixelsDataFrame to data.frame and uses [geom_tile] to plot it.
+#' Coerces input SpatialPixelsDataFrame to data.frame and uses `geom_tile` to plot it.
+#' Requires the `ggplot2` package.
 #'
 #' @aliases gg.SpatialPixelsDataFrame
 #' @name gg.SpatialPixelsDataFrame
 #' @export
-#' @import ggplot2
 #' @param data A SpatialPixelsDataFrame object.
-#' @param mapping Aesthetic mappings created by [aes] or [aes_] used to update the default
-#'                mapping. The default mapping is `aes_string(x = coordnames(data)[1],
-#'                y = coordnames(data)[2], fill = names(data)[[1]])`.
+#' @param mapping Aesthetic mappings created by `aes` used to update the default
+#'                mapping. The default mapping is `ggplot2::aes(x = .data[[coordnames(data)[1]]],
+#'                y = .data[[coordnames(data)[2]]], fill = .data[[names(data)[[1]]]])`.
 #' @param crs A [CRS] object defining the coordinate system to project the data to before plotting.
 #' @param mask A SpatialPolygon defining the region that is plotted.
-#' @param ... Arguments passed on to [geom_tile].
-#' @return A [geom_tile] return value.
+#' @param ... Arguments passed on to `geom_tile`.
+#' @return A `geom_tile` return value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R
 
@@ -513,22 +611,22 @@ gg.SpatialPixelsDataFrame <- function(data,
   df <- as.data.frame(data)
 
   if (length(names(data)) == 0) {
-    dmap <- aes_string(
-      x = coordnames(data)[1],
-      y = coordnames(data)[2]
+    dmap <- ggplot2::aes(
+      x = .data[[coordnames(data)[1]]],
+      y = .data[[coordnames(data)[2]]]
     )
   } else {
-    dmap <- aes_string(
-      x = coordnames(data)[1],
-      y = coordnames(data)[2],
-      fill = names(data)[[1]]
+    dmap <- ggplot2::aes(
+      x = .data[[coordnames(data)[1]]],
+      y = .data[[coordnames(data)[2]]],
+      fill = .data[[names(data)[[1]]]]
     )
   }
 
   if (!is.null(mapping)) {
     dmap <- modifyList(dmap, mapping)
   }
-  gm <- geom_tile(data = df, mapping = dmap, ...)
+  gm <- ggplot2::geom_tile(data = df, mapping = dmap, ...)
 
   gm
 }
@@ -536,28 +634,29 @@ gg.SpatialPixelsDataFrame <- function(data,
 
 #' Geom for SpatialPixels objects
 #'
-#' Uses [geom_point] to plot the pixel centers.
+#' Uses `geom_point` to plot the pixel centers.
+#' Requires the `ggplot2` package.
 #'
 #' @aliases gg.SpatialPixels
 #' @name gg.SpatialPixels
 #' @export
-#' @import ggplot2
 #' @param data A [SpatialPixels] object.
-#' @param ... Arguments passed on to [geom_tile].
-#' @return A [geom_tile] return value.
+#' @param ... Arguments passed on to `geom_tile`.
+#' @return A `geom_tile` return value.
 #' @family geomes for spatial data
 #' @examples
+#' if (require("ggplot2", quietly = TRUE)) {
+#'   # Load Gorilla data
 #'
-#' # Load Gorilla data
+#'   data(gorillas, package = "inlabru")
 #'
-#' data(gorillas, package = "inlabru")
+#'   # Turn elevation covariate into SpatialPixels
+#'   pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
 #'
-#' # Turn elevation covariate into SpatialPixels
-#' pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
-#'
-#' # Plot the pixel centers
-#' ggplot() +
-#'   gg(pxl, size = 0.1)
+#'   # Plot the pixel centers
+#'   ggplot() +
+#'     gg(pxl, size = 0.1)
+#' }
 gg.SpatialPixels <- function(data, ...) {
   gg(SpatialPoints(data), ...)
 }
@@ -568,17 +667,20 @@ gg.SpatialPixels <- function(data, ...) {
 #'
 #' @description
 #'
-#' This function extracts the graph of an inla.mesh object and uses [geom_line] to visualize
+#' This function extracts the graph of an inla.mesh object and uses `geom_line` to visualize
 #' the graph's edges. Alternatively, if the `color` argument is provided, interpolates the colors
-#' across for a set of SpatialPixels covering the mesh area and calls gg.SpatialPixelDataFrame()
+#' across for a set of SpatialPixels covering the mesh area and calls [gg.SpatialPixelsDataFrame()]
 #' to plot the interpolation.
+#' Requires the `ggplot2` package.
 #'
 #' @aliases gg.inla.mesh
 #' @name gg.inla.mesh
 #' @export
-#' @import ggplot2
+
 #' @param data An `INLA::inla.mesh` object.
-#' @param color A vector of scalar values to fill the mesh with colors. The length of the vector mus correspond to the number of mesh vertices.
+#' @param color A vector of scalar values to fill the mesh with colors.
+#' The length of the vector mus correspond to the number of mesh vertices.
+#' The alternative name `colour` is also recognised.
 #' @param alpha A vector of scalar values setting the alpha value of the colors provided.
 #' @param edge.color Color of the mesh edges.
 #' @param interior If TRUE, plot the interior boundaries of the mesh.
@@ -590,7 +692,8 @@ gg.SpatialPixels <- function(data, ...) {
 #' @param ny Number of pixels in y direction (when plotting using the color parameter).
 #' @param mask A SpatialPolygon defining the region that is plotted.
 #' @param ... ignored arguments (S3 generic compatibility).
-#' @return [geom_line] return values or, if the color argument is used, the values of gg.SpatialPixelDataFrame().
+#' @return `geom_line` return values or, if the color argument is used, the
+#'   values of [gg.SpatialPixelsDataFrame()].
 #' @family geomes for meshes
 #' @example inst/examples/gg.inla.mesh.R
 
@@ -606,6 +709,10 @@ gg.inla.mesh <- function(data,
                          mask = NULL,
                          nx = 500, ny = 500,
                          ...) {
+  requireNamespace("ggplot2")
+  if (is.null(color) && ("colour" %in% names(list(...)))) {
+    color <- list(...)[["colour"]]
+  }
   if (!is.null(color)) {
     px <- pixels(data, nx = nx, ny = ny)
     A <- INLA::inla.spde.make.A(data, px)
@@ -633,26 +740,32 @@ gg.inla.mesh <- function(data,
     )
 
     colnames(df) <- c("x", "y", "xend", "yend")
-    mp <- aes_string(x = "x", y = "y", xend = "xend", yend = "yend")
-    msh <- geom_segment(data = df, mapping = mp, color = edge.color)
+    mp <- ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend)
+    msh <- ggplot2::geom_segment(data = df, mapping = mp, color = edge.color)
 
     # Outer boundary
     if (exterior) {
-      df <- data.frame(data$loc[data$segm$bnd$idx[, 1], 1:2], data$loc[data$segm$bnd$idx[, 2], 1:2])
+      df <- data.frame(
+        data$loc[data$segm$bnd$idx[, 1], 1:2],
+        data$loc[data$segm$bnd$idx[, 2], 1:2]
+      )
       colnames(df) <- c("x", "y", "xend", "yend")
-      bnd <- geom_segment(data = df, mapping = mp, color = ext.color)
+      bnd <- ggplot2::geom_segment(data = df, mapping = mp, color = ext.color)
     } else {
       bnd <- NULL
     }
 
     if (interior) {
       # Interior boundary
-      df <- data.frame(data$loc[data$segm$int$idx[, 1], 1:2], data$loc[data$segm$int$idx[, 2], 1:2])
+      df <- data.frame(
+        data$loc[data$segm$int$idx[, 1], 1:2],
+        data$loc[data$segm$int$idx[, 2], 1:2]
+      )
       colnames(df) <- c("x", "y", "xend", "yend")
       if (nrow(df) == 0) {
         int <- NULL
       } else {
-        int <- geom_segment(data = df, mapping = mp, color = int.color)
+        int <- ggplot2::geom_segment(data = df, mapping = mp, color = int.color)
       }
     } else {
       int <- NULL
@@ -666,29 +779,26 @@ gg.inla.mesh <- function(data,
 
 #' Geom for inla.mesh.1d objects
 #'
-#' This function generates a [geom_point] object showing the knots (vertices)
+#' This function generates a `geom_point` object showing the knots (vertices)
 #' of a 1D mesh.
+#' Requires the `ggplot2` package.
 #'
 #' @aliases gg.inla.mesh.1d
 #' @name gg.inla.mesh.1d
 #' @export
-#' @import ggplot2
 #' @param data An inla.mesh.1d object.
-#' @param mapping aesthetic mappings created by [aes] or [aes_]. These are passed on to [geom_point].
+#' @param mapping aesthetic mappings created by `aes`. These are passed on to `geom_point`.
 #' @param y Single or vector numeric defining the y-coordinates of the mesh knots to plot.
 #' @param shape Shape of the knot markers.
-#' @param ... parameters passed on to [geom_point].
-#' @return An obbject generated by [geom_point].
+#' @param ... parameters passed on to `geom_point`.
+#' @return An object generated by `geom_point`.
 #' @family geomes for meshes
 #'
 #' @examples
 #' \donttest{
 #' # Some features use the INLA package.
-#' if (require("INLA", quietly = TRUE)) {
-#'
-#'   # Load INLA
-#'
-#'   library(INLA)
+#' if (require("INLA", quietly = TRUE) &&
+#'   require("ggplot2", quietly = TRUE)) {
 #'
 #'   # Create a 1D mesh
 #'
@@ -706,34 +816,35 @@ gg.inla.mesh <- function(data,
 #' }
 #' }
 #'
-gg.inla.mesh.1d <- function(data, mapping = aes_string("x", "y"), y = 0, shape = 4, ...) {
+gg.inla.mesh.1d <- function(data, mapping = ggplot2::aes(.data[["x"]], .data[["y"]]),
+                            y = 0, shape = 4, ...) {
   df <- data.frame(x = data$loc, y = y)
-  geom_point(data = df, mapping = mapping, shape = shape, ...)
+  ggplot2::geom_point(data = df, mapping = mapping, shape = shape, ...)
 }
 
 
 
 #' Geom for RasterLayer objects
 #'
-#' This function takes a RasterLayer object, converts it into a SpatialPixelsDataFrame and
-#' uses [geom_tile] to plot the data.
+#' This function takes a RasterLayer object, converts it into a
+#' `SpatialPixelsDataFrame` and uses `geom_tile` to plot the data.
 #'
-#' This function requires the `raster` package.
+#' This function requires the `raster` and `ggplot2` packages.
 #'
 #' @aliases gg.RasterLayer
 #' @name gg.RasterLayer
 #' @export
-#' @import ggplot2
 #' @param data A RasterLayer object.
-#' @param mapping aesthetic mappings created by [aes] or [aes_]. These are passed on to [geom_tile].
-#' @param ... Arguments passed on to [geom_tile].
-#' @return An object returned by [geom_tile]
+#' @param mapping aesthetic mappings created by `aes`. These are passed on to `geom_tile`.
+#' @param ... Arguments passed on to `geom_tile`.
+#' @return An object returned by `geom_tile`
 #' @family geomes for Raster data
 #'
 #' @examples
 #' # Some features require the raster and spatstat.data packages.
 #' if (require("spatstat.data", quietly = TRUE) &&
-#'   require("raster", quietly = TRUE)) {
+#'   require("raster", quietly = TRUE) &&
+#'   require("ggplot2", quietly = TRUE)) {
 #'
 #'   # Load Gorilla data
 #'   data("gorillas", package = "spatstat.data")
@@ -747,13 +858,14 @@ gg.inla.mesh.1d <- function(data, mapping = aes_string("x", "y"), y = 0, shape =
 #'   ggplot() +
 #'     gg(elev)
 #' }
-gg.RasterLayer <- function(data, mapping = aes_string(x = "x", y = "y", fill = "layer"), ...) {
+gg.RasterLayer <- function(data, mapping = ggplot2::aes(x = .data[["x"]], y = .data[["y"]], fill = .data[["layer"]]), ...) {
+  requireNamespace("ggplot2")
   requireNamespace("raster")
   spdf <- as(data, "SpatialPixelsDataFrame")
   df <- as.data.frame(spdf)
   # head(r.df)
-  # g <- ggplot(r.df, aes(x=x, y=y)) + geom_tile(aes(fill = layer)) + coord_equal()
-  geom_tile(data = df, mapping = mapping, ...)
+  # g <- ggplot(r.df, ggplot2::aes(x=x, y=y)) + geom_tile(ggplot2::aes(fill = layer)) + coord_equal()
+  ggplot2::geom_tile(data = df, mapping = mapping, ...)
 }
 
 #' Plot method for posterior marginals estimated by bru
@@ -764,9 +876,10 @@ gg.RasterLayer <- function(data, mapping = aes_string(x = "x", y = "y", fill = "
 #' all random effects in the model. This function serves to access and plot the posterior
 #' densities in a convenient way.
 #'
+#' Requires the `ggplot2` package.
+#'
 #' @method plot bru
 #' @export
-#' @import ggplot2
 #' @param x a fitted [bru()] model.
 #' @param ... A character naming the effect to plot, e.g. "Intercept". For random
 #' effects, adding `index = ...` plots the density for a single component of the
@@ -775,17 +888,17 @@ gg.RasterLayer <- function(data, mapping = aes_string(x = "x", y = "y", fill = "
 #'
 #'
 #' @examples
-#'
 #' \dontrun{
+#' if (require("ggplot2", quietly = TRUE)) {
+#'   # Generate some data and fit a simple model
+#'   input.df <- data.frame(x = cos(1:10))
+#'   input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
+#'   fit <- bru(y ~ x, family = "gaussian", data = input.df)
+#'   summary(fit)
 #'
-#' # Generate some data and fit a simple model
-#' input.df <- data.frame(x = cos(1:10))
-#' input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
-#' fit <- bru(y ~ x, family = "gaussian", data = input.df)
-#' summary(fit)
-#'
-#' # Plot the posterior of the model's x-effect
-#' plot(fit, "x")
+#'   # Plot the posterior of the model's x-effect
+#'   plot(fit, "x")
+#' }
 #' }
 #'
 plot.bru <- function(x, ...) {
@@ -794,11 +907,12 @@ plot.bru <- function(x, ...) {
 
 #' Plot prediction using ggplot2
 #'
-#' Generates a base ggplot2 using [ggplot] and adds a geom for input `x` using [gg].
+#' Generates a base ggplot2 using `ggplot()` and adds a geom for input `x` using [gg].
+#'
+#' Requires the `ggplot2` package.
 #'
 #' @export
 #' @method plot prediction
-#' @import ggplot2
 #' @param x a prediction object.
 #' @param y Ignored argument but required for S3 compatibility.
 #' @param ... Arguments passed on to [gg.prediction].
@@ -806,11 +920,13 @@ plot.bru <- function(x, ...) {
 #' @example inst/examples/gg.prediction.R
 
 plot.prediction <- function(x, y = NULL, ...) {
-  ggplot() +
+  requireNamespace("ggplot2")
+  ggplot2::ggplot() +
     gg(x, ...)
 }
 
 plot.prediction_old <- function(..., property = "median") {
+  requireNamespace("ggplot2")
   args <- list(...)
   pnames <- sapply(substitute(list(...))[-1], deparse)
 
@@ -818,12 +934,12 @@ plot.prediction_old <- function(..., property = "median") {
   data <- args[[1]]
 
   if (attr(data, "type") == "full") {
-    df <- do.call(rbind, lapply(1:length(args), function(k) {
+    df <- do.call(rbind, lapply(seq_along(args), function(k) {
       apr <- approx(args[[k]]$x, args[[k]]$y, xout = seq(range(args[[k]]$x)[1], range(args[[k]]$x)[2], length.out = 1000))
       data.frame(effect = pnames[[k]], x = apr$x, y = 0.1 * apr$y / max(apr$y))
     }))
 
-    qtl <- do.call(rbind, lapply(1:length(args), function(k) {
+    qtl <- do.call(rbind, lapply(seq_along(args), function(k) {
       data.frame(
         y = args[[k]]$quantiles,
         yend = args[[k]]$quantiles,
@@ -832,7 +948,7 @@ plot.prediction_old <- function(..., property = "median") {
       )
     }))
 
-    expec <- do.call(rbind, lapply(1:length(args), function(k) {
+    expec <- do.call(rbind, lapply(seq_along(args), function(k) {
       data.frame(
         y = args[[k]]$mean,
         yend = args[[k]]$mean,
@@ -843,7 +959,7 @@ plot.prediction_old <- function(..., property = "median") {
       )
     }))
 
-    sdev <- do.call(rbind, lapply(1:length(args), function(k) {
+    sdev <- do.call(rbind, lapply(seq_along(args), function(k) {
       data.frame(
         y = args[[k]]$mean + args[[k]]$sd,
         yend = args[[k]]$mean - args[[k]]$sd,
@@ -852,7 +968,7 @@ plot.prediction_old <- function(..., property = "median") {
       )
     }))
 
-    jit <- do.call(rbind, lapply(1:length(args), function(k) {
+    jit <- do.call(rbind, lapply(seq_along(args), function(k) {
       data.frame(
         y = INLA::inla.rmarginal(5000, args[[k]]),
         n = 500,
@@ -860,7 +976,7 @@ plot.prediction_old <- function(..., property = "median") {
       )
     }))
 
-    txt_size <- (5 / 14) * theme_get()$text$size
+    txt_size <- (5 / 14) * ggplot2::theme_get()$text$size
 
     # Function for formating numbers
     fmt <- function(x) {
@@ -882,62 +998,88 @@ plot.prediction_old <- function(..., property = "median") {
     cvy <- NULL
     effect <- NULL
 
-    plt <- ggplot() +
-      geom_violin(data = df, aes(x = as.numeric(effect), y = x, weight = y, fill = effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
-      geom_text(data = qtl, aes(x = xend, y = y, label = fmt(y)), size = txt_size, family = "", vjust = -0.5, hjust = 1.1) +
-      geom_text(data = expec, aes(x = xend, y = y, label = paste0(fmt(y), " +/- ", fmt(sdy), " [", round(100 * cvy), "%]")), size = txt_size, family = "", vjust = -0.5, angle = 90) +
-      geom_segment(data = qtl, aes(x = x, xend = xend, y = y, yend = yend), linetype = 1, alpha = 0.2) +
-      geom_segment(data = expec, aes(x = x, xend = xend, y = y, yend = yend), alpha = 0.5, linetype = 3) +
-      geom_segment(data = sdev, aes(x = x, xend = xend, y = y, yend = yend), alpha = 0.5, linetype = 1) +
-      geom_point(data = jit, aes(x = as.numeric(effect), y = y), shape = 95, size = 3, alpha = 0.05) +
-      ylab(paste0("integral_{", paste(ggopts$idims, collapse = ","), "} (", ggopts$predictor, ")")) +
-      guides(fill = FALSE) +
-      scale_x_continuous(name = "", breaks = 1:length(pnames), labels = pnames) +
-      scale_fill_brewer(palette = "YlOrRd", direction = -1) # YlOrRd, PuBu
+    plt <- ggplot2::ggplot() +
+      ggplot2::geom_violin(data = df, ggplot2::aes(x = as.numeric(effect), y = x, weight = y, fill = effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
+      ggplot2::geom_text(data = qtl, ggplot2::aes(x = xend, y = y, label = fmt(y)), size = txt_size, family = "", vjust = -0.5, hjust = 1.1) +
+      ggplot2::geom_text(data = expec, ggplot2::aes(x = xend, y = y, label = paste0(fmt(y), " +/- ", fmt(sdy), " [", round(100 * cvy), "%]")), size = txt_size, family = "", vjust = -0.5, angle = 90) +
+      ggplot2::geom_segment(data = qtl, ggplot2::aes(x = x, xend = xend, y = y, yend = yend), linetype = 1, alpha = 0.2) +
+      ggplot2::geom_segment(data = expec, ggplot2::aes(x = x, xend = xend, y = y, yend = yend), alpha = 0.5, linetype = 3) +
+      ggplot2::geom_segment(data = sdev, ggplot2::aes(x = x, xend = xend, y = y, yend = yend), alpha = 0.5, linetype = 1) +
+      ggplot2::geom_point(data = jit, ggplot2::aes(x = as.numeric(effect), y = y), shape = 95, size = 3, alpha = 0.05) +
+      ggplot2::ylab(paste0("integral_{", paste(ggopts$idims, collapse = ","), "} (", ggopts$predictor, ")")) +
+      ggplot2::guides(fill = FALSE) +
+      ggplot2::scale_x_continuous(name = "", breaks = seq_along(pnames), labels = pnames) +
+      ggplot2::scale_fill_brewer(palette = "YlOrRd", direction = -1) # YlOrRd, PuBu
 
     # This still causes a warning since the violin plot does not like the width argument
     # suppressWarnings(print(plt))
     return(plt)
-  }
-
-  else if (attr(data, "type") == "0d") {
+  } else if (attr(data, "type") == "0d") {
     dnames <- colnames(data)
-    ggp <- ggplot()
+    ggp <- ggplot2::ggplot()
 
     if ("summary" %in% names(attributes(data))) {
       smy <- attr(data, "summary")
-      ggp <- ggp + geom_ribbon(data = smy$inner.marg, ymin = 0, aes_string(x = dnames[1], ymax = dnames[2]), alpha = 0.1, colour = "grey")
+      ggp <- ggp + ggplot2::geom_ribbon(
+        data = smy$inner.marg, ymin = 0,
+        mapping = ggplot2::aes(
+          x = .data[[dnames[1]]],
+          ymax = .data[[dnames[2]]]
+        ),
+        alpha = 0.1, colour = "grey"
+      )
     }
 
-    ggp <- ggp + geom_path(data = data, aes_string(x = dnames[1], y = dnames[2]))
+    ggp <- ggp +
+      ggplot2::geom_path(
+        data = data,
+        mapping = ggplot2::aes(
+          x = .data[[dnames[1]]],
+          y = .data[[dnames[2]]]
+        )
+      )
 
     if (length(pnames) == 1) {
-      ggp <- ggp + guides(color = FALSE, fill = FALSE)
+      ggp <- ggp + ggplot2::guides(color = FALSE, fill = FALSE)
     }
 
     ggp
-  }
+  } else if (attr(data, "type") == "1d") {
+    data <- do.call(
+      rbind,
+      lapply(
+        seq_along(args),
+        function(k) {
+          data.frame(args[[k]],
+            Prediction = pnames[[k]]
+          )
+        }
+      )
+    )
 
-  else if (attr(data, "type") == "1d") {
-    data <- do.call(rbind, lapply(1:length(args), function(k) data.frame(args[[k]], Prediction = pnames[[k]])))
-
-    ggp <- ggplot(data = data) +
-      geom_ribbon(aes_string(x = ggopts$dims, ymin = "lq", ymax = "uq", fill = "Prediction"), alpha = 0.3) +
-      geom_line(aes_string(x = ggopts$dims, y = "median", color = "Prediction"), size = 1.1) +
-      xlab(ggopts$predictor) +
-      ylab(ggopts$predictor[2])
+    ggp <- ggplot2::ggplot(data = data) +
+      ggplot2::geom_ribbon(ggplot2::aes(
+        x = .data[[ggopts$dims]],
+        ymin = .data[["lq"]],
+        ymax = .data[["uq"]],
+        fill = "Prediction"
+      ), alpha = 0.3) +
+      ggplot2::geom_line(ggplot2::aes(
+        x = .data[[ggopts$dims]],
+        y = .data[["median"]],
+        color = "Prediction"
+      ), size = 1.1) +
+      ggplot2::xlab(ggopts$predictor) +
+      ggplot2::ylab(ggopts$predictor[2])
 
     # Show guide only for multiple graphs
     if (length(pnames) == 1) {
-      ggp <- ggp + guides(color = FALSE, fill = FALSE)
+      ggp <- ggp + ggplot2::guides(color = FALSE, fill = FALSE)
     }
 
     # Plot graph
     ggp
-  }
-
-
-  else if (attr(data, "type") == "spatial") {
+  } else if (attr(data, "type") == "spatial") {
     # ggplot() + gg.col(ggopts$data, color = data$mean) + scale_fill_gradientn(colours = topo.colors(100))
     pixelplot.mesh(mesh = ggopts$mesh, col = data[, property], property = property, ...)
   }
@@ -962,12 +1104,14 @@ plot.prediction_old <- function(..., property = "median") {
 #' <http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/>
 #'
 #' @examples
-#' df <- data.frame(x = 1:10, y = 1:10, z = 11:20)
-#' pl1 <- ggplot(data = df) +
-#'   geom_line(mapping = aes(x, y), color = "red")
-#' pl2 <- ggplot(data = df) +
-#'   geom_line(mapping = aes(x, z), color = "blue")
-#' multiplot(pl1, pl2, cols = 2)
+#' if (require("ggplot2", quietly = TRUE)) {
+#'   df <- data.frame(x = 1:10, y = 1:10, z = 11:20)
+#'   pl1 <- ggplot(data = df) +
+#'     geom_line(mapping = aes(x, y), color = "red")
+#'   pl2 <- ggplot(data = df) +
+#'     geom_line(mapping = aes(x, z), color = "blue")
+#'   multiplot(pl1, pl2, cols = 2)
+#' }
 #' @export
 #
 multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {

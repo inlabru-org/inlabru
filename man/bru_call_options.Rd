@@ -14,7 +14,6 @@ Construct a \code{bru_options} object including the default and global options,
 and converting deprecated option names.
 }
 \examples{
-
 \donttest{
 
 opts <- bru_call_options()

@@ -1264,7 +1264,7 @@ fm_crs_bounds_check <- function(x, bounds) {
     )
     > 0)
   } else {
-    ok <- rep(TRUE, nrow(x))
+    rep(TRUE, nrow(x))
   }
 }
 
@@ -1323,7 +1323,7 @@ fm_identical_CRS <- function(crs0, crs1, crsonly = FALSE) {
 #' @param \dots
 #' Potential additional arguments
 #' @seealso [fm_CRS()]
-#'
+#' @export
 fm_spTransform <- function(x, ...) {
   UseMethod("fm_spTransform")
 }
@@ -1773,7 +1773,7 @@ fm_as_inla_mesh_segment.SpatialLines <-
   function(sp, join = TRUE, grp = NULL, ...) {
     crs <- fm_sp_get_crs(sp)
     segm <- list()
-    for (k in 1:length(sp@lines)) {
+    for (k in seq_len(length(sp@lines))) {
       segm[[k]] <- fm_as_inla_mesh_segment(sp@lines[[k]],
         join = TRUE,
         crs = crs, ...
@@ -1781,7 +1781,7 @@ fm_as_inla_mesh_segment.SpatialLines <-
     }
     if (join) {
       if (missing(grp)) {
-        grp <- 1:length(segm)
+        grp <- seq_len(length(segm))
       }
       segm <- fm_internal_sp2segment_join(segm, grp = grp, closed = FALSE)
     }
@@ -1797,12 +1797,12 @@ fm_as_inla_mesh_segment.SpatialPolygons <-
   function(sp, join = TRUE, grp = NULL, ...) {
     crs <- fm_sp_get_crs(sp)
     segm <- list()
-    for (k in 1:length(sp@polygons)) {
+    for (k in seq_len(length(sp@polygons))) {
       segm[[k]] <- fm_as_inla_mesh_segment(sp@polygons[[k]], join = TRUE, crs = crs)
     }
     if (join) {
       if (missing(grp)) {
-        grp <- 1:length(segm)
+        grp <- seq_len(length(segm))
       }
       segm <- fm_internal_sp2segment_join(segm, grp = grp)
     }

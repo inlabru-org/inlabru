@@ -4,12 +4,14 @@
 \alias{evaluate_A}
 \title{Compute all A-matrices}
 \usage{
-evaluate_A(model, lhoods)
+evaluate_A(model, lhoods, inla_f)
 }
 \arguments{
 \item{model}{A \code{bru_model} object}
 
 \item{lhoods}{A \code{bru__like_list} object}
+
+\item{inla_f}{logical}
 }
 \description{
 Computes the A matrices for included components for each model likelihood

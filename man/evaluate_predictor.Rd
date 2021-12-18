@@ -27,7 +27,9 @@ the "matrix" format is used, otherwise "list".
 expression for a state.
 \item \code{"list"} A list where each column contains the evaluated predictor
 expression for a state.
-}
+}}
+
+\item{inla_f}{logical
 
 Default: "auto"}
 }
@@ -37,5 +39,10 @@ A list or matrix is returned, as specified by \code{format}
 \description{
 Evaluate component effects or expressions, based on a bru model and one or
 several states of the latent variables and hyperparameters.
+}
+\details{
+For each component, e.g. "name", the state values are available as
+\code{name_latent}, and arbitrary evaluation can be done with \code{name_eval(...)}, see
+\code{\link[=component_eval]{component_eval()}}.
 }
 \keyword{internal}

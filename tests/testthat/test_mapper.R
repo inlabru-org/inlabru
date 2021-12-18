@@ -66,7 +66,7 @@ test_that("Multi-mapper bru input", {
 
 test_that("User defined mappers", {
   # User defined mapper objects
-  
+
   ibm_amatrix.bm_test <- function(mapper, input, ...) {
     message("---- IBM_AMATRIX from inner environment ----")
     Matrix::sparseMatrix(
@@ -76,31 +76,33 @@ test_that("User defined mappers", {
       dims = c(length(input), mapper$n)
     )
   }
-  
+
   bm_test <- function(n, ...) {
     bru_mapper(
       list(n = n),
       new_class = "bm_test",
-      ibm_amatrix = ibm_amatrix.bm_test
+      methods = list(
+        ibm_amatrix = ibm_amatrix.bm_test
+      )
     )
   }
-  
+
   m <- bm_test(n = 20)
   cmp <- y ~ -1 + indep(x, model = "iid", mapper = m)
   mydata <- data.frame(y = rnorm(15) + 2 * (1:15), x = 1:15)
   expect_message(
-    {
+    object = {
       ibm_amatrix(m, mydata$x)
     },
     "---- IBM_AMATRIX from inner environment ----",
     label = "ibm_amatrix generic call"
   )
-  
+
   skip_on_cran()
   local_bru_safe_inla()
-  
+
   expect_message(
-    {
+    object = {
       fit <- bru(cmp, data = mydata, family = "gaussian")
     },
     "---- IBM_AMATRIX from inner environment ----",
@@ -112,9 +114,9 @@ test_that("User defined mappers", {
 test_that("User defined mappers 2", {
   # .S3method was unavailable in R 3.6!
   skip_if_not(utils::compareVersion("4", R.Version()$major) <= 0)
-  
+
   # User defined mapper objects
-  
+
   ibm_amatrix.bm_test <- function(mapper, input, ...) {
     message("---- IBM_AMATRIX from inner environment 2 ----")
     Matrix::sparseMatrix(
@@ -125,19 +127,19 @@ test_that("User defined mappers 2", {
     )
   }
   .S3method("ibm_amatrix", "bm_test", ibm_amatrix.bm_test)
-  
+
   bm_test <- function(n, ...) {
     bru_mapper(
       list(n = n),
       new_class = "bm_test"
     )
   }
-  
+
   m <- bm_test(n = 20)
   cmp <- y ~ -1 + indep(x, model = "iid", mapper = m)
   mydata <- data.frame(y = rnorm(15) + 2 * (1:15), x = 1:15)
   expect_message(
-    {
+    object = {
       ibm_amatrix(m, mydata$x)
     },
     "---- IBM_AMATRIX from inner environment 2 ----",
@@ -146,12 +148,133 @@ test_that("User defined mappers 2", {
 
   skip_on_cran()
   local_bru_safe_inla()
-  
+
   expect_message(
-    {
+    object = {
       fit <- bru(cmp, data = mydata, family = "gaussian")
     },
     "---- IBM_AMATRIX from inner environment 2 ----",
     label = "Non-interactive bru() call"
   )
+})
+
+
+
+test_that("mapper collection direct construction consistency", {
+  skip_on_cran()
+  local_bru_safe_inla()
+  set.seed(1234L)
+
+  mapper <- bru_mapper_collect(
+    list(
+      u = bru_mapper_index(4),
+      v = bru_mapper_index(4)
+    ),
+    hidden = TRUE
+  )
+  expect_equal(ibm_n(mapper), 8)
+  expect_equal(ibm_n(mapper, inla_f = TRUE), 4)
+  expect_equal(ibm_n(mapper, multi = 1), list(u = 4, v = 4))
+  expect_equal(ibm_values(mapper), seq_len(8))
+  expect_equal(ibm_values(mapper, inla_f = TRUE), seq_len(4))
+  expect_equal(
+    as.data.frame(ibm_values(mapper, multi = 1)),
+    list(u = seq_len(4), v = seq_len(4)),
+    ignore_attr = TRUE
+  )
+
+  list_data <- list(u = 1:3, v = 2:4)
+  A <- Matrix::bdiag(
+    Matrix::sparseMatrix(
+      i = 1:3,
+      j = 1:3,
+      x = 1,
+      dims = c(3, 4)
+    ),
+    Matrix::sparseMatrix(
+      i = 1:3,
+      j = 2:4,
+      x = 1,
+      dims = c(3, 4)
+    )
+  )
+  A <- as(A, "dgTMatrix")
+  expect_equal(ibm_amatrix(mapper, list_data), A)
+  expect_equal(
+    as(
+      ibm_amatrix(mapper, list_data[["u"]], inla_f = TRUE)[
+        , ibm_inla_subset(mapper),
+        drop = FALSE
+      ],
+      "dgTMatrix"
+    ),
+    as(A[
+      seq_along(list_data[["u"]]),
+      ibm_inla_subset(mapper),
+      drop = FALSE
+    ], "dgTMatrix")
+  )
+})
+
+
+test_that("mapper collection automatic construction consistency", {
+  local_bru_safe_inla()
+
+  data <- data.frame(val = 1:3, y = 1:3)
+
+  mapper <- bru_mapper_collect(
+    list(
+      u = bru_mapper_index(4),
+      v = bru_mapper_index(4)
+    ),
+    hidden = TRUE
+  )
+
+  cmp1 <- y ~
+  -1 +
+    indep(val,
+      model = "bym",
+      mapper = mapper,
+      graph = Matrix::Diagonal(4) + 1
+    )
+  # index mapper
+
+  cmp2 <- y ~
+  -1 +
+    indep(val,
+      model = "bym",
+      n = 4,
+      graph = Matrix::Diagonal(4) + 1
+    )
+  # inla.mesh.1d mapper
+
+  lik <- like(formula = y ~ ., data = data)
+
+  cmp1 <- component_list(cmp1, lhoods = list(lik))
+  cmp2 <- component_list(cmp2, lhoods = list(lik))
+
+  for (inla_f in c(FALSE, TRUE)) {
+    expect_identical(
+      ibm_n(cmp1$indep$mapper, inla_f = inla_f),
+      ibm_n(cmp2$indep$mapper, inla_f = inla_f)
+    )
+    expect_identical(
+      ibm_values(cmp1$indep$mapper, inla_f = inla_f),
+      ibm_values(cmp2$indep$mapper, inla_f = inla_f)
+    )
+    if (inla_f) {
+      input <- list(main = data$val,
+                    group = rep(1, 3),
+                    replicate = rep(1, 3))
+    } else {
+      input <- list(main = list(u = data$val),
+                    group = rep(1, 3),
+                    replicate = rep(1, 3))
+    }
+    expect_identical(
+      as.matrix(ibm_amatrix(cmp1$indep$mapper, input = input, inla_f = inla_f)),
+      as.matrix(ibm_amatrix(cmp2$indep$mapper, input = input, inla_f = inla_f))
+    )
+  }
+
 })

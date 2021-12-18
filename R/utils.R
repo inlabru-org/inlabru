@@ -176,9 +176,9 @@ eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
 
 
 #' Fill in missing values in Spatial grids
-#' 
+#'
 #' Computes nearest-available-value imputation for missing values in space
-#' 
+#'
 #' @param data A SpatialPointsDataFrame, SpatialPixelsDataFrame, or a
 #' SpatialGridDataFrame containg data to use for filling
 #' @param where A, matrix, data.frame, or SpatialPoints or
@@ -194,21 +194,19 @@ eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
 #' @examples
 #' \dontrun{
 #' if (bru_safe_inla()) {
-#' 
-#' points <-
-#'   sp::SpatialPointsDataFrame(
-#'     matrix(1:6, 3, 2),
-#'     data = data.frame(val = c(NA, NA, NA))
-#'   )
-#' input_coord <- expand.grid(x = 0:7, y = 0:7)
-#' input <- 
-#'   sp::SpatialPixelsDataFrame(
-#'     input_coord,
-#'     data = data.frame(val = as.vector(input_coord$y))
-#'   )    
-#' points$val <- bru_fill_missing(input, points, points$val)
-#' print(points)
-#' 
+#'   points <-
+#'     sp::SpatialPointsDataFrame(
+#'       matrix(1:6, 3, 2),
+#'       data = data.frame(val = c(NA, NA, NA))
+#'     )
+#'   input_coord <- expand.grid(x = 0:7, y = 0:7)
+#'   input <-
+#'     sp::SpatialPixelsDataFrame(
+#'       input_coord,
+#'       data = data.frame(val = as.vector(input_coord$y))
+#'     )
+#'   points$val <- bru_fill_missing(input, points, points$val)
+#'   print(points)
 #' }
 #' }
 bru_fill_missing <- function(data, where, values,
@@ -217,10 +215,14 @@ bru_fill_missing <- function(data, where, values,
   stopifnot(inherits(
     data,
     c(
+      "SpatialPointsDataFrame",
       "SpatialPixelsDataFrame",
       "SpatialGridDataFrame"
     )
   ))
+  if (inherits(data, "SpatialGridDataFrame")) {
+    data <- as(data, "SpatialPixelsDataFrame")
+  }
   if (is.null(layer) && is.null(selector)) {
     layer <- 1
   }
@@ -241,7 +243,7 @@ bru_fill_missing <- function(data, where, values,
     where_crs <- sp::CRS(NA_character_)
     where_coord <- where
   }
-  
+
   if (!is.null(selector)) {
     selection <- where[[selector]]
     selector_notok <- is.na(selection)
@@ -272,25 +274,25 @@ bru_fill_missing <- function(data, where, values,
     }
     return(values)
   }
-  
+
   notok <- is.na(values)
   ok <- which(!notok)
   notok <- which(notok)
   data_notok <- is.na(data[[layer]])
   data_ok <- which(!data_notok)
   data_notok <- which(data_notok)
-  
+
   for (batch in seq_len(ceiling(length(notok) / batch_size))) {
     subset <- notok[seq((batch - 1) * batch_size,
-                        min(length(notok), batch * batch_size),
-                        by = 1
+      min(length(notok), batch * batch_size),
+      by = 1
     )]
     dst <- rgeos::gDistance(
       sp::SpatialPoints(data[data_ok, , drop = FALSE], proj4string = data_crs),
       sp::SpatialPoints(where_coord[subset, , drop = FALSE], proj4string = where_crs),
       byid = TRUE
     )
-    
+
     nn <- apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
     values[subset] <- data[[layer]][data_ok[nn]]
   }
@@ -301,9 +303,11 @@ bru_fill_missing <- function(data, where, values,
 
 # Resave data
 resave_package_data <- function() {
-  name_list <- c("gorillas", "mexdolphin", "mrsea",
-            "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
-            "seals", "shrimp", "toygroups")
+  name_list <- c(
+    "gorillas", "mexdolphin", "mrsea",
+    "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
+    "seals", "shrimp", "toygroups"
+  )
   for (name in name_list) {
     message(paste0("Data: ", name))
     env <- new.env()
@@ -315,22 +319,26 @@ resave_package_data <- function() {
     if (!file.exists(old_path)) {
       old_path <- new_path
     }
-    
+
     old_info <- file.info(old_path)
     if (length(names(env)) == 1) {
       eval(
-        parse(text = paste0("usethis::use_data(",
-                            paste0(names(env), collapse = ", "),
-                            ", compress = 'xz', overwrite = TRUE)")),
+        parse(text = paste0(
+          "usethis::use_data(",
+          paste0(names(env), collapse = ", "),
+          ", compress = 'xz', overwrite = TRUE)"
+        )),
         envir = env
       )
     } else {
       eval(
-        parse(text = paste0("save(",
-                            paste0(names(env), collapse = ", "),
-                            ", file = '",
-                            new_path,
-                            "', compress = 'xz')")),
+        parse(text = paste0(
+          "save(",
+          paste0(names(env), collapse = ", "),
+          ", file = '",
+          new_path,
+          "', compress = 'xz')"
+        )),
         envir = env
       )
     }
@@ -361,7 +369,19 @@ resave_package_data <- function() {
 row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
   M1 <- as(as(as(M1, "CsparseMatrix"), "dgCMatrix"), "dgTMatrix")
   M2 <- as(as(as(M2, "CsparseMatrix"), "dgCMatrix"), "dgTMatrix")
-  n <- nrow(M1)
+  n1 <- nrow(M1)
+  n2 <- nrow(M2)
+  if ((n1 == 1) && (n2 > 1)) {
+    M1 <- Matrix::kronecker(rep(1, n2), M1)
+    n <- n2
+  } else if ((n1 > 1) && (n2 == 1)) {
+    M2 <- Matrix::kronecker(rep(1, n1), M2)
+    n <- n1
+  } else if (n1 != n2) {
+    stop(paste0("Size mismatch for row.kron, (n1, n2) = (", n1, ", ", n2, ")"))
+  } else {
+    n <- n1
+  }
   if (is.null(repl)) {
     repl <- rep(1L, n)
   }
@@ -373,11 +393,11 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
   } else if (length(weights) == 1L) {
     weights <- rep(weights[1], n)
   }
-  
+
   ## TODO: Check robustness for all-zero rows.
   ## TODO: Maybe move big sparseMatrix call outside the loop.
   ## TODO: Automatically choose M1 or M2 for looping.
-  
+
   n1 <- (as.vector(Matrix::sparseMatrix(
     i = 1L + M1@i, j = rep(1L, length(M1@i)),
     x = 1L, dims = c(n, 1)
@@ -386,7 +406,7 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
     i = 1L + M2@i, j = rep(1L, length(M2@i)),
     x = 1L, dims = c(n, 1)
   )))
-  
+
   M <- (Matrix::sparseMatrix(
     i = integer(0), j = integer(0), x = numeric(0),
     dims = c(n, ncol(M2) * ncol(M1) * n.repl)
@@ -395,7 +415,7 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
   for (k in unique(n1)) {
     sub <- which(n1 == k)
     n.sub <- length(sub)
-    
+
     i.sub <- 1L + M1@i[sub]
     j.sub <- 1L + M1@j[sub]
     o1 <- order(i.sub, j.sub)
@@ -414,22 +434,22 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
       dims = c(n, k)
     ))
     sub2 <- which(is.element(1L + M2@i, i.sub))
-    
+
     if (length(sub2) > 0) {
       i <- 1L + M2@i[sub2]
       ii <- rep(i, times = k)
       repl.i <- repl[ii]
-      
+
       M <- (M +
-              Matrix::sparseMatrix(
-                i = ii,
-                j = (1L + rep(M2@j[sub2], times = k) +
-                       ncol(M2) * (as.vector(j.sub[i, ]) - 1L) +
-                       ncol(M2) * ncol(M1) * (repl.i - 1L)),
-                x = (rep(M2@x[sub2], times = k) *
-                       as.vector(x.sub[i, ])),
-                dims = c(n, ncol(M2) * ncol(M1) * n.repl)
-              ))
+        Matrix::sparseMatrix(
+          i = ii,
+          j = (1L + rep(M2@j[sub2], times = k) +
+            ncol(M2) * (as.vector(j.sub[i, ]) - 1L) +
+            ncol(M2) * ncol(M1) * (repl.i - 1L)),
+          x = (rep(M2@x[sub2], times = k) *
+            as.vector(x.sub[i, ])),
+          dims = c(n, ncol(M2) * ncol(M1) * n.repl)
+        ))
     }
   }
 

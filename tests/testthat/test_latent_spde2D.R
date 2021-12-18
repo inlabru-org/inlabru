@@ -122,6 +122,7 @@ test_that("Georeferenced data with sp", {
   )
 
   pred_df <- pixels(mesh)
+  coordnames(pred_df) <- coordnames(mydata)
   expect_s4_class(pred_df, "SpatialPixelsDataFrame")
   pred <- predict(fit, pred_df, ~ exp(Intercept + field), n.samples = 5)
   expect_s4_class(pred, "SpatialPixelsDataFrame")
@@ -134,7 +135,7 @@ latent_spde2D_group_testdata <- function() {
   set.seed(123)
 
   # Load and reduce data set
-  data(mrsea, package = "inlabru")
+  data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
   coordnames(mrsea$points) <- c("Easting", "Northing")
   coordnames(mrsea$samplers) <- c("Easting", "Northing")
@@ -178,31 +179,33 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not(fm_has_PROJ6())
-  
-  expect_warning(
-    {
-      data_ <- latent_spde2D_group_testdata()
-    },
-    "export to PROJ failed: generic error of unknown origin"
+
+  suppressWarnings(
+    data_ <- latent_spde2D_group_testdata()
   )
+  # For rgdal 1.5-23:
+  # "export to PROJ failed: generic error of unknown origin"
+  # For rgdal 1.5-27
+  # proj_as_proj_string: GeodeticCRS::exportToPROJString() only supports metre unit
 
   # Check Intercept
   expect_equal(
     data_$fit$summary.fixed["Intercept", "mean"],
-    -2.206082,
+    -2.3875,
     tolerance = midtol
   )
 
   # Check SPDE
   expect_equal(
     data_$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    c(-0.1618776, 0.7721959, 2.0314753),
+    c(-0.186, 1.338, 2.503),
     tolerance = midtol
   )
   expect_equal(
     data_$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
-    c(1.9784044, 0.7738195, 0.5835616),
+    c(2.052, 0.757, 0.603),
     tolerance = midtol
   )
+  # No error should appear
   expect_error(spde.posterior(data_$fit, "mySmooth", what = "range"), NA)
 })

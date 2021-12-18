@@ -1,5 +1,6 @@
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla() &&
+    require(ggplot2, quietly = TRUE)) {
 
   # The like function's main purpose is to set up models with multiple likelihoods.
   # The following example generates some random covariates which are observed through
@@ -39,7 +40,7 @@ if (bru_safe_inla()) {
 
   # The union of effects of both models gives the components needed to run bru
 
-  jcmp <- ~ x + z + Intercept
+  jcmp <- ~ x + z + Intercept(1)
   jfit <- bru(jcmp, lik1, lik2)
 
   # Compare the estimates

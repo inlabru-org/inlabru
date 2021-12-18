@@ -23,16 +23,10 @@
 \item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for
 the prediction.}
 
-\item{formula}{A formula defining an R expression to evaluate for each generated
-sample. If \code{NULL}, the latent and hyperparameter states are generated
-as named list elements. In addition to the component names (that give the effect
-of each component evaluated for the input data), the suffix \verb{_latent} can be used
-to directly access the latent state for a component, and the suffix \verb{_eval}
-can be used to evaluate a component at other input values than the expressions
-defined in the component definition itself, e.g. \code{field_eval(cbind(x,y))} for a
-component defined with \code{field(coordinates, ...)}. For "iid" models with
-\code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to generate new realisations for
-indices greater than \code{n}.}
+\item{formula}{A formula where the right hand side defines an R expression
+to evaluate for each generated sample. If \code{NULL}, the latent and
+hyperparameter states are returned as named list elements.
+See Details for more information.}
 
 \item{n.samples}{Integer setting the number of samples to draw in order to
 calculate the posterior statistics. The default is rather low but provides
@@ -79,10 +73,22 @@ value drawn in course of estimating the statistics.
 
 Internally, this method calls \code{\link[=generate.bru]{generate.bru()}} in order to draw samples from
 the model.
+
+In addition to the component names (that give the effect
+of each component evaluated for the input data), the suffix \verb{_latent}
+variable name can be used to directly access the latent state for a component,
+and the suffix function \verb{_eval} can be used to evaluate a component at
+other input values than the expressions defined in the component definition
+itself, e.g. \code{field_eval(cbind(x, y))} for a component that was defined with
+\code{field(coordinates, ...)} (see also \code{\link[=component_eval]{component_eval()}}).
+
+For "iid" models with \code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to
+generate new realisations for indices greater than \code{n}.
 }
 \examples{
 \donttest{
-if (bru_safe_inla(multicore = FALSE)) {
+if (bru_safe_inla(multicore = FALSE) &&
+    require("ggplot2", quietly = TRUE)) {
 
   # Load the Gorilla data
 

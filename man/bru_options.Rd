@@ -99,7 +99,8 @@ Default: 0, to not print any messages}
 log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all messages.}
 \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
 to run inference.}
-\item{bru_max_iter}{maximum number of inla iterations}
+\item{bru_max_iter}{maximum number of inla iterations, default 10.
+Also see the \code{bru_method$rel_tol} and related options below.}
 \item{bru_initial}{An \code{inla} object returned from previous calls of
 \code{INLA::inla}, \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}, or a list of named vectors of starting
 values for the latent variables. This will be used as a
@@ -116,20 +117,36 @@ are aggregated to mesh vertices.}
 }
 \item{bru_method}{List of arguments controlling the iterative inlabru method:
 \describe{
-\item{taylor}{Either 'legacy' (for the pre-2.1.15 method) or 'pandemic'
+\item{taylor}{'pandemic'
 (default, from version 2.1.15).}
 \item{search}{Either 'all' (default), to use all available line search
 methods, or one or more of
-'finite' (reduce step size until predictor is finite),
-'contract' (decrease step size until trust hypersphere reached)
-'expand' (increase step size until no improvement),
-'optimise' (fast approximate error norm minimisation).
+\describe{
+\item{'finite'}{(reduce step size until predictor is finite)}
+\item{'contract'}{(decrease step size until trust hypersphere reached)}
+\item{'expand'}{(increase step size until no improvement)}
+\item{'optimise'}{(fast approximate error norm minimisation)}
+}
 To disable line search, set to an empty vector. Line search is not
 available for \code{taylor="legacy"}.}
 \item{factor}{Numeric, \eqn{> 1} determining the line search step scaling
 multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
+\item{rel_tol}{Stop the iterations when the largest change in linearisation point
+(the conditional latent state mode) in relation to the estimated posterior
+standard deviation is less than \code{rel_tol}. Default 0.01 (one percent).}
+\item{max_step}{The largest allowed line search step factor. Factor 1 is the
+full INLA step. Default is 2.}
+\item{lin_opt_method}{Which method to use for the line search optimisation step.
+Default "onestep", using a quadratic approximation based on the value and
+gradient at zero, and the value at the current best step length guess.
+The method "full" does line optimisation on the full nonlinear predictor;
+this is slow and intended for debugging purposes only.}
 }
 }
+\item{bru_compress_cp}{logical; when \code{TRUE}, compress the
+\eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
+part of the Poisson process likelihood (\code{family="cp"}) into a single term, with \eqn{y=n}{y=n},
+and predictor \code{mean(eta)}. Default: \code{TRUE}}
 \item{\code{inla()} options}{
 All options not starting with \code{bru_} are passed on to \code{inla()}, sometimes
 after altering according to the needs of the inlabru method.

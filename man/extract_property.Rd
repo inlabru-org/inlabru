@@ -12,7 +12,9 @@ extract_property(result, property, internal_hyperpar = FALSE)
 \item{property}{character; "mean", "sd", "mode", or some other column
 identifier for inla result \verb{$summary.fixed}, \verb{$summary.random$label}, and
 \verb{$summary.hyperpar}, or "joint_mode". For "joint_mode", the joint latent mode
-is extracted, and the joint hyperparameter mode, in the internal scale.}
+is extracted, and the joint hyperparameter mode, in the internal scale.
+For "predictor_sd" the posterior standard deviations of the linear predictor
+are returned.}
 
 \item{internal_hyperpar}{logical; if \code{TRUE}, use internal scale for
 hyperparamter properties. Default is \code{FALSE}, except when \code{property} is

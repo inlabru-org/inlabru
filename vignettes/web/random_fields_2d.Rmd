@@ -1,7 +1,7 @@
 ---
 title: "Random Fields in 2D"
 author: "Finn Lindgren"
-date: "`r Sys.Date()`"
+date: "Generated on `r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Random Fields in 2D}
@@ -27,6 +27,7 @@ Setting things up
 library(INLA)
 library(inlabru)
 library(mgcv)
+library(ggplot2)
 ```
 
 Make a shortcut to a nicer colour scale:
@@ -110,13 +111,16 @@ Extract observations from some random locations:
 ```{r }
 n <- 200
 mydata <- data.frame(lon = runif(n, 0, 10), lat = runif(n, 0, 10))
-mydata$observed <- inla.mesh.project(mesh_fine,
-  loc = as.matrix(mydata),
-  field = true_field
-) + rnorm(n, sd = 0.4)
+mydata$observed <-
+  inla.mesh.project(
+    mesh_fine,
+    loc = as.matrix(mydata),
+    field = true_field
+  ) +
+  rnorm(n, sd = 0.4)
 coordinates(mydata) <- c("lon", "lat")
 ggplot() +
-  gg(mydata)
+  gg(mydata, aes(col = observed))
 ```
 
 Estimating the field
@@ -152,7 +156,6 @@ Fit the model and inspect the results:
 ```{r warning=FALSE,message=FALSE,results="hide"}
 fit <- bru(cmp, mydata, family = "gaussian")
 summary(fit)
-INLA:::summary.inla(fit)
 ```
 
 Predict the field on a lattice, and generate
@@ -168,7 +171,7 @@ samp <- generate(fit, pix,
   ~ field + Intercept,
   n.samples = 1
 )
-pred$sample <- samp[[1]]
+pred$sample <- samp[, 1]
 ```
 
 Compare the truth to the estimated field

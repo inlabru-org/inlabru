@@ -2,13 +2,13 @@ local_bru_testthat_setup()
 
 latent_spde1D_testdata <- function() {
   local_bru_safe_inla()
-  data(Poisson2_1D, package = "inlabru")
+  data(Poisson2_1D, package = "inlabru", envir = environment())
   x <- seq(0, 55, length = 50)
   mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
 
   matern <- INLA::inla.spde2.pcmatern(mesh1D,
     prior.range = c(1, 0.01),
-    prior.sigma = c(10, 0.01)
+    prior.sigma = c(1, 0.01)
   )
 
   cmp <- count ~ field(main = x, model = matern) + Intercept(1)
@@ -34,17 +34,11 @@ test_that("Latent models: SPDE 1D", {
   local_bru_safe_inla()
   data <- latent_spde1D_testdata()
 
-  # Check Intercept
+  # Check Intercept + SPDE (highly negatively correlated)
   expect_equal(
-    data$fit$summary.fixed["Intercept", "mean"],
-    5.684758,
-    tolerance = midtol
-  )
-
-  # Check SPDE
-  expect_equal(
-    data$fit$summary.random$field$mean[c(1, 25, 50)],
-    c(-4.916781, -4.285672, -6.837233),
+    data$fit$summary.fixed["Intercept", "mean"] +
+      data$fit$summary.random$field$mean[c(1, 25, 50)],
+    c(0.55439, 1.25189, -1.54505),
     tolerance = midtol
   )
 })

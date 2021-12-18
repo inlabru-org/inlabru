@@ -29,7 +29,7 @@ local_testthat_assign <- function(x, values, envir = parent.frame()) {
 #' Assign local tolerance variables. Useful for easy cleanup
 #' of global workspace with `withr::deferred_run()` when running tests
 #' interactively.
-local_testthat_tolerances <- function(tolerances = c(1e-5, 1e-2, 1e-1),
+local_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
                                       envir = parent.frame()) {
   local_testthat_assign("lowtol", tolerances[1], envir = envir)
   local_testthat_assign("midtol", tolerances[2], envir = envir)
@@ -206,11 +206,18 @@ local_bru_safe_inla <- function(multicore = FALSE,
                                 envir = parent.frame()) {
   if (requireNamespace("INLA", quietly = TRUE)) {
     # Save the num.threads option so it can be restored
-    old <- INLA::inla.getOption("num.threads")
+    old_threads <- INLA::inla.getOption("num.threads")
     withr::defer(
-      INLA::inla.setOption(num.threads = old),
+      INLA::inla.setOption(num.threads = old_threads),
       envir
     )
+    # Save the fmesher.timeout option so it can be restored
+    old_fmesher_timeout <- INLA::inla.getOption("fmesher.timeout")
+    withr::defer(
+      INLA::inla.setOption(fmesher.timeout = old_fmesher_timeout),
+      envir
+    )
+    INLA::inla.setOption(fmesher.timeout = 30)
   }
   if (!multicore) {
     local_bru_options_set(num.threads = "1:1", envir = envir)
@@ -230,6 +237,7 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
   local_testthat_tolerances(envir = envir)
   local_bru_options_set(
     control.compute = list(dic = FALSE, waic = FALSE),
+    inla.mode = "experimental",
     envir = envir
   )
 }

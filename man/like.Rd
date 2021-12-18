@@ -12,6 +12,7 @@ like(
   formula = . ~ .,
   family = "gaussian",
   data = NULL,
+  response_data = NULL,
   mesh = NULL,
   E = NULL,
   Ntrials = NULL,
@@ -21,7 +22,8 @@ like(
   include = NULL,
   exclude = NULL,
   allow_latent = FALSE,
-  allow_combine = FALSE,
+  allow_combine = NULL,
+  control.family = NULL,
   options = list()
 )
 
@@ -50,7 +52,12 @@ a convenient interface to fitting Cox processes.}
 \code{SpatialPoints[DataFrame]}
 object.}
 
-\item{mesh}{An inla.mesh object.}
+\item{response_data}{Likelihood-specific data for models that need different
+size/format for inputs and response variables, as a \code{data.frame} or
+\code{SpatialPoints[DataFrame]}
+object.}
+
+\item{mesh}{An inla.mesh object. Obsolete.}
 
 \item{E}{Exposure parameter for family = 'poisson' passed on to
 \code{INLA::inla}. Special case if family is 'cp': rescale all integration
@@ -80,11 +87,14 @@ directly available to the predictor expression, with a \verb{_latent} suffix.
 This also makes evaluator functions with suffix \verb{_eval} available, taking
 parameters \code{main}, \code{group}, and \code{replicate}, taking values for where to
 evaluate the component effect that are different than those defined in the
-component definition itself.}
+component definition itself (see \code{\link[=component_eval]{component_eval()}}). Default \code{FALSE}}
 
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
 involve several rows of the input data to influence the same row.
-(TODO: review what's needed to allow the result to also be of a different size)}
+Default \code{FALSE}, but forced to \code{TRUE} if \code{response_data} is \code{NULL} or
+\code{data} is a \code{list}}
+
+\item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
@@ -123,7 +133,8 @@ into a \code{bru_like_list} object
 }
 \examples{
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla() &&
+    require(ggplot2, quietly = TRUE)) {
 
   # The like function's main purpose is to set up models with multiple likelihoods.
   # The following example generates some random covariates which are observed through
@@ -163,7 +174,7 @@ if (bru_safe_inla()) {
 
   # The union of effects of both models gives the components needed to run bru
 
-  jcmp <- ~ x + z + Intercept
+  jcmp <- ~ x + z + Intercept(1)
   jfit <- bru(jcmp, lik1, lik2)
 
   # Compare the estimates

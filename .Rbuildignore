@@ -17,3 +17,4 @@
 ^doc$
 ^Meta$
 ^CRAN-RELEASE$
+^\.lintr$

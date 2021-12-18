@@ -18,7 +18,8 @@ import.seals(
 The \link{seals} data set
 }
 \description{
-Generate \code{Spatial} objects from raw seal pup survey data (not inlcuded in \link{inlabru}). Note that this function
+Generate \code{Spatial} objects from raw seal pup survey data (not inlcuded in
+\link{inlabru}). Note that this function
 will only extract one of the survey transects.
 }
 \author{

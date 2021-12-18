@@ -18,12 +18,12 @@ test_that("Component construction: linear model", {
     input_eval(cmp, data = df),
     list(
       main = 1:10,
-      group = rep(1, 10),
-      replicate = rep(1, 10)
+      group = 1,
+      replicate = 1
     )
   )
 
-  idx <- index_eval(cmp)
+  idx <- index_eval(cmp, inla_f = FALSE)
   expect_type(idx, "list")
   expect_equal(names(idx)[1], "beta")
   expect_equal(names(idx)[2], "beta.group")
@@ -31,7 +31,7 @@ test_that("Component construction: linear model", {
   expect_equal(idx$beta, 1)
 
   # A-matrix
-  A <- amatrix_eval(cmp, data = df)
+  A <- amatrix_eval(cmp, data = df, inla_f = FALSE)
   expect_s4_class(A, "dgCMatrix")
   expect_equal(nrow(A), 10)
   expect_equal(ncol(A), 1)
@@ -82,7 +82,7 @@ test_that("Component construction: offset", {
 test_that("Component construction: default mesh/mapping construction", {
   skip_on_cran()
   local_bru_safe_inla()
-  
+
   lik <- like("gaussian",
     formula = y ~ .,
     data = data.frame(x = c(1, 1.5, 2, 3, 4), y = 11:15),
@@ -130,7 +130,7 @@ test_that("Component construction: unsafe intercepts", {
   cmp <- component_list(~ something_unknown - 1)
   lik <- like(formula = response ~ ., data = data.frame(response = 1:5))
   expect_warning(
-    {
+    object = {
       model <- bru_model(cmp, list(lik))
     },
     "All covariate evaluations for 'something_unknown' are NULL"

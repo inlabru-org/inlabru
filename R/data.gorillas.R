@@ -55,22 +55,24 @@
 #' 26 (6), 793-811.
 #'
 #' @examples
-#' data(gorillas, package = "inlabru") # get the data
-#' # extract all the objects, for convenience:
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   data(gorillas, package = "inlabru") # get the data
+#'   # extract all the objects, for convenience:
 #'
-#' # plot all the nests, mesh and boundary
-#' ggplot() +
-#'   gg(gorillas$mesh) +
-#'   gg(gorillas$boundary) +
-#'   gg(gorillas$nests)
+#'   # plot all the nests, mesh and boundary
+#'   ggplot() +
+#'     gg(gorillas$mesh) +
+#'     gg(gorillas$boundary) +
+#'     gg(gorillas$nests)
 #'
-#' # Plot the elevation covariate
-#' plot(gorillas$gcov$elevation)
+#'   # Plot the elevation covariate
+#'   plot(gorillas$gcov$elevation)
 #'
-#' # Plot the plot sample
-#' ggplot() +
-#'   gg(gorillas$plotsample$plots) +
-#'   gg(gorillas$plotsample$nests)
+#'   # Plot the plot sample
+#'   ggplot() +
+#'     gg(gorillas$plotsample$plots) +
+#'     gg(gorillas$plotsample$nests)
+#' }
 NULL
 
 #' Gorilla data import
@@ -82,11 +84,11 @@ NULL
 #' @return gorilla data
 
 import.gorillas <- function() {
-  
-  if (!check_spatstat("spatstat.data")) 
+  if (!check_spatstat("spatstat.data")) {
 
-  # Load Gorilla data from spatstat
-  gorillas <- NULL
+    # Load Gorilla data from spatstat
+    gorillas <- NULL
+  }
   gorillas.extra <- NULL
   data(gorillas, package = "spatstat.data", envir = environment())
 
@@ -171,7 +173,7 @@ import.gorillas <- function() {
 
   # Extrapolate covariate
   pxl <- pixels(gorillas$mesh, mask = FALSE, nx = 220, ny = 180)
-  for (k in 1:length(gorillas$gcov)) {
+  for (k in seq_len(length(gorillas$gcov))) {
     gorillas$gcov[[k]] <- sfill(gorillas$gcov[[k]], pxl)
   }
 

@@ -55,10 +55,10 @@ makepoly <- function(start, width, height) {
 #'  }.
 #'
 #' @examples
-#'
 #' \donttest{
 #' # Some features require the raster package
-#' if (require("raster", quietly = TRUE)) {
+#' if (require("raster", quietly = TRUE) &&
+#'   require("ggplot2", quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru")
 #'   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
 #'     x.ppn = 0.4, y.ppn = 0.4, nx = 5, ny = 5
@@ -120,13 +120,14 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
 #' @param dets A `SpatialPointsDataFrame` object containing the locations of the
 #'    points within the plots.
 #'
-#' @return A `SpatialPolygonsDataFrame` with counts in each plot contained in slot @data$n.
+#' @return A `SpatialPolygonsDataFrame` with counts in each plot contained in
+#'   slot `@data$n`.
 #'
 #' @examples
-#'
 #' \donttest{
 #' # Some features require the raster package
-#' if (require("raster", quietly = TRUE)) {
+#' if (require("raster", quietly = TRUE) &&
+#'   require("ggplot2", quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru")
 #'   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
 #'     x.ppn = 0.4, y.ppn = 0.4, nx = 5, ny = 5

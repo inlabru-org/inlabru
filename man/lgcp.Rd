@@ -12,6 +12,7 @@ lgcp(
   ips = NULL,
   formula = . ~ .,
   E = NULL,
+  ...,
   options = list()
 )
 }
@@ -33,6 +34,8 @@ used as a predictor. Multiple runs if INLA are then required for a better
 approximation of the posterior.}
 
 \item{E}{Single numeric used rescale all integration weights by a fixed factor}
+
+\item{\dots}{Further arguments passed on to \code{\link[=like]{like()}}}
 
 \item{options}{See \code{\link[=bru_options_set]{bru_options_set()}}}
 }
@@ -58,9 +61,9 @@ If samplers is NULL it is assumed that all of the LGCP's dimensions have
 been observed completely.
 }
 \examples{
-
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla() &&
+  require(ggplot2, quietly = TRUE)) {
 
   # Load the Gorilla data
   data(gorillas, package = "inlabru")
@@ -80,7 +83,7 @@ if (bru_safe_inla()) {
 
   # Define domain of the LGCP as well as the model components (spatial SPDE
   # effect and Intercept)
-  cmp <- coordinates ~ mySmooth(map = coordinates, model = matern) + Intercept
+  cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 
   # Fit the model (with int.strategy="eb" to make the example take less time)
   fit <- lgcp(cmp, gorillas$nests,

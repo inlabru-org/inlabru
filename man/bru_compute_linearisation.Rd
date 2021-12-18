@@ -55,7 +55,7 @@ A-matrices.
 
 \item{effects}{\itemize{
 \item For \code{bru_component}:
-Precomputed effect data.frame for all components involved in the likelihood
+Precomputed effect list for all components involved in the likelihood
 expression
 }}
 

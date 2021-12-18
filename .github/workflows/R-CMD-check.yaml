@@ -6,6 +6,7 @@ on:
       - devel
       - stable
       - release/*
+      - feature/*
   pull_request:
     branches:
       - devel
@@ -58,7 +59,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-
 
-      - name: Install system dependencies
+      - name: Install system dependencies on Linux
         if: runner.os == 'Linux'
         run: |
           while read -r cmd
@@ -66,27 +67,38 @@ jobs:
             eval sudo $cmd
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
 
-      - name: Install X11 dependencies on MacOS
+      - name: Install system dependencies on MacOS (X11, gdal)
         if: runner.os == 'macOS'
         run: |
           brew install --cask xquartz
-      
+          brew install pkg-config
+          brew install proj@8
+          brew install gdal
+
       - name: Install dependencies
         run: |
-          remotes::install_cran("Matrix")
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
+        shell: Rscript {0}
+
+      - name: Session info
+        run: |
+          options(width = 100)
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
         shell: Rscript {0}
 
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
         run: |
-          sessionInfo()
-          print(getNamespaceVersion("Matrix"))
-          print(.libPaths())
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
+
+      - name: Full testthat output
+        if: always()
+        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
 
       - name: Upload check results
         if: failure()

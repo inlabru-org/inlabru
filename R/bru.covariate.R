@@ -37,9 +37,7 @@ evaluator <- function(cdata, method = NULL, ...) {
     return(function(...) {
       method(cdata, data.frame(...))
     })
-  }
-
-  else if (class(cdata)[1] == "SpatialPolygonsDataFrame") {
+  } else if (class(cdata)[1] == "SpatialPolygonsDataFrame") {
     if (is.null(method)) {
       method <- shapefile.to.covariate
     }

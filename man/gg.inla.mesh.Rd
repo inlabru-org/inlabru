@@ -23,7 +23,9 @@
 \arguments{
 \item{data}{An \code{INLA::inla.mesh} object.}
 
-\item{color}{A vector of scalar values to fill the mesh with colors. The length of the vector mus correspond to the number of mesh vertices.}
+\item{color}{A vector of scalar values to fill the mesh with colors.
+The length of the vector mus correspond to the number of mesh vertices.
+The alternative name \code{colour} is also recognised.}
 
 \item{alpha}{A vector of scalar values setting the alpha value of the colors provided.}
 
@@ -48,17 +50,19 @@
 \item{...}{ignored arguments (S3 generic compatibility).}
 }
 \value{
-\link{geom_line} return values or, if the color argument is used, the values of gg.SpatialPixelDataFrame().
+\code{geom_line} return values or, if the color argument is used, the
+values of \code{\link[=gg.SpatialPixelsDataFrame]{gg.SpatialPixelsDataFrame()}}.
 }
 \description{
-This function extracts the graph of an inla.mesh object and uses \link{geom_line} to visualize
+This function extracts the graph of an inla.mesh object and uses \code{geom_line} to visualize
 the graph's edges. Alternatively, if the \code{color} argument is provided, interpolates the colors
-across for a set of SpatialPixels covering the mesh area and calls gg.SpatialPixelDataFrame()
+across for a set of SpatialPixels covering the mesh area and calls \code{\link[=gg.SpatialPixelsDataFrame]{gg.SpatialPixelsDataFrame()}}
 to plot the interpolation.
+Requires the \code{ggplot2} package.
 }
 \examples{
 \donttest{
-if (bru_safe_inla()) {
+if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
 
   # Load Gorilla data
   data("gorillas", package = "inlabru")

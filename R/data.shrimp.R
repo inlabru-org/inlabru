@@ -25,11 +25,13 @@
 #'
 #' @examples
 #' \donttest{
-#' data(shrimp, package = "inlabru")
-#' ggplot() +
-#'   gg(shrimp$mesh) +
-#'   gg(shrimp$hauls) +
-#'   coord_equal()
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   data(shrimp, package = "inlabru")
+#'   ggplot() +
+#'     gg(shrimp$mesh) +
+#'     gg(shrimp$hauls) +
+#'     coord_equal()
+#' }
 #' }
 NULL
 

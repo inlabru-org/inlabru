@@ -26,7 +26,7 @@ test_that("Linearisation", {
 
 
   idx <- evaluate_index(model, lhoods)
-  A <- evaluate_A(model, lhoods)
+  A <- evaluate_A(model, lhoods, inla_f = FALSE)
   lin0 <- bru_compute_linearisation.bru_model(model, lhoods,
     state = list(Int_y = 0, Int_z = 0, x = 0), A = A
   )
@@ -39,6 +39,7 @@ test_that("Linearisation", {
       seq_along(lhoods),
       function(lh_idx) {
         lh <- lhoods[[lh_idx]]
+        lin_A <- lin0[[lh_idx]]$A
         INLA::inla.stack(
           list(
             BRU.response = lh$data[[lh$response]],
@@ -46,8 +47,10 @@ test_that("Linearisation", {
             BRU.Ntrials = lh[["Ntrials"]],
             BRU.offset = as.vector(lin0[[lh_idx]]$offset)
           ),
-          A = lin0[[lh_idx]]$A,
-          effects = idx[names(lin0[[lh_idx]]$A)]
+          A = lapply(names(lin_A), function(nm) {
+            lin_A[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
+          }),
+          effects = idx[["idx_inla"]][names(lin0[[lh_idx]]$A)]
         )
       }
     )
@@ -58,10 +61,12 @@ test_that("Linearisation", {
       c(stks0, list(compress = TRUE, remove.unused = FALSE))
     )
 
+  stk0_ <- bru_make_stack.bru_like_list(lhoods, lin0, idx)
+
   expect_s3_class(stk0, "inla.data.stack")
 
   expect_error(
-    {
+    object = {
       fit <- bru(
         components = cmp,
         lhoods,

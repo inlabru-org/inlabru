@@ -30,7 +30,7 @@ test_that("conversion of 1D mesh to integration points", {
 
 test_that("conversion of SpatialPolygon to integration points", {
   local_bru_safe_inla()
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
   expect_warning(
     ips <- ipoints(gorillas$boundary),
     "Computing integration points from polygon"
@@ -44,7 +44,7 @@ test_that("conversion of SpatialPolygon to integration points", {
 
 test_that("conversion of SpatialPolygon to integration points when domain is defined via a mesh", {
   local_bru_safe_inla()
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
   ips <- ipoints(gorillas$boundary, gorillas$mesh)
   expect_warning(
     ips_nodomain <- ipoints(gorillas$boundary),
@@ -61,7 +61,7 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
 
 test_that("conversion of 2D mesh to integration points", {
   local_bru_safe_inla()
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
   ips <- ipoints(gorillas$mesh)
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
@@ -73,12 +73,16 @@ test_that("SLDF in metres to integration points using grouping parameter", {
   local_bru_safe_inla()
   skip_if_not(fm_has_PROJ6())
 
-  data(mrsea, package = "inlabru")
+  data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = FALSE)
-  expect_warning(
-    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
-    "export to PROJ failed: generic error of unknown origin"
+  suppressWarnings(
+    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
   )
+  # # For rgdal 1.5-23, we had this version
+  #  expect_warning(
+  #    ...,
+  #    "export to PROJ failed: generic error of unknown origin"
+  #  )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(
@@ -94,11 +98,10 @@ test_that("SLDF in kilometres to integration points using grouping parameter", {
   local_bru_safe_inla()
   skip_if_not(fm_has_PROJ6())
 
-  data(mrsea, package = "inlabru")
+  data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
-  expect_warning(
-    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season"),
-    "export to PROJ failed: generic error of unknown origin"
+  suppressWarnings(
+    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
   )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
@@ -112,43 +115,42 @@ test_that("SLDF in kilometres to integration points using grouping parameter", {
 
 test_that("Polygon integration with holes", {
   local_bru_safe_inla()
+  set.seed(123L)
 
   plyA <- sp::SpatialPolygons(list(
     sp::Polygons(
       list(
-        sp::Polygon(matrix(c(0, 3, 3, 0, 0, 0, 3, 3), 4, 2), hole = FALSE),
-        sp::Polygon(matrix(c(1, 2, 2, 1, 1, 1, 2, 2), 4, 2), hole = TRUE)
+        sp::Polygon(matrix(c(0, 3, 3, 0, 0, 0, 3, 3) + runif(8) * 0.01, 4, 2),
+                    hole = FALSE),
+        sp::Polygon(matrix(c(1, 2, 2, 1, 1, 1, 2, 2) + runif(8) * 0.01, 4, 2),
+                    hole = TRUE)
       ),
       ID = "A"
     )
   ))
-  plyB <- sp::SpatialPolygons(list(
-    sp::Polygons(
-      list(
-        sp::Polygon(matrix(c(0, 3, 3, 0, 0, 0, 3, 3), 4, 2), hole = FALSE),
-        sp::Polygon(matrix(c(1, 1, 2, 2, 1, 2, 2, 1), 4, 2), hole = TRUE)
-      ),
-      ID = "A"
-    )
-  ))
-  expect_equal(plyA, plyB)
 
   bndA <- INLA::inla.sp2segment(plyA)
   m <- INLA::inla.mesh.2d(
     loc.domain = bndA$loc,
     max.edge = 1
   )
-  ipA1 <- ipoints(plyA, m, int.args = list(poly_method = "legacy", method = "direct"))
-  ipA2 <- ipoints(plyA, m, int.args = list(poly_method = "legacy", method = "stable"))
-  ipA3 <- ipoints(plyA, m, int.args = list(method = "direct"))
-  ipA4 <- ipoints(plyA, m, int.args = list(method = "stable"))
+  ipA1 <- ipoints(plyA, m, int.args = list(poly_method = "legacy",
+                                           method = "direct",
+                                           nsub2 = 1))
+  ipA2 <- ipoints(plyA, m, int.args = list(poly_method = "legacy",
+                                           method = "stable",
+                                           nsub2 = 1))
+  ipA3 <- ipoints(plyA, m, int.args = list(method = "direct",
+                                           nsub2 = 1))
+  ipA4 <- ipoints(plyA, m, int.args = list(method = "stable",
+                                           nsub2 = 1))
   ipA1$test <- "A1"
   ipA2$test <- "A2"
   ipA3$test <- "A3"
   ipA4$test <- "A4"
 
   if (FALSE) {
-    pl <- ggplot() +
+    pl <- ggplot2::ggplot() +
       gg(m) +
       gg(plyA)
     pl
@@ -158,14 +160,14 @@ test_that("Polygon integration with holes", {
       gg(ipA2, mapping = aes(col = weight, size = weight)) +
       gg(ipA3, mapping = aes(col = weight, size = weight)) +
       gg(ipA4, mapping = aes(col = weight, size = weight)) +
-      facet_wrap(vars(test))
+      ggplot2::facet_wrap(vars(test))
   }
 
-  expect_equal(sum(ipA1$weight), 9, tolerance = midtol)
-  expect_equal(sum(ipA2$weight), 9, tolerance = midtol)
+  expect_equal(sum(ipA1$weight), 8.779508, tolerance = midtol)
+  expect_equal(sum(ipA2$weight), 8.779508, tolerance = midtol)
 
-  expect_equal(sum(ipA3$weight), 8, tolerance = midtol)
-  expect_equal(sum(ipA4$weight), 8, tolerance = midtol)
+  expect_equal(sum(ipA3$weight), 7.780959, tolerance = midtol)
+  expect_equal(sum(ipA4$weight), 7.780959, tolerance = midtol)
 })
 
 
@@ -179,7 +181,7 @@ test_that("Integration line splitting", {
   )
 
   expect_error(
-    {
+    object = {
       sl <- split_lines(
         mesh,
         sp = rbind(c(-1, 0), c(-1, 1)),
@@ -191,7 +193,7 @@ test_that("Integration line splitting", {
 
   # Check issue #63 (problem for single line input), fixed
   expect_error(
-    {
+    object = {
       sl <- split_lines(
         mesh,
         sp = cbind(-1, 0),
@@ -203,7 +205,7 @@ test_that("Integration line splitting", {
 
   # Check if empty input is ok
   expect_error(
-    {
+    object = {
       sl <- split_lines(
         mesh,
         sp = matrix(0, 0, 2),

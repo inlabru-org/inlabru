@@ -14,17 +14,18 @@ sampled.}
 points within the plots.}
 }
 \value{
-A \code{SpatialPolygonsDataFrame} with counts in each plot contained in slot @data$n.
+A \code{SpatialPolygonsDataFrame} with counts in each plot contained in
+slot \verb{@data$n}.
 }
 \description{
 Converts a plot sample with locations of each point within each plot, into a plot
 sample with only the count within each plot.
 }
 \examples{
-
 \donttest{
 # Some features require the raster package
-if (require("raster", quietly = TRUE)) {
+if (require("raster", quietly = TRUE) &&
+  require("ggplot2", quietly = TRUE)) {
   data(gorillas, package = "inlabru")
   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
     x.ppn = 0.4, y.ppn = 0.4, nx = 5, ny = 5

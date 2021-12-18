@@ -1,7 +1,7 @@
 ---
 title: "LGCPs - An example in two dimensions"
-author: "David Borchers"
-date: "`r Sys.Date()`"
+author: "David Borchers and Finn Lindgren"
+date: "Generated on `r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{LGCPs - An example in two dimensions}
@@ -34,6 +34,7 @@ Load libraries
 library(inlabru)
 library(INLA)
 library(mgcv)
+library(ggplot2)
 ```
 
 Get the data

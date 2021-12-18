@@ -5,8 +5,10 @@
 \alias{ibm_n}
 \alias{ibm_values}
 \alias{ibm_amatrix}
+\alias{ibm_inla_subset}
 \alias{ibm_valid_input}
 \alias{bru_mapper.default}
+\alias{ibm_inla_subset.default}
 \alias{bru_mapper.inla.mesh}
 \alias{bru_mapper.inla.mesh.1d}
 \alias{bru_mapper_index}
@@ -14,27 +16,24 @@
 \alias{bru_mapper_factor}
 \alias{bru_mapper_offset}
 \alias{bru_mapper_multi}
+\alias{bru_mapper_collect}
 \title{Methods for \code{bru_mapper} objects}
 \usage{
 bru_mapper(...)
 
-ibm_n(mapper, ...)
+ibm_n(mapper, inla_f = FALSE, ...)
 
-ibm_values(mapper, ...)
+ibm_values(mapper, inla_f = FALSE, ...)
 
-ibm_amatrix(mapper, input, ...)
+ibm_amatrix(mapper, input, inla_f = FALSE, ...)
 
-ibm_valid_input(mapper, input, ...)
+ibm_inla_subset(mapper, ...)
 
-\method{bru_mapper}{default}(
-  mapper,
-  new_class = NULL,
-  ibm_n = NULL,
-  ibm_values = NULL,
-  ibm_amatrix = NULL,
-  ibm_valid_input = NULL,
-  ...
-)
+ibm_valid_input(mapper, input, inla_f = FALSE, ...)
+
+\method{bru_mapper}{default}(mapper, new_class = NULL, methods = NULL, ...)
+
+\method{ibm_inla_subset}{default}(mapper, ...)
 
 \method{bru_mapper}{inla.mesh}(mesh, ...)
 
@@ -49,6 +48,8 @@ bru_mapper_factor(values, factor_mapping, ...)
 bru_mapper_offset(...)
 
 bru_mapper_multi(mappers, ...)
+
+bru_mapper_collect(mappers, hidden = FALSE, ...)
 }
 \arguments{
 \item{\dots}{Arguments passed on to other methods}
@@ -57,17 +58,18 @@ bru_mapper_multi(mappers, ...)
 For the default \code{bru_mapper} method, a list that will be converted to a
 \code{bru_mapper} object by adding class information and (optional) methods.}
 
+\item{inla_f}{logical; when \code{TRUE} in \code{ibm_n}, \code{ibm_values}, and
+\code{ibm_amatrix} methods, these must result in values compatible with \code{INLA::f(...)}
+an specification and corresponding \code{INLA::inla.stack(...)} constructions.
+Implementations do not normally need to do anything different, except
+for mappers of the type needed for hidden multicomponent models such
+as "bym2", which can be handled by \code{bru_mapper_collect}.}
+
 \item{input}{The values for which to produce validity information}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
-\item{ibm_n}{An \code{ibm_n} method function}
-
-\item{ibm_values}{An \code{ibm_values} method function}
-
-\item{ibm_amatrix}{An \code{ibm_amatrix} method function}
-
-\item{ibm_valid_input}{An \code{ibm_valid_input} method function}
+\item{methods, }{optional \code{list} of named method definitions; See Details.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
@@ -89,6 +91,13 @@ Default: \code{NULL}, to force user specification of this parameter}
 }}
 
 \item{mappers}{A list of \code{bru_mapper} objects}
+
+\item{hidden}{\code{logical}, set to \code{TRUE} to flag that the mapper is to be used
+as a first level input mapper for \code{INLA::f()} in a model that requires making
+only the first mapper visible to \code{INLA::f()} and \code{INLA::inla.stack()}, such
+as for "bym2" models, as activated by the \code{inla_f} argument to \code{ibm_n},
+\code{ibm_values}, and \code{ibm_amatrix}. Set to \code{FALSE} to always access the full
+mapper, e.g. for \code{rgeneric} models}
 }
 \description{
 Methods for \code{bru_mapper} objects
@@ -106,39 +115,69 @@ being mapped to.
 
 \itemize{
 \item \code{ibm_values} Generic. Implementations must return a vector that
-is interpretable by an \code{INLA::f(..., values = ...)} specification, and
-has length \code{\link[=ibm_n]{ibm_n()}}.
+would be interpretable by an \code{INLA::f(..., values = ...)} specification.
+The exception is the method for \code{bru_mapper_multi}, that returns a
+multi-column data frame
 }
 
 \itemize{
 \item \code{ibm_amatrix} Generic.
 Implementations must return a (sparse) matrix of size \code{NROW(input)}
-(except for the \code{bru_mapper_multi} method)
-by \code{ibm_n(mapper)}
+(except for the \code{bru_mapper_multi} and \code{bru_mapper_collect} methods,
+that require \code{list()} inputs, and the input size is determined by the
+combined inputs)
+by \code{ibm_n(mapper, inla_f = FALSE)}. The \code{inla_f=TRUE} argument should only affect
+the allowed type of input format.
+}
+
+\itemize{
+\item \code{ibm_inla_subset} Generic.
+Implementations must return a logical vector of \code{TRUE/FALSE} for
+the subset such that, given the full A matrix and values output,
+\code{A[, subset, drop = FALSE]} and \code{values[subset]}
+(or \code{values[subset, , drop = FALSE]} for data.frame values) are equal
+to the \code{inla_f = TRUE} version of A and values. The default method uses
+the \code{ibm_values} output to construct the subset indexing.
 }
 
 \itemize{
 \item \code{ibm_valid_input} Generic.
-Implementations must return a logical vector of length \code{NROW(input)}
+Implementations must return a logical vector of length \code{NROW(input)} (
+or for \code{bru_mapper_multi} and \code{bru_mapper_collect} a list of such
+vectors)
 }
 
 \itemize{
 \item \code{bru_mapper.default} adds the "bru_mapper" class and \code{new_class}
 to an object. If provided, mapper method functions are added to an environment
-\code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_values},
-\code{ibm_amatrix}, and \code{ibm_valid_input} look for these functions first,
+\code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_n_inla},
+\code{ibm_values}, \code{ibm_values_inla},
+\code{ibm_amatrix}, \code{ibm_amatrix_inla},
+\code{ibm_valid_input}, and \code{ibm_valid_input_inla} look for these
+functions first,
 and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
 to register the methods, e.g.
 \code{.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)}.
 }
 
 \itemize{
+\item The default \code{ibm_inla_subset} method uses
+the \code{ibm_values} output to construct the inla subset indexing, passing
+extra arguments such as \code{multi} on to the methods (this means it supports
+both regular vector values and \code{multi=1} data.frame values).
+}
+
+\itemize{
 \item \code{bru_mapper_multi} constructs a kronecker product mapping
+}
+
+\itemize{
+\item \code{bru_mapper_collect} constructs concatenated collection mapping
 }
 }
 \examples{
 mapper <- bru_mapper_index(5)
-ibm_amatrix(mapper, c(1,3,4,5,2))
+ibm_amatrix(mapper, c(1, 3, 4, 5, 2))
 }
 \seealso{
 \link{bru_mapper_methods} for specific method implementations.

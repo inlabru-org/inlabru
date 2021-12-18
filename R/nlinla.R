@@ -1,84 +1,4 @@
 
-nlinla.taylor <- function(expr, epunkt, data, env, offsets = c()) {
-  if (nrow(epunkt) <= 1000) {
-    effects <- colnames(epunkt)
-    df <- as.data.frame(data)
-    df <- df[, setdiff(names(df), names(epunkt)), drop = FALSE]
-    wh <- cbind(df, epunkt)
-    myenv <- new.env()
-    invisible(lapply(colnames(wh), function(x) myenv[[x]] <- wh[, x]))
-    invisible(lapply(setdiff(names(env), names(myenv)), function(x) myenv[[x]] <- env[[x]]))
-    active <- setdiff(effects, offsets)
-    tmp <- numericDeriv(expr[[1]], active, rho = myenv)
-    gra <- attr(tmp, "gradient")
-    nr <- NROW(gra)
-    ngrd <- matrix(0.0, nrow = nr, ncol = length(active))
-    colnames(ngrd) <- active
-    for (k in seq_along(active)) {
-      # as.matrix required since diag() will not work if gra has single entry
-      ngrd[, k] <- diag(as.matrix(
-        gra[, ((k - 1) * nr + 1):(k * nr), drop = FALSE]
-      ))
-    }
-    nconst <- as.vector(tmp) - Matrix::rowSums(
-      ngrd * as.matrix(epunkt[, active, drop = FALSE])
-    )
-    ngrd <- as.data.frame(ngrd)
-    return(list(gradient = ngrd, const = nconst))
-  } else {
-    blk <- floor((seq_len(nrow(epunkt)) - 1L) / 1000)
-    qq <- by(seq_len(nrow(epunkt)), blk, function(idx) {
-      nlinla.taylor(
-        expr,
-        epunkt[idx, , drop = FALSE],
-        data[idx, , drop = FALSE],
-        env
-      )
-    })
-    nconst <- do.call(c, lapply(qq, function(x) {
-      x$const
-    }))
-    ngrd <- do.call(rbind, lapply(qq, function(x) {
-      x$grad
-    }))
-    return(list(gradient = ngrd, const = nconst))
-  }
-}
-
-nlinla.epunkt <- function(model, data, state = NULL) {
-  # This function determines the current point around which
-  # to perform the taylor approximation
-  # (1) If result is NULL set all all effects to 0
-  # (2) If result is a data.frame, use the entries as to where to approximate
-  # (3) if result is an inla object, use these estimates as to where to approximate
-
-  dfdata <- as.data.frame(data) # data as data.frame (may have been supplied as Spatial* object)
-  if (is.null(state)) {
-    df <- data.frame(matrix(0, nrow = nrow(dfdata), ncol = length(model$effects)))
-    colnames(df) <- names(model$effects)
-    df
-  } else {
-    evaluate_model(model, state = state, data = data)[[1]]
-  }
-}
-
-nlinla.reweight <- function(A, model, data, expr, state) {
-  offsets <- names(model$effects)[vapply(
-    model$effects,
-    function(x) identical(x$type, "offset"),
-    TRUE
-  )]
-  epkt <- nlinla.epunkt(model, data, state = state)
-  ae <- nlinla.taylor(expr, epkt, data, environment(model$formula),
-    offsets = offsets
-  )
-  for (nm in setdiff(names(A), offsets)) {
-    A[[nm]] <- A[[nm]] * ae$gradient[[nm]]
-  }
-  return(list(A = A, const = ae$const))
-}
-
-
 # Linearisation ----
 
 #' Compute inlabru model linearisation information
@@ -103,7 +23,7 @@ bru_compute_linearisation <- function(...) {
 #' A-matrices.
 #' @param effects
 #' * For `bru_component`:
-#' Precomputed effect data.frame for all components involved in the likelihood
+#' Precomputed effect list for all components involved in the likelihood
 #' expression
 #' @param pred0 Precomputed predictor for the given state
 #' @param allow_latent logical. If `TRUE`, the latent state of each component is
@@ -125,6 +45,20 @@ bru_compute_linearisation.component <- function(cmp,
                                                 eps,
                                                 ...) {
   label <- cmp[["label"]]
+
+  assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
+
+  if (assume_rowwise) {
+    if (NROW(A) == 1) {
+      if (NROW(pred0) > 1) {
+        A <- Matrix::kronecker(rep(1, NROW(pred0)), A)
+      } else if (is.data.frame(data)) {
+        A <- Matrix::kronecker(rep(1, NROW(data)), A)
+        pred0 <- rep(pred0, NROW(A))
+      }
+    }
+  }
+
   if (identical(cmp[["main"]][["type"]], "offset")) {
     # Zero-column matrix, since an offset has no latent state variables.
     return(Matrix::sparseMatrix(
@@ -152,26 +86,47 @@ bru_compute_linearisation.component <- function(cmp,
       # Option: compute predictor for multiple different states. This requires
       # constructing multiple states and corresponding effects before calling
       # evaluate_predictor
-      if (allow_latent || allow_combine) {
-        # TODO: Allow some grouping specification to allow subsetting even
-        # when allow_combine is TRUE
-        row_subset <- seq_len(NROW(A))
-      }
-      effects_eps <- effects[row_subset, , drop = FALSE]
-      effects_eps[, label] <- effects_eps[, label] + A[row_subset, k] * eps
 
+      if (assume_rowwise) {
+        effects_eps <- list()
+        for (label_loop in names(effects)) {
+          if (NROW(effects[[label_loop]]) == 1) {
+            effects_eps[[label_loop]] <-
+              rep(effects[[label_loop]], length(row_subset))
+          } else {
+            effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
+          }
+        }
+        effects_eps[[label]] <- effects_eps[[label]] + A[row_subset, k] * eps
+      } else {
+        effects_eps <- effects
+        effects_eps[[label]] <- effects_eps[[label]] + A[, k] * eps
+      }
       pred_eps <- evaluate_predictor(
         model,
         state = list(state_eps),
-        data = data[row_subset, , drop = FALSE],
+        data =
+          if (assume_rowwise) {
+            data[row_subset, , drop = FALSE]
+          } else {
+            data
+          },
         effects = list(effects_eps),
         predictor = lhood_expr,
         format = "matrix"
       )
       # Store sparse triplet information
-      values <- (pred_eps - pred0[row_subset])
+      if (assume_rowwise) {
+        values <- (pred_eps - pred0[row_subset])
+      } else {
+        values <- (pred_eps - pred0)
+      }
       nonzero <- (values != 0.0) # Detect exact (non)zeros
-      triplets$i <- c(triplets$i, row_subset[nonzero])
+      if (assume_rowwise) {
+        triplets$i <- c(triplets$i, row_subset[nonzero])
+      } else {
+        triplets$i <- c(triplets$i, which(nonzero))
+      }
       triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
       triplets$x <- c(triplets$x, values[nonzero] / eps)
     }
@@ -219,16 +174,40 @@ bru_compute_linearisation.bru_like <- function(lhood,
     predictor = lhood_expr,
     format = "matrix"
   )
-  # Compute derivatives for each noon-offset component
+  if (lhood[["linear"]]) {
+    # If linear, can check if the predictor is a scalar or vector,
+    # and possibly expand to full size
+    if (length(pred0) == 1) {
+      if (is.data.frame(data) ||
+        inherits(data, c(
+          "SpatialPointsDataFrame",
+          "SpatialPolygonsDataFrame",
+          "SpatialLinesDataFrame"
+        ))) {
+        pred0 <- rep(pred0, NROW(data))
+      }
+    }
+  }
+
+  # Compute derivatives for each non-offset component
   B <- list()
   offset <- pred0
   # Either this loop or the internal bru_component specific loop
   # can in principle be parallelised.
   for (label in included) {
     if (!identical(model[["effects"]][[label]][["main"]][["type"]], "offset")) {
-      # If linear, just need to copy the non-offset A matrix
-      if (lhood[["linear"]]) {
-        B[[label]] <- A[[label]]
+      if (lhood[["linear"]] && !lhood[["allow_combine"]]) {
+        # If linear and no combinations allowed, just need to copy the
+        # non-offset A matrix, and possibly expand to full size
+        if (NROW(A[[label]]) == 1) {
+          if (NROW(offset) > 1) {
+            B[[label]] <- Matrix::kronecker(rep(1, NROW(offset)), A[[label]])
+          } else {
+            B[[label]] <- A[[label]]
+          }
+        } else {
+          B[[label]] <- A[[label]]
+        }
       } else {
         B[[label]] <-
           bru_compute_linearisation(
@@ -257,8 +236,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
 #' @param eps The finite difference step size
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_like_list <- function(
-                                                    lhoods,
+bru_compute_linearisation.bru_like_list <- function(lhoods,
                                                     model,
                                                     state,
                                                     A,

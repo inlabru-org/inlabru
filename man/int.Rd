@@ -26,7 +26,6 @@ dimensions to integrate over. The set of dimensions that are held fixed is the s
 of all column names in \code{data} and the dimensions stated by \code{dims}.
 }
 \examples{
-
 \donttest{
 # ipoints needs INLA
 if (require("INLA", quietly = TRUE)) {

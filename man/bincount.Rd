@@ -43,36 +43,36 @@ should be within the confidence intervals. Note that a proper comparison  is a m
 testing problem which the function does not solve for you.
 }
 \examples{
-
 \dontrun{
+if (require(ggplot2)) {
+  # Load a point pattern
+  data(Poisson2_1D)
 
-# Load a point pattern
-data(Poisson2_1D)
+  # Take a look at the point (and frequency) data
 
-# Take a look at the point (and frequency) data
+  ggplot(pts2) +
+    geom_histogram(aes(x = x), binwidth = 55 / 20, boundary = 0, fill = NA, color = "black") +
+    geom_point(aes(x), y = 0, pch = "|", cex = 4) +
+    coord_fixed(ratio = 1)
 
-ggplot(pts2) +
-  geom_histogram(aes(x = x), binwidth = 55 / 20, boundary = 0, fill = NA, color = "black") +
-  geom_point(aes(x), y = 0, pch = "|", cex = 4) +
-  coord_fixed(ratio = 1)
+  # Fit an LGCP model
+  x <- seq(0, 55, length = 50)
+  mesh1D <- inla.mesh.1d(x, boundary = "free")
+  mdl <- x ~ spde1D(x, model = inla.spde2.matern(mesh1D)) + Intercept(1)
+  fit.spde <- lgcp(mdl, pts2, domain = list(x = c(0, 55)))
 
-# Fit an LGCP model
-x <- seq(0, 55, length = 50)
-mesh1D <- inla.mesh.1d(x, boundary = "free")
-mdl <- x ~ spde1D(map = x, model = inla.spde2.matern(mesh1D)) + Intercept # SOLUTION
-fit.spde <- lgcp(mdl, pts2, domain = list(x = c(0, 55)))
-
-# Calculate bin statistics
-bc <- bincount(
-  result = fit.spde,
-  observations = pts2,
-  breaks = seq(0, max(pts2), length = 12),
-  predictor = x ~ exp(spde1D + Intercept)
-)
+  # Calculate bin statistics
+  bc <- bincount(
+    result = fit.spde,
+    observations = pts2,
+    breaks = seq(0, max(pts2), length = 12),
+    predictor = x ~ exp(spde1D + Intercept)
+  )
 
 
-# Plot them!
-attributes(bc)$ggp
+  # Plot them!
+  attributes(bc)$ggp
+}
 }
 
 }

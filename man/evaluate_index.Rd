@@ -11,6 +11,12 @@ evaluate_index(model, lhoods)
 
 \item{lhoods}{A \code{bru__like_list} object}
 }
+\value{
+A named list of \code{idx_full} and \code{idx_inla},
+named list of indices, and \code{inla_subset}, and \code{inla_subset},
+a named list of logical subset specifications for extracting the \code{INLA::f()}
+compatible index subsets.
+}
 \description{
 Computes the index values matrices for included components
 }

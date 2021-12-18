@@ -9,12 +9,12 @@
 
 sfill <- function(data, where = NULL) {
   check_spatstat("spatstat.geom")
-  
+
   if (is.null(where)) {
     where <- data
   }
   vallist <- list()
-  for (k in 1:ncol(data@data)) {
+  for (k in seq_len(ncol(data@data))) {
     dpoints <- SpatialPoints(data)
     vals <- data@data[, k]
     dpoints <- dpoints[!is.na(vals), ]
@@ -63,7 +63,6 @@ sfill <- function(data, where = NULL) {
 #' @return SpatialLinesDataFrame
 #'
 #' @examples
-#'
 #' \donttest{
 #' # Create a data frame defining three lines
 #' lns <- data.frame(
@@ -78,9 +77,11 @@ sfill <- function(data, where = NULL) {
 #'   end.cols = c("xe", "ye")
 #' )
 #'
-#' # Plot the lines
-#' ggplot() +
-#'   gg(spl)
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   # Plot the lines
+#'   ggplot() +
+#'     gg(spl)
+#' }
 #' }
 #'
 sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.crs = NULL) {
@@ -90,13 +91,13 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
   colnames(sp) <- c("x", "y")
   colnames(ep) <- c("x", "y")
 
-  lilist <- lapply(1:nrow(sp), function(k) {
+  lilist <- lapply(seq_len(nrow(sp)), function(k) {
     Lines(list(Line(rbind(sp[k, ], ep[k, ]))), ID = k)
   })
   spl <- SpatialLines(lilist, proj4string = crs)
 
   df <- data[, setdiff(names(data), c(start.cols, end.cols))]
-  rownames(df) <- 1:nrow(df)
+  rownames(df) <- seq_len(nrow(df))
 
   slines <- SpatialLinesDataFrame(spl, data = df)
 
@@ -138,9 +139,11 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
 #' # Convert to SpatialPolygonsDataFrame
 #' pol <- spoly(pts)
 #'
-#' # Plot it!
-#' ggplot() +
-#'   gg(pol)
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   # Plot it!
+#'   ggplot() +
+#'     gg(pol)
+#' }
 #' }
 #'
 spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(NA_character_), to.crs = NULL) {
@@ -180,20 +183,22 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(NA_character_), to
 #'
 #' # Compare original and transformed mesh
 #'
-#' multiplot(
-#'   ggplot() +
-#'     gg(gorillas$mesh) +
-#'     ggtitle("Original mesh"),
-#'   ggplot() +
-#'     gg(tmesh) +
-#'     ggtitle("Transformed mesh")
-#' )
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   multiplot(
+#'     ggplot() +
+#'       gg(gorillas$mesh) +
+#'       ggtitle("Original mesh"),
+#'     ggplot() +
+#'       gg(tmesh) +
+#'       ggtitle("Transformed mesh")
+#'   )
+#' }
 #' }
 #'
 stransform <- function(splist, crs) {
   if (!is.null(crs)) {
     if (class(splist)[[1]] == "list") {
-      for (k in 1:length(splist)) {
+      for (k in seq_len(length(splist))) {
         if (inherits(splist[[k]], "Spatial")) {
           # cn = coordnames(splist[[k]])
           splist[[k]] <- sp::spTransform(splist[[k]], crs)

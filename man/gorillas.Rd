@@ -52,22 +52,24 @@ This is the \code{gorillas} dataset from the package \code{spatstat.data}, refor
 as point process data for use with \code{inlabru}.
 }
 \examples{
-data(gorillas, package = "inlabru") # get the data
-# extract all the objects, for convenience:
+if (require(ggplot2, quietly = TRUE)) {
+  data(gorillas, package = "inlabru") # get the data
+  # extract all the objects, for convenience:
 
-# plot all the nests, mesh and boundary
-ggplot() +
-  gg(gorillas$mesh) +
-  gg(gorillas$boundary) +
-  gg(gorillas$nests)
+  # plot all the nests, mesh and boundary
+  ggplot() +
+    gg(gorillas$mesh) +
+    gg(gorillas$boundary) +
+    gg(gorillas$nests)
 
-# Plot the elevation covariate
-plot(gorillas$gcov$elevation)
+  # Plot the elevation covariate
+  plot(gorillas$gcov$elevation)
 
-# Plot the plot sample
-ggplot() +
-  gg(gorillas$plotsample$plots) +
-  gg(gorillas$plotsample$nests)
+  # Plot the plot sample
+  ggplot() +
+    gg(gorillas$plotsample$plots) +
+    gg(gorillas$plotsample$nests)
+}
 }
 \references{
 Funwi-Gabga, N. (2008) A pastoralist survey and fire impact assessment in the Kagwene Gorilla

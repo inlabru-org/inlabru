@@ -18,7 +18,6 @@ and multiplies their weights accordingly. If the object defining points in a par
 dimension has no weights attached to it all weights are assumend to be 1.
 }
 \examples{
-
 \donttest{
 # ipoints needs INLA
 if (bru_safe_inla()) {

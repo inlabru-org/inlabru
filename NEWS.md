@@ -1,3 +1,41 @@
+# inlabru 2.4.0
+
+## Features
+
+* Allow predictors to have different size than the input data.  The `data` argument
+  is now allowed to be a `list()`, and the new argument `response_data` allows separate
+  specification of component inputs and response variables.
+  
+* Add `bru_mapper_collect` class for handling sequential collections of
+  mappers, including collections where all but the first mapper is hidden from the
+  `INLA::f()` arguments `n` and `values`, as needed to support e.g. "bym2" models.
+  
+* Add `control.family` as a direct argument to `like()`. Gives a warning if a
+  `control.family` argument is supplied to the the `options` argument of `bru()`,
+  but at least one likelihood has `control.family` information. (Issue #109)
+  
+## Bugfixes
+
+* Fix support for `SpatialPointsDataFrame` and `SpatialGridDataFrame` input
+  to `bru_fill_missing()`
+
+* Force explicit `model = "offset"` components instead of special options, to
+  avoid interfering with the linearisation system (Issue #123)
+  
+* Make the iterations more robust by resetting the internal INLA predictor
+  states to initial value zero at each step
+  
+## Miscellaneous
+  
+* Rename the option `bru_method$stop_at_max_rel_deviation` to `bru_method$rel_tol`.
+  Automatic conversion to the new name, but a warning is given.
+
+* Add option `bru_method$max_step` to control the largest allowed line search
+  scaling factor. See `?bru_options`
+  
+* New default option `bru_compress_cp` set to `TRUE` to compress the predictor
+  expression for `family="cp"` to use a single element for the linear predictor sum.
+  
 # inlabru 2.3.1
 
 * Documentation and dependency updates for CRAN compatibility
