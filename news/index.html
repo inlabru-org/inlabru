@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0.9000</span>
       </span>
     </div>
 
@@ -92,16 +92,28 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
-<ul><li><p>Fix support for <code>SpatialPointsDataFrame</code> and <code>SpatialGridDataFrame</code> input to <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code></p></li>
-<li><p>Allow <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> data input, and predictors where the size of data/effect/predictor/response aren’t equal</p></li>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.4.0" id="inlabru-240">inlabru 2.4.0<a class="anchor" aria-label="anchor" href="#inlabru-240"></a></h2>
+<div class="section level3">
+<h3 id="features-2-4-0">Features<a class="anchor" aria-label="anchor" href="#features-2-4-0"></a></h3>
+<ul><li><p>Allow predictors to have different size than the input data. The <code>data</code> argument is now allowed to be a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>, and the new argument <code>response_data</code> allows separate specification of component inputs and response variables.</p></li>
 <li><p>Add <code>bru_mapper_collect</code> class for handling sequential collections of mappers, including collections where all but the first mapper is hidden from the <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> arguments <code>n</code> and <code>values</code>, as needed to support e.g. “bym2” models.</p></li>
+<li><p>Add <code>control.family</code> as a direct argument to <code><a href="../reference/like.html">like()</a></code>. Gives a warning if a <code>control.family</code> argument is supplied to the the <code>options</code> argument of <code><a href="../reference/bru.html">bru()</a></code>, but at least one likelihood has <code>control.family</code> information. (Issue <a href="https://github.com/inlabru-org/inlabru/issues/109" class="external-link">#109</a>)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bugfixes-2-4-0">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-2-4-0"></a></h3>
+<ul><li><p>Fix support for <code>SpatialPointsDataFrame</code> and <code>SpatialGridDataFrame</code> input to <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code></p></li>
 <li><p>Force explicit <code>model = "offset"</code> components instead of special options, to avoid interfering with the linearisation system (Issue <a href="https://github.com/inlabru-org/inlabru/issues/123" class="external-link">#123</a>)</p></li>
 <li><p>Make the iterations more robust by resetting the internal INLA predictor states to initial value zero at each step</p></li>
-<li><p>Rename the option <code>bru_method$stop_at_max_rel_deviation</code> to <code>bru_method$rel_tol</code>. Automatic conversion to the new name, but a warning is given.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="miscellaneous-2-4-0">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous-2-4-0"></a></h3>
+<ul><li><p>Rename the option <code>bru_method$stop_at_max_rel_deviation</code> to <code>bru_method$rel_tol</code>. Automatic conversion to the new name, but a warning is given.</p></li>
 <li><p>Add option <code>bru_method$max_step</code> to control the largest allowed line search scaling factor. See <code><a href="../reference/bru_options.html">?bru_options</a></code></p></li>
-<li><p>Add <code>control.family</code> as a direct argument to <code><a href="../reference/like.html">like()</a></code>. Gives a warning if a <code>control.family</code> argument is supplied to the the <code>options</code> argument of <code><a href="../reference/bru.html">bru()</a></code>, but at least one likelihood has <code>control.family</code> information. (Issue <a href="https://github.com/inlabru-org/inlabru/issues/109" class="external-link">#109</a>)</p></li>
 <li><p>New default option <code>bru_compress_cp</code> set to <code>TRUE</code> to compress the predictor expression for <code>family="cp"</code> to use a single element for the linear predictor sum.</p></li>
 </ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.3.1" id="inlabru-231">inlabru 2.3.1<small>2021-03-22</small><a class="anchor" aria-label="anchor" href="#inlabru-231"></a></h2>
 <ul><li><p>Documentation and dependency updates for CRAN compatibility</p></li>

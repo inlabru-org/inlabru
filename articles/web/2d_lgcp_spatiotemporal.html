@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0.9000</span>
       </span>
     </div>
 
@@ -112,9 +112,9 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>LGCPs - An example in space and time</h1>
-                        <h4 data-toc-skip class="author">Fabian E. Bachl</h4>
+                        <h4 data-toc-skip class="author">Fabian E. Bachl and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">2021-12-17</h4>
+            <h4 data-toc-skip class="date">Generated on 2021-12-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_spatiotemporal.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_spatiotemporal.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_spatiotemporal.Rmd</code></div>
@@ -158,7 +158,7 @@
 <div class="section level2">
 <h2 id="integration-points">Integration points<a class="anchor" aria-label="anchor" href="#integration-points"></a>
 </h2>
-<p>Because our model will take time (season) into account we have to construct the integration points for the LGCP accordingly. Using the ´group´ parameter we can let the ´ipoints´ function know that we would like to construct the integration points for each season inteprendently. Note that omitting this step would simply aggregate all sampling regions over time.</p>
+<p>Because our model will take time (season) into account we have to construct the integration points for the LGCP accordingly. Using the ´group´ parameter we can let the ´ipoints´ function know that we would like to construct the integration points for each season independently. Note that omitting this step would simply aggregate all sampling regions over time.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">mrsea</span><span class="op">$</span><span class="va">samplers</span>, <span class="va">mrsea</span><span class="op">$</span><span class="va">mesh</span>, group <span class="op">=</span> <span class="st">"season"</span><span class="op">)</span></code></pre></div>
 <p>Plot the integration points:</p>
