@@ -292,6 +292,8 @@ bru <- function(components = ~ Intercept(1),
                 options = list()) {
   stopifnot(bru_safe_inla())
 
+  timing_start <- Sys.time()
+
   # Update default options
   options <- bru_call_options(options)
 
@@ -360,6 +362,8 @@ bru <- function(components = ~ Intercept(1),
     options = options
   )
 
+  timing_setup <- Sys.time()
+
   # Run iterated INLA
   if (options$bru_run) {
     result <- iinla(
@@ -370,6 +374,17 @@ bru <- function(components = ~ Intercept(1),
   } else {
     result <- list()
   }
+
+  timing_end <- Sys.time()
+  result$bru_timings <-
+    rbind(
+      data.frame(
+        Task = c("Preparation"),
+        Iteration = rep(NA_integer_, 1),
+        Time = c(timing_setup - timing_start)
+      ),
+      result[["bru_iinla"]][["timings"]]
+    )
 
   # Add bru information to the result
   result$bru_info <- info
@@ -394,12 +409,21 @@ bru_rerun <- function(result, options = list()) {
     )
   )
 
+  original_timings <- result[["bru_timings"]]
+
   result <- iinla(
     model = info[["model"]],
     lhoods = info[["lhoods"]],
     initial = result,
     options = info[["options"]]
   )
+
+  timing_end <- Sys.time()
+  result$bru_timings <-
+    rbind(
+      original_timings[1, , drop = FALSE],
+      result[["bru_iinla"]][["timings"]]
+    )
 
   # Add bru information to the result
   result$bru_info <- info
@@ -1748,9 +1772,14 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 
 
 iinla <- function(model, lhoods, initial = NULL, options) {
+  timing_start <- Sys.time()
+  timing_setup <- Sys.time()
+  timing_iterations <- Sys.time()
+
   inla.options <- bru_options_inla(options)
 
   initial_log_length <- length(bru_log_get())
+  original_timings <- NULL
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
     list(
@@ -1775,6 +1804,25 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           track[[nn]] <- NA
         }
         rbind(original_track, track)
+      },
+      timings = {
+        iteration_offset <- if (is.null(original_timings)) {
+          0
+        } else {
+          max(c(0, original_timings$Iteration), na.rm = TRUE)
+        }
+        rbind(
+          original_timings,
+          data.frame(
+            Task = c("Setup",
+                     rep("Iteration", length(timing_iterations) - 1)),
+            Iteration = c(NA_integer_,
+                          iteration_offset +
+                            seq_len(length(timing_iterations) - 1)),
+            Time = c(timing_setup - timing_start,
+                     diff(timing_iterations))
+          )
+        )
       },
       ...
     )
@@ -1884,6 +1932,10 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     track_size <- max(original_track[["iteration"]])
   }
 
+  # Preserve old timings
+  if (!is.null(old.result[["bru_iinla"]][["timings"]])) {
+    original_timings <- old.result[["bru_iinla"]][["timings"]]
+  }
 
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search) {
@@ -1915,6 +1967,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   } else {
     previous_x <- 0 # TODO: construct from the initial linearisation state instead
   }
+
+  timing_setup <- Sys.time()
+  timing_iterations <- Sys.time()
 
   track_df <- NULL
   do_final_integration <- (options$bru_max_iter == 1)
@@ -2152,6 +2207,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         unlist(states[[length(states)]][[label]])
     }
     k <- k + 1
+
+    timing_iterations <- c(timing_iterations, Sys.time())
   }
 
   result[["bru_iinla"]] <- collect_misc_info()
