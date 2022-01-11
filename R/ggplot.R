@@ -494,7 +494,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @aliases gg.SpatialPolygons
 #' @name gg.SpatialPolygons
 #' @export
-#' @param data A `SpatialPolygons` object.
+#' @param data A `SpatialPolygons` or `SpatialPolygonsDataFrame` object.
 #' @param mapping Aesthetic mappings created by `aes` used to update the default
 #'                mapping. The default mapping is
 #'                `ggplot2::aes(x = long, y = lat, group = group)`.
@@ -502,7 +502,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @param ... Arguments passed on to `geom_polypath`.
 #' Unless specified by the user,
 #' the arguments `colour = "black"` (polygon colour) and
-#' `alpha = 0.1` (Alpha level for polygon filling).
+#' `alpha = 0.2` (Alpha level for polygon filling).
 #' @return A `ggpolypath::geom_polypath` object.
 #' @details Requires the `ggpolypath` package to ensure proper plotting, since
 #'   the `ggplot::geom_polygon` function doesn't always handle geometries with
@@ -518,7 +518,13 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
   if (!is.null(crs)) {
     data <- sp::spTransform(data, crs)
   }
+
   df <- ggplot2::fortify(data)
+  if (inherits(data, "SpatialPolygonsDataFrame")) {
+    data[["id"]] <- unique(df[["id"]])
+    df <- dplyr::left_join(df, as.data.frame(data), by = "id")
+  }
+
   cnames <- names(df)[1:2]
   if (requireNamespace("ggpolypath", quietly = TRUE)) {
     dmap <- ggplot2::aes(
@@ -547,7 +553,7 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
     arg$colour <- "black"
   }
   if (!any(names(params) %in% "alpha")) {
-    arg$alpha <- 0.1
+    arg$alpha <- 0.2
   }
   arg = modifyList(arg, params)
 
