@@ -75,7 +75,7 @@ test_that("2D LGCP fitting", {
     n.samples = 5, seed = 5657L,
     parallel.configs = FALSE
   )
-  # Prediction variability includes reordeing differences, so need large
+  # Prediction variability includes reordering differences, so need large
   # tolerances unless n.samples is large
   expect_equal(
     pr$mean[c(1, 255, 778, 1000)],
