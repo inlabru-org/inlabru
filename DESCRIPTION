@@ -124,6 +124,7 @@ Collate:
     'spatstat.R'
     'spde.R'
     'stack.R'
+    'track_plotting.R'
     'utils.R'
 VignetteBuilder: knitr
 BuildVignettes: true
