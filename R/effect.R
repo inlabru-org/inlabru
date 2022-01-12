@@ -1117,7 +1117,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
             " (or '+1' for '+ Intercept(1)')"
           },
           "."
-        ))
+        ),
+        immediate. = TRUE)
         unique_inputs <- list(
           inp_values = 1,
           n_values = 1
