@@ -157,7 +157,7 @@ evaluate_model <- function(model,
     stop("Not enough information to evaluate model states.")
   }
   if (is.null(A) && !is.null(data)) {
-    A <- amatrix_eval(model$effects[included], data = data)
+    A <- amatrix_eval(model$effects[included], data = data, inla_f = TRUE)
   }
   if (is.null(A)) {
     effects <- NULL
