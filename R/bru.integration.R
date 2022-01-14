@@ -433,16 +433,26 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     if (identical(int.args[["poly_method"]], "legacy")) {
       ips <- int.polygon(domain,
-        loc = polyloc[, 1:2], group = polyloc[, 3],
-        method = int.args$method, nsub = int.args$nsub2
+                         loc = polyloc[, 1:2], group = polyloc[, 3],
+                         method = int.args$method, nsub = int.args$nsub2
       )
     } else {
-      ips <- bru_int_polygon(
-        domain,
-        poly_segm,
-        method = int.args$method,
-        nsub = int.args$nsub2
-      )
+      if (!is.null(int.args$use_new) && !int.args$use_new) {
+        ips <- bru_int_polygon(
+          domain,
+          polylist = poly_segm,
+          method = int.args$method,
+          nsub = int.args$nsub2
+        )
+      } else {
+        ips <- bru_int_polygon(
+          domain,
+          polylist = poly_segm,
+          method = int.args$method,
+          nsub = int.args$nsub2,
+          sampler = samplers
+        )
+      }
     }
 
 
@@ -450,10 +460,17 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers@data[ips$group, group, drop = FALSE],
       weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
     )
-    ips <- SpatialPointsDataFrame(ips[, c("x", "y")],
-      data = df,
-      match.ID = FALSE, proj4string = domain_crs
-    )
+    if (is.null(ips$coordinateZ)) {
+      ips <- SpatialPointsDataFrame(ips[, c("x", "y")],
+                                    data = df,
+                                    match.ID = FALSE, proj4string = domain_crs
+      )
+    } else {
+      ips <- SpatialPointsDataFrame(ips[, c("x", "y", "coordinateZ")],
+                                    data = df,
+                                    match.ID = FALSE, proj4string = domain_crs
+      )
+    }
 
     if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(samplers_crs)) {
       ips <- stransform(ips, crs = samplers_crs)
