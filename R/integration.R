@@ -795,7 +795,9 @@ bru_int_polygon <- function(mesh,
         ips <- data.frame(
           x = integ_$loc[, 1],
           y = integ_$loc[, 2],
-          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
+          # TODO: figure out how to deal with 3D points without
+          # breaking sp::over later
+          #          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
           weight = integ_$weight,
           group = g
         )
@@ -830,7 +832,9 @@ bru_int_polygon <- function(mesh,
         ips <- data.frame(
           x = integ_$loc[, 1],
           y = integ_$loc[, 2],
-          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
+          # TODO: figure out how to deal with 3D points without
+          # breaking sp::over later
+          #          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
           weight = integ_$weight,
           group = g
         )
