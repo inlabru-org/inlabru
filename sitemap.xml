@@ -91,6 +91,9 @@
     <loc>/reference/bru_int_polygon.html</loc>
   </url>
   <url>
+    <loc>/reference/bru_int_polygon_old.html</loc>
+  </url>
+  <url>
     <loc>/reference/bru_log.html</loc>
   </url>
   <url>
@@ -314,6 +317,9 @@
   </url>
   <url>
     <loc>/reference/materncov.bands.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mesh_triangle_integration.html</loc>
   </url>
   <url>
     <loc>/reference/mexdolphin.html</loc>

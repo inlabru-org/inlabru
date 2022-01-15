@@ -96,7 +96,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bru_int_polygon</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">polylist</span>, method <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bru_int_polygon</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">polylist</span>, method <span class="op">=</span> <span class="cn">NULL</span>, samplers <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -106,7 +106,10 @@
 <dt>polylist</dt>
 <dd><p>A list of <code>inla.mesh.segment</code> objects</p></dd>
 <dt>method</dt>
-<dd><p>Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")</p></dd>
+<dd><p>Which integration method to use ("stable",
+with aggregation to mesh vertices, or "direct")</p></dd>
+<dt>samplers</dt>
+<dd><p>If non-NULL, a SpatialPolygons* object, used instead of polylist</p></dd>
 <dt>...</dt>
 <dd><p>Arguments passed to the low level integration method (<code>make_stable_integration_points</code>)</p></dd>
 </dl></div>
@@ -127,7 +130,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer></div>
