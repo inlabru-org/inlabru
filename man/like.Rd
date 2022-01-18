@@ -24,7 +24,8 @@ like(
   allow_latent = FALSE,
   allow_combine = NULL,
   control.family = NULL,
-  options = list()
+  options = list(),
+  .envir = parent.frame()
 )
 
 like_list(...)
@@ -98,6 +99,10 @@ Default \code{FALSE}, but forced to \code{TRUE} if \code{response_data} is \code
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
+
+\item{.envir}{The evaluation environment to use for special arguments
+(\code{E} and \code{Ntrials}) if not found in \code{response_data} or \code{data}. Defaults to
+the calling environment.}
 
 \item{\dots}{For \code{like_list.bru_like}, one or more \code{bru_like} objects}
 

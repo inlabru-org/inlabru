@@ -276,7 +276,12 @@ bru_info.bru <- function(object, ...) {
 #'   Also used to define a default linear additive predictor.  See
 #'   [component()] for details.
 #' @param ... Likelihoods, each constructed by a calling [like()], or named
-#'   parameters that can be passed to a single [like()] call.
+#'   parameters that can be passed to a single [like()] call. Note that
+#'   all the arguments will be evaluated before calling [like()] in order
+#'   to detect if they are `like` objects. This means that
+#'   special arguments that need to be evaluated in the context of
+#'   `response_data` or `data` (such as Ntrials) may will only work that
+#'   way in direct calls to [like()].
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #'
@@ -327,7 +332,10 @@ bru <- function(components = ~ Intercept(1),
         extract_response(components)
       )
     }
-    lhoods <- list(do.call(like, c(lhoods, list(options = options))))
+    lhoods <- list(do.call(like,
+                           c(lhoods,
+                             list(options = options,
+                                  .envir = NULL))))
     dot_is_lhood <- TRUE
     dot_is_lhood_list <- FALSE
   }
@@ -452,6 +460,46 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 
 
 
+eval_in_data_context <- function(input,
+                                data = NULL,
+                                response_data = NULL,
+                                default = NULL,
+                                .envir = parent.frame()) {
+  if (!is.null(data)) {
+    if (is.list(data) && !is.data.frame(data)) {
+    } else {
+      data <- as.data.frame(data)
+    }
+  }
+  if (!is.null(response_data)) {
+    if (is.list(response_data) && !is.data.frame(response_data)) {
+    } else {
+      data <- as.data.frame(data)
+    }
+  }
+  if (!is.null(response_data)) {
+    result <- try(
+      eval(input, envir = response_data, enclos = .envir),
+      silent = TRUE)
+  }
+  if (is.null(response_data) || inherits(result, "try-error")) {
+    result <- try(
+      eval(input, envir = data, enclos = .envir),
+      silent = TRUE)
+  }
+  if (inherits(result, "try-error")) {
+    stop(paste0("Input ",
+                substitute(input),
+                " could not be evaluated."))
+  }
+  if (is.null(result)) {
+    result <- default
+  }
+
+  result
+}
+
+
 #' Likelihood construction for usage with [bru()]
 #'
 #' @aliases like
@@ -506,6 +554,9 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
+#' @param .envir The evaluation environment to use for special arguments
+#' (`E` and `Ntrials`) if not found in `response_data` or `data`. Defaults to
+#' the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterize [bru()].
 #'
@@ -519,7 +570,8 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  allow_latent = FALSE,
                  allow_combine = NULL,
                  control.family = NULL,
-                 options = list()) {
+                 options = list(),
+                 .envir = parent.frame()) {
   options <- bru_call_options(options)
 
   # Some defaults
@@ -541,12 +593,16 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     stop("Missing response variable names")
   }
 
-  if (is.null(E)) {
-    E <- options$E
-  }
-  if (is.null(Ntrials)) {
-    Ntrials <- options$Ntrials
-  }
+  E <- eval_in_data_context(substitute(E),
+                            data = data,
+                            response_data = response_data,
+                            default = options[["E"]],
+                            .envir = .envir)
+  Ntrials <- eval_in_data_context(substitute(Ntrials),
+                                  data = data,
+                                  response_data = response_data,
+                                  default = options[["Ntrials"]],
+                                  .envir = .envir)
 
   # More on special bru likelihoods
   if (family == "cp") {
