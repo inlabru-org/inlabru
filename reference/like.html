@@ -112,7 +112,8 @@
   allow_latent = FALSE,
   allow_combine = NULL,
   control.family = NULL,
-  options = list()
+  options = list(),
+  .envir = parent.frame()
 )
 
 like_list(...)
@@ -192,6 +193,10 @@ Default <code>FALSE</code>, but forced to <code>TRUE</code> if <code>response_da
 <dt>options</dt>
 <dd><p>A <a href="bru_options.html">bru_options</a> options object or a list of options passed
 on to <code><a href="bru_options.html">bru_options()</a></code></p></dd>
+<dt>.envir</dt>
+<dd><p>The evaluation environment to use for special arguments
+(<code>E</code> and <code>Ntrials</code>) if not found in <code>response_data</code> or <code>data</code>. Defaults to
+the calling environment.</p></dd>
 <dt>...</dt>
 <dd><p>For <code>like_list.bru_like</code>, one or more <code>bru_like</code> objects</p></dd>
 <dt>object</dt>
