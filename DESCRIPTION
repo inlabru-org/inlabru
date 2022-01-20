@@ -64,6 +64,7 @@ Suggests:
     graphics,
     INLA (>= 21.08.31),
     knitr,
+    magrittr,
     maptools,
     mgcv,
     patchwork,

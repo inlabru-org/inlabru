@@ -450,7 +450,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
           polylist = poly_segm,
           method = int.args$method,
           nsub = int.args$nsub2,
-          sampler = samplers
+          samplers = samplers
         )
       }
     }
