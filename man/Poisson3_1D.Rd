@@ -40,7 +40,7 @@ different gridded data interval widths.
 }
 \examples{
 \donttest{
-library(ggplot2)
+if (require("ggplot2", quietly = TRUE)) {
 data(Poisson3_1D)
 # first the plots for the 10-bin case:
 p1a <- ggplot(countdata3a) +
@@ -95,5 +95,6 @@ p2a <- ggplot() +
   xlab(expression(bold(s))) +
   ylab(expression(lambda(bold(s))))
 multiplot(p1a, p2a, cols = 1)
+}
 }
 }
