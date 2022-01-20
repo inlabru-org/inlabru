@@ -21,6 +21,7 @@ Calculates DIC and WAIC differences and produces an ordered summary.
 }
 \examples{
 \donttest{
+if (bru_safe_inla(multicore = FALSE)) {
 # Generate some data
 input.df <- data.frame(x = cos(1:10))
 input.df <- within(
@@ -30,11 +31,11 @@ input.df <- within(
 
 # Fit two models
 fit <- bru(y ~ x, family = "gaussian", data = input.df)
-fit2 <- bru(y ~ x, family = "Poisson", data = input.df)
+fit2 <- bru(y ~ x, family = "poisson", data = input.df)
 
 # Compare DIC
 
 deltaIC(fit, fit2)
 }
-
+}
 }
