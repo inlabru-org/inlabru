@@ -114,7 +114,7 @@
       <h1 data-toc-skip>LGCPs - Distance sampling</h1>
                         <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-01-18</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-01-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_distancesampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_distancesampling.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_distancesampling.Rmd</code></div>
@@ -333,10 +333,10 @@
 <span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
-<span class="co">#&gt;       mean       sd   q0.025 median   q0.975    smin     smax        cv</span>
-<span class="co">#&gt; 1 325.7917 114.3182 167.9277 317.13 589.2151 102.043 796.4108 0.3508935</span>
-<span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 13068.64</span>
+<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
+<span class="co">#&gt; 1 355.2522 107.4747 191.8559 340.5721 597.4571 169.0103 774.7151 0.3025306</span>
+<span class="co">#&gt;       var</span>
+<span class="co">#&gt; 1 11550.8</span>
 
 <span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>
