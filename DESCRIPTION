@@ -48,8 +48,9 @@ Depends:
     sp (>= 1.4-5),
     stats
 Imports:
-    plyr,
+    magrittr,
     Matrix,
+    plyr,
     rgdal (>= 1.5.8),
     rgeos,
     rlang,
@@ -64,7 +65,6 @@ Suggests:
     graphics,
     INLA (>= 21.08.31),
     knitr,
-    magrittr,
     maptools,
     mgcv,
     patchwork,

@@ -1,6 +1,9 @@
 # library(tidyverse)
 # library(patchwork)
 
+#' @importFrom magrittr "%>%"
+#' @importFrom rlang .data
+#' @importFrom rlang .env
 
 make_track_plots <- function(fit) {
   if (!requireNamespace("dplyr", quietly = TRUE) ||
@@ -11,46 +14,46 @@ make_track_plots <- function(fit) {
   track_data <-
     fit$bru_iinla$track %>%
     dplyr::left_join(fit$bru_iinla$track %>%
-      dplyr::filter(iteration == max(iteration)) %>%
+      dplyr::filter(.data$iteration == max(.data$iteration)) %>%
       dplyr::rename(
-        mode_end = mode,
-        new_linearisation_end = new_linearisation,
-        sd_end = sd
+        mode_end = .data$mode,
+        new_linearisation_end = .data$new_linearisation,
+        sd_end = .data$sd
       ),
     by = c("effect", "index"),
     ) %>%
-    dplyr::mutate(iteration = iteration.x) %>%
-    dplyr::left_join(fit$bru_iinla$track %>%
-      dplyr::filter(iteration == 1) %>%
+    dplyr::mutate(iteration = .data$iteration.x) %>%
+    dplyr::left_join(.env$fit$bru_iinla$track %>%
+      dplyr::filter(.data$iteration == 1) %>%
       dplyr::rename(
-        mode_start = mode,
-        new_linearisation_start = new_linearisation,
-        sd_start = sd
+        mode_start = .data$mode,
+        new_linearisation_start = .data$new_linearisation,
+        sd_start = .data$sd
       ),
     by = c("effect", "index"),
     ) %>%
-    dplyr::mutate(iteration = iteration.x)
+    dplyr::mutate(iteration = .data$iteration.x)
 
   pl_theme <-
     list(
-      ggplot2::facet_wrap(ggplot2::vars(effect), scales = "free"),
+      ggplot2::facet_wrap(ggplot2::vars(.data$effect), scales = "free"),
       ggplot2::guides(color = "none")
     )
 
   pl1 <-
     ggplot2::ggplot(track_data) +
     ggplot2::geom_line(ggplot2::aes(
-      iteration,
-      mode,
-      col = index,
-      group = factor(index),
+      .data$iteration,
+      .data$mode,
+      col = .data$index,
+      group = factor(.data$index),
       lty = "Mode"
     )) +
     ggplot2::geom_line(ggplot2::aes(
-      iteration,
-      new_linearisation,
-      col = index,
-      group = factor(index),
+      .data$iteration,
+      .data$new_linearisation,
+      col = .data$index,
+      group = factor(.data$index),
       lty = "Lin"
     )) +
     pl_theme +
@@ -58,17 +61,17 @@ make_track_plots <- function(fit) {
   pl2 <-
     ggplot2::ggplot(track_data) +
     ggplot2::geom_line(ggplot2::aes(
-      iteration,
-      mode - mode_end,
-      col = index,
-      group = factor(index),
+      .data$iteration,
+      .data$mode - .data$mode_end,
+      col = .data$index,
+      group = factor(.data$index),
       lty = "Mode"
     )) +
     ggplot2::geom_line(ggplot2::aes(
-      iteration,
-      new_linearisation - mode_end,
-      col = index,
-      group = factor(index),
+      .data$iteration,
+      .data$new_linearisation - .data$mode_end,
+      col = .data$index,
+      group = factor(.data$index),
       lty = "Lin"
     )) +
     pl_theme +
@@ -76,24 +79,24 @@ make_track_plots <- function(fit) {
   pl3 <-
     ggplot2::ggplot(track_data) +
     ggplot2::geom_line(ggplot2::aes(
-      iteration,
-      mode - new_linearisation,
-      col = index,
-      group = factor(index),
+      .data$iteration,
+      .data$mode - .data$new_linearisation,
+      col = .data$index,
+      group = factor(.data$index),
       lty = "Mode-Lin"
     )) +
     ggplot2::geom_line(ggplot2::aes(
-      iteration,
-      -sd,
-      col = index,
-      group = factor(index),
+      .data$iteration,
+      -.data$sd,
+      col = .data$index,
+      group = factor(.data$index),
       lty = "SD"
     )) +
     ggplot2::geom_line(ggplot2::aes(
-      iteration,
-      sd,
-      col = index,
-      group = factor(index),
+      .data$iteration,
+      .data$sd,
+      col = .data$index,
+      group = factor(.data$index),
       lty = "SD"
     )) +
     pl_theme +
@@ -101,17 +104,17 @@ make_track_plots <- function(fit) {
   pl4 <-
     ggplot2::ggplot(track_data) +
     ggplot2::geom_line(ggplot2::aes(
-      iteration,
-      (mode - mode_end) / sd,
-      col = index,
-      group = factor(index),
+      .data$iteration,
+      (.data$mode - .data$mode_end) / .data$sd,
+      col = .data$index,
+      group = factor(.data$index),
       lty = "Mode"
     )) +
     ggplot2::geom_line(ggplot2::aes(
-      iteration,
-      (new_linearisation - mode_end) / sd,
-      col = index,
-      group = factor(index),
+      .data$iteration,
+      (.data$new_linearisation - .data$mode_end) / .data$sd,
+      col = .data$index,
+      group = factor(.data$index),
       lty = "Lin"
     )) +
     pl_theme +
