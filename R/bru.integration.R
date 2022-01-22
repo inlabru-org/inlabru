@@ -532,7 +532,11 @@ cprod <- function(...) {
     ips <- ipl[[1]]
   } else {
     ips1 <- ipl[[1]]
-    ips2 <- do.call(cprod, ipl[2:length(ipl)])
+    if (length(ipl) > 2) {
+      ips2 <- do.call(cprod, ipl[2:length(ipl)])
+    } else {
+      ips2 <- ipl[[2]]
+    }
     if (!"weight" %in% names(ips1)) {
       ips1$weight <- 1
     }
@@ -540,32 +544,18 @@ cprod <- function(...) {
       ips2$weight <- 1
     }
 
-    loc1 <- ips1[, setdiff(names(ipl[[1]]), "weight"), drop = FALSE]
-    w1 <- data.frame(weight = ips1$weight)
-    loc2 <- ips2[, setdiff(names(ips2), "weight"), drop = FALSE]
-    w2 <- data.frame(weight2 = ips2[, "weight"])
-
-    # Merge the locations. In case of Spatial objects we need to use the sp:merge
-    # function. Unfortunately sp::merge replicates entries in a different order than
-    # base merge so we need to reverse the order of merging the weights
-
-    if (inherits(loc1, "Spatial")) {
-      ips <- sp::merge(loc1, loc2, duplicateGeoms = TRUE)
-      weight <- base::merge(w2, w1)
-      name <- base::merge(row.names(loc2), row.names(loc1))
-      row.names(ips) <- paste(name$x, name$y, sep = "_")
-    } else if (inherits(loc2, "Spatial")) {
-      ips <- sp::merge(loc2, loc1, duplicateGeoms = TRUE)
-      weight <- base::merge(w1, w2)
-      name <- base::merge(row.names(loc1), row.names(loc2))
-      row.names(ips) <- paste(name$x, name$y,sep="_")
+    by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
+    if (inherits(ips1, "Spatial")) {
+      ips <- sp::merge(ips1, ips2, by = by, duplicateGeoms = TRUE)
+    } else if (inherits(ips2, "Spatial")) {
+      ips <- sp::merge(ips2, ips1, by = by, duplicateGeoms = TRUE)
     } else {
-      ips <- base::merge(loc1, loc2)
-      weight <- base::merge(w1, w2)
-      name <- base::merge(row.names(loc1), row.names(loc2))
-      row.names(ips) <- paste(name$x, name$y,sep="_")
+      ips <- base::merge(ips1, ips2, by = by)
     }
-    ips$weight <- weight$weight * weight$weight2
+    ips$weight <- ips$weight.x * ips$weight.y
+    ips[["weight.x"]] <- NULL
+    ips[["weight.y"]] <- NULL
+    row.names(ips) <- as.character(seq_len(NROW(ips)))
   }
   ips
 }
