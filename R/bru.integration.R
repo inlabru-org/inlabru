@@ -551,13 +551,19 @@ cprod <- function(...) {
 
     if (inherits(loc1, "Spatial")) {
       ips <- sp::merge(loc1, loc2, duplicateGeoms = TRUE)
-      weight <- merge(w2, w1)
+      weight <- base::merge(w2, w1)
+      name <- base::merge(row.names(loc2), row.names(loc1))
+      row.names(ips) <- paste(name$x, name$y, sep = "_")
     } else if (inherits(loc2, "Spatial")) {
       ips <- sp::merge(loc2, loc1, duplicateGeoms = TRUE)
-      weight <- merge(w2, w1)
+      weight <- base::merge(w1, w2)
+      name <- base::merge(row.names(loc1), row.names(loc2))
+      row.names(ips) <- paste(name$x, name$y,sep="_")
     } else {
-      ips <- merge(loc1, loc2)
-      weight <- merge(w1, w2)
+      ips <- base::merge(loc1, loc2)
+      weight <- base::merge(w1, w2)
+      name <- base::merge(row.names(loc1), row.names(loc2))
+      row.names(ips) <- paste(name$x, name$y,sep="_")
     }
     ips$weight <- weight$weight * weight$weight2
   }
