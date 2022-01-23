@@ -23,7 +23,7 @@ make_track_plots <- function(fit) {
     by = c("effect", "index"),
     ) %>%
     dplyr::mutate(iteration = .data$iteration.x) %>%
-    dplyr::left_join(.env$fit$bru_iinla$track %>%
+    dplyr::left_join(fit$bru_iinla$track %>%
       dplyr::filter(.data$iteration == 1) %>%
       dplyr::rename(
         mode_start = .data$mode,
