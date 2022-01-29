@@ -60,14 +60,14 @@ jobs:
 #          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-${{ hashFiles('.github/depends.Rds') }}
 #          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-
 
-      - name: Install system dependencies on Linux
-        if: runner.os == 'Linux'
-        run: |
-          (Rscript -e 'install.packages("remotes")')
-          while read -r cmd
-          do
-            eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
+#      - name: Install system dependencies on Linux
+#        if: runner.os == 'Linux'
+#        run: |
+#          (Rscript -e 'install.packages("remotes")')
+#          while read -r cmd
+#          do
+#            eval sudo $cmd
+#          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
 
       - name: Install system dependencies on MacOS (X11, gdal)
         if: runner.os == 'macOS'
@@ -78,14 +78,6 @@ jobs:
           brew install gdal
 
       - uses: r-lib/actions/setup-r-dependencies@v2
-        if: runner.os == 'Linux'
-        with:
-          dependencies: '"all"'
-          extra-packages: |
-             rcmdcheck
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        if: runner.os != 'Linux'
         with:
           dependencies: '"all"'
           extra-packages: |
@@ -98,12 +90,11 @@ jobs:
           sessioninfo::session_info(pkgs, include_base = TRUE)
         shell: Rscript {0}
 
-      - name: Check
+      - uses: r-lib/actions/check-r-package@v2
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: |
-          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
-        shell: Rscript {0}
+        with:
+          args: 'c("--no-manual", "--as-cran")'
 
       - name: Full testthat output
         if: always()

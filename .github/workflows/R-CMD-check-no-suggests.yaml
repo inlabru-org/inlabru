@@ -33,36 +33,38 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
+          extra-repositories: "https://inla.r-inla-download.org/R/testing"
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Query dependencies
-        run: |
-          install.packages("Matrix")
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = NA), ".github/depends-no-suggests.Rds", version = 2)
-          print(remotes::dev_package_deps(dependencies = NA))
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
+#      - name: Query dependencies
+#        run: |
+#          install.packages("Matrix")
+#          install.packages('remotes')
+#          saveRDS(remotes::dev_package_deps(dependencies = NA), ".github/depends-no-suggests.Rds", version = 2)
+#          print(remotes::dev_package_deps(dependencies = NA))
+#          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+#        shell: Rscript {0}
 
-      - name: Restore R package cache
-        if: runner.os != 'Windows'
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-plain-${{ hashFiles('.github/depends-no-suggests.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-plain-
+#      - name: Restore R package cache
+#        if: runner.os != 'Windows'
+#        uses: actions/cache@v2
+#        with:
+#          path: ${{ env.R_LIBS_USER }}
+#          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-plain-${{ hashFiles('.github/depends-no-suggests.Rds') }}
+#          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-plain-
 
-      - name: Install system dependencies on Linux
-        if: runner.os == 'Linux'
-        run: |
-          while read -r cmd
-          do
-            eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
+#      - name: Install system dependencies on Linux
+#        if: runner.os == 'Linux'
+#        run: |
+#          (Rscript -e 'install.packages("remotes")')
+#          while read -r cmd
+#          do
+#            eval sudo $cmd
+#          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
 
       - name: Install system dependencies on MacOS (X11, gdal)
         if: runner.os == 'macOS'
@@ -73,19 +75,9 @@ jobs:
           brew install gdal
 
       - uses: r-lib/actions/setup-r-dependencies@v2
-        if: runner.os == 'Linux'
         with:
           dependencies: '"hard"'
           extra-packages: |
-             devtools
-             rcmdcheck
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        if: runner.os != 'Linux'
-        with:
-          dependencies: '"hard"'
-          extra-packages: |
-             devtools
              rcmdcheck
 
       - name: Session info
@@ -95,15 +87,13 @@ jobs:
           sessioninfo::session_info(pkgs, include_base = TRUE)
         shell: Rscript {0}
 
-      - name: Check
+      - uses: r-lib/actions/check-r-package@v2
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
           _R_CHECK_FORCE_SUGGESTS_: false
-        run: |
-          build_args <- c("--no-manual", "--no-build-vignettes")
-          args <- c("--no-manual", "--ignore-vignettes", "--as-cran")
-          rcmdcheck::rcmdcheck(build_args = build_args, args = args, error_on = "warning", check_dir = "check")
-        shell: Rscript {0}
+        with:
+          build_args: 'c("--no-manual", "--no-build-vignettes")'
+          args: 'c("--no-manual", "--ignore-vignettes", "--as-cran")'
 
       - name: Full testthat output
         if: always()
