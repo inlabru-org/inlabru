@@ -63,6 +63,7 @@ jobs:
       - name: Install system dependencies on Linux
         if: runner.os == 'Linux'
         run: |
+          (Rscript -e 'install.packages("remotes")')
           while read -r cmd
           do
             eval sudo $cmd
