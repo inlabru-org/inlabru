@@ -126,6 +126,7 @@ Collate:
     'spde.R'
     'stack.R'
     'track_plotting.R'
+    'transformation.R'
     'utils.R'
 VignetteBuilder: knitr
 BuildVignettes: true
