@@ -118,6 +118,19 @@ fm_sp_get_crs <- function(x) {
   crs
 }
 
+#! For now just add fm_sf version of this
+# Is there any need for fm_has_PROJ6() stuff
+# for sf objects?
+
+# Given sf or sft object, return
+# crs as wkt
+fm_sf_get_crs <- function(x) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+  st_crs(x)$wkt
+}
+
 fm_crs_is_null <- function(crs) {
   if (is.null(crs)) {
     TRUE
@@ -402,6 +415,8 @@ fm_crs_set_ellipsoid_radius <- function(crs, radius) {
 #' }
 #' @export
 #' @rdname fm_CRS
+
+#! sp code in this function
 
 fm_CRS <- function(projargs = NULL, doCheckCRSArgs = TRUE,
                    args = NULL, oblique = NULL,
@@ -734,6 +749,23 @@ fm_list_as_CRS <- function(x, ...) {
 #'   print(fm_CRSargs(crs1))
 #'   print(fm_CRSargs(crs2))
 #' }
+
+#! An equivalent function to fm_CRSargs for sf object 
+# would have something like:
+#
+# if (inherits(x, "crs")){
+#   x$input   
+# }
+#
+# which returns equivalent of CRSargs(x)
+#
+# Note:  sf crs object class is lower case "crs"
+#        sp crs object class is upper case "CRS"
+#
+# Decision to make about at which point the sf vs sp code bifurcates
+# could write separate fm_ functions for "crs" class
+# or have single functions that check sp vs sf 
+
 fm_CRSargs <- function(x, ...) {
   fm_not_for_PROJ6()
 
@@ -951,6 +983,13 @@ fm_wkt_set_lengthunit <- function(wkt, unit, params = NULL) {
 #' @return For `fm_crs_get_wkt`, WKT2 string.
 #' @export
 #' @rdname fm_crs_wkt
+
+#! equivalent to comment(crs)
+# would be crs$wkt for sf crs class
+# 
+# Note: maybe sensible way structure code is to use
+# wkt as much as possible and then to always convert
+# crs objects to this structure as it is package independent?
 
 fm_crs_get_wkt <- function(crs) {
   fm_requires_PROJ6()
@@ -1255,6 +1294,8 @@ fm_crs_bounds <- function(crs, warn.unknown = FALSE) {
 }
 
 ## TRUE/FALSE for points inside/outside projection domain.
+
+#! sp code here
 fm_crs_bounds_check <- function(x, bounds) {
   stopifnot(inherits(x, "matrix"))
   if (all(is.finite(bounds$xlim)) && all(is.finite(bounds$ylim))) {
@@ -1269,7 +1310,7 @@ fm_crs_bounds_check <- function(x, bounds) {
 }
 
 
-
+#! show() for "CRS" and "crs" class appear identical
 fm_internal_update_crs <- function(crs, newcrs, mismatch.allowed) {
   if (is.null(crs)) {
     newcrs
@@ -1327,6 +1368,11 @@ fm_identical_CRS <- function(crs0, crs1, crsonly = FALSE) {
 fm_spTransform <- function(x, ...) {
   UseMethod("fm_spTransform")
 }
+
+#! Can either write fm_sfTransform method or just add
+# to this method?
+# Lots of sp code in here, mainly spTransform which has equivalent
+# sf::st_transform()
 
 #' @details The default method handles low level transformation of raw
 #' coordinates.
@@ -1392,6 +1438,9 @@ fm_spTransform.default <- function(x, crs0, crs1, passthrough = FALSE, ...) {
         crs1oblique <- NULL
       }
       x <- sp::SpatialPoints(x[ok, , drop = FALSE], proj4string = crs0crs)
+      #! equivalent is st_as_sf(coords = x, crs = ...)
+      # Note: st_as_sf has wkt argument which might make the "use wkt as much as possible"
+      # idea work quite well
       if (do_work_on_sphere) {
         if (!onsphere_0) {
           if (sphere_radius_0 != 1) {
@@ -1719,6 +1768,42 @@ fm_sp2segment <-
     UseMethod("fm_as_inla_mesh_segment")
   }
 
+#! Seems like easiest here would be to just
+# define fm_as_inla_mesh_segment.sfc_POINT etc
+#! Some experimental sf method code:
+fm_as_inla_mesh_segment_sfc <-
+  function(sf, ...) {
+    UseMethod("fm_as_inla_mesh_segment_sfc")
+  }
+
+fm_as_inla_mesh_segment_sfc.sfc_POINT <-
+  function(sfc, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
+    # For now remove crs as that might involve editing
+    # INLA::inla.mesh.segment() to recognise "crs" objects
+    # crs <- fm_sp_get_crs(sp)
+    loc <- st_coordinates(sfc)
+    loc <- unname(loc)   # to use identical() in testing, otherwise dimnames are different
+
+    n <- dim(loc)[1L]
+    if (reverse) {
+      idx <- seq(n, 1L, length = n)
+    } else {
+      idx <- seq_len(n)
+    }
+     INLA::inla.mesh.segment(
+       loc = loc, idx = idx, grp = grp, is.bnd = is.bnd
+       )
+   #  INLA::inla.mesh.segment(
+   #    loc = loc, idx = idx, grp = grp, is.bnd = is.bnd,
+   #    crs = crs
+   #  )
+  }
+  
+fm_as_inla_mesh_segment.sf <-
+  function(sf, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
+    sfc = st_geometry(sf)
+    fm_as_inla_mesh_segment_sfc(sfc)
+  }
 
 
 fm_as_inla_mesh_segment.SpatialPoints <-
