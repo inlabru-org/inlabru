@@ -1778,11 +1778,16 @@ fm_as_inla_mesh_segment_sfc <-
 
 fm_as_inla_mesh_segment_sfc.sfc_POINT <-
   function(sfc, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
-    # For now remove crs as that might involve editing
-    # INLA::inla.mesh.segment() to recognise "crs" objects
-    # crs <- fm_sp_get_crs(sp)
+    crs <- st_crs(sfc) 
+
+    if (is.na(crs)) {
+      crs <- NULL
+    } else { 
+      crs <- sp::CRS(crs$input)  # required for INLA::inla.mesh.segment
+    }
+
     loc <- st_coordinates(sfc)
-    loc <- unname(loc)   # to use identical() in testing, otherwise dimnames are different
+    loc <- unname(loc)   
 
     n <- dim(loc)[1L]
     if (reverse) {
@@ -1791,14 +1796,49 @@ fm_as_inla_mesh_segment_sfc.sfc_POINT <-
       idx <- seq_len(n)
     }
      INLA::inla.mesh.segment(
-       loc = loc, idx = idx, grp = grp, is.bnd = is.bnd
-       )
-   #  INLA::inla.mesh.segment(
-   #    loc = loc, idx = idx, grp = grp, is.bnd = is.bnd,
-   #    crs = crs
-   #  )
+       loc = loc, idx = idx, grp = grp, is.bnd = is.bnd,
+       crs = crs
+     )
   }
   
+fm_as_inla_mesh_segment_sfc.sfc_LINESTRING <-
+  function(sfc, join = TRUE, grp = NULL, reverse = FALSE, ...) {
+    crs <- st_crs(sfc) 
+
+    if (is.na(crs)) {
+      crs <- NULL
+    } else { 
+      crs <- sp::CRS(crs$input)  # required for INLA::inla.mesh.segment
+    }
+
+    segm <- list()
+    for (k in seq_len(length(sfc))) {
+
+      loc <- st_coordinates(sfc[k])[,1:2]
+      loc <- unname(loc)
+
+      n <- dim(loc)[1L]
+      if (reverse) {
+        idx <- seq(n, 1L, length = n)
+      } else {
+        idx <- seq_len(n)
+      }
+      segm[[k]] <- INLA::inla.mesh.segment(loc = loc, 
+                                           idx = idx, 
+                                           is.bnd = FALSE, 
+                                           crs = crs)
+    }
+
+    # Think this can stay the same?
+    if (join) {
+      if (missing(grp)) {
+        grp <- seq_len(length(segm))
+      }
+      segm <- fm_internal_sp2segment_join(segm, grp = grp, closed = FALSE)
+    }
+    segm
+  }
+
 fm_as_inla_mesh_segment.sf <-
   function(sf, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
     sfc = st_geometry(sf)
