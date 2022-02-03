@@ -120,6 +120,7 @@ Collate:
     'prediction.R'
     'rgl.R'
     'sampling.R'
+    'sf_utils.R'
     'shapefile.R'
     'spatstat.R'
     'spde.R'
