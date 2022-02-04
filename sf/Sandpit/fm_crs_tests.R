@@ -7,7 +7,8 @@ library(inlabru)
 library(INLA)
 library(sf)
 source(here::here("R", "fmesher_crs.R"))
-gorillas_sf = readRDS("sf", "Data", "gorillas_sf.rds")
+source(here::here("R", "sf_utils.R"))
+gorillas_sf = readRDS(here::here("sf", "Data", "gorillas_sf.rds"))
 
 #### testing for fm_as_inla_mesh_segment.sf ###
 
@@ -22,7 +23,7 @@ segm.bnd = inla.mesh.segment(loc.bnd,
                              idx = seq_len(nrow(loc.bnd)),  
                              is.bnd = TRUE)
 
-# note, this returns different indexing if idx is not set manually here. 
+# Note: this returns different indexing if idx is not set manually here. 
 # Setting this to seq_len(nrow(loc.bnd)) makes the test work.
 
 # From inla.mesh.segment documentation:
@@ -46,6 +47,15 @@ str(segm.bnd)
 str(segm.bnd.sf)
 
 crs = st_crs(st_geometry(loc.sf))
+
+# check warning message for xyz
+loc.sf.xyz = st_as_sf(as.data.frame(cbind(loc.bnd, 1)),
+                      coords = c(1,2,3))
+class(loc.sf.xyz)
+class(st_geometry(loc.sf.xyz))
+class(st_geometry(loc.sf.xyz)[[1]])
+
+segm.bnd.sf.xym = fm_as_inla_mesh_segment(loc.sf.xyz)
 
 ## scf_LINESTRING ##
 
@@ -72,5 +82,7 @@ identical(seg_sf, seg)
 
 str(seg)
 str(seg_sf)
+
+## scf_POLYGON ##
 
 

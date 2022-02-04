@@ -750,11 +750,11 @@ fm_list_as_CRS <- function(x, ...) {
 #'   print(fm_CRSargs(crs2))
 #' }
 
-#! An equivalent function to fm_CRSargs for sf object 
+#! An equivalent function to fm_CRSargs for sf object
 # would have something like:
 #
 # if (inherits(x, "crs")){
-#   x$input   
+#   x$input
 # }
 #
 # which returns equivalent of CRSargs(x)
@@ -764,7 +764,7 @@ fm_list_as_CRS <- function(x, ...) {
 #
 # Decision to make about at which point the sf vs sp code bifurcates
 # could write separate fm_ functions for "crs" class
-# or have single functions that check sp vs sf 
+# or have single functions that check sp vs sf
 
 fm_CRSargs <- function(x, ...) {
   fm_not_for_PROJ6()
@@ -986,7 +986,7 @@ fm_wkt_set_lengthunit <- function(wkt, unit, params = NULL) {
 
 #! equivalent to comment(crs)
 # would be crs$wkt for sf crs class
-# 
+#
 # Note: maybe sensible way structure code is to use
 # wkt as much as possible and then to always convert
 # crs objects to this structure as it is package independent?
@@ -1778,16 +1778,22 @@ fm_as_inla_mesh_segment_sfc <-
 
 fm_as_inla_mesh_segment_sfc.sfc_POINT <-
   function(sfc, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
-    crs <- st_crs(sfc) 
+    crs <- st_crs(sfc)
+
+    if (sf_check_dim(sfc)) {
+      warning(
+      "XYZ, XYM and XYZM sfg classes are not fully supported. In general the Z and M coordinates will be ignored"
+      )
+    }
 
     if (is.na(crs)) {
       crs <- NULL
-    } else { 
+    } else {
       crs <- sp::CRS(crs$input)  # required for INLA::inla.mesh.segment
     }
 
-    loc <- st_coordinates(sfc)
-    loc <- unname(loc)   
+    loc <- st_coordinates(sfc)[,1:2]   # only uses XY
+    loc <- unname(loc)
 
     n <- dim(loc)[1L]
     if (reverse) {
@@ -1800,14 +1806,21 @@ fm_as_inla_mesh_segment_sfc.sfc_POINT <-
        crs = crs
      )
   }
-  
+
 fm_as_inla_mesh_segment_sfc.sfc_LINESTRING <-
   function(sfc, join = TRUE, grp = NULL, reverse = FALSE, ...) {
-    crs <- st_crs(sfc) 
+
+    if (sf_check_dim(sfc)) {
+      warning(
+        "XYZ, XYM and XYZM sfg classes are not fully supported. In general the Z and M coordinates will be ignored"
+      )
+    }
+
+    crs <- st_crs(sfc)
 
     if (is.na(crs)) {
       crs <- NULL
-    } else { 
+    } else {
       crs <- sp::CRS(crs$input)  # required for INLA::inla.mesh.segment
     }
 
@@ -1823,9 +1836,9 @@ fm_as_inla_mesh_segment_sfc.sfc_LINESTRING <-
       } else {
         idx <- seq_len(n)
       }
-      segm[[k]] <- INLA::inla.mesh.segment(loc = loc, 
-                                           idx = idx, 
-                                           is.bnd = FALSE, 
+      segm[[k]] <- INLA::inla.mesh.segment(loc = loc,
+                                           idx = idx,
+                                           is.bnd = FALSE,
                                            crs = crs)
     }
 
@@ -1835,6 +1848,52 @@ fm_as_inla_mesh_segment_sfc.sfc_LINESTRING <-
         grp <- seq_len(length(segm))
       }
       segm <- fm_internal_sp2segment_join(segm, grp = grp, closed = FALSE)
+    }
+    segm
+  }
+
+fm_as_inla_mesh_segment_sfc.sfc_POLYGON <-
+  function(sp, join = TRUE, grp = NULL, ...) {
+    crs <- st_crs(sfc)
+
+    if (sf_check_dim(sfc)) {
+      warning(
+        "XYZ, XYM and XYZM are not fully supported. In general the Z and M coordinates will be ignored"
+      )
+    }
+
+    if (is.na(crs)) {
+      crs <- NULL
+    } else {
+      crs <- sp::CRS(crs$input)  # required for INLA::inla.mesh.segment
+    }
+
+    segm <- list()
+    for (k in seq_len(length(sfc))) {
+
+      loc <- sp@coords[-dim(sp@coords)[1L], , drop = FALSE]
+      n <- dim(loc)[1L]
+      if (sp@hole) {
+        if (sp@ringDir == 1) {
+          idx <- c(1L:n, 1L)
+        } else {
+          idx <- c(1L, seq(n, 1L, length.out = n))
+        }
+      } else
+        if (sp@ringDir == 1) {
+          idx <- c(1L, seq(n, 1L, length.out = n))
+        } else {
+          idx <- c(1L:n, 1L)
+        }
+      INLA::inla.mesh.segment(loc = loc, idx = idx, is.bnd = TRUE, crs = crs)
+      # segm[[k]] <- fm_as_inla_mesh_segment(sp@polygons[[k]], join = TRUE, crs = crs)
+    }
+
+    if (join) {
+      if (missing(grp)) {
+        grp <- seq_len(length(segm))
+      }
+      segm <- fm_internal_sp2segment_join(segm, grp = grp)
     }
     segm
   }
