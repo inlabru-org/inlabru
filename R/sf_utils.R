@@ -44,7 +44,7 @@ st_check_dim <- function(sfc) {
 #' @aliases st_check_polygon
 #' @export
 #' @param sfg A POLYGON sfg object
-#' @return LOGICAL indicating if sfg contains disjoint polygons.
+#' @return LOGICAL indicating if sfg does not contain disjoint polygons.
 
 st_check_polygon <- function(sfg) {
   if (!inherits(sfg, c("POLYGON", "sfg"))) {
@@ -56,7 +56,7 @@ st_check_polygon <- function(sfg) {
   np <- length(sfg)
 
   # 1st is outer boundary
-  main <- st_polygon(as.matrix(sfg[[1]]))
+  main <- st_polygon(list(as.matrix(sfg[[1]])))
 
   # Rest should be holes
   holes <- lapply(
@@ -74,6 +74,6 @@ st_check_polygon <- function(sfg) {
     holes, main, sparse = FALSE
     )
 
-  !all(check)
+  all(check)
 
 }

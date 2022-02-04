@@ -83,6 +83,15 @@ identical(seg_sf, seg)
 str(seg)
 str(seg_sf)
 
-## scf_POLYGON ##
+## sfc_POLYGON ##
+
+# check for disjoint polygons
+out = matrix(c(0,0,10,0,10,10,0,10,0,0),ncol=2, byrow=TRUE)
+hole1 = matrix(c(1,1,1,2,2,2,2,1,1,1),ncol=2, byrow=TRUE)
+hole2 = matrix(c(5,5,5,6,6,6,6,5,5,5),ncol=2, byrow=TRUE)
+goodp = st_polygon(list(out, hole1, hole2))
+st_check_polygon(goodp)   # should be true
+badp = st_polygon(list(out, hole1, hole2, out + 15))
+st_check_polygon(badp)    # should be false
 
 

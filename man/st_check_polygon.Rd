@@ -10,7 +10,7 @@ st_check_polygon(sfg)
 \item{sfg}{A POLYGON sfg object}
 }
 \value{
-LOGICAL indicating if sfg contains disjoint polygons.
+LOGICAL indicating if sfg does not contain disjoint polygons.
 }
 \description{
 It seems as though st_polygon does not check this.
