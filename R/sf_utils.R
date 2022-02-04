@@ -24,3 +24,17 @@ st_signed_area = function(sfg){
 
 }
 
+#' Check for "XYZ", "XYM" and "XYZM" sfg classes
+#'
+#' @aliases sf_check_dim
+#' @param sfc An sfc object
+#' @return LOGICAL indicating if any sfg element of the sfc object has class "XYZ", "XYM" or "XYZM". Internal function used to check for 3 and 4 dimensional objects.
+
+sf_check_dim = function(sfc){
+
+  check = sapply(sfc,
+                 FUN = inherits(x, c("XYZ", "XYM", "XYZM")))
+
+  sum(check)
+}
+
