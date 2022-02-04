@@ -33,7 +33,7 @@ st_signed_area = function(sfg){
 sf_check_dim = function(sfc){
 
   check = sapply(sfc,
-                 FUN = inherits(x, c("XYZ", "XYM", "XYZM")))
+                 FUN = function(x) inherits(x, c("XYZ", "XYM", "XYZM")))
 
   sum(check)
 }
