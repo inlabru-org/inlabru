@@ -1780,7 +1780,7 @@ fm_as_inla_mesh_segment_sfc.sfc_POINT <-
   function(sfc, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
     crs <- st_crs(sfc)
 
-    if (sf_check_dim(sfc)) {
+    if (st_check_dim(sfc)) {
       warning(
       "XYZ, XYM and XYZM sfg classes are not fully supported. In general the Z and M coordinates will be ignored"
       )
@@ -1810,7 +1810,7 @@ fm_as_inla_mesh_segment_sfc.sfc_POINT <-
 fm_as_inla_mesh_segment_sfc.sfc_LINESTRING <-
   function(sfc, join = TRUE, grp = NULL, reverse = FALSE, ...) {
 
-    if (sf_check_dim(sfc)) {
+    if (st_check_dim(sfc)) {
       warning(
         "XYZ, XYM and XYZM sfg classes are not fully supported. In general the Z and M coordinates will be ignored"
       )
@@ -1856,7 +1856,7 @@ fm_as_inla_mesh_segment_sfc.sfc_POLYGON <-
   function(sp, join = TRUE, grp = NULL, ...) {
     crs <- st_crs(sfc)
 
-    if (sf_check_dim(sfc)) {
+    if (st_check_dim(sfc)) {
       warning(
         "XYZ, XYM and XYZM are not fully supported. In general the Z and M coordinates will be ignored"
       )
