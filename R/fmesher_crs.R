@@ -1759,7 +1759,7 @@ fm_internal_sp2segment_join <- function(inp, grp = NULL, closed = TRUE) {
 
 
 fm_as_inla_mesh_segment <-
-  function(sp, ...) {
+  function(...) {
     UseMethod("fm_as_inla_mesh_segment")
   }
 
@@ -1768,141 +1768,8 @@ fm_sp2segment <-
     UseMethod("fm_as_inla_mesh_segment")
   }
 
-#! Seems like easiest here would be to just
-# define fm_as_inla_mesh_segment.sfc_POINT etc
-#! Some experimental sf method code:
-fm_as_inla_mesh_segment_sfc <-
-  function(sf, ...) {
-    UseMethod("fm_as_inla_mesh_segment_sfc")
-  }
 
-fm_as_inla_mesh_segment_sfc.sfc_POINT <-
-  function(sfc, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
-    crs <- st_crs(sfc)
 
-    if (st_check_dim(sfc)) {
-      warning(
-      "XYZ, XYM and XYZM sfg classes are not fully supported. In general the Z and M coordinates will be ignored"
-      )
-    }
-
-    if (is.na(crs)) {
-      crs <- NULL
-    } else {
-      crs <- sp::CRS(crs$input)  # required for INLA::inla.mesh.segment
-    }
-
-    loc <- st_coordinates(sfc)[,1:2]   # only uses XY
-    loc <- unname(loc)
-
-    n <- dim(loc)[1L]
-    if (reverse) {
-      idx <- seq(n, 1L, length = n)
-    } else {
-      idx <- seq_len(n)
-    }
-     INLA::inla.mesh.segment(
-       loc = loc, idx = idx, grp = grp, is.bnd = is.bnd,
-       crs = crs
-     )
-  }
-
-fm_as_inla_mesh_segment_sfc.sfc_LINESTRING <-
-  function(sfc, join = TRUE, grp = NULL, reverse = FALSE, ...) {
-
-    if (st_check_dim(sfc)) {
-      warning(
-        "XYZ, XYM and XYZM sfg classes are not fully supported. In general the Z and M coordinates will be ignored"
-      )
-    }
-
-    crs <- st_crs(sfc)
-
-    if (is.na(crs)) {
-      crs <- NULL
-    } else {
-      crs <- sp::CRS(crs$input)  # required for INLA::inla.mesh.segment
-    }
-
-    segm <- list()
-    for (k in seq_len(length(sfc))) {
-
-      loc <- st_coordinates(sfc[k])[,1:2]
-      loc <- unname(loc)
-
-      n <- dim(loc)[1L]
-      if (reverse) {
-        idx <- seq(n, 1L, length = n)
-      } else {
-        idx <- seq_len(n)
-      }
-      segm[[k]] <- INLA::inla.mesh.segment(loc = loc,
-                                           idx = idx,
-                                           is.bnd = FALSE,
-                                           crs = crs)
-    }
-
-    # Think this can stay the same?
-    if (join) {
-      if (missing(grp)) {
-        grp <- seq_len(length(segm))
-      }
-      segm <- fm_internal_sp2segment_join(segm, grp = grp, closed = FALSE)
-    }
-    segm
-  }
-
-fm_as_inla_mesh_segment_sfc.sfc_POLYGON <-
-  function(sp, join = TRUE, grp = NULL, ...) {
-    crs <- st_crs(sfc)
-
-    if (st_check_dim(sfc)) {
-      warning(
-        "XYZ, XYM and XYZM are not fully supported. In general the Z and M coordinates will be ignored"
-      )
-    }
-
-    if (is.na(crs)) {
-      crs <- NULL
-    } else {
-      crs <- sp::CRS(crs$input)  # required for INLA::inla.mesh.segment
-    }
-
-    segm <- list()
-    for (k in seq_len(length(sfc))) {
-
-      loc <- sp@coords[-dim(sp@coords)[1L], , drop = FALSE]
-      n <- dim(loc)[1L]
-      if (sp@hole) {
-        if (sp@ringDir == 1) {
-          idx <- c(1L:n, 1L)
-        } else {
-          idx <- c(1L, seq(n, 1L, length.out = n))
-        }
-      } else
-        if (sp@ringDir == 1) {
-          idx <- c(1L, seq(n, 1L, length.out = n))
-        } else {
-          idx <- c(1L:n, 1L)
-        }
-      INLA::inla.mesh.segment(loc = loc, idx = idx, is.bnd = TRUE, crs = crs)
-      # segm[[k]] <- fm_as_inla_mesh_segment(sp@polygons[[k]], join = TRUE, crs = crs)
-    }
-
-    if (join) {
-      if (missing(grp)) {
-        grp <- seq_len(length(segm))
-      }
-      segm <- fm_internal_sp2segment_join(segm, grp = grp)
-    }
-    segm
-  }
-
-fm_as_inla_mesh_segment.sf <-
-  function(sf, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
-    sfc = st_geometry(sf)
-    fm_as_inla_mesh_segment_sfc(sfc)
-  }
 
 
 fm_as_inla_mesh_segment.SpatialPoints <-
