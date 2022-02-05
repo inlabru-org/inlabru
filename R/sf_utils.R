@@ -44,7 +44,9 @@ st_check_dim <- function(sfc) {
 #' @aliases st_check_polygon
 #' @export
 #' @param sfg A POLYGON sfg object
-#' @return LOGICAL indicating if sfg does not contain disjoint polygons.
+#' @return LOGICAL; `TRUE` if the `sfg` holes are entirely inside the outer ring, and
+#' are disjoint, otherwise `FALSE`. When `FALSE`, the attribute `Message` is set
+#' to a character vector describing the detected reasons.
 
 st_check_polygon <- function(sfg) {
   if (!inherits(sfg, c("POLYGON", "sfg"))) {
@@ -56,24 +58,49 @@ st_check_polygon <- function(sfg) {
   np <- length(sfg)
 
   # 1st is outer boundary
-  main <- st_polygon(list(as.matrix(sfg[[1]])))
+  main <- sf::st_polygon(list(as.matrix(sfg[[1]])))
+  ok <- TRUE
+  msg <- NULL
 
   # Rest should be holes
-  holes <- lapply(
-    sfg[2:np], FUN = as.matrix
+  if (length(sfg) > 1) {
+    holes <- lapply(
+      sfg[-1], FUN = as.matrix
     )
-  holes <- lapply(
-    holes,
-    FUN = function(x) st_geometry(st_polygon(list(x)))
+    holes <- lapply(
+      holes,
+      FUN = function(x) sf::st_geometry(sf::st_polygon(list(x)))
     )
-  holes <- do.call(
-    c, holes
-    )
-
-  check <- st_within(
-    holes, main, sparse = FALSE
+    holes <- do.call(
+      c, holes
     )
 
-  all(check)
+    check_within <- sf::st_within(
+      holes, main, sparse = FALSE
+    )
+    if (!all(check_within)) {
+      ok <- FALSE
+      msg <- c(msg, "Holes not entirely within the outer ring")
+    }
+
+    if (length(holes) > 1) {
+      check_overlap <- vapply(
+        seq_along(holes),
+        function(k) {
+          !any(sf::st_intersects(
+            holes[-k], holes[k], sparse = FALSE
+          ))
+        },
+        TRUE
+      )
+      if (!all(check_overlap)) {
+        ok <- FALSE
+        msg <- c(msg, "Some holes overlap")
+      }
+    }
+  }
+
+  attr(ok, "Message") <- msg
+  ok
 
 }

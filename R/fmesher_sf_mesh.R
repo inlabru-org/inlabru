@@ -116,22 +116,29 @@ fm_as_inla_mesh_segment.sfc_POINT <-
   function(sfc, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
     crs <- sf::st_crs(sfc)
 
-    if (st_check_dim(sfc)) {
-      warning(
-        "XYZ, XYM and XYZM sfg classes are not fully supported. In general the Z and M coordinates will be ignored"
-      )
-    }
+#    if (st_check_dim(sfc)) {
+#      warning(
+#        "XYZ, XYM and XYZM sfg classes are not fully supported. In general the Z and M coordinates will be ignored"
+#      )
+#    }
 
     crs <- fm_as_sp_crs(crs) # required for INLA::inla.mesh.segment
 
     loc <- sf::st_coordinates(sfc)
-    loc <- unname(loc)
+    coord_names <- intersect(c("X", "Y", "Z"), colnames(loc))
+    loc <- unname(loc[, coord_names, drop = FALSE])
 
     n <- dim(loc)[1L]
-    if (reverse) {
-      idx <- seq(n, 1L, length = n)
+    if (is.bnd) {
+      idx <- c(seq_len(n), 1L)
     } else {
       idx <- seq_len(n)
+    }
+    if (reverse) {
+      idx <- rev(idx)
+      if (!is.null(grp)) {
+        grp <- rev(grp)
+      }
     }
     INLA::inla.mesh.segment(
       loc = loc, idx = idx, grp = grp, is.bnd = is.bnd,
@@ -143,11 +150,15 @@ fm_as_inla_mesh_segment.sfc_POINT <-
 #' @export
 fm_as_inla_mesh_segment.sfc_LINESTRING <-
   function(sfc, join = TRUE, grp = NULL, reverse = FALSE, ...) {
-    if (st_check_dim(sfc)) {
-      warning(
-        "XYZ, XYM and XYZM sfg classes are not fully supported. In general the Z and M coordinates will be ignored"
-      )
-    }
+# Note: Z should be fully supported in what we do with 3D coordinates ourselves.
+# It's when applying st_ methods that the check needs to be done, not when crating
+# objects, as we _do_ support 3D meshes in inla.mesh, and _should_ support those
+# in inlabru.
+#    if (st_check_dim(sfc)) {
+#      warning(
+#        "XYZ, XYM and XYZM sfg classes are not fully supported. In general the Z and M coordinates will be ignored"
+#      )
+#    }
 
     crs <- sf::st_crs(sfc)
     crs <- fm_as_sp_crs(crs) # required for INLA::inla.mesh.segment
@@ -155,7 +166,8 @@ fm_as_inla_mesh_segment.sfc_LINESTRING <-
     segm <- list()
     for (k in seq_len(length(sfc))) {
       loc <- sf::st_coordinates(sfc[k])
-      loc <- unname(loc)
+      coord_names <- intersect(c("X", "Y", "Z"), colnames(loc))
+      loc <- unname(loc[, coord_names, drop = FALSE])
 
       n <- dim(loc)[1L]
       if (reverse) {
@@ -228,7 +240,7 @@ fm_as_inla_mesh_segment.sfc_POLYGON <-
 #' @export
 fm_as_inla_mesh_segment.sf <-
   function(sf, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
-    sfc <- st_geometry(sf)
+    sfc <- sf::st_geometry(sf)
     fm_as_inla_mesh_segment(sfc)
   }
 
@@ -236,6 +248,6 @@ fm_as_inla_mesh_segment.sf <-
 #' @export
 fm_as_inla_mesh.sf <-
   function(sf, ...) {
-    sfc <- st_geometry(sf)
+    sfc <- sf::st_geometry(sf)
     fm_as_inla_mesh(sfc)
   }

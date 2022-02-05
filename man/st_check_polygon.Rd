@@ -10,7 +10,9 @@ st_check_polygon(sfg)
 \item{sfg}{A POLYGON sfg object}
 }
 \value{
-LOGICAL indicating if sfg does not contain disjoint polygons.
+LOGICAL; \code{TRUE} if the \code{sfg} holes are entirely inside the outer ring, and
+are disjoint, otherwise \code{FALSE}. When \code{FALSE}, the attribute \code{Message} is set
+to a character vector describing the detected reasons.
 }
 \description{
 It seems as though st_polygon does not check this.
