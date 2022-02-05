@@ -53,6 +53,7 @@ Imports:
     rgdal (>= 1.5.8),
     rgeos,
     rlang,
+    sf,
     utils,
     withr
 Suggests:
@@ -107,6 +108,7 @@ Collate:
     'effect.R'
     'environment.R'
     'fmesher_crs.R'
+    'fmesher_sf_mesh.R'
     'fmesher_utils.R'
     'ggplot.R'
     'inla.R'
