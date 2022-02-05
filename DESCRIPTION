@@ -48,8 +48,9 @@ Depends:
     sp (>= 1.4-5),
     stats
 Imports:
-    plyr,
+    magrittr,
     Matrix,
+    plyr,
     rgdal (>= 1.5.8),
     rgeos,
     rlang,
@@ -128,6 +129,7 @@ Collate:
     'spde.R'
     'stack.R'
     'track_plotting.R'
+    'transformation.R'
     'utils.R'
 VignetteBuilder: knitr
 BuildVignettes: true

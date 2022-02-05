@@ -11,7 +11,7 @@ integration_weight_aggregation(mesh, integ)
 
 \item{integ}{\code{list} of \code{loc}, integration points,
 and \code{weight}, integration weights,
-or a \code{SpatialPointsDataFrame}. Only the coordinates and \code{weigh} column
+or a \code{SpatialPointsDataFrame}. Only the coordinates and \code{weight} column
 are handled.}
 }
 \description{

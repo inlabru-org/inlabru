@@ -20,7 +20,8 @@ pixelplot.mesh <- function(...) {
 #'
 #' @examples
 #' \dontrun{
-#' if (require("ggplot2", quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE) &&
+#'     require(ggpolypath, quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'
@@ -73,7 +74,8 @@ gmap <- function(data, ...) {
 #' @family geomes for Raster data
 #'
 #' @examples
-#' if (require("ggplot2", quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE) &&
+#'     require(ggpolypath, quietly = TRUE)) {
 #'   # Load Gorilla data
 #'
 #'   data(gorillas, package = "inlabru")
@@ -110,7 +112,8 @@ gg <- function(data, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' if (require("ggplot2", quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE) &&
+#'     require(ggpolypath, quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'

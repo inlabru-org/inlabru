@@ -38,7 +38,7 @@ test_that("Latent models: SPDE 1D", {
   expect_snapshot_value(
     data$fit$summary.fixed["Intercept", "mean"] +
       data$fit$summary.random$field$mean[c(1, 25, 50)],
-    tolerance = midtol,
+    tolerance = hitol,
     style = "serialize"
   )
 

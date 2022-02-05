@@ -36,7 +36,7 @@ a unimodal nonhomogeneous 1-dimensional Poisson process example.
 }
 \examples{
 \donttest{
-library(ggplot2)
+if (require("ggplot2", quietly = TRUE)) {
 data(Poisson2_1D)
 p1 <- ggplot(countdata2) +
   geom_point(data = countdata2, aes(x = x, y = count), col = "blue") +
@@ -63,5 +63,6 @@ p2 <- ggplot() +
   xlab(expression(bold(s))) +
   ylab(expression(lambda(bold(s))))
 multiplot(p1, p2, cols = 1)
+}
 }
 }

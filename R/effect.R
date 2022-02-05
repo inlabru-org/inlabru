@@ -894,7 +894,14 @@ add_mappers.component_list <- function(components, lhoods, ...) {
   }
   for (k in which(is_copy)) {
     if (is.null(components[[k]][["copy"]])) {
-      stop("")
+      stop("Internal error: copy model detected, but no copy information available.")
+    }
+    if (is.null(components[[components[[k]][["copy"]]]])) {
+      stop(paste0("Could not find component '",
+                  components[[k]][["copy"]],
+                  "' to use as copy for component '",
+                  components[[k]][["label"]],
+                  "'."))
     }
     components[[k]]$mapper <- components[[components[[k]][["copy"]]]][["mapper"]]
   }
