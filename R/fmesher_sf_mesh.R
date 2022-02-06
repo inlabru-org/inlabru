@@ -172,12 +172,16 @@ fm_as_inla_mesh_segment.sfc_LINESTRING <-
       n <- dim(loc)[1L]
       if (reverse) {
         idx <- seq(n, 1L, length = n)
+        if (!is.null(grp)) {
+          grp <- rev(grp)
+        }
       } else {
         idx <- seq_len(n)
       }
       segm[[k]] <- INLA::inla.mesh.segment(
         loc = loc,
         idx = idx,
+        grp = grp,
         is.bnd = FALSE,
         crs = crs
       )

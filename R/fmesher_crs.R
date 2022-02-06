@@ -1325,7 +1325,7 @@ fm_internal_update_crs <- function(crs, newcrs, mismatch.allowed) {
 }
 
 
-#' @title Chack if two CRS objects are identical
+#' @title Check if two CRS objects are identical
 #' @param crs0,crs1 Two `sp::CRS` or `inla.CRS` objects to be compared.
 #' @param crsonly logical. If `TRUE` and any of `crs0` and `crs1` are `inla.CRS`
 #' objects, extract and compare only the `sp::CRS` objects. Default: `FALSE`
@@ -1772,126 +1772,9 @@ fm_sp2segment <-
 
 
 
-fm_as_inla_mesh_segment.SpatialPoints <-
-  function(sp, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
-    crs <- fm_sp_get_crs(sp)
-    loc <- coordinates(sp)
-
-    n <- dim(loc)[1L]
-    if (reverse) {
-      idx <- seq(n, 1L, length = n)
-    } else {
-      idx <- seq_len(n)
-    }
-    INLA::inla.mesh.segment(
-      loc = loc, idx = idx, grp = grp, is.bnd = is.bnd,
-      crs = crs
-    )
-  }
-
-fm_as_inla_mesh_segment.SpatialPointsDataFrame <-
-  function(sp, ...) {
-    fm_as_inla_mesh_segment.SpatialLines(sp, ...)
-  }
 
 
 
-fm_as_inla_mesh_segment.Line <-
-  function(sp, reverse = FALSE, crs = NULL, ...) {
-    loc <- sp@coords
-    n <- dim(loc)[1L]
-    if (reverse) {
-      idx <- seq(n, 1L, length = n)
-    } else {
-      idx <- seq_len(n)
-    }
-    INLA::inla.mesh.segment(loc = loc, idx = idx, is.bnd = FALSE, crs = crs)
-  }
 
-fm_as_inla_mesh_segment.Lines <-
-  function(sp, join = TRUE, crs = NULL, ...) {
-    segm <- as.list(lapply(
-      sp@Lines,
-      function(x) fm_as_inla_mesh_segment(x, crs = crs, ...)
-    ))
-    if (join) {
-      segm <- fm_internal_sp2segment_join(segm, grp = NULL, closed = FALSE)
-    }
-    segm
-  }
 
-fm_as_inla_mesh_segment.SpatialLines <-
-  function(sp, join = TRUE, grp = NULL, ...) {
-    crs <- fm_sp_get_crs(sp)
-    segm <- list()
-    for (k in seq_len(length(sp@lines))) {
-      segm[[k]] <- fm_as_inla_mesh_segment(sp@lines[[k]],
-        join = TRUE,
-        crs = crs, ...
-      )
-    }
-    if (join) {
-      if (missing(grp)) {
-        grp <- seq_len(length(segm))
-      }
-      segm <- fm_internal_sp2segment_join(segm, grp = grp, closed = FALSE)
-    }
-    segm
-  }
 
-fm_as_inla_mesh_segment.SpatialLinesDataFrame <-
-  function(sp, ...) {
-    fm_as_inla_mesh_segment.SpatialLines(sp, ...)
-  }
-
-fm_as_inla_mesh_segment.SpatialPolygons <-
-  function(sp, join = TRUE, grp = NULL, ...) {
-    crs <- fm_sp_get_crs(sp)
-    segm <- list()
-    for (k in seq_len(length(sp@polygons))) {
-      segm[[k]] <- fm_as_inla_mesh_segment(sp@polygons[[k]], join = TRUE, crs = crs)
-    }
-    if (join) {
-      if (missing(grp)) {
-        grp <- seq_len(length(segm))
-      }
-      segm <- fm_internal_sp2segment_join(segm, grp = grp)
-    }
-    segm
-  }
-
-fm_as_inla_mesh_segment.SpatialPolygonsDataFrame <-
-  function(sp, ...) {
-    fm_as_inla_mesh_segment.SpatialPolygons(sp, ...)
-  }
-
-fm_as_inla_mesh_segment.Polygons <-
-  function(sp, join = TRUE, crs = NULL, ...) {
-    segm <- as.list(lapply(
-      sp@Polygons,
-      function(x) fm_as_inla_mesh_segment(x, crs = crs)
-    ))
-    if (join) {
-      segm <- fm_internal_sp2segment_join(segm, grp = NULL)
-    }
-    segm
-  }
-
-fm_as_inla_mesh_segment.Polygon <-
-  function(sp, crs = NULL, ...) {
-    loc <- sp@coords[-dim(sp@coords)[1L], , drop = FALSE]
-    n <- dim(loc)[1L]
-    if (sp@hole) {
-      if (sp@ringDir == 1) {
-        idx <- c(1L:n, 1L)
-      } else {
-        idx <- c(1L, seq(n, 1L, length.out = n))
-      }
-    } else
-    if (sp@ringDir == 1) {
-      idx <- c(1L, seq(n, 1L, length.out = n))
-    } else {
-      idx <- c(1L:n, 1L)
-    }
-    INLA::inla.mesh.segment(loc = loc, idx = idx, is.bnd = TRUE, crs = crs)
-  }
