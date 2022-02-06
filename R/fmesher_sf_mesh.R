@@ -15,43 +15,6 @@ fm_as_inla_mesh <- function(...) {
 
 
 #' @rdname fm_as
-#' @export
-fm_as_sf_crs <- function(x) {
-  if (inherits(x, "crs")) {
-    x
-  } else if (inherits(x, "CRS")) {
-    sf::st_crs(x)
-  } else if (is.null(x)) {
-    sf::st_crs(x)
-  } else {
-    warning(paste0("Unsupported source crs class ",
-                   paste(class(x), sep = ",")),
-            immediate. = TRUE)
-    x
-  }
-}
-#' @rdname fm_as
-#' @export
-fm_as_sp_crs <- function(x) {
-  if (inherits(x, "CRS")) {
-    x
-  } else if (inherits(x, "crs")) {
-    if (is.na(x)) {
-      NULL
-    } else {
-      fm_CRS(SRS_string = x$wkt)
-    }
-  } else if (is.null(x)) {
-    NULL
-  } else {
-    warning(paste0("Unsupported source crs class ",
-                 paste(class(x), sep = ",")),
-          immediate. = TRUE)
-  x
-}
-}
-
-#' @rdname fm_as
 #' @aliases fm_as_sfc fm_as_sfc.inla.mesh
 #'
 #' @param x An `inla.mesh` mesh object, or an `sfg` `MULTIPOLYGON` object
@@ -164,6 +127,9 @@ fm_as_inla_mesh_segment.sfc_LINESTRING <-
     crs <- fm_as_sp_crs(crs) # required for INLA::inla.mesh.segment
 
     segm <- list()
+    if (is.null(grp)) {
+      grp <- seq_len(length(sfc))
+    }
     for (k in seq_len(length(sfc))) {
       loc <- sf::st_coordinates(sfc[k])
       coord_names <- intersect(c("X", "Y", "Z"), colnames(loc))
@@ -172,27 +138,20 @@ fm_as_inla_mesh_segment.sfc_LINESTRING <-
       n <- dim(loc)[1L]
       if (reverse) {
         idx <- seq(n, 1L, length = n)
-        if (!is.null(grp)) {
-          grp <- rev(grp)
-        }
       } else {
         idx <- seq_len(n)
       }
       segm[[k]] <- INLA::inla.mesh.segment(
         loc = loc,
         idx = idx,
-        grp = grp,
+        grp = grp[k],
         is.bnd = FALSE,
         crs = crs
       )
     }
 
-    # Think this can stay the same?
     if (join) {
-      if (missing(grp)) {
-        grp <- seq_len(length(segm))
-      }
-      segm <- fm_internal_sp2segment_join(segm, grp = grp, closed = FALSE)
+      segm <- fm_internal_sp2segment_join(segm, grp = grp)
     }
     segm
   }
@@ -200,41 +159,42 @@ fm_as_inla_mesh_segment.sfc_LINESTRING <-
 #' @rdname fm_as
 #' @export
 fm_as_inla_mesh_segment.sfc_POLYGON <-
-  function(sp, join = TRUE, grp = NULL, ...) {
+  function(sfc, join = TRUE, grp = NULL, ...) {
     crs <- sf::st_crs(sfc)
-
-    if (st_check_dim(sfc)) {
-      warning(
-        "XYZ, XYM and XYZM are not fully supported. In general the Z and M coordinates will be ignored"
-      )
-    }
-
     crs <- fm_as_sp_crs(crs) # required for INLA::inla.mesh.segment
 
     segm <- list()
+    if (is.null(grp)) {
+      grp <- seq_len(length(sfc))
+    }
     for (k in seq_len(length(sfc))) {
-      loc <- sp@coords[-dim(sp@coords)[1L], , drop = FALSE]
-      n <- dim(loc)[1L]
-      if (sp@hole) {
-        if (sp@ringDir == 1) {
-          idx <- c(1L:n, 1L)
-        } else {
-          idx <- c(1L, seq(n, 1L, length.out = n))
-        }
-      } else
-      if (sp@ringDir == 1) {
-        idx <- c(1L, seq(n, 1L, length.out = n))
-      } else {
-        idx <- c(1L:n, 1L)
-      }
-      INLA::inla.mesh.segment(loc = loc, idx = idx, is.bnd = TRUE, crs = crs)
-      # segm[[k]] <- fm_as_inla_mesh_segment(sp@polygons[[k]], join = TRUE, crs = crs)
+      loc <- sf::st_coordinates(sfc[k])
+      coord_names <- intersect(c("X", "Y", "Z"), colnames(loc))
+      Linfo <- loc[, "L2", drop = TRUE]
+      loc <- unname(loc[, coord_names, drop = FALSE])
+      # If winding directions are correct, all info is already available
+      # For 3D, cannot check winding, so must assume correct.
+      segm_k <-
+        lapply(unique(Linfo),
+               function(i) {
+                 subset <- which(Linfo == i)
+                 # sfc_POLYGON repeats the initial point
+                 n <- length(subset) - 1
+                 subset <- subset[-(n + 1)]
+                 idx <- c(seq_len(n), 1L)
+                 INLA::inla.mesh.segment(
+                   loc = loc[subset, , drop = FALSE],
+                   idx = idx,
+                   grp = grp[k],
+                   is.bnd = TRUE,
+                   crs = crs
+                 )
+               }
+        )
+      segm[[k]] <- fm_internal_sp2segment_join(segm_k)
     }
 
     if (join) {
-      if (missing(grp)) {
-        grp <- seq_len(length(segm))
-      }
       segm <- fm_internal_sp2segment_join(segm, grp = grp)
     }
     segm

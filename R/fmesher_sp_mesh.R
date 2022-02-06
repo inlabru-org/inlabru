@@ -1,14 +1,19 @@
 #' @importFrom sp coordinates proj4string `proj4string<-`
 
-## Input: list of segments, all closed polygons.
-fm_internal_sp2segment_join <- function(inp, grp = NULL, closed = TRUE) {
+## Input: list of segments
+fm_internal_sp2segment_join <- function(inp, grp = NULL) {
   crs <- NULL
   if (length(inp) > 0) {
     out.loc <- matrix(0, 0, ncol(inp[[1]]$loc))
+    is.bnd <- inp[[1]]$is.bnd
     for (k in seq_along(inp)) {
+      if (inp[[k]]$is.bnd != is.bnd) {
+        stop("Cannot join a mix of boundary and interior segment")
+      }
       crs <- fm_internal_update_crs(crs, inp[[k]]$crs, mismatch.allowed = FALSE)
     }
   } else {
+    is.bnd <- FALSE
     out.loc <- matrix(0, 0, 2)
   }
   out.idx <- matrix(0L, 0, 2)
@@ -22,30 +27,19 @@ fm_internal_sp2segment_join <- function(inp, grp = NULL, closed = TRUE) {
     inp.idx <- inp[[k]]$idx
     inp.grp <- inp[[k]]$grp
     offset <- nrow(out.loc)
-    n <- nrow(as.matrix(inp.idx))
-    if (closed) {
-      if (!is.null(grp) && is.null(inp.grp)) {
-        inp.grp <- rep(grp[k], n)
-      }
-      if (ncol(as.matrix(inp.idx)) == 1) {
-        inp.idx <- cbind(inp.idx, inp.idx[c(2:n, 1)])
-      }
-    } else {
-      if (!is.null(grp) && is.null(inp.grp)) {
-        inp.grp <- rep(grp[k], n - 1)
-      }
-      if (ncol(as.matrix(inp.idx)) == 1) {
-        inp.idx <- cbind(inp.idx[-n], inp.idx[-1])
-      }
+    if (ncol(as.matrix(inp.idx)) == 1) {
+      stop("inla.mesh.segment idx should be a matrix but a vector has been detected.")
     }
     out.loc <- rbind(out.loc, inp.loc)
     out.idx <- rbind(out.idx, inp.idx + offset)
     if (!is.null(grp)) {
+      out.grp <- c(out.grp, rep(grp[k], nrow(inp.idx)))
+    } else {
       out.grp <- c(out.grp, inp.grp)
     }
   }
   INLA::inla.mesh.segment(
-    loc = out.loc, idx = out.idx, grp = out.grp, is.bnd = FALSE,
+    loc = out.loc, idx = out.idx, grp = out.grp, is.bnd = is.bnd,
     crs = crs
   )
 }
@@ -117,7 +111,7 @@ fm_as_inla_mesh_segment.Lines <-
       function(x) fm_as_inla_mesh_segment(x, crs = crs, ...)
     ))
     if (join) {
-      segm <- fm_internal_sp2segment_join(segm, grp = NULL, closed = FALSE)
+      segm <- fm_internal_sp2segment_join(segm, grp = NULL)
     }
     segm
   }
@@ -136,7 +130,7 @@ fm_as_inla_mesh_segment.SpatialLines <-
       if (missing(grp)) {
         grp <- seq_len(length(segm))
       }
-      segm <- fm_internal_sp2segment_join(segm, grp = grp, closed = FALSE)
+      segm <- fm_internal_sp2segment_join(segm, grp = grp)
     }
     segm
   }

@@ -87,6 +87,80 @@ fm_requires_PROJ6 <- function(fun = NULL) {
 }
 
 
+#' @rdname fm_as
+#' @export
+fm_as_sf_crs <- function(x) {
+  if (inherits(x, "crs")) {
+    x
+  } else if (inherits(x, "CRS")) {
+    sf::st_crs(x)
+  } else if (is.null(x)) {
+    sf::st_crs(x)
+  } else {
+    warning(paste0("Unsupported source crs class ",
+                   paste(class(x), sep = ",")),
+            immediate. = TRUE)
+    x
+  }
+}
+#' @rdname fm_as
+#' @export
+fm_as_sp_crs <- function(x) {
+  if (inherits(x, "CRS")) {
+    x
+  } else if (inherits(x, "crs")) {
+    if (is.na(x)) {
+      NULL
+    } else {
+      fm_CRS(SRS_string = x$wkt)
+    }
+  } else if (is.null(x)) {
+    NULL
+  } else {
+    warning(paste0("Unsupported source crs class ",
+                   paste(class(x), sep = ",")),
+            immediate. = TRUE)
+    x
+  }
+}
+
+#' Generic method for extracting crs objects
+#' @rdname fm_get_crs
+#' @export
+fm_get_crs <- function(...) {
+  UseMethod("fm_get_crs")
+}
+
+#' @rdname fm_get_crs
+#' @export
+fm_get_crs.Spatial <- function(...) {
+  fm_sp_get_crs(...)
+}
+
+#' @rdname fm_get_crs
+#' @export
+fm_get_crs.sf <- function(...) {
+  fm_sf_get_crs(...)
+}
+
+#' @rdname fm_get_crs
+#' @export
+fm_get_crs.sfc <- function(...) {
+  fm_sf_get_crs(...)
+}
+
+#' @rdname fm_get_crs
+#' @export
+fm_get_crs.inla.mesh <- function(x, ...) {
+  x[["crs"]]
+}
+
+#' @rdname fm_get_crs
+#' @export
+fm_get_crs.inla.mesh.segment <- function(x, ...) {
+  x[["crs"]]
+}
+
 
 #' @title Extract CRS information
 #' @description Wrapper for CRS(projargs) (PROJ4) and CRS(wkt) for
@@ -122,13 +196,13 @@ fm_sp_get_crs <- function(x) {
 # Is there any need for fm_has_PROJ6() stuff
 # for sf objects?
 
-# Given sf or sft object, return
+# Given sf or sfc object, return
 # crs as wkt
 fm_sf_get_crs <- function(x) {
   if (is.null(x)) {
     return(NULL)
   }
-  st_crs(x)$wkt
+  sf::st_crs(x)$wkt
 }
 
 fm_crs_is_null <- function(crs) {

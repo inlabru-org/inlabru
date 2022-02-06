@@ -20,17 +20,23 @@ test_that("sf standards compliance: basic polygons", {
   expect_false(st_check_polygon(badp2))
 })
 
+# FL note: see the inla.mesh.segment documentation for the idx and is.bnd arguments
+# sf stores polygons with repeated coordinates for the first and last point,
+# whereas inla.mesh.segment requires the index into loc to do that job;
+# For is.bnd=TRUE, the idx default closes the polygon, but not for is.bnd=FALSE,
+# which is used for "linestring" type information.
+# Further note: inla.mesh.segment has two ways of specifying the index;
+# as a sequence, or as a two-column matrix. But it is always stored as a two column matrix,
+# with no general guarantee that one line connects to the one in the next row.
+# This makes conversion to sp and sf polygons more difficult, which is why there
+# isn't a general fm_as_sp.inla.mesh.segment method. There is some code in various places,
+# including in 'excursions' that could be used as a starting point to doing it properly
+# for sf conversion.
+#
+# The fm_as_inla_mesh_segment.SpatialPoints method had a bug, w.r.t is.bnd
+# handling, and has now been fixed.
 
-test_that("Conversion from sf to inla.mesh.segment", {
-  # FL note: see the inla.mesh.segment documentation for the idx and is.bnd arguments
-  # sf stores polygons with repeated coordinates for the first and last point,
-  # whereas inla.mesh.segment requires the index into loc to do that job;
-  # For is.bnd=TRUE, the idx default closes the polygon, but not for is.bnd=FALSE,
-  # which is used for "linestring" type information.
-  #
-  # The fm_as_inla_mesh_segment.SpatialPoints method had a bug, and has now been fixed.
-
-  #### testing for fm_as_inla_mesh_segment.sf ###
+test_that("Conversion from sfc_POINT to inla.mesh.segment", {
 
   local_bru_safe_inla()
 
@@ -70,19 +76,10 @@ test_that("Conversion from sf to inla.mesh.segment", {
 
 })
 
-if (FALSE) {
-  # Testing for fmesher functions using sf objects.
-  # For testing while editing code.  Eventually these will be the
-  # basis for proper package tests.  For now should work
-  # standalone by sourcing the relevant fmesher_*.R scripts directly
 
-  library(inlabru)
-  library(INLA)
-  library(sf)
-  source(here::here("R", "fmesher_crs.R"))
-  source(here::here("R", "sf_utils.R"))
-  gorillas_sf <- readRDS(here::here("sf", "Data", "gorillas_sf.rds"))
+test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
 
+  local_bru_safe_inla()
 
   ## scf_LINESTRING ##
 
@@ -101,28 +98,71 @@ if (FALSE) {
   )
 
   seg <- fm_internal_sp2segment_join(list(seg1, seg2),
-    grp = seq_len(length(seg)),
-    closed = FALSE
+                                     grp = seq_len(2))
+  expect_identical(seg$grp, as.matrix(rep(1:2, each = 3)))
+
+  line_str1 <- sf::st_linestring(pts1)
+  line_str2 <- sf::st_linestring(pts2)
+  line_sfc <- sf::st_as_sfc(list(line_str1, line_str2))
+  line_sf <- sf::st_sf(geometry = line_sfc)
+  seg_sf <- fm_as_inla_mesh_segment(line_sf)
+
+  expect_identical(seg_sf, seg)
+
+  #  str(seg)
+  #  str(seg_sf)
+
+})
+
+
+test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
+
+  local_bru_safe_inla()
+
+  ## scf_POLYGON ##
+
+  pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3))
+  pts2 <- rbind(c(1, 1), c(0, 0), c(0, -1), c(-2, -2), c(1, 1))
+  seg1 <- INLA::inla.mesh.segment(
+    loc = pts1[1:4, , drop = FALSE],
+    is.bnd = TRUE
   )
 
-  line_str1 <- st_linestring(pts1)
-  line_str2 <- st_linestring(pts2)
-  line_sfc <- st_as_sfc(list(line_str1, line_str2))
-  line_sf <- st_sf(geometry = line_sfc)
+  seg2 <- INLA::inla.mesh.segment(
+    loc = pts2[1:4, , drop = FALSE],
+    is.bnd = TRUE
+  )
+
+  seg <- fm_internal_sp2segment_join(list(seg1, seg2),
+                                     grp = seq_len(2))
+  expect_identical(seg$grp, as.matrix(rep(1:2, each = 4)))
+
+  line_str1 <- sf::st_polygon(list(pts1))
+  line_str2 <- sf::st_polygon(list(pts2))
+  line_sfc <- sf::st_as_sfc(list(line_str1, line_str2))
+  line_sf <- sf::st_sf(geometry = line_sfc)
   seg_sf <- fm_as_inla_mesh_segment(line_sf)
-  identical(seg_sf, seg)
 
-  str(seg)
-  str(seg_sf)
+  expect_identical(seg_sf, seg)
 
-  ## sfc_POLYGON ##
+  #  str(seg)
+  #  str(seg_sf)
 
-  # check for disjoint polygons
-  out <- matrix(c(0, 0, 10, 0, 10, 10, 0, 10, 0, 0), ncol = 2, byrow = TRUE)
-  hole1 <- matrix(c(1, 1, 1, 2, 2, 2, 2, 1, 1, 1), ncol = 2, byrow = TRUE)
-  hole2 <- matrix(c(5, 5, 5, 6, 6, 6, 6, 5, 5, 5), ncol = 2, byrow = TRUE)
-  goodp <- sf::st_polygon(list(out, hole1, hole2))
-  st_check_polygon(goodp) # should be true
-  badp <- sf::st_polygon(list(out, hole1, hole2, out + 15))
-  st_check_polygon(badp) # should be false
-}
+})
+
+
+
+#if (FALSE) {
+#  # Testing for fmesher functions using sf objects.
+#  # For testing while editing code.  Eventually these will be the
+#  # basis for proper package tests.  For now should work
+#  # standalone by sourcing the relevant fmesher_*.R scripts directly
+#
+#  library(inlabru)
+#  library(INLA)
+#  library(sf)
+#  source(here::here("R", "fmesher_crs.R"))
+#  source(here::here("R", "sf_utils.R"))
+#  gorillas_sf <- readRDS(here::here("sf", "Data", "gorillas_sf.rds"))
+#
+#}
