@@ -69,7 +69,7 @@ as "bym2", which can be handled by \code{bru_mapper_collect}.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
-\item{methods, }{optional \code{list} of named method definitions; See Details.}
+\item{methods}{optional \code{list} of named method definitions; See Details.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 

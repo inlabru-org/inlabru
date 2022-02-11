@@ -1390,7 +1390,7 @@ code.components <- function(components, add = "") {
 #' to register the methods, e.g.
 #' `.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)`.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
-#' @param methods, optional `list` of named method definitions; See Details.
+#' @param methods optional `list` of named method definitions; See Details.
 #'
 #' @export
 #' @rdname bru_mapper
