@@ -152,6 +152,7 @@ method, called inside <code><a href="bru.html">bru()</a></code>.</p>
   replicate_selector <span class="op">=</span> <span class="cn">NULL</span>,
   nrep <span class="op">=</span> <span class="cn">NULL</span>,
   A.msk <span class="op">=</span> <span class="cn">NULL</span>,
+  .envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span>,
   envir_extra <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -214,6 +215,8 @@ replication model. Same syntax as for <code>main</code></p></dd>
 <dt>A.msk</dt>
 <dd><p>TODO: check/fix/deprecate this parameter.
 Likely doesn't work at the moment, and I've found no examples that use it.</p></dd>
+<dt>.envir</dt>
+<dd><p>Evaluation environment</p></dd>
 <dt>envir_extra</dt>
 <dd><p>TODO: check/fix this parameter.</p></dd>
 </dl></div>

@@ -114,7 +114,7 @@
       <h1 data-toc-skip>LGCPs - Plot sampling</h1>
                         <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-01-29</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-02-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -240,15 +240,15 @@
     <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/ncell.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
-<span class="co">#&gt; 1 637.9818 47.11742 558.9740 638.2345 731.3345 510.3903 756.2739 0.07385387</span>
-<span class="co">#&gt; 2 627.9816 35.12953 570.8020 627.1439 688.0743 550.5414 745.9713 0.05594038</span>
-<span class="co">#&gt; 3 648.3969 24.53870 598.3754 650.3436 688.9368 594.3352 695.1640 0.03784519</span>
+<span class="co">#&gt; 1 633.9585 50.81536 546.5053 629.6994 720.1674 521.0743 803.7445 0.08015565</span>
+<span class="co">#&gt; 2 635.4936 36.29511 570.9462 634.8272 715.3627 564.4114 744.0688 0.05711326</span>
+<span class="co">#&gt; 3 650.0590 26.27839 605.7120 650.7414 713.4066 556.1768 732.0687 0.04042463</span>
 <span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA       NA         NA</span>
-<span class="co">#&gt;         var</span>
-<span class="co">#&gt; 1 2220.0513</span>
-<span class="co">#&gt; 2 1234.0837</span>
-<span class="co">#&gt; 3  602.1479</span>
-<span class="co">#&gt; 4        NA</span></code></pre></div>
+<span class="co">#&gt;        var</span>
+<span class="co">#&gt; 1 2582.201</span>
+<span class="co">#&gt; 2 1317.335</span>
+<span class="co">#&gt; 3  690.554</span>
+<span class="co">#&gt; 4       NA</span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span>
