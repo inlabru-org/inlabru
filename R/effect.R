@@ -307,6 +307,7 @@ component <- function(...) {
 #' @param A.msk TODO: check/fix/deprecate this parameter.
 #' Likely doesn't work at the moment, and I've found no examples that use it.
 # Deprecated parameters
+#' @param .envir Evaluation environment
 #' @param envir_extra TODO: check/fix this parameter.
 #'
 #' @details The `component.character` method is inlabru's equivalent to INLA's
@@ -368,6 +369,7 @@ component.character <- function(object,
                                 replicate_selector = NULL,
                                 nrep = NULL,
                                 A.msk = NULL,
+                                .envir = parent.frame(),
                                 envir_extra = NULL) {
 
   # INLA models:
@@ -428,9 +430,8 @@ component.character <- function(object,
     }
   }
 
-  envir <- parent.frame()
   if (is.null(envir_extra)) {
-    envir_extra <- new.env(envir)
+    envir_extra <- new.env(.envir)
   }
 
   # Convert ngroup and nrep to bru_mapper info
@@ -501,7 +502,7 @@ component.character <- function(object,
       },
     copy = copy,
     A.msk = A.msk,
-    env = envir,
+    env = .envir,
     env_extra = envir_extra
   )
 
@@ -539,7 +540,7 @@ component.character <- function(object,
     # or explicitly by name in the predictor expression, so no INLA formula
     # component is needed.
     component$inla.formula <- as.formula(paste0("~ ."),
-      env = envir
+      env = .envir
     )
     component$main$mapper <- bru_mapper_offset()
     component$group$mapper <- bru_mapper_index(1L)
@@ -643,7 +644,7 @@ component.character <- function(object,
         "~ . + ",
         as.character(parse(text = deparse(fcall)))
       ),
-      env = envir
+      env = .envir
       )
 
     component$fcall <- fcall
@@ -661,11 +662,17 @@ component.character <- function(object,
 #' [component()].
 #'
 #' @param \dots Parameters passed on to other methods
-#' @family component contructors
+#' @family component constructors
 #' @aliases bru_component_list
+#' @param object The object to operate on
+#' @param lhoods A `bru_like_list` object
+#' @param .envir An evaluation environment for non-formula input
 #' @export
 #' @rdname component_list
-component_list <- function(...) {
+component_list <- function(object,
+                           lhoods = NULL,
+                           .envir = parent.frame(),
+                           ...) {
   UseMethod("component_list")
 }
 
@@ -673,10 +680,6 @@ component_list <- function(...) {
 #' * `component_list.formula`: Convert a component formula
 #' into a `component_list` object
 #'
-#' @param object The object to operate on
-#' @param lhoods A `bru_like_list` object
-#' @param envir An evaluation environment to override the evaluation
-#' environment
 #' @export
 #' @family component constructors
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
@@ -696,9 +699,11 @@ component_list <- function(...) {
 #' eff <- component_list(~ myLinearEffectOfX(x))
 #' # Individual component
 #' eff <- component("myLinearEffectOfX", main = x, model = "linear")
-component_list.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
-  if (is.null(envir)) {
-    envir <- environment(object)
+component_list.formula <- function(object,
+                                   lhoods = NULL,
+                                   .envir = parent.frame(), ...) {
+  if (!is.null(environment(object))) {
+    .envir <- environment(object)
   }
   # Automatically add Intercept and remove -1 unless -1
   # or -Intercept is in components formula
@@ -710,12 +715,12 @@ component_list.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
     parsed,
     function(component.expression) {
       eval(component.expression,
-        envir = envir
+        envir = .envir
       )
     }
   )
-  environment(object) <- envir
-  component_list(components, lhoods = lhoods, envir = envir)
+  environment(object) <- .envir
+  component_list(components, lhoods = lhoods, .envir = .envir)
 }
 
 
@@ -727,9 +732,17 @@ component_list.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
 #' into a `component_list` object
 #' @export
 #' @rdname component_list
-component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
-  if (is.null(envir)) {
-    envir <- environment(object)
+component_list.list <- function(object,
+                                lhoods = NULL,
+                                .envir = parent.frame(),
+                                ...) {
+  if (is.null(.envir)) {
+    # Maybe the list has been given an environment?
+    .envir <- environment(object)
+  }
+  if (is.null(.envir)) {
+    # Later code needs an actual environment
+    .envir <- new.env()
   }
   if (any(vapply(object, function(x) inherits(x, "formula"), TRUE))) {
     object <-
@@ -739,7 +752,7 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
           object,
           function(x) {
             if (inherits(x, "formula")) {
-              component_list(x, lhoods = lhoods, envir = envir)
+              component_list(x, lhoods = lhoods, .envir = .envir)
             } else {
               list(x)
             }
@@ -761,7 +774,7 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
     ))
   }
   class(object) <- c("component_list", "list")
-  environment(object) <- envir
+  environment(object) <- .envir
   if (!is.null(lhoods)) {
     object <- add_mappers(object, lhoods = lhoods)
   }

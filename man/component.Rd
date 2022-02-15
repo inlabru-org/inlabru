@@ -35,6 +35,7 @@ component(...)
   replicate_selector = NULL,
   nrep = NULL,
   A.msk = NULL,
+  .envir = parent.frame(),
   envir_extra = NULL
 )
 }
@@ -95,6 +96,8 @@ replication model. Same syntax as for \code{main}}
 
 \item{A.msk}{TODO: check/fix/deprecate this parameter.
 Likely doesn't work at the moment, and I've found no examples that use it.}
+
+\item{.envir}{Evaluation environment}
 
 \item{envir_extra}{TODO: check/fix this parameter.}
 }

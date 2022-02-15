@@ -5,7 +5,7 @@
 \alias{bru_rerun}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
-bru(components = ~Intercept(1), ..., options = list())
+bru(components = ~Intercept(1), ..., options = list(), .envir = parent.frame())
 
 bru_rerun(result, options = list())
 }
@@ -24,6 +24,9 @@ way in direct calls to \code{\link[=like]{like()}}.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
+
+\item{.envir}{Environment for component evaluation (for when a non-formula
+specification is used)}
 
 \item{result}{A previous estimation object of class \code{bru}}
 }
