@@ -282,6 +282,8 @@ bru_info.bru <- function(object, ...) {
 #'   special arguments that need to be evaluated in the context of
 #'   `response_data` or `data` (such as Ntrials) may will only work that
 #'   way in direct calls to [like()].
+#' @param .envir Environment for component evaluation (for when a non-formula
+#' specification is used)
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #'
@@ -294,7 +296,8 @@ bru_info.bru <- function(object, ...) {
 
 bru <- function(components = ~ Intercept(1),
                 ...,
-                options = list()) {
+                options = list(),
+                .envir = parent.frame()) {
   stopifnot(bru_safe_inla())
 
   timing_start <- Sys.time()
@@ -335,7 +338,7 @@ bru <- function(components = ~ Intercept(1),
     lhoods <- list(do.call(like,
                            c(lhoods,
                              list(options = options,
-                                  .envir = NULL))))
+                                  .envir = .envir))))
     dot_is_lhood <- TRUE
     dot_is_lhood_list <- FALSE
   }
@@ -353,7 +356,7 @@ bru <- function(components = ~ Intercept(1),
   }
 
   # Turn input into a list of components (from existing list, or a special formula)
-  components <- component_list(components)
+  components <- component_list(components, .envir = .envir)
 
   # Turn model components into internal bru model
   bru.model <- bru_model(components, lhoods)

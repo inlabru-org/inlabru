@@ -8,23 +8,22 @@
 \alias{[.component_list}
 \title{Methods for inlabru component lists}
 \usage{
-component_list(...)
+component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 
-\method{component_list}{formula}(object, lhoods = NULL, envir = NULL, ...)
+\method{component_list}{formula}(object, lhoods = NULL, .envir = parent.frame(), ...)
 
-\method{component_list}{list}(object, lhoods = NULL, envir = NULL, ...)
+\method{component_list}{list}(object, lhoods = NULL, .envir = parent.frame(), ...)
 
 \method{[}{component_list}(x, i)
 }
 \arguments{
-\item{\dots}{Parameters passed on to other methods}
-
 \item{object}{The object to operate on}
 
 \item{lhoods}{A \code{bru_like_list} object}
 
-\item{envir}{An evaluation environment to override the evaluation
-environment}
+\item{.envir}{An evaluation environment for non-formula input}
+
+\item{\dots}{Parameters passed on to other methods}
 
 \item{x}{\code{component_list} object from which to extract element(s)}
 
@@ -62,10 +61,12 @@ eff <- component("myLinearEffectOfX", main = x, model = "linear")
 \seealso{
 Other component constructors: 
 \code{\link{component}()}
+
+Other component constructors: 
+\code{\link{component}()}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com} and
 Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \concept{component constructors}
-\concept{component contructors}
