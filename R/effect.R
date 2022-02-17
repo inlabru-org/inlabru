@@ -431,7 +431,7 @@ component.character <- function(object,
   }
 
   if (is.null(envir_extra)) {
-    envir_extra <- new.env(.envir)
+    envir_extra <- new.env(parent = .envir)
   }
 
   # Convert ngroup and nrep to bru_mapper info
