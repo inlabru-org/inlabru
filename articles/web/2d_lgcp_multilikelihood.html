@@ -114,7 +114,7 @@
       <h1 data-toc-skip>LGCPs - Multiple Likelihoods</h1>
                         <h4 data-toc-skip class="author">Fabian E. Bachl</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-02-15</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-02-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_multilikelihood.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -232,7 +232,7 @@
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit0</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.4.0.9000</span>
-<span class="co">#&gt; INLA version: 22.01.25</span>
+<span class="co">#&gt; INLA version: 22.02.16-2</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   Common: Model types main='spde', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   Difference: Model types main='spde', group='exchangeable', replicate='iid'</span>
@@ -245,10 +245,10 @@
 <span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
 <span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.31, Running = 1097, Post = 0.0985, Total = 1099 </span>
+<span class="co">#&gt;     Pre = 1.45, Running = 1274, Post = 0.105, Total = 1276 </span>
 <span class="co">#&gt; Fixed effects:</span>
-<span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span>
-<span class="co">#&gt; Intercept -0.301 1.367     -2.987   -0.301      2.378 -0.299   0</span>
+<span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode kld</span>
+<span class="co">#&gt; Intercept -0.301 1.367     -2.987   -0.301      2.378 -0.3   0</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
@@ -259,15 +259,15 @@
 <span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span>
 <span class="co">#&gt; Range for Common     2.957 0.573      2.032    2.887      4.273 2.742</span>
 <span class="co">#&gt; Stdev for Common     2.056 0.331      1.503    2.021      2.802 1.947</span>
-<span class="co">#&gt; Range for Difference 0.587 0.490      0.107    0.451      1.878 0.265</span>
-<span class="co">#&gt; Stdev for Difference 0.107 0.077      0.020    0.088      0.306 0.053</span>
+<span class="co">#&gt; Range for Difference 0.588 0.492      0.107    0.451      1.884 0.265</span>
+<span class="co">#&gt; Stdev for Difference 0.107 0.077      0.020    0.088      0.307 0.053</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1384.30</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32169.79</span>
-<span class="co">#&gt; Effective number of parameters .....................: -381.41</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1384.28</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32169.81</span>
+<span class="co">#&gt; Effective number of parameters .....................: -381.43</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 2793.14</span>
-<span class="co">#&gt; Effective number of parameters .................: 498.62</span>
+<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 2793.17</span>
+<span class="co">#&gt; Effective number of parameters .................: 498.64</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Marginal log-Likelihood:  -1205.30 </span>
 <span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span>
@@ -275,7 +275,7 @@
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.4.0.9000</span>
-<span class="co">#&gt; INLA version: 22.01.25</span>
+<span class="co">#&gt; INLA version: 22.02.16-2</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   Common: Model types main='spde', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   Difference: Model types main='spde', group='exchangeable', replicate='iid'</span>
@@ -288,10 +288,10 @@
 <span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
 <span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 0.883, Running = 301, Post = 0.0835, Total = 302 </span>
+<span class="co">#&gt;     Pre = 0.989, Running = 354, Post = 0.0883, Total = 355 </span>
 <span class="co">#&gt; Fixed effects:</span>
 <span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span>
-<span class="co">#&gt; Intercept -0.357 1.416     -3.139   -0.357      2.419 -0.355   0</span>
+<span class="co">#&gt; Intercept -0.356 1.413     -3.133   -0.355      2.415 -0.354   0</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
@@ -300,19 +300,19 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Model hyperparameters:</span>
 <span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span>
-<span class="co">#&gt; Range for Common     2.938 0.570      2.008    2.872      4.233 2.738</span>
-<span class="co">#&gt; Stdev for Common     2.103 0.339      1.523    2.073      2.854 2.012</span>
-<span class="co">#&gt; Range for Difference 2.158 3.065      0.128    1.233      9.839 0.335</span>
-<span class="co">#&gt; Stdev for Difference 0.144 0.084      0.029    0.129      0.346 0.084</span>
+<span class="co">#&gt; Range for Common     2.938 0.570      2.008    2.872      4.236 2.737</span>
+<span class="co">#&gt; Stdev for Common     2.102 0.339      1.523    2.071      2.853 2.009</span>
+<span class="co">#&gt; Range for Difference 1.843 2.257      0.128    1.157      7.718 0.345</span>
+<span class="co">#&gt; Stdev for Difference 0.143 0.084      0.028    0.128      0.346 0.082</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1179.76</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32374.33</span>
-<span class="co">#&gt; Effective number of parameters .....................: -478.55</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1179.03</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32375.06</span>
+<span class="co">#&gt; Effective number of parameters .....................: -478.95</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 3009.34</span>
-<span class="co">#&gt; Effective number of parameters .................: 662.30</span>
+<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 3010.09</span>
+<span class="co">#&gt; Effective number of parameters .................: 662.81</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Marginal log-Likelihood:  -1204.61 </span>
+<span class="co">#&gt; Marginal log-Likelihood:  -1204.73 </span>
 <span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span>
 <span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></code></pre></div>
 </div>

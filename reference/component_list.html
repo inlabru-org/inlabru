@@ -107,6 +107,9 @@ component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 
 # S3 method for component_list
+c(...)
+
+# S3 method for component_list
 [(x, i)</code></pre></div>
     </div>
 
@@ -119,7 +122,7 @@ component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 <dt>.envir</dt>
 <dd><p>An evaluation environment for non-formula input</p></dd>
 <dt>...</dt>
-<dd><p>Parameters passed on to other methods</p></dd>
+<dd><p>Parameters passed on to other methods. Also see Details.</p></dd>
 <dt>x</dt>
 <dd><p><code>component_list</code> object from which to extract element(s)</p></dd>
 <dt>i</dt>
@@ -132,6 +135,8 @@ component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 into a <code>component_list</code> object</p></li>
 </ul><ul><li><p><code>component_list.list</code>: Combine a list of components and/or component formulas
 into a <code>component_list</code> object</p></li>
+</ul><ul><li><p><code>c.component_list</code>: The <code>...</code> arguments should be <code>component_list</code>
+objects. The environment from the first argument will be applied to the resulting list.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
