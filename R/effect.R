@@ -661,7 +661,7 @@ component.character <- function(object,
 #' Constructor methods for inlabru component lists. Syntax details are given in
 #' [component()].
 #'
-#' @param \dots Parameters passed on to other methods
+#' @param \dots Parameters passed on to other methods. Also see Details.
 #' @family component constructors
 #' @aliases bru_component_list
 #' @param object The object to operate on
@@ -736,11 +736,10 @@ component_list.list <- function(object,
                                 lhoods = NULL,
                                 .envir = parent.frame(),
                                 ...) {
-  if (is.null(.envir)) {
-    # Maybe the list has been given an environment?
+  # Maybe the list has been given an environment?
+  if (!is.null(environment(object))) {
     .envir <- environment(object)
-  }
-  if (is.null(.envir)) {
+  } else if (is.null(.envir)) {
     # Later code needs an actual environment
     .envir <- new.env()
   }
@@ -785,6 +784,18 @@ component_list.list <- function(object,
 
 
 
+
+#' @export
+#' @details * `c.component_list`: The `...` arguments should be `component_list`
+#' objects. The environment from the first argument will be applied to the resulting list.
+#' @rdname component_list
+`c.component_list` <- function(...) {
+  env <- environment(..1)
+  object <- NextMethod()
+  class(object) <- c("component_list", "list")
+  environment(object) <- env
+  object
+}
 
 #' @export
 #' @param x `component_list` object from which to extract element(s)
