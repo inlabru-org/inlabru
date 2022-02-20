@@ -114,7 +114,7 @@
       <h1 data-toc-skip>LGCPs - An example in two dimensions</h1>
                         <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-02-17</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-02-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp.Rmd" class="external-link"><code>vignettes/web/2d_lgcp.Rmd</code></a></small>
       <div class="hidden name"><code>2d_lgcp.Rmd</code></div>
@@ -165,7 +165,7 @@
 <p>Fit an LGCP model to the locations of the gorilla nests, predict on the survey region, and produce a plot of the estimated density - which should look like the plot shown below.</p>
 <p>Recall that the steps to specifying, fitting and predicting are:</p>
 <ol style="list-style-type: decimal">
-<li><p>Specify a model, comprising (for 2D models) <code>coordinates</code> on the left of <code>~</code> and an SPDE <code>+ Intercept</code> on the right. Please use the SPDE prior specification stated below.</p></li>
+<li><p>Specify a model, comprising (for 2D models) <code>coordinates</code> on the left of <code>~</code> and an SPDE <code>+ Intercept(1)</code> on the right. Please use the SPDE prior specification stated below.</p></li>
 <li><p>Call <code><a href="../../reference/lgcp.html">lgcp( )</a></code>, passing it (with 2D models) the model components, the <code>SpatialPointsDataFrame</code> containing the observed points and the <code>SpatialPolygonsDataFrame</code> defining the survey boundary using the <code>samplers</code> argument.</p></li>
 <li><p>Call <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict( )</a></code>, passing it the fitted model from 2., locations at which to predict and an appropriate predictor spcification. The locations at which to predict should be a <code>SpatialPixelsDataFrame</code> covering the mesh obtained by calling <code>pixels(mesh)</code>.</p></li>
 </ol>
@@ -178,7 +178,7 @@
 <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>,
   model <span class="op">=</span> <span class="va">matern</span>
 <span class="op">)</span> <span class="op">+</span>
-  <span class="va">Intercept</span>
+  <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 
 <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">nests</span>, samplers <span class="op">=</span> <span class="va">boundary</span>, domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
@@ -251,10 +251,10 @@
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda</span>
-<span class="co">#&gt;       mean      sd   q0.025   median   q0.975     smin    smax         cv</span>
-<span class="co">#&gt; 1 648.4705 22.8309 602.2096 650.2259 687.5833 596.4278 709.432 0.03520731</span>
+<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax         cv</span>
+<span class="co">#&gt; 1 649.8698 26.21426 605.9694 651.2159 706.1846 592.4322 720.8438 0.04033771</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 521.2502</span></code></pre></div>
+<span class="co">#&gt; 1 687.1872</span></code></pre></div>
 <p>Given some generous interval boundaries (500, 800) for lambda we can estimate the posterior abundance distribution via</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Nest</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>
@@ -269,11 +269,11 @@
 <p>Get its quantiles via</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 579.5272 647.8006 718.1807</span></code></pre></div>
+<span class="co">#&gt; [1] 584.4190 654.4886 728.8469</span></code></pre></div>
 <p>… the mean via</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.emarginal</a></span><span class="op">(</span><span class="va">identity</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 648.138</span></code></pre></div>
+<span class="co">#&gt; [1] 655.078</span></code></pre></div>
 <p>and plot posteriors:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Nest</span><span class="op">$</span><span class="va">plugin_estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, lambda <span class="op">=</span> <span class="va">Lambda</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span>

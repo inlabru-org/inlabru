@@ -231,10 +231,12 @@ Finn Lindgren <a href="mailto:finn.lindgren@gmail.com">finn.lindgren@gmail.com</
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>        debug = debug, last = i == length(out), use_try = stop_on_error != </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>            2L, keep_warning = keep_warning, keep_message = keep_message, </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>        output_handler = output_handler, include_timing = include_timing)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 15: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos)), warning = wHandler, error = eHandler, message = mHandler)))</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 16: handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, envir, </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>        enclos)), warning = wHandler, error = eHandler, message = mHandler))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 15: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval_with_user_hand [...]</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos, user_handlers)), warning = wHandler, error = eHandler, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        message = mHandler)))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 16: handle(ev &lt;- withCallingHandlers(withVisible(eval_with_user_handlers(expr, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos, user_handlers)), warning = wHandler, error = eHandler, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        message = mHandler))</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 17: try(f, silent = TRUE)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 18: tryCatch(expr, error = function(e) {</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>        call &lt;- conditionCall(e)</span>
@@ -264,16 +266,18 @@ Finn Lindgren <a href="mailto:finn.lindgren@gmail.com">finn.lindgren@gmail.com</
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 19: tryCatchList(expr, classes, parentenv, handlers)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 20: tryCatchOne(expr, names, parentenv, handlers[[1L]])</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 21: doTryCatch(return(expr), name, parentenv, handler)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 22: withCallingHandlers(withVisible(eval(expr, envir, enclos)), warning = wHandler, </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>        error = eHandler, message = mHandler)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 23: withVisible(eval(expr, envir, enclos))</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 24: eval(expr, envir, enclos)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 22: withCallingHandlers(withVisible(eval_with_user_handlers(expr, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos, user_handlers)), warning = wHandler, error = eHandler, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        message = mHandler)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 23: withVisible(eval_with_user_handlers(expr, envir, enclos, user_handlers))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 24: eval_with_user_handlers(expr, envir, enclos, user_handlers)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 25: eval(expr, envir, enclos)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 26: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 27: fm_CRS(fm_CRSargs(mesh$crs))</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 28: fm_CRSargs(mesh$crs)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 29: fm_not_for_PROJ6()</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 30: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 26: eval(expr, envir, enclos)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 27: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 28: fm_CRS(fm_CRSargs(mesh$crs))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 29: fm_CRSargs(mesh$crs)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 30: fm_not_for_PROJ6()</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 31: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'fm_CRS' should be given a SRS_string for PROJ6 or a known keyword for a predefined string given in projargs. Using fallback PROJ4 method.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'fm_CRSargs_as_list()' should not be used with PROJ6 and rgdal v3</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> Call stack:</span>
@@ -307,10 +311,12 @@ Finn Lindgren <a href="mailto:finn.lindgren@gmail.com">finn.lindgren@gmail.com</
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>        debug = debug, last = i == length(out), use_try = stop_on_error != </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>            2L, keep_warning = keep_warning, keep_message = keep_message, </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>        output_handler = output_handler, include_timing = include_timing)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 15: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos)), warning = wHandler, error = eHandler, message = mHandler)))</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 16: handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, envir, </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>        enclos)), warning = wHandler, error = eHandler, message = mHandler))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 15: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval_with_user_hand [...]</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos, user_handlers)), warning = wHandler, error = eHandler, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        message = mHandler)))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 16: handle(ev &lt;- withCallingHandlers(withVisible(eval_with_user_handlers(expr, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos, user_handlers)), warning = wHandler, error = eHandler, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        message = mHandler))</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 17: try(f, silent = TRUE)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 18: tryCatch(expr, error = function(e) {</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>        call &lt;- conditionCall(e)</span>
@@ -340,15 +346,17 @@ Finn Lindgren <a href="mailto:finn.lindgren@gmail.com">finn.lindgren@gmail.com</
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 19: tryCatchList(expr, classes, parentenv, handlers)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 20: tryCatchOne(expr, names, parentenv, handlers[[1L]])</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 21: doTryCatch(return(expr), name, parentenv, handler)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 22: withCallingHandlers(withVisible(eval(expr, envir, enclos)), warning = wHandler, </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>        error = eHandler, message = mHandler)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 23: withVisible(eval(expr, envir, enclos))</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 24: eval(expr, envir, enclos)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 22: withCallingHandlers(withVisible(eval_with_user_handlers(expr, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos, user_handlers)), warning = wHandler, error = eHandler, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        message = mHandler)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 23: withVisible(eval_with_user_handlers(expr, envir, enclos, user_handlers))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 24: eval_with_user_handlers(expr, envir, enclos, user_handlers)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 25: eval(expr, envir, enclos)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 26: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 27: fm_CRSargs_as_list(fm_CRSargs(input.crs))</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 28: fm_not_for_PROJ6()</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 29: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 26: eval(expr, envir, enclos)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 27: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 28: fm_CRSargs_as_list(fm_CRSargs(input.crs))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 29: fm_not_for_PROJ6()</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 30: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'fm_CRSargs()' should not be used with PROJ6 and rgdal v3</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> Call stack:</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 1: pkgdown::deploy_to_branch(new_process = FALSE)</span>
@@ -381,10 +389,12 @@ Finn Lindgren <a href="mailto:finn.lindgren@gmail.com">finn.lindgren@gmail.com</
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>        debug = debug, last = i == length(out), use_try = stop_on_error != </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>            2L, keep_warning = keep_warning, keep_message = keep_message, </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>        output_handler = output_handler, include_timing = include_timing)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 15: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos)), warning = wHandler, error = eHandler, message = mHandler)))</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 16: handle(ev &lt;- withCallingHandlers(withVisible(eval(expr, envir, </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>        enclos)), warning = wHandler, error = eHandler, message = mHandler))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 15: timing_fn(handle(ev &lt;- withCallingHandlers(withVisible(eval_with_user_hand [...]</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos, user_handlers)), warning = wHandler, error = eHandler, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        message = mHandler)))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 16: handle(ev &lt;- withCallingHandlers(withVisible(eval_with_user_handlers(expr, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos, user_handlers)), warning = wHandler, error = eHandler, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        message = mHandler))</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 17: try(f, silent = TRUE)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 18: tryCatch(expr, error = function(e) {</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>        call &lt;- conditionCall(e)</span>
@@ -414,16 +424,18 @@ Finn Lindgren <a href="mailto:finn.lindgren@gmail.com">finn.lindgren@gmail.com</
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 19: tryCatchList(expr, classes, parentenv, handlers)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 20: tryCatchOne(expr, names, parentenv, handlers[[1L]])</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 21: doTryCatch(return(expr), name, parentenv, handler)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 22: withCallingHandlers(withVisible(eval(expr, envir, enclos)), warning = wHandler, </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>        error = eHandler, message = mHandler)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 23: withVisible(eval(expr, envir, enclos))</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 24: eval(expr, envir, enclos)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 22: withCallingHandlers(withVisible(eval_with_user_handlers(expr, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        envir, enclos, user_handlers)), warning = wHandler, error = eHandler, </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>        message = mHandler)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 23: withVisible(eval_with_user_handlers(expr, envir, enclos, user_handlers))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 24: eval_with_user_handlers(expr, envir, enclos, user_handlers)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> 25: eval(expr, envir, enclos)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 26: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 27: fm_CRSargs_as_list(fm_CRSargs(input.crs))</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 28: fm_CRSargs(input.crs)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 29: fm_not_for_PROJ6()</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> 30: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 26: eval(expr, envir, enclos)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 27: sample.lgcp(gorillas$mesh, loglambda = 1.5, samplers = gorillas$boundary)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 28: fm_CRSargs_as_list(fm_CRSargs(input.crs))</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 29: fm_CRSargs(input.crs)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 30: fm_not_for_PROJ6()</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 31: paste0("Call stack:\n", paste0(fm_call_stack(end = 1), collapse = "\n"))</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=geocent +R=1 +units=m +no_defs +type=crs</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded datum unknown in Proj4 definition</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span>
