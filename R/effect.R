@@ -1067,8 +1067,8 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       )
     ))
     n_values <- nrow(inp_values)
-  } else if (any(is_matrix || is_Matrix)) {
-    if (!all(is_matrix || is_Matrix)) {
+  } else if (any(is_matrix | is_Matrix)) {
+    if (!all(is_matrix | is_Matrix)) {
       stop("Inconsistent input types; matrix and non-matrix")
     }
     inp_values <- unique.matrix(do.call(rbind, inp))
@@ -1472,10 +1472,11 @@ bru_mapper.default <- function(mapper,
     )
     method_names <- intersect(
       c(
-        "ibm_n", "ibm_n_inla",
-        "ibm_values", "ibm_values_inla",
-        "ibm_amatrix", "ibm_amatrix_inla",
-        "ibm_valid_input", "ibm_valid_input_inla"
+        "ibm_n",
+        "ibm_values",
+        "ibm_amatrix",
+        "ibm_inla_subset",
+        "ibm_valid_input"
       ),
       ...names()
     )
@@ -2156,7 +2157,8 @@ ibm_valid_input.bru_mapper_multi <- function(mapper, input,
   names(x[["mappers"]])
 }
 
-#' @param value a character vector of up to the same length as x
+#' @param value a character vector of up to the same length as the number
+#' of mappers in the multi-mapper x
 #' @export
 #' @rdname bru_mapper_methods
 `names<-.bru_mapper_multi` <- function(x, value) {
@@ -2783,17 +2785,17 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   }
 
   # Check for NA values.
-  if (any(is.na(unlist(as.vector(val))))) {
-    # TODO: remove this check and make sure NAs are handled properly elsewhere,
-    # if possible. Problem: treating NA as "no effect" can have negative side
-    # effects. For spatial covariates, can be handled by infill, but a general
-    # solution doesn't exist, so not sure how to deal with this.
-    stop(sprintf(
-      "Input '%s' of component '%s' has returned NA values. Please design your
-                 argument as to return non-NA for all points in your model domain/mesh.",
-      as.character(input$input)[[1]], label
-    ))
-  }
+#  if (any(is.na(unlist(as.vector(val))))) {
+#    # TODO: remove this check and make sure NAs are handled properly elsewhere,
+#    # if possible. Problem: treating NA as "no effect" can have negative side
+#    # effects. For spatial covariates, can be handled by infill, but a general
+#    # solution doesn't exist, so not sure how to deal with this.
+#    stop(sprintf(
+#      "Input '%s' of component '%s' has returned NA values. Please design your
+#                 argument as to return non-NA for all points in your model domain/mesh.",
+#      as.character(input$input)[[1]], label
+#    ))
+#  }
 
   val
 }
