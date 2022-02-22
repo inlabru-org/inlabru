@@ -114,7 +114,7 @@
       <h1 data-toc-skip>Random Fields in One Dimension</h1>
                         <h4 data-toc-skip class="author">Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-02-20</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-02-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/random_fields.Rmd" class="external-link"><code>vignettes/web/random_fields.Rmd</code></a></small>
       <div class="hidden name"><code>random_fields.Rmd</code></div>
@@ -201,15 +201,14 @@
 <div class="section level2">
 <h2 id="fitting-an-spde-model-with-inlabru">Fitting an SPDE model with inlabru<a class="anchor" aria-label="anchor" href="#fitting-an-spde-model-with-inlabru"></a>
 </h2>
-<p>Make mesh.</p>
+<p>Make mesh. To avoid boundary effects in the region of interest, let the mesh extend outside the data range.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="co"># this sets mesh points - try others if you like</span>
+<code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">65</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># this sets mesh points - try others if you like</span>
 <span class="va">mesh1D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html" class="external-link">inla.mesh.1d</a></span><span class="op">(</span><span class="va">x</span>, boundary <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></code></pre></div>
 <p>… and see where the mesh points are:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">mesh1D</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">xlim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">mesh1D</span><span class="op">)</span></code></pre></div>
 <div class="section level3">
 <h3 id="using-function-bru-to-fit-to-count-data">Using function <code>bru( )</code> to fit to count data<a class="anchor" aria-label="anchor" href="#using-function-bru-to-fit-to-count-data"></a>
 </h3>
@@ -223,16 +222,20 @@
 <li>
 <code>model=</code> designates the type of effect, here an SPDE model object from the <code>INLA</code> function <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern( )</a></code>, which requires a mesh to be passed to it, so we pass it the 1D mesh that we created above, `<code>mesh1D</code>.</li>
 </ul>
-<p>For models that only adds the model components, we don’t need to specify a separate predictor formula. Instead, we can provide the name of the output to the left of the <code>~</code> in the component specification.</p>
+<p>For models that only adds the model components, we don’t need to specify the full predictor formula. Instead, we can provide the name of the output to the left of the <code>~</code> in the component specification, and “.” on the right hand side, which will cause it to add all components (unless a subset is selected via the <code>include</code>/<code>exclude</code> arguments to <code><a href="../../reference/like.html">like()</a></code>).</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">the_spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh1D</span>,
   prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span>,
-  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">0.01</span><span class="op">)</span>
+  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span>
 <span class="op">)</span>
 
-<span class="va">comp</span> <span class="op">&lt;-</span> <span class="va">count</span> <span class="op">~</span> <span class="fu">field</span><span class="op">(</span><span class="va">x</span>, model <span class="op">=</span> <span class="va">the_spde</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+<span class="va">comp</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="fu">field</span><span class="op">(</span><span class="va">x</span>, model <span class="op">=</span> <span class="va">the_spde</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span>, prec.linear <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">2</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
 
-<span class="va">fit2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">comp</span>, <span class="va">cd</span>, family <span class="op">=</span> <span class="st">"poisson"</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>E <span class="op">=</span> <span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span><span class="op">)</span>
+<span class="va">fit2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">comp</span>,
+                <span class="fu"><a href="../../reference/like.html">like</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">.</span>,
+                     data <span class="op">=</span> <span class="va">cd</span>,
+                     family <span class="op">=</span> <span class="st">"poisson"</span>,
+                     E <span class="op">=</span> <span class="va">exposure</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.4.0.9000</span>
@@ -245,28 +248,28 @@
 <span class="co">#&gt;     Data class: 'data.frame'</span>
 <span class="co">#&gt;     Predictor: count ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 0.894, Running = 0.131, Post = 0.0623, Total = 1.09 </span>
+<span class="co">#&gt;     Pre = 1.24, Running = 0.27, Post = 0.165, Total = 1.68 </span>
 <span class="co">#&gt; Fixed effects:</span>
-<span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span>
-<span class="co">#&gt; Intercept 5.723 7.804       -0.2    1.872     26.611 1.53 0.001</span>
+<span class="co">#&gt;           mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span>
+<span class="co">#&gt; Intercept 1.13 0.783      0.018    0.945      3.109 0.799   0</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
 <span class="co">#&gt;     field SPDE2 model</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Model hyperparameters:</span>
-<span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant   mode</span>
-<span class="co">#&gt; Range for field 48.295 45.857      4.918   35.187     175.25 14.357</span>
-<span class="co">#&gt; Stdev for field  0.596  0.325      0.221    0.514       1.45  0.396</span>
+<span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant  mode</span>
+<span class="co">#&gt; Range for field 31.512 19.774      8.850   26.611     83.159 19.22</span>
+<span class="co">#&gt; Stdev for field  0.518  0.165      0.267    0.494      0.908  0.45</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 59.68</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 76.32</span>
-<span class="co">#&gt; Effective number of parameters .....................: 4.81</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 60.20</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 76.85</span>
+<span class="co">#&gt; Effective number of parameters .....................: 5.39</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 58.11</span>
-<span class="co">#&gt; Effective number of parameters .................: 2.59</span>
+<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 58.33</span>
+<span class="co">#&gt; Effective number of parameters .................: 2.78</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Marginal log-Likelihood:  -38.72 </span>
+<span class="co">#&gt; Marginal log-Likelihood:  -36.80 </span>
 <span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span>
 <span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></code></pre></div>
 <p>Predict the values at the x points used for mesh (the data argument must be a data frame, see <code><a href="../../reference/predict.bru.html">?predict.bru</a></code>):</p>
@@ -281,11 +284,11 @@
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">pred2.bru</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">cd</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span> <span class="op">/</span> <span class="va">cd</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">cd</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span> <span class="op">/</span> <span class="va">exposure</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">true.lambda</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, pch <span class="op">=</span> <span class="st">"_"</span>, cex <span class="op">=</span> <span class="fl">9</span>, col <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"x"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Intensity"</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Use of `cd$exposure` is discouraged. Use `exposure` instead.</span></code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Intensity"</span><span class="op">)</span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-17-1.png" width="672"></p>
 <p>Compare the <code>inlabru</code> fit to the <code>gam</code> fit:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -293,6 +296,7 @@
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">pred2.bru</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">cd</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span> <span class="op">/</span> <span class="va">exposure</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dat4pred2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">gam</span> <span class="op">/</span> <span class="va">exposure</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"x"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Intensity"</span><span class="op">)</span></code></pre></div>
 </div>
