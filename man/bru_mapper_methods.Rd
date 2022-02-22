@@ -17,6 +17,9 @@
 \alias{ibm_n.bru_mapper_linear}
 \alias{ibm_values.bru_mapper_linear}
 \alias{ibm_amatrix.bru_mapper_linear}
+\alias{ibm_n.bru_mapper_matrix}
+\alias{ibm_values.bru_mapper_matrix}
+\alias{ibm_amatrix.bru_mapper_matrix}
 \alias{ibm_n.bru_mapper_factor}
 \alias{ibm_values.bru_mapper_factor}
 \alias{ibm_amatrix.bru_mapper_factor}
@@ -68,6 +71,12 @@
 \method{ibm_values}{bru_mapper_linear}(mapper, ...)
 
 \method{ibm_amatrix}{bru_mapper_linear}(mapper, input, ...)
+
+\method{ibm_n}{bru_mapper_matrix}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_matrix}(mapper, ...)
+
+\method{ibm_amatrix}{bru_mapper_matrix}(mapper, input, ...)
 
 \method{ibm_n}{bru_mapper_factor}(mapper, ...)
 
