@@ -1805,6 +1805,9 @@ ibm_amatrix.bru_mapper_matrix <- function(mapper, input, ...) {
     A <- as(input, "Matrix")
   } else if (inherits(input, "Matrix")) {
     A <- input
+  } else if (inherits(input, "Spatial")) {
+    A <- sp::coordinates(input)
+    A <- as(A, "Matrix")
   } else {
     A <- as(input, "Matrix")
   }
