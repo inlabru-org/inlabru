@@ -172,8 +172,11 @@ but for the corresponding features of <code><a href="https://rdrr.io/pkg/INLA/ma
 <dd><p>Optional specification of effect scaling weights.
 Same syntax as for <code>main</code>.</p></dd>
 <dt>model</dt>
-<dd><p>Either one of "offset", "factor_full", "factor_contrast", "linear" or a model name or
-object accepted by INLA's <code>f</code> function. If set to NULL, then "linear" is used.</p></dd>
+<dd><p>Either one of "offset", "factor_full", "factor_contrast", "linear",
+"fixed", or a model name or
+object accepted by INLA's <code>f</code> function. If set to NULL, then "linear" is used
+for vector inputs, and "fixed" for matrix input (converted internally to
+an iid model with fixed precision)</p></dd>
 <dt>mapper</dt>
 <dd><p>Information about how to do the mapping from the values evaluated in <code>main</code>,
 and to the latent variables. Auto-detects spde model objects in model and
@@ -222,8 +225,10 @@ Likely doesn't work at the moment, and I've found no examples that use it.</p></
 </dl></div>
     <div id="details">
     <h2>Details</h2>
-    <p><code><a href="bru.html">bru()</a></code> will understand formulae describing fixed effect models just like the other methods. For instance, the
-formula <code>y ~ x</code> will fit the linear combination of an effect named <code>x</code> and an intercept to
+    <p>As shorthand, <code><a href="bru.html">bru()</a></code> will understand basic additive formulae describing fixed effect
+models. For instance, the
+components specification <code>y ~ x</code> will define the linear combination of an
+effect named <code>x</code> and an intercept to
 the response <code>y</code> with respect to the likelihood family stated when calling <code><a href="bru.html">bru()</a></code>. Mathematically,
 the linear predictor \(\eta\) would be written down as</p>
 <p>$$\eta = \beta * x + c,$$</p>
@@ -232,8 +237,10 @@ the linear predictor \(\eta\) would be written down as</p>
 <li><p>\(x \)is a <em>covariate</em></p></li>
 <li><p>\(\beta\) is a <em>random variable</em> associated with \(x\) and</p></li>
 <li><p>\(\psi = \beta * x \) is called the <em>random effect</em> of \(x\)</p></li>
-</ul><p>A problem that arises when using this kind of R formula is that it does not clearly reflect the mathematical
-formula. For instance, when providing the formula to inla, the resulting object will refer to the random
+</ul><p>A problem that arises when using this kind of R formula is that it does not
+clearly reflect the mathematical
+formula. For instance, when providing the formula to inla, the resulting
+object will refer to the random
 effect \(\psi = \beta * x \) as <code>x</code>. Hence, it is not clear if <code>x</code> refers to the covariate
 or the effect of the covariate.</p>
 <p>The <code>component.character</code> method is inlabru's equivalent to INLA's
@@ -246,11 +253,12 @@ or the effect of the covariate.</p>
     
 
 
-<p>In INLA, a simple random effect model would be expressed as</p>
+<p>In INLA, the <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f()</a></code> notation is used to define more complex models, but
+a simple linear effect model can also be expressed as</p>
 <ul><li><p><code>formula = y ~ f(x, model = "linear")</code>,</p></li>
 </ul><p>where <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f()</a></code> is the inla specific function to set up random effects of all kinds. The underlying
 predictor would again be \(\eta = \beta * x + c\) but the result of fitting the model would state
-<code>x</code> as the random effect's name. bru allows to rewrite this formula in order to explicitly state
+<code>x</code> as the random effect's name. bru allows rewriting this formula in order to explicitly state
 the name of the random effect and the name of the associated covariate. This is achieved by replacing <code>f</code>
 with an arbitrary name that we wish to assign to the effect, e.g.</p>
 <ul><li><p><code>components = y ~ psi(x, model = "linear")</code>.</p></li>
@@ -303,21 +311,29 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-in"><span class="co"># \donttest{</span></span>
 <span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st">"INLA"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"></span>
-<span class="r-in">  <span class="co"># As an example, let us create a linear component. Here ,the component is</span></span>
+<span class="r-in">  <span class="co"># As an example, let us create a linear component. Here, the component is</span></span>
 <span class="r-in">  <span class="co"># called "myEffectOfX" while the covariate the component acts on is called "x":</span></span>
 <span class="r-in"></span>
-<span class="r-in">  <span class="va">eff</span> <span class="op">&lt;-</span> <span class="fu">component</span><span class="op">(</span><span class="st">"myEffectOfX"</span>, main <span class="op">=</span> <span class="va">x</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">eff</span><span class="op">)</span></span>
+<span class="r-in">  <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu">component</span><span class="op">(</span><span class="st">"myEffectOfX"</span>, main <span class="op">=</span> <span class="va">x</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span>
+<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cmp</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in">  <span class="co"># A more complicated component:</span></span>
-<span class="r-in">  <span class="va">eff</span> <span class="op">&lt;-</span> <span class="fu">component</span><span class="op">(</span><span class="st">"myEffectOfX"</span>,</span>
+<span class="r-in">  <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu">component</span><span class="op">(</span><span class="st">"myEffectOfX"</span>,</span>
 <span class="r-in">    main <span class="op">=</span> <span class="va">x</span>,</span>
 <span class="r-in">    model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.matern.html" class="external-link">inla.spde2.matern</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html" class="external-link">inla.mesh.1d</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in">  <span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in">  <span class="co"># Compound fixed effect component, where x and z are in the input data.</span></span>
+<span class="r-in">  <span class="co"># The formula will be passed on to MatrixModels::model.Matrix:</span></span>
+<span class="r-in">  <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu">component</span><span class="op">(</span><span class="st">"eff"</span>, <span class="op">~</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="va">x</span><span class="op">:</span><span class="va">z</span> , model <span class="op">=</span> <span class="st">"fixed"</span><span class="op">)</span></span>
+<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cmp</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> This is INLA_22.02.16-2 built 2022-02-16 11:33:31 UTC.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  - See www.r-inla.org/contact-us for how to get help.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  - To enable PARDISO sparse library; see inla.pardiso()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Label:	eff</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Main:	input '~-1 + x:z',	type 'fixed'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	~. + f(eff, model = BRU_eff_main_model, hyper = BRU_eff_main_fixed_hyper)</span>
 <span class="r-in"><span class="co"># }</span></span>
 <span class="r-in"></span>
 </code></pre></div>
