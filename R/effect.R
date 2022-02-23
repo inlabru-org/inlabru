@@ -645,7 +645,8 @@ component.character <- function(object,
           fcall[["hyper"]] <- as.symbol(fixed_hyper_name)
           assign(
             fixed_hyper_name,
-            list(prec = list(initial = log(1e-6), fixed = TRUE)),
+            list(prec = list(initial = log(INLA:::inla.set.control.fixed.default()$prec),
+                             fixed = TRUE)),
             envir = component$env_extra
           )
         }
