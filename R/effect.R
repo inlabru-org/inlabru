@@ -969,6 +969,8 @@ bru_subcomponent <- function(input = NULL,
     type <- "spde"
   } else if (inherits(model, "inla.rgeneric")) {
     type <- "rgeneric"
+  } else if (inherits(model, "inla.cgeneric")) {
+    type <- "cgeneric"
   } else if (inherits(
     model,
     c(
