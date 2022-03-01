@@ -55,3 +55,26 @@ Comments:
 
 ## Downstream dependencies
 inlabru does not have any reverse dependencies
+
+
+
+## Failure reports
+
+### INLA 22.02.16-2 and INLA 22.02.28-1
+
+ ----------- FAILURE REPORT -------------- 
+ --- failure: length > 1 in coercion to logical ---
+ --- srcref --- 
+: 
+ --- package (from environment) --- 
+INLA
+ --- call from context --- 
+FUN(X[[i]], ...)
+ --- call from argument --- 
+is.null(x) || is.na(x)
+ --- R stacktrace ---
+where 1: FUN(X[[i]], ...)
+where 2: lapply(X = X, FUN = FUN, ...)
+where 3: sapply(marginals.random, function(x) (is.null(x) || is.na(x)))
+where 4: inla.collect.random(results.dir, debug)
+
