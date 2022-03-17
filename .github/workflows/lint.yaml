@@ -46,7 +46,7 @@ jobs:
         with:
           dependencies: '"all"'
           extra-packages: |
-             rcmdcheck
+             lintr
 
       - name: Install package
         run: R CMD INSTALL .
