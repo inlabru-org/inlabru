@@ -32,12 +32,19 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
-      - name: Install dependencies
+      - name: Install system dependencies on MacOS (X11, gdal)
+        if: runner.os == 'macOS'
         run: |
-          install.packages(c("remotes"))
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_github("jimhester/lintr")
-        shell: Rscript {0}
+          brew install --cask xquartz
+          brew install pkg-config
+          brew install proj@9
+          brew install gdal
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          dependencies: '"all"'
+          extra-packages: |
+             rcmdcheck
 
       - name: Install package
         run: R CMD INSTALL .
