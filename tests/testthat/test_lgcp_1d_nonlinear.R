@@ -39,14 +39,14 @@ test_that("Mexdolphin: Hazard rate detection function", {
       -pts$distance))) +
       geom_density(aes(distance, after_stat(count))) +
       geom_line(aes(distance, est, col = "Plugin"),
-                data = data.frame(distance = seq(-8,8, by = 0.001)) %>%
+                data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
                   mutate(est = hr(abs(distance),
-                                  fit$summary.fixed["lsig","mean"]) *
-                           exp(fit$summary.fixed["Intercept","mean"]))) +
+                                  fit$summary.fixed["lsig", "mean"]) *
+                           exp(fit$summary.fixed["Intercept", "mean"]))) +
       geom_line(aes(distance, mean, col = "Pred"),
                 data = pred) +
       geom_line(aes(distance, est, col = "1"),
-                data = data.frame(distance = seq(-8,8, by = 0.001)) %>%
+                data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
                   mutate(est = hr(abs(distance),
                                   1) *
                            exp(2.3)))

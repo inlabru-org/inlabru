@@ -21,7 +21,7 @@ pixelplot.mesh <- function(...) {
 #' @examples
 #' \dontrun{
 #' if (require("ggplot2", quietly = TRUE) &&
-#'     require(ggpolypath, quietly = TRUE)) {
+#'   require(ggpolypath, quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'
@@ -75,7 +75,7 @@ gmap <- function(data, ...) {
 #'
 #' @examples
 #' if (require("ggplot2", quietly = TRUE) &&
-#'     require(ggpolypath, quietly = TRUE)) {
+#'   require(ggpolypath, quietly = TRUE)) {
 #'   # Load Gorilla data
 #'
 #'   data(gorillas, package = "inlabru")
@@ -113,7 +113,7 @@ gg <- function(data, ...) {
 #' @examples
 #' \dontrun{
 #' if (require("ggplot2", quietly = TRUE) &&
-#'     require(ggpolypath, quietly = TRUE)) {
+#'   require(ggpolypath, quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'
@@ -548,9 +548,11 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
     dmap <- modifyList(dmap, mapping)
   }
 
-  params = list(...)
-  arg = list(data = df,
-             mapping = dmap)
+  params <- list(...)
+  arg <- list(
+    data = df,
+    mapping = dmap
+  )
 
   if (!any(names(params) %in% c("colour", "color"))) {
     arg$colour <- "black"
@@ -558,7 +560,7 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
   if (!any(names(params) %in% "alpha")) {
     arg$alpha <- 0.2
   }
-  arg = modifyList(arg, params)
+  arg <- modifyList(arg, params)
 
   if (requireNamespace("ggpolypath", quietly = TRUE)) {
     do.call(ggpolypath::geom_polypath, arg)

@@ -28,7 +28,7 @@ test_that("Multiple likelihoods: basic model", {
 
   cmp <- component_list(~ -1 +
                           effect(x, model = "rw2",
-                                 values=seq(1, 5, by = 0.25),
+                                 values = seq(1, 5, by = 0.25),
                                  scale.model = TRUE) +
                           int1(1) + int2(1))
 

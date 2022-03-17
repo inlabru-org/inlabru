@@ -260,4 +260,3 @@ test_that("1D LGCP fitting, compressed format", {
   )
 
 })
-
