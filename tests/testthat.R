@@ -1,3 +1,3 @@
-library(testthat)
-
-test_check("inlabru")
+if (require(testthat, quietly = TRUE)) {
+  test_check("inlabru")
+}

@@ -53,6 +53,7 @@ jobs:
           dependencies: '"hard"'
           extra-packages: |
              rcmdcheck
+             testthat
 
       - name: Session info
         run: |
