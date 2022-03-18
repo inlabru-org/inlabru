@@ -325,7 +325,7 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-in"></span>
 <span class="r-in">  <span class="co"># Compound fixed effect component, where x and z are in the input data.</span></span>
 <span class="r-in">  <span class="co"># The formula will be passed on to MatrixModels::model.Matrix:</span></span>
-<span class="r-in">  <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu">component</span><span class="op">(</span><span class="st">"eff"</span>, <span class="op">~</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="va">x</span><span class="op">:</span><span class="va">z</span> , model <span class="op">=</span> <span class="st">"fixed"</span><span class="op">)</span></span>
+<span class="r-in">  <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu">component</span><span class="op">(</span><span class="st">"eff"</span>, <span class="op">~</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="va">x</span><span class="op">:</span><span class="va">z</span>, model <span class="op">=</span> <span class="st">"fixed"</span><span class="op">)</span></span>
 <span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cmp</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> This is INLA_22.03.16 built 2022-03-16 13:18:13 UTC.</span>
