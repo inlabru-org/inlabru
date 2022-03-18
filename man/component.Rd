@@ -220,7 +220,7 @@ if (require("INLA", quietly = TRUE)) {
 
   # Compound fixed effect component, where x and z are in the input data.
   # The formula will be passed on to MatrixModels::model.Matrix:
-  cmp <- component("eff", ~ -1 + x:z , model = "fixed")
+  cmp <- component("eff", ~ -1 + x:z, model = "fixed")
   summary(cmp)
 }
 }

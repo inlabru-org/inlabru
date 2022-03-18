@@ -731,7 +731,7 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
     idx_end <- idx_start + nB - 1
     loc[seq(idx_start, idx_end, length = nB), ] <-
       as.matrix(barycentric_grid %*%
-                  mesh$loc[mesh$graph$tv[tri, ], , drop = FALSE])
+        mesh$loc[mesh$graph$tv[tri, ], , drop = FALSE])
   }
 
   # Construct integration weights
@@ -809,7 +809,8 @@ bru_int_polygon <- function(mesh,
     # Old method
 
     bru_log_message(paste0("Integrating over ", length(polylist), " polygons."),
-                    verbosity = 2)
+      verbosity = 2
+    )
     gg <- seq_along(polylist)
     for (g in gg) {
       poly <- polylist[[g]]
@@ -861,8 +862,8 @@ bru_int_polygon <- function(mesh,
 #     nsub = int.args$nsub2),
 #   check = FALSE))
 ## A tibble: 2 × 13
-##expression      min median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time  gc
-##<bch:expr> <bch:tm> <bch:>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <lis> <lis>
+## expression      min median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time  gc
+## <bch:expr> <bch:tm> <bch:>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <lis> <lis>
 ##  1 A            14.03s 14.03s    0.0713        NA     2.28     1    32     14.03s <NULL> <NULL> <ben… <tib…
 ##  2 B             8.05s  8.05s    0.124         NA     2.61     1    21      8.05s <NULL> <NULL> <ben… <tib…
 

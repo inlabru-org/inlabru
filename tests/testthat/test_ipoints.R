@@ -121,9 +121,11 @@ test_that("Polygon integration with holes", {
     sp::Polygons(
       list(
         sp::Polygon(matrix(c(0, 3, 3, 0, 0, 0, 3, 3) + runif(8) * 0.01, 4, 2),
-                    hole = FALSE),
+          hole = FALSE
+        ),
         sp::Polygon(matrix(c(1, 2, 2, 1, 1, 1, 2, 2) + runif(8) * 0.01, 4, 2),
-                    hole = TRUE)
+          hole = TRUE
+        )
       ),
       ID = "A"
     )
@@ -134,16 +136,24 @@ test_that("Polygon integration with holes", {
     loc.domain = bndA$loc,
     max.edge = 1
   )
-  ipA1 <- ipoints(plyA, m, int.args = list(poly_method = "legacy",
-                                           method = "direct",
-                                           nsub2 = 1))
-  ipA2 <- ipoints(plyA, m, int.args = list(poly_method = "legacy",
-                                           method = "stable",
-                                           nsub2 = 1))
-  ipA3 <- ipoints(plyA, m, int.args = list(method = "direct",
-                                           nsub2 = 1))
-  ipA4 <- ipoints(plyA, m, int.args = list(method = "stable",
-                                           nsub2 = 1))
+  ipA1 <- ipoints(plyA, m, int.args = list(
+    poly_method = "legacy",
+    method = "direct",
+    nsub2 = 1
+  ))
+  ipA2 <- ipoints(plyA, m, int.args = list(
+    poly_method = "legacy",
+    method = "stable",
+    nsub2 = 1
+  ))
+  ipA3 <- ipoints(plyA, m, int.args = list(
+    method = "direct",
+    nsub2 = 1
+  ))
+  ipA4 <- ipoints(plyA, m, int.args = list(
+    method = "stable",
+    nsub2 = 1
+  ))
   ipA1$test <- "A1"
   ipA2$test <- "A2"
   ipA3$test <- "A3"

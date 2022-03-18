@@ -41,5 +41,4 @@ test_that("Latent models: SPDE 1D", {
     tolerance = hitol,
     style = "serialize"
   )
-
 })

@@ -346,7 +346,7 @@ component <- function(...) {
 #'
 #'   # Compound fixed effect component, where x and z are in the input data.
 #'   # The formula will be passed on to MatrixModels::model.Matrix:
-#'   cmp <- component("eff", ~ -1 + x:z , model = "fixed")
+#'   cmp <- component("eff", ~ -1 + x:z, model = "fixed")
 #'   summary(cmp)
 #' }
 #' }
@@ -647,7 +647,8 @@ component.character <- function(object,
             fixed_hyper_name,
             list(prec = list(
               initial = log(INLA::inla.set.control.fixed.default()$prec),
-              fixed = TRUE)),
+              fixed = TRUE
+            )),
             envir = component$env_extra
           )
         }
@@ -936,11 +937,13 @@ add_mappers.component_list <- function(components, lhoods, ...) {
       stop("Internal error: copy model detected, but no copy information available.")
     }
     if (is.null(components[[components[[k]][["copy"]]]])) {
-      stop(paste0("Could not find component '",
-                  components[[k]][["copy"]],
-                  "' to use as copy for component '",
-                  components[[k]][["label"]],
-                  "'."))
+      stop(paste0(
+        "Could not find component '",
+        components[[k]][["copy"]],
+        "' to use as copy for component '",
+        components[[k]][["label"]],
+        "'."
+      ))
     }
     components[[k]]$mapper <- components[[components[[k]][["copy"]]]][["mapper"]]
   }
@@ -1170,7 +1173,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
           },
           "."
         ),
-        immediate. = TRUE)
+        immediate. = TRUE
+        )
         unique_inputs <- list(
           inp_values = 1,
           n_values = 1
@@ -1317,7 +1321,8 @@ make_mapper <- function(subcomp,
       stop(paste0(
         "Need to specify at least one of values (labels), input, or n for '",
         subcomp[["label"]],
-        "' of component '", label, "'."))
+        "' of component '", label, "'."
+      ))
     }
     subcomp[["mapper"]] <- bru_mapper_matrix(labels)
   } else if (subcomp[["model"]] %in% c("bym", "bym2")) {
@@ -1816,9 +1821,11 @@ ibm_amatrix.bru_mapper_matrix <- function(mapper, input, ...) {
     A <- as(input, "Matrix")
   }
   if (ncol(A) != ibm_n(mapper)) {
-    stop(paste0("Input to matrix mapper has ", ncol(A),
-                " columns but should have ", ibm_n(mapper),
-                " columns."))
+    stop(paste0(
+      "Input to matrix mapper has ", ncol(A),
+      " columns but should have ", ibm_n(mapper),
+      " columns."
+    ))
   }
   A
 }
@@ -2696,8 +2703,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   } else if (is.function(emap)) {
     # Allow but detect failures:
     val <- tryCatch(emap(data),
-                    error = function(e) {
-                    }
+      error = function(e) {
+      }
     )
     if (is.null(val)) {
       # TODO: figure out if we need to do something else in this case.
@@ -2712,8 +2719,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
           coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
           data_crs <- tryCatch(fm_sp_get_crs(data),
-                               error = function(e) {
-                               }
+            error = function(e) {
+            }
           )
           if (!fm_crs_is_null(data_crs)) {
             proj4string(val) <- data_crs
@@ -2728,8 +2735,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   } else if (inherits(emap, "formula")) {
     # Allow but detect failures:
     val <- tryCatch(MatrixModels::model.Matrix(emap, data = data, sparse = TRUE),
-                    error = function(e) {
-                    }
+      error = function(e) {
+      }
     )
     if (is.null(val)) {
       # TODO: figure out if we need to do something else in this case.
@@ -2772,8 +2779,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   # # TODO: Check how to deal with this fully in the case of multilikelihood models
   # Answer: should respect the lhood "include/exclude" info for the component list
   if ((inherits(emap, "SpatialGridDataFrame") ||
-      inherits(emap, "SpatialPixelsDataFrame")) &&
-      any(is.na(as.data.frame(val)))) {
+    inherits(emap, "SpatialPixelsDataFrame")) &&
+    any(is.na(as.data.frame(val)))) {
     warning(
       paste0(
         "Model input '",
@@ -2792,17 +2799,17 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   }
 
   # Check for NA values.
-#  if (any(is.na(unlist(as.vector(val))))) {
-#    # TODO: remove this check and make sure NAs are handled properly elsewhere,
-#    # if possible. Problem: treating NA as "no effect" can have negative side
-#    # effects. For spatial covariates, can be handled by infill, but a general
-#    # solution doesn't exist, so not sure how to deal with this.
-#    stop(sprintf(
-#      "Input '%s' of component '%s' has returned NA values. Please design your
-#                 argument as to return non-NA for all points in your model domain/mesh.",
-#      as.character(input$input)[[1]], label
-#    ))
-#  }
+  #  if (any(is.na(unlist(as.vector(val))))) {
+  #    # TODO: remove this check and make sure NAs are handled properly elsewhere,
+  #    # if possible. Problem: treating NA as "no effect" can have negative side
+  #    # effects. For spatial covariates, can be handled by infill, but a general
+  #    # solution doesn't exist, so not sure how to deal with this.
+  #    stop(sprintf(
+  #      "Input '%s' of component '%s' has returned NA values. Please design your
+  #                 argument as to return non-NA for all points in your model domain/mesh.",
+  #      as.character(input$input)[[1]], label
+  #    ))
+  #  }
 
   val
 }

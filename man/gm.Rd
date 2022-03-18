@@ -24,7 +24,7 @@ if the coordinate system is latitude/longitude.
 \examples{
 \dontrun{
 if (require("ggplot2", quietly = TRUE) &&
-    require(ggpolypath, quietly = TRUE)) {
+  require(ggpolypath, quietly = TRUE)) {
   # Load the Gorilla data
   data(gorillas, package = "inlabru")
 

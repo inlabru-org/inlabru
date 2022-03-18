@@ -38,8 +38,8 @@ distributions in predictor expressions
 }
 \examples{
 \dontrun{
-if(interactive()){
- #EXAMPLE1
- }
+if (interactive()) {
+  # EXAMPLE1
+}
 }
 }

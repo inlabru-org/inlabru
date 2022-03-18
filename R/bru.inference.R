@@ -1513,7 +1513,7 @@ line_search_optimisation_target_exact <- function(x, param) {
 # @details DETAILS
 # @examples
 # \dontrun{
-# if(interactive()){
+# if (interactive()) {
 #  #EXAMPLE1
 #  }
 # }
