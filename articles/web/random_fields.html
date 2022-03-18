@@ -43,7 +43,7 @@
   <a href="../../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -108,13 +108,13 @@
 
       
 
-      </header><script src="random_fields_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Random Fields in One Dimension</h1>
                         <h4 data-toc-skip class="author">Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-03-02</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-03-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/random_fields.Rmd" class="external-link"><code>vignettes/web/random_fields.Rmd</code></a></small>
       <div class="hidden name"><code>random_fields.Rmd</code></div>
@@ -239,7 +239,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.4.0.9000</span>
-<span class="co">#&gt; INLA version: 22.02.28-1</span>
+<span class="co">#&gt; INLA version: 22.03.16</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   field: Model types main='spde', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   Intercept: Model types main='linear', group='exchangeable', replicate='iid'</span>
@@ -248,7 +248,7 @@
 <span class="co">#&gt;     Data class: 'data.frame'</span>
 <span class="co">#&gt;     Predictor: count ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.03, Running = 0.234, Post = 0.147, Total = 1.41 </span>
+<span class="co">#&gt;     Pre = 1.24, Running = 0.238, Post = 0.208, Total = 1.68 </span>
 <span class="co">#&gt; Fixed effects:</span>
 <span class="co">#&gt;           mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span>
 <span class="co">#&gt; Intercept 1.13 0.783      0.018    0.945      3.109 0.799   0</span>
@@ -259,7 +259,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Model hyperparameters:</span>
 <span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant  mode</span>
-<span class="co">#&gt; Range for field 31.512 19.774      8.850   26.611     83.159 19.22</span>
+<span class="co">#&gt; Range for field 31.512 19.774      8.850   26.611     83.158 19.22</span>
 <span class="co">#&gt; Stdev for field  0.518  0.165      0.267    0.494      0.908  0.45</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 60.20</span>
@@ -270,6 +270,7 @@
 <span class="co">#&gt; Effective number of parameters .................: 2.78</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Marginal log-Likelihood:  -36.80 </span>
+<span class="co">#&gt;  is computed </span>
 <span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span>
 <span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></code></pre></div>
 <p>Predict the values at the x points used for mesh (the data argument must be a data frame, see <code><a href="../../reference/predict.bru.html">?predict.bru</a></code>):</p>
