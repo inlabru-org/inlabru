@@ -190,7 +190,7 @@ plot(dfun)
 
 We can look at the posterior for expected number of dolphins as usual:
 
-```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+```{r warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 predpts <- ipoints(mexdolphin$ppoly, mexdolphin$mesh)
 Lambda <- predict(fit, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda
@@ -224,7 +224,7 @@ Try doing this all again, but use this hazard-rate detection function model:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo=TRUE}
 hr <- function(distance, lsig) {
-  1 - exp(-(distance / (exp(lsig)))^-1)
+  1 - exp(-(distance / exp(lsig))^-1)
 }
 ```
 
@@ -332,7 +332,7 @@ dfit <- lgcp(
   mexdolphin$points,
   domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
   formula = formula,
-  options = list(bru_initial = list(lsig = 1))
+  options = list(bru_initial = list(lsig = 1, Intercept = 3))
 )
 detfun <- predict(dfit, distdf, ~ hn(distance, lsig))
 ```
@@ -413,6 +413,6 @@ ggplot(data.frame(mexdolphin$points)) +
   geom_histogram(aes(x = distance), breaks = seq(0, 8, length = 9), alpha = 0.3) +
   geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
   geom_line(data = dlines, aes(x = distance, y = En, group = model, col = model)) +
-  geom_line(data = dlines, aes(x = distance, y = En.lower, group = model, col = model), lty = 2) +
-  geom_line(data = dlines, aes(x = distance, y = En.upper, group = model, col = model), lty = 2)
+  geom_ribbon(data = dlines, aes(x = distance, ymin = En.lower, ymax = En.upper, group = model, col = model, fill = model),
+              alpha = 0.2, lty = 2)
 ```
