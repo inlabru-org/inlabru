@@ -1,0 +1,12 @@
+# Latent models: SPDE with group parameter (spatiotemporal)
+
+    WAoAAAACAAQBAgACAwAAAAAOAAAAAcACEdegAAAA
+
+---
+
+    WAoAAAACAAQBAgACAwAAAAAOAAAAA7+8/eeAAAAAP/MxEIAAAABABBKsgAAAAA==
+
+---
+
+    WAoAAAACAAQBAgACAwAAAAAOAAAAAz//lkUgAAAAP+jGGsAAAAA/4qZloAAAAA==
+

@@ -35,10 +35,10 @@ test_that("Latent models: SPDE 1D", {
   data <- latent_spde1D_testdata()
 
   # Check Intercept + SPDE (highly negatively correlated)
-  expect_equal(
+  expect_snapshot_value(
     data$fit$summary.fixed["Intercept", "mean"] +
       data$fit$summary.random$field$mean[c(1, 25, 50)],
-    c(0.55439, 1.25189, -1.54505),
-    tolerance = midtol
+    tolerance = hitol,
+    style = "serialize"
   )
 })

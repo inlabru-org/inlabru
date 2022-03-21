@@ -276,7 +276,14 @@ bru_info.bru <- function(object, ...) {
 #'   Also used to define a default linear additive predictor.  See
 #'   [component()] for details.
 #' @param ... Likelihoods, each constructed by a calling [like()], or named
-#'   parameters that can be passed to a single [like()] call.
+#'   parameters that can be passed to a single [like()] call. Note that
+#'   all the arguments will be evaluated before calling [like()] in order
+#'   to detect if they are `like` objects. This means that
+#'   special arguments that need to be evaluated in the context of
+#'   `response_data` or `data` (such as Ntrials) may will only work that
+#'   way in direct calls to [like()].
+#' @param .envir Environment for component evaluation (for when a non-formula
+#' specification is used)
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #'
@@ -289,8 +296,11 @@ bru_info.bru <- function(object, ...) {
 
 bru <- function(components = ~ Intercept(1),
                 ...,
-                options = list()) {
+                options = list(),
+                .envir = parent.frame()) {
   stopifnot(bru_safe_inla())
+
+  timing_start <- Sys.time()
 
   # Update default options
   options <- bru_call_options(options)
@@ -325,7 +335,16 @@ bru <- function(components = ~ Intercept(1),
         extract_response(components)
       )
     }
-    lhoods <- list(do.call(like, c(lhoods, list(options = options))))
+    lhoods <- list(do.call(
+      like,
+      c(
+        lhoods,
+        list(
+          options = options,
+          .envir = .envir
+        )
+      )
+    ))
     dot_is_lhood <- TRUE
     dot_is_lhood_list <- FALSE
   }
@@ -343,7 +362,7 @@ bru <- function(components = ~ Intercept(1),
   }
 
   # Turn input into a list of components (from existing list, or a special formula)
-  components <- component_list(components)
+  components <- component_list(components, .envir = .envir)
 
   # Turn model components into internal bru model
   bru.model <- bru_model(components, lhoods)
@@ -360,6 +379,8 @@ bru <- function(components = ~ Intercept(1),
     options = options
   )
 
+  timing_setup <- Sys.time()
+
   # Run iterated INLA
   if (options$bru_run) {
     result <- iinla(
@@ -370,6 +391,17 @@ bru <- function(components = ~ Intercept(1),
   } else {
     result <- list()
   }
+
+  timing_end <- Sys.time()
+  result$bru_timings <-
+    rbind(
+      data.frame(
+        Task = c("Preparation"),
+        Iteration = rep(NA_integer_, 1),
+        Time = c(timing_setup - timing_start)
+      ),
+      result[["bru_iinla"]][["timings"]]
+    )
 
   # Add bru information to the result
   result$bru_info <- info
@@ -394,12 +426,21 @@ bru_rerun <- function(result, options = list()) {
     )
   )
 
+  original_timings <- result[["bru_timings"]]
+
   result <- iinla(
     model = info[["model"]],
     lhoods = info[["lhoods"]],
     initial = result,
     options = info[["options"]]
   )
+
+  timing_end <- Sys.time()
+  result$bru_timings <-
+    rbind(
+      original_timings[1, , drop = FALSE],
+      result[["bru_iinla"]][["timings"]]
+    )
 
   # Add bru information to the result
   result$bru_info <- info
@@ -426,6 +467,50 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
   }
 }
 
+
+
+eval_in_data_context <- function(input,
+                                 data = NULL,
+                                 response_data = NULL,
+                                 default = NULL,
+                                 .envir = parent.frame()) {
+  if (!is.null(data)) {
+    if (is.list(data) && !is.data.frame(data)) {
+    } else {
+      data <- as.data.frame(data)
+    }
+  }
+  if (!is.null(response_data)) {
+    if (is.list(response_data) && !is.data.frame(response_data)) {
+    } else {
+      data <- as.data.frame(data)
+    }
+  }
+  if (!is.null(response_data)) {
+    result <- try(
+      eval(input, envir = response_data, enclos = .envir),
+      silent = TRUE
+    )
+  }
+  if (is.null(response_data) || inherits(result, "try-error")) {
+    result <- try(
+      eval(input, envir = data, enclos = .envir),
+      silent = TRUE
+    )
+  }
+  if (inherits(result, "try-error")) {
+    stop(paste0(
+      "Input ",
+      substitute(input),
+      " could not be evaluated."
+    ))
+  }
+  if (is.null(result)) {
+    result <- default
+  }
+
+  result
+}
 
 
 #' Likelihood construction for usage with [bru()]
@@ -482,20 +567,24 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
+#' @param .envir The evaluation environment to use for special arguments
+#' (`E` and `Ntrials`) if not found in `response_data` or `data`. Defaults to
+#' the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterize [bru()].
 #'
 #' @example inst/examples/like.R
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
-                 response_data = NULL, #agg
+                 response_data = NULL, # agg
                  mesh = NULL, E = NULL, Ntrials = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
                  allow_latent = FALSE,
                  allow_combine = NULL,
                  control.family = NULL,
-                 options = list()) {
+                 options = list(),
+                 .envir = parent.frame()) {
   options <- bru_call_options(options)
 
   # Some defaults
@@ -517,12 +606,18 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     stop("Missing response variable names")
   }
 
-  if (is.null(E)) {
-    E <- options$E
-  }
-  if (is.null(Ntrials)) {
-    Ntrials <- options$Ntrials
-  }
+  E <- eval_in_data_context(substitute(E),
+    data = data,
+    response_data = response_data,
+    default = options[["E"]],
+    .envir = .envir
+  )
+  Ntrials <- eval_in_data_context(substitute(Ntrials),
+    data = data,
+    response_data = response_data,
+    default = options[["Ntrials"]],
+    .envir = .envir
+  )
 
   # More on special bru likelihoods
   if (family == "cp") {
@@ -586,19 +681,27 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     dim_names <- intersect(names(data), names(ips))
     if (identical(options[["bru_compress_cp"]], TRUE)) {
       allow_combine <- TRUE
-      response_data <- data.frame(BRU_E = c(0,
-                                            E * ips[["weight"]]),
-                                  BRU_response_cp = c(NROW(data),
-                                                      rep(0, NROW(ips))))
+      response_data <- data.frame(
+        BRU_E = c(
+          0,
+          E * ips[["weight"]]
+        ),
+        BRU_response_cp = c(
+          NROW(data),
+          rep(0, NROW(ips))
+        )
+      )
       if (!linear) {
-        expr_text = as.character(formula)[length(as.character(formula))]
+        expr_text <- as.character(formula)[length(as.character(formula))]
         expr_text <- paste0(
           "{BRU_eta <- ", expr_text, "\n",
-          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}")
+          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}"
+        )
       } else {
         expr_text <- paste0(
           "{BRU_eta <- BRU_EXPRESSION\n",
-          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}")
+          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}"
+        )
       }
       expr <- parse(text = expr_text)
       data <- rbind(
@@ -607,10 +710,16 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       )
       formula
     } else {
-      response_data <- data.frame(BRU_E = c(rep(0, NROW(data)),
-                                            E * ips[["weight"]]),
-                                  BRU_response_cp = c(rep(1, NROW(data)),
-                                                      rep(0, NROW(ips))))
+      response_data <- data.frame(
+        BRU_E = c(
+          rep(0, NROW(data)),
+          E * ips[["weight"]]
+        ),
+        BRU_response_cp = c(
+          rep(1, NROW(data)),
+          rep(0, NROW(ips))
+        )
+      )
       data <- rbind(
         data[dim_names],
         ips[dim_names]
@@ -664,11 +773,11 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     allow_latent = allow_latent,
     allow_combine =
       if (!is.null(response_data) ||
-          (is.list(data) && !is.data.frame(data))) {
+        (is.list(data) && !is.data.frame(data))) {
         TRUE
       } else if (is.null(allow_combine)) {
         FALSE
-      } else{
+      } else {
         allow_combine
       },
     control.family = control.family
@@ -739,8 +848,10 @@ bru_like_expr <- function(lhood, components) {
   } else {
     expr_text <- as.character(lhood[["expr"]])
   }
-  if (grepl(pattern = "BRU_EXPRESSION",
-            x = expr_text)) {
+  if (grepl(
+    pattern = "BRU_EXPRESSION",
+    x = expr_text
+  )) {
     included <-
       parse_inclusion(
         names(components),
@@ -748,9 +859,10 @@ bru_like_expr <- function(lhood, components) {
         exclude = lhood[["exclude_components"]]
       )
     expr_text <-
-      gsub(pattern = "BRU_EXPRESSION",
-           replacement = paste0(included, collapse = " + "),
-           x = expr_text
+      gsub(
+        pattern = "BRU_EXPRESSION",
+        replacement = paste0(included, collapse = " + "),
+        x = expr_text
       )
   }
   parse(text = expr_text)
@@ -1401,7 +1513,7 @@ line_search_optimisation_target_exact <- function(x, param) {
 # @details DETAILS
 # @examples
 # \dontrun{
-# if(interactive()){
+# if (interactive()) {
 #  #EXAMPLE1
 #  }
 # }
@@ -1608,9 +1720,11 @@ bru_line_search <- function(model,
           signif(100 * step_scaling, 4),
           "%, Optimisation",
           if (identical(options$bru_method$line_opt_method, "full")) {
-            paste0(" (Approx = ",
-                   signif(100 * step_scaling_opt_approx, 4),
-                   "%)")
+            paste0(
+              " (Approx = ",
+              signif(100 * step_scaling_opt_approx, 4),
+              "%)"
+            )
           } else {
             NULL
           }
@@ -1627,12 +1741,12 @@ bru_line_search <- function(model,
       "iinla: |lin1-lin0| = ",
       signif(pred_norm(lin_pred1 - lin_pred0), 4),
       "\n       <eta-lin1,delta>/|delta| = ",
-      signif(pred_scalprod(nonlin_pred-lin_pred1, lin_pred1 - lin_pred0) /
-               pred_norm(lin_pred1 - lin_pred0), 4),
+      signif(pred_scalprod(nonlin_pred - lin_pred1, lin_pred1 - lin_pred0) /
+        pred_norm(lin_pred1 - lin_pred0), 4),
       "\n       |eta-lin0 - delta <delta,eta-lin0>/<delta,delta>| = ",
-      signif(pred_norm(nonlin_pred-lin_pred0 - (lin_pred1-lin_pred0) *
-                  pred_scalprod(lin_pred1-lin_pred0, nonlin_pred-lin_pred0) /
-                  pred_norm2(lin_pred1-lin_pred0)), 4)
+      signif(pred_norm(nonlin_pred - lin_pred0 - (lin_pred1 - lin_pred0) *
+        pred_scalprod(lin_pred1 - lin_pred0, nonlin_pred - lin_pred0) /
+        pred_norm2(lin_pred1 - lin_pred0)), 4)
     ),
     verbose = options$bru_verbose,
     verbose_store = options$bru_verbose_store,
@@ -1748,9 +1862,14 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 
 
 iinla <- function(model, lhoods, initial = NULL, options) {
+  timing_start <- Sys.time()
+  timing_setup <- Sys.time()
+  timing_iterations <- Sys.time()
+
   inla.options <- bru_options_inla(options)
 
   initial_log_length <- length(bru_log_get())
+  original_timings <- NULL
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
     list(
@@ -1775,6 +1894,31 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           track[[nn]] <- NA
         }
         rbind(original_track, track)
+      },
+      timings = {
+        iteration_offset <- if (is.null(original_timings)) {
+          0
+        } else {
+          max(c(0, original_timings$Iteration), na.rm = TRUE)
+        }
+        rbind(
+          original_timings,
+          data.frame(
+            Task = c(
+              "Setup",
+              rep("Iteration", length(timing_iterations) - 1)
+            ),
+            Iteration = c(
+              NA_integer_,
+              iteration_offset +
+                seq_len(length(timing_iterations) - 1)
+            ),
+            Time = c(
+              timing_setup - timing_start,
+              diff(timing_iterations)
+            )
+          )
+        )
       },
       ...
     )
@@ -1815,7 +1959,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     )
     if (any(like_has_cf)) {
       warning("Global control.family option overrides settings in likelihood(s) ",
-              paste0(which(like_has_cf)), collapse = ", ")
+        paste0(which(like_has_cf)),
+        collapse = ", "
+      )
     }
   } else {
     control.family <- lapply(
@@ -1884,6 +2030,10 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     track_size <- max(original_track[["iteration"]])
   }
 
+  # Preserve old timings
+  if (!is.null(old.result[["bru_iinla"]][["timings"]])) {
+    original_timings <- old.result[["bru_iinla"]][["timings"]]
+  }
 
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search) {
@@ -1915,6 +2065,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   } else {
     previous_x <- 0 # TODO: construct from the initial linearisation state instead
   }
+
+  timing_setup <- Sys.time()
+  timing_iterations <- Sys.time()
 
   track_df <- NULL
   do_final_integration <- (options$bru_max_iter == 1)
@@ -2088,7 +2241,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
               result = result,
               property = "predictor_sd",
               internal_hyperpar = FALSE
-            )^{-2}
+            )^{
+              -2
+            }
           line_search <- bru_line_search(
             model = model,
             lhoods = lhoods,
@@ -2152,6 +2307,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         unlist(states[[length(states)]][[label]])
     }
     k <- k + 1
+
+    timing_iterations <- c(timing_iterations, Sys.time())
   }
 
   result[["bru_iinla"]] <- collect_misc_info()

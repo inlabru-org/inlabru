@@ -207,6 +207,12 @@ eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
 #'     )
 #'   points$val <- bru_fill_missing(input, points, points$val)
 #'   print(points)
+#'
+#'   # To fill in missing values in a grid:
+#'   print(input$val[c(3, 30)])
+#'   input$val[c(3, 30)] <- NA # Introduce missing values
+#'   input$val <- bru_fill_missing(input, input, input$val)
+#'   print(input$val[c(3, 30)])
 #' }
 #' }
 bru_fill_missing <- function(data, where, values,

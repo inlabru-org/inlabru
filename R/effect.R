@@ -174,8 +174,10 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #'
 #' @details
 #'
-#' [bru()] will understand formulae describing fixed effect models just like the other methods. For instance, the
-#' formula `y ~ x` will fit the linear combination of an effect named `x` and an intercept to
+#' As shorthand, [bru()] will understand basic additive formulae describing fixed effect
+#' models. For instance, the
+#' components specification `y ~ x` will define the linear combination of an
+#' effect named `x` and an intercept to
 #' the response `y` with respect to the likelihood family stated when calling [bru()]. Mathematically,
 #' the linear predictor \eqn{\eta} would be written down as
 #'
@@ -190,20 +192,23 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #' \item{\eqn{\psi = \beta * x }}{ is called the *random effect* of \eqn{x}}
 #' }
 #'
-#' A problem that arises when using this kind of R formula is that it does not clearly reflect the mathematical
-#' formula. For instance, when providing the formula to inla, the resulting object will refer to the random
+#' A problem that arises when using this kind of R formula is that it does not
+#' clearly reflect the mathematical
+#' formula. For instance, when providing the formula to inla, the resulting
+#' object will refer to the random
 #' effect \eqn{\psi = \beta * x } as `x`. Hence, it is not clear if `x` refers to the covariate
 #' or the effect of the covariate.
 #'
 #' @section Naming random effects:
 #'
-#' In INLA, a simple random effect model would be expressed as
+#' In INLA, the `f()` notation is used to define more complex models, but
+#' a simple linear effect model can also be expressed as
 #'
 #' \itemize{\item{`formula = y ~ f(x, model = "linear")`,}}
 #'
 #' where `f()` is the inla specific function to set up random effects of all kinds. The underlying
 #' predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
-#' `x` as the random effect's name. bru allows to rewrite this formula in order to explicitly state
+#' `x` as the random effect's name. bru allows rewriting this formula in order to explicitly state
 #' the name of the random effect and the name of the associated covariate. This is achieved by replacing `f`
 #' with an arbitrary name that we wish to assign to the effect, e.g.
 #'
@@ -261,8 +266,11 @@ component <- function(...) {
 #' should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 #' Arguments starting with weights, group, replicate behave similarly to main,
 #' but for the corresponding features of `INLA::f()`.
-#' @param model Either one of "offset", "factor_full", "factor_contrast", "linear" or a model name or
-#' object accepted by INLA's `f` function. If set to NULL, then "linear" is used.
+#' @param model Either one of "offset", "factor_full", "factor_contrast", "linear",
+#' "fixed", or a model name or
+#' object accepted by INLA's `f` function. If set to NULL, then "linear" is used
+#' for vector inputs, and "fixed" for matrix input (converted internally to
+#' an iid model with fixed precision)
 #' @param mapper
 #' Information about how to do the mapping from the values evaluated in `main`,
 #' and to the latent variables. Auto-detects spde model objects in model and
@@ -307,6 +315,7 @@ component <- function(...) {
 #' @param A.msk TODO: check/fix/deprecate this parameter.
 #' Likely doesn't work at the moment, and I've found no examples that use it.
 # Deprecated parameters
+#' @param .envir Evaluation environment
 #' @param envir_extra TODO: check/fix this parameter.
 #'
 #' @details The `component.character` method is inlabru's equivalent to INLA's
@@ -323,17 +332,22 @@ component <- function(...) {
 #' \donttest{
 #' if (require("INLA", quietly = TRUE)) {
 #'
-#'   # As an example, let us create a linear component. Here ,the component is
+#'   # As an example, let us create a linear component. Here, the component is
 #'   # called "myEffectOfX" while the covariate the component acts on is called "x":
 #'
-#'   eff <- component("myEffectOfX", main = x, model = "linear")
-#'   summary(eff)
+#'   cmp <- component("myEffectOfX", main = x, model = "linear")
+#'   summary(cmp)
 #'
 #'   # A more complicated component:
-#'   eff <- component("myEffectOfX",
+#'   cmp <- component("myEffectOfX",
 #'     main = x,
 #'     model = inla.spde2.matern(inla.mesh.1d(1:10))
 #'   )
+#'
+#'   # Compound fixed effect component, where x and z are in the input data.
+#'   # The formula will be passed on to MatrixModels::model.Matrix:
+#'   cmp <- component("eff", ~ -1 + x:z, model = "fixed")
+#'   summary(cmp)
 #' }
 #' }
 #'
@@ -368,6 +382,7 @@ component.character <- function(object,
                                 replicate_selector = NULL,
                                 nrep = NULL,
                                 A.msk = NULL,
+                                .envir = parent.frame(),
                                 envir_extra = NULL) {
 
   # INLA models:
@@ -383,7 +398,7 @@ component.character <- function(object,
   label <- object
 
   if (is.null(model) && is.null(copy)) {
-    # TODO: may need a special marker to autodetect factor variables,
+    # TODO: may need a special marker to autodetect factor and matrix variables,
     #       which can only be autodetected in a data-aware pass.
     model <- "linear"
   }
@@ -428,9 +443,8 @@ component.character <- function(object,
     }
   }
 
-  envir <- parent.frame()
   if (is.null(envir_extra)) {
-    envir_extra <- new.env(envir)
+    envir_extra <- new.env(parent = .envir)
   }
 
   # Convert ngroup and nrep to bru_mapper info
@@ -501,7 +515,7 @@ component.character <- function(object,
       },
     copy = copy,
     A.msk = A.msk,
-    env = envir,
+    env = .envir,
     env_extra = envir_extra
   )
 
@@ -539,7 +553,7 @@ component.character <- function(object,
     # or explicitly by name in the predictor expression, so no INLA formula
     # component is needed.
     component$inla.formula <- as.formula(paste0("~ ."),
-      env = envir
+      env = .envir
     )
     component$main$mapper <- bru_mapper_offset()
     component$group$mapper <- bru_mapper_index(1L)
@@ -624,14 +638,17 @@ component.character <- function(object,
       }
 
       # Setup factor precision parameter
-      if (identical(component$main$type, "factor")) {
+      if (component$main$type %in% c("factor", "fixed")) {
         if (is.null(fcall[["hyper"]])) {
-          # TODO: allow configuration of the precision via prec_linear
-          factor_hyper_name <- paste0("BRU_", label, "_main_factor_hyper")
-          fcall[["hyper"]] <- as.symbol(factor_hyper_name)
+          # TODO: allow configuration of the precision via prec.linear
+          fixed_hyper_name <- paste0("BRU_", label, "_main_fixed_hyper")
+          fcall[["hyper"]] <- as.symbol(fixed_hyper_name)
           assign(
-            factor_hyper_name,
-            list(prec = list(initial = log(1e-6), fixed = TRUE)),
+            fixed_hyper_name,
+            list(prec = list(
+              initial = log(INLA::inla.set.control.fixed.default()$prec),
+              fixed = TRUE
+            )),
             envir = component$env_extra
           )
         }
@@ -643,7 +660,7 @@ component.character <- function(object,
         "~ . + ",
         as.character(parse(text = deparse(fcall)))
       ),
-      env = envir
+      env = .envir
       )
 
     component$fcall <- fcall
@@ -660,12 +677,18 @@ component.character <- function(object,
 #' Constructor methods for inlabru component lists. Syntax details are given in
 #' [component()].
 #'
-#' @param \dots Parameters passed on to other methods
-#' @family component contructors
+#' @param \dots Parameters passed on to other methods. Also see Details.
+#' @family component constructors
 #' @aliases bru_component_list
+#' @param object The object to operate on
+#' @param lhoods A `bru_like_list` object
+#' @param .envir An evaluation environment for non-formula input
 #' @export
 #' @rdname component_list
-component_list <- function(...) {
+component_list <- function(object,
+                           lhoods = NULL,
+                           .envir = parent.frame(),
+                           ...) {
   UseMethod("component_list")
 }
 
@@ -673,10 +696,6 @@ component_list <- function(...) {
 #' * `component_list.formula`: Convert a component formula
 #' into a `component_list` object
 #'
-#' @param object The object to operate on
-#' @param lhoods A `bru_like_list` object
-#' @param envir An evaluation environment to override the evaluation
-#' environment
 #' @export
 #' @family component constructors
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
@@ -696,9 +715,11 @@ component_list <- function(...) {
 #' eff <- component_list(~ myLinearEffectOfX(x))
 #' # Individual component
 #' eff <- component("myLinearEffectOfX", main = x, model = "linear")
-component_list.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
-  if (is.null(envir)) {
-    envir <- environment(object)
+component_list.formula <- function(object,
+                                   lhoods = NULL,
+                                   .envir = parent.frame(), ...) {
+  if (!is.null(environment(object))) {
+    .envir <- environment(object)
   }
   # Automatically add Intercept and remove -1 unless -1
   # or -Intercept is in components formula
@@ -710,12 +731,12 @@ component_list.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
     parsed,
     function(component.expression) {
       eval(component.expression,
-        envir = envir
+        envir = .envir
       )
     }
   )
-  environment(object) <- envir
-  component_list(components, lhoods = lhoods, envir = envir)
+  environment(object) <- .envir
+  component_list(components, lhoods = lhoods, .envir = .envir)
 }
 
 
@@ -727,9 +748,16 @@ component_list.formula <- function(object, lhoods = NULL, envir = NULL, ...) {
 #' into a `component_list` object
 #' @export
 #' @rdname component_list
-component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
-  if (is.null(envir)) {
-    envir <- environment(object)
+component_list.list <- function(object,
+                                lhoods = NULL,
+                                .envir = parent.frame(),
+                                ...) {
+  # Maybe the list has been given an environment?
+  if (!is.null(environment(object))) {
+    .envir <- environment(object)
+  } else if (is.null(.envir)) {
+    # Later code needs an actual environment
+    .envir <- new.env()
   }
   if (any(vapply(object, function(x) inherits(x, "formula"), TRUE))) {
     object <-
@@ -739,7 +767,7 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
           object,
           function(x) {
             if (inherits(x, "formula")) {
-              component_list(x, lhoods = lhoods, envir = envir)
+              component_list(x, lhoods = lhoods, .envir = .envir)
             } else {
               list(x)
             }
@@ -761,7 +789,7 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
     ))
   }
   class(object) <- c("component_list", "list")
-  environment(object) <- envir
+  environment(object) <- .envir
   if (!is.null(lhoods)) {
     object <- add_mappers(object, lhoods = lhoods)
   }
@@ -772,6 +800,18 @@ component_list.list <- function(object, lhoods = NULL, envir = NULL, ...) {
 
 
 
+
+#' @export
+#' @details * `c.component_list`: The `...` arguments should be `component_list`
+#' objects. The environment from the first argument will be applied to the resulting list.
+#' @rdname component_list
+`c.component_list` <- function(...) {
+  env <- environment(..1)
+  object <- NextMethod()
+  class(object) <- c("component_list", "list")
+  environment(object) <- env
+  object
+}
 
 #' @export
 #' @param x `component_list` object from which to extract element(s)
@@ -894,7 +934,16 @@ add_mappers.component_list <- function(components, lhoods, ...) {
   }
   for (k in which(is_copy)) {
     if (is.null(components[[k]][["copy"]])) {
-      stop("")
+      stop("Internal error: copy model detected, but no copy information available.")
+    }
+    if (is.null(components[[components[[k]][["copy"]]]])) {
+      stop(paste0(
+        "Could not find component '",
+        components[[k]][["copy"]],
+        "' to use as copy for component '",
+        components[[k]][["label"]],
+        "'."
+      ))
     }
     components[[k]]$mapper <- components[[components[[k]][["copy"]]]][["mapper"]]
   }
@@ -924,6 +973,8 @@ bru_subcomponent <- function(input = NULL,
     type <- "spde"
   } else if (inherits(model, "inla.rgeneric")) {
     type <- "rgeneric"
+  } else if (inherits(model, "inla.cgeneric")) {
+    type <- "cgeneric"
   } else if (inherits(
     model,
     c(
@@ -951,6 +1002,9 @@ bru_subcomponent <- function(input = NULL,
       model <- "iid"
       type <- "factor"
       factor_mapping <- "contrast"
+    } else if (identical(model, "fixed")) {
+      model <- "iid"
+      type <- "fixed"
     } else {
       type <- model
     }
@@ -988,6 +1042,7 @@ bru_subcomponent <- function(input = NULL,
 make_unique_inputs <- function(inp, allow_list = FALSE) {
   is_spatial <- vapply(inp, function(x) inherits(x, "Spatial"), TRUE)
   is_matrix <- vapply(inp, function(x) is.matrix(x), TRUE)
+  is_Matrix <- vapply(inp, function(x) inherits(x, "Matrix"), TRUE)
   is_factor <- vapply(inp, function(x) is.factor(x), TRUE)
   is_data_frame <- vapply(inp, function(x) is.data.frame(x), TRUE)
   is_list <- vapply(inp, function(x) is.list(x), TRUE) &
@@ -1019,11 +1074,11 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       )
     ))
     n_values <- nrow(inp_values)
-  } else if (any(is_matrix)) {
-    if (!all(is_matrix)) {
+  } else if (any(is_matrix | is_Matrix)) {
+    if (!all(is_matrix | is_Matrix)) {
       stop("Inconsistent input types; matrix and non-matrix")
     }
-    inp_values <- unique(do.call(rbind, inp))
+    inp_values <- unique.matrix(do.call(rbind, inp))
     n_values <- nrow(inp_values)
   } else if (any(is_data_frame)) {
     if (!all(is_data_frame)) {
@@ -1117,7 +1172,9 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
             " (or '+1' for '+ Intercept(1)')"
           },
           "."
-        ))
+        ),
+        immediate. = TRUE
+        )
         unique_inputs <- list(
           inp_values = 1,
           n_values = 1
@@ -1249,6 +1306,25 @@ make_mapper <- function(subcomp,
     subcomp[["mapper"]] <- bru_mapper_linear()
   } else if (subcomp[["type"]] %in% c("offset")) {
     subcomp[["mapper"]] <- bru_mapper_offset()
+  } else if (subcomp[["type"]] %in% c("fixed")) {
+    if (!is.null(subcomp[["values"]])) {
+      labels <- subcomp[["values"]]
+    } else if (!is.null(input_values)) {
+      tmp <- as(input_values, "Matrix")
+      labels <- colnames(tmp)
+      if (is.null(labels)) {
+        labels <- as.character(seq_len(ncol(tmp)))
+      }
+    } else if (!is.null(subcomp[["n"]])) {
+      labels <- as.character(seq_len(subcomp[["n"]]))
+    } else {
+      stop(paste0(
+        "Need to specify at least one of values (labels), input, or n for '",
+        subcomp[["label"]],
+        "' of component '", label, "'."
+      ))
+    }
+    subcomp[["mapper"]] <- bru_mapper_matrix(labels)
   } else if (subcomp[["model"]] %in% c("bym", "bym2")) {
     # No mapper; construct based on input values
     mappers <- list(
@@ -1314,7 +1390,7 @@ code.components <- function(components, add = "") {
   for (k in seq_along(codes)) {
     code <- codes[[k]]
 
-    # Function syntax or fixed component?
+    # Function syntax or linear component?
     ix <- regexpr("(", text = code, fixed = TRUE)
     is.offset <- FALSE
     if (ix > 0) {
@@ -1396,7 +1472,7 @@ bru_mapper.default <- function(mapper,
     "ibm_amatrix", "ibm_amatrix_inla",
     "ibm_valid_input", "ibm_valid_input_inla"
   ) %in%
-    names(list(...)))) {
+    ...names())) {
     warning(
       paste0(
         "Deprecated use of named method arguments for 'bru_mapper'.\n",
@@ -1405,12 +1481,13 @@ bru_mapper.default <- function(mapper,
     )
     method_names <- intersect(
       c(
-        "ibm_n", "ibm_n_inla",
-        "ibm_values", "ibm_values_inla",
-        "ibm_amatrix", "ibm_amatrix_inla",
-        "ibm_valid_input", "ibm_valid_input_inla"
+        "ibm_n",
+        "ibm_values",
+        "ibm_amatrix",
+        "ibm_inla_subset",
+        "ibm_valid_input"
       ),
-      names(list(...))
+      ...names()
     )
     methods <- list(...)[method_names]
   }
@@ -1697,6 +1774,63 @@ ibm_amatrix.bru_mapper_linear <- function(mapper, input, ...) {
   )
   A
 }
+
+## _matrix ####
+
+#' @param labels Column labels for matrix mappings
+#' @export
+#' @rdname bru_mapper
+bru_mapper_matrix <- function(labels, ...) {
+  if (is.factor(labels)) {
+    mapper <- list(
+      labels = levels(labels)
+    )
+  } else {
+    mapper <- list(
+      labels = as.character(labels)
+    )
+  }
+  class(mapper) <- c("bru_mapper_matrix", "bru_mapper", "list")
+  mapper
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_n.bru_mapper_matrix <- function(mapper, ...) {
+  length(mapper$labels)
+}
+#' @export
+#' @rdname bru_mapper_methods
+ibm_values.bru_mapper_matrix <- function(mapper, ...) {
+  factor(x = mapper$labels, levels = mapper$labels)
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_amatrix.bru_mapper_matrix <- function(mapper, input, ...) {
+  if (is.null(input)) {
+    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
+  } else if (is.matrix(input)) {
+    A <- as(input, "Matrix")
+  } else if (inherits(input, "Matrix")) {
+    A <- input
+  } else if (inherits(input, "Spatial")) {
+    A <- sp::coordinates(input)
+    A <- as(A, "Matrix")
+  } else {
+    A <- as(input, "Matrix")
+  }
+  if (ncol(A) != ibm_n(mapper)) {
+    stop(paste0(
+      "Input to matrix mapper has ", ncol(A),
+      " columns but should have ", ibm_n(mapper),
+      " columns."
+    ))
+  }
+  A
+}
+
+
 
 ## _factor ####
 
@@ -2037,7 +2171,8 @@ ibm_valid_input.bru_mapper_multi <- function(mapper, input,
   names(x[["mappers"]])
 }
 
-#' @param value a character vector of up to the same length as x
+#' @param value a character vector of up to the same length as the number
+#' of mappers in the multi-mapper x
 #' @export
 #' @rdname bru_mapper_methods
 `names<-.bru_mapper_multi` <- function(x, value) {
@@ -2597,6 +2732,18 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
         }
       )
     }
+  } else if (inherits(emap, "formula")) {
+    # Allow but detect failures:
+    val <- tryCatch(MatrixModels::model.Matrix(emap, data = data, sparse = TRUE),
+      error = function(e) {
+      }
+    )
+    if (is.null(val)) {
+      # TODO: figure out if we need to do something else in this case.
+      # Returning NULL seems like a good way to keep track of these failures
+      # that are likely to happen for multilikelihood models; A component only
+      # needs to be evaluable for at least one of the likelihoods.
+    }
   } else if (inherits(emap, "SpatialGridDataFrame") |
     inherits(emap, "SpatialPixelsDataFrame")) {
     if (is.null(input[["selector"]])) {
@@ -2631,9 +2778,9 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   # to fix that by filling in nearest neighbour values.
   # # TODO: Check how to deal with this fully in the case of multilikelihood models
   # Answer: should respect the lhood "include/exclude" info for the component list
-  if (any(is.na(as.data.frame(val))) &&
-    (inherits(emap, "SpatialGridDataFrame") ||
-      inherits(emap, "SpatialPixelsDataFrame"))) {
+  if ((inherits(emap, "SpatialGridDataFrame") ||
+    inherits(emap, "SpatialPixelsDataFrame")) &&
+    any(is.na(as.data.frame(val)))) {
     warning(
       paste0(
         "Model input '",
@@ -2652,17 +2799,17 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   }
 
   # Check for NA values.
-  if (any(is.na(as.data.frame(val)))) {
-    # TODO: remove this check and make sure NAs are handled properly elsewhere,
-    # if possible. Problem: treating NA as "no effect" can have negative side
-    # effects. For spatial covariates, can be handled by infill, but a general
-    # solution doesn't exist, so not sure how to deal with this.
-    stop(sprintf(
-      "Input '%s' of component '%s' has returned NA values. Please design your
-                 argument as to return non-NA for all points in your model domain/mesh.",
-      as.character(input$input)[[1]], label
-    ))
-  }
+  #  if (any(is.na(unlist(as.vector(val))))) {
+  #    # TODO: remove this check and make sure NAs are handled properly elsewhere,
+  #    # if possible. Problem: treating NA as "no effect" can have negative side
+  #    # effects. For spatial covariates, can be handled by infill, but a general
+  #    # solution doesn't exist, so not sure how to deal with this.
+  #    stop(sprintf(
+  #      "Input '%s' of component '%s' has returned NA values. Please design your
+  #                 argument as to return non-NA for all points in your model domain/mesh.",
+  #      as.character(input$input)[[1]], label
+  #    ))
+  #  }
 
   val
 }

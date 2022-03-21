@@ -7,7 +7,7 @@
 \method{gg}{SpatialPolygons}(data, mapping = NULL, crs = NULL, ...)
 }
 \arguments{
-\item{data}{A \code{SpatialPolygons} object.}
+\item{data}{A \code{SpatialPolygons} or \code{SpatialPolygonsDataFrame} object.}
 
 \item{mapping}{Aesthetic mappings created by \code{aes} used to update the default
 mapping. The default mapping is
@@ -18,7 +18,7 @@ mapping. The default mapping is
 \item{...}{Arguments passed on to \code{geom_polypath}.
 Unless specified by the user,
 the arguments \code{colour = "black"} (polygon colour) and
-\code{alpha = 0.1} (Alpha level for polygon filling).}
+\code{alpha = 0.2} (Alpha level for polygon filling).}
 }
 \value{
 A \code{ggpolypath::geom_polypath} object.
@@ -35,7 +35,8 @@ holes properly.
 }
 \examples{
 \donttest{
-  if (require(ggplot2, quietly = TRUE)) {
+  if (require(ggplot2, quietly = TRUE) &&
+      require(ggpolypath, quietly = TRUE)) {
     # Load Gorilla data
 
     data("gorillas", package = "inlabru")

@@ -10,31 +10,33 @@ deltaIC(..., criterion = "DIC")
 \item{...}{Comma-separated objects inheriting from class \code{inla} and obtained
 from a run of \code{INLA::inla()}, \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}}
 
-\item{criterion}{If 'DIC', plots DIC differences; If 'WAIC', plots WAIC differences.}
+\item{criterion}{character vector. If it includes 'DIC', computes DIC differences;
+If it contains 'WAIC', computes WAIC differences. Default: 'DIC'}
 }
 \value{
-A data frame with each row containing the model name, DIC, WAIC, deltaDIC, and
-deltaWAIC.
+A data frame with each row containing the Model name, DIC and Delta.DIC,
+and/or WAIC and Delta.WAIC.
 }
 \description{
-Calculates DIC and WAIC differences and produces an ordered summary.
+Calculates DIC and/or WAIC differences and produces an ordered summary.
 }
 \examples{
 \donttest{
-# Generate some data
-input.df <- data.frame(x = cos(1:10))
-input.df <- within(
-  input.df,
-  y <- ceiling(5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
-)
+if (bru_safe_inla(multicore = FALSE)) {
+  # Generate some data
+  input.df <- data.frame(idx = 1:10, x = cos(1:10))
+  input.df <- within(
+    input.df,
+    y <- rpois(10, 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
+  )
 
-# Fit two models
-fit <- bru(y ~ x, family = "gaussian", data = input.df)
-fit2 <- bru(y ~ x, family = "Poisson", data = input.df)
+  # Fit two models
+  fit1 <- bru(y ~ x, family = "poisson", data = input.df)
+  fit2 <- bru(y ~ x + rand(idx, model = "iid"), family = "poisson", data = input.df)
 
-# Compare DIC
+  # Compare DIC
 
-deltaIC(fit, fit2)
+  deltaIC(fit1, fit2)
 }
-
+}
 }

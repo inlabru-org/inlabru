@@ -5,26 +5,28 @@
 \alias{bru_component_list}
 \alias{component_list.formula}
 \alias{component_list.list}
+\alias{c.component_list}
 \alias{[.component_list}
 \title{Methods for inlabru component lists}
 \usage{
-component_list(...)
+component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 
-\method{component_list}{formula}(object, lhoods = NULL, envir = NULL, ...)
+\method{component_list}{formula}(object, lhoods = NULL, .envir = parent.frame(), ...)
 
-\method{component_list}{list}(object, lhoods = NULL, envir = NULL, ...)
+\method{component_list}{list}(object, lhoods = NULL, .envir = parent.frame(), ...)
+
+\method{c}{component_list}(...)
 
 \method{[}{component_list}(x, i)
 }
 \arguments{
-\item{\dots}{Parameters passed on to other methods}
-
 \item{object}{The object to operate on}
 
 \item{lhoods}{A \code{bru_like_list} object}
 
-\item{envir}{An evaluation environment to override the evaluation
-environment}
+\item{.envir}{An evaluation environment for non-formula input}
+
+\item{\dots}{Parameters passed on to other methods. Also see Details.}
 
 \item{x}{\code{component_list} object from which to extract element(s)}
 
@@ -44,6 +46,11 @@ into a \code{component_list} object
 \item \code{component_list.list}: Combine a list of components and/or component formulas
 into a \code{component_list} object
 }
+
+\itemize{
+\item \code{c.component_list}: The \code{...} arguments should be \code{component_list}
+objects. The environment from the first argument will be applied to the resulting list.
+}
 }
 \examples{
 # As an example, let us create a linear component. Here, the component is
@@ -62,10 +69,12 @@ eff <- component("myLinearEffectOfX", main = x, model = "linear")
 \seealso{
 Other component constructors: 
 \code{\link{component}()}
+
+Other component constructors: 
+\code{\link{component}()}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com} and
 Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \concept{component constructors}
-\concept{component contructors}

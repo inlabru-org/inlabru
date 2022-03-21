@@ -189,22 +189,22 @@ test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   # proj_as_proj_string: GeodeticCRS::exportToPROJString() only supports metre unit
 
   # Check Intercept
-  expect_equal(
+  expect_snapshot_value(
     data_$fit$summary.fixed["Intercept", "mean"],
-    -2.3875,
-    tolerance = midtol
+    tolerance = midtol,
+    style = "serialize"
   )
 
   # Check SPDE
-  expect_equal(
+  expect_snapshot_value(
     data_$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    c(-0.186, 1.338, 2.503),
-    tolerance = midtol
+    tolerance = midtol,
+    style = "serialize"
   )
-  expect_equal(
+  expect_snapshot_value(
     data_$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
-    c(2.052, 0.757, 0.603),
-    tolerance = midtol
+    tolerance = midtol,
+    style = "serialize"
   )
   # No error should appear
   expect_error(spde.posterior(data_$fit, "mySmooth", what = "range"), NA)

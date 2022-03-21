@@ -38,7 +38,7 @@ test_that("conversion of SpatialPolygon to integration points", {
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(names(ips), "weight")
-  expect_equal(colnames(data.frame(ips)), c("weight", "x", "y", "optional"))
+  expect_equal(colnames(as.data.frame(ips)), c("weight", "x", "y"))
   expect_equal(sum(ips$weight), 19.87366, tolerance = lowtol)
 })
 
@@ -52,7 +52,7 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
   )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(colnames(data.frame(ips)), c("weight", "x", "y", "optional"))
+  expect_equal(colnames(as.data.frame(ips)), c("weight", "x", "y"))
   expect_equal(sum(ips$weight),
     sum(ips_nodomain$weight),
     tolerance = midtol
@@ -65,7 +65,7 @@ test_that("conversion of 2D mesh to integration points", {
   ips <- ipoints(gorillas$mesh)
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(colnames(data.frame(ips)), c("vertex", "weight", "x", "y", "optional"))
+  expect_equal(colnames(as.data.frame(ips)), c("vertex", "weight", "x", "y"))
   expect_equal(sum(ips$weight), 27.64229, tolerance = lowtol)
 })
 
@@ -86,8 +86,8 @@ test_that("SLDF in metres to integration points using grouping parameter", {
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(
-    colnames(data.frame(ips)),
-    c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional")
+    colnames(as.data.frame(ips)),
+    c("weight", "vertex", "season", "x", "y", "coordinateZ")
   )
   # Should be a factor 1000 relative to the kilometre scale, since both schemes us
   # CRS information to convert to km, but the weight information is in metres here
@@ -121,9 +121,11 @@ test_that("Polygon integration with holes", {
     sp::Polygons(
       list(
         sp::Polygon(matrix(c(0, 3, 3, 0, 0, 0, 3, 3) + runif(8) * 0.01, 4, 2),
-                    hole = FALSE),
+          hole = FALSE
+        ),
         sp::Polygon(matrix(c(1, 2, 2, 1, 1, 1, 2, 2) + runif(8) * 0.01, 4, 2),
-                    hole = TRUE)
+          hole = TRUE
+        )
       ),
       ID = "A"
     )
@@ -134,16 +136,24 @@ test_that("Polygon integration with holes", {
     loc.domain = bndA$loc,
     max.edge = 1
   )
-  ipA1 <- ipoints(plyA, m, int.args = list(poly_method = "legacy",
-                                           method = "direct",
-                                           nsub2 = 1))
-  ipA2 <- ipoints(plyA, m, int.args = list(poly_method = "legacy",
-                                           method = "stable",
-                                           nsub2 = 1))
-  ipA3 <- ipoints(plyA, m, int.args = list(method = "direct",
-                                           nsub2 = 1))
-  ipA4 <- ipoints(plyA, m, int.args = list(method = "stable",
-                                           nsub2 = 1))
+  ipA1 <- ipoints(plyA, m, int.args = list(
+    poly_method = "legacy",
+    method = "direct",
+    nsub2 = 1
+  ))
+  ipA2 <- ipoints(plyA, m, int.args = list(
+    poly_method = "legacy",
+    method = "stable",
+    nsub2 = 1
+  ))
+  ipA3 <- ipoints(plyA, m, int.args = list(
+    method = "direct",
+    nsub2 = 1
+  ))
+  ipA4 <- ipoints(plyA, m, int.args = list(
+    method = "stable",
+    nsub2 = 1
+  ))
   ipA1$test <- "A1"
   ipA2$test <- "A2"
   ipA3$test <- "A3"

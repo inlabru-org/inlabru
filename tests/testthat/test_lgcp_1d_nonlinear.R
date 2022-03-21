@@ -6,36 +6,87 @@ test_that("Mexdolphin: Hazard rate detection function", {
   data(mexdolphin, package = "inlabru", envir = environment())
 
   hr <- function(distance, lsig) {
-    1 - exp(-(distance / (exp(lsig)))^-1)
+    1 - exp(-(distance / exp(lsig))^-1)
   }
-
   cmp <- ~ lsig(1) + Intercept(1)
   form <- distance ~ log(hr(distance, lsig)) + Intercept
   ips <- ipoints(INLA::inla.mesh.1d(seq(0, 8, by = 0.1)), name = "distance")
 
+  pts <-
+    mexdolphin$points
+
   fit <- lgcp(
     components = cmp,
-    mexdolphin$points,
+    pts,
     ips = ips,
     formula = form,
     options = list(
-      bru_verbose = 2,
+      bru_verbose = 0,
+      bru_compress_cp = TRUE,
+      bru_max_iter = 10,
       control.inla = list(int.strategy = "auto"),
-      bru_initial = list(lsig = -1) # A difficult starting point
+      bru_initial = list(Intercept = 0, lsig = -1) # A difficult starting point
     )
   )
 
-  #  ggplot(data.frame(distance = c(
-  #    mexdolphin$points$distance,
-  #    -mexdolphin$points$distance))) +
-  #    geom_density(aes(distance, after_stat(count))) +
-  #    geom_line(aes(distance, est),
-  #              data = data.frame(distance = seq(-8,8, by = 0.01)) %>%
-  #                mutate(est = hr(abs(distance),
-  #                                fit$summary.fixed["lsig","mean"]) *
-  #                         exp(fit$summary.fixed["Intercept","mean"])))
-  #
-  #  plot(ips$distance, hr(ips$distance, fit$summary.fixed["lsig", "mean"]))
+  if (FALSE) {
+    pred <- predict(fit,
+      data = data.frame(distance = seq(-8, 8, by = 0.01)),
+      formula = ~ exp(Intercept + log_hr(abs(distance), lsig))
+    )
+
+    ggplot(data.frame(distance = c(
+      pts$distance,
+      -pts$distance
+    ))) +
+      geom_density(aes(distance, after_stat(count))) +
+      geom_line(aes(distance, est, col = "Plugin"),
+        data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
+          mutate(est = hr(
+            abs(distance),
+            fit$summary.fixed["lsig", "mean"]
+          ) *
+            exp(fit$summary.fixed["Intercept", "mean"]))
+      ) +
+      geom_line(aes(distance, mean, col = "Pred"),
+        data = pred
+      ) +
+      geom_line(aes(distance, est, col = "1"),
+        data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
+          mutate(est = hr(
+            abs(distance),
+            1
+          ) *
+            exp(2.3))
+      )
+
+    pred <- predict(fit,
+      data = ips,
+      formula = ~ exp(Intercept + log_hr(abs(distance), lsig))
+    )
+    ggplot(data.frame(pts)) +
+      stat_ecdf(aes(distance)) +
+      geom_line(aes(distance,
+        cumsum(hr(distance, fit$summary.fixed["lsig", "mean"])) /
+          sum(hr(distance, fit$summary.fixed["lsig", "mean"])),
+        col = "Plugin"
+      ),
+      data = data.frame(ips)
+      ) +
+      geom_line(aes(distance,
+        cumsum(mean) / sum(mean),
+        col = "Pred"
+      ),
+      data = pred
+      ) +
+      geom_line(aes(distance,
+        cumsum(hr(distance, 1)) /
+          sum(hr(distance, 1)),
+        col = "1"
+      ),
+      data = data.frame(ips)
+      )
+  }
 
   expect_equal(fit$summary.fixed["lsig", "mean"], 1.06, tolerance = midtol)
   expect_equal(fit$summary.fixed["lsig", "sd"], 0.5183252, tolerance = midtol)

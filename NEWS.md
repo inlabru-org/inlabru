@@ -1,3 +1,37 @@
+# inlabru 2.5.0
+
+# inlabru 2.4.1
+
+## Features
+
+* Add `bru()` timing information in `$bru_timings` and `$bru_iinla$timings`
+
+* Add `SpatialPolygonsDataFrame` support to `gg()` methods
+
+* Allow accessing `E` and `Ntrials` from `response_data` and `data`
+  (further special arguments remain to be added)
+  
+* `deltaIC` improvements
+
+* New transformation helper tools `bru_{forward/inverse}_transformation()`
+
+* Experimental support for matrix and formula component inputs. E.g. with
+    ~ name(~ -1 + a + b + a:b, model = "fixed"), covariate fixed effect interaction
+  specifications can be made. For formula input, `MatrixModels::model.Matrix()`
+  is called to construct matrix input that is then used as the A-matrix for
+  fixed effects, one per column, added up to form the combined effect.
+
+* Documentation and examples improvements
+
+## Bug fixes
+
+* Fix A-matrix construction for `evaluate_model()` for cases where the `inla_f`
+  argument matters
+
+* More efficient and robust mesh integration code
+
+* Cleanup of environment handling for component lists
+
 # inlabru 2.4.0
 
 ## Features

@@ -326,17 +326,18 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       ips <- stransform(ips, crs = crs)
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
-  } else if (class(samplers) == "SpatialPoints") {
-    ips <- samplers
-    ips$weight <- 1
-  } else if (class(samplers) == "SpatialPointsDataFrame") {
+  } else if (inherits(samplers, "SpatialPointsDataFrame")) {
     if (!("weight" %in% names(samplers))) {
       warning("The integration points provided have no weight column. Setting weights to 1.")
       samplers$weight <- 1
     }
 
     ips <- samplers
-  } else if (inherits(samplers, "SpatialLines") || inherits(samplers, "SpatialLinesDataFrame")) {
+  } else if (inherits(samplers, "SpatialPoints")) {
+    ips <- samplers
+    ips$weight <- 1
+  } else if (inherits(samplers, "SpatialLines") ||
+    inherits(samplers, "SpatialLinesDataFrame")) {
 
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
     if (inherits(samplers, "SpatialLines") &&
@@ -437,12 +438,22 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         method = int.args$method, nsub = int.args$nsub2
       )
     } else {
-      ips <- bru_int_polygon(
-        domain,
-        poly_segm,
-        method = int.args$method,
-        nsub = int.args$nsub2
-      )
+      if (!is.null(int.args$use_new) && !int.args$use_new) {
+        ips <- bru_int_polygon(
+          domain,
+          polylist = poly_segm,
+          method = int.args$method,
+          nsub = int.args$nsub2
+        )
+      } else {
+        ips <- bru_int_polygon(
+          domain,
+          polylist = poly_segm,
+          method = int.args$method,
+          nsub = int.args$nsub2,
+          samplers = samplers
+        )
+      }
     }
 
 
@@ -450,10 +461,17 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers@data[ips$group, group, drop = FALSE],
       weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
     )
-    ips <- SpatialPointsDataFrame(ips[, c("x", "y")],
-      data = df,
-      match.ID = FALSE, proj4string = domain_crs
-    )
+    if (is.null(ips$coordinateZ)) {
+      ips <- SpatialPointsDataFrame(ips[, c("x", "y")],
+        data = df,
+        match.ID = FALSE, proj4string = domain_crs
+      )
+    } else {
+      ips <- SpatialPointsDataFrame(ips[, c("x", "y", "coordinateZ")],
+        data = df,
+        match.ID = FALSE, proj4string = domain_crs
+      )
+    }
 
     if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(samplers_crs)) {
       ips <- stransform(ips, crs = samplers_crs)
@@ -515,7 +533,11 @@ cprod <- function(...) {
     ips <- ipl[[1]]
   } else {
     ips1 <- ipl[[1]]
-    ips2 <- do.call(cprod, ipl[2:length(ipl)])
+    if (length(ipl) > 2) {
+      ips2 <- do.call(cprod, ipl[2:length(ipl)])
+    } else {
+      ips2 <- ipl[[2]]
+    }
     if (!"weight" %in% names(ips1)) {
       ips1$weight <- 1
     }
@@ -523,26 +545,18 @@ cprod <- function(...) {
       ips2$weight <- 1
     }
 
-    loc1 <- ips1[, setdiff(names(ipl[[1]]), "weight"), drop = FALSE]
-    w1 <- data.frame(weight = ips1$weight)
-    loc2 <- ips2[, setdiff(names(ips2), "weight"), drop = FALSE]
-    w2 <- data.frame(weight2 = ips2[, "weight"])
-
-    # Merge the locations. In case of Spatial objects we need to use the sp:merge
-    # function. Unfortunately sp::merge replicates entries in a different order than
-    # base merge so we need to reverse the order of merging the weights
-
-    if (inherits(loc1, "Spatial")) {
-      ips <- sp::merge(loc1, loc2, duplicateGeoms = TRUE)
-      weight <- merge(w2, w1)
-    } else if (inherits(loc2, "Spatial")) {
-      ips <- sp::merge(loc2, loc1, duplicateGeoms = TRUE)
-      weight <- merge(w2, w1)
+    by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
+    if (inherits(ips1, "Spatial")) {
+      ips <- sp::merge(ips1, ips2, by = by, duplicateGeoms = TRUE)
+    } else if (inherits(ips2, "Spatial")) {
+      ips <- sp::merge(ips2, ips1, by = by, duplicateGeoms = TRUE)
     } else {
-      ips <- merge(loc1, loc2)
-      weight <- merge(w1, w2)
+      ips <- base::merge(ips1, ips2, by = by)
     }
-    ips$weight <- weight$weight * weight$weight2
+    ips$weight <- ips$weight.x * ips$weight.y
+    ips[["weight.x"]] <- NULL
+    ips[["weight.y"]] <- NULL
+    row.names(ips) <- as.character(seq_len(NROW(ips)))
   }
   ips
 }

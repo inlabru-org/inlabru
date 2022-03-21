@@ -494,7 +494,7 @@ intersection_mesh <- function(mesh, poly) {
 #' @param mesh Mesh on which to integrate
 #' @param integ `list` of `loc`, integration points,
 #'   and `weight`, integration weights,
-#'   or a `SpatialPointsDataFrame`. Only the coordinates and `weigh` column
+#'   or a `SpatialPointsDataFrame`. Only the coordinates and `weight` column
 #'   are handled.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
@@ -636,12 +636,13 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
 #' @export
 #' @param mesh An inla.mesh object
 #' @param polylist A list of `inla.mesh.segment` objects
-#' @param method Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")
+#' @param method Which integration method to use ("stable",
+#'   with aggregation to mesh vertices, or "direct")
 #' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 
-bru_int_polygon <- function(mesh, polylist, method = NULL, ...) {
+bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
   method <- match.arg(method, c("stable", "direct"))
 
   ipsl <- list()
@@ -681,3 +682,206 @@ bru_int_polygon <- function(mesh, polylist, method = NULL, ...) {
 
   do.call(rbind, ipsl)
 }
+
+
+# New integration methods ----
+
+#' Integration scheme for mesh triangle interiors
+#'
+#' @param mesh Mesh on which to integrate
+#' @param tri_subset Optional triangle index vector for integration on a subset
+#' of the mesh triangles (Default `NULL`)
+#' @param nsub number of subdivision points along each triangle edge, giving
+#'    `(nsub + 1)^2` proto-integration points used to compute
+#'   the vertex weights
+#'   (default `NULL=9`, giving 100 integration points for each triangle)
+#' @return `list` with elements `loc` and `weight` with
+#'   integration points for the mesh
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @keywords internal
+mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
+  # Construct a barycentric grid of subdivision triangle midpoints
+  if (is.null(nsub)) {
+    nsub <- 9
+  }
+  stopifnot(nsub >= 0)
+  nB <- (nsub + 1)^2
+
+  nT <- nrow(mesh$graph$tv)
+  if (is.null(tri_subset)) {
+    tri_subset <- seq_len(nT)
+  }
+
+  # Barycentric integration coordinates
+  b <- seq(1 / 3, 1 / 3 + nsub, length = nsub + 1) / (nsub + 1)
+  bb <- as.matrix(expand.grid(b, b))
+  # Points above the diagonal should be reflected into the lower triangle:
+  refl <- rowSums(bb) > 1
+  if (any(refl)) {
+    bb[refl, ] <- cbind(1 - bb[refl, 2], 1 - bb[refl, 1])
+  }
+  # Construct complete barycentric coordinates:
+  barycentric_grid <- cbind(1 - rowSums(bb), bb)
+
+  # Construct integration points
+  loc <- matrix(0.0, length(tri_subset) * nB, 3)
+  idx_end <- 0
+  for (tri in tri_subset) {
+    idx_start <- idx_end + 1
+    idx_end <- idx_start + nB - 1
+    loc[seq(idx_start, idx_end, length = nB), ] <-
+      as.matrix(barycentric_grid %*%
+        mesh$loc[mesh$graph$tv[tri, ], , drop = FALSE])
+  }
+
+  # Construct integration weights
+  weight <- rep(INLA::inla.mesh.fem(mesh, order = 1)$ta[tri_subset] / nB, each = nB)
+
+  list(
+    loc = loc,
+    weight = weight
+  )
+}
+
+
+#' Integration points for polygons inside an inla.mesh
+#'
+#' @export
+#' @param mesh An inla.mesh object
+#' @param polylist A list of `inla.mesh.segment` objects
+#' @param method Which integration method to use ("stable",
+#'   with aggregation to mesh vertices, or "direct")
+#' @param samplers If non-NULL, a SpatialPolygons* object, used instead of polylist
+#' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @keywords internal
+
+bru_int_polygon <- function(mesh,
+                            polylist,
+                            method = NULL,
+                            samplers = NULL,
+                            ...) {
+  method <- match.arg(method, c("stable", "direct"))
+
+  ipsl <- list()
+
+  # Compute direct integration points
+  # TODO: Allow blockwise construction to avoid
+  # overly large temporary coordinate matrices (via tri_subset)
+  integ <- mesh_triangle_integration(mesh, ...)
+
+  # Keep points with positive weights (This should be all, but if there's a degenerate triangle, this gets rid of it)
+  ok <- (integ$weight > 0)
+  integ$loc <- integ$loc[ok, , drop = FALSE]
+  integ$weight <- integ$weight[ok]
+
+  if (!is.null(samplers)) {
+    integ_sp <- SpatialPoints(integ$loc, proj4string = fm_sp_get_crs(samplers))
+
+    idx <- sp::over(samplers, integ_sp, returnList = TRUE)
+
+    for (g in seq_along(idx)) {
+      if (length(idx[[g]]) > 0) {
+        integ_ <- list(
+          loc = integ$loc[idx[[g]], , drop = FALSE],
+          weight = integ$weight[idx[[g]]]
+        )
+
+        if (method %in% c("stable")) {
+          # Project integration points and weights to mesh nodes
+          integ_ <- integration_weight_aggregation(mesh, integ_)
+        }
+
+        ips <- data.frame(
+          x = integ_$loc[, 1],
+          y = integ_$loc[, 2],
+          # TODO: figure out how to deal with 3D points without
+          # breaking sp::over later
+          #          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
+          weight = integ_$weight,
+          group = g
+        )
+
+        ipsl <- c(ipsl, list(ips))
+      }
+    }
+  } else {
+    # Old method
+
+    bru_log_message(paste0("Integrating over ", length(polylist), " polygons."),
+      verbosity = 2
+    )
+    gg <- seq_along(polylist)
+    for (g in gg) {
+      poly <- polylist[[g]]
+
+      # Filter away points outside integration domain boundary:
+      mesh_bnd <- INLA::inla.mesh.create(boundary = poly)
+      ok <- INLA::inla.mesh.projector(mesh_bnd, loc = integ$loc)$proj$ok
+
+      if (any(ok)) {
+        integ_ <- list(
+          loc = integ$loc[ok, , drop = FALSE],
+          weight = integ$weight[ok]
+        )
+
+        if (method %in% c("stable")) {
+          # Project integration points and weights to mesh nodes
+          integ_ <- integration_weight_aggregation(mesh, integ_)
+        }
+
+        ips <- data.frame(
+          x = integ_$loc[, 1],
+          y = integ_$loc[, 2],
+          # TODO: figure out how to deal with 3D points without
+          # breaking sp::over later
+          #          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
+          weight = integ_$weight,
+          group = g
+        )
+
+        ipsl <- c(ipsl, list(ips))
+      }
+    }
+  }
+
+  do.call(rbind, ipsl)
+}
+
+# From plotsample test, comparing before and after code refactor to avoid
+# recreating the full integration scheme for every polygon
+#
+# print(bench::mark(
+#   A=bru_int_polygon_old(domain,
+#     polylist=poly_segm,method=int.args$method,
+#     nsub=int.args$nsub2),
+#   B=bru_int_polygon(
+#     domain,
+#     polylist = poly_segm,
+#     method = int.args$method,
+#     nsub = int.args$nsub2),
+#   check = FALSE))
+## A tibble: 2 × 13
+## expression      min median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time  gc
+## <bch:expr> <bch:tm> <bch:>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <lis> <lis>
+##  1 A            14.03s 14.03s    0.0713        NA     2.28     1    32     14.03s <NULL> <NULL> <ben… <tib…
+##  2 B             8.05s  8.05s    0.124         NA     2.61     1    21      8.05s <NULL> <NULL> <ben… <tib…
+
+# With a SPDF samplers object:
+#
+# bench::mark(
+#   ips_old = ipoints(
+#     samplers = gorillas$plotsample$plots,
+#     domain = gorillas$mesh,
+#     int.args = list(use_new = FALSE)
+#   ),
+#   ips_new = ipoints(
+#     samplers = gorillas$plotsample$plots,
+#     domain = gorillas$mesh,
+#     int.args = list(use_new = TRUE)
+#   ),
+#   check = FALSE)
+# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time    gc
+# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <list>  <list>
+#   1 ips_old      10.04s   10.04s    0.0996        NA    1.10      1    11     10.04s <NULL> <NULL> <bench… <tibbl…
+# 2 ips_new       2.91s    2.91s    0.343         NA    0.343     1     1      2.91s <NULL> <NULL> <bench… <tibbl…
