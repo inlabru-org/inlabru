@@ -2,8 +2,6 @@
 
 # inlabru 2.5.0
 
-# inlabru 2.4.1
-
 ## Features
 
 * Add `bru()` timing information in `$bru_timings` and `$bru_iinla$timings`
