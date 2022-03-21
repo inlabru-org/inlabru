@@ -4,7 +4,6 @@
 * macOS-latest (on github, with INLA), R 4.1.2
 * windows-latest (on github, with INLA), R 4.1.2
 * win-builder, R devel
-* R-hub (Fedora Linux, clang, gfortran) R devel
 * For the ubuntu github platforms, tests were also done without installing
   packages in Suggests.
 
@@ -73,9 +72,9 @@ Comments:
 ## Downstream dependencies
 inlabru does not have any reverse dependencies
 
-## Failure reports
+## Failure reports for previous inlabru version 2.4.0
 
-### INLA 22.02.16-2 and INLA 22.02.28-1
+### Previous inlabru (2.4.0) with INLA 22.02.16-2 and INLA 22.02.28-1
 
  ----------- FAILURE REPORT -------------- 
  --- failure: length > 1 in coercion to logical ---
