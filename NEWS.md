@@ -16,7 +16,7 @@
 * New transformation helper tools `bru_{forward/inverse}_transformation()`
 
 * Experimental support for matrix and formula component inputs. E.g. with
-    ~ name(~ -1 + a + b + a:b, model = "fixed"), covariate fixed effect interaction
+    `~ name(~ -1 + a + b + a:b, model = "fixed")`, covariate fixed effect interaction
   specifications can be made. For formula input, `MatrixModels::model.Matrix()`
   is called to construct matrix input that is then used as the A-matrix for
   fixed effects, one per column, added up to form the combined effect.
