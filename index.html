@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.5.0.9000</span>
       </span>
     </div>
 
@@ -156,9 +156,8 @@
 <span class="co">#&gt; Loading required package: Matrix</span>
 <span class="co">#&gt; Loading required package: foreach</span>
 <span class="co">#&gt; Loading required package: parallel</span>
-<span class="co">#&gt; This is INLA_21.12.16 built 2021-12-16 11:40:12 UTC.</span>
+<span class="co">#&gt; This is INLA_22.03.16 built 2022-03-16 13:18:13 UTC.</span>
 <span class="co">#&gt;  - See www.r-inla.org/contact-us for how to get help.</span>
-<span class="co">#&gt;  - To enable PARDISO sparse library; see inla.pardiso()</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
 
 <span class="co"># Load the data</span>
@@ -170,7 +169,7 @@
                               prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.01</span><span class="op">)</span><span class="op">)</span>
 <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="co"># Fit LGCP model</span>
-<span class="co"># This particular bru+like combination has a shortcut function lgcp() as well</span>
+<span class="co"># This particular bru/like combination has a shortcut function lgcp() as well</span>
 <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bru.html">bru</a></span><span class="op">(</span>
   components <span class="op">=</span> <span class="va">cmp</span>,
   <span class="fu"><a href="reference/like.html">like</a></span><span class="op">(</span>

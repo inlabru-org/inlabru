@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">inlabru</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.4.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.5.0.9000</span>
       </span>
     </div>
 
@@ -92,6 +92,31 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.5.0" id="inlabru-250">inlabru 2.5.0<a class="anchor" aria-label="anchor" href="#inlabru-250"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.4.1" id="inlabru-241">inlabru 2.4.1<a class="anchor" aria-label="anchor" href="#inlabru-241"></a></h2>
+<div class="section level3">
+<h3 id="features-2-4-1">Features<a class="anchor" aria-label="anchor" href="#features-2-4-1"></a></h3>
+<ul><li><p>Add <code><a href="../reference/bru.html">bru()</a></code> timing information in <code>$bru_timings</code> and <code>$bru_iinla$timings</code></p></li>
+<li><p>Add <code>SpatialPolygonsDataFrame</code> support to <code><a href="../reference/gg.html">gg()</a></code> methods</p></li>
+<li><p>Allow accessing <code>E</code> and <code>Ntrials</code> from <code>response_data</code> and <code>data</code> (further special arguments remain to be added)</p></li>
+<li><p><code>deltaIC</code> improvements</p></li>
+<li><p>New transformation helper tools <code>bru_{forward/inverse}_transformation()</code></p></li>
+<li><dl><dt>Experimental support for matrix and formula component inputs. E.g. with</dt>
+<dd>name(~ -1 + a + b + a:b, model = “fixed”), covariate fixed effect interaction specifications can be made. For formula input, <code><a href="https://rdrr.io/pkg/MatrixModels/man/model.Matrix.html" class="external-link">MatrixModels::model.Matrix()</a></code> is called to construct matrix input that is then used as the A-matrix for fixed effects, one per column, added up to form the combined effect.
+</dd>
+</dl></li>
+<li><p>Documentation and examples improvements</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-2-4-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-4-1"></a></h3>
+<ul><li><p>Fix A-matrix construction for <code><a href="../reference/evaluate_model.html">evaluate_model()</a></code> for cases where the <code>inla_f</code> argument matters</p></li>
+<li><p>More efficient and robust mesh integration code</p></li>
+<li><p>Cleanup of environment handling for component lists</p></li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.4.0" id="inlabru-240">inlabru 2.4.0<small>2021-12-19</small><a class="anchor" aria-label="anchor" href="#inlabru-240"></a></h2>
