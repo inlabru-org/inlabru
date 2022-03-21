@@ -79,9 +79,8 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_21.12.16 built 2021-12-16 11:40:12 UTC.
+#> This is INLA_22.03.16 built 2022-03-16 13:18:13 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
-#>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
 
 # Load the data
@@ -93,7 +92,7 @@ matern <- inla.spde2.pcmatern(gorillas$mesh,
                               prior.range = c(0.01, 0.01))
 cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 # Fit LGCP model
-# This particular bru+like combination has a shortcut function lgcp() as well
+# This particular bru/like combination has a shortcut function lgcp() as well
 fit <- bru(
   components = cmp,
   like(
