@@ -7,20 +7,19 @@
 * R-hub (Fedora Linux, clang, gfortran) R devel
 
 ## Submission notes
-* Bugfix and minor feature release 2.4.0
+* Bugfix and minor feature release 2.5.0
 * NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
-* CRAN checks for old version, 2.3.1:
-  - M1 test errors: "... did not throw the expected warning"; this was
-    due to changes in rgdal, and the test for this warning has been removed for
-    broader compatibility with rgal versions.
-  - M1 test error in
-    "  ── Error (test_ipoints.R:141:3): Polygon integration with holes ── "
-    "Error in `fmesher.read(prefix, "manifold")`: File"
-    This appears to have been caused by unexpected floating point arithmetic
-    issues for special test geometries, that have therefore been changed.
-    We have also added a 30s timeout on all fmesher calls to prevent long-running
-    tests for potential similar problems in the future.
-* Checks for new version, 2.4.0:
+* CRAN checks for old version, 2.4.0:
+  - donttest: "failure: length > 1 in coercion to logical" (see partial reports below)
+    These errors were traced to the INLA package, and are fixed there since
+    version 22.03.03; The CRAN installations of INLA need to be upgraded
+    to fix this issue.  The "stable" INLA version hasn't been changed yet, but
+    the inlabru package points to the "testing" version, see
+    https://www.r-inla.org/download-install
+    For some platforms (notably with old GLIBC versions), inla.binary.install()
+    needs to be run after the regular package installation, to install compatible
+    program binaries.
+* Checks for new version, 2.5.0 (with latest INLA, 22.03.16):
   - Spurious error message about potentially invalid doi, see below
 
 
@@ -39,7 +38,8 @@ Comments:
     
   For R 4.0.5 and older, separate INLA package building may be needed to install
   the newer INLA version suggested by inlabru, but for the newer R versions
-  direct installation can be done
+  direct installation can be done. Bugs relating to vector-if-statements
+  were fixed in INLA version 22.03.03
     
 * Spurious doi problem. The 10.1214/17-AOAS1078 doi is listed on
     https://projecteuclid.org/journals/annals-of-applied-statistics/volume-11/issue-4/Point-process-models-for-spatio-temporal-distance-sampling-data-from/10.1214/17-AOAS1078.full
