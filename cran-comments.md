@@ -5,6 +5,8 @@
 * windows-latest (on github, with INLA), R 4.1.2
 * win-builder, R devel
 * R-hub (Fedora Linux, clang, gfortran) R devel
+* For the ubuntu github platforms, tests were also done without installing
+  packages in Suggests.
 
 ## Submission notes
 * Bugfix and minor feature release 2.5.0
@@ -41,22 +43,35 @@ Comments:
   direct installation can be done. Bugs relating to vector-if-statements
   were fixed in INLA version 22.03.03
     
-* Spurious doi problem. The 10.1214/17-AOAS1078 doi is listed on
-    https://projecteuclid.org/journals/annals-of-applied-statistics/volume-11/issue-4/Point-process-models-for-spatio-temporal-distance-sampling-data-from/10.1214/17-AOAS1078.full
-  which works, but https://doi.org/10.1214/17-AOAS1078 may give an invalid redirect
-  response with a malformed version of the target URL.
+* Spurious doi problems noted by win-builder.
+  Manually accessing https://doi.org/10.1111/2041-210X.13168 correctly leads to
+  https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.13168
+  Manually accessing https://doi.org/10.1214/17-AOAS1078 correctly leads to
+  https://projecteuclid.org/journals/annals-of-applied-statistics/volume-11/
+    issue-4/Point-process-models-for-spatio-temporal-distance-sampling-data-from/10.1214/17-AOAS1078.full
+
+  The checking messages:
+  
+  Found the following (possibly) invalid URLs:
+  URL: https://doi.org/10.1111/2041-210X.13168
+    From: README.md
+    Status: 503
+    Message: Service Unavailable
+
   Found the following (possibly) invalid DOIs:
-    DOI: 10.1214/17-AOAS1078
-      From: inst/CITATION
-      Status: libcurl error code 6:
-      	Could not resolve host: projecteuclid.org%5Cjournals%5Cannals-of-applied-statistics%5Cvolume-11%5Cissue-4%5CPoint-process-models-for-spatio-temporal-distance-sampling-data-from%5C10.1214
-      Message: Error
+  DOI: 10.1111/2041-210X.13168
+    From: DESCRIPTION
+          inst/CITATION
+    Status: Service Unavailable
+    Message: 503
+  DOI: 10.1214/17-AOAS1078
+    From: inst/CITATION
+    Status: Internal Server Error
+    Message: 500
 
 
 ## Downstream dependencies
 inlabru does not have any reverse dependencies
-
-
 
 ## Failure reports
 
