@@ -1,5 +1,29 @@
 # inlabru (development version)
 
+## Features
+
+* Add `bru()` timing information in `$bru_timings` and `$bru_iinla$timings`
+
+* Add `SpatialPolygonsDataFrame` support to `gg()` methods
+
+* Allow accessing `E` and `Ntrials` from `response_data` and `data`
+  (further special arguments remain to be added)
+  
+* `deltaIC` improvements
+
+* New transformation helper tools `bru_{forward/inverse}_transformation()`
+
+* Documentation and examples improvements
+
+## Bug fixes
+
+* Fix A-matrix construction for `evaluate_model()` for cases where the `inla_f`
+  argument matters
+
+* More efficient and robust mesh integration code
+
+* Cleanup of environment handling for component lists
+
 # inlabru 2.4.0
 
 ## Features
