@@ -1472,7 +1472,7 @@ bru_mapper.default <- function(mapper,
     "ibm_amatrix", "ibm_amatrix_inla",
     "ibm_valid_input", "ibm_valid_input_inla"
   ) %in%
-    ...names())) {
+    names(list(...)))) {
     warning(
       paste0(
         "Deprecated use of named method arguments for 'bru_mapper'.\n",
@@ -1487,7 +1487,7 @@ bru_mapper.default <- function(mapper,
         "ibm_inla_subset",
         "ibm_valid_input"
       ),
-      ...names()
+      names(list(...))
     )
     methods <- list(...)[method_names]
   }
