@@ -24,8 +24,8 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_verbose = 0,
       bru_compress_cp = TRUE,
       bru_max_iter = 10,
-      control.inla = list(int.strategy = "auto"),
-      bru_initial = list(Intercept = 0, lsig = -1) # A difficult starting point
+      verbose = FALSE,
+      bru_initial = list(Intercept = 0, lsig = -1)
     )
   )
 
