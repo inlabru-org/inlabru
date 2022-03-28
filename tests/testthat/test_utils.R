@@ -39,3 +39,21 @@ test_that("Missing data infilling", {
 
   expect_equal(val2, val0)
 })
+
+
+
+test_that("Laplace distribution", {
+  q <- -5:5
+  rate <- 2
+  p <- plaplace(q, rate = rate)
+
+  expect_equal(plaplace(q, rate = rate, lower.tail = TRUE), p)
+  expect_equal(plaplace(-q, rate = rate, lower.tail = FALSE), p)
+  expect_equal(plaplace(q, rate = rate, lower.tail = TRUE, log.p = TRUE), log(p))
+  expect_equal(plaplace(-q, rate = rate, lower.tail = FALSE, log.p = TRUE), log(p))
+  expect_equal(qlaplace(p, rate = rate, lower.tail = TRUE), q)
+  expect_equal(qlaplace(p, rate = rate, lower.tail = FALSE), -q)
+  expect_equal(qlaplace(log(p), rate = rate, lower.tail = TRUE, log.p = TRUE), q)
+  expect_equal(qlaplace(log(p), rate = rate, lower.tail = FALSE, log.p = TRUE), -q)
+
+})
