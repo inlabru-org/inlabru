@@ -326,17 +326,18 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       ips <- stransform(ips, crs = crs)
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
-  } else if (class(samplers) == "SpatialPoints") {
-    ips <- samplers
-    ips$weight <- 1
-  } else if (class(samplers) == "SpatialPointsDataFrame") {
+  } else if (inherits(samplers, "SpatialPointsDataFrame")) {
     if (!("weight" %in% names(samplers))) {
       warning("The integration points provided have no weight column. Setting weights to 1.")
       samplers$weight <- 1
     }
 
     ips <- samplers
-  } else if (inherits(samplers, "SpatialLines") || inherits(samplers, "SpatialLinesDataFrame")) {
+  } else if (inherits(samplers, "SpatialPoints")) {
+    ips <- samplers
+    ips$weight <- 1
+  } else if (inherits(samplers, "SpatialLines") ||
+    inherits(samplers, "SpatialLinesDataFrame")) {
 
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
     if (inherits(samplers, "SpatialLines") &&
@@ -433,8 +434,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     if (identical(int.args[["poly_method"]], "legacy")) {
       ips <- int.polygon(domain,
-                         loc = polyloc[, 1:2], group = polyloc[, 3],
-                         method = int.args$method, nsub = int.args$nsub2
+        loc = polyloc[, 1:2], group = polyloc[, 3],
+        method = int.args$method, nsub = int.args$nsub2
       )
     } else {
       if (!is.null(int.args$use_new) && !int.args$use_new) {
@@ -462,13 +463,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     )
     if (is.null(ips$coordinateZ)) {
       ips <- SpatialPointsDataFrame(ips[, c("x", "y")],
-                                    data = df,
-                                    match.ID = FALSE, proj4string = domain_crs
+        data = df,
+        match.ID = FALSE, proj4string = domain_crs
       )
     } else {
       ips <- SpatialPointsDataFrame(ips[, c("x", "y", "coordinateZ")],
-                                    data = df,
-                                    match.ID = FALSE, proj4string = domain_crs
+        data = df,
+        match.ID = FALSE, proj4string = domain_crs
       )
     }
 

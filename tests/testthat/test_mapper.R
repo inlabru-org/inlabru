@@ -263,18 +263,21 @@ test_that("mapper collection automatic construction consistency", {
       ibm_values(cmp2$indep$mapper, inla_f = inla_f)
     )
     if (inla_f) {
-      input <- list(main = data$val,
-                    group = rep(1, 3),
-                    replicate = rep(1, 3))
+      input <- list(
+        main = data$val,
+        group = rep(1, 3),
+        replicate = rep(1, 3)
+      )
     } else {
-      input <- list(main = list(u = data$val),
-                    group = rep(1, 3),
-                    replicate = rep(1, 3))
+      input <- list(
+        main = list(u = data$val),
+        group = rep(1, 3),
+        replicate = rep(1, 3)
+      )
     }
     expect_identical(
       as.matrix(ibm_amatrix(cmp1$indep$mapper, input = input, inla_f = inla_f)),
       as.matrix(ibm_amatrix(cmp2$indep$mapper, input = input, inla_f = inla_f))
     )
   }
-
 })

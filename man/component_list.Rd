@@ -5,6 +5,7 @@
 \alias{bru_component_list}
 \alias{component_list.formula}
 \alias{component_list.list}
+\alias{c.component_list}
 \alias{[.component_list}
 \title{Methods for inlabru component lists}
 \usage{
@@ -13,6 +14,8 @@ component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 \method{component_list}{formula}(object, lhoods = NULL, .envir = parent.frame(), ...)
 
 \method{component_list}{list}(object, lhoods = NULL, .envir = parent.frame(), ...)
+
+\method{c}{component_list}(...)
 
 \method{[}{component_list}(x, i)
 }
@@ -23,7 +26,7 @@ component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 
 \item{.envir}{An evaluation environment for non-formula input}
 
-\item{\dots}{Parameters passed on to other methods}
+\item{\dots}{Parameters passed on to other methods. Also see Details.}
 
 \item{x}{\code{component_list} object from which to extract element(s)}
 
@@ -42,6 +45,11 @@ into a \code{component_list} object
 \itemize{
 \item \code{component_list.list}: Combine a list of components and/or component formulas
 into a \code{component_list} object
+}
+
+\itemize{
+\item \code{c.component_list}: The \code{...} arguments should be \code{component_list}
+objects. The environment from the first argument will be applied to the resulting list.
 }
 }
 \examples{

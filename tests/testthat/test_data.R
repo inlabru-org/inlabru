@@ -68,17 +68,17 @@ test_that("Component construction: separate response_data input", {
   local_bru_safe_inla()
 
   lik1 <- like("gaussian",
-              formula = y ~ c(sum(effect), sum(effect^2)),
-              data = list(x = c(1, 1.5, 2, 3, 4)),
-              response_data = data.frame(y = 11:12),
-              include = "effect"
+    formula = y ~ c(sum(effect), sum(effect^2)),
+    data = list(x = c(1, 1.5, 2, 3, 4)),
+    response_data = data.frame(y = 11:12),
+    include = "effect"
   )
 
   lik2 <- like("gaussian",
-              formula = y ~ c(sum(effect), sum(effect^2)),
-              data = data.frame(x = c(1, 1.5, 2, 3, 4)),
-              response_data = data.frame(y = 11:12),
-              include = "effect"
+    formula = y ~ c(sum(effect), sum(effect^2)),
+    data = data.frame(x = c(1, 1.5, 2, 3, 4)),
+    response_data = data.frame(y = 11:12),
+    include = "effect"
   )
 
 
@@ -102,8 +102,8 @@ test_that("Component construction: separate response_data input", {
 
   cmp1 <- component_list(
     ~ effect(x,
-             model = "rw2",
-             mapper = bru_mapper(mesh1, indexed = FALSE)
+      model = "rw2",
+      mapper = bru_mapper(mesh1, indexed = FALSE)
     ) - 1
   )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik1))
@@ -111,8 +111,8 @@ test_that("Component construction: separate response_data input", {
 
   cmp1 <- component_list(
     ~ effect(x,
-             model = "rw2",
-             mapper = bru_mapper(mesh1, indexed = TRUE)
+      model = "rw2",
+      mapper = bru_mapper(mesh1, indexed = TRUE)
     ) - 1
   )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik1))

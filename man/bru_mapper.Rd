@@ -13,6 +13,7 @@
 \alias{bru_mapper.inla.mesh.1d}
 \alias{bru_mapper_index}
 \alias{bru_mapper_linear}
+\alias{bru_mapper_matrix}
 \alias{bru_mapper_factor}
 \alias{bru_mapper_offset}
 \alias{bru_mapper_multi}
@@ -42,6 +43,8 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 bru_mapper_index(n = 1L, ...)
 
 bru_mapper_linear(...)
+
+bru_mapper_matrix(labels, ...)
 
 bru_mapper_factor(values, factor_mapping, ...)
 
@@ -81,6 +84,8 @@ and similar).
 Default: \code{NULL}, to force user specification of this parameter}
 
 \item{n}{Size of a model for \code{bru_mapper_index}}
+
+\item{labels}{Column labels for matrix mappings}
 
 \item{values}{Input values calculated by \code{\link[=input_eval.bru_input]{input_eval.bru_input()}}}
 

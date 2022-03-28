@@ -7,8 +7,8 @@
 
 make_track_plots <- function(fit) {
   if (!requireNamespace("dplyr", quietly = TRUE) ||
-      !requireNamespace("ggplot2", quietly = TRUE) ||
-      !requireNamespace("magrittr", quietly = TRUE)) {
+    !requireNamespace("ggplot2", quietly = TRUE) ||
+    !requireNamespace("magrittr", quietly = TRUE)) {
     stop("One or more of 'dplyr', 'ggplot2', 'magrittr' not installed, but are needed by make_track_plots()")
   }
   track_data <-

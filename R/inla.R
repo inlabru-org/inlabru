@@ -134,8 +134,10 @@ extract_property <- function(result, property,
     }
     return(ret)
   } else if (property == "predictor_sd") {
-    idx <- grepl(pattern = "^APredictor",
-                 x = rownames(result$summary.linear.predict))
+    idx <- grepl(
+      pattern = "^APredictor",
+      x = rownames(result$summary.linear.predict)
+    )
     ret <- result$summary.linear.predictor$sd[idx]
     return(ret)
   }

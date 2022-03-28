@@ -23,20 +23,20 @@ Calculates DIC and/or WAIC differences and produces an ordered summary.
 \examples{
 \donttest{
 if (bru_safe_inla(multicore = FALSE)) {
-# Generate some data
-input.df <- data.frame(idx = 1:10, x = cos(1:10))
-input.df <- within(
-  input.df,
-  y <- rpois(10, 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
-)
+  # Generate some data
+  input.df <- data.frame(idx = 1:10, x = cos(1:10))
+  input.df <- within(
+    input.df,
+    y <- rpois(10, 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
+  )
 
-# Fit two models
-fit1 <- bru(y ~ x, family = "poisson", data = input.df)
-fit2 <- bru(y ~ x + rand(idx, model = "iid"), family = "poisson", data = input.df)
+  # Fit two models
+  fit1 <- bru(y ~ x, family = "poisson", data = input.df)
+  fit2 <- bru(y ~ x + rand(idx, model = "iid"), family = "poisson", data = input.df)
 
-# Compare DIC
+  # Compare DIC
 
-deltaIC(fit1, fit2)
+  deltaIC(fit1, fit2)
 }
 }
 }
