@@ -127,10 +127,11 @@ ggplot(dat4pred2) +
 
 Fitting an SPDE model with inlabru
 -----------------------------------
-Make mesh.
+Make mesh. To avoid boundary effects in the region of interest, let the
+mesh extend outside the data range.
 
 ```{r }
-x <- seq(0, 55, length = 50) # this sets mesh points - try others if you like
+x <- seq(-10, 65, by = 1) # this sets mesh points - try others if you like
 mesh1D <- inla.mesh.1d(x, boundary = "free")
 ```
 
@@ -139,8 +140,7 @@ mesh1D <- inla.mesh.1d(x, boundary = "free")
 
 ```{r fig.show="hide"}
 ggplot() +
-  gg(mesh1D) +
-  xlim(0, 55)
+  gg(mesh1D)
 ```
 
 ### Using function `bru( )` to fit to count data
@@ -165,18 +165,23 @@ where:
 `INLA` function `inla.spde2.pcmatern( )`, which requires a mesh to be passed to it, so we 
 pass it the 1D mesh that we created above, ``mesh1D`.
 
-For models that only adds the model components, we don't need to specify a separate
-predictor formula. Instead, we can provide the name of the output to the left of the `~` in the component specification.
+For models that only adds the model components, we don't need to specify the
+full predictor formula. Instead, we can provide the name of the output to the left of the `~` in the component specification, and "." on the right hand side,
+which will cause it to add all components (unless a subset is selected via the `include`/`exclude` arguments to `like()`).
 
 ```{r }
 the_spde <- inla.spde2.pcmatern(mesh1D,
   prior.range = c(1, 0.01),
-  prior.sigma = c(10, 0.01)
+  prior.sigma = c(1, 0.01)
 )
 
-comp <- count ~ field(x, model = the_spde) + Intercept(1)
+comp <- ~ field(x, model = the_spde) + Intercept(1, prec.linear = 1/2^2)
 
-fit2.bru <- bru(comp, cd, family = "poisson", options = list(E = cd$exposure))
+fit2.bru <- bru(comp,
+                like(count ~ .,
+                     data = cd,
+                     family = "poisson",
+                     E = exposure))
 
 summary(fit2.bru)
 ```
@@ -212,8 +217,9 @@ shown as a light red band about the curve.
 ```{r }
 ggplot() +
   gg(pred2.bru) +
-  geom_point(data = cd, aes(x = x, y = count / cd$exposure), cex = 2) +
+  geom_point(data = cd, aes(x = x, y = count / exposure), cex = 2) +
   geom_point(data = true.lambda, aes(x, y), pch = "_", cex = 9, col = "blue") +
+  coord_cartesian(xlim = c(0, 55), ylim = c(0, 6)) +
   xlab("x") +
   ylab("Intensity")
 ```
@@ -225,6 +231,7 @@ ggplot() +
   gg(pred2.bru) +
   geom_point(data = cd, aes(x = x, y = count / exposure), cex = 2) +
   geom_line(data = dat4pred2, aes(x, gam / exposure), lty = 2) +
+  coord_cartesian(xlim = c(0, 55), ylim = c(0, 6)) +
   xlab("x") +
   ylab("Intensity")
 ```

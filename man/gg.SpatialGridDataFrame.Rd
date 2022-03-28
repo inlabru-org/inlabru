@@ -21,7 +21,8 @@ Requires the \code{ggplot2} package.
 }
 \examples{
 \donttest{
-  if (require(ggplot2, quietly = TRUE)) {
+  if (require(ggplot2, quietly = TRUE) &&
+      require(ggpolypath, quietly = TRUE)) {
     # Load Gorilla data
 
     data("gorillas", package = "inlabru")

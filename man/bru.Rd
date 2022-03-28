@@ -5,7 +5,7 @@
 \alias{bru_rerun}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
-bru(components = ~Intercept(1), ..., options = list())
+bru(components = ~Intercept(1), ..., options = list(), .envir = parent.frame())
 
 bru_rerun(result, options = list())
 }
@@ -15,10 +15,18 @@ Also used to define a default linear additive predictor.  See
 \code{\link[=component]{component()}} for details.}
 
 \item{...}{Likelihoods, each constructed by a calling \code{\link[=like]{like()}}, or named
-parameters that can be passed to a single \code{\link[=like]{like()}} call.}
+parameters that can be passed to a single \code{\link[=like]{like()}} call. Note that
+all the arguments will be evaluated before calling \code{\link[=like]{like()}} in order
+to detect if they are \code{like} objects. This means that
+special arguments that need to be evaluated in the context of
+\code{response_data} or \code{data} (such as Ntrials) may will only work that
+way in direct calls to \code{\link[=like]{like()}}.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
+
+\item{.envir}{Environment for component evaluation (for when a non-formula
+specification is used)}
 
 \item{result}{A previous estimation object of class \code{bru}}
 }

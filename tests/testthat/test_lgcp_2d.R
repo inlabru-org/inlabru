@@ -34,7 +34,7 @@ test_that("2D LGCP fitting", {
   # test_that("2D LGCP fitting: INLA intercept", {
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    1.0912,
+    1.11,
     tolerance = midtol
   )
   expect_equal(
@@ -45,15 +45,15 @@ test_that("2D LGCP fitting", {
 
   index <- c(1, 456, 789, 1058, 1479)
   # test_that("2D LGCP fitting: INLA random field", {
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.random$mySmooth$mean[index],
-    c(-1.7432, 0.5305, -0.2831, 0.5830, -1.4833),
-    tolerance = midtol
+    tolerance = midtol,
+    style = "serialize"
   )
-  expect_equal(
+  expect_snapshot_value(
     fit$summary.random$mySmooth$sd[index],
-    c(1.5914, 0.8826, 0.8273, 0.7815, 1.0522),
-    tolerance = midtol
+    tolerance = midtol,
+    style = "serialize"
   )
   expect_equal(
     fit$summary.hyperpar["Range for mySmooth", "mean"],
@@ -75,17 +75,17 @@ test_that("2D LGCP fitting", {
     n.samples = 5, seed = 5657L,
     parallel.configs = FALSE
   )
-  # Prediction variability includes reordeing differences, so need large
+  # Prediction variability includes reordering differences, so need large
   # tolerances unless n.samples is large
-  expect_equal(
+  expect_snapshot_value(
     pr$mean[c(1, 255, 778, 1000)],
-    c(-2.7279196, -1.7653978, -1.7801908, -0.6127033),
-    tolerance = 1
+    tolerance = 1,
+    style = "serialize"
   )
-  expect_equal(
+  expect_snapshot_value(
     pr$sd[c(2, 215, 656, 1010)],
-    c(0.5892231, 0.4663549, 1.0070714, 1.2699464),
-    tolerance = 1
+    tolerance = 1,
+    style = "serialize"
   )
 
   # test_that("2D LGCP fitting: predicted intensity integral", {

@@ -16,6 +16,42 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
     prior.range = c(5, 0.01)
   )
 
+  #  if (FALSE) {
+  #    bm <- bench::mark(
+  #      ips_old = ipoints(
+  #        samplers = gorillas$plotsample$plots,
+  #        domain = gorillas$mesh,
+  #        int.args = list(use_new = FALSE)
+  #      ),
+  #      ips_new = ipoints(
+  #        samplers = gorillas$plotsample$plots,
+  #        domain = gorillas$mesh,
+  #        int.args = list(use_new = TRUE)
+  #      ),
+  #      check = FALSE)
+  #    ips_old <- ipoints(
+  #      samplers = gorillas$plotsample$plots,
+  #      domain = gorillas$mesh,
+  #      int.args = list(use_new = FALSE)
+  #    )
+  #    pl <- gorillas$plotsample$plots
+  #    pl$ID <- seq_len(NROW(pl))
+  #    ips_new <- ipoints(
+  #      samplers = pl,
+  #      domain = gorillas$mesh,
+  #      int.args = list(use_new = TRUE),
+  #      group = "ID"
+  #    )
+  #    ggplot() +
+  #      gg(gorillas$mesh) +
+  #      gg(ips_old, aes(size=weight, col="old")) +
+  #      gg(ips_new, aes(size=weight, col = "new"))
+  #    identical(ips_old, ips_new)
+  #    ggplot() +
+  #      gg(gorillas$mesh) +
+  #      gg(ips_new, aes(size=weight, col = factor(ID)))
+  #  }
+
   cmp <- coordinates ~ my.spde(main = coordinates, model = matern)
   fit <- lgcp(cmp,
     data = gorillas$plotsample$nests,

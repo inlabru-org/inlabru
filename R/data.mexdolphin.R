@@ -157,7 +157,7 @@ import.mexdolphin <- function() {
     Intercept(1) +
       df.lsigma(1) +
       spat(coordinates, model = matern)
-  pred <- ~ (log(1 - exp(-(distance / (exp(df.lsigma)))^-1)) + spat + Intercept + log(2))
+  pred <- ~ log(1 - exp(-(distance / exp(df.lsigma))^-1)) + spat + Intercept + log(2)
   r <- lgcp(
     data = mexdolphin$points,
     samplers = cbind(mexdolphin$samplers, data.frame(weight = 1)),

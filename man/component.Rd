@@ -35,6 +35,7 @@ component(...)
   replicate_selector = NULL,
   nrep = NULL,
   A.msk = NULL,
+  .envir = parent.frame(),
   envir_extra = NULL
 )
 }
@@ -51,8 +52,11 @@ but for the corresponding features of \code{INLA::f()}.}
 \item{weights, weights_layer, weights_selector}{Optional specification of effect scaling weights.
 Same syntax as for \code{main}.}
 
-\item{model}{Either one of "offset", "factor_full", "factor_contrast", "linear" or a model name or
-object accepted by INLA's \code{f} function. If set to NULL, then "linear" is used.}
+\item{model}{Either one of "offset", "factor_full", "factor_contrast", "linear",
+"fixed", or a model name or
+object accepted by INLA's \code{f} function. If set to NULL, then "linear" is used
+for vector inputs, and "fixed" for matrix input (converted internally to
+an iid model with fixed precision)}
 
 \item{mapper}{Information about how to do the mapping from the values evaluated in \code{main},
 and to the latent variables. Auto-detects spde model objects in model and
@@ -96,6 +100,8 @@ replication model. Same syntax as for \code{main}}
 \item{A.msk}{TODO: check/fix/deprecate this parameter.
 Likely doesn't work at the moment, and I've found no examples that use it.}
 
+\item{.envir}{Evaluation environment}
+
 \item{envir_extra}{TODO: check/fix this parameter.}
 }
 \description{
@@ -116,8 +122,10 @@ formula expression that can be interpreted by the \code{\link[=component_list.fo
 method, called inside \code{\link[=bru]{bru()}}.
 }
 \details{
-\code{\link[=bru]{bru()}} will understand formulae describing fixed effect models just like the other methods. For instance, the
-formula \code{y ~ x} will fit the linear combination of an effect named \code{x} and an intercept to
+As shorthand, \code{\link[=bru]{bru()}} will understand basic additive formulae describing fixed effect
+models. For instance, the
+components specification \code{y ~ x} will define the linear combination of an
+effect named \code{x} and an intercept to
 the response \code{y} with respect to the likelihood family stated when calling \code{\link[=bru]{bru()}}. Mathematically,
 the linear predictor \eqn{\eta} would be written down as
 
@@ -132,8 +140,10 @@ where:
 \item{\eqn{\psi = \beta * x }}{ is called the \emph{random effect} of \eqn{x}}
 }
 
-A problem that arises when using this kind of R formula is that it does not clearly reflect the mathematical
-formula. For instance, when providing the formula to inla, the resulting object will refer to the random
+A problem that arises when using this kind of R formula is that it does not
+clearly reflect the mathematical
+formula. For instance, when providing the formula to inla, the resulting
+object will refer to the random
 effect \eqn{\psi = \beta * x } as \code{x}. Hence, it is not clear if \code{x} refers to the covariate
 or the effect of the covariate.
 
@@ -149,13 +159,14 @@ Deprecated parameters:
 \section{Naming random effects}{
 
 
-In INLA, a simple random effect model would be expressed as
+In INLA, the \code{f()} notation is used to define more complex models, but
+a simple linear effect model can also be expressed as
 
 \itemize{\item{\code{formula = y ~ f(x, model = "linear")},}}
 
 where \code{f()} is the inla specific function to set up random effects of all kinds. The underlying
 predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
-\code{x} as the random effect's name. bru allows to rewrite this formula in order to explicitly state
+\code{x} as the random effect's name. bru allows rewriting this formula in order to explicitly state
 the name of the random effect and the name of the associated covariate. This is achieved by replacing \code{f}
 with an arbitrary name that we wish to assign to the effect, e.g.
 
@@ -195,17 +206,22 @@ summary(cmp)
 \donttest{
 if (require("INLA", quietly = TRUE)) {
 
-  # As an example, let us create a linear component. Here ,the component is
+  # As an example, let us create a linear component. Here, the component is
   # called "myEffectOfX" while the covariate the component acts on is called "x":
 
-  eff <- component("myEffectOfX", main = x, model = "linear")
-  summary(eff)
+  cmp <- component("myEffectOfX", main = x, model = "linear")
+  summary(cmp)
 
   # A more complicated component:
-  eff <- component("myEffectOfX",
+  cmp <- component("myEffectOfX",
     main = x,
     model = inla.spde2.matern(inla.mesh.1d(1:10))
   )
+
+  # Compound fixed effect component, where x and z are in the input data.
+  # The formula will be passed on to MatrixModels::model.Matrix:
+  cmp <- component("eff", ~ -1 + x:z, model = "fixed")
+  summary(cmp)
 }
 }
 

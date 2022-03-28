@@ -20,7 +20,8 @@ meshes, Raster objects and inla/inlabru predictions. The function invokes partic
 on the \link{class} of the first argument.
 }
 \examples{
-if (require("ggplot2", quietly = TRUE)) {
+if (require("ggplot2", quietly = TRUE) &&
+  require(ggpolypath, quietly = TRUE)) {
   # Load Gorilla data
 
   data(gorillas, package = "inlabru")

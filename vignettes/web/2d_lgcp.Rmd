@@ -81,7 +81,7 @@ plot shown below.
 Recall that the steps to specifying, fitting and predicting are:
 
 1. Specify a model, comprising (for 2D models) `coordinates` on the left of `~` and 
-an SPDE `+ Intercept` on the right. Please use the SPDE prior specification stated below.
+an SPDE `+ Intercept(1)` on the right. Please use the SPDE prior specification stated below.
 
 2. Call `lgcp( )`, passing it (with 2D models) the model components, the `SpatialPointsDataFrame` 
 containing the observed points and the `SpatialPolygonsDataFrame` defining the survey boundary
@@ -101,7 +101,7 @@ matern <- inla.spde2.pcmatern(mesh,
 cmp <- coordinates ~ mySmooth(coordinates,
   model = matern
 ) +
-  Intercept
+  Intercept(1)
 
 fit <- lgcp(cmp, nests, samplers = boundary, domain = list(coordinates = mesh))
 ```

@@ -197,19 +197,25 @@ test_that("1D LGCP fitting, compressed format", {
 
   mdl <- ~ spde1D(main = x, model = matern) + Intercept(1)
 
-  fit1 <- bru(mdl,
-              like(formula = x ~ .,
-                   family = "cp",
-                   data = pts2,
-                   domain = list(x = mesh1D),
-                   options = list(bru_compress_cp = FALSE))
+  fit1 <- bru(
+    mdl,
+    like(
+      formula = x ~ .,
+      family = "cp",
+      data = pts2,
+      domain = list(x = mesh1D),
+      options = list(bru_compress_cp = FALSE)
+    )
   )
-  fit2 <- bru(mdl,
-              like(formula = x ~ .,
-                   family = "cp",
-                   data = pts2,
-                   domain = list(x = mesh1D),
-                   options = list(bru_compress_cp = TRUE))
+  fit2 <- bru(
+    mdl,
+    like(
+      formula = x ~ .,
+      family = "cp",
+      data = pts2,
+      domain = list(x = mesh1D),
+      options = list(bru_compress_cp = TRUE)
+    )
   )
 
   expect_equal(
@@ -228,19 +234,25 @@ test_that("1D LGCP fitting, compressed format", {
     tolerance = midtol
   )
 
-  fit3 <- bru(mdl,
-              like(formula = x ~ spde1D + Intercept,
-                   family = "cp",
-                   data = pts2,
-                   domain = list(x = mesh1D),
-                   options = list(bru_compress_cp = FALSE))
+  fit3 <- bru(
+    mdl,
+    like(
+      formula = x ~ spde1D + Intercept,
+      family = "cp",
+      data = pts2,
+      domain = list(x = mesh1D),
+      options = list(bru_compress_cp = FALSE)
+    )
   )
-  fit4 <- bru(mdl,
-              like(formula = x ~ spde1D + Intercept,
-                   family = "cp",
-                   data = pts2,
-                   domain = list(x = mesh1D),
-                   options = list(bru_compress_cp = TRUE))
+  fit4 <- bru(
+    mdl,
+    like(
+      formula = x ~ spde1D + Intercept,
+      family = "cp",
+      data = pts2,
+      domain = list(x = mesh1D),
+      options = list(bru_compress_cp = TRUE)
+    )
   )
 
   expect_equal(
@@ -258,6 +270,4 @@ test_that("1D LGCP fitting, compressed format", {
     fit4$summary.random,
     tolerance = midtol
   )
-
 })
-

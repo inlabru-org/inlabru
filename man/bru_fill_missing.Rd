@@ -51,6 +51,12 @@ if (bru_safe_inla()) {
     )
   points$val <- bru_fill_missing(input, points, points$val)
   print(points)
+
+  # To fill in missing values in a grid:
+  print(input$val[c(3, 30)])
+  input$val[c(3, 30)] <- NA # Introduce missing values
+  input$val <- bru_fill_missing(input, input, input$val)
+  print(input$val[c(3, 30)])
 }
 }
 }
