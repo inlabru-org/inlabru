@@ -852,6 +852,7 @@ gg.inla.mesh.1d <- function(data, mapping = ggplot2::aes(.data[["x"]], .data[["y
 #' @family geomes for Raster data
 #'
 #' @examples
+#' \dontrun{
 #' # Some features require the raster and spatstat.data packages.
 #' if (require("spatstat.data", quietly = TRUE) &&
 #'   require("raster", quietly = TRUE) &&
@@ -868,6 +869,7 @@ gg.inla.mesh.1d <- function(data, mapping = ggplot2::aes(.data[["x"]], .data[["y
 #'
 #'   ggplot() +
 #'     gg(elev)
+#' }
 #' }
 gg.RasterLayer <- function(data, mapping = ggplot2::aes(x = .data[["x"]], y = .data[["y"]], fill = .data[["layer"]]), ...) {
   requireNamespace("ggplot2")
