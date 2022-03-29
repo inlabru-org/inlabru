@@ -721,6 +721,7 @@ gg.inla.mesh <- function(data,
                          nx = 500, ny = 500,
                          ...) {
   requireNamespace("ggplot2")
+  requireNamespace("INLA")
   if (is.null(color) && ("colour" %in% names(list(...)))) {
     color <- list(...)[["colour"]]
   }
