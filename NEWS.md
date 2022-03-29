@@ -1,5 +1,9 @@
 # inlabru (development version)
 
+* Revert to R language features compatible with R 4.0.5
+
+* Use `strategy="gaussian"` during iterations.
+
 # inlabru 2.5.0
 
 ## Features
