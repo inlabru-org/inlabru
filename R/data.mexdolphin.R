@@ -40,7 +40,8 @@
 #'
 #' @examples
 #' \donttest{
-#' if (require("ggplot2", quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE) &&
+#'     require("INLA", quietly = TRUE)) {
 #'   data(mexdolphin, package = "inlabru")
 #'   ggplot() +
 #'     gg(mexdolphin$mesh) +
