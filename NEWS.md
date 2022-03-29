@@ -1,3 +1,5 @@
+# inlabru (development version)
+
 # inlabru 2.5.1
 
 * Revert to R language features compatible with R 4.0.5
