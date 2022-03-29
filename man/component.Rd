@@ -215,7 +215,7 @@ if (bru_safe_inla(quietly = TRUE)) {
   # A more complicated component:
   cmp <- component("myEffectOfX",
     main = x,
-    model = inla.spde2.matern(inla.mesh.1d(1:10))
+    model = INLA::inla.spde2.matern(inla.mesh.1d(1:10))
   )
 
   # Compound fixed effect component, where x and z are in the input data.
