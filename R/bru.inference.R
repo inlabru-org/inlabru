@@ -2151,7 +2151,11 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         modifyList(
           inla.options.merged,
           list(
-            control.inla = list(int.strategy = "eb"),
+            control.inla = list(
+              control.vb = list(enable = FALSE),
+              strategy = "gaussian",
+              int.strategy = "eb"
+            ),
             control.compute = list(
               config = TRUE,
               dic = FALSE,
