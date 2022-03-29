@@ -1,28 +1,23 @@
 ## Test environments
-* ubuntu 20.04 (local, with INLA), R 4.1.2, R devel
-* ubuntu 20.04 (on github, with INLA), R 4.1.2, R devel
-* macOS-latest (on github, with INLA), R 4.1.2
-* windows-latest (on github, with INLA), R 4.1.2
+* ubuntu 20.04 (local, with INLA), R 4.0.5, R 4.1.3, R devel
+* ubuntu 20.04 (on github, with INLA), R 4.0.5, R 4.1.3, R devel
+* macOS-latest (on github, with INLA), R 4.1.3
+* windows-latest (on github, with INLA), R 4.1.3
 * win-builder, R devel
-* For the ubuntu github platforms, tests were also done without installing
-  packages in Suggests.
+* For the github platforms, separate tests were also
+  done without installing packages in Suggests.
 
 ## Submission notes
-* Bugfix and minor feature release 2.5.0
+* Bugfix release 2.5.1
 * NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
-* CRAN checks for old version, 2.4.0:
-  - donttest: "failure: length > 1 in coercion to logical" (see partial reports below)
-    These errors were traced to the INLA package, and are fixed there since
-    version 22.03.03; The CRAN installations of INLA need to be upgraded
-    to fix this issue.  The "stable" INLA version hasn't been changed yet, but
-    the inlabru package points to the "testing" version, see
-    https://www.r-inla.org/download-install
-    For some platforms (notably with old GLIBC versions), inla.binary.install()
-    needs to be run after the regular package installation, to install compatible
-    program binaries.
-* Checks for new version, 2.5.0 (with latest INLA, 22.03.16):
+* CRAN checks for old version, 2.5.0:
+  ERROR: In v2.5.0, `...names()` had been introduced without noting it was only
+  introduced in R4.1. Pre-submission testing had been turned off for the
+  old R release due to technical issues in the past that are now resolved.
+  The 2.5.1 code has been reverted to the `names(list(...))` pattern,
+  to support use on R 4.0.5.
+* Checks for new version, 2.5.1 (with latest INLA, 22.03.28):
   - Spurious error message about potentially invalid doi, see below
-
 
 ## R CMD check results
 
@@ -36,11 +31,6 @@ Comments:
     INLA
   Availability using Additional_repositories specification:
     INLA   yes   https://inla.r-inla-download.org/R/testing
-    
-  For R 4.0.5 and older, separate INLA package building may be needed to install
-  the newer INLA version suggested by inlabru, but for the newer R versions
-  direct installation can be done. Bugs relating to vector-if-statements
-  were fixed in INLA version 22.03.03
     
 * Spurious doi problems noted by win-builder.
   Manually accessing https://doi.org/10.1111/2041-210X.13168 correctly leads to
@@ -72,23 +62,11 @@ Comments:
 ## Downstream dependencies
 inlabru does not have any reverse dependencies
 
-## Failure reports for previous inlabru version 2.4.0
+## Failure reports for previous inlabru version 2.5.1
 
-### Previous inlabru (2.4.0) with INLA 22.02.16-2 and INLA 22.02.28-1
-
- ----------- FAILURE REPORT -------------- 
- --- failure: length > 1 in coercion to logical ---
- --- srcref --- 
-: 
- --- package (from environment) --- 
-INLA
- --- call from context --- 
-FUN(X[[i]], ...)
- --- call from argument --- 
-is.null(x) || is.na(x)
- --- R stacktrace ---
-where 1: FUN(X[[i]], ...)
-where 2: lapply(X = X, FUN = FUN, ...)
-where 3: sapply(marginals.random, function(x) (is.null(x) || is.na(x)))
-where 4: inla.collect.random(results.dir, debug)
-
+checking R code for possible problems ... [13s/13s] NOTE
+bru_mapper.default: no visible global function definition for
+  ‘...names’
+gg.inla.mesh: no visible global function definition for ‘...names’
+Undefined global functions or variables:
+  ...names
