@@ -21,7 +21,7 @@ setClass("inla.mesh")
 #'
 #' @examples
 #' \dontrun{
-#' if (require("INLA", quietly = TRUE)) {
+#' if (bru_safe_inla(quietly = TRUE)) {
 #'   # Load Gorilla data
 #'
 #'   data("gorillas", package = "inlabru")
