@@ -805,7 +805,7 @@ vertex.projection.1d <- function(points, mesh, group = NULL, column = "weight", 
 #' @examples
 #' \donttest{
 #' # ipoints needs INLA
-#' if (require("INLA", quietly = TRUE)) {
+#' if (bru_safe_inla(quietly = TRUE)) {
 #'   # Create integration points in two dimensions, x and y
 #'
 #'   ips <- cprod(

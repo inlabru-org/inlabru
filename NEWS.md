@@ -1,3 +1,11 @@
+# inlabru 2.5.2
+
+* More robust package checks
+
+* More robust namespace and INLA availability checks
+
+* Add package vignette with links to the website examples
+
 # inlabru 2.5.1
 
 * Revert to R language features compatible with R 4.0.5
