@@ -7,6 +7,8 @@
 
 [![CRAN
 Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
+[![inlabru status
+badge](https://inlabru-org.r-universe.dev/badges/inlabru)](https://inlabru-org.r-universe.dev)
 [![R build
 status](https://github.com/inlabru-org/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![R code coverage
