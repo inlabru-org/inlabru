@@ -255,10 +255,10 @@
 <code class="sourceCode R"><span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda</span>
-<span class="co">#&gt;      mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
-<span class="co">#&gt; 1 260.889 60.26999 167.1032 255.9713 395.2561 147.4361 441.5673 0.2310178</span>
+<span class="co">#&gt;       mean      sd   q0.025   median   q0.975     smin     smax        cv</span>
+<span class="co">#&gt; 1 259.6574 52.7423 177.1235 255.2137 369.0916 157.4347 440.2575 0.2031227</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 3632.472</span></code></pre></div>
+<span class="co">#&gt; 1 2781.751</span></code></pre></div>
 <p>and including the randomness about the expected number. In this case, it turns out that you need lots of posterior samples, e.g. 2,000 to smooth out the Monte Carlo error in the posterior, and this takes a little while to compute:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">450</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
@@ -340,10 +340,10 @@
 <span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
-<span class="co">#&gt;       mean       sd   q0.025   median   q0.975     smin     smax        cv</span>
-<span class="co">#&gt; 1 325.2418 93.91408 159.5538 321.7133 536.6826 133.7521 607.9504 0.2887516</span>
+<span class="co">#&gt;       mean     sd   q0.025   median   q0.975     smin     smax       cv</span>
+<span class="co">#&gt; 1 338.5663 108.61 175.0802 333.9828 586.3861 161.1799 826.5688 0.320794</span>
 <span class="co">#&gt;        var</span>
-<span class="co">#&gt; 1 8819.855</span>
+<span class="co">#&gt; 1 11796.14</span>
 
 <span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>
@@ -371,7 +371,7 @@
 <code class="sourceCode R"><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit</span><span class="op">)</span>
 <span class="co">#&gt;   Model       DIC Delta.DIC</span>
 <span class="co">#&gt; 1   fit -794.7826  0.000000</span>
-<span class="co">#&gt; 2  fit1 -793.1186  1.663937</span>
+<span class="co">#&gt; 2  fit1 -793.1186  1.663967</span>
 
 <span class="co"># Look at the goodness-of-fit of the two models in the distance dimension</span>
 <span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span>
