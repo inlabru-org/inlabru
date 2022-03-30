@@ -1,4 +1,5 @@
 ## Test environments
+
 * ubuntu 20.04 (local, with INLA), R 4.0.5, R 4.1.3, R devel
 * ubuntu 20.04 (on github, with INLA), R 4.0.5, R 4.1.3, R devel
 * macOS-latest (on github, with INLA), R 4.1.3
@@ -8,13 +9,15 @@
   done without installing packages in Suggests.
 
 ## Submission notes
-* Bugfix release 2.5.1
+
+* Bugfix release 2.5.2
 * NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
 * CRAN checks for old version, 2.5.0:
-  ERROR: In v2.5.0, `...names()` had been introduced without noting it was only
+  ERROR: "no visible global function definition for ‘...names’"
+  In v2.5.0, `...names()` had been introduced without noting it was only
   introduced in R4.1. Pre-submission testing had been turned off for the
   old R release due to technical issues in the past that are now resolved.
-  The 2.5.1 code has been reverted to the `names(list(...))` pattern,
+  The 2.5.2 code has been reverted to the `names(list(...))` pattern,
   to support use on R 4.0.5.
 * Checks for new version, 2.5.1 (with latest INLA, 22.03.28):
   - Spurious error message about potentially invalid doi, see below
@@ -60,9 +63,10 @@ Comments:
 
 
 ## Downstream dependencies
+
 inlabru does not have any reverse dependencies
 
-## Failure reports for previous inlabru version 2.5.1
+## Failure reports for previous inlabru version 2.5.0
 
 checking R code for possible problems ... [13s/13s] NOTE
 bru_mapper.default: no visible global function definition for
