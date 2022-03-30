@@ -58,11 +58,24 @@ remotes::install_github("inlabru-org/inlabru", ref="stable")
 ```
 
 You can install the development version of inlabru from
-[GitHub](https://github.com/inlabru-org/inlabru) with:
+[GitHub](https://github.com/inlabru-org/inlabru) with
 
 ``` r
 # install.packages("remotes")
 remotes::install_github("inlabru-org/inlabru", ref="devel")
+```
+
+or track the development version builds via
+[inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/ui#builds):
+
+``` r
+# Enable universe(s) by inlabru-org
+options(repos = c(
+  inlabruorg = 'https://inlabru-org.r-universe.dev',
+  CRAN = 'https://cloud.r-project.org'))
+
+# Install some packages
+install.packages('inlabru')
 ```
 
 ## Example
@@ -79,8 +92,9 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_22.03.16 built 2022-03-16 13:18:13 UTC.
+#> This is INLA_22.03.28 built 2022-03-28 10:27:33 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
+#>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
 
 # Load the data
