@@ -806,7 +806,7 @@ component_list.list <- function(object,
 #' objects. The environment from the first argument will be applied to the resulting list.
 #' @rdname component_list
 `c.component_list` <- function(...) {
-  env <- environment(..1)
+  env <- environment(list(...)[[1]])
   object <- NextMethod()
   class(object) <- c("component_list", "list")
   environment(object) <- env
