@@ -1461,15 +1461,15 @@ nonlin_predictor <- function(model, lhoods, state, A) {
   do.call(
     c,
     lapply(
-      lhoods,
-      function(lh) {
+      seq_along(lhoods),
+      function(lh_idx) {
         as.vector(
           evaluate_model(
             model = model,
-            data = lh[["data"]],
+            data = lhoods[[lh_idx]][["data"]],
             state = list(state),
-            A = A,
-            predictor = bru_like_expr(lh, model[["effects"]]),
+            A = A[[lh_idx]],
+            predictor = bru_like_expr(lhoods[[lh_idx]], model[["effects"]]),
             format = "matrix"
           )
         )

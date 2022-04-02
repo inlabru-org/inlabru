@@ -1,5 +1,7 @@
 # inlabru (development version)
 
+* Propagate multi-likelihood A-matrix information instead of recomputing
+
 # inlabru 2.5.2
 
 * More robust package checks
