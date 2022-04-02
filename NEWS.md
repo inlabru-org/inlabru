@@ -1,6 +1,7 @@
 # inlabru (development version)
 
-* Propagate multi-likelihood A-matrix information instead of recomputing
+* Propagate multi-likelihood A-matrix information instead of recomputing.
+  Fixes iteration issue for bym2 and other bru_mapper_collect models.
 
 # inlabru 2.5.2
 
