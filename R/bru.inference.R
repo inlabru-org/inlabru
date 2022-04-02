@@ -1563,7 +1563,7 @@ bru_line_search <- function(model,
 
   if (length(lin_pred1) != length(nonlin_pred)) {
     warning(
-      paste0("Please notify the package developer:",
+      paste0("Please notify the inlabru package developer:",
              "\nThe line search linear and nonlinear predictors have different lengths.",
              "\nThis should not happen!"),
       immediate. = TRUE
