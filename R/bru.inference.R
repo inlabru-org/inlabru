@@ -1560,6 +1560,16 @@ bru_line_search <- function(model,
   lin_pred0 <- lin_predictor(lin, state0)
   lin_pred1 <- lin_predictor(lin, state1)
   nonlin_pred <- nonlin_predictor(model, lhoods, state1, A)
+
+  if (length(lin_pred1) != length(nonlin_pred)) {
+    warning(
+      paste0("Please notify the package developer:",
+             "\nThe line search linear and nonlinear predictors have different lengths.",
+             "\nThis should not happen!"),
+      immediate. = TRUE
+    )
+  }
+
   step_scaling <- 1
 
   norm01 <- pred_norm(lin_pred1 - lin_pred0)
