@@ -1538,6 +1538,12 @@ bru_line_search <- function(model,
     )
   }
 
+  if (is.null(weights)) {
+    warning("NULL weights detected for line search. Using weights = 1 instead.",
+            immediate. = TRUE)
+    weights = 1
+  }
+
   fact <- options$bru_method$factor
 
   # Metrics ----
@@ -2171,7 +2177,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
               dic = FALSE,
               waic = FALSE
             ),
-            control.predictor = list(compute = FALSE)
+            # Required for line search weights:
+            control.predictor = list(compute = TRUE)
           )
         )
     }

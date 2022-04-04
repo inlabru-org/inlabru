@@ -2,6 +2,9 @@
 
 * Propagate multi-likelihood A-matrix information instead of recomputing.
   Fixes iteration issue for bym2 and other bru_mapper_collect models.
+  
+* Turn on predictor summaries during iterations to allow `inla.mode="classic"`
+  to use proper line search.
 
 # inlabru 2.5.2
 
