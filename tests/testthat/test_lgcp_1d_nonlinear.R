@@ -15,6 +15,21 @@ test_that("Mexdolphin: Hazard rate detection function", {
   pts <-
     mexdolphin$points
 
+  fit_classic <- lgcp(
+    components = cmp,
+    pts,
+    ips = ips,
+    formula = form,
+    options = list(
+      bru_verbose = 0,
+      bru_compress_cp = TRUE,
+      bru_max_iter = 10,
+      verbose = FALSE,
+      bru_initial = list(Intercept = 0, lsig = -1),
+      inla.mode = "classic"
+    )
+  )
+
   fit <- lgcp(
     components = cmp,
     pts,
@@ -25,7 +40,8 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_compress_cp = TRUE,
       bru_max_iter = 10,
       verbose = FALSE,
-      bru_initial = list(Intercept = 0, lsig = -1)
+      bru_initial = list(Intercept = 0, lsig = -1),
+      inla.mode = "experimental"
     )
   )
 
@@ -87,6 +103,11 @@ test_that("Mexdolphin: Hazard rate detection function", {
       data = data.frame(ips)
       )
   }
+
+  expect_equal(fit_classic$summary.fixed["lsig", "mean"], 1.03741, tolerance = midtol)
+  expect_equal(fit_classic$summary.fixed["lsig", "sd"], 0.5184620, tolerance = midtol)
+  expect_equal(fit_classic$summary.fixed["Intercept", "mean"], 2.32, tolerance = midtol)
+  expect_equal(fit_classic$summary.fixed["Intercept", "sd"], 0.2899217, tolerance = midtol)
 
   expect_equal(fit$summary.fixed["lsig", "mean"], 1.06, tolerance = midtol)
   expect_equal(fit$summary.fixed["lsig", "sd"], 0.5183252, tolerance = midtol)

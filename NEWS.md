@@ -1,5 +1,25 @@
 # inlabru (development version)
 
+* Propagate multi-likelihood A-matrix information instead of recomputing.
+  Fixes iteration issue for bym2 and other bru_mapper_collect models.
+  
+* Turn on predictor summaries during iterations to allow `inla.mode="classic"`
+  to use proper line search.
+
+# inlabru 2.5.2
+
+* More robust package checks
+
+* More robust namespace and INLA availability checks
+
+* Add package vignette with links to the website examples
+
+# inlabru 2.5.1
+
+* Revert to R language features compatible with R 4.0.5
+
+* Use `strategy="gaussian"` during iterations.
+
 # inlabru 2.5.0
 
 ## Features

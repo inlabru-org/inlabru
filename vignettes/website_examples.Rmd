@@ -1,0 +1,66 @@
+---
+title: "Examples on the inlabru website"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Examples on the inlabru website}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=FALSE,include=FALSE}
+```
+
+## Package examples
+
+These potentially long running examples/tutorials are available on
+(https://inlabru-org.github.io/inlabru/)
+
+```{r, echo=FALSE,results="asis"}
+files <- list.files("web", "\\.Rmd$")
+for (file in file.path("web", files)) {
+  lines <- readLines(file, n = 10)
+  title_idx <- grep("^title: ", lines)
+  if (length(title_idx) > 0) {
+    title <- sub("^title: ", "", lines[title_idx[1]])
+    title <- sub('^"', "", title)
+    title <- sub('"$', "", title)
+    cat("* [",
+        title,
+        "](https://inlabru-org.github.io/inlabru/articles/",
+        sub("\\.Rmd", ".html", file),
+        ")\n",
+        sep = "")
+  }
+}
+```
+
+## Package vignettes
+
+These package vignettes are also available on
+(https://inlabru-org.github.io/inlabru/)
+
+```{r, echo=FALSE,results="asis"}
+files <- list.files(".", "\\.Rmd$")
+for (file in files) {
+  lines <- readLines(file, n = 10)
+  title_idx <- grep("^title: ", lines)
+  if (length(title_idx) > 0) {
+    title <- sub("^title: ", "", lines[title_idx[1]])
+    title <- sub('^"', "", title)
+    title <- sub('"$', "", title)
+    cat("* [",
+        title,
+        "](https://inlabru-org.github.io/inlabru/articles/",
+        sub("\\.Rmd", ".html", file),
+        ")\n",
+        sep = "")
+  }
+}
+```

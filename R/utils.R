@@ -28,7 +28,16 @@ bru_safe_inla <- function(multicore = NULL,
           interactive()
     }
     if (!multicore) {
-      n.t <- INLA::inla.getOption("num.threads")
+      n.t <- tryCatch(
+        INLA::inla.getOption("num.threads"),
+        error = function(e) { e }
+      )
+      if (inherits(n.t, "simpleError")) {
+        if (!quietly) {
+          message("inla.getOption() failed. INLA not installed correctly.")
+        }
+        return(FALSE)
+      }
       if (!quietly) {
         message(paste0("Current num.threads is '", n.t, "'."))
       }

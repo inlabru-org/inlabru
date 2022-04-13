@@ -330,7 +330,7 @@ component <- function(...) {
 #'
 #' @examples
 #' \donttest{
-#' if (require("INLA", quietly = TRUE)) {
+#' if (bru_safe_inla(quietly = TRUE)) {
 #'
 #'   # As an example, let us create a linear component. Here, the component is
 #'   # called "myEffectOfX" while the covariate the component acts on is called "x":
@@ -341,7 +341,7 @@ component <- function(...) {
 #'   # A more complicated component:
 #'   cmp <- component("myEffectOfX",
 #'     main = x,
-#'     model = inla.spde2.matern(inla.mesh.1d(1:10))
+#'     model = INLA::inla.spde2.matern(INLA::inla.mesh.1d(1:10))
 #'   )
 #'
 #'   # Compound fixed effect component, where x and z are in the input data.
@@ -806,7 +806,7 @@ component_list.list <- function(object,
 #' objects. The environment from the first argument will be applied to the resulting list.
 #' @rdname component_list
 `c.component_list` <- function(...) {
-  env <- environment(..1)
+  env <- environment(list(...)[[1]])
   object <- NextMethod()
   class(object) <- c("component_list", "list")
   environment(object) <- env

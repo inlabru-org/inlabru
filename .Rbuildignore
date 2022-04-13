@@ -19,4 +19,5 @@
 ^CRAN-RELEASE$
 ^\.lintr$
 ^CRAN-SUBMISSION$
+^revdep$
 ^sf$

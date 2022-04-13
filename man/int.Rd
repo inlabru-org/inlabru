@@ -28,7 +28,7 @@ of all column names in \code{data} and the dimensions stated by \code{dims}.
 \examples{
 \donttest{
 # ipoints needs INLA
-if (require("INLA", quietly = TRUE)) {
+if (bru_safe_inla(quietly = TRUE)) {
   # Create integration points in two dimensions, x and y
 
   ips <- cprod(

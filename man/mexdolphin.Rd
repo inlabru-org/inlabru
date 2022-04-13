@@ -37,7 +37,8 @@ distance 8 km (transect half-width 8 km).
 }
 \examples{
 \donttest{
-if (require("ggplot2", quietly = TRUE)) {
+if (bru_safe_inla(quietly = TRUE) &&
+    require("ggplot2", quietly = TRUE)) {
   data(mexdolphin, package = "inlabru")
   ggplot() +
     gg(mexdolphin$mesh) +

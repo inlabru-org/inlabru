@@ -1461,15 +1461,15 @@ nonlin_predictor <- function(model, lhoods, state, A) {
   do.call(
     c,
     lapply(
-      lhoods,
-      function(lh) {
+      seq_along(lhoods),
+      function(lh_idx) {
         as.vector(
           evaluate_model(
             model = model,
-            data = lh[["data"]],
+            data = lhoods[[lh_idx]][["data"]],
             state = list(state),
-            A = A,
-            predictor = bru_like_expr(lh, model[["effects"]]),
+            A = A[[lh_idx]],
+            predictor = bru_like_expr(lhoods[[lh_idx]], model[["effects"]]),
             format = "matrix"
           )
         )
@@ -1538,6 +1538,12 @@ bru_line_search <- function(model,
     )
   }
 
+  if (is.null(weights)) {
+    warning("NULL weights detected for line search. Using weights = 1 instead.",
+            immediate. = TRUE)
+    weights = 1
+  }
+
   fact <- options$bru_method$factor
 
   # Metrics ----
@@ -1560,6 +1566,16 @@ bru_line_search <- function(model,
   lin_pred0 <- lin_predictor(lin, state0)
   lin_pred1 <- lin_predictor(lin, state1)
   nonlin_pred <- nonlin_predictor(model, lhoods, state1, A)
+
+  if (length(lin_pred1) != length(nonlin_pred)) {
+    warning(
+      paste0("Please notify the inlabru package developer:",
+             "\nThe line search linear and nonlinear predictors have different lengths.",
+             "\nThis should not happen!"),
+      immediate. = TRUE
+    )
+  }
+
   step_scaling <- 1
 
   norm01 <- pred_norm(lin_pred1 - lin_pred0)
@@ -2161,7 +2177,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
               dic = FALSE,
               waic = FALSE
             ),
-            control.predictor = list(compute = FALSE)
+            # Required for line search weights:
+            control.predictor = list(compute = TRUE)
           )
         )
     }
