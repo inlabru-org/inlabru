@@ -67,7 +67,7 @@ ibm_n() and ibm_values() methods also need to be provided."><!-- mathjax --><scr
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Implementation methods for mapper objects</h1>
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/effect.R" class="external-link"><code>R/effect.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/mappers.R" class="external-link"><code>R/mappers.R</code></a></small>
       <div class="d-none name"><code>bru_mapper_methods.Rd</code></div>
     </div>
 
@@ -193,7 +193,13 @@ ibm_valid_input(mapper, input, inla_f = FALSE, multi = 0L, ...)
 names(x)
 
 # S3 method for bru_mapper_collect
-names(x) &lt;- value</code></pre></div>
+names(x) &lt;- value
+
+# S3 method for bru_mapper_harmonics
+ibm_n(mapper, inla_f = FALSE, ...)
+
+# S3 method for bru_mapper_harmonics
+ibm_amatrix(mapper, input, inla_f = FALSE, ...)</code></pre></div>
     </div>
 
     <div class="section level2">

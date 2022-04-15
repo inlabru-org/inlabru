@@ -59,7 +59,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Methods for <code>bru_mapper</code> objects</h1>
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/effect.R" class="external-link"><code>R/effect.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/mappers.R" class="external-link"><code>R/mappers.R</code></a></small>
       <div class="d-none name"><code>bru_mapper.Rd</code></div>
     </div>
 
@@ -105,7 +105,15 @@
 
 <span class="fu">bru_mapper_multi</span><span class="op">(</span><span class="va">mappers</span>, <span class="va">...</span><span class="op">)</span>
 
-<span class="fu">bru_mapper_collect</span><span class="op">(</span><span class="va">mappers</span>, hidden <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+<span class="fu">bru_mapper_collect</span><span class="op">(</span><span class="va">mappers</span>, hidden <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
+
+<span class="fu">bru_mapper_harmonics</span><span class="op">(</span>
+  order <span class="op">=</span> <span class="fl">1</span>,
+  scaling <span class="op">=</span> <span class="fl">1</span>,
+  intercept <span class="op">=</span> <span class="cn">TRUE</span>,
+  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
+  <span class="va">...</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -157,6 +165,18 @@ only the first mapper visible to <code><a href="https://rdrr.io/pkg/INLA/man/f.h
 as for "bym2" models, as activated by the <code>inla_f</code> argument to <code>ibm_n</code>,
 <code>ibm_values</code>, and <code>ibm_amatrix</code>. Set to <code>FALSE</code> to always access the full
 mapper, e.g. for <code>rgeneric</code> models</p></dd>
+<dt>order</dt>
+<dd><p>For <code>bru_mapper_harmonics</code>, specifies the maximum <code>cos</code>/<code>sin</code>
+order. (Default 1)</p></dd>
+<dt>scaling</dt>
+<dd><p>For <code>bru_mapper_harmonics</code>, specifies an optional vector of
+scaling factors of length <code>intercept + order</code>, or a common single scalar.</p></dd>
+<dt>intercept</dt>
+<dd><p>logical; For <code>bru_mapper_harmonics</code>, if <code>TRUE</code>, the first
+basis function is a constant. (Default <code>TRUE</code>)</p></dd>
+<dt>interval</dt>
+<dd><p>numeric length-2 vector specifying a domain interval.
+Default <code>c(0, 1)</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -203,6 +223,15 @@ extra arguments such as <code>multi</code> on to the methods (this means it supp
 both regular vector values and <code>multi=1</code> data.frame values).</p></li>
 </ul><ul><li><p><code>bru_mapper_multi</code> constructs a kronecker product mapping</p></li>
 </ul><ul><li><p><code>bru_mapper_collect</code> constructs concatenated collection mapping</p></li>
+</ul><ul><li><p><code>bru_mapper_harmonics</code> constructs a mapper for <code>cos</code>/<code>sin</code> functions
+of orders 1 (if <code>intercept</code> is <code>TRUE</code>, otherwise 0) through <code>order</code>. The total
+number of basis functions is <code>intercept + 2 * order</code>.  Optionally, each order
+can be given a non-unit scaling, via the <code>scaling</code> vector, of length
+<code>intercept + order</code>. This can be used to
+give an effective spectral prior, e.g.
+<code>bru_mapper_harmonics(order = 4, scaling = 1 / (1 + (0:4)^2)^2)</code>.
+The period for the first order harmonics is shifted and scaled to match
+<code>interval</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
