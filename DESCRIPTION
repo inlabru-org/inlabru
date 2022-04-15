@@ -115,6 +115,7 @@ Collate:
     'inlabru.R'
     'integration.R'
     'local_testthat.R'
+    'mappers.R'
     'mesh.R'
     'model.R'
     'nlinla.R'
