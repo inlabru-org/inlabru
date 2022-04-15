@@ -5,6 +5,8 @@
   
 * Turn on predictor summaries during iterations to allow `inla.mode="classic"`
   to use proper line search.
+  
+* Add `bru_mapper_harmonics` mapper for `cos` and `sin` basis sets.
 
 # inlabru 2.5.2
 

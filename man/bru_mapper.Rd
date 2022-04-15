@@ -204,11 +204,22 @@ both regular vector values and \code{multi=1} data.frame values).
 \itemize{
 \item \code{bru_mapper_harmonics} constructs a mapper for \code{cos}/\code{sin} functions
 of orders 1 (if \code{intercept} is \code{TRUE}, otherwise 0) through \code{order}. The total
-number of basis functions is \code{intercept + 2 * order}.  Optionally, each order
-can be given a non-unit scaling, via the \code{scaling} vector, of length
-\code{intercept + order}. This can be used to
-give an effective spectral prior, e.g.
-\code{bru_mapper_harmonics(order = 4, scaling = 1 / (1 + (0:4)^2)^2)}.
+number of basis functions is \code{intercept + 2 * order}.
+
+Optionally, each order can be given a non-unit scaling, via the \code{scaling}
+vector, of length \code{intercept + order}. This can be used to
+give an effective spectral prior. For example, let\preformatted{scaling = 1 / (1 + (0:4)^2)
+A1 = bru_mapper_harmonics(order = 4)
+u1 <- A1 \%*\% rnorm(9, sd = scaling)
+}
+
+Then, with\preformatted{A2 = bru_mapper_harmonics(order = 4, scaling = scaling)
+u2 = A2 \%*\% rnorm(9)
+}
+
+the stochastic properties of \code{u1} and \code{u2} will be the same, with \code{scaling^2}
+determining the variance for each frequency contribution.
+
 The period for the first order harmonics is shifted and scaled to match
 \code{interval}.
 }

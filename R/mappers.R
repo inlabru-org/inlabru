@@ -1087,11 +1087,24 @@ ibm_valid_input.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, mu
 #'   Default `c(0, 1)`.
 #' @details * `bru_mapper_harmonics` constructs a mapper for `cos`/`sin` functions
 #'   of orders 1 (if `intercept` is `TRUE`, otherwise 0) through `order`. The total
-#'   number of basis functions is `intercept + 2 * order`.  Optionally, each order
-#'   can be given a non-unit scaling, via the `scaling` vector, of length
-#'   `intercept + order`. This can be used to
-#'   give an effective spectral prior, e.g.
-#'   `bru_mapper_harmonics(order = 4, scaling = 1 / (1 + (0:4)^2)^2)`.
+#'   number of basis functions is `intercept + 2 * order`.
+#'
+#'   Optionally, each order can be given a non-unit scaling, via the `scaling`
+#'   vector, of length `intercept + order`. This can be used to
+#'   give an effective spectral prior. For example, let
+#'   ```
+#'   scaling = 1 / (1 + (0:4)^2)
+#'   A1 = bru_mapper_harmonics(order = 4)
+#'   u1 <- A1 %*% rnorm(9, sd = scaling)
+#'   ```
+#'   Then, with
+#'   ```
+#'   A2 = bru_mapper_harmonics(order = 4, scaling = scaling)
+#'   u2 = A2 %*% rnorm(9)
+#'   ```
+#'   the stochastic properties of `u1` and `u2` will be the same, with `scaling^2`
+#'   determining the variance for each frequency contribution.
+#'
 #'   The period for the first order harmonics is shifted and scaled to match
 #'   `interval`.
 #' @export
