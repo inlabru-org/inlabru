@@ -1007,8 +1007,10 @@ expand_to_dataframe <- function(x, data = NULL) {
     result <- sp::SpatialPointsDataFrame(x, data = data)
   } else if (inherits(x, "Spatial")) {
     result <- sp::cbind.Spatial(x, data)
-  } else {
+  } else if (is.data.frame(x)) {
     result <- cbind(x, data)
+  } else {
+    result <- c(x, as.list(data))
   }
   result
 }
@@ -1261,22 +1263,22 @@ generate.bru <- function(object,
   # a application of expand.grid())
   # # TODO: Check if when removing this, all the other drange code can also
   # safely be removed.
-  if (class(data)[1] == "list") {
-    # Todo: check if this feature works at all.
-    # TODO: add method ipoints.list to handle this;
-    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code
-    # from generate()
-    warning(paste0(
-      "Attempting to convert data list into gridded data.\n",
-      "This probably doesn't work.\n",
-      "Please contact the package developers if you use this feature."
-    ))
-    lhs.names <- names(data)
-    add.pts <- lapply(lhs.names, function(nm) {
-      ipoints(object$bru_info$lhoods$default$drange[[nm]], name = nm)
-    })
-    data <- do.call(cprod, add.pts)
-  }
+#  if (class(data)[1] == "list") {
+#    # Todo: check if this feature works at all.
+#    # TODO: add method ipoints.list to handle this;
+#    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code
+#    # from generate()
+#    warning(paste0(
+#      "Attempting to convert data list into gridded data.\n",
+#      "This probably doesn't work.\n",
+#      "Please contact the package developers if you use this feature."
+#    ))
+#    lhs.names <- names(data)
+#    add.pts <- lapply(lhs.names, function(nm) {
+#      ipoints(object$bru_info$lhoods$default$drange[[nm]], name = nm)
+#    })
+#    data <- do.call(cprod, add.pts)
+#  }
 
   state <- evaluate_state(
     object$bru_info$model,

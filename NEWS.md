@@ -8,6 +8,8 @@
   
 * Add `bru_mapper_harmonics` mapper for `cos` and `sin` basis sets.
 
+* Allow `predict()` input data to be be a list.
+
 # inlabru 2.5.2
 
 * More robust package checks
