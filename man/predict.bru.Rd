@@ -10,6 +10,8 @@
   formula = NULL,
   n.samples = 100,
   seed = 0L,
+  probs = c(0.025, 0.5, 0.075),
+  return.samples = FALSE,
   num.threads = NULL,
   include = NULL,
   exclude = NULL,
@@ -33,6 +35,10 @@ calculate the posterior statistics. The default is rather low but provides
 a quick approximate result.}
 
 \item{seed}{Random number generator seed passed on to \code{inla.posterior.sample}}
+
+\item{probs}{A numeric vector of probabilities with values in \link{0,1}, passed to \code{stats::quantile}}
+
+\item{return.samples}{If TRUE, returns a matrix where each column is a sample}
 
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
