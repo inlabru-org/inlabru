@@ -1048,7 +1048,6 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' a quick approximate result.
 #' @param seed Random number generator seed passed on to `inla.posterior.sample`
 #' @param probs A numeric vector of probabilities with values in [0,1], passed to \code{stats::quantile}
-#' @param return.samples If TRUE, returns a matrix where each column is a sample
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
@@ -1085,7 +1084,6 @@ predict.bru <- function(object,
                         n.samples = 100,
                         seed = 0L,
                         probs = c(0.025, 0.5, 0.975),
-                        return.samples = FALSE,
                         num.threads = NULL,
                         include = NULL,
                         exclude = NULL,
@@ -1130,8 +1128,7 @@ predict.bru <- function(object,
             function(v) v[[nm]]
           ),
           x = vals[[1]][, covar, drop = FALSE],
-          probs = probs,
-          cbind.only = return.samples
+          probs = probs
         )
     }
     is.annot <- vapply(names(smy), function(v) all(smy[[v]]$sd == 0), TRUE)
@@ -1168,8 +1165,7 @@ predict.bru <- function(object,
             vals,
             function(v) v[[nm]]
           ),
-          probs = probs,
-          cbind.only = return.samples
+          probs = probs
         )
       if (!drop &&
         (NROW(data) == NROW(tmp))) {
@@ -1179,7 +1175,7 @@ predict.bru <- function(object,
       }
     }
   } else {
-    tmp <- bru_summarise(data = vals, probs = probs, cbind.only = return.samples)
+    tmp <- bru_summarise(data = vals, probs = probs)
     if (!drop &&
       (NROW(data) == NROW(tmp))) {
       smy <- expand_to_dataframe(data, tmp)
