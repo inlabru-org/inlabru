@@ -1084,7 +1084,7 @@ predict.bru <- function(object,
                         formula = NULL,
                         n.samples = 100,
                         seed = 0L,
-                        probs = c(0.025, 0.5, 0.075),
+                        probs = c(0.025, 0.5, 0.975),
                         return.samples = FALSE,
                         num.threads = NULL,
                         include = NULL,
@@ -1421,7 +1421,7 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 # @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
 # @return A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
 
-bru_summarise <- function(data, probs = c(0.025, 0.5, 0.075), x = NULL, cbind.only = FALSE) {
+bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975), x = NULL, cbind.only = FALSE) {
   if (is.list(data)) {
     data <- do.call(cbind, data)
   }

@@ -10,7 +10,7 @@
   formula = NULL,
   n.samples = 100,
   seed = 0L,
-  probs = c(0.025, 0.5, 0.075),
+  probs = c(0.025, 0.5, 0.975),
   return.samples = FALSE,
   num.threads = NULL,
   include = NULL,
