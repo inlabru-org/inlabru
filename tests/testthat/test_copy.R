@@ -73,12 +73,11 @@ test_that("Component copy feature", {
     f(x1, model = "rw2", values = 1:4, scale.model = TRUE) +
     f(x2, copy = "x1", fixed = FALSE)
   fit <- INLA::inla(
-    formula = inlaform, data = mydata, family = "poisson",
-    #                    inla.mode = bru_options_get("inla.mode"),
-    inla.mode = "twostage",
-    control.compute = list(config = TRUE)
-    # ,
-    #                    control.inla = list(int.strategy = "eb")
+    formula = inlaform,
+    data = mydata, family = "poisson",
+    inla.mode = bru_options_get("inla.mode"),
+    control.compute = list(config = TRUE),
+    control.inla = list(int.strategy = "eb")
   )
 
   cmp <- y ~ -1 +
