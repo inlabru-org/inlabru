@@ -229,9 +229,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     identical(int.args[["method"]], "stable")) {
     ips <- data.frame(
       x = domain$loc,
-      weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0)
+      weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0),
+      group = 1
     )
-    colnames(ips) <- c(name, "weight")
+    colnames(ips) <- c(name, "weight", "group")
   } else if (is_1d) {
     domain_range <-
       if (inherits(domain, "inla.mesh.1d")) {
