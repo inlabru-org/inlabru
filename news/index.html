@@ -155,8 +155,7 @@
 <p>Add <code>_eval</code> suffix feature for <code>generate.bru</code> and <code>predict.bru</code>, that provides a general evaluator function for each component, allowing evaluation of e.g. nonlinear effects of spatial covariates as a function of the covariate value instead of the by the spatial evaluator used in the component definition. For example, with <code>components = ~ covar(spatial_grid_df, model = "rw1")</code>, the prediction expression can have <code>~ covar_eval(covariate)</code>, where <code>covariate</code> is a data column in the prediction data object.</p>
 <p>For components with <code>group</code> and <code>replicate</code> features, these also need to be provided to the <code>_eval</code> function, with <code>..._eval(..., group = ..., replicate = ...)</code></p>
 <p>This feature is built on top of the <code>_latent</code> suffix feature, that gives direct access to the latent state variables of a component, so in order to use <code>_eval</code> in the model predictor itself, you must use <code>like(..., allow_latent = TRUE)</code> in the model definition.</p>
-</li>
-</ul></div>
+</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.7" id="inlabru-227">inlabru 2.2.7<a class="anchor" aria-label="anchor" href="#inlabru-227"></a></h2>
 <ul><li><p>Add support for <code>ngroup</code> and <code>nrep</code> in component definitions</p></li>
@@ -175,8 +174,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.4" id="inlabru-224">inlabru 2.2.4<a class="anchor" aria-label="anchor" href="#inlabru-224"></a></h2>
-<ul><li>Properly extract the joint latent conditional mode instead of the marginal latent conditional mode</li>
-</ul></div>
+<ul><li>Properly extract the joint latent conditional mode instead of the marginal latent conditional mode</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.2" id="inlabru-222">inlabru 2.2.2<a class="anchor" aria-label="anchor" href="#inlabru-222"></a></h2>
 <ul><li><p>Fixed issue with <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> logic for converting output to <code>Spatial*DataFrame</code></p></li>
@@ -185,8 +183,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.1" id="inlabru-221">inlabru 2.2.1<a class="anchor" aria-label="anchor" href="#inlabru-221"></a></h2>
-<ul><li>Fixed code regression bug for function input of covariates</li>
-</ul></div>
+<ul><li>Fixed code regression bug for function input of covariates</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.0" id="inlabru-220">inlabru 2.2.0<a class="anchor" aria-label="anchor" href="#inlabru-220"></a></h2>
 <ul><li><p>Support for the INLA “copy” feature, <code>comp2(input, copy = "comp1")</code></p></li>
@@ -213,25 +210,20 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.13" id="inlabru-2113">inlabru 2.1.13<a class="anchor" aria-label="anchor" href="#inlabru-2113"></a></h2><p class="text-muted">CRAN release: 2020-02-16</p>
-<ul><li>Fix CRAN complaint regarding documentation</li>
-</ul></div>
+<ul><li>Fix CRAN complaint regarding documentation</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.12" id="inlabru-2112">inlabru 2.1.12<a class="anchor" aria-label="anchor" href="#inlabru-2112"></a></h2><p class="text-muted">CRAN release: 2019-06-24</p>
-<ul><li>Workaround an integration points error for old (ca pre-2018) INLA versions</li>
-</ul></div>
+<ul><li>Workaround an integration points error for old (ca pre-2018) INLA versions</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.11" id="inlabru-2111">inlabru 2.1.11<a class="anchor" aria-label="anchor" href="#inlabru-2111"></a></h2>
-<ul><li>Add CITATION file</li>
-</ul></div>
+<ul><li>Add CITATION file</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.10" id="inlabru-2110">inlabru 2.1.10<a class="anchor" aria-label="anchor" href="#inlabru-2110"></a></h2>
-<ul><li>Fix internal sampling bug due to INLA changes</li>
-</ul></div>
+<ul><li>Fix internal sampling bug due to INLA changes</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.9" id="inlabru-219">inlabru 2.1.9<a class="anchor" aria-label="anchor" href="#inlabru-219"></a></h2><p class="text-muted">CRAN release: 2018-07-24</p>
 <ul><li>Remove unused <code>VignetteBuilder</code> entry from <code>DESCRIPTION</code>
-</li>
-</ul></div>
+</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.8" id="inlabru-218">inlabru 2.1.8<a class="anchor" aria-label="anchor" href="#inlabru-218"></a></h2>
 <ul><li><p>Update default options</p></li>
@@ -249,8 +241,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.4" id="inlabru-214">inlabru 2.1.4<a class="anchor" aria-label="anchor" href="#inlabru-214"></a></h2>
 <ul><li>
-<code><a href="../reference/iinla.html">iinla()</a></code> tracks convergence of both fixed and random effects</li>
-</ul></div>
+<code><a href="../reference/iinla.html">iinla()</a></code> tracks convergence of both fixed and random effects</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.3" id="inlabru-213">inlabru 2.1.3<a class="anchor" aria-label="anchor" href="#inlabru-213"></a></h2><p class="text-muted">CRAN release: 2018-02-11</p>
 <ul><li><p>Added matrix geom <code><a href="../reference/gg.matrix.html">gg.matrix()</a></code></p></li>
@@ -265,7 +256,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer></div>
