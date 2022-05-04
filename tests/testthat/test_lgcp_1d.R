@@ -41,23 +41,23 @@ test_that("1D LGCP fitting", {
   expect_snapshot_value(
     fit$summary.fixed["Intercept", "mean"],
     tolerance = midtol,
-    style = "serialize"
+    style = "deparse"
   )
   expect_snapshot_value(
     fit$summary.fixed["Intercept", "sd"],
     tolerance = midtol,
-    style = "serialize"
+    style = "deparse"
   )
 
   expect_snapshot_value(
     fit$summary.random$spde1D$mean[c(1, 27, 50)],
     tolerance = midtol,
-    style = "serialize"
+    style = "deparse"
   )
   expect_snapshot_value(
     fit$summary.random$spde1D$sd[c(2, 32, 29)],
     tolerance = midtol,
-    style = "serialize"
+    style = "deparse"
   )
 
   pr <- predict(fit,
@@ -129,23 +129,23 @@ test_that("1D LGCP fitting", {
   expect_snapshot_value(
     fit$summary.fixed["Intercept", "mean"],
     tolerance = midtol,
-    style = "serialize"
+    style = "deparse"
   )
   expect_snapshot_value(
     fit$summary.fixed["Intercept", "sd"],
     tolerance = midtol,
-    style = "serialize"
+    style = "deparse"
   )
 
   expect_snapshot_value(
     fit$summary.random$spde1D$mean[c(1, 27, 50)],
     tolerance = midtol,
-    style = "serialize"
+    style = "deparse"
   )
   expect_snapshot_value(
     fit$summary.random$spde1D$sd[c(2, 32, 29)],
     tolerance = midtol,
-    style = "serialize"
+    style = "deparse"
   )
 
   pr <- predict(
