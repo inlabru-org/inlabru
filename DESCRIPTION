@@ -22,7 +22,9 @@ Authors@R: c(
   person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
          comment = "Andy Seaton provided testing and bugfixes"),
   person("Suen", "Man Ho", email = "M.H.Suen@sms.ed.ac.uk", role = c("ctb", "cph"),
-         comment = "Man Ho Suen contributed features for aggregated responses")
+         comment = "Man Ho Suen contributed features for aggregated responses"),
+  person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
+         comment = "Pierre Roudier contributed general quantile summaries")
   )
 URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/
 BugReports: https://github.com/inlabru-org/inlabru/issues
