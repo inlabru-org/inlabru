@@ -88,6 +88,7 @@ posterior of the estimated random effects.</p>
   formula <span class="op">=</span> <span class="cn">NULL</span>,
   n.samples <span class="op">=</span> <span class="fl">100</span>,
   seed <span class="op">=</span> <span class="fl">0L</span>,
+  probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>,
   num.threads <span class="op">=</span> <span class="cn">NULL</span>,
   include <span class="op">=</span> <span class="cn">NULL</span>,
   exclude <span class="op">=</span> <span class="cn">NULL</span>,
@@ -114,6 +115,9 @@ calculate the posterior statistics. The default is rather low but provides
 a quick approximate result.</p></dd>
 <dt>seed</dt>
 <dd><p>Random number generator seed passed on to <code>inla.posterior.sample</code></p></dd>
+<dt>probs</dt>
+<dd><p>A numeric vector of probabilities with values in <code>[0, 1]</code>,
+passed to <code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">stats::quantile</a></code></p></dd>
 <dt>num.threads</dt>
 <dd><p>Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
