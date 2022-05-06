@@ -205,9 +205,9 @@ make_track_plots <- function(fit) {
 
   pl_combined <-
     ((pl1 |
-        pl3 + guides(linetype = "none")) /
-       (pl5 + guides(linetype = "none") |
-          pl6 + guides(linetype = "none"))) +
+        pl3 + ggplot2::guides(linetype = "none")) /
+       (pl5 + ggplot2::guides(linetype = "none") |
+          pl6 + ggplot2::guides(linetype = "none"))) +
     patchwork::plot_layout(guides = "collect") &
     ggplot2::theme(legend.position = "bottom")
 
