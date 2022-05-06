@@ -1047,6 +1047,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' calculate the posterior statistics. The default is rather low but provides
 #' a quick approximate result.
 #' @param seed Random number generator seed passed on to `inla.posterior.sample`
+#' @param probs A numeric vector of probabilities with values in `[0, 1]`, passed to `stats::quantile`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
@@ -1082,6 +1083,7 @@ predict.bru <- function(object,
                         formula = NULL,
                         n.samples = 100,
                         seed = 0L,
+                        probs = c(0.025, 0.5, 0.975),
                         num.threads = NULL,
                         include = NULL,
                         exclude = NULL,
@@ -1125,7 +1127,8 @@ predict.bru <- function(object,
             vals,
             function(v) v[[nm]]
           ),
-          x = vals[[1]][, covar, drop = FALSE]
+          x = vals[[1]][, covar, drop = FALSE],
+          probs = probs
         )
     }
     is.annot <- vapply(names(smy), function(v) all(smy[[v]]$sd == 0), TRUE)
@@ -1158,10 +1161,11 @@ predict.bru <- function(object,
     for (nm in vals.names) {
       tmp <-
         bru_summarise(
-          lapply(
+          data = lapply(
             vals,
             function(v) v[[nm]]
-          )
+          ),
+          probs = probs
         )
       if (!drop &&
         (NROW(data) == NROW(tmp))) {
@@ -1171,7 +1175,7 @@ predict.bru <- function(object,
       }
     }
   } else {
-    tmp <- bru_summarise(vals)
+    tmp <- bru_summarise(data = vals, probs = probs)
     if (!drop &&
       (NROW(data) == NROW(tmp))) {
       smy <- expand_to_dataframe(data, tmp)
@@ -1408,11 +1412,12 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 #
 # @export
 # @param data A list of samples, each either numeric or a \code{data.frame}
+# @param probs A numeric vector of probabilities with values in `[0, 1]`, passed to `stats::quantile`
 # @param x A \code{data.frame} of data columns that should be added to the summary data frame
 # @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
 # @return A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
 
-bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
+bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975), x = NULL, cbind.only = FALSE) {
   if (is.list(data)) {
     data <- do.call(cbind, data)
   }
@@ -1423,11 +1428,15 @@ bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
     smy <- data.frame(
       apply(data, MARGIN = 1, mean, na.rm = TRUE),
       apply(data, MARGIN = 1, sd, na.rm = TRUE),
-      t(apply(data, MARGIN = 1, quantile, prob = c(0.025, 0.5, 0.975), na.rm = TRUE)),
+      t(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE)),
       apply(data, MARGIN = 1, min, na.rm = TRUE),
       apply(data, MARGIN = 1, max, na.rm = TRUE)
     )
-    colnames(smy) <- c("mean", "sd", "q0.025", "median", "q0.975", "smin", "smax")
+    qs_names <- paste0("q", probs)
+    if (any(qs_names == "q0.5")) {
+      qs_names[qs_names == "q0.5"] <- "median"
+    }
+    colnames(smy) <- c("mean", "sd", qs_names, "smin", "smax")
     smy$cv <- smy$sd / smy$mean
     smy$var <- smy$sd^2
   }
