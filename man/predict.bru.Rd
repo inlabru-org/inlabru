@@ -35,7 +35,8 @@ a quick approximate result.}
 
 \item{seed}{Random number generator seed passed on to \code{inla.posterior.sample}}
 
-\item{probs}{A numeric vector of probabilities with values in \verb{[0, 1]}, passed to \code{stats::quantile}}
+\item{probs}{A numeric vector of probabilities with values in \verb{[0, 1]},
+passed to \code{stats::quantile}}
 
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
