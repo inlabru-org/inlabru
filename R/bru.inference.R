@@ -1417,7 +1417,8 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 #   passed to `stats::quantile`
 # @param x A \code{data.frame} of data columns that should be added to the summary data frame
 # @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
-# @return A \code{data.frame} or `Spatial[Points/Pixels]DataFrame` with summary statistics
+# @return A \code{data.frame} or `Spatial[Points/Pixels]DataFrame` with summary statistics,
+# "mean", "sd", `paste0("q", probs)`, "mean.mc_std_err", "sd.mc_std_err"
 
 bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
                           x = NULL, cbind.only = FALSE) {
@@ -1431,17 +1432,21 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     smy <- data.frame(
       apply(data, MARGIN = 1, mean, na.rm = TRUE),
       apply(data, MARGIN = 1, sd, na.rm = TRUE),
-      t(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE)),
-      apply(data, MARGIN = 1, min, na.rm = TRUE),
-      apply(data, MARGIN = 1, max, na.rm = TRUE)
+      t(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE))
     )
     qs_names <- paste0("q", probs)
+    colnames(smy) <- c("mean", "sd", qs_names)
+
+    # For backwards compatibility, add a median column:
     if (any(qs_names == "q0.5")) {
-      qs_names[qs_names == "q0.5"] <- "median"
+      smy[["median"]] <- smy[["q0.5"]]
     }
-    colnames(smy) <- c("mean", "sd", qs_names, "smin", "smax")
-    smy$cv <- smy$sd / smy$mean
-    smy$var <- smy$sd^2
+
+    # Add Monte Carlo standard errors
+    smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(nrow(data))
+    # This should really be based on the fourth order moments to
+    # better deal with skewed cases:
+    smy[["sd.mc_std_err"]] <- smy[["sd"]] / sqrt(2 * nrow(data))
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)

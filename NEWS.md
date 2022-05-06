@@ -10,6 +10,12 @@
 
 * Allow `predict()` input data to be be a list.
 
+* Allow arbitrary quantile summaries in `predict()`
+
+* Remove cv, var, smin, smax summaries from `predict()`
+
+* Add `mean.mc_std_err` and `sd.mc_std_err` output to `predict()`
+
 # inlabru 2.5.2
 
 * More robust package checks
