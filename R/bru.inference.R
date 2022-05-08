@@ -1409,19 +1409,29 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 }
 
 
-# Summarise and annotate data
-#
-# @export
-# @param data A list of samples, each either numeric or a \code{data.frame}
-# @param probs A numeric vector of probabilities with values in `[0, 1]`,
-#   passed to `stats::quantile`
-# @param x A \code{data.frame} of data columns that should be added to the summary data frame
-# @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
-# @return A \code{data.frame} or `Spatial[Points/Pixels]DataFrame` with summary statistics,
-# "mean", "sd", `paste0("q", probs)`, "mean.mc_std_err", "sd.mc_std_err"
+#' Summarise and annotate data
+#'
+#' @export
+#' @param data A list of samples, each either numeric or a \code{data.frame}
+#' @param probs A numeric vector of probabilities with values in `[0, 1]`,
+#'   passed to `stats::quantile`
+#' @param x A \code{data.frame} of data columns that should be added to the summary data frame
+#' @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
+#' @param max_moment integer, at least 2. Determines the largest moment
+#'   order information to include in the output. If `max_moment > 2`,
+#'   includes "skew" (skewness, `E[(x-m)^3/s^3]`), and
+#'   if `max_moment > 3`, includes
+#'   "ekurtosis" (excess kurtosis, `E[(x-m)^4/s^4] - 3`). Default 2.
+#'   Note that the Monte Carlo variability of the `ekurtois` estimate may be large.
+#' @return A \code{data.frame} or `Spatial[Points/Pixels]DataFrame` with summary statistics,
+#' "mean", "sd", `paste0("q", probs)`, "mean.mc_std_err", "sd.mc_std_err"
+#'
+#' @examples
+#' bru_summarise(matrix(rexp(10000), 10, 1000), max_moment = 4, probs = NULL)
 
 bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
-                          x = NULL, cbind.only = FALSE) {
+                          x = NULL, cbind.only = FALSE,
+                          max_moment = 2) {
   if (is.list(data)) {
     data <- do.call(cbind, data)
   }
@@ -1429,24 +1439,47 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     smy <- data.frame(data)
     colnames(smy) <- paste0("sample.", seq_len(ncol(smy)))
   } else {
-    smy <- data.frame(
-      apply(data, MARGIN = 1, mean, na.rm = TRUE),
-      apply(data, MARGIN = 1, sd, na.rm = TRUE),
-      t(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE))
-    )
-    qs_names <- paste0("q", probs)
+    if (length(probs) == 0) {
+      smy <- data.frame(
+        apply(data, MARGIN = 1, mean, na.rm = TRUE),
+        apply(data, MARGIN = 1, sd, na.rm = TRUE)
+      )
+      qs_names <- NULL
+    } else if (length(probs) == 1) {
+      smy <- data.frame(
+        apply(data, MARGIN = 1, mean, na.rm = TRUE),
+        apply(data, MARGIN = 1, sd, na.rm = TRUE),
+        as.matrix(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE))
+      )
+      qs_names <- paste0("q", probs)
+    } else {
+      smy <- data.frame(
+        apply(data, MARGIN = 1, mean, na.rm = TRUE),
+        apply(data, MARGIN = 1, sd, na.rm = TRUE),
+        t(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE))
+      )
+      qs_names <- paste0("q", probs)
+    }
     colnames(smy) <- c("mean", "sd", qs_names)
-
     # For backwards compatibility, add a median column:
     if (any(qs_names == "q0.5")) {
       smy[["median"]] <- smy[["q0.5"]]
     }
 
+    # Get 3rd and 4rt central moments
+    if (max_moment >= 3) {
+      smy[["skew"]] <- apply(((data - smy$mean) / smy$sd)^3, MARGIN = 1, mean, na.rm = TRUE)
+    }
+    ekurtosis <- apply(((data - smy$mean) / smy$sd)^4 - 3, MARGIN = 1, mean, na.rm = TRUE)
+    if (max_moment >= 4) {
+      smy[["ekurtosis"]] <- ekurtosis
+    }
+
     # Add Monte Carlo standard errors
     smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(NCOL(data))
-    # This should really be based on the fourth order moments to
-    # better deal with skewed cases:
-    smy[["sd.mc_std_err"]] <- smy[["sd"]] / sqrt(2 * NCOL(data))
+    # Var(s) \approx (K + 3) s^2 / (4 n):
+    smy[["sd.mc_std_err"]] <-
+      sqrt(pmax(0, ekurtosis + 3)) * smy[["sd"]] / sqrt(4 * NCOL(data))
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)
