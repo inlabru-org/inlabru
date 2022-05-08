@@ -162,10 +162,10 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
 #' @aliases devel.cvmeasure
 #' @export
 #' @param joint A joint `prediction` of two latent model components.
-#' @param prediction1 A `prediction` of first component.
-#' @param prediction2 A `prediction` of the first component.
-#' @param samplers A SpatialPolygon object describing the area for which to compute the cummulative variance measure.
-#' @param mesh The `inla.mesh` for which the prediction was performed (required for cummulative Vmeasure).
+#' @param prediction1 A `prediction` of the first component.
+#' @param prediction2 A `prediction` of the second component.
+#' @param samplers A SpatialPolygon object describing the area for which to compute the cumulative variance measure.
+#' @param mesh The `inla.mesh` for which the prediction was performed (required for cumulative Vmeasure).
 #' @return Variance and correlations measures.
 #'
 #' @references
@@ -178,13 +178,13 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
 devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, mesh = NULL) {
 
   # Covariance
-  joint$cov <- (joint$var - prediction1$var - prediction2$var) / 2
+  joint$cov <- (joint[["sd"]]^2 - prediction1[["sd"]]^2 - prediction2[["sd"]]^2) / 2
 
   # Correlation
   corr <- function(joint, a, b) {
     ((joint - a - b) / (2 * sqrt(a * b)))
   }
-  cor <- corr(joint$var, prediction1$var, prediction2$var)
+  cor <- corr(joint[["sd"]]^2, prediction1[["sd"]]^2, prediction2[["sd"]]^2)
   if (any((cor > 1) | (cor < (-1)), na.rm = TRUE)) {
     cor[(cor > 1) | (cor < (-1))] <- NA
   }
@@ -202,17 +202,17 @@ devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, me
 
     weights <- wips$weight
     weights <- weights / sum(weights)
-    vj <- sum(as.vector(A %*% joint$var) * weights)
-    v1 <- sum(as.vector(A %*% prediction1$var) * weights)
-    v2 <- sum(as.vector(A %*% prediction2$var) * weights)
+    vj <- sum(as.vector(A %*% joint[["sd"]]^2) * weights)
+    v1 <- sum(as.vector(A %*% prediction1[["sd"]]^2) * weights)
+    v2 <- sum(as.vector(A %*% prediction2[["sd"]]^2) * weights)
     cr <- corr(vj, v1, v2)
     ret <- data.frame(var.joint = vj, var1 = v1, var2 = v2, cor = cr)
   } else {
     tmp <- attributes(joint)
     ret <- joint[, c("cov", "cor")]
-    ret$var.joint <- joint$var
-    ret$var1 <- prediction1$var
-    ret$var2 <- prediction2$var
+    ret$var.joint <- joint[["sd"]]^2
+    ret$var1 <- prediction1[["sd"]]^2
+    ret$var2 <- prediction2[["sd"]]^2
     attr(ret, "misc") <- tmp[["misc"]]
     attr(ret, "type") <- tmp[["type"]]
   }

@@ -9,13 +9,13 @@ devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL, mesh = NULL)
 \arguments{
 \item{joint}{A joint \code{prediction} of two latent model components.}
 
-\item{prediction1}{A \code{prediction} of first component.}
+\item{prediction1}{A \code{prediction} of the first component.}
 
-\item{prediction2}{A \code{prediction} of the first component.}
+\item{prediction2}{A \code{prediction} of the second component.}
 
-\item{samplers}{A SpatialPolygon object describing the area for which to compute the cummulative variance measure.}
+\item{samplers}{A SpatialPolygon object describing the area for which to compute the cumulative variance measure.}
 
-\item{mesh}{The \code{inla.mesh} for which the prediction was performed (required for cummulative Vmeasure).}
+\item{mesh}{The \code{inla.mesh} for which the prediction was performed (required for cumulative Vmeasure).}
 }
 \value{
 Variance and correlations measures.
