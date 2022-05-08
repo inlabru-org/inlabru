@@ -314,6 +314,7 @@ We are going with Model `fit2`. Lets look at the spatial distribution of the
 coefficient of variation
 
 ```{r results="hide",warning=FALSE,message=FALSE}
+int2$cv <- int2$sd / int2$mean
 ggplot() +
   gg(int2["cv"]) +
   gg(boundary, alpha = 0) +
