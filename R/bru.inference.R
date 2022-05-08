@@ -1443,10 +1443,10 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     }
 
     # Add Monte Carlo standard errors
-    smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(nrow(data))
+    smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(NCOL(data))
     # This should really be based on the fourth order moments to
     # better deal with skewed cases:
-    smy[["sd.mc_std_err"]] <- smy[["sd"]] / sqrt(2 * nrow(data))
+    smy[["sd.mc_std_err"]] <- smy[["sd"]] / sqrt(2 * NCOL(data))
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)
