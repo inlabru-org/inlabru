@@ -1467,17 +1467,25 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     }
 
     # Get 3rd and 4rt central moments
+    skew <- apply(((data - smy$mean) / smy$sd)^3, MARGIN = 1, mean, na.rm = TRUE)
     if (max_moment >= 3) {
-      smy[["skew"]] <- apply(((data - smy$mean) / smy$sd)^3, MARGIN = 1, mean, na.rm = TRUE)
+      smy[["skew"]] <- skew
     }
-    ekurtosis <- apply(((data - smy$mean) / smy$sd)^4 - 3, MARGIN = 1, mean, na.rm = TRUE)
+    # eK + 3 >= skew^2 + 1
+    # eK >= skew^2 - 2
+    ekurtosis <- pmax(
+      skew^2 - 2,
+      apply(((data - smy$mean) / smy$sd)^4 - 3,
+            MARGIN = 1,
+            mean,
+            na.rm = TRUE))
     if (max_moment >= 4) {
       smy[["ekurtosis"]] <- ekurtosis
     }
 
     # Add Monte Carlo standard errors
     smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(NCOL(data))
-    # Var(s) \approx (K + 2) \sigma^2 / (4 n):
+    # Var(s) \approx (eK + 2) \sigma^2 / (4 n):
     smy[["sd.mc_std_err"]] <-
       sqrt(pmax(0, ekurtosis + 2)) * smy[["sd"]] / sqrt(4 * NCOL(data))
   }
