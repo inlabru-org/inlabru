@@ -1477,9 +1477,9 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
 
     # Add Monte Carlo standard errors
     smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(NCOL(data))
-    # Var(s) \approx (K + 3) s^2 / (4 n):
+    # Var(s) \approx (K + 2) \sigma^2 / (4 n):
     smy[["sd.mc_std_err"]] <-
-      sqrt(pmax(0, ekurtosis + 3)) * smy[["sd"]] / sqrt(4 * NCOL(data))
+      sqrt(pmax(0, ekurtosis + 2)) * smy[["sd"]] / sqrt(4 * NCOL(data))
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)
