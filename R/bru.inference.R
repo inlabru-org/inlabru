@@ -1435,9 +1435,10 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
   if (is.list(data)) {
     data <- do.call(cbind, data)
   }
+  N <- NCOL(data)
   if (cbind.only) {
     smy <- data.frame(data)
-    colnames(smy) <- paste0("sample.", seq_len(ncol(smy)))
+    colnames(smy) <- paste0("sample.", seq_len(N))
   } else {
     if (length(probs) == 0) {
       smy <- data.frame(
@@ -1467,15 +1468,18 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     }
 
     # Get 3rd and 4rt central moments
-    skew <- apply(((data - smy$mean) / smy$sd)^3, MARGIN = 1, mean, na.rm = TRUE)
+    # Use 1/N normalisation of the sample sd
+    skew <- apply(((data - smy$mean) / smy$sd)^3 * (N / (N-1))^3,
+                  MARGIN = 1, mean, na.rm = TRUE)
     if (max_moment >= 3) {
       smy[["skew"]] <- skew
     }
     # eK + 3 >= skew^2 + 1
     # eK >= skew^2 - 2
+    # Use 1/N normalisation of the sample sd
     ekurtosis <- pmax(
       skew^2 - 2,
-      apply(((data - smy$mean) / smy$sd)^4 - 3,
+      apply(((data - smy$mean) / smy$sd)^4 * (N / (N - 1))^4 - 3,
             MARGIN = 1,
             mean,
             na.rm = TRUE))
@@ -1484,10 +1488,12 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     }
 
     # Add Monte Carlo standard errors
-    smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(NCOL(data))
+    smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(N)
     # Var(s) \approx (eK + 2) \sigma^2 / (4 n):
+    # +2 replaced by 3-(n-3)/(n-1), from Rao 1973, p438
     smy[["sd.mc_std_err"]] <-
-      sqrt(pmax(0, ekurtosis + 2)) * smy[["sd"]] / sqrt(4 * NCOL(data))
+      sqrt(pmax(0, ekurtosis + 3 - (N - 3) / (N - 1))) *
+      smy[["sd"]] / sqrt(4 * N)
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)
