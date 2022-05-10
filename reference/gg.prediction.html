@@ -107,9 +107,12 @@ the confidence interval.</p>
 <dt>mapping</dt>
 <dd><p>a set of aesthetic mappings created by <code>aes</code>. These are passed on to <code>geom_line</code>.</p></dd>
 <dt>ribbon</dt>
-<dd><p>If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.</p></dd>
+<dd><p>If TRUE, plot a ribbon around the line based on the smalles and largest
+quantiles present in the data, found by matching names starting with <code>q</code> and
+followed by a numerical value.  <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code>-style <code>numeric+"quant"</code> names are converted
+to inlabru style before matching.</p></dd>
 <dt>alpha</dt>
-<dd><p>The ribbons numeric alpha level in <code>[0,1]</code>.</p></dd>
+<dd><p>The ribbons numeric alpha (transparency) level in <code>[0,1]</code>.</p></dd>
 <dt>bar</dt>
 <dd><p>If TRUE plot boxplot-style summary for each variable.</p></dd>
 <dt>...</dt>
