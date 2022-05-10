@@ -224,6 +224,11 @@ gg.data.frame <- function(...) {
 gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar = FALSE, ...) {
   requireNamespace("ggplot2")
   # Convert from old and inla style names
+  if (("median" %in% names(data)) &&
+      !("0.5quant" %in% names(data)) &&
+      !("q0.5" %in% names(data))) {
+    names(data)[names(data) == "median"] <- "q0.5"
+  }
   new_quant_names <- list(q0.025 = "0.025quant",
                           q0.5 = "0.5quant",
                           q0.975 = "0.975quant")
