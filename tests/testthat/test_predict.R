@@ -66,10 +66,7 @@ test_that("bru: factor component", {
   expect_equal(rownames(xpost2), c("a", "b", "a_b", "c"))
 
 
-  # The predict function can also be used to simultaneously estimate posteriors
-  # of multiple variables:
-
-  xipost <- predict(fit,
+  xipost <- generate(fit,
     data = NULL,
     formula = ~ c(
       Intercept = Intercept_latent,
