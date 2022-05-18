@@ -42,7 +42,7 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Encoding: UTF-8
 Depends:
     methods,

@@ -208,14 +208,18 @@ number of basis functions is \code{intercept + 2 * order}.
 
 Optionally, each order can be given a non-unit scaling, via the \code{scaling}
 vector, of length \code{intercept + order}. This can be used to
-give an effective spectral prior. For example, let\preformatted{scaling = 1 / (1 + (0:4)^2)
+give an effective spectral prior. For example, let
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{scaling = 1 / (1 + (0:4)^2)
 A1 = bru_mapper_harmonics(order = 4)
 u1 <- A1 \%*\% rnorm(9, sd = scaling)
-}
+}\if{html}{\out{</div>}}
 
-Then, with\preformatted{A2 = bru_mapper_harmonics(order = 4, scaling = scaling)
+Then, with
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{A2 = bru_mapper_harmonics(order = 4, scaling = scaling)
 u2 = A2 \%*\% rnorm(9)
-}
+}\if{html}{\out{</div>}}
 
 the stochastic properties of \code{u1} and \code{u2} will be the same, with \code{scaling^2}
 determining the variance for each frequency contribution.
