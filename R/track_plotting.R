@@ -36,7 +36,8 @@ make_track_plots <- function(fit) {
     dplyr::mutate(iteration = .data$iteration.x)
 
   lty_ <- factor(c("Mode", "Lin", "Mode-Lin", "SD"),
-                 levels = c("Mode", "Lin", "Mode-Lin", "SD"))
+    levels = c("Mode", "Lin", "Mode-Lin", "SD")
+  )
   names(lty_) <- levels(lty_)
 
   sc <- ggplot2::scale_linetype_discrete(
@@ -148,8 +149,9 @@ make_track_plots <- function(fit) {
   track_data_prev <- dplyr::filter(track_data, .data$iteration < max(.data$iteration))
   track_data_prev$iteration <- track_data_prev$iteration + 1
   track_data <- dplyr::left_join(track_data, track_data_prev,
-                                 by = c("effect", "iteration", "index"),
-                                 suffix = c("", ".prev"))
+    by = c("effect", "iteration", "index"),
+    suffix = c("", ".prev")
+  )
 
   pl5 <-
     ggplot2::ggplot(track_data) +
@@ -205,15 +207,16 @@ make_track_plots <- function(fit) {
 
   pl_combined <-
     ((pl1 |
-        pl3 + ggplot2::guides(linetype = "none")) /
-       (pl5 + ggplot2::guides(linetype = "none") |
-          pl6 + ggplot2::guides(linetype = "none"))) +
-    patchwork::plot_layout(guides = "collect") &
-    ggplot2::theme(legend.position = "bottom")
+      pl3 + ggplot2::guides(linetype = "none")) /
+      (pl5 + ggplot2::guides(linetype = "none") |
+        pl6 + ggplot2::guides(linetype = "none"))) +
+      patchwork::plot_layout(guides = "collect") &
+      ggplot2::theme(legend.position = "bottom")
 
 
   list(pl1, pl2, pl3, pl4, pl5, pl6,
-       default = pl_combined)
+    default = pl_combined
+  )
 }
 
 # (

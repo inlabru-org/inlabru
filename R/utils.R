@@ -30,7 +30,9 @@ bru_safe_inla <- function(multicore = NULL,
     if (!multicore) {
       n.t <- tryCatch(
         INLA::inla.getOption("num.threads"),
-        error = function(e) { e }
+        error = function(e) {
+          e
+        }
       )
       if (inherits(n.t, "simpleError")) {
         if (!quietly) {

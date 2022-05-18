@@ -53,8 +53,8 @@ as point process data for use with \code{inlabru}.
 }
 \examples{
 if (bru_safe_inla() &&
-    require(ggplot2, quietly = TRUE) &&
-    require(ggpolypath, quietly = TRUE)) {
+  require(ggplot2, quietly = TRUE) &&
+  require(ggpolypath, quietly = TRUE)) {
   data(gorillas, package = "inlabru") # get the data
 
   # plot all the nests, mesh and boundary

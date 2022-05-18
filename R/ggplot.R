@@ -225,13 +225,15 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
   requireNamespace("ggplot2")
   # Convert from old and inla style names
   if (("median" %in% names(data)) &&
-      !("0.5quant" %in% names(data)) &&
-      !("q0.5" %in% names(data))) {
+    !("0.5quant" %in% names(data)) &&
+    !("q0.5" %in% names(data))) {
     names(data)[names(data) == "median"] <- "q0.5"
   }
-  new_quant_names <- list(q0.025 = "0.025quant",
-                          q0.5 = "0.5quant",
-                          q0.975 = "0.975quant")
+  new_quant_names <- list(
+    q0.025 = "0.025quant",
+    q0.5 = "0.5quant",
+    q0.975 = "0.975quant"
+  )
 
   for (quant_name in names(new_quant_names[new_quant_names %in% names(data)])) {
     names(data)[names(data) == new_quant_names[[quant_name]]] <- quant_name
@@ -270,7 +272,7 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
         ),
         shape = 95, size = 0
       )
-      )
+    )
     if (length(quant_names) > 0) {
       geom <- c(
         geom,
@@ -304,17 +306,19 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
       geom <- c(
         geom,
         ggplot2::geom_point(
-        data = data,
-        mapping = ggplot2::aes(
-          x = .data$variable,
-          y = .data$q0.5
-        ),
-        color = "black", shape = 3, size = sz*2/3
-      )
+          data = data,
+          mapping = ggplot2::aes(
+            x = .data$variable,
+            y = .data$q0.5
+          ),
+          color = "black", shape = 3, size = sz * 2 / 3
+        )
       )
     }
-    geom <- c(geom,
-              ggplot2::coord_flip())
+    geom <- c(
+      geom,
+      ggplot2::coord_flip()
+    )
   } else {
     if ("pdf" %in% names(data)) {
       y.str <- "pdf"
@@ -348,8 +352,10 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
       )
       # Use line color for ribbon filling
       if ("colour" %in% names(line.map)) {
-        ribbon.map <- modifyList(ribbon.map,
-                                 ggplot2::aes(fill = .data[[line.map[["colour"]]]]))
+        ribbon.map <- modifyList(
+          ribbon.map,
+          ggplot2::aes(fill = .data[[line.map[["colour"]]]])
+        )
       }
       geom <- c(geom, ggplot2::geom_ribbon(data = data, ribbon.map, alpha = alpha))
     }

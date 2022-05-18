@@ -1428,7 +1428,7 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 #'
 #' @examples
 #' bru_summarise(matrix(rexp(10000), 10, 1000), max_moment = 4, probs = NULL)
-
+#'
 bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
                           x = NULL, cbind.only = FALSE,
                           max_moment = 2) {
@@ -1469,8 +1469,9 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
 
     # Get 3rd and 4rt central moments
     # Use 1/N normalisation of the sample sd
-    skew <- apply(((data - smy$mean) / smy$sd)^3 * (N / (N-1))^3,
-                  MARGIN = 1, mean, na.rm = TRUE)
+    skew <- apply(((data - smy$mean) / smy$sd)^3 * (N / (N - 1))^3,
+      MARGIN = 1, mean, na.rm = TRUE
+    )
     if (max_moment >= 3) {
       smy[["skew"]] <- skew
     }
@@ -1480,9 +1481,11 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     ekurtosis <- pmax(
       skew^2 - 2,
       apply(((data - smy$mean) / smy$sd)^4 * (N / (N - 1))^4 - 3,
-            MARGIN = 1,
-            mean,
-            na.rm = TRUE))
+        MARGIN = 1,
+        mean,
+        na.rm = TRUE
+      )
+    )
     if (max_moment >= 4) {
       smy[["ekurtosis"]] <- ekurtosis
     }
@@ -1493,7 +1496,7 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     # +2 replaced by 3-(n-3)/(n-1) = 2n/(n-1), from Rao 1973, p438
     smy[["sd.mc_std_err"]] <-
       sqrt(pmax(0, ekurtosis + 2 * N / (N - 1))) *
-      smy[["sd"]] / sqrt(4 * N)
+        smy[["sd"]] / sqrt(4 * N)
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)

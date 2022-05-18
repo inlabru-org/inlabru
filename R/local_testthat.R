@@ -208,7 +208,9 @@ local_bru_safe_inla <- function(multicore = FALSE,
     # Save the num.threads option so it can be restored
     old_threads <- tryCatch(
       INLA::inla.getOption("num.threads"),
-      error = function(e) { e }
+      error = function(e) {
+        e
+      }
     )
     if (inherits(old_threads, "simpleError")) {
       return(testthat::skip("inla.getOption() failed, skip INLA tests."))

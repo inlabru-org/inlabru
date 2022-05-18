@@ -131,7 +131,7 @@ bru_mapper.default <- function(mapper,
     "ibm_amatrix", "ibm_amatrix_inla",
     "ibm_valid_input", "ibm_valid_input_inla"
   ) %in%
-  names(list(...)))) {
+    names(list(...)))) {
     warning(
       paste0(
         "Deprecated use of named method arguments for 'bru_mapper'.\n",
@@ -726,9 +726,9 @@ ibm_amatrix.bru_mapper_multi <- function(mapper, input,
       indexing,
       function(x) {
         ibm_amatrix(mapper[["mappers"]][[x]],
-                    input = input[[x]],
-                    inla_f = inla_f,
-                    multi = multi - 1
+          input = input[[x]],
+          inla_f = inla_f,
+          multi = multi - 1
         )
       }
     )
@@ -775,9 +775,9 @@ ibm_valid_input.bru_mapper_multi <- function(mapper, input,
         indexing,
         function(x) {
           ibm_valid_input(mapper[["mappers"]][[x]],
-                          input = input[[x]],
-                          inla_f = inla_f,
-                          multi = 0
+            input = input[[x]],
+            inla_f = inla_f,
+            multi = 0
           )
         }
       )
@@ -988,8 +988,8 @@ ibm_amatrix.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, multi 
 ibm_valid_input.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, multi = 0L, ...) {
   if (mapper[["hidden"]] && inla_f) {
     validity <- ibm_valid_input(mapper[["mappers"]][[1]],
-                                input = input,
-                                multi = multi - 1
+      input = input,
+      multi = multi - 1
     )
   } else {
     if (!is.list(input)) {
@@ -1005,8 +1005,8 @@ ibm_valid_input.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, mu
           indexing,
           function(x) {
             ibm_valid_input(mapper[["mappers"]][[x]],
-                            input = input[[x]],
-                            multi = 0L
+              input = input[[x]],
+              multi = 0L
             )
           }
         )
@@ -1126,10 +1126,11 @@ bru_mapper_harmonics <- function(order = 1,
     interval = interval
   )
   bru_mapper(mapper,
-             new_class = "bru_mapper_harmonics",
-             methods = list(
-               ibm_n
-             ))
+    new_class = "bru_mapper_harmonics",
+    methods = list(
+      ibm_n
+    )
+  )
 }
 
 

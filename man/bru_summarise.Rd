@@ -38,4 +38,5 @@ Summarise and annotate data
 }
 \examples{
 bru_summarise(matrix(rexp(10000), 10, 1000), max_moment = 4, probs = NULL)
+
 }

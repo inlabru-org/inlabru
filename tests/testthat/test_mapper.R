@@ -231,7 +231,7 @@ test_that("mapper collection automatic construction consistency", {
   )
 
   cmp1 <- y ~
-  -1 +
+    -1 +
     indep(val,
       model = "bym",
       mapper = mapper,
@@ -240,7 +240,7 @@ test_that("mapper collection automatic construction consistency", {
   # index mapper
 
   cmp2 <- y ~
-  -1 +
+    -1 +
     indep(val,
       model = "bym",
       n = 4,
