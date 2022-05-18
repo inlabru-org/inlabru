@@ -254,7 +254,7 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
       data.frame(data),
       data.frame(
         variable = rownames(data),
-        summary = data$mean[1],
+        summary = data$mean,
         sdmax = data$mean + data$sd,
         sdmin = data$mean - data$sd
       )
@@ -297,7 +297,7 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
           x = .data$variable,
           y = .data$mean
         ),
-        color = "black", shape = 95, size = sz
+        color = "black", shape = 20, size = med_sz
       )
     )
     if ("q0.5" %in% quant_names) {
@@ -309,7 +309,7 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
           x = .data$variable,
           y = .data$q0.5
         ),
-        color = "black", shape = 20, size = med_sz
+        color = "black", shape = 3, size = sz*2/3
       )
       )
     }
