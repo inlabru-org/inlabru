@@ -304,8 +304,41 @@ Lambda3 <- predict(
   ~ sum(weight * exp(mySmooth + Intercept))
 )
 Lambda3
+```
+```{r warning=FALSE,message=FALSE}
+knitr::kable(cbind(
+  deltaIC(fit1, fit2, fit3, criterion = c("DIC")),
+  deltaIC(fit1, fit2, fit3, criterion = c("WAIC"))))
+```
+NOTE: the behaviour of DIC and WAIC is currently a bit unclear, in particular for experimental
+mode, and is being investigated.
 
-deltaIC(fit1, fit2, fit3)
+Classic mode:
+```{r echo=FALSE}
+knitr::kable(cbind(dplyr::tribble(
+~Model, ~DIC, ~Delta.DIC,
+"fit2",  2224.131,	0.00000,
+"fit3",	2274.306,	50.17504,
+"fit1",	3124.784,	900.65339),
+dplyr::tribble(
+  ~Model,	~WAIC,	~Delta.WAIC,
+"fit1",	2672.234,	0.0000,
+"fit3",	2949.498,	277.2636,
+"fit2",	3040.140,	367.9051)))
+```
+
+Experimental mode:
+```{r echo=FALSE}
+knitr::kable(cbind(dplyr::tribble(
+  ~Model, ~DIC, ~Delta.DIC,
+  "fit1",	-563.3583,	0.000,
+  "fit3",	509.4010,	1072.759,
+  "fit2",	597.6459,	1161.004),
+  dplyr::tribble(
+    ~Model,	~WAIC,	~Delta.WAIC,
+    "fit1",	1373.241,	0.0000,
+    "fit3",	1584.543,	211.3021,
+    "fit2",	1636.864,	263.6225)))
 ```
 
 #### CV and SPDE parameters for Model 2
@@ -314,9 +347,8 @@ We are going with Model `fit2`. Lets look at the spatial distribution of the
 coefficient of variation
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-int2$cv <- int2$sd / int2$mean
 ggplot() +
-  gg(int2["cv"]) +
+  gg(int2, aes(fill = sd / mean)) +
   gg(boundary, alpha = 0) +
   gg(nests) +
   coord_fixed()
