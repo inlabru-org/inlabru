@@ -86,7 +86,7 @@
       <img src="" class="logo" alt=""><h1>LGCPs - Spatial covariates</h1>
                         <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-05-10</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-05-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_covars.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_covars.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_covars.Rmd</code></div>
@@ -169,10 +169,10 @@
 <code class="sourceCode R"><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>
 <span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">ips</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Lambda1</span>
-<span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span>
-<span class="co">#&gt; 1 649.2151 25.57028 603.6457 650.6851 696.9184 650.6851        2.557028</span>
+<span class="co">#&gt;       mean       sd  q0.025     q0.5   q0.975   median mean.mc_std_err</span>
+<span class="co">#&gt; 1 650.5999 27.64674 592.851 653.1019 702.5608 653.1019        2.764674</span>
 <span class="co">#&gt;   sd.mc_std_err</span>
-<span class="co">#&gt; 1      1.738782</span></code></pre></div>
+<span class="co">#&gt; 1      2.066222</span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="a-model-with-vegetation-type-and-a-spde-type-smoother">A model with vegetation type and a SPDE type smoother<a class="anchor" aria-label="anchor" href="#a-model-with-vegetation-type-and-a-spde-type-smoother"></a>
@@ -209,10 +209,10 @@
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">vegetation</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda2</span>
-<span class="co">#&gt;       mean       sd  q0.025     q0.5   q0.975   median mean.mc_std_err</span>
-<span class="co">#&gt; 1 678.6588 25.89623 631.711 676.8777 726.6454 676.8777        2.589623</span>
+<span class="co">#&gt;      mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span>
+<span class="co">#&gt; 1 673.049 27.18419 625.8788 673.0476 716.5852 673.0476        2.718419</span>
 <span class="co">#&gt;   sd.mc_std_err</span>
-<span class="co">#&gt; 1      1.919594</span></code></pre></div>
+<span class="co">#&gt; 1      1.668317</span></code></pre></div>
 <p>Look at the contributions to the linear predictor from the SPDE and from vegetation:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
@@ -280,55 +280,163 @@
 <span class="op">)</span>
 <span class="va">Lambda3</span>
 <span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span>
-<span class="co">#&gt; 1 671.9672 26.94181 608.5466 672.7221 720.4632 672.7221        2.694181</span>
+<span class="co">#&gt; 1 674.7909 30.09306 616.1496 678.1669 737.4983 678.1669        3.009306</span>
 <span class="co">#&gt;   sd.mc_std_err</span>
-<span class="co">#&gt; 1      2.043002</span>
-
-<span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit2</span>, <span class="va">fit3</span><span class="op">)</span>
-<span class="co">#&gt;   Model       DIC Delta.DIC</span>
-<span class="co">#&gt; 1  fit1 -563.3583     0.000</span>
-<span class="co">#&gt; 2  fit3  510.0326  1073.391</span>
-<span class="co">#&gt; 3  fit2  598.1497  1161.508</span></code></pre></div>
+<span class="co">#&gt; 1      2.266989</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span>
+  <span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit2</span>, <span class="va">fit3</span>, criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DIC"</span><span class="op">)</span><span class="op">)</span>,
+  <span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit2</span>, <span class="va">fit3</span>, criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WAIC"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Model</th>
+<th align="right">DIC</th>
+<th align="right">Delta.DIC</th>
+<th align="left">Model</th>
+<th align="right">WAIC</th>
+<th align="right">Delta.WAIC</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">fit1</td>
+<td align="right">-563.3583</td>
+<td align="right">0.000</td>
+<td align="left">fit1</td>
+<td align="right">1373.241</td>
+<td align="right">0.0000</td>
+</tr>
+<tr class="even">
+<td align="left">fit3</td>
+<td align="right">509.5319</td>
+<td align="right">1072.890</td>
+<td align="left">fit3</td>
+<td align="right">1584.683</td>
+<td align="right">211.4417</td>
+</tr>
+<tr class="odd">
+<td align="left">fit2</td>
+<td align="right">597.8149</td>
+<td align="right">1161.173</td>
+<td align="left">fit2</td>
+<td align="right">1637.032</td>
+<td align="right">263.7910</td>
+</tr>
+</tbody>
+</table>
+<p>NOTE: the behaviour of DIC and WAIC is currently a bit unclear, in particular for experimental mode, and is being investigated.</p>
+<p>Classic mode:</p>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Model</th>
+<th align="right">DIC</th>
+<th align="right">Delta.DIC</th>
+<th align="left">Model</th>
+<th align="right">WAIC</th>
+<th align="right">Delta.WAIC</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">fit2</td>
+<td align="right">2224.131</td>
+<td align="right">0.00000</td>
+<td align="left">fit1</td>
+<td align="right">2672.234</td>
+<td align="right">0.0000</td>
+</tr>
+<tr class="even">
+<td align="left">fit3</td>
+<td align="right">2274.306</td>
+<td align="right">50.17504</td>
+<td align="left">fit3</td>
+<td align="right">2949.498</td>
+<td align="right">277.2636</td>
+</tr>
+<tr class="odd">
+<td align="left">fit1</td>
+<td align="right">3124.784</td>
+<td align="right">900.65339</td>
+<td align="left">fit2</td>
+<td align="right">3040.140</td>
+<td align="right">367.9051</td>
+</tr>
+</tbody>
+</table>
+<p>Experimental mode:</p>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Model</th>
+<th align="right">DIC</th>
+<th align="right">Delta.DIC</th>
+<th align="left">Model</th>
+<th align="right">WAIC</th>
+<th align="right">Delta.WAIC</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">fit1</td>
+<td align="right">-563.3583</td>
+<td align="right">0.000</td>
+<td align="left">fit1</td>
+<td align="right">1373.241</td>
+<td align="right">0.0000</td>
+</tr>
+<tr class="even">
+<td align="left">fit3</td>
+<td align="right">509.4010</td>
+<td align="right">1072.759</td>
+<td align="left">fit3</td>
+<td align="right">1584.543</td>
+<td align="right">211.3021</td>
+</tr>
+<tr class="odd">
+<td align="left">fit2</td>
+<td align="right">597.6459</td>
+<td align="right">1161.004</td>
+<td align="left">fit2</td>
+<td align="right">1636.864</td>
+<td align="right">263.6225</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level4">
 <h4 id="cv-and-spde-parameters-for-model-2">CV and SPDE parameters for Model 2<a class="anchor" aria-label="anchor" href="#cv-and-spde-parameters-for-model-2"></a>
 </h4>
 <p>We are going with Model <code>fit2</code>. Lets look at the spatial distribution of the coefficient of variation</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">int2</span><span class="op">$</span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="va">int2</span><span class="op">$</span><span class="va">sd</span> <span class="op">/</span> <span class="va">int2</span><span class="op">$</span><span class="va">mean</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int2</span><span class="op">[</span><span class="st">"cv"</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">sd</span> <span class="op">/</span> <span class="va">mean</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-23-1.png" width="672"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-26-1.png" width="672"></p>
 <p>Plot the vegetation “fixed effect” posteriors. First get their names - from <code>$marginals.random$vegetation</code> of the fitted object, which contains the fixed effect marginal distribution data</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span>
 <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">flist</span><span class="op">)</span><span class="op">)</span> <span class="va">flist</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"vegetation"</span>, index <span class="op">=</span> <span class="va">i</span><span class="op">)</span>
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="va">flist</span>, cols <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-24-1.png" width="672"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-27-1.png" width="672"></p>
 <p>Use <code><a href="../../reference/spde.posterior.html">spde.posterior( )</a></code> to obtain and then plot the SPDE parameter posteriors and the Matern correlation and covariance functions for this model.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span>
 <span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span>
 <span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span>
 <span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span>
 
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">range.plot</span>, <span class="va">var.plot</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-25-1.png" width="672"></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-28-1.png" width="672"></p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">corplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">covplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">covplot</span>, <span class="va">corplot</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-25-2.png" width="672"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-28-2.png" width="672"></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="continuous-covariates">Continuous covariates<a class="anchor" aria-label="anchor" href="#continuous-covariates"></a>
 </h2>
 <p>Now lets try a model with elevation as a (continuous) explanatory variable. (First centre elevations for more stable fitting.)</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">elev</span> <span class="op">&lt;-</span> <span class="va">gcov</span><span class="op">$</span><span class="va">elevation</span>
 <span class="va">elev</span><span class="op">$</span><span class="va">elevation</span> <span class="op">&lt;-</span> <span class="va">elev</span><span class="op">$</span><span class="va">elevation</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">elev</span><span class="op">$</span><span class="va">elevation</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
@@ -336,9 +444,9 @@
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">elev</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-26-1.png" width="672"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-29-1.png" width="672"></p>
 <p>The elevation variable here is of class ‘SpatialGridDataFrame’, that can be handled in the same way as the vegetation covariate. However, since in some cases data may be stored differently, and other methods are needed to access the stored values. In such cases, we can define a function that knows how to evaluate the covariate at arbitrary points in the survey region, and call that function in the component definition. In this case, we can use a powerful method from the ‘sp’ package to do this. We use this to create the needed function.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f.elev</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># turn coordinates into SpatialPoints object:</span>
   <span class="co"># with the appropriate coordinate reference system (CRS)</span>
@@ -352,7 +460,7 @@
   <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>For brevity we are not going to consider models with elevation only, with elevation and a SPDE, and with SPDE only. We will just fit one with elevation and SPDE. We create our model to pass to lgcp thus:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh</span>,
   prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,
   prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0.01</span><span class="op">)</span>
@@ -361,20 +469,20 @@
 <span class="va">ecomp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">elev</span><span class="op">(</span><span class="fu">f.elev</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
 <p>Note how the elevation effect is defined. When we used the <code>Spatial</code> grid object directly we specified it like</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">vegetation</span><span class="op">(</span><span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span>, model <span class="op">=</span> <span class="st">"factor_full"</span><span class="op">)</span></code></pre></div>
 <p>whereas with the function method we specify the covariate like this:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">elev</span><span class="op">(</span><span class="fu">f.elev</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></code></pre></div>
 <p>We also now include an intercept term.</p>
 <p>The model is fitted in the usual way:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">efit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">ecomp</span>, <span class="va">nests</span>, samplers <span class="op">=</span> <span class="va">boundary</span>, domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Summary and model selection</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">efit</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.5.2.9000</span>
-<span class="co">#&gt; INLA version: 22.05.07</span>
+<span class="co">#&gt; INLA version: 22.05.18-2</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   elev: Model types main='linear', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   mySmooth: Model types main='spde', group='exchangeable', replicate='iid'</span>
@@ -384,11 +492,11 @@
 <span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
 <span class="co">#&gt;     Predictor: coordinates ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 0.642, Running = 12.8, Post = 0.433, Total = 13.8 </span>
+<span class="co">#&gt;     Pre = 0.691, Running = 12.7, Post = 0.49, Total = 13.9 </span>
 <span class="co">#&gt; Fixed effects:</span>
 <span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant mode kld</span>
 <span class="co">#&gt; elev      0.003 0.001      0.002    0.003      0.005   NA   0</span>
-<span class="co">#&gt; Intercept 1.063 0.569     -0.088    1.072      2.158   NA   0</span>
+<span class="co">#&gt; Intercept 1.064 0.571     -0.091    1.075      2.162   NA   0</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
@@ -399,12 +507,12 @@
 <span class="co">#&gt; Range for mySmooth 2.10 0.253      1.652     2.08       2.65   NA</span>
 <span class="co">#&gt; Stdev for mySmooth 1.04 0.092      0.871     1.04       1.23   NA</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 502.24</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -16274.80</span>
-<span class="co">#&gt; Effective number of parameters .....................: -843.27</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 501.68</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -16275.36</span>
+<span class="co">#&gt; Effective number of parameters .....................: -843.69</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1575.82</span>
-<span class="co">#&gt; Effective number of parameters .................: 133.34</span>
+<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1575.34</span>
+<span class="co">#&gt; Effective number of parameters .................: 133.06</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Marginal log-Likelihood:  -1263.36 </span>
 <span class="co">#&gt;  is computed </span>
@@ -413,11 +521,11 @@
 <span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit2</span>, <span class="va">fit3</span>, <span class="va">efit</span><span class="op">)</span>
 <span class="co">#&gt;   Model       DIC Delta.DIC</span>
 <span class="co">#&gt; 1  fit1 -563.3583     0.000</span>
-<span class="co">#&gt; 2  efit  502.2415  1065.600</span>
-<span class="co">#&gt; 3  fit3  510.0326  1073.391</span>
-<span class="co">#&gt; 4  fit2  598.1497  1161.508</span></code></pre></div>
+<span class="co">#&gt; 2  efit  501.6842  1065.043</span>
+<span class="co">#&gt; 3  fit3  509.5319  1072.890</span>
+<span class="co">#&gt; 4  fit2  597.8149  1161.173</span></code></pre></div>
 <p>Predict and plot the density</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">e.int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">efit</span>, <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
@@ -425,10 +533,10 @@
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, shape <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-34-1.png" width="672"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-37-1.png" width="672"></p>
 <p>Now look at the elevation and SPDE effects in space. Leave out the Intercept because it swamps the spatial effects of elevation and the SPDE in the plots and we are interested in comparing the effects of elevation and the SPDE.</p>
 <p>First we need to predict on the linear predictor scale.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">e.lp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>, <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span>,
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
@@ -438,7 +546,7 @@
   <span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 <p>The code below, which is very similar to that used for the vegetation factor variable, produces the plots we want.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lprange</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">e.lp</span><span class="op">$</span><span class="va">smooth_elev</span><span class="op">$</span><span class="va">mean</span>, <span class="va">e.lp</span><span class="op">$</span><span class="va">elev</span><span class="op">$</span><span class="va">mean</span>, <span class="va">e.lp</span><span class="op">$</span><span class="va">smooth</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">RColorBrewer</span><span class="op">)</span>
@@ -473,17 +581,17 @@
   <span class="va">plot.e.lp.elev</span>,
   cols <span class="op">=</span> <span class="fl">3</span>
 <span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-36-1.png" width="1248"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-39-1.png" width="1248"></p>
 <p>You might also want to look at the posteriors of the fixed effects and of the SPDE. Adapt the code used for the vegetation factor to do this.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">efit</span><span class="op">$</span><span class="va">summary.fixed</span><span class="op">)</span><span class="op">)</span>
 <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">flist</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">flist</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">efit</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">efit</span><span class="op">$</span><span class="va">summary.fixed</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="va">flist</span>, cols <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-37-1.png" width="672"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-40-1.png" width="672"></p>
 <p>Plot the SPDE parameter posteriors and the Matern correlation and covariance functions for this model.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span>
 <span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span>
@@ -491,23 +599,23 @@
 <span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span>
 
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">range.plot</span>, <span class="va">var.plot</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-38-1.png" width="672"></p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-41-1.png" width="672"></p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">corplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">covplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">covplot</span>, <span class="va">corplot</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-38-2.png" width="672"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-41-2.png" width="672"></p>
 <p>Also estimate abundance. The <code>data.frame</code> in the second call leads to inclusion of <code>N</code> in the prediction object, for easier plotting.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>, <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>,
   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="va">Lambda</span>
-<span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span>
-<span class="co">#&gt; 1 670.7976 23.44207 629.4585 669.8811 721.3604 669.8811        2.344207</span>
+<span class="co">#&gt;       mean      sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span>
+<span class="co">#&gt; 1 672.2955 28.8117 619.3663 668.5295 727.4028 668.5295         2.88117</span>
 <span class="co">#&gt;   sd.mc_std_err</span>
-<span class="co">#&gt; 1      1.584111</span>
+<span class="co">#&gt; 1      1.846429</span>
 
 <span class="va">Nest.e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>,
@@ -521,17 +629,17 @@
   n.samples <span class="op">=</span> <span class="fl">2000</span>
 <span class="op">)</span></code></pre></div>
 <p>Plot in the same way as in previous practicals</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Nest.e</span><span class="op">$</span><span class="va">plugin_estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">Nest.e</span><span class="op">$</span><span class="va">N</span>, lambda <span class="op">=</span> <span class="va">Lambda</span><span class="op">$</span><span class="va">median</span><span class="op">)</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">Nest.e</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">N</span>, y <span class="op">=</span> <span class="va">mean</span>, colour <span class="op">=</span> <span class="st">"Posterior"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">N</span>, y <span class="op">=</span> <span class="va">plugin_estimate</span>, colour <span class="op">=</span> <span class="st">"Plugin"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-40-1.png" width="672"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-43-1.png" width="672"></p>
 <div class="section level3">
 <h3 id="non-spatial-evaluation-of-the-covariate-effect">Non-spatial evaluation of the covariate effect<a class="anchor" aria-label="anchor" href="#non-spatial-evaluation-of-the-covariate-effect"></a>
 </h3>
 <p>The previous examples of posterior prediction focused on spatial prediction. From <code>inlabru</code> version 2.2.8, a feauture is available for overriding the component input value specification from the component definition. Each model component can be evaluated directly, for arbitrary values by functions named by adding the suffix <code>_eval</code> to the end of the component name in the predictor expression. Since the elevation effect in this model is linear, the resulting plot isn’t very interesting, but the same method can be applied to non-linear effects as well, and combined into general R expressions:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">elev.pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>
   <span class="va">efit</span>,
   data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>elevation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span>, length.out <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span>,
@@ -548,14 +656,14 @@
                   ymin <span class="op">=</span> <span class="va">mean</span> <span class="op">-</span> <span class="fl">1</span> <span class="op">*</span> <span class="va">sd</span>,
                   ymax <span class="op">=</span> <span class="va">mean</span> <span class="op">+</span> <span class="fl">1</span> <span class="op">*</span> <span class="va">sd</span><span class="op">)</span>,
               alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-41-1.png" width="672"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-44-1.png" width="672"></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="a-1d-example">A 1D Example<a class="anchor" aria-label="anchor" href="#a-1d-example"></a>
 </h2>
 <p>Try fitting a 1-dimensional model to the point data in the <code>inlabru</code> dataset <code>Poisson2_1D</code>. This comes with a covariate function called <code>cov2_1D</code>. Try to reproduce the plot below (used in lectures) showing the effects of the <code>Intercept + z</code> and the <code>SPDE</code>. (You may find it helpful to build on the model you fitted in the previous practical, adding the covariate to the model specification.)</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Poisson2_1D</span><span class="op">)</span>
 <span class="va">ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">200</span><span class="op">)</span>
 <span class="va">z</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/Poisson2_1D.html">cov2_1D</a></span><span class="op">(</span><span class="va">ss</span><span class="op">)</span>
@@ -588,7 +696,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">40</span>, y <span class="op">=</span> <span class="fl">6</span>, label <span class="op">=</span> <span class="st">"Intensity"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">40</span>, y <span class="op">=</span> <span class="fl">5.5</span>, label <span class="op">=</span> <span class="st">"z-effect"</span>, color <span class="op">=</span> <span class="st">"green"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">40</span>, y <span class="op">=</span> <span class="fl">5</span>, label <span class="op">=</span> <span class="st">"SPDE"</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></code></pre></div>
-<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-42-1.png" width="672"></p>
+<p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-45-1.png" width="672"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
