@@ -34,12 +34,12 @@ test_that("2D LGCP fitting", {
   # test_that("2D LGCP fitting: INLA intercept", {
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    1.11,
+    1.085,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.5774,
+    0.579,
     tolerance = midtol
   )
 
