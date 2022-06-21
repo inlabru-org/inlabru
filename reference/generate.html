@@ -107,42 +107,63 @@ posterior of the estimated random effects.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>object</dt>
 <dd><p>A <code>bru</code> object obtained by calling <code><a href="bru.html">bru()</a></code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>additional, unused arguments.</p></dd>
+
+
 <dt>data</dt>
 <dd><p>A data.frame or SpatialPointsDataFrame of covariates needed for
 sampling.</p></dd>
+
+
 <dt>formula</dt>
 <dd><p>A formula where the right hand side defines an R expression
 to evaluate for each generated sample. If <code>NULL</code>, the latent and
 hyperparameter states are returned as named list elements.
 See Details for more information.</p></dd>
+
+
 <dt>n.samples</dt>
 <dd><p>Integer setting the number of samples to draw in order to
 calculate the posterior statistics.
 The default, 100, is rather low but provides a quick approximate result.</p></dd>
+
+
 <dt>seed</dt>
 <dd><p>Random number generator seed passed on to <code><a href="https://rdrr.io/pkg/INLA/man/posterior.sample.html" class="external-link">INLA::inla.posterior.sample</a></code></p></dd>
+
+
 <dt>num.threads</dt>
 <dd><p>Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"</p></dd>
+
+
 <dt>include</dt>
 <dd><p>Character vector of component labels that are needed by the
 predictor expression; Default: NULL (include all components that are not
 explicitly excluded)</p></dd>
+
+
 <dt>exclude</dt>
 <dd><p>Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list
 as determined by the <code>include</code> parameter; Default: NULL (do not remove
 any components from the inclusion list)</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The form of the value returned by gg depends on the class of its
+    
+
+<p>The form of the value returned by gg depends on the class of its
 argument. See the documentation of the particular methods for details of
-what is produced by that method.
-List of generated samples</p>
+what is produced by that method.</p>
+
+
+<p>List of generated samples</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -256,7 +277,7 @@ generate new realisations for indices greater than <code>n</code>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

@@ -131,30 +131,49 @@ been observed completely.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>components</dt>
 <dd><p>A formula describing the latent components</p></dd>
+
+
 <dt>data</dt>
 <dd><p>A data frame or <code>SpatialPoints(DataFrame)</code> object</p></dd>
+
+
 <dt>samplers</dt>
 <dd><p>A data frame or <code>Spatial[Points/Lines/Polygons]DataFrame</code> objects</p></dd>
+
+
 <dt>domain</dt>
 <dd><p>Named list of domain definitions</p></dd>
+
+
 <dt>ips</dt>
 <dd><p>Integration points (overrides <code>samplers</code>)</p></dd>
+
+
 <dt>formula</dt>
 <dd><p>If NULL, the linear combination implied by the <code>components</code>
 is used as a predictor for the point location intensity. If a (possibly
 non-linear) expression is provided the respective Taylor approximation is
 used as a predictor. Multiple runs if INLA are then required for a better
 approximation of the posterior.</p></dd>
+
+
 <dt>E</dt>
 <dd><p>Single numeric used rescale all integration weights by a fixed factor</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Further arguments passed on to <code><a href="like.html">like()</a></code></p></dd>
+
+
 <dt>options</dt>
 <dd><p>See <code><a href="bru_options.html">bru_options_set()</a></code></p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An <code><a href="bru.html">bru()</a></code> object</p>
+    
+
+<p>An <code><a href="bru.html">bru()</a></code> object</p>
     </div>
 
     <div class="section level2">
@@ -241,7 +260,7 @@ approximation of the posterior.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

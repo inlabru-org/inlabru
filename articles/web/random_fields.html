@@ -82,11 +82,11 @@
 
 
 <div class="row">
-  <main id="main"><div class="page-header">
+  <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Random Fields in One Dimension</h1>
                         <h4 data-toc-skip class="author">Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-05-19</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-06-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/random_fields.Rmd" class="external-link"><code>vignettes/web/random_fields.Rmd</code></a></small>
       <div class="d-none name"><code>random_fields.Rmd</code></div>
@@ -210,7 +210,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span>
 <span class="co">#&gt; inlabru version: 2.5.2.9000</span>
-<span class="co">#&gt; INLA version: 22.05.18-2</span>
+<span class="co">#&gt; INLA version: 22.06.20-2</span>
 <span class="co">#&gt; Components:</span>
 <span class="co">#&gt;   field: Model types main='spde', group='exchangeable', replicate='iid'</span>
 <span class="co">#&gt;   Intercept: Model types main='linear', group='exchangeable', replicate='iid'</span>
@@ -219,26 +219,26 @@
 <span class="co">#&gt;     Data class: 'data.frame'</span>
 <span class="co">#&gt;     Predictor: count ~ .</span>
 <span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 0.891, Running = 0.187, Post = 0.156, Total = 1.23 </span>
+<span class="co">#&gt;     Pre = 1.14, Running = 0.224, Post = 0.202, Total = 1.57 </span>
 <span class="co">#&gt; Fixed effects:</span>
 <span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant mode kld</span>
-<span class="co">#&gt; Intercept 1.125 0.766      0.018    0.947      3.069   NA   0</span>
+<span class="co">#&gt; Intercept 1.126 0.766      0.017    0.947       3.07  0.8   0</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Random effects:</span>
 <span class="co">#&gt;   Name     Model</span>
 <span class="co">#&gt;     field SPDE2 model</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Model hyperparameters:</span>
-<span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant mode</span>
-<span class="co">#&gt; Range for field 31.644 19.662      9.028   26.795     83.136   NA</span>
-<span class="co">#&gt; Stdev for field  0.518  0.164      0.267    0.494      0.907   NA</span>
+<span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant  mode</span>
+<span class="co">#&gt; Range for field 31.644 19.662      9.028   26.795     83.136 19.45</span>
+<span class="co">#&gt; Stdev for field  0.518  0.164      0.267    0.494      0.907  0.45</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 60.26</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 76.90</span>
-<span class="co">#&gt; Effective number of parameters .....................: 5.43</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 60.25</span>
+<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 76.89</span>
+<span class="co">#&gt; Effective number of parameters .....................: 5.42</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 58.33</span>
-<span class="co">#&gt; Effective number of parameters .................: 2.77</span>
+<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 58.32</span>
+<span class="co">#&gt; Effective number of parameters .................: 2.76</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Marginal log-Likelihood:  -36.82 </span>
 <span class="co">#&gt;  is computed </span>
@@ -317,7 +317,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer>

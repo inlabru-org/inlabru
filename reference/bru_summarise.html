@@ -82,13 +82,21 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>data</dt>
 <dd><p>A list of samples, each either numeric or a <code>data.frame</code></p></dd>
+
+
 <dt>probs</dt>
 <dd><p>A numeric vector of probabilities with values in <code>[0, 1]</code>,
 passed to <code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">stats::quantile</a></code></p></dd>
+
+
 <dt>x</dt>
 <dd><p>A <code>data.frame</code> of data columns that should be added to the summary data frame</p></dd>
+
+
 <dt>cbind.only</dt>
 <dd><p>If TRUE, only <code>cbind</code> the samples and return a matrix where each column is a sample</p></dd>
+
+
 <dt>max_moment</dt>
 <dd><p>integer, at least 2. Determines the largest moment
 order information to include in the output. If <code>max_moment &gt; 2</code>,
@@ -96,10 +104,13 @@ includes "skew" (skewness, <code>E[(x-m)^3/s^3]</code>), and
 if <code>max_moment &gt; 3</code>, includes
 "ekurtosis" (excess kurtosis, <code>E[(x-m)^4/s^4] - 3</code>). Default 2.
 Note that the Monte Carlo variability of the <code>ekurtois</code> estimate may be large.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>data.frame</code> or <code>Spatial[Points/Pixels]DataFrame</code> with summary statistics,
+    
+
+<p>A <code>data.frame</code> or <code>Spatial[Points/Pixels]DataFrame</code> with summary statistics,
 "mean", "sd", <code>paste0("q", probs)</code>, "mean.mc_std_err", "sd.mc_std_err"</p>
     </div>
 
@@ -107,16 +118,16 @@ Note that the Monte Carlo variability of the <code>ekurtois</code> estimate may 
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">bru_summarise</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">rexp</a></span><span class="op">(</span><span class="fl">10000</span><span class="op">)</span>, <span class="fl">10</span>, <span class="fl">1000</span><span class="op">)</span>, max_moment <span class="op">=</span> <span class="fl">4</span>, probs <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         mean        sd     skew ekurtosis mean.mc_std_err sd.mc_std_err</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1.0062344 1.0443239 2.181089  6.744094      0.03302442    0.04883288</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.9835896 0.9668557 1.837868  4.269906      0.03057466    0.03828525</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1.0153851 1.0144827 1.960533  5.566407      0.03208076    0.04412828</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.9752172 1.0186204 2.031114  5.371148      0.03221161    0.04373296</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1.0540940 1.0349149 1.902523  5.081051      0.03272688    0.04354967</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.9632246 0.9913236 1.863093  4.351714      0.03134840    0.03950930</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  1.0283126 1.0219285 1.783109  3.703849      0.03231622    0.03859675</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  1.0031627 0.9365316 1.689313  3.714421      0.02961573    0.03540419</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  1.0175372 0.9736471 1.682714  3.104227      0.03078943    0.03478738</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 1.0070857 0.9654672 1.762624  4.075556      0.03053075    0.03763328</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.9521158 0.9791341 2.202557  6.914600      0.03096294    0.04622872</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.9740022 1.0102771 2.152534  6.481943      0.03194777    0.04652747</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1.0161855 0.9661507 1.725534  3.550437      0.03055237    0.03599621</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.9563478 0.9841622 2.162938  7.534155      0.03112194    0.04805332</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1.0055773 0.9844183 1.909553  5.035018      0.03113004    0.04128992</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.9847249 0.9971925 1.793922  3.744395      0.03153399    0.03779608</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.9895734 0.9670539 1.858586  4.431768      0.03058093    0.03878408</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  0.9678116 0.9784144 2.034758  6.384401      0.03094018    0.04480028</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  1.0117340 1.0339874 2.269516  7.610142      0.03269755    0.05068686</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 1.0284826 1.0640182 2.096506  6.145697      0.03364721    0.04802159</span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>
@@ -129,7 +140,7 @@ Note that the Monte Carlo variability of the <code>ekurtois</code> estimate may 
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

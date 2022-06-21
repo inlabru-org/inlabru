@@ -106,6 +106,8 @@ like_list(..., envir = NULL)
     <dl><dt>formula</dt>
 <dd><p>a <code>formula</code> where the right hand side is a general R
 expression defines the predictor used in the model.</p></dd>
+
+
 <dt>family</dt>
 <dd><p>A string identifying a valid <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">INLA::inla</a></code> likelihood family.
 The default is
@@ -115,40 +117,62 @@ inlabru supports fitting latent Gaussian Cox
 processes via <code>family = "cp"</code>.
 As an alternative to <code><a href="bru.html">bru()</a></code>, the <code><a href="lgcp.html">lgcp()</a></code> function provides
 a convenient interface to fitting Cox processes.</p></dd>
+
+
 <dt>data</dt>
 <dd><p>Likelihood-specific data, as a <code>data.frame</code> or
 <code>SpatialPoints[DataFrame]</code>
 object.</p></dd>
+
+
 <dt>response_data</dt>
 <dd><p>Likelihood-specific data for models that need different
 size/format for inputs and response variables, as a <code>data.frame</code> or
 <code>SpatialPoints[DataFrame]</code>
 object.</p></dd>
+
+
 <dt>mesh</dt>
 <dd><p>An inla.mesh object. Obsolete.</p></dd>
+
+
 <dt>E</dt>
 <dd><p>Exposure parameter for family = 'poisson' passed on to
 <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">INLA::inla</a></code>. Special case if family is 'cp': rescale all integration
 weights by E. Default taken from <code>options$E</code>.</p></dd>
+
+
 <dt>Ntrials</dt>
 <dd><p>A vector containing the number of trials for the 'binomial'
 likelihood. Default value is rep(1, n.data).
 Default taken from <code>options$Ntrials</code>.</p></dd>
+
+
 <dt>samplers</dt>
 <dd><p>Integration domain for 'cp' family.</p></dd>
+
+
 <dt>ips</dt>
 <dd><p>Integration points for 'cp' family. Overrides <code>samplers</code>.</p></dd>
+
+
 <dt>domain</dt>
 <dd><p>Named list of domain definitions.</p></dd>
+
+
 <dt>include</dt>
 <dd><p>Character vector of component labels that are needed by the
 predictor expression; Default: NULL (include all components that are not
 explicitly excluded)</p></dd>
+
+
 <dt>exclude</dt>
 <dd><p>Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list
 as determined by the <code>include</code> parameter; Default: NULL (do not remove
 any components from the inclusion list)</p></dd>
+
+
 <dt>allow_latent</dt>
 <dd><p>logical. If <code>TRUE</code>, the latent state of each component is
 directly available to the predictor expression, with a <code>_latent</code> suffix.
@@ -156,34 +180,55 @@ This also makes evaluator functions with suffix <code>_eval</code> available, ta
 parameters <code>main</code>, <code>group</code>, and <code>replicate</code>, taking values for where to
 evaluate the component effect that are different than those defined in the
 component definition itself (see <code><a href="component_eval.html">component_eval()</a></code>). Default <code>FALSE</code></p></dd>
+
+
 <dt>allow_combine</dt>
 <dd><p>logical; If <code>TRUE</code>, the predictor expression may
 involve several rows of the input data to influence the same row.
 Default <code>FALSE</code>, but forced to <code>TRUE</code> if <code>response_data</code> is <code>NULL</code> or
 <code>data</code> is a <code>list</code></p></dd>
+
+
 <dt>control.family</dt>
 <dd><p>A optional <code>list</code> of <code><a href="https://rdrr.io/pkg/INLA/man/control.family.html" class="external-link">INLA::control.family</a></code> options</p></dd>
+
+
 <dt>options</dt>
 <dd><p>A <a href="bru_options.html">bru_options</a> options object or a list of options passed
 on to <code><a href="bru_options.html">bru_options()</a></code></p></dd>
+
+
 <dt>.envir</dt>
 <dd><p>The evaluation environment to use for special arguments
 (<code>E</code> and <code>Ntrials</code>) if not found in <code>response_data</code> or <code>data</code>. Defaults to
 the calling environment.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>For <code>like_list.bru_like</code>, one or more <code>bru_like</code> objects</p></dd>
+
+
 <dt>object</dt>
 <dd><p>A list of <code>bru_like</code> objects</p></dd>
+
+
 <dt>envir</dt>
 <dd><p>An optional environment for the new <code>bru_like_list</code> object</p></dd>
+
+
 <dt>x</dt>
 <dd><p><code>bru_like_list</code> object from which to extract element(s)</p></dd>
+
+
 <dt>i</dt>
 <dd><p>indices specifying elements to extract</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A likelihood configuration which can be used to parameterize <code><a href="bru.html">bru()</a></code>.</p>
+    
+
+<p>A likelihood configuration which can be used to parameterize <code><a href="bru.html">bru()</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -277,7 +322,7 @@ into a <code>bru_like_list</code> object</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

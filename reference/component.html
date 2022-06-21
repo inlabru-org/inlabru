@@ -147,27 +147,39 @@ method, called inside <code><a href="bru.html">bru()</a></code>.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>...</dt>
 <dd><p>Parameters passed on to other methods</p></dd>
+
+
 <dt>object</dt>
 <dd><p>A character label for the component</p></dd>
+
+
 <dt>main</dt>
 <dd><p><code>main</code> takes an R expression that evaluates to where the latent variables
 should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 Arguments starting with weights, group, replicate behave similarly to main,
 but for the corresponding features of <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code>.</p></dd>
+
+
 <dt>weights, weights_layer, weights_selector</dt>
 <dd><p>Optional specification of effect scaling weights.
 Same syntax as for <code>main</code>.</p></dd>
+
+
 <dt>model</dt>
 <dd><p>Either one of "offset", "factor_full", "factor_contrast", "linear",
 "fixed", or a model name or
 object accepted by INLA's <code>f</code> function. If set to NULL, then "linear" is used
 for vector inputs, and "fixed" for matrix input (converted internally to
 an iid model with fixed precision)</p></dd>
+
+
 <dt>mapper</dt>
 <dd><p>Information about how to do the mapping from the values evaluated in <code>main</code>,
 and to the latent variables. Auto-detects spde model objects in model and
 extracts the mesh object to use as the mapper, and auto-generates mappers
 for indexed models. (Default: NULL, for auto-determination)</p></dd>
+
+
 <dt>main_layer, main_selector</dt>
 <dd><p>The <code>_layer</code> is a numeric index or character name of which
 layer/variable to extract from a covariate data object given in <code>main</code>
@@ -176,38 +188,59 @@ otherwise the first column of the covariate data frame)</p>
 <p>The <code>_selector</code> is character name of a variable whose contents determines which layer to
 extract from a covariate for each data point. Overrides the <code>layer</code>.
 (Default: NULL)</p></dd>
+
+
 <dt>n</dt>
 <dd><p>The number of latent variables in the model. Should be auto-detected
 for most or all models (Default: NULL, for auto-detection).
 An error is given if it can't figure it out by itself.</p></dd>
+
+
 <dt>values</dt>
 <dd><p>Specifies for what covariate/index values INLA should build
 the latent model. Normally generated internally based on the mapping details.
 (Default: NULL, for auto-determination)</p></dd>
+
+
 <dt>season.length</dt>
 <dd><p>Passed on to <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> for model <code>"seasonal"</code>
 (TODO: check if this parameter is still fully handled)</p></dd>
+
+
 <dt>copy</dt>
 <dd><p>character; label of other component that this component should
 be a copy of. If the <code>fixed = FALSE</code>, a scaling constant is estimated, via a
 hyperparameter. If <code>fixed = TRUE</code>, the component scaling is fixed, by
 default to 1; for fixed scaling, it's more efficient to express the scaling
 in the predictor expression instead of making a copy component.</p></dd>
+
+
 <dt>group, group_mapper, group_layer, group_selector, ngroup</dt>
 <dd><p>Optional specification of kronecker/group model indexing.</p></dd>
+
+
 <dt>control.group</dt>
 <dd><p><code>list</code> of kronecker/group model parameters, currently
 passed directly on to <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f</a></code></p></dd>
+
+
 <dt>replicate, replicate_mapper, replicate_layer, replicate_selector, nrep</dt>
 <dd><p>Optional specification of indices for an independent
 replication model. Same syntax as for <code>main</code></p></dd>
+
+
 <dt>A.msk</dt>
 <dd><p>TODO: check/fix/deprecate this parameter.
 Likely doesn't work at the moment, and I've found no examples that use it.</p></dd>
+
+
 <dt>.envir</dt>
 <dd><p>Evaluation environment</p></dd>
+
+
 <dt>envir_extra</dt>
 <dd><p>TODO: check/fix this parameter.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -330,7 +363,7 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

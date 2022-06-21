@@ -206,6 +206,8 @@ ibm_amatrix(mapper, input, inla_f = FALSE, ...)</code></pre></div>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>mapper</dt>
 <dd><p>A mapper S3 object, normally inheriting from <code>bru_mapper</code></p></dd>
+
+
 <dt>inla_f</dt>
 <dd><p>logical; when <code>TRUE</code> in <code>ibm_n</code> and <code>ibm_values</code>, these must result in values compatible with <code>INLA::f(...)</code>
 an specification and corresponding <code>INLA::inla.stack(...)</code> constructions.
@@ -213,30 +215,47 @@ For <code>ibm_amatrix</code> methods, it may influence how the input data is int
 Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by <code>bru_mapper_collect</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Arguments passed on to other methods</p></dd>
+
+
 <dt>input</dt>
 <dd><p>The values for which to produce a mapping matrix</p></dd>
+
+
 <dt>multi</dt>
 <dd><p>integer or logical;
 If positive, the number of levels to recurse in a <code>bru_collect_mapper</code>.
 If <code>TRUE</code>, equivalent to <code>1L</code>. If <code>FALSE</code>, equivalent to <code>0L</code>.</p></dd>
+
+
 <dt>x</dt>
 <dd><p>object from which to extract element(s)</p></dd>
+
+
 <dt>i</dt>
 <dd><p>indices specifying element(s) to extract</p></dd>
+
+
 <dt>drop</dt>
 <dd><p>logical;
 For <code>[.bru_mapper_collect</code>, whether to extract an individual mapper when
 <code>i</code> identifies a single element. If <code>FALSE</code>, a list of sub-mappers is
 returned (suitable e.g. for creating a new <code>bru_mapper_collect</code> object).
 Default: <code>TRUE</code></p></dd>
+
+
 <dt>value</dt>
 <dd><p>a character vector of up to the same length as x</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <ul><li><p><code>[</code>-indexing a <code>bru_mapper_multi</code> extracts a subset
+    
+
+<ul><li><p><code>[</code>-indexing a <code>bru_mapper_multi</code> extracts a subset
 <code>bru_mapper_multi</code> object (for drop <code>FALSE</code>) or an individual sub-mapper
 (for drop <code>TRUE</code>, and <code>i</code> identifies a single element)</p></li>
 </ul><ul><li><p>The <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> method for <code>bru_mapper_multi</code> returns the names from the
@@ -304,7 +323,7 @@ with unnamed but ordered columns.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

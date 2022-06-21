@@ -89,6 +89,8 @@ log intensity has to be provided via its values at the nodes of an <code>inla.me
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>mesh</dt>
 <dd><p>An <code><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.create.html" class="external-link">INLA::inla.mesh</a></code> object</p></dd>
+
+
 <dt>loglambda</dt>
 <dd><p>vector or matrix; A vector of log intensities at the mesh vertices
 (for higher order basis functions, e.g.
@@ -96,6 +98,8 @@ for <code>inla.mesh.1d</code> meshes, <code>loglambda</code> should be given as 
 function weights rather than the values at the <code>mesh$n</code> vertices)
 A single scalar is expanded to a vector of the appropriate length.
 If a matrix is supplied, one process sample for each column is produced.</p></dd>
+
+
 <dt>strategy</dt>
 <dd><p>Only relevant for 2D meshes. One of <code>'triangulated'</code>, <code>'rectangle'</code>,
 <code>'sliced-spherical'</code>, <code>'spherical'</code>. The <code>'rectangle'</code> method is only valid for
@@ -104,20 +108,29 @@ If <code>NULL</code> or <code>'auto'</code>, the the likely fastest method is ch
 <code>'rectangle'</code> for flat 2D meshes with no CRS,
 <code>'sliced-spherical'</code> for CRS <code>'longlat'</code> meshes, and
 <code>'triangulated'</code> for all other meshes.</p></dd>
+
+
 <dt>R</dt>
 <dd><p>Numerical value only applicable to spherical and geographical meshes. It is interpreted as
 <code>R</code> is the equivalent Earth radius, in km, used to scale the lambda intensity.
 For CRS enabled meshes, the default is 6371. For CRS-less spherical meshes, the default is 1.</p></dd>
+
+
 <dt>samplers</dt>
 <dd><p>A <code>SpatialPolygonsDataFrame</code> or <code>inla.mesh</code> object.
 Simulated points that fall outside these polygons are discarded.</p></dd>
+
+
 <dt>ignore.CRS</dt>
 <dd><p>logical; if <code>TRUE</code>, ignore any CRS information in the mesh. Default <code>FALSE</code>.
 This affects <code>R</code> and the permitted values for <code>strategy</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>data.frame</code> (1D case),
+    
+
+<p>A <code>data.frame</code> (1D case),
 SpatialPoints (2D flat and 3D spherical surface cases)
 SpatialPointsDataFrame (2D/3D surface cases with multiple samples).
 For multiple samples, the <code>data.frame</code> output has a
@@ -443,7 +456,7 @@ Finn Lindgren <a href="mailto:finn.lindgren@gmail.com">finn.lindgren@gmail.com</
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

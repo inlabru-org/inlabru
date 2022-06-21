@@ -98,37 +98,63 @@ Retrieve, add, and/or print log messages"><!-- mathjax --><script src="https://c
 messages separated and terminated by line feeds, suitable for <code>cat(...)</code>.
 If <code>FALSE</code>, return the raw log as a vector of strings, suitable for
 <code>cat(..., sep = "\n")</code>. Default: <code>FALSE</code></p></dd>
+
+
 <dt>...</dt>
 <dd><p>Zero or more objects passed on to <code><a href="https://rdrr.io/r/base/message.html" class="external-link">base::.makeMessage()</a></code></p></dd>
+
+
 <dt>domain</dt>
 <dd><p>Domain for translations, passed on to <code><a href="https://rdrr.io/r/base/message.html" class="external-link">base::.makeMessage()</a></code></p></dd>
+
+
 <dt>appendLF</dt>
 <dd><p>logical; whether to add a newline to the message. Only
 used for verbose output.</p></dd>
+
+
 <dt>verbosity</dt>
 <dd><p>numeric value describing the verbosity level of the message</p></dd>
+
+
 <dt>allow_verbose</dt>
 <dd><p>Whether to allow verbose output. Must be set to FALSE
 until the options object has been initialised.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>logical; if <code>TRUE</code>, print the log message on screen with
 <code>message(txt)</code>. Default: <code>bru_options_get("bru_verbose")</code></p></dd>
+
+
 <dt>verbose_store</dt>
 <dd><p>Same as <code>verbose</code>, but controlling what messages are
 stored in the global log object. Can be controlled via the <code>bru_verbose_store</code>
 with <code><a href="bru_options.html">bru_options_set()</a></code>.</p></dd>
+
+
 <dt>txt</dt>
 <dd><p>character; log message.</p></dd>
+
+
 <dt>activation</dt>
 <dd><p>logical; whether to activate (<code>TRUE</code>) or deactivate
 (<code>FALSE</code>) the inlabru logging system. Default: NULL, to keep the current
 activation state</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code>bru_log_get</code> RETURN_VALUE</p><ul><li><p><code>bru_log_message</code> OUTPUT_DESCRIPTION</p></li>
-</ul><p><code>bru_log</code> invisibly returns the added log message.
-<code>bru_log_active</code> returns the previous activation state</p>
+    
+
+<p><code>bru_log_get</code> RETURN_VALUE</p>
+
+
+<ul><li><p><code>bru_log_message</code> OUTPUT_DESCRIPTION</p></li>
+</ul><p><code>bru_log</code> invisibly returns the added log message.</p>
+
+
+<p><code>bru_log_active</code> returns the previous activation state</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -164,21 +190,21 @@ activation state</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] Inf</span>
 <span class="r-in"><span class="fu">code_runner</span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu">bru_log_get</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2022-05-18 23:33:34: inlabru loaded 2022-05-18 23:33:34: Clear override options 2022-05-18 23:33:39: iinla: Iteration 1 [max:1] 2022-05-18 23:33:40: iinla: Iteration 1 [max:10] 2022-05-18 23:33:40: iinla: |lin1-lin0| = 311.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2022-06-21 16:17:02: inlabru loaded 2022-06-21 16:17:02: Clear override options 2022-06-21 16:17:08: iinla: Iteration 1 [max:1] 2022-06-21 16:17:09: iinla: Iteration 1 [max:10] 2022-06-21 16:17:09: iinla: |lin1-lin0| = 444.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 2.11e-14 2022-05-18 23:33:40: iinla: Iteration 2 [max:10] 2022-05-18 23:33:41: iinla: |lin1-lin0| = 5.469e-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 1.974e-15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.934e-14 2022-05-18 23:33:41: iinla: Max deviation from previous: 0.236% of SD [stop if: &lt;1%] 2022-05-18 23:33:41: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2022-05-18 23:33:41: iinla: Iteration 3 [max:10] 2022-05-18 23:33:41: iinla: Iteration 1 [max:10] 2022-05-18 23:33:42: iinla: Step rescaling: 61.8%, Contract 2022-05-18 23:33:42: iinla: Step rescaling: 38.2%, Contract 2022-05-18 23:33:42: iinla: Step rescaling: 27.14%, Optimisation 2022-05-18 23:33:42: iinla: |lin1-lin0| = 499.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -285.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 153.1 2022-05-18 23:33:42: iinla: Step rescaling: 27.1% 2022-05-18 23:33:42: iinla: Iteration 2 [max:10] 2022-05-18 23:33:42: iinla: Step rescaling: 99.57%, Optimisation 2022-05-18 23:33:42: iinla: |lin1-lin0| = 324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -1.696</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 16.52 2022-05-18 23:33:42: iinla: Step rescaling: 99.6% 2022-05-18 23:33:42: iinla: Max deviation from previous: 66300% of SD [stop if: &lt;1%] 2022-05-18 23:33:42: iinla: Iteration 3 [max:10] 2022-05-18 23:33:42: iinla: Step rescaling: 162%, Expand 2022-05-18 23:33:42: iinla: Step rescaling: 100%, Overstep 2022-05-18 23:33:42: iinla: Step rescaling: 101.8%, Optimisation 2022-05-18 23:33:42: iinla: |lin1-lin0| = 16.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -4.66e-05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 0.02485 2022-05-18 23:33:42: iinla: Step rescaling: 102% 2022-05-18 23:33:43: iinla: Max deviation from previous: 755% of SD [stop if: &lt;1%] 2022-05-18 23:33:43: iinla: Iteration 4 [max:10] 2022-05-18 23:33:43: iinla: Step rescaling: 162%, Expand 2022-05-18 23:33:43: iinla: Step rescaling: 100%, Overstep 2022-05-18 23:33:43: iinla: Step rescaling: 100%, Optimisation 2022-05-18 23:33:43: iinla: |lin1-lin0| = 0.02484</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 3.119e-10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 1.714e-07 2022-05-18 23:33:43: iinla: Max deviation from previous: 13% of SD [stop if: &lt;1%] 2022-05-18 23:33:43: iinla: Iteration 5 [max:10] 2022-05-18 23:33:43: iinla: Step rescaling: 162%, Expand 2022-05-18 23:33:43: iinla: Step rescaling: 100%, Overstep 2022-05-18 23:33:43: iinla: Step rescaling: 100%, Optimisation 2022-05-18 23:33:43: iinla: |lin1-lin0| = 3.339e-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -6.683e-14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 5.003e-13 2022-05-18 23:33:43: iinla: Max deviation from previous: 0.184% of SD [stop if: &lt;1%] 2022-05-18 23:33:43: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2022-05-18 23:33:43: iinla: Iteration 6 [max:10] 2022-05-18 23:33:46: Test message</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 2.989e-14 2022-06-21 16:17:09: iinla: Iteration 2 [max:10] 2022-06-21 16:17:10: iinla: Step rescaling: 162%, Expand 2022-06-21 16:17:10: iinla: Step rescaling: 100%, Overstep 2022-06-21 16:17:10: iinla: |lin1-lin0| = 1.132e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -1.906e-15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 6.325e-14 2022-06-21 16:17:10: iinla: Max deviation from previous: 0.728% of SD [stop if: &lt;1%] 2022-06-21 16:17:10: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2022-06-21 16:17:10: iinla: Iteration 3 [max:10] 2022-06-21 16:17:10: iinla: Iteration 1 [max:10] 2022-06-21 16:17:11: iinla: Step rescaling: 61.8%, Contract 2022-06-21 16:17:11: iinla: Step rescaling: 38.2%, Contract 2022-06-21 16:17:11: iinla: Step rescaling: 27.19%, Optimisation 2022-06-21 16:17:11: iinla: |lin1-lin0| = 378.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -215.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 116.5 2022-06-21 16:17:11: iinla: Step rescaling: 27.2% 2022-06-21 16:17:11: iinla: Iteration 2 [max:10] 2022-06-21 16:17:11: iinla: Step rescaling: 99.56%, Optimisation 2022-06-21 16:17:11: iinla: |lin1-lin0| = 244.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -1.284</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 12.49 2022-06-21 16:17:11: iinla: Step rescaling: 99.6% 2022-06-21 16:17:11: iinla: Max deviation from previous: 50700% of SD [stop if: &lt;1%] 2022-06-21 16:17:11: iinla: Iteration 3 [max:10] 2022-06-21 16:17:12: iinla: Step rescaling: 162%, Expand 2022-06-21 16:17:12: iinla: Step rescaling: 100%, Overstep 2022-06-21 16:17:12: iinla: Step rescaling: 101.8%, Optimisation 2022-06-21 16:17:12: iinla: |lin1-lin0| = 12.55</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -3.779e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 0.01905 2022-06-21 16:17:12: iinla: Step rescaling: 102% 2022-06-21 16:17:12: iinla: Max deviation from previous: 576% of SD [stop if: &lt;1%] 2022-06-21 16:17:12: iinla: Iteration 4 [max:10] 2022-06-21 16:17:12: iinla: Step rescaling: 162%, Expand 2022-06-21 16:17:12: iinla: Step rescaling: 100%, Overstep 2022-06-21 16:17:12: iinla: Step rescaling: 100%, Optimisation 2022-06-21 16:17:12: iinla: |lin1-lin0| = 0.01906</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 2.488e-10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 1.331e-07 2022-06-21 16:17:13: iinla: Max deviation from previous: 9.78% of SD [stop if: &lt;1%] 2022-06-21 16:17:13: iinla: Iteration 5 [max:10] 2022-06-21 16:17:13: iinla: Step rescaling: 162%, Expand 2022-06-21 16:17:13: iinla: Step rescaling: 100%, Overstep 2022-06-21 16:17:13: iinla: |lin1-lin0| = 3.547e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -3.33e-13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 1.017e-12 2022-06-21 16:17:13: iinla: Max deviation from previous: 0.196% of SD [stop if: &lt;1%] 2022-06-21 16:17:13: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2022-06-21 16:17:13: iinla: Iteration 6 [max:10] 2022-06-21 16:17:16: Test message</span>
 <span class="r-in"><span class="fu">bru_log_active</span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] Inf</span>
 </code></pre></div>
@@ -192,7 +218,7 @@ activation state</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>
