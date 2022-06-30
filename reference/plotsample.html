@@ -69,7 +69,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotsample</span><span class="op">(</span><span class="va">spdf</span>, <span class="va">boundary</span>, x.ppn <span class="op">=</span> <span class="fl">0.25</span>, y.ppn <span class="op">=</span> <span class="fl">0.25</span>, nx <span class="op">=</span> <span class="fl">5</span>, ny <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotsample</span><span class="op">(</span><span class="va">spdf</span>, <span class="va">boundary</span>, x.ppn <span class="op">=</span> <span class="fl">0.25</span>, y.ppn <span class="op">=</span> <span class="fl">0.25</span>, nx <span class="op">=</span> <span class="fl">5</span>, ny <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -134,27 +134,27 @@ points within the plots.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
-<span class="r-in"><span class="co"># Some features require the raster package</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://rspatial.org/raster" class="external-link">"raster"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span>
-<span class="r-in">  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">plotpts</span> <span class="op">&lt;-</span> <span class="fu">plotsample</span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
-<span class="r-in">    x.ppn <span class="op">=</span> <span class="fl">0.4</span>, y.ppn <span class="op">=</span> <span class="fl">0.4</span>, nx <span class="op">=</span> <span class="fl">5</span>, ny <span class="op">=</span> <span class="fl">5</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in">  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">plotpts</span><span class="op">$</span><span class="va">plots</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">plotpts</span><span class="op">$</span><span class="va">dets</span>, pch <span class="op">=</span> <span class="st">"+"</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="co"># Some features require the raster package</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://rspatial.org/raster" class="external-link">"raster"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
+<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">plotpts</span> <span class="op">&lt;-</span> <span class="fu">plotsample</span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span></span>
+<span class="r-in"><span>    x.ppn <span class="op">=</span> <span class="fl">0.4</span>, y.ppn <span class="op">=</span> <span class="fl">0.4</span>, nx <span class="op">=</span> <span class="fl">5</span>, ny <span class="op">=</span> <span class="fl">5</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">plotpts</span><span class="op">$</span><span class="va">plots</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">plotpts</span><span class="op">$</span><span class="va">dets</span>, pch <span class="op">=</span> <span class="st">"+"</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>CRS object has comment, which is lost in output; in tests, see</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> https://cran.r-project.org/web/packages/sp/vignettes/CRS_warnings.html</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: rgeos</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Regions defined for each Polygons</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Regions defined for each Polygons</span>
 <span class="r-plt img"><img src="plotsample-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="co"># }</span></span>
-<span class="r-in"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -166,7 +166,7 @@ points within the plots.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
     </footer></div>

@@ -69,7 +69,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">devel.cvmeasure</span><span class="op">(</span><span class="va">joint</span>, <span class="va">prediction1</span>, <span class="va">prediction2</span>, samplers <span class="op">=</span> <span class="cn">NULL</span>, mesh <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">devel.cvmeasure</span><span class="op">(</span><span class="va">joint</span>, <span class="va">prediction1</span>, <span class="va">prediction2</span>, samplers <span class="op">=</span> <span class="cn">NULL</span>, mesh <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -109,132 +109,132 @@ Point process models for spatio-temporal distance sampling data from a large-sca
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Load Gorilla data</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"gorillas"</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Use RColorBrewer</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">RColorBrewer</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Fit a model with two components:</span></span>
-<span class="r-in">  <span class="co"># 1) A spatial smooth SPDE</span></span>
-<span class="r-in">  <span class="co"># 2) A spatial covariate effect (vegetation)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="va">pcmatern</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
-<span class="r-in">    prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
-<span class="r-in">    prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.01</span><span class="op">)</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">vegetation</span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span>, model <span class="op">=</span> <span class="st">"factor_contrast"</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu">spde</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">pcmatern</span><span class="op">)</span> <span class="op">-</span></span>
-<span class="r-in">    <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>,</span>
-<span class="r-in">    samplers <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
-<span class="r-in">    domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>,</span>
-<span class="r-in">    options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Predict SPDE and vegetation at the mesh vertex locations</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="va">vrt</span> <span class="op">&lt;-</span> <span class="fu"><a href="vertices.html">vertices</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
-<span class="r-in">    <span class="va">fit</span>,</span>
-<span class="r-in">    <span class="va">vrt</span>,</span>
-<span class="r-in">    <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">      joint <span class="op">=</span> <span class="va">spde</span> <span class="op">+</span> <span class="va">vegetation</span>,</span>
-<span class="r-in">      field <span class="op">=</span> <span class="va">spde</span>,</span>
-<span class="r-in">      veg <span class="op">=</span> <span class="va">vegetation</span></span>
-<span class="r-in">    <span class="op">)</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Plot component mean</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="fu"><a href="multiplot.html">multiplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">joint</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">field</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">veg</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span>
-<span class="r-in">  cols <span class="op">=</span> <span class="fl">3</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Plot component variance</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="fu"><a href="multiplot.html">multiplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">joint</span><span class="op">$</span><span class="va">var</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">field</span><span class="op">$</span><span class="va">var</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">veg</span><span class="op">$</span><span class="va">var</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span>
-<span class="r-in">  cols <span class="op">=</span> <span class="fl">3</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Calculate variance and correlation measure</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="va">vm</span> <span class="op">&lt;-</span> <span class="fu">devel.cvmeasure</span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">joint</span>, <span class="va">pred</span><span class="op">$</span><span class="va">field</span>, <span class="va">pred</span><span class="op">$</span><span class="va">veg</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">lprange</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">vm</span><span class="op">$</span><span class="va">var.joint</span>, <span class="va">vm</span><span class="op">$</span><span class="va">var1</span>, <span class="va">vm</span><span class="op">$</span><span class="va">var2</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Variance contribution of the components</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="va">csc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradientn</a></span><span class="op">(</span>colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">9</span>, <span class="st">"YlOrRd"</span><span class="op">)</span>, limits <span class="op">=</span> <span class="va">lprange</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="va">plot.1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">vm</span><span class="op">$</span><span class="va">var.joint</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="va">csc</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"joint"</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">plot.2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">vm</span><span class="op">$</span><span class="va">var1</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="va">csc</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"SPDE"</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">plot.3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">vm</span><span class="op">$</span><span class="va">var2</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="va">csc</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"vegetation"</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="fu"><a href="multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">plot.1</span>, <span class="va">plot.2</span>, <span class="va">plot.3</span>, cols <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Covariance of SPDE field and vegetation</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">vm</span><span class="op">$</span><span class="va">cov</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Correlation between field and vegetation</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">vm</span><span class="op">$</span><span class="va">cor</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Variance and correlation integrated over space</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="va">vm.int</span> <span class="op">&lt;-</span> <span class="fu">devel.cvmeasure</span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">joint</span>, <span class="va">pred</span><span class="op">$</span><span class="va">field</span>, <span class="va">pred</span><span class="op">$</span><span class="va">veg</span>,</span>
-<span class="r-in">    samplers <span class="op">=</span> <span class="fu"><a href="ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>,</span>
-<span class="r-in">    mesh <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in">  <span class="va">vm.int</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Load Gorilla data</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"gorillas"</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Use RColorBrewer</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">RColorBrewer</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Fit a model with two components:</span></span></span>
+<span class="r-in"><span>  <span class="co"># 1) A spatial smooth SPDE</span></span></span>
+<span class="r-in"><span>  <span class="co"># 2) A spatial covariate effect (vegetation)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">pcmatern</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span></span>
+<span class="r-in"><span>    prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.01</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">vegetation</span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span>, model <span class="op">=</span> <span class="st">"factor_contrast"</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu">spde</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">pcmatern</span><span class="op">)</span> <span class="op">-</span></span></span>
+<span class="r-in"><span>    <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>,</span></span>
+<span class="r-in"><span>    samplers <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span></span>
+<span class="r-in"><span>    domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Predict SPDE and vegetation at the mesh vertex locations</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">vrt</span> <span class="op">&lt;-</span> <span class="fu"><a href="vertices.html">vertices</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">fit</span>,</span></span>
+<span class="r-in"><span>    <span class="va">vrt</span>,</span></span>
+<span class="r-in"><span>    <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      joint <span class="op">=</span> <span class="va">spde</span> <span class="op">+</span> <span class="va">vegetation</span>,</span></span>
+<span class="r-in"><span>      field <span class="op">=</span> <span class="va">spde</span>,</span></span>
+<span class="r-in"><span>      veg <span class="op">=</span> <span class="va">vegetation</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Plot component mean</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="multiplot.html">multiplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">joint</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">field</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">veg</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  cols <span class="op">=</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Plot component variance</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="multiplot.html">multiplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">joint</span><span class="op">$</span><span class="va">var</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">field</span><span class="op">$</span><span class="va">var</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">veg</span><span class="op">$</span><span class="va">var</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  cols <span class="op">=</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Calculate variance and correlation measure</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">vm</span> <span class="op">&lt;-</span> <span class="fu">devel.cvmeasure</span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">joint</span>, <span class="va">pred</span><span class="op">$</span><span class="va">field</span>, <span class="va">pred</span><span class="op">$</span><span class="va">veg</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">lprange</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">vm</span><span class="op">$</span><span class="va">var.joint</span>, <span class="va">vm</span><span class="op">$</span><span class="va">var1</span>, <span class="va">vm</span><span class="op">$</span><span class="va">var2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Variance contribution of the components</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">csc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradientn</a></span><span class="op">(</span>colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">9</span>, <span class="st">"YlOrRd"</span><span class="op">)</span>, limits <span class="op">=</span> <span class="va">lprange</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">plot.1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">vm</span><span class="op">$</span><span class="va">var.joint</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="va">csc</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"joint"</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">plot.2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">vm</span><span class="op">$</span><span class="va">var1</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="va">csc</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"SPDE"</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">plot.3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">vm</span><span class="op">$</span><span class="va">var2</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="va">csc</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"vegetation"</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">plot.1</span>, <span class="va">plot.2</span>, <span class="va">plot.3</span>, cols <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Covariance of SPDE field and vegetation</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">vm</span><span class="op">$</span><span class="va">cov</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Correlation between field and vegetation</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, color <span class="op">=</span> <span class="va">vm</span><span class="op">$</span><span class="va">cor</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Variance and correlation integrated over space</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">vm.int</span> <span class="op">&lt;-</span> <span class="fu">devel.cvmeasure</span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">joint</span>, <span class="va">pred</span><span class="op">$</span><span class="va">field</span>, <span class="va">pred</span><span class="op">$</span><span class="va">veg</span>,</span></span>
+<span class="r-in"><span>    samplers <span class="op">=</span> <span class="fu"><a href="ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    mesh <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">vm.int</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=1 +no_defs +type=crs</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded datum unknown in Proj4 definition</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded ellps unknown in Proj4 definition: +proj=longlat +R=6378137 +no_defs +type=crs</span>
@@ -343,8 +343,8 @@ Point process models for spatio-temporal distance sampling data from a large-sca
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Discarded datum unknown in Proj4 definition</span>
 <span class="r-plt img"><img src="devel.cvmeasure-3.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    var.joint         var1       var2         cor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.01561347 0.0001050361 0.01550118 0.002843268</span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.01998075 0.0001038686 0.01986953 0.002556641</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -356,7 +356,7 @@ Point process models for spatio-temporal distance sampling data from a large-sca
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
     </footer></div>

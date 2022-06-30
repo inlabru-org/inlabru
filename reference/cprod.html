@@ -75,7 +75,7 @@ dimension has no weights attached to it all weights are assumend to be 1.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cprod</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cprod</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -97,22 +97,22 @@ dimension has no weights attached to it all weights are assumend to be 1.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
-<span class="r-in"><span class="co"># ipoints needs INLA</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="co"># Create integration points in dimension 'myDim' and 'myDiscreteDim'</span></span>
-<span class="r-in">  <span class="va">ips1</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipoints.html">ipoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span>, <span class="fl">17</span>, name <span class="op">=</span> <span class="st">"myDim"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">ips2</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipoints.html">ipoints</a></span><span class="op">(</span>domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"myDiscreteDim"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Calculate the cross product</span></span>
-<span class="r-in">  <span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu">cprod</span><span class="op">(</span><span class="va">ips1</span>, <span class="va">ips2</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co"># Plot the integration points</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ips</span><span class="op">$</span><span class="va">myDim</span>, <span class="va">ips</span><span class="op">$</span><span class="va">myDiscreteDim</span>, cex <span class="op">=</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">ips</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="co"># ipoints needs INLA</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># Create integration points in dimension 'myDim' and 'myDiscreteDim'</span></span></span>
+<span class="r-in"><span>  <span class="va">ips1</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipoints.html">ipoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span>, <span class="fl">17</span>, name <span class="op">=</span> <span class="st">"myDim"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">ips2</span> <span class="op">&lt;-</span> <span class="fu"><a href="ipoints.html">ipoints</a></span><span class="op">(</span>domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"myDiscreteDim"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Calculate the cross product</span></span></span>
+<span class="r-in"><span>  <span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu">cprod</span><span class="op">(</span><span class="va">ips1</span>, <span class="va">ips2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Plot the integration points</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ips</span><span class="op">$</span><span class="va">myDim</span>, <span class="va">ips</span><span class="op">$</span><span class="va">myDiscreteDim</span>, cex <span class="op">=</span> <span class="fl">10</span> <span class="op">*</span> <span class="va">ips</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-plt img"><img src="cprod-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="co"># }</span></span>
-<span class="r-in"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -124,7 +124,7 @@ dimension has no weights attached to it all weights are assumend to be 1.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
     </footer></div>

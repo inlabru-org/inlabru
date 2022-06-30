@@ -86,7 +86,7 @@
       <img src="" class="logo" alt=""><h1>LGCPs - Multiple Likelihoods</h1>
                         <h4 data-toc-skip class="author">Fabian E. Bachl</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-06-21</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-06-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_multilikelihood.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -104,24 +104,24 @@
 </h2>
 <p>Load libraries</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="get-the-data">Get the data<a class="anchor" aria-label="anchor" href="#get-the-data"></a>
 </h2>
 <p>For the next few practicals we are going to be working with a dataset obtained from the <code>R</code> package <code>spatstat</code>, which contains the locations of 647 gorilla nests. We load the dataset like this:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
 <p>Plot the nests and visualize the group membership (major/minor) by color:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Gorillas nests and group membership"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Gorillas nests and group membership"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
 </div>
 <div class="section level2">
@@ -129,165 +129,165 @@
 </h2>
 <p>First, we define all components that enter the joint model. That is, the intercept that is common to both LGCPs and the two different spatial smoothers, one for each nest group.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,
-  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,
-  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span>
-<span class="op">)</span>
-
-<span class="va">cmp</span> <span class="op">&lt;-</span> <span class="op">~</span>
-  <span class="fu">Common</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">Difference</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
+<span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
+<span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="op">~</span></span>
+<span>  <span class="fu">Common</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">Difference</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p>Given these components we define the linear predictor for each of the likelihoods. (Using “.” indicates a pure additive model, and one can use include/exclude options for <code><a href="../../reference/like.html">like()</a></code> to indicate which components are actively involved in each model.)</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fml.major</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">Common</span> <span class="op">+</span> <span class="va">Difference</span> <span class="op">/</span> <span class="fl">2</span>
-<span class="va">fml.minor</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">Common</span> <span class="op">-</span> <span class="va">Difference</span> <span class="op">/</span> <span class="fl">2</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">fml.major</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">Common</span> <span class="op">+</span> <span class="va">Difference</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span><span class="va">fml.minor</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">Common</span> <span class="op">-</span> <span class="va">Difference</span> <span class="op">/</span> <span class="fl">2</span></span></code></pre></div>
 <p>Setting up the cox process integration points is easy in this example. Both nest types were observed within the same window.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span></span></code></pre></div>
 <p>Lastly, we define the two likelihoods…</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">lik_minor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,
-  formula <span class="op">=</span> <span class="va">fml.major</span>,
-  data <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">[</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"major"</span>, <span class="op">]</span>,
-  ips <span class="op">=</span> <span class="va">ips</span>
-<span class="op">)</span>
-<span class="va">lik_major</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,
-  formula <span class="op">=</span> <span class="va">fml.minor</span>,
-  data <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">[</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"minor"</span>, <span class="op">]</span>,
-  ips <span class="op">=</span> <span class="va">ips</span>
-<span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">lik_minor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,</span>
+<span>  formula <span class="op">=</span> <span class="va">fml.major</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">[</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"major"</span>, <span class="op">]</span>,</span>
+<span>  ips <span class="op">=</span> <span class="va">ips</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">lik_major</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,</span>
+<span>  formula <span class="op">=</span> <span class="va">fml.minor</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">[</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"minor"</span>, <span class="op">]</span>,</span>
+<span>  ips <span class="op">=</span> <span class="va">ips</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>… which we provide to the ´bru´ function.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">jfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">lik_major</span>, <span class="va">lik_minor</span>,
-  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-    control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span>,
-    bru_max_iter <span class="op">=</span> <span class="fl">1</span>
-  <span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">jfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">lik_major</span>, <span class="va">lik_minor</span>,</span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span>,</span>
+<span>    bru_max_iter <span class="op">=</span> <span class="fl">1</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span>
-<span class="va">pl.major</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,
-    mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,
-    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Common</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="va">pl.minor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,
-    mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,
-    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Difference</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="op">(</span><span class="va">pl.major</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="op">(</span><span class="va">pl.minor</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"right"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
+<span><span class="va">pl.major</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
+<span>    mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
+<span>    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Common</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">pl.minor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
+<span>    mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
+<span>    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Difference</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">pl.major</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="op">(</span><span class="va">pl.minor</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"right"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-9-1.png" width="768"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">jfit0</span> <span class="op">&lt;-</span> <span class="va">jfit</span>
-<span class="va">jfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru_rerun</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">jfit0</span> <span class="op">&lt;-</span> <span class="va">jfit</span></span>
+<span><span class="va">jfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru_rerun</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span>
-<span class="va">pl.major</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,
-    mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,
-    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Common</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="va">pl.minor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,
-    mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,
-    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Difference</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="op">(</span><span class="va">pl.major</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="op">(</span><span class="va">pl.minor</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"right"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
+<span><span class="va">pl.major</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
+<span>    mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
+<span>    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Common</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">pl.minor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
+<span>    mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
+<span>    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Difference</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">pl.major</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="op">(</span><span class="va">pl.minor</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"right"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-11-1.png" width="768"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit0</span><span class="op">)</span>
-<span class="co">#&gt; inlabru version: 2.5.2.9000</span>
-<span class="co">#&gt; INLA version: 22.06.20-2</span>
-<span class="co">#&gt; Components:</span>
-<span class="co">#&gt;   Common: Model types main='spde', group='exchangeable', replicate='iid'</span>
-<span class="co">#&gt;   Difference: Model types main='spde', group='exchangeable', replicate='iid'</span>
-<span class="co">#&gt;   Intercept: Model types main='linear', group='exchangeable', replicate='iid'</span>
-<span class="co">#&gt; Likelihoods:</span>
-<span class="co">#&gt;   Family: 'cp'</span>
-<span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
-<span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common - Difference/2</span>
-<span class="co">#&gt;   Family: 'cp'</span>
-<span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
-<span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span>
-<span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.65, Running = 504, Post = 0.15, Total = 506 </span>
-<span class="co">#&gt; Fixed effects:</span>
-<span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span>
-<span class="co">#&gt; Intercept -0.342 1.442     -3.172    -0.34      2.487   NA 0.044</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Random effects:</span>
-<span class="co">#&gt;   Name     Model</span>
-<span class="co">#&gt;     Common SPDE2 model</span>
-<span class="co">#&gt;    Difference SPDE2 model</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Model hyperparameters:</span>
-<span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span>
-<span class="co">#&gt; Range for Common     2.988 0.689      1.870    2.907      4.576 2.748</span>
-<span class="co">#&gt; Stdev for Common     2.103 0.401      1.426    2.064      3.005 1.986</span>
-<span class="co">#&gt; Range for Difference 0.628 0.330      0.174    0.568      1.434 0.433</span>
-<span class="co">#&gt; Stdev for Difference 0.123 0.044      0.058    0.116      0.229 0.103</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 622.49</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32931.60</span>
-<span class="co">#&gt; Effective number of parameters .....................: -760.62</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1648.51</span>
-<span class="co">#&gt; Effective number of parameters .................: 105.42</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Marginal log-Likelihood:  -1205.78 </span>
-<span class="co">#&gt;  is computed </span>
-<span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span>
-<span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; inlabru version: 2.5.2.9000</span></span>
+<span><span class="co">#&gt; INLA version: 22.06.25</span></span>
+<span><span class="co">#&gt; Components:</span></span>
+<span><span class="co">#&gt;   Common: Model types main='spde', group='exchangeable', replicate='iid'</span></span>
+<span><span class="co">#&gt;   Difference: Model types main='spde', group='exchangeable', replicate='iid'</span></span>
+<span><span class="co">#&gt;   Intercept: Model types main='linear', group='exchangeable', replicate='iid'</span></span>
+<span><span class="co">#&gt; Likelihoods:</span></span>
+<span><span class="co">#&gt;   Family: 'cp'</span></span>
+<span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
+<span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common - Difference/2</span></span>
+<span><span class="co">#&gt;   Family: 'cp'</span></span>
+<span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
+<span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
+<span><span class="co">#&gt; Time used:</span></span>
+<span><span class="co">#&gt;     Pre = 1.16, Running = 624, Post = 0.29, Total = 625 </span></span>
+<span><span class="co">#&gt; Fixed effects:</span></span>
+<span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
+<span><span class="co">#&gt; Intercept -0.302 1.333     -2.917     -0.3      2.313   NA 0.049</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;   Name     Model</span></span>
+<span><span class="co">#&gt;     Common SPDE2 model</span></span>
+<span><span class="co">#&gt;    Difference SPDE2 model</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model hyperparameters:</span></span>
+<span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
+<span><span class="co">#&gt; Range for Common     2.95 0.706      1.853    2.852      4.609 2.653</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.06 0.404      1.396    2.008      2.978 1.909</span></span>
+<span><span class="co">#&gt; Range for Difference 1.95 1.651      0.345    1.492      6.293 0.861</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.16 0.051      0.082    0.152      0.281 0.138</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 624.92</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32929.16</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -758.43</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1649.26</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 105.87</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1206.92 </span></span>
+<span><span class="co">#&gt;  is computed </span></span>
+<span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
+<span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">)</span>
-<span class="co">#&gt; inlabru version: 2.5.2.9000</span>
-<span class="co">#&gt; INLA version: 22.06.20-2</span>
-<span class="co">#&gt; Components:</span>
-<span class="co">#&gt;   Common: Model types main='spde', group='exchangeable', replicate='iid'</span>
-<span class="co">#&gt;   Difference: Model types main='spde', group='exchangeable', replicate='iid'</span>
-<span class="co">#&gt;   Intercept: Model types main='linear', group='exchangeable', replicate='iid'</span>
-<span class="co">#&gt; Likelihoods:</span>
-<span class="co">#&gt;   Family: 'cp'</span>
-<span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
-<span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common - Difference/2</span>
-<span class="co">#&gt;   Family: 'cp'</span>
-<span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span>
-<span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span>
-<span class="co">#&gt; Time used:</span>
-<span class="co">#&gt;     Pre = 1.25, Running = 380, Post = 0.142, Total = 382 </span>
-<span class="co">#&gt; Fixed effects:</span>
-<span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span>
-<span class="co">#&gt; Intercept -0.304 1.368     -2.988   -0.302      2.379   NA 0.046</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Random effects:</span>
-<span class="co">#&gt;   Name     Model</span>
-<span class="co">#&gt;     Common SPDE2 model</span>
-<span class="co">#&gt;    Difference SPDE2 model</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Model hyperparameters:</span>
-<span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span>
-<span class="co">#&gt; Range for Common     2.978 0.671      1.914    2.891      4.539 2.713</span>
-<span class="co">#&gt; Stdev for Common     2.059 0.380      1.430    2.017      2.920 1.930</span>
-<span class="co">#&gt; Range for Difference 1.267 0.731      0.417    1.087      3.165 0.822</span>
-<span class="co">#&gt; Stdev for Difference 0.179 0.090      0.055    0.163      0.398 0.129</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 627.22</span>
-<span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32926.87</span>
-<span class="co">#&gt; Effective number of parameters .....................: -756.88</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1652.41</span>
-<span class="co">#&gt; Effective number of parameters .................: 107.73</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Marginal log-Likelihood:  -1206.33 </span>
-<span class="co">#&gt;  is computed </span>
-<span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span>
-<span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; inlabru version: 2.5.2.9000</span></span>
+<span><span class="co">#&gt; INLA version: 22.06.25</span></span>
+<span><span class="co">#&gt; Components:</span></span>
+<span><span class="co">#&gt;   Common: Model types main='spde', group='exchangeable', replicate='iid'</span></span>
+<span><span class="co">#&gt;   Difference: Model types main='spde', group='exchangeable', replicate='iid'</span></span>
+<span><span class="co">#&gt;   Intercept: Model types main='linear', group='exchangeable', replicate='iid'</span></span>
+<span><span class="co">#&gt; Likelihoods:</span></span>
+<span><span class="co">#&gt;   Family: 'cp'</span></span>
+<span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
+<span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common - Difference/2</span></span>
+<span><span class="co">#&gt;   Family: 'cp'</span></span>
+<span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
+<span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
+<span><span class="co">#&gt; Time used:</span></span>
+<span><span class="co">#&gt;     Pre = 0.914, Running = 127, Post = 0.082, Total = 128 </span></span>
+<span><span class="co">#&gt; Fixed effects:</span></span>
+<span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
+<span><span class="co">#&gt; Intercept -0.294 1.337     -2.919   -0.292      2.329   NA 0.047</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;   Name     Model</span></span>
+<span><span class="co">#&gt;     Common SPDE2 model</span></span>
+<span><span class="co">#&gt;    Difference SPDE2 model</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model hyperparameters:</span></span>
+<span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
+<span><span class="co">#&gt; Range for Common     3.00 0.739      1.863    2.888      4.748 2.668</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.08 0.420      1.407    2.022      3.048 1.907</span></span>
+<span><span class="co">#&gt; Range for Difference 1.65 1.794      0.113    1.106      6.428 0.310</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.15 0.077      0.045    0.136      0.338 0.106</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 622.15</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32931.94</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -760.42</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1647.17</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 104.84</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.22 </span></span>
+<span><span class="co">#&gt;  is computed </span></span>
+<span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
+<span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
@@ -302,7 +302,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
     </footer>

@@ -69,30 +69,30 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">local_testthat_assign</span><span class="op">(</span><span class="va">x</span>, <span class="va">values</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">local_testthat_tolerances</span><span class="op">(</span>
-  tolerances <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e-04</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span><span class="op">)</span>,
-  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span>
-<span class="op">)</span>
-
-<span class="fu">local_bru_options_set</span><span class="op">(</span><span class="va">...</span>, .reset <span class="op">=</span> <span class="cn">FALSE</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">local_set_PROJ6_warnings</span><span class="op">(</span>proj4 <span class="op">=</span> <span class="cn">FALSE</span>, thin <span class="op">=</span> <span class="cn">TRUE</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">local_get_rgdal_options</span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu">local_disable_PROJ6_warnings</span><span class="op">(</span>envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">local_basic_intercept_testdata</span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu">local_basic_fixed_effect_testdata</span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu">local_mrsea_convert</span><span class="op">(</span><span class="va">x</span>, use_km <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="fu">local_bru_safe_inla</span><span class="op">(</span>multicore <span class="op">=</span> <span class="cn">FALSE</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">local_bru_testthat_setup</span><span class="op">(</span>envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">local_testthat_assign</span><span class="op">(</span><span class="va">x</span>, <span class="va">values</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">local_testthat_tolerances</span><span class="op">(</span></span>
+<span>  tolerances <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e-04</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
+<span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">local_bru_options_set</span><span class="op">(</span><span class="va">...</span>, .reset <span class="op">=</span> <span class="cn">FALSE</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">local_set_PROJ6_warnings</span><span class="op">(</span>proj4 <span class="op">=</span> <span class="cn">FALSE</span>, thin <span class="op">=</span> <span class="cn">TRUE</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">local_get_rgdal_options</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">local_disable_PROJ6_warnings</span><span class="op">(</span>envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">local_basic_intercept_testdata</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">local_basic_fixed_effect_testdata</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">local_mrsea_convert</span><span class="op">(</span><span class="va">x</span>, use_km <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">local_bru_safe_inla</span><span class="op">(</span>multicore <span class="op">=</span> <span class="cn">FALSE</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">local_bru_testthat_setup</span><span class="op">(</span>envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -182,19 +182,19 @@ should be called inside each test that relies on INLA.</p></li>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">my_fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">val</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="fu">local_bru_options_set</span><span class="op">(</span>bru_verbose <span class="op">=</span> <span class="va">val</span><span class="op">)</span></span>
-<span class="r-in">  <span class="fu"><a href="bru_options.html">bru_options_get</a></span><span class="op">(</span><span class="st">"bru_verbose"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"><span class="co"># Inside the function, the bru_verbose option is changed.</span></span>
-<span class="r-in"><span class="co"># Outside the function, the bru_verbose option is unchanged.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">my_fun</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">my_fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">val</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu">local_bru_options_set</span><span class="op">(</span>bru_verbose <span class="op">=</span> <span class="va">val</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="bru_options.html">bru_options_get</a></span><span class="op">(</span><span class="st">"bru_verbose"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co"># Inside the function, the bru_verbose option is changed.</span></span></span>
+<span class="r-in"><span><span class="co"># Outside the function, the bru_verbose option is unchanged.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">my_fun</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="bru_options.html">bru_options_get</a></span><span class="op">(</span><span class="st">"bru_verbose"</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="bru_options.html">bru_options_get</a></span><span class="op">(</span><span class="st">"bru_verbose"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">my_fun</span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">my_fun</span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="bru_options.html">bru_options_get</a></span><span class="op">(</span><span class="st">"bru_verbose"</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="bru_options.html">bru_options_get</a></span><span class="op">(</span><span class="st">"bru_verbose"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
 </code></pre></div>
     </div>
@@ -207,7 +207,7 @@ should be called inside each test that relies on INLA.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
     </footer></div>

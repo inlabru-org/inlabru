@@ -69,51 +69,51 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-
-<span class="fu">ibm_n</span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">ibm_values</span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">ibm_amatrix</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">ibm_inla_subset</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">ibm_valid_input</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, methods <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">ibm_inla_subset</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for inla.mesh</span>
-<span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for inla.mesh.1d</span>
-<span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">bru_mapper_index</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1L</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">bru_mapper_linear</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-
-<span class="fu">bru_mapper_matrix</span><span class="op">(</span><span class="va">labels</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">bru_mapper_factor</span><span class="op">(</span><span class="va">values</span>, <span class="va">factor_mapping</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">bru_mapper_offset</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-
-<span class="fu">bru_mapper_multi</span><span class="op">(</span><span class="va">mappers</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">bru_mapper_collect</span><span class="op">(</span><span class="va">mappers</span>, hidden <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">bru_mapper_harmonics</span><span class="op">(</span>
-  order <span class="op">=</span> <span class="fl">1</span>,
-  scaling <span class="op">=</span> <span class="fl">1</span>,
-  intercept <span class="op">=</span> <span class="cn">TRUE</span>,
-  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ibm_n</span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ibm_values</span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ibm_amatrix</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ibm_inla_subset</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ibm_valid_input</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, methods <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">ibm_inla_subset</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for inla.mesh</span></span>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for inla.mesh.1d</span></span>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_index</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1L</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_linear</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_matrix</span><span class="op">(</span><span class="va">labels</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_factor</span><span class="op">(</span><span class="va">values</span>, <span class="va">factor_mapping</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_offset</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_multi</span><span class="op">(</span><span class="va">mappers</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_collect</span><span class="op">(</span><span class="va">mappers</span>, hidden <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_harmonics</span><span class="op">(</span></span>
+<span>  order <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  scaling <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  intercept <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -282,8 +282,8 @@ determining the variance for each frequency contribution.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_index</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">ibm_amatrix</span><span class="op">(</span><span class="va">mapper</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_index</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ibm_amatrix</span><span class="op">(</span><span class="va">mapper</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5 x 5 sparse Matrix of class "dgCMatrix"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 1 . . . .</span>
@@ -302,7 +302,7 @@ determining the variance for each frequency contribution.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
     </footer></div>

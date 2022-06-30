@@ -1,5 +1,5 @@
 pandoc: 2.14.2
-pkgdown: 2.0.4
+pkgdown: 2.0.5
 pkgdown_sha: ~
 articles:
   linearapprox: linearapprox.html
@@ -15,5 +15,5 @@ articles:
   random_fields: web/random_fields.html
   random_fields_2d: web/random_fields_2d.html
   website_examples: website_examples.html
-last_built: 2022-06-21T16:17Z
+last_built: 2022-06-30T08:24Z
 
