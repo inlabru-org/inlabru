@@ -140,7 +140,7 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
 #' pol <- spoly(pts)
 #'
 #' if (require(ggplot2, quietly = TRUE) &&
-#'     require(ggpolypath, quietly = TRUE)) {
+#'   require(ggpolypath, quietly = TRUE)) {
 #'   # Plot it!
 #'   ggplot() +
 #'     gg(pol)
