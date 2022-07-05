@@ -42,6 +42,9 @@
 \alias{names<-.bru_mapper_collect}
 \alias{ibm_n.bru_mapper_harmonics}
 \alias{ibm_amatrix.bru_mapper_harmonics}
+\alias{ibm_n.bru_mapper_mesh_B}
+\alias{ibm_values.bru_mapper_mesh_B}
+\alias{ibm_amatrix.bru_mapper_mesh_B}
 \title{Implementation methods for mapper objects}
 \usage{
 \method{ibm_n}{default}(mapper, inla_f = FALSE, ...)
@@ -123,6 +126,12 @@
 \method{ibm_n}{bru_mapper_harmonics}(mapper, inla_f = FALSE, ...)
 
 \method{ibm_amatrix}{bru_mapper_harmonics}(mapper, input, inla_f = FALSE, ...)
+
+\method{ibm_n}{bru_mapper_mesh_B}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_mesh_B}(mapper, ...)
+
+\method{ibm_amatrix}{bru_mapper_mesh_B}(mapper, input, ...)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}

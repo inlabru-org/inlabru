@@ -20,3 +20,4 @@
 ^\.lintr$
 ^CRAN-SUBMISSION$
 ^revdep$
+^misc$
