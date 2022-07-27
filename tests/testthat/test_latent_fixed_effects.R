@@ -74,17 +74,17 @@ test_that("basic fixed effect model, order relevance", {
     control.inla = list(h = 0.005)
   )
   mydata <- local_basic_fixed_effect_testdata()
-  mycomp1 <- y ~ Intercept + x1
+  mycomp1 <- y ~ Intercept(1) + x1
   fit1 <- bru(mycomp1,
-    family = "normal",
-    data = mydata,
-    options = options
+              family = "normal",
+              data = mydata,
+              options = options
   )
-  mycomp2 <- y ~ x1 + Intercept
+  mycomp2 <- y ~ x1 + Intercept(1)
   fit2 <- bru(mycomp2,
-    family = "normal",
-    data = mydata,
-    options = options
+              family = "normal",
+              data = mydata,
+              options = options
   )
 
   expect_equal(
@@ -93,3 +93,4 @@ test_that("basic fixed effect model, order relevance", {
     tolerance = lowtol
   )
 })
+

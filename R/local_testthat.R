@@ -244,7 +244,9 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
   local_disable_PROJ6_warnings(envir = envir)
   local_testthat_tolerances(envir = envir)
   local_bru_options_set(
-    control.compute = list(dic = FALSE, waic = FALSE),
+    # Need to specify specific smtp to ensure consistent tests.
+    # To specifically test pardiso, need to override locally
+    control.compute = list(dic = FALSE, waic = FALSE, smtp = "taucs"),
     inla.mode = "experimental",
     envir = envir
   )
