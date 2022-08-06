@@ -12,6 +12,7 @@ header-includes:
   - \newcommand{\wt}[1]{\widetilde{#1}}
   - \newcommand{\ol}[1]{\overline{#1}}
   - \newcommand{\wh}[1]{\widehat{#1}}
+  - \newcommand{\E}{\mathbb{E}}
   - \DeclareMathOperator*{\argmax}{arg\,max}
 ---
 
@@ -53,8 +54,9 @@ The premise for the inlabru method for non-linear predictors is to build on
 the existing implementation, and only add a linearisation step. The properties of
 the resulting approximation will depend on the nature of the non-linearity.
 
-Let $\wt{\bm{\eta}}(\bm{u})$ be a non-linear predictor, and let
-$\ol{\bm{\eta}}(\bm{u})$ be the 1st order Taylor approximation at $\bm{u}_0$,
+Let $\wt{\bm{\eta}}(\bm{u})$ be a non-linear predictor, i.e. a deterministic function of $\bm{u}$, $$ \wt{\bm{\eta}} (\bm{u}) = \mathsf{fcn} (\bm{u}), $$
+and let
+$\ol{\bm{\eta}}(\bm{u})$ be the 1st order Taylor approximation at $\bm{u}_0,$
 $$
 \ol{\bm{\eta}}(\bm{u})
 = \wt{\bm{\eta}}(\bm{u}_0) + \bm{B}(\bm{u} - \bm{u}_0)
@@ -63,11 +65,18 @@ $$
 $$
 where $\bm{B}$ is the derivative matrix for the non-linear predictor, evaluated
 at $\bm{u}_0$.
-
+Hence, we define
+$$
+\begin{aligned}
+\bm{y} | \bm{u}, {\bm{\theta}} &\overset{d}{=} \bm{y} | \wt{\bm{\eta}}(\bm{u}), {\bm{\theta}} \\
+&\sim p (\bm{y} | g^{-1}[\wt{\bm{\eta}}(\bm{u})], {\bm{\theta}})\\
+\end{aligned}
+$$
 The non-linear observation model
 $p(\bm{y}|g^{-1}[\wt{\bm{\eta}}(\bm{u})],\bm{\theta})$
 is approximated by replacing the non-linear predictor with its linearisation,
 so that the linearised model is defined by
+
 $$
 \ol{p}(\bm{y}|\bm{u},\bm{\theta})
 =
@@ -87,17 +96,27 @@ $$
 $$
 and the linear model approximation is factorised as
 $$
-\ol{p}(\bm{\theta},\bm{u}|\bm{y}) = \ol{p}(\bm{\theta}|\bm{y})\ol{p}(\bm{u}|\bm{y},\bm{\theta}) .
+\ol{p}(\bm{\theta},\bm{u}|\bm{y}) = \ol{p}(\bm{\theta}|\bm{y})\ol{p}(\bm{u}|\bm{y},\bm{\theta}).
 $$
 
 ### Fixed point iteration
 
 The remaining step of the approximation is how to choose the linearisation
-point $\bm{u}_0$. We start by
+point $\bm{u}_*$. We start by
 introducing a functional $f(\ol{p}_{\bm{v}})$ of the posterior
 distribution linearised at $\bm{v}$,
-that generates a latent field configuration. We then seek a fix point of the
-functional, so that $\bm{u}_0=f(\ol{p}_{\bm{u}_0})$.
+that generates a latent field configuration. We then seek an optimal fixed point of the
+functional, so that $\bm{u}_*=f(\ol{p}_{\bm{u}_*})$ such that 
+
+$$
+\begin{align}
+    \wh{{\bm{\theta}}} &= \argmax_{\bm{\theta}} p_\bm{v} ( {\bm{\theta}} | \bm{y} ) \approx \argmax_{\bm{\theta}} \ol{p}_\bm{v} ( {\bm{\theta}} | \bm{y} ),  \label{eq:theta}\\
+    \bm{u}_* &= \argmax_{\bm{u}} p_\bm{v} (\bm{u} | \bm{y}, \wh{{\bm{\theta}}}) \approx \argmax_{\bm{u}} \ol{p}_\bm{v} (\bm{u} | \bm{y}, \wh{{\bm{\theta}}}),  \label{eq:u_*}
+\end{align}
+$$
+Combining both, it is equivalent to optimise the posterior modes $\wh{\bm{\theta}}$ and $\bm{u}_*$ via 
+$$ \argmax_{{\bm{\theta}}, \bm{u}} p_\bm{v} ({\bm{\theta}}, \bm{u} | \bm{y}) \approx \argmax_{{\bm{\theta}}, \bm{u}} \ol{p}_\bm{v} ({\bm{\theta}}, \bm{u}|\bm{y}).$$
+
 Potential choices for $f(\cdot)$ include the posterior expectation
 $\ol{E}(\bm{u}|\bm{y})$ and the joint conditional mode,
 $$
@@ -109,26 +128,31 @@ Note: In `inlabru` version 2.1.15,
 $$
 f(\ol{p}_{\bm{v}})=\left\{\argmax_{u_i} \ol{p}_{\bm{v}}(u_i|\bm{y}),\,i=1,\dots,n\right\},
 $$
-was used, which caused problems for some nonlinear models.])
-One key to the fix point iteration is that the observation model is linked to
+was used, which caused problems for some nonlinear models.]).
+One key to the fixed point iteration is that the observation model is linked to
 $\bm{u}$ only through the non-linear predictor $\wt{\bm{\eta}}(\bm{u})$.
 
-0. Let $\bm{u}_0$ be an initial linearisation point for the latent variables.
-1. Compute the predictor linearisation at $\bm{u}_0$,
-2. Compute the linearised INLA posterior $\ol{p}(\bm{\theta}|\bm{y})$
+<!-- intentional to start with 0 ?-->
+0. Let $\bm{u}_0$ be an initial linearisation point for the latent variables 
+   obtained from the initial INLA call.
+1. Compute the predictor linearisation at $\bm{u}_0$.
+2. Compute the linearised INLA posterior $\ol{p}(\bm{\theta}|\bm{y})$.
 3. Let $\bm{u}_1=f(\ol{p}_{\bm{u}_0})$ be the initial candidate for new
    linearisation point.
 4. Let $\bm{u}_\alpha=(1-\alpha)\bm{u}_0+\alpha\bm{u}_1$, and find the value
-   $\alpha$ that minimises $\|\wt{\eta}(\bm{u}_\alpha)-\ol{\eta}(\bm{u}_1)\|$.
+   $\alpha$ minimises $\|\wt{\eta}(\bm{u}_\alpha)-\ol{\eta}(\bm{u}_1)\|$.
 5. Set the linearisation point equal to $\bm{u}_\alpha$ and repeat from step 1,
    unless the iteration has converged to a given tolerance.
 
 #### Line search
 
-In step 4, an approximate line search can be used, that avoids many potentially
+In step 4, we would ideally want an $\alpha$ to be  
+$$ \argmax_{\alpha} [\ln p_{\bm{u}_\alpha}(\bm{u}|\bm{y},\wh{{\bm{\theta}}})].$$
+$\|\wt{\eta}(\bm{u}_\alpha)-\ol{\eta}(\bm{u}_1)\|$ is a loss function that an approximate line search can be used. It avoids many potentially
 expensive evaluations of the non-linear predictor. We evaluate
 $\wt{\bm{\eta}}_1=\wt{\bm{\eta}}(\bm{u}_1)$ and make use of the linearised predictor
 information. Let $\wt{\bm{\eta}}_\alpha=\wt{\bm{\eta}}(\bm{u}_\alpha)$ and $\ol{\bm{\eta}}_\alpha=\ol{\bm{\eta}}(\bm{u}_\alpha)=(1-\alpha)\wt{\bm{\eta}}(\bm{u}_0)+\alpha\ol{\bm{\eta}}(\bm{u}_1)$.
+In other words, $\alpha=0$ 
 An exact line search would minimise $\|\wt{\bm{\eta}}_\alpha-\ol{\bm{\eta}}_1\|$. 
 Instead, we define a quadratic approximation to the
 non-linear predictor as a function of $\alpha$,
@@ -158,7 +182,66 @@ $$
 $$
 which is minimised on the interval $\alpha\in[\gamma^{k-1},\gamma^{k+1}]$.
 
+We are working in progress on the user-defined minimisation of the loss function 
+term, where inlabru currently uses 
+$\| \wt{\bm{\eta}} (\bm{u}_\alpha) - \ol{\bm{\eta}}(\bm{u}_1)\|$. We hope to 
+improve the the accuracy but at the very least objectify this term as diagnostics. 
+There are two potential options. First option is 
+
+$$ \sum_i E_{\bm{u}\sim \ol{p}(\bm{u}|\bm{y})} \frac{(|\ol{\bm{\eta}}_i-\wt{\bm{\eta}}_i|^2)}{\mathrm{Var}_{\bm{u}\sim \ol{p}(\bm{u}|\bm{y})}(\ol{\bm{\eta}}_i)},$$ 
+
+this is scaling with the variance and somewhat similar to Dawid-Sebastiani score. 
+Another option is 
+$$ E_{\bm{u}\sim \ol{p}(\bm{u}|\bm{y})} (\log \frac{\ol{p}(\bm{u} |\bm{y},{\bm{\theta}})}{\wt{p}(\bm{u}|\bm{y},{\bm{\theta}})}),$$ 
+
+this is basically the approximate version of Kullback–Leibler divergence term. 
 
 A potential improvement of step 4 might be to also take into account the prior
 distribution for $\bm{u}$ as a minimisation penalty, to avoid moving further than
 would be indicated by a full likelihood optimisation.
+
+#### Accuracy
+We wish to assess how accurate the approximation is. Thus, we compare $({\bm{\theta}}, \bm{u} | \bm{y} )$ and $\overline{({\bm{\theta}}, \bm{u} |\bm{y})}$. 
+With Bayes' theorem, 
+$$
+\begin{aligned}
+    p(\bm{u}|\bm{y},{\bm{\theta}}) &= \frac{p(\bm{u},\bm{y},{\bm{\theta}})}{p(\bm{y},{\bm{\theta}})} \\
+    &= \frac{p(\bm{y}|\bm{u},{\bm{\theta}}) p(\bm{u}|{\bm{\theta}})}{p(\bm{y},{\bm{\theta}})},
+\end{aligned}
+$$
+and by chain rule, 
+$$ \nabla_{\bm{u}} \ln p (\bm{y} | {\bm{\theta}}, \wt{\bm{\eta}}(\bm{u}_*)) \biggr\rvert_{\bm{u}_*} (\bm{u}-\bm{u}_*) = \nabla_{\bm{\eta}} \ln p (\bm{y} | {\bm{\theta}}, \bm{\eta}) \cdot \frac{d\bm{\eta}}{d\bm{u}} \biggr\rvert_{\bm{u}_*} (\bm{u}-\bm{u}_*). $$
+
+Hence, using Taylor's expansion,
+$$
+\begin{aligned}
+    \ln p(\bm{y}|\bm{u},{\bm{\theta}}) &= \ln p (\bm{y}| {\bm{\theta}}, \wt{\bm{\eta}}(\bm{u})) \\
+    &= \ln p (\bm{y}|{\bm{\theta}},\wt{\bm{\eta}}(\bm{u}_*))  \\ 
+    &\qquad +\nabla_{\wt{\bm{\eta}}} \ln p (\bm{y} | {\bm{\theta}}, \wt{\bm{\eta}}(\bm{u}_*)) \cdot (\wt{\bm{\eta}}(\bm{u}) - \wt{\bm{\eta}}(\bm{u}_*)) \\
+    &\qquad + \frac{1}{2!} (\wt{\bm{\eta}}(\bm{u}) - \wt{\bm{\eta}}(\bm{u}_*))^\intercal [\nabla^2_{\wt{\bm{\eta}}} \ln p (\bm{y} | {\bm{\theta}})](\wt{\bm{\eta}}(\bm{u}) - \wt{\bm{\eta}}(\bm{u}_*))  + \mathsf{h.o.t},
+\end{aligned}
+$$
+
+where $\nabla^2$ is the Hessian. 
+We want to compare this expression with the Taylor's expansion of $\ln p (\bm{y} | {\bm{\theta}}, \ol{\bm{\eta}}(\bm{u}))$. Basically, we are looking for the expectation of the 2nd order term, i.e. $E(\textrm{Hessian})$, between $\ln p(\bm{y}|{\bm{\theta}},\wt{\bm{\eta}}(\bm{u}))$ and $\ln p(\bm{y}|{\bm{\theta}},\ol{\bm{\eta}}(\bm{u}))$. It may require to look into the 3rd order term to have some control over all the rest higher order terms. We would tell how different the terms are.
+
+#### Prior, Data and Posterior
+Here are some thoughts on the spectrum of models, namely, weak, somethings in between, and strong models. For the weak models, prior is strong, given the Gaussian in INLA, data is weak, then the posterior ends up Gaussian. Strong model is Gaussian because of a lot of data, then prior is weak, posterior ends up Gaussian again. What lies in between is problematic, which we have to investigate. 
+
+Most of the time, we only consider asymptoticity but the data in real world are most likely lying in between. In particular, low count models and binary models are the worst. For example, t-distribution in INLA, Hessian not positive definite, inlabru forces it to be positive definite for linearisation model. The question is how wrong it can be to force it in a point process setting. 
+
+#### Initialisation
+On a sidetrack, some may concern with an initalisation from a saddle point. although it is not implemented in inlabru, we want to talk about the technicality how we define the initial linearisation point $u_0$.
+
+Generally speaking, any values of $u_0$ work except the case that the gradient evaluated at $u_0$ is $\vec{0}$ because the linearisation point will never moves away. For multiple likelihood models, it can be tackled with another likelihood. For single likelihood, it is a saddle point problem. What even worse is the condition of multimodal property, it is difficult to obtain an unique solution. Therefore, we have to get around with and re-parameterise it. Here are some choices for reparameterisation, 
+
+$$ 
+\begin{aligned}
+\bm{\eta}_1 &= \bm{u} \\
+\bm{\eta}_2 &= \beta \bm{u} \\
+\bm{\eta}_3 &= e^\beta \bm{u} \\
+\bm{\eta}_4 &= F_\beta^{-1} ( \Phi(z_\beta)) \bm{u}, \quad z_{\beta} \sim \mathsf{N}(0,1) \\
+\end{aligned}
+$$
+
+
