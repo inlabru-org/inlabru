@@ -54,9 +54,9 @@ The premise for the inlabru method for non-linear predictors is to build on
 the existing implementation, and only add a linearisation step. The properties of
 the resulting approximation will depend on the nature of the non-linearity.
 
-Let $\wt{\bm{\eta}}(\bm{u})$ be a non-linear predictor, i.e. a deterministic function of $\bm{u}$, $$ \wt{\bm{\eta}} (\bm{u}) = \mathsf{fcn} (\bm{u}), $$
+Let $\wt{\bm{\eta}}(\bm{u})$ be a non-linear predictor, i.e. a deterministic function of $\bm{u}$, $$ \wt{\bm{\eta}} (\bm{u}) = \textsf{fcn} (\bm{u}), $$
 and let
-$\ol{\bm{\eta}}(\bm{u})$ be the 1st order Taylor approximation at $\bm{u}_0,$
+$\ol{\bm{\eta}}(\bm{u})$ be the 1st order Taylor approximation at $\bm{u}_0$,
 $$
 \ol{\bm{\eta}}(\bm{u})
 = \wt{\bm{\eta}}(\bm{u}_0) + \bm{B}(\bm{u} - \bm{u}_0)
@@ -102,54 +102,72 @@ $$
 ### Fixed point iteration
 
 The remaining step of the approximation is how to choose the linearisation
-point $\bm{u}_*$. We start by
-introducing a functional $f(\ol{p}_{\bm{v}})$ of the posterior
-distribution linearised at $\bm{v}$,
-that generates a latent field configuration. We then seek an optimal fixed point of the
-functional, so that $\bm{u}_*=f(\ol{p}_{\bm{u}_*})$ such that 
+point $\bm{u}_*$.
+For a given linearisation point $\bm{v}$, INLA will compute the posterior mode for $\bm{\theta}$,
+$$
+\wh{\bm{\theta}}_{\bm{v}} = \argmax_{\bm{\theta}} \ol{p}_\bm{v} ( {\bm{\theta}} | \bm{y} ),
+$$
+and the joint conditional posterior mode for $\bm{u}$,
+$$
+\wh{\bm{u}}_{\bm{v}} = \argmax_{\bm{u}} \ol{p}_\bm{v} ( \bm{u} | \bm{y}, \wh{\bm{\theta}}_{\bm{v}} ) .
+$$
+[FL note: need to show that when $\bm{u}_*$ is the fixed point of this functional, then the corresponding $\bm{\theta}_*$ is equal to the true posterior mode for $\bm{\theta}$, and $\wh{\bm{u}}_*$ is the true conditional posterior mode for $\bm{u}$.]
 
+Define the Bayesian estimation functional^[
+Potential other choices for $f(\cdot)$ include the posterior expectation
+$\ol{E}(\bm{u}|\bm{y})$ and the marginal conditional modes, 
 $$
-\begin{align}
-    \wh{{\bm{\theta}}} &= \argmax_{\bm{\theta}} p_\bm{v} ( {\bm{\theta}} | \bm{y} ) \approx \argmax_{\bm{\theta}} \ol{p}_\bm{v} ( {\bm{\theta}} | \bm{y} ),  \label{eq:theta}\\
-    \bm{u}_* &= \argmax_{\bm{u}} p_\bm{v} (\bm{u} | \bm{y}, \wh{{\bm{\theta}}}) \approx \argmax_{\bm{u}} \ol{p}_\bm{v} (\bm{u} | \bm{y}, \wh{{\bm{\theta}}}),  \label{eq:u_*}
-\end{align}
+\left\{\argmax_{u_i} \ol{p}_{\bm{v}}(u_i|\bm{y}),\,i=1,\dots,n\right\},
 $$
-Combining both, it is equivalent to optimise the posterior modes $\wh{\bm{\theta}}$ and $\bm{u}_*$ via 
-$$ \argmax_{{\bm{\theta}}, \bm{u}} p_\bm{v} ({\bm{\theta}}, \bm{u} | \bm{y}) \approx \argmax_{{\bm{\theta}}, \bm{u}} \ol{p}_\bm{v} ({\bm{\theta}}, \bm{u}|\bm{y}).$$
+which was used in `inlabru` up to version 2.1.15, which caused problems for some nonlinear models.
+From version 2.2.3, the joint conditional mode is used,
+$$
+\argmax_{\bm{u}} \ol{p}_{\bm{v}}(\bm{u}|\bm{y},\wh{\bm{\theta}}_{\bm{v}}),
+$$
+where $\wh{\bm{\theta}}=\argmax_{\bm{\theta}} \ol{p}_{\bm{v}}(\bm{\theta}|\bm{y})$.
+]
+$$
+f(\ol{p}_{\bm{v}}) = (\wh{\bm{\theta}}_{\bm{v}},\wh{\bm{u}}_{\bm{v}})
+$$
+and let $f(p)=(\wh{\bm{\theta}},\wh{\bm{u}})$ denote the corresponding posterior modes for the true posterior distribution,
+$$
+\begin{aligned}
+    \wh{{\bm{\theta}}} &= \argmax_{\bm{\theta}} p ( {\bm{\theta}} | \bm{y} ), \\
+    \wh{\bm{u}} &= \argmax_{\bm{u}} p (\bm{u} | \bm{y}, \wh{{\bm{\theta}}}).
+\end{aligned}
+$$
 
-Potential choices for $f(\cdot)$ include the posterior expectation
-$\ol{E}(\bm{u}|\bm{y})$ and the joint conditional mode,
-$$
-f(\ol{p}_{\bm{v}})=\argmax_{\bm{u}} \ol{p}_{\bm{v}}(\bm{u}|\bm{y},\wh{\bm{\theta}}),
-$$
-where $\wh{\bm{\theta}}=\argmax_{\bm{\theta}} \ol{p}_{\bm{v}}(\bm{\theta}|\bm{y})$
-(used in `inlabru` from version 2.2.3^[
-Note: In `inlabru` version 2.1.15, 
-$$
-f(\ol{p}_{\bm{v}})=\left\{\argmax_{u_i} \ol{p}_{\bm{v}}(u_i|\bm{y}),\,i=1,\dots,n\right\},
-$$
-was used, which caused problems for some nonlinear models.]).
+The fixed point $(\bm{\theta}_*,\bm{u}_*)=f(\ol{p}_{\bm{u}_*})$ should ideally be close to $(\wh{\bm{\theta}},\wh{\bm{u}})$, i.e. close to the true marginal/conditional posterior mode. We can achieve this for the conditional
+latent mode, so that $\bm{u}_*=\argmax_{\bm{u}} p (\bm{u} | \bm{y}, \wh{\bm{\theta}}_{\bm{u}_*})$.
+
+We therefore seek the latent vector $\bm{u}_*$ that generates the fixed point of the
+functional, so that $(\bm{\theta}_*,\bm{u}_*)=f(\ol{p}_{\bm{u}_*})$.
+
+
 One key to the fixed point iteration is that the observation model is linked to
-$\bm{u}$ only through the non-linear predictor $\wt{\bm{\eta}}(\bm{u})$.
+$\bm{u}$ only through the non-linear predictor $\wt{\bm{\eta}}(\bm{u})$, since
+this leads to a simplified line search method below.
 
 <!-- intentional to start with 0 ?-->
 0. Let $\bm{u}_0$ be an initial linearisation point for the latent variables 
-   obtained from the initial INLA call.
+   obtained from the initial INLA call. Iterate the following steps for $k=0,1,2,...$
 1. Compute the predictor linearisation at $\bm{u}_0$.
-2. Compute the linearised INLA posterior $\ol{p}(\bm{\theta}|\bm{y})$.
-3. Let $\bm{u}_1=f(\ol{p}_{\bm{u}_0})$ be the initial candidate for new
+2. Compute the linearised INLA posterior $\ol{p}_{\bm{u}_0}(\bm{\theta}|\bm{y})$.
+3. Let $(\bm{\theta}_1,\bm{u}_1)=(\wh{\bm{\theta}}_{\bm{u}_0},\wh{\bm{u}}_{\bm{u}_0})=f(\ol{p}_{\bm{u}_0})$ be the initial candidate for new
    linearisation point.
-4. Let $\bm{u}_\alpha=(1-\alpha)\bm{u}_0+\alpha\bm{u}_1$, and find the value
-   $\alpha$ minimises $\|\wt{\eta}(\bm{u}_\alpha)-\ol{\eta}(\bm{u}_1)\|$.
-5. Set the linearisation point equal to $\bm{u}_\alpha$ and repeat from step 1,
+4. Let $\bm{v}_\alpha=(1-\alpha)\bm{u}_1+\alpha\bm{u}_0$, and find the value
+   $\alpha$ minimises $\|\wt{\eta}(\bm{v}_\alpha)-\ol{\eta}(\bm{u}_1)\|$.
+5. Set the new linearisation point $\bm{u}_0$ equal to $\bm{v}_\alpha$ and repeat from step 1,
    unless the iteration has converged to a given tolerance.
 
 #### Line search
 
 In step 4, we would ideally want an $\alpha$ to be  
-$$ \argmax_{\alpha} [\ln p_{\bm{u}_\alpha}(\bm{u}|\bm{y},\wh{{\bm{\theta}}})].$$
-$\|\wt{\eta}(\bm{u}_\alpha)-\ol{\eta}(\bm{u}_1)\|$ is a loss function that an approximate line search can be used. It avoids many potentially
-expensive evaluations of the non-linear predictor. We evaluate
+$$ \argmax_{\alpha} [\ln p(\bm{u}|\bm{y},\bm{\theta}_1)].$$
+As a simpler alternative, we will consider loss function such as $\|\wt{\eta}(\bm{u}_\alpha)-\ol{\eta}(\bm{u}_1)\|$
+that only depend on the nonlinear and linearised predictor expressions (and other known quantities, given $\bm{u}_0$)
+instead as part of an approximate line search. This avoids many potentially
+expensive evaluations of the true posterior conditional log-density. We evaluate
 $\wt{\bm{\eta}}_1=\wt{\bm{\eta}}(\bm{u}_1)$ and make use of the linearised predictor
 information. Let $\wt{\bm{\eta}}_\alpha=\wt{\bm{\eta}}(\bm{u}_\alpha)$ and $\ol{\bm{\eta}}_\alpha=\ol{\bm{\eta}}(\bm{u}_\alpha)=(1-\alpha)\wt{\bm{\eta}}(\bm{u}_0)+\alpha\ol{\bm{\eta}}(\bm{u}_1)$.
 In other words, $\alpha=0$ 
@@ -231,7 +249,7 @@ Here are some thoughts on the spectrum of models, namely, weak, somethings in be
 Most of the time, we only consider asymptoticity but the data in real world are most likely lying in between. In particular, low count models and binary models are the worst. For example, t-distribution in INLA, Hessian not positive definite, inlabru forces it to be positive definite for linearisation model. The question is how wrong it can be to force it in a point process setting. 
 
 #### Initialisation
-On a sidetrack, some may concern with an initalisation from a saddle point. although it is not implemented in inlabru, we want to talk about the technicality how we define the initial linearisation point $u_0$.
+On a side note, one might be concerned about initalisation at, or convergence to, a saddle point. Although it is not implemented in inlabru, we want to talk about the technicality how we define the initial linearisation point $u_0$.
 
 Generally speaking, any values of $u_0$ work except the case that the gradient evaluated at $u_0$ is $\vec{0}$ because the linearisation point will never moves away. For multiple likelihood models, it can be tackled with another likelihood. For single likelihood, it is a saddle point problem. What even worse is the condition of multimodal property, it is difficult to obtain an unique solution. Therefore, we have to get around with and re-parameterise it. Here are some choices for reparameterisation, 
 
