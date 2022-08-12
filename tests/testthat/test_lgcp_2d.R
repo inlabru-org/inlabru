@@ -97,12 +97,12 @@ test_that("2D LGCP fitting", {
 
   expect_equal(
     Lambda$mean,
-    669.5,
+    670,
     tolerance = midtol
   )
   expect_equal(
     Lambda$sd,
-    40,
+    24,
     tolerance = hitol * 5
   )
 
