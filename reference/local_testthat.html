@@ -153,23 +153,23 @@ options (not including the defaults), invisibly.</p>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
     
-<ul><li><p><code>local_testthat_assign</code>: Assign local variable. Useful for easy cleanup
+<ul><li><p><code>local_testthat_assign()</code>: Assign local variable. Useful for easy cleanup
 of global workspace with <code><a href="https://withr.r-lib.org/reference/defer.html" class="external-link">withr::deferred_run()</a></code> when running tests
 interactively.</p></li>
-<li><p><code>local_testthat_tolerances</code>: Assign test tolerances
+<li><p><code>local_testthat_tolerances()</code>: Assign test tolerances
 Assign local tolerance variables. Useful for easy cleanup
 of global workspace with <code><a href="https://withr.r-lib.org/reference/defer.html" class="external-link">withr::deferred_run()</a></code> when running tests
 interactively.</p></li>
-<li><p><code>local_bru_options_set</code>: Calls <code><a href="bru_options.html">bru_options_set()</a></code> in a reversible way</p></li>
-<li><p><code>local_set_PROJ6_warnings</code>: Disable PROJ4/6 warnings.
+<li><p><code>local_bru_options_set()</code>: Calls <code><a href="bru_options.html">bru_options_set()</a></code> in a reversible way</p></li>
+<li><p><code>local_set_PROJ6_warnings()</code>: Disable PROJ4/6 warnings.
 To be used within package tests. Restores state on exit.</p></li>
-<li><p><code>local_get_rgdal_options</code>: Return a list of the current rgdal warning options</p></li>
-<li><p><code>local_disable_PROJ6_warnings</code>: Disable rgdal PROJ4 conversion warnings and thin
+<li><p><code>local_get_rgdal_options()</code>: Return a list of the current rgdal warning options</p></li>
+<li><p><code>local_disable_PROJ6_warnings()</code>: Disable rgdal PROJ4 conversion warnings and thin
 PROJ6 warnings.</p></li>
-<li><p><code>local_bru_safe_inla</code>: Tests should set num.threads = "1:1" to ensure
+<li><p><code>local_bru_safe_inla()</code>: Tests should set num.threads = "1:1" to ensure
 within-system repeatability by calling <code>local_bru_safe_inla()</code>;
 see also <code><a href="bru_safe_inla.html">bru_safe_inla()</a></code></p></li>
-<li><p><code>local_bru_testthat_setup</code>: Initialise environment for tests.
+<li><p><code>local_bru_testthat_setup()</code>: Initialise environment for tests.
 Disables PROJ4/PROJ6 warnings, and assigns tolerance variables.
 To be called either at the top of a testfile, or inside tests.
 Does <em>not</em> call <code>local_bru_safe_inla()</code>, since that may invoke a skip and
