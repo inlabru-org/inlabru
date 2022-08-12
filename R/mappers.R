@@ -1155,4 +1155,3 @@ ibm_amatrix.bru_mapper_harmonics <- function(mapper, input, inla_f = FALSE, ...)
   }
   A
 }
-etete
