@@ -1,16 +1,29 @@
 ---
-title: 'Building a Spatially Varying Coefficient Model in Continuous Space Using R-INLA'
+title: 'Spatially Varying Coefficient Models with inlabru'
 author: "Timothy D. Meehan (tmeeha@gmail.com), Elias T. Krainski, Finn Lindgren, and Håvard Rue"
-date: "`r Sys.Date()`"
-output: rmarkdown::pdf_document
+date: "Generated on `r Sys.Date()`"
+output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Spatially Varying Coefficient Models}
+  %\VignetteIndexEntry{Spatially Varying Coefficient Models with inlabru}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8} 
+  %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include=FALSE, cache=TRUE}
-knitr::opts_chunk$set(echo = TRUE, warning=FALSE, error=FALSE, message=FALSE)
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = "png",
+  dev.args = list(type = "cairo-png"),
+  fig.width = 7,
+  fig.height = 5,
+  eval = TRUE,
+  echo = TRUE,
+  warning = FALSE,
+  error = FALSE,
+  message = FALSE,
+  cache = TRUE
+)
 ```
 
 ## Introduction
@@ -34,7 +47,8 @@ In this vignette, we will describe how to build an SVC model similar
 to that described in Meehan et al. (2019), but within a
 continuous-space framework. This model will be computed using the
 stochastic partial differential equation (SPDE) approach of Lindgren
-et al. (2011, 2022), implemented in the `R-INLA` package for `R`. The
+et al. (2011, 2022), implemented with the `inlabru` interface to
+the `R-INLA` package for `R`. The
 SPDE approach employs a computationally efficient approximation of a
 Gaussian random field with parameters directly comparable to those of
 a Matérn covariance function. The benefits of a continuous-space
@@ -55,11 +69,11 @@ variation in count effort.
 
 The model used to analyze these data assumes that counts come from a
 negative binomial distribution with an expected count and dispersion
-parameter. The expected count has a linear predictor:
+parameter. The expected count has a log-linear predictor:
 
-$$log(\lambda_{st}) = \kappa_{s} + \alpha_s + \epsilon_{s}(log[Effort_{st}]) + \tau_{s}(Year_{st})$$
+$$\log(\lambda_{st}) = \kappa_{s} + \alpha_s + \epsilon_{s} \log[\text{Effort}_{st}] + \tau_{s} \text{Year}_{st}$$
 
-where the natural log of expected count, $log(\lambda_{st})$, at site
+where the natural log of expected count, $\log(\lambda_{st})$, at site
 $s$ during year $t$, is modeled with a zero-centered, normally
 distributed intercept per site, $\kappa_s$, a spatially varying
 intercept, $\alpha_s$, a spatially varying effect of the log of count
@@ -79,32 +93,32 @@ site.
 
 ## Environment
 
-To get started with data analysis, we set up the environment, which
-involves setting working directories, loading some packages, and
+To get started with data analysis, we set up the environment,
+by
+loading some packages, and
 setting some options.
-
 ```{r libs, warning=FALSE, message=FALSE, errors=FALSE}
-# working directory
-setwd(getwd())
-
 # libraries
-library(maps); library(ggplot2); library(sf); library(raster)
-library(tidyr); library(scales); library(inlabru); library(INLA)
+library(maps)
+library(ggplot2)
+library(sf)
+library(raster)
+library(tidyr)
+library(scales)
+library(inlabru)
+library(INLA)
 library(dplyr)
 
 # set option
 select <- dplyr::select
-options(scipen=99999)
-options(max.print=99999)
-options(stringsAsFactors=F)
+options(scipen = 99999)
+options(max.print = 99999)
+options(stringsAsFactors = FALSE)
 ```
 
 ```{r echo=F}
-library(INLA)
-inla.setOption(num.threads="1:1")
-inla.setOption(smtp="taucs")
-inla.setOption(inla.mode="experimental")
-if (file.exists("myinit.R")) source("myinit.R")
+inla.setOption(num.threads = "1:1")
+inla.setOption(smtp = "taucs")
 ```
 
 Next we define a coordinate reference system (CRS) for spatial
@@ -116,14 +130,18 @@ especially large numbers (Krainski et al. 2018).
 
 ```{r proj, warning=F, message=FALSE}
 # define a crs
-epsg6703km <- paste("+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5", 
-                    "+lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83", 
-                    "+units=km +no_defs")
+epsg6703km <- paste(
+  "+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5",
+  "+lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83",
+  "+units=km +no_defs"
+)
 
 # make a base map
-states <- st_as_sf(maps::map("state", plot = FALSE, fill = TRUE)) %>% 
-  filter(ID %in% c("texas", "oklahoma", "kansas", "missouri",
-                   "arkansas", "louisiana")) %>% 
+states <- st_as_sf(maps::map("state", plot = FALSE, fill = TRUE)) %>%
+  filter(ID %in% c(
+    "texas", "oklahoma", "kansas", "missouri",
+    "arkansas", "louisiana"
+  )) %>%
   st_transform(epsg6703km)
 ```
 
@@ -138,41 +156,57 @@ analyses, have already been conducted and this is the resulting data set.
 
 ```{r data, eval=T, cache=T}
 # get data
-download_dat <- read.csv(paste0("https://raw.github.com/tmeeha/inlaSVCBC",
-                  "/master/code/modeling_data.csv"))
+download_dat <- read.csv(paste0(
+  "https://raw.github.com/tmeeha/inlaSVCBC",
+  "/master/code/modeling_data.csv"
+))
 
 # select subset
-count_dat <- download_dat %>% 
-  select(circle, bcr, state, year, std_yr, count, log_hrs, 
-         lon, lat, obs) %>% 
-  mutate(year=year+1899) %>% 
-  filter(state %in% c("TEXAS", "OKLAHOMA", "KANSAS", "MISSOURI",
-                      "ARKANSAS", "LOUISIANA"), 
-         year>=1987) %>% 
-  mutate(site_idx=as.numeric(factor(paste(circle, lon, lat)))) %>% 
-  group_by(site_idx) %>% mutate(n_years=n()) %>% 
-  filter(n_years>=20) %>% ungroup() %>% 
-  mutate(std_yr=year-max(year), obs=1:nrow(.), 
-         site_idx=as.numeric(factor(paste(circle, lon, lat))), 
-         year_idx=as.numeric(factor(year)),
-         site_year_idx=as.numeric(factor(paste(circle, lon, lat, year)))) %>%
-  st_as_sf(coords=c("lon", "lat"), crs=4326, remove=F) %>% 
-  st_transform(epsg6703km) %>% 
-  mutate(lon=st_coordinates(.)[,1], lat=st_coordinates(.)[,2]) %>% 
+count_dat <- download_dat %>%
+  select(
+    circle, bcr, state, year, std_yr, count, log_hrs,
+    lon, lat, obs
+  ) %>%
+  mutate(year = year + 1899) %>%
+  filter(
+    state %in% c(
+      "TEXAS", "OKLAHOMA", "KANSAS", "MISSOURI",
+      "ARKANSAS", "LOUISIANA"
+    ),
+    year >= 1987
+  ) %>%
+  mutate(site_idx = as.numeric(factor(paste(circle, lon, lat)))) %>%
+  group_by(site_idx) %>%
+  mutate(n_years = n()) %>%
+  filter(n_years >= 20) %>%
+  ungroup() %>%
+  mutate(
+    std_yr = year - max(year), obs = 1:nrow(.),
+    site_idx = as.numeric(factor(paste(circle, lon, lat))),
+    year_idx = as.numeric(factor(year)),
+    site_year_idx = as.numeric(factor(paste(circle, lon, lat, year)))
+  ) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = F) %>%
+  st_transform(epsg6703km) %>%
+  mutate(lon = st_coordinates(.)[, 1], lat = st_coordinates(.)[, 2]) %>%
   arrange(circle, year)
 ```
 
-A rough view of changes in robin relative abundance, whicht does not
+A rough view of changes in robin relative abundance, which does not
 account for variation in count effort, can be seen by plotting raw
 counts per site and year.
 
 ```{r data_map, fig.pos='b', fig.align='center'}
 # map it
-ggplot() + 
-  geom_sf(data=count_dat %>% filter(year_idx %in% seq(1, 30, 3)), 
-          aes(col=log(count+1))) + 
-  geom_sf(data=states, fill=NA) + coord_sf(datum = NA) +
-  facet_wrap(~year) + scale_color_distiller(palette="Spectral") + 
+ggplot() +
+  geom_sf(
+    data = count_dat %>% filter(year_idx %in% seq(1, 30, 3)),
+    aes(col = log(count + 1))
+  ) +
+  geom_sf(data = states, fill = NA) +
+  coord_sf(datum = NA) +
+  facet_wrap(~year) +
+  scale_color_distiller(palette = "Spectral") +
   theme_bw()
 ```
 
@@ -184,12 +218,18 @@ later spatial modeling.
 
 ```{r spat_dat}
 # make a set of distinct study sites for mapping
-site_map <- count_dat %>% select(circle, lon, lat) %>%  
-  distinct() %>% select(circle, lon, lat)
+site_map <- count_dat %>%
+  select(circle, lon, lat) %>%
+  distinct() %>%
+  select(circle, lon, lat)
 
 # save coordinates as matrices for later
-unique_coords <- count_dat %>% select(circle, lon, lat) %>%  
-  distinct() %>% select(lon, lat) %>%  st_drop_geometry %>% as.matrix()
+unique_coords <- count_dat %>%
+  select(circle, lon, lat) %>%
+  distinct() %>%
+  select(lon, lat) %>%
+  st_drop_geometry() %>%
+  as.matrix()
 all_coords <- as.matrix(st_coordinates(count_dat))
 ```
 
@@ -198,23 +238,22 @@ all_coords <- as.matrix(st_coordinates(count_dat))
 Computing a continuous-space model with `R-INLA` using the SPDE
 approach requires construction of four distinct sets of data and model
 objects (Blangiardo and Cameletti 2015, Krainski et al. 2018). First,
-we create a **modeling mesh**, which is considered a
-representation of the continuous spatial surface based on
+we create a **modeling mesh**, which is used to provide a piecewise
+linear representation of the continuous spatial surface, based on a
 triangulation of the modeled region. Here, the same mesh will get
 reused for each of the spatial terms in the model. Second, we 
 construct an **SPDE model object** that specifies properties of 
 the spatial model. Again, we will use the same SPDE object for each 
-of the spatial terms in the model. Third, we create
-**named index sets** that identify data locations and mesh nodes for
-use in model construction, computation, and output extraction. Note
-that a separate set of indices needs to be constructed for each
-spatial term in the model. Fourth, we construct **projector matrices**
-or **A matrices** that create formulaic mappings between the observed
-data locations and the mesh nodes. Again, note that a separate set of
-projector matrices needs to be constructed for each spatial term in
-the model. The four corresponding `R-INLA` functions for these steps are:
-`inla.mesh.2D()`, `inla.spde2.pcmatern()`, `inla.spde.make.index()`,
-and `inla.spde.make.A()`.
+of the spatial terms in the model.
+
+In plain `R-INLA`, we would also need to create index vectors and projector matrices
+(or **A matrices** as they are often called).  However, in `inlabru`, these objects
+are created automatically, and the user does not need to deal with them directly.
+This qorks by an automatic creation of a `bru_mapper` object that knows how
+to map between mesh nodes and spatial data locations.  Thus, the only two
+`R-INLA` functions needed in the user code of the SPDE modelling steps are
+`inla.mesh.2D()` and `inla.spde2.pcmatern()`, and the `inla.spde.make.index()`
+and `inla.spde.make.A()` are only called internally by the `inlabru` code itself.
 
 ## Modeling mesh
 
@@ -229,20 +268,24 @@ outside the hull.
 
 ```{r mesh, warning=F, message=F, fig.pos='t', fig.align='center'}
 # make a hull and mesh for spatial model
-hull <- inla.nonconvex.hull(points=unique_coords, 200, 350)
-mesh <- inla.mesh.2d(boundary=hull, max.edge=c(100, 600), # km inside and outside
-                       cutoff=50, offset=c(100, 300)) # cutoff is min edge
+hull <- inla.nonconvex.hull(points = unique_coords, 200, 350)
+mesh <- inla.mesh.2d(
+  boundary = hull, max.edge = c(100, 600), # km inside and outside
+  cutoff = 50, offset = c(100, 300)
+) # cutoff is min edge
 
 # plot it
-ggplot() + gg(data=mesh) +
-  geom_sf(data=site_map, col="darkgreen", size=1) +
-  geom_sf(data=states, fill=NA) + theme_bw() +
-  labs(x="", y="")
+ggplot() +
+  gg(data = mesh) +
+  geom_sf(data = site_map, col = "darkgreen", size = 1) +
+  geom_sf(data = states, fill = NA) +
+  theme_bw() +
+  labs(x = "", y = "")
 ```
 
 ## SPDE model object
 
-Next we create an SPDE object to define the model smoothness, the 
+Next we create an SPDE object to define the model smoothness, with 
 prior distributions for the variance and range parameters, and the 
 mesh. Here we assume a Gaussian random field characterized with a 
 Matérn covariance function with penalized complexity priors 
@@ -252,114 +295,49 @@ correlation approaches 0.1) and variation explained by the function
 that the probability of a range exceeding 500 km is 0.5. The prior for
 the variance explained by the spatial effect is set such that the
 probability of a standard deviation exceeding 1 is 0.5 (Krainski et
-al. 2018). If one wants to constrain this kind of spatial effect to sum 
-to zero, `constr=T` should be added at this stage.
+al. 2018). If one wants to constrain this kind of spatial effect to integrate
+to zero, `constr=TRUE` should be added at this stage.
 
 ```{r spde}
 # make spde
-spde <- inla.spde2.pcmatern(mesh=mesh, prior.rang=c(500, 0.5), 
-                            prior.sigma=c(1, 0.5)) 
-```
-
-## Index sets
-
-Next we create index sets for the spatial terms in the model. Note
-that the `tag` names applied to the index sets in this step will be
-used in the model formula statement below. The index vectors for the
-spatial terms are essentially vectors of integers going from 1 to the
-number of nodes on the mesh.
-
-```{r indices}
-# make index sets
-alpha_idx <- inla.spde.make.index(name='alpha', n.spde=mesh$n) 
-eps_idx <- inla.spde.make.index(name='eps', n.spde=mesh$n) 
-tau_idx <- inla.spde.make.index(name='tau', n.spde=mesh$n) 
-```
-
-## Projector matrices
-
-Next we create projector matrices for the spatial terms in the model.
-Note that **this is the step where SVCs are specified**. In our model,
-$\epsilon_s$ is a spatially varying effect of the log of count effort.
-The SVC effort effect is specified using the `weights` argument to
-`inla.spde.make.A()` function. Similarly, $\tau_s$ is a spatially
-varying effect of year, so standardized year (with 1987 = 0) is also
-specified in the `weights` argument. $\alpha_s$ is also an SVC, but it
-is a spatially varying intercept. For intercepts it is not necessary
-to specify a constant weight of 1 when making a projector matrix. The
-only model component ignored here is $\kappa_{s}$, because it is not
-spatially structured and not modeled on the mesh. Note that the
-current use of the term 'weights' is different from that often
-encountered when defining mixed effect models in `R`. Here it is used
-to define covariate values, as opposed to importance values in other
-contexts.
-
-```{r projector}
-# make projector matrices
-A_alpha <- inla.spde.make.A(mesh=mesh, loc=all_coords) 
-A_eps <- inla.spde.make.A(mesh=mesh, loc=all_coords, 
-                          weights=count_dat$log_hrs) # note weights argument
-A_tau <- inla.spde.make.A(mesh=mesh, loc=all_coords, 
-                          weights=count_dat$std_yr) # note weights argument
-```
-
-## Data stack for model fitting
-
-With the SPDE method, there are several data structures that need to
-be bundled and used for analysis of the spatial model. There is the
-observed response at the count sites, the covariate values at the
-count sites, and the indices and mapping of those data to the modeling
-mesh. All of this information gets bundled into a data stack for model
-analysis using the `inla.stack()` function. This function is very
-flexible and can be difficult to understand at first. See Blandgiardo
-and Cameletti (2015) and Gomez-Rubio (2020) for practical information
-on how to use it.
-
-The first argument to the function, shown below, is the `tag` name for
-the stack. In this case we are including observed data for model
-estimation, so we name the stack 'obs'. The next argument, `data`,
-specifies the response variable. Here we have a single response
-variable called 'count'. We tell the stacking function that observed
-counts reside in the 'count_dat' data set. The next argument,
-`effects`, is used to specify the model predictors. These are defined
-using the observed data for non-spatial predictors, and using the
-named index sets for the spatial predictors. The last argument, `A`,
-asks for a list of projector matrices or A matrices for the predictor
-variables. We did not need to make a projector for $\kappa_s$, because
-it is not defined as a spatial parameter. Nevertheless, we add a value
-of 1 because it is the value that will be multiplied by the effect
-during model computations and serves as a way for the stacking
-function to match the number of A matrices with the number of effects
--- if there are 4 effects, then there must be four entries for `A`.
-Note that if there were more than one non-spatial predictor in the
-model, whether a grouped random intercept or a global fixed effect,
-then each one would be given its own value of 1 during this step. And
-note that the order of the A matrices must match the order of the
-effects.
-
-```{r stack1}
-# stack observed data
-stack_fit <- inla.stack(
-  tag = 'obs',
-  data = list(count = as.vector(count_dat$count)), # response from data frame
-  effects = list(data.frame(intercept=1, 
-                            kappa = count_dat$site_idx), # predictors, data frame 
-                 alpha = alpha_idx,          # or index sets if spatial
-                 eps = eps_idx,
-                 tau = tau_idx),
-  A = list(1,        # a value of 1 is given for non-spatial terms
-           A_alpha,  
-           A_eps, 
-           A_tau)
+spde <- inla.spde2.pcmatern(
+  mesh = mesh,
+  prior.range = c(500, 0.5),
+  prior.sigma = c(1, 0.5)
 )
 ```
 
-It is possible to construct additional data stacks for creating 
-predictions, and then stack the estimation and predictions stacks 
-together for analysis. We do not do that in this example. Information 
-on creating and adding prediction stacks in an SPDE context can be 
-found in  Krainski et al. (2018, chapter 2) and Moraga (2019, chapter 
-10).
+## Weighted spatial effects in inlabru
+
+In ordinary `R-INLA`, it would be necessary to construct projector matrices for each
+model component, that would include the different covariate weightings for
+each spatial model component. In `inlabru`, this can instead be handled by either
+explicitly multiplying the spatial random fields with the spatial covariates in the
+model formula expression, or by specifying the `weights` argument for each
+model component specification.  We will here use the latter approach, since
+it is the easiest.
+
+In our model,
+$\epsilon_s$ is a spatially varying effect of the log of count effort.
+Similarly, $\tau_s$ is a spatially
+varying effect of year, so standardized year (with 1987 = 0) is also
+specified in the `weights` argument. $\alpha_s$ is also an SVC, but it
+is a spatially varying intercept. For intercepts it is not necessary
+to specify a constant weight of 1. The
+model component $\kappa_{s}$ is linked to each observation site and is not modeled on the mesh.
+
+Note that the
+current use of the term 'weights' is different from that often
+encountered when defining mixed effect models in `R`. Here it is used
+to define covariate value multiplication, as opposed to **importance values** for
+likelihoods in other contexts.
+
+
+### Data stack for model fitting
+
+In plain `R-INLA`, we would need to bundle all the model data and component projector matrix
+information using the `inla.stack()` function. In `inlabru`, this is done automatically,
+so we skip that step.
 
 ## Model formula
 
@@ -372,72 +350,82 @@ effect exceeding 1 is 0.01.
 
 ```{r prior}
 # iid prior
-pc_prec <- list(prior = 'pcprec', param = c(1, 0.1))
+pc_prec <- list(prior = "pcprec", param = c(1, 0.1))
 ```
+
+Notice that if one wants to constrain a spatial spde effect to
+integrate to zero, it should be added `constr=TRUE` in the SPDE model
+definition rather than in the component definition. As we want to constrain
+$\kappa_s$ and it is a non-spatial term we **can** use `constr=TRUE` in
+its corresponding `label()` component definition below, which imposes a sum-to-zero constraint.
 
 The model described above is translated to `R-INLA` modeling syntax
 as:
 
 ```{r form}
-# formula
-svc_form <- count ~ -1 +
-  f(kappa, model ="iid", constr = T, hyper = list(prec = pc_prec)) + 
-  f(alpha, model = spde) + 
-  f(eps, model = spde) + 
-  f(tau, model = spde)
+# components
+svc_components <- ~ -1 +
+  kappa(site_idx, model = "iid", constr = TRUE, hyper = list(prec = pc_prec)) +
+  alpha(cbind(lon, lat), model = spde) +
+  eps(cbind(lon, lat), weights = log_hrs, model = spde) +
+  tau(cbind(lon, lat), weights = std_yr, model = spde)
+# formula, with "." meaning "add all the model components":
+svc_formula <- count ~ .
 ```
 
 Here, we define the response as `count`, remove the automatic global 
 intercept with a `-1`, and then specify the other terms in the model 
-with `f()` statements. The first `f()` statement defines $\kappa_s$, 
-the site effect, as a normally distributed and exchangeable 
-(`model="iid"`), zero-centered (sum to zero `constr=T`), deviation 
-from $\alpha_s$. The name 'kappa' given in the `f()` argument is 
-associated with the effect 'kappa' defined in the estimation stack. 
-The second `f()` statement defines $\alpha_s$ as a spatially varying 
+with `label()` statements. The first `kappa()` statement defines $\kappa_s$, 
+the site effect, as a normally distributed and independent 
+(`model="iid"`), globally zero-centered (sum to zero `constr=TRUE`), deviation 
+from $\alpha_s$. The second `alpha()` statement defines $\alpha_s$ as a spatially varying 
 intercept with spatial structure described by the SPDE object called 
 'spde'. Remember that if one wants to constrain this kind of spatial 
-effect to sum to zero, `constr=T` should be added in the SPDE model 
-definition rather than in the `f()` arguments. The third `f()` 
+effect to integrate to zero, `constr=TRUE` should be added in the SPDE model 
+definition rather than in the `label()` arguments. The third `eps()` 
 statement defines $\epsilon_s$ as an SVC for the effect of count 
 effort, with spatial structure also described by the SPDE object. 
 The weights for this spatially structured random 
-slope were specified during construction of the projector A matrix, 
-`A_eps`. The fourth `f()` statement defines $\tau_s$ as an SVC for 
+slope are specified with the `weights=log_hrs` argument.
+The fourth `tau()` statement defines $\tau_s$ as an SVC for 
 the year effect, with spatial structure described in the SPDE object. 
-The weights for this spatially structured random slope were specified 
-during construction of the projector A matrix, `A_tau`. Again, note 
-that the current use of the term 'weights' is to define covariate 
-values, as opposed to importance values.
+The weights for this spatially structured random slope are specified with
+the `weights=std_yr` argument.
 
 ## Run model
 
-We estimate the model with a call to `inla()`. First we set the option
+We estimate the model with a call to `bru()`. First we set the option
 to use the (new) experimental way to do internal computations, see Van
 Niekerk et. al. (2022), for the sake of computing speed and better
-numerics. In the call to `inla()`, we give the model formula, specify
-the negative binomial distribution for the counts, define the
-estimation data, and describe the location of the projector A matrix.
-Note that we are not generating predictions (`compute=F`).
-Nevertheless, the `control.preditor` argument still needs to be
-included so the software knows how to find the A matrices. Then we ask
+numerics. In the call to `bru()`, we give the model components, and
+specify an observation likelihood with the model formula for
+the negative binomial distribution for the counts, and define the
+estimation data.
+Then we ask
 `inla()` to compute WAIC and CPO to evaluate model fit, and to save
-the information necessary for posterior sampling (`config=T`). For
-computing speed, we choose to use the adaptive integration strategy
-and Empirical Bayes estimation. Another option is to use the Variational 
-Bayes approximation as detailed in Van Niekerk and Rue (2021) and Van 
-Niekerk et. al. (2022). The `inla()` run for this model takes about 1 
-minute on a standard laptop computer. 
+the information necessary for posterior sampling (`config=TRUE`, but
+this will otherwise be set by default by `bru()`, as `inlabru::predict()`
+relies on it for posterior sampling and prediction). For
+computing speed, we choose to use the simplified laplace approximation strategy
+and Empirical Bayes estimation. The `inla()` run for this model takes
+about 1 minutes on a standard laptop computer. Another option is to
+use the Variational Bayes approximation as detailed in Van Niekerk and
+Rue (2021) and Van Niekerk et. al. (2022).
 
 ```{r run, eval=T, cache=TRUE}
-res <- inla(svc_form,
-            family="nbinomial",
-            data=inla.stack.data(stack_fit), # stack the stack
-            control.predictor=list(A=inla.stack.A(stack_fit), 
-                                   compute=F), # must define A
-            control.compute=list(waic=T, cpo=T, config=T),
-            control.inla=list(strategy='adaptive', int.strategy='eb'),
-            verbose=F)
+res <- bru(svc_components,
+  like(
+    formula = svc_formula,
+    family = "nbinomial",
+    data = count_dat
+  ),
+  options = list(
+    inla.mode = "experimental",
+    control.compute = list(waic = TRUE, cpo = TRUE, config = TRUE),
+    control.inla = list(strategy = "simplified.laplace", int.strategy = "eb"),
+    verbose = FALSE
+  )
+)
 ```
 
 ## Model summaries
@@ -449,16 +437,17 @@ spatial ranges of the spatially structured parameters.
 
 ```{r vc}
 # view results
-res$summary.hyperpar[-1, c(1,2)]
+res$summary.hyperpar[-1, c(1, 2)]
 ```
 
 Next we examine some summaries of the random effect estimates,
-starting with $\alpha_s$, which is effort-corrected relative abundance
+starting with $\exp(\alpha_s)$, which is effort-corrected relative abundance
 at year = 0 (1987), given 1 hour of count effort (i.e., log[1]=0). 
 
 ```{r alpha_res}
-summary(exp(res$summary.random$alp$mean)) # alpha
+summary(exp(res$summary.random$alp$"0.5quant")) # exp(alpha) posterior median
 ```
+Note that to avoid issues due to $E[\exp(x)|y]\neq\exp[E(x|y)]$, we use the posterior median instead of the posterior mean.
 
 The summary for $\epsilon_s$ shows variation in the exponent for the
 effort correction function across space.
@@ -472,10 +461,13 @@ relative abundance have varied across space, from annual decreases of
 around 10% to annual increases of around 10%.
 
 ```{r tau_res}
-summary((exp(res$summary.random$tau$mean)-1)*100) # tau
+summary((exp(res$summary.random$tau$"0.5quant") - 1) * 100) # (exp(tau)-1)*100
 ```
 
 ## SVC maps
+
+Note: some of the plots in this section can be simplified further by using
+additional `inlabru` `ggplot` features.
 
 Next we create maps of $\alpha_s$, $\epsilon_s$, and $\tau_s$ to
 inspect the spatial structure of these parameter estimates. We start
@@ -486,76 +478,184 @@ grid to the modeling mesh.
 # get lon and lat limits
 xlim <- range(hull$loc[, 1])
 ylim <- range(hull$loc[, 2])
-grd_dims <- round(c(x=diff(range(xlim)), y=diff(range(ylim)))/25)
+grd_dims <- round(c(x = diff(range(xlim)), y = diff(range(ylim))) / 25)
 
-# make mesh projector that will get model summaries from the mesh to 
-# the mapping grid
+# make mesh projector to get model summaries from the mesh to the mapping grid
 mesh_proj <- inla.mesh.projector(
-    mesh, xlim=xlim, ylim=ylim, dims=grd_dims)
+  mesh,
+  xlim = xlim, ylim = ylim, dims = grd_dims
+)
 ```
 
 Then we populate the mapping grids with parameter estimates (posterior
-mean and SD), turn them into a raster stack, and mask the raster stack
+median and range95), turn them into a raster stack, and mask the raster stack
 to the study area.
 
 ```{r map_vals}
 # pull data
-alph <- exp(res$summary.random$alp[, c(2:3)])
-epsi <- res$summary.random$eps[, c(2:3)]
-taus <- (exp(res$summary.random$tau[, c(2:3)]) - 1) * 100
+kappa <- data.frame(
+  median = exp(res$summary.random$kappa$"0.5quant"),
+  range95 = exp(res$summary.random$kappa$"0.975quant") -
+    exp(res$summary.random$kappa$"0.025quant")
+)
+alph <- data.frame(
+  median = exp(res$summary.random$alpha$"0.5quant"),
+  range95 = exp(res$summary.random$alpha$"0.975quant") -
+    exp(res$summary.random$alpha$"0.025quant")
+)
+epsi <- data.frame(
+  median = exp(res$summary.random$eps$"0.5quant"),
+  range95 = (res$summary.random$eps$"0.975quant" -
+    res$summary.random$eps$"0.025quant")
+)
+taus <- data.frame(
+  median = (exp(res$summary.random$tau$"0.5quant") - 1) * 100,
+  range95 = (exp(res$summary.random$tau$"0.975quant") -
+    exp(res$summary.random$tau$"0.025quant")) * 100
+)
 
 # loop to get estimates on a mapping grid
-pred_grids <- lapply(list(alpha=alph, epsilon=epsi, tau=taus),
-                 function(x) as.matrix(inla.mesh.project(mesh_proj, x)))
+pred_grids <- lapply(
+  list(alpha = alph, epsilon = epsi, tau = taus),
+  function(x) as.matrix(inla.mesh.project(mesh_proj, x))
+)
 
-# make a raster stack with the posterior mean and SD
+# make a raster stack with the posterior median and range95
 out_stk <- stack()
-for(j in 1:3){
-  mean_j <- cbind(expand.grid(X=mesh_proj$x, Y=mesh_proj$y), 
-            Z=c(matrix(pred_grids[[j]][,1], grd_dims[1])))
-  mean_j <- rasterFromXYZ(mean_j, crs=epsg6703km)
-  sd_j <- cbind(expand.grid(X=mesh_proj$x, Y=mesh_proj$y), 
-            Z=c(matrix(pred_grids[[j]][,2], grd_dims[1])))
-  sd_j <- rasterFromXYZ(sd_j, crs=epsg6703km)
-  out_j <- stack(mean_j, sd_j)
+for (j in 1:3) {
+  mean_j <- cbind(expand.grid(X = mesh_proj$x, Y = mesh_proj$y),
+    Z = c(matrix(pred_grids[[j]][, 1], grd_dims[1]))
+  )
+  mean_j <- rasterFromXYZ(mean_j, crs = epsg6703km)
+  range95_j <- cbind(expand.grid(X = mesh_proj$x, Y = mesh_proj$y),
+    Z = c(matrix(pred_grids[[j]][, 2], grd_dims[1]))
+  )
+  range95_j <- rasterFromXYZ(range95_j, crs = epsg6703km)
+  out_j <- stack(mean_j, range95_j)
   out_stk <- addLayer(out_stk, out_j)
 }
-names(out_stk) <- c("alpha_mean", "alpha_sd", "epsilon_mean", 
-                    "epsilon_sd", "tau_mean", "tau_sd")
+names(out_stk) <- c(
+  "alpha_median", "alpha_range95", "epsilon_median",
+  "epsilon_range95", "tau_median", "tau_range95"
+)
 out_stk <- mask(out_stk, as(states, "Spatial"))
 ```
 
-Finally, we plot the SVC for $\tau_s$ with the following code.
+Finally, we plot the SVCs with the following code. We plot the posterior median and 95% uncertainty width ("range95")
+for $\exp(\kappa_s)$, $\exp(\alpha_s)$, $\epsilon_s$, and $100(\exp(\tau_s)-1)$.
 
-```{r svc_plots, warning=F, message=F, fig.width=8, fig.align='center'}
+```{r svc_plot_construction, warning=F, message=F}
+# alpha_s
+alpha_spdf <- as(out_stk[["alpha_median"]], "SpatialPixelsDataFrame")
+alpha_df <- as.data.frame(alpha_spdf)
+colnames(alpha_df) <- c("value", "x", "y")
+pa <- ggplot(states) +
+  geom_sf(fill = NA) +
+  coord_sf(datum = NA) +
+  geom_tile(data = alpha_df, aes(x = x, y = y, fill = value)) +
+  labs(x = "", y = "") +
+  scale_fill_distiller("posterior\nmedian\nexp(alpha_s)", palette = "Spectral") +
+  theme_bw() +
+  geom_sf(fill = NA)
+
+# epsilon_s
+eps_spdf <- as(out_stk[["epsilon_median"]], "SpatialPixelsDataFrame")
+eps_df <- as.data.frame(eps_spdf)
+colnames(eps_df) <- c("value", "x", "y")
+pe <- ggplot(states) +
+  geom_sf(fill = NA) +
+  coord_sf(datum = NA) +
+  geom_tile(data = eps_df, aes(x = x, y = y, fill = value)) +
+  labs(x = "", y = "") +
+  scale_fill_distiller("posterior\nmedian\nepsilon_s", palette = "Spectral") +
+  theme_bw() +
+  geom_sf(fill = NA)
+
 # tau_s
-tau_spdf <- as(out_stk[[5]], "SpatialPixelsDataFrame")
+tau_spdf <- as(out_stk[["tau_median"]], "SpatialPixelsDataFrame")
 tau_df <- as.data.frame(tau_spdf)
 colnames(tau_df) <- c("value", "x", "y")
-pt <- ggplot(states) + geom_sf(fill=NA) + coord_sf(datum = NA) +
-  geom_tile(data=tau_df, aes(x=x, y=y, fill=value)) +
-  labs(x="", y="") +
-  scale_fill_distiller("posterior\nmean\ntau_s", palette="Spectral") +
-  theme_bw() + geom_sf(fill=NA) 
+pt <- ggplot(states) +
+  geom_sf(fill = NA) +
+  coord_sf(datum = NA) +
+  geom_tile(data = tau_df, aes(x = x, y = y, fill = value)) +
+  labs(x = "", y = "") +
+  scale_fill_distiller("posterior\nmedian\n100(exp(tau_s)-1)", palette = "Spectral") +
+  theme_bw() +
+  geom_sf(fill = NA)
 
-# tau_s sd
-tau_spdf <- as(out_stk[[6]], "SpatialPixelsDataFrame")
+# sites kappa_s median
+ps <- ggplot(states) +
+  geom_sf() +
+  coord_sf(datum = NA) +
+  geom_sf(data = site_map, size = 1, mapping = aes(colour = kappa$median)) +
+  scale_colour_distiller("posterior\nmedian\nexp(kappa_s)", palette = "Spectral") +
+  labs(x = "", y = "") +
+  theme_bw() +
+  geom_sf(fill = NA)
+
+# alpha_s range95
+alpha_spdf <- as(out_stk[["alpha_range95"]], "SpatialPixelsDataFrame")
+alpha_df <- as.data.frame(alpha_spdf)
+colnames(alpha_df) <- c("value", "x", "y")
+pa_range95 <- ggplot(states) +
+  geom_sf(fill = NA) +
+  coord_sf(datum = NA) +
+  geom_tile(data = alpha_df, aes(x = x, y = y, fill = value)) +
+  labs(x = "", y = "") +
+  scale_fill_distiller("posterior\nrange95\nexp(alpha_s)", palette = "Spectral") +
+  theme_bw() +
+  geom_sf(fill = NA)
+
+# epsilon_s range95
+eps_spdf <- as(out_stk[["epsilon_range95"]], "SpatialPixelsDataFrame")
+eps_df <- as.data.frame(eps_spdf)
+colnames(eps_df) <- c("value", "x", "y")
+pe_range95 <- ggplot(states) +
+  geom_sf(fill = NA) +
+  coord_sf(datum = NA) +
+  geom_tile(data = eps_df, aes(x = x, y = y, fill = value)) +
+  labs(x = "", y = "") +
+  scale_fill_distiller("posterior\nrange95\nepsilon_s", palette = "Spectral") +
+  theme_bw() +
+  geom_sf(fill = NA)
+
+# tau_s
+tau_spdf <- as(out_stk[["tau_range95"]], "SpatialPixelsDataFrame")
 tau_df <- as.data.frame(tau_spdf)
 colnames(tau_df) <- c("value", "x", "y")
-psd <- ggplot(states) + geom_sf(fill=NA) + coord_sf(datum = NA) +
-  geom_tile(data=tau_df, aes(x=x, y=y, fill=value)) +
-  labs(x="", y="") +
-  scale_fill_distiller("posterior\nSD\ntau_s", palette="Spectral") +
-  theme_bw() + geom_sf(fill=NA) 
+pt_range95 <- ggplot(states) +
+  geom_sf(fill = NA) +
+  coord_sf(datum = NA) +
+  geom_tile(data = tau_df, aes(x = x, y = y, fill = value)) +
+  labs(x = "", y = "") +
+  scale_fill_distiller("posterior\nrange95\n100(exp(tau_s)-1)", palette = "Spectral") +
+  theme_bw() +
+  geom_sf(fill = NA)
 
-# plot together
-multiplot(pt, psd, cols=2)
+# sites kappa_s range95
+ps_range95 <- ggplot(states) +
+  geom_sf() +
+  coord_sf(datum = NA) +
+  geom_sf(data = site_map, size = 1, mapping = aes(colour = kappa$range95)) +
+  scale_colour_distiller("posterior\nrange95\nexp(kappa_s)", palette = "Spectral") +
+  labs(x = "", y = "") +
+  theme_bw() +
+  geom_sf(fill = NA)
 ```
-
+```{r svc_plots, warning=F, message=F, fig.width=8, fig.align='center'}
+# plot together
+multiplot(ps, pa, pe, pt, cols = 2)
+```
 The map for the posterior mean of $\tau_s$ shows that robins have 
 decreased in the southern part of the study area and increased in 
 the northern part. This demonstrates how the wintering range of robins 
 is shifting northward as winters become warmer due to climate change.
+
+```{r svc_plots_range95, warning=F, message=F, fig.width=8, fig.align='center'}
+# plot together
+multiplot(ps_range95, pa_range95, pe_range95, pt_range95, cols = 2)
+```
 
 ## More information
 
