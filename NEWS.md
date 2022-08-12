@@ -16,6 +16,8 @@
 
 * Add `mean.mc_std_err` and `sd.mc_std_err` output to `predict()`
 
+* Avoid deprecated Matrix (>=1.4-2) class coercion methods
+
 # inlabru 2.5.2
 
 * More robust package checks
