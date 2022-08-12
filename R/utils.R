@@ -384,8 +384,8 @@ resave_package_data <- function() {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @export row_kron
 row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
-  M1 <- as(as(as(M1, "CsparseMatrix"), "dgCMatrix"), "dgTMatrix")
-  M2 <- as(as(as(M2, "CsparseMatrix"), "dgCMatrix"), "dgTMatrix")
+  M1 <- as(as(as(as(M1, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
+  M2 <- as(as(as(as(M2, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
   n1 <- nrow(M1)
   n2 <- nrow(M2)
   if ((n1 == 1) && (n2 > 1)) {
