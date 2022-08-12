@@ -128,6 +128,12 @@ test_that("bru: factor component", {
 
 
 test_that("bru: predict with _eval", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  # Required for reproducible predict() and generate() output.
+  set.seed(1234L)
+
   mesh <- INLA::inla.mesh.2d(
     cbind(0, 0),
     offset = 2, max.edge = 0.25
@@ -155,7 +161,7 @@ test_that("bru: predict with _eval", {
   )
   pred <- predict(
     fit,
-    data = data.frame(u = seq(-1,6,by=0.1)),
+    data = data.frame(u = seq(-1, 6, by = 0.1)),
     formula = ~ data.frame(A = fun_eval(u),
                            B = fun_eval(fun),
                            fun = fun)
