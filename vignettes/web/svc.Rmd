@@ -54,7 +54,7 @@ a Matérn covariance function. The benefits of a continuous-space
 versus a discrete-space SVC include the potential for finer resolution
 estimation and prediction, a better understanding of the range of
 spatial correlation, and a reduction in boundary effects associated
-with discreet-space analyses.
+with discrete-space analyses.
 
 We build the model using a subset of the data described in Meehan et
 al. (2019). Specifically, we use counts of American Robin 
@@ -185,9 +185,9 @@ count_dat <- download_dat %>%
     year_idx = as.numeric(factor(year)),
     site_year_idx = as.numeric(factor(paste(circle, lon, lat, year)))
   ) %>%
-  st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = F) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = FALSE) %>%
   st_transform(epsg6703km) %>%
-  mutate(lon = st_coordinates(.)[, 1], lat = st_coordinates(.)[, 2]) %>%
+  mutate(easting = st_coordinates(.)[, 1], northing = st_coordinates(.)[, 2]) %>%
   arrange(circle, year)
 ```
 
@@ -213,23 +213,14 @@ ggplot() +
 
 Next we use the count data to make a map of distinct count sites and
 save the coordinates of the sites, unique and across all years, for
-later spatial modeling.
+later spatial plotting.
 
 ```{r spat_dat}
 # make a set of distinct study sites for mapping
 site_map <- count_dat %>%
-  select(circle, lon, lat) %>%
+  select(circle, easting, northing) %>%
   distinct() %>%
-  select(circle, lon, lat)
-
-# save coordinates as matrices for later
-unique_coords <- count_dat %>%
-  select(circle, lon, lat) %>%
-  distinct() %>%
-  select(lon, lat) %>%
-  st_drop_geometry() %>%
-  as.matrix()
-all_coords <- as.matrix(st_coordinates(count_dat))
+  select(circle, easting, northing)
 ```
 
 ## SPDE components
@@ -267,7 +258,8 @@ outside the hull.
 
 ```{r mesh, warning=F, message=F, fig.pos='t', fig.align='center'}
 # make a hull and mesh for spatial model
-hull <- inla.nonconvex.hull(points = unique_coords, 200, 350)
+hull <- inla.nonconvex.hull(points = as.matrix(st_coordinates(count_dat)),
+                            convex = 200, concave = 350)
 mesh <- inla.mesh.2d(
   boundary = hull, max.edge = c(100, 600), # km inside and outside
   cutoff = 50, offset = c(100, 300)
@@ -365,12 +357,16 @@ as:
 # components
 svc_components <- ~ -1 +
   kappa(site_idx, model = "iid", constr = TRUE, hyper = list(prec = pc_prec)) +
-  alpha(cbind(lon, lat), model = spde) +
-  eps(cbind(lon, lat), weights = log_hrs, model = spde) +
-  tau(cbind(lon, lat), weights = std_yr, model = spde)
+  alpha(st_coordinates, model = spde) +
+  eps(st_coordinates, weights = log_hrs, model = spde) +
+  tau(st_coordinates, weights = std_yr, model = spde)
 # formula, with "." meaning "add all the model components":
 svc_formula <- count ~ .
 ```
+Specifying the function `st_coordinates` as input causes `inlabru` to extracts
+the spatial coordinates of the observation locations from the internal `.data.`
+object.  Alternatively, we can specify that explicitly as input, with
+`st_coordinates(.data.)`, or with `cbind(easting, northing)`.
 
 Here, we define the response as `count`, remove the automatic global 
 intercept with a `-1`, and then specify the other terms in the model 
