@@ -1,5 +1,6 @@
 ---
 title: "Iterative INLA method"
+author: "Man Ho Suen, Finn Lindgren"
 output:
   - rmarkdown::html_vignette
   - rmarkdown::pdf_document
@@ -148,7 +149,7 @@ One key to the fixed point iteration is that the observation model is linked to
 $\bm{u}$ only through the non-linear predictor $\wt{\bm{\eta}}(\bm{u})$, since
 this leads to a simplified line search method below.
 
-<!-- intentional to start with 0 ?-->
+<!-- start with nth-done step 0. -->
 0. Let $\bm{u}_0$ be an initial linearisation point for the latent variables 
    obtained from the initial INLA call. Iterate the following steps for $k=0,1,2,...$
 1. Compute the predictor linearisation at $\bm{u}_0$.
