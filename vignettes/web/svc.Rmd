@@ -470,7 +470,7 @@ by creating a 25-km mapping grid, and then projecting this mapping
 grid to the modeling mesh.
 
 ```{r map_grid}
-# get lon and lat limits
+# get easting and northing limits
 xlim <- range(hull$loc[, 1])
 ylim <- range(hull$loc[, 2])
 grd_dims <- round(c(x = diff(range(xlim)), y = diff(range(ylim))) / 25)
