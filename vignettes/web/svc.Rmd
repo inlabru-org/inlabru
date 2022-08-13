@@ -358,7 +358,7 @@ definition rather than in the component definition. As we want to constrain
 $\kappa_s$ and it is a non-spatial term we **can** use `constr=TRUE` in
 its corresponding `label()` component definition below, which imposes a sum-to-zero constraint.
 
-The model described above is translated to `R-INLA` modeling syntax
+The model described above is translated to `inlabru` modeling syntax
 as:
 
 ```{r form}
