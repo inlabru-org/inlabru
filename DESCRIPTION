@@ -69,12 +69,15 @@ Suggests:
     graphics,
     INLA (>= 21.08.31),
     knitr,
+    maps,
     maptools,
     mgcv,
     raster,
     RColorBrewer,
     rgl,
     rmarkdown,
+    scales,
+    sf,
     shiny,
     sn,
     spatstat.geom,
@@ -82,7 +85,8 @@ Suggests:
     spatstat.data,
     spatstat (>= 2.0-0),
     sphereplot,
-    testthat
+    testthat,
+    tidyr
 Roxygen: list(markdown = TRUE)
 Config/testthat/parallel: true
 Config/testthat/edition: 3

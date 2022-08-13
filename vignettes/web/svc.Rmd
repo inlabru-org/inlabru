@@ -21,8 +21,7 @@ knitr::opts_chunk$set(
   echo = TRUE,
   warning = FALSE,
   error = FALSE,
-  message = FALSE,
-  cache = TRUE
+  message = FALSE
 )
 ```
 
@@ -97,7 +96,7 @@ To get started with data analysis, we set up the environment,
 by
 loading some packages, and
 setting some options.
-```{r libs, warning=FALSE, message=FALSE, errors=FALSE}
+```{r libs, warning=TRUE, message=TRUE, errors=TRUE}
 # libraries
 library(maps)
 library(ggplot2)
@@ -117,7 +116,7 @@ options(stringsAsFactors = FALSE)
 ```
 
 ```{r echo=F}
-inla.setOption(num.threads = "1:1")
+#inla.setOption(num.threads = "1:1")
 inla.setOption(smtp = "taucs")
 ```
 
