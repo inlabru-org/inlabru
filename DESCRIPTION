@@ -138,3 +138,4 @@ Collate:
     'utils.R'
 VignetteBuilder: knitr
 BuildVignettes: true
+LazyData: true
