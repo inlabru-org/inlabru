@@ -104,6 +104,7 @@ Collate:
     'data.gorillas.R'
     'data.mexdolphin.R'
     'data.mrsea.R'
+    'data.robins_subset.R'
     'data.seals.R'
     'data.shrimp.R'
     'data.toygroups.R'
@@ -138,4 +139,4 @@ Collate:
     'utils.R'
 VignetteBuilder: knitr
 BuildVignettes: true
-LazyData: true
+LazyData: false
