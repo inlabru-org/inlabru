@@ -24,7 +24,9 @@ Authors@R: c(
   person("Suen", "Man Ho", email = "M.H.Suen@sms.ed.ac.uk", role = c("ctb", "cph"),
          comment = "Man Ho Suen contributed features for aggregated responses"),
   person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
-         comment = "Pierre Roudier contributed general quantile summaries")
+         comment = "Pierre Roudier contributed general quantile summaries"),
+  person("Meehan", "Tim", email = "tmeeha@gmail.com", role = c("ctb", "cph"),
+         comment = "Tim Meehan contributed the SVC vignette and robins data")
   )
 URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/
 BugReports: https://github.com/inlabru-org/inlabru/issues
