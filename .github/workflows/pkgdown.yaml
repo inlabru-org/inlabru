@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - devel
+      - check
 
 name: pkgdown
 
@@ -21,14 +22,6 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Install system dependencies on MacOS (X11, gdal)
-        if: runner.os == 'macOS'
-        run: |
-          brew install --cask xquartz
-          brew install pkg-config
-          brew install proj@9
-          brew install gdal
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           dependencies: '"all"'
@@ -44,6 +37,11 @@ jobs:
 
       - name: Install package
         run: R CMD INSTALL .
+
+      - name: Setup tmate session
+        uses: mcschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
 
       - name: Deploy package
         run: |
