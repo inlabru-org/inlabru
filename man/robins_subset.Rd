@@ -3,22 +3,55 @@
 \docType{data}
 \name{robins_subset}
 \alias{robins_subset}
-\title{Robins}
+\title{robins_subset}
 \format{
 The data are a data.frame with variables
 \describe{
-\item{\code{variablename}:}{ The description}
+\item{\code{circle}:}{
+Four-letter code of the CBC circle.
+}
+\item{\code{bcr}:}{
+Numeric code for the bird conservation region encompassing the
+count circle.
+}
+\item{\code{state}:}{
+US state encompassing the count circle.
+}
+\item{\code{year}:}{
+calendar year the count was conducted.
+}
+\item{\code{std_yr}:}{
+transformed year, with 2016 = 0.
+}
+\item{\code{count}:}{
+number of robins recorded.
+}
+\item{\code{log_hrs}:}{
+the natural log of party hours.
+}
+\item{\code{lon}:}{
+longitude of the count circle centroid.
+}
+\item{\code{lat}:}{
+latitude of the count circle centroid.
+}
+\item{\code{obs}:}{
+unique record identifier.
+}
 }
 }
 \source{
-github ...
+https://github.com/tmeeha/inlaSVCBC
 }
 \usage{
 data(robins_subset)
 }
 \description{
-This is the \code{robins_subset} dataset which is a subset of the
-full Robins data set from ...
+This is the \code{robins_subset} dataset, which is a subset of the
+full robins data set used to demonstrate a spatially varying trend coefficient
+model in Meehan et al. 2019. The dataset includes American Robin counts,
+along with time, location, and effort information, from Audubon Christimas Bird
+Counts (CBC) conducted in six US states between 1987 and 2016.
 }
 \examples{
 if (require(ggplot2, quietly = TRUE)) {
@@ -31,5 +64,7 @@ if (require(ggplot2, quietly = TRUE)) {
 }
 }
 \references{
-Citation?
+Meehan, T.D., Michel, N.L., and Rue, H. 2019. Spatial modeling of Audubon
+Christmas Bird Counts reveals fine‐scale patterns and drivers of relative
+abundance trends. Ecosphere, 10(4), p.e02707.
 }
