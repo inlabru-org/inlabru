@@ -39,7 +39,7 @@ jobs:
         run: R CMD INSTALL .
 
       - name: Setup tmate session
-        uses: mcschmitt/action-tmate@v3
+        uses: mxschmitt/action-tmate@v3
         with:
           limit-access-to-actor: true
 
