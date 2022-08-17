@@ -100,7 +100,7 @@
 </h2>
 <p>Spatially varying coefficient models (SVCs, Gelfand et al. 2003) are often used to model data when relationships between dependent and independent variables are not uniform across space, a common situation when exploring phenomena across large spatial extents (Finley 2011). Meehan et al. (2019) described an SVC model to evaluate continent-scaled variation in bird abundance trends. The SVC model used in that analysis employed discrete aerial units (100 km grid cells), with spatial structure described by neighborhood matrices and spatial relationships described by an intrinsic conditional autoregressive model (Besag 1974). The online supplement for the paper included code for building the model using the <code>R-INLA</code> package (Rue et al. 2009) for the <code>R</code> statistical programming language (R Core Team 2021). Both the manuscript and code can be accessed at <a href="https://github.com/tmeeha/inlaSVCBC" class="external-link uri">https://github.com/tmeeha/inlaSVCBC</a>.</p>
 <p>In this vignette, we will describe how to build an SVC model similar to that described in Meehan et al. (2019), but within a continuous-space framework. This model will be computed using the stochastic partial differential equation (SPDE) approach of Lindgren et al. (2011, 2022), implemented with the <code>inlabru</code> interface to the <code>R-INLA</code> package for <code>R</code>. The SPDE approach employs a computationally efficient approximation of a Gaussian random field with parameters directly comparable to those of a Matérn covariance function. The benefits of a continuous-space versus a discrete-space SVC include the potential for finer resolution estimation and prediction, a better understanding of the range of spatial correlation, and a reduction in boundary effects associated with discrete-space analyses.</p>
-<p>We build the model using a subset of the data described in Meehan et al. (2019). Specifically, we use counts of American Robin (<em>Turdus migratorius</em>) from south central North America collected between 1987 and 2016 during the Audubon Christmas Bird Count (CBC). The overall goal of the analysis is to produce long-term relative abundance trends for robins that account for spatial and temporal variation in count effort.</p>
+<p>We build the model using a subset of the data described in Meehan et al. (2019). Specifically, we use counts of American Robin (<em>Turdus migratorius</em>) from south central North America collected between 1987 and 2016 during the Audubon Christmas Bird Count (CBC). The overall goal of the analysis is to produce spatially explicit estimates of annual relative abundance as well as long-term relative abundance trends for robins that account for spatial and temporal variation in count effort.</p>
 </div>
 <div class="section level2">
 <h2 id="model">Model<a class="anchor" aria-label="anchor" href="#model"></a>
@@ -190,7 +190,8 @@
 <span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span>coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lon"</span>, <span class="st">"lat"</span><span class="op">)</span>, crs <span class="op">=</span> <span class="fl">4326</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">epsg6703km</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>easting <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, northing <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>easting <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>,</span>
+<span>         northing <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">circle</span>, <span class="va">year</span><span class="op">)</span></span></code></pre></div>
 <p>A rough view of changes in robin relative abundance, which does not account for variation in count effort, can be seen by plotting raw counts per site and year.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -210,7 +211,7 @@
 <div class="section level2">
 <h2 id="make-spatial-data">Make spatial data<a class="anchor" aria-label="anchor" href="#make-spatial-data"></a>
 </h2>
-<p>Next we use the count data to make a map of distinct count sites and save the coordinates of the sites, unique and across all years, for later spatial plotting.</p>
+<p>Next we use the count data to make a map of distinct count sites and save the coordinates of the sites, unique and across all years, for later spatial modeling and plotting.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># make a set of distinct study sites for mapping</span></span>
 <span><span class="va">site_map</span> <span class="op">&lt;-</span> <span class="va">count_dat</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -320,34 +321,33 @@
 <code class="sourceCode R"><span><span class="co"># view results</span></span>
 <span><span class="va">res</span><span class="op">$</span><span class="va">summary.hyperpar</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                              mean            sd</span></span>
-<span><span class="co">#&gt; Precision for kappa    2.21475703    0.44900312</span></span>
-<span><span class="co">#&gt; Range for alpha      934.19704313  296.89026859</span></span>
-<span><span class="co">#&gt; Stdev for alpha        1.92084137    0.36858350</span></span>
-<span><span class="co">#&gt; Range for eps       7701.04852790 5827.49064199</span></span>
-<span><span class="co">#&gt; Stdev for eps          0.47861812    0.34602429</span></span>
-<span><span class="co">#&gt; Range for tau        802.86995071  345.12717726</span></span>
-<span><span class="co">#&gt; Stdev for tau          0.06274554    0.01192384</span></span></code></pre></div>
+<span><span class="co">#&gt; Precision for kappa    2.24751275    0.44983083</span></span>
+<span><span class="co">#&gt; Range for alpha      930.51062609  298.13147894</span></span>
+<span><span class="co">#&gt; Stdev for alpha        1.90729956    0.36777198</span></span>
+<span><span class="co">#&gt; Range for eps       6308.03227479 4127.27196457</span></span>
+<span><span class="co">#&gt; Stdev for eps          0.49135683    0.28273285</span></span>
+<span><span class="co">#&gt; Range for tau        794.11796126  350.35712383</span></span>
+<span><span class="co">#&gt; Stdev for tau          0.06163427    0.01155272</span></span></code></pre></div>
 <p>Next we examine some summaries of the random effect estimates, starting with <span class="math inline">\(\exp(\alpha_s)\)</span>, which is effort-corrected relative abundance at year = 0 (1987), given 1 hour of count effort (i.e., log[1]=0).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">alp</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span><span class="op">)</span> <span class="co"># exp(alpha) posterior median</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt;  0.06914  1.18402  3.34529  6.86732  8.48396 50.82995</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.06545  1.16593  3.17067  6.74168  8.31539 53.06144</span></span></code></pre></div>
 <p>Note that to avoid issues due to <span class="math inline">\(E[\exp(x)|y]\neq\exp[E(x|y)]\)</span>, we use the posterior median instead of the posterior mean.</p>
 <p>The summary for <span class="math inline">\(\epsilon_s\)</span> shows variation in the exponent for the effort correction function across space.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">eps</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="co"># epsilon</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.8259  0.9049  0.9703  0.9600  1.0182  1.0544</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.7696  0.8913  0.9841  0.9699  1.0515  1.1331</span></span></code></pre></div>
 <p>The <span class="math inline">\(\tau_s\)</span> summary shows how long-term, log-linear trends of robin relative abundance have varied across space, from annual decreases of around 10% to annual increases of around 10%.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">tau</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="co"># (exp(tau)-1)*100</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt; -12.6020  -4.6704  -1.4208  -0.9428   2.6693  10.7942</span></span></code></pre></div>
+<span><span class="co">#&gt; -12.5590  -4.5853  -1.4012  -0.9142   2.6741  10.6676</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="svc-maps">SVC maps<a class="anchor" aria-label="anchor" href="#svc-maps"></a>
 </h2>
-<p>Note: some of the plots in this section can be simplified further by using additional <code>inlabru</code> <code>ggplot</code> features.</p>
 <p>Next we create maps of <span class="math inline">\(\alpha_s\)</span>, <span class="math inline">\(\epsilon_s\)</span>, and <span class="math inline">\(\tau_s\)</span> to inspect the spatial structure of these parameter estimates. We start by creating a 25-km mapping grid, and then projecting this mapping grid to the modeling mesh.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># get easting and northing limits</span></span>
