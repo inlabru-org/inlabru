@@ -1,7 +1,7 @@
 # inlabru (development version)
 
 * Propagate multi-likelihood A-matrix information instead of recomputing.
-  Fixes iteration issue for bym2 and other bru_mapper_collect models.
+  Fixes iteration issue for bym2 and other `bru_mapper_collect` models.
   
 * Turn on predictor summaries during iterations to allow `inla.mode="classic"`
   to use proper line search.
@@ -12,11 +12,13 @@
 
 * Allow arbitrary quantile summaries in `predict()`
 
-* Remove cv, var, smin, smax summaries from `predict()`
+* Remove `cv`, `var`, `smin`, `smax` summaries from `predict()`
 
 * Add `mean.mc_std_err` and `sd.mc_std_err` output to `predict()`
 
 * Avoid deprecated Matrix (>=1.4-2) class coercion methods
+
+* Add `robins_subset` data set and associated variable coefficient web vignette
 
 # inlabru 2.5.2
 
