@@ -107,6 +107,8 @@ library(scales)
 library(inlabru)
 library(INLA)
 library(dplyr)
+# Note: the 'splancs' package also needs to be installed,
+# but doesn't need to be loaded
 
 # set option
 select <- dplyr::select

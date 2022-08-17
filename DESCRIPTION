@@ -85,6 +85,7 @@ Suggests:
     spatstat.data,
     spatstat (>= 2.0-0),
     sphereplot,
+    splancs,
     testthat,
     tidyr
 Roxygen: list(markdown = TRUE)
