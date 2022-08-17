@@ -68,6 +68,7 @@ lgcp function.
     <a class="dropdown-item" href="../articles/web/publications.html">Publications</a>
     <a class="dropdown-item" href="../articles/web/random_fields.html">Random Fields in One Dimension</a>
     <a class="dropdown-item" href="../articles/web/random_fields_2d.html">Random Fields in 2D</a>
+    <a class="dropdown-item" href="../articles/web/svc.html">Spatially Varying Coefficient Models with inlabru</a>
     <a class="dropdown-item" href="../articles/website_examples.html">Examples on the inlabru website</a>
   </div>
 </li>
@@ -190,11 +191,11 @@ adds additional information stored in the <code>bru_info</code> field.</p>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>   Implicit latent intercept component specification is deprecated since version 2.1.14.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>   Use explicit notation '+ Intercept(1)' instead (or '+1' for '+ Intercept(1)').</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.946393 0.04805908   1.850303 1.946393   2.042479 1.946394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.962307 0.03398547   4.894357 4.962308   5.030254 4.962309</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         2.046279 0.02231036   2.001675 2.046279   2.090882 2.046280</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.998069 0.01578951   4.966504 4.998069   5.029632 4.998069</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    kld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.028676e-06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 1.024857e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.019568e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 1.001995e-06</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span>multicore <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -208,11 +209,11 @@ adds additional information stored in the <code>bru_info</code> field.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.946393 0.04805743   1.850306 1.946393   2.042476 1.946394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.962307 0.03398430   4.894359 4.962308   5.030252 4.962309</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         2.046279 0.02230919   2.001678 2.046279    2.09088 2.046280</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.998069 0.01578868   4.966506 4.998069    5.02963 4.998069</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    kld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.020975e-06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 1.017179e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.008433e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 9.910216e-07</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># An important addition to the INLA methodology is bru's ability to use</span></span></span>
 <span class="r-in"><span><span class="co"># non-linear predictors. Such a predictor can be formulated via like()'s</span></span></span>
@@ -235,11 +236,11 @@ adds additional information stored in the <code>bru_info</code> field.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean          sd 0.025quant 0.5quant 0.975quant     mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> z         1.997251 0.005890013   1.985490 1.997251   2.009013 1.997251</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.015693 0.030253983   4.955204 5.015693   5.076179 5.015694</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> z         1.997456 0.005694113   1.986087 1.997456   2.008825 1.997456</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.996673 0.029224305   4.938243 4.996673   5.055100 4.996674</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    kld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> z         7.939384e-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 1.016143e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> z         7.750100e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 1.009931e-06</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

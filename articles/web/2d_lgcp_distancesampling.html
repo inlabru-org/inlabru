@@ -53,6 +53,7 @@
     <a class="dropdown-item" href="../../articles/web/publications.html">Publications</a>
     <a class="dropdown-item" href="../../articles/web/random_fields.html">Random Fields in One Dimension</a>
     <a class="dropdown-item" href="../../articles/web/random_fields_2d.html">Random Fields in 2D</a>
+    <a class="dropdown-item" href="../../articles/web/svc.html">Spatially Varying Coefficient Models with inlabru</a>
     <a class="dropdown-item" href="../../articles/website_examples.html">Examples on the inlabru website</a>
   </div>
 </li>
@@ -86,7 +87,7 @@
       <img src="" class="logo" alt=""><h1>LGCPs - Distance sampling</h1>
                         <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-08-12</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-08-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_distancesampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_distancesampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_distancesampling.Rmd</code></div>
@@ -224,9 +225,9 @@
 <span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 248.5284 68.70217 150.4007 236.7477 417.4388 236.7477        6.870217</span></span>
+<span><span class="co">#&gt; 1 251.0197 55.65725 159.6833 238.8039 371.5732 238.8039        5.565725</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      9.415139</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      4.310125</span></span></code></pre></div>
 <p>and including the randomness about the expected number. In this case, it turns out that you need lots of posterior samples, e.g. 2,000 to smooth out the Monte Carlo error in the posterior, and this takes a little while to compute:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">450</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -309,9 +310,9 @@
 <span><span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 320.2256 106.9254 177.0006 298.9633 571.1097 298.9633        10.69254</span></span>
+<span><span class="co">#&gt; 1 334.5351 88.42152 192.8276 314.9597 524.9914 314.9597        8.842152</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      12.17793</span></span>
+<span><span class="co">#&gt; 1      5.496988</span></span>
 <span></span>
 <span><span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -338,8 +339,8 @@
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   Model       DIC Delta.DIC</span></span>
-<span><span class="co">#&gt; 1   fit -802.3811  0.000000</span></span>
-<span><span class="co">#&gt; 2  fit1 -800.2929  2.088143</span></span>
+<span><span class="co">#&gt; 1   fit -802.3808   0.00000</span></span>
+<span><span class="co">#&gt; 2  fit1 -800.2927   2.08803</span></span>
 <span></span>
 <span><span class="co"># Look at the goodness-of-fit of the two models in the distance dimension</span></span>
 <span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span></span>

@@ -43,6 +43,9 @@
     <loc>/articles/web/random_fields_2d.html</loc>
   </url>
   <url>
+    <loc>/articles/web/svc.html</loc>
+  </url>
+  <url>
     <loc>/articles/website_examples.html</loc>
   </url>
   <url>
@@ -365,6 +368,9 @@
   </url>
   <url>
     <loc>/reference/refine.inla.mesh.html</loc>
+  </url>
+  <url>
+    <loc>/reference/robins_subset.html</loc>
   </url>
   <url>
     <loc>/reference/row_kron.html</loc>
