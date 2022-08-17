@@ -2,6 +2,13 @@ on:
   push:
     branches:
       - devel
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 name: pkgdown
 
@@ -21,14 +28,6 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Install system dependencies on MacOS (X11, gdal)
-        if: runner.os == 'macOS'
-        run: |
-          brew install --cask xquartz
-          brew install pkg-config
-          brew install proj@9
-          brew install gdal
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           dependencies: '"all"'
@@ -44,6 +43,14 @@ jobs:
 
       - name: Install package
         run: R CMD INSTALL .
+
+      # Enable tmate debugging of manually-triggered workflows if the input option was provided
+      # https://mxschmitt.github.io/action-tmate/
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          limit-access-to-actor: true
 
       - name: Deploy package
         run: |

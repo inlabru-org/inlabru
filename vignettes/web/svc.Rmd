@@ -57,12 +57,14 @@ spatial correlation, and a reduction in boundary effects associated
 with discrete-space analyses.
 
 We build the model using a subset of the data described in Meehan et
-al. (2019). Specifically, we use counts of American Robin 
-(*Turdus migratorius*) from south central North America collected 
-between 1987 and 2016 during the Audubon Christmas Bird Count (CBC). 
-The overall goal of the analysis is to produce long-term relative 
-abundance trends for robins that account for spatial and temporal 
-variation in count effort.  
+al. (2019). 
+Specifically, we use counts of American Robin (*Turdus migratorius*)
+from 
+south central North America collected between 1987 and 2016 during
+the Audubon Christmas Bird Count (CBC). The overall goal of the
+analysis is to produce spatially explicit estimates of 
+annual relative abundance as well as long-term relative abundance 
+trends for robins that account for spatial and temporal variation in count effort.  
 
 ## Model
 
@@ -198,7 +200,8 @@ count_dat <- robins_subset %>%
   ) %>%
   st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = FALSE) %>%
   st_transform(epsg6703km) %>%
-  mutate(easting = st_coordinates(.)[, 1], northing = st_coordinates(.)[, 2]) %>%
+  mutate(easting = st_coordinates(.)[, 1],
+         northing = st_coordinates(.)[, 2]) %>%
   arrange(circle, year)
 ```
 
@@ -224,7 +227,7 @@ ggplot() +
 
 Next we use the count data to make a map of distinct count sites and
 save the coordinates of the sites, unique and across all years, for
-later spatial plotting.
+later spatial modeling and plotting.
 
 ```{r spat_dat}
 # make a set of distinct study sites for mapping
@@ -473,9 +476,6 @@ summary((exp(res$summary.random$tau$"0.5quant") - 1) * 100) # (exp(tau)-1)*100
 ```
 
 ## SVC maps
-
-Note: some of the plots in this section can be simplified further by using
-additional `inlabru` `ggplot` features.
 
 Next we create maps of $\alpha_s$, $\epsilon_s$, and $\tau_s$ to
 inspect the spatial structure of these parameter estimates. We start
