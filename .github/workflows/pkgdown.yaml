@@ -38,6 +38,7 @@ jobs:
       - name: Install package
         run: R CMD INSTALL .
 
+      # https://mxschmitt.github.io/action-tmate/
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         with:
