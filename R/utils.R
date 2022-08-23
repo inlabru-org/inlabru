@@ -384,6 +384,12 @@ resave_package_data <- function() {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @export row_kron
 row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
+  if (!inherits(M1, "Matrix")) {
+    M1 <- as(M1, "Matrix")
+  }
+  if (!inherits(M2, "Matrix")) {
+    M2 <- as(M2, "Matrix")
+  }
   M1 <- as(as(as(as(M1, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
   M2 <- as(as(as(as(M2, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
   n1 <- nrow(M1)
