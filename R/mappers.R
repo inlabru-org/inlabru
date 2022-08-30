@@ -1125,12 +1125,7 @@ bru_mapper_harmonics <- function(order = 1,
     intercept = intercept,
     interval = interval
   )
-  bru_mapper(mapper,
-    new_class = "bru_mapper_harmonics",
-    methods = list(
-      ibm_n
-    )
-  )
+  bru_mapper(mapper, new_class = "bru_mapper_harmonics")
 }
 
 

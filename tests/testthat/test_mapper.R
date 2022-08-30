@@ -198,7 +198,7 @@ test_that("mapper collection direct construction consistency", {
       dims = c(3, 4)
     )
   )
-  A <- as(A, "dgTMatrix")
+  A <- as(as(as(A, "dMatrix"), "generalMatrix"), "TsparseMatrix")
   expect_equal(ibm_amatrix(mapper, list_data), A)
   expect_equal(
     as(
