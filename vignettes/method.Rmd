@@ -361,23 +361,20 @@ $$
 The first term was approximated above. The second term can also be approximated using the derived quantities (to be continued...).
 
 
-#### Prior, Data and Posterior
-Here are some thoughts on the spectrum of models, namely, weak, somethings in between, and strong models. For the weak models, prior is strong, given the Gaussian in INLA, data is weak, then the posterior ends up Gaussian. Strong model is Gaussian because of a lot of data, then prior is weak, posterior ends up Gaussian again. What lies in between is problematic, which we have to investigate. 
-
-Most of the time, we only consider asymptotics, but the data in real world are most likely lying in between. In particular, low count models and binary models are the worst. For example, t-distribution in INLA, Hessian not positive definite, inlabru forces it to be positive definite for linearisation model. The question is how wrong it can be to force it in a point process setting. 
-
-#### Initialisation
+### Well-posedness and initialisation
 On a side note, one might be concerned about initialisation at, or convergence to, a saddle point. Although it is not implemented in inlabru, we want to talk about the technicality how we define the initial linearisation point $u_0$.
 
-Generally speaking, any values of $u_0$ work except the case that the gradient evaluated at $u_0$ is $\vec{0}$ because the linearisation point will never moves away. For multiple likelihood models, it can be tackled with another likelihood. For single likelihood, it is a saddle point problem. What even worse is the condition of multimodal property, it is difficult to obtain an unique solution. Therefore, we have to get around with and re-parameterise it. Here are some choices for reparameterisation, 
+Generally speaking, any values of $\bm{u}_0$ work except the case that the gradient evaluated at $\bm{u}_0$ is $\bm{0}$ because the linearisation point will never move away if the prior mean is also $\bm{0}$. In general, this tends to be a saddle point problem. In some cases the problem can be handled by changing the predictor parameterisation or just changing the initialisation point using the `bru_initial` option. However, for true saddle point problems, it indicates that the predictor parameterisation may lead to a multimodal posterior distribution or is ill-posed in some other way. This is a more fundamental problem that cannot be fixed by changing the initialisation point.
 
+In these examples, where $\beta$ and $\bm{u}$ are latent Gaussian components, the predictors 1, 3, and 4 would typically be safe, but predictor 2 is fundamentally non-identifiable.
 $$ 
 \begin{aligned}
-\bm{\eta}_1 &= \bm{u} \\
-\bm{\eta}_2 &= \beta \bm{u} \\
-\bm{\eta}_3 &= e^\beta \bm{u} \\
-\bm{\eta}_4 &= F_\beta^{-1} ( \Phi(z_\beta)) \bm{u}, \quad z_{\beta} \sim \mathsf{N}(0,1) \\
+\bm{\eta}_1 &= \bm{u}, \\
+\bm{\eta}_2 &= \beta \bm{u}, \\
+\bm{\eta}_3 &= e^\beta \bm{u}, \\
+\bm{\eta}_4 &= F_\beta^{-1} ( \Phi(z_\beta)) \bm{u}, \quad z_{\beta} \sim \mathsf{N}(0,1) .
 \end{aligned}
 $$
+Note that for $\bm{\eta}_3$ and $\bm{\eta}_4$, the partial derivatives with respect to $\beta$ are zero for $\bm{u}=\bm{0}$. However, the first inlabru iteration will give a non-zero estimate of $\bm{u}$, so that subsequent iteration will involve both $\beta$ and $\bm{u}$.
 
 
