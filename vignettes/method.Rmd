@@ -16,6 +16,7 @@ header-includes:
   - \newcommand{\OO}{\mathcal{O}}
   - \DeclareMathOperator*{\argmax}{arg\,max}
   - \DeclareMathOperator*{\tr}{tr}
+  - \newcommand{\pN}{\mathsf{N}}
   - \newcommand{\pCov}{\mathsf{Cov}}
   - \newcommand{\pE}{\mathsf{E}}
   - \newcommand{\pKL}[2]{\mathsf{KL}\left(#1\,\middle\|\,#2\right)}
@@ -360,6 +361,24 @@ E_{\ol{p}}\left[
 $$
 The first term was approximated above. The second term can also be approximated using the derived quantities (to be continued...).
 
+Summary: The form of the observation likelihood discrepancy shows that, given a linearised posterior $\pN(\bm{m},\bm{Q}^{-1})$, a Gaussian approximation to the  nonlinear model posterior, $\pN(\wt{\bm{m}},\wt{\bm{Q}}^{-1})$, can be obtained from $\wt{\bm{Q}}=\bm{Q}-\bm{G}$ and $\wt{\bm{Q}}\wt{\bm{m}}=\bm{Q}\bm{m}-\bm{G}\bm{u}_*$. The K-L divergence becomes
+$$
+\begin{aligned}
+\pKL{\ol{p}}{\wt{p}} &\approx
+\frac{1}{2}
+\left[
+\ln\det(\bm{Q})-
+\ln\det(\bm{Q}-\bm{G})
+-\tr\left(\bm{G}\bm{Q}^{-1}\right)
++
+(\bm{m}-\bm{u}_*)^\top\bm{G}(\bm{Q}-\bm{G})^{-1}\bm{G}(\bm{m}-\bm{u}_*)
+\right] .
+\end{aligned}
+$$
+When the INLA posterior has mean $\bm{m}=\bm{u}_*$, e.g. for models with additive Gaussian observation noise, and $\bm{\theta}=\wh{\bm{\theta}}_{\bm{u}_*}$, the last term vanishes.
+
+Note: by implementing the K-L divergence accuracy metric, a by-product would be
+improved posterior estimates based on $\wt{\bm{m}}$ and $\wt{\bm{Q}}$.
 
 ### Well-posedness and initialisation
 On a side note, one might be concerned about initialisation at, or convergence to, a saddle point. Although it is not implemented in inlabru, we want to talk about the technicality how we define the initial linearisation point $u_0$.
