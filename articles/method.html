@@ -302,6 +302,20 @@ E_{\overline{p}}\left[
 \ln\frac{\overline{p}(\boldsymbol{y}|\boldsymbol{\theta})}{\widetilde{p}(\boldsymbol{y}|\boldsymbol{\theta})} .
 \end{aligned}
 \]</span> The first term was approximated above. The second term can also be approximated using the derived quantities (to be continued…).</p>
+<p>Summary: The form of the observation likelihood discrepancy shows that, given a linearised posterior <span class="math inline">\(\mathsf{N}(\boldsymbol{m},\boldsymbol{Q}^{-1})\)</span>, a Gaussian approximation to the nonlinear model posterior, <span class="math inline">\(\mathsf{N}(\widetilde{\boldsymbol{m}},\widetilde{\boldsymbol{Q}}^{-1})\)</span>, can be obtained from <span class="math inline">\(\widetilde{\boldsymbol{Q}}=\boldsymbol{Q}-\boldsymbol{G}\)</span> and <span class="math inline">\(\widetilde{\boldsymbol{Q}}\widetilde{\boldsymbol{m}}=\boldsymbol{Q}\boldsymbol{m}-\boldsymbol{G}\boldsymbol{u}_*\)</span>. The K-L divergence becomes <span class="math display">\[
+\begin{aligned}
+\mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right) &amp;\approx
+\frac{1}{2}
+\left[
+\ln\det(\boldsymbol{Q})-
+\ln\det(\boldsymbol{Q}-\boldsymbol{G})
+-\mathop{\mathrm{tr}}\left(\boldsymbol{G}\boldsymbol{Q}^{-1}\right)
++
+(\boldsymbol{m}-\boldsymbol{u}_*)^\top\boldsymbol{G}(\boldsymbol{Q}-\boldsymbol{G})^{-1}\boldsymbol{G}(\boldsymbol{m}-\boldsymbol{u}_*)
+\right] .
+\end{aligned}
+\]</span> When the INLA posterior has mean <span class="math inline">\(\boldsymbol{m}=\boldsymbol{u}_*\)</span>, e.g. for models with additive Gaussian observation noise, and <span class="math inline">\(\boldsymbol{\theta}=\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_*}\)</span>, the last term vanishes.</p>
+<p>Note: by implementing the K-L divergence accuracy metric, a by-product would be improved posterior estimates based on <span class="math inline">\(\widetilde{\boldsymbol{m}}\)</span> and <span class="math inline">\(\widetilde{\boldsymbol{Q}}\)</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="well-posedness-and-initialisation">Well-posedness and initialisation<a class="anchor" aria-label="anchor" href="#well-posedness-and-initialisation"></a>
