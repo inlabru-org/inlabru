@@ -12,7 +12,7 @@
 
 * Bugfix release 2.5.3
 * NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
-* Checks for new version, 2.5.1 (with latest INLA, 22.03.28):
+* Checks for new version, 2.5.3 (with latest INLA, 22.09.02):
   - Spurious error message about potentially invalid doi, see below
 
 ## R CMD check results
@@ -57,4 +57,4 @@ Comments:
 
 ## Downstream dependencies
 
-bmstdr, intSDM, PointedSDMs
+We checked the reverse dependencies (bmstdr, intSDM, PointedSDMs) and saw no problems.
