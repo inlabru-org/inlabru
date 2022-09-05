@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.2.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,10 +63,11 @@
       <small>Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2"><h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.5.3" id="inlabru-253">inlabru 2.5.3<a class="anchor" aria-label="anchor" href="#inlabru-253"></a></h2>
 <div class="section level3">
-<h3 id="features-development-version">Features<a class="anchor" aria-label="anchor" href="#features-development-version"></a></h3>
+<h3 id="features-2-5-3">Features<a class="anchor" aria-label="anchor" href="#features-2-5-3"></a></h3>
 <ul><li><p>Add <code>bru_mapper_harmonics</code> mapper for <code>cos</code> and <code>sin</code> basis sets.</p></li>
 <li><p>Allow <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> input data to be be a list.</p></li>
 <li><p>Allow arbitrary quantile summaries in <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code></p></li>
@@ -75,7 +76,7 @@
 <li><p>Add <code>robins_subset</code> data set and associated variable coefficient web vignette</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-2-5-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-5-3"></a></h3>
 <ul><li><p>Propagate multi-likelihood A-matrix information instead of recomputing. Fixes iteration issue for bym2 and other <code>bru_mapper_collect</code> models.</p></li>
 <li><p>Turn on predictor summaries during iterations to allow <code>inla.mode="classic"</code> to use proper line search.</p></li>
 <li><p>Avoid deprecated Matrix (&gt;=1.4-2) class coercion methods</p></li>
