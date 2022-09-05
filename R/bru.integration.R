@@ -229,9 +229,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     identical(int.args[["method"]], "stable")) {
     ips <- data.frame(
       x = domain$loc,
-      weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0)
+      weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0),
+      group = 1
     )
-    colnames(ips) <- c(name, "weight")
+    colnames(ips) <- c(name, "weight", "group")
   } else if (is_1d) {
     domain_range <-
       if (inherits(domain, "inla.mesh.1d")) {
@@ -288,7 +289,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         )
         ips[[j]] <- data.frame(
           loc = domain$loc,
-          weight = Matrix::colSums(A_w)
+          weight = Matrix::colSums(A_w),
+          group = j
         )
       } else {
         inside <-
@@ -297,10 +299,11 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
         ips[[j]] <- data.frame(
           loc = int_loc[inside],
-          weight = int_w[inside]
+          weight = int_w[inside],
+          group = j
         )
       }
-      colnames(ips[[j]]) <- c(name, "weight")
+      colnames(ips[[j]]) <- c(name, "weight", "group")
     }
 
     ips <- do.call(rbind, ips)

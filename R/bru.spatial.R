@@ -139,7 +139,8 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
 #' # Convert to SpatialPolygonsDataFrame
 #' pol <- spoly(pts)
 #'
-#' if (require(ggplot2, quietly = TRUE)) {
+#' if (require(ggplot2, quietly = TRUE) &&
+#'   require(ggpolypath, quietly = TRUE)) {
 #'   # Plot it!
 #'   ggplot() +
 #'     gg(pol)

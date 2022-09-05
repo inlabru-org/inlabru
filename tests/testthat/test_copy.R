@@ -13,14 +13,14 @@ test_that("bru: inla copy feature", {
   df2 <- within(df2, y <- 1 + (6 * x) + rnorm(length(x), mean = 0, sd = 0.1))
 
   cmp <- ~
-  +1 +
-    myLin1(x,
-      model = "rw1",
-      mapper = bru_mapper(INLA::inla.mesh.1d(seq(-1, 1, length.out = 100)),
-        indexed = FALSE
-      )
-    ) +
-    myLin2(x, copy = "myLin1", fixed = FALSE)
+    +1 +
+      myLin1(x,
+        model = "rw1",
+        mapper = bru_mapper(INLA::inla.mesh.1d(seq(-1, 1, length.out = 100)),
+          indexed = FALSE
+        )
+      ) +
+      myLin2(x, copy = "myLin1", fixed = FALSE)
   cmps <- component_list(cmp)
 
   fit <- bru(
@@ -73,12 +73,11 @@ test_that("Component copy feature", {
     f(x1, model = "rw2", values = 1:4, scale.model = TRUE) +
     f(x2, copy = "x1", fixed = FALSE)
   fit <- INLA::inla(
-    formula = inlaform, data = mydata, family = "poisson",
-    #                    inla.mode = bru_options_get("inla.mode"),
-    inla.mode = "twostage",
-    control.compute = list(config = TRUE)
-    # ,
-    #                    control.inla = list(int.strategy = "eb")
+    formula = inlaform,
+    data = mydata, family = "poisson",
+    inla.mode = bru_options_get("inla.mode"),
+    control.compute = list(config = TRUE),
+    control.inla = list(int.strategy = "eb")
   )
 
   cmp <- y ~ -1 +

@@ -198,7 +198,7 @@ test_that("mapper collection direct construction consistency", {
       dims = c(3, 4)
     )
   )
-  A <- as(A, "dgTMatrix")
+  A <- as(as(as(A, "dMatrix"), "generalMatrix"), "TsparseMatrix")
   expect_equal(ibm_amatrix(mapper, list_data), A)
   expect_equal(
     as(
@@ -231,7 +231,7 @@ test_that("mapper collection automatic construction consistency", {
   )
 
   cmp1 <- y ~
-  -1 +
+    -1 +
     indep(val,
       model = "bym",
       mapper = mapper,
@@ -240,7 +240,7 @@ test_that("mapper collection automatic construction consistency", {
   # index mapper
 
   cmp2 <- y ~
-  -1 +
+    -1 +
     indep(val,
       model = "bym",
       n = 4,

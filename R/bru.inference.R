@@ -1007,8 +1007,10 @@ expand_to_dataframe <- function(x, data = NULL) {
     result <- sp::SpatialPointsDataFrame(x, data = data)
   } else if (inherits(x, "Spatial")) {
     result <- sp::cbind.Spatial(x, data)
-  } else {
+  } else if (is.data.frame(x)) {
     result <- cbind(x, data)
+  } else {
+    result <- c(x, as.list(data))
   }
   result
 }
@@ -1045,6 +1047,8 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' calculate the posterior statistics. The default is rather low but provides
 #' a quick approximate result.
 #' @param seed Random number generator seed passed on to `inla.posterior.sample`
+#' @param probs A numeric vector of probabilities with values in `[0, 1]`,
+#'   passed to `stats::quantile`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
@@ -1080,6 +1084,7 @@ predict.bru <- function(object,
                         formula = NULL,
                         n.samples = 100,
                         seed = 0L,
+                        probs = c(0.025, 0.5, 0.975),
                         num.threads = NULL,
                         include = NULL,
                         exclude = NULL,
@@ -1123,7 +1128,8 @@ predict.bru <- function(object,
             vals,
             function(v) v[[nm]]
           ),
-          x = vals[[1]][, covar, drop = FALSE]
+          x = vals[[1]][, covar, drop = FALSE],
+          probs = probs
         )
     }
     is.annot <- vapply(names(smy), function(v) all(smy[[v]]$sd == 0), TRUE)
@@ -1156,10 +1162,11 @@ predict.bru <- function(object,
     for (nm in vals.names) {
       tmp <-
         bru_summarise(
-          lapply(
+          data = lapply(
             vals,
             function(v) v[[nm]]
-          )
+          ),
+          probs = probs
         )
       if (!drop &&
         (NROW(data) == NROW(tmp))) {
@@ -1169,7 +1176,7 @@ predict.bru <- function(object,
       }
     }
   } else {
-    tmp <- bru_summarise(vals)
+    tmp <- bru_summarise(data = vals, probs = probs)
     if (!drop &&
       (NROW(data) == NROW(tmp))) {
       smy <- expand_to_dataframe(data, tmp)
@@ -1261,22 +1268,22 @@ generate.bru <- function(object,
   # a application of expand.grid())
   # # TODO: Check if when removing this, all the other drange code can also
   # safely be removed.
-  if (class(data)[1] == "list") {
-    # Todo: check if this feature works at all.
-    # TODO: add method ipoints.list to handle this;
-    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code
-    # from generate()
-    warning(paste0(
-      "Attempting to convert data list into gridded data.\n",
-      "This probably doesn't work.\n",
-      "Please contact the package developers if you use this feature."
-    ))
-    lhs.names <- names(data)
-    add.pts <- lapply(lhs.names, function(nm) {
-      ipoints(object$bru_info$lhoods$default$drange[[nm]], name = nm)
-    })
-    data <- do.call(cprod, add.pts)
-  }
+  #  if (class(data)[1] == "list") {
+  #    # Todo: check if this feature works at all.
+  #    # TODO: add method ipoints.list to handle this;
+  #    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code
+  #    # from generate()
+  #    warning(paste0(
+  #      "Attempting to convert data list into gridded data.\n",
+  #      "This probably doesn't work.\n",
+  #      "Please contact the package developers if you use this feature."
+  #    ))
+  #    lhs.names <- names(data)
+  #    add.pts <- lapply(lhs.names, function(nm) {
+  #      ipoints(object$bru_info$lhoods$default$drange[[nm]], name = nm)
+  #    })
+  #    data <- do.call(cprod, add.pts)
+  #  }
 
   state <- evaluate_state(
     object$bru_info$model,
@@ -1402,32 +1409,94 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 }
 
 
-# Summarise and annotate data
-#
-# @export
-# @param data A list of samples, each either numeric or a \code{data.frame}
-# @param x A \code{data.frame} of data columns that should be added to the summary data frame
-# @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
-# @return A \code{data.frame} or Spatial[Points/Pixels]DataFrame with summary statistics
-
-bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
+#' Summarise and annotate data
+#'
+#' @export
+#' @param data A list of samples, each either numeric or a \code{data.frame}
+#' @param probs A numeric vector of probabilities with values in `[0, 1]`,
+#'   passed to `stats::quantile`
+#' @param x A \code{data.frame} of data columns that should be added to the summary data frame
+#' @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
+#' @param max_moment integer, at least 2. Determines the largest moment
+#'   order information to include in the output. If `max_moment > 2`,
+#'   includes "skew" (skewness, `E[(x-m)^3/s^3]`), and
+#'   if `max_moment > 3`, includes
+#'   "ekurtosis" (excess kurtosis, `E[(x-m)^4/s^4] - 3`). Default 2.
+#'   Note that the Monte Carlo variability of the `ekurtois` estimate may be large.
+#' @return A \code{data.frame} or `Spatial[Points/Pixels]DataFrame` with summary statistics,
+#' "mean", "sd", `paste0("q", probs)`, "mean.mc_std_err", "sd.mc_std_err"
+#'
+#' @examples
+#' bru_summarise(matrix(rexp(10000), 10, 1000), max_moment = 4, probs = NULL)
+#'
+bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
+                          x = NULL, cbind.only = FALSE,
+                          max_moment = 2) {
   if (is.list(data)) {
     data <- do.call(cbind, data)
   }
+  N <- NCOL(data)
   if (cbind.only) {
     smy <- data.frame(data)
-    colnames(smy) <- paste0("sample.", seq_len(ncol(smy)))
+    colnames(smy) <- paste0("sample.", seq_len(N))
   } else {
-    smy <- data.frame(
-      apply(data, MARGIN = 1, mean, na.rm = TRUE),
-      apply(data, MARGIN = 1, sd, na.rm = TRUE),
-      t(apply(data, MARGIN = 1, quantile, prob = c(0.025, 0.5, 0.975), na.rm = TRUE)),
-      apply(data, MARGIN = 1, min, na.rm = TRUE),
-      apply(data, MARGIN = 1, max, na.rm = TRUE)
+    if (length(probs) == 0) {
+      smy <- data.frame(
+        apply(data, MARGIN = 1, mean, na.rm = TRUE),
+        apply(data, MARGIN = 1, sd, na.rm = TRUE)
+      )
+      qs_names <- NULL
+    } else if (length(probs) == 1) {
+      smy <- data.frame(
+        apply(data, MARGIN = 1, mean, na.rm = TRUE),
+        apply(data, MARGIN = 1, sd, na.rm = TRUE),
+        as.matrix(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE))
+      )
+      qs_names <- paste0("q", probs)
+    } else {
+      smy <- data.frame(
+        apply(data, MARGIN = 1, mean, na.rm = TRUE),
+        apply(data, MARGIN = 1, sd, na.rm = TRUE),
+        t(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE))
+      )
+      qs_names <- paste0("q", probs)
+    }
+    colnames(smy) <- c("mean", "sd", qs_names)
+    # For backwards compatibility, add a median column:
+    if (any(qs_names == "q0.5")) {
+      smy[["median"]] <- smy[["q0.5"]]
+    }
+
+    # Get 3rd and 4rt central moments
+    # Use 1/N normalisation of the sample sd
+    skew <- apply(((data - smy$mean) / smy$sd)^3 * (N / (N - 1))^3,
+      MARGIN = 1, mean, na.rm = TRUE
     )
-    colnames(smy) <- c("mean", "sd", "q0.025", "median", "q0.975", "smin", "smax")
-    smy$cv <- smy$sd / smy$mean
-    smy$var <- smy$sd^2
+    if (max_moment >= 3) {
+      smy[["skew"]] <- skew
+    }
+    # eK + 3 >= skew^2 + 1
+    # eK >= skew^2 - 2
+    # Use 1/N normalisation of the sample sd
+    ekurtosis <- pmax(
+      skew^2 - 2,
+      apply(((data - smy$mean) / smy$sd)^4 * (N / (N - 1))^4 - 3,
+        MARGIN = 1,
+        mean,
+        na.rm = TRUE
+      )
+    )
+    if (max_moment >= 4) {
+      smy[["ekurtosis"]] <- ekurtosis
+    }
+
+    # Add Monte Carlo standard errors
+    smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(N)
+    # Var(s) \approx (eK + 2) \sigma^2 / (4 n):
+    # +2 replaced by 3-(n-3)/(n-1) = 2n/(n-1), from Rao 1973, p438
+    smy[["sd.mc_std_err"]] <-
+      sqrt(pmax(0, ekurtosis + 2 * N / (N - 1))) *
+        smy[["sd"]] / sqrt(4 * N)
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)
@@ -1438,21 +1507,19 @@ bru_summarise <- function(data, x = NULL, cbind.only = FALSE) {
 
 
 
-
 lin_predictor <- function(lin, state) {
   do.call(
     c,
     lapply(
       lin,
       function(x) {
-        as.vector(
-          x$offset + Matrix::rowSums(do.call(
-            cbind,
-            lapply(names(x$A), function(xx) {
-              x[["A"]][[xx]] %*% state[[xx]]
-            })
-          ))
-        )
+        Ax_list <-
+          lapply(names(x$A), function(xx) {
+            x[["A"]][[xx]] %*% state[[xx]]
+          })
+        Ax <- do.call(cbind, Ax_list)
+        sumAx <- Matrix::rowSums(Ax)
+        as.vector(x$offset) + as.vector(sumAx)
       }
     )
   )
@@ -1461,15 +1528,15 @@ nonlin_predictor <- function(model, lhoods, state, A) {
   do.call(
     c,
     lapply(
-      lhoods,
-      function(lh) {
+      seq_along(lhoods),
+      function(lh_idx) {
         as.vector(
           evaluate_model(
             model = model,
-            data = lh[["data"]],
+            data = lhoods[[lh_idx]][["data"]],
             state = list(state),
-            A = A,
-            predictor = bru_like_expr(lh, model[["effects"]]),
+            A = A[[lh_idx]],
+            predictor = bru_like_expr(lhoods[[lh_idx]], model[["effects"]]),
             format = "matrix"
           )
         )
@@ -1538,6 +1605,13 @@ bru_line_search <- function(model,
     )
   }
 
+  if (is.null(weights)) {
+    warning("NULL weights detected for line search. Using weights = 1 instead.",
+      immediate. = TRUE
+    )
+    weights <- 1
+  }
+
   fact <- options$bru_method$factor
 
   # Metrics ----
@@ -1560,6 +1634,18 @@ bru_line_search <- function(model,
   lin_pred0 <- lin_predictor(lin, state0)
   lin_pred1 <- lin_predictor(lin, state1)
   nonlin_pred <- nonlin_predictor(model, lhoods, state1, A)
+
+  if (length(lin_pred1) != length(nonlin_pred)) {
+    warning(
+      paste0(
+        "Please notify the inlabru package developer:",
+        "\nThe line search linear and nonlinear predictors have different lengths.",
+        "\nThis should not happen!"
+      ),
+      immediate. = TRUE
+    )
+  }
+
   step_scaling <- 1
 
   norm01 <- pred_norm(lin_pred1 - lin_pred0)
@@ -2161,7 +2247,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
               dic = FALSE,
               waic = FALSE
             ),
-            control.predictor = list(compute = FALSE)
+            # Required for line search weights:
+            control.predictor = list(compute = TRUE)
           )
         )
     }

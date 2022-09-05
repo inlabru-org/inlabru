@@ -603,9 +603,9 @@ evaluate_predictor <- function(model,
 #'   )
 #'   data <- sp::SpatialPointsDataFrame(
 #'     matrix(runif(10), 5, 2),
-#'     data = data.frame(y = rnorm(5))
+#'     data = data.frame(z = rnorm(5))
 #'   )
-#'   fit <- bru(y ~ -1 + field(coordinates, model = spde),
+#'   fit <- bru(z ~ -1 + field(coordinates, model = spde),
 #'     family = "gaussian", data = data
 #'   )
 #'   pred <- predict(

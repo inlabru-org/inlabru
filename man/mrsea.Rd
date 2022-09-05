@@ -28,7 +28,9 @@ data(mrsea)
 Data imported from package MRSea, see \url{http://creem2.st-andrews.ac.uk/software/}
 }
 \examples{
-if (require(ggplot2, quietly = TRUE)) {
+if (bru_safe_inla() &&
+  require(ggplot2, quietly = TRUE) &&
+  require(ggpolypath, quietly = TRUE)) {
   data(mrsea)
   ggplot() +
     gg(mrsea$mesh) +

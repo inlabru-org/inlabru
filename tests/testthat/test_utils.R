@@ -55,5 +55,4 @@ test_that("Laplace distribution", {
   expect_equal(qlaplace(p, rate = rate, lower.tail = FALSE), -q)
   expect_equal(qlaplace(log(p), rate = rate, lower.tail = TRUE, log.p = TRUE), q)
   expect_equal(qlaplace(log(p), rate = rate, lower.tail = FALSE, log.p = TRUE), -q)
-
 })

@@ -20,3 +20,5 @@
 ^\.lintr$
 ^CRAN-SUBMISSION$
 ^revdep$
+^data-raw$
+^inst/misc/Lambert_ocean_orig.png$

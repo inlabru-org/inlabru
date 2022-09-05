@@ -34,12 +34,12 @@ test_that("2D LGCP fitting", {
   # test_that("2D LGCP fitting: INLA intercept", {
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    1.11,
+    1.1109,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.5774,
+    0.579,
     tolerance = midtol
   )
 
@@ -97,13 +97,13 @@ test_that("2D LGCP fitting", {
 
   expect_equal(
     Lambda$mean,
-    669.5,
-    tolerance = midtol
+    670,
+    tolerance = max(Lambda$mean.mc_std_err) * 6 / 670
   )
   expect_equal(
     Lambda$sd,
-    40,
-    tolerance = hitol * 5
+    27,
+    tolerance = max(Lambda$sd.mc_std_err) * 6 / 27
   )
 
   # test_that("Supplying integration points instead of samplers&domains", {

@@ -41,7 +41,8 @@
 #' @examples
 #' \donttest{
 #' if (bru_safe_inla(quietly = TRUE) &&
-#'     require("ggplot2", quietly = TRUE)) {
+#'   require("ggplot2", quietly = TRUE) &&
+#'   require("ggpolypath", quietly = TRUE)) {
 #'   data(mexdolphin, package = "inlabru")
 #'   ggplot() +
 #'     gg(mexdolphin$mesh) +
@@ -57,7 +58,8 @@
 #' }
 #' \dontrun{
 #' if (requireNamespace("ggmap", quietly = TRUE) &&
-#'   require("ggplot2", quietly = TRUE)) {
+#'   require("ggplot2", quietly = TRUE) &&
+#'   require("ggpolypath", quietly = TRUE)) {
 #'   gmap(mexdolphin$depth) +
 #'     gm(mexdolphin$ppoly, color = "blue") +
 #'     gm(mexdolphin$samplers) +
@@ -156,8 +158,8 @@ import.mexdolphin <- function() {
   cmps <-
     coordinates + distance ~
     Intercept(1) +
-      df.lsigma(1) +
-      spat(coordinates, model = matern)
+    df.lsigma(1) +
+    spat(coordinates, model = matern)
   pred <- ~ log(1 - exp(-(distance / exp(df.lsigma))^-1)) + spat + Intercept + log(2)
   r <- lgcp(
     data = mexdolphin$points,
