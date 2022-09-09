@@ -219,16 +219,16 @@ fm_wkt_get_ellipsoid_radius <- function(wkt) {
     wt <- fm_wkt_tree_get_item(wt, geo_crs_items)
   }
   if (is.null(wt) || !(wt[["label"]] %in% geo_crs_items)) {
-    stop("Ellipsoid settings not found")
+    stop("Ellipsoid settings not found (no geo crs)")
   }
 
-  datum <- fm_wkt_tree_get_item(wt, "DATUM")
+  datum <- fm_wkt_tree_get_item(wt, c("DATUM", "ENSEMBLE"))
   if (is.null(datum)) {
-    stop("Ellipsoid settings not found")
+    stop("Ellipsoid settings not found (no datum/ensemble)")
   }
   ellipsoid <- fm_wkt_tree_get_item(datum, "ELLIPSOID")
   if (is.null(ellipsoid)) {
-    stop("Ellipsoid settings not found")
+    stop("Ellipsoid settings not found (no ellipsoid)")
   }
   as.numeric(ellipsoid[["params"]][[2]])
 }
@@ -257,10 +257,10 @@ fm_wkt_set_ellipsoid_radius <- function(wkt, radius) {
     if (is.null(wt)) {
       stop("Ellipsoid settings not found")
     } else if (wt[["label"]] %in% geo_crs_items) {
-      datum <- fm_wkt_tree_get_item(wt, "DATUM")
+      datum <- fm_wkt_tree_get_item(wt, c("DATUM", "ENSEMBLE"))
       null_datum <- is.null(datum)
-      if (is.null(datum)) {
-        stop("Ellipsoid settings not found")
+      if (null_datum) {
+        stop("Ellipsoid settings not found (no datum/ensemble)")
       }
       ellipsoid <- fm_wkt_tree_get_item(datum, "ELLIPSOID")
       if (is.null(ellipsoid)) {
@@ -1284,7 +1284,7 @@ fm_internal_update_crs <- function(crs, newcrs, mismatch.allowed) {
 }
 
 
-#' @title Chack if two CRS objects are identical
+#' @title Check if two CRS objects are identical
 #' @param crs0,crs1 Two `sp::CRS` or `inla.CRS` objects to be compared.
 #' @param crsonly logical. If `TRUE` and any of `crs0` and `crs1` are `inla.CRS`
 #' objects, extract and compare only the `sp::CRS` objects. Default: `FALSE`

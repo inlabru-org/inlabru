@@ -2,7 +2,7 @@
 % Please edit documentation in R/fmesher_crs.R
 \name{fm_identical_CRS}
 \alias{fm_identical_CRS}
-\title{Chack if two CRS objects are identical}
+\title{Check if two CRS objects are identical}
 \usage{
 fm_identical_CRS(crs0, crs1, crsonly = FALSE)
 }
@@ -13,6 +13,6 @@ fm_identical_CRS(crs0, crs1, crsonly = FALSE)
 objects, extract and compare only the \code{sp::CRS} objects. Default: \code{FALSE}}
 }
 \description{
-Chack if two CRS objects are identical
+Check if two CRS objects are identical
 }
 \keyword{internal}
