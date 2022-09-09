@@ -1,5 +1,8 @@
 # inlabru (development version)
 
+* Enable both datum/ensemble container for ellipsoid information, to support
+  `epsg:4326`. Fixes #154
+
 # inlabru 2.5.3
 
 ## Features
