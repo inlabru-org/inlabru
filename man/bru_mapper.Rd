@@ -33,28 +33,6 @@ ibm_inla_subset(mapper, ...)
 
 ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
-\method{bru_mapper}{default}(mapper, new_class = NULL, methods = NULL, ...)
-
-\method{ibm_inla_subset}{default}(mapper, ...)
-
-\method{bru_mapper}{inla.mesh}(mesh, ...)
-
-\method{bru_mapper}{inla.mesh.1d}(mesh, indexed = NULL, ...)
-
-bru_mapper_index(n = 1L, ...)
-
-bru_mapper_linear(...)
-
-bru_mapper_matrix(labels, ...)
-
-bru_mapper_factor(values, factor_mapping, ...)
-
-bru_mapper_offset(...)
-
-bru_mapper_multi(mappers, ...)
-
-bru_mapper_collect(mappers, hidden = FALSE, ...)
-
 bru_mapper(...)
 
 ibm_n(mapper, inla_f = FALSE, ...)
@@ -115,7 +93,7 @@ as "bym2", which can be handled by \code{bru_mapper_collect}.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
-\item{methods}{optional \code{list} of named method definitions; See Details.}
+\item{methods, }{optional \code{list} of named method definitions; See Details.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
@@ -158,8 +136,6 @@ basis function is a constant. (Default \code{TRUE})}
 
 \item{interval}{numeric length-2 vector specifying a domain interval.
 Default \code{c(0, 1)}.}
-
-\item{methods, }{optional \code{list} of named method definitions; See Details.}
 }
 \description{
 Methods for \code{bru_mapper} objects
@@ -209,34 +185,6 @@ the \code{ibm_values} output to construct the subset indexing.
 Implementations must return a logical vector of length \code{NROW(input)} (
 or for \code{bru_mapper_multi} and \code{bru_mapper_collect} a list of such
 vectors)
-}
-
-\itemize{
-\item \code{bru_mapper.default} adds the "bru_mapper" class and \code{new_class}
-to an object. If provided, mapper method functions are added to an environment
-\code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_n_inla},
-\code{ibm_values}, \code{ibm_values_inla},
-\code{ibm_amatrix}, \code{ibm_amatrix_inla},
-\code{ibm_valid_input}, and \code{ibm_valid_input_inla} look for these
-functions first,
-and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
-to register the methods, e.g.
-\code{.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)}.
-}
-
-\itemize{
-\item The default \code{ibm_inla_subset} method uses
-the \code{ibm_values} output to construct the inla subset indexing, passing
-extra arguments such as \code{multi} on to the methods (this means it supports
-both regular vector values and \code{multi=1} data.frame values).
-}
-
-\itemize{
-\item \code{bru_mapper_multi} constructs a kronecker product mapping
-}
-
-\itemize{
-\item \code{bru_mapper_collect} constructs concatenated collection mapping
 }
 
 \itemize{

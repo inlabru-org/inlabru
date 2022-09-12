@@ -116,6 +116,9 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #' and otherwise call `UseMethod()`.  This is an alternative to using `.S3method()`
 #' to register the methods, e.g.
 #' `.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)`.
+#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`.
+#' For the default `bru_mapper` method, a list that will be converted to a
+#' `bru_mapper` object by adding class information and (optional) methods.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
 #' @param methods, optional `list` of named method definitions; See Details.
 #'
@@ -179,7 +182,6 @@ bru_mapper.default <- function(mapper,
 #' `ibm_n()` and `ibm_values()` methods also need to be provided.
 #'
 #' @param \dots Arguments passed on to other methods
-#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
 #' @param inla_f logical; when `TRUE` in `ibm_n` and `ibm_values`, these must result in values compatible with `INLA::f(...)`
 #' an specification and corresponding `INLA::inla.stack(...)` constructions.
 #' For `ibm_amatrix` methods, it may influence how the input data is interpreted.

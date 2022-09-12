@@ -80,7 +80,6 @@ Suggests:
     rgl,
     rmarkdown,
     scales,
-    sf,
     shiny,
     sn,
     spatstat.geom,
