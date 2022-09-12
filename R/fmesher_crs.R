@@ -88,6 +88,7 @@ fm_requires_PROJ6 <- function(fun = NULL) {
 
 
 #' @rdname fm_as
+#' @name fm_as
 #' @export
 fm_as_sf_crs <- function(x) {
   if (inherits(x, "crs")) {
@@ -126,6 +127,7 @@ fm_as_sp_crs <- function(x) {
 
 #' Generic method for extracting crs objects
 #' @rdname fm_get_crs
+#' @param \dots Arguments passed on to other methods
 #' @export
 fm_get_crs <- function(...) {
   UseMethod("fm_get_crs")
@@ -150,6 +152,7 @@ fm_get_crs.sfc <- function(...) {
 }
 
 #' @rdname fm_get_crs
+#' @param x from which to extract crs information
 #' @export
 fm_get_crs.inla.mesh <- function(x, ...) {
   x[["crs"]]
@@ -1781,55 +1784,6 @@ fm_spTransform.inla.mesh <- function(x, CRSobj, passthrough = FALSE, ...) {
 }
 
 
-## Input: list of segments, all closed polygons.
-fm_internal_sp2segment_join <- function(inp, grp = NULL, closed = TRUE) {
-  crs <- NULL
-  if (length(inp) > 0) {
-    out.loc <- matrix(0, 0, ncol(inp[[1]]$loc))
-    for (k in seq_along(inp)) {
-      crs <- fm_internal_update_crs(crs, inp[[k]]$crs, mismatch.allowed = FALSE)
-    }
-  } else {
-    out.loc <- matrix(0, 0, 2)
-  }
-  out.idx <- matrix(0L, 0, 2)
-  if (is.null(grp)) {
-    out.grp <- NULL
-  } else {
-    out.grp <- integer(0)
-  }
-  for (k in seq_along(inp)) {
-    inp.loc <- inp[[k]]$loc
-    inp.idx <- inp[[k]]$idx
-    inp.grp <- inp[[k]]$grp
-    offset <- nrow(out.loc)
-    n <- nrow(as.matrix(inp.idx))
-    if (closed) {
-      if (!is.null(grp) && is.null(inp.grp)) {
-        inp.grp <- rep(grp[k], n)
-      }
-      if (ncol(as.matrix(inp.idx)) == 1) {
-        inp.idx <- cbind(inp.idx, inp.idx[c(2:n, 1)])
-      }
-    } else {
-      if (!is.null(grp) && is.null(inp.grp)) {
-        inp.grp <- rep(grp[k], n - 1)
-      }
-      if (ncol(as.matrix(inp.idx)) == 1) {
-        inp.idx <- cbind(inp.idx[-n], inp.idx[-1])
-      }
-    }
-    out.loc <- rbind(out.loc, inp.loc)
-    out.idx <- rbind(out.idx, inp.idx + offset)
-    if (!is.null(grp)) {
-      out.grp <- c(out.grp, inp.grp)
-    }
-  }
-  INLA::inla.mesh.segment(
-    loc = out.loc, idx = out.idx, grp = out.grp, is.bnd = FALSE,
-    crs = crs
-  )
-}
 
 
 fm_as_inla_mesh_segment <-

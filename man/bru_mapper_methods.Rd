@@ -125,6 +125,8 @@
 \method{ibm_amatrix}{bru_mapper_harmonics}(mapper, input, inla_f = FALSE, ...)
 }
 \arguments{
+\item{mapper}{A mapper S3 object, inheriting from (at least) \code{bru_mapper}.}
+
 \item{inla_f}{logical; when \code{TRUE} in \code{ibm_n} and \code{ibm_values}, these must result in values compatible with \code{INLA::f(...)}
 an specification and corresponding \code{INLA::inla.stack(...)} constructions.
 For \code{ibm_amatrix} methods, it may influence how the input data is interpreted.

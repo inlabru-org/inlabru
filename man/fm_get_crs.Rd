@@ -21,6 +21,11 @@ fm_get_crs(...)
 
 \method{fm_get_crs}{inla.mesh.segment}(x, ...)
 }
+\arguments{
+\item{\dots}{Arguments passed on to other methods}
+
+\item{x}{from which to extract crs information}
+}
 \description{
 Generic method for extracting crs objects
 }

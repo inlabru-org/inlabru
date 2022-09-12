@@ -17,7 +17,7 @@ fm_as_inla_mesh <- function(...) {
 #' @rdname fm_as
 #' @aliases fm_as_sfc fm_as_sfc.inla.mesh
 #'
-#' @param x An `inla.mesh` mesh object, or an `sfg` `MULTIPOLYGON` object
+#' @param x An object to be coerced/transformed/converted into another class
 #' @returns * `fm_as_sfc`: An `sfc_MULTIPOLYGON` object
 #' @exportS3Method fm_as_sfc inla.mesh
 #' @export
@@ -74,9 +74,17 @@ fm_as_inla_mesh.sfc_MULTIPOLYGON <- function(x, ...) {
 
 
 #' @rdname fm_as
+#' @param reverse logical; When TRUE, reverse the order of the input points.
+#'   Default `FALSE`
+#' @param grp if non-null, should be an integer vector of grouping labels for
+#'   one for each segment.
+#'    Default `NULL`
+#' @param is.bnd logical; if `TRUE`, set the boundary flag for the segments.
+#'   Default `TRUE`
 #' @export
 fm_as_inla_mesh_segment.sfc_POINT <-
-  function(sfc, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
+  function(x, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
+    sfc <- x
     crs <- sf::st_crs(sfc)
 
 #    if (st_check_dim(sfc)) {
@@ -110,9 +118,12 @@ fm_as_inla_mesh_segment.sfc_POINT <-
   }
 
 #' @rdname fm_as
+#' @param join logical; if `TRUE`, join input segments with common vertices.
+#'    Default `TRUE`
 #' @export
 fm_as_inla_mesh_segment.sfc_LINESTRING <-
-  function(sfc, join = TRUE, grp = NULL, reverse = FALSE, ...) {
+  function(x, join = TRUE, grp = NULL, reverse = FALSE, ...) {
+    sfc <- x
 # Note: Z should be fully supported in what we do with 3D coordinates ourselves.
 # It's when applying st_ methods that the check needs to be done, not when crating
 # objects, as we _do_ support 3D meshes in inla.mesh, and _should_ support those
@@ -159,7 +170,8 @@ fm_as_inla_mesh_segment.sfc_LINESTRING <-
 #' @rdname fm_as
 #' @export
 fm_as_inla_mesh_segment.sfc_POLYGON <-
-  function(sfc, join = TRUE, grp = NULL, ...) {
+  function(x, join = TRUE, grp = NULL, ...) {
+    sfc <- x
     crs <- sf::st_crs(sfc)
     crs <- fm_as_sp_crs(crs) # required for INLA::inla.mesh.segment
 
@@ -203,15 +215,15 @@ fm_as_inla_mesh_segment.sfc_POLYGON <-
 #' @rdname fm_as
 #' @export
 fm_as_inla_mesh_segment.sf <-
-  function(sf, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
-    sfc <- sf::st_geometry(sf)
+  function(x, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
+    sfc <- sf::st_geometry(x)
     fm_as_inla_mesh_segment(sfc)
   }
 
 #' @rdname fm_as
 #' @export
 fm_as_inla_mesh.sf <-
-  function(sf, ...) {
-    sfc <- sf::st_geometry(sf)
+  function(x, ...) {
+    sfc <- sf::st_geometry(x)
     fm_as_inla_mesh(sfc)
   }
