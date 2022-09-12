@@ -57,9 +57,7 @@ test_that("bru: factor component", {
   )
 
   # The statistics include mean, standard deviation, the 2.5% quantile, the median,
-  # the 97.5% quantile, minimum and maximum sample drawn from the posterior as well as
-  # the coefficient of variation and the variance.
-
+  # the 97.5% quantile
   expect_equal(is.data.frame(xpost), TRUE)
   expect_equal(nrow(xpost), 1)
 
@@ -67,9 +65,6 @@ test_that("bru: factor component", {
   expect_equal(nrow(xpost2), 4)
   expect_equal(rownames(xpost2), c("a", "b", "a_b", "c"))
 
-
-  # The predict function can also be used to simultaneously estimate posteriors
-  # of multiple variables:
 
   xipost <- generate(fit,
     data = NULL,
@@ -128,4 +123,48 @@ test_that("bru: factor component", {
     1,
     tolerance = hitol
   )
+})
+
+
+
+test_that("bru: predict with _eval", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  # Required for reproducible predict() and generate() output.
+  set.seed(1234L)
+
+  mesh <- INLA::inla.mesh.2d(
+    cbind(0, 0),
+    offset = 2, max.edge = 0.25
+  )
+  spde <- INLA::inla.spde2.pcmatern(mesh,
+                                    prior.range = c(0.1, 0.01),
+                                    prior.sigma = c(2, 0.01)
+  )
+  data <- sp::SpatialPointsDataFrame(
+    matrix(runif(10), 5, 2),
+    data = data.frame(z = rnorm(5))
+  )
+  fit <- bru(z ~ -1 + field(coordinates, model = spde),
+             family = "gaussian", data = data
+  )
+  pred <- predict(
+    fit,
+    data = data.frame(x = 0.5, y = 0.5),
+    formula = ~ field_eval(cbind(x, y))
+  )
+
+  data$u <- 1:5
+  fit <- bru(z ~ -1 + fun(u, model = "rw2", mapper=bru_mapper(INLA::inla.mesh.1d(seq(1,5,length.out=51)), indexed=FALSE)),
+             family = "gaussian", data = data
+  )
+  pred <- predict(
+    fit,
+    data = data.frame(u = seq(-1, 6, by = 0.1)),
+    formula = ~ data.frame(A = fun_eval(u),
+                           B = fun_eval(fun),
+                           fun = fun)
+  )
+
 })

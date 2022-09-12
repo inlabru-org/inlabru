@@ -6,11 +6,11 @@ test_that("1D integration points can be generated", {
 
   expect_s3_class(ips, "data.frame")
   expect_equal(nrow(ips), 3)
-  expect_equal(ncol(ips), 2)
-  expect_equal(names(ips), c("myDim", "weight"))
-  expect_equal(as.numeric(ips[1, ]), c(5 / 3, 10 / 3))
-  expect_equal(as.numeric(ips[2, ]), c(15 / 3, 10 / 3))
-  expect_equal(as.numeric(ips[3, ]), c(25 / 3, 10 / 3))
+  expect_equal(ncol(ips), 3)
+  expect_equal(names(ips), c("myDim", "weight", "group"))
+  expect_equal(as.numeric(ips[1, ]), c(5 / 3, 10 / 3, 1))
+  expect_equal(as.numeric(ips[2, ]), c(15 / 3, 10 / 3, 1))
+  expect_equal(as.numeric(ips[3, ]), c(25 / 3, 10 / 3, 1))
 })
 
 
@@ -21,11 +21,11 @@ test_that("conversion of 1D mesh to integration points", {
 
   expect_s3_class(ips, "data.frame")
   expect_equal(nrow(ips), 11)
-  expect_equal(ncol(ips), 2)
-  expect_equal(names(ips), c("time", "weight"))
-  expect_equal(as.numeric(ips[1, ]), c(0, 0.5))
-  expect_equal(as.numeric(ips[5, ]), c(4, 1))
-  expect_equal(as.numeric(ips[11, ]), c(10, 0.5))
+  expect_equal(ncol(ips), 3)
+  expect_equal(names(ips), c("time", "weight", "group"))
+  expect_equal(as.numeric(ips[1, ]), c(0, 0.5, 1))
+  expect_equal(as.numeric(ips[5, ]), c(4, 1, 1))
+  expect_equal(as.numeric(ips[11, ]), c(10, 0.5, 1))
 })
 
 test_that("conversion of SpatialPolygon to integration points", {

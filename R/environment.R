@@ -26,6 +26,8 @@ bru_env_get <- function() {
   bru_log_message("inlabru loaded", allow_verbose = FALSE)
   bru_log_message("Clear override options", allow_verbose = FALSE)
   bru_options_reset()
+  # For Matrix coercion deprecation testing: 1=warn, 2=stop, NA=something else
+  #  options(Matrix.warnDeprecatedCoerce = 2)
 }
 
 

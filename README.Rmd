@@ -121,3 +121,4 @@ If you have an R installation with PROJ6/GDAL3, and INLA >= 20.06.18, and
 loading old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
 method on them before they are fully usable. The data objects in `inlabru` have
 been updated, so should not need this conversion anymore.
+

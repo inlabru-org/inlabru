@@ -55,9 +55,10 @@
 #' 26 (6), 793-811.
 #'
 #' @examples
-#' if (require(ggplot2, quietly = TRUE)) {
+#' if (bru_safe_inla() &&
+#'   require(ggplot2, quietly = TRUE) &&
+#'   require(ggpolypath, quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru") # get the data
-#'   # extract all the objects, for convenience:
 #'
 #'   # plot all the nests, mesh and boundary
 #'   ggplot() +

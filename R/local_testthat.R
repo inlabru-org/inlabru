@@ -208,7 +208,9 @@ local_bru_safe_inla <- function(multicore = FALSE,
     # Save the num.threads option so it can be restored
     old_threads <- tryCatch(
       INLA::inla.getOption("num.threads"),
-      error = function(e) { e }
+      error = function(e) {
+        e
+      }
     )
     if (inherits(old_threads, "simpleError")) {
       return(testthat::skip("inla.getOption() failed, skip INLA tests."))
@@ -242,7 +244,9 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
   local_disable_PROJ6_warnings(envir = envir)
   local_testthat_tolerances(envir = envir)
   local_bru_options_set(
-    control.compute = list(dic = FALSE, waic = FALSE),
+    # Need to specify specific smtp to ensure consistent tests.
+    # To specifically test pardiso, need to override locally
+    control.compute = list(dic = FALSE, waic = FALSE, smtp = "taucs"),
     inla.mode = "experimental",
     envir = envir
   )

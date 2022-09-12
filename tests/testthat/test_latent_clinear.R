@@ -14,13 +14,14 @@ test_that("bru: clinear component", {
     y ~ myLin(main = x, model = "clinear", range = c(0, Inf)) +
       Intercept(1),
     family = "gaussian",
-    data = input.df
+    data = input.df,
+    options = list(bru_initial = list(myLin = 2))
   )
 
   expect_equal(
     fit$summary.random[["myLin"]][1, "mean"],
     2.002517,
-    tolerance = midtol
+    tolerance = hitol
   )
   expect_equal(
     fit$summary.random[["myLin"]][1, "sd"],

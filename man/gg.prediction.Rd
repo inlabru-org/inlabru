@@ -11,9 +11,12 @@
 
 \item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed on to \code{geom_line}.}
 
-\item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.}
+\item{ribbon}{If TRUE, plot a ribbon around the line based on the smalles and largest
+quantiles present in the data, found by matching names starting with \code{q} and
+followed by a numerical value.  \code{inla()}-style \code{numeric+"quant"} names are converted
+to inlabru style before matching.}
 
-\item{alpha}{The ribbons numeric alpha level in \verb{[0,1]}.}
+\item{alpha}{The ribbons numeric alpha (transparency) level in \verb{[0,1]}.}
 
 \item{bar}{If TRUE plot boxplot-style summary for each variable.}
 

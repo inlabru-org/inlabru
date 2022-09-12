@@ -94,7 +94,7 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_22.03.28 built 2022-03-28 10:27:33 UTC.
+#> This is INLA_22.09.02 built 2022-09-02 19:28:51 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)

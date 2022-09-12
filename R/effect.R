@@ -1078,7 +1078,9 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     if (!all(is_matrix | is_Matrix)) {
       stop("Inconsistent input types; matrix and non-matrix")
     }
-    inp_values <- unique.matrix(do.call(rbind, inp))
+    # Add extra column to work around bug in unique.matrix for single-column
+    # Matrix and ModelMatrix matrices:
+    inp_values <- unique.matrix(cbind(1, do.call(rbind, inp)))[, -1, drop = FALSE]
     n_values <- nrow(inp_values)
   } else if (any(is_data_frame)) {
     if (!all(is_data_frame)) {

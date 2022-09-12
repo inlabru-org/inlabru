@@ -30,24 +30,24 @@ future version.
 }
 \section{Functions}{
 \itemize{
-\item \code{summary_bru}: Old summary for an inlabru fit.
+\item \code{summary_bru()}: Old summary for an inlabru fit.
 
 Takes a fitted \code{bru} object produced by \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}} and creates
 various summaries from it.
 
-\item \code{iinla.getOption}: Use \code{bru_option_get} instead.
+\item \code{iinla.getOption()}: Use \code{bru_option_get} instead.
 
-\item \code{iinla.setOption}: Use \code{bru_option_set} instead.
+\item \code{iinla.setOption()}: Use \code{bru_option_set} instead.
 
-\item \code{init.tutorial}: Global setting for tutorial sessions.
+\item \code{init.tutorial()}: Global setting for tutorial sessions.
 
 Use \code{\link[=bru_options_set]{bru_options_set()}} to set specific
 options instead instead.  In versions <= 2.1.15, this function set the INLA
 integration strategy to "eb" to speed up calculations. This is normally not
 needed since version 2.2.0, since the only the final iteration will use
 other than "eb".
-}}
 
+}}
 \examples{
 \dontrun{
 # Note: Only run this if you want to change the inlabru options for this session

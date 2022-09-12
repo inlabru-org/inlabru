@@ -38,7 +38,8 @@ distance 8 km (transect half-width 8 km).
 \examples{
 \donttest{
 if (bru_safe_inla(quietly = TRUE) &&
-    require("ggplot2", quietly = TRUE)) {
+  require("ggplot2", quietly = TRUE) &&
+  require("ggpolypath", quietly = TRUE)) {
   data(mexdolphin, package = "inlabru")
   ggplot() +
     gg(mexdolphin$mesh) +
@@ -54,7 +55,8 @@ if (bru_safe_inla(quietly = TRUE) &&
 }
 \dontrun{
 if (requireNamespace("ggmap", quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE)) {
+  require("ggplot2", quietly = TRUE) &&
+  require("ggpolypath", quietly = TRUE)) {
   gmap(mexdolphin$depth) +
     gm(mexdolphin$ppoly, color = "blue") +
     gm(mexdolphin$samplers) +

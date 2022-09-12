@@ -1,5 +1,6 @@
 ---
-title: "Iterative INLA method"
+title: "Iterative linearised INLA method"
+author: "Finn Lindgren and Man Ho Suen"
 output:
   - rmarkdown::html_vignette
   - rmarkdown::pdf_document
@@ -12,7 +13,15 @@ header-includes:
   - \newcommand{\wt}[1]{\widetilde{#1}}
   - \newcommand{\ol}[1]{\overline{#1}}
   - \newcommand{\wh}[1]{\widehat{#1}}
+  - \newcommand{\OO}{\mathcal{O}}
   - \DeclareMathOperator*{\argmax}{arg\,max}
+  - \DeclareMathOperator*{\tr}{tr}
+  - \newcommand{\pN}{\mathsf{N}}
+  - \newcommand{\pCov}{\mathsf{Cov}}
+  - \newcommand{\pE}{\mathsf{E}}
+  - \newcommand{\pKL}[2]{\mathsf{KL}\left(#1\,\middle\|\,#2\right)}
+  - \newcommand{\mmd}{\mathrm{d}}
+  - \newcommand{\md}{\,\mmd}
 ---
 
 ```{r, include = FALSE}
@@ -53,7 +62,8 @@ The premise for the inlabru method for non-linear predictors is to build on
 the existing implementation, and only add a linearisation step. The properties of
 the resulting approximation will depend on the nature of the non-linearity.
 
-Let $\wt{\bm{\eta}}(\bm{u})$ be a non-linear predictor, and let
+Let $\wt{\bm{\eta}}(\bm{u})$ be a non-linear predictor, i.e. a deterministic function of $\bm{u}$, $$ \wt{\bm{\eta}} (\bm{u}) = \textsf{fcn} (\bm{u}), $$
+and let
 $\ol{\bm{\eta}}(\bm{u})$ be the 1st order Taylor approximation at $\bm{u}_0$,
 $$
 \ol{\bm{\eta}}(\bm{u})
@@ -63,11 +73,18 @@ $$
 $$
 where $\bm{B}$ is the derivative matrix for the non-linear predictor, evaluated
 at $\bm{u}_0$.
-
+Hence, we define
+$$
+\begin{aligned}
+\bm{y} | \bm{u}, {\bm{\theta}} &\overset{d}{=} \bm{y} | \wt{\bm{\eta}}(\bm{u}), {\bm{\theta}} \\
+&\sim p (\bm{y} | g^{-1}[\wt{\bm{\eta}}(\bm{u})], {\bm{\theta}})\\
+\end{aligned}
+$$
 The non-linear observation model
 $p(\bm{y}|g^{-1}[\wt{\bm{\eta}}(\bm{u})],\bm{\theta})$
 is approximated by replacing the non-linear predictor with its linearisation,
 so that the linearised model is defined by
+
 $$
 \ol{p}(\bm{y}|\bm{u},\bm{\theta})
 =
@@ -87,48 +104,103 @@ $$
 $$
 and the linear model approximation is factorised as
 $$
-\ol{p}(\bm{\theta},\bm{u}|\bm{y}) = \ol{p}(\bm{\theta}|\bm{y})\ol{p}(\bm{u}|\bm{y},\bm{\theta}) .
+\ol{p}(\bm{\theta},\bm{u}|\bm{y}) = \ol{p}(\bm{\theta}|\bm{y})\ol{p}(\bm{u}|\bm{y},\bm{\theta}).
 $$
 
 ### Fixed point iteration
 
 The remaining step of the approximation is how to choose the linearisation
-point $\bm{u}_0$. We start by
-introducing a functional $f(\ol{p}_{\bm{v}})$ of the posterior
-distribution linearised at $\bm{v}$,
-that generates a latent field configuration. We then seek a fix point of the
-functional, so that $\bm{u}_0=f(\ol{p}_{\bm{u}_0})$.
-Potential choices for $f(\cdot)$ include the posterior expectation
-$\ol{E}(\bm{u}|\bm{y})$ and the joint conditional mode,
+point $\bm{u}_*$.
+For a given linearisation point $\bm{v}$, INLA will compute the posterior mode for $\bm{\theta}$,
 $$
-f(\ol{p}_{\bm{v}})=\argmax_{\bm{u}} \ol{p}_{\bm{v}}(\bm{u}|\bm{y},\wh{\bm{\theta}}),
+\wh{\bm{\theta}}_{\bm{v}} = \argmax_{\bm{\theta}} \ol{p}_\bm{v} ( {\bm{\theta}} | \bm{y} ),
 $$
-where $\wh{\bm{\theta}}=\argmax_{\bm{\theta}} \ol{p}_{\bm{v}}(\bm{\theta}|\bm{y})$
-(used in `inlabru` from version 2.2.3^[
-Note: In `inlabru` version 2.1.15, 
+and the joint conditional posterior mode for $\bm{u}$,
 $$
-f(\ol{p}_{\bm{v}})=\left\{\argmax_{u_i} \ol{p}_{\bm{v}}(u_i|\bm{y}),\,i=1,\dots,n\right\},
+\wh{\bm{u}}_{\bm{v}} = \argmax_{\bm{u}} \ol{p}_\bm{v} ( \bm{u} | \bm{y}, \wh{\bm{\theta}}_{\bm{v}} ) .
 $$
-was used, which caused problems for some nonlinear models.])
-One key to the fix point iteration is that the observation model is linked to
-$\bm{u}$ only through the non-linear predictor $\wt{\bm{\eta}}(\bm{u})$.
 
-0. Let $\bm{u}_0$ be an initial linearisation point for the latent variables.
-1. Compute the predictor linearisation at $\bm{u}_0$,
-2. Compute the linearised INLA posterior $\ol{p}(\bm{\theta}|\bm{y})$
-3. Let $\bm{u}_1=f(\ol{p}_{\bm{u}_0})$ be the initial candidate for new
+Define the Bayesian estimation functional^[
+Potential other choices for $f(\cdot)$ include the posterior expectation
+$\ol{E}(\bm{u}|\bm{y})$ and the marginal conditional modes, 
+$$
+\left\{\argmax_{u_i} \ol{p}_{\bm{v}}(u_i|\bm{y}),\,i=1,\dots,n\right\},
+$$
+which was used in `inlabru` up to version 2.1.15, which caused problems for some nonlinear models.
+From version 2.2.3, the joint conditional mode is used,
+$$
+\argmax_{\bm{u}} \ol{p}_{\bm{v}}(\bm{u}|\bm{y},\wh{\bm{\theta}}_{\bm{v}}),
+$$
+where $\wh{\bm{\theta}}=\argmax_{\bm{\theta}} \ol{p}_{\bm{v}}(\bm{\theta}|\bm{y})$.
+]
+$$
+f(\ol{p}_{\bm{v}}) = (\wh{\bm{\theta}}_{\bm{v}},\wh{\bm{u}}_{\bm{v}})
+$$
+and let $f(p)=(\wh{\bm{\theta}},\wh{\bm{u}})$ denote the corresponding posterior modes for the true posterior distribution,
+$$
+\begin{aligned}
+    \wh{{\bm{\theta}}} &= \argmax_{\bm{\theta}} p ( {\bm{\theta}} | \bm{y} ), \\
+    \wh{\bm{u}} &= \argmax_{\bm{u}} p (\bm{u} | \bm{y}, \wh{{\bm{\theta}}}).
+\end{aligned}
+$$
+
+The fixed point $(\bm{\theta}_*,\bm{u}_*)=f(\ol{p}_{\bm{u}_*})$ should ideally be close to $(\wh{\bm{\theta}},\wh{\bm{u}})$, i.e. close to the true marginal/conditional posterior mode. We can achieve this for the conditional
+latent mode, so that $\bm{u}_*=\argmax_{\bm{u}} p (\bm{u} | \bm{y}, \wh{\bm{\theta}}_{\bm{u}_*})$.
+
+We therefore seek the latent vector $\bm{u}_*$ that generates the fixed point of the
+functional, so that $(\bm{\theta}_*,\bm{u}_*)=f(\ol{p}_{\bm{u}_*})$.
+
+
+One key to the fixed point iteration is that the observation model is linked to
+$\bm{u}$ only through the non-linear predictor $\wt{\bm{\eta}}(\bm{u})$, since
+this leads to a simplified line search method below.
+
+0. Let $\bm{u}_0$ be an initial linearisation point for the latent variables 
+   obtained from the initial INLA call. Iterate the following steps for $k=0,1,2,...$
+1. Compute the predictor linearisation at $\bm{u}_0$.
+2. Compute the linearised INLA posterior $\ol{p}_{\bm{u}_0}(\bm{\theta}|\bm{y})$.
+3. Let $(\bm{\theta}_1,\bm{u}_1)=(\wh{\bm{\theta}}_{\bm{u}_0},\wh{\bm{u}}_{\bm{u}_0})=f(\ol{p}_{\bm{u}_0})$ be the initial candidate for new
    linearisation point.
-4. Let $\bm{u}_\alpha=(1-\alpha)\bm{u}_0+\alpha\bm{u}_1$, and find the value
-   $\alpha$ that minimises $\|\wt{\eta}(\bm{u}_\alpha)-\ol{\eta}(\bm{u}_1)\|$.
-5. Set the linearisation point equal to $\bm{u}_\alpha$ and repeat from step 1,
+4. Let $\bm{v}_\alpha=(1-\alpha)\bm{u}_1+\alpha\bm{u}_0$, and find the value
+   $\alpha$ minimises $\|\wt{\eta}(\bm{v}_\alpha)-\ol{\eta}(\bm{u}_1)\|$.
+5. Set the new linearisation point $\bm{u}_0$ equal to $\bm{v}_\alpha$ and repeat from step 1,
    unless the iteration has converged to a given tolerance.
+
+A potential improvement of step 4 might be to also take into account the prior
+distribution for $\bm{u}$ as a minimisation penalty, to avoid moving further than
+would be indicated by a full likelihood optimisation.
 
 #### Line search
 
-In step 4, an approximate line search can be used, that avoids many potentially
-expensive evaluations of the non-linear predictor. We evaluate
+In step 4, we would ideally want $\alpha$ to be  
+$$
+\argmax_{\alpha} \left[\ln p(\bm{u}|\bm{y},\bm{\theta}_1)\right]_{\bm{u}=\bm{v}_\alpha}.
+$$
+However, since this requires access to the internal likelihood and prior density
+evaluation code, we instead use a simpler alternative. We consider norms of the form $\|\wt{\eta}(\bm{v}_\alpha)-\ol{\eta}(\bm{u}_1)\|$
+that only depend on the nonlinear and linearised predictor expressions, and other known quantities, given $\bm{u}_0$, such as the current INLA estimate of the component wise predictor variances.
+
+Let $\sigma_i^2 = \mathrm{Var}_{\bm{u}\sim \ol{p}(\bm{u}|\bm{y},\bm{\theta}_1)}(\ol{\bm{\eta}}_i(\bm{u}))$
+be the current estimate of the posterior variance for each predictor element $i$.
+We then define an inner product on the space of predictor vectors as
+$$
+\langle \bm{a},\bm{b} \rangle_V
+=
+\sum_i \frac{a_i b_i}{\sigma_i^2} .
+$$
+The squared norm for the difference between the predictor vectors $\wt{\bm{\eta}}(\bm{v}_\alpha)$
+and $\ol{\bm{\eta}}(\bm{u}_1)$,with respect to this inner product, is defined as
+$$
+\| \wt{\bm{\eta}}(\bm{v}_\alpha) - \ol{\bm{\eta}}(\bm{u}_1)\|^2_V
+=
+\sum_i \frac{|\wt{\bm{\eta}}_i(\bm{v}_\alpha)-\ol{\bm{\eta}}_i(\bm{u}_1)|^2}{\sigma_i^2} .
+$$
+Using this norm as the target loss function for the line search avoids many potentially
+expensive evaluations of the true posterior conditional log-density. We evaluate
 $\wt{\bm{\eta}}_1=\wt{\bm{\eta}}(\bm{u}_1)$ and make use of the linearised predictor
-information. Let $\wt{\bm{\eta}}_\alpha=\wt{\bm{\eta}}(\bm{u}_\alpha)$ and $\ol{\bm{\eta}}_\alpha=\ol{\bm{\eta}}(\bm{u}_\alpha)=(1-\alpha)\wt{\bm{\eta}}(\bm{u}_0)+\alpha\ol{\bm{\eta}}(\bm{u}_1)$.
+information. Let $\wt{\bm{\eta}}_\alpha=\wt{\bm{\eta}}(\bm{v}_\alpha)$ and $\ol{\bm{\eta}}_\alpha=\ol{\bm{\eta}}(\bm{v}_\alpha)=(1-\alpha)\wt{\bm{\eta}}(\bm{u}_0)+\alpha\ol{\bm{\eta}}(\bm{u}_1)$.
+In other words, $\alpha=0$ corresponds to the previous linear predictor, and $\alpha=1$
+is the current estimate from INLA.
 An exact line search would minimise $\|\wt{\bm{\eta}}_\alpha-\ol{\bm{\eta}}_1\|$. 
 Instead, we define a quadratic approximation to the
 non-linear predictor as a function of $\alpha$,
@@ -158,7 +230,170 @@ $$
 $$
 which is minimised on the interval $\alpha\in[\gamma^{k-1},\gamma^{k+1}]$.
 
+## Posterior non-linearity checks
 
-A potential improvement of step 4 might be to also take into account the prior
-distribution for $\bm{u}$ as a minimisation penalty, to avoid moving further than
-would be indicated by a full likelihood optimisation.
+Whereas the inlabru optimisation method leads to an estimate where $\| \wt{\bm{\eta}} (\bm{u}_*) - \ol{\bm{\eta}}(\bm{u}_*)\|=0$ for a specific $\bm{u}_*$, the overall posterior approximation accuracy depends on the degree of nonlinearity in the vicinity of $\bm{u}_*$.
+There are two main options for evaluating this nonlinearity, using sampling from the approximate posterior distribution.
+The first option is 
+$$
+\begin{aligned}
+\sum_i \frac{E_{\bm{u}\sim \ol{p}(\bm{u}|\bm{y})}\left[
+|\ol{\bm{\eta}}_i(\bm{u})-\wt{\bm{\eta}}_i(\bm{u})|^2\right]}{\mathrm{Var}_{\bm{u}\sim \ol{p}(\bm{u}|\bm{y})}(\ol{\bm{\eta}}_i(\bm{u}))} ,
+\end{aligned}
+$$ 
+which is the posterior expectation of the component-wise variance-normalised squared deviation between the non-linear and linearised predictor. Note that the normalising variance includes the variability induced by the posterior uncertainty for $\bm{\theta}$, whereas the $\|\cdot\|_V$ norm used for the line search used only the posterior mode.
+Another option is 
+$$
+E_{(\bm{u},\bm{\theta})\sim \ol{p}(\bm{u},\bm{\theta}|\bm{y})} \left[\ln \frac{\ol{p}(\bm{u} |\bm{y},{\bm{\theta}})}{\wt{p}(\bm{u}|\bm{y},{\bm{\theta}})}\right]
+=
+E_{\bm{\theta}\sim \ol{p}(\bm{\theta}|\bm{y})} \left\{
+E_{\bm{u}\sim \ol{p}(\bm{u}|\bm{y},\bm{\theta})}
+\left[\ln \frac{\ol{p}(\bm{u} |\bm{y},{\bm{\theta}})}{\wt{p}(\bm{u}|\bm{y},{\bm{\theta}})}\right]
+\right\}
+$$ 
+which is the Kullback–Leibler divergence for the conditional posterior densities, $\pKL{\ol{p}}{\wt{p}}$, integrated over the approximate posterior
+distribution for $\bm{\theta}$.  Implementing this would require access to the likelihood and prior distribution details.  The next section explores this in more detail.
+
+#### Accuracy
+
+We wish to assess how accurate the approximation is. Thus, we compare $\wt{p}(\bm{u} | \bm{y}, \bm{\theta} )$ and $\ol{p}(\bm{u} |\bm{y},\bm{\theta})$. 
+With Bayes' theorem, 
+$$
+\begin{aligned}
+    p(\bm{u}|\bm{y},{\bm{\theta}}) &= \frac{p(\bm{u},\bm{y}|{\bm{\theta}})}{p(\bm{y}|{\bm{\theta}})} \\
+    &= \frac{p(\bm{y}|\bm{u},{\bm{\theta}}) p(\bm{u}|{\bm{\theta}})}{p(\bm{y}|{\bm{\theta}})},
+\end{aligned}
+$$
+where $p(\bm{u}|\bm{\theta})$ is a Gaussian density and $p(\bm{y}|\bm{\theta})$ is a scaling factor that doesn't depend on $\bm{u}$. We can therefore focus on the behaviour of $\ln p(\bm{y}|\bm{\theta},\bm{u})$ for the exact and linearised observation models.
+
+Recall that the observation likelihood only depends on $\bm{u}$ through $\bm{\eta}$.
+Using a Taylor expansion with respect to $\bm{\eta}$ and $\bm{\eta}^*=\wt{\bm{\eta}}(\bm{u}_*)$,
+$$
+\begin{aligned}
+    \ln p(\bm{y}|\bm{\eta},\bm{\theta}) &=
+    \ln p (\bm{y}|{\bm{\theta}},\bm{\eta}^*))  \\ 
+    &\qquad + \sum_i \left.\frac{\partial}{\partial\eta_i} \ln p (\bm{y} | {\bm{\theta}}, \bm{\eta}) \right|_{\bm{\eta}^*}\cdot (\eta_i - \eta^*_i) \\
+    &\qquad + \frac{1}{2}\sum_{i,j} \left.\frac{\partial^2}{\partial\eta_i\partial\eta_j} \ln p (\bm{y} | {\bm{\theta}}, \bm{\eta}) \right|_{\bm{\eta}^*}\cdot (\eta_i - \eta^*_i) (\eta_j - \eta^*_j) + \OO(\|\bm{\eta}-\bm{\eta}^*\|^3),
+\end{aligned}
+$$
+Similarly, for each component of $\wt{\bm{\eta}}$,
+$$
+\begin{aligned}
+\wt{\eta}_i(\bm{u}) &= \eta^*_i 
++\left[\left.\nabla_{u}\wt{\eta}_i(\bm{u})\right|_{\bm{u}_*}\right]^\top (\bm{u} - \bm{u}_*)
+\\&\quad
++\frac{1}{2}(\bm{u} - \bm{u}_*)^\top\left[\left.\nabla_{u}\nabla_{u}^\top\wt{\eta}_i(\bm{u})\right|_{\bm{u}_*}\right] (\bm{u} - \bm{u}_*) + \OO(\|\bm{u}-\bm{u}^*\|^3)
+\\&= \eta_i^* + b_i(\bm{u}) + h_i(\bm{u}) + \OO(\|\bm{u}-\bm{u}_*\|^3)
+\\&= \ol{\eta}_i(\bm{u}) + h_i(\bm{u}) + \OO(\|\bm{u}-\bm{u}_*\|^3)
+\end{aligned}
+$$
+
+where $\nabla_u\nabla_u^\top$ is the Hessian with respect to $\bm{u}$, $b_i$ are linear in $\bm{u}$, and $h_i$ are quadratic in $\bm{u}$.
+Combining the two expansions and taking the difference between the full and linearised log-likelihoods, we get
+$$
+\begin{aligned}
+    \ln \wt{p}(\bm{y}|\bm{u},\bm{\theta}) -
+    \ln \ol{p}(\bm{y}|\bm{u},\bm{\theta})
+    &=
+    \sum_i \left.\frac{\partial}{\partial\eta_i} \ln p (\bm{y} | {\bm{\theta}}, \bm{\eta}) \right|_{\bm{\eta}^*}\cdot h_i(\bm{u}) + \OO(\|\bm{u}-\bm{u}_*\|^3)
+\end{aligned}
+$$
+Note that the log-likelihood Hessian difference contribution only involves third order $\bm{u}$ terms
+and higher, so the expression above includes all terms up to second order.
+
+Let
+$$
+g_i^*=\left.\frac{\partial}{\partial\eta_i} \ln p (\bm{y} | {\bm{\theta}}, \bm{\eta}) \right|_{\bm{\eta}^*}
+$$
+and
+$$
+\bm{H}^*_i = \left.\nabla_{u}\nabla_{u}^\top\wt{\eta}_i(\bm{u})\right|_{\bm{u}_*} .
+$$
+and form the sum of their products, $\bm{G}=\sum_i g_i^*\bm{H}_i^*$.
+Then
+$$
+\begin{aligned}
+    \ln \wt{p}(\bm{y}|\bm{u},\bm{\theta}) -
+    \ln \ol{p}(\bm{y}|\bm{u},\bm{\theta})
+    &=
+    \frac{1}{2}
+    \sum_i g_i^* (\bm{u}-\bm{u}_*)^\top \bm{H}_i^* (\bm{u}-\bm{u}_*) + \OO(\|\bm{u}-\bm{u}_*\|^3)
+    \\&=
+    \frac{1}{2}
+    (\bm{u}-\bm{u}_*)^\top \bm{G} (\bm{u}-\bm{u}_*) + \OO(\|\bm{u}-\bm{u}_*\|^3).
+\end{aligned}
+$$
+With $\bm{m}=\pE_\ol{p}(\bm{u}|\bm{y},\bm{\theta})$ and $\bm{Q}^{-1}=\pCov_\ol{p}(\bm{u},\bm{u}|\bm{y},\bm{\theta})$, we obtain
+$$
+\begin{aligned}
+\pE_{\ol{p}}\left[ \nabla_{\bm{u}}  \left\{\ln \wt{p}(\bm{y}|\bm{u},\bm{\theta}) -
+    \ln \ol{p}(\bm{y}|\bm{u},\bm{\theta})\right\}\right]
+ &\approx
+    \bm{G}(\bm{m}-\bm{u}_*) ,
+    \\
+\pE_{\ol{p}}\left[ \nabla_{\bm{u}}\nabla_{\bm{u}}^\top  \left\{\ln \wt{p}(\bm{y}|\bm{u},\bm{\theta}) -
+    \ln \ol{p}(\bm{y}|\bm{u},\bm{\theta})\right\}\right]
+ &\approx
+    \bm{G} ,
+    \\
+\pE_{\ol{p}}\left[    \ln \wt{p}(\bm{y}|\bm{u},\bm{\theta}) -
+    \ln \ol{p}(\bm{y}|\bm{u},\bm{\theta})\right]
+ &\approx
+    \frac{1}{2}
+    \tr(\bm{G}\bm{Q}^{-1}) + \frac{1}{2} (\bm{m}-\bm{u}_*)\bm{G}(\bm{m}-\bm{u}_*)^\top .
+\end{aligned}
+$$
+For each $\bm{\theta}$ configuration in the INLA output, we can extract both $\bm{m}$ and the sparse precision matrix $\bm{Q}$ for the Gaussian approximation. The non-sparsity structure of $\bm{G}$ is contained in the non-sparsity of $\bm{Q}$, which allows the use of Takahashi recursion (`inla.qinv(Q)`) to compute the corresponding $\bm{Q}^{-1}$ values needed to evaluate the trace $\tr(\bm{G}\bm{Q}^{-1})$.
+Thus, to implement a numerical approximation of this error analysis only needs special access to the log-likelihood derivatives $g_i^*$, as $H_i^*$ can in principle be evaluated numerically.
+
+For a given $\bm{\theta}$,
+$$
+\begin{aligned}
+\pKL{\ol{p}}{\wt{p}} &=
+E_{\ol{p}}\left[\ln\frac{\ol{p}(\bm{u}|\bm{y},\bm{\theta})}{\wt{p}(\bm{u}|\bm{y},\bm{\theta})}\right]
+\\&=
+E_{\ol{p}}\left[
+\ln\frac{\ol{p}(\bm{y}|\bm{u},\bm{\theta})}{\wt{p}(\bm{y}|\bm{u},\bm{\theta})}
+\right]
+-
+\ln\frac{\ol{p}(\bm{y}|\bm{\theta})}{\wt{p}(\bm{y}|\bm{\theta})} .
+\end{aligned}
+$$
+The first term was approximated above. The second term can also be approximated using the derived quantities (to be continued...).
+
+Summary: The form of the observation likelihood discrepancy shows that, given a linearised posterior $\pN(\bm{m},\bm{Q}^{-1})$, a Gaussian approximation to the  nonlinear model posterior, $\pN(\wt{\bm{m}},\wt{\bm{Q}}^{-1})$, can be obtained from $\wt{\bm{Q}}=\bm{Q}-\bm{G}$ and $\wt{\bm{Q}}\wt{\bm{m}}=\bm{Q}\bm{m}-\bm{G}\bm{u}_*$. The K-L divergence becomes
+$$
+\begin{aligned}
+\pKL{\ol{p}}{\wt{p}} &\approx
+\frac{1}{2}
+\left[
+\ln\det(\bm{Q})-
+\ln\det(\bm{Q}-\bm{G})
+-\tr\left(\bm{G}\bm{Q}^{-1}\right)
++
+(\bm{m}-\bm{u}_*)^\top\bm{G}(\bm{Q}-\bm{G})^{-1}\bm{G}(\bm{m}-\bm{u}_*)
+\right] .
+\end{aligned}
+$$
+When the INLA posterior has mean $\bm{m}=\bm{u}_*$, e.g. for models with additive Gaussian observation noise, and $\bm{\theta}=\wh{\bm{\theta}}_{\bm{u}_*}$, the last term vanishes.
+
+Note: by implementing the K-L divergence accuracy metric, a by-product would be
+improved posterior estimates based on $\wt{\bm{m}}$ and $\wt{\bm{Q}}$.
+
+### Well-posedness and initialisation
+On a side note, one might be concerned about initialisation at, or convergence to, a saddle point. Although it is not implemented in inlabru, we want to talk about the technicality how we define the initial linearisation point $u_0$.
+
+Generally speaking, any values of $\bm{u}_0$ work except the case that the gradient evaluated at $\bm{u}_0$ is $\bm{0}$ because the linearisation point will never move away if the prior mean is also $\bm{0}$. In general, this tends to be a saddle point problem. In some cases the problem can be handled by changing the predictor parameterisation or just changing the initialisation point using the `bru_initial` option. However, for true saddle point problems, it indicates that the predictor parameterisation may lead to a multimodal posterior distribution or is ill-posed in some other way. This is a more fundamental problem that cannot be fixed by changing the initialisation point.
+
+In these examples, where $\beta$ and $\bm{u}$ are latent Gaussian components, the predictors 1, 3, and 4 would typically be safe, but predictor 2 is fundamentally non-identifiable.
+$$ 
+\begin{aligned}
+\bm{\eta}_1 &= \bm{u}, \\
+\bm{\eta}_2 &= \beta \bm{u}, \\
+\bm{\eta}_3 &= e^\beta \bm{u}, \\
+\bm{\eta}_4 &= F_\beta^{-1} ( \Phi(z_\beta)) \bm{u}, \quad z_{\beta} \sim \mathsf{N}(0,1) .
+\end{aligned}
+$$
+Note that for $\bm{\eta}_3$ and $\bm{\eta}_4$, the partial derivatives with respect to $\beta$ are zero for $\bm{u}=\bm{0}$. However, the first inlabru iteration will give a non-zero estimate of $\bm{u}$, so that subsequent iteration will involve both $\beta$ and $\bm{u}$.
+
+

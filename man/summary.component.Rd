@@ -28,10 +28,6 @@ Summarise components
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}
 
-Fabian E. Bachl \email{bachlfab@gmail.com}
-
-Finn Lindgren \email{finn.lindgren@gmail.com}
-
 Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \keyword{internal}
