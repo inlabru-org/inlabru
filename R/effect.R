@@ -1166,6 +1166,25 @@ make_submapper <- function(subcomp_n,
 }
 
 
+#' @param model A model component object
+#' @return A `bru_mapper` object defined by the model component
+#' @export
+bru_get_mapper <- function(model, ...) {
+  UseMethod("bru_get_mapper", model)
+}
+
+
+#' @rdname bru_get_mapper
+#' @export
+bru_get_mapper.inla.rgeneric <- function(model, ...) {
+  if (is.null(model[["f"]][["rgeneric"]][["definition"]])) {
+    NULL
+  } else {
+    model[["f"]][["rgeneric"]][["definition"]]("mapper")
+  }
+}
+
+
 # Defines a default mapper given the type of model and parameters provided
 # Checks subcomp$mapper, subcomp$model (for "bym2" and other multicomponent
 # models), subcomp$model$mesh (for spde models), subcomp$n,
@@ -1188,6 +1207,17 @@ make_mapper <- function(subcomp,
           paste0(class(subcomp[["model"]]$mesh), collapse = ", "),
           "' for ", label, ". Please specify a mapper manually instead."
         ))
+      }
+    } else if (!inherits(subcomp[["model"]], "character")) {
+      m <- tryCatch(
+        bru_get_mapper(subcomp[["model"]]),
+        error = function(e) {}
+      )
+      if (!is.null(m)) {
+        if (!inherits(m, "bru_mapper")) {
+          stop("bru_get_mapper method didn't return a bru_mapper object")
+        }
+        subcomp[["mapper"]] <- m
       }
     }
   }
