@@ -17,6 +17,8 @@ bru_get_mapper_safely(model, ...)
 }
 \arguments{
 \item{model}{A model component object}
+
+\item{\dots}{Arguments passed on to other methods}
 }
 \value{
 A \link{bru_mapper} object defined by the model component

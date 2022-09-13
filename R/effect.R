@@ -1174,6 +1174,7 @@ make_submapper <- function(subcomp_n,
 #' for the given latent model.
 #'
 #' @param model A model component object
+#' @param \dots Arguments passed on to other methods
 #' @return A [bru_mapper] object defined by the model component
 #' @seealso [bru_mapper]
 #' @export
@@ -1247,7 +1248,7 @@ bru_get_mapper_safely <- function(model, ...) {
       stop(paste0(
         "The bru_get_mapper method for model class '",
         paste0(class(model), collapse = ", "),
-        "' for ", label, "did not return a bru_mapper object"))
+        "' did not return a bru_mapper object"))
   }
   m
 }
