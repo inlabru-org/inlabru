@@ -77,36 +77,36 @@ Local helper functions for package unit tests
 }
 \section{Functions}{
 \itemize{
-\item \code{local_testthat_assign}: Assign local variable. Useful for easy cleanup
+\item \code{local_testthat_assign()}: Assign local variable. Useful for easy cleanup
 of global workspace with \code{withr::deferred_run()} when running tests
 interactively.
 
-\item \code{local_testthat_tolerances}: Assign test tolerances
+\item \code{local_testthat_tolerances()}: Assign test tolerances
 Assign local tolerance variables. Useful for easy cleanup
 of global workspace with \code{withr::deferred_run()} when running tests
 interactively.
 
-\item \code{local_bru_options_set}: Calls \code{\link[=bru_options_set]{bru_options_set()}} in a reversible way
+\item \code{local_bru_options_set()}: Calls \code{\link[=bru_options_set]{bru_options_set()}} in a reversible way
 
-\item \code{local_set_PROJ6_warnings}: Disable PROJ4/6 warnings.
+\item \code{local_set_PROJ6_warnings()}: Disable PROJ4/6 warnings.
 To be used within package tests. Restores state on exit.
 
-\item \code{local_get_rgdal_options}: Return a list of the current rgdal warning options
+\item \code{local_get_rgdal_options()}: Return a list of the current rgdal warning options
 
-\item \code{local_disable_PROJ6_warnings}: Disable rgdal PROJ4 conversion warnings and thin
+\item \code{local_disable_PROJ6_warnings()}: Disable rgdal PROJ4 conversion warnings and thin
 PROJ6 warnings.
 
-\item \code{local_bru_safe_inla}: Tests should set num.threads = "1:1" to ensure
+\item \code{local_bru_safe_inla()}: Tests should set num.threads = "1:1" to ensure
 within-system repeatability by calling \code{local_bru_safe_inla()};
 see also \code{\link[=bru_safe_inla]{bru_safe_inla()}}
 
-\item \code{local_bru_testthat_setup}: Initialise environment for tests.
+\item \code{local_bru_testthat_setup()}: Initialise environment for tests.
 Disables PROJ4/PROJ6 warnings, and assigns tolerance variables.
 To be called either at the top of a testfile, or inside tests.
 Does \emph{not} call \code{\link[=local_bru_safe_inla]{local_bru_safe_inla()}}, since that may invoke a skip and
 should be called inside each test that relies on INLA.
-}}
 
+}}
 \examples{
 my_fun <- function(val) {
   local_bru_options_set(bru_verbose = val)
