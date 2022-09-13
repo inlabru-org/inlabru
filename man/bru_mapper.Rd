@@ -233,5 +233,7 @@ mapper <- bru_mapper_index(5)
 ibm_amatrix(mapper, c(1, 3, 4, 5, 2))
 }
 \seealso{
-\link{bru_mapper_methods} for specific method implementations.
+\link{bru_mapper_methods} for specific method implementations, and
+\link{bru_get_mapper} for hooks to extract mappers from latent model object
+class objects.
 }

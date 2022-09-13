@@ -1166,15 +1166,63 @@ make_submapper <- function(subcomp_n,
 }
 
 
+#' Extract mapper information from INLA model component objects
+#'
+#' The component definitions will automatically attempt to extract mapper
+#' information from any model object by calling the generic `bru_get_mapper`.
+#' Any class method implementation should return a [bru_mapper] object suitable
+#' for the given latent model.
+#'
 #' @param model A model component object
-#' @return A `bru_mapper` object defined by the model component
+#' @return A [bru_mapper] object defined by the model component
+#' @seealso [bru_mapper]
 #' @export
+#' @examples
+#' if (bru_safe_inla(quietly = TRUE)) {
+#'   library(INLA)
+#'   mesh <- inla.mesh.create(globe = 2)
+#'   spde <- inla.spde2.pcmatern(mesh,
+#'                               prior.range = c(1, 0.5),
+#'                               prior.sigma = c(1, 0.5))
+#'   mapper <- bru_get_mapper(spde)
+#'   ibm_n(mapper)
+#' }
 bru_get_mapper <- function(model, ...) {
   UseMethod("bru_get_mapper", model)
 }
 
 
 #' @rdname bru_get_mapper
+#' @details * `bru_get_mapper.inla.spde` constructs an indexed mapper for
+#' the `model$mesh` object contained in the model object. It returns `NULL` gives a warning
+#' if no known mesh type is found in the model object.
+#' @export
+bru_get_mapper.inla.spde <- function(model, ...) {
+  if (inherits(model$mesh, "inla.mesh")) {
+    mapper <- bru_mapper(model$mesh)
+  } else if (inherits(model$mesh, "inla.mesh.1d")) {
+    mapper <- bru_mapper(model$mesh, indexed = TRUE)
+  } else {
+    mapper <- NULL
+    warning(
+      paste0(
+        "Unknown SPDE mesh class '",
+        paste0(class(model$mesh), collapse = ", "),
+        "' for bru_get_mapper.inla.spde. Please specify a mapper manually instead."
+      ),
+      immediate. = TRUE
+    )
+  }
+  mapper
+}
+
+#' @rdname bru_get_mapper
+#' @details * `bru_get_mapper.inla.rgeneric` returns the mapper given by a call to
+#' `model$f$rgeneric$definition("mapper")`. To support this for your own
+#' `inla.rgeneric` models, add a `"mapper"` option to the `cmd` argument
+#' of your rgeneric definition function. You will need to store the mapper
+#' in your object as well.  Alternative, define your model using a subclass
+#' and define a corresponding `bru_get_mapper.subclass` method.
 #' @export
 bru_get_mapper.inla.rgeneric <- function(model, ...) {
   if (is.null(model[["f"]][["rgeneric"]][["definition"]])) {
@@ -1182,6 +1230,26 @@ bru_get_mapper.inla.rgeneric <- function(model, ...) {
   } else {
     model[["f"]][["rgeneric"]][["definition"]]("mapper")
   }
+}
+
+#' @rdname bru_get_mapper
+#' @details * `bru_get_mapper_safely` tries to call the `bru_get_mapper`,
+#' and returns `NULL` if it fails (e.g. due to no available class method).
+#' If the call succeeds and returns non-`NULL`, it checks that the object
+#' inherits from the `bru_mapper` class, and gives an error if it does not.
+#' @export
+bru_get_mapper_safely <- function(model, ...) {
+  m <- tryCatch(
+    bru_get_mapper(model, ...),
+    error = function(e) {}
+  )
+  if (!is.null(m) && !inherits(m, "bru_mapper")) {
+      stop(paste0(
+        "The bru_get_mapper method for model class '",
+        paste0(class(model), collapse = ", "),
+        "' for ", label, "did not return a bru_mapper object"))
+  }
+  m
 }
 
 
@@ -1195,30 +1263,8 @@ make_mapper <- function(subcomp,
                         strict = TRUE,
                         require_indexed = FALSE) {
   if (is.null(subcomp[["mapper"]])) {
-    if (subcomp[["type"]] %in% c("spde")) {
-      if (inherits(subcomp[["model"]]$mesh, "inla.mesh")) {
-        subcomp[["mapper"]] <- bru_mapper(subcomp[["model"]]$mesh)
-      } else if (inherits(subcomp[["model"]]$mesh, "inla.mesh.1d")) {
-        subcomp[["mapper"]] <-
-          bru_mapper(subcomp[["model"]]$mesh, indexed = TRUE)
-      } else {
-        stop(paste0(
-          "Unknown SPDE mesh class '",
-          paste0(class(subcomp[["model"]]$mesh), collapse = ", "),
-          "' for ", label, ". Please specify a mapper manually instead."
-        ))
-      }
-    } else if (!inherits(subcomp[["model"]], "character")) {
-      m <- tryCatch(
-        bru_get_mapper(subcomp[["model"]]),
-        error = function(e) {}
-      )
-      if (!is.null(m)) {
-        if (!inherits(m, "bru_mapper")) {
-          stop("bru_get_mapper method didn't return a bru_mapper object")
-        }
-        subcomp[["mapper"]] <- m
-      }
+    if (!inherits(subcomp[["model"]], "character")) {
+      subcomp[["mapper"]] <- bru_get_mapper_safely(subcomp[["model"]])
     }
   }
   if (!is.null(subcomp[["mapper"]])) {

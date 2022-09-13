@@ -8,7 +8,9 @@
 #' For the default `bru_mapper` method, a list that will be converted to a
 #' `bru_mapper` object by adding class information and (optional) methods.
 #' @export
-#' @seealso [bru_mapper_methods] for specific method implementations.
+#' @seealso [bru_mapper_methods] for specific method implementations, and
+#' [bru_get_mapper] for hooks to extract mappers from latent model object
+#' class objects.
 #' @rdname bru_mapper
 #' @examples
 #' mapper <- bru_mapper_index(5)
