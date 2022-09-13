@@ -82,8 +82,10 @@
 <span></span>
 <span><span class="fu">ibm_valid_input</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">bru_mapper_define</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, methods <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for default</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, methods <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">ibm_inla_subset</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -124,9 +126,11 @@
 
 
 <dt>mapper</dt>
-<dd><p>A mapper S3 object, normally inheriting from <code>bru_mapper</code>.
-For the default <code>bru_mapper</code> method, a list that will be converted to a
-<code>bru_mapper</code> object by adding class information and (optional) methods.</p></dd>
+<dd><p>A mapper S3 object, normally inheriting from <code>bru_mapper</code>,
+and otherwise an object that is to be converted into a mapper.
+For the <code>bru_mapper_define</code> method, commonly a list that will be
+converted to a <code>bru_mapper</code> object by adding class information and
+(optional) methods.</p></dd>
 
 
 <dt>inla_f</dt>
@@ -217,8 +221,11 @@ Default <code>c(0, 1)</code>.</p></dd>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     
-<ul><li><p><code>bru_mapper</code> Generic mapper S3 constructor. See below for details of the
-default constructor that can be used to define new mappers in user code.</p></li>
+<ul><li><p><code>bru_mapper</code> Generic mapper S3 constructor. See <code>bru_mapper_define()</code>
+for how to define new mapper classes in user code. Methods that specialize
+<code>bru_mapper</code> are for converting non-mapper object information to a
+corresponding mapper object. Such methods should normally call
+<code>bru_mapper_define()</code> as part of the process.</p></li>
 </ul><ul><li><p><code>ibm_n</code> Generic. Implementations must return the size of the latent vector
 being mapped to.</p></li>
 </ul><ul><li><p><code>ibm_values</code> Generic. Implementations must return a vector that
@@ -243,8 +250,10 @@ the <code>ibm_values</code> output to construct the subset indexing.</p></li>
 Implementations must return a logical vector of length <code>NROW(input)</code> (
 or for <code>bru_mapper_multi</code> and <code>bru_mapper_collect</code> a list of such
 vectors)</p></li>
-</ul><ul><li><p><code>bru_mapper.default</code> adds the "bru_mapper" class and <code>new_class</code>
-to an object. If provided, mapper method functions are added to an environment
+</ul><ul><li><p><code>bru_mapper_define</code> adds the <code>new_class</code> and "bru_mapper" class
+names to the inheritance list for the input <code>mapper</code> object, unless the object
+already inherits from these.
+If provided, mapper method functions are added to an environment
 <code>.envir</code> in the object.  The generic methods <code>ibm_n</code>, <code>ibm_n_inla</code>,
 <code>ibm_values</code>, <code>ibm_values_inla</code>,
 <code>ibm_amatrix</code>, <code>ibm_amatrix_inla</code>,
@@ -253,6 +262,12 @@ functions first,
 and otherwise call <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">UseMethod()</a></code>.  This is an alternative to using <code><a href="https://rdrr.io/r/base/S3method.html" class="external-link">.S3method()</a></code>
 to register the methods, e.g.
 <code>.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)</code>.</p></li>
+</ul><ul><li><p><code>bru_mapper.default</code> is deprecated as a method for constructing
+a new <code>bru_mapper</code> object. Mapper implementations should call
+<code>bru_mapper_define()</code> directly instead.
+For now, <code>bru_mapper.default</code> calls <code>bru_mapper_define</code>, passing all
+arguments along.  In the future,
+<code>bru_mapper.default</code> may be changed to give an error instead.</p></li>
 </ul><ul><li><p>The default <code>ibm_inla_subset</code> method uses
 the <code>ibm_values</code> output to construct the inla subset indexing, passing
 extra arguments such as <code>multi</code> on to the methods (this means it supports

@@ -109,15 +109,17 @@ for the given latent model.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     
-<ul><li><p><code>bru_get_mapper.inla.spde</code> constructs an indexed mapper for
-the <code>model$mesh</code> object contained in the model object. It returns <code>NULL</code> gives a warning
+<ul><li><p><code>bru_get_mapper.inla.spde</code> extract an indexed mapper for
+the <code>model$mesh</code> object contained in the model object.
+It returns <code>NULL</code> gives a warning
 if no known mesh type is found in the model object.</p></li>
 </ul><ul><li><p><code>bru_get_mapper.inla.rgeneric</code> returns the mapper given by a call to
 <code>model$f$rgeneric$definition("mapper")</code>. To support this for your own
 <code>inla.rgeneric</code> models, add a <code>"mapper"</code> option to the <code>cmd</code> argument
 of your rgeneric definition function. You will need to store the mapper
 in your object as well.  Alternative, define your model using a subclass
-and define a corresponding <code>bru_get_mapper.subclass</code> method.</p></li>
+and define a corresponding <code>bru_get_mapper.subclass</code> method that should return
+the corresponding <code>bru_mapper</code> object.</p></li>
 </ul><ul><li><p><code>bru_get_mapper_safely</code> tries to call the <code>bru_get_mapper</code>,
 and returns <code>NULL</code> if it fails (e.g. due to no available class method).
 If the call succeeds and returns non-<code>NULL</code>, it checks that the object
