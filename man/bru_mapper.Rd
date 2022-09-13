@@ -7,6 +7,7 @@
 \alias{ibm_amatrix}
 \alias{ibm_inla_subset}
 \alias{ibm_valid_input}
+\alias{bru_mapper_define}
 \alias{bru_mapper.default}
 \alias{ibm_inla_subset.default}
 \alias{bru_mapper.inla.mesh}
@@ -33,7 +34,9 @@ ibm_inla_subset(mapper, ...)
 
 ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
-\method{bru_mapper}{default}(mapper, new_class = NULL, methods = NULL, ...)
+bru_mapper_define(mapper, new_class = NULL, methods = NULL, ...)
+
+\method{bru_mapper}{default}(mapper, ...)
 
 \method{ibm_inla_subset}{default}(mapper, ...)
 
@@ -66,9 +69,11 @@ bru_mapper_harmonics(
 \arguments{
 \item{\dots}{Arguments passed on to other methods}
 
-\item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}.
-For the default \code{bru_mapper} method, a list that will be converted to a
-\code{bru_mapper} object by adding class information and (optional) methods.}
+\item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper},
+and otherwise an object that is to be converted into a mapper.
+For the \code{bru_mapper_define} method, commonly a list that will be
+converted to a \code{bru_mapper} object by adding class information and
+(optional) methods.}
 
 \item{inla_f}{logical; when \code{TRUE} in \code{ibm_n}, \code{ibm_values}, and
 \code{ibm_amatrix} methods, these must result in values compatible with \code{INLA::f(...)}
@@ -130,8 +135,11 @@ Methods for \code{bru_mapper} objects
 }
 \details{
 \itemize{
-\item \code{bru_mapper} Generic mapper S3 constructor. See below for details of the
-default constructor that can be used to define new mappers in user code.
+\item \code{bru_mapper} Generic mapper S3 constructor. See \code{\link[=bru_mapper_define]{bru_mapper_define()}}
+for how to define new mapper classes in user code. Methods that specialize
+\code{bru_mapper} are for converting non-mapper object information to a
+corresponding mapper object. Such methods should normally call
+\code{bru_mapper_define()} as part of the process.
 }
 
 \itemize{
@@ -174,8 +182,10 @@ vectors)
 }
 
 \itemize{
-\item \code{bru_mapper.default} adds the "bru_mapper" class and \code{new_class}
-to an object. If provided, mapper method functions are added to an environment
+\item \code{bru_mapper_define} adds the \code{new_class} and "bru_mapper" class
+names to the inheritance list for the input \code{mapper} object, unless the object
+already inherits from these.
+If provided, mapper method functions are added to an environment
 \code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_n_inla},
 \code{ibm_values}, \code{ibm_values_inla},
 \code{ibm_amatrix}, \code{ibm_amatrix_inla},
@@ -184,6 +194,15 @@ functions first,
 and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
 to register the methods, e.g.
 \code{.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)}.
+}
+
+\itemize{
+\item \code{bru_mapper.default} is deprecated as a method for constructing
+a new \code{bru_mapper} object. Mapper implementations should call
+\code{\link[=bru_mapper_define]{bru_mapper_define()}} directly instead.
+For now, \code{bru_mapper.default} calls \code{bru_mapper_define}, passing all
+arguments along.  In the future,
+\code{bru_mapper.default} may be changed to give an error instead.
 }
 
 \itemize{

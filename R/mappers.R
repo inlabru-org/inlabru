@@ -1,12 +1,17 @@
 #' Methods for `bru_mapper` objects
 #'
 #' @details
-#' * `bru_mapper` Generic mapper S3 constructor. See below for details of the
-#' default constructor that can be used to define new mappers in user code.
+#' * `bru_mapper` Generic mapper S3 constructor. See [bru_mapper_define()]
+#' for how to define new mapper classes in user code. Methods that specialize
+#' `bru_mapper` are for converting non-mapper object information to a
+#' corresponding mapper object. Such methods should normally call
+#' `bru_mapper_define()` as part of the process.
 #' @param \dots Arguments passed on to other methods
-#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`.
-#' For the default `bru_mapper` method, a list that will be converted to a
-#' `bru_mapper` object by adding class information and (optional) methods.
+#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`,
+#' and otherwise an object that is to be converted into a mapper.
+#' For the `bru_mapper_define` method, commonly a list that will be
+#' converted to a `bru_mapper` object by adding class information and
+#' (optional) methods.
 #' @export
 #' @seealso [bru_mapper_methods] for specific method implementations, and
 #' [bru_get_mapper] for hooks to extract mappers from latent model object
@@ -108,8 +113,10 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 
 # MAPPERS ----
 
-#' @details * `bru_mapper.default` adds the "bru_mapper" class and `new_class`
-#' to an object. If provided, mapper method functions are added to an environment
+#' @details * `bru_mapper_define` adds the `new_class` and "bru_mapper" class
+#' names to the inheritance list for the input `mapper` object, unless the object
+#' already inherits from these.
+#' If provided, mapper method functions are added to an environment
 #' `.envir` in the object.  The generic methods `ibm_n`, `ibm_n_inla`,
 #' `ibm_values`, `ibm_values_inla`,
 #' `ibm_amatrix`, `ibm_amatrix_inla`,
@@ -123,10 +130,10 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #'
 #' @export
 #' @rdname bru_mapper
-bru_mapper.default <- function(mapper,
-                               new_class = NULL,
-                               methods = NULL,
-                               ...) {
+bru_mapper_define <- function(mapper,
+                              new_class = NULL,
+                              methods = NULL,
+                              ...) {
   if (any(c(
     "ibm_n", "ibm_n_inla",
     "ibm_values", "ibm_values_inla",
@@ -169,6 +176,21 @@ bru_mapper.default <- function(mapper,
     }
   }
   mapper
+}
+
+#' @details * `bru_mapper.default` is deprecated as a method for constructing
+#' a new `bru_mapper` object. Mapper implementations should call
+#' [bru_mapper_define()] directly instead.
+#' For now, `bru_mapper.default` calls `bru_mapper_define`, passing all
+#' arguments along.  In the future,
+#' `bru_mapper.default` may be changed to give an error instead.
+#'
+#' @export
+#' @rdname bru_mapper
+bru_mapper.default <- function(mapper, ...) {
+  # TODO: Mark deprecated from version 2.6.0
+  # .Deprecated("bru_mapper_define")
+  bru_mapper_define(mapper, ...)
 }
 
 
@@ -291,8 +313,7 @@ ibm_valid_input.default <- function(mapper, input, ...) {
 #' @rdname bru_mapper
 bru_mapper.inla.mesh <- function(mesh, ...) {
   mapper <- list(mesh = mesh)
-  class(mapper) <- c("bru_mapper_inla_mesh_2d", "list")
-  bru_mapper.default(mapper)
+  bru_mapper_define(mapper, new_class = "bru_mapper_inla_mesh_2d")
 }
 
 #' @export
@@ -336,8 +357,7 @@ bru_mapper.inla.mesh.1d <- function(mesh, indexed = NULL, ...) {
     mesh = mesh,
     indexed = indexed
   )
-  class(mapper) <- c("bru_mapper_inla_mesh_1d", "list")
-  bru_mapper.default(mapper)
+  bru_mapper_define(mapper, new_class = "bru_mapper_inla_mesh_1d")
 }
 
 #' @export

@@ -31,8 +31,9 @@ for the given latent model.
 }
 \details{
 \itemize{
-\item \code{bru_get_mapper.inla.spde} constructs an indexed mapper for
-the \code{model$mesh} object contained in the model object. It returns \code{NULL} gives a warning
+\item \code{bru_get_mapper.inla.spde} extract an indexed mapper for
+the \code{model$mesh} object contained in the model object.
+It returns \code{NULL} gives a warning
 if no known mesh type is found in the model object.
 }
 
@@ -42,7 +43,8 @@ if no known mesh type is found in the model object.
 \code{inla.rgeneric} models, add a \code{"mapper"} option to the \code{cmd} argument
 of your rgeneric definition function. You will need to store the mapper
 in your object as well.  Alternative, define your model using a subclass
-and define a corresponding \code{bru_get_mapper.subclass} method.
+and define a corresponding \code{bru_get_mapper.subclass} method that should return
+the corresponding \code{bru_mapper} object.
 }
 
 \itemize{

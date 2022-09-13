@@ -1194,8 +1194,9 @@ bru_get_mapper <- function(model, ...) {
 
 
 #' @rdname bru_get_mapper
-#' @details * `bru_get_mapper.inla.spde` constructs an indexed mapper for
-#' the `model$mesh` object contained in the model object. It returns `NULL` gives a warning
+#' @details * `bru_get_mapper.inla.spde` extract an indexed mapper for
+#' the `model$mesh` object contained in the model object.
+#' It returns `NULL` gives a warning
 #' if no known mesh type is found in the model object.
 #' @export
 bru_get_mapper.inla.spde <- function(model, ...) {
@@ -1223,7 +1224,8 @@ bru_get_mapper.inla.spde <- function(model, ...) {
 #' `inla.rgeneric` models, add a `"mapper"` option to the `cmd` argument
 #' of your rgeneric definition function. You will need to store the mapper
 #' in your object as well.  Alternative, define your model using a subclass
-#' and define a corresponding `bru_get_mapper.subclass` method.
+#' and define a corresponding `bru_get_mapper.subclass` method that should return
+#' the corresponding `bru_mapper` object.
 #' @export
 bru_get_mapper.inla.rgeneric <- function(model, ...) {
   if (is.null(model[["f"]][["rgeneric"]][["definition"]])) {
@@ -1276,7 +1278,6 @@ make_mapper <- function(subcomp,
         "' for ", label
       ))
     }
-    subcomp[["mapper"]] <- bru_mapper(subcomp[["mapper"]])
   } else if (subcomp[["type"]] %in% c("linear", "clinear")) {
     subcomp[["mapper"]] <- bru_mapper_linear()
   } else if (subcomp[["type"]] %in% c("offset")) {
