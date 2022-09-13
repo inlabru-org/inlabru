@@ -1785,12 +1785,13 @@ fm_spTransform.inla.mesh <- function(x, CRSobj, passthrough = FALSE, ...) {
 
 
 
-
+#' @export
 fm_as_inla_mesh_segment <-
   function(...) {
     UseMethod("fm_as_inla_mesh_segment")
   }
 
+#' @export
 fm_sp2segment <-
   function(sp, ...) {
     UseMethod("fm_as_inla_mesh_segment")
