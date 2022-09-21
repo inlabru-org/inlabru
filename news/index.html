@@ -70,7 +70,9 @@
 <ul><li>Add <code>bru_get_mapper</code> generic, and associated methods for <code>inla.spde</code> and <code>inla.rgeneric</code> objects. This allows <code>inlabru</code> to automatically extract the appropriate <code>bru_mapper</code> object for each model component, and can be used as a hook by external packages implementing new INLA object classes.</li></ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li>Enable both datum/ensemble container for ellipsoid information, to support <code>epsg:4326</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/154" class="external-link">#154</a></li></ul></div>
+<ul><li><p>Enable both datum/ensemble container for ellipsoid information, to support <code>epsg:4326</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/154" class="external-link">#154</a></p></li>
+<li><p>Make duplicated component names an error instead of a warning. Relates to <a href="https://github.com/inlabru-org/inlabru/issues/155" class="external-link">#155</a></p></li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.5.3" id="inlabru-253">inlabru 2.5.3<a class="anchor" aria-label="anchor" href="#inlabru-253"></a></h2><p class="text-muted">CRAN release: 2022-09-05</p>
