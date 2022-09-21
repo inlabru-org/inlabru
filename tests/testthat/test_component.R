@@ -63,6 +63,19 @@ test_that("Component construction: linear model", {
 
 
 
+test_that("Component construction: duplicate detection", {
+  expect_error(
+    component_list(
+      ~ -1 +
+        beta(main = x, model = "linear", values = 1) +
+        beta(main = x, model = "linear", values = 2)
+    ),
+    regexp = "Duplicated component labels detected: 'beta'"
+  )
+})
+
+
+
 test_that("Component construction: offset", {
   cmp <- component_list(~ something(a, model = "offset"))
   val <- evaluate_effect_single(cmp[["something"]],

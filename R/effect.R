@@ -674,7 +674,7 @@ component_list.list <- function(object,
   stopifnot(all(vapply(object, function(x) inherits(x, "component"), TRUE)))
   names(object) <- lapply(object, function(x) x$label)
   if (anyDuplicated(names(object))) {
-    warning(paste0(
+    stop(paste0(
       "Duplicated component labels detected: ",
       paste0(
         "'",
