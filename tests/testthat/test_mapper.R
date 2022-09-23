@@ -78,7 +78,7 @@ test_that("User defined mappers", {
   }
 
   bm_test <- function(n, ...) {
-    bru_mapper(
+    bru_mapper_define(
       list(n = n),
       new_class = "bm_test",
       methods = list(
@@ -129,7 +129,7 @@ test_that("User defined mappers 2", {
   .S3method("ibm_amatrix", "bm_test", ibm_amatrix.bm_test)
 
   bm_test <- function(n, ...) {
-    bru_mapper(
+    bru_mapper_define(
       list(n = n),
       new_class = "bm_test"
     )
