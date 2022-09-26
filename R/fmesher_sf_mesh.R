@@ -6,6 +6,12 @@ fm_as_sfc <- function(x) {
   UseMethod("fm_as_sfc")
 }
 
+#' @rdname fm_as
+#' @export
+fm_as_inla_mesh_segment <-
+  function(...) {
+    UseMethod("fm_as_inla_mesh_segment")
+  }
 
 #' @rdname fm_as
 #' @export

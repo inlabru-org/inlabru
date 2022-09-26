@@ -44,8 +44,9 @@ fm_internal_sp2segment_join <- function(inp, grp = NULL, closed = TRUE) {
       out.grp <- c(out.grp, inp.grp)
     }
   }
+  is.bnd <- all(vapply(inp, function(x) x$is.bnd, TRUE))
   INLA::inla.mesh.segment(
-    loc = out.loc, idx = out.idx, grp = out.grp, is.bnd = FALSE,
+    loc = out.loc, idx = out.idx, grp = out.grp, is.bnd = is.bnd,
     crs = crs
   )
 }
@@ -53,8 +54,22 @@ fm_internal_sp2segment_join <- function(inp, grp = NULL, closed = TRUE) {
 
 
 
+#' @export
+#' @rdname fm_as
+#' @param sp An `sp` style S4 object to be converted
+fm_sp2segment <-
+  function(sp, ...) {
+    UseMethod("fm_as_inla_mesh_segment")
+  }
+
+
+
 
 #' @export
+#' @rdname fm_as
+#' @param crs A crs object
+#' @param closed logical; whether to treat a point sequence as a closed polygon.
+#' Default: `FALSE`
 fm_as_inla_mesh_segment.matrix <-
   function(sp, reverse = FALSE, grp = NULL, is.bnd = FALSE, crs = NULL, closed = FALSE, ...) {
     loc <- sp
@@ -77,6 +92,7 @@ fm_as_inla_mesh_segment.matrix <-
 
 
 #' @export
+#' @rdname fm_as
 fm_as_inla_mesh_segment.SpatialPoints <-
   function(sp, reverse = FALSE, grp = NULL, is.bnd = TRUE, closed = FALSE, ...) {
     crs <- fm_sp_get_crs(sp)
@@ -100,6 +116,7 @@ fm_as_inla_mesh_segment.SpatialPoints <-
   }
 
 #' @export
+#' @rdname fm_as
 fm_as_inla_mesh_segment.SpatialPointsDataFrame <-
   function(sp, ...) {
     fm_as_inla_mesh_segment.SpatialPoints(sp, ...)
@@ -108,6 +125,7 @@ fm_as_inla_mesh_segment.SpatialPointsDataFrame <-
 
 
 #' @export
+#' @rdname fm_as
 fm_as_inla_mesh_segment.Line <-
   function(sp, reverse = FALSE, grp = NULL, crs = NULL, ...) {
     loc <- sp@coords
@@ -126,6 +144,7 @@ fm_as_inla_mesh_segment.Line <-
   }
 
 #' @export
+#' @rdname fm_as
 fm_as_inla_mesh_segment.Lines <-
   function(sp, join = TRUE, grp = NULL, crs = NULL, ...) {
     segm <- as.list(lapply(
@@ -147,6 +166,7 @@ fm_as_inla_mesh_segment.Lines <-
   }
 
 #' @export
+#' @rdname fm_as
 fm_as_inla_mesh_segment.SpatialLines <-
   function(sp, join = TRUE, grp = NULL, ...) {
     crs <- fm_sp_get_crs(sp)
@@ -167,12 +187,14 @@ fm_as_inla_mesh_segment.SpatialLines <-
   }
 
 #' @export
+#' @rdname fm_as
 fm_as_inla_mesh_segment.SpatialLinesDataFrame <-
   function(sp, ...) {
     fm_as_inla_mesh_segment.SpatialLines(sp, ...)
   }
 
 #' @export
+#' @rdname fm_as
 fm_as_inla_mesh_segment.SpatialPolygons <-
   function(sp, join = TRUE, grp = NULL, ...) {
     crs <- fm_sp_get_crs(sp)
@@ -190,25 +212,31 @@ fm_as_inla_mesh_segment.SpatialPolygons <-
   }
 
 #' @export
+#' @rdname fm_as
 fm_as_inla_mesh_segment.SpatialPolygonsDataFrame <-
   function(sp, ...) {
     fm_as_inla_mesh_segment.SpatialPolygons(sp, ...)
   }
 
 #' @export
+#' @rdname fm_as
 fm_as_inla_mesh_segment.Polygons <-
-  function(sp, join = TRUE, crs = NULL, ...) {
+  function(sp, join = TRUE, crs = NULL, grp = NULL, ...) {
     segm <- as.list(lapply(
       sp@Polygons,
       function(x) fm_as_inla_mesh_segment(x, crs = crs, ...)
     ))
     if (join) {
-      segm <- fm_internal_sp2segment_join(segm, grp = NULL)
+      if (missing(grp)) {
+        grp <- seq_len(length(segm))
+      }
+      segm <- fm_internal_sp2segment_join(segm, grp = grp)
     }
     segm
   }
 
 #' @export
+#' @rdname fm_as
 fm_as_inla_mesh_segment.Polygon <-
   function(sp, crs = NULL, ...) {
     loc <- sp@coords[-dim(sp@coords)[1L], , drop = FALSE]
