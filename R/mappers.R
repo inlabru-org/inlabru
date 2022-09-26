@@ -13,9 +13,10 @@
 #' converted to a `bru_mapper` object by adding class information and
 #' (optional) methods.
 #' @export
-#' @seealso [bru_mapper_methods] for specific method implementations, and
+#' @seealso [bru_mapper_methods] for specific method implementations,
 #' [bru_get_mapper] for hooks to extract mappers from latent model object
-#' class objects.
+#' class objects, and [bru_mapper_define] for the core class constructor method.
+#'
 #' @rdname bru_mapper
 #' @examples
 #' mapper <- bru_mapper_index(5)
@@ -113,6 +114,10 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 
 # MAPPERS ----
 
+#' Mapper object constructor
+#'
+#' The core mapper class constructor method
+#'
 #' @details * `bru_mapper_define` adds the `new_class` and "bru_mapper" class
 #' names to the inheritance list for the input `mapper` object, unless the object
 #' already inherits from these.
@@ -132,7 +137,8 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #' @param methods Optional `list` of named method definitions; See Details.
 #'
 #' @export
-#' @rdname bru_mapper
+#' @seealso [bru_mapper()]
+#' @rdname bru_mapper_define
 bru_mapper_define <- function(mapper,
                               new_class = NULL,
                               methods = NULL,

@@ -7,7 +7,6 @@
 \alias{ibm_amatrix}
 \alias{ibm_inla_subset}
 \alias{ibm_valid_input}
-\alias{bru_mapper_define}
 \alias{bru_mapper.default}
 \alias{ibm_inla_subset.default}
 \alias{bru_mapper.inla.mesh}
@@ -33,8 +32,6 @@ ibm_amatrix(mapper, input, inla_f = FALSE, ...)
 ibm_inla_subset(mapper, ...)
 
 ibm_valid_input(mapper, input, inla_f = FALSE, ...)
-
-bru_mapper_define(mapper, new_class = NULL, methods = NULL, ...)
 
 \method{bru_mapper}{default}(mapper, ...)
 
@@ -83,10 +80,6 @@ for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by \code{bru_mapper_collect}.}
 
 \item{input}{The values for which to produce validity information}
-
-\item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
-
-\item{methods}{Optional \code{list} of named method definitions; See Details.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
@@ -182,21 +175,6 @@ vectors)
 }
 
 \itemize{
-\item \code{bru_mapper_define} adds the \code{new_class} and "bru_mapper" class
-names to the inheritance list for the input \code{mapper} object, unless the object
-already inherits from these.
-If provided, mapper method functions are added to an environment
-\code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_n_inla},
-\code{ibm_values}, \code{ibm_values_inla},
-\code{ibm_amatrix}, \code{ibm_amatrix_inla},
-\code{ibm_valid_input}, and \code{ibm_valid_input_inla} look for these
-functions first,
-and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
-to register the methods, e.g.
-\code{.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)}.
-}
-
-\itemize{
 \item \code{bru_mapper.default} is deprecated as a method for constructing
 a new \code{bru_mapper} object. Mapper implementations should call
 \code{\link[=bru_mapper_define]{bru_mapper_define()}} directly instead.
@@ -252,7 +230,7 @@ mapper <- bru_mapper_index(5)
 ibm_amatrix(mapper, c(1, 3, 4, 5, 2))
 }
 \seealso{
-\link{bru_mapper_methods} for specific method implementations, and
+\link{bru_mapper_methods} for specific method implementations,
 \link{bru_get_mapper} for hooks to extract mappers from latent model object
-class objects.
+class objects, and \link{bru_mapper_define} for the core class constructor method.
 }
