@@ -14,6 +14,8 @@ For the default \code{bru_mapper} method, a list that will be converted to a
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
 \item{methods}{Optional \code{list} of named method definitions; See Details.}
+
+\item{\dots}{Deprecated, alternative way to supply optional method definitions.}
 }
 \description{
 The core mapper class constructor method

@@ -135,6 +135,7 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #' `bru_mapper` object by adding class information and (optional) methods.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
 #' @param methods Optional `list` of named method definitions; See Details.
+#' @param \dots Deprecated, alternative way to supply optional method definitions.
 #'
 #' @export
 #' @seealso [bru_mapper()]
