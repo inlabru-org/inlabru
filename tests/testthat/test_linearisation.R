@@ -42,7 +42,7 @@ test_that("Linearisation", {
         lin_A <- lin0[[lh_idx]]$A
         INLA::inla.stack(
           list(
-            BRU.response = lh$data[[lh$response]],
+            BRU.response = lh$response_data[[lh$response]],
             BRU.E = lh[["E"]],
             BRU.Ntrials = lh[["Ntrials"]],
             BRU.offset = as.vector(lin0[[lh_idx]]$offset)
