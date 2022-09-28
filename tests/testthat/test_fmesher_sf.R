@@ -165,11 +165,11 @@ test_that("sf gorillas lgcp vignette", {
   ## Build boundary information:
   ## (fmesher supports SpatialPolygons, but this app is not (yet) intelligent enough for that.)
   boundary <- list(
-    as.inla.mesh.segment(gorillas_sf$boundary),
+    fm_as_inla_mesh_segment(gorillas_sf$boundary),
     NULL)
 
   ## Build the mesh:
-  mesh_sf <- inla.mesh.2d(
+  mesh_sf <- INLA::inla.mesh.2d(
     boundary = boundary,
     max.edge = c(0.24, 0.97),
     min.angle = c(30, 21),
