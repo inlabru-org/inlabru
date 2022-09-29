@@ -1176,7 +1176,8 @@ make_submapper <- function(subcomp_n,
 #' @param model A model component object
 #' @param \dots Arguments passed on to other methods
 #' @return A [bru_mapper] object defined by the model component
-#' @seealso [bru_mapper]
+#' @seealso [bru_mapper] for mapper constructor methods, and
+#' [bru_mapper_methods] for method generics and specific implementations.
 #' @export
 #' @examples
 #' if (bru_safe_inla(quietly = TRUE)) {
