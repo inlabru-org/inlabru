@@ -37,17 +37,22 @@ test_that("sf gorillas lgcp vignette", {
   #   gg(mesh_sf) +
   #   geom_sf(data = gorillas_sf$boundary)
 
-  matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+  matern <- INLA::inla.spde2.pcmatern(mesh_sf,
                                       prior.sigma = c(0.1, 0.01),
                                       prior.range = c(5, 0.01))
 
-  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept(1)
+  library(sf)
+  # Using sf::st_coordinates here did not seem to parse correctly
+  # and the domain definition in the lgcp() call was expecting a
+  # domain named sf.
+  cmp <- st_coordinates ~ mySmooth(main = coordinates, model = matern) +
+    Intercept(1)
 
   fit <- lgcp(
     cmp,
     data = gorillas_sf$nests,
     samplers = gorillas_sf$boundary,
-    domain = list(coordinates = gorillas$mesh)
+    domain = list(st_coordinates = mesh_sf)
   )
 
 })
