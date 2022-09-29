@@ -1,22 +1,15 @@
-#' Methods for `bru_mapper` objects
+#' Constructors for `bru_mapper` objects
 #'
 #' @details
-#' * `bru_mapper` Generic mapper S3 constructor. See [bru_mapper_define()]
-#' for how to define new mapper classes in user code. Methods that specialize
-#' `bru_mapper` are for converting non-mapper object information to a
-#' corresponding mapper object. Such methods should normally call
-#' `bru_mapper_define()` as part of the process.
+#' * `bru_mapper` Generic mapper S3 constructor, used for constructing
+#' mappers for special objects. See below for details of the
+#' default constructor [bru_mapper_define()] that can be used to define
+#' new mappers in user code.
 #' @param \dots Arguments passed on to other methods
-#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`,
-#' and otherwise an object that is to be converted into a mapper.
-#' For the `bru_mapper_define` method, commonly a list that will be
-#' converted to a `bru_mapper` object by adding class information and
-#' (optional) methods.
 #' @export
-#' @seealso [bru_mapper_methods] for specific method implementations,
+#' @seealso [bru_mapper_methods] for specific method implementations, and
 #' [bru_get_mapper] for hooks to extract mappers from latent model object
-#' class objects, and [bru_mapper_define] for the core class constructor method.
-#'
+#' class objects.
 #' @rdname bru_mapper
 #' @examples
 #' mapper <- bru_mapper_index(5)
@@ -24,9 +17,13 @@
 bru_mapper <- function(...) {
   UseMethod("bru_mapper")
 }
+
+#' Methods for bru_mapper objects
+#'
 #' @details
 #' * `ibm_n` Generic. Implementations must return the size of the latent vector
 #' being mapped to.
+#' @param mapper A mapper S3 object, inheriting from `bru_mapper`.
 #' @param inla_f logical; when `TRUE` in `ibm_n`, `ibm_values`, and
 #' `ibm_amatrix` methods, these must result in values compatible with `INLA::f(...)`
 #' an specification and corresponding `INLA::inla.stack(...)` constructions.
@@ -35,7 +32,8 @@ bru_mapper <- function(...) {
 #' as "bym2", which can be handled by `bru_mapper_collect`.
 #'
 #' @export
-#' @rdname bru_mapper
+#' @rdname bru_mapper_methods
+#' @name bru_mapper_methods
 ibm_n <- function(mapper, inla_f = FALSE, ...) {
   if (!is.null(mapper[[".envir"]][["ibm_n"]])) {
     mapper[[".envir"]][["ibm_n"]](mapper, inla_f = inla_f, ...)
@@ -49,7 +47,7 @@ ibm_n <- function(mapper, inla_f = FALSE, ...) {
 #' The exception is the method for `bru_mapper_multi`, that returns a
 #' multi-column data frame
 #' @export
-#' @rdname bru_mapper
+#' @rdname bru_mapper_methods
 ibm_values <- function(mapper, inla_f = FALSE, ...) {
   if (!is.null(mapper[[".envir"]][["ibm_values"]])) {
     mapper[[".envir"]][["ibm_values"]](mapper, inla_f = inla_f, ...)
@@ -67,7 +65,7 @@ ibm_values <- function(mapper, inla_f = FALSE, ...) {
 #' the allowed type of input format.
 #' @param input The values for which to produce a mapping matrix
 #' @export
-#' @rdname bru_mapper
+#' @rdname bru_mapper_methods
 ibm_amatrix <- function(mapper, input, inla_f = FALSE, ...) {
   if (!is.null(mapper[[".envir"]][["ibm_amatrix"]])) {
     mapper[[".envir"]][["ibm_amatrix"]](
@@ -85,7 +83,7 @@ ibm_amatrix <- function(mapper, input, inla_f = FALSE, ...) {
 #' to the `inla_f = TRUE` version of A and values. The default method uses
 #' the `ibm_values` output to construct the subset indexing.
 #' @export
-#' @rdname bru_mapper
+#' @rdname bru_mapper_methods
 ibm_inla_subset <- function(mapper, ...) {
   if (!is.null(mapper[[".envir"]][["ibm_inla_subset"]])) {
     mapper[[".envir"]][["ibm_inla_subset"]](
@@ -101,7 +99,7 @@ ibm_inla_subset <- function(mapper, ...) {
 #' vectors)
 #' @param input The values for which to produce validity information
 #' @export
-#' @rdname bru_mapper
+#' @rdname bru_mapper_methods
 ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
   if (!is.null(mapper[[".envir"]][["ibm_valid_input"]])) {
     mapper[[".envir"]][["ibm_valid_input"]](
@@ -114,10 +112,6 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 
 # MAPPERS ----
 
-#' Mapper object constructor
-#'
-#' The core mapper class constructor method
-#'
 #' @details * `bru_mapper_define` adds the `new_class` and "bru_mapper" class
 #' names to the inheritance list for the input `mapper` object, unless the object
 #' already inherits from these.
@@ -130,16 +124,15 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #' and otherwise call `UseMethod()`.  This is an alternative to using `.S3method()`
 #' to register the methods, e.g.
 #' `.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)`.
-#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`.
-#' For the default `bru_mapper` method, a list that will be converted to a
-#' `bru_mapper` object by adding class information and (optional) methods.
+#' @param mapper For the `bru_mapper_define` method, normally a
+#' list that will be converted to a `bru_mapper` object by adding
+#' class information and (optional) methods.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
 #' @param methods Optional `list` of named method definitions; See Details.
 #' @param \dots Deprecated, alternative way to supply optional method definitions.
 #'
 #' @export
-#' @seealso [bru_mapper()]
-#' @rdname bru_mapper_define
+#' @rdname bru_mapper
 bru_mapper_define <- function(mapper,
                               new_class = NULL,
                               methods = NULL,
@@ -188,19 +181,16 @@ bru_mapper_define <- function(mapper,
   mapper
 }
 
-#' @details * `bru_mapper.default` is deprecated as a method for constructing
-#' a new `bru_mapper` object. Mapper implementations should call
-#' [bru_mapper_define()] directly instead.
-#' For now, `bru_mapper.default` calls `bru_mapper_define`, passing all
-#' arguments along.  In the future,
-#' `bru_mapper.default` may be changed to give an error instead.
-#'
+#' @details * `bru_mapper.default` calls `bru_mapper_define`, passing all
+#' arguments along. Mapper implementations should call [bru_mapper_define()]
+#' instead, and supply at least a `new_class` class name.
+#' Use of the `bru_mapper.default` will be deprecated from version 2.6.0.
 #' @export
 #' @rdname bru_mapper
-bru_mapper.default <- function(mapper, ...) {
+bru_mapper.default <- function(...) {
   # TODO: Mark deprecated from version 2.6.0
   # .Deprecated("bru_mapper_define")
-  bru_mapper_define(mapper, ...)
+  bru_mapper_define(...)
 }
 
 
@@ -213,14 +203,16 @@ bru_mapper.default <- function(mapper, ...) {
 #' `ibm_n()` and `ibm_values()` methods also need to be provided.
 #'
 #' @param \dots Arguments passed on to other methods
-#' @param mapper A mapper S3 object, inheriting from (at least) `bru_mapper`.
+#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
 #' @param inla_f logical; when `TRUE` in `ibm_n` and `ibm_values`, these must result in values compatible with `INLA::f(...)`
 #' an specification and corresponding `INLA::inla.stack(...)` constructions.
 #' For `ibm_amatrix` methods, it may influence how the input data is interpreted.
 #' Implementations do not normally need to do anything different, except
 #' for mappers of the type needed for hidden multicomponent models such
 #' as "bym2", which can be handled by `bru_mapper_collect`.
-#' @seealso [bru_mapper()]
+#' @seealso [bru_mapper] for constructor methods, and
+#' [bru_get_mapper] for hooks to extract mappers from latent model object
+#' class objects.
 #' @name bru_mapper_methods
 #'
 #' @details
@@ -274,7 +266,7 @@ ibm_amatrix.default <- function(mapper, input, inla_f = FALSE, ...) {
 #' extra arguments such as `multi` on to the methods (this means it supports
 #' both regular vector values and `multi=1` data.frame values).
 #' @export
-#' @rdname bru_mapper
+#' @rdname bru_mapper_methods
 ibm_inla_subset.default <- function(mapper, ...) {
   values_full <- ibm_values(mapper, inla_f = FALSE, ...)
   values_inla <- ibm_values(mapper, inla_f = TRUE, ...)
@@ -399,11 +391,7 @@ ibm_amatrix.bru_mapper_inla_mesh_1d <- function(mapper, input, ...) {
 #' @export
 #' @rdname bru_mapper
 bru_mapper_index <- function(n = 1L, ...) {
-  mapper <- list(
-    n = n
-  )
-  class(mapper) <- c("bru_mapper_index", "bru_mapper", "list")
-  mapper
+  bru_mapper_define(list(n = n), new_class = "bru_mapper_index")
 }
 
 #' @export
@@ -434,9 +422,7 @@ ibm_amatrix.bru_mapper_index <- function(mapper, input, ...) {
 #' @export
 #' @rdname bru_mapper
 bru_mapper_linear <- function(...) {
-  mapper <- list()
-  class(mapper) <- c("bru_mapper_linear", "bru_mapper", "list")
-  mapper
+  bru_mapper_define(list(), new_class = "bru_mapper_linear")
 }
 
 #' @export
@@ -481,8 +467,7 @@ bru_mapper_matrix <- function(labels, ...) {
       labels = as.character(labels)
     )
   }
-  class(mapper) <- c("bru_mapper_matrix", "bru_mapper", "list")
-  mapper
+  bru_mapper_define(mapper, new_class = "bru_mapper_matrix")
 }
 
 #' @export
@@ -549,8 +534,7 @@ bru_mapper_factor <- function(values, factor_mapping, ...) {
       factor_mapping = factor_mapping
     )
   }
-  class(mapper) <- c("bru_mapper_factor", "bru_mapper", "list")
-  mapper
+  bru_mapper_define(mapper, new_class = "bru_mapper_factor")
 }
 
 #' @export
@@ -607,9 +591,7 @@ ibm_amatrix.bru_mapper_factor <- function(mapper, input, ...) {
 #' @export
 #' @rdname bru_mapper
 bru_mapper_offset <- function(...) {
-  mapper <- list()
-  class(mapper) <- c("bru_mapper_offset", "bru_mapper", "list")
-  mapper
+  bru_mapper_define(list(), new_class = "bru_mapper_offset")
 }
 
 #' @export
@@ -666,8 +648,7 @@ bru_mapper_multi <- function(mappers, ...) {
   )
   mapper[["n"]] <- prod(unlist(mapper[["n_multi"]]))
   mapper[["n_inla"]] <- prod(unlist(mapper[["n_inla_multi"]]))
-  class(mapper) <- c("bru_mapper_multi", "bru_mapper", "list")
-  mapper
+  bru_mapper_define(mapper, new_class = "bru_mapper_multi")
 }
 
 #' @param multi integer or logical;
@@ -903,8 +884,7 @@ bru_mapper_collect <- function(mappers, hidden = FALSE, ...) {
   )
   mapper[["n"]] <- sum(unlist(mapper[["n_multi"]]))
   mapper[["values"]] <- seq_len(mapper[["n"]])
-  class(mapper) <- c("bru_mapper_collect", "bru_mapper", "list")
-  mapper
+  bru_mapper_define(mapper, new_class = "bru_mapper_collect")
 }
 
 #' @param multi integer or logical;
@@ -1157,7 +1137,7 @@ bru_mapper_harmonics <- function(order = 1,
     intercept = intercept,
     interval = interval
   )
-  bru_mapper(mapper, new_class = "bru_mapper_harmonics")
+  bru_mapper_define(mapper, new_class = "bru_mapper_harmonics")
 }
 
 

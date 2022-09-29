@@ -2,9 +2,15 @@
 % Please edit documentation in R/mappers.R
 \name{bru_mapper_methods}
 \alias{bru_mapper_methods}
+\alias{ibm_n}
+\alias{ibm_values}
+\alias{ibm_amatrix}
+\alias{ibm_inla_subset}
+\alias{ibm_valid_input}
 \alias{ibm_n.default}
 \alias{ibm_values.default}
 \alias{ibm_amatrix.default}
+\alias{ibm_inla_subset.default}
 \alias{ibm_valid_input.default}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
 \alias{ibm_values.bru_mapper_inla_mesh_2d}
@@ -42,13 +48,25 @@
 \alias{names<-.bru_mapper_collect}
 \alias{ibm_n.bru_mapper_harmonics}
 \alias{ibm_amatrix.bru_mapper_harmonics}
-\title{Implementation methods for mapper objects}
+\title{Methods for bru_mapper objects}
 \usage{
+ibm_n(mapper, inla_f = FALSE, ...)
+
+ibm_values(mapper, inla_f = FALSE, ...)
+
+ibm_amatrix(mapper, input, inla_f = FALSE, ...)
+
+ibm_inla_subset(mapper, ...)
+
+ibm_valid_input(mapper, input, inla_f = FALSE, ...)
+
 \method{ibm_n}{default}(mapper, inla_f = FALSE, ...)
 
 \method{ibm_values}{default}(mapper, inla_f = FALSE, ...)
 
 \method{ibm_amatrix}{default}(mapper, input, inla_f = FALSE, ...)
+
+\method{ibm_inla_subset}{default}(mapper, ...)
 
 \method{ibm_valid_input}{default}(mapper, input, ...)
 
@@ -186,6 +204,45 @@ available (see Details). Otherwise the
 }
 \details{
 \itemize{
+\item \code{ibm_n} Generic. Implementations must return the size of the latent vector
+being mapped to.
+}
+
+\itemize{
+\item \code{ibm_values} Generic. Implementations must return a vector that
+would be interpretable by an \code{INLA::f(..., values = ...)} specification.
+The exception is the method for \code{bru_mapper_multi}, that returns a
+multi-column data frame
+}
+
+\itemize{
+\item \code{ibm_amatrix} Generic.
+Implementations must return a (sparse) matrix of size \code{NROW(input)}
+(except for the \code{bru_mapper_multi} and \code{bru_mapper_collect} methods,
+that require \code{list()} inputs, and the input size is determined by the
+combined inputs)
+by \code{ibm_n(mapper, inla_f = FALSE)}. The \code{inla_f=TRUE} argument should only affect
+the allowed type of input format.
+}
+
+\itemize{
+\item \code{ibm_inla_subset} Generic.
+Implementations must return a logical vector of \code{TRUE/FALSE} for
+the subset such that, given the full A matrix and values output,
+\code{A[, subset, drop = FALSE]} and \code{values[subset]}
+(or \code{values[subset, , drop = FALSE]} for data.frame values) are equal
+to the \code{inla_f = TRUE} version of A and values. The default method uses
+the \code{ibm_values} output to construct the subset indexing.
+}
+
+\itemize{
+\item \code{ibm_valid_input} Generic.
+Implementations must return a logical vector of length \code{NROW(input)} (
+or for \code{bru_mapper_multi} and \code{bru_mapper_collect} a list of such
+vectors)
+}
+
+\itemize{
 \item The default \code{ibm_n()} method returns a non-null element 'n' from the
 mapper object, and gives an error if it doesn't exist. If \code{inla_f=TRUE},
 first checks for a 'n_inla' element.
@@ -200,6 +257,13 @@ it doesn't exist.
 \itemize{
 \item The default \code{ibm_amatrix()} gives an error message.
 Mapper classes must implement their own \code{ibm_amatrix} method.
+}
+
+\itemize{
+\item The default \code{ibm_inla_subset} method uses
+the \code{ibm_values} output to construct the inla subset indexing, passing
+extra arguments such as \code{multi} on to the methods (this means it supports
+both regular vector values and \code{multi=1} data.frame values).
 }
 
 \itemize{
@@ -249,5 +313,7 @@ with unnamed but ordered columns.
 }
 }
 \seealso{
-\code{\link[=bru_mapper]{bru_mapper()}}
+\link{bru_mapper} for constructor methods, and
+\link{bru_get_mapper} for hooks to extract mappers from latent model object
+class objects.
 }
