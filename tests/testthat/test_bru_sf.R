@@ -21,7 +21,7 @@ test_that("sf gorillas lgcp vignette", {
   ## Build the mesh:
   mesh_sf <- INLA::inla.mesh.2d(
     boundary = boundary,
-    max.edge = c(0.24, 0.97),
+    max.edge = c(0.54, 0.97),
     min.angle = c(30, 21),
     max.n = c(48000, 16000),
     ## Safeguard against large meshes.
@@ -31,6 +31,11 @@ test_that("sf gorillas lgcp vignette", {
     ## Filter away adjacent points.
     offset = c(0.73, 1.55)
   ) ## Offset for extra boundaries, if needed.
+
+  # library(ggplot2)
+  # ggplot() +
+  #   gg(mesh_sf) +
+  #   geom_sf(data = gorillas_sf$boundary)
 
   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
                                       prior.sigma = c(0.1, 0.01),
