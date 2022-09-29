@@ -1,3 +1,5 @@
+local_bru_testthat_setup()
+
 test_that("sf gorillas lgcp vignette", {
 
   # Code adapted from the lgcp vignette with an additional mesh construction
