@@ -12,6 +12,8 @@
 * Enable both datum/ensemble container for ellipsoid information, to support
   `epsg:4326`. Fixes #154
   
+* Make duplicated component names an error instead of a warning. Relates to #155
+  
 # inlabru 2.5.3
 
 ## Features

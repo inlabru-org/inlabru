@@ -66,5 +66,6 @@ if (bru_safe_inla(quietly = TRUE)) {
 }
 }
 \seealso{
-\link{bru_mapper}
+\link{bru_mapper} for mapper constructor methods, and
+\link{bru_mapper_methods} for method generics and specific implementations.
 }
