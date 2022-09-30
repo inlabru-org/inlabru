@@ -87,7 +87,7 @@
       <img src="" class="logo" alt=""><h1>LGCPs - An example in one dimension</h1>
                         <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-09-21</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-09-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/1d_lgcp.Rmd" class="external-link"><code>vignettes/web/1d_lgcp.Rmd</code></a></small>
       <div class="d-none name"><code>1d_lgcp.Rmd</code></div>
@@ -220,7 +220,7 @@
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 130.2378 11.10208 113.6845 128.7869 155.1264 128.7869        1.110208     0.8163422</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 130.9643 11.64012 108.7091 130.3682 151.8941 130.3682        1.164012     0.7799853</span></span></code></pre></div>
 <ul>
 <li>
 <code>mean</code> is the posterior mean abundance.</li>
@@ -248,23 +248,23 @@
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    N         mean           sd       q0.025         q0.5       q0.975       median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 50 5.129224e-10 5.034690e-09 4.768490e-22 2.186629e-15 1.386743e-10 2.186629e-15    5.034690e-10</span></span>
-<span><span class="co">#&gt; 2 51 9.790880e-10 9.588220e-09 1.416929e-21 5.479565e-15 2.950552e-10 5.479565e-15    9.588220e-10</span></span>
-<span><span class="co">#&gt; 3 52 1.833514e-09 1.790892e-08 4.129437e-21 1.346741e-14 6.157289e-10 1.346741e-14    1.790892e-09</span></span>
-<span><span class="co">#&gt; 4 53 3.369888e-09 3.281915e-08 1.180783e-20 3.247501e-14 1.260711e-09 3.247501e-14    3.281915e-09</span></span>
-<span><span class="co">#&gt; 5 54 6.081183e-09 5.902916e-08 3.313905e-20 7.685936e-14 2.533588e-09 7.685936e-14    5.902916e-09</span></span>
-<span><span class="co">#&gt; 6 55 1.077882e-08 1.042404e-07 9.131669e-20 1.785975e-13 4.999191e-09 1.785975e-13    1.042404e-08</span></span>
+<span><span class="co">#&gt; 1 50 1.853402e-11 9.596368e-11 2.602710e-22 9.624484e-16 2.892113e-10 9.624484e-16    9.596368e-12</span></span>
+<span><span class="co">#&gt; 2 51 3.871375e-11 1.993602e-10 7.744051e-22 2.436856e-15 6.072765e-10 2.436856e-15    1.993602e-11</span></span>
+<span><span class="co">#&gt; 3 52 7.932915e-11 4.062280e-10 2.259924e-21 6.051326e-15 1.250672e-09 6.051326e-15    4.062280e-11</span></span>
+<span><span class="co">#&gt; 4 53 1.595288e-10 8.121996e-10 6.470886e-21 1.474349e-14 2.527245e-09 1.474349e-14    8.121996e-11</span></span>
+<span><span class="co">#&gt; 5 54 3.149530e-10 1.593942e-09 1.818584e-20 3.525604e-14 5.012479e-09 3.525604e-14    1.593942e-10</span></span>
+<span><span class="co">#&gt; 6 55 6.106725e-10 3.071490e-09 5.018244e-20 8.277504e-14 9.761312e-09 8.277504e-14    3.071490e-10</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1  2.517172e-09</span></span>
-<span><span class="co">#&gt; 2  4.793701e-09</span></span>
-<span><span class="co">#&gt; 3  8.953512e-09</span></span>
-<span><span class="co">#&gt; 4  1.640742e-08</span></span>
-<span><span class="co">#&gt; 5  2.950978e-08</span></span>
-<span><span class="co">#&gt; 6  5.210968e-08</span></span></code></pre></div>
+<span><span class="co">#&gt; 1  2.992963e-11</span></span>
+<span><span class="co">#&gt; 2  6.180708e-11</span></span>
+<span><span class="co">#&gt; 3  1.251850e-10</span></span>
+<span><span class="co">#&gt; 4  2.487736e-10</span></span>
+<span><span class="co">#&gt; 5  4.852315e-10</span></span>
+<span><span class="co">#&gt; 6  9.292569e-10</span></span></code></pre></div>
 <p>We compute the 95% prediction interval and the median as follows</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]  97.30194 126.94343 161.90530</span></span></code></pre></div>
+<span><span class="co">#&gt; [1]  99.87549 129.52850 163.39300</span></span></code></pre></div>
 <p>Compare <code>Lambda</code> to <code>Nest</code> by plotting: First calculate the posterior conditional on the mean of <code>Lambda</code></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">$</span><span class="va">plugin_estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, lambda <span class="op">=</span> <span class="va">Lambda</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span></code></pre></div>
