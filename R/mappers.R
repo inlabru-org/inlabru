@@ -1170,7 +1170,7 @@ ibm_amatrix.bru_mapper_harmonics <- function(mapper, input, inla_f = FALSE, ...)
 
 
 
-## mesh_B ####
+## _mesh_B ####
 
 #' @param B a square or tall basis conversion matrix
 #' @export
@@ -1178,8 +1178,7 @@ ibm_amatrix.bru_mapper_harmonics <- function(mapper, input, inla_f = FALSE, ...)
 bru_mapper_mesh_B <- function(mesh, B, ...) {
   stopifnot(nrow(B) >= ncol(B))
   mapper <- list(mapper = bru_mapper(mesh), B = B)
-  class(mapper) <- c("bru_mapper_mesh_B", "list")
-  bru_mapper.default(mapper)
+  bru_mapper_define(mapper, new_class = "bru_mapper_mesh_B")
 }
 
 #' @export
