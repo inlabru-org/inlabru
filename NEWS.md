@@ -1,20 +1,47 @@
 # inlabru (development version)
 
-* Propagate multi-likelihood A-matrix information instead of recomputing.
-  Fixes iteration issue for bym2 and other bru_mapper_collect models.
+## Feaures
   
-* Turn on predictor summaries during iterations to allow `inla.mode="classic"`
-  to use proper line search.
+* Add `bru_get_mapper` generic, and associated methods for `inla.spde` and
+  `inla.rgeneric` objects. This allows `inlabru` to automatically extract
+  the appropriate `bru_mapper` object for each model component, and can be used
+  as a hook by external packages implementing new INLA object classes.
+
+## Bug fixes
+
+* Enable both datum/ensemble container for ellipsoid information, to support
+  `epsg:4326`. Fixes #154
   
+* Make duplicated component names an error instead of a warning. Relates to #155
+  
+# inlabru 2.5.3
+
+## Features
+
 * Add `bru_mapper_harmonics` mapper for `cos` and `sin` basis sets.
 
 * Allow `predict()` input data to be be a list.
 
 * Allow arbitrary quantile summaries in `predict()`
 
-* Remove cv, var, smin, smax summaries from `predict()`
+* Remove `cv`, `var`, `smin`, `smax` summaries from `predict()`
 
 * Add `mean.mc_std_err` and `sd.mc_std_err` output to `predict()`
+
+* Add `robins_subset` data set and associated variable coefficient web vignette
+
+## Bug fixes
+
+* Propagate multi-likelihood A-matrix information instead of recomputing.
+  Fixes iteration issue for bym2 and other `bru_mapper_collect` models.
+  
+* Turn on predictor summaries during iterations to allow `inla.mode="classic"`
+  to use proper line search.
+  
+* Avoid deprecated Matrix (>=1.4-2) class coercion methods
+
+* Work around for lack of full Matrix and ModelMatrix support for the `unique`
+  method. Fixes #145
 
 # inlabru 2.5.2
 

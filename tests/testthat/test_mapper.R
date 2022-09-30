@@ -78,7 +78,7 @@ test_that("User defined mappers", {
   }
 
   bm_test <- function(n, ...) {
-    bru_mapper(
+    bru_mapper_define(
       list(n = n),
       new_class = "bm_test",
       methods = list(
@@ -129,7 +129,7 @@ test_that("User defined mappers 2", {
   .S3method("ibm_amatrix", "bm_test", ibm_amatrix.bm_test)
 
   bm_test <- function(n, ...) {
-    bru_mapper(
+    bru_mapper_define(
       list(n = n),
       new_class = "bm_test"
     )
@@ -198,7 +198,7 @@ test_that("mapper collection direct construction consistency", {
       dims = c(3, 4)
     )
   )
-  A <- as(A, "dgTMatrix")
+  A <- as(as(as(A, "dMatrix"), "generalMatrix"), "TsparseMatrix")
   expect_equal(ibm_amatrix(mapper, list_data), A)
   expect_equal(
     as(

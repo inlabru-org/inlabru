@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.5.2.9000
+Version: 2.5.3.9002
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -22,9 +22,11 @@ Authors@R: c(
   person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
          comment = "Andy Seaton provided testing and bugfixes"),
   person("Suen", "Man Ho", email = "M.H.Suen@sms.ed.ac.uk", role = c("ctb", "cph"),
-         comment = "Man Ho Suen contributed features for aggregated responses"),
+         comment = "Man Ho Suen contributed features for aggregated responses and vignett updates"),
   person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
-         comment = "Pierre Roudier contributed general quantile summaries")
+         comment = "Pierre Roudier contributed general quantile summaries"),
+  person("Meehan", "Tim", email = "tmeeha@gmail.com", role = c("ctb", "cph"),
+         comment = "Tim Meehan contributed the SVC vignette and robins data")
   )
 URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/
 BugReports: https://github.com/inlabru-org/inlabru/issues
@@ -42,7 +44,7 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Encoding: UTF-8
 Depends:
     methods,
@@ -69,12 +71,15 @@ Suggests:
     graphics,
     INLA (>= 21.08.31),
     knitr,
+    maps,
     maptools,
     mgcv,
     raster,
     RColorBrewer,
     rgl,
     rmarkdown,
+    scales,
+    sf,
     shiny,
     sn,
     spatstat.geom,
@@ -82,7 +87,9 @@ Suggests:
     spatstat.data,
     spatstat (>= 2.0-0),
     sphereplot,
-    testthat
+    splancs,
+    testthat,
+    tidyr
 Roxygen: list(markdown = TRUE)
 Config/testthat/parallel: true
 Config/testthat/edition: 3
@@ -100,6 +107,7 @@ Collate:
     'data.gorillas.R'
     'data.mexdolphin.R'
     'data.mrsea.R'
+    'data.robins_subset.R'
     'data.seals.R'
     'data.shrimp.R'
     'data.toygroups.R'
@@ -134,3 +142,4 @@ Collate:
     'utils.R'
 VignetteBuilder: knitr
 BuildVignettes: true
+LazyData: false

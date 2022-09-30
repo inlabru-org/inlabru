@@ -1507,21 +1507,19 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
 
 
 
-
 lin_predictor <- function(lin, state) {
   do.call(
     c,
     lapply(
       lin,
       function(x) {
-        as.vector(
-          x$offset + Matrix::rowSums(do.call(
-            cbind,
-            lapply(names(x$A), function(xx) {
-              x[["A"]][[xx]] %*% state[[xx]]
-            })
-          ))
-        )
+        Ax_list <-
+          lapply(names(x$A), function(xx) {
+            x[["A"]][[xx]] %*% state[[xx]]
+          })
+        Ax <- do.call(cbind, Ax_list)
+        sumAx <- Matrix::rowSums(Ax)
+        as.vector(x$offset) + as.vector(sumAx)
       }
     )
   )

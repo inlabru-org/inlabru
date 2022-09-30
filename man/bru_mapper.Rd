@@ -2,13 +2,8 @@
 % Please edit documentation in R/mappers.R
 \name{bru_mapper}
 \alias{bru_mapper}
-\alias{ibm_n}
-\alias{ibm_values}
-\alias{ibm_amatrix}
-\alias{ibm_inla_subset}
-\alias{ibm_valid_input}
+\alias{bru_mapper_define}
 \alias{bru_mapper.default}
-\alias{ibm_inla_subset.default}
 \alias{bru_mapper.inla.mesh}
 \alias{bru_mapper.inla.mesh.1d}
 \alias{bru_mapper_index}
@@ -20,23 +15,13 @@
 \alias{bru_mapper_collect}
 \alias{bru_mapper_harmonics}
 \alias{bru_mapper_mesh_B}
-\title{Methods for \code{bru_mapper} objects}
+\title{Constructors for \code{bru_mapper} objects}
 \usage{
 bru_mapper(...)
 
-ibm_n(mapper, inla_f = FALSE, ...)
+bru_mapper_define(mapper, new_class = NULL, methods = NULL, ...)
 
-ibm_values(mapper, inla_f = FALSE, ...)
-
-ibm_amatrix(mapper, input, inla_f = FALSE, ...)
-
-ibm_inla_subset(mapper, ...)
-
-ibm_valid_input(mapper, input, inla_f = FALSE, ...)
-
-\method{bru_mapper}{default}(mapper, new_class = NULL, methods = NULL, ...)
-
-\method{ibm_inla_subset}{default}(mapper, ...)
+\method{bru_mapper}{default}(...)
 
 \method{bru_mapper}{inla.mesh}(mesh, ...)
 
@@ -69,22 +54,13 @@ bru_mapper_mesh_B(mesh, B, ...)
 \arguments{
 \item{\dots}{Arguments passed on to other methods}
 
-\item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}.
-For the default \code{bru_mapper} method, a list that will be converted to a
-\code{bru_mapper} object by adding class information and (optional) methods.}
-
-\item{inla_f}{logical; when \code{TRUE} in \code{ibm_n}, \code{ibm_values}, and
-\code{ibm_amatrix} methods, these must result in values compatible with \code{INLA::f(...)}
-an specification and corresponding \code{INLA::inla.stack(...)} constructions.
-Implementations do not normally need to do anything different, except
-for mappers of the type needed for hidden multicomponent models such
-as "bym2", which can be handled by \code{bru_mapper_collect}.}
-
-\item{input}{The values for which to produce validity information}
+\item{mapper}{For the \code{bru_mapper_define} method, normally a
+list that will be converted to a \code{bru_mapper} object by adding
+class information and (optional) methods.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
-\item{methods, }{optional \code{list} of named method definitions; See Details.}
+\item{methods}{Optional \code{list} of named method definitions; See Details.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
@@ -131,56 +107,21 @@ Default \code{c(0, 1)}.}
 \item{B}{a square or tall basis conversion matrix}
 }
 \description{
-Methods for \code{bru_mapper} objects
+Constructors for \code{bru_mapper} objects
 }
 \details{
 \itemize{
-\item \code{bru_mapper} Generic mapper S3 constructor. See below for details of the
-default constructor that can be used to define new mappers in user code.
+\item \code{bru_mapper} Generic mapper S3 constructor, used for constructing
+mappers for special objects. See below for details of the
+default constructor \code{\link[=bru_mapper_define]{bru_mapper_define()}} that can be used to define
+new mappers in user code.
 }
 
 \itemize{
-\item \code{ibm_n} Generic. Implementations must return the size of the latent vector
-being mapped to.
-}
-
-\itemize{
-\item \code{ibm_values} Generic. Implementations must return a vector that
-would be interpretable by an \code{INLA::f(..., values = ...)} specification.
-The exception is the method for \code{bru_mapper_multi}, that returns a
-multi-column data frame
-}
-
-\itemize{
-\item \code{ibm_amatrix} Generic.
-Implementations must return a (sparse) matrix of size \code{NROW(input)}
-(except for the \code{bru_mapper_multi} and \code{bru_mapper_collect} methods,
-that require \code{list()} inputs, and the input size is determined by the
-combined inputs)
-by \code{ibm_n(mapper, inla_f = FALSE)}. The \code{inla_f=TRUE} argument should only affect
-the allowed type of input format.
-}
-
-\itemize{
-\item \code{ibm_inla_subset} Generic.
-Implementations must return a logical vector of \code{TRUE/FALSE} for
-the subset such that, given the full A matrix and values output,
-\code{A[, subset, drop = FALSE]} and \code{values[subset]}
-(or \code{values[subset, , drop = FALSE]} for data.frame values) are equal
-to the \code{inla_f = TRUE} version of A and values. The default method uses
-the \code{ibm_values} output to construct the subset indexing.
-}
-
-\itemize{
-\item \code{ibm_valid_input} Generic.
-Implementations must return a logical vector of length \code{NROW(input)} (
-or for \code{bru_mapper_multi} and \code{bru_mapper_collect} a list of such
-vectors)
-}
-
-\itemize{
-\item \code{bru_mapper.default} adds the "bru_mapper" class and \code{new_class}
-to an object. If provided, mapper method functions are added to an environment
+\item \code{bru_mapper_define} adds the \code{new_class} and "bru_mapper" class
+names to the inheritance list for the input \code{mapper} object, unless the object
+already inherits from these.
+If provided, mapper method functions are added to an environment
 \code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_n_inla},
 \code{ibm_values}, \code{ibm_values_inla},
 \code{ibm_amatrix}, \code{ibm_amatrix_inla},
@@ -192,10 +133,10 @@ to register the methods, e.g.
 }
 
 \itemize{
-\item The default \code{ibm_inla_subset} method uses
-the \code{ibm_values} output to construct the inla subset indexing, passing
-extra arguments such as \code{multi} on to the methods (this means it supports
-both regular vector values and \code{multi=1} data.frame values).
+\item \code{bru_mapper.default} calls \code{bru_mapper_define}, passing all
+arguments along. Mapper implementations should call \code{\link[=bru_mapper_define]{bru_mapper_define()}}
+instead, and supply at least a \code{new_class} class name.
+Use of the \code{bru_mapper.default} will be deprecated from version 2.6.0.
 }
 
 \itemize{
@@ -238,5 +179,7 @@ mapper <- bru_mapper_index(5)
 ibm_amatrix(mapper, c(1, 3, 4, 5, 2))
 }
 \seealso{
-\link{bru_mapper_methods} for specific method implementations.
+\link{bru_mapper_methods} for specific method implementations, and
+\link{bru_get_mapper} for hooks to extract mappers from latent model object
+class objects.
 }
