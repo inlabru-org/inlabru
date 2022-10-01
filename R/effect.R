@@ -1759,21 +1759,19 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       # that are likely to happen for multilikelihood models; A component only
       # needs to be evaluable for at least one of the likelihoods.
     }
-  } else if (inherits(emap, "SpatialGridDataFrame") |
-    inherits(emap, "SpatialPixelsDataFrame")) {
-    if (is.null(input[["selector"]])) {
-      layer <-
-        if (is.null(input[["layer"]])) {
-          1
-        } else {
-          input[["layer"]]
-        }
-    }
-    val <- eval_SpatialDF(
+  } else if (inherits(emap,
+                      c("SpatialGridDataFrame",
+                        "SpatialPixelsDataFrame",
+                        "SpatRaster"))) {
+    layer <- extract_layer(data,
+                           input[["layer"]],
+                           input[["selector"]])
+    check_layer(emap, data, layer)
+    val <- eval_spatial(
       emap,
       data,
       layer = layer,
-      selector = input[["selector"]]
+      selector = NULL
     )
     #  } else if ((input$label == "offset") &&
     #    is.numeric(emap) &&
@@ -1793,9 +1791,10 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   # to fix that by filling in nearest neighbour values.
   # # TODO: Check how to deal with this fully in the case of multilikelihood models
   # Answer: should respect the lhood "include/exclude" info for the component list
-  if ((inherits(emap, "SpatialGridDataFrame") ||
-    inherits(emap, "SpatialPixelsDataFrame")) &&
-    any(is.na(as.data.frame(val)))) {
+  if ((inherits(emap, c("SpatialGridDataFrame",
+                        "SpatialPixelsDataFrame",
+                        "SpatRaster"))) &&
+      any(is.na(as.data.frame(val)))) {
     warning(
       paste0(
         "Model input '",
@@ -1809,7 +1808,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 
     val <- bru_fill_missing(
       data = emap, where = data, values = val,
-      layer = layer, selector = input[["selector"]]
+      layer = layer, selector = NULL
     )
   }
 

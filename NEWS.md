@@ -6,6 +6,8 @@
   `inla.rgeneric` objects. This allows `inlabru` to automatically extract
   the appropriate `bru_mapper` object for each model component, and can be used
   as a hook by external packages implementing new INLA object classes.
+  
+* (Partial) `terra` support for covariate inputs
 
 ## Bug fixes
 

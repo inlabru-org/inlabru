@@ -49,7 +49,7 @@ bru_mapper_harmonics(
 )
 }
 \arguments{
-\item{\dots}{Arguments passed on to other methods}
+\item{\dots}{Deprecated, alternative way to supply optional method definitions.}
 
 \item{mapper}{For the \code{bru_mapper_define} method, normally a
 list that will be converted to a \code{bru_mapper} object by adding
