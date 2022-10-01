@@ -194,11 +194,13 @@ eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
 }
 
 eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
+  .Deprecated("eval_spatial")
   eval_spatial.Spatial(data = data,
                        where = where,
                        layer = layer,
                        selector = selector)
 }
+#' @export
 eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
   stopifnot(inherits(
     data,
@@ -228,7 +230,7 @@ eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
 }
 
 
-
+#' @export
 eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) {
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
