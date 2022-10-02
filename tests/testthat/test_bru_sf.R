@@ -10,10 +10,20 @@ test_that("sf gorillas lgcp vignette", {
   data(gorillas, package = "inlabru")
   gorillas_sf = list()
   gorillas_sf$nests = sf::st_as_sf(gorillas$nests)
-  gorillas_sf$boundary = sf::st_as_sf(gorillas$boundary)
+
+  # Bug in st_as_sf making check_ring_dir=TRUE have no effect, as st_as_sfc.SpatialPolygons
+  # ignores it. To get around it, need to convert to sfc_POLYGON first, and then do a separate
+  # st_sfc call, which does use check_ring_dir.
+  # No effect:
+  b1 <- sf::st_as_sf(gorillas$boundary, check_ring_dir = TRUE)
+  # st_sfc gives the proper effect:
+  b2 <- b1
+  b2$geometry <- sf::st_sfc(sf::st_geometry(b2$geometry), check_ring_dir = TRUE)
+
+  gorillas_sf$boundary <- b2
 
   ## Build boundary information:
-  ## (fmesher supports SpatialPolygons, but this app is not (yet) intelligent enough for that.)
+  ## inla.mesh.2d doesn't support sf yet.
   boundary <- list(
     fm_as_inla_mesh_segment(gorillas_sf$boundary),
     NULL)
@@ -35,7 +45,7 @@ test_that("sf gorillas lgcp vignette", {
   # library(ggplot2)
   # ggplot() +
   #   gg(mesh_sf) +
-  #   geom_sf(data = gorillas_sf$boundary)
+  #   geom_sf(data = gorillas_sf$boundary, alpha = 0.2, fill = "blue")
 
   matern <- INLA::inla.spde2.pcmatern(mesh_sf,
                                       prior.sigma = c(0.1, 0.01),
@@ -45,14 +55,17 @@ test_that("sf gorillas lgcp vignette", {
   # Using sf::st_coordinates here did not seem to parse correctly
   # and the domain definition in the lgcp() call was expecting a
   # domain named sf.
-  cmp <- st_coordinates ~ mySmooth(main = coordinates, model = matern) +
+  # FL: st_coordinates produces a matrix with both coordinates and some labelling columns,
+  # so is not a proper equivalent of sp::coordinates. But the geometry column
+  # makes sense to use.
+  cmp <- geometry ~ mySmooth(geometry, model = matern) +
     Intercept(1)
 
   fit <- lgcp(
     cmp,
     data = gorillas_sf$nests,
     samplers = gorillas_sf$boundary,
-    domain = list(st_coordinates = mesh_sf)
+    domain = list(geometry = mesh_sf)
   )
 
 })

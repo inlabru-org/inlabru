@@ -9,6 +9,10 @@
   
 * (Partial) `terra` support for covariate inputs
 
+* The component `*_layer` arguments are now evaluated in the data context,
+  to allow dynamic layer selection for spatial raster covariates.
+  This makes the `*_selector` arguments redundant.
+
 ## Bug fixes
 
 * Enable both datum/ensemble container for ellipsoid information, to support

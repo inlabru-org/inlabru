@@ -63,13 +63,15 @@ and to the latent variables. Auto-detects spde model objects in model and
 extracts the mesh object to use as the mapper, and auto-generates mappers
 for indexed models. (Default: NULL, for auto-determination)}
 
-\item{main_layer, main_selector}{The \verb{_layer} is a numeric index or character name of which
-layer/variable to extract from a covariate data object given in \code{main}
-(Default: The effect component name, if it exists i the covariate object,
+\item{main_layer, main_selector}{The \verb{_layer} input should evaluate to a numeric index or character name or
+vector of which
+layer/variable to extract from a covariate data object given in \code{main}.
+(Default: The effect component name, if it exists in the covariate object,
 otherwise the first column of the covariate data frame)
 
-The \verb{_selector} is character name of a variable whose contents determines which layer to
-extract from a covariate for each data point. Overrides the \code{layer}.
+The \verb{_selector} (deprecated since v2.5.6) is character name of a variable
+whose contents determines which layer to extract from a covariate for each
+data point. From v2.5.6, replace \verb{_selector="name"} with \verb{_layer=name}.
 (Default: NULL)}
 
 \item{n}{The number of latent variables in the model. Should be auto-detected

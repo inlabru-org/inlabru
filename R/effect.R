@@ -173,13 +173,15 @@ component <- function(...) {
 #' extracts the mesh object to use as the mapper, and auto-generates mappers
 #' for indexed models. (Default: NULL, for auto-determination)
 #' @param main_layer,main_selector
-#' The `_layer` is a numeric index or character name of which
-#' layer/variable to extract from a covariate data object given in `main`
-#' (Default: The effect component name, if it exists i the covariate object,
+#' The `_layer` input should evaluate to a numeric index or character name or
+#' vector of which
+#' layer/variable to extract from a covariate data object given in `main`.
+#' (Default: The effect component name, if it exists in the covariate object,
 #' otherwise the first column of the covariate data frame)
 #'
-#' The `_selector` is character name of a variable whose contents determines which layer to
-#' extract from a covariate for each data point. Overrides the `layer`.
+#' The `_selector` (deprecated since v2.5.6) is character name of a variable
+#' whose contents determines which layer to extract from a covariate for each
+#' data point. From v2.5.6, replace `_selector="name"` with `_layer=name`.
 #' (Default: NULL)
 #' @param n The number of latent variables in the model. Should be auto-detected
 #' for most or all models (Default: NULL, for auto-detection).
@@ -311,11 +313,6 @@ component.character <- function(object,
     group_model <- "exchangeable"
   }
 
-  if (is.null(main_layer)) {
-    main_layer <- label
-  }
-
-
   if ("map" %in% names(sys.call())) {
     #    if (!is.null(substitute(map))) {
     if (is.null(substitute(main))) {
@@ -367,7 +364,7 @@ component.character <- function(object,
       input = bru_input(
         substitute(main),
         label = label,
-        layer = main_layer,
+        layer = substitute(main_layer),
         selector = main_selector
       ),
       mapper = mapper,
@@ -380,7 +377,7 @@ component.character <- function(object,
       input = bru_input(
         substitute(group),
         label = paste0(label, ".group"),
-        layer = group_layer,
+        layer = substitute(group_layer),
         selector = group_selector
       ),
       mapper = group_mapper,
@@ -391,7 +388,7 @@ component.character <- function(object,
       input = bru_input(
         substitute(replicate),
         label = paste0(label, ".repl"),
-        layer = replicate_layer,
+        layer = substitute(replicate_layer),
         selector = replicate_selector
       ),
       mapper = replicate_mapper,
@@ -405,7 +402,7 @@ component.character <- function(object,
         bru_input(
           substitute(weights),
           label = paste0(label, ".weights"),
-          layer = weights_layer,
+          layer = substitute(weights_layer),
           selector = weights_selector
         )
       },
@@ -1629,7 +1626,6 @@ input_eval.component <- function(component,
         component[[part]]$input,
         data,
         env = component$env,
-        label = part,
         ...
       )
   }
@@ -1639,7 +1635,6 @@ input_eval.component <- function(component,
         component[["weights"]],
         data,
         env = component$env,
-        label = paste(component$label, "(weights)"),
         ...
       )
   }
@@ -1662,10 +1657,37 @@ input_eval.component_list <-
 
 
 
+input_eval_layer <- function(layer, selector = NULL, envir, enclos,
+                             label,
+                             e_input) {
+  input_layer <- tryCatch(
+    eval(layer, envir = envir, enclos = enclos),
+    error = function(e) {
+      e
+    }
+  )
+  if (inherits(input_layer, "error")) {
+    stop(paste0(
+      "Failed to evaluate 'layer' input '",
+      deparse(layer),
+      "' for '",
+      paste0(label, ":layer"),
+      "'."
+    ))
+  }
+  if (is.null(input_layer) && is.null(selector)) {
+    if (label %in% names(e_input)) {
+      input_layer <- label
+    }
+  }
+  input_layer
+}
+
+
 #' @export
 #' @rdname input_eval
 
-input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
+input_eval.bru_input <- function(input, data, env = NULL,
                                  null.on.fail = FALSE, ...) {
 
   # Evaluate the map with the data in an environment
@@ -1688,7 +1710,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   }
   assign(".data.", data, envir = envir)
 
-  emap <- tryCatch(eval(input$input, envir = envir, enclos = enclos),
+  e_input <- tryCatch(eval(input$input, envir = envir, enclos = enclos),
     error = function(e) {
     }
   )
@@ -1709,15 +1731,15 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   # ## A matrix.
   #  n <- nrow(as.data.frame(data))
 
-  if (is.null(emap)) {
+  if (is.null(e_input)) {
     if (null.on.fail) {
       return(NULL)
     }
     #    val <- rep(1, n)
     val <- 1
-  } else if (is.function(emap)) {
+  } else if (is.function(e_input)) {
     # Allow but detect failures:
-    val <- tryCatch(emap(data),
+    val <- tryCatch(e_input(data),
       error = function(e) {
       }
     )
@@ -1747,9 +1769,9 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
         }
       )
     }
-  } else if (inherits(emap, "formula")) {
+  } else if (inherits(e_input, "formula")) {
     # Allow but detect failures:
-    val <- tryCatch(MatrixModels::model.Matrix(emap, data = data, sparse = TRUE),
+    val <- tryCatch(MatrixModels::model.Matrix(e_input, data = data, sparse = TRUE),
       error = function(e) {
       }
     )
@@ -1759,26 +1781,35 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       # that are likely to happen for multilikelihood models; A component only
       # needs to be evaluable for at least one of the likelihoods.
     }
-  } else if (inherits(emap,
+  } else if (inherits(e_input,
                       c("SpatialGridDataFrame",
                         "SpatialPixelsDataFrame",
                         "SpatRaster"))) {
+    input_layer <-
+      input_eval_layer(
+        layer = input[["layer"]],
+        selector = input[["selector"]],
+        envir = envir,
+        enclos = enclos,
+        label = input[["label"]],
+        e_input = e_input
+      )
     layer <- extract_layer(data,
-                           input[["layer"]],
+                           input_layer,
                            input[["selector"]])
-    check_layer(emap, data, layer)
+    check_layer(e_input, data, layer)
     val <- eval_spatial(
-      emap,
+      e_input,
       data,
       layer = layer,
       selector = NULL
     )
     #  } else if ((input$label == "offset") &&
-    #    is.numeric(emap) &&
-    #    (length(emap) == 1)) {
-    #    val <- rep(emap, n)
+    #    is.numeric(e_input) &&
+    #    (length(e_input) == 1)) {
+    #    val <- rep(e_input, n)
   } else {
-    val <- emap
+    val <- e_input
   }
 
   # ## Need to allow different sizes; K %*% effect needs to have same length as response, but the input and effect effect itself doesn't.
@@ -1791,7 +1822,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   # to fix that by filling in nearest neighbour values.
   # # TODO: Check how to deal with this fully in the case of multilikelihood models
   # Answer: should respect the lhood "include/exclude" info for the component list
-  if ((inherits(emap, c("SpatialGridDataFrame",
+  if ((inherits(e_input, c("SpatialGridDataFrame",
                         "SpatialPixelsDataFrame",
                         "SpatRaster"))) &&
       any(is.na(as.data.frame(val)))) {
@@ -1799,7 +1830,8 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       paste0(
         "Model input '",
         deparse(input$input),
-        "' for '", label, "' returned some NA values.\n",
+        "' for '", input$label,
+        "' returned some NA values.\n",
         "Attempting to fill in spatially by nearest available value.\n",
         "To avoid this basic covariate imputation, supply complete data."
       ),
@@ -1807,7 +1839,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
     )
 
     val <- bru_fill_missing(
-      data = emap, where = data, values = val,
+      data = e_input, where = data, values = val,
       layer = layer, selector = NULL
     )
   }

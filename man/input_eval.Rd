@@ -13,7 +13,7 @@ input_eval(...)
 
 \method{input_eval}{component_list}(components, data, ...)
 
-\method{input_eval}{bru_input}(input, data, env = NULL, label = NULL, null.on.fail = FALSE, ...)
+\method{input_eval}{bru_input}(input, data, env = NULL, null.on.fail = FALSE, ...)
 }
 \arguments{
 \item{...}{Unused.}
