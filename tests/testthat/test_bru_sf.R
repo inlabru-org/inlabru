@@ -1,6 +1,9 @@
 local_bru_testthat_setup()
 
 test_that("sf gorillas lgcp vignette", {
+  skip_on_cran()
+  local_bru_safe_inla()
+  skip_if_not_installed("sf")
 
   # Code adapted from the lgcp vignette with an additional mesh construction
   # step instead of using the mesh provided in the gorillas data.
@@ -60,6 +63,10 @@ test_that("sf gorillas lgcp vignette", {
   # makes sense to use.
   cmp <- geometry ~ mySmooth(geometry, model = matern) +
     Intercept(1)
+
+  # Check integration construction
+  ips_sp <- ipoints(gorillas$boundary, mesh_sf)
+  ips_sf <- ipoints(gorillas_sf$boundary, mesh_sf)
 
   fit <- lgcp(
     cmp,
