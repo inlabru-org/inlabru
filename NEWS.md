@@ -2,16 +2,15 @@
 
 ## Feaures
   
-* Add `bru_get_mapper` generic, and associated methods for `inla.spde` and
+* Added `bru_get_mapper` generic, and associated methods for `inla.spde` and
   `inla.rgeneric` objects. This allows `inlabru` to automatically extract
   the appropriate `bru_mapper` object for each model component, and can be used
   as a hook by external packages implementing new INLA object classes.
   
-* (Partial) `terra` support for covariate inputs
+* Added `terra` support for covariate inputs
 
 * The component `*_layer` arguments are now evaluated in the data context,
   to allow dynamic layer selection for spatial raster covariates.
-  This makes the `*_selector` arguments redundant.
 
 ## Bug fixes
 

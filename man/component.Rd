@@ -66,13 +66,13 @@ for indexed models. (Default: NULL, for auto-determination)}
 \item{main_layer, main_selector}{The \verb{_layer} input should evaluate to a numeric index or character name or
 vector of which
 layer/variable to extract from a covariate data object given in \code{main}.
-(Default: The effect component name, if it exists in the covariate object,
-otherwise the first column of the covariate data frame)
+(Default: NULL if \verb{_selector} is given. Otherwise the effect component name,
+if it exists in the covariate object, and otherwise the first column of
+the covariate data frame)
 
-The \verb{_selector} (deprecated since v2.5.6) is character name of a variable
+The \verb{_selector} value should be a character name of a variable
 whose contents determines which layer to extract from a covariate for each
-data point. From v2.5.6, replace \verb{_selector="name"} with \verb{_layer=name}.
-(Default: NULL)}
+data point. (Default: NULL)}
 
 \item{n}{The number of latent variables in the model. Should be auto-detected
 for most or all models (Default: NULL, for auto-detection).

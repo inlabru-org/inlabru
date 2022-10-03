@@ -150,20 +150,24 @@ check_layer <- function(data, where, layer) {
 
 
 extract_selector <- function(where, selector) {
+  if (is.null(selector)) {
+    return(NULL)
+  }
   if (inherits(where, "SpatVector")) {
     layer <- terra::values(where)[[selector]]
   } else {
     layer <- where[[selector]]
   }
   if (is.null(layer)) {
-    stop("'selector' is non-null, but not such label found in the 'where' object")
+    stop("'selector' is non-null, but no such label found in the 'where' object")
   }
   layer
 }
 
 extract_layer <- function(where, layer, selector) {
   if (!is.null(layer) && !is.null(selector)) {
-    warning("Both layer and selector specified. Ignoring selector", immediate. = TRUE)
+    warning("Both layer and selector specified. Ignoring selector",
+            immediate. = TRUE)
     selector <- NULL
     if (length(layer) == 1) {
       layer <- rep(layer, NROW(where))
@@ -240,7 +244,13 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
   val <- terra::extract(
     data,
     where,
-    layer = layer)[["value"]]
+    ID = FALSE,
+    layer = layer)
+  if (terra::nlyr(data) == 1) {
+    val <- val[[1]]
+  } else {
+    val <- val[["value"]]
+  }
   val
 }
 

@@ -79,14 +79,82 @@ test_that("Component construction: duplicate detection", {
 test_that("Component construction: offset", {
   cmp <- component_list(~ something(a, model = "offset"))
   val <- evaluate_effect_single(cmp[["something"]],
-    data = data.frame(a = 11:15),
-    state = NULL
+                                data = data.frame(a = 11:15),
+                                state = NULL
   )
   expect_equal(
     val,
     11:15,
     ignore_attr = TRUE
   )
+})
+
+
+
+test_that("Component construction: terra", {
+  skip_if_not_installed("sf")
+  skip_if_not_installed("terra")
+
+  f <- system.file("ex/elev.tif", package = "terra")
+  r <- terra::rast(f)
+
+  data <- sf::st_sf(data.frame(geometry = sf::st_sfc(sf::st_point(cbind(6, 50)),
+                                                     crs = "epsg:4326")))
+
+  expect_equal(eval_spatial(r, data), 406)
+
+  cmp <- component_list(~ something(eval_spatial(r, geometry), model = "linear"),
+                        lhoods = list(list(data = data)))
+  val <- evaluate_effect_single(cmp[["something"]],
+                                data = data,
+                                state = 2
+  )
+  expect_equal(
+    val,
+    2 * 406
+  )
+
+  cmp <- component_list(~ something(r, model = "linear"),
+                        lhoods = list(list(data = data)))
+  val <- evaluate_effect_single(cmp[["something"]],
+                                data = data,
+                                state = 2
+  )
+  expect_equal(
+    val,
+    2 * 406
+  )
+
+  cmp <- component_list(~ something(r, model = "linear", main_layer = 1),
+                        lhoods = list(list(data = data)))
+  val <- evaluate_effect_single(cmp[["something"]],
+                                data = data,
+                                state = 2
+  )
+  expect_equal(
+    val,
+    2 * 406
+  )
+
+  cmp <- component_list(~ something(r, model = "linear", main_layer = "elevation"),
+                        lhoods = list(list(data = data)))
+  val <- evaluate_effect_single(cmp[["something"]],
+                                data = data,
+                                state = 2
+  )
+  expect_equal(
+    val,
+    2 * 406
+  )
+
+  expect_error(component_list(~ something(r, model = "linear", main_layer = 2),
+                              lhoods = list(list(data = data))),
+               NULL)
+
+  expect_error(component_list(~ something(r, model = "linear", main_layer = "elev"),
+                              lhoods = list(list(data = data))),
+               NULL)
+
 })
 
 

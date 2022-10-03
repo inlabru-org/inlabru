@@ -176,13 +176,13 @@ component <- function(...) {
 #' The `_layer` input should evaluate to a numeric index or character name or
 #' vector of which
 #' layer/variable to extract from a covariate data object given in `main`.
-#' (Default: The effect component name, if it exists in the covariate object,
-#' otherwise the first column of the covariate data frame)
+#' (Default: NULL if `_selector` is given. Otherwise the effect component name,
+#'  if it exists in the covariate object, and otherwise the first column of
+#'  the covariate data frame)
 #'
-#' The `_selector` (deprecated since v2.5.6) is character name of a variable
+#' The `_selector` value should be a character name of a variable
 #' whose contents determines which layer to extract from a covariate for each
-#' data point. From v2.5.6, replace `_selector="name"` with `_layer=name`.
-#' (Default: NULL)
+#' data point. (Default: NULL)
 #' @param n The number of latent variables in the model. Should be auto-detected
 #' for most or all models (Default: NULL, for auto-detection).
 #' An error is given if it can't figure it out by itself.
