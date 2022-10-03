@@ -335,7 +335,14 @@ ibm_amatrix.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  if (!is.matrix(input) && !inherits(input, "Spatial")) {
+  if (inherits(input, "sfc_POINT")) {
+    # TODO: Add direct sf support to inla.spde.make.A,
+    # to support crs passthrough.
+    A <- sf::st_coordinates(input)
+    nm <- intersect(colnames(A), c("X", "Y", "Z"))
+    input <- as.matrix(A[, nm, drop = FALSE])
+
+  } else if (!is.matrix(input) && !inherits(input, "Spatial")) {
     input <- as.matrix(input)
   }
   INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
@@ -493,6 +500,10 @@ ibm_amatrix.bru_mapper_matrix <- function(mapper, input, ...) {
   } else if (inherits(input, "Spatial")) {
     A <- sp::coordinates(input)
     A <- as(A, "Matrix")
+  } else if (inherits(input, "sfc_POINT")) {
+    A <- sf::st_coordinates(input)
+    nm <- intersect(colnames(A), c("X", "Y", "Z", "M"))
+    A <- as(A[, nm, drop = FALSE], "Matrix")
   } else {
     A <- as(input, "Matrix")
   }
@@ -503,6 +514,7 @@ ibm_amatrix.bru_mapper_matrix <- function(mapper, input, ...) {
       " columns."
     ))
   }
+  colnames(A) <- mapper$labels
   A
 }
 
