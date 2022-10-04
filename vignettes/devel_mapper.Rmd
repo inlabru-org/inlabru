@@ -5,6 +5,8 @@ vignette: >
   %\VignetteIndexEntry{Devel: Customised model components with the bru_mapper system}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+header-includes:
+  - \newcommand{\bm}[1]{\boldsymbol{#1}}
 ---
 
 ```{r, include = FALSE}
@@ -108,9 +110,17 @@ for a model component that takes input covariates with values $a_{ij}$,
 $i=1,\dots,m$ and $j=1,\dots,p$,
 in a `matrix` or `data.frame` and evaluates a full quadratic expression
 $$
-\eta_i = x_0 + \sum_{j=1}^p a_{ij} x_j +  \sum_{j=1}^p\sum_{k=1}^j a_{ij}a_{ik} x_{j,k},
+\eta_i = x_0 + \sum_{j=1}^p a_{ij} x_j +
+  \frac{1}{2}\sum_{j=1}^p\sum_{k=1}^j \gamma_{j,k} a_{ij}a_{ik} x_{j,k},
 $$
-where the latent component vector is $[x_0,x_1,\dots,x_p,x_{1,1},\dots,x_{p,1},x_{2,2}\dots,x_{p,p}]$.
+where the latent component vector is $\bm{x}=[x_0,x_1,\dots,x_p,x_{1,1},\dots,x_{p,1},x_{2,2}\dots,x_{p,p}]$,
+and
+$$
+\gamma_{j,k} = \begin{cases}
+1, & j = k,\\
+2, & j > k.
+\end{cases}
+$$
 
 We start with the constructor method. Like the `bru_mapper_matrix`, we require the user to supply
 a vector of covariate labels, and store them as a character vector. We also
@@ -179,6 +189,7 @@ ibm_amatrix.bru_mapper_p_quadratic <- function(mapper, input, ...) {
   for (k in seq_len(p)) {
     idx <- idx + 1
     A[[idx]] <- in_[, seq(k, p, by = 1), drop = FALSE] * in_[, k]
+    A[[idx]][, k] <- A[[idx]][, k] / 2
   }
   A <- do.call(cbind, A)
   colnames(A) <- as.character(ibm_values(mapper))
