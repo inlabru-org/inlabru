@@ -2,6 +2,7 @@ pandoc: 2.14.2
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
+  devel_mapper: devel_mapper.html
   linearapprox: linearapprox.html
   method: method.html
   1d_lgcp: web/1d_lgcp.html
@@ -16,5 +17,5 @@ articles:
   random_fields_2d: web/random_fields_2d.html
   svc: web/svc.html
   website_examples: website_examples.html
-last_built: 2022-10-01T20:58Z
+last_built: 2022-10-04T21:35Z
 
