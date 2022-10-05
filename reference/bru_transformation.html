@@ -26,6 +26,7 @@ distributions in predictor expressions"><!-- mathjax --><script src="https://cdn
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/components_vignette.html">Defining model components</a>
     <a class="dropdown-item" href="../articles/devel_mapper.html">Devel: Customised model components with the bru_mapper system</a>
     <a class="dropdown-item" href="../articles/linearapprox.html">Nonlinear model approximation</a>
     <a class="dropdown-item" href="../articles/method.html">Iterative linearised INLA method</a>
@@ -114,11 +115,14 @@ and inverse calculations use lower tails only, potentially losing accuracy in th
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="co"># EXAMPLE1</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">u</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">bru_forward_transformation</span><span class="op">(</span><span class="va">qexp</span>, <span class="va">u</span>, rate <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu">bru_inverse_transformation</span><span class="op">(</span><span class="va">pexp</span>, <span class="va">y</span>, rate <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">u</span>, <span class="va">y</span>, <span class="va">v</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       [,1]      [,2]       [,3]      [,4]        [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> u 1.593121 0.3647994 -0.5737870 0.4334518 -1.26986347</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> y 1.445087 0.5141274  0.1663787 0.5507934  0.05382971</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> v 1.593121 0.3647994 -0.5737870 0.4334518 -1.26986347</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

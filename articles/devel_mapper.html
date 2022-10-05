@@ -41,6 +41,7 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/components_vignette.html">Defining model components</a>
     <a class="dropdown-item" href="../articles/devel_mapper.html">Devel: Customised model components with the bru_mapper system</a>
     <a class="dropdown-item" href="../articles/linearapprox.html">Nonlinear model approximation</a>
     <a class="dropdown-item" href="../articles/method.html">Iterative linearised INLA method</a>
@@ -170,8 +171,14 @@
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>Let’s build a mapper class <code>bru_mapper_p_quadratic</code> for a model component that takes input covariates with values <span class="math inline">\(a_{ij}\)</span>, <span class="math inline">\(i=1,\dots,m\)</span> and <span class="math inline">\(j=1,\dots,p\)</span>, in a <code>matrix</code> or <code>data.frame</code> and evaluates a full quadratic expression <span class="math display">\[
-\eta_i = x_0 + \sum_{j=1}^p a_{ij} x_j +  \sum_{j=1}^p\sum_{k=1}^j a_{ij}a_{ik} x_{j,k},
-\]</span> where the latent component vector is <span class="math inline">\([x_0,x_1,\dots,x_p,x_{1,1},\dots,x_{p,1},x_{2,2}\dots,x_{p,p}]\)</span>.</p>
+\eta_i = x_0 + \sum_{j=1}^p a_{ij} x_j +
+  \frac{1}{2}\sum_{j=1}^p\sum_{k=1}^j \gamma_{j,k} a_{ij}a_{ik} x_{j,k},
+\]</span> where the latent component vector is <span class="math inline">\(\boldsymbol{x}=[x_0,x_1,\dots,x_p,x_{1,1},\dots,x_{p,1},x_{2,2}\dots,x_{p,p}]\)</span>, and <span class="math display">\[
+\gamma_{j,k} = \begin{cases}
+1, &amp; j = k,\\
+2, &amp; j &gt; k.
+\end{cases}
+\]</span></p>
 <p>We start with the constructor method. Like the <code>bru_mapper_matrix</code>, we require the user to supply a vector of covariate labels, and store them as a character vector. We also include a <code>min_degree</code> parameter to control if an intercept (<code>min_degree &lt;= 0</code>) and linear terms (<code>min_degree &lt;= 1</code>) should be included in the model.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">labels</span>, <span class="va">min_degree</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
@@ -228,6 +235,7 @@
 <span>  <span class="kw">for</span> <span class="op">(</span><span class="va">k</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">idx</span> <span class="op">&lt;-</span> <span class="va">idx</span> <span class="op">+</span> <span class="fl">1</span></span>
 <span>    <span class="va">A</span><span class="op">[[</span><span class="va">idx</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">in_</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">k</span>, <span class="va">p</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span> <span class="op">*</span> <span class="va">in_</span><span class="op">[</span>, <span class="va">k</span><span class="op">]</span></span>
+<span>    <span class="va">A</span><span class="op">[[</span><span class="va">idx</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">A</span><span class="op">[[</span><span class="va">idx</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="va">k</span><span class="op">]</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span>  <span class="op">}</span></span>
 <span>  <span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">cbind</span>, <span class="va">A</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span><span class="op">)</span></span>
