@@ -210,7 +210,6 @@ component <- function(...) {
 #' replication model. Same syntax as for `main`
 #' @param A.msk TODO: check/fix/deprecate this parameter.
 #' Likely doesn't work at the moment, and I've found no examples that use it.
-# Deprecated parameters
 #' @param .envir Evaluation environment
 #' @param envir_extra TODO: check/fix this parameter.
 #'
