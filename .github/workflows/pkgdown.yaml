@@ -45,6 +45,7 @@ jobs:
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
           sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
 
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       # https://mxschmitt.github.io/action-tmate/
