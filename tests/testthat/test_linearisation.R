@@ -45,6 +45,7 @@ test_that("Linearisation", {
             BRU.response = lh$data[[lh$response]],
             BRU.E = lh[["E"]],
             BRU.Ntrials = lh[["Ntrials"]],
+            BRU.weights = lh[["weights"]],
             BRU.offset = as.vector(lin0[[lh_idx]]$offset)
           ),
           A = lapply(names(lin_A), function(nm) {

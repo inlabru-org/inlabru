@@ -6,6 +6,10 @@
   `inla.rgeneric` objects. This allows `inlabru` to automatically extract
   the appropriate `bru_mapper` object for each model component, and can be used
   as a hook by external packages implementing new INLA object classes.
+  
+* Add a `weights` argument for `like()`, for likelihood-specific log-likelihood
+  weights, passed on to the `INLA::inla()` weights argument. Evaluated in the
+  data context.
 
 ## Bug fixes
 
