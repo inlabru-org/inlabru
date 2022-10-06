@@ -203,13 +203,16 @@
 <span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="fu">field</span><span class="op">(</span><span class="va">x</span>, model <span class="op">=</span> <span class="va">the_spde</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span>, prec.linear <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">2</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="fu">field</span><span class="op">(</span><span class="va">x</span>, model <span class="op">=</span> <span class="va">the_spde</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span>, prec.linear <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">2</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">fit2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">comp</span>,</span>
-<span>                <span class="fu"><a href="../../reference/like.html">like</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">.</span>,</span>
-<span>                     data <span class="op">=</span> <span class="va">cd</span>,</span>
-<span>                     family <span class="op">=</span> <span class="st">"poisson"</span>,</span>
-<span>                     E <span class="op">=</span> <span class="va">exposure</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fit2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span></span>
+<span>  <span class="va">comp</span>,</span>
+<span>  <span class="fu"><a href="../../reference/like.html">like</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">.</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">cd</span>,</span>
+<span>    family <span class="op">=</span> <span class="st">"poisson"</span>,</span>
+<span>    E <span class="op">=</span> <span class="va">exposure</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.5.3.9003</span></span>
@@ -222,10 +225,10 @@
 <span><span class="co">#&gt;     Data class: 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ .</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.872, Running = 0.172, Post = 0.151, Total = 1.19 </span></span>
+<span><span class="co">#&gt;     Pre = 0.804, Running = 0.152, Post = 0.129, Total = 1.09 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant mode kld</span></span>
-<span><span class="co">#&gt; Intercept 1.124 0.765      0.018    0.946      3.069  0.8   0</span></span>
+<span><span class="co">#&gt; Intercept 1.125 0.765      0.018    0.947      3.069  0.8   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>

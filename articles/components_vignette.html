@@ -99,8 +99,10 @@
     
 <p>Model components are defined using a formula syntax that is similar to <code>R-INLA</code> but has some differences. The basic syntax is</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_component_name</span><span class="op">(</span>main <span class="op">=</span> <span class="va">...</span>,</span>
-<span>                    model <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_component_name</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="va">...</span>,</span>
+<span>  model <span class="op">=</span> <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><code>my_component_name</code> is a user-chosen label for the model component. This label is used in model summaries, to label relevant parts of a fitted model object, and to access model components when sampling from a model using <code><a href="../reference/generate.html">generate()</a></code> and <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>.</p>
 <p>The <code>main</code> argument defines the input data for the component. For example, an intercept-like component has a vector of ones as an input. The linear effect of a covariate has the vector of covariate values as an input. A 2-dimensional SPDE effect takes a 2-column matrix of coordinate locations as an input. This argument can be a general <code>R</code> expression, more details on this are below.</p>
 <p>The type of model component is specified using the <code>model</code> component, (see <code><a href="../reference/component.html">?component</a></code>, and <code>?INLA::inla.list.models()$latent</code>).</p>
@@ -137,16 +139,20 @@
 <p>If the names are not found in the data then the global environment is searched for objects of that name.</p>
 <p>For example, suppose the data has columns named <code>x</code> and <code>y</code>, then a 2D SPDE model component could be specified as</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_spde_effect</span><span class="op">(</span>main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span>,</span>
-<span>                 model <span class="op">=</span> <span class="va">spde_model</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_spde_effect</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>,</span>
+<span>  model <span class="op">=</span> <span class="va">spde_model</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>The expression <code>cbind(x,y)</code> is internally evaluated in an environment that contains the columns of the data, which includes the variables <code>x</code> and <code>y</code>.</p>
 <p>The full data object can be accessed using the <code>.data.</code> key-word. An equivalent way to define the same component is</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">get_xy</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">get_xy</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">x</span>, <span class="va">df</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="op">~</span> <span class="fu">my_spde_effect</span><span class="op">(</span>main <span class="op">=</span> <span class="fu">get_xy</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>,</span>
-<span>                 model <span class="op">=</span> <span class="va">spde_model</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">~</span> <span class="fu">my_spde_effect</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="fu">get_xy</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>,</span>
+<span>  model <span class="op">=</span> <span class="va">spde_model</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>This keyword allows code to be written that works with arbitrarily named input data, rather than hardcoding with a specific name of a dataset that may change in future.</p>
 <p>If the objects required to evaluate the R expression cannot be found in the data, then the global environment is searched. This allows users to access objects in the global environment, such as other data-structures that may be of a different dimension to the response data. This avoids the need to pre-process everything into a single <code>data.frame</code>.</p>
 <p>The functionality of allowing general <code>R</code> expressions can be used to extend the types of data that can be passed to the <code><a href="../reference/bru.html">bru()</a></code>, <code><a href="../reference/like.html">like()</a></code> and <code><a href="../reference/lgcp.html">lgcp()</a></code> functions. It is the basis for the support of spatial data structures such as <code>sp</code> objects, and there is also experimental support to allow users to pass data as a list. <code>inlabru</code> is thus readily extendible, given appropriate functions to extract the relevant information for each component, and associated mappers that convert this information into a component design matrix.</p>
@@ -177,8 +183,10 @@
 <code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p>can be used as a shortcut for</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_intercept</span><span class="op">(</span>main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">n</span><span class="op">)</span>,</span>
-<span>               model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_intercept</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">n</span><span class="op">)</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"linear"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>where <code>n</code> is the length of the predictor vector. Note that this shortcut makes an assumption about the approriate length of the predictor. For many models this can be easily deduced by inspecting input data, but this is not always the case, for example if the response and covariate data are of different dimensions or for joint likelihood models with shared components.</p>
 </div>
 <div class="section level4">
@@ -188,17 +196,21 @@
 <p>If <code>main</code>, <code>group</code>, or <code>replicate</code>, is the name of an <code>sp</code> object stored in the global <code>R</code> environment, then <code>inlabru</code> attempts to do something intelligent by extracting the covariate information at the locations of the data passed to <code><a href="../reference/bru.html">bru()</a></code> or <code><a href="../reference/like.html">like()</a></code>. In this case <strong>it is assumed that this data is also an <code>sp</code> object</strong>. <code>inlabru</code> does this by applying <code><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">sp::coordinates()</a></code> to the data and then extracting the covariate information using <code><a href="https://rdrr.io/pkg/sp/man/over.html" class="external-link">sp::over()</a></code>.</p>
 <p>The shorcut</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_sp_effect</span><span class="op">(</span>main <span class="op">=</span> <span class="va">an_sp_object</span>,</span>
-<span>               model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_sp_effect</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="va">an_sp_object</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"linear"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>internally calls <code>eval_spatial()</code> which is almost equivalent to</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">get_sp_covariate</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="va">locs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/sp/man/over.html" class="external-link">over</a></span><span class="op">(</span><span class="va">locs</span>, <span class="va">an_sp_object</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">get_sp_covariate</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">locs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/sp/man/over.html" class="external-link">over</a></span><span class="op">(</span><span class="va">locs</span>, <span class="va">an_sp_object</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="op">~</span> <span class="fu">my_sp_effect</span><span class="op">(</span>main <span class="op">=</span> <span class="fu">get_sp_covariate</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>,</span>
-<span>               model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">~</span> <span class="fu">my_sp_effect</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="fu">get_sp_covariate</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"linear"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Note that this requires <code>an_sp_object</code> to be stored in the global <code>R</code> environment (or in the environment associated with the model definition code) so it is findable when the expression is internally evaluated by <code>inlabru</code>. Also note that the <code>get_sp_covariate</code> function above extract the first column of the <code>sp</code> object evaluation. For more general situations, one can either specify the optional <code>main_layer</code> argument to extract another named or indexed column, or directly use <code>main = eval_spatial(an_sp_object, .data., layer = some_layer)</code>.</p>
 <p>Note that this assumes that <code><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates()</a></code> applied to the input data is a sensible thing to do, this might not be the case for all models! For example, if the input data is a <code>SpatialPolygonsDataFrame</code> then <code><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates()</a></code> returns the centroid of each polygon. As more specific input type support is developed, these special cases may be given more precise meaning.</p>
 </div>
@@ -208,11 +220,13 @@
 </h4>
 <p>Since <code>inlabru</code> version 2.5.0, a feature has been added to allow users to specify linear fixed effects using a formula as input. This uses the <code>model = 'fixed'</code> component type. The syntax is</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_fixed_effects</span><span class="op">(</span>main <span class="op">=</span> <span class="op">~</span> <span class="va">x1</span><span class="op">:</span><span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span><span class="op">*</span><span class="va">x4</span>,</span>
-<span>                   model <span class="op">=</span> <span class="st">'fixed'</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_fixed_effects</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="op">~</span> <span class="va">x1</span><span class="op">:</span><span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">*</span> <span class="va">x4</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"fixed"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>where the data has columns named <code>x1</code>, <code>x2</code>, <code>x3</code>, and <code>x4</code>. In this case, <code>inlabru</code> creates the design matrix for this component by running</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">MatrixModels</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MatrixModels/man/model.Matrix.html" class="external-link">model.Matrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">x1</span><span class="op">:</span><span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span><span class="op">*</span><span class="va">x4</span>, <span class="va">.data.</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">MatrixModels</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MatrixModels/man/model.Matrix.html" class="external-link">model.Matrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">x1</span><span class="op">:</span><span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">*</span> <span class="va">x4</span>, <span class="va">.data.</span><span class="op">)</span></span></code></pre></div>
 <p>This allows users to define interactions in a concise way, by utilising the functionality already supported by the <code>MatrixModels</code> package. The formula is interpreted in the conventional way, <code>x1:x2</code> is the interaction of covariates <code>x1</code> and <code>x2</code>, not including their individual fixed effects, and <code>x3:x4</code> is the interaction of <code>x3</code> and <code>x4</code> inclusive of the individual fixed effects <code>x3</code> and <code>x4</code>. Note that for implementation technical reasons, the estimated parameters appear in <code>'summary.random'</code> instead of the normal <code>'summary.fixed'</code> part of the <code>inla</code>/<code>bru</code> output object.</p>
 <p>The alternative to using this shortcut would be for the user to define and name individual components for each term in the formula.</p>
 </div>
@@ -221,12 +235,16 @@
 </h4>
 <p>If <code>main</code>, <code>group</code>, or <code>replicate</code> are given as a function with no covariates, then this function is applied to the data. For example,</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">a_component</span><span class="op">(</span>main <span class="op">=</span> <span class="va">a_function</span>,</span>
-<span>              model <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">a_component</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="va">a_function</span>,</span>
+<span>  model <span class="op">=</span> <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>is equivalent to</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">a_component</span><span class="op">(</span>main <span class="op">=</span> <span class="fu">a_function</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>,</span>
-<span>              model <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">a_component</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="fu">a_function</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>,</span>
+<span>  model <span class="op">=</span> <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="non-linear-predictors">Non-linear predictors<a class="anchor" aria-label="anchor" href="#non-linear-predictors"></a>
