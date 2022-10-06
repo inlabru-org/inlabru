@@ -69,7 +69,7 @@ weights by E. Default taken from \code{options$E}, normally \code{1}.}
 likelihood. Default taken from \code{options$Ntrials}, normally \code{1}.}
 
 \item{weights}{Fixed (optional) weights parameters of the likelihood,
-so the log-likelihood\link{i} is changed into \code{weights[i]* log_likelihood[i]}.
+so the log-likelihood\verb{[i]} is changed into \code{weights[i] * log_likelihood[i]}.
 Default value is \code{1}. WARNING: The normalizing constant for the likelihood
 is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
 interpreted with great care.}
