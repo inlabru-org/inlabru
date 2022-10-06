@@ -559,7 +559,7 @@ eval_in_data_context <- function(input,
 #' @param Ntrials A vector containing the number of trials for the 'binomial'
 #'  likelihood. Default taken from `options$Ntrials`, normally `1`.
 #' @param weights Fixed (optional) weights parameters of the likelihood,
-#' so the log-likelihood[i] is changed into weights[i]*log-likelihood[i].
+#' so the log-likelihood[i] is changed into `weights[i]* log_likelihood[i]`.
 #' Default value is `1`. WARNING: The normalizing constant for the likelihood
 #' is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
 #' interpreted with great care.
