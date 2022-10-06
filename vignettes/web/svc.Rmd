@@ -193,7 +193,7 @@ count_dat <- robins_subset %>%
   ungroup() %>%
   mutate(
     std_yr = year - max(year),
-    obs = 1:nrow(.),
+    obs = seq_len(nrow(.)),
     site_idx = as.numeric(factor(paste(circle, lon, lat))),
     year_idx = as.numeric(factor(year)),
     site_year_idx = as.numeric(factor(paste(circle, lon, lat, year)))
