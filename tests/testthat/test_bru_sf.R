@@ -11,8 +11,8 @@ test_that("sf gorillas lgcp vignette", {
   # All sp objects in the example are replaced with sf equivalents.
 
   data(gorillas, package = "inlabru")
-  gorillas_sf = list()
-  gorillas_sf$nests = sf::st_as_sf(gorillas$nests)
+  gorillas_sf <- list()
+  gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
 
   # Bug in st_as_sf making check_ring_dir=TRUE have no effect, as st_as_sfc.SpatialPolygons
   # ignores it. To get around it, need to convert to sfc_POLYGON first, and then do a separate
@@ -29,7 +29,8 @@ test_that("sf gorillas lgcp vignette", {
   ## inla.mesh.2d doesn't support sf yet.
   boundary <- list(
     fm_as_inla_mesh_segment(gorillas_sf$boundary),
-    NULL)
+    NULL
+  )
 
   ## Build the mesh:
   mesh_sf <- INLA::inla.mesh.2d(
@@ -51,8 +52,9 @@ test_that("sf gorillas lgcp vignette", {
   #   geom_sf(data = gorillas_sf$boundary, alpha = 0.2, fill = "blue")
 
   matern <- INLA::inla.spde2.pcmatern(mesh_sf,
-                                      prior.sigma = c(0.1, 0.01),
-                                      prior.range = c(5, 0.01))
+    prior.sigma = c(0.1, 0.01),
+    prior.range = c(5, 0.01)
+  )
 
   library(sf)
   # Using sf::st_coordinates here did not seem to parse correctly
@@ -74,5 +76,4 @@ test_that("sf gorillas lgcp vignette", {
     samplers = gorillas_sf$boundary,
     domain = list(geometry = mesh_sf)
   )
-
 })

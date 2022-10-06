@@ -28,6 +28,7 @@ bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
       BRU.response = BRU.response,
       BRU.E = lhood[["E"]],
       BRU.Ntrials = lhood[["Ntrials"]],
+      BRU.weights = lhood[["weights"]],
       BRU.offset = as.vector(lin$offset)
     ),
     A = lapply(names(lin$A), function(nm) {

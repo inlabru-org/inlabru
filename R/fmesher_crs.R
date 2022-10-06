@@ -98,9 +98,12 @@ fm_as_sf_crs <- function(x) {
   } else if (is.null(x)) {
     sf::st_crs(x)
   } else {
-    warning(paste0("Unsupported source crs class ",
-                   paste(class(x), sep = ",")),
-            immediate. = TRUE)
+    warning(paste0(
+      "Unsupported source crs class ",
+      paste(class(x), sep = ",")
+    ),
+    immediate. = TRUE
+    )
     x
   }
 }
@@ -118,9 +121,12 @@ fm_as_sp_crs <- function(x) {
   } else if (is.null(x)) {
     NULL
   } else {
-    warning(paste0("Unsupported source crs class ",
-                   paste(class(x), sep = ",")),
-            immediate. = TRUE)
+    warning(paste0(
+      "Unsupported source crs class ",
+      paste(class(x), sep = ",")
+    ),
+    immediate. = TRUE
+    )
     x
   }
 }
@@ -195,7 +201,7 @@ fm_sp_get_crs <- function(x) {
   crs
 }
 
-#! For now just add fm_sf version of this
+# ! For now just add fm_sf version of this
 # Is there any need for fm_has_PROJ6() stuff
 # for sf objects?
 
@@ -493,7 +499,7 @@ fm_crs_set_ellipsoid_radius <- function(crs, radius) {
 #' @export
 #' @rdname fm_CRS
 
-#! sp code in this function
+# ! sp code in this function
 
 fm_CRS <- function(projargs = NULL, doCheckCRSArgs = TRUE,
                    args = NULL, oblique = NULL,
@@ -826,23 +832,23 @@ fm_list_as_CRS <- function(x, ...) {
 #'   print(fm_CRSargs(crs1))
 #'   print(fm_CRSargs(crs2))
 #' }
-
-#! An equivalent function to fm_CRSargs for sf object
+#'
+# ! An equivalent function to fm_CRSargs for sf object
 # would have something like:
-#
+#' #
 # if (inherits(x, "crs")){
 #   x$input
 # }
-#
+#' #
 # which returns equivalent of CRSargs(x)
-#
+#' #
 # Note:  sf crs object class is lower case "crs"
 #        sp crs object class is upper case "CRS"
-#
+#' #
 # Decision to make about at which point the sf vs sp code bifurcates
 # could write separate fm_ functions for "crs" class
 # or have single functions that check sp vs sf
-
+#'
 fm_CRSargs <- function(x, ...) {
   fm_not_for_PROJ6()
 
@@ -1061,7 +1067,7 @@ fm_wkt_set_lengthunit <- function(wkt, unit, params = NULL) {
 #' @export
 #' @rdname fm_crs_wkt
 
-#! equivalent to comment(crs)
+# ! equivalent to comment(crs)
 # would be crs$wkt for sf crs class
 #
 # Note: maybe sensible way structure code is to use
@@ -1372,7 +1378,7 @@ fm_crs_bounds <- function(crs, warn.unknown = FALSE) {
 
 ## TRUE/FALSE for points inside/outside projection domain.
 
-#! sp code here
+# ! sp code here
 fm_crs_bounds_check <- function(x, bounds) {
   stopifnot(inherits(x, "matrix"))
   if (all(is.finite(bounds$xlim)) && all(is.finite(bounds$ylim))) {
@@ -1387,7 +1393,7 @@ fm_crs_bounds_check <- function(x, bounds) {
 }
 
 
-#! show() for "CRS" and "crs" class appear identical
+# ! show() for "CRS" and "crs" class appear identical
 fm_internal_update_crs <- function(crs, newcrs, mismatch.allowed) {
   if (is.null(crs)) {
     newcrs
@@ -1446,7 +1452,7 @@ fm_spTransform <- function(x, ...) {
   UseMethod("fm_spTransform")
 }
 
-#! Can either write fm_sfTransform method or just add
+# ! Can either write fm_sfTransform method or just add
 # to this method?
 # Lots of sp code in here, mainly spTransform which has equivalent
 # sf::st_transform()
@@ -1515,7 +1521,7 @@ fm_spTransform.default <- function(x, crs0, crs1, passthrough = FALSE, ...) {
         crs1oblique <- NULL
       }
       x <- sp::SpatialPoints(x[ok, , drop = FALSE], proj4string = crs0crs)
-      #! equivalent is st_as_sf(coords = x, crs = ...)
+      # ! equivalent is st_as_sf(coords = x, crs = ...)
       # Note: st_as_sf has wkt argument which might make the "use wkt as much as possible"
       # idea work quite well
       if (do_work_on_sphere) {
@@ -1782,15 +1788,3 @@ fm_spTransform.inla.mesh <- function(x, CRSobj, passthrough = FALSE, ...) {
   x$crs <- CRSobj
   invisible(x)
 }
-
-
-
-
-
-
-
-
-
-
-
-

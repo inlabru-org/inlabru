@@ -175,13 +175,16 @@ the_spde <- inla.spde2.pcmatern(mesh1D,
   prior.sigma = c(1, 0.01)
 )
 
-comp <- ~ field(x, model = the_spde) + Intercept(1, prec.linear = 1/2^2)
+comp <- ~ field(x, model = the_spde) + Intercept(1, prec.linear = 1 / 2^2)
 
-fit2.bru <- bru(comp,
-                like(count ~ .,
-                     data = cd,
-                     family = "poisson",
-                     E = exposure))
+fit2.bru <- bru(
+  comp,
+  like(count ~ .,
+    data = cd,
+    family = "poisson",
+    E = exposure
+  )
+)
 
 summary(fit2.bru)
 ```

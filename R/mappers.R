@@ -341,7 +341,6 @@ ibm_amatrix.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
     A <- sf::st_coordinates(input)
     nm <- intersect(colnames(A), c("X", "Y", "Z"))
     input <- as.matrix(A[, nm, drop = FALSE])
-
   } else if (!is.matrix(input) && !inherits(input, "Spatial")) {
     input <- as.matrix(input)
   }

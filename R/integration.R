@@ -96,11 +96,11 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 # @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
 int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points = 1, geometry = "euc", coords = NULL) {
-  if (is.null(colnames(sp)) & !is.null(coords)) {
+  if (is.null(colnames(sp)) && !is.null(coords)) {
     sp <- data.frame(sp)
     colnames(sp) <- coords
   }
-  if (is.null(colnames(ep)) & !is.null(coords) & !(length(ep) == 0)) {
+  if (is.null(colnames(ep)) && !is.null(coords) && !(length(ep) == 0)) {
     ep <- data.frame(ep)
     colnames(ep) <- coords
   }
@@ -353,7 +353,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   }
 
   # Project to mesh vertices
-  if (project & !is.null(mesh)) {
+  if (project && !is.null(mesh)) {
     ips <- vertex.projection(ips, mesh, columns = "weight", group = group)
   }
 

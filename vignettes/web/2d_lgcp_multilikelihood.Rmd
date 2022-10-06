@@ -72,8 +72,8 @@ matern <- inla.spde2.pcmatern(gorillas$mesh,
 
 cmp <- ~
   Common(coordinates, model = matern) +
-  Difference(coordinates, model = matern) +
-  Intercept(1)
+    Difference(coordinates, model = matern) +
+    Intercept(1)
 ```
 
 Given these components we define the linear predictor for each of the likelihoods.

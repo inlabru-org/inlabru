@@ -167,7 +167,8 @@ extract_selector <- function(where, selector) {
 extract_layer <- function(where, layer, selector) {
   if (!is.null(layer) && !is.null(selector)) {
     warning("Both layer and selector specified. Ignoring selector",
-            immediate. = TRUE)
+      immediate. = TRUE
+    )
     selector <- NULL
     if (length(layer) == 1) {
       layer <- rep(layer, NROW(where))
@@ -199,10 +200,12 @@ eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
 
 eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
   .Deprecated("eval_spatial")
-  eval_spatial.Spatial(data = data,
-                       where = where,
-                       layer = layer,
-                       selector = selector)
+  eval_spatial.Spatial(
+    data = data,
+    where = where,
+    layer = layer,
+    selector = selector
+  )
 }
 #' @export
 eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
@@ -245,7 +248,8 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
     data,
     where,
     ID = FALSE,
-    layer = layer)
+    layer = layer
+  )
   if (terra::nlyr(data) == 1) {
     val <- val[[1]]
   } else {

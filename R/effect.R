@@ -212,7 +212,6 @@ component <- function(...) {
 #' replication model. Same syntax as for `main`
 #' @param A.msk TODO: check/fix/deprecate this parameter.
 #' Likely doesn't work at the moment, and I've found no examples that use it.
-# Deprecated parameters
 #' @param .envir Evaluation environment
 #' @param envir_extra TODO: check/fix this parameter.
 #'
@@ -1181,8 +1180,9 @@ make_submapper <- function(subcomp_n,
 #'   library(INLA)
 #'   mesh <- inla.mesh.create(globe = 2)
 #'   spde <- inla.spde2.pcmatern(mesh,
-#'                               prior.range = c(1, 0.5),
-#'                               prior.sigma = c(1, 0.5))
+#'     prior.range = c(1, 0.5),
+#'     prior.sigma = c(1, 0.5)
+#'   )
 #'   mapper <- bru_get_mapper(spde)
 #'   ibm_n(mapper)
 #' }
@@ -1242,13 +1242,15 @@ bru_get_mapper.inla.rgeneric <- function(model, ...) {
 bru_get_mapper_safely <- function(model, ...) {
   m <- tryCatch(
     bru_get_mapper(model, ...),
-    error = function(e) {}
+    error = function(e) {
+    }
   )
   if (!is.null(m) && !inherits(m, "bru_mapper")) {
-      stop(paste0(
-        "The bru_get_mapper method for model class '",
-        paste0(class(model), collapse = ", "),
-        "' did not return a bru_mapper object"))
+    stop(paste0(
+      "The bru_get_mapper method for model class '",
+      paste0(class(model), collapse = ", "),
+      "' did not return a bru_mapper object"
+    ))
   }
   m
 }
@@ -1781,10 +1783,14 @@ input_eval.bru_input <- function(input, data, env = NULL,
       # that are likely to happen for multilikelihood models; A component only
       # needs to be evaluable for at least one of the likelihoods.
     }
-  } else if (inherits(e_input,
-                      c("SpatialGridDataFrame",
-                        "SpatialPixelsDataFrame",
-                        "SpatRaster"))) {
+  } else if (inherits(
+    e_input,
+    c(
+      "SpatialGridDataFrame",
+      "SpatialPixelsDataFrame",
+      "SpatRaster"
+    )
+  )) {
     input_layer <-
       input_eval_layer(
         layer = input[["layer"]],
@@ -1794,9 +1800,11 @@ input_eval.bru_input <- function(input, data, env = NULL,
         label = input[["label"]],
         e_input = e_input
       )
-    layer <- extract_layer(data,
-                           input_layer,
-                           input[["selector"]])
+    layer <- extract_layer(
+      data,
+      input_layer,
+      input[["selector"]]
+    )
     check_layer(e_input, data, layer)
     val <- eval_spatial(
       e_input,
@@ -1822,10 +1830,12 @@ input_eval.bru_input <- function(input, data, env = NULL,
   # to fix that by filling in nearest neighbour values.
   # # TODO: Check how to deal with this fully in the case of multilikelihood models
   # Answer: should respect the lhood "include/exclude" info for the component list
-  if ((inherits(e_input, c("SpatialGridDataFrame",
-                        "SpatialPixelsDataFrame",
-                        "SpatRaster"))) &&
-      any(is.na(as.data.frame(val)))) {
+  if ((inherits(e_input, c(
+    "SpatialGridDataFrame",
+    "SpatialPixelsDataFrame",
+    "SpatRaster"
+  ))) &&
+    any(is.na(as.data.frame(val)))) {
     warning(
       paste0(
         "Model input '",

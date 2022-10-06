@@ -37,7 +37,6 @@ test_that("sf standards compliance: basic polygons", {
 # handling, and has now been fixed.
 
 test_that("Conversion from sfc_POINT to inla.mesh.segment", {
-
   local_bru_safe_inla()
 
   ## sfc_POINT ##
@@ -48,12 +47,12 @@ test_that("Conversion from sfc_POINT to inla.mesh.segment", {
   # matrix version
   loc.bnd <- matrix(c(0, 0, 1, 0, 1, 1, 0, 1), 4, 2, byrow = TRUE)
   segm.bnd <- INLA::inla.mesh.segment(loc.bnd,
-                                is.bnd = TRUE
+    is.bnd = TRUE
   )
 
   # sf version
   loc.sf <- sf::st_as_sf(as.data.frame(loc.bnd),
-                         coords = c(1, 2)
+    coords = c(1, 2)
   )
 
   segm.bnd.sf <- fm_as_inla_mesh_segment(loc.sf, is.bnd = TRUE)
@@ -66,19 +65,17 @@ test_that("Conversion from sfc_POINT to inla.mesh.segment", {
 
   # check warning message for xyz (there shouldn't be one)
   loc.sf.xyz <- sf::st_as_sf(as.data.frame(cbind(loc.bnd, 1)),
-                             coords = c(1, 2, 3)
+    coords = c(1, 2, 3)
   )
   class(loc.sf.xyz)
   class(sf::st_geometry(loc.sf.xyz))
   class(sf::st_geometry(loc.sf.xyz)[[1]])
 
   segm.bnd.sf.xym <- fm_as_inla_mesh_segment(loc.sf.xyz)
-
 })
 
 
 test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
-
   local_bru_safe_inla()
 
   ## scf_LINESTRING ##
@@ -98,7 +95,8 @@ test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
   )
 
   seg <- fm_internal_sp2segment_join(list(seg1, seg2),
-                                     grp = seq_len(2))
+    grp = seq_len(2)
+  )
   expect_identical(seg$grp, as.matrix(rep(1:2, each = 3)))
 
   line_str1 <- sf::st_linestring(pts1)
@@ -111,12 +109,10 @@ test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
 
   #  str(seg)
   #  str(seg_sf)
-
 })
 
 
 test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
-
   local_bru_safe_inla()
 
   ## scf_POLYGON ##
@@ -134,7 +130,8 @@ test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
   )
 
   seg <- fm_internal_sp2segment_join(list(seg1, seg2),
-                                     grp = seq_len(2))
+    grp = seq_len(2)
+  )
   expect_identical(seg$grp, as.matrix(rep(1:2, each = 4)))
 
   line_str1 <- sf::st_polygon(list(pts1))
@@ -147,9 +144,4 @@ test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
 
   #  str(seg)
   #  str(seg_sf)
-
 })
-
-
-
-

@@ -65,7 +65,8 @@ st_check_polygon <- function(sfg) {
   # Rest should be holes
   if (length(sfg) > 1) {
     holes <- lapply(
-      sfg[-1], FUN = as.matrix
+      sfg[-1],
+      FUN = as.matrix
     )
     holes <- lapply(
       holes,
@@ -76,7 +77,8 @@ st_check_polygon <- function(sfg) {
     )
 
     check_within <- sf::st_within(
-      holes, main, sparse = FALSE
+      holes, main,
+      sparse = FALSE
     )
     if (!all(check_within)) {
       ok <- FALSE
@@ -88,7 +90,8 @@ st_check_polygon <- function(sfg) {
         seq_along(holes),
         function(k) {
           !any(sf::st_intersects(
-            holes[-k], holes[k], sparse = FALSE
+            holes[-k], holes[k],
+            sparse = FALSE
           ))
         },
         TRUE
@@ -102,5 +105,4 @@ st_check_polygon <- function(sfg) {
 
   attr(ok, "Message") <- msg
   ok
-
 }
