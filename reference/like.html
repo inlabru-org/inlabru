@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,6 +80,7 @@
   mesh = NULL,
   E = NULL,
   Ntrials = NULL,
+  weights = NULL,
   samplers = NULL,
   ips = NULL,
   domain = NULL,
@@ -142,13 +143,20 @@ object.</p></dd>
 <dt>E</dt>
 <dd><p>Exposure parameter for family = 'poisson' passed on to
 <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">INLA::inla</a></code>. Special case if family is 'cp': rescale all integration
-weights by E. Default taken from <code>options$E</code>.</p></dd>
+weights by E. Default taken from <code>options$E</code>, normally <code>1</code>.</p></dd>
 
 
 <dt>Ntrials</dt>
 <dd><p>A vector containing the number of trials for the 'binomial'
-likelihood. Default value is rep(1, n.data).
-Default taken from <code>options$Ntrials</code>.</p></dd>
+likelihood. Default taken from <code>options$Ntrials</code>, normally <code>1</code>.</p></dd>
+
+
+<dt>weights</dt>
+<dd><p>Fixed (optional) weights parameters of the likelihood,
+so the log-likelihood<code>[i]</code> is changed into <code>weights[i] * log_likelihood[i]</code>.
+Default value is <code>1</code>. WARNING: The normalizing constant for the likelihood
+is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
+interpreted with great care.</p></dd>
 
 
 <dt>samplers</dt>
@@ -203,7 +211,7 @@ on to <code><a href="bru_options.html">bru_options()</a></code></p></dd>
 
 <dt>.envir</dt>
 <dd><p>The evaluation environment to use for special arguments
-(<code>E</code> and <code>Ntrials</code>) if not found in <code>response_data</code> or <code>data</code>. Defaults to
+(<code>E</code>, <code>Ntrials</code>, and <code>weights</code>) if not found in <code>response_data</code> or <code>data</code>. Defaults to
 the calling environment.</p></dd>
 
 
