@@ -26,8 +26,10 @@ options(width = 100) # sets width of output window
 
 Model components are defined using a formula syntax that is similar to `R-INLA` but has some differences.  The basic syntax is
 ```{r eval=FALSE}
-~ my_component_name(main = ...,
-                    model = ...)
+~ my_component_name(
+  main = ...,
+  model = ...
+)
 ```
 
 `my_component_name` is a user-chosen label for the model component.  This label is used in model summaries, to label relevant parts of a fitted model object, and to access model components when sampling from a model using `generate()` and `predict()`.  
@@ -78,19 +80,23 @@ If the names are not found in the data then the global environment is searched f
 
 For example, suppose the data has columns named `x` and `y`, then a 2D SPDE model component could be specified as
 ```{r eval=FALSE}
-~ my_spde_effect(main = cbind(x,y),
-                 model = spde_model)
+~ my_spde_effect(
+  main = cbind(x, y),
+  model = spde_model
+)
 ```
 The expression `cbind(x,y)` is internally evaluated in an environment that contains the columns of the data, which includes the variables `x` and `y`.
 
 The full data object can be accessed using the `.data.` key-word.
 An equivalent way to define the same component is
 ```{r eval=FALSE}
-get_xy = function(df){
+get_xy <- function(df) {
   cbind(df$x, df$y)
 }
-~ my_spde_effect(main = get_xy(.data.),
-                 model = spde_model)
+~ my_spde_effect(
+  main = get_xy(.data.),
+  model = spde_model
+)
 ```
 This keyword allows code to be written that works with arbitrarily named input data, rather than hardcoding with a specific name of a dataset that may change in future.
 
@@ -122,8 +128,10 @@ The syntax
 ```
 can be used as a shortcut for
 ```{r eval=FALSE}
-~ my_intercept(main = rep(1, n),
-               model = "linear")
+~ my_intercept(
+  main = rep(1, n),
+  model = "linear"
+)
 ```
 where `n` is the length of the predictor vector.  Note that this shortcut makes an assumption about the approriate length of the predictor.  For many models this can be easily deduced by inspecting input data, but this is not always the case, for example if the response and covariate data are of different dimensions or for joint likelihood models with shared components.
 
@@ -133,18 +141,22 @@ If `main`, `group`, or `replicate`, is the name of an `sp` object stored in the 
 
 The shorcut
 ```{r eval=FALSE}
-~ my_sp_effect(main = an_sp_object,
-               model = "linear")
+~ my_sp_effect(
+  main = an_sp_object,
+  model = "linear"
+)
 ```
 internally calls `eval_spatial()` which is almost equivalent to
 ```{r, eval=FALSE}
-get_sp_covariate = function(df){
-  locs = coordinates(df)
-  over(locs, an_sp_object)[,1]
+get_sp_covariate <- function(df) {
+  locs <- coordinates(df)
+  over(locs, an_sp_object)[, 1]
 }
 
-~ my_sp_effect(main = get_sp_covariate(.data.),
-               model = "linear")
+~ my_sp_effect(
+  main = get_sp_covariate(.data.),
+  model = "linear"
+)
 ```
 Note that this requires `an_sp_object` to be stored in the global `R` environment
 (or in the environment associated with the model definition code) so it is findable when the expression is internally evaluated by `inlabru`.  Also note that the `get_sp_covariate` function above extract the first column of the `sp` object evaluation.  For more general situations, one can either specify the optional `main_layer` argument to extract another named or indexed column, or directly
@@ -157,13 +169,15 @@ these special cases may be given more precise meaning.
 
 Since `inlabru` version 2.5.0, a feature has been added to allow users to specify linear fixed effects using a formula as input.  This uses the `model = 'fixed'` component type.  The syntax is
 ```{r eval=FALSE}
-~ my_fixed_effects(main = ~ x1:x2 + x3*x4,
-                   model = 'fixed')
+~ my_fixed_effects(
+  main = ~ x1:x2 + x3 * x4,
+  model = "fixed"
+)
 ```
 where the data has columns named `x1`, `x2`, `x3`, and `x4`.
 In this case, `inlabru` creates the design matrix for this component by running
 ```{r eval=FALSE}
-MatrixModels::model.Matrix(~ x1:x2 + x3*x4, .data.)
+MatrixModels::model.Matrix(~ x1:x2 + x3 * x4, .data.)
 ```
 This allows users to define interactions in a concise way, by utilising the functionality already supported by the `MatrixModels` package.
 The formula is interpreted in the conventional way, `x1:x2` is the interaction of covariates `x1` and `x2`, not including their individual fixed effects, and `x3:x4` is the interaction of `x3` and `x4` inclusive of the individual fixed effects `x3` and `x4`.
@@ -177,13 +191,17 @@ The alternative to using this shortcut would be for the user to define and name 
 
 If `main`, `group`, or `replicate` are given as a function with no covariates, then this function is applied to the data.  For example,
 ```{r eval=FALSE}
-~ a_component(main = a_function,
-              model = ...)
+~ a_component(
+  main = a_function,
+  model = ...
+)
 ```
 is equivalent to
 ```{r eval=FALSE}
-~ a_component(main = a_function(.data.),
-              model = ...)
+~ a_component(
+  main = a_function(.data.),
+  model = ...
+)
 ```
 
 #### Non-linear predictors

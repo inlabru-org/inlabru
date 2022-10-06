@@ -1183,8 +1183,9 @@ make_submapper <- function(subcomp_n,
 #'   library(INLA)
 #'   mesh <- inla.mesh.create(globe = 2)
 #'   spde <- inla.spde2.pcmatern(mesh,
-#'                               prior.range = c(1, 0.5),
-#'                               prior.sigma = c(1, 0.5))
+#'     prior.range = c(1, 0.5),
+#'     prior.sigma = c(1, 0.5)
+#'   )
 #'   mapper <- bru_get_mapper(spde)
 #'   ibm_n(mapper)
 #' }
@@ -1244,13 +1245,15 @@ bru_get_mapper.inla.rgeneric <- function(model, ...) {
 bru_get_mapper_safely <- function(model, ...) {
   m <- tryCatch(
     bru_get_mapper(model, ...),
-    error = function(e) {}
+    error = function(e) {
+    }
   )
   if (!is.null(m) && !inherits(m, "bru_mapper")) {
-      stop(paste0(
-        "The bru_get_mapper method for model class '",
-        paste0(class(model), collapse = ", "),
-        "' did not return a bru_mapper object"))
+    stop(paste0(
+      "The bru_get_mapper method for model class '",
+      paste0(class(model), collapse = ", "),
+      "' did not return a bru_mapper object"
+    ))
   }
   m
 }
@@ -1755,7 +1758,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       # that are likely to happen for multilikelihood models; A component only
       # needs to be evaluable for at least one of the likelihoods.
     }
-  } else if (inherits(emap, "SpatialGridDataFrame") |
+  } else if (inherits(emap, "SpatialGridDataFrame") ||
     inherits(emap, "SpatialPixelsDataFrame")) {
     if (is.null(input[["selector"]])) {
       layer <-

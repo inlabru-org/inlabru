@@ -17,7 +17,7 @@
 #' y <- bru_forward_transformation(qexp, u, rate = 2)
 #' v <- bru_inverse_transformation(pexp, y, rate = 2)
 #' rbind(u, y, v)
-
+#'
 bru_forward_transformation <- function(qfun, x, ..., tail.split. = 0) {
   if (is.null(tail.split.)) {
     # By default, split at 0

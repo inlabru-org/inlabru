@@ -62,9 +62,11 @@ test_that("1D LGCP fitting", {
 
   pr <- predict(fit,
     data = data.frame(x = mesh1D$loc),
-    formula = ~list(Intercept=Intercept,
-                    spde1D=spde1D,
-                    both=Intercept+spde1D),
+    formula = ~ list(
+      Intercept = Intercept,
+      spde1D = spde1D,
+      both = Intercept + spde1D
+    ),
     n.samples = 100, seed = 84354
   )
 
@@ -100,8 +102,8 @@ test_that("1D LGCP fitting", {
 
   expect_true(
     all(abs(pr$both$mean -
-              (fit$summary.random$spde1D$mean+fit$summary.fixed$mean)) /
-          pr$both$mean.mc_std_err <= 3)
+      (fit$summary.random$spde1D$mean + fit$summary.fixed$mean)) /
+      pr$both$mean.mc_std_err <= 3)
   )
 
   # predicted intensity integral

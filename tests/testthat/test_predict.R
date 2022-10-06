@@ -138,18 +138,25 @@ test_that("bru: predict with _eval", {
     z = rnorm(5),
     u = 1:5
   )
-  u_mapper <- bru_mapper(INLA::inla.mesh.1d(seq(1, 5, length.out = 51)),
-                         indexed = FALSE)
-  fit <- bru(z ~ -1 + fun(u, model = "rw2", mapper = u_mapper),
-             family = "gaussian", data = data
+  u_mapper <- bru_mapper(
+    INLA::inla.mesh.1d(
+      seq(1, 5, length.out = 51)
+    ),
+    indexed = FALSE
+  )
+  fit <- bru(
+    z ~ -1 + fun(u, model = "rw2", mapper = u_mapper),
+    family = "gaussian",
+    data = data
   )
   pred <- predict(
     fit,
     data = data.frame(u = seq(-1, 6, by = 0.1)),
-    formula = ~ data.frame(A = fun,
-                           B = fun_eval(u))
+    formula = ~ data.frame(
+      A = fun,
+      B = fun_eval(u)
+    )
   )
 
   expect_equal(pred$B, pred$A)
-
 })

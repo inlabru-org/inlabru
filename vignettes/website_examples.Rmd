@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, echo=FALSE,include=FALSE}
+
 ```
 
 ## Package examples
@@ -32,11 +33,12 @@ for (file in file.path("web", files)) {
     title <- sub('^"', "", title)
     title <- sub('"$', "", title)
     cat("* [",
-        title,
-        "](https://inlabru-org.github.io/inlabru/articles/",
-        sub("\\.Rmd", ".html", file),
-        ")\n",
-        sep = "")
+      title,
+      "](https://inlabru-org.github.io/inlabru/articles/",
+      sub("\\.Rmd", ".html", file),
+      ")\n",
+      sep = ""
+    )
   }
 }
 ```
@@ -56,11 +58,12 @@ for (file in files) {
     title <- sub('^"', "", title)
     title <- sub('"$', "", title)
     cat("* [",
-        title,
-        "](https://inlabru-org.github.io/inlabru/articles/",
-        sub("\\.Rmd", ".html", file),
-        ")\n",
-        sep = "")
+      title,
+      "](https://inlabru-org.github.io/inlabru/articles/",
+      sub("\\.Rmd", ".html", file),
+      ")\n",
+      sep = ""
+    )
   }
 }
 ```

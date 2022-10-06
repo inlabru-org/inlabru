@@ -45,9 +45,13 @@ should be used for the `INLA::f()` inputs, e.g. for `"bym2"` models. For
 total number of latent variables, but with `inla_f=TRUE` we get the values
 needed by `INLA::f()` instead:
 ```{r eval=TRUE}
-mapper <- bru_mapper_collect(list(a = bru_mapper_index(3),
-                                  b = bru_mapper_index(2)),
-                             hidden = TRUE)
+mapper <- bru_mapper_collect(
+  list(
+    a = bru_mapper_index(3),
+    b = bru_mapper_index(2)
+  ),
+  hidden = TRUE
+)
 ibm_n(mapper)
 ibm_values(mapper)
 ibm_n(mapper, inla_f = TRUE)
@@ -57,8 +61,10 @@ ibm_values(mapper, inla_f = TRUE)
 For the `bru_mapper_multi` class, the `multi` argument provides access to the
 inner layers of the multi-mapper:
 ```{r eval=TRUE}
-mapper <- bru_mapper_multi(list(a = bru_mapper_index(3),
-                                b = bru_mapper_index(2)))
+mapper <- bru_mapper_multi(list(
+  a = bru_mapper_index(3),
+  b = bru_mapper_index(2)
+))
 ibm_n(mapper)
 ibm_n(mapper, multi = 1)
 ibm_values(mapper)
@@ -159,9 +165,11 @@ ibm_values.bru_mapper_p_quadratic <- function(mapper, ...) {
   n <- ibm_n(mapper)
   jk <- expand.grid(seq_len(p), seq_len(p))
   jk <- jk[jk[, 2] <= jk[, 1], , drop = FALSE]
-  c(if (mapper$min_degree <= 0) "Intercept" else NULL,
+  c(
+    if (mapper$min_degree <= 0) "Intercept" else NULL,
     if (mapper$min_degree <= 1) mapper$labels else NULL,
-    paste0(mapper$labels[jk[, 1]], ":", mapper$labels[jk[, 2]]))
+    paste0(mapper$labels[jk[, 1]], ":", mapper$labels[jk[, 2]])
+  )
 }
 ```
 We can now define the main part of the mapper interface that computes the

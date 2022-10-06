@@ -31,8 +31,12 @@ bru_check_object_bru <- function(object,
   } else {
     old <- FALSE
   }
-  object[["bru_info"]] <- bru_info_upgrade(object[["bru_info"]], old = old,
-                                           new_version = new_version)
+  object[["bru_info"]] <-
+    bru_info_upgrade(
+      object[["bru_info"]],
+      old = old,
+      new_version = new_version
+    )
   object
 }
 
