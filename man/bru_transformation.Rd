@@ -42,4 +42,5 @@ u <- rnorm(5, 0, 1)
 y <- bru_forward_transformation(qexp, u, rate = 2)
 v <- bru_inverse_transformation(pexp, y, rate = 2)
 rbind(u, y, v)
+
 }
