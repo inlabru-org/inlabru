@@ -28,7 +28,7 @@ if (require("ggplot2", quietly = TRUE) &&
   # Load the Gorilla data
   data(gorillas, package = "inlabru")
 
-  # Create a base map centered around the nests and plot the boundary as well
+  # Create a base map centred around the nests and plot the boundary as well
   # as the nests
   ggplot() +
     gg(gorillas$boundary) +
