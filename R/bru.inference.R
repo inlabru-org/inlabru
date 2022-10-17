@@ -19,7 +19,8 @@ generate <- function(object, ...) {
   UseMethod("generate")
 }
 
-bru_check_object_bru <- function(object) {
+bru_check_object_bru <- function(object,
+                                 new_version = getNamespaceVersion("inlabru")) {
   if (is.null(object[["bru_info"]])) {
     if (is.null(object[["sppa"]])) {
       stop("bru object contains neither current `bru_info` or old `sppa` information")
@@ -30,11 +31,18 @@ bru_check_object_bru <- function(object) {
   } else {
     old <- FALSE
   }
-  object[["bru_info"]] <- bru_info_upgrade(object[["bru_info"]], old = old)
+  object[["bru_info"]] <-
+    bru_info_upgrade(
+      object[["bru_info"]],
+      old = old,
+      new_version = new_version
+    )
   object
 }
 
-bru_info_upgrade <- function(object, old = FALSE) {
+bru_info_upgrade <- function(object,
+                             old = FALSE,
+                             new_version = getNamespaceVersion("inlabru")) {
   if (!is.list(object)) {
     stop("bru_info part of the object can't be converted to `bru_info`; not a list")
   }
@@ -42,13 +50,12 @@ bru_info_upgrade <- function(object, old = FALSE) {
     old <- TRUE
     class(object) <- c("bru_info", "list")
   }
-  ver <- getNamespaceVersion("inlabru")
   if (is.null(object[["inlabru_version"]])) {
     object[["inlabru_version"]] <- "0.0.0"
     old <- TRUE
   }
   old_ver <- object[["inlabru_version"]]
-  if (old || (utils::compareVersion(ver, old_ver) > 0)) {
+  if (old || (utils::compareVersion(new_version, old_ver) > 0)) {
     warning(
       "Old bru_info object version ",
       old_ver,
@@ -75,7 +82,19 @@ bru_info_upgrade <- function(object, old = FALSE) {
       }
       object[["inlabru_version"]] <- "2.1.14.901"
     }
-    object[["inlabru_version"]] <- ver
+    if (utils::compareVersion("2.5.3.9003", old_ver) > 0) {
+      message("Upgrading bru_info to 2.5.3.9003")
+      # Check that likelihoods store 'weights'
+      for (k in seq_along(object[["lhoods"]])) {
+        lhood <- object[["lhoods"]][[k]]
+        if (is.null(lhood[["weights"]])) {
+          lhood[["weights"]] <- 1
+          object[["lhoods"]][[k]] <- lhood
+        }
+      }
+      object[["inlabru_version"]] <- "2.5.3.9003"
+    }
+    object[["inlabru_version"]] <- new_version
   }
   object
 }
@@ -546,10 +565,14 @@ eval_in_data_context <- function(input,
 #' @param mesh An inla.mesh object. Obsolete.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
-#'   weights by E. Default taken from `options$E`.
+#'   weights by E. Default taken from `options$E`, normally `1`.
 #' @param Ntrials A vector containing the number of trials for the 'binomial'
-#'  likelihood. Default value is rep(1, n.data).
-#'  Default taken from `options$Ntrials`.
+#'  likelihood. Default taken from `options$Ntrials`, normally `1`.
+#' @param weights Fixed (optional) weights parameters of the likelihood,
+#' so the log-likelihood`[i]` is changed into `weights[i] * log_likelihood[i]`.
+#' Default value is `1`. WARNING: The normalizing constant for the likelihood
+#' is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
+#' interpreted with great care.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides `samplers`.
 #' @param domain Named list of domain definitions.
@@ -574,7 +597,7 @@ eval_in_data_context <- function(input,
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #' @param .envir The evaluation environment to use for special arguments
-#' (`E` and `Ntrials`) if not found in `response_data` or `data`. Defaults to
+#' (`E`, `Ntrials`, and `weights`) if not found in `response_data` or `data`. Defaults to
 #' the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterize [bru()].
@@ -583,7 +606,7 @@ eval_in_data_context <- function(input,
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  response_data = NULL, # agg
-                 mesh = NULL, E = NULL, Ntrials = NULL,
+                 mesh = NULL, E = NULL, Ntrials = NULL, weights = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
                  allow_latent = FALSE,
@@ -677,6 +700,13 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     data = data,
     response_data = response_data,
     default = options[["Ntrials"]],
+    .envir = .envir
+  )
+  weights <- eval_in_data_context(
+    substitute(weights),
+    data = data,
+    response_data = response_data,
+    default = 1,
     .envir = .envir
   )
 
@@ -847,6 +877,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   names(drange) <- names(data)
   if (inherits(data, "Spatial")) drange[["coordinates"]] <- mesh
 
+
   # The likelihood object that will be returned
 
   lh <- list(
@@ -856,6 +887,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     data = data,
     E = E,
     Ntrials = Ntrials,
+    weights = weights,
     samplers = samplers,
     linear = linear,
     expr = expr,
@@ -2302,6 +2334,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           family = family,
           E = stk.data[["BRU.E"]],
           Ntrials = stk.data[["BRU.Ntrials"]],
+          weights = stk.data[["BRU.weights"]],
           offset = stk.data[["BRU.offset"]]
         )
       )

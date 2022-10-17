@@ -53,6 +53,11 @@ jobs:
           brew install proj@9
           brew install gdal
 
+      - name: Install system dependencies on Linux (GL)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y libglu1-mesa-dev
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           dependencies: '"all"'

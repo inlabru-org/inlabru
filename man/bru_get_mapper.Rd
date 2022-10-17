@@ -59,12 +59,14 @@ if (bru_safe_inla(quietly = TRUE)) {
   library(INLA)
   mesh <- inla.mesh.create(globe = 2)
   spde <- inla.spde2.pcmatern(mesh,
-                              prior.range = c(1, 0.5),
-                              prior.sigma = c(1, 0.5))
+    prior.range = c(1, 0.5),
+    prior.sigma = c(1, 0.5)
+  )
   mapper <- bru_get_mapper(spde)
   ibm_n(mapper)
 }
 }
 \seealso{
-\link{bru_mapper}
+\link{bru_mapper} for mapper constructor methods, and
+\link{bru_mapper_methods} for method generics and specific implementations.
 }

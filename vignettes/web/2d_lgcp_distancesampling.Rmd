@@ -413,6 +413,8 @@ ggplot(data.frame(mexdolphin$points)) +
   geom_histogram(aes(x = distance), breaks = seq(0, 8, length = 9), alpha = 0.3) +
   geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
   geom_line(data = dlines, aes(x = distance, y = En, group = model, col = model)) +
-  geom_ribbon(data = dlines, aes(x = distance, ymin = En.lower, ymax = En.upper, group = model, col = model, fill = model),
-              alpha = 0.2, lty = 2)
+  geom_ribbon(
+    data = dlines, aes(x = distance, ymin = En.lower, ymax = En.upper, group = model, col = model, fill = model),
+    alpha = 0.2, lty = 2
+  )
 ```

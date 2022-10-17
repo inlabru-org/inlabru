@@ -1,0 +1,125 @@
+---
+title: "Devel: Model evaluation flowchart"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Devel: Model evaluation flowchart}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+header-includes:
+  - \newcommand{\bm}[1]{\boldsymbol{#1}}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+(Vignette under construction!)
+
+```{r setup, include=FALSE}
+library(inlabru)
+```
+
+## Component effect evaluation
+
+```{r eval=TRUE,echo=FALSE}
+DiagrammeR::grViz("digraph {
+  graph [layout = dot, rankdir = TB]
+  
+  subgraph cluster_inputs {
+    label = 'main, group, replicate'
+    input
+    mapper
+  }
+
+  node [shape = oval]
+  mapper [label = 'mapper']
+  multi_mapper [label = 'multi_mapper']
+  weights [label = 'weight\ninput']
+  A [label = 'A (component\nmodel matrix)']
+  state
+  effect
+
+  node [shape = rectangle]        
+  ibm_A [label = 'ibm_amatrix']
+  
+  # edge definitions with the node IDs
+  input -> ibm_A -> A
+  weights -> A
+  state -> effect
+  mapper -> multi_mapper -> ibm_A
+  A -> effect
+  }",
+  width = 600,
+  height = 600)
+```
+
+## Component input evaluation
+
+For each of `main`, `group`, `replicate`, and `weights`, the given expression `expr`
+is evaluated in the data context, producing the `input` to the component `mapper`.
+
+Red nodes indicate deprecated behaviour retained for backwards compatibility.
+
+```{r eval=TRUE,echo=FALSE}
+DiagrammeR::grViz("digraph {
+  graph [layout = dot, rankdir = TB]
+
+  node [shape = oval]
+  expr
+  data
+  _envir [label = '.envir']
+  input
+  input0 [label = 'input = NULL']
+  input1 [label = 'input = 1', color = red]
+
+  node [shape = rectangle]
+  eval
+  eval_function [label = 'value=fun(.data.)']
+  eval_formula [label = 'model.Matrix']
+  eval_spatial [label = 'eval_spatial']
+  eval_coordinates [label = 'SpatialPoints(value,crs)', color = red]
+  eval_crs [label = 'crs=fm_sp_get_crs(.data.)']
+
+  node [shape = diamond]
+  error
+  null_on_fail [label = 'Is null_on_fail\n TRUE?']
+  is_function [label = 'Is it a\nfunction?']
+  is_coordinates_fun [label = 'Is expr=coordinates?']
+  is_formula [label = 'Is it a\nformula?']
+  is_spatial [label = 'Is it a\nspatial covariate?']
+
+  {expr data _envir} -> eval -> error
+  error -> null_on_fail [label = 'Yes']
+  error -> is_function [label = 'No']
+  null_on_fail -> input0 [label = 'Yes']
+  {rank=same; error; null_on_fail; input0}
+  null_on_fail -> input1 [label = 'No']
+  {input0 input1} -> input
+  
+  is_function -> eval_function [label = 'Yes']
+  is_function -> is_formula [label = 'No']
+  eval_function -> is_coordinates_fun
+  {rank=same; is_function; eval_function}
+
+  is_coordinates_fun -> eval_coordinates [label = 'Yes']
+  is_coordinates_fun -> input [label = 'No']
+  eval_coordinates -> input
+  eval_crs -> eval_coordinates
+  {rank=same; is_coordinates_fun; eval_coordinates}
+
+  is_formula -> eval_formula [label = 'Yes']
+  is_formula -> is_spatial [label = 'No']
+  eval_formula -> input
+  {rank=same; is_formula; eval_formula}
+
+  is_spatial -> eval_spatial [label = 'Yes']
+  is_spatial -> input [label = 'No']
+  eval_spatial -> input
+  {rank=same; is_spatial; eval_spatial}
+  }",
+  width = 600,
+  height = 600)
+```

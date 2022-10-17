@@ -193,15 +193,17 @@ count_dat <- robins_subset %>%
   ungroup() %>%
   mutate(
     std_yr = year - max(year),
-    obs = 1:nrow(.),
+    obs = seq_len(nrow(.)),
     site_idx = as.numeric(factor(paste(circle, lon, lat))),
     year_idx = as.numeric(factor(year)),
     site_year_idx = as.numeric(factor(paste(circle, lon, lat, year)))
   ) %>%
   st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = FALSE) %>%
   st_transform(epsg6703km) %>%
-  mutate(easting = st_coordinates(.)[, 1],
-         northing = st_coordinates(.)[, 2]) %>%
+  mutate(
+    easting = st_coordinates(.)[, 1],
+    northing = st_coordinates(.)[, 2]
+  ) %>%
   arrange(circle, year)
 ```
 
