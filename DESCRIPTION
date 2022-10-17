@@ -90,7 +90,7 @@ Suggests:
     splancs,
     testthat,
     tidyr,
-    DiagrammerR
+    DiagrammeR
 Roxygen: list(markdown = TRUE)
 Config/testthat/parallel: true
 Config/testthat/edition: 3
