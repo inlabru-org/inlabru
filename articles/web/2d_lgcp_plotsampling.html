@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,10 +41,11 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../../articles/components_vignette.html">Defining model components</a>
-    <a class="dropdown-item" href="../../articles/devel_mapper.html">Devel: Customised model components with the bru_mapper system</a>
+    <a class="dropdown-item" href="../../articles/bru_mapper.html">Devel: Customised model components with the bru_mapper system</a>
+    <a class="dropdown-item" href="../../articles/component.html">Defining model components</a>
     <a class="dropdown-item" href="../../articles/linearapprox.html">Nonlinear model approximation</a>
     <a class="dropdown-item" href="../../articles/method.html">Iterative linearised INLA method</a>
+    <a class="dropdown-item" href="../../articles/prediction_scores.html">Prediction scores</a>
     <a class="dropdown-item" href="../../articles/web/1d_lgcp.html">LGCPs - An example in one dimension</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp.html">LGCPs - An example in two dimensions</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
@@ -52,6 +53,7 @@
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
     <a class="dropdown-item" href="../../articles/web/publications.html">Publications</a>
     <a class="dropdown-item" href="../../articles/web/random_fields.html">Random Fields in One Dimension</a>
     <a class="dropdown-item" href="../../articles/web/random_fields_2d.html">Random Fields in 2D</a>
@@ -89,7 +91,7 @@
       <img src="" class="logo" alt=""><h1>LGCPs - Plot sampling</h1>
                         <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-10</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -216,14 +218,14 @@
 <span><span class="co">#&gt; Warning in rbind(deparse.level, ...): number of columns of result, 8, is not a</span></span>
 <span><span class="co">#&gt; multiple of vector length 9 of arg 4</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 646.2183 55.89431 545.9480 644.2136 770.7882 644.2136        5.589431</span></span>
-<span><span class="co">#&gt; 2 639.4963 35.10944 580.1863 632.8787 702.5880 632.8787        3.510944</span></span>
-<span><span class="co">#&gt; 3 648.1717 23.18652 603.3395 646.5843 689.0961 646.5843        2.318652</span></span>
+<span><span class="co">#&gt; 1 638.3886 52.91424 556.6529 639.2921 744.7648 639.2921        5.291424</span></span>
+<span><span class="co">#&gt; 2 636.5183 33.09736 572.8218 635.2906 706.1495 635.2906        3.309736</span></span>
+<span><span class="co">#&gt; 3 647.6765 24.33033 600.9591 646.5042 696.6066 646.5042        2.433033</span></span>
 <span><span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      3.693647</span></span>
-<span><span class="co">#&gt; 2      1.963100</span></span>
-<span><span class="co">#&gt; 3      1.567507</span></span>
+<span><span class="co">#&gt; 1      3.321015</span></span>
+<span><span class="co">#&gt; 2      2.461310</span></span>
+<span><span class="co">#&gt; 3      1.667599</span></span>
 <span><span class="co">#&gt; 4            NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">

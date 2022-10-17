@@ -2,10 +2,11 @@ pandoc: 2.14.2
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
-  components_vignette: components_vignette.html
-  devel_mapper: devel_mapper.html
+  bru_mapper: bru_mapper.html
+  component: component.html
   linearapprox: linearapprox.html
   method: method.html
+  prediction_scores: prediction_scores.html
   1d_lgcp: web/1d_lgcp.html
   2d_lgcp: web/2d_lgcp.html
   2d_lgcp_covars: web/2d_lgcp_covars.html
@@ -13,10 +14,11 @@ articles:
   2d_lgcp_multilikelihood: web/2d_lgcp_multilikelihood.html
   2d_lgcp_plotsampling: web/2d_lgcp_plotsampling.html
   2d_lgcp_spatiotemporal: web/2d_lgcp_spatiotemporal.html
+  devel_flow: web/devel_flow.html
   publications: web/publications.html
   random_fields: web/random_fields.html
   random_fields_2d: web/random_fields_2d.html
   svc: web/svc.html
   website_examples: website_examples.html
-last_built: 2022-10-10T23:20Z
+last_built: 2022-10-17T16:38Z
 

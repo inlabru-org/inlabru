@@ -12,7 +12,7 @@ distributions in predictor expressions"><!-- mathjax --><script src="https://cdn
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,10 +26,11 @@ distributions in predictor expressions"><!-- mathjax --><script src="https://cdn
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/components_vignette.html">Defining model components</a>
-    <a class="dropdown-item" href="../articles/devel_mapper.html">Devel: Customised model components with the bru_mapper system</a>
+    <a class="dropdown-item" href="../articles/bru_mapper.html">Devel: Customised model components with the bru_mapper system</a>
+    <a class="dropdown-item" href="../articles/component.html">Defining model components</a>
     <a class="dropdown-item" href="../articles/linearapprox.html">Nonlinear model approximation</a>
     <a class="dropdown-item" href="../articles/method.html">Iterative linearised INLA method</a>
+    <a class="dropdown-item" href="../articles/prediction_scores.html">Prediction scores</a>
     <a class="dropdown-item" href="../articles/web/1d_lgcp.html">LGCPs - An example in one dimension</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp.html">LGCPs - An example in two dimensions</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
@@ -37,6 +38,7 @@ distributions in predictor expressions"><!-- mathjax --><script src="https://cdn
     <a class="dropdown-item" href="../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
     <a class="dropdown-item" href="../articles/web/publications.html">Publications</a>
     <a class="dropdown-item" href="../articles/web/random_fields.html">Random Fields in One Dimension</a>
     <a class="dropdown-item" href="../articles/web/random_fields_2d.html">Random Fields in 2D</a>
@@ -119,10 +121,10 @@ and inverse calculations use lower tails only, potentially losing accuracy in th
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">bru_forward_transformation</span><span class="op">(</span><span class="va">qexp</span>, <span class="va">u</span>, rate <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu">bru_inverse_transformation</span><span class="op">(</span><span class="va">pexp</span>, <span class="va">y</span>, rate <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">u</span>, <span class="va">y</span>, <span class="va">v</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        [,1]      [,2]     [,3]     [,4]       [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> u 0.8212846 0.2643480 1.132353 1.787330 -0.8356230</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> y 0.7905660 0.4634789 1.024968 1.649202  0.1126251</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> v 0.8212846 0.2643480 1.132353 1.787330 -0.8356230</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]       [,2]      [,3]       [,4]     [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> u -0.94867898 -0.4337811 0.6805176 -0.1435915 1.298106</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> y  0.09400402  0.2019010 0.6969851  0.2925156 1.165876</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> v -0.94867898 -0.4337811 0.6805176 -0.1435915 1.298106</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -4,10 +4,10 @@
     <loc>/404.html</loc>
   </url>
   <url>
-    <loc>/articles/components_vignette.html</loc>
+    <loc>/articles/bru_mapper.html</loc>
   </url>
   <url>
-    <loc>/articles/devel_mapper.html</loc>
+    <loc>/articles/component.html</loc>
   </url>
   <url>
     <loc>/articles/index.html</loc>
@@ -17,6 +17,9 @@
   </url>
   <url>
     <loc>/articles/method.html</loc>
+  </url>
+  <url>
+    <loc>/articles/prediction_scores.html</loc>
   </url>
   <url>
     <loc>/articles/web/1d_lgcp.html</loc>
@@ -38,6 +41,9 @@
   </url>
   <url>
     <loc>/articles/web/2d_lgcp_spatiotemporal.html</loc>
+  </url>
+  <url>
+    <loc>/articles/web/devel_flow.html</loc>
   </url>
   <url>
     <loc>/articles/web/publications.html</loc>
