@@ -1,6 +1,6 @@
 # inlabru (development version)
 
-## Feaures
+## Features
   
 * Add `bru_get_mapper` generic, and associated methods for `inla.spde` and
   `inla.rgeneric` objects. This allows `inlabru` to automatically extract
