@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, include=FALSE}
 library(inlabru)
+library(DiagrammeR)
 ```
 
 ## Component effect evaluation
