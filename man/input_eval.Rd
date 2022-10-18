@@ -23,7 +23,7 @@ input_eval(...)
 \item{data}{A \code{data.frame} or Spatial* object of covariates and/or point locations. If null, return the component's map.}
 }
 \value{
-An vector or a coordinate matrix
+An list of mapper input values, formatted for the full component mapper
 }
 \description{
 Obtain covariate values
@@ -93,6 +93,6 @@ this would look as follows:
 }
 
 \author{
-Fabian E. Bachl \email{bachlfab@gmail.com}
+Fabian E. Bachl \email{bachlfab@gmail.com}, Finn Lindgren \email{finn.lindgren@gmail.com}
 }
 \keyword{internal}

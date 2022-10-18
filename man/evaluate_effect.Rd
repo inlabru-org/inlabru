@@ -13,7 +13,7 @@ evaluate_effect_single(...)
 
 evaluate_effect_multi(...)
 
-\method{evaluate_effect_single}{component}(component, state, data, A = NULL, ...)
+\method{evaluate_effect_single}{component}(component, state, data, input = NULL, A = NULL, ...)
 
 \method{evaluate_effect_single}{component_list}(components, state, data, A = NULL, ...)
 
@@ -37,6 +37,8 @@ only the label for the given component needs to be included
 }}
 
 \item{data}{A \code{data.frame} or Spatial* object of covariates and/or point locations.}
+
+\item{input}{An optional pre-evaluated component input}
 
 \item{A}{A matrix overriding the default projection matrix or matrices
 (named list of matrices for \code{evaluate_effect.component_list})}

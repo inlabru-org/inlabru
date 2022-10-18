@@ -5,8 +5,8 @@
 #' The [inlabru] syntax for model formulae is different from what
 #' `INLA::inla` considers a valid.
 #' In inla most of the effects are defined by adding an `f(...)` expression to the formula.
-#' In [inlabru] the `f` is replaced by an arbitrary (exception: `offset`) string that will
-#' determine the label of the effect. See Details for further information.
+#' In [inlabru] the `f` is replaced by an arbitrary (exceptions: `const` and `offset`)
+#' string that will determine the label of the effect. See Details for further information.
 #'
 #' @details
 #' For instance
@@ -86,7 +86,7 @@ bru_model <- function(components, lhoods) {
 
   for (cmp in included) {
     if (linear ||
-      !identical(components[[cmp]][["main"]][["type"]], "offset")) {
+      !(components[[cmp]][["main"]][["type"]] %in% c("offset", "const"))) {
       formula <- update.formula(formula, components[[cmp]]$inla.formula)
     }
   }
@@ -264,6 +264,7 @@ evaluate_effect_multi <- function(...) {
 #' only the label for the given component needs to be included
 #' @param A A matrix overriding the default projection matrix or matrices
 #' (named list of matrices for `evaluate_effect.component_list`)
+#' @param input An optional pre-evaluated component input
 #' @param ... Unused.
 #' @return * `evaluate_effect_single.component`: A numeric vector of the component effect values
 #' state.
@@ -271,18 +272,16 @@ evaluate_effect_multi <- function(...) {
 #' Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname evaluate_effect
 
-evaluate_effect_single.component <- function(component, state, data, A = NULL, ...) {
-  # Make A-matrix (if not provided)
+evaluate_effect_single.component <- function(component, state, data,
+                                             input = NULL, A = NULL, ...) {
+  if (is.null(input)) {
+    input <- input_eval(component, data)
+  }
   if (is.null(A)) {
-    A <- amatrix_eval(component, data)
+    A <- amatrix_eval(component, data = data, input = input)
   }
 
-  # Determine component depending on the type of latent model
-  if (component$main$type %in% c("offset")) {
-    values <- A
-  } else {
-    values <- A %*% state
-  }
+  values <- ibm_eval(component[["mapper"]], input = input, state = state, A = A)
 
   as.vector(as.matrix(values))
 }
@@ -317,6 +316,7 @@ evaluate_effect_single.component_list <- function(components, state, data,
 #' @keywords internal
 evaluate_effect_multi.component <- function(component, state, data,
                                             A = NULL, ...) {
+  input <- input_eval(component, data = data)
   if (is.null(A)) {
     A <- amatrix_eval(component, data = data)
   }
@@ -328,6 +328,7 @@ evaluate_effect_multi.component <- function(component, state, data,
         state = x,
         data = data,
         A = A,
+        input = input,
         ...
       )
     }
@@ -451,7 +452,7 @@ evaluate_predictor <- function(model,
 
   eval_fun_factory <-
     function(.comp, .envir, .enclos) {
-      .is_offset <- .comp$main$type %in% c("offset")
+      .is_offset <- .comp$main$type %in% c("offset", "const")
       .is_iid <- .comp$main$type %in% c("iid")
       .mapper <- .comp$mapper
       .label <- paste0(.comp$label, "_latent")
@@ -460,6 +461,7 @@ evaluate_predictor <- function(model,
       .iid_cache_index <- NULL
       eval_fun <- function(main, group = NULL,
                            replicate = NULL,
+                           weights = NULL,
                            .state = NULL) {
         if (is.null(group)) {
           group <- rep(1, NROW(main))
@@ -467,59 +469,59 @@ evaluate_predictor <- function(model,
         if (is.null(replicate)) {
           replicate <- rep(1, NROW(main))
         }
-        .A <- ibm_amatrix(
-          .mapper,
-          input = list(
+        if (!.is_offset && is.null(.state)) {
+          .state <- eval(
+            parse(text = .label),
+            envir = .envir,
+            enclos = .enclos
+          )
+        }
+        .input = list(
+          mapper = list(
             main = main,
             group = group,
             replicate = replicate
-          )
+          ),
+          scale = weights
         )
-        if (.is_offset) {
-          .values <- .A
-        } else {
-          if (is.null(.state)) {
-            .state <- eval(parse(text = .label),
+
+        .values <- ibm_eval(
+          .mapper,
+          input = .input,
+          state = .state
+        )
+        if (.is_iid) {
+          ok <- ibm_valid_input(
+            .mapper,
+            input = .input
+          )
+          if (any(!ok)) {
+            .cache_state_index <- eval(
+              parse(text = ".cache_state_index"),
               envir = .envir,
               enclos = .enclos
             )
-          }
-          .values <- .A %*% .state
-          if (.is_iid) {
-            ok <- ibm_valid_input(
-              .mapper,
-              input = list(
-                main = main,
-                group = group,
-                replicate = replicate
-              )
-            )
-            if (any(!ok)) {
-              .cache_state_index <- eval(parse(text = ".cache_state_index"),
+            if (!identical(.cache_state_index, .iid_cache_index)) {
+              .iid_cache_index <<- .cache_state_index
+              .iid_cache <<- list()
+            }
+            key <- as.character(main[!ok])
+            not_cached <- !(key %in% names(.iid_cache))
+            if (any(not_cached)) {
+              .prec <- eval(
+                parse(text = .iid_precision),
                 envir = .envir,
                 enclos = .enclos
               )
-              if (!identical(.cache_state_index, .iid_cache_index)) {
-                .iid_cache_index <<- .cache_state_index
-                .iid_cache <<- list()
+              for (k in unique(key[not_cached])) {
+                .iid_cache[k] <<- rnorm(1, mean = 0, sd = .prec^-0.5)
               }
-              key <- as.character(main[!ok])
-              not_cached <- !(key %in% names(.iid_cache))
-              if (any(not_cached)) {
-                .prec <- eval(parse(text = .iid_precision),
-                  envir = .envir,
-                  enclos = .enclos
-                )
-                for (k in unique(key[not_cached])) {
-                  .iid_cache[k] <<- rnorm(1, mean = 0, sd = .prec^-0.5)
-                }
-              }
-              .values[!ok] <- vapply(
-                key,
-                function(k) .iid_cache[[k]],
-                0.0
-              )
             }
+            .values[!ok] <- vapply(
+              key,
+              function(k) .iid_cache[[k]],
+              0.0
+            )
           }
         }
 
@@ -647,7 +649,8 @@ evaluate_A <- function(model, lhoods, inla_f) {
         lh[["exclude_components"]]
       )
 
-      amatrix_eval(model$effects[included],
+      amatrix_eval(
+        model$effects[included],
         data = lh[["data"]],
         inla_f = inla_f
       )

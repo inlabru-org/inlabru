@@ -8,7 +8,7 @@
 \usage{
 amatrix_eval(...)
 
-\method{amatrix_eval}{component}(component, data, ...)
+\method{amatrix_eval}{component}(component, data, input = NULL, ...)
 
 \method{amatrix_eval}{component_list}(components, data, ...)
 }
@@ -17,7 +17,9 @@ amatrix_eval(...)
 
 \item{component}{A component.}
 
-\item{data}{A \code{data.frame} or Spatial* object of covariates and/or point locations.}
+\item{data}{A \code{data.frame} or \verb{Spatial*} object of covariates and/or point locations.}
+
+\item{input}{Optional pre-evaluated component inputs, from \code{input_eval()}}
 }
 \value{
 An A-matrix.

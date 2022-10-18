@@ -59,8 +59,8 @@ bru_compute_linearisation.component <- function(cmp,
     }
   }
 
-  if (identical(cmp[["main"]][["type"]], "offset")) {
-    # Zero-column matrix, since an offset has no latent state variables.
+  if (cmp[["main"]][["type"]] %in% c("offset", "const")) {
+    # Zero-column matrix, since a const/offset has no latent state variables.
     return(Matrix::sparseMatrix(
       i = c(),
       j = c(),
@@ -166,7 +166,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
   effects <- evaluate_effect_single(
     model[["effects"]][included],
     state = state,
-    data = NULL,
+    data = data,
     A = A
   )
 
@@ -195,13 +195,13 @@ bru_compute_linearisation.bru_like <- function(lhood,
     }
   }
 
-  # Compute derivatives for each non-offset component
+  # Compute derivatives for each non-const/offset component
   B <- list()
   offset <- pred0
   # Either this loop or the internal bru_component specific loop
   # can in principle be parallelised.
   for (label in included) {
-    if (!identical(model[["effects"]][[label]][["main"]][["type"]], "offset")) {
+    if (ibm_n(model[["effects"]][[label]][["mapper"]]) > 0) {
       if (lhood[["linear"]] && !lhood[["allow_combine"]]) {
         # If linear and no combinations allowed, just need to copy the
         # non-offset A matrix, and possibly expand to full size

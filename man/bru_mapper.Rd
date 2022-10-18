@@ -10,7 +10,9 @@
 \alias{bru_mapper_linear}
 \alias{bru_mapper_matrix}
 \alias{bru_mapper_factor}
+\alias{bru_mapper_const}
 \alias{bru_mapper_offset}
+\alias{bru_mapper_scale}
 \alias{bru_mapper_multi}
 \alias{bru_mapper_collect}
 \alias{bru_mapper_harmonics}
@@ -34,7 +36,11 @@ bru_mapper_matrix(labels, ...)
 
 bru_mapper_factor(values, factor_mapping, ...)
 
+bru_mapper_const(...)
+
 bru_mapper_offset(...)
+
+bru_mapper_scale(mapper, ...)
 
 bru_mapper_multi(mappers, ...)
 
@@ -133,6 +139,10 @@ arguments along. Mapper implementations should call \code{\link[=bru_mapper_defi
 instead, and supply at least a \code{new_class} class name.
 Use of the \code{bru_mapper.default} will be deprecated from version 2.6.0.
 }
+
+For \code{bru_mapper_scale()}, \code{mapper} is a mapper to be scaled.
+The \code{input} format for the \code{ibm_eval} and \code{ibm_amatrix} methods is
+\code{list(mapper = input_to_the_inner_mapper, scale = scaling_weights)}
 
 \itemize{
 \item \code{bru_mapper_multi} constructs a kronecker product mapping

@@ -13,6 +13,14 @@
   
 * New vignettes on the `bru_mapper` system, `component` definitions,
   and `prediction_scores`
+  
+* Add `ibm_eval` generic for evaluating mappers for given states; unifies
+  ordinary mappers with `bru_mapper_const`, which replaces `bru_mapper_offset`.
+  `bru_mapper_offset` is now deprecated.
+  
+* The `<component>_eval()` methods available in predictor expressions
+  now handle optional scaling weights, like in ordinary component effect
+  evaluation.
 
 ## Bug fixes
 

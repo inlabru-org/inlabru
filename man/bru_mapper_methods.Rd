@@ -5,11 +5,13 @@
 \alias{ibm_n}
 \alias{ibm_values}
 \alias{ibm_amatrix}
+\alias{ibm_eval}
 \alias{ibm_inla_subset}
 \alias{ibm_valid_input}
 \alias{ibm_n.default}
 \alias{ibm_values.default}
 \alias{ibm_amatrix.default}
+\alias{ibm_eval.default}
 \alias{ibm_inla_subset.default}
 \alias{ibm_valid_input.default}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
@@ -29,12 +31,23 @@
 \alias{ibm_n.bru_mapper_factor}
 \alias{ibm_values.bru_mapper_factor}
 \alias{ibm_amatrix.bru_mapper_factor}
+\alias{ibm_n.bru_mapper_const}
+\alias{ibm_values.bru_mapper_const}
+\alias{ibm_amatrix.bru_mapper_const}
+\alias{ibm_eval.bru_mapper_const}
 \alias{ibm_n.bru_mapper_offset}
 \alias{ibm_values.bru_mapper_offset}
 \alias{ibm_amatrix.bru_mapper_offset}
+\alias{ibm_eval.bru_mapper_offset}
+\alias{ibm_n.bru_mapper_scale}
+\alias{ibm_values.bru_mapper_scale}
+\alias{ibm_amatrix.bru_mapper_scale}
+\alias{ibm_eval.bru_mapper_scale}
+\alias{ibm_valid_input.bru_mapper_scale}
 \alias{ibm_n.bru_mapper_multi}
 \alias{ibm_values.bru_mapper_multi}
 \alias{ibm_amatrix.bru_mapper_multi}
+\alias{ibm_eval.bru_mapper_multi}
 \alias{ibm_valid_input.bru_mapper_multi}
 \alias{[.bru_mapper_multi}
 \alias{names.bru_mapper_multi}
@@ -56,6 +69,8 @@ ibm_values(mapper, inla_f = FALSE, ...)
 
 ibm_amatrix(mapper, input, inla_f = FALSE, ...)
 
+ibm_eval(mapper, input, state, ...)
+
 ibm_inla_subset(mapper, ...)
 
 ibm_valid_input(mapper, input, inla_f = FALSE, ...)
@@ -65,6 +80,8 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 \method{ibm_values}{default}(mapper, inla_f = FALSE, ...)
 
 \method{ibm_amatrix}{default}(mapper, input, inla_f = FALSE, ...)
+
+\method{ibm_eval}{default}(mapper, input, state, A = NULL, ...)
 
 \method{ibm_inla_subset}{default}(mapper, ...)
 
@@ -104,17 +121,39 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_amatrix}{bru_mapper_factor}(mapper, input, ...)
 
+\method{ibm_n}{bru_mapper_const}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_const}(mapper, ...)
+
+\method{ibm_amatrix}{bru_mapper_const}(mapper, input, ...)
+
+\method{ibm_eval}{bru_mapper_const}(mapper, input, state, ...)
+
 \method{ibm_n}{bru_mapper_offset}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_offset}(mapper, ...)
 
 \method{ibm_amatrix}{bru_mapper_offset}(mapper, input, ...)
 
+\method{ibm_eval}{bru_mapper_offset}(mapper, input, state, ...)
+
+\method{ibm_n}{bru_mapper_scale}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_scale}(mapper, ...)
+
+\method{ibm_amatrix}{bru_mapper_scale}(mapper, input, ...)
+
+\method{ibm_eval}{bru_mapper_scale}(mapper, input, state, ...)
+
+\method{ibm_valid_input}{bru_mapper_scale}(mapper, input, ...)
+
 \method{ibm_n}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = 0L, ...)
 
 \method{ibm_values}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = 0L, ...)
 
 \method{ibm_amatrix}{bru_mapper_multi}(mapper, input, inla_f = FALSE, multi = 0L, ...)
+
+\method{ibm_eval}{bru_mapper_multi}(mapper, input, state, ...)
 
 \method{ibm_valid_input}{bru_mapper_multi}(mapper, input, inla_f = FALSE, multi = 0L, ...)
 
@@ -155,6 +194,11 @@ as "bym2", which can be handled by \code{bru_mapper_collect}.}
 \item{\dots}{Arguments passed on to other methods}
 
 \item{input}{The values for which to produce a mapping matrix}
+
+\item{state}{A vector of latent state values for the mapping,
+of length \code{ibm_n(mapper, inla_f = FALSE)}}
+
+\item{A}{For \code{ibm_amatrix.default}, an optional precomputed A-matrix.}
 
 \item{multi}{integer or logical;
 If positive, the number of levels to recurse in a \code{bru_collect_mapper}.
@@ -226,6 +270,17 @@ the allowed type of input format.
 }
 
 \itemize{
+\item \code{ibm_eval} Generic.
+Implementations must return a (sparse) matrix of size \code{NROW(input)}
+(except for the \code{bru_mapper_multi} and \code{bru_mapper_collect} methods,
+that require \code{list()} inputs, and the input size is determined by the
+combined inputs)
+by \code{ibm_n(mapper, inla_f = FALSE)}. The \code{input} contents must
+be in a format accepted by \code{ibm_amatrix(..., inla_f=FALSE)}
+for the mapper.
+}
+
+\itemize{
 \item \code{ibm_inla_subset} Generic.
 Implementations must return a logical vector of \code{TRUE/FALSE} for
 the subset such that, given the full A matrix and values output,
@@ -255,8 +310,14 @@ it doesn't exist.
 }
 
 \itemize{
-\item The default \code{ibm_amatrix()} gives an error message.
+\item The default \code{ibm_amatrix()} method gives an error message.
 Mapper classes must implement their own \code{ibm_amatrix} method.
+}
+
+\itemize{
+\item The default \code{ibm_eval()} method multiplies the \code{A} matrix
+from \code{ibm_amatrix(mapper, input, inla_f = FALSE)} with the
+state vector.
 }
 
 \itemize{
@@ -268,6 +329,16 @@ both regular vector values and \code{multi=1} data.frame values).
 
 \itemize{
 \item The default \code{ibm_valid_input()} method returns an all-TRUE logical vector.
+}
+
+For \code{bru_mapper_scale}, \code{input} values without a \code{scale} element
+are interpreted as no scaling.
+
+\itemize{
+\item \code{ibm_valid_input} for \code{bru_mapper_scale} accepts a list with
+named entries \code{mapper} and \code{scale}. The contents of the \code{mapper}
+element is checked for validity for the submapper
+with \code{ibm_valid_input(mapper$mapper, input$mapper, ...)}
 }
 
 \itemize{

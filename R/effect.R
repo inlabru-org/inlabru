@@ -162,7 +162,8 @@ component <- function(...) {
 #' should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 #' Arguments starting with weights, group, replicate behave similarly to main,
 #' but for the corresponding features of `INLA::f()`.
-#' @param model Either one of "offset", "factor_full", "factor_contrast", "linear",
+#' @param model Either one of "const" (same as "offset"), "factor_full",
+#' "factor_contrast", "linear",
 #' "fixed", or a model name or
 #' object accepted by INLA's `f` function. If set to NULL, then "linear" is used
 #' for vector inputs, and "fixed" for matrix input (converted internally to
@@ -287,7 +288,7 @@ component.character <- function(object,
   #            clinear, sigm, revsigm, log1exp, logdist)
   #
   # Supported:
-  # btypes = c("offset", "factor_full", "factor_contrast", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
+  # btypes = c("const", "offset", "factor_full", "factor_contrast", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
 
   # The label
   label <- object
@@ -443,23 +444,25 @@ component.character <- function(object,
   }
 
   # Special and general cases:
-  if (component$main$type %in% c("offset")) {
+  if (component$main$type %in% c("offset", "const")) {
     # The offset is included either automatically for ~ . linear models,
     # or explicitly by name in the predictor expression, so no INLA formula
     # component is needed.
     component$inla.formula <- as.formula(paste0("~ ."),
       env = .envir
     )
-    component$main$mapper <- bru_mapper_offset()
+    component$main$mapper <- bru_mapper_const()
     component$group$mapper <- bru_mapper_index(1L)
     component$replicate$mapper <- bru_mapper_index(1L)
-    # Add multi-mapper
+    # Add scalable multi-mapper
     component[["mapper"]] <-
-      bru_mapper_multi(list(
-        main = component$main$mapper,
-        group = component$group$mapper,
-        replicate = component$replicate$mapper
-      ))
+      bru_mapper_scale(
+        bru_mapper_multi(list(
+          main = component$main$mapper,
+          group = component$group$mapper,
+          replicate = component$replicate$mapper
+        ))
+      )
   } else {
     if (!is.null(copy)) {
       # Store copy-model name or object in the environment
@@ -773,13 +776,15 @@ add_mappers.component <- function(component, lhoods, ...) {
     env = component$env,
     require_indexed = TRUE
   )
-  # Add multi-mapper
+  # Add scalable multi-mapper
   component[["mapper"]] <-
-    bru_mapper_multi(list(
-      main = component$main$mapper,
-      group = component$group$mapper,
-      replicate = component$replicate$mapper
-    ))
+    bru_mapper_scale(
+      bru_mapper_multi(list(
+        main = component$main$mapper,
+        group = component$group$mapper,
+        replicate = component$replicate$mapper
+      ))
+    )
 
   fcall <- component$fcall
 
@@ -803,7 +808,7 @@ add_mappers.component <- function(component, lhoods, ...) {
     assign(values_name, component$main$values, envir = component$env_extra)
   }
 
-  if (!identical(component[["main"]][["type"]], "offset")) {
+  if (!(component[["main"]][["type"]] %in% c("offset", "const"))) {
     # Update the formula that will be presented to INLA
     component$inla.formula <-
       as.formula(paste0(
@@ -900,6 +905,9 @@ bru_subcomponent <- function(input = NULL,
     } else if (identical(model, "fixed")) {
       model <- "iid"
       type <- "fixed"
+    } else if (model %in% c("offset", "const")) {
+      model <- "const"
+      type <- "const"
     } else {
       type <- model
     }
@@ -1283,8 +1291,8 @@ make_mapper <- function(subcomp,
     }
   } else if (subcomp[["type"]] %in% c("linear", "clinear")) {
     subcomp[["mapper"]] <- bru_mapper_linear()
-  } else if (subcomp[["type"]] %in% c("offset")) {
-    subcomp[["mapper"]] <- bru_mapper_offset()
+  } else if (subcomp[["type"]] %in% c("offset", "const")) {
+    subcomp[["mapper"]] <- bru_mapper_const()
   } else if (subcomp[["type"]] %in% c("fixed")) {
     if (!is.null(subcomp[["values"]])) {
       labels <- subcomp[["values"]]
@@ -1375,7 +1383,7 @@ code.components <- function(components, add = "") {
     if (ix > 0) {
       label <- substr(code, 1, ix - 1)
       is.fixed <- FALSE
-      if (label == "offset") {
+      if (label %in% c("offset", "const")) {
         is.offset <- TRUE
       }
     } else {
@@ -1406,7 +1414,7 @@ code.components <- function(components, add = "") {
             paste0(label, "("),
             paste0(
               fname, '("', label, '"',
-              ', model = "offset", main = '
+              ', model = "const", main = '
             ),
             code,
             fixed = TRUE
@@ -1519,22 +1527,23 @@ print.summary_component_list <- function(x, ...) {
 #' @export
 #' @keywords internal
 #' @param component A component.
-#' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
+#' @param data A `data.frame` or `Spatial*` object of covariates and/or point locations.
+#' @param input Optional pre-evaluated component inputs, from `input_eval()`
 #' @param ... Unused.
 #' @return An A-matrix.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @rdname amatrix_eval
 
-amatrix_eval.component <- function(component, data, ...) {
-  val <- input_eval(component, data)
-  A <- ibm_amatrix(component$mapper, input = val, ...)
-
-  if (!is.null(val[["weights"]])) {
-    A <- val[["weights"]] * A
+amatrix_eval.component <- function(component, data, input = NULL, ...) {
+  if (is.null(input)) {
+    input  <- input_eval(component, data)
   }
+  # The bru_mapper_scale component mapper handles scaling by weights
+  A <- ibm_amatrix(component$mapper, input = input, ...)
 
   # Mask columns of A
-  # TODO: check what this feature is intended for!
+  # TODO: This is a special case of a "prescale" feature; can be done via a
+  # mapper class instead
   if (!is.null(component$A.msk)) {
     A[, as.logical(component$A.msk)] <- 0.0
   }
@@ -1612,18 +1621,20 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #' @param component A component.
 #' @param data A `data.frame` or Spatial* object of covariates and/or point locations. If null, return the component's map.
 #' @param ... Unused.
-#' @return An vector or a coordinate matrix
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @return An list of mapper input values, formatted for the full component mapper
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname input_eval
 
 input_eval.component <- function(component,
                                  data,
                                  ...) {
-  val <- list()
+  stopifnot(inherits(component[["mapper"]], "bru_mapper_scale"))
+
   # The names should be a subset of main, group, replicate
-  part_names <- names(component[["mapper"]])
+  part_names <- names(component[["mapper"]][["mapper"]])
+  mapper_val <- list()
   for (part in part_names) {
-    val[[part]] <-
+    mapper_val[[part]] <-
       input_eval(
         component[[part]]$input,
         data,
@@ -1632,8 +1643,10 @@ input_eval.component <- function(component,
         ...
       )
   }
-  if (!is.null(component[["weights"]])) {
-    val[["weights"]] <-
+  if (is.null(component[["weights"]])) {
+    scale_val <- NULL
+  } else {
+    scale_val <-
       input_eval(
         component[["weights"]],
         data,
@@ -1644,7 +1657,7 @@ input_eval.component <- function(component,
   }
   # Any potential length mismatches must be handled by bru_mapper_multi and
   # bru_mapper_collect, since e.g. 'main' might take a list() input object.
-  val
+  list(mapper = mapper_val, scale = scale_val)
 }
 
 #' @export
@@ -1774,7 +1787,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       layer = layer,
       selector = input[["selector"]]
     )
-    #  } else if ((input$label == "offset") &&
+    #  } else if ((input$label %in% c("offset", "const")) &&
     #    is.numeric(emap) &&
     #    (length(emap) == 1)) {
     #    val <- rep(emap, n)

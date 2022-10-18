@@ -17,9 +17,12 @@ test_that("Component construction: linear model", {
   expect_equal(
     input_eval(cmp, data = df),
     list(
-      main = 1:10,
-      group = 1,
-      replicate = 1
+      mapper = list(
+        main = 1:10,
+        group = 1,
+        replicate = 1
+      ),
+      scale = NULL
     )
   )
 
@@ -54,7 +57,7 @@ test_that("Component construction: linear model", {
 
   v <- evaluate_effect_multi(
     cmps,
-    data = NULL,
+    data = df,
     state = list(list(beta = 2)),
     A = list(beta = A)
   )
