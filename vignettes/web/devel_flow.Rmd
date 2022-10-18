@@ -31,27 +31,43 @@ DiagrammeR::grViz("digraph {
   
   subgraph cluster_inputs {
     label = 'main, group, replicate'
-    input
     mapper
+    input
   }
 
   node [shape = oval]
+  input_comb [label = 'combined inputs']
   mapper [label = 'mapper']
-  multi_mapper [label = 'multi_mapper']
+  multi_mapper [label = 'mapper_multi']
+  scale_mapper [label = 'mapper_scale']
   weights [label = 'weight\ninput']
-  A [label = 'A (component\nmodel matrix)']
+  A [label = 'A\n(component model matrix)']
+  off [label = 'offset\n(component offset)']
+  lin [label = 'lin\n(offset, A, state0)']
   state
   effect
 
   node [shape = rectangle]        
   ibm_A [label = 'ibm_amatrix']
+  ibm_is_lin [label = 'If ibm_is_linear']
+  ibm_lin [label = 'ibm_linear']
+  ibm_jac [label = 'ibm_jacobian']
+  ibm_off [label = 'ibm_offset']
+  ibm_eval [label = 'ibm_eval']
   
   # edge definitions with the node IDs
-  input -> ibm_A -> A
-  weights -> A
-  state -> effect
-  mapper -> multi_mapper -> ibm_A
-  A -> effect
+  {input weights} -> input_comb
+  input_comb -> {ibm_eval ibm_lin}
+  scale_mapper -> {ibm_eval ibm_is_lin}
+  ibm_is_lin -> ibm_lin
+  ibm_lin -> {ibm_jac ibm_off lin}
+  lin -> ibm_eval
+  ibm_jac -> A
+  ibm_off -> off
+  ibm_jac -> ibm_A [dir = 'none']
+  state -> {ibm_eval ibm_lin}
+  mapper -> multi_mapper -> scale_mapper
+  ibm_eval -> effect
   }",
   width = 600,
   height = 600)
