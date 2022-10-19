@@ -623,7 +623,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     expr <- NULL
   }
 
-  # Set response name
+  # Set the response name
   response <- all.vars(update(formula, . ~ 0))
   if (response[1] == ".") {
     stop("Missing response variable names")
