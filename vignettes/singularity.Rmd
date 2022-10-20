@@ -22,17 +22,37 @@ header-includes:
   - \newcommand{\pP}{\proper{P}}
   - \newcommand{\pVar}{\proper{Var}}
 ---
-High Performance Computing is surging in popularity. Building INLA package on 
-the HPC system with the Anaconda environment sometimes can be tricky due to the 
-Linux distributions and versions. This article is to suggest a workaround using 
-Singularity  because  
+High Performance Computing (HPC) is surging in popularity. Building INLA package
+on the HPC systems with the Anaconda environment sometimes can be tricky due to 
+the Linux distributions and versions. This article is to suggest a workaround 
+with container images using [Apptainer](https://apptainer.org/)(formerly known 
+as Singularity) because [Docker](https://www.docker.com/) requires root access 
+and usually is not available on HPC. Despite its convenience, the image size can
+be large. 
 
-## Docker 
-We start with introducing Docker. A Docker image is a standalone file 
-that  rocker/geospatial
+## Installation Procedures 
+We start with introducing Docker. A Docker image is a standalone file that  
+rocker/geospatial
 which can be regarded as 
 Docker images are not secure because they provide a means to gain root access to the system they are running on. For this reason Docker is not available on the 
 https://hub.docker.com/r/rocker/geospatial
 
+1. Check if [SingularityCE](https://github.com/sylabs/singularity/blob/main/INSTALL.md)
+   is available on your HPC. If not, ask the administrator to install it. 
+   
+2. Connect to the HPC Terminal and run the code below. 
 
+```{r singularity, eval=FALSE}
+# To pull the docker image 
+$ singularity pull name_your_containter.sif docker://rocker/geospatial:latest
+# once the image is downloaded, get into an interactive shell 
+$ singularity shell name_your_containter.sif
+# Inside the interactive shell, one can install INLA on a personal library
+$ R --verbose 
+> install.packages("INLA") 
+# You might be asked to choose your CRAN Mirror and create a personal library 
+# path.
+```
+Note: Using `inla. setOption(num. threads=ncpu)` to set the number of cpu as 
+INLA does not set it automatically. 
 
