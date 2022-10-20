@@ -1,5 +1,5 @@
 ---
-title: "Singularity container"
+title: "Installation of INLA with SingularityCE on HPC"
 output:
   rmarkdown::html_vignette:
   rmarkdown::pdf_document:
@@ -52,6 +52,7 @@ $ R --verbose
 > install.packages("INLA") 
 # You might be asked to choose your CRAN Mirror and create a personal library 
 # path.
+> install.packages("inlabru") 
 ```
 Note: Using `inla. setOption(num. threads=ncpu)` to set the number of cpu as 
 INLA does not set it automatically. 
