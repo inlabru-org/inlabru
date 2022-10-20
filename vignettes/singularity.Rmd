@@ -4,7 +4,7 @@ output:
   rmarkdown::html_vignette:
   rmarkdown::pdf_document:
 vignette: >
-  %\VignetteIndexEntry{Singularity container}
+  %\VignetteIndexEntry{SingularityCE}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 header-includes:
@@ -27,7 +27,7 @@ on the HPC systems with the Anaconda environment sometimes can be tricky due to
 the Linux distributions and versions. This article is to suggest a workaround 
 with container images using [Apptainer](https://apptainer.org/)(formerly known 
 as Singularity) because [Docker](https://www.docker.com/) requires root access 
-and usually is not available on HPC. Despite its convenience, the image size can
+and is usually not available on HPC. Despite its convenience, the image size can
 be large. 
 
 ## Installation Procedures 
@@ -38,22 +38,30 @@ Docker images are not secure because they provide a means to gain root access to
 https://hub.docker.com/r/rocker/geospatial
 
 1. Check if [SingularityCE](https://github.com/sylabs/singularity/blob/main/INSTALL.md)
-   is available on your HPC. If not, ask the administrator to install it. 
-   
-2. Connect to the HPC Terminal and run the code below. 
+   is available on your HPC. If not, ask the administrator to install it. Type 
+   on your HPC terminal. 
+```{r singularity check, eval=FALSE}
+$ singularity --version
+```
+
+2. Connect to the HPC Terminal and type the code below to pull the 
+rocker/geospatial sif file. 
 
 ```{r singularity, eval=FALSE}
 # To pull the docker image 
 $ singularity pull name_your_containter.sif docker://rocker/geospatial:latest
-# once the image is downloaded, get into an interactive shell 
+# once the sif is downloaded, get into an interactive shell 
 $ singularity shell name_your_containter.sif
-# Inside the interactive shell, one can install INLA on a personal library
+# Inside the interactive shell, one can install INLA on a personal library path
 $ R --verbose 
+# Now, in a R environment
 > install.packages("INLA") 
-# You might be asked to choose your CRAN Mirror and create a personal library 
+# One will be asked to choose your CRAN Mirror and create a personal library 
 # path.
 > install.packages("inlabru") 
+# quit R
+> q()
 ```
-Note: Using `inla. setOption(num. threads=ncpu)` to set the number of cpu as 
+Note: Using `inla. setOption(num. threads=ncpu)` to set the number of ncpu since 
 INLA does not set it automatically. 
 
