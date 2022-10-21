@@ -1,6 +1,8 @@
 local_bru_testthat_setup()
 
 test_that("sf gorillas lgcp vignette", {
+  skip("Feature not yet implemented")
+
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not_installed("sf")
