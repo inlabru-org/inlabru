@@ -1,6 +1,6 @@
 # inlabru (development version)
 
-## Feaures
+## Features
   
 * Add `bru_get_mapper` generic, and associated methods for `inla.spde` and
   `inla.rgeneric` objects. This allows `inlabru` to automatically extract
@@ -10,6 +10,9 @@
 * Add a `weights` argument for `like()`, for likelihood-specific log-likelihood
   weights, passed on to the `INLA::inla()` weights argument. Evaluated in the
   data context.
+  
+* New vignettes on the `bru_mapper` system, `component` definitions,
+  and `prediction_scores`
 
 * Add `terra` support for covariate inputs
 
@@ -22,6 +25,8 @@
   `epsg:4326`. Fixes #154
   
 * Make duplicated component names an error instead of a warning. Relates to #155
+
+* Fix Tsparse assumptions in `row_kron`. Fixes #162
   
 # inlabru 2.5.3
 

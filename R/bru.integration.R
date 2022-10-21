@@ -602,6 +602,10 @@ cprod <- function(...) {
 
 ipmaker <- function(samplers, domain, dnames,
                     int.args = list(method = "stable", nsub = NULL)) {
+  # To allow sf geometry support, should likely change the logic to
+  # use the domain specification to determine the type of integration
+  # method to call, so that it doesn't need to rely on the domain name.
+
   if ("coordinates" %in% dnames) {
     spatial <- TRUE
   } else {

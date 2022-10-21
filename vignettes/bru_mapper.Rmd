@@ -31,11 +31,11 @@ The reference documentation for the mapper methods is contained in three parts:
 
 
 ```{r eval=FALSE}
-ibm_n()
-ibm_values()
-ibm_amatrix()
-ibm_inla_subset()
-ibm_valid_input()
+ibm_n(mapper, inla_f, ...)
+ibm_values(mapper, inla_f, ...)
+ibm_amatrix(mapper, input, ...)
+ibm_inla_subset(mapper, ...)
+ibm_valid_input(mapper, input, ...)
 ```
 
 An example where the `inla_f` argument matters is the `bru_mapper_collect` class,
@@ -109,6 +109,14 @@ bru_get_mapper
 bru_mapper_define
 ```
 
+Implementations can avoid having to define `ibm_n` and `ibm_values` methods,
+by instead computing and storing `n`, `n_inla`, `values`, and `values_inla`
+in the mapper object during construction.  The default `ibm_n` and `ibm_values`
+methods checks if these values are available, and return the appropriate values
+depending on the `inla_f` argument.  When `*_inla` values are requested but not
+available, the methods fall back to the non-inla versions. If the needed information
+is not found, the default methods give an error message.
+
 ## Example
 
 Let's build a mapper class `bru_mapper_p_quadratic`
@@ -172,6 +180,23 @@ ibm_values.bru_mapper_p_quadratic <- function(mapper, ...) {
   )
 }
 ```
+While the approach to `ibm_n` and `ibm_values` above works, it is wasteful to
+recompute the `n` and `values` information for each call. Instead we can use that
+the default method will check if `n` or `values` are stored in the mapper object,
+and then return them. If we change the `.` in the method definitions to `_`,
+we can end the constructor method like this, making subsequent method calls faster:
+```{r}
+bru_mapper_p_quadratic <- function(labels, min_degree = 0, ...) {
+  ...
+  mapper <- bru_mapper_define(mapper, new_class = "bru_mapper_p_quadratic")
+  mapper$n <- ibm_n_bru_mapper_p_quadratic(mapper)
+  mapper$values <- ibm_values_bru_mapper_p_quadratic(mapper)
+  mapper
+}
+```
+Note that the order matters, since our `ibm_values_bru_mapper_p_quadratic`
+function calls `ibm_n(mapper)`.
+
 We can now define the main part of the mapper interface that computes the
 model matrix linking the latent variables to the component effect. It's required
 that `NULL` input should return a $0$-by-$n$ matrix.

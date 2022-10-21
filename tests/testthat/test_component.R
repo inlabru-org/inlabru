@@ -238,7 +238,7 @@ test_that("Component construction: deprecated arguments", {
   expect_warning(
     bru(~ something(map = a),
       formula = response ~ .,
-      data = data.frame(a = 1:5),
+      data = data.frame(a = 1:5, response = 11:15),
       options = list(bru_run = FALSE)
     ),
     "Use of 'map' is deprecated"
