@@ -602,6 +602,10 @@ cprod <- function(...) {
 
 ipmaker <- function(samplers, domain, dnames,
                     int.args = list(method = "stable", nsub = NULL)) {
+  # To allow sf geometry support, should likely change the logic to
+  # use the domain specification to determine the type of integration
+  # method to call, so that it doesn't need to rely on the domain name.
+
   if ("coordinates" %in% dnames) {
     spatial <- TRUE
   } else {
@@ -654,12 +658,12 @@ ipmaker <- function(samplers, domain, dnames,
 # @param mesh An inla.mesh object
 # @param columns A character array of the points columns which whall be projected
 # @param group Character array identifying columns in \code{points}. These
-# colouns are interpreted as factors and the projection is performed
+# columns are interpreted as factors and the projection is performed
 # independently for each combination of factor levels.
 # @return SpatialPointsDataFrame of mesh vertices with projected data attached
 
 vertex.projection <- function(points, mesh, columns = names(points), group = NULL, fill = NULL) {
-  if (is.null(group) | (length(group) == 0)) {
+  if (is.null(group) || (length(group) == 0)) {
     res <- INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
     tri <- res$p2m.t
 
@@ -826,7 +830,7 @@ vertex.projection.1d <- function(points, mesh, group = NULL, column = "weight", 
 #'
 int <- function(data, values, dims = NULL) {
   keep <- setdiff(names(data), c(dims, "weight"))
-  if (length(keep) > 0 & !is.null(dims)) {
+  if (length(keep) > 0 && !is.null(dims)) {
     agg <- aggregate(values * data$weight, by = as.list(data[, keep, drop = FALSE]), FUN = sum)
     names(agg)[ncol(agg)] <- "integral" # paste0("integral_{",dims,"}(",deparse(values),")")
   } else {

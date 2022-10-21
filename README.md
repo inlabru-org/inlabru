@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![CRAN
-Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
+Status](http://www.r-pkg.org/badges/version-last-release/inlabru)](https://cran.r-project.org/package=inlabru)
 [![inlabru status
 badge](https://inlabru-org.r-universe.dev/badges/inlabru)](https://inlabru-org.r-universe.dev)
 [![R build
@@ -94,7 +94,7 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_22.03.28 built 2022-03-28 10:27:33 UTC.
+#> This is INLA_22.09.02 built 2022-09-02 19:28:51 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)

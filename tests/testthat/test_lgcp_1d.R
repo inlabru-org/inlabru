@@ -61,15 +61,50 @@ test_that("1D LGCP fitting", {
   )
 
   pr <- predict(fit,
-    data = data.frame(x = mesh1D$loc), formula = ~spde1D,
+    data = data.frame(x = mesh1D$loc),
+    formula = ~ list(
+      Intercept = Intercept,
+      spde1D = spde1D,
+      both = Intercept + spde1D
+    ),
     n.samples = 100, seed = 84354
   )
-  expect_equal(
-    pr$mean,
-    fit$summary.random$spde1D$mean,
-    tolerance = hitol
+
+  # ggplot(data.frame(idx = seq_along(pr$both$mean),
+  #                   fit = fit$summary.random$spde1D$mean+fit$summary.fixed$mean,
+  #                   est = pr$both$mean,
+  #                   std_err = pr$both$mean.mc_std_err)) +
+  #   geom_point(aes(idx, fit)) +
+  #   geom_line(aes(idx, est)) +
+  #   geom_ribbon(aes(idx, ymin=est-2*std_err, ymax=est+2*std_err), alpha = 0.2)
+  #
+  # ggplot(data.frame(idx = seq_along(pr$spde1D$mean),
+  #                   fit = fit$summary.random$spde1D$mean,
+  #                   est = pr$spde1D$mean,
+  #                   std_err = pr$spde1D$mean.mc_std_err)) +
+  #   geom_point(aes(idx, fit)) +
+  #   geom_line(aes(idx, est)) +
+  #   geom_ribbon(aes(idx, ymin=est-2*std_err, ymax=est+2*std_err), alpha = 0.2)
+  #
+  # ggplot(data.frame(idx = seq_along(pr$both$sd),
+  #                   fit = fit$summary.random$spde1D$sd+fit$summary.fixed$sd,
+  #                   est = pr$both$sd,
+  #                   std_err = pr$both$sd.mc_std_err)) +
+  #   geom_point(aes(idx, fit)) +
+  #   geom_line(aes(idx, est)) +
+  #   geom_ribbon(aes(idx, ymin=est-2*std_err, ymax=est+2*std_err), alpha = 0.2)
+  #
+  # ggplot(data.frame(idx = seq_along(pr$both$mean),
+  #                   fit = fit$summary.random$spde1D$mean + fit$summary.fixed$mean,
+  #                   est = pr$both$mean,
+  #                   std_err = pr$both$mean.mc_std_err)) +
+  #   geom_point(aes(idx, abs(est - fit) / std_err))
+
+  expect_true(
+    all(abs(pr$both$mean -
+      (fit$summary.random$spde1D$mean + fit$summary.fixed$mean)) /
+      pr$both$mean.mc_std_err <= 3)
   )
-  expect_equal(pr$sd, fit$summary.random$spde1D$sd, tolerance = hitol)
 
   # predicted intensity integral
   ips <- ipoints(c(0, 55), 100, name = "x")
@@ -128,23 +163,23 @@ test_that("1D LGCP fitting", {
 
   expect_snapshot_value(
     fit$summary.fixed["Intercept", "mean"],
-    tolerance = midtol,
+    tolerance = hitol,
     style = "deparse"
   )
   expect_snapshot_value(
     fit$summary.fixed["Intercept", "sd"],
-    tolerance = midtol,
+    tolerance = hitol,
     style = "deparse"
   )
 
   expect_snapshot_value(
     fit$summary.random$spde1D$mean[c(1, 27, 50)],
-    tolerance = midtol,
+    tolerance = hitol,
     style = "deparse"
   )
   expect_snapshot_value(
     fit$summary.random$spde1D$sd[c(2, 32, 29)],
-    tolerance = midtol,
+    tolerance = hitol,
     style = "deparse"
   )
 
@@ -221,17 +256,17 @@ test_that("1D LGCP fitting, compressed format", {
   expect_equal(
     fit1$summary.hyperpar,
     fit2$summary.hyperpar,
-    tolerance = midtol
+    tolerance = hitol
   )
   expect_equal(
     fit1$summary.fixed,
     fit2$summary.fixed,
-    tolerance = midtol
+    tolerance = hitol
   )
   expect_equal(
     fit1$summary.random,
     fit2$summary.random,
-    tolerance = midtol
+    tolerance = hitol
   )
 
   fit3 <- bru(
@@ -258,7 +293,7 @@ test_that("1D LGCP fitting, compressed format", {
   expect_equal(
     fit3$summary.hyperpar,
     fit4$summary.hyperpar,
-    tolerance = midtol
+    tolerance = hitol
   )
   expect_equal(
     fit3$summary.fixed,

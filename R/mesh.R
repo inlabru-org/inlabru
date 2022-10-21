@@ -41,7 +41,7 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
   if (inherits(loc, "Spatial")) {
     loc <- coordinates(loc)
   }
-  if (!is.null(mesh.coords) & is.data.frame(loc)) {
+  if (!is.null(mesh.coords) && is.data.frame(loc)) {
     loc <- as.matrix(loc[, mesh.coords, drop = FALSE])
   }
   p2m <- INLA::inla.fmesher.smorg(loc = mesh$loc, tv = mesh$graph$tv, points2mesh = loc)
@@ -62,10 +62,10 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
 # @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
 is.inside.polygon <- function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TRUE) {
-  if (!is.null(mesh.coords) & is.data.frame(loc)) {
+  if (!is.null(mesh.coords) && is.data.frame(loc)) {
     loc <- as.matrix(loc[, mesh.coords, drop = FALSE])
   }
-  if (!is.null(mesh.coords) & is.data.frame(ploc)) {
+  if (!is.null(mesh.coords) && is.data.frame(ploc)) {
     ploc <- as.matrix(ploc[, mesh.coords, drop = FALSE])
   }
 

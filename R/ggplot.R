@@ -25,7 +25,7 @@ pixelplot.mesh <- function(...) {
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'
-#'   # Create a base map centered around the nests and plot the boundary as well
+#'   # Create a base map centred around the nests and plot the boundary as well
 #'   # as the nests
 #'   ggplot() +
 #'     gg(gorillas$boundary) +
@@ -248,7 +248,7 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
     uqname <- quant_names[length(quant_names)]
   }
 
-  if (bar | (nrow(data) == 1)) {
+  if (bar || (nrow(data) == 1)) {
     sz <- 10 # bar width
     med_sz <- 4 # median marker size
 
@@ -995,7 +995,7 @@ plot.prediction_old <- function(..., property = "median") {
     # Function for formating numbers
     fmt <- function(x) {
       th <- 1E3
-      if (abs(x) < th & abs(x) > 0.01) {
+      if (abs(x) < th && abs(x) > 0.01) {
         # sprintf("%.2f",x)
         as.character(signif(x, 4))
       } else {

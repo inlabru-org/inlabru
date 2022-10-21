@@ -118,21 +118,21 @@ test_that("2D LGCP fitting", {
   expect_equal(
     fit_ips$summary.fixed["Intercept", "mean"],
     fit$summary.fixed["Intercept", "mean"],
-    tolerance = lowtol
+    tolerance = midtol
   )
   expect_equal(
     fit_ips$summary.fixed["Intercept", "sd"],
     fit$summary.fixed["Intercept", "sd"],
-    tolerance = lowtol
+    tolerance = midtol
   )
   expect_equal(
     fit_ips$summary.random$mySmooth$mean,
     fit$summary.random$mySmooth$mean,
-    tolerance = lowtol
+    tolerance = midtol
   )
   expect_equal(
     fit_ips$summary.random$mySmooth$sd,
     fit$summary.random$mySmooth$sd,
-    tolerance = lowtol
+    tolerance = midtol
   )
 })

@@ -19,7 +19,8 @@ generate <- function(object, ...) {
   UseMethod("generate")
 }
 
-bru_check_object_bru <- function(object) {
+bru_check_object_bru <- function(object,
+                                 new_version = getNamespaceVersion("inlabru")) {
   if (is.null(object[["bru_info"]])) {
     if (is.null(object[["sppa"]])) {
       stop("bru object contains neither current `bru_info` or old `sppa` information")
@@ -30,11 +31,18 @@ bru_check_object_bru <- function(object) {
   } else {
     old <- FALSE
   }
-  object[["bru_info"]] <- bru_info_upgrade(object[["bru_info"]], old = old)
+  object[["bru_info"]] <-
+    bru_info_upgrade(
+      object[["bru_info"]],
+      old = old,
+      new_version = new_version
+    )
   object
 }
 
-bru_info_upgrade <- function(object, old = FALSE) {
+bru_info_upgrade <- function(object,
+                             old = FALSE,
+                             new_version = getNamespaceVersion("inlabru")) {
   if (!is.list(object)) {
     stop("bru_info part of the object can't be converted to `bru_info`; not a list")
   }
@@ -42,13 +50,12 @@ bru_info_upgrade <- function(object, old = FALSE) {
     old <- TRUE
     class(object) <- c("bru_info", "list")
   }
-  ver <- getNamespaceVersion("inlabru")
   if (is.null(object[["inlabru_version"]])) {
     object[["inlabru_version"]] <- "0.0.0"
     old <- TRUE
   }
   old_ver <- object[["inlabru_version"]]
-  if (old || (utils::compareVersion(ver, old_ver) > 0)) {
+  if (old || (utils::compareVersion(new_version, old_ver) > 0)) {
     warning(
       "Old bru_info object version ",
       old_ver,
@@ -75,7 +82,19 @@ bru_info_upgrade <- function(object, old = FALSE) {
       }
       object[["inlabru_version"]] <- "2.1.14.901"
     }
-    object[["inlabru_version"]] <- ver
+    if (utils::compareVersion("2.5.3.9003", old_ver) > 0) {
+      message("Upgrading bru_info to 2.5.3.9003")
+      # Check that likelihoods store 'weights'
+      for (k in seq_along(object[["lhoods"]])) {
+        lhood <- object[["lhoods"]][[k]]
+        if (is.null(lhood[["weights"]])) {
+          lhood[["weights"]] <- 1
+          object[["lhoods"]][[k]] <- lhood
+        }
+      }
+      object[["inlabru_version"]] <- "2.5.3.9003"
+    }
+    object[["inlabru_version"]] <- new_version
   }
   object
 }
@@ -474,6 +493,8 @@ eval_in_data_context <- function(input,
                                  response_data = NULL,
                                  default = NULL,
                                  .envir = parent.frame()) {
+  data_orig <- data
+  response_data_orig <- response_data
   if (!is.null(data)) {
     if (is.list(data) && !is.data.frame(data)) {
     } else {
@@ -487,14 +508,18 @@ eval_in_data_context <- function(input,
     }
   }
   if (!is.null(response_data)) {
+    enclos_envir <- new.env(parent = .envir)
+    assign(".data.", response_data_orig, envir = enclos_envir)
     result <- try(
-      eval(input, envir = response_data, enclos = .envir),
+      eval(input, envir = response_data, enclos = enclos_envir),
       silent = TRUE
     )
   }
   if (is.null(response_data) || inherits(result, "try-error")) {
+    enclos_envir <- new.env(parent = .envir)
+    assign(".data.", data_orig, envir = enclos_envir)
     result <- try(
-      eval(input, envir = data, enclos = .envir),
+      eval(input, envir = data, enclos = enclos_envir),
       silent = TRUE
     )
   }
@@ -540,10 +565,14 @@ eval_in_data_context <- function(input,
 #' @param mesh An inla.mesh object. Obsolete.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
-#'   weights by E. Default taken from `options$E`.
+#'   weights by E. Default taken from `options$E`, normally `1`.
 #' @param Ntrials A vector containing the number of trials for the 'binomial'
-#'  likelihood. Default value is rep(1, n.data).
-#'  Default taken from `options$Ntrials`.
+#'  likelihood. Default taken from `options$Ntrials`, normally `1`.
+#' @param weights Fixed (optional) weights parameters of the likelihood,
+#' so the log-likelihood`[i]` is changed into `weights[i] * log_likelihood[i]`.
+#' Default value is `1`. WARNING: The normalizing constant for the likelihood
+#' is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
+#' interpreted with great care.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides `samplers`.
 #' @param domain Named list of domain definitions.
@@ -568,7 +597,7 @@ eval_in_data_context <- function(input,
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #' @param .envir The evaluation environment to use for special arguments
-#' (`E` and `Ntrials`) if not found in `response_data` or `data`. Defaults to
+#' (`E`, `Ntrials`, and `weights`) if not found in `response_data` or `data`. Defaults to
 #' the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterize [bru()].
@@ -577,7 +606,7 @@ eval_in_data_context <- function(input,
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  response_data = NULL, # agg
-                 mesh = NULL, E = NULL, Ntrials = NULL,
+                 mesh = NULL, E = NULL, Ntrials = NULL, weights = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
                  allow_latent = FALSE,
@@ -590,32 +619,94 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   # Some defaults
   inla.family <- family
 
+  formula_char <- as.character(formula)
+
   # Does the likelihood formula imply a linear predictor?
-  linear <- as.character(formula)[length(as.character(formula))] == "."
+  linear <- formula_char[length(formula_char)] == "."
 
   # If not linear, set predictor expression according to the formula's RHS
   if (!linear) {
-    expr <- parse(text = as.character(formula)[length(as.character(formula))])
+    expr <- parse(text = formula_char[length(formula_char)])
   } else {
     expr <- NULL
   }
 
   # Set response name
-  response <- all.vars(update(formula, . ~ 0))
-  if (response[1] == ".") {
+  if (length(formula_char) < 3) {
     stop("Missing response variable names")
   }
+  response_expr <- parse(text = formula_char[2])
+  response <- tryCatch(
+    expr = eval_in_data_context(
+      substitute(response_expr),
+      data = data,
+      response_data = response_data,
+      default = NULL,
+      .envir = .envir
+    ),
+    error = function(e) {
+      NULL
+    }
+  )
 
-  E <- eval_in_data_context(substitute(E),
+  # Catch and handle special cases:
+  if ((family == "cp") && (is.null(response) || !is.list(response))) {
+    domain_names <- trimws(strsplit(formula_char[2], split = "\\+")[[1]])
+    if (!is.null(domain_names)) {
+      # "a + b" conversion to list(a = a, b = b)
+      domain_expr <- paste0(
+        "list(",
+        paste0(
+          vapply(domain_names, function(x) {
+            if (identical(x, "coordinates")) {
+              paste0(x, " = ", x, "(.data.)")
+            } else {
+              paste0(x, " = ", x)
+            }
+          },
+          ""),
+          collapse = ", "
+        ),
+        ")")
+      response_expr <- parse(text = domain_expr)
+    }
+    response <- tryCatch(
+      expr = eval_in_data_context(
+        substitute(response_expr),
+        data = data,
+        response_data = response_data,
+        default = NULL,
+        .envir = .envir
+      ),
+      error = function(e) {
+        NULL
+      }
+    )
+  }
+
+  if (is.null(response)) {
+    stop("Response variable missing or could not be evaluated")
+  }
+
+  E <- eval_in_data_context(
+    substitute(E),
     data = data,
     response_data = response_data,
     default = options[["E"]],
     .envir = .envir
   )
-  Ntrials <- eval_in_data_context(substitute(Ntrials),
+  Ntrials <- eval_in_data_context(
+    substitute(Ntrials),
     data = data,
     response_data = response_data,
     default = options[["Ntrials"]],
+    .envir = .envir
+  )
+  weights <- eval_in_data_context(
+    substitute(weights),
+    data = data,
+    response_data = response_data,
+    default = 1,
     .envir = .envir
   )
 
@@ -629,7 +720,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       ips <- ipmaker(
         samplers = samplers,
         domain = domain,
-        dnames = response,
+        dnames = names(response),
         int.args = options[["bru_int_args"]]
       )
     }
@@ -673,9 +764,28 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
         # TODO: check that the crs info is the same
       }
     }
-    data <- as.data.frame(data)
-    if (!is.null(response_data)) {
-      warning("Ignoring non-null response_data input for 'cp' likelihood")
+
+    # For non-Spatial models:
+    # Use the response data list as the actual data object, since that's
+    # now the canonical place where the point information is given.  This also allows
+    # response_data to be used when constructing the response list.
+    # This makes it a strict requirement that the predictor can be evaluated as
+    # a pure function of the domain data.  When implementing sf support, might
+    # be able to give explicit access to spatial coordinates, but otherwise
+    # the user can extract it from the geometry with st_coordinates(geometry)[,1]
+    # or similar.
+    # For Spatial models, keep the old behaviour for backwards compatibility for
+    # now, but can likely realign that in the future after more testing.
+    if (ips_is_Spatial) {
+      data <- as.data.frame(data)
+      if (!is.null(response_data)) {
+        warning("Ignoring non-null response_data input for 'cp' likelihood")
+      }
+      N_data <- NROW(data)
+    } else {
+      data <- as.data.frame(response)
+      response_data <- NULL
+      N_data <- NROW(data)
     }
     ips <- as.data.frame(ips)
     dim_names <- intersect(names(data), names(ips))
@@ -687,12 +797,12 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
           E * ips[["weight"]]
         ),
         BRU_response_cp = c(
-          NROW(data),
+          N_data,
           rep(0, NROW(ips))
         )
       )
       if (!linear) {
-        expr_text <- as.character(formula)[length(as.character(formula))]
+        expr_text <- formula_char[length(formula_char)]
         expr_text <- paste0(
           "{BRU_eta <- ", expr_text, "\n",
           " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}"
@@ -712,11 +822,11 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     } else {
       response_data <- data.frame(
         BRU_E = c(
-          rep(0, NROW(data)),
+          rep(0, N_data),
           E * ips[["weight"]]
         ),
         BRU_response_cp = c(
-          rep(1, NROW(data)),
+          rep(1, N_data),
           rep(0, NROW(ips))
         )
       )
@@ -738,6 +848,22 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response <- "BRU_response_cp"
     inla.family <- "poisson"
     E <- response_data[["BRU_E"]]
+
+    allow_combine <- TRUE
+  } else {
+    allow_combine <-
+      if (!is.null(response_data) ||
+          (is.list(data) && !is.data.frame(data))) {
+        TRUE
+      } else if (is.null(allow_combine)) {
+        FALSE
+      } else {
+        allow_combine
+      }
+
+    response_data <- data.frame(BRU_response = response,
+                                BRU_E = E, BRU_Ntrials = Ntrials)
+    response <- "BRU_response"
   }
 
   # Calculate data ranges
@@ -761,6 +887,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     data = data,
     E = E,
     Ntrials = Ntrials,
+    weights = weights,
     samplers = samplers,
     linear = linear,
     expr = expr,
@@ -771,15 +898,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     include_components = include,
     exclude_components = exclude,
     allow_latent = allow_latent,
-    allow_combine =
-      if (!is.null(response_data) ||
-        (is.list(data) && !is.data.frame(data))) {
-        TRUE
-      } else if (is.null(allow_combine)) {
-        FALSE
-      } else {
-        allow_combine
-      },
+    allow_combine = allow_combine,
     control.family = control.family
   )
 
@@ -2215,6 +2334,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           family = family,
           E = stk.data[["BRU.E"]],
           Ntrials = stk.data[["BRU.Ntrials"]],
+          weights = stk.data[["BRU.weights"]],
           offset = stk.data[["BRU.offset"]]
         )
       )

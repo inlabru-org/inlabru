@@ -73,8 +73,8 @@ makepoly <- function(start, width, height) {
 #' @export
 #'
 plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 5) {
-  if (x.ppn <= 0 | x.ppn >= 1) stop("'x.ppn' must greater than 0 and less than 1")
-  if (y.ppn <= 0 | y.ppn >= 1) stop("'y.ppn' must greater than 0 and less than 1")
+  if (x.ppn <= 0 || x.ppn >= 1) stop("'x.ppn' must greater than 0 and less than 1")
+  if (y.ppn <= 0 || y.ppn >= 1) stop("'y.ppn' must greater than 0 and less than 1")
 
 
   srange <- raster::extent(boundary)
