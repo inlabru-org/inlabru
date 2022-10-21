@@ -25,23 +25,24 @@ header-includes:
 High Performance Computing (HPC) is surging in popularity. Building INLA package
 on the HPC systems with the Anaconda environment sometimes can be tricky due to 
 the Linux distributions and versions. This article is to suggest a workaround 
-with container images using [Apptainer](https://apptainer.org/)(formerly known 
-as Singularity) because [Docker](https://www.docker.com/) requires root access 
-and is usually not available on HPC. Despite its convenience, the image size can
-be large. 
+with container images using [SingularityCE](https://github.com/sylabs/singularity)
+(formerly known as Singularity) because [Docker](https://www.docker.com/) 
+requires root access and is usually not available on HPC. SingularityCE is a 
+workaround to pull Docker image on HPC. Despite its convenience, the image size 
+can be large. 
 
 ## Installation Procedures 
 
 1. Check if [SingularityCE](https://github.com/sylabs/singularity/blob/main/INSTALL.md)
    is available on your HPC. If not, ask the administrator to install it. Type 
-   on your HPC terminal. 
+   on your HPC terminal to check if it is installed. 
 ```{r singularity check, eval=FALSE}
 $ singularity --version
 ```
 
 2. Connect to the HPC Terminal and type the code below to pull the 
-[rocker/geospatial](https://rocker-project.org/images/versioned/rstudio.html) sif 
-file with the latest R version.
+[rocker/geospatial](https://rocker-project.org/images/versioned/rstudio.html) 
+sif file with the latest R version.
 
 ```{r singularity, eval=FALSE}
 # To pull the docker image 
