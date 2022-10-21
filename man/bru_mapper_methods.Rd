@@ -98,7 +98,7 @@ ibm_offset(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 ibm_linear(mapper, input, state = NULL, ...)
 
-ibm_eval(mapper, input, state, ...)
+ibm_eval(mapper, input, state = NULL, ..., lin = NULL)
 
 ibm_inla_subset(mapper, ...)
 
@@ -108,7 +108,7 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_values}{default}(mapper, inla_f = FALSE, ...)
 
-\method{ibm_amatrix}{default}(mapper, input, inla_f = FALSE, ...)
+\method{ibm_amatrix}{default}(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 \method{ibm_is_linear}{default}(mapper, ...)
 
@@ -118,7 +118,7 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_linear}{default}(mapper, input, state, ...)
 
-\method{ibm_eval}{default}(mapper, input, state = NULL, lin = NULL, ...)
+\method{ibm_eval}{default}(mapper, input, state = NULL, ..., lin = NULL)
 
 \method{ibm_inla_subset}{default}(mapper, ...)
 
@@ -148,7 +148,7 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_jacobian}{bru_mapper_linearisation}(mapper, ...)
 
-\method{ibm_offset}{bru_mapper_linearisation}(mapper, state = NULL, ...)
+\method{ibm_offset}{bru_mapper_linearisation}(mapper, input = NULL, state = NULL, ...)
 
 \method{ibm_eval}{bru_mapper_linearisation}(mapper, input = NULL, state = NULL, ...)
 
@@ -162,7 +162,7 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_values}{bru_mapper_matrix}(mapper, ...)
 
-\method{ibm_amatrix}{bru_mapper_matrix}(mapper, input, ...)
+\method{ibm_amatrix}{bru_mapper_matrix}(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 \method{ibm_n}{bru_mapper_factor}(mapper, ...)
 
@@ -188,13 +188,13 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_values}{bru_mapper_scale}(mapper, ...)
 
-\method{ibm_amatrix}{bru_mapper_scale}(mapper, input, ..., sub_lin = NULL)
+\method{ibm_amatrix}{bru_mapper_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
 
 \method{ibm_offset}{bru_mapper_scale}(mapper, input, ..., sub_lin = NULL)
 
 \method{ibm_linear}{bru_mapper_scale}(mapper, input, state, ...)
 
-\method{ibm_eval}{bru_mapper_scale}(mapper, input, state, ..., lin = NULL)
+\method{ibm_eval}{bru_mapper_scale}(mapper, input, state = NULL, ..., lin = NULL)
 
 \method{ibm_valid_input}{bru_mapper_scale}(mapper, input, ...)
 
@@ -204,13 +204,21 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_is_linear}{bru_mapper_multi}(mapper, multi = FALSE, ...)
 
-\method{ibm_amatrix}{bru_mapper_multi}(mapper, input, inla_f = FALSE, multi = FALSE, ..., sub_A = NULL)
+\method{ibm_amatrix}{bru_mapper_multi}(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...,
+  sub_A = NULL
+)
 
-\method{ibm_offset}{bru_mapper_multi}(mapper, input, state, inla_f = FALSE, ..., A = NULL)
+\method{ibm_offset}{bru_mapper_multi}(mapper, input, state, inla_f = FALSE, ..., pre_A = NULL)
 
 \method{ibm_linear}{bru_mapper_multi}(mapper, input, state, inla_f = FALSE, ...)
 
-\method{ibm_eval}{bru_mapper_multi}(mapper, input, state, ...)
+\method{ibm_eval}{bru_mapper_multi}(mapper, input, state = NULL, ..., lin = NULL)
 
 \method{ibm_valid_input}{bru_mapper_multi}(mapper, input, inla_f = FALSE, multi = FALSE, ...)
 
@@ -258,7 +266,7 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_n}{bru_mapper_harmonics}(mapper, inla_f = FALSE, ...)
 
-\method{ibm_amatrix}{bru_mapper_harmonics}(mapper, input, inla_f = FALSE, ...)
+\method{ibm_amatrix}{bru_mapper_harmonics}(mapper, input, state = NULL, inla_f = FALSE, ...)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}
@@ -277,10 +285,16 @@ as "bym2", which can be handled by \code{bru_mapper_collect}.}
 \item{state}{A vector of latent state values for the mapping,
 of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
+\item{lin}{A precomputed \code{bru_mapper_linearised} object for linear mappers.}
+
 \item{sub_lin}{Internal, optional pre-computed sub-mapper information}
 
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
+
+\item{sub_A}{Internal; precomputed Jacobian matrices.}
+
+\item{pre_A}{Internal; precomputed Jacobian matrix.}
 
 \item{x}{object from which to extract element(s)}
 
@@ -293,8 +307,6 @@ returned (suitable e.g. for creating a new \code{bru_mapper_collect} object).
 Default: \code{TRUE}}
 
 \item{value}{a character vector of up to the same length as x}
-
-\item{prepared_input}{Internal parameter used by \code{ibm_linear.bru_mapper_multi}}
 }
 \value{
 \itemize{
@@ -465,7 +477,8 @@ For linear mappers, this may be different to the state provided to
 \itemize{
 \item The default \code{ibm_eval()} method verifies that the mapper is linear
 with \code{ibm_is_linear()}, and then computes the mapper output
-based on the information from \code{\link[=ibm_linear]{ibm_linear()}}.
+based on the information from \code{\link[=ibm_offset]{ibm_offset()}} or precomputed \code{lim=ibm_linear()}
+information.
 }
 
 \itemize{
@@ -483,7 +496,8 @@ both regular vector values and \code{multi=1} data.frame values).
 \item The \code{ibm_eval.bru_mapper_linearisation()} evaluates linearised
 mapper information at the given \code{state}. The \code{input} argument is ignored,
 so that the usual argument order
-\code{ibm_eval(mapper, input, state)} syntax can be used.
+\code{ibm_eval(mapper, input, state)} syntax can be used, but also
+\code{ibm_eval(mapper, state = state)}.
 }
 
 For \code{bru_mapper_scale}, \code{input} values without a \code{scale} element

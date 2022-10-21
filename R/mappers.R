@@ -27,9 +27,10 @@ bru_mapper <- function(...) {
 #' For the `bru_mapper_define` method, instead a
 #' list that will be converted to a `bru_mapper` object by adding
 #' class information and (optional) methods.
-#' @param inla_f logical; when `TRUE` in `ibm_n`, `ibm_values`, and
-#' `ibm_amatrix` methods, these must result in values compatible with `INLA::f(...)`
-#' an specification and corresponding `INLA::inla.stack(...)` constructions.
+#' @param inla_f logical; when `TRUE` for `ibm_n()` and `ibm_values()`, the
+#' result must be compatible with the `INLA::f(...)` and corresponding
+#' `INLA::inla.stack(...)` constructions.  For `ibm_{eval,offset,jacobian,linear,amatrix}`,
+#' the `input` interpretation may be different.
 #' Implementations do not normally need to do anything different, except
 #' for mappers of the type needed for hidden multicomponent models such
 #' as "bym2", which can be handled by `bru_mapper_collect`.
@@ -164,6 +165,7 @@ ibm_linear <- function(mapper, input, state = NULL, ...) {
 #' for the mapper.
 #' @param state A vector of latent state values for the mapping,
 #' of length `ibm_n(mapper, inla_f = FALSE)`
+#' @param lin A precomputed `bru_mapper_linearised` object for linear mappers.
 #' @export
 #' @rdname bru_mapper_methods
 ibm_eval <- function(mapper, input, state = NULL, ..., lin = NULL) {
@@ -221,6 +223,8 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #' and otherwise call `UseMethod()`.  This is an alternative to using `.S3method()`
 #' to register the methods, e.g.
 #' `.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)`.
+#' @param mapper For `bru_mapper_define`, a prototype mapper object, see Details.
+#' For `bru_mapper_scale`, a mapper to be scaled.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
 #' @param methods Optional `list` of named method definitions; See Details.
 #'
@@ -374,10 +378,11 @@ ibm_values.default <- function(mapper, inla_f = FALSE, ...) {
 #' in a future version.
 #' @export
 #' @rdname bru_mapper_methods
-ibm_amatrix.default <- function(mapper, input, inla_f = FALSE, ...) {
+ibm_amatrix.default <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   stop(paste0(
     "Missing implementation of 'ibm_amatrix()' for mapper of class '",
-    class(mapper)[1], "'."
+    class(mapper)[1], "'.\n",
+    "New implementations should implement a 'ibm_jacobian()' method."
   ))
 }
 
@@ -655,7 +660,7 @@ bru_mapper_linearisation <- function(offset, jacobian, state0, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_linearisation <- function(mapper, ...) {
-  n
+  mapper[["n"]]
 }
 #' @export
 #' @rdname bru_mapper_methods
@@ -674,7 +679,7 @@ ibm_jacobian.bru_mapper_linearisation <- function(mapper, ...) {
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_offset.bru_mapper_linearisation <- function(mapper, state = NULL, ...) {
+ibm_offset.bru_mapper_linearisation <- function(mapper, input = NULL, state = NULL, ...) {
   if (!is.null(state)) {
     ibm_eval(mapper, state = state)
   } else {
@@ -768,7 +773,8 @@ ibm_values.bru_mapper_matrix <- function(mapper, ...) {
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_matrix <- function(mapper, input, ...) {
+ibm_amatrix.bru_mapper_matrix <- function(mapper, input, state = NULL,
+                                          inla_f = FALSE, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   } else if (is.matrix(input)) {
@@ -971,9 +977,12 @@ ibm_values.bru_mapper_scale <- function(mapper, ...) {
 #' @details For `bru_mapper_scale`, `input` values without a `scale` element
 #' are interpreted as no scaling.
 #' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_scale <- function(mapper, input, ..., sub_lin = NULL) {
+ibm_amatrix.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
+                                         sub_lin = NULL) {
   if (is.null(sub_lin)) {
-    A <- ibm_amatrix(mapper[["mapper"]], input = input[["mapper"]], ...)
+    A <- ibm_jacobian(mapper[["mapper"]],
+                      input = input[["mapper"]],
+                      state = state, ...)
   } else {
     A <- sub_lin$jacobian
   }
@@ -1163,11 +1172,12 @@ bru_mapper_multi_prepare_input <- function(mapper, input) {
 #' sub-mapper. In case each element is a vector, the input can be given as a
 #' data.frame with named columns, a matrix with named columns, or a matrix
 #' with unnamed but ordered columns.
-#' @param prepared_input Internal parameter used by `ibm_linear.bru_mapper_multi`
+#' @param sub_A Internal; precomputed Jacobian matrices.
 #' @export
 #' @rdname bru_mapper_methods
 ibm_amatrix.bru_mapper_multi <- function(mapper,
                                          input,
+                                         state = NULL,
                                          inla_f = FALSE,
                                          multi = FALSE,
                                          ...,
@@ -1178,10 +1188,11 @@ ibm_amatrix.bru_mapper_multi <- function(mapper,
       lapply(
         names(mapper[["mappers"]]),
         function(x) {
-          ibm_amatrix(mapper[["mappers"]][[x]],
-                      input = input[[x]],
-                      inla_f = inla_f,
-                      multi = FALSE
+          ibm_jacobian(mapper[["mappers"]][[x]],
+                       input = input[[x]],
+                       state = state,
+                       inla_f = inla_f,
+                       multi = FALSE
           )
         }
       )
@@ -1198,12 +1209,13 @@ ibm_amatrix.bru_mapper_multi <- function(mapper,
   return(A_)
 }
 
+#' @param pre_A Internal; precomputed Jacobian matrix.
 #' @export
 #' @rdname bru_mapper_methods
 ibm_offset.bru_mapper_multi <- function(mapper, input, state,
                                         inla_f = FALSE,
                                         ...,
-                                        A = NULL) {
+                                        pre_A = NULL) {
   input <- bru_mapper_multi_prepare_input(mapper, input)
   if (ibm_n(mapper) == 0) {
     # Handle the case when the mapper is a _const mapper
@@ -1214,11 +1226,11 @@ ibm_offset.bru_mapper_multi <- function(mapper, input, state,
                       multi = FALSE,
                       ...)
   } else {
-    if (is.null(A)) {
-      A <- ibm_jacobian(mapper, input = input, state = state,
-                       inla_f = inla_f, multi = FALSE, ...)
+    if (is.null(pre_A)) {
+      pre_A <- ibm_jacobian(mapper, input = input, state = state,
+                            inla_f = inla_f, multi = FALSE, ...)
     }
-    off <- A %*% state
+    off <- pre_A %*% state
   }
   off
 }
@@ -1235,7 +1247,7 @@ ibm_linear.bru_mapper_multi <- function(mapper, input, state,
   bru_mapper_linearisation(
     offset = ibm_offset(mapper, input, state,
                         inla_f = inla_f, multi = FALSE, ...,
-                        A = A),
+                        pre_A = A),
     jacobian = A,
     state0 = state
   )
@@ -1254,7 +1266,7 @@ ibm_eval.bru_mapper_multi <- function(mapper, input, state = NULL, ..., lin = NU
              input = inp[[1]],
              state = state, ...)
   } else {
-    A <- ibm_amatrix(mapper, input = input, state = state, ...)
+    A <- ibm_jacobian(mapper, input = input, state = state, ...)
     A %*% state
   }
 }
@@ -1701,7 +1713,7 @@ ibm_n.bru_mapper_harmonics <- function(mapper, inla_f = FALSE, ...) {
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_harmonics <- function(mapper, input, inla_f = FALSE, ...) {
+ibm_amatrix.bru_mapper_harmonics <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   A <- Matrix::Matrix(0.0, NROW(input), ibm_n(mapper))
   off <- 0
   if (mapper[["intercept"]]) {

@@ -60,6 +60,9 @@ bru_mapper_harmonics(
 \arguments{
 \item{\dots}{Arguments passed on to other methods}
 
+\item{mapper}{For \code{bru_mapper_define}, a prototype mapper object, see Details.
+For \code{bru_mapper_scale}, a mapper to be scaled.}
+
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
 \item{methods}{Optional \code{list} of named method definitions; See Details.}

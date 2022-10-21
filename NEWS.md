@@ -11,17 +11,31 @@
   weights, passed on to the `INLA::inla()` weights argument. Evaluated in the
   data context.
   
-* New vignettes on the `bru_mapper` system, `component` definitions,
-  and `prediction_scores`
-  
-* Add `ibm_eval` generic for evaluating mappers for given states; unifies
-  ordinary mappers with `bru_mapper_const`, which replaces `bru_mapper_offset`.
-  `bru_mapper_offset` is now deprecated.
-  
 * The `<component>_eval()` methods available in predictor expressions
   now handle optional scaling weights, like in ordinary component effect
   evaluation.
 
+* New vignettes on the `bru_mapper` system, `component` definitions,
+  and `prediction_scores`
+  
+* General overhaul of the `bru_mapper` system, to prepare for new features.
+  
+  * Add `ibm_eval` generic for evaluating mappers for given states.
+  
+  * Add `bru_mapper_linearisation`, used as an internal mapper for linearised
+  mappers. This and `ibm_eval` is aimed at later adding support for nonlinear
+  mappers. Associated new generic methods: `ibm_{is_linear,offset,jacobian,linear}`.
+  New mapper implementations should use `ibm_jacobian` instead of `ibm_amatrix`.
+  The `ibm_offset` method should evaluate the mapping at a given latent state.
+  This allows defining the linearised mapper via
+  `offset(input, state0) + jacobian(input, state0) %*% (state - state0)`.
+  
+  * New mapper class `bru_mapper_const`, which replaces `bru_mapper_offset`.
+  `bru_mapper_offset` is now deprecated and will produce warnings.
+  
+  
+  
+  
 ## Bug fixes
 
 * Enable both datum/ensemble container for ellipsoid information, to support
