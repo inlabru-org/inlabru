@@ -55,6 +55,11 @@ jobs:
         with:
           limit-access-to-actor: true
 
+      - name: Mermaid update
+        run: |
+          source("vignettes/web/mermaid_updater.R")
+        shell: Rscript {0}
+
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
