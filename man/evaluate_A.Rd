@@ -9,7 +9,7 @@ evaluate_A(model, lhoods, inla_f)
 \arguments{
 \item{model}{A \code{bru_model} object}
 
-\item{lhoods}{A \code{bru__like_list} object}
+\item{lhoods}{A \code{bru_like_list} object}
 
 \item{inla_f}{logical}
 }

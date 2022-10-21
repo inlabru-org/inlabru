@@ -7,6 +7,7 @@
 \alias{bru_mapper.inla.mesh}
 \alias{bru_mapper.inla.mesh.1d}
 \alias{bru_mapper_index}
+\alias{bru_mapper_linearisation}
 \alias{bru_mapper_linear}
 \alias{bru_mapper_matrix}
 \alias{bru_mapper_factor}
@@ -29,6 +30,8 @@ bru_mapper_define(mapper, new_class = NULL, methods = NULL, ...)
 \method{bru_mapper}{inla.mesh.1d}(mesh, indexed = NULL, ...)
 
 bru_mapper_index(n = 1L, ...)
+
+bru_mapper_linearisation(offset, jacobian, state0, ...)
 
 bru_mapper_linear(...)
 
@@ -57,10 +60,6 @@ bru_mapper_harmonics(
 \arguments{
 \item{\dots}{Arguments passed on to other methods}
 
-\item{mapper}{For the \code{bru_mapper_define} method, normally a
-list that will be converted to a \code{bru_mapper} object by adding
-class information and (optional) methods.}
-
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
 \item{methods}{Optional \code{list} of named method definitions; See Details.}
@@ -75,6 +74,16 @@ and similar).
 Default: \code{NULL}, to force user specification of this parameter}
 
 \item{n}{Size of a model for \code{bru_mapper_index}}
+
+\item{offset}{For \code{bru_mapper_linearisation}, an offset vector evaluated
+at \code{state0}}
+
+\item{jacobian}{For \code{bru_mapper_linearisation}, the Jacobian matrix,
+evaluated at \code{state0}
+(may be \code{NULL} for constant mapping)}
+
+\item{state0}{For \code{bru_mapper_linearisation}, the state the linearisation
+was evauated at. \code{NULL} is interpreted as 0.}
 
 \item{labels}{Column labels for matrix mappings}
 
@@ -123,14 +132,11 @@ new mappers in user code.
 names to the inheritance list for the input \code{mapper} object, unless the object
 already inherits from these.
 If provided, mapper method functions are added to an environment
-\code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_n_inla},
-\code{ibm_values}, \code{ibm_values_inla},
-\code{ibm_amatrix}, \code{ibm_amatrix_inla},
-\code{ibm_valid_input}, and \code{ibm_valid_input_inla} look for these
+\code{.envir} in the object.  The generic methods look for these
 functions first,
 and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
 to register the methods, e.g.
-\code{.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)}.
+\code{.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)}.
 }
 
 \itemize{
@@ -139,6 +145,9 @@ arguments along. Mapper implementations should call \code{\link[=bru_mapper_defi
 instead, and supply at least a \code{new_class} class name.
 Use of the \code{bru_mapper.default} will be deprecated from version 2.6.0.
 }
+
+\code{bru_mapper_linearisation} is a special mapper type that
+is used internally to represent and evaluate linearisation information.
 
 For \code{bru_mapper_scale()}, \code{mapper} is a mapper to be scaled.
 The \code{input} format for the \code{ibm_eval} and \code{ibm_amatrix} methods is

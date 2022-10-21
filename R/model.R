@@ -635,7 +635,7 @@ component_eval <- function(main,
 #' Computes the A matrices for included components for each model likelihood
 #'
 #' @param model A `bru_model` object
-#' @param lhoods A `bru__like_list` object
+#' @param lhoods A `bru_like_list` object
 #' @param inla_f logical
 #' @rdname evaluate_A
 evaluate_A <- function(model, lhoods, inla_f) {
