@@ -59,7 +59,7 @@ $ R --verbose
 # quit R
 > q()
 ```
-Note: Using `inla. setOption(num. threads=ncpu)` to set the number of cpu (ncpu) since 
-INLA does not set it automatically. The ncpu also directly links to RAM 
+Note: Using `inla. setOption(num. threads=ncpu)` to set the number of cpu (ncpu) 
+since INLA does not set it automatically. The ncpu also directly links to RAM 
 requirement.
 
