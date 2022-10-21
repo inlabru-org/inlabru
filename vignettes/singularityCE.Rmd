@@ -1,5 +1,5 @@
 ---
-title: "Installation of INLA with SingularityCE on HPC"
+title: "Installation of INLA and inlabru with SingularityCE on HPC"
 output:
   rmarkdown::html_vignette:
   rmarkdown::pdf_document:
@@ -7,7 +7,6 @@ vignette: >
   %\VignetteIndexEntry{SingularityCE}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-header-includes:
 ---
 High Performance Computing (HPC) is surging in popularity. Building INLA package
 on the HPC systems with the Anaconda environment sometimes can be tricky due to 
