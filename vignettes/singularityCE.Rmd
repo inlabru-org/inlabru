@@ -8,19 +8,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 header-includes:
-  - \newcommand{\bm}[1]{\boldsymbol{#1}}
-  - \newcommand{\wt}[1]{\widetilde{#1}}
-  - \newcommand{\ol}[1]{\overline{#1}}
-  - \newcommand{\wh}[1]{\widehat{#1}}
-  - \DeclareMathOperator*{\argmax}{arg\,max}
-  - \newcommand{\proper}[1]{\mathsf{#1}}
-  - \newcommand{\pExp}{\proper{Exp}}
-  - \newcommand{\pN}{\proper{N}}
-  - \newcommand{\pPo}{\proper{Po}}
-  - \newcommand{\pGa}{\proper{Ga}}
-  - \newcommand{\pE}{\proper{E}}
-  - \newcommand{\pP}{\proper{P}}
-  - \newcommand{\pVar}{\proper{Var}}
 ---
 High Performance Computing (HPC) is surging in popularity. Building INLA package
 on the HPC systems with the Anaconda environment sometimes can be tricky due to 
