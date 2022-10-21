@@ -1,40 +1,39 @@
 ---
-title: "Installation of INLA and inlabru with SingularityCE on HPC"
+title: "Installation of INLA and inlabru with Apptainer on HPC"
 output:
   rmarkdown::html_vignette:
   rmarkdown::pdf_document:
 vignette: >
-  %\VignetteIndexEntry{SingularityCE}
+  %\VignetteIndexEntry{Apptainer}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
 High Performance Computing (HPC) is surging in popularity. Building INLA package
 on the HPC systems with the Anaconda environment sometimes can be tricky due to 
-the Linux distributions and versions. This article is to suggest a workaround 
-with container images using [SingularityCE](https://github.com/sylabs/singularity)
+the Linux distributions and glibc versions. This article is to suggest a 
+workaround with container images using [Apptainer](https://apptainer.org/)
 (formerly known as Singularity) because [Docker](https://www.docker.com/) 
-requires root access and is usually not available on HPC. SingularityCE is a 
-workaround to pull Docker image on HPC. Despite its convenience, the image size 
-can be large. 
+requires root access and is usually not available on HPC. Apptainer can pull 
+Docker images. Despite its convenience, the image size can be large. 
 
 ## Installation Procedures 
 
-1. Check if [SingularityCE](https://github.com/sylabs/singularity/blob/main/INSTALL.md)
+1. Check if [Apptainer](https://apptainer.org/docs/user/main/cli/apptainer_version.html)
    is available on your HPC. If not, ask the administrator to install it. Type 
-   on your HPC terminal to check if it is installed. 
-```{r singularity check, eval=FALSE}
-$ singularity --version
+   on your HPC terminal to check which version is installed. 
+```{r apptainer check, eval=FALSE}
+$ apptainer version
 ```
 
 2. Type the code below to pull the 
 [rocker/geospatial](https://rocker-project.org/images/versioned/rstudio.html) 
-sif file with the latest R version.
+Singularity Image Format (SIF) file with the latest R version.
 
-```{r singularity, eval=FALSE}
+```{r apptainer, eval=FALSE}
 # To pull the docker image 
-$ singularity pull name_your_containter.sif docker://rocker/geospatial:latest
+$ apptainer pull name_your_containter.sif docker://rocker/geospatial:latest
 # once the sif is downloaded, get into an interactive shell 
-$ singularity shell name_your_containter.sif
+$ apptainer shell name_your_containter.sif
 # Inside the interactive shell, one can install INLA on a personal library path
 $ R --verbose 
 # Now, in a R environment
@@ -46,11 +45,12 @@ $ R --verbose
 > q()
 
 ```
+
 3. Put the following to your job script to execute your R file. 
 
 ```{r exec, eval=FALSE}
-# To exexcute the R file with singularity
-$ singularity -vvv exec ./name_your_containter.sif Rscript --no-restore --no-save --verbose file_to_run.R
+# To execute the R file with apptainer
+$ apptainer exec ./name_your_containter.sif Rscript --no-restore --no-save --verbose file_to_run.R
 ```
 
 Note: Using `inla. setOption(num. threads=ncpu)` to set the number of cpu (ncpu) 
