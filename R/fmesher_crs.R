@@ -832,24 +832,25 @@ fm_list_as_CRS <- function(x, ...) {
 #'   print(fm_CRSargs(crs1))
 #'   print(fm_CRSargs(crs2))
 #' }
-#'
-# ! An equivalent function to fm_CRSargs for sf object
-# would have something like:
-#' #
-# if (inherits(x, "crs")){
-#   x$input
-# }
-#' #
-# which returns equivalent of CRSargs(x)
-#' #
-# Note:  sf crs object class is lower case "crs"
-#        sp crs object class is upper case "CRS"
-#' #
-# Decision to make about at which point the sf vs sp code bifurcates
-# could write separate fm_ functions for "crs" class
-# or have single functions that check sp vs sf
-#'
 fm_CRSargs <- function(x, ...) {
+  #
+  # ! An equivalent function to fm_CRSargs for sf object
+  # would have something like:
+  # #
+  # if (inherits(x, "crs")){
+  #   x$input
+  # }
+  # #
+  # which returns equivalent of CRSargs(x)
+  # #
+  # Note:  sf crs object class is lower case "crs"
+  #        sp crs object class is upper case "CRS"
+  # #
+  # Decision to make about at which point the sf vs sp code bifurcates
+  # could write separate fm_ functions for "crs" class
+  # or have single functions that check sp vs sf
+  #
+
   fm_not_for_PROJ6()
 
   if (inherits(x, "inla.CRS")) {
