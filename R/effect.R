@@ -8,7 +8,15 @@
 amatrix_eval <- function(...) {
   UseMethod("amatrix_eval")
 }
-#' Obtain covariate values
+#' Construct component linearisations
+#'
+#' Constructs the linearisation mapper for each component
+#' @export
+#' @rdname linearisation_eval
+linearisation_eval <- function(...) {
+  UseMethod("linearisation_eval")
+}
+#' Obtain component inputs
 #'
 #' @export
 #' @rdname input_eval
@@ -1558,6 +1566,28 @@ amatrix_eval.component_list <- function(components, data, ...) {
   lapply(components, function(x) amatrix_eval(x, data = data, ...))
 }
 
+#' @export
+#' @keywords internal
+#' @param component A component.
+#' @param data A `data.frame` or `Spatial*` object of covariates and/or point locations.
+#' @param input Component inputs, from `input_eval()`
+#' @param ... Unused.
+#' @return A `bru_mapper_linearisation` object.
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @rdname amatrix_eval
+
+linearisation_eval.component <- function(component, input = NULL, ...) {
+  ibm_linear(component[["mapper"]], input = input, ...)
+}
+
+#' @export
+#' @rdname linearisation_eval
+
+linearisation_eval.component_list <- function(components, input, ...) {
+  lapply(names(components),
+         function(x) linearisation_eval(components[[x]], input = input[[x]], ...))
+}
+
 #' @section Simple covariates and the map parameter:
 #'
 #' It is not unusual for a random effect act on a transformation of a covariate. In other frameworks this
@@ -1858,7 +1888,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 #' @rdname index_eval
 
 index_eval.component <- function(component, inla_f, ...) {
-  idx <- ibm_values(component[["mapper"]], inla_f = inla_f, multi = 1)
+  idx <- ibm_values(component[["mapper"]], inla_f = inla_f, multi = TRUE)
   names(idx) <- paste0(component[["label"]], c("", ".group", ".repl"))
   idx
 }
@@ -1879,5 +1909,5 @@ index_eval.component_list <- function(components, inla_f, ...) {
 #' @rdname inla_subset_eval
 
 inla_subset_eval.component_list <- function(components, ...) {
-  lapply(components, function(x) ibm_inla_subset(x[["mapper"]], multi = 1))
+  lapply(components, function(x) ibm_inla_subset(x[["mapper"]], multi = TRUE))
 }

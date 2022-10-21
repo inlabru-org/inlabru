@@ -5,7 +5,7 @@
 \alias{input_eval.component}
 \alias{input_eval.component_list}
 \alias{input_eval.bru_input}
-\title{Obtain covariate values}
+\title{Obtain component inputs}
 \usage{
 input_eval(...)
 
@@ -26,7 +26,7 @@ input_eval(...)
 An list of mapper input values, formatted for the full component mapper
 }
 \description{
-Obtain covariate values
+Obtain component inputs
 }
 \section{Simple covariates and the map parameter}{
 

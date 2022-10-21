@@ -658,6 +658,62 @@ evaluate_A <- function(model, lhoods, inla_f) {
   )
 }
 
+#' Compute all component linearisations
+#'
+#' Computes the `bru_mapper_linearisation` objects for included components
+#' for each model likelihood
+#'
+#' @param model A `bru_model` object
+#' @param input A list of component inputs
+#' @rdname evaluate_linearisations
+evaluate_linearisations <- function(model, input) {
+  stopifnot(inherits(model, "bru_model"))
+  lapply(
+    lhoods,
+    function(lh) {
+      included <- parse_inclusion(
+        names(model[["effects"]]),
+        lh[["include_components"]],
+        lh[["exclude_components"]]
+      )
+
+      linearisation_eval(
+        model$effects[included],
+        input = input[[included]]
+      )
+    }
+  )
+}
+
+#' Compute all component inputs
+#'
+#' Computes the component inputs for included components
+#' for each model likelihood
+#'
+#' @param model A `bru_model` object
+#' @param lhoods A `bru_like_list` object
+#' @param inla_f logical
+#' @rdname evaluate_inputs
+evaluate_inputs <- function(model, lhoods, inla_f) {
+  stopifnot(inherits(model, "bru_model"))
+  lapply(
+    lhoods,
+    function(lh) {
+      included <- parse_inclusion(
+        names(model[["effects"]]),
+        lh[["include_components"]],
+        lh[["exclude_components"]]
+      )
+
+      input_eval(
+        model$effects[included],
+        data = lh[["data"]],
+        inla_f = inla_f
+      )
+    }
+  )
+}
+
 #' Compute all index values
 #'
 #' Computes the index values matrices for included components

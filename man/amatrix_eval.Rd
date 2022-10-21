@@ -4,6 +4,7 @@
 \alias{amatrix_eval}
 \alias{amatrix_eval.component}
 \alias{amatrix_eval.component_list}
+\alias{linearisation_eval.component}
 \title{Construct A-matrix}
 \usage{
 amatrix_eval(...)
@@ -11,6 +12,8 @@ amatrix_eval(...)
 \method{amatrix_eval}{component}(component, data, input = NULL, ...)
 
 \method{amatrix_eval}{component_list}(components, data, ...)
+
+\method{linearisation_eval}{component}(component, input = NULL, ...)
 }
 \arguments{
 \item{...}{Unused.}
@@ -19,10 +22,12 @@ amatrix_eval(...)
 
 \item{data}{A \code{data.frame} or \verb{Spatial*} object of covariates and/or point locations.}
 
-\item{input}{Optional pre-evaluated component inputs, from \code{input_eval()}}
+\item{input}{Component inputs, from \code{input_eval()}}
 }
 \value{
 An A-matrix.
+
+A \code{bru_mapper_linearisation} object.
 }
 \description{
 Constructs the A-matrix for components and data
