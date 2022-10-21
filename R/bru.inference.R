@@ -658,7 +658,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   }
   response_expr <- parse(text = formula_char[2])
   response <- tryCatch(
-    response <- eval_in_data_context(
+    expr = eval_in_data_context(
       substitute(response_expr),
       data = data,
       response_data = response_data,
@@ -692,7 +692,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       response_expr <- parse(text = domain_expr)
     }
     response <- tryCatch(
-      response <- eval_in_data_context(
+      expr = eval_in_data_context(
         substitute(response_expr),
         data = data,
         response_data = response_data,

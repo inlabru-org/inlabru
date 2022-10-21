@@ -390,8 +390,6 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
   if (!inherits(M2, "Matrix")) {
     M2 <- as(M2, "Matrix")
   }
-  M1 <- as(as(as(as(M1, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
-  M2 <- as(as(as(as(M2, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
   n1 <- nrow(M1)
   n2 <- nrow(M2)
   if ((n1 == 1) && (n2 > 1)) {
@@ -417,10 +415,12 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
     weights <- rep(weights[1], n)
   }
 
-  ## TODO: Check robustness for all-zero rows.
+  ## OK: Checked robustness for all-zero rows 2022-10-20, matrix 1.5-2
   ## TODO: Maybe move big sparseMatrix call outside the loop.
   ## TODO: Automatically choose M1 or M2 for looping.
 
+  M1 <- as(as(as(as(M1, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
+  M2 <- as(as(as(as(M2, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
   n1 <- (as.vector(Matrix::sparseMatrix(
     i = 1L + M1@i, j = rep(1L, length(M1@i)),
     x = 1L, dims = c(n, 1)

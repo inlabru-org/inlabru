@@ -28,6 +28,8 @@
   `epsg:4326`. Fixes #154
   
 * Make duplicated component names an error instead of a warning. Relates to #155
+
+* Fix Tsparse assumptions in `row_kron`. Fixes #162
   
 # inlabru 2.5.3
 
