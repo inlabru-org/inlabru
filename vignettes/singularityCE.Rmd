@@ -26,7 +26,7 @@ can be large.
 $ singularity --version
 ```
 
-2. Connect to the HPC Terminal and type the code below to pull the 
+2. Type the code below to pull the 
 [rocker/geospatial](https://rocker-project.org/images/versioned/rstudio.html) 
 sif file with the latest R version.
 
@@ -44,7 +44,15 @@ $ R --verbose
 > install.packages("inlabru") 
 # quit R
 > q()
+
 ```
+3. Put the following to your job script to execute your R file. 
+
+```{r exec, eval=FALSE}
+# To exexcute the R file with singularity
+$ singularity -vvv exec ./name_your_containter.sif Rscript --no-restore --no-save --verbose file_to_run.R
+```
+
 Note: Using `inla. setOption(num. threads=ncpu)` to set the number of cpu (ncpu) 
 since INLA does not set it automatically. The ncpu also directly links to RAM 
 requirement.
