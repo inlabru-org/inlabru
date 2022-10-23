@@ -188,13 +188,15 @@ for indexed models. (Default: NULL, for auto-determination)</p></dd>
 
 
 <dt>main_layer, main_selector</dt>
-<dd><p>The <code>_layer</code> is a numeric index or character name of which
-layer/variable to extract from a covariate data object given in <code>main</code>
-(Default: The effect component name, if it exists i the covariate object,
-otherwise the first column of the covariate data frame)</p>
-<p>The <code>_selector</code> is character name of a variable whose contents determines which layer to
-extract from a covariate for each data point. Overrides the <code>layer</code>.
-(Default: NULL)</p></dd>
+<dd><p>The <code>_layer</code> input should evaluate to a numeric index or character name or
+vector of which
+layer/variable to extract from a covariate data object given in <code>main</code>.
+(Default: NULL if <code>_selector</code> is given. Otherwise the effect component name,
+if it exists in the covariate object, and otherwise the first column of
+the covariate data frame)</p>
+<p>The <code>_selector</code> value should be a character name of a variable
+whose contents determines which layer to extract from a covariate for each
+data point. (Default: NULL)</p></dd>
 
 
 <dt>n</dt>

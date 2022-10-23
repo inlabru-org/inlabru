@@ -172,6 +172,9 @@
     <loc>/reference/devel.cvmeasure.html</loc>
   </url>
   <url>
+    <loc>/reference/eval_spatial.html</loc>
+  </url>
+  <url>
     <loc>/reference/evaluate_comp_lin.html</loc>
   </url>
   <url>
@@ -208,7 +211,13 @@
     <loc>/reference/fm_CRSargs.html</loc>
   </url>
   <url>
+    <loc>/reference/fm_as.html</loc>
+  </url>
+  <url>
     <loc>/reference/fm_crs_wkt.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fm_get_crs.html</loc>
   </url>
   <url>
     <loc>/reference/fm_has_PROJ6.html</loc>
@@ -428,6 +437,15 @@
   </url>
   <url>
     <loc>/reference/spoly.html</loc>
+  </url>
+  <url>
+    <loc>/reference/st_check_dim.html</loc>
+  </url>
+  <url>
+    <loc>/reference/st_check_polygon.html</loc>
+  </url>
+  <url>
+    <loc>/reference/st_signed_area.html</loc>
   </url>
   <url>
     <loc>/reference/stransform.html</loc>
