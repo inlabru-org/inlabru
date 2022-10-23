@@ -118,7 +118,8 @@ available, the methods fall back to the non-inla versions. If the needed informa
 is not found, the default methods give an error message.
 
 Note: Before version 2.6.0, `ibm_amatrix` was used instead of `ibm_jacobian`.
-Version 2.6.0 still supports this, but will give a deprecation message from
+Version 2.6.0 still supports this, by having the default `ibm_jacobian` method
+call `ibm_amatrix`, but will give a deprecation message from
 version 2.7.0, and it may be removed in a future version.
 
 ## Example
