@@ -51,7 +51,7 @@ init.tutorial()
 
 \method{ibm_amatrix}{bru_mapper_collect}(...)
 
-eval_SpatialDF(data, where, layer = NULL, selector = NULL)
+eval_SpatialDF(...)
 }
 \arguments{
 \item{object}{An object obtained from a \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}} call}

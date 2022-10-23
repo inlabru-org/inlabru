@@ -199,15 +199,11 @@ eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
 }
 
 #' @describeIn inlabru-deprecated Replaced by the generic [eval_spatial()]
-eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
+eval_SpatialDF <- function(...) {
   .Deprecated("eval_spatial")
-  eval_spatial.Spatial(
-    data = data,
-    where = where,
-    layer = layer,
-    selector = selector
-  )
+  eval_spatial.Spatial(...)
 }
+
 #' @export
 #' @rdname eval_spatial
 eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
