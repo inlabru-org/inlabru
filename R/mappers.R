@@ -46,10 +46,10 @@ ibm_n <- function(mapper, inla_f = FALSE, ...) {
   }
 }
 #' @details
-#' * `ibm_values` Generic. Implementations must return a vector that
+#' * `ibm_values` Generic. When `inla_f=TRUE`, implementations must return a vector that
 #' would be interpretable by an `INLA::f(..., values = ...)` specification.
 #' The exception is the method for `bru_mapper_multi`, that returns a
-#' multi-column data frame
+#' multi-column data frame.
 #' @export
 #' @rdname bru_mapper_methods
 ibm_values <- function(mapper, inla_f = FALSE, ...) {
@@ -135,7 +135,7 @@ ibm_offset <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
 
 #' @details
 #' * `ibm_linear()` Generic.
-#' Implementations must return a [bru_mapper_linearisation] object
+#' Implementations must return a [bru_mapper_taylor] object
 #' The linearisation information includes `offset`, `jacobian`, and `state0`.
 #' The state information indicates for which state the `offset` was evaluated.
 #' For linear mappers, this may be different to the state provided to
@@ -432,18 +432,18 @@ ibm_offset.default <- function(mapper, input, state, ...) {
 
 #' @details
 #' * The default `ibm_linear()` method calls `ibm_jacobian()` and `ibm_offset()`
-#' and returns a list with elements `offset`, `jacobian`, and `state0`.
-#' The state information indicates for which state the `offset` was evaluated;
-#' For linear mappers, this may be different to the state provided to
-#' `ibm_linear`.  The linearised mapper output is defined as
+#' and returns a `bru_mapper_taylor` object.
+#' The `state0` information in the affine mapper indicates for which state
+#' the `offset` was evaluated; The affine mapper output is defined as
 #' `effect(input, state) = offset(input, state0) + jacobian(input, state0) %*% (state - state0)`
 #' @export
 #' @rdname bru_mapper_methods
 ibm_linear.default <- function(mapper, input, state, ...) {
-  bru_mapper_linearisation(
+  bru_mapper_taylor(
     offset = ibm_offset(mapper, input, state, ...),
     jacobian = ibm_jacobian(mapper, input, state, ...),
-    state0 = state
+    state0 = state,
+    values_mapper = mapper
   )
 }
 
@@ -633,53 +633,142 @@ ibm_amatrix.bru_mapper_index <- function(mapper, input, ...) {
   )
 }
 
-## _linearisation ####
+## _taylor ####
 
-#' @details `bru_mapper_linearisation` is a special mapper type that
-#' is used internally to represent and evaluate linearisation information.
-#' @param offset For `bru_mapper_linearisation`, an offset vector evaluated
+#' @details `bru_mapper_taylor` provides a pre-computed affine mapping,
+#' internally used to represent and evaluate linearisation information.
+#' The `state0` information indicates for which state the `offset` was evaluated;
+#' The affine mapper output is defined as
+#' `effect(state) = offset + jacobian %*% (state - state0)`
+#' @param offset For `bru_mapper_taylor`, an offset vector evaluated
 #' at `state0`
-#' @param jacobian For `bru_mapper_linearisation`, the Jacobian matrix,
-#' evaluated at `state0`
-#' (may be `NULL` for constant mapping)
-#' @param state0 For `bru_mapper_linearisation`, the state the linearisation
-#' was evauated at. `NULL` is interpreted as 0.
+#' @param jacobian For `bru_mapper_taylor`, the Jacobian matrix,
+#' evaluated at `state0`, or, a named list of such matrices.
+#' May be `NULL` or an empty list, for a constant mapping.
+#' @param state0 For `bru_mapper_taylor`, the state the linearisation
+#' was evaluated at, or a list of length matching the `jacobian` list.
+#' `NULL` is interpreted as 0.
+#' @param values_mapper mapper object to be used for `ibm_n` and
+#' `ibm_values` for `inla_f=TRUE` (experimental, currently unused)
 #' @export
 #' @rdname bru_mapper
-bru_mapper_linearisation <- function(offset, jacobian, state0, ...) {
+bru_mapper_taylor <- function(offset, jacobian, state0, ...,
+                              values_mapper = NULL) {
+  if (is.null(state0)) {
+    n_state <- 0
+  } else if (is.list(state0)) {
+      n_state <- vapply(state0,
+                        function(x) {
+                          ifelse(is.null(x),
+                                 0L,
+                                 length(x))
+                        },
+                        0L)
+  } else {
+    n_state <- length(state0)
+  }
+
+  if (is.null(jacobian)) {
+    n_jacobian <- 0
+  } else if (is.list(jacobian)) {
+    n_jacobian <- vapply(jacobian,
+                         function(x) {
+                           ifelse(is.null(x),
+                                  0L,
+                                  ncol(x))
+                         },
+                         0L)
+  } else {
+    n_jacobian <- ncol(jacobian)
+  }
+
+  if (!is.null(state0)) {
+    if ((sum(n_jacobian) == 0) && (sum(n_state) > 0)) {
+      stop("Jacobian information indicates an empty state, but the state information has length > 0")
+    }
+    stopifnot(sum(n_jacobian) == sum(n_state))
+  }
+
+  n_multi <- n_jacobian
+  if (is.null(jacobian)) {
+    state0 <- NULL
+    n_state <- 0
+  } else if (!is.list(jacobian) && is.list(state0)) {
+    state0 <- unlist(state0)
+    n_state <- length(state0)
+  } else if (is.list(jacobian) && !is.null(state0) && !is.list(state0)) {
+    # Split vector
+    state0 <- lapply(
+      seq_along(n_multi),
+      function(k) {
+        idx <- sum(n_multi[seq_len(k - 1)])
+        idx <- idx + seq_len(n_multi[k]) - 1
+        state0[idx]
+      })
+    n_state <- n_multi
+  }
+  if (!is.null(state0)) {
+    stopifnot(all(n_jacobian == n_state))
+  }
+
   bru_mapper_define(list(offset = offset,
                          jacobian = jacobian,
                          state0 = state0,
-                         n = ifelse(is.null(jacobian),
-                                    0L,
-                                    ncol(jacobian)),
-                         nrow = length(offset)),
-                    new_class = "bru_mapper_linearisation")
+                         n_multi = n_multi,
+                         n = sum(n_multi),
+                         nrow = length(offset),
+                         values_mapper = NULL),
+                    # TODO: maybe allow values_mapper
+                    new_class = "bru_mapper_taylor")
 }
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_n.bru_mapper_linearisation <- function(mapper, ...) {
-  mapper[["n"]]
+ibm_n.bru_mapper_taylor <- function(mapper, inla_f = FALSE, multi = FALSE, ...) {
+  if (inla_f && !is.null(mapper[["values_mapper"]])) {
+    stop("ibm_n.bru_mapper_taylor should not be used with inla_f = TRUE")
+
+    ibm_n(mapper[["values_inla"]], inla_f = inla_f, multi = multi)
+  } else if (multi) {
+    mapper[["n_multi"]]
+  } else {
+    mapper[["n"]]
+  }
 }
 #' @export
 #' @rdname bru_mapper_methods
-ibm_values.bru_mapper_linearisation <- function(mapper, ...) {
-  stop("ibm_values not supported for bru_mapper_linearisation")
+ibm_values.bru_mapper_taylor <- function(mapper,
+                                         inla_f = FALSE,
+                                         multi = FALSE,
+                                         ...) {
+  if (inla_f && !is.null(mapper[["values_mapper"]])) {
+    stop("ibm_values.bru_mapper_taylor should not be used with inla_f = TRUE")
+
+    ibm_values(mapper[["values_inla"]], inla_f = inla_f, multi = multi)
+  } else if (multi) {
+    lapply(mapper[["n_multi"]], function(k) seq_len(k))
+  } else {
+    seq_len(mapper[["n"]])
+  }
 }
 
-#' @export
 #' @rdname bru_mapper_methods
-ibm_jacobian.bru_mapper_linearisation <- function(mapper, ...) {
+ibm_jacobian.bru_mapper_taylor <- function(mapper, ..., multi = FALSE) {
   if (is.null(mapper[["jacobian"]])) {
     return(Matrix::Matrix(0, mapper[["nrow"]], 0))
   }
-  mapper[["jacobian"]]
+  if (multi) {
+    mapper[["jacobian"]]
+  } else if (is.list(mapper[["jacobian"]])) {
+    do.call(cbind, mapper[["jacobian"]])
+  } else {
+    mapper[["jacobian"]]
+  }
 }
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_offset.bru_mapper_linearisation <- function(mapper, input = NULL, state = NULL, ...) {
+ibm_offset.bru_mapper_taylor <- function(mapper, input = NULL, state = NULL, ...) {
   if (!is.null(state)) {
     ibm_eval(mapper, state = state)
   } else {
@@ -688,21 +777,41 @@ ibm_offset.bru_mapper_linearisation <- function(mapper, input = NULL, state = NU
 }
 
 #' @details
-#' * The `ibm_eval.bru_mapper_linearisation()` evaluates linearised
+#' * The `ibm_eval.bru_mapper_taylor()` evaluates linearised
 #' mapper information at the given `state`. The `input` argument is ignored,
 #' so that the usual argument order
 #' `ibm_eval(mapper, input, state)` syntax can be used, but also
-#' `ibm_eval(mapper, state = state)`.
+#' `ibm_eval(mapper, state = state)`.  For a mapper with a named jacobian list,
+#' the `state` argument must also be a named list.  If `state` is `NULL`,
+#' `state = state0` is assumed and the stored `offset` is returned.
 #' @export
 #' @rdname bru_mapper_methods
-ibm_eval.bru_mapper_linearisation <- function(mapper, input = NULL, state = NULL, ...) {
+ibm_eval.bru_mapper_taylor <- function(mapper, input = NULL, state = NULL, multi = FALSE, ...) {
   if (is.null(mapper[["jacobian"]]) ||
-      mapper[["n"]] == 0) {
+      (mapper[["n"]] == 0) ||
+      is.null(state)) {
     mapper[["offset"]]
-  } else if (is.null(mapper[["state0"]])) {
-    mapper[["offset"]] + mapper[["jacobian"]] %*% state
+  } else if (is.list(mapper[["jacobian"]])) {
+    stopifnot(is.list(state))
+    val <- mapper[["offset"]]
+    if (is.null(mapper[["state0"]])) {
+      for (nm in names(mapper[["jacobian"]])) {
+        val <- val + mapper[["jacobian"]][[nm]] %*% state[[nm]]
+      }
+    } else {
+      for (nm in names(mapper[["jacobian"]])) {
+        val <- val + mapper[["jacobian"]][[nm]] %*%
+          (state[[nm]] - mapper[["state0"]][[nm]])
+      }
+    }
+    val
   } else {
-    mapper[["offset"]] + mapper[["jacobian"]] %*% (state - mapper[["state0"]])
+    stopifnot(!is.list(state))
+    if (is.null(mapper[["state0"]])) {
+      mapper[["offset"]] + mapper[["jacobian"]] %*% state
+    } else {
+      mapper[["offset"]] + mapper[["jacobian"]] %*% (state - mapper[["state0"]])
+    }
   }
 }
 
@@ -1021,10 +1130,11 @@ ibm_linear.bru_mapper_scale <- function(mapper, input, state, ...) {
   sub_lin <- ibm_linear(mapper[["mapper"]],
                         input[["mapper"]],
                         state = state, ...)
-  bru_mapper_linearisation(
+  bru_mapper_taylor(
     offset = ibm_offset(mapper, input, state, ..., sub_lin = sub_lin),
     jacobian = ibm_jacobian(mapper, input, state, ..., sub_lin = sub_lin),
-    state0 = state
+    state0 = state,
+    values_mapper = mapper
   )
 }
 
@@ -1217,7 +1327,7 @@ ibm_offset.bru_mapper_multi <- function(mapper, input, state,
                                         ...,
                                         pre_A = NULL) {
   input <- bru_mapper_multi_prepare_input(mapper, input)
-  if (ibm_n(mapper) == 0) {
+  if ((ibm_n(mapper) == 0) || is.null(state)) {
     # Handle the case when the mapper is a _const mapper
     off <- ibm_offset(mapper[["mappers"]][[1]],
                       input = input[[1]],
@@ -1244,12 +1354,13 @@ ibm_linear.bru_mapper_multi <- function(mapper, input, state,
   A <- ibm_jacobian(mapper, input, state = state,
                     inla_f = inla_f, multi = FALSE,
                     ...)
-  bru_mapper_linearisation(
+  bru_mapper_taylor(
     offset = ibm_offset(mapper, input, state,
                         inla_f = inla_f, multi = FALSE, ...,
                         pre_A = A),
     jacobian = A,
-    state0 = state
+    state0 = state,
+    values_mapper = mapper
   )
 }
 
@@ -1513,12 +1624,6 @@ ibm_offset.bru_mapper_collect <- function(mapper, input, state,
   if (!multi) {
     # Combine the vectors (b1, b2, b3, ...) -> c(b1, b2, b3, ...)
     off <- do.call(c, off)
-
-    if (is.null(A)) {
-      A <- ibm_jacobian(mapper, input = input, state = state,
-                        inla_f = inla_f, multi = FALSE, ...)
-    }
-    off + A %*% state
   }
   off
 }
@@ -1539,13 +1644,13 @@ ibm_linear.bru_mapper_collect <- function(mapper, input, state,
   A <- ibm_jacobian(mapper, input, state,
                     inla_f = FALSE, multi = FALSE, ...,
                     sub_lin = sub_lin)
-  bru_mapper_linearisation(
+  bru_mapper_taylor(
     offset = ibm_offset(mapper, input, state,
                         inla_f = FALSE, multi = FALSE, ...,
-                        sub_lin = sub_lin,
-                        A = A),
+                        sub_lin = sub_lin),
     jacobian = A,
-    state0 = state
+    state0 = state,
+    values_mapper = mapper
   )
 }
 

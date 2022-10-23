@@ -31,11 +31,11 @@
 \alias{ibm_amatrix.bru_mapper_inla_mesh_1d}
 \alias{ibm_valid_input.bru_mapper_index}
 \alias{ibm_amatrix.bru_mapper_index}
-\alias{ibm_n.bru_mapper_linearisation}
-\alias{ibm_values.bru_mapper_linearisation}
-\alias{ibm_jacobian.bru_mapper_linearisation}
-\alias{ibm_offset.bru_mapper_linearisation}
-\alias{ibm_eval.bru_mapper_linearisation}
+\alias{ibm_n.bru_mapper_taylor}
+\alias{ibm_values.bru_mapper_taylor}
+\alias{ibm_jacobian.bru_mapper_taylor}
+\alias{ibm_offset.bru_mapper_taylor}
+\alias{ibm_eval.bru_mapper_taylor}
 \alias{ibm_n.bru_mapper_linear}
 \alias{ibm_values.bru_mapper_linear}
 \alias{ibm_amatrix.bru_mapper_linear}
@@ -142,15 +142,15 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_amatrix}{bru_mapper_index}(mapper, input, ...)
 
-\method{ibm_n}{bru_mapper_linearisation}(mapper, ...)
+\method{ibm_n}{bru_mapper_taylor}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
-\method{ibm_values}{bru_mapper_linearisation}(mapper, ...)
+\method{ibm_values}{bru_mapper_taylor}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
-\method{ibm_jacobian}{bru_mapper_linearisation}(mapper, ...)
+\method{ibm_jacobian}{bru_mapper_taylor}(mapper, ..., multi = FALSE)
 
-\method{ibm_offset}{bru_mapper_linearisation}(mapper, input = NULL, state = NULL, ...)
+\method{ibm_offset}{bru_mapper_taylor}(mapper, input = NULL, state = NULL, ...)
 
-\method{ibm_eval}{bru_mapper_linearisation}(mapper, input = NULL, state = NULL, ...)
+\method{ibm_eval}{bru_mapper_taylor}(mapper, input = NULL, state = NULL, multi = FALSE, ...)
 
 \method{ibm_n}{bru_mapper_linear}(mapper, ...)
 
@@ -287,10 +287,10 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{lin}{A precomputed \code{bru_mapper_linearised} object for linear mappers.}
 
-\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
-
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
+
+\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
 
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
 
@@ -345,10 +345,10 @@ being mapped to.
 }
 
 \itemize{
-\item \code{ibm_values} Generic. Implementations must return a vector that
+\item \code{ibm_values} Generic. When \code{inla_f=TRUE}, implementations must return a vector that
 would be interpretable by an \code{INLA::f(..., values = ...)} specification.
 The exception is the method for \code{bru_mapper_multi}, that returns a
-multi-column data frame
+multi-column data frame.
 }
 
 \itemize{
@@ -389,7 +389,7 @@ combined inputs). The default method returns an all-zero vector.
 
 \itemize{
 \item \code{ibm_linear()} Generic.
-Implementations must return a \link{bru_mapper_linearisation} object
+Implementations must return a \link{bru_mapper_taylor} object
 The linearisation information includes \code{offset}, \code{jacobian}, and \code{state0}.
 The state information indicates for which state the \code{offset} was evaluated.
 For linear mappers, this may be different to the state provided to
@@ -467,10 +467,9 @@ if the default isn't appropriate for the accepted input types.
 
 \itemize{
 \item The default \code{ibm_linear()} method calls \code{ibm_jacobian()} and \code{ibm_offset()}
-and returns a list with elements \code{offset}, \code{jacobian}, and \code{state0}.
-The state information indicates for which state the \code{offset} was evaluated;
-For linear mappers, this may be different to the state provided to
-\code{ibm_linear}.  The linearised mapper output is defined as
+and returns a \code{bru_mapper_taylor} object.
+The \code{state0} information in the affine mapper indicates for which state
+the \code{offset} was evaluated; The affine mapper output is defined as
 \code{effect(input, state) = offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)}
 }
 
@@ -493,11 +492,13 @@ both regular vector values and \code{multi=1} data.frame values).
 }
 
 \itemize{
-\item The \code{ibm_eval.bru_mapper_linearisation()} evaluates linearised
+\item The \code{ibm_eval.bru_mapper_taylor()} evaluates linearised
 mapper information at the given \code{state}. The \code{input} argument is ignored,
 so that the usual argument order
 \code{ibm_eval(mapper, input, state)} syntax can be used, but also
-\code{ibm_eval(mapper, state = state)}.
+\code{ibm_eval(mapper, state = state)}.  For a mapper with a named jacobian list,
+the \code{state} argument must also be a named list.  If \code{state} is \code{NULL},
+\code{state = state0} is assumed and the stored \code{offset} is returned.
 }
 
 For \code{bru_mapper_scale}, \code{input} values without a \code{scale} element

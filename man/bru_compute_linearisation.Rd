@@ -15,8 +15,9 @@ bru_compute_linearisation(...)
   model,
   lhood_expr,
   data,
+  input,
   state,
-  A,
+  comp_simple,
   effects,
   pred0,
   allow_latent,
@@ -25,11 +26,28 @@ bru_compute_linearisation(...)
   ...
 )
 
-\method{bru_compute_linearisation}{bru_like}(lhood, model, data, state, A, eps, ...)
+\method{bru_compute_linearisation}{bru_like}(
+  lhood,
+  model,
+  data,
+  input,
+  state,
+  comp_simple,
+  eps,
+  ...
+)
 
-\method{bru_compute_linearisation}{bru_like_list}(lhoods, model, state, A, eps = 1e-05, ...)
+\method{bru_compute_linearisation}{bru_like_list}(
+  lhoods,
+  model,
+  input,
+  state,
+  comp_simple,
+  eps = 1e-05,
+  ...
+)
 
-\method{bru_compute_linearisation}{bru_model}(model, lhoods, state, A, ...)
+\method{bru_compute_linearisation}{bru_model}(model, lhoods, input, state, comp_simple, ...)
 }
 \arguments{
 \item{\dots}{Parameters passed on to other methods}
@@ -42,15 +60,16 @@ bru_compute_linearisation(...)
 
 \item{data}{Input data}
 
+\item{input}{Precomputed component inputs from \code{evaluate_inputs()}}
+
 \item{state}{The state information, as a list of named vectors}
 
-\item{A}{A-matrix information:
+\item{comp_simple}{Component evaluation information
 \itemize{
-\item For \code{bru_component}: Precomputed A-matrix for the component
-\item For \code{bru_like}: A list of named A-matrices for the components in the
-likelihood for the component
-\item For \code{bru_like_list}: A list, where each element is a list of named
-A-matrices.
+\item For \code{bru_component}: \code{bru_mapper_taylor} object
+\item For \code{bru_like}: A \code{comp_simple_list} object
+for the components in the likelihood
+\item For \code{bru_like_list}: A \code{comp_simple_list_list} object
 }}
 
 \item{effects}{\itemize{

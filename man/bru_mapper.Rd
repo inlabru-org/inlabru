@@ -7,7 +7,7 @@
 \alias{bru_mapper.inla.mesh}
 \alias{bru_mapper.inla.mesh.1d}
 \alias{bru_mapper_index}
-\alias{bru_mapper_linearisation}
+\alias{bru_mapper_taylor}
 \alias{bru_mapper_linear}
 \alias{bru_mapper_matrix}
 \alias{bru_mapper_factor}
@@ -31,7 +31,7 @@ bru_mapper_define(mapper, new_class = NULL, methods = NULL, ...)
 
 bru_mapper_index(n = 1L, ...)
 
-bru_mapper_linearisation(offset, jacobian, state0, ...)
+bru_mapper_taylor(offset, jacobian, state0, ..., values_mapper = NULL)
 
 bru_mapper_linear(...)
 
@@ -78,15 +78,19 @@ Default: \code{NULL}, to force user specification of this parameter}
 
 \item{n}{Size of a model for \code{bru_mapper_index}}
 
-\item{offset}{For \code{bru_mapper_linearisation}, an offset vector evaluated
+\item{offset}{For \code{bru_mapper_taylor}, an offset vector evaluated
 at \code{state0}}
 
-\item{jacobian}{For \code{bru_mapper_linearisation}, the Jacobian matrix,
-evaluated at \code{state0}
-(may be \code{NULL} for constant mapping)}
+\item{jacobian}{For \code{bru_mapper_taylor}, the Jacobian matrix,
+evaluated at \code{state0}, or, a named list of such matrices.
+May be \code{NULL} or an empty list, for a constant mapping.}
 
-\item{state0}{For \code{bru_mapper_linearisation}, the state the linearisation
-was evauated at. \code{NULL} is interpreted as 0.}
+\item{state0}{For \code{bru_mapper_taylor}, the state the linearisation
+was evaluated at, or a list of length matching the \code{jacobian} list.
+\code{NULL} is interpreted as 0.}
+
+\item{values_mapper}{mapper object to be used for \code{ibm_n} and
+\code{ibm_values} for \code{inla_f=TRUE} (experimental, currently unused)}
 
 \item{labels}{Column labels for matrix mappings}
 
@@ -149,8 +153,11 @@ instead, and supply at least a \code{new_class} class name.
 Use of the \code{bru_mapper.default} will be deprecated from version 2.6.0.
 }
 
-\code{bru_mapper_linearisation} is a special mapper type that
-is used internally to represent and evaluate linearisation information.
+\code{bru_mapper_taylor} provides a pre-computed affine mapping,
+internally used to represent and evaluate linearisation information.
+The \code{state0} information indicates for which state the \code{offset} was evaluated;
+The affine mapper output is defined as
+\code{effect(state) = offset + jacobian \%*\% (state - state0)}
 
 For \code{bru_mapper_scale()}, \code{mapper} is a mapper to be scaled.
 The \code{input} format for the \code{ibm_eval} and \code{ibm_amatrix} methods is

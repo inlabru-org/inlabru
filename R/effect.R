@@ -1,20 +1,12 @@
 # GENERICS ----
 
-#' Construct A-matrix
-#'
-#' Constructs the A-matrix for components and data
-#' @export
-#' @rdname amatrix_eval
-amatrix_eval <- function(...) {
-  UseMethod("amatrix_eval")
-}
 #' Construct component linearisations
 #'
 #' Constructs the linearisation mapper for each component
 #' @export
-#' @rdname linearisation_eval
-linearisation_eval <- function(...) {
-  UseMethod("linearisation_eval")
+#' @rdname comp_lin_eval
+comp_lin_eval <- function(...) {
+  UseMethod("comp_lin_eval")
 }
 #' Obtain component inputs
 #'
@@ -1536,56 +1528,35 @@ print.summary_component_list <- function(x, ...) {
 #' @keywords internal
 #' @param component A component.
 #' @param data A `data.frame` or `Spatial*` object of covariates and/or point locations.
-#' @param input Optional pre-evaluated component inputs, from `input_eval()`
-#' @param ... Unused.
-#' @return An A-matrix.
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#' @rdname amatrix_eval
-
-amatrix_eval.component <- function(component, data, input = NULL, ...) {
-  if (is.null(input)) {
-    input  <- input_eval(component, data)
-  }
-  # The bru_mapper_scale component mapper handles scaling by weights
-  A <- ibm_amatrix(component$mapper, input = input, ...)
-
-  # Mask columns of A
-  # TODO: This is a special case of a "prescale" feature; can be done via a
-  # mapper class instead
-  if (!is.null(component$A.msk)) {
-    A[, as.logical(component$A.msk)] <- 0.0
-  }
-
-  A
-}
-
-#' @export
-#' @rdname amatrix_eval
-
-amatrix_eval.component_list <- function(components, data, ...) {
-  lapply(components, function(x) amatrix_eval(x, data = data, ...))
-}
-
-#' @export
-#' @keywords internal
-#' @param component A component.
-#' @param data A `data.frame` or `Spatial*` object of covariates and/or point locations.
 #' @param input Component inputs, from `input_eval()`
 #' @param ... Unused.
-#' @return A `bru_mapper_linearisation` object.
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#' @rdname amatrix_eval
+#' @return A `bru_mapper_taylor` object.
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname comp_lin_eval
 
-linearisation_eval.component <- function(component, input = NULL, ...) {
-  ibm_linear(component[["mapper"]], input = input, ...)
+comp_lin_eval.component <- function(component,
+                                    input = NULL,
+                                    state = NULL,
+                                    ...) {
+  if (is.null(state)) {
+    state <- rep(0, ibm_n(component[["mapper"]]))
+  }
+  ibm_linear(component[["mapper"]], input = input, state = state, ...)
 }
 
 #' @export
-#' @rdname linearisation_eval
+#' @rdname comp_lin_eval
 
-linearisation_eval.component_list <- function(components, input, ...) {
-  lapply(names(components),
-         function(x) linearisation_eval(components[[x]], input = input[[x]], ...))
+comp_lin_eval.component_list <- function(components, input, state, ...) {
+  # Note: Make sure the list element names carry over!
+  lapply(components,
+         function(x) {
+           label <- x[["label"]]
+           comp_lin_eval(x,
+                         input = input[[label]],
+                         state = state[[label]],
+                         ...)
+         })
 }
 
 #' @section Simple covariates and the map parameter:
@@ -1599,29 +1570,31 @@ linearisation_eval.component_list <- function(components, input, ...) {
 #'
 #' \itemize{\item{`formula = y ~ f(xsquared, model = "linear")`,}}
 #'
-#' In inlabru this can be achived using two ways of using the `main` parameter
-#' (`map` in version 2.1.13 and earlier).
+#' In inlabru this can be achieved in several ways of using the `main` parameter
+#' (`map` in version 2.1.13 and earlier), which does not need to be named.
 #'
 #' \itemize{
 #' \item{`components = y ~ psi(main = x^2, model = "linear")`}
-#' \item{`components = y ~ psi(main = mySquareFun(x), model = "linear")`,}
-#' \item{`components = y ~ psi(main = myOtherSquareFun, model = "linear")`,}
+#' \item{`components = y ~ psi(x^2, model = "linear")`}
+#' \item{`components = y ~ psi(mySquareFun(x), model = "linear")`,}
+#' \item{`components = y ~ psi(myOtherSquareFun, model = "linear")`,}
 #'
 #' }
 #'
 #' In the first example inlabru will interpret the map parameter as an expression to be evaluated within
 #' the data provided. Since \eqn{x} is a known covariate it will know how to calculate it. The second
-#' example is an expression as well but it uses a function alled `mySquareFun`. This function is
-#' defined by user but has wo be accessible within the work space when setting up the compoonents.
-#' The third example provides the function `myOtherSquareFun` directly and not within an expression.
-#' In this case, inlabru will call the function using the data provided via the  `data` parameter.
-#' inlabru expects that the output of this function is a data.frame with "psi" being the name of the
-#' single existing column. For instance,
-#'
-#' \code{myOtherSquareFun = function(data) {
-#'                             data = data[,"x", drop = FALSE] ;
-#'                             colnames(data) = "psi" ;
-#'                             return(data)}}
+#' example is an expression as well but it uses a function called `mySquareFun`. This function is
+#' defined by user but has to be accessible within the work space when setting up the components.
+#' The third example provides the function `myOtherSquareFun`. In this case,
+#'  inlabru will call the function as `myOtherSquareFun(.data.)`, where `.data.`
+#'  is the data provided via the [like()] `data` parameter.
+#' The function needs to know what parts of the data to use to construct the
+#' needed output. For example,
+#' ```
+#' myOtherSquareFun <- function(data) {
+#'   data[ ,"x"]^2
+#' }
+#' ```
 #'
 #' @section Spatial Covariates:
 #'
@@ -1630,28 +1603,34 @@ linearisation_eval.component_list <- function(components, input, ...) {
 #' data frame or write a covariate function like in the previous section there is an even more
 #' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelsDataFrame`,
 #' `SpatialPixelsDataFrame` or `RasterLayer` objects. These can be provided directly via
-#' the map parameter if the input data is a `SpatialPointsDataFrame`. inlabru will automatically
-#' evaluate and/or interpolate the coariate at your data locations when using code like
-#'
-#' \itemize{\item{`components = y ~ psi(mySpatialPixels, model = "linear")`.}}
+#' the input expressions if the [like()] data is a `SpatialPointsDataFrame` object.
+#' inlabru will automatically
+#' evaluate and/or interpolate the covariate at your data locations when using code like
+#' ```
+#' components = y ~ psi(mySpatialPixels, model = "linear")
+#' ```
 #'
 #' @section Coordinates:
 #'
 #' A common spatial modelling component when using inla are SPDE models. An important feature of
-#' inlabru is that it will automatically calculate the so called A-matrix which maps SPDE
-#' values at the mesh vertices to values at the data locations. For this purpose, the map parameter
-#' can be se to `coordinates`, which is the `sp` package function that extracts point
-#' coordinates from the SpatialPointsDataFrame that was provided as input to bru. The code for
+#' inlabru is that it will automatically calculate the so called A-matrix (a component model matrix)
+#' which maps SPDE
+#' values at the mesh vertices to values at the data locations. For this purpose, the input
+#' can be set to `coordinates`, which is the `sp` package function that extracts point
+#' coordinates from the `SpatialPointsDataFrame` that was provided as input to [like()]. The code for
 #' this would look as follows:
-#'
-#' \itemize{\item{`components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))`.}}
+#' ```
+#' components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))
+#' ```
 #'
 #' @export
 #' @keywords internal
 #' @param component A component.
-#' @param data A `data.frame` or Spatial* object of covariates and/or point locations. If null, return the component's map.
+#' @param data A `data.frame` or `Spatial*` object of covariates and/or point locations.
+#' If `NULL`, return the component's map.
 #' @param ... Unused.
 #' @return An list of mapper input values, formatted for the full component mapper
+#' (of type `bru_mapper_scale`)
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname input_eval
 
@@ -1697,9 +1676,7 @@ input_eval.component_list <-
   function(components,
            data,
            ...) {
-    part <- match.arg(part)
-    result <- lapply(components, function(x) input_eval(x, data = data, ...))
-    result
+    lapply(components, function(x) input_eval(x, data = data, ...))
   }
 
 
