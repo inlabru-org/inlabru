@@ -19,9 +19,8 @@ bru_make_stack(...)
 
 \item{lin}{Linearisation information
 \itemize{
-\item For \code{.bru_like}, a linearisation information list with elements
-\code{A} and \code{offset}
-\item For \code{.bru_like_list}, a list of linearisation information lists
+\item For \code{.bru_like}, a \code{bru_mapper_taylor} object
+\item For \code{.bru_like_list}, a list of \code{bru_mapper_taylor} objects
 }}
 
 \item{idx}{Output from \code{evaluate_index(...)}}
