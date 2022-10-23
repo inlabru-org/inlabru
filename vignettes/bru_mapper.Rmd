@@ -234,3 +234,6 @@ ibm_jacobian.bru_mapper_p_quadratic <- function(mapper, input, ...) {
   A
 }
 ```
+If the output of a mapper is of a different size than `NROW(input)`,
+the mapper should define a `ibm_n_output(mapper, input, ...)` method to return
+the output size for a given input.
