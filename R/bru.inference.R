@@ -486,7 +486,19 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
   }
 }
 
-
+#' Evaluate expressions in the data context - TODO
+#' @param input `substitute(expr)` The expression can be response, E, Ntrials
+#' @param data Likelihood-specific data, as a `data.frame` or
+#' `SpatialPoints[DataFrame]`
+#'   object.
+#' @param response_data Likelihood-specific data for models that need different
+#'  size/format for inputs and response variables, as a `data.frame` or
+#' `SpatialPoints[DataFrame]`
+#'   object.
+#' @param default options[[expr]] The expression can be E and Ntrials.
+#' See [bru_options_set()].
+#' @param .envir The environment
+#' @keywords internal
 
 eval_in_data_context <- function(input,
                                  data = NULL,
