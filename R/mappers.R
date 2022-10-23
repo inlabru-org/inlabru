@@ -223,6 +223,7 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #' For `bru_mapper_scale`, a mapper to be scaled.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
 #' @param methods Optional `list` of named method definitions; See Details.
+#' @param \dots Deprecated, alternative way to supply optional method definitions.
 #'
 #' @export
 #' @rdname bru_mapper
@@ -540,7 +541,13 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  if (!is.matrix(input) && !inherits(input, "Spatial")) {
+  if (inherits(input, "sfc_POINT")) {
+    # TODO: Add direct sf support to inla.spde.make.A,
+    # to support crs passthrough.
+    A <- sf::st_coordinates(input)
+    nm <- intersect(colnames(A), c("X", "Y", "Z"))
+    input <- as.matrix(A[, nm, drop = FALSE])
+  } else if (!is.matrix(input) && !inherits(input, "Spatial")) {
     input <- as.matrix(input)
   }
   INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
@@ -928,6 +935,10 @@ ibm_jacobian.bru_mapper_matrix <- function(mapper, input, state = NULL,
   } else if (inherits(input, "Spatial")) {
     A <- sp::coordinates(input)
     A <- as(A, "Matrix")
+  } else if (inherits(input, "sfc_POINT")) {
+    A <- sf::st_coordinates(input)
+    nm <- intersect(colnames(A), c("X", "Y", "Z", "M"))
+    A <- as(A[, nm, drop = FALSE], "Matrix")
   } else {
     A <- as(input, "Matrix")
   }
@@ -938,6 +949,7 @@ ibm_jacobian.bru_mapper_matrix <- function(mapper, input, state = NULL,
       " columns."
     ))
   }
+  colnames(A) <- mapper$labels
   A
 }
 

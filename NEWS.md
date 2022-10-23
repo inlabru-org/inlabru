@@ -15,6 +15,14 @@
   now handle optional scaling weights, like in ordinary component effect
   evaluation.
 
+* Add `terra` support for covariate inputs
+
+* The component `*_layer` arguments are now evaluated in the data context,
+  to allow dynamic layer selection for spatial raster covariates.  A new
+  generic `eval_spatial()` provides support for grid/pixel based
+  `Spatial*DataFrame` evaluation, and `SpatRaster`. Expanded support
+  is in progress.
+
 * New vignettes on the `bru_mapper` system, `component` definitions,
   and `prediction_scores`
   
@@ -34,15 +42,16 @@
   * New mapper class `bru_mapper_const`, which replaces `bru_mapper_offset`.
   `bru_mapper_offset` is now deprecated and will produce warnings.
   
-  
 ## Bug fixes
 
 * Enable both datum/ensemble container for ellipsoid information, to support
   `epsg:4326`. Fixes #154
   
-* Make duplicated component names an error instead of a warning. Relates to #155
+* Make duplicated component names an error instead of a warning.
+  Relates to #155
 
-* Fix Tsparse assumptions in `row_kron`. Fixes #162
+* Fix `Tsparse` assumptions in `row_kron` to prepare for Matrix `1.5-2`.
+  Fixes #162
   
 # inlabru 2.5.3
 

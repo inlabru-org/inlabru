@@ -97,6 +97,101 @@ test_that("Component construction: offset", {
 
 
 
+test_that("Component construction: terra", {
+  skip_if_not_installed("sf")
+  skip_if_not_installed("terra")
+
+  f <- system.file("ex/elev.tif", package = "terra")
+  r <- terra::rast(f)
+
+  data <- sf::st_sf(data.frame(geometry = sf::st_sfc(sf::st_point(cbind(6, 50)),
+    crs = "epsg:4326"
+  )))
+
+  expect_equal(eval_spatial(r, data), 406)
+
+  cmp <- component_list(~ -1 + something(eval_spatial(r, geometry), model = "linear"),
+    lhoods = list(list(data = data))
+  )
+  inp <- input_eval(cmp, data = data)
+  comp_lin <- comp_lin_eval(cmp,
+                            input = inp,
+                            state = list(something = 2),
+                            inla_f = FALSE)
+  val <- evaluate_effect_single_state(
+    comp_lin,
+    state = list(something = 2)
+  )
+  expect_equal(
+    val$something,
+    2 * 406
+  )
+
+  cmp <- component_list(~ -1 + something(r, model = "linear"),
+    lhoods = list(list(data = data))
+  )
+  inp <- input_eval(cmp, data = data)
+  comp_lin <- comp_lin_eval(cmp, input = inp,
+                            state = list(something = 2),
+                            inla_f = FALSE)
+  val <- evaluate_effect_single_state(
+    comp_lin,
+    state = list(something = 2)
+  )
+  expect_equal(
+    val$something,
+    2 * 406
+  )
+
+  cmp <- component_list(~ -1 + something(r, model = "linear", main_layer = 1),
+    lhoods = list(list(data = data))
+  )
+  inp <- input_eval(cmp, data = data)
+  comp_lin <- comp_lin_eval(cmp, input = inp,
+                            state = list(something = 2),
+                            inla_f = FALSE)
+  val <- evaluate_effect_single_state(
+    comp_lin,
+    state = list(something = 2)
+  )
+  expect_equal(
+    val$something,
+    2 * 406
+  )
+
+  cmp <- component_list(~ -1 + something(r, model = "linear", main_layer = "elevation"),
+    lhoods = list(list(data = data))
+  )
+  inp <- input_eval(cmp, data = data)
+  comp_lin <- comp_lin_eval(cmp, input = inp,
+                            state = list(something = 2),
+                            inla_f = FALSE)
+  val <- evaluate_effect_single_state(
+    comp_lin,
+    state = list(something = 2)
+  )
+  expect_equal(
+    val$something,
+    2 * 406
+  )
+
+  expect_error(
+    component_list(~ something(r, model = "linear", main_layer = 2),
+      lhoods = list(list(data = data))
+    ),
+    NULL
+  )
+
+  expect_error(
+    component_list(~ something(r, model = "linear", main_layer = "elev"),
+      lhoods = list(list(data = data))
+    ),
+    NULL
+  )
+})
+
+
+
 
 test_that("Component construction: default mesh/mapping construction", {
   skip_on_cran()

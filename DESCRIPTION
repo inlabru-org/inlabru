@@ -60,6 +60,7 @@ Imports:
     rgdal (>= 1.5.8),
     rgeos,
     rlang,
+    sf,
     utils,
     withr
 Suggests:
@@ -79,7 +80,6 @@ Suggests:
     rgl,
     rmarkdown,
     scales,
-    sf,
     shiny,
     sn,
     spatstat.geom,
@@ -88,6 +88,7 @@ Suggests:
     spatstat (>= 2.0-0),
     sphereplot,
     splancs,
+    terra,
     testthat,
     tidyr,
     DiagrammeR
@@ -120,6 +121,8 @@ Collate:
     'effect.R'
     'environment.R'
     'fmesher_crs.R'
+    'fmesher_sf_mesh.R'
+    'fmesher_sp_mesh.R'
     'fmesher_utils.R'
     'ggplot.R'
     'inla.R'
@@ -134,6 +137,7 @@ Collate:
     'prediction.R'
     'rgl.R'
     'sampling.R'
+    'sf_utils.R'
     'shapefile.R'
     'spatstat.R'
     'spde.R'
