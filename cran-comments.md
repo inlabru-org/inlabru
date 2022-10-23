@@ -1,21 +1,22 @@
+## Submission notes
+
+* Minor release 2.6.0, including new features and
+  a fix to prepare for Matrix 1.5-2
+* CRAN checks for old version, 2.5.3:
+  NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
+* Checks for new version, 2.6.0 (with latest INLA, 22.10.23):
+  - Spurious error message about potentially invalid doi, see below
+
 ## Test environments
 
 * ubuntu 22.04 (local, with INLA), R 4.2.1, R 4.1.3, R devel
 * ubuntu 20.04 (on github, with INLA), R 4.2.1, R 4.1.3, R devel
 * macOS-latest (on github, with INLA), R 4.2.1
 * windows-latest (on github, with INLA), R 4.2.1
-* win-builder, R devel
+* win-builder and R-hub, R devel, 4.2.1, 4.1.3
+* R-hub 
 * For the github platforms, separate tests were also
   done without installing packages in Suggests.
-
-## Submission notes
-
-* Minor release 2.6.0, including new features and
-  a fix to prepare for Matrix 1.5-2
-* CRAN checks for old version, 2.5.3,
-  NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
-* Checks for new version, 2.6.0 (with latest INLA, 22.10.23):
-  - Spurious error message about potentially invalid doi, see below
 
 ## R CMD check results
 
@@ -30,7 +31,7 @@ Suggests or Enhances not in mainstream repositories:
 Availability using Additional_repositories specification:
   INLA   yes   https://inla.r-inla-download.org/R/testing
 ``` 
-* Spurious URL issuenoted by `urlchecker` and some other checkers:
+* Spurious URL issue noted by `urlchecker` and some other checkers:
 ```
 > urlchecker::url_check()
 ✖ Error: README.md:37:31 503: Service Unavailable
