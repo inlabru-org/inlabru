@@ -52,7 +52,8 @@ but for the corresponding features of \code{INLA::f()}.}
 \item{weights, weights_layer, weights_selector}{Optional specification of effect scaling weights.
 Same syntax as for \code{main}.}
 
-\item{model}{Either one of "offset", "factor_full", "factor_contrast", "linear",
+\item{model}{Either one of "const" (same as "offset"), "factor_full",
+"factor_contrast", "linear",
 "fixed", or a model name or
 object accepted by INLA's \code{f} function. If set to NULL, then "linear" is used
 for vector inputs, and "fixed" for matrix input (converted internally to

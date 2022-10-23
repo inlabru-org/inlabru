@@ -18,8 +18,8 @@ A \link{bru_model} object
 The \link{inlabru} syntax for model formulae is different from what
 \code{INLA::inla} considers a valid.
 In inla most of the effects are defined by adding an \code{f(...)} expression to the formula.
-In \link{inlabru} the \code{f} is replaced by an arbitrary (exception: \code{offset}) string that will
-determine the label of the effect. See Details for further information.
+In \link{inlabru} the \code{f} is replaced by an arbitrary (exceptions: \code{const} and \code{offset})
+string that will determine the label of the effect. See Details for further information.
 }
 \details{
 For instance

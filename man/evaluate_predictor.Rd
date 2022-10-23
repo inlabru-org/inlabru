@@ -14,7 +14,7 @@ information, as produced by \code{\link[=evaluate_state]{evaluate_state()}}}
 and covariates needed to evaluate the model.}
 
 \item{effects}{A list where each element is list of named evaluated effects,
-as computed by \code{\link[=evaluate_effect_multi.component_list]{evaluate_effect_multi.component_list()}}}
+as computed by \code{\link[=evaluate_effect_multi_state.component_list]{evaluate_effect_multi_state.component_list()}}}
 
 \item{predictor}{Either a formula or expression}
 

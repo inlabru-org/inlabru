@@ -14,12 +14,16 @@ test_that("Component construction: linear model", {
 
   # Covariate mapping
   df <- data.frame(x = 1:10)
+  inp <- input_eval(cmp, data = df)
   expect_equal(
-    input_eval(cmp, data = df),
+    inp,
     list(
-      main = 1:10,
-      group = 1,
-      replicate = 1
+      mapper = list(
+        main = 1:10,
+        group = 1,
+        replicate = 1
+      ),
+      scale = NULL
     )
   )
 
@@ -31,32 +35,33 @@ test_that("Component construction: linear model", {
   expect_equal(idx$beta, 1)
 
   # A-matrix
-  A <- amatrix_eval(cmp, data = df, inla_f = FALSE)
+  comp_lin <- comp_lin_eval(cmp, input = inp, inla_f = FALSE)
+  A <- ibm_jacobian(comp_lin)
   expect_s4_class(A, "dgCMatrix")
   expect_equal(nrow(A), 10)
   expect_equal(ncol(A), 1)
   expect_equal(as.vector(A), 1:10)
 
   # Value
-  v <- evaluate_effect_single(cmp, data = df, state = 2)
+  v <- evaluate_effect_single_state(comp_lin, state = 2)
   expect_equal(v, 2 * df$x, ignore_attr = TRUE)
 
-  v <- evaluate_effect_single(cmp, data = df, state = 2, A = A)
+  v <- evaluate_effect_single_state(comp_lin, state = 2, A = A)
   expect_equal(v, 2 * df$x, ignore_attr = TRUE)
 
   cmps <- component_list(list(cmp))
-  v <- evaluate_effect_multi(
+  inps <- input_eval(cmps, data = df)
+  v <- evaluate_effect_multi_state(
     cmps,
-    data = df,
+    input = inps,
     state = list(list(beta = 2))
   )
   expect_equal(v[[1]][["beta"]], 2 * df$x, ignore_attr = TRUE)
 
-  v <- evaluate_effect_multi(
+  v <- evaluate_effect_multi_state(
     cmps,
-    data = NULL,
-    state = list(list(beta = 2)),
-    A = list(beta = A)
+    input = inps,
+    state = list(list(beta = 2))
   )
   expect_equal(v[[1]][["beta"]], 2 * df$x, ignore_attr = TRUE)
 })
@@ -77,13 +82,14 @@ test_that("Component construction: duplicate detection", {
 
 
 test_that("Component construction: offset", {
-  cmp <- component_list(~ something(a, model = "offset"))
-  val <- evaluate_effect_single(cmp[["something"]],
-    data = data.frame(a = 11:15),
+  cmp <- component_list(~ -1 + something(a, model = "offset"))
+  inp <- input_eval(cmp, data = data.frame(a = 11:15))
+  val <- evaluate_effect_single_state(cmp,
+    input = inp,
     state = NULL
   )
   expect_equal(
-    val,
+    val$something,
     11:15,
     ignore_attr = TRUE
   )
@@ -104,51 +110,68 @@ test_that("Component construction: terra", {
 
   expect_equal(eval_spatial(r, data), 406)
 
-  cmp <- component_list(~ something(eval_spatial(r, geometry), model = "linear"),
+  cmp <- component_list(~ -1 + something(eval_spatial(r, geometry), model = "linear"),
     lhoods = list(list(data = data))
   )
-  val <- evaluate_effect_single(cmp[["something"]],
-    data = data,
-    state = 2
+  inp <- input_eval(cmp, data = data)
+  comp_lin <- comp_lin_eval(cmp,
+                            input = inp,
+                            state = list(something = 2),
+                            inla_f = FALSE)
+  val <- evaluate_effect_single_state(
+    comp_lin,
+    state = list(something = 2)
   )
   expect_equal(
-    val,
+    val$something,
     2 * 406
   )
 
-  cmp <- component_list(~ something(r, model = "linear"),
+  cmp <- component_list(~ -1 + something(r, model = "linear"),
     lhoods = list(list(data = data))
   )
-  val <- evaluate_effect_single(cmp[["something"]],
-    data = data,
-    state = 2
+  inp <- input_eval(cmp, data = data)
+  comp_lin <- comp_lin_eval(cmp, input = inp,
+                            state = list(something = 2),
+                            inla_f = FALSE)
+  val <- evaluate_effect_single_state(
+    comp_lin,
+    state = list(something = 2)
   )
   expect_equal(
-    val,
+    val$something,
     2 * 406
   )
 
-  cmp <- component_list(~ something(r, model = "linear", main_layer = 1),
+  cmp <- component_list(~ -1 + something(r, model = "linear", main_layer = 1),
     lhoods = list(list(data = data))
   )
-  val <- evaluate_effect_single(cmp[["something"]],
-    data = data,
-    state = 2
+  inp <- input_eval(cmp, data = data)
+  comp_lin <- comp_lin_eval(cmp, input = inp,
+                            state = list(something = 2),
+                            inla_f = FALSE)
+  val <- evaluate_effect_single_state(
+    comp_lin,
+    state = list(something = 2)
   )
   expect_equal(
-    val,
+    val$something,
     2 * 406
   )
 
-  cmp <- component_list(~ something(r, model = "linear", main_layer = "elevation"),
+  cmp <- component_list(~ -1 + something(r, model = "linear", main_layer = "elevation"),
     lhoods = list(list(data = data))
   )
-  val <- evaluate_effect_single(cmp[["something"]],
-    data = data,
-    state = 2
+  inp <- input_eval(cmp, data = data)
+  comp_lin <- comp_lin_eval(cmp, input = inp,
+                            state = list(something = 2),
+                            inla_f = FALSE)
+  val <- evaluate_effect_single_state(
+    comp_lin,
+    state = list(something = 2)
   )
   expect_equal(
-    val,
+    val$something,
     2 * 406
   )
 

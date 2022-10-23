@@ -7,10 +7,13 @@
 \alias{bru_mapper.inla.mesh}
 \alias{bru_mapper.inla.mesh.1d}
 \alias{bru_mapper_index}
+\alias{bru_mapper_taylor}
 \alias{bru_mapper_linear}
 \alias{bru_mapper_matrix}
 \alias{bru_mapper_factor}
+\alias{bru_mapper_const}
 \alias{bru_mapper_offset}
+\alias{bru_mapper_scale}
 \alias{bru_mapper_multi}
 \alias{bru_mapper_collect}
 \alias{bru_mapper_harmonics}
@@ -28,13 +31,19 @@ bru_mapper_define(mapper, new_class = NULL, methods = NULL, ...)
 
 bru_mapper_index(n = 1L, ...)
 
+bru_mapper_taylor(offset, jacobian, state0, ..., values_mapper = NULL)
+
 bru_mapper_linear(...)
 
 bru_mapper_matrix(labels, ...)
 
 bru_mapper_factor(values, factor_mapping, ...)
 
+bru_mapper_const(...)
+
 bru_mapper_offset(...)
+
+bru_mapper_scale(mapper, ...)
 
 bru_mapper_multi(mappers, ...)
 
@@ -51,9 +60,8 @@ bru_mapper_harmonics(
 \arguments{
 \item{\dots}{Deprecated, alternative way to supply optional method definitions.}
 
-\item{mapper}{For the \code{bru_mapper_define} method, normally a
-list that will be converted to a \code{bru_mapper} object by adding
-class information and (optional) methods.}
+\item{mapper}{For \code{bru_mapper_define}, a prototype mapper object, see Details.
+For \code{bru_mapper_scale}, a mapper to be scaled.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
@@ -69,6 +77,20 @@ and similar).
 Default: \code{NULL}, to force user specification of this parameter}
 
 \item{n}{Size of a model for \code{bru_mapper_index}}
+
+\item{offset}{For \code{bru_mapper_taylor}, an offset vector evaluated
+at \code{state0}}
+
+\item{jacobian}{For \code{bru_mapper_taylor}, the Jacobian matrix,
+evaluated at \code{state0}, or, a named list of such matrices.
+May be \code{NULL} or an empty list, for a constant mapping.}
+
+\item{state0}{For \code{bru_mapper_taylor}, the state the linearisation
+was evaluated at, or a list of length matching the \code{jacobian} list.
+\code{NULL} is interpreted as 0.}
+
+\item{values_mapper}{mapper object to be used for \code{ibm_n} and
+\code{ibm_values} for \code{inla_f=TRUE} (experimental, currently unused)}
 
 \item{labels}{Column labels for matrix mappings}
 
@@ -86,7 +108,7 @@ Default: \code{NULL}, to force user specification of this parameter}
 as a first level input mapper for \code{INLA::f()} in a model that requires making
 only the first mapper visible to \code{INLA::f()} and \code{INLA::inla.stack()}, such
 as for "bym2" models, as activated by the \code{inla_f} argument to \code{ibm_n},
-\code{ibm_values}, and \code{ibm_amatrix}. Set to \code{FALSE} to always access the full
+\code{ibm_values}, and \code{ibm_jacobian}. Set to \code{FALSE} to always access the full
 mapper, e.g. for \code{rgeneric} models}
 
 \item{order}{For \code{bru_mapper_harmonics}, specifies the maximum \code{cos}/\code{sin}
@@ -117,22 +139,29 @@ new mappers in user code.
 names to the inheritance list for the input \code{mapper} object, unless the object
 already inherits from these.
 If provided, mapper method functions are added to an environment
-\code{.envir} in the object.  The generic methods \code{ibm_n}, \code{ibm_n_inla},
-\code{ibm_values}, \code{ibm_values_inla},
-\code{ibm_amatrix}, \code{ibm_amatrix_inla},
-\code{ibm_valid_input}, and \code{ibm_valid_input_inla} look for these
+\code{.envir} in the object.  The generic methods look for these
 functions first,
 and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
 to register the methods, e.g.
-\code{.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)}.
+\code{.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)}.
 }
 
 \itemize{
 \item \code{bru_mapper.default} calls \code{bru_mapper_define}, passing all
 arguments along. Mapper implementations should call \code{\link[=bru_mapper_define]{bru_mapper_define()}}
 instead, and supply at least a \code{new_class} class name.
-Use of the \code{bru_mapper.default} will be deprecated from version 2.6.0.
+Use of the \code{bru_mapper.default} will be deprecated from version 2.7.0.
 }
+
+\code{bru_mapper_taylor} provides a pre-computed affine mapping,
+internally used to represent and evaluate linearisation information.
+The \code{state0} information indicates for which state the \code{offset} was evaluated;
+The affine mapper output is defined as
+\code{effect(state) = offset + jacobian \%*\% (state - state0)}
+
+For \code{bru_mapper_scale()}, \code{mapper} is a mapper to be scaled.
+The \code{input} format for the \code{ibm_eval} and \code{ibm_jacobian} methods is
+\code{list(mapper = input_to_the_inner_mapper, scale = scaling_weights)}
 
 \itemize{
 \item \code{bru_mapper_multi} constructs a kronecker product mapping
@@ -171,7 +200,7 @@ The period for the first order harmonics is shifted and scaled to match
 }
 \examples{
 mapper <- bru_mapper_index(5)
-ibm_amatrix(mapper, c(1, 3, 4, 5, 2))
+ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
 }
 \seealso{
 \link{bru_mapper_methods} for specific method implementations, and

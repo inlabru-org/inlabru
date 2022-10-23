@@ -1,14 +1,14 @@
 # GENERICS ----
 
-#' Construct A-matrix
+#' Construct component linearisations
 #'
-#' Constructs the A-matrix for components and data
+#' Constructs the linearisation mapper for each component
 #' @export
-#' @rdname amatrix_eval
-amatrix_eval <- function(...) {
-  UseMethod("amatrix_eval")
+#' @rdname comp_lin_eval
+comp_lin_eval <- function(...) {
+  UseMethod("comp_lin_eval")
 }
-#' Obtain covariate values
+#' Obtain component inputs
 #'
 #' @export
 #' @rdname input_eval
@@ -162,7 +162,8 @@ component <- function(...) {
 #' should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 #' Arguments starting with weights, group, replicate behave similarly to main,
 #' but for the corresponding features of `INLA::f()`.
-#' @param model Either one of "offset", "factor_full", "factor_contrast", "linear",
+#' @param model Either one of "const" (same as "offset"), "factor_full",
+#' "factor_contrast", "linear",
 #' "fixed", or a model name or
 #' object accepted by INLA's `f` function. If set to NULL, then "linear" is used
 #' for vector inputs, and "fixed" for matrix input (converted internally to
@@ -289,7 +290,7 @@ component.character <- function(object,
   #            clinear, sigm, revsigm, log1exp, logdist)
   #
   # Supported:
-  # btypes = c("offset", "factor_full", "factor_contrast", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
+  # btypes = c("const", "offset", "factor_full", "factor_contrast", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
 
   # The label
   label <- object
@@ -440,23 +441,25 @@ component.character <- function(object,
   }
 
   # Special and general cases:
-  if (component$main$type %in% c("offset")) {
+  if (component$main$type %in% c("offset", "const")) {
     # The offset is included either automatically for ~ . linear models,
     # or explicitly by name in the predictor expression, so no INLA formula
     # component is needed.
     component$inla.formula <- as.formula(paste0("~ ."),
       env = .envir
     )
-    component$main$mapper <- bru_mapper_offset()
+    component$main$mapper <- bru_mapper_const()
     component$group$mapper <- bru_mapper_index(1L)
     component$replicate$mapper <- bru_mapper_index(1L)
-    # Add multi-mapper
+    # Add scalable multi-mapper
     component[["mapper"]] <-
-      bru_mapper_multi(list(
-        main = component$main$mapper,
-        group = component$group$mapper,
-        replicate = component$replicate$mapper
-      ))
+      bru_mapper_scale(
+        bru_mapper_multi(list(
+          main = component$main$mapper,
+          group = component$group$mapper,
+          replicate = component$replicate$mapper
+        ))
+      )
   } else {
     if (!is.null(copy)) {
       # Store copy-model name or object in the environment
@@ -770,13 +773,15 @@ add_mappers.component <- function(component, lhoods, ...) {
     env = component$env,
     require_indexed = TRUE
   )
-  # Add multi-mapper
+  # Add scalable multi-mapper
   component[["mapper"]] <-
-    bru_mapper_multi(list(
-      main = component$main$mapper,
-      group = component$group$mapper,
-      replicate = component$replicate$mapper
-    ))
+    bru_mapper_scale(
+      bru_mapper_multi(list(
+        main = component$main$mapper,
+        group = component$group$mapper,
+        replicate = component$replicate$mapper
+      ))
+    )
 
   fcall <- component$fcall
 
@@ -800,7 +805,7 @@ add_mappers.component <- function(component, lhoods, ...) {
     assign(values_name, component$main$values, envir = component$env_extra)
   }
 
-  if (!identical(component[["main"]][["type"]], "offset")) {
+  if (!(component[["main"]][["type"]] %in% c("offset", "const"))) {
     # Update the formula that will be presented to INLA
     component$inla.formula <-
       as.formula(paste0(
@@ -897,6 +902,9 @@ bru_subcomponent <- function(input = NULL,
     } else if (identical(model, "fixed")) {
       model <- "iid"
       type <- "fixed"
+    } else if (model %in% c("offset", "const")) {
+      model <- "const"
+      type <- "const"
     } else {
       type <- model
     }
@@ -1280,8 +1288,8 @@ make_mapper <- function(subcomp,
     }
   } else if (subcomp[["type"]] %in% c("linear", "clinear")) {
     subcomp[["mapper"]] <- bru_mapper_linear()
-  } else if (subcomp[["type"]] %in% c("offset")) {
-    subcomp[["mapper"]] <- bru_mapper_offset()
+  } else if (subcomp[["type"]] %in% c("offset", "const")) {
+    subcomp[["mapper"]] <- bru_mapper_const()
   } else if (subcomp[["type"]] %in% c("fixed")) {
     if (!is.null(subcomp[["values"]])) {
       labels <- subcomp[["values"]]
@@ -1372,7 +1380,7 @@ code.components <- function(components, add = "") {
     if (ix > 0) {
       label <- substr(code, 1, ix - 1)
       is.fixed <- FALSE
-      if (label == "offset") {
+      if (label %in% c("offset", "const")) {
         is.offset <- TRUE
       }
     } else {
@@ -1403,7 +1411,7 @@ code.components <- function(components, add = "") {
             paste0(label, "("),
             paste0(
               fname, '("', label, '"',
-              ', model = "offset", main = '
+              ', model = "const", main = '
             ),
             code,
             fixed = TRUE
@@ -1519,34 +1527,41 @@ print.summary_component_list <- function(x, ...) {
 #' @export
 #' @keywords internal
 #' @param component A component.
-#' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
-#' @param ... Unused.
-#' @return An A-matrix.
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#' @rdname amatrix_eval
+#' @param input Component inputs, from `input_eval()`
+#' @param linearisation evaluation state
+#' @param ... Optional parameters passed on to `ibm_eval`
+#' and `ibm_jacobian.
+#' @return A `bru_mapper_taylor` or `comp_simple_list` object.
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname comp_lin_eval
 
-amatrix_eval.component <- function(component, data, ...) {
-  val <- input_eval(component, data)
-  A <- ibm_amatrix(component$mapper, input = val, ...)
-
-  if (!is.null(val[["weights"]])) {
-    A <- val[["weights"]] * A
+comp_lin_eval.component <- function(component,
+                                    input = NULL,
+                                    state = NULL,
+                                    ...) {
+  if (is.null(state)) {
+    state <- rep(0, ibm_n(component[["mapper"]]))
   }
-
-  # Mask columns of A
-  # TODO: check what this feature is intended for!
-  if (!is.null(component$A.msk)) {
-    A[, as.logical(component$A.msk)] <- 0.0
-  }
-
-  A
+  ibm_linear(component[["mapper"]], input = input, state = state, ...)
 }
 
 #' @export
-#' @rdname amatrix_eval
+#' @rdname comp_lin_eval
 
-amatrix_eval.component_list <- function(components, data, ...) {
-  lapply(components, function(x) amatrix_eval(x, data = data, ...))
+comp_lin_eval.component_list <- function(components, input, state, ...) {
+  # Note: Make sure the list element names carry over!
+  mappers <-
+    lapply(components,
+           function(x) {
+             label <- x[["label"]]
+             comp_lin_eval(x,
+                           input = input[[label]],
+                           state = state[[label]],
+                           ...)
+           })
+
+  class(mappers) <- c("comp_simple_list", class(mappers))
+  mappers
 }
 
 #' @section Simple covariates and the map parameter:
@@ -1560,29 +1575,31 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #'
 #' \itemize{\item{`formula = y ~ f(xsquared, model = "linear")`,}}
 #'
-#' In inlabru this can be achived using two ways of using the `main` parameter
-#' (`map` in version 2.1.13 and earlier).
+#' In inlabru this can be achieved in several ways of using the `main` parameter
+#' (`map` in version 2.1.13 and earlier), which does not need to be named.
 #'
 #' \itemize{
 #' \item{`components = y ~ psi(main = x^2, model = "linear")`}
-#' \item{`components = y ~ psi(main = mySquareFun(x), model = "linear")`,}
-#' \item{`components = y ~ psi(main = myOtherSquareFun, model = "linear")`,}
+#' \item{`components = y ~ psi(x^2, model = "linear")`}
+#' \item{`components = y ~ psi(mySquareFun(x), model = "linear")`,}
+#' \item{`components = y ~ psi(myOtherSquareFun, model = "linear")`,}
 #'
 #' }
 #'
 #' In the first example inlabru will interpret the map parameter as an expression to be evaluated within
 #' the data provided. Since \eqn{x} is a known covariate it will know how to calculate it. The second
-#' example is an expression as well but it uses a function alled `mySquareFun`. This function is
-#' defined by user but has wo be accessible within the work space when setting up the compoonents.
-#' The third example provides the function `myOtherSquareFun` directly and not within an expression.
-#' In this case, inlabru will call the function using the data provided via the  `data` parameter.
-#' inlabru expects that the output of this function is a data.frame with "psi" being the name of the
-#' single existing column. For instance,
-#'
-#' \code{myOtherSquareFun = function(data) {
-#'                             data = data[,"x", drop = FALSE] ;
-#'                             colnames(data) = "psi" ;
-#'                             return(data)}}
+#' example is an expression as well but it uses a function called `mySquareFun`. This function is
+#' defined by user but has to be accessible within the work space when setting up the components.
+#' The third example provides the function `myOtherSquareFun`. In this case,
+#'  inlabru will call the function as `myOtherSquareFun(.data.)`, where `.data.`
+#'  is the data provided via the [like()] `data` parameter.
+#' The function needs to know what parts of the data to use to construct the
+#' needed output. For example,
+#' ```
+#' myOtherSquareFun <- function(data) {
+#'   data[ ,"x"]^2
+#' }
+#' ```
 #'
 #' @section Spatial Covariates:
 #'
@@ -1591,58 +1608,70 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #' data frame or write a covariate function like in the previous section there is an even more
 #' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelsDataFrame`,
 #' `SpatialPixelsDataFrame` or `RasterLayer` objects. These can be provided directly via
-#' the map parameter if the input data is a `SpatialPointsDataFrame`. inlabru will automatically
-#' evaluate and/or interpolate the coariate at your data locations when using code like
-#'
-#' \itemize{\item{`components = y ~ psi(mySpatialPixels, model = "linear")`.}}
+#' the input expressions if the [like()] data is a `SpatialPointsDataFrame` object.
+#' inlabru will automatically
+#' evaluate and/or interpolate the covariate at your data locations when using code like
+#' ```
+#' components = y ~ psi(mySpatialPixels, model = "linear")
+#' ```
 #'
 #' @section Coordinates:
 #'
 #' A common spatial modelling component when using inla are SPDE models. An important feature of
-#' inlabru is that it will automatically calculate the so called A-matrix which maps SPDE
-#' values at the mesh vertices to values at the data locations. For this purpose, the map parameter
-#' can be se to `coordinates`, which is the `sp` package function that extracts point
-#' coordinates from the SpatialPointsDataFrame that was provided as input to bru. The code for
+#' inlabru is that it will automatically calculate the so called A-matrix (a component model matrix)
+#' which maps SPDE
+#' values at the mesh vertices to values at the data locations. For this purpose, the input
+#' can be set to `coordinates`, which is the `sp` package function that extracts point
+#' coordinates from the `SpatialPointsDataFrame` that was provided as input to [like()]. The code for
 #' this would look as follows:
-#'
-#' \itemize{\item{`components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))`.}}
+#' ```
+#' components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))
+#' ```
 #'
 #' @export
 #' @keywords internal
 #' @param component A component.
-#' @param data A `data.frame` or Spatial* object of covariates and/or point locations. If null, return the component's map.
+#' @param data A `data.frame` or `Spatial*` object of covariates and/or point locations.
+#' If `NULL`, return the component's map.
 #' @param ... Unused.
-#' @return An vector or a coordinate matrix
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @return An list of mapper input values, formatted for the full component mapper
+#' (of type `bru_mapper_scale`)
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname input_eval
 
 input_eval.component <- function(component,
                                  data,
                                  ...) {
-  val <- list()
+  stopifnot(inherits(component[["mapper"]], "bru_mapper_scale"))
+
   # The names should be a subset of main, group, replicate
-  part_names <- names(component[["mapper"]])
+  part_names <- names(component[["mapper"]][["mapper"]])
+  mapper_val <- list()
   for (part in part_names) {
-    val[[part]] <-
+    mapper_val[[part]] <-
       input_eval(
         component[[part]]$input,
         data,
         env = component$env,
+        label = part,
         ...
       )
   }
-  if (!is.null(component[["weights"]])) {
-    val[["weights"]] <-
+  if (is.null(component[["weights"]])) {
+    scale_val <- NULL
+  } else {
+    scale_val <-
       input_eval(
         component[["weights"]],
         data,
         env = component$env,
+        label = paste(component$label, "(weights)"),
         ...
       )
   }
   # Any potential length mismatches must be handled by bru_mapper_multi and
   # bru_mapper_collect, since e.g. 'main' might take a list() input object.
-  val
+  list(mapper = mapper_val, scale = scale_val)
 }
 
 #' @export
@@ -1652,9 +1681,7 @@ input_eval.component_list <-
   function(components,
            data,
            ...) {
-    part <- match.arg(part)
-    result <- lapply(components, function(x) input_eval(x, data = data, ...))
-    result
+    lapply(components, function(x) input_eval(x, data = data, ...))
   }
 
 
@@ -1812,7 +1839,7 @@ input_eval.bru_input <- function(input, data, env = NULL,
       layer = layer,
       selector = NULL
     )
-    #  } else if ((input$label == "offset") &&
+    #  } else if ((input$label %in% c("offset", "const")) &&
     #    is.numeric(e_input) &&
     #    (length(e_input) == 1)) {
     #    val <- rep(e_input, n)
@@ -1887,7 +1914,7 @@ input_eval.bru_input <- function(input, data, env = NULL,
 #' @rdname index_eval
 
 index_eval.component <- function(component, inla_f, ...) {
-  idx <- ibm_values(component[["mapper"]], inla_f = inla_f, multi = 1)
+  idx <- ibm_values(component[["mapper"]], inla_f = inla_f, multi = TRUE)
   names(idx) <- paste0(component[["label"]], c("", ".group", ".repl"))
   idx
 }
@@ -1908,5 +1935,5 @@ index_eval.component_list <- function(components, inla_f, ...) {
 #' @rdname inla_subset_eval
 
 inla_subset_eval.component_list <- function(components, ...) {
-  lapply(components, function(x) ibm_inla_subset(x[["mapper"]], multi = 1))
+  lapply(components, function(x) ibm_inla_subset(x[["mapper"]], multi = TRUE))
 }
