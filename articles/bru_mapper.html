@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,7 @@
     <a class="dropdown-item" href="../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
     <a class="dropdown-item" href="../articles/web/publications.html">Publications</a>
     <a class="dropdown-item" href="../articles/web/random_fields.html">Random Fields in One Dimension</a>
@@ -109,7 +110,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">inla_f</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">inla_f</span>, <span class="va">...</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_jacobian</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_inla_subset</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_valid_input</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 <p>An example where the <code>inla_f</code> argument matters is the <code>bru_mapper_collect</code> class, when the <code>hidden=TRUE</code> argument is used to indicate that only the first mapper should be used for the <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> inputs, e.g. for <code>"bym2"</code> models. For <code>inla_f=FALSE</code> (the default), the <code>ibm_n</code> and <code>ibm_values</code> methods return the total number of latent variables, but with <code>inla_f=TRUE</code> we get the values needed by <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> instead:</p>
@@ -175,6 +176,7 @@
 </h2>
 <pre><code><span><span class="va">bru_mapper_define</span></span></code></pre>
 <p>Implementations can avoid having to define <code>ibm_n</code> and <code>ibm_values</code> methods, by instead computing and storing <code>n</code>, <code>n_inla</code>, <code>values</code>, and <code>values_inla</code> in the mapper object during construction. The default <code>ibm_n</code> and <code>ibm_values</code> methods checks if these values are available, and return the appropriate values depending on the <code>inla_f</code> argument. When <code>*_inla</code> values are requested but not available, the methods fall back to the non-inla versions. If the needed information is not found, the default methods give an error message.</p>
+<p>Note: Before version 2.6.0, <code>ibm_amatrix</code> was used instead of <code>ibm_jacobian</code>. Version 2.6.0 still supports this, by having the default <code>ibm_jacobian</code> method call <code>ibm_amatrix</code>, but will give a deprecation message from version 2.7.0, and it may be removed in a future version.</p>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -235,7 +237,7 @@
 <p>Note that the order matters, since our <code>ibm_values_bru_mapper_p_quadratic</code> function calls <code>ibm_n(mapper)</code>.</p>
 <p>We can now define the main part of the mapper interface that computes the model matrix linking the latent variables to the component effect. It’s required that <code>NULL</code> input should return a <span class="math inline">\(0\)</span>-by-<span class="math inline">\(n\)</span> matrix.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ibm_amatrix.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">ibm_jacobian.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">input</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/Matrix.html" class="external-link">Matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
@@ -262,6 +264,7 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="va">A</span></span>
 <span><span class="op">}</span></span></code></pre></div>
+<p>If the output of a mapper is of a different size than <code>NROW(input)</code>, the mapper should define a <code>ibm_n_output(mapper, input, ...)</code> method to return the output size for a given input.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

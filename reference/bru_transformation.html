@@ -12,7 +12,7 @@ distributions in predictor expressions"><!-- mathjax --><script src="https://cdn
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,7 @@ distributions in predictor expressions"><!-- mathjax --><script src="https://cdn
     <a class="dropdown-item" href="../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
     <a class="dropdown-item" href="../articles/web/publications.html">Publications</a>
     <a class="dropdown-item" href="../articles/web/random_fields.html">Random Fields in One Dimension</a>
@@ -121,10 +122,10 @@ and inverse calculations use lower tails only, potentially losing accuracy in th
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">bru_forward_transformation</span><span class="op">(</span><span class="va">qexp</span>, <span class="va">u</span>, rate <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu">bru_inverse_transformation</span><span class="op">(</span><span class="va">pexp</span>, <span class="va">y</span>, rate <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">u</span>, <span class="va">y</span>, <span class="va">v</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         [,1]        [,2]        [,3]     [,4]       [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> u -0.8189898 -1.67089222 -0.07590552 2.350486 -0.8764255</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> y  0.1155854  0.02426513  0.31720064 2.334883  0.1056071</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> v -0.8189898 -1.67089222 -0.07590552 2.350486 -0.8764255</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         [,1]     [,2]        [,3]       [,4]     [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> u -0.5504015 1.104292 -0.98642307 -0.5432150 2.072537</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> y  0.1719654 1.002229  0.08834638  0.1737096 1.978832</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> v -0.5504015 1.104292 -0.98642307 -0.5432150 2.072537</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

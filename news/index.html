@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,7 @@
     <a class="dropdown-item" href="../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
     <a class="dropdown-item" href="../articles/web/publications.html">Publications</a>
     <a class="dropdown-item" href="../articles/web/random_fields.html">Random Fields in One Dimension</a>
@@ -73,7 +74,15 @@
 <h3 id="features-development-version">Features<a class="anchor" aria-label="anchor" href="#features-development-version"></a></h3>
 <ul><li><p>Add <code>bru_get_mapper</code> generic, and associated methods for <code>inla.spde</code> and <code>inla.rgeneric</code> objects. This allows <code>inlabru</code> to automatically extract the appropriate <code>bru_mapper</code> object for each model component, and can be used as a hook by external packages implementing new INLA object classes.</p></li>
 <li><p>Add a <code>weights</code> argument for <code><a href="../reference/like.html">like()</a></code>, for likelihood-specific log-likelihood weights, passed on to the <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">INLA::inla()</a></code> weights argument. Evaluated in the data context.</p></li>
+<li><p>The <code>&lt;component&gt;_eval()</code> methods available in predictor expressions now handle optional scaling weights, like in ordinary component effect evaluation.</p></li>
 <li><p>New vignettes on the <code>bru_mapper</code> system, <code>component</code> definitions, and <code>prediction_scores</code></p></li>
+<li>
+<p>General overhaul of the <code>bru_mapper</code> and linearised predictor system, to prepare for new features.</p>
+<ul><li><p>Add <code>ibm_eval</code> generic for evaluating mappers for given states.</p></li>
+<li><p>Add <code>bru_mapper_taylor</code>, used as an internal mapper for linearised mappers. This and <code>ibm_eval</code> is aimed at future support for nonlinear mappers. Associated new generic methods: <code>ibm_{is_linear,jacobian,linear}</code>.</p></li>
+<li><p>New mapper implementations should use <code>ibm_jacobian</code> instead of <code>ibm_amatrix</code>. This allows defining a linearised mapper via <code>ibm_eval(input, state0) + ibm_jacobian(input, state0) %*% (state - state0)</code>.</p></li>
+<li><p>New mapper class <code>bru_mapper_const</code>, which replaces <code>bru_mapper_offset</code>. <code>bru_mapper_offset</code> is now deprecated and will produce warnings.</p></li>
+</ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>

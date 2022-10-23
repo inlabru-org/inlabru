@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,7 @@
     <a class="dropdown-item" href="../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
     <a class="dropdown-item" href="../articles/web/publications.html">Publications</a>
     <a class="dropdown-item" href="../articles/web/random_fields.html">Random Fields in One Dimension</a>
@@ -139,12 +140,12 @@
         <dd>Build an inla data stack from linearisation information</dd>
       </dl><dl><dt>
           
-          <code><a href="bru_mapper.html">bru_mapper()</a></code> <code><a href="bru_mapper.html">bru_mapper_define()</a></code> <code><a href="bru_mapper.html">bru_mapper_index()</a></code> <code><a href="bru_mapper.html">bru_mapper_linear()</a></code> <code><a href="bru_mapper.html">bru_mapper_matrix()</a></code> <code><a href="bru_mapper.html">bru_mapper_factor()</a></code> <code><a href="bru_mapper.html">bru_mapper_offset()</a></code> <code><a href="bru_mapper.html">bru_mapper_multi()</a></code> <code><a href="bru_mapper.html">bru_mapper_collect()</a></code> <code><a href="bru_mapper.html">bru_mapper_harmonics()</a></code> 
+          <code><a href="bru_mapper.html">bru_mapper()</a></code> <code><a href="bru_mapper.html">bru_mapper_define()</a></code> <code><a href="bru_mapper.html">bru_mapper_index()</a></code> <code><a href="bru_mapper.html">bru_mapper_taylor()</a></code> <code><a href="bru_mapper.html">bru_mapper_linear()</a></code> <code><a href="bru_mapper.html">bru_mapper_matrix()</a></code> <code><a href="bru_mapper.html">bru_mapper_factor()</a></code> <code><a href="bru_mapper.html">bru_mapper_const()</a></code> <code><a href="bru_mapper.html">bru_mapper_offset()</a></code> <code><a href="bru_mapper.html">bru_mapper_scale()</a></code> <code><a href="bru_mapper.html">bru_mapper_multi()</a></code> <code><a href="bru_mapper.html">bru_mapper_collect()</a></code> <code><a href="bru_mapper.html">bru_mapper_harmonics()</a></code> 
         </dt>
         <dd>Constructors for <code>bru_mapper</code> objects</dd>
       </dl><dl><dt>
           
-          <code><a href="bru_mapper_methods.html">ibm_n()</a></code> <code><a href="bru_mapper_methods.html">ibm_values()</a></code> <code><a href="bru_mapper_methods.html">ibm_amatrix()</a></code> <code><a href="bru_mapper_methods.html">ibm_inla_subset()</a></code> <code><a href="bru_mapper_methods.html">ibm_valid_input()</a></code> <code><a href="bru_mapper_methods.html">`[`(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">names(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`names&lt;-`(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`[`(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">names(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`names&lt;-`(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> 
+          <code><a href="bru_mapper_methods.html">ibm_n()</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output()</a></code> <code><a href="bru_mapper_methods.html">ibm_values()</a></code> <code><a href="bru_mapper_methods.html">ibm_amatrix()</a></code> <code><a href="bru_mapper_methods.html">ibm_is_linear()</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian()</a></code> <code><a href="bru_mapper_methods.html">ibm_linear()</a></code> <code><a href="bru_mapper_methods.html">ibm_eval()</a></code> <code><a href="bru_mapper_methods.html">ibm_inla_subset()</a></code> <code><a href="bru_mapper_methods.html">ibm_valid_input()</a></code> <code><a href="bru_mapper_methods.html">ibm_offset.default()</a></code> <code><a href="bru_mapper_methods.html">ibm_offset.bru_mapper_scale()</a></code> <code><a href="bru_mapper_methods.html">`[`(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">names(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`names&lt;-`(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`[`(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">names(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`names&lt;-`(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> 
         </dt>
         <dd>Methods for bru_mapper objects</dd>
       </dl><dl><dt>
@@ -204,14 +205,19 @@
         <dd>Variance and correlations measures for prediction components</dd>
       </dl><dl><dt>
           
-          <code><a href="evaluate_A.html">evaluate_A()</a></code> 
+          <code><a href="evaluate_comp_lin.html">evaluate_comp_lin()</a></code> 
         </dt>
-        <dd>Compute all A-matrices</dd>
+        <dd>Compute all component linearisations</dd>
       </dl><dl><dt>
           
           <code><a href="evaluate_index.html">evaluate_index()</a></code> 
         </dt>
         <dd>Compute all index values</dd>
+      </dl><dl><dt>
+          
+          <code><a href="evaluate_inputs.html">evaluate_inputs()</a></code> 
+        </dt>
+        <dd>Compute all component inputs</dd>
       </dl><dl><dt>
           
           <code><a href="expand_labels.html">expand_labels()</a></code> 
@@ -360,7 +366,7 @@ reference systems of sp::CRS or INLA::inla.CRS class.</dd>
         <dd>Join stacks intended to be run with different likelihoods</dd>
       </dl><dl><dt>
           
-          <code><a href="inlabru-deprecated.html">summary_bru()</a></code> <code><a href="inlabru-deprecated.html">iinla.getOption()</a></code> <code><a href="inlabru-deprecated.html">iinla.setOption()</a></code> <code><a href="inlabru-deprecated.html">init.tutorial()</a></code> 
+          <code><a href="inlabru-deprecated.html">summary_bru()</a></code> <code><a href="inlabru-deprecated.html">iinla.getOption()</a></code> <code><a href="inlabru-deprecated.html">iinla.setOption()</a></code> <code><a href="inlabru-deprecated.html">init.tutorial()</a></code> <code><a href="inlabru-deprecated.html">ibm_amatrix(<i>&lt;bru_mapper_inla_mesh_2d&gt;</i>)</a></code> <code><a href="inlabru-deprecated.html">ibm_amatrix(<i>&lt;bru_mapper_inla_mesh_1d&gt;</i>)</a></code> <code><a href="inlabru-deprecated.html">ibm_amatrix(<i>&lt;bru_mapper_index&gt;</i>)</a></code> <code><a href="inlabru-deprecated.html">ibm_amatrix(<i>&lt;bru_mapper_linear&gt;</i>)</a></code> <code><a href="inlabru-deprecated.html">ibm_amatrix(<i>&lt;bru_mapper_matrix&gt;</i>)</a></code> <code><a href="inlabru-deprecated.html">ibm_amatrix(<i>&lt;bru_mapper_factor&gt;</i>)</a></code> <code><a href="inlabru-deprecated.html">ibm_n(<i>&lt;bru_mapper_offset&gt;</i>)</a></code> <code><a href="inlabru-deprecated.html">ibm_values(<i>&lt;bru_mapper_offset&gt;</i>)</a></code> <code><a href="inlabru-deprecated.html">ibm_amatrix(<i>&lt;bru_mapper_offset&gt;</i>)</a></code> <code><a href="inlabru-deprecated.html">ibm_amatrix(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="inlabru-deprecated.html">ibm_amatrix(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> 
         </dt>
         <dd>Deprecated functions in inlabru</dd>
       </dl><dl><dt>

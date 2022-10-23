@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,7 @@
     <a class="dropdown-item" href="../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
     <a class="dropdown-item" href="../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
     <a class="dropdown-item" href="../articles/web/publications.html">Publications</a>
     <a class="dropdown-item" href="../articles/web/random_fields.html">Random Fields in One Dimension</a>
@@ -82,8 +83,9 @@
 <span>  <span class="va">model</span>,</span>
 <span>  <span class="va">lhood_expr</span>,</span>
 <span>  <span class="va">data</span>,</span>
+<span>  <span class="va">input</span>,</span>
 <span>  <span class="va">state</span>,</span>
-<span>  <span class="va">A</span>,</span>
+<span>  <span class="va">comp_simple</span>,</span>
 <span>  <span class="va">effects</span>,</span>
 <span>  <span class="va">pred0</span>,</span>
 <span>  <span class="va">allow_latent</span>,</span>
@@ -93,13 +95,30 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_like</span></span>
-<span><span class="fu">bru_compute_linearisation</span><span class="op">(</span><span class="va">lhood</span>, <span class="va">model</span>, <span class="va">data</span>, <span class="va">state</span>, <span class="va">A</span>, <span class="va">eps</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_compute_linearisation</span><span class="op">(</span></span>
+<span>  <span class="va">lhood</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">input</span>,</span>
+<span>  <span class="va">state</span>,</span>
+<span>  <span class="va">comp_simple</span>,</span>
+<span>  <span class="va">eps</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_like_list</span></span>
-<span><span class="fu">bru_compute_linearisation</span><span class="op">(</span><span class="va">lhoods</span>, <span class="va">model</span>, <span class="va">state</span>, <span class="va">A</span>, eps <span class="op">=</span> <span class="fl">1e-05</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_compute_linearisation</span><span class="op">(</span></span>
+<span>  <span class="va">lhoods</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">input</span>,</span>
+<span>  <span class="va">state</span>,</span>
+<span>  <span class="va">comp_simple</span>,</span>
+<span>  eps <span class="op">=</span> <span class="fl">1e-05</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_model</span></span>
-<span><span class="fu">bru_compute_linearisation</span><span class="op">(</span><span class="va">model</span>, <span class="va">lhoods</span>, <span class="va">state</span>, <span class="va">A</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">bru_compute_linearisation</span><span class="op">(</span><span class="va">model</span>, <span class="va">lhoods</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">comp_simple</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -124,16 +143,19 @@
 <dd><p>Input data</p></dd>
 
 
+<dt>input</dt>
+<dd><p>Precomputed component inputs from <code><a href="evaluate_inputs.html">evaluate_inputs()</a></code></p></dd>
+
+
 <dt>state</dt>
 <dd><p>The state information, as a list of named vectors</p></dd>
 
 
-<dt>A</dt>
-<dd><p>A-matrix information:</p><ul><li><p>For <code>bru_component</code>: Precomputed A-matrix for the component</p></li>
-<li><p>For <code>bru_like</code>: A list of named A-matrices for the components in the
-likelihood for the component</p></li>
-<li><p>For <code>bru_like_list</code>: A list, where each element is a list of named
-A-matrices.</p></li>
+<dt>comp_simple</dt>
+<dd><p>Component evaluation information</p><ul><li><p>For <code>bru_component</code>: <code>bru_mapper_taylor</code> object</p></li>
+<li><p>For <code>bru_like</code>: A <code>comp_simple_list</code> object
+for the components in the likelihood</p></li>
+<li><p>For <code>bru_like_list</code>: A <code>comp_simple_list_list</code> object</p></li>
 </ul></dd>
 
 

@@ -43,6 +43,9 @@
     <loc>/articles/web/2d_lgcp_spatiotemporal.html</loc>
   </url>
   <url>
+    <loc>/articles/web/Apptainer.html</loc>
+  </url>
+  <url>
     <loc>/articles/web/devel_flow.html</loc>
   </url>
   <url>
@@ -82,9 +85,6 @@
     <loc>/reference/add_mappers.html</loc>
   </url>
   <url>
-    <loc>/reference/amatrix_eval.html</loc>
-  </url>
-  <url>
     <loc>/reference/bincount.html</loc>
   </url>
   <url>
@@ -113,6 +113,9 @@
   </url>
   <url>
     <loc>/reference/bru_int_polygon_old.html</loc>
+  </url>
+  <url>
+    <loc>/reference/bru_like_methods.html</loc>
   </url>
   <url>
     <loc>/reference/bru_log.html</loc>
@@ -148,6 +151,9 @@
     <loc>/reference/code.components.html</loc>
   </url>
   <url>
+    <loc>/reference/comp_lin_eval.html</loc>
+  </url>
+  <url>
     <loc>/reference/component.html</loc>
   </url>
   <url>
@@ -166,13 +172,22 @@
     <loc>/reference/devel.cvmeasure.html</loc>
   </url>
   <url>
-    <loc>/reference/evaluate_A.html</loc>
+    <loc>/reference/evaluate_comp_lin.html</loc>
+  </url>
+  <url>
+    <loc>/reference/evaluate_comp_simple.html</loc>
+  </url>
+  <url>
+    <loc>/reference/evaluate_comp_simple_list_subsetting.html</loc>
   </url>
   <url>
     <loc>/reference/evaluate_effect.html</loc>
   </url>
   <url>
     <loc>/reference/evaluate_index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/evaluate_inputs.html</loc>
   </url>
   <url>
     <loc>/reference/evaluate_model.html</loc>

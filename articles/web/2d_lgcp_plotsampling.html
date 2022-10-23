@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,7 @@
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
     <a class="dropdown-item" href="../../articles/web/publications.html">Publications</a>
     <a class="dropdown-item" href="../../articles/web/random_fields.html">Random Fields in One Dimension</a>
@@ -91,7 +92,7 @@
       <img src="" class="logo" alt=""><h1>LGCPs - Plot sampling</h1>
                         <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-21</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -218,14 +219,14 @@
 <span><span class="co">#&gt; Warning in rbind(deparse.level, ...): number of columns of result, 8, is not a</span></span>
 <span><span class="co">#&gt; multiple of vector length 9 of arg 4</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 635.9492 45.80193 556.3130 637.8159 720.1389 637.8159        4.580193</span></span>
-<span><span class="co">#&gt; 2 639.3085 41.51010 560.7311 633.7823 723.5239 633.7823        4.151010</span></span>
-<span><span class="co">#&gt; 3 651.0983 25.37920 608.3194 647.8489 702.3166 647.8489        2.537920</span></span>
+<span><span class="co">#&gt; 1 642.4512 48.62198 542.8803 635.4776 757.7342 635.4776        4.862198</span></span>
+<span><span class="co">#&gt; 2 634.4812 39.62226 577.5499 627.8361 703.8886 627.8361        3.962226</span></span>
+<span><span class="co">#&gt; 3 650.6056 26.35942 603.0452 651.4949 698.3237 651.4949        2.635942</span></span>
 <span><span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      2.586555</span></span>
-<span><span class="co">#&gt; 2      3.489046</span></span>
-<span><span class="co">#&gt; 3      1.976723</span></span>
+<span><span class="co">#&gt; 1      3.840449</span></span>
+<span><span class="co">#&gt; 2      3.713700</span></span>
+<span><span class="co">#&gt; 3      1.984071</span></span>
 <span><span class="co">#&gt; 4            NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
