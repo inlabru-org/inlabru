@@ -33,7 +33,7 @@ The reference documentation for the mapper methods is contained in three parts:
 ```{r eval=FALSE}
 ibm_n(mapper, inla_f, ...)
 ibm_values(mapper, inla_f, ...)
-ibm_amatrix(mapper, input, ...)
+ibm_jacobian(mapper, input, ...)
 ibm_inla_subset(mapper, ...)
 ibm_valid_input(mapper, input, ...)
 ```
@@ -116,6 +116,10 @@ methods checks if these values are available, and return the appropriate values
 depending on the `inla_f` argument.  When `*_inla` values are requested but not
 available, the methods fall back to the non-inla versions. If the needed information
 is not found, the default methods give an error message.
+
+Note: Before version 2.6.0, `ibm_amatrix` was used instead of `ibm_jacobian`.
+Version 2.6.0 still supports this, but will give a deprecation message from
+version 2.7.0, and it may be removed in a future version.
 
 ## Example
 
@@ -201,7 +205,7 @@ We can now define the main part of the mapper interface that computes the
 model matrix linking the latent variables to the component effect. It's required
 that `NULL` input should return a $0$-by-$n$ matrix.
 ```{r}
-ibm_amatrix.bru_mapper_p_quadratic <- function(mapper, input, ...) {
+ibm_jacobian.bru_mapper_p_quadratic <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }

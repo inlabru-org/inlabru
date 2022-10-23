@@ -108,7 +108,7 @@ was evaluated at, or a list of length matching the \code{jacobian} list.
 as a first level input mapper for \code{INLA::f()} in a model that requires making
 only the first mapper visible to \code{INLA::f()} and \code{INLA::inla.stack()}, such
 as for "bym2" models, as activated by the \code{inla_f} argument to \code{ibm_n},
-\code{ibm_values}, and \code{ibm_amatrix}. Set to \code{FALSE} to always access the full
+\code{ibm_values}, and \code{ibm_jacobian}. Set to \code{FALSE} to always access the full
 mapper, e.g. for \code{rgeneric} models}
 
 \item{order}{For \code{bru_mapper_harmonics}, specifies the maximum \code{cos}/\code{sin}
@@ -150,7 +150,7 @@ to register the methods, e.g.
 \item \code{bru_mapper.default} calls \code{bru_mapper_define}, passing all
 arguments along. Mapper implementations should call \code{\link[=bru_mapper_define]{bru_mapper_define()}}
 instead, and supply at least a \code{new_class} class name.
-Use of the \code{bru_mapper.default} will be deprecated from version 2.6.0.
+Use of the \code{bru_mapper.default} will be deprecated from version 2.7.0.
 }
 
 \code{bru_mapper_taylor} provides a pre-computed affine mapping,
@@ -160,7 +160,7 @@ The affine mapper output is defined as
 \code{effect(state) = offset + jacobian \%*\% (state - state0)}
 
 For \code{bru_mapper_scale()}, \code{mapper} is a mapper to be scaled.
-The \code{input} format for the \code{ibm_eval} and \code{ibm_amatrix} methods is
+The \code{input} format for the \code{ibm_eval} and \code{ibm_jacobian} methods is
 \code{list(mapper = input_to_the_inner_mapper, scale = scaling_weights)}
 
 \itemize{
@@ -200,7 +200,7 @@ The period for the first order harmonics is shifted and scaled to match
 }
 \examples{
 mapper <- bru_mapper_index(5)
-ibm_amatrix(mapper, c(1, 3, 4, 5, 2))
+ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
 }
 \seealso{
 \link{bru_mapper_methods} for specific method implementations, and

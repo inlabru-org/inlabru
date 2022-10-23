@@ -48,7 +48,7 @@ test_that("Linearisation", {
       seq_along(lhoods),
       function(lh_idx) {
         lh <- lhoods[[lh_idx]]
-        lin_off <- ibm_offset(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
+        lin_off <- ibm_eval(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
         lin_A <- ibm_jacobian(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
         nms <- names(lin_A)
         INLA::inla.stack(

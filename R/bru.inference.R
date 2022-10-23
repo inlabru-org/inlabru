@@ -2869,7 +2869,6 @@ print.summary_bru <- function(x, ...) {
 #'
 #' @export
 #' @param object An object obtained from a [bru()] or [lgcp()] call
-#' @param \dots arguments passed on to other methods or ignored
 
 summary_bru <- function(object, ...) {
   .Deprecated(new = "summary")
