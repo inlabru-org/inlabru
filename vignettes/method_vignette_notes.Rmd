@@ -1,0 +1,5 @@
+### Prior, Data and Posterior
+Here are some thoughts on the spectrum of models, namely, weak, somethings in between, and strong models. For the weak models, prior is strong, given the Gaussian in INLA, data is weak, then the posterior ends up Gaussian. Strong model is Gaussian because of a lot of data, then prior is weak, posterior ends up Gaussian again. What lies in between is problematic, which we have to investigate.
+
+Most of the time, we only consider asymptotics, but the data in real world are most likely lying in between. In particular, low count models and binary models are the worst. For example, t-distribution in INLA, Hessian not positive definite, inlabru forces it to be positive definite for linearisation model. The question is how wrong it can be to force it in a point process setting.
+
