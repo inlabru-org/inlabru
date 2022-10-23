@@ -69,10 +69,10 @@ The weighted sum of a function evaluated at these points is the integral of that
 by linear basis functions. The parameter \code{samplers} describes the area(s) integrated over.
 
 In case of a single dimension \code{samplers} is supposed to be a two-column \code{matrix} where
-each row describes the start and end point of the interval to integrate over. In the two-dimensional
+each row describes the start and end points of the interval to integrate over. In the two-dimensional
 case \code{samplers} can be either a \code{SpatialPolygon}, an \code{inla.mesh} or a
 \code{SpatialLinesDataFrame} describing the area to integrate over. If a \code{SpatialLineDataFrame}
-is provided it has to have a column called 'weight' in order to indicate the width of the line.
+is provided, it has to have a column called 'weight' in order to indicate the width of the line.
 
 The domain parameter is an \code{inla.mesh.1d} or \code{inla.mesh} object that can be employed to
 project the integration points to the vertices of the mesh. This reduces the final number of
