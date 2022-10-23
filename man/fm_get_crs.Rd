@@ -27,5 +27,6 @@ fm_get_crs(...)
 \item{x}{from which to extract crs information}
 }
 \description{
-Generic method for extracting crs objects
+Support for \code{sp} \code{CRS} objects is supported.  Support for \code{sf} \code{crs}
+objects is experimental, and is likely to change.
 }

@@ -132,6 +132,10 @@ fm_as_sp_crs <- function(x) {
 }
 
 #' Generic method for extracting crs objects
+#'
+#' Support for `sp` `CRS` objects is supported.  Support for `sf` `crs`
+#' objects is experimental, and is likely to change.
+#'
 #' @rdname fm_get_crs
 #' @param \dots Arguments passed on to other methods
 #' @export
@@ -206,12 +210,11 @@ fm_sp_get_crs <- function(x) {
 # for sf objects?
 
 # Given sf or sfc object, return
-# crs as wkt
 fm_sf_get_crs <- function(x) {
   if (is.null(x)) {
     return(NULL)
   }
-  sf::st_crs(x)$wkt
+  fm_CRS(SRS_string = sf::st_crs(x)$wkt)
 }
 
 fm_crs_is_null <- function(crs) {
