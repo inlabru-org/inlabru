@@ -133,7 +133,7 @@ fm_as_sp_crs <- function(x) {
 
 #' Generic method for extracting crs objects
 #'
-#' Support for `sp` `CRS` objects is supported.  Support for `sf` `crs`
+#' Currently, `sp` `CRS` objects is supported.  Support for `sf` `crs`
 #' objects is experimental, and is likely to change.
 #'
 #' @rdname fm_get_crs
