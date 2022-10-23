@@ -198,6 +198,7 @@ eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
   UseMethod("eval_spatial")
 }
 
+#' @describeIn inlabru-deprecated Replaced by the generic [eval_spatial()]
 eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
   .Deprecated("eval_spatial")
   eval_spatial.Spatial(
@@ -208,6 +209,7 @@ eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
   )
 }
 #' @export
+#' @rdname eval_spatial
 eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
   stopifnot(inherits(
     data,
@@ -238,6 +240,7 @@ eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
 
 
 #' @export
+#' @rdname eval_spatial
 eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) {
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)

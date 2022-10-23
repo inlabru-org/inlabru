@@ -2,9 +2,15 @@
 % Please edit documentation in R/utils.R
 \name{eval_spatial}
 \alias{eval_spatial}
+\alias{eval_spatial.Spatial}
+\alias{eval_spatial.SpatRaster}
 \title{Evaluate spatial covariates}
 \usage{
 eval_spatial(data, where, layer = NULL, selector = NULL)
+
+\method{eval_spatial}{Spatial}(data, where, layer = NULL, selector = NULL)
+
+\method{eval_spatial}{SpatRaster}(data, where, layer = NULL, selector = NULL)
 }
 \arguments{
 \item{data}{Spatial grid-like data}

@@ -18,7 +18,10 @@
 * Add `terra` support for covariate inputs
 
 * The component `*_layer` arguments are now evaluated in the data context,
-  to allow dynamic layer selection for spatial raster covariates.
+  to allow dynamic layer selection for spatial raster covariates.  A new
+  generic `eval_spatial()` provides support for grid/pixel based
+  `Spatial*DataFrame` evaluation, and `SpatRaster`. Expanded support
+  is in progress.
 
 * New vignettes on the `bru_mapper` system, `component` definitions,
   and `prediction_scores`
