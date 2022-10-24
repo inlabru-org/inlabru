@@ -41,7 +41,7 @@ will focus on the mapper system itself, how the basic building blocks are used t
 construct the built-in mappers, and finally how to construct new mappers.
 
 The in-package documentation for the mapper methods is contained in three parts:
-```{r eval=FALSE}
+```{r, eval=FALSE}
 ?bru_mapper # Mapper constructors
 ?bru_mapper_methods # Mapper methods
 ?bru_get_mapper # Mapper extraction methods
@@ -58,7 +58,7 @@ class.
 
 The main purpose of each mapper class is to allow evaluating a component
 effect, from given `input` and latent `state`, by calling
-```{r eval=FALSE}
+```{r, eval=FALSE}
 ibm_eval(mapper, input, state)
 ```
 for the `mapper` associated with the component definition.
@@ -161,6 +161,8 @@ Current predefined object mappers are defined for objects of these classes:
 * `inla.mesh`; Use `bru_mapper(object)`
 * `inla.mesh.1d`; Use `bru_mapper(object, indexed)`
 
+More details are given below.
+
 ### Model object mappers
 
 For inla model objects with predefined mappers, use `bru_get_mapper(object)`
@@ -174,7 +176,7 @@ callback argument. A less invasive method, that works for both rgeneric and cgen
 models, is to define a `bru_get_mapper()` method for the class, which needs to
 include a unique class identifier, e.g. add
 `class(object) <- c("my_unique_model_class", class(object))` and define
-```{r eval=FALSE}
+```{r, eval=FALSE}
 bru_get_mapper.my_unique_model_class <- function(model, ...) {
   ...
 }
@@ -187,7 +189,7 @@ and register it in the namespace.
 
 ## Mapper methods
 
-```{r eval=FALSE}
+```{r, eval=FALSE}
 ibm_n(mapper, inla_f, ...)
 ibm_n_output(mapper, input, ...)
 ibm_values(mapper, inla_f, ...)
@@ -236,7 +238,7 @@ inla specific values information from `ibm_values(mapper, inla_f = TRUE)`,
 to determine the logical vector identifying the inla values subset.  Custom mappers
 should normally not need to specialise this method.
 
-## Mappers for inla.mesh objects and mapper extractors
+## Mappers for inla.mesh objects
 
 For component models referenced by a character label (e.g. `"iid"`, `"bym2"`, `"rw2"` etc),
 inlabru will construct default mappers, that in most cases replicate the default `INLA::f()`
@@ -244,11 +246,11 @@ behaviour.
 
 For the `inla.mesh` and `inla.mesh.1d` classes, default mappers can be constructed by
 the pre-defined `bru_mapper` S3 methods. For 2d meshes (`inla.mesh`),
-```{r eval=FALSE}
+```{r, eval=FALSE}
 bru_mapper(mesh)
 ```
 For 1d meshes (`inla.mesh.1d`),
-```{r eval=FALSE}
+```{r, eval=FALSE}
 # If ibm_values() should return mesh$loc (e.g. for "rw2" models with degree=1 meshes)
 bru_mapper(mesh, indexed = FALSE)
 # If ibm_values() should return seq_along(mesh$loc) (e.g. for inla.spde2.pcmatern() models)
@@ -257,14 +259,9 @@ bru_mapper(mesh, indexed = TRUE)
 
 
 
-For `inla.spde` and `inla.rgeneric` model objects
-```
-bru_get_mapper
-```
-
 ## Customised mappers
 
-```
+```{r, eval=FALSE}
 bru_mapper_define
 ```
 
@@ -349,7 +346,7 @@ recompute the `n` and `values` information for each call. Instead we can use tha
 the default method will check if `n` or `values` are stored in the mapper object,
 and then return them. If we change the `.` in the method definitions to `_`,
 we can end the constructor method like this, making subsequent method calls faster:
-```{r}
+```{r, eval=FALSE}
 bru_mapper_p_quadratic <- function(labels, min_degree = 0, ...) {
   ...
   mapper <- bru_mapper_define(mapper, new_class = "bru_mapper_p_quadratic")
