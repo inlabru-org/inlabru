@@ -13,8 +13,11 @@
 * ubuntu 20.04 (on github, with INLA), R 4.2.1, R 4.1.3, R devel
 * macOS-latest (on github, with INLA), R 4.2.1
 * windows-latest (on github, with INLA), R 4.2.1
-* win-builder and R-hub, R devel, 4.2.1, 4.1.3
-* R-hub 
+* win-builder; R devel, 4.2.1, 4.1.3
+* R-hub;
+    Windows Server R-devel
+    Fedora Linux R-devel
+    Ubuntu Linux 20.04 R-release
 * For the github platforms, separate tests were also
   done without installing packages in Suggests.
 
