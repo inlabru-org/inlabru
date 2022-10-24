@@ -27,11 +27,11 @@ test_that("Multi-mapper bru input", {
     x = 1,
     dims = c(3, 12)
   )
-  expect_equal(ibm_amatrix(mapper, list_data), A)
-  expect_equal(ibm_amatrix(mapper, olist_data), A)
-  expect_equal(ibm_amatrix(mapper, df_data), A)
-  expect_equal(ibm_amatrix(mapper, matrix_data), A)
-  expect_equal(ibm_amatrix(mapper, omatrix_data), A)
+  expect_equal(ibm_jacobian(mapper, list_data), A)
+  expect_equal(ibm_jacobian(mapper, olist_data), A)
+  expect_equal(ibm_jacobian(mapper, df_data), A)
+  expect_equal(ibm_jacobian(mapper, matrix_data), A)
+  expect_equal(ibm_jacobian(mapper, omatrix_data), A)
 
   data <- cbind(df_data, y = 1:3)
 
@@ -67,8 +67,8 @@ test_that("Multi-mapper bru input", {
 test_that("User defined mappers", {
   # User defined mapper objects
 
-  ibm_amatrix.bm_test <- function(mapper, input, ...) {
-    message("---- IBM_AMATRIX from inner environment ----")
+  ibm_jacobian.bm_test <- function(mapper, input, ...) {
+    message("---- IBM_JACOBIAN from inner environment ----")
     Matrix::sparseMatrix(
       i = seq_along(input),
       j = input,
@@ -78,11 +78,11 @@ test_that("User defined mappers", {
   }
 
   bm_test <- function(n, ...) {
-    bru_mapper(
+    bru_mapper_define(
       list(n = n),
       new_class = "bm_test",
       methods = list(
-        ibm_amatrix = ibm_amatrix.bm_test
+        ibm_jacobian = ibm_jacobian.bm_test
       )
     )
   }
@@ -92,10 +92,10 @@ test_that("User defined mappers", {
   mydata <- data.frame(y = rnorm(15) + 2 * (1:15), x = 1:15)
   expect_message(
     object = {
-      ibm_amatrix(m, mydata$x)
+      ibm_jacobian(m, mydata$x)
     },
-    "---- IBM_AMATRIX from inner environment ----",
-    label = "ibm_amatrix generic call"
+    "---- IBM_JACOBIAN from inner environment ----",
+    label = "ibm_jacobian generic call"
   )
 
   skip_on_cran()
@@ -105,7 +105,7 @@ test_that("User defined mappers", {
     object = {
       fit <- bru(cmp, data = mydata, family = "gaussian")
     },
-    "---- IBM_AMATRIX from inner environment ----",
+    "---- IBM_JACOBIAN from inner environment ----",
     label = "Non-interactive bru() call"
   )
 })
@@ -117,8 +117,8 @@ test_that("User defined mappers 2", {
 
   # User defined mapper objects
 
-  ibm_amatrix.bm_test <- function(mapper, input, ...) {
-    message("---- IBM_AMATRIX from inner environment 2 ----")
+  ibm_jacobian.bm_test <- function(mapper, input, ...) {
+    message("---- IBM_JACOBIAN from inner environment 2 ----")
     Matrix::sparseMatrix(
       i = seq_along(input),
       j = input,
@@ -126,10 +126,10 @@ test_that("User defined mappers 2", {
       dims = c(length(input), mapper$n)
     )
   }
-  .S3method("ibm_amatrix", "bm_test", ibm_amatrix.bm_test)
+  .S3method("ibm_jacobian", "bm_test", ibm_jacobian.bm_test)
 
   bm_test <- function(n, ...) {
-    bru_mapper(
+    bru_mapper_define(
       list(n = n),
       new_class = "bm_test"
     )
@@ -140,10 +140,10 @@ test_that("User defined mappers 2", {
   mydata <- data.frame(y = rnorm(15) + 2 * (1:15), x = 1:15)
   expect_message(
     object = {
-      ibm_amatrix(m, mydata$x)
+      ibm_jacobian(m, mydata$x)
     },
-    "---- IBM_AMATRIX from inner environment 2 ----",
-    label = "ibm_amatrix generic call"
+    "---- IBM_JACOBIAN from inner environment 2 ----",
+    label = "ibm_jacobian generic call"
   )
 
   skip_on_cran()
@@ -153,7 +153,7 @@ test_that("User defined mappers 2", {
     object = {
       fit <- bru(cmp, data = mydata, family = "gaussian")
     },
-    "---- IBM_AMATRIX from inner environment 2 ----",
+    "---- IBM_JACOBIAN from inner environment 2 ----",
     label = "Non-interactive bru() call"
   )
 })
@@ -199,10 +199,10 @@ test_that("mapper collection direct construction consistency", {
     )
   )
   A <- as(as(as(A, "dMatrix"), "generalMatrix"), "TsparseMatrix")
-  expect_equal(ibm_amatrix(mapper, list_data), A)
+  expect_equal(ibm_jacobian(mapper, list_data), A)
   expect_equal(
     as(
-      ibm_amatrix(mapper, list_data[["u"]], inla_f = TRUE)[
+      ibm_jacobian(mapper, list_data[["u"]], inla_f = TRUE)[
         , ibm_inla_subset(mapper),
         drop = FALSE
       ],
@@ -263,21 +263,21 @@ test_that("mapper collection automatic construction consistency", {
       ibm_values(cmp2$indep$mapper, inla_f = inla_f)
     )
     if (inla_f) {
-      input <- list(
+      input <- list(mapper = list(
         main = data$val,
         group = rep(1, 3),
         replicate = rep(1, 3)
-      )
+      ))
     } else {
-      input <- list(
+      input <- list(mapper = list(
         main = list(u = data$val),
         group = rep(1, 3),
         replicate = rep(1, 3)
-      )
+      ))
     }
     expect_identical(
-      as.matrix(ibm_amatrix(cmp1$indep$mapper, input = input, inla_f = inla_f)),
-      as.matrix(ibm_amatrix(cmp2$indep$mapper, input = input, inla_f = inla_f))
+      as.matrix(ibm_jacobian(cmp1$indep$mapper, input = input, inla_f = inla_f)),
+      as.matrix(ibm_jacobian(cmp2$indep$mapper, input = input, inla_f = inla_f))
     )
   }
 })

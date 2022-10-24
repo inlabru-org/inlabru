@@ -52,7 +52,8 @@ but for the corresponding features of \code{INLA::f()}.}
 \item{weights, weights_layer, weights_selector}{Optional specification of effect scaling weights.
 Same syntax as for \code{main}.}
 
-\item{model}{Either one of "offset", "factor_full", "factor_contrast", "linear",
+\item{model}{Either one of "const" (same as "offset"), "factor_full",
+"factor_contrast", "linear",
 "fixed", or a model name or
 object accepted by INLA's \code{f} function. If set to NULL, then "linear" is used
 for vector inputs, and "fixed" for matrix input (converted internally to
@@ -63,14 +64,16 @@ and to the latent variables. Auto-detects spde model objects in model and
 extracts the mesh object to use as the mapper, and auto-generates mappers
 for indexed models. (Default: NULL, for auto-determination)}
 
-\item{main_layer, main_selector}{The \verb{_layer} is a numeric index or character name of which
-layer/variable to extract from a covariate data object given in \code{main}
-(Default: The effect component name, if it exists i the covariate object,
-otherwise the first column of the covariate data frame)
+\item{main_layer, main_selector}{The \verb{_layer} input should evaluate to a numeric index or character name or
+vector of which
+layer/variable to extract from a covariate data object given in \code{main}.
+(Default: NULL if \verb{_selector} is given. Otherwise the effect component name,
+if it exists in the covariate object, and otherwise the first column of
+the covariate data frame)
 
-The \verb{_selector} is character name of a variable whose contents determines which layer to
-extract from a covariate for each data point. Overrides the \code{layer}.
-(Default: NULL)}
+The \verb{_selector} value should be a character name of a variable
+whose contents determines which layer to extract from a covariate for each
+data point. (Default: NULL)}
 
 \item{n}{The number of latent variables in the model. Should be auto-detected
 for most or all models (Default: NULL, for auto-detection).

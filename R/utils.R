@@ -104,54 +104,109 @@ extract_vectorlist_column <- function(thelist) {
 
 
 
-check_selector <- function(data, where, layer, selector) {
-  if (is.null(selector)) {
-    if (is.character(layer)) {
-      if (!(layer %in% names(data))) {
-        return(
-          paste0(
-            "Input layer name '",
-            layer,
-            "' doesn't match available variable names.\n",
-            "Available names are '",
-            paste0(names(data), collapse = "', '"),
-            "'.\n",
-            "Use *_layer for the input component to specify a valid name."
-          )
-        )
-      }
-    } else if (is.numeric(layer)) {
-      if ((layer < 1) || (layer > NCOL(data))) {
-        return(
-          paste0(
-            "Input layer nr ", layer,
-            " is not in the valid range, [",
-            1, ", ", NCOL(data)
-          )
-        )
-      }
-    } else {
-      return(
+check_layer <- function(data, where, layer) {
+  # This works for both SpatialGrid/PixelDataFrame and SpatRaster
+  names_data <- names(data)
+  if (is.character(layer)) {
+    unique_layer <- unique(layer)
+    if (any(!(unique_layer %in% names_data))) {
+      stop(
         paste0(
-          "Unable to identify the spatial data frame layer to evaluate.\n",
+          "Input layer name(s) '",
+          paste0(unique_layer, collapse = "', '"),
+          "' mismatch with available variable names.\n",
           "Available names are '",
-          paste0(names(data), collapse = "', '"),
+          paste0(names_data, collapse = "', '"),
           "'.\n",
           "Use *_layer for the input component to specify a valid name."
         )
       )
     }
-  } else {
-    if (is.null(where[[selector]])) {
-      return(
-        paste0("'selector' is non-null, but not such label found in the 'where' object")
+  } else if (is.numeric(layer)) {
+    ok_layer <- (layer >= 1) & (layer <= length(names_data))
+    if (any(!ok_layer)) {
+      stop(
+        paste0(
+          "Input layer(s) nr ",
+          paste0(unique(layer[!ok_layer]), collapse = ", "),
+          " not in the valid range, [",
+          1, ", ", length(names_data), "]"
+        )
       )
     }
+  } else {
+    stop(
+      paste0(
+        "Unable to identify the spatial data frame layer to evaluate.\n",
+        "Available names are '",
+        paste0(names(data), collapse = "', '"),
+        "'.\n",
+        "Use *_layer for the input component to specify a valid name."
+      )
+    )
   }
   TRUE
 }
 
-eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
+
+extract_selector <- function(where, selector) {
+  if (is.null(selector)) {
+    return(NULL)
+  }
+  if (inherits(where, "SpatVector")) {
+    layer <- terra::values(where)[[selector]]
+  } else {
+    layer <- where[[selector]]
+  }
+  if (is.null(layer)) {
+    stop("'selector' is non-null, but no such label found in the 'where' object")
+  }
+  layer
+}
+
+extract_layer <- function(where, layer, selector) {
+  if (!is.null(layer) && !is.null(selector)) {
+    warning("Both layer and selector specified. Ignoring selector",
+      immediate. = TRUE
+    )
+    selector <- NULL
+    if (length(layer) == 1) {
+      layer <- rep(layer, NROW(where))
+    }
+  } else if (!is.null(selector)) {
+    layer <- extract_selector(where, selector)
+  } else if (is.null(layer) && is.null(selector)) {
+    layer <- rep(1, NROW(where))
+  }
+  layer
+}
+
+
+
+
+#' Evaluate spatial covariates
+#'
+#' @param data Spatial grid-like data
+#' @param where Where to evaluate the data
+#' @param layer Which `data` layer to extract (as integer or character).
+#' May be a vector, specifying a separate layer for each `where` point.
+#' @param selector The name of a variable in `where` specifying the `layer`
+#' information.
+#'
+#' @export
+eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
+  UseMethod("eval_spatial")
+}
+
+#' @describeIn inlabru-deprecated Replaced by the generic [eval_spatial()]
+eval_SpatialDF <- function(...) {
+  .Deprecated("eval_spatial")
+  eval_spatial.Spatial(...)
+}
+
+#' @export
+#' @rdname eval_spatial
+eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
   stopifnot(inherits(
     data,
     c(
@@ -159,28 +214,45 @@ eval_SpatialDF <- function(data, where, layer = NULL, selector = NULL) {
       "SpatialGridDataFrame"
     )
   ))
-  if (is.null(layer) && is.null(selector)) {
-    layer <- 1
-  }
-  if (!isTRUE({
-    msg <- check_selector(data, where, layer, selector)
-  })) {
-    stop(msg)
-  }
-  if (is.null(selector)) {
+  layer <- extract_layer(where, layer, selector)
+  check_layer(data, where, layer)
+  unique_layer <- unique(layer)
+  if (length(unique_layer) == 1) {
     val <- sp::over(
       where,
       data
-    )[, layer, drop = TRUE]
+    )[, unique_layer, drop = TRUE]
   } else {
-    layer <- where[[selector]]
     val <- numeric(NROW(where))
     for (l in unique(layer)) {
-      val[layer == l] <- over(
+      val[layer == l] <- sp::over(
         where[layer == l, , drop = FALSE],
         data
       )[, l, drop = TRUE]
     }
+  }
+  val
+}
+
+
+#' @export
+#' @rdname eval_spatial
+eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) {
+  layer <- extract_layer(where, layer, selector)
+  check_layer(data, where, layer)
+  if (!inherits(where, "SpatVector")) {
+    where <- terra::vect(where)
+  }
+  val <- terra::extract(
+    data,
+    where,
+    ID = FALSE,
+    layer = layer
+  )
+  if (terra::nlyr(data) == 1) {
+    val <- val[[1]]
+  } else {
+    val <- val[["value"]]
   }
   val
 }
@@ -234,20 +306,17 @@ bru_fill_missing <- function(data, where, values,
     c(
       "SpatialPointsDataFrame",
       "SpatialPixelsDataFrame",
-      "SpatialGridDataFrame"
+      "SpatialGridDataFrame",
+      "SpatRaster"
     )
   ))
   if (inherits(data, "SpatialGridDataFrame")) {
     data <- as(data, "SpatialPixelsDataFrame")
   }
-  if (is.null(layer) && is.null(selector)) {
-    layer <- 1
-  }
-  if (!isTRUE({
-    msg <- check_selector(data, where, layer, selector)
-  })) {
-    stop(msg)
-  }
+  layer <- extract_layer(where, layer, selector)
+  check_layer(data, where, layer)
+
+  # TODO: Add cases for SpatVector and sf
   if (inherits(where, "Spatial")) {
     data_crs <- fm_sp_get_crs(data)
     where_crs <- fm_sp_get_crs(where)
@@ -261,36 +330,30 @@ bru_fill_missing <- function(data, where, values,
     where_coord <- where
   }
 
-  if (!is.null(selector)) {
-    selection <- where[[selector]]
-    selector_notok <- is.na(selection)
-    if (any(selector_notok)) {
-      # Only works if the selector is also in the data object.
-      selection <-
-        bru_fill_missing(
-          data = data,
-          where = where,
-          values = selection,
-          layer = selection,
-          batch_size = batch_size
-        )
-    }
-    layers <- unique(selection)
+  if (any(is.na(layer))) {
+    stop("NAs detected in the 'layer' information.")
+  }
+
+  layers <- unique(layer)
+  if (length(layers) > 1) {
     for (l in layers) {
-      values[selection == l] <-
+      values[layer == l] <-
         bru_fill_missing(
           data = data,
           where = sp::SpatialPoints(
-            where_coord[selection == l, , drop = FALSE],
+            where_coord[layer == l, , drop = FALSE],
             proj4string = where_crs
           ),
-          values = values[selection == l],
+          values = values[layer == l],
           layer = l,
           batch_size = batch_size
         )
     }
     return(values)
   }
+
+  # Only one layer from here on.
+  layer <- layers
 
   notok <- is.na(values)
   ok <- which(!notok)
@@ -390,8 +453,6 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
   if (!inherits(M2, "Matrix")) {
     M2 <- as(M2, "Matrix")
   }
-  M1 <- as(as(as(as(M1, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
-  M2 <- as(as(as(as(M2, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
   n1 <- nrow(M1)
   n2 <- nrow(M2)
   if ((n1 == 1) && (n2 > 1)) {
@@ -417,10 +478,12 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
     weights <- rep(weights[1], n)
   }
 
-  ## TODO: Check robustness for all-zero rows.
+  ## OK: Checked robustness for all-zero rows 2022-10-20, matrix 1.5-2
   ## TODO: Maybe move big sparseMatrix call outside the loop.
   ## TODO: Automatically choose M1 or M2 for looping.
 
+  M1 <- as(as(as(as(M1, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
+  M2 <- as(as(as(as(M2, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
   n1 <- (as.vector(Matrix::sparseMatrix(
     i = 1L + M1@i, j = rep(1L, length(M1@i)),
     x = 1L, dims = c(n, 1)

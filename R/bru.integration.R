@@ -6,10 +6,10 @@
 #' by linear basis functions. The parameter `samplers` describes the area(s) integrated over.
 #'
 #' In case of a single dimension `samplers` is supposed to be a two-column `matrix` where
-#' each row describes the start and end point of the interval to integrate over. In the two-dimensional
+#' each row describes the start and end points of the interval to integrate over. In the two-dimensional
 #' case `samplers` can be either a `SpatialPolygon`, an `inla.mesh` or a
 #' `SpatialLinesDataFrame` describing the area to integrate over. If a `SpatialLineDataFrame`
-#' is provided it has to have a column called 'weight' in order to indicate the width of the line.
+#' is provided, it has to have a column called 'weight' in order to indicate the width of the line.
 #'
 #' The domain parameter is an `inla.mesh.1d` or `inla.mesh` object that can be employed to
 #' project the integration points to the vertices of the mesh. This reduces the final number of
@@ -499,7 +499,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' @description
 #' Calculates the cross product of integration points in different dimensions
 #' and multiplies their weights accordingly. If the object defining points in a particular
-#' dimension has no weights attached to it all weights are assumend to be 1.
+#' dimension has no weights attached to it all weights are assumed to be 1.
 #'
 #' @aliases cprod
 #' @export
@@ -566,11 +566,11 @@ cprod <- function(...) {
 
 # Integration points for log Gaussian Cox process models using INLA
 #
-# prerequisits:
+# prerequisites:
 #
 # - List of integration dimension names, extend and quadrature
 # - Samplers: These may live in a subset of the dimensions, usually space and time
-#             ("Where and wehen did a have a look at the point process")
+#             ("Where and when did one have a look at the point process")
 # - Actually this is a simplified view. Samplers should have start and end time !
 #
 # Procedure:
@@ -596,12 +596,17 @@ cprod <- function(...) {
 # `inla.mesh.2d` object. Only those domains that are not given in the `samplers`
 # data.frame are used, plus the coordinates object, used for the spatial aspect
 # of the `samplers` object.
+# @param dnames Names of dimensions
 # @param int.args List of arguments passed on to \code{ipoints}
 # @return Integration points
 
 
 ipmaker <- function(samplers, domain, dnames,
                     int.args = list(method = "stable", nsub = NULL)) {
+  # To allow sf geometry support, should likely change the logic to
+  # use the domain specification to determine the type of integration
+  # method to call, so that it doesn't need to rely on the domain name.
+
   if ("coordinates" %in% dnames) {
     spatial <- TRUE
   } else {
@@ -645,7 +650,7 @@ ipmaker <- function(samplers, domain, dnames,
 
 
 
-# Project data to mesh vertices under the assumption of lineariity
+# Project data to mesh vertices under the assumption of linearity
 #
 #
 # @aliases vertex.projection
@@ -654,12 +659,12 @@ ipmaker <- function(samplers, domain, dnames,
 # @param mesh An inla.mesh object
 # @param columns A character array of the points columns which whall be projected
 # @param group Character array identifying columns in \code{points}. These
-# colouns are interpreted as factors and the projection is performed
+# columns are interpreted as factors and the projection is performed
 # independently for each combination of factor levels.
 # @return SpatialPointsDataFrame of mesh vertices with projected data attached
 
 vertex.projection <- function(points, mesh, columns = names(points), group = NULL, fill = NULL) {
-  if (is.null(group) | (length(group) == 0)) {
+  if (is.null(group) || (length(group) == 0)) {
     res <- INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
     tri <- res$p2m.t
 
@@ -826,7 +831,7 @@ vertex.projection.1d <- function(points, mesh, group = NULL, column = "weight", 
 #'
 int <- function(data, values, dims = NULL) {
   keep <- setdiff(names(data), c(dims, "weight"))
-  if (length(keep) > 0 & !is.null(dims)) {
+  if (length(keep) > 0 && !is.null(dims)) {
     agg <- aggregate(values * data$weight, by = as.list(data[, keep, drop = FALSE]), FUN = sum)
     names(agg)[ncol(agg)] <- "integral" # paste0("integral_{",dims,"}(",deparse(values),")")
   } else {

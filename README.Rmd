@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 # inlabru
 
 <!-- badges: start -->
-[![CRAN Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
+[![CRAN Status](http://www.r-pkg.org/badges/version-last-release/inlabru)](https://cran.r-project.org/package=inlabru)
 [![inlabru status badge](https://inlabru-org.r-universe.dev/badges/inlabru)](https://inlabru-org.r-universe.dev)
 [![R build status](https://github.com/inlabru-org/inlabru/workflows/R-CMD-check/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![R code coverage status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
@@ -66,6 +66,7 @@ or track the development version builds via [inlabru-org.r-universe.dev](https:/
 # Enable universe(s) by inlabru-org
 options(repos = c(
   inlabruorg = 'https://inlabru-org.r-universe.dev',
+  INLA = 'https://inla.r-inla-download.org/R/testing',
   CRAN = 'https://cloud.r-project.org'))
 
 # Install some packages

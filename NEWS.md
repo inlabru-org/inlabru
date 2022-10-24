@@ -1,3 +1,58 @@
+# inlabru 2.6.0
+
+## Features
+  
+* Add `bru_get_mapper` generic, and associated methods for `inla.spde` and
+  `inla.rgeneric` objects. This allows `inlabru` to automatically extract
+  the appropriate `bru_mapper` object for each model component, and can be used
+  as a hook by external packages implementing new INLA object classes.
+  
+* Add a `weights` argument for `like()`, for likelihood-specific log-likelihood
+  weights, passed on to the `INLA::inla()` weights argument. Evaluated in the
+  data context.
+  
+* The `<component>_eval()` methods available in predictor expressions
+  now handle optional scaling weights, like in ordinary component effect
+  evaluation.
+
+* Add `terra` support for covariate inputs
+
+* The component `*_layer` arguments are now evaluated in the data context,
+  to allow dynamic layer selection for spatial raster covariates.  A new
+  generic `eval_spatial()` provides support for grid/pixel based
+  `Spatial*DataFrame` evaluation, and `SpatRaster`. Expanded support
+  is in progress.
+
+* New vignettes on the `bru_mapper` system, `component` definitions,
+  and `prediction_scores`
+  
+* General overhaul of the `bru_mapper` and linearised predictor system,
+  to prepare for new features.
+  
+  * Add `ibm_eval` generic for evaluating mappers for given states.
+  
+  * Add `bru_mapper_taylor`, used as an internal mapper for linearised
+  mappers. This and `ibm_eval` is aimed at future support for nonlinear
+  mappers. Associated new generic methods: `ibm_{is_linear,jacobian,linear}`.
+  
+  * New mapper implementations should use `ibm_jacobian` instead of `ibm_amatrix`.
+    This allows defining a linearised mapper via
+   `ibm_eval(input, state0) + ibm_jacobian(input, state0) %*% (state - state0)`.
+  
+  * New mapper class `bru_mapper_const`, which replaces `bru_mapper_offset`.
+  `bru_mapper_offset` is now deprecated and will produce warnings.
+  
+## Bug fixes
+
+* Enable both datum/ensemble container for ellipsoid information, to support
+  `epsg:4326`. Fixes #154
+  
+* Make duplicated component names an error instead of a warning.
+  Relates to #155
+
+* Fix `Tsparse` assumptions in `row_kron` to prepare for Matrix `1.5-2`.
+  Fixes #162
+  
 # inlabru 2.5.3
 
 ## Features

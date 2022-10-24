@@ -1,0 +1,239 @@
+---
+title: "Devel: Customised model components with the bru_mapper system"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Devel: Customised model components with the bru_mapper system}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+header-includes:
+  - \newcommand{\bm}[1]{\boldsymbol{#1}}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+(Vignette under construction!)
+
+```{r setup}
+library(inlabru)
+```
+
+The reference documentation for the mapper methods is contained in three parts:
+```{r eval=FALSE}
+?bru_mapper # Mapper constructors
+?bru_mapper_methods # Mapper methods
+?bru_get_mapper # Mapper extraction methods
+```
+
+
+```{r eval=FALSE}
+ibm_n(mapper, inla_f, ...)
+ibm_values(mapper, inla_f, ...)
+ibm_jacobian(mapper, input, ...)
+ibm_inla_subset(mapper, ...)
+ibm_valid_input(mapper, input, ...)
+```
+
+An example where the `inla_f` argument matters is the `bru_mapper_collect` class,
+when the `hidden=TRUE` argument is used to indicate that only the first mapper
+should be used for the `INLA::f()` inputs, e.g. for `"bym2"` models. For
+`inla_f=FALSE` (the default), the `ibm_n` and `ibm_values` methods return the
+total number of latent variables, but with `inla_f=TRUE` we get the values
+needed by `INLA::f()` instead:
+```{r eval=TRUE}
+mapper <- bru_mapper_collect(
+  list(
+    a = bru_mapper_index(3),
+    b = bru_mapper_index(2)
+  ),
+  hidden = TRUE
+)
+ibm_n(mapper)
+ibm_values(mapper)
+ibm_n(mapper, inla_f = TRUE)
+ibm_values(mapper, inla_f = TRUE)
+```
+
+For the `bru_mapper_multi` class, the `multi` argument provides access to the
+inner layers of the multi-mapper:
+```{r eval=TRUE}
+mapper <- bru_mapper_multi(list(
+  a = bru_mapper_index(3),
+  b = bru_mapper_index(2)
+))
+ibm_n(mapper)
+ibm_n(mapper, multi = 1)
+ibm_values(mapper)
+ibm_values(mapper, multi = 1)
+```
+
+The default `ibm_inla_subset` method determines the inla subset by comparing
+the full values information from `ibm_values(mapper, inla_f = FALSE)` to the
+inla specific values information from `ibm_values(mapper, inla_f = TRUE)`,
+to determine the logical vector identifying the inla values subset.  Custom mappers
+should normally not need to specialise this method.
+
+## Mappers for inla.mesh objects and mapper extractors
+
+For component models referenced by a character label (e.g. `"iid"`, `"bym2"`, `"rw2"` etc),
+inlabru will construct default mappers, that in most cases replicate the default `INLA::f()`
+behaviour.
+
+For the `inla.mesh` and `inla.mesh.1d` classes, default mappers can be constructed by
+the pre-defined `bru_mapper` S3 methods. For 2d meshes (`inla.mesh`),
+```{r eval=FALSE}
+bru_mapper(mesh)
+```
+For 1d meshes (`inla.mesh.1d`),
+```{r eval=FALSE}
+# If ibm_values() should return mesh$loc (e.g. for "rw2" models with degree=1 meshes)
+bru_mapper(mesh, indexed = FALSE)
+# If ibm_values() should return seq_along(mesh$loc) (e.g. for inla.spde2.pcmatern() models)
+bru_mapper(mesh, indexed = TRUE)
+```
+
+
+
+For `inla.spde` and `inla.rgeneric` model objects
+```
+bru_get_mapper
+```
+
+## Customised mappers
+
+```
+bru_mapper_define
+```
+
+Implementations can avoid having to define `ibm_n` and `ibm_values` methods,
+by instead computing and storing `n`, `n_inla`, `values`, and `values_inla`
+in the mapper object during construction.  The default `ibm_n` and `ibm_values`
+methods checks if these values are available, and return the appropriate values
+depending on the `inla_f` argument.  When `*_inla` values are requested but not
+available, the methods fall back to the non-inla versions. If the needed information
+is not found, the default methods give an error message.
+
+Note: Before version 2.6.0, `ibm_amatrix` was used instead of `ibm_jacobian`.
+Version 2.6.0 still supports this, by having the default `ibm_jacobian` method
+call `ibm_amatrix`, but will give a deprecation message from
+version 2.7.0, and it may be removed in a future version.
+
+## Example
+
+Let's build a mapper class `bru_mapper_p_quadratic`
+for a model component that takes input covariates with values $a_{ij}$,
+$i=1,\dots,m$ and $j=1,\dots,p$,
+in a `matrix` or `data.frame` and evaluates a full quadratic expression
+$$
+\eta_i = x_0 + \sum_{j=1}^p a_{ij} x_j +
+  \frac{1}{2}\sum_{j=1}^p\sum_{k=1}^j \gamma_{j,k} a_{ij}a_{ik} x_{j,k},
+$$
+where the latent component vector is $\bm{x}=[x_0,x_1,\dots,x_p,x_{1,1},\dots,x_{p,1},x_{2,2}\dots,x_{p,p}]$,
+and
+$$
+\gamma_{j,k} = \begin{cases}
+1, & j = k,\\
+2, & j > k.
+\end{cases}
+$$
+
+We start with the constructor method. Like the `bru_mapper_matrix`, we require the user to supply
+a vector of covariate labels, and store them as a character vector. We also
+include a `min_degree` parameter to control if an intercept (`min_degree <= 0`)
+and linear terms (`min_degree <= 1`) should be included in the model.
+```{r}
+bru_mapper_p_quadratic <- function(labels, min_degree = 0, ...) {
+  if (is.factor(labels)) {
+    mapper <- list(
+      labels = levels(labels),
+      min_degree = min_degree
+    )
+  } else {
+    mapper <- list(
+      labels = as.character(labels),
+      min_degree = min_degree
+    )
+  }
+  bru_mapper_define(mapper, new_class = "bru_mapper_p_quadratic")
+}
+```
+The `ibm_n` method can compute the value of $n$ from $n=1+p+\frac{p(p+1)}{2}$: 
+```{r}
+ibm_n.bru_mapper_p_quadratic <- function(mapper, ...) {
+  p <- length(mapper$labels)
+  (mapper$min_degree <= 0) + (mapper$min_degree <= 1) * p + p * (p + 1) / 2
+}
+```
+For `ibm_values`, the default method is sufficient, returning the vector $[1,\dots,n]$
+with $n$ obtained by `ibm_n(mapper)`. However, for clearer result naming, we can use a
+character vector, at least for INLA `f()` models that allow it (we could have an option argument
+to the `bru_mapper_p_quadratic` constructor to control this):
+```{r}
+ibm_values.bru_mapper_p_quadratic <- function(mapper, ...) {
+  p <- length(mapper$labels)
+  n <- ibm_n(mapper)
+  jk <- expand.grid(seq_len(p), seq_len(p))
+  jk <- jk[jk[, 2] <= jk[, 1], , drop = FALSE]
+  c(
+    if (mapper$min_degree <= 0) "Intercept" else NULL,
+    if (mapper$min_degree <= 1) mapper$labels else NULL,
+    paste0(mapper$labels[jk[, 1]], ":", mapper$labels[jk[, 2]])
+  )
+}
+```
+While the approach to `ibm_n` and `ibm_values` above works, it is wasteful to
+recompute the `n` and `values` information for each call. Instead we can use that
+the default method will check if `n` or `values` are stored in the mapper object,
+and then return them. If we change the `.` in the method definitions to `_`,
+we can end the constructor method like this, making subsequent method calls faster:
+```{r}
+bru_mapper_p_quadratic <- function(labels, min_degree = 0, ...) {
+  ...
+  mapper <- bru_mapper_define(mapper, new_class = "bru_mapper_p_quadratic")
+  mapper$n <- ibm_n_bru_mapper_p_quadratic(mapper)
+  mapper$values <- ibm_values_bru_mapper_p_quadratic(mapper)
+  mapper
+}
+```
+Note that the order matters, since our `ibm_values_bru_mapper_p_quadratic`
+function calls `ibm_n(mapper)`.
+
+We can now define the main part of the mapper interface that computes the
+model matrix linking the latent variables to the component effect. It's required
+that `NULL` input should return a $0$-by-$n$ matrix.
+```{r}
+ibm_jacobian.bru_mapper_p_quadratic <- function(mapper, input, ...) {
+  if (is.null(input)) {
+    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
+  }
+  p <- length(mapper$labels)
+  n <- ibm_n(mapper)
+  N <- NROW(input)
+  A <- list()
+  in_ <- as(input, "Matrix")
+  idx <- 0
+  if (mapper$min_degree <= 0) {
+    idx <- idx + 1
+    A[[idx]] <- Matrix::Matrix(1, N)
+  }
+  if (mapper$min_degree <= 1) {
+    idx <- idx + 1
+    A[[idx]] <- in_
+  }
+  for (k in seq_len(p)) {
+    idx <- idx + 1
+    A[[idx]] <- in_[, seq(k, p, by = 1), drop = FALSE] * in_[, k]
+    A[[idx]][, k] <- A[[idx]][, k] / 2
+  }
+  A <- do.call(cbind, A)
+  colnames(A) <- as.character(ibm_values(mapper))
+  A
+}
+```
+If the output of a mapper is of a different size than `NROW(input)`,
+the mapper should define a `ibm_n_output(mapper, input, ...)` method to return
+the output size for a given input.

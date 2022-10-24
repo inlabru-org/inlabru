@@ -19,7 +19,8 @@ generate <- function(object, ...) {
   UseMethod("generate")
 }
 
-bru_check_object_bru <- function(object) {
+bru_check_object_bru <- function(object,
+                                 new_version = getNamespaceVersion("inlabru")) {
   if (is.null(object[["bru_info"]])) {
     if (is.null(object[["sppa"]])) {
       stop("bru object contains neither current `bru_info` or old `sppa` information")
@@ -30,11 +31,18 @@ bru_check_object_bru <- function(object) {
   } else {
     old <- FALSE
   }
-  object[["bru_info"]] <- bru_info_upgrade(object[["bru_info"]], old = old)
+  object[["bru_info"]] <-
+    bru_info_upgrade(
+      object[["bru_info"]],
+      old = old,
+      new_version = new_version
+    )
   object
 }
 
-bru_info_upgrade <- function(object, old = FALSE) {
+bru_info_upgrade <- function(object,
+                             old = FALSE,
+                             new_version = getNamespaceVersion("inlabru")) {
   if (!is.list(object)) {
     stop("bru_info part of the object can't be converted to `bru_info`; not a list")
   }
@@ -42,13 +50,12 @@ bru_info_upgrade <- function(object, old = FALSE) {
     old <- TRUE
     class(object) <- c("bru_info", "list")
   }
-  ver <- getNamespaceVersion("inlabru")
   if (is.null(object[["inlabru_version"]])) {
     object[["inlabru_version"]] <- "0.0.0"
     old <- TRUE
   }
   old_ver <- object[["inlabru_version"]]
-  if (old || (utils::compareVersion(ver, old_ver) > 0)) {
+  if (old || (utils::compareVersion(new_version, old_ver) > 0)) {
     warning(
       "Old bru_info object version ",
       old_ver,
@@ -75,7 +82,40 @@ bru_info_upgrade <- function(object, old = FALSE) {
       }
       object[["inlabru_version"]] <- "2.1.14.901"
     }
-    object[["inlabru_version"]] <- ver
+    if (utils::compareVersion("2.5.3.9003", old_ver) > 0) {
+      message("Upgrading bru_info to 2.5.3.9003")
+      # Check that likelihoods store 'weights'
+      for (k in seq_along(object[["lhoods"]])) {
+        lhood <- object[["lhoods"]][[k]]
+        if (is.null(lhood[["weights"]])) {
+          lhood[["weights"]] <- 1
+          object[["lhoods"]][[k]] <- lhood
+        }
+      }
+      object[["inlabru_version"]] <- "2.5.3.9003"
+    }
+    if (utils::compareVersion("2.5.3.9005", old_ver) > 0) {
+      message("Upgrading bru_info to 2.5.3.9005")
+      # Make sure component$mapper is a bru_mapper_scale
+      for (k in seq_along(object[["model"]][["effects"]])) {
+        cmp <- object[["model"]][["effects"]][[k]]
+        # Convert offset mappers to const mappers
+        if (inherits(cmp$main$mapper, "bru_mapper_offset")) {
+          cmp$main$mapper <- bru_mapper_const()
+        }
+        cmp[["mapper"]] <-
+          bru_mapper_scale(
+            bru_mapper_multi(list(
+              main = cmp$main$mapper,
+              group = cmp$group$mapper,
+              replicate = cmp$replicate$mapper
+            ))
+          )
+        object[["model"]][["effects"]][[k]] <- cmp
+      }
+      object[["inlabru_version"]] <- "2.5.3.9005"
+    }
+    object[["inlabru_version"]] <- new_version
   }
   object
 }
@@ -474,6 +514,8 @@ eval_in_data_context <- function(input,
                                  response_data = NULL,
                                  default = NULL,
                                  .envir = parent.frame()) {
+  data_orig <- data
+  response_data_orig <- response_data
   if (!is.null(data)) {
     if (is.list(data) && !is.data.frame(data)) {
     } else {
@@ -487,14 +529,18 @@ eval_in_data_context <- function(input,
     }
   }
   if (!is.null(response_data)) {
+    enclos_envir <- new.env(parent = .envir)
+    assign(".data.", response_data_orig, envir = enclos_envir)
     result <- try(
-      eval(input, envir = response_data, enclos = .envir),
+      eval(input, envir = response_data, enclos = enclos_envir),
       silent = TRUE
     )
   }
   if (is.null(response_data) || inherits(result, "try-error")) {
+    enclos_envir <- new.env(parent = .envir)
+    assign(".data.", data_orig, envir = enclos_envir)
     result <- try(
-      eval(input, envir = data, enclos = .envir),
+      eval(input, envir = data, enclos = enclos_envir),
       silent = TRUE
     )
   }
@@ -540,10 +586,14 @@ eval_in_data_context <- function(input,
 #' @param mesh An inla.mesh object. Obsolete.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
-#'   weights by E. Default taken from `options$E`.
+#'   weights by E. Default taken from `options$E`, normally `1`.
 #' @param Ntrials A vector containing the number of trials for the 'binomial'
-#'  likelihood. Default value is rep(1, n.data).
-#'  Default taken from `options$Ntrials`.
+#'  likelihood. Default taken from `options$Ntrials`, normally `1`.
+#' @param weights Fixed (optional) weights parameters of the likelihood,
+#' so the log-likelihood`[i]` is changed into `weights[i] * log_likelihood[i]`.
+#' Default value is `1`. WARNING: The normalizing constant for the likelihood
+#' is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
+#' interpreted with great care.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides `samplers`.
 #' @param domain Named list of domain definitions.
@@ -568,7 +618,7 @@ eval_in_data_context <- function(input,
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #' @param .envir The evaluation environment to use for special arguments
-#' (`E` and `Ntrials`) if not found in `response_data` or `data`. Defaults to
+#' (`E`, `Ntrials`, and `weights`) if not found in `response_data` or `data`. Defaults to
 #' the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterize [bru()].
@@ -577,7 +627,7 @@ eval_in_data_context <- function(input,
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  response_data = NULL, # agg
-                 mesh = NULL, E = NULL, Ntrials = NULL,
+                 mesh = NULL, E = NULL, Ntrials = NULL, weights = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL, exclude = NULL,
                  allow_latent = FALSE,
@@ -590,32 +640,94 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   # Some defaults
   inla.family <- family
 
+  formula_char <- as.character(formula)
+
   # Does the likelihood formula imply a linear predictor?
-  linear <- as.character(formula)[length(as.character(formula))] == "."
+  linear <- formula_char[length(formula_char)] == "."
 
   # If not linear, set predictor expression according to the formula's RHS
   if (!linear) {
-    expr <- parse(text = as.character(formula)[length(as.character(formula))])
+    expr <- parse(text = formula_char[length(formula_char)])
   } else {
     expr <- NULL
   }
 
-  # Set response name
-  response <- all.vars(update(formula, . ~ 0))
-  if (response[1] == ".") {
+  # Set the response name
+  if (length(formula_char) < 3) {
     stop("Missing response variable names")
   }
+  response_expr <- parse(text = formula_char[2])
+  response <- tryCatch(
+    expr = eval_in_data_context(
+      substitute(response_expr),
+      data = data,
+      response_data = response_data,
+      default = NULL,
+      .envir = .envir
+    ),
+    error = function(e) {
+      NULL
+    }
+  )
 
-  E <- eval_in_data_context(substitute(E),
+  # Catch and handle special cases:
+  if ((family == "cp") && (is.null(response) || !is.list(response))) {
+    domain_names <- trimws(strsplit(formula_char[2], split = "\\+")[[1]])
+    if (!is.null(domain_names)) {
+      # "a + b" conversion to list(a = a, b = b)
+      domain_expr <- paste0(
+        "list(",
+        paste0(
+          vapply(domain_names, function(x) {
+            if (identical(x, "coordinates")) {
+              paste0(x, " = ", x, "(.data.)")
+            } else {
+              paste0(x, " = ", x)
+            }
+          },
+          ""),
+          collapse = ", "
+        ),
+        ")")
+      response_expr <- parse(text = domain_expr)
+    }
+    response <- tryCatch(
+      expr = eval_in_data_context(
+        substitute(response_expr),
+        data = data,
+        response_data = response_data,
+        default = NULL,
+        .envir = .envir
+      ),
+      error = function(e) {
+        NULL
+      }
+    )
+  }
+
+  if (is.null(response)) {
+    stop("Response variable missing or could not be evaluated")
+  }
+
+  E <- eval_in_data_context(
+    substitute(E),
     data = data,
     response_data = response_data,
     default = options[["E"]],
     .envir = .envir
   )
-  Ntrials <- eval_in_data_context(substitute(Ntrials),
+  Ntrials <- eval_in_data_context(
+    substitute(Ntrials),
     data = data,
     response_data = response_data,
     default = options[["Ntrials"]],
+    .envir = .envir
+  )
+  weights <- eval_in_data_context(
+    substitute(weights),
+    data = data,
+    response_data = response_data,
+    default = 1,
     .envir = .envir
   )
 
@@ -629,7 +741,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       ips <- ipmaker(
         samplers = samplers,
         domain = domain,
-        dnames = response,
+        dnames = names(response),
         int.args = options[["bru_int_args"]]
       )
     }
@@ -673,9 +785,28 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
         # TODO: check that the crs info is the same
       }
     }
-    data <- as.data.frame(data)
-    if (!is.null(response_data)) {
-      warning("Ignoring non-null response_data input for 'cp' likelihood")
+
+    # For non-Spatial models:
+    # Use the response data list as the actual data object, since that's
+    # now the canonical place where the point information is given.  This also allows
+    # response_data to be used when constructing the response list.
+    # This makes it a strict requirement that the predictor can be evaluated as
+    # a pure function of the domain data.  When implementing sf support, might
+    # be able to give explicit access to spatial coordinates, but otherwise
+    # the user can extract it from the geometry with st_coordinates(geometry)[,1]
+    # or similar.
+    # For Spatial models, keep the old behaviour for backwards compatibility for
+    # now, but can likely realign that in the future after more testing.
+    if (ips_is_Spatial) {
+      data <- as.data.frame(data)
+      if (!is.null(response_data)) {
+        warning("Ignoring non-null response_data input for 'cp' likelihood")
+      }
+      N_data <- NROW(data)
+    } else {
+      data <- as.data.frame(response)
+      response_data <- NULL
+      N_data <- NROW(data)
     }
     ips <- as.data.frame(ips)
     dim_names <- intersect(names(data), names(ips))
@@ -687,12 +818,12 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
           E * ips[["weight"]]
         ),
         BRU_response_cp = c(
-          NROW(data),
+          N_data,
           rep(0, NROW(ips))
         )
       )
       if (!linear) {
-        expr_text <- as.character(formula)[length(as.character(formula))]
+        expr_text <- formula_char[length(formula_char)]
         expr_text <- paste0(
           "{BRU_eta <- ", expr_text, "\n",
           " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}"
@@ -712,11 +843,11 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     } else {
       response_data <- data.frame(
         BRU_E = c(
-          rep(0, NROW(data)),
+          rep(0, N_data),
           E * ips[["weight"]]
         ),
         BRU_response_cp = c(
-          rep(1, NROW(data)),
+          rep(1, N_data),
           rep(0, NROW(ips))
         )
       )
@@ -738,6 +869,22 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response <- "BRU_response_cp"
     inla.family <- "poisson"
     E <- response_data[["BRU_E"]]
+
+    allow_combine <- TRUE
+  } else {
+    allow_combine <-
+      if (!is.null(response_data) ||
+          (is.list(data) && !is.data.frame(data))) {
+        TRUE
+      } else if (is.null(allow_combine)) {
+        FALSE
+      } else {
+        allow_combine
+      }
+
+    response_data <- data.frame(BRU_response = response,
+                                BRU_E = E, BRU_Ntrials = Ntrials)
+    response <- "BRU_response"
   }
 
   # Calculate data ranges
@@ -761,6 +908,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     data = data,
     E = E,
     Ntrials = Ntrials,
+    weights = weights,
     samplers = samplers,
     linear = linear,
     expr = expr,
@@ -771,15 +919,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     include_components = include,
     exclude_components = exclude,
     allow_latent = allow_latent,
-    allow_combine =
-      if (!is.null(response_data) ||
-        (is.list(data) && !is.data.frame(data))) {
-        TRUE
-      } else if (is.null(allow_combine)) {
-        FALSE
-      } else {
-        allow_combine
-      },
+    allow_combine = allow_combine,
     control.family = control.family
   )
 
@@ -841,6 +981,67 @@ like_list.bru_like <- function(..., envir = NULL) {
   object
 }
 
+#' Utility functions for bru likelihood objects
+#' @param x Object of `bru_like` or `bru_like_list` type
+#' @export
+#' @keywords internal
+#' @rdname bru_like_methods
+bru_like_inla_family <- function(x, ...) {
+  UseMethod("bru_like_inla_family")
+}
+#' @export
+#' @rdname bru_like_methods
+bru_like_inla_family.bru_like <- function(x, ...) {
+  x[["inla.family"]]
+}
+#' @export
+#' @rdname bru_like_methods
+bru_like_inla_family.bru_like_list <- function(x, ...) {
+  vapply(x, bru_like_inla_family, "")
+}
+
+#' @param control.family INLA `control.family` overrides
+#' @export
+#' @keywords internal
+#' @rdname bru_like_methods
+bru_like_control_family <- function(x, control.family = NULL, ...) {
+  UseMethod("bru_like_control_family")
+}
+#' @export
+#' @rdname bru_like_methods
+bru_like_control_family.bru_like <- function(x, control.family = NULL, ...) {
+  if (!is.null(control.family)) {
+    control.family
+  } else if (is.null(x[["control.family"]])) {
+    list()
+  } else {
+    x[["control.family"]]
+  }
+}
+#' @export
+#' @rdname bru_like_methods
+bru_like_control_family.bru_like_list <- function(x, control.family = NULL, ...) {
+  # Extract the control.family information for each likelihood
+  if (!is.null(control.family)) {
+    if (length(control.family) != length(x)) {
+      stop("control.family supplied as option, but format doesn't match the number of likelihoods")
+    }
+    like_has_cf <- vapply(
+      seq_along(x),
+      function(k) !is.null(x[[k]][["control.family"]]),
+      TRUE
+    )
+    if (any(like_has_cf)) {
+      warning("Global control.family option overrides settings in likelihood(s) ",
+              paste0(which(like_has_cf)),
+              collapse = ", "
+      )
+    }
+  } else {
+    control.family <- lapply(x, bru_like_control_family)
+  }
+  control.family
+}
 
 bru_like_expr <- function(lhood, components) {
   if (is.null(lhood[["expr"]])) {
@@ -881,7 +1082,7 @@ bru_like_expr <- function(lhood, components) {
 #' The left hand side determines the intensity function that is assumed to
 #' drive the LGCP. This may include effects that lead to a thinning (filtering)
 #' of the point process. By default, the log intensity is assumed to be a linear
-#' combination of the effects defined by the formula's RHS. More sofisticated
+#' combination of the effects defined by the formula's RHS. More sophisticated
 #' models, e.g. non-linear thinning, can be achieved by using the predictor
 #' argument. The latter requires multiple runs of INLA for improving the
 #' required approximation of the predictor. In many applications the LGCP is
@@ -1513,30 +1714,26 @@ lin_predictor <- function(lin, state) {
     lapply(
       lin,
       function(x) {
-        Ax_list <-
-          lapply(names(x$A), function(xx) {
-            x[["A"]][[xx]] %*% state[[xx]]
-          })
-        Ax <- do.call(cbind, Ax_list)
-        sumAx <- Matrix::rowSums(Ax)
-        as.vector(x$offset) + as.vector(sumAx)
+        as.vector(ibm_eval(x, state = state))
       }
     )
   )
 }
-nonlin_predictor <- function(model, lhoods, state, A) {
+nonlin_predictor <- function(param, state) {
   do.call(
     c,
     lapply(
-      seq_along(lhoods),
+      seq_along(param[["lhoods"]]),
       function(lh_idx) {
         as.vector(
           evaluate_model(
-            model = model,
-            data = lhoods[[lh_idx]][["data"]],
+            model = param[["model"]],
+            data = param[["lhoods"]][[lh_idx]][["data"]],
+            input = param[["input"]][[lh_idx]],
             state = list(state),
-            A = A[[lh_idx]],
-            predictor = bru_like_expr(lhoods[[lh_idx]], model[["effects"]]),
+            comp_simple = param[["comp_simple"]][[lh_idx]],
+            predictor = bru_like_expr(param[["lhoods"]][[lh_idx]],
+                                      param[["model"]][["effects"]]),
             format = "matrix"
           )
         )
@@ -1559,9 +1756,10 @@ line_search_optimisation_target <- function(x, param) {
   (x - 1)^2 * param[1] + 2 * (x - 1) * x^2 * param[2] + x^4 * param[3]
 }
 
-line_search_optimisation_target_exact <- function(x, param) {
+line_search_optimisation_target_exact <- function(x, param, nonlin_param) {
   state <- scale_state(param$state0, param$state1, x)
-  nonlin <- nonlin_predictor(param$model, param$lhoods, state, param$A)
+  nonlin <- nonlin_predictor(param = nonlin_param,
+                             state = state)
   sum((nonlin - param$lin)^2 * param$weights)
 }
 
@@ -1592,7 +1790,9 @@ bru_line_search <- function(model,
                             lin,
                             state0,
                             state,
-                            A,
+                            input,
+                            comp_lin,
+                            comp_simple,
                             weights = 1,
                             options) {
   if (length(options$bru_method$search) == 0) {
@@ -1630,10 +1830,18 @@ bru_line_search <- function(model,
   }
 
   # Initialise ----
+  nonlin_param <- list(
+    model = model,
+    lhoods = lhoods,
+    input = input,
+    comp_simple = comp_simple
+  )
+
   state1 <- state
   lin_pred0 <- lin_predictor(lin, state0)
   lin_pred1 <- lin_predictor(lin, state1)
-  nonlin_pred <- nonlin_predictor(model, lhoods, state1, A)
+  nonlin_pred <- nonlin_predictor(param = nonlin_param,
+                                  state = state1)
 
   if (length(lin_pred1) != length(nonlin_pred)) {
     warning(
@@ -1679,7 +1887,8 @@ bru_line_search <- function(model,
       }
       step_scaling <- step_scaling / fact
       state <- scale_state(state0, state1, step_scaling)
-      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      nonlin_pred <- nonlin_predictor(param = nonlin_param,
+                                      state = state)
       nonfin <- any(!is.finite(nonlin_pred))
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
 
@@ -1712,7 +1921,8 @@ bru_line_search <- function(model,
       step_scaling <- step_scaling * fact
       state <- scale_state(state0, state1, step_scaling)
 
-      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      nonlin_pred <- nonlin_predictor(param = nonlin_param,
+                                 state = state)
       norm1_prev <- norm1
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
@@ -1739,7 +1949,8 @@ bru_line_search <- function(model,
       expand_active <- expand_active - 1
       step_scaling <- step_scaling / fact
       state <- scale_state(state0, state1, step_scaling)
-      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      nonlin_pred <- nonlin_predictor(param = nonlin_param,
+                                      state = state)
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
       bru_log_message(
@@ -1779,19 +1990,18 @@ bru_line_search <- function(model,
           step_scaling * c(1 / fact^2, fact),
           param = list(
             lin = lin_pred1,
-            model = model,
-            lhoods = lhoods,
-            A = A,
             state0 = state0,
             state1 = state1,
             weights = weights
-          )
+          ),
+          nonlin_param = nonlin_param
         )
     }
 
     step_scaling_opt <- alpha$minimum
     state_opt <- scale_state(state0, state1, step_scaling_opt)
-    nonlin_pred_opt <- nonlin_predictor(model, lhoods, state_opt, A)
+    nonlin_pred_opt <- nonlin_predictor(param = nonlin_param,
+                                        state = state_opt)
     norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
 
     if (norm1_opt < norm1) {
@@ -1843,7 +2053,8 @@ bru_line_search <- function(model,
   if (step_scaling > maximum_step) {
     step_scaling <- maximum_step
     state <- scale_state(state0, state1, step_scaling)
-    nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+    nonlin_pred <- nonlin_predictor(param = nonlin_param,
+                                    state = state)
     norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
     bru_log_message(
@@ -2027,41 +2238,11 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   )
 
   # Extract the family of each likelihood
-  family <- vapply(
-    seq_along(lhoods),
-    function(k) lhoods[[k]]$inla.family,
-    "family"
-  )
+  family <- bru_like_inla_family(lhoods)
 
   # Extract the control.family information for each likelihood
-  if (!is.null(inla.options[["control.family"]])) {
-    if (length(inla.options[["control.family"]]) != length(lhoods)) {
-      stop("control.family supplied as option, but format doesn't match the number of likelihoods")
-    }
-    like_has_cf <- vapply(
-      seq_along(lhoods),
-      function(k) !is.null(lhoods[[k]][["control.family"]]),
-      TRUE
-    )
-    if (any(like_has_cf)) {
-      warning("Global control.family option overrides settings in likelihood(s) ",
-        paste0(which(like_has_cf)),
-        collapse = ", "
-      )
-    }
-  } else {
-    control.family <- lapply(
-      seq_along(lhoods),
-      function(k) {
-        if (is.null(lhoods[[k]][["control.family"]])) {
-          list()
-        } else {
-          lhoods[[k]][["control.family"]]
-        }
-      }
-    )
-    inla.options[["control.family"]] <- control.family
-  }
+  inla.options[["control.family"]] <-
+    bru_like_control_family(lhoods, inla.options[["control.family"]])
 
   initial <-
     if (is.null(initial)) {
@@ -2121,16 +2302,27 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     original_timings <- old.result[["bru_iinla"]][["timings"]]
   }
 
+  inputs <- evaluate_inputs(model, lhoods = lhoods, inla_f = TRUE)
+  comp_lin <- evaluate_comp_lin(model,
+                                input = inputs,
+                                state = states[[length(states)]],
+                                inla_f = TRUE)
+  comp_simple <- evaluate_comp_simple(model,
+                                      input = inputs,
+                                      inla_f = TRUE)
+  lin <- bru_compute_linearisation(
+    model,
+    lhoods = lhoods,
+    input = inputs,
+    state = states[[length(states)]],
+    comp_simple = comp_simple
+  )
+
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search) {
-    A <- evaluate_A(model, lhoods, inla_f = TRUE) # Input is inla::f-compatible
-    lin <- bru_compute_linearisation(
-      model,
-      lhoods = lhoods,
-      state = states[[length(states)]],
-      A = A
-    )
+    # Always compute linearisation (above)
   }
+
   # Initial stack
   idx <- evaluate_index(model, lhoods)
   stk <- bru_make_stack(lhoods, lin, idx)
@@ -2215,6 +2407,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           family = family,
           E = stk.data[["BRU.E"]],
           Ntrials = stk.data[["BRU.Ntrials"]],
+          weights = stk.data[["BRU.weights"]],
           offset = stk.data[["BRU.offset"]]
         )
       )
@@ -2341,17 +2534,24 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             lin = lin,
             state0 = state0,
             state = state,
-            A = A,
+            input = inputs,
+            comp_lin = comp_lin,
+            comp_simple = comp_simple,
             weights = line_weights,
             options = options
           )
           state <- line_search[["state"]]
         }
+        comp_lin <- evaluate_comp_lin(model,
+                                      input = inputs,
+                                      state = state,
+                                      inla_f = TRUE)
         lin <- bru_compute_linearisation(
           model,
           lhoods = lhoods,
+          input = inputs,
           state = state,
-          A = A
+          comp_simple = comp_simple
         )
         stk <- bru_make_stack(lhoods, lin, idx)
 
@@ -2669,7 +2869,6 @@ print.summary_bru <- function(x, ...) {
 #'
 #' @export
 #' @param object An object obtained from a [bru()] or [lgcp()] call
-#' @param \dots arguments passed on to other methods or ignored
 
 summary_bru <- function(object, ...) {
   .Deprecated(new = "summary")

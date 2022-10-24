@@ -2,53 +2,126 @@
 % Please edit documentation in R/mappers.R
 \name{bru_mapper_methods}
 \alias{bru_mapper_methods}
+\alias{ibm_n}
+\alias{ibm_n_output}
+\alias{ibm_values}
+\alias{ibm_amatrix}
+\alias{ibm_is_linear}
+\alias{ibm_jacobian}
+\alias{ibm_linear}
+\alias{ibm_eval}
+\alias{ibm_inla_subset}
+\alias{ibm_valid_input}
 \alias{ibm_n.default}
+\alias{ibm_n_output.default}
 \alias{ibm_values.default}
 \alias{ibm_amatrix.default}
+\alias{ibm_is_linear.default}
+\alias{ibm_jacobian.default}
+\alias{ibm_offset.default}
+\alias{ibm_linear.default}
+\alias{ibm_eval.default}
+\alias{ibm_inla_subset.default}
 \alias{ibm_valid_input.default}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
 \alias{ibm_values.bru_mapper_inla_mesh_2d}
-\alias{ibm_amatrix.bru_mapper_inla_mesh_2d}
+\alias{ibm_jacobian.bru_mapper_inla_mesh_2d}
 \alias{ibm_n.bru_mapper_inla_mesh_1d}
 \alias{ibm_values.bru_mapper_inla_mesh_1d}
-\alias{ibm_amatrix.bru_mapper_inla_mesh_1d}
+\alias{ibm_jacobian.bru_mapper_inla_mesh_1d}
 \alias{ibm_valid_input.bru_mapper_index}
-\alias{ibm_amatrix.bru_mapper_index}
+\alias{ibm_jacobian.bru_mapper_index}
+\alias{ibm_n.bru_mapper_taylor}
+\alias{ibm_n_output.bru_mapper_taylor}
+\alias{ibm_values.bru_mapper_taylor}
+\alias{ibm_jacobian.bru_mapper_taylor}
+\alias{ibm_eval.bru_mapper_taylor}
 \alias{ibm_n.bru_mapper_linear}
 \alias{ibm_values.bru_mapper_linear}
-\alias{ibm_amatrix.bru_mapper_linear}
+\alias{ibm_jacobian.bru_mapper_linear}
 \alias{ibm_n.bru_mapper_matrix}
 \alias{ibm_values.bru_mapper_matrix}
-\alias{ibm_amatrix.bru_mapper_matrix}
+\alias{ibm_jacobian.bru_mapper_matrix}
 \alias{ibm_n.bru_mapper_factor}
 \alias{ibm_values.bru_mapper_factor}
-\alias{ibm_amatrix.bru_mapper_factor}
-\alias{ibm_n.bru_mapper_offset}
-\alias{ibm_values.bru_mapper_offset}
-\alias{ibm_amatrix.bru_mapper_offset}
+\alias{ibm_jacobian.bru_mapper_factor}
+\alias{ibm_n.bru_mapper_const}
+\alias{ibm_values.bru_mapper_const}
+\alias{ibm_jacobian.bru_mapper_const}
+\alias{ibm_eval.bru_mapper_const}
+\alias{ibm_n.bru_mapper_scale}
+\alias{ibm_n_output.bru_mapper_scale}
+\alias{ibm_values.bru_mapper_scale}
+\alias{ibm_jacobian.bru_mapper_scale}
+\alias{ibm_offset.bru_mapper_scale}
+\alias{ibm_linear.bru_mapper_scale}
+\alias{ibm_eval.bru_mapper_scale}
+\alias{ibm_valid_input.bru_mapper_scale}
 \alias{ibm_n.bru_mapper_multi}
+\alias{ibm_n_output.bru_mapper_multi}
 \alias{ibm_values.bru_mapper_multi}
-\alias{ibm_amatrix.bru_mapper_multi}
+\alias{ibm_is_linear.bru_mapper_multi}
+\alias{ibm_jacobian.bru_mapper_multi}
+\alias{ibm_linear.bru_mapper_multi}
+\alias{ibm_eval.bru_mapper_multi}
 \alias{ibm_valid_input.bru_mapper_multi}
 \alias{[.bru_mapper_multi}
 \alias{names.bru_mapper_multi}
 \alias{names<-.bru_mapper_multi}
 \alias{ibm_n.bru_mapper_collect}
+\alias{ibm_n_output.bru_mapper_collect}
 \alias{ibm_values.bru_mapper_collect}
-\alias{ibm_amatrix.bru_mapper_collect}
+\alias{ibm_is_linear.bru_mapper_collect}
+\alias{ibm_jacobian.bru_mapper_collect}
+\alias{ibm_eval.bru_mapper_collect}
+\alias{ibm_linear.bru_mapper_collect}
 \alias{ibm_valid_input.bru_mapper_collect}
 \alias{[.bru_mapper_collect}
 \alias{names.bru_mapper_collect}
 \alias{names<-.bru_mapper_collect}
 \alias{ibm_n.bru_mapper_harmonics}
-\alias{ibm_amatrix.bru_mapper_harmonics}
-\title{Implementation methods for mapper objects}
+\alias{ibm_jacobian.bru_mapper_harmonics}
+\title{Methods for bru_mapper objects}
 \usage{
+ibm_n(mapper, inla_f = FALSE, ...)
+
+ibm_n_output(mapper, input, inla_f = FALSE, ...)
+
+ibm_values(mapper, inla_f = FALSE, ...)
+
+ibm_amatrix(mapper, input, state = NULL, inla_f = FALSE, ...)
+
+ibm_is_linear(mapper, ...)
+
+ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
+
+ibm_linear(mapper, input, state = NULL, ...)
+
+ibm_eval(mapper, input, state = NULL, ...)
+
+ibm_inla_subset(mapper, ...)
+
+ibm_valid_input(mapper, input, inla_f = FALSE, ...)
+
 \method{ibm_n}{default}(mapper, inla_f = FALSE, ...)
+
+\method{ibm_n_output}{default}(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_values}{default}(mapper, inla_f = FALSE, ...)
 
-\method{ibm_amatrix}{default}(mapper, input, inla_f = FALSE, ...)
+\method{ibm_amatrix}{default}(mapper, ...)
+
+\method{ibm_is_linear}{default}(mapper, ...)
+
+\method{ibm_jacobian}{default}(mapper, input, state, ...)
+
+ibm_offset.default(mapper, input, state = NULL, ...)
+
+\method{ibm_linear}{default}(mapper, input, state, ...)
+
+\method{ibm_eval}{default}(mapper, input, state = NULL, ...)
+
+\method{ibm_inla_subset}{default}(mapper, ...)
 
 \method{ibm_valid_input}{default}(mapper, input, ...)
 
@@ -56,49 +129,95 @@
 
 \method{ibm_values}{bru_mapper_inla_mesh_2d}(mapper, ...)
 
-\method{ibm_amatrix}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
+\method{ibm_jacobian}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
+
+\method{ibm_jacobian}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
 
 \method{ibm_n}{bru_mapper_inla_mesh_1d}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_inla_mesh_1d}(mapper, ...)
 
-\method{ibm_amatrix}{bru_mapper_inla_mesh_1d}(mapper, input, ...)
+\method{ibm_jacobian}{bru_mapper_inla_mesh_1d}(mapper, input, ...)
 
 \method{ibm_valid_input}{bru_mapper_index}(mapper, input, ...)
 
-\method{ibm_amatrix}{bru_mapper_index}(mapper, input, ...)
+\method{ibm_jacobian}{bru_mapper_index}(mapper, input, ...)
+
+\method{ibm_n}{bru_mapper_taylor}(mapper, inla_f = FALSE, multi = FALSE, ...)
+
+\method{ibm_n_output}{bru_mapper_taylor}(mapper, input, inla_f = FALSE, ...)
+
+\method{ibm_values}{bru_mapper_taylor}(mapper, inla_f = FALSE, multi = FALSE, ...)
+
+\method{ibm_jacobian}{bru_mapper_taylor}(mapper, ..., multi = FALSE)
+
+\method{ibm_eval}{bru_mapper_taylor}(mapper, input = NULL, state = NULL, ...)
 
 \method{ibm_n}{bru_mapper_linear}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_linear}(mapper, ...)
 
-\method{ibm_amatrix}{bru_mapper_linear}(mapper, input, ...)
+\method{ibm_jacobian}{bru_mapper_linear}(mapper, input, ...)
 
 \method{ibm_n}{bru_mapper_matrix}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_matrix}(mapper, ...)
 
-\method{ibm_amatrix}{bru_mapper_matrix}(mapper, input, ...)
+\method{ibm_jacobian}{bru_mapper_matrix}(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 \method{ibm_n}{bru_mapper_factor}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_factor}(mapper, ...)
 
-\method{ibm_amatrix}{bru_mapper_factor}(mapper, input, ...)
+\method{ibm_jacobian}{bru_mapper_factor}(mapper, input, ...)
 
-\method{ibm_n}{bru_mapper_offset}(mapper, ...)
+\method{ibm_n}{bru_mapper_const}(mapper, ...)
 
-\method{ibm_values}{bru_mapper_offset}(mapper, ...)
+\method{ibm_values}{bru_mapper_const}(mapper, ...)
 
-\method{ibm_amatrix}{bru_mapper_offset}(mapper, input, ...)
+\method{ibm_jacobian}{bru_mapper_const}(mapper, input, ...)
 
-\method{ibm_n}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = 0L, ...)
+\method{ibm_eval}{bru_mapper_const}(mapper, input, state = NULL, ...)
 
-\method{ibm_values}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = 0L, ...)
+\method{ibm_n}{bru_mapper_scale}(mapper, ...)
 
-\method{ibm_amatrix}{bru_mapper_multi}(mapper, input, inla_f = FALSE, multi = 0L, ...)
+\method{ibm_n_output}{bru_mapper_scale}(mapper, input, ...)
 
-\method{ibm_valid_input}{bru_mapper_multi}(mapper, input, inla_f = FALSE, multi = 0L, ...)
+\method{ibm_values}{bru_mapper_scale}(mapper, ...)
+
+\method{ibm_jacobian}{bru_mapper_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
+
+ibm_offset.bru_mapper_scale(mapper, input, ..., sub_lin = NULL)
+
+\method{ibm_linear}{bru_mapper_scale}(mapper, input, state, ...)
+
+\method{ibm_eval}{bru_mapper_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
+
+\method{ibm_valid_input}{bru_mapper_scale}(mapper, input, ...)
+
+\method{ibm_n}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = FALSE, ...)
+
+\method{ibm_n_output}{bru_mapper_multi}(mapper, input, ...)
+
+\method{ibm_values}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = FALSE, ...)
+
+\method{ibm_is_linear}{bru_mapper_multi}(mapper, multi = FALSE, ...)
+
+\method{ibm_jacobian}{bru_mapper_multi}(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...,
+  sub_A = NULL
+)
+
+\method{ibm_linear}{bru_mapper_multi}(mapper, input, state, inla_f = FALSE, ...)
+
+\method{ibm_eval}{bru_mapper_multi}(mapper, input, state = NULL, inla_f = FALSE, ..., pre_A = NULL)
+
+\method{ibm_valid_input}{bru_mapper_multi}(mapper, input, inla_f = FALSE, multi = FALSE, ...)
 
 \method{[}{bru_mapper_multi}(x, i, drop = TRUE)
 
@@ -106,13 +225,37 @@
 
 \method{names}{bru_mapper_multi}(x) <- value
 
-\method{ibm_n}{bru_mapper_collect}(mapper, inla_f = FALSE, multi = 0L, ...)
+\method{ibm_n}{bru_mapper_collect}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
-\method{ibm_values}{bru_mapper_collect}(mapper, inla_f = FALSE, multi = 0L, ...)
+\method{ibm_n_output}{bru_mapper_collect}(mapper, input, inla_f = FALSE, multi = FALSE, ...)
 
-\method{ibm_amatrix}{bru_mapper_collect}(mapper, input, inla_f = FALSE, multi = 0L, ...)
+\method{ibm_values}{bru_mapper_collect}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
-\method{ibm_valid_input}{bru_mapper_collect}(mapper, input, inla_f = FALSE, multi = 0L, ...)
+\method{ibm_is_linear}{bru_mapper_collect}(mapper, inla_f = FALSE, multi = FALSE, ...)
+
+\method{ibm_jacobian}{bru_mapper_collect}(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...,
+  sub_lin = NULL
+)
+
+\method{ibm_eval}{bru_mapper_collect}(
+  mapper,
+  input,
+  state,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...,
+  sub_lin = NULL
+)
+
+\method{ibm_linear}{bru_mapper_collect}(mapper, input, state, inla_f = FALSE, ...)
+
+\method{ibm_valid_input}{bru_mapper_collect}(mapper, input, inla_f = FALSE, multi = FALSE, ...)
 
 \method{[}{bru_mapper_collect}(x, i, drop = TRUE)
 
@@ -122,25 +265,35 @@
 
 \method{ibm_n}{bru_mapper_harmonics}(mapper, inla_f = FALSE, ...)
 
-\method{ibm_amatrix}{bru_mapper_harmonics}(mapper, input, inla_f = FALSE, ...)
+\method{ibm_jacobian}{bru_mapper_harmonics}(mapper, input, state = NULL, inla_f = FALSE, ...)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}
 
-\item{inla_f}{logical; when \code{TRUE} in \code{ibm_n} and \code{ibm_values}, these must result in values compatible with \code{INLA::f(...)}
+\item{inla_f}{logical; when \code{TRUE} in \code{ibm_n} and \code{ibm_values},
+these must result in values compatible with \code{INLA::f(...)}
 an specification and corresponding \code{INLA::inla.stack(...)} constructions.
-For \code{ibm_amatrix} methods, it may influence how the input data is interpreted.
+For the \code{ibm_eval} and \code{ibm_jacobian} methods, it may influence how the
+input data is interpreted.
 Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by \code{bru_mapper_collect}.}
 
 \item{\dots}{Arguments passed on to other methods}
 
-\item{input}{The values for which to produce a mapping matrix}
+\item{input}{Data input for the mapper.}
 
-\item{multi}{integer or logical;
-If positive, the number of levels to recurse in a \code{bru_collect_mapper}.
-If \code{TRUE}, equivalent to \code{1L}. If \code{FALSE}, equivalent to \code{0L}.}
+\item{state}{A vector of latent state values for the mapping,
+of length \code{ibm_n(mapper, inla_f = FALSE)}}
+
+\item{multi}{logical;
+If \code{TRUE} (or positive), recurse one level into sub-mappers}
+
+\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
+
+\item{sub_A}{Internal; precomputed Jacobian matrices.}
+
+\item{pre_A}{Internal; precomputed Jacobian matrix}
 
 \item{x}{object from which to extract element(s)}
 
@@ -186,6 +339,89 @@ available (see Details). Otherwise the
 }
 \details{
 \itemize{
+\item \code{ibm_n} Generic. Implementations must return the size of the latent vector
+being mapped to.
+}
+
+\itemize{
+\item \code{ibm_n_output} Generic.
+Implementations must return an integer denoting the
+mapper output length, for valid inputs as determined by
+\code{ibm_valid_input(mapper, input, inla_f = inla_f)}.
+The default implementation returns \code{NROW(input)}.
+Mappers such as \code{bru_mapper_multi} and \code{bru_mapper_collect},
+that can accept \code{list()} inputs require their own methods implementations.
+}
+
+\itemize{
+\item \code{ibm_values} Generic. When \code{inla_f=TRUE}, implementations must return a vector that
+would be interpretable by an \code{INLA::f(..., values = ...)} specification.
+The exception is the method for \code{bru_mapper_multi}, that returns a
+multi-column data frame.
+}
+
+\itemize{
+\item \code{ibm_amatrix} Generic, will become deprecated in 2.7.0. Use \code{ibm_jacobian}
+instead.
+Implementations must return a (sparse) matrix of size \code{ibm_n_output(...)}
+by \code{ibm_n(...)}. The \code{inla_f=TRUE} argument should only affect
+the allowed type of input format.
+}
+
+\itemize{
+\item \code{ibm_is_linear} Generic.
+Implementations must return \code{TRUE} or \code{FALSE}.
+If \code{TRUE} (returned by the default method unless the mapper
+contains an \code{is_linear} variable), users of the mapper
+may assume the mapper is linear.
+}
+
+\itemize{
+\item \code{ibm_jacobian} Generic.
+Implementations must return a (sparse) matrix of size
+\code{ibm_n_output(mapper, input, inla_f)}
+by \code{ibm_n(mapper, inla_f = FALSE)}. The \code{inla_f=TRUE} argument should
+only affect the allowed type of input format.
+}
+
+\itemize{
+\item \code{ibm_linear()} Generic.
+Implementations must return a \link{bru_mapper_taylor} object
+The linearisation information includes \code{offset}, \code{jacobian}, and \code{state0}.
+The state information indicates for which state the \code{offset} was evaluated,
+with \code{NULL} meaning all-zero.
+The linearised mapper output is defined as
+\code{effect(input, state) = offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)}.
+The default method calls \code{ibm_eval()} and \code{ibm_jacobian()} to generate
+the needed information.
+}
+
+\itemize{
+\item \code{ibm_eval} Generic.
+Implementations must return a vector of length \code{ibm_n_output(...)}.
+The \code{input} contents must
+be in a format accepted by \code{ibm_jacobian(...)}
+for the mapper.
+}
+
+\itemize{
+\item \code{ibm_inla_subset} Generic.
+Implementations must return a logical vector of \code{TRUE/FALSE} for
+the subset such that, given the full A matrix and values output,
+\code{A[, subset, drop = FALSE]} and \code{values[subset]}
+(or \code{values[subset, , drop = FALSE]} for data.frame values) are equal
+to the \code{inla_f = TRUE} version of A and values. The default method uses
+the \code{ibm_values} output to construct the subset indexing.
+}
+
+\itemize{
+\item \code{ibm_valid_input} Generic.
+Implementations should return a logical vector of length \code{NROW(input)},
+or for \code{bru_mapper_multi} and \code{bru_mapper_collect} a list of such
+vectors.
+}
+
+\itemize{
 \item The default \code{ibm_n()} method returns a non-null element 'n' from the
 mapper object, and gives an error if it doesn't exist. If \code{inla_f=TRUE},
 first checks for a 'n_inla' element.
@@ -198,8 +434,44 @@ it doesn't exist.
 }
 
 \itemize{
-\item The default \code{ibm_amatrix()} gives an error message.
-Mapper classes must implement their own \code{ibm_amatrix} method.
+\item The default \code{ibm_amatrix()} method gives an error message.
+Mapper classes must implement their own \code{ibm_jacobian} or
+\code{ibm_amatrix} methods. New implementations should use
+a \code{ibm_jacobian} method. \code{ibm_amatrix} may become deprecated
+in a future version.
+}
+
+\itemize{
+\item The default \code{ibm_is_linear()} method returns logical
+'is_linear' from the mapper object if it exists, and otherwise \code{TRUE}.
+}
+
+\itemize{
+\item The default \code{ibm_jacobian()} calls \code{ibm_amatrix}, which
+by default gives an error.
+Mapper classes should implement their own \code{ibm_jacobian} method.
+}
+
+\itemize{
+\item The default \code{ibm_linear()} method calls \code{ibm_eval()} and \code{ibm_jacobian()}
+and returns a \code{bru_mapper_taylor} object.
+The \code{state0} information in the affine mapper indicates for which state
+the \code{offset} was evaluated; The affine mapper output is defined as
+\code{effect(input, state) = offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)}
+}
+
+\itemize{
+\item The default \code{ibm_eval()} method verifies that the mapper is linear
+with \code{ibm_is_linear()}, and then computes a linear mapping
+as \code{ibm_jacobian(...) \%*\% state}.  When \code{state} is \code{NULL},
+a zero vector of length \code{ibm_n_output(...)} is returned.
+}
+
+\itemize{
+\item The default \code{ibm_inla_subset} method uses
+the \code{ibm_values} output to construct the inla subset indexing, passing
+extra arguments such as \code{multi} on to the methods (this means it supports
+both regular vector values and \code{multi=1} data.frame values).
 }
 
 \itemize{
@@ -207,7 +479,27 @@ Mapper classes must implement their own \code{ibm_amatrix} method.
 }
 
 \itemize{
-\item \code{ibm_amatrix} for \code{bru_mapper_multi} accepts a list with
+\item The \code{ibm_eval.bru_mapper_taylor()} evaluates linearised
+mapper information at the given \code{state}. The \code{input} argument is ignored,
+so that the usual argument order
+\code{ibm_eval(mapper, input, state)} syntax can be used, but also
+\code{ibm_eval(mapper, state = state)}.  For a mapper with a named jacobian list,
+the \code{state} argument must also be a named list.  If \code{state} is \code{NULL},
+all-zero is assumed.
+}
+
+For \code{bru_mapper_scale}, \code{input} values without a \code{scale} element
+are interpreted as no scaling.
+
+\itemize{
+\item \code{ibm_valid_input} for \code{bru_mapper_scale} accepts a list with
+named entries \code{mapper} and \code{scale}. The contents of the \code{mapper}
+element is checked for validity for the submapper
+with \code{ibm_valid_input(mapper$mapper, input$mapper, ...)}
+}
+
+\itemize{
+\item \code{ibm_jacobian} for \code{bru_mapper_multi} accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see \code{\link[=names.bru_mapper_multi]{names.bru_mapper_multi()}}.
 Each list element should take a format accepted by the corresponding
@@ -227,7 +519,7 @@ with unnamed but ordered columns.
 }
 
 \itemize{
-\item \code{ibm_amatrix} for \code{bru_mapper_collect} accepts a list with
+\item \code{ibm_jacobian} for \code{bru_mapper_collect} accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see \code{\link[=names.bru_mapper_collect]{names.bru_mapper_collect()}}.
 Each list element should take a format accepted by the corresponding
@@ -249,5 +541,7 @@ with unnamed but ordered columns.
 }
 }
 \seealso{
-\code{\link[=bru_mapper]{bru_mapper()}}
+\link{bru_mapper} for constructor methods, and
+\link{bru_get_mapper} for hooks to extract mappers from latent model object
+class objects.
 }

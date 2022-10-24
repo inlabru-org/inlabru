@@ -5,7 +5,7 @@ output:
   - rmarkdown::html_vignette
   - rmarkdown::pdf_document
 vignette: >
-  %\VignetteIndexEntry{Iterative INLA method}
+  %\VignetteIndexEntry{Iterative linearised INLA method}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 header-includes:

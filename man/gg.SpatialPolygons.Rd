@@ -56,7 +56,7 @@ holes properly.
 
     # Load pantropical dolphin data
 
-    data("mexdolphin")
+    data("mexdolphin", package = "inlabru")
 
     # Plot the pantropiical survey boundary, ship transects and dolphin sightings
 

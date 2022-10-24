@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![CRAN
-Status](http://www.r-pkg.org/badges/version/inlabru)](https://cran.r-project.org/package=inlabru)
+Status](http://www.r-pkg.org/badges/version-last-release/inlabru)](https://cran.r-project.org/package=inlabru)
 [![inlabru status
 badge](https://inlabru-org.r-universe.dev/badges/inlabru)](https://inlabru-org.r-universe.dev)
 [![R build
@@ -74,6 +74,7 @@ or track the development version builds via
 # Enable universe(s) by inlabru-org
 options(repos = c(
   inlabruorg = 'https://inlabru-org.r-universe.dev',
+  INLA = 'https://inla.r-inla-download.org/R/testing',
   CRAN = 'https://cloud.r-project.org'))
 
 # Install some packages
@@ -94,7 +95,7 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_22.09.02 built 2022-09-02 19:28:51 UTC.
+#> This is INLA_22.10.15-1 built 2022-10-15 03:21:55 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)

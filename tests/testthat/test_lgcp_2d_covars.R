@@ -7,11 +7,14 @@ test_that("2D LGCP fitting", {
   # test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
   data(gorillas, package = "inlabru", envir = environment())
 
-  mdl <- coordinates ~ veg(
+  # Uses the component label to pick the covariate layer to extract,
+  # so doesn't need an explicit main_layer="vegetation".
+
+  mdl <- coordinates ~ vegetation(
     main = gorillas$gcov$vegetation,
-    main_layer = "vegetation",
     model = "iid"
   ) - Intercept
+
   fit <- lgcp(
     mdl, gorillas$nests,
     samplers = gorillas$boundary,
