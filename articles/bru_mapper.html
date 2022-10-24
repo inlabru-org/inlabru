@@ -99,22 +99,158 @@
     
     
 <p>(Vignette under construction!)</p>
+<div class="section level2">
+<h2 id="mapper-system-introduction">Mapper system introduction<a class="anchor" aria-label="anchor" href="#mapper-system-introduction"></a>
+</h2>
+<p>Each inlabru latent model component generates an <em>effect</em>, given the latent <em>state</em> vector. The purpose of the mapper system is to define the link from state vectors to effect vectors. For an ordinary model component, named <span class="math inline">\(c\)</span>, this link can be represented as a matrix-vector product <span class="math display">\[
+\eta_c(u_c) = A_c(\text{input}) u_c,
+\]</span> where <span class="math inline">\(u_c\)</span> is the latent state vector, <span class="math inline">\(\eta_c(u_c)\)</span> is the resulting component effect vector, and <span class="math inline">\(A_c(\text{input})\)</span> is a <em>component model matrix</em>. This matrix depends on the component inputs (covariates, index information, etc) from <code>main</code>, <code>group</code>, <code>replicate</code>, and <code>weights</code> in the component definition.</p>
+<p>The wider scope of component definitions is discussed in the <a href="http://inlabru-org.github.io/inlabru/articles/component.html" class="external-link">component vignette</a>. Here, we will focus on the mapper system itself, how the basic building blocks are used to construct the built-in mappers, and finally how to construct new mappers.</p>
+<p>The in-package documentation for the mapper methods is contained in three parts:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: sp</span></span></code></pre></div>
-<p>The reference documentation for the mapper methods is contained in three parts:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">?</span><span class="va">bru_mapper</span> <span class="co"># Mapper constructors</span></span>
 <span><span class="op">?</span><span class="va">bru_mapper_methods</span> <span class="co"># Mapper methods</span></span>
 <span><span class="op">?</span><span class="va">bru_get_mapper</span> <span class="co"># Mapper extraction methods</span></span></code></pre></div>
+<p>Regular users normally at most need some of the methods from <code><a href="../reference/bru_mapper.html">?bru_mapper</a></code>. The methods in <code><a href="../reference/bru_mapper_methods.html">?bru_mapper_methods</a></code> provides more details and allows the user to query mappers and to use them outside the context of inlabru model definitions. The <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code> and <code><a href="../reference/bru_get_mapper.html">bru_get_mapper()</a></code> method is needed for those implementing their own mapper class.</p>
+</div>
+<div class="section level2">
+<h2 id="mappers">Mappers<a class="anchor" aria-label="anchor" href="#mappers"></a>
+</h2>
+<p>The main purpose of each mapper class is to allow evaluating a component effect, from given <code>input</code> and latent <code>state</code>, by calling</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">state</span><span class="op">)</span></span></code></pre></div>
+<p>for the <code>mapper</code> associated with the component definition.</p>
+<div class="section level3">
+<h3 id="basic-mappers">Basic mappers<a class="anchor" aria-label="anchor" href="#basic-mappers"></a>
+</h3>
+<p>Basic mappers take covariate vectors or matrices as input and numeric vectors as state.</p>
+<p>Constructors:</p>
+<ul>
+<li><code><a href="../reference/bru_mapper.html">bru_mapper_const()</a></code></li>
+<li><code><a href="../reference/bru_mapper.html">bru_mapper_linear()</a></code></li>
+<li><code>bru_mapper_index(n)</code></li>
+<li><code>bru_mapper_factor(values, factor_mapping)</code></li>
+<li><code><a href="../reference/bru_mapper.html">bru_mapper_matrix()</a></code></li>
+<li><code>bru_mapper_harmonics(order, scaling, intercept, interval)</code></li>
+</ul>
+<div class="section level4">
+<h4 id="const">const<a class="anchor" aria-label="anchor" href="#const"></a>
+</h4>
+<p>The <code>const</code> mapper defines a mapping from an empty state vector. This is used to define offset components, <span class="math inline">\(\eta(u)_j = z_j\)</span>, where <span class="math inline">\(z\)</span> is a fixed input vector, indexed by <span class="math inline">\(j\)</span>.</p>
+</div>
+<div class="section level4">
+<h4 id="linear">linear<a class="anchor" aria-label="anchor" href="#linear"></a>
+</h4>
+<p>The <code>linear</code> mapper defines a mapper from a length-1 state vector. This is used to define ordinary “fixed” covariate effects, linear in both the covariate and in the state variable; <span class="math inline">\(\eta(u)_j = z_j u\)</span>, where <span class="math inline">\(u\)</span> is the state, and <span class="math inline">\(z\)</span> is the input covariate vector.</p>
+</div>
+<div class="section level4">
+<h4 id="index">index<a class="anchor" aria-label="anchor" href="#index"></a>
+</h4>
+<p>The <code>index</code> mapper defines a direct mapping between a length-<code>n</code> state variable. This is used for structured and unstructured “random effect” component effects; <span class="math inline">\(\eta(u)_j = u_{z_j}\)</span>, where <span class="math inline">\(u\)</span> is the state vector, and <span class="math inline">\(z\)</span> is the input index vector.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="compound-mappers">Compound mappers<a class="anchor" aria-label="anchor" href="#compound-mappers"></a>
+</h3>
+<p>Compound mappers define collections or chains of mappings, and can take various forms of input. The state vector is normally a numeric vector, but can in some cases be a list of vectors.</p>
+<ul>
+<li><code>bru_mapper_collect(mappers, hidden)</code></li>
+<li><code>bru_mapper_multi(mappers)</code></li>
+<li><code>bru_mapper_scale(mapper)</code></li>
+</ul>
+<div class="section level4">
+<h4 id="collect">collect<a class="anchor" aria-label="anchor" href="#collect"></a>
+</h4>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
+<span>                            hidden <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
+<span>         input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
+<span>         <span class="va">state</span><span class="op">)</span></span>
+<span><span class="co"># If hidden = TRUE, the inla_f=TRUE argument "hides" all but the first mapper:</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
+<span>         input <span class="op">=</span> <span class="va">name1_input</span>,</span>
+<span>         <span class="va">state</span>,</span>
+<span>         inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="multi">multi<a class="anchor" aria-label="anchor" href="#multi"></a>
+</h4>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
+<span>         input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
+<span>         state <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="scale">scale<a class="anchor" aria-label="anchor" href="#scale"></a>
+</h4>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_scale</a></span><span class="op">(</span><span class="va">inner_mapper</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
+<span>         input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mapper <span class="op">=</span> <span class="va">inner_mapper_input</span>,</span>
+<span>                      scale <span class="op">=</span> <span class="va">...</span><span class="op">)</span>,</span>
+<span>         <span class="va">state</span><span class="op">)</span></span></code></pre></div>
+<p>All component mappers are currently defined as a <code>multi</code> mapper within a <code>scale</code> mapper:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>inner_mapper <span class="ot">&lt;-</span> <span class="fu">bru_mapper_multi</span>(<span class="fu">list</span>(<span class="at">main =</span> ..., <span class="at">group =</span> ..., <span class="at">replicate =</span> ...))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>mapper <span class="ot">&lt;-</span> <span class="fu">bru_mapper_scale</span>(inner_mapper)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ibm_eval</span>(mapper,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">input =</span> <span class="fu">list</span>(<span class="at">mapper =</span> <span class="fu">list</span>(<span class="at">main =</span> ..., <span class="at">group =</span> ..., <span class="at">replicate =</span> ...),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">scale =</span> ...),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">state =</span> <span class="fu">list</span>(<span class="at">main =</span> ..., <span class="at">group =</span> ..., <span class="at">replicate =</span> ...)</span></code></pre></div>
+</div>
+</div>
+<div class="section level3">
+<h3 id="object-mappers">Object mappers<a class="anchor" aria-label="anchor" href="#object-mappers"></a>
+</h3>
+<p>For object with predefined mapper conversion methods, use <code>bru_mapper(object)</code> to obtain a suitable mapper object. Current predefined object mappers are defined for objects of these classes:</p>
+<ul>
+<li>
+<code>inla.mesh</code>; Use <code>bru_mapper(object)</code>
+</li>
+<li>
+<code>inla.mesh.1d</code>; Use <code>bru_mapper(object, indexed)</code>
+</li>
+</ul>
+<p>More details are given below.</p>
+</div>
+<div class="section level3">
+<h3 id="model-object-mappers">Model object mappers<a class="anchor" aria-label="anchor" href="#model-object-mappers"></a>
+</h3>
+<p>For inla model objects with predefined mappers, use <code>bru_get_mapper(object)</code> Current predefined model object mappers are defined for models of these classes:</p>
+<ul>
+<li>
+<code>inla.spde</code>; this includes <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.matern.html" class="external-link">inla.spde2.matern()</a></code> and <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern()</a></code> models. The conversion method calls <code><a href="../reference/bru_mapper.html">bru_mapper()</a></code> in the appropriate way for the mesh type used for the model</li>
+<li>
+<code>inla.rgeneric</code>; This relies on the rgeneric definition including a <code>"mapper"</code> callback argument. A less invasive method, that works for both rgeneric and cgeneric models, is to define a <code><a href="../reference/bru_get_mapper.html">bru_get_mapper()</a></code> method for the class, which needs to include a unique class identifier, e.g. add <code>class(object) &lt;- c("my_unique_model_class", class(object))</code> and define</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bru_get_mapper.my_unique_model_class</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>and register it in the namespace.</p>
+</div>
+<div class="section level3">
+<h3 id="special-mappers">Special mappers<a class="anchor" aria-label="anchor" href="#special-mappers"></a>
+</h3>
+<ul>
+<li><code><a href="../reference/bru_mapper.html">bru_mapper_taylor()</a></code></li>
+</ul>
+</div>
+</div>
+<div class="section level2">
+<h2 id="mapper-methods">Mapper methods<a class="anchor" aria-label="anchor" href="#mapper-methods"></a>
+</h2>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">inla_f</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_n_output</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">inla_f</span>, <span class="va">...</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_jacobian</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_jacobian</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_inla_subset</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_valid_input</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 <p>An example where the <code>inla_f</code> argument matters is the <code>bru_mapper_collect</code> class, when the <code>hidden=TRUE</code> argument is used to indicate that only the first mapper should be used for the <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> inputs, e.g. for <code>"bym2"</code> models. For <code>inla_f=FALSE</code> (the default), the <code>ibm_n</code> and <code>ibm_values</code> methods return the total number of latent variables, but with <code>inla_f=TRUE</code> we get the values needed by <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> instead:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_collect</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    a <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span>
@@ -131,7 +267,7 @@
 <span><span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1 2 3</span></span></code></pre></div>
 <p>For the <code>bru_mapper_multi</code> class, the <code>multi</code> argument provides access to the inner layers of the multi-mapper:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  a <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span>
 <span>  b <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
@@ -155,26 +291,26 @@
 <span><span class="co">#&gt; 5 2 2</span></span>
 <span><span class="co">#&gt; 6 3 2</span></span></code></pre></div>
 <p>The default <code>ibm_inla_subset</code> method determines the inla subset by comparing the full values information from <code>ibm_values(mapper, inla_f = FALSE)</code> to the inla specific values information from <code>ibm_values(mapper, inla_f = TRUE)</code>, to determine the logical vector identifying the inla values subset. Custom mappers should normally not need to specialise this method.</p>
+</div>
 <div class="section level2">
-<h2 id="mappers-for-inla-mesh-objects-and-mapper-extractors">Mappers for inla.mesh objects and mapper extractors<a class="anchor" aria-label="anchor" href="#mappers-for-inla-mesh-objects-and-mapper-extractors"></a>
+<h2 id="mappers-for-inla-mesh-objects">Mappers for inla.mesh objects<a class="anchor" aria-label="anchor" href="#mappers-for-inla-mesh-objects"></a>
 </h2>
 <p>For component models referenced by a character label (e.g. <code>"iid"</code>, <code>"bym2"</code>, <code>"rw2"</code> etc), inlabru will construct default mappers, that in most cases replicate the default <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> behaviour.</p>
 <p>For the <code>inla.mesh</code> and <code>inla.mesh.1d</code> classes, default mappers can be constructed by the pre-defined <code>bru_mapper</code> S3 methods. For 2d meshes (<code>inla.mesh</code>),</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span></code></pre></div>
 <p>For 1d meshes (<code>inla.mesh.1d</code>),</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If ibm_values() should return mesh$loc (e.g. for "rw2" models with degree=1 meshes)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co"># If ibm_values() should return seq_along(mesh$loc) (e.g. for inla.spde2.pcmatern() models)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>For <code>inla.spde</code> and <code>inla.rgeneric</code> model objects</p>
-<pre><code><span><span class="va">bru_get_mapper</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="customised-mappers">Customised mappers<a class="anchor" aria-label="anchor" href="#customised-mappers"></a>
 </h2>
-<pre><code><span><span class="va">bru_mapper_define</span></span></code></pre>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bru_mapper_define</span></span></code></pre></div>
 <p>Implementations can avoid having to define <code>ibm_n</code> and <code>ibm_values</code> methods, by instead computing and storing <code>n</code>, <code>n_inla</code>, <code>values</code>, and <code>values_inla</code> in the mapper object during construction. The default <code>ibm_n</code> and <code>ibm_values</code> methods checks if these values are available, and return the appropriate values depending on the <code>inla_f</code> argument. When <code>*_inla</code> values are requested but not available, the methods fall back to the non-inla versions. If the needed information is not found, the default methods give an error message.</p>
 <p>Note: Before version 2.6.0, <code>ibm_amatrix</code> was used instead of <code>ibm_jacobian</code>. Version 2.6.0 still supports this, by having the default <code>ibm_jacobian</code> method call <code>ibm_amatrix</code>, but will give a deprecation message from version 2.7.0, and it may be removed in a future version.</p>
 </div>
@@ -191,7 +327,7 @@
 \end{cases}
 \]</span></p>
 <p>We start with the constructor method. Like the <code>bru_mapper_matrix</code>, we require the user to supply a vector of covariate labels, and store them as a character vector. We also include a <code>min_degree</code> parameter to control if an intercept (<code>min_degree &lt;= 0</code>) and linear terms (<code>min_degree &lt;= 1</code>) should be included in the model.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">labels</span>, <span class="va">min_degree</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">is.factor</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -207,13 +343,13 @@
 <span>  <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="st">"bru_mapper_p_quadratic"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>The <code>ibm_n</code> method can compute the value of <span class="math inline">\(n\)</span> from <span class="math inline">\(n=1+p+\frac{p(p+1)}{2}\)</span>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ibm_n.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span></span>
 <span>  <span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">min_degree</span> <span class="op">&lt;=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">min_degree</span> <span class="op">&lt;=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="va">p</span> <span class="op">+</span> <span class="va">p</span> <span class="op">*</span> <span class="op">(</span><span class="va">p</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>For <code>ibm_values</code>, the default method is sufficient, returning the vector <span class="math inline">\([1,\dots,n]\)</span> with <span class="math inline">\(n\)</span> obtained by <code>ibm_n(mapper)</code>. However, for clearer result naming, we can use a character vector, at least for INLA <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f()</a></code> models that allow it (we could have an option argument to the <code>bru_mapper_p_quadratic</code> constructor to control this):</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ibm_values.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span></span>
 <span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
@@ -226,7 +362,7 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>While the approach to <code>ibm_n</code> and <code>ibm_values</code> above works, it is wasteful to recompute the <code>n</code> and <code>values</code> information for each call. Instead we can use that the default method will check if <code>n</code> or <code>values</code> are stored in the mapper object, and then return them. If we change the <code>.</code> in the method definitions to <code>_</code>, we can end the constructor method like this, making subsequent method calls faster:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">labels</span>, <span class="va">min_degree</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">...</span></span>
 <span>  <span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="st">"bru_mapper_p_quadratic"</span><span class="op">)</span></span>
@@ -236,7 +372,7 @@
 <span><span class="op">}</span></span></code></pre></div>
 <p>Note that the order matters, since our <code>ibm_values_bru_mapper_p_quadratic</code> function calls <code>ibm_n(mapper)</code>.</p>
 <p>We can now define the main part of the mapper interface that computes the model matrix linking the latent variables to the component effect. It’s required that <code>NULL</code> input should return a <span class="math inline">\(0\)</span>-by-<span class="math inline">\(n\)</span> matrix.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ibm_jacobian.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">input</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/Matrix.html" class="external-link">Matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fu"><a href="../reference/bru_mapper_methods.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
