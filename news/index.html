@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.3.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,10 +68,11 @@
       <small>Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2"><h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.6.0" id="inlabru-260">inlabru 2.6.0<a class="anchor" aria-label="anchor" href="#inlabru-260"></a></h2>
 <div class="section level3">
-<h3 id="features-development-version">Features<a class="anchor" aria-label="anchor" href="#features-development-version"></a></h3>
+<h3 id="features-2-6-0">Features<a class="anchor" aria-label="anchor" href="#features-2-6-0"></a></h3>
 <ul><li><p>Add <code>bru_get_mapper</code> generic, and associated methods for <code>inla.spde</code> and <code>inla.rgeneric</code> objects. This allows <code>inlabru</code> to automatically extract the appropriate <code>bru_mapper</code> object for each model component, and can be used as a hook by external packages implementing new INLA object classes.</p></li>
 <li><p>Add a <code>weights</code> argument for <code><a href="../reference/like.html">like()</a></code>, for likelihood-specific log-likelihood weights, passed on to the <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">INLA::inla()</a></code> weights argument. Evaluated in the data context.</p></li>
 <li><p>The <code>&lt;component&gt;_eval()</code> methods available in predictor expressions now handle optional scaling weights, like in ordinary component effect evaluation.</p></li>
@@ -87,7 +88,7 @@
 </ul></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-2-6-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-6-0"></a></h3>
 <ul><li><p>Enable both datum/ensemble container for ellipsoid information, to support <code>epsg:4326</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/154" class="external-link">#154</a></p></li>
 <li><p>Make duplicated component names an error instead of a warning. Relates to <a href="https://github.com/inlabru-org/inlabru/issues/155" class="external-link">#155</a></p></li>
 <li><p>Fix <code>Tsparse</code> assumptions in <code>row_kron</code> to prepare for Matrix <code>1.5-2</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/162" class="external-link">#162</a></p></li>
