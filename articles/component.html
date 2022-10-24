@@ -100,6 +100,10 @@
 
     
     
+<p>(Note: vignette under construction!)</p>
+<div class="section level2">
+<h2 id="basic-component-features">Basic component features<a class="anchor" aria-label="anchor" href="#basic-component-features"></a>
+</h2>
 <p>Model components are defined using a formula syntax that is similar to <code>R-INLA</code> but has some differences. The basic syntax is</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_component_name</span><span class="op">(</span></span>
@@ -107,21 +111,25 @@
 <span>  model <span class="op">=</span> <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><code>my_component_name</code> is a user-chosen label for the model component. This label is used in model summaries, to label relevant parts of a fitted model object, and to access model components when sampling from a model using <code><a href="../reference/generate.html">generate()</a></code> and <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>.</p>
-<p>The <code>main</code> argument defines the input data for the component. For example, an intercept-like component has a vector of ones as an input. The linear effect of a covariate has the vector of covariate values as an input. A 2-dimensional SPDE effect takes a 2-column matrix of coordinate locations as an input. This argument can be a general <code>R</code> expression, more details on this are below.</p>
+<p>The <code>main</code> argument defines the input data for the component. For example, an intercept-like component has a vector of ones as an input. The linear effect of a covariate has the vector of covariate values as an input. A 2-dimensional SPDE effect takes a 2-column matrix of coordinate locations as an input. This argument can be a general <code>R</code> expression, more details on this are below. The <code>main</code> argument doesn’t not need to be named. Other arguments should normally be named, to avoid confusion.</p>
 <p>The type of model component is specified using the <code>model</code> component, (see <code><a href="../reference/component.html">?component</a></code>, and <code>?INLA::inla.list.models()$latent</code>).</p>
 <p>Each component type has an associated <code>bru_mapper</code> method that takes <code>main</code> as an input and constructs the component design matrix. Users can also specify their own mapper methods (see <code><a href="../reference/bru_mapper.html">?bru_mapper</a></code>).</p>
 <p>This syntax replaces the <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> function that has the disadvantage that there is no clear separation between the name of the covariate and the label of the effect, and the user often has to do a substantial amount of pre-processing of data to construct relevant inputs. The documentation for defining model components can be viewed at <code><a href="../reference/component.html">?component</a></code>.</p>
 <p>The rest of the vignette goes into more detail about defining model components and highlights some advantages of the syntax.</p>
+</div>
 <div class="section level2">
 <h2 id="what-is-a-component-design-matrix">What is a component design matrix?<a class="anchor" aria-label="anchor" href="#what-is-a-component-design-matrix"></a>
 </h2>
 <p>A linear additive predictor of a latent Gaussian model can be written as <span class="math display">\[
 \begin{equation}
-\eta(u)_i = u_0 + \sum_{k=1}^K v_{ik} u_{ik} ,
+\eta(u)_i = u_0 + \sum_{k=1}^K a_{ik} u_{ik} ,
 \end{equation}
-\]</span> where <span class="math inline">\(u\)</span> is a multivariate Gaussian vector, <span class="math inline">\(v_k\)</span> are input information such as covariates or weights for random effects and <span class="math inline">\(i = 1, \ldots, n\)</span>. This can also be written as <span class="math inline">\(\eta(u) = Au\)</span>, where <span class="math inline">\(A\)</span> is the model design matrix with <span class="math inline">\(i\)</span>-th row <span class="math inline">\(\left[1, v_{i1}, \ldots, v_{iK}\right]\)</span>.</p>
-<p>We can also conceputally think of the predictor as the sum of <span class="math inline">\(D\)</span> model components, so that we partition <span class="math inline">\(A = \left[A^{(1)} \cdots A^{(D)}\right]\)</span>, and each component has an associated <strong>component design matrix</strong> <span class="math inline">\(A^{(d)}\)</span>.</p>
-<p>For example, if the component is an intercept parameter, then <span class="math inline">\(A^{(d)} = \left[1, \ldots, 1\right]^\intercal\)</span>. If the component is the linear effect of a covariate <span class="math inline">\(z\)</span> then <span class="math inline">\(A^{(d)} = \left[z_1, \ldots, z_n\right]^\intercal\)</span>. For more complicated effects, such as SPDE models, the component design matrix maps latent Gaussian parameters to the predictor (also known as the “projector” matrix in this context). The the construction of each <span class="math inline">\(A^{(d)}\)</span> is handled automatically by <code>bru_mapper</code> methods.</p>
+\]</span> where <span class="math inline">\(u\)</span> is a multivariate Gaussian vector, <span class="math inline">\(a_k\)</span> are input information such as covariates or weights for random effects and <span class="math inline">\(i = 1, \ldots, n\)</span>. This can also be written as <span class="math inline">\(\eta(u) = Au\)</span>, where <span class="math inline">\(A\)</span> is the model design matrix with <span class="math inline">\(i\)</span>-th row <span class="math inline">\(\left[1, a_{i1}, \ldots, a_{iK}\right]\)</span>.</p>
+<p>We can also conceptally think of the predictor as the sum of <span class="math inline">\(D\)</span> model components, so that we partition <span class="math inline">\(A = \left[A^{(1)} \cdots A^{(D)}\right]\)</span>, and each component has an associated <strong>component design matrix</strong> <span class="math inline">\(A^{(d)}\)</span>.</p>
+<p>For example, if the component is an intercept parameter, then <span class="math inline">\(A^{(d)} = \left[1, \ldots, 1\right]^\intercal\)</span>. If the component is the linear effect of a covariate <span class="math inline">\(z\)</span> then <span class="math inline">\(A^{(d)} = \left[z_1, \ldots, z_n\right]^\intercal\)</span>. For more complicated effects, such as SPDE models, the component design matrix maps latent Gaussian parameters to the predictor (also known as the “projector” matrix in this context). The the construction of each <span class="math inline">\(A^{(d)}\)</span> is handled automatically by <code>bru_mapper</code> methods, that define general (linear) <strong>component effects</strong> <span class="math inline">\(\eta^{(d)}(u^{(d)}) = A^{(d)} u^{(d)}\)</span>.</p>
+<p>Each linear predictor is defined by <span class="math display">\[
+\eta(u^{(1)},\dots,u^{(D)}) = \sum_{d=1}^D \eta^{(d)}(u^{(d)}) = \sum_{d=1}^D A^{(d)} u^{(d)} .
+\]</span> Non-linear predictors are defined by R expressions where the component label denotes the corresponding component effect.</p>
 <div class="section level3">
 <h3 id="mapper-methods">Mapper methods<a class="anchor" aria-label="anchor" href="#mapper-methods"></a>
 </h3>
@@ -132,7 +140,7 @@
 </h4>
 <p>The mapper for the 2D SPDE effect takes as an input a 2-column matrix of coordinates that represent the locations are which to evaluate the effect. The parameters of the SPDE component are defined at mesh nodes that may not be the same as the locations at which the effect should be evaluated.</p>
 <p>The appropriate weights required to evaluate the effect at the observation locations can be constructed using <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">INLA::inla.spde.make.A()</a></code>. The mapper for this model component takes the information in the component definition, in this case the minimum information required is an SPDE model object, and the 2-column matrix that <code>main</code> is evaluated to. The mapper then calls <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">INLA::inla.spde.make.A()</a></code> with appropriate arguments extracted from this information.</p>
-<p>(NOTE: Deliberately not going into huge detail here; the <a href="devel_bru_mapper.html">bru_mapper</a> vignette will have more details.)</p>
+<p>(NOTE: Deliberately not going into huge detail here; the <a href="bru_mapper.html">bru_mapper</a> vignette will have more details.)</p>
 </div>
 </div>
 <div class="section level3">
@@ -143,7 +151,7 @@
 <p>For example, suppose the data has columns named <code>x</code> and <code>y</code>, then a 2D SPDE model component could be specified as</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_spde_effect</span><span class="op">(</span></span>
-<span>  main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>,</span>
 <span>  model <span class="op">=</span> <span class="va">spde_model</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The expression <code>cbind(x,y)</code> is internally evaluated in an environment that contains the columns of the data, which includes the variables <code>x</code> and <code>y</code>.</p>
@@ -153,19 +161,23 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">x</span>, <span class="va">df</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="op">~</span> <span class="fu">my_spde_effect</span><span class="op">(</span></span>
-<span>  main <span class="op">=</span> <span class="fu">get_xy</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>,</span>
+<span>  <span class="fu">get_xy</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>,</span>
 <span>  model <span class="op">=</span> <span class="va">spde_model</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>This keyword allows code to be written that works with arbitrarily named input data, rather than hardcoding with a specific name of a dataset that may change in future.</p>
 <p>If the objects required to evaluate the R expression cannot be found in the data, then the global environment is searched. This allows users to access objects in the global environment, such as other data-structures that may be of a different dimension to the response data. This avoids the need to pre-process everything into a single <code>data.frame</code>.</p>
 <p>The functionality of allowing general <code>R</code> expressions can be used to extend the types of data that can be passed to the <code><a href="../reference/bru.html">bru()</a></code>, <code><a href="../reference/like.html">like()</a></code> and <code><a href="../reference/lgcp.html">lgcp()</a></code> functions. It is the basis for the support of spatial data structures such as <code>sp</code> objects, and there is also experimental support to allow users to pass data as a list. <code>inlabru</code> is thus readily extendible, given appropriate functions to extract the relevant information for each component, and associated mappers that convert this information into a component design matrix.</p>
+<p>In addition to the three main inputs, the optional <code>weights</code> argument also takes an R expression, and the result is used to scale the component. This can be used for spatially varying coefficient models, where the <code>weights</code> argument provides the covariate values.</p>
 </div>
 <div class="section level3">
 <h3 id="inlabru-specific-component-types">
 <code>inlabru</code>-specific component types<a class="anchor" aria-label="anchor" href="#inlabru-specific-component-types"></a>
 </h3>
 <p>In addition to the majority of latent models that can be defined using <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> function (see <code>INLA::inla.list.models()$latent)</code>), <code>inlabru</code> also has the following models: <code>'linear'</code>, <code>'fixed'</code>, <code>'offset'</code>, <code>'factor_full'</code> and <code>'factor_contrast'</code>).</p>
-<p>(NOTE: where should we put some documentation for these things? Some is in <code><a href="../reference/component.html">?component</a></code> but not all. I could add to that? And can we implement an <code>inlabru.list.models()</code> function?)</p>
+<!--
+(NOTE: where should we put some documentation for these things? Some is in `?component` but not all.  I could add to that?
+And can we implement an `inlabru.list.models()` function?)
+-->
 </div>
 </div>
 <div class="section level2">
@@ -252,7 +264,7 @@
 <div class="section level4">
 <h4 id="non-linear-predictors">Non-linear predictors<a class="anchor" aria-label="anchor" href="#non-linear-predictors"></a>
 </h4>
-<p><code>inlabru</code> supports non-linear predictors, where <span class="math inline">\(\tilde{\eta}(u)\)</span> is a non-linear function of <span class="math inline">\(u\)</span>. It is important to note that the mapping to a predictor vector <span class="math inline">\(Au\)</span> happens <strong>before</strong> the non-linear function is applied. So, for example, if <span class="math inline">\(\tilde{\eta}(u) = \exp(u)\)</span> then this is evaluated as <code>exp(A %*% u)</code> rather than <code>A %*% exp(u)</code>.</p>
+<p><code>inlabru</code> supports non-linear predictors, where <span class="math inline">\(\tilde{\eta}(u,v)\)</span> is a non-linear function of <span class="math inline">\(\eta_u\)</span> and <span class="math inline">\(\eta_v\)</span>. It is important to note that the mapping each component effect vector <span class="math inline">\(\eta_u=A^(u) u\)</span> happens <strong>before</strong> the non-linear function is applied. So, for example, if <span class="math inline">\(\tilde{\eta}(u,v) = \exp(\eta_u + \eta_v)\)</span> then this is evaluated as <code>exp(A_u %*% u + A_v %*% v)</code>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
