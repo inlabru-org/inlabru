@@ -218,6 +218,12 @@ ibm_values(mapper)
 ibm_n(mapper, inla_f = TRUE)
 ibm_values(mapper, inla_f = TRUE)
 ```
+```{r eval=TRUE}
+ibm_n(mapper, multi = TRUE)
+ibm_values(mapper, multi = TRUE)
+ibm_n(mapper, inla_f = TRUE, multi = TRUE)
+ibm_values(mapper, inla_f = TRUE, multi = TRUE)
+```
 
 For the `bru_mapper_multi` class, the `multi` argument provides access to the
 inner layers of the multi-mapper:
@@ -227,9 +233,16 @@ mapper <- bru_mapper_multi(list(
   b = bru_mapper_index(2)
 ))
 ibm_n(mapper)
-ibm_n(mapper, multi = 1)
+ibm_n(mapper, multi = TRUE)
 ibm_values(mapper)
-ibm_values(mapper, multi = 1)
+ibm_values(mapper, multi = TRUE)
+```
+
+```{r eval=TRUE}
+ibm_n(mapper, inla_f = TRUE)
+ibm_n(mapper, multi = TRUE, inla_f = TRUE)
+ibm_values(mapper, inla_f = TRUE)
+ibm_values(mapper, multi = TRUE, inla_f = TRUE)
 ```
 
 The default `ibm_inla_subset` method determines the inla subset by comparing

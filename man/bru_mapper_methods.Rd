@@ -53,10 +53,16 @@
 \alias{ibm_n_output.bru_mapper_scale}
 \alias{ibm_values.bru_mapper_scale}
 \alias{ibm_jacobian.bru_mapper_scale}
-\alias{ibm_offset.bru_mapper_scale}
 \alias{ibm_linear.bru_mapper_scale}
 \alias{ibm_eval.bru_mapper_scale}
 \alias{ibm_valid_input.bru_mapper_scale}
+\alias{ibm_n.bru_mapper_pipe}
+\alias{ibm_n_output.bru_mapper_pipe}
+\alias{ibm_values.bru_mapper_pipe}
+\alias{ibm_jacobian.bru_mapper_pipe}
+\alias{ibm_linear.bru_mapper_pipe}
+\alias{ibm_eval.bru_mapper_pipe}
+\alias{ibm_valid_input.bru_mapper_pipe}
 \alias{ibm_n.bru_mapper_multi}
 \alias{ibm_n_output.bru_mapper_multi}
 \alias{ibm_values.bru_mapper_multi}
@@ -179,21 +185,33 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 
 \method{ibm_eval}{bru_mapper_const}(mapper, input, state = NULL, ...)
 
-\method{ibm_n}{bru_mapper_scale}(mapper, ...)
+\method{ibm_n}{bru_mapper_scale}(mapper, ..., n_state = NULL)
 
-\method{ibm_n_output}{bru_mapper_scale}(mapper, input, ...)
+\method{ibm_n_output}{bru_mapper_scale}(mapper, input, ..., n_state = NULL)
 
-\method{ibm_values}{bru_mapper_scale}(mapper, ...)
+\method{ibm_values}{bru_mapper_scale}(mapper, ..., n_state = NULL)
 
 \method{ibm_jacobian}{bru_mapper_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
-
-ibm_offset.bru_mapper_scale(mapper, input, ..., sub_lin = NULL)
 
 \method{ibm_linear}{bru_mapper_scale}(mapper, input, state, ...)
 
 \method{ibm_eval}{bru_mapper_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
 
 \method{ibm_valid_input}{bru_mapper_scale}(mapper, input, ...)
+
+\method{ibm_n}{bru_mapper_pipe}(mapper, ..., state = NULL)
+
+\method{ibm_n_output}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
+
+\method{ibm_values}{bru_mapper_pipe}(mapper, ...)
+
+\method{ibm_jacobian}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
+
+\method{ibm_linear}{bru_mapper_pipe}(mapper, input, state, ...)
+
+\method{ibm_eval}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
+
+\method{ibm_valid_input}{bru_mapper_pipe}(mapper, input, ..., multi = FALSE)
 
 \method{ibm_n}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
@@ -496,6 +514,12 @@ are interpreted as no scaling.
 named entries \code{mapper} and \code{scale}. The contents of the \code{mapper}
 element is checked for validity for the submapper
 with \code{ibm_valid_input(mapper$mapper, input$mapper, ...)}
+}
+
+\itemize{
+\item \code{ibm_valid_input} for \code{bru_mapper_pipe} accepts a list with
+input entries, one for each pipe mapper. The contents of each element
+is checked for validity for the submapper.
 }
 
 \itemize{

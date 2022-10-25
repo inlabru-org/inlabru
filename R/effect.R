@@ -453,12 +453,15 @@ component.character <- function(object,
     component$replicate$mapper <- bru_mapper_index(1L)
     # Add scalable multi-mapper
     component[["mapper"]] <-
-      bru_mapper_scale(
-        bru_mapper_multi(list(
-          main = component$main$mapper,
-          group = component$group$mapper,
-          replicate = component$replicate$mapper
-        ))
+      bru_mapper_pipe(
+        list(
+          bru_mapper_multi(list(
+            main = component$main$mapper,
+            group = component$group$mapper,
+            replicate = component$replicate$mapper
+          )),
+          bru_mapper_scale()
+        )
       )
   } else {
     if (!is.null(copy)) {
@@ -775,12 +778,15 @@ add_mappers.component <- function(component, lhoods, ...) {
   )
   # Add scalable multi-mapper
   component[["mapper"]] <-
-    bru_mapper_scale(
-      bru_mapper_multi(list(
-        main = component$main$mapper,
-        group = component$group$mapper,
-        replicate = component$replicate$mapper
-      ))
+    bru_mapper_pipe(
+      list(
+        bru_mapper_multi(list(
+          main = component$main$mapper,
+          group = component$group$mapper,
+          replicate = component$replicate$mapper
+        )),
+        bru_mapper_scale()
+      )
     )
 
   fcall <- component$fcall
@@ -1635,17 +1641,17 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #' If `NULL`, return the component's map.
 #' @param ... Unused.
 #' @return An list of mapper input values, formatted for the full component mapper
-#' (of type `bru_mapper_scale`)
+#' (of type `bru_mapper_pipe`)
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname input_eval
 
 input_eval.component <- function(component,
                                  data,
                                  ...) {
-  stopifnot(inherits(component[["mapper"]], "bru_mapper_scale"))
+  stopifnot(inherits(component[["mapper"]], "bru_mapper_pipe"))
 
   # The names should be a subset of main, group, replicate
-  part_names <- names(component[["mapper"]][["mapper"]])
+  part_names <- names(component[["mapper"]][[1]])
   mapper_val <- list()
   for (part in part_names) {
     mapper_val[[part]] <-

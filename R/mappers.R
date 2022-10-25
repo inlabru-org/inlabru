@@ -348,7 +348,11 @@ ibm_n.default <- function(mapper, inla_f = FALSE, ...) {
   } else if (!is.null(mapper[["n"]])) {
     mapper[["n"]]
   } else {
-    stop("Default 'ibm_n()' method called but mapper doesn't have an 'n' element.")
+    stop(paste0(
+      "Default 'ibm_n()' method called but mapper doesn't have an 'n' element;",
+      "\nClass: ",
+      paste0(class(mapper), collapse = ", ")
+      ))
   }
 }
 
@@ -1123,26 +1127,70 @@ ibm_amatrix.bru_mapper_offset <- function(...) {
 #' The `input` format for the `ibm_eval` and `ibm_jacobian` methods is
 #' `list(mapper = input_to_the_inner_mapper, scale = scaling_weights)`
 #' @rdname bru_mapper
-bru_mapper_scale <- function(mapper, ...) {
-  bru_mapper_define(list(mapper = mapper,
-                         is_linear = ibm_is_linear(mapper)),
-                    new_class = "bru_mapper_scale")
+bru_mapper_scale <- function(mapper = NULL, ...) {
+  # TODO:
+  # 1. If mapper is NULL, implement a plain scaling mapper
+  # 2. First, if mapper is non-null, keep current behaviour
+  # 3. Later, if mapper is non-null, make a pipe mapper, that pipes
+  #   the mapper into a plain null-mapper scaling mapper
+  # 4. Remove the old non-null mapper support from the methods
+  if (is.null(mapper)) {
+    bru_mapper_define(list(mapper = mapper,
+                           is_linear = ibm_is_linear(mapper)),
+                      new_class = "bru_mapper_scale")
+  } else {
+    if (TRUE) {
+      bru_mapper_define(list(mapper = mapper,
+                             is_linear = ibm_is_linear(mapper)),
+                        new_class = "bru_mapper_scale")
+    } else {
+      bru_mapper_pipe(list(mapper, bru_mapper_scale()))
+    }
+  }
 }
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_n.bru_mapper_scale <- function(mapper, ...) {
-  ibm_n(mapper[["mapper"]], ...)
+ibm_n.bru_mapper_scale <- function(mapper, ..., n_state = NULL) {
+  if (is.null(mapper[["mapper"]])) {
+    # Output size depends on the state size
+    if (is.null(n_state)) {
+      NA_integer_
+    } else {
+      n_state
+    }
+  } else {
+    ibm_n(mapper[["mapper"]], ...)
+  }
 }
 #' @export
 #' @rdname bru_mapper_methods
-ibm_n_output.bru_mapper_scale <- function(mapper, input, ...) {
-  ibm_n_output(mapper[["mapper"]], input, ...)
+ibm_n_output.bru_mapper_scale <- function(mapper, input, ..., n_state = NULL) {
+  if (is.null(mapper[["mapper"]])) {
+    if (is.null(n_state)) {
+      # To allow scalar input weights, do not assume NROW(input) size
+      NA_integer_
+    } else {
+      n_state
+    }
+  } else {
+    ibm_n_output(mapper[["mapper"]], input, ...)
+  }
 }
 #' @export
 #' @rdname bru_mapper_methods
-ibm_values.bru_mapper_scale <- function(mapper, ...) {
-  ibm_values(mapper[["mapper"]], ...)
+ibm_values.bru_mapper_scale <- function(mapper, ..., n_state = NULL) {
+  if (is.null(mapper[["mapper"]])) {
+    n_state <- ibm_n(mapper, n_state = n_state)
+    if (is.na(n_state)) {
+      # Don't know how big the mapper will be
+      NULL
+    } else {
+      seq_len(n_state)
+    }
+  } else {
+    ibm_values(mapper[["mapper"]], ...)
+  }
 }
 
 #' @export
@@ -1151,7 +1199,21 @@ ibm_values.bru_mapper_scale <- function(mapper, ...) {
 #' are interpreted as no scaling.
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
-                                         sub_lin = NULL) {
+                                          sub_lin = NULL) {
+  if (is.null(mapper[["mapper"]])) {
+    stopifnot(!is.null(state))
+    if (is.null(input)) {
+      # No scaling
+      return(Matrix::Diagonal(n = length(state), 1.0))
+    } else {
+      scale <- as.vector(input)
+      ok <- !is.na(scale)
+      scale[!ok] <- 0
+      return(Matrix::Diagonal(n = length(state), scale))
+    }
+  }
+
+  # Behaviour for v2.6.0, non-null mapper
   if (is.null(sub_lin)) {
     A <- ibm_jacobian(mapper[["mapper"]],
                       input = input[["mapper"]],
@@ -1170,27 +1232,16 @@ ibm_jacobian.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
   }
 }
 
-#' @export
-#' @param sub_lin Internal, optional pre-computed sub-mapper information
-#' @rdname bru_mapper_methods
-ibm_offset.bru_mapper_scale <- function(mapper, input, ..., sub_lin = NULL) {
-  off <- ibm_eval(mapper[["mapper"]], input = input[["mapper"]], ...,
-                  lin = sub_lin)
-  if ((NROW(off) > 0) && !is.null(input[["scale"]])) {
-    scale <- as.vector(input[["scale"]])
-    ok <- !is.na(scale)
-    scale[!ok] <- 0
-    # Scale each row of A
-    scale * off
-  } else {
-    off
-  }
-}
 
 
 #' @export
 #' @rdname bru_mapper_methods
 ibm_linear.bru_mapper_scale <- function(mapper, input, state, ...) {
+  if (is.null(mapper[["mapper"]])) {
+    stop("bru_mapper_scale can only be linearised as part of a bru_mapper_pipe")
+  }
+
+  # Behaviour for v2.6.0, non-null mapper
   sub_lin <- ibm_linear(mapper[["mapper"]],
                         input[["mapper"]],
                         state = state, ...)
@@ -1207,6 +1258,15 @@ ibm_linear.bru_mapper_scale <- function(mapper, input, state, ...) {
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
                                       sub_lin = NULL) {
+  if (is.null(mapper[["mapper"]])) {
+    stopifnot(!is.null(state))
+    scale <- as.vector(input)
+    ok <- !is.na(scale)
+    scale[!ok] <- 0
+    return(scale * state)
+  }
+
+  # Behaviour for v2.6.0, non-null mapper
   if (!is.null(sub_lin)) {
     values <- ibm_eval(sub_lin, input = NULL, state = state)
   } else {
@@ -1233,7 +1293,124 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
 #' @export
 #' @rdname bru_mapper_methods
 ibm_valid_input.bru_mapper_scale <- function(mapper, input, ...) {
-  ibm_valid_input(mapper[["mapper"]], input[["mapper"]], ...)
+  rep(TRUE, NROW(input))
+}
+
+
+
+## _pipe ####
+
+#' @export
+#' @details For `bru_mapper_pipe()`, `mappers` is a list of mappers,
+#' where the evaluated output of each mapper is handed as the state to the next
+#' mapper..
+#' The `input` format for the `ibm_eval` and `ibm_jacobian` methods is
+#' a list of inputs, one for each mapper
+#' @rdname bru_mapper
+bru_mapper_pipe <- function(mappers, ...) {
+  is_linear_multi <- vapply(mappers, function(x) ibm_is_linear(x), TRUE)
+  n_multi <- vapply(mappers, function(x) as.integer(ibm_n(x)), 0L)
+  n <- ibm_n(mappers[[1]])
+  is_linear <- all(is_linear_multi)
+  bru_mapper_define(list(mappers = mappers,
+                         is_linear_multi,
+                         is_linear = is_linear,
+                         n_multi = n_multi,
+                         n = n),
+                    new_class = "bru_mapper_pipe")
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_n.bru_mapper_pipe <- function(mapper, ..., state = NULL) {
+  if (is.na(mapper[["mappers"]][[1]]) && is.null(state)) {
+    return(NA_integer_)
+  }
+  ibm_n(mapper[["mappers"]][[1]], ..., state = state)
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_n_output.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
+  final <- length(mapper[["mappers"]])
+  ibm_n_output(mapper[["mappers"]][[final]], input[[final]], state = state, ...,)
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_values.bru_mapper_pipe <- function(mapper, ...) {
+  ibm_values(mapper[["mappers"]][[1]], ...)
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_jacobian.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
+  state_k <- state
+  for (k in seq_along(mapper[["mappers"]])) {
+    # TODO: Introduce an "eval and Jacobian" method to avoid
+    # double-computing the evaluations when needing both.
+    A_k <- ibm_jacobian(mapper[["mappers"]][[k]],
+                      input = input[[k]],
+                      state = state_k, ...)
+    state_k <- ibm_eval(mapper[["mappers"]][[k]],
+                        input = input[[k]],
+                        state = state_k,
+                        ...)
+    if (k == 1) {
+      A <- A_k
+    } else {
+      A <- A_k %*% A
+    }
+  }
+  A
+}
+
+
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_linear.bru_mapper_pipe <- function(mapper, input, state, ...) {
+  bru_mapper_taylor(
+    offset = ibm_eval(mapper, input, state, ...),
+    jacobian = ibm_jacobian(mapper, input, state, ...),
+    state0 = state,
+    values_mapper = mapper
+  )
+}
+
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_eval.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
+  state_k <- state
+  for (k in seq_along(mapper[["mappers"]])) {
+    # TODO: Introduce an "eval and Jacobian" method...
+    state_k <- ibm_eval(mapper[["mappers"]][[k]],
+                        input = input[[k]],
+                        state = state_k,
+                        ...)
+  }
+  state_k
+}
+
+
+#' @details
+#' * `ibm_valid_input` for `bru_mapper_pipe` accepts a list with
+#' input entries, one for each pipe mapper. The contents of each element
+#' is checked for validity for the submapper.
+#' @export
+#' @rdname bru_mapper_methods
+ibm_valid_input.bru_mapper_pipe <- function(mapper, input, ..., multi = FALSE) {
+  valid <- lapply(
+    seq_len(mapper[["mappers"]]),
+    function(k) {
+      ibm_valid_input(mapper[["mappers"]][[k]], input[[k]], ...)
+    })
+
+  if (!multi) {
+    valid <- all(unlist(valid))
+  }
+  valid
 }
 
 
@@ -1655,13 +1832,17 @@ ibm_n_output.bru_mapper_collect <- function(mapper, input,
   if (is.matrix(input)) {
     n <- vapply(indexing,
                 function(x) {
-                  ibm_n_output(mapper[["mapper"]][[x]], input[, x], ...)
+                  as.integer(
+                    ibm_n_output(mapper[["mapper"]][[x]], input[, x], ...)
+                  )
                 },
                 0L)
   } else {
     n <- vapply(indexing,
                 function(x) {
-                  ibm_n_output(mapper[["mapper"]][[x]], input[[x]], ...)
+                  as.integer(
+                    ibm_n_output(mapper[["mapper"]][[x]], input[[x]], ...)
+                  )
                 },
                 0L)
   }
