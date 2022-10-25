@@ -94,6 +94,27 @@ bru_info_upgrade <- function(object,
       }
       object[["inlabru_version"]] <- "2.5.3.9003"
     }
+    if (utils::compareVersion("2.5.3.9005", old_ver) > 0) {
+      message("Upgrading bru_info to 2.5.3.9005")
+      # Make sure component$mapper is a bru_mapper_scale
+      for (k in seq_along(object[["model"]][["effects"]])) {
+        cmp <- object[["model"]][["effects"]][[k]]
+        # Convert offset mappers to const mappers
+        if (inherits(cmp$main$mapper, "bru_mapper_offset")) {
+          cmp$main$mapper <- bru_mapper_const()
+        }
+        cmp[["mapper"]] <-
+          bru_mapper_scale(
+            bru_mapper_multi(list(
+              main = cmp$main$mapper,
+              group = cmp$group$mapper,
+              replicate = cmp$replicate$mapper
+            ))
+          )
+        object[["model"]][["effects"]][[k]] <- cmp
+      }
+      object[["inlabru_version"]] <- "2.5.3.9005"
+    }
     object[["inlabru_version"]] <- new_version
   }
   object
@@ -972,6 +993,67 @@ like_list.bru_like <- function(..., envir = NULL) {
   object
 }
 
+#' Utility functions for bru likelihood objects
+#' @param x Object of `bru_like` or `bru_like_list` type
+#' @export
+#' @keywords internal
+#' @rdname bru_like_methods
+bru_like_inla_family <- function(x, ...) {
+  UseMethod("bru_like_inla_family")
+}
+#' @export
+#' @rdname bru_like_methods
+bru_like_inla_family.bru_like <- function(x, ...) {
+  x[["inla.family"]]
+}
+#' @export
+#' @rdname bru_like_methods
+bru_like_inla_family.bru_like_list <- function(x, ...) {
+  vapply(x, bru_like_inla_family, "")
+}
+
+#' @param control.family INLA `control.family` overrides
+#' @export
+#' @keywords internal
+#' @rdname bru_like_methods
+bru_like_control_family <- function(x, control.family = NULL, ...) {
+  UseMethod("bru_like_control_family")
+}
+#' @export
+#' @rdname bru_like_methods
+bru_like_control_family.bru_like <- function(x, control.family = NULL, ...) {
+  if (!is.null(control.family)) {
+    control.family
+  } else if (is.null(x[["control.family"]])) {
+    list()
+  } else {
+    x[["control.family"]]
+  }
+}
+#' @export
+#' @rdname bru_like_methods
+bru_like_control_family.bru_like_list <- function(x, control.family = NULL, ...) {
+  # Extract the control.family information for each likelihood
+  if (!is.null(control.family)) {
+    if (length(control.family) != length(x)) {
+      stop("control.family supplied as option, but format doesn't match the number of likelihoods")
+    }
+    like_has_cf <- vapply(
+      seq_along(x),
+      function(k) !is.null(x[[k]][["control.family"]]),
+      TRUE
+    )
+    if (any(like_has_cf)) {
+      warning("Global control.family option overrides settings in likelihood(s) ",
+              paste0(which(like_has_cf)),
+              collapse = ", "
+      )
+    }
+  } else {
+    control.family <- lapply(x, bru_like_control_family)
+  }
+  control.family
+}
 
 bru_like_expr <- function(lhood, components) {
   if (is.null(lhood[["expr"]])) {
@@ -1644,30 +1726,26 @@ lin_predictor <- function(lin, state) {
     lapply(
       lin,
       function(x) {
-        Ax_list <-
-          lapply(names(x$A), function(xx) {
-            x[["A"]][[xx]] %*% state[[xx]]
-          })
-        Ax <- do.call(cbind, Ax_list)
-        sumAx <- Matrix::rowSums(Ax)
-        as.vector(x$offset) + as.vector(sumAx)
+        as.vector(ibm_eval(x, state = state))
       }
     )
   )
 }
-nonlin_predictor <- function(model, lhoods, state, A) {
+nonlin_predictor <- function(param, state) {
   do.call(
     c,
     lapply(
-      seq_along(lhoods),
+      seq_along(param[["lhoods"]]),
       function(lh_idx) {
         as.vector(
           evaluate_model(
-            model = model,
-            data = lhoods[[lh_idx]][["data"]],
+            model = param[["model"]],
+            data = param[["lhoods"]][[lh_idx]][["data"]],
+            input = param[["input"]][[lh_idx]],
             state = list(state),
-            A = A[[lh_idx]],
-            predictor = bru_like_expr(lhoods[[lh_idx]], model[["effects"]]),
+            comp_simple = param[["comp_simple"]][[lh_idx]],
+            predictor = bru_like_expr(param[["lhoods"]][[lh_idx]],
+                                      param[["model"]][["effects"]]),
             format = "matrix"
           )
         )
@@ -1690,9 +1768,10 @@ line_search_optimisation_target <- function(x, param) {
   (x - 1)^2 * param[1] + 2 * (x - 1) * x^2 * param[2] + x^4 * param[3]
 }
 
-line_search_optimisation_target_exact <- function(x, param) {
+line_search_optimisation_target_exact <- function(x, param, nonlin_param) {
   state <- scale_state(param$state0, param$state1, x)
-  nonlin <- nonlin_predictor(param$model, param$lhoods, state, param$A)
+  nonlin <- nonlin_predictor(param = nonlin_param,
+                             state = state)
   sum((nonlin - param$lin)^2 * param$weights)
 }
 
@@ -1723,7 +1802,9 @@ bru_line_search <- function(model,
                             lin,
                             state0,
                             state,
-                            A,
+                            input,
+                            comp_lin,
+                            comp_simple,
                             weights = 1,
                             options) {
   if (length(options$bru_method$search) == 0) {
@@ -1761,10 +1842,18 @@ bru_line_search <- function(model,
   }
 
   # Initialise ----
+  nonlin_param <- list(
+    model = model,
+    lhoods = lhoods,
+    input = input,
+    comp_simple = comp_simple
+  )
+
   state1 <- state
   lin_pred0 <- lin_predictor(lin, state0)
   lin_pred1 <- lin_predictor(lin, state1)
-  nonlin_pred <- nonlin_predictor(model, lhoods, state1, A)
+  nonlin_pred <- nonlin_predictor(param = nonlin_param,
+                                  state = state1)
 
   if (length(lin_pred1) != length(nonlin_pred)) {
     warning(
@@ -1810,7 +1899,8 @@ bru_line_search <- function(model,
       }
       step_scaling <- step_scaling / fact
       state <- scale_state(state0, state1, step_scaling)
-      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      nonlin_pred <- nonlin_predictor(param = nonlin_param,
+                                      state = state)
       nonfin <- any(!is.finite(nonlin_pred))
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
 
@@ -1843,7 +1933,8 @@ bru_line_search <- function(model,
       step_scaling <- step_scaling * fact
       state <- scale_state(state0, state1, step_scaling)
 
-      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      nonlin_pred <- nonlin_predictor(param = nonlin_param,
+                                 state = state)
       norm1_prev <- norm1
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
@@ -1870,7 +1961,8 @@ bru_line_search <- function(model,
       expand_active <- expand_active - 1
       step_scaling <- step_scaling / fact
       state <- scale_state(state0, state1, step_scaling)
-      nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+      nonlin_pred <- nonlin_predictor(param = nonlin_param,
+                                      state = state)
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
       bru_log_message(
@@ -1910,19 +2002,18 @@ bru_line_search <- function(model,
           step_scaling * c(1 / fact^2, fact),
           param = list(
             lin = lin_pred1,
-            model = model,
-            lhoods = lhoods,
-            A = A,
             state0 = state0,
             state1 = state1,
             weights = weights
-          )
+          ),
+          nonlin_param = nonlin_param
         )
     }
 
     step_scaling_opt <- alpha$minimum
     state_opt <- scale_state(state0, state1, step_scaling_opt)
-    nonlin_pred_opt <- nonlin_predictor(model, lhoods, state_opt, A)
+    nonlin_pred_opt <- nonlin_predictor(param = nonlin_param,
+                                        state = state_opt)
     norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
 
     if (norm1_opt < norm1) {
@@ -1974,7 +2065,8 @@ bru_line_search <- function(model,
   if (step_scaling > maximum_step) {
     step_scaling <- maximum_step
     state <- scale_state(state0, state1, step_scaling)
-    nonlin_pred <- nonlin_predictor(model, lhoods, state, A)
+    nonlin_pred <- nonlin_predictor(param = nonlin_param,
+                                    state = state)
     norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
     bru_log_message(
@@ -2158,41 +2250,11 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   )
 
   # Extract the family of each likelihood
-  family <- vapply(
-    seq_along(lhoods),
-    function(k) lhoods[[k]]$inla.family,
-    "family"
-  )
+  family <- bru_like_inla_family(lhoods)
 
   # Extract the control.family information for each likelihood
-  if (!is.null(inla.options[["control.family"]])) {
-    if (length(inla.options[["control.family"]]) != length(lhoods)) {
-      stop("control.family supplied as option, but format doesn't match the number of likelihoods")
-    }
-    like_has_cf <- vapply(
-      seq_along(lhoods),
-      function(k) !is.null(lhoods[[k]][["control.family"]]),
-      TRUE
-    )
-    if (any(like_has_cf)) {
-      warning("Global control.family option overrides settings in likelihood(s) ",
-        paste0(which(like_has_cf)),
-        collapse = ", "
-      )
-    }
-  } else {
-    control.family <- lapply(
-      seq_along(lhoods),
-      function(k) {
-        if (is.null(lhoods[[k]][["control.family"]])) {
-          list()
-        } else {
-          lhoods[[k]][["control.family"]]
-        }
-      }
-    )
-    inla.options[["control.family"]] <- control.family
-  }
+  inla.options[["control.family"]] <-
+    bru_like_control_family(lhoods, inla.options[["control.family"]])
 
   initial <-
     if (is.null(initial)) {
@@ -2252,16 +2314,27 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     original_timings <- old.result[["bru_iinla"]][["timings"]]
   }
 
+  inputs <- evaluate_inputs(model, lhoods = lhoods, inla_f = TRUE)
+  comp_lin <- evaluate_comp_lin(model,
+                                input = inputs,
+                                state = states[[length(states)]],
+                                inla_f = TRUE)
+  comp_simple <- evaluate_comp_simple(model,
+                                      input = inputs,
+                                      inla_f = TRUE)
+  lin <- bru_compute_linearisation(
+    model,
+    lhoods = lhoods,
+    input = inputs,
+    state = states[[length(states)]],
+    comp_simple = comp_simple
+  )
+
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search) {
-    A <- evaluate_A(model, lhoods, inla_f = TRUE) # Input is inla::f-compatible
-    lin <- bru_compute_linearisation(
-      model,
-      lhoods = lhoods,
-      state = states[[length(states)]],
-      A = A
-    )
+    # Always compute linearisation (above)
   }
+
   # Initial stack
   idx <- evaluate_index(model, lhoods)
   stk <- bru_make_stack(lhoods, lin, idx)
@@ -2473,17 +2546,24 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             lin = lin,
             state0 = state0,
             state = state,
-            A = A,
+            input = inputs,
+            comp_lin = comp_lin,
+            comp_simple = comp_simple,
             weights = line_weights,
             options = options
           )
           state <- line_search[["state"]]
         }
+        comp_lin <- evaluate_comp_lin(model,
+                                      input = inputs,
+                                      state = state,
+                                      inla_f = TRUE)
         lin <- bru_compute_linearisation(
           model,
           lhoods = lhoods,
+          input = inputs,
           state = state,
-          A = A
+          comp_simple = comp_simple
         )
         stk <- bru_make_stack(lhoods, lin, idx)
 
@@ -2801,7 +2881,6 @@ print.summary_bru <- function(x, ...) {
 #'
 #' @export
 #' @param object An object obtained from a [bru()] or [lgcp()] call
-#' @param \dots arguments passed on to other methods or ignored
 
 summary_bru <- function(object, ...) {
   .Deprecated(new = "summary")
