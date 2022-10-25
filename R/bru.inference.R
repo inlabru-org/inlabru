@@ -539,8 +539,6 @@ eval_in_data_context <- function(input,
     } else {
       data <- as.data.frame(data)
     }
-  }
-  if (!is.null(response_data)) {
     enclos_envir <- new.env(parent = .envir)
     assign(".data.", response_data_orig, envir = enclos_envir)
     result <- try(
@@ -548,6 +546,7 @@ eval_in_data_context <- function(input,
       silent = TRUE
     )
   }
+
   if (is.null(response_data) || inherits(result, "try-error")) {
     enclos_envir <- new.env(parent = .envir)
     assign(".data.", data_orig, envir = enclos_envir)
