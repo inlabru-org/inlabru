@@ -83,7 +83,6 @@ Suggests:
     shiny,
     sn,
     spatstat.geom,
-    spatstat.core,
     spatstat.data,
     spatstat (>= 2.0-0),
     sphereplot,

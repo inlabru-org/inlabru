@@ -1,5 +1,9 @@
 # inlabru (development version)
 
+## Bug fixes
+
+* Remove unused `spatstat.core` dependency. Fixes #165
+
 # inlabru 2.6.0
 
 ## Features
