@@ -507,8 +507,8 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
   }
 }
 
-#' Evaluate expressions in the data context - TODO
-#' @param input `substitute(expr)` The expression can be response, E, Ntrials
+#' Evaluate expressions in the data context
+#' @param input An expression to be evaluated
 #' @param data Likelihood-specific data, as a `data.frame` or
 #' `SpatialPoints[DataFrame]`
 #'   object.
@@ -516,9 +516,10 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'  size/format for inputs and response variables, as a `data.frame` or
 #' `SpatialPoints[DataFrame]`
 #'   object.
-#' @param default options[[expr]] The expression can be E and Ntrials.
-#' See [bru_options_set()].
-#' @param .envir The environment
+#' @param default Value used if the expression is evaluated as NULL. Default
+#' NULL
+#' @param .envir The evaluation environment
+#' @return The result of expression evaluation
 #' @keywords internal
 
 eval_in_data_context <- function(input,
@@ -539,6 +540,8 @@ eval_in_data_context <- function(input,
     } else {
       data <- as.data.frame(data)
     }
+  }
+  if (!is.null(response_data)) {
     enclos_envir <- new.env(parent = .envir)
     assign(".data.", response_data_orig, envir = enclos_envir)
     result <- try(
@@ -546,7 +549,6 @@ eval_in_data_context <- function(input,
       silent = TRUE
     )
   }
-
   if (is.null(response_data) || inherits(result, "try-error")) {
     enclos_envir <- new.env(parent = .envir)
     assign(".data.", data_orig, envir = enclos_envir)
