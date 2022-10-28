@@ -4,6 +4,9 @@
 
 * Remove unused `spatstat.core` dependency. Fixes #165
 
+* Potential issue with model evaluation and linearisation
+  fixed in default `ibm_eval` method.
+
 # inlabru 2.6.0
 
 ## Features
