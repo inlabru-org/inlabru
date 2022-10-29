@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,7 +77,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_define</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, methods <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_define</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, methods <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
@@ -102,7 +102,9 @@
 <span></span>
 <span><span class="fu">bru_mapper_offset</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_scale</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_scale</span><span class="op">(</span>mapper <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_pipe</span><span class="op">(</span><span class="va">mappers</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bru_mapper_multi</span><span class="op">(</span><span class="va">mappers</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -133,7 +135,7 @@ For <code>bru_mapper_scale</code>, a mapper to be scaled.</p></dd>
 
 
 <dt>methods</dt>
-<dd><p>Optional <code>list</code> of named method definitions; See Details.</p></dd>
+<dd><p>Deprecated.</p></dd>
 
 
 <dt>mesh</dt>
@@ -231,14 +233,11 @@ default constructor <code>bru_mapper_define()</code> that can be used to define
 new mappers in user code.</p></li>
 </ul><ul><li><p><code>bru_mapper_define</code> adds the <code>new_class</code> and "bru_mapper" class
 names to the inheritance list for the input <code>mapper</code> object, unless the object
-already inherits from these.
-If provided, mapper method functions are added to an environment
-<code>.envir</code> in the object.  The generic methods look for these
-functions first,
-and otherwise call <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">UseMethod()</a></code>.  This is an alternative to using <code><a href="https://rdrr.io/r/base/S3method.html" class="external-link">.S3method()</a></code>
+already inherits from these.</p></li>
+</ul><p>To register mapper classes and methods in scripts, use <code><a href="https://rdrr.io/r/base/S3method.html" class="external-link">.S3method()</a></code>
 to register the methods, e.g.
-<code>.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)</code>.</p></li>
-</ul><ul><li><p><code>bru_mapper.default</code> calls <code>bru_mapper_define</code>, passing all
+<code>.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)</code>.</p>
+<ul><li><p><code>bru_mapper.default</code> calls <code>bru_mapper_define</code>, passing all
 arguments along. Mapper implementations should call <code>bru_mapper_define()</code>
 instead, and supply at least a <code>new_class</code> class name.
 Use of the <code>bru_mapper.default</code> will be deprecated from version 2.7.0.</p></li>
@@ -250,6 +249,11 @@ The affine mapper output is defined as
 <p>For <code>bru_mapper_scale()</code>, <code>mapper</code> is a mapper to be scaled.
 The <code>input</code> format for the <code>ibm_eval</code> and <code>ibm_jacobian</code> methods is
 <code>list(mapper = input_to_the_inner_mapper, scale = scaling_weights)</code></p>
+<p>For <code>bru_mapper_pipe()</code>, <code>mappers</code> is a list of mappers,
+where the evaluated output of each mapper is handed as the state to the next
+mapper..
+The <code>input</code> format for the <code>ibm_eval</code> and <code>ibm_jacobian</code> methods is
+a list of inputs, one for each mapper</p>
 <ul><li><p><code>bru_mapper_multi</code> constructs a kronecker product mapping</p></li>
 </ul><ul><li><p><code>bru_mapper_collect</code> constructs concatenated collection mapping</p></li>
 </ul><ul><li><p><code>bru_mapper_harmonics</code> constructs a mapper for <code>cos</code>/<code>sin</code> functions

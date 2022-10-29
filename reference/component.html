@@ -36,7 +36,7 @@ method, called inside bru()."><!-- mathjax --><script src="https://cdnjs.cloudfl
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -322,11 +322,16 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-in"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="component_list.html">component_list</a></span><span class="op">(</span><span class="op">~</span> <span class="fu">myLinearEffectOfX</span><span class="op">(</span>main <span class="op">=</span> <span class="va">x</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cmp</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Label:	myLinearEffectOfX</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Main:	input 'x',	type 'linear'</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	~. + f(myLinearEffectOfX, model = BRU_myLinearEffectOfX_main_model)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Main:	type 'linear', input 'x'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Map: Not yet initialised</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ~ . + f(myLinearEffectOfX, model =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       BRU_myLinearEffectOfX_main_model)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Label:	Intercept</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Main:	input '1',	type 'linear'</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	~. + f(Intercept, model = BRU_Intercept_main_model)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Main:	type 'linear', input '1'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Map: Not yet initialised</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ~ . + f(Intercept, model = BRU_Intercept_main_model)</span>
 <span class="r-in"><span><span class="co"># Equivalent shortcuts:</span></span></span>
 <span class="r-in"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="component_list.html">component_list</a></span><span class="op">(</span><span class="op">~</span> <span class="fu">myLinearEffectOfX</span><span class="op">(</span><span class="va">x</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="component_list.html">component_list</a></span><span class="op">(</span><span class="op">~</span> <span class="fu">myLinearEffectOfX</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -334,8 +339,11 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-in"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu">component</span><span class="op">(</span><span class="st">"myLinearEffectOfX"</span>, main <span class="op">=</span> <span class="va">x</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cmp</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Label:	myLinearEffectOfX</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Main:	input 'x',	type 'linear'</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	~. + f(myLinearEffectOfX, model = BRU_myLinearEffectOfX_main_model)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Main:	type 'linear', input 'x'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Map: Not yet initialised</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ~ . + f(myLinearEffectOfX, model =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       BRU_myLinearEffectOfX_main_model)</span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span>quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span></span></span>
@@ -357,8 +365,11 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cmp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Label:	eff</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Main:	input '~-1 + x:z',	type 'fixed'</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	~. + f(eff, model = BRU_eff_main_model, hyper = BRU_eff_main_fixed_hyper)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Main:	type 'fixed', input '~-1 + x:z'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Map: Not yet initialised</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ~ . + f(eff, model = BRU_eff_main_model, hyper =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       BRU_eff_main_fixed_hyper)</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

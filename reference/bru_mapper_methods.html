@@ -18,7 +18,7 @@ ibm_n() and ibm_values() methods also need to be provided."><!-- mathjax --><scr
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,7 +89,7 @@ available (see Details). Otherwise the
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre><code>ibm_n(mapper, inla_f = FALSE, ...)
 
-ibm_n_output(mapper, input, inla_f = FALSE, ...)
+ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 ibm_values(mapper, inla_f = FALSE, ...)
 
@@ -103,6 +103,10 @@ ibm_linear(mapper, input, state = NULL, ...)
 
 ibm_eval(mapper, input, state = NULL, ...)
 
+ibm_names(mapper)
+
+ibm_names(mapper) &lt;- value
+
 ibm_inla_subset(mapper, ...)
 
 ibm_valid_input(mapper, input, inla_f = FALSE, ...)
@@ -111,7 +115,7 @@ ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 ibm_n(mapper, inla_f = FALSE, ...)
 
 # S3 method for default
-ibm_n_output(mapper, input, inla_f = FALSE, ...)
+ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 # S3 method for default
 ibm_values(mapper, inla_f = FALSE, ...)
@@ -132,6 +136,9 @@ ibm_linear(mapper, input, state, ...)
 
 # S3 method for default
 ibm_eval(mapper, input, state = NULL, ...)
+
+# S3 method for default
+ibm_names(mapper, ...)
 
 # S3 method for default
 ibm_inla_subset(mapper, ...)
@@ -170,7 +177,7 @@ ibm_jacobian(mapper, input, ...)
 ibm_n(mapper, inla_f = FALSE, multi = FALSE, ...)
 
 # S3 method for bru_mapper_taylor
-ibm_n_output(mapper, input, inla_f = FALSE, ...)
+ibm_n_output(mapper, input, ...)
 
 # S3 method for bru_mapper_taylor
 ibm_values(mapper, inla_f = FALSE, multi = FALSE, ...)
@@ -221,18 +228,16 @@ ibm_jacobian(mapper, input, ...)
 ibm_eval(mapper, input, state = NULL, ...)
 
 # S3 method for bru_mapper_scale
-ibm_n(mapper, ...)
+ibm_n(mapper, ..., state = NULL, n_state = NULL)
 
 # S3 method for bru_mapper_scale
-ibm_n_output(mapper, input, ...)
+ibm_n_output(mapper, input, state = NULL, ..., n_state = NULL)
 
 # S3 method for bru_mapper_scale
-ibm_values(mapper, ...)
+ibm_values(mapper, ..., state = NULL, n_state = NULL)
 
 # S3 method for bru_mapper_scale
 ibm_jacobian(mapper, input, state = NULL, ..., sub_lin = NULL)
-
-ibm_offset.bru_mapper_scale(mapper, input, ..., sub_lin = NULL)
 
 # S3 method for bru_mapper_scale
 ibm_linear(mapper, input, state, ...)
@@ -242,6 +247,27 @@ ibm_eval(mapper, input, state = NULL, ..., sub_lin = NULL)
 
 # S3 method for bru_mapper_scale
 ibm_valid_input(mapper, input, ...)
+
+# S3 method for bru_mapper_pipe
+ibm_n(mapper, ..., state = NULL)
+
+# S3 method for bru_mapper_pipe
+ibm_n_output(mapper, input, state = NULL, ...)
+
+# S3 method for bru_mapper_pipe
+ibm_values(mapper, ...)
+
+# S3 method for bru_mapper_pipe
+ibm_jacobian(mapper, input, state = NULL, ...)
+
+# S3 method for bru_mapper_pipe
+ibm_linear(mapper, input, state, ...)
+
+# S3 method for bru_mapper_pipe
+ibm_eval(mapper, input, state = NULL, ...)
+
+# S3 method for bru_mapper_pipe
+ibm_valid_input(mapper, input, ..., multi = FALSE)
 
 # S3 method for bru_mapper_multi
 ibm_n(mapper, inla_f = FALSE, multi = FALSE, ...)
@@ -279,16 +305,16 @@ ibm_valid_input(mapper, input, inla_f = FALSE, multi = FALSE, ...)
 [(x, i, drop = TRUE)
 
 # S3 method for bru_mapper_multi
-names(x)
+ibm_names(mapper)
 
 # S3 method for bru_mapper_multi
-names(x) &lt;- value
+ibm_names(mapper) &lt;- value
 
 # S3 method for bru_mapper_collect
 ibm_n(mapper, inla_f = FALSE, multi = FALSE, ...)
 
 # S3 method for bru_mapper_collect
-ibm_n_output(mapper, input, inla_f = FALSE, multi = FALSE, ...)
+ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, multi = FALSE, ...)
 
 # S3 method for bru_mapper_collect
 ibm_values(mapper, inla_f = FALSE, multi = FALSE, ...)
@@ -328,10 +354,10 @@ ibm_valid_input(mapper, input, inla_f = FALSE, multi = FALSE, ...)
 [(x, i, drop = TRUE)
 
 # S3 method for bru_mapper_collect
-names(x)
+ibm_names(mapper)
 
 # S3 method for bru_mapper_collect
-names(x) &lt;- value
+ibm_names(mapper) &lt;- value
 
 # S3 method for bru_mapper_harmonics
 ibm_n(mapper, inla_f = FALSE, ...)
@@ -370,9 +396,19 @@ as "bym2", which can be handled by <code>bru_mapper_collect</code>.</p></dd>
 of length <code>ibm_n(mapper, inla_f = FALSE)</code></p></dd>
 
 
+<dt>value</dt>
+<dd><p>a character vector of up to the same length as the number
+of mappers in the multi-mapper x</p></dd>
+
+
 <dt>multi</dt>
 <dd><p>logical;
 If <code>TRUE</code> (or positive), recurse one level into sub-mappers</p></dd>
+
+
+<dt>n_state</dt>
+<dd><p>integer giving the length of the state vector for mappers
+that have state dependent output size.</p></dd>
 
 
 <dt>sub_lin</dt>
@@ -401,10 +437,6 @@ For <code>[.bru_mapper_collect</code>, whether to extract an individual mapper w
 <code>i</code> identifies a single element. If <code>FALSE</code>, a list of sub-mappers is
 returned (suitable e.g. for creating a new <code>bru_mapper_collect</code> object).
 Default: <code>TRUE</code></p></dd>
-
-
-<dt>value</dt>
-<dd><p>a character vector of up to the same length as x</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -467,6 +499,9 @@ Implementations must return a vector of length <code>ibm_n_output(...)</code>.
 The <code>input</code> contents must
 be in a format accepted by <code>ibm_jacobian(...)</code>
 for the mapper.</p></li>
+</ul><ul><li><p><code>ibm_names</code> Generic.
+Implementations must return a character vector of sub-mapper names, or <code>NULL</code>.
+Intended for providing information about multi-mappers and mapper collections.</p></li>
 </ul><ul><li><p><code>ibm_inla_subset</code> Generic.
 Implementations must return a logical vector of <code>TRUE/FALSE</code> for
 the subset such that, given the full A matrix and values output,
@@ -521,23 +556,26 @@ are interpreted as no scaling.</p>
 named entries <code>mapper</code> and <code>scale</code>. The contents of the <code>mapper</code>
 element is checked for validity for the submapper
 with <code>ibm_valid_input(mapper$mapper, input$mapper, ...)</code></p></li>
+</ul><ul><li><p><code>ibm_valid_input</code> for <code>bru_mapper_pipe</code> accepts a list with
+input entries, one for each pipe mapper. The contents of each element
+is checked for validity for the submapper.</p></li>
 </ul><ul><li><p><code>ibm_jacobian</code> for <code>bru_mapper_multi</code> accepts a list with
 named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see <code>names.bru_mapper_multi()</code>.
+The names must match the sub-mappers, see <code>ibm_names.bru_mapper_multi()</code>.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns.</p></li>
 </ul><ul><li><p><code>ibm_valid_input</code> for <code>bru_mapper_multi</code> accepts a list with
 named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see <code>names.bru_mapper_multi()</code>.
+The names must match the sub-mappers, see <code>ibm_names.bru_mapper_multi()</code>.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns.</p></li>
 </ul><ul><li><p><code>ibm_jacobian</code> for <code>bru_mapper_collect</code> accepts a list with
 named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see <code>names.bru_mapper_collect()</code>.
+The names must match the sub-mappers, see <code>ibm_names.bru_mapper_collect()</code>.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix
@@ -546,7 +584,7 @@ the mapper definition, the input format should instead match that of
 the first, non-hidden, sub-mapper.</p></li>
 </ul><ul><li><p><code>ibm_valid_input</code> for <code>bru_mapper_collect</code> accepts a list with
 named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see <code>names.bru_mapper_collect()</code>.
+The names must match the sub-mappers, see <code>ibm_names.bru_mapper_collect()</code>.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix
