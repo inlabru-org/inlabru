@@ -26,25 +26,31 @@ Retrieve, add, and/or print log messages"><!-- mathjax --><script src="https://c
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Devel: Customised model components with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/component.html">Defining model components</a>
-    <a class="dropdown-item" href="../articles/linearapprox.html">Nonlinear model approximation</a>
-    <a class="dropdown-item" href="../articles/method.html">Iterative linearised INLA method</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Prediction scores</a>
-    <a class="dropdown-item" href="../articles/web/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp.html">LGCPs - An example in two dimensions</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
-    <a class="dropdown-item" href="../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    <a class="dropdown-item" href="../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
-    <a class="dropdown-item" href="../articles/web/publications.html">Publications</a>
-    <a class="dropdown-item" href="../articles/web/random_fields.html">Random Fields in One Dimension</a>
-    <a class="dropdown-item" href="../articles/web/random_fields_2d.html">Random Fields in 2D</a>
-    <a class="dropdown-item" href="../articles/web/svc.html">Spatially Varying Coefficient Models with inlabru</a>
-    <a class="dropdown-item" href="../articles/website_examples.html">Examples on the inlabru website</a>
+    <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
+    <a class="dropdown-item" href="../articles/random_fields_1d.html">Random field models in 1D</a>
+    <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
+    <a class="dropdown-item" href="../articles/publications.html">Publications</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
+    <a class="dropdown-item" href="../articles/1d_lgcp.Rmd">LGCPs - An example in one dimension</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp.Rmd">LGCPs - An example in two dimensions</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_covariates.html">LGCPs - Spatial covariates</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
+    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
+    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
+    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
+    <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
+    <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
+    <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
+    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
 <li class="nav-item">
@@ -196,21 +202,21 @@ activation state</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] Inf</span>
 <span class="r-in"><span><span class="fu">code_runner</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu">bru_log_get</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2022-10-29 16:53:00: inlabru loaded 2022-10-29 16:53:00: Clear override options 2022-10-29 16:53:05: iinla: Iteration 1 [max:1] 2022-10-29 16:53:06: iinla: Iteration 1 [max:10] 2022-10-29 16:53:06: iinla: |lin1-lin0| = 729.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -1.814e-14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 5.324e-14 2022-10-29 16:53:06: iinla: Iteration 2 [max:10] 2022-10-29 16:53:07: iinla: Step rescaling: 162%, Expand 2022-10-29 16:53:07: iinla: Step rescaling: 100%, Overstep 2022-10-29 16:53:07: iinla: |lin1-lin0| = 2.979e-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -1.47e-14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 4.135e-14 2022-10-29 16:53:07: iinla: Max deviation from previous: 0.316% of SD [stop if: &lt;1%] 2022-10-29 16:53:07: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2022-10-29 16:53:07: iinla: Iteration 3 [max:10] 2022-10-29 16:53:08: iinla: Iteration 1 [max:10] 2022-10-29 16:53:08: iinla: Step rescaling: 61.8%, Contract 2022-10-29 16:53:08: iinla: Step rescaling: 38.2%, Contract 2022-10-29 16:53:08: iinla: Step rescaling: 27%, Optimisation 2022-10-29 16:53:08: iinla: |lin1-lin0| = 514.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -294.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 156.7 2022-10-29 16:53:08: iinla: Step rescaling: 27% 2022-10-29 16:53:08: iinla: Iteration 2 [max:10] 2022-10-29 16:53:09: iinla: Step rescaling: 99.5%, Optimisation 2022-10-29 16:53:09: iinla: |lin1-lin0| = 333.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -1.892</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 17.7 2022-10-29 16:53:09: iinla: Step rescaling: 99.5% 2022-10-29 16:53:09: iinla: Max deviation from previous: 68200% of SD [stop if: &lt;1%] 2022-10-29 16:53:09: iinla: Iteration 3 [max:10] 2022-10-29 16:53:09: iinla: Step rescaling: 162%, Expand 2022-10-29 16:53:09: iinla: Step rescaling: 100%, Overstep 2022-10-29 16:53:09: iinla: Step rescaling: 101.8%, Optimisation 2022-10-29 16:53:09: iinla: |lin1-lin0| = 17.79</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -7.175e-05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 0.03062 2022-10-29 16:53:09: iinla: Step rescaling: 102% 2022-10-29 16:53:10: iinla: Max deviation from previous: 809% of SD [stop if: &lt;1%] 2022-10-29 16:53:10: iinla: Iteration 4 [max:10] 2022-10-29 16:53:10: iinla: Step rescaling: 162%, Expand 2022-10-29 16:53:10: iinla: Step rescaling: 100%, Overstep 2022-10-29 16:53:10: iinla: Step rescaling: 100%, Optimisation 2022-10-29 16:53:10: iinla: |lin1-lin0| = 0.03063</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 5.095e-10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 2.504e-07 2022-10-29 16:53:10: iinla: Max deviation from previous: 14.3% of SD [stop if: &lt;1%] 2022-10-29 16:53:10: iinla: Iteration 5 [max:10] 2022-10-29 16:53:11: iinla: Step rescaling: 162%, Expand 2022-10-29 16:53:11: iinla: Step rescaling: 100%, Overstep 2022-10-29 16:53:11: iinla: Step rescaling: 100%, Optimisation 2022-10-29 16:53:11: iinla: |lin1-lin0| = 2.972e-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 9.434e-14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 5.349e-13 2022-10-29 16:53:11: iinla: Max deviation from previous: 0.0886% of SD [stop if: &lt;1%] 2022-10-29 16:53:11: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2022-10-29 16:53:11: iinla: Iteration 6 [max:10] 2022-10-29 16:53:14: Test message</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2022-10-29 21:59:21: inlabru loaded 2022-10-29 21:59:21: Clear override options 2022-10-29 21:59:27: iinla: Iteration 1 [max:1] 2022-10-29 21:59:28: iinla: Iteration 1 [max:10] 2022-10-29 21:59:29: iinla: |lin1-lin0| = 305.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 1.681e-14 2022-10-29 21:59:29: iinla: Iteration 2 [max:10] 2022-10-29 21:59:29: iinla: Step rescaling: 162%, Expand 2022-10-29 21:59:29: iinla: Step rescaling: 100%, Overstep 2022-10-29 21:59:29: iinla: |lin1-lin0| = 1.094e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -1.5e-15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 2.698e-14 2022-10-29 21:59:30: iinla: Max deviation from previous: 0.465% of SD [stop if: &lt;1%] 2022-10-29 21:59:30: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2022-10-29 21:59:30: iinla: Iteration 3 [max:10] 2022-10-29 21:59:30: iinla: Iteration 1 [max:10] 2022-10-29 21:59:31: iinla: Step rescaling: 61.8%, Contract 2022-10-29 21:59:31: iinla: Step rescaling: 38.2%, Contract 2022-10-29 21:59:31: iinla: Step rescaling: 27.15%, Optimisation 2022-10-29 21:59:31: iinla: |lin1-lin0| = 482.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -274.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 148 2022-10-29 21:59:31: iinla: Step rescaling: 27.2% 2022-10-29 21:59:31: iinla: Iteration 2 [max:10] 2022-10-29 21:59:32: iinla: Step rescaling: 99.55%, Optimisation 2022-10-29 21:59:32: iinla: |lin1-lin0| = 311.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -1.655</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 16 2022-10-29 21:59:32: iinla: Step rescaling: 99.6% 2022-10-29 21:59:32: iinla: Max deviation from previous: 64200% of SD [stop if: &lt;1%] 2022-10-29 21:59:32: iinla: Iteration 3 [max:10] 2022-10-29 21:59:33: iinla: Step rescaling: 162%, Expand 2022-10-29 21:59:33: iinla: Step rescaling: 100%, Overstep 2022-10-29 21:59:33: iinla: Step rescaling: 101.8%, Optimisation 2022-10-29 21:59:33: iinla: |lin1-lin0| = 16.09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -5.009e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 0.02485 2022-10-29 21:59:33: iinla: Step rescaling: 102% 2022-10-29 21:59:33: iinla: Max deviation from previous: 733% of SD [stop if: &lt;1%] 2022-10-29 21:59:33: iinla: Iteration 4 [max:10] 2022-10-29 21:59:33: iinla: Step rescaling: 162%, Expand 2022-10-29 21:59:33: iinla: Step rescaling: 100%, Overstep 2022-10-29 21:59:33: iinla: Step rescaling: 100%, Optimisation 2022-10-29 21:59:33: iinla: |lin1-lin0| = 0.02485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 3.342e-10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 1.774e-07 2022-10-29 21:59:33: iinla: Max deviation from previous: 12.6% of SD [stop if: &lt;1%] 2022-10-29 21:59:33: iinla: Iteration 5 [max:10] 2022-10-29 21:59:34: iinla: Step rescaling: 162%, Expand 2022-10-29 21:59:34: iinla: Step rescaling: 100%, Overstep 2022-10-29 21:59:34: iinla: Step rescaling: 100%, Optimisation 2022-10-29 21:59:34: iinla: |lin1-lin0| = 2.752e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -1.178e-14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 4.373e-13 2022-10-29 21:59:34: iinla: Max deviation from previous: 0.126% of SD [stop if: &lt;1%] 2022-10-29 21:59:34: iinla: Convergence criterion met, running final INLA integration with known theta mode. 2022-10-29 21:59:34: iinla: Iteration 6 [max:10] 2022-10-29 21:59:38: Test message</span>
 <span class="r-in"><span><span class="fu">bru_log_active</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] Inf</span>
 </code></pre></div>

@@ -56,25 +56,31 @@ lgcp function.
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Devel: Customised model components with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/component.html">Defining model components</a>
-    <a class="dropdown-item" href="../articles/linearapprox.html">Nonlinear model approximation</a>
-    <a class="dropdown-item" href="../articles/method.html">Iterative linearised INLA method</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Prediction scores</a>
-    <a class="dropdown-item" href="../articles/web/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp.html">LGCPs - An example in two dimensions</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
-    <a class="dropdown-item" href="../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    <a class="dropdown-item" href="../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
-    <a class="dropdown-item" href="../articles/web/publications.html">Publications</a>
-    <a class="dropdown-item" href="../articles/web/random_fields.html">Random Fields in One Dimension</a>
-    <a class="dropdown-item" href="../articles/web/random_fields_2d.html">Random Fields in 2D</a>
-    <a class="dropdown-item" href="../articles/web/svc.html">Spatially Varying Coefficient Models with inlabru</a>
-    <a class="dropdown-item" href="../articles/website_examples.html">Examples on the inlabru website</a>
+    <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
+    <a class="dropdown-item" href="../articles/random_fields_1d.html">Random field models in 1D</a>
+    <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
+    <a class="dropdown-item" href="../articles/publications.html">Publications</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
+    <a class="dropdown-item" href="../articles/1d_lgcp.Rmd">LGCPs - An example in one dimension</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp.Rmd">LGCPs - An example in two dimensions</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_covariates.html">LGCPs - Spatial covariates</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
+    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
+    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
+    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
+    <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
+    <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
+    <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
+    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
 <li class="nav-item">
@@ -196,11 +202,11 @@ adds additional information stored in the <code>bru_info</code> field.</p>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>   Implicit latent intercept component specification is deprecated since version 2.1.14.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>   Use explicit notation '+ Intercept(1)' instead (or '+1' for '+ Intercept(1)').</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.939742 0.02498975   1.889781 1.939743   1.989703 1.939743</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.954242 0.01768214   4.918893 4.954242   4.989590 4.954243</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         2.016856 0.06064246   1.895605 2.016857   2.138100 2.016858</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.032961 0.04288048   4.947224 5.032962   5.118691 5.032963</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    kld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.021322e-06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 1.007273e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.035045e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 1.032655e-06</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span>multicore <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -214,11 +220,11 @@ adds additional information stored in the <code>bru_info</code> field.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.939742 0.02498834   1.889783 1.939743   1.989700 1.939743</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.954242 0.01768114   4.918895 4.954242   4.989588 4.954243</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         2.016856 0.06063693   1.895615 2.016857   2.138090 2.016858</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.032961 0.04287657   4.947231 5.032962   5.118684 5.032963</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    kld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.010893e-06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 9.969726e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         1.015208e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 1.012857e-06</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># An important addition to the INLA methodology is bru's ability to use</span></span></span>
 <span class="r-in"><span><span class="co"># non-linear predictors. Such a predictor can be formulated via like()'s</span></span></span>
@@ -241,11 +247,11 @@ adds additional information stored in the <code>bru_info</code> field.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean          sd 0.025quant 0.5quant 0.975quant     mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> z         2.006831 0.005518441   1.995813 2.006831   2.017848 2.006831</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.022537 0.028560626   4.965434 5.022537   5.079637 5.022538</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> z         2.001895 0.005856704   1.990200 2.001895   2.013590 2.001895</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.977853 0.030217821   4.917437 4.977854   5.038267 4.977855</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    kld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> z         7.553533e-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 1.002358e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> z         7.826622e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 1.005118e-06</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

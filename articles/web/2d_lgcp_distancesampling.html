@@ -38,28 +38,34 @@
 <li class="nav-item">
   <a class="nav-link" href="../../reference/index.html">Reference</a>
 </li>
-<li class="active nav-item dropdown">
+<li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../../articles/bru_mapper.html">Devel: Customised model components with the bru_mapper system</a>
-    <a class="dropdown-item" href="../../articles/component.html">Defining model components</a>
-    <a class="dropdown-item" href="../../articles/linearapprox.html">Nonlinear model approximation</a>
-    <a class="dropdown-item" href="../../articles/method.html">Iterative linearised INLA method</a>
-    <a class="dropdown-item" href="../../articles/prediction_scores.html">Prediction scores</a>
-    <a class="dropdown-item" href="../../articles/web/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../../articles/web/2d_lgcp.html">LGCPs - An example in two dimensions</a>
-    <a class="dropdown-item" href="../../articles/web/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../../articles/web/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple Likelihoods</a>
-    <a class="dropdown-item" href="../../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
-    <a class="dropdown-item" href="../../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    <a class="dropdown-item" href="../../articles/web/devel_flow.html">Devel: Model evaluation flowchart</a>
-    <a class="dropdown-item" href="../../articles/web/publications.html">Publications</a>
-    <a class="dropdown-item" href="../../articles/web/random_fields.html">Random Fields in One Dimension</a>
-    <a class="dropdown-item" href="../../articles/web/random_fields_2d.html">Random Fields in 2D</a>
-    <a class="dropdown-item" href="../../articles/web/svc.html">Spatially Varying Coefficient Models with inlabru</a>
-    <a class="dropdown-item" href="../../articles/website_examples.html">Examples on the inlabru website</a>
+    <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
+    <a class="dropdown-item" href="../../articles/random_fields_1d.html">Random field models in 1D</a>
+    <a class="dropdown-item" href="../../articles/random_fields_2d.html">Spatial random field models in 2D</a>
+    <a class="dropdown-item" href="../../articles/publications.html">Publications</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
+    <a class="dropdown-item" href="../../articles/1d_lgcp.Rmd">LGCPs - An example in one dimension</a>
+    <a class="dropdown-item" href="../../articles/2d_lgcp.Rmd">LGCPs - An example in two dimensions</a>
+    <a class="dropdown-item" href="../../articles/2d_lgcp_covariates.html">LGCPs - Spatial covariates</a>
+    <a class="dropdown-item" href="../../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
+    <a class="dropdown-item" href="../../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
+    <a class="dropdown-item" href="../../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
+    <a class="dropdown-item" href="../../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
+    <a class="dropdown-item" href="../../articles/component.html">Defining a model component</a>
+    <a class="dropdown-item" href="../../articles/svc.html">Spatially varying coefficient models</a>
+    <a class="dropdown-item" href="../../articles/prediction_scores.html">Computing posterior prediction scores</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
+    <a class="dropdown-item" href="../../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
+    <a class="dropdown-item" href="../../articles/method.html">The iterative linearised inlabru method</a>
+    <a class="dropdown-item" href="../../articles/linearapprox.html">A nonlinear model approximation example</a>
+    <a class="dropdown-item" href="../../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="../../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
 <li class="nav-item">
@@ -262,9 +268,9 @@ usual:</p>
 <span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 265.7098 61.70982 172.5313 255.5242 400.6856 255.5242        6.170982</span></span>
+<span><span class="co">#&gt; 1 250.1394 49.93604 162.5187 244.0284 365.5458 244.0284        4.993604</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      4.195627</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      4.075741</span></span></code></pre></div>
 <p>and including the randomness about the expected number. In this case,
 it turns out that you need lots of posterior samples, e.g. 2,000 to
 smooth out the Monte Carlo error in the posterior, and this takes a
@@ -350,10 +356,10 @@ model:</p>
 <span><span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span></span>
-<span><span class="co">#&gt;      mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 326.385 96.74282 172.6072 330.4931 531.8365 330.4931        9.674282</span></span>
+<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 335.5821 81.97415 194.4805 333.5889 480.1522 333.5889        8.197415</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      8.275457</span></span>
+<span><span class="co">#&gt; 1      9.902153</span></span>
 <span></span>
 <span><span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -380,8 +386,8 @@ model:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   Model       DIC Delta.DIC</span></span>
-<span><span class="co">#&gt; 1   fit -801.9345  0.000000</span></span>
-<span><span class="co">#&gt; 2  fit1 -799.8567  2.077758</span></span>
+<span><span class="co">#&gt; 1   fit -801.9344  0.000000</span></span>
+<span><span class="co">#&gt; 2  fit1 -799.8567  2.077657</span></span>
 <span></span>
 <span><span class="co"># Look at the goodness-of-fit of the two models in the distance dimension</span></span>
 <span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span></span>
