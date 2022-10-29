@@ -115,9 +115,10 @@ test_that("Component construction: terra", {
   )
   inp <- input_eval(cmp, data = data)
   comp_lin <- comp_lin_eval(cmp,
-                            input = inp,
-                            state = list(something = 2),
-                            inla_f = FALSE)
+    input = inp,
+    state = list(something = 2),
+    inla_f = FALSE
+  )
   val <- evaluate_effect_single_state(
     comp_lin,
     state = list(something = 2)
@@ -131,9 +132,11 @@ test_that("Component construction: terra", {
     lhoods = list(list(data = data))
   )
   inp <- input_eval(cmp, data = data)
-  comp_lin <- comp_lin_eval(cmp, input = inp,
-                            state = list(something = 2),
-                            inla_f = FALSE)
+  comp_lin <- comp_lin_eval(cmp,
+    input = inp,
+    state = list(something = 2),
+    inla_f = FALSE
+  )
   val <- evaluate_effect_single_state(
     comp_lin,
     state = list(something = 2)
@@ -147,9 +150,11 @@ test_that("Component construction: terra", {
     lhoods = list(list(data = data))
   )
   inp <- input_eval(cmp, data = data)
-  comp_lin <- comp_lin_eval(cmp, input = inp,
-                            state = list(something = 2),
-                            inla_f = FALSE)
+  comp_lin <- comp_lin_eval(cmp,
+    input = inp,
+    state = list(something = 2),
+    inla_f = FALSE
+  )
   val <- evaluate_effect_single_state(
     comp_lin,
     state = list(something = 2)
@@ -163,9 +168,11 @@ test_that("Component construction: terra", {
     lhoods = list(list(data = data))
   )
   inp <- input_eval(cmp, data = data)
-  comp_lin <- comp_lin_eval(cmp, input = inp,
-                            state = list(something = 2),
-                            inla_f = FALSE)
+  comp_lin <- comp_lin_eval(cmp,
+    input = inp,
+    state = list(something = 2),
+    inla_f = FALSE
+  )
   val <- evaluate_effect_single_state(
     comp_lin,
     state = list(something = 2)

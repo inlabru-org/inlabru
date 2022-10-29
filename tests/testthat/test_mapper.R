@@ -15,8 +15,10 @@ test_that("Pipe mapper", {
     )
 
   expect_equal(ibm_n(mapper), 12)
-  expect_equal(ibm_n(mapper, multi = TRUE),
-               list(space = 4, time = 3))
+  expect_equal(
+    ibm_n(mapper, multi = TRUE),
+    list(space = 4, time = 3)
+  )
   expect_equal(ibm_values(mapper), seq_len(12))
   expect_equal(
     as.data.frame(ibm_values(mapper, multi = TRUE)),
@@ -75,22 +77,22 @@ test_that("Multi-mapper bru input", {
   data <- cbind(df_data, y = 1:3)
 
   cmp1 <- y ~ indep(list(space = space, time = time),
-                    model = "ar1", mapper = mapper
+    model = "ar1", mapper = mapper
   ) - 1
   fit1 <- bru(cmp1, family = "gaussian", data = data)
 
   cmp2 <- y ~ indep(list(space, time),
-                    model = "ar1", mapper = mapper
+    model = "ar1", mapper = mapper
   ) - 1
   fit2 <- bru(cmp2, family = "gaussian", data = data)
 
   cmp3 <- y ~ indep(data.frame(time = time, space = space),
-                    model = "ar1", mapper = mapper
+    model = "ar1", mapper = mapper
   ) - 1
   fit3 <- bru(cmp3, family = "gaussian", data = data)
 
   cmp4 <- y ~ indep(cbind(space, time),
-                    model = "ar1", mapper = mapper
+    model = "ar1", mapper = mapper
   ) - 1
   fit4 <- bru(cmp4, family = "gaussian", data = data)
 

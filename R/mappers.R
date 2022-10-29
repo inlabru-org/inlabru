@@ -216,8 +216,10 @@ summary.bru_mapper <- function(object, ...,
                                initial = prefix,
                                depth = 1) {
   summary_object <- paste0(initial, ibm_shortname(object))
-  class(summary_object) <- c("summary_bru_mapper",
-                             class(summary_object))
+  class(summary_object) <- c(
+    "summary_bru_mapper",
+    class(summary_object)
+  )
   summary_object
 }
 
@@ -239,17 +241,24 @@ summary.bru_mapper_multi <- function(object, ...,
       summary_object,
       "(",
       paste0(
-        vapply(names(object[["mappers"]]),
-               function(nm) paste0(nm,
-                                   " = ",
-                                   summary(
-                                     object[["mappers"]][[nm]],
-                                     prefix = sub_prefix,
-                                     initial = "",
-                                     depth = depth - 1)
-                                   ),
-               ""),
-        collapse = ", "),
+        vapply(
+          names(object[["mappers"]]),
+          function(nm) {
+            paste0(
+              nm,
+              " = ",
+              summary(
+                object[["mappers"]][[nm]],
+                prefix = sub_prefix,
+                initial = "",
+                depth = depth - 1
+              )
+            )
+          },
+          ""
+        ),
+        collapse = ", "
+      ),
       ")"
     )
   class(summary_object) <- c("summary_bru_mapper", class(summary_object))
@@ -274,14 +283,17 @@ summary.bru_mapper_pipe <- function(object, ...,
       summary_object,
       " = ",
       paste0(
-        vapply(object[["mappers"]],
-               function(x) {
-                 summary(x,
-                         prefix = sub_prefix,
-                         initial = "",
-                         depth = depth - 1)
-               },
-               ""),
+        vapply(
+          object[["mappers"]],
+          function(x) {
+            summary(x,
+              prefix = sub_prefix,
+              initial = "",
+              depth = depth - 1
+            )
+          },
+          ""
+        ),
         collapse = paste0(" -> ")
       )
     )
@@ -307,29 +319,33 @@ summary.bru_mapper_collect <- function(object, ...,
       summary_object,
       "(",
       paste0(
-        vapply(seq_along(object[["mappers"]]),
-               function(k) {
-                 nm <- names(object[["mappers"]])[k]
-                 if (is.null(nm)) {
-                   nm <- as.character(k)
-                 }
-                 paste0(nm,
-                        " = ",
-                        summary(
-                          object[["mappers"]][[k]],
-                          prefix = sub_prefix,
-                          initial = "",
-                          depth = depth - 1
-                        ),
-                        if (object[["hidden"]] && (k > 1)) {
-                          "(hidden)"
-                        } else {
-                          NULL
-                        }
-                 )
-               },
-               ""),
-        collapse = ", "),
+        vapply(
+          seq_along(object[["mappers"]]),
+          function(k) {
+            nm <- names(object[["mappers"]])[k]
+            if (is.null(nm)) {
+              nm <- as.character(k)
+            }
+            paste0(
+              nm,
+              " = ",
+              summary(
+                object[["mappers"]][[k]],
+                prefix = sub_prefix,
+                initial = "",
+                depth = depth - 1
+              ),
+              if (object[["hidden"]] && (k > 1)) {
+                "(hidden)"
+              } else {
+                NULL
+              }
+            )
+          },
+          ""
+        ),
+        collapse = ", "
+      ),
       ")"
     )
   class(summary_object) <- c("summary_bru_mapper", class(summary_object))
@@ -371,13 +387,15 @@ bru_mapper_define <- function(mapper,
                               methods = NULL) {
   if (!is.null(methods)) {
     txt <-
-      c("In packages with Suggests: inlabru, add method information, e.g.:",
+      c(
+        "In packages with Suggests: inlabru, add method information, e.g.:",
         "  #' @rawNamespace if (getRversion() >= '3.6.0') {",
         "  #'   S3method(inlabru::bru_get_mapper, inla_rspde)",
         "  #'   S3method(inlabru::ibm_n, bru_mapper_inla_rspde)",
         "  #'   S3method(inlabru::ibm_values, bru_mapper_inla_rspde)",
         "  #'   S3method(inlabru::ibm_jacobian, bru_mapper_inla_rspde)",
-        "  #' }")
+        "  #' }"
+      )
     lifecycle::deprecate_warn(
       when = "2.6.0.9000",
       what = "bru_mapper_define(methods)",
@@ -413,7 +431,8 @@ bru_mapper.default <- function(...) {
   lifecycle::deprecate_warn(
     "2.6.0.9000",
     "bru_mapper.default()",
-    "bru_mapper_define()")
+    "bru_mapper_define()"
+  )
   bru_mapper_define(...)
 }
 
@@ -457,7 +476,7 @@ ibm_n.default <- function(mapper, inla_f = FALSE, ...) {
       "Default 'ibm_n()' method called but mapper doesn't have an 'n' element;",
       "\nClass: ",
       paste0(class(mapper), collapse = ", ")
-      ))
+    ))
   }
 }
 
@@ -802,13 +821,16 @@ bru_mapper_taylor <- function(offset, jacobian, state0, ...,
   if (is.null(state0)) {
     n_state <- 0
   } else if (is.list(state0)) {
-      n_state <- vapply(state0,
-                        function(x) {
-                          ifelse(is.null(x),
-                                 0L,
-                                 length(x))
-                        },
-                        0L)
+    n_state <- vapply(
+      state0,
+      function(x) {
+        ifelse(is.null(x),
+          0L,
+          length(x)
+        )
+      },
+      0L
+    )
   } else {
     n_state <- length(state0)
   }
@@ -816,13 +838,16 @@ bru_mapper_taylor <- function(offset, jacobian, state0, ...,
   if (is.null(jacobian)) {
     n_jacobian <- 0
   } else if (is.list(jacobian)) {
-    n_jacobian <- vapply(jacobian,
-                         function(x) {
-                           ifelse(is.null(x),
-                                  0L,
-                                  ncol(x))
-                         },
-                         0L)
+    n_jacobian <- vapply(
+      jacobian,
+      function(x) {
+        ifelse(is.null(x),
+          0L,
+          ncol(x)
+        )
+      },
+      0L
+    )
   } else {
     n_jacobian <- ncol(jacobian)
   }
@@ -849,22 +874,26 @@ bru_mapper_taylor <- function(offset, jacobian, state0, ...,
         idx <- sum(n_multi[seq_len(k - 1)])
         idx <- idx + seq_len(n_multi[k]) - 1
         state0[idx]
-      })
+      }
+    )
     n_state <- n_multi
   }
   if (!is.null(state0)) {
     stopifnot(all(n_jacobian == n_state))
   }
 
-  bru_mapper_define(list(offset = offset,
-                         jacobian = jacobian,
-                         state0 = state0,
-                         n_multi = n_multi,
-                         n = sum(n_multi),
-                         noutput = length(offset),
-                         values_mapper = NULL),
-                    # TODO: maybe allow values_mapper
-                    new_class = "bru_mapper_taylor")
+  bru_mapper_define(list(
+    offset = offset,
+    jacobian = jacobian,
+    state0 = state0,
+    n_multi = n_multi,
+    n = sum(n_multi),
+    noutput = length(offset),
+    values_mapper = NULL
+  ),
+  # TODO: maybe allow values_mapper
+  new_class = "bru_mapper_taylor"
+  )
 }
 
 #' @export
@@ -932,8 +961,8 @@ ibm_jacobian.bru_mapper_taylor <- function(mapper, ..., multi = FALSE) {
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_taylor <- function(mapper, input = NULL, state = NULL, ...) {
   if (is.null(mapper[["jacobian"]]) ||
-      (mapper[["n"]] == 0) ||
-      (is.null(state) && is.null(mapper[["state0"]]))) {
+    (mapper[["n"]] == 0) ||
+    (is.null(state) && is.null(mapper[["state0"]]))) {
     mapper[["offset"]]
   } else if (is.list(mapper[["jacobian"]])) {
     stopifnot(is.null(state) || is.list(state))
@@ -1206,7 +1235,7 @@ ibm_eval.bru_mapper_const <- function(mapper, input, state = NULL, ...) {
 #' @export
 #' @rdname bru_mapper
 bru_mapper_offset <- function(...) {
-#  .Deprecated("bru_mapper_const")
+  #  .Deprecated("bru_mapper_const")
   bru_mapper_define(bru_mapper_const(), new_class = "bru_mapper_offset")
 }
 
@@ -1247,14 +1276,20 @@ bru_mapper_scale <- function(mapper = NULL, ...) {
   #   the mapper into a plain null-mapper scaling mapper
   # 4. Remove the old non-null mapper support from the methods
   if (is.null(mapper)) {
-    bru_mapper_define(list(mapper = mapper,
-                           is_linear = ibm_is_linear(mapper)),
-                      new_class = "bru_mapper_scale")
+    bru_mapper_define(list(
+      mapper = mapper,
+      is_linear = ibm_is_linear(mapper)
+    ),
+    new_class = "bru_mapper_scale"
+    )
   } else {
     if (TRUE) {
-      bru_mapper_define(list(mapper = mapper,
-                             is_linear = ibm_is_linear(mapper)),
-                        new_class = "bru_mapper_scale")
+      bru_mapper_define(list(
+        mapper = mapper,
+        is_linear = ibm_is_linear(mapper)
+      ),
+      new_class = "bru_mapper_scale"
+      )
     } else {
       bru_mapper_pipe(list(mapper, bru_mapper_scale()))
     }
@@ -1336,8 +1371,9 @@ ibm_jacobian.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
   # Behaviour for v2.6.0, non-null mapper
   if (is.null(sub_lin)) {
     A <- ibm_jacobian(mapper[["mapper"]],
-                      input = input[["mapper"]],
-                      state = state, ...)
+      input = input[["mapper"]],
+      state = state, ...
+    )
   } else {
     A <- sub_lin$jacobian
   }
@@ -1371,8 +1407,9 @@ ibm_linear.bru_mapper_scale <- function(mapper, input, state, ...) {
 
   # Behaviour for v2.6.0, non-null mapper
   sub_lin <- ibm_linear(mapper[["mapper"]],
-                        input[["mapper"]],
-                        state = state, ...)
+    input[["mapper"]],
+    state = state, ...
+  )
   bru_mapper_taylor(
     offset = ibm_eval(mapper, input, state, ..., sub_lin = sub_lin),
     jacobian = ibm_jacobian(mapper, input, state, ..., sub_lin = sub_lin),
@@ -1402,8 +1439,9 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
     values <- ibm_eval(sub_lin, input = NULL, state = state)
   } else {
     values <- ibm_eval(mapper[["mapper"]],
-                       input = input[["mapper"]],
-                       state = state, ...)
+      input = input[["mapper"]],
+      state = state, ...
+    )
   }
   if ((NROW(values) > 0) && !is.null(input[["scale"]])) {
     scale <- as.vector(input[["scale"]])
@@ -1449,12 +1487,15 @@ bru_mapper_pipe <- function(mappers, ...) {
     warning("Either all or none of the pipe sub-mappers should be named.", immediate. = TRUE)
     names(mappers) <- as.character(seq_along(mappers))
   }
-  bru_mapper_define(list(mappers = mappers,
-                         is_linear_multi,
-                         is_linear = is_linear,
-                         n_multi = n_multi,
-                         n = n),
-                    new_class = "bru_mapper_pipe")
+  bru_mapper_define(list(
+    mappers = mappers,
+    is_linear_multi,
+    is_linear = is_linear,
+    n_multi = n_multi,
+    n = n
+  ),
+  new_class = "bru_mapper_pipe"
+  )
 }
 
 #' @export
@@ -1470,7 +1511,7 @@ ibm_n.bru_mapper_pipe <- function(mapper, ..., state = NULL) {
 #' @rdname bru_mapper_methods
 ibm_n_output.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
   final <- length(mapper[["mappers"]])
-  ibm_n_output(mapper[["mappers"]][[final]], input[[final]], state = state, ...,)
+  ibm_n_output(mapper[["mappers"]][[final]], input[[final]], state = state, ..., )
 }
 
 #' @export
@@ -1493,12 +1534,14 @@ ibm_jacobian.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
     # TODO: Introduce an "eval and Jacobian" method to avoid
     # double-computing the evaluations when needing both.
     A_k <- ibm_jacobian(mapper[["mappers"]][[k]],
-                      input = input[[k]],
-                      state = state_k, ...)
+      input = input[[k]],
+      state = state_k, ...
+    )
     state_k <- ibm_eval(mapper[["mappers"]][[k]],
-                        input = input[[k]],
-                        state = state_k,
-                        ...)
+      input = input[[k]],
+      state = state_k,
+      ...
+    )
     if (k == first) {
       A <- A_k
     } else {
@@ -1529,9 +1572,10 @@ ibm_eval.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
   for (k in seq_along(mapper[["mappers"]])) {
     # TODO: Introduce an "eval and Jacobian" method...
     state_k <- ibm_eval(mapper[["mappers"]][[k]],
-                        input = input[[k]],
-                        state = state_k,
-                        ...)
+      input = input[[k]],
+      state = state_k,
+      ...
+    )
   }
   state_k
 }
@@ -1548,7 +1592,8 @@ ibm_valid_input.bru_mapper_pipe <- function(mapper, input, ..., multi = FALSE) {
     seq_along(mapper[["mappers"]]),
     function(k) {
       ibm_valid_input(mapper[["mappers"]][[k]], input[[k]], ...)
-    })
+    }
+  )
 
   if (!multi) {
     valid <- all(unlist(valid))
@@ -1701,10 +1746,10 @@ ibm_jacobian.bru_mapper_multi <- function(mapper,
         names(mapper[["mappers"]]),
         function(x) {
           ibm_jacobian(mapper[["mappers"]][[x]],
-                       input = input[[x]],
-                       state = NULL,
-                       inla_f = inla_f,
-                       multi = FALSE
+            input = input[[x]],
+            state = NULL,
+            inla_f = inla_f,
+            multi = FALSE
           )
         }
       )
@@ -1737,13 +1782,16 @@ ibm_linear.bru_mapper_multi <- function(mapper, input, state,
                                         inla_f = FALSE,
                                         ...) {
   input <- bru_mapper_multi_prepare_input(mapper, input)
-  A <- ibm_jacobian(mapper, input, state = state,
-                    inla_f = inla_f, multi = FALSE,
-                    ...)
+  A <- ibm_jacobian(mapper, input,
+    state = state,
+    inla_f = inla_f, multi = FALSE,
+    ...
+  )
   bru_mapper_taylor(
     offset = ibm_eval(mapper, input, state,
-                      inla_f = inla_f, multi = FALSE, ...,
-                      pre_A = A),
+      inla_f = inla_f, multi = FALSE, ...,
+      pre_A = A
+    ),
     jacobian = A,
     state0 = state,
     values_mapper = mapper
@@ -1759,15 +1807,18 @@ ibm_eval.bru_mapper_multi <- function(mapper, input, state = NULL,
   if ((ibm_n(mapper) == 0) || is.null(state)) {
     # Handle the case when the mapper is a _const mapper
     val <- ibm_eval(mapper[["mappers"]][[1]],
-                    input = input[[1]],
-                    state = NULL,
-                    inla_f = inla_f,
-                    multi = FALSE,
-                    ...)
+      input = input[[1]],
+      state = NULL,
+      inla_f = inla_f,
+      multi = FALSE,
+      ...
+    )
   } else {
     if (is.null(pre_A)) {
-      pre_A <- ibm_jacobian(mapper, input = input, state = state,
-                            inla_f = inla_f, multi = FALSE, ...)
+      pre_A <- ibm_jacobian(mapper,
+        input = input, state = state,
+        inla_f = inla_f, multi = FALSE, ...
+      )
     }
     val <- pre_A %*% state
   }
@@ -1815,9 +1866,9 @@ ibm_valid_input.bru_mapper_multi <- function(mapper, input,
         indexing,
         function(x) {
           ibm_valid_input(mapper[["mappers"]][[x]],
-                          input = input[, x],
-                          inla_f = inla_f,
-                          multi = FALSE
+            input = input[, x],
+            inla_f = inla_f,
+            multi = FALSE
           )
         }
       )
@@ -1827,9 +1878,9 @@ ibm_valid_input.bru_mapper_multi <- function(mapper, input,
         indexing,
         function(x) {
           ibm_valid_input(mapper[["mappers"]][[x]],
-                          input = input[[x]],
-                          inla_f = inla_f,
-                          multi = FALSE
+            input = input[[x]],
+            inla_f = inla_f,
+            multi = FALSE
           )
         }
       )
@@ -1974,21 +2025,25 @@ ibm_n_output.bru_mapper_collect <- function(mapper, input,
 
   indexing <- bm_collect_indexing(mapper, input)
   if (is.matrix(input)) {
-    n <- vapply(indexing,
-                function(x) {
-                  as.integer(
-                    ibm_n_output(mapper[["mapper"]][[x]], input[, x], ...)
-                  )
-                },
-                0L)
+    n <- vapply(
+      indexing,
+      function(x) {
+        as.integer(
+          ibm_n_output(mapper[["mapper"]][[x]], input[, x], ...)
+        )
+      },
+      0L
+    )
   } else {
-    n <- vapply(indexing,
-                function(x) {
-                  as.integer(
-                    ibm_n_output(mapper[["mapper"]][[x]], input[[x]], ...)
-                  )
-                },
-                0L)
+    n <- vapply(
+      indexing,
+      function(x) {
+        as.integer(
+          ibm_n_output(mapper[["mapper"]][[x]], input[[x]], ...)
+        )
+      },
+      0L
+    )
   }
 
   if (!multi) {
@@ -2029,8 +2084,8 @@ ibm_is_linear.bru_mapper_collect <- function(mapper,
 
 
 bm_collect_sub_lin <- function(mapper, input, state,
-                                       inla_f = FALSE,
-                                       ...) {
+                               inla_f = FALSE,
+                               ...) {
   if (mapper[["hidden"]] && inla_f) {
     input <- list(input)
   }
@@ -2084,9 +2139,9 @@ bm_collect_sub_lin <- function(mapper, input, state,
 #' @export
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_collect <- function(mapper, input, state = NULL,
-                                           inla_f = FALSE, multi = FALSE,
-                                           ...,
-                                           sub_lin = NULL) {
+                                            inla_f = FALSE, multi = FALSE,
+                                            ...,
+                                            sub_lin = NULL) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_collect_sub_lin(mapper, input, state, inla_f = inla_f)
   }
@@ -2137,15 +2192,18 @@ ibm_linear.bru_mapper_collect <- function(mapper, input, state,
   }
   sub_lin <-
     bm_collect_sub_lin(mapper, input, state,
-                       inla_f = FALSE,
-                       ...)
+      inla_f = FALSE,
+      ...
+    )
   A <- ibm_jacobian(mapper, input, state,
-                    inla_f = FALSE, multi = FALSE, ...,
-                    sub_lin = sub_lin)
+    inla_f = FALSE, multi = FALSE, ...,
+    sub_lin = sub_lin
+  )
   bru_mapper_taylor(
     offset = ibm_eval(mapper, input, state,
-                      inla_f = FALSE, multi = FALSE, ...,
-                      sub_lin = sub_lin),
+      inla_f = FALSE, multi = FALSE, ...,
+      sub_lin = sub_lin
+    ),
     jacobian = A,
     state0 = state,
     values_mapper = mapper
@@ -2180,8 +2238,8 @@ ibm_valid_input.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, mu
         indexing,
         function(x) {
           ibm_valid_input(mapper[["mappers"]][[x]],
-                          input = input[, x],
-                          multi = FALSE
+            input = input[, x],
+            multi = FALSE
           )
         }
       )
@@ -2191,8 +2249,8 @@ ibm_valid_input.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, mu
         indexing,
         function(x) {
           ibm_valid_input(mapper[["mappers"]][[x]],
-                          input = input[[x]],
-                          multi = FALSE
+            input = input[[x]],
+            multi = FALSE
           )
         }
       )

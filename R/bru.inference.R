@@ -701,17 +701,20 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       domain_expr <- paste0(
         "list(",
         paste0(
-          vapply(domain_names, function(x) {
-            if (identical(x, "coordinates")) {
-              paste0(x, " = ", x, "(.data.)")
-            } else {
-              paste0(x, " = ", x)
-            }
-          },
-          ""),
+          vapply(
+            domain_names, function(x) {
+              if (identical(x, "coordinates")) {
+                paste0(x, " = ", x, "(.data.)")
+              } else {
+                paste0(x, " = ", x)
+              }
+            },
+            ""
+          ),
           collapse = ", "
         ),
-        ")")
+        ")"
+      )
       response_expr <- parse(text = domain_expr)
     }
     response <- tryCatch(
@@ -897,7 +900,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   } else {
     allow_combine <-
       if (!is.null(response_data) ||
-          (is.list(data) && !is.data.frame(data))) {
+        (is.list(data) && !is.data.frame(data))) {
         TRUE
       } else if (is.null(allow_combine)) {
         FALSE
@@ -905,8 +908,10 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
         allow_combine
       }
 
-    response_data <- data.frame(BRU_response = response,
-                                BRU_E = E, BRU_Ntrials = Ntrials)
+    response_data <- data.frame(
+      BRU_response = response,
+      BRU_E = E, BRU_Ntrials = Ntrials
+    )
     response <- "BRU_response"
   }
 
@@ -1056,8 +1061,8 @@ bru_like_control_family.bru_like_list <- function(x, control.family = NULL, ...)
     )
     if (any(like_has_cf)) {
       warning("Global control.family option overrides settings in likelihood(s) ",
-              paste0(which(like_has_cf)),
-              collapse = ", "
+        paste0(which(like_has_cf)),
+        collapse = ", "
       )
     }
   } else {
@@ -1755,8 +1760,10 @@ nonlin_predictor <- function(param, state) {
             input = param[["input"]][[lh_idx]],
             state = list(state),
             comp_simple = param[["comp_simple"]][[lh_idx]],
-            predictor = bru_like_expr(param[["lhoods"]][[lh_idx]],
-                                      param[["model"]][["effects"]]),
+            predictor = bru_like_expr(
+              param[["lhoods"]][[lh_idx]],
+              param[["model"]][["effects"]]
+            ),
             format = "matrix"
           )
         )
@@ -1781,8 +1788,10 @@ line_search_optimisation_target <- function(x, param) {
 
 line_search_optimisation_target_exact <- function(x, param, nonlin_param) {
   state <- scale_state(param$state0, param$state1, x)
-  nonlin <- nonlin_predictor(param = nonlin_param,
-                             state = state)
+  nonlin <- nonlin_predictor(
+    param = nonlin_param,
+    state = state
+  )
   sum((nonlin - param$lin)^2 * param$weights)
 }
 
@@ -1863,8 +1872,10 @@ bru_line_search <- function(model,
   state1 <- state
   lin_pred0 <- lin_predictor(lin, state0)
   lin_pred1 <- lin_predictor(lin, state1)
-  nonlin_pred <- nonlin_predictor(param = nonlin_param,
-                                  state = state1)
+  nonlin_pred <- nonlin_predictor(
+    param = nonlin_param,
+    state = state1
+  )
 
   if (length(lin_pred1) != length(nonlin_pred)) {
     warning(
@@ -1910,8 +1921,10 @@ bru_line_search <- function(model,
       }
       step_scaling <- step_scaling / fact
       state <- scale_state(state0, state1, step_scaling)
-      nonlin_pred <- nonlin_predictor(param = nonlin_param,
-                                      state = state)
+      nonlin_pred <- nonlin_predictor(
+        param = nonlin_param,
+        state = state
+      )
       nonfin <- any(!is.finite(nonlin_pred))
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
 
@@ -1944,8 +1957,10 @@ bru_line_search <- function(model,
       step_scaling <- step_scaling * fact
       state <- scale_state(state0, state1, step_scaling)
 
-      nonlin_pred <- nonlin_predictor(param = nonlin_param,
-                                 state = state)
+      nonlin_pred <- nonlin_predictor(
+        param = nonlin_param,
+        state = state
+      )
       norm1_prev <- norm1
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
@@ -1972,8 +1987,10 @@ bru_line_search <- function(model,
       expand_active <- expand_active - 1
       step_scaling <- step_scaling / fact
       state <- scale_state(state0, state1, step_scaling)
-      nonlin_pred <- nonlin_predictor(param = nonlin_param,
-                                      state = state)
+      nonlin_pred <- nonlin_predictor(
+        param = nonlin_param,
+        state = state
+      )
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
       bru_log_message(
@@ -2023,8 +2040,10 @@ bru_line_search <- function(model,
 
     step_scaling_opt <- alpha$minimum
     state_opt <- scale_state(state0, state1, step_scaling_opt)
-    nonlin_pred_opt <- nonlin_predictor(param = nonlin_param,
-                                        state = state_opt)
+    nonlin_pred_opt <- nonlin_predictor(
+      param = nonlin_param,
+      state = state_opt
+    )
     norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
 
     if (norm1_opt < norm1) {
@@ -2076,8 +2095,10 @@ bru_line_search <- function(model,
   if (step_scaling > maximum_step) {
     step_scaling <- maximum_step
     state <- scale_state(state0, state1, step_scaling)
-    nonlin_pred <- nonlin_predictor(param = nonlin_param,
-                                    state = state)
+    nonlin_pred <- nonlin_predictor(
+      param = nonlin_param,
+      state = state
+    )
     norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
     bru_log_message(
@@ -2327,12 +2348,14 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
   inputs <- evaluate_inputs(model, lhoods = lhoods, inla_f = TRUE)
   comp_lin <- evaluate_comp_lin(model,
-                                input = inputs,
-                                state = states[[length(states)]],
-                                inla_f = TRUE)
+    input = inputs,
+    state = states[[length(states)]],
+    inla_f = TRUE
+  )
   comp_simple <- evaluate_comp_simple(model,
-                                      input = inputs,
-                                      inla_f = TRUE)
+    input = inputs,
+    inla_f = TRUE
+  )
   lin <- bru_compute_linearisation(
     model,
     lhoods = lhoods,
@@ -2566,9 +2589,10 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           state <- line_search[["state"]]
         }
         comp_lin <- evaluate_comp_lin(model,
-                                      input = inputs,
-                                      state = state,
-                                      inla_f = TRUE)
+          input = inputs,
+          state = state,
+          inla_f = TRUE
+        )
         lin <- bru_compute_linearisation(
           model,
           lhoods = lhoods,
