@@ -1551,14 +1551,17 @@ comp_lin_eval.component <- function(component,
 comp_lin_eval.component_list <- function(components, input, state, ...) {
   # Note: Make sure the list element names carry over!
   mappers <-
-    lapply(components,
-           function(x) {
-             label <- x[["label"]]
-             comp_lin_eval(x,
-                           input = input[[label]],
-                           state = state[[label]],
-                           ...)
-           })
+    lapply(
+      components,
+      function(x) {
+        label <- x[["label"]]
+        comp_lin_eval(x,
+          input = input[[label]],
+          state = state[[label]],
+          ...
+        )
+      }
+    )
 
   class(mappers) <- c("comp_simple_list", class(mappers))
   mappers
