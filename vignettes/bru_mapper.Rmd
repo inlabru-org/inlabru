@@ -349,7 +349,7 @@ label to the front of the S3 `class()` information of an existing mapper,
 to obtain a class to override some of the standard `ibm_*` method
 implementations.  More commonly, one would instead start with a basic `list()`,
 that might _contain_ an existing mapper object, and then add methods that
-know how to use that information.  in all these cases, the `bru_mapper_define()`
+know how to use that information.  In all these cases, the `bru_mapper_define()`
 method should be used to properly set the class information:
 ```{r, eval=FALSE}
 bru_mapper_define(mapper, new_class)
