@@ -94,6 +94,7 @@ bru_info_upgrade <- function(object,
       }
       object[["inlabru_version"]] <- "2.5.3.9003"
     }
+
     if (utils::compareVersion("2.5.3.9005", old_ver) > 0) {
       message("Upgrading bru_info to 2.5.3.9005")
       # Make sure component$mapper is a bru_mapper_scale
@@ -115,6 +116,28 @@ bru_info_upgrade <- function(object,
       }
       object[["inlabru_version"]] <- "2.5.3.9005"
     }
+
+    if (utils::compareVersion("2.6.0.9000", old_ver) > 0) {
+      message("Upgrading bru_info to 2.6.0.9000")
+      # Make sure component$mapper is a bru_mapper_pipe
+      for (k in seq_along(object[["model"]][["effects"]])) {
+        cmp <- object[["model"]][["effects"]][[k]]
+        cmp[["mapper"]] <-
+          bru_mapper_pipe(
+            list(
+              mapper = bru_mapper_multi(list(
+                main = cmp$main$mapper,
+                group = cmp$group$mapper,
+                replicate = cmp$replicate$mapper
+              )),
+              scale = bru_mapper_scale()
+            )
+          )
+        object[["model"]][["effects"]][[k]] <- cmp
+      }
+      object[["inlabru_version"]] <- "2.6.0.9000"
+    }
+
     object[["inlabru_version"]] <- new_version
   }
   object

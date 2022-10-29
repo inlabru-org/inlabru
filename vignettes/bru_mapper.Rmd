@@ -85,17 +85,48 @@ indexed by $j$.
 
 #### linear
 
-The `linear` mapper defines a mapper from a length-1 state vector. This is used to
+The `linear` mapper defines a mapper from a length 1 state vector. This is used to
 define ordinary "fixed" covariate effects, linear in both the covariate and in the state
 variable; $\eta(u)_j = z_j u$, where $u$ is the state, and $z$ is the
 input covariate vector.
 
 #### index
 
-The `index` mapper defines a direct mapping between a length-`n` state
+The `index(n)` mapper defines a direct mapping from a length `n` state
 variable. This is used for structured and unstructured "random effect" component
 effects; $\eta(u)_j = u_{z_j}$, where $u$ is the state vector, and $z$ is the
 input index vector.
+
+#### factor
+
+The `factor(values, factor_mapping)` mapper defines a direct mapping between
+a state vector of length equal to the number of factor levels of `values`
+(for `factor_mapping = "full"`), or one less (for `factor_mapping = "contrast"`).
+Each factor level is represented as a dummy 0/1 variable, or equivalently,
+the input is used as a label index into the state vector; $\eta(u)_j = u_{z_j}$.
+In the `"contrast"` case, the first factor level is removed from the model,
+and the corresponding effect defined to be zero.
+
+#### matrix
+
+The `matrix` mapper defines a direct matrix multiplication between
+a pre-computed model matrix $A_\text{input}$ with the state
+vector; $\eta(u) = A_\text{input} u$.
+This is used e.g. for linear model formula input, that is converted to a
+component model matrix before handing it over to the mapper system.
+
+#### harmonics
+
+The `harmonics(order, scaling, intercept, interval)` mapper defines a sum of
+weighted harmonics on a real interval $(L, U)$, each frequency
+additionally scaled by factors determined by `scale`;
+$\eta(u_j) = \sum_{k=1}^{1+2p} A_{j,k} u_k$, where $A_{j,k}=s_k$ for $k=1$,
+$A_{j,2k}=s_{k+1}\cos[2\pi k (z_j - L)/(U-L)]$ for $k=1,2,\dots,p$, and
+$A_{j,2k+1}=s_{k+1}\sin[2\pi k (z_j - L)/(U-L)]$ for $k=1,2,\dots,p$,
+where $p=$`order`.  When `intercept` is `TRUE`, the state vector has length
+$1+2p$.
+When `intercept` is `FALSE`, the first, constant, column is
+removed, and the state vector has length $2p$.
 
 ### Compound mappers
 
@@ -106,23 +137,37 @@ but can in some cases be a list of vectors.
 * `bru_mapper_collect(mappers, hidden)`
 * `bru_mapper_multi(mappers)`
 * `bru_mapper_scale(mapper)`
+* `bru_mapper_pipe(mappers)`
 
 #### collect
+
+The `collect` mapper defines a compound mapper where the Jacobian is
+block-diagonal, and each block is defined by a separate sub-mapper.
+When `hidden = TRUE`, it can be used for INLA models where the user-visible
+part of the latent state is only a part of the internal state, such as for
+`"bym"` models.
 
 ```{r, eval=FALSE}
 mapper <- bru_mapper_offset(list(name1 = ..., name2 = ..., ...),
                             hidden = FALSE)
 ibm_eval(mapper,
          input = list(name1 = ..., name2 = ..., ...),
-         state)
+         state = ...)
 # If hidden = TRUE, the inla_f=TRUE argument "hides" all but the first mapper:
 ibm_eval(mapper,
          input = name1_input,
-         state,
+         state = ...,
          inla_f = TRUE)
 ```
 
 #### multi
+
+The `multi` mapper defines a compound mapper where the Jacobian is
+the row-wise Kronecker product between the sub-mapper Jacobians.
+This can be used for INLA models to construct the internal mapper
+for `main`, `group`, and `replicate`, but also for user-defined models
+where a single `rgeneric` or `cgeneric` model is defined on e.g.
+a space-time product domain.
 
 ```{r, eval=FALSE}
 mapper <- bru_mapper_multi(list(name1 = ..., name2 = ..., ...))
@@ -133,23 +178,45 @@ ibm_eval(mapper,
 
 #### scale
 
+The `scale` mapper multiplies the `input` vector with the `state` vector.
+This is used for INLA models to implement the `weights` component scaling,
+as the final stage of a `pipe` mapper, see below.
+
 ```{r, eval=FALSE}
-mapper <- bru_mapper_scale(inner_mapper)
+mapper <- bru_mapper_scale()
 ibm_eval(mapper,
-         input = list(mapper = inner_mapper_input,
-                      scale = ...),
-         state)
+         input = ...),
+         state = ...)
 ```
 
-All component mappers are currently defined as a `multi` mapper within a `scale`
-mapper:
+#### pipe
+
+Pipe mappers chain multiple mappers into a sequence, where the evaluation
+result of each mapper is given as the state vector for the next mapper.
+
 ```{r, eval=FALSE}
-inner_mapper <- bru_mapper_multi(list(main = ..., group = ..., replicate = ...))
-mapper <- bru_mapper_scale(inner_mapper)
+mapper <- bru_mapper_pipe(list(name1 = ..., name2 = ..., ...))
+ibm_eval(mapper,
+         input = list(name1 = ..., name2 = ..., ...),
+         state = ...)
+```
+
+#### The core model component mapper
+
+All model component mappers are currently defined as a `pipe` mapper containing
+a `multi` mapper followed by a `scale` mapper:
+```{r, eval=FALSE}
+mapper <-
+  bru_mapper_pipe(
+    list(
+      mapper = bru_mapper_multi(list(main = ..., group = ..., replicate = ...)),
+      scale = bru_mapper_scale()
+    )
+  )
 ibm_eval(mapper,
          input = list(mapper = list(main = ..., group = ..., replicate = ...),
                       scale = ...),
-         state = list(main = ..., group = ..., replicate = ...)
+         state = ...)
 ```
 
 ### Object mappers
@@ -195,6 +262,7 @@ ibm_n_output(mapper, input, ...)
 ibm_values(mapper, inla_f, ...)
 ibm_jacobian(mapper, input, state, ...)
 ibm_eval(mapper, input, state, ...)
+ibm_names(mapper, ...)
 ibm_inla_subset(mapper, ...)
 ibm_valid_input(mapper, input, ...)
 ```
@@ -218,6 +286,12 @@ ibm_values(mapper)
 ibm_n(mapper, inla_f = TRUE)
 ibm_values(mapper, inla_f = TRUE)
 ```
+```{r eval=TRUE}
+ibm_n(mapper, multi = TRUE)
+ibm_values(mapper, multi = TRUE)
+ibm_n(mapper, inla_f = TRUE, multi = TRUE)
+ibm_values(mapper, inla_f = TRUE, multi = TRUE)
+```
 
 For the `bru_mapper_multi` class, the `multi` argument provides access to the
 inner layers of the multi-mapper:
@@ -227,9 +301,16 @@ mapper <- bru_mapper_multi(list(
   b = bru_mapper_index(2)
 ))
 ibm_n(mapper)
-ibm_n(mapper, multi = 1)
+ibm_n(mapper, multi = TRUE)
 ibm_values(mapper)
-ibm_values(mapper, multi = 1)
+ibm_values(mapper, multi = TRUE)
+```
+
+```{r eval=TRUE}
+ibm_n(mapper, inla_f = TRUE)
+ibm_n(mapper, multi = TRUE, inla_f = TRUE)
+ibm_values(mapper, inla_f = TRUE)
+ibm_values(mapper, multi = TRUE, inla_f = TRUE)
 ```
 
 The default `ibm_inla_subset` method determines the inla subset by comparing
@@ -261,22 +342,35 @@ bru_mapper(mesh, indexed = TRUE)
 
 ## Customised mappers
 
+A mapper object should store enough information in order for the `ibm_*` methods
+to work.
+The simplest case of  a customised mapper is to just attached a new class
+label to the front of the S3 `class()` information of an existing mapper,
+to obtain a class to override some of the standard `ibm_*` method
+implementations.  More commonly, one would instead start with a basic `list()`,
+that might _contain_ an existing mapper object, and then add methods that
+know how to use that information.  In all these cases, the `bru_mapper_define()`
+method should be used to properly set the class information:
 ```{r, eval=FALSE}
-bru_mapper_define
+bru_mapper_define(mapper, new_class)
 ```
-
 Implementations can avoid having to define `ibm_n` and `ibm_values` methods,
 by instead computing and storing `n`, `n_inla`, `values`, and `values_inla`
-in the mapper object during construction.  The default `ibm_n` and `ibm_values`
+in the mapper object during construction:
+```{r, eval=FALSE}
+bru_mapper_define(mapper = list(n = 10, values = 1:10),
+                  new_class = "my_bru_mapper_class_name")
+```
+The default `ibm_n` and `ibm_values`
 methods checks if these values are available, and return the appropriate values
-depending on the `inla_f` argument.  When `*_inla` values are requested but not
+depending on the `inla_f` argument. When `*_inla` values are requested but not
 available, the methods fall back to the non-inla versions. If the needed information
 is not found, the default methods give an error message.
 
 Note: Before version 2.6.0, `ibm_amatrix` was used instead of `ibm_jacobian`.
 Version 2.6.0 still supports this, by having the default `ibm_jacobian` method
-call `ibm_amatrix`, but will give a deprecation message from
-version 2.7.0, and it may be removed in a future version.
+call `ibm_amatrix`, but will give a deprecation message later,
+and it may be removed in a future version.
 
 ## Example
 

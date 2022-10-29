@@ -7,7 +7,7 @@
 \alias{print.summary_component_list}
 \title{Summarise components}
 \usage{
-\method{summary}{component}(object, ...)
+\method{summary}{component}(object, ..., depth = Inf)
 
 \method{summary}{component_list}(object, ...)
 
@@ -19,6 +19,9 @@
 \item{object}{A \code{component} or \code{component_list}.}
 
 \item{...}{ignored.}
+
+\item{depth}{The depth of which to expand the component mapper.
+Default \code{Inf}, to traverse the entire mapper tree.}
 
 \item{x}{A summary object to be printed.}
 }
