@@ -463,7 +463,7 @@ ibm_eval.default <- function(mapper, input, state = NULL, ...) {
 
   if ((ibm_n(mapper) > 0) && !is.null(state)) {
     A <- ibm_jacobian(mapper, input = input, state = state, ...)
-    val + A %*% state
+    val <- val + as.vector(A %*% state)
   }
 
   val
@@ -751,7 +751,7 @@ bru_mapper_taylor <- function(offset, jacobian, state0, ...,
   }
 
   bru_mapper_define(list(
-    offset = offset,
+    offset = as.vector(offset),
     jacobian = jacobian,
     state0 = state0,
     n_multi = n_multi,
@@ -831,7 +831,7 @@ ibm_eval.bru_mapper_taylor <- function(mapper, input = NULL, state = NULL, ...) 
   if (is.null(mapper[["jacobian"]]) ||
     (mapper[["n"]] == 0) ||
     (is.null(state) && is.null(mapper[["state0"]]))) {
-    mapper[["offset"]]
+    val <- mapper[["offset"]]
   } else if (is.list(mapper[["jacobian"]])) {
     stopifnot(is.null(state) || is.list(state))
     val <- mapper[["offset"]]
@@ -849,17 +849,17 @@ ibm_eval.bru_mapper_taylor <- function(mapper, input = NULL, state = NULL, ...) 
           (state[[nm]] - mapper[["state0"]][[nm]])
       }
     }
-    val
   } else {
     stopifnot(is.null(state) || !is.list(state))
     if (is.null(mapper[["state0"]])) {
-      mapper[["offset"]] + mapper[["jacobian"]] %*% state
+      val <- mapper[["offset"]] + mapper[["jacobian"]] %*% state
     } else if (is.null(state)) {
-      mapper[["offset"]] - mapper[["jacobian"]] %*% mapper[["state0"]]
+      val <- mapper[["offset"]] - mapper[["jacobian"]] %*% mapper[["state0"]]
     } else {
-      mapper[["offset"]] + mapper[["jacobian"]] %*% (state - mapper[["state0"]])
+      val <- mapper[["offset"]] + mapper[["jacobian"]] %*% (state - mapper[["state0"]])
     }
   }
+  as.vector(val)
 }
 
 
@@ -1239,10 +1239,9 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
     scale <- as.vector(input[["scale"]])
     ok <- !is.na(scale)
     scale[!ok] <- 0
-    scale * values
-  } else {
-    values
+    values <- scale * values
   }
+  as.vector(values)
 }
 
 
@@ -1478,7 +1477,7 @@ ibm_eval.bru_mapper_multi <- function(mapper, input, state = NULL,
     }
     val <- pre_A %*% state
   }
-  val
+  as.vector(val)
 }
 
 
