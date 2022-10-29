@@ -22,7 +22,7 @@
 \usage{
 bru_mapper(...)
 
-bru_mapper_define(mapper, new_class = NULL, methods = NULL, ...)
+bru_mapper_define(mapper, new_class = NULL, ..., methods = NULL)
 
 \method{bru_mapper}{default}(...)
 
@@ -68,7 +68,7 @@ For \code{bru_mapper_scale}, a mapper to be scaled.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
-\item{methods}{Optional \code{list} of named method definitions; See Details.}
+\item{methods}{Deprecated.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
@@ -141,13 +141,11 @@ new mappers in user code.
 \item \code{bru_mapper_define} adds the \code{new_class} and "bru_mapper" class
 names to the inheritance list for the input \code{mapper} object, unless the object
 already inherits from these.
-If provided, mapper method functions are added to an environment
-\code{.envir} in the object.  The generic methods look for these
-functions first,
-and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
+}
+
+To register mapper classes and methods in scripts, use \code{.S3method()}
 to register the methods, e.g.
 \code{.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)}.
-}
 
 \itemize{
 \item \code{bru_mapper.default} calls \code{bru_mapper_define}, passing all

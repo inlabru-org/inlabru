@@ -455,12 +455,12 @@ component.character <- function(object,
     component[["mapper"]] <-
       bru_mapper_pipe(
         list(
-          bru_mapper_multi(list(
+          mapper = bru_mapper_multi(list(
             main = component$main$mapper,
             group = component$group$mapper,
             replicate = component$replicate$mapper
           )),
-          bru_mapper_scale()
+          scale = bru_mapper_scale()
         )
       )
   } else {
@@ -780,12 +780,12 @@ add_mappers.component <- function(component, lhoods, ...) {
   component[["mapper"]] <-
     bru_mapper_pipe(
       list(
-        bru_mapper_multi(list(
+        mapper = bru_mapper_multi(list(
           main = component$main$mapper,
           group = component$group$mapper,
           replicate = component$replicate$mapper
         )),
-        bru_mapper_scale()
+        scale = bru_mapper_scale()
       )
     )
 
@@ -1166,9 +1166,17 @@ make_submapper <- function(subcomp_n,
           indexed = require_indexed
         )
     } else if (all(values == 1)) {
-      mapper <- bru_mapper_linear()
+      if (require_indexed) {
+        mapper <- bru_mapper_index(n = 1)
+      } else {
+        mapper <- bru_mapper_linear()
+      }
     } else {
-      mapper <- bru_mapper_linear()
+      if (require_indexed) {
+        mapper <- bru_mapper_factor(values, factor_mapping = "full")
+      } else {
+        mapper <- bru_mapper_linear()
+      }
     }
   }
 
@@ -1448,38 +1456,63 @@ code.components <- function(components, add = "") {
 #' @keywords internal
 #' @param object A `component` or `component_list`.
 #' @param ... ignored.
+#' @param depth The depth of which to expand the component mapper.
+#' Default `Inf`, to traverse the entire mapper tree.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 
-summary.component <- function(object, ...) {
+summary.component <- function(object, ..., depth = Inf) {
   result <- list(
     "Label" = object$label,
-    "  Main" = sprintf(
-      "input '%s',\ttype '%s'",
-      deparse(object[["main"]][["input"]][["input"]]),
-      object[["main"]][["type"]]
+    "Main" = sprintf(
+      "type '%s', input '%s'",
+      object[["main"]][["type"]],
+      deparse(object[["main"]][["input"]][["input"]])
     ),
-    "  Group" =
+    "Group" =
       if (!is.null(object[["group"]][["input"]][["input"]])) {
         sprintf(
-          "input '%s',\ttype '%s'",
-          deparse(object[["group"]][["input"]][["input"]]),
-          object[["group"]][["type"]]
+          "type '%s', input '%s'",
+          object[["group"]][["type"]],
+          deparse(object[["group"]][["input"]][["input"]])
         )
       } else {
         NULL
       },
-    "  Replicate" =
+    "Replicate" =
       if (!is.null(object[["replicate"]][["input"]][["input"]])) {
         sprintf(
-          "input '%s',\ttype '%s'",
-          deparse(object[["replicate"]][["input"]][["input"]]),
-          object[["replicate"]][["type"]]
+          "type '%s', input '%s'",
+          object[["replicate"]][["type"]],
+          deparse(object[["replicate"]][["input"]][["input"]])
         )
       } else {
         NULL
       },
-    "  INLA formula" = as.character(object$inla.formula)
+    "Mapper" =
+      if (is.null(object[["mapper"]])) {
+        "Not yet initialised"
+      } else {
+        strwrap(
+          summary(object[["mapper"]],
+                  prefix = "    ",
+                  initial = "",
+                  depth = depth),
+          prefix = "    ",
+          initial = ""
+        )
+      },
+    "INLA formula" =
+      paste0(
+        "\n",
+        strwrap(
+          paste(as.character(object$inla.formula), collapse = " "),
+          width = 0.9 * getOption("width"),
+          indent = 4,
+          exdent = 6
+        )
+      )
   )
   if (!is.null(object[["copy"]])) {
     result[["Copy"]] <- sprintf("Copy of component '%s'", object[["copy"]])
@@ -1511,7 +1544,13 @@ summary.component_list <- function(object, ...) {
 print.summary_component <- function(x, ...) {
   for (name in names(x)) {
     if (!is.null(x[[name]])) {
-      cat(name, ":", "\t", x[[name]], "\n", sep = "")
+      if (name %in% "Label") {
+        cat("Label:", "\t", x[[name]], "\n", sep = "")
+      } else if (name %in% "Mapper") {
+        cat("  ", "Map: ", x[[name]], "\n", sep = "")
+      } else {
+        cat("  ", name, ":", "\t", x[[name]], "\n", sep = "")
+      }
     }
   }
   invisible(x)
@@ -1651,7 +1690,7 @@ input_eval.component <- function(component,
   stopifnot(inherits(component[["mapper"]], "bru_mapper_pipe"))
 
   # The names should be a subset of main, group, replicate
-  part_names <- names(component[["mapper"]][[1]])
+  part_names <- ibm_names(component[["mapper"]][["mappers"]][[1]])
   mapper_val <- list()
   for (part in part_names) {
     mapper_val[[part]] <-

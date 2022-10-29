@@ -1,11 +1,25 @@
 # inlabru (development version)
 
+## Features
+
+* Further `bru_mapper` method updates;
+
+  * Deprecated `ibm_amatrix()` and `names()`
+  methods, replaced by `ibm_jacobian()` and `ibm_names()`.
+  
+  * Introduced `bru_mapper_pipe()`, used to link mappers in sequence.
+  
+  * `summary` methods for `bru_mapper` objects
+  
+  * Removed `methods` argument from `bru_mapper_define()`.  Implementations
+    should register S3 methods instead.
+
 ## Bug fixes
 
 * Remove unused `spatstat.core` dependency. Fixes #165
 
 * Potential issue with model evaluation and linearisation
-  fixed in default `ibm_eval` method.
+  fixed in the `ibm_eval.default` and `ibm_eval.bru_mapper_collect` methods.
 
 # inlabru 2.6.0
 

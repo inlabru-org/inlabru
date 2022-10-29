@@ -10,6 +10,8 @@
 \alias{ibm_jacobian}
 \alias{ibm_linear}
 \alias{ibm_eval}
+\alias{ibm_names}
+\alias{ibm_names<-}
 \alias{ibm_inla_subset}
 \alias{ibm_valid_input}
 \alias{ibm_n.default}
@@ -21,6 +23,7 @@
 \alias{ibm_offset.default}
 \alias{ibm_linear.default}
 \alias{ibm_eval.default}
+\alias{ibm_names.default}
 \alias{ibm_inla_subset.default}
 \alias{ibm_valid_input.default}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
@@ -72,8 +75,8 @@
 \alias{ibm_eval.bru_mapper_multi}
 \alias{ibm_valid_input.bru_mapper_multi}
 \alias{[.bru_mapper_multi}
-\alias{names.bru_mapper_multi}
-\alias{names<-.bru_mapper_multi}
+\alias{ibm_names.bru_mapper_multi}
+\alias{ibm_names<-.bru_mapper_multi}
 \alias{ibm_n.bru_mapper_collect}
 \alias{ibm_n_output.bru_mapper_collect}
 \alias{ibm_values.bru_mapper_collect}
@@ -83,15 +86,15 @@
 \alias{ibm_linear.bru_mapper_collect}
 \alias{ibm_valid_input.bru_mapper_collect}
 \alias{[.bru_mapper_collect}
-\alias{names.bru_mapper_collect}
-\alias{names<-.bru_mapper_collect}
+\alias{ibm_names.bru_mapper_collect}
+\alias{ibm_names<-.bru_mapper_collect}
 \alias{ibm_n.bru_mapper_harmonics}
 \alias{ibm_jacobian.bru_mapper_harmonics}
 \title{Methods for bru_mapper objects}
 \usage{
 ibm_n(mapper, inla_f = FALSE, ...)
 
-ibm_n_output(mapper, input, inla_f = FALSE, ...)
+ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 ibm_values(mapper, inla_f = FALSE, ...)
 
@@ -105,13 +108,17 @@ ibm_linear(mapper, input, state = NULL, ...)
 
 ibm_eval(mapper, input, state = NULL, ...)
 
+ibm_names(mapper)
+
+ibm_names(mapper) <- value
+
 ibm_inla_subset(mapper, ...)
 
 ibm_valid_input(mapper, input, inla_f = FALSE, ...)
 
 \method{ibm_n}{default}(mapper, inla_f = FALSE, ...)
 
-\method{ibm_n_output}{default}(mapper, input, inla_f = FALSE, ...)
+\method{ibm_n_output}{default}(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 \method{ibm_values}{default}(mapper, inla_f = FALSE, ...)
 
@@ -126,6 +133,8 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 \method{ibm_linear}{default}(mapper, input, state, ...)
 
 \method{ibm_eval}{default}(mapper, input, state = NULL, ...)
+
+\method{ibm_names}{default}(mapper, ...)
 
 \method{ibm_inla_subset}{default}(mapper, ...)
 
@@ -151,7 +160,7 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 
 \method{ibm_n}{bru_mapper_taylor}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
-\method{ibm_n_output}{bru_mapper_taylor}(mapper, input, inla_f = FALSE, ...)
+\method{ibm_n_output}{bru_mapper_taylor}(mapper, input, ...)
 
 \method{ibm_values}{bru_mapper_taylor}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
@@ -185,11 +194,11 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 
 \method{ibm_eval}{bru_mapper_const}(mapper, input, state = NULL, ...)
 
-\method{ibm_n}{bru_mapper_scale}(mapper, ..., n_state = NULL)
+\method{ibm_n}{bru_mapper_scale}(mapper, ..., state = NULL, n_state = NULL)
 
-\method{ibm_n_output}{bru_mapper_scale}(mapper, input, ..., n_state = NULL)
+\method{ibm_n_output}{bru_mapper_scale}(mapper, input, state = NULL, ..., n_state = NULL)
 
-\method{ibm_values}{bru_mapper_scale}(mapper, ..., n_state = NULL)
+\method{ibm_values}{bru_mapper_scale}(mapper, ..., state = NULL, n_state = NULL)
 
 \method{ibm_jacobian}{bru_mapper_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
 
@@ -239,13 +248,13 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 
 \method{[}{bru_mapper_multi}(x, i, drop = TRUE)
 
-\method{names}{bru_mapper_multi}(x)
+\method{ibm_names}{bru_mapper_multi}(mapper)
 
-\method{names}{bru_mapper_multi}(x) <- value
+\method{ibm_names}{bru_mapper_multi}(mapper) <- value
 
 \method{ibm_n}{bru_mapper_collect}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
-\method{ibm_n_output}{bru_mapper_collect}(mapper, input, inla_f = FALSE, multi = FALSE, ...)
+\method{ibm_n_output}{bru_mapper_collect}(mapper, input, state = NULL, inla_f = FALSE, multi = FALSE, ...)
 
 \method{ibm_values}{bru_mapper_collect}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
@@ -277,9 +286,9 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 
 \method{[}{bru_mapper_collect}(x, i, drop = TRUE)
 
-\method{names}{bru_mapper_collect}(x)
+\method{ibm_names}{bru_mapper_collect}(mapper)
 
-\method{names}{bru_mapper_collect}(x) <- value
+\method{ibm_names}{bru_mapper_collect}(mapper) <- value
 
 \method{ibm_n}{bru_mapper_harmonics}(mapper, inla_f = FALSE, ...)
 
@@ -304,8 +313,14 @@ as "bym2", which can be handled by \code{bru_mapper_collect}.}
 \item{state}{A vector of latent state values for the mapping,
 of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
+\item{value}{a character vector of up to the same length as the number
+of mappers in the multi-mapper x}
+
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
+
+\item{n_state}{integer giving the length of the state vector for mappers
+that have state dependent output size.}
 
 \item{sub_lin}{Internal, optional pre-computed sub-mapper information}
 
@@ -322,8 +337,6 @@ For \verb{[.bru_mapper_collect}, whether to extract an individual mapper when
 \code{i} identifies a single element. If \code{FALSE}, a list of sub-mappers is
 returned (suitable e.g. for creating a new \code{bru_mapper_collect} object).
 Default: \code{TRUE}}
-
-\item{value}{a character vector of up to the same length as x}
 }
 \value{
 \itemize{
@@ -420,6 +433,12 @@ Implementations must return a vector of length \code{ibm_n_output(...)}.
 The \code{input} contents must
 be in a format accepted by \code{ibm_jacobian(...)}
 for the mapper.
+}
+
+\itemize{
+\item \code{ibm_names} Generic.
+Implementations must return a character vector of sub-mapper names, or \code{NULL}.
+Intended for providing information about multi-mappers and mapper collections.
 }
 
 \itemize{
@@ -525,7 +544,7 @@ is checked for validity for the submapper.
 \itemize{
 \item \code{ibm_jacobian} for \code{bru_mapper_multi} accepts a list with
 named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see \code{\link[=names.bru_mapper_multi]{names.bru_mapper_multi()}}.
+The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_multi]{ibm_names.bru_mapper_multi()}}.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix
@@ -535,7 +554,7 @@ with unnamed but ordered columns.
 \itemize{
 \item \code{ibm_valid_input} for \code{bru_mapper_multi} accepts a list with
 named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see \code{\link[=names.bru_mapper_multi]{names.bru_mapper_multi()}}.
+The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_multi]{ibm_names.bru_mapper_multi()}}.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix
@@ -545,7 +564,7 @@ with unnamed but ordered columns.
 \itemize{
 \item \code{ibm_jacobian} for \code{bru_mapper_collect} accepts a list with
 named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see \code{\link[=names.bru_mapper_collect]{names.bru_mapper_collect()}}.
+The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_collect]{ibm_names.bru_mapper_collect()}}.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix
@@ -557,7 +576,7 @@ the first, non-hidden, sub-mapper.
 \itemize{
 \item \code{ibm_valid_input} for \code{bru_mapper_collect} accepts a list with
 named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see \code{\link[=names.bru_mapper_collect]{names.bru_mapper_collect()}}.
+The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_collect]{ibm_names.bru_mapper_collect()}}.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix

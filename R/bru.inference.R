@@ -125,12 +125,12 @@ bru_info_upgrade <- function(object,
         cmp[["mapper"]] <-
           bru_mapper_pipe(
             list(
-              bru_mapper_multi(list(
+              mapper = bru_mapper_multi(list(
                 main = cmp$main$mapper,
                 group = cmp$group$mapper,
                 replicate = cmp$replicate$mapper
               )),
-              bru_mapper_scale()
+              scale = bru_mapper_scale()
             )
           )
         object[["model"]][["effects"]][[k]] <- cmp
