@@ -18,8 +18,13 @@
 
 * Remove unused `spatstat.core` dependency. Fixes #165
 
-* Potential issue with model evaluation and linearisation
-  fixed in the `ibm_eval.default` and `ibm_eval.bru_mapper_collect` methods.
+* Fixed ossue with plain mapper evaluation in the `ibm_eval.default`
+  and `ibm_eval.bru_mapper_collect` methods, where they would return zeros
+  instead of the intended values.
+  The main component evaluation and estimation code was not directly affected
+  as that is based on the `bru_mapper_multi` class methods that rely on the
+  Jacobians instead.  The bug would therefore mainly have impacted the future,
+  not yet supported nonlinear mapper extensions.
 
 # inlabru 2.6.0
 

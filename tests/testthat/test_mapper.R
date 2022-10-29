@@ -1,5 +1,104 @@
 local_bru_testthat_setup()
 
+test_that("Linear mapper", {
+  skip_on_cran()
+
+  mapper <- bru_mapper_linear()
+
+  input <- seq_len(4)
+  state <- 10
+  expect_equal(ibm_n(mapper), 1)
+  expect_equal(ibm_n_output(mapper, input = input), length(input))
+  expect_equal(ibm_values(mapper), 1)
+  expect_equal(ibm_values(mapper, inla_f = TRUE), 1)
+  expect_equal(
+    ibm_eval(mapper, input = input, state = state),
+    input * state
+  )
+  expect_equal(
+    ibm_eval(
+      ibm_linear(mapper, input = input, state = state),
+      state = state
+    ),
+    input * state
+  )
+})
+
+
+test_that("Index mapper", {
+  skip_on_cran()
+
+  values <- seq_len(4)
+  state <- c(10, 20, 30, 40)
+  mapper <- bru_mapper_index(max(values))
+  input <- c(2, 2, 1, 3)
+  val <- state[input]
+
+  expect_equal(ibm_n(mapper), length(values))
+  expect_equal(ibm_n_output(mapper, input = input), length(input))
+  expect_equal(ibm_values(mapper), values)
+  expect_equal(ibm_values(mapper, inla_f = TRUE), values)
+  expect_equal(
+    ibm_eval(mapper, input = input, state = state),
+    val
+  )
+  expect_equal(
+    ibm_eval(
+      ibm_linear(mapper, input = input, state = state),
+      state = state
+    ),
+    val
+  )
+})
+
+
+test_that("Factor mapper", {
+  skip_on_cran()
+
+  all_values <-
+    list(
+      full = c("a", "b", "c"),
+      contrast = c("b", "c")
+    )
+  all_state <-
+    list(
+      full = c(a = 10, b = 30, c = 60),
+      contrast = c(b = 20, c = 50)
+    )
+  for (factor_mapping in rev(c("full", "contrast"))) {
+    values <- all_values[[factor_mapping]]
+    mapper <- bru_mapper_factor(all_values[["full"]],
+      factor_mapping = factor_mapping
+    )
+
+    input <- c("b", "b", "a", "c")
+    state <- all_state[[factor_mapping]]
+    val <- {
+      val <- rep(0, length(input))
+      ok <- input %in% names(state)
+      val[ok] <- state[input[ok]]
+      val
+    }
+
+    expect_equal(ibm_n(mapper), length(values))
+    expect_equal(ibm_n_output(mapper, input = input), length(input))
+    expect_equal(ibm_values(mapper), values)
+    expect_equal(ibm_values(mapper, inla_f = TRUE), values)
+    expect_equal(
+      ibm_eval(mapper, input = input, state = state),
+      val
+    )
+    expect_equal(
+      ibm_eval(
+        ibm_linear(mapper, input = input, state = state),
+        state = state
+      ),
+      val
+    )
+  }
+})
+
+
 test_that("Pipe mapper", {
   skip_on_cran()
   local_bru_safe_inla()
