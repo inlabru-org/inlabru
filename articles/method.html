@@ -90,7 +90,8 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Iterative linearised INLA method</h1>
-                        <h4 data-toc-skip class="author">Finn Lindgren and Man Ho Suen</h4>
+                        <h4 data-toc-skip class="author">Finn Lindgren
+and Man Ho Suen</h4>
             
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/method.Rmd" class="external-link"><code>vignettes/method.Rmd</code></a></small>
@@ -102,30 +103,56 @@
 <div class="section level2">
 <h2 id="the-inla-method-for-linear-predictors">The INLA method for linear predictors<a class="anchor" aria-label="anchor" href="#the-inla-method-for-linear-predictors"></a>
 </h2>
-<p>The INLA method is used to compute fast approximative posterior distribution for Bayesian generalised additive models. The hierarchical structure of such a model with latent Gaussian components <span class="math inline">\(\boldsymbol{u}\)</span>, covariance parameters <span class="math inline">\(\boldsymbol{\theta}\)</span>, and measured response variables <span class="math inline">\(\boldsymbol{y}\)</span>, can be written as <span class="math display">\[
+<p>The INLA method is used to compute fast approximative posterior
+distribution for Bayesian generalised additive models. The hierarchical
+structure of such a model with latent Gaussian components <span class="math inline">\(\boldsymbol{u}\)</span>, covariance parameters
+<span class="math inline">\(\boldsymbol{\theta}\)</span>, and measured
+response variables <span class="math inline">\(\boldsymbol{y}\)</span>,
+can be written as <span class="math display">\[
 \begin{aligned}
 \boldsymbol{\theta} &amp;\sim p(\boldsymbol{\theta}) \\
-\boldsymbol{u}|\boldsymbol{\theta} &amp;\sim \mathcal{N}\!\left(\boldsymbol{\mu}_u, \boldsymbol{Q}(\boldsymbol{\theta})^{-1}\right) \\
+\boldsymbol{u}|\boldsymbol{\theta} &amp;\sim
+\mathcal{N}\!\left(\boldsymbol{\mu}_u,
+\boldsymbol{Q}(\boldsymbol{\theta})^{-1}\right) \\
 \boldsymbol{\eta}(\boldsymbol{u}) &amp;= \boldsymbol{A}\boldsymbol{u} \\
-\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta} &amp; \sim p(\boldsymbol{y}|\boldsymbol{\eta}(\boldsymbol{u}),\boldsymbol{\theta})
+\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta} &amp; \sim
+p(\boldsymbol{y}|\boldsymbol{\eta}(\boldsymbol{u}),\boldsymbol{\theta})
 \end{aligned}
-\]</span> where typically each linear predictor element, <span class="math inline">\(\eta_i(\boldsymbol{u})\)</span>, is linked to a location parameter of the distribution for observation <span class="math inline">\(y_i\)</span>, for each <span class="math inline">\(i\)</span>, via a (non-linear) link function <span class="math inline">\(g^{-1}(\cdot)\)</span>. In the R-INLA implementation, the observations are assumed to be conditionally independent, given <span class="math inline">\(\boldsymbol{\eta}\)</span> and <span class="math inline">\(\boldsymbol{\theta}\)</span>.</p>
+\]</span> where typically each linear predictor element, <span class="math inline">\(\eta_i(\boldsymbol{u})\)</span>, is linked to a
+location parameter of the distribution for observation <span class="math inline">\(y_i\)</span>, for each <span class="math inline">\(i\)</span>, via a (non-linear) link function <span class="math inline">\(g^{-1}(\cdot)\)</span>. In the R-INLA
+implementation, the observations are assumed to be conditionally
+independent, given <span class="math inline">\(\boldsymbol{\eta}\)</span> and <span class="math inline">\(\boldsymbol{\theta}\)</span>.</p>
 </div>
 <div class="section level2">
 <h2 id="approximate-inla-for-non-linear-predictors">Approximate INLA for non-linear predictors<a class="anchor" aria-label="anchor" href="#approximate-inla-for-non-linear-predictors"></a>
 </h2>
-<p>The premise for the inlabru method for non-linear predictors is to build on the existing implementation, and only add a linearisation step. The properties of the resulting approximation will depend on the nature of the non-linearity.</p>
-<p>Let <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})\)</span> be a non-linear predictor, i.e. a deterministic function of <span class="math inline">\(\boldsymbol{u}\)</span>, <span class="math display">\[ \widetilde{\boldsymbol{\eta}} (\boldsymbol{u}) = \textsf{fcn} (\boldsymbol{u}), \]</span> and let <span class="math inline">\(\overline{\boldsymbol{\eta}}(\boldsymbol{u})\)</span> be the 1st order Taylor approximation at <span class="math inline">\(\boldsymbol{u}_0\)</span>, <span class="math display">\[
+<p>The premise for the inlabru method for non-linear predictors is to
+build on the existing implementation, and only add a linearisation step.
+The properties of the resulting approximation will depend on the nature
+of the non-linearity.</p>
+<p>Let <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})\)</span>
+be a non-linear predictor, i.e. a deterministic function of <span class="math inline">\(\boldsymbol{u}\)</span>, <span class="math display">\[ \widetilde{\boldsymbol{\eta}} (\boldsymbol{u}) =
+\textsf{fcn} (\boldsymbol{u}), \]</span> and let <span class="math inline">\(\overline{\boldsymbol{\eta}}(\boldsymbol{u})\)</span>
+be the 1st order Taylor approximation at <span class="math inline">\(\boldsymbol{u}_0\)</span>, <span class="math display">\[
 \overline{\boldsymbol{\eta}}(\boldsymbol{u})
-= \widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0) + \boldsymbol{B}(\boldsymbol{u} - \boldsymbol{u}_0)
-= \left[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0) - \boldsymbol{B}\boldsymbol{u}_0\right] + \boldsymbol{B}\boldsymbol{u}
+= \widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0) +
+\boldsymbol{B}(\boldsymbol{u} - \boldsymbol{u}_0)
+= \left[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0) -
+\boldsymbol{B}\boldsymbol{u}_0\right] + \boldsymbol{B}\boldsymbol{u}
 ,
-\]</span> where <span class="math inline">\(\boldsymbol{B}\)</span> is the derivative matrix for the non-linear predictor, evaluated at <span class="math inline">\(\boldsymbol{u}_0\)</span>. Hence, we define <span class="math display">\[
+\]</span> where <span class="math inline">\(\boldsymbol{B}\)</span> is
+the derivative matrix for the non-linear predictor, evaluated at <span class="math inline">\(\boldsymbol{u}_0\)</span>. Hence, we define <span class="math display">\[
 \begin{aligned}
-\boldsymbol{y} | \boldsymbol{u}, {\boldsymbol{\theta}} &amp;\overset{d}{=} \boldsymbol{y} | \widetilde{\boldsymbol{\eta}}(\boldsymbol{u}), {\boldsymbol{\theta}} \\
-&amp;\sim p (\boldsymbol{y} | g^{-1}[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})], {\boldsymbol{\theta}})\\
+\boldsymbol{y} | \boldsymbol{u}, {\boldsymbol{\theta}}
+&amp;\overset{d}{=} \boldsymbol{y} |
+\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}), {\boldsymbol{\theta}} \\
+&amp;\sim p (\boldsymbol{y} |
+g^{-1}[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})],
+{\boldsymbol{\theta}})\\
 \end{aligned}
-\]</span> The non-linear observation model <span class="math inline">\(p(\boldsymbol{y}|g^{-1}[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})],\boldsymbol{\theta})\)</span> is approximated by replacing the non-linear predictor with its linearisation, so that the linearised model is defined by</p>
+\]</span> The non-linear observation model <span class="math inline">\(p(\boldsymbol{y}|g^{-1}[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})],\boldsymbol{\theta})\)</span>
+is approximated by replacing the non-linear predictor with its
+linearisation, so that the linearised model is defined by</p>
 <p><span class="math display">\[
 \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
 =
@@ -139,72 +166,149 @@ p(\boldsymbol{y}|\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}),\boldsymbol{\thet
 =
 \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
 \]</span> The non-linear model posterior is factorised as <span class="math display">\[
-\widetilde{p}(\boldsymbol{\theta},\boldsymbol{u}|\boldsymbol{y}) = \widetilde{p}(\boldsymbol{\theta}|\boldsymbol{y})\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}),
+\widetilde{p}(\boldsymbol{\theta},\boldsymbol{u}|\boldsymbol{y}) =
+\widetilde{p}(\boldsymbol{\theta}|\boldsymbol{y})\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}),
 \]</span> and the linear model approximation is factorised as <span class="math display">\[
-\overline{p}(\boldsymbol{\theta},\boldsymbol{u}|\boldsymbol{y}) = \overline{p}(\boldsymbol{\theta}|\boldsymbol{y})\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}).
+\overline{p}(\boldsymbol{\theta},\boldsymbol{u}|\boldsymbol{y}) =
+\overline{p}(\boldsymbol{\theta}|\boldsymbol{y})\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}).
 \]</span></p>
 <div class="section level3">
 <h3 id="fixed-point-iteration">Fixed point iteration<a class="anchor" aria-label="anchor" href="#fixed-point-iteration"></a>
 </h3>
-<p>The remaining step of the approximation is how to choose the linearisation point <span class="math inline">\(\boldsymbol{u}_*\)</span>. For a given linearisation point <span class="math inline">\(\boldsymbol{v}\)</span>, INLA will compute the posterior mode for <span class="math inline">\(\boldsymbol{\theta}\)</span>, <span class="math display">\[
-\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}} = \mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}} \overline{p}_\boldsymbol{v} ( {\boldsymbol{\theta}} | \boldsymbol{y} ),
+<p>The remaining step of the approximation is how to choose the
+linearisation point <span class="math inline">\(\boldsymbol{u}_*\)</span>. For a given
+linearisation point <span class="math inline">\(\boldsymbol{v}\)</span>,
+INLA will compute the posterior mode for <span class="math inline">\(\boldsymbol{\theta}\)</span>, <span class="math display">\[
+\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}} =
+\mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}}
+\overline{p}_\boldsymbol{v} ( {\boldsymbol{\theta}} | \boldsymbol{y} ),
 \]</span> and the joint conditional posterior mode for <span class="math inline">\(\boldsymbol{u}\)</span>, <span class="math display">\[
-\widehat{\boldsymbol{u}}_{\boldsymbol{v}} = \mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} \overline{p}_\boldsymbol{v} ( \boldsymbol{u} | \boldsymbol{y}, \widehat{\boldsymbol{\theta}}_{\boldsymbol{v}} ) .
+\widehat{\boldsymbol{u}}_{\boldsymbol{v}} =
+\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} \overline{p}_\boldsymbol{v}
+( \boldsymbol{u} | \boldsymbol{y},
+\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}} ) .
 \]</span></p>
-<p>Define the Bayesian estimation functional<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt; Potential other choices for &lt;span class="math inline"&gt;\(f(\cdot)\)&lt;/span&gt; include the posterior expectation &lt;span class="math inline"&gt;\(\overline{E}(\boldsymbol{u}|\boldsymbol{y})\)&lt;/span&gt; and the marginal conditional modes, &lt;span class="math display"&gt;\[
-\left\{\mathop{\mathrm{arg\,max}}_{u_i} \overline{p}_{\boldsymbol{v}}(u_i|\boldsymbol{y}),\,i=1,\dots,n\right\},
-\]&lt;/span&gt; which was used in &lt;code&gt;inlabru&lt;/code&gt; up to version 2.1.15, which caused problems for some nonlinear models. From version 2.2.3, the joint conditional mode is used, &lt;span class="math display"&gt;\[
-\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} \overline{p}_{\boldsymbol{v}}(\boldsymbol{u}|\boldsymbol{y},\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}}),
-\]&lt;/span&gt; where &lt;span class="math inline"&gt;\(\widehat{\boldsymbol{\theta}}=\mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}} \overline{p}_{\boldsymbol{v}}(\boldsymbol{\theta}|\boldsymbol{y})\)&lt;/span&gt;.&lt;/p&gt;'><sup>1</sup></a> <span class="math display">\[
-f(\overline{p}_{\boldsymbol{v}}) = (\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}},\widehat{\boldsymbol{u}}_{\boldsymbol{v}})
-\]</span> and let <span class="math inline">\(f(p)=(\widehat{\boldsymbol{\theta}},\widehat{\boldsymbol{u}})\)</span> denote the corresponding posterior modes for the true posterior distribution, <span class="math display">\[
+<p>Define the Bayesian estimation functional<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt; Potential other choices for &lt;span class="math inline"&gt;\(f(\cdot)\)&lt;/span&gt; include the posterior
+expectation &lt;span class="math inline"&gt;\(\overline{E}(\boldsymbol{u}|\boldsymbol{y})\)&lt;/span&gt;
+and the marginal conditional modes, &lt;span class="math display"&gt;\[
+\left\{\mathop{\mathrm{arg\,max}}_{u_i}
+\overline{p}_{\boldsymbol{v}}(u_i|\boldsymbol{y}),\,i=1,\dots,n\right\},
+\]&lt;/span&gt; which was used in &lt;code&gt;inlabru&lt;/code&gt; up to version 2.1.15,
+which caused problems for some nonlinear models. From version 2.2.3, the
+joint conditional mode is used, &lt;span class="math display"&gt;\[
+\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}}
+\overline{p}_{\boldsymbol{v}}(\boldsymbol{u}|\boldsymbol{y},\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}}),
+\]&lt;/span&gt; where &lt;span class="math inline"&gt;\(\widehat{\boldsymbol{\theta}}=\mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}}
+\overline{p}_{\boldsymbol{v}}(\boldsymbol{\theta}|\boldsymbol{y})\)&lt;/span&gt;.&lt;/p&gt;'><sup>1</sup></a> <span class="math display">\[
+f(\overline{p}_{\boldsymbol{v}}) =
+(\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}},\widehat{\boldsymbol{u}}_{\boldsymbol{v}})
+\]</span> and let <span class="math inline">\(f(p)=(\widehat{\boldsymbol{\theta}},\widehat{\boldsymbol{u}})\)</span>
+denote the corresponding posterior modes for the true posterior
+distribution, <span class="math display">\[
 \begin{aligned}
-    \widehat{{\boldsymbol{\theta}}} &amp;= \mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}} p ( {\boldsymbol{\theta}} | \boldsymbol{y} ), \\
-    \widehat{\boldsymbol{u}} &amp;= \mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} p (\boldsymbol{u} | \boldsymbol{y}, \widehat{{\boldsymbol{\theta}}}).
+    \widehat{{\boldsymbol{\theta}}} &amp;=
+\mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}} p (
+{\boldsymbol{\theta}} | \boldsymbol{y} ), \\
+    \widehat{\boldsymbol{u}} &amp;=
+\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} p (\boldsymbol{u} |
+\boldsymbol{y}, \widehat{{\boldsymbol{\theta}}}).
 \end{aligned}
 \]</span></p>
-<p>The fixed point <span class="math inline">\((\boldsymbol{\theta}_*,\boldsymbol{u}_*)=f(\overline{p}_{\boldsymbol{u}_*})\)</span> should ideally be close to <span class="math inline">\((\widehat{\boldsymbol{\theta}},\widehat{\boldsymbol{u}})\)</span>, i.e. close to the true marginal/conditional posterior mode. We can achieve this for the conditional latent mode, so that <span class="math inline">\(\boldsymbol{u}_*=\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} p (\boldsymbol{u} | \boldsymbol{y}, \widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_*})\)</span>.</p>
-<p>We therefore seek the latent vector <span class="math inline">\(\boldsymbol{u}_*\)</span> that generates the fixed point of the functional, so that <span class="math inline">\((\boldsymbol{\theta}_*,\boldsymbol{u}_*)=f(\overline{p}_{\boldsymbol{u}_*})\)</span>.</p>
-<p>One key to the fixed point iteration is that the observation model is linked to <span class="math inline">\(\boldsymbol{u}\)</span> only through the non-linear predictor <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})\)</span>, since this leads to a simplified line search method below.</p>
+<p>The fixed point <span class="math inline">\((\boldsymbol{\theta}_*,\boldsymbol{u}_*)=f(\overline{p}_{\boldsymbol{u}_*})\)</span>
+should ideally be close to <span class="math inline">\((\widehat{\boldsymbol{\theta}},\widehat{\boldsymbol{u}})\)</span>,
+i.e. close to the true marginal/conditional posterior mode. We can
+achieve this for the conditional latent mode, so that <span class="math inline">\(\boldsymbol{u}_*=\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}}
+p (\boldsymbol{u} | \boldsymbol{y},
+\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_*})\)</span>.</p>
+<p>We therefore seek the latent vector <span class="math inline">\(\boldsymbol{u}_*\)</span> that generates the fixed
+point of the functional, so that <span class="math inline">\((\boldsymbol{\theta}_*,\boldsymbol{u}_*)=f(\overline{p}_{\boldsymbol{u}_*})\)</span>.</p>
+<p>One key to the fixed point iteration is that the observation model is
+linked to <span class="math inline">\(\boldsymbol{u}\)</span> only
+through the non-linear predictor <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})\)</span>,
+since this leads to a simplified line search method below.</p>
 <ol start="0" style="list-style-type: decimal">
-<li>Let <span class="math inline">\(\boldsymbol{u}_0\)</span> be an initial linearisation point for the latent variables obtained from the initial INLA call. Iterate the following steps for <span class="math inline">\(k=0,1,2,...\)</span>
+<li>Let <span class="math inline">\(\boldsymbol{u}_0\)</span> be an
+initial linearisation point for the latent variables obtained from the
+initial INLA call. Iterate the following steps for <span class="math inline">\(k=0,1,2,...\)</span>
 </li>
 <li>Compute the predictor linearisation at <span class="math inline">\(\boldsymbol{u}_0\)</span>.</li>
 <li>Compute the linearised INLA posterior <span class="math inline">\(\overline{p}_{\boldsymbol{u}_0}(\boldsymbol{\theta}|\boldsymbol{y})\)</span>.</li>
-<li>Let <span class="math inline">\((\boldsymbol{\theta}_1,\boldsymbol{u}_1)=(\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_0},\widehat{\boldsymbol{u}}_{\boldsymbol{u}_0})=f(\overline{p}_{\boldsymbol{u}_0})\)</span> be the initial candidate for new linearisation point.</li>
-<li>Let <span class="math inline">\(\boldsymbol{v}_\alpha=(1-\alpha)\boldsymbol{u}_1+\alpha\boldsymbol{u}_0\)</span>, and find the value <span class="math inline">\(\alpha\)</span> minimises <span class="math inline">\(\|\widetilde{\eta}(\boldsymbol{v}_\alpha)-\overline{\eta}(\boldsymbol{u}_1)\|\)</span>.</li>
-<li>Set the new linearisation point <span class="math inline">\(\boldsymbol{u}_0\)</span> equal to <span class="math inline">\(\boldsymbol{v}_\alpha\)</span> and repeat from step 1, unless the iteration has converged to a given tolerance.</li>
+<li>Let <span class="math inline">\((\boldsymbol{\theta}_1,\boldsymbol{u}_1)=(\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_0},\widehat{\boldsymbol{u}}_{\boldsymbol{u}_0})=f(\overline{p}_{\boldsymbol{u}_0})\)</span>
+be the initial candidate for new linearisation point.</li>
+<li>Let <span class="math inline">\(\boldsymbol{v}_\alpha=(1-\alpha)\boldsymbol{u}_1+\alpha\boldsymbol{u}_0\)</span>,
+and find the value <span class="math inline">\(\alpha\)</span> minimises
+<span class="math inline">\(\|\widetilde{\eta}(\boldsymbol{v}_\alpha)-\overline{\eta}(\boldsymbol{u}_1)\|\)</span>.</li>
+<li>Set the new linearisation point <span class="math inline">\(\boldsymbol{u}_0\)</span> equal to <span class="math inline">\(\boldsymbol{v}_\alpha\)</span> and repeat from
+step 1, unless the iteration has converged to a given tolerance.</li>
 </ol>
-<p>A potential improvement of step 4 might be to also take into account the prior distribution for <span class="math inline">\(\boldsymbol{u}\)</span> as a minimisation penalty, to avoid moving further than would be indicated by a full likelihood optimisation.</p>
+<p>A potential improvement of step 4 might be to also take into account
+the prior distribution for <span class="math inline">\(\boldsymbol{u}\)</span> as a minimisation penalty,
+to avoid moving further than would be indicated by a full likelihood
+optimisation.</p>
 <div class="section level4">
 <h4 id="line-search">Line search<a class="anchor" aria-label="anchor" href="#line-search"></a>
 </h4>
 <p>In step 4, we would ideally want <span class="math inline">\(\alpha\)</span> to be<br><span class="math display">\[
-\mathop{\mathrm{arg\,max}}_{\alpha} \left[\ln p(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}_1)\right]_{\boldsymbol{u}=\boldsymbol{v}_\alpha}.
-\]</span> However, since this requires access to the internal likelihood and prior density evaluation code, we instead use a simpler alternative. We consider norms of the form <span class="math inline">\(\|\widetilde{\eta}(\boldsymbol{v}_\alpha)-\overline{\eta}(\boldsymbol{u}_1)\|\)</span> that only depend on the nonlinear and linearised predictor expressions, and other known quantities, given <span class="math inline">\(\boldsymbol{u}_0\)</span>, such as the current INLA estimate of the component wise predictor variances.</p>
-<p>Let <span class="math inline">\(\sigma_i^2 = \mathrm{Var}_{\boldsymbol{u}\sim \overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}_1)}(\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}))\)</span> be the current estimate of the posterior variance for each predictor element <span class="math inline">\(i\)</span>. We then define an inner product on the space of predictor vectors as <span class="math display">\[
+\mathop{\mathrm{arg\,max}}_{\alpha} \left[\ln
+p(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}_1)\right]_{\boldsymbol{u}=\boldsymbol{v}_\alpha}.
+\]</span> However, since this requires access to the internal likelihood
+and prior density evaluation code, we instead use a simpler alternative.
+We consider norms of the form <span class="math inline">\(\|\widetilde{\eta}(\boldsymbol{v}_\alpha)-\overline{\eta}(\boldsymbol{u}_1)\|\)</span>
+that only depend on the nonlinear and linearised predictor expressions,
+and other known quantities, given <span class="math inline">\(\boldsymbol{u}_0\)</span>, such as the current
+INLA estimate of the component wise predictor variances.</p>
+<p>Let <span class="math inline">\(\sigma_i^2 =
+\mathrm{Var}_{\boldsymbol{u}\sim
+\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}_1)}(\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}))\)</span>
+be the current estimate of the posterior variance for each predictor
+element <span class="math inline">\(i\)</span>. We then define an inner
+product on the space of predictor vectors as <span class="math display">\[
 \langle \boldsymbol{a},\boldsymbol{b} \rangle_V
 =
 \sum_i \frac{a_i b_i}{\sigma_i^2} .
-\]</span> The squared norm for the difference between the predictor vectors <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)\)</span> and <span class="math inline">\(\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span>,with respect to this inner product, is defined as <span class="math display">\[
-\| \widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha) - \overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\|^2_V
+\]</span> The squared norm for the difference between the predictor
+vectors <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)\)</span>
+and <span class="math inline">\(\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span>,with
+respect to this inner product, is defined as <span class="math display">\[
+\| \widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha) -
+\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\|^2_V
 =
-\sum_i \frac{|\widetilde{\boldsymbol{\eta}}_i(\boldsymbol{v}_\alpha)-\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}_1)|^2}{\sigma_i^2} .
-\]</span> Using this norm as the target loss function for the line search avoids many potentially expensive evaluations of the true posterior conditional log-density. We evaluate <span class="math inline">\(\widetilde{\boldsymbol{\eta}}_1=\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span> and make use of the linearised predictor information. Let <span class="math inline">\(\widetilde{\boldsymbol{\eta}}_\alpha=\widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)\)</span> and <span class="math inline">\(\overline{\boldsymbol{\eta}}_\alpha=\overline{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)=(1-\alpha)\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0)+\alpha\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span>. In other words, <span class="math inline">\(\alpha=0\)</span> corresponds to the previous linear predictor, and <span class="math inline">\(\alpha=1\)</span> is the current estimate from INLA. An exact line search would minimise <span class="math inline">\(\|\widetilde{\boldsymbol{\eta}}_\alpha-\overline{\boldsymbol{\eta}}_1\|\)</span>. Instead, we define a quadratic approximation to the non-linear predictor as a function of <span class="math inline">\(\alpha\)</span>, <span class="math display">\[
+\sum_i
+\frac{|\widetilde{\boldsymbol{\eta}}_i(\boldsymbol{v}_\alpha)-\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}_1)|^2}{\sigma_i^2}
+.
+\]</span> Using this norm as the target loss function for the line
+search avoids many potentially expensive evaluations of the true
+posterior conditional log-density. We evaluate <span class="math inline">\(\widetilde{\boldsymbol{\eta}}_1=\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span>
+and make use of the linearised predictor information. Let <span class="math inline">\(\widetilde{\boldsymbol{\eta}}_\alpha=\widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)\)</span>
+and <span class="math inline">\(\overline{\boldsymbol{\eta}}_\alpha=\overline{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)=(1-\alpha)\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0)+\alpha\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span>.
+In other words, <span class="math inline">\(\alpha=0\)</span>
+corresponds to the previous linear predictor, and <span class="math inline">\(\alpha=1\)</span> is the current estimate from
+INLA. An exact line search would minimise <span class="math inline">\(\|\widetilde{\boldsymbol{\eta}}_\alpha-\overline{\boldsymbol{\eta}}_1\|\)</span>.
+Instead, we define a quadratic approximation to the non-linear predictor
+as a function of <span class="math inline">\(\alpha\)</span>, <span class="math display">\[
 \breve{\boldsymbol{\eta}}_\alpha =
-\overline{\boldsymbol{\eta}}_\alpha + \alpha^2 (\widetilde{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_1)
+\overline{\boldsymbol{\eta}}_\alpha + \alpha^2
+(\widetilde{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_1)
 \]</span> and minimise the quartic polynomial in <span class="math inline">\(\alpha\)</span>, <span class="math display">\[
 \begin{aligned}
 \|\breve{\boldsymbol{\eta}}_\alpha-\overline{\boldsymbol{\eta}}_1\|^2
 &amp;=
-\| (\alpha-1)(\overline{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_0) + \alpha^2 (\widetilde{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_1) \|^2
+\| (\alpha-1)(\overline{\boldsymbol{\eta}}_1 -
+\overline{\boldsymbol{\eta}}_0) + \alpha^2
+(\widetilde{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_1) \|^2
 .
 \end{aligned}
-\]</span> If initial expansion and contraction steps are carried out, leading to an initial guess of <span class="math inline">\(\alpha=\gamma^k\)</span>, where <span class="math inline">\(\gamma&gt;1\)</span> is a scaling factor (see <code><a href="../reference/bru_options.html">?bru_options</a></code>, <code>bru_method$factor</code>) and <span class="math inline">\(k\)</span> is the (signed) number of expansions and contractions, the quadratic expression is replaced by <span class="math display">\[
+\]</span> If initial expansion and contraction steps are carried out,
+leading to an initial guess of <span class="math inline">\(\alpha=\gamma^k\)</span>, where <span class="math inline">\(\gamma&gt;1\)</span> is a scaling factor (see
+<code><a href="../reference/bru_options.html">?bru_options</a></code>, <code>bru_method$factor</code>) and <span class="math inline">\(k\)</span> is the (signed) number of expansions
+and contractions, the quadratic expression is replaced by <span class="math display">\[
 \begin{aligned}
 \|\breve{\boldsymbol{\eta}}_\alpha-\overline{\boldsymbol{\eta}}_1\|^2
 &amp;=
-\| (\alpha-1)(\overline{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_0) + \frac{\alpha^2}{\gamma^{2k}} (\widetilde{\boldsymbol{\eta}}_{\gamma^k} - \overline{\boldsymbol{\eta}}_{\gamma^k}) \|^2
+\| (\alpha-1)(\overline{\boldsymbol{\eta}}_1 -
+\overline{\boldsymbol{\eta}}_0) + \frac{\alpha^2}{\gamma^{2k}}
+(\widetilde{\boldsymbol{\eta}}_{\gamma^k} -
+\overline{\boldsymbol{\eta}}_{\gamma^k}) \|^2
 ,
 \end{aligned}
 \]</span> which is minimised on the interval <span class="math inline">\(\alpha\in[\gamma^{k-1},\gamma^{k+1}]\)</span>.</p>
@@ -214,88 +318,181 @@ f(\overline{p}_{\boldsymbol{v}}) = (\widehat{\boldsymbol{\theta}}_{\boldsymbol{v
 <div class="section level2">
 <h2 id="posterior-non-linearity-checks">Posterior non-linearity checks<a class="anchor" aria-label="anchor" href="#posterior-non-linearity-checks"></a>
 </h2>
-<p>Whereas the inlabru optimisation method leads to an estimate where <span class="math inline">\(\| \widetilde{\boldsymbol{\eta}} (\boldsymbol{u}_*) - \overline{\boldsymbol{\eta}}(\boldsymbol{u}_*)\|=0\)</span> for a specific <span class="math inline">\(\boldsymbol{u}_*\)</span>, the overall posterior approximation accuracy depends on the degree of nonlinearity in the vicinity of <span class="math inline">\(\boldsymbol{u}_*\)</span>. There are two main options for evaluating this nonlinearity, using sampling from the approximate posterior distribution. The first option is <span class="math display">\[
+<p>Whereas the inlabru optimisation method leads to an estimate where
+<span class="math inline">\(\| \widetilde{\boldsymbol{\eta}}
+(\boldsymbol{u}_*) -
+\overline{\boldsymbol{\eta}}(\boldsymbol{u}_*)\|=0\)</span> for a
+specific <span class="math inline">\(\boldsymbol{u}_*\)</span>, the
+overall posterior approximation accuracy depends on the degree of
+nonlinearity in the vicinity of <span class="math inline">\(\boldsymbol{u}_*\)</span>. There are two main
+options for evaluating this nonlinearity, using sampling from the
+approximate posterior distribution. The first option is <span class="math display">\[
 \begin{aligned}
-\sum_i \frac{E_{\boldsymbol{u}\sim \overline{p}(\boldsymbol{u}|\boldsymbol{y})}\left[
-|\overline{\boldsymbol{\eta}}_i(\boldsymbol{u})-\widetilde{\boldsymbol{\eta}}_i(\boldsymbol{u})|^2\right]}{\mathrm{Var}_{\boldsymbol{u}\sim \overline{p}(\boldsymbol{u}|\boldsymbol{y})}(\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}))} ,
+\sum_i \frac{E_{\boldsymbol{u}\sim
+\overline{p}(\boldsymbol{u}|\boldsymbol{y})}\left[
+|\overline{\boldsymbol{\eta}}_i(\boldsymbol{u})-\widetilde{\boldsymbol{\eta}}_i(\boldsymbol{u})|^2\right]}{\mathrm{Var}_{\boldsymbol{u}\sim
+\overline{p}(\boldsymbol{u}|\boldsymbol{y})}(\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}))}
+,
 \end{aligned}
-\]</span> which is the posterior expectation of the component-wise variance-normalised squared deviation between the non-linear and linearised predictor. Note that the normalising variance includes the variability induced by the posterior uncertainty for <span class="math inline">\(\boldsymbol{\theta}\)</span>, whereas the <span class="math inline">\(\|\cdot\|_V\)</span> norm used for the line search used only the posterior mode. Another option is <span class="math display">\[
-E_{(\boldsymbol{u},\boldsymbol{\theta})\sim \overline{p}(\boldsymbol{u},\boldsymbol{\theta}|\boldsymbol{y})} \left[\ln \frac{\overline{p}(\boldsymbol{u} |\boldsymbol{y},{\boldsymbol{\theta}})}{\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}})}\right]
+\]</span> which is the posterior expectation of the component-wise
+variance-normalised squared deviation between the non-linear and
+linearised predictor. Note that the normalising variance includes the
+variability induced by the posterior uncertainty for <span class="math inline">\(\boldsymbol{\theta}\)</span>, whereas the <span class="math inline">\(\|\cdot\|_V\)</span> norm used for the line search
+used only the posterior mode. Another option is <span class="math display">\[
+E_{(\boldsymbol{u},\boldsymbol{\theta})\sim
+\overline{p}(\boldsymbol{u},\boldsymbol{\theta}|\boldsymbol{y})}
+\left[\ln \frac{\overline{p}(\boldsymbol{u}
+|\boldsymbol{y},{\boldsymbol{\theta}})}{\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}})}\right]
 =
-E_{\boldsymbol{\theta}\sim \overline{p}(\boldsymbol{\theta}|\boldsymbol{y})} \left\{
-E_{\boldsymbol{u}\sim \overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})}
-\left[\ln \frac{\overline{p}(\boldsymbol{u} |\boldsymbol{y},{\boldsymbol{\theta}})}{\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}})}\right]
+E_{\boldsymbol{\theta}\sim
+\overline{p}(\boldsymbol{\theta}|\boldsymbol{y})} \left\{
+E_{\boldsymbol{u}\sim
+\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})}
+\left[\ln \frac{\overline{p}(\boldsymbol{u}
+|\boldsymbol{y},{\boldsymbol{\theta}})}{\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}})}\right]
 \right\}
-\]</span> which is the Kullback–Leibler divergence for the conditional posterior densities, <span class="math inline">\(\mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right)\)</span>, integrated over the approximate posterior distribution for <span class="math inline">\(\boldsymbol{\theta}\)</span>. Implementing this would require access to the likelihood and prior distribution details. The next section explores this in more detail.</p>
+\]</span> which is the Kullback–Leibler divergence for the conditional
+posterior densities, <span class="math inline">\(\mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right)\)</span>,
+integrated over the approximate posterior distribution for <span class="math inline">\(\boldsymbol{\theta}\)</span>. Implementing this
+would require access to the likelihood and prior distribution details.
+The next section explores this in more detail.</p>
 <div class="section level4">
 <h4 id="accuracy">Accuracy<a class="anchor" aria-label="anchor" href="#accuracy"></a>
 </h4>
-<p>We wish to assess how accurate the approximation is. Thus, we compare <span class="math inline">\(\widetilde{p}(\boldsymbol{u} | \boldsymbol{y}, \boldsymbol{\theta} )\)</span> and <span class="math inline">\(\overline{p}(\boldsymbol{u} |\boldsymbol{y},\boldsymbol{\theta})\)</span>. With Bayes’ theorem, <span class="math display">\[
+<p>We wish to assess how accurate the approximation is. Thus, we compare
+<span class="math inline">\(\widetilde{p}(\boldsymbol{u} |
+\boldsymbol{y}, \boldsymbol{\theta} )\)</span> and <span class="math inline">\(\overline{p}(\boldsymbol{u}
+|\boldsymbol{y},\boldsymbol{\theta})\)</span>. With Bayes’ theorem,
+<span class="math display">\[
 \begin{aligned}
-    p(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}}) &amp;= \frac{p(\boldsymbol{u},\boldsymbol{y}|{\boldsymbol{\theta}})}{p(\boldsymbol{y}|{\boldsymbol{\theta}})} \\
-    &amp;= \frac{p(\boldsymbol{y}|\boldsymbol{u},{\boldsymbol{\theta}}) p(\boldsymbol{u}|{\boldsymbol{\theta}})}{p(\boldsymbol{y}|{\boldsymbol{\theta}})},
+    p(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}}) &amp;=
+\frac{p(\boldsymbol{u},\boldsymbol{y}|{\boldsymbol{\theta}})}{p(\boldsymbol{y}|{\boldsymbol{\theta}})}
+\\
+    &amp;= \frac{p(\boldsymbol{y}|\boldsymbol{u},{\boldsymbol{\theta}})
+p(\boldsymbol{u}|{\boldsymbol{\theta}})}{p(\boldsymbol{y}|{\boldsymbol{\theta}})},
 \end{aligned}
-\]</span> where <span class="math inline">\(p(\boldsymbol{u}|\boldsymbol{\theta})\)</span> is a Gaussian density and <span class="math inline">\(p(\boldsymbol{y}|\boldsymbol{\theta})\)</span> is a scaling factor that doesn’t depend on <span class="math inline">\(\boldsymbol{u}\)</span>. We can therefore focus on the behaviour of <span class="math inline">\(\ln p(\boldsymbol{y}|\boldsymbol{\theta},\boldsymbol{u})\)</span> for the exact and linearised observation models.</p>
-<p>Recall that the observation likelihood only depends on <span class="math inline">\(\boldsymbol{u}\)</span> through <span class="math inline">\(\boldsymbol{\eta}\)</span>. Using a Taylor expansion with respect to <span class="math inline">\(\boldsymbol{\eta}\)</span> and <span class="math inline">\(\boldsymbol{\eta}^*=\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_*)\)</span>, <span class="math display">\[
+\]</span> where <span class="math inline">\(p(\boldsymbol{u}|\boldsymbol{\theta})\)</span> is
+a Gaussian density and <span class="math inline">\(p(\boldsymbol{y}|\boldsymbol{\theta})\)</span> is
+a scaling factor that doesn’t depend on <span class="math inline">\(\boldsymbol{u}\)</span>. We can therefore focus on
+the behaviour of <span class="math inline">\(\ln
+p(\boldsymbol{y}|\boldsymbol{\theta},\boldsymbol{u})\)</span> for the
+exact and linearised observation models.</p>
+<p>Recall that the observation likelihood only depends on <span class="math inline">\(\boldsymbol{u}\)</span> through <span class="math inline">\(\boldsymbol{\eta}\)</span>. Using a Taylor
+expansion with respect to <span class="math inline">\(\boldsymbol{\eta}\)</span> and <span class="math inline">\(\boldsymbol{\eta}^*=\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_*)\)</span>,
+<span class="math display">\[
 \begin{aligned}
     \ln p(\boldsymbol{y}|\boldsymbol{\eta},\boldsymbol{\theta}) &amp;=
-    \ln p (\boldsymbol{y}|{\boldsymbol{\theta}},\boldsymbol{\eta}^*))  \\ 
-    &amp;\qquad + \sum_i \left.\frac{\partial}{\partial\eta_i} \ln p (\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta}) \right|_{\boldsymbol{\eta}^*}\cdot (\eta_i - \eta^*_i) \\
-    &amp;\qquad + \frac{1}{2}\sum_{i,j} \left.\frac{\partial^2}{\partial\eta_i\partial\eta_j} \ln p (\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta}) \right|_{\boldsymbol{\eta}^*}\cdot (\eta_i - \eta^*_i) (\eta_j - \eta^*_j) + \mathcal{O}(\|\boldsymbol{\eta}-\boldsymbol{\eta}^*\|^3),
+    \ln p
+(\boldsymbol{y}|{\boldsymbol{\theta}},\boldsymbol{\eta}^*))  \\
+    &amp;\qquad + \sum_i \left.\frac{\partial}{\partial\eta_i} \ln p
+(\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta})
+\right|_{\boldsymbol{\eta}^*}\cdot (\eta_i - \eta^*_i) \\
+    &amp;\qquad + \frac{1}{2}\sum_{i,j}
+\left.\frac{\partial^2}{\partial\eta_i\partial\eta_j} \ln p
+(\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta})
+\right|_{\boldsymbol{\eta}^*}\cdot (\eta_i - \eta^*_i) (\eta_j -
+\eta^*_j) + \mathcal{O}(\|\boldsymbol{\eta}-\boldsymbol{\eta}^*\|^3),
 \end{aligned}
 \]</span> Similarly, for each component of <span class="math inline">\(\widetilde{\boldsymbol{\eta}}\)</span>, <span class="math display">\[
 \begin{aligned}
-\widetilde{\eta}_i(\boldsymbol{u}) &amp;= \eta^*_i 
-+\left[\left.\nabla_{u}\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*}\right]^\top (\boldsymbol{u} - \boldsymbol{u}_*)
+\widetilde{\eta}_i(\boldsymbol{u}) &amp;= \eta^*_i
++\left[\left.\nabla_{u}\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*}\right]^\top
+(\boldsymbol{u} - \boldsymbol{u}_*)
 \\&amp;\quad
-+\frac{1}{2}(\boldsymbol{u} - \boldsymbol{u}_*)^\top\left[\left.\nabla_{u}\nabla_{u}^\top\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*}\right] (\boldsymbol{u} - \boldsymbol{u}_*) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}^*\|^3)
-\\&amp;= \eta_i^* + b_i(\boldsymbol{u}) + h_i(\boldsymbol{u}) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
-\\&amp;= \overline{\eta}_i(\boldsymbol{u}) + h_i(\boldsymbol{u}) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
++\frac{1}{2}(\boldsymbol{u} -
+\boldsymbol{u}_*)^\top\left[\left.\nabla_{u}\nabla_{u}^\top\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*}\right]
+(\boldsymbol{u} - \boldsymbol{u}_*) +
+\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}^*\|^3)
+\\&amp;= \eta_i^* + b_i(\boldsymbol{u}) + h_i(\boldsymbol{u}) +
+\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
+\\&amp;= \overline{\eta}_i(\boldsymbol{u}) + h_i(\boldsymbol{u}) +
+\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
 \end{aligned}
 \]</span></p>
-<p>where <span class="math inline">\(\nabla_u\nabla_u^\top\)</span> is the Hessian with respect to <span class="math inline">\(\boldsymbol{u}\)</span>, <span class="math inline">\(b_i\)</span> are linear in <span class="math inline">\(\boldsymbol{u}\)</span>, and <span class="math inline">\(h_i\)</span> are quadratic in <span class="math inline">\(\boldsymbol{u}\)</span>. Combining the two expansions and taking the difference between the full and linearised log-likelihoods, we get <span class="math display">\[
+<p>where <span class="math inline">\(\nabla_u\nabla_u^\top\)</span> is
+the Hessian with respect to <span class="math inline">\(\boldsymbol{u}\)</span>, <span class="math inline">\(b_i\)</span> are linear in <span class="math inline">\(\boldsymbol{u}\)</span>, and <span class="math inline">\(h_i\)</span> are quadratic in <span class="math inline">\(\boldsymbol{u}\)</span>. Combining the two
+expansions and taking the difference between the full and linearised
+log-likelihoods, we get <span class="math display">\[
 \begin{aligned}
-    \ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
+    \ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
+-
     \ln \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
     &amp;=
-    \sum_i \left.\frac{\partial}{\partial\eta_i} \ln p (\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta}) \right|_{\boldsymbol{\eta}^*}\cdot h_i(\boldsymbol{u}) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
+    \sum_i \left.\frac{\partial}{\partial\eta_i} \ln p (\boldsymbol{y} |
+{\boldsymbol{\theta}}, \boldsymbol{\eta})
+\right|_{\boldsymbol{\eta}^*}\cdot h_i(\boldsymbol{u}) +
+\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
 \end{aligned}
-\]</span> Note that the log-likelihood Hessian difference contribution only involves third order <span class="math inline">\(\boldsymbol{u}\)</span> terms and higher, so the expression above includes all terms up to second order.</p>
+\]</span> Note that the log-likelihood Hessian difference contribution
+only involves third order <span class="math inline">\(\boldsymbol{u}\)</span> terms and higher, so the
+expression above includes all terms up to second order.</p>
 <p>Let <span class="math display">\[
-g_i^*=\left.\frac{\partial}{\partial\eta_i} \ln p (\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta}) \right|_{\boldsymbol{\eta}^*}
+g_i^*=\left.\frac{\partial}{\partial\eta_i} \ln p (\boldsymbol{y} |
+{\boldsymbol{\theta}}, \boldsymbol{\eta}) \right|_{\boldsymbol{\eta}^*}
 \]</span> and <span class="math display">\[
-\boldsymbol{H}^*_i = \left.\nabla_{u}\nabla_{u}^\top\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*} .
-\]</span> and form the sum of their products, <span class="math inline">\(\boldsymbol{G}=\sum_i g_i^*\boldsymbol{H}_i^*\)</span>. Then <span class="math display">\[
+\boldsymbol{H}^*_i =
+\left.\nabla_{u}\nabla_{u}^\top\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*}
+.
+\]</span> and form the sum of their products, <span class="math inline">\(\boldsymbol{G}=\sum_i
+g_i^*\boldsymbol{H}_i^*\)</span>. Then <span class="math display">\[
 \begin{aligned}
-    \ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
+    \ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
+-
     \ln \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
     &amp;=
     \frac{1}{2}
-    \sum_i g_i^* (\boldsymbol{u}-\boldsymbol{u}_*)^\top \boldsymbol{H}_i^* (\boldsymbol{u}-\boldsymbol{u}_*) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
+    \sum_i g_i^* (\boldsymbol{u}-\boldsymbol{u}_*)^\top
+\boldsymbol{H}_i^* (\boldsymbol{u}-\boldsymbol{u}_*) +
+\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
     \\&amp;=
     \frac{1}{2}
-    (\boldsymbol{u}-\boldsymbol{u}_*)^\top \boldsymbol{G} (\boldsymbol{u}-\boldsymbol{u}_*) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3).
+    (\boldsymbol{u}-\boldsymbol{u}_*)^\top \boldsymbol{G}
+(\boldsymbol{u}-\boldsymbol{u}_*) +
+\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3).
 \end{aligned}
-\]</span> With <span class="math inline">\(\boldsymbol{m}=\mathsf{E}_\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})\)</span> and <span class="math inline">\(\boldsymbol{Q}^{-1}=\mathsf{Cov}_\overline{p}(\boldsymbol{u},\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})\)</span>, we obtain <span class="math display">\[
+\]</span> With <span class="math inline">\(\boldsymbol{m}=\mathsf{E}_\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})\)</span>
+and <span class="math inline">\(\boldsymbol{Q}^{-1}=\mathsf{Cov}_\overline{p}(\boldsymbol{u},\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})\)</span>,
+we obtain <span class="math display">\[
 \begin{aligned}
-\mathsf{E}_{\overline{p}}\left[ \nabla_{\boldsymbol{u}}  \left\{\ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
-    \ln \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right\}\right]
- &amp;\approx
+\mathsf{E}_{\overline{p}}\left[ \nabla_{\boldsymbol{u}}  \left\{\ln
+\widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
+    \ln
+\overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right\}\right]
+&amp;\approx
     \boldsymbol{G}(\boldsymbol{m}-\boldsymbol{u}_*) ,
     \\
-\mathsf{E}_{\overline{p}}\left[ \nabla_{\boldsymbol{u}}\nabla_{\boldsymbol{u}}^\top  \left\{\ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
-    \ln \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right\}\right]
- &amp;\approx
+\mathsf{E}_{\overline{p}}\left[
+\nabla_{\boldsymbol{u}}\nabla_{\boldsymbol{u}}^\top  \left\{\ln
+\widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
+    \ln
+\overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right\}\right]
+&amp;\approx
     \boldsymbol{G} ,
     \\
-\mathsf{E}_{\overline{p}}\left[    \ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
-    \ln \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right]
- &amp;\approx
+\mathsf{E}_{\overline{p}}\left[    \ln
+\widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
+    \ln
+\overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right]
+&amp;\approx
     \frac{1}{2}
-    \mathop{\mathrm{tr}}(\boldsymbol{G}\boldsymbol{Q}^{-1}) + \frac{1}{2} (\boldsymbol{m}-\boldsymbol{u}_*)\boldsymbol{G}(\boldsymbol{m}-\boldsymbol{u}_*)^\top .
+    \mathop{\mathrm{tr}}(\boldsymbol{G}\boldsymbol{Q}^{-1}) +
+\frac{1}{2}
+(\boldsymbol{m}-\boldsymbol{u}_*)\boldsymbol{G}(\boldsymbol{m}-\boldsymbol{u}_*)^\top
+.
 \end{aligned}
-\]</span> For each <span class="math inline">\(\boldsymbol{\theta}\)</span> configuration in the INLA output, we can extract both <span class="math inline">\(\boldsymbol{m}\)</span> and the sparse precision matrix <span class="math inline">\(\boldsymbol{Q}\)</span> for the Gaussian approximation. The non-sparsity structure of <span class="math inline">\(\boldsymbol{G}\)</span> is contained in the non-sparsity of <span class="math inline">\(\boldsymbol{Q}\)</span>, which allows the use of Takahashi recursion (<code>inla.qinv(Q)</code>) to compute the corresponding <span class="math inline">\(\boldsymbol{Q}^{-1}\)</span> values needed to evaluate the trace <span class="math inline">\(\mathop{\mathrm{tr}}(\boldsymbol{G}\boldsymbol{Q}^{-1})\)</span>. Thus, to implement a numerical approximation of this error analysis only needs special access to the log-likelihood derivatives <span class="math inline">\(g_i^*\)</span>, as <span class="math inline">\(H_i^*\)</span> can in principle be evaluated numerically.</p>
-<p>For a given <span class="math inline">\(\boldsymbol{\theta}\)</span>, <span class="math display">\[
+\]</span> For each <span class="math inline">\(\boldsymbol{\theta}\)</span> configuration in the
+INLA output, we can extract both <span class="math inline">\(\boldsymbol{m}\)</span> and the sparse precision
+matrix <span class="math inline">\(\boldsymbol{Q}\)</span> for the
+Gaussian approximation. The non-sparsity structure of <span class="math inline">\(\boldsymbol{G}\)</span> is contained in the
+non-sparsity of <span class="math inline">\(\boldsymbol{Q}\)</span>,
+which allows the use of Takahashi recursion (<code>inla.qinv(Q)</code>)
+to compute the corresponding <span class="math inline">\(\boldsymbol{Q}^{-1}\)</span> values needed to
+evaluate the trace <span class="math inline">\(\mathop{\mathrm{tr}}(\boldsymbol{G}\boldsymbol{Q}^{-1})\)</span>.
+Thus, to implement a numerical approximation of this error analysis only
+needs special access to the log-likelihood derivatives <span class="math inline">\(g_i^*\)</span>, as <span class="math inline">\(H_i^*\)</span> can in principle be evaluated
+numerically.</p>
+<p>For a given <span class="math inline">\(\boldsymbol{\theta}\)</span>,
+<span class="math display">\[
 \begin{aligned}
 \mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right) &amp;=
 E_{\overline{p}}\left[\ln\frac{\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})}{\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})}\right]
@@ -304,12 +501,21 @@ E_{\overline{p}}\left[
 \ln\frac{\overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})}{\widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})}
 \right]
 -
-\ln\frac{\overline{p}(\boldsymbol{y}|\boldsymbol{\theta})}{\widetilde{p}(\boldsymbol{y}|\boldsymbol{\theta})} .
+\ln\frac{\overline{p}(\boldsymbol{y}|\boldsymbol{\theta})}{\widetilde{p}(\boldsymbol{y}|\boldsymbol{\theta})}
+.
 \end{aligned}
-\]</span> The first term was approximated above. The second term can also be approximated using the derived quantities (to be continued…).</p>
-<p>Summary: The form of the observation likelihood discrepancy shows that, given a linearised posterior <span class="math inline">\(\mathsf{N}(\boldsymbol{m},\boldsymbol{Q}^{-1})\)</span>, a Gaussian approximation to the nonlinear model posterior, <span class="math inline">\(\mathsf{N}(\widetilde{\boldsymbol{m}},\widetilde{\boldsymbol{Q}}^{-1})\)</span>, can be obtained from <span class="math inline">\(\widetilde{\boldsymbol{Q}}=\boldsymbol{Q}-\boldsymbol{G}\)</span> and <span class="math inline">\(\widetilde{\boldsymbol{Q}}\widetilde{\boldsymbol{m}}=\boldsymbol{Q}\boldsymbol{m}-\boldsymbol{G}\boldsymbol{u}_*\)</span>. The K-L divergence becomes <span class="math display">\[
+\]</span> The first term was approximated above. The second term can
+also be approximated using the derived quantities (to be
+continued…).</p>
+<p>Summary: The form of the observation likelihood discrepancy shows
+that, given a linearised posterior <span class="math inline">\(\mathsf{N}(\boldsymbol{m},\boldsymbol{Q}^{-1})\)</span>,
+a Gaussian approximation to the nonlinear model posterior, <span class="math inline">\(\mathsf{N}(\widetilde{\boldsymbol{m}},\widetilde{\boldsymbol{Q}}^{-1})\)</span>,
+can be obtained from <span class="math inline">\(\widetilde{\boldsymbol{Q}}=\boldsymbol{Q}-\boldsymbol{G}\)</span>
+and <span class="math inline">\(\widetilde{\boldsymbol{Q}}\widetilde{\boldsymbol{m}}=\boldsymbol{Q}\boldsymbol{m}-\boldsymbol{G}\boldsymbol{u}_*\)</span>.
+The K-L divergence becomes <span class="math display">\[
 \begin{aligned}
-\mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right) &amp;\approx
+\mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right)
+&amp;\approx
 \frac{1}{2}
 \left[
 \ln\det(\boldsymbol{Q})-
@@ -319,22 +525,46 @@ E_{\overline{p}}\left[
 (\boldsymbol{m}-\boldsymbol{u}_*)^\top\boldsymbol{G}(\boldsymbol{Q}-\boldsymbol{G})^{-1}\boldsymbol{G}(\boldsymbol{m}-\boldsymbol{u}_*)
 \right] .
 \end{aligned}
-\]</span> When the INLA posterior has mean <span class="math inline">\(\boldsymbol{m}=\boldsymbol{u}_*\)</span>, e.g. for models with additive Gaussian observation noise, and <span class="math inline">\(\boldsymbol{\theta}=\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_*}\)</span>, the last term vanishes.</p>
-<p>Note: by implementing the K-L divergence accuracy metric, a by-product would be improved posterior estimates based on <span class="math inline">\(\widetilde{\boldsymbol{m}}\)</span> and <span class="math inline">\(\widetilde{\boldsymbol{Q}}\)</span>.</p>
+\]</span> When the INLA posterior has mean <span class="math inline">\(\boldsymbol{m}=\boldsymbol{u}_*\)</span>, e.g. for
+models with additive Gaussian observation noise, and <span class="math inline">\(\boldsymbol{\theta}=\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_*}\)</span>,
+the last term vanishes.</p>
+<p>Note: by implementing the K-L divergence accuracy metric, a
+by-product would be improved posterior estimates based on <span class="math inline">\(\widetilde{\boldsymbol{m}}\)</span> and <span class="math inline">\(\widetilde{\boldsymbol{Q}}\)</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="well-posedness-and-initialisation">Well-posedness and initialisation<a class="anchor" aria-label="anchor" href="#well-posedness-and-initialisation"></a>
 </h3>
-<p>On a side note, one might be concerned about initialisation at, or convergence to, a saddle point. Although it is not implemented in inlabru, we want to talk about the technicality how we define the initial linearisation point <span class="math inline">\(u_0\)</span>.</p>
-<p>Generally speaking, any values of <span class="math inline">\(\boldsymbol{u}_0\)</span> work except the case that the gradient evaluated at <span class="math inline">\(\boldsymbol{u}_0\)</span> is <span class="math inline">\(\boldsymbol{0}\)</span> because the linearisation point will never move away if the prior mean is also <span class="math inline">\(\boldsymbol{0}\)</span>. In general, this tends to be a saddle point problem. In some cases the problem can be handled by changing the predictor parameterisation or just changing the initialisation point using the <code>bru_initial</code> option. However, for true saddle point problems, it indicates that the predictor parameterisation may lead to a multimodal posterior distribution or is ill-posed in some other way. This is a more fundamental problem that cannot be fixed by changing the initialisation point.</p>
-<p>In these examples, where <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\boldsymbol{u}\)</span> are latent Gaussian components, the predictors 1, 3, and 4 would typically be safe, but predictor 2 is fundamentally non-identifiable. <span class="math display">\[ 
+<p>On a side note, one might be concerned about initialisation at, or
+convergence to, a saddle point. Although it is not implemented in
+inlabru, we want to talk about the technicality how we define the
+initial linearisation point <span class="math inline">\(u_0\)</span>.</p>
+<p>Generally speaking, any values of <span class="math inline">\(\boldsymbol{u}_0\)</span> work except the case
+that the gradient evaluated at <span class="math inline">\(\boldsymbol{u}_0\)</span> is <span class="math inline">\(\boldsymbol{0}\)</span> because the linearisation
+point will never move away if the prior mean is also <span class="math inline">\(\boldsymbol{0}\)</span>. In general, this tends to
+be a saddle point problem. In some cases the problem can be handled by
+changing the predictor parameterisation or just changing the
+initialisation point using the <code>bru_initial</code> option. However,
+for true saddle point problems, it indicates that the predictor
+parameterisation may lead to a multimodal posterior distribution or is
+ill-posed in some other way. This is a more fundamental problem that
+cannot be fixed by changing the initialisation point.</p>
+<p>In these examples, where <span class="math inline">\(\beta\)</span>
+and <span class="math inline">\(\boldsymbol{u}\)</span> are latent
+Gaussian components, the predictors 1, 3, and 4 would typically be safe,
+but predictor 2 is fundamentally non-identifiable. <span class="math display">\[
 \begin{aligned}
 \boldsymbol{\eta}_1 &amp;= \boldsymbol{u}, \\
 \boldsymbol{\eta}_2 &amp;= \beta \boldsymbol{u}, \\
 \boldsymbol{\eta}_3 &amp;= e^\beta \boldsymbol{u}, \\
-\boldsymbol{\eta}_4 &amp;= F_\beta^{-1} ( \Phi(z_\beta)) \boldsymbol{u}, \quad z_{\beta} \sim \mathsf{N}(0,1) .
+\boldsymbol{\eta}_4 &amp;= F_\beta^{-1} ( \Phi(z_\beta)) \boldsymbol{u},
+\quad z_{\beta} \sim \mathsf{N}(0,1) .
 \end{aligned}
-\]</span> Note that for <span class="math inline">\(\boldsymbol{\eta}_3\)</span> and <span class="math inline">\(\boldsymbol{\eta}_4\)</span>, the partial derivatives with respect to <span class="math inline">\(\beta\)</span> are zero for <span class="math inline">\(\boldsymbol{u}=\boldsymbol{0}\)</span>. However, the first inlabru iteration will give a non-zero estimate of <span class="math inline">\(\boldsymbol{u}\)</span>, so that subsequent iteration will involve both <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\boldsymbol{u}\)</span>.</p>
+\]</span> Note that for <span class="math inline">\(\boldsymbol{\eta}_3\)</span> and <span class="math inline">\(\boldsymbol{\eta}_4\)</span>, the partial
+derivatives with respect to <span class="math inline">\(\beta\)</span>
+are zero for <span class="math inline">\(\boldsymbol{u}=\boldsymbol{0}\)</span>. However,
+the first inlabru iteration will give a non-zero estimate of <span class="math inline">\(\boldsymbol{u}\)</span>, so that subsequent
+iteration will involve both <span class="math inline">\(\beta\)</span>
+and <span class="math inline">\(\boldsymbol{u}\)</span>.</p>
 </div>
 </div>
 

@@ -90,7 +90,8 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Installation of INLA and inlabru with Apptainer on HPC</h1>
-                        <h4 data-toc-skip class="author">Man Ho Suen</h4>
+                        <h4 data-toc-skip class="author">Man Ho
+Suen</h4>
             
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/Apptainer.Rmd" class="external-link"><code>vignettes/web/Apptainer.Rmd</code></a></small>
@@ -99,16 +100,28 @@
 
     
     
-<p>High Performance Computing (HPC) is surging in popularity. Building INLA package on the HPC systems with the Anaconda environment sometimes can be tricky due to the Linux distributions and glibc versions. This article is to suggest a workaround with container images using <a href="https://apptainer.org/" class="external-link">Apptainer</a> (formerly known as Singularity) because <a href="https://www.docker.com/" class="external-link">Docker</a> requires root access and is usually not available on HPC. Apptainer can pull Docker images. Despite its convenience, the image size can be large.</p>
+<p>High Performance Computing (HPC) is surging in popularity. Building
+INLA package on the HPC systems with the Anaconda environment sometimes
+can be tricky due to the Linux distributions and glibc versions. This
+article is to suggest a workaround with container images using <a href="https://apptainer.org/" class="external-link">Apptainer</a> (formerly known as
+Singularity) because <a href="https://www.docker.com/" class="external-link">Docker</a>
+requires root access and is usually not available on HPC. Apptainer can
+pull Docker images. Despite its convenience, the image size can be
+large.</p>
 <div class="section level2">
 <h2 id="installation-procedures">Installation Procedures<a class="anchor" aria-label="anchor" href="#installation-procedures"></a>
 </h2>
 <ol style="list-style-type: decimal">
-<li>Check if <a href="https://apptainer.org/docs/user/main/cli/apptainer_version.html" class="external-link">Apptainer</a> is available on your HPC. If not, ask the administrator to install it. Type on your HPC terminal to check which version is installed.</li>
+<li>Check if <a href="https://apptainer.org/docs/user/main/cli/apptainer_version.html" class="external-link">Apptainer</a>
+is available on your HPC. If not, ask the administrator to install it.
+Type on your HPC terminal to check which version is installed.</li>
 </ol>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span> apptainer version</span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
-<li>Type the code below to pull the <a href="https://rocker-project.org/images/versioned/rstudio.html" class="external-link">rocker/geospatial</a> Singularity Image Format (SIF) file with the latest R version. For illustration, we’ll assume the file is stored at <code>./your_container.sif</code>.</li>
+<li>Type the code below to pull the <a href="https://rocker-project.org/images/versioned/rstudio.html" class="external-link">rocker/geospatial</a>
+Singularity Image Format (SIF) file with the latest R version. For
+illustration, we’ll assume the file is stored at
+<code>./your_container.sif</code>.</li>
 </ol>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To pull the docker image </span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span> apptainer pull your_container.sif docker<span class="sc">:</span><span class="er">//</span>rocker<span class="sc">/</span>geospatial<span class="sc">:</span>latest</span>
@@ -126,11 +139,14 @@
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># quit R</span></span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">q</span>()</span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
-<li>Put the following in your job script to execute an R file non-interactively.</li>
+<li>Put the following in your job script to execute an R file
+non-interactively.</li>
 </ol>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To execute an R file with apptainer</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span> apptainer exec .<span class="sc">/</span>your_container.sif Rscript <span class="sc">--</span>no<span class="sc">-</span>restore <span class="sc">--</span>no<span class="sc">-</span>save <span class="sc">--</span>verbose file_to_run.R</span></code></pre></div>
-<p>Note: Use <code>inla.setOption(num.threads = ncpu)</code> to limit the number of threads (ncpu) since INLA does not set it automatically. The <code>ncpu</code> also directly links to RAM requirements.</p>
+<p>Note: Use <code>inla.setOption(num.threads = ncpu)</code> to limit
+the number of threads (ncpu) since INLA does not set it automatically.
+The <code>ncpu</code> also directly links to RAM requirements.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

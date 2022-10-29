@@ -90,9 +90,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>LGCPs - Spatial covariates</h1>
-                        <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
+                        <h4 data-toc-skip class="author">David Borchers
+and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-25</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_covars.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_covars.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_covars.Rmd</code></div>
@@ -111,15 +112,20 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>We are going to fit spatial models to the gorilla data, using factor and continuous explanatory variables in this practical. We will fit one using the factor variable <code>vegetation</code>, the other using the continuous covariate <code>elevation</code></p>
-<p>(Jump to the bottom of the practical if you want to start gently with a 1D example!)</p>
+<p>We are going to fit spatial models to the gorilla data, using factor
+and continuous explanatory variables in this practical. We will fit one
+using the factor variable <code>vegetation</code>, the other using the
+continuous covariate <code>elevation</code></p>
+<p>(Jump to the bottom of the practical if you want to start gently with
+a 1D example!)</p>
 </div>
 <div class="section level2">
 <h2 id="get-the-data">Get the data<a class="anchor" aria-label="anchor" href="#get-the-data"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
-<p>This dataset is a list (see <code><a href="../../reference/gorillas.html">help(gorillas)</a></code> for details. Extract the objects you need from the list, for convenience:</p>
+<p>This dataset is a list (see <code><a href="../../reference/gorillas.html">help(gorillas)</a></code> for details.
+Extract the objects you need from the list, for convenience:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nests</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span></span>
 <span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span></span>
@@ -149,17 +155,39 @@
 <div class="section level4">
 <h4 id="a-model-with-vegetation-type-only">A model with vegetation type only<a class="anchor" aria-label="anchor" href="#a-model-with-vegetation-type-only"></a>
 </h4>
-<p>It seems that vegetation type might be a good predictor because nearly all the nests fall in vegetation type <code>Primary</code>. So we construct a model with vegetation type as a fixed effect. To do this, we need to tell ‘lgcp’ how to find the vegetation type at any point in space, and we do this by creating model components with a fixed effect that we call <code>vegetation</code> (we could call it anything), as follows:</p>
+<p>It seems that vegetation type might be a good predictor because
+nearly all the nests fall in vegetation type <code>Primary</code>. So we
+construct a model with vegetation type as a fixed effect. To do this, we
+need to tell ‘lgcp’ how to find the vegetation type at any point in
+space, and we do this by creating model components with a fixed effect
+that we call <code>vegetation</code> (we could call it anything), as
+follows:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comp1</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">vegetation</span><span class="op">(</span><span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span>, model <span class="op">=</span> <span class="st">"factor_full"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span></code></pre></div>
-<p>Notes: * We need to tell ‘lgcp’ that this is a factor fixed effect, which we do with <code>model="factor_full"</code>, giving one coefficient for each factor level. * We need to be careful about overparameterisation when using factors. Unlike regression models like ‘lm()’, ‘glm()’ or ‘gam()’, ‘lgcp()’, <code>inlabru</code> does not automatically remove the first level and absorb it into an intercept. Instead, we can either use <code>model="factor_full"</code> without an intercept, or <code>model="factor_contrast"</code>, which does remove the first level.</p>
+<p>Notes: * We need to tell ‘lgcp’ that this is a factor fixed effect,
+which we do with <code>model="factor_full"</code>, giving one
+coefficient for each factor level. * We need to be careful about
+overparameterisation when using factors. Unlike regression models like
+‘lm()’, ‘glm()’ or ‘gam()’, ‘lgcp()’, <code>inlabru</code> does not
+automatically remove the first level and absorb it into an intercept.
+Instead, we can either use <code>model="factor_full"</code> without an
+intercept, or <code>model="factor_contrast"</code>, which does remove
+the first level.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comp1alt</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">vegetation</span><span class="op">(</span><span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span>, model <span class="op">=</span> <span class="st">"factor_contrast"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p>Fit the model as usual:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp1</span>, <span class="va">nests</span>, samplers <span class="op">=</span> <span class="va">boundary</span>, domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Predict the intensity, and plot the median intensity surface. (In older versions, predicting takes some time because we did not have vegetation values outside the mesh so ‘inlabru’ needed to predict these first. Since v2.0.0, the vegetation has been pre-extended.)</p>
-<p>The <code>predidct</code> function of <code>inlabru</code> takes into its <code>data</code> argument a <code>SpatialPointsDataFrame</code>, a <code>SpatialPixelsDataFrame</code> or a <code>data.frame</code>. We can use the <code>inlabru</code> function <code>pixels</code> to generate a <code>SpatialPixelsDataFrame</code> only within the boundary, using its <code>mask</code> argument, as shown below.</p>
+<p>Predict the intensity, and plot the median intensity surface. (In
+older versions, predicting takes some time because we did not have
+vegetation values outside the mesh so ‘inlabru’ needed to predict these
+first. Since v2.0.0, the vegetation has been pre-extended.)</p>
+<p>The <code>predidct</code> function of <code>inlabru</code> takes into
+its <code>data</code> argument a <code>SpatialPointsDataFrame</code>, a
+<code>SpatialPixelsDataFrame</code> or a <code>data.frame</code>. We can
+use the <code>inlabru</code> function <code>pixels</code> to generate a
+<code>SpatialPixelsDataFrame</code> only within the boundary, using its
+<code>mask</code> argument, as shown below.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span></span>
 <span><span class="va">int1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, data <span class="op">=</span> <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span></span>
@@ -170,20 +198,25 @@
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, color <span class="op">=</span> <span class="st">"DarkGreen"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
-<p>Not surprisingly, given that most nests are in <code>Primary</code> vegetation, the high density is in this vegetation. But there are substantial patches of predicted high density that have no nests, and some areas of predicted low density that have nests. What about the estimated abundance (there are really 647 nests there):</p>
+<p>Not surprisingly, given that most nests are in <code>Primary</code>
+vegetation, the high density is in this vegetation. But there are
+substantial patches of predicted high density that have no nests, and
+some areas of predicted low density that have nests. What about the
+estimated abundance (there are really 647 nests there):</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">ips</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025    q0.5   q0.975  median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 647.8535 26.98822 598.8933 649.209 697.2725 649.209        2.698822</span></span>
+<span><span class="co">#&gt;       mean       sd  q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 643.4935 25.05747 597.102 642.0413 687.3562 642.0413        2.505747</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.793406</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      1.546202</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="a-model-with-vegetation-type-and-a-spde-type-smoother">A model with vegetation type and a SPDE type smoother<a class="anchor" aria-label="anchor" href="#a-model-with-vegetation-type-and-a-spde-type-smoother"></a>
 </h4>
-<p>Lets try to <code>explain</code> the pattern in nest distribution that is not captured by the vegetation covariate, using an SPDE:</p>
+<p>Lets try to <code>explain</code> the pattern in nest distribution
+that is not captured by the vegetation covariate, using an SPDE:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pcmatern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh</span>,</span>
 <span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
@@ -216,17 +249,20 @@
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda2</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 682.3639 27.39014 627.2451 681.6224 730.8565 681.6224        2.739014</span></span>
+<span><span class="co">#&gt; 1 685.2419 24.85552 638.6791 687.4095 726.9555 687.4095        2.485552</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.852285</span></span></code></pre></div>
-<p>Look at the contributions to the linear predictor from the SPDE and from vegetation:</p>
+<span><span class="co">#&gt; 1      1.791752</span></span></code></pre></div>
+<p>Look at the contributions to the linear predictor from the SPDE and
+from vegetation:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="va">df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  smooth_veg <span class="op">=</span> <span class="va">mySmooth</span> <span class="op">+</span> <span class="va">vegetation</span>,</span>
 <span>  smooth <span class="op">=</span> <span class="va">mySmooth</span>,</span>
 <span>  veg <span class="op">=</span> <span class="va">vegetation</span></span>
 <span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The function <code>scale_fill_gradientn</code> sets the scale for the plot legend. Here we set it to span the range of the three linear predictor components being plotted (medians are plotted by default).</p>
+<p>The function <code>scale_fill_gradientn</code> sets the scale for the
+plot legend. Here we set it to span the range of the three linear
+predictor components being plotted (medians are plotted by default).</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lprange</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">lp2</span><span class="op">$</span><span class="va">smooth_veg</span><span class="op">$</span><span class="va">median</span>, <span class="va">lp2</span><span class="op">$</span><span class="va">smooth</span><span class="op">$</span><span class="va">median</span>, <span class="va">lp2</span><span class="op">$</span><span class="va">veg</span><span class="op">$</span><span class="va">median</span><span class="op">)</span></span>
 <span><span class="va">csc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradientn</a></span><span class="op">(</span>colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">9</span>, <span class="st">"YlOrRd"</span><span class="op">)</span>, limits <span class="op">=</span> <span class="va">lprange</span><span class="op">)</span></span>
@@ -261,7 +297,9 @@
 <div class="section level4">
 <h4 id="a-model-with-spde-only">A model with SPDE only<a class="anchor" aria-label="anchor" href="#a-model-with-spde-only"></a>
 </h4>
-<p>Do we need vegetation at all? Fit a model with only an SPDE + Intercept, and choose between models on the basis of DIC, using ‘deltaIC()’.</p>
+<p>Do we need vegetation at all? Fit a model with only an SPDE +
+Intercept, and choose between models on the basis of DIC, using
+‘deltaIC()’.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comp3</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">pcmatern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">fit3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp3</span>,</span>
@@ -285,10 +323,10 @@
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda3</span></span>
-<span><span class="co">#&gt;       mean      sd  q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 670.2587 26.9509 630.728 665.8497 726.5581 665.8497         2.69509</span></span>
+<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 665.9896 27.35349 605.9548 666.4327 713.9099 666.4327        2.735349</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.884155</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      2.129306</span></span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit2</span>, <span class="va">fit3</span>, criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DIC"</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -314,23 +352,24 @@
 </tr>
 <tr class="even">
 <td align="left">fit3</td>
-<td align="right">498.5739</td>
+<td align="right">498.5740</td>
 <td align="right">1061.932</td>
 <td align="left">fit3</td>
 <td align="right">1577.970</td>
-<td align="right">204.7287</td>
+<td align="right">204.7288</td>
 </tr>
 <tr class="odd">
 <td align="left">fit2</td>
-<td align="right">612.5468</td>
-<td align="right">1175.905</td>
+<td align="right">612.5484</td>
+<td align="right">1175.907</td>
 <td align="left">fit2</td>
-<td align="right">1646.473</td>
-<td align="right">273.2321</td>
+<td align="right">1646.476</td>
+<td align="right">273.2349</td>
 </tr>
 </tbody>
 </table>
-<p>NOTE: the behaviour of DIC and WAIC is currently a bit unclear, in particular for experimental mode, and is being investigated.</p>
+<p>NOTE: the behaviour of DIC and WAIC is currently a bit unclear, in
+particular for experimental mode, and is being investigated.</p>
 <p>Classic mode:</p>
 <table class="table">
 <thead><tr class="header">
@@ -409,7 +448,8 @@
 <div class="section level4">
 <h4 id="cv-and-spde-parameters-for-model-2">CV and SPDE parameters for Model 2<a class="anchor" aria-label="anchor" href="#cv-and-spde-parameters-for-model-2"></a>
 </h4>
-<p>We are going with Model <code>fit2</code>. Lets look at the spatial distribution of the coefficient of variation</p>
+<p>We are going with Model <code>fit2</code>. Lets look at the spatial
+distribution of the coefficient of variation</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">sd</span> <span class="op">/</span> <span class="va">mean</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -417,13 +457,17 @@
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-26-1.png" width="672"></p>
-<p>Plot the vegetation “fixed effect” posteriors. First get their names - from <code>$marginals.random$vegetation</code> of the fitted object, which contains the fixed effect marginal distribution data</p>
+<p>Plot the vegetation “fixed effect” posteriors. First get their names
+- from <code>$marginals.random$vegetation</code> of the fitted object,
+which contains the fixed effect marginal distribution data</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">flist</span><span class="op">)</span><span class="op">)</span> <span class="va">flist</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"vegetation"</span>, index <span class="op">=</span> <span class="va">i</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="va">flist</span>, cols <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-27-1.png" width="672"></p>
-<p>Use <code><a href="../../reference/spde.posterior.html">spde.posterior( )</a></code> to obtain and then plot the SPDE parameter posteriors and the Matern correlation and covariance functions for this model.</p>
+<p>Use <code><a href="../../reference/spde.posterior.html">spde.posterior( )</a></code> to obtain and then plot the SPDE
+parameter posteriors and the Matern correlation and covariance functions
+for this model.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span></span>
 <span><span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span></span>
@@ -442,7 +486,8 @@
 <div class="section level2">
 <h2 id="continuous-covariates">Continuous covariates<a class="anchor" aria-label="anchor" href="#continuous-covariates"></a>
 </h2>
-<p>Now lets try a model with elevation as a (continuous) explanatory variable. (First centre elevations for more stable fitting.)</p>
+<p>Now lets try a model with elevation as a (continuous) explanatory
+variable. (First centre elevations for more stable fitting.)</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">elev</span> <span class="op">&lt;-</span> <span class="va">gcov</span><span class="op">$</span><span class="va">elevation</span></span>
 <span><span class="va">elev</span><span class="op">$</span><span class="va">elevation</span> <span class="op">&lt;-</span> <span class="va">elev</span><span class="op">$</span><span class="va">elevation</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">elev</span><span class="op">$</span><span class="va">elevation</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -452,7 +497,14 @@
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-29-1.png" width="672"></p>
-<p>The elevation variable here is of class ‘SpatialGridDataFrame’, that can be handled in the same way as the vegetation covariate. However, since in some cases data may be stored differently, and other methods are needed to access the stored values. In such cases, we can define a function that knows how to evaluate the covariate at arbitrary points in the survey region, and call that function in the component definition. In this case, we can use a powerful method from the ‘sp’ package to do this. We use this to create the needed function.</p>
+<p>The elevation variable here is of class ‘SpatialGridDataFrame’, that
+can be handled in the same way as the vegetation covariate. However,
+since in some cases data may be stored differently, and other methods
+are needed to access the stored values. In such cases, we can define a
+function that knows how to evaluate the covariate at arbitrary points in
+the survey region, and call that function in the component definition.
+In this case, we can use a powerful method from the ‘sp’ package to do
+this. We use this to create the needed function.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">f.elev</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># turn coordinates into SpatialPoints object:</span></span>
@@ -466,7 +518,9 @@
 <span>  <span class="op">}</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>For brevity we are not going to consider models with elevation only, with elevation and a SPDE, and with SPDE only. We will just fit one with elevation and SPDE. We create our model to pass to lgcp thus:</p>
+<p>For brevity we are not going to consider models with elevation only,
+with elevation and a SPDE, and with SPDE only. We will just fit one with
+elevation and SPDE. We create our model to pass to lgcp thus:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh</span>,</span>
 <span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
@@ -475,10 +529,12 @@
 <span></span>
 <span><span class="va">ecomp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">elev</span><span class="op">(</span><span class="fu">f.elev</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>Note how the elevation effect is defined. When we used the <code>Spatial</code> grid object directly we specified it like</p>
+<p>Note how the elevation effect is defined. When we used the
+<code>Spatial</code> grid object directly we specified it like</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">vegetation</span><span class="op">(</span><span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span>, model <span class="op">=</span> <span class="st">"factor_full"</span><span class="op">)</span></span></code></pre></div>
-<p>whereas with the function method we specify the covariate like this:</p>
+<p>whereas with the function method we specify the covariate like
+this:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">elev</span><span class="op">(</span><span class="fu">f.elev</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span></code></pre></div>
 <p>We also now include an intercept term.</p>
@@ -499,7 +555,7 @@
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ .</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.683, Running = 14, Post = 0.473, Total = 15.2 </span></span>
+<span><span class="co">#&gt;     Pre = 0.843, Running = 14.2, Post = 0.533, Total = 15.5 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span></span>
 <span><span class="co">#&gt; elev      0.004 0.001      0.002    0.004      0.006 0.004   0</span></span>
@@ -529,8 +585,8 @@
 <span><span class="co">#&gt;   Model       DIC Delta.DIC</span></span>
 <span><span class="co">#&gt; 1  fit1 -563.3583     0.000</span></span>
 <span><span class="co">#&gt; 2  efit  490.5617  1053.920</span></span>
-<span><span class="co">#&gt; 3  fit3  498.5739  1061.932</span></span>
-<span><span class="co">#&gt; 4  fit2  612.5468  1175.905</span></span></code></pre></div>
+<span><span class="co">#&gt; 3  fit3  498.5740  1061.932</span></span>
+<span><span class="co">#&gt; 4  fit2  612.5484  1175.907</span></span></code></pre></div>
 <p>Predict and plot the density</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">e.int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">efit</span>, <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
@@ -541,7 +597,10 @@
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, shape <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-37-1.png" width="672"></p>
-<p>Now look at the elevation and SPDE effects in space. Leave out the Intercept because it swamps the spatial effects of elevation and the SPDE in the plots and we are interested in comparing the effects of elevation and the SPDE.</p>
+<p>Now look at the elevation and SPDE effects in space. Leave out the
+Intercept because it swamps the spatial effects of elevation and the
+SPDE in the plots and we are interested in comparing the effects of
+elevation and the SPDE.</p>
 <p>First we need to predict on the linear predictor scale.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">e.lp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -552,7 +611,8 @@
 <span>    smooth <span class="op">=</span> <span class="va">mySmooth</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>The code below, which is very similar to that used for the vegetation factor variable, produces the plots we want.</p>
+<p>The code below, which is very similar to that used for the vegetation
+factor variable, produces the plots we want.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lprange</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">e.lp</span><span class="op">$</span><span class="va">smooth_elev</span><span class="op">$</span><span class="va">mean</span>, <span class="va">e.lp</span><span class="op">$</span><span class="va">elev</span><span class="op">$</span><span class="va">mean</span>, <span class="va">e.lp</span><span class="op">$</span><span class="va">smooth</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
 <span></span>
@@ -589,7 +649,9 @@
 <span>  cols <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-39-1.png" width="1248"></p>
-<p>You might also want to look at the posteriors of the fixed effects and of the SPDE. Adapt the code used for the vegetation factor to do this.</p>
+<p>You might also want to look at the posteriors of the fixed effects
+and of the SPDE. Adapt the code used for the vegetation factor to do
+this.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">efit</span><span class="op">$</span><span class="va">summary.fixed</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">flist</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -597,7 +659,8 @@
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="va">flist</span>, cols <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-40-1.png" width="672"></p>
-<p>Plot the SPDE parameter posteriors and the Matern correlation and covariance functions for this model.</p>
+<p>Plot the SPDE parameter posteriors and the Matern correlation and
+covariance functions for this model.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span></span>
@@ -612,7 +675,9 @@
 <span><span class="va">covplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">efit</span>, <span class="st">"mySmooth"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">covplot</span>, <span class="va">corplot</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-41-2.png" width="672"></p>
-<p>Also estimate abundance. The <code>data.frame</code> in the second call leads to inclusion of <code>N</code> in the prediction object, for easier plotting.</p>
+<p>Also estimate abundance. The <code>data.frame</code> in the second
+call leads to inclusion of <code>N</code> in the prediction object, for
+easier plotting.</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">efit</span>, <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>,</span>
@@ -620,9 +685,9 @@
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 670.3648 23.45571 625.2438 670.5475 720.5766 670.5475        2.345571</span></span>
+<span><span class="co">#&gt; 1 664.6891 23.77581 625.1598 661.7048 713.5471 661.7048        2.377581</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.888702</span></span>
+<span><span class="co">#&gt; 1      1.640082</span></span>
 <span></span>
 <span><span class="va">Nest.e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">efit</span>,</span>
@@ -645,7 +710,16 @@
 <div class="section level3">
 <h3 id="non-spatial-evaluation-of-the-covariate-effect">Non-spatial evaluation of the covariate effect<a class="anchor" aria-label="anchor" href="#non-spatial-evaluation-of-the-covariate-effect"></a>
 </h3>
-<p>The previous examples of posterior prediction focused on spatial prediction. From <code>inlabru</code> version 2.2.8, a feauture is available for overriding the component input value specification from the component definition. Each model component can be evaluated directly, for arbitrary values by functions named by adding the suffix <code>_eval</code> to the end of the component name in the predictor expression. Since the elevation effect in this model is linear, the resulting plot isn’t very interesting, but the same method can be applied to non-linear effects as well, and combined into general R expressions:</p>
+<p>The previous examples of posterior prediction focused on spatial
+prediction. From <code>inlabru</code> version 2.2.8, a feauture is
+available for overriding the component input value specification from
+the component definition. Each model component can be evaluated
+directly, for arbitrary values by functions named by adding the suffix
+<code>_eval</code> to the end of the component name in the predictor
+expression. Since the elevation effect in this model is linear, the
+resulting plot isn’t very interesting, but the same method can be
+applied to non-linear effects as well, and combined into general R
+expressions:</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">elev.pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">efit</span>,</span>
@@ -673,7 +747,13 @@
 <div class="section level2">
 <h2 id="a-1d-example">A 1D Example<a class="anchor" aria-label="anchor" href="#a-1d-example"></a>
 </h2>
-<p>Try fitting a 1-dimensional model to the point data in the <code>inlabru</code> dataset <code>Poisson2_1D</code>. This comes with a covariate function called <code>cov2_1D</code>. Try to reproduce the plot below (used in lectures) showing the effects of the <code>Intercept + z</code> and the <code>SPDE</code>. (You may find it helpful to build on the model you fitted in the previous practical, adding the covariate to the model specification.)</p>
+<p>Try fitting a 1-dimensional model to the point data in the
+<code>inlabru</code> dataset <code>Poisson2_1D</code>. This comes with a
+covariate function called <code>cov2_1D</code>. Try to reproduce the
+plot below (used in lectures) showing the effects of the
+<code>Intercept + z</code> and the <code>SPDE</code>. (You may find it
+helpful to build on the model you fitted in the previous practical,
+adding the covariate to the model specification.)</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Poisson2_1D</span><span class="op">)</span></span>
 <span><span class="va">ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>

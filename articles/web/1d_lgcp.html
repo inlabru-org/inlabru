@@ -90,9 +90,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>LGCPs - An example in one dimension</h1>
-                        <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
+                        <h4 data-toc-skip class="author">David Borchers
+and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-25</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/1d_lgcp.Rmd" class="external-link"><code>vignettes/web/1d_lgcp.Rmd</code></a></small>
       <div class="d-none name"><code>1d_lgcp.Rmd</code></div>
@@ -103,7 +104,10 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>In this vignette we are going to see how to fit an SPDE to one-dimensional <em>point</em> data, i.e. data that consist of the points at which things are located, not the number of points in some area.</p>
+<p>In this vignette we are going to see how to fit an SPDE to
+one-dimensional <em>point</em> data, i.e. data that consist of the
+points at which things are located, not the number of points in some
+area.</p>
 </div>
 <div class="section level2">
 <h2 id="setting-things-up">Setting things up<a class="anchor" aria-label="anchor" href="#setting-things-up"></a>
@@ -139,7 +143,11 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh1D</span>, prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">150</span>, <span class="fl">0.75</span><span class="op">)</span>, prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mdl</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">~</span> <span class="fu">spde1D</span><span class="op">(</span><span class="va">x</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>Here we want to fit to the actual points, and the <code>inlabru</code> function that does this is called <code>lgcp</code> (for ‘Log Gaussian Cox Process’). The <code>ips</code> and <code>domain</code> parameters are optional, one or the other can be used. Here are two ways of doing the same thing:</p>
+<p>Here we want to fit to the actual points, and the
+<code>inlabru</code> function that does this is called <code>lgcp</code>
+(for ‘Log Gaussian Cox Process’). The <code>ips</code> and
+<code>domain</code> parameters are optional, one or the other can be
+used. Here are two ways of doing the same thing:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit.spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">mdl</span>, <span class="va">pts2</span>, ips <span class="op">=</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span><span class="op">)</span>, <span class="fl">50</span>, name <span class="op">=</span> <span class="st">"x"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">fita.spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">mdl</span>, <span class="va">pts2</span>, domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">mesh1D</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -147,12 +155,21 @@
 <div class="section level2">
 <h2 id="spde-parameters">SPDE parameters<a class="anchor" aria-label="anchor" href="#spde-parameters"></a>
 </h2>
-<p>We can look at the posterior distributions of the parameters of the SPDE using the function <code>spde.posterior</code>. It returns <code>x</code> and <code>y</code> values for a plot of the posterior PDF in a data frame, which can be printed using the <code>plot</code> function. To see the PDF for the range parameter, for example:</p>
+<p>We can look at the posterior distributions of the parameters of the
+SPDE using the function <code>spde.posterior</code>. It returns
+<code>x</code> and <code>y</code> values for a plot of the posterior PDF
+in a data frame, which can be printed using the <code>plot</code>
+function. To see the PDF for the range parameter, for example:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">post.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit.spde</span>, name <span class="op">=</span> <span class="st">"spde1D"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">post.range</span><span class="op">)</span></span></code></pre></div>
 <p><img src="1d_lgcp_files/figure-html/unnamed-chunk-8-1.png" width="672"></p>
-<p>Look at the help file for <code>spde.posterior</code> and then plot the posterior for the log of the SPDE range parameter, the SPDE variance and/or log of the variance, and for the Matern covariance function. Make sure you understand the difference between what is plotted for the range and variance parameters, and for the covariance function (which involves both these parameters).</p>
+<p>Look at the help file for <code>spde.posterior</code> and then plot
+the posterior for the log of the SPDE range parameter, the SPDE variance
+and/or log of the variance, and for the Matern covariance function. Make
+sure you understand the difference between what is plotted for the range
+and variance parameters, and for the covariance function (which involves
+both these parameters).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">post.log.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit.spde</span>, name <span class="op">=</span> <span class="st">"spde1D"</span>, what <span class="op">=</span> <span class="st">"log.range"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">post.log.range</span><span class="op">)</span> <span class="co"># SOLUTION</span></span>
@@ -162,16 +179,21 @@
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">post.log.variance</span><span class="op">)</span> <span class="co"># SOLUTION</span></span>
 <span><span class="va">post.matcorr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit.spde</span>, name <span class="op">=</span> <span class="st">"spde1D"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">post.matcorr</span><span class="op">)</span> <span class="co"># SOLUTION</span></span></code></pre></div>
-<p>You can get a feel for sensitivity to priors by specifying different priors and looking at the posterior plots.</p>
+<p>You can get a feel for sensitivity to priors by specifying different
+priors and looking at the posterior plots.</p>
 </div>
 <div class="section level2">
 <h2 id="predicting-intensity">Predicting intensity<a class="anchor" aria-label="anchor" href="#predicting-intensity"></a>
 </h2>
-<p>We can also now predict on any scale we want. For example, to predict on the ‘response’ scale (i.e. the intensity function <span class="math inline">\(\lambda(s)\)</span>), we call <code>predict</code> thus:</p>
+<p>We can also now predict on any scale we want. For example, to predict
+on the ‘response’ scale (i.e. the intensity function <span class="math inline">\(\lambda(s)\)</span>), we call <code>predict</code>
+thus:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">predf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># Set up a data frame of explanatory values at which to predict</span></span>
 <span><span class="va">pred_spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit.spde</span>, <span class="va">predf</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">spde1D</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>while to predict on the linear predictor scale (i.e. that of the log intensity, <span class="math inline">\(\log(\lambda(s))\)</span>), we call <code>predict</code> thus:</p>
+<p>while to predict on the linear predictor scale (i.e. that of the log
+intensity, <span class="math inline">\(\log(\lambda(s))\)</span>), we
+call <code>predict</code> thus:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred_spde_lp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit.spde</span>, <span class="va">predf</span>, <span class="op">~</span> <span class="va">spde1D</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span></span></code></pre></div>
 <p>here’s how to plot the prediction and 95% credible interval:</p>
@@ -180,7 +202,13 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pts2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">0</span>, pch <span class="op">=</span> <span class="st">"|"</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"x"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Intensity"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="1d_lgcp_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
-<p>How does this compare with the underlying intensity function that generated the data? The function <code><a href="../../reference/Poisson2_1D.html">lambda2_1D( )</a></code> in the dataset <code>Poission2_1D</code> calculates the true intensity that was used in simulating these data. In order to plot this, we make a data frame with <code>x</code>- and <code>y</code>-coordinates giving the true intensity function, <span class="math inline">\(\lambda(s)\)</span>. We use lots of <code>x</code>-values to get a nice smooth plot (150 values).</p>
+<p>How does this compare with the underlying intensity function that
+generated the data? The function <code><a href="../../reference/Poisson2_1D.html">lambda2_1D( )</a></code> in the
+dataset <code>Poission2_1D</code> calculates the true intensity that was
+used in simulating these data. In order to plot this, we make a data
+frame with <code>x</code>- and <code>y</code>-coordinates giving the
+true intensity function, <span class="math inline">\(\lambda(s)\)</span>. We use lots of
+<code>x</code>-values to get a nice smooth plot (150 values).</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">150</span><span class="op">)</span></span>
 <span><span class="va">true.lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xs</span>, y <span class="op">=</span> <span class="fu"><a href="../../reference/Poisson2_1D.html">lambda2_1D</a></span><span class="op">(</span><span class="va">xs</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -194,7 +222,12 @@
 <div class="section level2">
 <h2 id="goodness-of-fit">Goodness-of-Fit<a class="anchor" aria-label="anchor" href="#goodness-of-fit"></a>
 </h2>
-<p>We can look at the goodness-of-fit of the mode using the <code>inlabru</code> function <code><a href="../../reference/bincount.html">bincount( )</a></code>, which plots the 95% credible intervals in a specified set of bins along the <code>x</code>-axis together with the observed count in each bin: The credible intervals are shown as red rectangles, the mean fitted value as a short horizontal blue line, and the observed data as black points:</p>
+<p>We can look at the goodness-of-fit of the mode using the
+<code>inlabru</code> function <code><a href="../../reference/bincount.html">bincount( )</a></code>, which plots the
+95% credible intervals in a specified set of bins along the
+<code>x</code>-axis together with the observed count in each bin: The
+credible intervals are shown as red rectangles, the mean fitted value as
+a short horizontal blue line, and the observed data as black points:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span></span>
 <span>  result <span class="op">=</span> <span class="va">fit.spde</span>,</span>
@@ -209,7 +242,11 @@
 <div class="section level2">
 <h2 id="estimating-abundance">Estimating Abundance<a class="anchor" aria-label="anchor" href="#estimating-abundance"></a>
 </h2>
-<p>Abundance is the integral of the intensity over space. We estimate it by integrating the predicted intensity over <code>x</code>. Integration is done by adding up the intensity at locations <code>x</code> weighted by a particular weight. The locations <code>x</code> and their weights are constructed using the <code>ipoints</code> function</p>
+<p>Abundance is the integral of the intensity over space. We estimate it
+by integrating the predicted intensity over <code>x</code>. Integration
+is done by adding up the intensity at locations <code>x</code> weighted
+by a particular weight. The locations <code>x</code> and their weights
+are constructed using the <code>ipoints</code> function</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span><span class="op">)</span>, <span class="fl">100</span>, name <span class="op">=</span> <span class="st">"x"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ips</span><span class="op">)</span></span>
@@ -224,21 +261,28 @@
 <p>You can look at the abundance estimate by typing</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 132.4634 12.13093 108.8356 131.1944 155.8639 131.1944        1.213093     0.9727536</span></span></code></pre></div>
+<span><span class="co">#&gt;       mean      sd   q0.025     q0.5  q0.975   median mean.mc_std_err sd.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 131.2874 11.0035 109.9211 131.9719 150.591 131.9719         1.10035     0.6857274</span></span></code></pre></div>
 <ul>
 <li>
 <code>mean</code> is the posterior mean abundance.</li>
 <li>
-<code>sd</code> is the estimated standard error of the posterior of the abundance.</li>
+<code>sd</code> is the estimated standard error of the posterior of
+the abundance.</li>
 <li>
-<code>cv</code> is its estimated coefficient of variation (stander error divided by mean).</li>
+<code>cv</code> is its estimated coefficient of variation (stander
+error divided by mean).</li>
 <li>
-<code>q0.025</code> and <code>q0.975</code> are the 95% credible interval bounds.</li>
+<code>q0.025</code> and <code>q0.975</code> are the 95% credible
+interval bounds.</li>
 <li>
 <code>q0.5</code> is the posterior median abundance</li>
 </ul>
-<p>But it is not quite that simple! The above posterior for abundance takes account only of the variance due to us not knowing the parameters of the intensity function. It neglects the variance in the number of point locations, given the intensity function. To include this we need to modify <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict( )</a></code> as follows:</p>
+<p>But it is not quite that simple! The above posterior for abundance
+takes account only of the variance due to us not knowing the parameters
+of the intensity function. It neglects the variance in the number of
+point locations, given the intensity function. To include this we need
+to modify <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict( )</a></code> as follows:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit.spde</span>, <span class="va">ips</span>,</span>
@@ -249,28 +293,32 @@
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>This calculates the same statistics as were calculated for <code>Lambda</code>, but for evey value of <code>N</code> from 50 to 250, rather than for the posterior mean <code>N</code> alone:</p>
+<p>This calculates the same statistics as were calculated for
+<code>Lambda</code>, but for evey value of <code>N</code> from 50 to
+250, rather than for the posterior mean <code>N</code> alone:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    N         mean           sd       q0.025         q0.5       q0.975       median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 50 4.824430e-11 3.508118e-10 2.649825e-21 3.933420e-16 3.185365e-10 3.933420e-16    3.508118e-11</span></span>
-<span><span class="co">#&gt; 2 51 9.809372e-11 7.064583e-10 7.746238e-21 1.007209e-15 6.676181e-10 1.007209e-15    7.064583e-11</span></span>
-<span><span class="co">#&gt; 3 52 1.956948e-10 1.395463e-09 2.220930e-20 2.529513e-15 1.372413e-09 2.529513e-15    1.395463e-10</span></span>
-<span><span class="co">#&gt; 4 53 3.832025e-10 2.704792e-09 6.247552e-20 6.232784e-15 2.768153e-09 6.232784e-15    2.704792e-10</span></span>
-<span><span class="co">#&gt; 5 54 7.368028e-10 5.146256e-09 1.724926e-19 1.507336e-14 5.480231e-09 1.507336e-14    5.146256e-10</span></span>
-<span><span class="co">#&gt; 6 55 1.391573e-09 9.614876e-09 4.675903e-19 3.579069e-14 1.065271e-08 3.579069e-14    9.614876e-10</span></span>
+<span><span class="co">#&gt; 1 50 1.426680e-12 7.003421e-12 1.598373e-21 6.811985e-16 7.807716e-12 6.811985e-16    7.003421e-13</span></span>
+<span><span class="co">#&gt; 2 51 3.136439e-12 1.516033e-11 4.694507e-21 1.732492e-15 1.742378e-11 1.732492e-15    1.516033e-12</span></span>
+<span><span class="co">#&gt; 3 52 6.765525e-12 3.219243e-11 1.352306e-20 4.321511e-15 3.813557e-11 4.321511e-15    3.219243e-12</span></span>
+<span><span class="co">#&gt; 4 53 1.432468e-11 6.708270e-11 3.822030e-20 1.057615e-14 8.189330e-11 1.057615e-14    6.708270e-12</span></span>
+<span><span class="co">#&gt; 5 54 2.978145e-11 1.372266e-10 1.060234e-19 2.540399e-14 1.726042e-10 2.540399e-14    1.372266e-11</span></span>
+<span><span class="co">#&gt; 6 55 6.081862e-11 2.756708e-10 2.887665e-19 5.991112e-14 3.571810e-10 5.991112e-14    2.756708e-11</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1  1.644015e-10</span></span>
-<span><span class="co">#&gt; 2  3.297950e-10</span></span>
-<span><span class="co">#&gt; 3  6.487762e-10</span></span>
-<span><span class="co">#&gt; 4  1.252033e-09</span></span>
-<span><span class="co">#&gt; 5  2.371145e-09</span></span>
-<span><span class="co">#&gt; 6  4.408264e-09</span></span></code></pre></div>
+<span><span class="co">#&gt; 1  2.932077e-12</span></span>
+<span><span class="co">#&gt; 2  6.299566e-12</span></span>
+<span><span class="co">#&gt; 3  1.327183e-11</span></span>
+<span><span class="co">#&gt; 4  2.742790e-11</span></span>
+<span><span class="co">#&gt; 5  5.562195e-11</span></span>
+<span><span class="co">#&gt; 6  1.107226e-10</span></span></code></pre></div>
 <p>We compute the 95% prediction interval and the median as follows</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]  99.74841 129.32825 160.57762</span></span></code></pre></div>
-<p>Compare <code>Lambda</code> to <code>Nest</code> by plotting: First calculate the posterior conditional on the mean of <code>Lambda</code></p>
+<span><span class="co">#&gt; [1] 101.9630 130.0506 162.3088</span></span></code></pre></div>
+<p>Compare <code>Lambda</code> to <code>Nest</code> by plotting: First
+calculate the posterior conditional on the mean of
+<code>Lambda</code></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">$</span><span class="va">plugin_estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, lambda <span class="op">=</span> <span class="va">Lambda</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span></code></pre></div>
 <p>Then plot it and the unconditional posterior</p>
@@ -284,14 +332,17 @@
 <div class="section level2">
 <h2 id="comparison-to-gam-fit">Comparison to GAM fit<a class="anchor" aria-label="anchor" href="#comparison-to-gam-fit"></a>
 </h2>
-<p>Now refit a GAM for the count data of <code>Poisson2_1D</code> and plot the estimated intensity function from this GAM fit, together with the LGCP fitted above and the true intensity.</p>
+<p>Now refit a GAM for the count data of <code>Poisson2_1D</code> and
+plot the estimated intensity function from this GAM fit, together with
+the LGCP fitted above and the true intensity.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cd2</span> <span class="op">&lt;-</span> <span class="va">countdata2</span></span>
 <span><span class="va">fit2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">exposure</span><span class="op">)</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">cd2</span><span class="op">)</span></span>
 <span><span class="va">dat4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>, exposure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">cd2</span><span class="op">$</span><span class="va">exposure</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">pred2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit2.gam</span>, newdata <span class="op">=</span> <span class="va">dat4pred</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span><span class="va">dat4pred2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">dat4pred</span>, gam <span class="op">=</span> <span class="va">pred2.gam</span><span class="op">)</span> <span class="co"># SOLUTION</span></span></code></pre></div>
-<p>You should get a plot like this (thick line is the true intensity, the thin solid line the inlabru fit, the dashed line the GAM fit:</p>
+<p>You should get a plot like this (thick line is the true intensity,
+the thin solid line the inlabru fit, the dashed line the GAM fit:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_spde</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pts2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">0</span>, pch <span class="op">=</span> <span class="st">"|"</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>

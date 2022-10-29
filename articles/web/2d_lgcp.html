@@ -90,9 +90,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>LGCPs - An example in two dimensions</h1>
-                        <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
+                        <h4 data-toc-skip class="author">David Borchers
+and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-25</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp.Rmd" class="external-link"><code>vignettes/web/2d_lgcp.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp.Rmd</code></div>
@@ -103,7 +104,9 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>For this vignette we are going to be working with a dataset obtained from the <code>R</code> package <code>spatstat</code>. We will set up a two-dimensional LGCP to estimate Gorilla abundance.</p>
+<p>For this vignette we are going to be working with a dataset obtained
+from the <code>R</code> package <code>spatstat</code>. We will set up a
+two-dimensional LGCP to estimate Gorilla abundance.</p>
 </div>
 <div class="section level2">
 <h2 id="setting-things-up">Setting things up<a class="anchor" aria-label="anchor" href="#setting-things-up"></a>
@@ -118,15 +121,25 @@
 <div class="section level2">
 <h2 id="get-the-data">Get the data<a class="anchor" aria-label="anchor" href="#get-the-data"></a>
 </h2>
-<p>For the next few practicals we are going to be working with a dataset obtained from the <code>R</code> package <code>spatstat</code>, which contains the locations of 647 gorilla nests. We load the dataset like this:</p>
+<p>For the next few practicals we are going to be working with a dataset
+obtained from the <code>R</code> package <code>spatstat</code>, which
+contains the locations of 647 gorilla nests. We load the dataset like
+this:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
-<p>This dataset is a list containing a number of <code>R</code> objects, including the locations of the nests, the boundary of the survey area and an <code>INLA</code> mesh - see <code><a href="../../reference/gorillas.html">help(gorillas)</a></code> for details. Extract the the objects we need from the list, into other objects, so that we don’t have to keep typing ‘<code>gorillas$</code>’:</p>
+<p>This dataset is a list containing a number of <code>R</code> objects,
+including the locations of the nests, the boundary of the survey area
+and an <code>INLA</code> mesh - see <code><a href="../../reference/gorillas.html">help(gorillas)</a></code> for
+details. Extract the the objects we need from the list, into other
+objects, so that we don’t have to keep typing
+‘<code>gorillas$</code>’:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nests</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span></span>
 <span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span></span>
 <span><span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span></span></code></pre></div>
-<p>Plot the points (the nests(. (The <code>ggplot2</code> function <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed()</a></code> sets the aspect ratio, which defaults to 1.)</p>
+<p>Plot the points (the nests(. (The <code>ggplot2</code> function
+<code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed()</a></code> sets the aspect ratio, which defaults to
+1.)</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span> <span class="op">+</span></span>
@@ -139,12 +152,24 @@
 <div class="section level2">
 <h2 id="fiting-the-model">Fiting the model<a class="anchor" aria-label="anchor" href="#fiting-the-model"></a>
 </h2>
-<p>Fit an LGCP model to the locations of the gorilla nests, predict on the survey region, and produce a plot of the estimated density - which should look like the plot shown below.</p>
+<p>Fit an LGCP model to the locations of the gorilla nests, predict on
+the survey region, and produce a plot of the estimated density - which
+should look like the plot shown below.</p>
 <p>Recall that the steps to specifying, fitting and predicting are:</p>
 <ol style="list-style-type: decimal">
-<li><p>Specify a model, comprising (for 2D models) <code>coordinates</code> on the left of <code>~</code> and an SPDE <code>+ Intercept(1)</code> on the right. Please use the SPDE prior specification stated below.</p></li>
-<li><p>Call <code><a href="../../reference/lgcp.html">lgcp( )</a></code>, passing it (with 2D models) the model components, the <code>SpatialPointsDataFrame</code> containing the observed points and the <code>SpatialPolygonsDataFrame</code> defining the survey boundary using the <code>samplers</code> argument.</p></li>
-<li><p>Call <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict( )</a></code>, passing it the fitted model from 2., locations at which to predict and an appropriate predictor spcification. The locations at which to predict should be a <code>SpatialPixelsDataFrame</code> covering the mesh obtained by calling <code>pixels(mesh)</code>.</p></li>
+<li><p>Specify a model, comprising (for 2D models)
+<code>coordinates</code> on the left of <code>~</code> and an SPDE
+<code>+ Intercept(1)</code> on the right. Please use the SPDE prior
+specification stated below.</p></li>
+<li><p>Call <code><a href="../../reference/lgcp.html">lgcp( )</a></code>, passing it (with 2D models) the model
+components, the <code>SpatialPointsDataFrame</code> containing the
+observed points and the <code>SpatialPolygonsDataFrame</code> defining
+the survey boundary using the <code>samplers</code> argument.</p></li>
+<li><p>Call <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict( )</a></code>, passing it the fitted model from
+2., locations at which to predict and an appropriate predictor
+spcification. The locations at which to predict should be a
+<code>SpatialPixelsDataFrame</code> covering the mesh obtained by
+calling <code>pixels(mesh)</code>.</p></li>
 </ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh</span>,</span>
@@ -162,7 +187,8 @@
 <div class="section level2">
 <h2 id="predicting-intensity">Predicting intensity<a class="anchor" aria-label="anchor" href="#predicting-intensity"></a>
 </h2>
-<p>You should get a plot like that below (the command below assumes that the prediction is in an object called <code>lambda</code>):</p>
+<p>You should get a plot like that below (the command below assumes that
+the prediction is in an object called <code>lambda</code>):</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>,</span>
@@ -187,7 +213,9 @@
 <span></span>
 <span><span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">pl1</span>, <span class="va">pl2</span>, cols <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_files/figure-html/unnamed-chunk-6-1.png" width="864"></p>
-<p>You can plot the median, lower 95% and upper 95% density surfaces as follows (assuming that the predicted intensity is in object <code>lambda</code>).</p>
+<p>You can plot the median, lower 95% and upper 95% density surfaces as
+follows (assuming that the predicted intensity is in object
+<code>lambda</code>).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">lambda</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>property <span class="op">=</span> <span class="st">"q0.500"</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">median</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -220,7 +248,10 @@
 <div class="section level2">
 <h2 id="estimating-abundance">Estimating Abundance<a class="anchor" aria-label="anchor" href="#estimating-abundance"></a>
 </h2>
-<p>Finally, estimate abundance using the <code>predict</code> function. As a first step we need an estimate for the integrated lambda. The integration <code>weight</code> values are contained in the <code>ipoints</code> output.</p>
+<p>Finally, estimate abundance using the <code>predict</code> function.
+As a first step we need an estimate for the integrated lambda. The
+integration <code>weight</code> values are contained in the
+<code>ipoints</code> output.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>,</span>
@@ -229,10 +260,11 @@
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 647.7581 25.37195 601.7947 648.0624 692.7767 648.0624        2.537195</span></span>
+<span><span class="co">#&gt; 1 649.1437 27.35346 601.5948 652.8271 698.5847 652.8271        2.735346</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.500151</span></span></code></pre></div>
-<p>Given some generous interval boundaries (500, 800) for lambda we can estimate the posterior abundance distribution via</p>
+<span><span class="co">#&gt; 1       1.54572</span></span></code></pre></div>
+<p>Given some generous interval boundaries (500, 800) for lambda we can
+estimate the posterior abundance distribution via</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>, <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>,</span>
@@ -246,11 +278,11 @@
 <p>Get its quantiles via</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 579.6366 648.8503 720.5158</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 578.8076 648.0546 720.0029</span></span></code></pre></div>
 <p>… the mean via</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.emarginal</a></span><span class="op">(</span><span class="va">identity</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 649.1666</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 648.3618</span></span></code></pre></div>
 <p>and plot posteriors:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">$</span><span class="va">plugin_estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, lambda <span class="op">=</span> <span class="va">Lambda</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
@@ -258,7 +290,9 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">N</span>, y <span class="op">=</span> <span class="va">mean</span>, colour <span class="op">=</span> <span class="st">"Posterior"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">N</span>, y <span class="op">=</span> <span class="va">plugin_estimate</span>, colour <span class="op">=</span> <span class="st">"Plugin"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
-<p>The true number of nests in 647; the mean and median of the posterior distribution of abundance should be close to this if you have not done anything wrong!</p>
+<p>The true number of nests in 647; the mean and median of the posterior
+distribution of abundance should be close to this if you have not done
+anything wrong!</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

@@ -90,9 +90,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>LGCPs - Multiple Likelihoods</h1>
-                        <h4 data-toc-skip class="author">Fabian E. Bachl</h4>
+                        <h4 data-toc-skip class="author">Fabian E.
+Bachl</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-25</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_multilikelihood.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -103,7 +104,13 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>For this vignette we are going to be working with the inlabru’s ´gorillas´ dataset which was originally obtained from the <code>R</code> package <code>spatstat</code>. The data set contains two types of gorillas nests which are marked as either major or minor. We will set up a multi-likelihood model for these nests which creates two spatial LGCPs that share a common intercept but have employ different spatial smoothers.</p>
+<p>For this vignette we are going to be working with the inlabru’s
+´gorillas´ dataset which was originally obtained from the <code>R</code>
+package <code>spatstat</code>. The data set contains two types of
+gorillas nests which are marked as either major or minor. We will set up
+a multi-likelihood model for these nests which creates two spatial LGCPs
+that share a common intercept but have employ different spatial
+smoothers.</p>
 </div>
 <div class="section level2">
 <h2 id="setting-things-up">Setting things up<a class="anchor" aria-label="anchor" href="#setting-things-up"></a>
@@ -117,10 +124,14 @@
 <div class="section level2">
 <h2 id="get-the-data">Get the data<a class="anchor" aria-label="anchor" href="#get-the-data"></a>
 </h2>
-<p>For the next few practicals we are going to be working with a dataset obtained from the <code>R</code> package <code>spatstat</code>, which contains the locations of 647 gorilla nests. We load the dataset like this:</p>
+<p>For the next few practicals we are going to be working with a dataset
+obtained from the <code>R</code> package <code>spatstat</code>, which
+contains the locations of 647 gorilla nests. We load the dataset like
+this:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
-<p>Plot the nests and visualize the group membership (major/minor) by color:</p>
+<p>Plot the nests and visualize the group membership (major/minor) by
+color:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span> <span class="op">+</span></span>
@@ -133,7 +144,9 @@
 <div class="section level2">
 <h2 id="fiting-the-model">Fiting the model<a class="anchor" aria-label="anchor" href="#fiting-the-model"></a>
 </h2>
-<p>First, we define all components that enter the joint model. That is, the intercept that is common to both LGCPs and the two different spatial smoothers, one for each nest group.</p>
+<p>First, we define all components that enter the joint model. That is,
+the intercept that is common to both LGCPs and the two different spatial
+smoothers, one for each nest group.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
 <span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
@@ -144,11 +157,15 @@
 <span>  <span class="fu">Common</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">Difference</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>Given these components we define the linear predictor for each of the likelihoods. (Using “.” indicates a pure additive model, and one can use include/exclude options for <code><a href="../../reference/like.html">like()</a></code> to indicate which components are actively involved in each model.)</p>
+<p>Given these components we define the linear predictor for each of the
+likelihoods. (Using “.” indicates a pure additive model, and one can use
+include/exclude options for <code><a href="../../reference/like.html">like()</a></code> to indicate which
+components are actively involved in each model.)</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fml.major</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">Common</span> <span class="op">+</span> <span class="va">Difference</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="va">fml.minor</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">Common</span> <span class="op">-</span> <span class="va">Difference</span> <span class="op">/</span> <span class="fl">2</span></span></code></pre></div>
-<p>Setting up the cox process integration points is easy in this example. Both nest types were observed within the same window.</p>
+<p>Setting up the cox process integration points is easy in this
+example. Both nest types were observed within the same window.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span></span></code></pre></div>
 <p>Lastly, we define the two likelihoods…</p>
@@ -222,10 +239,10 @@
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.24, Running = 443, Post = 0.118, Total = 444 </span></span>
+<span><span class="co">#&gt;     Pre = 1.5, Running = 498, Post = 0.139, Total = 499 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
-<span><span class="co">#&gt; Intercept -0.322 1.475     -3.217    -0.32      2.573   NA 0.039</span></span>
+<span><span class="co">#&gt; Intercept -0.314 1.386     -3.033   -0.312      2.404   NA 0.045</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -234,19 +251,19 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     3.012 0.640      1.938    2.950      4.446 2.833</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.071 0.368      1.437    2.041      2.881 1.984</span></span>
-<span><span class="co">#&gt; Range for Difference 0.516 0.236      0.151    0.488      1.044 0.396</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.131 0.062      0.047    0.119      0.286 0.097</span></span>
+<span><span class="co">#&gt; Range for Common     2.979 0.660      1.925    2.896      4.509 2.725</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.069 0.377      1.440    2.030      2.920 1.948</span></span>
+<span><span class="co">#&gt; Range for Difference 0.489 0.219      0.152    0.463      0.982 0.383</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.117 0.052      0.042    0.108      0.242 0.090</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 614.05</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32940.04</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -766.69</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 619.55</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32934.54</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -762.84</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1642.45</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 102.46</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1646.70</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 104.54</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1206.70 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1206.73 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -266,10 +283,10 @@
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.03, Running = 208, Post = 0.107, Total = 209 </span></span>
+<span><span class="co">#&gt;     Pre = 1.24, Running = 163, Post = 0.109, Total = 164 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
-<span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
-<span><span class="co">#&gt; Intercept -0.291 1.337     -2.915   -0.288      2.333   NA 0.047</span></span>
+<span><span class="co">#&gt;             mean   sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
+<span><span class="co">#&gt; Intercept -0.304 1.38     -3.012   -0.302      2.403   NA 0.044</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -278,19 +295,19 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.946 0.589      2.005    2.871      4.309 2.711</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.034 0.321      1.498    2.000      2.757 1.925</span></span>
-<span><span class="co">#&gt; Range for Difference 2.206 4.011      0.199    1.023     11.642 0.414</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.219 0.260      0.029    0.141      0.882 0.069</span></span>
+<span><span class="co">#&gt; Range for Common     2.865 0.502      1.985    2.825      3.979 2.754</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.006 0.321      1.437    1.983      2.711 1.942</span></span>
+<span><span class="co">#&gt; Range for Difference 0.604 0.180      0.325    0.579      1.036 0.530</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.121 0.040      0.060    0.115      0.216 0.105</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 618.38</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32935.71</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -763.63</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 617.22</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32936.87</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -764.50</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1645.83</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 104.15</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1644.96</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 103.69</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1206.74 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.72 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>

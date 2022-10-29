@@ -90,9 +90,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>LGCPs - Plot sampling</h1>
-                        <h4 data-toc-skip class="author">David Borchers and Finn Lindgren</h4>
+                        <h4 data-toc-skip class="author">David Borchers
+and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-25</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -103,7 +104,9 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This practical demonstrates use of the <code>samplers</code> argument in <code>lgcp</code>, which you need to use when you have observed points from only a sample of plots in the survey region.</p>
+<p>This practical demonstrates use of the <code>samplers</code> argument
+in <code>lgcp</code>, which you need to use when you have observed
+points from only a sample of plots in the survey region.</p>
 </div>
 <div class="section level2">
 <h2 id="setting-things-up">Setting things up<a class="anchor" aria-label="anchor" href="#setting-things-up"></a>
@@ -120,13 +123,15 @@
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
-<p>This dataset is a list (see <code><a href="../../reference/gorillas.html">help(gorillas)</a></code> for details. Extract the the objects you need from the list, for convenience:</p>
+<p>This dataset is a list (see <code><a href="../../reference/gorillas.html">help(gorillas)</a></code> for details.
+Extract the the objects you need from the list, for convenience:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nests</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span></span>
 <span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span></span>
 <span><span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span></span>
 <span><span class="va">gcov</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">gcov</span></span></code></pre></div>
-<p>The <code>gorillas</code> data also contains a plot sample subset which covers 60% of the survey region.</p>
+<p>The <code>gorillas</code> data also contains a plot sample subset
+which covers 60% of the survey region.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sample</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">plotsample</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -139,7 +144,10 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Easting"</span>, y <span class="op">=</span> <span class="st">"Northing"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">plotdets</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_plotsampling_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
-<p>On this plot survey, only points within the rectangles are detected, but it is also informative to plot all the points here (which if it was a real plot survey you could not do, because you would not have seen them all).</p>
+<p>On this plot survey, only points within the rectangles are detected,
+but it is also informative to plot all the points here (which if it was
+a real plot survey you could not do, because you would not have seen
+them all).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">plotwithall</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -156,13 +164,18 @@
 <div class="section level2">
 <h2 id="inference">Inference<a class="anchor" aria-label="anchor" href="#inference"></a>
 </h2>
-<p>The observed nest locations are in the SpatialPointsDataFrame <code>sample$nests</code>, and the plots are in the SpatialPolygonsDataFrame <code>sample$plots</code>. Again, we are using the following SPDE setup:</p>
+<p>The observed nest locations are in the SpatialPointsDataFrame
+<code>sample$nests</code>, and the plots are in the
+SpatialPolygonsDataFrame <code>sample$plots</code>. Again, we are using
+the following SPDE setup:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh</span>,</span>
 <span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
 <span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0.01</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Fit an LGCP model with SPDE only to these data by using the <code>samplers=</code> argument of the function <code><a href="../../reference/lgcp.html">lgcp( )</a></code>:</p>
+<p>Fit an LGCP model with SPDE only to these data by using the
+<code>samplers=</code> argument of the function
+<code><a href="../../reference/lgcp.html">lgcp( )</a></code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">my.spde</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span></span>
 <span></span>
@@ -179,7 +192,11 @@
 <span></span>
 <span><span class="va">lambda.sample.plot</span></span></code></pre></div>
 <p><img src="2d_lgcp_plotsampling_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
-<p>Estimate the integrated intensity lambda. We compute both the overall integrated intensity, representative of an imagined new realisation of the point process, and the conditional expectation that takes the actually observed nests into account, by recognising that we have complete information in the surveyed plots.</p>
+<p>Estimate the integrated intensity lambda. We compute both the overall
+integrated intensity, representative of an imagined new realisation of
+the point process, and the conditional expectation that takes the
+actually observed nests into account, by recognising that we have
+complete information in the surveyed plots.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">my.spde</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda.empirical</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -196,7 +213,9 @@
 <span>  <span class="va">Lambda</span>,</span>
 <span>  <span class="va">Lambda.empirical</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Fit the same model to the full dataset (the points in <code>gorillas$nests</code>), or get your previous fit, if you kept it. Plot the intensity surface and estimate the integrated intensity</p>
+<p>Fit the same model to the full dataset (the points in
+<code>gorillas$nests</code>), or get your previous fit, if you kept it.
+Plot the intensity surface and estimate the integrated intensity</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">fit.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>,</span>
@@ -207,7 +226,9 @@
 <span><span class="va">Lambda.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit.all</span>, <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="va">mesh</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">my.spde</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Your plot should look like this:</p>
 <p><img src="2d_lgcp_plotsampling_files/figure-html/unnamed-chunk-13-1.png" width="672"></p>
-<p>The values <code>Lambda.empirical</code>, <code>Lambda</code>, and <code>Lambda.all</code> should be close to each other if the plot samples gave sufficient information for the overall prediction:</p>
+<p>The values <code>Lambda.empirical</code>, <code>Lambda</code>, and
+<code>Lambda.all</code> should be close to each other if the plot
+samples gave sufficient information for the overall prediction:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
 <span>  <span class="va">Lambda</span>,</span>
@@ -219,14 +240,14 @@
 <span><span class="co">#&gt; Warning in rbind(deparse.level, ...): number of columns of result, 8, is not a</span></span>
 <span><span class="co">#&gt; multiple of vector length 9 of arg 4</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 629.9854 46.63641 541.1185 627.5401 710.6332 627.5401        4.663641</span></span>
-<span><span class="co">#&gt; 2 638.5361 36.95601 573.5134 636.5333 717.5824 636.5333        3.695601</span></span>
-<span><span class="co">#&gt; 3 648.1736 26.38625 599.0335 648.4394 696.2082 648.4394        2.638625</span></span>
+<span><span class="co">#&gt; 1 626.6375 47.73494 531.2764 623.9452 715.5661 623.9452        4.773494</span></span>
+<span><span class="co">#&gt; 2 636.8057 35.32374 569.0192 634.7960 714.8626 634.7960        3.532374</span></span>
+<span><span class="co">#&gt; 3 655.7925 26.77914 610.4416 653.5925 713.5171 653.5925        2.677914</span></span>
 <span><span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      3.645902</span></span>
-<span><span class="co">#&gt; 2      2.553152</span></span>
-<span><span class="co">#&gt; 3      1.863667</span></span>
+<span><span class="co">#&gt; 1      3.236505</span></span>
+<span><span class="co">#&gt; 2      2.434019</span></span>
+<span><span class="co">#&gt; 3      1.901422</span></span>
 <span><span class="co">#&gt; 4            NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -236,7 +257,8 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">340</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_plotsampling_files/figure-html/unnamed-chunk-15-1.png" width="672"></p>
-<p>Do you understand the reason for the differences in the posteriors of the abundance estimates?</p>
+<p>Do you understand the reason for the differences in the posteriors of
+the abundance estimates?</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

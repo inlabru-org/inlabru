@@ -90,9 +90,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Random Fields in 2D</h1>
-                        <h4 data-toc-skip class="author">Finn Lindgren</h4>
+                        <h4 data-toc-skip class="author">Finn
+Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-25</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/random_fields_2d.Rmd" class="external-link"><code>vignettes/web/random_fields_2d.Rmd</code></a></small>
       <div class="d-none name"><code>random_fields_2d.Rmd</code></div>
@@ -120,8 +121,12 @@
 <div class="section level2">
 <h2 id="modelling-on-2d-domains">Modelling on 2D domains<a class="anchor" aria-label="anchor" href="#modelling-on-2d-domains"></a>
 </h2>
-<p>We will now construct a 2D model, generate a sample of a random field, and attempt to recover the field from observations at a few locations. Tomorrow, we will look into more general mesh constructions that adapt to irregular domains.</p>
-<p>First, we build a high resolution mesh for the true field, using low level INLA functions</p>
+<p>We will now construct a 2D model, generate a sample of a random
+field, and attempt to recover the field from observations at a few
+locations. Tomorrow, we will look into more general mesh constructions
+that adapt to irregular domains.</p>
+<p>First, we build a high resolution mesh for the true field, using low
+level INLA functions</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spoly.html">spoly</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">0</span><span class="op">)</span>, lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.CRS.html" class="external-link">inla.CRS</a></span><span class="op">(</span><span class="st">"longlat"</span><span class="op">)</span></span>
@@ -149,7 +154,9 @@
 <span><span class="va">true_range</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
 <span><span class="va">true_sigma</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="va">true_Q</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.precision.html" class="external-link">inla.spde.precision</a></span><span class="op">(</span><span class="va">matern_fine</span>, theta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">true_range</span>, <span class="va">true_sigma</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>What is the pointwise standard deviation of the field? Along straight boundaries, the variance is twice the target variance. At corners the variance is 4 times as large.</p>
+<p>What is the pointwise standard deviation of the field? Along straight
+boundaries, the variance is twice the target variance. At corners the
+variance is 4 times as large.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">true_sd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/qinv.html" class="external-link">inla.qinv</a></span><span class="op">(</span><span class="va">true_Q</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">0.5</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -223,7 +230,8 @@
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">mydata</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
-<p>Predict the field on a lattice, and generate a single realisation from the posterior distribution:</p>
+<p>Predict the field on a lattice, and generate a single realisation
+from the posterior distribution:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pix</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, nx <span class="op">=</span> <span class="fl">200</span>, ny <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
 <span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -235,7 +243,8 @@
 <span>  n.samples <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">pred</span><span class="op">$</span><span class="va">sample</span> <span class="op">&lt;-</span> <span class="va">samp</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span></code></pre></div>
-<p>Compare the truth to the estimated field (posterior mean and a sample from the posterior distribution):</p>
+<p>Compare the truth to the estimated field (posterior mean and a sample
+from the posterior distribution):</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pl_posterior_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span> <span class="op">+</span></span>
@@ -272,7 +281,9 @@
 <span><span class="va">covplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">covplot</span>, <span class="va">corplot</span><span class="op">)</span></span></code></pre></div>
 <p><img src="random_fields_2d_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
-<p>You can plot the median, lower 95% and upper 95% density surfaces as follows (assuming that the predicted intensity is in object <code>pred</code>).</p>
+<p>You can plot the median, lower 95% and upper 95% density surfaces as
+follows (assuming that the predicted intensity is in object
+<code>pred</code>).</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">csc</span> <span class="op">&lt;-</span> <span class="fu">colsc</span><span class="op">(</span></span>
 <span>  <span class="va">pred</span><span class="op">@</span><span class="va">data</span><span class="op">[</span><span class="st">"median"</span><span class="op">]</span>,</span>

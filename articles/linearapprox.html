@@ -98,7 +98,10 @@
 
     
     
-<p>See the <code>method</code> vignette for details of the general <code>inlabru</code> method. Here, we’ll take a look at a small toy example to see the difference between a few posterior approximation methods.</p>
+<p>See the <code>method</code> vignette for details of the general
+<code>inlabru</code> method. Here, we’ll take a look at a small toy
+example to see the difference between a few posterior approximation
+methods.</p>
 <p>Note: This vignette is not completed yet.</p>
 <div class="section level2">
 <h2 id="a-small-toy-problem">A small toy problem<a class="anchor" aria-label="anchor" href="#a-small-toy-problem"></a>
@@ -106,27 +109,33 @@
 <p>Hierarchical model: <span class="math display">\[
 \begin{aligned}
 \lambda &amp;\sim \mathsf{Exp}(\gamma) \\
-(y_i|\lambda) &amp;\sim \mathsf{Po}(\lambda), \text{ independent across $i=1,\dots,n$}
+(y_i|\lambda) &amp;\sim \mathsf{Po}(\lambda), \text{ independent across
+$i=1,\dots,n$}
 \end{aligned}
-\]</span> With <span class="math inline">\(\overline{y}=\frac{1}{n}\sum_{i=1}^n y_i\)</span>, the posterior density is <span class="math display">\[
+\]</span> With <span class="math inline">\(\overline{y}=\frac{1}{n}\sum_{i=1}^n y_i\)</span>,
+the posterior density is <span class="math display">\[
 \begin{aligned}
 p(\lambda | \{y_i\}) &amp;\propto p(\lambda, y_1,\dots,y_n) \\
-&amp;\propto \exp(-\gamma\lambda) \exp(-n\lambda) \lambda^{n\overline{y}} \\
+&amp;\propto \exp(-\gamma\lambda) \exp(-n\lambda)
+\lambda^{n\overline{y}} \\
 &amp;= \exp\{-(\gamma+n)\lambda\} \lambda^{n\overline{y}},
 \end{aligned}
-\]</span> which is the density of a <span class="math inline">\(\mathsf{Ga}(\alpha = 1+n\overline{y}, \beta = \gamma+n)\)</span> distribution.</p>
+\]</span> which is the density of a <span class="math inline">\(\mathsf{Ga}(\alpha = 1+n\overline{y}, \beta =
+\gamma+n)\)</span> distribution.</p>
 </div>
 <div class="section level2">
 <h2 id="latent-gaussian-predictor-version">Latent Gaussian predictor version<a class="anchor" aria-label="anchor" href="#latent-gaussian-predictor-version"></a>
 </h2>
-<p>Introducing a latent Gaussian variable <span class="math inline">\(u\sim\mathsf{N}(0,1)\)</span>, the model can be reformulated as <span class="math display">\[
+<p>Introducing a latent Gaussian variable <span class="math inline">\(u\sim\mathsf{N}(0,1)\)</span>, the model can be
+reformulated as <span class="math display">\[
 \begin{aligned}
 \lambda(u) &amp;=-\ln\{1-\Phi(u)\}/\gamma \\
 (y_i|u) &amp;\sim \mathsf{Po}(\lambda(u))
 \end{aligned}
 \]</span> We will need some derivatives of <span class="math inline">\(\lambda\)</span> with respect to <span class="math inline">\(u\)</span>: <span class="math display">\[
 \begin{aligned}
-\frac{\partial\lambda(u)}{\partial u} &amp;= \frac{1}{\gamma}\frac{\phi(u)}{1-\Phi(u)}
+\frac{\partial\lambda(u)}{\partial u} &amp;=
+\frac{1}{\gamma}\frac{\phi(u)}{1-\Phi(u)}
   = \lambda'(u) \\
 \frac{\partial^2\lambda(u)}{\partial u^2} &amp;=
 -
@@ -143,7 +152,8 @@ u + \frac{\phi(u)}{1-\Phi(u)}
   = \frac{\lambda'(u)}{\lambda(u)} \\
 \frac{\partial^2\ln\lambda(u)}{\partial u^2} &amp;=
   \frac{1}{\lambda(u)} \frac{\partial^2\lambda(u)}{\partial u^2}
-  -\frac{1}{\lambda(u)^2} \left(\frac{\partial\lambda(u)}{\partial u}\right)^2
+  -\frac{1}{\lambda(u)^2} \left(\frac{\partial\lambda(u)}{\partial
+u}\right)^2
   = \frac{-\lambda'(u)\{u - \gamma\lambda'(u)\}}{\lambda(u)}
   - \frac{\lambda'(u)^2}{\lambda(u)^2}\\
   &amp;= -\frac{\lambda'(u)}{\lambda(u)}\left\{
@@ -176,9 +186,14 @@ u + \frac{\phi(u)}{1-\Phi(u)}
 <div class="section level2">
 <h2 id="latent-gaussian-posterior-approximations">Latent Gaussian posterior approximations<a class="anchor" aria-label="anchor" href="#latent-gaussian-posterior-approximations"></a>
 </h2>
-<p>A basic approximation of the posterior distribution for <span class="math inline">\(\lambda\)</span> given <span class="math inline">\(y\)</span> can be defined as a deterministic transformation of a Gaussian distribution obtained from a 2nd order Taylor approximation of <span class="math inline">\(\ln p(u|\{y_i\})\)</span> at the posterior mode <span class="math inline">\(u_0\)</span> of <span class="math inline">\(p(u|\{y_i\})\)</span>. The needed derivatives are <span class="math display">\[
+<p>A basic approximation of the posterior distribution for <span class="math inline">\(\lambda\)</span> given <span class="math inline">\(y\)</span> can be defined as a deterministic
+transformation of a Gaussian distribution obtained from a 2nd order
+Taylor approximation of <span class="math inline">\(\ln
+p(u|\{y_i\})\)</span> at the posterior mode <span class="math inline">\(u_0\)</span> of <span class="math inline">\(p(u|\{y_i\})\)</span>. The needed derivatives are
+<span class="math display">\[
 \begin{aligned}
-\frac{\partial\ln p(u|\{y_i\})}{\partial u} &amp;= \frac{\partial\ln\phi(u)}{\partial u}
+\frac{\partial\ln p(u|\{y_i\})}{\partial u} &amp;=
+\frac{\partial\ln\phi(u)}{\partial u}
 - n\lambda'(u) + n\overline{y}\frac{\lambda'(u)}{\lambda(u)}
 = -u + n\frac{\lambda'(u)}{\lambda(u)}\left\{
 \overline{y} - \lambda(u)
@@ -199,7 +214,8 @@ u - \gamma\lambda'(u) + \frac{\lambda'(u)}{\lambda(u)}
 n
 \frac{\lambda'(u)^2}{\lambda(u)}
 \end{aligned}
-\]</span> At the mode <span class="math inline">\(u_0\)</span>, the first order derivative is zero, and <span class="math display">\[
+\]</span> At the mode <span class="math inline">\(u_0\)</span>, the
+first order derivative is zero, and <span class="math display">\[
 \begin{aligned}
 \left.\frac{\partial^2\ln p(u|\{y_i\})}{\partial u^2}\right|_{u=u_0}
 &amp;=
@@ -213,19 +229,27 @@ u_0
 n
 \frac{\lambda'(u_0)^2}{\lambda(u_0)} .
 \end{aligned}
-\]</span> The quadratic approximation of the log-posterior density at the mode <span class="math inline">\(u_0\)</span> is then <span class="math display">\[
+\]</span> The quadratic approximation of the log-posterior density at
+the mode <span class="math inline">\(u_0\)</span> is then <span class="math display">\[
 \ln \breve{p}(u|\{y_i\}) = \text{const} - \frac{(u-u_0)^2}{2}
 \left[
 -
 \left.\frac{\partial^2\ln p(u|\{y_i\})}{\partial u^2}\right|_{u=u_0}
 \right]
-\]</span> In <code>inlabru</code>, the approximation first linearises <span class="math inline">\(\ln \lambda(u)\)</span> at <span class="math inline">\(u_0\)</span> before applying the Taylor approximation of <span class="math inline">\(\ln p(u|\{y_i\})\)</span>. The linearised log-predictor is <span class="math display">\[
-\ln \overline{\lambda}(u) = \ln \lambda(u_0) + \frac{\lambda'(u_0)}{\lambda(u_0)}(u - u_0)
+\]</span> In <code>inlabru</code>, the approximation first linearises
+<span class="math inline">\(\ln \lambda(u)\)</span> at <span class="math inline">\(u_0\)</span> before applying the Taylor
+approximation of <span class="math inline">\(\ln p(u|\{y_i\})\)</span>.
+The linearised log-predictor is <span class="math display">\[
+\ln \overline{\lambda}(u) = \ln \lambda(u_0) +
+\frac{\lambda'(u_0)}{\lambda(u_0)}(u - u_0)
 \]</span> so that <span class="math display">\[
-\overline{\lambda}'(u) = \frac{\lambda'(u_0)}{\lambda(u_0)} \overline{\lambda}(u)
-\]</span> and the second order derivative of the linearised log-posterior density is <span class="math display">\[
+\overline{\lambda}'(u) = \frac{\lambda'(u_0)}{\lambda(u_0)}
+\overline{\lambda}(u)
+\]</span> and the second order derivative of the linearised
+log-posterior density is <span class="math display">\[
 \begin{aligned}
-\left.\frac{\partial^2\ln \overline{p}(u|\{y_i\})}{\partial u^2}\right|_{u=u_0}
+\left.\frac{\partial^2\ln \overline{p}(u|\{y_i\})}{\partial
+u^2}\right|_{u=u_0}
 &amp;=
 -1
 -
