@@ -222,4 +222,4 @@ is equivalent to
 
 #### Non-linear predictors
 
-`inlabru` supports non-linear predictors, where $\tilde{\eta}(u,v)$ is a non-linear function of $\eta_u$ and $\eta_v$.  It is important to note that the mapping each component effect vector $\eta_u=A^(u) u$ happens **before** the non-linear function is applied.  So, for example, if $\tilde{\eta}(u,v) = \exp(\eta_u + \eta_v)$ then this is evaluated as `exp(A_u %*% u + A_v %*% v)`.
+`inlabru` supports non-linear predictors, where $\tilde{\eta}(u,v)$ is a non-linear function of $\eta_u$ and $\eta_v$.  It is important to note that the mapping each component effect vector $\eta_u=A^{(u)} u$ happens **before** the non-linear function is applied.  So, for example, if $\tilde{\eta}(u,v) = \exp(\eta_u + \eta_v)$ then this is evaluated as $\exp(A^{(u)} u + A^{(v)} v)$.

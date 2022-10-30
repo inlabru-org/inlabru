@@ -112,7 +112,7 @@ Red nodes indicate deprecated behaviour retained for backwards compatibility.
 ```{r, eval=TRUE,echo=FALSE}
 DiagrammeR::mermaid('
 flowchart TD
-  expr([expr])
+  expr([`label`_expr])
   data([data])
   _envir([.envir])
   input(["`label`_input"])
@@ -157,11 +157,10 @@ flowchart TD
   eval_formula --> input
 
   res -->|"spatial<br/>covariate"| eval_spatial
-  res -->|"spatial<br/>covariate"| layer_eval
   eval_spatial --> input
 
 %% spatial covariate layer input
-  layer_expr(["`label`_expr"])
+  layer_expr(["`label`_layer_expr"])
   layer(["`label`_layer"])
   layer_eval["eval"]
   data --> layer_eval

@@ -8,7 +8,7 @@ navbar:
       menu:
       - text: Basic examples
       - text: Random field models in 1D
-        href: articles/web/random_fields_1d.html
+        href: articles/web/random_fields.html
       - text: Spatial random field models in 2D
         href: articles/web/random_fields_2d.html
       - text: Publications
@@ -16,11 +16,11 @@ navbar:
       - text: ---
       - text: Point process examples
       - text: LGCPs - An example in one dimension
-        href: articles/web/1d_lgcp.Rmd
+        href: articles/web/1d_lgcp.html
       - text: LGCPs - An example in two dimensions
-        href: articles/web/2d_lgcp.Rmd
+        href: articles/web/2d_lgcp.html
       - text: LGCPs - Spatial covariates
-        href: articles/web/2d_lgcp_covariates.html
+        href: articles/web/2d_lgcp_covars.html
       - text: LGCPs - Distance sampling
         href: articles/web/2d_lgcp_distancesampling.html
       - text: LGCPs - Plot sampling
