@@ -42,30 +42,30 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
-    <a class="dropdown-item" href="../../articles/random_fields_1d.html">Random field models in 1D</a>
-    <a class="dropdown-item" href="../../articles/random_fields_2d.html">Spatial random field models in 2D</a>
-    <a class="dropdown-item" href="../../articles/publications.html">Publications</a>
+    <a class="dropdown-item" href="../../articles/web/random_fields_1d.html">Random field models in 1D</a>
+    <a class="dropdown-item" href="../../articles/web/random_fields_2d.html">Spatial random field models in 2D</a>
+    <a class="dropdown-item" href="../../articles/web/publications.html">Publications</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
-    <a class="dropdown-item" href="../../articles/1d_lgcp.Rmd">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp.Rmd">LGCPs - An example in two dimensions</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_covariates.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../../articles/web/1d_lgcp.Rmd">LGCPs - An example in one dimension</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp.Rmd">LGCPs - An example in two dimensions</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_covariates.html">LGCPs - Spatial covariates</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
     <a class="dropdown-item" href="../../articles/component.html">Defining a model component</a>
-    <a class="dropdown-item" href="../../articles/svc.html">Spatially varying coefficient models</a>
+    <a class="dropdown-item" href="../../articles/web/svc.html">Spatially varying coefficient models</a>
     <a class="dropdown-item" href="../../articles/prediction_scores.html">Computing posterior prediction scores</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
-    <a class="dropdown-item" href="../../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
+    <a class="dropdown-item" href="../../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../../articles/linearapprox.html">A nonlinear model approximation example</a>
     <a class="dropdown-item" href="../../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
+    <a class="dropdown-item" href="../../articles/web/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
 <li class="nav-item">
@@ -99,7 +99,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-29</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp.Rmd" class="external-link"><code>vignettes/web/2d_lgcp.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp.Rmd</code></div>
@@ -266,9 +266,9 @@ integration <code>weight</code> values are contained in the
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 651.4236 25.20374 605.4501 649.4529 702.6379 649.4529        2.520374</span></span>
+<span><span class="co">#&gt; 1 649.3976 28.81632 601.3361 646.6798 711.8579 646.6798        2.881632</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      2.135566</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      2.150842</span></span></code></pre></div>
 <p>Given some generous interval boundaries (500, 800) for lambda we can
 estimate the posterior abundance distribution via</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -284,11 +284,11 @@ estimate the posterior abundance distribution via</p>
 <p>Get its quantiles via</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 579.3585 648.3883 721.2244</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 580.1394 646.4325 719.1686</span></span></code></pre></div>
 <p>… the mean via</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.emarginal</a></span><span class="op">(</span><span class="va">identity</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 648.8946</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 647.3676</span></span></code></pre></div>
 <p>and plot posteriors:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">$</span><span class="va">plugin_estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, lambda <span class="op">=</span> <span class="va">Lambda</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>

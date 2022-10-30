@@ -38,34 +38,34 @@
 <li class="nav-item">
   <a class="nav-link" href="../../reference/index.html">Reference</a>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
-    <a class="dropdown-item" href="../../articles/random_fields_1d.html">Random field models in 1D</a>
-    <a class="dropdown-item" href="../../articles/random_fields_2d.html">Spatial random field models in 2D</a>
-    <a class="dropdown-item" href="../../articles/publications.html">Publications</a>
+    <a class="dropdown-item" href="../../articles/web/random_fields_1d.html">Random field models in 1D</a>
+    <a class="dropdown-item" href="../../articles/web/random_fields_2d.html">Spatial random field models in 2D</a>
+    <a class="dropdown-item" href="../../articles/web/publications.html">Publications</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
-    <a class="dropdown-item" href="../../articles/1d_lgcp.Rmd">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp.Rmd">LGCPs - An example in two dimensions</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_covariates.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../../articles/web/1d_lgcp.Rmd">LGCPs - An example in one dimension</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp.Rmd">LGCPs - An example in two dimensions</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_covariates.html">LGCPs - Spatial covariates</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
     <a class="dropdown-item" href="../../articles/component.html">Defining a model component</a>
-    <a class="dropdown-item" href="../../articles/svc.html">Spatially varying coefficient models</a>
+    <a class="dropdown-item" href="../../articles/web/svc.html">Spatially varying coefficient models</a>
     <a class="dropdown-item" href="../../articles/prediction_scores.html">Computing posterior prediction scores</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
-    <a class="dropdown-item" href="../../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
+    <a class="dropdown-item" href="../../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../../articles/linearapprox.html">A nonlinear model approximation example</a>
     <a class="dropdown-item" href="../../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
+    <a class="dropdown-item" href="../../articles/web/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
 <li class="nav-item">
@@ -99,7 +99,7 @@
                         <h4 data-toc-skip class="author">Fabian E.
 Bachl</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-29</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_multilikelihood.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -245,10 +245,10 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.66, Running = 707, Post = 0.136, Total = 708 </span></span>
+<span><span class="co">#&gt;     Pre = 0.826, Running = 193, Post = 0.0817, Total = 194 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
-<span><span class="co">#&gt; Intercept -0.311 1.362     -2.983   -0.309       2.36   NA 0.047</span></span>
+<span><span class="co">#&gt; Intercept -0.319 1.474     -3.211   -0.316      2.574   NA 0.039</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -257,19 +257,19 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.979 0.724      1.850    2.878      4.677 2.678</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.077 0.419      1.396    2.028      3.037 1.926</span></span>
-<span><span class="co">#&gt; Range for Difference 2.199 2.779      0.167    1.359      9.323 0.445</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.156 0.051      0.078    0.148      0.277 0.135</span></span>
+<span><span class="co">#&gt; Range for Common     3.008 0.684      1.869    2.940      4.545 2.813</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.066 0.390      1.397    2.032      2.928 1.970</span></span>
+<span><span class="co">#&gt; Range for Difference 0.525 0.235      0.162    0.497      1.053 0.411</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.129 0.055      0.052    0.120      0.264 0.102</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 624.41</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32929.68</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -758.79</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 613.03</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32941.05</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -767.43</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1648.81</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 105.63</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1641.72</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 102.10</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1206.27 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1206.69 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -289,10 +289,10 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.2, Running = 146, Post = 0.137, Total = 147 </span></span>
+<span><span class="co">#&gt;     Pre = 0.665, Running = 103, Post = 0.0807, Total = 104 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
-<span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
-<span><span class="co">#&gt; Intercept -0.302 1.361     -2.973     -0.3      2.368   NA 0.046</span></span>
+<span><span class="co">#&gt;             mean   sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
+<span><span class="co">#&gt; Intercept -0.292 1.35      -2.94   -0.289      2.357   NA 0.046</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -301,19 +301,19 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.912 0.642      1.864    2.839      4.379 2.694</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.037 0.430      1.325    1.991      3.012 1.902</span></span>
-<span><span class="co">#&gt; Range for Difference 1.980 1.850      0.288    1.448      6.901 0.750</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.177 0.090      0.064    0.156      0.407 0.124</span></span>
+<span><span class="co">#&gt; Range for Common     2.955 0.589      2.007    2.882      4.313 2.728</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.040 0.332      1.488    2.006      2.788 1.928</span></span>
+<span><span class="co">#&gt; Range for Difference 0.581 0.290      0.166    0.535      1.268 0.418</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.110 0.060      0.027    0.100      0.255 0.072</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 621.90</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32932.18</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -760.59</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 617.39</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: -32936.70</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -764.34</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1646.93</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 104.71</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1645.10</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 103.79</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.53 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1206.64 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>

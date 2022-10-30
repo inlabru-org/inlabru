@@ -38,34 +38,34 @@
 <li class="nav-item">
   <a class="nav-link" href="../../reference/index.html">Reference</a>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
-    <a class="dropdown-item" href="../../articles/random_fields_1d.html">Random field models in 1D</a>
-    <a class="dropdown-item" href="../../articles/random_fields_2d.html">Spatial random field models in 2D</a>
-    <a class="dropdown-item" href="../../articles/publications.html">Publications</a>
+    <a class="dropdown-item" href="../../articles/web/random_fields_1d.html">Random field models in 1D</a>
+    <a class="dropdown-item" href="../../articles/web/random_fields_2d.html">Spatial random field models in 2D</a>
+    <a class="dropdown-item" href="../../articles/web/publications.html">Publications</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
-    <a class="dropdown-item" href="../../articles/1d_lgcp.Rmd">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp.Rmd">LGCPs - An example in two dimensions</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_covariates.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
-    <a class="dropdown-item" href="../../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../../articles/web/1d_lgcp.Rmd">LGCPs - An example in one dimension</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp.Rmd">LGCPs - An example in two dimensions</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_covariates.html">LGCPs - Spatial covariates</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
     <a class="dropdown-item" href="../../articles/component.html">Defining a model component</a>
-    <a class="dropdown-item" href="../../articles/svc.html">Spatially varying coefficient models</a>
+    <a class="dropdown-item" href="../../articles/web/svc.html">Spatially varying coefficient models</a>
     <a class="dropdown-item" href="../../articles/prediction_scores.html">Computing posterior prediction scores</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
-    <a class="dropdown-item" href="../../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
+    <a class="dropdown-item" href="../../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../../articles/linearapprox.html">A nonlinear model approximation example</a>
     <a class="dropdown-item" href="../../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
+    <a class="dropdown-item" href="../../articles/web/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
 <li class="nav-item">
@@ -99,7 +99,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-10-29</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-10-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -246,14 +246,14 @@ samples gave sufficient information for the overall prediction:</p>
 <span><span class="co">#&gt; Warning in rbind(deparse.level, ...): number of columns of result, 8, is not a</span></span>
 <span><span class="co">#&gt; multiple of vector length 9 of arg 4</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 632.1824 50.16620 547.9444 624.0448 716.9781 624.0448        5.016620</span></span>
-<span><span class="co">#&gt; 2 635.8485 34.60258 577.4512 633.3547 715.7896 633.3547        3.460258</span></span>
-<span><span class="co">#&gt; 3 650.4624 24.24050 598.7122 650.4344 697.4886 650.4344        2.424050</span></span>
+<span><span class="co">#&gt; 1 632.9028 45.81040 543.9413 634.5812 714.5774 634.5812        4.581040</span></span>
+<span><span class="co">#&gt; 2 632.7378 37.27796 568.1260 629.4080 703.9879 629.4080        3.727796</span></span>
+<span><span class="co">#&gt; 3 649.5405 25.78650 605.0367 647.8611 701.0538 647.8611        2.578650</span></span>
 <span><span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      3.400727</span></span>
-<span><span class="co">#&gt; 2      3.056273</span></span>
-<span><span class="co">#&gt; 3      1.914225</span></span>
+<span><span class="co">#&gt; 1      3.492764</span></span>
+<span><span class="co">#&gt; 2      2.784498</span></span>
+<span><span class="co">#&gt; 3      1.934231</span></span>
 <span><span class="co">#&gt; 4            NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
