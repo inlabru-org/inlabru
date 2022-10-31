@@ -295,13 +295,12 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 \method{ibm_jacobian}{bru_mapper_harmonics}(mapper, input, state = NULL, inla_f = FALSE, ...)
 }
 \arguments{
-\item{mapper}{A mapper S3 object, normally inheriting from \code{bru_mapper}}
+\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
 
-\item{inla_f}{logical; when \code{TRUE} in \code{ibm_n} and \code{ibm_values},
-these must result in values compatible with \code{INLA::f(...)}
-an specification and corresponding \code{INLA::inla.stack(...)} constructions.
-For the \code{ibm_eval} and \code{ibm_jacobian} methods, it may influence how the
-input data is interpreted.
+\item{inla_f}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
+result must be compatible with the \code{INLA::f(...)} and corresponding
+\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
+the \code{input} interpretation may be different.
 Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by \code{bru_mapper_collect}.}

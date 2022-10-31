@@ -26,17 +26,14 @@ bru_mapper <- function(...) {
 #' * `ibm_n` Generic. Implementations must return the size of the latent vector
 #' being mapped to.
 #' @param mapper A mapper S3 object, inheriting from `bru_mapper`.
-#' For the `bru_mapper_define` method, instead a
-#' list that will be converted to a `bru_mapper` object by adding
-#' class information and (optional) methods.
 #' @param inla_f logical; when `TRUE` for `ibm_n()` and `ibm_values()`, the
 #' result must be compatible with the `INLA::f(...)` and corresponding
-#' `INLA::inla.stack(...)` constructions.  For `ibm_{eval,offset,jacobian,linear,amatrix}`,
+#' `INLA::inla.stack(...)` constructions.  For `ibm_{eval,jacobian,linear}`,
 #' the `input` interpretation may be different.
 #' Implementations do not normally need to do anything different, except
 #' for mappers of the type needed for hidden multicomponent models such
 #' as "bym2", which can be handled by `bru_mapper_collect`.
-#'
+#' @param \dots Arguments passed on to other methods
 #' @export
 #' @rdname bru_mapper_methods
 #' @name bru_mapper_methods
@@ -413,9 +410,6 @@ bru_mapper_define <- function(mapper,
   if (!is.null(new_class) && !inherits(mapper, new_class)) {
     class(mapper) <- c(new_class, class(mapper))
   }
-  if (is.null(mapper[[".envir"]])) {
-    mapper$.envir <- new.env()
-  }
   mapper
 }
 
@@ -445,16 +439,6 @@ bru_mapper.default <- function(...) {
 #' available (see Details). Otherwise the
 #' `ibm_n()` and `ibm_values()` methods also need to be provided.
 #'
-#' @param \dots Arguments passed on to other methods
-#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
-#' @param inla_f logical; when `TRUE` in `ibm_n` and `ibm_values`,
-#' these must result in values compatible with `INLA::f(...)`
-#' an specification and corresponding `INLA::inla.stack(...)` constructions.
-#' For the `ibm_eval` and `ibm_jacobian` methods, it may influence how the
-#' input data is interpreted.
-#' Implementations do not normally need to do anything different, except
-#' for mappers of the type needed for hidden multicomponent models such
-#' as "bym2", which can be handled by `bru_mapper_collect`.
 #' @seealso [bru_mapper] for constructor methods, and
 #' [bru_get_mapper] for hooks to extract mappers from latent model object
 #' class objects.
