@@ -95,6 +95,9 @@ component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 # S3 method for component_list
 c(...)
 
+# S3 method for component
+c(...)
+
 # S3 method for component_list
 [(x, i)</code></pre></div>
     </div>
@@ -118,7 +121,7 @@ c(...)
 
 
 <dt>x</dt>
-<dd><p><code>component_list</code> object from which to extract element(s)</p></dd>
+<dd><p><code>component_list</code> object from which to extract a sub-list</p></dd>
 
 
 <dt>i</dt>
@@ -133,7 +136,11 @@ into a <code>component_list</code> object</p></li>
 </ul><ul><li><p><code>component_list.list</code>: Combine a list of components and/or component formulas
 into a <code>component_list</code> object</p></li>
 </ul><ul><li><p><code>c.component_list</code>: The <code>...</code> arguments should be <code>component_list</code>
-objects. The environment from the first argument will be applied to the resulting list.</p></li>
+objects. The environment from the first argument will be applied to the
+resulting <code>component_list</code>.</p></li>
+</ul><ul><li><p><code>c.component</code>: The <code>...</code> arguments should be <code>component</code>
+objects. The environment from the first argument will be applied to the
+resulting ``component_list`.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

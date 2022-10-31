@@ -252,9 +252,11 @@ internally used to represent and evaluate linearisation information.
 The <code>state0</code> information indicates for which state the <code>offset</code> was evaluated;
 The affine mapper output is defined as
 <code>effect(state) = offset + jacobian %*% (state - state0)</code></p>
-<p>For <code>bru_mapper_scale()</code>, <code>mapper</code> is a mapper to be scaled.
-The <code>input</code> format for the <code>ibm_eval</code> and <code>ibm_jacobian</code> methods is
-<code>list(mapper = input_to_the_inner_mapper, scale = scaling_weights)</code></p>
+<p>For <code>bru_mapper_scale()</code>, the default is to create a standalone
+scaling mapper that can be used as part of a <code>bru_mapper_pipe</code>.
+If <code>mapper</code> is non-null, the <code>bru_mapper_scale()</code> constructor
+returns
+<code>bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))</code></p>
 <p>For <code>bru_mapper_pipe()</code>, <code>mappers</code> is a list of mappers,
 where the evaluated output of each mapper is handed as the state to the next
 mapper..
