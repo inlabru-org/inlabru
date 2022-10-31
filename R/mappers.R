@@ -185,6 +185,81 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 }
 
 
+#' Methods for mapper lists
+#'
+#' `bru_mapper` lists can be combined into `bm_list` lists.
+#'
+#' @export
+#' @param \dots Objects to be combined.
+#' @details * `c.bru_mapper`: The `...` arguments should be `bru_mapper`
+#' objects.
+#' @rdname bm_list
+#' @export
+#' @examples
+#' m <- c(A = bru_mapper_const(), B = bru_mapper_scale())
+#' str(m)
+#' str(m[2])
+#'
+`c.bru_mapper` <- function(...) {
+  stopifnot(all(vapply(list(...),
+                       function(x) inherits(x, "bru_mapper"),
+                       TRUE)))
+  mappers <- list(...)
+  class(mappers) <- c("bm_list", "list")
+  mappers
+}
+
+#' @export
+#' @details * `c.bm_list`: The `...` arguments should be `bm_list`
+#' objects.
+#' @rdname bm_list
+#' @export
+`c.bm_list` <- function(...) {
+  stopifnot(all(vapply(list(...),
+                       function(x) inherits(x, "bm_list"),
+                       TRUE)))
+  object <- NextMethod()
+  class(object) <- c("bm_list", "list")
+  object
+}
+
+#' @export
+#' @param x `bm_list` object from which to extract element(s)
+#' @param i indices specifying elements to extract
+#' @rdname bm_list
+`[.bm_list` <- function(x, i) {
+  object <- NextMethod()
+  class(object) <- c("bm_list", "list")
+  object
+}
+
+
+# # @rawNamespace if (getRversion() >= '3.6.0') {
+# #   S3method(vctrs::vec_ptype_abbr, bru_mapper)
+# #   S3method(vctrs::vec_ptype_abbr, bm_list)
+# #   S3method(pillar::obj_sum, bru_mapper)
+# # }
+# # @rdname bm_list
+# `vec_ptype_abbr.bru_mapper` <- function(x, ...) {
+#   if (identical(class(x)[1], "bru_mapper")) {
+#     "mapper"
+#   } else {
+#     sub("bru_mapper_", "bm_", class(x)[1])
+#   }
+# }
+# # @rdname bm_list
+# `obj_sum.bru_mapper` <- function(x) {
+#   if (identical(class(x)[1], "bru_mapper")) {
+#     "mapper"
+#   } else {
+#     sub("bru_mapper_", "bm_", class(x)[1])
+#   }
+# }
+# # @rdname bm_list
+# `vec_ptype_abbr.bm_list` <- function(x, ...) {
+#   "mappers"
+# }
+
 
 # Summaries ----
 
@@ -1248,35 +1323,30 @@ ibm_amatrix.bru_mapper_offset <- function(...) {
 ## _scale ####
 
 #' @export
-#' @details For `bru_mapper_scale()`, `mapper` is a mapper to be scaled.
-#' The `input` format for the `ibm_eval` and `ibm_jacobian` methods is
-#' `list(mapper = input_to_the_inner_mapper, scale = scaling_weights)`
+#' @details For `bru_mapper_scale()`, the default is to create a standalone
+#' scaling mapper that can be used as part of a `bru_mapper_pipe`.
+#' If `mapper` is non-null, the `bru_mapper_scale()` constructor
+#' returns
+#' `bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))`
 #' @rdname bru_mapper
 bru_mapper_scale <- function(mapper = NULL, ...) {
   # TODO:
-  # 1. If mapper is NULL, implement a plain scaling mapper
-  # 2. First, if mapper is non-null, keep current behaviour
+  # 1. If mapper is NULL, implement a plain scaling mapper. Done!
+  # 2. First, if mapper is non-null, keep current behaviour. Still allowed
+  #    in the methods, but the constructor doesn't do it anymore, but
+  #    instead returns a pipe mapper.
   # 3. Later, if mapper is non-null, make a pipe mapper, that pipes
-  #   the mapper into a plain null-mapper scaling mapper
-  # 4. Remove the old non-null mapper support from the methods
+  #   the mapper into a plain null-mapper scaling mapper. Done!
+  # 4. Remove the old non-null mapper support from the methods. Future.
   if (is.null(mapper)) {
-    bru_mapper_define(list(
-      mapper = mapper,
-      is_linear = ibm_is_linear(mapper)
-    ),
-    new_class = "bru_mapper_scale"
-    )
-  } else {
-    if (TRUE) {
-      bru_mapper_define(list(
-        mapper = mapper,
+    bru_mapper_define(
+      list(
         is_linear = ibm_is_linear(mapper)
       ),
       new_class = "bru_mapper_scale"
-      )
-    } else {
-      bru_mapper_pipe(list(mapper, bru_mapper_scale()))
-    }
+    )
+  } else {
+    bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))
   }
 }
 

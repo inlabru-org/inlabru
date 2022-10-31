@@ -160,9 +160,11 @@ The \code{state0} information indicates for which state the \code{offset} was ev
 The affine mapper output is defined as
 \code{effect(state) = offset + jacobian \%*\% (state - state0)}
 
-For \code{bru_mapper_scale()}, \code{mapper} is a mapper to be scaled.
-The \code{input} format for the \code{ibm_eval} and \code{ibm_jacobian} methods is
-\code{list(mapper = input_to_the_inner_mapper, scale = scaling_weights)}
+For \code{bru_mapper_scale()}, the default is to create a standalone
+scaling mapper that can be used as part of a \code{bru_mapper_pipe}.
+If \code{mapper} is non-null, the \code{bru_mapper_scale()} constructor
+returns
+\code{bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))}
 
 For \code{bru_mapper_pipe()}, \code{mappers} is a list of mappers,
 where the evaluated output of each mapper is handed as the state to the next

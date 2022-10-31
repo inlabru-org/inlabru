@@ -701,9 +701,13 @@ component_list.list <- function(object,
 
 #' @export
 #' @details * `c.component_list`: The `...` arguments should be `component_list`
-#' objects. The environment from the first argument will be applied to the resulting list.
+#' objects. The environment from the first argument will be applied to the
+#' resulting `component_list`.
 #' @rdname component_list
 `c.component_list` <- function(...) {
+  stopifnot(all(vapply(list(...),
+                       function(x) inherits(x, "component_list"),
+                       TRUE)))
   env <- environment(list(...)[[1]])
   object <- NextMethod()
   class(object) <- c("component_list", "list")
@@ -712,7 +716,23 @@ component_list.list <- function(object,
 }
 
 #' @export
-#' @param x `component_list` object from which to extract element(s)
+#' @details * `c.component`: The `...` arguments should be `component`
+#' objects. The environment from the first argument will be applied to the
+#' resulting ``component_list`.
+#' @rdname component_list
+`c.component` <- function(...) {
+  stopifnot(all(vapply(list(...),
+                       function(x) inherits(x, "component"),
+                       TRUE)))
+  env <- environment(list(...)[[1]])
+  object <- list(...)
+  class(object) <- c("component_list", "list")
+  environment(object) <- env
+  object
+}
+
+#' @export
+#' @param x `component_list` object from which to extract a sub-list
 #' @param i indices specifying elements to extract
 #' @rdname component_list
 `[.component_list` <- function(x, i) {
