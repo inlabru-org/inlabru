@@ -375,15 +375,14 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)</code></pre></div
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>mapper</dt>
-<dd><p>A mapper S3 object, normally inheriting from <code>bru_mapper</code></p></dd>
+<dd><p>A mapper S3 object, inheriting from <code>bru_mapper</code>.</p></dd>
 
 
 <dt>inla_f</dt>
-<dd><p>logical; when <code>TRUE</code> in <code>ibm_n</code> and <code>ibm_values</code>,
-these must result in values compatible with <code>INLA::f(...)</code>
-an specification and corresponding <code>INLA::inla.stack(...)</code> constructions.
-For the <code>ibm_eval</code> and <code>ibm_jacobian</code> methods, it may influence how the
-input data is interpreted.
+<dd><p>logical; when <code>TRUE</code> for <code>ibm_n()</code> and <code>ibm_values()</code>, the
+result must be compatible with the <code>INLA::f(...)</code> and corresponding
+<code>INLA::inla.stack(...)</code> constructions.  For <code>ibm_{eval,jacobian,linear}</code>,
+the <code>input</code> interpretation may be different.
 Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by <code>bru_mapper_collect</code>.</p></dd>
