@@ -96,7 +96,13 @@
 <span></span>
 <span><span class="fu">bru_mapper_index</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1L</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_taylor</span><span class="op">(</span><span class="va">offset</span>, <span class="va">jacobian</span>, <span class="va">state0</span>, <span class="va">...</span>, values_mapper <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_taylor</span><span class="op">(</span></span>
+<span>  offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  jacobian <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  state0 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  values_mapper <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bru_mapper_linear</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -163,7 +169,9 @@ Default: <code>NULL</code>, to force user specification of this parameter</p></d
 
 <dt>offset</dt>
 <dd><p>For <code>bru_mapper_taylor</code>, an offset vector evaluated
-at <code>state0</code></p></dd>
+at <code>state0</code>.
+May be <code>NULL</code>, interpreted as an all-zero vector of length determined by
+a non-null Jacobian.</p></dd>
 
 
 <dt>jacobian</dt>
