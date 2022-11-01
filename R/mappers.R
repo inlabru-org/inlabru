@@ -41,29 +41,25 @@ ibm_n <- function(mapper, inla_f = FALSE, ...) {
   UseMethod("ibm_n")
 }
 
-#' @details
-#' * `ibm_n_output` Generic.
+#' @describeIn bru_mapper_methods Generic.
 #' Implementations must return an integer denoting the
-#' mapper output length, for valid inputs as determined by
-#' `ibm_valid_input(mapper, input, inla_f = inla_f)`.
+#' mapper output length.
 #' The default implementation returns `NROW(input)`.
 #' Mappers such as `bru_mapper_multi` and `bru_mapper_collect`,
 #' that can accept `list()` inputs require their own methods implementations.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_n_output <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   UseMethod("ibm_n_output")
 }
 
 
 
-#' @details
-#' * `ibm_values` Generic. When `inla_f=TRUE`, implementations must return a vector that
+#' @describeIn bru_mapper_methods Generic.
+#' When `inla_f=TRUE`, implementations must return a vector that
 #' would be interpretable by an `INLA::f(..., values = ...)` specification.
 #' The exception is the method for `bru_mapper_multi`, that returns a
 #' multi-column data frame.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_values <- function(mapper, inla_f = FALSE, ...) {
   UseMethod("ibm_values")
 }
@@ -182,14 +178,27 @@ ibm_names <- function(mapper) {
 ibm_inla_subset <- function(mapper, ...) {
   UseMethod("ibm_inla_subset")
 }
+
 #' @details
-#' * `ibm_valid_input` Generic.
-#' Implementations should return a logical vector of length `NROW(input)`,
-#' or for `bru_mapper_multi` and `bru_mapper_collect` a list of such
-#' vectors.
+#' * `ibm_invalid_output` Generic.
+#' Implementations should return a logical vector of length
+#' `ibm_n_output(mapper, input, state, ...)` indicating which, if any,
+#' output elements of `ibm_eval(mapper, input, state, ...)` are known to be
+#' invalid.
+#' For for multi/collect mappers, a list, when given a `multi=TRUE` argument.
 #' @export
 #' @rdname bru_mapper_methods
-ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
+ibm_invalid_output <- function(mapper, input, state, ...) {
+  UseMethod("ibm_invalid_output")
+}
+
+
+#' @describeIn inlabru-deprecated Use case changed to [ibm_invalid_output()]
+#' @export
+ibm_valid_input <- function(...) {
+  lifecycle::deprecate_stop(
+    "2.6.0.9001",
+    "ibm_valid_input()")
   UseMethod("ibm_valid_input")
 }
 
@@ -534,7 +543,7 @@ bru_mapper.default <- function(...) {
 #' Implementation methods for mapper objects
 #'
 #' A `bru_mapper` sub-class implementation must provide an
-#' `ibm_matrix()` method. If the model size 'n' and definition
+#' `ibm_jacobian()` method. If the model size 'n' and definition
 #' values 'values' are stored in the object itself, default methods are
 #' available (see Details). Otherwise the
 #' `ibm_n()` and `ibm_values()` methods also need to be provided.
@@ -718,11 +727,11 @@ ibm_inla_subset.default <- function(mapper, ...) {
 
 
 #' @details
-#' * The default `ibm_valid_input()` method returns an all-TRUE logical vector.
+#' * The default `ibm_invalid_output()` method returns an all-FALSE logical vector.
 #' @export
 #' @rdname bru_mapper_methods
-ibm_valid_input.default <- function(mapper, input, ...) {
-  rep(TRUE, NROW(input))
+ibm_invalid_output.default <- function(mapper, input, state, ...) {
+  rep(FALSE, ibm_n_output(mapper, input = input, state = state, ...))
 }
 
 
@@ -853,19 +862,22 @@ bru_mapper_index <- function(n = 1L, ...) {
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_valid_input.bru_mapper_index <- function(mapper, input, ...) {
+ibm_invalid_output.bru_mapper_index <- function(mapper, input, state, ...) {
   ok <- !is.na(input)
-  ok[ok] <- (input[ok] >= 1) & (input[ok] <= ibm_n(mapper))
-  ok
+  ok[ok] <-
+    (input[ok] >= 1) &
+    (input[ok] <= ibm_n_output(mapper, input, state, ...))
+  !ok
 }
+
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_jacobian.bru_mapper_index <- function(mapper, input, ...) {
+ibm_jacobian.bru_mapper_index <- function(mapper, input, state, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  ok <- which(ibm_valid_input(mapper, input, ...))
+  ok <- which((1L <= input) & (input <= ibm_n(mapper)))
   Matrix::sparseMatrix(
     i = ok,
     j = input[ok],
@@ -1457,8 +1469,8 @@ ibm_jacobian.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
   # Behaviour for v2.6.0, non-null mapper
   if (is.null(sub_lin)) {
     A <- ibm_jacobian(mapper[["mapper"]],
-      input = input[["mapper"]],
-      state = state, ...
+                      input = input[["mapper"]],
+                      state = state, ...
     )
   } else {
     A <- sub_lin$jacobian
@@ -1493,8 +1505,8 @@ ibm_linear.bru_mapper_scale <- function(mapper, input, state, ...) {
 
   # Behaviour for v2.6.0, non-null mapper
   sub_lin <- ibm_linear(mapper[["mapper"]],
-    input[["mapper"]],
-    state = state, ...
+                        input[["mapper"]],
+                        state = state, ...
   )
   bru_mapper_taylor(
     offset = ibm_eval(mapper, input, state, ..., sub_lin = sub_lin),
@@ -1525,8 +1537,8 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
     values <- ibm_eval(sub_lin, input = NULL, state = state)
   } else {
     values <- ibm_eval(mapper[["mapper"]],
-      input = input[["mapper"]],
-      state = state, ...
+                       input = input[["mapper"]],
+                       state = state, ...
     )
   }
   if ((NROW(values) > 0) && !is.null(input[["scale"]])) {
@@ -1539,16 +1551,182 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
 }
 
 
-#' @details
-#' * `ibm_valid_input` for `bru_mapper_scale` accepts a list with
-#' named entries `mapper` and `scale`. The contents of the `mapper`
-#' element is checked for validity for the submapper
-#' with `ibm_valid_input(mapper$mapper, input$mapper, ...)`
+
+
+## _aggregate ####
+
+#' @export
+#' @details * `bru_mapper_aggregate()` constructs a mapper
+#' that aggregates elements of the input state, so it can be used e.g.
+#' for weighted summation or integration over blocks of values.
+#' @param rescale
+#' logical; For `bru_mapper_aggregate`, specifies if the rows of the
+#' Jacobian should be normalised or not,
+#' after grouping by the block specification:
+#' * `FALSE`: (default) Straight weighted sum, no rescaling.
+#' * `TRUE`: Divide by the sum of the weight values within each block.
+#'   This is useful for integration averages, when the given weights are plain
+#'   integration weights. If the weights are `NULL` or all ones, this is
+#'   the same as dividing by the number of entries in each block.
+#' @param n_block Predetermined number of output blocks. If `NULL`, overrides
+#' the maximum block index in the inputs.
+#' @rdname bru_mapper
+bru_mapper_aggregate <- function(rescale = FALSE,
+                                 n_block = NULL,
+                                 ...) {
+  bru_mapper_define(
+    list(rescale = rescale,
+         n_block = n_block),
+    new_class = "bru_mapper_aggregate"
+  )
+}
+
+#' @param n_state integer giving the length of the state vector for mappers
+#' that have state dependent output size.
 #' @export
 #' @rdname bru_mapper_methods
-ibm_valid_input.bru_mapper_scale <- function(mapper, input, ...) {
-  rep(TRUE, NROW(input))
+ibm_n.bru_mapper_aggregate <- function(mapper, ...,
+                                       input = NULL,
+                                       state = NULL,
+                                       n_state = NULL) {
+  # Output size depends on the state size
+  if (!is.null(state)) {
+    length(state)
+  } else if (!is.null(n_state)) {
+    n_state
+  } else if (!is.null(input) &&
+             !is.null(input[["block"]])) {
+    length(input[["block"]])
+  } else {
+    NA_integer_
+  }
 }
+#' @export
+#' @rdname bru_mapper_methods
+ibm_n_output.bru_mapper_aggregate <- function(mapper,
+                                              input = NULL, ...) {
+  if (!is.null(mapper[["n_block"]])) {
+    mapper[["n_block"]]
+  } else if (!is.null(input)) {
+    max(input[["block"]])
+  } else {
+    NA_integer_
+  }
+}
+#' @export
+#' @rdname bru_mapper_methods
+ibm_values.bru_mapper_aggregate <- function(mapper, ...,
+                                            state = NULL,
+                                            n_state = NULL) {
+  n_state <- ibm_n(mapper, state = state, n_state = n_state)
+  if (is.na(n_state)) {
+    # Don't know how big the mapper will be
+    NULL
+  } else {
+    seq_len(n_state)
+  }
+}
+
+bm_aggregate_input <- function(input, state = NULL, n_state = NULL) {
+  if (is.null(input)) {
+    block <- NULL
+    weights <- NULL
+  } else {
+    block <- input[["block"]]
+    weights <- input[["weights"]]
+  }
+  if (is.null(state) && is.null(n_state)) {
+    n_state <- max(length(block), length(weights))
+  } else if (!is.null(state)) {
+    n_state <- length(state)
+  }
+  if (is.null(block)) {
+    block <- rep(1L, n_state)
+  } else if (length(block) == 1) {
+    block <- rep(block, n_state)
+  }
+  if (is.null(weights)) {
+    weights <- rep(1.0, n_state)
+  } else if (length(weights) == 1) {
+    weights <- rep(weights, n_state)
+  }
+  list(block = block, weights = weights)
+}
+
+#' @export
+#' @details
+#' * For `bru_mapper_aggregate`, `input` should be a list with elements `block`
+#' and `weights`. `block`
+#' should be a vector of the same length as the `state`, or `NULL`, with `NULL`
+#' equivalent to all-1.
+#' If `weights` is `NULL`, it's interpreted as all-1.
+#' @rdname bru_mapper_methods
+ibm_jacobian.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...) {
+  input <- bm_aggregate_input(input, state = state)
+  n_state <- ibm_n(mapper, input = input, state = state)
+  n_out <- ibm_n_output(mapper, input = input)
+
+  if (mapper[["rescale"]]) {
+    # Compute blockwise weight sums
+    rescale <- as.vector(
+      Matrix::sparseMatrix(i = input[["block"]],
+                           j = rep(1L, n_state),
+                           x = input[["weights"]],
+                           dims = c(n_out, 1))
+    )
+    rescale <- rescale[input[["block"]]]
+  } else {
+    rescale <- 1
+  }
+  Matrix::sparseMatrix(i = input[["block"]],
+                       j = seq_len(n_state),
+                       x = input[["weights"]] / rescale,
+                       dims = c(n_out, n_state))
+}
+
+
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_linear.bru_mapper_aggregate <- function(mapper, input, state, ...) {
+  bru_mapper_taylor(
+    offset = ibm_eval(mapper, input, state, ...),
+    jacobian = ibm_jacobian(mapper, input, state, ...),
+    state0 = state,
+    values_mapper = mapper
+  )
+}
+
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
+                                      sub_lin = NULL) {
+  input <- bm_aggregate_input(input, state = state)
+  n_state <- ibm_n(mapper, input = input, state = state)
+  n_out <- ibm_n_output(mapper, input = input)
+
+  if (mapper[["rescale"]]) {
+    # Compute blockwise weight sums
+    rescale <- as.vector(
+      Matrix::sparseMatrix(i = input[["block"]],
+                           j = rep(1L, n_state),
+                           x = input[["weights"]],
+                           dims = c(n_out, 1))
+    )
+    rescale <- rescale[input[["block"]]]
+  } else {
+    rescale <- 1
+  }
+  values <-
+    Matrix::sparseMatrix(i = input[["block"]],
+                         j = rep(1L, n_state),
+                         x = state * input[["weights"]] / rescale,
+                         dims = c(n_out, 1))
+  as.vector(values)
+}
+
+
 
 
 
@@ -1665,26 +1843,6 @@ ibm_eval.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
   state_k
 }
 
-
-#' @details
-#' * `ibm_valid_input` for `bru_mapper_pipe` accepts a list with
-#' input entries, one for each pipe mapper. The contents of each element
-#' is checked for validity for the submapper.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_valid_input.bru_mapper_pipe <- function(mapper, input, ..., multi = FALSE) {
-  valid <- lapply(
-    seq_along(mapper[["mappers"]]),
-    function(k) {
-      ibm_valid_input(mapper[["mappers"]][[k]], input[[k]], ...)
-    }
-  )
-
-  if (!multi) {
-    valid <- all(unlist(valid))
-  }
-  valid
-}
 
 
 ## _multi ####
@@ -1933,7 +2091,7 @@ bm_multi_indexing <- function(mapper, input) {
 
 
 #' @details
-#' * `ibm_valid_input` for `bru_mapper_multi` accepts a list with
+#' * `ibm_invalid_output` for `bru_mapper_multi` accepts a list with
 #' named entries, or a list with unnamed but ordered elements.
 #' The names must match the sub-mappers, see [ibm_names.bru_mapper_multi()].
 #' Each list element should take a format accepted by the corresponding
@@ -1942,15 +2100,20 @@ bm_multi_indexing <- function(mapper, input) {
 #' with unnamed but ordered columns.
 #' @export
 #' @rdname bru_mapper_methods
-ibm_valid_input.bru_mapper_multi <- function(mapper, input,
-                                             inla_f = FALSE, multi = FALSE, ...) {
+ibm_invalid_output.bru_mapper_multi <- function(mapper,
+                                                input,
+                                                state,
+                                                inla_f = FALSE,
+                                                multi = FALSE,
+                                                ...) {
   indexing <- bm_multi_indexing(mapper, input)
   if (is.matrix(input)) {
-    validity <-
+    invalid <-
       lapply(
         indexing,
         function(x) {
-          ibm_valid_input(mapper[["mappers"]][[x]],
+          ibm_invalid_output(
+            mapper[["mappers"]][[x]],
             input = input[, x],
             inla_f = inla_f,
             multi = FALSE
@@ -1958,11 +2121,12 @@ ibm_valid_input.bru_mapper_multi <- function(mapper, input,
         }
       )
   } else if (is.list(input)) {
-    validity <-
+    invalid <-
       lapply(
         indexing,
         function(x) {
-          ibm_valid_input(mapper[["mappers"]][[x]],
+          ibm_invalid_output(
+            mapper[["mappers"]][[x]],
             input = input[[x]],
             inla_f = inla_f,
             multi = FALSE
@@ -1970,18 +2134,18 @@ ibm_valid_input.bru_mapper_multi <- function(mapper, input,
         }
       )
   } else {
-    validity <- as.list(rep(FALSE, length(mapper[["mappers"]])))
-    names(validity) <- names(mapper[["mappers"]])
+    invalid <- as.list(rep(TRUE, length(mapper[["mappers"]])))
+    names(invalid) <- names(mapper[["mappers"]])
   }
   if (!multi) {
-    # Combine the vectors (v1, v2, v3) -> v1 & v2 & v3
-    validity_ <- validity[[1]]
+    # Combine the vectors (v1, v2, v3) -> v1 | v2 | v3
+    invalid_ <- invalid[[1]]
     for (k in seq_len(length(mapper[["mappers"]]) - 1)) {
-      validity_ <- validity_ & validity[[k + 1]]
+      invalid_ <- invalid_ | invalid[[k + 1]]
     }
-    return(validity_)
+    return(invalid_)
   }
-  validity
+  invalid
 }
 
 #' @return
@@ -2299,7 +2463,7 @@ ibm_linear.bru_mapper_collect <- function(mapper, input, state,
 
 
 #' @details
-#' * `ibm_valid_input` for `bru_mapper_collect` accepts a list with
+#' * `ibm_invalid_output` for `bru_mapper_collect` accepts a list with
 #' named entries, or a list with unnamed but ordered elements.
 #' The names must match the sub-mappers, see [ibm_names.bru_mapper_collect()].
 #' Each list element should take a format accepted by the corresponding
@@ -2308,48 +2472,55 @@ ibm_linear.bru_mapper_collect <- function(mapper, input, state,
 #' with unnamed but ordered columns.
 #' @export
 #' @rdname bru_mapper_methods
-ibm_valid_input.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, multi = FALSE, ...) {
+ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
+                                                  inla_f = FALSE,
+                                                  multi = FALSE, ...) {
   if (mapper[["hidden"]] && inla_f) {
-    return(ibm_valid_input(mapper[["mappers"]][[1]],
-      input = input,
-      multi = FALSE
-    ))
+    return(
+      ibm_invalid_output(
+        mapper[["mappers"]][[1]],
+        input = input,
+        multi = FALSE
+      )
+    )
   }
 
   indexing <- bm_collect_indexing(mapper, input)
   if (is.matrix(input)) {
-    validity <-
+    invalid <-
       lapply(
         indexing,
         function(x) {
-          ibm_valid_input(mapper[["mappers"]][[x]],
+          ibm_invalid_output(
+            mapper[["mappers"]][[x]],
             input = input[, x],
             multi = FALSE
           )
         }
       )
   } else if (is.list(input)) {
-    validity <-
+    invalid <-
       lapply(
         indexing,
         function(x) {
-          ibm_valid_input(mapper[["mappers"]][[x]],
+          ibm_invalid_output(
+            mapper[["mappers"]][[x]],
             input = input[[x]],
             multi = FALSE
           )
         }
       )
   } else {
-    validity <- as.list(rep(FALSE, length(mapper[["mappers"]])))
+    invalid <- as.list(rep(TRUE, length(mapper[["mappers"]])))
   }
 
   if (!multi) {
     # Combine the vectors (v1, v2, v3) -> c(v1, v2, v3)
-    validity_ <- do.call(c, validity)
-    return(validity_)
+    invalid_ <- do.call(c, invalid)
+    return(invalid_)
   }
 
-  validity
+  invalid
 }
 
 #' @return

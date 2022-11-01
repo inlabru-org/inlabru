@@ -264,7 +264,6 @@ ibm_jacobian(mapper, input, state, ...)
 ibm_eval(mapper, input, state, ...)
 ibm_names(mapper, ...)
 ibm_inla_subset(mapper, ...)
-ibm_valid_input(mapper, input, ...)
 ```
 
 An example where the `inla_f` argument matters is the `bru_mapper_collect` class,

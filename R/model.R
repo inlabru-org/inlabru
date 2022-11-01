@@ -467,11 +467,15 @@ evaluate_predictor <- function(model,
           state = .state
         )
         if (.is_iid) {
-          ok <- ibm_valid_input(
-            .mapper,
-            input = .input
+          # Check for known invalid output elements, based on the
+          # initial mapper (subsequent mappers in the component pipe
+          # are assumed to keep the same length and validity)
+          not_ok <- ibm_invalid_output(
+            .mapper[["mappers"]][[1]],
+            input = .input[[1]],
+            state = .state
           )
-          if (any(!ok)) {
+          if (any(not_ok)) {
             .cache_state_index <- eval(
               parse(text = ".cache_state_index"),
               envir = .envir,
@@ -481,7 +485,7 @@ evaluate_predictor <- function(model,
               .iid_cache_index <<- .cache_state_index
               .iid_cache <<- list()
             }
-            key <- as.character(main[!ok])
+            key <- as.character(main[not_ok])
             not_cached <- !(key %in% names(.iid_cache))
             if (any(not_cached)) {
               .prec <- eval(
@@ -493,7 +497,7 @@ evaluate_predictor <- function(model,
                 .iid_cache[k] <<- rnorm(1, mean = 0, sd = .prec^-0.5)
               }
             }
-            .values[!ok] <- vapply(
+            .values[not_ok] <- vapply(
               key,
               function(k) .iid_cache[[k]],
               0.0

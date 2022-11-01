@@ -7,6 +7,7 @@
 \alias{iinla.getOption}
 \alias{iinla.setOption}
 \alias{init.tutorial}
+\alias{ibm_valid_input}
 \alias{ibm_amatrix.bru_mapper_inla_mesh_2d}
 \alias{ibm_amatrix.bru_mapper_inla_mesh_1d}
 \alias{ibm_amatrix.bru_mapper_index}
@@ -28,6 +29,8 @@ iinla.getOption(name = NULL)
 iinla.setOption(...)
 
 init.tutorial()
+
+ibm_valid_input(...)
 
 \method{ibm_amatrix}{bru_mapper_inla_mesh_2d}(...)
 
@@ -82,6 +85,8 @@ options instead instead.  In versions <= 2.1.15, this function set the INLA
 integration strategy to "eb" to speed up calculations. This is normally not
 needed since version 2.2.0, since the only the final iteration will use
 other than "eb".
+
+\item \code{ibm_valid_input()}: Use case changed to \code{\link[=ibm_invalid_output]{ibm_invalid_output()}}
 
 \item \code{ibm_amatrix(bru_mapper_inla_mesh_2d)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
 

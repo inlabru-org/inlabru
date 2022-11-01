@@ -13,7 +13,7 @@
 \alias{ibm_names}
 \alias{ibm_names<-}
 \alias{ibm_inla_subset}
-\alias{ibm_valid_input}
+\alias{ibm_invalid_output}
 \alias{ibm_n.default}
 \alias{ibm_n_output.default}
 \alias{ibm_values.default}
@@ -25,14 +25,14 @@
 \alias{ibm_eval.default}
 \alias{ibm_names.default}
 \alias{ibm_inla_subset.default}
-\alias{ibm_valid_input.default}
+\alias{ibm_invalid_output.default}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
 \alias{ibm_values.bru_mapper_inla_mesh_2d}
 \alias{ibm_jacobian.bru_mapper_inla_mesh_2d}
 \alias{ibm_n.bru_mapper_inla_mesh_1d}
 \alias{ibm_values.bru_mapper_inla_mesh_1d}
 \alias{ibm_jacobian.bru_mapper_inla_mesh_1d}
-\alias{ibm_valid_input.bru_mapper_index}
+\alias{ibm_invalid_output.bru_mapper_index}
 \alias{ibm_jacobian.bru_mapper_index}
 \alias{ibm_n.bru_mapper_taylor}
 \alias{ibm_n_output.bru_mapper_taylor}
@@ -58,14 +58,18 @@
 \alias{ibm_jacobian.bru_mapper_scale}
 \alias{ibm_linear.bru_mapper_scale}
 \alias{ibm_eval.bru_mapper_scale}
-\alias{ibm_valid_input.bru_mapper_scale}
+\alias{ibm_n.bru_mapper_aggregate}
+\alias{ibm_n_output.bru_mapper_aggregate}
+\alias{ibm_values.bru_mapper_aggregate}
+\alias{ibm_jacobian.bru_mapper_aggregate}
+\alias{ibm_linear.bru_mapper_aggregate}
+\alias{ibm_eval.bru_mapper_aggregate}
 \alias{ibm_n.bru_mapper_pipe}
 \alias{ibm_n_output.bru_mapper_pipe}
 \alias{ibm_values.bru_mapper_pipe}
 \alias{ibm_jacobian.bru_mapper_pipe}
 \alias{ibm_linear.bru_mapper_pipe}
 \alias{ibm_eval.bru_mapper_pipe}
-\alias{ibm_valid_input.bru_mapper_pipe}
 \alias{ibm_n.bru_mapper_multi}
 \alias{ibm_n_output.bru_mapper_multi}
 \alias{ibm_values.bru_mapper_multi}
@@ -73,7 +77,7 @@
 \alias{ibm_jacobian.bru_mapper_multi}
 \alias{ibm_linear.bru_mapper_multi}
 \alias{ibm_eval.bru_mapper_multi}
-\alias{ibm_valid_input.bru_mapper_multi}
+\alias{ibm_invalid_output.bru_mapper_multi}
 \alias{[.bru_mapper_multi}
 \alias{ibm_names.bru_mapper_multi}
 \alias{ibm_names<-.bru_mapper_multi}
@@ -84,7 +88,7 @@
 \alias{ibm_jacobian.bru_mapper_collect}
 \alias{ibm_eval.bru_mapper_collect}
 \alias{ibm_linear.bru_mapper_collect}
-\alias{ibm_valid_input.bru_mapper_collect}
+\alias{ibm_invalid_output.bru_mapper_collect}
 \alias{[.bru_mapper_collect}
 \alias{ibm_names.bru_mapper_collect}
 \alias{ibm_names<-.bru_mapper_collect}
@@ -114,7 +118,7 @@ ibm_names(mapper) <- value
 
 ibm_inla_subset(mapper, ...)
 
-ibm_valid_input(mapper, input, inla_f = FALSE, ...)
+ibm_invalid_output(mapper, input, state, ...)
 
 \method{ibm_n}{default}(mapper, inla_f = FALSE, ...)
 
@@ -138,7 +142,7 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 
 \method{ibm_inla_subset}{default}(mapper, ...)
 
-\method{ibm_valid_input}{default}(mapper, input, ...)
+\method{ibm_invalid_output}{default}(mapper, input, state, ...)
 
 \method{ibm_n}{bru_mapper_inla_mesh_2d}(mapper, ...)
 
@@ -154,9 +158,9 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 
 \method{ibm_jacobian}{bru_mapper_inla_mesh_1d}(mapper, input, ...)
 
-\method{ibm_valid_input}{bru_mapper_index}(mapper, input, ...)
+\method{ibm_invalid_output}{bru_mapper_index}(mapper, input, state, ...)
 
-\method{ibm_jacobian}{bru_mapper_index}(mapper, input, ...)
+\method{ibm_jacobian}{bru_mapper_index}(mapper, input, state, ...)
 
 \method{ibm_n}{bru_mapper_taylor}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
@@ -206,7 +210,17 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 
 \method{ibm_eval}{bru_mapper_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
 
-\method{ibm_valid_input}{bru_mapper_scale}(mapper, input, ...)
+\method{ibm_n}{bru_mapper_aggregate}(mapper, ..., input = NULL, state = NULL, n_state = NULL)
+
+\method{ibm_n_output}{bru_mapper_aggregate}(mapper, input = NULL, ...)
+
+\method{ibm_values}{bru_mapper_aggregate}(mapper, ..., state = NULL, n_state = NULL)
+
+\method{ibm_jacobian}{bru_mapper_aggregate}(mapper, input, state = NULL, ...)
+
+\method{ibm_linear}{bru_mapper_aggregate}(mapper, input, state, ...)
+
+\method{ibm_eval}{bru_mapper_aggregate}(mapper, input, state = NULL, ..., sub_lin = NULL)
 
 \method{ibm_n}{bru_mapper_pipe}(mapper, ..., state = NULL)
 
@@ -219,8 +233,6 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 \method{ibm_linear}{bru_mapper_pipe}(mapper, input, state, ...)
 
 \method{ibm_eval}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
-
-\method{ibm_valid_input}{bru_mapper_pipe}(mapper, input, ..., multi = FALSE)
 
 \method{ibm_n}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
@@ -244,7 +256,7 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 
 \method{ibm_eval}{bru_mapper_multi}(mapper, input, state = NULL, inla_f = FALSE, ..., pre_A = NULL)
 
-\method{ibm_valid_input}{bru_mapper_multi}(mapper, input, inla_f = FALSE, multi = FALSE, ...)
+\method{ibm_invalid_output}{bru_mapper_multi}(mapper, input, state, inla_f = FALSE, multi = FALSE, ...)
 
 \method{[}{bru_mapper_multi}(x, i, drop = TRUE)
 
@@ -282,7 +294,7 @@ ibm_offset.default(mapper, input, state = NULL, ...)
 
 \method{ibm_linear}{bru_mapper_collect}(mapper, input, state, inla_f = FALSE, ...)
 
-\method{ibm_valid_input}{bru_mapper_collect}(mapper, input, inla_f = FALSE, multi = FALSE, ...)
+\method{ibm_invalid_output}{bru_mapper_collect}(mapper, input, state, inla_f = FALSE, multi = FALSE, ...)
 
 \method{[}{bru_mapper_collect}(x, i, drop = TRUE)
 
@@ -362,7 +374,7 @@ sub-mappers list
 }
 \description{
 A \code{bru_mapper} sub-class implementation must provide an
-\code{ibm_matrix()} method. If the model size 'n' and definition
+\code{ibm_jacobian()} method. If the model size 'n' and definition
 values 'values' are stored in the object itself, default methods are
 available (see Details). Otherwise the
 \code{ibm_n()} and \code{ibm_values()} methods also need to be provided.
@@ -371,23 +383,6 @@ available (see Details). Otherwise the
 \itemize{
 \item \code{ibm_n} Generic. Implementations must return the size of the latent vector
 being mapped to.
-}
-
-\itemize{
-\item \code{ibm_n_output} Generic.
-Implementations must return an integer denoting the
-mapper output length, for valid inputs as determined by
-\code{ibm_valid_input(mapper, input, inla_f = inla_f)}.
-The default implementation returns \code{NROW(input)}.
-Mappers such as \code{bru_mapper_multi} and \code{bru_mapper_collect},
-that can accept \code{list()} inputs require their own methods implementations.
-}
-
-\itemize{
-\item \code{ibm_values} Generic. When \code{inla_f=TRUE}, implementations must return a vector that
-would be interpretable by an \code{INLA::f(..., values = ...)} specification.
-The exception is the method for \code{bru_mapper_multi}, that returns a
-multi-column data frame.
 }
 
 \itemize{
@@ -451,10 +446,12 @@ the \code{ibm_values} output to construct the subset indexing.
 }
 
 \itemize{
-\item \code{ibm_valid_input} Generic.
-Implementations should return a logical vector of length \code{NROW(input)},
-or for \code{bru_mapper_multi} and \code{bru_mapper_collect} a list of such
-vectors.
+\item \code{ibm_invalid_output} Generic.
+Implementations should return a logical vector of length
+\code{ibm_n_output(mapper, input, state, ...)} indicating which, if any,
+output elements of \code{ibm_eval(mapper, input, state, ...)} are known to be
+invalid.
+For for multi/collect mappers, a list, when given a \code{multi=TRUE} argument.
 }
 
 \itemize{
@@ -511,7 +508,7 @@ both regular vector values and \code{multi=1} data.frame values).
 }
 
 \itemize{
-\item The default \code{ibm_valid_input()} method returns an all-TRUE logical vector.
+\item The default \code{ibm_invalid_output()} method returns an all-FALSE logical vector.
 }
 
 \itemize{
@@ -528,16 +525,11 @@ For \code{bru_mapper_scale}, \code{input} values without a \code{scale} element
 are interpreted as no scaling.
 
 \itemize{
-\item \code{ibm_valid_input} for \code{bru_mapper_scale} accepts a list with
-named entries \code{mapper} and \code{scale}. The contents of the \code{mapper}
-element is checked for validity for the submapper
-with \code{ibm_valid_input(mapper$mapper, input$mapper, ...)}
-}
-
-\itemize{
-\item \code{ibm_valid_input} for \code{bru_mapper_pipe} accepts a list with
-input entries, one for each pipe mapper. The contents of each element
-is checked for validity for the submapper.
+\item For \code{bru_mapper_aggregate}, \code{input} should be a list with elements \code{block}
+and \code{weights}. \code{block}
+should be a vector of the same length as the \code{state}, or \code{NULL}, with \code{NULL}
+equivalent to all-1.
+If \code{weights} is \code{NULL}, it's interpreted as all-1.
 }
 
 \itemize{
@@ -551,7 +543,7 @@ with unnamed but ordered columns.
 }
 
 \itemize{
-\item \code{ibm_valid_input} for \code{bru_mapper_multi} accepts a list with
+\item \code{ibm_invalid_output} for \code{bru_mapper_multi} accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_multi]{ibm_names.bru_mapper_multi()}}.
 Each list element should take a format accepted by the corresponding
@@ -573,7 +565,7 @@ the first, non-hidden, sub-mapper.
 }
 
 \itemize{
-\item \code{ibm_valid_input} for \code{bru_mapper_collect} accepts a list with
+\item \code{ibm_invalid_output} for \code{bru_mapper_collect} accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_collect]{ibm_names.bru_mapper_collect()}}.
 Each list element should take a format accepted by the corresponding
@@ -582,6 +574,22 @@ data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns.
 }
 }
+\section{Functions}{
+\itemize{
+\item \code{ibm_n_output()}: Generic.
+Implementations must return an integer denoting the
+mapper output length.
+The default implementation returns \code{NROW(input)}.
+Mappers such as \code{bru_mapper_multi} and \code{bru_mapper_collect},
+that can accept \code{list()} inputs require their own methods implementations.
+
+\item \code{ibm_values()}: Generic.
+When \code{inla_f=TRUE}, implementations must return a vector that
+would be interpretable by an \code{INLA::f(..., values = ...)} specification.
+The exception is the method for \code{bru_mapper_multi}, that returns a
+multi-column data frame.
+
+}}
 \examples{
 # ibm_names
 mapper <- bru_mapper_multi(list(

@@ -14,6 +14,7 @@
 \alias{bru_mapper_const}
 \alias{bru_mapper_offset}
 \alias{bru_mapper_scale}
+\alias{bru_mapper_aggregate}
 \alias{bru_mapper_pipe}
 \alias{bru_mapper_multi}
 \alias{bru_mapper_collect}
@@ -51,6 +52,8 @@ bru_mapper_const(...)
 bru_mapper_offset(...)
 
 bru_mapper_scale(mapper = NULL, ...)
+
+bru_mapper_aggregate(rescale = FALSE, n_block = NULL, ...)
 
 bru_mapper_pipe(mappers, ...)
 
@@ -113,6 +116,20 @@ was evaluated at, or a list of length matching the \code{jacobian} list.
 \item \code{'full'} for keeping all levels.
 }}
 
+\item{rescale}{logical; For \code{bru_mapper_aggregate}, specifies if the rows of the
+Jacobian should be normalised or not,
+after grouping by the block specification:
+\itemize{
+\item \code{FALSE}: (default) Straight weighted sum, no rescaling.
+\item \code{TRUE}: Divide by the sum of the weight values within each block.
+This is useful for integration averages, when the given weights are plain
+integration weights. If the weights are \code{NULL} or all ones, this is
+the same as dividing by the number of entries in each block.
+}}
+
+\item{n_block}{Predetermined number of output blocks. If \code{NULL}, overrides
+the maximum block index in the inputs.}
+
 \item{mappers}{A list of \code{bru_mapper} objects}
 
 \item{hidden}{\code{logical}, set to \code{TRUE} to flag that the mapper is to be used
@@ -173,6 +190,12 @@ scaling mapper that can be used as part of a \code{bru_mapper_pipe}.
 If \code{mapper} is non-null, the \code{bru_mapper_scale()} constructor
 returns
 \code{bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))}
+
+\itemize{
+\item \code{bru_mapper_aggregate()} constructs a mapper
+that aggregates elements of the input state, so it can be used e.g.
+for weighted summation or integration over blocks of values.
+}
 
 For \code{bru_mapper_pipe()}, \code{mappers} is a list of mappers,
 where the evaluated output of each mapper is handed as the state to the next
