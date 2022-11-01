@@ -29,7 +29,9 @@ subgraph "main, group, replicate"
   mapper([mapper])
 end
 weights(["weights"])
-input_comb(["combined inputs:<br/>list(mapper = list(main, group, replicate),<br/>scale = weights)"])
+input_comb(["combined inputs:
+  list(mapper = list(main, group, replicate),
+  scale = weights)"])
 multi_mapper(["mapper_multi<br/>list(main, group, replicate)"])
 scale_mapper([mapper_scale])
 pipe_mapper([mapper_pipe])

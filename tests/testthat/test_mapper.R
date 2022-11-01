@@ -368,8 +368,14 @@ test_that("mapper collection automatic construction consistency", {
       ))
     }
     expect_identical(
-      as.matrix(ibm_jacobian(cmp1$indep$mapper, input = input, inla_f = inla_f)),
-      as.matrix(ibm_jacobian(cmp2$indep$mapper, input = input, inla_f = inla_f))
+      as.matrix(ibm_jacobian(cmp1$indep$mapper,
+        input = input,
+        inla_f = inla_f
+      )),
+      as.matrix(ibm_jacobian(cmp2$indep$mapper,
+        input = input,
+        inla_f = inla_f
+      ))
     )
   }
 })

@@ -56,8 +56,8 @@ test_that("bru: factor component", {
     seed = 12345L
   )
 
-  # The statistics include mean, standard deviation, the 2.5% quantile, the median,
-  # the 97.5% quantile
+  # The default statistics include mean, standard deviation,
+  # the 2.5% quantile, the median, the 97.5% quantile
   expect_equal(is.data.frame(xpost), TRUE)
   expect_equal(nrow(xpost), 1)
 

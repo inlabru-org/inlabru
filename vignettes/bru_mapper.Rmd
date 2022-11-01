@@ -332,9 +332,11 @@ bru_mapper(mesh)
 ```
 For 1d meshes (`inla.mesh.1d`),
 ```{r, eval=FALSE}
-# If ibm_values() should return mesh$loc (e.g. for "rw2" models with degree=1 meshes)
+# If ibm_values() should return mesh$loc (e.g. for "rw2" models
+# with degree=1 meshes)
 bru_mapper(mesh, indexed = FALSE)
-# If ibm_values() should return seq_along(mesh$loc) (e.g. for inla.spde2.pcmatern() models)
+# If ibm_values() should return seq_along(mesh$loc) (e.g. for
+# inla.spde2.pcmatern() models)
 bru_mapper(mesh, indexed = TRUE)
 ```
 
