@@ -494,9 +494,11 @@ default mappers can be constructed by the pre-defined
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span></code></pre></div>
 <p>For 1d meshes (<code>inla.mesh.1d</code>),</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># If ibm_values() should return mesh$loc (e.g. for "rw2" models with degree=1 meshes)</span></span>
+<code class="sourceCode R"><span><span class="co"># If ibm_values() should return mesh$loc (e.g. for "rw2" models</span></span>
+<span><span class="co"># with degree=1 meshes)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co"># If ibm_values() should return seq_along(mesh$loc) (e.g. for inla.spde2.pcmatern() models)</span></span>
+<span><span class="co"># If ibm_values() should return seq_along(mesh$loc) (e.g. for</span></span>
+<span><span class="co"># inla.spde2.pcmatern() models)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
