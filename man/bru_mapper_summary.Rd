@@ -41,7 +41,8 @@ mapper <-
     list(
       bru_mapper_multi(list(
         A = bru_mapper_index(2),
-        B = bru_mapper_index(3))),
+        B = bru_mapper_index(3)
+      )),
       bru_mapper_index(2)
     )
   )

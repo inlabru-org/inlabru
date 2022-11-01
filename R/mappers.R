@@ -1018,6 +1018,7 @@ ibm_values.bru_mapper_taylor <- function(mapper,
   }
 }
 
+#' @export
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_taylor <- function(mapper, ..., multi = FALSE) {
   if (is.null(mapper[["jacobian"]])) {

@@ -584,8 +584,10 @@ with unnamed but ordered columns.
 }
 \examples{
 # ibm_names
-mapper <- bru_mapper_multi(list(A = bru_mapper_index(2),
-                                B = bru_mapper_index(2)))
+mapper <- bru_mapper_multi(list(
+  A = bru_mapper_index(2),
+  B = bru_mapper_index(2)
+))
 ibm_names(mapper)
 ibm_names(mapper) <- c("new", "names")
 ibm_names(mapper)
