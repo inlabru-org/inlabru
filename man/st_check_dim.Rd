@@ -10,7 +10,9 @@ st_check_dim(sfc)
 \item{sfc}{An sfc object}
 }
 \value{
-LOGICAL indicating if any sfg element of the sfc object has class "XYZ", "XYM" or "XYZM". Internal function used to check for 3 and 4 dimensional objects.
+LOGICAL indicating if any sfg element of the sfc object has class
+"XYZ", "XYM" or "XYZM". Internal function used to check for 3 and 4
+dimensional objects.
 }
 \description{
 Check for "XYZ", "XYM" and "XYZM" sfg classes
