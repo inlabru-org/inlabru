@@ -70,35 +70,6 @@ test_that("1D LGCP fitting", {
     n.samples = 100, seed = 84354
   )
 
-  # ggplot(data.frame(idx = seq_along(pr$both$mean),
-  #                   fit = fit$summary.random$spde1D$mean+fit$summary.fixed$mean,
-  #                   est = pr$both$mean,
-  #                   std_err = pr$both$mean.mc_std_err)) +
-  #   geom_point(aes(idx, fit)) +
-  #   geom_line(aes(idx, est)) +
-  #   geom_ribbon(aes(idx, ymin=est-2*std_err, ymax=est+2*std_err), alpha = 0.2)
-  #
-  # ggplot(data.frame(idx = seq_along(pr$spde1D$mean),
-  #                   fit = fit$summary.random$spde1D$mean,
-  #                   est = pr$spde1D$mean,
-  #                   std_err = pr$spde1D$mean.mc_std_err)) +
-  #   geom_point(aes(idx, fit)) +
-  #   geom_line(aes(idx, est)) +
-  #   geom_ribbon(aes(idx, ymin=est-2*std_err, ymax=est+2*std_err), alpha = 0.2)
-  #
-  # ggplot(data.frame(idx = seq_along(pr$both$sd),
-  #                   fit = fit$summary.random$spde1D$sd+fit$summary.fixed$sd,
-  #                   est = pr$both$sd,
-  #                   std_err = pr$both$sd.mc_std_err)) +
-  #   geom_point(aes(idx, fit)) +
-  #   geom_line(aes(idx, est)) +
-  #   geom_ribbon(aes(idx, ymin=est-2*std_err, ymax=est+2*std_err), alpha = 0.2)
-  #
-  # ggplot(data.frame(idx = seq_along(pr$both$mean),
-  #                   fit = fit$summary.random$spde1D$mean + fit$summary.fixed$mean,
-  #                   est = pr$both$mean,
-  #                   std_err = pr$both$mean.mc_std_err)) +
-  #   geom_point(aes(idx, abs(est - fit) / std_err))
 
   expect_true(
     all(abs(pr$both$mean -

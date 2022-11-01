@@ -157,14 +157,17 @@ evaluate_model <- function(model,
     stop("Not enough information to evaluate model states.")
   }
   if (is.null(input) && !is.null(data)) {
-    input <- input_eval(components = model$effects[included],
-                        data = data,
-                        inla_f = TRUE)
+    input <- input_eval(
+      components = model$effects[included],
+      data = data,
+      inla_f = TRUE
+    )
   }
   if (is.null(comp_simple) && !is.null(input)) {
     comp_simple <- evaluate_comp_simple(model$effects[included],
-                                        input = input,
-                                        inla_f = TRUE)
+      input = input,
+      inla_f = TRUE
+    )
   }
   if (is.null(comp_simple)) {
     effects <- NULL
@@ -272,7 +275,7 @@ evaluate_effect_multi_state <- function(...) {
 #' @rdname evaluate_effect
 
 evaluate_effect_single_state.bru_mapper <- function(component, input, state,
-                                                     ...) {
+                                                    ...) {
   values <- ibm_eval(component, input = input, state = state, ...)
 
   as.vector(as.matrix(values))
@@ -449,7 +452,7 @@ evaluate_predictor <- function(model,
             enclos = .enclos
           )
         }
-        .input = list(
+        .input <- list(
           mapper = list(
             main = main,
             group = group,
@@ -667,9 +670,11 @@ evaluate_comp_simple <- function(...) {
 #' @rdname evaluate_comp_simple
 evaluate_comp_simple.component_list <- function(components, input,
                                                 inla_f = FALSE, ...) {
-  are_linear <- vapply(components,
-                       function(x) ibm_is_linear(x[["mapper"]]),
-                       TRUE)
+  are_linear <- vapply(
+    components,
+    function(x) ibm_is_linear(x[["mapper"]]),
+    TRUE
+  )
   the_linear <- names(components)[are_linear]
   the_nonlinear <- names(components)[!are_linear]
 
@@ -686,9 +691,13 @@ evaluate_comp_simple.component_list <- function(components, input,
 
   if (any(!are_linear)) {
     warning("Non-linear mappers are experimental!", immediate. = TRUE)
-    mappers <- c(mappers,
-                 lapply(components[the_nonlinear],
-                        function(x) x[["mapper"]]))
+    mappers <- c(
+      mappers,
+      lapply(
+        components[the_nonlinear],
+        function(x) x[["mapper"]]
+      )
+    )
   }
 
   # Reorder

@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.5.3.9006
+Version: 2.6.0.9001
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -62,7 +62,8 @@ Imports:
     rlang,
     sf,
     utils,
-    withr
+    withr,
+    lifecycle
 Suggests:
     covr,
     dplyr,
@@ -83,7 +84,6 @@ Suggests:
     shiny,
     sn,
     spatstat.geom,
-    spatstat.core,
     spatstat.data,
     spatstat (>= 2.0-0),
     sphereplot,

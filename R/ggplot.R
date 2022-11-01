@@ -942,7 +942,7 @@ plot.prediction <- function(x, y = NULL, ...) {
 plot.prediction_old <- function(..., property = "median") {
   requireNamespace("ggplot2")
   args <- list(...)
-  pnames <- sapply(substitute(list(...))[-1], deparse)
+  pnames <- lapply(substitute(list(...))[-1], deparse)
 
   ggopts <- attr(args[[1]], "misc")
   data <- args[[1]]

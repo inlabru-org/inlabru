@@ -453,12 +453,15 @@ component.character <- function(object,
     component$replicate$mapper <- bru_mapper_index(1L)
     # Add scalable multi-mapper
     component[["mapper"]] <-
-      bru_mapper_scale(
-        bru_mapper_multi(list(
-          main = component$main$mapper,
-          group = component$group$mapper,
-          replicate = component$replicate$mapper
-        ))
+      bru_mapper_pipe(
+        list(
+          mapper = bru_mapper_multi(list(
+            main = component$main$mapper,
+            group = component$group$mapper,
+            replicate = component$replicate$mapper
+          )),
+          scale = bru_mapper_scale()
+        )
       )
   } else {
     if (!is.null(copy)) {
@@ -698,9 +701,15 @@ component_list.list <- function(object,
 
 #' @export
 #' @details * `c.component_list`: The `...` arguments should be `component_list`
-#' objects. The environment from the first argument will be applied to the resulting list.
+#' objects. The environment from the first argument will be applied to the
+#' resulting `component_list`.
 #' @rdname component_list
 `c.component_list` <- function(...) {
+  stopifnot(all(vapply(
+    list(...),
+    function(x) inherits(x, "component_list"),
+    TRUE
+  )))
   env <- environment(list(...)[[1]])
   object <- NextMethod()
   class(object) <- c("component_list", "list")
@@ -709,7 +718,25 @@ component_list.list <- function(object,
 }
 
 #' @export
-#' @param x `component_list` object from which to extract element(s)
+#' @details * `c.component`: The `...` arguments should be `component`
+#' objects. The environment from the first argument will be applied to the
+#' resulting ``component_list`.
+#' @rdname component_list
+`c.component` <- function(...) {
+  stopifnot(all(vapply(
+    list(...),
+    function(x) inherits(x, "component"),
+    TRUE
+  )))
+  env <- environment(list(...)[[1]])
+  object <- list(...)
+  class(object) <- c("component_list", "list")
+  environment(object) <- env
+  object
+}
+
+#' @export
+#' @param x `component_list` object from which to extract a sub-list
 #' @param i indices specifying elements to extract
 #' @rdname component_list
 `[.component_list` <- function(x, i) {
@@ -775,12 +802,15 @@ add_mappers.component <- function(component, lhoods, ...) {
   )
   # Add scalable multi-mapper
   component[["mapper"]] <-
-    bru_mapper_scale(
-      bru_mapper_multi(list(
-        main = component$main$mapper,
-        group = component$group$mapper,
-        replicate = component$replicate$mapper
-      ))
+    bru_mapper_pipe(
+      list(
+        mapper = bru_mapper_multi(list(
+          main = component$main$mapper,
+          group = component$group$mapper,
+          replicate = component$replicate$mapper
+        )),
+        scale = bru_mapper_scale()
+      )
     )
 
   fcall <- component$fcall
@@ -1160,9 +1190,17 @@ make_submapper <- function(subcomp_n,
           indexed = require_indexed
         )
     } else if (all(values == 1)) {
-      mapper <- bru_mapper_linear()
+      if (require_indexed) {
+        mapper <- bru_mapper_index(n = 1)
+      } else {
+        mapper <- bru_mapper_linear()
+      }
     } else {
-      mapper <- bru_mapper_linear()
+      if (require_indexed) {
+        mapper <- bru_mapper_factor(values, factor_mapping = "full")
+      } else {
+        mapper <- bru_mapper_linear()
+      }
     }
   }
 
@@ -1442,38 +1480,64 @@ code.components <- function(components, add = "") {
 #' @keywords internal
 #' @param object A `component` or `component_list`.
 #' @param ... ignored.
+#' @param depth The depth of which to expand the component mapper.
+#' Default `Inf`, to traverse the entire mapper tree.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 
-summary.component <- function(object, ...) {
+summary.component <- function(object, ..., depth = Inf) {
   result <- list(
     "Label" = object$label,
-    "  Main" = sprintf(
-      "input '%s',\ttype '%s'",
-      deparse(object[["main"]][["input"]][["input"]]),
-      object[["main"]][["type"]]
+    "Main" = sprintf(
+      "type '%s', input '%s'",
+      object[["main"]][["type"]],
+      deparse(object[["main"]][["input"]][["input"]])
     ),
-    "  Group" =
+    "Group" =
       if (!is.null(object[["group"]][["input"]][["input"]])) {
         sprintf(
-          "input '%s',\ttype '%s'",
-          deparse(object[["group"]][["input"]][["input"]]),
-          object[["group"]][["type"]]
+          "type '%s', input '%s'",
+          object[["group"]][["type"]],
+          deparse(object[["group"]][["input"]][["input"]])
         )
       } else {
         NULL
       },
-    "  Replicate" =
+    "Replicate" =
       if (!is.null(object[["replicate"]][["input"]][["input"]])) {
         sprintf(
-          "input '%s',\ttype '%s'",
-          deparse(object[["replicate"]][["input"]][["input"]]),
-          object[["replicate"]][["type"]]
+          "type '%s', input '%s'",
+          object[["replicate"]][["type"]],
+          deparse(object[["replicate"]][["input"]][["input"]])
         )
       } else {
         NULL
       },
-    "  INLA formula" = as.character(object$inla.formula)
+    "Mapper" =
+      if (is.null(object[["mapper"]])) {
+        "Not yet initialised"
+      } else {
+        strwrap(
+          summary(object[["mapper"]],
+            prefix = "    ",
+            initial = "",
+            depth = depth
+          ),
+          prefix = "    ",
+          initial = ""
+        )
+      },
+    "INLA formula" =
+      paste0(
+        "\n",
+        strwrap(
+          paste(as.character(object$inla.formula), collapse = " "),
+          width = 0.9 * getOption("width"),
+          indent = 4,
+          exdent = 6
+        )
+      )
   )
   if (!is.null(object[["copy"]])) {
     result[["Copy"]] <- sprintf("Copy of component '%s'", object[["copy"]])
@@ -1505,7 +1569,13 @@ summary.component_list <- function(object, ...) {
 print.summary_component <- function(x, ...) {
   for (name in names(x)) {
     if (!is.null(x[[name]])) {
-      cat(name, ":", "\t", x[[name]], "\n", sep = "")
+      if (name %in% "Label") {
+        cat("Label:", "\t", x[[name]], "\n", sep = "")
+      } else if (name %in% "Mapper") {
+        cat("  ", "Map: ", x[[name]], "\n", sep = "")
+      } else {
+        cat("  ", name, ":", "\t", x[[name]], "\n", sep = "")
+      }
     }
   }
   invisible(x)
@@ -1551,14 +1621,17 @@ comp_lin_eval.component <- function(component,
 comp_lin_eval.component_list <- function(components, input, state, ...) {
   # Note: Make sure the list element names carry over!
   mappers <-
-    lapply(components,
-           function(x) {
-             label <- x[["label"]]
-             comp_lin_eval(x,
-                           input = input[[label]],
-                           state = state[[label]],
-                           ...)
-           })
+    lapply(
+      components,
+      function(x) {
+        label <- x[["label"]]
+        comp_lin_eval(x,
+          input = input[[label]],
+          state = state[[label]],
+          ...
+        )
+      }
+    )
 
   class(mappers) <- c("comp_simple_list", class(mappers))
   mappers
@@ -1635,17 +1708,17 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #' If `NULL`, return the component's map.
 #' @param ... Unused.
 #' @return An list of mapper input values, formatted for the full component mapper
-#' (of type `bru_mapper_scale`)
+#' (of type `bru_mapper_pipe`)
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname input_eval
 
 input_eval.component <- function(component,
                                  data,
                                  ...) {
-  stopifnot(inherits(component[["mapper"]], "bru_mapper_scale"))
+  stopifnot(inherits(component[["mapper"]], "bru_mapper_pipe"))
 
   # The names should be a subset of main, group, replicate
-  part_names <- names(component[["mapper"]][["mapper"]])
+  part_names <- ibm_names(component[["mapper"]][["mappers"]][[1]])
   mapper_val <- list()
   for (part in part_names) {
     mapper_val[[part]] <-

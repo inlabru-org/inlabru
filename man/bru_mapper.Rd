@@ -14,6 +14,7 @@
 \alias{bru_mapper_const}
 \alias{bru_mapper_offset}
 \alias{bru_mapper_scale}
+\alias{bru_mapper_pipe}
 \alias{bru_mapper_multi}
 \alias{bru_mapper_collect}
 \alias{bru_mapper_harmonics}
@@ -21,7 +22,7 @@
 \usage{
 bru_mapper(...)
 
-bru_mapper_define(mapper, new_class = NULL, methods = NULL, ...)
+bru_mapper_define(mapper, new_class = NULL, ..., methods = NULL)
 
 \method{bru_mapper}{default}(...)
 
@@ -43,7 +44,9 @@ bru_mapper_const(...)
 
 bru_mapper_offset(...)
 
-bru_mapper_scale(mapper, ...)
+bru_mapper_scale(mapper = NULL, ...)
+
+bru_mapper_pipe(mappers, ...)
 
 bru_mapper_multi(mappers, ...)
 
@@ -65,7 +68,7 @@ For \code{bru_mapper_scale}, a mapper to be scaled.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
-\item{methods}{Optional \code{list} of named method definitions; See Details.}
+\item{methods}{Deprecated.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
@@ -138,13 +141,11 @@ new mappers in user code.
 \item \code{bru_mapper_define} adds the \code{new_class} and "bru_mapper" class
 names to the inheritance list for the input \code{mapper} object, unless the object
 already inherits from these.
-If provided, mapper method functions are added to an environment
-\code{.envir} in the object.  The generic methods look for these
-functions first,
-and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
+}
+
+To register mapper classes and methods in scripts, use \code{.S3method()}
 to register the methods, e.g.
 \code{.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)}.
-}
 
 \itemize{
 \item \code{bru_mapper.default} calls \code{bru_mapper_define}, passing all
@@ -159,9 +160,17 @@ The \code{state0} information indicates for which state the \code{offset} was ev
 The affine mapper output is defined as
 \code{effect(state) = offset + jacobian \%*\% (state - state0)}
 
-For \code{bru_mapper_scale()}, \code{mapper} is a mapper to be scaled.
+For \code{bru_mapper_scale()}, the default is to create a standalone
+scaling mapper that can be used as part of a \code{bru_mapper_pipe}.
+If \code{mapper} is non-null, the \code{bru_mapper_scale()} constructor
+returns
+\code{bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))}
+
+For \code{bru_mapper_pipe()}, \code{mappers} is a list of mappers,
+where the evaluated output of each mapper is handed as the state to the next
+mapper..
 The \code{input} format for the \code{ibm_eval} and \code{ibm_jacobian} methods is
-\code{list(mapper = input_to_the_inner_mapper, scale = scaling_weights)}
+a list of inputs, one for each mapper
 
 \itemize{
 \item \code{bru_mapper_multi} constructs a kronecker product mapping

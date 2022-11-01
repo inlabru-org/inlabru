@@ -19,7 +19,8 @@ test_that("2D LGCP fitting", {
     prior.sigma = c(0.1, 0.01),
     prior.range = c(5, 0.01)
   )
-  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept(1)
+  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) +
+    Intercept(1)
 
   fit <- lgcp(
     cmp,

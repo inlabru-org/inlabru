@@ -24,6 +24,10 @@ knitr::opts_chunk$set(
 options(width = 100) # sets width of output window
 ```
 
+(Note: vignette under construction!)
+
+## Basic component features
+
 Model components are defined using a formula syntax that is similar to `R-INLA` but has some differences.  The basic syntax is
 ```{r eval=FALSE}
 ~ my_component_name(
@@ -34,7 +38,7 @@ Model components are defined using a formula syntax that is similar to `R-INLA` 
 
 `my_component_name` is a user-chosen label for the model component.  This label is used in model summaries, to label relevant parts of a fitted model object, and to access model components when sampling from a model using `generate()` and `predict()`.  
 
-The `main` argument defines the input data for the component.  For example, an intercept-like component has a vector of ones as an input.  The linear effect of a covariate has the vector of covariate values as an input.  A 2-dimensional SPDE effect takes a 2-column matrix of coordinate locations as an input.   This argument can be a general `R` expression, more details on this are below.
+The `main` argument defines the input data for the component.  For example, an intercept-like component has a vector of ones as an input.  The linear effect of a covariate has the vector of covariate values as an input.  A 2-dimensional SPDE effect takes a 2-column matrix of coordinate locations as an input.   This argument can be a general `R` expression, more details on this are below.  The `main` argument doesn't not need to be named. Other arguments should normally be named, to avoid confusion.
 
 The type of model component is specified using the `model` component, (see `?component`, and `?INLA::inla.list.models()$latent`).
 
@@ -49,14 +53,20 @@ The rest of the vignette goes into more detail about defining model components a
 A linear additive predictor of a latent Gaussian model can be written as
 $$
 \begin{equation}
-\eta(u)_i = u_0 + \sum_{k=1}^K v_{ik} u_{ik} ,
+\eta(u)_i = u_0 + \sum_{k=1}^K a_{ik} u_{ik} ,
 \end{equation}
 $$
-where $u$ is a multivariate Gaussian vector, $v_k$ are input information such as covariates or weights for random effects and $i = 1, \ldots, n$.  This can also be written as $\eta(u) = Au$, where $A$ is the model design matrix with $i$-th row $\left[1, v_{i1}, \ldots, v_{iK}\right]$.
+where $u$ is a multivariate Gaussian vector, $a_k$ are input information such as covariates or weights for random effects and $i = 1, \ldots, n$.  This can also be written as $\eta(u) = Au$, where $A$ is the model design matrix with $i$-th row $\left[1, a_{i1}, \ldots, a_{iK}\right]$.
 
-We can also conceputally think of the predictor as the sum of $D$ model components, so that we partition $A = \left[A^{(1)} \cdots A^{(D)}\right]$, and each component has an associated **component design matrix** $A^{(d)}$. 
+We can also conceptally think of the predictor as the sum of $D$ model components, so that we partition $A = \left[A^{(1)} \cdots A^{(D)}\right]$, and each component has an associated **component design matrix** $A^{(d)}$. 
 
-For example, if the component is an intercept parameter, then $A^{(d)} = \left[1, \ldots, 1\right]^\intercal$. If the component is the linear effect of a covariate $z$ then $A^{(d)} = \left[z_1, \ldots, z_n\right]^\intercal$. For more complicated effects, such as SPDE models, the component design matrix maps latent Gaussian parameters to the predictor (also known as the "projector" matrix in this context).  The the construction of each $A^{(d)}$ is handled automatically by `bru_mapper` methods.
+For example, if the component is an intercept parameter, then $A^{(d)} = \left[1, \ldots, 1\right]^\intercal$. If the component is the linear effect of a covariate $z$ then $A^{(d)} = \left[z_1, \ldots, z_n\right]^\intercal$. For more complicated effects, such as SPDE models, the component design matrix maps latent Gaussian parameters to the predictor (also known as the "projector" matrix in this context).  The the construction of each $A^{(d)}$ is handled automatically by `bru_mapper` methods, that define general (linear) **component effects** $\eta^{(d)}(u^{(d)}) = A^{(d)} u^{(d)}$.
+
+Each linear predictor is defined by
+$$
+\eta(u^{(1)},\dots,u^{(D)}) = \sum_{d=1}^D \eta^{(d)}(u^{(d)}) = \sum_{d=1}^D A^{(d)} u^{(d)} .
+$$
+Non-linear predictors are defined by R expressions where the component label denotes the corresponding component effect.
 
 ### Mapper methods
 
@@ -70,7 +80,7 @@ The mapper for the 2D SPDE effect takes as an input a 2-column matrix of coordin
 
 The appropriate weights required to evaluate the effect at the observation locations can be constructed using `INLA::inla.spde.make.A()`.  The mapper for this model component takes the information in the component definition, in this case the minimum information required is an SPDE model object, and the 2-column matrix that `main` is evaluated to. The mapper then calls `INLA::inla.spde.make.A()` with appropriate arguments extracted from this information.
 
-(NOTE: Deliberately not going into huge detail here; the [bru_mapper](devel_bru_mapper.html) vignette will have more details.)
+(NOTE: Deliberately not going into huge detail here; the [bru_mapper](bru_mapper.html) vignette will have more details.)
 
 ### Defining `main`, `group`, and `replicate`.
 
@@ -81,7 +91,7 @@ If the names are not found in the data then the global environment is searched f
 For example, suppose the data has columns named `x` and `y`, then a 2D SPDE model component could be specified as
 ```{r eval=FALSE}
 ~ my_spde_effect(
-  main = cbind(x, y),
+  cbind(x, y),
   model = spde_model
 )
 ```
@@ -94,7 +104,7 @@ get_xy <- function(df) {
   cbind(df$x, df$y)
 }
 ~ my_spde_effect(
-  main = get_xy(.data.),
+  get_xy(.data.),
   model = spde_model
 )
 ```
@@ -104,12 +114,18 @@ If the objects required to evaluate the R expression cannot be found in the data
 
 The functionality of allowing general `R` expressions can be used to extend the types of data that can be passed to the `bru()`, `like()` and `lgcp()` functions.  It is the basis for the support of spatial data structures such as `sp` objects, and there is also experimental support to allow users to pass data as a list.  `inlabru` is thus readily extendible, given appropriate functions to extract the relevant information for each component, and associated mappers that convert this information into a component design matrix.
 
+In addition to the three main inputs, the optional `weights` argument also takes an R expression, and
+the result is used to scale the component. This can be used for spatially varying coefficient models,
+where the `weights` argument provides the covariate values.
+
 ### `inlabru`-specific component types
 
 In addition to the majority of latent models that can be defined using `INLA::f()` function (see `INLA::inla.list.models()$latent)`), `inlabru` also has the following models:  `'linear'`, `'fixed'`, `'offset'`, `'factor_full'` and `'factor_contrast'`).
 
+<!--
 (NOTE: where should we put some documentation for these things? Some is in `?component` but not all.  I could add to that?
 And can we implement an `inlabru.list.models()` function?)
+-->
 
 ## Shortcuts
 
@@ -206,4 +222,4 @@ is equivalent to
 
 #### Non-linear predictors
 
-`inlabru` supports non-linear predictors, where $\tilde{\eta}(u)$ is a non-linear function of $u$.  It is important to note that the mapping to a predictor vector $Au$ happens **before** the non-linear function is applied.  So, for example, if $\tilde{\eta}(u) = \exp(u)$ then this is evaluated as `exp(A %*% u)` rather than `A %*% exp(u)`.
+`inlabru` supports non-linear predictors, where $\tilde{\eta}(u,v)$ is a non-linear function of $\eta_u$ and $\eta_v$.  It is important to note that the mapping each component effect vector $\eta_u=A^{(u)} u$ happens **before** the non-linear function is applied.  So, for example, if $\tilde{\eta}(u,v) = \exp(\eta_u + \eta_v)$ then this is evaluated as $\exp(A^{(u)} u + A^{(v)} v)$.
