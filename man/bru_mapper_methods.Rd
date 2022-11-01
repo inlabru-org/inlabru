@@ -582,6 +582,14 @@ data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns.
 }
 }
+\examples{
+# ibm_names
+mapper <- bru_mapper_multi(list(A = bru_mapper_index(2),
+                                B = bru_mapper_index(2)))
+ibm_names(mapper)
+ibm_names(mapper) <- c("new", "names")
+ibm_names(mapper)
+}
 \seealso{
 \link{bru_mapper} for constructor methods, and
 \link{bru_get_mapper} for hooks to extract mappers from latent model object

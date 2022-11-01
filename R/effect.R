@@ -705,9 +705,11 @@ component_list.list <- function(object,
 #' resulting `component_list`.
 #' @rdname component_list
 `c.component_list` <- function(...) {
-  stopifnot(all(vapply(list(...),
-                       function(x) inherits(x, "component_list"),
-                       TRUE)))
+  stopifnot(all(vapply(
+    list(...),
+    function(x) inherits(x, "component_list"),
+    TRUE
+  )))
   env <- environment(list(...)[[1]])
   object <- NextMethod()
   class(object) <- c("component_list", "list")
@@ -721,9 +723,11 @@ component_list.list <- function(object,
 #' resulting ``component_list`.
 #' @rdname component_list
 `c.component` <- function(...) {
-  stopifnot(all(vapply(list(...),
-                       function(x) inherits(x, "component"),
-                       TRUE)))
+  stopifnot(all(vapply(
+    list(...),
+    function(x) inherits(x, "component"),
+    TRUE
+  )))
   env <- environment(list(...)[[1]])
   object <- list(...)
   class(object) <- c("component_list", "list")

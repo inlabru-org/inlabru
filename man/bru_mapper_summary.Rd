@@ -35,3 +35,15 @@ Default 1, to only show the collection, and not the contents of the sub-mappers.
 \description{
 mapper object summaries
 }
+\examples{
+mapper <-
+  bru_mapper_pipe(
+    list(
+      bru_mapper_multi(list(
+        A = bru_mapper_index(2),
+        B = bru_mapper_index(3))),
+      bru_mapper_index(2)
+    )
+  )
+summary(mapper, depth = 2)
+}

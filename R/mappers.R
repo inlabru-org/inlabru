@@ -146,6 +146,15 @@ ibm_eval <- function(mapper, input, state = NULL, ...) {
 #' Intended for providing information about multi-mappers and mapper collections.
 #' @export
 #' @rdname bru_mapper_methods
+#' @examples
+#' # ibm_names
+#' mapper <- bru_mapper_multi(list(
+#'   A = bru_mapper_index(2),
+#'   B = bru_mapper_index(2)
+#' ))
+#' ibm_names(mapper)
+#' ibm_names(mapper) <- c("new", "names")
+#' ibm_names(mapper)
 ibm_names <- function(mapper) {
   UseMethod("ibm_names")
 }
@@ -201,9 +210,11 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #' str(m[2])
 #'
 `c.bru_mapper` <- function(...) {
-  stopifnot(all(vapply(list(...),
-                       function(x) inherits(x, "bru_mapper"),
-                       TRUE)))
+  stopifnot(all(vapply(
+    list(...),
+    function(x) inherits(x, "bru_mapper"),
+    TRUE
+  )))
   mappers <- list(...)
   class(mappers) <- c("bm_list", "list")
   mappers
@@ -215,9 +226,11 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #' @rdname bm_list
 #' @export
 `c.bm_list` <- function(...) {
-  stopifnot(all(vapply(list(...),
-                       function(x) inherits(x, "bm_list"),
-                       TRUE)))
+  stopifnot(all(vapply(
+    list(...),
+    function(x) inherits(x, "bm_list"),
+    TRUE
+  )))
   object <- NextMethod()
   class(object) <- c("bm_list", "list")
   object
@@ -298,6 +311,18 @@ summary.bru_mapper <- function(object, ...,
 #' @export
 #' @method summary bru_mapper_multi
 #' @rdname bru_mapper_summary
+#' @examples
+#' mapper <-
+#'   bru_mapper_pipe(
+#'     list(
+#'       bru_mapper_multi(list(
+#'         A = bru_mapper_index(2),
+#'         B = bru_mapper_index(3)
+#'       )),
+#'       bru_mapper_index(2)
+#'     )
+#'   )
+#' summary(mapper, depth = 2)
 summary.bru_mapper_multi <- function(object, ...,
                                      prefix = "",
                                      initial = prefix,
