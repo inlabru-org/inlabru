@@ -889,7 +889,9 @@ ibm_amatrix.bru_mapper_index <- function(...) {
 #' The affine mapper output is defined as
 #' `effect(state) = offset + jacobian %*% (state - state0)`
 #' @param offset For `bru_mapper_taylor`, an offset vector evaluated
-#' at `state0`
+#' at `state0`.
+#' May be `NULL`, interpreted as an all-zero vector of length determined by
+#' a non-null Jacobian.
 #' @param jacobian For `bru_mapper_taylor`, the Jacobian matrix,
 #' evaluated at `state0`, or, a named list of such matrices.
 #' May be `NULL` or an empty list, for a constant mapping.
@@ -900,8 +902,9 @@ ibm_amatrix.bru_mapper_index <- function(...) {
 #' `ibm_values` for `inla_f=TRUE` (experimental, currently unused)
 #' @export
 #' @rdname bru_mapper
-bru_mapper_taylor <- function(offset, jacobian, state0, ...,
+bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL, ...,
                               values_mapper = NULL) {
+  stopifnot(!is.null(offset) || !is.null(jacobian))
   if (is.null(state0)) {
     n_state <- 0
   } else if (is.list(state0)) {
@@ -966,13 +969,16 @@ bru_mapper_taylor <- function(offset, jacobian, state0, ...,
     stopifnot(all(n_jacobian == n_state))
   }
 
+  if (is.null(offset)) {
+    offset <- numeric(nrow(jacobian))
+  }
   bru_mapper_define(list(
     offset = as.vector(offset),
     jacobian = jacobian,
     state0 = state0,
     n_multi = n_multi,
     n = sum(n_multi),
-    noutput = length(offset),
+    n_output = length(offset),
     values_mapper = NULL
   ),
   # TODO: maybe allow values_mapper

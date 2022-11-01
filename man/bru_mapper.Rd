@@ -32,7 +32,13 @@ bru_mapper_define(mapper, new_class = NULL, ..., methods = NULL)
 
 bru_mapper_index(n = 1L, ...)
 
-bru_mapper_taylor(offset, jacobian, state0, ..., values_mapper = NULL)
+bru_mapper_taylor(
+  offset = NULL,
+  jacobian = NULL,
+  state0 = NULL,
+  ...,
+  values_mapper = NULL
+)
 
 bru_mapper_linear(...)
 
@@ -82,7 +88,9 @@ Default: \code{NULL}, to force user specification of this parameter}
 \item{n}{Size of a model for \code{bru_mapper_index}}
 
 \item{offset}{For \code{bru_mapper_taylor}, an offset vector evaluated
-at \code{state0}}
+at \code{state0}.
+May be \code{NULL}, interpreted as an all-zero vector of length determined by
+a non-null Jacobian.}
 
 \item{jacobian}{For \code{bru_mapper_taylor}, the Jacobian matrix,
 evaluated at \code{state0}, or, a named list of such matrices.
