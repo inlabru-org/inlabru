@@ -40,19 +40,20 @@ The wider scope of component definitions is discussed in the [component vignette
 will focus on the mapper system itself, how the basic building blocks are used to
 construct the built-in mappers, and finally how to construct new mappers.
 
-The in-package documentation for the mapper methods is contained in three parts:
+The in-package documentation for the mapper methods is contained in four parts:
 ```{r, eval=FALSE}
 ?bru_mapper # Mapper constructors
-?bru_mapper_methods # Mapper methods
+?bru_mapper_generics # Generic and default methods
+?bru_mapper_methods # Specialised mapper methods
 ?bru_get_mapper # Mapper extraction methods
 ```
 
-Regular users normally at most need some of the methods from `?bru_mapper`.
+Regular users normally at most need some of the methods from `?bru_mapper`
+and sometimes `?bru_mapper_generics`.
 The methods in `?bru_mapper_methods` provides more details and allows the user
 to query mappers and to use them outside the context of inlabru model definitions.
-The `bru_mapper_define()` and `bru_get_mapper()` method is needed for those
-implementing their own mapper
-class.
+The `bru_mapper_define()` and `bru_get_mapper()` methods are needed for those
+implementing their own mapper class.
 
 ## Mappers
 
@@ -128,6 +129,41 @@ $1+2p$.
 When `intercept` is `FALSE`, the first, constant, column is
 removed, and the state vector has length $2p$.
 
+### Transformation mappers
+
+Transformation mappers are mappers that would normally be combined with other
+mappers, as steps in a sequence of transformations, or as individual
+transformation mappers.
+
+* `bru_mapper_scale()`
+* `bru_mapper_aggregate(rescale)`
+
+#### scale
+
+The `scale` mapper multiplies the `input` vector with the `state` vector.
+This is used for INLA models to implement the `weights` component scaling,
+as the final stage of a `pipe` mapper, see below.
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_scale()
+ibm_eval(mapper,
+         input = ...),
+         state = ...)
+```
+
+#### aggregate
+
+The `aggregate` mapper aggregates the `state` vector elements by blockwise
+summation after scaling the elements by weights.
+This can be used for summation, integration, and averaging (for `rescale=TRUE`).
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_aggregate(rescale = ...)
+ibm_eval(mapper,
+         input = list(block = ..., weights = ...),
+         state = ...)
+```
+
 ### Compound mappers
 
 Compound mappers define collections or chains of mappings,
@@ -136,7 +172,6 @@ but can in some cases be a list of vectors.
 
 * `bru_mapper_collect(mappers, hidden)`
 * `bru_mapper_multi(mappers)`
-* `bru_mapper_scale(mapper)`
 * `bru_mapper_pipe(mappers)`
 
 #### collect
@@ -173,19 +208,6 @@ a space-time product domain.
 mapper <- bru_mapper_multi(list(name1 = ..., name2 = ..., ...))
 ibm_eval(mapper,
          input = list(name1 = ..., name2 = ..., ...),
-         state = ...)
-```
-
-#### scale
-
-The `scale` mapper multiplies the `input` vector with the `state` vector.
-This is used for INLA models to implement the `weights` component scaling,
-as the final stage of a `pipe` mapper, see below.
-
-```{r, eval=FALSE}
-mapper <- bru_mapper_scale()
-ibm_eval(mapper,
-         input = ...),
          state = ...)
 ```
 
