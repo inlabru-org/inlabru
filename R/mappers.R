@@ -1,18 +1,20 @@
 # Generics ----
 
 #' Constructors for `bru_mapper` objects
-#'
-#' @details
-#' * `bru_mapper` Generic mapper S3 constructor, used for constructing
+#' @name bru_mapper
+NULL
+
+#' @param \dots Arguments passed on to other methods
+#' @export
+#' @seealso [bru_mapper_generics] for generic methods,
+#' [bru_mapper_methods] for specific method implementations, and
+#' [bru_get_mapper] for hooks to extract mappers from latent model object
+#' class objects.
+#' @describeIn bru_mapper
+#' Generic mapper S3 constructor, used for constructing
 #' mappers for special objects. See below for details of the
 #' default constructor [bru_mapper_define()] that can be used to define
 #' new mappers in user code.
-#' @param \dots Arguments passed on to other methods
-#' @export
-#' @seealso [bru_mapper_methods] for specific method implementations, and
-#' [bru_get_mapper] for hooks to extract mappers from latent model object
-#' class objects.
-#' @rdname bru_mapper
 #' @examples
 #' mapper <- bru_mapper_index(5)
 #' ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
@@ -20,11 +22,41 @@ bru_mapper <- function(...) {
   UseMethod("bru_mapper")
 }
 
+#' Generic methods for bru_mapper objects
+#'
+#' @description
+#' A `bru_mapper` sub-class implementation must provide an
+#' `ibm_jacobian()` method. If the model size 'n' and definition
+#' values 'values' are stored in the object itself, default methods are
+#' available (see Details). Otherwise the
+#' `ibm_n()` and `ibm_values()` methods also need to be provided.
+#'
+#' @seealso [bru_mapper] for constructor methods, and
+#' [bru_get_mapper] for hooks to extract mappers from latent model object
+#' class objects.
+#'
+#' @name bru_mapper_generics
+#' @seealso [bru_mapper], [bru_mapper_methods]
+NULL
+
 #' Methods for bru_mapper objects
 #'
-#' @details
-#' * `ibm_n` Generic. Implementations must return the size of the latent vector
-#' being mapped to.
+#' @description
+#' A `bru_mapper` sub-class implementation must provide an
+#' `ibm_jacobian()` method. If the model size 'n' and definition
+#' values 'values' are stored in the object itself, default methods are
+#' available (see Details). Otherwise the
+#' `ibm_n()` and `ibm_values()` methods also need to be provided.
+#'
+#' @seealso [bru_mapper] for constructor methods, and
+#' [bru_get_mapper] for hooks to extract mappers from latent model object
+#' class objects.
+#'
+#' @name bru_mapper_methods
+#' @inheritParams bru_mapper_generics
+#' @seealso [bru_mapper], [bru_mapper_generics]
+NULL
+
 #' @param mapper A mapper S3 object, inheriting from `bru_mapper`.
 #' @param inla_f logical; when `TRUE` for `ibm_n()` and `ibm_values()`, the
 #' result must be compatible with the `INLA::f(...)` and corresponding
@@ -34,14 +66,15 @@ bru_mapper <- function(...) {
 #' for mappers of the type needed for hidden multicomponent models such
 #' as "bym2", which can be handled by `bru_mapper_collect`.
 #' @param \dots Arguments passed on to other methods
+#' @describeIn bru_mapper_generics
+#' Implementations must return the size of the latent vector
+#' being mapped to.
 #' @export
-#' @rdname bru_mapper_methods
-#' @name bru_mapper_methods
 ibm_n <- function(mapper, inla_f = FALSE, ...) {
   UseMethod("ibm_n")
 }
 
-#' @describeIn bru_mapper_methods Generic.
+#' @describeIn bru_mapper_generics
 #' Implementations must return an integer denoting the
 #' mapper output length.
 #' The default implementation returns `NROW(input)`.
@@ -54,7 +87,7 @@ ibm_n_output <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
 
 
 
-#' @describeIn bru_mapper_methods Generic.
+#' @describeIn bru_mapper_generics
 #' When `inla_f=TRUE`, implementations must return a vector that
 #' would be interpretable by an `INLA::f(..., values = ...)` specification.
 #' The exception is the method for `bru_mapper_multi`, that returns a
@@ -63,14 +96,14 @@ ibm_n_output <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
 ibm_values <- function(mapper, inla_f = FALSE, ...) {
   UseMethod("ibm_values")
 }
-#' @details
-#' * `ibm_amatrix` Generic, will become deprecated in 2.7.0. Use `ibm_jacobian`
+
+#' @describeIn bru_mapper_generics
+#' will become deprecated in 2.7.0. Use `ibm_jacobian`
 #' instead.
 #' Implementations must return a (sparse) matrix of size `ibm_n_output(...)`
 #' by `ibm_n(...)`. The `inla_f=TRUE` argument should only affect
 #' the allowed type of input format.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_amatrix <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   lifecycle::deprecate_soft(
     "2.6.0.9000",
@@ -80,34 +113,29 @@ ibm_amatrix <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   UseMethod("ibm_amatrix")
 }
 
-#' @details
-#' * `ibm_is_linear` Generic.
+#' @describeIn bru_mapper_generics
 #' Implementations must return `TRUE` or `FALSE`.
 #' If `TRUE` (returned by the default method unless the mapper
 #' contains an `is_linear` variable), users of the mapper
 #' may assume the mapper is linear.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_is_linear <- function(mapper, ...) {
   UseMethod("ibm_is_linear")
 }
 
-#' @details
-#' * `ibm_jacobian` Generic.
+#' @param input Data input for the mapper.
+#' @describeIn bru_mapper_generics
 #' Implementations must return a (sparse) matrix of size
 #' `ibm_n_output(mapper, input, inla_f)`
 #' by `ibm_n(mapper, inla_f = FALSE)`. The `inla_f=TRUE` argument should
 #' only affect the allowed type of input format.
-#' @param input Data input for the mapper.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_jacobian <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   UseMethod("ibm_jacobian")
 }
 
 
-#' @details
-#' * `ibm_linear()` Generic.
+#' @describeIn bru_mapper_generics
 #' Implementations must return a [bru_mapper_taylor] object
 #' The linearisation information includes `offset`, `jacobian`, and `state0`.
 #' The state information indicates for which state the `offset` was evaluated,
@@ -117,31 +145,26 @@ ibm_jacobian <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
 #' The default method calls `ibm_eval()` and `ibm_jacobian()` to generate
 #' the needed information.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_linear <- function(mapper, input, state = NULL, ...) {
   UseMethod("ibm_linear")
 }
 
-#' @details
-#' * `ibm_eval` Generic.
+#' @param state A vector of latent state values for the mapping,
+#' of length `ibm_n(mapper, inla_f = FALSE)`
+#' @describeIn bru_mapper_generics
 #' Implementations must return a vector of length `ibm_n_output(...)`.
 #' The `input` contents must
 #' be in a format accepted by `ibm_jacobian(...)`
 #' for the mapper.
-#' @param state A vector of latent state values for the mapping,
-#' of length `ibm_n(mapper, inla_f = FALSE)`
 #' @export
-#' @rdname bru_mapper_methods
 ibm_eval <- function(mapper, input, state = NULL, ...) {
   UseMethod("ibm_eval")
 }
 
-#' @details
-#' * `ibm_names` Generic.
+#' @describeIn bru_mapper_generics
 #' Implementations must return a character vector of sub-mapper names, or `NULL`.
 #' Intended for providing information about multi-mappers and mapper collections.
 #' @export
-#' @rdname bru_mapper_methods
 #' @examples
 #' # ibm_names
 #' mapper <- bru_mapper_multi(list(
@@ -157,16 +180,14 @@ ibm_names <- function(mapper) {
 
 #' @param value a character vector of the same length as the number
 #' of sub-mappers in the mapper
-#' * `ibm_names<-` Generic.
+#' @describeIn bru_mapper_generics Set mapper names.
 #' @export
-#' @rdname bru_mapper_methods
 `ibm_names<-` <- function(mapper, value) {
   UseMethod("ibm_names<-")
 }
 
 
-#' @details
-#' * `ibm_inla_subset` Generic.
+#' @describeIn bru_mapper_generics
 #' Implementations must return a logical vector of `TRUE/FALSE` for
 #' the subset such that, given the full A matrix and values output,
 #' `A[, subset, drop = FALSE]` and `values[subset]`
@@ -174,20 +195,17 @@ ibm_names <- function(mapper) {
 #' to the `inla_f = TRUE` version of A and values. The default method uses
 #' the `ibm_values` output to construct the subset indexing.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_inla_subset <- function(mapper, ...) {
   UseMethod("ibm_inla_subset")
 }
 
-#' @details
-#' * `ibm_invalid_output` Generic.
+#' @describeIn bru_mapper_generics
 #' Implementations should return a logical vector of length
 #' `ibm_n_output(mapper, input, state, ...)` indicating which, if any,
 #' output elements of `ibm_eval(mapper, input, state, ...)` are known to be
 #' invalid.
 #' For for multi/collect mappers, a list, when given a `multi=TRUE` argument.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_invalid_output <- function(mapper, input, state, ...) {
   UseMethod("ibm_invalid_output")
 }
@@ -206,18 +224,17 @@ ibm_valid_input <- function(...) {
 #' Methods for mapper lists
 #'
 #' `bru_mapper` lists can be combined into `bm_list` lists.
-#'
-#' @export
+#' @name bm_list
 #' @param \dots Objects to be combined.
-#' @details * `c.bru_mapper`: The `...` arguments should be `bru_mapper`
-#' objects.
-#' @rdname bm_list
+NULL
+
 #' @export
+#' @describeIn bm_list The `...` arguments should be `bru_mapper`
+#' objects.
 #' @examples
 #' m <- c(A = bru_mapper_const(), B = bru_mapper_scale())
 #' str(m)
 #' str(m[2])
-#'
 `c.bru_mapper` <- function(...) {
   stopifnot(all(vapply(
     list(...),
@@ -230,10 +247,8 @@ ibm_valid_input <- function(...) {
 }
 
 #' @export
-#' @details * `c.bm_list`: The `...` arguments should be `bm_list`
+#' @describeIn bm_list The `...` arguments should be `bm_list`
 #' objects.
-#' @rdname bm_list
-#' @export
 `c.bm_list` <- function(...) {
   stopifnot(all(vapply(
     list(...),
@@ -248,7 +263,7 @@ ibm_valid_input <- function(...) {
 #' @export
 #' @param x `bm_list` object from which to extract element(s)
 #' @param i indices specifying elements to extract
-#' @rdname bm_list
+#' @describeIn bm_list Extract sub-list
 `[.bm_list` <- function(x, i) {
   object <- NextMethod()
   class(object) <- c("bm_list", "list")
@@ -472,21 +487,21 @@ print.summary_bru_mapper <- function(x, ...) {
 # MAPPERS ----
 ## Constructor ----
 
-#' @details * `bru_mapper_define` adds the `new_class` and "bru_mapper" class
-#' names to the inheritance list for the input `mapper` object, unless the object
-#' already inherits from these.
-#'
-#' To register mapper classes and methods in scripts, use `.S3method()`
-#' to register the methods, e.g.
-#' `.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)`.
 #' @param mapper For `bru_mapper_define`, a prototype mapper object, see Details.
 #' For `bru_mapper_scale`, a mapper to be scaled.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
 #' @param \dots Deprecated, alternative way to supply optional method definitions.
 #' @param methods Deprecated.
 #'
+#' @describeIn bru_mapper Adds the `new_class` and "bru_mapper" class
+#' names to the inheritance list for the input `mapper` object, unless the object
+#' already inherits from these.
+#'
+#' To register mapper classes and methods in scripts, use `.S3method()`
+#' to register the methods, e.g.
+#' `.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)`.
+#'
 #' @export
-#' @rdname bru_mapper
 bru_mapper_define <- function(mapper,
                               new_class = NULL,
                               ...,
@@ -524,12 +539,11 @@ bru_mapper_define <- function(mapper,
 
 ## Default methods ----
 
-#' @details * `bru_mapper.default` calls `bru_mapper_define`, passing all
+#' @describeIn bru_mapper Calls `bru_mapper_define`, passing all
 #' arguments along. Mapper implementations should call [bru_mapper_define()]
 #' instead, and supply at least a `new_class` class name.
-#' Use of the `bru_mapper.default` will be deprecated from version 2.7.0.
+#' Use of the `bru_mapper.default` method will be deprecated from version 2.7.0.
 #' @export
-#' @rdname bru_mapper
 bru_mapper.default <- function(...) {
   lifecycle::deprecate_warn(
     "2.6.0.9000",
@@ -540,25 +554,11 @@ bru_mapper.default <- function(...) {
 }
 
 
-#' Implementation methods for mapper objects
-#'
-#' A `bru_mapper` sub-class implementation must provide an
-#' `ibm_jacobian()` method. If the model size 'n' and definition
-#' values 'values' are stored in the object itself, default methods are
-#' available (see Details). Otherwise the
-#' `ibm_n()` and `ibm_values()` methods also need to be provided.
-#'
-#' @seealso [bru_mapper] for constructor methods, and
-#' [bru_get_mapper] for hooks to extract mappers from latent model object
-#' class objects.
-#' @name bru_mapper_methods
-#'
-#' @details
-#' * The default `ibm_n()` method returns a non-null element 'n' from the
+#' @describeIn bru_mapper_generics
+#' Returns a non-null element 'n' from the
 #' mapper object, and gives an error if it doesn't exist. If `inla_f=TRUE`,
 #' first checks for a 'n_inla' element.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_n.default <- function(mapper, inla_f = FALSE, ...) {
   if (inla_f && !is.null(mapper[["n_inla"]])) {
     mapper[["n_inla"]]
@@ -574,18 +574,17 @@ ibm_n.default <- function(mapper, inla_f = FALSE, ...) {
 }
 
 #' @export
-#' @rdname bru_mapper_methods
+#' @describeIn bru_mapper_generics Returns `NROW(input)`
 ibm_n_output.default <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   NROW(input)
 }
 
 
-#' @details
-#' * The default `ibm_values()` method returns a non-null element
+#' @describeIn bru_mapper_generics
+#' Returns a non-null element
 #' 'values' from the mapper object, and `seq_len(ibm_n(mapper))` if
 #' it doesn't exist.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_values.default <- function(mapper, inla_f = FALSE, ...) {
   if (inla_f && !is.null(mapper[["values_inla"]])) {
     mapper[["values_inla"]]
@@ -596,14 +595,13 @@ ibm_values.default <- function(mapper, inla_f = FALSE, ...) {
   }
 }
 
-#' @details
-#' * The default `ibm_amatrix()` method gives an error message.
+#' @describeIn bru_mapper_generics
+#' Gives an error message.
 #' Mapper classes must implement their own `ibm_jacobian` or
 #' `ibm_amatrix` methods. New implementations should use
 #' a `ibm_jacobian` method. `ibm_amatrix` may become deprecated
 #' in a future version.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_amatrix.default <- function(mapper, ...) {
   stop(paste0(
     "Missing implementation of 'ibm_jacobian()/ibm_amatrix()' for mapper of class '",
@@ -612,11 +610,10 @@ ibm_amatrix.default <- function(mapper, ...) {
   ))
 }
 
-#' @details
-#' * The default `ibm_is_linear()` method returns logical
-#' 'is_linear' from the mapper object if it exists, and otherwise `TRUE`.
+#' @describeIn bru_mapper_generics
+#' Returns logical
+#' `is_linear` from the mapper object if it exists, and otherwise `TRUE`.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_is_linear.default <- function(mapper, ...) {
   if (!is.null(mapper[["is_linear"]])) {
     mapper[["is_linear"]]
@@ -625,12 +622,11 @@ ibm_is_linear.default <- function(mapper, ...) {
   }
 }
 
-#' @details
-#' * The default `ibm_jacobian()` calls `ibm_amatrix`, which
+#' @describeIn bru_mapper_generics
+#' Calls `ibm_amatrix`, which
 #' by default gives an error.
 #' Mapper classes should implement their own `ibm_jacobian` method.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_jacobian.default <- function(mapper, input, state, ...) {
   if (!ibm_is_linear(mapper)) {
     stop(paste0(
@@ -642,20 +638,13 @@ ibm_jacobian.default <- function(mapper, input, state, ...) {
   ibm_amatrix(mapper, input = input, state = state, ...)
 }
 
-#' @export
-#' @rdname bru_mapper_methods
-ibm_offset.default <- function(mapper, input, state = NULL, ...) {
-  stop("ibm_offset.default method has been removed")
-}
-
-#' @details
-#' * The default `ibm_linear()` method calls `ibm_eval()` and `ibm_jacobian()`
+#' @describeIn bru_mapper_generics
+#' Calls `ibm_eval()` and `ibm_jacobian()`
 #' and returns a `bru_mapper_taylor` object.
 #' The `state0` information in the affine mapper indicates for which state
 #' the `offset` was evaluated; The affine mapper output is defined as
 #' `effect(input, state) = offset(input, state0) + jacobian(input, state0) %*% (state - state0)`
 #' @export
-#' @rdname bru_mapper_methods
 ibm_linear.default <- function(mapper, input, state, ...) {
   bru_mapper_taylor(
     offset = ibm_eval(mapper, input, state, ...),
@@ -665,13 +654,12 @@ ibm_linear.default <- function(mapper, input, state, ...) {
   )
 }
 
-#' @details
-#' * The default `ibm_eval()` method verifies that the mapper is linear
+#' @describeIn bru_mapper_generics
+#' Verifies that the mapper is linear
 #' with `ibm_is_linear()`, and then computes a linear mapping
 #' as `ibm_jacobian(...) %*% state`.  When `state` is `NULL`,
 #' a zero vector of length `ibm_n_output(...)` is returned.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_eval.default <- function(mapper, input, state = NULL, ...) {
   if (!ibm_is_linear(mapper)) {
     stop("Non-linear mappers must implement their own ibm_eval() method.")
@@ -689,19 +677,18 @@ ibm_eval.default <- function(mapper, input, state = NULL, ...) {
 
 
 #' @export
-#' @rdname bru_mapper_methods
+#' @describeIn bru_mapper_generics Returns `NULL`
 ibm_names.default <- function(mapper, ...) {
   NULL
 }
 
 
-#' @details
-#' * The default `ibm_inla_subset` method uses
+#' @describeIn bru_mapper_generics
+#' Uses
 #' the `ibm_values` output to construct the inla subset indexing, passing
 #' extra arguments such as `multi` on to the methods (this means it supports
 #' both regular vector values and `multi=1` data.frame values).
 #' @export
-#' @rdname bru_mapper_methods
 ibm_inla_subset.default <- function(mapper, ...) {
   values_full <- ibm_values(mapper, inla_f = FALSE, ...)
   values_inla <- ibm_values(mapper, inla_f = TRUE, ...)
@@ -726,10 +713,9 @@ ibm_inla_subset.default <- function(mapper, ...) {
 }
 
 
-#' @details
-#' * The default `ibm_invalid_output()` method returns an all-FALSE logical vector.
+#' @describeIn bru_mapper_generics
+#' Returns an all-`FALSE` logical vector.
 #' @export
-#' @rdname bru_mapper_methods
 ibm_invalid_output.default <- function(mapper, input, state, ...) {
   rep(FALSE, ibm_n_output(mapper, input = input, state = state, ...))
 }
@@ -747,7 +733,7 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 #' and similar).
 #' Default: `TRUE`
 #' @export
-#' @rdname bru_mapper
+#' @describeIn bru_mapper Creates a mapper for 2D `inla.mesh` objects
 bru_mapper.inla.mesh <- function(mesh, ...) {
   mapper <- list(mesh = mesh)
   bru_mapper_define(mapper, new_class = "bru_mapper_inla_mesh_2d")
@@ -809,7 +795,7 @@ ibm_amatrix.bru_mapper_inla_mesh_2d <- function(...) {
 #' and similar).
 #' Default: `NULL`, to force user specification of this parameter
 #' @export
-#' @rdname bru_mapper
+#' @describeIn bru_mapper Create mapper for an `inla.mesh.1d` object
 bru_mapper.inla.mesh.1d <- function(mesh, indexed = NULL, ...) {
   if (is.null(indexed)) {
     stop("indexed=TRUE/FALSE needs to be specified to convert inla.mesh.1d to a bru_mapper")
@@ -855,7 +841,7 @@ ibm_amatrix.bru_mapper_inla_mesh_1d <- function(...) {
 
 #' @param n Size of a model for `bru_mapper_index`
 #' @export
-#' @rdname bru_mapper
+#' @describeIn bru_mapper Create a an indexing mapper
 bru_mapper_index <- function(n = 1L, ...) {
   bru_mapper_define(list(n = n), new_class = "bru_mapper_index")
 }
@@ -895,11 +881,6 @@ ibm_amatrix.bru_mapper_index <- function(...) {
 
 ## _taylor ####
 
-#' @details `bru_mapper_taylor` provides a pre-computed affine mapping,
-#' internally used to represent and evaluate linearisation information.
-#' The `state0` information indicates for which state the `offset` was evaluated;
-#' The affine mapper output is defined as
-#' `effect(state) = offset + jacobian %*% (state - state0)`
 #' @param offset For `bru_mapper_taylor`, an offset vector evaluated
 #' at `state0`.
 #' May be `NULL`, interpreted as an all-zero vector of length determined by
@@ -912,8 +893,13 @@ ibm_amatrix.bru_mapper_index <- function(...) {
 #' `NULL` is interpreted as 0.
 #' @param values_mapper mapper object to be used for `ibm_n` and
 #' `ibm_values` for `inla_f=TRUE` (experimental, currently unused)
+#' @describeIn bru_mapper
+#' Provides a pre-computed affine mapping,
+#' internally used to represent and evaluate linearisation information.
+#' The `state0` information indicates for which state the `offset` was evaluated;
+#' The affine mapper output is defined as
+#' `effect(state) = offset + jacobian %*% (state - state0)`
 #' @export
-#' @rdname bru_mapper
 bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL, ...,
                               values_mapper = NULL) {
   stopifnot(!is.null(offset) || !is.null(jacobian))
@@ -1101,7 +1087,7 @@ ibm_eval.bru_mapper_taylor <- function(mapper, input = NULL, state = NULL, ...) 
 ## _linear ####
 
 #' @export
-#' @rdname bru_mapper
+#' @describeIn bru_mapper Create a mapper for linear effects
 bru_mapper_linear <- function(...) {
   bru_mapper_define(list(), new_class = "bru_mapper_linear")
 }
@@ -1145,7 +1131,7 @@ ibm_amatrix.bru_mapper_linear <- function(...) {
 
 #' @param labels Column labels for matrix mappings
 #' @export
-#' @rdname bru_mapper
+#' @describeIn bru_mapper Create a matrix mapper, for a given number of columns
 bru_mapper_matrix <- function(labels, ...) {
   if (is.factor(labels)) {
     mapper <- list(
@@ -1217,7 +1203,7 @@ ibm_amatrix.bru_mapper_matrix <- function(...) {
 #' * `'contrast'` for leaving out the first factor level.
 #' * `'full'` for keeping all levels.
 #' @export
-#' @rdname bru_mapper
+#' @describeIn bru_mapper Create a factor mapper
 bru_mapper_factor <- function(values, factor_mapping, ...) {
   factor_mapping <- match.arg(factor_mapping, c("full", "contrast"))
   if (is.factor(values)) {
@@ -1298,7 +1284,7 @@ ibm_amatrix.bru_mapper_factor <- function(...) {
 ## _const ####
 
 #' @export
-#' @rdname bru_mapper
+#' @describeIn bru_mapper Create a constant mapper
 bru_mapper_const <- function(...) {
   bru_mapper_define(list(), new_class = "bru_mapper_const")
 }
@@ -1336,7 +1322,7 @@ ibm_eval.bru_mapper_const <- function(mapper, input, state = NULL, ...) {
 ## _offset ####
 
 #' @export
-#' @rdname bru_mapper
+#' @describeIn inlabru-deprecated Creates a [bru_mapper_const()] mapper.
 bru_mapper_offset <- function(...) {
   #  .Deprecated("bru_mapper_const")
   bru_mapper_define(bru_mapper_const(), new_class = "bru_mapper_offset")
@@ -1367,12 +1353,11 @@ ibm_amatrix.bru_mapper_offset <- function(...) {
 ## _scale ####
 
 #' @export
-#' @details For `bru_mapper_scale()`, the default is to create a standalone
+#' @describeIn bru_mapper Create a standalone
 #' scaling mapper that can be used as part of a `bru_mapper_pipe`.
 #' If `mapper` is non-null, the `bru_mapper_scale()` constructor
 #' returns
 #' `bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))`
-#' @rdname bru_mapper
 bru_mapper_scale <- function(mapper = NULL, ...) {
   # TODO:
   # 1. If mapper is NULL, implement a plain scaling mapper. Done!
@@ -1556,9 +1541,6 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
 ## _aggregate ####
 
 #' @export
-#' @details * `bru_mapper_aggregate()` constructs a mapper
-#' that aggregates elements of the input state, so it can be used e.g.
-#' for weighted summation or integration over blocks of values.
 #' @param rescale
 #' logical; For `bru_mapper_aggregate`, specifies if the rows of the
 #' Jacobian should be normalised or not,
@@ -1570,7 +1552,10 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
 #'   the same as dividing by the number of entries in each block.
 #' @param n_block Predetermined number of output blocks. If `NULL`, overrides
 #' the maximum block index in the inputs.
-#' @rdname bru_mapper
+#' @describeIn bru_mapper
+#' Constructs a mapper
+#' that aggregates elements of the input state, so it can be used e.g.
+#' for weighted summation or integration over blocks of values.
 bru_mapper_aggregate <- function(rescale = FALSE,
                                  n_block = NULL,
                                  ...) {
@@ -1733,12 +1718,12 @@ ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
 ## _pipe ####
 
 #' @export
-#' @details For `bru_mapper_pipe()`, `mappers` is a list of mappers,
+#' @describeIn bru_mapper
+#' Create a pipe mapper, where, `mappers` is a list of mappers,
 #' where the evaluated output of each mapper is handed as the state to the next
 #' mapper..
 #' The `input` format for the `ibm_eval` and `ibm_jacobian` methods is
-#' a list of inputs, one for each mapper
-#' @rdname bru_mapper
+#' a list of inputs, one for each mapper.
 bru_mapper_pipe <- function(mappers, ...) {
   is_linear_multi <- vapply(mappers, function(x) ibm_is_linear(x), TRUE)
   n_multi <- vapply(mappers, function(x) as.integer(ibm_n(x)), 0L)
@@ -1849,9 +1834,8 @@ ibm_eval.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
 
 #' @param values Input values calculated by [input_eval.bru_input()]
 #' @param mappers A list of `bru_mapper` objects
-#' @details * `bru_mapper_multi` constructs a kronecker product mapping
+#' @describeIn bru_mapper Constructs a rowwise Kronecker product mapping
 #' @export
-#' @rdname bru_mapper
 bru_mapper_multi <- function(mappers, ...) {
   mapper <- list(
     mappers = mappers,
@@ -2176,11 +2160,9 @@ ibm_invalid_output.bru_mapper_multi <- function(mapper,
   mapper
 }
 
-#' @return
-#' * The `names()` method for `bru_mapper_multi` returns the names from the
-#' sub-mappers list
+#' @describeIn bru_mapper_methods
+#' Returns the names from the sub-mappers list
 #' @export
-#' @rdname bru_mapper_methods
 `ibm_names.bru_mapper_multi` <- function(mapper) {
   names(mapper[["mappers"]])
 }
@@ -2210,9 +2192,9 @@ ibm_invalid_output.bru_mapper_multi <- function(mapper,
 #' as for "bym2" models, as activated by the `inla_f` argument to `ibm_n`,
 #' `ibm_values`, and `ibm_jacobian`. Set to `FALSE` to always access the full
 #' mapper, e.g. for `rgeneric` models
-#' @details * `bru_mapper_collect` constructs concatenated collection mapping
+#' @describeIn bru_mapper
+#' Constructs a concatenated collection mapping
 #' @export
-#' @rdname bru_mapper
 bru_mapper_collect <- function(mappers, hidden = FALSE, ...) {
   mapper <- list(
     mappers = mappers,
@@ -2588,7 +2570,7 @@ ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
 #'   basis function is a constant. (Default `TRUE`)
 #' @param interval numeric length-2 vector specifying a domain interval.
 #'   Default `c(0, 1)`.
-#' @details * `bru_mapper_harmonics` constructs a mapper for `cos`/`sin` functions
+#' @describeIn bru_mapper Constructs a mapper for `cos`/`sin` functions
 #'   of orders 1 (if `intercept` is `TRUE`, otherwise 0) through `order`. The total
 #'   number of basis functions is `intercept + 2 * order`.
 #'
@@ -2611,7 +2593,6 @@ ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
 #'   The period for the first order harmonics is shifted and scaled to match
 #'   `interval`.
 #' @export
-#' @rdname bru_mapper
 bru_mapper_harmonics <- function(order = 1,
                                  scaling = 1,
                                  intercept = TRUE,

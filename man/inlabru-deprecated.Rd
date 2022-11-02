@@ -14,6 +14,7 @@
 \alias{ibm_amatrix.bru_mapper_linear}
 \alias{ibm_amatrix.bru_mapper_matrix}
 \alias{ibm_amatrix.bru_mapper_factor}
+\alias{bru_mapper_offset}
 \alias{ibm_n.bru_mapper_offset}
 \alias{ibm_values.bru_mapper_offset}
 \alias{ibm_amatrix.bru_mapper_offset}
@@ -43,6 +44,8 @@ ibm_valid_input(...)
 \method{ibm_amatrix}{bru_mapper_matrix}(...)
 
 \method{ibm_amatrix}{bru_mapper_factor}(...)
+
+bru_mapper_offset(...)
 
 \method{ibm_n}{bru_mapper_offset}(...)
 
@@ -99,6 +102,8 @@ other than "eb".
 \item \code{ibm_amatrix(bru_mapper_matrix)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
 
 \item \code{ibm_amatrix(bru_mapper_factor)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
+
+\item \code{bru_mapper_offset()}: Creates a \code{\link[=bru_mapper_const]{bru_mapper_const()}} mapper.
 
 \item \code{ibm_n(bru_mapper_offset)}: Replaced by \link{bru_mapper_const} methods
 

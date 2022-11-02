@@ -12,7 +12,6 @@
 \alias{bru_mapper_matrix}
 \alias{bru_mapper_factor}
 \alias{bru_mapper_const}
-\alias{bru_mapper_offset}
 \alias{bru_mapper_scale}
 \alias{bru_mapper_aggregate}
 \alias{bru_mapper_pipe}
@@ -48,8 +47,6 @@ bru_mapper_matrix(labels, ...)
 bru_mapper_factor(values, factor_mapping, ...)
 
 bru_mapper_const(...)
-
-bru_mapper_offset(...)
 
 bru_mapper_scale(mapper = NULL, ...)
 
@@ -154,65 +151,70 @@ Default \code{c(0, 1)}.}
 \description{
 Constructors for \code{bru_mapper} objects
 }
-\details{
+\section{Methods (by class)}{
 \itemize{
-\item \code{bru_mapper} Generic mapper S3 constructor, used for constructing
+\item \code{bru_mapper(default)}: Calls \code{bru_mapper_define}, passing all
+arguments along. Mapper implementations should call \code{\link[=bru_mapper_define]{bru_mapper_define()}}
+instead, and supply at least a \code{new_class} class name.
+Use of the \code{bru_mapper.default} method will be deprecated from version 2.7.0.
+
+\item \code{bru_mapper(inla.mesh)}: Creates a mapper for 2D \code{inla.mesh} objects
+
+\item \code{bru_mapper(inla.mesh.1d)}: Create mapper for an \code{inla.mesh.1d} object
+
+}}
+\section{Functions}{
+\itemize{
+\item \code{bru_mapper()}: Generic mapper S3 constructor, used for constructing
 mappers for special objects. See below for details of the
 default constructor \code{\link[=bru_mapper_define]{bru_mapper_define()}} that can be used to define
 new mappers in user code.
-}
 
-\itemize{
-\item \code{bru_mapper_define} adds the \code{new_class} and "bru_mapper" class
+\item \code{bru_mapper_define()}: Adds the \code{new_class} and "bru_mapper" class
 names to the inheritance list for the input \code{mapper} object, unless the object
 already inherits from these.
-}
 
 To register mapper classes and methods in scripts, use \code{.S3method()}
 to register the methods, e.g.
 \code{.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)}.
 
-\itemize{
-\item \code{bru_mapper.default} calls \code{bru_mapper_define}, passing all
-arguments along. Mapper implementations should call \code{\link[=bru_mapper_define]{bru_mapper_define()}}
-instead, and supply at least a \code{new_class} class name.
-Use of the \code{bru_mapper.default} will be deprecated from version 2.7.0.
-}
+\item \code{bru_mapper_index()}: Create a an indexing mapper
 
-\code{bru_mapper_taylor} provides a pre-computed affine mapping,
+\item \code{bru_mapper_taylor()}: Provides a pre-computed affine mapping,
 internally used to represent and evaluate linearisation information.
 The \code{state0} information indicates for which state the \code{offset} was evaluated;
 The affine mapper output is defined as
 \code{effect(state) = offset + jacobian \%*\% (state - state0)}
 
-For \code{bru_mapper_scale()}, the default is to create a standalone
+\item \code{bru_mapper_linear()}: Create a mapper for linear effects
+
+\item \code{bru_mapper_matrix()}: Create a matrix mapper, for a given number of columns
+
+\item \code{bru_mapper_factor()}: Create a factor mapper
+
+\item \code{bru_mapper_const()}: Create a constant mapper
+
+\item \code{bru_mapper_scale()}: Create a standalone
 scaling mapper that can be used as part of a \code{bru_mapper_pipe}.
 If \code{mapper} is non-null, the \code{bru_mapper_scale()} constructor
 returns
 \code{bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))}
 
-\itemize{
-\item \code{bru_mapper_aggregate()} constructs a mapper
+\item \code{bru_mapper_aggregate()}: Constructs a mapper
 that aggregates elements of the input state, so it can be used e.g.
 for weighted summation or integration over blocks of values.
-}
 
-For \code{bru_mapper_pipe()}, \code{mappers} is a list of mappers,
+\item \code{bru_mapper_pipe()}: Create a pipe mapper, where, \code{mappers} is a list of mappers,
 where the evaluated output of each mapper is handed as the state to the next
 mapper..
 The \code{input} format for the \code{ibm_eval} and \code{ibm_jacobian} methods is
-a list of inputs, one for each mapper
+a list of inputs, one for each mapper.
 
-\itemize{
-\item \code{bru_mapper_multi} constructs a kronecker product mapping
-}
+\item \code{bru_mapper_multi()}: Constructs a rowwise Kronecker product mapping
 
-\itemize{
-\item \code{bru_mapper_collect} constructs concatenated collection mapping
-}
+\item \code{bru_mapper_collect()}: Constructs a concatenated collection mapping
 
-\itemize{
-\item \code{bru_mapper_harmonics} constructs a mapper for \code{cos}/\code{sin} functions
+\item \code{bru_mapper_harmonics()}: Constructs a mapper for \code{cos}/\code{sin} functions
 of orders 1 (if \code{intercept} is \code{TRUE}, otherwise 0) through \code{order}. The total
 number of basis functions is \code{intercept + 2 * order}.
 
@@ -236,13 +238,14 @@ determining the variance for each frequency contribution.
 
 The period for the first order harmonics is shifted and scaled to match
 \code{interval}.
-}
-}
+
+}}
 \examples{
 mapper <- bru_mapper_index(5)
 ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
 }
 \seealso{
+\link{bru_mapper_generics} for generic methods,
 \link{bru_mapper_methods} for specific method implementations, and
 \link{bru_get_mapper} for hooks to extract mappers from latent model object
 class objects.
