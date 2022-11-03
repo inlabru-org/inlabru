@@ -1620,7 +1620,8 @@ ibm_values.bru_mapper_aggregate <- function(mapper, ...,
 bm_aggregate_input <- function(input,
                                state = NULL,
                                n_state = NULL,
-                               allow_log = FALSE) {
+                               allow_log = TRUE,
+                               force_log = FALSE) {
   if (is.null(input)) {
     block <- NULL
     weights <- NULL
@@ -1644,7 +1645,7 @@ bm_aggregate_input <- function(input,
   } else if (length(block) == 1) {
     block <- rep(block, n_state)
   }
-  if (allow_log) {
+  if (allow_log && force_log) {
     if (is.null(log_weights)) {
       if (is.null(weights)) {
         log_weights <- rep(0.0, n_state)
@@ -1659,6 +1660,25 @@ bm_aggregate_input <- function(input,
     }
     if (length(log_weights) == 1) {
       log_weights <- rep(log_weights, n_state)
+    }
+  } else if (allow_log && !force_log) {
+    if (is.null(log_weights) && is.null(weights)) {
+      weights <- rep(1.0, n_state)
+    } else if (!is.null(weights)) {
+      # log_weights is non-NULL
+      if (!is.null(log_weights)) {
+        warning("Both weights and log_weights supplied. Using weights.",
+                immediate. = TRUE)
+        log_weights <- NULL
+      }
+      if (length(weights) == 1) {
+        weights <- rep(weights, n_state)
+      }
+    } else {
+      # log_weights is non-NULL, weights is null
+      if (length(log_weights) == 1) {
+        log_weights <- rep(log_weights, n_state)
+      }
     }
   } else {
     if (is.null(weights)) {
@@ -1679,9 +1699,16 @@ bm_aggregate_input <- function(input,
 #' If `weights` is `NULL`, it's interpreted as all-1.
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...) {
-  input <- bm_aggregate_input(input, state = state)
+  input <- bm_aggregate_input(input, state = state,
+                              allow_log = TRUE,
+                              force_log = FALSE)
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
+
+  # Temporary line:
+  if (!is.null(input[["log_weights"]])) {
+    input[["weights"]] <- exp(input[["log_weights"]])
+  }
 
   if (mapper[["rescale"]]) {
     # Compute blockwise weighted sums
@@ -1719,10 +1746,16 @@ ibm_linear.bru_mapper_aggregate <- function(mapper, input, state, ...) {
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
                                           sub_lin = NULL) {
-  input <- bm_aggregate_input(input, state = state)
+  input <- bm_aggregate_input(input, state = state,
+                              allow_log = TRUE,
+                              force_log = FALSE)
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
 
+  # Temporary line:
+  if (!is.null(input[["log_weights"]])) {
+    input[["weights"]] <- exp(input[["log_weights"]])
+  }
   if (mapper[["rescale"]]) {
     # Compute blockwise weight sums
     rescale <- as.vector(
@@ -1784,7 +1817,8 @@ bru_mapper_logsumexp <- function(rescale = FALSE,
 #' If `weights` is `NULL`, it's interpreted as all-1.
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) {
-  input <- bm_aggregate_input(input, state = state, allow_log = TRUE)
+  input <- bm_aggregate_input(input, state = state,
+                              allow_log = TRUE, force_log = TRUE)
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
 
@@ -1849,7 +1883,8 @@ ibm_linear.bru_mapper_logsumexp <- function(mapper, input, state, ...) {
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...,
                                           sub_lin = NULL) {
-  input <- bm_aggregate_input(input, state = state, allow_log = TRUE)
+  input <- bm_aggregate_input(input, state = state,
+                              allow_log = TRUE, force_log = TRUE)
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
 
