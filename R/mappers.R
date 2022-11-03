@@ -1580,7 +1580,12 @@ ibm_n.bru_mapper_aggregate <- function(mapper, ...,
   } else if (!is.null(n_state)) {
     n_state
   } else if (!is.null(input) &&
-             !is.null(input[["block"]])) {
+             (!is.null(input[["block"]]) ||
+              !is.null(input[["weights"]]) ||
+              !is.null(input[["log_weights"]]))) {
+    max(length(input[["block"]]),
+        length(input[["weights"]]),
+        length(input[["log_weights"]]))
     length(input[["block"]])
   } else {
     NA_integer_
@@ -1630,7 +1635,7 @@ bm_aggregate_input <- function(input,
     }
   }
   if (is.null(state) && is.null(n_state)) {
-    n_state <- max(length(block), length(weights))
+    n_state <- max(length(block), length(weights), length(log_weights))
   } else if (!is.null(state)) {
     n_state <- length(state)
   }
