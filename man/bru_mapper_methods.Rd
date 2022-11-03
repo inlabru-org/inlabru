@@ -40,6 +40,9 @@
 \alias{ibm_jacobian.bru_mapper_aggregate}
 \alias{ibm_linear.bru_mapper_aggregate}
 \alias{ibm_eval.bru_mapper_aggregate}
+\alias{ibm_jacobian.bru_mapper_logsumexp}
+\alias{ibm_linear.bru_mapper_logsumexp}
+\alias{ibm_eval.bru_mapper_logsumexp}
 \alias{ibm_n.bru_mapper_pipe}
 \alias{ibm_n_output.bru_mapper_pipe}
 \alias{ibm_values.bru_mapper_pipe}
@@ -149,6 +152,12 @@
 \method{ibm_linear}{bru_mapper_aggregate}(mapper, input, state, ...)
 
 \method{ibm_eval}{bru_mapper_aggregate}(mapper, input, state = NULL, ..., sub_lin = NULL)
+
+\method{ibm_jacobian}{bru_mapper_logsumexp}(mapper, input, state = NULL, ...)
+
+\method{ibm_linear}{bru_mapper_logsumexp}(mapper, input, state, ...)
+
+\method{ibm_eval}{bru_mapper_logsumexp}(mapper, input, state = NULL, ..., sub_lin = NULL)
 
 \method{ibm_n}{bru_mapper_pipe}(mapper, ..., state = NULL)
 
@@ -318,6 +327,14 @@ are interpreted as no scaling.
 
 \itemize{
 \item For \code{bru_mapper_aggregate}, \code{input} should be a list with elements \code{block}
+and \code{weights}. \code{block}
+should be a vector of the same length as the \code{state}, or \code{NULL}, with \code{NULL}
+equivalent to all-1.
+If \code{weights} is \code{NULL}, it's interpreted as all-1.
+}
+
+\itemize{
+\item For \code{bru_mapper_logsumexp}, \code{input} should be a list with elements \code{block}
 and \code{weights}. \code{block}
 should be a vector of the same length as the \code{state}, or \code{NULL}, with \code{NULL}
 equivalent to all-1.

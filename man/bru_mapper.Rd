@@ -14,6 +14,7 @@
 \alias{bru_mapper_const}
 \alias{bru_mapper_scale}
 \alias{bru_mapper_aggregate}
+\alias{bru_mapper_logsumexp}
 \alias{bru_mapper_pipe}
 \alias{bru_mapper_multi}
 \alias{bru_mapper_collect}
@@ -51,6 +52,8 @@ bru_mapper_const(...)
 bru_mapper_scale(mapper = NULL, ...)
 
 bru_mapper_aggregate(rescale = FALSE, n_block = NULL, ...)
+
+bru_mapper_logsumexp(rescale = FALSE, n_block = NULL, ...)
 
 bru_mapper_pipe(mappers, ...)
 
@@ -113,9 +116,9 @@ was evaluated at, or a list of length matching the \code{jacobian} list.
 \item \code{'full'} for keeping all levels.
 }}
 
-\item{rescale}{logical; For \code{bru_mapper_aggregate}, specifies if the rows of the
-Jacobian should be normalised or not,
-after grouping by the block specification:
+\item{rescale}{logical; For \code{bru_mapper_aggregate} and \code{bru_mapper_logsumexp},
+specifies if the blockwise sums should be normalised by the blockwise weight
+sums or not:
 \itemize{
 \item \code{FALSE}: (default) Straight weighted sum, no rescaling.
 \item \code{TRUE}: Divide by the sum of the weight values within each block.
@@ -203,6 +206,12 @@ returns
 \item \code{bru_mapper_aggregate()}: Constructs a mapper
 that aggregates elements of the input state, so it can be used e.g.
 for weighted summation or integration over blocks of values.
+
+\item \code{bru_mapper_logsumexp()}: Constructs a mapper
+that aggregates elements of \code{exp(state)}, with optional weighting,
+and then takes the \code{log()}, so it can be used e.g.
+for  \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]}{log(blocksum(w*exp(state)))}
+calculations.
 
 \item \code{bru_mapper_pipe()}: Create a pipe mapper, where, \code{mappers} is a list of mappers,
 where the evaluated output of each mapper is handed as the state to the next

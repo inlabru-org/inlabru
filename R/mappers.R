@@ -1542,9 +1542,9 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
 
 #' @export
 #' @param rescale
-#' logical; For `bru_mapper_aggregate`, specifies if the rows of the
-#' Jacobian should be normalised or not,
-#' after grouping by the block specification:
+#' logical; For `bru_mapper_aggregate` and `bru_mapper_logsumexp`,
+#' specifies if the blockwise sums should be normalised by the blockwise weight
+#' sums or not:
 #' * `FALSE`: (default) Straight weighted sum, no rescaling.
 #' * `TRUE`: Divide by the sum of the weight values within each block.
 #'   This is useful for integration averages, when the given weights are plain
@@ -1612,13 +1612,22 @@ ibm_values.bru_mapper_aggregate <- function(mapper, ...,
   }
 }
 
-bm_aggregate_input <- function(input, state = NULL, n_state = NULL) {
+bm_aggregate_input <- function(input,
+                               state = NULL,
+                               n_state = NULL,
+                               allow_log = FALSE) {
   if (is.null(input)) {
     block <- NULL
     weights <- NULL
+    log_weights <- NULL
   } else {
     block <- input[["block"]]
     weights <- input[["weights"]]
+    if (allow_log) {
+      log_weights <- input[["log_weights"]]
+    } else {
+      log_weights <- NULL
+    }
   }
   if (is.null(state) && is.null(n_state)) {
     n_state <- max(length(block), length(weights))
@@ -1630,12 +1639,30 @@ bm_aggregate_input <- function(input, state = NULL, n_state = NULL) {
   } else if (length(block) == 1) {
     block <- rep(block, n_state)
   }
-  if (is.null(weights)) {
-    weights <- rep(1.0, n_state)
-  } else if (length(weights) == 1) {
-    weights <- rep(weights, n_state)
+  if (allow_log) {
+    if (is.null(log_weights)) {
+      if (is.null(weights)) {
+        log_weights <- rep(0.0, n_state)
+      } else {
+        log_weights <- log(weights)
+        weights <- NULL
+      }
+    } else if (!is.null(weights)) {
+      warning("Both weights and log_weights supplied. Using log_weights.",
+              immediate. = TRUE)
+      weights <- NULL
+    }
+    if (length(log_weights) == 1) {
+      log_weights <- rep(log_weights, n_state)
+    }
+  } else {
+    if (is.null(weights)) {
+      weights <- rep(1.0, n_state)
+    } else if (length(weights) == 1) {
+      weights <- rep(weights, n_state)
+    }
   }
-  list(block = block, weights = weights)
+  list(block = block, weights = weights, log_weights = log_weights)
 }
 
 #' @export
@@ -1652,7 +1679,7 @@ ibm_jacobian.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...) 
   n_out <- ibm_n_output(mapper, input = input)
 
   if (mapper[["rescale"]]) {
-    # Compute blockwise weight sums
+    # Compute blockwise weighted sums
     rescale <- as.vector(
       Matrix::sparseMatrix(i = input[["block"]],
                            j = rep(1L, n_state),
@@ -1686,7 +1713,7 @@ ibm_linear.bru_mapper_aggregate <- function(mapper, input, state, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
-                                      sub_lin = NULL) {
+                                          sub_lin = NULL) {
   input <- bm_aggregate_input(input, state = state)
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
@@ -1709,6 +1736,149 @@ ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
                          x = state * input[["weights"]] / rescale,
                          dims = c(n_out, 1))
   as.vector(values)
+}
+
+
+
+
+
+## _logsumexp ####
+
+#' @export
+#' @describeIn bru_mapper
+#' Constructs a mapper
+#' that aggregates elements of `exp(state)`, with optional non-negative weighting,
+#' and then takes the `log()`, so it can be used e.g.
+#' for  \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]}{log(blocksum(w*exp(state)))}
+#' and \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]}{log(blocksum(w*exp(state)/blocksum(w)))}
+#' calculations.  Relies on the input handling methods for `bru_mapper_aggregate`,
+#' but also allows the weights to be supplied on a logarithmic scale as `log_weights`.
+#' To avoid numerical overflow, it uses the common method of internally
+#' shifting the state blockwise with
+#' `(state-log_weights)[block] - max((state-log_weights)[block])`,
+#' and shifting the result back afterwards.
+bru_mapper_logsumexp <- function(rescale = FALSE,
+                                 n_block = NULL,
+                                 ...) {
+  # Arguments documented for bru_mapper_aggregate
+  # Inherit class bru_mapper_aggregate to reuse common methods
+  bru_mapper_define(
+    list(rescale = rescale,
+         n_block = n_block),
+    new_class = c("bru_mapper_logsumexp", "bru_mapper_aggregate")
+  )
+}
+
+
+#' @export
+#' @details
+#' * For `bru_mapper_logsumexp`, `input` should be a list with elements `block`
+#' and `weights`. `block`
+#' should be a vector of the same length as the `state`, or `NULL`, with `NULL`
+#' equivalent to all-1.
+#' If `weights` is `NULL`, it's interpreted as all-1.
+#' @rdname bru_mapper_methods
+ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) {
+  input <- bm_aggregate_input(input, state = state, allow_log = TRUE)
+  n_state <- ibm_n(mapper, input = input, state = state)
+  n_out <- ibm_n_output(mapper, input = input)
+
+  # Temporary line:
+  input[["weights"]] <- exp(input[["log_weights"]])
+
+  if (mapper[["rescale"]]) {
+    # Compute blockwise weighted sums
+    rescale <- as.vector(
+      Matrix::sparseMatrix(i = input[["block"]],
+                           j = rep(1L, n_state),
+                           x = input[["weights"]],
+                           dims = c(n_out, 1))
+    )
+    rescale <- rescale[input[["block"]]]
+  } else {
+    rescale <- 1
+  }
+  # Compute shift for stable log-sum-exp
+  input_k <- sort(unique(input[["block"]]))
+  state_shift <- numeric(n_out)
+  state_shift[input_k] <-
+    vapply(input_k,
+           function(k) {
+             max(state[input[["block"]] == k])
+           },
+           0.0)
+
+  state <- state - state_shift[input[["block"]]]
+
+  weighted_exp <- exp(state) * input[["weights"]] / rescale
+  sum_values <-
+    as.vector(
+      Matrix::sparseMatrix(i = input[["block"]],
+                           j = rep(1L, n_state),
+                           x = weighted_exp,
+                           dims = c(n_out, 1))
+    )
+  rescale <- sum_values[input[["block"]]]
+
+  Matrix::sparseMatrix(i = input[["block"]],
+                       j = seq_len(n_state),
+                       x = weighted_exp / rescale,
+                       dims = c(n_out, n_state))
+}
+
+
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_linear.bru_mapper_logsumexp <- function(mapper, input, state, ...) {
+  bru_mapper_taylor(
+    offset = ibm_eval(mapper, input, state, ...),
+    jacobian = ibm_jacobian(mapper, input, state, ...),
+    state0 = state,
+    values_mapper = mapper
+  )
+}
+
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...,
+                                          sub_lin = NULL) {
+  input <- bm_aggregate_input(input, state = state, allow_log = TRUE)
+  n_state <- ibm_n(mapper, input = input, state = state)
+  n_out <- ibm_n_output(mapper, input = input)
+
+  # Temporary line:
+  input[["weights"]] <- exp(input[["log_weights"]])
+
+  if (mapper[["rescale"]]) {
+    # Compute blockwise weight sums
+    rescale <- as.vector(
+      Matrix::sparseMatrix(i = input[["block"]],
+                           j = rep(1L, n_state),
+                           x = input[["weights"]],
+                           dims = c(n_out, 1))
+    )
+    rescale <- rescale[input[["block"]]]
+  } else {
+    rescale <- 1
+  }
+  # Compute shift for stable log-sum-exp
+  input_k <- sort(unique(input[["block"]]))
+  state_shift <- numeric(n_out)
+  state_shift[input_k] <-
+    vapply(input_k,
+           function(k) {
+             max(state[input[["block"]] == k])
+           },
+           0.0)
+  values <-
+    Matrix::sparseMatrix(i = input[["block"]],
+                         j = rep(1L, n_state),
+                         x = exp(state - state_shift[input[["block"]]]) *
+                           input[["weights"]] / rescale,
+                         dims = c(n_out, 1))
+  log(as.vector(values)) + state_shift
 }
 
 
