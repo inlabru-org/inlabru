@@ -782,19 +782,22 @@ add_mappers.component <- function(component, lhoods, ...) {
     )
   lh <- lhoods[keep_lh]
 
-  component$main <- add_mapper(component$main,
+  component$main <- add_mapper(
+    component$main,
     label = component$label,
     lhoods = lh,
     env = component$env,
     require_indexed = FALSE
   )
-  component$group <- add_mapper(component$group,
+  component$group <- add_mapper(
+    component$group,
     label = component$label,
     lhoods = lh,
     env = component$env,
     require_indexed = TRUE
   )
-  component$replicate <- add_mapper(component$replicate,
+  component$replicate <- add_mapper(
+    component$replicate,
     label = component$label,
     lhoods = lh,
     env = component$env,
@@ -1157,7 +1160,8 @@ make_submapper <- function(subcomp_n,
                            label,
                            subcomp_type,
                            subcomp_factor_mapping,
-                           require_indexed) {
+                           require_indexed,
+                           allow_interpolation = TRUE) {
   if (!is.null(subcomp_n)) {
     if (!is.null(subcomp_values)) {
       warning(
@@ -1184,11 +1188,15 @@ make_submapper <- function(subcomp_n,
   } else {
     values <- sort(unique(values), na.last = NA)
     if (length(values) > 1) {
-      mapper <-
-        bru_mapper(
-          INLA::inla.mesh.1d(values),
-          indexed = require_indexed
-        )
+      if (allow_interpolation) {
+        mapper <-
+          bru_mapper(
+            INLA::inla.mesh.1d(values),
+            indexed = require_indexed
+          )
+      } else {
+        mapper <- bru_mapper_index(n = ceiling(max(values)))
+      }
     } else if (all(values == 1)) {
       if (require_indexed) {
         mapper <- bru_mapper_index(n = 1)
@@ -1349,6 +1357,8 @@ make_mapper <- function(subcomp,
     subcomp[["mapper"]] <- bru_mapper_matrix(labels)
   } else if (subcomp[["model"]] %in% c("bym", "bym2")) {
     # No mapper; construct based on input values
+    # Default mapper will be integer or factor indexed, not
+    # interpolated
     mappers <- list(
       make_submapper(
         subcomp_n = subcomp[["n"]],
@@ -1357,7 +1367,8 @@ make_mapper <- function(subcomp,
         label = paste0(subcomp[["label"]], " part 1"),
         subcomp_type = subcomp[["type"]],
         subcomp_factor_mapping = subcomp[["factor_mapping"]],
-        require_indexed = require_indexed
+        require_indexed = require_indexed,
+        allow_interpolation = FALSE
       )
     )
     mappers[[2]] <- mappers[[1]]
@@ -1374,7 +1385,8 @@ make_mapper <- function(subcomp,
         label = subcomp[["label"]],
         subcomp_type = subcomp[["type"]],
         subcomp_factor_mapping = subcomp[["factor_mapping"]],
-        require_indexed = require_indexed
+        require_indexed = require_indexed,
+        allow_interpolation = TRUE
       )
   }
   subcomp
