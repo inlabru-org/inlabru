@@ -112,9 +112,11 @@
 <span></span>
 <span><span class="fu">bru_mapper_const</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_offset</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu">bru_mapper_scale</span><span class="op">(</span>mapper <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_aggregate</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_logsumexp</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bru_mapper_pipe</span><span class="op">(</span><span class="va">mappers</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -155,7 +157,7 @@ For <code>bru_mapper_scale</code>, a mapper to be scaled.</p></dd>
 
 
 <dt>indexed</dt>
-<dd><p>logical; If <code>TRUE</code>, the <code><a href="bru_mapper_methods.html">ibm_values()</a></code> output will be the
+<dd><p>logical; If <code>TRUE</code>, the <code><a href="bru_mapper_generics.html">ibm_values()</a></code> output will be the
 integer indexing sequence for the latent variables (needed for <code>spde</code> models).
 If <code>FALSE</code>, the knot
 locations are returned (useful as an interpolator for <code>rw2</code> models
@@ -205,6 +207,22 @@ was evaluated at, or a list of length matching the <code>jacobian</code> list.
 </ul></dd>
 
 
+<dt>rescale</dt>
+<dd><p>logical; For <code>bru_mapper_aggregate</code> and <code>bru_mapper_logsumexp</code>,
+specifies if the blockwise sums should be normalised by the blockwise weight
+sums or not:</p><ul><li><p><code>FALSE</code>: (default) Straight weighted sum, no rescaling.</p></li>
+<li><p><code>TRUE</code>: Divide by the sum of the weight values within each block.
+This is useful for integration averages, when the given weights are plain
+integration weights. If the weights are <code>NULL</code> or all ones, this is
+the same as dividing by the number of entries in each block.</p></li>
+</ul></dd>
+
+
+<dt>n_block</dt>
+<dd><p>Predetermined number of output blocks. If <code>NULL</code>, overrides
+the maximum block index in the inputs.</p></dd>
+
+
 <dt>mappers</dt>
 <dd><p>A list of <code>bru_mapper</code> objects</p></dd>
 
@@ -239,40 +257,59 @@ Default <code>c(0, 1)</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <h2 id="methods-by-class-">Methods (by class)<a class="anchor" aria-label="anchor" href="#methods-by-class-"></a></h2>
     
-<ul><li><p><code>bru_mapper</code> Generic mapper S3 constructor, used for constructing
+<ul><li><p><code>bru_mapper(default)</code>: Calls <code>bru_mapper_define</code>, passing all
+arguments along. Mapper implementations should call <code>bru_mapper_define()</code>
+instead, and supply at least a <code>new_class</code> class name.
+Use of the <code>bru_mapper.default</code> method will be deprecated from version 2.7.0.</p></li>
+<li><p><code>bru_mapper(inla.mesh)</code>: Creates a mapper for 2D <code>inla.mesh</code> objects</p></li>
+<li><p><code>bru_mapper(inla.mesh.1d)</code>: Create mapper for an <code>inla.mesh.1d</code> object</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
+    
+<ul><li><p><code>bru_mapper()</code>: Generic mapper S3 constructor, used for constructing
 mappers for special objects. See below for details of the
 default constructor <code>bru_mapper_define()</code> that can be used to define
 new mappers in user code.</p></li>
-</ul><ul><li><p><code>bru_mapper_define</code> adds the <code>new_class</code> and "bru_mapper" class
+<li><p><code>bru_mapper_define()</code>: Adds the <code>new_class</code> and "bru_mapper" class
 names to the inheritance list for the input <code>mapper</code> object, unless the object
-already inherits from these.</p></li>
-</ul><p>To register mapper classes and methods in scripts, use <code><a href="https://rdrr.io/r/base/S3method.html" class="external-link">.S3method()</a></code>
+already inherits from these.</p>
+<p>To register mapper classes and methods in scripts, use <code><a href="https://rdrr.io/r/base/S3method.html" class="external-link">.S3method()</a></code>
 to register the methods, e.g.
-<code>.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)</code>.</p>
-<ul><li><p><code>bru_mapper.default</code> calls <code>bru_mapper_define</code>, passing all
-arguments along. Mapper implementations should call <code>bru_mapper_define()</code>
-instead, and supply at least a <code>new_class</code> class name.
-Use of the <code>bru_mapper.default</code> will be deprecated from version 2.7.0.</p></li>
-</ul><p><code>bru_mapper_taylor</code> provides a pre-computed affine mapping,
+<code>.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)</code>.</p></li>
+<li><p><code>bru_mapper_index()</code>: Create a an indexing mapper</p></li>
+<li><p><code>bru_mapper_taylor()</code>: Provides a pre-computed affine mapping,
 internally used to represent and evaluate linearisation information.
 The <code>state0</code> information indicates for which state the <code>offset</code> was evaluated;
 The affine mapper output is defined as
-<code>effect(state) = offset + jacobian %*% (state - state0)</code></p>
-<p>For <code>bru_mapper_scale()</code>, the default is to create a standalone
+<code>effect(state) = offset + jacobian %*% (state - state0)</code></p></li>
+<li><p><code>bru_mapper_linear()</code>: Create a mapper for linear effects</p></li>
+<li><p><code>bru_mapper_matrix()</code>: Create a matrix mapper, for a given number of columns</p></li>
+<li><p><code>bru_mapper_factor()</code>: Create a factor mapper</p></li>
+<li><p><code>bru_mapper_const()</code>: Create a constant mapper</p></li>
+<li><p><code>bru_mapper_scale()</code>: Create a standalone
 scaling mapper that can be used as part of a <code>bru_mapper_pipe</code>.
 If <code>mapper</code> is non-null, the <code>bru_mapper_scale()</code> constructor
 returns
-<code>bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))</code></p>
-<p>For <code>bru_mapper_pipe()</code>, <code>mappers</code> is a list of mappers,
+<code>bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))</code></p></li>
+<li><p><code>bru_mapper_aggregate()</code>: Constructs a mapper
+that aggregates elements of the input state, so it can be used e.g.
+for weighted summation or integration over blocks of values.</p></li>
+<li><p><code>bru_mapper_logsumexp()</code>: Constructs a mapper
+that aggregates elements of <code>exp(state)</code>, with optional weighting,
+and then takes the <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code>, so it can be used e.g.
+for  \(v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]\)
+calculations.</p></li>
+<li><p><code>bru_mapper_pipe()</code>: Create a pipe mapper, where, <code>mappers</code> is a list of mappers,
 where the evaluated output of each mapper is handed as the state to the next
 mapper..
 The <code>input</code> format for the <code>ibm_eval</code> and <code>ibm_jacobian</code> methods is
-a list of inputs, one for each mapper</p>
-<ul><li><p><code>bru_mapper_multi</code> constructs a kronecker product mapping</p></li>
-</ul><ul><li><p><code>bru_mapper_collect</code> constructs concatenated collection mapping</p></li>
-</ul><ul><li><p><code>bru_mapper_harmonics</code> constructs a mapper for <code>cos</code>/<code>sin</code> functions
+a list of inputs, one for each mapper.</p></li>
+<li><p><code>bru_mapper_multi()</code>: Constructs a rowwise Kronecker product mapping</p></li>
+<li><p><code>bru_mapper_collect()</code>: Constructs a concatenated collection mapping</p></li>
+<li><p><code>bru_mapper_harmonics()</code>: Constructs a mapper for <code>cos</code>/<code>sin</code> functions
 of orders 1 (if <code>intercept</code> is <code>TRUE</code>, otherwise 0) through <code>order</code>. The total
 number of basis functions is <code>intercept + 2 * order</code>.</p>
 <p>Optionally, each order can be given a non-unit scaling, via the <code>scaling</code>
@@ -291,7 +328,8 @@ determining the variance for each frequency contribution.</p>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><a href="bru_mapper_methods.html">bru_mapper_methods</a> for specific method implementations, and
+    <div class="dont-index"><p><a href="bru_mapper_generics.html">bru_mapper_generics</a> for generic methods,
+<a href="bru_mapper_methods.html">bru_mapper_methods</a> for specific method implementations, and
 <a href="bru_get_mapper.html">bru_get_mapper</a> for hooks to extract mappers from latent model object
 class objects.</p></div>
     </div>
@@ -299,7 +337,7 @@ class objects.</p></div>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_index</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="bru_mapper_methods.html">ibm_jacobian</a></span><span class="op">(</span><span class="va">mapper</span>, input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="bru_mapper_generics.html">ibm_jacobian</a></span><span class="op">(</span><span class="va">mapper</span>, input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5 x 5 sparse Matrix of class "dgCMatrix"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 1 . . . .</span>

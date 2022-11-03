@@ -92,38 +92,42 @@ future version.</p>
 <span></span>
 <span><span class="fu">init.tutorial</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">ibm_valid_input</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for bru_mapper_inla_mesh_2d</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_inla_mesh_1d</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_index</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_linear</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_matrix</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_factor</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_offset</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_offset</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_n</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_offset</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_values</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_offset</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_multi</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_collect</span></span>
-<span><span class="fu"><a href="bru_mapper_methods.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">eval_SpatialDF</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -156,17 +160,19 @@ options instead instead.  In versions &lt;= 2.1.15, this function set the INLA
 integration strategy to "eb" to speed up calculations. This is normally not
 needed since version 2.2.0, since the only the final iteration will use
 other than "eb".</p></li>
-<li><p><code>ibm_amatrix(bru_mapper_inla_mesh_2d)</code>: Replaced by <code><a href="bru_mapper_methods.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_inla_mesh_1d)</code>: Replaced by <code><a href="bru_mapper_methods.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_index)</code>: Replaced by <code><a href="bru_mapper_methods.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_linear)</code>: Replaced by <code><a href="bru_mapper_methods.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_matrix)</code>: Replaced by <code><a href="bru_mapper_methods.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_factor)</code>: Replaced by <code><a href="bru_mapper_methods.html">ibm_jacobian()</a></code></p></li>
+<li><p><code>ibm_valid_input()</code>: Use case changed to <code><a href="bru_mapper_generics.html">ibm_invalid_output()</a></code></p></li>
+<li><p><code>ibm_amatrix(bru_mapper_inla_mesh_2d)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
+<li><p><code>ibm_amatrix(bru_mapper_inla_mesh_1d)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
+<li><p><code>ibm_amatrix(bru_mapper_index)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
+<li><p><code>ibm_amatrix(bru_mapper_linear)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
+<li><p><code>ibm_amatrix(bru_mapper_matrix)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
+<li><p><code>ibm_amatrix(bru_mapper_factor)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
+<li><p><code>bru_mapper_offset()</code>: Creates a <code><a href="bru_mapper.html">bru_mapper_const()</a></code> mapper.</p></li>
 <li><p><code>ibm_n(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
 <li><p><code>ibm_values(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
 <li><p><code>ibm_amatrix(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
-<li><p><code>ibm_amatrix(bru_mapper_multi)</code>: Replaced by <code><a href="bru_mapper_methods.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_collect)</code>: Replaced by <code><a href="bru_mapper_methods.html">ibm_jacobian()</a></code></p></li>
+<li><p><code>ibm_amatrix(bru_mapper_multi)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
+<li><p><code>ibm_amatrix(bru_mapper_collect)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
 <li><p><code>eval_SpatialDF()</code>: Replaced by the generic <code><a href="eval_spatial.html">eval_spatial()</a></code></p></li>
 </ul></div>
     <div class="section level2">
