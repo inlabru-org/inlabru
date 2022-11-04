@@ -768,17 +768,6 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
   INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
 }
 
-#' @export
-#' @rdname bru_mapper_methods
-ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
-  if (is.null(input)) {
-    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
-  }
-  if (!is.matrix(input) && !inherits(input, "Spatial")) {
-    input <- as.matrix(input)
-  }
-  INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
-}
 
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
@@ -828,7 +817,14 @@ ibm_jacobian.bru_mapper_inla_mesh_1d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
+  ok <- !is.na(input)
+  if (all(ok)) {
+    A <- INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
+  } else {
+    A <- Matrix::Matrix(0, length(input), ibm_n(mapper))
+    A[ok, ] <- INLA::inla.spde.make.A(mapper[["mesh"]], loc = input[ok])
+  }
+  A
 }
 
 #' @export
@@ -850,11 +846,12 @@ bru_mapper_index <- function(n = 1L, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_invalid_output.bru_mapper_index <- function(mapper, input, state, ...) {
-  ok <- !is.na(input)
-  ok[ok] <-
-    (input[ok] >= 1) &
-      (input[ok] <= ibm_n_output(mapper, input, state, ...))
-  !ok
+  # Allow NA to give effect zero
+  nok <- !is.na(input)
+  nok[nok] <-
+    !((input[nok] >= 1) &
+      (input[nok] <= ibm_n_output(mapper, input, state, ...)))
+  nok
 }
 
 

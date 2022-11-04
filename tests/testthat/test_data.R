@@ -9,7 +9,7 @@ test_that("Component construction: default mesh/mapping construction, data is li
 
   lik <- like("gaussian",
     formula = y ~ .,
-    data = list(x = c(1, 1.5, 2, 3, 4), y = 11:15),
+    data = list(x = c(1, 1.5, 2, NA, 3, 4), y = 11:15),
     include = "effect"
   )
 
@@ -17,14 +17,19 @@ test_that("Component construction: default mesh/mapping construction, data is li
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
-    1:4
+    sort(unique(lik$data$x), na.last = NA)
   )
 
   cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    sort(unique(lik$data$x), na.last = NA)
+  )
 
-  mesh1 <- INLA::inla.mesh.1d(lik$data$x)
+  mesh1 <- INLA::inla.mesh.1d(
+    sort(unique(lik$data$x), na.last = NA)
+  )
   expect_error(
     component_list(
       ~ effect(x, model = "rw2", mapper = mesh1) - 1
@@ -39,7 +44,10 @@ test_that("Component construction: default mesh/mapping construction, data is li
     ) - 1
   )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    sort(unique(lik$data$x), na.last = NA)
+  )
 
   cmp1 <- component_list(
     ~ effect(x,
@@ -48,7 +56,10 @@ test_that("Component construction: default mesh/mapping construction, data is li
     ) - 1
   )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, seq_along(lik$data$x))
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    seq_along(sort(unique(lik$data$x), na.last = NA))
+  )
 })
 
 

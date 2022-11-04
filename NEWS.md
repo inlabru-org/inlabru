@@ -2,12 +2,23 @@
 
 ## Features
 
+* Allow `NA` input for default 1D mappers to generate effect zero, like
+  in `inla()`.
+
 * Further `bru_mapper` method updates;
 
   * Deprecated `ibm_amatrix()` and `names()`
   methods, replaced by `ibm_jacobian()` and `ibm_names()`.
   
   * Introduced `bru_mapper_pipe()`, used to link mappers in sequence.
+  
+  * Introduced `bru_mapper_aggregate()` and `bru_mapper_logsumexp()`,
+    used for blockwise weighted sums and log-sum-exp mappings,
+    `output[k] = sum(weights[block==k]*state[block==k])))` and
+    `output[k] = log(sum(weights[block==k]*exp(state[block==k])))`,
+    with optional weight normalisation within each block.  Allows
+    providing the weights as log-weights, and uses block-wise shifts to
+    avoid potential overflow.
   
   * `summary` methods for `bru_mapper` objects
   

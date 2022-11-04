@@ -84,15 +84,16 @@ add_mappers <- function(...) {
 #' \itemize{
 #' \item{\eqn{c} }{is the *intercept*}
 #' \item{\eqn{x }}{is a *covariate*}
-#' \item{\eqn{\beta} }{is a *random variable* associated with \eqn{x} and}
-#' \item{\eqn{\psi = \beta * x }}{ is called the *random effect* of \eqn{x}}
+#' \item{\eqn{\beta} }{is a *latent variable* associated with \eqn{x} and}
+#' \item{\eqn{\psi = \beta * x }}{ is called the *effect* of \eqn{x}}
 #' }
 #'
 #' A problem that arises when using this kind of R formula is that it does not
 #' clearly reflect the mathematical
 #' formula. For instance, when providing the formula to inla, the resulting
 #' object will refer to the random
-#' effect \eqn{\psi = \beta * x } as `x`. Hence, it is not clear if `x` refers to the covariate
+#' effect \eqn{\psi = \beta * x } as `x`.
+#' Hence, it is not clear when `x` refers to the covariate
 #' or the effect of the covariate.
 #'
 #' @section Naming random effects:
@@ -1377,7 +1378,7 @@ make_mapper <- function(subcomp,
       bru_mapper_collect(mappers, hidden = TRUE)
   } else {
     # No mapper; construct based on input values
-    # Interpolation off by default for iid models
+    # Interpolation on by default
     subcomp[["mapper"]] <-
       make_submapper(
         subcomp_n = subcomp[["n"]],
@@ -1387,8 +1388,7 @@ make_mapper <- function(subcomp,
         subcomp_type = subcomp[["type"]],
         subcomp_factor_mapping = subcomp[["factor_mapping"]],
         require_indexed = require_indexed,
-        allow_interpolation =
-          !(subcomp[["model"]] %in% c("iid"))
+        allow_interpolation = TRUE
       )
   }
   subcomp

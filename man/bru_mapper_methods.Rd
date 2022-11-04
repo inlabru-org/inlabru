@@ -81,8 +81,6 @@
 
 \method{ibm_jacobian}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
 
-\method{ibm_jacobian}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
-
 \method{ibm_n}{bru_mapper_inla_mesh_1d}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_inla_mesh_1d}(mapper, ...)
