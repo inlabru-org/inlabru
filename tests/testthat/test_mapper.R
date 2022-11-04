@@ -1,7 +1,6 @@
 local_bru_testthat_setup()
 
 test_that("Linear mapper", {
-
   mapper <- bru_mapper_linear()
 
   input <- seq_len(4)
@@ -25,7 +24,6 @@ test_that("Linear mapper", {
 
 
 test_that("Index mapper", {
-
   values <- seq_len(4)
   state <- c(10, 20, 30, 40)
   mapper <- bru_mapper_index(max(values))
@@ -51,7 +49,6 @@ test_that("Index mapper", {
 
 
 test_that("Factor mapper", {
-
   all_values <-
     list(
       full = c("a", "b", "c"),
@@ -97,7 +94,6 @@ test_that("Factor mapper", {
 
 
 test_that("Pipe mapper", {
-
   mapper <-
     bru_mapper_pipe(
       list(
@@ -137,7 +133,6 @@ test_that("Pipe mapper", {
 
 
 test_that("Aggregate mapper", {
-
   mapper <- bru_mapper_aggregate(rescale = FALSE)
 
   expect_equal(ibm_n(mapper), NA_integer_)
@@ -152,7 +147,7 @@ test_that("Aggregate mapper", {
   expect_equal(ibm_values(mapper, state = c(1, 1)), seq_len(2))
 
   input <-
-    list(block = c(1,2,2,1,3), weights = c(1, 1, 1, 2, 3))
+    list(block = c(1, 2, 2, 1, 3), weights = c(1, 1, 1, 2, 3))
   state <- c(1, 2, 3, 4, 5)
 
   val <- c(9, 5, 15)
@@ -183,7 +178,7 @@ test_that("Aggregate mapper", {
   A <- Matrix::sparseMatrix(
     i = c(1, 1, 2, 2, 3),
     j = c(1, 4, 2, 3, 5),
-    x = c(1/3, 2/3, 1/2, 1/2, 3/3),
+    x = c(1 / 3, 2 / 3, 1 / 2, 1 / 2, 3 / 3),
     dims = c(3, 5)
   )
   expect_equal(ibm_eval(mapper, input = input, state = state), val)
@@ -193,21 +188,20 @@ test_that("Aggregate mapper", {
   delta <- (runif(length(state)) * 2 - 1) * 1e-6
   num_deriv <-
     (ibm_eval(mapper, input = input, state = state + delta) -
-       ibm_eval(mapper, input = input, state = state - delta)) /
-    (2 * sum(delta^2)^0.5)
+      ibm_eval(mapper, input = input, state = state - delta)) /
+      (2 * sum(delta^2)^0.5)
   jac_deriv <-
     as.vector(ibm_jacobian(mapper, input = input, state = state) %*%
-                (delta / sum(delta^2)^0.5))
+      (delta / sum(delta^2)^0.5))
   expect_equal(
     num_deriv,
     jac_deriv,
-    tolerance = lowtol)
-
+    tolerance = lowtol
+  )
 })
 
 
 test_that("logsumexp mapper", {
-
   mapper <- bru_mapper_logsumexp(rescale = FALSE)
 
   expect_equal(ibm_n(mapper), NA_integer_)
@@ -222,7 +216,7 @@ test_that("logsumexp mapper", {
   expect_equal(ibm_values(mapper, state = c(1, 1)), seq_len(2))
 
   input <-
-    list(block = c(1,2,2,1,3), weights = c(1, 1, 1, 2, 3))
+    list(block = c(1, 2, 2, 1, 3), weights = c(1, 1, 1, 2, 3))
   state <- c(1, 2, 3, 4, 5)
 
   val <- c(4.717736, 3.313262, 6.098612)
@@ -235,11 +229,13 @@ test_that("logsumexp mapper", {
   expect_equal(
     ibm_eval(mapper, input = input, state = state),
     val,
-    tolerance = lowtol)
+    tolerance = lowtol
+  )
   expect_equal(
     ibm_jacobian(mapper, input = input, state = state),
     A,
-    tolerance = midtol)
+    tolerance = midtol
+  )
 
 
   mapper <- bru_mapper_logsumexp(rescale = TRUE)
@@ -265,25 +261,28 @@ test_that("logsumexp mapper", {
   expect_equal(
     ibm_eval(mapper, input = input, state = state),
     val,
-    tolerance = lowtol)
+    tolerance = lowtol
+  )
   expect_equal(
     ibm_jacobian(mapper, input = input, state = state),
     A,
-    tolerance = midtol)
+    tolerance = midtol
+  )
 
   set.seed(123L)
   delta <- (runif(length(state)) * 2 - 1) * 1e-6
   num_deriv <-
     (ibm_eval(mapper, input = input, state = state + delta) -
-    ibm_eval(mapper, input = input, state = state - delta)) /
-    (2 * sum(delta^2)^0.5)
+      ibm_eval(mapper, input = input, state = state - delta)) /
+      (2 * sum(delta^2)^0.5)
   jac_deriv <-
     as.vector(ibm_jacobian(mapper, input = input, state = state) %*%
-                (delta / sum(delta^2)^0.5))
+      (delta / sum(delta^2)^0.5))
   expect_equal(
     num_deriv,
     jac_deriv,
-    tolerance = lowtol)
+    tolerance = lowtol
+  )
 })
 
 

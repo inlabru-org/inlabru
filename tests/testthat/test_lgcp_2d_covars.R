@@ -59,13 +59,17 @@ test_that("2D LGCP fitting", {
   )
 
   expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004192824,
-               tolerance = midtol)
+    tolerance = midtol
+  )
   expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.00249103,
-               tolerance = midtol)
+    tolerance = midtol
+  )
   expect_equal(fit2$summary.fixed["Intercept", "mean"], 3.069781,
-               tolerance = midtol)
+    tolerance = midtol
+  )
   expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.05587102,
-               tolerance = midtol)
+    tolerance = midtol
+  )
 
   f.elev <- function(x, y) {
     spp <- SpatialPoints(data.frame(x = x, y = y),
@@ -90,11 +94,15 @@ test_that("2D LGCP fitting", {
   )
 
   expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004192824,
-               tolerance = midtol)
+    tolerance = midtol
+  )
   expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.00249103,
-               tolerance = midtol)
+    tolerance = midtol
+  )
   expect_equal(fit2$summary.fixed["Intercept", "mean"], 3.069781,
-               tolerance = midtol)
+    tolerance = midtol
+  )
   expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.05587102,
-               tolerance = midtol)
+    tolerance = midtol
+  )
 })

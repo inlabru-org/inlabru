@@ -216,7 +216,8 @@ ibm_invalid_output <- function(mapper, input, state, ...) {
 ibm_valid_input <- function(...) {
   lifecycle::deprecate_stop(
     "2.6.0.9001",
-    "ibm_valid_input()")
+    "ibm_valid_input()"
+  )
   UseMethod("ibm_valid_input")
 }
 
@@ -852,7 +853,7 @@ ibm_invalid_output.bru_mapper_index <- function(mapper, input, state, ...) {
   ok <- !is.na(input)
   ok[ok] <-
     (input[ok] >= 1) &
-    (input[ok] <= ibm_n_output(mapper, input, state, ...))
+      (input[ok] <= ibm_n_output(mapper, input, state, ...))
   !ok
 }
 
@@ -1454,8 +1455,8 @@ ibm_jacobian.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
   # Behaviour for v2.6.0, non-null mapper
   if (is.null(sub_lin)) {
     A <- ibm_jacobian(mapper[["mapper"]],
-                      input = input[["mapper"]],
-                      state = state, ...
+      input = input[["mapper"]],
+      state = state, ...
     )
   } else {
     A <- sub_lin$jacobian
@@ -1490,8 +1491,8 @@ ibm_linear.bru_mapper_scale <- function(mapper, input, state, ...) {
 
   # Behaviour for v2.6.0, non-null mapper
   sub_lin <- ibm_linear(mapper[["mapper"]],
-                        input[["mapper"]],
-                        state = state, ...
+    input[["mapper"]],
+    state = state, ...
   )
   bru_mapper_taylor(
     offset = ibm_eval(mapper, input, state, ..., sub_lin = sub_lin),
@@ -1522,8 +1523,8 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
     values <- ibm_eval(sub_lin, input = NULL, state = state)
   } else {
     values <- ibm_eval(mapper[["mapper"]],
-                       input = input[["mapper"]],
-                       state = state, ...
+      input = input[["mapper"]],
+      state = state, ...
     )
   }
   if ((NROW(values) > 0) && !is.null(input[["scale"]])) {
@@ -1560,8 +1561,10 @@ bru_mapper_aggregate <- function(rescale = FALSE,
                                  n_block = NULL,
                                  ...) {
   bru_mapper_define(
-    list(rescale = rescale,
-         n_block = n_block),
+    list(
+      rescale = rescale,
+      n_block = n_block
+    ),
     new_class = "bru_mapper_aggregate"
   )
 }
@@ -1580,12 +1583,14 @@ ibm_n.bru_mapper_aggregate <- function(mapper, ...,
   } else if (!is.null(n_state)) {
     n_state
   } else if (!is.null(input) &&
-             (!is.null(input[["block"]]) ||
-              !is.null(input[["weights"]]) ||
-              !is.null(input[["log_weights"]]))) {
-    max(length(input[["block"]]),
-        length(input[["weights"]]),
-        length(input[["log_weights"]]))
+    (!is.null(input[["block"]]) ||
+      !is.null(input[["weights"]]) ||
+      !is.null(input[["log_weights"]]))) {
+    max(
+      length(input[["block"]]),
+      length(input[["weights"]]),
+      length(input[["log_weights"]])
+    )
     length(input[["block"]])
   } else {
     NA_integer_
@@ -1655,7 +1660,8 @@ bm_aggregate_input <- function(input,
       }
     } else if (!is.null(weights)) {
       warning("Both weights and log_weights supplied. Using log_weights.",
-              immediate. = TRUE)
+        immediate. = TRUE
+      )
       weights <- NULL
     }
     if (length(log_weights) == 1) {
@@ -1668,7 +1674,8 @@ bm_aggregate_input <- function(input,
       # log_weights is non-NULL
       if (!is.null(log_weights)) {
         warning("Both weights and log_weights supplied. Using weights.",
-                immediate. = TRUE)
+          immediate. = TRUE
+        )
         log_weights <- NULL
       }
       if (length(weights) == 1) {
@@ -1697,17 +1704,21 @@ bm_calc_weights <- function(block, log_weights, weights,
   if (rescale) {
     # Compute blockwise normalised weights
     if (!is.null(log_weights)) {
-      log_weights <- bm_calc_log_weights(log_weights = log_weights,
-                                         block = block,
-                                         n_out = n_out,
-                                         n_state = n_state)
+      log_weights <- bm_calc_log_weights(
+        log_weights = log_weights,
+        block = block,
+        n_out = n_out,
+        n_state = n_state
+      )
       weights <- exp(log_weights)
     } else {
       scale <- as.vector(
-        Matrix::sparseMatrix(i = block,
-                             j = rep(1L, n_state),
-                             x = weights,
-                             dims = c(n_out, 1))
+        Matrix::sparseMatrix(
+          i = block,
+          j = rep(1L, n_state),
+          x = weights,
+          dims = c(n_out, 1)
+        )
       )
       weights <- weights / scale[block]
     }
@@ -1729,24 +1740,30 @@ bm_calc_weights <- function(block, log_weights, weights,
 #' If `weights` is `NULL`, it's interpreted as all-1.
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...) {
-  input <- bm_aggregate_input(input, state = state,
-                              allow_log = TRUE,
-                              force_log = FALSE)
+  input <- bm_aggregate_input(input,
+    state = state,
+    allow_log = TRUE,
+    force_log = FALSE
+  )
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
 
   weights <-
-    bm_calc_weights(block = input[["block"]],
-                    log_weights = input[["log_weights"]],
-                    weights = input[["weights"]],
-                    n_out = n_out,
-                    n_state = n_state,
-                    rescale = mapper[["rescale"]])
+    bm_calc_weights(
+      block = input[["block"]],
+      log_weights = input[["log_weights"]],
+      weights = input[["weights"]],
+      n_out = n_out,
+      n_state = n_state,
+      rescale = mapper[["rescale"]]
+    )
 
-  Matrix::sparseMatrix(i = input[["block"]],
-                       j = seq_len(n_state),
-                       x = weights,
-                       dims = c(n_out, n_state))
+  Matrix::sparseMatrix(
+    i = input[["block"]],
+    j = seq_len(n_state),
+    x = weights,
+    dims = c(n_out, n_state)
+  )
 }
 
 
@@ -1754,25 +1771,31 @@ ibm_jacobian.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...) 
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
                                           sub_lin = NULL) {
-  input <- bm_aggregate_input(input, state = state,
-                              allow_log = TRUE,
-                              force_log = FALSE)
+  input <- bm_aggregate_input(input,
+    state = state,
+    allow_log = TRUE,
+    force_log = FALSE
+  )
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
 
   weights <-
-    bm_calc_weights(block = input[["block"]],
-                    log_weights = input[["log_weights"]],
-                    weights = input[["weights"]],
-                    n_out = n_out,
-                    n_state = n_state,
-                    rescale = mapper[["rescale"]])
+    bm_calc_weights(
+      block = input[["block"]],
+      log_weights = input[["log_weights"]],
+      weights = input[["weights"]],
+      n_out = n_out,
+      n_state = n_state,
+      rescale = mapper[["rescale"]]
+    )
 
   values <-
-    Matrix::sparseMatrix(i = input[["block"]],
-                         j = rep(1L, n_state),
-                         x = state * weights,
-                         dims = c(n_out, 1))
+    Matrix::sparseMatrix(
+      i = input[["block"]],
+      j = rep(1L, n_state),
+      x = state * weights,
+      dims = c(n_out, 1)
+    )
   as.vector(values)
 }
 
@@ -1813,8 +1836,10 @@ bru_mapper_logsumexp <- function(rescale = FALSE,
   # Arguments documented for bru_mapper_aggregate
   # Inherit class bru_mapper_aggregate to reuse common methods
   bru_mapper_define(
-    list(rescale = rescale,
-         n_block = n_block),
+    list(
+      rescale = rescale,
+      n_block = n_block
+    ),
     new_class = c("bru_mapper_logsumexp", "bru_mapper_aggregate")
   )
 }
@@ -1825,11 +1850,13 @@ bm_calc_log_shift <- function(block, log_weights, n_out, n_state) {
   block_k <- sort(unique(block))
   shift <- numeric(n_out)
   shift[block_k] <-
-    vapply(block_k,
-           function(k) {
-             max(log_weights[block == k])
-           },
-           0.0)
+    vapply(
+      block_k,
+      function(k) {
+        max(log_weights[block == k])
+      },
+      0.0
+    )
   shift
 }
 
@@ -1840,13 +1867,17 @@ bm_calc_log_weights <- function(block, log_weights, weights = NULL,
     log_weights <- log(weights)
   }
   if (rescale) {
-    shift <- bm_calc_log_shift(block = block, log_weights = log_weights,
-                               n_out = n_out, n_state = n_state)
+    shift <- bm_calc_log_shift(
+      block = block, log_weights = log_weights,
+      n_out = n_out, n_state = n_state
+    )
     log_rescale <- as.vector(
-      Matrix::sparseMatrix(i = block,
-                           j = rep(1L, n_state),
-                           x = exp(log_weights - shift[block]),
-                           dims = c(n_out, 1))
+      Matrix::sparseMatrix(
+        i = block,
+        j = rep(1L, n_state),
+        x = exp(log_weights - shift[block]),
+        dims = c(n_out, 1)
+      )
     )
     log_rescale <- (log(log_rescale) + shift)[block]
     log_weights <- log_weights - log_rescale
@@ -1865,8 +1896,10 @@ bm_calc_log_weights <- function(block, log_weights, weights = NULL,
 #' If `weights` is `NULL`, it's interpreted as all-1.
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) {
-  input <- bm_aggregate_input(input, state = state,
-                              allow_log = TRUE, force_log = TRUE)
+  input <- bm_aggregate_input(input,
+    state = state,
+    allow_log = TRUE, force_log = TRUE
+  )
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
 
@@ -1880,24 +1913,30 @@ ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) 
 
   # Compute shift for stable log-sum-exp
   w_state <- state + log_weights
-  shift <- bm_calc_log_shift(log_weights = w_state,
-                             block = input[["block"]],
-                             n_out = n_out,
-                             n_state = n_state)
+  shift <- bm_calc_log_shift(
+    log_weights = w_state,
+    block = input[["block"]],
+    n_out = n_out,
+    n_state = n_state
+  )
 
   sum_values <-
     as.vector(
-      Matrix::sparseMatrix(i = input[["block"]],
-                           j = rep(1L, n_state),
-                           x = exp(w_state - shift[input[["block"]]]),
-                           dims = c(n_out, 1))
+      Matrix::sparseMatrix(
+        i = input[["block"]],
+        j = rep(1L, n_state),
+        x = exp(w_state - shift[input[["block"]]]),
+        dims = c(n_out, 1)
+      )
     )
   scale <- sum_values[input[["block"]]]
 
-  Matrix::sparseMatrix(i = input[["block"]],
-                       j = seq_len(n_state),
-                       x = exp(w_state - shift[input[["block"]]]) / scale,
-                       dims = c(n_out, n_state))
+  Matrix::sparseMatrix(
+    i = input[["block"]],
+    j = seq_len(n_state),
+    x = exp(w_state - shift[input[["block"]]]) / scale,
+    dims = c(n_out, n_state)
+  )
 }
 
 
@@ -1906,8 +1945,10 @@ ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) 
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...,
                                           sub_lin = NULL) {
-  input <- bm_aggregate_input(input, state = state,
-                              allow_log = TRUE, force_log = TRUE)
+  input <- bm_aggregate_input(input,
+    state = state,
+    allow_log = TRUE, force_log = TRUE
+  )
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
 
@@ -1921,16 +1962,20 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...,
 
   # Compute shift for stable log-sum-exp
   w_state <- state + log_weights
-  shift <- bm_calc_log_shift(log_weights = w_state,
-                             block = input[["block"]],
-                             n_out = n_out,
-                             n_state = n_state)
+  shift <- bm_calc_log_shift(
+    log_weights = w_state,
+    block = input[["block"]],
+    n_out = n_out,
+    n_state = n_state
+  )
 
   values <-
-    Matrix::sparseMatrix(i = input[["block"]],
-                         j = rep(1L, n_state),
-                         x = exp(w_state - shift[input[["block"]]]),
-                         dims = c(n_out, 1))
+    Matrix::sparseMatrix(
+      i = input[["block"]],
+      j = rep(1L, n_state),
+      x = exp(w_state - shift[input[["block"]]]),
+      dims = c(n_out, 1)
+    )
   log(as.vector(values)) + shift
 }
 
