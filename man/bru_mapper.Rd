@@ -208,10 +208,16 @@ that aggregates elements of the input state, so it can be used e.g.
 for weighted summation or integration over blocks of values.
 
 \item \code{bru_mapper_logsumexp()}: Constructs a mapper
-that aggregates elements of \code{exp(state)}, with optional weighting,
+that aggregates elements of \code{exp(state)}, with optional non-negative weighting,
 and then takes the \code{log()}, so it can be used e.g.
 for  \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]}{log(blocksum(w*exp(state)))}
-calculations.
+and \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]}{log(blocksum(w*exp(state)/blocksum(w)))}
+calculations.  Relies on the input handling methods for \code{bru_mapper_aggregate},
+but also allows the weights to be supplied on a logarithmic scale as \code{log_weights}.
+To avoid numerical overflow, it uses the common method of internally
+shifting the state blockwise with
+\code{(state-log_weights)[block] - max((state-log_weights)[block])},
+and shifting the result back afterwards.
 
 \item \code{bru_mapper_pipe()}: Create a pipe mapper, where, \code{mappers} is a list of mappers,
 where the evaluated output of each mapper is handed as the state to the next
