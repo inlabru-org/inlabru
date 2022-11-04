@@ -205,19 +205,19 @@ ibm_values(mapper, ..., state = NULL, n_state = NULL)
 ibm_jacobian(mapper, input, state = NULL, ...)
 
 # S3 method for bru_mapper_aggregate
-ibm_linear(mapper, input, state, ...)
+ibm_eval(mapper, input, state = NULL, ..., sub_lin = NULL)
 
 # S3 method for bru_mapper_aggregate
-ibm_eval(mapper, input, state = NULL, ..., sub_lin = NULL)
+ibm_linear(mapper, input, state, ...)
 
 # S3 method for bru_mapper_logsumexp
 ibm_jacobian(mapper, input, state = NULL, ...)
 
 # S3 method for bru_mapper_logsumexp
-ibm_linear(mapper, input, state, ...)
+ibm_eval(mapper, input, state = NULL, ..., sub_lin = NULL)
 
 # S3 method for bru_mapper_logsumexp
-ibm_eval(mapper, input, state = NULL, ..., sub_lin = NULL)
+ibm_linear(mapper, input, state, ...)
 
 # S3 method for bru_mapper_pipe
 ibm_n(mapper, ..., state = NULL)

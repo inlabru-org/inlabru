@@ -298,10 +298,16 @@ returns
 that aggregates elements of the input state, so it can be used e.g.
 for weighted summation or integration over blocks of values.</p></li>
 <li><p><code>bru_mapper_logsumexp()</code>: Constructs a mapper
-that aggregates elements of <code>exp(state)</code>, with optional weighting,
+that aggregates elements of <code>exp(state)</code>, with optional non-negative weighting,
 and then takes the <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code>, so it can be used e.g.
 for  \(v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]\)
-calculations.</p></li>
+and \(v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]\)
+calculations.  Relies on the input handling methods for <code>bru_mapper_aggregate</code>,
+but also allows the weights to be supplied on a logarithmic scale as <code>log_weights</code>.
+To avoid numerical overflow, it uses the common method of internally
+shifting the state blockwise with
+<code>(state-log_weights)[block] - max((state-log_weights)[block])</code>,
+and shifting the result back afterwards.</p></li>
 <li><p><code>bru_mapper_pipe()</code>: Create a pipe mapper, where, <code>mappers</code> is a list of mappers,
 where the evaluated output of each mapper is handed as the state to the next
 mapper..
