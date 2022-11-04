@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,10 +78,12 @@
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
 <div class="section level3">
 <h3 id="features-development-version">Features<a class="anchor" aria-label="anchor" href="#features-development-version"></a></h3>
-<ul><li>
+<ul><li><p>Allow <code>NA</code> input for default 1D mappers to generate effect zero, like in <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code>.</p></li>
+<li>
 <p>Further <code>bru_mapper</code> method updates;</p>
 <ul><li><p>Deprecated <code><a href="../reference/bru_mapper_generics.html">ibm_amatrix()</a></code> and <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</p></li>
 <li><p>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_pipe()</a></code>, used to link mappers in sequence.</p></li>
+<li><p>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_aggregate()</a></code> and <code><a href="../reference/bru_mapper.html">bru_mapper_logsumexp()</a></code>, used for blockwise weighted sums and log-sum-exp mappings, <code>output[k] = sum(weights[block==k]*state[block==k])))</code> and <code>output[k] = log(sum(weights[block==k]*exp(state[block==k])))</code>, with optional weight normalisation within each block. Allows providing the weights as log-weights, and uses block-wise shifts to avoid potential overflow.</p></li>
 <li><p><code>summary</code> methods for <code>bru_mapper</code> objects</p></li>
 <li><p>Removed <code>methods</code> argument from <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code>. Implementations should register S3 methods instead.</p></li>
 </ul></li>
@@ -89,7 +91,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p>Remove unused <code>spatstat.core</code> dependency. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/165" class="external-link">#165</a></p></li>
-<li><p>Fixed ossue with plain mapper evaluation in the <code>ibm_eval.default</code> and <code>ibm_eval.bru_mapper_collect</code> methods, where they would return zeros instead of the intended values. The main component evaluation and estimation code was not directly affected as that is based on the <code>bru_mapper_multi</code> class methods that rely on the Jacobians instead. The bug would therefore mainly have impacted the future, not yet supported nonlinear mapper extensions.</p></li>
+<li><p>Fixed issue with plain mapper evaluation in the <code>ibm_eval.default</code> and <code>ibm_eval.bru_mapper_collect</code> methods, where they would return zeros instead of the intended values. The main component evaluation and estimation code was not directly affected as that is based on the <code>bru_mapper_multi</code> class methods that rely on the Jacobians instead. The bug would therefore mainly have impacted the future, not yet supported nonlinear mapper extensions.</p></li>
 </ul></div>
 </div>
     <div class="section level2">

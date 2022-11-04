@@ -36,7 +36,7 @@ method, called inside bru()."><!-- mathjax --><script src="https://cdnjs.cloudfl
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -269,13 +269,14 @@ the linear predictor \(\eta\) would be written down as</p>
 <p>where:</p>
 <ul><li><p>\(c\) is the <em>intercept</em></p></li>
 <li><p>\(x \)is a <em>covariate</em></p></li>
-<li><p>\(\beta\) is a <em>random variable</em> associated with \(x\) and</p></li>
-<li><p>\(\psi = \beta * x \) is called the <em>random effect</em> of \(x\)</p></li>
+<li><p>\(\beta\) is a <em>latent variable</em> associated with \(x\) and</p></li>
+<li><p>\(\psi = \beta * x \) is called the <em>effect</em> of \(x\)</p></li>
 </ul><p>A problem that arises when using this kind of R formula is that it does not
 clearly reflect the mathematical
 formula. For instance, when providing the formula to inla, the resulting
 object will refer to the random
-effect \(\psi = \beta * x \) as <code>x</code>. Hence, it is not clear if <code>x</code> refers to the covariate
+effect \(\psi = \beta * x \) as <code>x</code>.
+Hence, it is not clear when <code>x</code> refers to the covariate
 or the effect of the covariate.</p>
 <p>The <code>component.character</code> method is inlabru's equivalent to INLA's
 <code>f</code> function but adds functionality that is unique to inlabru.</p>
