@@ -15,7 +15,10 @@ test_that("Component construction: default mesh/mapping construction, data is li
 
   cmp1 <- component_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    1:4
+  )
 
   cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))

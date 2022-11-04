@@ -1377,6 +1377,7 @@ make_mapper <- function(subcomp,
       bru_mapper_collect(mappers, hidden = TRUE)
   } else {
     # No mapper; construct based on input values
+    # Interpolation off by default for iid models
     subcomp[["mapper"]] <-
       make_submapper(
         subcomp_n = subcomp[["n"]],
@@ -1386,7 +1387,8 @@ make_mapper <- function(subcomp,
         subcomp_type = subcomp[["type"]],
         subcomp_factor_mapping = subcomp[["factor_mapping"]],
         require_indexed = require_indexed,
-        allow_interpolation = TRUE
+        allow_interpolation =
+          !(subcomp[["model"]] %in% c("iid"))
       )
   }
   subcomp
@@ -1967,6 +1969,11 @@ input_eval.bru_input <- function(input, data, env = NULL,
   }
 
   # Check for NA values.
+  # TODO: update 2022-11-04:
+  # iid models now by default are given _index mappers, which treat NAs
+  # as zero.  An option to turn on a warning could be useful for checking
+  # models that aren't supposed to have NA inputs.
+  #
   #  if (any(is.na(unlist(as.vector(val))))) {
   #    # TODO: remove this check and make sure NAs are handled properly elsewhere,
   #    # if possible. Problem: treating NA as "no effect" can have negative side

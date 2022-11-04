@@ -200,7 +200,7 @@ test_that("Component construction: terra", {
 
 
 
-test_that("Component construction: default mesh/mapping construction", {
+test_that("Component construction: default index/mesh/mapping construction", {
   skip_on_cran()
   local_bru_safe_inla()
 
@@ -212,7 +212,17 @@ test_that("Component construction: default mesh/mapping construction", {
 
   cmp1 <- component_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    1:4
+  )
+  expect_equal(
+    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$main,
+      input = c(1, NA, 4),
+      state = c(11, 12, 13, 14)
+    ),
+    c(11, 0, 14)
+  )
 
   cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
@@ -243,6 +253,35 @@ test_that("Component construction: default mesh/mapping construction", {
   )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, seq_along(lik$data$x))
+})
+
+
+
+test_that("Component construction: default iid factor construction", {
+  skip_on_cran()
+
+  lik <- like("gaussian",
+    formula = y ~ .,
+    data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
+    include = "effect"
+  )
+
+  cmp1 <- component_list(~ effect(as.factor(c(1, 1.5, 2, 3, 4)),
+    model = "iid"
+  ) - 1)
+  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    as.character(lik$data$x)
+  )
+
+  expect_equal(
+    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$main,
+      input = as.factor(c(1, NA, 4)),
+      state = c(11, 12, 13, 14, 15)
+    ),
+    c(11, 0, 15)
+  )
 })
 
 
