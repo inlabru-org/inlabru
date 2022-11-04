@@ -29,7 +29,7 @@
 
 * Remove unused `spatstat.core` dependency. Fixes #165
 
-* Fixed ossue with plain mapper evaluation in the `ibm_eval.default`
+* Fixed issue with plain mapper evaluation in the `ibm_eval.default`
   and `ibm_eval.bru_mapper_collect` methods, where they would return zeros
   instead of the intended values.
   The main component evaluation and estimation code was not directly affected
