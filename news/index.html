@@ -92,6 +92,7 @@
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p>Remove unused <code>spatstat.core</code> dependency. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/165" class="external-link">#165</a></p></li>
 <li><p>Fixed issue with plain mapper evaluation in the <code>ibm_eval.default</code> and <code>ibm_eval.bru_mapper_collect</code> methods, where they would return zeros instead of the intended values. The main component evaluation and estimation code was not directly affected as that is based on the <code>bru_mapper_multi</code> class methods that rely on the Jacobians instead. The bug would therefore mainly have impacted the future, not yet supported nonlinear mapper extensions.</p></li>
+<li><p>Fix for eval_spatial.SpatRaster; Work around inconsistent logic in <code>terra::extract(..., layer)</code> when <code>length(layer)==1</code> or <code>nrow(where)==1</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/169" class="external-link">#169</a></p></li>
 </ul></div>
 </div>
     <div class="section level2">
