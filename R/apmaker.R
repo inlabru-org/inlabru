@@ -1,4 +1,4 @@
-# @aliases ipmaker
+# @aliases apmaker
 # @export
 # @param samplers A `Spatial[Points/Lines/Polygons]DataFrame` object
 # @param domain A list of named integration definitions, each either a numeric
