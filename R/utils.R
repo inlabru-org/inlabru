@@ -165,18 +165,20 @@ extract_selector <- function(where, selector) {
 }
 
 extract_layer <- function(where, layer, selector) {
-  if (!is.null(layer) && !is.null(selector)) {
-    warning("Both layer and selector specified. Ignoring selector",
-      immediate. = TRUE
-    )
-    selector <- NULL
-    if (length(layer) == 1) {
-      layer <- rep(layer, NROW(where))
+  if (!is.null(layer)) {
+    if (!is.null(selector)) {
+      warning("Both layer and selector specified. Ignoring selector",
+              immediate. = TRUE
+      )
     }
+    selector <- NULL
   } else if (!is.null(selector)) {
     layer <- extract_selector(where, selector)
-  } else if (is.null(layer) && is.null(selector)) {
-    layer <- rep(1, NROW(where))
+  } else if (is.null(layer)) {
+    layer <- 1
+  }
+  if (length(layer) == 1) {
+    layer <- rep(layer, NROW(where))
   }
   layer
 }
@@ -200,8 +202,8 @@ eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
 
 #' @describeIn inlabru-deprecated Replaced by the generic [eval_spatial()]
 eval_SpatialDF <- function(...) {
-  .Deprecated("eval_spatial")
-  eval_spatial.Spatial(...)
+  lifecycle::deprecate_warn("2.6.0", "eval_spatial()")
+  eval_spatial(...)
 }
 
 #' @export
@@ -243,12 +245,27 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
   if (!inherits(where, "SpatVector")) {
     where <- terra::vect(where)
   }
-  val <- terra::extract(
-    data,
-    where,
-    ID = FALSE,
-    layer = layer
-  )
+  if ((NROW(where) == 1) && (terra::nlyr(data) > 1)) {
+    # Work around issue in terra::extract() that assumes `layer` to point
+    # to a column of `where` (like `selector`) when
+    # length(layer)==1 (NROW(where)==1),
+    # but otherwise be used directly for indexing into data.
+    # When nlyr == 1, terra:extract ignores the layer input.
+    val <- terra::extract(
+      data,
+      rbind(where, where),
+      ID = FALSE,
+      layer = c(layer, layer)
+    )
+    val <- val[1, , drop = FALSE]
+  } else {
+    val <- terra::extract(
+      data,
+      where,
+      ID = FALSE,
+      layer = layer
+    )
+  }
   if (terra::nlyr(data) == 1) {
     val <- val[[1]]
   } else {

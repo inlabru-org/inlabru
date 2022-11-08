@@ -36,6 +36,10 @@
   as that is based on the `bru_mapper_multi` class methods that rely on the
   Jacobians instead.  The bug would therefore mainly have impacted the future,
   not yet supported nonlinear mapper extensions.
+  
+* Fix for eval_spatial.SpatRaster; Work around inconsistent logic in
+  `terra::extract(..., layer)` when `length(layer)==1` or `nrow(where)==1`.
+  Fixes #169
 
 # inlabru 2.6.0
 
