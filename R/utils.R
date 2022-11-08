@@ -168,7 +168,7 @@ extract_layer <- function(where, layer, selector) {
   if (!is.null(layer)) {
     if (!is.null(selector)) {
       warning("Both layer and selector specified. Ignoring selector",
-              immediate. = TRUE
+        immediate. = TRUE
       )
     }
     selector <- NULL
@@ -250,7 +250,7 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
     # to a column of `where` (like `selector`) when
     # length(layer)==1 (NROW(where)==1),
     # but otherwise be used directly for indexing into data.
-    # When nlyr == 1, terra:extract ignores the layer input.
+    # When nlyr == 1, terra::extract ignores the layer input.
     val <- terra::extract(
       data,
       rbind(where, where),
