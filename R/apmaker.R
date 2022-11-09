@@ -1,11 +1,12 @@
 # @aliases apmaker
 # @export
 # @param samplers A `Spatial[Points/Lines/Polygons]DataFrame` object
-# @param domain A list of named integration definitions, each either a numeric
-# vector of points given integration weight 1, an `inla.mesh.1d` object, or an
-# `inla.mesh.2d` object. Only those domains that are not given in the `samplers`
-# data.frame are used, plus the coordinates object, used for the spatial aspect
-# of the `samplers` object.
+# TODO 20221109 does domainsssss make more sense?
+# @param domain A list/A list of list(s) of named integration definitions, each
+# either a numeric vector of points given integration weight 1, an
+# `inla.mesh.1d` object, or an `inla.mesh.2d` object. Only those domains that
+# are not given in the `samplers` data.frame are used, plus the coordinates
+# object, used for the spatial aspect of the `samplers` object.
 # @param dnames Names of dimensions
 # @param int.args List of arguments passed on to \code{ipoints}
 # @return Integration points
@@ -16,7 +17,8 @@ apmaker <- function(samplers, domain, dnames,
   # To allow sf geometry support, should likely change the logic to
   # use the domain specification to determine the type of integration
   # method to call, so that it doesn't need to rely on the domain name.
-
+  # TODO 20221109 For multiple samplers multiple domains, it does have to rely
+  # on the domain names. or does it contradict?
   if ("coordinates" %in% dnames) {
     spatial <- TRUE
   } else {
@@ -47,7 +49,7 @@ apmaker <- function(samplers, domain, dnames,
 
   if (spatial) {
     ips <- ipoints(samplers, domain$coordinates,
-                   group = samp.dim, int.args = int.args
+      group = samp.dim, int.args = int.args
     )
   } else {
     ips <- NULL
