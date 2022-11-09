@@ -5,7 +5,7 @@ if (family == "apc") {
   }
 
   if (is.null(ips)) {
-    ips <- ipmaker(
+    ips <- apmaker(
       samplers = samplers,
       domain = domain,
       dnames = response,
