@@ -58,8 +58,8 @@ test_that("Conversion from sfc_POINT to inla.mesh.segment", {
   segm.bnd.sf <- fm_as_inla_mesh_segment(loc.sf, is.bnd = TRUE)
 
   expect_identical(segm.bnd.sf, segm.bnd)
-  str(segm.bnd)
-  str(segm.bnd.sf)
+#  str(segm.bnd)
+#  str(segm.bnd.sf)
 
   crs <- sf::st_crs(sf::st_geometry(loc.sf))
 
