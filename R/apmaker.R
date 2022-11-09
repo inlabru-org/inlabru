@@ -1,12 +1,13 @@
 # @aliases apmaker
 # @export
-# @param samplers A `Spatial[Points/Lines/Polygons]DataFrame` object
+# @param samplers A `[sf]DataFrame` or Spatial[Points/Lines/Polygons]DataFrame`
+# object
 # TODO 20221109 does domainsssss make more sense?
 # @param domain A list/A list of list(s) of named integration definitions, each
-# either a numeric vector of points given integration weight 1, an
-# `inla.mesh.1d` object, or an `inla.mesh.2d` object. Only those domains that
-# are not given in the `samplers` data.frame are used, plus the coordinates
-# object, used for the spatial aspect of the `samplers` object.
+# either a vector of factors ,a numeric vector of points given integration
+#  weight 1, an `inla.mesh.1d` object, or an `inla.mesh.2d` object. Only those
+# domains that are not given in the `samplers` data.frame are used, plus the
+# coordinates object, used for the spatial aspect of the `samplers` object.
 # @param dnames Names of dimensions
 # @param int.args List of arguments passed on to \code{ipoints}
 # @return Integration points
