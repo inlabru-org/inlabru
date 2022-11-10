@@ -20,6 +20,15 @@ apmaker <- function(samplers, domain, dnames,
   # method to call, so that it doesn't need to rely on the domain name.
   # TODO 20221109 For multiple samplers multiple domains, it does have to rely
   # on the domain names. or does it contradict?
+
+  if (class(samplers) %in% "sf") {
+    is_sf <- TRUE
+  } else is_sf <- FALSE
+
+  if (names(domain) == NULL) {
+    is_multi_domains <- FALSE
+  } else is_multi_domains <- TRUE
+
   if ("coordinates" %in% dnames) {
     spatial <- TRUE
   } else {
