@@ -103,7 +103,7 @@ test_that("bru: factor component", {
     xpost4[4, , drop = FALSE],
     xpost4[5, , drop = FALSE]
   )
-  # The columns should all be different
+  # The columns should all different values
   expect_equal(
     sum(xpost4[, 1] == xpost4[, 2]),
     0

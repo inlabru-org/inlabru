@@ -2,12 +2,23 @@
 
 ## Features
 
+* Allow `NA` input for default 1D mappers to generate effect zero, like
+  in `inla()`.
+
 * Further `bru_mapper` method updates;
 
   * Deprecated `ibm_amatrix()` and `names()`
   methods, replaced by `ibm_jacobian()` and `ibm_names()`.
   
   * Introduced `bru_mapper_pipe()`, used to link mappers in sequence.
+  
+  * Introduced `bru_mapper_aggregate()` and `bru_mapper_logsumexp()`,
+    used for blockwise weighted sums and log-sum-exp mappings,
+    `output[k] = sum(weights[block==k]*state[block==k])))` and
+    `output[k] = log(sum(weights[block==k]*exp(state[block==k])))`,
+    with optional weight normalisation within each block.  Allows
+    providing the weights as log-weights, and uses block-wise shifts to
+    avoid potential overflow.
   
   * `summary` methods for `bru_mapper` objects
   
@@ -18,13 +29,17 @@
 
 * Remove unused `spatstat.core` dependency. Fixes #165
 
-* Fixed ossue with plain mapper evaluation in the `ibm_eval.default`
+* Fixed issue with plain mapper evaluation in the `ibm_eval.default`
   and `ibm_eval.bru_mapper_collect` methods, where they would return zeros
   instead of the intended values.
   The main component evaluation and estimation code was not directly affected
   as that is based on the `bru_mapper_multi` class methods that rely on the
   Jacobians instead.  The bug would therefore mainly have impacted the future,
   not yet supported nonlinear mapper extensions.
+  
+* Fix for eval_spatial.SpatRaster; Work around inconsistent logic in
+  `terra::extract(..., layer)` when `length(layer)==1` or `nrow(where)==1`.
+  Fixes #169
 
 # inlabru 2.6.0
 

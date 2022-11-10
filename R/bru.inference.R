@@ -569,9 +569,9 @@ eval_in_data_context <- function(input,
   }
   if (inherits(result, "try-error")) {
     stop(paste0(
-      "Input ",
-      substitute(input),
-      " could not be evaluated."
+      "Input '",
+      deparse(input),
+      "' could not be evaluated."
     ))
   }
   if (is.null(result)) {

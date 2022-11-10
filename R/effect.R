@@ -84,15 +84,16 @@ add_mappers <- function(...) {
 #' \itemize{
 #' \item{\eqn{c} }{is the *intercept*}
 #' \item{\eqn{x }}{is a *covariate*}
-#' \item{\eqn{\beta} }{is a *random variable* associated with \eqn{x} and}
-#' \item{\eqn{\psi = \beta * x }}{ is called the *random effect* of \eqn{x}}
+#' \item{\eqn{\beta} }{is a *latent variable* associated with \eqn{x} and}
+#' \item{\eqn{\psi = \beta * x }}{ is called the *effect* of \eqn{x}}
 #' }
 #'
 #' A problem that arises when using this kind of R formula is that it does not
 #' clearly reflect the mathematical
 #' formula. For instance, when providing the formula to inla, the resulting
 #' object will refer to the random
-#' effect \eqn{\psi = \beta * x } as `x`. Hence, it is not clear if `x` refers to the covariate
+#' effect \eqn{\psi = \beta * x } as `x`.
+#' Hence, it is not clear when `x` refers to the covariate
 #' or the effect of the covariate.
 #'
 #' @section Naming random effects:
@@ -782,19 +783,22 @@ add_mappers.component <- function(component, lhoods, ...) {
     )
   lh <- lhoods[keep_lh]
 
-  component$main <- add_mapper(component$main,
+  component$main <- add_mapper(
+    component$main,
     label = component$label,
     lhoods = lh,
     env = component$env,
     require_indexed = FALSE
   )
-  component$group <- add_mapper(component$group,
+  component$group <- add_mapper(
+    component$group,
     label = component$label,
     lhoods = lh,
     env = component$env,
     require_indexed = TRUE
   )
-  component$replicate <- add_mapper(component$replicate,
+  component$replicate <- add_mapper(
+    component$replicate,
     label = component$label,
     lhoods = lh,
     env = component$env,
@@ -1157,7 +1161,8 @@ make_submapper <- function(subcomp_n,
                            label,
                            subcomp_type,
                            subcomp_factor_mapping,
-                           require_indexed) {
+                           require_indexed,
+                           allow_interpolation = TRUE) {
   if (!is.null(subcomp_n)) {
     if (!is.null(subcomp_values)) {
       warning(
@@ -1184,11 +1189,15 @@ make_submapper <- function(subcomp_n,
   } else {
     values <- sort(unique(values), na.last = NA)
     if (length(values) > 1) {
-      mapper <-
-        bru_mapper(
-          INLA::inla.mesh.1d(values),
-          indexed = require_indexed
-        )
+      if (allow_interpolation) {
+        mapper <-
+          bru_mapper(
+            INLA::inla.mesh.1d(values),
+            indexed = require_indexed
+          )
+      } else {
+        mapper <- bru_mapper_index(n = ceiling(max(values)))
+      }
     } else if (all(values == 1)) {
       if (require_indexed) {
         mapper <- bru_mapper_index(n = 1)
@@ -1349,6 +1358,8 @@ make_mapper <- function(subcomp,
     subcomp[["mapper"]] <- bru_mapper_matrix(labels)
   } else if (subcomp[["model"]] %in% c("bym", "bym2")) {
     # No mapper; construct based on input values
+    # Default mapper will be integer or factor indexed, not
+    # interpolated
     mappers <- list(
       make_submapper(
         subcomp_n = subcomp[["n"]],
@@ -1357,7 +1368,8 @@ make_mapper <- function(subcomp,
         label = paste0(subcomp[["label"]], " part 1"),
         subcomp_type = subcomp[["type"]],
         subcomp_factor_mapping = subcomp[["factor_mapping"]],
-        require_indexed = require_indexed
+        require_indexed = require_indexed,
+        allow_interpolation = FALSE
       )
     )
     mappers[[2]] <- mappers[[1]]
@@ -1366,6 +1378,7 @@ make_mapper <- function(subcomp,
       bru_mapper_collect(mappers, hidden = TRUE)
   } else {
     # No mapper; construct based on input values
+    # Interpolation on by default
     subcomp[["mapper"]] <-
       make_submapper(
         subcomp_n = subcomp[["n"]],
@@ -1374,7 +1387,8 @@ make_mapper <- function(subcomp,
         label = subcomp[["label"]],
         subcomp_type = subcomp[["type"]],
         subcomp_factor_mapping = subcomp[["factor_mapping"]],
-        require_indexed = require_indexed
+        require_indexed = require_indexed,
+        allow_interpolation = TRUE
       )
   }
   subcomp
@@ -1955,6 +1969,11 @@ input_eval.bru_input <- function(input, data, env = NULL,
   }
 
   # Check for NA values.
+  # TODO: update 2022-11-04:
+  # iid models now by default are given _index mappers, which treat NAs
+  # as zero.  An option to turn on a warning could be useful for checking
+  # models that aren't supposed to have NA inputs.
+  #
   #  if (any(is.na(unlist(as.vector(val))))) {
   #    # TODO: remove this check and make sure NAs are handled properly elsewhere,
   #    # if possible. Problem: treating NA as "no effect" can have negative side
