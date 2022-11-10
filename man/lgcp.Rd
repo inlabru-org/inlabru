@@ -49,7 +49,7 @@ hand side of the formula provided via the model parameter.
 The left hand side determines the intensity function that is assumed to
 drive the LGCP. This may include effects that lead to a thinning (filtering)
 of the point process. By default, the log intensity is assumed to be a linear
-combination of the effects defined by the formula's RHS. More sofisticated
+combination of the effects defined by the formula's RHS. More sophisticated
 models, e.g. non-linear thinning, can be achieved by using the predictor
 argument. The latter requires multiple runs of INLA for improving the
 required approximation of the predictor. In many applications the LGCP is

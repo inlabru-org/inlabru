@@ -15,7 +15,7 @@ A \code{data.frame} or \code{SpatialPointsDataFrame} of multidimensional integra
 \description{
 Calculates the cross product of integration points in different dimensions
 and multiplies their weights accordingly. If the object defining points in a particular
-dimension has no weights attached to it all weights are assumend to be 1.
+dimension has no weights attached to it all weights are assumed to be 1.
 }
 \examples{
 \donttest{

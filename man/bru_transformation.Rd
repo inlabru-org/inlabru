@@ -2,6 +2,7 @@
 % Please edit documentation in R/transformation.R
 \name{bru_forward_transformation}
 \alias{bru_forward_transformation}
+\alias{bru_transformation}
 \alias{bru_inverse_transformation}
 \title{Transformation tools}
 \usage{
@@ -37,9 +38,9 @@ Tools for transforming between N(0,1) variables and other
 distributions in predictor expressions
 }
 \examples{
-\dontrun{
-if (interactive()) {
-  # EXAMPLE1
-}
-}
+u <- rnorm(5, 0, 1)
+y <- bru_forward_transformation(qexp, u, rate = 2)
+v <- bru_inverse_transformation(pexp, y, rate = 2)
+rbind(u, y, v)
+
 }

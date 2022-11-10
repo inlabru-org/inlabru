@@ -9,15 +9,15 @@
 #' can avoid lack of accuracy in the distribution tails. If `NULL`, forward calculations split at 0,
 #' and inverse calculations use lower tails only, potentially losing accuracy in the upper tails.
 #' @return * For `bru_forward_transformation`, a numeric vector
-#' @examples
-#' \dontrun{
-#' if (interactive()) {
-#'   # EXAMPLE1
-#' }
-#' }
 #' @export
 #' @rdname bru_transformation
-
+#' @aliases bru_transformation
+#' @examples
+#' u <- rnorm(5, 0, 1)
+#' y <- bru_forward_transformation(qexp, u, rate = 2)
+#' v <- bru_inverse_transformation(pexp, y, rate = 2)
+#' rbind(u, y, v)
+#'
 bru_forward_transformation <- function(qfun, x, ..., tail.split. = 0) {
   if (is.null(tail.split.)) {
     # By default, split at 0

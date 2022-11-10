@@ -66,6 +66,7 @@ or track the development version builds via [inlabru-org.r-universe.dev](https:/
 # Enable universe(s) by inlabru-org
 options(repos = c(
   inlabruorg = 'https://inlabru-org.r-universe.dev',
+  INLA = 'https://inla.r-inla-download.org/R/testing',
   CRAN = 'https://cloud.r-project.org'))
 
 # Install some packages

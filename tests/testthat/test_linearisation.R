@@ -26,12 +26,21 @@ test_that("Linearisation", {
 
 
   idx <- evaluate_index(model, lhoods)
-  A <- evaluate_A(model, lhoods, inla_f = FALSE)
-  lin0 <- bru_compute_linearisation.bru_model(model, lhoods,
-    state = list(Int_y = 0, Int_z = 0, x = 0), A = A
+  inp <- evaluate_inputs(model, lhoods, inla_f = FALSE)
+  comp_lin <- evaluate_comp_lin(model, input = inp, state = NULL)
+  lin0 <- bru_compute_linearisation.bru_model(
+    model,
+    lhoods = lhoods,
+    input = inp,
+    state = list(Int_y = 0, Int_z = 0, x = 0),
+    comp_simple = comp_lin
   )
-  lin <- bru_compute_linearisation.bru_model(model, lhoods,
-    state = list(x = 1 / 5, Int_y = -4, Int_z = 4), A = A
+  lin <- bru_compute_linearisation.bru_model(
+    model,
+    lhoods = lhoods,
+    input = inp,
+    state = list(x = 1 / 5, Int_y = -4, Int_z = 4),
+    comp_simple = comp_lin
   )
 
   stks0 <-
@@ -39,18 +48,21 @@ test_that("Linearisation", {
       seq_along(lhoods),
       function(lh_idx) {
         lh <- lhoods[[lh_idx]]
-        lin_A <- lin0[[lh_idx]]$A
+        lin_off <- ibm_eval(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
+        lin_A <- ibm_jacobian(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
+        nms <- names(lin_A)
         INLA::inla.stack(
           list(
-            BRU.response = lh$data[[lh$response]],
+            BRU.response = lh$response_data[[lh$response]],
             BRU.E = lh[["E"]],
             BRU.Ntrials = lh[["Ntrials"]],
-            BRU.offset = as.vector(lin0[[lh_idx]]$offset)
+            BRU.weights = lh[["weights"]],
+            BRU.offset = as.vector(lin_off)
           ),
-          A = lapply(names(lin_A), function(nm) {
+          A = lapply(nms, function(nm) {
             lin_A[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
           }),
-          effects = idx[["idx_inla"]][names(lin0[[lh_idx]]$A)]
+          effects = idx[["idx_inla"]][nms]
         )
       }
     )

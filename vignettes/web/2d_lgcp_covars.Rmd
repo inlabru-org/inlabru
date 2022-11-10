@@ -123,7 +123,7 @@ fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(coordinates = mesh
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit1.rds")
 if ((!.cache_recompute) &&
-    file.exists(.cache_file)) {
+  file.exists(.cache_file)) {
   fit1 <- readRDS(file = .cache_file)
 } else {
   fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(coordinates = mesh))
@@ -174,7 +174,7 @@ pcmatern <- inla.spde2.pcmatern(mesh,
 )
 
 comp2 <- coordinates ~
--1 +
+  -1 +
   vegetation(gcov$vegetation, model = "factor_full") +
   mySmooth(coordinates, model = pcmatern)
 ```
@@ -184,7 +184,7 @@ fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(coordinates = mesh
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit2.rds")
 if ((!.cache_recompute) &&
-    file.exists(.cache_file)) {
+  file.exists(.cache_file)) {
   fit2 <- readRDS(file = .cache_file)
 } else {
   fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(coordinates = mesh))
@@ -280,7 +280,7 @@ fit3 <- lgcp(comp3,
 comp3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept(1)
 .cache_file <- file.path(.cache_dir, "fit3.rds")
 if ((!.cache_recompute) &&
-    file.exists(.cache_file)) {
+  file.exists(.cache_file)) {
   fit3 <- readRDS(file = .cache_file)
 } else {
   fit3 <- lgcp(comp3, nests, samplers = boundary, domain = list(coordinates = mesh))
@@ -308,37 +308,46 @@ Lambda3
 ```{r warning=FALSE,message=FALSE}
 knitr::kable(cbind(
   deltaIC(fit1, fit2, fit3, criterion = c("DIC")),
-  deltaIC(fit1, fit2, fit3, criterion = c("WAIC"))))
+  deltaIC(fit1, fit2, fit3, criterion = c("WAIC"))
+))
 ```
 NOTE: the behaviour of DIC and WAIC is currently a bit unclear, in particular for experimental
 mode, and is being investigated.
 
 Classic mode:
 ```{r echo=FALSE}
-knitr::kable(cbind(dplyr::tribble(
-~Model, ~DIC, ~Delta.DIC,
-"fit2",  2224.131,	0.00000,
-"fit3",	2274.306,	50.17504,
-"fit1",	3124.784,	900.65339),
-dplyr::tribble(
-  ~Model,	~WAIC,	~Delta.WAIC,
-"fit1",	2672.234,	0.0000,
-"fit3",	2949.498,	277.2636,
-"fit2",	3040.140,	367.9051)))
+knitr::kable(cbind(
+  dplyr::tribble(
+    ~Model, ~DIC, ~Delta.DIC,
+    "fit2", 2224.131, 0.00000,
+    "fit3", 2274.306, 50.17504,
+    "fit1", 3124.784, 900.65339
+  ),
+  dplyr::tribble(
+    ~Model, ~WAIC, ~Delta.WAIC,
+    "fit1", 2672.234, 0.0000,
+    "fit3", 2949.498, 277.2636,
+    "fit2", 3040.140, 367.9051
+  )
+))
 ```
 
 Experimental mode:
 ```{r echo=FALSE}
-knitr::kable(cbind(dplyr::tribble(
-  ~Model, ~DIC, ~Delta.DIC,
-  "fit1",	-563.3583,	0.000,
-  "fit3",	509.4010,	1072.759,
-  "fit2",	597.6459,	1161.004),
+knitr::kable(cbind(
   dplyr::tribble(
-    ~Model,	~WAIC,	~Delta.WAIC,
-    "fit1",	1373.241,	0.0000,
-    "fit3",	1584.543,	211.3021,
-    "fit2",	1636.864,	263.6225)))
+    ~Model, ~DIC, ~Delta.DIC,
+    "fit1", -563.3583, 0.000,
+    "fit3", 509.4010, 1072.759,
+    "fit2", 597.6459, 1161.004
+  ),
+  dplyr::tribble(
+    ~Model, ~WAIC, ~Delta.WAIC,
+    "fit1", 1373.241, 0.0000,
+    "fit3", 1584.543, 211.3021,
+    "fit2", 1636.864, 263.6225
+  )
+))
 ```
 
 #### CV and SPDE parameters for Model 2
@@ -457,7 +466,7 @@ efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(coordinates = mesh
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "efit.rds")
 if ((!.cache_recompute) &&
-    file.exists(.cache_file)) {
+  file.exists(.cache_file)) {
   efit <- readRDS(file = .cache_file)
 } else {
   efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(coordinates = mesh))
@@ -639,13 +648,17 @@ elev.pred <- predict(
 ggplot(elev.pred) +
   geom_line(aes(elevation, mean)) +
   geom_ribbon(aes(elevation,
-                  ymin = q0.025,
-                  ymax = q0.975),
-              alpha = 0.2) +
+    ymin = q0.025,
+    ymax = q0.975
+  ),
+  alpha = 0.2
+  ) +
   geom_ribbon(aes(elevation,
-                  ymin = mean - 1 * sd,
-                  ymax = mean + 1 * sd),
-              alpha = 0.2)
+    ymin = mean - 1 * sd,
+    ymax = mean + 1 * sd
+  ),
+  alpha = 0.2
+  )
 ```
 
 
