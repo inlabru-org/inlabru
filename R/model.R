@@ -157,14 +157,17 @@ evaluate_model <- function(model,
     stop("Not enough information to evaluate model states.")
   }
   if (is.null(input) && !is.null(data)) {
-    input <- input_eval(components = model$effects[included],
-                        data = data,
-                        inla_f = TRUE)
+    input <- input_eval(
+      components = model$effects[included],
+      data = data,
+      inla_f = TRUE
+    )
   }
   if (is.null(comp_simple) && !is.null(input)) {
     comp_simple <- evaluate_comp_simple(model$effects[included],
-                                        input = input,
-                                        inla_f = TRUE)
+      input = input,
+      inla_f = TRUE
+    )
   }
   if (is.null(comp_simple)) {
     effects <- NULL
@@ -272,7 +275,7 @@ evaluate_effect_multi_state <- function(...) {
 #' @rdname evaluate_effect
 
 evaluate_effect_single_state.bru_mapper <- function(component, input, state,
-                                                     ...) {
+                                                    ...) {
   values <- ibm_eval(component, input = input, state = state, ...)
 
   as.vector(as.matrix(values))
@@ -449,7 +452,7 @@ evaluate_predictor <- function(model,
             enclos = .enclos
           )
         }
-        .input = list(
+        .input <- list(
           mapper = list(
             main = main,
             group = group,
@@ -464,11 +467,15 @@ evaluate_predictor <- function(model,
           state = .state
         )
         if (.is_iid) {
-          ok <- ibm_valid_input(
-            .mapper,
-            input = .input
+          # Check for known invalid output elements, based on the
+          # initial mapper (subsequent mappers in the component pipe
+          # are assumed to keep the same length and validity)
+          not_ok <- ibm_invalid_output(
+            .mapper[["mappers"]][[1]],
+            input = .input[[1]],
+            state = .state
           )
-          if (any(!ok)) {
+          if (any(not_ok)) {
             .cache_state_index <- eval(
               parse(text = ".cache_state_index"),
               envir = .envir,
@@ -478,7 +485,7 @@ evaluate_predictor <- function(model,
               .iid_cache_index <<- .cache_state_index
               .iid_cache <<- list()
             }
-            key <- as.character(main[!ok])
+            key <- as.character(main[not_ok])
             not_cached <- !(key %in% names(.iid_cache))
             if (any(not_cached)) {
               .prec <- eval(
@@ -490,7 +497,7 @@ evaluate_predictor <- function(model,
                 .iid_cache[k] <<- rnorm(1, mean = 0, sd = .prec^-0.5)
               }
             }
-            .values[!ok] <- vapply(
+            .values[not_ok] <- vapply(
               key,
               function(k) .iid_cache[[k]],
               0.0
@@ -667,9 +674,11 @@ evaluate_comp_simple <- function(...) {
 #' @rdname evaluate_comp_simple
 evaluate_comp_simple.component_list <- function(components, input,
                                                 inla_f = FALSE, ...) {
-  are_linear <- vapply(components,
-                       function(x) ibm_is_linear(x[["mapper"]]),
-                       TRUE)
+  are_linear <- vapply(
+    components,
+    function(x) ibm_is_linear(x[["mapper"]]),
+    TRUE
+  )
   the_linear <- names(components)[are_linear]
   the_nonlinear <- names(components)[!are_linear]
 
@@ -686,9 +695,13 @@ evaluate_comp_simple.component_list <- function(components, input,
 
   if (any(!are_linear)) {
     warning("Non-linear mappers are experimental!", immediate. = TRUE)
-    mappers <- c(mappers,
-                 lapply(components[the_nonlinear],
-                        function(x) x[["mapper"]]))
+    mappers <- c(
+      mappers,
+      lapply(
+        components[the_nonlinear],
+        function(x) x[["mapper"]]
+      )
+    )
   }
 
   # Reorder

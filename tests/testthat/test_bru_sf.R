@@ -1,0 +1,81 @@
+local_bru_testthat_setup()
+
+test_that("sf gorillas lgcp vignette", {
+  skip("Feature not yet implemented")
+
+  skip_on_cran()
+  local_bru_safe_inla()
+  skip_if_not_installed("sf")
+
+  # Code adapted from the lgcp vignette with an additional mesh construction
+  # step instead of using the mesh provided in the gorillas data.
+
+  # All sp objects in the example are replaced with sf equivalents.
+
+  data(gorillas, package = "inlabru")
+  gorillas_sf <- list()
+  gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
+
+  # Bug in st_as_sf making check_ring_dir=TRUE have no effect, as st_as_sfc.SpatialPolygons
+  # ignores it. To get around it, need to convert to sfc_POLYGON first, and then do a separate
+  # st_sfc call, which does use check_ring_dir.
+  # No effect:
+  b1 <- sf::st_as_sf(gorillas$boundary, check_ring_dir = TRUE)
+  # st_sfc gives the proper effect:
+  b2 <- b1
+  b2$geometry <- sf::st_sfc(sf::st_geometry(b2$geometry), check_ring_dir = TRUE)
+
+  gorillas_sf$boundary <- b2
+
+  ## Build boundary information:
+  ## inla.mesh.2d doesn't support sf yet.
+  boundary <- list(
+    fm_as_inla_mesh_segment(gorillas_sf$boundary),
+    NULL
+  )
+
+  ## Build the mesh:
+  mesh_sf <- INLA::inla.mesh.2d(
+    boundary = boundary,
+    max.edge = c(0.54, 0.97),
+    min.angle = c(30, 21),
+    max.n = c(48000, 16000),
+    ## Safeguard against large meshes.
+    max.n.strict = c(128000, 128000),
+    ## Don't build a huge mesh!
+    cutoff = 0.01,
+    ## Filter away adjacent points.
+    offset = c(0.73, 1.55)
+  ) ## Offset for extra boundaries, if needed.
+
+  # library(ggplot2)
+  # ggplot() +
+  #   gg(mesh_sf) +
+  #   geom_sf(data = gorillas_sf$boundary, alpha = 0.2, fill = "blue")
+
+  matern <- INLA::inla.spde2.pcmatern(mesh_sf,
+    prior.sigma = c(0.1, 0.01),
+    prior.range = c(5, 0.01)
+  )
+
+  library(sf)
+  # Using sf::st_coordinates here did not seem to parse correctly
+  # and the domain definition in the lgcp() call was expecting a
+  # domain named sf.
+  # FL: st_coordinates produces a matrix with both coordinates and some labelling columns,
+  # so is not a proper equivalent of sp::coordinates. But the geometry column
+  # makes sense to use.
+  cmp <- geometry ~ mySmooth(geometry, model = matern) +
+    Intercept(1)
+
+  # Check integration construction
+  ips_sp <- ipoints(gorillas$boundary, mesh_sf)
+  ips_sf <- ipoints(gorillas_sf$boundary, mesh_sf)
+
+  fit <- lgcp(
+    cmp,
+    data = gorillas_sf$nests,
+    samplers = gorillas_sf$boundary,
+    domain = list(geometry = mesh_sf)
+  )
+})

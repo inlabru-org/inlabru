@@ -7,11 +7,14 @@ test_that("2D LGCP fitting", {
   # test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
   data(gorillas, package = "inlabru", envir = environment())
 
-  mdl <- coordinates ~ veg(
+  # Uses the component label to pick the covariate layer to extract,
+  # so doesn't need an explicit main_layer="vegetation".
+
+  mdl <- coordinates ~ vegetation(
     main = gorillas$gcov$vegetation,
-    main_layer = "vegetation",
     model = "iid"
   ) - Intercept
+
   fit <- lgcp(
     mdl, gorillas$nests,
     samplers = gorillas$boundary,
@@ -55,10 +58,18 @@ test_that("2D LGCP fitting", {
     )
   )
 
-  expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004192824, tolerance = midtol)
-  expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.00249103, tolerance = midtol)
-  expect_equal(fit2$summary.fixed["Intercept", "mean"], 3.069781, tolerance = midtol)
-  expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.05587102, tolerance = midtol)
+  expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004192824,
+    tolerance = midtol
+  )
+  expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.00249103,
+    tolerance = midtol
+  )
+  expect_equal(fit2$summary.fixed["Intercept", "mean"], 3.069781,
+    tolerance = midtol
+  )
+  expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.05587102,
+    tolerance = midtol
+  )
 
   f.elev <- function(x, y) {
     spp <- SpatialPoints(data.frame(x = x, y = y),
@@ -69,7 +80,8 @@ test_that("2D LGCP fitting", {
     return(v$elevation)
   }
 
-  mdl3 <- coordinates ~ beta.elev(main = f.elev(x, y), model = "linear") + Intercept(1)
+  mdl3 <- coordinates ~ beta.elev(main = f.elev(x, y), model = "linear") +
+    Intercept(1)
   fit3 <- lgcp(mdl3, gorillas$nests,
     samplers = gorillas$boundary,
     domain = list(coordinates = gorillas$mesh),
@@ -81,8 +93,16 @@ test_that("2D LGCP fitting", {
     )
   )
 
-  expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004192824, tolerance = midtol)
-  expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.00249103, tolerance = midtol)
-  expect_equal(fit2$summary.fixed["Intercept", "mean"], 3.069781, tolerance = midtol)
-  expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.05587102, tolerance = midtol)
+  expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004192824,
+    tolerance = midtol
+  )
+  expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.00249103,
+    tolerance = midtol
+  )
+  expect_equal(fit2$summary.fixed["Intercept", "mean"], 3.069781,
+    tolerance = midtol
+  )
+  expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.05587102,
+    tolerance = midtol
+  )
 })
