@@ -29,31 +29,38 @@ subgraph "main, group, replicate"
   mapper([mapper])
 end
 weights(["weights"])
-input_comb(["combined inputs:<br/>list(mapper = list(main, group, replicate),<br/>scale = weights)"])
+input_comb(["combined inputs:
+  list(mapper = list(main, group, replicate),
+  scale = weights)"])
 multi_mapper(["mapper_multi<br/>list(main, group, replicate)"])
 scale_mapper([mapper_scale])
+pipe_mapper([mapper_pipe])
+state([state])
 lin(["mapper_linearised<br/>(offset, jacobian, state0)"])
 effect([effect])
 
 ibm_do_lin{linearise}
-state([state])
 ibm_lin[ibm_linear]
 ibm_eval[ibm_eval]
+ibm_eval_lin[ibm_eval]
 
 %% edge definitions with the node IDs
 input --> input_comb
 weights --> input_comb
 input_comb --> ibm_eval
 input_comb --> ibm_lin
-scale_mapper --> ibm_do_lin
+pipe_mapper --> ibm_do_lin
 ibm_do_lin -->|Yes| ibm_lin
 ibm_do_lin -->|No| ibm_eval
 state0([state0]) --> ibm_lin
 ibm_lin --> lin
-lin --> ibm_eval
+state --> ibm_eval_lin
+lin --> ibm_eval_lin
 state --> ibm_eval
-mapper --> multi_mapper --> scale_mapper
+mapper --> multi_mapper --> pipe_mapper
+scale_mapper --> pipe_mapper
 ibm_eval --> effect
+ibm_eval_lin --> effect
 ',
   width = 600,
   height = 800)
@@ -107,7 +114,7 @@ Red nodes indicate deprecated behaviour retained for backwards compatibility.
 ```{r, eval=TRUE,echo=FALSE}
 DiagrammeR::mermaid('
 flowchart TD
-  expr([expr])
+  expr([`label`_expr])
   data([data])
   _envir([.envir])
   input(["`label`_input"])
@@ -152,11 +159,10 @@ flowchart TD
   eval_formula --> input
 
   res -->|"spatial<br/>covariate"| eval_spatial
-  res -->|"spatial<br/>covariate"| layer_eval
   eval_spatial --> input
 
 %% spatial covariate layer input
-  layer_expr(["`label`_expr"])
+  layer_expr(["`label`_layer_expr"])
   layer(["`label`_layer"])
   layer_eval["eval"]
   data --> layer_eval

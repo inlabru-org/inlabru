@@ -279,7 +279,8 @@ S_\text{CRPS}(F_i,y_i) \approx \sum_{k=0}^{K} r_{ik}^2
   $$
 
 ```{r eval=FALSE}
-max_K <- ceiling(max(y)) + 4 * sqrt(max(y)) # some large value, so that 1-F(K) is small
+# some large value, so that 1-F(K) is small
+max_K <- ceiling(max(y)) + 4 * sqrt(max(y))
 pred <- generate(fit, newdata,
                 formula = ~ {
                   lambda <- exp(eta)
@@ -310,7 +311,8 @@ crps_score <-
      group_by(i) %>%
      summarise(crps = sum(mean^2), groups = "drop") %>%
      pull(crps))
-# Check that the cutoff point K has nearly probability mass 1 below it, for all i:
+# Check that the cutoff point K has nearly probability mass 1 below it,
+# for all i:
 min(F_estimate)
 ```
 

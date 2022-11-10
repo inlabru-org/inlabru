@@ -51,8 +51,9 @@ bru_compute_linearisation.component <- function(cmp,
     warning("Non-linear component mappers not fully supported!", immediate. = TRUE)
   }
   A <- ibm_jacobian(comp_simple,
-                    input = input[[label]],
-                    state = state[[label]])
+    input = input[[label]],
+    state = state[[label]]
+  )
 
   assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
 
@@ -192,11 +193,11 @@ bru_compute_linearisation.bru_like <- function(lhood,
     # and possibly expand to full size
     if (length(pred0) == 1) {
       if (is.data.frame(data) ||
-          inherits(data, c(
-            "SpatialPointsDataFrame",
-            "SpatialPolygonsDataFrame",
-            "SpatialLinesDataFrame"
-          ))) {
+        inherits(data, c(
+          "SpatialPointsDataFrame",
+          "SpatialPolygonsDataFrame",
+          "SpatialLinesDataFrame"
+        ))) {
         pred0 <- rep(pred0, NROW(data))
       }
     }
@@ -212,9 +213,11 @@ bru_compute_linearisation.bru_like <- function(lhood,
       if (lhood[["linear"]] && !lhood[["allow_combine"]]) {
         # If linear and no combinations allowed, just need to copy the
         # non-offset A matrix, and possibly expand to full size
-        A <- ibm_jacobian(comp_simple[[label]],
-                          input[[label]],
-                          state[[label]])
+        A <- ibm_jacobian(
+          comp_simple[[label]],
+          input[[label]],
+          state[[label]]
+        )
         if (NROW(A) == 1) {
           if (NROW(offset) > 1) {
             B[[label]] <- Matrix::kronecker(rep(1, NROW(offset)), A)
@@ -280,7 +283,9 @@ bru_compute_linearisation.bru_like_list <- function(lhoods,
 bru_compute_linearisation.bru_model <- function(model, lhoods,
                                                 input, state,
                                                 comp_simple, ...) {
-  bru_compute_linearisation(lhoods, model = model,
-                            input = input, state = state,
-                            comp_simple = comp_simple, ...)
+  bru_compute_linearisation(lhoods,
+    model = model,
+    input = input, state = state,
+    comp_simple = comp_simple, ...
+  )
 }

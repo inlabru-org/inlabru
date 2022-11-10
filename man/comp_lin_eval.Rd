@@ -13,16 +13,17 @@ comp_lin_eval(...)
 \method{comp_lin_eval}{component_list}(components, input, state, ...)
 }
 \arguments{
-\item{...}{Unused.}
+\item{...}{Optional parameters passed on to \code{ibm_eval}
+and `ibm_jacobian.}
 
 \item{component}{A component.}
 
 \item{input}{Component inputs, from \code{input_eval()}}
 
-\item{data}{A \code{data.frame} or \verb{Spatial*} object of covariates and/or point locations.}
+\item{linearisation}{evaluation state}
 }
 \value{
-A \code{bru_mapper_taylor} object.
+A \code{bru_mapper_taylor} or \code{comp_simple_list} object.
 }
 \description{
 Constructs the linearisation mapper for each component
