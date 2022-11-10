@@ -2944,11 +2944,11 @@ ibm_values.bru_mapper_mesh_B <- function(mapper, ...) {
 #' @param input The values for which to produce a mapping matrix
 #' @export
 #' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_mesh_B <- function(mapper, input, ...) {
+ibm_jacobian.bru_mapper_mesh_B <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  A <- ibm_amatrix(mapper[["mapper"]], input = input, ...)
+  A <- ibm_jacobian(mapper[["mapper"]], input = input, ...)
   A %*% mapper[["B"]]
 }
 
