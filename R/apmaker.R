@@ -39,9 +39,11 @@ apmaker <- function(samplers, domain, dnames,
     is_sf <- FALSE
     }
 
-  # check if the names of samplers and domains match
+  # Check if the names of samplers and domains match. How to establish the link
+  # between samplers and domain? If names are not provided, follow the order in
+  # list. If names are provided but do not match, what should we do?
   if (unique(names(samplers)) != unique(names(domains))) {
-    warnings("Samplers and domains")
+    warnings("Names of samplers and domain do not match.")
   }
 
   if ("coordinates" %in% dnames) {
