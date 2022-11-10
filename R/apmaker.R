@@ -21,13 +21,24 @@ apmaker <- function(samplers, domain, dnames,
   # TODO 20221109 For multiple samplers multiple domains, it does have to rely
   # on the domain names. or does it contradict?
 
+  # Check if sf object
   if (class(samplers) %in% "sf") {
-    is_sf <- TRUE
-  } else is_sf <- FALSE
+    is_sf <- TRUE # fm_as_sfc.inla.mesh
+  } else {
+    is_sf <- FALSE
+    }
 
-  if (names(domain) == NULL) {
-    is_multi_domains <- FALSE
-  } else is_multi_domains <- TRUE
+  # Double check if the logic is correct
+  if (is.null(names(unlist(domain)))) {
+    is_multi_domain <- FALSE
+  } else {
+    is_multi_domain <- TRUE
+  }
+
+  # check if the names of samplers and domains match
+  if (names(unique(unlist(samplers))) != names(unique(unlist(domains)))) {
+    stop("samplers and domains do not match")
+  }
 
   if ("coordinates" %in% dnames) {
     spatial <- TRUE
