@@ -298,38 +298,42 @@ samplers --> multi_samplers[("multi domain
 samplers")]
 samplers --> single_samplers[("single domain
 samplers")]
-domains --> calc_full_samplers["remove sampler
-domains"] --> full_samplers[("full domain
+samplers --> calc_full_samplers["remove sampler
+domains"]
+domains --> calc_full_samplers --> full_samplers[("full domain
 samplers")]
-samplers --> calc_full_samplers
 domains --> multi_samplers
 domains --> single_samplers
 domains --> full_samplers
 
-subgraph "multi sampler"
-  ipoints_rowwise["compute ips
-for each row"] -->
-  ipoints_elementwise["compute ips
-for each element"] -->
-  ips_element[("ips list
-for each row")] -->
-  cprod_row["cprod within
-each sampler row"] -->
-  multi_sampler_ips([ips])
-end
 subgraph "single sampler"
   ipoints_single_rowwise["compute ips
 for each row"] -->
   single_sampler_ips([ips])
 end
 
-multi_samplers -->|for each| ipoints_rowwise
+subgraph "multi sampler"
+  ipoints_domainwise["compute ips
+for each domain"] -->
+  ipoints_single_rowwise
+  
+  ips_domain_list[("ips
+for each domain")] -->
+  cprod_row["cprod within
+each sampler row"] -->
+  multi_sampler_ips([ips])
+end
+
+multi_samplers -->|for each| ipoints_domainwise
 single_samplers -->|for each| ipoints_single_rowwise
 full_samplers -->|for each| ipoints_single_rowwise
+
+
 
 multi_sampler_ips --> ips_list[(ips list)]
 single_sampler_ips --> ips_list
 
+single_sampler_ips --> ips_domain_list
 
 ips_list --> cprod_joint[cprod] --> joint_ips([joint ips])
 ',
