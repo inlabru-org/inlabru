@@ -2,7 +2,7 @@
 % Please edit documentation in R/bru.inference.R
 \name{eval_in_data_context}
 \alias{eval_in_data_context}
-\title{Evaluate expressions in the data context - TODO}
+\title{Evaluate expressions in the data context}
 \usage{
 eval_in_data_context(
   input,
@@ -13,7 +13,7 @@ eval_in_data_context(
 )
 }
 \arguments{
-\item{input}{\code{substitute(expr)} The expression can be response, E, Ntrials}
+\item{input}{An expression to be evaluated}
 
 \item{data}{Likelihood-specific data, as a \code{data.frame} or
 \code{SpatialPoints[DataFrame]}
@@ -24,12 +24,15 @@ size/format for inputs and response variables, as a \code{data.frame} or
 \code{SpatialPoints[DataFrame]}
 object.}
 
-\item{default}{options[\link{expr}] The expression can be E and Ntrials.
-See \code{\link[=bru_options_set]{bru_options_set()}}.}
+\item{default}{Value used if the expression is evaluated as NULL. Default
+NULL}
 
-\item{.envir}{The environment}
+\item{.envir}{The evaluation environment}
+}
+\value{
+The result of expression evaluation
 }
 \description{
-Evaluate expressions in the data context - TODO
+Evaluate expressions in the data context
 }
 \keyword{internal}
