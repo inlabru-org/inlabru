@@ -86,6 +86,7 @@
 <li><p>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_aggregate()</a></code> and <code><a href="../reference/bru_mapper.html">bru_mapper_logsumexp()</a></code>, used for blockwise weighted sums and log-sum-exp mappings, <code>output[k] = sum(weights[block==k]*state[block==k])))</code> and <code>output[k] = log(sum(weights[block==k]*exp(state[block==k])))</code>, with optional weight normalisation within each block. Allows providing the weights as log-weights, and uses block-wise shifts to avoid potential overflow.</p></li>
 <li><p><code>summary</code> methods for <code>bru_mapper</code> objects</p></li>
 <li><p>Removed <code>methods</code> argument from <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code>. Implementations should register S3 methods instead.</p></li>
+<li><p>Add <code>indexed</code> logical option to <code><a href="../reference/bru_mapper.html">bru_mapper_factor()</a></code>, to allow factor inputs to be mapped to index values, as needed for <code>group</code> and <code>replicate</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/174" class="external-link">#174</a></p></li>
 </ul></li>
 </ul></div>
 <div class="section level3">

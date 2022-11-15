@@ -108,7 +108,7 @@
 <span></span>
 <span><span class="fu">bru_mapper_matrix</span><span class="op">(</span><span class="va">labels</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_factor</span><span class="op">(</span><span class="va">values</span>, <span class="va">factor_mapping</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_factor</span><span class="op">(</span><span class="va">values</span>, <span class="va">factor_mapping</span>, indexed <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bru_mapper_const</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -157,12 +157,12 @@ For <code>bru_mapper_scale</code>, a mapper to be scaled.</p></dd>
 
 
 <dt>indexed</dt>
-<dd><p>logical; If <code>TRUE</code>, the <code><a href="bru_mapper_generics.html">ibm_values()</a></code> output will be the
-integer indexing sequence for the latent variables (needed for <code>spde</code> models).
-If <code>FALSE</code>, the knot
-locations are returned (useful as an interpolator for <code>rw2</code> models
-and similar).
-Default: <code>NULL</code>, to force user specification of this parameter</p></dd>
+<dd><p>logical; if <code>TRUE</code>, the <code><a href="bru_mapper_generics.html">ibm_values()</a></code> method
+will return an integer vector instead of the factor levels.
+This is needed e.g. for <code>group</code> and <code>replicate</code> mappers, since
+<code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> doesn't accept factor values. Default: <code>FALSE</code>, which
+works for the main input mappers. The default mapper constructions
+will set it the required setting.</p></dd>
 
 
 <dt>n</dt>
