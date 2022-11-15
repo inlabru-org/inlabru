@@ -35,6 +35,4 @@ automatically detecting the version}
 }
 \description{
 Methods for bru_info objects
-
-Summary for bru_info objects
 }

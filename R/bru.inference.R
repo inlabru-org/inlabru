@@ -144,15 +144,6 @@ bru_info_upgrade <- function(object,
 }
 
 
-get_component_type <- function(x, part, components) {
-  if (is.null(x[["copy"]])) {
-    x[[part]][["type"]]
-  } else {
-    components[[x[["copy"]]]][[part]][["type"]]
-  }
-}
-
-
 #' Methods for bru_info objects
 #' @export
 #' @method summary bru_info
@@ -163,28 +154,7 @@ summary.bru_info <- function(object, ...) {
   result <- list(
     inlabru_version = object[["inlabru_version"]],
     INLA_version = object[["INLA_version"]],
-    components =
-      lapply(
-        object[["model"]][["effects"]],
-        function(x) {
-          list(
-            label = x[["label"]],
-            copy_of = x[["copy"]],
-            main_type = get_component_type(
-              x, "main",
-              object[["model"]][["effects"]]
-            ),
-            group_type = get_component_type(
-              x, "group",
-              object[["model"]][["effects"]]
-            ),
-            replicate_type = get_component_type(
-              x, "replicate",
-              object[["model"]][["effects"]]
-            )
-          )
-        }
-      ),
+    components = summary(object[["model"]]),
     lhoods =
       lapply(
         object[["lhoods"]],
@@ -200,7 +170,7 @@ summary.bru_info <- function(object, ...) {
   class(result) <- c("summary_bru_info", "list")
   result
 }
-#' Summary for bru_info objects
+
 #' @export
 #' @param x A `summary_bru_info` object to be printed
 #' @rdname bru_info
@@ -208,26 +178,7 @@ print.summary_bru_info <- function(x, ...) {
   cat(paste0("inlabru version: ", x$inlabru_version, "\n"))
   cat(paste0("INLA version: ", x$INLA_version, "\n"))
   cat(paste0("Components:\n"))
-  for (cmp in x$components) {
-    if (!is.null(cmp$copy_of)) {
-      cat(sprintf(
-        "  %s: Copy of '%s' (types main='%s', group='%s', replicate='%s)\n",
-        cmp$label,
-        cmp$copy_of,
-        cmp$main_type,
-        cmp$group_type,
-        cmp$replicate_type
-      ))
-    } else {
-      cat(sprintf(
-        "  %s: Model types main='%s', group='%s', replicate='%s'\n",
-        cmp$label,
-        cmp$main_type,
-        cmp$group_type,
-        cmp$replicate_type
-      ))
-    }
-  }
+  print(x$components)
   cat(paste0("Likelihoods:\n"))
   for (lh in x$lhoods) {
     cat(sprintf(

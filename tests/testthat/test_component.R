@@ -268,7 +268,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
 
 
 
-test_that("Component construction: default iid factor construction", {
+test_that("Component construction: main iid factor construction", {
   skip_on_cran()
 
   lik <- like("gaussian",
@@ -293,6 +293,75 @@ test_that("Component construction: default iid factor construction", {
     ),
     c(11, 0, 15)
   )
+})
+
+test_that("Component construction: group iid factor construction", {
+  skip_on_cran()
+
+  lik <- like("gaussian",
+    formula = y ~ .,
+    data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
+    include = "effect"
+  )
+
+  cmp1 <- component_list(
+    ~ -1 +
+      effect(rep(1, 5),
+        group = x,
+        model = "iid",
+        control.group = list(model = "iid")
+      )
+  )
+  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$group,
+    as.numeric(lik$data$x)
+  )
+
+  expect_equal(
+    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$group,
+      input = as.factor(c(1, NA, 4)),
+      state = c(11, 12, 13, 14, 15)
+    ),
+    c(11, 0, 15)
+  )
+
+  local_bru_safe_inla()
+  expect_no_error(bru(cmp2, lik))
+})
+
+test_that("Component construction: replicate iid factor construction", {
+  skip_on_cran()
+
+  lik <- like("gaussian",
+    formula = y ~ .,
+    data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
+    include = "effect"
+  )
+
+  cmp1 <- component_list(
+    ~ -1 +
+      effect(rep(1, 5),
+        replicate = x,
+        model = "iid"
+      )
+  )
+  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$replicate,
+    as.numeric(lik$data$x)
+  )
+
+  expect_equal(
+    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$replicate,
+      input = as.factor(c(1, NA, 4)),
+      state = c(11, 12, 13, 14, 15)
+    ),
+    c(11, 0, 15)
+  )
+
+  local_bru_safe_inla()
+  expect_no_error(bru(cmp2, lik))
 })
 
 

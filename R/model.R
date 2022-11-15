@@ -99,6 +99,28 @@ bru_model <- function(components, lhoods) {
 }
 
 
+#' @export
+#' @method summary bru_model
+#' @param object Object to operate on
+#' @param \dots Arguments passed on to other methods
+#' @rdname bru_model
+summary.bru_model <- function(object, ...) {
+  result <- list(
+    components =
+      summary(object[["effects"]])
+  )
+  class(result) <- c("summary_bru_model", "list")
+  result
+}
+
+#' @export
+#' @param x A `summary_bru_model` object to be printed
+#' @rdname bru_model
+print.summary_bru_model <- function(x, ...) {
+  print(x[["components"]])
+  invisible(x)
+}
+
 
 
 
