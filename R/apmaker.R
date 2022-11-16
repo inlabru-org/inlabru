@@ -19,32 +19,56 @@ apmaker <- function(samplers, domain, dnames,
   # use the domain specification to determine the type of integration
   # method to call, so that it doesn't need to rely on the domain name.
   # TODO 20221109 For multiple samplers multiple domains, it does have to rely
-  # on the domain names. or does it contradict?
+  # on the domain names. 20221111 They do have to match
 
-  # Check if a list of samplers and domains (Double check if the logic is correct)
-  list_samplers <- ifelse(length(samplers) > 1, TRUE, FALSE)
-  list_domain <- ifelse(length(domain) > 1, TRUE, FALSE)
-
-  # Domain should be more than samplers
-  if (length(samplers) > length(domain)) {
-    stop("There are more samplers items than domain ones.")
-  } else {
-    multi_samplers <- TRUE
+  # Mandate both the samplers and domain arguments
+  if (is.null(samplers) || is.null(domain)) {
+    stop("Samplers or domain argument(s) missing.")
   }
 
-  # Check if sf object
-  if (class(samplers) %in% "sf") {
-    is_sf <- TRUE # fm_as_sfc.inla.mesh
+  # Check if both samplers and domain list
+  # https://stackoverflow.com/questions/38539654/how-to-know-if-the-data-is-a-list-or-data-frame-in-r
+  if (inherits(samplers, "list") && inherits(domain, "list")) {
+    is_list <- TRUE
+  } else if (inherits(samplers, "list")) {
+    multisampler_int <- TRUE
+  } else if (inherits(domain, "list")) {
+    singlesampler_int <- TRUE
   } else {
-    is_sf <- FALSE
+    is_list <- FALSE
+  }
+
+  # check sf or sp object
+  if (is_list) {
+    if (sapply(samplers, class) %in% "sf" || sapply(domain, class) %in% "sf") {
+      is_sf <- TRUE # fm_as_sfc.inla.mesh
+    } else if (sapply(samplers, class) %in% "sp" || sapply(domain, class) %in% "sp") {
+        is_sp <- FALSE
+      }{
+      is_sf <- FALSE
     }
+  }
+
+  # How does sf deal with secondary geometry columns?
+  # https://r-spatial.github.io/sf/articles/sf6.html
+  if (is_sf) {
+    cat("The active geometry is", attr(samplers, "sf_column"))
+    cat("The active geometry is", attr(domain, "sf_column"))
+  }
+
+  # Domain should be more than samplers TODO this is the problem
+  if (length(samplers) > length(domain)) {
+    stop("There are more samplers items than domain ones.")
+  }
 
   # Check if the names of samplers and domains match. How to establish the link
   # between samplers and domain? If names are not provided, follow the order in
   # list. If names are provided but do not match, what should we do?
-  if (unique(names(samplers)) != unique(names(domains))) {
+  if (unique(names(samplers)) != unique(names(domain))) {
     warnings("Names of samplers and domain do not match.")
   }
+
+  #####################################
 
   if ("coordinates" %in% dnames) {
     spatial <- TRUE
