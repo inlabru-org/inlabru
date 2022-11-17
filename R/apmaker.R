@@ -12,7 +12,7 @@
 # @param int.args List of arguments passed on to \code{ipoints}
 # @return Integration points
 
-
+# TODO option argument as in bru function with list() bru_int_args
 apmaker <- function(samplers, domain, dnames,
                     int.args = list(method = "stable", nsub = NULL)) {
   # To allow sf geometry support, should likely change the logic to
@@ -21,7 +21,7 @@ apmaker <- function(samplers, domain, dnames,
   # TODO 20221109 For multiple samplers multiple domains, it does have to rely
   # on the domain names. 20221111 They do have to match
 
-  # Mandate both the samplers and domain arguments
+  # Mandate both the samplers and domain arguments later on no
   if (is.null(samplers) || is.null(domain)) {
     stop("Samplers or domain argument(s) missing.")
   }
@@ -38,23 +38,19 @@ apmaker <- function(samplers, domain, dnames,
     is_list <- FALSE
   }
 
-  # check sf or sp object
+  # check sf or sp object, can do a mix of sp and sf objects,
   if (is_list) {
-    if (sapply(samplers, class) %in% "sf" || sapply(domain, class) %in% "sf") {
-      is_sf <- TRUE # fm_as_sfc.inla.mesh
-    } else if (sapply(samplers, class) %in% "sp" ||
-               sapply(domain, class) %in% "sp") {
-        is_sp <- FALSE
-      } else {
-      is_sf <- FALSE
-    }
+    is_sf_samplers <- lapply(samplers, function(x) inherits(x, "sf"))
+    is_sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
+    is_sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
+    is_sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
   }
 
   # How does sf deal with secondary geometry columns?
   # TODO have to deal with the multidomain samplers
   # https://r-spatial.github.io/sf/articles/sf6.html
   if (is_sf) {
-    cat("The active samplers geometry is", attr(samplers, "sf_column"))
+    cat("The active samplers",samplers[i], "geometry is", attr(samplers, "sf_column"))
     cat("The active domain geometry is", attr(domain, "sf_column"))
   }
 
