@@ -1,7 +1,7 @@
 # @aliases apmaker
 # @export
-# @param samplers A `[sf]DataFrame` or Spatial[Points/Lines/Polygons]DataFrame`
-# object
+# @param samplers A (list of) `[sf]DataFrame` or
+# Spatial[Points/Lines/Polygons]DataFrame object(s)
 # TODO 20221109 does domainsssss make more sense?
 # @param domain A list/A list of list(s) of named integration definitions, each
 # either a vector of factors ,a numeric vector of points given integration
@@ -31,9 +31,9 @@ apmaker <- function(samplers, domain, dnames,
   if (inherits(samplers, "list") && inherits(domain, "list")) {
     is_list <- TRUE
   } else if (inherits(samplers, "list")) {
-    multisampler_int <- TRUE
-  } else if (inherits(domain, "list")) {
     singlesampler_int <- TRUE
+  } else if (inherits(domain, "list")) {
+    multisampler_int <- TRUE
   } else {
     is_list <- FALSE
   }
@@ -42,18 +42,20 @@ apmaker <- function(samplers, domain, dnames,
   if (is_list) {
     if (sapply(samplers, class) %in% "sf" || sapply(domain, class) %in% "sf") {
       is_sf <- TRUE # fm_as_sfc.inla.mesh
-    } else if (sapply(samplers, class) %in% "sp" || sapply(domain, class) %in% "sp") {
+    } else if (sapply(samplers, class) %in% "sp" ||
+               sapply(domain, class) %in% "sp") {
         is_sp <- FALSE
-      }{
+      } else {
       is_sf <- FALSE
     }
   }
 
   # How does sf deal with secondary geometry columns?
+  # TODO have to deal with the multidomain samplers
   # https://r-spatial.github.io/sf/articles/sf6.html
   if (is_sf) {
-    cat("The active geometry is", attr(samplers, "sf_column"))
-    cat("The active geometry is", attr(domain, "sf_column"))
+    cat("The active samplers geometry is", attr(samplers, "sf_column"))
+    cat("The active domain geometry is", attr(domain, "sf_column"))
   }
 
   # Domain should be more than samplers TODO this is the problem
@@ -65,7 +67,7 @@ apmaker <- function(samplers, domain, dnames,
   # between samplers and domain? If names are not provided, follow the order in
   # list. If names are provided but do not match, what should we do?
   if (unique(names(samplers)) != unique(names(domain))) {
-    warnings("Names of samplers and domain do not match.")
+    warnings("Names of samplers and domain columns do not match.")
   }
 
   #####################################
