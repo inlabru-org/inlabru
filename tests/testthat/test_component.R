@@ -3,10 +3,20 @@ local_bru_testthat_setup()
 test_that("Component construction: linear model", {
   df <- data.frame(x = 1:10)
 
+  # Using label as input:
+  cmp0 <- component_list(
+    ~ x,
+    lhoods = list(list(data = df))
+  )[["x"]]
+
+  expect_equal(cmp0$label, "x")
+  expect_equal(cmp0$main$model, "linear")
+  expect_equal(as.character(cmp0$main$input$input), "x")
+
   cmp <- component_list(
     ~ beta(main = x, model = "linear", values = 1),
     lhoods = list(list(data = df))
-  )[[1]]
+  )[["beta"]]
 
   expect_equal(cmp$label, "beta")
   expect_equal(cmp$main$model, "linear")
@@ -393,3 +403,4 @@ test_that("Component construction: deprecated arguments", {
     "Use of 'map' is deprecated"
   )
 })
+
