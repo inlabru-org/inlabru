@@ -1,7 +1,7 @@
 #' @include 0_inlabru_envir.R
 
 #' @title Get access to the internal environment
-#' @details The environment is defined in aaaaa.R which is loaded first.
+#' @details The environment is defined in 0_inlabru_envir.R which is loaded first.
 #' @keywords internal
 bru_env_get <- function() {
   pkg_envir <- parent.env(environment())
