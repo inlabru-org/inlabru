@@ -98,11 +98,12 @@ fm_as_sf_crs <- function(x) {
   } else if (is.null(x)) {
     sf::st_crs(x)
   } else {
-    warning(paste0(
-      "Unsupported source crs class ",
-      paste(class(x), sep = ",")
-    ),
-    immediate. = TRUE
+    warning(
+      paste0(
+        "Unsupported source crs class ",
+        paste(class(x), sep = ",")
+      ),
+      immediate. = TRUE
     )
     x
   }
@@ -121,11 +122,12 @@ fm_as_sp_crs <- function(x) {
   } else if (is.null(x)) {
     NULL
   } else {
-    warning(paste0(
-      "Unsupported source crs class ",
-      paste(class(x), sep = ",")
-    ),
-    immediate. = TRUE
+    warning(
+      paste0(
+        "Unsupported source crs class ",
+        paste(class(x), sep = ",")
+      ),
+      immediate. = TRUE
     )
     x
   }
@@ -708,27 +710,28 @@ fm_wkt_tree_as_wkt <- function(x, pretty = FALSE, ...) {
       },
       x[["label"]],
       "[",
-      paste0(vapply(
-        x[["params"]],
-        function(param) {
-          if (!is.list(param)) {
-            paste0(param)
-          } else {
-            paste0(
-              if (pretty) {
-                "\n"
-              } else {
-                ""
-              },
-              construct_item(param,
-                level = level + 1
+      paste0(
+        vapply(
+          x[["params"]],
+          function(param) {
+            if (!is.list(param)) {
+              paste0(param)
+            } else {
+              paste0(
+                if (pretty) {
+                  "\n"
+                } else {
+                  ""
+                },
+                construct_item(param,
+                  level = level + 1
+                )
               )
-            )
-          }
-        },
-        ""
-      ),
-      collapse = ","
+            }
+          },
+          ""
+        ),
+        collapse = ","
       ),
       "]"
     )
@@ -871,17 +874,18 @@ fm_CRSargs <- function(x, ...) {
 #' @return For `fm_list_as_CRSargs()`, a CRS proj4 string for name=value pair list
 #' @rdname fm_CRSargs
 fm_list_as_CRSargs <- function(x, ...) {
-  paste(lapply(
-    names(x),
-    function(xx) {
-      if (is.na(x[[xx]])) {
-        paste("+", xx, sep = "")
-      } else {
-        paste("+", xx, "=", x[[xx]], sep = "")
+  paste(
+    lapply(
+      names(x),
+      function(xx) {
+        if (is.na(x[[xx]])) {
+          paste("+", xx, sep = "")
+        } else {
+          paste("+", xx, "=", x[[xx]], sep = "")
+        }
       }
-    }
-  ),
-  collapse = " "
+    ),
+    collapse = " "
   )
 }
 
@@ -1538,20 +1542,22 @@ fm_spTransform.default <- function(x, crs0, crs1, passthrough = FALSE, ...) {
           x <- sp::spTransform(x, crs_sphere)
         }
         if (!is.null(crs0oblique)) {
-          x <- sp::SpatialPoints(fm_crs_transform_oblique(coordinates(x),
-            crs0oblique,
-            to.oblique = FALSE
-          ),
-          proj4string = crs_sphere
+          x <- sp::SpatialPoints(
+            fm_crs_transform_oblique(coordinates(x),
+              crs0oblique,
+              to.oblique = FALSE
+            ),
+            proj4string = crs_sphere
           )
         }
 
         if (!is.null(crs1oblique)) {
-          x <- sp::SpatialPoints(fm_crs_transform_oblique(coordinates(x),
-            crs1oblique,
-            to.oblique = TRUE
-          ),
-          proj4string = crs_sphere
+          x <- sp::SpatialPoints(
+            fm_crs_transform_oblique(coordinates(x),
+              crs1oblique,
+              to.oblique = TRUE
+            ),
+            proj4string = crs_sphere
           )
         }
         if (sphere_radius_1 != 1) {
@@ -1619,11 +1625,12 @@ fm_spTransform.default <- function(x, crs0, crs1, passthrough = FALSE, ...) {
           )
         }
         if (!is.null(crs0$oblique)) {
-          x <- sp::SpatialPoints(fm_crs_transform_oblique(coordinates(x),
-            crs0$oblique,
-            to.oblique = FALSE
-          ),
-          proj4string = fm_CRS("sphere")
+          x <- sp::SpatialPoints(
+            fm_crs_transform_oblique(coordinates(x),
+              crs0$oblique,
+              to.oblique = FALSE
+            ),
+            proj4string = fm_CRS("sphere")
           )
         }
         onshpere <- TRUE
@@ -1635,11 +1642,12 @@ fm_spTransform.default <- function(x, crs0, crs1, passthrough = FALSE, ...) {
           x <- sp::spTransform(x, fm_CRS("sphere"))
         }
         if (!is.null(crs1$oblique)) {
-          x <- sp::SpatialPoints(fm_crs_transform_oblique(coordinates(x),
-            crs1$oblique,
-            to.oblique = TRUE
-          ),
-          proj4string = fm_CRS("sphere")
+          x <- sp::SpatialPoints(
+            fm_crs_transform_oblique(coordinates(x),
+              crs1$oblique,
+              to.oblique = TRUE
+            ),
+            proj4string = fm_CRS("sphere")
           )
         }
         x <- sp::spTransform(x, crs1$crs)
@@ -1676,12 +1684,13 @@ fm_spTransform.SpatialPoints <- function(x, CRSobj, passthrough = FALSE, ...) {
     ok1 <- (!missing(CRSobj) && !is.null(CRSobj) &&
       (inherits(CRSobj, "CRS") && !is.null(fm_crs_get_wkt(CRSobj))))
     if (ok0 && ok1) {
-      invisible(sp::SpatialPoints(fm_spTransform(
-        coordinates(x),
-        crs_x,
-        CRSobj
-      ),
-      proj4string = CRSobj
+      invisible(sp::SpatialPoints(
+        fm_spTransform(
+          coordinates(x),
+          crs_x,
+          CRSobj
+        ),
+        proj4string = CRSobj
       ))
     } else if (ok1) { ## Know: !ok0 && ok1
       if (!passthrough) {
@@ -1700,12 +1709,13 @@ fm_spTransform.SpatialPoints <- function(x, CRSobj, passthrough = FALSE, ...) {
     ok1 <- (!missing(CRSobj) && !is.null(CRSobj) &&
       (inherits(CRSobj, "CRS") && !is.na(fm_CRSargs(CRSobj))))
     if (ok0 && ok1) {
-      invisible(sp::SpatialPoints(fm_spTransform(
-        coordinates(x),
-        sp::CRS(sp::proj4string(x)),
-        CRSobj
-      ),
-      proj4string = CRSobj
+      invisible(sp::SpatialPoints(
+        fm_spTransform(
+          coordinates(x),
+          sp::CRS(sp::proj4string(x)),
+          CRSobj
+        ),
+        proj4string = CRSobj
       ))
     } else if (ok1) { ## Know: !ok0 && ok1
       if (!passthrough) {

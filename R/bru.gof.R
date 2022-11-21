@@ -57,7 +57,6 @@
 #'
 bincount <- function(result, predictor, observations, breaks, nint = 20,
                      probs = c(0.025, 0.5, 0.975), ...) {
-
   # Sort probabilities
   probs <- sort(probs)
 
@@ -176,7 +175,6 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
 #' @example inst/examples/devel.cvmeasure.R
 
 devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, mesh = NULL) {
-
   # Covariance
   joint$cov <- (joint[["sd"]]^2 - prediction1[["sd"]]^2 - prediction2[["sd"]]^2) / 2
 
@@ -191,7 +189,6 @@ devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, me
   joint$cor <- cor
 
   if (!is.null(samplers)) {
-
     #
     # PRESENTED TO YOU BY HACKY McHACKERSON
     #

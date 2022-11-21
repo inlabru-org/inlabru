@@ -811,7 +811,6 @@ gg.inla.mesh <- function(data,
 #' # Some features use the INLA package.
 #' if (require("INLA", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
-#'
 #'   # Create a 1D mesh
 #'
 #'   mesh <- inla.mesh.1d(seq(0, 10, by = 0.5))
@@ -858,7 +857,6 @@ gg.inla.mesh.1d <- function(data, mapping = ggplot2::aes(.data[["x"]], .data[["y
 #' if (require("spatstat.data", quietly = TRUE) &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
-#'
 #'   # Load Gorilla data
 #'   data("gorillas", package = "spatstat.data")
 #'
@@ -1129,7 +1127,6 @@ plot.prediction_old <- function(..., property = "median") {
 #' @export
 #
 multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
-
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
 

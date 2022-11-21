@@ -53,9 +53,12 @@ Then come back here to continue.
 
 The most basic `inla.spde.make.A` call is to map purely spatial points to a mesh:
 ```{r}
-mesh <- inla.mesh.2d(cbind(0,0), offset = 2, max.edge = 10)
+mesh <- inla.mesh.2d(cbind(0, 0), offset = 2, max.edge = 10)
 loc <- matrix(runif(10) * 2 - 1, 5, 2)
-ggplot() + gg(mesh) + geom_point(aes(loc[,1], loc[,2])) + coord_equal()
+ggplot() +
+  gg(mesh) +
+  geom_point(aes(loc[, 1], loc[, 2])) +
+  coord_equal()
 ```
 
 ```{r}
@@ -95,30 +98,38 @@ ibm_jacobian(mapper, input = list(index = index))
 ```{r, eval=FALSE}
 inla.spde.make.A(..., group = group.values, group.mesh = group.mesh)
 
-mapper <- bru_mapper_multi(list(main = bru_mapper(mesh),
-                                group = bru_mapper(group.mesh)))
+mapper <- bru_mapper_multi(list(
+  main = bru_mapper(mesh),
+  group = bru_mapper(group.mesh)
+))
 ibm_jacobian(mapper, input = list(main = loc, group = group.values))
 ```
 ### Blockwise aggregation
 
 ```{r, eval=FALSE}
 block_rescale <- # one of "none", "count", "weights", "sum"
-inla.spde.make.A(...,
-                 weights = weights,
-                 block = block,
-                 block.rescale = block_rescale,
-                 n.block = n_block)
+  inla.spde.make.A(...,
+    weights = weights,
+    block = block,
+    block.rescale = block_rescale,
+    n.block = n_block
+  )
 
 mapper <- bru_mapper_pipe(
-  list(main = bru_mapper_multi(list(main = bru_mapper(mesh), ...)),
-       block = bru_mapper_aggregate(rescale = (block_rescale != "none"),
-                                    n_block = n_block))
+  list(
+    main = bru_mapper_multi(list(main = bru_mapper(mesh), ...)),
+    block = bru_mapper_aggregate(
+      rescale = (block_rescale != "none"),
+      n_block = n_block
+    )
+  )
 )
 ibm_jacobian(mapper,
-             input = list(
-               main = list(main = loc),
-               block = list(block = block, weights = weights)
-             ))
+  input = list(
+    main = list(main = loc),
+    block = list(block = block, weights = weights)
+  )
+)
 ```
 
 
@@ -132,15 +143,18 @@ nrepl <- 3
 summary(
   as.data.frame(
     inla.spde.make.index("field",
-                         n.spde = mesh$n,
-                         n.group = ngroup,
-                         n.repl = nrepl)
+      n.spde = mesh$n,
+      n.group = ngroup,
+      n.repl = nrepl
+    )
   )
 )
 
-mapper <- bru_mapper_multi(list(field.main = bru_mapper(mesh),
-                                field.group = bru_mapper_index(ngroup),
-                                field.replicate = bru_mapper_index(nrepl)))
+mapper <- bru_mapper_multi(list(
+  field.main = bru_mapper(mesh),
+  field.group = bru_mapper_index(ngroup),
+  field.replicate = bru_mapper_index(nrepl)
+))
 summary(ibm_values(mapper, multi = TRUE, inla_f = TRUE))
 ```
 The benefit of the mapper approach here is that it encapsulates all the information,

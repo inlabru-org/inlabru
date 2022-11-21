@@ -214,7 +214,6 @@ combine.dsmdata.f <- function(blocks = NULL, dists = NULL) {
 
 get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
                                  geometry = "euc") {
-
   # NOTE: old param: data=data
 
   # Get the quadrant and angle (from 0 to 360o) using blocks (is.block=T) or transects (is.block=F)
@@ -273,7 +272,6 @@ get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
 
 
 get.direction.segment.f <- function(data = NULL, geometry = "euc") {
-
   # NOTE: old param: data=data
 
   # Get the quadrant and angle (from 0 to 360o clockwise) for each segment
@@ -549,7 +547,6 @@ geo.distance.f <- function(lon1, lat1, lon2, lat2) {
 
 
 get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
-
   # NOTE: old parameterization: seg.len=half.segment.length,angle=angle
 
   # Calculate the height and length of triangle given length of hypotenuse and angle
@@ -620,7 +617,6 @@ generate.obs.location.f <- function(seg = NULL, dists = NULL, geometry = "euc",
 
 
 get.point.along.segment.f <- function(x1, y1, x2, y2, quad = NULL, seg.angle) {
-
   # NOTE: old parameterization: quad=quadrant
 
   # Get a random point along the segment (at which object was detected)
@@ -704,7 +700,6 @@ get.point.along.segment.f <- function(x1, y1, x2, y2, quad = NULL, seg.angle) {
 
 
 get.coords.f <- function(quad = NULL, alpha = NULL, new.x = NULL, new.y = NULL, pd = NULL, side = NULL) {
-
   # NOTE old parameterization:
   # quad=quadrant,alpha=angle,new.x=x.reference,new.y=y.reference,pd=perp.dist,side=side.of.segment
 
@@ -817,7 +812,6 @@ get.hypot.f <- function(side1, side2) {
 
 
 what.angle.f <- function(dy = NULL, dx = NULL, quad = NULL) {
-
   # NOTE old parameterization: dy=diff.y,dx=diff.x,quad=quadrant
 
   # Get the angle between two points (from 0 to 360) using trig and the direction (quadrant)

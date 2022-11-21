@@ -47,7 +47,6 @@ NULL
 #'
 
 import.shrimp <- function() {
-
   # Load the raw data
   load(file = paste0(system.file("inst/extdata", package = "inlabru"), "/gamba.Rdata"))
 

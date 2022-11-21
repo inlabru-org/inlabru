@@ -33,7 +33,6 @@ This function requires the \code{raster} and \code{ggplot2} packages.
 if (require("spatstat.data", quietly = TRUE) &&
   require("raster", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE)) {
-
   # Load Gorilla data
   data("gorillas", package = "spatstat.data")
 

@@ -631,17 +631,19 @@ elev.pred <- predict(
 
 ggplot(elev.pred) +
   geom_line(aes(elevation, mean)) +
-  geom_ribbon(aes(elevation,
-    ymin = q0.025,
-    ymax = q0.975
-  ),
-  alpha = 0.2
+  geom_ribbon(
+    aes(elevation,
+      ymin = q0.025,
+      ymax = q0.975
+    ),
+    alpha = 0.2
   ) +
-  geom_ribbon(aes(elevation,
-    ymin = mean - 1 * sd,
-    ymax = mean + 1 * sd
-  ),
-  alpha = 0.2
+  geom_ribbon(
+    aes(elevation,
+      ymin = mean - 1 * sd,
+      ymax = mean + 1 * sd
+    ),
+    alpha = 0.2
   )
 ```
 

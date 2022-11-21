@@ -1093,7 +1093,6 @@ bru_like_expr <- function(lhood, components) {
 #' \donttest{
 #' if (bru_safe_inla() &&
 #'   require(ggplot2, quietly = TRUE)) {
-#'
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'
@@ -1544,7 +1543,6 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 
   converged <- FALSE
   while (!converged) {
-
     # Compute last HPD interval
     xnew <- xmaker2(INLA::inla.hpdmarginal(0.999, list(x = x, y = lest)))
 
@@ -2386,11 +2384,12 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     inla.data <-
       c(
         stk.data,
-        do.call(c, c(lapply(
-          model$effects,
-          function(xx) as.list(xx$env_extra)
-        ),
-        use.names = FALSE
+        do.call(c, c(
+          lapply(
+            model$effects,
+            function(xx) as.list(xx$env_extra)
+          ),
+          use.names = FALSE
         ))
       )
     #        list.data(model$formula))
@@ -2710,7 +2709,6 @@ auto_response <- function(formula, response) {
 # Returns a formula's environment as a list. Removes all variable that are of type
 # inla, function or formula. Also removes all variables that are not variables of the formula.
 list.data <- function(formula) {
-
   # Formula environment as list
   elist <- as.list(environment(formula))
 
