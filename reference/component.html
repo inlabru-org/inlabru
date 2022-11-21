@@ -74,6 +74,7 @@ method, called inside bru()."><!-- mathjax --><script src="https://cdnjs.cloudfl
     <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
     <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="../articles/web/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <a class="dropdown-item" href="../articles/web/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
@@ -356,7 +357,6 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-out co"><span class="r-pr">#&gt;</span>       BRU_myLinearEffectOfX_main_model)</span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span>quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># As an example, let us create a linear component. Here, the component is</span></span></span>
 <span class="r-in"><span>  <span class="co"># called "myEffectOfX" while the covariate the component acts on is called "x":</span></span></span>
 <span class="r-in"><span></span></span>

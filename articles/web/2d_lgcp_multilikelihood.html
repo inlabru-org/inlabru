@@ -65,6 +65,7 @@
     <a class="dropdown-item" href="../../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../../articles/linearapprox.html">A nonlinear model approximation example</a>
     <a class="dropdown-item" href="../../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="../../articles/web/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <a class="dropdown-item" href="../../articles/web/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
@@ -263,10 +264,10 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.14, Running = 376, Post = 0.121, Total = 378 </span></span>
+<span><span class="co">#&gt;     Pre = 1.04, Running = 330, Post = 0.111, Total = 331 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
-<span><span class="co">#&gt; Intercept -0.321 1.471     -3.207   -0.319      2.565   NA 0.039</span></span>
+<span><span class="co">#&gt; Intercept -0.305 1.344     -2.943   -0.303      2.332   NA 0.048</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -275,19 +276,19 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     3.013 0.615      1.979    2.954      4.389 2.841</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.072 0.354      1.460    2.043      2.851 1.987</span></span>
-<span><span class="co">#&gt; Range for Difference 0.509 0.236      0.145    0.481      1.036 0.386</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.135 0.070      0.044    0.120      0.312 0.094</span></span>
+<span><span class="co">#&gt; Range for Common     2.911 0.603      1.936    2.838       4.29 2.688</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.043 0.332      1.487    2.009       2.79 1.936</span></span>
+<span><span class="co">#&gt; Range for Difference 1.774 1.939      0.133    1.185       6.92 0.369</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.156 0.096      0.037    0.135       0.40 0.093</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 614.12</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 624.72</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -766.64</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -758.57</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1642.51</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 102.49</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1649.07</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 105.77</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1206.70 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.19 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -325,10 +326,10 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.945, Running = 183, Post = 0.0962, Total = 184 </span></span>
+<span><span class="co">#&gt;     Pre = 0.81, Running = 82.8, Post = 0.0765, Total = 83.7 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
-<span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
-<span><span class="co">#&gt; Intercept -0.29 1.337     -2.914   -0.288      2.332   NA 0.047</span></span>
+<span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant mode   kld</span></span>
+<span><span class="co">#&gt; Intercept -0.298 1.347      -2.94   -0.296      2.344   NA 0.047</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -337,19 +338,19 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.946 0.589      2.005    2.871       4.31 2.711</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.034 0.321      1.498    2.000       2.76 1.925</span></span>
-<span><span class="co">#&gt; Range for Difference 1.765 2.814      0.200    0.937       8.43 0.421</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.249 0.338      0.029    0.149       1.08 0.068</span></span>
+<span><span class="co">#&gt; Range for Common     2.920 0.728      1.763    2.828      4.611 2.647</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.032 0.409      1.354    1.989      2.959 1.901</span></span>
+<span><span class="co">#&gt; Range for Difference 1.705 0.892      0.571    1.512      3.978 1.188</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.171 0.082      0.063    0.154      0.378 0.125</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 618.40</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 622.22</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -763.62</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -760.36</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1645.84</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 104.16</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1647.20</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 104.85</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1206.74 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.73 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>

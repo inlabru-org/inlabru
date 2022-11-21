@@ -65,6 +65,7 @@
     <a class="dropdown-item" href="../../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../../articles/linearapprox.html">A nonlinear model approximation example</a>
     <a class="dropdown-item" href="../../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="../../articles/web/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <a class="dropdown-item" href="../../articles/web/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
@@ -122,34 +123,34 @@ large.</p>
 is available on your HPC. If not, ask the administrator to install it.
 Type on your HPC terminal to check which version is installed.</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span> apptainer version</span></code></pre></div>
+<pre class="shell"><code>$ apptainer version</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Type the code below to pull the <a href="https://rocker-project.org/images/versioned/rstudio.html" class="external-link">rocker/geospatial</a>
 Singularity Image Format (SIF) file with the latest R version. For
 illustration, we’ll assume the file is stored at
 <code>./your_container.sif</code>.</li>
 </ol>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To pull the docker image </span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span> apptainer pull your_container.sif docker<span class="sc">:</span><span class="er">//</span>rocker<span class="sc">/</span>geospatial<span class="sc">:</span>latest</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># once the sif is downloaded, get into an interactive shell </span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span> apptainer shell your_container.sif</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Inside the interactive shell, one can install INLA on a personal library path</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span> R <span class="sc">--</span>verbose </span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Now, in a R environment</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">options</span>(<span class="at">repos =</span> <span class="fu">c</span>(</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">INLA =</span> <span class="st">'https://inla.r-inla-download.org/R/testing'</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">CRAN =</span> <span class="st">'https://cloud.r-project.org'</span>))</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">install.packages</span>(<span class="st">"INLA"</span>) </span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># One may be asked to create a personal library path.</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">install.packages</span>(<span class="st">"inlabru"</span>) </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># quit R</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">q</span>()</span></code></pre></div>
+<pre class="shell"><code># To pull the docker image 
+$ apptainer pull your_container.sif docker://rocker/geospatial:latest
+# once the sif is downloaded, get into an interactive shell 
+$ apptainer shell your_container.sif
+# Inside the interactive shell, one can install INLA on a personal library path
+$ R --verbose 
+# Now, in a R environment
+&gt; options(repos = c(
+    INLA = 'https://inla.r-inla-download.org/R/testing',
+    CRAN = 'https://cloud.r-project.org'))
+&gt; install.packages("INLA") 
+# One may be asked to create a personal library path.
+&gt; install.packages("inlabru") 
+# quit R
+&gt; q()</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li>Put the following in your job script to execute an R file
 non-interactively.</li>
 </ol>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To execute an R file with apptainer</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span> apptainer exec .<span class="sc">/</span>your_container.sif Rscript <span class="sc">--</span>no<span class="sc">-</span>restore <span class="sc">--</span>no<span class="sc">-</span>save <span class="sc">--</span>verbose file_to_run.R</span></code></pre></div>
+<pre class="shell"><code># To execute an R file with apptainer
+$ apptainer exec ./your_container.sif Rscript --no-restore --no-save --verbose file_to_run.R</code></pre>
 <p>Note: Use <code>inla.setOption(num.threads = ncpu)</code> to limit
 the number of threads (ncpu) since INLA does not set it automatically.
 The <code>ncpu</code> also directly links to RAM requirements.</p>

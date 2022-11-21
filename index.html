@@ -87,6 +87,7 @@
     <a class="dropdown-item" href="articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="articles/linearapprox.html">A nonlinear model approximation example</a>
     <a class="dropdown-item" href="articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="articles/web/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <a class="dropdown-item" href="articles/web/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
@@ -128,21 +129,22 @@
 <p>You can install the latest bugfix release of inlabru from <a href="https://github.com/inlabru-org/inlabru" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref<span class="op">=</span><span class="st">"stable"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref <span class="op">=</span> <span class="st">"stable"</span><span class="op">)</span></span></code></pre></div>
 <p>You can install the development version of inlabru from <a href="https://github.com/inlabru-org/inlabru" class="external-link">GitHub</a> with</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref<span class="op">=</span><span class="st">"devel"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref <span class="op">=</span> <span class="st">"devel"</span><span class="op">)</span></span></code></pre></div>
 <p>or track the development version builds via <a href="https://inlabru-org.r-universe.dev/ui#builds" class="external-link">inlabru-org.r-universe.dev</a>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Enable universe(s) by inlabru-org</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  inlabruorg <span class="op">=</span> <span class="st">'https://inlabru-org.r-universe.dev'</span>,</span>
-<span>  INLA <span class="op">=</span> <span class="st">'https://inla.r-inla-download.org/R/testing'</span>,</span>
-<span>  CRAN <span class="op">=</span> <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span><span class="op">)</span></span>
+<span>  inlabruorg <span class="op">=</span> <span class="st">"https://inlabru-org.r-universe.dev"</span>,</span>
+<span>  INLA <span class="op">=</span> <span class="st">"https://inla.r-inla-download.org/R/testing"</span>,</span>
+<span>  CRAN <span class="op">=</span> <span class="st">"https://cloud.r-project.org"</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Install some packages</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'inlabru'</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -150,14 +152,14 @@
 <p>This is a basic example which shows you how fit a simple spatial Log Gaussian Cox Process (LGCP) and predicts its intensity:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load libraries</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"rgdal_show_exportToProj4_warnings"</span><span class="op">=</span><span class="st">"none"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"rgdal_show_exportToProj4_warnings"</span> <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: sp</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
 <span><span class="co">#&gt; Loading required package: foreach</span></span>
 <span><span class="co">#&gt; Loading required package: parallel</span></span>
-<span><span class="co">#&gt; This is INLA_22.10.15-1 built 2022-10-15 03:21:55 UTC.</span></span>
+<span><span class="co">#&gt; This is INLA_22.11.08 built 2022-11-08 17:47:27 UTC.</span></span>
 <span><span class="co">#&gt;  - See www.r-inla.org/contact-us for how to get help.</span></span>
 <span><span class="co">#&gt;  - To enable PARDISO sparse library; see inla.pardiso()</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -166,9 +168,10 @@
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Construct latent model components</span></span>
-<span><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, </span>
-<span>                              prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>, </span>
-<span>                              prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.01</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
+<span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
+<span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.01</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co"># Fit LGCP model</span></span>
 <span><span class="co"># This particular bru/like combination has a shortcut function lgcp() as well</span></span>
@@ -183,14 +186,38 @@
 <span>  <span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
 <span></span>
 <span><span class="co"># Predict Gorilla nest intensity</span></span>
-<span><span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>,</span>
-<span>                  <span class="fu"><a href="reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span>,</span>
-<span>                  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>,</span>
+<span>  <span class="fu"><a href="reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span>,</span>
+<span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
 <span></span>
 <span><span class="co"># Plot the result</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/gg.html">gg</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>, color <span class="op">=</span> <span class="st">"red"</span>, size <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>

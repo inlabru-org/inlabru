@@ -65,6 +65,7 @@
     <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
     <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="../articles/web/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <a class="dropdown-item" href="../articles/web/devel_flow.html">Code internal flow diagrams for model evaluation</a>
   </div>
 </li>
@@ -241,10 +242,12 @@ individual transformation mappers.</p>
 vector with the <code>state</code> vector. This is used for INLA models
 to implement the <code>weights</code> component scaling, as the final
 stage of a <code>pipe</code> mapper, see below.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mapper <span class="ot">&lt;-</span> <span class="fu">bru_mapper_scale</span>()</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ibm_eval</span>(mapper,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">input =</span> ...),</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>         state <span class="ot">=</span> ...<span class="er">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_scale</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
+<span>  input <span class="op">=</span> <span class="va">...</span>,</span>
+<span>  state <span class="op">=</span> <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="aggregate">aggregate<a class="anchor" aria-label="anchor" href="#aggregate"></a>
@@ -256,8 +259,9 @@ weights. This can be used for summation, integration, and averaging (for
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_aggregate</a></span><span class="op">(</span>rescale <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
-<span>         input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>block <span class="op">=</span> <span class="va">...</span>, weights <span class="op">=</span> <span class="va">...</span><span class="op">)</span>,</span>
-<span>         state <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>block <span class="op">=</span> <span class="va">...</span>, weights <span class="op">=</span> <span class="va">...</span><span class="op">)</span>,</span>
+<span>  state <span class="op">=</span> <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -281,15 +285,18 @@ models where the user-visible part of the latent state is only a part of
 the internal state, such as for <code>"bym"</code> models.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/inlabru-deprecated.html">bru_mapper_offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
-<span>                            hidden <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  hidden <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
-<span>         input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
-<span>         state <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span>
+<span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
+<span>  state <span class="op">=</span> <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co"># If hidden = TRUE, the inla_f=TRUE argument "hides" all but the first mapper:</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
-<span>         input <span class="op">=</span> <span class="va">name1_input</span>,</span>
-<span>         state <span class="op">=</span> <span class="va">...</span>,</span>
-<span>         inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>  input <span class="op">=</span> <span class="va">name1_input</span>,</span>
+<span>  state <span class="op">=</span> <span class="va">...</span>,</span>
+<span>  inla_f <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="multi">multi<a class="anchor" aria-label="anchor" href="#multi"></a>
@@ -304,8 +311,9 @@ a space-time product domain.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
-<span>         input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
-<span>         state <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
+<span>  state <span class="op">=</span> <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="pipe">pipe<a class="anchor" aria-label="anchor" href="#pipe"></a>
@@ -316,8 +324,9 @@ next mapper.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_pipe</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
-<span>         input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
-<span>         state <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
+<span>  state <span class="op">=</span> <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="the-core-model-component-mapper">The core model component mapper<a class="anchor" aria-label="anchor" href="#the-core-model-component-mapper"></a>
@@ -334,9 +343,12 @@ by a <code>scale</code> mapper:</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
-<span>         input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mapper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>main <span class="op">=</span> <span class="va">...</span>, group <span class="op">=</span> <span class="va">...</span>, replicate <span class="op">=</span> <span class="va">...</span><span class="op">)</span>,</span>
-<span>                      scale <span class="op">=</span> <span class="va">...</span><span class="op">)</span>,</span>
-<span>         state <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    mapper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>main <span class="op">=</span> <span class="va">...</span>, group <span class="op">=</span> <span class="va">...</span>, replicate <span class="op">=</span> <span class="va">...</span><span class="op">)</span>,</span>
+<span>    scale <span class="op">=</span> <span class="va">...</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  state <span class="op">=</span> <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -545,8 +557,10 @@ used to properly set the class information:</p>
 <code>n</code>, <code>n_inla</code>, <code>values</code>, and
 <code>values_inla</code> in the mapper object during construction:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span>mapper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, values <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
-<span>                  new_class <span class="op">=</span> <span class="st">"my_bru_mapper_class_name"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span></span>
+<span>  mapper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, values <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
+<span>  new_class <span class="op">=</span> <span class="st">"my_bru_mapper_class_name"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>The default <code>ibm_n</code> and <code>ibm_values</code> methods
 checks if these values are available, and return the appropriate values
 depending on the <code>inla_f</code> argument. When <code>*_inla</code>
