@@ -88,44 +88,30 @@ fm_requires_PROJ6 <- function(fun = NULL) {
 
 
 #' @rdname fm_as
-#' @name fm_as
 #' @export
-fm_as_sf_crs <- function(x) {
-  if (inherits(x, "crs")) {
-    x
-  } else if (inherits(x, "CRS")) {
-    sf::st_crs(x)
-  } else if (is.null(x)) {
-    sf::st_crs(x)
-  } else {
-    warning(
-      paste0(
-        "Unsupported source crs class ",
-        paste(class(x), sep = ",")
-      ),
-      immediate. = TRUE
-    )
-    x
-  }
-}
-#' @rdname fm_as
-#' @export
-fm_as_sp_crs <- function(x) {
+fm_as_sp_crs <- function(x, ...) {
   if (inherits(x, "CRS")) {
     x
+  } else if (inherits(x, "fm_crs")) {
+    if (is.na(x)) {
+      fm_CRS(NA_character_)
+    } else {
+      fm_CRS(SRS_string = x$wkt, oblique = x$oblique)
+    }
   } else if (inherits(x, "crs")) {
     if (is.na(x)) {
-      NULL
+      fm_CRS(NA_character_)
     } else {
       fm_CRS(SRS_string = x$wkt)
     }
   } else if (is.null(x)) {
-    NULL
+    fm_CRS(NA_character_)
   } else {
     warning(
       paste0(
-        "Unsupported source crs class ",
-        paste(class(x), sep = ",")
+        "Unsupported source crs class '",
+        paste(class(x), sep = ", "),
+        "'."
       ),
       immediate. = TRUE
     )
@@ -133,48 +119,7 @@ fm_as_sp_crs <- function(x) {
   }
 }
 
-#' Generic method for extracting crs objects
-#'
-#' Currently, `sp` `CRS` objects is supported.  Support for `sf` `crs`
-#' objects is experimental, and is likely to change.
-#'
-#' @rdname fm_get_crs
-#' @param \dots Arguments passed on to other methods
-#' @export
-fm_get_crs <- function(...) {
-  UseMethod("fm_get_crs")
-}
 
-#' @rdname fm_get_crs
-#' @export
-fm_get_crs.Spatial <- function(...) {
-  fm_sp_get_crs(...)
-}
-
-#' @rdname fm_get_crs
-#' @export
-fm_get_crs.sf <- function(...) {
-  fm_sf_get_crs(...)
-}
-
-#' @rdname fm_get_crs
-#' @export
-fm_get_crs.sfc <- function(...) {
-  fm_sf_get_crs(...)
-}
-
-#' @rdname fm_get_crs
-#' @param x from which to extract crs information
-#' @export
-fm_get_crs.inla.mesh <- function(x, ...) {
-  x[["crs"]]
-}
-
-#' @rdname fm_get_crs
-#' @export
-fm_get_crs.inla.mesh.segment <- function(x, ...) {
-  x[["crs"]]
-}
 
 
 #' @title Extract CRS information
@@ -185,6 +130,8 @@ fm_get_crs.inla.mesh.segment <- function(x, ...) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @details This function is a convenience method to workaround PROJ4/PROJ6
 #' differences, and the lack of a crs extraction method for Spatial objects.
+#' For newer code, use [fm_crs()] instead, that returns `crs` objects,
+#' and use [fm_as_sp_crs()] to convert to old style `sp::CRS` objects.
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
@@ -207,36 +154,15 @@ fm_sp_get_crs <- function(x) {
   crs
 }
 
-# ! For now just add fm_sf version of this
-# Is there any need for fm_has_PROJ6() stuff
-# for sf objects?
-
-# Given sf or sfc object, return
-fm_sf_get_crs <- function(x) {
-  if (is.null(x)) {
-    return(NULL)
-  }
-  fm_CRS(SRS_string = sf::st_crs(x)$wkt)
-}
 
 fm_crs_is_null <- function(crs) {
   if (is.null(crs)) {
     TRUE
-  } else if (fm_has_PROJ6()) {
-    wkt <- fm_crs_get_wkt(crs)
-    is.null(wkt)
   } else {
-    #    is.na(crs)
-    is.na(crs@projargs) && is.null(comment(crs))
+    is.na(fm_crs(crs))
   }
 }
 
-fm_ensure_crs <- function(crs) {
-  if (fm_crs_is_null(crs)) {
-    crs <- sp::CRS(NA_character_)
-  }
-  crs
-}
 
 
 
@@ -343,6 +269,27 @@ fm_crs_get_ellipsoid_radius <- function(crs) {
   fm_wkt_get_ellipsoid_radius(fm_crs_get_wkt(crs))
 }
 
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_ellipsoid_radius <- function(x) {
+  UseMethod("fm_ellipsoid_radius")
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_ellipsoid_radius.default <- function(x) {
+  fm_ellipsoid_radius(fm_crs_get_wkt(x))
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_ellipsoid_radius.character <- function(x) {
+  fm_wkt_get_ellipsoid_radius(x)
+}
+
 
 #' @param radius numeric; The new radius value
 #' @rdname fm_crs_wkt
@@ -397,25 +344,232 @@ fm_wkt_set_ellipsoid_radius <- function(wkt, radius) {
 #' @rdname fm_crs_wkt
 #' @export
 
-fm_crs_set_ellipsoid_radius <- function(crs, radius) {
-  fm_requires_PROJ6()
+`fm_ellipsoid_radius<-` <- function(x, value) {
+  UseMethod("fm_ellipsoid_radius<-")
+}
 
-  wkt <- fm_crs_get_wkt(crs)
-  wkt <- fm_wkt_set_ellipsoid_radius(wkt, radius)
-  new_crs <- fm_CRS(SRS_string = wkt)
-  if (inherits(crs, "inla.CRS")) {
-    crs$crs <- new_crs
-    crs
-  } else {
-    new_crs
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.character` <- function(x, value) {
+  x <- fm_wkt_set_ellipsoid_radius(x, value)
+  invisible(x)
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.CRS` <- function(x, value) {
+  crs <- fm_crs(x)
+  fm_ellipsoid_radius(crs) <- value
+  new_crs <- fm_as_sp_crs(crs)
+
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.inla.CRS` <- function(x, value) {
+  crs <- fm_crs(x)
+  fm_ellipsoid_radius(crs) <- value
+  new_crs <- fm_as_sp_crs(crs)
+
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.crs` <- function(x, value) {
+  wkt <- fm_crs_get_wkt(x)
+  fm_ellipsoid_radius(wkt) <- value
+  new_crs <- fm_crs(wkt)
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.fm_crs` <- function(x, value) {
+  wkt <- fm_crs_get_wkt(x)
+  fm_ellipsoid_radius(wkt) <- value
+  new_crs <- fm_crs(wkt)
+  class(new_crs) <- c("fm_crs", class(new_crs))
+  new_crs$oblique <- x$oblique
+  new_crs
+}
+
+
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_crs_set_ellipsoid_radius <- function(crs, radius) {
+  fm_ellipsoid_radius(crs) <- radius
+  crs
+}
+
+# Length unit ----
+
+
+#' @rdname fm_crs_wkt
+#' @export
+
+`fm_ellipsoid_radius<-` <- function(x, value) {
+  UseMethod("fm_ellipsoid_radius<-")
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.character` <- function(x, value) {
+  x <- fm_wkt_set_ellipsoid_radius(x, value)
+  invisible(x)
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.CRS` <- function(x, value) {
+  crs <- fm_crs(x)
+  fm_ellipsoid_radius(crs) <- value
+  new_crs <- fm_as_sp_crs(crs)
+
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.inla.CRS` <- function(x, value) {
+  crs <- fm_crs(x)
+  fm_ellipsoid_radius(crs) <- value
+  new_crs <- fm_as_sp_crs(crs)
+
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.crs` <- function(x, value) {
+  wkt <- fm_crs_get_wkt(x)
+  fm_ellipsoid_radius(wkt) <- value
+  new_crs <- fm_crs(wkt)
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.fm_crs` <- function(x, value) {
+  wkt <- fm_crs_get_wkt(x)
+  fm_ellipsoid_radius(wkt) <- value
+  new_crs <- fm_crs(wkt)
+  class(new_crs) <- c("fm_crs", class(new_crs))
+  new_crs$oblique <- x$oblique
+  new_crs
+}
+
+
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_crs_set_lengthunit <- function(crs, radius) {
+  fm_length_unit(crs) <- radius
+  crs
+}
+
+# ----
+
+
+#' @title Obtain coordinate reference system object
+#'
+#' @description Obtain an `sf::crs` or `fm_crs` object from a spatial object, or
+#' convert crs information to construct a new `sf::crs` object.
+#' @export
+fm_crs <- function(x, ...) {
+  UseMethod("fm_crs")
+}
+
+#' @export
+#' @rdname fm_crs
+fm_crs.default <- function(x, ...) {
+  if (missing(x)) {
+    return(sf::NA_crs_)
   }
+  sf::st_crs(x, ...)
+}
+
+#' @export
+#' @param crsonly logical; if `TRUE`, remove any oblique` information
+#' for `fm_crs` class objects and return a pure `crs` class object. Default: `FALSE`.
+#' @rdname fm_crs
+fm_crs.fm_crs <- function(x, ..., crsonly = FALSE) {
+  if (crsonly) {
+    x$oblique <- NULL
+    class(x) <- "crs"
+    sf::st_crs(x)
+  } else {
+    x
+  }
+}
+
+#' @export
+#' @rdname fm_crs
+fm_crs.inla.CRS <- function(x, ...) {
+  y <- fm_crs(x$crs, ...)
+  class(y) <- c("fm_crs", class(y))
+  y$oblique <- x$oblique
+  y
+}
+
+#' @export
+#' @rdname fm_crs
+fm_crs.character <- function(x, ...) {
+  predef <- fm_wkt_predef()
+  if (x %in% names(predef)) {
+    x <- predef[[x]]
+  }
+  sf::st_crs(x)
+}
+
+
+#' @rdname fm_crs
+#' @export
+fm_crs.Spatial <- function(x, ...) {
+  if (is.null(x)) {
+    return(sf::NA_crs_)
+  }
+  if (fm_has_PROJ6()) {
+    suppressWarnings(crs <- fm_crs(sp::wkt(x)))
+  } else {
+    crs <- fm_crs(proj4string(x))
+  }
+  crs
 }
 
 
 
+#' @rdname fm_crs
+#' @export
+fm_crs.sf <- function(x, ...) {
+  sf::st_crs(x)
+}
 
+#' @rdname fm_crs
+#' @export
+fm_crs.sfc <- function(x, ...) {
+  sf::st_crs(x)
+}
 
+#' @rdname fm_crs
+#' @export
+fm_crs.sfg <- function(x, ...) {
+  sf::st_crs(x)
+}
 
+#' @rdname fm_crs
+#' @export
+fm_crs.inla.mesh <- function(x, ...) {
+  fm_crs(x[["crs"]])
+}
+
+#' @rdname fm_crs
+#' @export
+fm_crs.inla.mesh.segment <- function(x, ...) {
+  fm_crs(x[["crs"]])
+}
 
 
 
@@ -503,13 +657,28 @@ fm_crs_set_ellipsoid_radius <- function(crs, radius) {
 #' }
 #' @export
 #' @rdname fm_CRS
+fm_CRS <- function(...) {
+  UseMethod("fm_CRS")
+}
 
-# ! sp code in this function
+#' @export
+#' @rdname fm_CRS
+fm_CRS.crs <- function(...) {
+  fm_as_sp_crs(...)
+}
 
-fm_CRS <- function(projargs = NULL, doCheckCRSArgs = TRUE,
-                   args = NULL, oblique = NULL,
-                   SRS_string = NULL,
-                   ...) {
+#' @export
+#' @rdname fm_CRS
+fm_CRS.fm_crs <- function(...) {
+  fm_as_sp_crs(...)
+}
+
+#' @export
+#' @rdname fm_CRS
+fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
+                           args = NULL, oblique = NULL,
+                           SRS_string = NULL,
+                           ...) {
   if (fm_has_PROJ6()) {
     # PROJ6
     if (identical(projargs, "")) {
@@ -1093,7 +1262,11 @@ fm_crs_get_wkt <- function(crs) {
     return(NULL)
   }
 
-  comment(crs)
+  if (inherits(crs, "CRS")) {
+    comment(crs)
+  } else {
+    crs$wkt
+  }
 }
 
 #' @return For `fm_crs_get_lengthunit`, a
@@ -1424,18 +1597,256 @@ fm_internal_update_crs <- function(crs, newcrs, mismatch.allowed) {
 #' @keywords internal
 
 fm_identical_CRS <- function(crs0, crs1, crsonly = FALSE) {
-  if (!crsonly) {
-    identical(crs0, crs1)
+  if (crsonly) {
+    crs0 <- fm_crs(crs0, crsonly = TRUE)
+    crs1 <- fm_crs(crs1, crsonly = TRUE)
+  }
+  identical(crs0, crs1)
+}
+
+
+
+
+
+
+
+#' @title Object coordinate transformation
+#'
+#' @description
+#' Handle transformation of various inla objects according to coordinate
+#' reference systems of `crs` (from `sf::st_crs()`), `fm_crs`,¬`sp::CRS` or
+#' `INLA::inla.CRS` class.
+#'
+#' @param x
+#' The object that should be transformed from it's current CRS to a new CRS
+#' @param crs
+#' The target crs object
+#' @param crs0
+#' The source crs object for spatial classes without crs information
+#' @param passthrough
+#' Default is FALSE.
+#' Setting to TRUE allows objects with no CRS information to be passed
+#' through without transformation. Use with care!
+#' @param \dots
+#' Potential additional arguments
+#' @seealso [fm_CRS()]
+#' @export
+fm_transform <- function(x, crs = fm_crs(x), ...) {
+  UseMethod("fm_transform")
+}
+
+#' @rdname fm_transform
+#' @export
+fm_transform.default <- function(x, crs = fm_crs(x), ..., crs0 = NULL) {
+  stop(paste0(
+    "fm_transform() for '",
+    paste0(class(x), sep = ", "),
+    "' not yet implemented."
+  ))
+  if (!is.null(crs0)) {
+    fm_spTransform.default(x, crs0 = crs0, crs1 = crs, ...)
   } else {
-    if (inherits(crs0, "inla.CRS")) {
-      crs0 <- crs0$crs
-    }
-    if (inherits(crs1, "inla.CRS")) {
-      crs1 <- crs1$crs
-    }
-    identical(crs0, crs1)
+    fm_spTransform(x, CRSobj = crs, ...)
   }
 }
+
+#' @rdname fm_transform
+#' @export
+fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = NULL) {
+  crs1 <- fm_crs(crs)
+  crs0 <- fm_crs(crs0)
+  if (is.na(crs0) || is.na(crs1)) {
+    if (!passthrough) {
+      if (is.na(crs0)) {
+        stop("'crs0' is an invalid coordinate reference object.")
+      }
+      if (is.na(crs1)) {
+        stop("'crs' is an invalid coordinate reference object.")
+      }
+    }
+    return(x)
+  }
+  if (ncol(x) == 2) {
+    x <- cbind(x, 0)
+  }
+  sphere_radius_0 <- fm_crs_get_ellipsoid_radius(crs0)
+  sphere_radius_1 <- fm_crs_get_ellipsoid_radius(crs1)
+  different_radii <- (sphere_radius_0 != sphere_radius_1)
+  longlat_norm <- fm_crs("longlat_norm")
+  longlat_0 <- fm_crs_set_ellipsoid_radius(longlat_norm, sphere_radius_0)
+  longlat_1 <- fm_crs_set_ellipsoid_radius(longlat_norm, sphere_radius_1)
+
+  crs_sphere <- fm_crs("sphere")
+  onsphere_0 <- fm_identical_CRS(crs0, crs_sphere, crsonly = TRUE)
+  onsphere_1 <- fm_identical_CRS(crs1, crs_sphere, crsonly = TRUE)
+  is_geocentric_0 <- fm_crs_is_geocent(crs0)
+  is_geocentric_1 <- fm_crs_is_geocent(crs1)
+  if (is_geocentric_0) {
+    ok <- TRUE
+  } else {
+    bounds <- fm_crs_bounds(crs0)
+    if (identical(fm_crs_projection_type(crs0), "longlat")) {
+      ## Wrap longitudes to [-180,180]
+      needswrap <- (x[, 1] < -180) | (x[, 1] > 180)
+      if (any(needswrap)) {
+        x[needswrap, 1] <- ((x[needswrap, 1] + 180) %% 360) - 180
+      }
+    }
+    ok <- fm_crs_bounds_check(x, bounds)
+    if (!all(ok)) {
+      xx <- x
+    }
+  }
+  do_work_on_sphere <-
+    inherits(crs0, "fm_crs") ||
+      inherits(crs1, "fm_crs") ||
+      different_radii
+  x <- x[ok, , drop = FALSE]
+  if (do_work_on_sphere) {
+    if (!onsphere_0) {
+      if (sphere_radius_0 != 1) {
+        x <- sf::sf_project(
+          x,
+          from = crs0,
+          to = longlat_0
+        )
+      }
+      # x can now be treated as being in longlat_norm coordinates
+      x <- sf::sf_project(
+        x,
+        from = longlat_norm,
+        to = crs_sphere
+      )
+    }
+    if (!is.null(crs0$oblique)) {
+      x <- fm_crs_transform_oblique(x,
+        crs0$oblique,
+        to.oblique = FALSE
+      )
+    }
+
+    if (!is.null(crs1$oblique)) {
+      x <- fm_crs_transform_oblique(x,
+        crs1$oblique,
+        to.oblique = TRUE
+      )
+    }
+    if (sphere_radius_1 != 1) {
+      x <- sf::sf_project(
+        x,
+        from = crs0,
+        to = longlat_norm
+      )
+      # x can now be treated as being in longlat_1
+    }
+  }
+
+  x <- sf::sf_project(
+    x,
+    from = if (do_work_on_sphere) longlat_1 else crs0,
+    to = crs1
+  )
+
+  if (!all(ok)) {
+    xx[ok, ] <- x
+    xx[!ok, ] <- NA
+    x <- xx
+  }
+
+  x
+}
+
+#' @rdname fm_transform
+#' @export
+fm_transform.list <- function(x, crs = fm_crs(x), ...) {
+  if (!is.null(crs)) {
+    x <- lapply(x, function(xx) fm_transform(xx))
+  }
+  x
+}
+
+
+# Internal helper function for fm_transform.sf/sfc/sfg
+fm_transform_sf <- function(x, crs, ..., passthrough) {
+  crs1 <- fm_crs(crs)
+  crs0 <- fm_crs(x)
+  if (is.na(crs0) || is.na(crs1)) {
+    if (!passthrough) {
+      if (is.na(crs0)) {
+        stop("'crs0' is an invalid coordinate reference object.")
+      }
+      if (is.na(crs1)) {
+        stop("'crs' is an invalid coordinate reference object.")
+      }
+    }
+    return(x)
+  }
+
+  sf::st_transform(x, crs1)
+}
+
+#' @export
+#' @rdname fm_transform
+fm_transform.sf <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  fm_transform_sf(x, crs = crs, ..., passthrough = passthrough)
+}
+#' @export
+#' @rdname fm_transform
+fm_transform.sfc <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  fm_transform_sf(x, crs = crs, ..., passthrough = passthrough)
+}
+#' @export
+#' @rdname fm_transform
+fm_transform.sfg <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  fm_transform_sf(x, crs = crs, ..., passthrough = passthrough)
+}
+
+#' @export
+#' @rdname fm_transform
+fm_transform.Spatial <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  as(fm_transform(sf::st_as_sf(x), crs = crs, ..., passthrough = passthrough), "Spatial")
+}
+
+
+
+fm_crs_detect_manifold <- function(crs) {
+  if (fm_crs_is_geocent(crs)) {
+    manifold <- "S2"
+  } else {
+    manifold <- "R2"
+  }
+  manifold
+}
+
+#' @export
+#' @rdname fm_transform
+fm_transform.inla.mesh <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  x$loc <- fm_transform(x$loc, crs0 = x$crs, crs = crs, ..., passthrough = passthrough)
+  x$manifold <- fm_crs_detect_manifold(crs)
+  x$crs <- fm_as_sp_crs(crs)
+  x
+}
+
+#' @export
+#' @rdname fm_transform
+fm_transform.inla.mesh.lattice <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  x$segm <- fm_transform(x$segm, crs = crs, ..., passthrough = passthrough)
+  x$loc <- fm_transform(x$loc, csr0 = x$crs, csr = crs, ..., passthrough = passthrough)
+  x$crs <- fm_as_sp_crs(crs)
+  invisible(x)
+}
+
+#' @export
+#' @rdname fm_transform
+fm_transform.inla.mesh.segment <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  x$loc <- fm_transform(x$loc, crs0 = x$crs, crs = crs, ..., passthrough = passthrough)
+  x$crs <- fm_as_sp_crs(crs)
+  invisible(x)
+}
+
+
+
+
 
 #' Handle transformation of various inla objects according to coordinate
 #' reference systems of sp::CRS or INLA::inla.CRS class.
@@ -1768,37 +2179,20 @@ fm_spTransform.SpatialPointsDataFrame <- function(x,
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.inla.mesh.lattice <- function(x, CRSobj, passthrough = FALSE, ...) {
-  x$segm <- fm_spTransform(x$segm, CRSobj, passthrough = passthrough)
-  x$loc <- fm_spTransform(x$loc, x$crs, CRSobj, passthrough = passthrough)
-  x$crs <- CRSobj
-  invisible(x)
+  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh.lattie()", "fm_transform()")
+  fm_transform(x, crs = CRSobj, ..., passthrough = passthrough)
 }
 
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.inla.mesh.segment <- function(x, CRSobj, passthrough = FALSE, ...) {
-  x$loc <- fm_spTransform(x$loc, x$crs, CRSobj, passthrough = passthrough)
-  x$crs <- CRSobj
-  invisible(x)
-}
-
-
-
-
-fm_crs_detect_manifold <- function(crs) {
-  if (fm_crs_is_geocent(crs)) {
-    manifold <- "S2"
-  } else {
-    manifold <- "R2"
-  }
-  manifold
+  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh.segment()", "fm_transform()")
+  fm_transform(x, crs = CRSobj, ..., passthrough = passthrough)
 }
 
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.inla.mesh <- function(x, CRSobj, passthrough = FALSE, ...) {
-  x$loc <- fm_spTransform(x$loc, x$crs, CRSobj, passthrough = passthrough)
-  x$manifold <- fm_crs_detect_manifold(CRSobj)
-  x$crs <- CRSobj
-  invisible(x)
+  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh()", "fm_transform()")
+  fm_transform(x, crs = CRSobj, ..., passthrough = passthrough)
 }

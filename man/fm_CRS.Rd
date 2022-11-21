@@ -2,10 +2,19 @@
 % Please edit documentation in R/fmesher_crs.R
 \name{fm_CRS}
 \alias{fm_CRS}
+\alias{fm_CRS.crs}
+\alias{fm_CRS.fm_crs}
+\alias{fm_CRS.default}
 \alias{fm_wkt_predef}
 \title{Create a coordinate reference system object}
 \usage{
-fm_CRS(
+fm_CRS(...)
+
+\method{fm_CRS}{crs}(...)
+
+\method{fm_CRS}{fm_crs}(...)
+
+\method{fm_CRS}{default}(
   projargs = NULL,
   doCheckCRSArgs = TRUE,
   args = NULL,
@@ -17,6 +26,8 @@ fm_CRS(
 fm_wkt_predef()
 }
 \arguments{
+\item{\dots}{Additional parameters. Not currently in use.}
+
 \item{projargs}{Either 1) a projection argument string suitable as input to
 \code{sp::CRS}, or 2) an existing \code{CRS} object, or 3) a shortcut
 reference string to a predefined projection; run
@@ -37,8 +48,6 @@ Details section below.}
 
 \item{SRS_string}{a WKT2 string defining the coordinate system;
 see \code{sp::CRS}. This takes precedence over \code{projargs}.}
-
-\item{\dots}{Additional parameters. Not currently in use.}
 }
 \value{
 Either an \code{sp::CRS} object or an \code{inla.CRS} object,

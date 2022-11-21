@@ -58,13 +58,6 @@ test_that("sf gorillas lgcp vignette", {
     prior.range = c(5, 0.01)
   )
 
-  library(sf)
-  # Using sf::st_coordinates here did not seem to parse correctly
-  # and the domain definition in the lgcp() call was expecting a
-  # domain named sf.
-  # FL: st_coordinates produces a matrix with both coordinates and some labelling columns,
-  # so is not a proper equivalent of sp::coordinates. But the geometry column
-  # makes sense to use.
   cmp <- geometry ~ mySmooth(geometry, model = matern) +
     Intercept(1)
 

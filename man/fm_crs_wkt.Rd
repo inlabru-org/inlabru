@@ -5,15 +5,24 @@
 \alias{fm_crs_is_geocent}
 \alias{fm_wkt_get_ellipsoid_radius}
 \alias{fm_crs_get_ellipsoid_radius}
+\alias{fm_ellipsoid_radius}
+\alias{fm_ellipsoid_radius.default}
+\alias{fm_ellipsoid_radius.character}
 \alias{fm_wkt_set_ellipsoid_radius}
+\alias{fm_ellipsoid_radius<-}
+\alias{fm_ellipsoid_radius<-.character}
+\alias{fm_ellipsoid_radius<-.CRS}
+\alias{fm_ellipsoid_radius<-.inla.CRS}
+\alias{fm_ellipsoid_radius<-.crs}
+\alias{fm_ellipsoid_radius<-.fm_crs}
 \alias{fm_crs_set_ellipsoid_radius}
+\alias{fm_crs_set_lengthunit}
 \alias{fm_wkt_unit_params}
 \alias{fm_crs_wkt}
 \alias{fm_wkt_get_lengthunit}
 \alias{fm_wkt_set_lengthunit}
 \alias{fm_crs_get_wkt}
 \alias{fm_crs_get_lengthunit}
-\alias{fm_crs_set_lengthunit}
 \title{Handling CRS/WKT}
 \usage{
 fm_wkt_is_geocent(wkt)
@@ -24,9 +33,41 @@ fm_wkt_get_ellipsoid_radius(wkt)
 
 fm_crs_get_ellipsoid_radius(crs)
 
+fm_ellipsoid_radius(x)
+
+\method{fm_ellipsoid_radius}{default}(x)
+
+\method{fm_ellipsoid_radius}{character}(x)
+
 fm_wkt_set_ellipsoid_radius(wkt, radius)
 
+fm_ellipsoid_radius(x) <- value
+
+\method{fm_ellipsoid_radius}{character}(x) <- value
+
+\method{fm_ellipsoid_radius}{CRS}(x) <- value
+
+\method{fm_ellipsoid_radius}{inla.CRS}(x) <- value
+
+\method{fm_ellipsoid_radius}{crs}(x) <- value
+
+\method{fm_ellipsoid_radius}{fm_crs}(x) <- value
+
 fm_crs_set_ellipsoid_radius(crs, radius)
+
+fm_ellipsoid_radius(x) <- value
+
+\method{fm_ellipsoid_radius}{character}(x) <- value
+
+\method{fm_ellipsoid_radius}{CRS}(x) <- value
+
+\method{fm_ellipsoid_radius}{inla.CRS}(x) <- value
+
+\method{fm_ellipsoid_radius}{crs}(x) <- value
+
+\method{fm_ellipsoid_radius}{fm_crs}(x) <- value
+
+fm_crs_set_lengthunit(crs, unit, params = NULL)
 
 fm_wkt_unit_params()
 

@@ -197,22 +197,6 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(NA_character_), to
 #' }
 #'
 stransform <- function(splist, crs) {
-  if (!is.null(crs)) {
-    if (class(splist)[[1]] == "list") {
-      for (k in seq_len(length(splist))) {
-        if (inherits(splist[[k]], "Spatial")) {
-          # cn = coordnames(splist[[k]])
-          splist[[k]] <- sp::spTransform(splist[[k]], crs)
-          # coordnames(splist[[k]]) = cn
-        } else if (inherits(splist[[k]], "inla.mesh")) {
-          splist[[k]] <- fm_spTransform(splist[[k]], CRSobj = crs)
-        }
-      }
-    } else {
-      splist <- stransform(list(splist), crs = crs)[[1]]
-    }
-    splist
-  } else {
-    splist
-  }
+  lifecycle::deprecate_warn("2.6.0", "stransform()", "fm_transform()")
+  fm_transform(splist, crs = crs)
 }

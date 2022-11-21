@@ -40,7 +40,7 @@ fm_as_sfc.inla.mesh <- function(x, ...) {
       dim = "XYZ"
     )
   )
-  sf::st_crs(geom) <- fm_as_sf_crs(x$crs)
+  sf::st_crs(geom) <- fm_crs(x$crs)
   geom
 }
 
@@ -70,7 +70,7 @@ fm_as_inla_mesh.sfc_MULTIPOLYGON <- function(x, ...) {
       }
     )
   )
-  crs <- fm_as_sp_crs(sf::st_crs(x))
+  crs <- fm_CRS(sf::st_crs(x))
   mesh <- INLA::inla.mesh.create(
     loc = loc, tv = tv, ...,
     crs = crs
@@ -102,7 +102,7 @@ fm_as_inla_mesh_segment.sfc_POINT <-
     #      )
     #    }
 
-    crs <- fm_as_sp_crs(crs) # required for INLA::inla.mesh.segment
+    crs <- fm_CRS(crs) # required for INLA::inla.mesh.segment
 
     loc <- sf::st_coordinates(sfc)
     coord_names <- intersect(c("X", "Y", "Z"), colnames(loc))
@@ -144,7 +144,7 @@ fm_as_inla_mesh_segment.sfc_LINESTRING <-
     #    }
 
     crs <- sf::st_crs(sfc)
-    crs <- fm_as_sp_crs(crs) # required for INLA::inla.mesh.segment
+    crs <- fm_CRS(crs) # required for INLA::inla.mesh.segment
 
     segm <- list()
     if (is.null(grp)) {
@@ -182,7 +182,7 @@ fm_as_inla_mesh_segment.sfc_POLYGON <-
   function(x, join = TRUE, grp = NULL, ...) {
     sfc <- x
     crs <- sf::st_crs(sfc)
-    crs <- fm_as_sp_crs(crs) # required for INLA::inla.mesh.segment
+    crs <- fm_CRS(crs) # required for INLA::inla.mesh.segment
 
     segm <- list()
     if (is.null(grp)) {

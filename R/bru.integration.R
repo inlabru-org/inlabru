@@ -317,7 +317,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     # transform to equal area projection
     if (!fm_crs_is_null(domain$crs)) {
       crs <- domain$crs
-      samplers <- stransform(domain, crs = CRS("+proj=cea +units=km"))
+      samplers <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
     }
 
     ips <- vertices(domain)
@@ -325,7 +325,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     # backtransform
     if (!fm_crs_is_null(domain$crs)) {
-      ips <- stransform(ips, crs = crs)
+      ips <- fm_transform(ips, crs = crs)
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else if (inherits(samplers, "SpatialPointsDataFrame")) {
@@ -393,7 +393,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     # Convert samplers and domain to equal area CRS
     if (!fm_crs_is_null(domain$crs)) {
-      samplers <- stransform(samplers, crs = sp::CRS("+proj=cea +units=km"))
+      samplers <- fm_transform(samplers, crs = fm_crs("+proj=cea +units=km"))
     }
 
     # This old code doesn't handle holes properly.
@@ -428,10 +428,12 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       domain$crs <- fm_sp_get_crs(samplers)
     } else {
       if (!fm_crs_is_null(domain$crs)) {
-        domain <- stransform(domain, crs = CRS("+proj=cea +units=km"))
+        domain <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
       }
     }
-    domain_crs <- fm_ensure_crs(domain$crs)
+    domain_crs <- fm_crs(domain$crs)
+    domain_crs <- fm_CRS(domain_crs)
+
 
     if (identical(int.args[["poly_method"]], "legacy")) {
       ips <- int.polygon(domain,
@@ -475,7 +477,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(samplers_crs)) {
-      ips <- stransform(ips, crs = samplers_crs)
+      ips <- fm_transform(ips, crs = samplers_crs)
     }
 
     coord_names <- c("x", "y", "coordinateZ")
