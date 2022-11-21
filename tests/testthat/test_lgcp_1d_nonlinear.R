@@ -85,25 +85,28 @@ test_that("Mexdolphin: Hazard rate detection function", {
     )
     ggplot(data.frame(pts)) +
       stat_ecdf(aes(distance)) +
-      geom_line(aes(distance,
-        cumsum(hr(distance, fit$summary.fixed["lsig", "mean"])) /
-          sum(hr(distance, fit$summary.fixed["lsig", "mean"])),
-        col = "Plugin"
-      ),
-      data = data.frame(ips)
+      geom_line(
+        aes(distance,
+          cumsum(hr(distance, fit$summary.fixed["lsig", "mean"])) /
+            sum(hr(distance, fit$summary.fixed["lsig", "mean"])),
+          col = "Plugin"
+        ),
+        data = data.frame(ips)
       ) +
-      geom_line(aes(distance,
-        cumsum(mean) / sum(mean),
-        col = "Pred"
-      ),
-      data = pred
+      geom_line(
+        aes(distance,
+          cumsum(mean) / sum(mean),
+          col = "Pred"
+        ),
+        data = pred
       ) +
-      geom_line(aes(distance,
-        cumsum(hr(distance, 1)) /
-          sum(hr(distance, 1)),
-        col = "1"
-      ),
-      data = data.frame(ips)
+      geom_line(
+        aes(distance,
+          cumsum(hr(distance, 1)) /
+            sum(hr(distance, 1)),
+          col = "1"
+        ),
+        data = data.frame(ips)
       )
   }
 

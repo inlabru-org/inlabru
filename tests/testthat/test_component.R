@@ -5,7 +5,7 @@ test_that("Component construction: linear model", {
 
   # Using label as input:
   cmp0 <- component_list(
-    ~ x,
+    ~x,
     lhoods = list(list(data = df))
   )[["x"]]
 
@@ -403,4 +403,3 @@ test_that("Component construction: deprecated arguments", {
     "Use of 'map' is deprecated"
   )
 })
-

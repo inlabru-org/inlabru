@@ -64,7 +64,6 @@ been observed completely.
 \donttest{
 if (bru_safe_inla() &&
   require(ggplot2, quietly = TRUE)) {
-
   # Load the Gorilla data
   data(gorillas, package = "inlabru")
 

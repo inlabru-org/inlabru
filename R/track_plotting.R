@@ -14,24 +14,26 @@ make_track_plots <- function(fit) {
   }
   track_data <-
     fit$bru_iinla$track %>%
-    dplyr::left_join(fit$bru_iinla$track %>%
-      dplyr::filter(.data$iteration == max(.data$iteration)) %>%
-      dplyr::rename(
-        mode_end = .data$mode,
-        new_linearisation_end = .data$new_linearisation,
-        sd_end = .data$sd
-      ),
-    by = c("effect", "index"),
+    dplyr::left_join(
+      fit$bru_iinla$track %>%
+        dplyr::filter(.data$iteration == max(.data$iteration)) %>%
+        dplyr::rename(
+          mode_end = .data$mode,
+          new_linearisation_end = .data$new_linearisation,
+          sd_end = .data$sd
+        ),
+      by = c("effect", "index"),
     ) %>%
     dplyr::mutate(iteration = .data$iteration.x) %>%
-    dplyr::left_join(fit$bru_iinla$track %>%
-      dplyr::filter(.data$iteration == 1) %>%
-      dplyr::rename(
-        mode_start = .data$mode,
-        new_linearisation_start = .data$new_linearisation,
-        sd_start = .data$sd
-      ),
-    by = c("effect", "index"),
+    dplyr::left_join(
+      fit$bru_iinla$track %>%
+        dplyr::filter(.data$iteration == 1) %>%
+        dplyr::rename(
+          mode_start = .data$mode,
+          new_linearisation_start = .data$new_linearisation,
+          sd_start = .data$sd
+        ),
+      by = c("effect", "index"),
     ) %>%
     dplyr::mutate(iteration = .data$iteration.x)
 

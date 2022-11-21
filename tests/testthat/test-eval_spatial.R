@@ -65,7 +65,6 @@ test_that("eval_spatial.SpatRaster", {
 
 
 test_that("eval_spatial.Spatial", {
-
   # Load the Gorilla data
   data(gorillas, package = "inlabru", envir = environment())
 

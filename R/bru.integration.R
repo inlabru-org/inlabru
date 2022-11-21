@@ -72,7 +72,6 @@
 #' \donttest{
 #' if (require("INLA", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
-#'
 #'   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 #'
 #'   ips <- ipoints(c(0, 10), 50, name = "myDim")
@@ -341,7 +340,6 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     ips$weight <- 1
   } else if (inherits(samplers, "SpatialLines") ||
     inherits(samplers, "SpatialLinesDataFrame")) {
-
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
     if (inherits(samplers, "SpatialLines") &&
       !inherits(samplers, "SpatialLinesDataFrame")) {

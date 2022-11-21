@@ -63,7 +63,8 @@ ibm_eval --> effect
 ibm_eval_lin --> effect
 ',
   width = 600,
-  height = 800)
+  height = 800
+)
 ```
 
 ## Linearising a mapping
@@ -100,7 +101,8 @@ ibm_lin --> lin
 %%state-->lin
 ',
   width = 600,
-  height = 400)
+  height = 400
+)
 ```
 
 ## Component input evaluation
@@ -139,12 +141,12 @@ flowchart TD
   res -->|error| null_on_fail
   data --> eval
   _envir --> eval
-  
+
   null_on_fail -->|TRUE| input0
   null_on_fail -->|FALSE| input1
   input0 --> input
   input1 --> input
-  
+
   res -->|function| eval_function
   eval_function --> is_coordinates_fun
 
@@ -170,5 +172,6 @@ flowchart TD
   layer_expr --> layer_eval --> layer --> eval_spatial
 ',
   width = 900,
-  height = 700)
+  height = 700
+)
 ```

@@ -230,7 +230,6 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
 
 
 int.slines <- function(data, mesh, group = NULL, project = TRUE) {
-
   # Extract start and end coordinates
   qq <- coordinates(data)
   sp <- do.call(

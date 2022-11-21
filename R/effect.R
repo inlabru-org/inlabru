@@ -230,7 +230,6 @@ component <- function(...) {
 #' @examples
 #' \donttest{
 #' if (bru_safe_inla(quietly = TRUE)) {
-#'
 #'   # As an example, let us create a linear component. Here, the component is
 #'   # called "myEffectOfX" while the covariate the component acts on is called "x":
 #'
@@ -283,7 +282,6 @@ component.character <- function(object,
                                 A.msk = NULL,
                                 .envir = parent.frame(),
                                 envir_extra = NULL) {
-
   # INLA models:
   # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper,
   #            besagproper2, fgn, fgn2, ar1, ar1c, ar, ou, generic, generic0, generic1, generic2, generic3, spde,
@@ -555,11 +553,12 @@ component.character <- function(object,
     }
 
     component$inla.formula <-
-      as.formula(paste0(
-        "~ . + ",
-        as.character(parse(text = deparse(fcall)))
-      ),
-      env = .envir
+      as.formula(
+        paste0(
+          "~ . + ",
+          as.character(parse(text = deparse(fcall)))
+        ),
+        env = .envir
       )
 
     component$fcall <- fcall
@@ -842,13 +841,14 @@ add_mappers.component <- function(component, lhoods, ...) {
   if (!(component[["main"]][["type"]] %in% c("offset", "const"))) {
     # Update the formula that will be presented to INLA
     component$inla.formula <-
-      as.formula(paste0(
-        "~ . + ",
-        paste0(deparse(fcall),
-          collapse = "\n"
-        )
-      ),
-      env = component$env
+      as.formula(
+        paste0(
+          "~ . + ",
+          paste0(deparse(fcall),
+            collapse = "\n"
+          )
+        ),
+        env = component$env
       )
   }
 
@@ -917,12 +917,13 @@ bru_subcomponent <- function(input = NULL,
   } else if (is.character(model)) {
     if (identical(model, "factor")) {
       model <- "factor_contrast"
-      warning(paste0(
-        "Deprecated model 'factor'. Please use 'factor_full' or ",
-        "'factor_contrast' instead.\n",
-        "Defaulting to 'factor_contrast' that matches the old 'factor' model."
-      ),
-      immediate. = TRUE
+      warning(
+        paste0(
+          "Deprecated model 'factor'. Please use 'factor_full' or ",
+          "'factor_contrast' instead.\n",
+          "Defaulting to 'factor_contrast' that matches the old 'factor' model."
+        ),
+        immediate. = TRUE
       )
     }
     if (identical(model, "factor_full")) {
@@ -1099,17 +1100,18 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
       # TODO: Check for vector/matrix/coordinate inconsistency
       null.results <- vapply(inp, function(x) is.null(x), TRUE)
       if (all(null.results)) {
-        warning(paste0(
-          "All covariate evaluations for '", label,
-          "' are NULL; an intercept component was likely intended.\n",
-          "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
-          "  Use explicit notation '+ ", label, "(1)' instead",
-          if (identical(label, "Intercept")) {
-            " (or '+1' for '+ Intercept(1)')"
-          },
-          "."
-        ),
-        immediate. = TRUE
+        warning(
+          paste0(
+            "All covariate evaluations for '", label,
+            "' are NULL; an intercept component was likely intended.\n",
+            "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
+            "  Use explicit notation '+ ", label, "(1)' instead",
+            if (identical(label, "Intercept")) {
+              " (or '+1' for '+ Intercept(1)')"
+            },
+            "."
+          ),
+          immediate. = TRUE
         )
         unique_inputs <- list(
           inp_values = 1,
@@ -1814,7 +1816,6 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
 
 input_eval.bru_input <- function(input, data, env = NULL,
                                  null.on.fail = FALSE, ...) {
-
   # Evaluate the map with the data in an environment
   enclos <-
     if (is.null(env)) {

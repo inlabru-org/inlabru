@@ -968,17 +968,18 @@ bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL, ...
   if (is.null(offset)) {
     offset <- numeric(nrow(jacobian))
   }
-  bru_mapper_define(list(
-    offset = as.vector(offset),
-    jacobian = jacobian,
-    state0 = state0,
-    n_multi = n_multi,
-    n = sum(n_multi),
-    n_output = length(offset),
-    values_mapper = NULL
-  ),
-  # TODO: maybe allow values_mapper
-  new_class = "bru_mapper_taylor"
+  bru_mapper_define(
+    list(
+      offset = as.vector(offset),
+      jacobian = jacobian,
+      state0 = state0,
+      n_multi = n_multi,
+      n = sum(n_multi),
+      n_output = length(offset),
+      values_mapper = NULL
+    ),
+    # TODO: maybe allow values_mapper
+    new_class = "bru_mapper_taylor"
   )
 }
 
@@ -2035,14 +2036,15 @@ bru_mapper_pipe <- function(mappers, ...) {
     warning("Either all or none of the pipe sub-mappers should be named.", immediate. = TRUE)
     names(mappers) <- as.character(seq_along(mappers))
   }
-  bru_mapper_define(list(
-    mappers = mappers,
-    is_linear_multi,
-    is_linear = is_linear,
-    n_multi = n_multi,
-    n = n
-  ),
-  new_class = "bru_mapper_pipe"
+  bru_mapper_define(
+    list(
+      mappers = mappers,
+      is_linear_multi,
+      is_linear = is_linear,
+      n_multi = n_multi,
+      n = n
+    ),
+    new_class = "bru_mapper_pipe"
   )
 }
 
