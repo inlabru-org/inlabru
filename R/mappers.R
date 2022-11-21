@@ -1200,41 +1200,64 @@ ibm_amatrix.bru_mapper_matrix <- function(...) {
 #' @param factor_mapping character; selects the type of factor mapping.
 #' * `'contrast'` for leaving out the first factor level.
 #' * `'full'` for keeping all levels.
+#' @param indexed logical; if `TRUE`, the `ibm_values()` method
+#' will return an integer vector instead of the factor levels.
+#' This is needed e.g. for `group` and `replicate` mappers, since
+#' `INLA::f()` doesn't accept factor values. Default: `FALSE`, which
+#' works for the main input mappers. The default mapper constructions
+#' will set it the required setting.
 #' @export
 #' @describeIn bru_mapper Create a factor mapper
-bru_mapper_factor <- function(values, factor_mapping, ...) {
+bru_mapper_factor <- function(values, factor_mapping, indexed = FALSE, ...) {
   factor_mapping <- match.arg(factor_mapping, c("full", "contrast"))
   if (is.factor(values)) {
     mapper <- list(
       levels = levels(values),
-      factor_mapping = factor_mapping
+      factor_mapping = factor_mapping,
+      indexed = indexed
     )
   } else if (is.character(values)) {
     mapper <- list(
       levels = unique(values),
-      factor_mapping = factor_mapping
+      factor_mapping = factor_mapping,
+      indexed = indexed
     )
   } else {
     mapper <- list(
       levels = as.character(sort(unique(values))),
-      factor_mapping = factor_mapping
+      factor_mapping = factor_mapping,
+      indexed = indexed
     )
   }
-  bru_mapper_define(mapper, new_class = "bru_mapper_factor")
+  mapper$n <- length(mapper$levels) - identical(factor_mapping, "contrast")
+  if (indexed) {
+    bru_mapper_define(mapper,
+      new_class = c(
+        "bru_mapper_factor_index",
+        "bru_mapper_factor"
+      )
+    )
+  } else {
+    bru_mapper_define(mapper, new_class = "bru_mapper_factor")
+  }
 }
 
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_factor <- function(mapper, ...) {
-  length(ibm_values(mapper))
+  length(mapper[["levels"]]) - identical(mapper[["factor_mapping"]], "contrast")
 }
 #' @export
 #' @rdname bru_mapper_methods
 ibm_values.bru_mapper_factor <- function(mapper, ...) {
-  if (identical(mapper$factor_mapping, "contrast")) {
-    mapper$levels[-1L]
+  if (is.null(mapper[["indexed"]]) || !mapper[["indexed"]]) {
+    if (identical(mapper[["factor_mapping"]], "contrast")) {
+      mapper$levels[-1L]
+    } else {
+      mapper$levels
+    }
   } else {
-    mapper$levels
+    seq_len(ibm_n(mapper))
   }
 }
 

@@ -24,6 +24,10 @@
   
   * Removed `methods` argument from `bru_mapper_define()`.  Implementations
     should register S3 methods instead.
+    
+  * Add `indexed` logical option to `bru_mapper_factor()`, to allow
+  factor inputs to be mapped to index values, as needed for `group` and
+  `replicate`. Fixes #174
 
 ## Bug fixes
 

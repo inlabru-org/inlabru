@@ -1184,7 +1184,8 @@ make_submapper <- function(subcomp_n,
     (!is.null(subcomp_type) && (subcomp_type %in% "factor"))) {
     mapper <- bru_mapper_factor(
       values,
-      factor_mapping = subcomp_factor_mapping
+      factor_mapping = subcomp_factor_mapping,
+      indexed = require_indexed
     )
   } else {
     values <- sort(unique(values), na.last = NA)
@@ -1206,7 +1207,10 @@ make_submapper <- function(subcomp_n,
       }
     } else {
       if (require_indexed) {
-        mapper <- bru_mapper_factor(values, factor_mapping = "full")
+        mapper <- bru_mapper_factor(values,
+          factor_mapping = "full",
+          indexed = TRUE
+        )
       } else {
         mapper <- bru_mapper_linear()
       }
@@ -1502,32 +1506,37 @@ code.components <- function(components, add = "") {
 
 summary.component <- function(object, ..., depth = Inf) {
   result <- list(
-    "Label" = object$label,
-    "Main" = sprintf(
-      "type '%s', input '%s'",
-      object[["main"]][["type"]],
-      deparse(object[["main"]][["input"]][["input"]])
+    "Label" = object[["label"]],
+    "Copy_of" = object[["copy"]],
+    "Type" = paste0(
+      unlist(lapply(
+        c("main", "group", "replicate"),
+        function(x) {
+          if (is.null(object[[x]][["input"]][["input"]])) {
+            NULL
+          } else {
+            paste0(x, " = ", object[[x]][["type"]])
+          }
+        }
+      )),
+      collapse = ", "
     ),
-    "Group" =
-      if (!is.null(object[["group"]][["input"]][["input"]])) {
-        sprintf(
-          "type '%s', input '%s'",
-          object[["group"]][["type"]],
-          deparse(object[["group"]][["input"]][["input"]])
-        )
-      } else {
-        NULL
-      },
-    "Replicate" =
-      if (!is.null(object[["replicate"]][["input"]][["input"]])) {
-        sprintf(
-          "type '%s', input '%s'",
-          object[["replicate"]][["type"]],
-          deparse(object[["replicate"]][["input"]][["input"]])
-        )
-      } else {
-        NULL
-      },
+    "Input" = paste0(
+      unlist(lapply(
+        c("main", "group", "replicate", "weights"),
+        function(x) {
+          if (is.null(object[[x]][["input"]][["input"]])) {
+            NULL
+          } else {
+            paste0(
+              x, " = ",
+              deparse(object[[x]][["input"]][["input"]])
+            )
+          }
+        }
+      )),
+      collapse = ", "
+    ),
     "Mapper" =
       if (is.null(object[["mapper"]])) {
         "Not yet initialised"
@@ -1553,9 +1562,6 @@ summary.component <- function(object, ..., depth = Inf) {
         )
       )
   )
-  if (!is.null(object[["copy"]])) {
-    result[["Copy"]] <- sprintf("Copy of component '%s'", object[["copy"]])
-  }
   class(result) <- c("summary_component", "list")
   result
 }
@@ -1571,6 +1577,9 @@ summary.component_list <- function(object, ...) {
     object,
     summary
   )
+  for (cp in which(vapply(result, function(x) !is.null(x$Copy_of), FALSE))) {
+    result[[cp]]$Type <- result[[result[[cp]][["Copy_of"]]]][["Type"]]
+  }
   class(result) <- c("summary_component_list", "list")
   result
 }

@@ -10,6 +10,6 @@ bru_env_get()
 Get access to the internal environment
 }
 \details{
-The environment is defined in aaaaa.R which is loaded first.
+The environment is defined in 0_inlabru_envir.R which is loaded first.
 }
 \keyword{internal}

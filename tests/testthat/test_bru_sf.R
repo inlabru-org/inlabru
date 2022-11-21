@@ -12,7 +12,7 @@ test_that("sf gorillas lgcp vignette", {
 
   # All sp objects in the example are replaced with sf equivalents.
 
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
   gorillas_sf <- list()
   gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
 
