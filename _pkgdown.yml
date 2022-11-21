@@ -47,5 +47,7 @@ navbar:
         href: articles/linearapprox.html
       - text: Customised model component with the bru_mapper system
         href: articles/bru_mapper.html
+      - text: Converting inla.spde.make.A calls to the bru_mapper system
+        href: articles/web/mesh_mapping.html
       - text: Code internal flow diagrams for model evaluation
         href: articles/web/devel_flow.html
