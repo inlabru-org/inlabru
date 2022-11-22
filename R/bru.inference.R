@@ -834,11 +834,11 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       )
     }
     if (ips_is_Spatial) {
-      non_coordnames <- setdiff(names(data), data_coordnames)
+      non_dim_names <- setdiff(names(data), dim_names)
       data <- sp::SpatialPointsDataFrame(
-        coords = data[new_coordnames],
-        data = data[non_coordnames],
-        proj4string = data_crs,
+        coords = data[dim_names],
+        data = data[non_dim_names],
+        proj4string = fm_CRS(data_crs),
         match.ID = FALSE
       )
     }

@@ -5,7 +5,6 @@
 \alias{fm_CRS.crs}
 \alias{fm_CRS.fm_crs}
 \alias{fm_CRS.default}
-\alias{fm_wkt_predef}
 \title{Create a coordinate reference system object}
 \usage{
 fm_CRS(...)
@@ -22,8 +21,6 @@ fm_CRS(...)
   SRS_string = NULL,
   ...
 )
-
-fm_wkt_predef()
 }
 \arguments{
 \item{\dots}{Additional parameters. Not currently in use.}
@@ -57,8 +54,6 @@ can be expressed with a pure \code{sp::CRS} object or not.
 An S3 \code{inla.CRS} object is a list, usually (but not necessarily)
 containing at least one element: \item{crs }{The basic \code{sp::CRS}
 object}
-
-\code{fm_wkt_predef} returns a WKT2 string defining a projection
 }
 \description{
 Creates either a CRS object or an inla.CRS object, describing a coordinate
@@ -111,9 +106,6 @@ if (require(rgdal)) {
     crs5 <- fm_CRS("sphere")
     crs6 <- fm_CRS("globe")
   }
-}
-\dontrun{
-names(fm_wkt_predef())
 }
 }
 \seealso{
