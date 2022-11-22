@@ -53,11 +53,11 @@ apmaker <- function(samplers, domain, dnames,
     sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
     sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
     sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
-    if(any(sf_samplers) && any(sp_domain)){
-      samplers <-  lapply(samplers, sf::st_as_sf())
+    if (any(sf_samplers) && any(sp_domain)) {
+      samplers <- lapply(samplers, sf::st_as_sf())
     }
-    if(any(sf_domain) && any(sp_samplers)){
-      domain <-  lapply(domain, sf::st_as_sf())
+    if (any(sf_domain) && any(sp_samplers)) {
+      domain <- lapply(domain, sf::st_as_sf())
     }
   }
   # single domain samplers
@@ -66,10 +66,10 @@ apmaker <- function(samplers, domain, dnames,
     sf_domain <- inherits(domain, "sf")
     sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
     sp_domain <- inherits(domain, "sp")
-    if(any(sf_samplers) && sp_domain){
-      samplers <-  lapply(samplers, sf::st_as_sf())
+    if (any(sf_samplers) && sp_domain) {
+      samplers <- lapply(samplers, sf::st_as_sf())
     }
-    if(sf_domain && any(sp_samplers)){
+    if (sf_domain && any(sp_samplers)) {
       domain <- sf::st_as_sf(domain)
     }
   }
@@ -79,11 +79,11 @@ apmaker <- function(samplers, domain, dnames,
     sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
     sp_samplers <- inherits(samplers, "sp")
     sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
-    if(sf_samplers && any(sp_domain)){
-      samplers <-  sf::st_as_sf(samplers)
+    if (sf_samplers && any(sp_domain)) {
+      samplers <- sf::st_as_sf(samplers)
     }
-    if(sf_domain && any(sp_samplers)){
-      domain <-  lapply(domain, sf::st_as_sf())
+    if (sf_domain && any(sp_samplers)) {
+      domain <- lapply(domain, sf::st_as_sf())
     }
   }
   # not list
@@ -92,11 +92,11 @@ apmaker <- function(samplers, domain, dnames,
     sf_domain <- inherits(domain, "sf")
     sp_samplers <- inherits(samplers, "sp")
     sp_domain <- linherits(domain, "sp")
-    if(sf_samplers && sp_domain){
-      samplers <-  sf::st_as_sf(samplers)
+    if (sf_samplers && sp_domain) {
+      samplers <- sf::st_as_sf(samplers)
     }
-    if(sf_domain && sp_samplers){
-      domain <-  sf::st_as_sf(domain)
+    if (sf_domain && sp_samplers) {
+      domain <- sf::st_as_sf(domain)
     }
   }
 
@@ -185,7 +185,12 @@ apmaker <- function(samplers, domain, dnames,
 
   # TODO weights argument to take effect on samplers. The weight should go to
   # the integration part
-
+  ips <- apoints(samplers, domain,
+    group = samplers_domain, int.args = int.args, weights = weights
+  )
+# using groupwise cprod
+  lips <- lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
+  ips <- do.call(group_cprod, c(list(ips), lips), group = samplers_domain)
 
   #####################################
 
