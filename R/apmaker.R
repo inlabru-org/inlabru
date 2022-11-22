@@ -47,20 +47,58 @@ apmaker <- function(samplers, domain, dnames,
 
   # check sf or sp object, can do a mix of sp and sf objects,
   # TODO if not a list, we should have to check
-  if (list) {
+  # TODO have to convert sp to sf for output if there is a mix of sp and sf
+  if (is_list) {
     sf_samplers <- lapply(samplers, function(x) inherits(x, "sf"))
     sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
     sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
     sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
-  # TODO have to convert sp to sf for output if there is a mix of sp and sf
-    if(sf_samplers && sp_samplers){
+    if(any(sf_samplers) && any(sp_domain)){
       samplers <-  lapply(samplers, sf::st_as_sf())
     }
-    if(sf_domain && sp_domain){
+    if(any(sf_domain) && any(sp_samplers)){
       domain <-  lapply(domain, sf::st_as_sf())
     }
   }
-
+  # single domain samplers
+  if (singlesampler_int) {
+    sf_samplers <- lapply(samplers, function(x) inherits(x, "sf"))
+    sf_domain <- inherits(domain, "sf")
+    sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
+    sp_domain <- inherits(domain, "sp")
+    if(any(sf_samplers) && sp_domain){
+      samplers <-  lapply(samplers, sf::st_as_sf())
+    }
+    if(sf_domain && any(sp_samplers)){
+      domain <- sf::st_as_sf(domain)
+    }
+  }
+  # multi domain sampler
+  if (multisampler_int) {
+    sf_samplers <- inherits(samplers, "sf")
+    sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
+    sp_samplers <- inherits(samplers, "sp")
+    sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
+    if(sf_samplers && any(sp_domain)){
+      samplers <-  sf::st_as_sf(samplers)
+    }
+    if(sf_domain && any(sp_samplers)){
+      domain <-  lapply(domain, sf::st_as_sf())
+    }
+  }
+  # not list
+  if (!is_list) {
+    sf_samplers <- inherits(samplers, "sf")
+    sf_domain <- inherits(domain, "sf")
+    sp_samplers <- inherits(samplers, "sp")
+    sp_domain <- linherits(domain, "sp")
+    if(sf_samplers && sp_domain){
+      samplers <-  sf::st_as_sf(samplers)
+    }
+    if(sf_domain && sp_samplers){
+      domain <-  sf::st_as_sf(domain)
+    }
+  }
 
   # How does sf deal with secondary geometry columns?
   # TODO have to deal with the multidomain samplers
