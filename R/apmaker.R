@@ -49,6 +49,8 @@ apmaker <- function(samplers, domain, dnames,
   # How does sf deal with secondary geometry columns?
   # TODO have to deal with the multidomain samplers
   # https://r-spatial.github.io/sf/articles/sf6.html
+  # TODO save to log and verbosity = 2, use seq_along to introduce the indices
+  # for each active geometry
   if (is_sf) {
     cat("The active samplers",samplers[i], "geometry is", attr(samplers, "sf_column"))
     cat("The active domain geometry is", attr(domain, "sf_column"))
