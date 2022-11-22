@@ -8,12 +8,19 @@
 #  weight 1, an `inla.mesh.1d` object, or an `inla.mesh.2d` object. Only those
 # domains that are not given in the `samplers` data.frame are used, plus the
 # coordinates object, used for the spatial aspect of the `samplers` object.
-# @param dnames Names of dimensions
+# @param weights The name of integration weights column in the samplers.
+# TODO 1) how about domain? 2) allow_names should be bru_weight?
+# Default: "weights".
+# It mainly works for line transect at the moment, determining the width of the
+# line to be integrated. See the distance sampling example
+# https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_distancesampling.html
+# @param dnames The names of dimensions
 # @param int.args List of arguments passed on to \code{ipoints}
 # @return Integration points
 
 # TODO option argument as in bru function with list() bru_int_args
 apmaker <- function(samplers, domain, dnames,
+                    weights = "weights",
                     int.args = list(method = "stable", nsub = NULL)) {
   # To allow sf geometry support, should likely change the logic to
   # use the domain specification to determine the type of integration
@@ -39,34 +46,108 @@ apmaker <- function(samplers, domain, dnames,
   }
 
   # check sf or sp object, can do a mix of sp and sf objects,
-  if (is_list) {
-    is_sf_samplers <- lapply(samplers, function(x) inherits(x, "sf"))
-    is_sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
-    is_sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
-    is_sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
+  # TODO if not a list, we should have to check
+  if (list) {
+    sf_samplers <- lapply(samplers, function(x) inherits(x, "sf"))
+    sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
+    sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
+    sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
+  # TODO have to convert sp to sf for output if there is a mix of sp and sf
+    if(sf_samplers && sp_samplers){
+      samplers <-  lapply(samplers, sf::st_as_sf())
+    }
+    if(sf_domain && sp_domain){
+      domain <-  lapply(domain, sf::st_as_sf())
+    }
   }
+
 
   # How does sf deal with secondary geometry columns?
   # TODO have to deal with the multidomain samplers
   # https://r-spatial.github.io/sf/articles/sf6.html
   # TODO save to log and verbosity = 2, use seq_along to introduce the indices
   # for each active geometry
-  if (is_sf) {
-    cat("The active samplers",samplers[i], "geometry is", attr(samplers, "sf_column"))
-    cat("The active domain geometry is", attr(domain, "sf_column"))
+  # TODO extra domains we assign the sampler for them
+  if (is_sf_samplers) {
+    for (i in seq_along(samplers)) {
+      bru_log_message(
+        paste0(
+          "The active geometry of the sampler",
+          samplers[i],
+          " is ",
+          attr(samplers[i], "sf_column"),
+          ".\n"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 2
+      )
+    }
+  }
+  if (is_sf_domain) {
+    for (i in seq_along(domain)) {
+      bru_log_message(
+        paste0(
+          "The active geometry of the domain",
+          domain[i],
+          " is ",
+          attr(domain[i], "sf_column"),
+          ".\n"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 2
+      )
+    }
   }
 
-  # Domain should be more than samplers TODO this is the problem
-  if (length(samplers) > length(domain)) {
-    stop("There are more samplers items than domain ones.")
-  }
+
 
   # Check if the names of samplers and domains match. How to establish the link
   # between samplers and domain? If names are not provided, follow the order in
   # list. If names are provided but do not match, what should we do?
   if (unique(names(samplers)) != unique(names(domain))) {
-    warnings("Names of samplers and domain columns do not match.")
+    samplers_domain <- intersect(names(samplers), names(domain))
+    bru_log_message(
+      paste0(
+        "The shared samplers and domain: \n",
+        paste0(samplers_domain, collapse = ", ") # TODO for the NULL case
+      ),
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store,
+      verbosity = 2
+    )
+
+    # Domain should be more than samplers.
+    # However, we can have unused samplers as well.
+    if (length(samplers) > length(domain)) {
+      unused_samplers <- setdiff(names(samplers), names(domain))
+      bru_log_message(
+        paste0(
+          "The unused samplers: \n",
+          paste0(unused_samplers, collapse = ", ")
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 2
+      )
+    } else {
+      extra_domain <- setdiff(names(samplers), names(domain))
+      bru_log_message(
+        paste0(
+          "\n  The extra domain: \n",
+          paste0(extra_domain, collapse = ", ")
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 2
+      )
+    }
   }
+
+  # TODO weights argument to take effect on samplers. The weight should go to
+  # the integration part
+
 
   #####################################
 
