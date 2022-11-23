@@ -154,7 +154,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     samplers <- NULL
   }
 
-  if (inherits(samplers, c("sf", "sfc"))) {
+  samplers_is_sf <- inherits(samplers, c("sf", "sfc"))
+  if (samplers_is_sf) {
     samplers <- as(samplers, "Spatial")
   }
 
@@ -469,12 +470,12 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
     )
     if (is.null(ips$coordinateZ)) {
-      ips <- SpatialPointsDataFrame(ips[, c("x", "y")],
+      ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y")],
         data = df,
         match.ID = FALSE, proj4string = domain_crs
       )
     } else {
-      ips <- SpatialPointsDataFrame(ips[, c("x", "y", "coordinateZ")],
+      ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y", "coordinateZ")],
         data = df,
         match.ID = FALSE, proj4string = domain_crs
       )
@@ -493,6 +494,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else {
     stop("No integration handling code reached; please notify the package developer.")
+  }
+
+  if (samplers_is_sf && inherits(ips, "Spatial")) {
+    ips <- sf::st_as_sf(ips)
   }
 
   ips
@@ -689,7 +694,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     coords <- mesh$loc[as.numeric(names(w.by)), , drop = FALSE]
     data$vertex <- as.numeric(names(w.by))
 
-    ret <- SpatialPointsDataFrame(coords,
+    ret <- sp::SpatialPointsDataFrame(coords,
       proj4string = fm_sp_get_crs(points),
       data = data,
       match.ID = FALSE
