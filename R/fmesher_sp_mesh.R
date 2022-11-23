@@ -247,8 +247,7 @@ fm_as_inla_mesh_segment.Polygon <-
       } else {
         idx <- c(1L, seq(n, 1L, length.out = n))
       }
-    } else
-    if (sp@ringDir == 1) {
+    } else if (sp@ringDir == 1) {
       idx <- c(1L, seq(n, 1L, length.out = n))
     } else {
       idx <- c(1L:n, 1L)

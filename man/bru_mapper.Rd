@@ -45,7 +45,7 @@ bru_mapper_linear(...)
 
 bru_mapper_matrix(labels, ...)
 
-bru_mapper_factor(values, factor_mapping, ...)
+bru_mapper_factor(values, factor_mapping, indexed = FALSE, ...)
 
 bru_mapper_const(...)
 
@@ -81,12 +81,12 @@ For \code{bru_mapper_scale}, a mapper to be scaled.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
-\item{indexed}{logical; If \code{TRUE}, the \code{ibm_values()} output will be the
-integer indexing sequence for the latent variables (needed for \code{spde} models).
-If \code{FALSE}, the knot
-locations are returned (useful as an interpolator for \code{rw2} models
-and similar).
-Default: \code{NULL}, to force user specification of this parameter}
+\item{indexed}{logical; if \code{TRUE}, the \code{ibm_values()} method
+will return an integer vector instead of the factor levels.
+This is needed e.g. for \code{group} and \code{replicate} mappers, since
+\code{INLA::f()} doesn't accept factor values. Default: \code{FALSE}, which
+works for the main input mappers. The default mapper constructions
+will set it the required setting.}
 
 \item{n}{Size of a model for \code{bru_mapper_index}}
 

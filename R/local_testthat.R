@@ -167,12 +167,12 @@ local_mrsea_convert <- function(x, use_km = FALSE) {
   if (!use_km) {
     # Transform km to m:
     crs_m <- fm_crs_set_lengthunit(x$mesh$crs, "m")
-    x$mesh <- fm_spTransform(x$mesh, crs_m)
-    x$samplers <- sp::spTransform(x$samplers, crs_m)
+    x$mesh <- fm_transform(x$mesh, crs_m)
+    x$samplers <- fm_transform(x$samplers, crs_m)
     x$samplers$weight <- x$samplers$weight * 1000
-    x$points <- sp::spTransform(x$points, crs_m)
-    x$boundary <- sp::spTransform(x$boundary, crs_m)
-    x$covar <- sp::spTransform(x$covar, crs_m)
+    x$points <- fm_transform(x$points, crs_m)
+    x$boundary <- fm_transform(x$boundary, crs_m)
+    x$covar <- fm_transform(x$covar, crs_m)
     x$points$Effort <- x$points$Effort * 1000
     x$points$mid.x <- x$points$mid.x * 1000
     x$points$mid.y <- x$points$mid.y * 1000

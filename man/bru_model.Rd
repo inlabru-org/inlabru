@@ -2,14 +2,26 @@
 % Please edit documentation in R/model.R
 \name{bru_model}
 \alias{bru_model}
+\alias{summary.bru_model}
+\alias{print.summary_bru_model}
 \title{Create an inlabru model object from model components}
 \usage{
 bru_model(components, lhoods)
+
+\method{summary}{bru_model}(object, ...)
+
+\method{print}{summary_bru_model}(x, ...)
 }
 \arguments{
 \item{components}{A \link{component_list} object}
 
 \item{lhoods}{A list of one or more \code{lhood} objects}
+
+\item{object}{Object to operate on}
+
+\item{\dots}{Arguments passed on to other methods}
+
+\item{x}{A \code{summary_bru_model} object to be printed}
 }
 \value{
 A \link{bru_model} object

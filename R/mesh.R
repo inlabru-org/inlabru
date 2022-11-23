@@ -120,7 +120,12 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #' }
 #'
 vertices.inla.mesh <- function(object) {
-  object$crs <- fm_ensure_crs(object$crs)
+  object$crs <- fm_crs(object$crs)
+  if (is.na(object$crs)) {
+    object$crs <- sp::CRS(NA_character_)
+  } else {
+    object$crs <- fm_as_sp_crs(object$crs)
+  }
 
   vrt <- data.frame(object$loc)
   if (!is.null(colnames(vrt))) {

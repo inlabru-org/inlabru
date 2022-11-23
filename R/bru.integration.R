@@ -72,7 +72,6 @@
 #' \donttest{
 #' if (require("INLA", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
-#'
 #'   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 #'
 #'   ips <- ipoints(c(0, 10), 50, name = "myDim")
@@ -153,6 +152,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     inherits(samplers, c("inla.mesh.1d", "inla.mesh"))) {
     domain <- samplers
     samplers <- NULL
+  }
+
+  if (inherits(samplers, c("sf", "sfc"))) {
+    samplers <- as(samplers, "Spatial")
   }
 
   is_2d <-
@@ -318,7 +321,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     # transform to equal area projection
     if (!fm_crs_is_null(domain$crs)) {
       crs <- domain$crs
-      samplers <- stransform(domain, crs = CRS("+proj=cea +units=km"))
+      samplers <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
     }
 
     ips <- vertices(domain)
@@ -326,7 +329,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     # backtransform
     if (!fm_crs_is_null(domain$crs)) {
-      ips <- stransform(ips, crs = crs)
+      ips <- fm_transform(ips, crs = crs)
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else if (inherits(samplers, "SpatialPointsDataFrame")) {
@@ -341,7 +344,6 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     ips$weight <- 1
   } else if (inherits(samplers, "SpatialLines") ||
     inherits(samplers, "SpatialLinesDataFrame")) {
-
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
     if (inherits(samplers, "SpatialLines") &&
       !inherits(samplers, "SpatialLinesDataFrame")) {
@@ -395,7 +397,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     # Convert samplers and domain to equal area CRS
     if (!fm_crs_is_null(domain$crs)) {
-      samplers <- stransform(samplers, crs = sp::CRS("+proj=cea +units=km"))
+      samplers <- fm_transform(samplers, crs = fm_crs("+proj=cea +units=km"))
     }
 
     # This old code doesn't handle holes properly.
@@ -430,10 +432,12 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       domain$crs <- fm_sp_get_crs(samplers)
     } else {
       if (!fm_crs_is_null(domain$crs)) {
-        domain <- stransform(domain, crs = CRS("+proj=cea +units=km"))
+        domain <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
       }
     }
-    domain_crs <- fm_ensure_crs(domain$crs)
+    domain_crs <- fm_crs(domain$crs)
+    domain_crs <- fm_CRS(domain_crs)
+
 
     if (identical(int.args[["poly_method"]], "legacy")) {
       ips <- int.polygon(domain,
@@ -477,7 +481,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(samplers_crs)) {
-      ips <- stransform(ips, crs = samplers_crs)
+      ips <- fm_transform(ips, crs = samplers_crs)
     }
 
     coord_names <- c("x", "y", "coordinateZ")
@@ -638,6 +642,11 @@ ipmaker <- function(samplers, domain, dnames,
   if (spatial) {
     ips <- ipoints(samplers, domain$coordinates,
       group = samp.dim, int.args = int.args
+    )
+  } else if (inherits(samplers, c("sf", "sfc")) && ("geometry" %in% dnames)) {
+    ips <- ipoints(samplers, domain$geometry,
+      group = setdiff(samp.dim, "geometry"),
+      int.args = int.args
     )
   } else {
     ips <- NULL

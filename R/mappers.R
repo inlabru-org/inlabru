@@ -758,11 +758,20 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
   }
   if (inherits(input, "sfc_POINT")) {
     # TODO: Add direct sf support to inla.spde.make.A,
-    # to support crs passthrough.
+    input <- fm_transform(input,
+      crs = fm_crs(mapper[["mesh"]]),
+      passthrough = TRUE
+    )
     A <- sf::st_coordinates(input)
     nm <- intersect(colnames(A), c("X", "Y", "Z"))
     input <- as.matrix(A[, nm, drop = FALSE])
-  } else if (!is.matrix(input) && !inherits(input, "Spatial")) {
+  } else if (inherits(input, "Spatial")) {
+    input <- fm_transform(input,
+      crs = fm_crs(mapper[["mesh"]]),
+      passthrough = TRUE
+    )
+    input <- sp::coordinates(input)
+  } else if (!is.matrix(input)) {
     input <- as.matrix(input)
   }
   INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
@@ -968,17 +977,18 @@ bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL, ...
   if (is.null(offset)) {
     offset <- numeric(nrow(jacobian))
   }
-  bru_mapper_define(list(
-    offset = as.vector(offset),
-    jacobian = jacobian,
-    state0 = state0,
-    n_multi = n_multi,
-    n = sum(n_multi),
-    n_output = length(offset),
-    values_mapper = NULL
-  ),
-  # TODO: maybe allow values_mapper
-  new_class = "bru_mapper_taylor"
+  bru_mapper_define(
+    list(
+      offset = as.vector(offset),
+      jacobian = jacobian,
+      state0 = state0,
+      n_multi = n_multi,
+      n = sum(n_multi),
+      n_output = length(offset),
+      values_mapper = NULL
+    ),
+    # TODO: maybe allow values_mapper
+    new_class = "bru_mapper_taylor"
   )
 }
 
@@ -1200,41 +1210,64 @@ ibm_amatrix.bru_mapper_matrix <- function(...) {
 #' @param factor_mapping character; selects the type of factor mapping.
 #' * `'contrast'` for leaving out the first factor level.
 #' * `'full'` for keeping all levels.
+#' @param indexed logical; if `TRUE`, the `ibm_values()` method
+#' will return an integer vector instead of the factor levels.
+#' This is needed e.g. for `group` and `replicate` mappers, since
+#' `INLA::f()` doesn't accept factor values. Default: `FALSE`, which
+#' works for the main input mappers. The default mapper constructions
+#' will set it the required setting.
 #' @export
 #' @describeIn bru_mapper Create a factor mapper
-bru_mapper_factor <- function(values, factor_mapping, ...) {
+bru_mapper_factor <- function(values, factor_mapping, indexed = FALSE, ...) {
   factor_mapping <- match.arg(factor_mapping, c("full", "contrast"))
   if (is.factor(values)) {
     mapper <- list(
       levels = levels(values),
-      factor_mapping = factor_mapping
+      factor_mapping = factor_mapping,
+      indexed = indexed
     )
   } else if (is.character(values)) {
     mapper <- list(
       levels = unique(values),
-      factor_mapping = factor_mapping
+      factor_mapping = factor_mapping,
+      indexed = indexed
     )
   } else {
     mapper <- list(
       levels = as.character(sort(unique(values))),
-      factor_mapping = factor_mapping
+      factor_mapping = factor_mapping,
+      indexed = indexed
     )
   }
-  bru_mapper_define(mapper, new_class = "bru_mapper_factor")
+  mapper$n <- length(mapper$levels) - identical(factor_mapping, "contrast")
+  if (indexed) {
+    bru_mapper_define(mapper,
+      new_class = c(
+        "bru_mapper_factor_index",
+        "bru_mapper_factor"
+      )
+    )
+  } else {
+    bru_mapper_define(mapper, new_class = "bru_mapper_factor")
+  }
 }
 
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_factor <- function(mapper, ...) {
-  length(ibm_values(mapper))
+  length(mapper[["levels"]]) - identical(mapper[["factor_mapping"]], "contrast")
 }
 #' @export
 #' @rdname bru_mapper_methods
 ibm_values.bru_mapper_factor <- function(mapper, ...) {
-  if (identical(mapper$factor_mapping, "contrast")) {
-    mapper$levels[-1L]
+  if (is.null(mapper[["indexed"]]) || !mapper[["indexed"]]) {
+    if (identical(mapper[["factor_mapping"]], "contrast")) {
+      mapper$levels[-1L]
+    } else {
+      mapper$levels
+    }
   } else {
-    mapper$levels
+    seq_len(ibm_n(mapper))
   }
 }
 
@@ -2012,14 +2045,15 @@ bru_mapper_pipe <- function(mappers, ...) {
     warning("Either all or none of the pipe sub-mappers should be named.", immediate. = TRUE)
     names(mappers) <- as.character(seq_along(mappers))
   }
-  bru_mapper_define(list(
-    mappers = mappers,
-    is_linear_multi,
-    is_linear = is_linear,
-    n_multi = n_multi,
-    n = n
-  ),
-  new_class = "bru_mapper_pipe"
+  bru_mapper_define(
+    list(
+      mappers = mappers,
+      is_linear_multi,
+      is_linear = is_linear,
+      n_multi = n_multi,
+      n = n
+    ),
+    new_class = "bru_mapper_pipe"
   )
 }
 
