@@ -19,6 +19,8 @@ Wrapper for CRS(projargs) (PROJ4) and CRS(wkt) for
 \details{
 This function is a convenience method to workaround PROJ4/PROJ6
 differences, and the lack of a crs extraction method for Spatial objects.
+For newer code, use \code{\link[=fm_crs]{fm_crs()}} instead, that returns \code{crs} objects,
+and use \code{\link[=fm_as_sp_crs]{fm_as_sp_crs()}} to convert to old style \code{sp::CRS} objects.
 }
 \examples{
 \dontrun{

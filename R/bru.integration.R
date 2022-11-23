@@ -154,6 +154,11 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     samplers <- NULL
   }
 
+  samplers_is_sf <- inherits(samplers, c("sf", "sfc"))
+  if (samplers_is_sf) {
+    samplers <- as(samplers, "Spatial")
+  }
+
   is_2d <-
     (
       !is.null(samplers) &&
@@ -317,7 +322,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     # transform to equal area projection
     if (!fm_crs_is_null(domain$crs)) {
       crs <- domain$crs
-      samplers <- stransform(domain, crs = CRS("+proj=cea +units=km"))
+      samplers <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
     }
 
     ips <- vertices(domain)
@@ -325,7 +330,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     # backtransform
     if (!fm_crs_is_null(domain$crs)) {
-      ips <- stransform(ips, crs = crs)
+      ips <- fm_transform(ips, crs = crs)
     }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else if (inherits(samplers, "SpatialPointsDataFrame")) {
@@ -393,7 +398,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
     # Convert samplers and domain to equal area CRS
     if (!fm_crs_is_null(domain$crs)) {
-      samplers <- stransform(samplers, crs = sp::CRS("+proj=cea +units=km"))
+      samplers <- fm_transform(samplers, crs = fm_crs("+proj=cea +units=km"))
     }
 
     # This old code doesn't handle holes properly.
@@ -428,10 +433,12 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       domain$crs <- fm_sp_get_crs(samplers)
     } else {
       if (!fm_crs_is_null(domain$crs)) {
-        domain <- stransform(domain, crs = CRS("+proj=cea +units=km"))
+        domain <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
       }
     }
-    domain_crs <- fm_ensure_crs(domain$crs)
+    domain_crs <- fm_crs(domain$crs)
+    domain_crs <- fm_CRS(domain_crs)
+
 
     if (identical(int.args[["poly_method"]], "legacy")) {
       ips <- int.polygon(domain,
@@ -463,19 +470,19 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
     )
     if (is.null(ips$coordinateZ)) {
-      ips <- SpatialPointsDataFrame(ips[, c("x", "y")],
+      ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y")],
         data = df,
         match.ID = FALSE, proj4string = domain_crs
       )
     } else {
-      ips <- SpatialPointsDataFrame(ips[, c("x", "y", "coordinateZ")],
+      ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y", "coordinateZ")],
         data = df,
         match.ID = FALSE, proj4string = domain_crs
       )
     }
 
     if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(samplers_crs)) {
-      ips <- stransform(ips, crs = samplers_crs)
+      ips <- fm_transform(ips, crs = samplers_crs)
     }
 
     coord_names <- c("x", "y", "coordinateZ")
@@ -487,6 +494,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else {
     stop("No integration handling code reached; please notify the package developer.")
+  }
+
+  if (samplers_is_sf && inherits(ips, "Spatial")) {
+    ips <- sf::st_as_sf(ips)
   }
 
   ips
@@ -637,6 +648,11 @@ ipmaker <- function(samplers, domain, dnames,
     ips <- ipoints(samplers, domain$coordinates,
       group = samp.dim, int.args = int.args
     )
+  } else if (inherits(samplers, c("sf", "sfc")) && ("geometry" %in% dnames)) {
+    ips <- ipoints(samplers, domain$geometry,
+      group = setdiff(samp.dim, "geometry"),
+      int.args = int.args
+    )
   } else {
     ips <- NULL
   }
@@ -678,7 +694,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     coords <- mesh$loc[as.numeric(names(w.by)), , drop = FALSE]
     data$vertex <- as.numeric(names(w.by))
 
-    ret <- SpatialPointsDataFrame(coords,
+    ret <- sp::SpatialPointsDataFrame(coords,
       proj4string = fm_sp_get_crs(points),
       data = data,
       match.ID = FALSE

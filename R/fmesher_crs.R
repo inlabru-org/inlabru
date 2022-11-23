@@ -88,44 +88,30 @@ fm_requires_PROJ6 <- function(fun = NULL) {
 
 
 #' @rdname fm_as
-#' @name fm_as
 #' @export
-fm_as_sf_crs <- function(x) {
-  if (inherits(x, "crs")) {
-    x
-  } else if (inherits(x, "CRS")) {
-    sf::st_crs(x)
-  } else if (is.null(x)) {
-    sf::st_crs(x)
-  } else {
-    warning(
-      paste0(
-        "Unsupported source crs class ",
-        paste(class(x), sep = ",")
-      ),
-      immediate. = TRUE
-    )
-    x
-  }
-}
-#' @rdname fm_as
-#' @export
-fm_as_sp_crs <- function(x) {
+fm_as_sp_crs <- function(x, ...) {
   if (inherits(x, "CRS")) {
     x
+  } else if (inherits(x, "fm_crs")) {
+    if (is.na(x)) {
+      fm_CRS(NA_character_)
+    } else {
+      fm_CRS(SRS_string = x$crs$wkt, oblique = fm_crs_oblique(x))
+    }
   } else if (inherits(x, "crs")) {
     if (is.na(x)) {
-      NULL
+      fm_CRS(NA_character_)
     } else {
       fm_CRS(SRS_string = x$wkt)
     }
   } else if (is.null(x)) {
-    NULL
+    fm_CRS(NA_character_)
   } else {
     warning(
       paste0(
-        "Unsupported source crs class ",
-        paste(class(x), sep = ",")
+        "Unsupported source crs class '",
+        paste(class(x), sep = ", "),
+        "'."
       ),
       immediate. = TRUE
     )
@@ -133,48 +119,7 @@ fm_as_sp_crs <- function(x) {
   }
 }
 
-#' Generic method for extracting crs objects
-#'
-#' Currently, `sp` `CRS` objects is supported.  Support for `sf` `crs`
-#' objects is experimental, and is likely to change.
-#'
-#' @rdname fm_get_crs
-#' @param \dots Arguments passed on to other methods
-#' @export
-fm_get_crs <- function(...) {
-  UseMethod("fm_get_crs")
-}
 
-#' @rdname fm_get_crs
-#' @export
-fm_get_crs.Spatial <- function(...) {
-  fm_sp_get_crs(...)
-}
-
-#' @rdname fm_get_crs
-#' @export
-fm_get_crs.sf <- function(...) {
-  fm_sf_get_crs(...)
-}
-
-#' @rdname fm_get_crs
-#' @export
-fm_get_crs.sfc <- function(...) {
-  fm_sf_get_crs(...)
-}
-
-#' @rdname fm_get_crs
-#' @param x from which to extract crs information
-#' @export
-fm_get_crs.inla.mesh <- function(x, ...) {
-  x[["crs"]]
-}
-
-#' @rdname fm_get_crs
-#' @export
-fm_get_crs.inla.mesh.segment <- function(x, ...) {
-  x[["crs"]]
-}
 
 
 #' @title Extract CRS information
@@ -185,6 +130,8 @@ fm_get_crs.inla.mesh.segment <- function(x, ...) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @details This function is a convenience method to workaround PROJ4/PROJ6
 #' differences, and the lack of a crs extraction method for Spatial objects.
+#' For newer code, use [fm_crs()] instead, that returns `crs` objects,
+#' and use [fm_as_sp_crs()] to convert to old style `sp::CRS` objects.
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
@@ -207,36 +154,15 @@ fm_sp_get_crs <- function(x) {
   crs
 }
 
-# ! For now just add fm_sf version of this
-# Is there any need for fm_has_PROJ6() stuff
-# for sf objects?
-
-# Given sf or sfc object, return
-fm_sf_get_crs <- function(x) {
-  if (is.null(x)) {
-    return(NULL)
-  }
-  fm_CRS(SRS_string = sf::st_crs(x)$wkt)
-}
 
 fm_crs_is_null <- function(crs) {
   if (is.null(crs)) {
     TRUE
-  } else if (fm_has_PROJ6()) {
-    wkt <- fm_crs_get_wkt(crs)
-    is.null(wkt)
   } else {
-    #    is.na(crs)
-    is.na(crs@projargs) && is.null(comment(crs))
+    is.na(fm_crs(crs))
   }
 }
 
-fm_ensure_crs <- function(crs) {
-  if (fm_crs_is_null(crs)) {
-    crs <- sp::CRS(NA_character_)
-  }
-  crs
-}
 
 
 
@@ -302,6 +228,8 @@ fm_crs_is_geocent <- function(crs) {
 }
 
 
+# ellipsoid_radius ----
+
 #' @rdname fm_crs_wkt
 #' @export
 
@@ -338,9 +266,29 @@ fm_wkt_get_ellipsoid_radius <- function(wkt) {
 #' @export
 
 fm_crs_get_ellipsoid_radius <- function(crs) {
-  fm_requires_PROJ6()
-
   fm_wkt_get_ellipsoid_radius(fm_crs_get_wkt(crs))
+}
+
+#' @param x crs object to extract value from or assign values in
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_ellipsoid_radius <- function(x) {
+  UseMethod("fm_ellipsoid_radius")
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_ellipsoid_radius.default <- function(x) {
+  fm_wkt_get_ellipsoid_radius(fm_crs_get_wkt(x))
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_ellipsoid_radius.character <- function(x) {
+  fm_wkt_get_ellipsoid_radius(x)
 }
 
 
@@ -395,31 +343,525 @@ fm_wkt_set_ellipsoid_radius <- function(wkt, radius) {
 }
 
 #' @rdname fm_crs_wkt
+#' @param value Value to assign
+#' @export
+
+`fm_ellipsoid_radius<-` <- function(x, value) {
+  UseMethod("fm_ellipsoid_radius<-")
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.character` <- function(x, value) {
+  x <- fm_wkt_set_ellipsoid_radius(x, value)
+  invisible(x)
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.CRS` <- function(x, value) {
+  crs <- fm_crs(x)
+  fm_ellipsoid_radius(crs) <- value
+  new_crs <- fm_as_sp_crs(crs)
+
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.inla.CRS` <- function(x, value) {
+  crs <- fm_crs(x)
+  fm_ellipsoid_radius(crs) <- value
+  new_crs <- fm_as_sp_crs(crs)
+
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.crs` <- function(x, value) {
+  wkt <- fm_crs_get_wkt(x)
+  fm_ellipsoid_radius(wkt) <- value
+  new_crs <- fm_crs(wkt)
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_ellipsoid_radius<-.fm_crs` <- function(x, value) {
+  wkt <- fm_crs_get_wkt(x)
+  fm_ellipsoid_radius(wkt) <- value
+  x$crs <- fm_crs(wkt)
+  x
+}
+
+
+#' @rdname fm_crs_wkt
 #' @export
 
 fm_crs_set_ellipsoid_radius <- function(crs, radius) {
-  fm_requires_PROJ6()
+  fm_ellipsoid_radius(crs) <- radius
+  crs
+}
 
-  wkt <- fm_crs_get_wkt(crs)
-  wkt <- fm_wkt_set_ellipsoid_radius(wkt, radius)
-  new_crs <- fm_CRS(SRS_string = wkt)
-  if (inherits(crs, "inla.CRS")) {
-    crs$crs <- new_crs
-    crs
-  } else {
-    new_crs
+# Length unit ----
+
+
+
+#' @param crs A `sp::CRS` or `inla.CRS` object
+#' @param wkt A WKT2 character string
+#' @param unit character, name of a unit. Supported names are
+#' "metre", "kilometre", and the aliases "meter", "m", International metre",
+#' "kilometer", and "km", as defined by `fm_wkt_unit_params` or the
+#' `params` argument. (For legacy PROJ4 use, only "m" and "km" are
+#' supported)
+#' @param params Length unit definitions, in the list format produced by
+#' `fm_wkt_unit_params()`, Default: NULL, which invokes
+#' `fm_wkt_unit_params()`
+#' @return For `fm_wkt_unit_params`, a
+#' list of named unit definitions
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @examples
+#' \dontrun{
+#' if (fm_has_PROJ6()) {
+#'   c1 <- fm_CRS("globe")
+#'   fm_crs_get_lengthunit(c1)
+#'   c2 <- fm_crs_set_lengthunit(c1, "km")
+#'   fm_crs_get_lengthunit(c2)
+#' }
+#' }
+#' @export
+#' @seealso [fm_sp_get_crs()]
+#' @aliases fm_crs_wkt
+#' @rdname fm_crs_wkt
+
+fm_wkt_unit_params <- function() {
+  params <- list(
+    "metre" =
+      list(
+        '"metre"',
+        "1",
+        list(
+          label = "ID",
+          params = list('"EPSG"', "9001")
+        )
+      ),
+    "kilometre" =
+      list(
+        '"kilometre"',
+        "1000",
+        list(
+          label = "ID",
+          params = list('"EPSG"', "9036")
+        )
+      )
+  )
+  params[["meter"]] <- params[["metre"]]
+  params[["m"]] <- params[["metre"]]
+  params[["International metre"]] <- params[["metre"]]
+  params[["kilometer"]] <- params[["kilometre"]]
+  params[["km"]] <- params[["kilometre"]]
+  params
+}
+
+#' @export
+#' @rdname fm_crs_wkt
+#' @return For `fm_wkt_get_lengthunit`, a
+#' list of length units used in the wkt string, excluding the ellipsoid radius
+#' unit.
+
+fm_wkt_get_lengthunit <- function(wkt) {
+  extract <- function(wt) {
+    # 1. Recursively find LENGTHUNIT, except within ELLIPSOID
+    # 2. Return unit
+
+    if (wt[["label"]] == "LENGTHUNIT") {
+      result <- list(wt[["params"]])
+    } else if (wt[["label"]] != "ELLIPSOID") {
+      result <- list()
+      for (k in seq_along(wt$param)) {
+        if (is.list(wt[["params"]][[k]])) {
+          result <- c(result, extract(wt[["params"]][[k]]))
+        }
+      }
+    } else {
+      result <- list()
+    }
+    result
   }
+
+  wt <- fm_wkt_as_wkt_tree(wkt)
+  params <- unique(extract(wt))
+  names(params) <-
+    vapply(
+      params,
+      function(x) {
+        gsub('"', "", x[[1]])
+      },
+      ""
+    )
+  params
+}
+
+#' @export
+#' @rdname fm_crs_wkt
+#' @return For `fm_wkt_set_lengthunit`, a
+#' WKT2 string with altered length units.
+#' Note that the length unit for the ellipsoid radius is unchanged.
+
+fm_wkt_set_lengthunit <- function(wkt, unit, params = NULL) {
+  convert <- function(wt, unit) {
+    # 1. Recursively find LENGTHUNIT, except within ELLIPSOID
+    # 2. Change unit
+
+    if (wt[["label"]] == "LENGTHUNIT") {
+      wt[["params"]] <- unit
+    } else if (wt[["label"]] != "ELLIPSOID") {
+      if ((wt[["label"]] == "PARAMETER") &&
+        (wt[["params"]][[1]] %in% c('"False easting"', '"False northing"'))) {
+        orig_unit <- (wt[["params"]][[3]][["params"]][[1]])
+        new_unit <- (unit[[1]])
+        if (orig_unit != new_unit) {
+          if (orig_unit == '"metre"' && new_unit == '"kilometre"') {
+            wt[["params"]][[2]] <-
+              as.character(as.numeric(wt[["params"]][[2]]) / 1000)
+          } else if (orig_unit == '"kilometre"' && new_unit == '"metre"') {
+            wt[["params"]][[2]] <-
+              as.character(as.numeric(wt[["params"]][[2]]) * 1000)
+          } else {
+            warning("False easting/northing could not be properly converted.")
+          }
+        }
+      }
+      for (k in seq_along(wt$param)) {
+        if (is.list(wt[["params"]][[k]])) {
+          wt[["params"]][[k]] <- convert(wt[["params"]][[k]], unit)
+        }
+      }
+    }
+    wt
+  }
+
+  if (is.null(params)) {
+    params <- fm_wkt_unit_params()
+  }
+  if (!(unit %in% names(params))) {
+    warning(paste0(
+      "'fm_wkt_set_lengthunit' unit conversion to '",
+      unit,
+      "' not supported. Unit left unchanged."
+    ))
+    return(wkt)
+  }
+
+  wt <- fm_wkt_as_wkt_tree(wkt)
+  wt <- convert(wt, params[[unit]])
+  fm_wkt_tree_as_wkt(wt)
+}
+
+
+#' @return For `fm_crs_get_lengthunit`, a
+#' list of length units used in the wkt string, excluding the ellipsoid radius
+#' unit. (For legacy PROJ4 code, the raw units from the proj4string are
+#' returned, if present.)
+#' @export
+#' @rdname fm_crs_wkt
+
+fm_crs_get_lengthunit <- function(crs) {
+  fm_wkt_get_lengthunit(fm_crs_get_wkt(crs))
+}
+
+
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_crs_set_lengthunit <- function(crs, unit) {
+  fm_length_unit(crs) <- unit
+  crs
+}
+
+
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_length_unit <- function(x) {
+  UseMethod("fm_length_unit")
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_length_unit.default <- function(x) {
+  fm_wkt_get_lengthunit(fm_crs_get_wkt(x))
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+
+fm_length_unit.character <- function(x) {
+  fm_wkt_get_lengthunit(x)
 }
 
 
 
 
+#' @return For `fm_length_unit<-`, a crs object with
+#' altered length units.
+#' Note that the length unit for the ellipsoid radius is unchanged.
+#' @rdname fm_crs_wkt
+#' @export
+
+`fm_length_unit<-` <- function(x, value) {
+  UseMethod("fm_length_unit<-")
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_length_unit<-.character` <- function(x, value) {
+  x <- fm_wkt_set_lengthunit(x, value)
+  invisible(x)
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_length_unit<-.CRS` <- function(x, value) {
+  crs <- fm_crs(x)
+  fm_length_unit(crs) <- value
+  new_crs <- fm_as_sp_crs(crs)
+
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_length_unit<-.inla.CRS` <- function(x, value) {
+  crs <- fm_crs(x)
+  fm_length_unit(crs) <- value
+  new_crs <- fm_as_sp_crs(crs)
+
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_length_unit<-.crs` <- function(x, value) {
+  wkt <- fm_crs_get_wkt(x)
+  fm_length_unit(wkt) <- value
+  new_crs <- fm_crs(wkt)
+  new_crs
+}
+
+#' @rdname fm_crs_wkt
+#' @export
+`fm_length_unit<-.fm_crs` <- function(x, value) {
+  wkt <- fm_crs_get_wkt(x)
+  fm_length_unit(wkt) <- value
+  x$crs <- fm_crs(wkt)
+  x
+}
 
 
 
+# fm_crs ----
+
+#' @title Obtain coordinate reference system object
+#'
+#' @description Obtain an `sf::crs` or `fm_crs` object from a spatial object, or
+#' convert crs information to construct a new `sf::crs` object.
+#'
+#' @param x Object to convert to `crs` or  to extract `crs` information from.
+#' If `character`, a string suitable for `sf::st_crs(x)`, or the name of a
+#' predefined `wkt` string from ``names(fm_wkt_predef())`.
+#' @param \dots Additional arguments passed on the `sf::st_crs()`
+#' @param crsonly logical; if TRUE, remove `oblique` information from `fm_crs`
+#' objects and return a plain `crs` object instead.
+#' @param value Vector of length at most 4 of rotation angles (in degrees)
+#' for an oblique projection, all values defaulting to zero. The values
+#' indicate (longitude, latitude, orientation, orbit), as explained in the
+#' Details section below.
+#'
+#' @details The first two
+#' elements of the `oblique` vector are the (longitude, latitude)
+#' coordinates for the oblique centre point. The third value (orientation) is a
+#' counterclockwise rotation angle for an observer looking at the centre point
+#' from outside the sphere. The fourth value is the quasi-longitude (orbit
+#' angle) for a rotation along the oblique observers equator.
+#'
+#' Simple oblique: `oblique=c(0, 45)`
+#'
+#' Polar: `oblique=c(0, 90)`
+#'
+#' Quasi-transversal: `oblique=c(0, 0, 90)`
+#'
+#' Satellite orbit viewpoint: `oblique=c(lon0-time*v1, 0, orbitangle,
+#' orbit0+time*v2)`, where `lon0` is the longitude at which a satellite
+#' orbit crosses the equator at `time=0`, when the satellite is at an
+#' angle `orbit0` further along in its orbit.  The orbital angle relative
+#' to the equatorial plane is `orbitangle`, and `v1` and `v2`
+#' are the angular velocities of the planet and the satellite, respectively.
+#' Note that "forward" from the satellite's point of view is "to the right" in
+#' the projection.
+#'
+#' When `oblique[2]` or `oblique[3]` are non-zero, the resulting
+#' projection is only correct for perfect spheres.
+#' @param \dots Additional parameters. Not currently in use.
+#' @return Either an `sf::crs` object or an `fm_crs` object,
+#' depending on if the coordinate reference system described by the parameters
+#' can be expressed with a pure `crs` object or not.
+#'
+#' @returns A `crs` object ([sf::st_crs()]) or a `fm_crs` object.
+#' An S3 `fm_crs` object is a list with elements `crs` and `oblique`.
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @seealso [sf::st_crs()], [`fm_crs_wkt`],
+#' @examples
+#' crs1 <- fm_crs("longlat_globe")
+#' crs2 <- fm_crs("lambert_globe")
+#' crs3 <- fm_crs("mollweide_norm")
+#' crs4 <- fm_crs("hammer_globe")
+#' crs5 <- fm_crs("sphere")
+#' crs6 <- fm_crs("globe")
+#' @export
+#' @rdname fm_crs
+fm_crs <- function(x, ..., crsonly = FALSE) {
+  UseMethod("fm_crs")
+}
+
+#' @export
+#' @rdname fm_crs
+fm_crs_oblique <- function(x) {
+  stopifnot(inherits(x, c("crs", "fm_crs", "inla.CRS")))
+  if (inherits(x, c("fm_crs", "inla.CRS"))) {
+    x$oblique
+  } else {
+    NULL
+  }
+}
+
+#' @export
+#' @rdname fm_crs
+`fm_crs_oblique<-` <- function(x, value) {
+  stopifnot(inherits(x, c("crs", "fm_crs")))
+  if (is.null(value)) {
+    if (inherits(x, "fm_crs")) {
+      x <- x[["crs"]]
+    }
+  } else {
+    if (!inherits(x, "fm_crs")) {
+      x <- list(crs = x, oblique = value)
+      class(x) <- "fm_crs"
+    }
+  }
+  x
+}
+
+#' @export
+#' @rdname fm_crs
+print.fm_crs <- function(x, ...) {
+  print(x$crs)
+  cat(paste0("Oblique: c(", paste0(x$oblique, collapse = ", "), ")\n"))
+}
 
 
 
+#' @export
+#' @rdname fm_crs
+fm_crs.default <- function(x, ..., crsonly = FALSE) {
+  if (missing(x)) {
+    return(sf::NA_crs_)
+  }
+  sf::st_crs(x, ...)
+}
+
+#' @rawNamespace if (getRversion() >= "3.6.0") {
+#'   S3method(sf::st_crs, fm_crs)
+#' }
+#' @describeIn fm_crs `st_crs(x, ...)` is equivalent to `fm_crs(x, ..., crsonly = TRUE)`
+#' when `x` is a `fm_crs` object.
+st_crs.fm_crs <- function(x, ...) {
+  fm_crs(x, ..., crsonly = TRUE)
+}
+
+#' @export
+#' @param crsonly logical; if `TRUE`, remove any oblique` information
+#' for `fm_crs` class objects and return a pure `crs` class object. Default: `FALSE`.
+#' @rdname fm_crs
+fm_crs.fm_crs <- function(x, ..., crsonly = FALSE) {
+  if (crsonly) {
+    fm_crs_oblique(x) <- NULL
+  }
+  x
+}
+
+#' @export
+#' @rdname fm_crs
+fm_crs.inla.CRS <- function(x, ..., crsonly = FALSE) {
+  y <- fm_crs(x$crs, ..., crsonly = TRUE)
+  if (!crsonly) {
+    fm_crs_oblique(y) <- x$oblique
+  }
+  y
+}
+
+#' @export
+#' @rdname fm_crs
+fm_crs.character <- function(x, ..., crsonly = FALSE) {
+  predef <- fm_wkt_predef()
+  if (x %in% names(predef)) {
+    x <- predef[[x]]
+  }
+  sf::st_crs(x, ...)
+}
+
+
+#' @rdname fm_crs
+#' @export
+fm_crs.Spatial <- function(x, ..., crsonly = FALSE) {
+  if (is.null(x)) {
+    return(sf::NA_crs_)
+  }
+  if (fm_has_PROJ6()) {
+    suppressWarnings(crs <- fm_crs(sp::wkt(x)))
+  } else {
+    crs <- fm_crs(proj4string(x))
+  }
+  crs
+}
+
+
+
+#' @rdname fm_crs
+#' @export
+fm_crs.sf <- function(x, ..., crsonly = FALSE) {
+  sf::st_crs(x, ...)
+}
+
+#' @rdname fm_crs
+#' @export
+fm_crs.sfc <- function(x, ..., crsonly = FALSE) {
+  sf::st_crs(x, ...)
+}
+
+#' @rdname fm_crs
+#' @export
+fm_crs.sfg <- function(x, ..., crsonly = FALSE) {
+  sf::st_crs(x, ...)
+}
+
+#' @rdname fm_crs
+#' @export
+fm_crs.inla.mesh <- function(x, ..., crsonly = FALSE) {
+  fm_crs(x[["crs"]], ..., crsonly = crsonly)
+}
+
+#' @rdname fm_crs
+#' @export
+fm_crs.inla.mesh.segment <- function(x, ..., crsonly = FALSE) {
+  fm_crs(x[["crs"]], ..., crsonly = crsonly)
+}
+
+
+
+# fm_CRS ----
 
 #' Create a coordinate reference system object
 #'
@@ -502,14 +944,29 @@ fm_crs_set_ellipsoid_radius <- function(crs, radius) {
 #'   }
 #' }
 #' @export
-#' @rdname fm_CRS
+#' @rdname fm_CRS_sp
+fm_CRS <- function(...) {
+  UseMethod("fm_CRS")
+}
 
-# ! sp code in this function
+#' @export
+#' @rdname fm_CRS_sp
+fm_CRS.crs <- function(...) {
+  fm_as_sp_crs(...)
+}
 
-fm_CRS <- function(projargs = NULL, doCheckCRSArgs = TRUE,
-                   args = NULL, oblique = NULL,
-                   SRS_string = NULL,
-                   ...) {
+#' @export
+#' @rdname fm_CRS_sp
+fm_CRS.fm_crs <- function(...) {
+  fm_as_sp_crs(...)
+}
+
+#' @export
+#' @rdname fm_CRS_sp
+fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
+                           args = NULL, oblique = NULL,
+                           SRS_string = NULL,
+                           ...) {
   if (fm_has_PROJ6()) {
     # PROJ6
     if (identical(projargs, "")) {
@@ -617,7 +1074,7 @@ fm_CRS <- function(projargs = NULL, doCheckCRSArgs = TRUE,
 #' names(fm_wkt_predef())
 #' }
 #' @export
-#' @rdname fm_CRS
+#' @rdname fm_crs
 
 fm_wkt_predef <- function() {
   list(
@@ -920,235 +1377,23 @@ fm_CRSargs_as_list <- function(x, ...) {
 
 
 
-#' @param crs A `sp::CRS` or `inla.CRS` object
-#' @param wkt A WKT2 character string
-#' @param unit character, name of a unit. Supported names are
-#' "metre", "kilometre", and the aliases "meter", "m", International metre",
-#' "kilometer", and "km", as defined by `fm_wkt_unit_params` or the
-#' `params` argument. (For legacy PROJ4 use, only "m" and "km" are
-#' supported)
-#' @param params Length unit definitions, in the list format produced by
-#' `fm_wkt_unit_params()`, Default: NULL, which invokes
-#' `fm_wkt_unit_params()`
-#' @return For `fm_wkt_unit_params`, a
-#' list of named unit definitions
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @examples
-#' \dontrun{
-#' if (fm_has_PROJ6()) {
-#'   c1 <- fm_CRS("globe")
-#'   fm_crs_get_lengthunit(c1)
-#'   c2 <- fm_crs_set_lengthunit(c1, "km")
-#'   fm_crs_get_lengthunit(c2)
-#' }
-#' }
+
+
+# fm_wkt ----
+
+#' @return For `fm_wkt`, WKT2 string.
 #' @export
-#' @seealso [fm_sp_get_crs()]
-#' @aliases fm_crs_wkt
 #' @rdname fm_crs_wkt
 
-fm_wkt_unit_params <- function() {
-  params <- list(
-    "metre" =
-      list(
-        '"metre"',
-        "1",
-        list(
-          label = "ID",
-          params = list('"EPSG"', "9001")
-        )
-      ),
-    "kilometre" =
-      list(
-        '"kilometre"',
-        "1000",
-        list(
-          label = "ID",
-          params = list('"EPSG"', "9036")
-        )
-      )
-  )
-  params[["meter"]] <- params[["metre"]]
-  params[["m"]] <- params[["metre"]]
-  params[["International metre"]] <- params[["metre"]]
-  params[["kilometer"]] <- params[["kilometre"]]
-  params[["km"]] <- params[["kilometre"]]
-  params
+fm_wkt <- function(crs) {
+  fm_crs(crs, crsonly = TRUE)$wkt
 }
 
 #' @export
 #' @rdname fm_crs_wkt
-#' @return For `fm_wkt_get_lengthunit`, a
-#' list of length units used in the wkt string, excluding the ellipsoid radius
-#' unit.
 
-fm_wkt_get_lengthunit <- function(wkt) {
-  extract <- function(wt) {
-    # 1. Recursively find LENGTHUNIT, except within ELLIPSOID
-    # 2. Return unit
+fm_crs_get_wkt <- fm_wkt
 
-    if (wt[["label"]] == "LENGTHUNIT") {
-      result <- list(wt[["params"]])
-    } else if (wt[["label"]] != "ELLIPSOID") {
-      result <- list()
-      for (k in seq_along(wt$param)) {
-        if (is.list(wt[["params"]][[k]])) {
-          result <- c(result, extract(wt[["params"]][[k]]))
-        }
-      }
-    } else {
-      result <- list()
-    }
-    result
-  }
-
-  wt <- fm_wkt_as_wkt_tree(wkt)
-  params <- unique(extract(wt))
-  names(params) <-
-    vapply(
-      params,
-      function(x) {
-        gsub('"', "", x[[1]])
-      },
-      ""
-    )
-  params
-}
-
-#' @export
-#' @rdname fm_crs_wkt
-#' @return For `fm_wkt_set_lengthunit`, a
-#' WKT2 string with altered length units.
-#' Note that the length unit for the ellipsoid radius is unchanged.
-
-fm_wkt_set_lengthunit <- function(wkt, unit, params = NULL) {
-  convert <- function(wt, unit) {
-    # 1. Recursively find LENGTHUNIT, except within ELLIPSOID
-    # 2. Change unit
-
-    if (wt[["label"]] == "LENGTHUNIT") {
-      wt[["params"]] <- unit
-    } else if (wt[["label"]] != "ELLIPSOID") {
-      if ((wt[["label"]] == "PARAMETER") &&
-        (wt[["params"]][[1]] %in% c('"False easting"', '"False northing"'))) {
-        orig_unit <- (wt[["params"]][[3]][["params"]][[1]])
-        new_unit <- (unit[[1]])
-        if (orig_unit != new_unit) {
-          if (orig_unit == '"metre"' && new_unit == '"kilometre"') {
-            wt[["params"]][[2]] <-
-              as.character(as.numeric(wt[["params"]][[2]]) / 1000)
-          } else if (orig_unit == '"kilometre"' && new_unit == '"metre"') {
-            wt[["params"]][[2]] <-
-              as.character(as.numeric(wt[["params"]][[2]]) * 1000)
-          } else {
-            warning("False easting/northing could not be properly converted.")
-          }
-        }
-      }
-      for (k in seq_along(wt$param)) {
-        if (is.list(wt[["params"]][[k]])) {
-          wt[["params"]][[k]] <- convert(wt[["params"]][[k]], unit)
-        }
-      }
-    }
-    wt
-  }
-
-  if (is.null(params)) {
-    params <- fm_wkt_unit_params()
-  }
-  if (!(unit %in% names(params))) {
-    warning(paste0(
-      "'fm_wkt_set_lengthunit' unit conversion to '",
-      unit,
-      "' not supported. Unit left unchanged."
-    ))
-    return(wkt)
-  }
-
-  wt <- fm_wkt_as_wkt_tree(wkt)
-  wt <- convert(wt, params[[unit]])
-  fm_wkt_tree_as_wkt(wt)
-}
-
-#' @return For `fm_crs_get_wkt`, WKT2 string.
-#' @export
-#' @rdname fm_crs_wkt
-
-# ! equivalent to comment(crs)
-# would be crs$wkt for sf crs class
-#
-# Note: maybe sensible way structure code is to use
-# wkt as much as possible and then to always convert
-# crs objects to this structure as it is package independent?
-
-fm_crs_get_wkt <- function(crs) {
-  fm_requires_PROJ6()
-
-  if (inherits(crs, "inla.CRS")) {
-    crs <- crs[["crs"]]
-  }
-
-  if (is.null(crs)) {
-    return(NULL)
-  }
-
-  comment(crs)
-}
-
-#' @return For `fm_crs_get_lengthunit`, a
-#' list of length units used in the wkt string, excluding the ellipsoid radius
-#' unit. (For legacy PROJ4 code, the raw units from the proj4string are
-#' returned, if present.)
-#' @export
-#' @rdname fm_crs_wkt
-
-fm_crs_get_lengthunit <- function(crs) {
-  if (fm_has_PROJ6()) {
-    x <- fm_wkt_get_lengthunit(fm_crs_get_wkt(crs))
-  } else {
-    if (inherits(crs, "inla.CRS")) {
-      crs_ <- crs
-      crs <- crs[["crs"]]
-    } else {
-      crs_ <- NULL
-    }
-
-    crs_args <- fm_CRS_as_list(crs)
-    x <- crs_args[["units"]]
-  }
-  x
-}
-
-#' @return For `fm_crs_set_lengthunit`, a `sp::CRS` object with
-#' altered length units.
-#' Note that the length unit for the ellipsoid radius is unchanged.
-#' @export
-#' @rdname fm_crs_wkt
-
-fm_crs_set_lengthunit <- function(crs, unit, params = NULL) {
-  if (inherits(crs, "inla.CRS")) {
-    crs_ <- crs
-    crs <- crs[["crs"]]
-  } else {
-    crs_ <- NULL
-  }
-  if (fm_has_PROJ6()) {
-    x <- sp::CRS(SRS_string = fm_wkt_set_lengthunit(fm_crs_get_wkt(crs),
-      unit,
-      params = params
-    ))
-  } else {
-    crs_args <- fm_CRS_as_list(crs)
-    crs_args[["units"]] <- unit
-    x <- fm_list_as_CRS(crs_args)
-  }
-  if (!is.null(crs_)) {
-    crs_[["crs"]] <- x
-    x <- crs_
-  }
-  x
-}
 
 fm_rotmat3213 <- function(rot) {
   cs <- cos(rot[1])
@@ -1424,18 +1669,319 @@ fm_internal_update_crs <- function(crs, newcrs, mismatch.allowed) {
 #' @keywords internal
 
 fm_identical_CRS <- function(crs0, crs1, crsonly = FALSE) {
-  if (!crsonly) {
-    identical(crs0, crs1)
+  if (crsonly) {
+    crs0 <- fm_crs(crs0, crsonly = TRUE)
+    crs1 <- fm_crs(crs1, crsonly = TRUE)
+  }
+  identical(crs0, crs1)
+}
+
+
+
+
+
+# fm_transform ----
+
+#' @title Object coordinate transformation
+#'
+#' @description
+#' Handle transformation of various inla objects according to coordinate
+#' reference systems of `crs` (from `sf::st_crs()`), `fm_crs`,¬`sp::CRS` or
+#' `INLA::inla.CRS` class.
+#'
+#' @param x
+#' The object that should be transformed from it's current CRS to a new CRS
+#' @param crs
+#' The target crs object
+#' @param crs0
+#' The source crs object for spatial classes without crs information
+#' @param passthrough
+#' Default is FALSE.
+#' Setting to TRUE allows objects with no CRS information to be passed
+#' through without transformation. Use with care!
+#' @param \dots
+#' Potential additional arguments
+#' @seealso [fm_CRS()]
+#' @export
+fm_transform <- function(x, crs = fm_crs(x), ...) {
+  UseMethod("fm_transform")
+}
+
+#' @rdname fm_transform
+#' @export
+fm_transform.default <- function(x, crs = fm_crs(x), ..., crs0 = NULL) {
+  stop(paste0(
+    "fm_transform() for '",
+    paste0(class(x), sep = ", "),
+    "' not yet implemented."
+  ))
+}
+
+
+fm_transform_raw <- function(x, from, to) {
+  adjust_input <- function(x, crs) {
+    if (fm_crs_is_geocent(crs) &&
+      ncol(x) == 2) {
+      if (nrow(x) > 0) {
+        x <- cbind(x, 0)
+      } else {
+        x <- matrix(0, 0, ncol(x) + 1)
+      }
+    }
+    x
+  }
+
+  x <- adjust_input(x, crs = to)
+  if (nrow(x) == 0) {
+    x
   } else {
-    if (inherits(crs0, "inla.CRS")) {
-      crs0 <- crs0$crs
-    }
-    if (inherits(crs1, "inla.CRS")) {
-      crs1 <- crs1$crs
-    }
-    identical(crs0, crs1)
+    sf::sf_project(
+      pts = x,
+      from = from,
+      to = to
+    )
   }
 }
+
+
+#' @rdname fm_transform
+#' @export
+fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = NULL) {
+  crs1 <- fm_crs(crs)
+  crs0 <- fm_crs(crs0)
+  if (is.na(crs0) || is.na(crs1)) {
+    if (!passthrough) {
+      if (is.na(crs0)) {
+        stop("'crs0' is an invalid coordinate reference object.")
+      }
+      if (is.na(crs1)) {
+        stop("'crs' is an invalid coordinate reference object.")
+      }
+    }
+    return(x)
+  }
+  #  if (ncol(x) == 2) {
+  #    x <- cbind(x, 0)
+  #  }
+  sphere_radius_0 <- fm_crs_get_ellipsoid_radius(crs0)
+  sphere_radius_1 <- fm_crs_get_ellipsoid_radius(crs1)
+  different_radii <- (sphere_radius_0 != sphere_radius_1)
+  longlat_norm <- fm_crs("longlat_norm")
+  longlat_0 <- fm_crs_set_ellipsoid_radius(longlat_norm, sphere_radius_0)
+  longlat_1 <- fm_crs_set_ellipsoid_radius(longlat_norm, sphere_radius_1)
+
+  crs_sphere <- fm_crs("sphere")
+  onsphere_0 <- fm_identical_CRS(crs0, crs_sphere, crsonly = TRUE)
+  onsphere_1 <- fm_identical_CRS(crs1, crs_sphere, crsonly = TRUE)
+  is_geocentric_0 <- fm_crs_is_geocent(crs0)
+  is_geocentric_1 <- fm_crs_is_geocent(crs1)
+  if (is_geocentric_0) {
+    ok <- TRUE
+  } else {
+    bounds <- fm_crs_bounds(crs0)
+    if (identical(fm_crs_projection_type(crs0), "longlat")) {
+      ## Wrap longitudes to [-180,180]
+      needswrap <- (x[, 1] < -180) | (x[, 1] > 180)
+      if (any(needswrap)) {
+        x[needswrap, 1] <- ((x[needswrap, 1] + 180) %% 360) - 180
+      }
+    }
+    ok <- fm_crs_bounds_check(x, bounds)
+    if (!all(ok)) {
+      xx <- x
+    }
+  }
+  do_work_on_sphere <-
+    inherits(crs0, "fm_crs") ||
+      inherits(crs1, "fm_crs") ||
+      different_radii
+  x <- x[ok, , drop = FALSE]
+  current_crs <- fm_crs(crs0, crsonly = TRUE)
+  if (do_work_on_sphere) {
+    if (!onsphere_0) {
+      if (sphere_radius_0 != 1) {
+        x <- fm_transform_raw(
+          x,
+          from = current_crs,
+          to = longlat_0
+        )
+      }
+      # x can now be treated as being in longlat_norm coordinates
+      current_crs <- longlat_norm
+      x <- fm_transform_raw(
+        x,
+        from = current_crs,
+        to = crs_sphere
+      )
+      current_crs <- crs_sphere
+    }
+    if (!is.null(crs0$oblique)) {
+      x <- fm_crs_transform_oblique(
+        x,
+        fm_crs_oblique(crs0),
+        to.oblique = FALSE
+      )
+    }
+
+    if (!is.null(crs1$oblique)) {
+      x <- fm_crs_transform_oblique(
+        x,
+        fm_crs_oblique(crs1),
+        to.oblique = TRUE
+      )
+    }
+    if (sphere_radius_1 != 1) {
+      x <- fm_transform_raw(
+        x,
+        from = current_crs,
+        to = longlat_norm
+      )
+      # x can now be treated as being in longlat_1
+      current_crs <- longlat_1
+    }
+  }
+
+  x <- fm_transform_raw(
+    x,
+    from = current_crs,
+    to = crs1
+  )
+
+  if (!all(ok)) {
+    xx[ok, ] <- x
+    xx[!ok, ] <- NA
+    x <- xx
+  }
+
+  x
+}
+
+#' @rdname fm_transform
+#' @export
+fm_transform.list <- function(x, crs = fm_crs(x), ...) {
+  if (!is.null(crs)) {
+    x <- lapply(x, function(xx) fm_transform(xx))
+  }
+  x
+}
+
+
+# Internal helper function for fm_transform.sf/sfc/sfg
+fm_transform_sf <- function(x, crs, ..., passthrough) {
+  crs1 <- fm_crs(crs)
+  crs0 <- fm_crs(x)
+  if (is.na(crs0) || is.na(crs1)) {
+    if (!passthrough) {
+      if (is.na(crs0)) {
+        stop("'crs0' is an invalid coordinate reference object.")
+      }
+      if (is.na(crs1)) {
+        stop("'crs' is an invalid coordinate reference object.")
+      }
+    }
+    return(x)
+  }
+
+  if (inherits(x, "sfc_POINT")) {
+    adjust_input <- function(x, crs) {
+      if (fm_crs_is_geocent(crs) &&
+        length(x) &&
+        inherits(x[[1]], "XY")) {
+        x <- sf::st_zm(x = x, drop = FALSE, what = "Z")
+      }
+      x
+    }
+
+    x <- adjust_input(x, crs1)
+    coord <- sf::st_coordinates(x)
+    M <- if ("M" %in% colnames(coord)) coord[, "M"] else NULL
+    coord <- coord[, intersect(colnames(coord), c("X", "Y", "Z")), drop = FALSE]
+    coord <- fm_transform(coord, crs = crs1, crs0 = crs0, passthrough = passthrough)
+    if (is.null(M)) {
+      the_dim <- c("X", "XY", "XYZ")[ncol(coord)]
+    } else {
+      the_dim <- c("XM", "XYM", "XYZM")[ncol(coord)]
+      coord <- cbind(coord, M)
+    }
+    x <-
+      do.call(sf::st_sfc, c(
+        lapply(
+          seq_len(nrow(coord)),
+          function(k) sf::st_point(coord[k, ], dim = the_dim)
+        ),
+        list(crs = sf::st_crs(crs1))
+      ))
+  } else {
+    x <- sf::st_transform(x, sf::st_crs(crs1))
+  }
+  x
+}
+
+#' @export
+#' @rdname fm_transform
+fm_transform.sf <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  geo <- fm_transform(sf::st_geometry(x), crs = crs, ..., passthrough = passthrough)
+  sf::st_geometry(x) <- geo
+  x
+}
+#' @export
+#' @rdname fm_transform
+fm_transform.sfc <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  fm_transform_sf(x, crs = crs, ..., passthrough = passthrough)
+}
+#' @export
+#' @rdname fm_transform
+fm_transform.sfg <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  fm_transform_sf(x, crs = crs, ..., passthrough = passthrough)
+}
+
+#' @export
+#' @rdname fm_transform
+fm_transform.Spatial <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  # TODO: preserve coordinate names
+  as(fm_transform(sf::st_as_sf(x), crs = crs, ..., passthrough = passthrough), "Spatial")
+}
+
+
+
+fm_crs_detect_manifold <- function(crs) {
+  if (fm_crs_is_geocent(crs)) {
+    manifold <- "S2"
+  } else {
+    manifold <- "R2"
+  }
+  manifold
+}
+
+#' @export
+#' @rdname fm_transform
+fm_transform.inla.mesh <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  x$loc <- fm_transform(x$loc, crs0 = x$crs, crs = crs, ..., passthrough = passthrough)
+  x$manifold <- fm_crs_detect_manifold(crs)
+  x$crs <- fm_as_sp_crs(crs)
+  x
+}
+
+#' @export
+#' @rdname fm_transform
+fm_transform.inla.mesh.lattice <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  x$segm <- fm_transform(x$segm, crs = crs, ..., passthrough = passthrough)
+  x$loc <- fm_transform(x$loc, csr0 = x$crs, csr = crs, ..., passthrough = passthrough)
+  x$crs <- fm_as_sp_crs(crs)
+  invisible(x)
+}
+
+#' @export
+#' @rdname fm_transform
+fm_transform.inla.mesh.segment <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+  x$loc <- fm_transform(x$loc, crs0 = x$crs, crs = crs, ..., passthrough = passthrough)
+  x$crs <- fm_as_sp_crs(crs)
+  invisible(x)
+}
+
+
+
+# fm_spTransform ----
 
 #' Handle transformation of various inla objects according to coordinate
 #' reference systems of sp::CRS or INLA::inla.CRS class.
@@ -1768,37 +2314,20 @@ fm_spTransform.SpatialPointsDataFrame <- function(x,
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.inla.mesh.lattice <- function(x, CRSobj, passthrough = FALSE, ...) {
-  x$segm <- fm_spTransform(x$segm, CRSobj, passthrough = passthrough)
-  x$loc <- fm_spTransform(x$loc, x$crs, CRSobj, passthrough = passthrough)
-  x$crs <- CRSobj
-  invisible(x)
+  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh.lattie()", "fm_transform()")
+  fm_transform(x, crs = CRSobj, ..., passthrough = passthrough)
 }
 
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.inla.mesh.segment <- function(x, CRSobj, passthrough = FALSE, ...) {
-  x$loc <- fm_spTransform(x$loc, x$crs, CRSobj, passthrough = passthrough)
-  x$crs <- CRSobj
-  invisible(x)
-}
-
-
-
-
-fm_crs_detect_manifold <- function(crs) {
-  if (fm_crs_is_geocent(crs)) {
-    manifold <- "S2"
-  } else {
-    manifold <- "R2"
-  }
-  manifold
+  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh.segment()", "fm_transform()")
+  fm_transform(x, crs = CRSobj, ..., passthrough = passthrough)
 }
 
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.inla.mesh <- function(x, CRSobj, passthrough = FALSE, ...) {
-  x$loc <- fm_spTransform(x$loc, x$crs, CRSobj, passthrough = passthrough)
-  x$manifold <- fm_crs_detect_manifold(CRSobj)
-  x$crs <- CRSobj
-  invisible(x)
+  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh()", "fm_transform()")
+  fm_transform(x, crs = CRSobj, ..., passthrough = passthrough)
 }

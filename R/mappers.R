@@ -758,11 +758,20 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
   }
   if (inherits(input, "sfc_POINT")) {
     # TODO: Add direct sf support to inla.spde.make.A,
-    # to support crs passthrough.
+    input <- fm_transform(input,
+      crs = fm_crs(mapper[["mesh"]]),
+      passthrough = TRUE
+    )
     A <- sf::st_coordinates(input)
     nm <- intersect(colnames(A), c("X", "Y", "Z"))
     input <- as.matrix(A[, nm, drop = FALSE])
-  } else if (!is.matrix(input) && !inherits(input, "Spatial")) {
+  } else if (inherits(input, "Spatial")) {
+    input <- fm_transform(input,
+      crs = fm_crs(mapper[["mesh"]]),
+      passthrough = TRUE
+    )
+    input <- sp::coordinates(input)
+  } else if (!is.matrix(input)) {
     input <- as.matrix(input)
   }
   INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)

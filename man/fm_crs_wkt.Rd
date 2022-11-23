@@ -5,15 +5,34 @@
 \alias{fm_crs_is_geocent}
 \alias{fm_wkt_get_ellipsoid_radius}
 \alias{fm_crs_get_ellipsoid_radius}
+\alias{fm_ellipsoid_radius}
+\alias{fm_ellipsoid_radius.default}
+\alias{fm_ellipsoid_radius.character}
 \alias{fm_wkt_set_ellipsoid_radius}
+\alias{fm_ellipsoid_radius<-}
+\alias{fm_ellipsoid_radius<-.character}
+\alias{fm_ellipsoid_radius<-.CRS}
+\alias{fm_ellipsoid_radius<-.inla.CRS}
+\alias{fm_ellipsoid_radius<-.crs}
+\alias{fm_ellipsoid_radius<-.fm_crs}
 \alias{fm_crs_set_ellipsoid_radius}
 \alias{fm_wkt_unit_params}
 \alias{fm_crs_wkt}
 \alias{fm_wkt_get_lengthunit}
 \alias{fm_wkt_set_lengthunit}
-\alias{fm_crs_get_wkt}
 \alias{fm_crs_get_lengthunit}
 \alias{fm_crs_set_lengthunit}
+\alias{fm_length_unit}
+\alias{fm_length_unit.default}
+\alias{fm_length_unit.character}
+\alias{fm_length_unit<-}
+\alias{fm_length_unit<-.character}
+\alias{fm_length_unit<-.CRS}
+\alias{fm_length_unit<-.inla.CRS}
+\alias{fm_length_unit<-.crs}
+\alias{fm_length_unit<-.fm_crs}
+\alias{fm_wkt}
+\alias{fm_crs_get_wkt}
 \title{Handling CRS/WKT}
 \usage{
 fm_wkt_is_geocent(wkt)
@@ -24,7 +43,25 @@ fm_wkt_get_ellipsoid_radius(wkt)
 
 fm_crs_get_ellipsoid_radius(crs)
 
+fm_ellipsoid_radius(x)
+
+\method{fm_ellipsoid_radius}{default}(x)
+
+\method{fm_ellipsoid_radius}{character}(x)
+
 fm_wkt_set_ellipsoid_radius(wkt, radius)
+
+fm_ellipsoid_radius(x) <- value
+
+\method{fm_ellipsoid_radius}{character}(x) <- value
+
+\method{fm_ellipsoid_radius}{CRS}(x) <- value
+
+\method{fm_ellipsoid_radius}{inla.CRS}(x) <- value
+
+\method{fm_ellipsoid_radius}{crs}(x) <- value
+
+\method{fm_ellipsoid_radius}{fm_crs}(x) <- value
 
 fm_crs_set_ellipsoid_radius(crs, radius)
 
@@ -34,18 +71,42 @@ fm_wkt_get_lengthunit(wkt)
 
 fm_wkt_set_lengthunit(wkt, unit, params = NULL)
 
-fm_crs_get_wkt(crs)
-
 fm_crs_get_lengthunit(crs)
 
-fm_crs_set_lengthunit(crs, unit, params = NULL)
+fm_crs_set_lengthunit(crs, unit)
+
+fm_length_unit(x)
+
+\method{fm_length_unit}{default}(x)
+
+\method{fm_length_unit}{character}(x)
+
+fm_length_unit(x) <- value
+
+\method{fm_length_unit}{character}(x) <- value
+
+\method{fm_length_unit}{CRS}(x) <- value
+
+\method{fm_length_unit}{inla.CRS}(x) <- value
+
+\method{fm_length_unit}{crs}(x) <- value
+
+\method{fm_length_unit}{fm_crs}(x) <- value
+
+fm_wkt(crs)
+
+fm_crs_get_wkt(crs)
 }
 \arguments{
 \item{wkt}{A WKT2 character string}
 
 \item{crs}{A \code{sp::CRS} or \code{inla.CRS} object}
 
+\item{x}{crs object to extract value from or assign values in}
+
 \item{radius}{numeric; The new radius value}
+
+\item{value}{Value to assign}
 
 \item{unit}{character, name of a unit. Supported names are
 "metre", "kilometre", and the aliases "meter", "m", International metre",
@@ -69,16 +130,16 @@ For \code{fm_wkt_set_lengthunit}, a
 WKT2 string with altered length units.
 Note that the length unit for the ellipsoid radius is unchanged.
 
-For \code{fm_crs_get_wkt}, WKT2 string.
-
 For \code{fm_crs_get_lengthunit}, a
 list of length units used in the wkt string, excluding the ellipsoid radius
 unit. (For legacy PROJ4 code, the raw units from the proj4string are
 returned, if present.)
 
-For \code{fm_crs_set_lengthunit}, a \code{sp::CRS} object with
+For \verb{fm_length_unit<-}, a crs object with
 altered length units.
 Note that the length unit for the ellipsoid radius is unchanged.
+
+For \code{fm_wkt}, WKT2 string.
 }
 \description{
 Get and set CRS object or WKT string properties.

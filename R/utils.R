@@ -216,6 +216,14 @@ eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
       "SpatialGridDataFrame"
     )
   ))
+  if (inherits(where, "SpatialPoints")) {
+    if (ncol(sp::coordinates(where)) >= 3) {
+      where <- sp::SpatialPoints(
+        coords = sp::coordinates(where)[, 1:2, drop = FALSE],
+        proj4string = fm_sp_get_crs(where)
+      )
+    }
+  }
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
   unique_layer <- unique(layer)

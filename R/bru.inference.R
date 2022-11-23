@@ -533,6 +533,40 @@ eval_in_data_context <- function(input,
 }
 
 
+
+
+
+
+complete_coordnames <- function(data_coordnames, ips_coordnames) {
+  new_coordnames <- character(
+    max(
+      length(ips_coordnames),
+      length(data_coordnames)
+    )
+  )
+  from_data <- which(!(data_coordnames %in% ""))
+  new_coordnames[from_data] <- data_coordnames[from_data]
+  from_ips <- setdiff(
+    which(!(ips_coordnames %in% "")),
+    from_data
+  )
+  new_coordnames[from_ips] <- ips_coordnames[from_ips]
+
+  dummies <- seq_len(length(new_coordnames))
+  dummies <- setdiff(dummies, c(from_data, from_ips))
+
+  new_coordnames[dummies] <-
+    paste0(
+      "BRU_dummy_coordinate_",
+      seq_along(new_coordnames)
+    )[dummies]
+
+  list(
+    data = new_coordnames[seq_along(data_coordnames)],
+    ips = new_coordnames[seq_along(ips_coordnames)]
+  )
+}
+
 #' Likelihood construction for usage with [bru()]
 #'
 #' @aliases like
@@ -645,7 +679,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   )
 
   # Catch and handle special cases:
-  if ((family == "cp") && (is.null(response) || !is.list(response))) {
+  if ((family == "cp") && (is.null(response) || !inherits(response, "list"))) {
     domain_names <- trimws(strsplit(formula_char[2], split = "\\+")[[1]])
     if (!is.null(domain_names)) {
       # "a + b" conversion to list(a = a, b = b)
@@ -710,8 +744,8 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 
   # More on special bru likelihoods
   if (family == "cp") {
-    if (is.null(data)) {
-      stop("You called like() with family='cp' but no 'data' argument was supplied.")
+    if (is.null(response)) {
+      stop("You called like() with family='cp' but the evaluated response information is NULL")
     }
 
     if (is.null(ips)) {
@@ -727,41 +761,29 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       warning("Exposure/effort parameter E should be a scalar for likelihood 'cp'.")
     }
 
+    # TODO!!! ####
     ips_is_Spatial <- inherits(ips, "Spatial")
     if (ips_is_Spatial) {
       ips_coordnames <- sp::coordnames(ips)
       ips_crs <- fm_sp_get_crs(ips)
-    }
-    data_is_Spatial <- inherits(data, "Spatial")
-    if (data_is_Spatial) {
-      data_coordnames <- sp::coordnames(data)
-      data_crs <- fm_sp_get_crs(data)
-      if (ips_is_Spatial) {
-        new_coordnames <- data_coordnames[seq_len(min(
-          length(ips_coordnames),
-          length(data_coordnames)
-        ))]
-        new_coordnames[new_coordnames %in% ""] <-
-          paste0(
-            "BRU_dummy_coordinate_",
-            seq_along(new_coordnames)
-          )[new_coordnames %in% ""]
-        ips_coordnames <- paste0(
-          "BRU_dummy_coordinate_",
-          seq_along(ips_coordnames)
-        )
-        data_coordnames <- paste(
-          "BRU_dummy_coordinate_",
-          seq_along(data_coordnames)
-        )
-        ips_coordnames[seq_along(new_coordnames)] <- new_coordnames
-        data_coordnames[seq_along(new_coordnames)] <- new_coordnames
-        coordnames(ips) <- ips_coordnames
-        coordnames(data) <- data_coordnames
+      # For backwards compatibility:
+      data_crs <- fm_CRS(fm_crs(data))
 
-        # TODO: check that the crs info is the same
+      if ("coordinates" %in% names(response)) {
+        data_coordnames <- colnames(response$coordinates)
+        new_coordnames <- complete_coordnames(data_coordnames, ips_coordnames)
+        colnames(response$coordinates) <- new_coordnames$data
+        sp::coordnames(ips) <- new_coordnames$ips
+      } else {
+        if (inherits(response, c("sf", "sfc")) ||
+          (is.list(response) &&
+            any(vapply(response, function(x) inherits(x, c("sf", "sfc")), TRUE)))) {
+          ips <- sf::st_as_sf(ips)
+          ips_is_Spatial <- FALSE
+        }
       }
     }
+    # TODO: check that the crs info is the same
 
     # For non-Spatial models:
     # Use the response data list as the actual data object, since that's
@@ -775,17 +797,33 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     # For Spatial models, keep the old behaviour for backwards compatibility for
     # now, but can likely realign that in the future after more testing.
     if (ips_is_Spatial) {
-      data <- as.data.frame(data)
-      if (!is.null(response_data)) {
-        warning("Ignoring non-null response_data input for 'cp' likelihood")
+      if ("coordinates" %in% names(response)) {
+        idx <- names(response) %in% "coordinates"
+        data <- as.data.frame(response$coordinates)
+        if (any(!idx)) {
+          data <- cbind(data, as.data.frame(response[!idx]))
+        }
+      } else {
+        data <- as.data.frame(response)
       }
+      response_data <- NULL
       N_data <- NROW(data)
     } else {
       data <- as.data.frame(response)
+      if (("geometry" %in% names(data)) &&
+        inherits(data$geometry, "sfc")) {
+        sf::st_geometry(data) <- "geometry"
+      }
       response_data <- NULL
       N_data <- NROW(data)
     }
-    ips <- as.data.frame(ips)
+    if (ips_is_Spatial) {
+      ips <- as.data.frame(ips)
+    } else {
+      if ("geometry" %in% names(ips)) {
+        sf::st_geometry(ips) <- "geometry"
+      }
+    }
     dim_names <- intersect(names(data), names(ips))
     if (identical(options[["bru_compress_cp"]], TRUE)) {
       allow_combine <- TRUE
@@ -836,9 +874,9 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     if (ips_is_Spatial) {
       non_coordnames <- setdiff(names(data), data_coordnames)
       data <- sp::SpatialPointsDataFrame(
-        coords = data[new_coordnames],
+        coords = as.matrix(data[data_coordnames]),
         data = data[non_coordnames],
-        proj4string = data_crs,
+        proj4string = fm_CRS(data_crs),
         match.ID = FALSE
       )
     }
