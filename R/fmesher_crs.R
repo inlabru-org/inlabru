@@ -1717,6 +1717,25 @@ fm_transform.default <- function(x, crs = fm_crs(x), ..., crs0 = NULL) {
   ))
 }
 
+
+fm_transform_raw <- function(x, from, to) {
+  adjust_input <- function(x, crs) {
+    if (fm_crs_is_geocent(crs) &&
+        length(x) &&
+        dim(x)[2] == 2) {
+      x <- cbind(x, 0)
+    }
+    x
+  }
+
+  sf::sf_project(
+    adjust_input(x, crs = to),
+    from = from,
+    to = to
+  )
+}
+
+
 #' @rdname fm_transform
 #' @export
 fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = NULL) {
@@ -1773,7 +1792,7 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
   if (do_work_on_sphere) {
     if (!onsphere_0) {
       if (sphere_radius_0 != 1) {
-        x <- sf::sf_project(
+        x <- fm_transform_raw(
           x,
           from = current_crs,
           to = longlat_0
@@ -1781,10 +1800,7 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
       }
       # x can now be treated as being in longlat_norm coordinates
       current_crs <- longlat_norm
-      if (ncol(x) == 2) {
-        x <- cbind(x, 0)
-      }
-      x <- sf::sf_project(
+      x <- fm_transform_raw(
         x,
         from = current_crs,
         to = crs_sphere
@@ -1807,7 +1823,7 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
       )
     }
     if (sphere_radius_1 != 1) {
-      x <- sf::sf_project(
+      x <- fm_transform_raw(
         x,
         from = current_crs,
         to = longlat_norm
@@ -1817,7 +1833,7 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
     }
   }
 
-  x <- sf::sf_project(
+  x <- fm_transform_raw(
     x,
     from = current_crs,
     to = crs1
@@ -1859,14 +1875,31 @@ fm_transform_sf <- function(x, crs, ..., passthrough) {
   }
 
   if (inherits(x, "sfc_POINT")) {
+    adjust_input <- function(x, crs) {
+      if (fm_crs_is_geocent(crs) &&
+          length(x) &&
+          inherits(x[[1]], "XY")) {
+        x <- sf::st_zm(x = x, drop = FALSE, what = "Z")
+      }
+      x
+    }
+
+    x <- adjust_input(x, crs1)
     coord <- sf::st_coordinates(x)
+    M <- if ("M" %in% colnames(coord)) coord[, "M"] else NULL
     coord <- coord[, intersect(colnames(coord), c("X", "Y", "Z")), drop = FALSE]
     coord <- fm_transform(coord, crs = crs1, crs0 = crs0, passthrough = passthrough)
+    if (is.null(M)) {
+      the_dim <- c("X", "XY", "XYZ")[ncol(coord)]
+    } else {
+      the_dim <- c("XM", "XYM", "XYZM")[ncol(coord)]
+      coord <- cbind(coord, M)
+    }
     x <-
       do.call(sf::st_sfc, c(
         lapply(
           seq_len(nrow(coord)),
-          function(k) sf::st_point(coord[k, ])
+          function(k) sf::st_point(coord[k, ], dim = the_dim)
         ),
         list(crs = sf::st_crs(crs1))
       ))
