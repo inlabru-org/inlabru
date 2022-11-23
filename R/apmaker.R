@@ -91,7 +91,7 @@ apmaker <- function(samplers, domain, dnames,
     sf_samplers <- inherits(samplers, "sf")
     sf_domain <- inherits(domain, "sf")
     sp_samplers <- inherits(samplers, "sp")
-    sp_domain <- linherits(domain, "sp")
+    sp_domain <- inherits(domain, "sp")
     if (sf_samplers && sp_domain) {
       samplers <- sf::st_as_sf(samplers)
     }
@@ -106,7 +106,7 @@ apmaker <- function(samplers, domain, dnames,
   # TODO save to log and verbosity = 2, use seq_along to introduce the indices
   # for each active geometry
   # TODO extra domains we assign the sampler for them
-  if (is_sf_samplers) {
+  if (sf_samplers) {
     for (i in seq_along(samplers)) {
       bru_log_message(
         paste0(
@@ -122,7 +122,7 @@ apmaker <- function(samplers, domain, dnames,
       )
     }
   }
-  if (is_sf_domain) {
+  if (sf_domain) {
     for (i in seq_along(domain)) {
       bru_log_message(
         paste0(
@@ -188,7 +188,8 @@ apmaker <- function(samplers, domain, dnames,
   ips <- apoints(samplers, domain,
     group = samplers_domain, int.args = int.args, weights = weights
   )
-  # TODO using groupwise cprod
+  # TODO using groupwise cprod for each domain
+  # this is just a draft atm
   lips <- lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
   ips <- do.call(group_cprod, c(list(ips), lips, group = samplers_domain))
 
