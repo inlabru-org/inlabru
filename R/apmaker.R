@@ -9,17 +9,16 @@
 # domains that are not given in the `samplers` data.frame are used, plus the
 # coordinates object, used for the spatial aspect of the `samplers` object.
 # @param weights The name of integration weights column in the samplers.
-# TODO 1) how about domain? 2) allow_names should be bru_weight?
+# TODO 1) how about domain? should not be allowed.  2) allow_names should be bru_weight? 23112022 Only for samplers
 # Default: "weights".
 # It mainly works for line transect at the moment, determining the width of the
 # line to be integrated. See the distance sampling example
 # https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_distancesampling.html
-# @param dnames The names of dimensions
 # @param int.args List of arguments passed on to \code{ipoints}
 # @return Integration points
 
 # TODO option argument as in bru function with list() bru_int_args
-apmaker <- function(samplers, domain, dnames,
+apmaker <- function(domain, samplers,
                     weights = "weights",
                     int.args = list(method = "stable", nsub = NULL)) {
   # To allow sf geometry support, should likely change the logic to
@@ -28,9 +27,9 @@ apmaker <- function(samplers, domain, dnames,
   # TODO 20221109 For multiple samplers multiple domains, it does have to rely
   # on the domain names. 20221111 They do have to match
 
-  # Mandate both the samplers and domain arguments later on no
-  if (is.null(samplers) || is.null(domain)) {
-    stop("Samplers or domain argument(s) missing.")
+  # Mandate both the domain argument not specified or is null
+  if (missing(domain) || is.null(domain)) {
+    stop("Domain argument(s) missing or NULL.")
   }
 
   # Check if both samplers and domain list
@@ -45,6 +44,7 @@ apmaker <- function(samplers, domain, dnames,
     is_list <- FALSE
   }
 
+  # multi domain sampler the main thing is data drame 23112022 specific column has that meaning
   # check sf or sp object, can do a mix of sp and sf objects,
   # TODO if not a list, we should have to check
   # TODO have to convert sp to sf for output if there is a mix of sp and sf
@@ -53,11 +53,8 @@ apmaker <- function(samplers, domain, dnames,
     sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
     sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
     sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
-    if (any(sf_samplers) && any(sp_domain)) {
-      samplers <- lapply(samplers, sf::st_as_sf())
-    }
     if (any(sf_domain) && any(sp_samplers)) {
-      domain <- lapply(domain, sf::st_as_sf())
+      samplers <- lapply(samplers, sf::st_as_sf)
     }
   }
   # single domain samplers
@@ -66,11 +63,8 @@ apmaker <- function(samplers, domain, dnames,
     sf_domain <- inherits(domain, "sf")
     sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
     sp_domain <- inherits(domain, "sp")
-    if (any(sf_samplers) && sp_domain) {
-      samplers <- lapply(samplers, sf::st_as_sf())
-    }
     if (sf_domain && any(sp_samplers)) {
-      domain <- sf::st_as_sf(domain)
+      samplers <- sf::st_as_sf(samplers)
     }
   }
   # multi domain sampler
@@ -79,24 +73,18 @@ apmaker <- function(samplers, domain, dnames,
     sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
     sp_samplers <- inherits(samplers, "sp")
     sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
-    if (sf_samplers && any(sp_domain)) {
-      samplers <- sf::st_as_sf(samplers)
-    }
     if (sf_domain && any(sp_samplers)) {
-      domain <- lapply(domain, sf::st_as_sf())
+      samplers <- lapply(samplers, sf::st_as_sf)
     }
   }
-  # not list
+  # have to sort this out beforehand then this cannot happen 23112022
   if (!is_list) {
     sf_samplers <- inherits(samplers, "sf")
     sf_domain <- inherits(domain, "sf")
     sp_samplers <- inherits(samplers, "sp")
     sp_domain <- inherits(domain, "sp")
-    if (sf_samplers && sp_domain) {
-      samplers <- sf::st_as_sf(samplers)
-    }
     if (sf_domain && sp_samplers) {
-      domain <- sf::st_as_sf(domain)
+      samplers <- sf::st_as_sf(samplers)
     }
   }
 
@@ -116,35 +104,17 @@ apmaker <- function(samplers, domain, dnames,
           attr(samplers[i], "sf_column"),
           ".\n"
         ),
-        verbose = options$bru_verbose,
+        verbose = options$bru_verbose, # TODO to global bru_option_get
         verbose_store = options$bru_verbose_store,
         verbosity = 2
       )
     }
   }
-  if (sf_domain) {
-    for (i in seq_along(domain)) {
-      bru_log_message(
-        paste0(
-          "The active geometry of the domain",
-          domain[i],
-          " is ",
-          attr(domain[i], "sf_column"),
-          ".\n"
-        ),
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store,
-        verbosity = 2
-      )
-    }
-  }
-
-
 
   # Check if the names of samplers and domains match. How to establish the link
   # between samplers and domain? If names are not provided, follow the order in
   # list. If names are provided but do not match, what should we do?
-  if (unique(names(samplers)) != unique(names(domain))) {
+  if (unique(names(samplers)) != unique(names(domain))) { # TODO have to accomodate weights as well
     samplers_domain <- intersect(names(samplers), names(domain))
     bru_log_message(
       paste0(
@@ -186,7 +156,7 @@ apmaker <- function(samplers, domain, dnames,
   # TODO weights argument to take effect on samplers. The weight should go to
   # the integration part
   ips <- apoints(samplers, domain,
-    group = samplers_domain, int.args = int.args, weights = weights
+    int.args = int.args, weights_name = weights_name
   )
   # TODO using groupwise cprod for each domain
   # this is just a draft atm
