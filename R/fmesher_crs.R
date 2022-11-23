@@ -1938,8 +1938,18 @@ fm_transform.sfg <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
 #' @export
 #' @rdname fm_transform
 fm_transform.Spatial <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
-  # TODO: preserve coordinate names
-  as(fm_transform(sf::st_as_sf(x), crs = crs, ..., passthrough = passthrough), "Spatial")
+  orig_class <- class(x)
+  as(
+    as(
+      fm_transform(
+        sf::st_as_sf(x),
+        crs = crs,
+        ...,
+        passthrough = passthrough),
+      "Spatial"
+    ),
+    orig_class[1]
+  )
 }
 
 

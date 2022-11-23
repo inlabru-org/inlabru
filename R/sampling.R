@@ -159,9 +159,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     if (ignore.CRS) {
       mesh$crs <- NULL
     }
-    input.crs <- fm_CRS(fm_CRSargs(mesh$crs))
-    input.crs.list <- fm_CRSargs_as_list(fm_CRSargs(input.crs))
-    use.crs <- !is.null(input.crs.list$proj) && !ignore.CRS
+    input.crs <- fm_crs(mesh$crs)
+    use.crs <- !is.na(input.crs) && !ignore.CRS
     is.geocent <- (mesh$manifold == "S2")
 
     if (is.geocent || use.crs) {
@@ -177,7 +176,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         strategy <- "triangulated"
       } else if (!use.crs) {
         strategy <- "rectangle"
-      } else if (identical(input.crs.list$proj, "longlat")) {
+      } else if (identical(sf::st_crs(input.crs)$proj, "longlat")) {
         strategy <- "sliced-spherical"
       }
     }
@@ -185,11 +184,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
 
     if (is.geocent) {
       space.R <- mean(rowSums(mesh$loc^2)^0.5)
-      if (is.null(input.crs.list$units)) {
-        space.units <- "m"
-      } else {
-        space.units <- input.crs.list$units
-      }
+      space.units <- fm_length_unit(input.crs)
       internal.crs <- fm_CRS("sphere", args = list(a = 1, b = 1, units = "m"))
       mesh$loc <- mesh$loc / space.R
       mesh$crs <- internal.crs
@@ -262,7 +257,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (is.geocent) {
           target.crs <- internal.crs
         } else if (use.crs) {
-          target.crs <- input.crs
+          target.crs <- fm_CRS(input.crs)
         } else {
           target.crs <- CRS(as.character(NA))
         }
