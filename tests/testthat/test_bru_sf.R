@@ -35,18 +35,24 @@ test_that("sf gorillas lgcp vignette", {
   )
 
   ## Build the mesh:
-  mesh_sf <- INLA::inla.mesh.2d(
-    boundary = boundary,
-    max.edge = c(0.54, 0.97),
-    min.angle = c(30, 21),
-    max.n = c(48000, 16000),
-    ## Safeguard against large meshes.
-    max.n.strict = c(128000, 128000),
-    ## Don't build a huge mesh!
-    cutoff = 0.01,
-    ## Filter away adjacent points.
-    offset = c(0.73, 1.55)
-  ) ## Offset for extra boundaries, if needed.
+  ## Suppress PROJ support warnings, until the inla.mesh functions are updated
+  suppressWarnings(
+    mesh_sf <- INLA::inla.mesh.2d(
+      boundary = boundary,
+      max.edge = c(0.54, 0.97),
+      min.angle = c(30, 21),
+      ## Safeguard against large meshes.
+      max.n = c(48000, 16000),
+      ## Don't build a huge mesh!
+      max.n.strict = c(128000, 128000),
+      ## Filter away adjacent points.
+      cutoff = 0.01,
+      ## Offset for extra boundaries, if needed.
+      offset = c(0.73, 1.55),
+      ## Build mesh in this crs:
+      crs = fm_CRS(fm_crs(gorillas$nests))
+    )
+  )
 
   # library(ggplot2)
   # ggplot() +
@@ -64,6 +70,8 @@ test_that("sf gorillas lgcp vignette", {
   # Check integration construction
   ips_sp <- ipoints(gorillas$boundary, mesh_sf)
   ips_sf <- ipoints(gorillas_sf$boundary, mesh_sf)
+
+  expect_equal(ips_sp, ips_sf)
 
   fit <- lgcp(
     cmp,

@@ -518,7 +518,7 @@ fm_wkt_set_lengthunit <- function(wkt, unit, params = NULL) {
       wt[["params"]] <- unit
     } else if (wt[["label"]] != "ELLIPSOID") {
       if ((wt[["label"]] == "PARAMETER") &&
-          (wt[["params"]][[1]] %in% c('"False easting"', '"False northing"'))) {
+        (wt[["params"]][[1]] %in% c('"False easting"', '"False northing"'))) {
         orig_unit <- (wt[["params"]][[3]][["params"]][[1]])
         new_unit <- (unit[[1]])
         if (orig_unit != new_unit) {
@@ -709,7 +709,7 @@ fm_length_unit.character <- function(x) {
 #' depending on if the coordinate reference system described by the parameters
 #' can be expressed with a pure `crs` object or not.
 #'
-#'@returns A `crs` object ([sf::st_crs()]) or a `fm_crs` object.
+#' @returns A `crs` object ([sf::st_crs()]) or a `fm_crs` object.
 #' An S3 `fm_crs` object is a list with elements `crs` and `oblique`.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @seealso [sf::st_crs()], [`fm_crs_wkt`],
@@ -1733,9 +1733,9 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
     }
     return(x)
   }
-  if (ncol(x) == 2) {
-    x <- cbind(x, 0)
-  }
+  #  if (ncol(x) == 2) {
+  #    x <- cbind(x, 0)
+  #  }
   sphere_radius_0 <- fm_crs_get_ellipsoid_radius(crs0)
   sphere_radius_1 <- fm_crs_get_ellipsoid_radius(crs1)
   different_radii <- (sphere_radius_0 != sphere_radius_1)
@@ -1766,24 +1766,30 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
   }
   do_work_on_sphere <-
     inherits(crs0, "fm_crs") ||
-    inherits(crs1, "fm_crs") ||
-    different_radii
+      inherits(crs1, "fm_crs") ||
+      different_radii
   x <- x[ok, , drop = FALSE]
+  current_crs <- fm_crs(crs0, crsonly = TRUE)
   if (do_work_on_sphere) {
     if (!onsphere_0) {
       if (sphere_radius_0 != 1) {
         x <- sf::sf_project(
           x,
-          from = fm_crs(crs0, crsonly = TRUE),
+          from = current_crs,
           to = longlat_0
         )
       }
       # x can now be treated as being in longlat_norm coordinates
+      current_crs <- longlat_norm
+      if (ncol(x) == 2) {
+        x <- cbind(x, 0)
+      }
       x <- sf::sf_project(
         x,
-        from = longlat_norm,
+        from = current_crs,
         to = crs_sphere
       )
+      current_crs <- crs_sphere
     }
     if (!is.null(crs0$oblique)) {
       x <- fm_crs_transform_oblique(
@@ -1803,16 +1809,17 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
     if (sphere_radius_1 != 1) {
       x <- sf::sf_project(
         x,
-        from = crs_sphere,
+        from = current_crs,
         to = longlat_norm
       )
       # x can now be treated as being in longlat_1
+      current_crs <- longlat_1
     }
   }
 
   x <- sf::sf_project(
     x,
-    from = if (do_work_on_sphere) longlat_1 else fm_crs(crs0, crsonly = TRUE),
+    from = current_crs,
     to = crs1
   )
 
@@ -1856,9 +1863,13 @@ fm_transform_sf <- function(x, crs, ..., passthrough) {
     coord <- coord[, intersect(colnames(coord), c("X", "Y", "Z")), drop = FALSE]
     coord <- fm_transform(coord, crs = crs1, crs0 = crs0, passthrough = passthrough)
     x <-
-      do.call(sf::st_sfc, c(lapply(seq_len(nrow(coord)),
-                                   function(k) sf::st_point(coord[k, ])),
-                            list(crs = sf::st_crs(crs1))))
+      do.call(sf::st_sfc, c(
+        lapply(
+          seq_len(nrow(coord)),
+          function(k) sf::st_point(coord[k, ])
+        ),
+        list(crs = sf::st_crs(crs1))
+      ))
   } else {
     x <- sf::st_transform(x, sf::st_crs(crs1))
   }

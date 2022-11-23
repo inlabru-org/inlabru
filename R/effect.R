@@ -976,6 +976,7 @@ bru_subcomponent <- function(input = NULL,
 
 make_unique_inputs <- function(inp, allow_list = FALSE) {
   is_spatial <- vapply(inp, function(x) inherits(x, "Spatial"), TRUE)
+  is_sfc <- vapply(inp, function(x) inherits(x, "sfc"), TRUE)
   is_matrix <- vapply(inp, function(x) is.matrix(x), TRUE)
   is_Matrix <- vapply(inp, function(x) inherits(x, "Matrix"), TRUE)
   is_factor <- vapply(inp, function(x) is.factor(x), TRUE)
@@ -1009,6 +1010,23 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       )
     ))
     n_values <- nrow(inp_values)
+  } else if (any(is_sfc)) {
+    if (!all(is_sfc)) {
+      stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
+    }
+    inconsistent_crs <- FALSE
+    inp_crs <- lapply(inp, fm_crs)
+    null_crs <- vapply(inp_crs, is.na, logical(1))
+    inconsistent_crs <-
+      (length(unique(inp_crs)) > 1) ||
+        (any(null_crs) && !all(null_crs))
+    if (inconsistent_crs) {
+      stop("Inconsistent spatial crs information. Unable to infer mapper information.")
+    }
+    inp_values <- sf::st_sfc(unique(do.call(c, inp)),
+      crs = inp_crs[[1]]
+    )
+    n_values <- NROW(inp_values)
   } else if (any(is_matrix | is_Matrix)) {
     if (!all(is_matrix | is_Matrix)) {
       stop("Inconsistent input types; matrix and non-matrix")

@@ -7,6 +7,8 @@
   
 * New methods for `fm_crs`, `fm_CRS`, `fm_ellipsoid_radius`, `fm_transform`
   to further support `sf` objects.
+  
+* Allow `sf` input to `family="cp"` models.
 
 * Further `bru_mapper` method updates;
 

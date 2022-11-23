@@ -154,6 +154,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     samplers <- NULL
   }
 
+  if (inherits(samplers, c("sf", "sfc"))) {
+    samplers <- as(samplers, "Spatial")
+  }
+
   is_2d <-
     (
       !is.null(samplers) &&
@@ -638,6 +642,11 @@ ipmaker <- function(samplers, domain, dnames,
   if (spatial) {
     ips <- ipoints(samplers, domain$coordinates,
       group = samp.dim, int.args = int.args
+    )
+  } else if (inherits(samplers, c("sf", "sfc")) && ("geometry" %in% dnames)) {
+    ips <- ipoints(samplers, domain$geometry,
+      group = setdiff(samp.dim, "geometry"),
+      int.args = int.args
     )
   } else {
     ips <- NULL

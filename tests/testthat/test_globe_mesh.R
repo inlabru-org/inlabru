@@ -27,7 +27,7 @@ test_that("2D modelling on the globe", {
   )
   coordinates(data) <- c("Long", "Lat")
   proj4string(data) <- fm_CRS("longlat_globe")
-  data <- fm_spTransform(data, CRSobj = fm_CRS("sphere"))
+  data <- fm_transform(data, crs = fm_CRS("sphere"))
 
   matern <- INLA::inla.spde2.pcmatern(
     mesh,
@@ -80,7 +80,7 @@ test_that("2D LGCP modelling on the globe", {
   )
   coordinates(data) <- c("Long", "Lat")
   proj4string(data) <- fm_CRS("longlat_globe")
-  data <- fm_spTransform(data, CRSobj = fm_CRS("sphere"))
+  data <- fm_transform(data, crs = fm_CRS("sphere"))
 
   matern <- INLA::inla.spde2.pcmatern(
     mesh,
