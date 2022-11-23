@@ -1721,18 +1721,25 @@ fm_transform.default <- function(x, crs = fm_crs(x), ..., crs0 = NULL) {
 fm_transform_raw <- function(x, from, to) {
   adjust_input <- function(x, crs) {
     if (fm_crs_is_geocent(crs) &&
-      length(x) &&
-      dim(x)[2] == 2) {
-      x <- cbind(x, 0)
+      ncol(x) == 2) {
+      if (nrow(x) > 0) {
+        x <- cbind(x, 0)
+      } else {
+        x <- matrix(0, 0, ncol(x) + 1)
+      }
     }
     x
   }
 
-  sf::sf_project(
+  if (nrow(x) == 0) {
+    adjust_input(x, crs = to)
+  } else {
+    sf::sf_project(
     adjust_input(x, crs = to),
     from = from,
     to = to
   )
+  }
 }
 
 
