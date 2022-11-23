@@ -103,7 +103,9 @@ sp::Spatial objects."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function is a convenience method to workaround PROJ4/PROJ6
-differences, and the lack of a crs extraction method for Spatial objects.</p>
+differences, and the lack of a crs extraction method for Spatial objects.
+For newer code, use <code><a href="fm_crs.html">fm_crs()</a></code> instead, that returns <code>crs</code> objects,
+and use <code><a href="fm_as.html">fm_as_sp_crs()</a></code> to convert to old style <code><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">sp::CRS</a></code> objects.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -114,7 +116,7 @@ differences, and the lack of a crs extraction method for Spatial objects.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>, proj4string <span class="op">=</span> <span class="fu"><a href="fm_CRS.html">fm_CRS</a></span><span class="op">(</span><span class="st">"sphere"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>, proj4string <span class="op">=</span> <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="st">"sphere"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">fm_sp_get_crs</span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>

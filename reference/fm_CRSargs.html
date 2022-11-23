@@ -137,7 +137,7 @@ name/value pairs.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="http://rgdal.r-forge.r-project.org/reference/rgdal-deprecated.html" class="external-link">rgdal::CRSargs()</a></code>, <code><a href="fm_CRS.html">fm_CRS()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="http://rgdal.r-forge.r-project.org/reference/rgdal-deprecated.html" class="external-link">rgdal::CRSargs()</a></code>, <code><a href="fm_CRS_sp.html">fm_CRS()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -148,12 +148,12 @@ name/value pairs.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="http://rgdal.r-forge.r-project.org" class="external-link">rgdal</a></span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="fu"><a href="fm_has_PROJ6.html">fm_has_PROJ6</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">crs0</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_CRS.html">fm_CRS</a></span><span class="op">(</span><span class="st">"longlat"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">crs0</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="st">"longlat"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">p4s</span> <span class="op">&lt;-</span> <span class="fu">fm_CRSargs</span><span class="op">(</span><span class="va">crs0</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">lst</span> <span class="op">&lt;-</span> <span class="fu">fm_CRSargs_as_list</span><span class="op">(</span><span class="va">p4s</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">crs1</span> <span class="op">&lt;-</span> <span class="fu">fm_list_as_CRS</span><span class="op">(</span><span class="va">lst</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">lst</span><span class="op">$</span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
-<span class="r-in"><span>  <span class="va">crs2</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_CRS.html">fm_CRS</a></span><span class="op">(</span><span class="va">p4s</span>, args <span class="op">=</span> <span class="va">lst</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">crs2</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="va">p4s</span>, args <span class="op">=</span> <span class="va">lst</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">fm_CRSargs</span><span class="op">(</span><span class="va">crs0</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">fm_CRSargs</span><span class="op">(</span><span class="va">crs1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">fm_CRSargs</span><span class="op">(</span><span class="va">crs2</span><span class="op">)</span><span class="op">)</span></span></span>

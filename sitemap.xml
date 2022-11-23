@@ -217,7 +217,7 @@
     <loc>/reference/extract_property.html</loc>
   </url>
   <url>
-    <loc>/reference/fm_CRS.html</loc>
+    <loc>/reference/fm_CRS_sp.html</loc>
   </url>
   <url>
     <loc>/reference/fm_CRSargs.html</loc>
@@ -226,10 +226,10 @@
     <loc>/reference/fm_as.html</loc>
   </url>
   <url>
-    <loc>/reference/fm_crs_wkt.html</loc>
+    <loc>/reference/fm_crs.html</loc>
   </url>
   <url>
-    <loc>/reference/fm_get_crs.html</loc>
+    <loc>/reference/fm_crs_wkt.html</loc>
   </url>
   <url>
     <loc>/reference/fm_has_PROJ6.html</loc>
@@ -242,6 +242,9 @@
   </url>
   <url>
     <loc>/reference/fm_sp_get_crs.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fm_transform.html</loc>
   </url>
   <url>
     <loc>/reference/generate.html</loc>

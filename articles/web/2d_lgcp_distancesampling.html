@@ -100,7 +100,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-11-21</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-11-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_distancesampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_distancesampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_distancesampling.Rmd</code></div>
@@ -268,10 +268,10 @@ usual:</p>
 <code class="sourceCode R"><span><span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5  q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 257.5009 56.91631 176.0269 253.4431 369.718 253.4431        5.691631</span></span>
+<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 263.5443 56.87644 177.9329 261.4187 393.6267 261.4187        5.687644</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      5.351361</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      4.790601</span></span></code></pre></div>
 <p>and including the randomness about the expected number. In this case,
 it turns out that you need lots of posterior samples, e.g. 2,000 to
 smooth out the Monte Carlo error in the posterior, and this takes a
@@ -358,9 +358,9 @@ model:</p>
 <span><span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 326.3155 99.20476 185.4323 314.5202 508.0925 314.5202        9.920476</span></span>
+<span><span class="co">#&gt; 1 324.8839 98.92725 168.5603 316.4356 561.6718 316.4356        9.892725</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      13.44859</span></span>
+<span><span class="co">#&gt; 1      8.047445</span></span>
 <span></span>
 <span><span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -387,8 +387,8 @@ model:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   Model       DIC Delta.DIC</span></span>
-<span><span class="co">#&gt; 1   fit -1005.338  0.000000</span></span>
-<span><span class="co">#&gt; 2  fit1 -1003.240  2.097984</span></span>
+<span><span class="co">#&gt; 1   fit -801.9348  0.000000</span></span>
+<span><span class="co">#&gt; 2  fit1 -799.8569  2.077853</span></span>
 <span></span>
 <span><span class="co"># Look at the goodness-of-fit of the two models in the distance dimension</span></span>
 <span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span></span>
@@ -440,8 +440,8 @@ model:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">dfit1</span>, <span class="va">dfit</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   Model       DIC Delta.DIC</span></span>
-<span><span class="co">#&gt; 1  dfit -196.6955  0.000000</span></span>
-<span><span class="co">#&gt; 2 dfit1 -194.5777  2.117774</span></span></code></pre></div>
+<span><span class="co">#&gt; 1  dfit -8.626852  0.000000</span></span>
+<span><span class="co">#&gt; 2 dfit1 -6.512819  2.114033</span></span></code></pre></div>
 <p>Plot both lines on histogram of observations First scale lines to
 have same area as that of histogram Half-normal:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">

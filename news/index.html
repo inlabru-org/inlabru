@@ -80,6 +80,8 @@
 <div class="section level3">
 <h3 id="features-development-version">Features<a class="anchor" aria-label="anchor" href="#features-development-version"></a></h3>
 <ul><li><p>Allow <code>NA</code> input for default 1D mappers to generate effect zero, like in <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code>.</p></li>
+<li><p>New methods for <code>fm_crs</code>, <code>fm_CRS</code>, <code>fm_ellipsoid_radius</code>, <code>fm_transform</code> to further support <code>sf</code> objects.</p></li>
+<li><p>Allow <code>sf</code> input to <code>family="cp"</code> models.</p></li>
 <li>
 <p>Further <code>bru_mapper</code> method updates;</p>
 <ul><li><p>Deprecated <code><a href="../reference/bru_mapper_generics.html">ibm_amatrix()</a></code> and <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</p></li>
