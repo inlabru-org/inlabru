@@ -339,7 +339,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           waste_ratio <- sum(keep) / length(keep)
         }
       } else if (strategy == "sliced-spherical") {
-        if (identical(input.crs.list$proj, "longlat")) {
+        if (identical(input.crs$proj, "longlat")) {
           # Simulate number of points
           lon.range <- range(mesh$loc[, 1])
           lat.range <- range(mesh$loc[, 2])
@@ -423,7 +423,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         ret <- sp::SpatialPoints(matrix(0, 1, 3))[-1]
       }
       if (use.crs) {
-        proj4string(ret) <- input.crs
+        proj4string(ret) <- fm_CRS(input.crs)
       } else {
         proj4string(ret) <- CRS(as.character(NA))
       }
@@ -433,10 +433,10 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           ret <- fm_transform(ret, input.crs)
         } else if (multi.samples) {
           ret <- sp::SpatialPointsDataFrame(matrix(0, 1, 2), data = data.frame(sample = 1))[-1]
-          proj4string(ret) <- input.crs
+          proj4string(ret) <- fm_CRS(input.crs)
         } else {
           ret <- sp::SpatialPoints(matrix(0, 1, 2))[-1]
-          proj4string(ret) <- input.crs
+          proj4string(ret) <- fm_CRS(input.crs)
         }
       } else {
         proj4string(ret) <- sp::CRS(NA_character_)
