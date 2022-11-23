@@ -1731,14 +1731,15 @@ fm_transform_raw <- function(x, from, to) {
     x
   }
 
+  x <- adjust_input(x, crs = to)
   if (nrow(x) == 0) {
-    adjust_input(x, crs = to)
+    x
   } else {
     sf::sf_project(
-    adjust_input(x, crs = to),
-    from = from,
-    to = to
-  )
+      pts = x,
+      from = from,
+      to = to
+    )
   }
 }
 
