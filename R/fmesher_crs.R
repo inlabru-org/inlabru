@@ -1721,8 +1721,8 @@ fm_transform.default <- function(x, crs = fm_crs(x), ..., crs0 = NULL) {
 fm_transform_raw <- function(x, from, to) {
   adjust_input <- function(x, crs) {
     if (fm_crs_is_geocent(crs) &&
-        length(x) &&
-        dim(x)[2] == 2) {
+      length(x) &&
+      dim(x)[2] == 2) {
       x <- cbind(x, 0)
     }
     x
@@ -1877,8 +1877,8 @@ fm_transform_sf <- function(x, crs, ..., passthrough) {
   if (inherits(x, "sfc_POINT")) {
     adjust_input <- function(x, crs) {
       if (fm_crs_is_geocent(crs) &&
-          length(x) &&
-          inherits(x[[1]], "XY")) {
+        length(x) &&
+        inherits(x[[1]], "XY")) {
         x <- sf::st_zm(x = x, drop = FALSE, what = "Z")
       }
       x
