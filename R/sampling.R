@@ -222,7 +222,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (is.geocent) {
           area.mesh <- mesh
         } else if (use.crs) {
-          area.mesh <- fm_spTransform(mesh, CRSobj = internal.crs)
+          area.mesh <- fm_transform(mesh, crs = internal.crs)
         } else {
           area.mesh <- mesh
           area.R <- 1
@@ -372,7 +372,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         for (k in seq_len(length(sp) - 1)) {
           n.points <- sp[k + 1] - sp[k]
           if (n.points == 0) {
-            sampled.points[[k]] <- SpatialPoints(matrix(0, 1, 3), proj4string = internal.crs)[-1]
+            sampled.points[[k]] <-
+              sp::SpatialPoints(matrix(0, 1, 3), proj4string = internal.crs)[-1]
             break
           }
 
@@ -420,11 +421,11 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
 
     if (is.geocent) {
       if (length(ret) > 0) {
-        ret <- sp::spTransform(ret, fm_CRS("sphere", args = list(a = space.R, b = space.R, units = "m")))
+        ret <- fm_transform(ret, crs = fm_CRS("sphere", args = list(a = space.R, b = space.R, units = "m")))
       } else if (multi.samples) {
-        ret <- SpatialPointsDataFrame(matrix(0, 1, 3), data = data.frame(sample = 1))[-1]
+        ret <- sp::SpatialPointsDataFrame(matrix(0, 1, 3), data = data.frame(sample = 1))[-1]
       } else {
-        ret <- SpatialPoints(matrix(0, 1, 3))[-1]
+        ret <- sp::SpatialPoints(matrix(0, 1, 3))[-1]
       }
       if (use.crs) {
         proj4string(ret) <- input.crs
@@ -434,16 +435,16 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     } else {
       if (use.crs) {
         if (length(ret) > 0) {
-          ret <- spTransform(ret, input.crs)
+          ret <- fm_transform(ret, input.crs)
         } else if (multi.samples) {
-          ret <- SpatialPointsDataFrame(matrix(0, 1, 2), data = data.frame(sample = 1))[-1]
+          ret <- sp::SpatialPointsDataFrame(matrix(0, 1, 2), data = data.frame(sample = 1))[-1]
           proj4string(ret) <- input.crs
         } else {
-          ret <- SpatialPoints(matrix(0, 1, 2))[-1]
+          ret <- sp::SpatialPoints(matrix(0, 1, 2))[-1]
           proj4string(ret) <- input.crs
         }
       } else {
-        proj4string(ret) <- CRS(as.character(NA))
+        proj4string(ret) <- sp::CRS(NA_character_)
       }
     }
 
