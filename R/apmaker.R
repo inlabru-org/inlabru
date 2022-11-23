@@ -188,9 +188,9 @@ apmaker <- function(samplers, domain, dnames,
   ips <- apoints(samplers, domain,
     group = samplers_domain, int.args = int.args, weights = weights
   )
-# using groupwise cprod
+  # TODO using groupwise cprod
   lips <- lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
-  ips <- do.call(group_cprod, c(list(ips), lips), group = samplers_domain)
+  ips <- do.call(group_cprod, c(list(ips), lips, group = samplers_domain))
 
   #####################################
 
