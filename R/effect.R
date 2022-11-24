@@ -1524,7 +1524,7 @@ code.components <- function(components, add = "") {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 
-summary.component <- function(object, ..., depth = Inf) {
+summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
   result <- list(
     "Label" = object[["label"]],
     "Copy_of" = object[["copy"]],
@@ -1582,6 +1582,31 @@ summary.component <- function(object, ..., depth = Inf) {
         )
       )
   )
+  if (!verbose) {
+    Summary <- paste0(
+      object[["label"]],
+      if (is.null(object[["copy"]])) NULL else paste0("(=", object[["copy"]], ")"),
+      ": ",
+      paste0(
+        unlist(lapply(
+          c("main", "group", "replicate", "weights"),
+          function(x) {
+            if (is.null(object[[x]][["input"]][["input"]])) {
+              NULL
+            } else {
+              paste0(x, " = ", object[[x]][["type"]],
+                     "(",
+                     deparse(object[[x]][["input"]][["input"]]),
+                     ")"
+              )
+            }
+          }
+        )),
+        collapse = ", "
+      )
+    )
+    result$Summary <- Summary
+  }
   class(result) <- c("summary_component", "list")
   result
 }
@@ -1592,10 +1617,12 @@ summary.component <- function(object, ..., depth = Inf) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @rdname summary.component
 
-summary.component_list <- function(object, ...) {
+summary.component_list <- function(object, verbose = FALSE, ...) {
   result <- lapply(
     object,
-    summary
+    function(x) {
+      summary(x, verbose = verbose)
+    }
   )
   for (cp in which(vapply(result, function(x) !is.null(x$Copy_of), FALSE))) {
     result[[cp]]$Type <- result[[result[[cp]][["Copy_of"]]]][["Type"]]
@@ -1610,16 +1637,20 @@ summary.component_list <- function(object, ...) {
 #' @rdname summary.component
 
 print.summary_component <- function(x, ...) {
-  for (name in names(x)) {
-    if (!is.null(x[[name]])) {
-      if (name %in% "Label") {
-        cat("Label:", "\t", x[[name]], "\n", sep = "")
-      } else if (name %in% "Mapper") {
-        cat("  ", "Map: ", x[[name]], "\n", sep = "")
-      } else {
-        cat("  ", name, ":", "\t", x[[name]], "\n", sep = "")
+  if (is.null(x[["Summary"]])) {
+    for (name in names(x)) {
+      if (!is.null(x[[name]])) {
+        if (name %in% "Label") {
+          cat("Label:", "\t", x[[name]], "\n", sep = "")
+        } else if (name %in% "Mapper") {
+          cat("  ", "Map: ", x[[name]], "\n", sep = "")
+        } else {
+          cat("  ", name, ":", "\t", x[[name]], "\n", sep = "")
+        }
       }
     }
+  } else {
+    cat(x[["Summary"]], "\n", sep = "")
   }
   invisible(x)
 }
