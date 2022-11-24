@@ -308,17 +308,17 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     # Has CRS
     longlat.crs <- fm_CRS("longlat_globe")
     geocentric.crs <- fm_CRS("globe")
-    sp3d <- spTransform(sp3d, CRSobj = geocentric.crs)
-    ep3d <- spTransform(ep3d, CRSobj = geocentric.crs)
+    sp3d <- fm_transform(sp3d, crs = geocentric.crs)
+    ep3d <- fm_transform(ep3d, crs = geocentric.crs)
     mp3d <- SpatialPoints(
       (coordinates(sp3d) + coordinates(ep3d)) / 2,
       proj4string = geocentric.crs
     )
 
-    ips <- coordinates(spTransform(mp3d, crs))
+    ips <- coordinates(fm_transform(mp3d, crs))
     w <- spDists(
-      coordinates(spTransform(sp3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
-      coordinates(spTransform(ep3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
+      coordinates(fm_transform(sp3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
+      coordinates(fm_transform(ep3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
       diagonal = TRUE, longlat = TRUE
     )
   }
