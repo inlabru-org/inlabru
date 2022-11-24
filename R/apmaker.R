@@ -51,8 +51,8 @@ apmaker <- function(domain, samplers,
   if (is_list) {
     sf_samplers <- lapply(samplers, function(x) inherits(x, "sf"))
     sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
-    sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
-    sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
+    sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
+    sp_domain <- lapply(domain, function(x) inherits(x, "Spatial"))
     if (any(sf_domain) && any(sp_samplers)) {
       samplers <- lapply(samplers, sf::st_as_sf)
     }
@@ -61,8 +61,8 @@ apmaker <- function(domain, samplers,
   if (singlesampler_int) {
     sf_samplers <- lapply(samplers, function(x) inherits(x, "sf"))
     sf_domain <- inherits(domain, "sf")
-    sp_samplers <- lapply(samplers, function(x) inherits(x, "sp"))
-    sp_domain <- inherits(domain, "sp")
+    sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
+    sp_domain <- inherits(domain, "Spatial")
     if (sf_domain && any(sp_samplers)) {
       samplers <- sf::st_as_sf(samplers)
     }
@@ -71,8 +71,8 @@ apmaker <- function(domain, samplers,
   if (multisampler_int) {
     sf_samplers <- inherits(samplers, "sf")
     sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
-    sp_samplers <- inherits(samplers, "sp")
-    sp_domain <- lapply(domain, function(x) inherits(x, "sp"))
+    sp_samplers <- inherits(samplers, "Spatial")
+    sp_domain <- lapply(domain, function(x) inherits(x, "Spatial"))
     if (sf_domain && any(sp_samplers)) {
       samplers <- lapply(samplers, sf::st_as_sf)
     }
@@ -81,8 +81,8 @@ apmaker <- function(domain, samplers,
   if (!is_list) {
     sf_samplers <- inherits(samplers, "sf")
     sf_domain <- inherits(domain, "sf")
-    sp_samplers <- inherits(samplers, "sp")
-    sp_domain <- inherits(domain, "sp")
+    sp_samplers <- inherits(samplers, "Spatial")
+    sp_domain <- inherits(domain, "Spatial")
     if (sf_domain && sp_samplers) {
       samplers <- sf::st_as_sf(samplers)
     }
