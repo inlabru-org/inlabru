@@ -406,6 +406,9 @@ export(summary_bru)
 export(vertices.inla.mesh)
 exportMethods(vertices)
 if (getRversion() >= "3.6.0") {
+  S3method("$", fm_crs)
+}
+if (getRversion() >= "3.6.0") {
   S3method(sf::st_crs, fm_crs)
 }
 import(methods)

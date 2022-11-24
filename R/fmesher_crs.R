@@ -757,8 +757,8 @@ fm_crs_oblique <- function(x) {
 #' @export
 #' @rdname fm_crs
 print.fm_crs <- function(x, ...) {
-  print(x$crs)
-  cat(paste0("Oblique: c(", paste0(x$oblique, collapse = ", "), ")\n"))
+  print(x[["crs"]])
+  cat(paste0("Oblique: c(", paste0(x[["oblique"]], collapse = ", "), ")\n"))
 }
 
 
@@ -780,6 +780,21 @@ fm_crs.default <- function(x, ..., crsonly = FALSE) {
 st_crs.fm_crs <- function(x, ...) {
   fm_crs(x, ..., crsonly = TRUE)
 }
+
+#' @rawNamespace if (getRversion() >= "3.6.0") {
+#'   S3method("$", fm_crs)
+#' }
+#' @describeIn fm_crs For `fm_crs` objects, `$name` calls the accessor method for the
+#' `crs` object inside it.
+`$.fm_crs` <- function(x, name) {
+  if (name %in% c("crs", "oblique")) {
+    x[[name]]
+  } else {
+    `$`(x[["crs"]], name)
+  }
+}
+
+
 
 #' @export
 #' @param crsonly logical; if `TRUE`, remove any oblique` information

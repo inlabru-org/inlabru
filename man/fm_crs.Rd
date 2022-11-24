@@ -7,6 +7,7 @@
 \alias{print.fm_crs}
 \alias{fm_crs.default}
 \alias{st_crs.fm_crs}
+\alias{$.fm_crs}
 \alias{fm_crs.fm_crs}
 \alias{fm_crs.inla.CRS}
 \alias{fm_crs.character}
@@ -30,6 +31,8 @@ fm_crs_oblique(x) <- value
 \method{fm_crs}{default}(x, ..., crsonly = FALSE)
 
 st_crs.fm_crs(x, ...)
+
+\method{$}{fm_crs}(x, name)
 
 \method{fm_crs}{fm_crs}(x, ..., crsonly = FALSE)
 
@@ -104,6 +107,12 @@ the projection.
 When \code{oblique[2]} or \code{oblique[3]} are non-zero, the resulting
 projection is only correct for perfect spheres.
 }
+\section{Methods (by generic)}{
+\itemize{
+\item \code{$}: For \code{fm_crs} objects, \verb{$name} calls the accessor method for the
+\code{crs} object inside it.
+
+}}
 \section{Functions}{
 \itemize{
 \item \code{st_crs.fm_crs()}: \code{st_crs(x, ...)} is equivalent to \code{fm_crs(x, ..., crsonly = TRUE)}
