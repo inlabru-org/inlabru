@@ -285,7 +285,7 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
             xend = .data$variable,
             color = .data$variable
           ),
-          size = sz
+          linewidth = sz
         )
       )
     }
