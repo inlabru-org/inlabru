@@ -67,6 +67,8 @@ predefined \code{wkt} string from ``names(fm_wkt_predef())`.}
 for an oblique projection, all values defaulting to zero. The values
 indicate (longitude, latitude, orientation, orbit), as explained in the
 Details section below.}
+
+\item{name}{element name}
 }
 \value{
 Either an \code{sf::crs} object or an \code{fm_crs} object,
@@ -109,8 +111,9 @@ projection is only correct for perfect spheres.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{$}: For \code{fm_crs} objects, \verb{$name} calls the accessor method for the
-\code{crs} object inside it.
+\item \code{$}: For a \code{fm_crs} object \code{x}, \code{x$name} calls the accessor method for the
+\code{crs} object inside it. If \code{name} is "crs", the internal crs object itself is returned.
+If \code{name} is "oblique", the internal oblique angle parameter vector is returned.
 
 }}
 \section{Functions}{

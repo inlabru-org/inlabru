@@ -784,13 +784,15 @@ st_crs.fm_crs <- function(x, ...) {
 #' @rawNamespace if (getRversion() >= "3.6.0") {
 #'   S3method("$", fm_crs)
 #' }
-#' @describeIn fm_crs For `fm_crs` objects, `$name` calls the accessor method for the
-#' `crs` object inside it.
+#' @describeIn fm_crs For a `fm_crs` object `x`, `x$name` calls the accessor method for the
+#' `crs` object inside it. If `name` is "crs", the internal crs object itself is returned.
+#' If `name` is "oblique", the internal oblique angle parameter vector is returned.
+#' @param name element name
 `$.fm_crs` <- function(x, name) {
   if (name %in% c("crs", "oblique")) {
     x[[name]]
   } else {
-    `$`(x[["crs"]], name)
+    eval(parse(text = paste0('x[["crs"]]$', name)))
   }
 }
 
