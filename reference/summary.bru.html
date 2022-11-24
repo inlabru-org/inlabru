@@ -12,7 +12,7 @@ various summaries from it."><!-- mathjax --><script src="https://cdnjs.cloudflar
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,7 +86,7 @@ various summaries from it.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for bru</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for summary_bru</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -98,8 +98,15 @@ various summaries from it.</p>
 <dd><p>An object obtained from a <code><a href="bru.html">bru()</a></code> or <code><a href="lgcp.html">lgcp()</a></code> call</p></dd>
 
 
+<dt>verbose</dt>
+<dd><p>logical; If <code>TRUE</code>, include more details of the
+component definitions. If <code>FALSE</code>, only show basic component
+definition information. Default: <code>FALSE</code></p></dd>
+
+
 <dt>...</dt>
-<dd><p>ignored arguments</p></dd>
+<dd><p>arguments passed on to component summary functions, see
+<code><a href="summary.component.html">summary.component()</a></code>.</p></dd>
 
 
 <dt>x</dt>
@@ -146,11 +153,11 @@ various summaries from it.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         2.018472 0.04665363   1.925276 2.018473   2.111663 2.018473</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.017068 0.03298440   4.951177 5.017069   5.082954 5.017070</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         2.018472 0.04665512   1.925273 2.018473   2.111666 2.018473</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.017068 0.03298546   4.951175 5.017069   5.082956 5.017070</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    kld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         8.489419e-06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 8.489634e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         8.486210e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 8.486425e-06</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># An important addition to the INLA methodology is bru's ability to use</span></span></span>
 <span class="r-in"><span><span class="co"># non-linear predictors. Such a predictor can be formulated via like()'s</span></span></span>
