@@ -148,13 +148,16 @@ bru_info_upgrade <- function(object,
 #' @export
 #' @method summary bru_info
 #' @param object Object to operate on
+#' @param verbose logical; If `TRUE`, include more details of the
+#' component definitions. If `FALSE`, only show basic component
+#' definition information. Default: `TRUE`
 #' @param \dots Arguments passed on to other methods
 #' @rdname bru_info
-summary.bru_info <- function(object, verbose = FALSE, ...) {
+summary.bru_info <- function(object, verbose = TRUE, ...) {
   result <- list(
     inlabru_version = object[["inlabru_version"]],
     INLA_version = object[["INLA_version"]],
-    components = summary(object[["model"]], verbose = verbose),
+    components = summary(object[["model"]], verbose = verbose, ...),
     lhoods =
       lapply(
         object[["lhoods"]],
@@ -2779,7 +2782,11 @@ list.data <- function(formula) {
 #' @export
 #' @method summary bru
 #' @param object An object obtained from a [bru()] or [lgcp()] call
-#' @param \dots ignored arguments
+#' @param verbose logical; If `TRUE`, include more details of the
+#' component definitions. If `FALSE`, only show basic component
+#' definition information. Default: `FALSE`
+#' @param \dots arguments passed on to component summary functions, see
+#' [summary.component()].
 #' @example inst/examples/bru.R
 #'
 
@@ -2787,7 +2794,7 @@ summary.bru <- function(object, verbose = FALSE, ...) {
   object <- bru_check_object_bru(object)
 
   result <- list(
-    bru_info = summary(object[["bru_info"]], verbose = verbose)
+    bru_info = summary(object[["bru_info"]], verbose = verbose, ...)
   )
 
   result$WAIC <- object[["waic"]][["waic"]]

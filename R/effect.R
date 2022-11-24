@@ -1520,6 +1520,9 @@ code.components <- function(components, add = "") {
 #' @param ... ignored.
 #' @param depth The depth of which to expand the component mapper.
 #' Default `Inf`, to traverse the entire mapper tree.
+#' @param verbose logical; If `TRUE`, includes more details of the
+#' component definitions. When `FALSE`, only show basic component
+#' definition information.  Default `TRUE`.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
@@ -1613,15 +1616,15 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
 
 #' @export
 #' @method summary component_list
-#' @param ... ignored.
+#' @param ... passed on to other summary methods
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @rdname summary.component
 
-summary.component_list <- function(object, verbose = FALSE, ...) {
+summary.component_list <- function(object, verbose = TRUE, ...) {
   result <- lapply(
     object,
     function(x) {
-      summary(x, verbose = verbose)
+      summary(x, verbose = verbose, ...)
     }
   )
   for (cp in which(vapply(result, function(x) !is.null(x$Copy_of), FALSE))) {
