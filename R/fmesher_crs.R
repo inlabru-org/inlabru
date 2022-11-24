@@ -1738,7 +1738,7 @@ fm_transform.default <- function(x, crs = fm_crs(x), ..., crs0 = NULL) {
 fm_transform_raw <- function(x, from, to) {
   adjust_input <- function(x, crs) {
     if (fm_crs_is_geocent(crs) &&
-        ncol(x) == 2) {
+      ncol(x) == 2) {
       if (nrow(x) > 0) {
         x <- cbind(x, 0)
       } else {
@@ -1750,7 +1750,7 @@ fm_transform_raw <- function(x, from, to) {
 
   adjust_output <- function(x, crs) {
     if (!fm_crs_is_geocent(crs) &&
-        ncol(x) == 3) {
+      ncol(x) == 3) {
       if (nrow(x) > 0) {
         x <- x[, 1:2, drop = FALSE]
       } else {

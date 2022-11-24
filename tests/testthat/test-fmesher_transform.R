@@ -8,8 +8,10 @@ test_that("fm_transform: geocentric globe transformation", {
   longlat_globe <- fm_crs("longlat_globe")
   globe <- fm_crs("globe")
   points0_sp <-
-    sp::SpatialPoints(matrix(1:10, 5, 2),
-                      proj4string = fm_CRS(longlat_globe))
+    sp::SpatialPoints(
+      matrix(1:10, 5, 2),
+      proj4string = fm_CRS(longlat_globe)
+    )
   points0 <- sf::st_as_sf(points0_sp)
 
   points1 <- fm_transform(points0, crs = globe)
@@ -35,8 +37,10 @@ test_that("fm_transform: geocentric globe transformation", {
   globe <- fm_crs("globe")
   sphere <- fm_crs("sphere")
   points0_sp <-
-    sp::SpatialPoints(matrix(1:10, 5, 2),
-                      proj4string = fm_CRS(longlat_globe))
+    sp::SpatialPoints(
+      matrix(1:10, 5, 2),
+      proj4string = fm_CRS(longlat_globe)
+    )
   points0 <- sf::st_as_sf(points0_sp)
 
   points1 <- fm_transform(points0, crs = sphere)

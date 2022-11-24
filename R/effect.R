@@ -1597,10 +1597,11 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
             if (is.null(object[[x]][["input"]][["input"]])) {
               NULL
             } else {
-              paste0(x, " = ", object[[x]][["type"]],
-                     "(",
-                     deparse(object[[x]][["input"]][["input"]]),
-                     ")"
+              paste0(
+                x, " = ", object[[x]][["type"]],
+                "(",
+                deparse(object[[x]][["input"]][["input"]]),
+                ")"
               )
             }
           }
