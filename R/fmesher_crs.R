@@ -1962,7 +1962,8 @@ fm_transform.Spatial <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
         sf::st_as_sf(x),
         crs = crs,
         ...,
-        passthrough = passthrough),
+        passthrough = passthrough
+      ),
       "Spatial"
     ),
     orig_class[1]
