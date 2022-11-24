@@ -274,27 +274,14 @@ add all components (unless a subset is selected via the
 <span><span class="co">#&gt; inlabru version: 2.6.0.9006</span></span>
 <span><span class="co">#&gt; INLA version: 22.11.22</span></span>
 <span><span class="co">#&gt; Components:</span></span>
-<span><span class="co">#&gt; Label:   field</span></span>
-<span><span class="co">#&gt;   Type:  main = spde</span></span>
-<span><span class="co">#&gt;   Input: main = x</span></span>
-<span><span class="co">#&gt;   Map: pipe = multi(main = inla_mesh_1d, group = index, replicate = index) -&gt;    scale</span></span>
-<span><span class="co">#&gt;   INLA formula:  </span></span>
-<span><span class="co">#&gt;     ~ . + f(field, model = BRU_field_main_model, ngroup = 1, nrep = 1,</span></span>
-<span><span class="co">#&gt;       values = BRU_field_values)</span></span>
-<span><span class="co">#&gt; Label:   Intercept</span></span>
-<span><span class="co">#&gt;   Type:  main = linear</span></span>
-<span><span class="co">#&gt;   Input: main = 1</span></span>
-<span><span class="co">#&gt;   Map: pipe = multi(main = linear, group = index, replicate = index) -&gt; scale</span></span>
-<span><span class="co">#&gt;   INLA formula:  </span></span>
-<span><span class="co">#&gt;     ~ . + f(Intercept, prec.linear = 1/2^2, model =</span></span>
-<span><span class="co">#&gt;       BRU_Intercept_main_model, ngroup = 1, nrep = 1, values =</span></span>
-<span><span class="co">#&gt;       BRU_Intercept_values)</span></span>
+<span><span class="co">#&gt; field: main = spde(x)</span></span>
+<span><span class="co">#&gt; Intercept: main = linear(1)</span></span>
 <span><span class="co">#&gt; Likelihoods:</span></span>
 <span><span class="co">#&gt;   Family: 'poisson'</span></span>
 <span><span class="co">#&gt;     Data class: 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ .</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.918, Running = 0.205, Post = 0.16, Total = 1.28 </span></span>
+<span><span class="co">#&gt;     Pre = 0.843, Running = 0.2, Post = 0.131, Total = 1.17 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span></span>
 <span><span class="co">#&gt; Intercept 1.074 0.807     -0.003    0.885      3.396 0.794   0</span></span>

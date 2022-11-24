@@ -235,27 +235,9 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt; inlabru version: 2.6.0.9006</span></span>
 <span><span class="co">#&gt; INLA version: 22.11.22</span></span>
 <span><span class="co">#&gt; Components:</span></span>
-<span><span class="co">#&gt; Label:   Common</span></span>
-<span><span class="co">#&gt;   Type:  main = spde</span></span>
-<span><span class="co">#&gt;   Input: main = coordinates</span></span>
-<span><span class="co">#&gt;   Map: pipe = multi(main = inla_mesh_2d, group = index, replicate = index) -&gt;    scale</span></span>
-<span><span class="co">#&gt;   INLA formula:  </span></span>
-<span><span class="co">#&gt;     ~ . + f(Common, model = BRU_Common_main_model, ngroup = 1, nrep =</span></span>
-<span><span class="co">#&gt;       1, values = BRU_Common_values)</span></span>
-<span><span class="co">#&gt; Label:   Difference</span></span>
-<span><span class="co">#&gt;   Type:  main = spde</span></span>
-<span><span class="co">#&gt;   Input: main = coordinates</span></span>
-<span><span class="co">#&gt;   Map: pipe = multi(main = inla_mesh_2d, group = index, replicate = index) -&gt;    scale</span></span>
-<span><span class="co">#&gt;   INLA formula:  </span></span>
-<span><span class="co">#&gt;     ~ . + f(Difference, model = BRU_Difference_main_model, ngroup = 1,</span></span>
-<span><span class="co">#&gt;       nrep = 1, values = BRU_Difference_values)</span></span>
-<span><span class="co">#&gt; Label:   Intercept</span></span>
-<span><span class="co">#&gt;   Type:  main = linear</span></span>
-<span><span class="co">#&gt;   Input: main = 1</span></span>
-<span><span class="co">#&gt;   Map: pipe = multi(main = linear, group = index, replicate = index) -&gt; scale</span></span>
-<span><span class="co">#&gt;   INLA formula:  </span></span>
-<span><span class="co">#&gt;     ~ . + f(Intercept, model = BRU_Intercept_main_model, ngroup = 1,</span></span>
-<span><span class="co">#&gt;       nrep = 1, values = BRU_Intercept_values)</span></span>
+<span><span class="co">#&gt; Common: main = spde(coordinates)</span></span>
+<span><span class="co">#&gt; Difference: main = spde(coordinates)</span></span>
+<span><span class="co">#&gt; Intercept: main = linear(1)</span></span>
 <span><span class="co">#&gt; Likelihoods:</span></span>
 <span><span class="co">#&gt;   Family: 'cp'</span></span>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
@@ -264,7 +246,7 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.24, Running = 119, Post = 0.183, Total = 120 </span></span>
+<span><span class="co">#&gt;     Pre = 1.14, Running = 106, Post = 0.122, Total = 107 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; Intercept -0.349 1.351     -2.998   -0.349      2.299 -0.349   0</span></span>
@@ -276,19 +258,19 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.989 0.722      1.869     2.89      4.687 2.680</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.065 0.416      1.389     2.02      3.017 1.913</span></span>
-<span><span class="co">#&gt; Range for Difference 1.922 1.333      0.630     1.55      5.489 1.071</span></span>
+<span><span class="co">#&gt; Range for Common     2.989 0.722      1.870     2.89      4.686 2.680</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.065 0.416      1.390     2.02      3.016 1.914</span></span>
+<span><span class="co">#&gt; Range for Difference 1.920 1.332      0.629     1.54      5.484 1.070</span></span>
 <span><span class="co">#&gt; Stdev for Difference 0.141 0.069      0.041     0.13      0.304 0.103</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 589.26</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 589.25</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
 <span><span class="co">#&gt; Effective number of parameters .....................: -774.85</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1628.72</span></span>
 <span><span class="co">#&gt; Effective number of parameters .................: 104.73</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.60 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.61 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -297,27 +279,9 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt; inlabru version: 2.6.0.9006</span></span>
 <span><span class="co">#&gt; INLA version: 22.11.22</span></span>
 <span><span class="co">#&gt; Components:</span></span>
-<span><span class="co">#&gt; Label:   Common</span></span>
-<span><span class="co">#&gt;   Type:  main = spde</span></span>
-<span><span class="co">#&gt;   Input: main = coordinates</span></span>
-<span><span class="co">#&gt;   Map: pipe = multi(main = inla_mesh_2d, group = index, replicate = index) -&gt;    scale</span></span>
-<span><span class="co">#&gt;   INLA formula:  </span></span>
-<span><span class="co">#&gt;     ~ . + f(Common, model = BRU_Common_main_model, ngroup = 1, nrep =</span></span>
-<span><span class="co">#&gt;       1, values = BRU_Common_values)</span></span>
-<span><span class="co">#&gt; Label:   Difference</span></span>
-<span><span class="co">#&gt;   Type:  main = spde</span></span>
-<span><span class="co">#&gt;   Input: main = coordinates</span></span>
-<span><span class="co">#&gt;   Map: pipe = multi(main = inla_mesh_2d, group = index, replicate = index) -&gt;    scale</span></span>
-<span><span class="co">#&gt;   INLA formula:  </span></span>
-<span><span class="co">#&gt;     ~ . + f(Difference, model = BRU_Difference_main_model, ngroup = 1,</span></span>
-<span><span class="co">#&gt;       nrep = 1, values = BRU_Difference_values)</span></span>
-<span><span class="co">#&gt; Label:   Intercept</span></span>
-<span><span class="co">#&gt;   Type:  main = linear</span></span>
-<span><span class="co">#&gt;   Input: main = 1</span></span>
-<span><span class="co">#&gt;   Map: pipe = multi(main = linear, group = index, replicate = index) -&gt; scale</span></span>
-<span><span class="co">#&gt;   INLA formula:  </span></span>
-<span><span class="co">#&gt;     ~ . + f(Intercept, model = BRU_Intercept_main_model, ngroup = 1,</span></span>
-<span><span class="co">#&gt;       nrep = 1, values = BRU_Intercept_values)</span></span>
+<span><span class="co">#&gt; Common: main = spde(coordinates)</span></span>
+<span><span class="co">#&gt; Difference: main = spde(coordinates)</span></span>
+<span><span class="co">#&gt; Intercept: main = linear(1)</span></span>
 <span><span class="co">#&gt; Likelihoods:</span></span>
 <span><span class="co">#&gt;   Family: 'cp'</span></span>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
@@ -326,10 +290,10 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.08, Running = 22.7, Post = 0.108, Total = 23.9 </span></span>
+<span><span class="co">#&gt;     Pre = 0.948, Running = 24.2, Post = 0.105, Total = 25.2 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.35 1.371     -3.038    -0.35      2.338 -0.35   0</span></span>
+<span><span class="co">#&gt; Intercept -0.35 1.372     -3.039    -0.35      2.338 -0.35   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -338,16 +302,16 @@ example. Both nest types were observed within the same window.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.984 0.657      1.938    2.899      4.511 2.725</span></span>
+<span><span class="co">#&gt; Range for Common     2.984 0.657      1.937    2.899      4.510 2.726</span></span>
 <span><span class="co">#&gt; Stdev for Common     2.055 0.353      1.466    2.018      2.850 1.939</span></span>
-<span><span class="co">#&gt; Range for Difference 1.665 1.090      0.502    1.374      4.538 0.985</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.148 0.078      0.039    0.134      0.338 0.101</span></span>
+<span><span class="co">#&gt; Range for Difference 1.663 1.089      0.501    1.373      4.531 0.984</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.148 0.079      0.039    0.134      0.338 0.101</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 587.72</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 587.71</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -775.96</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -775.97</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1627.57</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1627.56</span></span>
 <span><span class="co">#&gt; Effective number of parameters .................: 104.15</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Marginal log-Likelihood:  -1205.66 </span></span>
