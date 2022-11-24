@@ -1738,7 +1738,7 @@ fm_transform.default <- function(x, crs = fm_crs(x), ..., crs0 = NULL) {
 fm_transform_raw <- function(x, from, to) {
   adjust_input <- function(x, crs) {
     if (fm_crs_is_geocent(crs) &&
-      ncol(x) == 2) {
+        ncol(x) == 2) {
       if (nrow(x) > 0) {
         x <- cbind(x, 0)
       } else {
@@ -1748,15 +1748,28 @@ fm_transform_raw <- function(x, from, to) {
     x
   }
 
+  adjust_output <- function(x, crs) {
+    if (!fm_crs_is_geocent(crs) &&
+        ncol(x) == 3) {
+      if (nrow(x) > 0) {
+        x <- x[, 1:2, drop = FALSE]
+      } else {
+        x <- matrix(0, 0, 2)
+      }
+    }
+    x
+  }
+
   x <- adjust_input(x, crs = to)
   if (nrow(x) == 0) {
     x
   } else {
-    sf::sf_project(
+    y <- sf::sf_project(
       pts = x,
       from = from,
       to = to
     )
+    adjust_output(y, to)
   }
 }
 
@@ -1793,7 +1806,7 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
   is_geocentric_0 <- fm_crs_is_geocent(crs0)
   is_geocentric_1 <- fm_crs_is_geocent(crs1)
   if (is_geocentric_0) {
-    ok <- TRUE
+    ok <- rep(TRUE, nrow(x))
   } else {
     bounds <- fm_crs_bounds(crs0)
     if (identical(fm_crs_projection_type(crs0), "longlat")) {
@@ -1822,9 +1835,9 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
           from = current_crs,
           to = longlat_0
         )
+        # x can now be treated as being in longlat_norm coordinates
+        current_crs <- longlat_norm
       }
-      # x can now be treated as being in longlat_norm coordinates
-      current_crs <- longlat_norm
       x <- fm_transform_raw(
         x,
         from = current_crs,
@@ -1924,7 +1937,7 @@ fm_transform_sf <- function(x, crs, ..., passthrough) {
       do.call(sf::st_sfc, c(
         lapply(
           seq_len(nrow(coord)),
-          function(k) sf::st_point(coord[k, ], dim = the_dim)
+          function(k) sf::st_point(coord[k, , drop = FALSE], dim = the_dim)
         ),
         list(crs = sf::st_crs(crs1))
       ))
