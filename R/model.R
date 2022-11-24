@@ -107,7 +107,7 @@ bru_model <- function(components, lhoods) {
 summary.bru_model <- function(object, ...) {
   result <- list(
     components =
-      summary(object[["effects"]])
+      summary(object[["effects"]], ...)
   )
   class(result) <- c("summary_bru_model", "list")
   result
