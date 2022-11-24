@@ -86,10 +86,6 @@ fml.minor <- coordinates ~ Intercept + Common - Difference / 2
 
 Setting up the Cox process likelihoods is easy in this example. Both nest types were observed within the same window:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ips <- ipoints(gorillas$boundary, gorillas$mesh)
-```
-Lastly, we define the two likelihoods...
-```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 lik_minor <- like("cp",
   formula = fml.major,
   data = gorillas$nests[gorillas$nests$group == "major", ],
