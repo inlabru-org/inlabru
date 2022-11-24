@@ -35,7 +35,6 @@ Load libraries
 library(inlabru)
 library(INLA)
 library(ggplot2)
-bru_options_set(inla.mode = "experimental")
 ```
 
 Get the data
@@ -187,6 +186,9 @@ distdf <- data.frame(distance = seq(0, 8, length = 100))
 dfun <- predict(fit, distdf, ~ hn(distance, lsig), include = "lsig")
 plot(dfun)
 ```
+The average detection probability within the maximum detection distance is estimated to be
+`r mean(dfun$mean)`.
+
 
 We can look at the posterior for expected number of dolphins as usual:
 
