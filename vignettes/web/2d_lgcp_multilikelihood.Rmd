@@ -84,7 +84,7 @@ fml.major <- coordinates ~ Intercept + Common + Difference / 2
 fml.minor <- coordinates ~ Intercept + Common - Difference / 2
 ```
 
-Setting up the cox process integration points is easy in this example. Both nest types were observed within the same window.
+Setting up the Cox process likelihoods is easy in this example. Both nest types were observed within the same window:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 ips <- ipoints(gorillas$boundary, gorillas$mesh)
 ```
@@ -93,12 +93,14 @@ Lastly, we define the two likelihoods...
 lik_minor <- like("cp",
   formula = fml.major,
   data = gorillas$nests[gorillas$nests$group == "major", ],
-  ips = ips
+  samplers = gorillas$boundary,
+  domain = list(coordinates = gorillas$mesh)
 )
 lik_major <- like("cp",
   formula = fml.minor,
   data = gorillas$nests[gorillas$nests$group == "minor", ],
-  ips = ips
+  samplers = gorillas$boundary,
+  domain = list(coordinates = gorillas$mesh)
 )
 ```
 ... which we provide to the ´bru´ function.
