@@ -681,21 +681,25 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
   if (is.null(group) || (length(group) == 0)) {
     res <- INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
     tri <- res$p2m.t
+    ok <- tri > 0
+    if (any(!ok)) {
+      warning("Some integration points were outside the mesh; check your coordinate systems.")
+    }
 
     data <- list()
     for (k in seq_along(columns)) {
       cn <- columns[k]
-      nw <- points@data[, columns] * res$p2m.b
-      w.by <- by(as.vector(nw), as.vector(mesh$graph$tv[tri, ]), sum, simplify = TRUE)
+      nw <- points@data[ok, cn] * res$p2m.b[ok, , drop = FALSE]
+      w.by <- by(as.vector(nw), as.vector(mesh$graph$tv[tri[ok], ]), sum, simplify = TRUE)
       data[[cn]] <- as.vector(w.by)
     }
 
     data <- data.frame(data)
-    coords <- mesh$loc[as.numeric(names(w.by)), , drop = FALSE]
+    coords <- mesh$loc[as.numeric(names(w.by)), seq_along(coordnames(points)), drop = FALSE]
     data$vertex <- as.numeric(names(w.by))
 
     ret <- sp::SpatialPointsDataFrame(coords,
-      proj4string = fm_sp_get_crs(points),
+      proj4string = fm_CRS(fm_crs(points)),
       data = data,
       match.ID = FALSE
     )

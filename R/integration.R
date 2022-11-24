@@ -306,13 +306,14 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     w <- rowSums((coordinates(ep3d) - coordinates(sp3d))^2)^0.5
   } else {
     # Has CRS
-    longlat.crs <- fm_CRS("longlat_globe")
-    geocentric.crs <- fm_CRS("globe")
+    longlat.crs <- fm_crs("longlat_globe")
+    geocentric.crs <- fm_crs("sphere")
     sp3d <- fm_transform(sp3d, crs = geocentric.crs)
     ep3d <- fm_transform(ep3d, crs = geocentric.crs)
-    mp3d <- SpatialPoints(
-      (coordinates(sp3d) + coordinates(ep3d)) / 2,
-      proj4string = geocentric.crs
+    mp3d <- sp::SpatialPoints(
+      (coordinates(sp3d) + coordinates(ep3d)) /
+        rowSums((coordinates(sp3d) + coordinates(ep3d))^2)^0.5,
+      proj4string = fm_CRS(geocentric.crs)
     )
 
     ips <- coordinates(fm_transform(mp3d, crs))
@@ -325,8 +326,9 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
 
   # Wrap everything up and perform projection according to distance and given group argument
   ips <- data.frame(ips)
+  d_ips <- ncol(ips)
   # Temporary names
-  colnames(ips) <- c("x", "y", "z")
+  colnames(ips) <- c("x", "y", "z")[seq_len(d_ips)]
 
   # Weights
   ips <- cbind(ips, weight = w)
@@ -339,13 +341,13 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   }
 
   ips <- SpatialPointsDataFrame(
-    ips[, 1:3, drop = FALSE],
-    data = ips[, -(1:3), drop = FALSE],
+    ips[, 1:d_ips, drop = FALSE],
+    data = ips[, -(1:d_ips), drop = FALSE],
     proj4string = crs
   )
   if (!is.null(coordnames(data))) {
     name <- coordnames(data)
-    if (length(name) < 3) {
+    if (length(name) < d_ips) {
       name <- c(name, "coordinateZ")
     }
     coordnames(ips) <- name
@@ -723,7 +725,7 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
   barycentric_grid <- cbind(1 - rowSums(bb), bb)
 
   # Construct integration points
-  loc <- matrix(0.0, length(tri_subset) * nB, 3)
+  loc <- matrix(0.0, length(tri_subset) * nB, ncol(mesh$loc))
   idx_end <- 0
   for (tri in tri_subset) {
     idx_start <- idx_end + 1
