@@ -317,8 +317,8 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
 
     ips <- coordinates(fm_transform(mp3d, crs))
     w <- spDists(
-      coordinates(fm_transform(sp3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
-      coordinates(fm_transform(ep3d, CRSobj = longlat.crs))[, 1:2, drop = FALSE],
+      coordinates(fm_transform(sp3d, crs = longlat.crs))[, 1:2, drop = FALSE],
+      coordinates(fm_transform(ep3d, crs = longlat.crs))[, 1:2, drop = FALSE],
       diagonal = TRUE, longlat = TRUE
     )
   }
