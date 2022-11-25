@@ -95,6 +95,26 @@ apmaker <- function(domain, samplers,
   # for each active geometry
   # TODO extra domains we assign the sampler for them
   # TODO can use local helper function (with S3 usemethod() maybe)
+  sfsp <- function(x, ...) {
+    UseMethod("sfsp")
+  }
+  sfsp.list <- function(x, begin = NULL){
+    bru_log_message(
+      paste0(
+        begin,
+        x[i],
+        " are ",
+        attr(x[i], "sf_column"),
+        ".\n"
+      ),
+      # TODO to global bru_option_get verbose=logical; if TRUE, print the log message on screen with message(txt). Default: bru_options_get("bru_verbose")
+      verbose_store = options$bru_verbose_store,
+      verbosity = 2
+    )
+  }
+  sfsp.data.frame
+
+
   if (sf_samplers) {
     for (i in seq_along(samplers)) {
       bru_log_message(
@@ -115,7 +135,8 @@ apmaker <- function(domain, samplers,
   # Check if the names of samplers and domains match. How to establish the link
   # between samplers and domain? If names are not provided, follow the order in
   # list. If names are provided but do not match, what should we do?
-  if (unique(names(samplers)) != unique(names(domain))) { # TODO have to accomodate weights as well
+  if (unique(names(samplers)) != unique(names(domain))) {
+    # TODO have to accommodate weights column in samplers as well, omit this column
     samplers_domain <- intersect(names(samplers), names(domain))
     bru_log_message(
       paste0(
