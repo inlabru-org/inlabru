@@ -44,7 +44,7 @@ apmaker <- function(domain, samplers,
     is_list <- FALSE
   }
 
-  # multi domain sampler the main thing is data drame 23112022 specific column has that meaning
+  # multi domain sampler the main thing is data dname 23112022 specific column has that meaning
   # check sf or sp object, can do a mix of sp and sf objects,
   # TODO if not a list, we should have to check
   # TODO have to convert sp to sf for output if there is a mix of sp and sf
@@ -94,6 +94,7 @@ apmaker <- function(domain, samplers,
   # TODO save to log and verbosity = 2, use seq_along to introduce the indices
   # for each active geometry
   # TODO extra domains we assign the sampler for them
+  # TODO can use local helper function (with S3 usemethod() maybe)
   if (sf_samplers) {
     for (i in seq_along(samplers)) {
       bru_log_message(
