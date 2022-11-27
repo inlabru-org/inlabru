@@ -447,7 +447,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       )
     } else {
       if (!is.null(int.args$use_new) && !int.args$use_new) {
-        ips <- bru_int_polygon(
+        ips <- bru_int_polygon_old(
           domain,
           polylist = poly_segm,
           method = int.args$method,
@@ -456,7 +456,6 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       } else {
         ips <- bru_int_polygon(
           domain,
-          polylist = poly_segm,
           method = int.args$method,
           nsub = int.args$nsub2,
           samplers = samplers

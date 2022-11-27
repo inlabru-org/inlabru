@@ -4,6 +4,13 @@
 \alias{fm_CRS}
 \alias{fm_CRS.crs}
 \alias{fm_CRS.fm_crs}
+\alias{fm_CRS.Spatial}
+\alias{fm_CRS.inla.CRS}
+\alias{fm_CRS.sf}
+\alias{fm_CRS.sfc}
+\alias{fm_CRS.sfg}
+\alias{fm_CRS.inla.mesh}
+\alias{fm_CRS.inla.segment}
 \alias{fm_CRS.default}
 \title{Create a coordinate reference system object}
 \usage{
@@ -12,6 +19,20 @@ fm_CRS(...)
 \method{fm_CRS}{crs}(...)
 
 \method{fm_CRS}{fm_crs}(...)
+
+\method{fm_CRS}{Spatial}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{inla.CRS}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{sf}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{sfc}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{sfg}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{inla.mesh}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{inla.segment}(x, ..., crsonly = FALSE)
 
 \method{fm_CRS}{default}(
   projargs = NULL,

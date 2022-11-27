@@ -978,6 +978,52 @@ fm_CRS.fm_crs <- function(...) {
   fm_as_sp_crs(...)
 }
 
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.Spatial <- function(x, ..., crsonly = FALSE) {
+  fm_sp_get_crs(x)
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.inla.CRS <- function(x, ..., crsonly = FALSE) {
+  y <- x[["crs"]]
+  if (crsonly) {
+    y <- y[["crs"]]
+  }
+  y
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.sf <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(sf::st_crs(x, ...))
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.sfc <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(sf::st_crs(x, ...))
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.sfg <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(sf::st_crs(x, ...))
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.inla.mesh <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(x[["crs"]], ..., crsonly = crsonly)
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.inla.segment <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(x[["crs"]], ..., crsonly = crsonly)
+}
+
 #' @export
 #' @rdname fm_CRS_sp
 fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,

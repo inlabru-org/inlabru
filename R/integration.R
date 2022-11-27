@@ -507,6 +507,9 @@ integration_weight_aggregation <- function(mesh, integ) {
     loc <- integ$loc
   }
   # Project points onto the mesh
+  # 2022-11-27: inla.mesh.project converts globes to unit radius spheres
+  # and assumes raw loc input is unit-radius.
+  # TODO: Fix inla.mesh.project
   proj <- INLA::inla.mesh.projector(mesh, loc = loc)
 
   # Convert integration weights to mesh points
@@ -713,6 +716,8 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
     tri_subset <- seq_len(nT)
   }
 
+  is_spherical <- identical(mesh$manifold, "S2")
+
   # Barycentric integration coordinates
   b <- seq(1 / 3, 1 / 3 + nsub, length = nsub + 1) / (nsub + 1)
   bb <- as.matrix(expand.grid(b, b))
@@ -735,12 +740,24 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
         mesh$loc[mesh$graph$tv[tri, ], , drop = FALSE])
   }
 
+  if (is_spherical) {
+    # Normalise
+    radius <- sum(mesh$loc[1, ]^2)^0.5
+    loc <- loc / rowSums(loc^2)^0.5
+    mesh$loc <- mesh$loc / radius
+  }
+
   # Construct integration weights
-  weight <- rep(INLA::inla.mesh.fem(mesh, order = 1)$ta[tri_subset] / nB, each = nB)
+  tri_area <- INLA::inla.mesh.fem(mesh, order = 1)$ta[tri_subset]
+
+  if (is_spherical) {
+    tri_area <- tri_area * radius^2
+    loc <- loc * radius
+  }
 
   list(
     loc = loc,
-    weight = weight
+    weight = rep(tri_area / nB, each = nB)
   )
 }
 
@@ -749,7 +766,6 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
 #'
 #' @export
 #' @param mesh An inla.mesh object
-#' @param polylist A list of `inla.mesh.segment` objects
 #' @param method Which integration method to use ("stable",
 #'   with aggregation to mesh vertices, or "direct")
 #' @param samplers If non-NULL, a SpatialPolygons* object, used instead of polylist
@@ -758,7 +774,6 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
 #' @keywords internal
 
 bru_int_polygon <- function(mesh,
-                            polylist,
                             method = NULL,
                             samplers = NULL,
                             ...) {
@@ -771,7 +786,8 @@ bru_int_polygon <- function(mesh,
   # overly large temporary coordinate matrices (via tri_subset)
   integ <- mesh_triangle_integration(mesh, ...)
 
-  # Keep points with positive weights (This should be all, but if there's a degenerate triangle, this gets rid of it)
+  # Keep points with positive weights (This should be all,
+  # but if there's a degenerate triangle, this gets rid of it)
   ok <- (integ$weight > 0)
   integ$loc <- integ$loc[ok, , drop = FALSE]
   integ$weight <- integ$weight[ok]
@@ -807,43 +823,18 @@ bru_int_polygon <- function(mesh,
       }
     }
   } else {
-    # Old method
-
-    bru_log_message(paste0("Integrating over ", length(polylist), " polygons."),
-      verbosity = 2
-    )
-    gg <- seq_along(polylist)
-    for (g in gg) {
-      poly <- polylist[[g]]
-
-      # Filter away points outside integration domain boundary:
-      mesh_bnd <- INLA::inla.mesh.create(boundary = poly)
-      ok <- INLA::inla.mesh.projector(mesh_bnd, loc = integ$loc)$proj$ok
-
-      if (any(ok)) {
-        integ_ <- list(
-          loc = integ$loc[ok, , drop = FALSE],
-          weight = integ$weight[ok]
-        )
-
-        if (method %in% c("stable")) {
-          # Project integration points and weights to mesh nodes
-          integ_ <- integration_weight_aggregation(mesh, integ_)
-        }
-
-        ips <- data.frame(
-          x = integ_$loc[, 1],
-          y = integ_$loc[, 2],
-          # TODO: figure out how to deal with 3D points without
-          # breaking sp::over later
-          #          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
-          weight = integ_$weight,
-          group = g
-        )
-
-        ipsl <- c(ipsl, list(ips))
-      }
+    if (method %in% c("stable")) {
+      # Project integration points and weights to mesh nodes
+      integ <- integration_weight_aggregation(mesh, integ)
     }
+
+    ipsl <- list(data.frame(
+      x = integ$loc[, 1],
+      y = integ$loc[, 2],
+      z = integ$loc[, 3],
+      weight = integ$weight,
+      group = 1
+    ))
   }
 
   do.call(rbind, ipsl)
