@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9007</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,7 +100,7 @@
                         <h4 data-toc-skip class="author">Fabian E.
 Bachl</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-11-24</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-11-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_multilikelihood.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -231,7 +231,7 @@ nest types were observed within the same window:</p>
 <p><img src="2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.6.0.9006</span></span>
+<span><span class="co">#&gt; inlabru version: 2.6.0.9007</span></span>
 <span><span class="co">#&gt; INLA version: 22.11.22</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; Common: main = spde(coordinates)</span></span>
@@ -245,7 +245,7 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.11, Running = 72.9, Post = 0.115, Total = 74.1 </span></span>
+<span><span class="co">#&gt;     Pre = 1.24, Running = 105, Post = 0.127, Total = 106 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; Intercept -0.349 1.351     -2.998   -0.349      2.299 -0.349   0</span></span>
@@ -257,25 +257,25 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.989 0.722      1.869     2.89      4.688 2.680</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.065 0.417      1.388     2.02      3.018 1.913</span></span>
-<span><span class="co">#&gt; Range for Difference 1.926 1.336      0.632     1.55      5.501 1.073</span></span>
+<span><span class="co">#&gt; Range for Common     2.989 0.722      1.870     2.89      4.688 2.680</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.065 0.417      1.388     2.02      3.019 1.913</span></span>
+<span><span class="co">#&gt; Range for Difference 1.931 1.341      0.633     1.55      5.518 1.074</span></span>
 <span><span class="co">#&gt; Stdev for Difference 0.141 0.069      0.040     0.13      0.303 0.103</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 589.27</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 589.29</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -774.84</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -774.83</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1628.73</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1628.74</span></span>
 <span><span class="co">#&gt; Effective number of parameters .................: 104.74</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.60 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.59 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.6.0.9006</span></span>
+<span><span class="co">#&gt; inlabru version: 2.6.0.9007</span></span>
 <span><span class="co">#&gt; INLA version: 22.11.22</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; Common: main = spde(coordinates)</span></span>
@@ -289,10 +289,10 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.94, Running = 22.3, Post = 0.0903, Total = 23.4 </span></span>
+<span><span class="co">#&gt;     Pre = 1.04, Running = 21, Post = 0.105, Total = 22.1 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
-<span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.35 1.371     -3.037    -0.35      2.336 -0.35   0</span></span>
+<span><span class="co">#&gt;            mean   sd 0.025quant 0.5quant 0.975quant  mode kld</span></span>
+<span><span class="co">#&gt; Intercept -0.35 1.37     -3.035    -0.35      2.335 -0.35   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -301,19 +301,19 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.985 0.658      1.938    2.900      4.513 2.725</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.055 0.352      1.467    2.018      2.850 1.939</span></span>
-<span><span class="co">#&gt; Range for Difference 1.669 1.093      0.503    1.376      4.549 0.987</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.148 0.078      0.039    0.134      0.336 0.101</span></span>
+<span><span class="co">#&gt; Range for Common     2.985 0.658      1.940    2.900      4.515 2.724</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.055 0.352      1.467    2.018      2.850 1.938</span></span>
+<span><span class="co">#&gt; Range for Difference 1.673 1.097      0.504    1.379      4.565 0.988</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.147 0.078      0.039    0.134      0.335 0.101</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 587.73</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 587.75</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -775.95</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -775.94</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1627.58</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1627.59</span></span>
 <span><span class="co">#&gt; Effective number of parameters .................: 104.16</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.65 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.64 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>

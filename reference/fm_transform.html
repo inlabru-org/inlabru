@@ -14,7 +14,7 @@ INLA::inla.CRS class."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9007</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,37 +88,37 @@ reference systems of <code>crs</code> (from <code><a href="https://r-spatial.git
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
-<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span>, crs0 <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, crs0 <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for matrix</span></span>
-<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, crs0 <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="cn">NULL</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, crs0 <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for list</span></span>
-<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for sf</span></span>
-<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for sfc</span></span>
-<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for sfg</span></span>
-<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for Spatial</span></span>
-<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for inla.mesh</span></span>
-<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, crs0 <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for inla.mesh.lattice</span></span>
-<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for inla.mesh.segment</span></span>
-<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">fm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -127,12 +127,12 @@ reference systems of <code>crs</code> (from <code><a href="https://r-spatial.git
 <dd><p>The object that should be transformed from it's current CRS to a new CRS</p></dd>
 
 
-<dt>crs</dt>
-<dd><p>The target crs object</p></dd>
-
-
 <dt>...</dt>
 <dd><p>Potential additional arguments</p></dd>
+
+
+<dt>crs</dt>
+<dd><p>The target crs object</p></dd>
 
 
 <dt>crs0</dt>

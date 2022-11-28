@@ -12,7 +12,7 @@ reference system"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9007</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,10 +88,37 @@ reference system</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for crs</span></span>
-<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for fm_crs</span></span>
-<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for Spatial</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for inla.CRS</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crsonly <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sf</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crsonly <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sfc</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crsonly <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sfg</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crsonly <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for inla.mesh</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crsonly <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for inla.mesh.lattice</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crsonly <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for inla.segment</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crsonly <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for CRS</span></span>
+<span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, oblique <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">fm_CRS</span><span class="op">(</span></span>
@@ -108,6 +135,21 @@ reference system</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>...</dt>
 <dd><p>Additional parameters. Not currently in use.</p></dd>
+
+
+<dt>x</dt>
+<dd><p>Object to convert to CRS or to extract CRS information from.</p></dd>
+
+
+<dt>crsonly</dt>
+<dd><p>logical; if <code>TRUE</code>, remove any oblique<code>information for</code>inla.CRS<code>class objects and return a pure</code>CRS<code>class object. Default:</code>FALSE`.</p></dd>
+
+
+<dt>oblique</dt>
+<dd><p>Vector of length at most 4 of rotation angles (in degrees)
+for an oblique projection, all values defaulting to zero. The values
+indicate (longitude, latitude, orientation, orbit), as explained in the
+Details section below.</p></dd>
 
 
 <dt>projargs</dt>
@@ -127,13 +169,6 @@ uncontrollable loading of the <code>rgdal</code> namespace.</p></dd>
 <dd><p>An optional list of name/value pairs to add to and/or override
 the PROJ4 arguments in <code>projargs</code>.  <code>name=value</code> is converted to
 <code>"+name=value"</code>, and <code>name=NA</code> is converted to <code>"+name"</code>.</p></dd>
-
-
-<dt>oblique</dt>
-<dd><p>Vector of length at most 4 of rotation angles (in degrees)
-for an oblique projection, all values defaulting to zero. The values
-indicate (longitude, latitude, orientation, orbit), as explained in the
-Details section below.</p></dd>
 
 
 <dt>SRS_string</dt>

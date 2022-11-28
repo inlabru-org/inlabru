@@ -12,7 +12,7 @@ convert crs information to construct a new sf::crs object."><!-- mathjax --><scr
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9007</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,8 +97,7 @@ print(x, ...)
 # S3 method for default
 fm_crs(x, ..., crsonly = FALSE)
 
-# S3 method for fm_crs
-st_crs(x, ...)
+st_crs.fm_crs(x, ...)
 
 # S3 method for fm_crs
 $(x, name)
@@ -125,6 +124,9 @@ fm_crs(x, ..., crsonly = FALSE)
 fm_crs(x, ..., crsonly = FALSE)
 
 # S3 method for inla.mesh
+fm_crs(x, ..., crsonly = FALSE)
+
+# S3 method for inla.mesh.lattice
 fm_crs(x, ..., crsonly = FALSE)
 
 # S3 method for inla.mesh.segment
@@ -199,11 +201,15 @@ projection is only correct for perfect spheres.</p>
     <div class="section level2">
     <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
     
-<ul><li><p><code>st_crs(fm_crs)</code>: <code>st_crs(x, ...)</code> is equivalent to <code>fm_crs(x, ..., crsonly = TRUE)</code>
-when <code>x</code> is a <code>fm_crs</code> object.</p></li>
-<li><p><code>$</code>: For a <code>fm_crs</code> object <code>x</code>, <code>x$name</code> calls the accessor method for the
+<ul><li><p><code>$</code>: For a <code>fm_crs</code> object <code>x</code>, <code>x$name</code> calls the accessor method for the
 <code>crs</code> object inside it. If <code>name</code> is "crs", the internal crs object itself is returned.
 If <code>name</code> is "oblique", the internal oblique angle parameter vector is returned.</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
+    
+<ul><li><p><code>st_crs.fm_crs()</code>: <code>st_crs(x, ...)</code> is equivalent to <code>fm_crs(x, ..., crsonly = TRUE)</code>
+when <code>x</code> is a <code>fm_crs</code> object.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
