@@ -89,9 +89,14 @@ test_that("globe polygon integration", {
   )
 
   poly <- SpatialPolygons(list(Polygons(list(Polygon(rbind(
-    c(-10, -10), c(-10, 10), c(10, 10), c(10, -10)
+    c(-45, -45), c(-45, 45), c(45, 45), c(45, -45)
   ))), ID = "A")),
   proj4string = fm_CRS("longlat_globe"))
 
-  ips0 <- bru_int_polygon(mesh, samplers = poly, nsub = 0, method = "direct")
+  ips0 <- bru_int_polygon(mesh, samplers = poly, nsub = 2)
+
+  expect_equal(
+    nrow(ips0),
+    9
+  )
 })
