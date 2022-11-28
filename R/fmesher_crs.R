@@ -977,24 +977,28 @@ fm_CRS <- function(...) {
 }
 
 #' @export
+#' @param x Object to convert to CRS or to extract CRS information from.
 #' @rdname fm_CRS_sp
-fm_CRS.crs <- function(...) {
-  fm_as_sp_crs(...)
+fm_CRS.crs <- function(x, ...) {
+  fm_as_sp_crs(x, ...)
 }
 
 #' @export
 #' @rdname fm_CRS_sp
-fm_CRS.fm_crs <- function(...) {
-  fm_as_sp_crs(...)
+fm_CRS.fm_crs <- function(x, ...) {
+  fm_as_sp_crs(x, ...)
 }
 
 #' @rdname fm_CRS_sp
 #' @export
-fm_CRS.Spatial <- function(x, ..., crsonly = FALSE) {
-  fm_sp_get_crs(x)
+fm_CRS.Spatial <- function(x, ...) {
+  fm_sp_get_crs(x, ...)
 }
 
 #' @rdname fm_CRS_sp
+#' @param crsonly logical; if `TRUE`, remove any oblique` information
+#' for `inla.CRS` class objects and return a pure `CRS` class object.
+#' Default: `FALSE`.
 #' @export
 fm_CRS.inla.CRS <- function(x, ..., crsonly = FALSE) {
   y <- x[["crs"]]

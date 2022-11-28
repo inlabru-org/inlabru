@@ -7,7 +7,7 @@
 #' @param mesh An `inla.mesh` or `inla.mesh.1d` object.
 #' @param loc Projection locations.  Can be a matrix, `SpatialPoints`,
 #' `SpatialPointsDataFrame`, `sf`, `sfc`, or `sfg` object.
-#' @param lattice An [inla.mesh.lattice()] object.
+#' @param lattice An `inla.mesh.lattice()` object.
 #' @param xlim X-axis limits for a lattice. For R2 meshes, defaults to covering
 #' the domain.
 #' @param ylim Y-axis limits for a lattice. For R2 meshes, defaults to covering
@@ -27,13 +27,13 @@
 #' field, ...)`, a field projected from the mesh onto the locations given by
 #' the projector object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @seealso [inla.mesh()], [inla.mesh.1d()],
-#' [inla.mesh.lattice()]
+#' @seealso `inla.mesh`, `inla.mesh.1d`,
+#' `inla.mesh.lattice`
 #' @examples
-#'
+#' if (bru_safe_inla()) {
 #' n <- 20
 #' loc <- matrix(runif(n * 2), n, 2)
-#' mesh <- inla.mesh.create(loc, refine = list(max.edge = 0.05))
+#' mesh <- INLA::inla.mesh.create(loc, refine = list(max.edge = 0.05))
 #' proj <- fm_evaluator(mesh)
 #' field <- cos(mesh$loc[, 1] * 2 * pi * 3) * sin(mesh$loc[, 2] * 2 * pi * 7)
 #' image(proj$x, proj$y, fm_evaluate(proj, field))
@@ -42,7 +42,7 @@
 #'     plot(mesh, rgl = TRUE, col = field, draw.edges = FALSE, draw.vertices = FALSE)
 #' }
 #' }
-#'
+#' }
 #' @export fm_evaluate
 fm_evaluate <- function(...) {
   UseMethod("fm_evaluate")
@@ -105,6 +105,8 @@ fm_evaluator <- function(...) {
 }
 
 
+#' @export
+#' @rdname fm_evaluate
 fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
   stopifnot(inherits(mesh, "inla.mesh"))
 
@@ -174,6 +176,8 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
 }
 
 
+#' @export
+#' @rdname fm_evaluate
 fm_evaluator_inla_mesh_1d <- function(mesh, loc, ...) {
   stopifnot(inherits(mesh, "inla.mesh.1d"))
 
@@ -188,6 +192,8 @@ fm_evaluator_inla_mesh_1d <- function(mesh, loc, ...) {
 
 
 
+#' @export
+#' @rdname fm_evaluate
 fm_evaluator_lattice <- function(mesh,
                                  xlim = NULL,
                                  ylim = NULL,
@@ -201,7 +207,7 @@ fm_evaluator_lattice <- function(mesh,
     units <- "default"
     lim <- list(
       xlim = if (is.null(xlim)) range(mesh$loc[, 1]) else xlim,
-      ylim = if (is.null(ylim)) range(mesh$loc[, 2]) else ylim,
+      ylim = if (is.null(ylim)) range(mesh$loc[, 2]) else ylim
     )
   } else if (identical(mesh$manifold, "S2") &&
              (is.null(mesh$crs) || is.null(crs))) {
@@ -213,11 +219,11 @@ fm_evaluator_lattice <- function(mesh,
     units <- projection
     lim <- INLA::inla.mesh.map.lim(loc = mesh$loc, projection = projection)
   } else {
-    lim <- INLA::inla.crs.bounds(crs)
+    lim <- fm_crs_bounds(crs)
     if (identical(mesh$manifold, "R2")) {
       lim0 <- list(
         xlim = if (is.null(xlim)) range(mesh$loc[, 1]) else xlim,
-        ylim = if (is.null(ylim)) range(mesh$loc[, 2]) else ylim,
+        ylim = if (is.null(ylim)) range(mesh$loc[, 2]) else ylim
       )
       lim$xlim[1] <- max(lim$xlim[1], lim0$xlim[1])
       lim$xlim[2] <- min(lim$xlim[2], lim0$xlim[2])

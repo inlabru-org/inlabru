@@ -6,6 +6,9 @@
 \alias{fm_evaluate.inla.mesh.1d}
 \alias{fm_evaluate.fm_evaluator}
 \alias{fm_evaluator}
+\alias{fm_evaluator_inla_mesh}
+\alias{fm_evaluator_inla_mesh_1d}
+\alias{fm_evaluator_lattice}
 \alias{fm_evaluator.inla.mesh}
 \alias{fm_evaluator.inla.mesh.1d}
 \title{Methods for projecting to/from an inla.mesh}
@@ -19,6 +22,20 @@ fm_evaluate(...)
 \method{fm_evaluate}{fm_evaluator}(projector, field, ...)
 
 fm_evaluator(...)
+
+fm_evaluator_inla_mesh(mesh, loc = NULL, crs = NULL, ...)
+
+fm_evaluator_inla_mesh_1d(mesh, loc, ...)
+
+fm_evaluator_lattice(
+  mesh,
+  xlim = NULL,
+  ylim = NULL,
+  dims = c(100, 100),
+  projection = NULL,
+  crs = NULL,
+  ...
+)
 
 \method{fm_evaluator}{inla.mesh}(mesh, loc = NULL, lattice = NULL, crs = NULL, ...)
 
@@ -37,20 +54,20 @@ the function to be evaluated at the projection locations}
 \item{loc}{Projection locations.  Can be a matrix, \code{SpatialPoints},
 \code{SpatialPointsDataFrame}, \code{sf}, \code{sfc}, or \code{sfg} object.}
 
-\item{lattice}{An \code{\link[=inla.mesh.lattice]{inla.mesh.lattice()}} object.}
-
 \item{crs}{An optional CRS or inla.CRS object associated with \code{loc}
 and/or \code{lattice}.}
 
 \item{xlim}{X-axis limits for a lattice. For R2 meshes, defaults to covering
 the domain.}
 
-\item{dims}{Lattice dimensions.}
-
 \item{ylim}{Y-axis limits for a lattice. For R2 meshes, defaults to covering
 the domain.}
 
+\item{dims}{Lattice dimensions.}
+
 \item{projection}{One of \code{c("default", "longlat", "longsinlat", "mollweide")}.}
+
+\item{lattice}{An \code{inla.mesh.lattice()} object.}
 }
 \value{
 For \code{fm_evaluate(mesh, ...)}, a list with projection
@@ -68,10 +85,10 @@ if no \code{loc} or \code{lattice} is provided.
 
 }}
 \examples{
-
+if (bru_safe_inla()) {
 n <- 20
 loc <- matrix(runif(n * 2), n, 2)
-mesh <- inla.mesh.create(loc, refine = list(max.edge = 0.05))
+mesh <- INLA::inla.mesh.create(loc, refine = list(max.edge = 0.05))
 proj <- fm_evaluator(mesh)
 field <- cos(mesh$loc[, 1] * 2 * pi * 3) * sin(mesh$loc[, 2] * 2 * pi * 7)
 image(proj$x, proj$y, fm_evaluate(proj, field))
@@ -80,11 +97,11 @@ if (require(rgl)) {
     plot(mesh, rgl = TRUE, col = field, draw.edges = FALSE, draw.vertices = FALSE)
 }
 }
-
+}
 }
 \seealso{
-\code{\link[=inla.mesh]{inla.mesh()}}, \code{\link[=inla.mesh.1d]{inla.mesh.1d()}},
-\code{\link[=inla.mesh.lattice]{inla.mesh.lattice()}}
+\code{inla.mesh}, \code{inla.mesh.1d},
+\code{inla.mesh.lattice}
 }
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}

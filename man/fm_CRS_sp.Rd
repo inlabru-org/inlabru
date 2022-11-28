@@ -18,11 +18,11 @@
 \usage{
 fm_CRS(...)
 
-\method{fm_CRS}{crs}(...)
+\method{fm_CRS}{crs}(x, ...)
 
-\method{fm_CRS}{fm_crs}(...)
+\method{fm_CRS}{fm_crs}(x, ...)
 
-\method{fm_CRS}{Spatial}(x, ..., crsonly = FALSE)
+\method{fm_CRS}{Spatial}(x, ...)
 
 \method{fm_CRS}{inla.CRS}(x, ..., crsonly = FALSE)
 
@@ -51,6 +51,10 @@ fm_CRS(...)
 }
 \arguments{
 \item{\dots}{Additional parameters. Not currently in use.}
+
+\item{x}{Object to convert to CRS or to extract CRS information from.}
+
+\item{crsonly}{logical; if \code{TRUE}, remove any oblique\verb{information for}inla.CRS\verb{class objects and return a pure}CRS\verb{class object. Default:}FALSE`.}
 
 \item{oblique}{Vector of length at most 4 of rotation angles (in degrees)
 for an oblique projection, all values defaulting to zero. The values
