@@ -5,8 +5,13 @@
 * Allow `NA` input for default 1D mappers to generate effect zero, like
   in `inla()`.
   
-* New methods for `fm_crs`, `fm_CRS`, `fm_ellipsoid_radius`, `fm_transform`
-  to further support `sf` objects.
+* New and expanded methods `fm_crs`, `fm_CRS`, `fm_transform`,
+  `fm_ellipsoid_radius`, and `fm_length_unit` to further support `sf` objects.
+  
+* New experimental methods `fm_evaluator` and `fm_evaluate`, replacing the
+  `INLA` `inla.mesh.projector` and `inla.mesh.project` methods.
+  
+* Experimental integration support for sphere and globe meshes.
   
 * Allow `sf` input to `family="cp"` models.
 
