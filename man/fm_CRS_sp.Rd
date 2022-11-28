@@ -10,7 +10,9 @@
 \alias{fm_CRS.sfc}
 \alias{fm_CRS.sfg}
 \alias{fm_CRS.inla.mesh}
+\alias{fm_CRS.inla.mesh.lattice}
 \alias{fm_CRS.inla.segment}
+\alias{fm_CRS.CRS}
 \alias{fm_CRS.default}
 \title{Create a coordinate reference system object}
 \usage{
@@ -32,7 +34,11 @@ fm_CRS(...)
 
 \method{fm_CRS}{inla.mesh}(x, ..., crsonly = FALSE)
 
+\method{fm_CRS}{inla.mesh.lattice}(x, ..., crsonly = FALSE)
+
 \method{fm_CRS}{inla.segment}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{CRS}(x, oblique = NULL, ...)
 
 \method{fm_CRS}{default}(
   projargs = NULL,
@@ -46,6 +52,11 @@ fm_CRS(...)
 \arguments{
 \item{\dots}{Additional parameters. Not currently in use.}
 
+\item{oblique}{Vector of length at most 4 of rotation angles (in degrees)
+for an oblique projection, all values defaulting to zero. The values
+indicate (longitude, latitude, orientation, orbit), as explained in the
+Details section below.}
+
 \item{projargs}{Either 1) a projection argument string suitable as input to
 \code{sp::CRS}, or 2) an existing \code{CRS} object, or 3) a shortcut
 reference string to a predefined projection; run
@@ -58,11 +69,6 @@ uncontrollable loading of the \code{rgdal} namespace.}
 \item{args}{An optional list of name/value pairs to add to and/or override
 the PROJ4 arguments in \code{projargs}.  \code{name=value} is converted to
 \code{"+name=value"}, and \code{name=NA} is converted to \code{"+name"}.}
-
-\item{oblique}{Vector of length at most 4 of rotation angles (in degrees)
-for an oblique projection, all values defaulting to zero. The values
-indicate (longitude, latitude, orientation, orbit), as explained in the
-Details section below.}
 
 \item{SRS_string}{a WKT2 string defining the coordinate system;
 see \code{sp::CRS}. This takes precedence over \code{projargs}.}

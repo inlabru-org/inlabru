@@ -48,7 +48,7 @@
 #' * an `inla.mesh.2d` object for continuous 2D integration.
 #' @param name Character array stating the name of the domains dimension(s).
 #' If `NULL`, the names are taken from coordinate names from `samplers` for
-#' `Spatial*` objects, otherwise "x", "y", "coordinateZ" for 2D regions and
+#' `Spatial*` objects, otherwise "x", "y", "z" for 2D regions and
 #' `"x"` for 1D regions
 #' @param group Column names of the `samplers` object (if applicable) for which
 #' the integration points are calculated independently and not merged when
@@ -314,7 +314,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   } else if (inherits(domain, "inla.mesh") &&
     is.null(samplers) &&
     identical(int.args[["method"]], "stable")) {
-    coord_names <- c("x", "y", "coordinateZ")
+    coord_names <- c("x", "y", "z")
     if (!is.null(name)) {
       coord_names[seq_along(name)] <- name
     }
@@ -366,7 +366,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       project = identical(int.args[["method"]], "stable")
     )
 
-    coord_names <- c("x", "y", "coordinateZ")
+    coord_names <- c("x", "y", "z")
     if (!is.null(coordnames(samplers))) {
       coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
     } else if (!is.null(name)) {
@@ -468,13 +468,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers@data[ips$group, group, drop = FALSE],
       weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
     )
-    if (is.null(ips$coordinateZ)) {
+    if (is.null(ips$z)) {
       ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y")],
         data = df,
         match.ID = FALSE, proj4string = domain_crs
       )
     } else {
-      ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y", "coordinateZ")],
+      ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y", "z")],
         data = df,
         match.ID = FALSE, proj4string = domain_crs
       )
@@ -484,7 +484,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       ips <- fm_transform(ips, crs = samplers_crs)
     }
 
-    coord_names <- c("x", "y", "coordinateZ")
+    coord_names <- c("x", "y", "z")
     if (!is.null(coordnames(samplers))) {
       coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
     } else if (!is.null(name)) {

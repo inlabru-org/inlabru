@@ -16,6 +16,7 @@
 \alias{fm_crs.sfc}
 \alias{fm_crs.sfg}
 \alias{fm_crs.inla.mesh}
+\alias{fm_crs.inla.mesh.lattice}
 \alias{fm_crs.inla.mesh.segment}
 \alias{fm_wkt_predef}
 \title{Obtain coordinate reference system object}
@@ -49,6 +50,8 @@ st_crs.fm_crs(x, ...)
 \method{fm_crs}{sfg}(x, ..., crsonly = FALSE)
 
 \method{fm_crs}{inla.mesh}(x, ..., crsonly = FALSE)
+
+\method{fm_crs}{inla.mesh.lattice}(x, ..., crsonly = FALSE)
 
 \method{fm_crs}{inla.mesh.segment}(x, ..., crsonly = FALSE)
 

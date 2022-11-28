@@ -228,7 +228,8 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
 
 
 
-
+# 2022-11-28: Currently assumes the data is Spatial and in the same coordinate
+# system as the mesh
 int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   # Extract start and end coordinates
   qq <- coordinates(data)
@@ -274,8 +275,8 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   if (!is.null(mesh)) {
     # Filter out points outside the mesh...
     loc <- as.matrix(rbind(sp, ep))
-    proj1 <- INLA::inla.mesh.projector(mesh, loc = as.matrix(sp))
-    proj2 <- INLA::inla.mesh.projector(mesh, loc = as.matrix(ep))
+    proj1 <- fm_evaluator(mesh, loc = as.matrix(sp))
+    proj2 <- fm_evaluator(mesh, loc = as.matrix(ep))
     ok <- (proj1$proj$ok & proj2$proj$ok)
     if (!all(ok)) {
       warning("Found spatial lines with start or end point ouside of the mesh. Omitting.")
@@ -316,7 +317,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
       proj4string = fm_CRS(geocentric.crs)
     )
 
-    ips <- coordinates(fm_transform(mp3d, crs))
+    ips <- coordinates(fm_transform(mp3d, crs = crs))
     w <- spDists(
       coordinates(fm_transform(sp3d, crs = longlat.crs))[, 1:2, drop = FALSE],
       coordinates(fm_transform(ep3d, crs = longlat.crs))[, 1:2, drop = FALSE],
@@ -340,7 +341,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     ips <- cbind(ips, as.data.frame(data)[idx[, 1], group, drop = FALSE])
   }
 
-  ips <- SpatialPointsDataFrame(
+  ips <- sp::SpatialPointsDataFrame(
     ips[, 1:d_ips, drop = FALSE],
     data = ips[, -(1:d_ips), drop = FALSE],
     proj4string = crs
@@ -348,10 +349,12 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   if (!is.null(coordnames(data))) {
     name <- coordnames(data)
     if (length(name) < d_ips) {
-      name <- c(name, "coordinateZ")
+      name <- c(name, "z")
     }
     coordnames(ips) <- name
   }
+
+  ips <- fm_transform(ips, crs = fm_CRS(mesh), passthrough = TRUE)
 
   # Project to mesh vertices
   if (project && !is.null(mesh)) {
@@ -506,11 +509,8 @@ integration_weight_aggregation <- function(mesh, integ) {
   } else {
     loc <- integ$loc
   }
-  # Project points onto the mesh
-  # 2022-11-27: inla.mesh.project converts globes to unit radius spheres
-  # and assumes raw loc input is unit-radius.
-  # TODO: Fix inla.mesh.project
-  proj <- INLA::inla.mesh.projector(mesh, loc = loc)
+  # Locate points onto the mesh
+  proj <- fm_evaluator(mesh, loc = loc)
 
   # Convert integration weights to mesh points
   weight <- as.vector(as.vector(integ$weight) %*% proj$proj$A)
@@ -743,8 +743,8 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
   if (is_spherical) {
     # Normalise
     radius <- sum(mesh$loc[1, ]^2)^0.5
-    loc <- loc / rowSums(loc^2)^0.5
     mesh$loc <- mesh$loc / radius
+    loc <- loc / rowSums(loc^2)^0.5
   }
 
   # Construct integration weights
@@ -793,7 +793,16 @@ bru_int_polygon <- function(mesh,
   integ$weight <- integ$weight[ok]
 
   if (!is.null(samplers)) {
-    integ_sp <- SpatialPoints(integ$loc, proj4string = fm_sp_get_crs(samplers))
+    mesh_crs <- fm_CRS(mesh)
+    samplers_crs <- fm_CRS(samplers)
+    integ_sp <- sp::SpatialPoints(integ$loc, proj4string = mesh_crs)
+    if (!identical(mesh_crs, samplers_crs) &&
+        !fm_crs_is_null(mesh_crs) &&
+        !fm_crs_is_null(samplers_crs)) {
+      integ_sp <- fm_transform(integ_sp,
+                               crs = samplers_crs,
+                               passthrough = TRUE)
+    }
 
     idx <- sp::over(samplers, integ_sp, returnList = TRUE)
 
@@ -809,15 +818,25 @@ bru_int_polygon <- function(mesh,
           integ_ <- integration_weight_aggregation(mesh, integ_)
         }
 
-        ips <- data.frame(
-          x = integ_$loc[, 1],
-          y = integ_$loc[, 2],
-          # TODO: figure out how to deal with 3D points without
-          # breaking sp::over later
-          #          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
-          weight = integ_$weight,
-          group = g
-        )
+        if (ncol(integ_$loc) > 2) {
+          ips <- data.frame(
+            x = integ_$loc[, 1],
+            y = integ_$loc[, 2],
+            z = integ_$loc[, 3],
+            # TODO: figure out how to deal with 3D points without
+            # breaking sp::over later
+            #          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
+            weight = integ_$weight,
+            group = g
+          )
+        } else {
+          ips <- data.frame(
+            x = integ_$loc[, 1],
+            y = integ_$loc[, 2],
+            weight = integ_$weight,
+            group = g
+          )
+        }
 
         ipsl <- c(ipsl, list(ips))
       }
@@ -828,13 +847,22 @@ bru_int_polygon <- function(mesh,
       integ <- integration_weight_aggregation(mesh, integ)
     }
 
-    ipsl <- list(data.frame(
-      x = integ$loc[, 1],
-      y = integ$loc[, 2],
-      z = integ$loc[, 3],
-      weight = integ$weight,
-      group = 1
-    ))
+    if (ncol(integ$loc) > 2) {
+      ipsl <- list(data.frame(
+        x = integ$loc[, 1],
+        y = integ$loc[, 2],
+        z = integ$loc[, 3],
+        weight = integ$weight,
+        group = 1
+      ))
+    } else {
+      ipsl <- list(data.frame(
+        x = integ$loc[, 1],
+        y = integ$loc[, 2],
+        weight = integ$weight,
+        group = 1
+      ))
+    }
   }
 
   do.call(rbind, ipsl)
