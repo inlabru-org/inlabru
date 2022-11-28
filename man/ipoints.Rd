@@ -37,7 +37,7 @@ in between),
 
 \item{name}{Character array stating the name of the domains dimension(s).
 If \code{NULL}, the names are taken from coordinate names from \code{samplers} for
-\verb{Spatial*} objects, otherwise "x", "y", "coordinateZ" for 2D regions and
+\verb{Spatial*} objects, otherwise "x", "y", "z" for 2D regions and
 \code{"x"} for 1D regions}
 
 \item{group}{Column names of the \code{samplers} object (if applicable) for which

@@ -121,6 +121,7 @@ Collate:
     'effect.R'
     'environment.R'
     'fmesher_crs.R'
+    'fmesher_evaluator.R'
     'fmesher_sf_mesh.R'
     'fmesher_sp_mesh.R'
     'fmesher_utils.R'

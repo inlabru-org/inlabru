@@ -14,34 +14,34 @@
 \alias{fm_transform.inla.mesh.segment}
 \title{Object coordinate transformation}
 \usage{
-fm_transform(x, crs = fm_crs(x), ...)
+fm_transform(x, ..., crs = fm_crs(x))
 
-\method{fm_transform}{default}(x, crs = fm_crs(x), ..., crs0 = NULL)
+\method{fm_transform}{default}(x, ..., crs = fm_crs(x), crs0 = NULL)
 
-\method{fm_transform}{matrix}(x, crs = NULL, ..., passthrough = FALSE, crs0 = NULL)
+\method{fm_transform}{matrix}(x, ..., crs = NULL, passthrough = FALSE, crs0 = NULL)
 
-\method{fm_transform}{list}(x, crs = fm_crs(x), ...)
+\method{fm_transform}{list}(x, ..., crs = fm_crs(x))
 
-\method{fm_transform}{sf}(x, crs = fm_crs(x), ..., passthrough = FALSE)
+\method{fm_transform}{sf}(x, ..., crs = fm_crs(x), passthrough = FALSE)
 
-\method{fm_transform}{sfc}(x, crs = fm_crs(x), ..., passthrough = FALSE)
+\method{fm_transform}{sfc}(x, ..., crs = fm_crs(x), passthrough = FALSE)
 
-\method{fm_transform}{sfg}(x, crs = fm_crs(x), ..., passthrough = FALSE)
+\method{fm_transform}{sfg}(x, ..., crs = fm_crs(x), passthrough = FALSE)
 
-\method{fm_transform}{Spatial}(x, crs = fm_crs(x), ..., passthrough = FALSE)
+\method{fm_transform}{Spatial}(x, ..., crs = fm_crs(x), passthrough = FALSE)
 
-\method{fm_transform}{inla.mesh}(x, crs = fm_crs(x), ..., passthrough = FALSE)
+\method{fm_transform}{inla.mesh}(x, ..., crs = fm_crs(x), passthrough = FALSE, crs0 = fm_crs(x))
 
-\method{fm_transform}{inla.mesh.lattice}(x, crs = fm_crs(x), ..., passthrough = FALSE)
+\method{fm_transform}{inla.mesh.lattice}(x, ..., crs = fm_crs(x), passthrough = FALSE)
 
-\method{fm_transform}{inla.mesh.segment}(x, crs = fm_crs(x), ..., passthrough = FALSE)
+\method{fm_transform}{inla.mesh.segment}(x, ..., crs = fm_crs(x), passthrough = FALSE)
 }
 \arguments{
 \item{x}{The object that should be transformed from it's current CRS to a new CRS}
 
-\item{crs}{The target crs object}
-
 \item{\dots}{Potential additional arguments}
+
+\item{crs}{The target crs object}
 
 \item{crs0}{The source crs object for spatial classes without crs information}
 

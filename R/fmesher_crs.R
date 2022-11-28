@@ -747,6 +747,10 @@ fm_crs_oblique <- function(x) {
     }
   } else {
     if (!inherits(x, "fm_crs")) {
+      stopifnot(is.vector(value))
+      if (length(value) < 4) {
+        value <- c(value, rep(0, 4 - length(value)))
+      }
       x <- list(crs = x, oblique = value)
       class(x) <- "fm_crs"
     }
@@ -872,6 +876,12 @@ fm_crs.inla.mesh <- function(x, ..., crsonly = FALSE) {
 
 #' @rdname fm_crs
 #' @export
+fm_crs.inla.mesh.lattice <- function(x, ..., crsonly = FALSE) {
+  fm_crs(x[["crs"]], ..., crsonly = crsonly)
+}
+
+#' @rdname fm_crs
+#' @export
 fm_crs.inla.mesh.segment <- function(x, ..., crsonly = FALSE) {
   fm_crs(x[["crs"]], ..., crsonly = crsonly)
 }
@@ -967,15 +977,86 @@ fm_CRS <- function(...) {
 }
 
 #' @export
+#' @param x Object to convert to CRS or to extract CRS information from.
 #' @rdname fm_CRS_sp
-fm_CRS.crs <- function(...) {
-  fm_as_sp_crs(...)
+fm_CRS.crs <- function(x, ...) {
+  fm_as_sp_crs(x, ...)
 }
 
 #' @export
 #' @rdname fm_CRS_sp
-fm_CRS.fm_crs <- function(...) {
-  fm_as_sp_crs(...)
+fm_CRS.fm_crs <- function(x, ...) {
+  fm_as_sp_crs(x, ...)
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.Spatial <- function(x, ...) {
+  fm_sp_get_crs(x, ...)
+}
+
+#' @rdname fm_CRS_sp
+#' @param crsonly logical; if `TRUE`, remove any oblique` information
+#' for `inla.CRS` class objects and return a pure `CRS` class object.
+#' Default: `FALSE`.
+#' @export
+fm_CRS.inla.CRS <- function(x, ..., crsonly = FALSE) {
+  y <- x[["crs"]]
+  if (crsonly) {
+    y <- y[["crs"]]
+  }
+  y
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.sf <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(sf::st_crs(x, ...))
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.sfc <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(sf::st_crs(x, ...))
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.sfg <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(sf::st_crs(x, ...))
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.inla.mesh <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(x[["crs"]], ..., crsonly = crsonly)
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.inla.mesh.lattice <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(x[["crs"]], ..., crsonly = crsonly)
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.inla.segment <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(x[["crs"]], ..., crsonly = crsonly)
+}
+
+#' @export
+#' @rdname fm_CRS_sp
+fm_CRS.CRS <- function(x, oblique = NULL,
+                           ...) {
+  if (!is.null(oblique)) {
+    stopifnot(is.vector(oblique))
+    if (length(oblique) < 4) {
+      oblique <- c(oblique, rep(0, 4 - length(oblique)))
+    }
+    x <- list(crs = x, oblique = oblique)
+    class(x) <- "inla.CRS"
+  }
+  x
 }
 
 #' @export
@@ -990,9 +1071,9 @@ fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
       projargs <- NULL
     }
     if (is.null(SRS_string) &&
-      !is.null(projargs) &&
-      !is.na(projargs) &&
-      is.character(projargs)) {
+        !is.null(projargs) &&
+        !is.na(projargs) &&
+        is.character(projargs)) {
       if (projargs %in% c("hammer", "lambert", "longlat", "mollweide")) {
         warning(paste0(
           "Use of old predefined projection '",
@@ -1720,13 +1801,13 @@ fm_identical_CRS <- function(crs0, crs1, crsonly = FALSE) {
 #' Potential additional arguments
 #' @seealso [fm_CRS()]
 #' @export
-fm_transform <- function(x, crs = fm_crs(x), ...) {
+fm_transform <- function(x, ..., crs = fm_crs(x)) {
   UseMethod("fm_transform")
 }
 
 #' @rdname fm_transform
 #' @export
-fm_transform.default <- function(x, crs = fm_crs(x), ..., crs0 = NULL) {
+fm_transform.default <- function(x, ..., crs = fm_crs(x), crs0 = NULL) {
   stop(paste0(
     "fm_transform() for '",
     paste0(class(x), sep = ", "),
@@ -1776,7 +1857,7 @@ fm_transform_raw <- function(x, from, to) {
 
 #' @rdname fm_transform
 #' @export
-fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = NULL) {
+fm_transform.matrix <- function(x, ..., crs = NULL, passthrough = FALSE, crs0 = NULL) {
   crs1 <- fm_crs(crs)
   crs0 <- fm_crs(crs0)
   if (is.na(crs0) || is.na(crs1)) {
@@ -1888,7 +1969,7 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
 
 #' @rdname fm_transform
 #' @export
-fm_transform.list <- function(x, crs = fm_crs(x), ...) {
+fm_transform.list <- function(x, ..., crs = fm_crs(x)) {
   if (!is.null(crs)) {
     x <- lapply(x, function(xx) fm_transform(xx))
   }
@@ -1897,7 +1978,7 @@ fm_transform.list <- function(x, crs = fm_crs(x), ...) {
 
 
 # Internal helper function for fm_transform.sf/sfc/sfg
-fm_transform_sf <- function(x, crs, ..., passthrough) {
+fm_transform_sf <- function(x, ..., crs, passthrough) {
   crs1 <- fm_crs(crs)
   crs0 <- fm_crs(x)
   if (is.na(crs0) || is.na(crs1)) {
@@ -1949,25 +2030,25 @@ fm_transform_sf <- function(x, crs, ..., passthrough) {
 
 #' @export
 #' @rdname fm_transform
-fm_transform.sf <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+fm_transform.sf <- function(x, ..., crs = fm_crs(x), passthrough = FALSE) {
   geo <- fm_transform(sf::st_geometry(x), crs = crs, ..., passthrough = passthrough)
   sf::st_geometry(x) <- geo
   x
 }
 #' @export
 #' @rdname fm_transform
-fm_transform.sfc <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+fm_transform.sfc <- function(x, ..., crs = fm_crs(x), passthrough = FALSE) {
   fm_transform_sf(x, crs = crs, ..., passthrough = passthrough)
 }
 #' @export
 #' @rdname fm_transform
-fm_transform.sfg <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+fm_transform.sfg <- function(x, ..., crs = fm_crs(x), passthrough = FALSE) {
   fm_transform_sf(x, crs = crs, ..., passthrough = passthrough)
 }
 
 #' @export
 #' @rdname fm_transform
-fm_transform.Spatial <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+fm_transform.Spatial <- function(x, ..., crs = fm_crs(x), passthrough = FALSE) {
   orig_class <- class(x)
   as(
     as(
@@ -1996,8 +2077,11 @@ fm_crs_detect_manifold <- function(crs) {
 
 #' @export
 #' @rdname fm_transform
-fm_transform.inla.mesh <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
-  x$loc <- fm_transform(x$loc, crs0 = x$crs, crs = crs, ..., passthrough = passthrough)
+fm_transform.inla.mesh <- function(x, ...,
+                                   crs = fm_crs(x),
+                                   passthrough = FALSE,
+                                   crs0 = fm_crs(x)) {
+  x$loc <- fm_transform(x$loc, ..., crs0 = x$crs, crs = crs, passthrough = passthrough)
   x$manifold <- fm_crs_detect_manifold(crs)
   x$crs <- fm_as_sp_crs(crs)
   x
@@ -2005,16 +2089,16 @@ fm_transform.inla.mesh <- function(x, crs = fm_crs(x), ..., passthrough = FALSE)
 
 #' @export
 #' @rdname fm_transform
-fm_transform.inla.mesh.lattice <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+fm_transform.inla.mesh.lattice <- function(x, ..., crs = fm_crs(x), passthrough = FALSE) {
   x$segm <- fm_transform(x$segm, crs = crs, ..., passthrough = passthrough)
-  x$loc <- fm_transform(x$loc, csr0 = x$crs, csr = crs, ..., passthrough = passthrough)
+  x$loc <- fm_transform(x$loc, crs0 = x$crs, crs = crs, ..., passthrough = passthrough)
   x$crs <- fm_as_sp_crs(crs)
   invisible(x)
 }
 
 #' @export
 #' @rdname fm_transform
-fm_transform.inla.mesh.segment <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
+fm_transform.inla.mesh.segment <- function(x, ..., crs = fm_crs(x), passthrough = FALSE) {
   x$loc <- fm_transform(x$loc, crs0 = x$crs, crs = crs, ..., passthrough = passthrough)
   x$crs <- fm_as_sp_crs(crs)
   invisible(x)
