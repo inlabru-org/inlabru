@@ -1047,7 +1047,7 @@ fm_CRS.inla.segment <- function(x, ..., crsonly = FALSE) {
 #' @export
 #' @rdname fm_CRS_sp
 fm_CRS.CRS <- function(x, oblique = NULL,
-                           ...) {
+                       ...) {
   if (!is.null(oblique)) {
     stopifnot(is.vector(oblique))
     if (length(oblique) < 4) {
@@ -1071,9 +1071,9 @@ fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
       projargs <- NULL
     }
     if (is.null(SRS_string) &&
-        !is.null(projargs) &&
-        !is.na(projargs) &&
-        is.character(projargs)) {
+      !is.null(projargs) &&
+      !is.na(projargs) &&
+      is.character(projargs)) {
       if (projargs %in% c("hammer", "lambert", "longlat", "mollweide")) {
         warning(paste0(
           "Use of old predefined projection '",

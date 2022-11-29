@@ -68,11 +68,11 @@ test_that("flat SpatialPolygons integration", {
   ips9 <- bru_int_polygon(mesh, samplers = poly, nsub = 9, method = "direct")
   ips19 <- bru_int_polygon(mesh, samplers = poly, nsub = 19, method = "direct")
 
-#  ggplot() + gg(mesh) +
-#    geom_point(aes(x=x,y=y,size=weight,colour="0"),data=ips0) +
-#    geom_point(aes(x=x,y=y,size=weight,colour="1"),data=ips1) +
-#    geom_point(aes(x=x,y=y,size=weight,colour="9"),data=ips9) +
-#    geom_point(aes(x=x,y=y,size=weight,colour="19"),data=ips19)
+  #  ggplot() + gg(mesh) +
+  #    geom_point(aes(x=x,y=y,size=weight,colour="0"),data=ips0) +
+  #    geom_point(aes(x=x,y=y,size=weight,colour="1"),data=ips1) +
+  #    geom_point(aes(x=x,y=y,size=weight,colour="9"),data=ips9) +
+  #    geom_point(aes(x=x,y=y,size=weight,colour="19"),data=ips19)
 
   expect_equal(sum(ips0$weight), 6.627417, tolerance = midtol)
   expect_equal(sum(ips1$weight), 4.970563, tolerance = midtol)
@@ -88,10 +88,12 @@ test_that("globe polygon integration", {
     mesh <- INLA::inla.mesh.create(globe = 1, crs = fm_CRS("globe"))
   )
 
-  poly <- SpatialPolygons(list(Polygons(list(Polygon(rbind(
-    c(-45, -45), c(-45, 45), c(45, 45), c(45, -45)
-  ))), ID = "A")),
-  proj4string = fm_CRS("longlat_globe"))
+  poly <- SpatialPolygons(
+    list(Polygons(list(Polygon(rbind(
+      c(-45, -45), c(-45, 45), c(45, 45), c(45, -45)
+    ))), ID = "A")),
+    proj4string = fm_CRS("longlat_globe")
+  )
 
   ips0 <- bru_int_polygon(mesh, samplers = poly, nsub = 2)
 

@@ -282,7 +282,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   sampler_crs <- fm_crs(data)
   target_crs <- fm_crs(mesh)
   if (!fm_crs_is_null(sampler_crs) &&
-      fm_crs_is_null(target_crs)) {
+    fm_crs_is_null(target_crs)) {
     target_crs <- sampler_crs
   }
 
@@ -800,11 +800,12 @@ bru_int_polygon <- function(mesh,
     samplers_crs <- fm_CRS(samplers)
     integ_sp <- sp::SpatialPoints(integ$loc, proj4string = mesh_crs)
     if (!identical(mesh_crs, samplers_crs) &&
-        !fm_crs_is_null(mesh_crs) &&
-        !fm_crs_is_null(samplers_crs)) {
+      !fm_crs_is_null(mesh_crs) &&
+      !fm_crs_is_null(samplers_crs)) {
       integ_sp <- fm_transform(integ_sp,
-                               crs = samplers_crs,
-                               passthrough = TRUE)
+        crs = samplers_crs,
+        passthrough = TRUE
+      )
     }
 
     idx <- sp::over(samplers, integ_sp, returnList = TRUE)

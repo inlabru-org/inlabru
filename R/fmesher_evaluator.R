@@ -31,16 +31,17 @@
 #' `inla.mesh.lattice`
 #' @examples
 #' if (bru_safe_inla()) {
-#' n <- 20
-#' loc <- matrix(runif(n * 2), n, 2)
-#' mesh <- INLA::inla.mesh.create(loc, refine = list(max.edge = 0.05))
-#' proj <- fm_evaluator(mesh)
-#' field <- cos(mesh$loc[, 1] * 2 * pi * 3) * sin(mesh$loc[, 2] * 2 * pi * 7)
-#' image(proj$x, proj$y, fm_evaluate(proj, field))
-#' \donttest{
-#' if (require(rgl)) {
-#'     plot(mesh, rgl = TRUE, col = field, draw.edges = FALSE, draw.vertices = FALSE)
+#'   n <- 20
+#'   loc <- matrix(runif(n * 2), n, 2)
+#'   mesh <- INLA::inla.mesh.create(loc, refine = list(max.edge = 0.05))
+#'   proj <- fm_evaluator(mesh)
+#'   field <- cos(mesh$loc[, 1] * 2 * pi * 3) * sin(mesh$loc[, 2] * 2 * pi * 7)
+#'   image(proj$x, proj$y, fm_evaluate(proj, field))
 #' }
+#' \donttest{
+#' if (bru_safe_inla() &&
+#'   require(rgl)) {
+#'   plot(mesh, rgl = TRUE, col = field, draw.edges = FALSE, draw.vertices = FALSE)
 #' }
 #' }
 #' @export fm_evaluate
@@ -131,7 +132,7 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
         }
       }
     } else if (!fm_identical_CRS(crs, mesh$crs)) {
-        mesh <- fm_transform(mesh, crs = mesh$crs, crs0 = crs, passthrough = TRUE)
+      mesh <- fm_transform(mesh, crs = mesh$crs, crs0 = crs, passthrough = TRUE)
     }
   } else if (identical(mesh$manifold, "S2")) {
     mesh$loc <- mesh$loc / rowSums(mesh$loc^2)^0.5
@@ -149,12 +150,12 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
 
   jj <-
     which(rowSums(matrix(is.na(as.vector(loc)),
-                         nrow = nrow(loc),
-                         ncol = ncol(loc)
+      nrow = nrow(loc),
+      ncol = ncol(loc)
     )) == 0)
   smorg <- (INLA::inla.fmesher.smorg(mesh$loc,
-                               mesh$graph$tv,
-                               points2mesh = loc[jj, , drop = FALSE]
+    mesh$graph$tv,
+    points2mesh = loc[jj, , drop = FALSE]
   ))
   ti <- matrix(0L, nrow(loc), 1)
   b <- matrix(0, nrow(loc), 3)
@@ -203,14 +204,14 @@ fm_evaluator_lattice <- function(mesh,
                                  ...) {
   stopifnot(inherits(mesh, "inla.mesh"))
   if (identical(mesh$manifold, "R2") &&
-      (is.null(mesh$crs) || is.null(crs))) {
+    (is.null(mesh$crs) || is.null(crs))) {
     units <- "default"
     lim <- list(
       xlim = if (is.null(xlim)) range(mesh$loc[, 1]) else xlim,
       ylim = if (is.null(ylim)) range(mesh$loc[, 2]) else ylim
     )
   } else if (identical(mesh$manifold, "S2") &&
-             (is.null(mesh$crs) || is.null(crs))) {
+    (is.null(mesh$crs) || is.null(crs))) {
     projection <-
       match.arg(projection, c(
         "longlat", "longsinlat",
@@ -258,8 +259,9 @@ fm_evaluator.inla.mesh <- function(mesh,
   if (missing(loc) || is.null(loc)) {
     if (missing(lattice) || is.null(lattice)) {
       lattice <- fm_evaluator_lattice(mesh,
-                                      crs = crs,
-                                      ...)
+        crs = crs,
+        ...
+      )
     }
     dims <- lattice$dims
     x <- lattice$x
@@ -270,8 +272,8 @@ fm_evaluator.inla.mesh <- function(mesh,
       proj <- fm_evaluator_inla_mesh(mesh, lattice$loc)
     } else {
       proj <- fm_evaluator_inla_mesh(mesh,
-                                     loc = lattice$loc,
-                                     crs = lattice$crs
+        loc = lattice$loc,
+        crs = lattice$crs
       )
     }
     projector <- list(x = x, y = y, lattice = lattice, loc = NULL, proj = proj, crs = crs)
@@ -305,5 +307,3 @@ fm_evaluator.inla.mesh.1d <- function(mesh,
 
   return(projector)
 }
-
-
