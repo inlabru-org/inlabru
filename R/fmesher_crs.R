@@ -1848,7 +1848,8 @@ fm_transform_raw <- function(x, from, to) {
     y <- sf::sf_project(
       pts = x,
       from = from,
-      to = to
+      to = to,
+      keep = TRUE
     )
     adjust_output(y, to)
   }
@@ -1860,12 +1861,12 @@ fm_transform_raw <- function(x, from, to) {
 fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = NULL) {
   crs1 <- fm_crs(crs)
   crs0 <- fm_crs(crs0)
-  if (is.na(crs0) || is.na(crs1)) {
+  if (fm_crs_is_null(crs0) || fm_crs_is_null(crs1)) {
     if (!passthrough) {
-      if (is.na(crs0)) {
+      if (fm_crs_is_null(crs0)) {
         stop("'crs0' is an invalid coordinate reference object.")
       }
-      if (is.na(crs1)) {
+      if (fm_crs_is_null(crs1)) {
         stop("'crs' is an invalid coordinate reference object.")
       }
     }
@@ -1981,12 +1982,12 @@ fm_transform.list <- function(x, crs = fm_crs(x), ...) {
 fm_transform_sf <- function(x, crs, ..., passthrough) {
   crs1 <- fm_crs(crs)
   crs0 <- fm_crs(x)
-  if (is.na(crs0) || is.na(crs1)) {
+  if (fm_crs_is_null(crs0) || fm_crs_is_null(crs1)) {
     if (!passthrough) {
-      if (is.na(crs0)) {
+      if (fm_crs_is_null(crs0)) {
         stop("'crs0' is an invalid coordinate reference object.")
       }
-      if (is.na(crs1)) {
+      if (fm_crs_is_null(crs1)) {
         stop("'crs' is an invalid coordinate reference object.")
       }
     }
