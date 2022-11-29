@@ -272,8 +272,8 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   )
   idx <- cbind(idx, idx)
 
-  sampler_crs <- fm_CRS(data)
-  target_crs <- fm_CRS(mesh)
+  sampler_crs <- fm_crs(data)
+  target_crs <- fm_crs(mesh)
   if (!fm_crs_is_null(sampler_crs) &&
       fm_crs_is_null(target_crs)) {
     target_crs <- sampler_crs
@@ -281,20 +281,16 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
 
   if (!is.null(mesh)) {
     # Filter out points outside the mesh...
-    sp_ <- sp::SpatialPoints(as.matrix(sp), proj4string = sampler_crs)
-    ep_ <- sp::SpatialPoints(as.matrix(ep), proj4string = sampler_crs)
-    sp_ <- fm_transform(sp_, crs = target_crs, passthrough = TRUE)
-    ep_ <- fm_transform(ep_, crs = target_crs, passthrough = TRUE)
-    proj1 <- fm_evaluator(mesh, loc = sp_)
-    proj2 <- fm_evaluator(mesh, loc = ep_)
+    sp <- fm_transform(sp, crs = target_crs, crs0 = sampler_crs, passthrough = TRUE)
+    ep <- fm_transform(ep, crs = target_crs, crs0 = sampler_crs, passthrough = TRUE)
+    proj1 <- fm_evaluator(mesh, loc = sp, crs = target_crs)
+    proj2 <- fm_evaluator(mesh, loc = ep, crs = target_crs)
     ok <- (proj1$proj$ok & proj2$proj$ok)
     if (!all(ok)) {
       warning("Found spatial lines with start or end point ouside of the mesh. Omitting.")
     }
-    sp_ <- sp_[ok, , drop = FALSE]
-    ep_ <- ep_[ok, , drop = FALSE]
-    sp <- sp::coordinates(sp_)
-    ep <- sp::coordinates(ep_)
+    sp <- sp[ok, , drop = FALSE]
+    ep <- ep[ok, , drop = FALSE]
     idx <- idx[ok, , drop = FALSE]
 
     # Split at mesh edges
@@ -304,30 +300,25 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     idx <- idx[line.spl$split.origin, ]
   }
 
-  sp_ <- sp::SpatialPoints(as.matrix(sp), proj4string = target_crs)
-  ep_ <- sp::SpatialPoints(as.matrix(ep), proj4string = target_crs)
+  # At this point, sp and ep are in the target_crs
 
   # Determine integration points along lines
 
   if (fm_crs_is_null(sampler_crs)) {
-    ips <- SpatialPoints((sp + ep) / 2)
+    ips <- (sp + ep) / 2
     w <- rowSums((ep - sp)^2)^0.5
   } else {
     # Has CRS
     longlat.crs <- fm_crs("longlat_globe")
     geocentric.crs <- fm_crs("sphere")
-    sp3d <- fm_transform(sp_, crs = geocentric.crs)
-    ep3d <- fm_transform(ep_, crs = geocentric.crs)
-    mp3d <- sp::SpatialPoints(
-      (coordinates(sp3d) + coordinates(ep3d)) /
-        rowSums((coordinates(sp3d) + coordinates(ep3d))^2)^0.5,
-      proj4string = fm_CRS(geocentric.crs)
-    )
+    sp3d <- fm_transform(sp, crs = geocentric.crs, crs0 = target_crs)
+    ep3d <- fm_transform(ep, crs = geocentric.crs, crs0 = target_crs)
+    mp3d <- (sp3d + ep3d) / rowSums((sp3d + ep3d)^2)^0.5
 
-    ips <- sp::coordinates(fm_transform(mp3d, crs = sampler_crs))
+    ips <- fm_transform(mp3d, crs = target_crs, crs0 = geocentric.crs)
     w <- sp::spDists(
-      coordinates(fm_transform(sp3d, crs = longlat.crs))[, 1:2, drop = FALSE],
-      coordinates(fm_transform(ep3d, crs = longlat.crs))[, 1:2, drop = FALSE],
+      fm_transform(sp3d, crs = longlat.crs, crs0 = geocentric.crs)[, 1:2, drop = FALSE],
+      fm_transform(ep3d, crs = longlat.crs, crs0 = geocentric.crs)[, 1:2, drop = FALSE],
       diagonal = TRUE, longlat = TRUE
     )
   }
@@ -351,7 +342,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   ips <- sp::SpatialPointsDataFrame(
     ips[, 1:d_ips, drop = FALSE],
     data = ips[, -(1:d_ips), drop = FALSE],
-    proj4string = sampler_crs
+    proj4string = fm_CRS(target_crs)
   )
   if (!is.null(coordnames(data))) {
     name <- coordnames(data)
@@ -360,8 +351,6 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     }
     coordnames(ips) <- name
   }
-
-  ips <- fm_transform(ips, crs = target_crs, passthrough = TRUE)
 
   # Project to mesh vertices
   if (project && !is.null(mesh)) {

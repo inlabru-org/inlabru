@@ -698,7 +698,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     data$vertex <- as.numeric(names(w.by))
 
     ret <- sp::SpatialPointsDataFrame(coords,
-      proj4string = fm_CRS(fm_crs(points)),
+      proj4string = fm_CRS(points),
       data = data,
       match.ID = FALSE
     )
