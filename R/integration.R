@@ -227,9 +227,16 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
 }
 
 
+# Arc length from Cartesian coordinates
+sphere_geodesic_length <- function(sp, ep) {
+  # Needs to get coordinates on S2 with arbitrary radius; the caller
+  # can then scale by the appropriate ellipsoid radius.
+  #   len = atan2(crossproduct(sp, ep), dotproduct(sp, ep))
+  # but check fmesher code for potentially more stable method when sp \approx ep.
+  stop("Not implemented")
+}
 
-# 2022-11-28: Currently assumes the data is Spatial and in the same coordinate
-# system as the mesh
+# 2022-11-29: Currently assumes the data is Spatial
 int.slines <- function(data, mesh, group = NULL, project = TRUE) {
   # Extract start and end coordinates
   qq <- coordinates(data)

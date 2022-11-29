@@ -15,8 +15,11 @@ tsplit.inla.mesh(mesh, n = 1)
 mesh A refined inla.mesh object
 }
 \description{
-Warning: does not reconstruct interior boundary
-Warning2: Works in euclidean coordinates. Not suitable for sphere.
+\itemize{
+\item Warning: does not reconstruct interior boundary
+\item Warning2: Works in euclidean coordinates. Not suitable for sphere.
+\item Warning3: Experimental; will be replaced by a new method
+}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}
