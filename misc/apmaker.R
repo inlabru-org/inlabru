@@ -7,7 +7,7 @@
 #' domains that are not given in the `samplers` data.frame are used, plus the
 #' coordinates object, used for the spatial aspect of the `samplers` object.
 #' @param samplers A (list of) `[sf]DataFrame` or
-#' Spatial[Points/Lines/Polygons]DataFrame object(s)
+#' `Spatial[Points/Lines/Polygons]DataFrame` object(s)
 #' @param weights The name of integration weights column in the samplers.
 #' TODO 1) how about domain? should not be allowed.
 #' 2) allow_names should be bru_weight? 23112022 Only for samplers
