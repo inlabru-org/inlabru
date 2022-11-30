@@ -97,7 +97,6 @@ Config/testthat/parallel: true
 Config/testthat/edition: 3
 Collate: 
     '0_inlabru_envir.R'
-    'apmaker.R'
     'bru.covariate.R'
     'bru.gof.R'
     'bru.inference.R'
