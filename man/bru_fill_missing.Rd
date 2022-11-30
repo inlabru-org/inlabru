@@ -10,15 +10,16 @@ bru_fill_missing(
   values,
   layer = NULL,
   selector = NULL,
-  batch_size = 500
+  batch_size = 50
 )
 }
 \arguments{
-\item{data}{A SpatialPointsDataFrame, SpatialPixelsDataFrame, or a
-SpatialGridDataFrame containg data to use for filling}
+\item{data}{A SpatialPointsDataFrame, SpatialPixelsDataFrame,
+SpatialGridDataFrame, SpatRaster, Raster, or sf object
+containing data to use for filling}
 
 \item{where}{A, matrix, data.frame, or SpatialPoints or
-SpatialPointsDataFrame, containing the locations of the evaluated values}
+SpatialPointsDataFrame, or sf object, containing the locations of the evaluated values}
 
 \item{values}{A vector of values to be filled in where \code{is.na(values)} is
 \code{TRUE}}

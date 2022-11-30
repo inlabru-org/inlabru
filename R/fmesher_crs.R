@@ -852,6 +852,28 @@ fm_crs.Spatial <- function(x, ..., crsonly = FALSE) {
 
 #' @rdname fm_crs
 #' @export
+fm_crs.SpatVector <- function(x, ..., crsonly = FALSE) {
+  tcrs <- terra::crs(x)
+  if (is.null(tcrs) || is.na(tcrs) || identical(tcrs, "")) {
+    fm_crs()
+  } else {
+    sf::st_crs(tcrs, ...)
+  }
+}
+
+#' @rdname fm_crs
+#' @export
+fm_crs.SpatRaster <- function(x, ..., crsonly = FALSE) {
+  tcrs <- terra::crs(x)
+  if (is.null(tcrs) || is.na(tcrs) || identical(tcrs, "")) {
+    fm_crs()
+  } else {
+    sf::st_crs(tcrs, ...)
+  }
+}
+
+#' @rdname fm_crs
+#' @export
 fm_crs.sf <- function(x, ..., crsonly = FALSE) {
   sf::st_crs(x, ...)
 }
