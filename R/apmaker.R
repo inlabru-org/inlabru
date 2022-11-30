@@ -37,92 +37,78 @@ apmaker <- function(domain = NULL, samplers = NULL,
     stop("Domain argument(s) missing or NULL.")
   }
 
+  # Mandate domain to be data.frame, factor, numeric, inla.mesh, inla.mesh.1d
+  if (inherits(domain, "list")) {
+    is_list_domain <- TRUE
+    # TODO do I have to index the domain that is not of the class ... or do I allow unused domain
+    if (!all(unlist(lapply(domain, function(x) {
+      inherits(
+        x,
+        c(
+          "data.frame",
+          "factor",
+          "numeric",
+          "inla.mesh.1d",
+          "inla.mesh"
+        )
+      )
+    })))) {
+      stop("Domain must be of class data.frame, factor, numeric, inla.mesh, inla.mesh.1d")
+    }
+  } else if (!inherits(
+    domain,
+    c("data.frame", "factor", "numeric", "inla.mesh.1d", "inla.mesh")
+  )) {
+    stop("Domain must be of class data.frame, factor, numeric, inla.mesh, inla.mesh.1d")
+  }
+
   # Sort multi domain samplers, single domain samplers,
   # remove sampler domains and full domain samplers
   # https://stackoverflow.com/questions/38539654/how-to-know-if-the-data-is-a-list-or-data-frame-in-r
-  if (inherits(samplers, "list") && inherits(domain, "list")) {
-    is_list <- TRUE
+  if (is_list_domain) {
+  # TODO if domain a list then it is multidomain samplers, we should then do the name check for domain and samplers here
+    multi_domain <- TRUE
+    if (inherits(samplers, "list")){
+      is_list <- TRUE
+    }
   }
-  # domain =/= list = df/inla.mesh/factor/numeric, samplers = list
-  # TODO have to check the length to determine multidomain
-  # how to
-  else if (inherits(samplers, "list") &&
-           inherits(domain,
-                    c("factor", "numeric", "inla.mesh.1d", "inla.mesh",
-                      "data.frame"))) {
-    singlesampler_int <- TRUE
-  }
-  # samplers =/= list, domain = list
-  else if (inherits(domain, "list")) {
-    multisampler_int <- TRUE
-  }
-  else {
+  else if (inherits(samplers, "list") && !is_list_domain) {
+    single_domain <- TRUE
+  } else {
     is_list <- FALSE
   }
 
   # Turn data frame into a list (standardise the input class)
-  if(inherits((domain), "data.frame")){
+  if (inherits((domain), "data.frame")) {
     domain <- as.list(domain)
   }
 
-  if(inherits((samplers), "data.frame")){
+  if (inherits((samplers), "data.frame")) {
     samplers <- as.list(samplers)
   }
 
   # multi domain sampler the main thing is data dname 23112022 specific column has that meaning
   # check sf or sp object, can do a mix of sp and sf objects,
-  # TODO if not a list, we should have to check
-  # TODO have to convert sp to sf for output if there is a mix of sp and sf
-  if (is_list) {
+  # We do not care if samplers a list or not now
     sf_samplers <- lapply(samplers, function(x) inherits(x, c("sf", "sfc")))
     sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
     if (any(sp_samplers)) {
       samplers <- lapply(samplers, sf::st_as_sf)
     }
-  }
-  # single domain samplers
-  if (singlesampler_int) {
-    sf_samplers <- lapply(samplers, function(x) inherits(x, c("sf", "sfc")))
-    sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
-    if (any(sp_samplers)) {
-      samplers <- sf::st_as_sf(samplers)
-    }
-  }
-  # multi domain sampler
-  if (multisampler_int) {
-    sf_samplers <- inherits(samplers, c("sf", "sfc"))
-    sf_domain <- lapply(domain, function(x) inherits(x, c("sf", "sfc")))
-    sp_samplers <- inherits(samplers, "Spatial")
-    sp_domain <- lapply(domain, function(x) inherits(x, "Spatial"))
-    if (sf_domain && any(sp_samplers)) {
-      samplers <- lapply(samplers, sf::st_as_sf)
-    }
-  }
 
-  # have to sort this out beforehand then this cannot happen 23112022
-  if (!is_list) {
-    sf_samplers <- inherits(samplers, c("sf", "sfc"))
-    sf_domain <- inherits(domain, c("sf", "sfc"))
-    sp_samplers <- inherits(samplers, "Spatial")
-    sp_domain <- inherits(domain, "Spatial")
-    if (sf_domain && sp_samplers) {
-      samplers <- sf::st_as_sf(samplers)
-    }
-  }
-
-# sandom function ---------------------------------------------------------
+  # sandom function ---------------------------------------------------------
   # How does sf deal with secondary geometry columns?
   # TODO ####
   # TODO have to deal with the multidomain samplers
   # https://r-spatial.github.io/sf/articles/sf6.html
   # TODO #### extra domains we assign the sampler for them
-  # TODO can use local helper function (with S3 usemethod() maybe)
+  # TODO can use local helper function (with S3 Usemethod() maybe)
   #' @param begin the beginning part of the message
   samdom <- function(x, start_with = NULL, ...) {
     UseMethod("samdom")
   }
-  samdom.list <- function(x, start_with){
-    for(i in seq_along(x)){
+  samdom.list <- function(x, start_with) {
+    for (i in seq_along(x)) {
       bru_log_message(
         paste0(
           start_with,
@@ -151,7 +137,8 @@ apmaker <- function(domain = NULL, samplers = NULL,
 
   if (sf_samplers) {
     samdom(samplers,
-           start_with = "The active geometry of the sampler")
+      start_with = "The active geometry of the sampler"
+    )
   }
 
   # Check if the names of samplers and domains match. How to establish the link
@@ -162,15 +149,15 @@ apmaker <- function(domain = NULL, samplers = NULL,
     samplers_domain <- intersect(names(samplers), names(domain))
     # TODO for the NULL name case
     samdom(samplers_domain, start_with = "\n The shared samplers and domain: \n")
-    }
-    # Domain should be more than samplers. However, we can have unused samplers as well.
-    else if (length(samplers) > length(domain)) {
-      unused_samplers <- setdiff(names(samplers), names(domain))
-      sandom(unused_samplers, start_with = "\n The unused samplers: \n")
-    } else {
-      extra_domain <- setdiff(names(samplers), names(domain))
-      samdom(extra_domain, start_with = "\n The extra domain: \n")
-    }
+  }
+  # Domain should be more than samplers. However, we can have unused samplers as well.
+  else if (length(samplers) > length(domain)) {
+    unused_samplers <- setdiff(names(samplers), names(domain))
+    sandom(unused_samplers, start_with = "\n The unused samplers: \n")
+  } else {
+    extra_domain <- setdiff(names(samplers), names(domain))
+    samdom(extra_domain, start_with = "\n The extra domain: \n")
+  }
 
 
   # TODO weights argument to take effect on samplers. The weight should go to
