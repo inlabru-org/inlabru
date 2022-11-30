@@ -45,7 +45,11 @@ apmaker <- function(domain = NULL, samplers = NULL,
   }
   # domain =/= list = df/inla.mesh/factor/numeric, samplers = list
   # TODO have to check the length to determine multidomain
-  else if (inherits(samplers, "list")) {
+  # how to
+  else if (inherits(samplers, "list") &&
+           inherits(domain,
+                    c("factor", "numeric", "inla.mesh.1d", "inla.mesh",
+                      "data.frame"))) {
     singlesampler_int <- TRUE
   }
   # samplers =/= list, domain = list
@@ -70,7 +74,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # TODO if not a list, we should have to check
   # TODO have to convert sp to sf for output if there is a mix of sp and sf
   if (is_list) {
-    sf_samplers <- lapply(samplers, function(x) inherits(x, "sf"))
+    sf_samplers <- lapply(samplers, function(x) inherits(x, c("sf", "sfc")))
     sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
     if (any(sp_samplers)) {
       samplers <- lapply(samplers, sf::st_as_sf)
@@ -78,7 +82,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
   }
   # single domain samplers
   if (singlesampler_int) {
-    sf_samplers <- lapply(samplers, function(x) inherits(x, "sf"))
+    sf_samplers <- lapply(samplers, function(x) inherits(x, c("sf", "sfc")))
     sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
     if (any(sp_samplers)) {
       samplers <- sf::st_as_sf(samplers)
@@ -86,8 +90,8 @@ apmaker <- function(domain = NULL, samplers = NULL,
   }
   # multi domain sampler
   if (multisampler_int) {
-    sf_samplers <- inherits(samplers, "sf")
-    sf_domain <- lapply(domain, function(x) inherits(x, "sf"))
+    sf_samplers <- inherits(samplers, c("sf", "sfc"))
+    sf_domain <- lapply(domain, function(x) inherits(x, c("sf", "sfc")))
     sp_samplers <- inherits(samplers, "Spatial")
     sp_domain <- lapply(domain, function(x) inherits(x, "Spatial"))
     if (sf_domain && any(sp_samplers)) {
@@ -97,8 +101,8 @@ apmaker <- function(domain = NULL, samplers = NULL,
 
   # have to sort this out beforehand then this cannot happen 23112022
   if (!is_list) {
-    sf_samplers <- inherits(samplers, "sf")
-    sf_domain <- inherits(domain, "sf")
+    sf_samplers <- inherits(samplers, c("sf", "sfc"))
+    sf_domain <- inherits(domain, c("sf", "sfc"))
     sp_samplers <- inherits(samplers, "Spatial")
     sp_domain <- inherits(domain, "Spatial")
     if (sf_domain && sp_samplers) {
@@ -167,7 +171,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
       extra_domain <- setdiff(names(samplers), names(domain))
       samdom(extra_domain, start_with = "\n The extra domain: \n")
     }
-  }
+
 
   # TODO weights argument to take effect on samplers. The weight should go to
   # the integration part
