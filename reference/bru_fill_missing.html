@@ -88,20 +88,21 @@
 <span>  <span class="va">values</span>,</span>
 <span>  layer <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  selector <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">500</span></span>
+<span>  batch_size <span class="op">=</span> <span class="fl">50</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>data</dt>
-<dd><p>A SpatialPointsDataFrame, SpatialPixelsDataFrame, or a
-SpatialGridDataFrame containg data to use for filling</p></dd>
+<dd><p>A SpatialPointsDataFrame, SpatialPixelsDataFrame,
+SpatialGridDataFrame, SpatRaster, Raster, or sf object
+containing data to use for filling</p></dd>
 
 
 <dt>where</dt>
 <dd><p>A, matrix, data.frame, or SpatialPoints or
-SpatialPointsDataFrame, containing the locations of the evaluated values</p></dd>
+SpatialPointsDataFrame, or sf object, containing the locations of the evaluated values</p></dd>
 
 
 <dt>values</dt>

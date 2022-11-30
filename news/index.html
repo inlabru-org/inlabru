@@ -78,9 +78,16 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
 <div class="section level3">
-<h3 id="features-development-version">Features<a class="anchor" aria-label="anchor" href="#features-development-version"></a></h3>
+<h3 id="feature-overview-development-version">Feature overview<a class="anchor" aria-label="anchor" href="#feature-overview-development-version"></a></h3>
+<ul><li><p>Added support for <code>sf</code> and <code>terra</code> inputs to most methods</p></li>
+<li><p>Expanded geometry and mesh handling methods</p></li>
+<li><p>Expanded <code>bru_mapper</code> system</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="feature-details-development-version">Feature details<a class="anchor" aria-label="anchor" href="#feature-details-development-version"></a></h3>
 <ul><li><p>Allow <code>NA</code> input for default 1D mappers to generate effect zero, like in <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code>.</p></li>
-<li><p>New and expanded methods <code>fm_crs</code>, <code>fm_CRS</code>, <code>fm_transform</code>, <code>fm_ellipsoid_radius</code>, and <code>fm_length_unit</code> to further support <code>sf</code> objects.</p></li>
+<li><p>New and expanded methods <code>fm_crs</code>, <code>fm_CRS</code>, <code>fm_transform</code>, <code>fm_ellipsoid_radius</code>, and <code>fm_length_unit</code> to further support <code>sf</code> objects. The <code>fm_crs</code> extraction method also supports <code>terra</code>.</p></li>
+<li><p><code>bru_fill_missing</code> now supports <code>terra</code> <code>SpatRaster</code> data and and <code>sf</code> locations.</p></li>
 <li><p>New experimental methods <code>fm_evaluator</code> and <code>fm_evaluate</code>, replacing the <code>INLA</code> <code>inla.mesh.projector</code> and <code>inla.mesh.project</code> methods.</p></li>
 <li><p>Experimental integration support for sphere and globe meshes.</p></li>
 <li><p>Allow <code>sf</code> input to <code>family="cp"</code> models.</p></li>
@@ -91,14 +98,16 @@
 <li><p>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_aggregate()</a></code> and <code><a href="../reference/bru_mapper.html">bru_mapper_logsumexp()</a></code>, used for blockwise weighted sums and log-sum-exp mappings, <code>output[k] = sum(weights[block==k]*state[block==k])))</code> and <code>output[k] = log(sum(weights[block==k]*exp(state[block==k])))</code>, with optional weight normalisation within each block. Allows providing the weights as log-weights, and uses block-wise shifts to avoid potential overflow.</p></li>
 <li><p><code>summary</code> methods for <code>bru_mapper</code> objects</p></li>
 <li><p>Removed <code>methods</code> argument from <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code>. Implementations should register S3 methods instead.</p></li>
-<li><p>Add <code>indexed</code> logical option to <code><a href="../reference/bru_mapper.html">bru_mapper_factor()</a></code>, to allow factor inputs to be mapped to index values, as needed for <code>group</code> and <code>replicate</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/174" class="external-link">#174</a></p></li>
 </ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p>Remove unused <code>spatstat.core</code> dependency. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/165" class="external-link">#165</a></p></li>
 <li><p>Fixed issue with plain mapper evaluation in the <code>ibm_eval.default</code> and <code>ibm_eval.bru_mapper_collect</code> methods, where they would return zeros instead of the intended values. The main component evaluation and estimation code was not directly affected as that is based on the <code>bru_mapper_multi</code> class methods that rely on the Jacobians instead. The bug would therefore mainly have impacted the future, not yet supported nonlinear mapper extensions.</p></li>
-<li><p>Fix for eval_spatial.SpatRaster; Work around inconsistent logic in <code>terra::extract(..., layer)</code> when <code>length(layer)==1</code> or <code>nrow(where)==1</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/169" class="external-link">#169</a></p></li>
+<li>
+<p>Fix for <code>eval_spatial.SpatRaster</code>; Work around inconsistent logic in <code>terra::extract(..., layer)</code> when <code>length(layer)==1</code> or <code>nrow(where)==1</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/169" class="external-link">#169</a></p>
+<ul><li>Add <code>indexed</code> logical option to <code><a href="../reference/bru_mapper.html">bru_mapper_factor()</a></code>, to allow factor inputs to be mapped to index values, as needed for <code>group</code> and <code>replicate</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/174" class="external-link">#174</a></li>
+</ul></li>
 </ul></div>
 </div>
     <div class="section level2">
