@@ -36,7 +36,7 @@ $A_c(\text{input})$ is a _component model matrix_. This matrix depends on the co
 inputs (covariates, index information, etc) from `main`, `group`, `replicate`, and `weights`
 in the component definition.
 
-The wider scope of component definitions is discussed in the [component vignette](http://inlabru-org.github.io/inlabru/articles/component.html). Here, we
+The wider scope of component definitions is discussed in the [component vignette](https://inlabru-org.github.io/inlabru/articles/component.html). Here, we
 will focus on the mapper system itself, how the basic building blocks are used to
 construct the built-in mappers, and finally how to construct new mappers.
 
