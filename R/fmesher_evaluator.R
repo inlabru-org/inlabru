@@ -61,7 +61,7 @@ fm_evaluate.inla.mesh <- function(mesh, field, ...) {
 
 #' @export
 #' @rdname fm_evaluate
-fm_evaluate.inla.mesh.1d <- function(mesh, field = NULL, ...) {
+fm_evaluate.inla.mesh.1d <- function(mesh, field, ...) {
   stopifnot(!missing(field) && !is.null(field))
 
   proj <- fm_evaluator(mesh, ...)

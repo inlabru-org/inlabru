@@ -147,13 +147,13 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
 #' }
 #' }
 #'
-spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(NA_character_), to.crs = NULL) {
-  po <- Polygon(data[, cols], hole = FALSE)
-  pos <- Polygons(list(po), ID = "tmp")
-  predpoly <- SpatialPolygons(list(pos), proj4string = crs)
+spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NULL) {
+  po <- sp::Polygon(data[, cols], hole = FALSE)
+  pos <- sp::Polygons(list(po), ID = "tmp")
+  predpoly <- sp::SpatialPolygons(list(pos), proj4string = crs)
   df <- data.frame(weight = 1)
   rownames(df) <- "tmp"
-  spoly <- SpatialPolygonsDataFrame(predpoly, data = df)
+  spoly <- sp::SpatialPolygonsDataFrame(predpoly, data = df)
 
   # If requested, change CRS
   if (!is.null(to.crs)) spoly <- fm_transform(spoly, to.crs)

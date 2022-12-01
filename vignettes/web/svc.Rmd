@@ -434,7 +434,7 @@ res <- bru(svc_components,
   ),
   options = list(
     inla.mode = "experimental",
-    control.compute = list(waic = TRUE, cpo = TRUE, config = TRUE),
+    control.compute = list(waic = TRUE, cpo = TRUE),
     control.inla = list(strategy = "simplified.laplace", int.strategy = "eb"),
     verbose = FALSE
   )
@@ -491,7 +491,7 @@ ylim <- range(hull$loc[, 2])
 grd_dims <- round(c(x = diff(range(xlim)), y = diff(range(ylim))) / 25)
 
 # make mesh projector to get model summaries from the mesh to the mapping grid
-mesh_proj <- inla.mesh.projector(
+mesh_proj <- fm_evaluator(
   mesh,
   xlim = xlim, ylim = ylim, dims = grd_dims
 )
@@ -527,7 +527,7 @@ taus <- data.frame(
 # loop to get estimates on a mapping grid
 pred_grids <- lapply(
   list(alpha = alph, epsilon = epsi, tau = taus),
-  function(x) as.matrix(inla.mesh.project(mesh_proj, x))
+  function(x) as.matrix(fm_evaluate(mesh_proj, x))
 )
 
 # make a raster stack with the posterior median and range95
