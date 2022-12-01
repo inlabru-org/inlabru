@@ -283,10 +283,11 @@ classDiagram
         bru_int_polygon(domain, polylist = poly_segm,
           method = int.args$method, nsub = int.args$nsub2,
           samplers = samplers)
-    }   
+    }
 ',
   width = 2000,
-  height = 1200)
+  height = 1200
+)
 ```
 
 Flow diagram for new integration scheme construction
@@ -319,7 +320,7 @@ subgraph "multi sampler"
   ipoints_domainwise["compute ips
 for each domain"] -->
   ipoints_single_rowwise
-  
+
   ips_domain_list[("ips
 for each domain")] -->
   cprod_row["cprod within
@@ -340,6 +341,7 @@ single_sampler_ips --> ips_domain_list
 
 ips_list --> cprod_joint[cprod] --> joint_ips([joint ips])
 ',
-width = 900,
-height = 1200)
+  width = 900,
+  height = 1200
+)
 ```
