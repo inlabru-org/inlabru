@@ -385,8 +385,10 @@ bru_fill_missing <- function(data, where, values,
   if (inherits(data, "SpatRaster")) {
     data_values <- as.vector(terra::values(data[[layer]]))
     data_coord <- as.data.frame(terra::crds(data))
-    data_coord <- sf::st_as_sf(data_coord, coords = seq_len(ncol(data_coord)),
-                               crs = data_crs)
+    data_coord <- sf::st_as_sf(data_coord,
+      coords = seq_len(ncol(data_coord)),
+      crs = data_crs
+    )
   } else {
     data_values <- data[[layer]]
     data_coord <- data
