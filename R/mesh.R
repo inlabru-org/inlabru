@@ -1,7 +1,3 @@
-# Needed for registering S4 methods, e.g. vertices()
-setClass("inla.mesh")
-
-
 # GENERICS
 # refine = function(...) {UseMethod("refine")}
 # tsplit = function(...) {UseMethod("tsplit")}
@@ -78,25 +74,6 @@ is.inside.polygon <- function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = T
   }
 }
 
-#' Vertices
-#'
-#' This is a generic function. The outcome depends on the `object` provided
-#'
-#' @name vertices
-#' @exportMethod vertices
-#' @param object An object for which to call the particular vertices method.
-#' @return The form of the value returned by vertices() depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
-
-setGeneric("vertices", valueClass = "SpatialPointsDataFrame", function(object) {
-  standardGeneric("vertices")
-})
-
-#' Vertices
-#'
-#' @rdname vertices
-setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mesh(object))
-
-
 #' @title Extract vertex locations from an `inla.mesh`
 #'
 #' @description Converts the vertices of an `inla.mesh` object into a `SpatialPointsDataFrame`.
@@ -112,7 +89,7 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #' \donttest{
 #' if (require(ggplot2, quietly = TRUE)) {
 #'   data("mrsea", package = "inlabru")
-#'   vrt <- vertices(mrsea$mesh)
+#'   vrt <- vertices.inla.mesh(mrsea$mesh)
 #'   ggplot() +
 #'     gg(mrsea$mesh) +
 #'     gg(vrt, color = "red")

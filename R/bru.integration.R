@@ -325,7 +325,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
     }
 
-    ips <- vertices(domain)
+    ips <- vertices.inla.mesh(domain)
     ips$weight <- INLA::inla.mesh.fem(domain, order = 1)$va
 
     # backtransform
@@ -708,7 +708,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     # and set their projected data according to `fill`
 
     if (!is.null(fill)) {
-      vrt <- vertices(mesh)
+      vrt <- vertices.inla.mesh(mesh)
       vrt <- vrt[setdiff(vrt$vertex, data$vertex), ]
       if (nrow(vrt) > 0) {
         for (nm in setdiff(names(data), "vertex")) vrt[[nm]] <- fill
