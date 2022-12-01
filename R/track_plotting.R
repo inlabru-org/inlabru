@@ -6,6 +6,26 @@
 #' @importFrom rlang .env
 #' @import patchwork
 
+#' @title Plot inlabru convergence diagnostics
+#'
+#' @description
+#' Draws four panels of convergence diagnostics for an iterated INLA method
+#' estimation
+#'
+#' @param x a [bru] object, typically a result from [bru()] for a nonlinear
+#' predictor model
+#' @export
+#' @examples
+#' \dontrun{
+#'    fit <- bru(...)
+#'    bru_convergence_plot(fit)
+#' }
+bru_convergence_plot <- function(x) {
+  stopifnot(inherits(x, "bru"))
+  make_track_plots(x)[["default"]]
+}
+
+
 make_track_plots <- function(fit) {
   if (!requireNamespace("dplyr", quietly = TRUE) ||
     !requireNamespace("ggplot2", quietly = TRUE) ||

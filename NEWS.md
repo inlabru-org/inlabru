@@ -8,6 +8,8 @@
 
 * Expanded `bru_mapper` system
 
+* Added convergence diagnostics plot with `bru_convergence_plot()`
+
 ## Feature details
 
 * Allow `NA` input for default 1D mappers to generate effect zero, like
@@ -15,7 +17,7 @@
   
 * New and expanded methods `fm_crs`, `fm_CRS`, `fm_transform`,
   `fm_ellipsoid_radius`, and `fm_length_unit` to further support `sf` objects.
-  The `fm_crs` extraction method also supports `terra`.
+  The `fm_crs` extraction method also supports `terra` objects.
 
 * `bru_fill_missing` now supports `terra` `SpatRaster` data and and `sf` locations.
   
