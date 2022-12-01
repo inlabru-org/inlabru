@@ -103,8 +103,8 @@ import.mexdolphin <- function() {
   target_crs <- sp::CRS(target.p4s)
 
   # Units to km
-  mexdolphin$points <- sp::spTransform(mexdolphin$points, CRSobj = target_crs)
-  mexdolphin$samplers <- sp::spTransform(mexdolphin$samplers, CRSobj = target_crs)
+  mexdolphin$points <- fm_transform(mexdolphin$points, crs = target_crs)
+  mexdolphin$samplers <- fm_transform(mexdolphin$samplers, crs = target_crs)
   mexdolphin$points$distance <- mexdolphin$points$distance / 1000
   mexdolphin$points$Effort <- mexdolphin$points$Effort / 1000
   mexdolphin$points$mid.x <- mexdolphin$points$mid.x / 1000
@@ -201,7 +201,7 @@ import.mexdolphin <- function() {
     data = mexdolphins$preddata[, "depth", drop = FALSE],
     proj4string = data_crs
   )
-  mexdolphin$depth <- sp::spTransform(depth, target_crs)
+  mexdolphin$depth <- fm_transform(depth, target_crs)
 
   # return
   mexdolphin

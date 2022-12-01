@@ -7,14 +7,18 @@
 \alias{print.fm_crs}
 \alias{fm_crs.default}
 \alias{st_crs.fm_crs}
+\alias{$.fm_crs}
 \alias{fm_crs.fm_crs}
 \alias{fm_crs.inla.CRS}
 \alias{fm_crs.character}
 \alias{fm_crs.Spatial}
+\alias{fm_crs.SpatVector}
+\alias{fm_crs.SpatRaster}
 \alias{fm_crs.sf}
 \alias{fm_crs.sfc}
 \alias{fm_crs.sfg}
 \alias{fm_crs.inla.mesh}
+\alias{fm_crs.inla.mesh.lattice}
 \alias{fm_crs.inla.mesh.segment}
 \alias{fm_wkt_predef}
 \title{Obtain coordinate reference system object}
@@ -31,6 +35,8 @@ fm_crs_oblique(x) <- value
 
 st_crs.fm_crs(x, ...)
 
+\method{$}{fm_crs}(x, name)
+
 \method{fm_crs}{fm_crs}(x, ..., crsonly = FALSE)
 
 \method{fm_crs}{inla.CRS}(x, ..., crsonly = FALSE)
@@ -39,6 +45,10 @@ st_crs.fm_crs(x, ...)
 
 \method{fm_crs}{Spatial}(x, ..., crsonly = FALSE)
 
+\method{fm_crs}{SpatVector}(x, ..., crsonly = FALSE)
+
+\method{fm_crs}{SpatRaster}(x, ..., crsonly = FALSE)
+
 \method{fm_crs}{sf}(x, ..., crsonly = FALSE)
 
 \method{fm_crs}{sfc}(x, ..., crsonly = FALSE)
@@ -46,6 +56,8 @@ st_crs.fm_crs(x, ...)
 \method{fm_crs}{sfg}(x, ..., crsonly = FALSE)
 
 \method{fm_crs}{inla.mesh}(x, ..., crsonly = FALSE)
+
+\method{fm_crs}{inla.mesh.lattice}(x, ..., crsonly = FALSE)
 
 \method{fm_crs}{inla.mesh.segment}(x, ..., crsonly = FALSE)
 
@@ -58,12 +70,15 @@ predefined \code{wkt} string from ``names(fm_wkt_predef())`.}
 
 \item{\dots}{Additional parameters. Not currently in use.}
 
-\item{crsonly}{logical; if \code{TRUE}, remove any oblique\verb{information for}fm_crs\verb{class objects and return a pure}crs\verb{class object. Default:}FALSE`.}
+\item{crsonly}{logical; if \code{TRUE}, remove any \code{oblique} information
+for \code{fm_crs} class objects and return a pure \code{crs} class object. Default: \code{FALSE}.}
 
 \item{value}{Vector of length at most 4 of rotation angles (in degrees)
 for an oblique projection, all values defaulting to zero. The values
 indicate (longitude, latitude, orientation, orbit), as explained in the
 Details section below.}
+
+\item{name}{element name}
 }
 \value{
 Either an \code{sf::crs} object or an \code{fm_crs} object,
@@ -104,6 +119,13 @@ the projection.
 When \code{oblique[2]} or \code{oblique[3]} are non-zero, the resulting
 projection is only correct for perfect spheres.
 }
+\section{Methods (by generic)}{
+\itemize{
+\item \code{$}: For a \code{fm_crs} object \code{x}, \code{x$name} calls the accessor method for the
+\code{crs} object inside it. If \code{name} is "crs", the internal crs object itself is returned.
+If \code{name} is "oblique", the internal oblique angle parameter vector is returned.
+
+}}
 \section{Functions}{
 \itemize{
 \item \code{st_crs.fm_crs()}: \code{st_crs(x, ...)} is equivalent to \code{fm_crs(x, ..., crsonly = TRUE)}
@@ -122,7 +144,7 @@ names(fm_wkt_predef())
 }
 }
 \seealso{
-\code{\link[sf:st_crs]{sf::st_crs()}}, \code{\link{fm_crs_wkt}},
+\code{\link[sf:st_crs]{sf::st_crs()}}, \code{\link{fm_crs_wkt}}
 }
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}

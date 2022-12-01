@@ -712,7 +712,7 @@ fm_length_unit.character <- function(x) {
 #' @returns A `crs` object ([sf::st_crs()]) or a `fm_crs` object.
 #' An S3 `fm_crs` object is a list with elements `crs` and `oblique`.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @seealso [sf::st_crs()], [`fm_crs_wkt`],
+#' @seealso [sf::st_crs()], [`fm_crs_wkt`]
 #' @examples
 #' crs1 <- fm_crs("longlat_globe")
 #' crs2 <- fm_crs("lambert_globe")
@@ -747,6 +747,10 @@ fm_crs_oblique <- function(x) {
     }
   } else {
     if (!inherits(x, "fm_crs")) {
+      stopifnot(is.vector(value))
+      if (length(value) < 4) {
+        value <- c(value, rep(0, 4 - length(value)))
+      }
       x <- list(crs = x, oblique = value)
       class(x) <- "fm_crs"
     }
@@ -757,8 +761,8 @@ fm_crs_oblique <- function(x) {
 #' @export
 #' @rdname fm_crs
 print.fm_crs <- function(x, ...) {
-  print(x$crs)
-  cat(paste0("Oblique: c(", paste0(x$oblique, collapse = ", "), ")\n"))
+  print(x[["crs"]])
+  cat(paste0("Oblique: c(", paste0(x[["oblique"]], collapse = ", "), ")\n"))
 }
 
 
@@ -781,8 +785,25 @@ st_crs.fm_crs <- function(x, ...) {
   fm_crs(x, ..., crsonly = TRUE)
 }
 
+#' @rawNamespace if (getRversion() >= "3.6.0") {
+#'   S3method("$", fm_crs)
+#' }
+#' @describeIn fm_crs For a `fm_crs` object `x`, `x$name` calls the accessor method for the
+#' `crs` object inside it. If `name` is "crs", the internal crs object itself is returned.
+#' If `name` is "oblique", the internal oblique angle parameter vector is returned.
+#' @param name element name
+`$.fm_crs` <- function(x, name) {
+  if (name %in% c("crs", "oblique")) {
+    x[[name]]
+  } else {
+    eval(parse(text = paste0('x[["crs"]]$', name)))
+  }
+}
+
+
+
 #' @export
-#' @param crsonly logical; if `TRUE`, remove any oblique` information
+#' @param crsonly logical; if `TRUE`, remove any `oblique` information
 #' for `fm_crs` class objects and return a pure `crs` class object. Default: `FALSE`.
 #' @rdname fm_crs
 fm_crs.fm_crs <- function(x, ..., crsonly = FALSE) {
@@ -831,6 +852,28 @@ fm_crs.Spatial <- function(x, ..., crsonly = FALSE) {
 
 #' @rdname fm_crs
 #' @export
+fm_crs.SpatVector <- function(x, ..., crsonly = FALSE) {
+  tcrs <- terra::crs(x)
+  if (is.null(tcrs) || is.na(tcrs) || identical(tcrs, "")) {
+    fm_crs()
+  } else {
+    sf::st_crs(tcrs, ...)
+  }
+}
+
+#' @rdname fm_crs
+#' @export
+fm_crs.SpatRaster <- function(x, ..., crsonly = FALSE) {
+  tcrs <- terra::crs(x)
+  if (is.null(tcrs) || is.na(tcrs) || identical(tcrs, "")) {
+    fm_crs()
+  } else {
+    sf::st_crs(tcrs, ...)
+  }
+}
+
+#' @rdname fm_crs
+#' @export
 fm_crs.sf <- function(x, ..., crsonly = FALSE) {
   sf::st_crs(x, ...)
 }
@@ -850,6 +893,12 @@ fm_crs.sfg <- function(x, ..., crsonly = FALSE) {
 #' @rdname fm_crs
 #' @export
 fm_crs.inla.mesh <- function(x, ..., crsonly = FALSE) {
+  fm_crs(x[["crs"]], ..., crsonly = crsonly)
+}
+
+#' @rdname fm_crs
+#' @export
+fm_crs.inla.mesh.lattice <- function(x, ..., crsonly = FALSE) {
   fm_crs(x[["crs"]], ..., crsonly = crsonly)
 }
 
@@ -950,15 +999,86 @@ fm_CRS <- function(...) {
 }
 
 #' @export
+#' @param x Object to convert to CRS or to extract CRS information from.
 #' @rdname fm_CRS_sp
-fm_CRS.crs <- function(...) {
-  fm_as_sp_crs(...)
+fm_CRS.crs <- function(x, ...) {
+  fm_as_sp_crs(x, ...)
 }
 
 #' @export
 #' @rdname fm_CRS_sp
-fm_CRS.fm_crs <- function(...) {
-  fm_as_sp_crs(...)
+fm_CRS.fm_crs <- function(x, ...) {
+  fm_as_sp_crs(x, ...)
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.Spatial <- function(x, ...) {
+  fm_sp_get_crs(x, ...)
+}
+
+#' @rdname fm_CRS_sp
+#' @param crsonly logical; if `TRUE`, remove any oblique` information
+#' for `inla.CRS` class objects and return a pure `CRS` class object.
+#' Default: `FALSE`.
+#' @export
+fm_CRS.inla.CRS <- function(x, ..., crsonly = FALSE) {
+  y <- x[["crs"]]
+  if (crsonly) {
+    y <- y[["crs"]]
+  }
+  y
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.sf <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(sf::st_crs(x, ...))
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.sfc <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(sf::st_crs(x, ...))
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.sfg <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(sf::st_crs(x, ...))
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.inla.mesh <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(x[["crs"]], ..., crsonly = crsonly)
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.inla.mesh.lattice <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(x[["crs"]], ..., crsonly = crsonly)
+}
+
+#' @rdname fm_CRS_sp
+#' @export
+fm_CRS.inla.segment <- function(x, ..., crsonly = FALSE) {
+  fm_CRS(x[["crs"]], ..., crsonly = crsonly)
+}
+
+#' @export
+#' @rdname fm_CRS_sp
+fm_CRS.CRS <- function(x, oblique = NULL,
+                       ...) {
+  if (!is.null(oblique)) {
+    stopifnot(is.vector(oblique))
+    if (length(oblique) < 4) {
+      oblique <- c(oblique, rep(0, 4 - length(oblique)))
+    }
+    x <- list(crs = x, oblique = oblique)
+    class(x) <- "inla.CRS"
+  }
+  x
 }
 
 #' @export
@@ -1731,15 +1851,29 @@ fm_transform_raw <- function(x, from, to) {
     x
   }
 
+  adjust_output <- function(x, crs) {
+    if (!fm_crs_is_geocent(crs) &&
+      ncol(x) == 3) {
+      if (nrow(x) > 0) {
+        x <- x[, 1:2, drop = FALSE]
+      } else {
+        x <- matrix(0, 0, 2)
+      }
+    }
+    x
+  }
+
   x <- adjust_input(x, crs = to)
   if (nrow(x) == 0) {
     x
   } else {
-    sf::sf_project(
+    y <- sf::sf_project(
       pts = x,
       from = from,
-      to = to
+      to = to,
+      keep = TRUE
     )
+    adjust_output(y, to)
   }
 }
 
@@ -1749,12 +1883,12 @@ fm_transform_raw <- function(x, from, to) {
 fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = NULL) {
   crs1 <- fm_crs(crs)
   crs0 <- fm_crs(crs0)
-  if (is.na(crs0) || is.na(crs1)) {
+  if (fm_crs_is_null(crs0) || fm_crs_is_null(crs1)) {
     if (!passthrough) {
-      if (is.na(crs0)) {
+      if (fm_crs_is_null(crs0)) {
         stop("'crs0' is an invalid coordinate reference object.")
       }
-      if (is.na(crs1)) {
+      if (fm_crs_is_null(crs1)) {
         stop("'crs' is an invalid coordinate reference object.")
       }
     }
@@ -1776,7 +1910,7 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
   is_geocentric_0 <- fm_crs_is_geocent(crs0)
   is_geocentric_1 <- fm_crs_is_geocent(crs1)
   if (is_geocentric_0) {
-    ok <- TRUE
+    ok <- rep(TRUE, nrow(x))
   } else {
     bounds <- fm_crs_bounds(crs0)
     if (identical(fm_crs_projection_type(crs0), "longlat")) {
@@ -1805,9 +1939,9 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
           from = current_crs,
           to = longlat_0
         )
+        # x can now be treated as being in longlat_norm coordinates
+        current_crs <- longlat_norm
       }
-      # x can now be treated as being in longlat_norm coordinates
-      current_crs <- longlat_norm
       x <- fm_transform_raw(
         x,
         from = current_crs,
@@ -1859,8 +1993,8 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
 #' @rdname fm_transform
 #' @export
 fm_transform.list <- function(x, crs = fm_crs(x), ...) {
-  if (!is.null(crs)) {
-    x <- lapply(x, function(xx) fm_transform(xx))
+  if (!fm_crs_is_null(crs)) {
+    x <- lapply(x, function(xx) fm_transform(xx, crs = crs, ...))
   }
   x
 }
@@ -1870,12 +2004,12 @@ fm_transform.list <- function(x, crs = fm_crs(x), ...) {
 fm_transform_sf <- function(x, crs, ..., passthrough) {
   crs1 <- fm_crs(crs)
   crs0 <- fm_crs(x)
-  if (is.na(crs0) || is.na(crs1)) {
+  if (fm_crs_is_null(crs0) || fm_crs_is_null(crs1)) {
     if (!passthrough) {
-      if (is.na(crs0)) {
+      if (fm_crs_is_null(crs0)) {
         stop("'crs0' is an invalid coordinate reference object.")
       }
-      if (is.na(crs1)) {
+      if (fm_crs_is_null(crs1)) {
         stop("'crs' is an invalid coordinate reference object.")
       }
     }
@@ -1907,7 +2041,7 @@ fm_transform_sf <- function(x, crs, ..., passthrough) {
       do.call(sf::st_sfc, c(
         lapply(
           seq_len(nrow(coord)),
-          function(k) sf::st_point(coord[k, ], dim = the_dim)
+          function(k) sf::st_point(coord[k, , drop = FALSE], dim = the_dim)
         ),
         list(crs = sf::st_crs(crs1))
       ))
@@ -1938,8 +2072,19 @@ fm_transform.sfg <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
 #' @export
 #' @rdname fm_transform
 fm_transform.Spatial <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
-  # TODO: preserve coordinate names
-  as(fm_transform(sf::st_as_sf(x), crs = crs, ..., passthrough = passthrough), "Spatial")
+  orig_class <- class(x)
+  as(
+    as(
+      fm_transform(
+        sf::st_as_sf(x),
+        crs = crs,
+        ...,
+        passthrough = passthrough
+      ),
+      "Spatial"
+    ),
+    orig_class[1]
+  )
 }
 
 
@@ -1955,27 +2100,34 @@ fm_crs_detect_manifold <- function(crs) {
 
 #' @export
 #' @rdname fm_transform
-fm_transform.inla.mesh <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
-  x$loc <- fm_transform(x$loc, crs0 = x$crs, crs = crs, ..., passthrough = passthrough)
+fm_transform.inla.mesh <- function(x, ...,
+                                   crs = fm_crs(x),
+                                   passthrough = FALSE,
+                                   crs0 = fm_crs(x)) {
+  x$loc <- fm_transform(x$loc, crs = crs, ..., crs0 = x$crs, passthrough = passthrough)
   x$manifold <- fm_crs_detect_manifold(crs)
-  x$crs <- fm_as_sp_crs(crs)
+  x$crs <- fm_CRS(crs)
   x
 }
 
 #' @export
 #' @rdname fm_transform
-fm_transform.inla.mesh.lattice <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
-  x$segm <- fm_transform(x$segm, crs = crs, ..., passthrough = passthrough)
-  x$loc <- fm_transform(x$loc, csr0 = x$crs, csr = crs, ..., passthrough = passthrough)
-  x$crs <- fm_as_sp_crs(crs)
+fm_transform.inla.mesh.lattice <- function(x,
+                                           crs = fm_crs(x),
+                                           ...,
+                                           passthrough = FALSE,
+                                           crs0 = fm_crs(x)) {
+  x$segm <- fm_transform(x$segm, crs = crs, crs0 = x$crs, ..., passthrough = passthrough)
+  x$loc <- fm_transform(x$loc, crs = crs, crs0 = x$crs, ..., passthrough = passthrough)
+  x$crs <- fm_CRS(crs)
   invisible(x)
 }
 
 #' @export
 #' @rdname fm_transform
 fm_transform.inla.mesh.segment <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
-  x$loc <- fm_transform(x$loc, crs0 = x$crs, crs = crs, ..., passthrough = passthrough)
-  x$crs <- fm_as_sp_crs(crs)
+  x$loc <- fm_transform(x$loc, crs = crs, crs0 = x$crs, ..., passthrough = passthrough)
+  x$crs <- fm_CRS(crs)
   invisible(x)
 }
 

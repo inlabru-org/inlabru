@@ -71,7 +71,7 @@ test_that("sf gorillas lgcp vignette", {
   ips_sp <- ipoints(gorillas$boundary, mesh_sf)
   ips_sf <- ipoints(gorillas_sf$boundary, mesh_sf)
 
-  expect_equal(ips_sp, ips_sf)
+  expect_equal(ips_sp$weight, ips_sf$weight)
 
   fit <- lgcp(
     cmp,

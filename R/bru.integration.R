@@ -48,7 +48,7 @@
 #' * an `inla.mesh.2d` object for continuous 2D integration.
 #' @param name Character array stating the name of the domains dimension(s).
 #' If `NULL`, the names are taken from coordinate names from `samplers` for
-#' `Spatial*` objects, otherwise "x", "y", "coordinateZ" for 2D regions and
+#' `Spatial*` objects, otherwise "x", "y", "z" for 2D regions and
 #' `"x"` for 1D regions
 #' @param group Column names of the `samplers` object (if applicable) for which
 #' the integration points are calculated independently and not merged when
@@ -154,7 +154,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     samplers <- NULL
   }
 
-  if (inherits(samplers, c("sf", "sfc"))) {
+  samplers_is_sf <- inherits(samplers, c("sf", "sfc"))
+  if (samplers_is_sf) {
     samplers <- as(samplers, "Spatial")
   }
 
@@ -313,7 +314,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   } else if (inherits(domain, "inla.mesh") &&
     is.null(samplers) &&
     identical(int.args[["method"]], "stable")) {
-    coord_names <- c("x", "y", "coordinateZ")
+    coord_names <- c("x", "y", "z")
     if (!is.null(name)) {
       coord_names[seq_along(name)] <- name
     }
@@ -365,7 +366,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       project = identical(int.args[["method"]], "stable")
     )
 
-    coord_names <- c("x", "y", "coordinateZ")
+    coord_names <- c("x", "y", "z")
     if (!is.null(coordnames(samplers))) {
       coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
     } else if (!is.null(name)) {
@@ -446,7 +447,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       )
     } else {
       if (!is.null(int.args$use_new) && !int.args$use_new) {
-        ips <- bru_int_polygon(
+        ips <- bru_int_polygon_old(
           domain,
           polylist = poly_segm,
           method = int.args$method,
@@ -455,7 +456,6 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       } else {
         ips <- bru_int_polygon(
           domain,
-          polylist = poly_segm,
           method = int.args$method,
           nsub = int.args$nsub2,
           samplers = samplers
@@ -468,13 +468,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers@data[ips$group, group, drop = FALSE],
       weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
     )
-    if (is.null(ips$coordinateZ)) {
-      ips <- SpatialPointsDataFrame(ips[, c("x", "y")],
+    if (is.null(ips$z)) {
+      ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y")],
         data = df,
         match.ID = FALSE, proj4string = domain_crs
       )
     } else {
-      ips <- SpatialPointsDataFrame(ips[, c("x", "y", "coordinateZ")],
+      ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y", "z")],
         data = df,
         match.ID = FALSE, proj4string = domain_crs
       )
@@ -484,7 +484,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       ips <- fm_transform(ips, crs = samplers_crs)
     }
 
-    coord_names <- c("x", "y", "coordinateZ")
+    coord_names <- c("x", "y", "z")
     if (!is.null(coordnames(samplers))) {
       coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
     } else if (!is.null(name)) {
@@ -493,6 +493,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else {
     stop("No integration handling code reached; please notify the package developer.")
+  }
+
+  if (samplers_is_sf && inherits(ips, "Spatial")) {
+    ips <- sf::st_as_sf(ips)
   }
 
   ips
@@ -676,21 +680,25 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
   if (is.null(group) || (length(group) == 0)) {
     res <- INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
     tri <- res$p2m.t
+    ok <- tri > 0
+    if (any(!ok)) {
+      warning("Some integration points were outside the mesh; check your coordinate systems.")
+    }
 
     data <- list()
     for (k in seq_along(columns)) {
       cn <- columns[k]
-      nw <- points@data[, columns] * res$p2m.b
-      w.by <- by(as.vector(nw), as.vector(mesh$graph$tv[tri, ]), sum, simplify = TRUE)
+      nw <- points@data[ok, cn] * res$p2m.b[ok, , drop = FALSE]
+      w.by <- by(as.vector(nw), as.vector(mesh$graph$tv[tri[ok], ]), sum, simplify = TRUE)
       data[[cn]] <- as.vector(w.by)
     }
 
     data <- data.frame(data)
-    coords <- mesh$loc[as.numeric(names(w.by)), , drop = FALSE]
+    coords <- mesh$loc[as.numeric(names(w.by)), seq_along(coordnames(points)), drop = FALSE]
     data$vertex <- as.numeric(names(w.by))
 
-    ret <- SpatialPointsDataFrame(coords,
-      proj4string = fm_sp_get_crs(points),
+    ret <- sp::SpatialPointsDataFrame(coords,
+      proj4string = fm_CRS(points),
       data = data,
       match.ID = FALSE
     )

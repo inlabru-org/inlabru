@@ -94,7 +94,7 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
     object <- ll
   }
 
-  object <- fm_spTransform(object, CRSobj = fm_CRS("sphere"))
+  object <- fm_transform(object, crs = fm_crs("sphere"))
   cc <- coordinates(object)
   requireNamespace("rgl")
   rgl::rgl.points(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
@@ -129,8 +129,8 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
   proj4string(sp) <- fm_sp_get_crs(object)
   proj4string(ep) <- fm_sp_get_crs(object)
 
-  sp <- fm_spTransform(sp, CRSobj = fm_CRS("sphere"))
-  ep <- fm_spTransform(ep, CRSobj = fm_CRS("sphere"))
+  sp <- fm_transform(sp, crs = fm_crs("sphere"))
+  ep <- fm_transform(ep, crs = fm_crs("sphere"))
 
   cs <- coordinates(sp)
   ce <- coordinates(ep)
@@ -169,7 +169,7 @@ glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
     colnames(ll) <- c("x", "y", "z")
     coordinates(ll) <- c("x", "y", "z")
     proj4string(ll) <- object$crs
-    ll <- fm_spTransform(ll, CRSobj = fm_CRS("sphere"))
+    ll <- fm_transform(ll, crs = fm_crs("sphere"))
     object$loc <- coordinates(ll)
   }
 

@@ -5,14 +5,19 @@
 \alias{print.summary_bru}
 \title{Summary for an inlabru fit}
 \usage{
-\method{summary}{bru}(object, ...)
+\method{summary}{bru}(object, verbose = FALSE, ...)
 
 \method{print}{summary_bru}(x, ...)
 }
 \arguments{
 \item{object}{An object obtained from a \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}} call}
 
-\item{\dots}{ignored arguments}
+\item{verbose}{logical; If \code{TRUE}, include more details of the
+component definitions. If \code{FALSE}, only show basic component
+definition information. Default: \code{FALSE}}
+
+\item{\dots}{arguments passed on to component summary functions, see
+\code{\link[=summary.component]{summary.component()}}.}
 
 \item{x}{An \code{summary_bru2} object}
 }

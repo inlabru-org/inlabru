@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.6.0.9003
+Version: 2.6.0.9007
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -121,6 +121,7 @@ Collate:
     'effect.R'
     'environment.R'
     'fmesher_crs.R'
+    'fmesher_evaluator.R'
     'fmesher_sf_mesh.R'
     'fmesher_sp_mesh.R'
     'fmesher_utils.R'

@@ -172,6 +172,9 @@ vertices.inla.mesh <- function(object) {
 #' }
 #'
 pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
+  if (!identical(mesh$manifold, "R2")) {
+    stop("inlabru::pixels() currently works for R2 meshes only.")
+  }
   if (length(nx) == 1) {
     x <- seq(min(mesh$loc[, 1]), max(mesh$loc[, 1]), length = nx)
   } else {
@@ -185,7 +188,7 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
 
   pixels <- expand.grid(x = x, y = y)
   coordinates(pixels) <- c("x", "y")
-  if (!is.null(mesh$crs)) {
+  if (!fm_crs_is_null(mesh$crs)) {
     proj4string(pixels) <- mesh$crs
   }
 
@@ -221,6 +224,7 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
 # @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
 triangle <- function(mesh, loc) {
+  warning("'triangle()' is an internal unused function. To be replaced by method using inla.mesh.smorg, and later fmesher")
   mcross <- function(a, b) {
     return((a[, 1]) * (b[2]) - (a[, 2]) * (b[1]))
   }
@@ -269,6 +273,7 @@ triangle <- function(mesh, loc) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 
 refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
+  warning("refine.inla.mesh() is experimental and will be replaced by a new method")
   rmesh <- INLA::inla.mesh.create(
     loc = mesh$loc,
     interior = INLA::inla.mesh.interior(mesh),
@@ -280,8 +285,9 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
 
 #' Split triangles of a mesh into four triangles
 #'
-#' Warning: does not reconstruct interior boundary
-#' Warning2: Works in euclidean coordinates. Not suitable for sphere.
+#' * Warning: does not reconstruct interior boundary
+#' * Warning2: Works in euclidean coordinates. Not suitable for sphere.
+#' * Warning3: Experimental; will be replaced by a new method
 #'
 #' @aliases tsplit.inla.mesh
 #' @keywords internal
@@ -291,6 +297,8 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 
 tsplit.inla.mesh <- function(mesh, n = 1) {
+  warning("tsplit.inla.mesh() is experimental and will be replaced by a new method")
+
   n <- 1
 
   p1 <- mesh$loc[mesh$graph$tv[, 1], ]

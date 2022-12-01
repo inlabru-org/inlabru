@@ -30,9 +30,9 @@ fm_transform(x, crs = fm_crs(x), ...)
 
 \method{fm_transform}{Spatial}(x, crs = fm_crs(x), ..., passthrough = FALSE)
 
-\method{fm_transform}{inla.mesh}(x, crs = fm_crs(x), ..., passthrough = FALSE)
+\method{fm_transform}{inla.mesh}(x, ..., crs = fm_crs(x), passthrough = FALSE, crs0 = fm_crs(x))
 
-\method{fm_transform}{inla.mesh.lattice}(x, crs = fm_crs(x), ..., passthrough = FALSE)
+\method{fm_transform}{inla.mesh.lattice}(x, crs = fm_crs(x), ..., passthrough = FALSE, crs0 = fm_crs(x))
 
 \method{fm_transform}{inla.mesh.segment}(x, crs = fm_crs(x), ..., passthrough = FALSE)
 }

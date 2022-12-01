@@ -148,13 +148,16 @@ bru_info_upgrade <- function(object,
 #' @export
 #' @method summary bru_info
 #' @param object Object to operate on
+#' @param verbose logical; If `TRUE`, include more details of the
+#' component definitions. If `FALSE`, only show basic component
+#' definition information. Default: `TRUE`
 #' @param \dots Arguments passed on to other methods
 #' @rdname bru_info
-summary.bru_info <- function(object, ...) {
+summary.bru_info <- function(object, verbose = TRUE, ...) {
   result <- list(
     inlabru_version = object[["inlabru_version"]],
     INLA_version = object[["INLA_version"]],
-    components = summary(object[["model"]]),
+    components = summary(object[["model"]], verbose = verbose, ...),
     lhoods =
       lapply(
         object[["lhoods"]],
@@ -2784,49 +2787,6 @@ list.data <- function(formula) {
 
 
 
-# Summary methods ----
-
-#  Summarise a LGCP object
-#
-# @export
-# @param object A result object obtained from a lgcp() run
-# @param ... ignored arguments (S3 generic compatibility)
-
-summary.lgcp <- function(object, ...) {
-  result <- object
-  warning("The summary.lgcp() method probably doesn't work with the current devel inlabru version!")
-
-  cat("### LGCP Summary #################################################################################\n\n")
-
-  cat(paste0("Predictor: log(lambda) = ", as.character(result$model$expr), "\n"))
-
-  cat("\n--- Points & Samplers ----\n\n")
-  cat(paste0("Number of points: ", nrow(result$bru_info$points)), "\n")
-  if (inherits(result$bru_info$points, "Spatial")) {
-    cat(paste0("Coordinate names: ", paste0(coordnames(result$bru_info$points), collapse = ", ")), "\n")
-    cat(paste0("Coordinate system: ", proj4string(result$bru_info$points), "\n"))
-  }
-
-  cat(paste0("Total integration mass, E*weight: ", sum(result$bru_info$lhoods[[1]]$E)), "\n")
-
-  cat("\n--- Dimensions -----------\n\n")
-  icfg <- result$iconfig
-  invisible(lapply(names(icfg), function(nm) {
-    cat(paste0(
-      "  ", nm, " [", icfg[[nm]]$class, "]",
-      ": ",
-      "n = ", icfg[[nm]]$n.points,
-      ", min = ", icfg[[nm]]$min,
-      ", max = ", icfg[[nm]]$max,
-      ", cardinality = ", signif(icfg[[nm]]$max - icfg[[nm]]$min),
-      "\n"
-    ))
-  }))
-
-  summary.bru(result)
-}
-
-
 #' Summary for an inlabru fit
 #'
 #' Takes a fitted `bru` object produced by [bru()] or [lgcp()] and creates
@@ -2835,15 +2795,19 @@ summary.lgcp <- function(object, ...) {
 #' @export
 #' @method summary bru
 #' @param object An object obtained from a [bru()] or [lgcp()] call
-#' @param \dots ignored arguments
+#' @param verbose logical; If `TRUE`, include more details of the
+#' component definitions. If `FALSE`, only show basic component
+#' definition information. Default: `FALSE`
+#' @param \dots arguments passed on to component summary functions, see
+#' [summary.component()].
 #' @example inst/examples/bru.R
 #'
 
-summary.bru <- function(object, ...) {
+summary.bru <- function(object, verbose = FALSE, ...) {
   object <- bru_check_object_bru(object)
 
   result <- list(
-    bru_info = summary(object[["bru_info"]])
+    bru_info = summary(object[["bru_info"]], verbose = verbose, ...)
   )
 
   result$WAIC <- object[["waic"]][["waic"]]

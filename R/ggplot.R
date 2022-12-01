@@ -38,7 +38,7 @@ pixelplot.mesh <- function(...) {
 #' }
 #' }
 gmap <- function(data, ...) {
-  data <- sp::spTransform(data, sp::CRS("+proj=longlat"))
+  data <- fm_transform(data, crs = fm_crs("longlat_globe"))
   df <- cbind(coordinates(data), data@data)
 
   # Figure out a sensible bounding box (range of data plus 30%)
@@ -285,7 +285,7 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
             xend = .data$variable,
             color = .data$variable
           ),
-          size = sz
+          linewidth = sz
         )
       )
     }
@@ -386,7 +386,7 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
 gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
   requireNamespace("ggplot2")
   if (!is.null(crs)) {
-    data <- spTransform(data, crs)
+    data <- fm_transform(data, crs)
   }
 
   df <- as.data.frame(data)
@@ -435,7 +435,7 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   requireNamespace("ggplot2")
   if (!is.null(crs)) {
-    data <- spTransform(data, crs)
+    data <- fm_transform(data, crs)
   }
 
   qq <- coordinates(data)
@@ -519,7 +519,7 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
     stop("The 'ggpolypath' package is required for SpatialPolygons plotting, but it is not installed.")
   }
   if (!is.null(crs)) {
-    data <- sp::spTransform(data, crs)
+    data <- fm_transform(data, crs)
   }
 
   df <- ggplot2::fortify(data)
@@ -613,7 +613,7 @@ gg.SpatialPixelsDataFrame <- function(data,
                                       crs = NULL,
                                       mask = NULL, ...) {
   if (!is.null(crs)) {
-    data <- spTransform(data, crs)
+    data <- fm_transform(data, crs)
   }
   if (!is.null(mask)) {
     data <- data[as.vector(!is.na(over(data, mask))), ]
@@ -742,7 +742,7 @@ gg.inla.mesh <- function(data,
       stop("Geom not implemented for spherical meshes (manifold = S2)")
     }
     if (!is.null(crs)) {
-      data <- fm_spTransform(data, CRSobj = crs)
+      data <- fm_transform(data, crs = crs)
     }
 
     df <- rbind(
