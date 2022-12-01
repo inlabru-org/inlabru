@@ -501,7 +501,7 @@ et. al. (2022).</p>
 <span>  <span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    inla.mode <span class="op">=</span> <span class="st">"experimental"</span>,</span>
-<span>    control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>waic <span class="op">=</span> <span class="cn">TRUE</span>, cpo <span class="op">=</span> <span class="cn">TRUE</span>, config <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>waic <span class="op">=</span> <span class="cn">TRUE</span>, cpo <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>    control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>strategy <span class="op">=</span> <span class="st">"simplified.laplace"</span>, int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span>,</span>
 <span>    verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
@@ -518,13 +518,13 @@ spatial ranges of the spatially structured parameters.</p>
 <code class="sourceCode R"><span><span class="co"># view results</span></span>
 <span><span class="va">res</span><span class="op">$</span><span class="va">summary.hyperpar</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                              mean            sd</span></span>
-<span><span class="co">#&gt; Precision for kappa    2.21844805    0.43871745</span></span>
-<span><span class="co">#&gt; Range for alpha      941.22564043  290.93407911</span></span>
-<span><span class="co">#&gt; Stdev for alpha        1.93873694    0.37768284</span></span>
-<span><span class="co">#&gt; Range for eps       8419.81462901 6033.10098192</span></span>
-<span><span class="co">#&gt; Stdev for eps          0.41236597    0.25089745</span></span>
-<span><span class="co">#&gt; Range for tau        787.41991323  322.14265548</span></span>
-<span><span class="co">#&gt; Stdev for tau          0.06242387    0.01175424</span></span></code></pre></div>
+<span><span class="co">#&gt; Precision for kappa    2.24437782    0.44217816</span></span>
+<span><span class="co">#&gt; Range for alpha      921.18494575  289.99623615</span></span>
+<span><span class="co">#&gt; Stdev for alpha        1.92208930    0.36582172</span></span>
+<span><span class="co">#&gt; Range for eps       8180.16362368 5685.50446618</span></span>
+<span><span class="co">#&gt; Stdev for eps          0.45762650    0.27067205</span></span>
+<span><span class="co">#&gt; Range for tau        804.58935140  357.12035369</span></span>
+<span><span class="co">#&gt; Stdev for tau          0.06047773    0.01105709</span></span></code></pre></div>
 <p>Next we examine some summaries of the random effect estimates,
 starting with <span class="math inline">\(\exp(\alpha_s)\)</span>, which
 is effort-corrected relative abundance at year = 0 (1987), given 1 hour
@@ -532,7 +532,7 @@ of count effort (i.e., log[1]=0).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">alp</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span><span class="op">)</span> <span class="co"># exp(alpha) posterior median</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt;  0.06577  1.17448  3.37247  6.88850  8.45225 51.05051</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.06882  1.15447  3.24457  6.81912  8.46357 52.89561</span></span></code></pre></div>
 <p>Note that to avoid issues due to <span class="math inline">\(E[\exp(x)|y]\neq\exp[E(x|y)]\)</span>, we use the
 posterior median instead of the posterior mean.</p>
 <p>The summary for <span class="math inline">\(\epsilon_s\)</span> shows
@@ -541,7 +541,7 @@ space.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">eps</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="co"># epsilon</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.8177  0.9017  0.9717  0.9609  1.0230  1.0638</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.7986  0.8973  0.9764  0.9646  1.0361  1.0896</span></span></code></pre></div>
 <p>The <span class="math inline">\(\tau_s\)</span> summary shows how
 long-term, log-linear trends of robin relative abundance have varied
 across space, from annual decreases of around 10% to annual increases of
@@ -549,7 +549,7 @@ around 10%.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">tau</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="co"># (exp(tau)-1)*100</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt; -12.6051  -4.7037  -1.4404  -0.9433   2.6878  10.7814</span></span></code></pre></div>
+<span><span class="co">#&gt; -12.4967  -4.5706  -1.3923  -0.9131   2.6426  10.6109</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="svc-maps">SVC maps<a class="anchor" aria-label="anchor" href="#svc-maps"></a>
@@ -565,7 +565,7 @@ and then projecting this mapping grid to the modeling mesh.</p>
 <span><span class="va">grd_dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">xlim</span><span class="op">)</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">ylim</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">25</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># make mesh projector to get model summaries from the mesh to the mapping grid</span></span>
-<span><span class="va">mesh_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.project.html" class="external-link">inla.mesh.projector</a></span><span class="op">(</span></span>
+<span><span class="va">mesh_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fm_evaluate.html">fm_evaluator</a></span><span class="op">(</span></span>
 <span>  <span class="va">mesh</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="va">xlim</span>, ylim <span class="op">=</span> <span class="va">ylim</span>, dims <span class="op">=</span> <span class="va">grd_dims</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -598,7 +598,7 @@ the raster stack to the study area.</p>
 <span><span class="co"># loop to get estimates on a mapping grid</span></span>
 <span><span class="va">pred_grids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="va">alph</span>, epsilon <span class="op">=</span> <span class="va">epsi</span>, tau <span class="op">=</span> <span class="va">taus</span><span class="op">)</span>,</span>
-<span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.project.html" class="external-link">inla.mesh.project</a></span><span class="op">(</span><span class="va">mesh_proj</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../../reference/fm_evaluate.html">fm_evaluate</a></span><span class="op">(</span><span class="va">mesh_proj</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># make a raster stack with the posterior median and range95</span></span>

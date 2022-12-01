@@ -295,7 +295,7 @@ for</p>
 <li>Parameters that are the same for all predictor evaluations
 (intercept-like parameters).</li>
 <li>Using a covariate stored in an <code>sp</code> <code>Spatial*</code>
-object.</li>
+or <code>terra</code> <code>SpatRaster</code> object.</li>
 <li>Defining linear effects using an <code>lm</code>-style syntax.</li>
 <li>Behaviour for if <code>main</code>, <code>group</code> or
 <code>replicate</code> is a function given with no arguments.</li>
@@ -324,18 +324,20 @@ models with shared components.</p>
 <code>sp</code> covariates<a class="anchor" aria-label="anchor" href="#sp-covariates"></a>
 </h4>
 <p>If <code>main</code>, <code>group</code>, or <code>replicate</code>,
-is the name of an <code>sp</code> object stored in the global
-<code>R</code> environment, then <code>inlabru</code> attempts to do
-something intelligent by extracting the covariate information at the
-locations of the data passed to <code><a href="../reference/bru.html">bru()</a></code> or
-<code><a href="../reference/like.html">like()</a></code>. In this case <strong>it is assumed that this data
-is also an <code>sp</code> object</strong>. <code>inlabru</code> does
-this by applying <code><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">sp::coordinates()</a></code> to the data and then
-extracting the covariate information using <code><a href="https://rdrr.io/pkg/sp/man/over.html" class="external-link">sp::over()</a></code>.</p>
+is the name of an <code>Spatial*</code> or <code>SpatRaster</code>
+object stored in the global <code>R</code> environment, then
+<code>inlabru</code> attempts to do something intelligent by extracting
+the covariate information at the locations of the data passed to
+<code><a href="../reference/bru.html">bru()</a></code> or <code><a href="../reference/like.html">like()</a></code>. This <strong>requires that
+this data is a <code>SpatialPoints*</code> or <code>sf</code>
+object</strong>. For <code>Spatial*</code> inputs, <code>inlabru</code>
+does this by applying <code><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">sp::coordinates()</a></code> to the data and
+then extracting the covariate information using
+<code><a href="https://rdrr.io/pkg/sp/man/over.html" class="external-link">sp::over()</a></code>.</p>
 <p>The shorcut</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_sp_effect</span><span class="op">(</span></span>
-<span>  main <span class="op">=</span> <span class="va">an_sp_object</span>,</span>
+<span>  main <span class="op">=</span> <span class="va">a_spatial_object</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"linear"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>internally calls <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> which is almost
@@ -350,22 +352,23 @@ equivalent to</p>
 <span>  main <span class="op">=</span> <span class="fu">get_sp_covariate</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"linear"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Note that this requires <code>an_sp_object</code> to be stored in the
-global <code>R</code> environment (or in the environment associated with
-the model definition code) so it is findable when the expression is
+<p>Note that this requires <code>a_spatial_object</code> to be stored in
+the global <code>R</code> environment (or in the environment associated
+with the model definition code) so it is findable when the expression is
 internally evaluated by <code>inlabru</code>. Also note that the
-<code>get_sp_covariate</code> function above extract the first column of
-the <code>sp</code> object evaluation. For more general situations, one
-can either specify the optional <code>main_layer</code> argument to
+<code>get_sp_covariate</code> function above extracts the first column
+of the <code>sp</code> object evaluation. For more general situations,
+one can either specify the optional <code>main_layer</code> argument to
 extract another named or indexed column, or directly use
-<code>main = eval_spatial(an_sp_object, .data., layer = some_layer)</code>.</p>
+<code>main = eval_spatial(a_spatial_object, .data., layer = some_layer)</code>.</p>
 <p>Note that this assumes that <code><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates()</a></code> applied to the
 input data is a sensible thing to do, this might not be the case for all
 models! For example, if the input data is a
 <code>SpatialPolygonsDataFrame</code> then <code><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates()</a></code>
 returns the centroid of each polygon. As more specific input type
-support is developed, these special cases may be given more precise
-meaning.</p>
+support is developed, and support for <code>sp</code> is gradually
+deprecated in favour of <code>sf</code> and <code>terra</code>, these
+special cases may be given more precise meaning.</p>
 </div>
 <div class="section level4">
 <h4 id="lm-style-syntax">

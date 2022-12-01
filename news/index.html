@@ -82,11 +82,12 @@
 <ul><li><p>Added support for <code>sf</code> and <code>terra</code> inputs to most methods</p></li>
 <li><p>Expanded geometry and mesh handling methods</p></li>
 <li><p>Expanded <code>bru_mapper</code> system</p></li>
+<li><p>Added convergence diagnostics plot with <code><a href="../reference/bru_convergence_plot.html">bru_convergence_plot()</a></code></p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="feature-details-development-version">Feature details<a class="anchor" aria-label="anchor" href="#feature-details-development-version"></a></h3>
 <ul><li><p>Allow <code>NA</code> input for default 1D mappers to generate effect zero, like in <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code>.</p></li>
-<li><p>New and expanded methods <code>fm_crs</code>, <code>fm_CRS</code>, <code>fm_transform</code>, <code>fm_ellipsoid_radius</code>, and <code>fm_length_unit</code> to further support <code>sf</code> objects. The <code>fm_crs</code> extraction method also supports <code>terra</code>.</p></li>
+<li><p>New and expanded methods <code>fm_crs</code>, <code>fm_CRS</code>, <code>fm_transform</code>, <code>fm_ellipsoid_radius</code>, and <code>fm_length_unit</code> to further support <code>sf</code> objects. The <code>fm_crs</code> extraction method also supports <code>terra</code> objects.</p></li>
 <li><p><code>bru_fill_missing</code> now supports <code>terra</code> <code>SpatRaster</code> data and and <code>sf</code> locations.</p></li>
 <li><p>New experimental methods <code>fm_evaluator</code> and <code>fm_evaluate</code>, replacing the <code>INLA</code> <code>inla.mesh.projector</code> and <code>inla.mesh.project</code> methods.</p></li>
 <li><p>Experimental integration support for sphere and globe meshes.</p></li>
