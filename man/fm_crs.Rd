@@ -33,7 +33,7 @@ fm_crs_oblique(x) <- value
 
 \method{fm_crs}{default}(x, ..., crsonly = FALSE)
 
-\method{st_crs}{fm_crs}(x, ...)
+st_crs.fm_crs(x, ...)
 
 \method{$}{fm_crs}(x, name)
 
@@ -70,7 +70,8 @@ predefined \code{wkt} string from ``names(fm_wkt_predef())`.}
 
 \item{\dots}{Additional parameters. Not currently in use.}
 
-\item{crsonly}{logical; if \code{TRUE}, remove any oblique\verb{information for}fm_crs\verb{class objects and return a pure}crs\verb{class object. Default:}FALSE`.}
+\item{crsonly}{logical; if \code{TRUE}, remove any \code{oblique} information
+for \code{fm_crs} class objects and return a pure \code{crs} class object. Default: \code{FALSE}.}
 
 \item{value}{Vector of length at most 4 of rotation angles (in degrees)
 for an oblique projection, all values defaulting to zero. The values
@@ -120,12 +121,15 @@ projection is only correct for perfect spheres.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{st_crs(fm_crs)}: \code{st_crs(x, ...)} is equivalent to \code{fm_crs(x, ..., crsonly = TRUE)}
-when \code{x} is a \code{fm_crs} object.
-
 \item \code{$}: For a \code{fm_crs} object \code{x}, \code{x$name} calls the accessor method for the
 \code{crs} object inside it. If \code{name} is "crs", the internal crs object itself is returned.
 If \code{name} is "oblique", the internal oblique angle parameter vector is returned.
+
+}}
+\section{Functions}{
+\itemize{
+\item \code{st_crs.fm_crs()}: \code{st_crs(x, ...)} is equivalent to \code{fm_crs(x, ..., crsonly = TRUE)}
+when \code{x} is a \code{fm_crs} object.
 
 }}
 \examples{
@@ -140,7 +144,7 @@ names(fm_wkt_predef())
 }
 }
 \seealso{
-\code{\link[sf:st_crs]{sf::st_crs()}}, \code{\link{fm_crs_wkt}},
+\code{\link[sf:st_crs]{sf::st_crs()}}, \code{\link{fm_crs_wkt}}
 }
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}

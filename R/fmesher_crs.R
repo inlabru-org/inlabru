@@ -712,7 +712,7 @@ fm_length_unit.character <- function(x) {
 #' @returns A `crs` object ([sf::st_crs()]) or a `fm_crs` object.
 #' An S3 `fm_crs` object is a list with elements `crs` and `oblique`.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @seealso [sf::st_crs()], [`fm_crs_wkt`],
+#' @seealso [sf::st_crs()], [`fm_crs_wkt`]
 #' @examples
 #' crs1 <- fm_crs("longlat_globe")
 #' crs2 <- fm_crs("lambert_globe")
@@ -803,7 +803,7 @@ st_crs.fm_crs <- function(x, ...) {
 
 
 #' @export
-#' @param crsonly logical; if `TRUE`, remove any oblique` information
+#' @param crsonly logical; if `TRUE`, remove any `oblique` information
 #' for `fm_crs` class objects and return a pure `crs` class object. Default: `FALSE`.
 #' @rdname fm_crs
 fm_crs.fm_crs <- function(x, ..., crsonly = FALSE) {
