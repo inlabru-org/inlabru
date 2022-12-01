@@ -272,31 +272,6 @@ NULL
 }
 
 
-# # @rawNamespace if (getRversion() >= '3.6.0') {
-# #   S3method(vctrs::vec_ptype_abbr, bru_mapper)
-# #   S3method(vctrs::vec_ptype_abbr, bm_list)
-# #   S3method(pillar::obj_sum, bru_mapper)
-# # }
-# # @rdname bm_list
-# `vec_ptype_abbr.bru_mapper` <- function(x, ...) {
-#   if (identical(class(x)[1], "bru_mapper")) {
-#     "mapper"
-#   } else {
-#     sub("bru_mapper_", "bm_", class(x)[1])
-#   }
-# }
-# # @rdname bm_list
-# `obj_sum.bru_mapper` <- function(x) {
-#   if (identical(class(x)[1], "bru_mapper")) {
-#     "mapper"
-#   } else {
-#     sub("bru_mapper_", "bm_", class(x)[1])
-#   }
-# }
-# # @rdname bm_list
-# `vec_ptype_abbr.bm_list` <- function(x, ...) {
-#   "mappers"
-# }
 
 
 # Summaries ----
@@ -502,6 +477,20 @@ print.summary_bru_mapper <- function(x, ...) {
 #' to register the methods, e.g.
 #' `.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)`.
 #'
+#' In packages with `Suggests: inlabru`, add method information for delayed
+#' registration, e.g.:
+#' ```
+#' #' @rawNamespace S3method(inlabru::bru_get_mapper, inla_rspde)
+#' #' @rawNamespace S3method(inlabru::ibm_n, bru_mapper_inla_rspde)
+#' #' @rawNamespace S3method(inlabru::ibm_values, bru_mapper_inla_rspde)
+#' #' @rawNamespace S3method(inlabru::ibm_jacobian, bru_mapper_inla_rspde)
+#' ```
+#' or before each method, use `@exportS3Method`:
+#' ```
+#' #' @exportS3Method inlabru::bru_get_mapper
+#' ```
+#' etc., which semi-automates it.
+#'
 #' @export
 bru_mapper_define <- function(mapper,
                               new_class = NULL,
@@ -511,12 +500,13 @@ bru_mapper_define <- function(mapper,
     txt <-
       c(
         "In packages with Suggests: inlabru, add method information, e.g.:",
-        "  #' @rawNamespace if (getRversion() >= '3.6.0') {",
-        "  #'   S3method(inlabru::bru_get_mapper, inla_rspde)",
-        "  #'   S3method(inlabru::ibm_n, bru_mapper_inla_rspde)",
-        "  #'   S3method(inlabru::ibm_values, bru_mapper_inla_rspde)",
-        "  #'   S3method(inlabru::ibm_jacobian, bru_mapper_inla_rspde)",
-        "  #' }"
+        "  #' @rawNamespace S3method(inlabru::bru_get_mapper, inla_rspde)",
+        "  #' @rawNamespace S3method(inlabru::ibm_n, bru_mapper_inla_rspde)",
+        "  #' @rawNamespace S3method(inlabru::ibm_values, bru_mapper_inla_rspde)",
+        "  #' @rawNamespace S3method(inlabru::ibm_jacobian, bru_mapper_inla_rspde)",
+        "or before each method, use @exportS3Method:",
+        "  #' @exportS3Method inlabru::bru_get_mapper",
+        "etc., which semi-automates it."
       )
     lifecycle::deprecate_warn(
       when = "2.6.0.9000",

@@ -181,6 +181,22 @@ To register mapper classes and methods in scripts, use \code{.S3method()}
 to register the methods, e.g.
 \code{.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)}.
 
+In packages with \code{Suggests: inlabru}, add method information for delayed
+registration, e.g.:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{#' @rawNamespace S3method(inlabru::bru_get_mapper, inla_rspde)
+#' @rawNamespace S3method(inlabru::ibm_n, bru_mapper_inla_rspde)
+#' @rawNamespace S3method(inlabru::ibm_values, bru_mapper_inla_rspde)
+#' @rawNamespace S3method(inlabru::ibm_jacobian, bru_mapper_inla_rspde)
+}\if{html}{\out{</div>}}
+
+or before each method, use \verb{@exportS3Method}:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{#' @exportS3Method inlabru::bru_get_mapper
+}\if{html}{\out{</div>}}
+
+etc., which semi-automates it.
+
 \item \code{bru_mapper_index()}: Create a an indexing mapper
 
 \item \code{bru_mapper_taylor()}: Provides a pre-computed affine mapping,
