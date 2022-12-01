@@ -58,7 +58,6 @@ Imports:
     patchwork,
     plyr,
     rgdal (>= 1.5.8),
-    rgeos,
     rlang,
     sf,
     utils,
