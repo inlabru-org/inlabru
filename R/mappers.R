@@ -2992,7 +2992,7 @@ make_hierarchical_mesh_basis <- function(mesh, forward = TRUE) {
   # only the computational neighbourhood structure:
   fem <- INLA::inla.mesh.fem(mesh, order = 1)
   G <- (fem$g1 != 0) * 1.0
-  G <- G - Diagonal(nrow(G), diag(G))
+  G <- G - Matrix::Diagonal(nrow(G), diag(G))
 
   # First point for each disconnected mesh component
   # Calculate graph distances
