@@ -1,10 +1,10 @@
 ## Submission notes
 
-* Minor release 2.6.0, including new features and
-  a fix to prepare for Matrix 1.5-2
-* CRAN checks for old version, 2.5.3:
+* Minor release 2.7.0, including new features, bug fixes, and
+  fixes for package dependencies
+* CRAN checks for old version, 2.6.0:
   NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
-* Checks for new version, 2.6.0 (with latest INLA, 22.10.23):
+* Checks for new version, 2.7.0 (with latest INLA, 22.11.28-1):
   - Spurious error message about potentially invalid doi, see below
 
 ## Test environments
