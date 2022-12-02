@@ -15,6 +15,7 @@ NULL
 #' mappers for special objects. See below for details of the
 #' default constructor [bru_mapper_define()] that can be used to define
 #' new mappers in user code.
+#'
 #' @examples
 #' mapper <- bru_mapper_index(5)
 #' ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
@@ -2881,13 +2882,13 @@ ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
 #'   give an effective spectral prior. For example, let
 #'   ```
 #'   scaling = 1 / (1 + (0:4)^2)
-#'   A1 = bru_mapper_harmonics(order = 4)
-#'   u1 <- A1 %*% rnorm(9, sd = scaling)
+#'   bmh1 = bru_mapper_harmonics(order = 4)
+#'   u1 <- ibm_eval(bmh1, state = rnorm(9, sd = scaling))
 #'   ```
 #'   Then, with
 #'   ```
-#'   A2 = bru_mapper_harmonics(order = 4, scaling = scaling)
-#'   u2 = A2 %*% rnorm(9)
+#'   bnh2 = bru_mapper_harmonics(order = 4, scaling = scaling)
+#'   u2 = ibm_eval(bmh2, state = rnorm(9))
 #'   ```
 #'   the stochastic properties of `u1` and `u2` will be the same, with `scaling^2`
 #'   determining the variance for each frequency contribution.
