@@ -51,7 +51,10 @@ Availability using Additional_repositories specification:
     issue-4/Point-process-models-for-spatio-temporal-distance-sampling-data-from/10.1214/17-AOAS1078.full
 ```
 
-## Downstream dependencies
+## revdepcheck results
 
-We tested the reverse dependencies (bmstdr, intSDM, PointedSDMs, rSPDE) and
-found no problems.
+We checked 4 reverse dependencies (1 from CRAN + 3 from Bioconductor),
+comparing R CMD check results across CRAN and dev versions of this package.
+
+ * We saw 0 new problems
+ * We failed to check 0 packages
