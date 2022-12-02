@@ -254,14 +254,19 @@ vector, of length \code{intercept + order}. This can be used to
 give an effective spectral prior. For example, let
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{scaling = 1 / (1 + (0:4)^2)
-bmh1 = bru_mapper_harmonics(order = 4)
-u1 <- ibm_eval(bmh1, state = rnorm(9, sd = scaling))
+x <- seq(0, 1, length.out = 11)
+bmh1 = bru_mapper_harmonics(order = 4, interval = c(0, 1))
+u1 <- ibm_eval(
+  bmh1,
+  input = x,
+  state = rnorm(9, sd = rep(scaling, c(1, 2, 2, 2, 2)))
+)
 }\if{html}{\out{</div>}}
 
 Then, with
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{bnh2 = bru_mapper_harmonics(order = 4, scaling = scaling)
-u2 = ibm_eval(bmh2, state = rnorm(9))
+\if{html}{\out{<div class="sourceCode">}}\preformatted{bmh2 = bru_mapper_harmonics(order = 4, scaling = scaling)
+u2 = ibm_eval(bmh2, input = x, state = rnorm(9))
 }\if{html}{\out{</div>}}
 
 the stochastic properties of \code{u1} and \code{u2} will be the same, with \code{scaling^2}
