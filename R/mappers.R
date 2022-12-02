@@ -2882,13 +2882,18 @@ ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
 #'   give an effective spectral prior. For example, let
 #'   ```
 #'   scaling = 1 / (1 + (0:4)^2)
-#'   bmh1 = bru_mapper_harmonics(order = 4)
-#'   u1 <- ibm_eval(bmh1, state = rnorm(9, sd = scaling))
+#'   x <- seq(0, 1, length.out = 11)
+#'   bmh1 = bru_mapper_harmonics(order = 4, interval = c(0, 1))
+#'   u1 <- ibm_eval(
+#'     bmh1,
+#'     input = x,
+#'     state = rnorm(9, sd = rep(scaling, c(1, 2, 2, 2, 2)))
+#'   )
 #'   ```
 #'   Then, with
 #'   ```
-#'   bnh2 = bru_mapper_harmonics(order = 4, scaling = scaling)
-#'   u2 = ibm_eval(bmh2, state = rnorm(9))
+#'   bmh2 = bru_mapper_harmonics(order = 4, scaling = scaling)
+#'   u2 = ibm_eval(bmh2, input = x, state = rnorm(9))
 #'   ```
 #'   the stochastic properties of `u1` and `u2` will be the same, with `scaling^2`
 #'   determining the variance for each frequency contribution.
