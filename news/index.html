@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,15 +77,18 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.7.0" id="inlabru-270">inlabru 2.7.0<a class="anchor" aria-label="anchor" href="#inlabru-270"></a></h2>
 <div class="section level3">
-<h3 id="feature-overview-development-version">Feature overview<a class="anchor" aria-label="anchor" href="#feature-overview-development-version"></a></h3>
+<h3 id="feature-overview-2-7-0">Feature overview<a class="anchor" aria-label="anchor" href="#feature-overview-2-7-0"></a></h3>
 <ul><li><p>Added support for <code>sf</code> and <code>terra</code> inputs to most methods</p></li>
 <li><p>Expanded geometry and mesh handling methods</p></li>
 <li><p>Expanded <code>bru_mapper</code> system</p></li>
 <li><p>Added convergence diagnostics plot with <code><a href="../reference/bru_convergence_plot.html">bru_convergence_plot()</a></code></p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="feature-details-development-version">Feature details<a class="anchor" aria-label="anchor" href="#feature-details-development-version"></a></h3>
+<h3 id="feature-details-2-7-0">Feature details<a class="anchor" aria-label="anchor" href="#feature-details-2-7-0"></a></h3>
 <ul><li><p>Allow <code>NA</code> input for default 1D mappers to generate effect zero, like in <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code>.</p></li>
 <li><p>New and expanded methods <code>fm_crs</code>, <code>fm_CRS</code>, <code>fm_transform</code>, <code>fm_ellipsoid_radius</code>, and <code>fm_length_unit</code> to further support <code>sf</code> objects. The <code>fm_crs</code> extraction method also supports <code>terra</code> objects.</p></li>
 <li><p><code>bru_fill_missing</code> now supports <code>terra</code> <code>SpatRaster</code> data and and <code>sf</code> locations.</p></li>
@@ -102,7 +105,7 @@
 </ul></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-2-7-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-7-0"></a></h3>
 <ul><li><p>Remove unused <code>spatstat.core</code> dependency. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/165" class="external-link">#165</a></p></li>
 <li><p>Fixed issue with plain mapper evaluation in the <code>ibm_eval.default</code> and <code>ibm_eval.bru_mapper_collect</code> methods, where they would return zeros instead of the intended values. The main component evaluation and estimation code was not directly affected as that is based on the <code>bru_mapper_multi</code> class methods that rely on the Jacobians instead. The bug would therefore mainly have impacted the future, not yet supported nonlinear mapper extensions.</p></li>
 <li>

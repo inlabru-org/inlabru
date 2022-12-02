@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -332,11 +332,16 @@ number of basis functions is <code>intercept + 2 * order</code>.</p>
 vector, of length <code>intercept + order</code>. This can be used to
 give an effective spectral prior. For example, let</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>scaling <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> (<span class="dv">0</span><span class="sc">:</span><span class="dv">4</span>)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>bmh1 <span class="ot">=</span> <span class="fu">bru_mapper_harmonics</span>(<span class="at">order =</span> <span class="dv">4</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>u1 <span class="ot">&lt;-</span> <span class="fu">ibm_eval</span>(bmh1, <span class="at">state =</span> <span class="fu">rnorm</span>(<span class="dv">9</span>, <span class="at">sd =</span> scaling))</span></code></pre><p></p></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">11</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>bmh1 <span class="ot">=</span> <span class="fu">bru_mapper_harmonics</span>(<span class="at">order =</span> <span class="dv">4</span>, <span class="at">interval =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>u1 <span class="ot">&lt;-</span> <span class="fu">ibm_eval</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  bmh1,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">input =</span> x,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="fu">rnorm</span>(<span class="dv">9</span>, <span class="at">sd =</span> <span class="fu">rep</span>(scaling, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>)))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre><p></p></div>
 <p>Then, with</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>bnh2 <span class="ot">=</span> <span class="fu">bru_mapper_harmonics</span>(<span class="at">order =</span> <span class="dv">4</span>, <span class="at">scaling =</span> scaling)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>u2 <span class="ot">=</span> <span class="fu">ibm_eval</span>(bmh2, <span class="at">state =</span> <span class="fu">rnorm</span>(<span class="dv">9</span>))</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>bmh2 <span class="ot">=</span> <span class="fu">bru_mapper_harmonics</span>(<span class="at">order =</span> <span class="dv">4</span>, <span class="at">scaling =</span> scaling)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>u2 <span class="ot">=</span> <span class="fu">ibm_eval</span>(bmh2, <span class="at">input =</span> x, <span class="at">state =</span> <span class="fu">rnorm</span>(<span class="dv">9</span>))</span></code></pre><p></p></div>
 <p>the stochastic properties of <code>u1</code> and <code>u2</code> will be the same, with <code>scaling^2</code>
 determining the variance for each frequency contribution.</p>
 <p>The period for the first order harmonics is shifted and scaled to match
