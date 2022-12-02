@@ -22,5 +22,8 @@ articles:
   random_fields_2d: web/random_fields_2d.html
   svc: web/svc.html
   website_examples: website_examples.html
-last_built: 2022-12-02T03:15Z
+last_built: 2022-12-02T13:04Z
+urls:
+  reference: https://inlabru-org.github.io/inlabru/reference
+  article: https://inlabru-org.github.io/inlabru/articles
 
