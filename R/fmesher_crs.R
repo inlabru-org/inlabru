@@ -2462,7 +2462,7 @@ fm_spTransform.SpatialPointsDataFrame <- function(x,
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.inla.mesh.lattice <- function(x, CRSobj, passthrough = FALSE, ...) {
-  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh.lattie()", "fm_transform()")
+  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh.lattice()", "fm_transform()")
   fm_transform(x, crs = CRSobj, ..., passthrough = passthrough)
 }
 
