@@ -22,7 +22,7 @@ Docker images. Despite its convenience, the image size can be large.
 1. Check if [Apptainer](https://apptainer.org/docs/user/main/cli/apptainer_version.html)
    is available on your HPC. If not, ask the administrator to install it. Type 
    on your HPC terminal to check which version is installed. 
-```{r apptainer check, eval=FALSE}
+```{shell apptainer check, eval=FALSE}
 $ apptainer version
 ```
 
@@ -31,7 +31,7 @@ $ apptainer version
 Singularity Image Format (SIF) file with the latest R version.
 For illustration, we'll assume the file is stored at `./your_container.sif`.
 
-```{r apptainer, eval=FALSE}
+```{shell apptainer, eval=FALSE}
 # To pull the docker image 
 $ apptainer pull your_container.sif docker://rocker/geospatial:latest
 # once the sif is downloaded, get into an interactive shell 
@@ -51,7 +51,7 @@ $ R --verbose
 
 3. Put the following in your job script to execute an R file non-interactively.
 
-```{r exec, eval=FALSE}
+```{shell exec, eval=FALSE}
 # To execute an R file with apptainer
 $ apptainer exec ./your_container.sif Rscript --no-restore --no-save --verbose file_to_run.R
 ```

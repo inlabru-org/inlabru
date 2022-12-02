@@ -47,15 +47,18 @@ Get the data
 -----------------------------------
 
 ```{r }
-data(Poisson2_1D)
+data(Poisson2_1D, package = "inlabru")
 ```
 
 Take a look at the point (and frequency) data
 
 
-```{r fig.width=10, fig.heigth=4}
+```{r, fig.height=3}
 ggplot(pts2) +
-  geom_histogram(aes(x = x), binwidth = 55 / 20, boundary = 0, fill = NA, color = "black") +
+  geom_histogram(aes(x = x),
+    binwidth = 55 / 20,
+    boundary = 0, fill = NA, color = "black"
+  ) +
   geom_point(aes(x), y = 0, pch = "|", cex = 4) +
   coord_fixed(ratio = 1)
 ```
@@ -69,19 +72,31 @@ x <- seq(0, 55, length.out = 50)
 mesh1D <- inla.mesh.1d(x, boundary = "free")
 ```
 
-Make a 1D SPDE model:
+Make the latent components for a 1D SPDE model:
 ```{r results="hide",warning=FALSE,message=FALSE}
-matern <- inla.spde2.pcmatern(mesh1D, prior.range = c(150, 0.75), prior.sigma = c(0.1, 0.75))
-mdl <- x ~ spde1D(x, model = matern) + Intercept(1)
+matern <- inla.spde2.pcmatern(mesh1D,
+  prior.range = c(150, 0.75),
+  prior.sigma = c(0.1, 0.75)
+)
+comp <- ~ spde1D(x, model = matern) + Intercept(1)
 ```
 
-Here we want to fit to the actual points, and the `inlabru` function that does this is called `lgcp` (for 'Log Gaussian Cox Process'). The `ips` and `domain` parameters are optional, one or the other can be used.
-Here are two ways of doing the same thing:
+Here we want to fit to the actual points, and the `inlabru` functions that are
+used for this are `bru()` and `like(..., family = "cp")`.
+For this special case there is also a shortcut function `lgcp()` (for 'Log Gaussian Cox Process'),
+but it doesn't support all features. The standard way of specifying
+the function space for integration is via the `domain` argument.
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-fit.spde <- lgcp(mdl, pts2, ips = ipoints(c(0, 55), 50, name = "x"))
-fita.spde <- lgcp(mdl, pts2, domain = list(x = mesh1D))
+fit.spde <- bru(
+  comp,
+  like(x ~ ., family = "cp", data = pts2, domain = list(x = mesh1D))
+)
+## Equivalent call for this particular example:
+# fit.spde <- lgcp(comp, formula = x ~ ., data = pts2, domain = list(x = mesh1D))
 ```
+Here, `formula = x ~ .` means that the observed points are in `x`, and `.` denotes
+a linear predictor that is the sum of all the latent components.
 
 SPDE parameters 
 -----------------------------------
@@ -122,14 +137,14 @@ scale (i.e. the intensity function $\lambda(s)$), we call `predict` thus:
 
 ```{r }
 predf <- data.frame(x = seq(0, 55, by = 1)) # Set up a data frame of explanatory values at which to predict
-pred_spde <- predict(fit.spde, predf, ~ exp(spde1D + Intercept))
+pred_spde <- predict(fit.spde, predf, ~ exp(spde1D + Intercept), n.samples = 1000)
 ```
 
 while to predict on the linear predictor scale (i.e. that of the log intensity, 
 $\log(\lambda(s))$), we call `predict` thus:
 
 ```{r }
-pred_spde_lp <- predict(fit.spde, predf, ~ spde1D + Intercept)
+pred_spde_lp <- predict(fit.spde, predf, ~ spde1D + Intercept, n.samples = 1000)
 ```
 
 here's how to plot the prediction and 95% credible interval:
@@ -228,7 +243,7 @@ This calculates the same statistics as were calculated for `Lambda`, but for eve
 rather than for the posterior mean `N` alone:
 
 ```{r }
-head(Nest)
+Nest[Nest$N %in% 100:105, ]
 ```
 
 We compute the 95% prediction interval and the median as follows
@@ -248,8 +263,20 @@ Then plot it and the unconditional posterior
 
 ```{r }
 ggplot(data = Nest) +
+  geom_point(aes(x = N, y = mean, colour = "Posterior")) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +
-  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
+  geom_ribbon(
+    aes(
+      x = N,
+      ymin = mean - 2 * mean.mc_std_err,
+      ymax = mean + 2 * mean.mc_std_err
+    ),
+    fill = "grey",
+    alpha = 0.5
+  ) +
+  geom_point(aes(x = N, y = plugin_estimate, colour = "Plugin")) +
+  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin")) +
+  ylab("pmf")
 ```
 
 Do the differences make sense to you?
@@ -276,8 +303,8 @@ solid line the inlabru fit, the dashed line the GAM fit:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE,eval=TRUE}
 plot(pred_spde) +
   geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) +
-  geom_line(data = dat4pred2, aes(x, gam / exposure), lty = 2) +
-  geom_line(data = true.lambda, aes(x, y), lwd = 1.5) +
+  geom_line(data = dat4pred2, aes(x, gam / exposure, colour = "gam()"), lty = 2) +
+  geom_line(data = true.lambda, aes(x, y, colour = "True"), lwd = 1.5) +
   geom_point(data = cd2, aes(x, y = count / exposure)) +
   ylab("Intensity") + xlab("x") # SOLUTION
 ```

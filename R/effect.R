@@ -230,7 +230,6 @@ component <- function(...) {
 #' @examples
 #' \donttest{
 #' if (bru_safe_inla(quietly = TRUE)) {
-#'
 #'   # As an example, let us create a linear component. Here, the component is
 #'   # called "myEffectOfX" while the covariate the component acts on is called "x":
 #'
@@ -283,7 +282,6 @@ component.character <- function(object,
                                 A.msk = NULL,
                                 .envir = parent.frame(),
                                 envir_extra = NULL) {
-
   # INLA models:
   # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper,
   #            besagproper2, fgn, fgn2, ar1, ar1c, ar, ou, generic, generic0, generic1, generic2, generic3, spde,
@@ -555,11 +553,12 @@ component.character <- function(object,
     }
 
     component$inla.formula <-
-      as.formula(paste0(
-        "~ . + ",
-        as.character(parse(text = deparse(fcall)))
-      ),
-      env = .envir
+      as.formula(
+        paste0(
+          "~ . + ",
+          as.character(parse(text = deparse(fcall)))
+        ),
+        env = .envir
       )
 
     component$fcall <- fcall
@@ -842,13 +841,14 @@ add_mappers.component <- function(component, lhoods, ...) {
   if (!(component[["main"]][["type"]] %in% c("offset", "const"))) {
     # Update the formula that will be presented to INLA
     component$inla.formula <-
-      as.formula(paste0(
-        "~ . + ",
-        paste0(deparse(fcall),
-          collapse = "\n"
-        )
-      ),
-      env = component$env
+      as.formula(
+        paste0(
+          "~ . + ",
+          paste0(deparse(fcall),
+            collapse = "\n"
+          )
+        ),
+        env = component$env
       )
   }
 
@@ -917,12 +917,13 @@ bru_subcomponent <- function(input = NULL,
   } else if (is.character(model)) {
     if (identical(model, "factor")) {
       model <- "factor_contrast"
-      warning(paste0(
-        "Deprecated model 'factor'. Please use 'factor_full' or ",
-        "'factor_contrast' instead.\n",
-        "Defaulting to 'factor_contrast' that matches the old 'factor' model."
-      ),
-      immediate. = TRUE
+      warning(
+        paste0(
+          "Deprecated model 'factor'. Please use 'factor_full' or ",
+          "'factor_contrast' instead.\n",
+          "Defaulting to 'factor_contrast' that matches the old 'factor' model."
+        ),
+        immediate. = TRUE
       )
     }
     if (identical(model, "factor_full")) {
@@ -975,6 +976,7 @@ bru_subcomponent <- function(input = NULL,
 
 make_unique_inputs <- function(inp, allow_list = FALSE) {
   is_spatial <- vapply(inp, function(x) inherits(x, "Spatial"), TRUE)
+  is_sfc <- vapply(inp, function(x) inherits(x, "sfc"), TRUE)
   is_matrix <- vapply(inp, function(x) is.matrix(x), TRUE)
   is_Matrix <- vapply(inp, function(x) inherits(x, "Matrix"), TRUE)
   is_factor <- vapply(inp, function(x) is.factor(x), TRUE)
@@ -1008,6 +1010,23 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       )
     ))
     n_values <- nrow(inp_values)
+  } else if (any(is_sfc)) {
+    if (!all(is_sfc)) {
+      stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
+    }
+    inconsistent_crs <- FALSE
+    inp_crs <- lapply(inp, fm_crs)
+    null_crs <- vapply(inp_crs, is.na, logical(1))
+    inconsistent_crs <-
+      (length(unique(inp_crs)) > 1) ||
+        (any(null_crs) && !all(null_crs))
+    if (inconsistent_crs) {
+      stop("Inconsistent spatial crs information. Unable to infer mapper information.")
+    }
+    inp_values <- sf::st_sfc(unique(do.call(c, inp)),
+      crs = inp_crs[[1]]
+    )
+    n_values <- NROW(inp_values)
   } else if (any(is_matrix | is_Matrix)) {
     if (!all(is_matrix | is_Matrix)) {
       stop("Inconsistent input types; matrix and non-matrix")
@@ -1099,17 +1118,18 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
       # TODO: Check for vector/matrix/coordinate inconsistency
       null.results <- vapply(inp, function(x) is.null(x), TRUE)
       if (all(null.results)) {
-        warning(paste0(
-          "All covariate evaluations for '", label,
-          "' are NULL; an intercept component was likely intended.\n",
-          "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
-          "  Use explicit notation '+ ", label, "(1)' instead",
-          if (identical(label, "Intercept")) {
-            " (or '+1' for '+ Intercept(1)')"
-          },
-          "."
-        ),
-        immediate. = TRUE
+        warning(
+          paste0(
+            "All covariate evaluations for '", label,
+            "' are NULL; an intercept component was likely intended.\n",
+            "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
+            "  Use explicit notation '+ ", label, "(1)' instead",
+            if (identical(label, "Intercept")) {
+              " (or '+1' for '+ Intercept(1)')"
+            },
+            "."
+          ),
+          immediate. = TRUE
         )
         unique_inputs <- list(
           inp_values = 1,
@@ -1184,7 +1204,8 @@ make_submapper <- function(subcomp_n,
     (!is.null(subcomp_type) && (subcomp_type %in% "factor"))) {
     mapper <- bru_mapper_factor(
       values,
-      factor_mapping = subcomp_factor_mapping
+      factor_mapping = subcomp_factor_mapping,
+      indexed = require_indexed
     )
   } else {
     values <- sort(unique(values), na.last = NA)
@@ -1206,7 +1227,10 @@ make_submapper <- function(subcomp_n,
       }
     } else {
       if (require_indexed) {
-        mapper <- bru_mapper_factor(values, factor_mapping = "full")
+        mapper <- bru_mapper_factor(values,
+          factor_mapping = "full",
+          indexed = TRUE
+        )
       } else {
         mapper <- bru_mapper_linear()
       }
@@ -1496,38 +1520,46 @@ code.components <- function(components, add = "") {
 #' @param ... ignored.
 #' @param depth The depth of which to expand the component mapper.
 #' Default `Inf`, to traverse the entire mapper tree.
+#' @param verbose logical; If `TRUE`, includes more details of the
+#' component definitions. When `FALSE`, only show basic component
+#' definition information.  Default `TRUE`.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 
-summary.component <- function(object, ..., depth = Inf) {
+summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
   result <- list(
-    "Label" = object$label,
-    "Main" = sprintf(
-      "type '%s', input '%s'",
-      object[["main"]][["type"]],
-      deparse(object[["main"]][["input"]][["input"]])
+    "Label" = object[["label"]],
+    "Copy_of" = object[["copy"]],
+    "Type" = paste0(
+      unlist(lapply(
+        c("main", "group", "replicate"),
+        function(x) {
+          if (is.null(object[[x]][["input"]][["input"]])) {
+            NULL
+          } else {
+            paste0(x, " = ", object[[x]][["type"]])
+          }
+        }
+      )),
+      collapse = ", "
     ),
-    "Group" =
-      if (!is.null(object[["group"]][["input"]][["input"]])) {
-        sprintf(
-          "type '%s', input '%s'",
-          object[["group"]][["type"]],
-          deparse(object[["group"]][["input"]][["input"]])
-        )
-      } else {
-        NULL
-      },
-    "Replicate" =
-      if (!is.null(object[["replicate"]][["input"]][["input"]])) {
-        sprintf(
-          "type '%s', input '%s'",
-          object[["replicate"]][["type"]],
-          deparse(object[["replicate"]][["input"]][["input"]])
-        )
-      } else {
-        NULL
-      },
+    "Input" = paste0(
+      unlist(lapply(
+        c("main", "group", "replicate", "weights"),
+        function(x) {
+          if (is.null(object[[x]][["input"]][["input"]])) {
+            NULL
+          } else {
+            paste0(
+              x, " = ",
+              deparse(object[[x]][["input"]][["input"]])
+            )
+          }
+        }
+      )),
+      collapse = ", "
+    ),
     "Mapper" =
       if (is.null(object[["mapper"]])) {
         "Not yet initialised"
@@ -1553,8 +1585,31 @@ summary.component <- function(object, ..., depth = Inf) {
         )
       )
   )
-  if (!is.null(object[["copy"]])) {
-    result[["Copy"]] <- sprintf("Copy of component '%s'", object[["copy"]])
+  if (!verbose) {
+    Summary <- paste0(
+      object[["label"]],
+      if (is.null(object[["copy"]])) NULL else paste0("(=", object[["copy"]], ")"),
+      ": ",
+      paste0(
+        unlist(lapply(
+          c("main", "group", "replicate", "weights"),
+          function(x) {
+            if (is.null(object[[x]][["input"]][["input"]])) {
+              NULL
+            } else {
+              paste0(
+                x, " = ", object[[x]][["type"]],
+                "(",
+                deparse(object[[x]][["input"]][["input"]]),
+                ")"
+              )
+            }
+          }
+        )),
+        collapse = ", "
+      )
+    )
+    result$Summary <- Summary
   }
   class(result) <- c("summary_component", "list")
   result
@@ -1562,15 +1617,20 @@ summary.component <- function(object, ..., depth = Inf) {
 
 #' @export
 #' @method summary component_list
-#' @param ... ignored.
+#' @param ... passed on to other summary methods
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @rdname summary.component
 
-summary.component_list <- function(object, ...) {
+summary.component_list <- function(object, verbose = TRUE, ...) {
   result <- lapply(
     object,
-    summary
+    function(x) {
+      summary(x, verbose = verbose, ...)
+    }
   )
+  for (cp in which(vapply(result, function(x) !is.null(x$Copy_of), FALSE))) {
+    result[[cp]]$Type <- result[[result[[cp]][["Copy_of"]]]][["Type"]]
+  }
   class(result) <- c("summary_component_list", "list")
   result
 }
@@ -1581,16 +1641,20 @@ summary.component_list <- function(object, ...) {
 #' @rdname summary.component
 
 print.summary_component <- function(x, ...) {
-  for (name in names(x)) {
-    if (!is.null(x[[name]])) {
-      if (name %in% "Label") {
-        cat("Label:", "\t", x[[name]], "\n", sep = "")
-      } else if (name %in% "Mapper") {
-        cat("  ", "Map: ", x[[name]], "\n", sep = "")
-      } else {
-        cat("  ", name, ":", "\t", x[[name]], "\n", sep = "")
+  if (is.null(x[["Summary"]])) {
+    for (name in names(x)) {
+      if (!is.null(x[[name]])) {
+        if (name %in% "Label") {
+          cat("Label:", "\t", x[[name]], "\n", sep = "")
+        } else if (name %in% "Mapper") {
+          cat("  ", "Map: ", x[[name]], "\n", sep = "")
+        } else {
+          cat("  ", name, ":", "\t", x[[name]], "\n", sep = "")
+        }
       }
     }
+  } else {
+    cat(x[["Summary"]], "\n", sep = "")
   }
   invisible(x)
 }
@@ -1805,7 +1869,6 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
 
 input_eval.bru_input <- function(input, data, env = NULL,
                                  null.on.fail = FALSE, ...) {
-
   # Evaluate the map with the data in an environment
   enclos <-
     if (is.null(env)) {

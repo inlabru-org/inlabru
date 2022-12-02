@@ -1,7 +1,3 @@
-# Needed for registering S4 methods, e.g. vertices()
-setClass("inla.mesh")
-
-
 # GENERICS
 # refine = function(...) {UseMethod("refine")}
 # tsplit = function(...) {UseMethod("tsplit")}
@@ -78,25 +74,6 @@ is.inside.polygon <- function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = T
   }
 }
 
-#' Vertices
-#'
-#' This is a generic function. The outcome depends on the `object` provided
-#'
-#' @name vertices
-#' @exportMethod vertices
-#' @param object An object for which to call the particular vertices method.
-#' @return The form of the value returned by vertices() depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
-
-setGeneric("vertices", valueClass = "SpatialPointsDataFrame", function(object) {
-  standardGeneric("vertices")
-})
-
-#' Vertices
-#'
-#' @rdname vertices
-setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mesh(object))
-
-
 #' @title Extract vertex locations from an `inla.mesh`
 #'
 #' @description Converts the vertices of an `inla.mesh` object into a `SpatialPointsDataFrame`.
@@ -112,7 +89,7 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #' \donttest{
 #' if (require(ggplot2, quietly = TRUE)) {
 #'   data("mrsea", package = "inlabru")
-#'   vrt <- vertices(mrsea$mesh)
+#'   vrt <- vertices.inla.mesh(mrsea$mesh)
 #'   ggplot() +
 #'     gg(mrsea$mesh) +
 #'     gg(vrt, color = "red")
@@ -120,7 +97,12 @@ setMethod("vertices", signature("inla.mesh"), function(object) vertices.inla.mes
 #' }
 #'
 vertices.inla.mesh <- function(object) {
-  object$crs <- fm_ensure_crs(object$crs)
+  object$crs <- fm_crs(object$crs)
+  if (is.na(object$crs)) {
+    object$crs <- sp::CRS(NA_character_)
+  } else {
+    object$crs <- fm_as_sp_crs(object$crs)
+  }
 
   vrt <- data.frame(object$loc)
   if (!is.null(colnames(vrt))) {
@@ -167,6 +149,9 @@ vertices.inla.mesh <- function(object) {
 #' }
 #'
 pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
+  if (!identical(mesh$manifold, "R2")) {
+    stop("inlabru::pixels() currently works for R2 meshes only.")
+  }
   if (length(nx) == 1) {
     x <- seq(min(mesh$loc[, 1]), max(mesh$loc[, 1]), length = nx)
   } else {
@@ -180,7 +165,7 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
 
   pixels <- expand.grid(x = x, y = y)
   coordinates(pixels) <- c("x", "y")
-  if (!is.null(mesh$crs)) {
+  if (!fm_crs_is_null(mesh$crs)) {
     proj4string(pixels) <- mesh$crs
   }
 
@@ -216,6 +201,7 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
 # @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
 triangle <- function(mesh, loc) {
+  warning("'triangle()' is an internal unused function. To be replaced by method using inla.mesh.smorg, and later fmesher")
   mcross <- function(a, b) {
     return((a[, 1]) * (b[2]) - (a[, 2]) * (b[1]))
   }
@@ -264,6 +250,7 @@ triangle <- function(mesh, loc) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 
 refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
+  warning("refine.inla.mesh() is experimental and will be replaced by a new method")
   rmesh <- INLA::inla.mesh.create(
     loc = mesh$loc,
     interior = INLA::inla.mesh.interior(mesh),
@@ -275,8 +262,9 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
 
 #' Split triangles of a mesh into four triangles
 #'
-#' Warning: does not reconstruct interior boundary
-#' Warning2: Works in euclidean coordinates. Not suitable for sphere.
+#' * Warning: does not reconstruct interior boundary
+#' * Warning2: Works in euclidean coordinates. Not suitable for sphere.
+#' * Warning3: Experimental; will be replaced by a new method
 #'
 #' @aliases tsplit.inla.mesh
 #' @keywords internal
@@ -286,6 +274,8 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 
 tsplit.inla.mesh <- function(mesh, n = 1) {
+  warning("tsplit.inla.mesh() is experimental and will be replaced by a new method")
+
   n <- 1
 
   p1 <- mesh$loc[mesh$graph$tv[, 1], ]

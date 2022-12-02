@@ -215,9 +215,24 @@ test_that("logsumexp mapper", {
   )
   expect_equal(ibm_values(mapper, state = c(1, 1)), seq_len(2))
 
+  state <- c(1, 2, 3, 4, 5)
+
+  # Test default input handling
+  # Should treat NULL group and weights as all-1, but input needs to be supplied
+  expect_equal(
+    ibm_eval(mapper, input = NULL, state = state),
+    5.451914,
+    tolerance = lowtol
+  )
+  expect_equal(
+    ibm_eval(mapper, input = NULL, state = state),
+    5.451914,
+    tolerance = lowtol
+  )
+
+
   input <-
     list(block = c(1, 2, 2, 1, 3), weights = c(1, 1, 1, 2, 3))
-  state <- c(1, 2, 3, 4, 5)
 
   val <- c(4.717736, 3.313262, 6.098612)
   A <- Matrix::sparseMatrix(

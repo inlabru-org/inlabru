@@ -86,7 +86,6 @@ NULL
 
 import.gorillas <- function() {
   if (!check_spatstat("spatstat.data")) {
-
     # Load Gorilla data from spatstat
     gorillas <- NULL
   }

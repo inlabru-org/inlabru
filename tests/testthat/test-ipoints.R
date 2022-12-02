@@ -87,7 +87,7 @@ test_that("SLDF in metres to integration points using grouping parameter", {
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(
     colnames(as.data.frame(ips)),
-    c("weight", "vertex", "season", "x", "y", "coordinateZ")
+    c("weight", "vertex", "season", "x", "y")
   )
   # Should be a factor 1000 relative to the kilometre scale, since both schemes us
   # CRS information to convert to km, but the weight information is in metres here
@@ -107,7 +107,7 @@ test_that("SLDF in kilometres to integration points using grouping parameter", {
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(
     colnames(data.frame(ips)),
-    c("weight", "vertex", "season", "x", "y", "coordinateZ", "optional")
+    c("weight", "vertex", "season", "x", "y", "optional")
   )
   expect_equal(sum(ips$weight) / 2293.712, 1, tolerance = midtol)
 })

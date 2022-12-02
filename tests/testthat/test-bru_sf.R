@@ -1,7 +1,7 @@
 local_bru_testthat_setup()
 
 test_that("sf gorillas lgcp vignette", {
-  skip("Feature not yet implemented")
+  ##  skip("Feature not yet implemented")
 
   skip_on_cran()
   local_bru_safe_inla()
@@ -12,7 +12,7 @@ test_that("sf gorillas lgcp vignette", {
 
   # All sp objects in the example are replaced with sf equivalents.
 
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
   gorillas_sf <- list()
   gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
 
@@ -35,18 +35,24 @@ test_that("sf gorillas lgcp vignette", {
   )
 
   ## Build the mesh:
-  mesh_sf <- INLA::inla.mesh.2d(
-    boundary = boundary,
-    max.edge = c(0.54, 0.97),
-    min.angle = c(30, 21),
-    max.n = c(48000, 16000),
-    ## Safeguard against large meshes.
-    max.n.strict = c(128000, 128000),
-    ## Don't build a huge mesh!
-    cutoff = 0.01,
-    ## Filter away adjacent points.
-    offset = c(0.73, 1.55)
-  ) ## Offset for extra boundaries, if needed.
+  ## Suppress PROJ support warnings, until the inla.mesh functions are updated
+  suppressWarnings(
+    mesh_sf <- INLA::inla.mesh.2d(
+      boundary = boundary,
+      max.edge = c(0.54, 0.97),
+      min.angle = c(30, 21),
+      ## Safeguard against large meshes.
+      max.n = c(48000, 16000),
+      ## Don't build a huge mesh!
+      max.n.strict = c(128000, 128000),
+      ## Filter away adjacent points.
+      cutoff = 0.01,
+      ## Offset for extra boundaries, if needed.
+      offset = c(0.73, 1.55),
+      ## Build mesh in this crs:
+      crs = fm_CRS(fm_crs(gorillas$nests))
+    )
+  )
 
   # library(ggplot2)
   # ggplot() +
@@ -58,19 +64,14 @@ test_that("sf gorillas lgcp vignette", {
     prior.range = c(5, 0.01)
   )
 
-  library(sf)
-  # Using sf::st_coordinates here did not seem to parse correctly
-  # and the domain definition in the lgcp() call was expecting a
-  # domain named sf.
-  # FL: st_coordinates produces a matrix with both coordinates and some labelling columns,
-  # so is not a proper equivalent of sp::coordinates. But the geometry column
-  # makes sense to use.
   cmp <- geometry ~ mySmooth(geometry, model = matern) +
     Intercept(1)
 
   # Check integration construction
   ips_sp <- ipoints(gorillas$boundary, mesh_sf)
   ips_sf <- ipoints(gorillas_sf$boundary, mesh_sf)
+
+  expect_equal(ips_sp$weight, ips_sf$weight)
 
   fit <- lgcp(
     cmp,

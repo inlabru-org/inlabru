@@ -13,7 +13,6 @@ print.prediction <- function(prd) {
 
 
 summary.prediction <- function(prd) {
-
   # Univariate predictions
   if ("mce" %in% names(prd)) {
     print(data.frame(

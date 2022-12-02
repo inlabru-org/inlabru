@@ -4,7 +4,7 @@ test_that("eval_spatial.SpatRaster", {
   skip_if_not_installed("terra")
 
   # Load the Gorilla data
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
 
   covs <- c(
     terra::rast(gorillas$gcov$elevation),
@@ -65,9 +65,8 @@ test_that("eval_spatial.SpatRaster", {
 
 
 test_that("eval_spatial.Spatial", {
-
   # Load the Gorilla data
-  data(gorillas, package = "inlabru")
+  data(gorillas, package = "inlabru", envir = environment())
 
   covs <- gorillas$gcov$elevation
   names(covs) <- "A"

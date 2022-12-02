@@ -46,7 +46,7 @@ bru_mapper_linear(...)
 
 bru_mapper_matrix(labels, ...)
 
-bru_mapper_factor(values, factor_mapping, ...)
+bru_mapper_factor(values, factor_mapping, indexed = FALSE, ...)
 
 bru_mapper_const(...)
 
@@ -84,12 +84,12 @@ For \code{bru_mapper_scale}, a mapper to be scaled.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
-\item{indexed}{logical; If \code{TRUE}, the \code{ibm_values()} output will be the
-integer indexing sequence for the latent variables (needed for \code{spde} models).
-If \code{FALSE}, the knot
-locations are returned (useful as an interpolator for \code{rw2} models
-and similar).
-Default: \code{NULL}, to force user specification of this parameter}
+\item{indexed}{logical; if \code{TRUE}, the \code{ibm_values()} method
+will return an integer vector instead of the factor levels.
+This is needed e.g. for \code{group} and \code{replicate} mappers, since
+\code{INLA::f()} doesn't accept factor values. Default: \code{FALSE}, which
+works for the main input mappers. The default mapper constructions
+will set it the required setting.}
 
 \item{n}{Size of a model for \code{bru_mapper_index}}
 
@@ -186,6 +186,22 @@ To register mapper classes and methods in scripts, use \code{.S3method()}
 to register the methods, e.g.
 \code{.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)}.
 
+In packages with \code{Suggests: inlabru}, add method information for delayed
+registration, e.g.:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{#' @rawNamespace S3method(inlabru::bru_get_mapper, inla_rspde)
+#' @rawNamespace S3method(inlabru::ibm_n, bru_mapper_inla_rspde)
+#' @rawNamespace S3method(inlabru::ibm_values, bru_mapper_inla_rspde)
+#' @rawNamespace S3method(inlabru::ibm_jacobian, bru_mapper_inla_rspde)
+}\if{html}{\out{</div>}}
+
+or before each method, use \verb{@exportS3Method}:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{#' @exportS3Method inlabru::bru_get_mapper
+}\if{html}{\out{</div>}}
+
+etc., which semi-automates it.
+
 \item \code{bru_mapper_index()}: Create a an indexing mapper
 
 \item \code{bru_mapper_taylor()}: Provides a pre-computed affine mapping,
@@ -243,14 +259,19 @@ vector, of length \code{intercept + order}. This can be used to
 give an effective spectral prior. For example, let
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{scaling = 1 / (1 + (0:4)^2)
-A1 = bru_mapper_harmonics(order = 4)
-u1 <- A1 \%*\% rnorm(9, sd = scaling)
+x <- seq(0, 1, length.out = 11)
+bmh1 = bru_mapper_harmonics(order = 4, interval = c(0, 1))
+u1 <- ibm_eval(
+  bmh1,
+  input = x,
+  state = rnorm(9, sd = rep(scaling, c(1, 2, 2, 2, 2)))
+)
 }\if{html}{\out{</div>}}
 
 Then, with
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{A2 = bru_mapper_harmonics(order = 4, scaling = scaling)
-u2 = A2 \%*\% rnorm(9)
+\if{html}{\out{<div class="sourceCode">}}\preformatted{bmh2 = bru_mapper_harmonics(order = 4, scaling = scaling)
+u2 = ibm_eval(bmh2, input = x, state = rnorm(9))
 }\if{html}{\out{</div>}}
 
 the stochastic properties of \code{u1} and \code{u2} will be the same, with \code{scaling^2}

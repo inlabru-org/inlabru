@@ -159,9 +159,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     if (ignore.CRS) {
       mesh$crs <- NULL
     }
-    input.crs <- fm_CRS(fm_CRSargs(mesh$crs))
-    input.crs.list <- fm_CRSargs_as_list(fm_CRSargs(input.crs))
-    use.crs <- !is.null(input.crs.list$proj) && !ignore.CRS
+    input.crs <- fm_crs(mesh$crs)
+    use.crs <- !is.na(input.crs) && !ignore.CRS
     is.geocent <- (mesh$manifold == "S2")
 
     if (is.geocent || use.crs) {
@@ -177,7 +176,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         strategy <- "triangulated"
       } else if (!use.crs) {
         strategy <- "rectangle"
-      } else if (identical(input.crs.list$proj, "longlat")) {
+      } else if (identical(sf::st_crs(input.crs)$proj, "longlat")) {
         strategy <- "sliced-spherical"
       }
     }
@@ -185,11 +184,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
 
     if (is.geocent) {
       space.R <- mean(rowSums(mesh$loc^2)^0.5)
-      if (is.null(input.crs.list$units)) {
-        space.units <- "m"
-      } else {
-        space.units <- input.crs.list$units
-      }
+      space.units <- fm_length_unit(input.crs)
       internal.crs <- fm_CRS("sphere", args = list(a = 1, b = 1, units = "m"))
       mesh$loc <- mesh$loc / space.R
       mesh$crs <- internal.crs
@@ -222,7 +217,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (is.geocent) {
           area.mesh <- mesh
         } else if (use.crs) {
-          area.mesh <- fm_spTransform(mesh, CRSobj = internal.crs)
+          area.mesh <- fm_transform(mesh, crs = internal.crs)
         } else {
           area.mesh <- mesh
           area.R <- 1
@@ -262,7 +257,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (is.geocent) {
           target.crs <- internal.crs
         } else if (use.crs) {
-          target.crs <- input.crs
+          target.crs <- fm_CRS(input.crs)
         } else {
           target.crs <- CRS(as.character(NA))
         }
@@ -344,7 +339,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           waste_ratio <- sum(keep) / length(keep)
         }
       } else if (strategy == "sliced-spherical") {
-        if (identical(input.crs.list$proj, "longlat")) {
+        if (identical(input.crs$proj, "longlat")) {
           # Simulate number of points
           lon.range <- range(mesh$loc[, 1])
           lat.range <- range(mesh$loc[, 2])
@@ -372,7 +367,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         for (k in seq_len(length(sp) - 1)) {
           n.points <- sp[k + 1] - sp[k]
           if (n.points == 0) {
-            sampled.points[[k]] <- SpatialPoints(matrix(0, 1, 3), proj4string = internal.crs)[-1]
+            sampled.points[[k]] <-
+              sp::SpatialPoints(matrix(0, 1, 3), proj4string = internal.crs)[-1]
             break
           }
 
@@ -420,30 +416,30 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
 
     if (is.geocent) {
       if (length(ret) > 0) {
-        ret <- sp::spTransform(ret, fm_CRS("sphere", args = list(a = space.R, b = space.R, units = "m")))
+        ret <- fm_transform(ret, crs = fm_CRS("sphere", args = list(a = space.R, b = space.R, units = "m")))
       } else if (multi.samples) {
-        ret <- SpatialPointsDataFrame(matrix(0, 1, 3), data = data.frame(sample = 1))[-1]
+        ret <- sp::SpatialPointsDataFrame(matrix(0, 1, 3), data = data.frame(sample = 1))[-1]
       } else {
-        ret <- SpatialPoints(matrix(0, 1, 3))[-1]
+        ret <- sp::SpatialPoints(matrix(0, 1, 3))[-1]
       }
       if (use.crs) {
-        proj4string(ret) <- input.crs
+        proj4string(ret) <- fm_CRS(input.crs)
       } else {
         proj4string(ret) <- CRS(as.character(NA))
       }
     } else {
       if (use.crs) {
         if (length(ret) > 0) {
-          ret <- spTransform(ret, input.crs)
+          ret <- fm_transform(ret, input.crs)
         } else if (multi.samples) {
-          ret <- SpatialPointsDataFrame(matrix(0, 1, 2), data = data.frame(sample = 1))[-1]
-          proj4string(ret) <- input.crs
+          ret <- sp::SpatialPointsDataFrame(matrix(0, 1, 2), data = data.frame(sample = 1))[-1]
+          proj4string(ret) <- fm_CRS(input.crs)
         } else {
-          ret <- SpatialPoints(matrix(0, 1, 2))[-1]
-          proj4string(ret) <- input.crs
+          ret <- sp::SpatialPoints(matrix(0, 1, 2))[-1]
+          proj4string(ret) <- fm_CRS(input.crs)
         }
       } else {
-        proj4string(ret) <- CRS(as.character(NA))
+        proj4string(ret) <- sp::CRS(NA_character_)
       }
     }
 

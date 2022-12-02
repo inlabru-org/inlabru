@@ -26,8 +26,6 @@ globe <- function(R = 1,
                   axes = FALSE,
                   box = FALSE,
                   xlab = "", ylab = "", zlab = "") {
-
-
   # coordinates for texture
   n.smp <- 50
   lat <- matrix(-asin(seq(-1, 1, len = n.smp)), n.smp, n.smp, byrow = TRUE)
@@ -96,7 +94,7 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
     object <- ll
   }
 
-  object <- fm_spTransform(object, CRSobj = fm_CRS("sphere"))
+  object <- fm_transform(object, crs = fm_crs("sphere"))
   cc <- coordinates(object)
   requireNamespace("rgl")
   rgl::rgl.points(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
@@ -131,8 +129,8 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
   proj4string(sp) <- fm_sp_get_crs(object)
   proj4string(ep) <- fm_sp_get_crs(object)
 
-  sp <- fm_spTransform(sp, CRSobj = fm_CRS("sphere"))
-  ep <- fm_spTransform(ep, CRSobj = fm_CRS("sphere"))
+  sp <- fm_transform(sp, crs = fm_crs("sphere"))
+  ep <- fm_transform(ep, crs = fm_crs("sphere"))
 
   cs <- coordinates(sp)
   ce <- coordinates(ep)
@@ -171,7 +169,7 @@ glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
     colnames(ll) <- c("x", "y", "z")
     coordinates(ll) <- c("x", "y", "z")
     proj4string(ll) <- object$crs
-    ll <- fm_spTransform(ll, CRSobj = fm_CRS("sphere"))
+    ll <- fm_transform(ll, crs = fm_crs("sphere"))
     object$loc <- coordinates(ll)
   }
 
@@ -184,30 +182,3 @@ glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
 
 
 
-# Play (animate) spatial field
-#
-# Animates a spatial field using RGL.
-#
-# @aliases play.spatial
-# @export
-# @param group Example: group = list(year = c(1,2)) animates the field for years 1 and 2
-# @param ... Parameters passed on to \link{plot.spatial}
-#
-
-play.spatial <- function(group = list(), rgl, ...) {
-  if (!rgl) {
-    rgl <- TRUE
-  }
-  globe()
-  sargs <- list(...)
-  myanim <- function(time, ...) {
-    rgl::par3d(skipRedraw = TRUE)
-    grp <- list()
-    grp[[names(group)[[1]]]] <- group[[1]][(floor(time) %% 2) + 1]
-    do.call(pixelplot.mesh, c(sargs, list(group = grp, add = TRUE, rgl = TRUE)))
-    rgl::par3d(skipRedraw = FALSE)
-    return("")
-  }
-
-  rgl::play3d(myanim, duration = 10, startTime = 0, fps = 1)
-}

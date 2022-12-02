@@ -56,7 +56,7 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
 
   # Predict SPDE and vegetation at the mesh vertex locations
 
-  vrt <- vertices(gorillas$mesh)
+  vrt <- vertices.inla.mesh(gorillas$mesh)
   pred <- predict(
     fit,
     vrt,
