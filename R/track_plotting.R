@@ -17,8 +17,8 @@
 #' @export
 #' @examples
 #' \dontrun{
-#'    fit <- bru(...)
-#'    bru_convergence_plot(fit)
+#' fit <- bru(...)
+#' bru_convergence_plot(fit)
 #' }
 bru_convergence_plot <- function(x) {
   stopifnot(inherits(x, "bru"))

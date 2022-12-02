@@ -200,6 +200,6 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NUL
 #' }
 #'
 stransform <- function(splist, crs) {
-  lifecycle::deprecate_warn("2.6.0.9004", "stransform()", "fm_transform()")
+  lifecycle::deprecate_warn("2.7.0", "stransform()", "fm_transform()")
   fm_transform(splist, crs = crs)
 }

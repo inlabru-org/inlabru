@@ -3,9 +3,11 @@ local_bru_testthat_setup()
 test_that("Aggregated Gaussian observations", {
   local_bru_safe_inla()
 
-  obs <- data.frame(x = c(10, 20, 30),
-                    y = c(10, 20, 30),
-                    z = c(10, 20, 30))
+  obs <- data.frame(
+    x = c(10, 20, 30),
+    y = c(10, 20, 30),
+    z = c(10, 20, 30)
+  )
   pred <- data.frame(
     x = c(1, 2, 3, 4, 5, 6),
     y = c(1, 20, 3, 40, 5, 60),
@@ -108,8 +110,10 @@ test_that("Aggregated Poisson observations", {
 
   # With E specification:
 
-  obs <- data.frame(y = c(10, 20, 30),
-                    E = c(1, 2, 3))
+  obs <- data.frame(
+    y = c(10, 20, 30),
+    E = c(1, 2, 3)
+  )
 
   fit <- bru(
     comp,
@@ -131,5 +135,4 @@ test_that("Aggregated Poisson observations", {
     c(0.639, 0.237),
     tolerance = midtol
   )
-
 })

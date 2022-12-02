@@ -106,7 +106,7 @@ ibm_values <- function(mapper, inla_f = FALSE, ...) {
 #' @export
 ibm_amatrix <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   lifecycle::deprecate_soft(
-    "2.6.0.9000",
+    "2.7.0",
     "ibm_amatrix()",
     "ibm_jacobian()"
   )
@@ -215,7 +215,7 @@ ibm_invalid_output <- function(mapper, input, state, ...) {
 #' @export
 ibm_valid_input <- function(...) {
   lifecycle::deprecate_stop(
-    "2.6.0.9001",
+    "2.7.0",
     "ibm_valid_input()"
   )
   UseMethod("ibm_valid_input")
@@ -509,7 +509,7 @@ bru_mapper_define <- function(mapper,
         "etc., which semi-automates it."
       )
     lifecycle::deprecate_warn(
-      when = "2.6.0.9000",
+      when = "2.7.0",
       what = "bru_mapper_define(methods)",
       details =
         c(
@@ -537,7 +537,7 @@ bru_mapper_define <- function(mapper,
 #' @export
 bru_mapper.default <- function(...) {
   lifecycle::deprecate_warn(
-    "2.6.0.9000",
+    "2.7.0",
     "bru_mapper.default()",
     "bru_mapper_define()"
   )
@@ -771,7 +771,7 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_inla_mesh_2d <- function(...) {
-  .Deprecated("ibm_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -829,7 +829,7 @@ ibm_jacobian.bru_mapper_inla_mesh_1d <- function(mapper, input, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_inla_mesh_1d <- function(...) {
-  .Deprecated("ibm_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -872,7 +872,7 @@ ibm_jacobian.bru_mapper_index <- function(mapper, input, state, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_index <- function(...) {
-  .Deprecated("ibm_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -1120,7 +1120,7 @@ ibm_jacobian.bru_mapper_linear <- function(mapper, input, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_linear <- function(...) {
-  .Deprecated("bru_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -1188,7 +1188,7 @@ ibm_jacobian.bru_mapper_matrix <- function(mapper, input, state = NULL,
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_matrix <- function(...) {
-  .Deprecated("bru_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -1296,7 +1296,7 @@ ibm_jacobian.bru_mapper_factor <- function(mapper, input, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_factor <- function(...) {
-  .Deprecated("bru_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -1345,27 +1345,28 @@ ibm_eval.bru_mapper_const <- function(mapper, input, state = NULL, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Creates a [bru_mapper_const()] mapper.
 bru_mapper_offset <- function(...) {
-  #  .Deprecated("bru_mapper_const")
+  lifecycle::deprecate_soft("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
   bru_mapper_define(bru_mapper_const(), new_class = "bru_mapper_offset")
 }
 
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [bru_mapper_const] methods
 ibm_n.bru_mapper_offset <- function(...) {
-  .Deprecated("bru_mapper_const")
+  lifecycle::deprecate_soft("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
   NextMethod()
 }
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [bru_mapper_const] methods
 ibm_values.bru_mapper_offset <- function(...) {
-  .Deprecated("bru_mapper_const")
+  lifecycle::deprecate_soft("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
   NextMethod()
 }
 
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [bru_mapper_const] methods
 ibm_amatrix.bru_mapper_offset <- function(...) {
-  .Deprecated("bru_mapper_const")
+  lifecycle::deprecate_soft("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   NextMethod()
 }
 
@@ -2297,7 +2298,7 @@ ibm_jacobian.bru_mapper_multi <- function(mapper,
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_multi <- function(...) {
-  .Deprecated("bru_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -2690,7 +2691,7 @@ ibm_jacobian.bru_mapper_collect <- function(mapper, input, state = NULL,
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_collect <- function(...) {
-  .Deprecated("bru_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 

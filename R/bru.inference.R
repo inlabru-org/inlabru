@@ -2860,13 +2860,13 @@ print.summary_bru <- function(x, ...) {
 
 
 
-#' @describeIn inlabru-deprecated Old summary for an inlabru fit.
-#'
-#' Takes a fitted `bru` object produced by [bru()] or [lgcp()] and creates
-#' various summaries from it.
-#'
-#' @export
-#' @param object An object obtained from a [bru()] or [lgcp()] call
+# @describeIn inlabru-deprecated Old summary for an inlabru fit.
+#
+# Takes a fitted `bru` object produced by [bru()] or [lgcp()] and creates
+# various summaries from it.
+#
+# @export
+# @param object An object obtained from a [bru()] or [lgcp()] call
 
 summary_bru <- function(object, ...) {
   .Deprecated(new = "summary")

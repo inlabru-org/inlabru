@@ -1,10 +1,4 @@
-# DEPRECATED
-pixelplot.mesh <- function(...) {
-  .Deprecated("gg.inla.mesh")
-}
-
-
-#' Plot a map using extend of a spatial object
+#' Plot a map using extent of a spatial object
 #'
 #' Uses get_map() to query map services like Google Maps for a region centered around
 #' the spatial object provided. Then calls ggmap() to plot the map.

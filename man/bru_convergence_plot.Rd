@@ -16,7 +16,7 @@ estimation
 }
 \examples{
 \dontrun{
-   fit <- bru(...)
-   bru_convergence_plot(fit)
+fit <- bru(...)
+bru_convergence_plot(fit)
 }
 }
