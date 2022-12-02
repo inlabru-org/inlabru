@@ -152,14 +152,13 @@
 <p>This is a basic example which shows you how fit a simple spatial Log Gaussian Cox Process (LGCP) and predicts its intensity:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load libraries</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"rgdal_show_exportToProj4_warnings"</span> <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: sp</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
 <span><span class="co">#&gt; Loading required package: foreach</span></span>
 <span><span class="co">#&gt; Loading required package: parallel</span></span>
-<span><span class="co">#&gt; This is INLA_22.11.08 built 2022-11-08 17:47:27 UTC.</span></span>
+<span><span class="co">#&gt; This is INLA_22.11.28-1 built 2022-11-28 08:04:58 UTC.</span></span>
 <span><span class="co">#&gt;  - See www.r-inla.org/contact-us for how to get help.</span></span>
 <span><span class="co">#&gt;  - To enable PARDISO sparse library; see inla.pardiso()</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -186,23 +185,6 @@
 <span>  <span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
 <span></span>
 <span><span class="co"># Predict Gorilla nest intensity</span></span>
 <span><span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -210,11 +192,6 @@
 <span>  <span class="fu"><a href="reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span>,</span>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: PROJ support is provided by the sf and terra packages among others</span></span>
 <span></span>
 <span><span class="co"># Plot the result</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
