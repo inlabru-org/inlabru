@@ -8,7 +8,7 @@
 
 * Expanded geometry and mesh handling methods
 
-* Expanded `bru_mapper` system
+* Expanded `bru_mapper()` system
 
 * Added convergence diagnostics plot with `bru_convergence_plot()`
 
@@ -17,20 +17,20 @@
 * Allow `NA` input for default 1D mappers to generate effect zero, like
   in `inla()`.
   
-* New and expanded methods `fm_crs`, `fm_CRS`, `fm_transform`,
-  `fm_ellipsoid_radius`, and `fm_length_unit` to further support `sf` objects.
-  The `fm_crs` extraction method also supports `terra` objects.
+* New and expanded methods `fm_crs()`, `fm_CRS()`, `fm_transform()`,
+  `fm_ellipsoid_radius()`, and `fm_length_unit()` to further support `sf` objects.
+  The `fm_crs()` extraction method also supports `terra` objects.
 
-* `bru_fill_missing` now supports `terra` `SpatRaster` data and and `sf` locations.
+* `bru_fill_missing()` now supports `terra` `SpatRaster` data and and `sf` locations.
   
-* New experimental methods `fm_evaluator` and `fm_evaluate`, replacing the
+* New experimental methods `fm_evaluator()` and `fm_evaluate()`, replacing the
   `INLA` `inla.mesh.projector` and `inla.mesh.project` methods.
   
 * Experimental integration support for sphere and globe meshes.
   
 * Allow `sf` input to `family="cp"` models.
 
-* Further `bru_mapper` method updates;
+* Further `bru_mapper()` method updates;
 
   * Deprecated `ibm_amatrix()` and `names()`
   methods, replaced by `ibm_jacobian()` and `ibm_names()`.
@@ -45,7 +45,7 @@
     providing the weights as log-weights, and uses block-wise shifts to
     avoid potential overflow.
   
-  * `summary` methods for `bru_mapper` objects
+  * `summary` methods for `bru_mapper` objects (`summary.bru_mapper()`)
   
   * Removed `methods` argument from `bru_mapper_define()`.  Implementations
     should register S3 methods instead.
@@ -54,11 +54,11 @@
 
 * Remove unused `spatstat.core` dependency. Fixes #165
 
-* Fixed issue with plain mapper evaluation in the `ibm_eval.default`
-  and `ibm_eval.bru_mapper_collect` methods, where they would return zeros
+* Fixed issue with plain mapper evaluation in the `ibm_eval.default()`
+  and `ibm_eval.bru_mapper_collect()` methods, where they would return zeros
   instead of the intended values.
   The main component evaluation and estimation code was not directly affected
-  as that is based on the `bru_mapper_multi` class methods that rely on the
+  as that is based on the `bru_mapper_multi()` class methods that rely on the
   Jacobians instead.  The bug would therefore mainly have impacted the future,
   not yet supported nonlinear mapper extensions.
   
