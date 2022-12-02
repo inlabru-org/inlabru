@@ -1,3 +1,5 @@
+# inlabru (development version)
+
 # inlabru 2.7.0
 
 ## Feature overview
