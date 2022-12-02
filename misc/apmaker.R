@@ -1,8 +1,7 @@
 #' @aliases apmaker
 #' @export
-#' TODO 20221109 does domainsssss make more sense?
 #' @param domain A list/A list of list(s) of named integration definitions, each
-#' either a vector of factors ,a numeric vector of points given integration
+#' either character/factor vector, a numeric vector of points given integration
 #'  weight 1, an `inla.mesh.1d` object, or an `inla.mesh.2d` object. Only those
 #' domains that are not given in the `samplers` data.frame are used, plus the
 #' coordinates object, used for the spatial aspect of the `samplers` object.
@@ -45,21 +44,25 @@ apmaker <- function(domain = NULL, samplers = NULL,
       inherits(
         x,
         c(
-          "data.frame",
+          # "data.frame", # maybe in the future
+          "character",
           "factor",
           "numeric",
+          "inla.mesh",
           "inla.mesh.1d",
-          "inla.mesh"
+          "inla.mesh.lattice",
+          "raster",
+          "spatraster"
         )
       )
     })))) {
-      stop("Domain must be of class data.frame, factor, numeric, inla.mesh, inla.mesh.1d")
+      stop("Domain must be of class factor, numeric, inla.mesh, inla.mesh.1d, inla.mesh.lattice, raster, spatraster")
     }
   } else if (!inherits(
     domain,
     c("data.frame", "factor", "numeric", "inla.mesh.1d", "inla.mesh")
   )) {
-    stop("Domain must be of class data.frame, factor, numeric, inla.mesh, inla.mesh.1d")
+    stop("Domain must be of class factor, numeric, inla.mesh, inla.mesh.1d, inla.mesh.lattice, raster, spatraster")
   }
 
   # Sort multi domain samplers, single domain samplers,
@@ -89,7 +92,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
 
   # multi domain sampler the main thing is data dname 23112022 specific column has that meaning
   # check sf or sp object, can do a mix of sp and sf objects,
-  # We do not care if samplers a list or not now
+  # We do not care if samplers a list or not now 20221201 We should allow sf and sp input, if there is a mix then give a warning and log and change them into sf
     sf_samplers <- lapply(samplers, function(x) inherits(x, c("sf", "sfc")))
     sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
     if (any(sp_samplers)) {
