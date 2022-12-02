@@ -20,7 +20,7 @@ Authors@R: c(
          role = c("ctb", "dtc", "cph"),
          comment = "Lindesay Scott-Howard provided MRSea data import code"),
   person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
-         comment = "Andy Seaton provided testing and bugfixes"),
+         comment = "Andy Seaton provided testing, bugfixes, and vignettes"),
   person("Suen", "Man Ho", email = "M.H.Suen@sms.ed.ac.uk", role = c("ctb", "cph"),
          comment = "Man Ho Suen contributed features for aggregated responses and vignette updates"),
   person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
