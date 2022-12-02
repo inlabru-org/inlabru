@@ -4,12 +4,7 @@
 \alias{spoly}
 \title{Convert a data.frame of boundary points into a SpatialPolgonsDataFrame}
 \usage{
-spoly(
-  data,
-  cols = colnames(data)[1:2],
-  crs = CRS(NA_character_),
-  to.crs = NULL
-)
+spoly(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NULL)
 }
 \arguments{
 \item{data}{A data.frame of points describing the boundary of the polygon}

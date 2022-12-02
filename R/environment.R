@@ -1,7 +1,7 @@
 #' @include 0_inlabru_envir.R
 
 #' @title Get access to the internal environment
-#' @details The environment is defined in aaaaa.R which is loaded first.
+#' @details The environment is defined in 0_inlabru_envir.R which is loaded first.
 #' @keywords internal
 bru_env_get <- function() {
   pkg_envir <- parent.env(environment())
@@ -740,73 +740,8 @@ bru_log_active <- function(activation = NULL) {
 
 # Old options methods ----
 
-#' @describeIn inlabru-deprecated Use `bru_option_get` instead.
-#' @param name character; an option name
-#' @export
-iinla.getOption <- function(name = NULL) {
-  if (identical(name, "iinla.verbose")) {
-    new_option <- "bru_verbose"
-  } else {
-    new_option <- name
-  }
-  .Deprecated(
-    paste0('bru_options_get("', new_option, '")'),
-    old = deparse(sys.call(sys.parent()))
-  )
-  res <- bru_options_get(new_option)
-  res
-}
 
 
-#' @describeIn inlabru-deprecated Use `bru_option_set` instead.
-#' @export
-iinla.setOption <- function(...) {
-  iinla.setOption.core <- function(option = c(
-                                     "control.compute",
-                                     "control.inla",
-                                     "iinla.verbose",
-                                     "control.fixed"
-                                   ),
-                                   value,
-                                   option_value_alternating = TRUE) {
-    if (identical(option, "iinla.verbose")) {
-      new_option <- "bru_verbose"
-    } else {
-      new_option <- option
-    }
-    if (option_value_alternating) {
-      .Deprecated(
-        paste0("bru_options_get(", new_option, " = value)"),
-        old = paste0('iinla.setOption("', option, '", value)')
-      )
-    } else {
-      .Deprecated(
-        paste0("bru_options_get(", new_option, " = value)"),
-        old = paste0("iinla.setOption(", option, " = value)")
-      )
-    }
-    setting <- list(value)
-    names(setting) <- new_option
-    do.call(bru_options_set, setting)
-  }
-  called <- list(...)
-  len <- length(names(called))
-  if (len > 0L) {
-    for (i in 1L:len) {
-      do.call(
-        iinla.setOption.core,
-        args = list(
-          names(called)[i],
-          called[[i]],
-          option_value_alternating = FALSE
-        )
-      )
-    }
-  } else {
-    iinla.setOption.core(..., option_value_alternating = TRUE)
-  }
-  return(invisible())
-}
 
 
 
@@ -842,7 +777,13 @@ iinla.setOption <- function(...) {
 #' }
 #'
 init.tutorial <- function() {
-  .Deprecated("bru_options_set(bru_verbose = TRUE, control.compute = list(dic = TRUE, waic = TRUE))")
+  lifecycle::deprecate_warn(
+    "2.5.0",
+    I("init.tutorial()"),
+    I(
+      "bru_options_set(bru_verbose = TRUE, control.compute = list(dic = TRUE, waic = TRUE))"
+    )
+  )
   message("Setting defaults for tutorial session.")
   local_bru_options_set(
     bru_verbose = TRUE,

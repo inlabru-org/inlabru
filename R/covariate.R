@@ -58,27 +58,6 @@ covdata.import <- function(dframe, colname, data) {
 }
 
 
-# Plot covariate data set
-#
-# Note: documentation does not match code
-#
-# @aliases plot.covdata
-# @export
-# @param covdata A covariate data set
-# @examples
-# \dontrun{
-# data(sst, package = "inlabru")
-# plot.covariate(sst, time = 1)
-# }
-# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
-
-plot.covdata <- function(covdata, time = 1, fun = NULL, ...) {
-  if (is.null(covdata$geometry)) {
-    covdata$geometry <- "euc"
-  }
-  col <- covdata$values[, time]
-  pixelplot.mesh(data = covdata, col = col, ...)
-}
 
 
 # Make covariate function

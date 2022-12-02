@@ -28,24 +28,26 @@ bru_forward_transformation <- function(qfun, x, ..., tail.split. = 0) {
   res <- numeric(length(x))
   if (sum(upper) > 0) {
     res[upper] <-
-      qfun(pnorm(x[upper],
+      qfun(
+        pnorm(x[upper],
+          lower.tail = FALSE,
+          log.p = TRUE
+        ),
+        ...,
         lower.tail = FALSE,
         log.p = TRUE
-      ),
-      ...,
-      lower.tail = FALSE,
-      log.p = TRUE
       )
   }
   if (sum(!upper) > 0) {
     res[!upper] <-
-      qfun(pnorm(x[!upper],
+      qfun(
+        pnorm(x[!upper],
+          lower.tail = TRUE,
+          log.p = TRUE
+        ),
+        ...,
         lower.tail = TRUE,
         log.p = TRUE
-      ),
-      ...,
-      lower.tail = TRUE,
-      log.p = TRUE
       )
   }
   res
@@ -67,24 +69,26 @@ bru_inverse_transformation <- function(pfun, x, ..., tail.split. = NULL) {
   res <- numeric(length(x))
   if (sum(upper) > 0) {
     res[upper] <-
-      qnorm(pfun(x[upper],
-        ...,
+      qnorm(
+        pfun(x[upper],
+          ...,
+          lower.tail = FALSE,
+          log.p = TRUE
+        ),
         lower.tail = FALSE,
         log.p = TRUE
-      ),
-      lower.tail = FALSE,
-      log.p = TRUE
       )
   }
   if (sum(!upper) > 0) {
     res[!upper] <-
-      qnorm(pfun(x[!upper],
-        ...,
+      qnorm(
+        pfun(x[!upper],
+          ...,
+          lower.tail = TRUE,
+          log.p = TRUE
+        ),
         lower.tail = TRUE,
         log.p = TRUE
-      ),
-      lower.tail = TRUE,
-      log.p = TRUE
       )
   }
   res

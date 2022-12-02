@@ -1,10 +1,4 @@
-# DEPRECATED
-pixelplot.mesh <- function(...) {
-  .Deprecated("gg.inla.mesh")
-}
-
-
-#' Plot a map using extend of a spatial object
+#' Plot a map using extent of a spatial object
 #'
 #' Uses get_map() to query map services like Google Maps for a region centered around
 #' the spatial object provided. Then calls ggmap() to plot the map.
@@ -38,7 +32,7 @@ pixelplot.mesh <- function(...) {
 #' }
 #' }
 gmap <- function(data, ...) {
-  data <- sp::spTransform(data, sp::CRS("+proj=longlat"))
+  data <- fm_transform(data, crs = fm_crs("longlat_globe"))
   df <- cbind(coordinates(data), data@data)
 
   # Figure out a sensible bounding box (range of data plus 30%)
@@ -285,7 +279,7 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
             xend = .data$variable,
             color = .data$variable
           ),
-          size = sz
+          linewidth = sz
         )
       )
     }
@@ -386,7 +380,7 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
 gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
   requireNamespace("ggplot2")
   if (!is.null(crs)) {
-    data <- spTransform(data, crs)
+    data <- fm_transform(data, crs)
   }
 
   df <- as.data.frame(data)
@@ -435,7 +429,7 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   requireNamespace("ggplot2")
   if (!is.null(crs)) {
-    data <- spTransform(data, crs)
+    data <- fm_transform(data, crs)
   }
 
   qq <- coordinates(data)
@@ -519,7 +513,7 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
     stop("The 'ggpolypath' package is required for SpatialPolygons plotting, but it is not installed.")
   }
   if (!is.null(crs)) {
-    data <- sp::spTransform(data, crs)
+    data <- fm_transform(data, crs)
   }
 
   df <- ggplot2::fortify(data)
@@ -613,7 +607,7 @@ gg.SpatialPixelsDataFrame <- function(data,
                                       crs = NULL,
                                       mask = NULL, ...) {
   if (!is.null(crs)) {
-    data <- spTransform(data, crs)
+    data <- fm_transform(data, crs)
   }
   if (!is.null(mask)) {
     data <- data[as.vector(!is.na(over(data, mask))), ]
@@ -742,7 +736,7 @@ gg.inla.mesh <- function(data,
       stop("Geom not implemented for spherical meshes (manifold = S2)")
     }
     if (!is.null(crs)) {
-      data <- fm_spTransform(data, CRSobj = crs)
+      data <- fm_transform(data, crs = crs)
     }
 
     df <- rbind(
@@ -811,7 +805,6 @@ gg.inla.mesh <- function(data,
 #' # Some features use the INLA package.
 #' if (require("INLA", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
-#'
 #'   # Create a 1D mesh
 #'
 #'   mesh <- inla.mesh.1d(seq(0, 10, by = 0.5))
@@ -858,7 +851,6 @@ gg.inla.mesh.1d <- function(data, mapping = ggplot2::aes(.data[["x"]], .data[["y
 #' if (require("spatstat.data", quietly = TRUE) &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
-#'
 #'   # Load Gorilla data
 #'   data("gorillas", package = "spatstat.data")
 #'
@@ -939,165 +931,6 @@ plot.prediction <- function(x, y = NULL, ...) {
     gg(x, ...)
 }
 
-plot.prediction_old <- function(..., property = "median") {
-  requireNamespace("ggplot2")
-  args <- list(...)
-  pnames <- sapply(substitute(list(...))[-1], deparse)
-
-  ggopts <- attr(args[[1]], "misc")
-  data <- args[[1]]
-
-  if (attr(data, "type") == "full") {
-    df <- do.call(rbind, lapply(seq_along(args), function(k) {
-      apr <- approx(args[[k]]$x, args[[k]]$y, xout = seq(range(args[[k]]$x)[1], range(args[[k]]$x)[2], length.out = 1000))
-      data.frame(effect = pnames[[k]], x = apr$x, y = 0.1 * apr$y / max(apr$y))
-    }))
-
-    qtl <- do.call(rbind, lapply(seq_along(args), function(k) {
-      data.frame(
-        y = args[[k]]$quantiles,
-        yend = args[[k]]$quantiles,
-        x = k, xend = k + 0.5,
-        effect = pnames[[k]]
-      )
-    }))
-
-    expec <- do.call(rbind, lapply(seq_along(args), function(k) {
-      data.frame(
-        y = args[[k]]$mean,
-        yend = args[[k]]$mean,
-        x = k, xend = k - 0.28,
-        sdy = args[[k]]$sd,
-        cvy = args[[k]]$cv,
-        effect = pnames[[k]]
-      )
-    }))
-
-    sdev <- do.call(rbind, lapply(seq_along(args), function(k) {
-      data.frame(
-        y = args[[k]]$mean + args[[k]]$sd,
-        yend = args[[k]]$mean - args[[k]]$sd,
-        x = k - 0.28, xend = k - 0.28,
-        effect = pnames[[k]]
-      )
-    }))
-
-    jit <- do.call(rbind, lapply(seq_along(args), function(k) {
-      data.frame(
-        y = INLA::inla.rmarginal(5000, args[[k]]),
-        n = 500,
-        effect = pnames[[k]]
-      )
-    }))
-
-    txt_size <- (5 / 14) * ggplot2::theme_get()$text$size
-
-    # Function for formating numbers
-    fmt <- function(x) {
-      th <- 1E3
-      if (abs(x) < th && abs(x) > 0.01) {
-        # sprintf("%.2f",x)
-        as.character(signif(x, 4))
-      } else {
-        sprintf("%.2E", x)
-      }
-    }
-
-    # Workaround for non-visible bindings error during CRAN check
-    x <- NULL
-    y <- NULL
-    xend <- NULL
-    yend <- NULL
-    sdy <- NULL
-    cvy <- NULL
-    effect <- NULL
-
-    plt <- ggplot2::ggplot() +
-      ggplot2::geom_violin(data = df, ggplot2::aes(x = as.numeric(effect), y = x, weight = y, fill = effect), width = 0.5, alpha = 0.7, adjust = 0.2) +
-      ggplot2::geom_text(data = qtl, ggplot2::aes(x = xend, y = y, label = fmt(y)), size = txt_size, family = "", vjust = -0.5, hjust = 1.1) +
-      ggplot2::geom_text(data = expec, ggplot2::aes(x = xend, y = y, label = paste0(fmt(y), " +/- ", fmt(sdy), " [", round(100 * cvy), "%]")), size = txt_size, family = "", vjust = -0.5, angle = 90) +
-      ggplot2::geom_segment(data = qtl, ggplot2::aes(x = x, xend = xend, y = y, yend = yend), linetype = 1, alpha = 0.2) +
-      ggplot2::geom_segment(data = expec, ggplot2::aes(x = x, xend = xend, y = y, yend = yend), alpha = 0.5, linetype = 3) +
-      ggplot2::geom_segment(data = sdev, ggplot2::aes(x = x, xend = xend, y = y, yend = yend), alpha = 0.5, linetype = 1) +
-      ggplot2::geom_point(data = jit, ggplot2::aes(x = as.numeric(effect), y = y), shape = 95, size = 3, alpha = 0.05) +
-      ggplot2::ylab(paste0("integral_{", paste(ggopts$idims, collapse = ","), "} (", ggopts$predictor, ")")) +
-      ggplot2::guides(fill = FALSE) +
-      ggplot2::scale_x_continuous(name = "", breaks = seq_along(pnames), labels = pnames) +
-      ggplot2::scale_fill_brewer(palette = "YlOrRd", direction = -1) # YlOrRd, PuBu
-
-    # This still causes a warning since the violin plot does not like the width argument
-    # suppressWarnings(print(plt))
-    return(plt)
-  } else if (attr(data, "type") == "0d") {
-    dnames <- colnames(data)
-    ggp <- ggplot2::ggplot()
-
-    if ("summary" %in% names(attributes(data))) {
-      smy <- attr(data, "summary")
-      ggp <- ggp + ggplot2::geom_ribbon(
-        data = smy$inner.marg, ymin = 0,
-        mapping = ggplot2::aes(
-          x = .data[[dnames[1]]],
-          ymax = .data[[dnames[2]]]
-        ),
-        alpha = 0.1, colour = "grey"
-      )
-    }
-
-    ggp <- ggp +
-      ggplot2::geom_path(
-        data = data,
-        mapping = ggplot2::aes(
-          x = .data[[dnames[1]]],
-          y = .data[[dnames[2]]]
-        )
-      )
-
-    if (length(pnames) == 1) {
-      ggp <- ggp + ggplot2::guides(color = FALSE, fill = FALSE)
-    }
-
-    ggp
-  } else if (attr(data, "type") == "1d") {
-    data <- do.call(
-      rbind,
-      lapply(
-        seq_along(args),
-        function(k) {
-          data.frame(args[[k]],
-            Prediction = pnames[[k]]
-          )
-        }
-      )
-    )
-
-    ggp <- ggplot2::ggplot(data = data) +
-      ggplot2::geom_ribbon(ggplot2::aes(
-        x = .data[[ggopts$dims]],
-        ymin = .data[["lq"]],
-        ymax = .data[["uq"]],
-        fill = "Prediction"
-      ), alpha = 0.3) +
-      ggplot2::geom_line(ggplot2::aes(
-        x = .data[[ggopts$dims]],
-        y = .data[["median"]],
-        color = "Prediction"
-      ), size = 1.1) +
-      ggplot2::xlab(ggopts$predictor) +
-      ggplot2::ylab(ggopts$predictor[2])
-
-    # Show guide only for multiple graphs
-    if (length(pnames) == 1) {
-      ggp <- ggp + ggplot2::guides(color = FALSE, fill = FALSE)
-    }
-
-    # Plot graph
-    ggp
-  } else if (attr(data, "type") == "spatial") {
-    # ggplot() + gg.col(ggopts$data, color = data$mean) + scale_fill_gradientn(colours = topo.colors(100))
-    pixelplot.mesh(mesh = ggopts$mesh, col = data[, property], property = property, ...)
-  }
-}
 
 
 #' @title Multiple ggplots on a page.
@@ -1129,7 +962,6 @@ plot.prediction_old <- function(..., property = "median") {
 #' @export
 #
 multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
-
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
 

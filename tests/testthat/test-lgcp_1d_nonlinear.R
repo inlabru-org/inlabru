@@ -85,37 +85,72 @@ test_that("Mexdolphin: Hazard rate detection function", {
     )
     ggplot(data.frame(pts)) +
       stat_ecdf(aes(distance)) +
-      geom_line(aes(distance,
-        cumsum(hr(distance, fit$summary.fixed["lsig", "mean"])) /
-          sum(hr(distance, fit$summary.fixed["lsig", "mean"])),
-        col = "Plugin"
-      ),
-      data = data.frame(ips)
+      geom_line(
+        aes(distance,
+          cumsum(hr(distance, fit$summary.fixed["lsig", "mean"])) /
+            sum(hr(distance, fit$summary.fixed["lsig", "mean"])),
+          col = "Plugin"
+        ),
+        data = data.frame(ips)
       ) +
-      geom_line(aes(distance,
-        cumsum(mean) / sum(mean),
-        col = "Pred"
-      ),
-      data = pred
+      geom_line(
+        aes(distance,
+          cumsum(mean) / sum(mean),
+          col = "Pred"
+        ),
+        data = pred
       ) +
-      geom_line(aes(distance,
-        cumsum(hr(distance, 1)) /
-          sum(hr(distance, 1)),
-        col = "1"
-      ),
-      data = data.frame(ips)
+      geom_line(
+        aes(distance,
+          cumsum(hr(distance, 1)) /
+            sum(hr(distance, 1)),
+          col = "1"
+        ),
+        data = data.frame(ips)
       )
   }
 
-  expect_equal(fit_classic$summary.fixed["lsig", "mean"], 1.03741, tolerance = midtol)
-  expect_equal(fit_classic$summary.fixed["lsig", "sd"], 0.5184620, tolerance = midtol)
-  expect_equal(fit_classic$summary.fixed["Intercept", "mean"], 2.32, tolerance = midtol)
-  expect_equal(fit_classic$summary.fixed["Intercept", "sd"], 0.2899217, tolerance = midtol)
+  expect_equal(
+    fit_classic$summary.fixed["lsig", "mean"],
+    1.03741,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit_classic$summary.fixed["lsig", "sd"],
+    0.5184620,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit_classic$summary.fixed["Intercept", "mean"],
+    2.32,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit_classic$summary.fixed["Intercept", "sd"],
+    0.2899217,
+    tolerance = midtol
+  )
 
-  expect_equal(fit$summary.fixed["lsig", "mean"], 1.06, tolerance = midtol)
-  expect_equal(fit$summary.fixed["lsig", "sd"], 0.5183252, tolerance = midtol)
-  expect_equal(fit$summary.fixed["Intercept", "mean"], 2.29, tolerance = midtol)
-  expect_equal(fit$summary.fixed["Intercept", "sd"], 0.2900139, tolerance = midtol)
+  expect_equal(
+    fit$summary.fixed["lsig", "mean"],
+    1.06,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["lsig", "sd"],
+    0.5183252,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["Intercept", "mean"],
+    2.29,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["Intercept", "sd"],
+    0.2900139,
+    tolerance = midtol
+  )
 })
 
 

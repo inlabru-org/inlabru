@@ -139,15 +139,16 @@ where:
 \itemize{
 \item{\eqn{c} }{is the \emph{intercept}}
 \item{\eqn{x }}{is a \emph{covariate}}
-\item{\eqn{\beta} }{is a \emph{random variable} associated with \eqn{x} and}
-\item{\eqn{\psi = \beta * x }}{ is called the \emph{random effect} of \eqn{x}}
+\item{\eqn{\beta} }{is a \emph{latent variable} associated with \eqn{x} and}
+\item{\eqn{\psi = \beta * x }}{ is called the \emph{effect} of \eqn{x}}
 }
 
 A problem that arises when using this kind of R formula is that it does not
 clearly reflect the mathematical
 formula. For instance, when providing the formula to inla, the resulting
 object will refer to the random
-effect \eqn{\psi = \beta * x } as \code{x}. Hence, it is not clear if \code{x} refers to the covariate
+effect \eqn{\psi = \beta * x } as \code{x}.
+Hence, it is not clear when \code{x} refers to the covariate
 or the effect of the covariate.
 
 The \code{component.character} method is inlabru's equivalent to INLA's
@@ -208,7 +209,6 @@ cmp <- component("myLinearEffectOfX", main = x, model = "linear")
 summary(cmp)
 \donttest{
 if (bru_safe_inla(quietly = TRUE)) {
-
   # As an example, let us create a linear component. Here, the component is
   # called "myEffectOfX" while the covariate the component acts on is called "x":
 

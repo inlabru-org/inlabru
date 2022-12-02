@@ -6,6 +6,26 @@
 #' @importFrom rlang .env
 #' @import patchwork
 
+#' @title Plot inlabru convergence diagnostics
+#'
+#' @description
+#' Draws four panels of convergence diagnostics for an iterated INLA method
+#' estimation
+#'
+#' @param x a [bru] object, typically a result from [bru()] for a nonlinear
+#' predictor model
+#' @export
+#' @examples
+#' \dontrun{
+#' fit <- bru(...)
+#' bru_convergence_plot(fit)
+#' }
+bru_convergence_plot <- function(x) {
+  stopifnot(inherits(x, "bru"))
+  make_track_plots(x)[["default"]]
+}
+
+
 make_track_plots <- function(fit) {
   if (!requireNamespace("dplyr", quietly = TRUE) ||
     !requireNamespace("ggplot2", quietly = TRUE) ||
@@ -14,24 +34,26 @@ make_track_plots <- function(fit) {
   }
   track_data <-
     fit$bru_iinla$track %>%
-    dplyr::left_join(fit$bru_iinla$track %>%
-      dplyr::filter(.data$iteration == max(.data$iteration)) %>%
-      dplyr::rename(
-        mode_end = .data$mode,
-        new_linearisation_end = .data$new_linearisation,
-        sd_end = .data$sd
-      ),
-    by = c("effect", "index"),
+    dplyr::left_join(
+      fit$bru_iinla$track %>%
+        dplyr::filter(.data$iteration == max(.data$iteration)) %>%
+        dplyr::rename(
+          mode_end = .data$mode,
+          new_linearisation_end = .data$new_linearisation,
+          sd_end = .data$sd
+        ),
+      by = c("effect", "index"),
     ) %>%
     dplyr::mutate(iteration = .data$iteration.x) %>%
-    dplyr::left_join(fit$bru_iinla$track %>%
-      dplyr::filter(.data$iteration == 1) %>%
-      dplyr::rename(
-        mode_start = .data$mode,
-        new_linearisation_start = .data$new_linearisation,
-        sd_start = .data$sd
-      ),
-    by = c("effect", "index"),
+    dplyr::left_join(
+      fit$bru_iinla$track %>%
+        dplyr::filter(.data$iteration == 1) %>%
+        dplyr::rename(
+          mode_start = .data$mode,
+          new_linearisation_start = .data$new_linearisation,
+          sd_start = .data$sd
+        ),
+      by = c("effect", "index"),
     ) %>%
     dplyr::mutate(iteration = .data$iteration.x)
 

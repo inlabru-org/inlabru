@@ -3,10 +3,20 @@ local_bru_testthat_setup()
 test_that("Component construction: linear model", {
   df <- data.frame(x = 1:10)
 
+  # Using label as input:
+  cmp0 <- component_list(
+    ~x,
+    lhoods = list(list(data = df))
+  )[["x"]]
+
+  expect_equal(cmp0$label, "x")
+  expect_equal(cmp0$main$model, "linear")
+  expect_equal(as.character(cmp0$main$input$input), "x")
+
   cmp <- component_list(
     ~ beta(main = x, model = "linear", values = 1),
     lhoods = list(list(data = df))
-  )[[1]]
+  )[["beta"]]
 
   expect_equal(cmp$label, "beta")
   expect_equal(cmp$main$model, "linear")
@@ -115,9 +125,10 @@ test_that("Component construction: terra", {
   )
   inp <- input_eval(cmp, data = data)
   comp_lin <- comp_lin_eval(cmp,
-                            input = inp,
-                            state = list(something = 2),
-                            inla_f = FALSE)
+    input = inp,
+    state = list(something = 2),
+    inla_f = FALSE
+  )
   val <- evaluate_effect_single_state(
     comp_lin,
     state = list(something = 2)
@@ -131,9 +142,11 @@ test_that("Component construction: terra", {
     lhoods = list(list(data = data))
   )
   inp <- input_eval(cmp, data = data)
-  comp_lin <- comp_lin_eval(cmp, input = inp,
-                            state = list(something = 2),
-                            inla_f = FALSE)
+  comp_lin <- comp_lin_eval(cmp,
+    input = inp,
+    state = list(something = 2),
+    inla_f = FALSE
+  )
   val <- evaluate_effect_single_state(
     comp_lin,
     state = list(something = 2)
@@ -147,9 +160,11 @@ test_that("Component construction: terra", {
     lhoods = list(list(data = data))
   )
   inp <- input_eval(cmp, data = data)
-  comp_lin <- comp_lin_eval(cmp, input = inp,
-                            state = list(something = 2),
-                            inla_f = FALSE)
+  comp_lin <- comp_lin_eval(cmp,
+    input = inp,
+    state = list(something = 2),
+    inla_f = FALSE
+  )
   val <- evaluate_effect_single_state(
     comp_lin,
     state = list(something = 2)
@@ -163,9 +178,11 @@ test_that("Component construction: terra", {
     lhoods = list(list(data = data))
   )
   inp <- input_eval(cmp, data = data)
-  comp_lin <- comp_lin_eval(cmp, input = inp,
-                            state = list(something = 2),
-                            inla_f = FALSE)
+  comp_lin <- comp_lin_eval(cmp,
+    input = inp,
+    state = list(something = 2),
+    inla_f = FALSE
+  )
   val <- evaluate_effect_single_state(
     comp_lin,
     state = list(something = 2)
@@ -193,25 +210,40 @@ test_that("Component construction: terra", {
 
 
 
-test_that("Component construction: default mesh/mapping construction", {
+test_that("Component construction: default index/mesh/mapping construction", {
   skip_on_cran()
   local_bru_safe_inla()
 
   lik <- like("gaussian",
     formula = y ~ .,
-    data = data.frame(x = c(1, 1.5, 2, 3, 4), y = 11:15),
+    data = data.frame(x = c(1, 1.5, 2, NA, 4), y = 11:15),
     include = "effect"
   )
 
-  cmp1 <- component_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
+  cmp1 <- component_list(~ effect(c(1, 1.5, 2, NA, 4), model = "iid") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    sort(unique(lik$data$x), na.last = NA)
+  )
+  expect_equal(
+    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$main,
+      input = c(1, NA, 4),
+      state = c(11, 12, 13, 14)
+    ),
+    c(11, 0, 14)
+  )
 
   cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    sort(unique(lik$data$x), na.last = NA)
+  )
 
-  mesh1 <- INLA::inla.mesh.1d(lik$data$x)
+  mesh1 <- INLA::inla.mesh.1d(
+    sort(unique(lik$data$x), na.last = NA)
+  )
   expect_error(
     component_list(
       ~ effect(x, model = "rw2", mapper = mesh1) - 1
@@ -226,7 +258,10 @@ test_that("Component construction: default mesh/mapping construction", {
     ) - 1
   )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik$data$x)
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    sort(unique(lik$data$x), na.last = NA)
+  )
 
   cmp1 <- component_list(
     ~ effect(x,
@@ -235,7 +270,108 @@ test_that("Component construction: default mesh/mapping construction", {
     ) - 1
   )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, seq_along(lik$data$x))
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    seq_along(sort(unique(lik$data$x), na.last = NA))
+  )
+})
+
+
+
+test_that("Component construction: main iid factor construction", {
+  skip_on_cran()
+
+  lik <- like("gaussian",
+    formula = y ~ .,
+    data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
+    include = "effect"
+  )
+
+  cmp1 <- component_list(~ effect(as.factor(c(1, 1.5, 2, 3, 4)),
+    model = "iid"
+  ) - 1)
+  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    as.character(lik$data$x)
+  )
+
+  expect_equal(
+    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$main,
+      input = as.factor(c(1, NA, 4)),
+      state = c(11, 12, 13, 14, 15)
+    ),
+    c(11, 0, 15)
+  )
+})
+
+test_that("Component construction: group iid factor construction", {
+  skip_on_cran()
+
+  lik <- like("gaussian",
+    formula = y ~ .,
+    data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
+    include = "effect"
+  )
+
+  cmp1 <- component_list(
+    ~ -1 +
+      effect(rep(1, 5),
+        group = x,
+        model = "iid",
+        control.group = list(model = "iid")
+      )
+  )
+  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$group,
+    as.numeric(lik$data$x)
+  )
+
+  expect_equal(
+    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$group,
+      input = as.factor(c(1, NA, 4)),
+      state = c(11, 12, 13, 14, 15)
+    ),
+    c(11, 0, 15)
+  )
+
+  local_bru_safe_inla()
+  expect_no_error(bru(cmp2, lik))
+})
+
+test_that("Component construction: replicate iid factor construction", {
+  skip_on_cran()
+
+  lik <- like("gaussian",
+    formula = y ~ .,
+    data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
+    include = "effect"
+  )
+
+  cmp1 <- component_list(
+    ~ -1 +
+      effect(rep(1, 5),
+        replicate = x,
+        model = "iid"
+      )
+  )
+  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$replicate,
+    as.numeric(lik$data$x)
+  )
+
+  expect_equal(
+    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$replicate,
+      input = as.factor(c(1, NA, 4)),
+      state = c(11, 12, 13, 14, 15)
+    ),
+    c(11, 0, 15)
+  )
+
+  local_bru_safe_inla()
+  expect_no_error(bru(cmp2, lik))
 })
 
 

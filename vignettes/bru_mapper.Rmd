@@ -12,30 +12,290 @@ header-includes:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
 (Vignette under construction!)
 
-```{r setup}
+## Mapper system introduction
+
+```{r setup, eval = TRUE, echo=FALSE, include=FALSE}
 library(inlabru)
 ```
 
-The reference documentation for the mapper methods is contained in three parts:
-```{r eval=FALSE}
+Each inlabru latent model component generates an _effect_, given the latent _state_ vector.
+The purpose of the mapper system is to define the link from state vectors to effect vectors.
+For an ordinary model component, named $c$, this link can be represented as a matrix-vector product
+$$
+\eta_c(u_c) = A_c(\text{input}) u_c,
+$$
+where $u_c$ is the latent state vector, $\eta_c(u_c)$ is the resulting component effect vector, and
+$A_c(\text{input})$ is a _component model matrix_. This matrix depends on the component
+inputs (covariates, index information, etc) from `main`, `group`, `replicate`, and `weights`
+in the component definition.
+
+The wider scope of component definitions is discussed in the [component vignette](https://inlabru-org.github.io/inlabru/articles/component.html). Here, we
+will focus on the mapper system itself, how the basic building blocks are used to
+construct the built-in mappers, and finally how to construct new mappers.
+
+The in-package documentation for the mapper methods is contained in four parts:
+```{r, eval=FALSE}
 ?bru_mapper # Mapper constructors
-?bru_mapper_methods # Mapper methods
+?bru_mapper_generics # Generic and default methods
+?bru_mapper_methods # Specialised mapper methods
 ?bru_get_mapper # Mapper extraction methods
 ```
 
+Regular users normally at most need some of the methods from `?bru_mapper`
+and sometimes `?bru_mapper_generics`.
+The methods in `?bru_mapper_methods` provides more details and allows the user
+to query mappers and to use them outside the context of inlabru model definitions.
+The `bru_mapper_define()` and `bru_get_mapper()` methods are needed for those
+implementing their own mapper class.
 
-```{r eval=FALSE}
+## Mappers
+
+The main purpose of each mapper class is to allow evaluating a component
+effect, from given `input` and latent `state`, by calling
+```{r, eval=FALSE}
+ibm_eval(mapper, input, state)
+```
+for the `mapper` associated with the component definition.
+
+### Basic mappers
+
+Basic mappers take covariate vectors or matrices as input and numeric vectors as
+state.
+
+Constructors:
+
+* `bru_mapper_const()`
+* `bru_mapper_linear()`
+* `bru_mapper_index(n)`
+* `bru_mapper_factor(values, factor_mapping)`
+* `bru_mapper_matrix()`
+* `bru_mapper_harmonics(order, scaling, intercept, interval)`
+
+#### const
+
+The `const` mapper defines a mapping from an empty state vector. This is used to
+define offset components, $\eta(u)_j = z_j$, where $z$ is a fixed input vector,
+indexed by $j$.
+
+#### linear
+
+The `linear` mapper defines a mapper from a length 1 state vector. This is used to
+define ordinary "fixed" covariate effects, linear in both the covariate and in the state
+variable; $\eta(u)_j = z_j u$, where $u$ is the state, and $z$ is the
+input covariate vector.
+
+#### index
+
+The `index(n)` mapper defines a direct mapping from a length `n` state
+variable. This is used for structured and unstructured "random effect" component
+effects; $\eta(u)_j = u_{z_j}$, where $u$ is the state vector, and $z$ is the
+input index vector.
+
+#### factor
+
+The `factor(values, factor_mapping)` mapper defines a direct mapping between
+a state vector of length equal to the number of factor levels of `values`
+(for `factor_mapping = "full"`), or one less (for `factor_mapping = "contrast"`).
+Each factor level is represented as a dummy 0/1 variable, or equivalently,
+the input is used as a label index into the state vector; $\eta(u)_j = u_{z_j}$.
+In the `"contrast"` case, the first factor level is removed from the model,
+and the corresponding effect defined to be zero.
+
+#### matrix
+
+The `matrix` mapper defines a direct matrix multiplication between
+a pre-computed model matrix $A_\text{input}$ with the state
+vector; $\eta(u) = A_\text{input} u$.
+This is used e.g. for linear model formula input, that is converted to a
+component model matrix before handing it over to the mapper system.
+
+#### harmonics
+
+The `harmonics(order, scaling, intercept, interval)` mapper defines a sum of
+weighted harmonics on a real interval $(L, U)$, each frequency
+additionally scaled by factors determined by `scale`;
+$\eta(u_j) = \sum_{k=1}^{1+2p} A_{j,k} u_k$, where $A_{j,k}=s_k$ for $k=1$,
+$A_{j,2k}=s_{k+1}\cos[2\pi k (z_j - L)/(U-L)]$ for $k=1,2,\dots,p$, and
+$A_{j,2k+1}=s_{k+1}\sin[2\pi k (z_j - L)/(U-L)]$ for $k=1,2,\dots,p$,
+where $p=$`order`.  When `intercept` is `TRUE`, the state vector has length
+$1+2p$.
+When `intercept` is `FALSE`, the first, constant, column is
+removed, and the state vector has length $2p$.
+
+### Transformation mappers
+
+Transformation mappers are mappers that would normally be combined with other
+mappers, as steps in a sequence of transformations, or as individual
+transformation mappers.
+
+* `bru_mapper_scale()`
+* `bru_mapper_aggregate(rescale)`
+
+#### scale
+
+The `scale` mapper multiplies the `input` vector with the `state` vector.
+This is used for INLA models to implement the `weights` component scaling,
+as the final stage of a `pipe` mapper, see below.
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_scale()
+ibm_eval(mapper,
+  input = ...,
+  state = ...
+)
+```
+
+#### aggregate
+
+The `aggregate` mapper aggregates the `state` vector elements by blockwise
+summation after scaling the elements by weights.
+This can be used for summation, integration, and averaging (for `rescale=TRUE`).
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_aggregate(rescale = ...)
+ibm_eval(mapper,
+  input = list(block = ..., weights = ...),
+  state = ...
+)
+```
+
+### Compound mappers
+
+Compound mappers define collections or chains of mappings,
+and can take various forms of input. The state vector is normally a numeric vector,
+but can in some cases be a list of vectors.
+
+* `bru_mapper_collect(mappers, hidden)`
+* `bru_mapper_multi(mappers)`
+* `bru_mapper_pipe(mappers)`
+
+#### collect
+
+The `collect` mapper defines a compound mapper where the Jacobian is
+block-diagonal, and each block is defined by a separate sub-mapper.
+When `hidden = TRUE`, it can be used for INLA models where the user-visible
+part of the latent state is only a part of the internal state, such as for
+`"bym"` models.
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_offset(list(name1 = ..., name2 = ..., ...),
+  hidden = FALSE
+)
+ibm_eval(mapper,
+  input = list(name1 = ..., name2 = ..., ...),
+  state = ...
+)
+# If hidden = TRUE, the inla_f=TRUE argument "hides" all but the first mapper:
+ibm_eval(mapper,
+  input = name1_input,
+  state = ...,
+  inla_f = TRUE
+)
+```
+
+#### multi
+
+The `multi` mapper defines a compound mapper where the Jacobian is
+the row-wise Kronecker product between the sub-mapper Jacobians.
+This can be used for INLA models to construct the internal mapper
+for `main`, `group`, and `replicate`, but also for user-defined models
+where a single `rgeneric` or `cgeneric` model is defined on e.g.
+a space-time product domain.
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_multi(list(name1 = ..., name2 = ..., ...))
+ibm_eval(mapper,
+  input = list(name1 = ..., name2 = ..., ...),
+  state = ...
+)
+```
+
+#### pipe
+
+Pipe mappers chain multiple mappers into a sequence, where the evaluation
+result of each mapper is given as the state vector for the next mapper.
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_pipe(list(name1 = ..., name2 = ..., ...))
+ibm_eval(mapper,
+  input = list(name1 = ..., name2 = ..., ...),
+  state = ...
+)
+```
+
+#### The core model component mapper
+
+All model component mappers are currently defined as a `pipe` mapper containing
+a `multi` mapper followed by a `scale` mapper:
+```{r, eval=FALSE}
+mapper <-
+  bru_mapper_pipe(
+    list(
+      mapper = bru_mapper_multi(list(main = ..., group = ..., replicate = ...)),
+      scale = bru_mapper_scale()
+    )
+  )
+ibm_eval(mapper,
+  input = list(
+    mapper = list(main = ..., group = ..., replicate = ...),
+    scale = ...
+  ),
+  state = ...
+)
+```
+
+### Object mappers
+
+For object with predefined mapper conversion methods, use `bru_mapper(object)`
+to obtain a suitable mapper object.
+Current predefined object mappers are defined for objects of these classes:
+
+* `inla.mesh`; Use `bru_mapper(object)`
+* `inla.mesh.1d`; Use `bru_mapper(object, indexed)`
+
+More details are given below.
+
+### Model object mappers
+
+For inla model objects with predefined mappers, use `bru_get_mapper(object)`
+Current predefined model object mappers are defined for models of these classes:
+
+* `inla.spde`; this includes `inla.spde2.matern()` and `inla.spde2.pcmatern()`
+models. The conversion method calls `bru_mapper()` in the appropriate way for
+the mesh type used for the model
+* `inla.rgeneric`; This relies on the rgeneric definition including a `"mapper"`
+callback argument. A less invasive method, that works for both rgeneric and cgeneric
+models, is to define a `bru_get_mapper()` method for the class, which needs to
+include a unique class identifier, e.g. add
+`class(object) <- c("my_unique_model_class", class(object))` and define
+```{r, eval=FALSE}
+bru_get_mapper.my_unique_model_class <- function(model, ...) {
+  ...
+}
+```
+and register it in the namespace.
+
+### Special mappers
+
+* `bru_mapper_taylor()`
+
+## Mapper methods
+
+```{r, eval=FALSE}
 ibm_n(mapper, inla_f, ...)
+ibm_n_output(mapper, input, ...)
 ibm_values(mapper, inla_f, ...)
-ibm_jacobian(mapper, input, ...)
+ibm_jacobian(mapper, input, state, ...)
+ibm_eval(mapper, input, state, ...)
+ibm_names(mapper, ...)
 ibm_inla_subset(mapper, ...)
-ibm_valid_input(mapper, input, ...)
 ```
 
 An example where the `inla_f` argument matters is the `bru_mapper_collect` class,
@@ -57,6 +317,12 @@ ibm_values(mapper)
 ibm_n(mapper, inla_f = TRUE)
 ibm_values(mapper, inla_f = TRUE)
 ```
+```{r eval=TRUE}
+ibm_n(mapper, multi = TRUE)
+ibm_values(mapper, multi = TRUE)
+ibm_n(mapper, inla_f = TRUE, multi = TRUE)
+ibm_values(mapper, inla_f = TRUE, multi = TRUE)
+```
 
 For the `bru_mapper_multi` class, the `multi` argument provides access to the
 inner layers of the multi-mapper:
@@ -66,9 +332,16 @@ mapper <- bru_mapper_multi(list(
   b = bru_mapper_index(2)
 ))
 ibm_n(mapper)
-ibm_n(mapper, multi = 1)
+ibm_n(mapper, multi = TRUE)
 ibm_values(mapper)
-ibm_values(mapper, multi = 1)
+ibm_values(mapper, multi = TRUE)
+```
+
+```{r eval=TRUE}
+ibm_n(mapper, inla_f = TRUE)
+ibm_n(mapper, multi = TRUE, inla_f = TRUE)
+ibm_values(mapper, inla_f = TRUE)
+ibm_values(mapper, multi = TRUE, inla_f = TRUE)
 ```
 
 The default `ibm_inla_subset` method determines the inla subset by comparing
@@ -77,7 +350,7 @@ inla specific values information from `ibm_values(mapper, inla_f = TRUE)`,
 to determine the logical vector identifying the inla values subset.  Custom mappers
 should normally not need to specialise this method.
 
-## Mappers for inla.mesh objects and mapper extractors
+## Mappers for inla.mesh objects
 
 For component models referenced by a character label (e.g. `"iid"`, `"bym2"`, `"rw2"` etc),
 inlabru will construct default mappers, that in most cases replicate the default `INLA::f()`
@@ -85,42 +358,54 @@ behaviour.
 
 For the `inla.mesh` and `inla.mesh.1d` classes, default mappers can be constructed by
 the pre-defined `bru_mapper` S3 methods. For 2d meshes (`inla.mesh`),
-```{r eval=FALSE}
+```{r, eval=FALSE}
 bru_mapper(mesh)
 ```
 For 1d meshes (`inla.mesh.1d`),
-```{r eval=FALSE}
-# If ibm_values() should return mesh$loc (e.g. for "rw2" models with degree=1 meshes)
+```{r, eval=FALSE}
+# If ibm_values() should return mesh$loc (e.g. for "rw2" models
+# with degree=1 meshes)
 bru_mapper(mesh, indexed = FALSE)
-# If ibm_values() should return seq_along(mesh$loc) (e.g. for inla.spde2.pcmatern() models)
+# If ibm_values() should return seq_along(mesh$loc) (e.g. for
+# inla.spde2.pcmatern() models)
 bru_mapper(mesh, indexed = TRUE)
 ```
 
 
 
-For `inla.spde` and `inla.rgeneric` model objects
-```
-bru_get_mapper
-```
-
 ## Customised mappers
 
+A mapper object should store enough information in order for the `ibm_*` methods
+to work.
+The simplest case of  a customised mapper is to just attached a new class
+label to the front of the S3 `class()` information of an existing mapper,
+to obtain a class to override some of the standard `ibm_*` method
+implementations.  More commonly, one would instead start with a basic `list()`,
+that might _contain_ an existing mapper object, and then add methods that
+know how to use that information.  In all these cases, the `bru_mapper_define()`
+method should be used to properly set the class information:
+```{r, eval=FALSE}
+bru_mapper_define(mapper, new_class)
 ```
-bru_mapper_define
-```
-
 Implementations can avoid having to define `ibm_n` and `ibm_values` methods,
 by instead computing and storing `n`, `n_inla`, `values`, and `values_inla`
-in the mapper object during construction.  The default `ibm_n` and `ibm_values`
+in the mapper object during construction:
+```{r, eval=FALSE}
+bru_mapper_define(
+  mapper = list(n = 10, values = 1:10),
+  new_class = "my_bru_mapper_class_name"
+)
+```
+The default `ibm_n` and `ibm_values`
 methods checks if these values are available, and return the appropriate values
-depending on the `inla_f` argument.  When `*_inla` values are requested but not
+depending on the `inla_f` argument. When `*_inla` values are requested but not
 available, the methods fall back to the non-inla versions. If the needed information
 is not found, the default methods give an error message.
 
 Note: Before version 2.6.0, `ibm_amatrix` was used instead of `ibm_jacobian`.
 Version 2.6.0 still supports this, by having the default `ibm_jacobian` method
-call `ibm_amatrix`, but will give a deprecation message from
-version 2.7.0, and it may be removed in a future version.
+call `ibm_amatrix`, but will give a deprecation message later,
+and it may be removed in a future version.
 
 ## Example
 
@@ -145,7 +430,7 @@ We start with the constructor method. Like the `bru_mapper_matrix`, we require t
 a vector of covariate labels, and store them as a character vector. We also
 include a `min_degree` parameter to control if an intercept (`min_degree <= 0`)
 and linear terms (`min_degree <= 1`) should be included in the model.
-```{r}
+```{r, eval=TRUE}
 bru_mapper_p_quadratic <- function(labels, min_degree = 0, ...) {
   if (is.factor(labels)) {
     mapper <- list(
@@ -162,7 +447,7 @@ bru_mapper_p_quadratic <- function(labels, min_degree = 0, ...) {
 }
 ```
 The `ibm_n` method can compute the value of $n$ from $n=1+p+\frac{p(p+1)}{2}$: 
-```{r}
+```{r, eval=TRUE}
 ibm_n.bru_mapper_p_quadratic <- function(mapper, ...) {
   p <- length(mapper$labels)
   (mapper$min_degree <= 0) + (mapper$min_degree <= 1) * p + p * (p + 1) / 2
@@ -172,7 +457,7 @@ For `ibm_values`, the default method is sufficient, returning the vector $[1,\do
 with $n$ obtained by `ibm_n(mapper)`. However, for clearer result naming, we can use a
 character vector, at least for INLA `f()` models that allow it (we could have an option argument
 to the `bru_mapper_p_quadratic` constructor to control this):
-```{r}
+```{r, eval=TRUE}
 ibm_values.bru_mapper_p_quadratic <- function(mapper, ...) {
   p <- length(mapper$labels)
   n <- ibm_n(mapper)
@@ -190,7 +475,7 @@ recompute the `n` and `values` information for each call. Instead we can use tha
 the default method will check if `n` or `values` are stored in the mapper object,
 and then return them. If we change the `.` in the method definitions to `_`,
 we can end the constructor method like this, making subsequent method calls faster:
-```{r}
+```{r, eval=FALSE}
 bru_mapper_p_quadratic <- function(labels, min_degree = 0, ...) {
   ...
   mapper <- bru_mapper_define(mapper, new_class = "bru_mapper_p_quadratic")
@@ -205,7 +490,7 @@ function calls `ibm_n(mapper)`.
 We can now define the main part of the mapper interface that computes the
 model matrix linking the latent variables to the component effect. It's required
 that `NULL` input should return a $0$-by-$n$ matrix.
-```{r}
+```{r, eval=TRUE}
 ibm_jacobian.bru_mapper_p_quadratic <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))

@@ -60,7 +60,7 @@ if (require(rgdal) && !fm_has_PROJ6()) {
 }
 }
 \seealso{
-\code{\link[rgdal:CRS-class]{rgdal::CRSargs()}}, \code{\link[=fm_CRS]{fm_CRS()}}
+\code{\link[rgdal:rgdal-deprecated]{rgdal::CRSargs()}}, \code{\link[=fm_CRS]{fm_CRS()}}
 }
 \author{
 Finn Lindgren \href{mailto:finn.lindgren@gmail.com}{finn.lindgren@gmail.com}

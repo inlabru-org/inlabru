@@ -60,17 +60,24 @@ ggplot() +
 Integration points
 -----------------------------------
 
-Because our model will take time (season) into account we have to construct the integration points for the LGCP accordingly. Using the ´group´ parameter we can let the ´ipoints´ function know that we would like to construct the integration points for each season independently. Note that omitting this step would simply aggregate all sampling regions over time.
+The `inlbru` point process model known how to construct the numerical integration
+scheme for the LGCP likelihood.  We can also call the internal functions directly to see
+what the integration scheme will look like.  Because our model will take time (season) into account we have to construct the integration points for the LGCP accordingly. Using the `group` parameter we can let the `ipoints()` function know that we would like to construct the integration points for each season independently. Note that omitting this step would simply aggregate all sampling regions over time.
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
+ips <- ipoints(
+  samplers = mrsea$samplers,
+  domain = mrsea$mesh,
+  group = "season"
+)
 ```
 Plot the integration points:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 ggplot() +
-  gg(ips, aes(color = season)) +
+  gg(mrsea$mesh) +
+  gg(ips, aes(size = weight)) +
   facet_wrap(~season) +
-  coord_equal()
+  coord_fixed()
 ```
 
 Fitting the model
@@ -84,12 +91,22 @@ matern <- inla.spde2.pcmatern(mrsea$mesh,
   prior.range = c(10, 0.01)
 )
 
-cmp <- coordinates + season ~ mySmooth(coordinates,
-  model = matern, group = season, ngroup = 4
-) +
-  Intercept
+cmp <- coordinates + season ~ Intercept(1) +
+  mySmooth(
+    coordinates,
+    model = matern,
+    group = season,
+    ngroup = 4
+  )
 
-fit <- lgcp(cmp, mrsea$points, ips = ips)
+fit <- lgcp(cmp,
+  data = mrsea$points,
+  samplers = mrsea$samplers,
+  domain = list(
+    coordinates = mrsea$mesh,
+    season = seq_len(4)
+  )
+)
 ```
 
 Predict and plot the intensity for all seasons:

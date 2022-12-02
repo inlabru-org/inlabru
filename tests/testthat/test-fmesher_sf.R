@@ -47,7 +47,8 @@ test_that("Conversion from sfc_POINT to inla.mesh.segment", {
   # matrix version
   loc.bnd <- matrix(c(0, 0, 1, 0, 1, 1, 0, 1), 4, 2, byrow = TRUE)
   segm.bnd <- INLA::inla.mesh.segment(loc.bnd,
-    is.bnd = TRUE
+    is.bnd = TRUE,
+    crs = fm_CRS()
   )
 
   # sf version
@@ -58,8 +59,8 @@ test_that("Conversion from sfc_POINT to inla.mesh.segment", {
   segm.bnd.sf <- fm_as_inla_mesh_segment(loc.sf, is.bnd = TRUE)
 
   expect_identical(segm.bnd.sf, segm.bnd)
-  str(segm.bnd)
-  str(segm.bnd.sf)
+  #  str(segm.bnd)
+  #  str(segm.bnd.sf)
 
   crs <- sf::st_crs(sf::st_geometry(loc.sf))
 
@@ -71,7 +72,7 @@ test_that("Conversion from sfc_POINT to inla.mesh.segment", {
   class(sf::st_geometry(loc.sf.xyz))
   class(sf::st_geometry(loc.sf.xyz)[[1]])
 
-  segm.bnd.sf.xym <- fm_as_inla_mesh_segment(loc.sf.xyz)
+  expect_no_warning(fm_as_inla_mesh_segment(loc.sf.xyz))
 })
 
 
@@ -85,13 +86,15 @@ test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
   seg1 <- INLA::inla.mesh.segment(
     loc = pts1,
     idx = seq_len(nrow(pts1)),
-    is.bnd = FALSE
+    is.bnd = FALSE,
+    crs = fm_CRS()
   )
 
   seg2 <- INLA::inla.mesh.segment(
     loc = pts2,
     idx = seq_len(nrow(pts2)),
-    is.bnd = FALSE
+    is.bnd = FALSE,
+    crs = fm_CRS()
   )
 
   seg <- fm_internal_sp2segment_join(list(seg1, seg2),
@@ -121,12 +124,14 @@ test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
   pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2))
   seg1 <- INLA::inla.mesh.segment(
     loc = pts1[1:4, , drop = FALSE],
-    is.bnd = TRUE
+    is.bnd = TRUE,
+    crs = fm_CRS()
   )
 
   seg2 <- INLA::inla.mesh.segment(
     loc = pts2[1:4, , drop = FALSE],
-    is.bnd = TRUE
+    is.bnd = TRUE,
+    crs = fm_CRS()
   )
 
   seg <- fm_internal_sp2segment_join(list(seg1, seg2),

@@ -36,7 +36,6 @@ Requires the \code{ggplot2} package.
 # Some features use the INLA package.
 if (require("INLA", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE)) {
-
   # Create a 1D mesh
 
   mesh <- inla.mesh.1d(seq(0, 10, by = 0.5))

@@ -102,7 +102,7 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
   slines <- SpatialLinesDataFrame(spl, data = df)
 
   # If requested, change CRS
-  if (!is.null(to.crs)) slines <- spTransform(slines, to.crs)
+  if (!is.null(to.crs)) slines <- fm_transform(slines, to.crs)
 
   slines
 }
@@ -147,32 +147,35 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
 #' }
 #' }
 #'
-spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(NA_character_), to.crs = NULL) {
-  po <- Polygon(data[, cols], hole = FALSE)
-  pos <- Polygons(list(po), ID = "tmp")
-  predpoly <- SpatialPolygons(list(pos), proj4string = crs)
+spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NULL) {
+  po <- sp::Polygon(data[, cols], hole = FALSE)
+  pos <- sp::Polygons(list(po), ID = "tmp")
+  predpoly <- sp::SpatialPolygons(list(pos), proj4string = crs)
   df <- data.frame(weight = 1)
   rownames(df) <- "tmp"
-  spoly <- SpatialPolygonsDataFrame(predpoly, data = df)
+  spoly <- sp::SpatialPolygonsDataFrame(predpoly, data = df)
 
   # If requested, change CRS
-  if (!is.null(to.crs)) spoly <- spTransform(spoly, to.crs)
+  if (!is.null(to.crs)) spoly <- fm_transform(spoly, to.crs)
   spoly
 }
 
 
-#' Coordinate transformation for spatial objects
+#' @describeIn inlabru-deprecated Coordinate transformation for spatial objects
 #'
 #' This is a wrapper for the [spTransform][sp::spTransform] function provided by the `sp` package.
 #' Given a spatial object (or a list thereof) it will transform the coordinate system according
 #' to the parameter `crs`. In addition to the usual spatial objects this function is
-#' also capables of transforming `INLA::inla.mesh` objects that are equipped with a coordinate
-#' system.#'
+#' also capable of transforming `INLA::inla.mesh` objects that are equipped with a coordinate
+#' system. Returns a list of Spatial* objects.
+#'
+#' Deprecated in favour of the `fm_transform` methods.
+#'
 #' @aliases stransform
 #' @export
 #' @param splist list of Spatial* objects
 #' @param crs Coordinate reference system to change to
-#' @return List of Spatial* objects
+#' @return `stransform`
 #'
 #' @examples
 #' \donttest{
@@ -197,22 +200,6 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = CRS(NA_character_), to
 #' }
 #'
 stransform <- function(splist, crs) {
-  if (!is.null(crs)) {
-    if (class(splist)[[1]] == "list") {
-      for (k in seq_len(length(splist))) {
-        if (inherits(splist[[k]], "Spatial")) {
-          # cn = coordnames(splist[[k]])
-          splist[[k]] <- sp::spTransform(splist[[k]], crs)
-          # coordnames(splist[[k]]) = cn
-        } else if (inherits(splist[[k]], "inla.mesh")) {
-          splist[[k]] <- fm_spTransform(splist[[k]], CRSobj = crs)
-        }
-      }
-    } else {
-      splist <- stransform(list(splist), crs = crs)[[1]]
-    }
-    splist
-  } else {
-    splist
-  }
+  lifecycle::deprecate_warn("2.7.0", "stransform()", "fm_transform()")
+  fm_transform(splist, crs = crs)
 }

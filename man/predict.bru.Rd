@@ -147,7 +147,7 @@ if (bru_safe_inla(multicore = FALSE) &&
   # objects as well as Spatial objects. For instance, we might want to predict
   # 'mySmooth' at the locations of the mesh vertices. Using
 
-  vrt <- vertices(gorillas$mesh)
+  vrt <- vertices.inla.mesh(gorillas$mesh)
 
   # we obtain these vertices as a SpatialPointsDataFrame
 

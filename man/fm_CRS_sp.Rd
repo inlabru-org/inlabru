@@ -2,10 +2,45 @@
 % Please edit documentation in R/fmesher_crs.R
 \name{fm_CRS}
 \alias{fm_CRS}
-\alias{fm_wkt_predef}
+\alias{fm_CRS.crs}
+\alias{fm_CRS.fm_crs}
+\alias{fm_CRS.Spatial}
+\alias{fm_CRS.inla.CRS}
+\alias{fm_CRS.sf}
+\alias{fm_CRS.sfc}
+\alias{fm_CRS.sfg}
+\alias{fm_CRS.inla.mesh}
+\alias{fm_CRS.inla.mesh.lattice}
+\alias{fm_CRS.inla.segment}
+\alias{fm_CRS.CRS}
+\alias{fm_CRS.default}
 \title{Create a coordinate reference system object}
 \usage{
-fm_CRS(
+fm_CRS(...)
+
+\method{fm_CRS}{crs}(x, ...)
+
+\method{fm_CRS}{fm_crs}(x, ...)
+
+\method{fm_CRS}{Spatial}(x, ...)
+
+\method{fm_CRS}{inla.CRS}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{sf}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{sfc}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{sfg}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{inla.mesh}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{inla.mesh.lattice}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{inla.segment}(x, ..., crsonly = FALSE)
+
+\method{fm_CRS}{CRS}(x, oblique = NULL, ...)
+
+\method{fm_CRS}{default}(
   projargs = NULL,
   doCheckCRSArgs = TRUE,
   args = NULL,
@@ -13,10 +48,19 @@ fm_CRS(
   SRS_string = NULL,
   ...
 )
-
-fm_wkt_predef()
 }
 \arguments{
+\item{\dots}{Additional parameters. Not currently in use.}
+
+\item{x}{Object to convert to CRS or to extract CRS information from.}
+
+\item{crsonly}{logical; if \code{TRUE}, remove any oblique\verb{information for}inla.CRS\verb{class objects and return a pure}CRS\verb{class object. Default:}FALSE`.}
+
+\item{oblique}{Vector of length at most 4 of rotation angles (in degrees)
+for an oblique projection, all values defaulting to zero. The values
+indicate (longitude, latitude, orientation, orbit), as explained in the
+Details section below.}
+
 \item{projargs}{Either 1) a projection argument string suitable as input to
 \code{sp::CRS}, or 2) an existing \code{CRS} object, or 3) a shortcut
 reference string to a predefined projection; run
@@ -30,15 +74,8 @@ uncontrollable loading of the \code{rgdal} namespace.}
 the PROJ4 arguments in \code{projargs}.  \code{name=value} is converted to
 \code{"+name=value"}, and \code{name=NA} is converted to \code{"+name"}.}
 
-\item{oblique}{Vector of length at most 4 of rotation angles (in degrees)
-for an oblique projection, all values defaulting to zero. The values
-indicate (longitude, latitude, orientation, orbit), as explained in the
-Details section below.}
-
 \item{SRS_string}{a WKT2 string defining the coordinate system;
 see \code{sp::CRS}. This takes precedence over \code{projargs}.}
-
-\item{\dots}{Additional parameters. Not currently in use.}
 }
 \value{
 Either an \code{sp::CRS} object or an \code{inla.CRS} object,
@@ -48,8 +85,6 @@ can be expressed with a pure \code{sp::CRS} object or not.
 An S3 \code{inla.CRS} object is a list, usually (but not necessarily)
 containing at least one element: \item{crs }{The basic \code{sp::CRS}
 object}
-
-\code{fm_wkt_predef} returns a WKT2 string defining a projection
 }
 \description{
 Creates either a CRS object or an inla.CRS object, describing a coordinate
@@ -102,9 +137,6 @@ if (require(rgdal)) {
     crs5 <- fm_CRS("sphere")
     crs6 <- fm_CRS("globe")
   }
-}
-\dontrun{
-names(fm_wkt_predef())
 }
 }
 \seealso{

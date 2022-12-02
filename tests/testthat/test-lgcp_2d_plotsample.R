@@ -67,12 +67,14 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   )
   # Test points selected with sd+sd less than 1.2, for a more stable check.
   expect_snapshot_value(
-    fit$summary.fixed["Intercept", "mean"] + fit$summary.random$my.spde$mean[c(19, 100, 212)],
+    fit$summary.fixed["Intercept", "mean"] +
+      fit$summary.random$my.spde$mean[c(19, 100, 212)],
     tolerance = midtol,
     style = "serialize"
   )
   expect_snapshot_value(
-    fit$summary.fixed["Intercept", "sd"] + fit$summary.random$my.spde$sd[c(19, 100, 212)],
+    fit$summary.fixed["Intercept", "sd"] +
+      fit$summary.random$my.spde$sd[c(19, 100, 212)],
     tolerance = hitol,
     style = "serialize"
   )

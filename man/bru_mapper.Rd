@@ -12,8 +12,10 @@
 \alias{bru_mapper_matrix}
 \alias{bru_mapper_factor}
 \alias{bru_mapper_const}
-\alias{bru_mapper_offset}
 \alias{bru_mapper_scale}
+\alias{bru_mapper_aggregate}
+\alias{bru_mapper_logsumexp}
+\alias{bru_mapper_pipe}
 \alias{bru_mapper_multi}
 \alias{bru_mapper_collect}
 \alias{bru_mapper_harmonics}
@@ -21,7 +23,7 @@
 \usage{
 bru_mapper(...)
 
-bru_mapper_define(mapper, new_class = NULL, methods = NULL, ...)
+bru_mapper_define(mapper, new_class = NULL, ..., methods = NULL)
 
 \method{bru_mapper}{default}(...)
 
@@ -31,19 +33,29 @@ bru_mapper_define(mapper, new_class = NULL, methods = NULL, ...)
 
 bru_mapper_index(n = 1L, ...)
 
-bru_mapper_taylor(offset, jacobian, state0, ..., values_mapper = NULL)
+bru_mapper_taylor(
+  offset = NULL,
+  jacobian = NULL,
+  state0 = NULL,
+  ...,
+  values_mapper = NULL
+)
 
 bru_mapper_linear(...)
 
 bru_mapper_matrix(labels, ...)
 
-bru_mapper_factor(values, factor_mapping, ...)
+bru_mapper_factor(values, factor_mapping, indexed = FALSE, ...)
 
 bru_mapper_const(...)
 
-bru_mapper_offset(...)
+bru_mapper_scale(mapper = NULL, ...)
 
-bru_mapper_scale(mapper, ...)
+bru_mapper_aggregate(rescale = FALSE, n_block = NULL, ...)
+
+bru_mapper_logsumexp(rescale = FALSE, n_block = NULL, ...)
+
+bru_mapper_pipe(mappers, ...)
 
 bru_mapper_multi(mappers, ...)
 
@@ -65,21 +77,23 @@ For \code{bru_mapper_scale}, a mapper to be scaled.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
-\item{methods}{Optional \code{list} of named method definitions; See Details.}
+\item{methods}{Deprecated.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
-\item{indexed}{logical; If \code{TRUE}, the \code{ibm_values()} output will be the
-integer indexing sequence for the latent variables (needed for \code{spde} models).
-If \code{FALSE}, the knot
-locations are returned (useful as an interpolator for \code{rw2} models
-and similar).
-Default: \code{NULL}, to force user specification of this parameter}
+\item{indexed}{logical; if \code{TRUE}, the \code{ibm_values()} method
+will return an integer vector instead of the factor levels.
+This is needed e.g. for \code{group} and \code{replicate} mappers, since
+\code{INLA::f()} doesn't accept factor values. Default: \code{FALSE}, which
+works for the main input mappers. The default mapper constructions
+will set it the required setting.}
 
 \item{n}{Size of a model for \code{bru_mapper_index}}
 
 \item{offset}{For \code{bru_mapper_taylor}, an offset vector evaluated
-at \code{state0}}
+at \code{state0}.
+May be \code{NULL}, interpreted as an all-zero vector of length determined by
+a non-null Jacobian.}
 
 \item{jacobian}{For \code{bru_mapper_taylor}, the Jacobian matrix,
 evaluated at \code{state0}, or, a named list of such matrices.
@@ -101,6 +115,20 @@ was evaluated at, or a list of length matching the \code{jacobian} list.
 \item \code{'contrast'} for leaving out the first factor level.
 \item \code{'full'} for keeping all levels.
 }}
+
+\item{rescale}{logical; For \code{bru_mapper_aggregate} and \code{bru_mapper_logsumexp},
+specifies if the blockwise sums should be normalised by the blockwise weight
+sums or not:
+\itemize{
+\item \code{FALSE}: (default) Straight weighted sum, no rescaling.
+\item \code{TRUE}: Divide by the sum of the weight values within each block.
+This is useful for integration averages, when the given weights are plain
+integration weights. If the weights are \code{NULL} or all ones, this is
+the same as dividing by the number of entries in each block.
+}}
+
+\item{n_block}{Predetermined number of output blocks. If \code{NULL}, overrides
+the maximum block index in the inputs.}
 
 \item{mappers}{A list of \code{bru_mapper} objects}
 
@@ -126,53 +154,98 @@ Default \code{c(0, 1)}.}
 \description{
 Constructors for \code{bru_mapper} objects
 }
-\details{
+\section{Methods (by class)}{
 \itemize{
-\item \code{bru_mapper} Generic mapper S3 constructor, used for constructing
+\item \code{bru_mapper(default)}: Calls \code{bru_mapper_define}, passing all
+arguments along. Mapper implementations should call \code{\link[=bru_mapper_define]{bru_mapper_define()}}
+instead, and supply at least a \code{new_class} class name.
+Use of the \code{bru_mapper.default} method will be deprecated from version 2.7.0.
+
+\item \code{bru_mapper(inla.mesh)}: Creates a mapper for 2D \code{inla.mesh} objects
+
+\item \code{bru_mapper(inla.mesh.1d)}: Create mapper for an \code{inla.mesh.1d} object
+
+}}
+\section{Functions}{
+\itemize{
+\item \code{bru_mapper()}: Generic mapper S3 constructor, used for constructing
 mappers for special objects. See below for details of the
 default constructor \code{\link[=bru_mapper_define]{bru_mapper_define()}} that can be used to define
 new mappers in user code.
-}
 
-\itemize{
-\item \code{bru_mapper_define} adds the \code{new_class} and "bru_mapper" class
+\item \code{bru_mapper_define()}: Adds the \code{new_class} and "bru_mapper" class
 names to the inheritance list for the input \code{mapper} object, unless the object
 already inherits from these.
-If provided, mapper method functions are added to an environment
-\code{.envir} in the object.  The generic methods look for these
-functions first,
-and otherwise call \code{UseMethod()}.  This is an alternative to using \code{.S3method()}
+
+To register mapper classes and methods in scripts, use \code{.S3method()}
 to register the methods, e.g.
 \code{.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)}.
-}
 
-\itemize{
-\item \code{bru_mapper.default} calls \code{bru_mapper_define}, passing all
-arguments along. Mapper implementations should call \code{\link[=bru_mapper_define]{bru_mapper_define()}}
-instead, and supply at least a \code{new_class} class name.
-Use of the \code{bru_mapper.default} will be deprecated from version 2.7.0.
-}
+In packages with \code{Suggests: inlabru}, add method information for delayed
+registration, e.g.:
 
-\code{bru_mapper_taylor} provides a pre-computed affine mapping,
+\if{html}{\out{<div class="sourceCode">}}\preformatted{#' @rawNamespace S3method(inlabru::bru_get_mapper, inla_rspde)
+#' @rawNamespace S3method(inlabru::ibm_n, bru_mapper_inla_rspde)
+#' @rawNamespace S3method(inlabru::ibm_values, bru_mapper_inla_rspde)
+#' @rawNamespace S3method(inlabru::ibm_jacobian, bru_mapper_inla_rspde)
+}\if{html}{\out{</div>}}
+
+or before each method, use \verb{@exportS3Method}:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{#' @exportS3Method inlabru::bru_get_mapper
+}\if{html}{\out{</div>}}
+
+etc., which semi-automates it.
+
+\item \code{bru_mapper_index()}: Create a an indexing mapper
+
+\item \code{bru_mapper_taylor()}: Provides a pre-computed affine mapping,
 internally used to represent and evaluate linearisation information.
 The \code{state0} information indicates for which state the \code{offset} was evaluated;
 The affine mapper output is defined as
 \code{effect(state) = offset + jacobian \%*\% (state - state0)}
 
-For \code{bru_mapper_scale()}, \code{mapper} is a mapper to be scaled.
+\item \code{bru_mapper_linear()}: Create a mapper for linear effects
+
+\item \code{bru_mapper_matrix()}: Create a matrix mapper, for a given number of columns
+
+\item \code{bru_mapper_factor()}: Create a factor mapper
+
+\item \code{bru_mapper_const()}: Create a constant mapper
+
+\item \code{bru_mapper_scale()}: Create a standalone
+scaling mapper that can be used as part of a \code{bru_mapper_pipe}.
+If \code{mapper} is non-null, the \code{bru_mapper_scale()} constructor
+returns
+\code{bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))}
+
+\item \code{bru_mapper_aggregate()}: Constructs a mapper
+that aggregates elements of the input state, so it can be used e.g.
+for weighted summation or integration over blocks of values.
+
+\item \code{bru_mapper_logsumexp()}: Constructs a mapper
+that aggregates elements of \code{exp(state)}, with optional non-negative weighting,
+and then takes the \code{log()}, so it can be used e.g.
+for  \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]}{log(blocksum(w*exp(state)))}
+and \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]}{log(blocksum(w*exp(state)/blocksum(w)))}
+calculations.  Relies on the input handling methods for \code{bru_mapper_aggregate},
+but also allows the weights to be supplied on a logarithmic scale as \code{log_weights}.
+To avoid numerical overflow, it uses the common method of internally
+shifting the state blockwise with
+\code{(state-log_weights)[block] - max((state-log_weights)[block])},
+and shifting the result back afterwards.
+
+\item \code{bru_mapper_pipe()}: Create a pipe mapper, where, \code{mappers} is a list of mappers,
+where the evaluated output of each mapper is handed as the state to the next
+mapper..
 The \code{input} format for the \code{ibm_eval} and \code{ibm_jacobian} methods is
-\code{list(mapper = input_to_the_inner_mapper, scale = scaling_weights)}
+a list of inputs, one for each mapper.
 
-\itemize{
-\item \code{bru_mapper_multi} constructs a kronecker product mapping
-}
+\item \code{bru_mapper_multi()}: Constructs a rowwise Kronecker product mapping
 
-\itemize{
-\item \code{bru_mapper_collect} constructs concatenated collection mapping
-}
+\item \code{bru_mapper_collect()}: Constructs a concatenated collection mapping
 
-\itemize{
-\item \code{bru_mapper_harmonics} constructs a mapper for \code{cos}/\code{sin} functions
+\item \code{bru_mapper_harmonics()}: Constructs a mapper for \code{cos}/\code{sin} functions
 of orders 1 (if \code{intercept} is \code{TRUE}, otherwise 0) through \code{order}. The total
 number of basis functions is \code{intercept + 2 * order}.
 
@@ -181,14 +254,19 @@ vector, of length \code{intercept + order}. This can be used to
 give an effective spectral prior. For example, let
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{scaling = 1 / (1 + (0:4)^2)
-A1 = bru_mapper_harmonics(order = 4)
-u1 <- A1 \%*\% rnorm(9, sd = scaling)
+x <- seq(0, 1, length.out = 11)
+bmh1 = bru_mapper_harmonics(order = 4, interval = c(0, 1))
+u1 <- ibm_eval(
+  bmh1,
+  input = x,
+  state = rnorm(9, sd = rep(scaling, c(1, 2, 2, 2, 2)))
+)
 }\if{html}{\out{</div>}}
 
 Then, with
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{A2 = bru_mapper_harmonics(order = 4, scaling = scaling)
-u2 = A2 \%*\% rnorm(9)
+\if{html}{\out{<div class="sourceCode">}}\preformatted{bmh2 = bru_mapper_harmonics(order = 4, scaling = scaling)
+u2 = ibm_eval(bmh2, input = x, state = rnorm(9))
 }\if{html}{\out{</div>}}
 
 the stochastic properties of \code{u1} and \code{u2} will be the same, with \code{scaling^2}
@@ -196,13 +274,14 @@ determining the variance for each frequency contribution.
 
 The period for the first order harmonics is shifted and scaled to match
 \code{interval}.
-}
-}
+
+}}
 \examples{
 mapper <- bru_mapper_index(5)
 ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
 }
 \seealso{
+\link{bru_mapper_generics} for generic methods,
 \link{bru_mapper_methods} for specific method implementations, and
 \link{bru_get_mapper} for hooks to extract mappers from latent model object
 class objects.

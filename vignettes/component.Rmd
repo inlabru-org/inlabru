@@ -132,7 +132,7 @@ And can we implement an `inlabru.list.models()` function?)
 There are a few shortcuts to defining model components.  They are for
 
 1. Parameters that are the same for all predictor evaluations (intercept-like parameters).
-2. Using a covariate stored in an `sp` `Spatial*` object.
+2. Using a covariate stored in an `sp` `Spatial*` or `terra` `SpatRaster` object.
 3. Defining linear effects using an `lm`-style syntax.
 4. Behaviour for if `main`, `group` or `replicate` is a function given with no arguments.
 
@@ -153,12 +153,12 @@ where `n` is the length of the predictor vector.  Note that this shortcut makes 
 
 #### `sp` covariates
 
-If `main`, `group`, or `replicate`, is the name of an `sp` object stored in the global `R` environment, then `inlabru` attempts to do something intelligent by extracting the covariate information at the locations of the data passed to `bru()` or `like()`.  In this case **it is assumed that this data is also an `sp` object**.  `inlabru` does this by applying `sp::coordinates()` to the data and then extracting the covariate information using `sp::over()`.
+If `main`, `group`, or `replicate`, is the name of an `Spatial*` or `SpatRaster` object stored in the global `R` environment, then `inlabru` attempts to do something intelligent by extracting the covariate information at the locations of the data passed to `bru()` or `like()`.  This **requires that this data is a `SpatialPoints*` or `sf` object**.  For `Spatial*` inputs, `inlabru` does this by applying `sp::coordinates()` to the data and then extracting the covariate information using `sp::over()`. 
 
 The shorcut
 ```{r eval=FALSE}
 ~ my_sp_effect(
-  main = an_sp_object,
+  main = a_spatial_object,
   model = "linear"
 )
 ```
@@ -174,11 +174,11 @@ get_sp_covariate <- function(df) {
   model = "linear"
 )
 ```
-Note that this requires `an_sp_object` to be stored in the global `R` environment
-(or in the environment associated with the model definition code) so it is findable when the expression is internally evaluated by `inlabru`.  Also note that the `get_sp_covariate` function above extract the first column of the `sp` object evaluation.  For more general situations, one can either specify the optional `main_layer` argument to extract another named or indexed column, or directly
-use `main = eval_spatial(an_sp_object, .data., layer = some_layer)`.
+Note that this requires `a_spatial_object` to be stored in the global `R` environment
+(or in the environment associated with the model definition code) so it is findable when the expression is internally evaluated by `inlabru`.  Also note that the `get_sp_covariate` function above extracts the first column of the `sp` object evaluation.  For more general situations, one can either specify the optional `main_layer` argument to extract another named or indexed column, or directly
+use `main = eval_spatial(a_spatial_object, .data., layer = some_layer)`.
 
-Note that this assumes that `coordinates()` applied to the input data is a sensible thing to do, this might not be the case for all models!  For example, if the input data is a `SpatialPolygonsDataFrame` then `coordinates()` returns the centroid of each polygon.  As more specific input type support is developed,
+Note that this assumes that `coordinates()` applied to the input data is a sensible thing to do, this might not be the case for all models!  For example, if the input data is a `SpatialPolygonsDataFrame` then `coordinates()` returns the centroid of each polygon.  As more specific input type support is developed, and support for `sp` is gradually deprecated in favour of `sf` and `terra`,
 these special cases may be given more precise meaning.
 
 #### `lm`-style syntax
@@ -222,4 +222,4 @@ is equivalent to
 
 #### Non-linear predictors
 
-`inlabru` supports non-linear predictors, where $\tilde{\eta}(u,v)$ is a non-linear function of $\eta_u$ and $\eta_v$.  It is important to note that the mapping each component effect vector $\eta_u=A^(u) u$ happens **before** the non-linear function is applied.  So, for example, if $\tilde{\eta}(u,v) = \exp(\eta_u + \eta_v)$ then this is evaluated as `exp(A_u %*% u + A_v %*% v)`.
+`inlabru` supports non-linear predictors, where $\tilde{\eta}(u,v)$ is a non-linear function of $\eta_u$ and $\eta_v$.  It is important to note that the mapping each component effect vector $\eta_u=A^{(u)} u$ happens **before** the non-linear function is applied.  So, for example, if $\tilde{\eta}(u,v) = \exp(\eta_u + \eta_v)$ then this is evaluated as $\exp(A^{(u)} u + A^{(v)} v)$.

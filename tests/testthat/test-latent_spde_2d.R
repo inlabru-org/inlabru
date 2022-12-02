@@ -90,11 +90,12 @@ test_that("Georeferenced data with sp", {
 
 
   # Check that explicit access to the data object works
-  cmp <- obs ~ Intercept(1) + field(cbind(
-    as.data.frame(.data.)$Easting,
-    as.data.frame(.data.)$Northing
-  ),
-  model = matern
+  cmp <- obs ~ Intercept(1) + field(
+    cbind(
+      as.data.frame(.data.)$Easting,
+      as.data.frame(.data.)$Northing
+    ),
+    model = matern
   )
 
   fit <- bru(

@@ -165,18 +165,20 @@ extract_selector <- function(where, selector) {
 }
 
 extract_layer <- function(where, layer, selector) {
-  if (!is.null(layer) && !is.null(selector)) {
-    warning("Both layer and selector specified. Ignoring selector",
-      immediate. = TRUE
-    )
-    selector <- NULL
-    if (length(layer) == 1) {
-      layer <- rep(layer, NROW(where))
+  if (!is.null(layer)) {
+    if (!is.null(selector)) {
+      warning("Both layer and selector specified. Ignoring selector",
+        immediate. = TRUE
+      )
     }
+    selector <- NULL
   } else if (!is.null(selector)) {
     layer <- extract_selector(where, selector)
-  } else if (is.null(layer) && is.null(selector)) {
-    layer <- rep(1, NROW(where))
+  } else if (is.null(layer)) {
+    layer <- 1
+  }
+  if (length(layer) == 1) {
+    layer <- rep(layer, NROW(where))
   }
   layer
 }
@@ -200,8 +202,8 @@ eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
 
 #' @describeIn inlabru-deprecated Replaced by the generic [eval_spatial()]
 eval_SpatialDF <- function(...) {
-  .Deprecated("eval_spatial")
-  eval_spatial.Spatial(...)
+  lifecycle::deprecate_warn("2.6.0", "eval_spatial()")
+  eval_spatial(...)
 }
 
 #' @export
@@ -214,6 +216,14 @@ eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
       "SpatialGridDataFrame"
     )
   ))
+  if (inherits(where, "SpatialPoints")) {
+    if (ncol(sp::coordinates(where)) >= 3) {
+      where <- sp::SpatialPoints(
+        coords = sp::coordinates(where)[, 1:2, drop = FALSE],
+        proj4string = fm_sp_get_crs(where)
+      )
+    }
+  }
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
   unique_layer <- unique(layer)
@@ -243,12 +253,27 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
   if (!inherits(where, "SpatVector")) {
     where <- terra::vect(where)
   }
-  val <- terra::extract(
-    data,
-    where,
-    ID = FALSE,
-    layer = layer
-  )
+  if ((NROW(where) == 1) && (terra::nlyr(data) > 1)) {
+    # Work around issue in terra::extract() that assumes `layer` to point
+    # to a column of `where` (like `selector`) when
+    # length(layer)==1 (NROW(where)==1),
+    # but otherwise be used directly for indexing into data.
+    # When nlyr == 1, terra::extract ignores the layer input.
+    val <- terra::extract(
+      data,
+      rbind(where, where),
+      ID = FALSE,
+      layer = c(layer, layer)
+    )
+    val <- val[1, , drop = FALSE]
+  } else {
+    val <- terra::extract(
+      data,
+      where,
+      ID = FALSE,
+      layer = layer
+    )
+  }
   if (terra::nlyr(data) == 1) {
     val <- val[[1]]
   } else {
@@ -262,10 +287,11 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
 #'
 #' Computes nearest-available-value imputation for missing values in space
 #'
-#' @param data A SpatialPointsDataFrame, SpatialPixelsDataFrame, or a
-#' SpatialGridDataFrame containg data to use for filling
+#' @param data A SpatialPointsDataFrame, SpatialPixelsDataFrame,
+#' SpatialGridDataFrame, SpatRaster, Raster, or sf object
+#' containing data to use for filling
 #' @param where A, matrix, data.frame, or SpatialPoints or
-#' SpatialPointsDataFrame, containing the locations of the evaluated values
+#' SpatialPointsDataFrame, or sf object, containing the locations of the evaluated values
 #' @param values A vector of values to be filled in where `is.na(values)` is
 #' `TRUE`
 #' @param layer,selector Specifies what data column or columns from which to
@@ -300,38 +326,42 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
 #' }
 bru_fill_missing <- function(data, where, values,
                              layer = NULL, selector = NULL,
-                             batch_size = 500) {
+                             batch_size = 50) {
   stopifnot(inherits(
     data,
     c(
       "SpatialPointsDataFrame",
       "SpatialPixelsDataFrame",
       "SpatialGridDataFrame",
-      "SpatRaster"
+      "Raster",
+      "SpatRaster",
+      "sf"
     )
   ))
-  if (inherits(data, "SpatialGridDataFrame")) {
-    data <- as(data, "SpatialPixelsDataFrame")
+  # Convert to sf and terra
+  if (inherits(data, c("SpatialGrid", "SpatialPixelsDataFrame", "Raster"))) {
+    data <- terra::rast(data)
+  } else if (inherits(data, "SpatialPointsDataFrame")) {
+    data <- sf::st_as_sf(data)
   }
+  # Convert to sf
+  if (inherits(where, c("Spatial", "SpatVector"))) {
+    where <- sf::st_as_sf(where)
+  } else if (!inherits(where, "sf")) {
+    where <- sf::st_as_sf(where, coords = seq_len(min(3, NCOL(where))))
+  }
+
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
 
-  # TODO: Add cases for SpatVector and sf
-  if (inherits(where, "Spatial")) {
-    data_crs <- fm_sp_get_crs(data)
-    where_crs <- fm_sp_get_crs(where)
-    if (!fm_identical_CRS(data_crs, where_crs)) {
-      warning("'data' and 'where' for spatial infilling have different CRS")
-    }
-    where_coord <- sp::coordinates(where)
-  } else {
-    data_crs <- sp::CRS(NA_character_)
-    where_crs <- sp::CRS(NA_character_)
-    where_coord <- where
-  }
-
   if (any(is.na(layer))) {
     stop("NAs detected in the 'layer' information.")
+  }
+
+  data_crs <- fm_crs(data)
+  where_crs <- fm_crs(where)
+  if (!fm_identical_CRS(data_crs, where_crs)) {
+    warning("'data' and 'where' for spatial infilling have different CRS")
   }
 
   layers <- unique(layer)
@@ -340,10 +370,7 @@ bru_fill_missing <- function(data, where, values,
       values[layer == l] <-
         bru_fill_missing(
           data = data,
-          where = sp::SpatialPoints(
-            where_coord[layer == l, , drop = FALSE],
-            proj4string = where_crs
-          ),
+          where = where[layer == l, , drop = FALSE],
           values = values[layer == l],
           layer = l,
           batch_size = batch_size
@@ -355,26 +382,39 @@ bru_fill_missing <- function(data, where, values,
   # Only one layer from here on.
   layer <- layers
 
+  if (inherits(data, "SpatRaster")) {
+    data_values <- as.vector(terra::values(data[[layer]]))
+    data_coord <- as.data.frame(terra::crds(data))
+    data_coord <- sf::st_as_sf(data_coord,
+      coords = seq_len(ncol(data_coord)),
+      crs = data_crs
+    )
+  } else {
+    data_values <- data[[layer]]
+    data_coord <- data
+  }
+
   notok <- is.na(values)
   ok <- which(!notok)
   notok <- which(notok)
-  data_notok <- is.na(data[[layer]])
+  data_notok <- is.na(data_values)
   data_ok <- which(!data_notok)
   data_notok <- which(data_notok)
+
 
   for (batch in seq_len(ceiling(length(notok) / batch_size))) {
     subset <- notok[seq((batch - 1) * batch_size,
       min(length(notok), batch * batch_size),
       by = 1
     )]
-    dst <- rgeos::gDistance(
-      sp::SpatialPoints(data[data_ok, , drop = FALSE], proj4string = data_crs),
-      sp::SpatialPoints(where_coord[subset, , drop = FALSE], proj4string = where_crs),
-      byid = TRUE
+    dst <- sf::st_distance(
+      data_coord[data_ok, , drop = FALSE],
+      where[subset, , drop = FALSE],
+      by_element = FALSE
     )
 
-    nn <- apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
-    values[subset] <- data[[layer]][data_ok[nn]]
+    nn <- apply(dst, MARGIN = 2, function(col) which.min(col)[[1]])
+    values[subset] <- data_values[data_ok[nn]]
   }
   values
 }
