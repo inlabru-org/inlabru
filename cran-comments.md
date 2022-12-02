@@ -1,7 +1,7 @@
 ## Submission notes
 
 * Minor release 2.7.0, including new features, bug fixes, and
-  fixes for package dependencies
+  fixes for package dependencies (spatstat.core removed)
 * CRAN checks for old version, 2.6.0:
   NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
 * Checks for new version, 2.7.0 (with latest INLA, 22.11.28-1):
@@ -9,11 +9,11 @@
 
 ## Test environments
 
-* ubuntu 22.04 (local, with INLA), R 4.2.1, R 4.1.3, R devel
-* ubuntu 20.04 (on github, with INLA), R 4.2.1, R 4.1.3, R devel
-* macOS-latest (on github, with INLA), R 4.2.1
-* windows-latest (on github, with INLA), R 4.2.1
-* win-builder; R devel, 4.2.1, 4.1.3
+* ubuntu 22.04 (local, with INLA), R 4.2.2, R 4.1.3, R devel
+* ubuntu 20.04 (on github, with INLA), R 4.2.2, R 4.1.3, R devel
+* macOS-latest (on github, with INLA), R 4.2.2
+* windows-latest (on github, with INLA), R 4.2.2
+* win-builder; R devel, 4.2.2, 4.1.3
 * R-hub;
     Windows Server R-devel
     Fedora Linux R-devel
