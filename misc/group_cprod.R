@@ -30,6 +30,9 @@
 #' }
 #' }
 #'
+#' 20221201 This is the full_join trick I need here
+#' Z <- full_join(as_tibble(X), as_tibble(Y), by = "grp")
+#' st_as_sf(Z)
 group_cprod <- function(..., group = NULL) {
   ipl <- list(...)
   ipl <- ipl[!vapply(ipl, is.null, TRUE)]
