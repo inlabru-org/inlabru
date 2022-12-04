@@ -31,10 +31,23 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # TODO 20221109 For multiple samplers multiple domains, it does have to rely
   # on the domain names. 20221111 They do have to match
 
+  # a template for deprecate
+  # dname deprecated
+  # sampler(list)
+  lifecycle::deprecate_soft(
+    when = "2.7.1", # TODO next inlabru version
+    what = "apmaker(dnames)",
+    with = "apmaker(samplers)",
+    details = NULL
+  )
+
   # Mandate both the domain argument not specified or is null
   if (missing(domain) || is.null(domain)) {
     stop("Domain argument(s) missing or NULL.")
   }
+
+  # TODO Make a S3/S4 generic check function icheck, generate stop warning
+
 
   # Mandate domain to be data.frame, factor, numeric, inla.mesh, inla.mesh.1d
   if (inherits(domain, "list")) {
@@ -95,7 +108,8 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # We do not care if samplers a list or not now 20221201 We should allow sf and sp input, if there is a mix then give a warning and log and change them into sf
     sf_samplers <- lapply(samplers, function(x) inherits(x, c("sf", "sfc")))
     sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
-    if (any(sp_samplers)) {
+    if (sp_samplers && sp_samplers) {
+      warning("Both sf and sp objects in the samplers are detected. Produce sf output as desired")
       samplers <- lapply(samplers, sf::st_as_sf)
     }
 
@@ -156,6 +170,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # Domain should be more than samplers. However, we can have unused samplers as well.
   else if (length(samplers) > length(domain)) {
     unused_samplers <- setdiff(names(samplers), names(domain))
+    sandom(unused_samplers, start_with = "\n The unused samplers: \n")
     sandom(unused_samplers, start_with = "\n The unused samplers: \n")
   } else {
     extra_domain <- setdiff(names(samplers), names(domain))
