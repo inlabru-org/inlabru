@@ -1082,6 +1082,11 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
 
 add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
                        require_indexed = FALSE) {
+  if (is.null(subcomp[["mapper"]])) {
+    if (!inherits(subcomp[["model"]], "character")) {
+      subcomp[["mapper"]] <- bru_get_mapper_safely(subcomp[["model"]])
+    }
+  }
   if (!is.null(subcomp[["mapper"]])) {
     if (!inherits(subcomp[["mapper"]], "bru_mapper")) {
       stop(paste0(
@@ -1144,7 +1149,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
 
         unique_inputs <- make_unique_inputs(inp_, allow_list = TRUE)
       }
-      if (unique_inputs$n_values < 1) {
+      if (sum(unlist(unique_inputs$n_values)) < 1) {
         subcomp$n <- 1
         subcomp$values <- NULL
         inp_values <- NULL
