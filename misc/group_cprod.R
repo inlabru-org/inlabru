@@ -33,7 +33,7 @@
 #' 20221201 This is the full_join trick I need here
 #' Z <- full_join(as_tibble(X), as_tibble(Y), by = "grp")
 #' st_as_sf(Z)
-group_cprod <- function(..., group = NULL) {
+group_cprod <- function(..., grp = NULL) {
   ipl <- list(...)
   ipl <- ipl[!vapply(ipl, is.null, TRUE)]
   if (length(ipl) == 0) {
@@ -45,7 +45,7 @@ group_cprod <- function(..., group = NULL) {
   } else {
     ips1 <- ipl[[1]]
     if (length(ipl) > 2) {
-      ips2 <- do.call(cprod, ipl[2:length(ipl)])
+      ips2 <- do.call(group_cprod, ipl[2:length(ipl)])
     } else {
       ips2 <- ipl[[2]]
     }
@@ -57,6 +57,18 @@ group_cprod <- function(..., group = NULL) {
     }
 
     by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
+
+    if (inherits(ips1, "sf","sfc")) { # better double check ips1 and ips2
+      ips <- full_join(as_tibble(ips1), as_tibble(ips2), by = c(by, grp)) # double check if c(by,grp) the right logic and if it works
+      # ips <- sp::merge(ips1, ips2, by = by, duplicateGeoms = TRUE)
+    } else if (inherits(ips2, "sf","sfc")) {
+      ips <- full_join(as_tibble(ips2), as_tibble(ips1), by = c(by, grp)) # double check if c(by,grp) the right logic and if it works
+      # ips <- sp::merge(ips2, ips1, by = by, duplicateGeoms = TRUE)
+    } else {
+      ips <- full_join(as_tibble(ips1), as_tibble(ips2), by = c(by, grp)) # double check if c(by,grp) the right logic and if it works
+      # ips <- base::merge(ips1, ips2, by = by)
+    }
+
     if (inherits(ips1, "Spatial")) {
       ips <- sp::merge(ips1, ips2, by = by, duplicateGeoms = TRUE)
     } else if (inherits(ips2, "Spatial")) {
