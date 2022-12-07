@@ -46,49 +46,63 @@ apmaker <- function(domain = NULL, samplers = NULL,
     stop("Domain argument(s) missing or NULL.")
   }
 
-  # TODO Make a S3/S4 generic check function icheck, generate stop warning
-
+  #' A S3/S4 generic function to generate stop warning if the object is not of
+  #' the specified classes.
+  #' @param  object An object
+  #' @param class A vector of class(es)
+  #' @keywords internal
+  stopifnot_class <- function(object = NULL, class = NULL, ...) {
+    if (is.null(object) || is.null(class) || missing(object) || missing(class)) {
+      stop("Object andclass argument(s) missing or NULL.")
+    }
+    class_name <- paste0(sort(class), collapse = ",")
+    obj_name <- paste0(as.character(expression(object)), collapse = ",")
+    UseMethod("stopifnot_class")
+  }
+  stopifnot_class.default <- function(object, class) {
+    if (!inherits(object, class)) {
+      stop(paste0(obj_name), " must be of class(es) ", class_name)
+    }
+  }
+  stopifnot_class.list <- function(object, class) {
+    if (!all(unlist(lapply(object, function(x) {
+      inherits(x, class)
+    })))) {
+      stop(paste0(obj_name), " must be of class(es) ", class_name)
+    }
+  }
 
   # Mandate domain to be data.frame, factor, numeric, inla.mesh, inla.mesh.1d
+  # TODO do I have to index the domain that is not of the class ... or do I allow unused domain
+  stopifnot_class(
+    domain,
+    c(
+      # "data.frame", # maybe in the future
+      "character",
+      "factor",
+      "numeric",
+      "inla.mesh",
+      "inla.mesh.1d",
+      "inla.mesh.lattice",
+      "raster",
+      "spatraster"
+    )
+  )
+
   if (inherits(domain, "list")) {
     is_list_domain <- TRUE
-    # TODO do I have to index the domain that is not of the class ... or do I allow unused domain
-    if (!all(unlist(lapply(domain, function(x) {
-      inherits(
-        x,
-        c(
-          # "data.frame", # maybe in the future
-          "character",
-          "factor",
-          "numeric",
-          "inla.mesh",
-          "inla.mesh.1d",
-          "inla.mesh.lattice",
-          "raster",
-          "spatraster"
-        )
-      )
-    })))) {
-      stop("Domain must be of class factor, numeric, inla.mesh, inla.mesh.1d, inla.mesh.lattice, raster, spatraster")
-    }
-  } else if (!inherits(
-    domain,
-    c("data.frame", "factor", "numeric", "inla.mesh.1d", "inla.mesh")
-  )) {
-    stop("Domain must be of class factor, numeric, inla.mesh, inla.mesh.1d, inla.mesh.lattice, raster, spatraster")
   }
 
   # Sort multi domain samplers, single domain samplers,
   # remove sampler domains and full domain samplers
   # https://stackoverflow.com/questions/38539654/how-to-know-if-the-data-is-a-list-or-data-frame-in-r
   if (is_list_domain) {
-  # TODO if domain a list then it is multidomain samplers, we should then do the name check for domain and samplers here
+    # TODO if domain a list then it is multidomain samplers, we should then do the name check for domain and samplers here
     multi_domain <- TRUE
-    if (inherits(samplers, "list")){
+    if (inherits(samplers, "list")) {
       is_list <- TRUE
     }
-  }
-  else if (inherits(samplers, "list") && !is_list_domain) {
+  } else if (inherits(samplers, "list") && !is_list_domain) {
     single_domain <- TRUE
   } else {
     is_list <- FALSE
@@ -106,12 +120,12 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # multi domain sampler the main thing is data dname 23112022 specific column has that meaning
   # check sf or sp object, can do a mix of sp and sf objects,
   # We do not care if samplers a list or not now 20221201 We should allow sf and sp input, if there is a mix then give a warning and log and change them into sf
-    sf_samplers <- lapply(samplers, function(x) inherits(x, c("sf", "sfc")))
-    sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
-    if (sp_samplers && sp_samplers) {
-      warning("Both sf and sp objects in the samplers are detected. Produce sf output as desired")
-      samplers <- lapply(samplers, sf::st_as_sf)
-    }
+  sf_samplers <- lapply(samplers, function(x) inherits(x, c("sf", "sfc")))
+  sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
+  if (sp_samplers && sp_samplers) {
+    warning("Both sf and sp objects in the samplers are detected. Produce sf output as desired")
+    samplers <- lapply(samplers, sf::st_as_sf)
+  }
 
   # sandom function ---------------------------------------------------------
   # How does sf deal with secondary geometry columns?
