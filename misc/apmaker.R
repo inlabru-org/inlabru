@@ -32,13 +32,14 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # on the domain names. 20221111 They do have to match
 
   # a template for deprecate
-  # dname deprecated
-  # sampler(list)
+  # 1) dname deprecated
+  # 2) samplers should be provided as list
+  # 3) ...
   lifecycle::deprecate_soft(
     when = "2.7.1", # TODO next inlabru version
     what = "apmaker(dnames)",
     with = "apmaker(samplers)",
-    details = NULL
+    details = "dnames should be provided in the samplers as the dimension names."
   )
 
   # Mandate both the domain argument not specified or is null
@@ -52,11 +53,15 @@ apmaker <- function(domain = NULL, samplers = NULL,
   #' @param class A vector of class(es)
   #' @keywords internal
   stopifnot_class <- function(object = NULL, class = NULL, ...) {
-    if (is.null(object) || is.null(class) || missing(object) || missing(class)) {
-      stop("Object andclass argument(s) missing or NULL.")
-    }
+    # 20221207 Probably better to leave it out not to deal with NULL and missing in this function
+    # if (is.null(object) || missing(object)) {
+    #   stop(paste0(as.character(expression(object))), " argument missing or NULL.") # TODO It does not work object is NULL
+    # }
+    # if (is.null(class) || missing(class)) {
+    #   stop("Class argument(s) missing or NULL.")
+    # }
     class_name <- paste0(sort(class), collapse = ",")
-    obj_name <- paste0(as.character(expression(object)), collapse = ",")
+    obj_name <- paste0(as.character(expression(object)), collapse = ",") # TODO checking several objects the same time
     UseMethod("stopifnot_class")
   }
   stopifnot_class.default <- function(object, class) {
@@ -72,8 +77,8 @@ apmaker <- function(domain = NULL, samplers = NULL,
     }
   }
 
-  # Mandate domain to be data.frame, factor, numeric, inla.mesh, inla.mesh.1d
-  # TODO do I have to index the domain that is not of the class ... or do I allow unused domain
+  # Mandate domain to be the following classes
+  # Unused domain is not allowed
   stopifnot_class(
     domain,
     c(
@@ -89,45 +94,42 @@ apmaker <- function(domain = NULL, samplers = NULL,
     )
   )
 
+  # Mandate domain to be the following classes
+  stopifnot_class(samplers,
+                  c("numeric", "character", "factor", "sf", "sfc", "Spatial"))
+
+  # https://stackoverflow.com/questions/38539654/how-to-know-if-the-data-is-a-list-or-data-frame-in-r
+  # Turn data frame into a list (standardise the input class)
   if (inherits(domain, "list")) {
     is_list_domain <- TRUE
-  }
-
-  # Sort multi domain samplers, single domain samplers,
-  # remove sampler domains and full domain samplers
-  # https://stackoverflow.com/questions/38539654/how-to-know-if-the-data-is-a-list-or-data-frame-in-r
-  if (is_list_domain) {
-    # TODO if domain a list then it is multidomain samplers, we should then do the name check for domain and samplers here
-    multi_domain <- TRUE
     if (inherits(samplers, "list")) {
       is_list <- TRUE
     }
   } else if (inherits(samplers, "list") && !is_list_domain) {
     single_domain <- TRUE
+    domain <- as.list(domain)
   } else {
     is_list <- FALSE
+      domain <- as.list(domain)
+      samplers <- as.list(samplers)
   }
 
-  # Turn data frame into a list (standardise the input class)
-  if (inherits((domain), "data.frame")) {
-    domain <- as.list(domain)
-  }
-
-  if (inherits((samplers), "data.frame")) {
-    samplers <- as.list(samplers)
-  }
-
-  # multi domain sampler the main thing is data dname 23112022 specific column has that meaning
-  # check sf or sp object, can do a mix of sp and sf objects,
-  # We do not care if samplers a list or not now 20221201 We should allow sf and sp input, if there is a mix then give a warning and log and change them into sf
+  # Change a mix of sp and sf objects to sf
   sf_samplers <- lapply(samplers, function(x) inherits(x, c("sf", "sfc")))
   sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
-  if (sp_samplers && sp_samplers) {
+  if (sp_samplers && sf_samplers) {
     warning("Both sf and sp objects in the samplers are detected. Produce sf output as desired")
     samplers <- lapply(samplers, sf::st_as_sf)
   }
 
-  # sandom function ---------------------------------------------------------
+  # TODO Sort multidomain samplers, single domain samplers,
+  # TODO Multidomain samplers happens when a sampler across several domains. How to detect that?
+  # TODO we should then do the name check for domain and samplers here
+  # TODO remove sampler domains and full domain samplers
+  # multidomain sampler the main thing is data dname 23112022 specific column has that meaning
+
+
+  # bru_log_smpdi function ---------------------------------------------------------
   # How does sf deal with secondary geometry columns?
   # TODO ####
   # TODO have to deal with the multidomain samplers
@@ -135,10 +137,10 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # TODO #### extra domains we assign the sampler for them
   # TODO can use local helper function (with S3 Usemethod() maybe)
   #' @param begin the beginning part of the message
-  samdom <- function(x, start_with = NULL, ...) {
-    UseMethod("samdom")
+  bru_log_smpdi <- function(x, start_with = NULL, ...) {
+    UseMethod("bru_log_smpdi")
   }
-  samdom.list <- function(x, start_with) {
+  bru_log_smpdi.list <- function(x, start_with) {
     for (i in seq_along(x)) {
       bru_log_message(
         paste0(
@@ -153,7 +155,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
     }
   }
   # Technically speaking
-  # samdom.data.frame <- function(x){
+  # bru_log_smpdi.data.frame <- function(x){
   #   bru_log_message(
   #     paste0(
   #       start_with,
@@ -167,7 +169,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # }
 
   if (sf_samplers) {
-    samdom(samplers,
+    bru_log_smpdi(samplers,
       start_with = "The active geometry of the sampler"
     )
   }
@@ -179,16 +181,16 @@ apmaker <- function(domain = NULL, samplers = NULL,
     # TODO have to accommodate weights column in samplers as well, omit this column
     samplers_domain <- intersect(names(samplers), names(domain))
     # TODO for the NULL name case
-    samdom(samplers_domain, start_with = "\n The shared samplers and domain: \n")
+    bru_log_smpdi(samplers_domain, start_with = "\n The shared samplers and domain: \n")
   }
   # Domain should be more than samplers. However, we can have unused samplers as well.
   else if (length(samplers) > length(domain)) {
     unused_samplers <- setdiff(names(samplers), names(domain))
-    sandom(unused_samplers, start_with = "\n The unused samplers: \n")
-    sandom(unused_samplers, start_with = "\n The unused samplers: \n")
+    bru_log_smpdi(unused_samplers, start_with = "\n The unused samplers: \n")
+    bru_log_smpdi(unused_samplers, start_with = "\n The unused samplers: \n")
   } else {
     extra_domain <- setdiff(names(samplers), names(domain))
-    samdom(extra_domain, start_with = "\n The extra domain: \n")
+    bru_log_smpdi(extra_domain, start_with = "\n The extra domain: \n")
   }
 
 
