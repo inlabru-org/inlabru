@@ -7,9 +7,8 @@
 #' weights attached to it all weights are assumed to be 1.
 #'
 #' @aliases group_cprod
-#' @export
+#' @keywords internal
 #'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 #' @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
 #' @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
@@ -31,9 +30,9 @@
 #' }
 #'
 #' 20221201 This is the full_join trick I need here
-#' Z <- full_join(as_tibble(X), as_tibble(Y), by = "grp")
+#' Z <- full_join(as_tibble(X), as_tibble(Y), by = "group")
 #' st_as_sf(Z)
-group_cprod <- function(..., grp = NULL) {
+group_cprod <- function(..., group = NULL) {
   ipl <- list(...)
   ipl <- ipl[!vapply(ipl, is.null, TRUE)]
   if (length(ipl) == 0) {
@@ -59,13 +58,13 @@ group_cprod <- function(..., grp = NULL) {
     by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
 
     if (inherits(ips1, "sf","sfc")) { # better double check ips1 and ips2
-      ips <- full_join(as_tibble(ips1), as_tibble(ips2), by = c(by, grp)) # double check if c(by,grp) the right logic and if it works
+      ips <- full_join(as_tibble(ips1), as_tibble(ips2), by = c(by, group)) # double check if c(by,group) the right logic and if it works
       # ips <- sp::merge(ips1, ips2, by = by, duplicateGeoms = TRUE)
     } else if (inherits(ips2, "sf","sfc")) {
-      ips <- full_join(as_tibble(ips2), as_tibble(ips1), by = c(by, grp)) # double check if c(by,grp) the right logic and if it works
+      ips <- full_join(as_tibble(ips2), as_tibble(ips1), by = c(by, group)) # double check if c(by,group) the right logic and if it works
       # ips <- sp::merge(ips2, ips1, by = by, duplicateGeoms = TRUE)
     } else {
-      ips <- full_join(as_tibble(ips1), as_tibble(ips2), by = c(by, grp)) # double check if c(by,grp) the right logic and if it works
+      ips <- full_join(as_tibble(ips1), as_tibble(ips2), by = c(by, group)) # double check if c(by,group) the right logic and if it works
       # ips <- base::merge(ips1, ips2, by = by)
     }
 
