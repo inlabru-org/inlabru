@@ -80,7 +80,6 @@ This is a basic example which shows you how fit a simple spatial Log Gaussian Co
 and predicts its intensity:
 ```{r example}
 # Load libraries
-options("rgdal_show_exportToProj4_warnings" = "none")
 library(inlabru)
 library(INLA)
 library(ggplot2)

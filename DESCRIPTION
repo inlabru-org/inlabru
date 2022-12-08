@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.6.0.9007
+Version: 2.7.0.9001
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -20,7 +20,7 @@ Authors@R: c(
          role = c("ctb", "dtc", "cph"),
          comment = "Lindesay Scott-Howard provided MRSea data import code"),
   person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
-         comment = "Andy Seaton provided testing and bugfixes"),
+         comment = "Andy Seaton provided testing, bugfixes, and vignettes"),
   person("Suen", "Man Ho", email = "M.H.Suen@sms.ed.ac.uk", role = c("ctb", "cph"),
          comment = "Man Ho Suen contributed features for aggregated responses and vignette updates"),
   person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
@@ -48,7 +48,7 @@ RoxygenNote: 7.2.2
 Encoding: UTF-8
 Depends:
     methods,
-    R (>= 3.5),
+    R (>= 3.6),
     sp (>= 1.4-5),
     stats
 Imports:
@@ -58,7 +58,6 @@ Imports:
     patchwork,
     plyr,
     rgdal (>= 1.5.8),
-    rgeos,
     rlang,
     sf,
     utils,

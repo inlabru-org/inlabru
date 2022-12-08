@@ -776,18 +776,14 @@ fm_crs.default <- function(x, ..., crsonly = FALSE) {
   sf::st_crs(x, ...)
 }
 
-#' @rawNamespace if (getRversion() >= "3.6.0") {
-#'   S3method(sf::st_crs, fm_crs)
-#' }
+#' @exportS3Method sf::st_crs
 #' @describeIn fm_crs `st_crs(x, ...)` is equivalent to `fm_crs(x, ..., crsonly = TRUE)`
 #' when `x` is a `fm_crs` object.
 st_crs.fm_crs <- function(x, ...) {
   fm_crs(x, ..., crsonly = TRUE)
 }
 
-#' @rawNamespace if (getRversion() >= "3.6.0") {
-#'   S3method("$", fm_crs)
-#' }
+#' @rawNamespace S3method("$", fm_crs)
 #' @describeIn fm_crs For a `fm_crs` object `x`, `x$name` calls the accessor method for the
 #' `crs` object inside it. If `name` is "crs", the internal crs object itself is returned.
 #' If `name` is "oblique", the internal oblique angle parameter vector is returned.
@@ -1424,15 +1420,15 @@ fm_CRSargs <- function(x, ...) {
   #   x$input
   # }
   # #
-  # which returns equivalent of CRSargs(x)
+  # which returns equivalent of CRSargs(x), but _only_ if the original
+  # input to st_crs was an actual proj4string; it can also be WKT, so
+  # this approach wouldn't work.
+  #
+  # TODO: fm_CRSargs is _only_ used for PROJ4. Not needed for PROJ6+,
+  # so it can be removed when removing PROJ4 support.
   # #
   # Note:  sf crs object class is lower case "crs"
   #        sp crs object class is upper case "CRS"
-  # #
-  # Decision to make about at which point the sf vs sp code bifurcates
-  # could write separate fm_ functions for "crs" class
-  # or have single functions that check sp vs sf
-  #
 
   fm_not_for_PROJ6()
 
@@ -2466,20 +2462,20 @@ fm_spTransform.SpatialPointsDataFrame <- function(x,
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.inla.mesh.lattice <- function(x, CRSobj, passthrough = FALSE, ...) {
-  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh.lattie()", "fm_transform()")
+  lifecycle::deprecate_soft("2.7.0", "fm_spTransform.inla.mesh.lattice()", "fm_transform()")
   fm_transform(x, crs = CRSobj, ..., passthrough = passthrough)
 }
 
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.inla.mesh.segment <- function(x, CRSobj, passthrough = FALSE, ...) {
-  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh.segment()", "fm_transform()")
+  lifecycle::deprecate_soft("2.7.0", "fm_spTransform.inla.mesh.segment()", "fm_transform()")
   fm_transform(x, crs = CRSobj, ..., passthrough = passthrough)
 }
 
 #' @export
 #' @rdname fm_spTransform
 fm_spTransform.inla.mesh <- function(x, CRSobj, passthrough = FALSE, ...) {
-  lifecycle::deprecate_soft("2.6.1", "fm_spTransform.inla.mesh()", "fm_transform()")
+  lifecycle::deprecate_soft("2.7.0", "fm_spTransform.inla.mesh()", "fm_transform()")
   fm_transform(x, crs = CRSobj, ..., passthrough = passthrough)
 }

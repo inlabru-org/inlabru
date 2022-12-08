@@ -1329,7 +1329,7 @@ predict.bru <- function(object,
   if (is.character(data)) {
     data <- as.list(setNames(data, data))
   } else if (inherits(data, "inla.mesh")) {
-    data <- vertices(data)
+    data <- vertices.inla.mesh(data)
   } else if (inherits(data, "formula")) {
     stop("Formula supplied as data to predict.bru(). Please check your argument order/names.")
   }
@@ -1488,7 +1488,7 @@ generate.bru <- function(object,
   if (is.character(data)) {
     data <- as.list(setNames(data, data))
   } else if (inherits(data, "inla.mesh")) {
-    data <- vertices(data)
+    data <- vertices.inla.mesh(data)
   } else if (inherits(data, "formula")) {
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }
@@ -2873,13 +2873,13 @@ print.summary_bru <- function(x, ...) {
 
 
 
-#' @describeIn inlabru-deprecated Old summary for an inlabru fit.
-#'
-#' Takes a fitted `bru` object produced by [bru()] or [lgcp()] and creates
-#' various summaries from it.
-#'
-#' @export
-#' @param object An object obtained from a [bru()] or [lgcp()] call
+# @describeIn inlabru-deprecated Old summary for an inlabru fit.
+#
+# Takes a fitted `bru` object produced by [bru()] or [lgcp()] and creates
+# various summaries from it.
+#
+# @export
+# @param object An object obtained from a [bru()] or [lgcp()] call
 
 summary_bru <- function(object, ...) {
   .Deprecated(new = "summary")

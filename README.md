@@ -89,14 +89,13 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 
 ``` r
 # Load libraries
-options("rgdal_show_exportToProj4_warnings" = "none")
 library(inlabru)
 #> Loading required package: sp
 library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_22.11.08 built 2022-11-08 17:47:27 UTC.
+#> This is INLA_22.11.28-1 built 2022-11-28 08:04:58 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
@@ -123,23 +122,6 @@ fit <- bru(
   ),
   options = list(control.inla = list(int.strategy = "eb"))
 )
-#> Warning: PROJ support is provided by the sf and terra packages among others
-
-#> Warning: PROJ support is provided by the sf and terra packages among others
-
-#> Warning: PROJ support is provided by the sf and terra packages among others
-
-#> Warning: PROJ support is provided by the sf and terra packages among others
-
-#> Warning: PROJ support is provided by the sf and terra packages among others
-
-#> Warning: PROJ support is provided by the sf and terra packages among others
-
-#> Warning: PROJ support is provided by the sf and terra packages among others
-
-#> Warning: PROJ support is provided by the sf and terra packages among others
-
-#> Warning: PROJ support is provided by the sf and terra packages among others
 
 # Predict Gorilla nest intensity
 lambda <- predict(
@@ -147,11 +129,6 @@ lambda <- predict(
   pixels(gorillas$mesh, mask = gorillas$boundary),
   ~ exp(mySmooth + Intercept)
 )
-#> Warning: PROJ support is provided by the sf and terra packages among others
-
-#> Warning: PROJ support is provided by the sf and terra packages among others
-
-#> Warning: PROJ support is provided by the sf and terra packages among others
 
 # Plot the result
 ggplot() +

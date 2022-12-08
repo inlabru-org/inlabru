@@ -17,7 +17,7 @@ fm_evaluate(...)
 
 \method{fm_evaluate}{inla.mesh}(mesh, field, ...)
 
-\method{fm_evaluate}{inla.mesh.1d}(mesh, field = NULL, ...)
+\method{fm_evaluate}{inla.mesh.1d}(mesh, field, ...)
 
 \method{fm_evaluate}{fm_evaluator}(projector, field, ...)
 

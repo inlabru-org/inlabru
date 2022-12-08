@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggplot.R
 \name{gmap}
 \alias{gmap}
-\title{Plot a map using extend of a spatial object}
+\title{Plot a map using extent of a spatial object}
 \usage{
 gmap(data, ...)
 }
