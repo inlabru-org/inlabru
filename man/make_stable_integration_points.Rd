@@ -14,7 +14,7 @@ make_stable_integration_points(mesh, bnd, nsub = NULL)
 \item{nsub}{number of subdivision points along each triangle edge, giving
 \code{(nsub + 1)^2} proto-integration points used to compute
 the vertex weights
-(default \code{NULL=9}, giving 100 integration points for each triangle)}
+(default \code{nsub=9}, giving 100 integration points for each triangle)}
 }
 \value{
 \code{list} with elements \code{loc} and \code{weight} with
