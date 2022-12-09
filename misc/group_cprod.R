@@ -29,11 +29,17 @@
 #' }
 #' }
 #'
-#' 20221201 This is the full_join trick I need here
-#' Z <- full_join(as_tibble(X), as_tibble(Y), by = "group")
-#' st_as_sf(Z)
+
+# TODO For sp, change sp to sf, do the full_join, change sp back. Onion structure.
 group_cprod <- function(..., group = NULL) {
   ipl <- list(...)
+
+  # Transfrom sp to sf
+  if (any(lapply(ipl, function(x) inherits(x, "Spatial")))) {
+    ipl_sp <- TRUE
+    ipl <- lapply(ipl, sf::st_as_sf)
+  }
+
   ipl <- ipl[!vapply(ipl, is.null, TRUE)]
   if (length(ipl) == 0) {
     return(NULL)
@@ -55,30 +61,35 @@ group_cprod <- function(..., group = NULL) {
       ips2$weight <- 1
     }
 
+    # This line from the cprod handles the grouping already.
     by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
 
-    if (inherits(ips1, "sf","sfc")) { # better double check ips1 and ips2
-      ips <- full_join(as_tibble(ips1), as_tibble(ips2), by = c(by, group)) # double check if c(by,group) the right logic and if it works
-      # ips <- sp::merge(ips1, ips2, by = by, duplicateGeoms = TRUE)
-    } else if (inherits(ips2, "sf","sfc")) {
-      ips <- full_join(as_tibble(ips2), as_tibble(ips1), by = c(by, group)) # double check if c(by,group) the right logic and if it works
-      # ips <- sp::merge(ips2, ips1, by = by, duplicateGeoms = TRUE)
+# `sf::st_join` performs spatial join/filter; `dplyr::*_join` expects `x` of
+# class `sf` and `y` of class `data.frame`. The trick `as.tibble(sf_obj)` allows
+# `dplyr::full_join` and turn it back to `sf` with active geometry as the ips1.
+# Z <- full_join(as_tibble(X), as_tibble(Y), by = "group")
+# st_as_sf(Z)
+# https://stackoverflow.com/questions/64365792/dplyr-full-join-on-geometry-columns-of-sf-objects
+    if (inherits(ips1, "sf", "sfc") ||
+        inherits(ips2, "sf", "sfc")) {
+      ips <-
+        sf::st_as_sf(dplyr::full_join(tibble::as_tibble(ips1),
+                                      tibble::as_tibble(ips2),
+                                      by = by))
     } else {
-      ips <- full_join(as_tibble(ips1), as_tibble(ips2), by = c(by, group)) # double check if c(by,group) the right logic and if it works
-      # ips <- base::merge(ips1, ips2, by = by)
+      ips <-
+        base::merge(ips1, ips2, by = by, all = TRUE) # all = TRUE for full_join
     }
 
-    if (inherits(ips1, "Spatial")) {
-      ips <- sp::merge(ips1, ips2, by = by, duplicateGeoms = TRUE)
-    } else if (inherits(ips2, "Spatial")) {
-      ips <- sp::merge(ips2, ips1, by = by, duplicateGeoms = TRUE)
-    } else {
-      ips <- base::merge(ips1, ips2, by = by)
-    }
     ips$weight <- ips$weight.x * ips$weight.y
     ips[["weight.x"]] <- NULL
     ips[["weight.y"]] <- NULL
     row.names(ips) <- as.character(seq_len(NROW(ips)))
+  }
+
+  # Transform back to sp
+  if(ipl_sp){
+    ips <-  sp::as.Spatial(ips)
   }
   ips
 }
