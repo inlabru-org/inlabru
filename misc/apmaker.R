@@ -1,3 +1,40 @@
+#' A S3/S4 generic function to generate stop warning if the object is not of
+#' the specified classes.
+#' @param  object An object except NULL
+#' @param class A vector of class(es) except NULL
+#' @keywords internal
+stopifnot_class <- function(object = NULL, class = NULL, ...) {
+  # 20221208 Probably better to leave out NULL and missing class in this
+  # function, though it deals with it
+  class_name <- paste0(sort(class), collapse = ",")
+  obj_name <- paste0(as.character(expression(object)))
+  UseMethod("stopifnot_class")
+}
+stopifnot_class.default <- function(object, class) {
+  if (!inherits(object, class)) {
+    stop(paste0(
+      obj_name,
+      " of class ",
+      class(object),
+      "must be of class(es) ",
+      class_name
+    ))
+  }
+}
+stopifnot_class.list <- function(object, class) {
+  if (!all(unlist(lapply(object, function(x) {
+    inherits(x, class)
+  })))) {
+    stop(paste0(
+      obj_name,
+      " of class ",
+      paste0(unlist(lapply(object, class)), collapse = ","),
+      "must be of class(es) ",
+      class_name
+    ))
+  }
+}
+
 #' @aliases apmaker
 #' @export
 #' @param domain A list/A list of list(s) of named integration definitions, each
@@ -43,39 +80,23 @@ apmaker <- function(domain = NULL, samplers = NULL,
   )
 
   # Mandate both the domain argument not specified or is null
-  if (missing(domain) || is.null(domain)) {
-    stop("Domain argument(s) missing or NULL.")
+  if (missing(domain)) {
+    stop("Domain argument(s) missing.")
+  }
+  if (is.null(domain)) {
+    if (is.null(samplers)){
+      stop("Domain and samplers argument(s) NULL.")
+    }
+    warning("Domain argument(s) NULL. Sampler is used to create the domain")
   }
 
-  #' A S3/S4 generic function to generate stop warning if the object is not of
-  #' the specified classes.
-  #' @param  object An object
-  #' @param class A vector of class(es)
-  #' @keywords internal
-  stopifnot_class <- function(object = NULL, class = NULL, ...) {
-    # 20221207 Probably better to leave it out not to deal with NULL and missing in this function
-    # if (is.null(object) || missing(object)) {
-    #   stop(paste0(as.character(expression(object))), " argument missing or NULL.") # TODO It does not work object is NULL
-    # }
-    # if (is.null(class) || missing(class)) {
-    #   stop("Class argument(s) missing or NULL.")
-    # }
-    class_name <- paste0(sort(class), collapse = ",")
-    obj_name <- paste0(as.character(expression(object)), collapse = ",") # TODO checking several objects the same time
-    UseMethod("stopifnot_class")
+  if (is.null(names(domain))){
+    stop("Domain must be a named list.")
   }
-  stopifnot_class.default <- function(object, class) {
-    if (!inherits(object, class)) {
-      stop(paste0(obj_name), " must be of class(es) ", class_name)
-    }
-  }
-  stopifnot_class.list <- function(object, class) {
-    if (!all(unlist(lapply(object, function(x) {
-      inherits(x, class)
-    })))) {
-      stop(paste0(obj_name), " must be of class(es) ", class_name)
-    }
-  }
+
+  # 20221208 sf sfc Spatial should match inla.mesh, inla.mesh.lattice, raster, SpatRaster
+  # character/factor/numeric should match the same classes of domain.
+  # numeric is implemented with weight 1 in ipoints. TODO character and factor to be implemented similiarly but not changed into numeric.
 
   # Mandate domain to be the following classes
   # Unused domain is not allowed
@@ -90,7 +111,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
       "inla.mesh.1d",
       "inla.mesh.lattice",
       "raster",
-      "spatraster"
+      "SpatRaster"
     )
   )
 
@@ -110,7 +131,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
     domain <- as.list(domain)
   } else {
     is_list <- FALSE
-      domain <- as.list(domain)
+      domain <- as.list(domain) #TODO 20221208 as.list is not the way to do it, be careful of the diff btw as.list() and list()
       samplers <- as.list(samplers)
   }
 
@@ -187,19 +208,20 @@ apmaker <- function(domain = NULL, samplers = NULL,
   else if (length(samplers) > length(domain)) {
     unused_samplers <- setdiff(names(samplers), names(domain))
     bru_log_smpdi(unused_samplers, start_with = "\n The unused samplers: \n")
-    bru_log_smpdi(unused_samplers, start_with = "\n The unused samplers: \n")
   } else {
     extra_domain <- setdiff(names(samplers), names(domain))
     bru_log_smpdi(extra_domain, start_with = "\n The extra domain: \n")
   }
 
+  # TODO ####
+  # TODO check ibm_values.bru_mapper_factor for character/factor/numeric samplers
 
   # TODO weights argument to take effect on samplers. The weight should go to
   # the integration part
   ips <- apoints(samplers, domain,
     int.args = int.args, weights_name = weights_name
   )
-  # TODO using groupwise cprod for each domain
+  # TODO using group_cprod for each domain
   # this is just a draft atm
   lips <- lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
   ips <- do.call(group_cprod, c(list(ips), lips, group = samplers_domain))
