@@ -41,6 +41,8 @@
 #' * when `samplers` is a 1D interval(s) definition only, `domain` can be
 #'   a single integer for the number of integration points to place in each 1D
 #'   interval, overriding `int.args[["nsub1"]]`, and otherwise
+#'   TODO * 20221212 For extension, it can be factor or character while keeping
+#'   the level to map them back to the components
 #' * when `samplers` is `NULL`, `domain` can be a numeric vector of points,
 #'   each given integration weight 1 (and no additional points are added
 #'   in between),
@@ -178,23 +180,31 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   is_1d <- !is_2d &&
     (
       (!is.null(samplers) &&
-        is.numeric(samplers)) ||
+        (is.numeric(samplers) ||
+         is.character(samplers) ||
+         is.factor(samplers)) ||
         (!is.null(domain) &&
           (is.numeric(domain) ||
-            inherits(domain, "inla.mesh.1d")))
+           is.character(domain) ||
+           is.factor(domain)) ||
+           inherits(domain, "inla.mesh.1d")))
     )
   if (!is_1d && !is_2d) {
     stop("Unable to determine integration domain definition")
   }
 
   if (is_1d && !is.null(samplers) && !is.null(domain) &&
-    is.numeric(domain) && length(domain) == 1) {
+      (is.numeric(domain) ||
+       is.character(domain) ||
+       is.factor(domain)) && length(domain) == 1) {
     int.args[["nsub1"]] <- domain
     domain <- NULL
     int.args[["method"]] <- "direct"
   }
   if (is_2d && !is.null(samplers) && !is.null(domain) &&
-    is.numeric(domain) && length(domain) == 1) {
+      (is.numeric(domain) ||
+       is.character(domain) ||
+       is.factor(domain)) && length(domain) == 1) {
     int.args[["nsub2"]] <- domain
     domain <- NULL
     int.args[["method"]] <- "direct"
@@ -217,13 +227,17 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers$weight <- 1
     }
     ips <- samplers
-  } else if (is_1d && is.null(samplers) && is.numeric(domain)) {
+  } else if (is_1d && is.null(samplers) && (is.numeric(domain) ||
+                                            is.character(domain) ||
+                                            is.factor(domain))) {
     ips <- data.frame(
       x = as.vector(domain),
       weight = 1
     )
     colnames(ips) <- c(name, "weight")
-  } else if (is_1d && is.null(domain) && is.integer(samplers)) {
+  } else if (is_1d && is.null(domain) && (is.integer(samplers) || # TODO why here is.integer? not just is.numeric?
+                                          is.character(samplers) ||
+                                          is.factor(samplers))) {
     ips <- data.frame(
       x = as.vector(samplers),
       weight = 1
