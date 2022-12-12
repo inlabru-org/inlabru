@@ -1,8 +1,9 @@
-#' A S3/S4 generic function to generate stop warning if the object is not of
-#' the specified classes.
+#' A S3/S4 generic function to generate stop warning if the object of some class
+#'  is not of the specified classes.
 #' @param  object An object except NULL
 #' @param class A vector of class(es) except NULL
 #' @keywords internal
+#'
 stopifnot_class <- function(object = NULL, class = NULL, ...) {
   # 20221208 Probably better to leave out NULL and missing class in this
   # function, though it deals with it
@@ -90,43 +91,56 @@ apmaker <- function(domain = NULL, samplers = NULL,
     warning("Domain argument(s) NULL. Sampler is used to create the domain")
   }
 
-  if (is.null(names(domain))){
+  # If domain is a list, it must be a named list.
+  if (inherits(domain, "list") && is.null(names(domain))) {
     stop("Domain must be a named list.")
   }
 
   # 20221208 sf sfc Spatial should match inla.mesh, inla.mesh.lattice, raster, SpatRaster
   # character/factor/numeric should match the same classes of domain.
-  # numeric is implemented with weight 1 in ipoints. TODO character and factor to be implemented similiarly but not changed into numeric.
+  # numeric is implemented with weight 1 in ipoints. TODO character and factor
+  # to be implemented similarly but not changed into numeric.
 
   # Mandate domain to be the following classes
   # Unused domain is not allowed
   stopifnot_class(
     domain,
-    c(
-      # "data.frame", # maybe in the future
+    c(# "data.frame", # maybe in the future
       "character",
       "factor",
-      "numeric",
+      "numeric", # here is the split
       "inla.mesh",
       "inla.mesh.1d",
       "inla.mesh.lattice",
       "raster",
-      "SpatRaster"
-    )
+      "SpatRaster")
   )
-
   # Mandate domain to be the following classes
   stopifnot_class(samplers,
-                  c("numeric", "character", "factor", "sf", "sfc", "Spatial"))
+                  c("character", "factor", "numeric", # here is the split
+                    "sf", "sfc", "Spatial"))
+
+  # 20221212 We have to check the matching here, that is
+  # 1) certain domain classes  have to match certain samplers classes.
+  # 2) in which 1) has to check the domain one by one if it is a list
+  if(inherits(domain, c("character", "factor", "numeric","inla.mesh.1d"))){
+    stopifnot_class(samplers, c("character", "factor", "numeric"))
+  }
+  if(inherits(domain, c("inla.mesh",
+                        "inla.mesh.lattice",
+                        "raster",
+                        "SpatRaster"))){
+    stopifnot_class(samplers, c("sf", "sfc", "Spatial"))
+  }
 
   # https://stackoverflow.com/questions/38539654/how-to-know-if-the-data-is-a-list-or-data-frame-in-r
   # Turn data frame into a list (standardise the input class)
   if (inherits(domain, "list")) {
-    is_list_domain <- TRUE
+    domain_is_list <- TRUE
     if (inherits(samplers, "list")) {
       is_list <- TRUE
     }
-  } else if (inherits(samplers, "list") && !is_list_domain) {
+  } else if (inherits(samplers, "list") && !domain_is_list) {
     single_domain <- TRUE
     domain <- as.list(domain)
   } else {
