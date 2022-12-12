@@ -118,11 +118,12 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # Mandate domain to be the following classes
   stopifnot_class(samplers,
                   c("character", "factor", "numeric", # here is the split
+                    "data.frame", # 20221212 ipoints allows data.frame samplers
                     "sf", "sfc", "Spatial"))
 
   # 20221212 We have to check the matching here, that is
   # 1) certain domain classes  have to match certain samplers classes.
-  # 2) in which 1) has to check the domain one by one if it is a list
+  # TODO 2) in which 1) has to check the domain one by one if it is a list
   if(inherits(domain, c("character", "factor", "numeric","inla.mesh.1d"))){
     stopifnot_class(samplers, c("character", "factor", "numeric"))
   }
@@ -141,12 +142,11 @@ apmaker <- function(domain = NULL, samplers = NULL,
       is_list <- TRUE
     }
   } else if (inherits(samplers, "list") && !domain_is_list) {
-    single_domain <- TRUE
-    domain <- as.list(domain)
+    domain <- list(domain)
   } else {
     is_list <- FALSE
-      domain <- as.list(domain) #TODO 20221208 as.list is not the way to do it, be careful of the diff btw as.list() and list()
-      samplers <- as.list(samplers)
+      domain <- list(domain) #TODO 20221208 as.list is not the way to do it, be careful of the diff btw as.list() and list()
+      samplers <- list(samplers)
   }
 
   # Change a mix of sp and sf objects to sf
