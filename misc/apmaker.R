@@ -162,6 +162,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # TODO we should then do the name check for domain and samplers here
   # TODO remove sampler domains and full domain samplers
   # multidomain sampler the main thing is data dname 23112022 specific column has that meaning
+  names_domain <- names(domain)
 
 
   # bru_log_smpdi function ---------------------------------------------------------
