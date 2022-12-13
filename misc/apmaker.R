@@ -202,11 +202,11 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # multidomain sampler the main thing is data dname 23112022 specific column has that meaning
   names_domain <- names(domain)
   names_samplers <- names(samplers)
-  names_diff <- setdiff(intersect(names_domain, names_samplers), "weight")
+  names_diff <- setdiff(setdiff(names_domain, names_samplers), "weight")
   if(domain_is_list && (length(names_diff)>0)){
     warning("The difference in the names of domain and samplers are ",
             paste0(names_diff,collapse = ","),
-            "\n Create samplers for unmathced domains and do nothing on unused samplers.")
+            "\n Create samplers for unmatched domains and do nothing on unused samplers.")
   }
 
   # Check if the names of samplers and domains match. How to establish the link
@@ -214,7 +214,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # list. If names are provided but do not match, what should we do?
   if (unique(names_samplers) != unique(names_domain)) {
     # TODO have to accommodate weight column in samplers as well, omit this column
-    samplers_domain <- intersect(names_samplers, names_domain)
+    samplers_domain <- setdiff(intersect(names_samplers, names_domain), "weight")
     # TODO for the NULL name case
     bru_log_smpdi(samplers_domain, start_with = "\n The shared samplers and domain: \n")
   }
