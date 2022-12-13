@@ -36,6 +36,32 @@ stopifnot_class.list <- function(object, class) {
   }
 }
 
+# bru_log_smpdi function ---------------------------------------------------------
+# How does sf deal with secondary geometry columns?
+# TODO ####
+# TODO have to deal with the multidomain samplers
+# https://r-spatial.github.io/sf/articles/sf6.html
+# TODO #### extra domains we assign the sampler for them
+# TODO can use local helper function (with S3 Usemethod() maybe)
+#' @param begin the beginning part of the message
+bru_log_smpdi <- function(x, start_with = NULL, ...) {
+  UseMethod("bru_log_smpdi")
+}
+bru_log_smpdi.list <- function(x, start_with) {
+  for (i in seq_along(x)) {
+    bru_log_message(
+      paste0(
+        start_with,
+        x[i],
+        " are ",
+        attr(x[i], "sf_column"),
+        ".\n"
+      ),
+      verbosity = 2, verbose_store = T
+    )
+  }
+}
+
 #' @aliases apmaker
 #' @export
 #' @param domain A list/A list of list(s) of named integration definitions, each
@@ -80,20 +106,36 @@ apmaker <- function(domain = NULL, samplers = NULL,
     details = "dnames should be provided in the samplers as the dimension names."
   )
 
-  # Mandate both the domain argument not specified or is null
+  # Mandate the domain argument to be specified
   if (missing(domain)) {
     stop("Domain argument(s) missing.")
   }
+  # Mandate one of domain and samplers to be non-NULL
   if (is.null(domain)) {
-    if (is.null(samplers)){
+    if (is.null(samplers)) {
       stop("Domain and samplers argument(s) NULL.")
     }
     warning("Domain argument(s) NULL. Sampler is used to create the domain")
   }
 
-  # If domain is a list, it must be a named list.
-  if (inherits(domain, "list") && is.null(names(domain))) {
-    stop("Domain must be a named list.")
+  # https://stackoverflow.com/questions/38539654/how-to-know-if-the-data-is-a-list-or-data-frame-in-r
+  # Turn data frame into a list (standardise the input class)
+  if (inherits(domain, "list")) {
+    domain_is_list <- TRUE
+    # If domain is a list, it must be a named list.
+    if (is.null(names(domain))) {
+      stop("Domain must be a named list.")
+    }
+  } else {
+    domain_is_list <- FALSE
+    domain <- list(domain)
+  }
+
+  if (inherits(samplers, "list")) {
+    sampler_is_list <- TRUE
+  } else {
+    sampler_is_list <- FALSE
+    samplers <- list(samplers)
   }
 
   # 20221208 sf sfc Spatial should match inla.mesh, inla.mesh.lattice, raster, SpatRaster
@@ -105,7 +147,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # Unused domain is not allowed
   stopifnot_class(
     domain,
-    c(# "data.frame", # maybe in the future
+    c( # "data.frame", # maybe in the future
       "character",
       "factor",
       "numeric", # here is the split
@@ -113,47 +155,43 @@ apmaker <- function(domain = NULL, samplers = NULL,
       "inla.mesh.1d",
       "inla.mesh.lattice",
       "raster",
-      "SpatRaster")
+      "SpatRaster"
+    )
   )
   # Mandate domain to be the following classes
-  stopifnot_class(samplers,
-                  c("character", "factor", "numeric", # here is the split
-                    "data.frame", # 20221212 ipoints allows data.frame samplers
-                    "sf", "sfc", "Spatial"))
+  stopifnot_class(
+    samplers,
+    c(
+      "character", "factor", "numeric", # here is the split
+      "data.frame", # 20221212 ipoints allows data.frame samplers
+      "sf", "sfc", "Spatial"
+    )
+  )
 
   # 20221212 We have to check the matching here, that is
   # 1) certain domain classes  have to match certain samplers classes.
   # TODO 2) in which 1) has to check the domain one by one if it is a list
-  if(inherits(domain, c("character", "factor", "numeric","inla.mesh.1d"))){
-    stopifnot_class(samplers, c("character", "factor", "numeric"))
+  if (any(unlist(lapply(domain, function(x) {
+    inherits(x, c("character", "factor", "numeric", "inla.mesh.1d"))
+  })))) {
+    stopifnot_class(samplers, c("character", "factor", "numeric", "data.frame"))
   }
-  if(inherits(domain, c("inla.mesh",
-                        "inla.mesh.lattice",
-                        "raster",
-                        "SpatRaster"))){
+  if (any(unlist(lapply(domain, function(x) {
+    inherits(x, cc(
+      "inla.mesh",
+      "inla.mesh.lattice",
+      "raster",
+      "SpatRaster"
+    ))
+  })))) {
     stopifnot_class(samplers, c("sf", "sfc", "Spatial"))
   }
 
-  # https://stackoverflow.com/questions/38539654/how-to-know-if-the-data-is-a-list-or-data-frame-in-r
-  # Turn data frame into a list (standardise the input class)
-  if (inherits(domain, "list")) {
-    domain_is_list <- TRUE
-    if (inherits(samplers, "list")) {
-      is_list <- TRUE
-    }
-  } else if (inherits(samplers, "list") && !domain_is_list) {
-    domain <- list(domain)
-  } else {
-    is_list <- FALSE
-      domain <- list(domain) #TODO 20221208 as.list is not the way to do it, be careful of the diff btw as.list() and list()
-      samplers <- list(samplers)
-  }
-
   # Change a mix of sp and sf objects to sf
-  sf_samplers <- lapply(samplers, function(x) inherits(x, c("sf", "sfc")))
-  sp_samplers <- lapply(samplers, function(x) inherits(x, "Spatial"))
+  sf_samplers <- any(unlist(lapply(samplers, function(x) inherits(x, c("sf", "sfc")))))
+  sp_samplers <- any(unlist(lapply(samplers, function(x) inherits(x, "Spatial"))))
   if (sp_samplers && sf_samplers) {
-    warning("Both sf and sp objects in the samplers are detected. Produce sf output as desired")
+    warning("Both `sf` and `sp` objects in the samplers are detected. Produce `sf` output as desired")
     samplers <- lapply(samplers, sf::st_as_sf)
   }
 
@@ -163,46 +201,14 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # TODO remove sampler domains and full domain samplers
   # multidomain sampler the main thing is data dname 23112022 specific column has that meaning
   names_domain <- names(domain)
-
-
-  # bru_log_smpdi function ---------------------------------------------------------
-  # How does sf deal with secondary geometry columns?
-  # TODO ####
-  # TODO have to deal with the multidomain samplers
-  # https://r-spatial.github.io/sf/articles/sf6.html
-  # TODO #### extra domains we assign the sampler for them
-  # TODO can use local helper function (with S3 Usemethod() maybe)
-  #' @param begin the beginning part of the message
-  bru_log_smpdi <- function(x, start_with = NULL, ...) {
-    UseMethod("bru_log_smpdi")
+  names_samplers <- names(samplers)
+  if(domain_is_list && !(names_domain %in% names_samplers)){
+    stop("The names of domain are ",
+         paste0(names_domain, collapse = ","),
+         ". \n The names of samplers are ",
+         paste0(names_samplers, collapse = ","),
+         ". \n The names do not match each other.")
   }
-  bru_log_smpdi.list <- function(x, start_with) {
-    for (i in seq_along(x)) {
-      bru_log_message(
-        paste0(
-          start_with,
-          x[i],
-          " are ",
-          attr(x[i], "sf_column"),
-          ".\n"
-        ),
-        verbosity = 2, verbose_store = T
-      )
-    }
-  }
-  # Technically speaking
-  # bru_log_smpdi.data.frame <- function(x){
-  #   bru_log_message(
-  #     paste0(
-  #       start_with,
-  #       x,
-  #       " is ",
-  #       attr(x[i], "sf_column"),
-  #       ".\n"
-  #     ),
-  #     verbosity = 2, verbose_store = T
-  #   )
-  # }
 
   if (sf_samplers) {
     bru_log_smpdi(samplers,
@@ -230,7 +236,6 @@ apmaker <- function(domain = NULL, samplers = NULL,
 
   # TODO ####
   # TODO check ibm_values.bru_mapper_factor for character/factor/numeric samplers
-
   # TODO weights argument to take effect on samplers. The weight should go to
   # the integration part
   ips <- apoints(samplers, domain,
@@ -238,7 +243,8 @@ apmaker <- function(domain = NULL, samplers = NULL,
   )
   # TODO using group_cprod for each domain
   # this is just a draft atm
-  lips <- lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
+  lips <- lapply(nosamp.dim, function(nm)
+            ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
   ips <- do.call(group_cprod, c(list(ips), lips, group = samplers_domain))
 
   #####################################
