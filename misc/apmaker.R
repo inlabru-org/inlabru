@@ -71,10 +71,10 @@ bru_log_smpdi.list <- function(x, start_with) {
 #' coordinates object, used for the spatial aspect of the `samplers` object.
 #' @param samplers A (list of) `[sf]DataFrame` or
 #' `Spatial[Points/Lines/Polygons]DataFrame` object(s)
-#' @param weights The name of integration weights column in the samplers.
+#' @param weight The name of integration weight column in the samplers.
 #' TODO 1) how about domain? should not be allowed.
 #' 2) allow_names should be bru_weight? 23112022 Only for samplers
-#' Default: "weights".
+#' Default: "weight".
 #' It mainly works for line transect at the moment, determining the width of the
 #' line to be integrated. See the distance sampling example
 #' https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_distancesampling.html
@@ -83,7 +83,7 @@ bru_log_smpdi.list <- function(x, start_with) {
 
 # TODO option argument as in bru function with list() bru_int_args
 apmaker <- function(domain = NULL, samplers = NULL,
-                    weights = "weights",
+                    weight = "weight",
                     int.args = list(method = "stable", nsub = NULL)) {
   # To allow sf geometry support, should likely change the logic to
   # use the domain specification to determine the type of integration
@@ -202,44 +202,45 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # multidomain sampler the main thing is data dname 23112022 specific column has that meaning
   names_domain <- names(domain)
   names_samplers <- names(samplers)
-  if(domain_is_list && !(names_domain %in% names_samplers)){
-    stop("The names of domain are ",
-         paste0(names_domain, collapse = ","),
-         ". \n The names of samplers are ",
-         paste0(names_samplers, collapse = ","),
-         ". \n The names do not match each other.")
-  }
-
-  if (sf_samplers) {
-    bru_log_smpdi(samplers,
-      start_with = "The active geometry of the sampler"
-    )
+  names_diff <- setdiff(intersect(names_domain, names_samplers), "weight")
+  if(domain_is_list && (length(names_diff)>0)){
+    warning("The difference in the names of domain and samplers are ",
+            paste0(names_diff,collapse = ","),
+            "\n Create samplers for unmathced domains and do nothing on unused samplers.")
   }
 
   # Check if the names of samplers and domains match. How to establish the link
   # between samplers and domain? If names are not provided, follow the order in
   # list. If names are provided but do not match, what should we do?
-  if (unique(names(samplers)) != unique(names(domain))) {
-    # TODO have to accommodate weights column in samplers as well, omit this column
-    samplers_domain <- intersect(names(samplers), names(domain))
+  if (unique(names_samplers) != unique(names_domain)) {
+    # TODO have to accommodate weight column in samplers as well, omit this column
+    samplers_domain <- intersect(names_samplers, names_domain)
     # TODO for the NULL name case
     bru_log_smpdi(samplers_domain, start_with = "\n The shared samplers and domain: \n")
   }
   # Domain should be more than samplers. However, we can have unused samplers as well.
   else if (length(samplers) > length(domain)) {
-    unused_samplers <- setdiff(names(samplers), names(domain))
+    unused_samplers <- setdiff(names_samplers, names_domain)
     bru_log_smpdi(unused_samplers, start_with = "\n The unused samplers: \n")
   } else {
-    extra_domain <- setdiff(names(samplers), names(domain))
+    extra_domain <- setdiff(names_samplers, names_domain)
     bru_log_smpdi(extra_domain, start_with = "\n The extra domain: \n")
   }
 
+  # log the active geometry of the samplers
+  if (sf_samplers) {
+    bru_log_smpdi(samplers,
+      start_with = "The active geometry of the sampler(s)"
+    )
+  }
+
+
   # TODO ####
   # TODO check ibm_values.bru_mapper_factor for character/factor/numeric samplers
-  # TODO weights argument to take effect on samplers. The weight should go to
+  # TODO weight argument to take effect on samplers. The weight should go to
   # the integration part
   ips <- apoints(samplers, domain,
-    int.args = int.args, weights_name = weights_name
+    int.args = int.args, weight_name = weight_name
   )
   # TODO using group_cprod for each domain
   # this is just a draft atm
