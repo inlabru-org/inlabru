@@ -434,7 +434,6 @@ res <- bru(svc_components,
     data = count_dat
   ),
   options = list(
-    inla.mode = "experimental",
     control.compute = list(waic = TRUE, cpo = TRUE),
     control.inla = list(strategy = "simplified.laplace", int.strategy = "eb"),
     verbose = FALSE
@@ -552,7 +551,7 @@ names(out_stk) <- c(
   "alpha_median", "alpha_range95", "epsilon_median",
   "epsilon_range95", "tau_median", "tau_range95"
 )
-out_stk <- terra::mask(out_stk, states)
+out_stk <- terra::mask(out_stk, states, touches = FALSE)
 ```
 
 Finally, we plot the SVCs with the following code. We plot the posterior median and 95% uncertainty width ("range95")
@@ -560,15 +559,14 @@ for $\exp(\kappa_s)$, $\exp(\alpha_s)$, $\epsilon_s$, and $100(\exp(\tau_s)-1)$.
 
 ```{r svc_plot_construction, warning=F, message=F}
 make_plot_field <- function(data_stk, scale_label) {
-#  spdf <- as(data_stk, "SpatialPixelsDataFrame")
-#  df <- as.data.frame(spdf)
-#  colnames(df) <- c("value", "x", "y")
   ggplot(states) +
     geom_sf(fill = NA) +
     coord_sf(datum = NA) +
     geom_spatraster(data = data_stk) +
     labs(x = "", y = "") +
-    scale_fill_distiller(scale_label, palette = "Spectral") +
+    scale_fill_distiller(scale_label,
+                         palette = "Spectral",
+                         na.value = "transparent") +
     theme_bw() +
     geom_sf(fill = NA)
 }
