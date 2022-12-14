@@ -77,7 +77,9 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
-</div>
+<ul><li><p>Remove inactive/unused <code>maptools</code> dependency <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
+<li><p>Remove last active <code>rgdal</code> use, to prepare for complete rgdal dependency removal <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.7.0" id="inlabru-270">inlabru 2.7.0<a class="anchor" aria-label="anchor" href="#inlabru-270"></a></h2><p class="text-muted">CRAN release: 2022-12-02</p>
 <div class="section level3">
@@ -144,10 +146,10 @@
 <div class="section level3">
 <h3 id="features-2-5-3">Features<a class="anchor" aria-label="anchor" href="#features-2-5-3"></a></h3>
 <ul><li><p>Add <code>bru_mapper_harmonics</code> mapper for <code>cos</code> and <code>sin</code> basis sets.</p></li>
-<li><p>Allow <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> input data to be be a list.</p></li>
-<li><p>Allow arbitrary quantile summaries in <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code></p></li>
-<li><p>Remove <code>cv</code>, <code>var</code>, <code>smin</code>, <code>smax</code> summaries from <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code></p></li>
-<li><p>Add <code>mean.mc_std_err</code> and <code>sd.mc_std_err</code> output to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code></p></li>
+<li><p>Allow <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> input data to be be a list.</p></li>
+<li><p>Allow arbitrary quantile summaries in <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code></p></li>
+<li><p>Remove <code>cv</code>, <code>var</code>, <code>smin</code>, <code>smax</code> summaries from <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code></p></li>
+<li><p>Add <code>mean.mc_std_err</code> and <code>sd.mc_std_err</code> output to <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code></p></li>
 <li><p>Add <code>robins_subset</code> data set and associated variable coefficient web vignette</p></li>
 </ul></div>
 <div class="section level3">
@@ -231,7 +233,7 @@
 <li><p>The R-INLA <code>weights</code> and <code>copy</code> features are now supported.</p></li>
 <li><p>The predictor expressions can access the data object directly via <code>.data.</code></p></li>
 <li><p>If data from several rows can affect the same output row, the <code>allow_combine = TRUE</code> argument must be supplied to <code><a href="../reference/like.html">like()</a></code></p></li>
-<li><p>The <code>include</code> and <code>exclude</code> arguments to <code><a href="../reference/like.html">like()</a></code>, <code><a href="../reference/generate.html">generate()</a></code>, and <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> can be used to specify which components are used for a given likelihood model or predictor expression. This can be used to prevent evaluation of components that are invalid for a likelihood or predictor.</p></li>
+<li><p>The <code>include</code> and <code>exclude</code> arguments to <code><a href="../reference/like.html">like()</a></code>, <code><a href="../reference/generate.html">generate()</a></code>, and <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> can be used to specify which components are used for a given likelihood model or predictor expression. This can be used to prevent evaluation of components that are invalid for a likelihood or predictor.</p></li>
 <li><p>Predictor expressions can access the latent state of a model component directly, by adding the suffix <code>_latent</code> to the component name, e.g. <code>name_latent</code>. For <code><a href="../reference/like.html">like()</a></code>, this requires <code>allow_latent = TRUE</code> to activate the needed linearisation code for this.</p></li>
 <li><p>Predictor expressions can evaluate component effects for arbitrary inputs by adding the suffix <code>_eval</code> to access special evaluator functions, e.g. <code>name_eval(1:10)</code>. This is useful for evaluating the 1D effect of spatial covariates. See the NEWS item for version 2.2.8 for further details.</p></li>
 <li><p>The internal system for predictor linearisation and iterated INLA inference has been rewritten to be faster and more robust</p></li>
@@ -268,7 +270,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.2" id="inlabru-222">inlabru 2.2.2<a class="anchor" aria-label="anchor" href="#inlabru-222"></a></h2>
-<ul><li><p>Fixed issue with <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> logic for converting output to <code>Spatial*DataFrame</code></p></li>
+<ul><li><p>Fixed issue with <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> logic for converting output to <code>Spatial*DataFrame</code></p></li>
 <li><p>Use <code>control.mode=list(restart=FALSE)</code> in the final inla run for nonlinear models, to avoid an unnecessary optimisation.</p></li>
 <li><p>Fix issues in <code><a href="../reference/pixels.html">pixels()</a></code> and <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> for <code>Spatial*DataFrame</code> objects with <code>ncol=0</code> data frame parts.</p></li>
 </ul></div>
@@ -330,7 +332,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.7" id="inlabru-217">inlabru 2.1.7<a class="anchor" aria-label="anchor" href="#inlabru-217"></a></h2>
 <ul><li><p>Added a <code>NEWS.md</code> file to track changes to the package.</p></li>
-<li><p>Added <code>inla</code> methods for <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> and <code><a href="../reference/generate.html">generate()</a></code> that convert <code>inla</code> output into <code>bru</code> objects before calling the <code>bru</code> prediction and posterior sample generator.</p></li>
+<li><p>Added <code>inla</code> methods for <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> and <code><a href="../reference/generate.html">generate()</a></code> that convert <code>inla</code> output into <code>bru</code> objects before calling the <code>bru</code> prediction and posterior sample generator.</p></li>
 <li><p>Added protection for examples requiring optional packages</p></li>
 <li><p>Fix <code>sample.lgcp</code> output formatting, extended CRS support, and more efficient sampling algorithm</p></li>
 <li><p>Avoid dense matrices for effect mapping</p></li>
