@@ -996,8 +996,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
         (length(unique(unlist(crs_info))) > 1) ||
           (any(null_crs) && !all(null_crs))
     } else {
-      crs_info <- vapply(inp_crs, fm_CRSargs, "")
-      inconsistent_crs <- length(unique(crs_info)) > 1
+      stop("PROJ4 or later required.")
     }
     if (inconsistent_crs) {
       stop("Inconsistent spatial CRS information. Unable to infer mapper information.")

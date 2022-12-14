@@ -776,7 +776,7 @@ fm_crs.default <- function(x, ..., crsonly = FALSE) {
   sf::st_crs(x, ...)
 }
 
-#' @exportS3Method sf::st_crs
+#' @exportS3Method sf::st_crs fm_crs
 #' @describeIn fm_crs `st_crs(x, ...)` is equivalent to `fm_crs(x, ..., crsonly = TRUE)`
 #' when `x` is a `fm_crs` object.
 st_crs.fm_crs <- function(x, ...) {
@@ -1107,9 +1107,11 @@ fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
         SRS_string <- predef[[projargs]]
         projargs <- NULL
       } else {
-        warning("'fm_CRS' should be given a SRS_string for PROJ6 or a known keyword for a predefined string given in projargs. Using fallback PROJ4 method.")
+        warning(
+          paste0("'fm_CRS' should be given a SRS_string for PROJ6 or a known keyword for a\n",
+                 "  predefined string given in projargs. Using 'fm_crs()' workaround."))
         if (!is.null(args)) {
-          x <- sp::CRS(projargs, doCheckCRSArgs = doCheckCRSArgs)
+          x <- fm_crs(projargs)
           if (typeof(args) != "list") {
             stop("'args' must be NULL or a list of name=value pairs.")
           }
@@ -1119,7 +1121,7 @@ fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
           }
           projargs <- fm_list_as_CRSargs(xargs)
         }
-        SRS_string <- rgdal::showSRID(projargs, multiline = "NO")
+        SRS_string <- fm_crs(projargs)$wkt
         projargs <- NULL
       }
     }
@@ -1430,7 +1432,7 @@ fm_CRSargs <- function(x, ...) {
   # Note:  sf crs object class is lower case "crs"
   #        sp crs object class is upper case "CRS"
 
-  fm_not_for_PROJ6()
+  fm_requires_PROJ6()
 
   if (inherits(x, "inla.CRS")) {
     x <- x[["crs"]]
@@ -1438,8 +1440,7 @@ fm_CRSargs <- function(x, ...) {
   if (is.null(x)) {
     as.character(NA)
   } else {
-    stopifnot(requireNamespace("rgdal", quietly = TRUE))
-    rgdal::CRSargs(x)
+    stop("Unsupported rgdal::CRSargs()")
   }
 }
 

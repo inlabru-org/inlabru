@@ -2,6 +2,8 @@
 
 * Remove inactive/unused `maptools` dependency #178
 
+* Remove last active `rgdal` use, to prepare for complete rgdal dependency removal #178
+
 # inlabru 2.7.0
 
 ## Feature overview
