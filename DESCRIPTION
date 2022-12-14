@@ -87,6 +87,7 @@ Suggests:
     sphereplot,
     splancs,
     terra,
+    tidyterra,
     testthat,
     tidyr,
     DiagrammeR
