@@ -1,5 +1,7 @@
 # inlabru (development version)
 
+* Remove inactive/unused `maptools` dependency #178
+
 # inlabru 2.7.0
 
 ## Feature overview
