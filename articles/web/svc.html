@@ -101,7 +101,7 @@
 Meehan (<a href="mailto:tmeeha@gmail.com" class="email">tmeeha@gmail.com</a>), Elias T. Krainski, Finn Lindgren,
 and Håvard Rue</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2022-12-14</h4>
+            <h4 data-toc-skip class="date">Generated on 2022-12-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/svc.Rmd" class="external-link"><code>vignettes/web/svc.Rmd</code></a></small>
       <div class="d-none name"><code>svc.Rmd</code></div>
@@ -501,7 +501,6 @@ et. al. (2022).</p>
 <span>    data <span class="op">=</span> <span class="va">count_dat</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    inla.mode <span class="op">=</span> <span class="st">"experimental"</span>,</span>
 <span>    control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>waic <span class="op">=</span> <span class="cn">TRUE</span>, cpo <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>    control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>strategy <span class="op">=</span> <span class="st">"simplified.laplace"</span>, int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span>,</span>
 <span>    verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -519,13 +518,13 @@ spatial ranges of the spatially structured parameters.</p>
 <code class="sourceCode R"><span><span class="co"># view results</span></span>
 <span><span class="va">res</span><span class="op">$</span><span class="va">summary.hyperpar</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                              mean            sd</span></span>
-<span><span class="co">#&gt; Precision for kappa    2.21808383    0.43883500</span></span>
-<span><span class="co">#&gt; Range for alpha      941.45454808  291.12885972</span></span>
-<span><span class="co">#&gt; Stdev for alpha        1.93856118    0.37790996</span></span>
-<span><span class="co">#&gt; Range for eps       8416.79361514 6044.55816746</span></span>
-<span><span class="co">#&gt; Stdev for eps          0.41454349    0.25350689</span></span>
-<span><span class="co">#&gt; Range for tau        788.82064949  323.64398085</span></span>
-<span><span class="co">#&gt; Stdev for tau          0.06235182    0.01173356</span></span></code></pre></div>
+<span><span class="co">#&gt; Precision for kappa    2.29317010    0.44460337</span></span>
+<span><span class="co">#&gt; Range for alpha      933.73403741  293.60755291</span></span>
+<span><span class="co">#&gt; Stdev for alpha        1.92018137    0.37723928</span></span>
+<span><span class="co">#&gt; Range for eps       6991.84330935 4725.10706531</span></span>
+<span><span class="co">#&gt; Stdev for eps          0.49647767    0.29560360</span></span>
+<span><span class="co">#&gt; Range for tau        788.44917198  339.04516779</span></span>
+<span><span class="co">#&gt; Stdev for tau          0.06103352    0.01122996</span></span></code></pre></div>
 <p>Next we examine some summaries of the random effect estimates,
 starting with <span class="math inline">\(\exp(\alpha_s)\)</span>, which
 is effort-corrected relative abundance at year = 0 (1987), given 1 hour
@@ -533,7 +532,7 @@ of count effort (i.e., log[1]=0).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">alp</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span><span class="op">)</span> <span class="co"># exp(alpha) posterior median</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt;  0.06592  1.17563  3.37178  6.88789  8.45458 51.02636</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.06285  1.15006  3.22952  6.79173  8.47944 53.08188</span></span></code></pre></div>
 <p>Note that to avoid issues due to <span class="math inline">\(E[\exp(x)|y]\neq\exp[E(x|y)]\)</span>, we use the
 posterior median instead of the posterior mean.</p>
 <p>The summary for <span class="math inline">\(\epsilon_s\)</span> shows
@@ -542,7 +541,7 @@ space.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">eps</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="co"># epsilon</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.8179  0.9018  0.9717  0.9609  1.0229  1.0635</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.7810  0.8942  0.9826  0.9689  1.0462  1.1251</span></span></code></pre></div>
 <p>The <span class="math inline">\(\tau_s\)</span> summary shows how
 long-term, log-linear trends of robin relative abundance have varied
 across space, from annual decreases of around 10% to annual increases of
@@ -550,7 +549,7 @@ around 10%.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">tau</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="co"># (exp(tau)-1)*100</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt; -12.5991  -4.6990  -1.4417  -0.9427   2.6871  10.7745</span></span></code></pre></div>
+<span><span class="co">#&gt; -12.5401  -4.5977  -1.3997  -0.9105   2.6795  10.6598</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="svc-maps">SVC maps<a class="anchor" aria-label="anchor" href="#svc-maps"></a>
@@ -620,20 +619,19 @@ the raster stack to the study area.</p>
 <span>  <span class="st">"alpha_median"</span>, <span class="st">"alpha_range95"</span>, <span class="st">"epsilon_median"</span>,</span>
 <span>  <span class="st">"epsilon_range95"</span>, <span class="st">"tau_median"</span>, <span class="st">"tau_range95"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">out_stk</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">out_stk</span>, <span class="va">states</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">out_stk</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">out_stk</span>, <span class="va">states</span>, touches <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Finally, we plot the SVCs with the following code. We plot the
 posterior median and 95% uncertainty width (“range95”) for <span class="math inline">\(\exp(\kappa_s)\)</span>, <span class="math inline">\(\exp(\alpha_s)\)</span>, <span class="math inline">\(\epsilon_s\)</span>, and <span class="math inline">\(100(\exp(\tau_s)-1)\)</span>.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">make_plot_field</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_stk</span>, <span class="va">scale_label</span><span class="op">)</span> <span class="op">{</span></span>
-<span><span class="co">#  spdf &lt;- as(data_stk, "SpatialPixelsDataFrame")</span></span>
-<span><span class="co">#  df &lt;- as.data.frame(spdf)</span></span>
-<span><span class="co">#  colnames(df) &lt;- c("value", "x", "y")</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">states</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://dieghernan.github.io/tidyterra/reference/geom_spatraster.html" class="external-link">geom_spatraster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_stk</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">""</span>, y <span class="op">=</span> <span class="st">""</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span><span class="va">scale_label</span>, palette <span class="op">=</span> <span class="st">"Spectral"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span><span class="va">scale_label</span>,</span>
+<span>                         palette <span class="op">=</span> <span class="st">"Spectral"</span>,</span>
+<span>                         na.value <span class="op">=</span> <span class="st">"transparent"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
