@@ -31,12 +31,13 @@
 #'
 
 # TODO For sp, change sp to sf, do the full_join, change sp back. Onion structure.
-group_cprod <- function(..., group = NULL) {
+group_cprod <- function(...) {
   ipl <- list(...)
 
   # Transfrom sp to sf
-  if (any(lapply(ipl, function(x) inherits(x, "Spatial")))) {
-    ipl_sp <- TRUE
+  # check for each element, or on the subset, change only for sp annoymous funciton on lapply
+  ipl_sp <- any(lapply(ipl, function(x) inherits(x, "Spatial"))) #TODO adjustment
+  if(ipl_sp){
     ipl <- lapply(ipl, sf::st_as_sf)
   }
 

@@ -194,17 +194,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   }
 
   if (is_1d && !is.null(samplers) && !is.null(domain) &&
-      (is.numeric(domain) ||
-       is.character(domain) ||
-       is.factor(domain)) && length(domain) == 1) {
+      is.numeric(domain) && length(domain) == 1) {
     int.args[["nsub1"]] <- domain
     domain <- NULL
     int.args[["method"]] <- "direct"
   }
   if (is_2d && !is.null(samplers) && !is.null(domain) &&
-      (is.numeric(domain) ||
-       is.character(domain) ||
-       is.factor(domain)) && length(domain) == 1) {
+      is.numeric(domain) && length(domain) == 1) {
     int.args[["nsub2"]] <- domain
     domain <- NULL
     int.args[["method"]] <- "direct"
@@ -235,7 +231,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       weight = 1
     )
     colnames(ips) <- c(name, "weight")
-  } else if (is_1d && is.null(domain) && (is.integer(samplers) || # TODO why here is.integer? not just is.numeric?
+    # TODO samplers numeric and you do not have domain, it is not safe to forget to supply domain, if stored in integer
+  } else if (is_1d && is.null(domain) && (is.integer(samplers) ||
                                           is.character(samplers) ||
                                           is.factor(samplers))) {
     ips <- data.frame(

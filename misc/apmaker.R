@@ -16,7 +16,7 @@ stopifnot_class.default <- function(object, class) {
     stop(paste0(
       obj_name,
       " of class ",
-      class(object),
+      paste0(class(object), collapse = ","),
       "must be of class(es) ",
       class_name
     ))
@@ -29,7 +29,7 @@ stopifnot_class.list <- function(object, class) {
     stop(paste0(
       obj_name,
       " of class ",
-      paste0(unlist(lapply(object, class)), collapse = ","),
+      paste0(unlist(lapply(object, class)), collapse = ","), # TODO more complicated
       "must be of class(es) ",
       class_name
     ))
@@ -111,6 +111,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
     stop("Domain argument(s) missing.")
   }
   # Mandate one of domain and samplers to be non-NULL
+  # 20221213 ??? leave it for now for backward compatability
   if (is.null(domain)) {
     if (is.null(samplers)) {
       stop("Domain and samplers argument(s) NULL.")
@@ -120,21 +121,23 @@ apmaker <- function(domain = NULL, samplers = NULL,
 
   # https://stackoverflow.com/questions/38539654/how-to-know-if-the-data-is-a-list-or-data-frame-in-r
   # Turn data frame into a list (standardise the input class)
+  # TODO some element do not have names, did it happen or does it happen?
+  # simple and known defect if happen
   if (inherits(domain, "list")) {
-    domain_is_list <- TRUE
+    # domain_is_list <- TRUE
     # If domain is a list, it must be a named list.
     if (is.null(names(domain))) {
       stop("Domain must be a named list.")
     }
   } else {
-    domain_is_list <- FALSE
+    # domain_is_list <- FALSE
     domain <- list(domain)
   }
 
   if (inherits(samplers, "list")) {
-    sampler_is_list <- TRUE
+    # sampler_is_list <- TRUE
   } else {
-    sampler_is_list <- FALSE
+    # sampler_is_list <- FALSE
     samplers <- list(samplers)
   }
 
@@ -145,51 +148,54 @@ apmaker <- function(domain = NULL, samplers = NULL,
 
   # Mandate domain to be the following classes
   # Unused domain is not allowed
-  stopifnot_class(
-    domain,
-    c( # "data.frame", # maybe in the future
-      "character",
-      "factor",
-      "numeric", # here is the split
-      "inla.mesh",
-      "inla.mesh.1d",
-      "inla.mesh.lattice",
-      "raster",
-      "SpatRaster"
-    )
-  )
+  # 20221213 not needed, up to another function to deal with it
+  # stopifnot_class(
+  #   domain,
+  #   c( # "data.frame", # maybe in the future
+  #     "character",
+  #     "factor",
+  #     "numeric", # here is the split
+  #     "inla.mesh",
+  #     "inla.mesh.1d",
+  #     "inla.mesh.lattice",
+  #     "raster",
+  #     "SpatRaster"
+  #   )
+  # )
   # Mandate domain to be the following classes
-  stopifnot_class(
-    samplers,
-    c(
-      "character", "factor", "numeric", # here is the split
-      "data.frame", # 20221212 ipoints allows data.frame samplers
-      "sf", "sfc", "Spatial"
-    )
-  )
-
+  # stopifnot_class(
+  #   samplers,
+  #   c(
+  #     "character", "factor", "numeric", # here is the split
+  #     "data.frame", # 20221212 ipoints allows data.frame samplers
+  #     "sf", "sfc", "Spatial"
+  #   )
+  # )
+ # 20221213 This function to figure out which samplers the domain integration are
+  # class check is not needed here but done in S3 method
   # 20221212 We have to check the matching here, that is
   # 1) certain domain classes  have to match certain samplers classes.
   # TODO 2) in which 1) has to check the domain one by one if it is a list
-  if (any(unlist(lapply(domain, function(x) {
-    inherits(x, c("character", "factor", "numeric", "inla.mesh.1d"))
-  })))) {
-    stopifnot_class(samplers, c("character", "factor", "numeric", "data.frame"))
-  }
-  if (any(unlist(lapply(domain, function(x) {
-    inherits(x, cc(
-      "inla.mesh",
-      "inla.mesh.lattice",
-      "raster",
-      "SpatRaster"
-    ))
-  })))) {
-    stopifnot_class(samplers, c("sf", "sfc", "Spatial"))
-  }
+  # if (any(unlist(lapply(domain, function(x) {
+  #   inherits(x, c("character", "factor", "numeric", "inla.mesh.1d"))
+  # })))) {
+  #   stopifnot_class(samplers, c("character", "factor", "numeric", "data.frame"))
+  # }
+  # if (any(unlist(lapply(domain, function(x) {
+  #   inherits(x, cc(
+  #     "inla.mesh",
+  #     "inla.mesh.lattice",
+  #     "raster",
+  #     "SpatRaster"
+  #   ))
+  # })))) {
+  #   stopifnot_class(samplers, c("sf", "sfc", "Spatial"))
+  # }
 
   # Change a mix of sp and sf objects to sf
-  sf_samplers <- any(unlist(lapply(samplers, function(x) inherits(x, c("sf", "sfc")))))
-  sp_samplers <- any(unlist(lapply(samplers, function(x) inherits(x, "Spatial"))))
+  # do sth extra, convert only sp to sf not neither; otherwise character to sf
+  sf_samplers <- unlist(lapply(samplers, function(x) inherits(x, c("sf", "sfc"))))
+  sp_samplers <- unlist(lapply(samplers, function(x) inherits(x, "Spatial")))
   if (sp_samplers && sf_samplers) {
     warning("Both `sf` and `sp` objects in the samplers are detected. Produce `sf` output as desired")
     samplers <- lapply(samplers, sf::st_as_sf)
@@ -202,12 +208,13 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # multidomain sampler the main thing is data dname 23112022 specific column has that meaning
   names_domain <- names(domain)
   names_samplers <- names(samplers)
-  names_diff <- setdiff(setdiff(names_domain, names_samplers), "weight")
-  if(domain_is_list && (length(names_diff)>0)){
-    warning("The difference in the names of domain and samplers are ",
-            paste0(names_diff,collapse = ","),
-            "\n Create samplers for unmatched domains and do nothing on unused samplers.")
-  }
+  names_diff <- setdiff(setdiff(names_domain, names_samplers), weight)
+  # TODO20221213 warning samplers without domain associated
+  # if(domain_is_list && (length(names_diff)>0)){
+  #   cat("The difference in the names of domain and samplers are ",
+  #           paste0(names_diff,collapse = ","),
+  #           "\n Create samplers for unmatched domains and do nothing on unused samplers.")
+  # }
 
   # Check if the names of samplers and domains match. How to establish the link
   # between samplers and domain? If names are not provided, follow the order in
