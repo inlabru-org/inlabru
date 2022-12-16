@@ -544,7 +544,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' }
 #' }
 #'
-cprod <- function(...) {
+old_cprod <- function(...) {
   ipl <- list(...)
   ipl <- ipl[!vapply(ipl, is.null, TRUE)]
   if (length(ipl) == 0) {
