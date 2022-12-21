@@ -75,6 +75,7 @@ Suggests:
     mgcv,
     raster,
     RColorBrewer,
+    rgdal,
     rgl,
     rmarkdown,
     scales,
