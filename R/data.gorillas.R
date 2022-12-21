@@ -105,7 +105,7 @@ import.gorillas <- function() {
   )
 
   #' Build mesh
-  bnd <- INLA::inla.sp2segment(boundary)
+  bnd <- fm_as_inla_mesh_segment(boundary)
   mesh <- INLA::inla.mesh.2d(
     interior = bnd, max.edge = 222,
     crs = crs
