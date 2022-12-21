@@ -394,7 +394,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     cnames <- coordnames(samplers)
-    samplers_crs <- fm_crs(samplers)
+    samplers_crs <- fm_CRS(samplers)
 
     # Convert samplers and domain to equal area CRS
     if (!fm_crs_is_null(domain$crs)) {

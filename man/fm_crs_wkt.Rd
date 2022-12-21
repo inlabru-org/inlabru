@@ -146,10 +146,10 @@ Get and set CRS object or WKT string properties.
 }
 \examples{
 \dontrun{
-  c1 <- fm_CRS("globe")
-  fm_crs_get_lengthunit(c1)
-  c2 <- fm_crs_set_lengthunit(c1, "km")
-  fm_crs_get_lengthunit(c2)
+c1 <- fm_CRS("globe")
+fm_crs_get_lengthunit(c1)
+c2 <- fm_crs_set_lengthunit(c1, "km")
+fm_crs_get_lengthunit(c2)
 }
 }
 \seealso{

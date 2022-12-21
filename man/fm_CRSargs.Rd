@@ -47,15 +47,15 @@ see \code{\link[=fm_wkt]{fm_wkt()}} for a new approach.
 }
 \examples{
 
-  crs0 <- fm_CRS("longlat")
-  p4s <- fm_CRSargs(crs0)
-  lst <- fm_CRSargs_as_list(p4s)
-  crs1 <- fm_list_as_CRS(lst)
-  lst$a <- 2
-  crs2 <- fm_CRS(p4s, args = lst)
-  print(fm_CRSargs(crs0))
-  print(fm_CRSargs(crs1))
-  print(fm_CRSargs(crs2))
+crs0 <- fm_CRS("longlat")
+p4s <- fm_CRSargs(crs0)
+lst <- fm_CRSargs_as_list(p4s)
+crs1 <- fm_list_as_CRS(lst)
+lst$a <- 2
+crs2 <- fm_CRS(p4s, args = lst)
+print(fm_CRSargs(crs0))
+print(fm_CRSargs(crs1))
+print(fm_CRSargs(crs2))
 }
 \seealso{
 \code{\link[=fm_CRS]{fm_CRS()}}

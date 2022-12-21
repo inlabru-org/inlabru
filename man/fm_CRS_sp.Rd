@@ -116,12 +116,12 @@ When \code{oblique[2]} or \code{oblique[3]} are non-zero, the resulting
 projection is only correct for perfect spheres.
 }
 \examples{
-    crs1 <- fm_CRS("longlat_globe")
-    crs2 <- fm_CRS("lambert_globe")
-    crs3 <- fm_CRS("mollweide_norm")
-    crs4 <- fm_CRS("hammer_globe")
-    crs5 <- fm_CRS("sphere")
-    crs6 <- fm_CRS("globe")
+crs1 <- fm_CRS("longlat_globe")
+crs2 <- fm_CRS("lambert_globe")
+crs3 <- fm_CRS("mollweide_norm")
+crs4 <- fm_CRS("hammer_globe")
+crs5 <- fm_CRS("sphere")
+crs6 <- fm_CRS("globe")
 }
 \seealso{
 \code{\link[sp:CRS-class]{sp::CRS()}}, \code{\link{fm_crs_wkt}},
