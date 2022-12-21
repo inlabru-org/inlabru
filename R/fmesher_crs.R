@@ -1118,8 +1118,6 @@ fm_wkt_predef <- function() {
 #' @export
 
 fm_wkt_as_wkt_tree <- function(x, ...) {
-  fm_requires_PROJ6()
-
   # Basic parsing of WKT string
   # ITEM[Param1, Param2, ...]
   # Param can be a constant or an ITEM[...]
