@@ -71,7 +71,6 @@ test_that("conversion of 2D mesh to integration points", {
 
 test_that("SLDF in metres to integration points using grouping parameter", {
   local_bru_safe_inla()
-  skip_if_not(fm_has_PROJ6())
 
   data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = FALSE)
@@ -96,7 +95,6 @@ test_that("SLDF in metres to integration points using grouping parameter", {
 
 test_that("SLDF in kilometres to integration points using grouping parameter", {
   local_bru_safe_inla()
-  skip_if_not(fm_has_PROJ6())
 
   data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)

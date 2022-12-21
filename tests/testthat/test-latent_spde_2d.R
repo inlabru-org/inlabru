@@ -179,15 +179,10 @@ latent_spde2D_group_testdata <- function() {
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not(fm_has_PROJ6())
 
   suppressWarnings(
     data_ <- latent_spde2D_group_testdata()
   )
-  # For rgdal 1.5-23:
-  # "export to PROJ failed: generic error of unknown origin"
-  # For rgdal 1.5-27
-  # proj_as_proj_string: GeodeticCRS::exportToPROJString() only supports metre unit
 
   # Check Intercept
   expect_snapshot_value(

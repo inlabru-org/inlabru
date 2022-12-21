@@ -394,7 +394,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     cnames <- coordnames(samplers)
-    samplers_crs <- fm_sp_get_crs(samplers)
+    samplers_crs <- fm_crs(samplers)
 
     # Convert samplers and domain to equal area CRS
     if (!fm_crs_is_null(domain$crs)) {
@@ -430,7 +430,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       warning("Computing integration points from polygon; specify a mesh for better numerical control.")
       max.edge <- max(diff(range(polyloc[, 1])), diff(range(polyloc[, 2]))) / 20
       domain <- INLA::inla.mesh.2d(boundary = samplers, max.edge = max.edge)
-      domain$crs <- fm_sp_get_crs(samplers)
+      domain$crs <- fm_CRS(samplers)
     } else {
       if (!fm_crs_is_null(domain$crs)) {
         domain <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))

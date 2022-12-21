@@ -988,16 +988,12 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
     }
     inconsistent_crs <- FALSE
-    inp_crs <- lapply(inp, fm_sp_get_crs)
-    if (fm_has_PROJ6()) {
-      crs_info <- lapply(inp_crs, fm_crs_get_wkt)
+    inp_crs <- lapply(inp, fm_CRS)
+      crs_info <- lapply(inp_crs, fm_wkt)
       null_crs <- vapply(crs_info, is.null, logical(1))
       inconsistent_crs <-
         (length(unique(unlist(crs_info))) > 1) ||
           (any(null_crs) && !all(null_crs))
-    } else {
-      stop("PROJ4 or later required.")
-    }
     if (inconsistent_crs) {
       stop("Inconsistent spatial CRS information. Unable to infer mapper information.")
     }
@@ -1938,7 +1934,7 @@ input_eval.bru_input <- function(input, data, env = NULL,
           val <- as.data.frame(val)
           coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
-          data_crs <- tryCatch(fm_sp_get_crs(data),
+          data_crs <- tryCatch(fm_CRS(data),
             error = function(e) {
             }
           )
