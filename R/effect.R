@@ -989,11 +989,11 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     }
     inconsistent_crs <- FALSE
     inp_crs <- lapply(inp, fm_CRS)
-      crs_info <- lapply(inp_crs, fm_wkt)
-      null_crs <- vapply(crs_info, is.null, logical(1))
-      inconsistent_crs <-
-        (length(unique(unlist(crs_info))) > 1) ||
-          (any(null_crs) && !all(null_crs))
+    crs_info <- lapply(inp_crs, fm_wkt)
+    null_crs <- vapply(crs_info, is.null, logical(1))
+    inconsistent_crs <-
+      (length(unique(unlist(crs_info))) > 1) ||
+        (any(null_crs) && !all(null_crs))
     if (inconsistent_crs) {
       stop("Inconsistent spatial CRS information. Unable to infer mapper information.")
     }

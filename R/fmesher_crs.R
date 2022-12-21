@@ -7,9 +7,12 @@
 fm_has_PROJ6 <- function() {
   # TODO: deprecate_warn
   lifecycle::deprecate_stop("2.7.1",
-                            "fm_has_PROJ6()",
-                            details = c(i = "Since inlabru 2.7.1, fm_has_PROJ6() always returns TRUE",
-                                        i = "rgdal/PROJ4 is no longer supported."))
+    "fm_has_PROJ6()",
+    details = c(
+      i = "Since inlabru 2.7.1, fm_has_PROJ6() always returns TRUE",
+      i = "rgdal/PROJ4 is no longer supported."
+    )
+  )
   TRUE
 }
 
@@ -19,8 +22,9 @@ fm_has_PROJ6 <- function() {
 fm_not_for_PROJ6 <- function(fun = NULL) {
   # TODO: deprecate_warn
   lifecycle::deprecate_stop("2.7.1",
-                            "fm_not_for_PROJ6()",
-                            details = c(x = "rgdal/PROJ4 is no longer supported."))
+    "fm_not_for_PROJ6()",
+    details = c(x = "rgdal/PROJ4 is no longer supported.")
+  )
   fun <- fm_caller_name(1, fun)
   msg <- paste0(
     "Call stack:\n",
@@ -39,8 +43,9 @@ fm_not_for_PROJ6 <- function(fun = NULL) {
 
 fm_not_for_PROJ4 <- function(fun = NULL) {
   lifecycle::deprecate_stop("2.7.1",
-                            "fm_not_for_PROJ4()",
-                            details = c(x = "rgdal/PROJ4 is no longer supported."))
+    "fm_not_for_PROJ4()",
+    details = c(x = "rgdal/PROJ4 is no longer supported.")
+  )
 }
 
 #' @describeIn inlabru-deprecated Called to warn about falling back
@@ -48,8 +53,9 @@ fm_not_for_PROJ4 <- function(fun = NULL) {
 
 fm_fallback_PROJ6 <- function(fun = NULL) {
   lifecycle::deprecate_stop("2.7.1",
-                            "fm_not_for_PROJ4()",
-                            details = c(x = "rgdal/PROJ4 requested by PROJ4 is no longer supported."))
+    "fm_not_for_PROJ4()",
+    details = c(x = "rgdal/PROJ4 requested by PROJ4 is no longer supported.")
+  )
 }
 
 
@@ -60,8 +66,9 @@ fm_fallback_PROJ6 <- function(fun = NULL) {
 
 fm_requires_PROJ6 <- function(fun = NULL) {
   lifecycle::deprecate_stop("2.7.1",
-                            "fm_requires_PROJ6()",
-                            details = c(x = "Now always returns TRUE. rgdal/PROJ4 is no longer supported."))
+    "fm_requires_PROJ6()",
+    details = c(x = "Now always returns TRUE. rgdal/PROJ4 is no longer supported.")
+  )
   TRUE
 }
 
@@ -362,10 +369,10 @@ fm_crs_set_ellipsoid_radius <- function(crs, radius) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @examples
 #' \dontrun{
-#'   c1 <- fm_CRS("globe")
-#'   fm_crs_get_lengthunit(c1)
-#'   c2 <- fm_crs_set_lengthunit(c1, "km")
-#'   fm_crs_get_lengthunit(c2)
+#' c1 <- fm_CRS("globe")
+#' fm_crs_get_lengthunit(c1)
+#' c2 <- fm_crs_set_lengthunit(c1, "km")
+#' fm_crs_get_lengthunit(c2)
 #' }
 #' @export
 #' @seealso [fm_sp_get_crs()]
@@ -899,12 +906,12 @@ fm_crs.inla.mesh.segment <- function(x, ..., crsonly = FALSE) {
 #' @seealso [sp::CRS()], [`fm_crs_wkt`],
 #' [fm_sp_get_crs()], [fm_identical_CRS()]
 #' @examples
-#'     crs1 <- fm_CRS("longlat_globe")
-#'     crs2 <- fm_CRS("lambert_globe")
-#'     crs3 <- fm_CRS("mollweide_norm")
-#'     crs4 <- fm_CRS("hammer_globe")
-#'     crs5 <- fm_CRS("sphere")
-#'     crs6 <- fm_CRS("globe")
+#' crs1 <- fm_CRS("longlat_globe")
+#' crs2 <- fm_CRS("lambert_globe")
+#' crs3 <- fm_CRS("mollweide_norm")
+#' crs4 <- fm_CRS("hammer_globe")
+#' crs5 <- fm_CRS("sphere")
+#' crs6 <- fm_CRS("globe")
 #' @export
 #' @rdname fm_CRS_sp
 fm_CRS <- function(...) {
@@ -1007,59 +1014,60 @@ fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
                            args = NULL, oblique = NULL,
                            SRS_string = NULL,
                            ...) {
-  if (fm_has_PROJ6()) {
-    # PROJ6
-    if (identical(projargs, "")) {
+  if (identical(projargs, "")) {
+    projargs <- NULL
+  }
+  if (is.null(SRS_string) &&
+    !is.null(projargs) &&
+    !is.na(projargs) &&
+    is.character(projargs)) {
+    if (projargs %in% c("hammer", "lambert", "longlat", "mollweide")) {
+      warning(paste0(
+        "Use of old predefined projection '",
+        projargs,
+        "' is deprecated. Converting to '",
+        projargs,
+        "_norm'"
+      ))
+      projargs <- paste0(projargs, "_norm")
+    }
+    predef <- fm_wkt_predef()
+    if (projargs %in% names(predef)) {
+      SRS_string <- predef[[projargs]]
+      projargs <- NULL
+    } else {
+      warning(
+        paste0(
+          "'fm_CRS' should be given a SRS_string for PROJ6 or a known keyword for a\n",
+          "  predefined string given in projargs. Using 'fm_crs()' workaround."
+        )
+      )
+      if (!is.null(args)) {
+        x <- fm_crs(projargs)
+        if (typeof(args) != "list") {
+          stop("'args' must be NULL or a list of name=value pairs.")
+        }
+        xargs <- fm_CRS_as_list(x)
+        for (name in names(args)) {
+          xargs[[name]] <- args[[name]]
+        }
+        projargs <- fm_list_as_CRSargs(xargs)
+      }
+      SRS_string <- fm_crs(projargs)$wkt
       projargs <- NULL
     }
-    if (is.null(SRS_string) &&
-      !is.null(projargs) &&
-      !is.na(projargs) &&
-      is.character(projargs)) {
-      if (projargs %in% c("hammer", "lambert", "longlat", "mollweide")) {
-        warning(paste0(
-          "Use of old predefined projection '",
-          projargs,
-          "' is deprecated. Converting to '",
-          projargs,
-          "_norm'"
-        ))
-        projargs <- paste0(projargs, "_norm")
-      }
-      predef <- fm_wkt_predef()
-      if (projargs %in% names(predef)) {
-        SRS_string <- predef[[projargs]]
-        projargs <- NULL
-      } else {
-        warning(
-          paste0("'fm_CRS' should be given a SRS_string for PROJ6 or a known keyword for a\n",
-                 "  predefined string given in projargs. Using 'fm_crs()' workaround."))
-        if (!is.null(args)) {
-          x <- fm_crs(projargs)
-          if (typeof(args) != "list") {
-            stop("'args' must be NULL or a list of name=value pairs.")
-          }
-          xargs <- fm_CRS_as_list(x)
-          for (name in names(args)) {
-            xargs[[name]] <- args[[name]]
-          }
-          projargs <- fm_list_as_CRSargs(xargs)
-        }
-        SRS_string <- fm_crs(projargs)$wkt
-        projargs <- NULL
-      }
-    }
+  }
 
-    if (!is.null(SRS_string)) {
-      if (!is.null(projargs)) {
-        warning("SRS_string specified. Ignoring non-null projargs.")
-      }
-      x <- sp::CRS(SRS_string = SRS_string, doCheckCRSArgs = doCheckCRSArgs)
-    } else if (inherits(projargs, "CRS")) {
-      x <- projargs
-    } else {
-      x <- sp::CRS(NA_character_, doCheckCRSArgs = doCheckCRSArgs)
+  if (!is.null(SRS_string)) {
+    if (!is.null(projargs)) {
+      warning("SRS_string specified. Ignoring non-null projargs.")
     }
+    x <- sp::CRS(SRS_string = SRS_string, doCheckCRSArgs = doCheckCRSArgs)
+  } else if (inherits(projargs, "CRS")) {
+    x <- projargs
+  } else {
+    x <- sp::CRS(NA_character_, doCheckCRSArgs = doCheckCRSArgs)
+  }
 
   if (!is.null(oblique)) {
     stopifnot(is.vector(oblique))
@@ -1284,15 +1292,15 @@ fm_list_as_CRS <- function(x, ...) {
 #' @keywords internal
 #' @examples
 #'
-#'   crs0 <- fm_CRS("longlat")
-#'   p4s <- fm_CRSargs(crs0)
-#'   lst <- fm_CRSargs_as_list(p4s)
-#'   crs1 <- fm_list_as_CRS(lst)
-#'   lst$a <- 2
-#'   crs2 <- fm_CRS(p4s, args = lst)
-#'   print(fm_CRSargs(crs0))
-#'   print(fm_CRSargs(crs1))
-#'   print(fm_CRSargs(crs2))
+#' crs0 <- fm_CRS("longlat")
+#' p4s <- fm_CRSargs(crs0)
+#' lst <- fm_CRSargs_as_list(p4s)
+#' crs1 <- fm_list_as_CRS(lst)
+#' lst$a <- 2
+#' crs2 <- fm_CRS(p4s, args = lst)
+#' print(fm_CRSargs(crs0))
+#' print(fm_CRSargs(crs1))
+#' print(fm_CRSargs(crs2))
 fm_CRSargs <- function(x, ...) {
   # TODO: deprecate_warn
   lifecycle::deprecate_warn("2.7.1", "fm_CRSargs()", details = "No replacement available.")
@@ -1498,50 +1506,50 @@ fm_crs_projection_type <- function(crs) {
 ## +proj=moll in (-2,2)x(-1,1) scaled by +a and +b, and +units
 ## +proj=lambert in (-pi,pi)x(-1,1) scaled by +a and +b, and +units
 fm_crs_bounds <- function(crs, warn.unknown = FALSE) {
-    wkt <- fm_wkt(crs)
-    wt <- fm_wkt_as_wkt_tree(wkt)
-    type <- fm_wkt_tree_projection_type(wt)
+  wkt <- fm_wkt(crs)
+  wt <- fm_wkt_as_wkt_tree(wkt)
+  type <- fm_wkt_tree_projection_type(wt)
 
-    if (is.null(type)) {
-      if (fm_wkt_is_geocent(wkt)) {
-        bounds <- list(type = "rectangle", xlim = c(-Inf, Inf), ylim = c(-Inf, Inf))
-      } else {
-        if (warn.unknown) {
-          warning("Could not determine shape of transformation bounds. Using infinite rectangle.")
-        }
-        bounds <- list(type = "rectangle", xlim = c(-Inf, Inf), ylim = c(-Inf, Inf))
-      }
-    } else if (type == "longlat") {
-      bounds <- list(type = "rectangle", xlim = c(-180, 180), ylim = c(-90, 90))
-    } else if (type == "lambert") {
-      axis <- c(pi, 1)
-      radius <- fm_wkt_get_ellipsoid_radius(wkt)
-      axis[1] <- axis[1] * radius
-      # TODO: handle eccentricity
-      axis[2] <- axis[2] * sqrt(radius) * sqrt(radius)
-      # TODO: Handle units"
-      bounds <- list(
-        type = "rectangle",
-        xlim = c(-1, 1) * axis[1],
-        ylim = c(-1, 1) * axis[2]
-      )
-    } else if (type %in% c("mollweide", "hammer")) {
-      axis <- c(2, 1)
-      center <- c(0, 0)
-      radius <- fm_wkt_get_ellipsoid_radius(wkt)
-      axis[1] <- axis[1] * radius / sqrt(1 / 2)
-      axis[2] <- axis[2] * radius / sqrt(1 / 2)
-      # TODO: Handle "units"
-      bounds <- list(
-        type = "ellipse", axis = axis, center = center,
-        xlim = center[1] + c(-1, 1) * axis[1],
-        ylim = center[2] + c(-1, 1) * axis[2]
-      )
-    } else if (type == "tmerc") {
+  if (is.null(type)) {
+    if (fm_wkt_is_geocent(wkt)) {
       bounds <- list(type = "rectangle", xlim = c(-Inf, Inf), ylim = c(-Inf, Inf))
     } else {
-      stop("'fm_crs_bounds' internal error: transformation detected but not handled.")
+      if (warn.unknown) {
+        warning("Could not determine shape of transformation bounds. Using infinite rectangle.")
+      }
+      bounds <- list(type = "rectangle", xlim = c(-Inf, Inf), ylim = c(-Inf, Inf))
     }
+  } else if (type == "longlat") {
+    bounds <- list(type = "rectangle", xlim = c(-180, 180), ylim = c(-90, 90))
+  } else if (type == "lambert") {
+    axis <- c(pi, 1)
+    radius <- fm_wkt_get_ellipsoid_radius(wkt)
+    axis[1] <- axis[1] * radius
+    # TODO: handle eccentricity
+    axis[2] <- axis[2] * sqrt(radius) * sqrt(radius)
+    # TODO: Handle units"
+    bounds <- list(
+      type = "rectangle",
+      xlim = c(-1, 1) * axis[1],
+      ylim = c(-1, 1) * axis[2]
+    )
+  } else if (type %in% c("mollweide", "hammer")) {
+    axis <- c(2, 1)
+    center <- c(0, 0)
+    radius <- fm_wkt_get_ellipsoid_radius(wkt)
+    axis[1] <- axis[1] * radius / sqrt(1 / 2)
+    axis[2] <- axis[2] * radius / sqrt(1 / 2)
+    # TODO: Handle "units"
+    bounds <- list(
+      type = "ellipse", axis = axis, center = center,
+      xlim = center[1] + c(-1, 1) * axis[1],
+      ylim = center[2] + c(-1, 1) * axis[2]
+    )
+  } else if (type == "tmerc") {
+    bounds <- list(type = "rectangle", xlim = c(-Inf, Inf), ylim = c(-Inf, Inf))
+  } else {
+    stop("'fm_crs_bounds' internal error: transformation detected but not handled.")
+  }
 
   if (bounds$type == "rectangle") {
     bounds$polygon <- cbind(
