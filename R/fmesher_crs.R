@@ -102,7 +102,7 @@ fm_sp_get_crs <- function(x) {
 
 fm_crs_is_null <- function(crs) {
   if (is.null(crs)) {
-    TRUE
+    return(TRUE)
   }
   is.na(fm_crs(crs))
 }
@@ -1007,6 +1007,8 @@ fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
                            args = NULL, oblique = NULL,
                            SRS_string = NULL,
                            ...) {
+  if (fm_has_PROJ6()) {
+    # PROJ6
     if (identical(projargs, "")) {
       projargs <- NULL
     }
@@ -1108,6 +1110,8 @@ fm_wkt_predef <- function() {
 #' @export
 
 fm_wkt_as_wkt_tree <- function(x, ...) {
+  fm_requires_PROJ6()
+
   # Basic parsing of WKT string
   # ITEM[Param1, Param2, ...]
   # Param can be a constant or an ITEM[...]
