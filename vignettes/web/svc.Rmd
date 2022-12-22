@@ -565,8 +565,9 @@ make_plot_field <- function(data_stk, scale_label) {
     geom_spatraster(data = data_stk) +
     labs(x = "", y = "") +
     scale_fill_distiller(scale_label,
-                         palette = "Spectral",
-                         na.value = "transparent") +
+      palette = "Spectral",
+      na.value = "transparent"
+    ) +
     theme_bw() +
     geom_sf(fill = NA)
 }

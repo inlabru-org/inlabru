@@ -70,68 +70,6 @@ local_bru_options_set <- function(...,
 
 
 
-#' @describeIn local_testthat Disable PROJ4/6 warnings.
-#' To be used within package tests. Restores state on exit.
-#'
-#' @param proj4 logical; whether to show PROJ4 conversion warnings. Default `FALSE`
-#' @param thin logical; whether to show only a thinned version of rgdal PROJ6
-#' warnings. Default `TRUE`
-#' @export
-local_set_PROJ6_warnings <- function(proj4 = FALSE,
-                                     thin = TRUE,
-                                     envir = parent.frame()) {
-  withr::local_options(
-    list(
-      "rgdal_show_exportToProj4_warnings" =
-        if (!proj4) {
-          "none"
-        } else if (thin) {
-          "thin"
-        } else {
-          "all"
-        }
-    ),
-    .local_envir = envir
-  )
-  requireNamespace("rgdal", quietly = TRUE)
-  if (fm_has_PROJ6()) {
-    old1 <- rgdal::get_rgdal_show_exportToProj4_warnings()
-    withr::defer(
-      rgdal::set_rgdal_show_exportToProj4_warnings(old1),
-      envir = envir
-    )
-    rgdal::set_rgdal_show_exportToProj4_warnings(proj4)
-
-    old2 <- rgdal::get_thin_PROJ6_warnings()
-    withr::defer(
-      rgdal::set_thin_PROJ6_warnings(old2),
-      envir = envir
-    )
-    rgdal::set_thin_PROJ6_warnings(thin)
-  }
-}
-
-
-#' @export
-#' @describeIn local_testthat Return a list of the current rgdal warning options
-local_get_rgdal_options <- function() {
-  requireNamespace("rgdal", quietly = TRUE)
-  list(
-    option_rgdal_show_exportToProj4_warnings =
-      getOption("rgdal_show_exportToProj4_warnings"),
-    rgdal_show_exportToProj4_warnings = rgdal::get_rgdal_show_exportToProj4_warnings(),
-    thin_PROJ6_warnings = rgdal::get_thin_PROJ6_warnings()
-  )
-}
-
-#' @export
-#' @describeIn local_testthat Disable rgdal PROJ4 conversion warnings and thin
-#' PROJ6 warnings.
-local_disable_PROJ6_warnings <- function(envir = parent.frame()) {
-  local_set_PROJ6_warnings(proj4 = FALSE, thin = TRUE, envir = envir)
-}
-
-
 #' @export
 #' @rdname local_testthat
 local_basic_intercept_testdata <- function() {
@@ -141,7 +79,6 @@ local_basic_intercept_testdata <- function() {
     y = rnorm(100)
   )
 }
-
 
 #' @export
 #' @rdname local_testthat
@@ -235,13 +172,12 @@ local_bru_safe_inla <- function(multicore = FALSE,
 
 
 #' @describeIn local_testthat Initialise environment for tests.
-#' Disables PROJ4/PROJ6 warnings, and assigns tolerance variables.
+#' Assigns tolerance variables.
 #' To be called either at the top of a testfile, or inside tests.
 #' Does *not* call [local_bru_safe_inla()], since that may invoke a skip and
 #' should be called inside each test that relies on INLA.
 #' @export
 local_bru_testthat_setup <- function(envir = parent.frame()) {
-  local_disable_PROJ6_warnings(envir = envir)
   local_testthat_tolerances(envir = envir)
   local_bru_options_set(
     # Need to specify specific smtp to ensure consistent tests.

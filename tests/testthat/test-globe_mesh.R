@@ -3,7 +3,6 @@ local_bru_testthat_setup()
 test_that("2D modelling on the globe", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not(fm_has_PROJ6())
 
   set.seed(123L)
 
@@ -62,7 +61,6 @@ test_that("2D modelling on the globe", {
 test_that("2D LGCP modelling on the globe", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not(fm_has_PROJ6())
 
   set.seed(123L)
 

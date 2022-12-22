@@ -95,7 +95,7 @@ import.seals <- function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.
   #' Ice Covariate
 
   stop("readRGDAL used by old internal method disable to allow removal of rgdal dependency.")
-#  ice <- rgdal::readGDAL(icefile)
+  #  ice <- rgdal::readGDAL(icefile)
   ice <- NULL
   ice <- fm_transform(ice, fm_crs(target.p4s))
   ii <- is.inside(mesh, coordinates(ice))
@@ -107,15 +107,17 @@ import.seals <- function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.
 
   stop("Old internal methods needed by import.seals have been removed.")
   # TODO: replace old code in misc/ with modern code
-#  icecv <- covariate(ice, predictor = "band1", mesh = mesh)
+  #  icecv <- covariate(ice, predictor = "band1", mesh = mesh)
   icecv <- NULL
-#  plot(icecv)
+  #  plot(icecv)
 
   #' Add band1 covariate to seals data frame
 
   # TODO: replace old code in misc/ with modern code
   # ice.band1 <- evaluator(icecv)
-  ice.band1 <- function(x, y) { NULL }
+  ice.band1 <- function(x, y) {
+    NULL
+  }
   seals$ice <- ice.band1(x = coordinates(seals)[, 1], y = coordinates(seals)[, 2])
 
   #' Plot seal count and ice together

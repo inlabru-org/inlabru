@@ -95,7 +95,7 @@ fm_as_inla_mesh_segment.matrix <-
 #' @rdname fm_as
 fm_as_inla_mesh_segment.SpatialPoints <-
   function(sp, reverse = FALSE, grp = NULL, is.bnd = TRUE, closed = FALSE, ...) {
-    crs <- fm_sp_get_crs(sp)
+    crs <- fm_CRS(sp)
     loc <- coordinates(sp)
 
     n <- dim(loc)[1L]
@@ -169,7 +169,7 @@ fm_as_inla_mesh_segment.Lines <-
 #' @rdname fm_as
 fm_as_inla_mesh_segment.SpatialLines <-
   function(sp, join = TRUE, grp = NULL, ...) {
-    crs <- fm_sp_get_crs(sp)
+    crs <- fm_CRS(sp)
     segm <- list()
     for (k in seq_len(length(sp@lines))) {
       segm[[k]] <- fm_as_inla_mesh_segment(sp@lines[[k]],
@@ -197,7 +197,7 @@ fm_as_inla_mesh_segment.SpatialLinesDataFrame <-
 #' @rdname fm_as
 fm_as_inla_mesh_segment.SpatialPolygons <-
   function(sp, join = TRUE, grp = NULL, ...) {
-    crs <- fm_sp_get_crs(sp)
+    crs <- fm_CRS(sp)
     segm <- list()
     for (k in seq_len(length(sp@polygons))) {
       segm[[k]] <- fm_as_inla_mesh_segment(sp@polygons[[k]], join = TRUE, crs = crs)
