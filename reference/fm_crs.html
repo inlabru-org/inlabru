@@ -97,7 +97,8 @@ print(x, ...)
 # S3 method for default
 fm_crs(x, ..., crsonly = FALSE)
 
-st_crs.fm_crs(x, ...)
+# S3 method for fm_crs
+st_crs(x, ...)
 
 # S3 method for fm_crs
 $(x, name)
@@ -208,15 +209,11 @@ projection is only correct for perfect spheres.</p>
     <div class="section level2">
     <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
     
-<ul><li><p><code>$</code>: For a <code>fm_crs</code> object <code>x</code>, <code>x$name</code> calls the accessor method for the
+<ul><li><p><code>st_crs(fm_crs)</code>: <code>st_crs(x, ...)</code> is equivalent to <code>fm_crs(x, ..., crsonly = TRUE)</code>
+when <code>x</code> is a <code>fm_crs</code> object.</p></li>
+<li><p><code>$</code>: For a <code>fm_crs</code> object <code>x</code>, <code>x$name</code> calls the accessor method for the
 <code>crs</code> object inside it. If <code>name</code> is "crs", the internal crs object itself is returned.
 If <code>name</code> is "oblique", the internal oblique angle parameter vector is returned.</p></li>
-</ul></div>
-    <div class="section level2">
-    <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
-    
-<ul><li><p><code>st_crs.fm_crs()</code>: <code>st_crs(x, ...)</code> is equivalent to <code>fm_crs(x, ..., crsonly = TRUE)</code>
-when <code>x</code> is a <code>fm_crs</code> object.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
