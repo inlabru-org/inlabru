@@ -8,7 +8,7 @@
   coordinate values (e.g. for custom spatial covariate evaluation.).
   When possible, use the built-in covariate evaluation method, `eval_spatial()`,
   either implicitly with `comp(covariate, ...)` or explicitly,
-  `comp(eval_spatial(covariate, where = .data.))`.
+  `comp(eval_spatial(covariate, where = .data.), ...)`.
 
 # inlabru 2.7.0
 
