@@ -84,9 +84,8 @@ if (bru_safe_inla(quietly = TRUE)) {
 }
 
 \donttest{
-# The INLA package and PROJ6 are required
+# The INLA package is required
 if (bru_safe_inla(quietly = TRUE) &&
-  fm_has_PROJ6() &&
   require(ggplot2, quietly = TRUE)) {
   data("gorillas", package = "inlabru")
   pts <- sample.lgcp(gorillas$mesh,

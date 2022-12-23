@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.7.0.9000
+Version: 2.7.0.9001
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -57,7 +57,6 @@ Imports:
     Matrix,
     patchwork,
     plyr,
-    rgdal (>= 1.5.8),
     rlang,
     sf,
     utils,
@@ -73,10 +72,10 @@ Suggests:
     INLA (>= 21.08.31),
     knitr,
     maps,
-    maptools,
     mgcv,
     raster,
     RColorBrewer,
+    rgdal,
     rgl,
     rmarkdown,
     scales,
@@ -88,6 +87,7 @@ Suggests:
     sphereplot,
     splancs,
     terra,
+    tidyterra,
     testthat,
     tidyr,
     DiagrammeR
@@ -96,12 +96,10 @@ Config/testthat/parallel: true
 Config/testthat/edition: 3
 Collate: 
     '0_inlabru_envir.R'
-    'bru.covariate.R'
     'bru.gof.R'
     'bru.inference.R'
     'bru.integration.R'
     'bru.spatial.R'
-    'covariate.R'
     'data.Poisson1_1D.R'
     'data.Poisson2_1D.R'
     'data.Poisson3_1D.R'
@@ -138,7 +136,6 @@ Collate:
     'rgl.R'
     'sampling.R'
     'sf_utils.R'
-    'shapefile.R'
     'spatstat.R'
     'spde.R'
     'stack.R'

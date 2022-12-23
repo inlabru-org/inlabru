@@ -988,17 +988,12 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
     }
     inconsistent_crs <- FALSE
-    inp_crs <- lapply(inp, fm_sp_get_crs)
-    if (fm_has_PROJ6()) {
-      crs_info <- lapply(inp_crs, fm_crs_get_wkt)
-      null_crs <- vapply(crs_info, is.null, logical(1))
-      inconsistent_crs <-
-        (length(unique(unlist(crs_info))) > 1) ||
-          (any(null_crs) && !all(null_crs))
-    } else {
-      crs_info <- vapply(inp_crs, fm_CRSargs, "")
-      inconsistent_crs <- length(unique(crs_info)) > 1
-    }
+    inp_crs <- lapply(inp, fm_CRS)
+    crs_info <- lapply(inp_crs, fm_wkt)
+    null_crs <- vapply(crs_info, is.null, logical(1))
+    inconsistent_crs <-
+      (length(unique(unlist(crs_info))) > 1) ||
+        (any(null_crs) && !all(null_crs))
     if (inconsistent_crs) {
       stop("Inconsistent spatial CRS information. Unable to infer mapper information.")
     }
@@ -1082,6 +1077,11 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
 
 add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
                        require_indexed = FALSE) {
+  if (is.null(subcomp[["mapper"]])) {
+    if (!inherits(subcomp[["model"]], "character")) {
+      subcomp[["mapper"]] <- bru_get_mapper_safely(subcomp[["model"]])
+    }
+  }
   if (!is.null(subcomp[["mapper"]])) {
     if (!inherits(subcomp[["mapper"]], "bru_mapper")) {
       stop(paste0(
@@ -1144,7 +1144,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
 
         unique_inputs <- make_unique_inputs(inp_, allow_list = TRUE)
       }
-      if (unique_inputs$n_values < 1) {
+      if (sum(unlist(unique_inputs$n_values)) < 1) {
         subcomp$n <- 1
         subcomp$values <- NULL
         inp_values <- NULL
@@ -1934,7 +1934,7 @@ input_eval.bru_input <- function(input, data, env = NULL,
           val <- as.data.frame(val)
           coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
-          data_crs <- tryCatch(fm_sp_get_crs(data),
+          data_crs <- tryCatch(fm_CRS(data),
             error = function(e) {
             }
           )

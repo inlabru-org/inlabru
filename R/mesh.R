@@ -101,7 +101,7 @@ vertices.inla.mesh <- function(object) {
   if (is.na(object$crs)) {
     object$crs <- sp::CRS(NA_character_)
   } else {
-    object$crs <- fm_as_sp_crs(object$crs)
+    object$crs <- fm_CRS(object$crs)
   }
 
   vrt <- data.frame(object$loc)

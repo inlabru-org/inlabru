@@ -179,6 +179,3 @@ glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
     plot(object, rgl = TRUE, add = add, col = col, ...)
   }
 }
-
-
-
