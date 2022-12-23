@@ -2,6 +2,11 @@
 
 * Remove `rgdal` and `maptools` dependencies #178
 
+* Warning: Coordinate names for `Spatial*` objects have been inconsistently
+  available in the predictor expression evaluation. Avoid relying on those being
+  present, and use explicit calls to `coordinates(.data.)` if you need the
+  coordinate values (e.g. for custom spatial covariate evaluation.)
+
 # inlabru 2.7.0
 
 ## Feature overview
