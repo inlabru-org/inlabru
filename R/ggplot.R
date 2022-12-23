@@ -667,6 +667,31 @@ gg.SpatialPixels <- function(data, ...) {
 }
 
 
+#' Geom wrapper for SpatRaster objects
+#'
+#' Convenience wrapper function for `tidyterra::geom_spatraster()`.
+#' Requires the `ggplot2` and `tidyterra` packages.
+#'
+#' @aliases gg.SpatRaster
+#' @name gg.SpatRaster
+#' @export
+#' @param data A SpatRaster object.
+#' @param ... Arguments passed on to `geom_spatraster`.
+#' @return The output from `geom_spatraster.
+#' @family geomes for spatial data
+
+gg.SpatRaster <- function(data, ...) {
+  if (!requireNamespace("tidyterra", quietly = TRUE)) {
+    stop(paste0("gg.SpatRaster requires the 'tidyterra' package, ",
+                "which is not installed.\n",
+                "Please install it and try again!"))
+  }
+  tidyterra::geom_spatraster(data = data, ...)
+}
+
+
+
+
 
 #' Geom for inla.mesh objects
 #'
