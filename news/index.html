@@ -78,7 +78,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
 <ul><li><p>Remove <code>rgdal</code> and <code>maptools</code> dependencies <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
-<li><p>Warning: Coordinate names for <code>Spatial*</code> objects have been inconsistently available in the predictor expression evaluation. Avoid relying on those being present, and use explicit calls to <code>coordinates(.data.)</code> if you need the coordinate values (e.g. for custom spatial covariate evaluation.)</p></li>
+<li><p>Warning: Coordinate names for <code>Spatial*</code> objects have been inconsistently available in the predictor expression evaluation. Avoid relying on those being present, and use explicit calls to <code>coordinates(.data.)</code> if you need the coordinate values (e.g. for custom spatial covariate evaluation.). When possible, use the built-in covariate evaluation method, <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>, either implicitly with <code>comp(covariate, ...)</code> or explicitly, <code>comp(eval_spatial(covariate, where = .data.))</code>.</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.7.0" id="inlabru-270">inlabru 2.7.0<a class="anchor" aria-label="anchor" href="#inlabru-270"></a></h2><p class="text-muted">CRAN release: 2022-12-02</p>
