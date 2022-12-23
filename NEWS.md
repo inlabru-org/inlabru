@@ -5,7 +5,10 @@
 * Warning: Coordinate names for `Spatial*` objects have been inconsistently
   available in the predictor expression evaluation. Avoid relying on those being
   present, and use explicit calls to `coordinates(.data.)` if you need the
-  coordinate values (e.g. for custom spatial covariate evaluation.)
+  coordinate values (e.g. for custom spatial covariate evaluation.).
+  When possible, use the built-in covariate evaluation method, `eval_spatial()`,
+  either implicitly with `comp(covariate, ...)` or explicitly,
+  `comp(eval_spatial(covariate, where = .data.))`.
 
 # inlabru 2.7.0
 
