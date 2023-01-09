@@ -70,15 +70,15 @@ glplot <- function(object, ...) {
 #' Visualize SpatialPoints using RGL
 #'
 #' This function will calculate the cartesian coordinates of the points provided
-#' and use rgl.points() in order to render them.
+#' and use points3d() in order to render them.
 #'
 #' @export
 #' @name glplot.SpatialPoints
 #'
 #' @param object a SpatialPoints or SpatialPointsDataFrame object.
 #' @param add If TRUE, add the points to an existing plot. If FALSE, create new plot.
-#' @param color vector of R color characters. See rgl.material() for details.
-#' @param ... Parameters passed on to rgl.points()
+#' @param color vector of R color characters. See material3d() for details.
+#' @param ... Parameters passed on to points3d()
 #'
 #' @family inlabru RGL tools
 #'
@@ -97,13 +97,13 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
   object <- fm_transform(object, crs = fm_crs("sphere"))
   cc <- coordinates(object)
   requireNamespace("rgl")
-  rgl::rgl.points(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
+  rgl::points3d(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
 }
 
 #' Visualize SpatialLines using RGL
 #'
 #' This function will calculate a cartesian representation of the lines provided
-#' and use rgl.linestrip() in order to render them.
+#' and use lines3d() in order to render them.
 #'
 #'
 #' @export
@@ -111,7 +111,7 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
 #'
 #' @param object a SpatialLines or SpatialLinesDataFrame object.
 #' @param add If TRUE, add the lines to an existing plot. If FALSE, create new plot.
-#' @param ... Parameters passed on to rgl.linestrips().
+#' @param ... Parameters passed on to lines3d().
 #'
 #' @family inlabru RGL tools
 #'
@@ -140,7 +140,7 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 
   requireNamespace("rgl")
 
-  rgl::rgl.linestrips(mm, add = add, ...)
+  rgl::lines3d(mm, add = add, ...)
 }
 
 
