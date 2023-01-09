@@ -90,7 +90,7 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
     ll <- data.frame(object)
     ll$TMP.ZCOORD <- 0
     coordinates(ll) <- c(coordnames(object), "TMP.ZCOORD")
-    proj4string(ll) <- fm_sp_get_crs(object)
+    proj4string(ll) <- fm_CRS(object)
     object <- ll
   }
 
@@ -126,8 +126,8 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 
   coordinates(sp) <- c("x", "y", "z")
   coordinates(ep) <- c("x", "y", "z")
-  proj4string(sp) <- fm_sp_get_crs(object)
-  proj4string(ep) <- fm_sp_get_crs(object)
+  proj4string(sp) <- fm_CRS(object)
+  proj4string(ep) <- fm_CRS(object)
 
   sp <- fm_transform(sp, crs = fm_crs("sphere"))
   ep <- fm_transform(ep, crs = fm_crs("sphere"))

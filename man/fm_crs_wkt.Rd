@@ -100,7 +100,7 @@ fm_crs_get_wkt(crs)
 \arguments{
 \item{wkt}{A WKT2 character string}
 
-\item{crs}{A \code{sp::CRS} or \code{inla.CRS} object}
+\item{crs}{An \code{sf::crs}, \code{sp::CRS}, \code{fm_crs} or \code{inla.CRS} object}
 
 \item{x}{crs object to extract value from or assign values in}
 
@@ -146,14 +146,14 @@ Get and set CRS object or WKT string properties.
 }
 \examples{
 \dontrun{
-c1 <- fm_CRS("globe")
+c1 <- fm_crs("globe")
 fm_crs_get_lengthunit(c1)
-c2 <- fm_crs_set_lengthunit(c1, "km")
+c2 <- fm_crs_set_lengthunit(c1, "m")
 fm_crs_get_lengthunit(c2)
 }
 }
 \seealso{
-\code{\link[=fm_sp_get_crs]{fm_sp_get_crs()}}
+\code{\link[=fm_crs]{fm_crs()}}
 }
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}

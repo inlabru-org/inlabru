@@ -101,8 +101,7 @@ fm_as_sp_crs <- function(x, ...) {
 #' @export
 
 fm_sp_get_crs <- function(x) {
-  # TODO: deprecate_warn
-  lifecycle::deprecate_stop("2.7.1", "fm_sp_get_crs()", "fm_CRS()")
+  lifecycle::deprecate_warn("2.7.1", "fm_sp_get_crs()", "fm_CRS()")
   fm_CRS(x)
 }
 
@@ -354,7 +353,7 @@ fm_crs_set_ellipsoid_radius <- function(crs, radius) {
 
 
 
-#' @param crs A `sp::CRS` or `inla.CRS` object
+#' @param crs An `sf::crs`, `sp::CRS`, `fm_crs` or `inla.CRS` object
 #' @param wkt A WKT2 character string
 #' @param unit character, name of a unit. Supported names are
 #' "metre", "kilometre", and the aliases "meter", "m", International metre",
@@ -369,13 +368,13 @@ fm_crs_set_ellipsoid_radius <- function(crs, radius) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @examples
 #' \dontrun{
-#' c1 <- fm_CRS("globe")
+#' c1 <- fm_crs("globe")
 #' fm_crs_get_lengthunit(c1)
-#' c2 <- fm_crs_set_lengthunit(c1, "km")
+#' c2 <- fm_crs_set_lengthunit(c1, "m")
 #' fm_crs_get_lengthunit(c2)
 #' }
 #' @export
-#' @seealso [fm_sp_get_crs()]
+#' @seealso [fm_crs()]
 #' @aliases fm_crs_wkt
 #' @rdname fm_crs_wkt
 
