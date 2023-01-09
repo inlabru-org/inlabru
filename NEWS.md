@@ -2,6 +2,8 @@
 
 * Remove `rgdal` and `maptools` dependencies #178
 
+* Remove PROJ4 support #178
+
 * Warning: Coordinate names for `Spatial*` objects have been inconsistently
   available in the predictor expression evaluation. Avoid relying on those being
   present, and use explicit calls to `coordinates(.data.)` if you need the
@@ -9,6 +11,8 @@
   When possible, use the built-in covariate evaluation method, `eval_spatial()`,
   either implicitly with `comp(covariate, ...)` or explicitly,
   `comp(eval_spatial(covariate, where = .data.), ...)`.
+  
+* Change rgl.* functions to *3d. Thanks to Duncan Murdoch #181
 
 # inlabru 2.7.0
 
