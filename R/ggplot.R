@@ -682,9 +682,11 @@ gg.SpatialPixels <- function(data, ...) {
 
 gg.SpatRaster <- function(data, ...) {
   if (!requireNamespace("tidyterra", quietly = TRUE)) {
-    stop(paste0("gg.SpatRaster requires the 'tidyterra' package, ",
-                "which is not installed.\n",
-                "Please install it and try again!"))
+    stop(paste0(
+      "gg.SpatRaster requires the 'tidyterra' package, ",
+      "which is not installed.\n",
+      "Please install it and try again!"
+    ))
   }
   tidyterra::geom_spatraster(data = data, ...)
 }

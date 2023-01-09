@@ -423,8 +423,9 @@ objects, and mismatching coordinate systems as well.
 f.elev <- function(xy) {
   # turn coordinates into SpatialPoints object:
   # with the appropriate coordinate reference system (CRS)
-  spp <- SpatialPoints(data.frame(x = xy[,1], y = xy[,2]),
-                       proj4string = fm_CRS(elev))
+  spp <- SpatialPoints(data.frame(x = xy[, 1], y = xy[, 2]),
+    proj4string = fm_CRS(elev)
+  )
   # Extract elevation values at spp coords, from our elev SpatialGridDataFrame
   v <- over(spp, elev)
   if (any(is.na(v$elevation))) {
