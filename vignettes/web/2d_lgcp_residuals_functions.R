@@ -1,4 +1,4 @@
-# Niharika Reddy Peddinenikalva 
+# Niharika Reddy Peddinenikalva
 # Vacation Scholarship project
 
 # Place the function definitions that may be needed in Code.Rmd
@@ -24,8 +24,8 @@ theme_set(theme_bw())
 #' ----------------------------------
 #' prepare_residual_calculations
 #' ----------------------------------
-#' 
-#' Computes the A_sum, A_integrate matrices and the data frame used for 
+#'
+#' Computes the A_sum, A_integrate matrices and the data frame used for
 #' calculating the residuals for the given set of polygons B
 
 #' Input:
@@ -37,42 +37,42 @@ theme_set(theme_bw())
 #' Output:
 #' @return A_sum - matrix used to compute the summation term of the residuals
 #' @return A_integrate - matrix used to compute the integral term
-#' @return df - SpatialPointsDataFrame containing all the locations 'u' for 
+#' @return df - SpatialPointsDataFrame containing all the locations 'u' for
 #' calculating residuals
 #'
 prepare_residual_calculations <- function(samplers, domain, observations) {
   # Assign separate IDs to each polygon in the set B
   samplers$ID = seq_len(nrow(samplers))
-  
+
   # Calculate the integration weights for A_integrate
-  ips <- ipoints(samplers = samplers, domain = domain, 
+  ips <- ipoints(samplers = samplers, domain = domain,
                  name = c("x", "y"), group = "ID")
-  
+
   # Set-up the A_integrate matrix
-  # A_integrate has as many rows as polygons in the samplers, 
+  # A_integrate has as many rows as polygons in the samplers,
   # as many columns as mesh points
   A_integrate <- inla.spde.make.A(mesh = domain, ips, weights = ips$weight,
                                   block=ips$ID, block.rescale = "none")
-  
-  
+
+
   # Set-up the A_sum matrix
-  # A_sum has as many rows as polygons in the samplers, 
+  # A_sum has as many rows as polygons in the samplers,
   # as many columns as observed points
   # each row has 1s for the points in the corresponding polygon
   idx <- sp::over(observations, samplers)
-  A_sum <- sparseMatrix(i = idx$ID, j = seq_len(nrow(observations)), 
-                        x = rep(1, nrow(observations)), 
+  A_sum <- sparseMatrix(i = idx$ID, j = seq_len(nrow(observations)),
+                        x = rep(1, nrow(observations)),
                         dims = c(nrow(samplers), nrow(observations)))
-  
-  
+
+
   # Setting up the data frame for calculating residuals
   observations$obs <- TRUE
   df <- SpatialPointsDataFrame(
-    coords = rbind(domain$loc[,1:2], coordinates(observations)), 
-    data = bind_rows(data.frame(obs = rep(FALSE, domain$n)), observations@data), 
+    coords = rbind(domain$loc[,1:2], coordinates(observations)),
+    data = bind_rows(data.frame(obs = rep(FALSE, domain$n)), observations@data),
     proj4string = domain$crs)
   coordnames(df) <- c("x", "y")
-  
+
   # Return A-sum, A_integrate and the data frame for predicting the residuals
   list(A_sum = A_sum, A_integrate = A_integrate, df = df)
 }
@@ -82,20 +82,20 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
 #' ------------
 #' residual_df
 #' ------------
-#' 
+#'
 #' Computes the three types if residuals and returns a data frame containing
 #' information about all 3 residuals for each partition of 'B'
-#' 
+#'
 #' Inputs:
-#' @param model fitted model for which residuals need to be calculated 
-#' @param df SpatialPointsDataFrame object containing all the locations 'u' 
+#' @param model fitted model for which residuals need to be calculated
+#' @param df SpatialPointsDataFrame object containing all the locations 'u'
 #' for calculating residuals
 #' @param expr an expression object containing the formula of the model
 #' @param A_sum matrix used to compute the summation term of the residuals
 #' @param A_integrate matrix that computes the integral term of the residuals
 #'
 #' Outputs:
-#' @return Data frame containing residual information for each of the 
+#' @return Data frame containing residual information for each of the
 #' partitions of the subset 'B'
 #'
 
@@ -119,7 +119,7 @@ residual_df <- function(model, df, expr, A_sum, A_integrate) {
                        as.vector(A_integrate %*% (h3 * lambda)[!obs])
                    )
                  })
-  
+
   # Label the three types of residuals
   res$Scaling_Residuals$Type <- "Scaling Residuals"
   res$Inverse_Residuals$Type <- "Inverse Residuals"
@@ -129,69 +129,50 @@ residual_df <- function(model, df, expr, A_sum, A_integrate) {
 
 
 
-#' -------------
-#' f.elev
-#' -------------
-#' turn coordinates into SpatialPoints object:
-#' with the appropriate coordinate reference system (CRS)
-
-f.elev <- function(x, y) {
-  # turn coordinates into SpatialPoints object:
-  # with the appropriate coordinate reference system (CRS)
-  spp <- SpatialPoints(data.frame(x = x, y = y), 
-                       proj4string = fm_sp_get_crs(elev))
-  proj4string(spp) <- fm_sp_get_crs(elev)
-  # Extract elevation values at spp coords, from our elev SpatialGridDataFrame
-  v <- over(spp, elev)
-  if (any(is.na(v$elevation))) {
-    v$elevation <- inlabru:::bru_fill_missing(elev, spp, v$elevation)
-  }
-  return(v$elevation)
-}
 
 
 #' --------------
 #' set_csc
 #' --------------
-#' 
+#'
 #' Sets the colour scale for the three types of residuals
-#' 
-#' Inputs: 
-#' @param residuals frame containing residual information for each of the 
+#'
+#' Inputs:
+#' @param residuals frame containing residual information for each of the
 #' partitions of the subset 'B'
 #' @param col_theme vector of themes for each type of residual
-#' 
+#'
 #' Outputs:
 #' @return a list of 3 colour scales for each type of residual
 #'
- 
+
 set_csc <- function(residuals, col_theme) {
   # Store data for the colour scale of the plots for each type of residual
-  cscrange <- data.frame(residuals %>% group_by(Type) %>% 
+  cscrange <- data.frame(residuals %>% group_by(Type) %>%
                            summarise(maxabs=max(abs(mean))))
-  
+
   # Set the colour scale for all three types of residuals
-  scaling_csc <- 
-    scale_fill_gradientn(colours = brewer.pal(9, col_theme[1]), 
-                         name = "Scaling Residual", 
-                         limits = 
+  scaling_csc <-
+    scale_fill_gradientn(colours = brewer.pal(9, col_theme[1]),
+                         name = "Scaling Residual",
+                         limits =
                            cscrange[cscrange$Type == "Scaling Residuals", 2] *
                            c(-1,1))
-  
-  inverse_csc <- 
-    scale_fill_gradientn(colours = brewer.pal(9, col_theme[2]),  
-                         name = "Inverse Residual", 
-                         limits = 
-                           cscrange[cscrange$Type == "Inverse Residuals", 2] *  
+
+  inverse_csc <-
+    scale_fill_gradientn(colours = brewer.pal(9, col_theme[2]),
+                         name = "Inverse Residual",
+                         limits =
+                           cscrange[cscrange$Type == "Inverse Residuals", 2] *
                            c(-1,1))
-  
-  pearson_csc <- 
-    scale_fill_gradientn(colours = brewer.pal(9, col_theme[3]), 
+
+  pearson_csc <-
+    scale_fill_gradientn(colours = brewer.pal(9, col_theme[3]),
                          name = "Pearson Residual",
-                         limits = 
-                           cscrange[cscrange$Type == "Pearson Residuals", 2] * 
+                         limits =
+                           cscrange[cscrange$Type == "Pearson Residuals", 2] *
                            c(-1,1))
-  
+
   list("Scaling" = scaling_csc, "Inverse" = inverse_csc, "Pearson" = pearson_csc)
 }
 
@@ -200,19 +181,19 @@ set_csc <- function(residuals, col_theme) {
 #' ---------------
 #' residual_plot
 #' ---------------
-#' 
+#'
 #' plots the three types of residuals for each polygon
-#' 
-#' Input: 
+#'
+#' Input:
 #' @param samplers A SpatialPolygonsDataFrame containing partitions for which
 #' residuals are to be calculated
-#' @param residuals frame containing residual information for each of the 
+#' @param residuals frame containing residual information for each of the
 #' partitions of the subset 'B'
 #' @param csc list of three colour scales for the three types of residuals
 #' @param model_name string containing the name of the model being assessed
-#' 
-#' Output: 
-#' @return a list of three subplots scaling, inverse and Pearson residuals 
+#'
+#' Output:
+#' @return a list of three subplots scaling, inverse and Pearson residuals
 #' for the different partitions of samplers
 
 
@@ -223,10 +204,10 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
     pull(mean)
   scaling <- ggplot() +
     gg(samplers, aes(fill = Residual), alpha = 1, colour = NA) +
-    csc["Scaling"] + 
+    csc["Scaling"] +
     theme(legend.position = "bottom") +
     labs(subtitle = paste(model_name, "Scaling"))
-  
+
   # Initialise the inverse residuals plot
   samplers$Residual <- residuals %>%
     filter(Type == "Inverse Residuals") %>%
@@ -236,19 +217,19 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
     csc["Inverse"] +
     theme(legend.position = "bottom") +
     labs(subtitle = paste(model_name, "Inverse"))
-  
+
   # Initialise the Pearson residuals plot
   samplers$Residual <- residuals %>%
     filter(Type == "Pearson Residuals") %>%
     pull(mean)
   pearson <- ggplot() +
     gg(samplers, aes(fill = Residual), alpha = 1, colour = NA) +
-    csc["Pearson"] + 
+    csc["Pearson"] +
     theme(legend.position = "bottom") +
     labs(subtitle = paste(model_name, "Pearson"))
-  
+
   # Return the three plots in a list
-  list(Scaling = scaling, Inverse = inverse, 
+  list(Scaling = scaling, Inverse = inverse,
        Pearson = pearson)
 }
 
@@ -258,37 +239,37 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
 #' ------------------
 #' partition
 #' ------------------
-#' 
-#' Partitions the region based on the given criteria for calculating residuals 
-#' in each partition. Parts of this function are taken from concepts in 
+#'
+#' Partitions the region based on the given criteria for calculating residuals
+#' in each partition. Parts of this function are taken from concepts in
 #' https://rpubs.com/huanfaChen/grid_from_polygon
-#' 
-#' Input: 
-#' @param samplers A SpatialPolygonsDataFrame containing region for which 
+#'
+#' Input:
+#' @param samplers A SpatialPolygonsDataFrame containing region for which
 #' partitions need to be created
 #' @param resolution resolution of the grids that are required
 #' @param nrows number of rows of grids that are required
 #' @param ncols number of columns of grids that are required
-#' 
-#' Output: 
+#'
+#' Output:
 #' @return a partitioned SpatialPolygonsDataFrame as required
-#' 
-#' 
+#'
+#'
 partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   # Create a grid for the given boundary
   if (is.null(resolution)) {
     grid <- raster(extent(samplers), crs = proj4string(samplers),
                    nrows = nrows, ncols = ncols)
   }
-  
+
   if (is.null(c(nrows, ncols))) {
     grid <- raster(extent(samplers), crs = proj4string(samplers),
                  resolution = resolution)
-    
+
   }
-  
+
   gridPolygon <- rasterToPolygons(grid)
-  
+
   # Extract the boundary with subpolygons only
   raster::intersect(gridPolygon, samplers)
 }
@@ -297,19 +278,19 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
 #' ------------------
 #' edit_df
 #' ------------------
-#' 
+#'
 #' Edits the residual data frames to remove columns that need not be displayed
-#' 
-#' Input: 
+#'
+#' Input:
 #' @param df the data frame which needs to be edited
 #' @param columns a vector of columns that need to be deleted from df
-#' 
-#' Output: 
+#'
+#' Output:
 #' @return the edited data frame with only the desired columns
-#' 
-#' 
+#'
+#'
 edit_df <- function(df, columns) {
   # Remove the columns that are not required
   df[, !(colnames(df) %in% columns)]
-  
+
 }
