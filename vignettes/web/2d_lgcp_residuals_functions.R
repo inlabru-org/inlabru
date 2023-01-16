@@ -1,11 +1,6 @@
 # Niharika Reddy Peddinenikalva
 # Vacation Scholarship project
 
-# Place the function definitions that may be needed in Code.Rmd
-# in this file, including documentation.
-# You can also include any needed library() calls here
-
-suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library("INLA"))
 suppressPackageStartupMessages(library("inlabru"))
 suppressPackageStartupMessages(library("RColorBrewer"))
