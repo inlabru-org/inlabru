@@ -54,6 +54,7 @@
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_residuals.html">LGCPs - Residuals</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
     <a class="dropdown-item" href="../../articles/component.html">Defining a model component</a>
@@ -101,7 +102,7 @@
 Meehan (<a href="mailto:tmeeha@gmail.com" class="email">tmeeha@gmail.com</a>), Elias T. Krainski, Finn Lindgren,
 and Håvard Rue</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-01-09</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-01-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/svc.Rmd" class="external-link"><code>vignettes/web/svc.Rmd</code></a></small>
       <div class="d-none name"><code>svc.Rmd</code></div>
@@ -433,7 +434,7 @@ integrate to zero, it should be added <code>constr=TRUE</code> in the
 SPDE model definition rather than in the component definition. As we
 want to constrain <span class="math inline">\(\kappa_s\)</span> and it
 is a non-spatial term we <strong>can</strong> use
-<code>constr=TRUE</code> in its corresponding <code>label()</code>
+<code>constr=TRUE</code> in its corresponding <code><a href="http://maptools.r-forge.r-project.org/reference/maptools-deprecated.html" class="external-link">label()</a></code>
 component definition below, which imposes a sum-to-zero constraint.</p>
 <p>The model described above is translated to <code>inlabru</code>
 modeling syntax as:</p>
@@ -454,7 +455,7 @@ Alternatively, we can specify that explicitly as input, with
 <code>cbind(easting, northing)</code>.</p>
 <p>Here, we define the response as <code>count</code>, remove the
 automatic global intercept with a <code>-1</code>, and then specify the
-other terms in the model with <code>label()</code> statements. The first
+other terms in the model with <code><a href="http://maptools.r-forge.r-project.org/reference/maptools-deprecated.html" class="external-link">label()</a></code> statements. The first
 <code><a href="https://rdrr.io/r/base/kappa.html" class="external-link">kappa()</a></code> statement defines <span class="math inline">\(\kappa_s\)</span>, the site effect, as a normally
 distributed and independent (<code>model="iid"</code>), globally
 zero-centered (sum to zero <code>constr=TRUE</code>), deviation from
@@ -463,7 +464,7 @@ zero-centered (sum to zero <code>constr=TRUE</code>), deviation from
 with spatial structure described by the SPDE object called ‘spde’.
 Remember that if one wants to constrain this kind of spatial effect to
 integrate to zero, <code>constr=TRUE</code> should be added in the SPDE
-model definition rather than in the <code>label()</code> arguments. The
+model definition rather than in the <code><a href="http://maptools.r-forge.r-project.org/reference/maptools-deprecated.html" class="external-link">label()</a></code> arguments. The
 third <code>eps()</code> statement defines <span class="math inline">\(\epsilon_s\)</span> as an SVC for the effect of
 count effort, with spatial structure also described by the SPDE object.
 The weights for this spatially structured random slope are specified
@@ -518,13 +519,13 @@ spatial ranges of the spatially structured parameters.</p>
 <code class="sourceCode R"><span><span class="co"># view results</span></span>
 <span><span class="va">res</span><span class="op">$</span><span class="va">summary.hyperpar</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                              mean            sd</span></span>
-<span><span class="co">#&gt; Precision for kappa    2.21808931    0.43881612</span></span>
-<span><span class="co">#&gt; Range for alpha      940.49343516  290.61901428</span></span>
-<span><span class="co">#&gt; Stdev for alpha        1.93738372    0.37732769</span></span>
-<span><span class="co">#&gt; Range for eps       8472.48843609 6060.84317964</span></span>
-<span><span class="co">#&gt; Stdev for eps          0.40915058    0.24727705</span></span>
-<span><span class="co">#&gt; Range for tau        787.35965480  322.26974927</span></span>
-<span><span class="co">#&gt; Stdev for tau          0.06231681    0.01171061</span></span></code></pre></div>
+<span><span class="co">#&gt; Precision for kappa    2.21818206    0.43873922</span></span>
+<span><span class="co">#&gt; Range for alpha      941.08875600  290.89426592</span></span>
+<span><span class="co">#&gt; Stdev for alpha        1.93842112    0.37764570</span></span>
+<span><span class="co">#&gt; Range for eps       8436.39832336 6043.56090099</span></span>
+<span><span class="co">#&gt; Stdev for eps          0.41162069    0.25014900</span></span>
+<span><span class="co">#&gt; Range for tau        787.65916625  322.42532706</span></span>
+<span><span class="co">#&gt; Stdev for tau          0.06238187    0.01173881</span></span></code></pre></div>
 <p>Next we examine some summaries of the random effect estimates,
 starting with <span class="math inline">\(\exp(\alpha_s)\)</span>, which
 is effort-corrected relative abundance at year = 0 (1987), given 1 hour
@@ -532,7 +533,7 @@ of count effort (i.e., log[1]=0).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">alp</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span><span class="op">)</span> <span class="co"># exp(alpha) posterior median</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt;  0.06596  1.17553  3.37122  6.88691  8.45366 51.02031</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.06584  1.17503  3.37218  6.88826  8.45338 51.03923</span></span></code></pre></div>
 <p>Note that to avoid issues due to <span class="math inline">\(E[\exp(x)|y]\neq\exp[E(x|y)]\)</span>, we use the
 posterior median instead of the posterior mean.</p>
 <p>The summary for <span class="math inline">\(\epsilon_s\)</span> shows
@@ -541,15 +542,15 @@ space.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">eps</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="co"># epsilon</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.8178  0.9018  0.9718  0.9609  1.0229  1.0636</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.8178  0.9017  0.9717  0.9609  1.0229  1.0637</span></span></code></pre></div>
 <p>The <span class="math inline">\(\tau_s\)</span> summary shows how
 long-term, log-linear trends of robin relative abundance have varied
 across space, from annual decreases of around 10% to annual increases of
 around 10%.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">tau</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="co"># (exp(tau)-1)*100</span></span>
-<span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt; -12.5981  -4.6963  -1.4409  -0.9423   2.6868  10.7735</span></span></code></pre></div>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt; -12.602  -4.701  -1.441  -0.943   2.687  10.778</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="svc-maps">SVC maps<a class="anchor" aria-label="anchor" href="#svc-maps"></a>

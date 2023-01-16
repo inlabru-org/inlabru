@@ -54,6 +54,7 @@
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_residuals.html">LGCPs - Residuals</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
     <a class="dropdown-item" href="../../articles/component.html">Defining a model component</a>
@@ -100,7 +101,7 @@
                         <h4 data-toc-skip class="author">Finn
 Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-01-09</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-01-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/random_fields_2d.Rmd" class="external-link"><code>vignettes/web/random_fields_2d.Rmd</code></a></small>
       <div class="d-none name"><code>random_fields_2d.Rmd</code></div>
@@ -267,18 +268,18 @@ from the posterior distribution):</p>
 <p><img src="random_fields_2d_files/figure-html/unnamed-chunk-12-1.png" width="1152"></p>
 <p>Plot the SPDE parameter and fixed effect parameter posteriors.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">int.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"Intercept"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">int.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"Intercept"</span><span class="op">)</span></span>
 <span><span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span></span>
 <span><span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span></span>
-<span><span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span></span>
-<span><span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span></span>
+<span><span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span></span>
+<span><span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">range.plot</span>, <span class="va">var.plot</span>, <span class="va">int.plot</span><span class="op">)</span></span></code></pre></div>
 <p><img src="random_fields_2d_files/figure-html/unnamed-chunk-13-1.png" width="672"></p>
 <p>Look at the correlation function if you want to:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">corplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">covplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">corplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">covplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">covplot</span>, <span class="va">corplot</span><span class="op">)</span></span></code></pre></div>
 <p><img src="random_fields_2d_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
 <p>You can plot the median, lower 95% and upper 95% density surfaces as
