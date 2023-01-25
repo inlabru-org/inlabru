@@ -604,7 +604,7 @@ cprod <- function(...) {
     ips$weight <- ips$weight.x * ips$weight.y
     ips[["weight.x"]] <- NULL
     ips[["weight.y"]] <- NULL
-    row.names(ips) <- as.character(seq_len(NROW(ips)))
+    row.names(ips) <- as.character(seq_len(NROW(ips))) # Warning message: Setting row names on a tibble is deprecated.
   }
 
   # TODO Transform back to sp only if they are required. ips is a tibble sf tbl data.frame.
