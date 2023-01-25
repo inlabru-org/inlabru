@@ -522,6 +522,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' weights attached to it all weights are assumed to be 1.
 #'
 #' @aliases cprod
+#' @export
 #' @keywords internal
 #'
 #'
