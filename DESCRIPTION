@@ -62,7 +62,8 @@ Imports:
     sf,
     utils,
     withr,
-    lifecycle
+    lifecycle,
+    tibble
 Suggests:
     covr,
     dplyr,
