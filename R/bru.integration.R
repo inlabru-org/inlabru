@@ -527,6 +527,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #'
 #'
 #' @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
+#' TODO #### na.rm and user-defined weight argument
+#' @param na.rm logical; if `TRUE`, the rows with weight NA from the non-overlapping full_join will be removed; otherwise assumed to be weight 1. Default: `TRUE`
 #' @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
 #'
 #' @examples
@@ -545,13 +547,11 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' }
 #' }
 #'
-# Replace the function cprod in integration.R 20221218
-# TODO For sp, change sp to sf, do the full_join, change sp back. Onion structure. 20221229 half-done
-cprod <- function(...) {
+cprod <- function(..., na.rm = TRUE) {
   ipl <- list(...)
 
   # Transform sp to sf
-  # TODO make a test. and give a warning for NA outcome?
+  # TODO make a test. and give a warning for NA non-overlapping outcome?
   # check for each element, or on the subset, change only for sp anonymous function on lapply
   ipl_sp <- vapply(ipl, function(x) inherits(x, "Spatial"), TRUE)
   ipl[ipl_sp] <- lapply(ipl[ipl_sp], sf::st_as_sf)
@@ -577,7 +577,7 @@ cprod <- function(...) {
       ips2$weight <- 1
     }
 
-    # This line from the cprod handles the grouping already.
+    # This line from the cprod handles the grouping.
     by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
 
     # `sf::st_join` performs spatial join/filter; `dplyr::*_join` expects `x` of
@@ -585,8 +585,6 @@ cprod <- function(...) {
     # `dplyr::full_join` and turn it back to `sf` with active geometry as the ips1.
     # Z <- full_join(as_tibble(X), as_tibble(Y), by = "group")
     # st_as_sf(Z)
-    # they should be an option to deal with non-overlap 20221218 IT should GIVE A (WARNING) OR suggest WHAT TO DO
-    # look at the full_join operation for further information
     # https://stackoverflow.com/questions/64365792/dplyr-full-join-on-geometry-columns-of-sf-objects
     if (inherits(ips1, c("sf", "sfc")) ||
         inherits(ips2, c("sf", "sfc"))) {
@@ -595,34 +593,37 @@ cprod <- function(...) {
                                       tibble::as_tibble(ips2),
                                       by = by))
     } else {
-      ips <-
-        base::merge(ips1, ips2, by = by, all = TRUE) # all = TRUE for full_join
-      # TODO CONSDIER FULL JOIN INSTEAD OF MERGE TO REMOVE TIBBLE AND ST_AS_SF 20221218
-      dplyr::full_join(ips1, ips2, by = by)
+      ips <- dplyr::full_join(ips1, ips2, by = by) # equivalent to base::merge(ips1, ips2, by = by, all = TRUE)
     }
 
     ips$weight <- ips$weight.x * ips$weight.y
     ips[["weight.x"]] <- NULL
     ips[["weight.y"]] <- NULL
-    row.names(ips) <- as.character(seq_len(NROW(ips))) # Warning message: Setting row names on a tibble is deprecated.
+    tibble::remove_rownames(ips)
+    # row.names(ips) <- as.character(seq_len(NROW(ips))) # Warning message: Setting row names on a tibble is deprecated.
+  }
+
+  if (any(is.na(ips$weight))){
+    if(na.rm){
+      warning("Non-unique matches detected resulting in NA weight. These rows will be removed.")
+      ips <- na.omit(ips)
+    } else {
+      warning("Non-unique matches detected resulting in NA weight. These rows will be assumed to weight 1.")
+      ips$weight[is.na(ips$weight)] <- 1 # TODO what if weight = sthelse 20230126
+    }
   }
 
   # TODO Transform back to sp only if they are required. ips is a tibble sf tbl data.frame.
-  # i do not know which item index to revert back after merge. Hence, I revert the item back to sp.
-  # Error: '"/home/s1872841/inlabru"' is not an exported object from 'namespace:sp'
+  # It does not make sense to revert certain indices back after merging. Hence, I revert the entire object back to sp.
   if(any(ipl_sp)){
-    ips <-  sf::as_Spatial(ips) # WARNING SHOULD BE HERE, MORE FRIENDLY ERROR, METHOD ST_AS_SF
+    ips <-  sf::as_Spatial(ips)
+    # WARNING SHOULD BE HERE, MORE FRIENDLY ERROR, METHOD ST_AS_SF
     # TODO deprecated_soft warning for `sp` presence
-    lifecycle::deprecate_soft(
-      when = "2.7.0",
-      what = "inlabru::ipl_sp()", # ipl_sp() does not exisit but it does not allow mentioning deprecated function in another package
-      details = "Support for `sp` is gradually deprecated in favour of `sf` and `terra`"
-    )
-  }
-  # TODO a warning for NA outcome
-  if(any(is.na(ips$weight))){
-    warning("Non-unique matches detected resulting in NA weight. These rows will be removed.")
-    ips <- ips[!is.na(ips$weight)]
+    # lifecycle::deprecate_soft(
+    #   when = "2.7.0",
+    #   what = "inlabru::ipl_sp()", # ipl_sp() does not exist but it does not allow mentioning deprecated function in another package
+    #   details = "Support for `sp` is gradually deprecated in favour of `sf` and `terra`"
+    # )
   }
   ips
 }
