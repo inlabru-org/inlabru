@@ -214,12 +214,15 @@ apmaker <- function(domain = NULL, samplers = NULL,
   names_diff <- setdiff(setdiff(names_domain, names_samplers), weight)
   # Warn samplers without domain associated
   if(!is.null(names_diff %in% names_samplers)){
+    bru_log_smpdi(intersect(names_diff, names_samplers),
+                  start_with = "\n The unused samplers: \n")
     warning(paste0("Sampler(s) without associated domain(s): ",
             paste0(intersect(names_diff, names_samplers)), collapse = ","))
   }
   # Warn domains without associated samplers
   if(!is.null(names_diff %in% names_domain)){
     extra_domain <- intersect(names_diff, names_domains)
+    bru_log_smpdi(extra_domain, start_with = "\n The extra domain: \n")
     warning(paste0("Create sampler(s) for domain(s) without associated sampler(s): ",
             paste0(intersect(names_diff, names_samplers)), collapse = ","))
   }
@@ -232,13 +235,6 @@ apmaker <- function(domain = NULL, samplers = NULL,
     samplers_domain <- setdiff(intersect(names_samplers, names_domain), "weight")
     # TODO for the NULL name case
     bru_log_smpdi(samplers_domain, start_with = "\n The shared samplers and domain: \n")
-  }
-  # Domain should be more than samplers. However, we can have unused samplers as well.
-  else if (length(samplers) > length(domain)) {
-    unused_samplers <- setdiff(names_samplers, names_domain)
-    bru_log_smpdi(unused_samplers, start_with = "\n The unused samplers: \n")
-  } else {
-    bru_log_smpdi(extra_domain, start_with = "\n The extra domain: \n")
   }
 
   # log the active geometry of the samplers
