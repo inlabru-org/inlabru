@@ -20,8 +20,7 @@ fm_has_PROJ6 <- function() {
 #' features even though PROJ6 is available
 
 fm_not_for_PROJ6 <- function(fun = NULL) {
-  # TODO: deprecate_warn
-  lifecycle::deprecate_stop("2.7.1",
+  lifecycle::deprecate_warn("2.7.1",
     "fm_not_for_PROJ6()",
     details = c(x = "rgdal/PROJ4 is no longer supported.")
   )
