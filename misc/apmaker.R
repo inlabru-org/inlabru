@@ -119,25 +119,12 @@ apmaker <- function(domain = NULL, samplers = NULL,
     warning("Domain argument(s) NULL. Sampler is used to create the domain")
   }
 
-  # https://stackoverflow.com/questions/38539654/how-to-know-if-the-data-is-a-list-or-data-frame-in-r
-  # Turn data frame into a list (standardise the input class)
-  # TODO some element do not have names, did it happen or does it happen?
-  # simple and known defect if happen
-  if (inherits(domain, "list")) {
-    # domain_is_list <- TRUE
-    # If domain is a list, it must be a named list.
-    if (is.null(names(domain))) {
-      stop("Domain must be a named list.")
-    }
-  } else {
-    # domain_is_list <- FALSE
-    domain <- list(domain)
+  if (!inherits(domain, "list") ||
+      is.null(names(domain))) {
+    stop("Domain must be a named list.")
   }
 
-  if (inherits(samplers, "list")) {
-    # sampler_is_list <- TRUE
-  } else {
-    # sampler_is_list <- FALSE
+  if (!inherits(samplers, "list")) {
     samplers <- list(samplers)
   }
 
