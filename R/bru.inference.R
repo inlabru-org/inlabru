@@ -781,7 +781,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     ips_is_Spatial <- inherits(ips, "Spatial")
     if (ips_is_Spatial) {
       ips_coordnames <- sp::coordnames(ips)
-      ips_crs <- fm_sp_get_crs(ips)
+      ips_crs <- fm_CRS(ips)
       # For backwards compatibility:
       data_crs <- fm_CRS(fm_crs(data))
 

@@ -130,7 +130,7 @@ flowchart TD
   eval_spatial["eval_spatial"]
   eval_coordinates["SpatialPoints(value, crs)"]
   style eval_coordinates color:#f00
-  eval_crs["crs=fm_sp_get_crs(.data.)"]
+  eval_crs["crs=fm_CRS(.data.)"]
 
   res{"Type of<br/>result"}
   null_on_fail{"null_on_fail?"}

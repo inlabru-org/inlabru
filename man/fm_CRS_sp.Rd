@@ -116,28 +116,12 @@ When \code{oblique[2]} or \code{oblique[3]} are non-zero, the resulting
 projection is only correct for perfect spheres.
 }
 \examples{
-
-if (require(rgdal)) {
-  if (fm_has_PROJ6()) {
-    crs1 <- fm_CRS("longlat_globe")
-    crs2 <- fm_CRS("lambert_globe")
-    crs3 <- fm_CRS("mollweide_norm")
-    crs4 <- fm_CRS("hammer_globe")
-    crs5 <- fm_CRS("sphere")
-    crs6 <- fm_CRS("globe")
-  } else {
-    # Old definitions for pre-PROJ6:
-    # Old radius-1 projections have a added "_norm" in the PROJ6 version of
-    # the fm_CRS() predefined projections. They are detected and converted
-    # to the new versions when RPOJ6 is available.
-    crs1 <- fm_CRS("longlat") # PROJ6: longlat_norm
-    crs2 <- fm_CRS("lambert") # PROJ6: lambert_norm
-    crs3 <- fm_CRS("mollweide") # PROJ6: mollweide_norm
-    crs4 <- fm_CRS("hammer") # PROJ6: hammer_norm
-    crs5 <- fm_CRS("sphere")
-    crs6 <- fm_CRS("globe")
-  }
-}
+crs1 <- fm_CRS("longlat_globe")
+crs2 <- fm_CRS("lambert_globe")
+crs3 <- fm_CRS("mollweide_norm")
+crs4 <- fm_CRS("hammer_globe")
+crs5 <- fm_CRS("sphere")
+crs6 <- fm_CRS("globe")
 }
 \seealso{
 \code{\link[sp:CRS-class]{sp::CRS()}}, \code{\link{fm_crs_wkt}},

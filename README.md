@@ -95,7 +95,7 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_22.11.28-1 built 2022-11-28 08:04:58 UTC.
+#> This is INLA_22.12.16 built 2022-12-16 14:25:20 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
@@ -138,8 +138,4 @@ ggplot() +
   ggtitle("Nest intensity per km squared")
 ```
 
-<img src="man/figures/README-example-1.png" width="100%" /> If you have
-an R installation with PROJ6/GDAL3, and INLA \>= 20.06.18, and loading
-old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
-method on them before they are fully usable. The data objects in
-`inlabru` have been updated, so should not need this conversion anymore.
+<img src="man/figures/README-example-1.png" width="100%" />

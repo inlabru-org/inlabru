@@ -414,19 +414,22 @@ the stored values. In such cases, we can define a function that knows how to
 evaluate the covariate at arbitrary points in the survey region, and call that
 function in the component definition. In this case, we can use a powerful
 method from the 'sp' package to do this. We use this to create the needed
-function.
+function.  NOTE: There is a new method `eval_spatial()` that handles this
+automatically, and supports `terra` `SpatRaster` and `sf` geometry points
+objects, and mismatching coordinate systems as well.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-f.elev <- function(x, y) {
+f.elev <- function(xy) {
   # turn coordinates into SpatialPoints object:
   # with the appropriate coordinate reference system (CRS)
-  spp <- SpatialPoints(data.frame(x = x, y = y), proj4string = fm_sp_get_crs(elev))
-  proj4string(spp) <- fm_sp_get_crs(elev)
+  spp <- SpatialPoints(data.frame(x = xy[, 1], y = xy[, 2]),
+    proj4string = fm_CRS(elev)
+  )
   # Extract elevation values at spp coords, from our elev SpatialGridDataFrame
   v <- over(spp, elev)
   if (any(is.na(v$elevation))) {
-    v$elevation <- inlabru:::bru_fill_missing(elev, spp, v$elevation)
+    v$elevation <- bru_fill_missing(elev, spp, v$elevation)
   }
   return(v$elevation)
 }
@@ -443,7 +446,7 @@ matern <- inla.spde2.pcmatern(mesh,
   prior.range = c(5, 0.01)
 )
 
-ecomp <- coordinates ~ elev(f.elev(x, y), model = "linear") +
+ecomp <- coordinates ~ elev(f.elev(coordinates(.data.)), model = "linear") +
   mySmooth(coordinates, model = matern) + Intercept(1)
 ```
 
@@ -454,7 +457,7 @@ vegetation(gcov$vegetation, model = "factor_full")
 ```
 whereas with the function method we specify the covariate like this:
 ```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
-elev(f.elev(x, y), model = "linear")
+elev(f.elev(coordinates(.data.)), model = "linear")
 ```
 
 We also now include an intercept term.

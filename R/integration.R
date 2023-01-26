@@ -523,7 +523,7 @@ integration_weight_aggregation <- function(mesh, integ) {
   if (inherits(integ, "SpatialPointsDataFrame")) {
     sp::SpatialPointsDataFrame(mesh$loc[ok, , drop = FALSE],
       data = data.frame(weight = weight[ok]),
-      proj4string = fm_sp_get_crs(integ),
+      proj4string = fm_CRS(integ),
       match.ID = FALSE
     )
   } else {

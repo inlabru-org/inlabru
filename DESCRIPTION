@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.7.0.9001
+Version: 2.7.0.9002
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -26,7 +26,9 @@ Authors@R: c(
   person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
          comment = "Pierre Roudier contributed general quantile summaries"),
   person("Meehan", "Tim", email = "tmeeha@gmail.com", role = c("ctb", "cph"),
-         comment = "Tim Meehan contributed the SVC vignette and robins data")
+         comment = "Tim Meehan contributed the SVC vignette and robins data"),
+  person("Reddy Peddinenikalva", "Niharika", role = c("ctb", "cph"),
+         comment = "Niharika Peddinenikalva contributed the LGCP residuals vignette")
   )
 URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/
 BugReports: https://github.com/inlabru-org/inlabru/issues
@@ -44,7 +46,7 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 Depends:
     methods,
@@ -57,7 +59,6 @@ Imports:
     Matrix,
     patchwork,
     plyr,
-    rgdal (>= 1.5.8),
     rlang,
     sf,
     utils,
@@ -73,10 +74,10 @@ Suggests:
     INLA (>= 21.08.31),
     knitr,
     maps,
-    maptools,
     mgcv,
     raster,
     RColorBrewer,
+    rgdal,
     rgl,
     rmarkdown,
     scales,
@@ -88,6 +89,7 @@ Suggests:
     sphereplot,
     splancs,
     terra,
+    tidyterra,
     testthat,
     tidyr,
     DiagrammeR
@@ -96,12 +98,10 @@ Config/testthat/parallel: true
 Config/testthat/edition: 3
 Collate: 
     '0_inlabru_envir.R'
-    'bru.covariate.R'
     'bru.gof.R'
     'bru.inference.R'
     'bru.integration.R'
     'bru.spatial.R'
-    'covariate.R'
     'data.Poisson1_1D.R'
     'data.Poisson2_1D.R'
     'data.Poisson3_1D.R'
@@ -138,7 +138,6 @@ Collate:
     'rgl.R'
     'sampling.R'
     'sf_utils.R'
-    'shapefile.R'
     'spatstat.R'
     'spde.R'
     'stack.R'

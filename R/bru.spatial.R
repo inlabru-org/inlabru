@@ -177,29 +177,8 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NUL
 #' @param crs Coordinate reference system to change to
 #' @return `stransform`
 #'
-#' @examples
-#' \donttest{
-#' # Load Gorilla data
-#' data("gorillas", package = "inlabru")
-#'
-#' # Take the mesh and transform it to latitude/longitude
-#' tmesh <- stransform(gorillas$mesh, crs = CRS("+proj=longlat"))
-#'
-#' # Compare original and transformed mesh
-#'
-#' if (require(ggplot2, quietly = TRUE)) {
-#'   multiplot(
-#'     ggplot() +
-#'       gg(gorillas$mesh) +
-#'       ggtitle("Original mesh"),
-#'     ggplot() +
-#'       gg(tmesh) +
-#'       ggtitle("Transformed mesh")
-#'   )
-#' }
-#' }
-#'
 stransform <- function(splist, crs) {
-  lifecycle::deprecate_warn("2.7.0", "stransform()", "fm_transform()")
+  # TODO: deprecate_warn
+  lifecycle::deprecate_stop("2.7.0", "stransform()", "fm_transform()")
   fm_transform(splist, crs = crs)
 }

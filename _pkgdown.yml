@@ -31,6 +31,8 @@ navbar:
         href: articles/web/2d_lgcp_multilikelihood.html
       - text: LGCPs - An example in space and time
         href: articles/web/2d_lgcp_spatiotemporal.html
+      - text: LGCPs - Residuals
+        href: articles/web/2d_lgcp_residuals.html
       - text: ---
       - text: Concepts
       - text: Defining a model component
