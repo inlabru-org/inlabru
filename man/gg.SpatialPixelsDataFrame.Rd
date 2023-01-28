@@ -81,6 +81,7 @@ Requires the \code{ggplot2} package.
 }
 \seealso{
 Other geomes for spatial data: 
+\code{\link{gg.SpatRaster}()},
 \code{\link{gg.SpatialGridDataFrame}()},
 \code{\link{gg.SpatialLines}()},
 \code{\link{gg.SpatialPixels}()},

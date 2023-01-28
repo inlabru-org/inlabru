@@ -34,6 +34,7 @@ if (require("ggplot2", quietly = TRUE)) {
 }
 \seealso{
 Other geomes for spatial data: 
+\code{\link{gg.SpatRaster}()},
 \code{\link{gg.SpatialGridDataFrame}()},
 \code{\link{gg.SpatialLines}()},
 \code{\link{gg.SpatialPixelsDataFrame}()},

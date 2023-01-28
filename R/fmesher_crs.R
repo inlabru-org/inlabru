@@ -20,8 +20,7 @@ fm_has_PROJ6 <- function() {
 #' features even though PROJ6 is available
 
 fm_not_for_PROJ6 <- function(fun = NULL) {
-  # TODO: deprecate_warn
-  lifecycle::deprecate_stop("2.7.1",
+  lifecycle::deprecate_warn("2.7.1",
     "fm_not_for_PROJ6()",
     details = c(x = "rgdal/PROJ4 is no longer supported.")
   )
@@ -101,8 +100,7 @@ fm_as_sp_crs <- function(x, ...) {
 #' @export
 
 fm_sp_get_crs <- function(x) {
-  # TODO: deprecate_warn
-  lifecycle::deprecate_stop("2.7.1", "fm_sp_get_crs()", "fm_CRS()")
+  lifecycle::deprecate_warn("2.7.1", "fm_sp_get_crs()", "fm_CRS()")
   fm_CRS(x)
 }
 
@@ -354,7 +352,7 @@ fm_crs_set_ellipsoid_radius <- function(crs, radius) {
 
 
 
-#' @param crs A `sp::CRS` or `inla.CRS` object
+#' @param crs An `sf::crs`, `sp::CRS`, `fm_crs` or `inla.CRS` object
 #' @param wkt A WKT2 character string
 #' @param unit character, name of a unit. Supported names are
 #' "metre", "kilometre", and the aliases "meter", "m", International metre",
@@ -369,13 +367,13 @@ fm_crs_set_ellipsoid_radius <- function(crs, radius) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @examples
 #' \dontrun{
-#' c1 <- fm_CRS("globe")
+#' c1 <- fm_crs("globe")
 #' fm_crs_get_lengthunit(c1)
-#' c2 <- fm_crs_set_lengthunit(c1, "km")
+#' c2 <- fm_crs_set_lengthunit(c1, "m")
 #' fm_crs_get_lengthunit(c2)
 #' }
 #' @export
-#' @seealso [fm_sp_get_crs()]
+#' @seealso [fm_crs()]
 #' @aliases fm_crs_wkt
 #' @rdname fm_crs_wkt
 
@@ -769,6 +767,14 @@ fm_crs.character <- function(x, ..., crsonly = FALSE) {
   predef <- fm_wkt_predef()
   if (x %in% names(predef)) {
     x <- predef[[x]]
+    # Would like nicer proj4string/input display.
+    # Possible approach: sf::st_crs(as(sf::st_crs(x), "CRS"))
+    # Borrowing from the sf::CRS_from_crs code:
+    y <- sf::st_crs(x, ...)
+    x <- y$proj4string
+    if (is.na(x)) {
+      return(y)
+    }
   }
   sf::st_crs(x, ...)
 }
@@ -1062,7 +1068,7 @@ fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
     if (!is.null(projargs)) {
       warning("SRS_string specified. Ignoring non-null projargs.")
     }
-    x <- sp::CRS(SRS_string = SRS_string, doCheckCRSArgs = doCheckCRSArgs)
+    x <- as(sf::st_crs(SRS_string), "CRS")
   } else if (inherits(projargs, "CRS")) {
     x <- projargs
   } else {

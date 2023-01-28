@@ -220,7 +220,7 @@ eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
     if (ncol(sp::coordinates(where)) >= 3) {
       where <- sp::SpatialPoints(
         coords = sp::coordinates(where)[, 1:2, drop = FALSE],
-        proj4string = fm_sp_get_crs(where)
+        proj4string = fm_CRS(where)
       )
     }
   }
