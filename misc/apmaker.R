@@ -36,29 +36,32 @@
 #'   }
 #' }
 
-# bru_log_smpdi function ---------------------------------------------------------
+# TODO 20220126should not be a S3 but local function and function name should be clearer
+# bru_log_list function ---------------------------------------------------------
 # How does sf deal with secondary geometry columns?
 # TODO ####
 # TODO have to deal with the multidomain samplers
 # https://r-spatial.github.io/sf/articles/sf6.html
 # TODO #### extra domains we assign the sampler for them
-# TODO can use local helper function (with S3 Usemethod() maybe)
-#' @param begin the beginning part of the message
-bru_log_smpdi <- function(x, start_with = NULL, ...) {
-  UseMethod("bru_log_smpdi")
-}
-bru_log_smpdi.list <- function(x, start_with) {
+#TODO can use local helper function (with S3 Usemethod() maybe)
+
+# @param start_with The message starts with
+# @param end_with The message ends with
+# @verbosity Default: 2
+# @ verbose_store Default: T
+bru_log_list <- function(x, attr_names="sf_column", start_with=NULL, end_with=NULL) {
   for (i in seq_along(x)) {
-    bru_log_message(
+    # bru_log_message(
       paste0(
         start_with,
-        x[i],
-        " are ",
-        attr(x[i], "sf_column"),
+        i,
+        " is/are ",
+        attr(x[[i]], attr_names),
+        end_with,
         ".\n"
-      ),
-      verbosity = 2, verbose_store = T
-    )
+      ) #,
+      # verbosity = 2, verbose_store = T
+    # )
   }
 }
 
@@ -71,6 +74,7 @@ bru_log_smpdi.list <- function(x, start_with) {
 #' coordinates object, used for the spatial aspect of the `samplers` object.
 #' @param samplers A (list of) `[sf]DataFrame` or
 #' `Spatial[Points/Lines/Polygons]DataFrame` object(s)
+#' @param response Name(s) of the responses. deprecated: dnames
 #' @param weight The name of integration weight column in the samplers. Default: `weight`
 #' TODO 1) how about domain? should not be allowed.
 #' 2) allow_names should be bru_weight? 23112022 Only for samplers
@@ -82,7 +86,7 @@ bru_log_smpdi.list <- function(x, start_with) {
 #' @return Integration points
 
 # TODO option argument as in bru function with list() bru_int_args
-apmaker <- function(domain = NULL, samplers = NULL,
+apmaker <- function(domain = NULL, samplers = NULL, response,
                     weight = "weight",
                     int.args = list(method = "stable", nsub = NULL)) {
   # To allow sf geometry support, should likely change the logic to
@@ -111,7 +115,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
     stop("Domain argument(s) missing.")
   }
   # Mandate one of domain and samplers to be non-NULL
-  # 20221213 ??? leave it for now for backward compatibility
+  # TODO 20221213 leave it for now for backward compatibility
   if (is.null(domain)) {
     if (is.null(samplers)) {
       stop("Domain and samplers argument(s) NULL.")
@@ -182,7 +186,6 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # }
 
   # Change a mix of sp and sf objects to sf
-  # do sth extra, convert only sp to sf not neither; otherwise character to sf DONE 20220126
   sf_samplers <- unlist(lapply(samplers, function(x) inherits(x, c("sf", "sfc"))))
   sp_samplers <- unlist(lapply(samplers, function(x) inherits(x, "Spatial")))
   if (sp_samplers && sf_samplers) {
@@ -190,28 +193,38 @@ apmaker <- function(domain = NULL, samplers = NULL,
     samplers[sp_samplers] <- lapply(samplers[sp_samplers], sf::st_as_sf)
   }
 
-  # TODO Sort multidomain samplers, single domain samplers,
+  # TODO 20220126 lapply to extract the names, the current one is not sufficient
+  # TODO Sort multidomain samplers, single domain samplers
   # TODO Multidomain samplers happens when a sampler across several domains. How to detect that?
   # TODO we should then do the name check for domain and samplers here
   # TODO remove sampler domains and full domain samplers
-  # For multidomain sampler, the main thing is data aka dname 23112022 specific column has that meaning
+  # For multidomain sampler, the main thing is data aka dname 23112022
+  # specific column has that meaning, how to find the response?
   names_domain <- names(domain)
   names_samplers <- names(samplers)
-  # Store the names in domain but not in samplers and is not named as `weight`
-  names_diff <- setdiff(setdiff(names_domain, names_samplers), weight)
+  names_response <- names(response)
+
+  # Names setdiff and intersect between domain and samplers and are not named as
+  # either `names_response`, `geometry`, `weight`
+  names_setdiff <- setdiff(setdiff(names_domain, names_samplers),
+                        c(names_response, "geometry", weight))
+  names_intersect <- setdiff(intersect(names_domain, names_samplers),
+                        c(names_response, "geometry", weight))
+
   # Warn samplers without domain associated
-  if(!is.null(names_diff %in% names_samplers)){
-    bru_log_smpdi(intersect(names_diff, names_samplers),
+  if(!is.null(names_setdiff %in% names_samplers)){
+    bru_log_list(inames_intersect,
                   start_with = "\n The unused samplers: \n")
     warning(paste0("Sampler(s) without associated domain(s): ",
-            paste0(intersect(names_diff, names_samplers)), collapse = ","))
+            paste0(names_intersect), collapse = ","))
   }
+  # Store the names in domain but not in samplers
   # Warn domains without associated samplers
-  if(!is.null(names_diff %in% names_domain)){
-    extra_domain <- intersect(names_diff, names_domains)
-    bru_log_smpdi(extra_domain, start_with = "\n The extra domain: \n")
+  if(!is.null(names_setdiff %in% names_domain)){
+    extra_domain <- intersect(names_setdiff, names_domains)
+    bru_log_list(extra_domain, start_with = "\n The extra domain: \n", "names")
     warning(paste0("Create sampler(s) for domain(s) without associated sampler(s): ",
-            paste0(intersect(names_diff, names_samplers)), collapse = ","))
+            paste0(names_intersect), collapse = ","))
   }
 
   # Check if the names of samplers and domains match. How to establish the link
@@ -221,13 +234,14 @@ apmaker <- function(domain = NULL, samplers = NULL,
     # TODO have to accommodate weight column in samplers as well, omit this column
     samplers_domain <- setdiff(intersect(names_samplers, names_domain), "weight")
     # TODO for the NULL name case
-    bru_log_smpdi(samplers_domain, start_with = "\n The shared samplers and domain: \n")
+    bru_log_list(samplers_domain, start_with = "\n The shared samplers and domain: \n")
   }
 
   # log the active geometry of the samplers
-  if (sf_samplers) {
-    bru_log_smpdi(samplers,
-      start_with = "The active geometry of the sampler(s)"
+  # TODO 20220126 when sf_samplers is a vector, if clause does not work
+  if (any(sf_samplers)) {
+    bru_log_list(samplers[sf_samplers],
+      start_with = "The active geometry of the sampler(s) "
     )
   }
 
