@@ -14,6 +14,8 @@
   
 * Change rgl.* functions to *3d. Thanks to Duncan Murdoch #181
 
+* Speed up `ibm_jacobian.bru_mapper_harmonics` for large models
+
 # inlabru 2.7.0
 
 ## Feature overview
