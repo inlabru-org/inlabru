@@ -2925,8 +2925,9 @@ ibm_n.bru_mapper_harmonics <- function(mapper, inla_f = FALSE, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_harmonics <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
-  # Indexing into Matrix is slower than into matrix, so wait until the end to convert
-  A <- matrix(0.0, NROW(input), ibm_n(mapper))
+  # Indexing into sparseMatrix is slower than into a dense Matrix,
+  # so make sure we create a dense Matrix
+  A <- Matrix::Matrix(1.0, NROW(input), ibm_n(mapper))
   off <- 0
   if (mapper[["intercept"]]) {
     A[, 1] <- 1.0 * mapper[["scaling"]][1]
@@ -2942,5 +2943,5 @@ ibm_jacobian.bru_mapper_harmonics <- function(mapper, input, state = NULL, inla_
       off <- off + 2
     }
   }
-  as(A, "Matrix")
+  A
 }
