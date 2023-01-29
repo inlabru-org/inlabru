@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,6 +82,7 @@
 <li><p>Remove PROJ4 support <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
 <li><p>Warning: Coordinate names for <code>Spatial*</code> objects have been inconsistently available in the predictor expression evaluation. Avoid relying on those being present, and use explicit calls to <code>coordinates(.data.)</code> if you need the coordinate values (e.g. for custom spatial covariate evaluation.). When possible, use the built-in covariate evaluation method, <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>, either implicitly with <code>comp(covariate, ...)</code> or explicitly, <code>comp(eval_spatial(covariate, where = .data.), ...)</code>.</p></li>
 <li><p>Change rgl.* functions to *3d. Thanks to Duncan Murdoch <a href="https://github.com/inlabru-org/inlabru/issues/181" class="external-link">#181</a></p></li>
+<li><p>Speed up <code>ibm_jacobian.bru_mapper_harmonics</code> for large models</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.7.0" id="inlabru-270">inlabru 2.7.0<a class="anchor" aria-label="anchor" href="#inlabru-270"></a></h2><p class="text-muted">CRAN release: 2022-12-02</p>
