@@ -91,9 +91,25 @@ for (ord in ords) {
 timings <- do.call(rbind, lapply(timings, function(x) do.call(rbind, x)))
 timings$order <- as.character(timings$ord)
 
+pv <- profvis::profvis({
+  for (ord in ords) {
+    m <- bru_mapper_harmonics(ord)
+    for (Ni in seq_along(NN)) {
+      N <- NN[Ni]
+      input <- seq(0, 1, length.out = N)
+      A_sM <- ibm_jacobian.bru_mapper_harmonics.sparseMatrix(m, input = input)
+      A_M <- ibm_jacobian.bru_mapper_harmonics.Matrix(m, input = input)
+      A_m <- ibm_jacobian.bru_mapper_harmonics.matrix(m, input = input)
+    }
+  }
+})
+
 library(ggplot2)
 ggplot(timings, aes(N, 1/`itr/sec`, col = expression, shape = order)) +
   geom_point() +
   scale_x_log10() +
   scale_y_log10() +
   ylab("sec/itr")
+
+htmlwidgets::saveWidget(pv, "misc/profile.html")
+browseURL("misc/profile.html")
