@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,7 +85,16 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">eval_spatial</span><span class="op">(</span><span class="va">data</span>, <span class="va">where</span>, layer <span class="op">=</span> <span class="cn">NULL</span>, selector <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for Spatial</span></span>
+<span><span class="co"># S3 method for SpatialPolygonsDataFrame</span></span>
+<span><span class="fu">eval_spatial</span><span class="op">(</span><span class="va">data</span>, <span class="va">where</span>, layer <span class="op">=</span> <span class="cn">NULL</span>, selector <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for SpatialPixelsDataFrame</span></span>
+<span><span class="fu">eval_spatial</span><span class="op">(</span><span class="va">data</span>, <span class="va">where</span>, layer <span class="op">=</span> <span class="cn">NULL</span>, selector <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for SpatialGridDataFrame</span></span>
+<span><span class="fu">eval_spatial</span><span class="op">(</span><span class="va">data</span>, <span class="va">where</span>, layer <span class="op">=</span> <span class="cn">NULL</span>, selector <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sf</span></span>
 <span><span class="fu">eval_spatial</span><span class="op">(</span><span class="va">data</span>, <span class="va">where</span>, layer <span class="op">=</span> <span class="cn">NULL</span>, selector <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for SpatRaster</span></span>
@@ -95,7 +104,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>data</dt>
-<dd><p>Spatial grid-like data</p></dd>
+<dd><p>Spatial data</p></dd>
 
 
 <dt>where</dt>
@@ -104,7 +113,7 @@
 
 <dt>layer</dt>
 <dd><p>Which <code>data</code> layer to extract (as integer or character).
-May be a vector, specifying a separate layer for each <code>where</code> point.</p></dd>
+May be a vector, specifying a separate layer for each <code>where</code> item.</p></dd>
 
 
 <dt>selector</dt>
@@ -112,6 +121,13 @@ May be a vector, specifying a separate layer for each <code>where</code> point.<
 information.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="methods-by-class-">Methods (by class)<a class="anchor" aria-label="anchor" href="#methods-by-class-"></a></h2>
+    
+<ul><li><p><code>eval_spatial(SpatialPolygonsDataFrame)</code>: Compatibility wrapper for <code>eval_spatial.sf</code></p></li>
+<li><p><code>eval_spatial(sf)</code>: Supports point-in-polygon information lookup.
+Other combinations are untested.</p></li>
+</ul></div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

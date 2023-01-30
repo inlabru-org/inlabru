@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -232,8 +232,8 @@ nest types were observed within the same window:</p>
 <p><img src="2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.7.0.9003</span></span>
-<span><span class="co">#&gt; INLA version: 23.01.12</span></span>
+<span><span class="co">#&gt; inlabru version: 2.7.0.9004</span></span>
+<span><span class="co">#&gt; INLA version: 23.01.31</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; Common: main = spde(coordinates)</span></span>
 <span><span class="co">#&gt; Difference: main = spde(coordinates)</span></span>
@@ -246,7 +246,7 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.27, Running = 86.3, Post = 0.132, Total = 87.7 </span></span>
+<span><span class="co">#&gt;     Pre = 1.27, Running = 97.1, Post = 0.127, Total = 98.5 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; Intercept -0.349 1.351     -2.998   -0.349      2.299 -0.349   0</span></span>
@@ -260,7 +260,7 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
 <span><span class="co">#&gt; Range for Common     2.989 0.722      1.870     2.89      4.686 2.680</span></span>
 <span><span class="co">#&gt; Stdev for Common     2.065 0.415      1.390     2.02      3.015 1.914</span></span>
-<span><span class="co">#&gt; Range for Difference 1.919 1.330      0.628     1.54      5.478 1.070</span></span>
+<span><span class="co">#&gt; Range for Difference 1.919 1.331      0.628     1.54      5.479 1.070</span></span>
 <span><span class="co">#&gt; Stdev for Difference 0.141 0.069      0.041     0.13      0.304 0.103</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 589.25</span></span>
@@ -276,8 +276,8 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.7.0.9003</span></span>
-<span><span class="co">#&gt; INLA version: 23.01.12</span></span>
+<span><span class="co">#&gt; inlabru version: 2.7.0.9004</span></span>
+<span><span class="co">#&gt; INLA version: 23.01.31</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; Common: main = spde(coordinates)</span></span>
 <span><span class="co">#&gt; Difference: main = spde(coordinates)</span></span>
@@ -290,7 +290,7 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.04, Running = 21.8, Post = 0.13, Total = 23 </span></span>
+<span><span class="co">#&gt;     Pre = 1.06, Running = 22.6, Post = 0.108, Total = 23.8 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span></span>
 <span><span class="co">#&gt; Intercept -0.35 1.372      -3.04    -0.35      2.339 -0.35   0</span></span>
@@ -304,7 +304,7 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
 <span><span class="co">#&gt; Range for Common     2.983 0.657      1.937    2.899      4.510 2.726</span></span>
 <span><span class="co">#&gt; Stdev for Common     2.055 0.353      1.466    2.018      2.850 1.939</span></span>
-<span><span class="co">#&gt; Range for Difference 1.662 1.086      0.501    1.372      4.523 0.984</span></span>
+<span><span class="co">#&gt; Range for Difference 1.662 1.087      0.501    1.372      4.524 0.984</span></span>
 <span><span class="co">#&gt; Stdev for Difference 0.148 0.079      0.039    0.134      0.339 0.101</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 587.71</span></span>
