@@ -64,8 +64,9 @@ ibm_jacobian.bru_mapper_harmonics.matrix <- function(mapper, input, state = NULL
 
 library(inlabru)
 NN <- c(10, 100, 1000, 10000, 10000, 100000)
+ords <- 1:5
 timings <- list()
-for (ord in 1:5) {
+for (ord in ords) {
   timings[[ord]] <- list()
   m <- bru_mapper_harmonics(ord)
   for (Ni in seq_along(NN)) {
