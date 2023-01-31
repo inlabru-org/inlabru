@@ -1,40 +1,40 @@
-#' #' A S3/S4 generic function to generate stop warning if the object of some class
-#' #'  is not of the specified classes.
-#' #' @param  object An object except NULL
-#' #' @param class A vector of class(es) except NULL
-#' #' @keywords internal
-#' #'
-#' stopifnot_class <- function(object = NULL, class = NULL, ...) {
-#'   # 20221208 Probably better to leave out NULL and missing class in this
-#'   # function, though it deals with it
-#'   class_name <- paste0(sort(class), collapse = ",")
-#'   obj_name <- paste0(as.character(expression(object)))
-#'   UseMethod("stopifnot_class")
-#' }
-#' stopifnot_class.default <- function(object, class) {
-#'   if (!inherits(object, class)) {
-#'     stop(paste0(
-#'       obj_name,
-#'       " of class ",
-#'       paste0(class(object), collapse = ","),
-#'       "must be of class(es) ",
-#'       class_name
-#'     ))
-#'   }
-#' }
-#' stopifnot_class.list <- function(object, class) {
-#'   if (!all(unlist(lapply(object, function(x) {
-#'     inherits(x, class)
-#'   })))) {
-#'     stop(paste0(
-#'       obj_name,
-#'       " of class ",
-#'       paste0(unlist(lapply(object, class)), collapse = ","), # TODO more complicated
-#'       "must be of class(es) ",
-#'       class_name
-#'     ))
-#'   }
-#' }
+#' A S3/S4 generic function to generate stop warning if the object of some class
+#'  is not of the specified classes.
+#' @param  object An object except NULL
+#' @param class A vector of class(es) except NULL
+#' @keywords internal
+#'
+# stopifnot_class <- function(object = NULL, class = NULL, ...) {
+#   # 20221208 Probably better to leave out NULL and missing class in this
+#   # function, though it deals with it
+#   class_name <- paste0(sort(class), collapse = ",")
+#   obj_name <- paste0(as.character(expression(object)))
+#   UseMethod("stopifnot_class")
+# }
+# stopifnot_class.default <- function(object, class) {
+#   if (!inherits(object, class)) {
+#     stop(paste0(
+#       obj_name,
+#       " of class ",
+#       paste0(class(object), collapse = ","),
+#       "must be of class(es) ",
+#       class_name
+#     ))
+#   }
+# }
+# stopifnot_class.list <- function(object, class) {
+#   if (!all(unlist(lapply(object, function(x) {
+#     inherits(x, class)
+#   })))) {
+#     stop(paste0(
+#       obj_name,
+#       " of class ",
+#       paste0(unlist(lapply(object, class)), collapse = ","), # TODO more complicated
+#       "must be of class(es) ",
+#       class_name
+#     ))
+#   }
+# }
 
 # TODO 20220126should not be a S3 but local function and function name should be clearer
 # bru_log_list function ---------------------------------------------------------
@@ -43,15 +43,15 @@
 # TODO have to deal with the multidomain samplers
 # https://r-spatial.github.io/sf/articles/sf6.html
 # TODO #### extra domains we assign the sampler for them
-#TODO can use local helper function (with S3 Usemethod() maybe)
+# TODO can use local helper function (with S3 Usemethod() maybe)
 
 # @param start_with The message starts with
 # @param end_with The message ends with
 # @verbosity Default: 2
 # @ verbose_store Default: T
-bru_log_list <- function(x, attr_names="sf_column", start_with=NULL, end_with=NULL) {
+bru_log_list <- function(x, attr_names = "sf_column", start_with = NULL, end_with = NULL) {
   for (i in seq_along(x)) {
-    # bru_log_message(
+    bru_log_message(
       paste0(
         start_with,
         i,
@@ -59,11 +59,29 @@ bru_log_list <- function(x, attr_names="sf_column", start_with=NULL, end_with=NU
         attr(x[[i]], attr_names),
         end_with,
         ".\n"
-      ) #,
-      # verbosity = 2, verbose_store = T
-    # )
+      ),
+      verbosity = 2, verbose_store = T
+    )
   }
 }
+
+# TODO Extend S3 method with names.list???
+# https://stackoverflow.com/questions/18513607/how-to-extend-s3-method-from-another-package-without-loading-the-package
+# to deal with samplers names in a dataframe 20230126
+# 1) do I need the names of the list or the names within the list(s)?
+# 2) Does column names mean sth here?
+# 3) What to do with NULL cases, aka unamed list?
+#' @name names
+#' @export names.list
+#' @method extract names within list(s)
+#' @title Names within list(s)
+#'
+names.list <- function(x) {
+  lapply(x, function(y) {
+    names(y)
+  })
+}
+
 
 #' @aliases apmaker
 #' @export
@@ -74,7 +92,8 @@ bru_log_list <- function(x, attr_names="sf_column", start_with=NULL, end_with=NU
 #' coordinates object, used for the spatial aspect of the `samplers` object.
 #' @param samplers A (list of) `[sf]DataFrame` or
 #' `Spatial[Points/Lines/Polygons]DataFrame` object(s)
-#' @param response Name(s) of the responses. deprecated: dnames
+#' TODO is response useful here? 20220130
+#' @param response Name(s) of the responses. Deprecated: dnames
 #' @param weight The name of integration weight column in the samplers. Default: `weight`
 #' TODO 1) how about domain? should not be allowed.
 #' 2) allow_names should be bru_weight? 23112022 Only for samplers
@@ -86,14 +105,13 @@ bru_log_list <- function(x, attr_names="sf_column", start_with=NULL, end_with=NU
 #' @return Integration points
 
 # TODO option argument as in bru function with list() bru_int_args
-apmaker <- function(domain = NULL, samplers = NULL, response,
+apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
                     weight = "weight",
                     int.args = list(method = "stable", nsub = NULL)) {
   # To allow sf geometry support, should likely change the logic to
   # use the domain specification to determine the type of integration
   # method to call, so that it doesn't need to rely on the domain name.
   # TODO ####
-  # TODO handle the weight DONE 20220126
   # TODO handle domain not spatial object, can be time points
   # TODO use the unnamed and named columns in list
   # TODO 20221109 For multiple samplers multiple domains, it does have to rely
@@ -124,7 +142,7 @@ apmaker <- function(domain = NULL, samplers = NULL, response,
   }
 
   if (!inherits(domain, "list") ||
-      is.null(names(domain))) {
+    is.null(names(domain))) {
     stop("Domain must be a named list.")
   }
 
@@ -164,7 +182,7 @@ apmaker <- function(domain = NULL, samplers = NULL, response,
   #   )
   # )
   #####################################################################################
- # 20221213 This function to figure out which samplers the domain integration are
+  # 20221213 This function to figure out which samplers the domain integration are
   # class check is not needed here but to be done in S3 method
   # 20221212 We have to check the matching here, that is
   # 1) certain domain classes have to match certain samplers classes.
@@ -201,50 +219,129 @@ apmaker <- function(domain = NULL, samplers = NULL, response,
   # For multidomain sampler, the main thing is data aka dname 23112022
   # specific column has that meaning, how to find the response?
   names_domain <- names(domain)
-  names_samplers <- names(samplers)
-  names_response <- names(response)
+  names_samplers <- unique(names(names.list(samplers)))
+  names_response <- names(response) # from the formula
+  names_reserved <- c("coordinates", "geometry", weight)
 
   # Names setdiff and intersect between domain and samplers and are not named as
   # either `names_response`, `geometry`, `weight`
-  names_setdiff <- setdiff(setdiff(names_domain, names_samplers),
-                        c(names_response, "geometry", weight))
-  names_intersect <- setdiff(intersect(names_domain, names_samplers),
-                        c(names_response, "geometry", weight))
+  # names_domain <- c("a", "b", "c", "b", "a", "e", "c")
+  # names_samplers <- c("a", "b", "e")
+  # `coordinates` replaced by `geometry` after `sf::st_as_sf`
+  # 20220131 To start with,
+  # logical duplicated locations
+  # duplicated_loc <- names_domain %in% names_domain[duplicated(names_domain)]
+  # duplicated domains only for multidomain samplers
+  names_domain_duplicated <- names_domain[duplicated(names_domain) | duplicated(names_domain, fromLast = TRUE)]
+  names_domain_once <- setdiff(names_domain, names_domain_duplicated)
 
+  # full domain samplers
+  names_setdiff_domain <- setdiff(
+    names_domain,
+    c(names_response, names_reserved, names_samplers)
+  )
+  # remove sampler domains
+  names_setdiff_samplers <- setdiff(
+    names_samplers,
+    c(names_response, names_reserved, names_domain)
+  )
+
+  # Names in domains and as well in samplers, not the other way round
+  names_multidomain <- setdiff(
+    intersect(names_domain_duplicated, names_samplers),
+    c(names_response, names_reserved)
+  )
+  names_singledomain <- setdiff(
+    intersect(names_domain_once, names_samplers),
+    c(names_response, names_reserved)
+  )
+
+  # multi domain samplers
+  # TODO because it is multi, ie duplicated, we have to use the exact indices to identify
+  if ((any(sf_samplers) || any(sp_samplers)) &&
+      ("geometry" %in% names_response)) {
+    ips_multi_domain_samplers <-
+      ipoints(
+        samplers[names_multidomain],
+        domain[names_multidomain]$geometry,
+        group = setdiff(names_multidomain, "geometry"),
+        int.args = int.args
+      )
+  } else {
+    ips_multi_domain_samplers <- NULL
+  }
+  lips_multi_domain_samplers <-
+    lapply(names_multidomain, function(nm) {
+      ipoints(NULL, domain[[nm]], name = nm, int.args = int.args)
+    })
+  ips_multi_domain_samplers <-
+    do.call(cprod, c(list(ips_multi_domain_samplers), lips_multi_domain_samplers))
+
+  # single domain samplers
+  if ((any(sf_samplers) || any(sp_samplers)) &&
+      ("geometry" %in% names_response)) {
+    ips_single_domain_samplers <-
+      ipoints(
+        samplers[names_singledomain],
+        domain[names_singledomain]$geometry,
+        group = setdiff(names_singledomain, "geometry"),
+        int.args = int.args
+      )
+  } else {
+    ips_single_domain_samplers <- NULL
+  }
+  lips_single_domain_samplers <-
+    lapply(names_singledomain, function(nm) {
+      ipoints(NULL, domain[[nm]], name = nm, int.args = int.args)
+    })
+  ips_single_domain_samplers <-
+    do.call(cprod, c(
+      list(ips_single_domain_samplers),
+      lips_single_domain_samplers
+    ))
+
+  #############################################################################
   # Warn samplers without domain associated
-  if(!is.null(names_setdiff %in% names_samplers)){
-    bru_log_list(inames_intersect,
-                  start_with = "\n The unused samplers: \n")
+  if (!is.null(names_setdiff %in% names_samplers)) {
+    bru_log_list(as.list(names_intersect),
+      attr_names = "names",
+      start_with = "\n The unused samplers: \n"
+    )
     warning(paste0("Sampler(s) without associated domain(s): ",
-            paste0(names_intersect), collapse = ","))
+      paste0(names_intersect),
+      collapse = ","
+    ))
   }
   # Store the names in domain but not in samplers
   # Warn domains without associated samplers
-  if(!is.null(names_setdiff %in% names_domain)){
+  if (!is.null(names_setdiff %in% names_domain)) {
     extra_domain <- intersect(names_setdiff, names_domains)
-    bru_log_list(extra_domain, start_with = "\n The extra domain: \n", "names")
+    bru_log_list(as.list(extra_domain),
+      attr_names = "names",
+      start_with = "\n The extra domain: \n"
+    )
     warning(paste0("Create sampler(s) for domain(s) without associated sampler(s): ",
-            paste0(names_intersect), collapse = ","))
+      paste0(names_intersect),
+      collapse = ","
+    ))
   }
 
   # Check if the names of samplers and domains match. How to establish the link
   # between samplers and domain? If names are not provided, follow the order in
   # list. If names are provided but do not match, what should we do?
   if (unique(names_samplers) != unique(names_domain)) {
-    # TODO have to accommodate weight column in samplers as well, omit this column
-    samplers_domain <- setdiff(intersect(names_samplers, names_domain), "weight")
     # TODO for the NULL name case
     bru_log_list(samplers_domain, start_with = "\n The shared samplers and domain: \n")
   }
 
   # log the active geometry of the samplers
   # TODO 20220126 when sf_samplers is a vector, if clause does not work
+  # 20220130 I think it works now
   if (any(sf_samplers)) {
     bru_log_list(samplers[sf_samplers],
       start_with = "The active geometry of the sampler(s) "
     )
   }
-
 
   # TODO ####
   # TODO check ibm_values.bru_mapper_factor for character/factor/numeric samplers
@@ -253,50 +350,11 @@ apmaker <- function(domain = NULL, samplers = NULL, response,
   ips <- apoints(samplers, domain,
     int.args = int.args, weight_name = weight_name
   )
-  # TODO using group_cprod for each domain
+  # TODO using cprod for each domain
   # this is just a draft atm
-  lips <- lapply(nosamp.dim, function(nm)
-            ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
-  ips <- do.call(cprod, c(list(ips), lips, group = samplers_domain))
-
-  #####################################
-
-  if ("coordinates" %in% dnames) {
-    spatial <- TRUE
-  } else {
-    spatial <- FALSE
-  }
-
-  # Dimensions provided via samplers (except "coordinates")
-  samp.dim <- intersect(names(samplers), dnames)
-
-  # Dimensions provided via domain but not via samplers
-  nosamp.dim <- setdiff(names(domain), c(samp.dim, "coordinates"))
-
-  # Check if a domain definition is missing
-  missing.dims <- setdiff(dnames, c(names(domain), samp.dim))
-  if (length(missing.dims > 0)) {
-    stop(paste0(
-      "Domain definitions missing for dimensions: ",
-      paste0(missing.dims, collapse = ", ")
-    ))
-  }
-  extra.dims <- setdiff(names(domain), c(samp.dim, nosamp.dim))
-  if (length(missing.dims > 0)) {
-    warning(paste0(
-      "Unexpected extra domain defintions: ",
-      paste0(extra.dims, collapse = ", ")
-    ))
-  }
-
-  if (spatial) {
-    ips <- ipoints(samplers, domain$coordinates,
-      group = samp.dim, int.args = int.args
-    )
-  } else {
-    ips <- NULL
-  }
-
-  lips <- lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
+  lips <- lapply(nosamp.dim, function(nm) {
+    ipoints(NULL, domain[[nm]], name = nm, int.args = int.args)
+  })
   ips <- do.call(cprod, c(list(ips), lips))
+  ##########################################################
 }
