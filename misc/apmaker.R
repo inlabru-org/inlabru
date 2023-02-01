@@ -218,6 +218,19 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
   # TODO remove sampler domains and full domain samplers
   # For multidomain sampler, the main thing is data aka dname 23112022
   # specific column has that meaning, how to find the response?
+  #######################
+  # # test case
+  # a <- list(hi=1:4)
+  # b <- list(bye=5:8)
+  # c <- list(hey=7:9)
+  # e <- list(hej=6:8)
+  # domain <- list(a,b,c,b,a,e,c) # assume a b c the same
+  # names_domain <- c("a", "b", "c", "b", "a", "e", "c")
+  # names_samplers <- c("a", "b", "e")
+  # names_response <- c("g")
+  # weight <- "weight"
+  #######################
+
   names_domain <- names(domain)
   names_samplers <- unique(names(names.list(samplers)))
   names_response <- names(response) # from the formula
@@ -225,14 +238,15 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
 
   # Names setdiff and intersect between domain and samplers and are not named as
   # either `names_response`, `geometry`, `weight`
-  # names_domain <- c("a", "b", "c", "b", "a", "e", "c")
-  # names_samplers <- c("a", "b", "e")
+
   # `coordinates` replaced by `geometry` after `sf::st_as_sf`
   # 20220131 To start with,
   # logical duplicated locations
   # duplicated_loc <- names_domain %in% names_domain[duplicated(names_domain)]
   # duplicated domains only for multidomain samplers
-  names_domain_duplicated <- names_domain[duplicated(names_domain) | duplicated(names_domain, fromLast = TRUE)]
+  names_domain_duplicated <-
+    names_domain[duplicated(names_domain) |
+      duplicated(names_domain, fromLast = TRUE)]
   names_domain_once <- setdiff(names_domain, names_domain_duplicated)
 
   # full domain samplers
@@ -246,59 +260,53 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
     c(names_response, names_reserved, names_domain)
   )
 
-  # Names in domains and as well in samplers, not the other way round
+  # multidomain sampler
   names_multidomain <- setdiff(
     intersect(names_domain_duplicated, names_samplers),
     c(names_response, names_reserved)
   )
+
+  # this extracts the multidomain into a new list
+  multidomain <- domain[names_domain %in% names_multidomain]
+  names(multidomain) <- names_domain[names_domain %in% names_multidomain]
+  sf_multidomain <- unlist(lapply(multidomain, function(x) inherits(x, c("sf", "sfc"))))
+
+  # singledomain sampler
   names_singledomain <- setdiff(
     intersect(names_domain_once, names_samplers),
     c(names_response, names_reserved)
   )
 
   # multi domain samplers
-  # TODO because it is multi, ie duplicated, we have to use the exact indices to identify
-  if ((any(sf_samplers) || any(sp_samplers)) &&
-      ("geometry" %in% names_response)) {
-    ips_multi_domain_samplers <-
-      ipoints(
-        samplers[names_multidomain],
-        domain[names_multidomain]$geometry,
-        group = setdiff(names_multidomain, "geometry"),
-        int.args = int.args
-      )
-  } else {
-    ips_multi_domain_samplers <- NULL
+  if (!is.null(names_multidomain)) {
+    lips_multi_domain_samplers <- ips_multi_domain_samplers <- list()
+    for (i in seq_along(multidomain)) {
+      samp.dim <- setdiff(intersect(names(samplers[names(multidomain)[i]]), names_response), names_reserved)
+      nosamp.dim <- setdiff(names(multidomain[i]), c(samp.dim, names_reserved))
+      if (inherits(samplers[names(multidomain)[i]], c("sf", "sfc")) &&
+        ("geometry" %in% names_response)) {
+        ips_multi_domain_samplers[i] <-
+          ipoints(
+            samplers[names(multidomain)[i]],
+            multidomain[i]$geometry,
+            group = samp.dim,
+            int.args = int.args
+          )
+      } else {
+        ips_multi_domain_samplers[i] <- NULL
+      }
+    lips_multi_domain_samplers[i] <-
+      lapply(nosamp.dim, function(nm) {
+        ipoints(NULL, domain[[nm]], name = nm, int.args = int.args)
+      })
+    ips_multi_domain_samplers[i] <-
+      do.call(cprod, c(list(ips_multi_domain_samplers[i]), lips_multi_domain_samplers[i]))
+    }
   }
-  lips_multi_domain_samplers <-
-    lapply(names_multidomain, function(nm) {
-      ipoints(NULL, domain[[nm]], name = nm, int.args = int.args)
-    })
-  ips_multi_domain_samplers <-
-    do.call(cprod, c(list(ips_multi_domain_samplers), lips_multi_domain_samplers))
 
+  ################################################################################
   # single domain samplers
-  if ((any(sf_samplers) || any(sp_samplers)) &&
-      ("geometry" %in% names_response)) {
-    ips_single_domain_samplers <-
-      ipoints(
-        samplers[names_singledomain],
-        domain[names_singledomain]$geometry,
-        group = setdiff(names_singledomain, "geometry"),
-        int.args = int.args
-      )
-  } else {
-    ips_single_domain_samplers <- NULL
-  }
-  lips_single_domain_samplers <-
-    lapply(names_singledomain, function(nm) {
-      ipoints(NULL, domain[[nm]], name = nm, int.args = int.args)
-    })
-  ips_single_domain_samplers <-
-    do.call(cprod, c(
-      list(ips_single_domain_samplers),
-      lips_single_domain_samplers
-    ))
+
 
   #############################################################################
   # Warn samplers without domain associated
