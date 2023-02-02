@@ -605,18 +605,14 @@ cprod <- function(..., na.rm = NULL) {
     # row.names(ips) <- as.character(seq_len(NROW(ips))) # Warning message: Setting row names on a tibble is deprecated.
   }
 
-  if (any(is.na(ips$weight))){
+  if (any(is.na(ips$weight)) && !isFALSE(na.rm)) {
     if (is.null(na.rm)) {
       warning(
         paste0(
           "Block information mismatch resulting in NA weights, and 'na.rm' was not supplied.",
-          ifelse(!isFALSE(na.rm),
-                 "These rows will be removed.",
-                 "These rows will be kept.")))
+          " These rows will be removed."))
     }
-    if (!isFALSE(na.rm)) {
-      ips <- na.omit(ips)
-    }
+    ips <- na.omit(ips)
   }
 
   # TODO Transform back to sp only if they are required. ips is a tibble sf tbl data.frame.
