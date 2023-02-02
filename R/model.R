@@ -622,6 +622,7 @@ evaluate_predictor <- function(model,
 component_eval <- function(main,
                            group = NULL,
                            replicate = NULL,
+                           weights = NULL,
                            .state = NULL) {
   stop(paste0(
     "In your predictor expression, use 'mylabel_eval(...)' instead of\n",

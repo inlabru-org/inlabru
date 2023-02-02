@@ -4,7 +4,13 @@
 \alias{component_eval}
 \title{Evaluate component values in predictor expressions}
 \usage{
-component_eval(main, group = NULL, replicate = NULL, .state = NULL)
+component_eval(
+  main,
+  group = NULL,
+  replicate = NULL,
+  weights = NULL,
+  .state = NULL
+)
 }
 \arguments{
 \item{main, group, replicate}{Specification of where to evaluate a component.
