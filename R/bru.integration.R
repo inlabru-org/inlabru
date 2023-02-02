@@ -528,7 +528,9 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #'
 #' @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
 #' TODO #### na.rm and user-defined weight argument
-#' @param na.rm logical; if `TRUE`, the rows with weight NA from the non-overlapping full_join will be removed; otherwise assumed to be weight 1. Default: `TRUE`
+#' @param na.rm logical; if `TRUE`, the rows with weight `NA` from the
+#' non-overlapping full_join will be removed; if `FALSE`, set the undefined weights to `NA`.
+#' If `NULL` (default), act as `TRUE`, but warn if any elements needed removing.
 #' @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
 #'
 #' @examples
@@ -547,7 +549,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' }
 #' }
 #'
-cprod <- function(..., na.rm = TRUE) {
+cprod <- function(..., na.rm = NULL) {
   ipl <- list(...)
 
   # Transform sp to sf
@@ -604,12 +606,16 @@ cprod <- function(..., na.rm = TRUE) {
   }
 
   if (any(is.na(ips$weight))){
-    if(na.rm){
-      warning("Non-unique matches detected resulting in NA weight. These rows will be removed.")
+    if (is.null(na.rm)) {
+      warning(
+        paste0(
+          "Block information mismatch resulting in NA weights, and 'na.rm' was not supplied.",
+          ifelse(!isFALSE(na.rm),
+                 "These rows will be removed.",
+                 "These rows will be kept.")))
+    }
+    if (!isFALSE(na.rm)) {
       ips <- na.omit(ips)
-    } else {
-      warning("Non-unique matches detected resulting in NA weight. These rows will be assumed to weight 1.")
-      ips$weight[is.na(ips$weight)] <- 1 # TODO what if weight = sthelse 20230126
     }
   }
 
