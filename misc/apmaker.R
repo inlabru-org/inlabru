@@ -242,37 +242,41 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
   names_response <- names(response) # from the formula
   names_reserved <- c(weight) # coordinate and geometry is not required here
 
+  #######################
   # multidomain samplers, ie unnamed element(s) in samplers
   multidomain <-
     samplers[unlist(lapply(list(names_lsamplers), function(x) {
       x == ""
     }))]
-
   names_multidomain <- unlist(names_list(multidomain)) # retain the attr(*, "names") without unique
-  names_multidomain <- setdiff(intersect(names_domain, names_samplers),
-                               names_reserved)
-  if (!is.null(names_multidomain)){
-    multidomain <- list()
-  }
-  for (i in seq_along(names_lsamplers)){
-    multidomain[i] <- ipoints(
-      samplers[names_lsamplers[i]],
-      domain$geometry,
-      group = names_multidomain,
-      int.args = int.args
-    )
-  } else {
-    multidomain[i] <- NULL
+
+  if (!is.null(multidomain)){
+    lips_multidomain <- list()
+    for (i in seq_along(multidomain)){
+    names_intersect <- setdiff(intersect(names_multidomain[i], names_samplers),
+                                 names_reserved)
+    lips_multidomain[i] <- ipoints(
+        multidomain[names_intersect[i]],
+        domain$geometry,
+        group = names_intersect, # TODO the block=group isnt sure what to put in
+        int.args = int.args
+      )
+    } else {
+      lips_multidomain[i] <- NULL # TODO do we still need this bit???
+    }
   }
 
+  #######################
   # singledomain samplers, ie named element(s) in samplers
   singledomain <-
     samplers[unlist(lapply(list(names_lsamplers), function(x) {
       x != ""
     }))]
 
-  # remove sampler domains
+  #######################
+  # remove sampler domains, then pass them to full domain samplers
 
+  #######################
   # full domain samplers, i.e. domain with missing samplers
   names_fulldomain <- setdiff(names_domain, c(names_samplers, names_reserved))
 
