@@ -4,13 +4,15 @@
 \alias{cprod}
 \title{(Groupwise) cross product of integration points}
 \usage{
-cprod(..., na.rm = TRUE)
+cprod(..., na.rm = NULL)
 }
 \arguments{
 \item{...}{\code{data.frame} or \code{SpatialPointsDataFrame} objects, each one usually obtained by a call to the \link{ipoints} function.
 TODO #### na.rm and user-defined weight argument}
 
-\item{na.rm}{logical; if \code{TRUE}, the rows with weight NA from the non-overlapping full_join will be removed; otherwise assumed to be weight 1. Default: \code{TRUE}}
+\item{na.rm}{logical; if \code{TRUE}, the rows with weight \code{NA} from the
+non-overlapping full_join will be removed; if \code{FALSE}, set the undefined weights to \code{NA}.
+If \code{NULL} (default), act as \code{TRUE}, but warn if any elements needed removing.}
 }
 \value{
 A \code{data.frame} or \code{SpatialPointsDataFrame} of multidimensional integration points and their weights

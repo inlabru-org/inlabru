@@ -33,7 +33,7 @@ fm_crs_oblique(x) <- value
 
 \method{fm_crs}{default}(x, ..., crsonly = FALSE)
 
-st_crs.fm_crs(x, ...)
+\method{st_crs}{fm_crs}(x, ...)
 
 \method{$}{fm_crs}(x, name)
 
@@ -121,15 +121,12 @@ projection is only correct for perfect spheres.
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{st_crs(fm_crs)}: \code{st_crs(x, ...)} is equivalent to \code{fm_crs(x, ..., crsonly = TRUE)}
+when \code{x} is a \code{fm_crs} object.
+
 \item \code{$}: For a \code{fm_crs} object \code{x}, \code{x$name} calls the accessor method for the
 \code{crs} object inside it. If \code{name} is "crs", the internal crs object itself is returned.
 If \code{name} is "oblique", the internal oblique angle parameter vector is returned.
-
-}}
-\section{Functions}{
-\itemize{
-\item \code{st_crs.fm_crs()}: \code{st_crs(x, ...)} is equivalent to \code{fm_crs(x, ..., crsonly = TRUE)}
-when \code{x} is a \code{fm_crs} object.
 
 }}
 \examples{

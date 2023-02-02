@@ -206,7 +206,7 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
   # Change a mix of sp and sf objects to sf
   sf_samplers <- unlist(lapply(samplers, function(x) inherits(x, c("sf", "sfc"))))
   sp_samplers <- unlist(lapply(samplers, function(x) inherits(x, "Spatial")))
-  if (sp_samplers && sf_samplers) {
+  if (any(sp_samplers) && any(sf_samplers)) {
     warning("Both `sf` and `sp` objects in the samplers are detected. Produce `sf` output as desired")
     samplers[sp_samplers] <- lapply(samplers[sp_samplers], sf::st_as_sf)
   }

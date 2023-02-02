@@ -27,7 +27,7 @@ test_that("cprod(..., na.rm = FALSE) sf output can be generated", {
   expect_equal(names(ips), c("geometry", "weight"))
   expect_equal(as.numeric(unlist(sf::st_geometry(ips))),
                c(1, 3, 2, 4, 3, 5, 4, 6, 5, 7, 6, 8))
-  expect_equal(as.numeric(ips[[2]]), rep(1,6))
+  expect_equal(as.numeric(ips[[2]]), rep(c(NA, 1, NA), c(2, 1, 3)))
 })
 
 test_that("cprod(na.rm = TRUE) sp output can be generated", {
@@ -44,7 +44,7 @@ test_that("cprod(na.rm = TRUE) sp output can be generated", {
   expect_equal(nrow(ips), 1)
   expect_equal(ncol(ips), 1)
   expect_equal(names(ips), "weight")
-  expect_equal(as.numeric(ips@coords), c(3, 5))
+  expect_equal(as.numeric(sp::coordinates(ips)), c(3, 5))
   expect_equal(as.numeric(ips[[1]]), 1)
 })
 
@@ -62,8 +62,8 @@ test_that("cprod(na.rm = FALSE) sp output can be generated", {
   expect_equal(nrow(ips), 6)
   expect_equal(ncol(ips), 1)
   expect_equal(names(ips), "weight")
-  expect_equal(as.numeric(ips@coords), c(1:6, 3:8))
-  expect_equal(as.numeric(ips[[1]]), rep(1,6))
+  expect_equal(as.numeric(sp::coordinates(ips)), c(1:6, 3:8))
+  expect_equal(as.numeric(ips[[1]]), rep(c(NA, 1, NA), c(2, 1, 3)))
 })
 
 # ips <- ipoints(c(0, 10), 50, name = "myDim")
