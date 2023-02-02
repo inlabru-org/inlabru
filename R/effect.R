@@ -1965,7 +1965,8 @@ input_eval.bru_input <- function(input, data, env = NULL,
     c(
       "SpatialGridDataFrame",
       "SpatialPixelsDataFrame",
-      "SpatRaster"
+      "SpatRaster",
+      "sf"
     )
   )) {
     input_layer <-

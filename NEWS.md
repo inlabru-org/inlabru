@@ -14,6 +14,10 @@
   
 * Change rgl.* functions to *3d. Thanks to Duncan Murdoch #181
 
+* Speed up `ibm_jacobian.bru_mapper_harmonics` for large models
+
+* `eval_spatial` supported to sf objects (for point-in-polygon data lookups)
+
 # inlabru 2.7.0
 
 ## Feature overview
