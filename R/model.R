@@ -588,8 +588,16 @@ evaluate_predictor <- function(model,
 #' In predictor expressions, `name_eval(...)` can be used to evaluate
 #' the effect of a component called "name".
 #'
-#' @param main,group,replicate Specification of where to evaluate a component.
-#'   The three inputs are passed on to the respective `bru_mapper` methods.
+#' @param main,group,replicate,weights Specification of where to evaluate a component.
+#'   The four inputs are passed on to the joint `bru_mapper` for the component,
+#'   as
+#'  ```
+#'  list(mapper = list(
+#'         main = main,
+#'         group = group,
+#'         replicate = replicate),
+#'       scale = weights)
+#' ````
 #' @param .state The internal component state. Normally supplied automatically
 #' by the internal methods for evaluating inlabru predictor expressions.
 #' @return A vector of values for a component
