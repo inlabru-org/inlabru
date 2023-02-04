@@ -238,31 +238,36 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
   #######################
 
   names_domain <- names(domain)
-  names_lsamplers <- names(samplers)
+  names_lsamplers <- names(samplers) # so that we know which are named and unnamed
   names_response <- names(response) # from the formula
   names_reserved <- c(weight) # coordinate and geometry is not required here
 
   #######################
   # multidomain samplers, ie unnamed element(s) in samplers
-  multidomain <-
-    samplers[unlist(lapply(list(names_lsamplers), function(x) {
-      x == ""
-    }))]
-  names_multidomain <- unlist(names_list(multidomain)) # retain the attr(*, "names") without unique
-
-  if (!is.null(multidomain)){
-    lips_multidomain <- list()
-    for (i in seq_along(multidomain)){
-    names_intersect <- setdiff(intersect(names_multidomain[i], names_samplers),
-                                 names_reserved)
-    lips_multidomain[i] <- ipoints(
-        multidomain[names_intersect[i]],
-        domain$geometry,
-        group = names_intersect, # TODO the block=group isnt sure what to put in
-        int.args = int.args
-      )
+  if (any("" %in% names_lsamplers)) {
+    multidomainsamplers <-
+      samplers[unlist(lapply(list(names_lsamplers), function(x) {
+        x == ""
+      }))]
+    lnames <- names_list(multidomainsamplers)   # retain the attr(*, "names") while keeping the list structure
+    if (!is.null(lnames)) {
+      lips_multidomainsamplers <- list()
+      for (i in seq_along(multidomainsamplers)){
+        names_intersect <- setdiff(
+          intersect(unlist(lnames[i]), names_domain),
+          names_reserved
+        )
+        # compute ips for each domain with group(block)=names_intersect
+        lapply(list(multidomainsamplers[i],domain,names_intersect), ipoints, )
+        lips_multidomainsamplers[i] <- ipoints(
+          multidomainsamplers,
+          domain,
+          group = names_intersect, # TODO the block=group isn't sure what to put in, actually what does group mean? Column names of the samplers object (if applicable) for which the integration points are calculated independently and not merged when aggregating to mesh nodes.
+          int.args = int.args
+        )
+      }
     } else {
-      lips_multidomain[i] <- NULL # TODO do we still need this bit???
+      warning("The unnamed list in the samplers is NULL")
     }
   }
 
@@ -279,6 +284,17 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
   #######################
   # full domain samplers, i.e. domain with missing samplers
   names_fulldomain <- setdiff(names_domain, c(names_samplers, names_reserved))
+  if (!is.null(names_fulldomain)) {
+    lips_fulldomain <- list()
+    for (i in seq_along(fulldomain)){
+      lips_fulldomain[i] <- ipoints(
+        domain = fulldomain[names_intersect[i]],
+        group = , # TODO the block=group isn't sure what to put in, actually what does group mean? Column names of the samplers object (if applicable) for which the integration points are calculated independently and not merged when aggregating to mesh nodes.
+        int.args = int.args
+      )
+    }
+  }
+
 
   #############################################################################
   # Warn samplers without domain associated
