@@ -218,6 +218,8 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
   # TODO remove sampler domains and full domain samplers
   # For multidomain sampler, the main thing is data aka dname 23112022
   # specific column has that meaning, how to find the response?
+
+  # TODO some thoughts for S3 methods, there should be an extra layer to take samplers and domain arguments and difine multidomain, singledomain and full domain s3 class
   #######################
   # test case
   # a <- data.frame(hi=1:4, hi2=9:10)
