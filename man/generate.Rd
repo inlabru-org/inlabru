@@ -52,9 +52,9 @@ as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
 }
 \value{
-The form of the value returned by gg depends on the class of its
-argument. See the documentation of the particular methods for details of
-what is produced by that method.
+The form of the value returned by \code{generate()} depends on the data
+class and prediction formula. Normally, a data.frame is returned, or a list
+of data.frames (if the prediction formula generates a list)
 
 List of generated samples
 }
