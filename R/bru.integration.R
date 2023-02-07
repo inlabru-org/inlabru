@@ -41,8 +41,6 @@
 #' * when `samplers` is a 1D interval(s) definition only, `domain` can be
 #'   a single integer for the number of integration points to place in each 1D
 #'   interval, overriding `int.args[["nsub1"]]`, and otherwise
-#'   TODO * 20221212 For extension, it can be factor or character while keeping
-#'   the level to map them back to the components
 #' * when `samplers` is `NULL`, `domain` can be a numeric vector of points,
 #'   each given integration weight 1 (and no additional points are added
 #'   in between),
