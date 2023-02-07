@@ -1,40 +1,4 @@
-#' A S3/S4 generic function to generate stop warning if the object of some class
-#'  is not of the specified classes.
-#' @param  object An object except NULL
-#' @param class A vector of class(es) except NULL
-#' @keywords internal
-#'
-# stopifnot_class <- function(object = NULL, class = NULL, ...) {
-#   # 20221208 Probably better to leave out NULL and missing class in this
-#   # function, though it deals with it
-#   class_name <- paste0(sort(class), collapse = ",")
-#   obj_name <- paste0(as.character(expression(object)))
-#   UseMethod("stopifnot_class")
-# }
-# stopifnot_class.default <- function(object, class) {
-#   if (!inherits(object, class)) {
-#     stop(paste0(
-#       obj_name,
-#       " of class ",
-#       paste0(class(object), collapse = ","),
-#       "must be of class(es) ",
-#       class_name
-#     ))
-#   }
-# }
-# stopifnot_class.list <- function(object, class) {
-#   if (!all(unlist(lapply(object, function(x) {
-#     inherits(x, class)
-#   })))) {
-#     stop(paste0(
-#       obj_name,
-#       " of class ",
-#       paste0(unlist(lapply(object, class)), collapse = ","), # TODO more complicated
-#       "must be of class(es) ",
-#       class_name
-#     ))
-#   }
-# }
+#' https://github.com/inlabru-org/inlabru/issues/125
 
 # TODO 20220126should not be a S3 but local function and function name should be clearer
 # bru_log_list function ---------------------------------------------------------
@@ -65,6 +29,15 @@ bru_log_list <- function(x, attr_names = "sf_column", start_with = NULL, end_wit
   }
 }
 
+# devtools::load_all()
+# data(mrsea, package = "inlabru")
+# domain = list(coordinates = mrsea$mesh,
+#               season = seq_len(4))
+# samplers <- mrsea$samplers
+# samplers <- list(season = samplers$season, samplers)
+# debugonce(inlabru:::apmaker)
+# apmaker(samplers=samplers, domain=domain, response="coordinate")
+
 # TODO Extend S3 method with names_list???
 # https://stackoverflow.com/questions/18513607/how-to-extend-s3-method-from-another-package-without-loading-the-package
 # to deal with samplers names in a dataframe 20230126
@@ -90,8 +63,13 @@ names_list <- function(x) {
 #' weight 1, an `inla.mesh.1d` object, or an `inla.mesh.2d` object. Only those
 #' domains that are not given in the `samplers` data.frame are used, plus the
 #' coordinates object, used for the spatial aspect of the `samplers` object.
-#' @param samplers A (list of) `[sf/sfc]DataFrame` or
-#' `Spatial[Points/Lines/Polygons]DataFrame` object(s)
+#' TODO * 20221212 For extension, it can be factor or character while keeping
+#' the level to map them back to the components
+#' @param samplers A (list of unnamed or named element(s) of ) `[sf/sfc]DataFrame` or
+#' `Spatial[Points/Lines/Polygons]DataFrame` object(s). Unnamed elements
+#' are assumed to be multidomain samperls; named elements are singledomain
+#' samplers; domains without corresponding samplers are assumed to be full domain
+#' samplers.
 #' TODO is response useful here? 20220130
 #' @param response Name(s) of the responses. Deprecated: dnames
 #' @param weight The name of integration weight column in the samplers. Default: `weight`
@@ -108,10 +86,10 @@ names_list <- function(x) {
 apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
                     weight = "weight",
                     int.args = list(method = "stable", nsub = NULL)) {
-  # To allow sf geometry support, should likely change the logic to
+  # TODO ####
+  # TODO To allow sf geometry support, should likely change the logic to
   # use the domain specification to determine the type of integration
   # method to call, so that it doesn't need to rely on the domain name.
-  # TODO ####
   # TODO handle domain not spatial object, can be time points
   # TODO use the unnamed and named columns in list
   # TODO 20221109 For multiple samplers multiple domains, it does have to rely
@@ -216,143 +194,100 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
   # TODO Multidomain samplers happens when a sampler across several domains. How to detect that?
   # TODO we should then do the name check for domain and samplers here
   # TODO remove sampler domains and full domain samplers
-  # For multidomain sampler, the main thing is data aka dname 23112022
-  # specific column has that meaning, how to find the response?
-
-  # TODO some thoughts for S3 methods, there should be an extra layer to take samplers and domain arguments and difine multidomain, singledomain and full domain s3 class
+  # TODO some thoughts for S3 methods, there should be an extra layer ie function to sort samplers and domain arguments and difine multidomain, singledomain and full domain s3 class
   #######################
-  # test case
-  # a <- data.frame(hi=1:4, hi2=9:10)
-  # b <- data.frame(bye=5:8)
-  # c <- data.frame(hey=6:9)
-  # g <- data.frame(ciao=7:10)
-  # e <- data.frame(hej=6:8)
-  # domain <- list(a,b,c,e,g) # domain names are unique
-  # samp1 <- data.frame(a)
-  # samp2 <- data.frame(b,c)
-  # samplers <- list(samp1, samp2)
-  # samplers <- list(a,list(b,e)) # this is not the case
-  # response <- list(g)
-  # # names(domain) <- c("a", "b", "c", "b", "a", "a", "e", "c")
-  # # names(samplers) <- c("a", "be")
-  # # names(response) <- c("g")
-  # weight <- "weight"
-  #######################
-
   names_domain <- names(domain)
   names_lsamplers <- names(samplers) # so that we know which are named and unnamed
+  names_samplers <- unique(unlist(names_list(samplers)))
   names_response <- names(response) # from the formula
   names_reserved <- c(weight) # coordinate and geometry is not required here
 
   #######################
-  # multidomain samplers, ie unnamed element(s) in samplers
+  # multidomain samplers, ie unnamed element(s) in samplers, for each sampler and then for each domain(lapply)
+  # TODO still have to deal with secondary geometry
   if (any("" %in% names_lsamplers)) {
     multidomainsamplers <-
       samplers[unlist(lapply(list(names_lsamplers), function(x) {
         x == ""
       }))]
-    lnames <- names_list(multidomainsamplers)   # retain the attr(*, "names") while keeping the list structure
-    if (!is.null(lnames)) {
-      lips_multidomainsamplers <- list()
-      for (i in seq_along(multidomainsamplers)){
+    lnames <- names_list(multidomainsamplers) # retain the attr(*, "names") while keeping the list structure
+    lips_multidomainsamplers <- list()
+    for (i in seq_along(multidomainsamplers)) {
+      if (!is.null(lnames[[i]])) {
         names_intersect <- setdiff(
-          intersect(unlist(lnames[i]), names_domain),
+          intersect(lnames[[i]], names_domain),
           names_reserved
         )
         # compute ips for each domain with group(block)=names_intersect
-        lapply(list(multidomainsamplers[i],domain,names_intersect), ipoints, )
-        lips_multidomainsamplers[i] <- ipoints(
-          multidomainsamplers,
-          domain,
-          group = names_intersect, # TODO the block=group isn't sure what to put in, actually what does group mean? Column names of the samplers object (if applicable) for which the integration points are calculated independently and not merged when aggregating to mesh nodes.
+        # lapply(list(multidomainsamplers[i], domain, names_intersect), ipoints, )
+        lips_multidomainsamplers[i] <- lapply(names_domain, function(nm) ipoints(
+          samplers = multidomainsamplers[[i]],
+          domain = domain[nm],
+          name = nm,
+          group = names_intersect, # block=group should be the grouping, say season,
           int.args = int.args
-        )
+        ))
+      } else {
+        warning(paste0("The unnamed list", lnames[i], "in the samplers is NULL"))
+        lips_multidomainsamplers[i] <- NULL
       }
-    } else {
-      warning("The unnamed list in the samplers is NULL")
     }
+    # TODO 20230206 cprod step
+    lips_multidomainsamplers <- do.call(cprod, lips_multidomainsamplers)
   }
 
   #######################
   # singledomain samplers, ie named element(s) in samplers
-  singledomain <-
+  singledomainsamplers <-
     samplers[unlist(lapply(list(names_lsamplers), function(x) {
       x != ""
     }))]
-
-  #######################
-  # remove sampler domains, then pass them to full domain samplers
-
-  #######################
-  # full domain samplers, i.e. domain with missing samplers
-  names_fulldomain <- setdiff(names_domain, c(names_samplers, names_reserved))
-  if (!is.null(names_fulldomain)) {
-    lips_fulldomain <- list()
-    for (i in seq_along(fulldomain)){
-      lips_fulldomain[i] <- ipoints(
-        domain = fulldomain[names_intersect[i]],
-        group = , # TODO the block=group isn't sure what to put in, actually what does group mean? Column names of the samplers object (if applicable) for which the integration points are calculated independently and not merged when aggregating to mesh nodes.
+  if (!is.null(singledomainsamplers)){
+    lips_singledomainsamplers <- list()
+    for (i in seq_along(singledomainsamplers)) {
+      names_intersect <- setdiff(intersect(names(singledomainsamplers),
+                                           names_domain), names_reserved)
+      lips_singledomainsamplers[i] <- lapply(names_domain, function(nm) ipoints(
+        samplers = singledomainsamplers[[i]],
+        domain = domain[nm],
+        name = nm,
+        group = names_intersect, # block=group should be the grouping, say season,
         int.args = int.args
-      )
+      ))
     }
   }
+
+  # remove sampler domains, then pass them to full domain samplers
+  # full domain samplers, i.e. domain with missing samplers
+  names_fulldomain <- setdiff(names_domain, c(names_samplers, names_reserved))
+  if (!is.null(names_fulldomain)){
+    lips_fulldomainsamplers <- list()
+
+  }
+
+  # TODO cprod lips and ips ...
+  ips <- do.call(cprod, c(list(ips), lips))
 
 
   #############################################################################
   # Warn samplers without domain associated
-  if (!is.null(names_setdiff %in% names_samplers)) {
-    bru_log_list(as.list(names_intersect),
-      attr_names = "names",
-      start_with = "\n The unused samplers: \n"
-    )
-    warning(paste0("Sampler(s) without associated domain(s): ",
-      paste0(names_intersect),
-      collapse = ","
-    ))
-  }
   # Store the names in domain but not in samplers
   # Warn domains without associated samplers
-  if (!is.null(names_setdiff %in% names_domain)) {
-    extra_domain <- intersect(names_setdiff, names_domains)
-    bru_log_list(as.list(extra_domain),
-      attr_names = "names",
-      start_with = "\n The extra domain: \n"
-    )
-    warning(paste0("Create sampler(s) for domain(s) without associated sampler(s): ",
-      paste0(names_intersect),
-      collapse = ","
-    ))
-  }
+
 
   # Check if the names of samplers and domains match. How to establish the link
   # between samplers and domain? If names are not provided, follow the order in
   # list. If names are provided but do not match, what should we do?
-  if (unique(names_samplers) != unique(names_domain)) {
-    # TODO for the NULL name case
-    bru_log_list(samplers_domain, start_with = "\n The shared samplers and domain: \n")
-  }
 
   # log the active geometry of the samplers
   # TODO 20220126 when sf_samplers is a vector, if clause does not work
   # 20220130 I think it works now
-  if (any(sf_samplers)) {
-    bru_log_list(samplers[sf_samplers],
-      start_with = "The active geometry of the sampler(s) "
-    )
-  }
+
 
   # TODO ####
   # TODO check ibm_values.bru_mapper_factor for character/factor/numeric samplers
   # TODO weight argument to take effect on samplers. The weight should go to
   # the integration part
-  ips <- apoints(samplers, domain,
-    int.args = int.args, weight_name = weight_name
-  )
-  # TODO using cprod for each domain
-  # this is just a draft atm
-  lips <- lapply(nosamp.dim, function(nm) {
-    ipoints(NULL, domain[[nm]], name = nm, int.args = int.args)
-  })
-  ips <- do.call(cprod, c(list(ips), lips))
+
   ##########################################################
 }
