@@ -212,7 +212,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
   names_samplers[index_multi_samplers] <- names_list(samplers[index_multi_samplers])
   names_reserved <- c(weight) # coordinate and geometry is not required here
 
-  if (length(intersect(names_domain, names_reserved) > 0)) {
+  if (length(intersect(names_domain, names_reserved)) > 0) {
     stop(paste0("The reserved names ",
                 paste0(intersect(names_domain, names_reserved), collapse = ", "),
                 " cannot be used as domain names."))
