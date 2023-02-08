@@ -71,7 +71,6 @@ names_list <- function(x) {
 #' samplers; domains without corresponding samplers are assumed to be full domain
 #' samplers.
 #' TODO is response useful here? 20220130
-#' @param response Name(s) of the responses. Deprecated: dnames
 #' @param weight The name of integration weight column in the samplers. Default: `weight`
 #' TODO 1) how about domain? should not be allowed.
 #' 2) allow_names should be bru_weight? 23112022 Only for samplers
@@ -83,7 +82,7 @@ names_list <- function(x) {
 #' @return Integration points
 
 # TODO option argument as in bru function with list() bru_int_args
-apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
+apmaker <- function(domain = NULL, samplers = NULL,
                     weight = "weight",
                     int.args = list(method = "stable", nsub = NULL)) {
   # TODO ####
@@ -184,9 +183,15 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
   # Change a mix of sp and sf objects to sf
   sf_samplers <- unlist(lapply(samplers, function(x) inherits(x, c("sf", "sfc"))))
   sp_samplers <- unlist(lapply(samplers, function(x) inherits(x, "Spatial")))
-  if (any(sp_samplers) && any(sf_samplers)) {
-    warning("Both `sf` and `sp` objects in the samplers are detected. Produce `sf` output as desired")
+  if (any(sp_samplers)) {
+    if (any(sf_samplers)) {
+      warning("Both `sf` and `sp` objects in the samplers are detected. Output will be `sf`.")
+    }
     samplers[sp_samplers] <- lapply(samplers[sp_samplers], sf::st_as_sf)
+    if (!("coordinates" %in% names(domain))) {
+      stop("`sp` input detected but no `coordinates` domain present.")
+    }
+    names(domain)[names(domain) %in% "coordinates"] <- "geometry"
   }
 
   # TODO 20220126 lapply to extract the names, the current one is not sufficient
@@ -197,76 +202,82 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
   # TODO some thoughts for S3 methods, there should be an extra layer ie function to sort samplers and domain arguments and difine multidomain, singledomain and full domain s3 class
   #######################
   names_domain <- names(domain)
-  names_lsamplers <- names(samplers) # so that we know which are named and unnamed
-  names_samplers <- unique(unlist(names_list(samplers)))
-  names_response <- names(response) # from the formula
+  names_lsamplers <- names(samplers)
+  if (is.null(names_lsamplers)) {
+    names_lsamplers <- rep("", length(samplers))
+  }
+  index_single_samplers <- which(names_lsamplers != "")
+  index_multi_samplers <- which(names_lsamplers == "")
+  names_samplers <- as.list(names_lsamplers)
+  names_samplers[index_multi_samplers] <- names_list(samplers[index_multi_samplers])
   names_reserved <- c(weight) # coordinate and geometry is not required here
+
+  if (length(intersect(names_domain, names_reserved) > 0)) {
+    stop(paste0("The reserved names ",
+                paste0(intersect(names_domain, names_reserved), collapse = ", "),
+                " cannot be used as domain names."))
+  }
+
+  lips_samplers <- list()
 
   #######################
   # multidomain samplers, ie unnamed element(s) in samplers, for each sampler and then for each domain(lapply)
   # TODO still have to deal with secondary geometry
-  if (any("" %in% names_lsamplers)) {
-    multidomainsamplers <-
-      samplers[unlist(lapply(list(names_lsamplers), function(x) {
-        x == ""
-      }))]
-    lnames <- names_list(multidomainsamplers) # retain the attr(*, "names") while keeping the list structure
-    lips_multidomainsamplers <- list()
-    for (i in seq_along(multidomainsamplers)) {
-      if (!is.null(lnames[[i]])) {
-        names_intersect <- setdiff(
-          intersect(lnames[[i]], names_domain),
-          names_reserved
-        )
-        # compute ips for each domain with group(block)=names_intersect
-        # lapply(list(multidomainsamplers[i], domain, names_intersect), ipoints, )
-        lips_multidomainsamplers[i] <- lapply(names_domain, function(nm) ipoints(
-          samplers = multidomainsamplers[[i]],
-          domain = domain[nm],
-          name = nm,
-          group = names_intersect, # block=group should be the grouping, say season,
-          int.args = int.args
-        ))
-      } else {
-        warning(paste0("The unnamed list", lnames[i], "in the samplers is NULL"))
-        lips_multidomainsamplers[i] <- NULL
-      }
+  for (i in index_multi_samplers) {
+    if (is.null(names_samplers[[i]])) {
+      stop(paste0("The unnamed sampler #", i, " in the samplers is NULL"))
     }
-    # TODO 20230206 cprod step
-    lips_multidomainsamplers <- do.call(cprod, lips_multidomainsamplers)
+    names_intersect <- intersect(names_samplers[[i]], names_domain)
+    lips_multidomainsampler <- lapply(
+      names_intersect,
+      function(nm) ipoints(
+        samplers = samplers[[i]][[nm]],
+        domain = domain[nm],
+        name = nm,
+#        group = names_intersect, # block=group should be the grouping, say season,
+        int.args = int.args
+      ))
+    lips_samplers[[i]] <- do.call(cprod, lips_multidomainsampler)
   }
+
 
   #######################
   # singledomain samplers, ie named element(s) in samplers
-  singledomainsamplers <-
-    samplers[unlist(lapply(list(names_lsamplers), function(x) {
-      x != ""
-    }))]
-  if (!is.null(singledomainsamplers)){
-    lips_singledomainsamplers <- list()
-    for (i in seq_along(singledomainsamplers)) {
-      names_intersect <- setdiff(intersect(names(singledomainsamplers),
-                                           names_domain), names_reserved)
-      lips_singledomainsamplers[i] <- lapply(names_domain, function(nm) ipoints(
-        samplers = singledomainsamplers[[i]],
-        domain = domain[nm],
-        name = nm,
-        group = names_intersect, # block=group should be the grouping, say season,
-        int.args = int.args
-      ))
-    }
+  for (i in index_single_samplers) {
+    nm <- intersect(names_samplers[[i]], names_domain)
+    stopifnot(length(nm) == 1)
+    lips_samplers[i] <-
+      ipoints(
+      samplers = samplers[[i]],
+      domain = domain[nm],
+      name = nm,
+#      group = names_intersect, # block=group should be the grouping, say season,
+      int.args = int.args
+    )
   }
 
-  # remove sampler domains, then pass them to full domain samplers
-  # full domain samplers, i.e. domain with missing samplers
-  names_fulldomain <- setdiff(names_domain, c(names_samplers, names_reserved))
-  if (!is.null(names_fulldomain)){
-    lips_fulldomainsamplers <- list()
+  # Full domain samplers
+  names_full_domain_samplers <- setdiff(names_domain, unlist(names_samplers))
+  lips_full_domain_samplers <-
+    lapply(
+      names_full_domain_samplers,
+      function(nm) {
+        ipoints(
+          domain = domain[nm],
+          name = nm,
+          #      group = names_intersect, # block=group should be the grouping, say season,
+          int.args = int.args
+        )
+      })
 
+  ips <- do.call(cprod, c(lips_samplers, lips_full_domain_samplers))
+
+  if (any(sp_samplers) && !any(sf_samplers)) {
+    ips <- sf::as_Spatial(ips)
   }
 
-  # TODO cprod lips and ips ...
-  ips <- do.call(cprod, c(list(ips), lips))
+  ips
+}
 
 
   #############################################################################
@@ -290,4 +301,4 @@ apmaker <- function(domain = NULL, samplers = NULL, response = NULL,
   # the integration part
 
   ##########################################################
-}
+
