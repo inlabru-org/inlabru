@@ -300,9 +300,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
               (int_loc >= min(subsamplers)) *
               (int_loc <= max(subsamplers))
         )
+        w <- Matrix::colSums(A_w)
         ips[[j]] <- data.frame(
-          loc = domain$loc,
-          weight = Matrix::colSums(A_w),
+          loc = domain$loc[w > 0],
+          weight = w[w > 0],
           group = j
         )
       } else {
