@@ -232,7 +232,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
       names_intersect,
       function(nm) ipoints(
         samplers = samplers[[i]][[nm]],
-        domain = domain[nm],
+        domain = domain[[nm]],
         name = nm,
 #        group = names_intersect, # block=group should be the grouping, say season,
         int.args = int.args
@@ -246,10 +246,10 @@ apmaker <- function(domain = NULL, samplers = NULL,
   for (i in index_single_samplers) {
     nm <- intersect(names_samplers[[i]], names_domain)
     stopifnot(length(nm) == 1)
-    lips_samplers[i] <-
+    lips_samplers[[i]] <-
       ipoints(
       samplers = samplers[[i]],
-      domain = domain[nm],
+      domain = domain[[nm]],
       name = nm,
 #      group = names_intersect, # block=group should be the grouping, say season,
       int.args = int.args
@@ -263,7 +263,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
       names_full_domain_samplers,
       function(nm) {
         ipoints(
-          domain = domain[nm],
+          domain = domain[[nm]],
           name = nm,
           #      group = names_intersect, # block=group should be the grouping, say season,
           int.args = int.args
