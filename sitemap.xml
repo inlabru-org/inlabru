@@ -124,9 +124,6 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_int_polygon.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_int_polygon_old.html</loc>
-  </url>
-  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_like_methods.html</loc>
   </url>
   <url>
@@ -358,9 +355,6 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/int.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/int.polygon.html</loc>
-  </url>
-  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/integration_weight_aggregation.html</loc>
   </url>
   <url>
@@ -380,9 +374,6 @@
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/local_testthat.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/make_stable_integration_points.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/materncov.bands.html</loc>

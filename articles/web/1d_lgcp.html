@@ -285,7 +285,7 @@ are constructed using the <code>ipoints</code> function</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 131.3105 11.44575 112.4328 131.1347 154.6441 131.1347        1.144575     0.8315581</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 129.1973 11.50514 109.7932 128.0608 150.8926 128.0608        1.150514     0.6429261</span></span></code></pre></div>
 <ul>
 <li>
 <code>mean</code> is the posterior mean abundance.</li>
@@ -322,23 +322,23 @@ to modify <code><a href="https://rdrr.io/r/stats/predict.html" class="external-l
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">[</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">100</span><span class="op">:</span><span class="fl">105</span>, <span class="op">]</span></span>
 <span><span class="co">#&gt;      N        mean          sd       q0.025         q0.5     q0.975       median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 51 100 0.003510260 0.006221689 5.104600e-07 0.0008831156 0.02267693 0.0008831156    0.0006221689</span></span>
-<span><span class="co">#&gt; 52 101 0.004051097 0.006827618 7.845851e-07 0.0011383544 0.02491580 0.0011383544    0.0006827618</span></span>
-<span><span class="co">#&gt; 53 102 0.004645418 0.007432778 1.194102e-06 0.0014529821 0.02710801 0.0014529821    0.0007432778</span></span>
-<span><span class="co">#&gt; 54 103 0.005293921 0.008028686 1.799729e-06 0.0018365705 0.02920752 0.0018365705    0.0008028686</span></span>
-<span><span class="co">#&gt; 55 104 0.005996651 0.008606771 2.686450e-06 0.0022991138 0.03116785 0.0022991138    0.0008606771</span></span>
-<span><span class="co">#&gt; 56 105 0.006752937 0.009158619 3.971879e-06 0.0028507494 0.03294384 0.0028507494    0.0009158619</span></span>
+<span><span class="co">#&gt; 51 100 0.003190084 0.006315881 2.719736e-06 0.0005481811 0.02133314 0.0005481811    0.0006315881</span></span>
+<span><span class="co">#&gt; 52 101 0.003664340 0.006899748 4.050232e-06 0.0007175431 0.02356235 0.0007175431    0.0006899748</span></span>
+<span><span class="co">#&gt; 53 102 0.004184156 0.007479162 5.972484e-06 0.0009300219 0.02577045 0.0009300219    0.0007479162</span></span>
+<span><span class="co">#&gt; 54 103 0.004750455 0.008046024 8.721552e-06 0.0011937170 0.02791302 0.0011937170    0.0008046024</span></span>
+<span><span class="co">#&gt; 55 104 0.005363766 0.008592320 1.261355e-05 0.0015174471 0.02994428 0.0015174471    0.0008592320</span></span>
+<span><span class="co">#&gt; 56 105 0.006024186 0.009110379 1.806864e-05 0.0019106003 0.03181878 0.0019106003    0.0009110379</span></span>
 <span><span class="co">#&gt;    sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 51  0.0009210456</span></span>
-<span><span class="co">#&gt; 52  0.0009574680</span></span>
-<span><span class="co">#&gt; 53  0.0009838104</span></span>
-<span><span class="co">#&gt; 54  0.0009991010</span></span>
-<span><span class="co">#&gt; 55  0.0010027282</span></span>
-<span><span class="co">#&gt; 56  0.0009944928</span></span></code></pre></div>
+<span><span class="co">#&gt; 51   0.001003245</span></span>
+<span><span class="co">#&gt; 52   0.001037313</span></span>
+<span><span class="co">#&gt; 53   0.001062131</span></span>
+<span><span class="co">#&gt; 54   0.001077101</span></span>
+<span><span class="co">#&gt; 55   0.001081828</span></span>
+<span><span class="co">#&gt; 56   0.001076117</span></span></code></pre></div>
 <p>We compute the 95% prediction interval and the median as follows</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 101.4122 129.9418 162.2208</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 101.8537 131.3429 162.2179</span></span></code></pre></div>
 <p>Compare <code>Lambda</code> to <code>Nest</code> by plotting: First
 calculate the posterior conditional on the mean of
 <code>Lambda</code></p>
