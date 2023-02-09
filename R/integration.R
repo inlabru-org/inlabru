@@ -532,18 +532,18 @@ integration_weight_aggregation <- function(mesh, integ) {
 }
 
 
-#' Basic robust integration weights for mesh/polygon intersections
-#'
-#' @param mesh Mesh on which to integrate
-#' @param bnd `inla.mesh.segment` defining the integration domain
-#' @param nsub number of subdivision points along each triangle edge, giving
-#'    `(nsub + 1)^2` proto-integration points used to compute
-#'   the vertex weights
-#'   (default `NULL=9`, giving 100 integration points for each triangle)
-#' @return `list` with elements `loc` and `weight` with
-#'   integration points for the intersection of the mesh and polygon
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @keywords internal
+# Basic robust integration weights for mesh/polygon intersections
+#
+# @param mesh Mesh on which to integrate
+# @param bnd `inla.mesh.segment` defining the integration domain
+# @param nsub number of subdivision points along each triangle edge, giving
+#    `(nsub + 1)^2` proto-integration points used to compute
+#   the vertex weights
+#   (default `NULL=9`, giving 100 integration points for each triangle)
+# @return `list` with elements `loc` and `weight` with
+#   integration points for the intersection of the mesh and polygon
+# @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+# @keywords internal
 make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   # Construct a barycentric grid of subdivision triangle midpoints
   if (is.null(nsub)) {
@@ -587,18 +587,18 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   )
 }
 
-#' Integration points for polygons inside an inla.mesh
-#'
-#' This method doesn't handle polygons with holes. Use [bru_int_polygon()]
-#' instead.
-#'
-#' @param mesh An inla.mesh object
-#' @param loc Locations defining the polygons
-#' @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
-#' @param method Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")
-#' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
-#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @keywords internal
+# Integration points for polygons inside an inla.mesh
+#
+# This method doesn't handle polygons with holes. Use [bru_int_polygon()]
+# instead.
+#
+# @param mesh An inla.mesh object
+# @param loc Locations defining the polygons
+# @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
+# @param method Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")
+# @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
+# @keywords internal
 
 int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
   if (is.null(group)) {
@@ -638,16 +638,15 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
 
 
 
-#' Integration points for polygons inside an inla.mesh
-#'
-#' @export
-#' @param mesh An inla.mesh object
-#' @param polylist A list of `inla.mesh.segment` objects
-#' @param method Which integration method to use ("stable",
-#'   with aggregation to mesh vertices, or "direct")
-#' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @keywords internal
+# Integration points for polygons inside an inla.mesh
+#
+# @param mesh An inla.mesh object
+# @param polylist A list of `inla.mesh.segment` objects
+# @param method Which integration method to use ("stable",
+#   with aggregation to mesh vertices, or "direct")
+# @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
+# @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+# @keywords internal
 
 bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
   method <- match.arg(method, c("stable", "direct"))
@@ -772,7 +771,7 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
 #' @param method Which integration method to use ("stable",
 #'   with aggregation to mesh vertices, or "direct")
 #' @param samplers If non-NULL, a SpatialPolygons* object, used instead of polylist
-#' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
+#' @param ... Arguments passed to the low level integration method (`make_triangle_integration`)
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 
