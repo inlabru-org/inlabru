@@ -101,7 +101,7 @@
                         <h4 data-toc-skip class="author">Fabian E.
 Bachl</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-02-09</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_multilikelihood.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -211,6 +211,12 @@ nest types were observed within the same window:</p>
 <span>  <span class="op">(</span><span class="va">pl.minor</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"right"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-8-1.png" width="768"></p>
+</div>
+<div class="section level2">
+<h2 id="rerunning">Rerunning<a class="anchor" aria-label="anchor" href="#rerunning"></a>
+</h2>
+<p>Rerunning with the previous estimate as starting point sometimes
+improves the accuracy of the posterior distribution estimation.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">jfit0</span> <span class="op">&lt;-</span> <span class="va">jfit</span></span>
 <span><span class="va">jfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru_rerun</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">)</span></span></code></pre></div>
@@ -246,7 +252,7 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.3, Running = 121, Post = 0.129, Total = 122 </span></span>
+<span><span class="co">#&gt;     Pre = 1.53, Running = 93.2, Post = 0.152, Total = 94.9 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; Intercept -0.349 1.351     -2.998   -0.349      2.299 -0.349   0</span></span>
@@ -258,19 +264,19 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.989 0.722      1.870     2.89      4.688 2.680</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.065 0.417      1.388     2.02      3.019 1.913</span></span>
-<span><span class="co">#&gt; Range for Difference 1.928 1.339      0.633     1.55      5.510 1.073</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.141 0.069      0.040     0.13      0.303 0.103</span></span>
+<span><span class="co">#&gt; Range for Common     2.988 0.720      1.871    2.886      4.680 2.681</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.064 0.413      1.393    2.016      3.009 1.914</span></span>
+<span><span class="co">#&gt; Range for Difference 1.911 1.324      0.624    1.538      5.450 1.067</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.142 0.069      0.041    0.131      0.305 0.103</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 589.28</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 589.21</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -774.83</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -774.88</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1628.73</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 104.74</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1628.68</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 104.71</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.59 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.63 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -290,10 +296,10 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.04, Running = 27.2, Post = 0.124, Total = 28.4 </span></span>
+<span><span class="co">#&gt;     Pre = 1.27, Running = 21.1, Post = 0.132, Total = 22.5 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
-<span><span class="co">#&gt;            mean   sd 0.025quant 0.5quant 0.975quant  mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.35 1.37     -3.036    -0.35      2.336 -0.35   0</span></span>
+<span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
+<span><span class="co">#&gt; Intercept -0.351 1.374     -3.044   -0.351      2.342 -0.351   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -302,22 +308,70 @@ nest types were observed within the same window:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.985 0.658      1.939    2.900      4.514 2.725</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.055 0.352      1.467    2.018      2.850 1.938</span></span>
-<span><span class="co">#&gt; Range for Difference 1.670 1.095      0.504    1.377      4.556 0.987</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.148 0.078      0.039    0.134      0.336 0.101</span></span>
+<span><span class="co">#&gt; Range for Common     2.982 0.657      1.934    2.899      4.507 2.727</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.055 0.353      1.464    2.018      2.850 1.940</span></span>
+<span><span class="co">#&gt; Range for Difference 1.652 1.075      0.499    1.366      4.482 0.982</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.149 0.080      0.039    0.135      0.343 0.101</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 587.74</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 587.69</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -775.95</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -775.99</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1627.58</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 104.16</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1627.54</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 104.14</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.65 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.69 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="single-likelihood-version">Single-likelihood version<a class="anchor" aria-label="anchor" href="#single-likelihood-version"></a>
+</h2>
+<p>In this particular model, we can also rewrite the problem as a single
+point process over a product domain over space and <code>group</code>.
+In versions <code>&lt;= 2.7.0</code>, the integration domain has to be
+numeric, so we convert the group variable to a 0/1 variable,
+<code>group_major &lt;- group == "major"</code>.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fml.joint</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">+</span> <span class="va">group_major</span> <span class="op">~</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">Common</span> <span class="op">+</span> <span class="op">(</span><span class="va">group_major</span> <span class="op">-</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="va">Difference</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">$</span><span class="va">group_major</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"major"</span></span>
+<span><span class="va">lik_joint</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,</span>
+<span>  formula <span class="op">=</span> <span class="va">fml.joint</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>,</span>
+<span>  samplers <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
+<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
+<span>                group_major <span class="op">=</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html" class="external-link">inla.mesh.1d</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">jfit_joint</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">lik_joint</span>,</span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span>,</span>
+<span>    bru_max_iter <span class="op">=</span> <span class="fl">2</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Plotting the ratios of <code>exp(Common)</code> and
+<code>exp(Difference)</code> between the new fit and the old confirms
+that the results are the same up to small numerical differences.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
+<span><span class="va">pl.major</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
+<span>    mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
+<span>    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">jfit_joint</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Common</span><span class="op">$</span><span class="va">mean</span> <span class="op">-</span></span>
+<span>      <span class="va">jfit</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Common</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">pl.minor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>,</span>
+<span>    mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
+<span>    col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">jfit_joint</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Difference</span><span class="op">$</span><span class="va">mean</span> <span class="op">-</span></span>
+<span>                <span class="va">jfit</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">Difference</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">pl.major</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="op">(</span><span class="va">pl.minor</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_fill_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"right"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-16-1.png" width="768"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

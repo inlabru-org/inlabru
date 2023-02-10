@@ -85,16 +85,19 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fm_as_sp_crs</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">fm_as_sfc</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu">fm_as_sfc</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">fm_as_inla_mesh_segment</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">fm_as_inla_mesh</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for inla.mesh</span></span>
-<span><span class="fu">fm_as_sfc</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">fm_as_sfc</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, multi <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for sfc_MULTIPOLYGON</span></span>
+<span><span class="fu">fm_as_inla_mesh</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sfc_POLYGON</span></span>
 <span><span class="fu">fm_as_inla_mesh</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for sfc_POINT</span></span>
@@ -104,6 +107,9 @@
 <span><span class="fu">fm_as_inla_mesh_segment</span><span class="op">(</span><span class="va">x</span>, join <span class="op">=</span> <span class="cn">TRUE</span>, grp <span class="op">=</span> <span class="cn">NULL</span>, reverse <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for sfc_POLYGON</span></span>
+<span><span class="fu">fm_as_inla_mesh_segment</span><span class="op">(</span><span class="va">x</span>, join <span class="op">=</span> <span class="cn">TRUE</span>, grp <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sfc_MULTIPOLYGON</span></span>
 <span><span class="fu">fm_as_inla_mesh_segment</span><span class="op">(</span><span class="va">x</span>, join <span class="op">=</span> <span class="cn">TRUE</span>, grp <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for sf</span></span>
@@ -173,6 +179,11 @@
 <dd><p>Arguments passed on to other methods</p></dd>
 
 
+<dt>multi</dt>
+<dd><p>logical; if <code>TRUE</code>, attempt to a <code>sfc_MULTIPOLYGON</code>, otherwise
+a set of <code>sfc_POLYGON</code>. Default <code>FALSE</code></p></dd>
+
+
 <dt>reverse</dt>
 <dd><p>logical; When TRUE, reverse the order of the input points.
 Default <code>FALSE</code></p></dd>
@@ -211,7 +222,7 @@ Default: <code>FALSE</code></p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<ul><li><p><code>fm_as_sfc</code>: An <code>sfc_MULTIPOLYGON</code> object</p></li>
+<ul><li><p><code>fm_as_sfc</code>: An <code>sfc_MULTIPOLYGON</code> or <code>sfc_POLYGON</code> object</p></li>
 </ul><ul><li><p><code>fm_as_inla_mesh</code>: An <code>inla.mesh</code> mesh object</p></li>
 </ul></div>
 
