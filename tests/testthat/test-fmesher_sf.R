@@ -120,8 +120,21 @@ test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
 
   ## scf_POLYGON ##
 
-  pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3))
-  pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2))
+  pts0 <- rbind(c(-7, -7), c(7,-7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
+  pts0b <- pts0 + 10
+  pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3)) # hole (CW)
+  pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2)) # hole (CW)
+  seg0 <- INLA::inla.mesh.segment(
+    loc = pts0[1:4, , drop = FALSE],
+    is.bnd = TRUE,
+    crs = fm_CRS()
+  )
+  seg0b <- INLA::inla.mesh.segment(
+    loc = pts0b[1:4, , drop = FALSE],
+    is.bnd = TRUE,
+    crs = fm_CRS()
+  )
+
   seg1 <- INLA::inla.mesh.segment(
     loc = pts1[1:4, , drop = FALSE],
     is.bnd = TRUE,
@@ -134,18 +147,71 @@ test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
     crs = fm_CRS()
   )
 
-  seg <- fm_internal_sp2segment_join(list(seg1, seg2),
-    grp = seq_len(2)
-  )
-  expect_identical(seg$grp, as.matrix(rep(1:2, each = 4)))
+  seg <- fm_internal_sp2segment_join(list(seg0, seg1, seg2, seg0b),
+                                     grp = c(1, 1, 1, 2))
+  expect_identical(seg$grp, as.matrix(rep(c(1L, 1L, 1L, 2L), each = 4)))
 
-  line_str1 <- sf::st_polygon(list(pts1))
-  line_str2 <- sf::st_polygon(list(pts2))
+  line_str1 <- sf::st_polygon(list(pts0, pts1, pts2))
+  line_str2 <- sf::st_polygon(list(pts0b))
   line_sfc <- sf::st_as_sfc(list(line_str1, line_str2))
   line_sf <- sf::st_sf(geometry = line_sfc)
   seg_sf <- fm_as_inla_mesh_segment(line_sf)
 
   expect_identical(seg_sf, seg)
+
+  #  str(seg)
+  #  str(seg_sf)
+})
+
+
+
+test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
+  local_bru_safe_inla()
+
+  ## scf_MULTIPOLYGON ##
+
+  pts0 <- rbind(c(-7, -7), c(7,-7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
+  pts0b <- pts0 + 15
+  pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3)) # hole (CW)
+  pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2)) # hole (CW)
+  seg0 <- INLA::inla.mesh.segment(
+    loc = pts0[1:4, , drop = FALSE],
+    is.bnd = TRUE,
+    crs = fm_CRS()
+  )
+  seg0b <- INLA::inla.mesh.segment(
+    loc = pts0b[1:4, , drop = FALSE],
+    is.bnd = TRUE,
+    crs = fm_CRS()
+  )
+
+  seg1 <- INLA::inla.mesh.segment(
+    loc = pts1[1:4, , drop = FALSE],
+    is.bnd = TRUE,
+    crs = fm_CRS()
+  )
+
+  seg2 <- INLA::inla.mesh.segment(
+    loc = pts2[1:4, , drop = FALSE],
+    is.bnd = TRUE,
+    crs = fm_CRS()
+  )
+
+  seg <- fm_internal_sp2segment_join(list(seg0, seg1, seg2, seg0b,
+                                          seg0, seg1, seg2, seg0b),
+                                     grp = c(1, 1, 1, 1, 2, 2, 2, 2))
+  expect_identical(seg$grp, as.matrix(rep(c(1L, 2L), each = 16)))
+
+  line_str1 <- sf::st_polygon(list(pts0, pts1, pts2))
+  line_str2 <- sf::st_polygon(list(pts0b))
+  line_sfc <- sf::st_as_sfc(list(line_str1, line_str2))
+  line_sfc_c <- sf::st_combine(line_sfc)
+  line_sfc_u <- sf::st_union(line_sfc) # Bug in st_union breaks this step
+  line_sfc2 <- c(sf::st_union(line_sfc), sf::st_union(line_sfc))
+  seg_sf <- fm_as_inla_mesh_segment(line_sfc)
+  seg_sf2 <- fm_as_inla_mesh_segment(line_sfc2)
+
+#  expect_identical(seg_sf, seg)
 
   #  str(seg)
   #  str(seg_sf)

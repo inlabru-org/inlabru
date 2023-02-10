@@ -8,9 +8,11 @@
 \alias{fm_as_inla_mesh}
 \alias{fm_as_sfc.inla.mesh}
 \alias{fm_as_inla_mesh.sfc_MULTIPOLYGON}
+\alias{fm_as_inla_mesh.sfc_POLYGON}
 \alias{fm_as_inla_mesh_segment.sfc_POINT}
 \alias{fm_as_inla_mesh_segment.sfc_LINESTRING}
 \alias{fm_as_inla_mesh_segment.sfc_POLYGON}
+\alias{fm_as_inla_mesh_segment.sfc_MULTIPOLYGON}
 \alias{fm_as_inla_mesh_segment.sf}
 \alias{fm_as_inla_mesh.sf}
 \alias{fm_sp2segment}
@@ -29,21 +31,25 @@
 \usage{
 fm_as_sp_crs(x, ...)
 
-fm_as_sfc(x)
+fm_as_sfc(x, ...)
 
 fm_as_inla_mesh_segment(...)
 
 fm_as_inla_mesh(...)
 
-\method{fm_as_sfc}{inla.mesh}(x, ...)
+\method{fm_as_sfc}{inla.mesh}(x, ..., multi = FALSE)
 
 \method{fm_as_inla_mesh}{sfc_MULTIPOLYGON}(x, ...)
+
+\method{fm_as_inla_mesh}{sfc_POLYGON}(x, ...)
 
 \method{fm_as_inla_mesh_segment}{sfc_POINT}(x, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...)
 
 \method{fm_as_inla_mesh_segment}{sfc_LINESTRING}(x, join = TRUE, grp = NULL, reverse = FALSE, ...)
 
 \method{fm_as_inla_mesh_segment}{sfc_POLYGON}(x, join = TRUE, grp = NULL, ...)
+
+\method{fm_as_inla_mesh_segment}{sfc_MULTIPOLYGON}(x, join = TRUE, grp = NULL, ...)
 
 \method{fm_as_inla_mesh_segment}{sf}(x, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...)
 
@@ -93,6 +99,9 @@ fm_sp2segment(sp, ...)
 
 \item{...}{Arguments passed on to other methods}
 
+\item{multi}{logical; if \code{TRUE}, attempt to a \code{sfc_MULTIPOLYGON}, otherwise
+a set of \code{sfc_POLYGON}. Default \code{FALSE}}
+
 \item{reverse}{logical; When TRUE, reverse the order of the input points.
 Default \code{FALSE}}
 
@@ -115,7 +124,7 @@ Default: \code{FALSE}}
 }
 \value{
 \itemize{
-\item \code{fm_as_sfc}: An \code{sfc_MULTIPOLYGON} object
+\item \code{fm_as_sfc}: An \code{sfc_MULTIPOLYGON} or \code{sfc_POLYGON} object
 }
 
 \itemize{
