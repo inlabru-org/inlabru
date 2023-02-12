@@ -41,7 +41,8 @@ fm_as_sfc.inla.mesh <- function(x, ..., multi = FALSE) {
           }
         ),
         dim = "XYZ"
-      )
+      ),
+      check_ring_dir = TRUE
     )
   } else {
     geom <- sf::st_sfc(
@@ -72,6 +73,9 @@ fm_as_inla_mesh.sfc_MULTIPOLYGON <- function(x, ...) {
             immediate. = TRUE
     )
   }
+  # Ensure correct CCW ring orientation; sf doesn't take into account
+  # that geos has CW as canonical orientation
+  x <- sf::st_sfc(x, check_ring_dir = TRUE)
   tv <- matrix(seq_len(3 * length(x[[1]])), length(x[[1]]), 3, byrow = TRUE)
   loc <- do.call(
     rbind,
@@ -99,6 +103,9 @@ fm_as_inla_mesh.sfc_MULTIPOLYGON <- function(x, ...) {
 #'
 #' @export
 fm_as_inla_mesh.sfc_POLYGON <- function(x, ...) {
+  # Ensure correct CCW ring orientation; sf doesn't take into account
+  # that geos has CW as canonical orientation
+  sfc <- sf::st_sfc(x, check_ring_dir = TRUE)
   tv <- matrix(seq_len(3 * NROW(x)), NROW(x), 3, byrow = TRUE)
   loc <- do.call(
     rbind,
@@ -223,7 +230,9 @@ fm_as_inla_mesh_segment.sfc_LINESTRING <-
 #' @export
 fm_as_inla_mesh_segment.sfc_POLYGON <-
   function(x, join = TRUE, grp = NULL, ...) {
-    sfc <- x
+    # Ensure correct CCW ring orientation; sf doesn't take into account
+    # that geos has CW as canonical orientation
+    sfc <- sf::st_sfc(x, check_ring_dir = TRUE)
     crs <- sf::st_crs(sfc)
     crs <- fm_CRS(crs) # required for INLA::inla.mesh.segment
 
@@ -270,7 +279,9 @@ fm_as_inla_mesh_segment.sfc_POLYGON <-
 #' @export
 fm_as_inla_mesh_segment.sfc_MULTIPOLYGON <-
   function(x, join = TRUE, grp = NULL, ...) {
-    sfc <- x
+    # Ensure correct CCW ring orientation; sf doesn't take into account
+    # that geos has CW as canonical orientation
+    sfc <- sf::st_sfc(x, check_ring_dir = TRUE)
     crs <- sf::st_crs(sfc)
     crs <- fm_CRS(crs) # required for INLA::inla.mesh.segment
 
@@ -316,10 +327,28 @@ fm_as_inla_mesh_segment.sfc_MULTIPOLYGON <-
 
 #' @rdname fm_as
 #' @export
+fm_as_inla_mesh_segment.sfc_GEOMETRY <-
+  function(x, grp = NULL, join = TRUE, ...) {
+    if (is.null(grp)) {
+      grp <- seq_len(length(x))
+    }
+    segm <-
+      lapply(seq_along(x),
+             function(k) {
+               fm_as_inla_mesh_segment(x[k], grp = grp[[k]], join = join, ...)
+             })
+    if (join) {
+      segm <- fm_internal_sp2segment_join(segm, grp = grp)
+    }
+    segm
+  }
+
+#' @rdname fm_as
+#' @export
 fm_as_inla_mesh_segment.sf <-
-  function(x, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...) {
+  function(x, ...) {
     sfc <- sf::st_geometry(x)
-    fm_as_inla_mesh_segment(sfc)
+    fm_as_inla_mesh_segment(sfc, ...)
   }
 
 #' @rdname fm_as
@@ -327,5 +356,5 @@ fm_as_inla_mesh_segment.sf <-
 fm_as_inla_mesh.sf <-
   function(x, ...) {
     sfc <- sf::st_geometry(x)
-    fm_as_inla_mesh(sfc)
+    fm_as_inla_mesh(sfc, ...)
   }

@@ -13,6 +13,7 @@
 \alias{fm_as_inla_mesh_segment.sfc_LINESTRING}
 \alias{fm_as_inla_mesh_segment.sfc_POLYGON}
 \alias{fm_as_inla_mesh_segment.sfc_MULTIPOLYGON}
+\alias{fm_as_inla_mesh_segment.sfc_GEOMETRY}
 \alias{fm_as_inla_mesh_segment.sf}
 \alias{fm_as_inla_mesh.sf}
 \alias{fm_sp2segment}
@@ -51,7 +52,9 @@ fm_as_inla_mesh(...)
 
 \method{fm_as_inla_mesh_segment}{sfc_MULTIPOLYGON}(x, join = TRUE, grp = NULL, ...)
 
-\method{fm_as_inla_mesh_segment}{sf}(x, reverse = FALSE, grp = NULL, is.bnd = TRUE, ...)
+\method{fm_as_inla_mesh_segment}{sfc_GEOMETRY}(x, grp = NULL, join = TRUE, ...)
+
+\method{fm_as_inla_mesh_segment}{sf}(x, ...)
 
 \method{fm_as_inla_mesh}{sf}(x, ...)
 

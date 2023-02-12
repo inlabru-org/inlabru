@@ -18,6 +18,11 @@
 
 * `eval_spatial` supported to sf objects (for point-in-polygon data lookups)
 
+* Add workarounds for inconsistent polygon orientation resulting from `sf::st_*`
+  calls that don't account for the `geos` canonical representation being CW,
+  whereas the canonical Simple Features representation being CCW. See
+  https://github.com/r-spatial/sf/issues/2096
+
 # inlabru 2.7.0
 
 ## Feature overview
