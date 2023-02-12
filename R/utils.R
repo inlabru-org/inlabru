@@ -188,10 +188,10 @@ extract_layer <- function(where, layer, selector) {
 
 #' Evaluate spatial covariates
 #'
-#' @param data Spatial grid-like data
+#' @param data Spatial data
 #' @param where Where to evaluate the data
 #' @param layer Which `data` layer to extract (as integer or character).
-#' May be a vector, specifying a separate layer for each `where` point.
+#' May be a vector, specifying a separate layer for each `where` item.
 #' @param selector The name of a variable in `where` specifying the `layer`
 #' information.
 #'
@@ -207,8 +207,48 @@ eval_SpatialDF <- function(...) {
 }
 
 #' @export
+#' @describeIn eval_spatial Compatibility wrapper for `eval_spatial.sf`
+eval_spatial.SpatialPolygonsDataFrame <- function(data,
+                                                  where,
+                                                  layer = NULL,
+                                                  selector = NULL) {
+  eval_spatial(
+    sf::st_as_sf(data),
+    where = where,
+    layer = layer,
+    selector = selector
+  )
+}
+
+#' @export
 #' @rdname eval_spatial
-eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
+eval_spatial.SpatialPixelsDataFrame <- function(data,
+                                                where,
+                                                layer = NULL,
+                                                selector = NULL) {
+  eval_spatial_Spatial(
+    data = data,
+    where = where,
+    layer = layer,
+    selector = selector
+  )
+}
+
+#' @export
+#' @rdname eval_spatial
+eval_spatial.SpatialGridDataFrame <- function(data,
+                                              where,
+                                              layer = NULL,
+                                              selector = NULL) {
+  eval_spatial_Spatial(
+    data = data,
+    where = where,
+    layer = layer,
+    selector = selector
+  )
+}
+
+eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
   stopifnot(inherits(
     data,
     c(
@@ -239,6 +279,57 @@ eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
         where[layer == l, , drop = FALSE],
         data
       )[, l, drop = TRUE]
+    }
+  }
+  val
+}
+
+
+#' @export
+#' @describeIn eval_spatial Supports point-in-polygon information lookup.
+#' Other combinations are untested.
+eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
+  if (inherits(where, "SpatialPoints")) {
+    where <- sf::st_as_sf(where)
+  }
+  layer <- extract_layer(where, layer, selector)
+  check_layer(data, where, layer)
+  unique_layer <- unique(layer)
+  data_example <- data[1, unique_layer[1], drop = TRUE]
+  data_NA <- data_example
+  is.na(data_NA) <- TRUE
+  if (length(unique_layer) == 1) {
+    idx <- sf::st_intersects(where, data, sparse = TRUE)
+    val <- vapply(
+      idx,
+      function(i) {
+        if (is.null(i) || (length(i) == 0)) {
+          data_NA
+        } else {
+          data[min(i), unique_layer, drop = TRUE]
+        }
+      },
+      data_example
+    )
+  } else {
+    val <- numeric(NROW(where))
+    idx <- sf::st_intersects(where, data, sparse = TRUE)
+    for (l in unique(layer)) {
+      val[layer == l] <- sp::over(
+        where[layer == l, , drop = FALSE],
+        data
+      )[, l, drop = TRUE]
+      val[layer == l] <- vapply(
+        idx[layer == l],
+        function(i) {
+          if (is.null(i) || (length(i) == 0)) {
+            data_NA
+          } else {
+            data[min(i), unique_layer, drop = TRUE]
+          }
+        },
+        data_example
+      )
     }
   }
   val

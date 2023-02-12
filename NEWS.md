@@ -14,6 +14,15 @@
   
 * Change rgl.* functions to *3d. Thanks to Duncan Murdoch #181
 
+* Speed up `ibm_jacobian.bru_mapper_harmonics` for large models
+
+* `eval_spatial` supported to sf objects (for point-in-polygon data lookups)
+
+* Add workarounds for inconsistent polygon orientation resulting from `sf::st_*`
+  calls that don't account for the `geos` canonical representation being CW,
+  whereas the canonical Simple Features representation being CCW. See
+  https://github.com/r-spatial/sf/issues/2096
+
 # inlabru 2.7.0
 
 ## Feature overview

@@ -2,23 +2,32 @@
 % Please edit documentation in R/utils.R
 \name{eval_spatial}
 \alias{eval_spatial}
-\alias{eval_spatial.Spatial}
+\alias{eval_spatial.SpatialPolygonsDataFrame}
+\alias{eval_spatial.SpatialPixelsDataFrame}
+\alias{eval_spatial.SpatialGridDataFrame}
+\alias{eval_spatial.sf}
 \alias{eval_spatial.SpatRaster}
 \title{Evaluate spatial covariates}
 \usage{
 eval_spatial(data, where, layer = NULL, selector = NULL)
 
-\method{eval_spatial}{Spatial}(data, where, layer = NULL, selector = NULL)
+\method{eval_spatial}{SpatialPolygonsDataFrame}(data, where, layer = NULL, selector = NULL)
+
+\method{eval_spatial}{SpatialPixelsDataFrame}(data, where, layer = NULL, selector = NULL)
+
+\method{eval_spatial}{SpatialGridDataFrame}(data, where, layer = NULL, selector = NULL)
+
+\method{eval_spatial}{sf}(data, where, layer = NULL, selector = NULL)
 
 \method{eval_spatial}{SpatRaster}(data, where, layer = NULL, selector = NULL)
 }
 \arguments{
-\item{data}{Spatial grid-like data}
+\item{data}{Spatial data}
 
 \item{where}{Where to evaluate the data}
 
 \item{layer}{Which \code{data} layer to extract (as integer or character).
-May be a vector, specifying a separate layer for each \code{where} point.}
+May be a vector, specifying a separate layer for each \code{where} item.}
 
 \item{selector}{The name of a variable in \code{where} specifying the \code{layer}
 information.}
@@ -26,3 +35,11 @@ information.}
 \description{
 Evaluate spatial covariates
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{eval_spatial(SpatialPolygonsDataFrame)}: Compatibility wrapper for \code{eval_spatial.sf}
+
+\item \code{eval_spatial(sf)}: Supports point-in-polygon information lookup.
+Other combinations are untested.
+
+}}

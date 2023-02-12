@@ -14,7 +14,7 @@ with aggregation to mesh vertices, or "direct")}
 
 \item{samplers}{If non-NULL, a SpatialPolygons* object, used instead of polylist}
 
-\item{...}{Arguments passed to the low level integration method (\code{make_stable_integration_points})}
+\item{...}{Arguments passed to the low level integration method (\code{make_triangle_integration})}
 }
 \description{
 Integration points for polygons inside an inla.mesh

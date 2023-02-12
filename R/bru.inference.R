@@ -10,9 +10,9 @@
 #' @family sample generators
 #' @param object a fitted model.
 #' @param ... additional arguments affecting the samples produced.
-#' @return The form of the value returned by gg depends on the class of its
-#' argument. See the documentation of the particular methods for details of
-#' what is produced by that method.
+#' @return The form of the value returned by `generate()` depends on the data
+#' class and prediction formula. Normally, a data.frame is returned, or a list
+#' of data.frames (if the prediction formula generates a list)
 #' @example inst/examples/generate.bru.R
 
 generate <- function(object, ...) {

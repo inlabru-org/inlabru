@@ -2925,7 +2925,10 @@ ibm_n.bru_mapper_harmonics <- function(mapper, inla_f = FALSE, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_harmonics <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
-  A <- Matrix::Matrix(0.0, NROW(input), ibm_n(mapper))
+  # Indexing into sparseMatrix is slower than into a dense Matrix,
+  # and indexing into a dense Matrix is slower than for a plain matrix(),
+  # including conversion to dense Matrix afterwards.
+  A <- matrix(0.0, NROW(input), ibm_n(mapper))
   off <- 0
   if (mapper[["intercept"]]) {
     A[, 1] <- 1.0 * mapper[["scaling"]][1]
@@ -2935,12 +2938,13 @@ ibm_jacobian.bru_mapper_harmonics <- function(mapper, input, state = NULL, inla_
     input <- (input - mapper[["interval"]][1]) / diff(mapper[["interval"]])
     for (ord in seq_len(mapper[["order"]])) {
       scale <- mapper[["scaling"]][mapper[["intercept"]] + ord]
-      A[, off + 1] <- cos(2 * pi * input * ord) * scale
-      A[, off + 2] <- sin(2 * pi * input * ord) * scale
+      angle <- (2 * pi * ord) * input
+      A[, off + 1] <- cos(angle) * scale
+      A[, off + 2] <- sin(angle) * scale
       off <- off + 2
     }
   }
-  A
+  as(A, "Matrix")
 }
 
 
