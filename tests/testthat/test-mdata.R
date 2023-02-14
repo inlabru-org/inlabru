@@ -39,6 +39,7 @@ test_that("mdata", {
     ok <- !all(y == 0)
   }
   ## head(data.frame(y, E, x, z, xx, zz))
+  suppressWarnings(
   r <- INLA::inla(
     INLA::inla.mdata(cbind(y, E), cbind(1, x, z, x*z)) ~ 1 + xx + zz + xx*zz,
     family = "0poisson",
@@ -51,6 +52,24 @@ test_that("mdata", {
                                        beta3 = list(param = c(0, 1)),
                                        beta4 = list(param = c(0, 1)),
                                        beta5 = list(param = c(0, 1)))))
+)
+#  y2 <- INLA::inla.mdata(cbind(y, -1, E/2),
+#                         cbind(1, x, z, x*z))
+#  r2 <- INLA::inla(
+#    y2 ~ 1 + xx + zz + xx*zz,
+#    family = "0poisson",
+#    data = data.frame(y, E, x, z, xx, zz),
+#    control.fixed = list(prec = 1, prec.intercept = 1),
+#    control.compute = list(cpo = TRUE),
+#    control.family = list(
+#      list(link.simple = link.simple,
+#                          hyper = list(beta1 = list(param = c(0, 1)),
+#                                       beta2 = list(param = c(0, 1)),
+#                                       beta3 = list(param = c(0, 1)),
+#                                       beta4 = list(param = c(0, 1)),
+#                                       beta5 = list(param = c(0, 1)))))
+#  )
+#
 
   if (FALSE) {
     r_bru <- bru(
