@@ -913,9 +913,11 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
         allow_combine
       }
 
-    response_data <- data.frame(
+    # Need to make a list instead of data.frame, to allow inla.mdata responses
+    response_data <- list(
       BRU_response = response,
-      BRU_E = E, BRU_Ntrials = Ntrials
+      BRU_E = E,
+      BRU_Ntrials = Ntrials
     )
     response <- "BRU_response"
   }

@@ -240,9 +240,20 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     colnames(ips) <- c(name, "weight")
   } else if (is_1d && is.null(samplers) && inherits(domain, "inla.mesh.1d") &&
     identical(int.args[["method"]], "stable")) {
+    if (isTRUE(domain$cyclic)) {
+      loc_trap <- c(domain$loc, domain$interval[2])
+    } else {
+      loc_trap <- domain$loc
+    }
+    loc_mid <- (loc_trap[-1] + loc_trap[-length(loc_trap)]) / 2
+    weight_mid <- diff(loc_trap)
+    weight_trap = c(weight_mid / 2, 0) + c(0, weight_mid / 2)
+    loc_simpson <- c(loc_trap, loc_mid)
+    weight_simpson <- c(weight_trap / 3, weight_mid * 2 / 3)
+
     ips <- data.frame(
-      x = domain$loc,
-      weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0),
+      x = loc_simpson,
+      weight = weight_simpson,
       group = 1
     )
     colnames(ips) <- c(name, "weight", "group")
