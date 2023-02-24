@@ -3,11 +3,12 @@ local_bru_testthat_setup()
 test_data <- function() {
   data(Poisson2_1D, package = "inlabru", envir = environment())
   x <- seq(0, 55, length = 50)
-  mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
+  mesh1D <- INLA::inla.mesh.1d(x, boundary = "free", degree = 2)
   matern <- INLA::inla.spde2.pcmatern(
     mesh1D,
     prior.range = c(150, 0.75),
-    prior.sigma = c(0.1, 0.75)
+    prior.sigma = c(0.1, 0.75),
+    constr = TRUE
   )
   mdl <- x ~ spde1D(main = x, model = matern) + Intercept(1)
   fit <- lgcp(
@@ -38,15 +39,15 @@ test_that("1D LGCP fitting", {
 
   expect_s3_class(fit, "bru")
 
-  expect_snapshot_value(
+  expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    tolerance = midtol,
-    style = "deparse"
+    0.60974,
+    tolerance = midtol
   )
-  expect_snapshot_value(
+  expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    tolerance = midtol,
-    style = "deparse"
+    0.10916,
+    tolerance = midtol
   )
 
   expect_snapshot_value(
@@ -73,7 +74,10 @@ test_that("1D LGCP fitting", {
 
   expect_true(
     all(abs(pr$both$mean -
-      (fit$summary.random$spde1D$mean + fit$summary.fixed$mean)) /
+      (fm_evaluate(mesh1D,
+                   loc = mesh1D$loc,
+                   field = fit$summary.random$spde1D$mean) +
+         fit$summary.fixed$mean)) /
       pr$both$mean.mc_std_err <= 3)
   )
 
@@ -86,8 +90,8 @@ test_that("1D LGCP fitting", {
     n.samples = 100,
     seed = 4354
   )
-  expect_equal(Lambda$mean, 131.0741, tolerance = hitol)
-  expect_equal(Lambda$sd, 11.35888, tolerance = 1)
+  expect_equal(Lambda$mean, 130.25, tolerance = hitol)
+  expect_equal(Lambda$sd, 12.28, tolerance = 1)
 })
 
 
@@ -97,16 +101,17 @@ test_that("1D LGCP fitting", {
 test_data_discrete <- function() {
   data(Poisson2_1D, package = "inlabru", envir = environment())
   xx <- ceiling(pts2$x)
-  data <- data.frame(x = rep(xx, xx))
+  data <- data.frame(x = xx)
   x <- seq(1, 55, length = 55)
   mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
   matern <- INLA::inla.spde2.pcmatern(mesh1D,
     prior.range = c(0.01, 0.01),
-    prior.sigma = c(1, 0.01)
+    prior.sigma = c(1, 0.01),
+    constr = TRUE
   )
   mdl <- x ~ spde1D(main = x, model = matern) + Intercept(1)
   fit <- lgcp(mdl,
-    data = pts2,
+    data = data,
     domain = list(x = x),
     options = list(
       control.inla = list(int.strategy = "eb")
@@ -119,7 +124,7 @@ test_data_discrete <- function() {
 }
 
 
-test_that("1D LGCP fitting", {
+test_that("1D LGCP fitting, discrete point domain", {
   skip_on_cran()
   local_bru_safe_inla()
 
@@ -132,15 +137,15 @@ test_that("1D LGCP fitting", {
 
   expect_s3_class(fit, "bru")
 
-  expect_snapshot_value(
+  expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    tolerance = hitol,
-    style = "deparse"
+    0.605155,
+    tolerance = hitol
   )
-  expect_snapshot_value(
+  expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    tolerance = hitol,
-    style = "deparse"
+    0.11224,
+    tolerance = hitol
   )
 
   expect_snapshot_value(
@@ -168,7 +173,7 @@ test_that("1D LGCP fitting", {
   )
 
   # predicted intensity integral
-  ips <- ipoints(c(0, 55), 100, name = "x")
+  ips <- data.frame(x = 1:55, weight = 1)
   Lambda <- predict(
     fit,
     ips,
@@ -176,8 +181,8 @@ test_that("1D LGCP fitting", {
     n.samples = 100,
     seed = 4354
   )
-  expect_equal(Lambda$mean, 131.5858, tolerance = hitol)
-  expect_equal(Lambda$sd, 12.37687, tolerance = 1)
+  expect_equal(Lambda$mean, 130.127, tolerance = hitol)
+  expect_equal(Lambda$sd, 11.09, tolerance = 1)
 })
 
 
