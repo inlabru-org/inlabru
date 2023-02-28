@@ -22,6 +22,8 @@
   calls that don't account for the `geos` canonical representation being CW,
   whereas the canonical Simple Features representation being CCW. See
   https://github.com/r-spatial/sf/issues/2096
+  
+* Allow precomputed spatial covariates in the data for point process observations
 
 # inlabru 2.7.0
 
