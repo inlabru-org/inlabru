@@ -181,7 +181,7 @@ lik_joint <- like("cp",
   data = gorillas$nests,
   samplers = gorillas$boundary,
   domain = list(coordinates = gorillas$mesh,
-                group_major = INLA::inla.mesh.1d(c(0, 1)))
+                group_major = c(0, 1))
 )
 ```
 
