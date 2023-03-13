@@ -61,6 +61,7 @@ Imports:
     plyr,
     rlang,
     sf,
+    tibble,
     utils,
     withr,
     lifecycle

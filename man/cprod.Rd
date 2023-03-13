@@ -2,20 +2,26 @@
 % Please edit documentation in R/bru.integration.R
 \name{cprod}
 \alias{cprod}
-\title{Cross product of integration points}
+\title{(Groupwise) cross product of integration points}
 \usage{
-cprod(...)
+cprod(..., na.rm = NULL)
 }
 \arguments{
-\item{...}{\code{data.frame} or \code{SpatialPointsDataFrame} objects, each one usually obtained by a call to the \link{ipoints} function.}
+\item{...}{\code{data.frame} or \code{SpatialPointsDataFrame} objects, each one usually obtained by a call to the \link{ipoints} function.
+TODO #### na.rm and user-defined weight argument}
+
+\item{na.rm}{logical; if \code{TRUE}, the rows with weight \code{NA} from the
+non-overlapping full_join will be removed; if \code{FALSE}, set the undefined weights to \code{NA}.
+If \code{NULL} (default), act as \code{TRUE}, but warn if any elements needed removing.}
 }
 \value{
 A \code{data.frame} or \code{SpatialPointsDataFrame} of multidimensional integration points and their weights
 }
 \description{
-Calculates the cross product of integration points in different dimensions
-and multiplies their weights accordingly. If the object defining points in a particular
-dimension has no weights attached to it all weights are assumed to be 1.
+Calculates the groupwise cross product of integration points in different
+dimensions and multiplies their weights accordingly, where the group is told
+by polygon ID. If the object defining points in a particular dimension has no
+weights attached to it all weights are assumed to be 1.
 }
 \examples{
 \donttest{
@@ -34,6 +40,4 @@ if (bru_safe_inla()) {
 }
 
 }
-\author{
-Fabian E. Bachl \email{bachlfab@gmail.com}
-}
+\keyword{internal}

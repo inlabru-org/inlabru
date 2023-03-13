@@ -30,6 +30,50 @@ bru_env_get <- function() {
   #  options(Matrix.warnDeprecatedCoerce = 2)
 }
 
+#' Check for potential `sp` version compatibility issues
+#'
+#' @param silent logical; if `TRUE```
+#' @param required logical; if `TRUE`, give an error if `sp` is not available
+#' @return Returns `FALSE` if a potential issue is detected, and give a
+#' warning if `silent` is `FALSE`. Otherwise returns `TRUE` and calls `requireNamespace("sp")`
+#' @export
+bru_check_sp_status <- function(silent = FALSE, required = TRUE) {
+  sp_version <- tryCatch(packageVersion("sp"),
+                         error = function(e) NA_character_)
+  if (is.na(sp_version)) {
+    if (!silent && required) {
+      stop("No 'sp' version detected.")
+    }
+    return(FALSE)
+  }
+  if (!requireNamespace("sp", quietly = silent)) {
+    if (required) {
+      stop("'sp' couldn't be loaded.")
+    }
+    return(FALSE)
+  }
+  if (sp_version >= "1.6-0") {
+    # Default to 2L to allow future sp to stop supporting
+    # get_evolution_status; assume everything is fine if it fails.
+    evolution_status <- tryCatch(sp::get_evolution_status(),
+                                 error = function(e) 2L)
+    rgdal_version <- tryCatch(packageVersion("rgdal"),
+                              error = function(e) NA_character_)
+    if ((evolution_status < 2L) && is.na(rgdal_version)) {
+      if (!silent) {
+        warning(
+          paste0(
+            "'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.\n",
+            "This may cause issues with some CRS handling code. To avoid this, use 'sp::set_evolution_status(2L)'"
+          )
+        )
+      }
+      return(FALSE)
+    }
+  }
+  return(TRUE)
+}
+
 
 
 

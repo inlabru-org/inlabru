@@ -186,4 +186,12 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
     inla.mode = "experimental",
     envir = envir
   )
+  if (utils::compareVersion(getNamespaceVersion("sp"), "1.6-0") >= 0) {
+    old_sp_evolution_status <- sp::get_evolution_status()
+    withr::defer(
+      sp::set_evolution_status(old_sp_evolution_status),
+      envir = envir
+    )
+    sp::set_evolution_status(2L)
+  }
 }

@@ -513,6 +513,131 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   ips
 }
 
+
+
+
+
+#' @title (Groupwise) cross product of integration points
+#'
+#' @description
+#' Calculates the groupwise cross product of integration points in different
+#' dimensions and multiplies their weights accordingly, where the group is told
+#' by polygon ID. If the object defining points in a particular dimension has no
+#' weights attached to it all weights are assumed to be 1.
+#'
+#' @aliases cprod
+#' @export
+#' @keywords internal
+#'
+#'
+#' @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
+#' TODO #### na.rm and user-defined weight argument
+#' @param na.rm logical; if `TRUE`, the rows with weight `NA` from the
+#' non-overlapping full_join will be removed; if `FALSE`, set the undefined weights to `NA`.
+#' If `NULL` (default), act as `TRUE`, but warn if any elements needed removing.
+#' @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
+#'
+#' @examples
+#' \donttest{
+#' # ipoints needs INLA
+#' if (bru_safe_inla()) {
+#'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
+#'   ips1 <- ipoints(rbind(c(0, 3), c(3, 8)), 17, name = "myDim")
+#'   ips2 <- ipoints(domain = c(1, 2, 4), name = "myDiscreteDim")
+#'
+#'   # Calculate the cross product
+#'   ips <- cprod(ips1, ips2)
+#'
+#'   # Plot the integration points
+#'   plot(ips$myDim, ips$myDiscreteDim, cex = 10 * ips$weight)
+#' }
+#' }
+#'
+cprod <- function(..., na.rm = NULL) {
+  ipl <- list(...)
+
+  # Transform sp to sf
+  # TODO make a test. and give a warning for NA non-overlapping outcome?
+  # check for each element, or on the subset, change only for sp anonymous function on lapply
+  ipl_sp <- vapply(ipl, function(x) inherits(x, "Spatial"), TRUE)
+  ipl[ipl_sp] <- lapply(ipl[ipl_sp], sf::st_as_sf)
+
+  ipl <- ipl[!vapply(ipl, is.null, TRUE)]
+  if (length(ipl) == 0) {
+    return(NULL)
+  }
+
+  if (length(ipl) == 1) {
+    ips <- ipl[[1]]
+  } else {
+    ips1 <- ipl[[1]]
+    if (length(ipl) > 2) {
+      ips2 <- do.call(cprod, ipl[2:length(ipl)])
+    } else {
+      ips2 <- ipl[[2]]
+    }
+    if (!"weight" %in% names(ips1)) {
+      ips1$weight <- 1
+    }
+    if (!"weight" %in% names(ips2)) {
+      ips2$weight <- 1
+    }
+
+    # This line from the cprod handles the grouping.
+    by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
+
+    # `sf::st_join` performs spatial join/filter; `dplyr::*_join` expects `x` of
+    # class `sf` and `y` of class `data.frame`. The trick `as.tibble(sf_obj)` allows
+    # `dplyr::full_join` and turn it back to `sf` with active geometry as the ips1.
+    # Z <- full_join(as_tibble(X), as_tibble(Y), by = "group")
+    # st_as_sf(Z)
+    # https://stackoverflow.com/questions/64365792/dplyr-full-join-on-geometry-columns-of-sf-objects
+    if (inherits(ips1, c("sf", "sfc")) ||
+        inherits(ips2, c("sf", "sfc"))) {
+      ips <-
+        sf::st_as_sf(dplyr::full_join(tibble::as_tibble(ips1),
+                                      tibble::as_tibble(ips2),
+                                      by = by))
+    } else {
+      ips <- dplyr::full_join(ips1, ips2, by = by) # equivalent to base::merge(ips1, ips2, by = by, all = TRUE)
+    }
+
+    ips$weight <- ips$weight.x * ips$weight.y
+    ips[["weight.x"]] <- NULL
+    ips[["weight.y"]] <- NULL
+    tibble::remove_rownames(ips)
+    # row.names(ips) <- as.character(seq_len(NROW(ips))) # Warning message: Setting row names on a tibble is deprecated.
+  }
+  if (any(is.na(ips$weight)) && !isFALSE(na.rm)) {
+    if (is.null(na.rm)) {
+      warning(
+        paste0(
+          "Block information mismatch resulting in NA weights, and 'na.rm' was not supplied.",
+          " These rows will be removed."))
+    }
+    ips <- na.omit(ips)
+  }
+
+  # TODO Transform back to sp only if they are required. ips is a tibble sf tbl data.frame.
+  # It does not make sense to revert certain indices back after merging. Hence, I revert the entire object back to sp.
+  if(any(ipl_sp)){
+    ips <-  sf::as_Spatial(ips)
+    # WARNING SHOULD BE HERE, MORE FRIENDLY ERROR, METHOD ST_AS_SF
+    # TODO deprecated_soft warning for `sp` presence
+    # lifecycle::deprecate_soft(
+    #   when = "2.7.0",
+    #   what = "inlabru::ipl_sp()", # ipl_sp() does not exist but it does not allow mentioning deprecated function in another package
+    #   details = "Support for `sp` is gradually deprecated in favour of `sf` and `terra`"
+    # )
+  }
+  ips
+}
+
+
+
+
+
+
 #' @title Cross product of integration points
 #'
 #' @description
@@ -520,8 +645,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' and multiplies their weights accordingly. If the object defining points in a particular
 #' dimension has no weights attached to it all weights are assumed to be 1.
 #'
-#' @aliases cprod
-#' @export
+# @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
@@ -544,7 +668,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' }
 #' }
 #'
-cprod <- function(...) {
+cprod_old <- function(...) {
   ipl <- list(...)
   ipl <- ipl[!vapply(ipl, is.null, TRUE)]
   if (length(ipl) == 0) {
