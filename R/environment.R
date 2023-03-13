@@ -38,7 +38,7 @@ bru_env_get <- function() {
 #' warning if `silent` is `FALSE`. Otherwise returns `TRUE` and calls `requireNamespace("sp")`
 #' @export
 bru_check_sp_status <- function(silent = FALSE, required = TRUE) {
-  sp_version <- tryCatch(packageVersion("sp"),
+  sp_version <- tryCatch(utils::packageVersion("sp"),
                          error = function(e) NA_character_)
   if (is.na(sp_version)) {
     if (!silent && required) {
@@ -57,7 +57,7 @@ bru_check_sp_status <- function(silent = FALSE, required = TRUE) {
     # get_evolution_status; assume everything is fine if it fails.
     evolution_status <- tryCatch(sp::get_evolution_status(),
                                  error = function(e) 2L)
-    rgdal_version <- tryCatch(packageVersion("rgdal"),
+    rgdal_version <- tryCatch(utils::packageVersion("rgdal"),
                               error = function(e) NA_character_)
     if ((evolution_status < 2L) && is.na(rgdal_version)) {
       if (!silent) {

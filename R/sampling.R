@@ -204,8 +204,10 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
 #          space.units <- fm_length_unit(input.crs)
 #        }
         area.R <- 6371
-        if (abs(1 - space.R/area.R) > 1e-2) {
-          warning("The mesh has radius '", space.R, "', but crs information is available. Using radius 6371 for area calculations.")
+        if (is.geocent){
+          if (abs(1 - space.R/area.R) > 1e-2) {
+            warning("The mesh has radius '", space.R, "', but crs information is available. Using radius 6371 for area calculations.")
+          }
         }
       } else if (is.geocent) {
         area.R <- space.R
