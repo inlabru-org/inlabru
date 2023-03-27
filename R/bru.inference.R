@@ -491,18 +491,11 @@ eval_in_data_context <- function(input,
                                  response_data = NULL,
                                  default = NULL,
                                  .envir = parent.frame()) {
-  data_orig <- data
   response_data_orig <- response_data
-  if (!is.null(data)) {
-    if (is.list(data) && !is.data.frame(data)) {
-    } else {
-      data <- as.data.frame(data)
-    }
-  }
   if (!is.null(response_data)) {
     if (is.list(response_data) && !is.data.frame(response_data)) {
     } else {
-      data <- as.data.frame(data)
+      response_data <- as.data.frame(response_data)
     }
   }
   if (!is.null(response_data)) {
@@ -514,6 +507,13 @@ eval_in_data_context <- function(input,
     )
   }
   if (is.null(response_data) || inherits(result, "try-error")) {
+    data_orig <- data
+    if (!is.null(data)) {
+      if (is.list(data) && !is.data.frame(data)) {
+      } else {
+        data <- as.data.frame(data)
+      }
+    }
     enclos_envir <- new.env(parent = .envir)
     assign(".data.", data_orig, envir = enclos_envir)
     result <- try(
