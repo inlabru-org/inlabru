@@ -101,10 +101,13 @@ Requires the <code>ggplot2</code> package.</p>
 <span>  color <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  edge.color <span class="op">=</span> <span class="st">"grey"</span>,</span>
+<span>  edge.linewidth <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  interior <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  int.color <span class="op">=</span> <span class="st">"blue"</span>,</span>
+<span>  int.linewidth <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  exterior <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ext.color <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  ext.linewidth <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  crs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mask <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nx <span class="op">=</span> <span class="fl">500</span>,</span>
@@ -130,7 +133,11 @@ The alternative name <code>colour</code> is also recognised.</p></dd>
 
 
 <dt>edge.color</dt>
-<dd><p>Color of the mesh edges.</p></dd>
+<dd><p>Color of the regular mesh edges.</p></dd>
+
+
+<dt>edge.linewidth</dt>
+<dd><p>Line width for the regular mesh edges. Default 0.25</p></dd>
 
 
 <dt>interior</dt>
@@ -138,7 +145,11 @@ The alternative name <code>colour</code> is also recognised.</p></dd>
 
 
 <dt>int.color</dt>
-<dd><p>Color used to plot the interior boundaries.</p></dd>
+<dd><p>Color used to plot the interior constraint edges.</p></dd>
+
+
+<dt>int.linewidth</dt>
+<dd><p>Line width for the interior constraint edges. Default 0.5</p></dd>
 
 
 <dt>exterior</dt>
@@ -146,11 +157,16 @@ The alternative name <code>colour</code> is also recognised.</p></dd>
 
 
 <dt>ext.color</dt>
-<dd><p>Color used to plot the interior boundaries.</p></dd>
+<dd><p>Color used to plot the exterior boundary edges.</p></dd>
+
+
+<dt>ext.linewidth</dt>
+<dd><p>Line width for the exterior boundary edges. Default 1</p></dd>
 
 
 <dt>crs</dt>
-<dd><p>A <a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a> object defining the coordinate system to project the mesh to before plotting.</p></dd>
+<dd><p>A CRS object supported by <code><a href="fm_transform.html">fm_transform()</a></code> defining the coordinate
+system to project the mesh to before plotting.</p></dd>
 
 
 <dt>mask</dt>
