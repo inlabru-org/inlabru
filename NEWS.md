@@ -25,7 +25,7 @@
   
 * Allow precomputed spatial covariates in the data for point process observations
 
-* Add `edge|int|ext.linewidth` arguments to `gg.inla.mesh`
+* Add `edge|int|ext.linewidth` arguments to `gg.inla.mesh` #188
 
 # inlabru 2.7.0
 

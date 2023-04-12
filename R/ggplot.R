@@ -765,55 +765,55 @@ gg.inla.mesh <- function(data,
     }
 
     return(gg)
-  } else {
-    if (data$manifold == "S2") {
-      stop("Geom not implemented for spherical meshes (manifold = S2)")
-    }
-    if (!is.null(crs)) {
-      data <- fm_transform(data, crs = crs)
-    }
-
-    df <- rbind(
-      data.frame(a = data$loc[data$graph$tv[, 1], c(1, 2)], b = data$loc[data$graph$tv[, 2], c(1, 2)]),
-      data.frame(a = data$loc[data$graph$tv[, 2], c(1, 2)], b = data$loc[data$graph$tv[, 3], c(1, 2)]),
-      data.frame(a = data$loc[data$graph$tv[, 1], c(1, 2)], b = data$loc[data$graph$tv[, 3], c(1, 2)])
-    )
-
-    colnames(df) <- c("x", "y", "xend", "yend")
-    mp <- ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend)
-    msh <- ggplot2::geom_segment(data = df, mapping = mp, color = edge.color, linewidth = edge.linewidth)
-
-    # Outer boundary
-    if (exterior) {
-      df <- data.frame(
-        data$loc[data$segm$bnd$idx[, 1], 1:2],
-        data$loc[data$segm$bnd$idx[, 2], 1:2]
-      )
-      colnames(df) <- c("x", "y", "xend", "yend")
-      bnd <- ggplot2::geom_segment(data = df, mapping = mp, color = ext.color, linewidth = ext.linewidth)
-    } else {
-      bnd <- NULL
-    }
-
-    if (interior) {
-      # Interior boundary
-      df <- data.frame(
-        data$loc[data$segm$int$idx[, 1], 1:2],
-        data$loc[data$segm$int$idx[, 2], 1:2]
-      )
-      colnames(df) <- c("x", "y", "xend", "yend")
-      if (nrow(df) == 0) {
-        int <- NULL
-      } else {
-        int <- ggplot2::geom_segment(data = df, mapping = mp, color = int.color, linewidth = int.linewidth)
-      }
-    } else {
-      int <- NULL
-    }
-
-    # Return combined geomes
-    c(msh, bnd, int)
   }
+
+  if (data$manifold == "S2") {
+    stop("Geom not implemented for spherical meshes (manifold = S2)")
+  }
+  if (!is.null(crs)) {
+    data <- fm_transform(data, crs = crs)
+  }
+
+  df <- rbind(
+    data.frame(a = data$loc[data$graph$tv[, 1], c(1, 2)], b = data$loc[data$graph$tv[, 2], c(1, 2)]),
+    data.frame(a = data$loc[data$graph$tv[, 2], c(1, 2)], b = data$loc[data$graph$tv[, 3], c(1, 2)]),
+    data.frame(a = data$loc[data$graph$tv[, 1], c(1, 2)], b = data$loc[data$graph$tv[, 3], c(1, 2)])
+  )
+
+  colnames(df) <- c("x", "y", "xend", "yend")
+  mp <- ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend)
+  msh <- ggplot2::geom_segment(data = df, mapping = mp, color = edge.color, linewidth = edge.linewidth)
+
+  # Outer boundary
+  if (exterior) {
+    df <- data.frame(
+      data$loc[data$segm$bnd$idx[, 1], 1:2],
+      data$loc[data$segm$bnd$idx[, 2], 1:2]
+    )
+    colnames(df) <- c("x", "y", "xend", "yend")
+    bnd <- ggplot2::geom_segment(data = df, mapping = mp, color = ext.color, linewidth = ext.linewidth)
+  } else {
+    bnd <- NULL
+  }
+
+  if (interior) {
+    # Interior boundary
+    df <- data.frame(
+      data$loc[data$segm$int$idx[, 1], 1:2],
+      data$loc[data$segm$int$idx[, 2], 1:2]
+    )
+    colnames(df) <- c("x", "y", "xend", "yend")
+    if (nrow(df) == 0) {
+      int <- NULL
+    } else {
+      int <- ggplot2::geom_segment(data = df, mapping = mp, color = int.color, linewidth = int.linewidth)
+    }
+  } else {
+    int <- NULL
+  }
+
+  # Return combined geomes
+  c(msh, bnd, int)
 }
 
 
