@@ -101,7 +101,7 @@
                         <h4 data-toc-skip class="author">Niharika Reddy
 Peddinenikalva</h4>
             
-            <h4 data-toc-skip class="date">2023-03-27</h4>
+            <h4 data-toc-skip class="date">2023-04-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_residuals.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_residuals.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_residuals.Rmd</code></div>
@@ -109,6 +109,9 @@ Peddinenikalva</h4>
 
     
     
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Load function definitions</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"2d_lgcp_residuals_functions.R"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -280,7 +283,7 @@ given in the Code appendix at the end of this vignette.</p>
 “inlabru” package in R for modelling spatial Poisson processes. Here,
 the ``inlabru” package uses Latent Gaussian Cox Processes to model the
 data using different model definitions.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span>
 <span><span class="va">nests</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span></span>
@@ -296,14 +299,13 @@ residual and a matrix <code>A_integrate</code> that helps to calculate
 the integral term of the residual.</p>
 <p>The function <code>residual_df</code> is defined to compute all three
 types of residuals for a given model and choice of <span class="math inline">\(B\)</span> given a set of observations.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the subset B</span></span>
 <span><span class="va">B</span> <span class="op">&lt;-</span> <span class="va">boundary</span></span>
 <span></span>
 <span><span class="co"># Store the required matrices and data frames for residual computation</span></span>
 <span><span class="va">As</span> <span class="op">&lt;-</span> <span class="fu">prepare_residual_calculations</span><span class="op">(</span>samplers <span class="op">=</span> <span class="va">B</span>, domain <span class="op">=</span> <span class="va">mesh</span>,</span>
 <span>                     observations <span class="op">=</span> <span class="va">nests</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: PROJ support is provided by the sf and terra packages among others</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="assessing-4-models-with-residuals">Assessing 4 models with residuals<a class="anchor" aria-label="anchor" href="#assessing-4-models-with-residuals"></a>
@@ -342,11 +344,11 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu">edit_df</span><span class="op">(</span><span class="va">veg_res</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Type"</span>, <span class="st">"mean.mc_std_err"</span>, <span class="st">"sd.mc_std_err"</span>, <span class="st">"median"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="26%">
+<col width="25%">
 <col width="14%">
 <col width="14%">
 <col width="15%">
-<col width="14%">
+<col width="15%">
 <col width="14%">
 </colgroup>
 <thead><tr class="header">
@@ -360,27 +362,27 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">2.5647253</td>
-<td align="right">24.338475</td>
-<td align="right">-40.160219</td>
-<td align="right">4.5407744</td>
-<td align="right">54.384130</td>
+<td align="right">6.5510572</td>
+<td align="right">25.089440</td>
+<td align="right">-44.342707</td>
+<td align="right">10.5317533</td>
+<td align="right">45.528701</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">0.2868099</td>
-<td align="right">1.311244</td>
-<td align="right">-2.156640</td>
-<td align="right">0.2262184</td>
-<td align="right">2.706137</td>
+<td align="right">0.5262916</td>
+<td align="right">1.371162</td>
+<td align="right">-1.854319</td>
+<td align="right">0.4019278</td>
+<td align="right">3.373840</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">0.6739976</td>
-<td align="right">4.141836</td>
-<td align="right">-6.941574</td>
-<td align="right">0.5674474</td>
-<td align="right">9.151718</td>
+<td align="right">1.5164378</td>
+<td align="right">4.330247</td>
+<td align="right">-8.372728</td>
+<td align="right">2.1381065</td>
+<td align="right">9.469903</td>
 </tr>
 </tbody>
 </table>
@@ -441,27 +443,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-26.336850</td>
-<td align="right">27.050046</td>
-<td align="right">-85.05029</td>
-<td align="right">-24.630498</td>
-<td align="right">18.594607</td>
+<td align="right">-24.729059</td>
+<td align="right">27.353161</td>
+<td align="right">-78.61752</td>
+<td align="right">-20.246344</td>
+<td align="right">26.526860</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-8.080683</td>
-<td align="right">1.637287</td>
-<td align="right">-10.44819</td>
-<td align="right">-8.254192</td>
-<td align="right">-4.434005</td>
+<td align="right">-7.986907</td>
+<td align="right">1.469348</td>
+<td align="right">-10.24820</td>
+<td align="right">-8.225361</td>
+<td align="right">-4.232814</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-10.808498</td>
-<td align="right">3.695917</td>
-<td align="right">-17.09049</td>
-<td align="right">-10.772805</td>
-<td align="right">-4.222480</td>
+<td align="right">-10.457467</td>
+<td align="right">3.236243</td>
+<td align="right">-17.06930</td>
+<td align="right">-10.428952</td>
+<td align="right">-5.078680</td>
 </tr>
 </tbody>
 </table>
@@ -494,11 +496,11 @@ The residuals of the model are also computed where <span class="math inline">\(B
 W\)</span> are given below:</p>
 <table class="table">
 <colgroup>
-<col width="25%">
+<col width="26%">
+<col width="14%">
 <col width="15%">
 <col width="15%">
-<col width="15%">
-<col width="15%">
+<col width="14%">
 <col width="13%">
 </colgroup>
 <thead><tr class="header">
@@ -512,27 +514,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-3.8031015</td>
-<td align="right">26.4111047</td>
-<td align="right">-60.291336</td>
-<td align="right">-0.6736533</td>
-<td align="right">40.405337</td>
+<td align="right">0.7688143</td>
+<td align="right">26.5536167</td>
+<td align="right">-56.752178</td>
+<td align="right">1.6690694</td>
+<td align="right">57.49183</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-0.0843852</td>
-<td align="right">0.7931313</td>
-<td align="right">-1.695069</td>
-<td align="right">-0.0206774</td>
-<td align="right">1.324679</td>
+<td align="right">0.0571806</td>
+<td align="right">0.8256696</td>
+<td align="right">-1.602932</td>
+<td align="right">0.0514340</td>
+<td align="right">1.94020</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-0.5733914</td>
-<td align="right">4.5729871</td>
-<td align="right">-10.109295</td>
-<td align="right">-0.1180229</td>
-<td align="right">7.316015</td>
+<td align="right">0.2301460</td>
+<td align="right">4.6768415</td>
+<td align="right">-9.537767</td>
+<td align="right">0.2929964</td>
+<td align="right">10.56147</td>
 </tr>
 </tbody>
 </table>
@@ -564,13 +566,13 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <p><img src="2d_lgcp_residuals_files/figure-html/smooth-mod-1.png" width="700"></p>
 <p>The residuals of the model when <span class="math inline">\(B =
 W\)</span> are given below:</p>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
 <col width="26%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
 <col width="15%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
 <col width="14%">
 </colgroup>
 <thead><tr class="header">
@@ -584,27 +586,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-26.58590</td>
-<td align="right">28.244788</td>
-<td align="right">-76.26372</td>
-<td align="right">-28.452653</td>
-<td align="right">26.272256</td>
+<td align="right">-22.286224</td>
+<td align="right">25.293942</td>
+<td align="right">-64.66941</td>
+<td align="right">-23.27312</td>
+<td align="right">26.987419</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-8.67418</td>
-<td align="right">1.459150</td>
-<td align="right">-10.74811</td>
-<td align="right">-8.615661</td>
-<td align="right">-5.480039</td>
+<td align="right">-8.844933</td>
+<td align="right">1.369975</td>
+<td align="right">-11.16534</td>
+<td align="right">-9.01543</td>
+<td align="right">-5.836037</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-11.93992</td>
-<td align="right">3.706417</td>
-<td align="right">-18.10055</td>
-<td align="right">-11.979098</td>
-<td align="right">-5.116153</td>
+<td align="right">-11.288460</td>
+<td align="right">3.862768</td>
+<td align="right">-18.57954</td>
+<td align="right">-11.26195</td>
+<td align="right">-3.985174</td>
 </tr>
 </tbody>
 </table>
@@ -634,19 +636,17 @@ residuals for this choice of <span class="math inline">\(B\)</span>.</p>
 <p><img src="2d_lgcp_residuals_files/figure-html/partitioning-B-two-1.png" width="700"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">As1</span> <span class="op">&lt;-</span> <span class="fu">prepare_residual_calculations</span><span class="op">(</span>samplers <span class="op">=</span> <span class="va">B1</span>, domain <span class="op">=</span> <span class="va">mesh</span>, </span>
-<span>                                     observations <span class="op">=</span> <span class="va">nests</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: PROJ support is provided by the sf and terra packages among others</span></span></code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Residuals for the vegetation model</span></span>
+<span>                                     observations <span class="op">=</span> <span class="va">nests</span><span class="op">)</span></span>
+<span><span class="co"># Residuals for the vegetation model</span></span>
 <span><span class="va">veg_res2</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span><span class="va">fit1</span>, <span class="va">As1</span><span class="op">$</span><span class="va">df</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                        <span class="va">As1</span><span class="op">$</span><span class="va">A_sum</span>, <span class="va">As1</span><span class="op">$</span><span class="va">A_integrate</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu">edit_df</span><span class="op">(</span><span class="va">veg_res2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Type"</span>, <span class="st">"mean.mc_std_err"</span>, </span>
 <span>                                 <span class="st">"sd.mc_std_err"</span>, <span class="st">"median"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="26%">
+<col width="27%">
 <col width="14%">
-<col width="14%">
+<col width="13%">
 <col width="14%">
 <col width="14%">
 <col width="14%">
@@ -662,51 +662,51 @@ residuals for this choice of <span class="math inline">\(B\)</span>.</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals.1</td>
-<td align="right">43.568395</td>
-<td align="right">16.5671590</td>
-<td align="right">15.696513</td>
-<td align="right">45.332742</td>
-<td align="right">72.541364</td>
+<td align="right">42.676324</td>
+<td align="right">18.763013</td>
+<td align="right">10.722317</td>
+<td align="right">41.858461</td>
+<td align="right">82.041990</td>
 </tr>
 <tr class="even">
 <td align="left">Scaling_Residuals.2</td>
-<td align="right">-42.919332</td>
-<td align="right">10.3322318</td>
-<td align="right">-62.198567</td>
-<td align="right">-43.395484</td>
-<td align="right">-24.574626</td>
+<td align="right">-43.918073</td>
+<td align="right">10.557018</td>
+<td align="right">-63.553540</td>
+<td align="right">-44.223306</td>
+<td align="right">-24.100988</td>
 </tr>
 <tr class="odd">
 <td align="left">Inverse_Residuals.1</td>
-<td align="right">5.236970</td>
-<td align="right">1.0507275</td>
-<td align="right">3.326979</td>
-<td align="right">5.047888</td>
-<td align="right">7.683559</td>
+<td align="right">5.172323</td>
+<td align="right">1.096702</td>
+<td align="right">3.277646</td>
+<td align="right">5.098554</td>
+<td align="right">7.310569</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.2</td>
-<td align="right">-4.924604</td>
-<td align="right">0.3959167</td>
-<td align="right">-5.521616</td>
-<td align="right">-4.994611</td>
-<td align="right">-4.059773</td>
+<td align="right">-4.928771</td>
+<td align="right">0.428075</td>
+<td align="right">-5.596264</td>
+<td align="right">-4.971630</td>
+<td align="right">-3.977348</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.1</td>
-<td align="right">15.495344</td>
-<td align="right">2.8249337</td>
-<td align="right">10.112894</td>
-<td align="right">15.371238</td>
-<td align="right">20.830327</td>
+<td align="right">15.284417</td>
+<td align="right">3.022552</td>
+<td align="right">10.436932</td>
+<td align="right">14.791935</td>
+<td align="right">21.667061</td>
 </tr>
 <tr class="even">
 <td align="left">Pearson_Residuals.2</td>
-<td align="right">-14.866445</td>
-<td align="right">1.6899818</td>
-<td align="right">-18.144714</td>
-<td align="right">-15.106908</td>
-<td align="right">-11.394533</td>
+<td align="right">-15.015605</td>
+<td align="right">1.797624</td>
+<td align="right">-17.996469</td>
+<td align="right">-15.147391</td>
+<td align="right">-11.535784</td>
 </tr>
 </tbody>
 </table>
@@ -719,7 +719,6 @@ defined that plots the residuals for each corresponding polygon of
 <p>Another type of partitioning is considered with three sections of the
 region and its residuals are as displayed below:
 <img src="2d_lgcp_residuals_files/figure-html/partitioning-B-three-1.png" width="700"></p>
-<pre><code><span><span class="co">## Warning: PROJ support is provided by the sf and terra packages among others</span></span></code></pre>
 <table class="table">
 <colgroup>
 <col width="26%">
@@ -740,75 +739,75 @@ region and its residuals are as displayed below:
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals.1</td>
-<td align="right">69.895389</td>
-<td align="right">7.6529424</td>
-<td align="right">56.2031527</td>
-<td align="right">70.267264</td>
-<td align="right">83.982668</td>
+<td align="right">68.848851</td>
+<td align="right">6.7012853</td>
+<td align="right">56.0596435</td>
+<td align="right">69.510435</td>
+<td align="right">81.029903</td>
 </tr>
 <tr class="even">
 <td align="left">Scaling_Residuals.2</td>
-<td align="right">-23.360735</td>
-<td align="right">16.3259825</td>
-<td align="right">-52.5649515</td>
-<td align="right">-21.531140</td>
-<td align="right">5.834282</td>
+<td align="right">-24.223327</td>
+<td align="right">14.7650860</td>
+<td align="right">-50.4399258</td>
+<td align="right">-24.551469</td>
+<td align="right">3.110253</td>
 </tr>
 <tr class="odd">
 <td align="left">Scaling_Residuals.3</td>
-<td align="right">-46.118670</td>
-<td align="right">4.4027113</td>
-<td align="right">-55.4927503</td>
-<td align="right">-46.113248</td>
-<td align="right">-38.819882</td>
+<td align="right">-46.804191</td>
+<td align="right">4.1882075</td>
+<td align="right">-55.2289370</td>
+<td align="right">-46.522351</td>
+<td align="right">-39.432677</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.1</td>
-<td align="right">2.966300</td>
-<td align="right">0.7356423</td>
-<td align="right">1.6012368</td>
-<td align="right">2.847054</td>
-<td align="right">4.641233</td>
+<td align="right">2.891326</td>
+<td align="right">0.7030891</td>
+<td align="right">1.8437774</td>
+<td align="right">2.824902</td>
+<td align="right">4.492037</td>
 </tr>
 <tr class="odd">
 <td align="left">Inverse_Residuals.2</td>
-<td align="right">3.032153</td>
-<td align="right">0.7145395</td>
-<td align="right">1.6680748</td>
-<td align="right">2.974171</td>
-<td align="right">4.424218</td>
+<td align="right">2.933154</td>
+<td align="right">0.6663930</td>
+<td align="right">1.7919139</td>
+<td align="right">2.959830</td>
+<td align="right">4.247451</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.3</td>
-<td align="right">-5.452845</td>
-<td align="right">0.0535304</td>
-<td align="right">-5.5337953</td>
-<td align="right">-5.459987</td>
-<td align="right">-5.332294</td>
+<td align="right">-5.455142</td>
+<td align="right">0.0526399</td>
+<td align="right">-5.5301256</td>
+<td align="right">-5.462878</td>
+<td align="right">-5.327626</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.1</td>
-<td align="right">11.666155</td>
-<td align="right">1.7328120</td>
-<td align="right">8.3789475</td>
-<td align="right">11.514640</td>
-<td align="right">14.964253</td>
+<td align="right">11.429436</td>
+<td align="right">1.5234058</td>
+<td align="right">8.6938416</td>
+<td align="right">11.550900</td>
+<td align="right">14.124502</td>
 </tr>
 <tr class="even">
 <td align="left">Pearson_Residuals.2</td>
-<td align="right">4.487813</td>
-<td align="right">2.1107936</td>
-<td align="right">0.7214957</td>
-<td align="right">4.431618</td>
-<td align="right">8.809428</td>
+<td align="right">4.268412</td>
+<td align="right">1.7926636</td>
+<td align="right">0.8670982</td>
+<td align="right">4.164337</td>
+<td align="right">7.113542</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.3</td>
-<td align="right">-15.218921</td>
-<td align="right">0.8483239</td>
-<td align="right">-16.9965760</td>
-<td align="right">-15.144066</td>
-<td align="right">-13.728526</td>
+<td align="right">-15.331950</td>
+<td align="right">0.8182924</td>
+<td align="right">-16.8367105</td>
+<td align="right">-15.286324</td>
+<td align="right">-13.768651</td>
 </tr>
 </tbody>
 </table>
@@ -816,11 +815,12 @@ region and its residuals are as displayed below:
 <div class="section level3">
 <h3 id="residuals-of-models-at-different-resolutions">Residuals of models at different resolutions<a class="anchor" aria-label="anchor" href="#residuals-of-models-at-different-resolutions"></a>
 </h3>
-<p>Consider two more resolutions of <span class="math inline">\(B\)</span>, given in the plots below.
-<img src="2d_lgcp_residuals_files/figure-html/more-resolutions-1.png" width="700"></p>
-<pre><code><span><span class="co">## Warning: PROJ support is provided by the sf and terra packages among others</span></span></code></pre>
-<p><img src="2d_lgcp_residuals_files/figure-html/more-resolutions-2.png" width="700"></p>
-<pre><code><span><span class="co">## Warning: PROJ support is provided by the sf and terra packages among others</span></span></code></pre>
+<p>Consider two more resolutions of <span class="math inline">\(B\)</span>, given in the plots below. Here we use
+the <code>resolution</code> argument instead of <code>nrow</code> and
+<code>ncol</code>. Due to the way <code><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">terra::rast()</a></code> interprets
+the arguments, using <code>resolution</code> doesn’t guarantee complete
+coverage of the <code>samplers</code> polygon.
+<img src="2d_lgcp_residuals_files/figure-html/more-resolutions-1.png" width="700"><img src="2d_lgcp_residuals_files/figure-html/more-resolutions-2.png" width="700"></p>
 <p>Using these two new choices of <span class="math inline">\(B\)</span>, the residuals are calculated for all
 four models at both resolutions using <code>residual_df()</code>.</p>
 <p>The functions <code>set_csc()</code> and <code>residual_plot()</code>
@@ -854,7 +854,7 @@ resolutions.</p>
 <span><span class="co">## Regions defined for each Polygons</span></span>
 <span><span class="co">## Regions defined for each Polygons</span></span>
 <span><span class="co">## Regions defined for each Polygons</span></span></code></pre>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Residuals of Vegetation model</span></span>
 <span><span class="va">Residual_fit1_B3</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span>model <span class="op">=</span>  <span class="va">fit1</span>, df <span class="op">=</span> <span class="va">As3</span><span class="op">$</span><span class="va">df</span>, </span>
 <span>            expr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>, A_sum <span class="op">=</span> <span class="va">As3</span><span class="op">$</span><span class="va">A_sum</span>, </span>
@@ -960,7 +960,7 @@ is useful to have the same colour scale for all the 4 models.</p>
 <span><span class="co">## Regions defined for each Polygons</span></span></code></pre>
 <p>The code chunk below demonstrates the code for plotting the “Pearson”
 residuals when <span class="math inline">\(B = B_4\)</span>.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the residuals for all models at B4</span></span>
 <span><span class="va">Residual_fit1_B4</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span>model <span class="op">=</span>  <span class="va">fit1</span>, df <span class="op">=</span> <span class="va">As4</span><span class="op">$</span><span class="va">df</span>, </span>
 <span>            expr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>, A_sum <span class="op">=</span> <span class="va">As4</span><span class="op">$</span><span class="va">A_sum</span>, </span>
@@ -1041,7 +1041,7 @@ resolutions <span class="math inline">\(B_3\)</span> and <span class="math inlin
 <div class="section level3">
 <h3 id="function-definitions">Function definitions<a class="anchor" aria-label="anchor" href="#function-definitions"></a>
 </h3>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Niharika Reddy Peddinenikalva</span></span>
 <span><span class="co"># Vacation Scholarship project</span></span>
 <span></span>
@@ -1049,12 +1049,10 @@ resolutions <span class="math inline">\(B_3\)</span> and <span class="math inlin
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.inlabru.org" class="external-link">"inlabru"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"RColorBrewer"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://maptools.r-forge.r-project.org/" class="external-link">"maptools"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/r-spatial/lwgeom/" class="external-link">"lwgeom"</a></span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/mtennekes/tmaptools" class="external-link">"tmaptools"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://patchwork.data-imaginist.com" class="external-link">"patchwork"</a></span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://rspatial.org/raster" class="external-link">"raster"</a></span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://rspatial.org/" class="external-link">"terra"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://r-datatable.com" class="external-link">"data.table"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html" class="external-link">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -1081,7 +1079,7 @@ resolutions <span class="math inline">\(B_3\)</span> and <span class="math inlin
 <span><span class="co">#'</span></span>
 <span><span class="va">prepare_residual_calculations</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">domain</span>, <span class="va">observations</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Assign separate IDs to each polygon in the set B</span></span>
-<span>  <span class="va">samplers</span><span class="op">$</span><span class="va">ID</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">samplers</span><span class="op">$</span><span class="va">ID</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># Calculate the integration weights for A_integrate</span></span>
 <span>  <span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span>samplers <span class="op">=</span> <span class="va">samplers</span>, domain <span class="op">=</span> <span class="va">domain</span>,</span>
@@ -1098,10 +1096,12 @@ resolutions <span class="math inline">\(B_3\)</span> and <span class="math inlin
 <span>  <span class="co"># A_sum has as many rows as polygons in the samplers,</span></span>
 <span>  <span class="co"># as many columns as observed points</span></span>
 <span>  <span class="co"># each row has 1s for the points in the corresponding polygon</span></span>
-<span>  <span class="va">idx</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/over.html" class="external-link">over</a></span><span class="op">(</span><span class="va">observations</span>, <span class="va">samplers</span><span class="op">)</span></span>
-<span>  <span class="va">A_sum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/sparseMatrix.html" class="external-link">sparseMatrix</a></span><span class="op">(</span>i <span class="op">=</span> <span class="va">idx</span><span class="op">$</span><span class="va">ID</span>, j <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">observations</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                        x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">observations</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                        dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">observations</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">idx</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_within</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">observations</span><span class="op">)</span>, <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>, sparse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">A_sum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/sparseMatrix.html" class="external-link">sparseMatrix</a></span><span class="op">(</span>i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">idx</span><span class="op">)</span>,</span>
+<span>                        j <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">observations</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">idx</span>, <span class="va">length</span>, <span class="fl">1L</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                        x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">idx</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                        dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">observations</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span>  <span class="co"># Setting up the data frame for calculating residuals</span></span>
@@ -1140,7 +1140,7 @@ resolutions <span class="math inline">\(B_3\)</span> and <span class="math inlin
 <span></span>
 <span><span class="va">residual_df</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">df</span>, <span class="va">expr</span>, <span class="va">A_sum</span>, <span class="va">A_integrate</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Compute residuals</span></span>
-<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">model</span>, data <span class="op">=</span> <span class="va">df</span>,</span>
+<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">model</span>, data <span class="op">=</span> <span class="va">df</span>,</span>
 <span>                 <span class="op">~</span><span class="op">{</span></span>
 <span>                   <span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval</a></span><span class="op">(</span><span class="va">expr</span><span class="op">)</span></span>
 <span>                   <span class="va">h1</span> <span class="op">&lt;-</span> <span class="va">lambda</span> <span class="op">*</span> <span class="fl">0</span> <span class="op">+</span> <span class="fl">1</span></span>
@@ -1297,20 +1297,20 @@ resolutions <span class="math inline">\(B_3\)</span> and <span class="math inlin
 <span><span class="va">partition</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">resolution</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">nrows</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">ncols</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Create a grid for the given boundary</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">resolution</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>, crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/is.projected.html" class="external-link">proj4string</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
+<span>    <span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>, crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/is.projected.html" class="external-link">proj4string</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
 <span>                   nrows <span class="op">=</span> <span class="va">nrows</span>, ncols <span class="op">=</span> <span class="va">ncols</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">nrows</span>, <span class="va">ncols</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>, crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/is.projected.html" class="external-link">proj4string</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
+<span>    <span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>, crs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/is.projected.html" class="external-link">proj4string</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
 <span>                 resolution <span class="op">=</span> <span class="va">resolution</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="op">}</span></span>
 <span></span>
-<span>  <span class="va">gridPolygon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/rasterToPolygons.html" class="external-link">rasterToPolygons</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span></span>
+<span>  <span class="va">gridPolygon</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/as.spatvector.html" class="external-link">as.polygons</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># Extract the boundary with subpolygons only</span></span>
-<span>  <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">intersect</a></span><span class="op">(</span><span class="va">gridPolygon</span>, <span class="va">samplers</span><span class="op">)</span></span>
+<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/coerce-methods.html" class="external-link">as_Spatial</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/intersect.html" class="external-link">intersect</a></span><span class="op">(</span><span class="va">gridPolygon</span>, <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span></span>
@@ -1330,7 +1330,7 @@ resolutions <span class="math inline">\(B_3\)</span> and <span class="math inlin
 <span><span class="co">#'</span></span>
 <span><span class="va">edit_df</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span>, <span class="va">columns</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Remove the columns that are not required</span></span>
-<span>  <span class="va">df</span><span class="op">[</span>, <span class="op">!</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">columns</span><span class="op">)</span><span class="op">]</span></span>
+<span>  <span class="va">df</span><span class="op">[</span>, <span class="op">!</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/terra/man/match.html" class="external-link">%in%</a></span> <span class="va">columns</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
