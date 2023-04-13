@@ -86,18 +86,27 @@ checks and optionally sets the <code>sp</code> evolution status flag if <code>rg
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_safe_sp</span><span class="op">(</span>quietly <span class="op">=</span> <span class="cn">FALSE</span>, force <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_safe_sp</span><span class="op">(</span>quietly <span class="op">=</span> <span class="cn">FALSE</span>, force <span class="op">=</span> <span class="cn">FALSE</span>, minimum_version <span class="op">=</span> <span class="st">"1.4-5"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>quietly</dt>
-<dd><p>logical; if <code>TRUE</code>, always return <code>TRUE</code> or <code>FALSE</code>. Default <code>FALSE</code></p></dd>
+<dd><p>logical; if <code>TRUE</code>, prints diagnostic messages. Default <code>FALSE</code></p></dd>
 
 
 <dt>force</dt>
-<dd><p>logical; if <code>TRUE</code>, give an error or warning if <code>sp</code> is not available,
-and set the evolution status to <code>2L</code> if needed. Default <code>FALSE</code></p></dd>
+<dd><p>logical; If <code>rgdal</code> is unavailable
+and evolution status is less that <code>2L</code>, return <code>FALSE</code> if <code>force</code> is <code>FALSE</code>.
+If <code>force</code> is <code>TRUE</code>, return <code>TRUE</code> if the package configuration is safe,
+potentially after forcing the evolution status to <code>2L</code>.
+Default <code>FALSE</code></p></dd>
+
+
+<dt>minimum_version</dt>
+<dd><p>character; the minimum required INLA version.
+Default 1.4-5 (should always match the requirement in the package
+DESCRIPTION)</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -105,7 +114,7 @@ and set the evolution status to <code>2L</code> if needed. Default <code>FALSE</
     
 
 <p>Returns <code>FALSE</code> if a potential issue is detected, and give a
-warning or error if <code>quietly</code> is <code>FALSE</code>. Otherwise returns <code>TRUE</code> and calls <code><a href="https://github.com/edzer/sp/" class="external-link">requireNamespace("sp")</a></code></p>
+message if <code>quietly</code> is <code>FALSE</code>. Otherwise returns <code>TRUE</code></p>
 
 
     </div>
