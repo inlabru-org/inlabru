@@ -103,9 +103,6 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_call_options.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_check_sp_status.html</loc>
-  </url>
-  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_compute_linearisation.html</loc>
   </url>
   <url>
@@ -155,6 +152,9 @@
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_safe_inla.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_safe_sp.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_standardise_names.html</loc>

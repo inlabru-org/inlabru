@@ -87,6 +87,7 @@
 <li><p>Add workarounds for inconsistent polygon orientation resulting from <code>sf::st_*</code> calls that don’t account for the <code>geos</code> canonical representation being CW, whereas the canonical Simple Features representation being CCW. See <a href="https://github.com/r-spatial/sf/issues/2096" class="external-link uri">https://github.com/r-spatial/sf/issues/2096</a></p></li>
 <li><p>Allow precomputed spatial covariates in the data for point process observations</p></li>
 <li><p>Add <code>edge|int|ext.linewidth</code> arguments to <code>gg.inla.mesh</code> <a href="https://github.com/inlabru-org/inlabru/issues/188" class="external-link">#188</a></p></li>
+<li><p>Add <code><a href="../reference/bru_safe_sp.html">bru_safe_sp()</a></code> to check if <code>sp</code> can be used safely (checks <code>rgdal</code> availability and <code>sp</code> evolution status, optionally forcing use of <code>sf</code>) <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.7.0" id="inlabru-270">inlabru 2.7.0<a class="anchor" aria-label="anchor" href="#inlabru-270"></a></h2><p class="text-muted">CRAN release: 2022-12-02</p>
