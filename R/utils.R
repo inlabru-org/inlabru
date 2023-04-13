@@ -9,6 +9,9 @@
 #' if running in testthat or non-interactively, in which case sets
 #' `multicore=FALSE`, otherwise `TRUE`.
 #' @param quietly logical; if `TRUE`, prints diagnostic messages. Default: FALSE.
+#' @param minimum_version character; the minimum required INLA version.
+#' Default 23.1.31 (should always match the requirement in the package
+#' DESCRIPTION)
 #' @export
 #' @return logical; `TRUE` if INLA was loaded safely, otherwise FALSE
 #'
@@ -20,50 +23,67 @@
 #' }
 #'
 bru_safe_inla <- function(multicore = NULL,
-                          quietly = FALSE) {
-  if (requireNamespace("INLA", quietly = TRUE)) {
-    if (is.null(multicore)) {
-      multicore <-
-        !identical(Sys.getenv("TESTTHAT"), "true") ||
-          interactive()
+                          quietly = FALSE,
+                          minimum_version = "23.1.31") {
+  inla_version <- tryCatch(utils::packageVersion("INLA"),
+                         error = function(e) NA_character_)
+  if (is.na(inla_version)) {
+    if (!quietly) {
+      message("INLA is not installed.")
     }
-    if (!multicore) {
-      n.t <- tryCatch(
-        INLA::inla.getOption("num.threads"),
-        error = function(e) {
-          e
-        }
-      )
-      if (inherits(n.t, "simpleError")) {
-        if (!quietly) {
-          message("inla.getOption() failed. INLA not installed correctly.")
-        }
-        return(FALSE)
-      }
-      if (!quietly) {
-        message(paste0("Current num.threads is '", n.t, "'."))
-      }
-      if (!identical(n.t, "1:1")) {
-        if (!quietly) {
-          message(paste0(
-            "Setting INLA option num.threads to '1:1'.",
-            " Previous value '", n.t, "'."
-          ))
-        }
-        INLA::inla.setOption(num.threads = "1:1")
-      } else {
-        if (!quietly) {
-          message("No num.threads change needed.")
-        }
-      }
+    return(FALSE)
+  }
+  if (inla_version < minimum_version) {
+    if (!quietly) {
+      message(paste0(
+        "Installed INLA version is ", inla_version, " but ",
+        "version >= ", minimum_version, " is required."))
     }
-    TRUE
-  } else {
+    return(FALSE)
+  }
+  if (!requireNamespace("INLA", quietly = TRUE)) {
     if (!quietly) {
       message("INLA not loaded safely.")
     }
-    FALSE
+    return(FALSE)
   }
+
+  if (is.null(multicore)) {
+    multicore <-
+      !identical(Sys.getenv("TESTTHAT"), "true") ||
+      interactive()
+  }
+  if (!multicore) {
+    n.t <- tryCatch(
+      INLA::inla.getOption("num.threads"),
+      error = function(e) {
+        e
+      }
+    )
+    if (inherits(n.t, "simpleError")) {
+      if (!quietly) {
+        message("inla.getOption() failed. INLA not installed correctly.")
+      }
+      return(FALSE)
+    }
+    if (!quietly) {
+      message(paste0("Current num.threads is '", n.t, "'."))
+    }
+    if (!identical(n.t, "1:1")) {
+      if (!quietly) {
+        message(paste0(
+          "Setting INLA option num.threads to '1:1'.",
+          " Previous value '", n.t, "'."
+        ))
+      }
+      INLA::inla.setOption(num.threads = "1:1")
+    } else {
+      if (!quietly) {
+        message("No num.threads change needed.")
+      }
+    }
+  }
+  return(TRUE)
 }
 
 
@@ -74,11 +94,14 @@ bru_safe_inla <- function(multicore = NULL,
 #' Loads the sp package with `requireNamespace("sp", quietly = TRUE)`, and
 #' checks and optionally sets the `sp` evolution status flag if `rgdal` is unavailable.
 #'
-#' @param quietly logical; if `TRUE`, always return `TRUE` or `FALSE`. Default `FALSE`
-#' @param force logical; if `TRUE`, give an error or warning if `sp` is not available,
-#' and set the evolution status to `2L` if needed. Default `FALSE`
+#' @param quietly logical; if `TRUE`, prints diagnostic messages. Default `FALSE`
+#' @param force logical; If `rgdal` is unavailable
+#' and evolution status is less that `2L`, return `FALSE` if `force` is `FALSE`.
+#' If `force` is `TRUE`, return `TRUE` if the package configuration is safe,
+#' potentially after forcing the evolution status to `2L`.
+#' Default `FALSE`
 #' @return Returns `FALSE` if a potential issue is detected, and give a
-#' warning or error if `quietly` is `FALSE`. Otherwise returns `TRUE` and calls `requireNamespace("sp")`
+#' message if `quietly` is `FALSE`. Otherwise returns `TRUE`
 #' @export
 #' @examples
 #' \dontrun{
@@ -92,12 +115,7 @@ bru_safe_sp <- function(quietly = FALSE, force = FALSE) {
                          error = function(e) NA_character_)
   if (is.na(sp_version) || !requireNamespace("sp", quietly = quietly)) {
     if (!quietly) {
-      msg <- "No 'sp' version detected or the package couldn't be loaded."
-      if (force) {
-        stop(msg)
-      } else {
-        warning(msg, immediate. = TRUE)
-      }
+      message("No 'sp' version detected or the package couldn't be loaded.")
     }
     return(FALSE)
   }
@@ -110,14 +128,13 @@ bru_safe_sp <- function(quietly = FALSE, force = FALSE) {
     rgdal_version <- tryCatch(utils::packageVersion("rgdal"),
                               error = function(e) NA_character_)
     if ((evolution_status < 2L) && is.na(rgdal_version)) {
+      if (!quietly) {
+        message("'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.")
+      }
       if (!force) {
         if (!quietly) {
-          warning(
-            paste0(
-              "'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.\n",
-              "This may cause issues with some CRS handling code. To avoid this, use 'sp::set_evolution_status(2L)'"
-            ),
-            immediate. = TRUE
+          message(
+            "This may cause issues with some CRS handling code. To avoid this, use 'sp::set_evolution_status(2L)'"
           )
         }
         return(FALSE)
@@ -126,10 +143,7 @@ bru_safe_sp <- function(quietly = FALSE, force = FALSE) {
       sp::set_evolution_status(2L)
       if (!quietly) {
         message(
-          paste0(
-            "'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.\n",
-            "Ran 'sp::set_evolution_status(2L)' to avoid issues with some CRS handling code."
-          )
+          "Ran 'sp::set_evolution_status(2L)' to avoid issues with some CRS handling code."
         )
       }
     }
