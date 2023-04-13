@@ -67,6 +67,78 @@ bru_safe_inla <- function(multicore = NULL,
 }
 
 
+
+
+#' Check for potential `sp` version compatibility issues
+#'
+#' Loads the sp package with `requireNamespace("sp", quietly = TRUE)`, and
+#' checks and optionally sets the `sp` evolution status flag if `rgdal` is unavailable.
+#'
+#' @param quietly logical; if `TRUE`, always return `TRUE` or `FALSE`. Default `FALSE`
+#' @param force logical; if `TRUE`, give an error or warning if `sp` is not available,
+#' and set the evolution status to `2L` if needed. Default `FALSE`
+#' @return Returns `FALSE` if a potential issue is detected, and give a
+#' warning or error if `quietly` is `FALSE`. Otherwise returns `TRUE` and calls `requireNamespace("sp")`
+#' @export
+#' @examples
+#' \dontrun{
+#' if (bru_safe_sp()) {
+#'   # Run sp dependent calculations
+#' }
+#' }
+#'
+bru_safe_sp <- function(quietly = FALSE, force = FALSE) {
+  sp_version <- tryCatch(utils::packageVersion("sp"),
+                         error = function(e) NA_character_)
+  if (is.na(sp_version) || !requireNamespace("sp", quietly = quietly)) {
+    if (!quietly) {
+      msg <- "No 'sp' version detected or the package couldn't be loaded."
+      if (force) {
+        stop(msg)
+      } else {
+        warning(msg, immediate. = TRUE)
+      }
+    }
+    return(FALSE)
+  }
+
+  if (sp_version >= "1.6-0") {
+    # Default to 2L to allow future sp to stop supporting
+    # get_evolution_status; assume everything is fine if it fails.
+    evolution_status <- tryCatch(sp::get_evolution_status(),
+                                 error = function(e) 2L)
+    rgdal_version <- tryCatch(utils::packageVersion("rgdal"),
+                              error = function(e) NA_character_)
+    if ((evolution_status < 2L) && is.na(rgdal_version)) {
+      if (!force) {
+        if (!quietly) {
+          warning(
+            paste0(
+              "'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.\n",
+              "This may cause issues with some CRS handling code. To avoid this, use 'sp::set_evolution_status(2L)'"
+            ),
+            immediate. = TRUE
+          )
+        }
+        return(FALSE)
+      }
+
+      sp::set_evolution_status(2L)
+      if (!quietly) {
+        message(
+          paste0(
+            "'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.\n",
+            "Ran 'sp::set_evolution_status(2L)' to avoid issues with some CRS handling code."
+          )
+        )
+      }
+    }
+  }
+  return(TRUE)
+}
+
+
+
 #' Expand labels
 #'
 #' @param labels character vector; original labels
