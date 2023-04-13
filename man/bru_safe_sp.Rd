@@ -4,17 +4,24 @@
 \alias{bru_safe_sp}
 \title{Check for potential \code{sp} version compatibility issues}
 \usage{
-bru_safe_sp(quietly = FALSE, force = FALSE)
+bru_safe_sp(quietly = FALSE, force = FALSE, minimum_version = "1.4-5")
 }
 \arguments{
-\item{quietly}{logical; if \code{TRUE}, always return \code{TRUE} or \code{FALSE}. Default \code{FALSE}}
+\item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. Default \code{FALSE}}
 
-\item{force}{logical; if \code{TRUE}, give an error or warning if \code{sp} is not available,
-and set the evolution status to \code{2L} if needed. Default \code{FALSE}}
+\item{force}{logical; If \code{rgdal} is unavailable
+and evolution status is less that \code{2L}, return \code{FALSE} if \code{force} is \code{FALSE}.
+If \code{force} is \code{TRUE}, return \code{TRUE} if the package configuration is safe,
+potentially after forcing the evolution status to \code{2L}.
+Default \code{FALSE}}
+
+\item{minimum_version}{character; the minimum required INLA version.
+Default 1.4-5 (should always match the requirement in the package
+DESCRIPTION)}
 }
 \value{
 Returns \code{FALSE} if a potential issue is detected, and give a
-warning or error if \code{quietly} is \code{FALSE}. Otherwise returns \code{TRUE} and calls \code{requireNamespace("sp")}
+message if \code{quietly} is \code{FALSE}. Otherwise returns \code{TRUE}
 }
 \description{
 Loads the sp package with \code{requireNamespace("sp", quietly = TRUE)}, and

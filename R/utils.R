@@ -25,26 +25,11 @@
 bru_safe_inla <- function(multicore = NULL,
                           quietly = FALSE,
                           minimum_version = "23.1.31") {
-  inla_version <- tryCatch(utils::packageVersion("INLA"),
-                         error = function(e) NA_character_)
+  inla_version <-
+    check_package_version_and_load(pkg = "INLA",
+                                   minimum_version = minimum_version,
+                                   quietly = quietly)
   if (is.na(inla_version)) {
-    if (!quietly) {
-      message("INLA is not installed.")
-    }
-    return(FALSE)
-  }
-  if (inla_version < minimum_version) {
-    if (!quietly) {
-      message(paste0(
-        "Installed INLA version is ", inla_version, " but ",
-        "version >= ", minimum_version, " is required."))
-    }
-    return(FALSE)
-  }
-  if (!requireNamespace("INLA", quietly = TRUE)) {
-    if (!quietly) {
-      message("INLA not loaded safely.")
-    }
     return(FALSE)
   }
 
@@ -89,6 +74,36 @@ bru_safe_inla <- function(multicore = NULL,
 
 
 
+
+check_package_version_and_load <-
+  function(pkg, minimum_version, quietly = FALSE) {
+    version <- tryCatch(utils::packageVersion(pkg),
+                        error = function(e) NA_character_)
+    if (is.na(version)) {
+      if (!quietly) {
+        message(paste0("Package '", pkg, "' is not installed."))
+      }
+      return(NA_character_)
+    }
+    if (version < minimum_version) {
+      if (!quietly) {
+        message(paste0(
+          "Installed '", pkg, "' version is ", version, " but ",
+          "version >= ", minimum_version, " is required."
+        ))
+      }
+      return(NA_character_)
+    }
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      if (!quietly) {
+        message("Package '", pkg, "' not loaded safely.")
+      }
+      return(NA_character_)
+    }
+    return(version)
+  }
+
+
 #' Check for potential `sp` version compatibility issues
 #'
 #' Loads the sp package with `requireNamespace("sp", quietly = TRUE)`, and
@@ -100,6 +115,9 @@ bru_safe_inla <- function(multicore = NULL,
 #' If `force` is `TRUE`, return `TRUE` if the package configuration is safe,
 #' potentially after forcing the evolution status to `2L`.
 #' Default `FALSE`
+#' @param minimum_version character; the minimum required INLA version.
+#' Default 1.4-5 (should always match the requirement in the package
+#' DESCRIPTION)
 #' @return Returns `FALSE` if a potential issue is detected, and give a
 #' message if `quietly` is `FALSE`. Otherwise returns `TRUE`
 #' @export
@@ -110,13 +128,14 @@ bru_safe_inla <- function(multicore = NULL,
 #' }
 #' }
 #'
-bru_safe_sp <- function(quietly = FALSE, force = FALSE) {
-  sp_version <- tryCatch(utils::packageVersion("sp"),
-                         error = function(e) NA_character_)
-  if (is.na(sp_version) || !requireNamespace("sp", quietly = quietly)) {
-    if (!quietly) {
-      message("No 'sp' version detected or the package couldn't be loaded.")
-    }
+bru_safe_sp <- function(quietly = FALSE,
+                        force = FALSE,
+                        minimum_version = "1.4-5") {
+  sp_version <-
+    check_package_version_and_load(pkg = "sp",
+                                   minimum_version = minimum_version,
+                                   quietly = quietly)
+  if (is.na(sp_version)) {
     return(FALSE)
   }
 
