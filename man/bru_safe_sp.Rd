@@ -20,7 +20,7 @@ Default 1.4-5 (should always match the requirement in the package
 DESCRIPTION)}
 }
 \value{
-Returns \code{FALSE} if a potential issue is detected, and give a
+Returns (invisibly) \code{FALSE} if a potential issue is detected, and give a
 message if \code{quietly} is \code{FALSE}. Otherwise returns \code{TRUE}
 }
 \description{

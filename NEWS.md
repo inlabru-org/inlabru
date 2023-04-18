@@ -2,6 +2,9 @@
 
 * Remove `rgdal` and `maptools` dependencies #178
 
+* Add `bru_safe_sp()` to check if `sp` can be used safely (checks `rgdal` availability
+  and `sp` evolution status, optionally forcing use of `sf`) #178
+
 * Remove PROJ4 support #178
 
 * Warning: Coordinate names for `Spatial*` objects have been inconsistently
@@ -26,9 +29,6 @@
 * Allow precomputed spatial covariates in the data for point process observations
 
 * Add `edge|int|ext.linewidth` arguments to `gg.inla.mesh` #188
-
-* Add `bru_safe_sp()` to check if `sp` can be used safely (checks `rgdal` availability
-  and `sp` evolution status, optionally forcing use of `sf`) #178
 
 # inlabru 2.7.0
 

@@ -650,13 +650,14 @@ gg.SpatialPixelsDataFrame <- function(data,
 #' @return A `geom_tile` return value.
 #' @family geomes for spatial data
 #' @examples
-#' if (require("ggplot2", quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE) &&
+#'     bru_safe_sp()) {
 #'   # Load Gorilla data
 #'
 #'   data(gorillas, package = "inlabru")
 #'
 #'   # Turn elevation covariate into SpatialPixels
-#'   pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
+#'   pxl <- sp::SpatialPixels(sp::SpatialPoints(gorillas$gcov$elevation))
 #'
 #'   # Plot the pixel centers
 #'   ggplot() +

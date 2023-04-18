@@ -1149,7 +1149,8 @@ bru_like_expr <- function(lhood, components) {
 #' @examples
 #' \donttest{
 #' if (bru_safe_inla() &&
-#'   require(ggplot2, quietly = TRUE)) {
+#'   require(ggplot2, quietly = TRUE) &&
+#'   bru_safe_sp()) {
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'

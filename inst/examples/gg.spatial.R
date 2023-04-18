@@ -1,6 +1,7 @@
 \donttest{
   if (require(ggplot2, quietly = TRUE) &&
-      require(ggpolypath, quietly = TRUE)) {
+      require(ggpolypath, quietly = TRUE) &&
+      bru_safe_sp()) {
     # Load Gorilla data
 
     data("gorillas", package = "inlabru")

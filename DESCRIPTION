@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.7.0.9005
+Version: 2.7.0.9006
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -78,7 +78,6 @@ Suggests:
     mgcv,
     raster,
     RColorBrewer,
-    rgdal,
     rgl,
     rmarkdown,
     scales,

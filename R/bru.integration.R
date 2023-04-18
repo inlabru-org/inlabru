@@ -71,7 +71,8 @@
 #' @examples
 #' \donttest{
 #' if (require("INLA", quietly = TRUE) &&
-#'   require("ggplot2", quietly = TRUE)) {
+#'   require("ggplot2", quietly = TRUE) &&
+#'   bru_safe_sp()) {
 #'   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 #'
 #'   ips <- ipoints(c(0, 10), 50, name = "myDim")
@@ -531,7 +532,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #'
 #'
 #' @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
-#' TODO #### na.rm and user-defined weight argument
+# TODO #### na.rm and user-defined weight argument
 #' @param na.rm logical; if `TRUE`, the rows with weight `NA` from the
 #' non-overlapping full_join will be removed; if `FALSE`, set the undefined weights to `NA`.
 #' If `NULL` (default), act as `TRUE`, but warn if any elements needed removing.
@@ -638,36 +639,36 @@ cprod <- function(..., na.rm = NULL) {
 
 
 
-#' @title Cross product of integration points
-#'
-#' @description
-#' Calculates the cross product of integration points in different dimensions
-#' and multiplies their weights accordingly. If the object defining points in a particular
-#' dimension has no weights attached to it all weights are assumed to be 1.
-#'
+# @title Cross product of integration points
+#
+# @description
+# Calculates the cross product of integration points in different dimensions
+# and multiplies their weights accordingly. If the object defining points in a particular
+# dimension has no weights attached to it all weights are assumed to be 1.
+#
 # @export
-#'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
-#' @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
-#' @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
-#'
-#' @examples
-#' \donttest{
-#' # ipoints needs INLA
-#' if (bru_safe_inla()) {
-#'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
-#'   ips1 <- ipoints(rbind(c(0, 3), c(3, 8)), 17, name = "myDim")
-#'   ips2 <- ipoints(domain = c(1, 2, 4), name = "myDiscreteDim")
-#'
-#'   # Calculate the cross product
-#'   ips <- cprod(ips1, ips2)
-#'
-#'   # Plot the integration points
-#'   plot(ips$myDim, ips$myDiscreteDim, cex = 10 * ips$weight)
-#' }
-#' }
-#'
+#
+# @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#
+# @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
+# @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
+#
+# @examples
+# \donttest{
+# # ipoints needs INLA
+# if (bru_safe_inla()) {
+#   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
+#   ips1 <- ipoints(rbind(c(0, 3), c(3, 8)), 17, name = "myDim")
+#   ips2 <- ipoints(domain = c(1, 2, 4), name = "myDiscreteDim")
+#
+#   # Calculate the cross product
+#   ips <- cprod(ips1, ips2)
+#
+#   # Plot the integration points
+#   plot(ips$myDim, ips$myDiscreteDim, cex = 10 * ips$weight)
+# }
+# }
+#
 cprod_old <- function(...) {
   ipl <- list(...)
   ipl <- ipl[!vapply(ipl, is.null, TRUE)]

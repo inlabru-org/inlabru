@@ -37,6 +37,7 @@ library(inlabru)
 library(INLA)
 library(mgcv)
 library(ggplot2)
+bru_safe_sp(force = TRUE)
 ```
 
 Get the data

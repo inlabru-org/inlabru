@@ -118,7 +118,7 @@ check_package_version_and_load <-
 #' @param minimum_version character; the minimum required INLA version.
 #' Default 1.4-5 (should always match the requirement in the package
 #' DESCRIPTION)
-#' @return Returns `FALSE` if a potential issue is detected, and give a
+#' @return Returns (invisibly) `FALSE` if a potential issue is detected, and give a
 #' message if `quietly` is `FALSE`. Otherwise returns `TRUE`
 #' @export
 #' @examples
@@ -136,7 +136,7 @@ bru_safe_sp <- function(quietly = FALSE,
                                    minimum_version = minimum_version,
                                    quietly = quietly)
   if (is.na(sp_version)) {
-    return(FALSE)
+    return(invisible(FALSE))
   }
 
   if (sp_version >= "1.6-0") {
@@ -156,7 +156,7 @@ bru_safe_sp <- function(quietly = FALSE,
             "This may cause issues with some CRS handling code. To avoid this, use 'sp::set_evolution_status(2L)'"
           )
         }
-        return(FALSE)
+        return(invisible(FALSE))
       }
 
       sp::set_evolution_status(2L)
@@ -167,7 +167,7 @@ bru_safe_sp <- function(quietly = FALSE,
       }
     }
   }
-  return(TRUE)
+  return(invisible(TRUE))
 }
 
 

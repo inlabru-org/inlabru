@@ -192,6 +192,6 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
       sp::set_evolution_status(old_sp_evolution_status),
       envir = envir
     )
-    sp::set_evolution_status(2L)
+    bru_safe_sp(quietly = TRUE, force = TRUE)
   }
 }

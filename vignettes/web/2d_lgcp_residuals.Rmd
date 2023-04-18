@@ -29,7 +29,7 @@ library("lwgeom")
 library("patchwork")
 library("terra")
 library("data.table")
-sp::set_evolution_status(2L)
+bru_safe_sp(force = TRUE)
 ```
 
 ```{r, eval=TRUE, echo=FALSE}

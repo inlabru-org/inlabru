@@ -27,7 +27,8 @@ to plot the points. Requires the \code{ggplot2} package.
 \examples{
 \donttest{
   if (require(ggplot2, quietly = TRUE) &&
-      require(ggpolypath, quietly = TRUE)) {
+      require(ggpolypath, quietly = TRUE) &&
+      bru_safe_sp()) {
     # Load Gorilla data
 
     data("gorillas", package = "inlabru")
