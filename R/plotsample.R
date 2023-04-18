@@ -128,7 +128,7 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
 #' @examples
 #' \donttest{
 #' # Some features require the raster package
-#' if (bru_Safe_sp() &&
+#' if (bru_safe_sp() &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru")
