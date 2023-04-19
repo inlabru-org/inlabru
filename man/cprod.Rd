@@ -7,8 +7,7 @@
 cprod(..., na.rm = NULL)
 }
 \arguments{
-\item{...}{\code{data.frame} or \code{SpatialPointsDataFrame} objects, each one usually obtained by a call to the \link{ipoints} function.
-TODO #### na.rm and user-defined weight argument}
+\item{...}{\code{data.frame} or \code{SpatialPointsDataFrame} objects, each one usually obtained by a call to the \link{ipoints} function.}
 
 \item{na.rm}{logical; if \code{TRUE}, the rows with weight \code{NA} from the
 non-overlapping full_join will be removed; if \code{FALSE}, set the undefined weights to \code{NA}.

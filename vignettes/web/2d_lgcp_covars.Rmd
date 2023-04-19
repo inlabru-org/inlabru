@@ -33,8 +33,7 @@ library(INLA)
 library(inlabru)
 library(RColorBrewer)
 library(ggplot2)
-
-bru_options_set(inla.mode = "experimental")
+bru_safe_sp(force = TRUE)
 ```
 
 Introduction

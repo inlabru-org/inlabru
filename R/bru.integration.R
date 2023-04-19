@@ -71,7 +71,8 @@
 #' @examples
 #' \donttest{
 #' if (require("INLA", quietly = TRUE) &&
-#'   require("ggplot2", quietly = TRUE)) {
+#'   require("ggplot2", quietly = TRUE) &&
+#'   bru_safe_sp()) {
 #'   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 #'
 #'   ips <- ipoints(c(0, 10), 50, name = "myDim")
@@ -523,6 +524,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   ips
 }
 
+
+
+
+
 #' @title (Groupwise) cross product of integration points
 #'
 #' @description
@@ -537,7 +542,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #'
 #'
 #' @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
-#' TODO #### na.rm and user-defined weight argument
+# TODO #### na.rm and user-defined weight argument
 #' @param na.rm logical; if `TRUE`, the rows with weight `NA` from the
 #' non-overlapping full_join will be removed; if `FALSE`, set the undefined weights to `NA`.
 #' If `NULL` (default), act as `TRUE`, but warn if any elements needed removing.
@@ -604,6 +609,104 @@ cprod <- function(..., na.rm = NULL) {
         sf::st_as_sf(dplyr::full_join(tibble::as_tibble(ips1),
                                       tibble::as_tibble(ips2),
                                       by = by))
+    } else {
+      ips <- dplyr::full_join(ips1, ips2, by = by) # equivalent to base::merge(ips1, ips2, by = by, all = TRUE)
+    }
+
+    ips$weight <- ips$weight.x * ips$weight.y
+    ips[["weight.x"]] <- NULL
+    ips[["weight.y"]] <- NULL
+    tibble::remove_rownames(ips)
+    # row.names(ips) <- as.character(seq_len(NROW(ips))) # Warning message: Setting row names on a tibble is deprecated.
+  }
+  if (any(is.na(ips$weight)) && !isFALSE(na.rm)) {
+    if (is.null(na.rm)) {
+      warning(
+        paste0(
+          "Block information mismatch resulting in NA weights, and 'na.rm' was not supplied.",
+          " These rows will be removed."))
+    }
+    ips <- na.omit(ips)
+  }
+
+  # TODO Transform back to sp only if they are required. ips is a tibble sf tbl data.frame.
+  # It does not make sense to revert certain indices back after merging. Hence, I revert the entire object back to sp.
+  if(any(ipl_sp)){
+    ips <-  sf::as_Spatial(ips)
+    # WARNING SHOULD BE HERE, MORE FRIENDLY ERROR, METHOD ST_AS_SF
+    # TODO deprecated_soft warning for `sp` presence
+    # lifecycle::deprecate_soft(
+    #   when = "2.7.0",
+    #   what = "inlabru::ipl_sp()", # ipl_sp() does not exist but it does not allow mentioning deprecated function in another package
+    #   details = "Support for `sp` is gradually deprecated in favour of `sf` and `terra`"
+    # )
+  }
+  ips
+}
+
+
+
+
+
+
+# @title Cross product of integration points
+#
+# @description
+# Calculates the cross product of integration points in different dimensions
+# and multiplies their weights accordingly. If the object defining points in a particular
+# dimension has no weights attached to it all weights are assumed to be 1.
+#
+# @export
+#
+# @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#
+# @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
+# @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
+#
+# @examples
+# \donttest{
+# # ipoints needs INLA
+# if (bru_safe_inla()) {
+#   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
+#   ips1 <- ipoints(rbind(c(0, 3), c(3, 8)), 17, name = "myDim")
+#   ips2 <- ipoints(domain = c(1, 2, 4), name = "myDiscreteDim")
+#
+#   # Calculate the cross product
+#   ips <- cprod(ips1, ips2)
+#
+#   # Plot the integration points
+#   plot(ips$myDim, ips$myDiscreteDim, cex = 10 * ips$weight)
+# }
+# }
+#
+cprod_old <- function(...) {
+  ipl <- list(...)
+  ipl <- ipl[!vapply(ipl, is.null, TRUE)]
+  if (length(ipl) == 0) {
+    return(NULL)
+  }
+
+  if (length(ipl) == 1) {
+    ips <- ipl[[1]]
+  } else {
+    ips1 <- ipl[[1]]
+    if (length(ipl) > 2) {
+      ips2 <- do.call(cprod, ipl[2:length(ipl)])
+    } else {
+      ips2 <- ipl[[2]]
+    }
+    if (!"weight" %in% names(ips1)) {
+      ips1$weight <- 1
+    }
+    if (!"weight" %in% names(ips2)) {
+      ips2$weight <- 1
+    }
+
+    by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
+    if (inherits(ips1, "Spatial")) {
+      ips <- sp::merge(ips1, ips2, by = by, duplicateGeoms = TRUE)
+    } else if (inherits(ips2, "Spatial")) {
+      ips <- sp::merge(ips2, ips1, by = by, duplicateGeoms = TRUE)
     } else {
       ips <- dplyr::full_join(ips1, ips2, by = by) # equivalent to base::merge(ips1, ips2, by = by, all = TRUE)
     }

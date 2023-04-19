@@ -504,18 +504,11 @@ eval_in_data_context <- function(input,
                                  response_data = NULL,
                                  default = NULL,
                                  .envir = parent.frame()) {
-  data_orig <- data
   response_data_orig <- response_data
-  if (!is.null(data)) {
-    if (is.list(data) && !is.data.frame(data)) {
-    } else {
-      data <- as.data.frame(data)
-    }
-  }
   if (!is.null(response_data)) {
     if (is.list(response_data) && !is.data.frame(response_data)) {
     } else {
-      data <- as.data.frame(data)
+      response_data <- as.data.frame(response_data)
     }
   }
   if (!is.null(response_data)) {
@@ -527,6 +520,13 @@ eval_in_data_context <- function(input,
     )
   }
   if (is.null(response_data) || inherits(result, "try-error")) {
+    data_orig <- data
+    if (!is.null(data)) {
+      if (is.list(data) && !is.data.frame(data)) {
+      } else {
+        data <- as.data.frame(data)
+      }
+    }
     enclos_envir <- new.env(parent = .envir)
     assign(".data.", data_orig, envir = enclos_envir)
     result <- try(
@@ -812,6 +812,15 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     # or similar.
     # For Spatial models, keep the old behaviour for backwards compatibility for
     # now, but can likely realign that in the future after more testing.
+    # Save general response data to add to response (precomputed covariates etc)
+    if (!is.null(response_data)) {
+      data_ <- response_data
+    } else {
+      data_ <- data
+    }
+    if (inherits(data_, "Spatial")) {
+      data_ <- as.data.frame(data_)
+    }
     if (ips_is_Spatial) {
       if ("coordinates" %in% names(response)) {
         idx <- names(response) %in% "coordinates"
@@ -833,6 +842,14 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       response_data <- NULL
       N_data <- NROW(data)
     }
+
+    # Add back additional data
+    additional_data_names <- setdiff(names(data_), names(data))
+    if ((length(additional_data_names) > 0) &&
+        (NROW(data_) == N_data)) {
+      data <- cbind(data, data_[additional_data_names])
+    }
+
     if (ips_is_Spatial) {
       ips <- as.data.frame(ips)
     } else {
@@ -840,7 +857,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
         sf::st_geometry(ips) <- "geometry"
       }
     }
-    dim_names <- intersect(names(data), names(ips))
+
     if (identical(options[["bru_compress_cp"]], TRUE)) {
       allow_combine <- TRUE
       response_data <- data.frame(
@@ -866,9 +883,9 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
         )
       }
       expr <- parse(text = expr_text)
-      data <- rbind(
-        cbind(data[dim_names], BRU_aggregate = TRUE),
-        cbind(ips[dim_names], BRU_aggregate = FALSE)
+      data <- dplyr::bind_rows(
+        cbind(data, BRU_aggregate = TRUE),
+        cbind(ips, BRU_aggregate = FALSE)
       )
       formula
     } else {
@@ -882,10 +899,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
           rep(0, NROW(ips))
         )
       )
-      data <- rbind(
-        data[dim_names],
-        ips[dim_names]
-      )
+      data <- dplyr::bind_rows(data, ips)
     }
     if (ips_is_Spatial) {
       non_coordnames <- setdiff(names(data), data_coordnames)
@@ -1148,7 +1162,8 @@ bru_like_expr <- function(lhood, components) {
 #' @examples
 #' \donttest{
 #' if (bru_safe_inla() &&
-#'   require(ggplot2, quietly = TRUE)) {
+#'   require(ggplot2, quietly = TRUE) &&
+#'   bru_safe_sp()) {
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'
@@ -2351,15 +2366,39 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     original_timings <- old.result[["bru_iinla"]][["timings"]]
   }
 
+  bru_log_message(
+    "iinla: Evaluate component inputs",
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 3
+  )
   inputs <- evaluate_inputs(model, lhoods = lhoods, inla_f = TRUE)
+  bru_log_message(
+    "iinla: Evaluate component linearisations",
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 3
+  )
   comp_lin <- evaluate_comp_lin(model,
     input = inputs,
     state = states[[length(states)]],
     inla_f = TRUE
   )
+  bru_log_message(
+    "iinla: Evaluate component simplifications",
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 3
+  )
   comp_simple <- evaluate_comp_simple(model,
     input = inputs,
     inla_f = TRUE
+  )
+  bru_log_message(
+    "iinla: Evaluate predictor linearisation",
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 3
   )
   lin <- bru_compute_linearisation(
     model,
@@ -2374,12 +2413,24 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     # Always compute linearisation (above)
   }
 
+  bru_log_message(
+    "iinla: Construct inla stack",
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 3
+  )
   # Initial stack
   idx <- evaluate_index(model, lhoods)
   stk <- bru_make_stack(lhoods, lin, idx)
 
   stk.data <- INLA::inla.stack.data(stk)
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
+  bru_log_message(
+    "iinla: Model initialisation completed",
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 3
+  )
 
   k <- 1
   interrupt <- FALSE
@@ -2594,10 +2645,22 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           )
           state <- line_search[["state"]]
         }
+        bru_log_message(
+          "iinla: Evaluate component linearisations",
+          verbose = options$bru_verbose,
+          verbose_store = options$bru_verbose_store,
+          verbosity = 3
+        )
         comp_lin <- evaluate_comp_lin(model,
           input = inputs,
           state = state,
           inla_f = TRUE
+        )
+        bru_log_message(
+          "iinla: Evaluate predictor linearisation",
+          verbose = options$bru_verbose,
+          verbose_store = options$bru_verbose_store,
+          verbosity = 3
         )
         lin <- bru_compute_linearisation(
           model,

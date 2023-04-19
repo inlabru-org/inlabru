@@ -4,7 +4,7 @@
 \alias{bru_safe_inla}
 \title{Load INLA safely for examples and tests}
 \usage{
-bru_safe_inla(multicore = NULL, quietly = FALSE)
+bru_safe_inla(multicore = NULL, quietly = FALSE, minimum_version = "23.1.31")
 }
 \arguments{
 \item{multicore}{logical; if \code{TRUE}, multiple cores are allowed, and the
@@ -14,6 +14,10 @@ if running in testthat or non-interactively, in which case sets
 \code{multicore=FALSE}, otherwise \code{TRUE}.}
 
 \item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. Default: FALSE.}
+
+\item{minimum_version}{character; the minimum required INLA version.
+Default 23.1.31 (should always match the requirement in the package
+DESCRIPTION)}
 }
 \value{
 logical; \code{TRUE} if INLA was loaded safely, otherwise FALSE

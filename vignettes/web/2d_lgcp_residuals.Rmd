@@ -24,17 +24,28 @@ library("INLA")
 library("inlabru")
 library("RColorBrewer")
 library("ggplot2")
-library("maptools")
 library("dplyr")
 library("lwgeom")
-library("tmaptools")
 library("patchwork")
-library("raster")
+library("terra")
 library("data.table")
+bru_safe_sp(force = TRUE)
 ```
 
-```{r load-functions, code=readLines("2d_lgcp_residuals_functions.R"), eval=TRUE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE}
+# Determine function location
+code_location <- "2d_lgcp_residuals_functions.R"
+if (!file.exists(code_location)) {
+  code_location <- file.path("vignettes", "web", code_location)
+}
+```
+
+```{r load-functions, file=code_location, eval=TRUE, echo=FALSE}
 # Do not change this code chunk
+# Load function definitions
+source(code_location)
+```
+```{r , eval=FALSE, echo=TRUE}
 # Load function definitions
 source("2d_lgcp_residuals_functions.R")
 ```
@@ -433,7 +444,10 @@ knitr::kable(edit_df(veg_res3, c("Type", "mean.mc_std_err", "sd.mc_std_err", "me
 
 
 ## Residuals of models at different resolutions
-Consider two more resolutions of $B$, given in the plots below.
+Consider two more resolutions of $B$, given in the plots below.  Here we use the
+`resolution` argument instead of `nrow` and `ncol`. Due to the way `terra::rast()`
+interprets the arguments, using `resolution` doesn't guarantee complete coverage of the
+`samplers` polygon.
 ```{r more-resolutions, echo=FALSE}
 # Create two more partitions of B using two resolutions
 B3 <- partition(samplers = boundary, resolution = c(0.5, 0.5))
@@ -773,6 +787,6 @@ the Pearson and scaling residuals for both resolutions $B_3$ and $B_4$.
 
 ## Function definitions
 
-```{r code=readLines("2d_lgcp_residuals_functions.R"), eval=FALSE, echo=TRUE}
+```{r file=code_location, eval=FALSE, echo=TRUE}
 # Do not change this code chunk
 ```

@@ -58,7 +58,8 @@
 #' @examples
 #' \donttest{
 #' # The INLA package is required
-#' if (bru_safe_inla(quietly = TRUE)) {
+#' if (bru_safe_inla(quietly = TRUE) &&
+#' bru_safe_sp()) {
 #'   vertices <- seq(0, 3, by = 0.1)
 #'   mesh <- INLA::inla.mesh.1d(vertices)
 #'   loglambda <- 5 - 0.5 * vertices
@@ -72,7 +73,8 @@
 #' \donttest{
 #' # The INLA package is required
 #' if (bru_safe_inla(quietly = TRUE) &&
-#'   require(ggplot2, quietly = TRUE)) {
+#'   require(ggplot2, quietly = TRUE) &&
+#'   bru_safe_sp()) {
 #'   data("gorillas", package = "inlabru")
 #'   pts <- sample.lgcp(gorillas$mesh,
 #'     loglambda = 1.5,
@@ -183,7 +185,6 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
 
     if (is.geocent) {
       space.R <- mean(rowSums(mesh$loc^2)^0.5)
-      space.units <- fm_length_unit(input.crs)
       internal.crs <- fm_CRS("sphere", args = list(a = 1, b = 1, units = "m"))
       mesh$loc <- mesh$loc / space.R
       mesh$crs <- internal.crs
@@ -201,7 +202,15 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       area.R <- R
     } else {
       if (use.crs) {
+#        if (is.na(input.crs)) {
+#          space.units <- fm_length_unit(input.crs)
+#        }
         area.R <- 6371
+        if (is.geocent){
+          if (abs(1 - space.R/area.R) > 1e-2) {
+            warning("The mesh has radius '", space.R, "', but crs information is available. Using radius 6371 for area calculations.")
+          }
+        }
       } else if (is.geocent) {
         area.R <- space.R
       }

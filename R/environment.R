@@ -33,6 +33,7 @@ bru_env_get <- function() {
 
 
 
+
 # inlabru log methods ----
 
 #' @title inlabru log message methods

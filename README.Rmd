@@ -83,6 +83,7 @@ and predicts its intensity:
 library(inlabru)
 library(INLA)
 library(ggplot2)
+bru_safe_sp(force = TRUE) # Ensures sp works without rgdal installed
 
 # Load the data
 data(gorillas, package = "inlabru")

@@ -56,6 +56,7 @@
 #'
 #' @examples
 #' if (bru_safe_inla() &&
+#'   bru_safe_sp() &&
 #'   require(ggplot2, quietly = TRUE) &&
 #'   require(ggpolypath, quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru") # get the data

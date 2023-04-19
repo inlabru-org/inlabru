@@ -5,12 +5,10 @@ suppressPackageStartupMessages(library("INLA"))
 suppressPackageStartupMessages(library("inlabru"))
 suppressPackageStartupMessages(library("RColorBrewer"))
 suppressPackageStartupMessages(library("ggplot2"))
-suppressPackageStartupMessages(library("maptools"))
 suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("lwgeom"))
-suppressPackageStartupMessages(library("tmaptools"))
 suppressPackageStartupMessages(library("patchwork"))
-suppressPackageStartupMessages(library("raster"))
+suppressPackageStartupMessages(library("terra"))
 suppressPackageStartupMessages(library("data.table"))
 theme_set(theme_bw())
 
@@ -54,9 +52,11 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
   # A_sum has as many rows as polygons in the samplers,
   # as many columns as observed points
   # each row has 1s for the points in the corresponding polygon
-  idx <- sp::over(observations, samplers)
-  A_sum <- sparseMatrix(i = idx$ID, j = seq_len(nrow(observations)),
-                        x = rep(1, nrow(observations)),
+  idx <- sf::st_within(sf::st_as_sf(observations), sf::st_as_sf(samplers), sparse = TRUE)
+  A_sum <- sparseMatrix(i = unlist(idx),
+                        j = rep(seq_len(nrow(observations)),
+                                vapply(idx, length, 1L)),
+                        x = rep(1, length(unlist(idx))),
                         dims = c(nrow(samplers), nrow(observations)))
 
 
@@ -253,20 +253,20 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
 partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   # Create a grid for the given boundary
   if (is.null(resolution)) {
-    grid <- raster(extent(samplers), crs = proj4string(samplers),
+    grid <- rast(terra::ext(samplers), crs = proj4string(samplers),
                    nrows = nrows, ncols = ncols)
   }
 
   if (is.null(c(nrows, ncols))) {
-    grid <- raster(extent(samplers), crs = proj4string(samplers),
+    grid <- rast(terra::ext(samplers), crs = proj4string(samplers),
                  resolution = resolution)
 
   }
 
-  gridPolygon <- rasterToPolygons(grid)
+  gridPolygon <- terra::as.polygons(grid)
 
   # Extract the boundary with subpolygons only
-  raster::intersect(gridPolygon, samplers)
+  sf::as_Spatial(sf::st_as_sf(terra::intersect(gridPolygon, terra::vect(samplers))))
 }
 
 

@@ -95,10 +95,13 @@ library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_22.12.16 built 2022-12-16 14:25:20 UTC.
+#> This is INLA_99.99.9999 built 2023-04-18 13:09:54 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
+bru_safe_sp(force = TRUE) # Ensures sp works without rgdal installed
+#> 'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.
+#> Ran 'sp::set_evolution_status(2L)' to avoid issues with some CRS handling code.
 
 # Load the data
 data(gorillas, package = "inlabru")

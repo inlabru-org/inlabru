@@ -89,7 +89,8 @@ points in the one-dimensional case.
 \examples{
 \donttest{
 if (require("INLA", quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE)) {
+  require("ggplot2", quietly = TRUE) &&
+  bru_safe_sp()) {
   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 
   ips <- ipoints(c(0, 10), 50, name = "myDim")
