@@ -45,7 +45,7 @@ Requires the \code{ggplot2} package.
 
     data("mexdolphin", package = "inlabru")
 
-    # Plot the pantropiical survey boundary, ship transects and dolphin sightings
+    # Plot the pantropical survey boundary, ship transects and dolphin sightings
 
     ggplot() +
       gg(mexdolphin$ppoly) + # survey boundary as SpatialPolygon
