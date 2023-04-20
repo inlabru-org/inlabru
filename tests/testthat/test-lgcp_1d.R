@@ -75,9 +75,10 @@ test_that("1D LGCP fitting", {
   expect_true(
     all(abs(pr$both$mean -
       (fm_evaluate(mesh1D,
-                   loc = mesh1D$loc,
-                   field = fit$summary.random$spde1D$mean) +
-         fit$summary.fixed$mean)) /
+        loc = mesh1D$loc,
+        field = fit$summary.random$spde1D$mean
+      ) +
+        fit$summary.fixed$mean)) /
       pr$both$mean.mc_std_err <= 3)
   )
 

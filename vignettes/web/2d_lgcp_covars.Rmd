@@ -571,7 +571,6 @@ for this model.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-
 spde.range <- spde.posterior(efit, "mySmooth", what = "range")
 spde.logvar <- spde.posterior(efit, "mySmooth", what = "log.variance")
 range.plot <- plot(spde.range)

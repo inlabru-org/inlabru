@@ -20,7 +20,7 @@ Requires the \code{ggplot2} package.
 }
 \examples{
 if (require("ggplot2", quietly = TRUE) &&
-    bru_safe_sp()) {
+  bru_safe_sp()) {
   # Load Gorilla data
 
   data(gorillas, package = "inlabru")

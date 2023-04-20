@@ -807,7 +807,7 @@ bru_int_polygon <- function(mesh,
       )
     }
 
-#    idx_ <- sp::over(samplers, integ_sp, returnList = TRUE)
+    #    idx_ <- sp::over(samplers, integ_sp, returnList = TRUE)
     samplers_sf <- sf::st_as_sf(samplers)
     integ_sp_sf <- sf::st_as_sf(integ_sp)
     idx <- sf::st_contains(samplers_sf, integ_sp_sf, sparse = TRUE)

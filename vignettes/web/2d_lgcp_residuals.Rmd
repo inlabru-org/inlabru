@@ -232,8 +232,10 @@ for a given model and choice of $B$ given a set of observations.
 B <- boundary
 
 # Store the required matrices and data frames for residual computation
-As <- prepare_residual_calculations(samplers = B, domain = mesh,
-                     observations = nests)
+As <- prepare_residual_calculations(
+  samplers = B, domain = mesh,
+  observations = nests
+)
 ```
 
 
@@ -250,15 +252,19 @@ The residuals of the model are also computed where $B = W$.
 
 ```{r veg-mod, echo=TRUE}
 # Define the vegetation model
-comp1 <- coordinates ~ 
-  vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(x*0 + 1)
+comp1 <- coordinates ~
+  vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(x * 0 + 1)
 
-fit1 <- lgcp(comp1, nests, samplers = boundary, 
-             domain = list(coordinates = mesh))
+fit1 <- lgcp(comp1, nests,
+  samplers = boundary,
+  domain = list(coordinates = mesh)
+)
 
 # Display the model
-int1 <- predict(fit1, data = pixels(mesh, mask = boundary), 
-                ~ exp(vegetation + Intercept))
+int1 <- predict(fit1,
+  data = pixels(mesh, mask = boundary),
+  ~ exp(vegetation + Intercept)
+)
 ggplot() +
   gg(int1) +
   gg(boundary, alpha = 0, lwd = 2) +
@@ -266,8 +272,10 @@ ggplot() +
   coord_equal()
 
 # Calculate the residuals for the vegetation model
-veg_res <- residual_df(fit1, As$df, expression(exp(vegetation + Intercept)), 
-            As$A_sum, As$A_integrate)
+veg_res <- residual_df(
+  fit1, As$df, expression(exp(vegetation + Intercept)),
+  As$A_sum, As$A_integrate
+)
 knitr::kable(edit_df(veg_res, c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")))
 ```
 
@@ -300,12 +308,16 @@ displays the model in the form of a plot.
 comp2 <- coordinates ~ elev(elev, model = "linear") +
   mySmooth(coordinates, model = matern) + Intercept(1)
 
-fit2 <- lgcp(comp2, nests, samplers = boundary, 
-             domain = list(coordinates = mesh))
+fit2 <- lgcp(comp2, nests,
+  samplers = boundary,
+  domain = list(coordinates = mesh)
+)
 
 # Display the model
-int2 <- predict(fit2, pixels(mesh, mask = boundary), 
-                ~ exp(elev + mySmooth + Intercept))
+int2 <- predict(
+  fit2, pixels(mesh, mask = boundary),
+  ~ exp(elev + mySmooth + Intercept)
+)
 ggplot() +
   gg(int2) +
   gg(boundary, alpha = 0) +
@@ -317,11 +329,15 @@ The residuals of the model when $B = W$ are given below:
 
 ```{r elev-res, echo=FALSE}
 # Calculate the residuals for the model
-elev_res <- residual_df(model = fit2, df = As$df, 
-            expr = expression(exp(elev + mySmooth + Intercept)), 
-            A_sum = As$A_sum, A_integrate = As$A_integrate)
-knitr::kable(edit_df(elev_res, 
-                     c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")))
+elev_res <- residual_df(
+  model = fit2, df = As$df,
+  expr = expression(exp(elev + mySmooth + Intercept)),
+  A_sum = As$A_sum, A_integrate = As$A_integrate
+)
+knitr::kable(edit_df(
+  elev_res,
+  c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")
+))
 ```
 
 ### Intercept Model
@@ -336,8 +352,10 @@ computed where $B = W$.
 ```{r int-mod, echo=TRUE}
 # Define the Intercept model
 comp3 <- coordinates ~ Intercept(rep(1, nrow(.data.)))
-fit3 <- lgcp(comp3, nests, samplers = boundary, 
-             domain = list(coordinates = mesh))
+fit3 <- lgcp(comp3, nests,
+  samplers = boundary,
+  domain = list(coordinates = mesh)
+)
 
 # Display the model
 int3 <- predict(fit3, pixels(mesh, mask = boundary), ~ exp(Intercept))
@@ -352,11 +370,15 @@ The residuals of the model when $B = W$ are given below:
 
 ```{r int-res, echo=FALSE}
 # Calculate the residuals for the model
-int_res <- residual_df(model = fit3, df = As$df, 
-            expr = expression(exp(Intercept)), 
-            A_sum = As$A_sum, A_integrate = As$A_integrate)
-knitr::kable(edit_df(int_res, 
-                     c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")))
+int_res <- residual_df(
+  model = fit3, df = As$df,
+  expr = expression(exp(Intercept)),
+  A_sum = As$A_sum, A_integrate = As$A_integrate
+)
+knitr::kable(edit_df(
+  int_res,
+  c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")
+))
 ```
 
 ### Smooth Model
@@ -370,13 +392,15 @@ computed where $B = W$.
 
 ```{r smooth-mod, echo=TRUE}
 # Define the Smooth model
-comp4 <- coordinates ~ mySmooth(coordinates, model = matern) + 
+comp4 <- coordinates ~ mySmooth(coordinates, model = matern) +
   Intercept(1)
-fit4 <- lgcp(comp4, nests, samplers = boundary, 
-             domain = list(coordinates = mesh))
+fit4 <- lgcp(comp4, nests,
+  samplers = boundary,
+  domain = list(coordinates = mesh)
+)
 
 # Display the model
-int4 <- predict(fit4, pixels(mesh, mask = boundary), ~exp(mySmooth + Intercept))
+int4 <- predict(fit4, pixels(mesh, mask = boundary), ~ exp(mySmooth + Intercept))
 ggplot() +
   gg(int4) +
   gg(boundary) +
@@ -388,11 +412,15 @@ The residuals of the model when $B = W$ are given below:
 
 ```{r smooth-res, echo=FALSE}
 # Calculate the residuals for the model
-smooth_res <- residual_df(model = fit4, df = As$df, 
-            expr = expression(exp(mySmooth + Intercept)), 
-            A_sum = As$A_sum, A_integrate = As$A_integrate)
-knitr::kable(edit_df(smooth_res, 
-                     c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")))
+smooth_res <- residual_df(
+  model = fit4, df = As$df,
+  expr = expression(exp(mySmooth + Intercept)),
+  A_sum = As$A_sum, A_integrate = As$A_integrate
+)
+knitr::kable(edit_df(
+  smooth_res,
+  c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")
+))
 ```
 ### Comparing models
 Firstly, from the plots of the four models, we see that there are visual 
@@ -412,13 +440,19 @@ and calculating the residuals for this choice of $B$.
 B1 <- partition(samplers = boundary, nrows = 1, ncols = 2)
 plot(B1, main = "Two partitions of B")
 
-As1 <- prepare_residual_calculations(samplers = B1, domain = mesh, 
-                                     observations = nests)
+As1 <- prepare_residual_calculations(
+  samplers = B1, domain = mesh,
+  observations = nests
+)
 # Residuals for the vegetation model
-veg_res2 <- residual_df(fit1, As1$df, expression(exp(vegetation + Intercept)),
-                        As1$A_sum, As1$A_integrate)
-knitr::kable(edit_df(veg_res2, c("Type", "mean.mc_std_err", 
-                                 "sd.mc_std_err", "median")))
+veg_res2 <- residual_df(
+  fit1, As1$df, expression(exp(vegetation + Intercept)),
+  As1$A_sum, As1$A_integrate
+)
+knitr::kable(edit_df(veg_res2, c(
+  "Type", "mean.mc_std_err",
+  "sd.mc_std_err", "median"
+)))
 ```
 Here, it can be seen that there are two lines of residual data for each type of 
 residual. This signifies that the `residual_df` function has calculated 
@@ -433,11 +467,15 @@ its residuals are as displayed below:
 B2 <- partition(samplers = boundary, nrows = 3, ncols = 1)
 plot(B2, main = "Three partitions of B")
 
-As2 <- prepare_residual_calculations(samplers = B2, domain = mesh, 
-                                     observations = nests)
+As2 <- prepare_residual_calculations(
+  samplers = B2, domain = mesh,
+  observations = nests
+)
 # Residuals for the vegetation model
-veg_res3 <- residual_df(fit1, As2$df, expression(exp(vegetation + Intercept)),
-                        As2$A_sum, As2$A_integrate)
+veg_res3 <- residual_df(
+  fit1, As2$df, expression(exp(vegetation + Intercept)),
+  As2$A_sum, As2$A_integrate
+)
 knitr::kable(edit_df(veg_res3, c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")))
 ```
 
@@ -454,16 +492,20 @@ B3 <- partition(samplers = boundary, resolution = c(0.5, 0.5))
 plot(B3, main = "B3")
 
 # Calculate preparatory data for residuals at this resolution
-As3 <- prepare_residual_calculations(samplers = B3, domain = mesh, 
-                                     observations = nests)
+As3 <- prepare_residual_calculations(
+  samplers = B3, domain = mesh,
+  observations = nests
+)
 
 
 B4 <- partition(samplers = boundary, resolution = c(2, 2))
 plot(B4, main = "B4")
 
 # Calculate preparatory data for residuals at this resolution
-As4 <- prepare_residual_calculations(samplers = B4, domain = mesh, 
-                                     observations = nests)
+As4 <- prepare_residual_calculations(
+  samplers = B4, domain = mesh,
+  observations = nests
+)
 ```
 
 
@@ -471,43 +513,59 @@ Using these two new choices of $B$, the residuals are calculated for all four
 models at both resolutions using `residual_df()`.
 ```{r calc-res-all-models-two-resolutions, echo=FALSE}
 # Vegetation model
-Residual_fit1_B3 <- residual_df(model =  fit1, df = As3$df, 
-            expr = expression(exp(vegetation + Intercept)), A_sum = As3$A_sum, 
-            A_integrate = As3$A_integrate)
+Residual_fit1_B3 <- residual_df(
+  model = fit1, df = As3$df,
+  expr = expression(exp(vegetation + Intercept)), A_sum = As3$A_sum,
+  A_integrate = As3$A_integrate
+)
 
-Residual_fit1_B4 <- residual_df(model =  fit1, df = As4$df, 
-            expr = expression(exp(vegetation + Intercept)), A_sum = As4$A_sum, 
-            A_integrate = As4$A_integrate)
+Residual_fit1_B4 <- residual_df(
+  model = fit1, df = As4$df,
+  expr = expression(exp(vegetation + Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
 
 
 # Elevation model
-Residual_fit2_B3 <- residual_df(model =  fit2, df = As3$df, 
-            expr = expression(exp(elev + mySmooth + Intercept)), 
-            A_sum = As3$A_sum, A_integrate = As3$A_integrate)
+Residual_fit2_B3 <- residual_df(
+  model = fit2, df = As3$df,
+  expr = expression(exp(elev + mySmooth + Intercept)),
+  A_sum = As3$A_sum, A_integrate = As3$A_integrate
+)
 
-Residual_fit2_B4 <- residual_df(model =  fit2, df = As4$df, 
-            expr = expression(exp(elev + mySmooth + Intercept)), 
-            A_sum = As4$A_sum, A_integrate = As4$A_integrate)
+Residual_fit2_B4 <- residual_df(
+  model = fit2, df = As4$df,
+  expr = expression(exp(elev + mySmooth + Intercept)),
+  A_sum = As4$A_sum, A_integrate = As4$A_integrate
+)
 
 
 # Intercept model
-Residual_fit3_B3 <- residual_df(model =  fit3, df = As3$df, 
-            expr = expression(exp(Intercept)), A_sum = As3$A_sum, 
-            A_integrate = As3$A_integrate)
+Residual_fit3_B3 <- residual_df(
+  model = fit3, df = As3$df,
+  expr = expression(exp(Intercept)), A_sum = As3$A_sum,
+  A_integrate = As3$A_integrate
+)
 
-Residual_fit3_B4 <- residual_df(model =  fit3, df = As4$df, 
-            expr = expression(exp(Intercept)), A_sum = As4$A_sum, 
-            A_integrate = As4$A_integrate)
+Residual_fit3_B4 <- residual_df(
+  model = fit3, df = As4$df,
+  expr = expression(exp(Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
 
 
 # Smooth + Intercept
-Residual_fit4_B3 <- residual_df(model =  fit4, df = As3$df, 
-            expr = expression(exp(mySmooth + Intercept)), A_sum = As3$A_sum, 
-            A_integrate = As3$A_integrate)
+Residual_fit4_B3 <- residual_df(
+  model = fit4, df = As3$df,
+  expr = expression(exp(mySmooth + Intercept)), A_sum = As3$A_sum,
+  A_integrate = As3$A_integrate
+)
 
-Residual_fit4_B4 <- residual_df(model =  fit4, df = As4$df, 
-            expr = expression(exp(mySmooth + Intercept)), A_sum = As4$A_sum, 
-            A_integrate = As4$A_integrate)
+Residual_fit4_B4 <- residual_df(
+  model = fit4, df = As4$df,
+  expr = expression(exp(mySmooth + Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
 ```
 
 The functions `set_csc()` and `residual_plot()` are defined to plot the three 
@@ -517,7 +575,7 @@ $B = B_3$. Here, it is useful for each type of residual to have the same colour
 scale at both resolutions.
 
 ```{r store-res-plot-1, echo = FALSE}
-# Colour scales for each model to cover both resolutions 
+# Colour scales for each model to cover both resolutions
 fit1_csc <- set_csc(rbind(Residual_fit1_B3, Residual_fit1_B4), rep("RdBu", 3))
 fit2_csc <- set_csc(rbind(Residual_fit2_B3, Residual_fit2_B4), rep("RdBu", 3))
 fit3_csc <- set_csc(rbind(Residual_fit3_B3, Residual_fit3_B4), rep("RdBu", 3))
@@ -538,15 +596,19 @@ plotB4_fit4 <- residual_plot(B4, Residual_fit4_B4, fit4_csc, "Smooth Model")
 
 ```{r display-veg-plot-code, eval=FALSE,echo=TRUE, fig.height=2.5,fig.width=4.5}
 # Residuals of Vegetation model
-Residual_fit1_B3 <- residual_df(model =  fit1, df = As3$df, 
-            expr = expression(exp(vegetation + Intercept)), A_sum = As3$A_sum, 
-            A_integrate = As3$A_integrate)
+Residual_fit1_B3 <- residual_df(
+  model = fit1, df = As3$df,
+  expr = expression(exp(vegetation + Intercept)), A_sum = As3$A_sum,
+  A_integrate = As3$A_integrate
+)
 
-Residual_fit1_B4 <- residual_df(model =  fit1, df = As4$df, 
-            expr = expression(exp(vegetation + Intercept)), A_sum = As4$A_sum, 
-            A_integrate = As4$A_integrate)
+Residual_fit1_B4 <- residual_df(
+  model = fit1, df = As4$df,
+  expr = expression(exp(vegetation + Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
 
-# Colour scales for each model to cover both resolutions 
+# Colour scales for each model to cover both resolutions
 fit1_csc <- set_csc(rbind(Residual_fit1_B3, Residual_fit1_B4), rep("RdBu", 3))
 
 # Store plots
@@ -555,9 +617,9 @@ plotB4_fit1 <- residual_plot(B4, Residual_fit1_B4, fit1_csc, "Vegetation Model")
 
 # comparing the vegetation model
 ((plotB3_fit1$Scaling | plotB3_fit1$Inverse | plotB3_fit1$Pearson) /
-    (plotB4_fit1$Scaling | plotB4_fit1$Inverse | plotB4_fit1$Pearson)) +
-  plot_annotation(title = "Vegetation Model") + 
-  plot_layout(guides = "collect") & 
+  (plotB4_fit1$Scaling | plotB4_fit1$Inverse | plotB4_fit1$Pearson)) +
+  plot_annotation(title = "Vegetation Model") +
+  plot_layout(guides = "collect") &
   theme(legend.position = "bottom")
 ```
 
@@ -568,30 +630,30 @@ resolutions of $B$ for each type of residual.
 ```{r plot-all-1, echo=FALSE, fig.width=9, , fig.height=7}
 # comparing the vegetation model
 ((plotB3_fit1$Scaling | plotB3_fit1$Inverse | plotB3_fit1$Pearson) /
-    (plotB4_fit1$Scaling | plotB4_fit1$Inverse | plotB4_fit1$Pearson)) +
-  plot_annotation(title = "Vegetation Model") + 
-  plot_layout(guides = "collect") & 
+  (plotB4_fit1$Scaling | plotB4_fit1$Inverse | plotB4_fit1$Pearson)) +
+  plot_annotation(title = "Vegetation Model") +
+  plot_layout(guides = "collect") &
   theme(legend.position = "bottom")
 
 # comparing the elevation model
 ((plotB3_fit2$Scaling | plotB3_fit2$Inverse | plotB3_fit2$Pearson) /
-    (plotB4_fit2$Scaling | plotB4_fit2$Inverse | plotB4_fit2$Pearson)) +
-  plot_annotation(title = "Elevation Model") + 
-  plot_layout(guides = "collect") & 
+  (plotB4_fit2$Scaling | plotB4_fit2$Inverse | plotB4_fit2$Pearson)) +
+  plot_annotation(title = "Elevation Model") +
+  plot_layout(guides = "collect") &
   theme(legend.position = "bottom")
 
 # comparing the intercept model
 ((plotB3_fit3$Scaling | plotB3_fit3$Inverse | plotB3_fit3$Pearson) /
-    (plotB4_fit3$Scaling | plotB4_fit3$Inverse | plotB4_fit3$Pearson)) +
-  plot_annotation("Intercept model") + 
-  plot_layout(guides = "collect") & 
+  (plotB4_fit3$Scaling | plotB4_fit3$Inverse | plotB4_fit3$Pearson)) +
+  plot_annotation("Intercept model") +
+  plot_layout(guides = "collect") &
   theme(legend.position = "bottom")
 
 # comparing the smooth+intercept model
 ((plotB3_fit4$Scaling | plotB3_fit4$Inverse | plotB3_fit4$Pearson) /
-    (plotB4_fit4$Scaling | plotB4_fit4$Inverse | plotB4_fit4$Pearson)) +
-  plot_annotation("Smooth model") + 
-  plot_layout(guides = "collect") & 
+  (plotB4_fit4$Scaling | plotB4_fit4$Inverse | plotB4_fit4$Pearson)) +
+  plot_annotation("Smooth model") +
+  plot_layout(guides = "collect") &
   theme(legend.position = "bottom")
 ```
 
@@ -641,10 +703,14 @@ Here, it is useful to have the same colour scale for all the 4 models.
 
 ```{r store-res-plot-2, echo=FALSE}
 # Data frame of all models together for B3 and B4
-B3res <- rbind(Residual_fit1_B3, Residual_fit2_B3, 
-               Residual_fit3_B3, Residual_fit4_B3)
-B4res <- rbind(Residual_fit1_B4, Residual_fit2_B4, 
-               Residual_fit3_B4, Residual_fit4_B4)
+B3res <- rbind(
+  Residual_fit1_B3, Residual_fit2_B3,
+  Residual_fit3_B3, Residual_fit4_B3
+)
+B4res <- rbind(
+  Residual_fit1_B4, Residual_fit2_B4,
+  Residual_fit3_B4, Residual_fit4_B4
+)
 
 # Colour scale for each resolution to cover all 4 models
 B3csc <- set_csc(B3res, rep("RdBu", 3))
@@ -669,25 +735,35 @@ when $B = B_4$.
 
 ```{r disply-pearson-plot-code, eval = FALSE, echo = TRUE}
 # Calculate the residuals for all models at B4
-Residual_fit1_B4 <- residual_df(model =  fit1, df = As4$df, 
-            expr = expression(exp(vegetation + Intercept)), A_sum = As4$A_sum, 
-            A_integrate = As4$A_integrate)
+Residual_fit1_B4 <- residual_df(
+  model = fit1, df = As4$df,
+  expr = expression(exp(vegetation + Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
 
-Residual_fit2_B4 <- residual_df(model =  fit2, df = As4$df, 
-            expr = expression(exp(elev + mySmooth + Intercept)), 
-            A_sum = As4$A_sum, A_integrate = As4$A_integrate)
+Residual_fit2_B4 <- residual_df(
+  model = fit2, df = As4$df,
+  expr = expression(exp(elev + mySmooth + Intercept)),
+  A_sum = As4$A_sum, A_integrate = As4$A_integrate
+)
 
-Residual_fit3_B4 <- residual_df(model =  fit3, df = As4$df, 
-            expr = expression(exp(Intercept)), A_sum = As4$A_sum, 
-            A_integrate = As4$A_integrate)
+Residual_fit3_B4 <- residual_df(
+  model = fit3, df = As4$df,
+  expr = expression(exp(Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
 
-Residual_fit4_B4 <- residual_df(model =  fit4, df = As4$df, 
-            expr = expression(exp(mySmooth + Intercept)), A_sum = As4$A_sum, 
-            A_integrate = As4$A_integrate)
+Residual_fit4_B4 <- residual_df(
+  model = fit4, df = As4$df,
+  expr = expression(exp(mySmooth + Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
 
 # Set the colour scale
-B4res <- rbind(Residual_fit1_B4, Residual_fit2_B4, 
-               Residual_fit3_B4, Residual_fit4_B4)
+B4res <- rbind(
+  Residual_fit1_B4, Residual_fit2_B4,
+  Residual_fit3_B4, Residual_fit4_B4
+)
 B4csc <- set_csc(B4res, rep("RdBu", 3))
 
 # Plots for residuals of all 4 models with resolution B4
@@ -698,10 +774,10 @@ plotB4_smooth <- residual_plot(B4, Residual_fit4_B4, B4csc, "Smooth Model")
 
 # Comparing all models for B4 Pearson residuals
 ((plotB4_veg$Pearson | plotB4_elev$Pearson) /
-   (plotB4_int$Pearson | plotB4_smooth$Pearson)) +
-  plot_annotation("B4 Pearson Residuals") + 
+  (plotB4_int$Pearson | plotB4_smooth$Pearson)) +
+  plot_annotation("B4 Pearson Residuals") +
   plot_layout(guides = "collect") &
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom")
 ```
 
 Now, the plots below help to compare all 4 models at a particular choice of $B$
@@ -710,47 +786,47 @@ and for a chosen residual type.
 ```{r plot-all-2, fig.height=7, fig.width=7, echo=FALSE}
 # Comparing all models for B3 Scaling residuals
 ((plotB3_veg$Scaling | plotB3_elev$Scaling) /
-   (plotB3_int$Scaling | plotB3_smooth$Scaling)) + 
-  plot_annotation("B3 Scaling Residuals") + 
+  (plotB3_int$Scaling | plotB3_smooth$Scaling)) +
+  plot_annotation("B3 Scaling Residuals") +
   plot_layout(guides = "collect") &
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom")
 
 # Comparing all models for B3 Inverse residuals
 ((plotB3_veg$Inverse | plotB3_elev$Inverse) /
-   (plotB3_int$Inverse | plotB3_smooth$Inverse)) + 
-  plot_annotation("B3 Inverse Residuals") + 
+  (plotB3_int$Inverse | plotB3_smooth$Inverse)) +
+  plot_annotation("B3 Inverse Residuals") +
   plot_layout(guides = "collect") &
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom")
 
 # Comparing all models for B3 Pearson residuals
 ((plotB3_veg$Pearson | plotB3_elev$Pearson) /
-   (plotB3_int$Pearson | plotB3_smooth$Pearson)) + 
-  plot_annotation("B3 Pearson Residuals") + 
+  (plotB3_int$Pearson | plotB3_smooth$Pearson)) +
+  plot_annotation("B3 Pearson Residuals") +
   plot_layout(guides = "collect") &
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom")
 
 # Comparing all models for B4 Scaling Residuals
 ((plotB4_veg$Scaling | plotB4_elev$Scaling) /
-   (plotB4_int$Scaling | plotB4_smooth$Scaling)) + 
-  plot_annotation("B4 Scaling Residuals") + 
+  (plotB4_int$Scaling | plotB4_smooth$Scaling)) +
+  plot_annotation("B4 Scaling Residuals") +
   plot_layout(guides = "collect") &
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom")
 
 
 # Comparing all models for B4 Inverse residuals
 ((plotB4_veg$Inverse | plotB4_elev$Inverse) /
-   (plotB4_int$Inverse | plotB4_smooth$Inverse)) + 
-  plot_annotation("B4 Inverse Residuals") + 
+  (plotB4_int$Inverse | plotB4_smooth$Inverse)) +
+  plot_annotation("B4 Inverse Residuals") +
   plot_layout(guides = "collect") &
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom")
 
 
 # Comparing all models for B4 Pearson residuals
 ((plotB4_veg$Pearson | plotB4_elev$Pearson) /
-   (plotB4_int$Pearson | plotB4_smooth$Pearson)) +
-  plot_annotation("B4 Pearson Residuals") + 
+  (plotB4_int$Pearson | plotB4_smooth$Pearson)) +
+  plot_annotation("B4 Pearson Residuals") +
   plot_layout(guides = "collect") &
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom")
 ```
 
 #### Discussion

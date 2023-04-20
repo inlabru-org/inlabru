@@ -59,7 +59,7 @@
 #' \donttest{
 #' # The INLA package is required
 #' if (bru_safe_inla(quietly = TRUE) &&
-#' bru_safe_sp()) {
+#'   bru_safe_sp()) {
 #'   vertices <- seq(0, 3, by = 0.1)
 #'   mesh <- INLA::inla.mesh.1d(vertices)
 #'   loglambda <- 5 - 0.5 * vertices
@@ -202,12 +202,12 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       area.R <- R
     } else {
       if (use.crs) {
-#        if (is.na(input.crs)) {
-#          space.units <- fm_length_unit(input.crs)
-#        }
+        #        if (is.na(input.crs)) {
+        #          space.units <- fm_length_unit(input.crs)
+        #        }
         area.R <- 6371
-        if (is.geocent){
-          if (abs(1 - space.R/area.R) > 1e-2) {
+        if (is.geocent) {
+          if (abs(1 - space.R / area.R) > 1e-2) {
             warning("The mesh has radius '", space.R, "', but crs information is available. Using radius 6371 for area calculations.")
           }
         }

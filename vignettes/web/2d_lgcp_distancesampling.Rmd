@@ -93,7 +93,6 @@ We need to define a half-normal detection probability function. This must take d
 arguent and the linear predictor of the sigma parameter (which we will call `lsig`) as its second:
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
-
 hn <- function(distance, lsig) {
   exp(-0.5 * (distance / exp(lsig))^2)
 }
@@ -250,7 +249,6 @@ fit1 <- lgcp(
 ```
 Plots:
 ```{r, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-
 spde.range <- spde.posterior(fit1, "mySPDE", what = "range")
 plot(spde.range)
 spde.logvar <- spde.posterior(fit1, "mySPDE", what = "log.variance")

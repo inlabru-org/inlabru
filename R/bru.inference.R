@@ -846,7 +846,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     # Add back additional data
     additional_data_names <- setdiff(names(data_), names(data))
     if ((length(additional_data_names) > 0) &&
-        (NROW(data_) == N_data)) {
+      (NROW(data_) == N_data)) {
       data <- cbind(data, data_[additional_data_names])
     }
 

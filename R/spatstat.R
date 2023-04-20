@@ -40,7 +40,8 @@ check_spatstat <- function(pkg = "spatstat.geom") {
 #'
 #' @examples
 #' \donttest{
-#' if (require("spatstat.geom")) {
+#' if (require("spatstat.geom") &&
+#'   bru_safe_sp()) {
 #'   # Load Gorilla data
 #'
 #'   data("gorillas", package = "inlabru")

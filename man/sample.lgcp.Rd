@@ -73,7 +73,7 @@ or \code{R}, if specified. Output given in the same CRS as the mesh.
 \donttest{
 # The INLA package is required
 if (bru_safe_inla(quietly = TRUE) &&
-bru_safe_sp()) {
+  bru_safe_sp()) {
   vertices <- seq(0, 3, by = 0.1)
   mesh <- INLA::inla.mesh.1d(vertices)
   loglambda <- 5 - 0.5 * vertices
