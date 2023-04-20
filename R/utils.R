@@ -26,9 +26,11 @@ bru_safe_inla <- function(multicore = NULL,
                           quietly = FALSE,
                           minimum_version = "23.1.31") {
   inla_version <-
-    check_package_version_and_load(pkg = "INLA",
-                                   minimum_version = minimum_version,
-                                   quietly = quietly)
+    check_package_version_and_load(
+      pkg = "INLA",
+      minimum_version = minimum_version,
+      quietly = quietly
+    )
   if (is.na(inla_version)) {
     return(FALSE)
   }
@@ -36,7 +38,7 @@ bru_safe_inla <- function(multicore = NULL,
   if (is.null(multicore)) {
     multicore <-
       !identical(Sys.getenv("TESTTHAT"), "true") ||
-      interactive()
+        interactive()
   }
   if (!multicore) {
     n.t <- tryCatch(
@@ -78,7 +80,8 @@ bru_safe_inla <- function(multicore = NULL,
 check_package_version_and_load <-
   function(pkg, minimum_version, quietly = FALSE) {
     version <- tryCatch(utils::packageVersion(pkg),
-                        error = function(e) NA_character_)
+      error = function(e) NA_character_
+    )
     if (is.na(version)) {
       if (!quietly) {
         message(paste0("Package '", pkg, "' is not installed."))
@@ -132,9 +135,11 @@ bru_safe_sp <- function(quietly = FALSE,
                         force = FALSE,
                         minimum_version = "1.4-5") {
   sp_version <-
-    check_package_version_and_load(pkg = "sp",
-                                   minimum_version = minimum_version,
-                                   quietly = quietly)
+    check_package_version_and_load(
+      pkg = "sp",
+      minimum_version = minimum_version,
+      quietly = quietly
+    )
   if (is.na(sp_version)) {
     return(invisible(FALSE))
   }
@@ -143,9 +148,11 @@ bru_safe_sp <- function(quietly = FALSE,
     # Default to 2L to allow future sp to stop supporting
     # get_evolution_status; assume everything is fine if it fails.
     evolution_status <- tryCatch(sp::get_evolution_status(),
-                                 error = function(e) 2L)
+      error = function(e) 2L
+    )
     rgdal_version <- tryCatch(utils::packageVersion("rgdal"),
-                              error = function(e) NA_character_)
+      error = function(e) NA_character_
+    )
     if ((evolution_status < 2L) && is.na(rgdal_version)) {
       if (!quietly) {
         message("'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.")

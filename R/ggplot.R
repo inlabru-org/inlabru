@@ -651,7 +651,7 @@ gg.SpatialPixelsDataFrame <- function(data,
 #' @family geomes for spatial data
 #' @examples
 #' if (require("ggplot2", quietly = TRUE) &&
-#'     bru_safe_sp()) {
+#'   bru_safe_sp()) {
 #'   # Load Gorilla data
 #'
 #'   data(gorillas, package = "inlabru")

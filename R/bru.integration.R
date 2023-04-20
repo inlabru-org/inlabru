@@ -239,7 +239,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
     loc_mid <- (loc_trap[-1] + loc_trap[-length(loc_trap)]) / 2
     weight_mid <- diff(loc_trap)
-    weight_trap = c(weight_mid / 2, 0) + c(0, weight_mid / 2)
+    weight_trap <- c(weight_mid / 2, 0) + c(0, weight_mid / 2)
     loc_simpson <- c(loc_trap, loc_mid)
     weight_simpson <- c(weight_trap / 3, weight_mid * 2 / 3)
 
@@ -594,11 +594,12 @@ cprod <- function(..., na.rm = NULL) {
     # st_as_sf(Z)
     # https://stackoverflow.com/questions/64365792/dplyr-full-join-on-geometry-columns-of-sf-objects
     if (inherits(ips1, c("sf", "sfc")) ||
-        inherits(ips2, c("sf", "sfc"))) {
+      inherits(ips2, c("sf", "sfc"))) {
       ips <-
         sf::st_as_sf(dplyr::full_join(tibble::as_tibble(ips1),
-                                      tibble::as_tibble(ips2),
-                                      by = by))
+          tibble::as_tibble(ips2),
+          by = by
+        ))
     } else {
       ips <- dplyr::full_join(ips1, ips2, by = by) # equivalent to base::merge(ips1, ips2, by = by, all = TRUE)
     }
@@ -614,15 +615,17 @@ cprod <- function(..., na.rm = NULL) {
       warning(
         paste0(
           "Block information mismatch resulting in NA weights, and 'na.rm' was not supplied.",
-          " These rows will be removed."))
+          " These rows will be removed."
+        )
+      )
     }
     ips <- na.omit(ips)
   }
 
   # TODO Transform back to sp only if they are required. ips is a tibble sf tbl data.frame.
   # It does not make sense to revert certain indices back after merging. Hence, I revert the entire object back to sp.
-  if(any(ipl_sp)){
-    ips <-  sf::as_Spatial(ips)
+  if (any(ipl_sp)) {
+    ips <- sf::as_Spatial(ips)
     # WARNING SHOULD BE HERE, MORE FRIENDLY ERROR, METHOD ST_AS_SF
     # TODO deprecated_soft warning for `sp` presence
     # lifecycle::deprecate_soft(

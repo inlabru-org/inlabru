@@ -3,8 +3,8 @@ local_bru_testthat_setup()
 # sp sf test
 test_that("cprod(..., na.rm = TRUE) sf output can be generated", {
   local_bru_safe_inla()
-  sf_obj1 <- sf::st_as_sf(data.frame(x=1:3, y=3:5), coords=c("x","y"))
-  sf_obj2 <- sf::st_as_sf(data.frame(x=3:6, y=5:8), coords=c("x","y"))
+  sf_obj1 <- sf::st_as_sf(data.frame(x = 1:3, y = 3:5), coords = c("x", "y"))
+  sf_obj2 <- sf::st_as_sf(data.frame(x = 3:6, y = 5:8), coords = c("x", "y"))
   ips <- cprod(sf_obj1, sf_obj2, na.rm = TRUE)
 
   expect_s3_class(ips, "sf")
@@ -17,26 +17,28 @@ test_that("cprod(..., na.rm = TRUE) sf output can be generated", {
 
 test_that("cprod(..., na.rm = FALSE) sf output can be generated", {
   local_bru_safe_inla()
-  sf_obj1 <- sf::st_as_sf(data.frame(x=1:3, y=3:5), coords=c("x","y"))
-  sf_obj2 <- sf::st_as_sf(data.frame(x=3:6, y=5:8), coords=c("x","y"))
+  sf_obj1 <- sf::st_as_sf(data.frame(x = 1:3, y = 3:5), coords = c("x", "y"))
+  sf_obj2 <- sf::st_as_sf(data.frame(x = 3:6, y = 5:8), coords = c("x", "y"))
   ips <- cprod(sf_obj1, sf_obj2, na.rm = FALSE)
 
   expect_s3_class(ips, "sf")
   expect_equal(nrow(ips), 6)
   expect_equal(ncol(ips), 2)
   expect_equal(names(ips), c("geometry", "weight"))
-  expect_equal(as.numeric(unlist(sf::st_geometry(ips))),
-               c(1, 3, 2, 4, 3, 5, 4, 6, 5, 7, 6, 8))
+  expect_equal(
+    as.numeric(unlist(sf::st_geometry(ips))),
+    c(1, 3, 2, 4, 3, 5, 4, 6, 5, 7, 6, 8)
+  )
   expect_equal(as.numeric(ips[[2]]), rep(c(NA, 1, NA), c(2, 1, 3)))
 })
 
 test_that("cprod(na.rm = TRUE) sp output can be generated", {
   local_bru_safe_inla()
-  sf_obj1 <- sf::st_as_sf(data.frame(x=1:3, y=3:5), coords=c("x","y"))
-  sf_obj2 <- sf::st_as_sf(data.frame(x=3:6, y=5:8), coords=c("x","y"))
-  if(require(sp, quietly = TRUE)){
-    sp_obj1 <- as(sf_obj1, 'Spatial')
-    sp_obj2 <- as(sf_obj2, 'Spatial')
+  sf_obj1 <- sf::st_as_sf(data.frame(x = 1:3, y = 3:5), coords = c("x", "y"))
+  sf_obj2 <- sf::st_as_sf(data.frame(x = 3:6, y = 5:8), coords = c("x", "y"))
+  if (require(sp, quietly = TRUE)) {
+    sp_obj1 <- as(sf_obj1, "Spatial")
+    sp_obj2 <- as(sf_obj2, "Spatial")
   }
   ips <- cprod(sp_obj1, sp_obj2, na.rm = TRUE)
 
@@ -50,11 +52,11 @@ test_that("cprod(na.rm = TRUE) sp output can be generated", {
 
 test_that("cprod(na.rm = FALSE) sp output can be generated", {
   local_bru_safe_inla()
-  sf_obj1 <- sf::st_as_sf(data.frame(x=1:3, y=3:5), coords=c("x","y"))
-  sf_obj2 <- sf::st_as_sf(data.frame(x=3:6, y=5:8), coords=c("x","y"))
-  if(require(sp, quietly = TRUE)){
-    sp_obj1 <- as(sf_obj1, 'Spatial')
-    sp_obj2 <- as(sf_obj2, 'Spatial')
+  sf_obj1 <- sf::st_as_sf(data.frame(x = 1:3, y = 3:5), coords = c("x", "y"))
+  sf_obj2 <- sf::st_as_sf(data.frame(x = 3:6, y = 5:8), coords = c("x", "y"))
+  if (require(sp, quietly = TRUE)) {
+    sp_obj1 <- as(sf_obj1, "Spatial")
+    sp_obj2 <- as(sf_obj2, "Spatial")
   }
   ips <- cprod(sp_obj1, sp_obj2, na.rm = FALSE)
 

@@ -23,8 +23,8 @@ test_that("conversion of 1D mesh to integration points", {
   expect_equal(nrow(ips), 21)
   expect_equal(ncol(ips), 3)
   expect_equal(names(ips), c("time", "weight", "group"))
-  expect_equal(as.numeric(ips[1, ]), c(0, 1/6, 1))
-  expect_equal(as.numeric(ips[2, ]), c(1, 1/3, 1))
+  expect_equal(as.numeric(ips[1, ]), c(0, 1 / 6, 1))
+  expect_equal(as.numeric(ips[2, ]), c(1, 1 / 3, 1))
   expect_equal(as.numeric(ips[12, ]), c(0.5, 2 / 3, 1))
 })
 
