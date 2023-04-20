@@ -158,8 +158,7 @@ but it is also informative to plot all the points here (which if it was
 a real plot survey you could not do, because you would not have seen
 them all).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">plotwithall</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="va">plotwithall</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">plots</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, pch <span class="op">=</span> <span class="st">"+"</span>, cex <span class="op">=</span> <span class="fl">4</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -226,8 +225,7 @@ complete information in the surveyed plots.</p>
 <code>gorillas$nests</code>), or get your previous fit, if you kept it.
 Plot the intensity surface and estimate the integrated intensity</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">fit.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>,</span>
+<code class="sourceCode R"><span><span class="va">fit.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
 <span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -249,14 +247,14 @@ samples gave sufficient information for the overall prediction:</p>
 <span><span class="co">#&gt; Warning in rbind(deparse.level, ...): number of columns of result, 8, is not a</span></span>
 <span><span class="co">#&gt; multiple of vector length 9 of arg 4</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 654.8815 55.23195 551.9197 650.5091 751.2102 650.5091        5.523195</span></span>
-<span><span class="co">#&gt; 2 645.3811 36.32936 577.6903 637.9029 716.7867 637.9029        3.632936</span></span>
-<span><span class="co">#&gt; 3 672.5203 27.13163 627.4148 668.8696 729.0691 668.8696        2.713163</span></span>
+<span><span class="co">#&gt; 1 668.1228 53.60326 571.7161 663.4596 768.1236 663.4596        5.360326</span></span>
+<span><span class="co">#&gt; 2 646.2121 38.06656 584.0300 646.4997 719.3947 646.4997        3.806656</span></span>
+<span><span class="co">#&gt; 3 671.1023 25.42009 630.9768 667.2702 726.7715 667.2702        2.542009</span></span>
 <span><span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      3.439845</span></span>
-<span><span class="co">#&gt; 2      2.495605</span></span>
-<span><span class="co">#&gt; 3      1.891597</span></span>
+<span><span class="co">#&gt; 1      4.240887</span></span>
+<span><span class="co">#&gt; 2      2.158703</span></span>
+<span><span class="co">#&gt; 3      1.788547</span></span>
 <span><span class="co">#&gt; 4            NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
