@@ -85,7 +85,6 @@ Suggests:
     sn,
     spatstat.geom,
     spatstat.data,
-    spatstat (>= 2.0-0),
     sphereplot,
     splancs,
     terra,
