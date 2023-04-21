@@ -11,7 +11,7 @@ on:
     branches:
       - devel
 
-name: R-CMD-check-no-suggests
+name: R-CMD-check-no-suggests-no-INLA
 
 jobs:
   R-CMD-check:
