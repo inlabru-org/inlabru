@@ -29,6 +29,7 @@ test_that("bru: clinear component", {
     tolerance = hitol
   )
 
+  skip_if_not_installed("sn")
   pr <- predict(
     fit,
     data.frame(x = c(1, 2)),
