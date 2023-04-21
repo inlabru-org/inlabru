@@ -37,6 +37,8 @@ line to be integrated. See the distance sampling example
 https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_distancesampling.html}
 
 \item{int.args}{List of arguments passed on to \code{ipoints}}
+
+\item{...}{Unused additional arguments}
 }
 \value{
 Integration points

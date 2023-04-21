@@ -79,6 +79,7 @@ names_list <- function(x) {
 #' It mainly works for line transect at the moment, determining the width of the
 #' line to be integrated. See the distance sampling example
 #' https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_distancesampling.html
+#' @param ... Unused additional arguments
 #' @param int.args List of arguments passed on to \code{ipoints}
 #' @return Integration points
 
