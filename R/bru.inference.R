@@ -768,7 +768,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       ips <- ipmaker(
         samplers = samplers,
         domain = domain,
-        dnames = names(response),
+#        dnames = names(response),
         int.args = options[["bru_int_args"]]
       )
     }

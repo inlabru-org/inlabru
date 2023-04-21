@@ -789,6 +789,10 @@ ipmaker <- function(samplers, domain, dnames,
   # use the domain specification to determine the type of integration
   # method to call, so that it doesn't need to rely on the domain name.
 
+  if (missing(dnames)) {
+    dnames <- names(domain)
+  }
+
   if ("coordinates" %in% dnames) {
     spatial <- TRUE
   } else {

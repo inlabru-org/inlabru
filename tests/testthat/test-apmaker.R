@@ -28,6 +28,8 @@ test_that("1D integration points can be generated", {
 
   mdl <- ~ spde1D(main = x, model = matern) + Intercept(1)
 
+  ips <- apmaker(domain = list(x = mesh1D))
+
   fit1 <- bru(
     mdl,
     like(

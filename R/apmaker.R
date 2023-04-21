@@ -1,4 +1,4 @@
-#' https://github.com/inlabru-org/inlabru/issues/125
+# https://github.com/inlabru-org/inlabru/issues/125
 
 # TODO 20220126should not be a S3 but local function and function name should be clearer
 # bru_log_list function ---------------------------------------------------------
@@ -44,19 +44,20 @@ bru_log_list <- function(x, attr_names = "sf_column", start_with = NULL, end_wit
 # 1) do I need the names of the list or the names within the list(s)?
 # 2) Does column names mean sth here?
 # 3) What to do with NULL cases, aka unamed list?
-#' @name names
-#' @export names_list
-#' @method extract names within list(s)
-#' @title Names within list(s)
-#'
+# @name names
+# @export names_list
+# @title Names within list(s)
+#
 names_list <- function(x) {
   lapply(x, function(y) {
     names(y)
   })
 }
 
-
-#' @aliases apmaker
+#' Construct tensor product integration schemes for multiple domains and subregions
+#'
+#' Constructs an integration scheme for each domain, restricted by samplers
+#'
 #' @export
 #' @param domain A list of named integration definitions, each either
 #' character/factor vector, a numeric vector of points given integration
@@ -67,7 +68,7 @@ names_list <- function(x) {
 #' the level to map them back to the components
 #' @param samplers A (list of unnamed or named element(s) of ) `[sf/sfc]DataFrame` or
 #' `Spatial[Points/Lines/Polygons]DataFrame` object(s). Unnamed elements
-#' are assumed to be multidomain samperls; named elements are singledomain
+#' are assumed to be multidomain samplers; named elements are singledomain
 #' samplers; domains without corresponding samplers are assumed to be full domain
 #' samplers.
 #' TODO is response useful here? 20220130
@@ -84,7 +85,8 @@ names_list <- function(x) {
 # TODO option argument as in bru function with list() bru_int_args
 apmaker <- function(domain = NULL, samplers = NULL,
                     weight = "weight",
-                    int.args = list(method = "stable", nsub = NULL)) {
+                    int.args = list(method = "stable", nsub = NULL),
+                    ...) {
   # TODO ####
   # TODO To allow sf geometry support, should likely change the logic to
   # use the domain specification to determine the type of integration
@@ -98,12 +100,13 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # 1) dname deprecated
   # 2) samplers should be provided as list
   # 3) ...
-  lifecycle::deprecate_soft(
-    when = "2.7.1", # TODO next inlabru version
-    what = "apmaker(dnames)",
-    with = "apmaker(samplers)",
-    details = "dnames should be provided in the samplers as the dimension names."
-  )
+  if ("dnames" %in% names(list(...))) {
+    lifecycle::deprecate_soft(
+      when = "2.7.1", # TODO next inlabru version
+      what = "apmaker(dnames)",
+      details = "The dnames information is extracted from the names of the domains."
+    )
+  }
 
   # Mandate the domain argument to be specified
   if (missing(domain)) {
@@ -123,7 +126,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
     stop("Domain must be a named list.")
   }
 
-  if (!inherits(samplers, "list")) {
+  if (!is.null(samplers) && !inherits(samplers, "list")) {
     samplers <- list(samplers)
   }
 
