@@ -119,7 +119,7 @@ jobs:
           build_args: 'c("--no-manual", "--no-build-vignettes")'
           args: 'c("--no-manual", "--ignore-vignettes", "--as-cran")'
 
-      - name: Has Suggests? Check, remove all except INLA and ensure INLA installed.
+      - name: Has Suggests? Ensure INLA installed.
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
