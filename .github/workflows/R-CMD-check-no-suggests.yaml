@@ -86,7 +86,7 @@ jobs:
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
-          if ("INLA" pkgs) {
+          if ("INLA" %in% pkgs) {
             cat("Uninstalling INLA\n")
             remove.packages(sug[sug %in% pkgs])
           }
