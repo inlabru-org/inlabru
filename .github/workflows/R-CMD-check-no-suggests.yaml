@@ -58,7 +58,7 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y libglu1-mesa-dev
 
-      - name: Has Suggests? Check.
+      - name: Has Suggests?
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
@@ -82,19 +82,12 @@ jobs:
              rcmdcheck
              testthat
 
-      - name: Has Suggests? Check, and remove.
+      - name: Has Suggests? Remove INLA.
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
-          sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
-          sug <- gsub(" \\([^)]*\\)", "", sug)
-          sug <- gsub("\n", "", sug)
-          sug <- gsub(" ", "", sug)
-          sug <- strsplit(sug, ",")[[1]]
-          if (any(sug %in% pkgs)) {
-            cat(paste0("Uninstalling Suggests: ",
-                       paste0(sug[sug %in% pkgs], collapse = ", "),
-                       "\n"))
+          if ("INLA" pkgs) {
+            cat("Uninstalling INLA\n")
             remove.packages(sug[sug %in% pkgs])
           }
           pkgs <- installed.packages()[, "Package"]
@@ -130,19 +123,10 @@ jobs:
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
-          pkgs <- installed.packages()[, "Package"]
-          sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
-          sug <- gsub(" \\([^)]*\\)", "", sug)
-          sug <- gsub("\n", "", sug)
-          sug <- gsub(" ", "", sug)
-          sug <- strsplit(sug, ",")[[1]]
-          if (any(sug %in% pkgs)) {
-            cat(paste0("Uninstalling Suggests: ",
-                       paste0(sug[sug %in% pkgs], collapse = ", "),
-                       "\n"))
-            remove.packages(sug[sug %in% pkgs])
+          if (!("INLA" %in% pkgs)) {
+            cat("Installing INLA\n")
+            install.packages("INLA")
           }
-          install.packages("INLA")
           pkgs <- installed.packages()[, "Package"]
           sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
           sug <- gsub(" \\([^)]*\\)", "", sug)
