@@ -41,7 +41,9 @@ Requires the \code{ggplot2} package.
 }
 \examples{
 \donttest{
-if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
+if (bru_safe_inla() &&
+    require(sn, quietly = TRUE) &&
+    require(ggplot2, quietly = TRUE)) {
   # Generate some data
 
   input.df <- data.frame(x = cos(1:10))
