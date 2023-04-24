@@ -58,11 +58,19 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y libglu1-mesa-dev
 
-      - name: Has inla? Check.
+      - name: Has Suggests? Check.
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
-          "INLA" %in% pkgs
+          sug <- packageDescription("inlabru", fields = "Suggests")
+          sug <- gsub(" \\([^)]*\\)", "", sug)
+          sug <- strsplit(sug, ",\n")
+          cat(paste0("Uninstalled Suggests: ",
+                     paste0(sug[!(sug %in% pkgs)], collapse = ", "),
+                     "\n"))
+          cat(paste0("Installed Suggests: ",
+                     paste0(sug[sug %in% pkgs], collapse = ", "),
+                     "\n"))
         shell: Rscript {0}
 
       - uses: r-lib/actions/setup-r-dependencies@v2
@@ -76,10 +84,19 @@ jobs:
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
-          "INLA" %in% pkgs
           if ("INLA" %in% pkgs) {
             remove.packages("INLA")
           }
+          pkgs <- installed.packages()[, "Package"]
+          sug <- packageDescription("inlabru", fields = "Suggests")
+          sug <- gsub(" \\([^)]*\\)", "", sug)
+          sug <- strsplit(sug, ",\n")
+          cat(paste0("Uninstalled Suggests: ",
+                     paste0(sug[!(sug %in% pkgs)], collapse = ", "),
+                     "\n"))
+          cat(paste0("Installed Suggests: ",
+                     paste0(sug[sug %in% pkgs], collapse = ", "),
+                     "\n"))
         shell: Rscript {0}
 
       - name: Session info without INLA
@@ -105,6 +122,16 @@ jobs:
           if (!("INLA" %in% pkgs)) {
             install.packages("INLA")
           }
+          pkgs <- installed.packages()[, "Package"]
+          sug <- packageDescription("inlabru", fields = "Suggests")
+          sug <- gsub(" \\([^)]*\\)", "", sug)
+          sug <- strsplit(sug, ",\n")
+          cat(paste0("Uninstalled Suggests: ",
+                     paste0(sug[!(sug %in% pkgs)], collapse = ", "),
+                     "\n"))
+          cat(paste0("Installed Suggests: ",
+                     paste0(sug[sug %in% pkgs], collapse = ", "),
+                     "\n"))
         shell: Rscript {0}
 
       - name: Session info with INLA
