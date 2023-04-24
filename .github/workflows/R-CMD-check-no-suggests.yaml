@@ -62,7 +62,7 @@ jobs:
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
-          sug <- packageDescription("inlabru", fields = "Suggests")
+          sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
           sug <- gsub(" \\([^)]*\\)", "", sug)
           sug <- strsplit(sug, ",\n")
           cat(paste0("Uninstalled Suggests: ",
@@ -88,7 +88,7 @@ jobs:
             remove.packages("INLA")
           }
           pkgs <- installed.packages()[, "Package"]
-          sug <- packageDescription("inlabru", fields = "Suggests")
+          sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
           sug <- gsub(" \\([^)]*\\)", "", sug)
           sug <- strsplit(sug, ",\n")
           cat(paste0("Uninstalled Suggests: ",
@@ -123,7 +123,7 @@ jobs:
             install.packages("INLA")
           }
           pkgs <- installed.packages()[, "Package"]
-          sug <- packageDescription("inlabru", fields = "Suggests")
+          sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
           sug <- gsub(" \\([^)]*\\)", "", sug)
           sug <- strsplit(sug, ",\n")
           cat(paste0("Uninstalled Suggests: ",
