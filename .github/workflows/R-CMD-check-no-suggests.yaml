@@ -11,7 +11,7 @@ on:
     branches:
       - devel
 
-name: R-CMD-check-no-suggests-no-INLA
+name: R-CMD-check-no-suggests
 
 jobs:
   R-CMD-check:
@@ -82,7 +82,32 @@ jobs:
           }
         shell: Rscript {0}
 
-      - name: Session info
+      - name: Session info without INLA
+        run: |
+          options(width = 100)
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
+
+      - uses: r-lib/actions/check-r-package@v2
+        env:
+          _R_CHECK_CRAN_INCOMING_REMOTE_: false
+          _R_CHECK_FORCE_SUGGESTS_: false
+        with:
+          build_args: 'c("--no-manual", "--no-build-vignettes")'
+          args: 'c("--no-manual", "--ignore-vignettes", "--as-cran")'
+
+      - name: Has inla? Check, and ensure.
+        run: |
+          options(width = 100)
+          pkgs <- installed.packages()[, "Package"]
+          "INLA" %in% pkgs
+          if (!("INLA" %in% pkgs)) {
+            install.packages("INLA")
+          }
+        shell: Rscript {0}
+
+      - name: Session info with INLA
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
