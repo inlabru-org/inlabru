@@ -82,12 +82,20 @@ jobs:
              rcmdcheck
              testthat
 
-      - name: Has inla? Check, and remove.
+      - name: Has Suggests? Check, and remove.
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
-          if ("INLA" %in% pkgs) {
-            remove.packages("INLA")
+          sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
+          sug <- gsub(" \\([^)]*\\)", "", sug)
+          sug <- gsub("\n", "", sug)
+          sug <- gsub(" ", "", sug)
+          sug <- strsplit(sug, ",")[[1]]
+          if (any(sug %in% pkgs)) {
+            cat(paste0("Uninstalling Suggests: ",
+                       paste0(sug[sug %in% pkgs], collapse = ", "),
+                       "\n"))
+            remove.packages(sug[sug %in% pkgs])
           }
           pkgs <- installed.packages()[, "Package"]
           sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
@@ -118,14 +126,23 @@ jobs:
           build_args: 'c("--no-manual", "--no-build-vignettes")'
           args: 'c("--no-manual", "--ignore-vignettes", "--as-cran")'
 
-      - name: Has inla? Check, and ensure.
+      - name: Has Suggests? Check, remove all except INLA and ensure INLA installed.
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
-          "INLA" %in% pkgs
-          if (!("INLA" %in% pkgs)) {
-            install.packages("INLA")
+          pkgs <- installed.packages()[, "Package"]
+          sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
+          sug <- gsub(" \\([^)]*\\)", "", sug)
+          sug <- gsub("\n", "", sug)
+          sug <- gsub(" ", "", sug)
+          sug <- strsplit(sug, ",")[[1]]
+          if (any(sug %in% pkgs)) {
+            cat(paste0("Uninstalling Suggests: ",
+                       paste0(sug[sug %in% pkgs], collapse = ", "),
+                       "\n"))
+            remove.packages(sug[sug %in% pkgs])
           }
+          install.packages("INLA")
           pkgs <- installed.packages()[, "Package"]
           sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
           sug <- gsub(" \\([^)]*\\)", "", sug)
