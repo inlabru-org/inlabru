@@ -72,6 +72,7 @@ test_that("2D LGCP fitting", {
     proj4string = fm_CRS(gorillas$nests)
   )
   set.seed(123L)
+  skip_if_not_installed("sn")
   pr <- predict(fit, loc, ~mySmooth,
     n.samples = 5, seed = 5657L,
     parallel.configs = FALSE

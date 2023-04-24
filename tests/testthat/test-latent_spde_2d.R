@@ -125,6 +125,8 @@ test_that("Georeferenced data with sp", {
   pred_df <- pixels(mesh)
   coordnames(pred_df) <- coordnames(mydata)
   expect_s4_class(pred_df, "SpatialPixelsDataFrame")
+
+  skip_if_not_installed("sn")
   pred <- predict(fit, pred_df, ~ exp(Intercept + field), n.samples = 5)
   expect_s4_class(pred, "SpatialPixelsDataFrame")
 })

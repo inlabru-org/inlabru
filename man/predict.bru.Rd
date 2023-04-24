@@ -93,6 +93,7 @@ generate new realisations for indices greater than \code{n}.
 \donttest{
 if (bru_safe_inla(multicore = FALSE) &&
     bru_safe_sp() &&
+    require("sn", quietly = TRUE) &&
     require("ggplot2", quietly = TRUE)) {
 
   # Load the Gorilla data

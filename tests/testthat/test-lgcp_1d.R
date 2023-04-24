@@ -61,6 +61,7 @@ test_that("1D LGCP fitting", {
     style = "deparse"
   )
 
+  skip_if_not_installed("sn")
   pr <- predict(fit,
     data = data.frame(x = mesh1D$loc),
     formula = ~ list(
@@ -160,6 +161,7 @@ test_that("1D LGCP fitting, discrete point domain", {
     style = "deparse"
   )
 
+  skip_if_not_installed("sn")
   pr <- predict(
     fit,
     data = data.frame(x = mesh1D$loc),

@@ -77,6 +77,7 @@ test_that("bru: factor component", {
   )
 
   # Check if prediction works
+  skip_if_not_installed("sn")
   pr <- predict(
     fit,
     data.frame(

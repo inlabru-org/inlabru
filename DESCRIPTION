@@ -54,20 +54,20 @@ Depends:
     sp (>= 1.4-5),
     stats
 Imports:
-    MatrixModels,
+    dplyr,
+    lifecycle,
     magrittr,
+    MatrixModels,
     Matrix,
-    patchwork,
     plyr,
     rlang,
     sf,
+    terra,
     tibble,
     utils,
-    withr,
-    lifecycle
+    withr
 Suggests:
     covr,
-    dplyr,
     ggmap,
     ggplot2,
     ggpolypath,
@@ -76,6 +76,7 @@ Suggests:
     knitr,
     maps,
     mgcv,
+    patchwork,
     raster,
     RColorBrewer,
     rgl,
@@ -87,7 +88,6 @@ Suggests:
     spatstat.data,
     sphereplot,
     splancs,
-    terra,
     tidyterra,
     testthat,
     tidyr,
