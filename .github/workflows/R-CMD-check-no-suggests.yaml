@@ -88,7 +88,7 @@ jobs:
           pkgs <- installed.packages()[, "Package"]
           if ("INLA" %in% pkgs) {
             cat("Uninstalling INLA\n")
-            remove.packages(sug[sug %in% pkgs])
+            remove.packages("INLA")
           }
           pkgs <- installed.packages()[, "Package"]
           sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
