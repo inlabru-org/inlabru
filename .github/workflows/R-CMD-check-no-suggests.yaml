@@ -64,7 +64,9 @@ jobs:
           pkgs <- installed.packages()[, "Package"]
           sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
           sug <- gsub(" \\([^)]*\\)", "", sug)
-          sug <- strsplit(sug, ",\n")
+          sug <- gsub("\n", "", sug)
+          sug <- gsub(" ", "", sug)
+          sug <- strsplit(sug, ",")[[1]]
           cat(paste0("Uninstalled Suggests: ",
                      paste0(sug[!(sug %in% pkgs)], collapse = ", "),
                      "\n"))
@@ -90,7 +92,9 @@ jobs:
           pkgs <- installed.packages()[, "Package"]
           sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
           sug <- gsub(" \\([^)]*\\)", "", sug)
-          sug <- strsplit(sug, ",\n")
+          sug <- gsub("\n", "", sug)
+          sug <- gsub(" ", "", sug)
+          sug <- strsplit(sug, ",")[[1]]
           cat(paste0("Uninstalled Suggests: ",
                      paste0(sug[!(sug %in% pkgs)], collapse = ", "),
                      "\n"))
@@ -125,7 +129,9 @@ jobs:
           pkgs <- installed.packages()[, "Package"]
           sug <- as.list(read.dcf("DESCRIPTION")[1,])$Suggests
           sug <- gsub(" \\([^)]*\\)", "", sug)
-          sug <- strsplit(sug, ",\n")
+          sug <- gsub("\n", "", sug)
+          sug <- gsub(" ", "", sug)
+          sug <- strsplit(sug, ",")[[1]]
           cat(paste0("Uninstalled Suggests: ",
                      paste0(sug[!(sug %in% pkgs)], collapse = ", "),
                      "\n"))
