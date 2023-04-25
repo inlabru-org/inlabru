@@ -136,17 +136,14 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   }
 
   if (!is.null(project)) {
-    if (project && !identical(int.args$method, "stable")) {
-      stop("ipoints(project=TRUE) is deprecated, and int.args$methods != 'stable'")
-    } else if (!project && identical(int.args$method, "stable")) {
-      stop("ipoints(project=FALSE) is deprecated, and int.args$methods == 'stable'")
-    }
-    warning(
-      "ipoints(project=", ifelse(project, "TRUE", "FALSE"),
-      ") is deprecated. Will use int.args$method = '",
-      int.args[["method"]],
-      "' instead."
-    )
+    lifecycle::deprecate_warn(
+      "2.7.0",
+      "ipoints(project)",
+      details = paste0("For project=", project,
+                       ", use int.args$method = '",
+                       list("TRUE" = "stable",
+                            "FALSE" = "direct")[as.character(project)],
+                       "' instead."))
   }
 
   if (is.null(domain) &&

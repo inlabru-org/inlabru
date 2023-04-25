@@ -370,11 +370,14 @@ fm_int.inla.mesh <- function(domain, samplers = NULL, name = NULL, int.args = NU
     if (!("weight" %in% names(samplers))) {
       samplers$weight <- 1
     }
+    if (!("group" %in% names(samplers))) {
+      samplers$group <- 1
+    }
 
     ips <- int.slines(
       samplers,
       domain,
-      group = group,
+      group = "group",
       project = identical(int.args[["method"]], "stable")
     )
 
@@ -450,7 +453,7 @@ fm_int.inla.mesh <- function(domain, samplers = NULL, name = NULL, int.args = NU
 
     if (!is.null(samplers)) {
       df <- data.frame(
-        samplers@data[ips$group, group, drop = FALSE],
+        samplers@data[ips$group, "group", drop = FALSE],
         weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
       )
     } else {
