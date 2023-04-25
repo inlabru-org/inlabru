@@ -24,12 +24,28 @@ fm_int(domain, samplers = NULL, ...)
 
 \method{fm_int}{inla.mesh}(domain, samplers = NULL, name = NULL, int.args = NULL, ...)
 }
+\arguments{
+\item{domain}{Functional space specification; single domain or a named list
+of domains}
+
+\item{samplers}{For single domain \code{fm_int} methods, an object specifying one or more
+subsets of the domain, and optional weighting and group information, as variables \code{weight} and \code{group}
+in a data frame.
+For \code{fm_int.list}, a list of sampling definitions.}
+
+\item{\dots}{Additional arguments passed on to other methods}
+
+\item{name}{For single-domain methods, the variable name to use for the
+integration points. Default 'x'}
+
+\item{int.args}{A list of integration options}
+}
 \description{
 Construct integration points on tensor product spaces
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{fm_int(list)}: multi-domain integration
+\item \code{fm_int(list)}: Multi-domain integration
 
 \item \code{fm_int(numeric)}: Discrete double or integer space integration
 
@@ -37,8 +53,15 @@ Construct integration points on tensor product spaces
 
 \item \code{fm_int(factor)}: Discrete factor space integration
 
-\item \code{fm_int(inla.mesh.1d)}: \code{inla.mesh.1d} integration
+\item \code{fm_int(inla.mesh.1d)}: \code{inla.mesh.1d} integration.
 
 \item \code{fm_int(inla.mesh)}: \code{inla.mesh.2d} integration
 
 }}
+\examples{
+if (bru_safe_inla()) {
+  # Integration on the interval (2, 3.5) with Simpson's rule
+  fm_int(INLA::inla.mesh.1d(0:4), samplers = cbind(2, 3.5))
+}
+
+}

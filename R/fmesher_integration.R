@@ -1,17 +1,33 @@
 #' @title Multi-domain integration
 #'
 #' @description Construct integration points on tensor product spaces
+#' @param domain Functional space specification; single domain or a named list
+#' of domains
+#' @param samplers For single domain `fm_int` methods, an object specifying one or more
+#' subsets of the domain, and optional weighting and group information, as variables `weight` and `group`
+#' in a data frame.
+#' For `fm_int.list`, a list of sampling definitions.
+#' @param name For single-domain methods, the variable name to use for the
+#' integration points. Default 'x'
+#' @param \dots Additional arguments passed on to other methods
 #'
 #' @export
+#' @examples
+#' if (bru_safe_inla()) {
+#'   # Integration on the interval (2, 3.5) with Simpson's rule
+#'   fm_int(INLA::inla.mesh.1d(0:4), samplers = cbind(2, 3.5))
+#' }
+#'
 fm_int <- function(domain, samplers = NULL, ...) {
   UseMethod("fm_int")
 }
 
 #' @export
-#' @describeIn fm_int multi-domain integration
+#' @describeIn fm_int Multi-domain integration
 fm_int.list <- function(domain, samplers = NULL, ...) {
   stop("TODO: convert apmaker")
 }
+
 
 #' @export
 #' @describeIn fm_int Discrete double or integer space integration
@@ -19,22 +35,33 @@ fm_int.numeric <- function(domain, samplers = NULL, name = "x", ...) {
   if (is.null(samplers)) {
     ips <- data.frame(
       x = as.vector(domain),
-      weight = 1
+      weight = 1,
+      group = 1L
     )
     colnames(ips)[1] <- name
     return(ips)
   }
 
-  stopifnot(is.numeric(samplers))
+  if (!is.data.frame(samplers)) {
+    samplers <- data.frame(
+      x = samplers,
+      weight = 1,
+      group = 1L
+    )
+    colnames(samplers)[1] <- name
+  } else {
+    if (is.null(samplers[["weight"]])) {
+      samplers[["weight"]] <- 1
+    }
+    if (is.null(samplers[["group"]])) {
+      samplers[["group"]] <- 1L
+    }
+  }
 
-  ok <- samplers %in% domain
-  ips <- data.frame(
-    x = as.vector(samplers),
-    weight = 1
-  )
-  ips[["x"]][!ok] <- if (is.integer(samplers)) NA_integer_ else NA_real_
-  storage.mode(ips[["x"]]) <- storage.mode(domain)
-  colnames(ips)[1] <- name
+  storage.mode(samplers[[name]]) <- storage.mode(domain)
+
+  ok <- samplers[[name]] %in% domain
+  ips <- samplers[ok, , drop = FALSE]
   ips
 }
 
@@ -44,21 +71,33 @@ fm_int.character <- function(domain, samplers = NULL, name = "x", ...) {
   if (is.null(samplers)) {
     ips <- data.frame(
       x = as.vector(domain),
-      weight = 1
+      weight = 1,
+      group = 1L
     )
     colnames(ips)[1] <- name
     return(ips)
   }
 
-  stopifnot(is.character(samplers))
+  if (!is.data.frame(samplers)) {
+    samplers <- data.frame(
+      x = samplers,
+      weight = 1,
+      group = 1L
+    )
+    colnames(samplers)[1] <- name
+  } else {
+    if (is.null(samplers[["weight"]])) {
+      samplers[["weight"]] <- 1
+    }
+    if (is.null(samplers[["group"]])) {
+      samplers[["group"]] <- 1L
+    }
+  }
 
-  ok <- samplers %in% domain
-  ips <- data.frame(
-    x = as.vector(samplers),
-    weight = 1
-  )
-  ips[["x"]][!ok] <- NA_character_
-  colnames(ips)[1] <- name
+  storage.mode(samplers[[name]]) <- storage.mode(domain)
+
+  ok <- samplers[[name]] %in% domain
+  ips <- samplers[ok, , drop = FALSE]
   ips
 }
 
@@ -67,26 +106,39 @@ fm_int.character <- function(domain, samplers = NULL, name = "x", ...) {
 fm_int.factor <- function(domain, samplers = NULL, name = "x", ...) {
   if (is.null(samplers)) {
     ips <- data.frame(
-      x = factor(as.vector(domain), levels = levels(domain)),
-      weight = 1
+      x = as.vector(domain),
+      weight = 1,
+      group = 1L
     )
     colnames(ips)[1] <- name
     return(ips)
   }
 
-  stopifnot(is.factor(samplers) || is.character(samplers))
+  if (!is.data.frame(samplers)) {
+    samplers <- data.frame(
+      x = factor(as.vector(samplers), levels = levels(domain)),
+      weight = 1,
+      group = 1L
+    )
+    colnames(samplers)[1] <- name
+  } else {
+    if (is.null(samplers[["weight"]])) {
+      samplers[["weight"]] <- 1
+    }
+    if (is.null(samplers[["group"]])) {
+      samplers[["group"]] <- 1L
+    }
+  }
 
-  ips <- data.frame(
-    x = factor(as.vector(samplers), levels = levels(domain)),
-    weight = 1
-  )
-  colnames(ips)[1] <- name
+  ok <- samplers[[name]] %in% domain
+  ips <- samplers[ok, , drop = FALSE]
   ips
 }
 
 
+#' @param int.args A list of integration options
 #' @export
-#' @describeIn fm_int `inla.mesh.1d` integration
+#' @describeIn fm_int `inla.mesh.1d` integration.
 fm_int.inla.mesh.1d <- function(domain, samplers = NULL, name = "x", int.args = NULL, ...) {
   int.args.default <- list(method = "stable", nsub1 = 30, nsub2 = 9)
   if (is.null(int.args)) {
@@ -99,24 +151,81 @@ fm_int.inla.mesh.1d <- function(domain, samplers = NULL, name = "x", int.args = 
   }
 
   if (is.null(samplers)) {
-    samplers <- rbind(domain$interval)
+    samplers <- data.frame(
+      x1 = domain$interval[1],
+      x2 = domain$interval[2],
+      weight = 1,
+      group = 1L
+    )
+    colnames(samplers)[1:2] <- paste0(name, 1:2)
   } else if (is.null(dim(samplers))) {
-    samplers <- matrix(samplers, 1, 2)
-  }
-  if (ncol(samplers) != 2) {
-    stop("Interval description matrix must have 2 elements or be a 2-column matrix.")
+    samplers <- data.frame(
+      x1 = samplers[1],
+      x2 = samplers[2],
+      weight = 1,
+      group = 1L
+    )
+    colnames(samplers)[1:2] <- paste0(name, 1:2)
+  } else {
+    samplers <- as.data.frame(samplers)
+    colnames(samplers)[1:2] <- paste0(name, 1:2)
+    if (!("weight" %in% colnames(samplers))) {
+      samplers <- cbind(samplers, weight = 1)
+    }
+    if (!("group" %in% colnames(samplers))) {
+      samplers <- cbind(samplers, group = seq_len(NROW(samplers)))
+    }
   }
 
   ips <- list()
   for (j in seq_len(nrow(samplers))) {
-    subsampler <- samplers[j, ]
+    subsampler <- unlist(samplers[j, 1:2, drop = TRUE])
+    theweight <- samplers[j, "weight"]
+    thegroup <- samplers[j, "group"]
+
+    if (isTRUE(domain$cyclic)) {
+      if (diff(subsampler) >= diff(domain$interval)) {
+        subsampler <- domain$interval
+      } else {
+        subsampler[1] <- domain$interval[1] +
+          (subsampler[1] - domain$interval[1]) %% diff(domain$interval)
+        subsampler[2] <- subsampler[1] + diff(subsampler) %% diff(domain$interval)
+        if (diff(subsampler) == 0.0) {
+          subsampler <- domain$interval
+        } else if (subsampler[2] > domain$interval[2]) {
+          subsampler[2] <- domain$interval[1] +
+            (subsampler[2] - domain$interval[1]) %% diff(domain$interval)
+        }
+      }
+    } else if (diff(subsampler) <= 0.0) {
+      # Empty interval, skip to next subsampler
+      next
+    }
 
     if (identical(int.args[["method"]], "stable")) {
       if (isTRUE(domain$cyclic)) {
-        loc_trap <-
-          sort(unique(c(domain$loc, as.vector(subsampler), domain$interval)))
+        loc_trap <- sort(unique(pmin(
+          domain$interval[2],
+          pmax(
+            domain$interval[1],
+            c(
+              domain$loc,
+              as.vector(subsampler),
+              domain$interval
+            )
+          )
+        )))
       } else {
-        loc_trap <- sort(unique(c(domain$loc, as.vector(subsampler))))
+        loc_trap <- sort(unique(pmin(
+          domain$interval[2],
+          pmax(
+            domain$interval[1],
+            c(
+              domain$loc,
+              as.vector(subsampler)
+            )
+          )
+        )))
       }
 
       # Simpson's rule integration
@@ -140,8 +249,8 @@ fm_int.inla.mesh.1d <- function(domain, samplers = NULL, name = "x", int.args = 
 
       ips[[j]] <- data.frame(
         x = loc_simpson[ok & (weight_simpson > 0)],
-        weight = weight_simpson[ok & (weight_simpson > 0)],
-        group = j
+        weight = weight_simpson[ok & (weight_simpson > 0)] * theweight,
+        group = thegroup
       )
       colnames(ips[[j]])[1] <- name
     } else {
@@ -155,23 +264,32 @@ fm_int.inla.mesh.1d <- function(domain, samplers = NULL, name = "x", int.args = 
         domain$loc[rep(seq_len(domain$n - 1) + 1, each = nsub)] * u
       int_w <-
         (domain$loc[rep(seq_len(domain$n - 1) + 1, each = nsub)] -
-           domain$loc[rep(seq_len(domain$n - 1), each = nsub)]) /
-        nsub
+          domain$loc[rep(seq_len(domain$n - 1), each = nsub)]) /
+          nsub
 
-      inside <-
-        (int_loc >= min(subsampler)) &
-        (int_loc <= max(subsampler))
+      if (isTRUE(domain$cyclic) && (subsampler[1] > subsampler[2])) {
+        inside <- (int_loc < min(subsampler)) |
+          (int_loc > max(subsampler))
+      } else {
+        inside <- (int_loc >= min(subsampler)) &
+          (int_loc <= max(subsampler))
+      }
 
       ips[[j]] <- data.frame(
         loc = int_loc[inside],
-        weight = int_w[inside],
-        group = j
+        weight = int_w[inside] * theweight,
+        group = thegroup
       )
     }
     colnames(ips[[j]])[1] <- name
   }
 
   ips <- do.call(rbind, ips)
+
+  if (NROW(ips) == 0) {
+    ips <- data.frame(x = numeric(0), weight = numeric(0), group = integer(0))
+    colnames(ips)[1] <- name
+  }
 
   ips
 }
@@ -201,8 +319,8 @@ fm_int.inla.mesh <- function(domain, samplers = NULL, name = NULL, int.args = NU
   }
 
   if (inherits(domain, "inla.mesh") &&
-      is.null(samplers) &&
-      identical(int.args[["method"]], "stable")) {
+    is.null(samplers) &&
+    identical(int.args[["method"]], "stable")) {
     coord_names <- c("x", "y", "z")
     if (!is.null(name)) {
       coord_names[seq_along(name)] <- name
@@ -235,10 +353,10 @@ fm_int.inla.mesh <- function(domain, samplers = NULL, name = NULL, int.args = NU
     ips <- samplers
     ips$weight <- 1
   } else if (inherits(samplers, "SpatialLines") ||
-             inherits(samplers, "SpatialLinesDataFrame")) {
+    inherits(samplers, "SpatialLinesDataFrame")) {
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
     if (inherits(samplers, "SpatialLines") &&
-        !inherits(samplers, "SpatialLinesDataFrame")) {
+      !inherits(samplers, "SpatialLinesDataFrame")) {
       samplers <- SpatialLinesDataFrame(
         samplers,
         data = data.frame(weight = rep(1, length(samplers)))
@@ -268,14 +386,13 @@ fm_int.inla.mesh <- function(domain, samplers = NULL, name = NULL, int.args = NU
     "SpatialPolygons",
     "SpatialPolygonsDataFrame"
   )) ||
-  is.null(samplers))) {
-
+    is.null(samplers))) {
     if (!is.null(samplers)) {
       # If SpatialPolygons are provided convert into SpatialPolygonsDataFrame and attach weight = 1
       if (class(samplers)[1] == "SpatialPolygons") {
         samplers <- SpatialPolygonsDataFrame(samplers,
-                                             data = data.frame(weight = rep(1, length(samplers))),
-                                             match.ID = FALSE
+          data = data.frame(weight = rep(1, length(samplers))),
+          match.ID = FALSE
         )
       } else if (is.null(samplers@data[["weight"]])) {
         samplers@data[["weight"]] <- 1
@@ -300,7 +417,6 @@ fm_int.inla.mesh <- function(domain, samplers = NULL, name = NULL, int.args = NU
       lifecycle::deprecate_stop("2.8.0", I("int.args$poly_method == 'legacy'"))
     } else {
       if (!is.null(int.args$use_new) && !int.args$use_new) {
-
         # This handles holes
         poly_segm <- fm_as_inla_mesh_segment(samplers, join = FALSE)
         poly_segm <- lapply(
@@ -339,13 +455,13 @@ fm_int.inla.mesh <- function(domain, samplers = NULL, name = NULL, int.args = NU
     }
     if (is.null(ips$z)) {
       ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y")],
-                                        data = df,
-                                        match.ID = FALSE, proj4string = domain_crs
+        data = df,
+        match.ID = FALSE, proj4string = domain_crs
       )
     } else {
       ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y", "z")],
-                                        data = df,
-                                        match.ID = FALSE, proj4string = domain_crs
+        data = df,
+        match.ID = FALSE, proj4string = domain_crs
       )
     }
 
