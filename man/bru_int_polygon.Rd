@@ -12,7 +12,7 @@ bru_int_polygon(mesh, method = NULL, samplers = NULL, ...)
 \item{method}{Which integration method to use ("stable",
 with aggregation to mesh vertices, or "direct")}
 
-\item{samplers}{If non-NULL, a SpatialPolygons* object, used instead of polylist}
+\item{samplers}{If non-NULL, a SpatialPolygons* object}
 
 \item{...}{Arguments passed to the low level integration method (\code{make_triangle_integration})}
 }

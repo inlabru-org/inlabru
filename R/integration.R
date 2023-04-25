@@ -770,7 +770,7 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
 #' @param mesh An inla.mesh object
 #' @param method Which integration method to use ("stable",
 #'   with aggregation to mesh vertices, or "direct")
-#' @param samplers If non-NULL, a SpatialPolygons* object, used instead of polylist
+#' @param samplers If non-NULL, a SpatialPolygons* object
 #' @param ... Arguments passed to the low level integration method (`make_triangle_integration`)
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
