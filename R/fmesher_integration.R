@@ -318,8 +318,7 @@ fm_int.inla.mesh <- function(domain, samplers = NULL, name = NULL, int.args = NU
     samplers <- as(samplers, "Spatial")
   }
 
-  if (inherits(domain, "inla.mesh") &&
-    is.null(samplers) &&
+  if (is.null(samplers) &&
     identical(int.args[["method"]], "stable")) {
     coord_names <- c("x", "y", "z")
     if (!is.null(name)) {
@@ -344,14 +343,18 @@ fm_int.inla.mesh <- function(domain, samplers = NULL, name = NULL, int.args = NU
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else if (inherits(samplers, "SpatialPointsDataFrame")) {
     if (!("weight" %in% names(samplers))) {
-      warning("The integration points provided have no weight column. Setting weights to 1.")
+      warning("The integration points provided have no weight column. Setting weight to 1.")
       samplers$weight <- 1
+    }
+    if (!("group" %in% names(samplers))) {
+      samplers$group <- 1L
     }
 
     ips <- samplers
   } else if (inherits(samplers, "SpatialPoints")) {
     ips <- samplers
     ips$weight <- 1
+    ips$group <- 1L
   } else if (inherits(samplers, "SpatialLines") ||
     inherits(samplers, "SpatialLinesDataFrame")) {
     # If SpatialLines are provided convert into SpatialLinesDataFrame and attach weight = 1
