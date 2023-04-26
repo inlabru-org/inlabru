@@ -6,6 +6,8 @@
 \alias{fm_int.numeric}
 \alias{fm_int.character}
 \alias{fm_int.factor}
+\alias{fm_int.SpatRaster}
+\alias{fm_int.inla.mesh.lattice}
 \alias{fm_int.inla.mesh.1d}
 \alias{fm_int.inla.mesh}
 \title{Multi-domain integration}
@@ -19,6 +21,10 @@ fm_int(domain, samplers = NULL, ...)
 \method{fm_int}{character}(domain, samplers = NULL, name = "x", ...)
 
 \method{fm_int}{factor}(domain, samplers = NULL, name = "x", ...)
+
+\method{fm_int}{SpatRaster}(domain, samplers = NULL, name = "x", ...)
+
+\method{fm_int}{inla.mesh.lattice}(domain, samplers = NULL, name = "x", ...)
 
 \method{fm_int}{inla.mesh.1d}(domain, samplers = NULL, name = "x", int.args = NULL, ...)
 
@@ -53,9 +59,13 @@ Construct integration points on tensor product spaces
 
 \item \code{fm_int(factor)}: Discrete factor space integration
 
+\item \code{fm_int(SpatRaster)}: \code{SpatRaster} integration. Not yet implemented.
+
+\item \code{fm_int(inla.mesh.lattice)}: \code{inla.mesh.lattice} integration. Not yet implemented.
+
 \item \code{fm_int(inla.mesh.1d)}: \code{inla.mesh.1d} integration.
 
-\item \code{fm_int(inla.mesh)}: \code{inla.mesh.2d} integration
+\item \code{fm_int(inla.mesh)}: \code{inla.mesh} integration
 
 }}
 \examples{
