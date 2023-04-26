@@ -718,6 +718,7 @@ fm_crs.default <- function(x, ..., crsonly = FALSE) {
   sf::st_crs(x, ...)
 }
 
+#' @importFrom sf st_crs
 #' @exportS3Method sf::st_crs fm_crs
 #' @describeIn fm_crs `st_crs(x, ...)` is equivalent to `fm_crs(x, ..., crsonly = TRUE)`
 #' when `x` is a `fm_crs` object.
