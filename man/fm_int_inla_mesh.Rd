@@ -3,23 +3,70 @@
 \name{fm_int_inla_mesh}
 \alias{fm_int_inla_mesh}
 \alias{fm_int_inla_mesh.NULL}
-\alias{fm_int_inla_mesh.default}
-\alias{fm_int_inla_mesh.Spatial}
+\alias{fm_int_inla_mesh.sf}
+\alias{fm_int_inla_mesh.sfc_POINT}
+\alias{fm_int_inla_mesh.sfc_LINESTRING}
+\alias{fm_int_inla_mesh.sfc_POLYGON}
+\alias{fm_int_inla_mesh.sfc_MULTIPOLYGON}
+\alias{fm_int_inla_mesh.SpatialPoints}
+\alias{fm_int_inla_mesh.SpatialLines}
+\alias{fm_int_inla_mesh.SpatialPolygons}
 \title{Subset integration on a mesh}
 \usage{
 fm_int_inla_mesh(samplers, domain, name = NULL, int.args = NULL, ...)
 
 \method{fm_int_inla_mesh}{`NULL`}(samplers, domain, name = NULL, int.args = NULL, ...)
 
-\method{fm_int_inla_mesh}{default}(samplers, domain, name = NULL, int.args = NULL, ...)
+\method{fm_int_inla_mesh}{sf}(samplers, domain, name = NULL, int.args = NULL, ...)
 
-\method{fm_int_inla_mesh}{Spatial}(samplers, domain, name = NULL, int.args = NULL, ...)
+\method{fm_int_inla_mesh}{sfc_POINT}(
+  samplers,
+  domain,
+  name = NULL,
+  int.args = NULL,
+  .weight = rep(1, NROW(samplers)),
+  ...
+)
+
+\method{fm_int_inla_mesh}{sfc_LINESTRING}(
+  samplers,
+  domain,
+  name = NULL,
+  int.args = NULL,
+  .weight = rep(1, NROW(samplers)),
+  ...
+)
+
+\method{fm_int_inla_mesh}{sfc_POLYGON}(
+  samplers,
+  domain,
+  name = NULL,
+  int.args = NULL,
+  .weight = rep(1, NROW(samplers)),
+  ...
+)
+
+\method{fm_int_inla_mesh}{sfc_MULTIPOLYGON}(
+  samplers,
+  domain,
+  name = NULL,
+  int.args = NULL,
+  .weight = rep(1, NROW(samplers)),
+  ...
+)
+
+\method{fm_int_inla_mesh}{SpatialPoints}(samplers, domain, name = NULL, int.args = NULL, ...)
+
+\method{fm_int_inla_mesh}{SpatialLines}(samplers, domain, name = NULL, int.args = NULL, ...)
+
+\method{fm_int_inla_mesh}{SpatialPolygons}(samplers, domain, name = NULL, int.args = NULL, ...)
 }
 \arguments{
 \item{samplers}{For single domain \code{fm_int} methods, an object specifying one or more
-subsets of the domain, and optional weighting and group information, as variables \code{weight} and \code{group}
-in a data frame.
-For \code{fm_int.list}, a list of sampling definitions.}
+subsets of the domain, and optional weighting in a \code{weight} variable.
+For \code{fm_int.list}, a list of sampling definitions, where data frame elements
+may contain information for multiple domains, in which case each row represent
+a separate tensor product integration subspace.}
 
 \item{domain}{Functional space specification; single domain or a named list
 of domains}
@@ -30,6 +77,10 @@ integration points. Default 'x'}
 \item{int.args}{A list of integration options}
 
 \item{...}{Additional arguments passed on to other methods}
+
+\item{.weight}{Optional weight vector for \verb{sfc_*} integration}
+
+\item{.block}{Optional block grouping vector for \verb{sfc_*} integration}
 }
 \description{
 Integration methods for spatial samplers on \code{inla.mesh} meshes.
@@ -38,9 +89,21 @@ Integration methods for spatial samplers on \code{inla.mesh} meshes.
 \itemize{
 \item \code{fm_int_inla_mesh(`NULL`)}: Full domain integration
 
-\item \code{fm_int_inla_mesh(default)}: General integration
+\item \code{fm_int_inla_mesh(sf)}: \code{sf} integration
 
-\item \code{fm_int_inla_mesh(Spatial)}: \code{Spatial} integration
+\item \code{fm_int_inla_mesh(sfc_POINT)}: \code{sfc_POINT} integration
+
+\item \code{fm_int_inla_mesh(sfc_LINESTRING)}: \code{sfc_LINESTRING} integration
+
+\item \code{fm_int_inla_mesh(sfc_POLYGON)}: \code{sfc_POLYGON} integration
+
+\item \code{fm_int_inla_mesh(sfc_MULTIPOLYGON)}: \code{sfc_MULTIPOLYGON} integration
+
+\item \code{fm_int_inla_mesh(SpatialPoints)}: SpatialPoints integration
+
+\item \code{fm_int_inla_mesh(SpatialLines)}: SpatialLines integration
+
+\item \code{fm_int_inla_mesh(SpatialPolygons)}: SpatialPolygons integration
 
 }}
 \keyword{internal}

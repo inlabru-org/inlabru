@@ -35,9 +35,10 @@ fm_int(domain, samplers = NULL, ...)
 of domains}
 
 \item{samplers}{For single domain \code{fm_int} methods, an object specifying one or more
-subsets of the domain, and optional weighting and group information, as variables \code{weight} and \code{group}
-in a data frame.
-For \code{fm_int.list}, a list of sampling definitions.}
+subsets of the domain, and optional weighting in a \code{weight} variable.
+For \code{fm_int.list}, a list of sampling definitions, where data frame elements
+may contain information for multiple domains, in which case each row represent
+a separate tensor product integration subspace.}
 
 \item{\dots}{Additional arguments passed on to other methods}
 

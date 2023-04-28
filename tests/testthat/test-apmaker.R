@@ -2,10 +2,10 @@ local_bru_testthat_setup()
 
 test_that("1D integration points can be generated", {
   local_bru_safe_inla()
-  sf_obj1 <- sf::st_as_sf(data.frame(x=1:3, y=3:5), coords=c("x","y"))
-  sf_obj2 <- sf::st_as_sf(data.frame(x=3:6, y=5:8), coords=c("x","y"))
+  sf_obj1 <- sf::st_as_sf(data.frame(x = 1:3, y = 3:5), coords = c("x", "y"))
+  sf_obj2 <- sf::st_as_sf(data.frame(x = 3:6, y = 5:8), coords = c("x", "y"))
 
-  samplers <- list(data.frame(x=1:4), sf_obj1, sf_obj2)
+  samplers <- list(data.frame(x = 1:4), sf_obj1, sf_obj2)
   ips <- ipoints(c(0, 10), 3, name = "myDim")
 
   expect_s3_class(ips, "data.frame")
@@ -47,8 +47,8 @@ test_that("1D integration points can be generated", {
   library(ggplot2)
   data(mrsea, package = "inlabru")
   matern <- INLA::inla.spde2.pcmatern(mrsea$mesh,
-                                prior.sigma = c(0.1, 0.01),
-                                prior.range = c(10, 0.01)
+    prior.sigma = c(0.1, 0.01),
+    prior.range = c(10, 0.01)
   )
 
   cmp <- coordinates + season ~ Intercept(1) +
@@ -60,33 +60,31 @@ test_that("1D integration points can be generated", {
     )
 
   fit <- lgcp(cmp,
-              data = mrsea$points,
-              samplers = mrsea$samplers,
-              domain = list(
-                coordinates = mrsea$mesh,
-                season = seq_len(4)
-              )
+    data = mrsea$points,
+    samplers = mrsea$samplers,
+    domain = list(
+      coordinates = mrsea$mesh,
+      season = seq_len(4)
+    )
   )
 
-# gorillas
-    data(gorillas, package = "inlabru")
+  # gorillas
+  data(gorillas, package = "inlabru")
 
-    # Define SPDE prior
-    matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
-      prior.sigma = c(0.1, 0.01),
-      prior.range = c(0.01, 0.01)
-    )
+  # Define SPDE prior
+  matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+    prior.sigma = c(0.1, 0.01),
+    prior.range = c(0.01, 0.01)
+  )
 
-    # Define domain of the LGCP as well as the model components (spatial SPDE
-    # effect and Intercept)
-    cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
+  # Define domain of the LGCP as well as the model components (spatial SPDE
+  # effect and Intercept)
+  cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
 
-    # Fit the model (with int.strategy="eb" to make the example take less time)
-    fit <- lgcp(cmp, gorillas$nests,
-      samplers = gorillas$boundary,
-      domain = list(coordinates = gorillas$mesh),
-      options = list(control.inla = list(int.strategy = "eb"))
-    )
-
+  # Fit the model (with int.strategy="eb" to make the example take less time)
+  fit <- lgcp(cmp, gorillas$nests,
+    samplers = gorillas$boundary,
+    domain = list(coordinates = gorillas$mesh),
+    options = list(control.inla = list(int.strategy = "eb"))
+  )
 })
-

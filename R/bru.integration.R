@@ -139,11 +139,16 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     lifecycle::deprecate_warn(
       "2.7.0",
       "ipoints(project)",
-      details = paste0("For project=", project,
-                       ", use int.args$method = '",
-                       list("TRUE" = "stable",
-                            "FALSE" = "direct")[as.character(project)],
-                       "' instead."))
+      details = paste0(
+        "For project=", project,
+        ", use int.args$method = '",
+        list(
+          "TRUE" = "stable",
+          "FALSE" = "direct"
+        )[as.character(project)],
+        "' instead."
+      )
+    )
   }
 
   if (is.null(domain) &&
@@ -177,26 +182,26 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     (
       (!is.null(samplers) &&
         (is.numeric(samplers) ||
-         is.character(samplers) ||
-         is.factor(samplers)) ||
+          is.character(samplers) ||
+          is.factor(samplers)) ||
         (!is.null(domain) &&
           (is.numeric(domain) ||
-           is.character(domain) ||
-           is.factor(domain)) ||
-           inherits(domain, "inla.mesh.1d")))
+            is.character(domain) ||
+            is.factor(domain)) ||
+          inherits(domain, "inla.mesh.1d")))
     )
   if (!is_1d && !is_2d) {
     stop("Unable to determine integration domain definition")
   }
 
   if (is_1d && !is.null(samplers) && !is.null(domain) &&
-      is.numeric(domain) && length(domain) == 1) {
+    is.numeric(domain) && length(domain) == 1) {
     int.args[["nsub1"]] <- domain
     domain <- NULL
     int.args[["method"]] <- "direct"
   }
   if (is_2d && !is.null(samplers) && !is.null(domain) &&
-      is.numeric(domain) && length(domain) == 1) {
+    is.numeric(domain) && length(domain) == 1) {
     int.args[["nsub2"]] <- domain
     domain <- NULL
     int.args[["method"]] <- "direct"
@@ -220,8 +225,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
     ips <- samplers
   } else if (is_1d && is.null(samplers) && (is.numeric(domain) ||
-                                            is.character(domain) ||
-                                            is.factor(domain))) {
+    is.character(domain) ||
+    is.factor(domain))) {
     ips <- data.frame(
       x = as.vector(domain),
       weight = 1
@@ -229,8 +234,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     colnames(ips) <- c(name, "weight")
     # TODO samplers numeric and you do not have domain, it is not safe to forget to supply domain, if stored in integer
   } else if (is_1d && is.null(domain) && (is.integer(samplers) ||
-                                          is.character(samplers) ||
-                                          is.factor(samplers))) {
+    is.character(samplers) ||
+    is.factor(samplers))) {
     ips <- data.frame(
       x = as.vector(samplers),
       weight = 1
@@ -381,7 +386,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     ips <- int.slines(
       samplers,
       domain,
-      group = group,
+      .block = group,
       project = identical(int.args[["method"]], "stable")
     )
 
@@ -483,10 +488,18 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
 
-    df <- data.frame(
-      samplers@data[ips$group, group, drop = FALSE],
-      weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
-    )
+    if (is.null(group)) {
+      df <- data.frame(
+        weight = ips[, "weight"] * samplers@data[ips$.block, "weight"],
+        .block = ips$.block
+      )
+    } else {
+      df <- data.frame(
+        samplers@data[ips$.block, group, drop = FALSE],
+        weight = ips[, "weight"] * samplers@data[ips$.block, "weight"],
+        .block = ips$.block
+      )
+    }
     if (is.null(ips$z)) {
       ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y")],
         data = df,
@@ -538,12 +551,17 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' @keywords internal
 #'
 #'
-#' @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
-# TODO #### na.rm and user-defined weight argument
+#' @param ... `data.frame`, `sf`, or `SpatialPointsDataFrame` objects, each one
+#' usually obtained by a call to an [fm_int()] method.
 #' @param na.rm logical; if `TRUE`, the rows with weight `NA` from the
 #' non-overlapping full_join will be removed; if `FALSE`, set the undefined weights to `NA`.
 #' If `NULL` (default), act as `TRUE`, but warn if any elements needed removing.
-#' @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
+#' @param .blockwise logical; if `FALSE`, computes full tensor product integration.
+#' If `TRUE`, computes within-block tensor product integration (used internally
+#' by [fm_int()]).
+#' Default `FALSE`
+#' @return A `data.frame`, `sf`, or `SpatialPointsDataFrame` of multidimensional
+#' integration points and their weights
 #'
 #' @examples
 #' \donttest{
@@ -561,7 +579,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' }
 #' }
 #'
-cprod <- function(..., na.rm = NULL) {
+cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
   ipl <- list(...)
 
   # Transform sp to sf
@@ -590,9 +608,17 @@ cprod <- function(..., na.rm = NULL) {
     if (!"weight" %in% names(ips2)) {
       ips2$weight <- 1
     }
+    if (!".block" %in% names(ips1)) {
+      ips1$.block <- seq_len(NROW(ips1))
+    }
+    if (!".block" %in% names(ips2)) {
+      ips2$.block <- seq_len(NROW(ips2))
+    }
 
-    # This line from the cprod handles the grouping.
     by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
+    if (!.blockwise) {
+      by <- setdiff(by, ".block")
+    }
 
     # `sf::st_join` performs spatial join/filter; `dplyr::*_join` expects `x` of
     # class `sf` and `y` of class `data.frame`. The trick `as.tibble(sf_obj)` allows
@@ -602,20 +628,44 @@ cprod <- function(..., na.rm = NULL) {
     # https://stackoverflow.com/questions/64365792/dplyr-full-join-on-geometry-columns-of-sf-objects
     if (inherits(ips1, c("sf", "sfc")) ||
       inherits(ips2, c("sf", "sfc"))) {
-      ips <-
-        sf::st_as_sf(dplyr::full_join(tibble::as_tibble(ips1),
-          tibble::as_tibble(ips2),
-          by = by
-        ))
+      if (length(by) == 0) {
+        ips <-
+          sf::st_as_sf(dplyr::cross_join(
+            tibble::as_tibble(ips1),
+            tibble::as_tibble(ips2)
+          ))
+      } else {
+        ips <-
+          sf::st_as_sf(dplyr::full_join(tibble::as_tibble(ips1),
+            tibble::as_tibble(ips2),
+            by = by,
+            relationship = "many-to-many"
+          ))
+      }
     } else {
-      ips <- dplyr::full_join(ips1, ips2, by = by) # equivalent to base::merge(ips1, ips2, by = by, all = TRUE)
+      # equivalent to base::merge(ips1, ips2, by = by, all = TRUE)
+      if (length(by) == 0) {
+        ips <-
+          dplyr::cross_join(ips1, ips2)
+      } else {
+        ips <-
+          dplyr::full_join(ips1, ips2,
+            by = by,
+            relationship = "many-to-many"
+          )
+      }
     }
 
     ips$weight <- ips$weight.x * ips$weight.y
     ips[["weight.x"]] <- NULL
     ips[["weight.y"]] <- NULL
     tibble::remove_rownames(ips)
-    # row.names(ips) <- as.character(seq_len(NROW(ips))) # Warning message: Setting row names on a tibble is deprecated.
+
+    if (!.blockwise) {
+      ips$.block <- paste0(ips$.block.x, ",", ips$.block.y)
+      ips[[".block.x"]] <- NULL
+      ips[[".block.y"]] <- NULL
+    }
   }
   if (any(is.na(ips$weight)) && !isFALSE(na.rm)) {
     if (is.null(na.rm)) {

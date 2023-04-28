@@ -37,8 +37,8 @@ test_that("conversion of SpatialPolygon to integration points", {
   )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(names(ips), "weight")
-  expect_equal(colnames(as.data.frame(ips)), c("weight", "x", "y"))
+  expect_equal(names(ips), c("weight", ".block"))
+  expect_equal(colnames(as.data.frame(ips)), c("weight", ".block", "x", "y"))
   expect_equal(sum(ips$weight), 19.87366, tolerance = lowtol)
 })
 
@@ -52,7 +52,7 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
   )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(colnames(as.data.frame(ips)), c("weight", "x", "y"))
+  expect_equal(colnames(as.data.frame(ips)), c("weight", ".block", "x", "y"))
   expect_equal(sum(ips$weight),
     sum(ips_nodomain$weight),
     tolerance = midtol

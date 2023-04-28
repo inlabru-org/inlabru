@@ -237,7 +237,7 @@ sphere_geodesic_length <- function(sp, ep) {
 }
 
 # 2022-11-29: Currently assumes the data is Spatial
-int.slines <- function(data, mesh, group = NULL, project = TRUE) {
+int.slines <- function(data, mesh, .block = NULL, project = TRUE) {
   # Extract start and end coordinates
   qq <- coordinates(data)
   sp <- do.call(
@@ -330,7 +330,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     )
   }
 
-  # Wrap everything up and perform projection according to distance and given group argument
+  # Wrap everything up and perform projection according to distance and given .block argument
   ips <- data.frame(ips)
   d_ips <- ncol(ips)
   # Temporary names
@@ -342,8 +342,8 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     ips$weight <- ips$weight * data$weight[idx[, 1]]
   }
 
-  if (!is.null(group)) {
-    ips <- cbind(ips, as.data.frame(data)[idx[, 1], group, drop = FALSE])
+  if (!is.null(.block)) {
+    ips <- cbind(ips, as.data.frame(data)[idx[, 1], .block, drop = FALSE])
   }
 
   ips <- sp::SpatialPointsDataFrame(
@@ -361,7 +361,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
 
   # Project to mesh vertices
   if (project && !is.null(mesh)) {
-    ips <- vertex.projection(ips, mesh, columns = "weight", group = group)
+    ips <- vertex.projection(ips, mesh, columns = "weight", group = .block)
   }
 
   ips
@@ -629,7 +629,7 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
     colnames(ips) <- c("x", "y")
     ips$weight <- integ$weight[ok]
 
-    ips$group <- rep(g, nrow(ips))
+    ips$.block <- rep(g, nrow(ips))
     ipsl <- c(ipsl, list(ips))
   }
 
@@ -679,7 +679,7 @@ bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
         x = integ$loc[, 1],
         y = integ$loc[, 2],
         weight = integ$weight,
-        group = g
+        .block = g
       )
 
       ipsl <- c(ipsl, list(ips))
@@ -833,14 +833,14 @@ bru_int_polygon <- function(mesh,
             # breaking sp::over later
             #          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
             weight = integ_$weight,
-            group = g
+            .block = g
           )
         } else {
           ips <- data.frame(
             x = integ_$loc[, 1],
             y = integ_$loc[, 2],
             weight = integ_$weight,
-            group = g
+            .block = g
           )
         }
 
@@ -859,14 +859,14 @@ bru_int_polygon <- function(mesh,
         y = integ$loc[, 2],
         z = integ$loc[, 3],
         weight = integ$weight,
-        group = 1
+        .block = 1
       ))
     } else {
       ipsl <- list(data.frame(
         x = integ$loc[, 1],
         y = integ$loc[, 2],
         weight = integ$weight,
-        group = 1
+        .block = 1
       ))
     }
   }

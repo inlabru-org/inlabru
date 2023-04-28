@@ -68,8 +68,8 @@ test_that("sf gorillas lgcp vignette", {
     Intercept(1)
 
   # Check integration construction
-  ips_sp <- ipoints(gorillas$boundary, mesh_sf)
-  ips_sf <- ipoints(gorillas_sf$boundary, mesh_sf)
+  ips_sp <- fm_int(mesh_sf, gorillas$boundary)
+  ips_sf <- fm_int(mesh_sf, gorillas_sf$boundary)
 
   expect_equal(ips_sp$weight, ips_sf$weight)
 

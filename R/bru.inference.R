@@ -765,10 +765,14 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     }
 
     if (is.null(ips)) {
-      ips <- ipmaker(
-        samplers = samplers,
+      #      ips <- ipmaker(
+      #        samplers = samplers,
+      #        domain = domain,
+      #        int.args = options[["bru_int_args"]]
+      #      )
+      ips <- fm_int(
         domain = domain,
-#        dnames = names(response),
+        samplers = samplers,
         int.args = options[["bru_int_args"]]
       )
     }

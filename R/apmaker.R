@@ -217,9 +217,11 @@ apmaker <- function(domain = NULL, samplers = NULL,
   names_reserved <- c(weight) # coordinate and geometry is not required here
 
   if (length(intersect(names_domain, names_reserved)) > 0) {
-    stop(paste0("The reserved names ",
-                paste0(intersect(names_domain, names_reserved), collapse = ", "),
-                " cannot be used as domain names."))
+    stop(paste0(
+      "The reserved names ",
+      paste0(intersect(names_domain, names_reserved), collapse = ", "),
+      " cannot be used as domain names."
+    ))
   }
 
   lips_samplers <- list()
@@ -234,13 +236,16 @@ apmaker <- function(domain = NULL, samplers = NULL,
     names_intersect <- intersect(names_samplers[[i]], names_domain)
     lips_multidomainsampler <- lapply(
       names_intersect,
-      function(nm) ipoints(
-        samplers = samplers[[i]][[nm]],
-        domain = domain[[nm]],
-        name = nm,
-#        group = names_intersect, # block=group should be the grouping, say season,
-        int.args = int.args
-      ))
+      function(nm) {
+        ipoints(
+          samplers = samplers[[i]][[nm]],
+          domain = domain[[nm]],
+          name = nm,
+          #        group = names_intersect, # block=group should be the grouping, say season,
+          int.args = int.args
+        )
+      }
+    )
     lips_samplers[[i]] <- do.call(cprod, lips_multidomainsampler)
   }
 
@@ -252,12 +257,12 @@ apmaker <- function(domain = NULL, samplers = NULL,
     stopifnot(length(nm) == 1)
     lips_samplers[[i]] <-
       ipoints(
-      samplers = samplers[[i]],
-      domain = domain[[nm]],
-      name = nm,
-#      group = names_intersect, # block=group should be the grouping, say season,
-      int.args = int.args
-    )
+        samplers = samplers[[i]],
+        domain = domain[[nm]],
+        name = nm,
+        #      group = names_intersect, # block=group should be the grouping, say season,
+        int.args = int.args
+      )
   }
 
   # Full domain samplers
@@ -272,7 +277,8 @@ apmaker <- function(domain = NULL, samplers = NULL,
           #      group = names_intersect, # block=group should be the grouping, say season,
           int.args = int.args
         )
-      })
+      }
+    )
 
   ips <- do.call(cprod, c(lips_samplers, lips_full_domain_samplers))
 
@@ -284,25 +290,24 @@ apmaker <- function(domain = NULL, samplers = NULL,
 }
 
 
-  #############################################################################
-  # Warn samplers without domain associated
-  # Store the names in domain but not in samplers
-  # Warn domains without associated samplers
+#############################################################################
+# Warn samplers without domain associated
+# Store the names in domain but not in samplers
+# Warn domains without associated samplers
 
 
-  # Check if the names of samplers and domains match. How to establish the link
-  # between samplers and domain? If names are not provided, follow the order in
-  # list. If names are provided but do not match, what should we do?
+# Check if the names of samplers and domains match. How to establish the link
+# between samplers and domain? If names are not provided, follow the order in
+# list. If names are provided but do not match, what should we do?
 
-  # log the active geometry of the samplers
-  # TODO 20220126 when sf_samplers is a vector, if clause does not work
-  # 20220130 I think it works now
+# log the active geometry of the samplers
+# TODO 20220126 when sf_samplers is a vector, if clause does not work
+# 20220130 I think it works now
 
 
-  # TODO ####
-  # TODO check ibm_values.bru_mapper_factor for character/factor/numeric samplers
-  # TODO weight argument to take effect on samplers. The weight should go to
-  # the integration part
+# TODO ####
+# TODO check ibm_values.bru_mapper_factor for character/factor/numeric samplers
+# TODO weight argument to take effect on samplers. The weight should go to
+# the integration part
 
-  ##########################################################
-
+##########################################################
