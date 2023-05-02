@@ -583,6 +583,73 @@ complete_coordnames <- function(data_coordnames, ips_coordnames) {
   )
 }
 
+
+# Extend bind_rows to handle XY/XYZ mismatches in one or more sfc columns
+extended_bind_rows <- function(...) {
+  dt <- list(...)
+  names_ <- lapply(dt, names)
+  is_sfc_ <- lapply(dt,
+                    function(data)
+                      vapply(data,
+                             function(x) {
+                               inherits(x, "sfc")
+                             },
+                             TRUE))
+  sfc_names_ <- unique(unlist(names_)[unlist(is_sfc_)])
+
+  for (nm in sfc_names_) {
+    # Which data objects have this column?
+    sf_data_idx_ <-
+      which(vapply(dt, function(data) !is.null(data[[nm]]), TRUE))
+
+    # Unify CRS
+    the_crs <- fm_crs(dt[[sf_data_idx_[1]]][[nm]])
+    for (i in sf_data_idx_) {
+      dt_crs <- fm_crs(dt[[i]][[nm]])
+      if (!fm_identical_CRS(dt_crs, the_crs)) {
+        dt[[i]][[nm]] <- fm_transform(dt[[i]][[nm]], crs = the_crs)
+      }
+    }
+
+    ncol_ <- vapply(sf_data_idx_,
+                    function(i) {
+                      ncol(sf::st_coordinates(dt[[i]][[nm]]))
+                    },
+                    0L)
+    if (length(unique(ncol_)) > 0) {
+      # Some dimension mismatch
+      ncol_max <- max(ncol_)
+      for (ii in which(ncol_ < ncol_max)) {
+        i <- sf_data_idx_[ii]
+        # Extend columns
+        if (nrow(dt[[i]]) > 0) {
+          dt[[i]][[nm]] <-
+            sf::st_as_sf(as.data.frame(cbind(
+              sf::st_coordinates(dt[[i]][[nm]]),
+              matrix(0.0, nrow(dt[[i]]), ncol_max - ncol_[[i]])
+            )),
+            coords = seq_len(ncol_max),
+            crs = fm_crs(dt[[i]][[nm]]))$geometry
+        } else {
+          dt[[i]][[nm]] <-
+            sf::st_as_sf(as.data.frame(
+              matrix(0.0, 0L, ncol_max)
+            ),
+            coords = seq_len(ncol_max),
+            crs = fm_crs(dt[[i]][[nm]]))$geometry
+        }
+      }
+    }
+  }
+  result <- do.call(dplyr::bind_rows, dt)
+  if (length(sfc_names_) > 0) {
+    result <- sf::st_as_sf(result)
+  }
+
+  result
+}
+
+
 #' Likelihood construction for usage with [bru()]
 #'
 #' @aliases like
@@ -888,71 +955,10 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       }
       expr <- parse(text = expr_text)
 
-      is_sf_data <- inherits(data, "sf")
-      is_sf_ips <- inherits(ips, "sf")
-      is_sf <- is_sf_data || is_sf_ips
-      if (xor(is_sf_data, is_sf_ips)) {
-        stop(paste0("'data' ", ifelse(is_sf_data, "is", "is not"),
-                    "'sf', and ",
-                    "'ips' ", ifelse(is_sf_ips, "is", "is not"),
-                    "'sf'. Both or neither should be 'sf'."))
-      }
-      if (is_sf) {
-        stopifnot(
-          attr(data, "sf_column") == attr(ips, "sf_column")
-        )
-        ncol_data <- ncol(sf::st_coordinates(data))
-        ncol_ips <- ncol(sf::st_coordinates(ips))
-        if (ncol_data != ncol_ips) {
-          ncol_max <- max(ncol_data, ncol_ips)
-          if (ncol_data < ncol_max) {
-            if (nrow(data) > 0) {
-              data[[attr(data, "sf_column")]] <-
-                sf::st_as_sf(as.data.frame(cbind(
-                  sf::st_coordinates(data),
-                  matrix(0.0, nrow(data), ncol_max -
-                           ncol_data)
-                )),
-                coords = seq_len(ncol_max),
-                crs = fm_crs(data))$geometry
-            } else {
-              data[[attr(data, "sf_column")]] <-
-                sf::st_as_sf(as.data.frame(
-                matrix(0, 0, ncol_max)),
-                coords = seq_len(ncol_max),
-                crs = fm_crs(data))$geometry
-            }
-          }
-          if (ncol_ips < ncol_max) {
-            if (nrow(ips) > 0) {
-              ips[[attr(ips, "sf_column")]] <-
-                sf::st_as_sf(as.data.frame(cbind(
-                  sf::st_coordinates(ips),
-                  matrix(0.0, nrow(ips), ncol_max -
-                           ncol_ips)
-                )),
-                coords = seq_len(ncol_max),
-                crs = fm_crs(ips))$geometry
-            } else {
-              ips[[attr(ips, "sf_column")]] <-
-                sf::st_as_sf(as.data.frame(
-                  matrix(0, 0, ncol_max)),
-                  coords = seq_len(ncol_max),
-                  crs = fm_crs(ips))$geometry
-            }
-          }
-        }
-
-        data <- tibble::as_tibble(data)
-        ips <- tibble::as_tibble(ips)
-      }
-      data <- dplyr::bind_rows(
-        cbind(data, BRU_aggregate = TRUE),
-        cbind(ips, BRU_aggregate = FALSE)
+      data <- extended_bind_rows(
+        dplyr::bind_cols(data, BRU_aggregate = TRUE),
+        dplyr::bind_cols(ips, BRU_aggregate = FALSE)
       )
-      if (is_sf) {
-        data <- sf::st_as_sf(data)
-      }
     } else {
       response_data <- data.frame(
         BRU_E = c(
@@ -964,7 +970,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
           rep(0, NROW(ips))
         )
       )
-      data <- dplyr::bind_rows(data, ips)
+      data <- extended_bind_rows(data, ips)
     }
     if (ips_is_Spatial) {
       non_coordnames <- setdiff(names(data), data_coordnames)
@@ -1001,18 +1007,6 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response <- "BRU_response"
   }
 
-  # Calculate data ranges
-  drange <- lapply(names(data), function(nm) {
-    if (is.numeric(data[[nm]])) {
-      range(data[[nm]])
-    } else {
-      NULL
-    }
-  })
-  names(drange) <- names(data)
-  if (inherits(data, "Spatial")) drange[["coordinates"]] <- mesh
-
-
   # The likelihood object that will be returned
 
   lh <- list(
@@ -1029,7 +1023,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response = response,
     inla.family = inla.family,
     domain = domain,
-    drange = drange,
+    drange = NULL,
     include_components = include,
     exclude_components = exclude,
     allow_latent = allow_latent,
@@ -1602,30 +1596,6 @@ generate.bru <- function(object,
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }
 
-  # If data is provided as list, generate data automatically for each dimension
-  # stated in this list
-  # # TODO: remove this! This feature clashes with problems that need input
-  # data given as a list. Better to make the user cornstruct the inputs
-  # (optionally with a special ipoints function, but to some degree it's just
-  # a application of expand.grid())
-  # # TODO: Check if when removing this, all the other drange code can also
-  # safely be removed.
-  #  if (class(data)[1] == "list") {
-  #    # Todo: check if this feature works at all.
-  #    # TODO: add method ipoints.list to handle this;
-  #    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code
-  #    # from generate()
-  #    warning(paste0(
-  #      "Attempting to convert data list into gridded data.\n",
-  #      "This probably doesn't work.\n",
-  #      "Please contact the package developers if you use this feature."
-  #    ))
-  #    lhs.names <- names(data)
-  #    add.pts <- lapply(lhs.names, function(nm) {
-  #      ipoints(object$bru_info$lhoods$default$drange[[nm]], name = nm)
-  #    })
-  #    data <- do.call(cprod, add.pts)
-  #  }
 
   state <- evaluate_state(
     object$bru_info$model,
