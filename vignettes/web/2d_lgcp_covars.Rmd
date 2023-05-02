@@ -141,7 +141,7 @@ a `SpatialPixelsDataFrame` only within the boundary, using its `mask` argument, 
 
 ```{r warning=FALSE,message=FALSE}
 df <- pixels(mesh, mask = boundary)
-int1 <- predict(fit1, data = df, ~ exp(vegetation))
+int1 <- predict(fit1, df, ~ exp(vegetation))
 
 ggplot() +
   gg(int1) +
@@ -626,7 +626,7 @@ expression. Since the elevation effect in this model is linear, the resulting pl
 ```{r}
 elev.pred <- predict(
   efit,
-  data = data.frame(elevation = seq(0, 100, length.out = 1000)),
+  data.frame(elevation = seq(0, 100, length.out = 1000)),
   formula = ~ elev_eval(elevation)
 )
 
