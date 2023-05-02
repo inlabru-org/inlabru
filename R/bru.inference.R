@@ -851,7 +851,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     additional_data_names <- setdiff(names(data_), names(data))
     if ((length(additional_data_names) > 0) &&
       (NROW(data_) == N_data)) {
-      data <- cbind(data, data_[additional_data_names])
+      data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
     }
 
     if (ips_is_Spatial) {
@@ -887,11 +887,72 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
         )
       }
       expr <- parse(text = expr_text)
+
+      is_sf_data <- inherits(data, "sf")
+      is_sf_ips <- inherits(ips, "sf")
+      is_sf <- is_sf_data || is_sf_ips
+      if (xor(is_sf_data, is_sf_ips)) {
+        stop(paste0("'data' ", ifelse(is_sf_data, "is", "is not"),
+                    "'sf', and ",
+                    "'ips' ", ifelse(is_sf_ips, "is", "is not"),
+                    "'sf'. Both or neither should be 'sf'."))
+      }
+      if (is_sf) {
+        stopifnot(
+          attr(data, "sf_column") == attr(ips, "sf_column")
+        )
+        ncol_data <- ncol(sf::st_coordinates(data))
+        ncol_ips <- ncol(sf::st_coordinates(ips))
+        if (ncol_data != ncol_ips) {
+          ncol_max <- max(ncol_data, ncol_ips)
+          if (ncol_data < ncol_max) {
+            if (nrow(data) > 0) {
+              data[[attr(data, "sf_column")]] <-
+                sf::st_as_sf(as.data.frame(cbind(
+                  sf::st_coordinates(data),
+                  matrix(0.0, nrow(data), ncol_max -
+                           ncol_data)
+                )),
+                coords = seq_len(ncol_max),
+                crs = fm_crs(data))$geometry
+            } else {
+              data[[attr(data, "sf_column")]] <-
+                sf::st_as_sf(as.data.frame(
+                matrix(0, 0, ncol_max)),
+                coords = seq_len(ncol_max),
+                crs = fm_crs(data))$geometry
+            }
+          }
+          if (ncol_ips < ncol_max) {
+            if (nrow(ips) > 0) {
+              ips[[attr(ips, "sf_column")]] <-
+                sf::st_as_sf(as.data.frame(cbind(
+                  sf::st_coordinates(ips),
+                  matrix(0.0, nrow(ips), ncol_max -
+                           ncol_ips)
+                )),
+                coords = seq_len(ncol_max),
+                crs = fm_crs(ips))$geometry
+            } else {
+              ips[[attr(ips, "sf_column")]] <-
+                sf::st_as_sf(as.data.frame(
+                  matrix(0, 0, ncol_max)),
+                  coords = seq_len(ncol_max),
+                  crs = fm_crs(ips))$geometry
+            }
+          }
+        }
+
+        data <- tibble::as_tibble(data)
+        ips <- tibble::as_tibble(ips)
+      }
       data <- dplyr::bind_rows(
         cbind(data, BRU_aggregate = TRUE),
         cbind(ips, BRU_aggregate = FALSE)
       )
-      formula
+      if (is_sf) {
+        data <- sf::st_as_sf(data)
+      }
     } else {
       response_data <- data.frame(
         BRU_E = c(

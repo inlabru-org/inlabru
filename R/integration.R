@@ -799,11 +799,11 @@ bru_int_polygon <- function(mesh,
     samplers_crs <- fm_CRS(samplers)
     integ_sp <- sp::SpatialPoints(integ$loc, proj4string = mesh_crs)
     if (!identical(mesh_crs, samplers_crs) &&
-      !fm_crs_is_null(mesh_crs) &&
-      !fm_crs_is_null(samplers_crs)) {
+        !fm_crs_is_null(mesh_crs) &&
+        !fm_crs_is_null(samplers_crs)) {
       integ_sp <- fm_transform(integ_sp,
-        crs = samplers_crs,
-        passthrough = TRUE
+                               crs = samplers_crs,
+                               passthrough = TRUE
       )
     }
 
@@ -873,6 +873,138 @@ bru_int_polygon <- function(mesh,
 
   do.call(rbind, ipsl)
 }
+
+
+
+
+#' Integration points for polygons inside an inla.mesh
+#'
+#' @export
+#' @param mesh An inla.mesh object
+#' @param method Which integration method to use ("stable",
+#'   with aggregation to mesh vertices, or "direct")
+#' @param samplers If non-NULL, an `sf` or `sfc_POLYGON` object
+#' @param ... Arguments passed to the low level integration method (`make_triangle_integration`)
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @keywords internal
+
+bru_int_polygon_sf <- function(mesh,
+                            method = NULL,
+                            samplers = NULL,
+                            ...) {
+  method <- match.arg(method, c("stable", "direct"))
+
+  ipsl <- list()
+
+  # Compute direct integration points
+  # TODO: Allow blockwise construction to avoid
+  # overly large temporary coordinate matrices (via tri_subset)
+  integ <- mesh_triangle_integration(mesh, ...)
+
+  # Keep points with positive weights (This should be all,
+  # but if there's a degenerate triangle, this gets rid of it)
+  ok <- (integ$weight > 0)
+  integ$loc <- integ$loc[ok, , drop = FALSE]
+  integ$weight <- integ$weight[ok]
+
+  domain_crs <- fm_crs(mesh)
+
+  if (!is.null(samplers)) {
+    mesh_crs <- fm_crs(mesh)
+    samplers_crs <- fm_crs(samplers)
+    integ_sf <- sf::st_as_sf(as.data.frame(integ$loc),
+                             coords = seq_len(ncol(integ$loc)),
+                             crs = mesh_crs)
+    if (!identical(mesh_crs, samplers_crs) &&
+        !fm_crs_is_null(mesh_crs) &&
+        !fm_crs_is_null(samplers_crs)) {
+      integ_sf <- fm_transform(integ_sf,
+                               crs = samplers_crs,
+                               passthrough = TRUE
+      )
+    }
+
+    idx <- sf::st_contains(samplers, integ_sf, sparse = TRUE)
+
+    for (g in seq_along(idx)) {
+      if (length(idx[[g]]) > 0) {
+        integ_ <- list(
+          loc = integ$loc[idx[[g]], , drop = FALSE],
+          weight = integ$weight[idx[[g]]]
+        )
+
+        if (method %in% c("stable")) {
+          # Project integration points and weights to mesh nodes
+          integ_ <- integration_weight_aggregation(mesh, integ_)
+        }
+
+        if (ncol(integ_$loc) > 2) {
+          ips <- sf::st_as_sf(
+            tibble::tibble(
+              x = integ_$loc[, 1],
+              y = integ_$loc[, 2],
+              z = integ_$loc[, 3],
+              weight = integ_$weight,
+              .block = g
+            ),
+            coords = c("x", "y", "z"),
+            crs = domain_crs
+          )
+        } else {
+          ips <- sf::st_as_sf(
+            tibble::tibble(
+              x = integ_$loc[, 1],
+              y = integ_$loc[, 2],
+              weight = integ_$weight,
+              .block = g
+            ),
+            coords = c("x", "y"),
+            crs = domain_crs
+          )
+        }
+
+        ipsl <- c(ipsl, list(ips))
+      }
+    }
+  } else {
+    if (method %in% c("stable")) {
+      # Project integration points and weights to mesh nodes
+      integ <- integration_weight_aggregation(mesh, integ)
+    }
+
+    if (ncol(integ$loc) > 2) {
+      ipsl <- list(sf::st_as_sf(
+        tibble::tibble(
+          x = integ_$loc[, 1],
+          y = integ_$loc[, 2],
+          z = integ_$loc[, 3],
+          weight = integ$weight,
+          .block = 1L
+        ),
+        coords = c("x", "y", "z"),
+        crs = domain_crs
+      ))
+    } else {
+      ipsl <- list(sf::st_as_sf(
+        tibble::tibble(
+          x = integ_$loc[, 1],
+          y = integ_$loc[, 2],
+          weight = integ$weight,
+          .block = 1L
+        ),
+        coords = c("x", "y"),
+        crs = domain_crs
+      ))
+    }
+  }
+
+  do.call(rbind, ipsl)
+}
+
+
+
+
+
 
 # From plotsample test, comparing before and after code refactor to avoid
 # recreating the full integration scheme for every polygon

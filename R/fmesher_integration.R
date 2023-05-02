@@ -592,14 +592,41 @@ fm_int_inla_mesh.sfc_POLYGON <- function(samplers,
                                          int.args = NULL,
                                          .weight = rep(1, NROW(samplers)),
                                          ...) {
-  samplers <- sf::as_Spatial(samplers)
-  samplers$weight <- .weight
-  ips <- fm_int_inla_mesh(samplers,
-    domain = domain,
-    name = name,
-    int.args = int.args, ...
+  weight = .weight
+  .block = seq_len(NROW(samplers))
+
+#  samplers_crs <- fm_crs(samplers)
+
+#  # Convert samplers and domain to equal area CRS
+#  if (!fm_crs_is_null(domain$crs)) {
+#    samplers <- fm_transform(samplers, crs = fm_crs("+proj=cea +units=km"))
+#  }
+
+#  if (!fm_crs_is_null(domain$crs)) {
+#    domain <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
+#  }
+#  domain_crs <- fm_crs(domain$crs)
+
+  if (identical(int.args[["poly_method"]], "legacy")) {
+    lifecycle::deprecate_stop("2.8.0", I("int.args$poly_method == 'legacy'"))
+  } else if (!is.null(int.args$use_new) && !int.args$use_new) {
+    lifecycle::deprecate_stop("2.8.0", I("int.args$use_new == FALSE"))
+  }
+
+  ips <- bru_int_polygon_sf(
+    domain,
+    method = int.args$method,
+    nsub = int.args$nsub2,
+    samplers = samplers
   )
-  ips <- sf::st_as_sf(ips)
+
+  ips$weight <- ips$weight * .weight[ips$.block]
+  ips$.block = .block[ips$.block]
+
+#  if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(samplers_crs)) {
+#    ips <- fm_transform(ips, crs = domain_crs)
+#  }
+
   ips <- tibble::as_tibble(ips)
   names(ips)[names(ips) == "geometry"] <- name
   ips <- sf::st_as_sf(ips, sf_column_name = name)
