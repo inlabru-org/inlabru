@@ -6,7 +6,7 @@
 \usage{
 \method{predict}{bru}(
   object,
-  data = NULL,
+  newdata = NULL,
   formula = NULL,
   n.samples = 100,
   seed = 0L,
@@ -15,13 +15,14 @@
   include = NULL,
   exclude = NULL,
   drop = FALSE,
-  ...
+  ...,
+  data = NULL
 )
 }
 \arguments{
 \item{object}{An object obtained by calling \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}.}
 
-\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for
+\item{newdata}{A \code{data.frame} or \code{SpatialPointsDataFrame} of covariates needed for
 the prediction.}
 
 \item{formula}{A formula where the right hand side defines an R expression
@@ -51,14 +52,16 @@ predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
 
-\item{drop}{logical; If \code{keep=FALSE}, \code{data} is a \code{Spatial*DataFrame}, and the
-prediciton summary has the same number of rows as \code{data}, then the output is
+\item{drop}{logical; If \code{keep=FALSE}, \code{newdata} is a \code{Spatial*DataFrame}, and the
+prediciton summary has the same number of rows as \code{newdata}, then the output is
 a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
 
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
+
+\item{data}{Deprecated. Use \code{newdata} instead.}
 }
 \value{
-a data.frame or Spatial* object with predicted mean values and other
+a \code{data.frame} or \verb{Spatial*} object with predicted mean values and other
 summary statistics attached.
 }
 \description{

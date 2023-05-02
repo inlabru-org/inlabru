@@ -63,7 +63,7 @@ test_that("1D LGCP fitting", {
 
   skip_if_not_installed("sn")
   pr <- predict(fit,
-    data = data.frame(x = mesh1D$loc),
+    newdata = data.frame(x = mesh1D$loc),
     formula = ~ list(
       Intercept = Intercept,
       spde1D = spde1D,
@@ -164,7 +164,7 @@ test_that("1D LGCP fitting, discrete point domain", {
   skip_if_not_installed("sn")
   pr <- predict(
     fit,
-    data = data.frame(x = mesh1D$loc),
+    newdata = data.frame(x = mesh1D$loc),
     formula = ~ spde1D + Intercept,
     n.samples = 100,
     seed = 84354

@@ -1291,7 +1291,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' @aliases predict.bru
 #' @export
 #' @param object An object obtained by calling [bru()] or [lgcp()].
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
+#' @param newdata A `data.frame` or `SpatialPointsDataFrame` of covariates needed for
 #' the prediction.
 #' @param formula A formula where the right hand side defines an R expression
 #' to evaluate for each generated sample. If `NULL`, the latent and
@@ -1313,10 +1313,11 @@ expand_to_dataframe <- function(x, data = NULL) {
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#' @param drop logical; If `keep=FALSE`, `data` is a `Spatial*DataFrame`, and the
-#' prediciton summary has the same number of rows as `data`, then the output is
+#' @param drop logical; If `keep=FALSE`, `newdata` is a `Spatial*DataFrame`, and the
+#' prediciton summary has the same number of rows as `newdata`, then the output is
 #' a `Spatial*DataFrame` object. Default `FALSE`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
+#' @param data Deprecated. Use `newdata` instead.
 #' @details
 #' In addition to the component names (that give the effect
 #' of each component evaluated for the input data), the suffix `_latent`
@@ -1329,12 +1330,12 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
-#' @return a data.frame or Spatial* object with predicted mean values and other
+#' @return a `data.frame` or `Spatial*` object with predicted mean values and other
 #' summary statistics attached.
 #' @example inst/examples/predict.bru.R
 
 predict.bru <- function(object,
-                        data = NULL,
+                        newdata = NULL,
                         formula = NULL,
                         n.samples = 100,
                         seed = 0L,
@@ -1343,20 +1344,32 @@ predict.bru <- function(object,
                         include = NULL,
                         exclude = NULL,
                         drop = FALSE,
-                        ...) {
+                        ...,
+                        data = NULL) {
   object <- bru_check_object_bru(object)
+  if (!is.null(data)) {
+    if (is.null(newdata)) {
+      lifecycle::deprecate_soft("2.8.0", "predict(data)", "predict(newdata)",
+                                details = c("Both `data` provided but not `newdata`. Setting `newdata <- data`."))
+      newdata <- data
+    } else {
+      lifecycle::deprecate_warn("2.8.0", "predict(data)", "predict(newdata)",
+                                details = c("Both `newdata` and `data` provided. `data` will be ignored."))
+    }
+    data <- NULL
+  }
 
   # Convert data into list, data.frame or a Spatial object if not provided as such
-  if (is.character(data)) {
-    data <- as.list(setNames(data, data))
-  } else if (inherits(data, "inla.mesh")) {
-    data <- vertices.inla.mesh(data)
-  } else if (inherits(data, "formula")) {
+  if (is.character(newdata)) {
+    newdata <- as.list(setNames(newdata, newdata))
+  } else if (inherits(newdata, "inla.mesh")) {
+    newdata <- vertices.inla.mesh(newdata)
+  } else if (inherits(newdata, "formula")) {
     stop("Formula supplied as data to predict.bru(). Please check your argument order/names.")
   }
 
   vals <- generate.bru(object,
-    data = data,
+    newdata = newdata,
     formula = formula,
     n.samples = n.samples,
     seed = seed,
@@ -1368,10 +1381,10 @@ predict.bru <- function(object,
 
   # Summarise
 
-  data <- expand_to_dataframe(data)
+  newdata <- expand_to_dataframe(newdata)
   if (is.data.frame(vals[[1]])) {
     vals.names <- names(vals[[1]])
-    covar <- intersect(vals.names, names(data))
+    covar <- intersect(vals.names, names(newdata))
     estim <- setdiff(vals.names, covar)
     smy <- list()
 
@@ -1397,8 +1410,8 @@ predict.bru <- function(object,
       smy <- lapply(
         smy,
         function(tmp) {
-          if (NROW(data) == NROW(tmp)) {
-            expand_to_dataframe(data, tmp)
+          if (NROW(newdata) == NROW(tmp)) {
+            expand_to_dataframe(newdata, tmp)
           } else {
             tmp
           }
@@ -1423,8 +1436,8 @@ predict.bru <- function(object,
           probs = probs
         )
       if (!drop &&
-        (NROW(data) == NROW(tmp))) {
-        smy[[nm]] <- expand_to_dataframe(data, tmp)
+        (NROW(newdata) == NROW(tmp))) {
+        smy[[nm]] <- expand_to_dataframe(newdata, tmp)
       } else {
         smy[[nm]] <- tmp
       }
@@ -1432,8 +1445,8 @@ predict.bru <- function(object,
   } else {
     tmp <- bru_summarise(data = vals, probs = probs)
     if (!drop &&
-      (NROW(data) == NROW(tmp))) {
-      smy <- expand_to_dataframe(data, tmp)
+      (NROW(newdata) == NROW(tmp))) {
+      smy <- expand_to_dataframe(newdata, tmp)
     } else {
       smy <- tmp
     }
@@ -1456,7 +1469,7 @@ predict.bru <- function(object,
 #' @export
 #' @family sample generators
 #' @param object A `bru` object obtained by calling [bru()].
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
+#' @param newdata A data.frame or SpatialPointsDataFrame of covariates needed for
 #' sampling.
 #' @param formula A formula where the right hand side defines an R expression
 #' to evaluate for each generated sample. If `NULL`, the latent and
@@ -1477,6 +1490,8 @@ predict.bru <- function(object,
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
 #' @param ... additional, unused arguments.
+#' @param data Deprecated. Use `newdata` instead.
+#' sampling.
 #' @details
 #' In addition to the component names (that give the effect
 #' of each component evaluated for the input data), the suffix `_latent`
@@ -1495,22 +1510,34 @@ predict.bru <- function(object,
 #' @rdname generate
 
 generate.bru <- function(object,
-                         data = NULL,
+                         newdata = NULL,
                          formula = NULL,
                          n.samples = 100,
                          seed = 0L,
                          num.threads = NULL,
                          include = NULL,
                          exclude = NULL,
-                         ...) {
+                         ...,
+                         data = NULL) {
   object <- bru_check_object_bru(object)
+  if (!is.null(data)) {
+    if (is.null(newdata)) {
+      lifecycle::deprecate_soft("2.8.0", "generate(data)", "generate(newdata)",
+                                details = c("Both `data` provided but not `newdata`. Setting `newdata <- data`."))
+      newdata <- data
+    } else {
+      lifecycle::deprecate_warn("2.8.0", "generate(data)", "generate(newdata)",
+                                details = c("Both `newdata` and `data` provided. `data` will be ignored."))
+    }
+    data <- NULL
+  }
 
   # Convert data into list, data.frame or a Spatial object if not provided as such
-  if (is.character(data)) {
-    data <- as.list(setNames(data, data))
-  } else if (inherits(data, "inla.mesh")) {
-    data <- vertices.inla.mesh(data)
-  } else if (inherits(data, "formula")) {
+  if (is.character(newdata)) {
+    newdata <- as.list(setNames(newdata, newdata))
+  } else if (inherits(newdata, "inla.mesh")) {
+    newdata <- vertices.inla.mesh(newdata)
+  } else if (inherits(newdata, "formula")) {
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }
 
@@ -1555,7 +1582,7 @@ generate.bru <- function(object,
     vals <- evaluate_model(
       model = object$bru_info$model,
       state = state,
-      data = data,
+      data = newdata,
       predictor = formula,
       include = include,
       exclude = exclude
