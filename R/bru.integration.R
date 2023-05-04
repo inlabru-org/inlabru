@@ -61,12 +61,13 @@
 #'   points before aggregation. Points per triangle: `(nsub2+1)^2`.
 #'   Points per knot segment: `nsub1`
 #' * `poly_method`: if set to "legacy", selects an old polygon integration method
-#'   that doesn't handle holes. Currently only used for debugging purposes.
+#'   that doesn't handle holes. Only used for debugging purposes.
 #' @param project Deprecated in favour of `int.args(method=...)`.
 #' If TRUE, aggregate the integration points to mesh vertices. Default:
 #' `project = (identical(int.args$method, "stable"))`
 #'
-#' @return A `data.frame` or `SpatialPointsDataFrame` of 1D and 2D integration points, respectively.
+#' @return A `data.frame`, `tibble`, `sf`, or `SpatialPointsDataFrame` of 1D and
+#' 2D integration points, including a `weight` column and `.block` column.
 #'
 #' @examples
 #' \donttest{
@@ -257,9 +258,9 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     ips <- data.frame(
       x = loc_simpson,
       weight = weight_simpson,
-      group = 1
+      .block = 1
     )
-    colnames(ips) <- c(name, "weight", "group")
+    colnames(ips) <- c(name, "weight", ".block")
   } else if (is_1d) {
     domain_range <-
       if (inherits(domain, "inla.mesh.1d")) {
@@ -318,7 +319,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         ips[[j]] <- data.frame(
           loc = domain$loc[w > 0],
           weight = w[w > 0],
-          group = j
+          .block = j
         )
       } else {
         inside <-
@@ -328,10 +329,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         ips[[j]] <- data.frame(
           loc = int_loc[inside],
           weight = int_w[inside],
-          group = j
+          .block = j
         )
       }
-      colnames(ips[[j]]) <- c(name, "weight", "group")
+      colnames(ips[[j]]) <- c(name, "weight", ".block")
     }
 
     ips <- do.call(rbind, ips)
@@ -391,11 +392,11 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     )
 
     coord_names <- c("x", "y", "z")
-    if (!is.null(coordnames(samplers))) {
-      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
-    } else if (!is.null(name)) {
-      coord_names[seq_along(name)] <- name
-    }
+#    if (!is.null(coordnames(samplers))) {
+#      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
+#    } else if (!is.null(name)) {
+#      coord_names[seq_along(name)] <- name
+#    }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else if (is_2d &&
     (inherits(samplers, c(
@@ -455,13 +456,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       max.edge <- max(diff(range(polyloc[, 1])), diff(range(polyloc[, 2]))) / 20
       domain <- INLA::inla.mesh.2d(boundary = samplers, max.edge = max.edge)
       domain$crs <- fm_CRS(samplers)
+      domain_crs <- fm_CRS(domain$crs)
     } else {
+      domain_crs <- fm_CRS(domain$crs)
       if (!fm_crs_is_null(domain$crs)) {
         domain <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
       }
     }
-    domain_crs <- fm_crs(domain$crs)
-    domain_crs <- fm_CRS(domain_crs)
 
 
     if (identical(int.args[["poly_method"]], "legacy")) {
@@ -503,25 +504,25 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     if (is.null(ips$z)) {
       ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y")],
         data = df,
-        match.ID = FALSE, proj4string = domain_crs
+        match.ID = FALSE, proj4string = fm_CRS(domain)
       )
     } else {
       ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y", "z")],
         data = df,
-        match.ID = FALSE, proj4string = domain_crs
+        match.ID = FALSE, proj4string = fm_CRS(domain)
       )
     }
 
     if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(samplers_crs)) {
-      ips <- fm_transform(ips, crs = samplers_crs)
+      ips <- fm_transform(ips, crs = domain_crs)
     }
 
     coord_names <- c("x", "y", "z")
-    if (!is.null(coordnames(samplers))) {
-      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
-    } else if (!is.null(name)) {
-      coord_names[seq_along(name)] <- name
-    }
+#    if (!is.null(coordnames(samplers))) {
+#      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
+#    } else if (!is.null(name)) {
+#      coord_names[seq_along(name)] <- name
+#    }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else {
     stop("No integration handling code reached; please notify the package developer.")

@@ -180,6 +180,8 @@ flowchart TD
 
 ## Intergration point construction
 
+Classic integration structure
+
 ```{r, eval=FALSE,echo=FALSE}
 DiagrammeR::mermaid('
 %%{init: {"securityLevel": "loose", "theme":"base"}}%%
@@ -290,7 +292,8 @@ classDiagram
 )
 ```
 
-Flow diagram for new integration scheme construction
+Flow diagram for new integration scheme construction, implemented as `fm_int(domain, samplers)`
+methods.
 
 ```{r, eval=TRUE,echo=FALSE}
 DiagrammeR::mermaid('

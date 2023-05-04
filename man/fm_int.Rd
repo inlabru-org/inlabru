@@ -47,6 +47,10 @@ integration points. Default 'x'}
 
 \item{int.args}{A list of integration options}
 }
+\value{
+A \code{data.frame}, \code{tibble}, \code{sf}, or \code{SpatialPointsDataFrame} of 1D and
+2D integration points, including a \code{weight} column and \code{.block} column.
+}
 \description{
 Construct integration points on tensor product spaces
 }
@@ -64,9 +68,17 @@ Construct integration points on tensor product spaces
 
 \item \code{fm_int(inla.mesh.lattice)}: \code{inla.mesh.lattice} integration. Not yet implemented.
 
-\item \code{fm_int(inla.mesh.1d)}: \code{inla.mesh.1d} integration.
+\item \code{fm_int(inla.mesh.1d)}: \code{inla.mesh.1d} integration. Supported samplers:
+\itemize{
+\item \code{NULL} for integration over the entire domain;
+\item A length 2 vector defining an interval;
+\item A 2-column matrix with a single interval in each row;
+\item A tibble with a named column containing a matrix, and optionally a
+\code{weight} column.
+}
 
-\item \code{fm_int(inla.mesh)}: \code{inla.mesh} integration
+\item \code{fm_int(inla.mesh)}: \code{inla.mesh} integration. Any sampler class with an
+associated \code{\link[=fm_int_inla_mesh]{fm_int_inla_mesh()}} method is supported.
 
 }}
 \examples{

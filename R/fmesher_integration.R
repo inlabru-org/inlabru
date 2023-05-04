@@ -12,6 +12,10 @@
 #' integration points. Default 'x'
 #' @param \dots Additional arguments passed on to other methods
 #'
+#' @returns A `data.frame`, `tibble`, `sf`, or `SpatialPointsDataFrame` of 1D and
+#' 2D integration points, including a `weight` column and `.block` column.
+
+#'
 #' @export
 #' @examples
 #' if (bru_safe_inla()) {
@@ -304,7 +308,12 @@ fm_int.inla.mesh.lattice <- function(domain, samplers = NULL, name = "x", ...) {
 
 #' @param int.args A list of integration options
 #' @export
-#' @describeIn fm_int `inla.mesh.1d` integration.
+#' @describeIn fm_int `inla.mesh.1d` integration. Supported samplers:
+#' * `NULL` for integration over the entire domain;
+#' * A length 2 vector defining an interval;
+#' * A 2-column matrix with a single interval in each row;
+#' * A tibble with a named column containing a matrix, and optionally a
+#'  `weight` column.
 fm_int.inla.mesh.1d <- function(domain, samplers = NULL, name = "x", int.args = NULL, ...) {
   int.args.default <- list(method = "stable", nsub1 = 30, nsub2 = 9)
   if (is.null(int.args)) {
@@ -856,7 +865,8 @@ fm_int_inla_mesh.SpatialPolygons <- function(samplers,
 # }
 
 #' @export
-#' @describeIn fm_int `inla.mesh` integration
+#' @describeIn fm_int `inla.mesh` integration. Any sampler class with an
+#' associated [fm_int_inla_mesh()] method is supported.
 fm_int.inla.mesh <- function(domain,
                              samplers = NULL,
                              name = NULL,
