@@ -122,7 +122,7 @@ fm_crs_is_null <- function(crs) {
 #' @rdname fm_crs_wkt
 
 fm_wkt_is_geocent <- function(wkt) {
-  if (is.null(wkt) || identical(wkt, "")) {
+  if (is.null(wkt) || identical(wkt, "") || is.na(wkt)) {
     return(FALSE)
   }
   # See https://proceedings.esri.com/library/userconf/proc17/tech-workshops/tw_2588-212.pdf
@@ -889,9 +889,7 @@ fm_crs.inla.mesh.segment <- function(x, ..., crsonly = FALSE) {
 #' `sp::CRS`, or 2) an existing `CRS` object, or 3) a shortcut
 #' reference string to a predefined projection; run
 #' `names(fm_wkt_predef())` for valid predefined projections.
-#' @param doCheckCRSArgs default TRUE, must be set to FALSE by package
-#' developers including `CRS` in an S4 class definition to avoid
-#' uncontrollable loading of the `rgdal` namespace.
+#' @param doCheckCRSArgs ignored.
 #' @param args An optional list of name/value pairs to add to and/or override
 #' the PROJ4 arguments in `projargs`.  `name=value` is converted to
 #' `"+name=value"`, and `name=NA` is converted to `"+name"`.
@@ -1017,7 +1015,7 @@ fm_CRS.CRS <- function(x, oblique = NULL,
 
 #' @export
 #' @rdname fm_CRS_sp
-fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
+fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = NULL,
                            args = NULL, oblique = NULL,
                            SRS_string = NULL,
                            ...) {
@@ -1073,7 +1071,7 @@ fm_CRS.default <- function(projargs = NULL, doCheckCRSArgs = TRUE,
   } else if (inherits(projargs, "CRS")) {
     x <- projargs
   } else {
-    x <- sp::CRS(NA_character_, doCheckCRSArgs = doCheckCRSArgs)
+    x <- sp::CRS(NA_character_)
   }
 
   if (!is.null(oblique)) {
