@@ -42,7 +42,7 @@ fm_CRS(...)
 
 \method{fm_CRS}{default}(
   projargs = NULL,
-  doCheckCRSArgs = TRUE,
+  doCheckCRSArgs = NULL,
   args = NULL,
   oblique = NULL,
   SRS_string = NULL,
@@ -66,9 +66,7 @@ Details section below.}
 reference string to a predefined projection; run
 \code{names(fm_wkt_predef())} for valid predefined projections.}
 
-\item{doCheckCRSArgs}{default TRUE, must be set to FALSE by package
-developers including \code{CRS} in an S4 class definition to avoid
-uncontrollable loading of the \code{rgdal} namespace.}
+\item{doCheckCRSArgs}{ignored.}
 
 \item{args}{An optional list of name/value pairs to add to and/or override
 the PROJ4 arguments in \code{projargs}.  \code{name=value} is converted to
