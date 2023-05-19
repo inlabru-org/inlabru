@@ -115,7 +115,7 @@ reference system</p>
 <span><span class="co"># S3 method for inla.mesh.lattice</span></span>
 <span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crsonly <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for inla.segment</span></span>
+<span><span class="co"># S3 method for inla.mesh.segment</span></span>
 <span><span class="fu">fm_CRS</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, crsonly <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for CRS</span></span>
@@ -124,7 +124,7 @@ reference system</p>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">fm_CRS</span><span class="op">(</span></span>
 <span>  projargs <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  doCheckCRSArgs <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  doCheckCRSArgs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  oblique <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  SRS_string <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -161,9 +161,7 @@ reference string to a predefined projection; run
 
 
 <dt>doCheckCRSArgs</dt>
-<dd><p>default TRUE, must be set to FALSE by package
-developers including <code>CRS</code> in an S4 class definition to avoid
-uncontrollable loading of the <code>rgdal</code> namespace.</p></dd>
+<dd><p>ignored.</p></dd>
 
 
 <dt>args</dt>
