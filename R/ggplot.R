@@ -689,6 +689,15 @@ gg.SpatRaster <- function(data, ...) {
       "Please install it and try again!"
     ))
   }
+  if (".mask" %in% names(data)) {
+    data <-
+      terra::mask(
+        data,
+        mask = data$.mask,
+        maskvalues = FALSE,
+        updatevalue = NA
+      )
+  }
   tidyterra::geom_spatraster(data = data, ...)
 }
 
