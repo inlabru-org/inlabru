@@ -72,11 +72,13 @@ x <- seq(0, 55, length.out = 50)
 mesh1D <- inla.mesh.1d(x, boundary = "free")
 ```
 
-Make the latent components for a 1D SPDE model:
+Make the latent components for a 1D SPDE model, using an integrate-to-zero constraint for
+better identifiability:
 ```{r results="hide",warning=FALSE,message=FALSE}
 matern <- inla.spde2.pcmatern(mesh1D,
   prior.range = c(150, 0.75),
-  prior.sigma = c(0.1, 0.75)
+  prior.sigma = c(0.1, 0.75),
+  constr = TRUE
 )
 comp <- ~ spde1D(x, model = matern) + Intercept(1)
 ```
