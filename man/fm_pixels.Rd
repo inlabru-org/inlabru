@@ -2,7 +2,6 @@
 % Please edit documentation in R/mesh.R
 \name{fm_pixels}
 \alias{fm_pixels}
-\alias{pixels}
 \title{Generate lattice points covering a mesh}
 \usage{
 fm_pixels(mesh, nx = 150, ny = 150, mask = TRUE, format = "sf")

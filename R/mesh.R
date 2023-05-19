@@ -123,8 +123,8 @@ vertices.inla.mesh <- function(object) {
 #'
 #' @description Generate `SpatialPixels` covering an `inla.mesh`
 #'
-#' @aliases pixels
 #' @export
+#' @seealso [fm_pixels()]
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
@@ -162,7 +162,6 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
 #'
 #' @description Generate `terra`, `sf`, or `sp` lattice locations
 #'
-#' @aliases pixels
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
