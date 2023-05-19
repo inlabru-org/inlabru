@@ -993,7 +993,7 @@ fm_CRS.inla.mesh.lattice <- function(x, ..., crsonly = FALSE) {
 
 #' @rdname fm_CRS_sp
 #' @export
-fm_CRS.inla.segment <- function(x, ..., crsonly = FALSE) {
+fm_CRS.inla.mesh.segment <- function(x, ..., crsonly = FALSE) {
   fm_CRS(x[["crs"]], ..., crsonly = crsonly)
 }
 
