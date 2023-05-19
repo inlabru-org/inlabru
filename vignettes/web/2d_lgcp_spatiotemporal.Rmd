@@ -76,6 +76,7 @@ Plot the integration points:
 ggplot() +
   gg(mrsea$mesh) +
   gg(ips, aes(size = weight)) +
+  scale_size_area(max_size = 1) +
   facet_wrap(~season) +
   coord_fixed()
 ```
