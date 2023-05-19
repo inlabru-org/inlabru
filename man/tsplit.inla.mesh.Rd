@@ -16,9 +16,9 @@ mesh A refined inla.mesh object
 }
 \description{
 \itemize{
-\item Warning: does not reconstruct interior boundary
-\item Warning2: Works in euclidean coordinates. Not suitable for sphere.
-\item Warning3: Experimental; will be replaced by a new method
+\item Warning: The original triangle edges are not always preserved.
+\item Warning: Works in euclidean coordinates. Not suitable for sphere.
+\item Warning: Experimental; will be replaced by a new method
 }
 }
 \author{
