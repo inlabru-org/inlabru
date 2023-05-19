@@ -11,7 +11,7 @@
 \alias{fm_CRS.sfg}
 \alias{fm_CRS.inla.mesh}
 \alias{fm_CRS.inla.mesh.lattice}
-\alias{fm_CRS.inla.segment}
+\alias{fm_CRS.inla.mesh.segment}
 \alias{fm_CRS.CRS}
 \alias{fm_CRS.default}
 \title{Create a coordinate reference system object}
@@ -36,7 +36,7 @@ fm_CRS(...)
 
 \method{fm_CRS}{inla.mesh.lattice}(x, ..., crsonly = FALSE)
 
-\method{fm_CRS}{inla.segment}(x, ..., crsonly = FALSE)
+\method{fm_CRS}{inla.mesh.segment}(x, ..., crsonly = FALSE)
 
 \method{fm_CRS}{CRS}(x, oblique = NULL, ...)
 
