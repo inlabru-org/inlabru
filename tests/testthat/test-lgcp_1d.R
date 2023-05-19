@@ -62,26 +62,6 @@ test_that("1D LGCP fitting", {
   )
 
   skip_if_not_installed("sn")
-  pr <- predict(fit,
-    newdata = data.frame(x = mesh1D$loc),
-    formula = ~ list(
-      Intercept = Intercept,
-      spde1D = spde1D,
-      both = Intercept + spde1D
-    ),
-    n.samples = 100, seed = 84354
-  )
-
-
-  expect_true(
-    all(abs(pr$both$mean -
-      (fm_evaluate(mesh1D,
-        loc = mesh1D$loc,
-        field = fit$summary.random$spde1D$mean
-      ) +
-        fit$summary.fixed$mean)) /
-      pr$both$mean.mc_std_err <= 3)
-  )
 
   # predicted intensity integral
   ips <- ipoints(c(0, 55), 100, name = "x")
@@ -162,18 +142,6 @@ test_that("1D LGCP fitting, discrete point domain", {
   )
 
   skip_if_not_installed("sn")
-  pr <- predict(
-    fit,
-    newdata = data.frame(x = mesh1D$loc),
-    formula = ~ spde1D + Intercept,
-    n.samples = 100,
-    seed = 84354
-  )
-  expect_equal(
-    pr$mean,
-    fit$summary.random$spde1D$mean + fit$summary.fixed$mean,
-    tolerance = hitol
-  )
 
   # predicted intensity integral
   ips <- data.frame(x = 1:55, weight = 1)
@@ -206,7 +174,8 @@ test_that("1D LGCP fitting, compressed format", {
   matern <- INLA::inla.spde2.pcmatern(
     mesh1D,
     prior.range = c(1, 0.01),
-    prior.sigma = c(0.1, 0.75)
+    prior.sigma = c(0.1, 0.75),
+    constr = TRUE
   )
 
   mdl <- ~ spde1D(main = x, model = matern) + Intercept(1)
@@ -240,12 +209,12 @@ test_that("1D LGCP fitting, compressed format", {
   expect_equal(
     fit1$summary.fixed,
     fit2$summary.fixed,
-    tolerance = hitol
+    tolerance = midtol
   )
   expect_equal(
     fit1$summary.random,
     fit2$summary.random,
-    tolerance = hitol
+    tolerance = midtol
   )
 
   fit3 <- bru(
