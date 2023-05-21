@@ -141,7 +141,7 @@ a `SpatialPixelsDataFrame` only within the boundary, using its `mask` argument, 
 
 ```{r warning=FALSE,message=FALSE}
 df <- pixels(mesh, mask = boundary)
-int1 <- predict(fit1, data = df, ~ exp(vegetation))
+int1 <- predict(fit1, df, ~ exp(vegetation))
 
 ggplot() +
   gg(int1) +
@@ -156,7 +156,7 @@ that have no nests, and some areas of predicted low density that have nests. Wha
 about the estimated abundance (there are really 647 nests there):
 
 ```{r warning=FALSE,message=FALSE}
-ips <- ipoints(boundary, mesh)
+ips <- fm_int(mesh, boundary)
 Lambda1 <- predict(fit1, ips, ~ sum(weight * exp(vegetation)))
 Lambda1
 ```
@@ -210,7 +210,7 @@ ggplot() +
 ```{r warning=FALSE,message=FALSE}
 Lambda2 <- predict(
   fit2,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + vegetation))
 )
 Lambda2
@@ -299,7 +299,7 @@ ggplot() +
 ```{r warning=FALSE,message=FALSE}
 Lambda3 <- predict(
   fit3,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + Intercept))
 )
 Lambda3
@@ -587,14 +587,14 @@ in the prediction object, for easier plotting.
 
 ```{r fig.show="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 Lambda <- predict(
-  efit, ipoints(boundary, mesh),
+  efit, fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + elev + Intercept))
 )
 Lambda
 
 Nest.e <- predict(
   efit,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ data.frame(
     N = 200:1000,
     density = dpois(200:1000,
@@ -626,7 +626,7 @@ expression. Since the elevation effect in this model is linear, the resulting pl
 ```{r}
 elev.pred <- predict(
   efit,
-  data = data.frame(elevation = seq(0, 100, length.out = 1000)),
+  data.frame(elevation = seq(0, 100, length.out = 1000)),
   formula = ~ elev_eval(elevation)
 )
 

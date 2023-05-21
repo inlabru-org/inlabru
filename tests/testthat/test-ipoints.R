@@ -7,7 +7,7 @@ test_that("1D integration points can be generated", {
   expect_s3_class(ips, "data.frame")
   expect_equal(nrow(ips), 3)
   expect_equal(ncol(ips), 3)
-  expect_equal(names(ips), c("myDim", "weight", "group"))
+  expect_equal(names(ips), c("myDim", "weight", ".block"))
   expect_equal(as.numeric(ips[1, ]), c(5 / 3, 10 / 3, 1))
   expect_equal(as.numeric(ips[2, ]), c(15 / 3, 10 / 3, 1))
   expect_equal(as.numeric(ips[3, ]), c(25 / 3, 10 / 3, 1))
@@ -22,7 +22,7 @@ test_that("conversion of 1D mesh to integration points", {
   expect_s3_class(ips, "data.frame")
   expect_equal(nrow(ips), 21)
   expect_equal(ncol(ips), 3)
-  expect_equal(names(ips), c("time", "weight", "group"))
+  expect_equal(names(ips), c("time", "weight", ".block"))
   expect_equal(as.numeric(ips[1, ]), c(0, 1 / 6, 1))
   expect_equal(as.numeric(ips[2, ]), c(1, 1 / 3, 1))
   expect_equal(as.numeric(ips[12, ]), c(0.5, 2 / 3, 1))
@@ -37,8 +37,8 @@ test_that("conversion of SpatialPolygon to integration points", {
   )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(names(ips), "weight")
-  expect_equal(colnames(as.data.frame(ips)), c("weight", "x", "y"))
+  expect_equal(names(ips), c("weight", ".block"))
+  expect_equal(colnames(as.data.frame(ips)), c("weight", ".block", "x", "y"))
   expect_equal(sum(ips$weight), 19.87366, tolerance = lowtol)
 })
 
@@ -52,7 +52,7 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
   )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(colnames(as.data.frame(ips)), c("weight", "x", "y"))
+  expect_equal(colnames(as.data.frame(ips)), c("weight", ".block", "x", "y"))
   expect_equal(sum(ips$weight),
     sum(ips_nodomain$weight),
     tolerance = midtol
@@ -74,20 +74,13 @@ test_that("SLDF in metres to integration points using grouping parameter", {
 
   data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = FALSE)
-  suppressWarnings(
-    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
-  )
-  # # For rgdal 1.5-23, we had this version
-  #  expect_warning(
-  #    ...,
-  #    "export to PROJ failed: generic error of unknown origin"
-  #  )
+  ips <- fm_int(list(coordinates = mrsea$mesh, season = 1:4),
+                mrsea$samplers)
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(
-    colnames(as.data.frame(ips)),
-    c("weight", "vertex", "season", "x", "y")
-  )
+  expect_true("weight" %in% colnames(as.data.frame(ips)))
+  expect_true("season" %in% colnames(as.data.frame(ips)))
+
   # Should be a factor 1000 relative to the kilometre scale, since both schemes us
   # CRS information to convert to km, but the weight information is in metres here
   expect_equal(sum(ips$weight) / 2293712, 1, tolerance = midtol)
@@ -98,15 +91,13 @@ test_that("SLDF in kilometres to integration points using grouping parameter", {
 
   data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
-  suppressWarnings(
-    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
-  )
+  ips <- fm_int(list(coordinates = mrsea$mesh, season = 1:4),
+                mrsea$samplers)
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(
-    colnames(data.frame(ips)),
-    c("weight", "vertex", "season", "x", "y", "optional")
-  )
+  expect_true("weight" %in% colnames(as.data.frame(ips)))
+  expect_true("season" %in% colnames(as.data.frame(ips)))
+
   expect_equal(sum(ips$weight) / 2293.712, 1, tolerance = midtol)
 })
 

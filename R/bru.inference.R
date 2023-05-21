@@ -484,7 +484,20 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
   }
 }
 
-
+#' Evaluate expressions in the data context
+#' @param input An expression to be evaluated
+#' @param data Likelihood-specific data, as a `data.frame` or
+#' `SpatialPoints[DataFrame]`
+#'   object.
+#' @param response_data Likelihood-specific data for models that need different
+#'  size/format for inputs and response variables, as a `data.frame` or
+#' `SpatialPoints[DataFrame]`
+#'   object.
+#' @param default Value used if the expression is evaluated as NULL. Default
+#' NULL
+#' @param .envir The evaluation environment
+#' @return The result of expression evaluation
+#' @keywords internal
 
 eval_in_data_context <- function(input,
                                  data = NULL,
@@ -569,6 +582,73 @@ complete_coordnames <- function(data_coordnames, ips_coordnames) {
     ips = new_coordnames[seq_along(ips_coordnames)]
   )
 }
+
+
+# Extend bind_rows to handle XY/XYZ mismatches in one or more sfc columns
+extended_bind_rows <- function(...) {
+  dt <- list(...)
+  names_ <- lapply(dt, names)
+  is_sfc_ <- lapply(dt,
+                    function(data)
+                      vapply(data,
+                             function(x) {
+                               inherits(x, "sfc")
+                             },
+                             TRUE))
+  sfc_names_ <- unique(unlist(names_)[unlist(is_sfc_)])
+
+  for (nm in sfc_names_) {
+    # Which data objects have this column?
+    sf_data_idx_ <-
+      which(vapply(dt, function(data) !is.null(data[[nm]]), TRUE))
+
+    # Unify CRS
+    the_crs <- fm_crs(dt[[sf_data_idx_[1]]][[nm]])
+    for (i in sf_data_idx_) {
+      dt_crs <- fm_crs(dt[[i]][[nm]])
+      if (!fm_identical_CRS(dt_crs, the_crs)) {
+        dt[[i]][[nm]] <- fm_transform(dt[[i]][[nm]], crs = the_crs)
+      }
+    }
+
+    ncol_ <- vapply(sf_data_idx_,
+                    function(i) {
+                      ncol(sf::st_coordinates(dt[[i]][[nm]]))
+                    },
+                    0L)
+    if (length(unique(ncol_)) > 0) {
+      # Some dimension mismatch
+      ncol_max <- max(ncol_)
+      for (ii in which(ncol_ < ncol_max)) {
+        i <- sf_data_idx_[ii]
+        # Extend columns
+        if (nrow(dt[[i]]) > 0) {
+          dt[[i]][[nm]] <-
+            sf::st_as_sf(as.data.frame(cbind(
+              sf::st_coordinates(dt[[i]][[nm]]),
+              matrix(0.0, nrow(dt[[i]]), ncol_max - ncol_[[i]])
+            )),
+            coords = seq_len(ncol_max),
+            crs = fm_crs(dt[[i]][[nm]]))$geometry
+        } else {
+          dt[[i]][[nm]] <-
+            sf::st_as_sf(as.data.frame(
+              matrix(0.0, 0L, ncol_max)
+            ),
+            coords = seq_len(ncol_max),
+            crs = fm_crs(dt[[i]][[nm]]))$geometry
+        }
+      }
+    }
+  }
+  result <- do.call(dplyr::bind_rows, dt)
+  if (length(sfc_names_) > 0) {
+    result <- sf::st_as_sf(result)
+  }
+
+  result
+}
+
 
 #' Likelihood construction for usage with [bru()]
 #'
@@ -752,10 +832,14 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     }
 
     if (is.null(ips)) {
-      ips <- ipmaker(
-        samplers = samplers,
+      #      ips <- ipmaker(
+      #        samplers = samplers,
+      #        domain = domain,
+      #        int.args = options[["bru_int_args"]]
+      #      )
+      ips <- fm_int(
         domain = domain,
-        dnames = names(response),
+        samplers = samplers,
         int.args = options[["bru_int_args"]]
       )
     }
@@ -834,7 +918,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     additional_data_names <- setdiff(names(data_), names(data))
     if ((length(additional_data_names) > 0) &&
       (NROW(data_) == N_data)) {
-      data <- cbind(data, data_[additional_data_names])
+      data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
     }
 
     if (ips_is_Spatial) {
@@ -870,11 +954,11 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
         )
       }
       expr <- parse(text = expr_text)
-      data <- dplyr::bind_rows(
-        cbind(data, BRU_aggregate = TRUE),
-        cbind(ips, BRU_aggregate = FALSE)
+
+      data <- extended_bind_rows(
+        dplyr::bind_cols(data, BRU_aggregate = TRUE),
+        dplyr::bind_cols(ips, BRU_aggregate = FALSE)
       )
-      formula
     } else {
       response_data <- data.frame(
         BRU_E = c(
@@ -886,7 +970,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
           rep(0, NROW(ips))
         )
       )
-      data <- dplyr::bind_rows(data, ips)
+      data <- extended_bind_rows(data, ips)
     }
     if (ips_is_Spatial) {
       non_coordnames <- setdiff(names(data), data_coordnames)
@@ -923,18 +1007,6 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response <- "BRU_response"
   }
 
-  # Calculate data ranges
-  drange <- lapply(names(data), function(nm) {
-    if (is.numeric(data[[nm]])) {
-      range(data[[nm]])
-    } else {
-      NULL
-    }
-  })
-  names(drange) <- names(data)
-  if (inherits(data, "Spatial")) drange[["coordinates"]] <- mesh
-
-
   # The likelihood object that will be returned
 
   lh <- list(
@@ -951,7 +1023,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response = response,
     inla.family = inla.family,
     domain = domain,
-    drange = drange,
+    drange = NULL,
     include_components = include,
     exclude_components = exclude,
     allow_latent = allow_latent,
@@ -1274,7 +1346,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' @aliases predict.bru
 #' @export
 #' @param object An object obtained by calling [bru()] or [lgcp()].
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
+#' @param newdata A `data.frame` or `SpatialPointsDataFrame` of covariates needed for
 #' the prediction.
 #' @param formula A formula where the right hand side defines an R expression
 #' to evaluate for each generated sample. If `NULL`, the latent and
@@ -1296,10 +1368,11 @@ expand_to_dataframe <- function(x, data = NULL) {
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#' @param drop logical; If `keep=FALSE`, `data` is a `Spatial*DataFrame`, and the
-#' prediciton summary has the same number of rows as `data`, then the output is
+#' @param drop logical; If `keep=FALSE`, `newdata` is a `Spatial*DataFrame`, and the
+#' prediciton summary has the same number of rows as `newdata`, then the output is
 #' a `Spatial*DataFrame` object. Default `FALSE`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
+#' @param data Deprecated. Use `newdata` instead.
 #' @details
 #' In addition to the component names (that give the effect
 #' of each component evaluated for the input data), the suffix `_latent`
@@ -1312,12 +1385,12 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
-#' @return a data.frame or Spatial* object with predicted mean values and other
+#' @return a `data.frame` or `Spatial*` object with predicted mean values and other
 #' summary statistics attached.
 #' @example inst/examples/predict.bru.R
 
 predict.bru <- function(object,
-                        data = NULL,
+                        newdata = NULL,
                         formula = NULL,
                         n.samples = 100,
                         seed = 0L,
@@ -1326,20 +1399,32 @@ predict.bru <- function(object,
                         include = NULL,
                         exclude = NULL,
                         drop = FALSE,
-                        ...) {
+                        ...,
+                        data = NULL) {
   object <- bru_check_object_bru(object)
+  if (!is.null(data)) {
+    if (is.null(newdata)) {
+      lifecycle::deprecate_soft("2.8.0", "predict(data)", "predict(newdata)",
+                                details = c("Both `data` provided but not `newdata`. Setting `newdata <- data`."))
+      newdata <- data
+    } else {
+      lifecycle::deprecate_warn("2.8.0", "predict(data)", "predict(newdata)",
+                                details = c("Both `newdata` and `data` provided. `data` will be ignored."))
+    }
+    data <- NULL
+  }
 
   # Convert data into list, data.frame or a Spatial object if not provided as such
-  if (is.character(data)) {
-    data <- as.list(setNames(data, data))
-  } else if (inherits(data, "inla.mesh")) {
-    data <- vertices.inla.mesh(data)
-  } else if (inherits(data, "formula")) {
+  if (is.character(newdata)) {
+    newdata <- as.list(setNames(newdata, newdata))
+  } else if (inherits(newdata, "inla.mesh")) {
+    newdata <- vertices.inla.mesh(newdata)
+  } else if (inherits(newdata, "formula")) {
     stop("Formula supplied as data to predict.bru(). Please check your argument order/names.")
   }
 
   vals <- generate.bru(object,
-    data = data,
+    newdata = newdata,
     formula = formula,
     n.samples = n.samples,
     seed = seed,
@@ -1351,10 +1436,10 @@ predict.bru <- function(object,
 
   # Summarise
 
-  data <- expand_to_dataframe(data)
+  newdata <- expand_to_dataframe(newdata)
   if (is.data.frame(vals[[1]])) {
     vals.names <- names(vals[[1]])
-    covar <- intersect(vals.names, names(data))
+    covar <- intersect(vals.names, names(newdata))
     estim <- setdiff(vals.names, covar)
     smy <- list()
 
@@ -1380,8 +1465,8 @@ predict.bru <- function(object,
       smy <- lapply(
         smy,
         function(tmp) {
-          if (NROW(data) == NROW(tmp)) {
-            expand_to_dataframe(data, tmp)
+          if (NROW(newdata) == NROW(tmp)) {
+            expand_to_dataframe(newdata, tmp)
           } else {
             tmp
           }
@@ -1406,8 +1491,8 @@ predict.bru <- function(object,
           probs = probs
         )
       if (!drop &&
-        (NROW(data) == NROW(tmp))) {
-        smy[[nm]] <- expand_to_dataframe(data, tmp)
+        (NROW(newdata) == NROW(tmp))) {
+        smy[[nm]] <- expand_to_dataframe(newdata, tmp)
       } else {
         smy[[nm]] <- tmp
       }
@@ -1415,8 +1500,8 @@ predict.bru <- function(object,
   } else {
     tmp <- bru_summarise(data = vals, probs = probs)
     if (!drop &&
-      (NROW(data) == NROW(tmp))) {
-      smy <- expand_to_dataframe(data, tmp)
+      (NROW(newdata) == NROW(tmp))) {
+      smy <- expand_to_dataframe(newdata, tmp)
     } else {
       smy <- tmp
     }
@@ -1439,7 +1524,7 @@ predict.bru <- function(object,
 #' @export
 #' @family sample generators
 #' @param object A `bru` object obtained by calling [bru()].
-#' @param data A data.frame or SpatialPointsDataFrame of covariates needed for
+#' @param newdata A data.frame or SpatialPointsDataFrame of covariates needed for
 #' sampling.
 #' @param formula A formula where the right hand side defines an R expression
 #' to evaluate for each generated sample. If `NULL`, the latent and
@@ -1460,6 +1545,8 @@ predict.bru <- function(object,
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
 #' @param ... additional, unused arguments.
+#' @param data Deprecated. Use `newdata` instead.
+#' sampling.
 #' @details
 #' In addition to the component names (that give the effect
 #' of each component evaluated for the input data), the suffix `_latent`
@@ -1478,49 +1565,37 @@ predict.bru <- function(object,
 #' @rdname generate
 
 generate.bru <- function(object,
-                         data = NULL,
+                         newdata = NULL,
                          formula = NULL,
                          n.samples = 100,
                          seed = 0L,
                          num.threads = NULL,
                          include = NULL,
                          exclude = NULL,
-                         ...) {
+                         ...,
+                         data = NULL) {
   object <- bru_check_object_bru(object)
+  if (!is.null(data)) {
+    if (is.null(newdata)) {
+      lifecycle::deprecate_soft("2.8.0", "generate(data)", "generate(newdata)",
+                                details = c("Both `data` provided but not `newdata`. Setting `newdata <- data`."))
+      newdata <- data
+    } else {
+      lifecycle::deprecate_warn("2.8.0", "generate(data)", "generate(newdata)",
+                                details = c("Both `newdata` and `data` provided. `data` will be ignored."))
+    }
+    data <- NULL
+  }
 
   # Convert data into list, data.frame or a Spatial object if not provided as such
-  if (is.character(data)) {
-    data <- as.list(setNames(data, data))
-  } else if (inherits(data, "inla.mesh")) {
-    data <- vertices.inla.mesh(data)
-  } else if (inherits(data, "formula")) {
+  if (is.character(newdata)) {
+    newdata <- as.list(setNames(newdata, newdata))
+  } else if (inherits(newdata, "inla.mesh")) {
+    newdata <- vertices.inla.mesh(newdata)
+  } else if (inherits(newdata, "formula")) {
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }
 
-  # If data is provided as list, generate data automatically for each dimension
-  # stated in this list
-  # # TODO: remove this! This feature clashes with problems that need input
-  # data given as a list. Better to make the user cornstruct the inputs
-  # (optionally with a special ipoints function, but to some degree it's just
-  # a application of expand.grid())
-  # # TODO: Check if when removing this, all the other drange code can also
-  # safely be removed.
-  #  if (class(data)[1] == "list") {
-  #    # Todo: check if this feature works at all.
-  #    # TODO: add method ipoints.list to handle this;
-  #    # ipoints(list(coordinates=mesh, etc)) and remove this implicit code
-  #    # from generate()
-  #    warning(paste0(
-  #      "Attempting to convert data list into gridded data.\n",
-  #      "This probably doesn't work.\n",
-  #      "Please contact the package developers if you use this feature."
-  #    ))
-  #    lhs.names <- names(data)
-  #    add.pts <- lapply(lhs.names, function(nm) {
-  #      ipoints(object$bru_info$lhoods$default$drange[[nm]], name = nm)
-  #    })
-  #    data <- do.call(cprod, add.pts)
-  #  }
 
   state <- evaluate_state(
     object$bru_info$model,
@@ -1538,7 +1613,7 @@ generate.bru <- function(object,
     vals <- evaluate_model(
       model = object$bru_info$model,
       state = state,
-      data = data,
+      data = newdata,
       predictor = formula,
       include = include,
       exclude = exclude

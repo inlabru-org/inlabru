@@ -30,6 +30,11 @@
 
 * Add `edge|int|ext.linewidth` arguments to `gg.inla.mesh` #188
 
+* Rename the `predict()` and `generate()` `data` arguments to `newdata`, for
+  better compatibility with other `predict()` methods.  The old argument name
+  will still be accepted, but give a warning.  Code that does not name the `data`
+  argument is not affected.
+
 # inlabru 2.7.0
 
 ## Feature overview

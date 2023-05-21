@@ -203,10 +203,10 @@ Estimating Abundance
 Abundance is the integral of the intensity over space. We estimate it by integrating
 the predicted intensity over `x`. Integration is done by adding up the intensity at 
 locations `x` weighted by a particular weight. The locations `x` and their weights
-are constructed using the `ipoints` function
+are constructed using the `fm_int` function
 
 ```{r }
-ips <- ipoints(c(0, 55), 100, name = "x")
+ips <- fm_int(mesh1D, name = "x")
 head(ips)
 Lambda <- predict(fit.spde, ips, ~ sum(weight * exp(spde1D + Intercept)))
 ```

@@ -122,7 +122,7 @@ fm_crs_is_null <- function(crs) {
 #' @rdname fm_crs_wkt
 
 fm_wkt_is_geocent <- function(wkt) {
-  if (is.null(wkt) || identical(wkt, "")) {
+  if (is.null(wkt) || identical(wkt, "") || is.na(wkt)) {
     return(FALSE)
   }
   # See https://proceedings.esri.com/library/userconf/proc17/tech-workshops/tw_2588-212.pdf
@@ -718,6 +718,7 @@ fm_crs.default <- function(x, ..., crsonly = FALSE) {
   sf::st_crs(x, ...)
 }
 
+#' @importFrom sf st_crs
 #' @exportS3Method sf::st_crs fm_crs
 #' @describeIn fm_crs `st_crs(x, ...)` is equivalent to `fm_crs(x, ..., crsonly = TRUE)`
 #' when `x` is a `fm_crs` object.

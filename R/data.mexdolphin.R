@@ -4,7 +4,7 @@
 #' @description This a version of the `mexdolphins` dataset from the package `dsm`, reformatted
 #' as point process data for use with `inlabru`. The data are from a combination of several NOAA
 #' shipboard surveys conducted on pan-tropical spotted dolphins in the Gulf of Mexico. 47 observations
-#' of groups of dolphins wre detected. The group size was recorded, as well as the Beaufort sea state at
+#' of groups of dolphins were detected. The group size was recorded, as well as the Beaufort sea state at
 #' the time of the observation. Transect width is 16 km, i.e. maximal detection
 #' distance 8 km (transect half-width 8 km).
 #'

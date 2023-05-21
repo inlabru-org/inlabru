@@ -186,7 +186,7 @@ Finally, estimate abundance using the `predict` function. As a first step we nee
 ```{r eval=TRUE,warning=FALSE,message=FALSE,echo=TRUE}
 Lambda <- predict(
   fit,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + Intercept))
 )
 Lambda
@@ -195,7 +195,7 @@ Lambda
 Given some generous interval boundaries (500, 800) for lambda we can estimate the posterior abundance distribution via
 ```{r,warning=FALSE,message=FALSE,echo=TRUE}
 Nest <- predict(
-  fit, ipoints(boundary, mesh),
+  fit, fm_int(mesh, boundary),
   ~ data.frame(
     N = 500:800,
     dpois(500:800,

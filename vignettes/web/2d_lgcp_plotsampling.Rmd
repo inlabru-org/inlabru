@@ -139,12 +139,12 @@ intensity, representative of an imagined new realisation of the point process,
 and the conditional expectation that takes the actually observed nests into account,
 by recognising that we have complete information in the surveyed plots. 
 ```{r results="hide",warning=FALSE,message=FALSE}
-Lambda <- predict(fit, ipoints(boundary, mesh), ~ sum(weight * exp(my.spde + Intercept)))
+Lambda <- predict(fit, fm_int(mesh, boundary), ~ sum(weight * exp(my.spde + Intercept)))
 Lambda.empirical <- predict(
   fit,
   rbind(
-    cbind(ipoints(boundary, mesh), data.frame(all = TRUE)),
-    cbind(ipoints(sample$plots, mesh), data.frame(all = FALSE))
+    cbind(fm_int(mesh, boundary), data.frame(all = TRUE)),
+    cbind(fm_int(mesh, sample$plots), data.frame(all = FALSE))
   ),
   ~ (sum(weight * exp(my.spde + Intercept) * all) -
     sum(weight * exp(my.spde + Intercept) * !all) +
@@ -166,7 +166,7 @@ fit.all <- lgcp(cmp, gorillas$nests,
   domain = list(coordinates = mesh)
 )
 lambda.all <- predict(fit.all, pixels(mesh, mask = boundary), ~ exp(my.spde + Intercept))
-Lambda.all <- predict(fit.all, ipoints(boundary, mesh), ~ sum(weight * exp(my.spde + Intercept)))
+Lambda.all <- predict(fit.all, fm_int(mesh, boundary), ~ sum(weight * exp(my.spde + Intercept)))
 ```
 
 Your plot should look like this:

@@ -5,7 +5,7 @@
 #' counts that the histogram calculates to simulations from a 1D log Gaussian Cox process
 #' conditioned on the number of data samples. For each bin this results in a median number
 #' of counts as well as a confidence interval. If the LGCP is a plausible model for the
-#' observed points then most of the histrogram counts (number of points within a bin)
+#' observed points then most of the histogram counts (number of points within a bin)
 #' should be within the confidence intervals. Note that a proper comparison  is a multiple
 #' testing problem which the function does not solve for you.
 #'
@@ -194,7 +194,7 @@ devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, me
     #
 
 
-    wips <- ipoints(samplers)
+    wips <- fm_int(mesh, samplers)
     A <- INLA::inla.spde.make.A(mesh, loc = wips)
 
     weights <- wips$weight
