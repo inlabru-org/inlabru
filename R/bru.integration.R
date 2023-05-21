@@ -123,6 +123,24 @@
 ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
                     project = NULL) {
+#  lifecycle::deprecate_soft("2.8.0",
+#                            "ipoints()",
+#                            "fm_int()",
+#                            details = c("ipoints(samplers, domain) has been replaced by more versatile fm_int(domain, samplers, ...) methods."))
+
+  if (!is.null(group)) {
+    if (is.null(name) && inherits(domain, "inla.mesh")) {
+      name <- "coordinates"
+    }
+    domain <- c(list(domain), as.list(as.data.frame(samplers[group]))[group])
+    names(domain) <- c(name, group)
+    ips <- fm_int(domain = domain,
+                  samplers = samplers,
+                  int.args = int.args)
+    return(ips)
+  }
+
+
   int.args.default <- list(method = "stable", nsub1 = 30, nsub2 = 9)
   if (is.null(int.args)) {
     int.args <- list()
@@ -742,6 +760,11 @@ cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
 
 ipmaker <- function(samplers, domain, dnames,
                     int.args = list(method = "stable", nsub = NULL)) {
+  lifecycle::deprecate_soft("2.8.0",
+                            "ipmaker()",
+                            "fm_int()",
+                            details = c("ipmaker(samplers, domain, ...) has been replaced by more versatile fm_int(domain, samplers, ...) methods."))
+
   # To allow sf geometry support, should likely change the logic to
   # use the domain specification to determine the type of integration
   # method to call, so that it doesn't need to rely on the domain name.
@@ -811,10 +834,17 @@ ipmaker <- function(samplers, domain, dnames,
 # independently for each combination of factor levels.
 # @return SpatialPointsDataFrame of mesh vertices with projected data attached
 
-vertex.projection <- function(points, mesh, columns = names(points), group = NULL, fill = NULL) {
+vertex.projection <- function(points, mesh, columns = names(points),
+                              group = NULL, fill = NULL,
+                              precomp_t = NULL, precomp_bary = NULL) {
   if (is.null(group) || (length(group) == 0)) {
-    res <- INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
-    tri <- res$p2m.t
+    if (is.null(precomp_t)) {
+      res <- INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
+      precomp_t <- res$p2m.t
+      precomp_bary <- res$p2m.b
+    }
+    tri <- precomp_t
+    bary <- precomp_bary
     ok <- tri > 0
     if (any(!ok)) {
       warning("Some integration points were outside the mesh; check your coordinate systems.")
@@ -823,7 +853,7 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
     data <- list()
     for (k in seq_along(columns)) {
       cn <- columns[k]
-      nw <- points@data[ok, cn] * res$p2m.b[ok, , drop = FALSE]
+      nw <- points@data[ok, cn] * bary[ok, , drop = FALSE]
       w.by <- by(as.vector(nw), as.vector(mesh$graph$tv[tri[ok], ]), sum, simplify = TRUE)
       data[[cn]] <- as.vector(w.by)
     }
@@ -852,17 +882,27 @@ vertex.projection <- function(points, mesh, columns = names(points), group = NUL
       ret <- ret[match(1:mesh$n, ret$vertex), ]
     }
   } else {
-    fn <- function(X) {
-      ret <- vertex.projection(X, mesh, columns = columns)
+    fn <- function(X, precomp_t, precomp_bary) {
+      ret <- vertex.projection(X, mesh, columns = columns,
+                               precomp_t = precomp_t,
+                               precomp_bary = precomp_bary)
       for (g in group) {
         ret[[g]] <- X[[g]][1]
       }
       ret
     }
+    res <- INLA::inla.fmesher.smorg(mesh$loc,
+                                    mesh$graph$tv,
+                                    points2mesh = sp::coordinates(points))
+    precomp_t <- res$p2m.t
+    precomp_bary <- res$p2m.b
     ret <- lapply(
       unique(points[[group]]),
       function(x) {
-        fn(points[points[[group]] == x, , drop = FALSE])
+        the_subset <- points[[group]] == x
+        fn(points[the_subset, , drop = FALSE],
+           precomp_t = precomp_t[the_subset],
+           precomp_bary = precomp_bary[the_subset, , drop = FALSE])
       }
     )
     ret <- do.call(rbind, ret)
@@ -927,7 +967,7 @@ vertex.projection.1d <- function(points, mesh, group = NULL, column = "weight", 
     if (!is.null(group)) {
       bygroup <- c(bygroup, as.list(rbind(points[, group, drop = FALSE], points[, group, drop = FALSE])))
     }
-    ips <- aggregate(ips[, column, drop = FALSE], by = bygroup, FUN = sum)
+    ips <- stats::aggregate(ips[, column, drop = FALSE], by = bygroup, FUN = sum)
   }
 
   # Add x-coordinate
@@ -992,3 +1032,70 @@ int <- function(data, values, dims = NULL) {
 
   agg
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Project integration points to mesh vertices
+#
+# @export
+# @param points A SpatialPointsDataFrame object
+# @param mesh An inla.mesh object
+# @return SpatialPointsDataFrame of mesh vertices with projected data attached
+
+fm_vertex_projection <- function(points, mesh) {
+  if (is.null(points$.block)) {
+    points$.block <- rep(1L, NROW(points))
+  }
+
+  res <- INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
+  tri <- res$p2m.t
+  bary <- res$p2m.b
+
+  ok <- tri > 0
+  if (any(!ok)) {
+    warning("Some integration points were outside the mesh; check your coordinate systems.")
+  }
+
+  data <-
+    data.frame(
+      vertex = as.vector(mesh$graph$tv[tri[ok], ]),
+      weight = as.vector(points$weight[ok] * bary[ok, ]),
+      .block = rep(points$.block[ok], times = 3)
+    )
+
+  data <-
+      dplyr::summarise(
+        dplyr::group_by(data, vertex, .block),
+        weight = sum(weight),
+        .groups = "drop"
+      )
+  coords <- mesh$loc[data$vertex, seq_along(coordnames(points)), drop = FALSE]
+  data <-
+    dplyr::select(
+      data,
+      c(weight, .block)
+    )
+
+  ret <- sp::SpatialPointsDataFrame(coords,
+                                    proj4string = fm_CRS(points),
+                                    data = data,
+                                    match.ID = FALSE
+  )
+  coordnames(ret) <- coordnames(points)
+
+  ret
+}
+
+

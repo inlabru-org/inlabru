@@ -361,7 +361,8 @@ int.slines <- function(data, mesh, .block = NULL, project = TRUE) {
 
   # Project to mesh vertices
   if (project && !is.null(mesh)) {
-    ips <- vertex.projection(ips, mesh, columns = "weight", group = .block)
+#    ips <- vertex.projection(ips, mesh, columns = "weight", group = .block)
+    ips <- fm_vertex_projection(ips, mesh)
   }
 
   ips

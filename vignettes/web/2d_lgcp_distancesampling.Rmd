@@ -192,7 +192,7 @@ The average detection probability within the maximum detection distance is estim
 We can look at the posterior for expected number of dolphins as usual:
 
 ```{r warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-predpts <- ipoints(mexdolphin$ppoly, mexdolphin$mesh)
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda <- predict(fit, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda
 ```
@@ -273,7 +273,7 @@ distdf <- data.frame(distance = seq(0, 8, length = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
 plot(dfun1)
 
-predpts <- ipoints(mexdolphin$ppoly, mexdolphin$mesh)
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda1 <- predict(fit1, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda1
 

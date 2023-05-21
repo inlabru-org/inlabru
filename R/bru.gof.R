@@ -194,7 +194,7 @@ devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, me
     #
 
 
-    wips <- ipoints(samplers)
+    wips <- fm_int(mesh, samplers)
     A <- INLA::inla.spde.make.A(mesh, loc = wips)
 
     weights <- wips$weight

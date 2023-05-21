@@ -147,7 +147,7 @@ if (bru_safe_inla() &&
   # Variance and correlation integrated over space
 
   vm.int <- devel.cvmeasure(pred$joint, pred$field, pred$veg,
-    samplers = ipoints(gorillas$boundary, gorillas$mesh),
+    samplers = fm_int(gorillas$mesh, gorillas$boundary),
     mesh = gorillas$mesh
   )
   vm.int

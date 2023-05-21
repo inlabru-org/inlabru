@@ -91,7 +91,7 @@ test_that("2D LGCP fitting", {
   )
 
   # test_that("2D LGCP fitting: predicted intensity integral", {
-  ips <- ipoints(gorillas$boundary, gorillas$mesh)
+  ips <- fm_int(gorillas$mesh, gorillas$boundary)
   set.seed(123L)
   Lambda <- predict(fit, ips, ~ sum(weight * exp(mySmooth + Intercept)),
     n.samples = 10, seed = 5657L
@@ -109,7 +109,7 @@ test_that("2D LGCP fitting", {
   )
 
   # test_that("Supplying integration points instead of samplers&domains", {
-  ips <- ipoints(gorillas$boundary, gorillas$mesh)
+  ips <- fm_int(gorillas$mesh, gorillas$boundary)
   fit_ips <- lgcp(
     cmp,
     gorillas$nests,

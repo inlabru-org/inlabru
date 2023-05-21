@@ -74,20 +74,13 @@ test_that("SLDF in metres to integration points using grouping parameter", {
 
   data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = FALSE)
-  suppressWarnings(
-    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
-  )
-  # # For rgdal 1.5-23, we had this version
-  #  expect_warning(
-  #    ...,
-  #    "export to PROJ failed: generic error of unknown origin"
-  #  )
+  ips <- fm_int(list(coordinates = mrsea$mesh, season = 1:4),
+                mrsea$samplers)
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(
-    colnames(as.data.frame(ips)),
-    c("weight", "vertex", "season", "x", "y")
-  )
+  expect_true("weight" %in% colnames(as.data.frame(ips)))
+  expect_true("season" %in% colnames(as.data.frame(ips)))
+
   # Should be a factor 1000 relative to the kilometre scale, since both schemes us
   # CRS information to convert to km, but the weight information is in metres here
   expect_equal(sum(ips$weight) / 2293712, 1, tolerance = midtol)
@@ -98,15 +91,13 @@ test_that("SLDF in kilometres to integration points using grouping parameter", {
 
   data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
-  suppressWarnings(
-    ips <- ipoints(mrsea$samplers, mrsea$mesh, group = "season")
-  )
+  ips <- fm_int(list(coordinates = mrsea$mesh, season = 1:4),
+                mrsea$samplers)
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(
-    colnames(data.frame(ips)),
-    c("weight", "vertex", "season", "x", "y", "optional")
-  )
+  expect_true("weight" %in% colnames(as.data.frame(ips)))
+  expect_true("season" %in% colnames(as.data.frame(ips)))
+
   expect_equal(sum(ips$weight) / 2293.712, 1, tolerance = midtol)
 })
 

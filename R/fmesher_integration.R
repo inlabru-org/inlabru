@@ -118,7 +118,7 @@ fm_int.list <- function(domain, samplers = NULL, ...) {
   index_single_samplers <- which(names_lsamplers != "")
   index_multi_samplers <- which(names_lsamplers == "")
   names_samplers <- as.list(names_lsamplers)
-  names_samplers[index_multi_samplers] <- names_list(samplers[index_multi_samplers])
+  names_samplers[index_multi_samplers] <- lapply(samplers[index_multi_samplers], names)
   names_reserved <- c("weight", ".block") # coordinate and geometry is not required here
 
   if (length(intersect(names_domain, names_reserved)) > 0) {
