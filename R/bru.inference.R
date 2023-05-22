@@ -1405,7 +1405,7 @@ predict.bru <- function(object,
   if (!is.null(data)) {
     if (is.null(newdata)) {
       lifecycle::deprecate_soft("2.8.0", "predict(data)", "predict(newdata)",
-                                details = c("Both `data` provided but not `newdata`. Setting `newdata <- data`."))
+                                details = c("`data` provided but not `newdata`. Setting `newdata <- data`."))
       newdata <- data
     } else {
       lifecycle::deprecate_warn("2.8.0", "predict(data)", "predict(newdata)",

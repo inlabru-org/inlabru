@@ -262,7 +262,7 @@ fit1 <- lgcp(comp1, nests,
 
 # Display the model
 int1 <- predict(fit1,
-  data = pixels(mesh, mask = boundary),
+  newdata = pixels(mesh, mask = boundary),
   ~ exp(vegetation + Intercept)
 )
 ggplot() +
@@ -315,7 +315,8 @@ fit2 <- lgcp(comp2, nests,
 
 # Display the model
 int2 <- predict(
-  fit2, pixels(mesh, mask = boundary),
+  fit2,
+  pixels(mesh, mask = boundary),
   ~ exp(elev + mySmooth + Intercept)
 )
 ggplot() +
