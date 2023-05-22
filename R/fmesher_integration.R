@@ -616,6 +616,132 @@ fm_int_inla_mesh.sfc_POINT <- function(samplers,
   ips
 }
 
+
+
+
+
+
+
+
+
+fm_int_inla_mesh_lines <- function(samplers,
+                                   domain,
+                                   name = NULL,
+                                   int.args = NULL,
+                                   .weight = rep(1, NROW(samplers)),
+                                   ...) {
+  project <- identical(int.args$method, "stable")
+
+  weight <- .weight
+  .block <- seq_len(NROW(samplers))
+
+  # Extract start and end coordinates
+  coords <- sf::st_coordinates(samplers)
+  L1 <- coords[, "L1"]
+  L1colidx <- which("L1" == colnames(coords))
+  sp <- do.call(
+    rbind,
+    lapply(
+      unique(coords[, "L1"]),
+      function(k) {
+        x <- coords[coords[, "L1"] == k, , drop = FALSE]
+        x[seq_len(nrow(x) - 1), -L1colidx, drop = FALSE]
+      }
+    )
+  )
+  ep <- do.call(
+    rbind,
+    lapply(
+      unique(coords[, "L1"]),
+      function(k) {
+        x <- coords[coords[, "L1"] == k, , drop = FALSE]
+        x[1L + seq_len(nrow(x) - 1), -L1colidx, drop = FALSE]
+      }
+    )
+  )
+  idx <- do.call(
+    rbind,
+    lapply(
+      unique(coords[, "L1"]),
+      function(k) {
+        rep(k, sum(coords[, "L1"] == k) - 1)
+      }
+    )
+  )
+
+  sampler_crs <- fm_crs(samplers)
+  target_crs <- fm_crs(domain)
+  if (!fm_crs_is_null(sampler_crs) &&
+      fm_crs_is_null(target_crs)) {
+    target_crs <- sampler_crs
+  }
+
+  # Filter out points outside the mesh...
+  sp <- fm_transform(sp, crs = target_crs, crs0 = sampler_crs, passthrough = TRUE)
+  ep <- fm_transform(ep, crs = target_crs, crs0 = sampler_crs, passthrough = TRUE)
+  proj1 <- fm_evaluator(domain, loc = sp, crs = target_crs)
+  proj2 <- fm_evaluator(domain, loc = ep, crs = target_crs)
+  ok <- (proj1$proj$ok & proj2$proj$ok)
+  if (!all(ok)) {
+    warning("Found spatial lines with start or end point ouside of the mesh. Omitting.")
+  }
+  sp <- sp[ok, , drop = FALSE]
+  ep <- ep[ok, , drop = FALSE]
+  idx <- idx[ok, , drop = FALSE]
+
+  # Split at mesh edges
+  line.spl <- split_lines(domain, sp, ep, TRUE)
+  sp <- line.spl$sp
+  ep <- line.spl$ep
+  idx <- idx[line.spl$split.origin, ]
+
+  # At this point, sp and ep are in the target_crs
+
+  # Determine integration points along lines
+
+  if (fm_crs_is_null(sampler_crs)) {
+    ips <- (sp + ep) / 2
+    w <- rowSums((ep - sp)^2)^0.5
+  } else {
+    # Has CRS
+    longlat.crs <- fm_crs("longlat_globe")
+    geocentric.crs <- fm_crs("sphere")
+    sp3d <- fm_transform(sp, crs = geocentric.crs, crs0 = target_crs)
+    ep3d <- fm_transform(ep, crs = geocentric.crs, crs0 = target_crs)
+    mp3d <- (sp3d + ep3d) / rowSums((sp3d + ep3d)^2)^0.5
+
+    ips <- fm_transform(mp3d, crs = target_crs, crs0 = geocentric.crs)
+    w <- sp::spDists(
+      fm_transform(sp3d, crs = longlat.crs, crs0 = geocentric.crs)[, 1:2, drop = FALSE],
+      fm_transform(ep3d, crs = longlat.crs, crs0 = geocentric.crs)[, 1:2, drop = FALSE],
+      diagonal = TRUE, longlat = TRUE
+    )
+  }
+
+  # Wrap everything up and perform projection according to distance and given .block argument
+  ips <- data.frame(ips)
+  d_ips <- ncol(ips)
+  # Temporary names
+  colnames(ips) <- c("x", "y", "z")[seq_len(d_ips)]
+
+  # Weights
+  ips <- cbind(ips, weight = w)
+  ips$weight <- ips$weight * weight[idx]
+  ips$.block <- .block[idx]
+
+  ips <- sf::st_as_sf(as.data.frame(ips),
+                      coords = seq_len(d_ips),
+                      crs = target_crs)
+
+  # Project to mesh vertices
+  if (project) {
+    ips <- fm_vertex_projection(ips, domain)
+  }
+
+  ips
+}
+
+
 #' @export
 #' @describeIn fm_int_inla_mesh `sfc_LINESTRING` integration
 fm_int_inla_mesh.sfc_LINESTRING <- function(samplers,
@@ -624,14 +750,8 @@ fm_int_inla_mesh.sfc_LINESTRING <- function(samplers,
                                             int.args = NULL,
                                             .weight = rep(1, NROW(samplers)),
                                             ...) {
-  samplers <- sf::as_Spatial(samplers)
-  samplers$weight <- .weight
-  ips <- fm_int_inla_mesh(samplers,
-    domain = domain,
-    name = name,
-    int.args = int.args, ...
-  )
-  ips <- sf::st_as_sf(ips)
+  ips <- fm_int_inla_mesh_lines(samplers,domain,name,int.args,.weight,...)
+
   ips <- tibble::as_tibble(ips)
   names(ips)[names(ips) == "geometry"] <- name
   ips <- sf::st_as_sf(ips, sf_column_name = name)

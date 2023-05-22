@@ -1066,9 +1066,9 @@ fm_vertex_projection <- function(points, mesh) {
     points$.block <- rep(1L, NROW(points))
   }
 
-  res <- INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
-  tri <- res$p2m.t
-  bary <- res$p2m.b
+  res <- fm_evaluator(mesh, points)
+  tri <- res$proj$t
+  bary <- res$proj$bary
 
   ok <- tri > 0
   if (any(!ok)) {
@@ -1088,19 +1088,29 @@ fm_vertex_projection <- function(points, mesh) {
       weight = sum(weight),
       .groups = "drop"
     )
-  coords <- mesh$loc[data$vertex, seq_along(coordnames(points)), drop = FALSE]
+  coords <- mesh$loc[data$vertex, , drop = FALSE]
   data <-
     dplyr::select(
       data,
       c(weight, .block)
     )
 
-  ret <- sp::SpatialPointsDataFrame(coords,
-    proj4string = fm_CRS(points),
-    data = data,
-    match.ID = FALSE
-  )
-  coordnames(ret) <- coordnames(points)
+  if (inherits(points, "Spatial")) {
+    ret <- sp::SpatialPointsDataFrame(coords[, seq_along(coordnames(points)), drop = FALSE],
+                                      proj4string = fm_CRS(points),
+                                      data = data,
+                                      match.ID = FALSE
+    )
+    coordnames(ret) <- coordnames(points)
+  } else {
+    colnames(coords) <- c("X", "Y", "Z")[seq_len(ncol(coords))]
+    d <- length(intersect(colnames(sf::st_coordinates(points)), c("X", "Y", "Z")))
+    data <- cbind(tibble::as_tibble(coords[, seq_len(d), drop = FALSE]),
+                  tibble::as_tibble(data))
+    ret <- sf::st_as_sf(data,
+                        coords = seq_len(d),
+                        crs = fm_crs(mesh))
+  }
 
   ret
 }
