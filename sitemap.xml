@@ -124,6 +124,9 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_int_polygon.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_int_polygon_sf.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_like_methods.html</loc>
   </url>
   <url>
@@ -190,6 +193,9 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/devel.cvmeasure.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/eval_in_data_context.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/eval_spatial.html</loc>
   </url>
   <url>
@@ -242,6 +248,18 @@
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_identical_CRS.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_int.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_int_inla_mesh.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_int_multi_sampler.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_pixels.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_transform.html</loc>

@@ -44,7 +44,7 @@ points in the one-dimensional case."><!-- mathjax --><script src="https://cdnjs.
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -190,7 +190,7 @@ without aggregating onto mesh nodes)</p></li>
 points before aggregation. Points per triangle: <code>(nsub2+1)^2</code>.
 Points per knot segment: <code>nsub1</code></p></li>
 <li><p><code>poly_method</code>: if set to "legacy", selects an old polygon integration method
-that doesn't handle holes. Currently only used for debugging purposes.</p></li>
+that doesn't handle holes. Only used for debugging purposes.</p></li>
 </ul></dd>
 
 
@@ -204,7 +204,8 @@ If TRUE, aggregate the integration points to mesh vertices. Default:
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>data.frame</code> or <code>SpatialPointsDataFrame</code> of 1D and 2D integration points, respectively.</p>
+<p>A <code>data.frame</code>, <code>tibble</code>, <code>sf</code>, or <code>SpatialPointsDataFrame</code> of 1D and
+2D integration points, including a <code>weight</code> column and <code>.block</code> column.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -246,7 +246,7 @@ Point process models for spatio-temporal distance sampling data from a large-sca
 <span class="r-in"><span>  <span class="co"># Variance and correlation integrated over space</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">vm.int</span> <span class="op">&lt;-</span> <span class="fu">devel.cvmeasure</span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">joint</span>, <span class="va">pred</span><span class="op">$</span><span class="va">field</span>, <span class="va">pred</span><span class="op">$</span><span class="va">veg</span>,</span></span>
-<span class="r-in"><span>    samplers <span class="op">=</span> <span class="fu"><a href="ipoints.html">ipoints</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    samplers <span class="op">=</span> <span class="fu"><a href="fm_int.html">fm_int</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    mesh <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">vm.int</span></span></span>

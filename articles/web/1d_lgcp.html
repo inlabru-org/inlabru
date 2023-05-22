@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-05-19</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-05-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/1d_lgcp.Rmd" class="external-link"><code>vignettes/web/1d_lgcp.Rmd</code></a></small>
       <div class="d-none name"><code>1d_lgcp.Rmd</code></div>
@@ -271,23 +271,23 @@ a short horizontal blue line, and the observed data as black points:</p>
 by integrating the predicted intensity over <code>x</code>. Integration
 is done by adding up the intensity at locations <code>x</code> weighted
 by a particular weight. The locations <code>x</code> and their weights
-are constructed using the <code>ipoints</code> function</p>
+are constructed using the <code>fm_int</code> function</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ipoints.html">ipoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span><span class="op">)</span>, <span class="fl">100</span>, name <span class="op">=</span> <span class="st">"x"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fm_int.html">fm_int</a></span><span class="op">(</span><span class="va">mesh1D</span>, name <span class="op">=</span> <span class="st">"x"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ips</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       x weight group</span></span>
-<span><span class="co">#&gt; 1 0.275   0.55     1</span></span>
-<span><span class="co">#&gt; 2 0.825   0.55     1</span></span>
-<span><span class="co">#&gt; 3 1.375   0.55     1</span></span>
-<span><span class="co">#&gt; 4 1.925   0.55     1</span></span>
-<span><span class="co">#&gt; 5 2.475   0.55     1</span></span>
-<span><span class="co">#&gt; 6 3.025   0.55     1</span></span>
+<span><span class="co">#&gt;          x    weight .block</span></span>
+<span><span class="co">#&gt; 1 0.000000 0.1870748      1</span></span>
+<span><span class="co">#&gt; 2 1.122449 0.3741497      1</span></span>
+<span><span class="co">#&gt; 3 2.244898 0.3741497      1</span></span>
+<span><span class="co">#&gt; 4 3.367347 0.3741497      1</span></span>
+<span><span class="co">#&gt; 5 4.489796 0.3741497      1</span></span>
+<span><span class="co">#&gt; 6 5.612245 0.3741497      1</span></span>
 <span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit.spde</span>, <span class="va">ips</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">spde1D</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>You can look at the abundance estimate by typing</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 128.8847 11.42507 106.5396 129.3914 152.6102 129.3914        1.142507     0.8827137</span></span></code></pre></div>
+<span><span class="co">#&gt;       mean       sd  q0.025   q0.5   q0.975 median mean.mc_std_err sd.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 128.4944 9.979306 111.721 127.58 148.6362 127.58       0.9979306     0.6625505</span></span></code></pre></div>
 <ul>
 <li>
 <code>mean</code> is the posterior mean abundance.</li>
@@ -323,24 +323,24 @@ to modify <code><a href="https://rdrr.io/r/stats/predict.html" class="external-l
 250, rather than for the posterior mean <code>N</code> alone:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">[</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">100</span><span class="op">:</span><span class="fl">105</span>, <span class="op">]</span></span>
-<span><span class="co">#&gt;      N        mean          sd       q0.025         q0.5     q0.975       median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 51 100 0.004856162 0.007816799 2.829979e-06 0.0009727979 0.02692485 0.0009727979    0.0007816799</span></span>
-<span><span class="co">#&gt; 52 101 0.005514038 0.008476583 4.210168e-06 0.0012499821 0.02908993 0.0012499821    0.0008476583</span></span>
-<span><span class="co">#&gt; 53 102 0.006220162 0.009118870 6.202133e-06 0.0015904005 0.03112098 0.0015904005    0.0009118870</span></span>
-<span><span class="co">#&gt; 54 103 0.006972350 0.009733938 9.047947e-06 0.0020038837 0.03297061 0.0020038837    0.0009733938</span></span>
-<span><span class="co">#&gt; 55 104 0.007767656 0.010312569 1.307276e-05 0.0025005914 0.03459431 0.0025005914    0.0010312569</span></span>
-<span><span class="co">#&gt; 56 105 0.008602401 0.010846346 1.870824e-05 0.0030907035 0.03595228 0.0030907035    0.0010846346</span></span>
+<span><span class="co">#&gt;      N        mean          sd       q0.025        q0.5     q0.975      median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 51 100 0.004095366 0.006120129 2.402284e-06 0.001008126 0.02105065 0.001008126    0.0006120129</span></span>
+<span><span class="co">#&gt; 52 101 0.004694415 0.006621195 3.585791e-06 0.001293593 0.02326396 0.001293593    0.0006621195</span></span>
+<span><span class="co">#&gt; 53 102 0.005355929 0.007181523 5.299924e-06 0.001643641 0.02392893 0.001643641    0.0007181523</span></span>
+<span><span class="co">#&gt; 54 103 0.006079830 0.007786904 7.757472e-06 0.002068159 0.02381650 0.002068159    0.0007786904</span></span>
+<span><span class="co">#&gt; 55 104 0.006864787 0.008421129 1.124547e-05 0.002577329 0.02598176 0.002577329    0.0008421129</span></span>
+<span><span class="co">#&gt; 56 105 0.007708159 0.009067112 1.614664e-05 0.003181301 0.02807472 0.003181301    0.0009067112</span></span>
 <span><span class="co">#&gt;    sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 51  0.0009314446</span></span>
-<span><span class="co">#&gt; 52  0.0009540445</span></span>
-<span><span class="co">#&gt; 53  0.0009661916</span></span>
-<span><span class="co">#&gt; 54  0.0009671946</span></span>
-<span><span class="co">#&gt; 55  0.0009566826</span></span>
-<span><span class="co">#&gt; 56  0.0009346656</span></span></code></pre></div>
+<span><span class="co">#&gt; 51  0.0007552001</span></span>
+<span><span class="co">#&gt; 52  0.0006999267</span></span>
+<span><span class="co">#&gt; 53  0.0006846162</span></span>
+<span><span class="co">#&gt; 54  0.0006921447</span></span>
+<span><span class="co">#&gt; 55  0.0007072714</span></span>
+<span><span class="co">#&gt; 56  0.0007203427</span></span></code></pre></div>
 <p>We compute the 95% prediction interval and the median as follows</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]  99.13436 128.70232 161.20861</span></span></code></pre></div>
+<span><span class="co">#&gt; [1]  99.34906 128.78902 161.77734</span></span></code></pre></div>
 <p>Compare <code>Lambda</code> to <code>Nest</code> by plotting: First
 calculate the posterior conditional on the mean of
 <code>Lambda</code></p>

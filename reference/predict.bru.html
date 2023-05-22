@@ -18,7 +18,7 @@ posterior of the estimated random effects."><!-- mathjax --><script src="https:/
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,7 +98,7 @@ posterior of the estimated random effects.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for bru</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  formula <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n.samples <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">0L</span>,</span>
@@ -107,7 +107,8 @@ posterior of the estimated random effects.</p>
 <span>  include <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  drop <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -117,8 +118,8 @@ posterior of the estimated random effects.</p>
 <dd><p>An object obtained by calling <code><a href="bru.html">bru()</a></code> or <code><a href="lgcp.html">lgcp()</a></code>.</p></dd>
 
 
-<dt>data</dt>
-<dd><p>A data.frame or SpatialPointsDataFrame of covariates needed for
+<dt>newdata</dt>
+<dd><p>A <code>data.frame</code> or <code>SpatialPointsDataFrame</code> of covariates needed for
 the prediction.</p></dd>
 
 
@@ -164,20 +165,24 @@ any components from the inclusion list)</p></dd>
 
 
 <dt>drop</dt>
-<dd><p>logical; If <code>keep=FALSE</code>, <code>data</code> is a <code>Spatial*DataFrame</code>, and the
-prediciton summary has the same number of rows as <code>data</code>, then the output is
+<dd><p>logical; If <code>keep=FALSE</code>, <code>newdata</code> is a <code>Spatial*DataFrame</code>, and the
+prediciton summary has the same number of rows as <code>newdata</code>, then the output is
 a <code>Spatial*DataFrame</code> object. Default <code>FALSE</code>.</p></dd>
 
 
 <dt>...</dt>
 <dd><p>Additional arguments passed on to <code>inla.posterior.sample</code></p></dd>
 
+
+<dt>data</dt>
+<dd><p>Deprecated. Use <code>newdata</code> instead.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>a data.frame or Spatial* object with predicted mean values and other
+<p>a <code>data.frame</code> or <code>Spatial*</code> object with predicted mean values and other
 summary statistics attached.</p>
     </div>
     <div class="section level2">

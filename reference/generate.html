@@ -22,7 +22,7 @@ posterior of the estimated random effects."><!-- mathjax --><script src="https:/
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -106,14 +106,15 @@ posterior of the estimated random effects.</p>
 <span><span class="co"># S3 method for bru</span></span>
 <span><span class="fu">generate</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  formula <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n.samples <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">0L</span>,</span>
 <span>  num.threads <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  include <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -127,7 +128,7 @@ posterior of the estimated random effects.</p>
 <dd><p>additional, unused arguments.</p></dd>
 
 
-<dt>data</dt>
+<dt>newdata</dt>
 <dd><p>A data.frame or SpatialPointsDataFrame of covariates needed for
 sampling.</p></dd>
 
@@ -166,6 +167,11 @@ explicitly excluded)</p></dd>
 predictor expression. The exclusion list is applied to the list
 as determined by the <code>include</code> parameter; Default: NULL (do not remove
 any components from the inclusion list)</p></dd>
+
+
+<dt>data</dt>
+<dd><p>Deprecated. Use <code>newdata</code> instead.
+sampling.</p></dd>
 
 </dl></div>
     <div class="section level2">

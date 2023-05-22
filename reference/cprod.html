@@ -16,7 +16,7 @@ weights attached to it all weights are assumed to be 1."><!-- mathjax --><script
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,13 +92,14 @@ weights attached to it all weights are assumed to be 1.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cprod</span><span class="op">(</span><span class="va">...</span>, na.rm <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cprod</span><span class="op">(</span><span class="va">...</span>, na.rm <span class="op">=</span> <span class="cn">NULL</span>, .blockwise <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>...</dt>
-<dd><p><code>data.frame</code> or <code>SpatialPointsDataFrame</code> objects, each one usually obtained by a call to the <a href="ipoints.html">ipoints</a> function.</p></dd>
+<dd><p><code>data.frame</code>, <code>sf</code>, or <code>SpatialPointsDataFrame</code> objects, each one
+usually obtained by a call to an <code><a href="fm_int.html">fm_int()</a></code> method.</p></dd>
 
 
 <dt>na.rm</dt>
@@ -106,12 +107,20 @@ weights attached to it all weights are assumed to be 1.</p>
 non-overlapping full_join will be removed; if <code>FALSE</code>, set the undefined weights to <code>NA</code>.
 If <code>NULL</code> (default), act as <code>TRUE</code>, but warn if any elements needed removing.</p></dd>
 
+
+<dt>.blockwise</dt>
+<dd><p>logical; if <code>FALSE</code>, computes full tensor product integration.
+If <code>TRUE</code>, computes within-block tensor product integration (used internally
+by <code><a href="fm_int.html">fm_int()</a></code>).
+Default <code>FALSE</code></p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>data.frame</code> or <code>SpatialPointsDataFrame</code> of multidimensional integration points and their weights</p>
+<p>A <code>data.frame</code>, <code>sf</code>, or <code>SpatialPointsDataFrame</code> of multidimensional
+integration points and their weights</p>
     </div>
 
     <div class="section level2">
