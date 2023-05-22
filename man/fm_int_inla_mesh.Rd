@@ -2,7 +2,7 @@
 % Please edit documentation in R/fmesher_integration.R
 \name{fm_int_inla_mesh}
 \alias{fm_int_inla_mesh}
-\alias{fm_int_inla_mesh.NULL}
+\alias{fm_int_inla_mesh_NULL}
 \alias{fm_int_inla_mesh.sf}
 \alias{fm_int_inla_mesh.sfc_POINT}
 \alias{fm_int_inla_mesh.sfc_LINESTRING}
@@ -15,7 +15,7 @@
 \usage{
 fm_int_inla_mesh(samplers, domain, name = NULL, int.args = NULL, ...)
 
-\method{fm_int_inla_mesh}{`NULL`}(samplers, domain, name = NULL, int.args = NULL, ...)
+fm_int_inla_mesh_NULL(samplers, domain, name = NULL, int.args = NULL, ...)
 
 \method{fm_int_inla_mesh}{sf}(samplers, domain, name = NULL, int.args = NULL, ...)
 
@@ -87,8 +87,6 @@ Integration methods for spatial samplers on \code{inla.mesh} meshes.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{fm_int_inla_mesh(`NULL`)}: Full domain integration
-
 \item \code{fm_int_inla_mesh(sf)}: \code{sf} integration
 
 \item \code{fm_int_inla_mesh(sfc_POINT)}: \code{sfc_POINT} integration
@@ -104,6 +102,11 @@ Integration methods for spatial samplers on \code{inla.mesh} meshes.
 \item \code{fm_int_inla_mesh(SpatialLines)}: SpatialLines integration
 
 \item \code{fm_int_inla_mesh(SpatialPolygons)}: SpatialPolygons integration
+
+}}
+\section{Functions}{
+\itemize{
+\item \code{fm_int_inla_mesh_NULL()}: Full domain integration
 
 }}
 \keyword{internal}

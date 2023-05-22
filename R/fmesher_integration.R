@@ -490,16 +490,28 @@ fm_int_inla_mesh <- function(samplers,
                              int.args = NULL,
                              ...) {
   stopifnot(inherits(domain, "inla.mesh"))
+  if (missing(samplers) || is.null(samplers)) {
+    return(
+      fm_int_inla_mesh_NULL(
+        samplers = NULL,
+        domain = domain,
+        name = name,
+        int.args = int.args,
+        ...
+      )
+    )
+  }
   UseMethod("fm_int_inla_mesh")
 }
 
-#' @export
 #' @describeIn fm_int_inla_mesh Full domain integration
-fm_int_inla_mesh.NULL <- function(samplers,
+fm_int_inla_mesh_NULL <- function(samplers,
                                   domain,
                                   name = NULL,
                                   int.args = NULL,
                                   ...) {
+  stopifnot(is.null(samplers))
+
   ipsl <- bru_int_polygon(domain,
     samplers = NULL,
     method = int.args[["method"]],
