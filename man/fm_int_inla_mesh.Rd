@@ -6,9 +6,9 @@
 \alias{fm_int_inla_mesh.sf}
 \alias{fm_int_inla_mesh.sfc_POINT}
 \alias{fm_int_inla_mesh.sfc_LINESTRING}
+\alias{fm_int_inla_mesh.sfc_MULTILINESTRING}
 \alias{fm_int_inla_mesh.sfc_POLYGON}
 \alias{fm_int_inla_mesh.sfc_MULTIPOLYGON}
-\alias{fm_int_inla_mesh.SpatialLines}
 \alias{fm_int_inla_mesh.Spatial}
 \title{Subset integration on a mesh}
 \usage{
@@ -36,6 +36,15 @@ fm_int_inla_mesh_NULL(samplers, domain, name = NULL, int.args = NULL, ...)
   ...
 )
 
+\method{fm_int_inla_mesh}{sfc_MULTILINESTRING}(
+  samplers,
+  domain,
+  name = NULL,
+  int.args = NULL,
+  .weight = rep(1, NROW(samplers)),
+  ...
+)
+
 \method{fm_int_inla_mesh}{sfc_POLYGON}(
   samplers,
   domain,
@@ -53,8 +62,6 @@ fm_int_inla_mesh_NULL(samplers, domain, name = NULL, int.args = NULL, ...)
   .weight = rep(1, NROW(samplers)),
   ...
 )
-
-\method{fm_int_inla_mesh}{SpatialLines}(samplers, domain, name = NULL, int.args = NULL, ...)
 
 \method{fm_int_inla_mesh}{Spatial}(samplers, domain, name = NULL, int.args = NULL, ...)
 }
@@ -90,11 +97,11 @@ Integration methods for spatial samplers on \code{inla.mesh} meshes.
 
 \item \code{fm_int_inla_mesh(sfc_LINESTRING)}: \code{sfc_LINESTRING} integration
 
+\item \code{fm_int_inla_mesh(sfc_MULTILINESTRING)}: \code{sfc_MULTILINESTRING} integration
+
 \item \code{fm_int_inla_mesh(sfc_POLYGON)}: \code{sfc_POLYGON} integration
 
 \item \code{fm_int_inla_mesh(sfc_MULTIPOLYGON)}: \code{sfc_MULTIPOLYGON} integration
-
-\item \code{fm_int_inla_mesh(SpatialLines)}: SpatialLines integration
 
 \item \code{fm_int_inla_mesh(Spatial)}: \code{Spatial} integration
 

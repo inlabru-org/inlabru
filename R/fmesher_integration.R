@@ -637,37 +637,23 @@ fm_int_inla_mesh_lines <- function(samplers,
 
   # Extract start and end coordinates
   coords <- sf::st_coordinates(samplers)
-  L1 <- coords[, "L1"]
-  L1colidx <- which("L1" == colnames(coords))
-  sp <- do.call(
-    rbind,
-    lapply(
-      unique(coords[, "L1"]),
-      function(k) {
-        x <- coords[coords[, "L1"] == k, , drop = FALSE]
-        x[seq_len(nrow(x) - 1), -L1colidx, drop = FALSE]
-      }
-    )
-  )
-  ep <- do.call(
-    rbind,
-    lapply(
-      unique(coords[, "L1"]),
-      function(k) {
-        x <- coords[coords[, "L1"] == k, , drop = FALSE]
-        x[1L + seq_len(nrow(x) - 1), -L1colidx, drop = FALSE]
-      }
-    )
-  )
-  idx <- do.call(
-    rbind,
-    lapply(
-      unique(coords[, "L1"]),
-      function(k) {
-        rep(k, sum(coords[, "L1"] == k) - 1)
-      }
-    )
-  )
+  if ("L2" %in% colnames(coords)) {
+    # MULTILINESTRING
+    feature <- coords[, "L2"]
+    part <- coords[, "L1"]
+    L_idx <- which(colnames(coords) %in% c("L1", "L2"))
+  } else {
+    feature <- coords[, "L1"]
+    part <- rep(1, nrow(coords))
+    L_idx <- which(colnames(coords) %in% "L1")
+  }
+
+  segment <- which((diff(part) > 0) | (diff(feature) > 0))
+  coordnames <- intersect(colnames(coords), c("X", "Y", "Z", "M"))
+
+  sp <- coords[-c(segment, nrow(coords)), coordnames, drop = FALSE]
+  ep <- coords[-c(1L, 1L + segment), coordnames, drop = FALSE]
+  idx <- feature[-c(segment, nrow(coords))]
 
   sampler_crs <- fm_crs(samplers)
   target_crs <- fm_crs(domain)
@@ -687,13 +673,13 @@ fm_int_inla_mesh_lines <- function(samplers,
   }
   sp <- sp[ok, , drop = FALSE]
   ep <- ep[ok, , drop = FALSE]
-  idx <- idx[ok, , drop = FALSE]
+  idx <- idx[ok]
 
   # Split at mesh edges
   line.spl <- split_lines(domain, sp, ep, TRUE)
   sp <- line.spl$sp
   ep <- line.spl$ep
-  idx <- idx[line.spl$split.origin, ]
+  idx <- idx[line.spl$split.origin]
 
   # At this point, sp and ep are in the target_crs
 
@@ -738,6 +724,14 @@ fm_int_inla_mesh_lines <- function(samplers,
     ips <- fm_vertex_projection(ips, domain)
   }
 
+  if (!is.null(name) &&
+      !identical(name, "geometry") &&
+      ("geometry" %in% names(ips))) {
+    ips <- tibble::as_tibble(ips)
+    names(ips)[names(ips) == "geometry"] <- name
+    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  }
+
   ips
 }
 
@@ -752,9 +746,33 @@ fm_int_inla_mesh.sfc_LINESTRING <- function(samplers,
                                             ...) {
   ips <- fm_int_inla_mesh_lines(samplers,domain,name,int.args,.weight,...)
 
-  ips <- tibble::as_tibble(ips)
-  names(ips)[names(ips) == "geometry"] <- name
-  ips <- sf::st_as_sf(ips, sf_column_name = name)
+  if (!is.null(name) &&
+      !identical(name, "geometry") &&
+      ("geometry" %in% names(ips))) {
+    ips <- tibble::as_tibble(ips)
+    names(ips)[names(ips) == "geometry"] <- name
+    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  }
+  ips
+}
+
+#' @export
+#' @describeIn fm_int_inla_mesh `sfc_MULTILINESTRING` integration
+fm_int_inla_mesh.sfc_MULTILINESTRING <- function(samplers,
+                                            domain,
+                                            name = NULL,
+                                            int.args = NULL,
+                                            .weight = rep(1, NROW(samplers)),
+                                            ...) {
+  ips <- fm_int_inla_mesh_lines(samplers,domain,name,int.args,.weight,...)
+
+  if (!is.null(name) &&
+      !identical(name, "geometry") &&
+      ("geometry" %in% names(ips))) {
+    ips <- tibble::as_tibble(ips)
+    names(ips)[names(ips) == "geometry"] <- name
+    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  }
   ips
 }
 
@@ -779,9 +797,11 @@ fm_int_inla_mesh.sfc_POLYGON <- function(samplers,
   ips$weight <- ips$weight * .weight[ips$.block]
   ips$.block <- .block[ips$.block]
 
-  ips <- tibble::as_tibble(ips)
-  names(ips)[names(ips) == "geometry"] <- name
-  ips <- sf::st_as_sf(ips, sf_column_name = name)
+  if (!is.null(name) && !identical(name, "geometry")) {
+    ips <- tibble::as_tibble(ips)
+    names(ips)[names(ips) == "geometry"] <- name
+    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  }
   ips
 }
 
@@ -806,55 +826,16 @@ fm_int_inla_mesh.sfc_MULTIPOLYGON <- function(samplers,
   ips$weight <- ips$weight * .weight[ips$.block]
   ips$.block <- .block[ips$.block]
 
-  ips <- tibble::as_tibble(ips)
-  names(ips)[names(ips) == "geometry"] <- name
-  ips <- sf::st_as_sf(ips, sf_column_name = name)
+  if (!is.null(name) && !identical(name, "geometry")) {
+    ips <- tibble::as_tibble(ips)
+    names(ips)[names(ips) == "geometry"] <- name
+    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  }
   ips
 }
 
 
 
-#' @export
-#' @describeIn fm_int_inla_mesh SpatialLines integration
-fm_int_inla_mesh.SpatialLines <- function(samplers,
-                                          domain,
-                                          name = NULL,
-                                          int.args = NULL,
-                                          ...) {
-  if (!inherits(samplers, "SpatialLinesDataFrame")) {
-    samplers <- SpatialLinesDataFrame(
-      samplers,
-      data = data.frame(
-        weight = rep(1, length(samplers)),
-        .block = seq_len(NROW(samplers))
-      )
-    )
-  }
-
-  # Set weight to 1 if not provided
-  if (!("weight" %in% names(samplers))) {
-    samplers$weight <- 1
-  }
-  if (!(".block" %in% names(samplers))) {
-    samplers$.block <- seq_len(NROW(samplers))
-  }
-
-  ips <- int.slines(
-    samplers,
-    domain,
-    .block = ".block",
-    project = identical(int.args[["method"]], "stable")
-  )
-
-  coord_names <- c("x", "y", "z")
-  if (!is.null(coordnames(samplers))) {
-    coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
-  } else if (!is.null(name)) {
-    coord_names[seq_along(name)] <- name
-  }
-  coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
-  ips
-}
 
 
 
