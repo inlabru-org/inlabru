@@ -8,9 +8,8 @@
 \alias{fm_int_inla_mesh.sfc_LINESTRING}
 \alias{fm_int_inla_mesh.sfc_POLYGON}
 \alias{fm_int_inla_mesh.sfc_MULTIPOLYGON}
-\alias{fm_int_inla_mesh.SpatialPoints}
 \alias{fm_int_inla_mesh.SpatialLines}
-\alias{fm_int_inla_mesh.SpatialPolygons}
+\alias{fm_int_inla_mesh.Spatial}
 \title{Subset integration on a mesh}
 \usage{
 fm_int_inla_mesh(samplers, domain, name = NULL, int.args = NULL, ...)
@@ -55,11 +54,9 @@ fm_int_inla_mesh_NULL(samplers, domain, name = NULL, int.args = NULL, ...)
   ...
 )
 
-\method{fm_int_inla_mesh}{SpatialPoints}(samplers, domain, name = NULL, int.args = NULL, ...)
-
 \method{fm_int_inla_mesh}{SpatialLines}(samplers, domain, name = NULL, int.args = NULL, ...)
 
-\method{fm_int_inla_mesh}{SpatialPolygons}(samplers, domain, name = NULL, int.args = NULL, ...)
+\method{fm_int_inla_mesh}{Spatial}(samplers, domain, name = NULL, int.args = NULL, ...)
 }
 \arguments{
 \item{samplers}{For single domain \code{fm_int} methods, an object specifying one or more
@@ -97,11 +94,9 @@ Integration methods for spatial samplers on \code{inla.mesh} meshes.
 
 \item \code{fm_int_inla_mesh(sfc_MULTIPOLYGON)}: \code{sfc_MULTIPOLYGON} integration
 
-\item \code{fm_int_inla_mesh(SpatialPoints)}: SpatialPoints integration
-
 \item \code{fm_int_inla_mesh(SpatialLines)}: SpatialLines integration
 
-\item \code{fm_int_inla_mesh(SpatialPolygons)}: SpatialPolygons integration
+\item \code{fm_int_inla_mesh(Spatial)}: \code{Spatial} integration
 
 }}
 \section{Functions}{

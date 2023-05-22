@@ -669,35 +669,6 @@ fm_int_inla_mesh.sfc_MULTIPOLYGON <- function(samplers,
 
 
 #' @export
-#' @describeIn fm_int_inla_mesh SpatialPoints integration
-fm_int_inla_mesh.SpatialPoints <- function(samplers,
-                                           domain,
-                                           name = NULL,
-                                           int.args = NULL,
-                                           ...) {
-  if (!inherits(samplers, "SpatialPointsDataFrame")) {
-    # If SpatialPoints are provided convert into SpatialPointsDataFrame and attach weight = 1
-    samplers <- SpatialLinesDataFrame(
-      samplers,
-      data = data.frame(
-        weight = rep(1, length(samplers)),
-        .block <- seq_len(NROW(samplers))
-      )
-    )
-  }
-  if (!("weight" %in% names(samplers))) {
-    samplers$weight <- 1
-  }
-  if (!(".block" %in% names(samplers))) {
-    samplers$.block <- seq_len(NROW(samplers))
-  }
-
-  # TODO: remove points outside the domain
-
-  samplers
-}
-
-#' @export
 #' @describeIn fm_int_inla_mesh SpatialLines integration
 fm_int_inla_mesh.SpatialLines <- function(samplers,
                                           domain,
@@ -739,132 +710,29 @@ fm_int_inla_mesh.SpatialLines <- function(samplers,
   ips
 }
 
+
+
+
 #' @export
-#' @describeIn fm_int_inla_mesh SpatialPolygons integration
-fm_int_inla_mesh.SpatialPolygons <- function(samplers,
-                                             domain,
-                                             name = NULL,
-                                             int.args = NULL,
-                                             ...) {
-  if (!inherits(samplers, "SpatialPolygonsDataFrame")) {
-    samplers <- SpatialPolygonsDataFrame(
-      samplers,
-      data = data.frame(
-        weight = rep(1, length(samplers)),
-        .block = seq_len(NROW(samplers))
-      ),
-      match.ID = FALSE
-    )
-  }
+#' @describeIn fm_int_inla_mesh `Spatial` integration
+fm_int_inla_mesh.Spatial <- function(samplers,
+                                     domain,
+                                     name = NULL,
+                                     int.args = NULL,
+                                     ...) {
+  samplers <- sf::st_as_sf(samplers)
 
-  # Set weight to 1 if not provided
-  if (!("weight" %in% names(samplers))) {
-    samplers$weight <- 1
-  }
-  if (!(".block" %in% names(samplers))) {
-    samplers$.block <- seq_len(NROW(samplers))
-  }
+  ips <-
+    fm_int_inla_mesh(samplers,
+                     domain = domain,
+                     name = name,
+                     int.args = int.args,
+                     ...)
 
-  cnames <- coordnames(samplers)
-  samplers_crs <- fm_CRS(samplers)
+  ips <- as(ips, "Spatial")
 
-  # Convert samplers and domain to equal area CRS
-  if (!fm_crs_is_null(domain$crs)) {
-    samplers <- fm_transform(samplers, crs = fm_crs("+proj=cea +units=km"))
-  }
-
-  if (!fm_crs_is_null(domain$crs)) {
-    domain <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
-  }
-  domain_crs <- fm_crs(domain$crs)
-  domain_crs <- fm_CRS(domain_crs)
-
-  if (identical(int.args[["poly_method"]], "legacy")) {
-    lifecycle::deprecate_stop("2.8.0", I("int.args$poly_method == 'legacy'"))
-  } else {
-    if (!is.null(int.args$use_new) && !int.args$use_new) {
-      # This handles holes
-      poly_segm <- fm_as_inla_mesh_segment(samplers, join = FALSE)
-      poly_segm <- lapply(
-        seq_along(poly_segm),
-        function(k) {
-          segm <- poly_segm[[k]]
-          segm[["grp"]] <- rep(k, NROW(segm[["idx"]]))
-          segm[["is.bnd"]] <- TRUE
-          segm
-        }
-      )
-
-      ips <- bru_int_polygon_old(
-        domain,
-        polylist = poly_segm,
-        method = int.args$method,
-        nsub = int.args$nsub2
-      )
-    } else {
-      ips <- bru_int_polygon(
-        domain,
-        method = int.args$method,
-        nsub = int.args$nsub2,
-        samplers = samplers
-      )
-    }
-  }
-
-  df <- data.frame(
-    weight = ips[, "weight"] * samplers@data[ips$.block, "weight"],
-    .block = samplers@data[ips$.block, ".block", drop = TRUE]
-  )
-  if (is.null(ips$z)) {
-    ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y")],
-      data = df,
-      match.ID = FALSE,
-      proj4string = domain_crs
-    )
-  } else {
-    ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y", "z")],
-      data = df,
-      match.ID = FALSE,
-      proj4string = domain_crs
-    )
-  }
-
-  if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(samplers_crs)) {
-    ips <- fm_transform(ips, crs = samplers_crs)
-  }
-
-  coord_names <- c("x", "y", "z")
-  if (!is.null(samplers) && !is.null(coordnames(samplers))) {
-    coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
-  } else if (!is.null(name)) {
-    coord_names[seq_along(name)] <- name
-  }
-  coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   ips
-}
-
-
-
-## @export
-## @describeIn fm_int_inla_mesh `Spatial` integration
-# fm_int_inla_mesh.Spatial <- function(samplers,
-#                                     domain,
-#                                     name = NULL,
-#                                     int.args = NULL,
-#                                     ...) {
-#  samplers <- sf::st_as_sf(samplers)
-#
-#  ips <-
-#    fm_int_inla_mesh(samplers,
-#                     domain = domain,
-#                     name = name,
-#                     int.args = int.args,
-#                     ...)
-#
-#  ips <- as(ips, "Spatial")
-#
-#  ips
-# }
+ }
 
 #' @export
 #' @describeIn fm_int `inla.mesh` integration. Any sampler class with an
