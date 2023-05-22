@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
   rmarkdown::pdf_document:
 vignette: >
-  %\VignetteIndexEntry{Apptainer}
+  %\VignetteIndexEntry{Installation of INLA and inlabru with Apptainer on HPC}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
