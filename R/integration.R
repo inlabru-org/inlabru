@@ -80,7 +80,7 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 
 # Gaussian quadrature and other integration point constructors
 #
-# Contruct integration points for each of lines defined by the start and end points provided.
+# Construct integration points for each of lines defined by the start and end points provided.
 # The following schemes are available:
 # "equidistant" : Equidistant integration points without boundary. All weights are identical and sum uf to the length of a line.
 # "gaussian": Points and weight according to the Gaussian quadrature rule. Currently only n=1 and n=2 are supported (Exact integration for linear and quadratic functions).
@@ -361,7 +361,7 @@ int.slines <- function(data, mesh, .block = NULL, project = TRUE) {
 
   # Project to mesh vertices
   if (project && !is.null(mesh)) {
-#    ips <- vertex.projection(ips, mesh, columns = "weight", group = .block)
+    #    ips <- vertex.projection(ips, mesh, columns = "weight", group = .block)
     ips <- fm_vertex_projection(ips, mesh)
   }
 
@@ -800,11 +800,11 @@ bru_int_polygon <- function(mesh,
     samplers_crs <- fm_CRS(samplers)
     integ_sp <- sp::SpatialPoints(integ$loc, proj4string = mesh_crs)
     if (!identical(mesh_crs, samplers_crs) &&
-        !fm_crs_is_null(mesh_crs) &&
-        !fm_crs_is_null(samplers_crs)) {
+      !fm_crs_is_null(mesh_crs) &&
+      !fm_crs_is_null(samplers_crs)) {
       integ_sp <- fm_transform(integ_sp,
-                               crs = samplers_crs,
-                               passthrough = TRUE
+        crs = samplers_crs,
+        passthrough = TRUE
       )
     }
 
@@ -890,9 +890,9 @@ bru_int_polygon <- function(mesh,
 #' @keywords internal
 
 bru_int_polygon_sf <- function(mesh,
-                            method = NULL,
-                            samplers = NULL,
-                            ...) {
+                               method = NULL,
+                               samplers = NULL,
+                               ...) {
   method <- match.arg(method, c("stable", "direct"))
 
   ipsl <- list()
@@ -914,14 +914,15 @@ bru_int_polygon_sf <- function(mesh,
     mesh_crs <- fm_crs(mesh)
     samplers_crs <- fm_crs(samplers)
     integ_sf <- sf::st_as_sf(as.data.frame(integ$loc),
-                             coords = seq_len(ncol(integ$loc)),
-                             crs = mesh_crs)
+      coords = seq_len(ncol(integ$loc)),
+      crs = mesh_crs
+    )
     if (!identical(mesh_crs, samplers_crs) &&
-        !fm_crs_is_null(mesh_crs) &&
-        !fm_crs_is_null(samplers_crs)) {
+      !fm_crs_is_null(mesh_crs) &&
+      !fm_crs_is_null(samplers_crs)) {
       integ_sf <- fm_transform(integ_sf,
-                               crs = samplers_crs,
-                               passthrough = TRUE
+        crs = samplers_crs,
+        passthrough = TRUE
       )
     }
 

@@ -18,9 +18,35 @@
 #'
 #' @export
 #' @examples
-#' if (bru_safe_inla()) {
+#' if (bru_safe_inla() && bru_safe_sp()) {
 #'   # Integration on the interval (2, 3.5) with Simpson's rule
-#'   fm_int(INLA::inla.mesh.1d(0:4), samplers = cbind(2, 3.5))
+#'   ips <- fm_int(INLA::inla.mesh.1d(0:4), samplers = cbind(2, 3.5))
+#'   plot(ips)
+#'
+#'   # Create integration points for the two intervals [0,3] and [5,10]
+#'
+#'   ips <- fm_int(
+#'     INLA::inla.mesh.1d(0:10),
+#'     matrix(c(0, 3, 5, 10), nrow = 2, byrow = TRUE)
+#'   )
+#'   plot(ips)
+#'
+#'   # Convert a 1D mesh into integration points
+#'   mesh <- INLA::inla.mesh.1d(seq(0, 10, by = 1))
+#'   ips <- ipoints(mesh, name = "time")
+#'   plot(ips)
+#'
+#'
+#'   if (require("ggplot2", quietly = TRUE)) {
+#'     data("gorillas", package = "inlabru")
+#'     #' Integrate on a 2D mesh with polygon boundary subset
+#'     ips <- fm_int(gorillas$mesh, gorillas$boundary)
+#'     ggplot() +
+#'       gg(gorillas$mesh) +
+#'       gg(gorillas$boundary) +
+#'       gg(ips, aes(size = weight)) +
+#'       scale_size_area()
+#'   }
 #' }
 #'
 fm_int <- function(domain, samplers = NULL, ...) {
@@ -631,7 +657,7 @@ fm_int_inla_mesh.sfc_POLYGON <- function(samplers,
   )
 
   ips$weight <- ips$weight * .weight[ips$.block]
-  ips$.block = .block[ips$.block]
+  ips$.block <- .block[ips$.block]
 
   ips <- tibble::as_tibble(ips)
   names(ips)[names(ips) == "geometry"] <- name
@@ -658,7 +684,7 @@ fm_int_inla_mesh.sfc_MULTIPOLYGON <- function(samplers,
   )
 
   ips$weight <- ips$weight * .weight[ips$.block]
-  ips$.block = .block[ips$.block]
+  ips$.block <- .block[ips$.block]
 
   ips <- tibble::as_tibble(ips)
   names(ips)[names(ips) == "geometry"] <- name
@@ -724,15 +750,16 @@ fm_int_inla_mesh.Spatial <- function(samplers,
 
   ips <-
     fm_int_inla_mesh(samplers,
-                     domain = domain,
-                     name = name,
-                     int.args = int.args,
-                     ...)
+      domain = domain,
+      name = name,
+      int.args = int.args,
+      ...
+    )
 
   ips <- as(ips, "Spatial")
 
   ips
- }
+}
 
 #' @export
 #' @describeIn fm_int `inla.mesh` integration. Any sampler class with an

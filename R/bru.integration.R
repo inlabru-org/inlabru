@@ -123,10 +123,10 @@
 ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
                     project = NULL) {
-#  lifecycle::deprecate_soft("2.8.0",
-#                            "ipoints()",
-#                            "fm_int()",
-#                            details = c("ipoints(samplers, domain) has been replaced by more versatile fm_int(domain, samplers, ...) methods."))
+  #  lifecycle::deprecate_soft("2.8.0",
+  #                            "ipoints()",
+  #                            "fm_int()",
+  #                            details = c("ipoints(samplers, domain) has been replaced by more versatile fm_int(domain, samplers, ...) methods."))
 
   if (!is.null(group)) {
     if (is.null(name) && inherits(domain, "inla.mesh")) {
@@ -134,9 +134,11 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
     domain <- c(list(domain), as.list(as.data.frame(samplers[group]))[group])
     names(domain) <- c(name, group)
-    ips <- fm_int(domain = domain,
-                  samplers = samplers,
-                  int.args = int.args)
+    ips <- fm_int(
+      domain = domain,
+      samplers = samplers,
+      int.args = int.args
+    )
     return(ips)
   }
 
@@ -410,11 +412,11 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     )
 
     coord_names <- c("x", "y", "z")
-#    if (!is.null(coordnames(samplers))) {
-#      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
-#    } else if (!is.null(name)) {
-#      coord_names[seq_along(name)] <- name
-#    }
+    #    if (!is.null(coordnames(samplers))) {
+    #      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
+    #    } else if (!is.null(name)) {
+    #      coord_names[seq_along(name)] <- name
+    #    }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else if (is_2d &&
     (inherits(samplers, c(
@@ -536,11 +538,11 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     coord_names <- c("x", "y", "z")
-#    if (!is.null(coordnames(samplers))) {
-#      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
-#    } else if (!is.null(name)) {
-#      coord_names[seq_along(name)] <- name
-#    }
+    #    if (!is.null(coordnames(samplers))) {
+    #      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
+    #    } else if (!is.null(name)) {
+    #      coord_names[seq_along(name)] <- name
+    #    }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else {
     stop("No integration handling code reached; please notify the package developer.")
@@ -761,9 +763,10 @@ cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
 ipmaker <- function(samplers, domain, dnames,
                     int.args = list(method = "stable", nsub = NULL)) {
   lifecycle::deprecate_soft("2.8.0",
-                            "ipmaker()",
-                            "fm_int()",
-                            details = c("ipmaker(samplers, domain, ...) has been replaced by more versatile fm_int(domain, samplers, ...) methods."))
+    "ipmaker()",
+    "fm_int()",
+    details = c("ipmaker(samplers, domain, ...) has been replaced by more versatile fm_int(domain, samplers, ...) methods.")
+  )
 
   # To allow sf geometry support, should likely change the logic to
   # use the domain specification to determine the type of integration
@@ -883,17 +886,20 @@ vertex.projection <- function(points, mesh, columns = names(points),
     }
   } else {
     fn <- function(X, precomp_t, precomp_bary) {
-      ret <- vertex.projection(X, mesh, columns = columns,
-                               precomp_t = precomp_t,
-                               precomp_bary = precomp_bary)
+      ret <- vertex.projection(X, mesh,
+        columns = columns,
+        precomp_t = precomp_t,
+        precomp_bary = precomp_bary
+      )
       for (g in group) {
         ret[[g]] <- X[[g]][1]
       }
       ret
     }
     res <- INLA::inla.fmesher.smorg(mesh$loc,
-                                    mesh$graph$tv,
-                                    points2mesh = sp::coordinates(points))
+      mesh$graph$tv,
+      points2mesh = sp::coordinates(points)
+    )
     precomp_t <- res$p2m.t
     precomp_bary <- res$p2m.b
     ret <- lapply(
@@ -901,8 +907,9 @@ vertex.projection <- function(points, mesh, columns = names(points),
       function(x) {
         the_subset <- points[[group]] == x
         fn(points[the_subset, , drop = FALSE],
-           precomp_t = precomp_t[the_subset],
-           precomp_bary = precomp_bary[the_subset, , drop = FALSE])
+          precomp_t = precomp_t[the_subset],
+          precomp_bary = precomp_bary[the_subset, , drop = FALSE]
+        )
       }
     )
     ret <- do.call(rbind, ret)
@@ -1076,11 +1083,11 @@ fm_vertex_projection <- function(points, mesh) {
     )
 
   data <-
-      dplyr::summarise(
-        dplyr::group_by(data, vertex, .block),
-        weight = sum(weight),
-        .groups = "drop"
-      )
+    dplyr::summarise(
+      dplyr::group_by(data, vertex, .block),
+      weight = sum(weight),
+      .groups = "drop"
+    )
   coords <- mesh$loc[data$vertex, seq_along(coordnames(points)), drop = FALSE]
   data <-
     dplyr::select(
@@ -1089,13 +1096,11 @@ fm_vertex_projection <- function(points, mesh) {
     )
 
   ret <- sp::SpatialPointsDataFrame(coords,
-                                    proj4string = fm_CRS(points),
-                                    data = data,
-                                    match.ID = FALSE
+    proj4string = fm_CRS(points),
+    data = data,
+    match.ID = FALSE
   )
   coordnames(ret) <- coordnames(points)
 
   ret
 }
-
-

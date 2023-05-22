@@ -82,9 +82,35 @@ associated \code{\link[=fm_int_inla_mesh]{fm_int_inla_mesh()}} method is support
 
 }}
 \examples{
-if (bru_safe_inla()) {
+if (bru_safe_inla() && bru_safe_sp()) {
   # Integration on the interval (2, 3.5) with Simpson's rule
-  fm_int(INLA::inla.mesh.1d(0:4), samplers = cbind(2, 3.5))
+  ips <- fm_int(INLA::inla.mesh.1d(0:4), samplers = cbind(2, 3.5))
+  plot(ips)
+
+  # Create integration points for the two intervals [0,3] and [5,10]
+
+  ips <- fm_int(
+    INLA::inla.mesh.1d(0:10),
+    matrix(c(0, 3, 5, 10), nrow = 2, byrow = TRUE)
+  )
+  plot(ips)
+
+  # Convert a 1D mesh into integration points
+  mesh <- INLA::inla.mesh.1d(seq(0, 10, by = 1))
+  ips <- ipoints(mesh, name = "time")
+  plot(ips)
+
+
+  if (require("ggplot2", quietly = TRUE)) {
+    data("gorillas", package = "inlabru")
+    #' Integrate on a 2D mesh with polygon boundary subset
+    ips <- fm_int(gorillas$mesh, gorillas$boundary)
+    ggplot() +
+      gg(gorillas$mesh) +
+      gg(gorillas$boundary) +
+      gg(ips, aes(size = weight)) +
+      scale_size_area()
+  }
 }
 
 }

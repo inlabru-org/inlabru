@@ -74,8 +74,10 @@ test_that("SLDF in metres to integration points using grouping parameter", {
 
   data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = FALSE)
-  ips <- fm_int(list(coordinates = mrsea$mesh, season = 1:4),
-                mrsea$samplers)
+  ips <- fm_int(
+    list(coordinates = mrsea$mesh, season = 1:4),
+    mrsea$samplers
+  )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_true("weight" %in% colnames(as.data.frame(ips)))
@@ -91,8 +93,10 @@ test_that("SLDF in kilometres to integration points using grouping parameter", {
 
   data(mrsea, package = "inlabru", envir = environment())
   mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
-  ips <- fm_int(list(coordinates = mrsea$mesh, season = 1:4),
-                mrsea$samplers)
+  ips <- fm_int(
+    list(coordinates = mrsea$mesh, season = 1:4),
+    mrsea$samplers
+  )
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_true("weight" %in% colnames(as.data.frame(ips)))

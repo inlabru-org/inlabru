@@ -88,7 +88,7 @@ test_that("2D LGCP modelling on the globe", {
   cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) - 1
 
   expect_equal(
-    sum(ipoints(mesh)$weight),
+    sum(fm_int(mesh)$weight),
     4 * pi
   )
 

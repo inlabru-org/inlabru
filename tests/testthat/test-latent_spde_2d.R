@@ -147,9 +147,13 @@ latent_spde2D_group_testdata <- function() {
   mrsea$samplers <- mrsea$samplers[mrsea$samplers$season %in% c(1, 2), ]
 
   # Integration points
-  ips <- fm_int(domain = list(coordinates = mrsea$mesh,
-                              season = seq_len(2)),
-                samplers = mrsea$samplers)
+  ips <- fm_int(
+    domain = list(
+      coordinates = mrsea$mesh,
+      season = seq_len(2)
+    ),
+    samplers = mrsea$samplers
+  )
 
   # Run the model
   matern <- INLA::inla.spde2.pcmatern(mrsea$mesh,

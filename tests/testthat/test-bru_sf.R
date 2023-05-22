@@ -72,7 +72,8 @@ test_that("sf gorillas lgcp vignette", {
   ips_sf <- fm_int(mesh_sf, gorillas_sf$boundary)
 
   expect_equal(ips_sp$weight, ips_sf$weight,
-               tolerance = 1e-3)
+    tolerance = 1e-3
+  )
 
   fit <- lgcp(
     cmp,

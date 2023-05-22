@@ -588,13 +588,18 @@ complete_coordnames <- function(data_coordnames, ips_coordnames) {
 extended_bind_rows <- function(...) {
   dt <- list(...)
   names_ <- lapply(dt, names)
-  is_sfc_ <- lapply(dt,
-                    function(data)
-                      vapply(data,
-                             function(x) {
-                               inherits(x, "sfc")
-                             },
-                             TRUE))
+  is_sfc_ <- lapply(
+    dt,
+    function(data) {
+      vapply(
+        data,
+        function(x) {
+          inherits(x, "sfc")
+        },
+        TRUE
+      )
+    }
+  )
   sfc_names_ <- unique(unlist(names_)[unlist(is_sfc_)])
 
   for (nm in sfc_names_) {
@@ -611,11 +616,13 @@ extended_bind_rows <- function(...) {
       }
     }
 
-    ncol_ <- vapply(sf_data_idx_,
-                    function(i) {
-                      ncol(sf::st_coordinates(dt[[i]][[nm]]))
-                    },
-                    0L)
+    ncol_ <- vapply(
+      sf_data_idx_,
+      function(i) {
+        ncol(sf::st_coordinates(dt[[i]][[nm]]))
+      },
+      0L
+    )
     if (length(unique(ncol_)) > 0) {
       # Some dimension mismatch
       ncol_max <- max(ncol_)
@@ -624,19 +631,23 @@ extended_bind_rows <- function(...) {
         # Extend columns
         if (nrow(dt[[i]]) > 0) {
           dt[[i]][[nm]] <-
-            sf::st_as_sf(as.data.frame(cbind(
-              sf::st_coordinates(dt[[i]][[nm]]),
-              matrix(0.0, nrow(dt[[i]]), ncol_max - ncol_[[i]])
-            )),
-            coords = seq_len(ncol_max),
-            crs = fm_crs(dt[[i]][[nm]]))$geometry
+            sf::st_as_sf(
+              as.data.frame(cbind(
+                sf::st_coordinates(dt[[i]][[nm]]),
+                matrix(0.0, nrow(dt[[i]]), ncol_max - ncol_[[i]])
+              )),
+              coords = seq_len(ncol_max),
+              crs = fm_crs(dt[[i]][[nm]])
+            )$geometry
         } else {
           dt[[i]][[nm]] <-
-            sf::st_as_sf(as.data.frame(
-              matrix(0.0, 0L, ncol_max)
-            ),
-            coords = seq_len(ncol_max),
-            crs = fm_crs(dt[[i]][[nm]]))$geometry
+            sf::st_as_sf(
+              as.data.frame(
+                matrix(0.0, 0L, ncol_max)
+              ),
+              coords = seq_len(ncol_max),
+              crs = fm_crs(dt[[i]][[nm]])
+            )$geometry
         }
       }
     }
@@ -1405,11 +1416,13 @@ predict.bru <- function(object,
   if (!is.null(data)) {
     if (is.null(newdata)) {
       lifecycle::deprecate_soft("2.8.0", "predict(data)", "predict(newdata)",
-                                details = c("`data` provided but not `newdata`. Setting `newdata <- data`."))
+        details = c("`data` provided but not `newdata`. Setting `newdata <- data`.")
+      )
       newdata <- data
     } else {
       lifecycle::deprecate_warn("2.8.0", "predict(data)", "predict(newdata)",
-                                details = c("Both `newdata` and `data` provided. `data` will be ignored."))
+        details = c("Both `newdata` and `data` provided. `data` will be ignored.")
+      )
     }
     data <- NULL
   }
@@ -1578,11 +1591,13 @@ generate.bru <- function(object,
   if (!is.null(data)) {
     if (is.null(newdata)) {
       lifecycle::deprecate_soft("2.8.0", "generate(data)", "generate(newdata)",
-                                details = c("Both `data` provided but not `newdata`. Setting `newdata <- data`."))
+        details = c("Both `data` provided but not `newdata`. Setting `newdata <- data`.")
+      )
       newdata <- data
     } else {
       lifecycle::deprecate_warn("2.8.0", "generate(data)", "generate(newdata)",
-                                details = c("Both `newdata` and `data` provided. `data` will be ignored."))
+        details = c("Both `newdata` and `data` provided. `data` will be ignored.")
+      )
     }
     data <- NULL
   }

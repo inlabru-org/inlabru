@@ -147,12 +147,12 @@ vertices.inla.mesh <- function(object) {
 #' }
 #'
 pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
-#  lifecycle::deprecate_soft(
-#    "2.8.0",
-#    "pixels()",
-#   "fm_pixels(format = 'sp')",
-#   details = "The fm_pixels() function can generate sf, terra, and sp output."
-# )
+  #  lifecycle::deprecate_soft(
+  #    "2.8.0",
+  #    "pixels()",
+  #   "fm_pixels(format = 'sp')",
+  #   details = "The fm_pixels() function can generate sf, terra, and sp output."
+  # )
   fm_pixels(mesh, nx = nx, ny = ny, mask = mask, format = "sp")
 }
 
@@ -179,8 +179,10 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
 #' \donttest{
 #' if (require(ggplot2, quietly = TRUE)) {
 #'   data("mrsea", package = "inlabru")
-#'   pxl <- fm_pixels(mrsea$mesh, nx = 50, ny = 50, mask = mrsea$boundary,
-#'                    format = "terra")
+#'   pxl <- fm_pixels(mrsea$mesh,
+#'     nx = 50, ny = 50, mask = mrsea$boundary,
+#'     format = "terra"
+#'   )
 #'   ggplot() +
 #'     gg(pxl, fill = "grey", alpha = 0.5) +
 #'     gg(mrsea$mesh)
@@ -188,7 +190,6 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
 #' }
 #'
 fm_pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE,
-
                       format = "sf") {
   format <- match.arg(format, c("sf", "terra", "sp"))
   if (!identical(mesh$manifold, "R2")) {
@@ -323,12 +324,12 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 
 tsplit.inla.mesh <- function(mesh, n = 1) {
-#  lifecycle::deprecate_soft(
-#    "2.8.0",
-#    "tsplit.inla.mesh()",
-#    "fm_subdivide()",
-#    details = "tsplit.inla.mesh(mesh, n) has been replaced by fm_subdivide(mesh, n = 2^n - 1)"
-#  )
+  #  lifecycle::deprecate_soft(
+  #    "2.8.0",
+  #    "tsplit.inla.mesh()",
+  #    "fm_subdivide()",
+  #    details = "tsplit.inla.mesh(mesh, n) has been replaced by fm_subdivide(mesh, n = 2^n - 1)"
+  #  )
 
   p1 <- mesh$loc[mesh$graph$tv[, 1], ]
   p2 <- mesh$loc[mesh$graph$tv[, 2], ]
@@ -345,20 +346,24 @@ tsplit.inla.mesh <- function(mesh, n = 1) {
     }
     n.loc <- nrow(segm$loc)
     n.idx <- nrow(segm$idx)
-    loc <- rbind(segm$loc,
-                 (segm$loc[segm$idx[, 1], ] +
-                    segm$loc[segm$idx[, 2], ]) / 2)
+    loc <- rbind(
+      segm$loc,
+      (segm$loc[segm$idx[, 1], ] +
+        segm$loc[segm$idx[, 2], ]) / 2
+    )
     idx <- rbind(
       cbind(segm$idx[, 1], n.loc + seq_len(n.idx)),
       cbind(n.loc + seq_len(n.idx), segm$idx[, 2])
     )
 
     segm2 <-
-      INLA::inla.mesh.segment(loc = loc,
-                              idx = idx,
-                              grp = c(segm$grp, segm$grp),
-                              is.bnd = segm$is.bnd,
-                              crs = fm_CRS(segm))
+      INLA::inla.mesh.segment(
+        loc = loc,
+        idx = idx,
+        grp = c(segm$grp, segm$grp),
+        is.bnd = segm$is.bnd,
+        crs = fm_CRS(segm)
+      )
 
     segm2
   }
@@ -366,10 +371,12 @@ tsplit.inla.mesh <- function(mesh, n = 1) {
   interior2 <- split.edges(INLA::inla.mesh.interior(mesh)[[1]])
   boundary2 <- split.edges(INLA::inla.mesh.boundary(mesh)[[1]])
 
-  mesh2 <- INLA::inla.mesh.create(loc = tri.loc,
-                                  interior = interior2,
-                                  boundary = boundary2,
-                                  crs = fm_CRS(mesh))
+  mesh2 <- INLA::inla.mesh.create(
+    loc = tri.loc,
+    interior = interior2,
+    boundary = boundary2,
+    crs = fm_CRS(mesh)
+  )
 
   if (n <= 1) {
     return(mesh2)
@@ -398,34 +405,48 @@ fm_subdivide <- function(mesh, n = 1) {
     }
     n.loc <- nrow(segm$loc)
     n.idx <- nrow(segm$idx)
-    loc <- do.call(rbind,
-                   c(list(segm$loc),
-                     lapply(seq_len(n),
-                            function(k) {
-                              (segm$loc[segm$idx[, 1], ] * k / (n + 1) +
-                                 segm$loc[segm$idx[, 2], ] * (n - k + 1) / (n +
-                                                                              1))
-                            })))
-    idx <- do.call(rbind,
-                   c(list(cbind(
-                     segm$idx[, 1], n.loc + seq_len(n.idx)
-                   )),
-                   lapply(
-                     seq_len(n - 1),
-                     function(k) {
-                     cbind(n.loc * k + seq_len(n.idx),
-                           n.loc * (k + 1) + seq_len(n.idx))
-                     }
-                   ),
-                   list(cbind(
-                     n.loc * n + seq_len(n.idx), segm$idx[, 2]
-                   ))))
+    loc <- do.call(
+      rbind,
+      c(
+        list(segm$loc),
+        lapply(
+          seq_len(n),
+          function(k) {
+            (segm$loc[segm$idx[, 1], ] * k / (n + 1) +
+              segm$loc[segm$idx[, 2], ] * (n - k + 1) / (n +
+                1))
+          }
+        )
+      )
+    )
+    idx <- do.call(
+      rbind,
+      c(
+        list(cbind(
+          segm$idx[, 1], n.loc + seq_len(n.idx)
+        )),
+        lapply(
+          seq_len(n - 1),
+          function(k) {
+            cbind(
+              n.loc * k + seq_len(n.idx),
+              n.loc * (k + 1) + seq_len(n.idx)
+            )
+          }
+        ),
+        list(cbind(
+          n.loc * n + seq_len(n.idx), segm$idx[, 2]
+        ))
+      )
+    )
 
     segm2 <-
-      INLA::inla.mesh.segment(loc = loc,
-                              idx = idx,
-                              grp = rep(segm$grp, n + 1),
-                              is.bnd = segm$is.bnd)
+      INLA::inla.mesh.segment(
+        loc = loc,
+        idx = idx,
+        grp = rep(segm$grp, n + 1),
+        is.bnd = segm$is.bnd
+      )
 
     segm2
   }
@@ -435,25 +456,35 @@ fm_subdivide <- function(mesh, n = 1) {
   p3 <- mesh$loc[mesh$graph$tv[, 3], ]
 
   tri.inner.loc <-
-    do.call(rbind,
-            lapply(seq_len(n + 2) - 1,
-                   function(k2) {
-                     do.call(rbind,
-                             lapply(seq_len(n + 2- k2) - 1,
-                                    function(k3) {
-                                      w1 <- (n + 1 - k2 - k3) / (n + 1)
-                                      w2 <- k2 / (n + 1)
-                                      w3 <- k3 / (n + 1)
-                                      p1 * w1 + p2 * w2 + p3 * w3
-                                    }))
-                   }))
+    do.call(
+      rbind,
+      lapply(
+        seq_len(n + 2) - 1,
+        function(k2) {
+          do.call(
+            rbind,
+            lapply(
+              seq_len(n + 2 - k2) - 1,
+              function(k3) {
+                w1 <- (n + 1 - k2 - k3) / (n + 1)
+                w2 <- k2 / (n + 1)
+                w3 <- k3 / (n + 1)
+                p1 * w1 + p2 * w2 + p3 * w3
+              }
+            )
+          )
+        }
+      )
+    )
 
   n.tri <- nrow(p1)
   tri.edges <- INLA::inla.mesh.segment(
     loc = rbind(p1, p2, p3),
-    idx = rbind(cbind(seq_len(n.tri), seq_len(n.tri) + n.tri),
-                cbind(seq_len(n.tri) + n.tri, seq_len(n.tri) + 2 * n.tri),
-                cbind(seq_len(n.tri) + 2 * n.tri, seq_len(n.tri))),
+    idx = rbind(
+      cbind(seq_len(n.tri), seq_len(n.tri) + n.tri),
+      cbind(seq_len(n.tri) + n.tri, seq_len(n.tri) + 2 * n.tri),
+      cbind(seq_len(n.tri) + 2 * n.tri, seq_len(n.tri))
+    ),
     is.bnd = FALSE
   )
 
@@ -469,12 +500,16 @@ fm_subdivide <- function(mesh, n = 1) {
     boundary2$loc <- renorm(boundary2$loc)
   }
 
-  mesh2 <- INLA::inla.mesh.create(loc = tri.inner.loc,
-                                  interior = tri.edges,
-                                  boundary = boundary2,
-                                  refine = list(min.angle = 0,
-                                                max.edge = Inf),
-                                  crs = fm_CRS(mesh))
+  mesh2 <- INLA::inla.mesh.create(
+    loc = tri.inner.loc,
+    interior = tri.edges,
+    boundary = boundary2,
+    refine = list(
+      min.angle = 0,
+      max.edge = Inf
+    ),
+    crs = fm_CRS(mesh)
+  )
 
   mesh2
 }

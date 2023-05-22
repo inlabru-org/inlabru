@@ -28,8 +28,10 @@ Generate \code{terra}, \code{sf}, or \code{sp} lattice locations
 \donttest{
 if (require(ggplot2, quietly = TRUE)) {
   data("mrsea", package = "inlabru")
-  pxl <- fm_pixels(mrsea$mesh, nx = 50, ny = 50, mask = mrsea$boundary,
-                   format = "terra")
+  pxl <- fm_pixels(mrsea$mesh,
+    nx = 50, ny = 50, mask = mrsea$boundary,
+    format = "terra"
+  )
   ggplot() +
     gg(pxl, fill = "grey", alpha = 0.5) +
     gg(mrsea$mesh)

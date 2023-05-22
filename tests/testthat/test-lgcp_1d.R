@@ -64,7 +64,7 @@ test_that("1D LGCP fitting", {
   skip_if_not_installed("sn")
 
   # predicted intensity integral
-  ips <- ipoints(c(0, 55), 100, name = "x")
+  ips <- fm_int(mesh1D, name = "x")
   Lambda <- predict(
     fit,
     ips,
