@@ -191,7 +191,7 @@ fm_cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
 #'
 #'   # Convert a 1D mesh into integration points
 #'   mesh <- INLA::inla.mesh.1d(seq(0, 10, by = 1))
-#'   ips <- ipoints(mesh, name = "time")
+#'   ips <- fm_int(mesh, name = "time")
 #'   plot(ips)
 #'
 #'
@@ -490,7 +490,13 @@ fm_int.inla.mesh.lattice <- function(domain, samplers = NULL, name = "x", ...) {
 
 # inla.mesh.1d integration ####
 
-#' @param int.args A list of integration options
+#' @param int.args List of arguments passed to line and integration methods.
+#' * `method`: "stable" (to aggregate integration weights onto mesh nodes)
+#'   or "direct" (to construct a within triangle/segment integration scheme
+#'   without aggregating onto mesh nodes)
+#' * `nsub1`, `nsub2`: integers controlling the number of internal integration
+#'   points before aggregation. Points per triangle: `(nsub2+1)^2`.
+#'   Points per knot segment: `nsub1`
 #' @export
 #' @describeIn fm_int `inla.mesh.1d` integration. Supported samplers:
 #' * `NULL` for integration over the entire domain;

@@ -39,7 +39,7 @@ if (bru_safe_inla()) {
   ips1 <- fm_int(INLA::inla.mesh.1d(0:20),
                  rbind(c(0, 3), c(3, 8)),
                  name = "myDim")
-  ips2 <- ipoints(domain = c(1, 2, 4), name = "myDiscreteDim")
+  ips2 <- fm_int(domain = c(1, 2, 4), name = "myDiscreteDim")
 
   # Calculate the cross product
   ips <- cprod(ips1, ips2)

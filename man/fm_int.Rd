@@ -45,7 +45,15 @@ a separate tensor product integration subspace.}
 \item{name}{For single-domain methods, the variable name to use for the
 integration points. Default 'x'}
 
-\item{int.args}{A list of integration options}
+\item{int.args}{List of arguments passed to line and integration methods.
+\itemize{
+\item \code{method}: "stable" (to aggregate integration weights onto mesh nodes)
+or "direct" (to construct a within triangle/segment integration scheme
+without aggregating onto mesh nodes)
+\item \code{nsub1}, \code{nsub2}: integers controlling the number of internal integration
+points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
+Points per knot segment: \code{nsub1}
+}}
 }
 \value{
 A \code{data.frame}, \code{tibble}, \code{sf}, or \code{SpatialPointsDataFrame} of 1D and
@@ -97,7 +105,7 @@ if (bru_safe_inla() && bru_safe_sp()) {
 
   # Convert a 1D mesh into integration points
   mesh <- INLA::inla.mesh.1d(seq(0, 10, by = 1))
-  ips <- ipoints(mesh, name = "time")
+  ips <- fm_int(mesh, name = "time")
   plot(ips)
 
 

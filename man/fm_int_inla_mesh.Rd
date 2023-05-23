@@ -98,7 +98,15 @@ of domains}
 \item{name}{For single-domain methods, the variable name to use for the
 integration points. Default 'x'}
 
-\item{int.args}{A list of integration options}
+\item{int.args}{List of arguments passed to line and integration methods.
+\itemize{
+\item \code{method}: "stable" (to aggregate integration weights onto mesh nodes)
+or "direct" (to construct a within triangle/segment integration scheme
+without aggregating onto mesh nodes)
+\item \code{nsub1}, \code{nsub2}: integers controlling the number of internal integration
+points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
+Points per knot segment: \code{nsub1}
+}}
 
 \item{...}{Additional arguments passed on to other methods}
 

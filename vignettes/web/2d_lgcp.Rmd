@@ -179,7 +179,7 @@ Estimating Abundance
 -----------------------------------
 
 Finally, estimate abundance using the `predict` function. As a first step we need an estimate
- for the integrated lambda. The integration `weight` values are contained in the `ipoints`
+ for the integrated lambda. The integration `weight` values are contained in the `fm_int()`
  output. 
  
 
