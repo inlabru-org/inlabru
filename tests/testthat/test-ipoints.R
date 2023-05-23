@@ -69,41 +69,6 @@ test_that("conversion of 2D mesh to integration points", {
   expect_equal(sum(ips$weight), 27.64229, tolerance = lowtol)
 })
 
-test_that("SLDF in metres to integration points using grouping parameter", {
-  local_bru_safe_inla()
-
-  data(mrsea, package = "inlabru", envir = environment())
-  mrsea <- local_mrsea_convert(mrsea, use_km = FALSE)
-  ips <- fm_int(
-    list(coordinates = mrsea$mesh, season = 1:4),
-    mrsea$samplers
-  )
-
-  expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_true("weight" %in% colnames(as.data.frame(ips)))
-  expect_true("season" %in% colnames(as.data.frame(ips)))
-
-  # Should be a factor 1000 relative to the kilometre scale, since both schemes us
-  # CRS information to convert to km, but the weight information is in metres here
-  expect_equal(sum(ips$weight) / 2293712, 1, tolerance = midtol)
-})
-
-test_that("SLDF in kilometres to integration points using grouping parameter", {
-  local_bru_safe_inla()
-
-  data(mrsea, package = "inlabru", envir = environment())
-  mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
-  ips <- fm_int(
-    list(coordinates = mrsea$mesh, season = 1:4),
-    mrsea$samplers
-  )
-
-  expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_true("weight" %in% colnames(as.data.frame(ips)))
-  expect_true("season" %in% colnames(as.data.frame(ips)))
-
-  expect_equal(sum(ips$weight) / 2293.712, 1, tolerance = midtol)
-})
 
 
 test_that("Polygon integration with holes", {

@@ -1,3 +1,161 @@
+#' @title (Blockwise) cross product of integration points
+#'
+#' @description
+#' Calculates the groupwise cross product of integration points in different
+#' dimensions and multiplies their weights accordingly.
+#' If the object defining points in a particular dimension has no
+#' weights attached to it all weights are assumed to be 1.
+#'
+#'
+#' @export
+#' @keywords internal
+#'
+#' @param ... `data.frame`, `sf`, or `SpatialPointsDataFrame` objects, each one
+#' usually obtained by a call to an [fm_int()] method.
+#' @param na.rm logical; if `TRUE`, the rows with weight `NA` from the
+#' non-overlapping full_join will be removed; if `FALSE`, set the undefined weights to `NA`.
+#' If `NULL` (default), act as `TRUE`, but warn if any elements needed removing.
+#' @param .blockwise logical; if `FALSE`, computes full tensor product integration.
+#' If `TRUE`, computes within-block tensor product integration (used internally
+#' by [fm_int()]).
+#' Default `FALSE`
+#' @return A `data.frame`, `sf`, or `SpatialPointsDataFrame` of multidimensional
+#' integration points and their weights
+#'
+#' @examples
+#' \donttest{
+#' # fm_int needs INLA
+#' if (bru_safe_inla()) {
+#'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
+#'   ips1 <- fm_int(INLA::inla.mesh.1d(1:20),
+#'                  rbind(c(0, 3), c(3, 8)),
+#'                  name = "myDim")
+#'   ips2 <- fm_int(domain = c(1, 2, 4), name = "myDiscreteDim")
+#'
+#'   # Calculate the cross product
+#'   ips <- fm_cprod(ips1, ips2)
+#'
+#'   # Plot the integration points
+#'   plot(ips$myDim, ips$myDiscreteDim, cex = 10 * ips$weight)
+#' }
+#' }
+#'
+fm_cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
+  ipl <- list(...)
+
+  # Transform sp to sf
+  # TODO make a test. and give a warning for NA non-overlapping outcome?
+  # check for each element, or on the subset, change only for sp anonymous function on lapply
+  ipl_sp <- vapply(ipl, function(x) inherits(x, "Spatial"), TRUE)
+  ipl[ipl_sp] <- lapply(ipl[ipl_sp], sf::st_as_sf)
+
+  ipl <- ipl[!vapply(ipl, is.null, TRUE)]
+  if (length(ipl) == 0) {
+    return(NULL)
+  }
+
+  if (length(ipl) == 1) {
+    ips <- ipl[[1]]
+  } else {
+    ips1 <- ipl[[1]]
+    if (length(ipl) > 2) {
+      ips2 <- do.call(fm_cprod, ipl[2:length(ipl)])
+    } else {
+      ips2 <- ipl[[2]]
+    }
+    if (!"weight" %in% names(ips1)) {
+      ips1$weight <- 1
+    }
+    if (!"weight" %in% names(ips2)) {
+      ips2$weight <- 1
+    }
+    if (!".block" %in% names(ips1)) {
+      ips1$.block <- seq_len(NROW(ips1))
+    }
+    if (!".block" %in% names(ips2)) {
+      ips2$.block <- seq_len(NROW(ips2))
+    }
+
+    by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
+    if (!.blockwise) {
+      by <- setdiff(by, ".block")
+    }
+
+    # `sf::st_join` performs spatial join/filter; `dplyr::*_join` expects `x` of
+    # class `sf` and `y` of class `data.frame`. The trick `as.tibble(sf_obj)` allows
+    # `dplyr::full_join` and turn it back to `sf` with active geometry as the ips1.
+    # Z <- full_join(as_tibble(X), as_tibble(Y), by = "group")
+    # st_as_sf(Z)
+    # https://stackoverflow.com/questions/64365792/dplyr-full-join-on-geometry-columns-of-sf-objects
+    if (inherits(ips1, c("sf", "sfc")) ||
+        inherits(ips2, c("sf", "sfc"))) {
+      if (length(by) == 0) {
+        ips <-
+          sf::st_as_sf(dplyr::cross_join(
+            tibble::as_tibble(ips1),
+            tibble::as_tibble(ips2)
+          ))
+      } else {
+        ips <-
+          sf::st_as_sf(dplyr::full_join(tibble::as_tibble(ips1),
+                                        tibble::as_tibble(ips2),
+                                        by = by,
+                                        relationship = "many-to-many"
+          ))
+      }
+    } else {
+      # equivalent to base::merge(ips1, ips2, by = by, all = TRUE)
+      if (length(by) == 0) {
+        ips <-
+          dplyr::cross_join(ips1, ips2)
+      } else {
+        ips <-
+          dplyr::full_join(ips1, ips2,
+                           by = by,
+                           relationship = "many-to-many"
+          )
+      }
+    }
+
+    ips$weight <- ips$weight.x * ips$weight.y
+    ips[["weight.x"]] <- NULL
+    ips[["weight.y"]] <- NULL
+    tibble::remove_rownames(ips)
+
+    if (!.blockwise) {
+      ips$.block <- paste0(ips$.block.x, ",", ips$.block.y)
+      ips[[".block.x"]] <- NULL
+      ips[[".block.y"]] <- NULL
+    }
+  }
+  if (any(is.na(ips$weight)) && !isFALSE(na.rm)) {
+    if (is.null(na.rm)) {
+      warning(
+        paste0(
+          "Block information mismatch resulting in NA weights, and 'na.rm' was not supplied.",
+          " These rows will be removed."
+        )
+      )
+    }
+    ips <- na.omit(ips)
+  }
+
+  # TODO Transform back to sp only if they are required. ips is a tibble sf tbl data.frame.
+  # It does not make sense to revert certain indices back after merging. Hence, I revert the entire object back to sp.
+  if (any(ipl_sp)) {
+    ips <- sf::as_Spatial(ips)
+    # WARNING SHOULD BE HERE, MORE FRIENDLY ERROR, METHOD ST_AS_SF
+    # TODO deprecated_soft warning for `sp` presence
+    # lifecycle::deprecate_soft(
+    #   when = "2.7.0",
+    #   what = "inlabru::ipl_sp()", # ipl_sp() does not exist but it does not allow mentioning deprecated function in another package
+    #   details = "Support for `sp` is gradually deprecated in favour of `sf` and `terra`"
+    # )
+  }
+  ips
+}
+
+
 #' @title Multi-domain integration
 #'
 #' @description Construct integration points on tensor product spaces
@@ -92,7 +250,7 @@ fm_int_multi_sampler <- function(domain, samplers, ...) {
       )
     }
   )
-  ips <- do.call(cprod, c(ips_list, list(.blockwise = TRUE)))
+  ips <- do.call(fm_cprod, c(ips_list, list(.blockwise = TRUE)))
 
   if ("weight" %in% names(samplers)) {
     ips$weight <- ips$weight * samplers$weight[ips$.block]
@@ -201,7 +359,7 @@ fm_int.list <- function(domain, samplers = NULL, ...) {
     )
 
 
-  ips <- do.call(cprod, c(
+  ips <- do.call(fm_cprod, c(
     lips_samplers,
     lips_full_domain_samplers,
     list(.blockwise = FALSE)
@@ -503,6 +661,85 @@ fm_int.inla.mesh.1d <- function(domain, samplers = NULL, name = "x", int.args = 
 
 # inla.mesh integration ####
 
+# Project integration points to mesh vertices
+#
+# @export
+# @param points A `SpatialPointsDataFrame`, `sf`, lor `list` object
+# @param mesh An `inla.mesh` object
+# @return `SpatialPointsDataFrame`, `sf`m, or `list` of mesh vertices with
+# projected data attached
+# @importFrom rlang .data
+
+fm_vertex_projection <- function(points, mesh) {
+
+  if (inherits(points, "sf") ||
+      inherits(points, "Spatial")) {
+    n_points <- NROW(points)
+    res <- fm_evaluator(mesh, points)
+  } else {
+    n_points <- NROW(points$loc)
+    res <- fm_evaluator(mesh, points$loc)
+  }
+  tri <- res$proj$t
+  bary <- res$proj$bary
+
+  if (is.null(points$weight)) {
+    points$weight <- rep(1L, n_points)
+  }
+  if (is.null(points$.block)) {
+    points$.block <- rep(1L, n_points)
+  }
+
+  ok <- tri > 0
+  if (any(!ok)) {
+    warning("Some integration points were outside the mesh; check your coordinate systems.")
+  }
+
+  data <-
+    data.frame(
+      .vertex = as.vector(mesh$graph$tv[tri[ok], ]),
+      weight = as.vector(points$weight[ok] * bary[ok, ]),
+      .block = rep(points$.block[ok], times = 3)
+    )
+
+  data <-
+    dplyr::summarise(
+      dplyr::group_by(data, .data$.vertex, .data$.block),
+      weight = sum(.data$weight),
+      .groups = "drop"
+    )
+  coords <- mesh$loc[data$.vertex, , drop = FALSE]
+  data <- dplyr::select(data, c("weight", ".block", ".vertex"))
+
+  if (inherits(points, "Spatial")) {
+    ret <- sp::SpatialPointsDataFrame(
+      coords[, seq_along(coordnames(points)), drop = FALSE],
+      proj4string = fm_CRS(mesh),
+      data = data,
+      match.ID = FALSE
+    )
+    coordnames(ret) <- coordnames(points)
+  } else if (inherits(points, "sf")) {
+    colnames(coords) <- c("X", "Y", "Z")[seq_len(ncol(coords))]
+    d <- length(intersect(colnames(sf::st_coordinates(points)), c("X", "Y", "Z")))
+    data <- cbind(
+      tibble::as_tibble(coords[, seq_len(d), drop = FALSE]),
+      tibble::as_tibble(data)
+    )
+    ret <- sf::st_as_sf(
+      data,
+      coords = seq_len(d),
+      crs = fm_crs(mesh)
+    )
+  } else {
+    colnames(coords) <- c("X", "Y", "Z")[seq_len(ncol(coords))]
+    data$loc <- coords
+    ret <- data
+  }
+
+  ret
+}
+
 #' Subset integration on a mesh
 #'
 #' Integration methods for spatial samplers on `inla.mesh` meshes.
@@ -545,25 +782,19 @@ fm_int_inla_mesh_NULL <- function(samplers,
                                   ...) {
   stopifnot(is.null(samplers))
 
-  ipsl <- bru_int_polygon(domain,
+  ips <- fm_int_inla_mesh_polygon(
+    domain = domain,
     samplers = NULL,
-    method = int.args[["method"]],
-    nsub = int.args$nsub2
+    int.args = int.args
   )
 
-  ips <- sf::st_as_sf(ipsl,
-    coords = intersect(c("x", "y", "z"), names(ipsl)),
-    crs = fm_crs(domain)
-  )
-
-  if (!is.null(name)) {
-    ips <- tibble::as_tibble(ips)
-    names(ips)[names(ips) == "geometry"] <- name
-    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+    ips <- dplyr::rename(ips, "{name}" := "geometry")
   }
 
   # TODO: figure out a way to decide the output format
   ips <- sf::as_Spatial(ips)
+  coordnames(ips) <- c("x", "y", "z")[seq_along(coordnames(ips))]
 
   ips
 }
@@ -630,7 +861,7 @@ fm_int_inla_mesh.sfc_MULTIPOINT <- function(samplers,
                                             .weight = rep(1, NROW(samplers)),
                                             ...) {
   coords <- tibble::as_tibble(sf::st_coordinates(samplers))
-  coords <- dplyr::rename(coords, .block = .data$L1)
+  coords <- dplyr::rename(coords, .block = "L1")
   coords$weight <- .weight[coords$.block]
   ips <- sf::st_as_sf(
     coords,
@@ -641,7 +872,7 @@ fm_int_inla_mesh.sfc_MULTIPOINT <- function(samplers,
   # TODO: remove points outside the domain
 
   if (!is.null(name) && (name != attr(ips, "sf_column"))) {
-    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
+    ips <- dplyr::rename(ips, "{name}" := "geometry")
   }
   ips
 }
@@ -756,7 +987,7 @@ fm_int_inla_mesh_lines <- function(samplers,
   }
 
   if (!is.null(name) && (name != attr(ips, "sf_column"))) {
-    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
+    ips <- dplyr::rename(ips, "{name}" := "geometry")
   }
 
   ips
@@ -774,7 +1005,7 @@ fm_int_inla_mesh.sfc_LINESTRING <- function(samplers,
   ips <- fm_int_inla_mesh_lines(samplers, domain, name, int.args, .weight, ...)
 
   if (!is.null(name) && (name != attr(ips, "sf_column"))) {
-    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
+    ips <- dplyr::rename(ips, "{name}" := "geometry")
   }
 
   ips
@@ -791,11 +1022,210 @@ fm_int_inla_mesh.sfc_MULTILINESTRING <- function(samplers,
   ips <- fm_int_inla_mesh_lines(samplers, domain, name, int.args, .weight, ...)
 
   if (!is.null(name) && (name != attr(ips, "sf_column"))) {
-    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
+    ips <- dplyr::rename(ips, "{name}" := "geometry")
   }
 
   ips
 }
+
+
+
+#' Integration scheme for mesh triangle interiors
+#'
+#' @param mesh Mesh on which to integrate
+#' @param tri_subset Optional triangle index vector for integration on a subset
+#' of the mesh triangles (Default `NULL`)
+#' @param nsub number of subdivision points along each triangle edge, giving
+#'    `(nsub + 1)^2` proto-integration points used to compute
+#'   the vertex weights
+#'   (default `NULL=9`, giving 100 integration points for each triangle)
+#' @return `list` with elements `loc` and `weight` with
+#'   integration points for the mesh
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @keywords internal
+fm_int_inla_mesh_core <- function(mesh, tri_subset = NULL, nsub = NULL) {
+  # Construct a barycentric grid of subdivision triangle midpoints
+  if (is.null(nsub)) {
+    nsub <- 9
+  }
+  stopifnot(nsub >= 0)
+  nB <- (nsub + 1)^2
+
+  nT <- nrow(mesh$graph$tv)
+  if (is.null(tri_subset)) {
+    tri_subset <- seq_len(nT)
+  }
+
+  is_spherical <- identical(mesh$manifold, "S2")
+
+  # Barycentric integration coordinates
+  b <- seq(1 / 3, 1 / 3 + nsub, length = nsub + 1) / (nsub + 1)
+  bb <- as.matrix(expand.grid(b, b))
+  # Points above the diagonal should be reflected into the lower triangle:
+  refl <- rowSums(bb) > 1
+  if (any(refl)) {
+    bb[refl, ] <- cbind(1 - bb[refl, 2], 1 - bb[refl, 1])
+  }
+  # Construct complete barycentric coordinates:
+  barycentric_grid <- cbind(1 - rowSums(bb), bb)
+
+  # Construct integration points
+  loc <- matrix(0.0, length(tri_subset) * nB, ncol(mesh$loc))
+  idx_end <- 0
+  for (tri in tri_subset) {
+    idx_start <- idx_end + 1
+    idx_end <- idx_start + nB - 1
+    loc[seq(idx_start, idx_end, length = nB), ] <-
+      as.matrix(barycentric_grid %*%
+                  mesh$loc[mesh$graph$tv[tri, ], , drop = FALSE])
+  }
+
+  if (is_spherical) {
+    # Normalise
+    radius <- sum(mesh$loc[1, ]^2)^0.5
+    mesh$loc <- mesh$loc / radius
+    loc <- loc / rowSums(loc^2)^0.5
+  }
+
+  # Construct integration weights
+  tri_area <- INLA::inla.mesh.fem(mesh, order = 1)$ta[tri_subset]
+
+  if (is_spherical) {
+    tri_area <- tri_area * radius^2
+    loc <- loc * radius
+  }
+
+  list(
+    loc = loc,
+    weight = rep(tri_area / nB, each = nB)
+  )
+}
+
+
+fm_int_inla_mesh_polygon <- function(samplers,
+                                     domain,
+                                     name = NULL,
+                                     int.args = NULL,
+                                     .weight = rep(1, NROW(samplers)),
+                                     ...) {
+  method <- match.arg(int.args[["method"]], c("stable", "direct"))
+
+  ipsl <- list()
+
+  # Compute direct integration points
+  # TODO: Allow blockwise construction to avoid
+  # overly large temporary coordinate matrices (via tri_subset)
+  integ <- fm_int_inla_mesh_core(domain, nsub = int.args[["nsub2"]])
+
+  # Keep points with positive weights (This should be all,
+  # but if there's a degenerate triangle, this gets rid of it)
+  ok <- (integ$weight > 0)
+  integ$loc <- integ$loc[ok, , drop = FALSE]
+  integ$weight <- integ$weight[ok]
+
+  domain_crs <- fm_crs(domain)
+
+  if (!is.null(samplers)) {
+    samplers_crs <- fm_crs(samplers)
+    integ_sf <- sf::st_as_sf(as.data.frame(integ$loc),
+                             coords = seq_len(ncol(integ$loc)),
+                             crs = domain_crs
+    )
+    if (!identical(domain_crs, samplers_crs) &&
+        !fm_crs_is_null(domain_crs) &&
+        !fm_crs_is_null(samplers_crs)) {
+      integ_sf <- fm_transform(integ_sf,
+                               crs = samplers_crs,
+                               passthrough = TRUE
+      )
+    }
+
+    idx <- sf::st_contains(samplers, integ_sf, sparse = TRUE)
+
+    for (g in seq_along(idx)) {
+      if (length(idx[[g]]) > 0) {
+        integ_ <- list(
+          loc = integ$loc[idx[[g]], , drop = FALSE],
+          weight = integ$weight[idx[[g]]]
+        )
+
+        if (method %in% c("stable")) {
+          # Project integration points and weights to mesh nodes
+          integ_ <- fm_vertex_projection(integ_, domain)
+        }
+
+        if (ncol(integ_$loc) > 2) {
+          ips <- sf::st_as_sf(
+            tibble::tibble(
+              x = integ_$loc[, 1],
+              y = integ_$loc[, 2],
+              z = integ_$loc[, 3],
+              weight = integ_$weight,
+              .block = g
+            ),
+            coords = c("x", "y", "z"),
+            crs = domain_crs
+          )
+        } else {
+          ips <- sf::st_as_sf(
+            tibble::tibble(
+              x = integ_$loc[, 1],
+              y = integ_$loc[, 2],
+              weight = integ_$weight,
+              .block = g
+            ),
+            coords = c("x", "y"),
+            crs = domain_crs
+          )
+        }
+
+        ipsl <- c(ipsl, list(ips))
+      }
+    }
+  } else {
+    if (method %in% c("stable")) {
+      # Project integration points and weights to mesh nodes
+      integ <- fm_vertex_projection(integ, domain)
+    }
+
+    if (ncol(integ$loc) > 2) {
+      ipsl <- list(sf::st_as_sf(
+        tibble::tibble(
+          x = integ$loc[, 1],
+          y = integ$loc[, 2],
+          z = integ$loc[, 3],
+          weight = integ$weight,
+          .block = 1L
+        ),
+        coords = c("x", "y", "z"),
+        crs = domain_crs
+      ))
+    } else {
+      ipsl <- list(sf::st_as_sf(
+        tibble::tibble(
+          x = integ$loc[, 1],
+          y = integ$loc[, 2],
+          weight = integ$weight,
+          .block = 1L
+        ),
+        coords = c("x", "y"),
+        crs = domain_crs
+      ))
+    }
+  }
+
+  ips <- do.call(rbind, ipsl)
+
+  if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+    ips <- dplyr::rename(ips, "{name}" := "geometry")
+  }
+
+  ips
+}
+
+
+
+
 
 #' @export
 #' @describeIn fm_int_inla_mesh `sfc_POLYGON` integration
@@ -808,10 +1238,9 @@ fm_int_inla_mesh.sfc_POLYGON <- function(samplers,
   weight <- .weight
   .block <- seq_len(NROW(samplers))
 
-  ips <- bru_int_polygon_sf(
-    domain,
-    method = int.args$method,
-    nsub = int.args$nsub2,
+  ips <- fm_int_inla_mesh_polygon(
+    domain = domain,
+    int.args = int.args,
     samplers = samplers
   )
 
@@ -819,7 +1248,7 @@ fm_int_inla_mesh.sfc_POLYGON <- function(samplers,
   ips$.block <- .block[ips$.block]
 
   if (!is.null(name) && (name != attr(ips, "sf_column"))) {
-    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
+    ips <- dplyr::rename(ips, "{name}" := "geometry")
   }
 
   ips
@@ -836,10 +1265,9 @@ fm_int_inla_mesh.sfc_MULTIPOLYGON <- function(samplers,
   weight <- .weight
   .block <- seq_len(NROW(samplers))
 
-  ips <- bru_int_polygon_sf(
-    domain,
-    method = int.args$method,
-    nsub = int.args$nsub2,
+  ips <- fm_int_inla_mesh_polygon(
+    domain = domain,
+    int.args = int.args,
     samplers = samplers
   )
 
@@ -847,7 +1275,7 @@ fm_int_inla_mesh.sfc_MULTIPOLYGON <- function(samplers,
   ips$.block <- .block[ips$.block]
 
   if (!is.null(name) && (name != attr(ips, "sf_column"))) {
-    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
+    ips <- dplyr::rename(ips, "{name}" := "geometry")
   }
 
   ips
@@ -887,7 +1315,7 @@ fm_int_inla_mesh.sfc_GEOMETRY <- function(samplers,
   ips <- do.call(dplyr::bind_rows, ips)
 
   if (!is.null(name) && (name != attr(ips, "sf_column"))) {
-    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
+    ips <- dplyr::rename(ips, "{name}" := "geometry")
   }
 
   ips
@@ -919,6 +1347,8 @@ fm_int_inla_mesh.Spatial <- function(samplers,
     )
 
   ips <- as(ips, "Spatial")
+  cnames <- coordnames(ips)
+  coordnames(ips) <- c("x", "y", "z")[seq_along(cnames)]
 
   ips
 }
