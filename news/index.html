@@ -89,6 +89,8 @@
 <li><p>Allow precomputed spatial covariates in the data for point process observations</p></li>
 <li><p>Add <code>edge|int|ext.linewidth</code> arguments to <code>gg.inla.mesh</code> <a href="https://github.com/inlabru-org/inlabru/issues/188" class="external-link">#188</a></p></li>
 <li><p>Rename the <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> and <code><a href="../reference/generate.html">generate()</a></code> <code>data</code> arguments to <code>newdata</code>, for better compatibility with other <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> methods. The old argument name will still be accepted, but give a warning. Code that does not name the <code>data</code> argument is not affected.</p></li>
+<li><p>Add <code><a href="../reference/fm_int.html">fm_int()</a></code> integration methods, replacing the old <code>ipmaker()</code> and <code><a href="../reference/ipoints.html">ipoints()</a></code> methods. Supports <code>sf</code> sampler objects.</p></li>
+<li><p>Add <code><a href="../reference/fm_pixels.html">fm_pixels()</a></code>. <code><a href="../reference/pixels.html">pixels()</a></code> calls <code>fm_pixels(..., format = "sp")</code></p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.7.0" id="inlabru-270">inlabru 2.7.0<a class="anchor" aria-label="anchor" href="#inlabru-270"></a></h2><p class="text-muted">CRAN release: 2022-12-02</p>

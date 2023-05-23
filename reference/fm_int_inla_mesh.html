@@ -100,6 +100,16 @@
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for sfc_MULTIPOINT</span></span>
+<span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span></span>
+<span>  <span class="va">samplers</span>,</span>
+<span>  <span class="va">domain</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  int.args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for sfc_LINESTRING</span></span>
 <span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span></span>
 <span>  <span class="va">samplers</span>,</span>
@@ -131,6 +141,16 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for sfc_MULTIPOLYGON</span></span>
+<span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span></span>
+<span>  <span class="va">samplers</span>,</span>
+<span>  <span class="va">domain</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  int.args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for sfc_GEOMETRY</span></span>
 <span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span></span>
 <span>  <span class="va">samplers</span>,</span>
 <span>  <span class="va">domain</span>,</span>
@@ -185,10 +205,12 @@ integration points. Default 'x'</p></dd>
     
 <ul><li><p><code>fm_int_inla_mesh(sf)</code>: <code>sf</code> integration</p></li>
 <li><p><code>fm_int_inla_mesh(sfc_POINT)</code>: <code>sfc_POINT</code> integration</p></li>
+<li><p><code>fm_int_inla_mesh(sfc_MULTIPOINT)</code>: <code>sfc_MULTIPOINT</code> integration</p></li>
 <li><p><code>fm_int_inla_mesh(sfc_LINESTRING)</code>: <code>sfc_LINESTRING</code> integration</p></li>
 <li><p><code>fm_int_inla_mesh(sfc_MULTILINESTRING)</code>: <code>sfc_MULTILINESTRING</code> integration</p></li>
 <li><p><code>fm_int_inla_mesh(sfc_POLYGON)</code>: <code>sfc_POLYGON</code> integration</p></li>
 <li><p><code>fm_int_inla_mesh(sfc_MULTIPOLYGON)</code>: <code>sfc_MULTIPOLYGON</code> integration</p></li>
+<li><p><code>fm_int_inla_mesh(sfc_GEOMETRY)</code>: <code>sfc_GEOMERY</code> integration</p></li>
 <li><p><code>fm_int_inla_mesh(Spatial)</code>: <code>Spatial</code> integration</p></li>
 </ul></div>
     <div class="section level2">
