@@ -38,7 +38,7 @@
 * Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
   Supports `sf` sampler objects.
   
-* Add `fm_pixels()`. `pixels()` calls `fm_pixels(..., format = "sp")`
+* Add `fm_pixels()` methods for gridded points. `pixels()` calls `fm_pixels(..., format = "sp")`
 
 # inlabru 2.7.0
 
