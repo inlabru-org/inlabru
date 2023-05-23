@@ -1060,6 +1060,7 @@ int <- function(data, values, dims = NULL) {
 # @param points A SpatialPointsDataFrame object
 # @param mesh An inla.mesh object
 # @return SpatialPointsDataFrame of mesh vertices with projected data attached
+# @importFrom rlang .data
 
 fm_vertex_projection <- function(points, mesh) {
   if (is.null(points$.block)) {
@@ -1084,32 +1085,31 @@ fm_vertex_projection <- function(points, mesh) {
 
   data <-
     dplyr::summarise(
-      dplyr::group_by(data, vertex, .block),
-      weight = sum(weight),
+      dplyr::group_by(data, .data$vertex, .data$.block),
+      weight = sum(.data$weight),
       .groups = "drop"
     )
   coords <- mesh$loc[data$vertex, , drop = FALSE]
-  data <-
-    dplyr::select(
-      data,
-      c(weight, .block)
-    )
+  data <- dplyr::select(data, c("weight", ".block"))
 
   if (inherits(points, "Spatial")) {
     ret <- sp::SpatialPointsDataFrame(coords[, seq_along(coordnames(points)), drop = FALSE],
-                                      proj4string = fm_CRS(points),
-                                      data = data,
-                                      match.ID = FALSE
+      proj4string = fm_CRS(points),
+      data = data,
+      match.ID = FALSE
     )
     coordnames(ret) <- coordnames(points)
   } else {
     colnames(coords) <- c("X", "Y", "Z")[seq_len(ncol(coords))]
     d <- length(intersect(colnames(sf::st_coordinates(points)), c("X", "Y", "Z")))
-    data <- cbind(tibble::as_tibble(coords[, seq_len(d), drop = FALSE]),
-                  tibble::as_tibble(data))
+    data <- cbind(
+      tibble::as_tibble(coords[, seq_len(d), drop = FALSE]),
+      tibble::as_tibble(data)
+    )
     ret <- sf::st_as_sf(data,
-                        coords = seq_len(d),
-                        crs = fm_crs(mesh))
+      coords = seq_len(d),
+      crs = fm_crs(mesh)
+    )
   }
 
   ret

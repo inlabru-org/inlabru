@@ -584,7 +584,8 @@ fm_int_inla_mesh.sf <- function(samplers,
     weight <- samplers$weight
   }
 
-  fm_int_inla_mesh(sf::st_geometry(samplers),
+  fm_int_inla_mesh(
+    sf::st_geometry(samplers),
     domain,
     name = name,
     int.args = int.args,
@@ -603,16 +604,45 @@ fm_int_inla_mesh.sfc_POINT <- function(samplers,
                                        int.args = NULL,
                                        .weight = rep(1, NROW(samplers)),
                                        ...) {
+  if (is.null(name)) {
+    name <- "geometry"
+  }
   ips <- tibble::tibble(
-    geometry = samplers,
+    "{name}" := samplers,
     weight = .weight,
     .block = seq_len(NROW(samplers))
   )
-  names(ips)[names(ips) == "geometry"] <- name
   ips <- sf::st_as_sf(ips, sf_column_name = name)
 
   # TODO: remove points outside the domain
 
+  ips
+}
+
+
+#' @export
+#' @describeIn fm_int_inla_mesh `sfc_MULTIPOINT` integration
+#' @importFrom rlang :=
+fm_int_inla_mesh.sfc_MULTIPOINT <- function(samplers,
+                                            domain,
+                                            name = NULL,
+                                            int.args = NULL,
+                                            .weight = rep(1, NROW(samplers)),
+                                            ...) {
+  coords <- tibble::as_tibble(sf::st_coordinates(samplers))
+  coords <- dplyr::rename(coords, .block = .data$L1)
+  coords$weight <- .weight[coords$.block]
+  ips <- sf::st_as_sf(
+    coords,
+    coords = intersect(names(coords), c("X", "Y", "Z", "M")),
+    crs = fm_crs(samplers)
+  )
+
+  # TODO: remove points outside the domain
+
+  if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
+  }
   ips
 }
 
@@ -658,7 +688,7 @@ fm_int_inla_mesh_lines <- function(samplers,
   sampler_crs <- fm_crs(samplers)
   target_crs <- fm_crs(domain)
   if (!fm_crs_is_null(sampler_crs) &&
-      fm_crs_is_null(target_crs)) {
+    fm_crs_is_null(target_crs)) {
     target_crs <- sampler_crs
   }
 
@@ -716,20 +746,17 @@ fm_int_inla_mesh_lines <- function(samplers,
   ips$.block <- .block[idx]
 
   ips <- sf::st_as_sf(as.data.frame(ips),
-                      coords = seq_len(d_ips),
-                      crs = target_crs)
+    coords = seq_len(d_ips),
+    crs = target_crs
+  )
 
   # Project to mesh vertices
   if (project) {
     ips <- fm_vertex_projection(ips, domain)
   }
 
-  if (!is.null(name) &&
-      !identical(name, "geometry") &&
-      ("geometry" %in% names(ips))) {
-    ips <- tibble::as_tibble(ips)
-    names(ips)[names(ips) == "geometry"] <- name
-    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
   }
 
   ips
@@ -744,35 +771,29 @@ fm_int_inla_mesh.sfc_LINESTRING <- function(samplers,
                                             int.args = NULL,
                                             .weight = rep(1, NROW(samplers)),
                                             ...) {
-  ips <- fm_int_inla_mesh_lines(samplers,domain,name,int.args,.weight,...)
+  ips <- fm_int_inla_mesh_lines(samplers, domain, name, int.args, .weight, ...)
 
-  if (!is.null(name) &&
-      !identical(name, "geometry") &&
-      ("geometry" %in% names(ips))) {
-    ips <- tibble::as_tibble(ips)
-    names(ips)[names(ips) == "geometry"] <- name
-    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
   }
+
   ips
 }
 
 #' @export
 #' @describeIn fm_int_inla_mesh `sfc_MULTILINESTRING` integration
 fm_int_inla_mesh.sfc_MULTILINESTRING <- function(samplers,
-                                            domain,
-                                            name = NULL,
-                                            int.args = NULL,
-                                            .weight = rep(1, NROW(samplers)),
-                                            ...) {
-  ips <- fm_int_inla_mesh_lines(samplers,domain,name,int.args,.weight,...)
+                                                 domain,
+                                                 name = NULL,
+                                                 int.args = NULL,
+                                                 .weight = rep(1, NROW(samplers)),
+                                                 ...) {
+  ips <- fm_int_inla_mesh_lines(samplers, domain, name, int.args, .weight, ...)
 
-  if (!is.null(name) &&
-      !identical(name, "geometry") &&
-      ("geometry" %in% names(ips))) {
-    ips <- tibble::as_tibble(ips)
-    names(ips)[names(ips) == "geometry"] <- name
-    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
   }
+
   ips
 }
 
@@ -797,11 +818,10 @@ fm_int_inla_mesh.sfc_POLYGON <- function(samplers,
   ips$weight <- ips$weight * .weight[ips$.block]
   ips$.block <- .block[ips$.block]
 
-  if (!is.null(name) && !identical(name, "geometry")) {
-    ips <- tibble::as_tibble(ips)
-    names(ips)[names(ips) == "geometry"] <- name
-    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
   }
+
   ips
 }
 
@@ -826,13 +846,54 @@ fm_int_inla_mesh.sfc_MULTIPOLYGON <- function(samplers,
   ips$weight <- ips$weight * .weight[ips$.block]
   ips$.block <- .block[ips$.block]
 
-  if (!is.null(name) && !identical(name, "geometry")) {
-    ips <- tibble::as_tibble(ips)
-    names(ips)[names(ips) == "geometry"] <- name
-    ips <- sf::st_as_sf(ips, sf_column_name = name)
+  if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
   }
+
   ips
 }
+
+
+
+#' @export
+#' @describeIn fm_int_inla_mesh `sfc_GEOMERY` integration
+fm_int_inla_mesh.sfc_GEOMETRY <- function(samplers,
+                                          domain,
+                                          name = NULL,
+                                          int.args = NULL,
+                                          .weight = rep(1, NROW(samplers)),
+                                          ...) {
+  geometry_class <- vapply(
+    seq_along(samplers),
+    function(x) {
+      class(samplers[x])[1]
+    },
+    ""
+  )
+  .block <- seq_len(NROW(samplers))
+
+  ips <- list()
+  for (g_class in unique(geometry_class)) {
+    subset <- geometry_class == g_class
+    ips[[g_class]] <-
+      fm_int_inla_mesh(samplers[subset],
+        domain = domain,
+        name = name,
+        int.args = int.args,
+        .weight = .weight[subset]
+      )
+    ips[[g_class]][[".block"]] <- .block[subset][ips[[g_class]][[".block"]]]
+  }
+  ips <- do.call(dplyr::bind_rows, ips)
+
+  if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+    ips <- dplyr::rename(ips, "{name}" := .data$geometry)
+  }
+
+  ips
+}
+
+
 
 
 

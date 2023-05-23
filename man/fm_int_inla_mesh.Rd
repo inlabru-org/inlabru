@@ -5,10 +5,12 @@
 \alias{fm_int_inla_mesh_NULL}
 \alias{fm_int_inla_mesh.sf}
 \alias{fm_int_inla_mesh.sfc_POINT}
+\alias{fm_int_inla_mesh.sfc_MULTIPOINT}
 \alias{fm_int_inla_mesh.sfc_LINESTRING}
 \alias{fm_int_inla_mesh.sfc_MULTILINESTRING}
 \alias{fm_int_inla_mesh.sfc_POLYGON}
 \alias{fm_int_inla_mesh.sfc_MULTIPOLYGON}
+\alias{fm_int_inla_mesh.sfc_GEOMETRY}
 \alias{fm_int_inla_mesh.Spatial}
 \title{Subset integration on a mesh}
 \usage{
@@ -19,6 +21,15 @@ fm_int_inla_mesh_NULL(samplers, domain, name = NULL, int.args = NULL, ...)
 \method{fm_int_inla_mesh}{sf}(samplers, domain, name = NULL, int.args = NULL, ...)
 
 \method{fm_int_inla_mesh}{sfc_POINT}(
+  samplers,
+  domain,
+  name = NULL,
+  int.args = NULL,
+  .weight = rep(1, NROW(samplers)),
+  ...
+)
+
+\method{fm_int_inla_mesh}{sfc_MULTIPOINT}(
   samplers,
   domain,
   name = NULL,
@@ -63,6 +74,15 @@ fm_int_inla_mesh_NULL(samplers, domain, name = NULL, int.args = NULL, ...)
   ...
 )
 
+\method{fm_int_inla_mesh}{sfc_GEOMETRY}(
+  samplers,
+  domain,
+  name = NULL,
+  int.args = NULL,
+  .weight = rep(1, NROW(samplers)),
+  ...
+)
+
 \method{fm_int_inla_mesh}{Spatial}(samplers, domain, name = NULL, int.args = NULL, ...)
 }
 \arguments{
@@ -95,6 +115,8 @@ Integration methods for spatial samplers on \code{inla.mesh} meshes.
 
 \item \code{fm_int_inla_mesh(sfc_POINT)}: \code{sfc_POINT} integration
 
+\item \code{fm_int_inla_mesh(sfc_MULTIPOINT)}: \code{sfc_MULTIPOINT} integration
+
 \item \code{fm_int_inla_mesh(sfc_LINESTRING)}: \code{sfc_LINESTRING} integration
 
 \item \code{fm_int_inla_mesh(sfc_MULTILINESTRING)}: \code{sfc_MULTILINESTRING} integration
@@ -102,6 +124,8 @@ Integration methods for spatial samplers on \code{inla.mesh} meshes.
 \item \code{fm_int_inla_mesh(sfc_POLYGON)}: \code{sfc_POLYGON} integration
 
 \item \code{fm_int_inla_mesh(sfc_MULTIPOLYGON)}: \code{sfc_MULTIPOLYGON} integration
+
+\item \code{fm_int_inla_mesh(sfc_GEOMETRY)}: \code{sfc_GEOMERY} integration
 
 \item \code{fm_int_inla_mesh(Spatial)}: \code{Spatial} integration
 

@@ -34,6 +34,11 @@
   better compatibility with other `predict()` methods.  The old argument name
   will still be accepted, but give a warning.  Code that does not name the `data`
   argument is not affected.
+  
+* Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
+  Supports `sf` sampler objects.
+  
+* Add `fm_pixels()`. `pixels()` calls `fm_pixels(..., format = "sp")`
 
 # inlabru 2.7.0
 
