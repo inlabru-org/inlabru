@@ -83,9 +83,23 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">domain</span>, name <span class="op">=</span> <span class="cn">NULL</span>, int.args <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span></span>
+<span>  <span class="va">samplers</span>,</span>
+<span>  <span class="va">domain</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  int.args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  format <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">fm_int_inla_mesh_NULL</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">domain</span>, name <span class="op">=</span> <span class="cn">NULL</span>, int.args <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">fm_int_inla_mesh_NULL</span><span class="op">(</span></span>
+<span>  <span class="va">samplers</span>,</span>
+<span>  <span class="va">domain</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  int.args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  format <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for sf</span></span>
 <span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">domain</span>, name <span class="op">=</span> <span class="cn">NULL</span>, int.args <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -192,6 +206,12 @@ without aggregating onto mesh nodes)</p></li>
 points before aggregation. Points per triangle: <code>(nsub2+1)^2</code>.
 Points per knot segment: <code>nsub1</code></p></li>
 </ul></dd>
+
+
+<dt>format</dt>
+<dd><p>character; determines the output format, as either "sf"
+(default when the sampler is <code>NULL</code>) or "sp". When <code>NULL</code>, determined by
+the sampler type.</p></dd>
 
 
 <dt>...</dt>
