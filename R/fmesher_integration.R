@@ -751,12 +751,16 @@ fm_vertex_projection <- function(points, mesh) {
 #' Integration methods for spatial samplers on `inla.mesh` meshes.
 #'
 #' @inheritParams fm_int
+#' @param format character; determines the output format, as either "sf"
+#'   (default when the sampler is `NULL`) or "sp". When `NULL`, determined by
+#'   the sampler type.
 #' @export
 #' @keywords internal
 fm_int_inla_mesh <- function(samplers,
                              domain,
                              name = NULL,
                              int.args = NULL,
+                             format = NULL,
                              ...) {
   stopifnot(inherits(domain, "inla.mesh"))
 
@@ -773,11 +777,28 @@ fm_int_inla_mesh <- function(samplers,
         domain = domain,
         name = name,
         int.args = int.args,
+        format = format,
         ...
       )
     )
   }
-  UseMethod("fm_int_inla_mesh")
+
+  ips <- UseMethod("fm_int_inla_mesh")
+
+  if (!is.null(format)) {
+    if ((format == "sf") && !inherits(ips, "sf")) {
+      ips <- sf::st_as_sf(ips)
+      if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+        ips <- dplyr::rename(ips, "{name}" := "geometry")
+      }
+    } else if ((format == "sp") && !inherits(ips, "Spatial")) {
+      ips <- as(ips, "Spatial")
+      cnames <- coordnames(ips)
+      coordnames(ips) <- c("x", "y", "z")[seq_along(cnames)]
+    }
+  }
+
+    ips
 }
 
 #' @describeIn fm_int_inla_mesh Full domain integration
@@ -785,6 +806,7 @@ fm_int_inla_mesh_NULL <- function(samplers,
                                   domain,
                                   name = NULL,
                                   int.args = NULL,
+                                  format = NULL,
                                   ...) {
   stopifnot(is.null(samplers))
 
@@ -798,9 +820,11 @@ fm_int_inla_mesh_NULL <- function(samplers,
     ips <- dplyr::rename(ips, "{name}" := "geometry")
   }
 
-  # TODO: figure out a way to decide the output format
-  ips <- sf::as_Spatial(ips)
-  coordnames(ips) <- c("x", "y", "z")[seq_along(coordnames(ips))]
+  format <- match.arg(format, c("sf", "sp"))
+  if (identical(format, "sp")) {
+    ips <- sf::as_Spatial(ips)
+    coordnames(ips) <- c("x", "y", "z")[seq_along(coordnames(ips))]
+  }
 
   ips
 }

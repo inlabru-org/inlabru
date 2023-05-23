@@ -14,9 +14,23 @@
 \alias{fm_int_inla_mesh.Spatial}
 \title{Subset integration on a mesh}
 \usage{
-fm_int_inla_mesh(samplers, domain, name = NULL, int.args = NULL, ...)
+fm_int_inla_mesh(
+  samplers,
+  domain,
+  name = NULL,
+  int.args = NULL,
+  format = NULL,
+  ...
+)
 
-fm_int_inla_mesh_NULL(samplers, domain, name = NULL, int.args = NULL, ...)
+fm_int_inla_mesh_NULL(
+  samplers,
+  domain,
+  name = NULL,
+  int.args = NULL,
+  format = NULL,
+  ...
+)
 
 \method{fm_int_inla_mesh}{sf}(samplers, domain, name = NULL, int.args = NULL, ...)
 
@@ -107,6 +121,10 @@ without aggregating onto mesh nodes)
 points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
 Points per knot segment: \code{nsub1}
 }}
+
+\item{format}{character; determines the output format, as either "sf"
+(default when the sampler is \code{NULL}) or "sp". When \code{NULL}, determined by
+the sampler type.}
 
 \item{...}{Additional arguments passed on to other methods}
 

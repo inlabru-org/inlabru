@@ -91,13 +91,20 @@ test_that("conversion of SpatialPolygon to integration points when domain is def
   )
 })
 
-test_that("conversion of 2D mesh to integration points", {
+test_that("conversion of whole 2D mesh to integration points", {
   local_bru_safe_inla()
   data(gorillas, package = "inlabru", envir = environment())
-  ips <- fm_int(gorillas$mesh)
+
+  ips <- fm_int(gorillas$mesh, format = "sp")
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
   expect_equal(colnames(as.data.frame(ips)), c("weight", ".block", "x", "y", "z"))
+  expect_equal(sum(ips$weight), 27.64229, tolerance = lowtol)
+
+  ips <- fm_int(gorillas$mesh, format = "sf")
+
+  expect_s3_class(ips, "sf")
+  expect_equal(colnames(as.data.frame(ips)), c("weight", ".block", "geometry"))
   expect_equal(sum(ips$weight), 27.64229, tolerance = lowtol)
 })
 

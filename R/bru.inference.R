@@ -783,7 +783,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
           vapply(
             domain_names, function(x) {
               if (identical(x, "coordinates")) {
-                paste0(x, " = ", x, "(.data.)")
+                paste0(x, " = sp::", x, "(.data.)")
               } else {
                 paste0(x, " = ", x)
               }

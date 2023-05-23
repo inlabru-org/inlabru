@@ -70,7 +70,7 @@ test_that("2D LGCP modelling on the globe", {
     )
   )
 
-  mesh <- INLA::inla.mesh.create(globe = 2)
+  mesh <- INLA::inla.mesh.create(globe = 2, crs = fm_CRS("sphere"))
 
   data <- data.frame(
     Long = seq(-179, 179, length.out = 100),
@@ -79,13 +79,14 @@ test_that("2D LGCP modelling on the globe", {
   coordinates(data) <- c("Long", "Lat")
   proj4string(data) <- fm_CRS("longlat_globe")
   data <- fm_transform(data, crs = fm_CRS("sphere"))
+  data <- sf::st_as_sf(data)
 
   matern <- INLA::inla.spde2.pcmatern(
     mesh,
     prior.range = c(0.1, 0.01),
     prior.sigma = c(0.1, 0.01)
   )
-  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) - 1
+  cmp <- geometry ~ mySmooth(main = geometry, model = matern) - 1
 
   expect_equal(
     sum(fm_int(mesh)$weight),
@@ -96,7 +97,7 @@ test_that("2D LGCP modelling on the globe", {
     cmp,
     data = data,
     family = "cp",
-    domain = list(coordinates = mesh),
+    domain = list(geometry = mesh),
     options = options
   )
 
