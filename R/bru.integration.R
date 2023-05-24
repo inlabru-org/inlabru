@@ -130,7 +130,11 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
   if (!is.null(group)) {
     if (is.null(name) && inherits(domain, "inla.mesh")) {
-      name <- "coordinates"
+      if (inherits(samplers, "sf")) {
+        name <- "geometry"
+      } else {
+        name <- "coordinates"
+      }
     }
     domain <- c(list(domain), as.list(as.data.frame(samplers[group]))[group])
     names(domain) <- c(name, group)
