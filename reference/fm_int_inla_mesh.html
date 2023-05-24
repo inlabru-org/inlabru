@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9009</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,23 +83,9 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span></span>
-<span>  <span class="va">samplers</span>,</span>
-<span>  <span class="va">domain</span>,</span>
-<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  int.args <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  format <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">domain</span>, name <span class="op">=</span> <span class="cn">NULL</span>, int.args <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">fm_int_inla_mesh_NULL</span><span class="op">(</span></span>
-<span>  <span class="va">samplers</span>,</span>
-<span>  <span class="va">domain</span>,</span>
-<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  int.args <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  format <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span>
+<span><span class="fu">fm_int_inla_mesh_NULL</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">domain</span>, name <span class="op">=</span> <span class="cn">NULL</span>, int.args <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for sf</span></span>
 <span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">domain</span>, name <span class="op">=</span> <span class="cn">NULL</span>, int.args <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -175,7 +161,14 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for Spatial</span></span>
-<span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">domain</span>, name <span class="op">=</span> <span class="cn">NULL</span>, int.args <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">fm_int_inla_mesh</span><span class="op">(</span></span>
+<span>  <span class="va">samplers</span>,</span>
+<span>  <span class="va">domain</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  int.args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  format <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -208,12 +201,6 @@ Points per knot segment: <code>nsub1</code></p></li>
 </ul></dd>
 
 
-<dt>format</dt>
-<dd><p>character; determines the output format, as either "sf"
-(default when the sampler is <code>NULL</code>) or "sp". When <code>NULL</code>, determined by
-the sampler type.</p></dd>
-
-
 <dt>...</dt>
 <dd><p>Additional arguments passed on to other methods</p></dd>
 
@@ -222,10 +209,24 @@ the sampler type.</p></dd>
 <dd><p>Optional weight vector for <code>sfc_*</code> integration</p></dd>
 
 
+<dt>format</dt>
+<dd><p>character; determines the output format, as either "sf"
+(default when the sampler is <code>NULL</code>) or "sp". When <code>NULL</code>, determined by
+the sampler type.</p></dd>
+
+
 <dt>.block</dt>
 <dd><p>Optional block grouping vector for <code>sfc_*</code> integration</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>An <code>sf</code> point object with columns <code>weight</code> and <code>.block</code></p>
+
+
+    </div>
     <div class="section level2">
     <h2 id="methods-by-class-">Methods (by class)<a class="anchor" aria-label="anchor" href="#methods-by-class-"></a></h2>
     

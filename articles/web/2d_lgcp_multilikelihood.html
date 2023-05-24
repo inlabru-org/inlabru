@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9009</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,7 @@
                         <h4 data-toc-skip class="author">Fabian E.
 Bachl</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-05-23</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-05-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_multilikelihood.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -239,7 +239,7 @@ improves the accuracy of the posterior distribution estimation.</p>
 <p><img src="2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.7.0.9008</span></span>
+<span><span class="co">#&gt; inlabru version: 2.7.0.9009</span></span>
 <span><span class="co">#&gt; INLA version: 23.05.22</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; Common: main = spde(coordinates)</span></span>
@@ -253,7 +253,7 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.37, Running = 115, Post = 0.106, Total = 117 </span></span>
+<span><span class="co">#&gt;     Pre = 1.31, Running = 105, Post = 0.105, Total = 107 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; Intercept -0.349 1.351     -2.997   -0.349        2.3 -0.349   0</span></span>
@@ -267,7 +267,7 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant mode</span></span>
 <span><span class="co">#&gt; Range for Common     2.977 0.725      1.848    2.877      4.679 2.50</span></span>
 <span><span class="co">#&gt; Stdev for Common     2.062 0.417      1.383    2.013      3.015 1.86</span></span>
-<span><span class="co">#&gt; Range for Difference 1.742 1.148      0.548    1.440      4.806 1.02</span></span>
+<span><span class="co">#&gt; Range for Difference 1.742 1.149      0.548    1.440      4.808 1.02</span></span>
 <span><span class="co">#&gt; Stdev for Difference 0.155 0.079      0.046    0.139      0.347 0.15</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 590.05</span></span>
@@ -283,7 +283,7 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.7.0.9008</span></span>
+<span><span class="co">#&gt; inlabru version: 2.7.0.9009</span></span>
 <span><span class="co">#&gt; INLA version: 23.05.22</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; Common: main = spde(coordinates)</span></span>
@@ -297,7 +297,7 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.05, Running = 18, Post = 0.0942, Total = 19.1 </span></span>
+<span><span class="co">#&gt;     Pre = 1.06, Running = 28.2, Post = 0.117, Total = 29.4 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span></span>
 <span><span class="co">#&gt; Intercept -0.35 1.372     -3.039    -0.35      2.339 -0.35   0</span></span>
@@ -311,7 +311,7 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
 <span><span class="co">#&gt; Range for Common     2.946 0.644      1.902    2.871      4.424 2.547</span></span>
 <span><span class="co">#&gt; Stdev for Common     2.044 0.348      1.458    2.010      2.823 1.894</span></span>
-<span><span class="co">#&gt; Range for Difference 1.526 0.945      0.451    1.290      3.989 0.953</span></span>
+<span><span class="co">#&gt; Range for Difference 1.526 0.945      0.451    1.290      3.991 0.953</span></span>
 <span><span class="co">#&gt; Stdev for Difference 0.164 0.092      0.045    0.145      0.394 0.152</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 588.51</span></span>
