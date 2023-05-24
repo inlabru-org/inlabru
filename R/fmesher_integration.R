@@ -358,7 +358,6 @@ fm_int.list <- function(domain, samplers = NULL, ...) {
       }
     )
 
-
   ips <- do.call(fm_cprod, c(
     lips_samplers,
     lips_full_domain_samplers,
@@ -367,6 +366,8 @@ fm_int.list <- function(domain, samplers = NULL, ...) {
 
   if (any(sp_samplers) && !any(sf_samplers)) {
     ips <- sf::as_Spatial(ips)
+    cnames <- coordnames(ips)
+    coordnames(ips) <- c("x", "y", "z")[seq_along(cnames)]
   }
 
   ips
@@ -1378,7 +1379,7 @@ fm_int.inla.mesh <- function(domain,
     ...
   )
 
-  if (is.null(format) || inherits(samplers, "Spatial")) {
+  if (is.null(format) && inherits(samplers, "Spatial")) {
     format <- "sp"
   }
   if (!is.null(format)) {
