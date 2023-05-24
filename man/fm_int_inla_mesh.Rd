@@ -14,23 +14,9 @@
 \alias{fm_int_inla_mesh.Spatial}
 \title{Subset integration on a mesh}
 \usage{
-fm_int_inla_mesh(
-  samplers,
-  domain,
-  name = NULL,
-  int.args = NULL,
-  format = NULL,
-  ...
-)
+fm_int_inla_mesh(samplers, domain, name = NULL, int.args = NULL, ...)
 
-fm_int_inla_mesh_NULL(
-  samplers,
-  domain,
-  name = NULL,
-  int.args = NULL,
-  format = NULL,
-  ...
-)
+fm_int_inla_mesh_NULL(samplers, domain, name = NULL, int.args = NULL, ...)
 
 \method{fm_int_inla_mesh}{sf}(samplers, domain, name = NULL, int.args = NULL, ...)
 
@@ -97,7 +83,14 @@ fm_int_inla_mesh_NULL(
   ...
 )
 
-\method{fm_int_inla_mesh}{Spatial}(samplers, domain, name = NULL, int.args = NULL, ...)
+\method{fm_int_inla_mesh}{Spatial}(
+  samplers,
+  domain,
+  name = NULL,
+  int.args = NULL,
+  format = NULL,
+  ...
+)
 }
 \arguments{
 \item{samplers}{For single domain \code{fm_int} methods, an object specifying one or more
@@ -122,15 +115,18 @@ points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
 Points per knot segment: \code{nsub1}
 }}
 
-\item{format}{character; determines the output format, as either "sf"
-(default when the sampler is \code{NULL}) or "sp". When \code{NULL}, determined by
-the sampler type.}
-
 \item{...}{Additional arguments passed on to other methods}
 
 \item{.weight}{Optional weight vector for \verb{sfc_*} integration}
 
+\item{format}{character; determines the output format, as either "sf"
+(default when the sampler is \code{NULL}) or "sp". When \code{NULL}, determined by
+the sampler type.}
+
 \item{.block}{Optional block grouping vector for \verb{sfc_*} integration}
+}
+\value{
+An \code{sf} point object with columns \code{weight} and \code{.block}
 }
 \description{
 Integration methods for spatial samplers on \code{inla.mesh} meshes.

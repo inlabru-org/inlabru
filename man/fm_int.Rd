@@ -28,7 +28,14 @@ fm_int(domain, samplers = NULL, ...)
 
 \method{fm_int}{inla.mesh.1d}(domain, samplers = NULL, name = "x", int.args = NULL, ...)
 
-\method{fm_int}{inla.mesh}(domain, samplers = NULL, name = NULL, int.args = NULL, ...)
+\method{fm_int}{inla.mesh}(
+  domain,
+  samplers = NULL,
+  name = NULL,
+  int.args = NULL,
+  format = NULL,
+  ...
+)
 }
 \arguments{
 \item{domain}{Functional space specification; single domain or a named list
@@ -54,6 +61,10 @@ without aggregating onto mesh nodes)
 points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
 Points per knot segment: \code{nsub1}
 }}
+
+\item{format}{character; determines the output format, as either "sf"
+(default when the sampler is \code{NULL}) or "sp". When \code{NULL}, determined by
+the sampler type.}
 }
 \value{
 A \code{data.frame}, \code{tibble}, \code{sf}, or \code{SpatialPointsDataFrame} of 1D and

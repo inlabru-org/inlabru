@@ -372,6 +372,7 @@ bru_options_deprecated <- function(args) {
 }
 
 
+
 #' Additional bru options
 #'
 #' Construct a `bru_options` object including the default and global options,

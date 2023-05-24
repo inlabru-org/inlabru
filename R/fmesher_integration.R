@@ -750,25 +750,16 @@ fm_vertex_projection <- function(points, mesh) {
 #'
 #' Integration methods for spatial samplers on `inla.mesh` meshes.
 #'
+#' @returns An `sf` point object with columns `weight` and `.block`
 #' @inheritParams fm_int
-#' @param format character; determines the output format, as either "sf"
-#'   (default when the sampler is `NULL`) or "sp". When `NULL`, determined by
-#'   the sampler type.
 #' @export
 #' @keywords internal
 fm_int_inla_mesh <- function(samplers,
                              domain,
                              name = NULL,
                              int.args = NULL,
-                             format = NULL,
                              ...) {
   stopifnot(inherits(domain, "inla.mesh"))
-
-  if (identical(int.args[["poly_method"]], "legacy")) {
-    lifecycle::deprecate_stop("2.8.0", I("int.args$poly_method == 'legacy'"))
-  } else if (!is.null(int.args$use_new) && !int.args$use_new) {
-    lifecycle::deprecate_stop("2.8.0", I("int.args$use_new == FALSE"))
-  }
 
   if (missing(samplers) || is.null(samplers)) {
     return(
@@ -777,28 +768,12 @@ fm_int_inla_mesh <- function(samplers,
         domain = domain,
         name = name,
         int.args = int.args,
-        format = format,
         ...
       )
     )
   }
 
-  ips <- UseMethod("fm_int_inla_mesh")
-
-  if (!is.null(format)) {
-    if ((format == "sf") && !inherits(ips, "sf")) {
-      ips <- sf::st_as_sf(ips)
-      if (!is.null(name) && (name != attr(ips, "sf_column"))) {
-        ips <- dplyr::rename(ips, "{name}" := "geometry")
-      }
-    } else if ((format == "sp") && !inherits(ips, "Spatial")) {
-      ips <- as(ips, "Spatial")
-      cnames <- coordnames(ips)
-      coordnames(ips) <- c("x", "y", "z")[seq_along(cnames)]
-    }
-  }
-
-    ips
+  UseMethod("fm_int_inla_mesh")
 }
 
 #' @describeIn fm_int_inla_mesh Full domain integration
@@ -806,7 +781,6 @@ fm_int_inla_mesh_NULL <- function(samplers,
                                   domain,
                                   name = NULL,
                                   int.args = NULL,
-                                  format = NULL,
                                   ...) {
   stopifnot(is.null(samplers))
 
@@ -818,12 +792,6 @@ fm_int_inla_mesh_NULL <- function(samplers,
 
   if (!is.null(name) && (name != attr(ips, "sf_column"))) {
     ips <- dplyr::rename(ips, "{name}" := "geometry")
-  }
-
-  format <- match.arg(format, c("sf", "sp"))
-  if (identical(format, "sp")) {
-    ips <- sf::as_Spatial(ips)
-    coordnames(ips) <- c("x", "y", "z")[seq_along(coordnames(ips))]
   }
 
   ips
@@ -1365,20 +1333,18 @@ fm_int_inla_mesh.Spatial <- function(samplers,
                                      domain,
                                      name = NULL,
                                      int.args = NULL,
+                                     format = NULL,
                                      ...) {
   samplers <- sf::st_as_sf(samplers)
 
   ips <-
-    fm_int_inla_mesh(samplers,
+    fm_int_inla_mesh(
+      samplers,
       domain = domain,
       name = name,
       int.args = int.args,
       ...
     )
-
-  ips <- as(ips, "Spatial")
-  cnames <- coordnames(ips)
-  coordnames(ips) <- c("x", "y", "z")[seq_along(cnames)]
 
   ips
 }
@@ -1386,10 +1352,14 @@ fm_int_inla_mesh.Spatial <- function(samplers,
 #' @export
 #' @describeIn fm_int `inla.mesh` integration. Any sampler class with an
 #' associated [fm_int_inla_mesh()] method is supported.
+#' @param format character; determines the output format, as either "sf"
+#'   (default when the sampler is `NULL`) or "sp". When `NULL`, determined by
+#'   the sampler type.
 fm_int.inla.mesh <- function(domain,
                              samplers = NULL,
                              name = NULL,
                              int.args = NULL,
+                             format = NULL,
                              ...) {
   int.args.default <- list(method = "stable", nsub1 = 30, nsub2 = 9)
   if (is.null(int.args)) {
@@ -1408,5 +1378,21 @@ fm_int.inla.mesh <- function(domain,
     ...
   )
 
-  return(ips)
+  if (is.null(format) || inherits(samplers, "Spatial")) {
+    format <- "sp"
+  }
+  if (!is.null(format)) {
+    if ((format == "sf") && !inherits(ips, "sf")) {
+      ips <- sf::st_as_sf(ips)
+      if (!is.null(name) && (name != attr(ips, "sf_column"))) {
+        ips <- dplyr::rename(ips, "{name}" := attr(ips, "sf_column"))
+      }
+    } else if ((format == "sp") && !inherits(ips, "Spatial")) {
+      ips <- as(ips, "Spatial")
+      cnames <- coordnames(ips)
+      coordnames(ips) <- c("x", "y", "z")[seq_along(cnames)]
+    }
+  }
+
+  ips
 }
