@@ -123,7 +123,7 @@ lambda1 <- predict(fit, ppxl_all, ~ data.frame(season = season, lambda = exp(myS
 ```
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 pl1 <- ggplot() +
-  gg(lambda1, aes(fill = mean)) +
+  gg(as(lambda1,"SpatialPixelsDataFrame"), aes(fill = q0.5)) +
   gg(mrsea$points, size = 0.3) +
   facet_wrap(~season) +
   coord_equal()
