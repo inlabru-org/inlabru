@@ -454,10 +454,14 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     # Only retain points within the samplers
     if (!is.null(samplers) && (length(ret) > 0)) {
       if (inherits(samplers, "inla.mesh")) {
-        proj <- INLA::inla.mesh.project(samplers, points)
-        ret <- ret[proj$ok]
+        proj <- fm_evaluator(samplers, points)
+        ret <- ret[proj$proj$ok]
+      } else if (inherits(samplers, "Spatial")) {
+        ret <- ret[!is.na(sp::over(ret, samplers))]
       } else {
-        ret <- ret[!is.na(over(ret, samplers))]
+        idx <- sf::st_within(sf::st_as_sf(ret), samplers)
+        ok <- vapply(idx, function(x) length(x) > 0, TRUE)
+        ret <- ret[ok]
       }
     }
   } else {
