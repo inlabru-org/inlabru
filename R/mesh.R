@@ -104,9 +104,9 @@ vertices.inla.mesh <- function(object) {
 
   vrt <- data.frame(object$loc)
   if (!is.null(colnames(vrt))) {
-    colnames(vrt) <- c("x", "y", "z")
+    colnames(vrt) <- c("x", "y", "z")[length(colnames(vrt))]
   }
-  if (all(vrt[, 3] == 0)) {
+  if ((length(colnames(vrt)) > 2) && all(vrt[, 3] == 0)) {
     vrt <- vrt[, 1:2]
   }
   vrt <- SpatialPoints(vrt, proj4string = object$crs)
