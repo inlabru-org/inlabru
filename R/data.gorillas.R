@@ -125,12 +125,13 @@ import.gorillas <- function() {
     }
   }
 
-  #' Hack: change CRS units of the covariates to km
+  # Hack: Change CRS units of the covariates to km
   for (nm in names(gcov)) {
     ga <- attributes(gcov[[nm]])$grid
     attributes(ga)$cellcentre.offset <- attributes(ga)$cellcentre.offset / 1000
     attributes(ga)$cellsize <- attributes(ga)$cellsize / 1000
     attributes(gcov[[nm]])$grid <- ga
+    attributes(gcov[[nm]])$bbox <- attributes(gcov[[nm]])$bbox / 1000
     attributes(gcov[[nm]])$proj4string <- crs_km
   }
 
@@ -179,7 +180,9 @@ import.gorillas <- function() {
   pxl <- pixels(gorillas$mesh, mask = FALSE, nx = 220, ny = 180)
   pxl <- fm_transform(pxl, fm_crs(gorillas$gcov[[1]]))
   for (k in names(gorillas$gcov)) {
-    pxl[[k]] <- NA
+    NA_value <- gorillas$gcov[[k]][[1]][1]
+    is.na(NA_value) <- NA
+    pxl[[k]] <- NA_value
     pxl[[k]] <- bru_fill_missing(gorillas$gcov[[k]], pxl, values = pxl[[k]])
   }
   gorillas$gcov <- pxl
@@ -190,13 +193,14 @@ import.gorillas <- function() {
 
 #' @describeIn import.gorillas Convert gorillas to `sf` and `terra` format
 import.gorillas.sf <- function() {
-  warning("Not fully implemented", immediate. = TRUE)
-  gorillas <- import.gorillas()
+  data(gorillas, package = "inlabru", envir = environment())
 
+  gorillas_sf <- list()
   gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
   gorillas_sf$mesh <- gorillas$mesh
   gorillas_sf$boundary <- sf::st_as_sf(gorillas$boundary)
-  gorillas_sf$gcov <- lapply(gorillas$gcov, sf::st_as_sf)
+  gorillas_sf$gcov <- lapply(gorillas$gcov, terra::rast)
+  gorillas_sf$gcov2 <- do.call(c, gorillas_sf$gcov)
   gorillas_sf$plotsample <- lapply(gorillas$plotsample, sf::st_as_sf)
 }
 
