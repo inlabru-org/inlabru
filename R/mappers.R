@@ -1959,9 +1959,10 @@ ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) 
 
 
 #' @export
+#' @details `log` argument (Default `TRUE`) for log scale weight return.
 #' @rdname bru_mapper_methods
-ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...,
-                                          sub_lin = NULL) {
+ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
+                                          log = TRUE,..., sub_lin = NULL) {
   input <- bm_aggregate_input(input,
     state = state,
     allow_log = TRUE, force_log = TRUE
@@ -1993,7 +1994,11 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...,
       x = exp(w_state - shift[input[["block"]]]),
       dims = c(n_out, 1)
     )
-  log(as.vector(values)) + shift
+  if (log){
+    log(as.vector(values)) + shift
+  } else {
+    as.vector(values)*exp(shift)
+  }
 }
 
 

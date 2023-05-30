@@ -156,7 +156,7 @@
 
 \method{ibm_jacobian}{bru_mapper_logsumexp}(mapper, input, state = NULL, ...)
 
-\method{ibm_eval}{bru_mapper_logsumexp}(mapper, input, state = NULL, ..., sub_lin = NULL)
+\method{ibm_eval}{bru_mapper_logsumexp}(mapper, input, state = NULL, log = TRUE, ..., sub_lin = NULL)
 
 \method{ibm_linear}{bru_mapper_logsumexp}(mapper, input, state, ...)
 
@@ -347,6 +347,8 @@ should be a vector of the same length as the \code{state}, or \code{NULL}, with 
 equivalent to all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.
 }
+
+\code{log} argument (Default \code{TRUE}) for log scale weight return.
 
 \itemize{
 \item \code{ibm_jacobian} for \code{bru_mapper_multi} accepts a list with

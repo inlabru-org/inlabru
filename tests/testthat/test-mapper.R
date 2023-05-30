@@ -247,6 +247,11 @@ test_that("logsumexp mapper", {
     tolerance = lowtol
   )
   expect_equal(
+    ibm_eval(mapper, input = input, state = state, log = FALSE),
+    exp(val),
+    tolerance = lowtol
+  )
+  expect_equal(
     ibm_jacobian(mapper, input = input, state = state),
     A,
     tolerance = midtol
@@ -276,6 +281,11 @@ test_that("logsumexp mapper", {
   expect_equal(
     ibm_eval(mapper, input = input, state = state),
     val,
+    tolerance = lowtol
+  )
+  expect_equal(
+    ibm_eval(mapper, input = input, state = state, log = FALSE),
+    exp(val),
     tolerance = lowtol
   )
   expect_equal(
