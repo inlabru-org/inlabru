@@ -2990,7 +2990,10 @@ ibm_jacobian.bru_mapper_mesh_B <- function(mapper, input, ...) {
 
 # pcmatern_B ####
 
+#' @title Make hierarchical mesh basis functions
 #' @export
+#' @keywords internal
+#' @rdname pcmatern_B
 make_hierarchical_mesh_basis <- function(mesh, forward = TRUE) {
   # Construct neighbour matrix in a way that doesn't involve the mesh specifics;
   # only the computational neighbourhood structure:
@@ -3059,6 +3062,9 @@ make_hierarchical_mesh_basis <- function(mesh, forward = TRUE) {
 }
 
 #' @export
+#' @keywords internal
+#' @describeIn pcmatern_B Construct a pcmatern model with basis change
+#' `r lifecycle::badge("experimental")`
 inla.spde2.pcmatern_B <- function(mesh, ..., B) {
   model <- INLA::inla.spde2.pcmatern(mesh, ...)
   model$n.spde <- ncol(B)
