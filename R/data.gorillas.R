@@ -101,19 +101,19 @@ import.gorillas <- function() {
   crs_km <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84 +units=km")
   proj4string(nests) <- crs
 
-  #' Turn the observation window into spatial polygon
+  # Turn the observation window into spatial polygon
   boundary <- spoly(as.data.frame(gorillas$window$bdry[[1]]),
     crs = crs
   )
 
-  #' Build mesh
+  # Build mesh
   bnd <- fm_as_inla_mesh_segment(boundary)
   mesh <- INLA::inla.mesh.2d(
     interior = bnd, max.edge = 222,
     crs = crs
-  ) # ! With higher max.edge we run into various INLA errors/warnings
+  ) # With higher max.edge we run into various INLA errors/warnings
 
-  #' Turn covariates int SpatialGridDataFrame
+  # Turn covariates int SpatialGridDataFrame
   gcov <- list()
   for (nm in names(gorillas.extra)) {
     gcov[[nm]] <- as(gorillas.extra[[nm]], "SpatialGridDataFrame")

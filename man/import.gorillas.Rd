@@ -11,10 +11,6 @@ import.gorillas.sf()
 }
 \value{
 gorilla data
-Turn the observation window into spatial polygon
-Build mesh
-Turn covariates int SpatialGridDataFrame
-Hack: change CRS units of the covariates to km
 }
 \description{
 Gorilla data import
