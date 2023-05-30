@@ -768,14 +768,14 @@ fm_crs.character <- function(x, ..., crsonly = FALSE) {
   predef <- fm_wkt_predef()
   if (x %in% names(predef)) {
     x <- predef[[x]]
-    # Would like nicer proj4string/input display.
-    # Possible approach: sf::st_crs(as(sf::st_crs(x), "CRS"))
-    # Borrowing from the sf::CRS_from_crs code:
-    y <- sf::st_crs(x, ...)
-    x <- y$proj4string
-    if (is.na(x)) {
-      return(y)
-    }
+  }
+  y <- sf::st_crs(x, ...)
+  # Would like nicer proj4string/input display.
+  # Possible approach: sf::st_crs(as(sf::st_crs(x), "CRS"))
+  # Borrowing from the sf::CRS_from_crs code:
+  x <- y$proj4string
+  if (is.na(x) || identical(x, y$input)) {
+    return(y)
   }
   sf::st_crs(x, ...)
 }
