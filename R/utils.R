@@ -563,7 +563,7 @@ bru_fill_missing <- function(data, where, values,
 
   data_crs <- fm_crs(data)
   where_crs <- fm_crs(where)
-  if (!fm_identical_CRS(fm_crs(fm_CRS(data_crs)), fm_crs(fm_CRS(where_crs)))) {
+  if (!fm_identical_CRS(data_crs, where_crs)) {
     warning("'data' and 'where' for spatial infilling have different CRS")
   }
 

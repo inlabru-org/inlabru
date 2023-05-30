@@ -769,6 +769,9 @@ fm_crs.character <- function(x, ..., crsonly = FALSE) {
   if (x %in% names(predef)) {
     x <- predef[[x]]
   }
+  if (identical(x, "")) {
+    x <- NA_character_
+  }
   y <- sf::st_crs(x, ...)
   # Would like nicer proj4string/input display.
   # Possible approach: sf::st_crs(as(sf::st_crs(x), "CRS"))
@@ -800,7 +803,7 @@ fm_crs.SpatVector <- function(x, ..., crsonly = FALSE) {
   if (is.null(tcrs) || is.na(tcrs) || identical(tcrs, "")) {
     fm_crs()
   } else {
-    sf::st_crs(tcrs, ...)
+    fm_crs(tcrs, ...)
   }
 }
 
@@ -811,7 +814,7 @@ fm_crs.SpatRaster <- function(x, ..., crsonly = FALSE) {
   if (is.null(tcrs) || is.na(tcrs) || identical(tcrs, "")) {
     fm_crs()
   } else {
-    sf::st_crs(tcrs, ...)
+    fm_crs(tcrs, ...)
   }
 }
 
