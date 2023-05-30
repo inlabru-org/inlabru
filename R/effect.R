@@ -751,15 +751,16 @@ component_list.list <- function(object,
 
 
 
-#' @description FUNCTION_DESCRIPTION
-#' @param component PARAM_DESCRIPTION
-#' @param lhoods PARAM_DESCRIPTION
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title Equip components with mappers
+#' @description Equip component(s) with mappers for subcomponents that do not
+#' have predefined mappers. When needed, the data in `lhoods` is used to determine
+#' the appropriate mapper(s).
+#' @param component A `component` object
+#' @param lhoods A `bru_like_list` object
+#' @return A `component` object with completed mapper information
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
-#'   # EXAMPLE1
 #' }
 #' }
 #' @rdname add_mappers
@@ -856,6 +857,8 @@ add_mappers.component <- function(component, lhoods, ...) {
 
   component
 }
+
+#' @param components A `component_list` object
 #' @export
 #' @rdname add_mappers
 add_mappers.component_list <- function(components, lhoods, ...) {
