@@ -75,7 +75,7 @@
 \alias{ibm_jacobian.bru_mapper_harmonics}
 \alias{ibm_n.bru_mapper_mesh_B}
 \alias{ibm_values.bru_mapper_mesh_B}
-\alias{ibm_amatrix.bru_mapper_mesh_B}
+\alias{ibm_jacobian.bru_mapper_mesh_B}
 \title{Methods for bru_mapper objects}
 \usage{
 \method{ibm_n}{bru_mapper_inla_mesh_2d}(mapper, ...)
@@ -248,7 +248,7 @@
 
 \method{ibm_values}{bru_mapper_mesh_B}(mapper, ...)
 
-\method{ibm_amatrix}{bru_mapper_mesh_B}(mapper, input, ...)
+\method{ibm_jacobian}{bru_mapper_mesh_B}(mapper, input, ...)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
