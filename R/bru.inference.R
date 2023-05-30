@@ -1987,6 +1987,15 @@ bru_line_search <- function(model,
 
   step_scaling <- 1
 
+  if (isTRUE(options[["bru_debug"]])) {
+    df_debug <- data.frame(
+      idx = seq_along(lin_pred0),
+      lin0 = lin_pred0,
+      lin1 = lin_pred1,
+      nonlin1 = nonlin_pred
+    )
+  }
+
   norm01 <- pred_norm(lin_pred1 - lin_pred0)
   norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
@@ -2225,6 +2234,68 @@ bru_line_search <- function(model,
       verbose_store = options$bru_verbose_store,
       verbosity = 2
     )
+  }
+
+  if (isTRUE(options[["bru_debug"]])) {
+    df_debug$nonlinopt <- nonlin_pred
+
+    requireNamespace("ggplot2")
+    requireNamespace("patchwork")
+    pl1 <- ggplot2::ggplot(df_debug) +
+      ggplot2::geom_point(ggplot2::aes(.data$lin1, (.data$lin0 - .data$lin1), col = "start", shape = "linear")) +
+      ggplot2::geom_point(ggplot2::aes(.data$lin1, (.data$nonlin1 - .data$lin1), col = "full", shape = "nonlin")) +
+      ggplot2::geom_point(ggplot2::aes(.data$lin1, (.data$nonlinopt - .data$lin1), col = "opt", shape = "nonlin")) +
+      ggplot2::geom_abline(slope = 0, intercept = 0) +
+      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+    pl2 <- ggplot2::ggplot(df_debug) +
+      ggplot2::geom_point(ggplot2::aes(
+        .data$lin1,
+        (.data$lin0 - .data$lin1) * .data$weights ^ 0.5,
+        col = "start",
+        shape = "linear"
+      )) +
+      ggplot2::geom_point(ggplot2::aes(
+        .data$lin1,
+        (.data$nonlin1 - .data$lin1) * .data$weights ^ 0.5,
+        col = "full",
+        shape = "nonlin"
+      )) +
+      ggplot2::geom_point(ggplot2::aes(
+        .data$lin1,
+        (.data$nonlinopt - .data$lin1) * .data$weights ^ 0.5,
+        col = "opt",
+        shape = "nonlin"
+      )) +
+      ggplot2::geom_abline(slope = 0, intercept = 0) +
+      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+    pl3 <- ggplot2::ggplot(df_debug) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin0, col = "start", shape = "linear")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin1, col = "full", shape = "linear")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlin1, col = "full", shape = "nonlin")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlinopt, col = "opt", shape = "nonlin")) +
+      ggplot2::geom_ribbon(ggplot2::aes(
+        .data$idx,
+        ymin = .data$lin1 - 2 * .data$weights ^ -0.5,
+        ymax = .data$lin1 + 2 * .data$weights ^ -0.5
+      ),
+      alpha = 0.1) +
+      ggplot2::geom_abline(slope = 0, intercept = 0) +
+      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+    pl4 <- ggplot2::ggplot(data.frame(
+      idx = seq_along(unlist(state0)),
+      state0 = unlist(state0),
+      state1 = unlist(state1),
+      state = unlist(state)
+    )) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, state0, col = "start")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, state1, col = "full")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, state, col = "opt")) +
+      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+    print(((pl1 | pl2) / (pl3 | pl4)) +
+            patchwork::plot_layout(guides = "collect") &
+            ggplot2::theme(legend.position = "right"))
+
+    browser()
   }
 
   list(

@@ -204,6 +204,8 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
 #' part of the Poisson process likelihood (`family="cp"`) into a single term, with \eqn{y=n}{y=n},
 #' and predictor `mean(eta)`. Default: `TRUE`}
+#' \item{bru_debug}{logical; when `TRUE`, activate temporary debug features for
+#' package development. Default: `FALSE`}
 #' \item{`inla()` options}{
 #' All options not starting with `bru_` are passed on to `inla()`, sometimes
 #' after altering according to the needs of the inlabru method.
@@ -303,6 +305,7 @@ bru_options_default <- function() {
       lin_opt_method = "onestep"
     ),
     bru_compress_cp = TRUE,
+    bru_debug = FALSE,
     # bru_initial: NULL
     # inla options
     E = 1,

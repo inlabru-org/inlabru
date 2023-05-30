@@ -147,6 +147,8 @@ this is slow and intended for debugging purposes only.}
 \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
 part of the Poisson process likelihood (\code{family="cp"}) into a single term, with \eqn{y=n}{y=n},
 and predictor \code{mean(eta)}. Default: \code{TRUE}}
+\item{bru_debug}{logical; when \code{TRUE}, activate temporary debug features for
+package development. Default: \code{FALSE}}
 \item{\code{inla()} options}{
 All options not starting with \code{bru_} are passed on to \code{inla()}, sometimes
 after altering according to the needs of the inlabru method.
