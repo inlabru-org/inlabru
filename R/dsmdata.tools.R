@@ -214,7 +214,6 @@ combine.dsmdata.f <- function(blocks = NULL, dists = NULL) {
 
 get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
                                  geometry = "euc") {
-
   # NOTE: old param: data=data
 
   # Get the quadrant and angle (from 0 to 360o) using blocks (is.block=T) or transects (is.block=F)
@@ -273,7 +272,6 @@ get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
 
 
 get.direction.segment.f <- function(data = NULL, geometry = "euc") {
-
   # NOTE: old param: data=data
 
   # Get the quadrant and angle (from 0 to 360o clockwise) for each segment
@@ -478,7 +476,7 @@ get.quadrant.f <- function(start.x, start.y, end.x, end.y, tol = 0.0000001) {
   x.diff <- (start.x - end.x)
   y.diff <- (start.y - end.y)
 
-  if (abs(x.diff) < tol & abs(y.diff) < tol) print("Segments on top of each other!")
+  if (abs(x.diff) < tol && abs(y.diff) < tol) print("Segments on top of each other!")
 
   quad <- NA
 
@@ -495,13 +493,13 @@ get.quadrant.f <- function(start.x, start.y, end.x, end.y, tol = 0.0000001) {
     if (end.x < start.x) quad <- 4
   }
   # NE
-  if (end.x > start.x & end.y > start.y) quad <- 5
+  if (end.x > start.x && end.y > start.y) quad <- 5
   # SE
-  if (end.x > start.x & end.y < start.y) quad <- 6
+  if (end.x > start.x && end.y < start.y) quad <- 6
   # SW
-  if (end.x < start.x & end.y < start.y) quad <- 7
+  if (end.x < start.x && end.y < start.y) quad <- 7
   # NW
-  if (end.x < start.x & end.y > start.y) quad <- 8
+  if (end.x < start.x && end.y > start.y) quad <- 8
 
   if (is.na(quad)) print("Quadrant not assigned")
 
@@ -531,7 +529,7 @@ geo.distance.f <- function(lon1, lat1, lon2, lat2) {
   rad <- pi / 180
   nm2km <- 1.852
 
-  if ((lat1 == lat2) & (lon1 == lon2)) {
+  if ((lat1 == lat2) && (lon1 == lon2)) {
     posdist <- 0
   } else {
     rlat1 <- lat1 * rad
@@ -549,7 +547,6 @@ geo.distance.f <- function(lon1, lat1, lon2, lat2) {
 
 
 get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
-
   # NOTE: old parameterization: seg.len=half.segment.length,angle=angle
 
   # Calculate the height and length of triangle given length of hypotenuse and angle
@@ -620,7 +617,6 @@ generate.obs.location.f <- function(seg = NULL, dists = NULL, geometry = "euc",
 
 
 get.point.along.segment.f <- function(x1, y1, x2, y2, quad = NULL, seg.angle) {
-
   # NOTE: old parameterization: quad=quadrant
 
   # Get a random point along the segment (at which object was detected)
@@ -704,7 +700,6 @@ get.point.along.segment.f <- function(x1, y1, x2, y2, quad = NULL, seg.angle) {
 
 
 get.coords.f <- function(quad = NULL, alpha = NULL, new.x = NULL, new.y = NULL, pd = NULL, side = NULL) {
-
   # NOTE old parameterization:
   # quad=quadrant,alpha=angle,new.x=x.reference,new.y=y.reference,pd=perp.dist,side=side.of.segment
 
@@ -718,12 +713,12 @@ get.coords.f <- function(quad = NULL, alpha = NULL, new.x = NULL, new.y = NULL, 
   deg2rad <- pi / 180
 
   # Quadrants 1 and 3 (i.e. heading directly N or S, respectively)
-  if (quad == 1 | quad == 3) {
+  if (quad == 1 || quad == 3) {
     sgt.x <- new.x + (side * pd)
     sgt.y <- new.y
   }
   # Quadrants 2 and 4 (i.e. heading directly E or W, respectively)
-  if (quad == 2 | quad == 4) {
+  if (quad == 2 || quad == 4) {
     sgt.x <- new.x
     sgt.y <- new.y + (side * pd)
   }
@@ -817,7 +812,6 @@ get.hypot.f <- function(side1, side2) {
 
 
 what.angle.f <- function(dy = NULL, dx = NULL, quad = NULL) {
-
   # NOTE old parameterization: dy=diff.y,dx=diff.x,quad=quadrant
 
   # Get the angle between two points (from 0 to 360) using trig and the direction (quadrant)

@@ -9,13 +9,13 @@ devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL, mesh = NULL)
 \arguments{
 \item{joint}{A joint \code{prediction} of two latent model components.}
 
-\item{prediction1}{A \code{prediction} of first component.}
+\item{prediction1}{A \code{prediction} of the first component.}
 
-\item{prediction2}{A \code{prediction} of the first component.}
+\item{prediction2}{A \code{prediction} of the second component.}
 
-\item{samplers}{A SpatialPolygon object describing the area for which to compute the cummulative variance measure.}
+\item{samplers}{A SpatialPolygon object describing the area for which to compute the cumulative variance measure.}
 
-\item{mesh}{The \code{inla.mesh} for which the prediction was performed (required for cummulative Vmeasure).}
+\item{mesh}{The \code{inla.mesh} for which the prediction was performed (required for cumulative Vmeasure).}
 }
 \value{
 Variance and correlations measures.
@@ -25,7 +25,9 @@ Calculates local and integrated variance and correlation measures as introduced 
 }
 \examples{
 \donttest{
-if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
+if (bru_safe_inla() &&
+    require(ggplot2, quietly = TRUE) &&
+    bru_safe_sp()) {
 
   # Load Gorilla data
 
@@ -56,7 +58,7 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
 
   # Predict SPDE and vegetation at the mesh vertex locations
 
-  vrt <- vertices(gorillas$mesh)
+  vrt <- vertices.inla.mesh(gorillas$mesh)
   pred <- predict(
     fit,
     vrt,
@@ -145,7 +147,7 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
   # Variance and correlation integrated over space
 
   vm.int <- devel.cvmeasure(pred$joint, pred$field, pred$veg,
-    samplers = ipoints(gorillas$boundary, gorillas$mesh),
+    samplers = fm_int(gorillas$mesh, gorillas$boundary),
     mesh = gorillas$mesh
   )
   vm.int

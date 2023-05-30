@@ -33,8 +33,7 @@ library(INLA)
 library(inlabru)
 library(RColorBrewer)
 library(ggplot2)
-
-bru_options_set(inla.mode = "experimental")
+bru_safe_sp(force = TRUE)
 ```
 
 Introduction
@@ -123,7 +122,7 @@ fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(coordinates = mesh
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit1.rds")
 if ((!.cache_recompute) &&
-    file.exists(.cache_file)) {
+  file.exists(.cache_file)) {
   fit1 <- readRDS(file = .cache_file)
 } else {
   fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(coordinates = mesh))
@@ -142,7 +141,7 @@ a `SpatialPixelsDataFrame` only within the boundary, using its `mask` argument, 
 
 ```{r warning=FALSE,message=FALSE}
 df <- pixels(mesh, mask = boundary)
-int1 <- predict(fit1, data = df, ~ exp(vegetation))
+int1 <- predict(fit1, df, ~ exp(vegetation))
 
 ggplot() +
   gg(int1) +
@@ -157,7 +156,7 @@ that have no nests, and some areas of predicted low density that have nests. Wha
 about the estimated abundance (there are really 647 nests there):
 
 ```{r warning=FALSE,message=FALSE}
-ips <- ipoints(boundary, mesh)
+ips <- fm_int(mesh, boundary)
 Lambda1 <- predict(fit1, ips, ~ sum(weight * exp(vegetation)))
 Lambda1
 ```
@@ -174,7 +173,7 @@ pcmatern <- inla.spde2.pcmatern(mesh,
 )
 
 comp2 <- coordinates ~
--1 +
+  -1 +
   vegetation(gcov$vegetation, model = "factor_full") +
   mySmooth(coordinates, model = pcmatern)
 ```
@@ -184,7 +183,7 @@ fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(coordinates = mesh
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit2.rds")
 if ((!.cache_recompute) &&
-    file.exists(.cache_file)) {
+  file.exists(.cache_file)) {
   fit2 <- readRDS(file = .cache_file)
 } else {
   fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(coordinates = mesh))
@@ -211,7 +210,7 @@ ggplot() +
 ```{r warning=FALSE,message=FALSE}
 Lambda2 <- predict(
   fit2,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + vegetation))
 )
 Lambda2
@@ -280,7 +279,7 @@ fit3 <- lgcp(comp3,
 comp3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept(1)
 .cache_file <- file.path(.cache_dir, "fit3.rds")
 if ((!.cache_recompute) &&
-    file.exists(.cache_file)) {
+  file.exists(.cache_file)) {
   fit3 <- readRDS(file = .cache_file)
 } else {
   fit3 <- lgcp(comp3, nests, samplers = boundary, domain = list(coordinates = mesh))
@@ -300,12 +299,54 @@ ggplot() +
 ```{r warning=FALSE,message=FALSE}
 Lambda3 <- predict(
   fit3,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + Intercept))
 )
 Lambda3
+```
+```{r warning=FALSE,message=FALSE}
+knitr::kable(cbind(
+  deltaIC(fit1, fit2, fit3, criterion = c("DIC")),
+  deltaIC(fit1, fit2, fit3, criterion = c("WAIC"))
+))
+```
+NOTE: the behaviour of DIC and WAIC is currently a bit unclear, in particular for experimental
+mode, and is being investigated.
 
-deltaIC(fit1, fit2, fit3)
+Classic mode:
+```{r echo=FALSE}
+knitr::kable(cbind(
+  dplyr::tribble(
+    ~Model, ~DIC, ~Delta.DIC,
+    "fit2", 2224.131, 0.00000,
+    "fit3", 2274.306, 50.17504,
+    "fit1", 3124.784, 900.65339
+  ),
+  dplyr::tribble(
+    ~Model, ~WAIC, ~Delta.WAIC,
+    "fit1", 2672.234, 0.0000,
+    "fit3", 2949.498, 277.2636,
+    "fit2", 3040.140, 367.9051
+  )
+))
+```
+
+Experimental mode:
+```{r echo=FALSE}
+knitr::kable(cbind(
+  dplyr::tribble(
+    ~Model, ~DIC, ~Delta.DIC,
+    "fit1", -563.3583, 0.000,
+    "fit3", 509.4010, 1072.759,
+    "fit2", 597.6459, 1161.004
+  ),
+  dplyr::tribble(
+    ~Model, ~WAIC, ~Delta.WAIC,
+    "fit1", 1373.241, 0.0000,
+    "fit3", 1584.543, 211.3021,
+    "fit2", 1636.864, 263.6225
+  )
+))
 ```
 
 #### CV and SPDE parameters for Model 2
@@ -315,7 +356,7 @@ coefficient of variation
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 ggplot() +
-  gg(int2["cv"]) +
+  gg(int2, aes(fill = sd / mean)) +
   gg(boundary, alpha = 0) +
   gg(nests) +
   coord_fixed()
@@ -372,19 +413,22 @@ the stored values. In such cases, we can define a function that knows how to
 evaluate the covariate at arbitrary points in the survey region, and call that
 function in the component definition. In this case, we can use a powerful
 method from the 'sp' package to do this. We use this to create the needed
-function.
+function.  NOTE: There is a new method `eval_spatial()` that handles this
+automatically, and supports `terra` `SpatRaster` and `sf` geometry points
+objects, and mismatching coordinate systems as well.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-f.elev <- function(x, y) {
+f.elev <- function(xy) {
   # turn coordinates into SpatialPoints object:
   # with the appropriate coordinate reference system (CRS)
-  spp <- SpatialPoints(data.frame(x = x, y = y), proj4string = fm_sp_get_crs(elev))
-  proj4string(spp) <- fm_sp_get_crs(elev)
+  spp <- SpatialPoints(data.frame(x = xy[, 1], y = xy[, 2]),
+    proj4string = fm_CRS(elev)
+  )
   # Extract elevation values at spp coords, from our elev SpatialGridDataFrame
   v <- over(spp, elev)
   if (any(is.na(v$elevation))) {
-    v$elevation <- inlabru:::bru_fill_missing(elev, spp, v$elevation)
+    v$elevation <- bru_fill_missing(elev, spp, v$elevation)
   }
   return(v$elevation)
 }
@@ -401,7 +445,7 @@ matern <- inla.spde2.pcmatern(mesh,
   prior.range = c(5, 0.01)
 )
 
-ecomp <- coordinates ~ elev(f.elev(x, y), model = "linear") +
+ecomp <- coordinates ~ elev(f.elev(coordinates(.data.)), model = "linear") +
   mySmooth(coordinates, model = matern) + Intercept(1)
 ```
 
@@ -412,7 +456,7 @@ vegetation(gcov$vegetation, model = "factor_full")
 ```
 whereas with the function method we specify the covariate like this:
 ```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
-elev(f.elev(x, y), model = "linear")
+elev(f.elev(coordinates(.data.)), model = "linear")
 ```
 
 We also now include an intercept term.
@@ -424,7 +468,7 @@ efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(coordinates = mesh
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "efit.rds")
 if ((!.cache_recompute) &&
-    file.exists(.cache_file)) {
+  file.exists(.cache_file)) {
   efit <- readRDS(file = .cache_file)
 } else {
   efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(coordinates = mesh))
@@ -527,7 +571,6 @@ for this model.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-
 spde.range <- spde.posterior(efit, "mySmooth", what = "range")
 spde.logvar <- spde.posterior(efit, "mySmooth", what = "log.variance")
 range.plot <- plot(spde.range)
@@ -544,14 +587,14 @@ in the prediction object, for easier plotting.
 
 ```{r fig.show="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 Lambda <- predict(
-  efit, ipoints(boundary, mesh),
+  efit, fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + elev + Intercept))
 )
 Lambda
 
 Nest.e <- predict(
   efit,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ data.frame(
     N = 200:1000,
     density = dpois(200:1000,
@@ -583,20 +626,26 @@ expression. Since the elevation effect in this model is linear, the resulting pl
 ```{r}
 elev.pred <- predict(
   efit,
-  data = data.frame(elevation = seq(0, 100, length.out = 1000)),
+  data.frame(elevation = seq(0, 100, length.out = 1000)),
   formula = ~ elev_eval(elevation)
 )
 
 ggplot(elev.pred) +
   geom_line(aes(elevation, mean)) +
-  geom_ribbon(aes(elevation,
-                  ymin = q0.025,
-                  ymax = q0.975),
-              alpha = 0.2) +
-  geom_ribbon(aes(elevation,
-                  ymin = mean - 1 * sd,
-                  ymax = mean + 1 * sd),
-              alpha = 0.2)
+  geom_ribbon(
+    aes(elevation,
+      ymin = q0.025,
+      ymax = q0.975
+    ),
+    alpha = 0.2
+  ) +
+  geom_ribbon(
+    aes(elevation,
+      ymin = mean - 1 * sd,
+      ymax = mean + 1 * sd
+    ),
+    alpha = 0.2
+  )
 ```
 
 

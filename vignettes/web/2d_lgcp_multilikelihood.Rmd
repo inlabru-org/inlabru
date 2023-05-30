@@ -16,7 +16,8 @@ knitr::opts_chunk$set(
   dev = "png",
   dev.args = list(type = "cairo-png"),
   fig.width = 7,
-  fig.height = 5
+  fig.height = 5,
+  cache = TRUE
 )
 ```
 
@@ -34,6 +35,7 @@ Load libraries
 library(inlabru)
 library(INLA)
 library(ggplot2)
+bru_safe_sp(force = TRUE)
 ```
 
 Get the data
@@ -72,8 +74,8 @@ matern <- inla.spde2.pcmatern(gorillas$mesh,
 
 cmp <- ~
   Common(coordinates, model = matern) +
-  Difference(coordinates, model = matern) +
-  Intercept(1)
+    Difference(coordinates, model = matern) +
+    Intercept(1)
 ```
 
 Given these components we define the linear predictor for each of the likelihoods.
@@ -84,21 +86,19 @@ fml.major <- coordinates ~ Intercept + Common + Difference / 2
 fml.minor <- coordinates ~ Intercept + Common - Difference / 2
 ```
 
-Setting up the cox process integration points is easy in this example. Both nest types were observed within the same window.
-```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ips <- ipoints(gorillas$boundary, gorillas$mesh)
-```
-Lastly, we define the two likelihoods...
+Setting up the Cox process likelihoods is easy in this example. Both nest types were observed within the same window:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 lik_minor <- like("cp",
   formula = fml.major,
   data = gorillas$nests[gorillas$nests$group == "major", ],
-  ips = ips
+  samplers = gorillas$boundary,
+  domain = list(coordinates = gorillas$mesh)
 )
 lik_major <- like("cp",
   formula = fml.minor,
   data = gorillas$nests[gorillas$nests$group == "minor", ],
-  ips = ips
+  samplers = gorillas$boundary,
+  domain = list(coordinates = gorillas$mesh)
 )
 ```
 ... which we provide to the ´bru´ function.
@@ -127,6 +127,12 @@ pl.minor <- ggplot() +
   (pl.minor + scale_fill_continuous(trans = "log")) &
   theme(legend.position = "right")
 ```
+
+
+## Rerunning
+
+Rerunning with the previous estimate as starting point sometimes improves the
+accuracy of the posterior distribution estimation.
 
 ```{r, warning=FALSE}
 jfit0 <- jfit
@@ -157,4 +163,57 @@ summary(jfit0)
 
 ```{r}
 summary(jfit)
+```
+
+## Single-likelihood version
+
+In this particular model, we can also rewrite the problem as a single point process
+over a product domain over space and `group`.  In versions `<= 2.7.0`, the integration
+domain has to be numeric, so we convert the group variable to a 0/1 variable,
+`group_major <- group == "major"`.
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+fml.joint <- coordinates + group_major ~ Intercept + Common + (group_major - 0.5) * Difference
+```
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+gorillas$nests$group_major <- gorillas$nests$group == "major"
+lik_joint <- like("cp",
+  formula = fml.joint,
+  data = gorillas$nests,
+  samplers = gorillas$boundary,
+  domain = list(
+    coordinates = gorillas$mesh,
+    group_major = c(0, 1)
+  )
+)
+```
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+jfit_joint <- bru(cmp, lik_joint,
+  options = list(
+    control.inla = list(int.strategy = "eb"),
+    bru_max_iter = 2
+  )
+)
+```
+
+Plotting the ratios of `exp(Common)` and `exp(Difference)` between the new fit and
+the old confirms that the results are the same up to small numerical differences.
+```{r, warning=FALSE,fig.width=8}
+library(patchwork)
+pl.major <- ggplot() +
+  gg(gorillas$mesh,
+    mask = gorillas$boundary,
+    col = exp(jfit_joint$summary.random$Common$mean -
+      jfit$summary.random$Common$mean)
+  )
+pl.minor <- ggplot() +
+  gg(gorillas$mesh,
+    mask = gorillas$boundary,
+    col = exp(jfit_joint$summary.random$Difference$mean -
+      jfit$summary.random$Difference$mean)
+  )
+(pl.major + scale_fill_continuous(trans = "log")) +
+  (pl.minor + scale_fill_continuous(trans = "log")) &
+  theme(legend.position = "right")
 ```

@@ -10,7 +10,6 @@
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 import.dsmdata <- function(dsmdata, covar.col = NA) {
-
   # Extract data
   segdata <- dsmdata$segdata
   distdata <- dsmdata$distdata

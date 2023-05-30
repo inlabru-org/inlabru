@@ -1,5 +1,213 @@
 # inlabru (development version)
 
+* Remove `rgdal` and `maptools` dependencies #178
+
+* Add `bru_safe_sp()` to check if `sp` can be used safely (checks `rgdal` availability
+  and `sp` evolution status, optionally forcing use of `sf`) #178
+
+* Remove PROJ4 support #178
+
+* Warning: Coordinate names for `Spatial*` objects have been inconsistently
+  available in the predictor expression evaluation. Avoid relying on those being
+  present, and use explicit calls to `coordinates(.data.)` if you need the
+  coordinate values (e.g. for custom spatial covariate evaluation.).
+  When possible, use the built-in covariate evaluation method, `eval_spatial()`,
+  either implicitly with `comp(covariate, ...)` or explicitly,
+  `comp(eval_spatial(covariate, where = .data.), ...)`.
+  
+* Change rgl.* functions to *3d. Thanks to Duncan Murdoch #181
+
+* Speed up `ibm_jacobian.bru_mapper_harmonics` for large models
+
+* `eval_spatial` supported to sf objects (for point-in-polygon data lookups)
+
+* Add workarounds for inconsistent polygon orientation resulting from `sf::st_*`
+  calls that don't account for the `geos` canonical representation being CW,
+  whereas the canonical Simple Features representation being CCW. See
+  https://github.com/r-spatial/sf/issues/2096
+  
+* Allow precomputed spatial covariates in the data for point process observations
+
+* Add `edge|int|ext.linewidth` arguments to `gg.inla.mesh` #188
+
+* Rename the `predict()` and `generate()` `data` arguments to `newdata`, for
+  better compatibility with other `predict()` methods.  The old argument name
+  will still be accepted, but give a warning.  Code that does not name the `data`
+  argument is not affected.
+  
+* Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
+  Supports `sf` sampler objects.
+  
+* Add `fm_pixels()` methods for gridded points. `pixels()` calls `fm_pixels(..., format = "sp")`
+
+# inlabru 2.7.0
+
+## Feature overview
+
+* Added support for `sf ` and `terra` inputs to most methods
+
+* Expanded geometry and mesh handling methods
+
+* Expanded `bru_mapper()` system
+
+* Added convergence diagnostics plot with `bru_convergence_plot()`
+
+## Feature details
+
+* Allow `NA` input for default 1D mappers to generate effect zero, like
+  in `inla()`.
+  
+* New and expanded methods `fm_crs()`, `fm_CRS()`, `fm_transform()`,
+  `fm_ellipsoid_radius()`, and `fm_length_unit()` to further support `sf` objects.
+  The `fm_crs()` extraction method also supports `terra` objects.
+
+* `bru_fill_missing()` now supports `terra` `SpatRaster` data and and `sf` locations.
+  
+* New experimental methods `fm_evaluator()` and `fm_evaluate()`, replacing the
+  `INLA` `inla.mesh.projector` and `inla.mesh.project` methods.
+  
+* Experimental integration support for sphere and globe meshes.
+  
+* Allow `sf` input to `family="cp"` models.
+
+* Further `bru_mapper()` method updates;
+
+  * Deprecated `ibm_amatrix()` and `names()`
+  methods, replaced by `ibm_jacobian()` and `ibm_names()`.
+  
+  * Introduced `bru_mapper_pipe()`, used to link mappers in sequence.
+  
+  * Introduced `bru_mapper_aggregate()` and `bru_mapper_logsumexp()`,
+    used for blockwise weighted sums and log-sum-exp mappings,
+    `output[k] = sum(weights[block==k]*state[block==k])))` and
+    `output[k] = log(sum(weights[block==k]*exp(state[block==k])))`,
+    with optional weight normalisation within each block.  Allows
+    providing the weights as log-weights, and uses block-wise shifts to
+    avoid potential overflow.
+  
+  * `summary` methods for `bru_mapper` objects (`summary.bru_mapper()`)
+  
+  * Removed `methods` argument from `bru_mapper_define()`.  Implementations
+    should register S3 methods instead.
+    
+## Bug fixes
+
+* Remove unused `spatstat.core` dependency. Fixes #165
+
+* Fixed issue with plain mapper evaluation in the `ibm_eval.default()`
+  and `ibm_eval.bru_mapper_collect()` methods, where they would return zeros
+  instead of the intended values.
+  The main component evaluation and estimation code was not directly affected
+  as that is based on the `bru_mapper_multi()` class methods that rely on the
+  Jacobians instead.  The bug would therefore mainly have impacted the future,
+  not yet supported nonlinear mapper extensions.
+  
+* Fix for `eval_spatial.SpatRaster`; Work around inconsistent logic in
+  `terra::extract(..., layer)` when `length(layer)==1` or `nrow(where)==1`.
+  Fixes #169
+
+  * Add `indexed` logical option to `bru_mapper_factor()`, to allow
+  factor inputs to be mapped to index values, as needed for `group` and
+  `replicate`. Fixes #174
+
+# inlabru 2.6.0
+
+## Features
+  
+* Add `bru_get_mapper` generic, and associated methods for `inla.spde` and
+  `inla.rgeneric` objects. This allows `inlabru` to automatically extract
+  the appropriate `bru_mapper` object for each model component, and can be used
+  as a hook by external packages implementing new INLA object classes.
+  
+* Add a `weights` argument for `like()`, for likelihood-specific log-likelihood
+  weights, passed on to the `INLA::inla()` weights argument. Evaluated in the
+  data context.
+  
+* The `<component>_eval()` methods available in predictor expressions
+  now handle optional scaling weights, like in ordinary component effect
+  evaluation.
+
+* Add `terra` support for covariate inputs
+
+* The component `*_layer` arguments are now evaluated in the data context,
+  to allow dynamic layer selection for spatial raster covariates.  A new
+  generic `eval_spatial()` provides support for grid/pixel based
+  `Spatial*DataFrame` evaluation, and `SpatRaster`. Expanded support
+  is in progress.
+
+* New vignettes on the `bru_mapper` system, `component` definitions,
+  and `prediction_scores`
+  
+* General overhaul of the `bru_mapper` and linearised predictor system,
+  to prepare for new features.
+  
+  * Add `ibm_eval` generic for evaluating mappers for given states.
+  
+  * Add `bru_mapper_taylor`, used as an internal mapper for linearised
+  mappers. This and `ibm_eval` is aimed at future support for nonlinear
+  mappers. Associated new generic methods: `ibm_{is_linear,jacobian,linear}`.
+  
+  * New mapper implementations should use `ibm_jacobian` instead of `ibm_amatrix`.
+    This allows defining a linearised mapper via
+   `ibm_eval(input, state0) + ibm_jacobian(input, state0) %*% (state - state0)`.
+  
+  * New mapper class `bru_mapper_const`, which replaces `bru_mapper_offset`.
+  `bru_mapper_offset` is now deprecated and will produce warnings.
+  
+## Bug fixes
+
+* Enable both datum/ensemble container for ellipsoid information, to support
+  `epsg:4326`. Fixes #154
+  
+* Make duplicated component names an error instead of a warning.
+  Relates to #155
+
+* Fix `Tsparse` assumptions in `row_kron` to prepare for Matrix `1.5-2`.
+  Fixes #162
+  
+# inlabru 2.5.3
+
+## Features
+
+* Add `bru_mapper_harmonics` mapper for `cos` and `sin` basis sets.
+
+* Allow `predict()` input data to be be a list.
+
+* Allow arbitrary quantile summaries in `predict()`
+
+* Remove `cv`, `var`, `smin`, `smax` summaries from `predict()`
+
+* Add `mean.mc_std_err` and `sd.mc_std_err` output to `predict()`
+
+* Add `robins_subset` data set and associated variable coefficient web vignette
+
+## Bug fixes
+
+* Propagate multi-likelihood A-matrix information instead of recomputing.
+  Fixes iteration issue for bym2 and other `bru_mapper_collect` models.
+  
+* Turn on predictor summaries during iterations to allow `inla.mode="classic"`
+  to use proper line search.
+  
+* Avoid deprecated Matrix (>=1.4-2) class coercion methods
+
+* Work around for lack of full Matrix and ModelMatrix support for the `unique`
+  method. Fixes #145
+
+# inlabru 2.5.2
+
+* More robust package checks
+
+* More robust namespace and INLA availability checks
+
+* Add package vignette with links to the website examples
+
+# inlabru 2.5.1
+
+* Revert to R language features compatible with R 4.0.5
+
+* Use `strategy="gaussian"` during iterations.
+
 # inlabru 2.5.0
 
 ## Features

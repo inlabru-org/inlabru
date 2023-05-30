@@ -31,13 +31,15 @@ data(mexdolphin)
 This a version of the \code{mexdolphins} dataset from the package \code{dsm}, reformatted
 as point process data for use with \code{inlabru}. The data are from a combination of several NOAA
 shipboard surveys conducted on pan-tropical spotted dolphins in the Gulf of Mexico. 47 observations
-of groups of dolphins wre detected. The group size was recorded, as well as the Beaufort sea state at
+of groups of dolphins were detected. The group size was recorded, as well as the Beaufort sea state at
 the time of the observation. Transect width is 16 km, i.e. maximal detection
 distance 8 km (transect half-width 8 km).
 }
 \examples{
 \donttest{
-if (require("ggplot2", quietly = TRUE)) {
+if (bru_safe_inla(quietly = TRUE) &&
+  require("ggplot2", quietly = TRUE) &&
+  require("ggpolypath", quietly = TRUE)) {
   data(mexdolphin, package = "inlabru")
   ggplot() +
     gg(mexdolphin$mesh) +
@@ -53,7 +55,8 @@ if (require("ggplot2", quietly = TRUE)) {
 }
 \dontrun{
 if (requireNamespace("ggmap", quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE)) {
+  require("ggplot2", quietly = TRUE) &&
+  require("ggpolypath", quietly = TRUE)) {
   gmap(mexdolphin$depth) +
     gm(mexdolphin$ppoly, color = "blue") +
     gm(mexdolphin$samplers) +

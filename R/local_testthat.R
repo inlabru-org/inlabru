@@ -70,68 +70,6 @@ local_bru_options_set <- function(...,
 
 
 
-#' @describeIn local_testthat Disable PROJ4/6 warnings.
-#' To be used within package tests. Restores state on exit.
-#'
-#' @param proj4 logical; whether to show PROJ4 conversion warnings. Default `FALSE`
-#' @param thin logical; whether to show only a thinned version of rgdal PROJ6
-#' warnings. Default `TRUE`
-#' @export
-local_set_PROJ6_warnings <- function(proj4 = FALSE,
-                                     thin = TRUE,
-                                     envir = parent.frame()) {
-  withr::local_options(
-    list(
-      "rgdal_show_exportToProj4_warnings" =
-        if (!proj4) {
-          "none"
-        } else if (thin) {
-          "thin"
-        } else {
-          "all"
-        }
-    ),
-    .local_envir = envir
-  )
-  requireNamespace("rgdal", quietly = TRUE)
-  if (fm_has_PROJ6()) {
-    old1 <- rgdal::get_rgdal_show_exportToProj4_warnings()
-    withr::defer(
-      rgdal::set_rgdal_show_exportToProj4_warnings(old1),
-      envir = envir
-    )
-    rgdal::set_rgdal_show_exportToProj4_warnings(proj4)
-
-    old2 <- rgdal::get_thin_PROJ6_warnings()
-    withr::defer(
-      rgdal::set_thin_PROJ6_warnings(old2),
-      envir = envir
-    )
-    rgdal::set_thin_PROJ6_warnings(thin)
-  }
-}
-
-
-#' @export
-#' @describeIn local_testthat Return a list of the current rgdal warning options
-local_get_rgdal_options <- function() {
-  requireNamespace("rgdal", quietly = TRUE)
-  list(
-    option_rgdal_show_exportToProj4_warnings =
-      getOption("rgdal_show_exportToProj4_warnings"),
-    rgdal_show_exportToProj4_warnings = rgdal::get_rgdal_show_exportToProj4_warnings(),
-    thin_PROJ6_warnings = rgdal::get_thin_PROJ6_warnings()
-  )
-}
-
-#' @export
-#' @describeIn local_testthat Disable rgdal PROJ4 conversion warnings and thin
-#' PROJ6 warnings.
-local_disable_PROJ6_warnings <- function(envir = parent.frame()) {
-  local_set_PROJ6_warnings(proj4 = FALSE, thin = TRUE, envir = envir)
-}
-
-
 #' @export
 #' @rdname local_testthat
 local_basic_intercept_testdata <- function() {
@@ -141,7 +79,6 @@ local_basic_intercept_testdata <- function() {
     y = rnorm(100)
   )
 }
-
 
 #' @export
 #' @rdname local_testthat
@@ -167,12 +104,12 @@ local_mrsea_convert <- function(x, use_km = FALSE) {
   if (!use_km) {
     # Transform km to m:
     crs_m <- fm_crs_set_lengthunit(x$mesh$crs, "m")
-    x$mesh <- fm_spTransform(x$mesh, crs_m)
-    x$samplers <- sp::spTransform(x$samplers, crs_m)
+    x$mesh <- fm_transform(x$mesh, crs_m)
+    x$samplers <- fm_transform(x$samplers, crs_m)
     x$samplers$weight <- x$samplers$weight * 1000
-    x$points <- sp::spTransform(x$points, crs_m)
-    x$boundary <- sp::spTransform(x$boundary, crs_m)
-    x$covar <- sp::spTransform(x$covar, crs_m)
+    x$points <- fm_transform(x$points, crs_m)
+    x$boundary <- fm_transform(x$boundary, crs_m)
+    x$covar <- fm_transform(x$covar, crs_m)
     x$points$Effort <- x$points$Effort * 1000
     x$points$mid.x <- x$points$mid.x * 1000
     x$points$mid.y <- x$points$mid.y * 1000
@@ -206,7 +143,15 @@ local_bru_safe_inla <- function(multicore = FALSE,
                                 envir = parent.frame()) {
   if (requireNamespace("INLA", quietly = TRUE)) {
     # Save the num.threads option so it can be restored
-    old_threads <- INLA::inla.getOption("num.threads")
+    old_threads <- tryCatch(
+      INLA::inla.getOption("num.threads"),
+      error = function(e) {
+        e
+      }
+    )
+    if (inherits(old_threads, "simpleError")) {
+      return(testthat::skip("inla.getOption() failed, skip INLA tests."))
+    }
     withr::defer(
       INLA::inla.setOption(num.threads = old_threads),
       envir
@@ -227,17 +172,26 @@ local_bru_safe_inla <- function(multicore = FALSE,
 
 
 #' @describeIn local_testthat Initialise environment for tests.
-#' Disables PROJ4/PROJ6 warnings, and assigns tolerance variables.
+#' Assigns tolerance variables.
 #' To be called either at the top of a testfile, or inside tests.
 #' Does *not* call [local_bru_safe_inla()], since that may invoke a skip and
 #' should be called inside each test that relies on INLA.
 #' @export
 local_bru_testthat_setup <- function(envir = parent.frame()) {
-  local_disable_PROJ6_warnings(envir = envir)
   local_testthat_tolerances(envir = envir)
   local_bru_options_set(
-    control.compute = list(dic = FALSE, waic = FALSE),
+    # Need to specify specific smtp to ensure consistent tests.
+    # To specifically test pardiso, need to override locally
+    control.compute = list(dic = FALSE, waic = FALSE, smtp = "taucs"),
     inla.mode = "experimental",
     envir = envir
   )
+  if (utils::compareVersion(getNamespaceVersion("sp"), "1.6-0") >= 0) {
+    old_sp_evolution_status <- sp::get_evolution_status()
+    withr::defer(
+      sp::set_evolution_status(old_sp_evolution_status),
+      envir = envir
+    )
+    bru_safe_sp(quietly = TRUE, force = TRUE)
+  }
 }

@@ -11,9 +11,12 @@
 
 \item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed on to \code{geom_line}.}
 
-\item{ribbon}{If TRUE, plot a ribbon around the line based on the upper and lower 2.5 percent quantiles.}
+\item{ribbon}{If TRUE, plot a ribbon around the line based on the smalles and largest
+quantiles present in the data, found by matching names starting with \code{q} and
+followed by a numerical value.  \code{inla()}-style \code{numeric+"quant"} names are converted
+to inlabru style before matching.}
 
-\item{alpha}{The ribbons numeric alpha level in \verb{[0,1]}.}
+\item{alpha}{The ribbons numeric alpha (transparency) level in \verb{[0,1]}.}
 
 \item{bar}{If TRUE plot boxplot-style summary for each variable.}
 
@@ -38,7 +41,9 @@ Requires the \code{ggplot2} package.
 }
 \examples{
 \donttest{
-if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
+if (bru_safe_inla() &&
+    require(sn, quietly = TRUE) &&
+    require(ggplot2, quietly = TRUE)) {
   # Generate some data
 
   input.df <- data.frame(x = cos(1:10))
@@ -50,7 +55,7 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
 
   # Predict posterior statistics of 'x'
 
-  xpost <- predict(fit, data = NULL, formula = ~x_latent)
+  xpost <- predict(fit, NULL, formula = ~x_latent)
 
   # The statistics include mean, standard deviation, the 2.5\% quantile, the median,
   # the 97.5\% quantile, minimum and maximum sample drawn from the posterior as well as
@@ -64,11 +69,11 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
     gg(xpost)
 
 
-  # The predict function can also be used to simulataneously estimate posteriors
+  # The predict function can also be used to simultaneously estimate posteriors
   # of multiple variables:
 
   xipost <- predict(fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ c(
       Intercept = Intercept_latent,
       x = x_latent

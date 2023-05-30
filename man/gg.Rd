@@ -41,6 +41,7 @@ Other geomes for inla and inlabru predictions:
 \code{\link{gm}()}
 
 Other geomes for spatial data: 
+\code{\link{gg.SpatRaster}()},
 \code{\link{gg.SpatialGridDataFrame}()},
 \code{\link{gg.SpatialLines}()},
 \code{\link{gg.SpatialPixelsDataFrame}()},

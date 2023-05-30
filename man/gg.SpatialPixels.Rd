@@ -19,13 +19,14 @@ Uses \code{geom_point} to plot the pixel centers.
 Requires the \code{ggplot2} package.
 }
 \examples{
-if (require("ggplot2", quietly = TRUE)) {
+if (require("ggplot2", quietly = TRUE) &&
+  bru_safe_sp()) {
   # Load Gorilla data
 
   data(gorillas, package = "inlabru")
 
   # Turn elevation covariate into SpatialPixels
-  pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
+  pxl <- sp::SpatialPixels(sp::SpatialPoints(gorillas$gcov$elevation))
 
   # Plot the pixel centers
   ggplot() +
@@ -34,6 +35,7 @@ if (require("ggplot2", quietly = TRUE)) {
 }
 \seealso{
 Other geomes for spatial data: 
+\code{\link{gg.SpatRaster}()},
 \code{\link{gg.SpatialGridDataFrame}()},
 \code{\link{gg.SpatialLines}()},
 \code{\link{gg.SpatialPixelsDataFrame}()},

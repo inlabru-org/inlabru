@@ -28,11 +28,11 @@ This function takes a RasterLayer object, converts it into a
 This function requires the \code{raster} and \code{ggplot2} packages.
 }
 \examples{
+\dontrun{
 # Some features require the raster and spatstat.data packages.
 if (require("spatstat.data", quietly = TRUE) &&
   require("raster", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE)) {
-
   # Load Gorilla data
   data("gorillas", package = "spatstat.data")
 
@@ -44,6 +44,7 @@ if (require("spatstat.data", quietly = TRUE) &&
 
   ggplot() +
     gg(elev)
+}
 }
 }
 \seealso{

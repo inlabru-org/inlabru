@@ -9,10 +9,13 @@
   color = NULL,
   alpha = NULL,
   edge.color = "grey",
+  edge.linewidth = 0.25,
   interior = TRUE,
   int.color = "blue",
+  int.linewidth = 0.5,
   exterior = TRUE,
   ext.color = "black",
+  ext.linewidth = 1,
   crs = NULL,
   mask = NULL,
   nx = 500,
@@ -29,17 +32,24 @@ The alternative name \code{colour} is also recognised.}
 
 \item{alpha}{A vector of scalar values setting the alpha value of the colors provided.}
 
-\item{edge.color}{Color of the mesh edges.}
+\item{edge.color}{Color of the regular mesh edges.}
+
+\item{edge.linewidth}{Line width for the regular mesh edges. Default 0.25}
 
 \item{interior}{If TRUE, plot the interior boundaries of the mesh.}
 
-\item{int.color}{Color used to plot the interior boundaries.}
+\item{int.color}{Color used to plot the interior constraint edges.}
+
+\item{int.linewidth}{Line width for the interior constraint edges. Default 0.5}
 
 \item{exterior}{If TRUE, plot the exterior boundaries of the mesh.}
 
-\item{ext.color}{Color used to plot the interior boundaries.}
+\item{ext.color}{Color used to plot the exterior boundary edges.}
 
-\item{crs}{A \link{CRS} object defining the coordinate system to project the mesh to before plotting.}
+\item{ext.linewidth}{Line width for the exterior boundary edges. Default 1}
+
+\item{crs}{A CRS object supported by \code{\link[=fm_transform]{fm_transform()}} defining the coordinate
+system to project the mesh to before plotting.}
 
 \item{mask}{A SpatialPolygon defining the region that is plotted.}
 

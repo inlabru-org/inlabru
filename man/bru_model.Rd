@@ -2,14 +2,26 @@
 % Please edit documentation in R/model.R
 \name{bru_model}
 \alias{bru_model}
+\alias{summary.bru_model}
+\alias{print.summary_bru_model}
 \title{Create an inlabru model object from model components}
 \usage{
 bru_model(components, lhoods)
+
+\method{summary}{bru_model}(object, ...)
+
+\method{print}{summary_bru_model}(x, ...)
 }
 \arguments{
 \item{components}{A \link{component_list} object}
 
 \item{lhoods}{A list of one or more \code{lhood} objects}
+
+\item{object}{Object to operate on}
+
+\item{\dots}{Arguments passed on to other methods}
+
+\item{x}{A \code{summary_bru_model} object to be printed}
 }
 \value{
 A \link{bru_model} object
@@ -18,8 +30,8 @@ A \link{bru_model} object
 The \link{inlabru} syntax for model formulae is different from what
 \code{INLA::inla} considers a valid.
 In inla most of the effects are defined by adding an \code{f(...)} expression to the formula.
-In \link{inlabru} the \code{f} is replaced by an arbitrary (exception: \code{offset}) string that will
-determine the label of the effect. See Details for further information.
+In \link{inlabru} the \code{f} is replaced by an arbitrary (exceptions: \code{const} and \code{offset})
+string that will determine the label of the effect. See Details for further information.
 }
 \details{
 For instance

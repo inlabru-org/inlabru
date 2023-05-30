@@ -28,6 +28,7 @@ library(INLA)
 library(inlabru)
 library(mgcv)
 library(ggplot2)
+library(sp)
 ```
 
 Make a shortcut to a nicer colour scale:
@@ -51,9 +52,7 @@ Tomorrow, we will look into more general mesh constructions that adapt to irregu
 First, we build a high resolution mesh for the true field, using low level INLA functions
 
 ```{r }
-bnd <- spoly(data.frame(lon = c(0, 10, 10, 0), lat = c(0, 0, 10, 10)),
-  crs = inla.CRS("longlat")
-)
+bnd <- spoly(data.frame(easting = c(0, 10, 10, 0), northing = c(0, 0, 10, 10)))
 mesh_fine <- inla.mesh.2d(boundary = bnd, max.edge = 0.2)
 ggplot() +
   gg(mesh_fine) +
@@ -85,18 +84,19 @@ Generate a sample from the model:
 true_field <- inla.qsample(1, true_Q)[, 1]
 
 truth <- expand.grid(
-  lon = seq(0, 10, length = 100),
-  lat = seq(0, 10, length = 100)
+  easting = seq(0, 10, length = 100),
+  northing = seq(0, 10, length = 100)
 )
-truth$field <- inla.mesh.project(mesh_fine,
+truth$field <- fm_evaluate(
+  mesh_fine,
   loc = as.matrix(truth),
   field = true_field
 )
-coordinates(truth) <- c("lon", "lat")
+coordinates(truth) <- c("easting", "northing")
 truth <- as(truth, "SpatialPixelsDataFrame")
 
 pl_truth <- ggplot() +
-  gg(truth, mapping = aes_string("lon", "lat", fill = "field")) +
+  gg(truth, mapping = aes(easting, northing, fill = field)) +
   coord_equal() +
   ggtitle("True field")
 pl_truth
@@ -110,15 +110,15 @@ Extract observations from some random locations:
 
 ```{r }
 n <- 200
-mydata <- data.frame(lon = runif(n, 0, 10), lat = runif(n, 0, 10))
+mydata <- data.frame(easting = runif(n, 0, 10), northing = runif(n, 0, 10))
 mydata$observed <-
-  inla.mesh.project(
+  fm_evaluate(
     mesh_fine,
     loc = as.matrix(mydata),
     field = true_field
   ) +
   rnorm(n, sd = 0.4)
-coordinates(mydata) <- c("lon", "lat")
+coordinates(mydata) <- c("easting", "northing")
 ggplot() +
   gg(mydata, aes(col = observed))
 ```
@@ -185,7 +185,7 @@ pl_posterior_mean <- ggplot() +
   ggtitle("Posterior mean") +
   coord_fixed()
 pl_posterior_sample <- ggplot() +
-  gg(pred, mapping = aes_string(x = "x", y = "y", fill = "sample")) +
+  gg(pred, aes(fill = sample)) +
   gg(bnd) +
   ggtitle("Posterior sample") +
   coord_fixed()

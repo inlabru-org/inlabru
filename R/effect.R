@@ -1,14 +1,14 @@
 # GENERICS ----
 
-#' Construct A-matrix
+#' Construct component linearisations
 #'
-#' Constructs the A-matrix for components and data
+#' Constructs the linearisation mapper for each component
 #' @export
-#' @rdname amatrix_eval
-amatrix_eval <- function(...) {
-  UseMethod("amatrix_eval")
+#' @rdname comp_lin_eval
+comp_lin_eval <- function(...) {
+  UseMethod("comp_lin_eval")
 }
-#' Obtain covariate values
+#' Obtain component inputs
 #'
 #' @export
 #' @rdname input_eval
@@ -43,110 +43,6 @@ add_mappers <- function(...) {
   UseMethod("add_mappers")
 }
 
-#' Methods for `bru_mapper` objects
-#'
-#' @details
-#' * `bru_mapper` Generic mapper S3 constructor. See below for details of the
-#' default constructor that can be used to define new mappers in user code.
-#' @param \dots Arguments passed on to other methods
-#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`.
-#' For the default `bru_mapper` method, a list that will be converted to a
-#' `bru_mapper` object by adding class information and (optional) methods.
-#' @export
-#' @seealso [bru_mapper_methods] for specific method implementations.
-#' @rdname bru_mapper
-#' @examples
-#' mapper <- bru_mapper_index(5)
-#' ibm_amatrix(mapper, c(1, 3, 4, 5, 2))
-bru_mapper <- function(...) {
-  UseMethod("bru_mapper")
-}
-#' @details
-#' * `ibm_n` Generic. Implementations must return the size of the latent vector
-#' being mapped to.
-#' @param inla_f logical; when `TRUE` in `ibm_n`, `ibm_values`, and
-#' `ibm_amatrix` methods, these must result in values compatible with `INLA::f(...)`
-#' an specification and corresponding `INLA::inla.stack(...)` constructions.
-#' Implementations do not normally need to do anything different, except
-#' for mappers of the type needed for hidden multicomponent models such
-#' as "bym2", which can be handled by `bru_mapper_collect`.
-#'
-#' @export
-#' @rdname bru_mapper
-ibm_n <- function(mapper, inla_f = FALSE, ...) {
-  if (!is.null(mapper[[".envir"]][["ibm_n"]])) {
-    mapper[[".envir"]][["ibm_n"]](mapper, inla_f = inla_f, ...)
-  } else {
-    UseMethod("ibm_n")
-  }
-}
-#' @details
-#' * `ibm_values` Generic. Implementations must return a vector that
-#' would be interpretable by an `INLA::f(..., values = ...)` specification.
-#' The exception is the method for `bru_mapper_multi`, that returns a
-#' multi-column data frame
-#' @export
-#' @rdname bru_mapper
-ibm_values <- function(mapper, inla_f = FALSE, ...) {
-  if (!is.null(mapper[[".envir"]][["ibm_values"]])) {
-    mapper[[".envir"]][["ibm_values"]](mapper, inla_f = inla_f, ...)
-  } else {
-    UseMethod("ibm_values")
-  }
-}
-#' @details
-#' * `ibm_amatrix` Generic.
-#' Implementations must return a (sparse) matrix of size `NROW(input)`
-#' (except for the `bru_mapper_multi` and `bru_mapper_collect` methods,
-#' that require `list()` inputs, and the input size is determined by the
-#' combined inputs)
-#' by `ibm_n(mapper, inla_f = FALSE)`. The `inla_f=TRUE` argument should only affect
-#' the allowed type of input format.
-#' @param input The values for which to produce a mapping matrix
-#' @export
-#' @rdname bru_mapper
-ibm_amatrix <- function(mapper, input, inla_f = FALSE, ...) {
-  if (!is.null(mapper[[".envir"]][["ibm_amatrix"]])) {
-    mapper[[".envir"]][["ibm_amatrix"]](
-      mapper, input, inla_f = inla_f, ...)
-  } else {
-    UseMethod("ibm_amatrix")
-  }
-}
-#' @details
-#' * `ibm_inla_subset` Generic.
-#' Implementations must return a logical vector of `TRUE/FALSE` for
-#' the subset such that, given the full A matrix and values output,
-#' `A[, subset, drop = FALSE]` and `values[subset]`
-#' (or `values[subset, , drop = FALSE]` for data.frame values) are equal
-#' to the `inla_f = TRUE` version of A and values. The default method uses
-#' the `ibm_values` output to construct the subset indexing.
-#' @export
-#' @rdname bru_mapper
-ibm_inla_subset <- function(mapper, ...) {
-  if (!is.null(mapper[[".envir"]][["ibm_inla_subset"]])) {
-    mapper[[".envir"]][["ibm_inla_subset"]](
-      mapper, ...)
-  } else {
-    UseMethod("ibm_inla_subset")
-  }
-}
-#' @details
-#' * `ibm_valid_input` Generic.
-#' Implementations must return a logical vector of length `NROW(input)` (
-#' or for `bru_mapper_multi` and `bru_mapper_collect` a list of such
-#' vectors)
-#' @param input The values for which to produce validity information
-#' @export
-#' @rdname bru_mapper
-ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
-  if (!is.null(mapper[[".envir"]][["ibm_valid_input"]])) {
-    mapper[[".envir"]][["ibm_valid_input"]](
-      mapper, input, inla_f = inla_f, ...)
-  } else {
-    UseMethod("ibm_valid_input")
-  }
-}
 
 
 
@@ -188,15 +84,16 @@ ibm_valid_input <- function(mapper, input, inla_f = FALSE, ...) {
 #' \itemize{
 #' \item{\eqn{c} }{is the *intercept*}
 #' \item{\eqn{x }}{is a *covariate*}
-#' \item{\eqn{\beta} }{is a *random variable* associated with \eqn{x} and}
-#' \item{\eqn{\psi = \beta * x }}{ is called the *random effect* of \eqn{x}}
+#' \item{\eqn{\beta} }{is a *latent variable* associated with \eqn{x} and}
+#' \item{\eqn{\psi = \beta * x }}{ is called the *effect* of \eqn{x}}
 #' }
 #'
 #' A problem that arises when using this kind of R formula is that it does not
 #' clearly reflect the mathematical
 #' formula. For instance, when providing the formula to inla, the resulting
 #' object will refer to the random
-#' effect \eqn{\psi = \beta * x } as `x`. Hence, it is not clear if `x` refers to the covariate
+#' effect \eqn{\psi = \beta * x } as `x`.
+#' Hence, it is not clear when `x` refers to the covariate
 #' or the effect of the covariate.
 #'
 #' @section Naming random effects:
@@ -266,7 +163,8 @@ component <- function(...) {
 #' should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 #' Arguments starting with weights, group, replicate behave similarly to main,
 #' but for the corresponding features of `INLA::f()`.
-#' @param model Either one of "offset", "factor_full", "factor_contrast", "linear",
+#' @param model Either one of "const" (same as "offset"), "factor_full",
+#' "factor_contrast", "linear",
 #' "fixed", or a model name or
 #' object accepted by INLA's `f` function. If set to NULL, then "linear" is used
 #' for vector inputs, and "fixed" for matrix input (converted internally to
@@ -277,14 +175,16 @@ component <- function(...) {
 #' extracts the mesh object to use as the mapper, and auto-generates mappers
 #' for indexed models. (Default: NULL, for auto-determination)
 #' @param main_layer,main_selector
-#' The `_layer` is a numeric index or character name of which
-#' layer/variable to extract from a covariate data object given in `main`
-#' (Default: The effect component name, if it exists i the covariate object,
-#' otherwise the first column of the covariate data frame)
+#' The `_layer` input should evaluate to a numeric index or character name or
+#' vector of which
+#' layer/variable to extract from a covariate data object given in `main`.
+#' (Default: NULL if `_selector` is given. Otherwise the effect component name,
+#'  if it exists in the covariate object, and otherwise the first column of
+#'  the covariate data frame)
 #'
-#' The `_selector` is character name of a variable whose contents determines which layer to
-#' extract from a covariate for each data point. Overrides the `layer`.
-#' (Default: NULL)
+#' The `_selector` value should be a character name of a variable
+#' whose contents determines which layer to extract from a covariate for each
+#' data point. (Default: NULL)
 #' @param n The number of latent variables in the model. Should be auto-detected
 #' for most or all models (Default: NULL, for auto-detection).
 #' An error is given if it can't figure it out by itself.
@@ -314,7 +214,6 @@ component <- function(...) {
 #' replication model. Same syntax as for `main`
 #' @param A.msk TODO: check/fix/deprecate this parameter.
 #' Likely doesn't work at the moment, and I've found no examples that use it.
-# Deprecated parameters
 #' @param .envir Evaluation environment
 #' @param envir_extra TODO: check/fix this parameter.
 #'
@@ -330,8 +229,7 @@ component <- function(...) {
 #'
 #' @examples
 #' \donttest{
-#' if (require("INLA", quietly = TRUE)) {
-#'
+#' if (bru_safe_inla(quietly = TRUE)) {
 #'   # As an example, let us create a linear component. Here, the component is
 #'   # called "myEffectOfX" while the covariate the component acts on is called "x":
 #'
@@ -341,7 +239,7 @@ component <- function(...) {
 #'   # A more complicated component:
 #'   cmp <- component("myEffectOfX",
 #'     main = x,
-#'     model = inla.spde2.matern(inla.mesh.1d(1:10))
+#'     model = INLA::inla.spde2.matern(INLA::inla.mesh.1d(1:10))
 #'   )
 #'
 #'   # Compound fixed effect component, where x and z are in the input data.
@@ -384,7 +282,6 @@ component.character <- function(object,
                                 A.msk = NULL,
                                 .envir = parent.frame(),
                                 envir_extra = NULL) {
-
   # INLA models:
   # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper,
   #            besagproper2, fgn, fgn2, ar1, ar1c, ar, ou, generic, generic0, generic1, generic2, generic3, spde,
@@ -392,7 +289,7 @@ component.character <- function(object,
   #            clinear, sigm, revsigm, log1exp, logdist)
   #
   # Supported:
-  # btypes = c("offset", "factor_full", "factor_contrast", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
+  # btypes = c("const", "offset", "factor_full", "factor_contrast", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
 
   # The label
   label <- object
@@ -414,11 +311,6 @@ component.character <- function(object,
   } else {
     group_model <- "exchangeable"
   }
-
-  if (is.null(main_layer)) {
-    main_layer <- label
-  }
-
 
   if ("map" %in% names(sys.call())) {
     #    if (!is.null(substitute(map))) {
@@ -471,7 +363,7 @@ component.character <- function(object,
       input = bru_input(
         substitute(main),
         label = label,
-        layer = main_layer,
+        layer = substitute(main_layer),
         selector = main_selector
       ),
       mapper = mapper,
@@ -484,7 +376,7 @@ component.character <- function(object,
       input = bru_input(
         substitute(group),
         label = paste0(label, ".group"),
-        layer = group_layer,
+        layer = substitute(group_layer),
         selector = group_selector
       ),
       mapper = group_mapper,
@@ -495,7 +387,7 @@ component.character <- function(object,
       input = bru_input(
         substitute(replicate),
         label = paste0(label, ".repl"),
-        layer = replicate_layer,
+        layer = substitute(replicate_layer),
         selector = replicate_selector
       ),
       mapper = replicate_mapper,
@@ -509,7 +401,7 @@ component.character <- function(object,
         bru_input(
           substitute(weights),
           label = paste0(label, ".weights"),
-          layer = weights_layer,
+          layer = substitute(weights_layer),
           selector = weights_selector
         )
       },
@@ -548,23 +440,28 @@ component.character <- function(object,
   }
 
   # Special and general cases:
-  if (component$main$type %in% c("offset")) {
+  if (component$main$type %in% c("offset", "const")) {
     # The offset is included either automatically for ~ . linear models,
     # or explicitly by name in the predictor expression, so no INLA formula
     # component is needed.
     component$inla.formula <- as.formula(paste0("~ ."),
       env = .envir
     )
-    component$main$mapper <- bru_mapper_offset()
+    component$main$mapper <- bru_mapper_const()
     component$group$mapper <- bru_mapper_index(1L)
     component$replicate$mapper <- bru_mapper_index(1L)
-    # Add multi-mapper
+    # Add scalable multi-mapper
     component[["mapper"]] <-
-      bru_mapper_multi(list(
-        main = component$main$mapper,
-        group = component$group$mapper,
-        replicate = component$replicate$mapper
-      ))
+      bru_mapper_pipe(
+        list(
+          mapper = bru_mapper_multi(list(
+            main = component$main$mapper,
+            group = component$group$mapper,
+            replicate = component$replicate$mapper
+          )),
+          scale = bru_mapper_scale()
+        )
+      )
   } else {
     if (!is.null(copy)) {
       # Store copy-model name or object in the environment
@@ -656,11 +553,12 @@ component.character <- function(object,
     }
 
     component$inla.formula <-
-      as.formula(paste0(
-        "~ . + ",
-        as.character(parse(text = deparse(fcall)))
-      ),
-      env = .envir
+      as.formula(
+        paste0(
+          "~ . + ",
+          as.character(parse(text = deparse(fcall)))
+        ),
+        env = .envir
       )
 
     component$fcall <- fcall
@@ -778,7 +676,7 @@ component_list.list <- function(object,
   stopifnot(all(vapply(object, function(x) inherits(x, "component"), TRUE)))
   names(object) <- lapply(object, function(x) x$label)
   if (anyDuplicated(names(object))) {
-    warning(paste0(
+    stop(paste0(
       "Duplicated component labels detected: ",
       paste0(
         "'",
@@ -803,10 +701,16 @@ component_list.list <- function(object,
 
 #' @export
 #' @details * `c.component_list`: The `...` arguments should be `component_list`
-#' objects. The environment from the first argument will be applied to the resulting list.
+#' objects. The environment from the first argument will be applied to the
+#' resulting `component_list`.
 #' @rdname component_list
 `c.component_list` <- function(...) {
-  env <- environment(..1)
+  stopifnot(all(vapply(
+    list(...),
+    function(x) inherits(x, "component_list"),
+    TRUE
+  )))
+  env <- environment(list(...)[[1]])
   object <- NextMethod()
   class(object) <- c("component_list", "list")
   environment(object) <- env
@@ -814,7 +718,25 @@ component_list.list <- function(object,
 }
 
 #' @export
-#' @param x `component_list` object from which to extract element(s)
+#' @details * `c.component`: The `...` arguments should be `component`
+#' objects. The environment from the first argument will be applied to the
+#' resulting ``component_list`.
+#' @rdname component_list
+`c.component` <- function(...) {
+  stopifnot(all(vapply(
+    list(...),
+    function(x) inherits(x, "component"),
+    TRUE
+  )))
+  env <- environment(list(...)[[1]])
+  object <- list(...)
+  class(object) <- c("component_list", "list")
+  environment(object) <- env
+  object
+}
+
+#' @export
+#' @param x `component_list` object from which to extract a sub-list
 #' @param i indices specifying elements to extract
 #' @rdname component_list
 `[.component_list` <- function(x, i) {
@@ -829,15 +751,16 @@ component_list.list <- function(object,
 
 
 
-#' @description FUNCTION_DESCRIPTION
-#' @param component PARAM_DESCRIPTION
-#' @param lhoods PARAM_DESCRIPTION
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title Equip components with mappers
+#' @description Equip component(s) with mappers for subcomponents that do not
+#' have predefined mappers. When needed, the data in `lhoods` is used to determine
+#' the appropriate mapper(s).
+#' @param component A `component` object
+#' @param lhoods A `bru_like_list` object
+#' @return A `component` object with completed mapper information
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
-#'   # EXAMPLE1
 #' }
 #' }
 #' @rdname add_mappers
@@ -860,31 +783,39 @@ add_mappers.component <- function(component, lhoods, ...) {
     )
   lh <- lhoods[keep_lh]
 
-  component$main <- add_mapper(component$main,
+  component$main <- add_mapper(
+    component$main,
     label = component$label,
     lhoods = lh,
     env = component$env,
     require_indexed = FALSE
   )
-  component$group <- add_mapper(component$group,
+  component$group <- add_mapper(
+    component$group,
     label = component$label,
     lhoods = lh,
     env = component$env,
     require_indexed = TRUE
   )
-  component$replicate <- add_mapper(component$replicate,
+  component$replicate <- add_mapper(
+    component$replicate,
     label = component$label,
     lhoods = lh,
     env = component$env,
     require_indexed = TRUE
   )
-  # Add multi-mapper
+  # Add scalable multi-mapper
   component[["mapper"]] <-
-    bru_mapper_multi(list(
-      main = component$main$mapper,
-      group = component$group$mapper,
-      replicate = component$replicate$mapper
-    ))
+    bru_mapper_pipe(
+      list(
+        mapper = bru_mapper_multi(list(
+          main = component$main$mapper,
+          group = component$group$mapper,
+          replicate = component$replicate$mapper
+        )),
+        scale = bru_mapper_scale()
+      )
+    )
 
   fcall <- component$fcall
 
@@ -908,16 +839,17 @@ add_mappers.component <- function(component, lhoods, ...) {
     assign(values_name, component$main$values, envir = component$env_extra)
   }
 
-  if (!identical(component[["main"]][["type"]], "offset")) {
+  if (!(component[["main"]][["type"]] %in% c("offset", "const"))) {
     # Update the formula that will be presented to INLA
     component$inla.formula <-
-      as.formula(paste0(
-        "~ . + ",
-        paste0(deparse(fcall),
-          collapse = "\n"
-        )
-      ),
-      env = component$env
+      as.formula(
+        paste0(
+          "~ . + ",
+          paste0(deparse(fcall),
+            collapse = "\n"
+          )
+        ),
+        env = component$env
       )
   }
 
@@ -925,6 +857,8 @@ add_mappers.component <- function(component, lhoods, ...) {
 
   component
 }
+
+#' @param components A `component_list` object
 #' @export
 #' @rdname add_mappers
 add_mappers.component_list <- function(components, lhoods, ...) {
@@ -986,12 +920,13 @@ bru_subcomponent <- function(input = NULL,
   } else if (is.character(model)) {
     if (identical(model, "factor")) {
       model <- "factor_contrast"
-      warning(paste0(
-        "Deprecated model 'factor'. Please use 'factor_full' or ",
-        "'factor_contrast' instead.\n",
-        "Defaulting to 'factor_contrast' that matches the old 'factor' model."
-      ),
-      immediate. = TRUE
+      warning(
+        paste0(
+          "Deprecated model 'factor'. Please use 'factor_full' or ",
+          "'factor_contrast' instead.\n",
+          "Defaulting to 'factor_contrast' that matches the old 'factor' model."
+        ),
+        immediate. = TRUE
       )
     }
     if (identical(model, "factor_full")) {
@@ -1005,6 +940,9 @@ bru_subcomponent <- function(input = NULL,
     } else if (identical(model, "fixed")) {
       model <- "iid"
       type <- "fixed"
+    } else if (model %in% c("offset", "const")) {
+      model <- "const"
+      type <- "const"
     } else {
       type <- model
     }
@@ -1041,6 +979,7 @@ bru_subcomponent <- function(input = NULL,
 
 make_unique_inputs <- function(inp, allow_list = FALSE) {
   is_spatial <- vapply(inp, function(x) inherits(x, "Spatial"), TRUE)
+  is_sfc <- vapply(inp, function(x) inherits(x, "sfc"), TRUE)
   is_matrix <- vapply(inp, function(x) is.matrix(x), TRUE)
   is_Matrix <- vapply(inp, function(x) inherits(x, "Matrix"), TRUE)
   is_factor <- vapply(inp, function(x) is.factor(x), TRUE)
@@ -1052,17 +991,12 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
     }
     inconsistent_crs <- FALSE
-    inp_crs <- lapply(inp, fm_sp_get_crs)
-    if (fm_has_PROJ6()) {
-      crs_info <- lapply(inp_crs, fm_crs_get_wkt)
-      null_crs <- vapply(crs_info, is.null, logical(1))
-      inconsistent_crs <-
-        (length(unique(unlist(crs_info))) > 1) ||
-          (any(null_crs) && !all(null_crs))
-    } else {
-      crs_info <- vapply(inp_crs, fm_CRSargs, "")
-      inconsistent_crs <- length(unique(crs_info)) > 1
-    }
+    inp_crs <- lapply(inp, fm_CRS)
+    crs_info <- lapply(inp_crs, fm_wkt)
+    null_crs <- vapply(crs_info, is.null, logical(1))
+    inconsistent_crs <-
+      (length(unique(unlist(crs_info))) > 1) ||
+        (any(null_crs) && !all(null_crs))
     if (inconsistent_crs) {
       stop("Inconsistent spatial CRS information. Unable to infer mapper information.")
     }
@@ -1074,11 +1008,30 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       )
     ))
     n_values <- nrow(inp_values)
+  } else if (any(is_sfc)) {
+    if (!all(is_sfc)) {
+      stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
+    }
+    inconsistent_crs <- FALSE
+    inp_crs <- lapply(inp, fm_crs)
+    null_crs <- vapply(inp_crs, is.na, logical(1))
+    inconsistent_crs <-
+      (length(unique(inp_crs)) > 1) ||
+        (any(null_crs) && !all(null_crs))
+    if (inconsistent_crs) {
+      stop("Inconsistent spatial crs information. Unable to infer mapper information.")
+    }
+    inp_values <- sf::st_sfc(unique(do.call(c, inp)),
+      crs = inp_crs[[1]]
+    )
+    n_values <- NROW(inp_values)
   } else if (any(is_matrix | is_Matrix)) {
     if (!all(is_matrix | is_Matrix)) {
       stop("Inconsistent input types; matrix and non-matrix")
     }
-    inp_values <- unique.matrix(do.call(rbind, inp))
+    # Add extra column to work around bug in unique.matrix for single-column
+    # Matrix and ModelMatrix matrices:
+    inp_values <- unique.matrix(cbind(1, do.call(rbind, inp)))[, -1, drop = FALSE]
     n_values <- nrow(inp_values)
   } else if (any(is_data_frame)) {
     if (!all(is_data_frame)) {
@@ -1127,6 +1080,11 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
 
 add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
                        require_indexed = FALSE) {
+  if (is.null(subcomp[["mapper"]])) {
+    if (!inherits(subcomp[["model"]], "character")) {
+      subcomp[["mapper"]] <- bru_get_mapper_safely(subcomp[["model"]])
+    }
+  }
   if (!is.null(subcomp[["mapper"]])) {
     if (!inherits(subcomp[["mapper"]], "bru_mapper")) {
       stop(paste0(
@@ -1163,17 +1121,18 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
       # TODO: Check for vector/matrix/coordinate inconsistency
       null.results <- vapply(inp, function(x) is.null(x), TRUE)
       if (all(null.results)) {
-        warning(paste0(
-          "All covariate evaluations for '", label,
-          "' are NULL; an intercept component was likely intended.\n",
-          "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
-          "  Use explicit notation '+ ", label, "(1)' instead",
-          if (identical(label, "Intercept")) {
-            " (or '+1' for '+ Intercept(1)')"
-          },
-          "."
-        ),
-        immediate. = TRUE
+        warning(
+          paste0(
+            "All covariate evaluations for '", label,
+            "' are NULL; an intercept component was likely intended.\n",
+            "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
+            "  Use explicit notation '+ ", label, "(1)' instead",
+            if (identical(label, "Intercept")) {
+              " (or '+1' for '+ Intercept(1)')"
+            },
+            "."
+          ),
+          immediate. = TRUE
         )
         unique_inputs <- list(
           inp_values = 1,
@@ -1188,7 +1147,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
 
         unique_inputs <- make_unique_inputs(inp_, allow_list = TRUE)
       }
-      if (unique_inputs$n_values < 1) {
+      if (sum(unlist(unique_inputs$n_values)) < 1) {
         subcomp$n <- 1
         subcomp$values <- NULL
         inp_values <- NULL
@@ -1225,7 +1184,8 @@ make_submapper <- function(subcomp_n,
                            label,
                            subcomp_type,
                            subcomp_factor_mapping,
-                           require_indexed) {
+                           require_indexed,
+                           allow_interpolation = TRUE) {
   if (!is.null(subcomp_n)) {
     if (!is.null(subcomp_values)) {
       warning(
@@ -1247,24 +1207,134 @@ make_submapper <- function(subcomp_n,
     (!is.null(subcomp_type) && (subcomp_type %in% "factor"))) {
     mapper <- bru_mapper_factor(
       values,
-      factor_mapping = subcomp_factor_mapping
+      factor_mapping = subcomp_factor_mapping,
+      indexed = require_indexed
     )
   } else {
     values <- sort(unique(values), na.last = NA)
     if (length(values) > 1) {
-      mapper <-
-        bru_mapper(
-          INLA::inla.mesh.1d(values),
-          indexed = require_indexed
-        )
+      if (allow_interpolation) {
+        mapper <-
+          bru_mapper(
+            INLA::inla.mesh.1d(values),
+            indexed = require_indexed
+          )
+      } else {
+        mapper <- bru_mapper_index(n = ceiling(max(values)))
+      }
     } else if (all(values == 1)) {
-      mapper <- bru_mapper_linear()
+      if (require_indexed) {
+        mapper <- bru_mapper_index(n = 1)
+      } else {
+        mapper <- bru_mapper_linear()
+      }
     } else {
-      mapper <- bru_mapper_linear()
+      if (require_indexed) {
+        mapper <- bru_mapper_factor(values,
+          factor_mapping = "full",
+          indexed = TRUE
+        )
+      } else {
+        mapper <- bru_mapper_linear()
+      }
     }
   }
 
   mapper
+}
+
+
+#' Extract mapper information from INLA model component objects
+#'
+#' The component definitions will automatically attempt to extract mapper
+#' information from any model object by calling the generic `bru_get_mapper`.
+#' Any class method implementation should return a [bru_mapper] object suitable
+#' for the given latent model.
+#'
+#' @param model A model component object
+#' @param \dots Arguments passed on to other methods
+#' @return A [bru_mapper] object defined by the model component
+#' @seealso [bru_mapper] for mapper constructor methods, and
+#' [bru_mapper_methods] for method generics and specific implementations.
+#' @export
+#' @examples
+#' if (bru_safe_inla(quietly = TRUE)) {
+#'   library(INLA)
+#'   mesh <- inla.mesh.create(globe = 2)
+#'   spde <- inla.spde2.pcmatern(mesh,
+#'     prior.range = c(1, 0.5),
+#'     prior.sigma = c(1, 0.5)
+#'   )
+#'   mapper <- bru_get_mapper(spde)
+#'   ibm_n(mapper)
+#' }
+bru_get_mapper <- function(model, ...) {
+  UseMethod("bru_get_mapper", model)
+}
+
+
+#' @rdname bru_get_mapper
+#' @details * `bru_get_mapper.inla.spde` extract an indexed mapper for
+#' the `model$mesh` object contained in the model object.
+#' It returns `NULL` gives a warning
+#' if no known mesh type is found in the model object.
+#' @export
+bru_get_mapper.inla.spde <- function(model, ...) {
+  if (inherits(model$mesh, "inla.mesh")) {
+    mapper <- bru_mapper(model$mesh)
+  } else if (inherits(model$mesh, "inla.mesh.1d")) {
+    mapper <- bru_mapper(model$mesh, indexed = TRUE)
+  } else {
+    mapper <- NULL
+    warning(
+      paste0(
+        "Unknown SPDE mesh class '",
+        paste0(class(model$mesh), collapse = ", "),
+        "' for bru_get_mapper.inla.spde. Please specify a mapper manually instead."
+      ),
+      immediate. = TRUE
+    )
+  }
+  mapper
+}
+
+#' @rdname bru_get_mapper
+#' @details * `bru_get_mapper.inla.rgeneric` returns the mapper given by a call to
+#' `model$f$rgeneric$definition("mapper")`. To support this for your own
+#' `inla.rgeneric` models, add a `"mapper"` option to the `cmd` argument
+#' of your rgeneric definition function. You will need to store the mapper
+#' in your object as well.  Alternative, define your model using a subclass
+#' and define a corresponding `bru_get_mapper.subclass` method that should return
+#' the corresponding `bru_mapper` object.
+#' @export
+bru_get_mapper.inla.rgeneric <- function(model, ...) {
+  if (is.null(model[["f"]][["rgeneric"]][["definition"]])) {
+    NULL
+  } else {
+    model[["f"]][["rgeneric"]][["definition"]]("mapper")
+  }
+}
+
+#' @rdname bru_get_mapper
+#' @details * `bru_get_mapper_safely` tries to call the `bru_get_mapper`,
+#' and returns `NULL` if it fails (e.g. due to no available class method).
+#' If the call succeeds and returns non-`NULL`, it checks that the object
+#' inherits from the `bru_mapper` class, and gives an error if it does not.
+#' @export
+bru_get_mapper_safely <- function(model, ...) {
+  m <- tryCatch(
+    bru_get_mapper(model, ...),
+    error = function(e) {
+    }
+  )
+  if (!is.null(m) && !inherits(m, "bru_mapper")) {
+    stop(paste0(
+      "The bru_get_mapper method for model class '",
+      paste0(class(model), collapse = ", "),
+      "' did not return a bru_mapper object"
+    ))
+  }
+  m
 }
 
 
@@ -1278,19 +1348,8 @@ make_mapper <- function(subcomp,
                         strict = TRUE,
                         require_indexed = FALSE) {
   if (is.null(subcomp[["mapper"]])) {
-    if (subcomp[["type"]] %in% c("spde")) {
-      if (inherits(subcomp[["model"]]$mesh, "inla.mesh")) {
-        subcomp[["mapper"]] <- bru_mapper(subcomp[["model"]]$mesh)
-      } else if (inherits(subcomp[["model"]]$mesh, "inla.mesh.1d")) {
-        subcomp[["mapper"]] <-
-          bru_mapper(subcomp[["model"]]$mesh, indexed = TRUE)
-      } else {
-        stop(paste0(
-          "Unknown SPDE mesh class '",
-          paste0(class(subcomp[["model"]]$mesh), collapse = ", "),
-          "' for ", label, ". Please specify a mapper manually instead."
-        ))
-      }
+    if (!inherits(subcomp[["model"]], "character")) {
+      subcomp[["mapper"]] <- bru_get_mapper_safely(subcomp[["model"]])
     }
   }
   if (!is.null(subcomp[["mapper"]])) {
@@ -1301,11 +1360,10 @@ make_mapper <- function(subcomp,
         "' for ", label
       ))
     }
-    subcomp[["mapper"]] <- bru_mapper(subcomp[["mapper"]])
   } else if (subcomp[["type"]] %in% c("linear", "clinear")) {
     subcomp[["mapper"]] <- bru_mapper_linear()
-  } else if (subcomp[["type"]] %in% c("offset")) {
-    subcomp[["mapper"]] <- bru_mapper_offset()
+  } else if (subcomp[["type"]] %in% c("offset", "const")) {
+    subcomp[["mapper"]] <- bru_mapper_const()
   } else if (subcomp[["type"]] %in% c("fixed")) {
     if (!is.null(subcomp[["values"]])) {
       labels <- subcomp[["values"]]
@@ -1327,6 +1385,8 @@ make_mapper <- function(subcomp,
     subcomp[["mapper"]] <- bru_mapper_matrix(labels)
   } else if (subcomp[["model"]] %in% c("bym", "bym2")) {
     # No mapper; construct based on input values
+    # Default mapper will be integer or factor indexed, not
+    # interpolated
     mappers <- list(
       make_submapper(
         subcomp_n = subcomp[["n"]],
@@ -1335,7 +1395,8 @@ make_mapper <- function(subcomp,
         label = paste0(subcomp[["label"]], " part 1"),
         subcomp_type = subcomp[["type"]],
         subcomp_factor_mapping = subcomp[["factor_mapping"]],
-        require_indexed = require_indexed
+        require_indexed = require_indexed,
+        allow_interpolation = FALSE
       )
     )
     mappers[[2]] <- mappers[[1]]
@@ -1344,6 +1405,7 @@ make_mapper <- function(subcomp,
       bru_mapper_collect(mappers, hidden = TRUE)
   } else {
     # No mapper; construct based on input values
+    # Interpolation on by default
     subcomp[["mapper"]] <-
       make_submapper(
         subcomp_n = subcomp[["n"]],
@@ -1352,7 +1414,8 @@ make_mapper <- function(subcomp,
         label = subcomp[["label"]],
         subcomp_type = subcomp[["type"]],
         subcomp_factor_mapping = subcomp[["factor_mapping"]],
-        require_indexed = require_indexed
+        require_indexed = require_indexed,
+        allow_interpolation = TRUE
       )
   }
   subcomp
@@ -1396,7 +1459,7 @@ code.components <- function(components, add = "") {
     if (ix > 0) {
       label <- substr(code, 1, ix - 1)
       is.fixed <- FALSE
-      if (label == "offset") {
+      if (label %in% c("offset", "const")) {
         is.offset <- TRUE
       }
     } else {
@@ -1427,7 +1490,7 @@ code.components <- function(components, add = "") {
             paste0(label, "("),
             paste0(
               fname, '("', label, '"',
-              ', model = "offset", main = '
+              ', model = "const", main = '
             ),
             code,
             fixed = TRUE
@@ -1445,968 +1508,6 @@ code.components <- function(components, add = "") {
   codes
 }
 
-# MAPPERS ----
-
-#' @details * `bru_mapper.default` adds the "bru_mapper" class and `new_class`
-#' to an object. If provided, mapper method functions are added to an environment
-#' `.envir` in the object.  The generic methods `ibm_n`, `ibm_n_inla`,
-#' `ibm_values`, `ibm_values_inla`,
-#' `ibm_amatrix`, `ibm_amatrix_inla`,
-#' `ibm_valid_input`, and `ibm_valid_input_inla` look for these
-#' functions first,
-#' and otherwise call `UseMethod()`.  This is an alternative to using `.S3method()`
-#' to register the methods, e.g.
-#' `.S3method("ibm_amatrix", "my_mapper_class", ibm_amatrix.my_mapper_class)`.
-#' @param new_class If non-`NULL`, this is added at the front of the class definition
-#' @param methods, optional `list` of named method definitions; See Details.
-#'
-#' @export
-#' @rdname bru_mapper
-bru_mapper.default <- function(mapper,
-                               new_class = NULL,
-                               methods = NULL,
-                               ...) {
-  if (any(c(
-    "ibm_n", "ibm_n_inla",
-    "ibm_values", "ibm_values_inla",
-    "ibm_amatrix", "ibm_amatrix_inla",
-    "ibm_valid_input", "ibm_valid_input_inla"
-  ) %in%
-    names(list(...)))) {
-    warning(
-      paste0(
-        "Deprecated use of named method arguments for 'bru_mapper'.\n",
-        "Use methods = list(methodname = ..., ...) instead."
-      )
-    )
-    method_names <- intersect(
-      c(
-        "ibm_n",
-        "ibm_values",
-        "ibm_amatrix",
-        "ibm_inla_subset",
-        "ibm_valid_input"
-      ),
-      names(list(...))
-    )
-    methods <- list(...)[method_names]
-  }
-  if (!inherits(mapper, "bru_mapper")) {
-    class(mapper) <- c("bru_mapper", class(mapper))
-  }
-  if (!is.null(new_class) && !inherits(mapper, new_class)) {
-    class(mapper) <- c(new_class, class(mapper))
-  }
-  if (is.null(mapper[[".envir"]])) {
-    mapper$.envir <- new.env()
-  }
-  if (!is.null(methods)) {
-    for (method in names(methods)) {
-      if (!is.null(methods[[method]])) {
-        assign(method, methods[[method]], envir = mapper[[".envir"]])
-      }
-    }
-  }
-  mapper
-}
-
-
-#' Implementation methods for mapper objects
-#'
-#' A `bru_mapper` sub-class implementation must provide an
-#' `ibm_matrix()` method. If the model size 'n' and definition
-#' values 'values' are stored in the object itself, default methods are
-#' available (see Details). Otherwise the
-#' `ibm_n()` and `ibm_values()` methods also need to be provided.
-#'
-#' @param \dots Arguments passed on to other methods
-#' @param mapper A mapper S3 object, normally inheriting from `bru_mapper`
-#' @param inla_f logical; when `TRUE` in `ibm_n` and `ibm_values`, these must result in values compatible with `INLA::f(...)`
-#' an specification and corresponding `INLA::inla.stack(...)` constructions.
-#' For `ibm_amatrix` methods, it may influence how the input data is interpreted.
-#' Implementations do not normally need to do anything different, except
-#' for mappers of the type needed for hidden multicomponent models such
-#' as "bym2", which can be handled by `bru_mapper_collect`.
-#' @seealso [bru_mapper()]
-#' @name bru_mapper_methods
-#'
-#' @details
-#' * The default `ibm_n()` method returns a non-null element 'n' from the
-#' mapper object, and gives an error if it doesn't exist. If `inla_f=TRUE`,
-#' first checks for a 'n_inla' element.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_n.default <- function(mapper, inla_f = FALSE, ...) {
-  if (inla_f && !is.null(mapper[["n_inla"]])) {
-    mapper[["n_inla"]]
-  } else if (!is.null(mapper[["n"]])) {
-    mapper[["n"]]
-  } else {
-    stop("Default 'ibm_n()' method called but mapper doesn't have an 'n' element.")
-  }
-}
-
-
-#' @details
-#' * The default `ibm_values()` method returns a non-null element
-#' 'values' from the mapper object, and `seq_len(ibm_n(mapper))` if
-#' it doesn't exist.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_values.default <- function(mapper, inla_f = FALSE, ...) {
-  if (inla_f && !is.null(mapper[["values_inla"]])) {
-    mapper[["values_inla"]]
-  } else if (!inla_f && !is.null(mapper[["values"]])) {
-    mapper[["values"]]
-  } else {
-    seq_len(ibm_n(mapper, inla_f = inla_f))
-  }
-}
-
-#' @details
-#' * The default `ibm_amatrix()` gives an error message.
-#' Mapper classes must implement their own `ibm_amatrix` method.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.default <- function(mapper, input, inla_f = FALSE, ...) {
-  stop(paste0(
-    "Missing implementation of 'ibm_amatrix()' for mapper of class '",
-    class(mapper)[1], "'."
-  ))
-}
-
-#' @details
-#' * The default `ibm_inla_subset` method uses
-#' the `ibm_values` output to construct the inla subset indexing, passing
-#' extra arguments such as `multi` on to the methods (this means it supports
-#' both regular vector values and `multi=1` data.frame values).
-#' @export
-#' @rdname bru_mapper
-ibm_inla_subset.default <- function(mapper, ...) {
-  values_full <- ibm_values(mapper, inla_f = FALSE, ...)
-  values_inla <- ibm_values(mapper, inla_f = TRUE, ...)
-  if (is.data.frame(values_full)) {
-    subset <- logical(NROW(values_full))
-    if (length(subset) > 0) {
-      subset[
-        plyr::match_df(
-          cbind(
-            .inla_subset = seq_len(NROW(values_full)),
-            values_full
-          ),
-          values_inla,
-          on = names(values_full)
-        )[[".inla_subset"]]
-      ] <- TRUE
-    }
-  } else {
-    subset <- base::match(values_full, values_inla, nomatch = 0) > 0
-  }
-  subset
-}
-
-
-#' @details
-#' * The default `ibm_valid_input()` method returns an all-TRUE logical vector.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_valid_input.default <- function(mapper, input, ...) {
-  rep(TRUE, NROW(input))
-}
-
-
-
-
-
-## inla.mesh ####
-
-#' @param mesh An `inla.mesh.1d` or `inla.mesh.2d` object to use as a mapper
-#' @param indexed logical; If `TRUE`, the `ibm_values()` output will be the
-#' integer indexing sequence for the latent variables. If `FALSE`, the knot
-#' locations are returned (useful as an interpolator for `rw2` models
-#' and similar).
-#' Default: `TRUE`
-#' @export
-#' @rdname bru_mapper
-bru_mapper.inla.mesh <- function(mesh, ...) {
-  mapper <- list(mesh = mesh)
-  class(mapper) <- c("bru_mapper_inla_mesh_2d", "list")
-  bru_mapper.default(mapper)
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_n.bru_mapper_inla_mesh_2d <- function(mapper, ...) {
-  mapper[["mesh"]]$n
-}
-#' @export
-#' @rdname bru_mapper_methods
-ibm_values.bru_mapper_inla_mesh_2d <- function(mapper, ...) {
-  seq_len(mapper[["mesh"]]$n)
-}
-#' @param input The values for which to produce a mapping matrix
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
-  if (is.null(input)) {
-    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
-  }
-  if (!is.matrix(input) && !inherits(input, "Spatial")) {
-    input <- as.matrix(input)
-  }
-  INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
-}
-
-## inla.mesh.1d ####
-
-#' @param indexed logical; If `TRUE`, the `ibm_values()` output will be the
-#' integer indexing sequence for the latent variables (needed for `spde` models).
-#' If `FALSE`, the knot
-#' locations are returned (useful as an interpolator for `rw2` models
-#' and similar).
-#' Default: `NULL`, to force user specification of this parameter
-#' @export
-#' @rdname bru_mapper
-bru_mapper.inla.mesh.1d <- function(mesh, indexed = NULL, ...) {
-  if (is.null(indexed)) {
-    stop("indexed=TRUE/FALSE needs to be specified to convert inla.mesh.1d to a bru_mapper")
-  }
-  mapper <- list(
-    mesh = mesh,
-    indexed = indexed
-  )
-  class(mapper) <- c("bru_mapper_inla_mesh_1d", "list")
-  bru_mapper.default(mapper)
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_n.bru_mapper_inla_mesh_1d <- function(mapper, ...) {
-  mapper[["mesh"]]$m
-}
-#' @export
-#' @rdname bru_mapper_methods
-ibm_values.bru_mapper_inla_mesh_1d <- function(mapper, ...) {
-  if (mapper[["indexed"]]) {
-    seq_len(mapper[["mesh"]]$m)
-  } else {
-    mapper[["mesh"]]$loc
-  }
-}
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_inla_mesh_1d <- function(mapper, input, ...) {
-  if (is.null(input)) {
-    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
-  }
-  INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
-}
-
-## _index ####
-
-#' @param n Size of a model for `bru_mapper_index`
-#' @export
-#' @rdname bru_mapper
-bru_mapper_index <- function(n = 1L, ...) {
-  mapper <- list(
-    n = n
-  )
-  class(mapper) <- c("bru_mapper_index", "bru_mapper", "list")
-  mapper
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_valid_input.bru_mapper_index <- function(mapper, input, ...) {
-  ok <- !is.na(input)
-  ok[ok] <- (input[ok] >= 1) & (input[ok] <= ibm_n(mapper))
-  ok
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_index <- function(mapper, input, ...) {
-  if (is.null(input)) {
-    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
-  }
-  ok <- which(ibm_valid_input(mapper, input, ...))
-  Matrix::sparseMatrix(
-    i = ok,
-    j = input[ok],
-    x = rep(1, length(ok)),
-    dims = c(NROW(input), ibm_n(mapper))
-  )
-}
-
-## _linear ####
-
-#' @export
-#' @rdname bru_mapper
-bru_mapper_linear <- function(...) {
-  mapper <- list()
-  class(mapper) <- c("bru_mapper_linear", "bru_mapper", "list")
-  mapper
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_n.bru_mapper_linear <- function(mapper, ...) {
-  1L
-}
-#' @export
-#' @rdname bru_mapper_methods
-ibm_values.bru_mapper_linear <- function(mapper, ...) {
-  1.0
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_linear <- function(mapper, input, ...) {
-  if (is.null(input)) {
-    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
-  }
-  ok <- !is.na(input)
-  A <- Matrix::sparseMatrix(
-    i = which(ok),
-    j = rep(1, sum(ok)),
-    x = input[ok],
-    dims = c(NROW(input), ibm_n(mapper))
-  )
-  A
-}
-
-## _matrix ####
-
-#' @param labels Column labels for matrix mappings
-#' @export
-#' @rdname bru_mapper
-bru_mapper_matrix <- function(labels, ...) {
-  if (is.factor(labels)) {
-    mapper <- list(
-      labels = levels(labels)
-    )
-  } else {
-    mapper <- list(
-      labels = as.character(labels)
-    )
-  }
-  class(mapper) <- c("bru_mapper_matrix", "bru_mapper", "list")
-  mapper
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_n.bru_mapper_matrix <- function(mapper, ...) {
-  length(mapper$labels)
-}
-#' @export
-#' @rdname bru_mapper_methods
-ibm_values.bru_mapper_matrix <- function(mapper, ...) {
-  factor(x = mapper$labels, levels = mapper$labels)
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_matrix <- function(mapper, input, ...) {
-  if (is.null(input)) {
-    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
-  } else if (is.matrix(input)) {
-    A <- as(input, "Matrix")
-  } else if (inherits(input, "Matrix")) {
-    A <- input
-  } else if (inherits(input, "Spatial")) {
-    A <- sp::coordinates(input)
-    A <- as(A, "Matrix")
-  } else {
-    A <- as(input, "Matrix")
-  }
-  if (ncol(A) != ibm_n(mapper)) {
-    stop(paste0(
-      "Input to matrix mapper has ", ncol(A),
-      " columns but should have ", ibm_n(mapper),
-      " columns."
-    ))
-  }
-  A
-}
-
-
-
-## _factor ####
-
-#' @param values Input values calculated by [input_eval.bru_input()]
-#' @param factor_mapping character; selects the type of factor mapping.
-#' * `'contrast'` for leaving out the first factor level.
-#' * `'full'` for keeping all levels.
-#' @export
-#' @rdname bru_mapper
-bru_mapper_factor <- function(values, factor_mapping, ...) {
-  factor_mapping <- match.arg(factor_mapping, c("full", "contrast"))
-  if (is.factor(values)) {
-    mapper <- list(
-      levels = levels(values),
-      factor_mapping = factor_mapping
-    )
-  } else if (is.character(values)) {
-    mapper <- list(
-      levels = unique(values),
-      factor_mapping = factor_mapping
-    )
-  } else {
-    mapper <- list(
-      levels = as.character(sort(unique(values))),
-      factor_mapping = factor_mapping
-    )
-  }
-  class(mapper) <- c("bru_mapper_factor", "bru_mapper", "list")
-  mapper
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_n.bru_mapper_factor <- function(mapper, ...) {
-  length(ibm_values(mapper))
-}
-#' @export
-#' @rdname bru_mapper_methods
-ibm_values.bru_mapper_factor <- function(mapper, ...) {
-  if (identical(mapper$factor_mapping, "contrast")) {
-    mapper$levels[-1L]
-  } else {
-    mapper$levels
-  }
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_factor <- function(mapper, input, ...) {
-  if (is.null(input)) {
-    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
-  }
-  if (is.factor(input)) {
-    if (!identical(levels(input), mapper$levels)) {
-      input <- factor(as.character(input), levels = mapper$levels)
-    }
-  } else {
-    input <- factor(input, levels = mapper$levels)
-  }
-  if (mapper$factor_mapping == "full") {
-    input <- as.numeric(input)
-  } else if (mapper$factor_mapping == "contrast") {
-    input <- as.numeric(input) - 1L
-  } else {
-    stop("Unknown factor mapping '", mapper$factor_mapping, "'.")
-  }
-  ok <- !is.na(input)
-  ok[which(ok)] <- (input[ok] > 0L)
-  A <- Matrix::sparseMatrix(
-    i = which(ok),
-    j = input[ok],
-    x = rep(1.0, sum(ok)),
-    dims = c(NROW(input), ibm_n(mapper))
-  )
-  A
-}
-
-
-
-## _offset ####
-
-#' @param values Input values calculated by [input_eval.bru_input()]
-#' @export
-#' @rdname bru_mapper
-bru_mapper_offset <- function(...) {
-  mapper <- list()
-  class(mapper) <- c("bru_mapper_offset", "bru_mapper", "list")
-  mapper
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_n.bru_mapper_offset <- function(mapper, ...) {
-  0L
-}
-#' @export
-#' @rdname bru_mapper_methods
-ibm_values.bru_mapper_offset <- function(mapper, ...) {
-  NULL
-}
-
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_offset <- function(mapper, input, ...) {
-  if (is.null(input)) {
-    return(Matrix::Matrix(0, 0, 1L))
-  }
-  ok <- !is.na(input)
-  ok[which(ok)] <- (input[ok] > 0L)
-  A <- Matrix::sparseMatrix(
-    i = which(ok),
-    j = rep(1L, sum(ok)),
-    x = input[ok],
-    dims = c(NROW(input), 1L)
-  )
-  A
-}
-
-
-## _multi ####
-
-#' @param values Input values calculated by [input_eval.bru_input()]
-#' @param mappers A list of `bru_mapper` objects
-#' @details * `bru_mapper_multi` constructs a kronecker product mapping
-#' @export
-#' @rdname bru_mapper
-bru_mapper_multi <- function(mappers, ...) {
-  mapper <- list(
-    mappers = mappers,
-    n_multi = lapply(mappers, function(x) {
-      ibm_n(x)
-    }),
-    n_inla_multi = lapply(mappers, function(x) {
-      ibm_n(x, inla_f = TRUE)
-    }),
-    values_multi = lapply(mappers, function(x) {
-      ibm_values(x)
-    }),
-    values_inla_multi = lapply(mappers, function(x) {
-      ibm_values(x, inla_f = TRUE)
-    })
-  )
-  mapper[["n"]] <- prod(unlist(mapper[["n_multi"]]))
-  mapper[["n_inla"]] <- prod(unlist(mapper[["n_inla_multi"]]))
-  class(mapper) <- c("bru_mapper_multi", "bru_mapper", "list")
-  mapper
-}
-
-#' @param multi integer or logical;
-#' If positive, the number of levels to recurse in a `bru_multi_mapper`.
-#' If `TRUE`, equivalent to `1L`. If `FALSE`, equivalent to `0L`.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_n.bru_mapper_multi <- function(mapper, inla_f = FALSE, multi = 0L, ...) {
-  if (multi > 1) {
-    lapply(mapper[["mappers"]], function(x) {
-      ibm_n(x, multi = multi - 1)
-    })
-  } else if (multi == 1) {
-    if (inla_f) {
-      mapper[["n_inla_multi"]]
-    } else {
-      mapper[["n_multi"]]
-    }
-  } else {
-    if (inla_f) {
-      mapper[["n_inla"]]
-    } else {
-      mapper[["n"]]
-    }
-  }
-}
-#' @export
-#' @rdname bru_mapper_methods
-ibm_values.bru_mapper_multi <- function(mapper, inla_f = FALSE, multi = 0L, ...) {
-  if (multi > 1) {
-    lapply(mapper[["mappers"]], function(x) {
-      ibm_values(x, multi = multi - 1)
-    })
-  } else if (multi == 1) {
-    # Expand indices/values. First sub-mapper varies fastest
-    as.data.frame(
-      do.call(
-        expand.grid,
-        c(
-          if (inla_f) {
-            mapper[["values_inla_multi"]]
-          } else {
-            mapper[["values_multi"]]
-          },
-          list(
-            KEEP.OUT.ATTRS = FALSE,
-            stringsAsFactors = FALSE
-          )
-        )
-      )
-    )
-  } else {
-    if (inla_f) {
-      seq_len(mapper[["n_inla"]])
-    } else {
-      seq_len(mapper[["n"]])
-    }
-  }
-}
-
-
-#' @details
-#' * `ibm_amatrix` for `bru_mapper_multi` accepts a list with
-#' named entries, or a list with unnamed but ordered elements.
-#' The names must match the sub-mappers, see [names.bru_mapper_multi()].
-#' Each list element should take a format accepted by the corresponding
-#' sub-mapper. In case each element is a vector, the input can be given as a
-#' data.frame with named columns, a matrix with named columns, or a matrix
-#' with unnamed but ordered columns.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_multi <- function(mapper, input,
-                                         inla_f = FALSE, multi = 0L, ...) {
-  by_number <- FALSE
-  if (is.matrix(input)) {
-    if (is.null(colnames(input))) {
-      by_number <- TRUE
-    }
-    input <- as.data.frame(input)
-  }
-  if (by_number || is.null(names(input))) {
-    indexing <- seq_along(mapper[["mappers"]])
-  } else {
-    indexing <- names(mapper[["mappers"]])
-  }
-  A <-
-    lapply(
-      indexing,
-      function(x) {
-        ibm_amatrix(mapper[["mappers"]][[x]],
-          input = input[[x]],
-          inla_f = inla_f,
-          multi = multi - 1
-        )
-      }
-    )
-  if (multi < 1) {
-    # Combine the matrices (A1, A2, A3) -> rowkron(A3, rowkron(A2, A1))
-    A_ <- A[[1]]
-    for (k in seq_len(length(mapper[["mappers"]]) - 1)) {
-      A_ <- row_kron(A[[k + 1]], A_)
-    }
-    return(A_)
-  }
-  A
-}
-
-#' @details
-#' * `ibm_valid_input` for `bru_mapper_multi` accepts a list with
-#' named entries, or a list with unnamed but ordered elements.
-#' The names must match the sub-mappers, see [names.bru_mapper_multi()].
-#' Each list element should take a format accepted by the corresponding
-#' sub-mapper. In case each element is a vector, the input can be given as a
-#' data.frame with named columns, a matrix with named columns, or a matrix
-#' with unnamed but ordered columns.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_valid_input.bru_mapper_multi <- function(mapper, input,
-                                             inla_f = FALSE, multi = 0L, ...) {
-  by_number <- FALSE
-  if (is.matrix(input)) {
-    if (is.null(colnames(input))) {
-      by_number <- TRUE
-    }
-    input <- as.data.frame(input)
-  }
-  if (!is.list(input)) {
-    validity <- as.list(rep(FALSE, length(mapper[["mappers"]])))
-  } else {
-    if (by_number || is.null(names(input))) {
-      indexing <- seq_along(mapper[["mappers"]])
-    } else {
-      indexing <- names(mapper[["mappers"]])
-    }
-    validity <-
-      lapply(
-        indexing,
-        function(x) {
-          ibm_valid_input(mapper[["mappers"]][[x]],
-            input = input[[x]],
-            inla_f = inla_f,
-            multi = 0
-          )
-        }
-      )
-  }
-  if (multi < 1) {
-    # Combine the vectors (v1, v2, v3) -> v1 & v2 & v3
-    validity_ <- validity[[1]]
-    for (k in seq_len(length(mapper[["mappers"]]) - 1)) {
-      validity_ <- validity_ & validity[[k + 1]]
-    }
-    return(validity_)
-  }
-  validity
-}
-
-#' @return
-#' * `[`-indexing a `bru_mapper_multi` extracts a subset
-#'   `bru_mapper_multi` object (for drop `FALSE`) or an individual sub-mapper
-#'   (for drop `TRUE`, and `i` identifies a single element)
-#' @export
-#' @param x object from which to extract element(s)
-#' @param i indices specifying element(s) to extract
-#' @param drop logical;
-#' For `[.bru_mapper_multi`, whether to extract an individual mapper when
-#' `i` identifies a single element. If `FALSE`, a list of sub-mappers is
-#' returned (suitable e.g. for creating a new `bru_mapper_multi` object).
-#' Default: `TRUE`
-#' @rdname bru_mapper_methods
-`[.bru_mapper_multi` <- function(x, i, drop = TRUE) {
-  if (is.logical(i)) {
-    i <- which(i)
-  }
-  mapper <- x[["mappers"]][i]
-  if (drop) {
-    if (length(mapper) == 1) {
-      mapper <- mapper[[1]]
-    } else if (length(mapper) == 0) {
-      mapper <- NULL
-    }
-  }
-  mapper
-}
-
-#' @return
-#' * The `names()` method for `bru_mapper_multi` returns the names from the
-#' sub-mappers list
-#' @export
-#' @rdname bru_mapper_methods
-`names.bru_mapper_multi` <- function(x) {
-  names(x[["mappers"]])
-}
-
-#' @param value a character vector of up to the same length as the number
-#' of mappers in the multi-mapper x
-#' @export
-#' @rdname bru_mapper_methods
-`names<-.bru_mapper_multi` <- function(x, value) {
-  names(x[["mappers"]]) <- value
-  names(x[["n_multi"]]) <- value
-  names(x[["n_inla_multi"]]) <- value
-  names(x[["values_multi"]]) <- value
-  names(x[["values_inla_multi"]]) <- value
-  x
-}
-
-
-
-## _collect ####
-
-#' @param values Input values calculated by [input_eval.bru_input()]
-#' @param mappers A list of `bru_mapper` objects
-#' @param hidden `logical`, set to `TRUE` to flag that the mapper is to be used
-#' as a first level input mapper for `INLA::f()` in a model that requires making
-#' only the first mapper visible to `INLA::f()` and `INLA::inla.stack()`, such
-#' as for "bym2" models, as activated by the `inla_f` argument to `ibm_n`,
-#' `ibm_values`, and `ibm_amatrix`. Set to `FALSE` to always access the full
-#' mapper, e.g. for `rgeneric` models
-#' @details * `bru_mapper_collect` constructs concatenated collection mapping
-#' @export
-#' @rdname bru_mapper
-bru_mapper_collect <- function(mappers, hidden = FALSE, ...) {
-  mapper <- list(
-    mappers = mappers,
-    n_multi = lapply(mappers, function(x) {
-      ibm_n(x)
-    }),
-    values_multi = lapply(mappers, function(x) {
-      ibm_values(x)
-    }),
-    hidden = hidden
-  )
-  mapper[["n"]] <- sum(unlist(mapper[["n_multi"]]))
-  mapper[["values"]] <- seq_len(mapper[["n"]])
-  class(mapper) <- c("bru_mapper_collect", "bru_mapper", "list")
-  mapper
-}
-
-#' @param multi integer or logical;
-#' If positive, the number of levels to recurse in a `bru_collect_mapper`.
-#' If `TRUE`, equivalent to `1L`. If `FALSE`, equivalent to `0L`.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_n.bru_mapper_collect <- function(mapper, inla_f = FALSE, multi = 0L, ...) {
-  if (mapper[["hidden"]] && inla_f) {
-    if (multi > 0) {
-      ibm_n(mapper, multi = multi, ...)
-    } else {
-      ibm_n(mapper[["mappers"]][[1]])
-    }
-  } else {
-    if (multi > 1) {
-      lapply(mapper[["mappers"]], function(x) {
-        ibm_n(x, multi = multi - 1)
-      })
-    } else if (multi == 1) {
-      mapper[["n_multi"]]
-    } else {
-      mapper[["n"]]
-    }
-  }
-}
-#' @export
-#' @rdname bru_mapper_methods
-ibm_values.bru_mapper_collect <- function(mapper, inla_f = FALSE, multi = 0L, ...) {
-  if (mapper[["hidden"]] && inla_f) {
-    if (multi > 0) {
-      ibm_values(mapper, multi = multi, ...)
-    } else {
-      ibm_values(mapper[["mappers"]][[1]])
-    }
-  } else {
-    if (multi > 1) {
-      lapply(mapper[["mappers"]], function(x) {
-        ibm_values(x, multi = multi - 1)
-      })
-    } else if (multi == 1) {
-      mapper[["values_multi"]]
-    } else {
-      mapper[["values"]]
-    }
-  }
-}
-#' @details
-#' * `ibm_amatrix` for `bru_mapper_collect` accepts a list with
-#' named entries, or a list with unnamed but ordered elements.
-#' The names must match the sub-mappers, see [names.bru_mapper_collect()].
-#' Each list element should take a format accepted by the corresponding
-#' sub-mapper. In case each element is a vector, the input can be given as a
-#' data.frame with named columns, a matrix with named columns, or a matrix
-#' with unnamed but ordered columns. When `inla_f=TRUE` and `hidden=TRUE` in
-#' the mapper definition, the input format should instead match that of
-#' the first, non-hidden, sub-mapper.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_amatrix.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, multi = 0L, ...) {
-  if (mapper[["hidden"]] && inla_f) {
-    input <- list(input)
-  }
-  if (is.null(names(input))) {
-    indexing <- seq_len(length(mapper[["mappers"]]))
-    A <-
-      lapply(
-        indexing,
-        function(x) {
-          ibm_amatrix(
-            mapper[["mappers"]][[x]],
-            input = if (x <= length(input)) {
-              input[[x]]
-            } else {
-              NULL
-            },
-            multi = multi - 1
-          )
-        }
-      )
-  } else {
-    indexing <- names(mapper[["mappers"]])
-    A <-
-      lapply(
-        indexing,
-        function(x) {
-          ibm_amatrix(
-            mapper[["mappers"]][[x]],
-            input = input[[x]],
-            multi = multi - 1
-          )
-        }
-      )
-  }
-  if (multi < 1) {
-    # Combine the matrices (A1, A2, A3, ...) -> bdiag(A1, A2, A3, ...)
-    A_ <- Matrix::.bdiag(A)
-    return(A_)
-  }
-  A
-}
-
-#' @details
-#' * `ibm_valid_input` for `bru_mapper_collect` accepts a list with
-#' named entries, or a list with unnamed but ordered elements.
-#' The names must match the sub-mappers, see [names.bru_mapper_collect()].
-#' Each list element should take a format accepted by the corresponding
-#' sub-mapper. In case each element is a vector, the input can be given as a
-#' data.frame with named columns, a matrix with named columns, or a matrix
-#' with unnamed but ordered columns.
-#' @export
-#' @rdname bru_mapper_methods
-ibm_valid_input.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, multi = 0L, ...) {
-  if (mapper[["hidden"]] && inla_f) {
-    validity <- ibm_valid_input(mapper[["mappers"]][[1]],
-      input = input,
-      multi = multi - 1
-    )
-  } else {
-    if (!is.list(input)) {
-      validity <- as.list(rep(FALSE, mapper[["mappers"]]))
-    } else {
-      if (is.null(names(input))) {
-        indexing <- seq_along(mapper[["mappers"]])
-      } else {
-        indexing <- names(mapper[["mappers"]])
-      }
-      validity <-
-        lapply(
-          indexing,
-          function(x) {
-            ibm_valid_input(mapper[["mappers"]][[x]],
-              input = input[[x]],
-              multi = 0L
-            )
-          }
-        )
-    }
-    if (multi < 1) {
-      # Combine the vectors (v1, v2, v3) -> c(v1, v2, v3)
-      validity_ <- do.call(c, validity)
-      return(validity_)
-    }
-  }
-  validity
-}
-
-#' @return
-#' * `[`-indexing a `bru_mapper_collect` extracts a subset
-#'   `bru_mapper_collect` object (for drop `FALSE`) or an individual sub-mapper
-#'   (for drop `TRUE`, and `i` identifies a single element)
-#' @export
-#' @param x object from which to extract element(s)
-#' @param i indices specifying element(s) to extract
-#' @param drop logical;
-#' For `[.bru_mapper_collect`, whether to extract an individual mapper when
-#' `i` identifies a single element. If `FALSE`, a list of sub-mappers is
-#' returned (suitable e.g. for creating a new `bru_mapper_collect` object).
-#' Default: `TRUE`
-#' @rdname bru_mapper_methods
-`[.bru_mapper_collect` <- function(x, i, drop = TRUE) {
-  if (is.logical(i)) {
-    i <- which(i)
-  }
-  mapper <- x[["mappers"]][i]
-  if (drop) {
-    if (length(mapper) == 1) {
-      mapper <- mapper[[1]]
-    } else if (length(mapper) == 0) {
-      mapper <- NULL
-    }
-  }
-  mapper
-}
-
-#' @return
-#' * The `names()` method for `bru_mapper_collect` returns the names from the
-#' sub-mappers list
-#' @export
-#' @rdname bru_mapper_methods
-`names.bru_mapper_collect` <- function(x) {
-  names(x[["mappers"]])
-}
-
-#' @param value a character vector of up to the same length as x
-#' @export
-#' @rdname bru_mapper_methods
-`names<-.bru_mapper_collect` <- function(x, value) {
-  names(x[["mappers"]]) <- value
-  names(x[["n_multi"]]) <- value
-  names(x[["values_multi"]]) <- value
-  x
-}
 
 
 
@@ -2420,41 +1521,98 @@ ibm_valid_input.bru_mapper_collect <- function(mapper, input, inla_f = FALSE, mu
 #' @keywords internal
 #' @param object A `component` or `component_list`.
 #' @param ... ignored.
+#' @param depth The depth of which to expand the component mapper.
+#' Default `Inf`, to traverse the entire mapper tree.
+#' @param verbose logical; If `TRUE`, includes more details of the
+#' component definitions. When `FALSE`, only show basic component
+#' definition information.  Default `TRUE`.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 
-summary.component <- function(object, ...) {
+summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
   result <- list(
-    "Label" = object$label,
-    "  Main" = sprintf(
-      "input '%s',\ttype '%s'",
-      deparse(object[["main"]][["input"]][["input"]]),
-      object[["main"]][["type"]]
+    "Label" = object[["label"]],
+    "Copy_of" = object[["copy"]],
+    "Type" = paste0(
+      unlist(lapply(
+        c("main", "group", "replicate"),
+        function(x) {
+          if (is.null(object[[x]][["input"]][["input"]])) {
+            NULL
+          } else {
+            paste0(x, " = ", object[[x]][["type"]])
+          }
+        }
+      )),
+      collapse = ", "
     ),
-    "  Group" =
-      if (!is.null(object[["group"]][["input"]][["input"]])) {
-        sprintf(
-          "input '%s',\ttype '%s'",
-          deparse(object[["group"]][["input"]][["input"]]),
-          object[["group"]][["type"]]
-        )
+    "Input" = paste0(
+      unlist(lapply(
+        c("main", "group", "replicate", "weights"),
+        function(x) {
+          if (is.null(object[[x]][["input"]][["input"]])) {
+            NULL
+          } else {
+            paste0(
+              x, " = ",
+              deparse(object[[x]][["input"]][["input"]])
+            )
+          }
+        }
+      )),
+      collapse = ", "
+    ),
+    "Mapper" =
+      if (is.null(object[["mapper"]])) {
+        "Not yet initialised"
       } else {
-        NULL
-      },
-    "  Replicate" =
-      if (!is.null(object[["replicate"]][["input"]][["input"]])) {
-        sprintf(
-          "input '%s',\ttype '%s'",
-          deparse(object[["replicate"]][["input"]][["input"]]),
-          object[["replicate"]][["type"]]
+        strwrap(
+          summary(object[["mapper"]],
+            prefix = "    ",
+            initial = "",
+            depth = depth
+          ),
+          prefix = "    ",
+          initial = ""
         )
-      } else {
-        NULL
       },
-    "  INLA formula" = as.character(object$inla.formula)
+    "INLA formula" =
+      paste0(
+        "\n",
+        strwrap(
+          paste(as.character(object$inla.formula), collapse = " "),
+          width = 0.9 * getOption("width"),
+          indent = 4,
+          exdent = 6
+        )
+      )
   )
-  if (!is.null(object[["copy"]])) {
-    result[["Copy"]] <- sprintf("Copy of component '%s'", object[["copy"]])
+  if (!verbose) {
+    Summary <- paste0(
+      object[["label"]],
+      if (is.null(object[["copy"]])) NULL else paste0("(=", object[["copy"]], ")"),
+      ": ",
+      paste0(
+        unlist(lapply(
+          c("main", "group", "replicate", "weights"),
+          function(x) {
+            if (is.null(object[[x]][["input"]][["input"]])) {
+              NULL
+            } else {
+              paste0(
+                x, " = ", object[[x]][["type"]],
+                "(",
+                deparse(object[[x]][["input"]][["input"]]),
+                ")"
+              )
+            }
+          }
+        )),
+        collapse = ", "
+      )
+    )
+    result$Summary <- Summary
   }
   class(result) <- c("summary_component", "list")
   result
@@ -2462,15 +1620,20 @@ summary.component <- function(object, ...) {
 
 #' @export
 #' @method summary component_list
-#' @param ... ignored.
+#' @param ... passed on to other summary methods
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @rdname summary.component
 
-summary.component_list <- function(object, ...) {
+summary.component_list <- function(object, verbose = TRUE, ...) {
   result <- lapply(
     object,
-    summary
+    function(x) {
+      summary(x, verbose = verbose, ...)
+    }
   )
+  for (cp in which(vapply(result, function(x) !is.null(x$Copy_of), FALSE))) {
+    result[[cp]]$Type <- result[[result[[cp]][["Copy_of"]]]][["Type"]]
+  }
   class(result) <- c("summary_component_list", "list")
   result
 }
@@ -2481,10 +1644,20 @@ summary.component_list <- function(object, ...) {
 #' @rdname summary.component
 
 print.summary_component <- function(x, ...) {
-  for (name in names(x)) {
-    if (!is.null(x[[name]])) {
-      cat(name, ":", "\t", x[[name]], "\n", sep = "")
+  if (is.null(x[["Summary"]])) {
+    for (name in names(x)) {
+      if (!is.null(x[[name]])) {
+        if (name %in% "Label") {
+          cat("Label:", "\t", x[[name]], "\n", sep = "")
+        } else if (name %in% "Mapper") {
+          cat("  ", "Map: ", x[[name]], "\n", sep = "")
+        } else {
+          cat("  ", name, ":", "\t", x[[name]], "\n", sep = "")
+        }
+      }
     }
+  } else {
+    cat(x[["Summary"]], "\n", sep = "")
   }
   invisible(x)
 }
@@ -2505,34 +1678,44 @@ print.summary_component_list <- function(x, ...) {
 #' @export
 #' @keywords internal
 #' @param component A component.
-#' @param data A `data.frame` or Spatial* object of covariates and/or point locations.
-#' @param ... Unused.
-#' @return An A-matrix.
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#' @rdname amatrix_eval
+#' @param input Component inputs, from `input_eval()`
+#' @param linearisation evaluation state
+#' @param ... Optional parameters passed on to `ibm_eval`
+#' and `ibm_jacobian.
+#' @return A `bru_mapper_taylor` or `comp_simple_list` object.
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname comp_lin_eval
 
-amatrix_eval.component <- function(component, data, ...) {
-  val <- input_eval(component, data)
-  A <- ibm_amatrix(component$mapper, input = val, ...)
-
-  if (!is.null(val[["weights"]])) {
-    A <- val[["weights"]] * A
+comp_lin_eval.component <- function(component,
+                                    input = NULL,
+                                    state = NULL,
+                                    ...) {
+  if (is.null(state)) {
+    state <- rep(0, ibm_n(component[["mapper"]]))
   }
-
-  # Mask columns of A
-  # TODO: check what this feature is intended for!
-  if (!is.null(component$A.msk)) {
-    A[, as.logical(component$A.msk)] <- 0.0
-  }
-
-  A
+  ibm_linear(component[["mapper"]], input = input, state = state, ...)
 }
 
 #' @export
-#' @rdname amatrix_eval
+#' @rdname comp_lin_eval
 
-amatrix_eval.component_list <- function(components, data, ...) {
-  lapply(components, function(x) amatrix_eval(x, data = data, ...))
+comp_lin_eval.component_list <- function(components, input, state, ...) {
+  # Note: Make sure the list element names carry over!
+  mappers <-
+    lapply(
+      components,
+      function(x) {
+        label <- x[["label"]]
+        comp_lin_eval(x,
+          input = input[[label]],
+          state = state[[label]],
+          ...
+        )
+      }
+    )
+
+  class(mappers) <- c("comp_simple_list", class(mappers))
+  mappers
 }
 
 #' @section Simple covariates and the map parameter:
@@ -2546,29 +1729,31 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #'
 #' \itemize{\item{`formula = y ~ f(xsquared, model = "linear")`,}}
 #'
-#' In inlabru this can be achived using two ways of using the `main` parameter
-#' (`map` in version 2.1.13 and earlier).
+#' In inlabru this can be achieved in several ways of using the `main` parameter
+#' (`map` in version 2.1.13 and earlier), which does not need to be named.
 #'
 #' \itemize{
 #' \item{`components = y ~ psi(main = x^2, model = "linear")`}
-#' \item{`components = y ~ psi(main = mySquareFun(x), model = "linear")`,}
-#' \item{`components = y ~ psi(main = myOtherSquareFun, model = "linear")`,}
+#' \item{`components = y ~ psi(x^2, model = "linear")`}
+#' \item{`components = y ~ psi(mySquareFun(x), model = "linear")`,}
+#' \item{`components = y ~ psi(myOtherSquareFun, model = "linear")`,}
 #'
 #' }
 #'
 #' In the first example inlabru will interpret the map parameter as an expression to be evaluated within
 #' the data provided. Since \eqn{x} is a known covariate it will know how to calculate it. The second
-#' example is an expression as well but it uses a function alled `mySquareFun`. This function is
-#' defined by user but has wo be accessible within the work space when setting up the compoonents.
-#' The third example provides the function `myOtherSquareFun` directly and not within an expression.
-#' In this case, inlabru will call the function using the data provided via the  `data` parameter.
-#' inlabru expects that the output of this function is a data.frame with "psi" being the name of the
-#' single existing column. For instance,
-#'
-#' \code{myOtherSquareFun = function(data) {
-#'                             data = data[,"x", drop = FALSE] ;
-#'                             colnames(data) = "psi" ;
-#'                             return(data)}}
+#' example is an expression as well but it uses a function called `mySquareFun`. This function is
+#' defined by user but has to be accessible within the work space when setting up the components.
+#' The third example provides the function `myOtherSquareFun`. In this case,
+#'  inlabru will call the function as `myOtherSquareFun(.data.)`, where `.data.`
+#'  is the data provided via the [like()] `data` parameter.
+#' The function needs to know what parts of the data to use to construct the
+#' needed output. For example,
+#' ```
+#' myOtherSquareFun <- function(data) {
+#'   data[ ,"x"]^2
+#' }
+#' ```
 #'
 #' @section Spatial Covariates:
 #'
@@ -2577,39 +1762,47 @@ amatrix_eval.component_list <- function(components, data, ...) {
 #' data frame or write a covariate function like in the previous section there is an even more
 #' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelsDataFrame`,
 #' `SpatialPixelsDataFrame` or `RasterLayer` objects. These can be provided directly via
-#' the map parameter if the input data is a `SpatialPointsDataFrame`. inlabru will automatically
-#' evaluate and/or interpolate the coariate at your data locations when using code like
-#'
-#' \itemize{\item{`components = y ~ psi(mySpatialPixels, model = "linear")`.}}
+#' the input expressions if the [like()] data is a `SpatialPointsDataFrame` object.
+#' inlabru will automatically
+#' evaluate and/or interpolate the covariate at your data locations when using code like
+#' ```
+#' components = y ~ psi(mySpatialPixels, model = "linear")
+#' ```
 #'
 #' @section Coordinates:
 #'
 #' A common spatial modelling component when using inla are SPDE models. An important feature of
-#' inlabru is that it will automatically calculate the so called A-matrix which maps SPDE
-#' values at the mesh vertices to values at the data locations. For this purpose, the map parameter
-#' can be se to `coordinates`, which is the `sp` package function that extracts point
-#' coordinates from the SpatialPointsDataFrame that was provided as input to bru. The code for
+#' inlabru is that it will automatically calculate the so called A-matrix (a component model matrix)
+#' which maps SPDE
+#' values at the mesh vertices to values at the data locations. For this purpose, the input
+#' can be set to `coordinates`, which is the `sp` package function that extracts point
+#' coordinates from the `SpatialPointsDataFrame` that was provided as input to [like()]. The code for
 #' this would look as follows:
-#'
-#' \itemize{\item{`components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))`.}}
+#' ```
+#' components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))
+#' ```
 #'
 #' @export
 #' @keywords internal
 #' @param component A component.
-#' @param data A `data.frame` or Spatial* object of covariates and/or point locations. If null, return the component's map.
+#' @param data A `data.frame` or `Spatial*` object of covariates and/or point locations.
+#' If `NULL`, return the component's map.
 #' @param ... Unused.
-#' @return An vector or a coordinate matrix
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @return An list of mapper input values, formatted for the full component mapper
+#' (of type `bru_mapper_pipe`)
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname input_eval
 
 input_eval.component <- function(component,
                                  data,
                                  ...) {
-  val <- list()
+  stopifnot(inherits(component[["mapper"]], "bru_mapper_pipe"))
+
   # The names should be a subset of main, group, replicate
-  part_names <- names(component[["mapper"]])
+  part_names <- ibm_names(component[["mapper"]][["mappers"]][[1]])
+  mapper_val <- list()
   for (part in part_names) {
-    val[[part]] <-
+    mapper_val[[part]] <-
       input_eval(
         component[[part]]$input,
         data,
@@ -2618,8 +1811,10 @@ input_eval.component <- function(component,
         ...
       )
   }
-  if (!is.null(component[["weights"]])) {
-    val[["weights"]] <-
+  if (is.null(component[["weights"]])) {
+    scale_val <- NULL
+  } else {
+    scale_val <-
       input_eval(
         component[["weights"]],
         data,
@@ -2630,7 +1825,7 @@ input_eval.component <- function(component,
   }
   # Any potential length mismatches must be handled by bru_mapper_multi and
   # bru_mapper_collect, since e.g. 'main' might take a list() input object.
-  val
+  list(mapper = mapper_val, scale = scale_val)
 }
 
 #' @export
@@ -2640,19 +1835,43 @@ input_eval.component_list <-
   function(components,
            data,
            ...) {
-    part <- match.arg(part)
-    result <- lapply(components, function(x) input_eval(x, data = data, ...))
-    result
+    lapply(components, function(x) input_eval(x, data = data, ...))
   }
 
+
+
+input_eval_layer <- function(layer, selector = NULL, envir, enclos,
+                             label,
+                             e_input) {
+  input_layer <- tryCatch(
+    eval(layer, envir = envir, enclos = enclos),
+    error = function(e) {
+      e
+    }
+  )
+  if (inherits(input_layer, "error")) {
+    stop(paste0(
+      "Failed to evaluate 'layer' input '",
+      deparse(layer),
+      "' for '",
+      paste0(label, ":layer"),
+      "'."
+    ))
+  }
+  if (is.null(input_layer) && is.null(selector)) {
+    if (label %in% names(e_input)) {
+      input_layer <- label
+    }
+  }
+  input_layer
+}
 
 
 #' @export
 #' @rdname input_eval
 
-input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
+input_eval.bru_input <- function(input, data, env = NULL,
                                  null.on.fail = FALSE, ...) {
-
   # Evaluate the map with the data in an environment
   enclos <-
     if (is.null(env)) {
@@ -2673,7 +1892,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   }
   assign(".data.", data, envir = envir)
 
-  emap <- tryCatch(eval(input$input, envir = envir, enclos = enclos),
+  e_input <- tryCatch(eval(input$input, envir = envir, enclos = enclos),
     error = function(e) {
     }
   )
@@ -2694,15 +1913,15 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   # ## A matrix.
   #  n <- nrow(as.data.frame(data))
 
-  if (is.null(emap)) {
+  if (is.null(e_input)) {
     if (null.on.fail) {
       return(NULL)
     }
     #    val <- rep(1, n)
     val <- 1
-  } else if (is.function(emap)) {
+  } else if (is.function(e_input)) {
     # Allow but detect failures:
-    val <- tryCatch(emap(data),
+    val <- tryCatch(e_input(data),
       error = function(e) {
       }
     )
@@ -2718,7 +1937,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
           val <- as.data.frame(val)
           coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
-          data_crs <- tryCatch(fm_sp_get_crs(data),
+          data_crs <- tryCatch(fm_CRS(data),
             error = function(e) {
             }
           )
@@ -2732,9 +1951,9 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
         }
       )
     }
-  } else if (inherits(emap, "formula")) {
+  } else if (inherits(e_input, "formula")) {
     # Allow but detect failures:
-    val <- tryCatch(MatrixModels::model.Matrix(emap, data = data, sparse = TRUE),
+    val <- tryCatch(MatrixModels::model.Matrix(e_input, data = data, sparse = TRUE),
       error = function(e) {
       }
     )
@@ -2744,28 +1963,42 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
       # that are likely to happen for multilikelihood models; A component only
       # needs to be evaluable for at least one of the likelihoods.
     }
-  } else if (inherits(emap, "SpatialGridDataFrame") |
-    inherits(emap, "SpatialPixelsDataFrame")) {
-    if (is.null(input[["selector"]])) {
-      layer <-
-        if (is.null(input[["layer"]])) {
-          1
-        } else {
-          input[["layer"]]
-        }
-    }
-    val <- eval_SpatialDF(
-      emap,
+  } else if (inherits(
+    e_input,
+    c(
+      "SpatialGridDataFrame",
+      "SpatialPixelsDataFrame",
+      "SpatRaster",
+      "sf"
+    )
+  )) {
+    input_layer <-
+      input_eval_layer(
+        layer = input[["layer"]],
+        selector = input[["selector"]],
+        envir = envir,
+        enclos = enclos,
+        label = input[["label"]],
+        e_input = e_input
+      )
+    layer <- extract_layer(
+      data,
+      input_layer,
+      input[["selector"]]
+    )
+    check_layer(e_input, data, layer)
+    val <- eval_spatial(
+      e_input,
       data,
       layer = layer,
-      selector = input[["selector"]]
+      selector = NULL
     )
-    #  } else if ((input$label == "offset") &&
-    #    is.numeric(emap) &&
-    #    (length(emap) == 1)) {
-    #    val <- rep(emap, n)
+    #  } else if ((input$label %in% c("offset", "const")) &&
+    #    is.numeric(e_input) &&
+    #    (length(e_input) == 1)) {
+    #    val <- rep(e_input, n)
   } else {
-    val <- emap
+    val <- e_input
   }
 
   # ## Need to allow different sizes; K %*% effect needs to have same length as response, but the input and effect effect itself doesn't.
@@ -2778,14 +2011,18 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
   # to fix that by filling in nearest neighbour values.
   # # TODO: Check how to deal with this fully in the case of multilikelihood models
   # Answer: should respect the lhood "include/exclude" info for the component list
-  if ((inherits(emap, "SpatialGridDataFrame") ||
-    inherits(emap, "SpatialPixelsDataFrame")) &&
+  if ((inherits(e_input, c(
+    "SpatialGridDataFrame",
+    "SpatialPixelsDataFrame",
+    "SpatRaster"
+  ))) &&
     any(is.na(as.data.frame(val)))) {
     warning(
       paste0(
         "Model input '",
         deparse(input$input),
-        "' for '", label, "' returned some NA values.\n",
+        "' for '", input$label,
+        "' returned some NA values.\n",
         "Attempting to fill in spatially by nearest available value.\n",
         "To avoid this basic covariate imputation, supply complete data."
       ),
@@ -2793,12 +2030,17 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
     )
 
     val <- bru_fill_missing(
-      data = emap, where = data, values = val,
-      layer = layer, selector = input[["selector"]]
+      data = e_input, where = data, values = val,
+      layer = layer, selector = NULL
     )
   }
 
   # Check for NA values.
+  # TODO: update 2022-11-04:
+  # iid models now by default are given _index mappers, which treat NAs
+  # as zero.  An option to turn on a warning could be useful for checking
+  # models that aren't supposed to have NA inputs.
+  #
   #  if (any(is.na(unlist(as.vector(val))))) {
   #    # TODO: remove this check and make sure NAs are handled properly elsewhere,
   #    # if possible. Problem: treating NA as "no effect" can have negative side
@@ -2831,7 +2073,7 @@ input_eval.bru_input <- function(input, data, env = NULL, label = NULL,
 #' @rdname index_eval
 
 index_eval.component <- function(component, inla_f, ...) {
-  idx <- ibm_values(component[["mapper"]], inla_f = inla_f, multi = 1)
+  idx <- ibm_values(component[["mapper"]], inla_f = inla_f, multi = TRUE)
   names(idx) <- paste0(component[["label"]], c("", ".group", ".repl"))
   idx
 }
@@ -2852,5 +2094,5 @@ index_eval.component_list <- function(components, inla_f, ...) {
 #' @rdname inla_subset_eval
 
 inla_subset_eval.component_list <- function(components, ...) {
-  lapply(components, function(x) ibm_inla_subset(x[["mapper"]], multi = 1))
+  lapply(components, function(x) ibm_inla_subset(x[["mapper"]], multi = TRUE))
 }

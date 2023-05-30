@@ -7,9 +7,9 @@
 \alias{print.summary_component_list}
 \title{Summarise components}
 \usage{
-\method{summary}{component}(object, ...)
+\method{summary}{component}(object, ..., depth = Inf, verbose = TRUE)
 
-\method{summary}{component_list}(object, ...)
+\method{summary}{component_list}(object, verbose = TRUE, ...)
 
 \method{print}{summary_component}(x, ...)
 
@@ -18,7 +18,14 @@
 \arguments{
 \item{object}{A \code{component} or \code{component_list}.}
 
-\item{...}{ignored.}
+\item{...}{passed on to other summary methods}
+
+\item{depth}{The depth of which to expand the component mapper.
+Default \code{Inf}, to traverse the entire mapper tree.}
+
+\item{verbose}{logical; If \code{TRUE}, includes more details of the
+component definitions. When \code{FALSE}, only show basic component
+definition information.  Default \code{TRUE}.}
 
 \item{x}{A summary object to be printed.}
 }

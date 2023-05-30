@@ -6,6 +6,7 @@
 \alias{component_list.formula}
 \alias{component_list.list}
 \alias{c.component_list}
+\alias{c.component}
 \alias{[.component_list}
 \title{Methods for inlabru component lists}
 \usage{
@@ -16,6 +17,8 @@ component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 \method{component_list}{list}(object, lhoods = NULL, .envir = parent.frame(), ...)
 
 \method{c}{component_list}(...)
+
+\method{c}{component}(...)
 
 \method{[}{component_list}(x, i)
 }
@@ -28,7 +31,7 @@ component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 
 \item{\dots}{Parameters passed on to other methods. Also see Details.}
 
-\item{x}{\code{component_list} object from which to extract element(s)}
+\item{x}{\code{component_list} object from which to extract a sub-list}
 
 \item{i}{indices specifying elements to extract}
 }
@@ -49,7 +52,14 @@ into a \code{component_list} object
 
 \itemize{
 \item \code{c.component_list}: The \code{...} arguments should be \code{component_list}
-objects. The environment from the first argument will be applied to the resulting list.
+objects. The environment from the first argument will be applied to the
+resulting \code{component_list}.
+}
+
+\itemize{
+\item \code{c.component}: The \code{...} arguments should be \code{component}
+objects. The environment from the first argument will be applied to the
+resulting ``component_list`.
 }
 }
 \examples{

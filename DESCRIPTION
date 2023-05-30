@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.5.0.9000
+Version: 2.7.0.9009
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -20,9 +20,15 @@ Authors@R: c(
          role = c("ctb", "dtc", "cph"),
          comment = "Lindesay Scott-Howard provided MRSea data import code"),
   person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
-         comment = "Andy Seaton provided testing and bugfixes"),
+         comment = "Andy Seaton provided testing, bugfixes, and vignettes"),
   person("Suen", "Man Ho", email = "M.H.Suen@sms.ed.ac.uk", role = c("ctb", "cph"),
-         comment = "Man Ho Suen contributed features for aggregated responses")
+         comment = "Man Ho Suen contributed features for aggregated responses and vignette updates"),
+  person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
+         comment = "Pierre Roudier contributed general quantile summaries"),
+  person("Meehan", "Tim", email = "tmeeha@gmail.com", role = c("ctb", "cph"),
+         comment = "Tim Meehan contributed the SVC vignette and robins data"),
+  person("Reddy Peddinenikalva", "Niharika", role = c("ctb", "cph"),
+         comment = "Niharika Peddinenikalva contributed the LGCP residuals vignette")
   )
 URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/
 BugReports: https://github.com/inlabru-org/inlabru/issues
@@ -40,64 +46,68 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 Depends:
     methods,
-    R (>= 3.5),
+    R (>= 3.6),
     sp (>= 1.4-5),
     stats
 Imports:
-    MatrixModels,
+    dplyr,
+    lifecycle,
     magrittr,
+    MatrixModels,
     Matrix,
     plyr,
-    rgdal (>= 1.5.8),
-    rgeos,
     rlang,
+    sf,
+    terra,
+    tibble,
     utils,
     withr
 Suggests:
     covr,
-    dplyr,
     ggmap,
     ggplot2,
     ggpolypath,
     graphics,
-    INLA (>= 21.08.31),
+    INLA (>= 23.01.31),
     knitr,
-    maptools,
+    maps,
     mgcv,
     patchwork,
     raster,
     RColorBrewer,
     rgl,
     rmarkdown,
+    scales,
     shiny,
     sn,
     spatstat.geom,
-    spatstat.core,
     spatstat.data,
-    spatstat (>= 2.0-0),
     sphereplot,
-    testthat
+    splancs,
+    tidyterra,
+    testthat,
+    tidyr,
+    DiagrammeR
 Roxygen: list(markdown = TRUE)
 Config/testthat/parallel: true
 Config/testthat/edition: 3
 Collate: 
     '0_inlabru_envir.R'
-    'bru.covariate.R'
     'bru.gof.R'
     'bru.inference.R'
     'bru.integration.R'
     'bru.spatial.R'
-    'covariate.R'
     'data.Poisson1_1D.R'
     'data.Poisson2_1D.R'
     'data.Poisson3_1D.R'
     'data.gorillas.R'
     'data.mexdolphin.R'
     'data.mrsea.R'
+    'data.robins_subset.R'
     'data.seals.R'
     'data.shrimp.R'
     'data.toygroups.R'
@@ -109,12 +119,17 @@ Collate:
     'effect.R'
     'environment.R'
     'fmesher_crs.R'
+    'fmesher_evaluator.R'
+    'fmesher_integration.R'
+    'fmesher_sf_mesh.R'
+    'fmesher_sp_mesh.R'
     'fmesher_utils.R'
     'ggplot.R'
     'inla.R'
     'inlabru.R'
     'integration.R'
     'local_testthat.R'
+    'mappers.R'
     'mesh.R'
     'model.R'
     'nlinla.R'
@@ -122,7 +137,7 @@ Collate:
     'prediction.R'
     'rgl.R'
     'sampling.R'
-    'shapefile.R'
+    'sf_utils.R'
     'spatstat.R'
     'spde.R'
     'stack.R'
@@ -131,3 +146,4 @@ Collate:
     'utils.R'
 VignetteBuilder: knitr
 BuildVignettes: true
+LazyData: false

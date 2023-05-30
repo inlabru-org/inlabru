@@ -37,7 +37,7 @@ in between),
 
 \item{name}{Character array stating the name of the domains dimension(s).
 If \code{NULL}, the names are taken from coordinate names from \code{samplers} for
-\verb{Spatial*} objects, otherwise "x", "y", "coordinateZ" for 2D regions and
+\verb{Spatial*} objects, otherwise "x", "y", "z" for 2D regions and
 \code{"x"} for 1D regions}
 
 \item{group}{Column names of the \code{samplers} object (if applicable) for which
@@ -53,7 +53,7 @@ without aggregating onto mesh nodes)
 points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
 Points per knot segment: \code{nsub1}
 \item \code{poly_method}: if set to "legacy", selects an old polygon integration method
-that doesn't handle holes. Currently only used for debugging purposes.
+that doesn't handle holes. Only used for debugging purposes.
 }}
 
 \item{project}{Deprecated in favour of \code{int.args(method=...)}.
@@ -61,7 +61,8 @@ If TRUE, aggregate the integration points to mesh vertices. Default:
 \code{project = (identical(int.args$method, "stable"))}}
 }
 \value{
-A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
+A \code{data.frame}, \code{tibble}, \code{sf}, or \code{SpatialPointsDataFrame} of 1D and
+2D integration points, including a \code{weight} column and \code{.block} column.
 }
 \description{
 This function generates points in one or two dimensions with a weight attached to each point.
@@ -69,10 +70,10 @@ The weighted sum of a function evaluated at these points is the integral of that
 by linear basis functions. The parameter \code{samplers} describes the area(s) integrated over.
 
 In case of a single dimension \code{samplers} is supposed to be a two-column \code{matrix} where
-each row describes the start and end point of the interval to integrate over. In the two-dimensional
+each row describes the start and end points of the interval to integrate over. In the two-dimensional
 case \code{samplers} can be either a \code{SpatialPolygon}, an \code{inla.mesh} or a
 \code{SpatialLinesDataFrame} describing the area to integrate over. If a \code{SpatialLineDataFrame}
-is provided it has to have a column called 'weight' in order to indicate the width of the line.
+is provided, it has to have a column called 'weight' in order to indicate the width of the line.
 
 The domain parameter is an \code{inla.mesh.1d} or \code{inla.mesh} object that can be employed to
 project the integration points to the vertices of the mesh. This reduces the final number of
@@ -89,8 +90,8 @@ points in the one-dimensional case.
 \examples{
 \donttest{
 if (require("INLA", quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE)) {
-
+  require("ggplot2", quietly = TRUE) &&
+  bru_safe_sp()) {
   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 
   ips <- ipoints(c(0, 10), 50, name = "myDim")

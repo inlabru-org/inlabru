@@ -31,7 +31,7 @@ if (bru_safe_inla(multicore = FALSE) &&
     gg(xpost)
 
 
-  # The predict function can also be used to simulatenneously estimate posteriors
+  # The predict function can also be used to simultaneously estimate posteriors
   # of multiple variables:
 
   xipost <- predict(fit, formula = ~ data.frame(post = c(x, Intercept)))

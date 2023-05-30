@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggplot.R
 \name{gmap}
 \alias{gmap}
-\title{Plot a map using extend of a spatial object}
+\title{Plot a map using extent of a spatial object}
 \usage{
 gmap(data, ...)
 }
@@ -28,7 +28,7 @@ if (require("ggplot2", quietly = TRUE) &&
   # Load the Gorilla data
   data(gorillas, package = "inlabru")
 
-  # Create a base map centered around the nests and plot the boundary as well
+  # Create a base map centred around the nests and plot the boundary as well
   # as the nests
   ggplot() +
     gg(gorillas$boundary) +

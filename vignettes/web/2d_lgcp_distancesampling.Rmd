@@ -35,7 +35,6 @@ Load libraries
 library(inlabru)
 library(INLA)
 library(ggplot2)
-bru_options_set(inla.mode = "experimental")
 ```
 
 Get the data
@@ -94,7 +93,6 @@ We need to define a half-normal detection probability function. This must take d
 arguent and the linear predictor of the sigma parameter (which we will call `lsig`) as its second:
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
-
 hn <- function(distance, lsig) {
   exp(-0.5 * (distance / exp(lsig))^2)
 }
@@ -187,11 +185,14 @@ distdf <- data.frame(distance = seq(0, 8, length = 100))
 dfun <- predict(fit, distdf, ~ hn(distance, lsig), include = "lsig")
 plot(dfun)
 ```
+The average detection probability within the maximum detection distance is estimated to be
+`r mean(dfun$mean)`.
+
 
 We can look at the posterior for expected number of dolphins as usual:
 
 ```{r warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-predpts <- ipoints(mexdolphin$ppoly, mexdolphin$mesh)
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda <- predict(fit, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda
 ```
@@ -248,7 +249,6 @@ fit1 <- lgcp(
 ```
 Plots:
 ```{r, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-
 spde.range <- spde.posterior(fit1, "mySPDE", what = "range")
 plot(spde.range)
 spde.logvar <- spde.posterior(fit1, "mySPDE", what = "log.variance")
@@ -273,7 +273,7 @@ distdf <- data.frame(distance = seq(0, 8, length = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
 plot(dfun1)
 
-predpts <- ipoints(mexdolphin$ppoly, mexdolphin$mesh)
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda1 <- predict(fit1, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda1
 
@@ -413,6 +413,8 @@ ggplot(data.frame(mexdolphin$points)) +
   geom_histogram(aes(x = distance), breaks = seq(0, 8, length = 9), alpha = 0.3) +
   geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
   geom_line(data = dlines, aes(x = distance, y = En, group = model, col = model)) +
-  geom_ribbon(data = dlines, aes(x = distance, ymin = En.lower, ymax = En.upper, group = model, col = model, fill = model),
-              alpha = 0.2, lty = 2)
+  geom_ribbon(
+    data = dlines, aes(x = distance, ymin = En.lower, ymax = En.upper, group = model, col = model, fill = model),
+    alpha = 0.2, lty = 2
+  )
 ```

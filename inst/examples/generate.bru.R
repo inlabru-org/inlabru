@@ -1,5 +1,6 @@
 \donttest{
-if (bru_safe_inla(multicore = FALSE)) {
+if (bru_safe_inla(multicore = FALSE) &&
+    require("sn", quietly = TRUE)) {
 
   # Generate data for a simple linear model
 

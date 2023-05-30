@@ -4,12 +4,7 @@
 \alias{spoly}
 \title{Convert a data.frame of boundary points into a SpatialPolgonsDataFrame}
 \usage{
-spoly(
-  data,
-  cols = colnames(data)[1:2],
-  crs = CRS(NA_character_),
-  to.crs = NULL
-)
+spoly(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NULL)
 }
 \arguments{
 \item{data}{A data.frame of points describing the boundary of the polygon}
@@ -45,7 +40,8 @@ pts <- data.frame(
 # Convert to SpatialPolygonsDataFrame
 pol <- spoly(pts)
 
-if (require(ggplot2, quietly = TRUE)) {
+if (require(ggplot2, quietly = TRUE) &&
+  require(ggpolypath, quietly = TRUE)) {
   # Plot it!
   ggplot() +
     gg(pol)

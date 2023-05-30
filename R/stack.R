@@ -11,29 +11,35 @@ bru_make_stack <- function(...) {
 
 #' @param lhood A `bru_like` object
 #' @param lin Linearisation information
-#' * For `.bru_like`, a linearisation information list with elements
-#' `A` and `offset`
-#' * For `.bru_like_list`, a list of linearisation information lists
+#' * For `.bru_like`, a `bru_mapper_taylor` object
+#' * For `.bru_like_list`, a list of `bru_mapper_taylor` objects
 #' @param idx Output from `evaluate_index(...)`
 #' @export
 #' @rdname bru_make_stack
 bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
+  stopifnot(inherits(lin, "bru_mapper_taylor"))
+  stopifnot(!is.null(lin[["offset"]]))
+  stopifnot(is.null(lin[["jacobian"]]) || is.list(lin[["jacobian"]]))
+  stopifnot(is.null(lin[["state0"]]))
+
   if (is.null(lhood[["response_data"]])) {
     BRU.response <- lhood$data[[lhood$response]]
   } else {
     BRU.response <- lhood$response_data[[lhood$response]]
   }
+  nms <- names(lin$jacobian)
   INLA::inla.stack(
     list(
       BRU.response = BRU.response,
       BRU.E = lhood[["E"]],
       BRU.Ntrials = lhood[["Ntrials"]],
+      BRU.weights = lhood[["weights"]],
       BRU.offset = as.vector(lin$offset)
     ),
-    A = lapply(names(lin$A), function(nm) {
-      lin$A[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
+    A = lapply(nms, function(nm) {
+      lin$jacobian[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
     }),
-    effects = idx[["idx_inla"]][names(lin$A)],
+    effects = idx[["idx_inla"]][nms],
     remove.unused = FALSE
   )
 }

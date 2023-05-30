@@ -4,19 +4,17 @@
 \alias{bru_int_polygon}
 \title{Integration points for polygons inside an inla.mesh}
 \usage{
-bru_int_polygon(mesh, polylist, method = NULL, samplers = NULL, ...)
+bru_int_polygon(mesh, method = NULL, samplers = NULL, ...)
 }
 \arguments{
 \item{mesh}{An inla.mesh object}
 
-\item{polylist}{A list of \code{inla.mesh.segment} objects}
-
 \item{method}{Which integration method to use ("stable",
 with aggregation to mesh vertices, or "direct")}
 
-\item{samplers}{If non-NULL, a SpatialPolygons* object, used instead of polylist}
+\item{samplers}{If non-NULL, a SpatialPolygons* object}
 
-\item{...}{Arguments passed to the low level integration method (\code{make_stable_integration_points})}
+\item{...}{Arguments passed to the low level integration method (\code{make_triangle_integration})}
 }
 \description{
 Integration points for polygons inside an inla.mesh

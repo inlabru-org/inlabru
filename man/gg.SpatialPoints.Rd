@@ -27,7 +27,8 @@ to plot the points. Requires the \code{ggplot2} package.
 \examples{
 \donttest{
   if (require(ggplot2, quietly = TRUE) &&
-      require(ggpolypath, quietly = TRUE)) {
+      require(ggpolypath, quietly = TRUE) &&
+      bru_safe_sp()) {
     # Load Gorilla data
 
     data("gorillas", package = "inlabru")
@@ -47,9 +48,9 @@ to plot the points. Requires the \code{ggplot2} package.
 
     # Load pantropical dolphin data
 
-    data("mexdolphin")
+    data("mexdolphin", package = "inlabru")
 
-    # Plot the pantropiical survey boundary, ship transects and dolphin sightings
+    # Plot the pantropical survey boundary, ship transects and dolphin sightings
 
     ggplot() +
       gg(mexdolphin$ppoly) + # survey boundary as SpatialPolygon
@@ -80,6 +81,7 @@ to plot the points. Requires the \code{ggplot2} package.
 }
 \seealso{
 Other geomes for spatial data: 
+\code{\link{gg.SpatRaster}()},
 \code{\link{gg.SpatialGridDataFrame}()},
 \code{\link{gg.SpatialLines}()},
 \code{\link{gg.SpatialPixelsDataFrame}()},
