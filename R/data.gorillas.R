@@ -193,11 +193,11 @@ import.gorillas.sf <- function() {
   warning("Not fully implemented", immediate. = TRUE)
   gorillas <- import.gorillas()
 
-  gorillas_sf$nests = sf::st_as_sf(gorillas$nests)
-  gorillas_sf$mesh = gorillas$mesh
-  gorillas_sf$boundary = sf::st_as_sf(gorillas$boundary)
-  gorillas_sf$gcov = lapply(gorillas$gcov, sf::st_as_sf)
-  gorillas_sf$plotsample = lapply(gorillas$plotsample, sf::st_as_sf)
+  gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
+  gorillas_sf$mesh <- gorillas$mesh
+  gorillas_sf$boundary <- sf::st_as_sf(gorillas$boundary)
+  gorillas_sf$gcov <- lapply(gorillas$gcov, sf::st_as_sf)
+  gorillas_sf$plotsample <- lapply(gorillas$plotsample, sf::st_as_sf)
 }
 
 

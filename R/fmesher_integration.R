@@ -28,8 +28,9 @@
 #' if (bru_safe_inla()) {
 #'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
 #'   ips1 <- fm_int(INLA::inla.mesh.1d(1:20),
-#'                  rbind(c(0, 3), c(3, 8)),
-#'                  name = "myDim")
+#'     rbind(c(0, 3), c(3, 8)),
+#'     name = "myDim"
+#'   )
 #'   ips2 <- fm_int(domain = c(1, 2, 4), name = "myDiscreteDim")
 #'
 #'   # Calculate the cross product
@@ -88,7 +89,7 @@ fm_cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
     # st_as_sf(Z)
     # https://stackoverflow.com/questions/64365792/dplyr-full-join-on-geometry-columns-of-sf-objects
     if (inherits(ips1, c("sf", "sfc")) ||
-        inherits(ips2, c("sf", "sfc"))) {
+      inherits(ips2, c("sf", "sfc"))) {
       if (length(by) == 0) {
         ips <-
           sf::st_as_sf(dplyr::cross_join(
@@ -98,9 +99,9 @@ fm_cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
       } else {
         ips <-
           sf::st_as_sf(dplyr::full_join(tibble::as_tibble(ips1),
-                                        tibble::as_tibble(ips2),
-                                        by = by,
-                                        relationship = "many-to-many"
+            tibble::as_tibble(ips2),
+            by = by,
+            relationship = "many-to-many"
           ))
       }
     } else {
@@ -111,8 +112,8 @@ fm_cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
       } else {
         ips <-
           dplyr::full_join(ips1, ips2,
-                           by = by,
-                           relationship = "many-to-many"
+            by = by,
+            relationship = "many-to-many"
           )
       }
     }
@@ -678,9 +679,8 @@ fm_int.inla.mesh.1d <- function(domain, samplers = NULL, name = "x", int.args = 
 # @importFrom rlang .data
 
 fm_vertex_projection <- function(points, mesh) {
-
   if (inherits(points, "sf") ||
-      inherits(points, "Spatial")) {
+    inherits(points, "Spatial")) {
     n_points <- NROW(points)
     res <- fm_evaluator(mesh, points)
   } else {
@@ -1076,7 +1076,7 @@ fm_int_inla_mesh_core <- function(mesh, tri_subset = NULL, nsub = NULL) {
     idx_end <- idx_start + nB - 1
     loc[seq(idx_start, idx_end, length = nB), ] <-
       as.matrix(barycentric_grid %*%
-                  mesh$loc[mesh$graph$tv[tri, ], , drop = FALSE])
+        mesh$loc[mesh$graph$tv[tri, ], , drop = FALSE])
   }
 
   if (is_spherical) {
@@ -1127,15 +1127,15 @@ fm_int_inla_mesh_polygon <- function(samplers,
   if (!is.null(samplers)) {
     samplers_crs <- fm_crs(samplers)
     integ_sf <- sf::st_as_sf(as.data.frame(integ$loc),
-                             coords = seq_len(ncol(integ$loc)),
-                             crs = domain_crs
+      coords = seq_len(ncol(integ$loc)),
+      crs = domain_crs
     )
     if (!identical(domain_crs, samplers_crs) &&
-        !fm_crs_is_null(domain_crs) &&
-        !fm_crs_is_null(samplers_crs)) {
+      !fm_crs_is_null(domain_crs) &&
+      !fm_crs_is_null(samplers_crs)) {
       integ_sf <- fm_transform(integ_sf,
-                               crs = samplers_crs,
-                               passthrough = TRUE
+        crs = samplers_crs,
+        passthrough = TRUE
       )
     }
 

@@ -37,8 +37,9 @@ Legacy wrapper for \code{\link[=fm_cprod]{fm_cprod()}}
 if (bru_safe_inla()) {
   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
   ips1 <- fm_int(INLA::inla.mesh.1d(0:20),
-                 rbind(c(0, 3), c(3, 8)),
-                 name = "myDim")
+    rbind(c(0, 3), c(3, 8)),
+    name = "myDim"
+  )
   ips2 <- fm_int(domain = c(1, 2, 4), name = "myDiscreteDim")
 
   # Calculate the cross product

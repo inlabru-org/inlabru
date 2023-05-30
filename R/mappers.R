@@ -1962,7 +1962,7 @@ ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) 
 #' @details `log` argument (Default `TRUE`) for log scale weight return.
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
-                                          log = TRUE,..., sub_lin = NULL) {
+                                          log = TRUE, ..., sub_lin = NULL) {
   input <- bm_aggregate_input(input,
     state = state,
     allow_log = TRUE, force_log = TRUE
@@ -1994,10 +1994,10 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
       x = exp(w_state - shift[input[["block"]]]),
       dims = c(n_out, 1)
     )
-  if (log){
+  if (log) {
     log(as.vector(values)) + shift
   } else {
-    as.vector(values)*exp(shift)
+    as.vector(values) * exp(shift)
   }
 }
 
@@ -3053,15 +3053,19 @@ make_hierarchical_mesh_basis <- function(mesh, forward = TRUE) {
   }
 
   if (forward) {
-    B <- Matrix::sparseMatrix(i = unlist(ii),
-                              j = unlist(jj),
-                              x = unlist(xx),
-                              dims = c(nrow(G), length(ii)))
+    B <- Matrix::sparseMatrix(
+      i = unlist(ii),
+      j = unlist(jj),
+      x = unlist(xx),
+      dims = c(nrow(G), length(ii))
+    )
   } else {
-    B <- Matrix::sparseMatrix(i = unlist(ii),
-                              j = length(ii) + 1 - unlist(jj),
-                              x = unlist(xx),
-                              dims = c(nrow(G), length(ii)))
+    B <- Matrix::sparseMatrix(
+      i = unlist(ii),
+      j = length(ii) + 1 - unlist(jj),
+      x = unlist(xx),
+      dims = c(nrow(G), length(ii))
+    )
   }
   B
 }

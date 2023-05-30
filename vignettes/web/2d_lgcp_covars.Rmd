@@ -492,12 +492,12 @@ e.int <- predict(efit, pixels(mesh, mask = boundary), ~ exp(mySmooth + elev + In
 e.int.log <- predict(efit, pixels(mesh, mask = boundary), ~ (mySmooth + elev + Intercept))
 
 ggplot() +
-  gg(e.int, aes(fill=log(sd))) +
+  gg(e.int, aes(fill = log(sd))) +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+") +
   coord_equal()
 ggplot() +
-  gg(e.int.log, aes(fill=exp(mean+sd^2/2))) +
+  gg(e.int.log, aes(fill = exp(mean + sd^2 / 2))) +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+") +
   coord_equal()

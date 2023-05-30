@@ -673,9 +673,11 @@ bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
 #' @keywords internal
 #' @export
 integration_weight_aggregation <- function(mesh, integ) {
-  lifecycle::deprecate_warn("2.8.0",
-                            "integration_weight_aggregation()",
-                            "fm_vertex_projection()")
+  lifecycle::deprecate_warn(
+    "2.8.0",
+    "integration_weight_aggregation()",
+    "fm_vertex_projection()"
+  )
 
   fm_vertex_projection(points = integ, mesh = mesh)
 }
@@ -694,9 +696,11 @@ integration_weight_aggregation <- function(mesh, integ) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
-  lifecycle::deprecate_warn("2.8.0",
-                            "mesh_triangle_integration()",
-                            "fm_int_inla_mesh_core()")
+  lifecycle::deprecate_warn(
+    "2.8.0",
+    "mesh_triangle_integration()",
+    "fm_int_inla_mesh_core()"
+  )
 
   fm_int_inla_mesh_core(mesh = mesh, tri_subset = tri_subset, nsub = NULL)
 }

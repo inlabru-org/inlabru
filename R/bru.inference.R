@@ -2250,19 +2250,19 @@ bru_line_search <- function(model,
     pl2 <- ggplot2::ggplot(df_debug) +
       ggplot2::geom_point(ggplot2::aes(
         .data$lin1,
-        (.data$lin0 - .data$lin1) * .data$weights ^ 0.5,
+        (.data$lin0 - .data$lin1) * .data$weights^0.5,
         col = "start",
         shape = "linear"
       )) +
       ggplot2::geom_point(ggplot2::aes(
         .data$lin1,
-        (.data$nonlin1 - .data$lin1) * .data$weights ^ 0.5,
+        (.data$nonlin1 - .data$lin1) * .data$weights^0.5,
         col = "full",
         shape = "nonlin"
       )) +
       ggplot2::geom_point(ggplot2::aes(
         .data$lin1,
-        (.data$nonlinopt - .data$lin1) * .data$weights ^ 0.5,
+        (.data$nonlinopt - .data$lin1) * .data$weights^0.5,
         col = "opt",
         shape = "nonlin"
       )) +
@@ -2273,12 +2273,14 @@ bru_line_search <- function(model,
       ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin1, col = "full", shape = "linear")) +
       ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlin1, col = "full", shape = "nonlin")) +
       ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlinopt, col = "opt", shape = "nonlin")) +
-      ggplot2::geom_ribbon(ggplot2::aes(
-        .data$idx,
-        ymin = .data$lin1 - 2 * .data$weights ^ -0.5,
-        ymax = .data$lin1 + 2 * .data$weights ^ -0.5
-      ),
-      alpha = 0.1) +
+      ggplot2::geom_ribbon(
+        ggplot2::aes(
+          .data$idx,
+          ymin = .data$lin1 - 2 * .data$weights^-0.5,
+          ymax = .data$lin1 + 2 * .data$weights^-0.5
+        ),
+        alpha = 0.1
+      ) +
       ggplot2::geom_abline(slope = 0, intercept = 0) +
       ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
     pl4 <- ggplot2::ggplot(data.frame(
@@ -2292,8 +2294,8 @@ bru_line_search <- function(model,
       ggplot2::geom_point(ggplot2::aes(.data$idx, state, col = "opt")) +
       ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
     print(((pl1 | pl2) / (pl3 | pl4)) +
-            patchwork::plot_layout(guides = "collect") &
-            ggplot2::theme(legend.position = "right"))
+      patchwork::plot_layout(guides = "collect") &
+      ggplot2::theme(legend.position = "right"))
 
     browser()
   }
