@@ -1,0 +1,53 @@
+---
+title: "Untitled"
+author: "Finn Lindgren"
+date: "2023-01-28"
+output: html_document
+header-includes:
+  - \newcommand{\wt}[1]{\widetilde{#1}}
+  - \DeclareMathOperator{\argmax}{arg\,max}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+devtools::load_all("~/git/inlabru/")
+```
+
+## Hierarchical basis
+
+Let $d(a, b)$ denote the distance between two nodes, $a$, and $b$.
+Let $V_K=\{v_k;k=1,\dots,K\}$ be the set of points included at step $k$ of the algorithm
+
+1. Let $v_1$ be the initial node and let $V_1=\{v_1\}$
+2. Let $D=\max_v d(v_1, v)$
+3. Let $\wt{b}^D_1\equiv b^D_1\equiv 1$
+4. Let $B_1 = \wt{b}^D_1$
+5. For $K=1,\dots,N_V-1$:
+    1. Let $D=\max_v \min_{1\leq k \leq K} d(v_k, v)$
+    3. Find $v_{K+1} = \argmax_v \min_{1\leq k \leq K} d(v_k, v)$
+    4. Let $b^{D}_k(v) = \max(0, D - d(v_k, v))$ for all $1\leq k \leq K$.
+    5. Normalise $\wt{b}^D_k(v) = b^D_k(v) / \sum_{j=1}^{K+1} b^D_j(v)$
+    6. Let $V_{K+1}=V_K\cup\{v_{K+1}\}$ and $B_{K+1} = \wt{b}^D_{K+1}$
+
+## Equivalent variational adjustment 
+
+$$
+\begin{aligned}
+u &\sim N(\mu_u,Q_u^{-1}) \\
+u &= Bv \\
+v &\sim N(B^{-1}\mu_u,(B^\top Q_u B)^{-1}) \\
+\eta &= A u = ABv \\
+Q_{u|y} &= Q_u + A^\top Q_{y|u} A \\
+Q_{u|y} \mu_{u|y} &= Q_u\mu_u + A^\top Q_{y|u} y = b_u \\
+Q_{v|y} &= B^\top Q_u B + B^\top A^\top Q_{y|u} A B \\
+Q_{v|y} \mu_{v|y} &= Q_v\mu_v + B^\top A^\top Q_{y|u} y = b_v = B^\top b_u
+\end{aligned}
+$$
+Variational adjustment equations:
+$$
+\begin{aligned}
+Q_{v|y} \mu_{v|y} &= b_v + \delta \\
+B^\top Q_{u|y} B B^{-1} \mu_{u|y} &= B^\top b_u + \delta \\
+Q_{u|y} \mu_{u|y} &= b_u + B^{-\top} \delta
+\end{aligned}
+$$

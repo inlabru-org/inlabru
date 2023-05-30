@@ -126,7 +126,7 @@ Collate:
     'fmesher_utils.R'
     'ggplot.R'
     'inla.R'
-    'inlabru.R'
+    'inlabru-package.R'
     'integration.R'
     'local_testthat.R'
     'mappers.R'
