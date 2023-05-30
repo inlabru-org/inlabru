@@ -47,7 +47,6 @@ NULL
 #'
 
 import.seals <- function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif") {
-
   #' Load seal data
 
   seals <- read.csv(sealfile)
@@ -64,7 +63,7 @@ import.seals <- function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.
   #' Change CRS
 
   target.p4s <- "+proj=utm +zone=27 +units=km"
-  seals <- spTransform(seals, CRS(target.p4s))
+  seals <- fm_transform(seals, fm_crs(target.p4s))
   coordnames(seals) <- c("x", "y")
 
   #' Select a strip
@@ -95,8 +94,10 @@ import.seals <- function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.
 
   #' Ice Covariate
 
-  ice <- rgdal::readGDAL(icefile)
-  ice <- spTransform(ice, CRS(target.p4s))
+  stop("readRGDAL used by old internal method disable to allow removal of rgdal dependency.")
+  #  ice <- rgdal::readGDAL(icefile)
+  ice <- NULL
+  ice <- fm_transform(ice, fm_crs(target.p4s))
   ii <- is.inside(mesh, coordinates(ice))
   ice <- ice[as.vector(ii), ]
 
@@ -104,12 +105,19 @@ import.seals <- function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.
 
   #' Interpolate ice covariate
 
-  icecv <- covariate(ice, predictor = "band1", mesh = mesh)
-  plot(icecv)
+  stop("Old internal methods needed by import.seals have been removed.")
+  # TODO: replace old code in misc/ with modern code
+  #  icecv <- covariate(ice, predictor = "band1", mesh = mesh)
+  icecv <- NULL
+  #  plot(icecv)
 
   #' Add band1 covariate to seals data frame
 
-  ice.band1 <- evaluator(icecv)
+  # TODO: replace old code in misc/ with modern code
+  # ice.band1 <- evaluator(icecv)
+  ice.band1 <- function(x, y) {
+    NULL
+  }
   seals$ice <- ice.band1(x = coordinates(seals)[, 1], y = coordinates(seals)[, 2])
 
   #' Plot seal count and ice together

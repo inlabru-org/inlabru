@@ -36,7 +36,7 @@ $A_c(\text{input})$ is a _component model matrix_. This matrix depends on the co
 inputs (covariates, index information, etc) from `main`, `group`, `replicate`, and `weights`
 in the component definition.
 
-The wider scope of component definitions is discussed in the [component vignette](http://inlabru-org.github.io/inlabru/articles/component.html). Here, we
+The wider scope of component definitions is discussed in the [component vignette](https://inlabru-org.github.io/inlabru/articles/component.html). Here, we
 will focus on the mapper system itself, how the basic building blocks are used to
 construct the built-in mappers, and finally how to construct new mappers.
 
@@ -147,8 +147,9 @@ as the final stage of a `pipe` mapper, see below.
 ```{r, eval=FALSE}
 mapper <- bru_mapper_scale()
 ibm_eval(mapper,
-         input = ...),
-         state = ...)
+  input = ...,
+  state = ...
+)
 ```
 
 #### aggregate
@@ -160,8 +161,9 @@ This can be used for summation, integration, and averaging (for `rescale=TRUE`).
 ```{r, eval=FALSE}
 mapper <- bru_mapper_aggregate(rescale = ...)
 ibm_eval(mapper,
-         input = list(block = ..., weights = ...),
-         state = ...)
+  input = list(block = ..., weights = ...),
+  state = ...
+)
 ```
 
 ### Compound mappers
@@ -184,15 +186,18 @@ part of the latent state is only a part of the internal state, such as for
 
 ```{r, eval=FALSE}
 mapper <- bru_mapper_offset(list(name1 = ..., name2 = ..., ...),
-                            hidden = FALSE)
+  hidden = FALSE
+)
 ibm_eval(mapper,
-         input = list(name1 = ..., name2 = ..., ...),
-         state = ...)
+  input = list(name1 = ..., name2 = ..., ...),
+  state = ...
+)
 # If hidden = TRUE, the inla_f=TRUE argument "hides" all but the first mapper:
 ibm_eval(mapper,
-         input = name1_input,
-         state = ...,
-         inla_f = TRUE)
+  input = name1_input,
+  state = ...,
+  inla_f = TRUE
+)
 ```
 
 #### multi
@@ -207,8 +212,9 @@ a space-time product domain.
 ```{r, eval=FALSE}
 mapper <- bru_mapper_multi(list(name1 = ..., name2 = ..., ...))
 ibm_eval(mapper,
-         input = list(name1 = ..., name2 = ..., ...),
-         state = ...)
+  input = list(name1 = ..., name2 = ..., ...),
+  state = ...
+)
 ```
 
 #### pipe
@@ -219,8 +225,9 @@ result of each mapper is given as the state vector for the next mapper.
 ```{r, eval=FALSE}
 mapper <- bru_mapper_pipe(list(name1 = ..., name2 = ..., ...))
 ibm_eval(mapper,
-         input = list(name1 = ..., name2 = ..., ...),
-         state = ...)
+  input = list(name1 = ..., name2 = ..., ...),
+  state = ...
+)
 ```
 
 #### The core model component mapper
@@ -236,9 +243,12 @@ mapper <-
     )
   )
 ibm_eval(mapper,
-         input = list(mapper = list(main = ..., group = ..., replicate = ...),
-                      scale = ...),
-         state = ...)
+  input = list(
+    mapper = list(main = ..., group = ..., replicate = ...),
+    scale = ...
+  ),
+  state = ...
+)
 ```
 
 ### Object mappers
@@ -381,8 +391,10 @@ Implementations can avoid having to define `ibm_n` and `ibm_values` methods,
 by instead computing and storing `n`, `n_inla`, `values`, and `values_inla`
 in the mapper object during construction:
 ```{r, eval=FALSE}
-bru_mapper_define(mapper = list(n = 10, values = 1:10),
-                  new_class = "my_bru_mapper_class_name")
+bru_mapper_define(
+  mapper = list(n = 10, values = 1:10),
+  new_class = "my_bru_mapper_class_name"
+)
 ```
 The default `ibm_n` and `ibm_values`
 methods checks if these values are available, and return the appropriate values

@@ -99,6 +99,28 @@ bru_model <- function(components, lhoods) {
 }
 
 
+#' @export
+#' @method summary bru_model
+#' @param object Object to operate on
+#' @param \dots Arguments passed on to other methods
+#' @rdname bru_model
+summary.bru_model <- function(object, ...) {
+  result <- list(
+    components =
+      summary(object[["effects"]], ...)
+  )
+  class(result) <- c("summary_bru_model", "list")
+  result
+}
+
+#' @export
+#' @param x A `summary_bru_model` object to be printed
+#' @rdname bru_model
+print.summary_bru_model <- function(x, ...) {
+  print(x[["components"]])
+  invisible(x)
+}
+
 
 
 
@@ -566,8 +588,16 @@ evaluate_predictor <- function(model,
 #' In predictor expressions, `name_eval(...)` can be used to evaluate
 #' the effect of a component called "name".
 #'
-#' @param main,group,replicate Specification of where to evaluate a component.
-#'   The three inputs are passed on to the respective `bru_mapper` methods.
+#' @param main,group,replicate,weights Specification of where to evaluate a component.
+#'   The four inputs are passed on to the joint `bru_mapper` for the component,
+#'   as
+#'  ```
+#'  list(mapper = list(
+#'         main = main,
+#'         group = group,
+#'         replicate = replicate),
+#'       scale = weights)
+#' ````
 #' @param .state The internal component state. Normally supplied automatically
 #' by the internal methods for evaluating inlabru predictor expressions.
 #' @return A vector of values for a component
@@ -600,6 +630,7 @@ evaluate_predictor <- function(model,
 component_eval <- function(main,
                            group = NULL,
                            replicate = NULL,
+                           weights = NULL,
                            .state = NULL) {
   stop(paste0(
     "In your predictor expression, use 'mylabel_eval(...)' instead of\n",

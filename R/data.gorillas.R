@@ -56,6 +56,7 @@
 #'
 #' @examples
 #' if (bru_safe_inla() &&
+#'   bru_safe_sp() &&
 #'   require(ggplot2, quietly = TRUE) &&
 #'   require(ggpolypath, quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru") # get the data
@@ -86,7 +87,6 @@ NULL
 
 import.gorillas <- function() {
   if (!check_spatstat("spatstat.data")) {
-
     # Load Gorilla data from spatstat
     gorillas <- NULL
   }
@@ -96,8 +96,8 @@ import.gorillas <- function() {
   # Create SpatialPoints representing nest locations
   nests <- as.data.frame(gorillas)
   coordinates(nests) <- c("x", "y")
-  crs <- sp::CRS("+proj=utm +zone=32N +datum=WGS84") # from the Gorillas help file
-  crs_km <- sp::CRS("+proj=utm +zone=32N +datum=WGS84 +units=km")
+  crs <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84") # from the Gorillas help file
+  crs_km <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84 +units=km")
   proj4string(nests) <- crs
 
   #' Turn the observation window into spatial polygon
@@ -106,7 +106,7 @@ import.gorillas <- function() {
   )
 
   #' Build mesh
-  bnd <- INLA::inla.sp2segment(boundary)
+  bnd <- fm_as_inla_mesh_segment(boundary)
   mesh <- INLA::inla.mesh.2d(
     interior = bnd, max.edge = 222,
     crs = crs
@@ -142,7 +142,9 @@ import.gorillas <- function() {
     gcov = gcov
   )
 
-  gorillas <- stransform(gorillas, crs_km)
+  gorillas$nests <- fm_transform(gorillas$nests, crs_km)
+  gorillas$mesh <- fm_transform(gorillas$mesh, crs_km)
+  gorillas$boundary <- fm_transform(gorillas$boundary, crs_km)
 
   # Create a plot sampling data set
   set.seed(121)
@@ -174,11 +176,27 @@ import.gorillas <- function() {
 
   # Extrapolate covariate
   pxl <- pixels(gorillas$mesh, mask = FALSE, nx = 220, ny = 180)
-  for (k in seq_len(length(gorillas$gcov))) {
-    gorillas$gcov[[k]] <- sfill(gorillas$gcov[[k]], pxl)
+  pxl <- fm_transform(pxl, fm_crs(fm_CRS(gorillas$gcov[[1]])))
+  for (k in names(gorillas$gcov)) {
+    pxl[[k]] <- NA
+    stop("error!")
+    pxl[[k]] <- bru_fill_missing(gorillas$gcov[[k]], pxl, values = pxl[[k]])
+#    gorillas$gcov[[k]] <- sfill(gorillas$gcov[[k]], pxl)
   }
 
   return(gorillas)
+}
+
+
+#' @describeIn import.gorillas Convert gorillas to `sf` and `terra` format
+import.gorillas.sf <- function() {
+  gorillas <- import.gorillas()
+
+  gorillas_sf$nests = st_as_sf(gorillas$nests)
+  gorillas_sf$mesh = gorillas$mesh
+  gorillas_sf$boundary = st_as_sf(gorillas$boundary)
+  gorillas_sf$gcov = lapply(gorillas$gcov, st_as_sf)
+  gorillas_sf$plotsample = lapply(gorillas$plotsample, st_as_sf)
 }
 
 

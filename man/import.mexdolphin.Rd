@@ -2,9 +2,12 @@
 % Please edit documentation in R/data.mexdolphin.R
 \name{import.mexdolphin}
 \alias{import.mexdolphin}
+\alias{import.mexdolphin.sf}
 \title{Mexdolphin data import}
 \usage{
 import.mexdolphin()
+
+import.mexdolphin.sf()
 }
 \value{
 The \link{mexdolphin} data set
@@ -12,6 +15,11 @@ The \link{mexdolphin} data set
 \description{
 Load \code{mexdolphins} survey data from \code{dsm} package and convert to spatial formats defined by the \link{sp} package.
 }
+\section{Functions}{
+\itemize{
+\item \code{import.mexdolphin.sf()}: Import mexdolphin data as \code{sf}
+
+}}
 \examples{
 \dontrun{
 mexdolphin <- import.mexdolphin()

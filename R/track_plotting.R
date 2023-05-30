@@ -1,37 +1,71 @@
-# library(tidyverse)
-# library(patchwork)
-
 #' @importFrom magrittr "%>%"
 #' @importFrom rlang .data
 #' @importFrom rlang .env
-#' @import patchwork
+
+#' @title Plot inlabru convergence diagnostics
+#'
+#' @description
+#' Draws four panels of convergence diagnostics for an iterated INLA method
+#' estimation
+#'
+#' @param x a [bru] object, typically a result from [bru()] for a nonlinear
+#' predictor model
+#'
+#' @details Requires the "dplyr", "ggplot2", "magrittr", and "patchwork"
+#' packages to be installed.
+#' @export
+#' @examples
+#' \dontrun{
+#' fit <- bru(...)
+#' bru_convergence_plot(fit)
+#' }
+bru_convergence_plot <- function(x) {
+  stopifnot(inherits(x, "bru"))
+  make_track_plots(x)[["default"]]
+}
+
 
 make_track_plots <- function(fit) {
-  if (!requireNamespace("dplyr", quietly = TRUE) ||
-    !requireNamespace("ggplot2", quietly = TRUE) ||
-    !requireNamespace("magrittr", quietly = TRUE)) {
-    stop("One or more of 'dplyr', 'ggplot2', 'magrittr' not installed, but are needed by make_track_plots()")
+  needed <- c("dplyr", "ggplot2", "magrittr", "patchwork")
+  are_installed <-
+    vapply(
+      needed,
+      function(x) {
+        requireNamespace(x, quietly = TRUE)
+      },
+      TRUE
+    )
+  if (any(!are_installed)) {
+    stop(
+      paste0(
+        "Needed package(s) ",
+        paste0("'", needed[!are_installed], "'", collapse = ", "),
+        " not installed, but are needed by make_track_plots()"
+      )
+    )
   }
   track_data <-
     fit$bru_iinla$track %>%
-    dplyr::left_join(fit$bru_iinla$track %>%
-      dplyr::filter(.data$iteration == max(.data$iteration)) %>%
-      dplyr::rename(
-        mode_end = .data$mode,
-        new_linearisation_end = .data$new_linearisation,
-        sd_end = .data$sd
-      ),
-    by = c("effect", "index"),
+    dplyr::left_join(
+      fit$bru_iinla$track %>%
+        dplyr::filter(.data$iteration == max(.data$iteration)) %>%
+        dplyr::rename(
+          mode_end = .data$mode,
+          new_linearisation_end = .data$new_linearisation,
+          sd_end = .data$sd
+        ),
+      by = c("effect", "index"),
     ) %>%
     dplyr::mutate(iteration = .data$iteration.x) %>%
-    dplyr::left_join(fit$bru_iinla$track %>%
-      dplyr::filter(.data$iteration == 1) %>%
-      dplyr::rename(
-        mode_start = .data$mode,
-        new_linearisation_start = .data$new_linearisation,
-        sd_start = .data$sd
-      ),
-    by = c("effect", "index"),
+    dplyr::left_join(
+      fit$bru_iinla$track %>%
+        dplyr::filter(.data$iteration == 1) %>%
+        dplyr::rename(
+          mode_start = .data$mode,
+          new_linearisation_start = .data$new_linearisation,
+          sd_start = .data$sd
+        ),
+      by = c("effect", "index"),
     ) %>%
     dplyr::mutate(iteration = .data$iteration.x)
 

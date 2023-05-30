@@ -21,7 +21,8 @@ and the window. Lastly, the ppp() function is called to create the \code{ppp} ob
 }
 \examples{
 \donttest{
-if (require("spatstat.geom")) {
+if (require("spatstat.geom") &&
+  bru_safe_sp()) {
   # Load Gorilla data
 
   data("gorillas", package = "inlabru")

@@ -9,6 +9,9 @@
 #' if running in testthat or non-interactively, in which case sets
 #' `multicore=FALSE`, otherwise `TRUE`.
 #' @param quietly logical; if `TRUE`, prints diagnostic messages. Default: FALSE.
+#' @param minimum_version character; the minimum required INLA version.
+#' Default 23.1.31 (should always match the requirement in the package
+#' DESCRIPTION)
 #' @export
 #' @return logical; `TRUE` if INLA was loaded safely, otherwise FALSE
 #'
@@ -20,51 +23,160 @@
 #' }
 #'
 bru_safe_inla <- function(multicore = NULL,
-                          quietly = FALSE) {
-  if (requireNamespace("INLA", quietly = TRUE)) {
-    if (is.null(multicore)) {
-      multicore <-
-        !identical(Sys.getenv("TESTTHAT"), "true") ||
-          interactive()
-    }
-    if (!multicore) {
-      n.t <- tryCatch(
-        INLA::inla.getOption("num.threads"),
-        error = function(e) {
-          e
-        }
-      )
-      if (inherits(n.t, "simpleError")) {
-        if (!quietly) {
-          message("inla.getOption() failed. INLA not installed correctly.")
-        }
-        return(FALSE)
-      }
-      if (!quietly) {
-        message(paste0("Current num.threads is '", n.t, "'."))
-      }
-      if (!identical(n.t, "1:1")) {
-        if (!quietly) {
-          message(paste0(
-            "Setting INLA option num.threads to '1:1'.",
-            " Previous value '", n.t, "'."
-          ))
-        }
-        INLA::inla.setOption(num.threads = "1:1")
-      } else {
-        if (!quietly) {
-          message("No num.threads change needed.")
-        }
-      }
-    }
-    TRUE
-  } else {
-    if (!quietly) {
-      message("INLA not loaded safely.")
-    }
-    FALSE
+                          quietly = FALSE,
+                          minimum_version = "23.1.31") {
+  inla_version <-
+    check_package_version_and_load(
+      pkg = "INLA",
+      minimum_version = minimum_version,
+      quietly = quietly
+    )
+  if (is.na(inla_version)) {
+    return(FALSE)
   }
+
+  if (is.null(multicore)) {
+    multicore <-
+      !identical(Sys.getenv("TESTTHAT"), "true") ||
+        interactive()
+  }
+  if (!multicore) {
+    n.t <- tryCatch(
+      INLA::inla.getOption("num.threads"),
+      error = function(e) {
+        e
+      }
+    )
+    if (inherits(n.t, "simpleError")) {
+      if (!quietly) {
+        message("inla.getOption() failed. INLA not installed correctly.")
+      }
+      return(FALSE)
+    }
+    if (!quietly) {
+      message(paste0("Current num.threads is '", n.t, "'."))
+    }
+    if (!identical(n.t, "1:1")) {
+      if (!quietly) {
+        message(paste0(
+          "Setting INLA option num.threads to '1:1'.",
+          " Previous value '", n.t, "'."
+        ))
+      }
+      INLA::inla.setOption(num.threads = "1:1")
+    } else {
+      if (!quietly) {
+        message("No num.threads change needed.")
+      }
+    }
+  }
+  return(TRUE)
 }
+
+
+
+
+
+check_package_version_and_load <-
+  function(pkg, minimum_version, quietly = FALSE) {
+    version <- tryCatch(utils::packageVersion(pkg),
+      error = function(e) NA_character_
+    )
+    if (is.na(version)) {
+      if (!quietly) {
+        message(paste0("Package '", pkg, "' is not installed."))
+      }
+      return(NA_character_)
+    }
+    if (version < minimum_version) {
+      if (!quietly) {
+        message(paste0(
+          "Installed '", pkg, "' version is ", version, " but ",
+          "version >= ", minimum_version, " is required."
+        ))
+      }
+      return(NA_character_)
+    }
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      if (!quietly) {
+        message("Package '", pkg, "' not loaded safely.")
+      }
+      return(NA_character_)
+    }
+    return(version)
+  }
+
+
+#' Check for potential `sp` version compatibility issues
+#'
+#' Loads the sp package with `requireNamespace("sp", quietly = TRUE)`, and
+#' checks and optionally sets the `sp` evolution status flag if `rgdal` is unavailable.
+#'
+#' @param quietly logical; if `TRUE`, prints diagnostic messages. Default `FALSE`
+#' @param force logical; If `rgdal` is unavailable
+#' and evolution status is less that `2L`, return `FALSE` if `force` is `FALSE`.
+#' If `force` is `TRUE`, return `TRUE` if the package configuration is safe,
+#' potentially after forcing the evolution status to `2L`.
+#' Default `FALSE`
+#' @param minimum_version character; the minimum required INLA version.
+#' Default 1.4-5 (should always match the requirement in the package
+#' DESCRIPTION)
+#' @return Returns (invisibly) `FALSE` if a potential issue is detected, and give a
+#' message if `quietly` is `FALSE`. Otherwise returns `TRUE`
+#' @export
+#' @examples
+#' \dontrun{
+#' if (bru_safe_sp()) {
+#'   # Run sp dependent calculations
+#' }
+#' }
+#'
+bru_safe_sp <- function(quietly = FALSE,
+                        force = FALSE,
+                        minimum_version = "1.4-5") {
+  sp_version <-
+    check_package_version_and_load(
+      pkg = "sp",
+      minimum_version = minimum_version,
+      quietly = quietly
+    )
+  if (is.na(sp_version)) {
+    return(invisible(FALSE))
+  }
+
+  if (sp_version >= "1.6-0") {
+    # Default to 2L to allow future sp to stop supporting
+    # get_evolution_status; assume everything is fine if it fails.
+    evolution_status <- tryCatch(sp::get_evolution_status(),
+      error = function(e) 2L
+    )
+    rgdal_version <- tryCatch(utils::packageVersion("rgdal"),
+      error = function(e) NA_character_
+    )
+    if ((evolution_status < 2L) && is.na(rgdal_version)) {
+      if (!quietly) {
+        message("'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.")
+      }
+      if (!force) {
+        if (!quietly) {
+          message(
+            "This may cause issues with some CRS handling code. To avoid this, use 'sp::set_evolution_status(2L)'"
+          )
+        }
+        return(invisible(FALSE))
+      }
+
+      sp::set_evolution_status(2L)
+      if (!quietly) {
+        message(
+          "Ran 'sp::set_evolution_status(2L)' to avoid issues with some CRS handling code."
+        )
+      }
+    }
+  }
+  return(invisible(TRUE))
+}
+
 
 
 #' Expand labels
@@ -188,10 +300,10 @@ extract_layer <- function(where, layer, selector) {
 
 #' Evaluate spatial covariates
 #'
-#' @param data Spatial grid-like data
+#' @param data Spatial data
 #' @param where Where to evaluate the data
 #' @param layer Which `data` layer to extract (as integer or character).
-#' May be a vector, specifying a separate layer for each `where` point.
+#' May be a vector, specifying a separate layer for each `where` item.
 #' @param selector The name of a variable in `where` specifying the `layer`
 #' information.
 #'
@@ -207,8 +319,48 @@ eval_SpatialDF <- function(...) {
 }
 
 #' @export
+#' @describeIn eval_spatial Compatibility wrapper for `eval_spatial.sf`
+eval_spatial.SpatialPolygonsDataFrame <- function(data,
+                                                  where,
+                                                  layer = NULL,
+                                                  selector = NULL) {
+  eval_spatial(
+    sf::st_as_sf(data),
+    where = where,
+    layer = layer,
+    selector = selector
+  )
+}
+
+#' @export
 #' @rdname eval_spatial
-eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
+eval_spatial.SpatialPixelsDataFrame <- function(data,
+                                                where,
+                                                layer = NULL,
+                                                selector = NULL) {
+  eval_spatial_Spatial(
+    data = data,
+    where = where,
+    layer = layer,
+    selector = selector
+  )
+}
+
+#' @export
+#' @rdname eval_spatial
+eval_spatial.SpatialGridDataFrame <- function(data,
+                                              where,
+                                              layer = NULL,
+                                              selector = NULL) {
+  eval_spatial_Spatial(
+    data = data,
+    where = where,
+    layer = layer,
+    selector = selector
+  )
+}
+
+eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
   stopifnot(inherits(
     data,
     c(
@@ -216,6 +368,14 @@ eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
       "SpatialGridDataFrame"
     )
   ))
+  if (inherits(where, "SpatialPoints")) {
+    if (ncol(sp::coordinates(where)) >= 3) {
+      where <- sp::SpatialPoints(
+        coords = sp::coordinates(where)[, 1:2, drop = FALSE],
+        proj4string = fm_CRS(where)
+      )
+    }
+  }
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
   unique_layer <- unique(layer)
@@ -231,6 +391,57 @@ eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
         where[layer == l, , drop = FALSE],
         data
       )[, l, drop = TRUE]
+    }
+  }
+  val
+}
+
+
+#' @export
+#' @describeIn eval_spatial Supports point-in-polygon information lookup.
+#' Other combinations are untested.
+eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
+  if (inherits(where, "SpatialPoints")) {
+    where <- sf::st_as_sf(where)
+  }
+  layer <- extract_layer(where, layer, selector)
+  check_layer(data, where, layer)
+  unique_layer <- unique(layer)
+  data_example <- data[1, unique_layer[1], drop = TRUE]
+  data_NA <- data_example
+  is.na(data_NA) <- TRUE
+  if (length(unique_layer) == 1) {
+    idx <- sf::st_intersects(where, data, sparse = TRUE)
+    val <- vapply(
+      idx,
+      function(i) {
+        if (is.null(i) || (length(i) == 0)) {
+          data_NA
+        } else {
+          data[min(i), unique_layer, drop = TRUE]
+        }
+      },
+      data_example
+    )
+  } else {
+    val <- numeric(NROW(where))
+    idx <- sf::st_intersects(where, data, sparse = TRUE)
+    for (l in unique(layer)) {
+      val[layer == l] <- sp::over(
+        where[layer == l, , drop = FALSE],
+        data
+      )[, l, drop = TRUE]
+      val[layer == l] <- vapply(
+        idx[layer == l],
+        function(i) {
+          if (is.null(i) || (length(i) == 0)) {
+            data_NA
+          } else {
+            data[min(i), unique_layer, drop = TRUE]
+          }
+        },
+        data_example
+      )
     }
   }
   val
@@ -279,10 +490,11 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
 #'
 #' Computes nearest-available-value imputation for missing values in space
 #'
-#' @param data A SpatialPointsDataFrame, SpatialPixelsDataFrame, or a
-#' SpatialGridDataFrame containg data to use for filling
+#' @param data A SpatialPointsDataFrame, SpatialPixelsDataFrame,
+#' SpatialGridDataFrame, SpatRaster, Raster, or sf object
+#' containing data to use for filling
 #' @param where A, matrix, data.frame, or SpatialPoints or
-#' SpatialPointsDataFrame, containing the locations of the evaluated values
+#' SpatialPointsDataFrame, or sf object, containing the locations of the evaluated values
 #' @param values A vector of values to be filled in where `is.na(values)` is
 #' `TRUE`
 #' @param layer,selector Specifies what data column or columns from which to
@@ -317,38 +529,42 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
 #' }
 bru_fill_missing <- function(data, where, values,
                              layer = NULL, selector = NULL,
-                             batch_size = 500) {
+                             batch_size = 50) {
   stopifnot(inherits(
     data,
     c(
       "SpatialPointsDataFrame",
       "SpatialPixelsDataFrame",
       "SpatialGridDataFrame",
-      "SpatRaster"
+      "Raster",
+      "SpatRaster",
+      "sf"
     )
   ))
-  if (inherits(data, "SpatialGridDataFrame")) {
-    data <- as(data, "SpatialPixelsDataFrame")
+  # Convert to sf and terra
+  if (inherits(data, c("SpatialGrid", "SpatialPixelsDataFrame", "Raster"))) {
+    data <- terra::rast(data)
+  } else if (inherits(data, "SpatialPointsDataFrame")) {
+    data <- sf::st_as_sf(data)
   }
+  # Convert to sf
+  if (inherits(where, c("Spatial", "SpatVector"))) {
+    where <- sf::st_as_sf(where)
+  } else if (!inherits(where, "sf")) {
+    where <- sf::st_as_sf(where, coords = seq_len(min(3, NCOL(where))))
+  }
+
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
 
-  # TODO: Add cases for SpatVector and sf
-  if (inherits(where, "Spatial")) {
-    data_crs <- fm_sp_get_crs(data)
-    where_crs <- fm_sp_get_crs(where)
-    if (!fm_identical_CRS(data_crs, where_crs)) {
-      warning("'data' and 'where' for spatial infilling have different CRS")
-    }
-    where_coord <- sp::coordinates(where)
-  } else {
-    data_crs <- sp::CRS(NA_character_)
-    where_crs <- sp::CRS(NA_character_)
-    where_coord <- where
-  }
-
   if (any(is.na(layer))) {
     stop("NAs detected in the 'layer' information.")
+  }
+
+  data_crs <- fm_crs(data)
+  where_crs <- fm_crs(where)
+  if (!fm_identical_CRS(fm_crs(fm_CRS(data_crs)), fm_crs(fm_CRS(where_crs)))) {
+    warning("'data' and 'where' for spatial infilling have different CRS")
   }
 
   layers <- unique(layer)
@@ -357,10 +573,7 @@ bru_fill_missing <- function(data, where, values,
       values[layer == l] <-
         bru_fill_missing(
           data = data,
-          where = sp::SpatialPoints(
-            where_coord[layer == l, , drop = FALSE],
-            proj4string = where_crs
-          ),
+          where = where[layer == l, , drop = FALSE],
           values = values[layer == l],
           layer = l,
           batch_size = batch_size
@@ -372,26 +585,39 @@ bru_fill_missing <- function(data, where, values,
   # Only one layer from here on.
   layer <- layers
 
+  if (inherits(data, "SpatRaster")) {
+    data_values <- as.vector(terra::values(data[[layer]]))
+    data_coord <- as.data.frame(terra::crds(data))
+    data_coord <- sf::st_as_sf(data_coord,
+      coords = seq_len(ncol(data_coord)),
+      crs = data_crs
+    )
+  } else {
+    data_values <- data[[layer]]
+    data_coord <- data
+  }
+
   notok <- is.na(values)
   ok <- which(!notok)
   notok <- which(notok)
-  data_notok <- is.na(data[[layer]])
+  data_notok <- is.na(data_values)
   data_ok <- which(!data_notok)
   data_notok <- which(data_notok)
+
 
   for (batch in seq_len(ceiling(length(notok) / batch_size))) {
     subset <- notok[seq((batch - 1) * batch_size,
       min(length(notok), batch * batch_size),
       by = 1
     )]
-    dst <- rgeos::gDistance(
-      sp::SpatialPoints(data[data_ok, , drop = FALSE], proj4string = data_crs),
-      sp::SpatialPoints(where_coord[subset, , drop = FALSE], proj4string = where_crs),
-      byid = TRUE
+    dst <- sf::st_distance(
+      data_coord[data_ok, , drop = FALSE],
+      where[subset, , drop = FALSE],
+      by_element = FALSE
     )
 
-    nn <- apply(dst, MARGIN = 1, function(row) which.min(row)[[1]])
-    values[subset] <- data[[layer]][data_ok[nn]]
+    nn <- apply(dst, MARGIN = 2, function(col) which.min(col)[[1]])
+    values[subset] <- data_values[data_ok[nn]]
   }
   values
 }

@@ -15,6 +15,7 @@ NULL
 #' mappers for special objects. See below for details of the
 #' default constructor [bru_mapper_define()] that can be used to define
 #' new mappers in user code.
+#'
 #' @examples
 #' mapper <- bru_mapper_index(5)
 #' ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
@@ -106,7 +107,7 @@ ibm_values <- function(mapper, inla_f = FALSE, ...) {
 #' @export
 ibm_amatrix <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   lifecycle::deprecate_soft(
-    "2.6.0.9000",
+    "2.7.0",
     "ibm_amatrix()",
     "ibm_jacobian()"
   )
@@ -215,7 +216,7 @@ ibm_invalid_output <- function(mapper, input, state, ...) {
 #' @export
 ibm_valid_input <- function(...) {
   lifecycle::deprecate_stop(
-    "2.6.0.9001",
+    "2.7.0",
     "ibm_valid_input()"
   )
   UseMethod("ibm_valid_input")
@@ -272,31 +273,6 @@ NULL
 }
 
 
-# # @rawNamespace if (getRversion() >= '3.6.0') {
-# #   S3method(vctrs::vec_ptype_abbr, bru_mapper)
-# #   S3method(vctrs::vec_ptype_abbr, bm_list)
-# #   S3method(pillar::obj_sum, bru_mapper)
-# # }
-# # @rdname bm_list
-# `vec_ptype_abbr.bru_mapper` <- function(x, ...) {
-#   if (identical(class(x)[1], "bru_mapper")) {
-#     "mapper"
-#   } else {
-#     sub("bru_mapper_", "bm_", class(x)[1])
-#   }
-# }
-# # @rdname bm_list
-# `obj_sum.bru_mapper` <- function(x) {
-#   if (identical(class(x)[1], "bru_mapper")) {
-#     "mapper"
-#   } else {
-#     sub("bru_mapper_", "bm_", class(x)[1])
-#   }
-# }
-# # @rdname bm_list
-# `vec_ptype_abbr.bm_list` <- function(x, ...) {
-#   "mappers"
-# }
 
 
 # Summaries ----
@@ -502,6 +478,20 @@ print.summary_bru_mapper <- function(x, ...) {
 #' to register the methods, e.g.
 #' `.S3method("ibm_jacobian", "my_mapper_class", ibm_jacobian.my_mapper_class)`.
 #'
+#' In packages with `Suggests: inlabru`, add method information for delayed
+#' registration, e.g.:
+#' ```
+#' #' @rawNamespace S3method(inlabru::bru_get_mapper, inla_rspde)
+#' #' @rawNamespace S3method(inlabru::ibm_n, bru_mapper_inla_rspde)
+#' #' @rawNamespace S3method(inlabru::ibm_values, bru_mapper_inla_rspde)
+#' #' @rawNamespace S3method(inlabru::ibm_jacobian, bru_mapper_inla_rspde)
+#' ```
+#' or before each method, use `@exportS3Method`:
+#' ```
+#' #' @exportS3Method inlabru::bru_get_mapper
+#' ```
+#' etc., which semi-automates it.
+#'
 #' @export
 bru_mapper_define <- function(mapper,
                               new_class = NULL,
@@ -511,15 +501,16 @@ bru_mapper_define <- function(mapper,
     txt <-
       c(
         "In packages with Suggests: inlabru, add method information, e.g.:",
-        "  #' @rawNamespace if (getRversion() >= '3.6.0') {",
-        "  #'   S3method(inlabru::bru_get_mapper, inla_rspde)",
-        "  #'   S3method(inlabru::ibm_n, bru_mapper_inla_rspde)",
-        "  #'   S3method(inlabru::ibm_values, bru_mapper_inla_rspde)",
-        "  #'   S3method(inlabru::ibm_jacobian, bru_mapper_inla_rspde)",
-        "  #' }"
+        "  #' @rawNamespace S3method(inlabru::bru_get_mapper, inla_rspde)",
+        "  #' @rawNamespace S3method(inlabru::ibm_n, bru_mapper_inla_rspde)",
+        "  #' @rawNamespace S3method(inlabru::ibm_values, bru_mapper_inla_rspde)",
+        "  #' @rawNamespace S3method(inlabru::ibm_jacobian, bru_mapper_inla_rspde)",
+        "or before each method, use @exportS3Method:",
+        "  #' @exportS3Method inlabru::bru_get_mapper",
+        "etc., which semi-automates it."
       )
     lifecycle::deprecate_warn(
-      when = "2.6.0.9000",
+      when = "2.7.0",
       what = "bru_mapper_define(methods)",
       details =
         c(
@@ -547,7 +538,7 @@ bru_mapper_define <- function(mapper,
 #' @export
 bru_mapper.default <- function(...) {
   lifecycle::deprecate_warn(
-    "2.6.0.9000",
+    "2.7.0",
     "bru_mapper.default()",
     "bru_mapper_define()"
   )
@@ -753,11 +744,20 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
   }
   if (inherits(input, "sfc_POINT")) {
     # TODO: Add direct sf support to inla.spde.make.A,
-    # to support crs passthrough.
+    input <- fm_transform(input,
+      crs = fm_crs(mapper[["mesh"]]),
+      passthrough = TRUE
+    )
     A <- sf::st_coordinates(input)
     nm <- intersect(colnames(A), c("X", "Y", "Z"))
     input <- as.matrix(A[, nm, drop = FALSE])
-  } else if (!is.matrix(input) && !inherits(input, "Spatial")) {
+  } else if (inherits(input, "Spatial")) {
+    input <- fm_transform(input,
+      crs = fm_crs(mapper[["mesh"]]),
+      passthrough = TRUE
+    )
+    input <- sp::coordinates(input)
+  } else if (!is.matrix(input)) {
     input <- as.matrix(input)
   }
   INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
@@ -767,7 +767,7 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_inla_mesh_2d <- function(...) {
-  .Deprecated("ibm_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -825,7 +825,7 @@ ibm_jacobian.bru_mapper_inla_mesh_1d <- function(mapper, input, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_inla_mesh_1d <- function(...) {
-  .Deprecated("ibm_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -868,7 +868,7 @@ ibm_jacobian.bru_mapper_index <- function(mapper, input, state, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_index <- function(...) {
-  .Deprecated("ibm_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -963,17 +963,18 @@ bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL, ...
   if (is.null(offset)) {
     offset <- numeric(nrow(jacobian))
   }
-  bru_mapper_define(list(
-    offset = as.vector(offset),
-    jacobian = jacobian,
-    state0 = state0,
-    n_multi = n_multi,
-    n = sum(n_multi),
-    n_output = length(offset),
-    values_mapper = NULL
-  ),
-  # TODO: maybe allow values_mapper
-  new_class = "bru_mapper_taylor"
+  bru_mapper_define(
+    list(
+      offset = as.vector(offset),
+      jacobian = jacobian,
+      state0 = state0,
+      n_multi = n_multi,
+      n = sum(n_multi),
+      n_output = length(offset),
+      values_mapper = NULL
+    ),
+    # TODO: maybe allow values_mapper
+    new_class = "bru_mapper_taylor"
   )
 }
 
@@ -1115,7 +1116,7 @@ ibm_jacobian.bru_mapper_linear <- function(mapper, input, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_linear <- function(...) {
-  .Deprecated("bru_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -1183,7 +1184,7 @@ ibm_jacobian.bru_mapper_matrix <- function(mapper, input, state = NULL,
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_matrix <- function(...) {
-  .Deprecated("bru_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -1195,41 +1196,64 @@ ibm_amatrix.bru_mapper_matrix <- function(...) {
 #' @param factor_mapping character; selects the type of factor mapping.
 #' * `'contrast'` for leaving out the first factor level.
 #' * `'full'` for keeping all levels.
+#' @param indexed logical; if `TRUE`, the `ibm_values()` method
+#' will return an integer vector instead of the factor levels.
+#' This is needed e.g. for `group` and `replicate` mappers, since
+#' `INLA::f()` doesn't accept factor values. Default: `FALSE`, which
+#' works for the main input mappers. The default mapper constructions
+#' will set it the required setting.
 #' @export
 #' @describeIn bru_mapper Create a factor mapper
-bru_mapper_factor <- function(values, factor_mapping, ...) {
+bru_mapper_factor <- function(values, factor_mapping, indexed = FALSE, ...) {
   factor_mapping <- match.arg(factor_mapping, c("full", "contrast"))
   if (is.factor(values)) {
     mapper <- list(
       levels = levels(values),
-      factor_mapping = factor_mapping
+      factor_mapping = factor_mapping,
+      indexed = indexed
     )
   } else if (is.character(values)) {
     mapper <- list(
       levels = unique(values),
-      factor_mapping = factor_mapping
+      factor_mapping = factor_mapping,
+      indexed = indexed
     )
   } else {
     mapper <- list(
       levels = as.character(sort(unique(values))),
-      factor_mapping = factor_mapping
+      factor_mapping = factor_mapping,
+      indexed = indexed
     )
   }
-  bru_mapper_define(mapper, new_class = "bru_mapper_factor")
+  mapper$n <- length(mapper$levels) - identical(factor_mapping, "contrast")
+  if (indexed) {
+    bru_mapper_define(mapper,
+      new_class = c(
+        "bru_mapper_factor_index",
+        "bru_mapper_factor"
+      )
+    )
+  } else {
+    bru_mapper_define(mapper, new_class = "bru_mapper_factor")
+  }
 }
 
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_factor <- function(mapper, ...) {
-  length(ibm_values(mapper))
+  length(mapper[["levels"]]) - identical(mapper[["factor_mapping"]], "contrast")
 }
 #' @export
 #' @rdname bru_mapper_methods
 ibm_values.bru_mapper_factor <- function(mapper, ...) {
-  if (identical(mapper$factor_mapping, "contrast")) {
-    mapper$levels[-1L]
+  if (is.null(mapper[["indexed"]]) || !mapper[["indexed"]]) {
+    if (identical(mapper[["factor_mapping"]], "contrast")) {
+      mapper$levels[-1L]
+    } else {
+      mapper$levels
+    }
   } else {
-    mapper$levels
+    seq_len(ibm_n(mapper))
   }
 }
 
@@ -1268,7 +1292,7 @@ ibm_jacobian.bru_mapper_factor <- function(mapper, input, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_factor <- function(...) {
-  .Deprecated("bru_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -1317,27 +1341,28 @@ ibm_eval.bru_mapper_const <- function(mapper, input, state = NULL, ...) {
 #' @export
 #' @describeIn inlabru-deprecated Creates a [bru_mapper_const()] mapper.
 bru_mapper_offset <- function(...) {
-  #  .Deprecated("bru_mapper_const")
+  lifecycle::deprecate_soft("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
   bru_mapper_define(bru_mapper_const(), new_class = "bru_mapper_offset")
 }
 
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [bru_mapper_const] methods
 ibm_n.bru_mapper_offset <- function(...) {
-  .Deprecated("bru_mapper_const")
+  lifecycle::deprecate_soft("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
   NextMethod()
 }
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [bru_mapper_const] methods
 ibm_values.bru_mapper_offset <- function(...) {
-  .Deprecated("bru_mapper_const")
+  lifecycle::deprecate_soft("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
   NextMethod()
 }
 
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [bru_mapper_const] methods
 ibm_amatrix.bru_mapper_offset <- function(...) {
-  .Deprecated("bru_mapper_const")
+  lifecycle::deprecate_soft("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   NextMethod()
 }
 
@@ -2007,14 +2032,15 @@ bru_mapper_pipe <- function(mappers, ...) {
     warning("Either all or none of the pipe sub-mappers should be named.", immediate. = TRUE)
     names(mappers) <- as.character(seq_along(mappers))
   }
-  bru_mapper_define(list(
-    mappers = mappers,
-    is_linear_multi,
-    is_linear = is_linear,
-    n_multi = n_multi,
-    n = n
-  ),
-  new_class = "bru_mapper_pipe"
+  bru_mapper_define(
+    list(
+      mappers = mappers,
+      is_linear_multi,
+      is_linear = is_linear,
+      n_multi = n_multi,
+      n = n
+    ),
+    new_class = "bru_mapper_pipe"
   )
 }
 
@@ -2268,7 +2294,7 @@ ibm_jacobian.bru_mapper_multi <- function(mapper,
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_multi <- function(...) {
-  .Deprecated("bru_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -2661,7 +2687,7 @@ ibm_jacobian.bru_mapper_collect <- function(mapper, input, state = NULL,
 #' @export
 #' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
 ibm_amatrix.bru_mapper_collect <- function(...) {
-  .Deprecated("bru_jacobian")
+  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   ibm_jacobian(...)
 }
 
@@ -2851,13 +2877,18 @@ ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
 #'   give an effective spectral prior. For example, let
 #'   ```
 #'   scaling = 1 / (1 + (0:4)^2)
-#'   A1 = bru_mapper_harmonics(order = 4)
-#'   u1 <- A1 %*% rnorm(9, sd = scaling)
+#'   x <- seq(0, 1, length.out = 11)
+#'   bmh1 = bru_mapper_harmonics(order = 4, interval = c(0, 1))
+#'   u1 <- ibm_eval(
+#'     bmh1,
+#'     input = x,
+#'     state = rnorm(9, sd = rep(scaling, c(1, 2, 2, 2, 2)))
+#'   )
 #'   ```
 #'   Then, with
 #'   ```
-#'   A2 = bru_mapper_harmonics(order = 4, scaling = scaling)
-#'   u2 = A2 %*% rnorm(9)
+#'   bmh2 = bru_mapper_harmonics(order = 4, scaling = scaling)
+#'   u2 = ibm_eval(bmh2, input = x, state = rnorm(9))
 #'   ```
 #'   the stochastic properties of `u1` and `u2` will be the same, with `scaling^2`
 #'   determining the variance for each frequency contribution.
@@ -2894,7 +2925,10 @@ ibm_n.bru_mapper_harmonics <- function(mapper, inla_f = FALSE, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_harmonics <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
-  A <- Matrix::Matrix(0.0, NROW(input), ibm_n(mapper))
+  # Indexing into sparseMatrix is slower than into a dense Matrix,
+  # and indexing into a dense Matrix is slower than for a plain matrix(),
+  # including conversion to dense Matrix afterwards.
+  A <- matrix(0.0, NROW(input), ibm_n(mapper))
   off <- 0
   if (mapper[["intercept"]]) {
     A[, 1] <- 1.0 * mapper[["scaling"]][1]
@@ -2904,12 +2938,13 @@ ibm_jacobian.bru_mapper_harmonics <- function(mapper, input, state = NULL, inla_
     input <- (input - mapper[["interval"]][1]) / diff(mapper[["interval"]])
     for (ord in seq_len(mapper[["order"]])) {
       scale <- mapper[["scaling"]][mapper[["intercept"]] + ord]
-      A[, off + 1] <- cos(2 * pi * input * ord) * scale
-      A[, off + 2] <- sin(2 * pi * input * ord) * scale
+      angle <- (2 * pi * ord) * input
+      A[, off + 1] <- cos(angle) * scale
+      A[, off + 2] <- sin(angle) * scale
       off <- off + 2
     }
   }
-  A
+  as(A, "Matrix")
 }
 
 

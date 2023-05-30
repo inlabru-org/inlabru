@@ -34,6 +34,9 @@ if (require(ggplot2, quietly = TRUE)) {
 }
 
 }
+\seealso{
+\code{\link[=fm_pixels]{fm_pixels()}}
+}
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}
 }

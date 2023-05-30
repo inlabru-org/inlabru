@@ -53,24 +53,25 @@ install.packages("inlabru")
 You can install the latest bugfix release of inlabru from [GitHub](https://github.com/inlabru-org/inlabru) with:
 ```{r gh-bugfix-installation, eval = FALSE}
 # install.packages("remotes")
-remotes::install_github("inlabru-org/inlabru", ref="stable")
+remotes::install_github("inlabru-org/inlabru", ref = "stable")
 ```
 
 You can install the development version of inlabru from [GitHub](https://github.com/inlabru-org/inlabru) with
 ```{r gh-installation, eval = FALSE}
 # install.packages("remotes")
-remotes::install_github("inlabru-org/inlabru", ref="devel")
+remotes::install_github("inlabru-org/inlabru", ref = "devel")
 ```
 or track the development version builds via [inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/ui#builds):
 ```{r universe-installation, eval = FALSE}
 # Enable universe(s) by inlabru-org
 options(repos = c(
-  inlabruorg = 'https://inlabru-org.r-universe.dev',
-  INLA = 'https://inla.r-inla-download.org/R/testing',
-  CRAN = 'https://cloud.r-project.org'))
+  inlabruorg = "https://inlabru-org.r-universe.dev",
+  INLA = "https://inla.r-inla-download.org/R/testing",
+  CRAN = "https://cloud.r-project.org"
+))
 
 # Install some packages
-install.packages('inlabru')
+install.packages("inlabru")
 ```
 
 ## Example
@@ -79,19 +80,20 @@ This is a basic example which shows you how fit a simple spatial Log Gaussian Co
 and predicts its intensity:
 ```{r example}
 # Load libraries
-options("rgdal_show_exportToProj4_warnings"="none")
 library(inlabru)
 library(INLA)
 library(ggplot2)
+bru_safe_sp(force = TRUE) # Ensures sp works without rgdal installed
 
 # Load the data
 data(gorillas, package = "inlabru")
 
 # Construct latent model components
-matern <- inla.spde2.pcmatern(gorillas$mesh, 
-                              prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(0.01, 0.01))
-cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
+matern <- inla.spde2.pcmatern(gorillas$mesh,
+  prior.sigma = c(0.1, 0.01),
+  prior.range = c(0.01, 0.01)
+)
+cmp <- ~ mySmooth(coordinates, model = matern) + Intercept(1)
 # Fit LGCP model
 # This particular bru/like combination has a shortcut function lgcp() as well
 fit <- bru(
@@ -107,19 +109,16 @@ fit <- bru(
 )
 
 # Predict Gorilla nest intensity
-lambda <- predict(fit,
-                  pixels(gorillas$mesh, mask = gorillas$boundary),
-                  ~ exp(mySmooth + Intercept))
+lambda <- predict(
+  fit,
+  pixels(gorillas$mesh, mask = gorillas$boundary),
+  ~ exp(mySmooth + Intercept)
+)
 
 # Plot the result
-ggplot() + 
+ggplot() +
   gg(lambda) +
   gg(gorillas$nests, color = "red", size = 0.2) +
   coord_equal() +
   ggtitle("Nest intensity per km squared")
 ```
-If you have an R installation with PROJ6/GDAL3, and INLA >= 20.06.18, and
-loading old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
-method on them before they are fully usable. The data objects in `inlabru` have
-been updated, so should not need this conversion anymore.
-

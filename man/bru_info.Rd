@@ -8,7 +8,7 @@
 \alias{bru_info.bru}
 \title{Methods for bru_info objects}
 \usage{
-\method{summary}{bru_info}(object, ...)
+\method{summary}{bru_info}(object, verbose = TRUE, ...)
 
 \method{print}{summary_bru_info}(x, ...)
 
@@ -20,6 +20,10 @@ bru_info(...)
 }
 \arguments{
 \item{object}{Object to operate on}
+
+\item{verbose}{logical; If \code{TRUE}, include more details of the
+component definitions. If \code{FALSE}, only show basic component
+definition information. Default: \code{TRUE}}
 
 \item{\dots}{Arguments passed on to other methods}
 
@@ -35,6 +39,4 @@ automatically detecting the version}
 }
 \description{
 Methods for bru_info objects
-
-Summary for bru_info objects
 }

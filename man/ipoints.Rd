@@ -37,7 +37,7 @@ in between),
 
 \item{name}{Character array stating the name of the domains dimension(s).
 If \code{NULL}, the names are taken from coordinate names from \code{samplers} for
-\verb{Spatial*} objects, otherwise "x", "y", "coordinateZ" for 2D regions and
+\verb{Spatial*} objects, otherwise "x", "y", "z" for 2D regions and
 \code{"x"} for 1D regions}
 
 \item{group}{Column names of the \code{samplers} object (if applicable) for which
@@ -53,7 +53,7 @@ without aggregating onto mesh nodes)
 points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
 Points per knot segment: \code{nsub1}
 \item \code{poly_method}: if set to "legacy", selects an old polygon integration method
-that doesn't handle holes. Currently only used for debugging purposes.
+that doesn't handle holes. Only used for debugging purposes.
 }}
 
 \item{project}{Deprecated in favour of \code{int.args(method=...)}.
@@ -61,7 +61,8 @@ If TRUE, aggregate the integration points to mesh vertices. Default:
 \code{project = (identical(int.args$method, "stable"))}}
 }
 \value{
-A \code{data.frame} or \code{SpatialPointsDataFrame} of 1D and 2D integration points, respectively.
+A \code{data.frame}, \code{tibble}, \code{sf}, or \code{SpatialPointsDataFrame} of 1D and
+2D integration points, including a \code{weight} column and \code{.block} column.
 }
 \description{
 This function generates points in one or two dimensions with a weight attached to each point.
@@ -89,8 +90,8 @@ points in the one-dimensional case.
 \examples{
 \donttest{
 if (require("INLA", quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE)) {
-
+  require("ggplot2", quietly = TRUE) &&
+  bru_safe_sp()) {
   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 
   ips <- ipoints(c(0, 10), 50, name = "myDim")

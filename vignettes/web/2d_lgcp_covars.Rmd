@@ -33,8 +33,7 @@ library(INLA)
 library(inlabru)
 library(RColorBrewer)
 library(ggplot2)
-
-bru_options_set(inla.mode = "experimental")
+bru_safe_sp(force = TRUE)
 ```
 
 Introduction
@@ -142,7 +141,7 @@ a `SpatialPixelsDataFrame` only within the boundary, using its `mask` argument, 
 
 ```{r warning=FALSE,message=FALSE}
 df <- pixels(mesh, mask = boundary)
-int1 <- predict(fit1, data = df, ~ exp(vegetation))
+int1 <- predict(fit1, df, ~ exp(vegetation))
 
 ggplot() +
   gg(int1) +
@@ -157,7 +156,7 @@ that have no nests, and some areas of predicted low density that have nests. Wha
 about the estimated abundance (there are really 647 nests there):
 
 ```{r warning=FALSE,message=FALSE}
-ips <- ipoints(boundary, mesh)
+ips <- fm_int(mesh, boundary)
 Lambda1 <- predict(fit1, ips, ~ sum(weight * exp(vegetation)))
 Lambda1
 ```
@@ -211,7 +210,7 @@ ggplot() +
 ```{r warning=FALSE,message=FALSE}
 Lambda2 <- predict(
   fit2,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + vegetation))
 )
 Lambda2
@@ -300,7 +299,7 @@ ggplot() +
 ```{r warning=FALSE,message=FALSE}
 Lambda3 <- predict(
   fit3,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + Intercept))
 )
 Lambda3
@@ -414,19 +413,22 @@ the stored values. In such cases, we can define a function that knows how to
 evaluate the covariate at arbitrary points in the survey region, and call that
 function in the component definition. In this case, we can use a powerful
 method from the 'sp' package to do this. We use this to create the needed
-function.
+function.  NOTE: There is a new method `eval_spatial()` that handles this
+automatically, and supports `terra` `SpatRaster` and `sf` geometry points
+objects, and mismatching coordinate systems as well.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-f.elev <- function(x, y) {
+f.elev <- function(xy) {
   # turn coordinates into SpatialPoints object:
   # with the appropriate coordinate reference system (CRS)
-  spp <- SpatialPoints(data.frame(x = x, y = y), proj4string = fm_sp_get_crs(elev))
-  proj4string(spp) <- fm_sp_get_crs(elev)
+  spp <- SpatialPoints(data.frame(x = xy[, 1], y = xy[, 2]),
+    proj4string = fm_CRS(elev)
+  )
   # Extract elevation values at spp coords, from our elev SpatialGridDataFrame
   v <- over(spp, elev)
   if (any(is.na(v$elevation))) {
-    v$elevation <- inlabru:::bru_fill_missing(elev, spp, v$elevation)
+    v$elevation <- bru_fill_missing(elev, spp, v$elevation)
   }
   return(v$elevation)
 }
@@ -443,7 +445,7 @@ matern <- inla.spde2.pcmatern(mesh,
   prior.range = c(1, 0.01)
 )
 
-ecomp <- coordinates ~ elev(f.elev(x, y), model = "linear") +
+ecomp <- coordinates ~ elev(f.elev(coordinates(.data.)), model = "linear") +
   mySmooth(coordinates, model = matern) + Intercept(1)
 ```
 
@@ -454,7 +456,7 @@ vegetation(gcov$vegetation, model = "factor_full")
 ```
 whereas with the function method we specify the covariate like this:
 ```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
-elev(f.elev(x, y), model = "linear")
+elev(f.elev(coordinates(.data.)), model = "linear")
 ```
 
 We also now include an intercept term.
@@ -585,7 +587,6 @@ for this model.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-
 spde.range <- spde.posterior(efit, "mySmooth", what = "range")
 spde.logvar <- spde.posterior(efit, "mySmooth", what = "log.variance")
 range.plot <- plot(spde.range)
@@ -602,14 +603,14 @@ in the prediction object, for easier plotting.
 
 ```{r fig.show="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 Lambda <- predict(
-  efit, ipoints(boundary, mesh),
+  efit, fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + elev + Intercept))
 )
 Lambda
 
 Nest.e <- predict(
   efit,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ data.frame(
     N = 200:1000,
     density = dpois(200:1000,
@@ -641,23 +642,25 @@ expression. Since the elevation effect in this model is linear, the resulting pl
 ```{r}
 elev.pred <- predict(
   efit,
-  data = data.frame(elevation = seq(0, 100, length.out = 1000)),
+  data.frame(elevation = seq(0, 100, length.out = 1000)),
   formula = ~ elev_eval(elevation)
 )
 
 ggplot(elev.pred) +
   geom_line(aes(elevation, mean)) +
-  geom_ribbon(aes(elevation,
-    ymin = q0.025,
-    ymax = q0.975
-  ),
-  alpha = 0.2
+  geom_ribbon(
+    aes(elevation,
+      ymin = q0.025,
+      ymax = q0.975
+    ),
+    alpha = 0.2
   ) +
-  geom_ribbon(aes(elevation,
-    ymin = mean - 1 * sd,
-    ymax = mean + 1 * sd
-  ),
-  alpha = 0.2
+  geom_ribbon(
+    aes(elevation,
+      ymin = mean - 1 * sd,
+      ymax = mean + 1 * sd
+    ),
+    alpha = 0.2
   )
 ```
 

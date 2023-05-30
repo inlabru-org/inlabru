@@ -56,7 +56,7 @@ You can install the latest bugfix release of inlabru from
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("inlabru-org/inlabru", ref="stable")
+remotes::install_github("inlabru-org/inlabru", ref = "stable")
 ```
 
 You can install the development version of inlabru from
@@ -64,7 +64,7 @@ You can install the development version of inlabru from
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("inlabru-org/inlabru", ref="devel")
+remotes::install_github("inlabru-org/inlabru", ref = "devel")
 ```
 
 or track the development version builds via
@@ -73,12 +73,13 @@ or track the development version builds via
 ``` r
 # Enable universe(s) by inlabru-org
 options(repos = c(
-  inlabruorg = 'https://inlabru-org.r-universe.dev',
-  INLA = 'https://inla.r-inla-download.org/R/testing',
-  CRAN = 'https://cloud.r-project.org'))
+  inlabruorg = "https://inlabru-org.r-universe.dev",
+  INLA = "https://inla.r-inla-download.org/R/testing",
+  CRAN = "https://cloud.r-project.org"
+))
 
 # Install some packages
-install.packages('inlabru')
+install.packages("inlabru")
 ```
 
 ## Example
@@ -88,26 +89,27 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 
 ``` r
 # Load libraries
-options("rgdal_show_exportToProj4_warnings"="none")
 library(inlabru)
 #> Loading required package: sp
 library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_22.10.15-1 built 2022-10-15 03:21:55 UTC.
+#> This is INLA_23.05.22 built 2023-05-21 18:43:44 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
+bru_safe_sp(force = TRUE) # Ensures sp works without rgdal installed
 
 # Load the data
 data(gorillas, package = "inlabru")
 
 # Construct latent model components
-matern <- inla.spde2.pcmatern(gorillas$mesh, 
-                              prior.sigma = c(0.1, 0.01), 
-                              prior.range = c(0.01, 0.01))
-cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
+matern <- inla.spde2.pcmatern(gorillas$mesh,
+  prior.sigma = c(0.1, 0.01),
+  prior.range = c(0.01, 0.01)
+)
+cmp <- ~ mySmooth(coordinates, model = matern) + Intercept(1)
 # Fit LGCP model
 # This particular bru/like combination has a shortcut function lgcp() as well
 fit <- bru(
@@ -123,20 +125,18 @@ fit <- bru(
 )
 
 # Predict Gorilla nest intensity
-lambda <- predict(fit,
-                  pixels(gorillas$mesh, mask = gorillas$boundary),
-                  ~ exp(mySmooth + Intercept))
+lambda <- predict(
+  fit,
+  pixels(gorillas$mesh, mask = gorillas$boundary),
+  ~ exp(mySmooth + Intercept)
+)
 
 # Plot the result
-ggplot() + 
+ggplot() +
   gg(lambda) +
   gg(gorillas$nests, color = "red", size = 0.2) +
   coord_equal() +
   ggtitle("Nest intensity per km squared")
 ```
 
-<img src="man/figures/README-example-1.png" width="100%" /> If you have
-an R installation with PROJ6/GDAL3, and INLA \>= 20.06.18, and loading
-old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
-method on them before they are fully usable. The data objects in
-`inlabru` have been updated, so should not need this conversion anymore.
+<img src="man/figures/README-example-1.png" width="100%" />
