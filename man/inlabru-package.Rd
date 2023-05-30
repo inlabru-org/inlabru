@@ -2,11 +2,33 @@
 % Please edit documentation in R/inlabru-package.R
 \docType{package}
 \name{inlabru-package}
-\alias{inlabru}
 \alias{inlabru-package}
-\title{inlabru: Bayesian Latent Gaussian Modelling using INLA and Extensions}
+\alias{_PACKAGE}
+\alias{inlabru}
+\title{inlabru}
 \description{
-Facilitates spatial and general latent Gaussian modeling using integrated nested Laplace approximation via the INLA package (\url{https://www.r-inla.org}). Additionally, extends the GAM-like model class to more general nonlinear predictor expressions, and implements a log Gaussian Cox process likelihood for modeling univariate and spatial point processes based on ecological survey data. Model components are specified with general inputs and mapping methods to the latent variables, and the predictors are specified via general R expressions, with separate expressions for each observation likelihood model in multi-likelihood models. A prediction method based on fast Monte Carlo sampling allows posterior prediction of general expressions of the latent variables. Ecology-focused introduction in Bachl, Lindgren, Borchers, and Illian (2019) \doi{10.1111/2041-210X.13168}.
+Convenient model fitting using (iterated) INLA.
+}
+\details{
+\code{inlabru} facilitates Bayesian spatial modelling using integrated nested
+Laplace approximations. It is heavily based on R-inla
+(\url{https://www.r-inla.org}) but adds additional modelling abilities and simplified
+syntax for (in particular) spatial models.
+Tutorials and more information can be found at
+\url{https://inlabru-org.github.io/inlabru/} and \url{http://www.inlabru.org/}.
+The iterative method used for non-linear predictors is documented in the
+\code{method} vignette.
+
+The main function for inference using inlabru is \code{\link[=bru]{bru()}}.
+The general model specification details is documented in \code{\link[=component]{component()}} and \code{\link[=like]{like()}}.
+Posterior quantities beyond the basic summaries can be calculated with
+a \code{predict()} method, documented in \code{\link[=predict.bru]{predict.bru()}}.
+For point process inference \code{\link[=lgcp]{lgcp()}} can be used as a shortcut to \code{bru(..., like(model="cp", ...))}.
+
+The package comes with multiple real world data sets, namely \link{gorillas},
+\link{mexdolphin}, \link{seals}. Plotting these data sets is straight forward using inlabru's extensions
+to \code{ggplot2}, e.g. the \code{\link[=gg]{gg()}} function. For educational purposes some simulated data sets are available
+as well, e.g. \link{Poisson1_1D}, \link{Poisson2_1D}, \link{Poisson2_1D} and \link{toygroups}.
 }
 \seealso{
 Useful links:
@@ -18,24 +40,6 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Finn Lindgren \email{finn.lindgren@gmail.com} (\href{https://orcid.org/0000-0002-5833-2011}{ORCID}) (Finn Lindgren continued development of the main code) [copyright holder]
-
-Authors:
-\itemize{
-  \item Fabian E. Bachl \email{bachlfab@gmail.com} (Fabian Bachl wrote the main code) [copyright holder]
+Fabian E. Bachl \email{bachlfab@gmail.com}
+and Finn Lindgren \email{finn.lindgren@gmail.com}
 }
-
-Other contributors:
-\itemize{
-  \item David L. Borchers \email{dlb@st-andrews.ac.uk} (David Borchers wrote code for Gorilla data import and sampling, multiplot tool) [contributor, data contributor, copyright holder]
-  \item Daniel Simpson \email{dp.simpson@gmail.com} (Daniel Simpson wrote the basic LGCP sampling method) [contributor, copyright holder]
-  \item Lindesay Scott-Howard \email{lass@st-andrews.ac.uk} (Lindesay Scott-Howard provided MRSea data import code) [contributor, data contributor, copyright holder]
-  \item Seaton Andy \email{andy.e.seaton@gmail.com} (Andy Seaton provided testing, bugfixes, and vignettes) [contributor]
-  \item Suen Man Ho \email{M.H.Suen@sms.ed.ac.uk} (Man Ho Suen contributed features for aggregated responses and vignette updates) [contributor, copyright holder]
-  \item Roudier Pierre (Pierre Roudier contributed general quantile summaries) [contributor, copyright holder]
-  \item Meehan Tim \email{tmeeha@gmail.com} (Tim Meehan contributed the SVC vignette and robins data) [contributor, copyright holder]
-  \item Reddy Peddinenikalva Niharika (Niharika Peddinenikalva contributed the LGCP residuals vignette) [contributor, copyright holder]
-}
-
-}
-\keyword{internal}

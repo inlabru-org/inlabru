@@ -190,13 +190,14 @@ import.gorillas <- function() {
 
 #' @describeIn import.gorillas Convert gorillas to `sf` and `terra` format
 import.gorillas.sf <- function() {
+  warning("Not fully implemented", immediate. = TRUE)
   gorillas <- import.gorillas()
 
-  gorillas_sf$nests = st_as_sf(gorillas$nests)
+  gorillas_sf$nests = sf::st_as_sf(gorillas$nests)
   gorillas_sf$mesh = gorillas$mesh
-  gorillas_sf$boundary = st_as_sf(gorillas$boundary)
-  gorillas_sf$gcov = lapply(gorillas$gcov, st_as_sf)
-  gorillas_sf$plotsample = lapply(gorillas$plotsample, st_as_sf)
+  gorillas_sf$boundary = sf::st_as_sf(gorillas$boundary)
+  gorillas_sf$gcov = lapply(gorillas$gcov, sf::st_as_sf)
+  gorillas_sf$plotsample = lapply(gorillas$plotsample, sf::st_as_sf)
 }
 
 
