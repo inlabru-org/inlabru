@@ -56,6 +56,7 @@
 #'
 #' @examples
 #' if (bru_safe_inla() &&
+#'   bru_safe_sp() &&
 #'   require(ggplot2, quietly = TRUE) &&
 #'   require(ggpolypath, quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru") # get the data
@@ -93,10 +94,11 @@ import.gorillas <- function() {
   data(gorillas, package = "spatstat.data", envir = environment())
 
   # Create SpatialPoints representing nest locations
+  requireNamespace("spatstat.geom")
   nests <- as.data.frame(gorillas)
   coordinates(nests) <- c("x", "y")
-  crs <- sp::CRS("+proj=utm +zone=32N +datum=WGS84") # from the Gorillas help file
-  crs_km <- sp::CRS("+proj=utm +zone=32N +datum=WGS84 +units=km")
+  crs <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84") # from the Gorillas help file
+  crs_km <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84 +units=km")
   proj4string(nests) <- crs
 
   #' Turn the observation window into spatial polygon
@@ -141,7 +143,9 @@ import.gorillas <- function() {
     gcov = gcov
   )
 
-  gorillas <- stransform(gorillas, crs_km)
+  gorillas$nests <- fm_transform(gorillas$nests, crs_km)
+  gorillas$mesh <- fm_transform(gorillas$mesh, crs_km)
+  gorillas$boundary <- fm_transform(gorillas$boundary, crs_km)
 
   # Create a plot sampling data set
   set.seed(121)
@@ -173,11 +177,27 @@ import.gorillas <- function() {
 
   # Extrapolate covariate
   pxl <- pixels(gorillas$mesh, mask = FALSE, nx = 220, ny = 180)
-  for (k in seq_len(length(gorillas$gcov))) {
-    gorillas$gcov[[k]] <- sfill(gorillas$gcov[[k]], pxl)
+  pxl <- fm_transform(pxl, fm_crs(gorillas$gcov[[1]]))
+  for (k in names(gorillas$gcov)) {
+    pxl[[k]] <- NA
+    pxl[[k]] <- bru_fill_missing(gorillas$gcov[[k]], pxl, values = pxl[[k]])
   }
+  gorillas$gcov <- pxl
 
   return(gorillas)
+}
+
+
+#' @describeIn import.gorillas Convert gorillas to `sf` and `terra` format
+import.gorillas.sf <- function() {
+  warning("Not fully implemented", immediate. = TRUE)
+  gorillas <- import.gorillas()
+
+  gorillas_sf$nests = sf::st_as_sf(gorillas$nests)
+  gorillas_sf$mesh = gorillas$mesh
+  gorillas_sf$boundary = sf::st_as_sf(gorillas$boundary)
+  gorillas_sf$gcov = lapply(gorillas$gcov, sf::st_as_sf)
+  gorillas_sf$plotsample = lapply(gorillas$plotsample, sf::st_as_sf)
 }
 
 

@@ -93,7 +93,6 @@ We need to define a half-normal detection probability function. This must take d
 arguent and the linear predictor of the sigma parameter (which we will call `lsig`) as its second:
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
-
 hn <- function(distance, lsig) {
   exp(-0.5 * (distance / exp(lsig))^2)
 }
@@ -193,7 +192,7 @@ The average detection probability within the maximum detection distance is estim
 We can look at the posterior for expected number of dolphins as usual:
 
 ```{r warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-predpts <- ipoints(mexdolphin$ppoly, mexdolphin$mesh)
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda <- predict(fit, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda
 ```
@@ -250,7 +249,6 @@ fit1 <- lgcp(
 ```
 Plots:
 ```{r, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-
 spde.range <- spde.posterior(fit1, "mySPDE", what = "range")
 plot(spde.range)
 spde.logvar <- spde.posterior(fit1, "mySPDE", what = "log.variance")
@@ -275,7 +273,7 @@ distdf <- data.frame(distance = seq(0, 8, length = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
 plot(dfun1)
 
-predpts <- ipoints(mexdolphin$ppoly, mexdolphin$mesh)
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda1 <- predict(fit1, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda1
 

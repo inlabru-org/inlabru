@@ -115,8 +115,6 @@ through without transformation.}
 \item{CRSobj}{The target sp::CRS or inla.CRS object}
 }
 \value{
-\code{stransform}
-
 A \code{CRS} object, or NULL if no valid CRS identified
 }
 \description{

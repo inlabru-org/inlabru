@@ -70,7 +70,7 @@ fm_as_sfc.inla.mesh <- function(x, ..., multi = FALSE) {
 fm_as_inla_mesh.sfc_MULTIPOLYGON <- function(x, ...) {
   if (length(x) > 1) {
     warning("More than one MULTIPOLYGON detected, but conversion method only uses one.",
-            immediate. = TRUE
+      immediate. = TRUE
     )
   }
   # Ensure correct CCW ring orientation; sf doesn't take into account
@@ -83,7 +83,7 @@ fm_as_inla_mesh.sfc_MULTIPOLYGON <- function(x, ...) {
       x[[1]],
       function(xx) {
         if ((length(xx) > 1) ||
-            (nrow(xx[[1]]) > 4)) {
+          (nrow(xx[[1]]) > 4)) {
           stop("Invalid geometry; non-triangle detected.")
         }
         xx[[1]][1:3, , drop = FALSE]
@@ -113,7 +113,7 @@ fm_as_inla_mesh.sfc_POLYGON <- function(x, ...) {
       x,
       function(xx) {
         if ((length(xx) > 1) ||
-            (nrow(xx[[1]]) > 4)) {
+          (nrow(xx[[1]]) > 4)) {
           stop("Invalid geometry; non-triangle detected.")
         }
         xx[[1]][1:3, , drop = FALSE]
@@ -302,7 +302,7 @@ fm_as_inla_mesh_segment.sfc_MULTIPOLYGON <-
           seq_len(nrow(uniqueLinfo)),
           function(i) {
             subset <- which((Linfo[, 1] == uniqueLinfo[i, 1]) &
-                              (Linfo[, 2] == uniqueLinfo[i, 2]))
+              (Linfo[, 2] == uniqueLinfo[i, 2]))
             # sfc_POLYGON repeats the initial point
             n <- length(subset) - 1
             subset <- subset[-(n + 1)]
@@ -333,10 +333,12 @@ fm_as_inla_mesh_segment.sfc_GEOMETRY <-
       grp <- seq_len(length(x))
     }
     segm <-
-      lapply(seq_along(x),
-             function(k) {
-               fm_as_inla_mesh_segment(x[k], grp = grp[[k]], join = join, ...)
-             })
+      lapply(
+        seq_along(x),
+        function(k) {
+          fm_as_inla_mesh_segment(x[k], grp = grp[[k]], join = join, ...)
+        }
+      )
     if (join) {
       segm <- fm_internal_sp2segment_join(segm, grp = grp)
     }

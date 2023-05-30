@@ -73,6 +73,9 @@
 \alias{ibm_names<-.bru_mapper_collect}
 \alias{ibm_n.bru_mapper_harmonics}
 \alias{ibm_jacobian.bru_mapper_harmonics}
+\alias{ibm_n.bru_mapper_mesh_B}
+\alias{ibm_values.bru_mapper_mesh_B}
+\alias{ibm_jacobian.bru_mapper_mesh_B}
 \title{Methods for bru_mapper objects}
 \usage{
 \method{ibm_n}{bru_mapper_inla_mesh_2d}(mapper, ...)
@@ -240,13 +243,19 @@
 \method{ibm_n}{bru_mapper_harmonics}(mapper, inla_f = FALSE, ...)
 
 \method{ibm_jacobian}{bru_mapper_harmonics}(mapper, input, state = NULL, inla_f = FALSE, ...)
+
+\method{ibm_n}{bru_mapper_mesh_B}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_mesh_B}(mapper, ...)
+
+\method{ibm_jacobian}{bru_mapper_mesh_B}(mapper, input, ...)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
 
 \item{...}{Arguments passed on to other methods}
 
-\item{input}{Data input for the mapper.}
+\item{input}{The values for which to produce a mapping matrix}
 
 \item{state}{A vector of latent state values for the mapping,
 of length \code{ibm_n(mapper, inla_f = FALSE)}}

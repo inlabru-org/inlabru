@@ -1,10 +1,6 @@
-# library(tidyverse)
-# library(patchwork)
-
 #' @importFrom magrittr "%>%"
 #' @importFrom rlang .data
 #' @importFrom rlang .env
-#' @import patchwork
 
 #' @title Plot inlabru convergence diagnostics
 #'
@@ -14,6 +10,9 @@
 #'
 #' @param x a [bru] object, typically a result from [bru()] for a nonlinear
 #' predictor model
+#'
+#' @details Requires the "dplyr", "ggplot2", "magrittr", and "patchwork"
+#' packages to be installed.
 #' @export
 #' @examples
 #' \dontrun{
@@ -27,10 +26,23 @@ bru_convergence_plot <- function(x) {
 
 
 make_track_plots <- function(fit) {
-  if (!requireNamespace("dplyr", quietly = TRUE) ||
-    !requireNamespace("ggplot2", quietly = TRUE) ||
-    !requireNamespace("magrittr", quietly = TRUE)) {
-    stop("One or more of 'dplyr', 'ggplot2', 'magrittr' not installed, but are needed by make_track_plots()")
+  needed <- c("dplyr", "ggplot2", "magrittr", "patchwork")
+  are_installed <-
+    vapply(
+      needed,
+      function(x) {
+        requireNamespace(x, quietly = TRUE)
+      },
+      TRUE
+    )
+  if (any(!are_installed)) {
+    stop(
+      paste0(
+        "Needed package(s) ",
+        paste0("'", needed[!are_installed], "'", collapse = ", "),
+        " not installed, but are needed by make_track_plots()"
+      )
+    )
   }
   track_data <-
     fit$bru_iinla$track %>%

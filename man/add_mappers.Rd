@@ -15,26 +15,26 @@ add_mappers(...)
 \arguments{
 \item{\dots}{Parameters passed on to other methods}
 
-\item{component}{PARAM_DESCRIPTION}
+\item{component}{A \code{component} object}
 
-\item{lhoods}{PARAM_DESCRIPTION}
+\item{lhoods}{A \code{bru_like_list} object}
+
+\item{components}{A \code{component_list} object}
 }
 \value{
-OUTPUT_DESCRIPTION
+A \code{component} object with completed mapper information
 }
 \description{
 Add missing mappers between input data and latent variables,
 based on likelihood data
 
-FUNCTION_DESCRIPTION
-}
-\details{
-DETAILS
+Equip component(s) with mappers for subcomponents that do not
+have predefined mappers. When needed, the data in \code{lhoods} is used to determine
+the appropriate mapper(s).
 }
 \examples{
 \dontrun{
 if (interactive()) {
-  # EXAMPLE1
 }
 }
 }

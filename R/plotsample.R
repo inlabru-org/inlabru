@@ -58,7 +58,8 @@ makepoly <- function(start, width, height) {
 #' @examples
 #' \donttest{
 #' # Some features require the raster package
-#' if (require("raster", quietly = TRUE) &&
+#' if (bru_safe_sp() &&
+#'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru")
 #'   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
@@ -101,7 +102,7 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
   for (i in 1:nplots) {
     polys[[i]] <- Polygons(list(makepoly(as.numeric(starts[i, ]), width, height)), i)
   }
-  plots <- SpatialPolygons(polys, proj4string = CRS(as.character(proj4string(spdf))))
+  plots <- SpatialPolygons(polys, proj4string = fm_CRS(spdf))
   plots <- raster::intersect(boundary, plots) # remove bits of plot outside boundary
   dets <- spdf[plots, ] # extract only those nests inside the polygons (neat!)
 
@@ -127,7 +128,8 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
 #' @examples
 #' \donttest{
 #' # Some features require the raster package
-#' if (require("raster", quietly = TRUE) &&
+#' if (bru_safe_sp() &&
+#'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru")
 #'   plotpts <- plotsample(gorillas$nests, gorillas$boundary,

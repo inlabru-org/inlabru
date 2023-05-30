@@ -2,9 +2,12 @@
 % Please edit documentation in R/data.gorillas.R
 \name{import.gorillas}
 \alias{import.gorillas}
+\alias{import.gorillas.sf}
 \title{Gorilla data import}
 \usage{
 import.gorillas()
+
+import.gorillas.sf()
 }
 \value{
 gorilla data
@@ -16,6 +19,11 @@ Hack: change CRS units of the covariates to km
 \description{
 Gorilla data import
 }
+\section{Functions}{
+\itemize{
+\item \code{import.gorillas.sf()}: Convert gorillas to \code{sf} and \code{terra} format
+
+}}
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}, David L. Borchers \email{dlb@st-andrews.ac.uk}
 }

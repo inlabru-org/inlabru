@@ -34,14 +34,12 @@
 #' }
 #'
 is.inside <- function(mesh, loc, mesh.coords = NULL) {
-  if (inherits(loc, "Spatial")) {
-    loc <- coordinates(loc)
+  if (!is.null(mesh.coords)) {
+    loc <- as.matrix(loc[, mesh.coords])
   }
-  if (!is.null(mesh.coords) && is.data.frame(loc)) {
-    loc <- as.matrix(loc[, mesh.coords, drop = FALSE])
-  }
-  p2m <- INLA::inla.fmesher.smorg(loc = mesh$loc, tv = mesh$graph$tv, points2mesh = loc)
-  return(!(p2m$p2m.t == 0))
+  proj <- fm_evaluator(mesh, loc = loc)
+
+  return(proj$proj$ok)
 }
 
 # Query if a point is inside a polygon AND inside the mesh;
@@ -125,8 +123,8 @@ vertices.inla.mesh <- function(object) {
 #'
 #' @description Generate `SpatialPixels` covering an `inla.mesh`
 #'
-#' @aliases pixels
 #' @export
+#' @seealso [fm_pixels()]
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
@@ -149,9 +147,55 @@ vertices.inla.mesh <- function(object) {
 #' }
 #'
 pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
+  #  lifecycle::deprecate_soft(
+  #    "2.8.0",
+  #    "pixels()",
+  #   "fm_pixels(format = 'sp')",
+  #   details = "The fm_pixels() function can generate sf, terra, and sp output."
+  # )
+  fm_pixels(mesh, nx = nx, ny = ny, mask = mask, format = "sp")
+}
+
+
+
+#' @title Generate lattice points covering a mesh
+#'
+#' @description Generate `terra`, `sf`, or `sp` lattice locations
+#'
+#' @export
+#'
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
+#'  Finn Lindgren \email{finn.lindgren@@gmail.com}
+#'
+#' @param mesh An `inla.mesh` object
+#' @param nx Number of pixels in x direction
+#' @param ny Number of pixels in y direction
+#' @param mask If logical and TRUE, remove pixels that are outside the mesh.
+#' If `mask` is an `sf` or `Spatial` object, only return pixels covered by this object.
+#' @param format character; "sf", "terra" or "sp"
+#' @return `sf`, `SpatRaster`, or `SpatialPixelsDataFrame` covering the mesh
+#'
+#' @examples
+#' \donttest{
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   data("mrsea", package = "inlabru")
+#'   pxl <- fm_pixels(mrsea$mesh,
+#'     nx = 50, ny = 50, mask = mrsea$boundary,
+#'     format = "terra"
+#'   )
+#'   ggplot() +
+#'     gg(pxl, fill = "grey", alpha = 0.5) +
+#'     gg(mrsea$mesh)
+#' }
+#' }
+#'
+fm_pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE,
+                      format = "sf") {
+  format <- match.arg(format, c("sf", "terra", "sp"))
   if (!identical(mesh$manifold, "R2")) {
-    stop("inlabru::pixels() currently works for R2 meshes only.")
+    stop("inlabru::fm_pixels() currently works for R2 meshes only.")
   }
+
   if (length(nx) == 1) {
     x <- seq(min(mesh$loc[, 1]), max(mesh$loc[, 1]), length = nx)
   } else {
@@ -164,26 +208,32 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
   }
 
   pixels <- expand.grid(x = x, y = y)
-  coordinates(pixels) <- c("x", "y")
-  if (!fm_crs_is_null(mesh$crs)) {
-    proj4string(pixels) <- mesh$crs
-  }
+  pixels <- sf::st_as_sf(pixels, coords = c("x", "y"), crs = fm_crs(mesh))
 
+  pixels_within <- rep(TRUE, NROW(pixels))
   if (is.logical(mask)) {
     if (mask) {
-      pixels <- pixels[is.inside(mesh, coordinates(pixels))]
+      pixels_within <- is.inside(mesh, pixels)
+      pixels <- pixels[pixels_within, , drop = FALSE]
     }
   } else {
     if (inherits(mask, "SpatialPolygonsDataFrame")) {
       mask <- as(mask, "SpatialPolygons")
     }
-    pixels <- pixels[!is.na(sp::over(pixels, mask))]
+    mask <- sf::st_as_sf(mask)
+    pixels_within <- sf::st_within(pixels, mask)
+    pixels <- pixels[lengths(pixels_within) > 0, , drop = FALSE]
   }
 
-  pixels <- sp::SpatialPixelsDataFrame(
-    pixels,
-    data = data.frame(matrix(nrow = NROW(pixels), ncol = 0))
-  )
+  if (identical(format, "sp")) {
+    pixels <- as(pixels, "Spatial")
+    pixels <- as(pixels, "SpatialPixelsDataFrame")
+  } else if (identical(format, "terra")) {
+    pixels <- as(pixels, "Spatial")
+    pixels <- as(pixels, "SpatialPixels")
+    pixels <- terra::rast(pixels)
+    pixels$.mask <- as.vector(as.matrix(pixels_within))
+  }
 
   pixels
 }
@@ -262,9 +312,9 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
 
 #' Split triangles of a mesh into four triangles
 #'
-#' * Warning: does not reconstruct interior boundary
-#' * Warning2: Works in euclidean coordinates. Not suitable for sphere.
-#' * Warning3: Experimental; will be replaced by a new method
+#' * Warning: The original triangle edges are not always preserved.
+#' * Warning: Works in euclidean coordinates. Not suitable for sphere.
+#' * Warning: Experimental; will be replaced by a new method
 #'
 #' @aliases tsplit.inla.mesh
 #' @keywords internal
@@ -274,31 +324,192 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 
 tsplit.inla.mesh <- function(mesh, n = 1) {
-  warning("tsplit.inla.mesh() is experimental and will be replaced by a new method")
-
-  n <- 1
+  #  lifecycle::deprecate_soft(
+  #    "2.8.0",
+  #    "tsplit.inla.mesh()",
+  #    "fm_subdivide()",
+  #    details = "tsplit.inla.mesh(mesh, n) has been replaced by fm_subdivide(mesh, n = 2^n - 1)"
+  #  )
 
   p1 <- mesh$loc[mesh$graph$tv[, 1], ]
   p2 <- mesh$loc[mesh$graph$tv[, 2], ]
   p3 <- mesh$loc[mesh$graph$tv[, 3], ]
 
-  m1 <- p1 + 0.5 * (p2 - p1)
-  m2 <- p1 + 0.5 * (p3 - p1)
-  m3 <- p2 + 0.5 * (p3 - p2)
-  all.loc <- rbind(mesh$loc, m1, m2, m3)
+  m1 <- (p2 + p3) / 2
+  m2 <- (p1 + p3) / 2
+  m3 <- (p1 + p2) / 2
+  tri.loc <- rbind(mesh$loc, m1, m2, m3)
 
-  # TODO: Make this compliant with the inla.mesh boundary specifications;
-  #   - Order is not guaranteed
-  #   - Multiple disconnected components may occur
-  bnd.mid <- mesh$loc[mesh$segm$bnd$idx[, 1], ] + 0.5 * (mesh$loc[mesh$segm$bnd$idx[, 2], ] - mesh$loc[mesh$segm$bnd$idx[, 1], ])
-  all.bnd <- rbind(mesh$segm$bnd$loc, bnd.mid)
+  split.edges <- function(segm) {
+    if (is.null(segm) || (nrow(segm$idx) == 0)) {
+      return(segm)
+    }
+    n.loc <- nrow(segm$loc)
+    n.idx <- nrow(segm$idx)
+    loc <- rbind(
+      segm$loc,
+      (segm$loc[segm$idx[, 1], ] +
+        segm$loc[segm$idx[, 2], ]) / 2
+    )
+    idx <- rbind(
+      cbind(segm$idx[, 1], n.loc + seq_len(n.idx)),
+      cbind(n.loc + seq_len(n.idx), segm$idx[, 2])
+    )
 
+    segm2 <-
+      INLA::inla.mesh.segment(
+        loc = loc,
+        idx = idx,
+        grp = c(segm$grp, segm$grp),
+        is.bnd = segm$is.bnd,
+        crs = fm_CRS(segm)
+      )
 
-  mesh2 <- INLA::inla.mesh.create(loc = all.loc, boundary = all.bnd)
+    segm2
+  }
 
-  if (n == 1) {
+  interior2 <- split.edges(INLA::inla.mesh.interior(mesh)[[1]])
+  boundary2 <- split.edges(INLA::inla.mesh.boundary(mesh)[[1]])
+
+  mesh2 <- INLA::inla.mesh.create(
+    loc = tri.loc,
+    interior = interior2,
+    boundary = boundary2,
+    crs = fm_CRS(mesh)
+  )
+
+  if (n <= 1) {
     return(mesh2)
   } else {
     return(tsplit.inla.mesh(mesh2, n - 1))
   }
+}
+
+
+# Split triangles of a mesh into subtriangles
+#
+# @param mesh an inla.mesh object
+# @param n number of added points along each edge
+# @return A refined inla.mesh object
+# @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+# @export
+
+fm_subdivide <- function(mesh, n = 1) {
+  if (n < 1) {
+    return(mesh)
+  }
+
+  split.edges <- function(segm, n) {
+    if (is.null(segm) || (nrow(segm$idx) == 0)) {
+      return(segm)
+    }
+    n.loc <- nrow(segm$loc)
+    n.idx <- nrow(segm$idx)
+    loc <- do.call(
+      rbind,
+      c(
+        list(segm$loc),
+        lapply(
+          seq_len(n),
+          function(k) {
+            (segm$loc[segm$idx[, 1], ] * k / (n + 1) +
+              segm$loc[segm$idx[, 2], ] * (n - k + 1) / (n +
+                1))
+          }
+        )
+      )
+    )
+    idx <- do.call(
+      rbind,
+      c(
+        list(cbind(
+          segm$idx[, 1], n.loc + seq_len(n.idx)
+        )),
+        lapply(
+          seq_len(n - 1),
+          function(k) {
+            cbind(
+              n.loc * k + seq_len(n.idx),
+              n.loc * (k + 1) + seq_len(n.idx)
+            )
+          }
+        ),
+        list(cbind(
+          n.loc * n + seq_len(n.idx), segm$idx[, 2]
+        ))
+      )
+    )
+
+    segm2 <-
+      INLA::inla.mesh.segment(
+        loc = loc,
+        idx = idx,
+        grp = rep(segm$grp, n + 1),
+        is.bnd = segm$is.bnd
+      )
+
+    segm2
+  }
+
+  p1 <- mesh$loc[mesh$graph$tv[, 1], ]
+  p2 <- mesh$loc[mesh$graph$tv[, 2], ]
+  p3 <- mesh$loc[mesh$graph$tv[, 3], ]
+
+  tri.inner.loc <-
+    do.call(
+      rbind,
+      lapply(
+        seq_len(n + 2) - 1,
+        function(k2) {
+          do.call(
+            rbind,
+            lapply(
+              seq_len(n + 2 - k2) - 1,
+              function(k3) {
+                w1 <- (n + 1 - k2 - k3) / (n + 1)
+                w2 <- k2 / (n + 1)
+                w3 <- k3 / (n + 1)
+                p1 * w1 + p2 * w2 + p3 * w3
+              }
+            )
+          )
+        }
+      )
+    )
+
+  n.tri <- nrow(p1)
+  tri.edges <- INLA::inla.mesh.segment(
+    loc = rbind(p1, p2, p3),
+    idx = rbind(
+      cbind(seq_len(n.tri), seq_len(n.tri) + n.tri),
+      cbind(seq_len(n.tri) + n.tri, seq_len(n.tri) + 2 * n.tri),
+      cbind(seq_len(n.tri) + 2 * n.tri, seq_len(n.tri))
+    ),
+    is.bnd = FALSE
+  )
+
+  boundary2 <- split.edges(INLA::inla.mesh.boundary(mesh)[[1]], n = n)
+
+  if (identical(mesh$manifold, "S2")) {
+    radius <- mean(rowSums(mesh$loc^2)^0.5)
+    renorm <- function(loc) {
+      loc * (radius / rowSums(loc^2)^0.5)
+    }
+    tri.inner.loc <- renorm(tri.inner.loc)
+    tri.edges2$loc <- renorm(tri.edges2$loc)
+    boundary2$loc <- renorm(boundary2$loc)
+  }
+
+  mesh2 <- INLA::inla.mesh.create(
+    loc = tri.inner.loc,
+    interior = tri.edges,
+    boundary = boundary2,
+    refine = list(
+      min.angle = 0,
+      max.edge = Inf
+    ),
+    crs = fm_CRS(mesh)
+  )
+
+  mesh2
 }

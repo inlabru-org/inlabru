@@ -33,8 +33,7 @@ library(INLA)
 library(inlabru)
 library(RColorBrewer)
 library(ggplot2)
-
-bru_options_set(inla.mode = "experimental")
+bru_safe_sp(force = TRUE)
 ```
 
 Introduction
@@ -142,7 +141,7 @@ a `SpatialPixelsDataFrame` only within the boundary, using its `mask` argument, 
 
 ```{r warning=FALSE,message=FALSE}
 df <- pixels(mesh, mask = boundary)
-int1 <- predict(fit1, data = df, ~ exp(vegetation))
+int1 <- predict(fit1, df, ~ exp(vegetation))
 
 ggplot() +
   gg(int1) +
@@ -157,7 +156,7 @@ that have no nests, and some areas of predicted low density that have nests. Wha
 about the estimated abundance (there are really 647 nests there):
 
 ```{r warning=FALSE,message=FALSE}
-ips <- ipoints(boundary, mesh)
+ips <- fm_int(mesh, boundary)
 Lambda1 <- predict(fit1, ips, ~ sum(weight * exp(vegetation)))
 Lambda1
 ```
@@ -170,7 +169,7 @@ the vegetation covariate, using an SPDE:
 ```{r results='hide',warning=FALSE,message=FALSE}
 pcmatern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(0.1, 0.01),
-  prior.range = c(5, 0.01)
+  prior.range = c(1, 0.01)
 )
 
 comp2 <- coordinates ~
@@ -211,7 +210,7 @@ ggplot() +
 ```{r warning=FALSE,message=FALSE}
 Lambda2 <- predict(
   fit2,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + vegetation))
 )
 Lambda2
@@ -300,7 +299,7 @@ ggplot() +
 ```{r warning=FALSE,message=FALSE}
 Lambda3 <- predict(
   fit3,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + Intercept))
 )
 Lambda3
@@ -443,7 +442,7 @@ We create our model to pass to lgcp thus:
 ```{r results="hide",warning=FALSE,message=FALSE}
 matern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(0.1, 0.01),
-  prior.range = c(5, 0.01)
+  prior.range = c(1, 0.01)
 )
 
 ecomp <- coordinates ~ elev(f.elev(coordinates(.data.)), model = "linear") +
@@ -490,9 +489,15 @@ Predict and plot the density
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 e.int <- predict(efit, pixels(mesh, mask = boundary), ~ exp(mySmooth + elev + Intercept))
+e.int.log <- predict(efit, pixels(mesh, mask = boundary), ~ (mySmooth + elev + Intercept))
 
 ggplot() +
-  gg(e.int) +
+  gg(e.int, aes(fill=log(sd))) +
+  gg(boundary, alpha = 0) +
+  gg(nests, shape = "+") +
+  coord_equal()
+ggplot() +
+  gg(e.int.log, aes(fill=exp(mean+sd^2/2))) +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+") +
   coord_equal()
@@ -559,6 +564,16 @@ You might also want to look at the posteriors of the fixed effects and of the SP
 Adapt the code used for the vegetation factor to do this.
 
 
+```{r warning=FALSE,message=FALSE}
+LambdaE <- predict(
+  efit,
+  ipoints(boundary, mesh),
+  ~ sum(weight * exp(Intercept + elev + mySmooth))
+)
+LambdaE
+```
+
+
 ```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 flist <- vector("list", NROW(efit$summary.fixed))
 for (i in seq_along(flist)) {
@@ -572,7 +587,6 @@ for this model.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-
 spde.range <- spde.posterior(efit, "mySmooth", what = "range")
 spde.logvar <- spde.posterior(efit, "mySmooth", what = "log.variance")
 range.plot <- plot(spde.range)
@@ -589,14 +603,14 @@ in the prediction object, for easier plotting.
 
 ```{r fig.show="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 Lambda <- predict(
-  efit, ipoints(boundary, mesh),
+  efit, fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + elev + Intercept))
 )
 Lambda
 
 Nest.e <- predict(
   efit,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ data.frame(
     N = 200:1000,
     density = dpois(200:1000,
@@ -628,7 +642,7 @@ expression. Since the elevation effect in this model is linear, the resulting pl
 ```{r}
 elev.pred <- predict(
   efit,
-  data = data.frame(elevation = seq(0, 100, length.out = 1000)),
+  data.frame(elevation = seq(0, 100, length.out = 1000)),
   formula = ~ elev_eval(elevation)
 )
 

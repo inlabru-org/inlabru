@@ -20,6 +20,7 @@ test_that("bru: factor component", {
 
   # Predict posterior statistics of 'x'
 
+  skip_if_not_installed("sn")
   xpost <- predict(
     fit,
     data = NULL,
@@ -149,9 +150,11 @@ test_that("bru: predict with _eval", {
     family = "gaussian",
     data = data
   )
+
+  skip_if_not_installed("sn")
   pred <- predict(
     fit,
-    data = data.frame(u = seq(-1, 6, by = 0.1)),
+    newdata = data.frame(u = seq(-1, 6, by = 0.1)),
     formula = ~ data.frame(
       A = fun,
       B = fun_eval(u)

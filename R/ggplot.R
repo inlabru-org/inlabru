@@ -650,13 +650,14 @@ gg.SpatialPixelsDataFrame <- function(data,
 #' @return A `geom_tile` return value.
 #' @family geomes for spatial data
 #' @examples
-#' if (require("ggplot2", quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE) &&
+#'   bru_safe_sp()) {
 #'   # Load Gorilla data
 #'
 #'   data(gorillas, package = "inlabru")
 #'
 #'   # Turn elevation covariate into SpatialPixels
-#'   pxl <- SpatialPixels(SpatialPoints(gorillas$gcov$elevation))
+#'   pxl <- sp::SpatialPixels(sp::SpatialPoints(gorillas$gcov$elevation))
 #'
 #'   # Plot the pixel centers
 #'   ggplot() +
@@ -688,6 +689,15 @@ gg.SpatRaster <- function(data, ...) {
       "Please install it and try again!"
     ))
   }
+  if (".mask" %in% names(data)) {
+    data <-
+      terra::mask(
+        data,
+        mask = data$.mask,
+        maskvalues = FALSE,
+        updatevalue = NA
+      )
+  }
   tidyterra::geom_spatraster(data = data, ...)
 }
 
@@ -714,12 +724,16 @@ gg.SpatRaster <- function(data, ...) {
 #' The length of the vector mus correspond to the number of mesh vertices.
 #' The alternative name `colour` is also recognised.
 #' @param alpha A vector of scalar values setting the alpha value of the colors provided.
-#' @param edge.color Color of the mesh edges.
+#' @param edge.color Color of the regular mesh edges.
+#' @param edge.linewidth Line width for the regular mesh edges. Default 0.25
 #' @param interior If TRUE, plot the interior boundaries of the mesh.
-#' @param int.color Color used to plot the interior boundaries.
+#' @param int.color Color used to plot the interior constraint edges.
+#' @param int.linewidth Line width for the interior constraint edges. Default 0.5
 #' @param exterior If TRUE, plot the exterior boundaries of the mesh.
-#' @param ext.color Color used to plot the interior boundaries.
-#' @param crs A [CRS] object defining the coordinate system to project the mesh to before plotting.
+#' @param ext.color Color used to plot the exterior boundary edges.
+#' @param ext.linewidth Line width for the exterior boundary edges. Default 1
+#' @param crs A CRS object supported by [fm_transform()] defining the coordinate
+#' system to project the mesh to before plotting.
 #' @param nx Number of pixels in x direction (when plotting using the color parameter).
 #' @param ny Number of pixels in y direction (when plotting using the color parameter).
 #' @param mask A SpatialPolygon defining the region that is plotted.
@@ -733,10 +747,13 @@ gg.inla.mesh <- function(data,
                          color = NULL,
                          alpha = NULL,
                          edge.color = "grey",
+                         edge.linewidth = 0.25,
                          interior = TRUE,
                          int.color = "blue",
+                         int.linewidth = 0.5,
                          exterior = TRUE,
                          ext.color = "black",
+                         ext.linewidth = 1,
                          crs = NULL,
                          mask = NULL,
                          nx = 500, ny = 500,
@@ -758,55 +775,55 @@ gg.inla.mesh <- function(data,
     }
 
     return(gg)
-  } else {
-    if (data$manifold == "S2") {
-      stop("Geom not implemented for spherical meshes (manifold = S2)")
-    }
-    if (!is.null(crs)) {
-      data <- fm_transform(data, crs = crs)
-    }
-
-    df <- rbind(
-      data.frame(a = data$loc[data$graph$tv[, 1], c(1, 2)], b = data$loc[data$graph$tv[, 2], c(1, 2)]),
-      data.frame(a = data$loc[data$graph$tv[, 2], c(1, 2)], b = data$loc[data$graph$tv[, 3], c(1, 2)]),
-      data.frame(a = data$loc[data$graph$tv[, 1], c(1, 2)], b = data$loc[data$graph$tv[, 3], c(1, 2)])
-    )
-
-    colnames(df) <- c("x", "y", "xend", "yend")
-    mp <- ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend)
-    msh <- ggplot2::geom_segment(data = df, mapping = mp, color = edge.color)
-
-    # Outer boundary
-    if (exterior) {
-      df <- data.frame(
-        data$loc[data$segm$bnd$idx[, 1], 1:2],
-        data$loc[data$segm$bnd$idx[, 2], 1:2]
-      )
-      colnames(df) <- c("x", "y", "xend", "yend")
-      bnd <- ggplot2::geom_segment(data = df, mapping = mp, color = ext.color)
-    } else {
-      bnd <- NULL
-    }
-
-    if (interior) {
-      # Interior boundary
-      df <- data.frame(
-        data$loc[data$segm$int$idx[, 1], 1:2],
-        data$loc[data$segm$int$idx[, 2], 1:2]
-      )
-      colnames(df) <- c("x", "y", "xend", "yend")
-      if (nrow(df) == 0) {
-        int <- NULL
-      } else {
-        int <- ggplot2::geom_segment(data = df, mapping = mp, color = int.color)
-      }
-    } else {
-      int <- NULL
-    }
-
-    # Return combined geomes
-    c(msh, bnd, int)
   }
+
+  if (data$manifold == "S2") {
+    stop("Geom not implemented for spherical meshes (manifold = S2)")
+  }
+  if (!is.null(crs)) {
+    data <- fm_transform(data, crs = crs)
+  }
+
+  df <- rbind(
+    data.frame(a = data$loc[data$graph$tv[, 1], c(1, 2)], b = data$loc[data$graph$tv[, 2], c(1, 2)]),
+    data.frame(a = data$loc[data$graph$tv[, 2], c(1, 2)], b = data$loc[data$graph$tv[, 3], c(1, 2)]),
+    data.frame(a = data$loc[data$graph$tv[, 1], c(1, 2)], b = data$loc[data$graph$tv[, 3], c(1, 2)])
+  )
+
+  colnames(df) <- c("x", "y", "xend", "yend")
+  mp <- ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend)
+  msh <- ggplot2::geom_segment(data = df, mapping = mp, color = edge.color, linewidth = edge.linewidth)
+
+  # Outer boundary
+  if (exterior) {
+    df <- data.frame(
+      data$loc[data$segm$bnd$idx[, 1], 1:2],
+      data$loc[data$segm$bnd$idx[, 2], 1:2]
+    )
+    colnames(df) <- c("x", "y", "xend", "yend")
+    bnd <- ggplot2::geom_segment(data = df, mapping = mp, color = ext.color, linewidth = ext.linewidth)
+  } else {
+    bnd <- NULL
+  }
+
+  if (interior) {
+    # Interior boundary
+    df <- data.frame(
+      data$loc[data$segm$int$idx[, 1], 1:2],
+      data$loc[data$segm$int$idx[, 2], 1:2]
+    )
+    colnames(df) <- c("x", "y", "xend", "yend")
+    if (nrow(df) == 0) {
+      int <- NULL
+    } else {
+      int <- ggplot2::geom_segment(data = df, mapping = mp, color = int.color, linewidth = int.linewidth)
+    }
+  } else {
+    int <- NULL
+  }
+
+  # Return combined geomes
+  c(msh, bnd, int)
 }
 
 

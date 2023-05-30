@@ -35,6 +35,7 @@ Load libraries
 library(inlabru)
 library(INLA)
 library(ggplot2)
+bru_safe_sp(force = TRUE)
 ```
 
 Get the data
@@ -180,8 +181,10 @@ lik_joint <- like("cp",
   formula = fml.joint,
   data = gorillas$nests,
   samplers = gorillas$boundary,
-  domain = list(coordinates = gorillas$mesh,
-                group_major = INLA::inla.mesh.1d(c(0, 1)))
+  domain = list(
+    coordinates = gorillas$mesh,
+    group_major = c(0, 1)
+  )
 )
 ```
 
@@ -208,7 +211,7 @@ pl.minor <- ggplot() +
   gg(gorillas$mesh,
     mask = gorillas$boundary,
     col = exp(jfit_joint$summary.random$Difference$mean -
-                jfit$summary.random$Difference$mean)
+      jfit$summary.random$Difference$mean)
   )
 (pl.major + scale_fill_continuous(trans = "log")) +
   (pl.minor + scale_fill_continuous(trans = "log")) &

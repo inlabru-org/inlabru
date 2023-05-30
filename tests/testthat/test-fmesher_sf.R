@@ -128,7 +128,7 @@ test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
 
   ## scf_POLYGON ##
 
-  pts0 <- rbind(c(-7, -7), c(7,-7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
+  pts0 <- rbind(c(-7, -7), c(7, -7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
   pts0b <- pts0 + 10
   pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3)) # hole (CW)
   pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2)) # hole (CW)
@@ -156,7 +156,8 @@ test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
   )
 
   seg <- fm_internal_sp2segment_join(list(seg0, seg1, seg2, seg0b),
-                                     grp = c(1, 1, 1, 2))
+    grp = c(1, 1, 1, 2)
+  )
   expect_identical(seg$grp, as.matrix(rep(c(1L, 1L, 1L, 2L), each = 4)))
 
   line_str1 <- sf::st_polygon(list(pts0, pts1, pts2))
@@ -178,7 +179,7 @@ test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
 
   ## scf_MULTIPOLYGON ##
 
-  pts0 <- rbind(c(-7, -7), c(7,-7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
+  pts0 <- rbind(c(-7, -7), c(7, -7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
   pts0b <- pts0 + 15
   pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3)) # hole (CW)
   pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2)) # hole (CW)
@@ -206,11 +207,16 @@ test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
   )
 
   seg_1 <- fm_internal_sp2segment_join(list(seg0, seg1, seg2, seg0b),
-                                       grp = c(1, 1, 1, 1))
+    grp = c(1, 1, 1, 1)
+  )
   expect_identical(seg_1$grp, as.matrix(rep(c(1L), each = 16)))
-  seg_2 <- fm_internal_sp2segment_join(list(seg0, seg1, seg2, seg0b,
-                                            seg0, seg1, seg2, seg0b),
-                                       grp = c(1, 1, 1, 1, 2, 2, 2, 2))
+  seg_2 <- fm_internal_sp2segment_join(
+    list(
+      seg0, seg1, seg2, seg0b,
+      seg0, seg1, seg2, seg0b
+    ),
+    grp = c(1, 1, 1, 1, 2, 2, 2, 2)
+  )
   expect_identical(seg_2$grp, as.matrix(rep(c(1L, 2L), each = 16)))
 
   line_str1 <- sf::st_polygon(list(pts0, pts1, pts2))
@@ -244,7 +250,7 @@ test_that("Conversion from sfc_GEOMETRY to inla.mesh.segment", {
 
   ## scf_GEOMETRY ##
 
-  pts0 <- rbind(c(-7, -7), c(7,-7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
+  pts0 <- rbind(c(-7, -7), c(7, -7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
   pts0b <- pts0 + 15
   pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3)) # hole (CW)
   pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2)) # hole (CW)
@@ -272,7 +278,8 @@ test_that("Conversion from sfc_GEOMETRY to inla.mesh.segment", {
   )
 
   seg_1 <- fm_internal_sp2segment_join(list(seg0, seg1, seg2, seg0b, seg0b),
-                                       grp = c(1, 1, 1, 1, 2))
+    grp = c(1, 1, 1, 1, 2)
+  )
   expect_identical(seg_1$grp, as.matrix(rep(c(1L, 2L), times = c(16, 4))))
 
   line_str1 <- sf::st_polygon(list(pts0, pts1, pts2))

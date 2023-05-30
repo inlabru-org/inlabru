@@ -72,11 +72,13 @@ x <- seq(0, 55, length.out = 50)
 mesh1D <- inla.mesh.1d(x, boundary = "free")
 ```
 
-Make the latent components for a 1D SPDE model:
+Make the latent components for a 1D SPDE model, using an integrate-to-zero constraint for
+better identifiability:
 ```{r results="hide",warning=FALSE,message=FALSE}
 matern <- inla.spde2.pcmatern(mesh1D,
   prior.range = c(150, 0.75),
-  prior.sigma = c(0.1, 0.75)
+  prior.sigma = c(0.1, 0.75),
+  constr = TRUE
 )
 comp <- ~ spde1D(x, model = matern) + Intercept(1)
 ```
@@ -201,10 +203,10 @@ Estimating Abundance
 Abundance is the integral of the intensity over space. We estimate it by integrating
 the predicted intensity over `x`. Integration is done by adding up the intensity at 
 locations `x` weighted by a particular weight. The locations `x` and their weights
-are constructed using the `ipoints` function
+are constructed using the `fm_int` function
 
 ```{r }
-ips <- ipoints(c(0, 55), 100, name = "x")
+ips <- fm_int(mesh1D, name = "x")
 head(ips)
 Lambda <- predict(fit.spde, ips, ~ sum(weight * exp(spde1D + Intercept)))
 ```

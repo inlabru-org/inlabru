@@ -14,6 +14,10 @@ predictor model}
 Draws four panels of convergence diagnostics for an iterated INLA method
 estimation
 }
+\details{
+Requires the "dplyr", "ggplot2", "magrittr", and "patchwork"
+packages to be installed.
+}
 \examples{
 \dontrun{
 fit <- bru(...)

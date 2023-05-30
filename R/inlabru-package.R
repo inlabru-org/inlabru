@@ -13,11 +13,11 @@
 #' The iterative method used for non-linear predictors is documented in the
 #' `method` vignette.
 #'
-#' The main function for inference using inlabru is [bru()]. For point process inference [lgcp()] is
-#' a good starting point.
+#' The main function for inference using inlabru is [bru()].
 #' The general model specification details is documented in [component()] and [like()].
 #' Posterior quantities beyond the basic summaries can be calculated with
 #' a `predict()` method, documented in [predict.bru()].
+#' For point process inference [lgcp()] can be used as a shortcut to `bru(..., like(model="cp", ...))`.
 #'
 #' The package comes with multiple real world data sets, namely [gorillas],
 #' [mexdolphin], [seals]. Plotting these data sets is straight forward using inlabru's extensions
@@ -31,5 +31,9 @@
 #' @importFrom Matrix diag
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'   and Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @name inlabru
+"_PACKAGE"
+
+## usethis namespace: start
+#' @importFrom lifecycle deprecated
+## usethis namespace: end
 NULL

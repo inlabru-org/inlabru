@@ -1,4 +1,3 @@
-
 # Linearisation ----
 
 #' Compute inlabru model linearisation information

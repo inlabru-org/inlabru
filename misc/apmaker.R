@@ -1,4 +1,4 @@
-#' https://github.com/inlabru-org/inlabru/issues/125
+# https://github.com/inlabru-org/inlabru/issues/125
 
 # TODO 20220126should not be a S3 but local function and function name should be clearer
 # bru_log_list function ---------------------------------------------------------
@@ -44,19 +44,20 @@ bru_log_list <- function(x, attr_names = "sf_column", start_with = NULL, end_wit
 # 1) do I need the names of the list or the names within the list(s)?
 # 2) Does column names mean sth here?
 # 3) What to do with NULL cases, aka unamed list?
-#' @name names
-#' @export names_list
-#' @method extract names within list(s)
-#' @title Names within list(s)
-#'
+# @name names
+# @export names_list
+# @title Names within list(s)
+#
 names_list <- function(x) {
   lapply(x, function(y) {
     names(y)
   })
 }
 
-
-#' @aliases apmaker
+#' Construct tensor product integration schemes for multiple domains and subregions
+#'
+#' Constructs an integration scheme for each domain, restricted by samplers
+#'
 #' @export
 #' @param domain A list of named integration definitions, each either
 #' character/factor vector, a numeric vector of points given integration
@@ -67,7 +68,7 @@ names_list <- function(x) {
 #' the level to map them back to the components
 #' @param samplers A (list of unnamed or named element(s) of ) `[sf/sfc]DataFrame` or
 #' `Spatial[Points/Lines/Polygons]DataFrame` object(s). Unnamed elements
-#' are assumed to be multidomain samperls; named elements are singledomain
+#' are assumed to be multidomain samplers; named elements are singledomain
 #' samplers; domains without corresponding samplers are assumed to be full domain
 #' samplers.
 #' TODO is response useful here? 20220130
@@ -78,13 +79,15 @@ names_list <- function(x) {
 #' It mainly works for line transect at the moment, determining the width of the
 #' line to be integrated. See the distance sampling example
 #' https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_distancesampling.html
+#' @param ... Unused additional arguments
 #' @param int.args List of arguments passed on to \code{ipoints}
 #' @return Integration points
 
 # TODO option argument as in bru function with list() bru_int_args
 apmaker <- function(domain = NULL, samplers = NULL,
                     weight = "weight",
-                    int.args = list(method = "stable", nsub = NULL)) {
+                    int.args = list(method = "stable", nsub = NULL),
+                    ...) {
   # TODO ####
   # TODO To allow sf geometry support, should likely change the logic to
   # use the domain specification to determine the type of integration
@@ -98,12 +101,13 @@ apmaker <- function(domain = NULL, samplers = NULL,
   # 1) dname deprecated
   # 2) samplers should be provided as list
   # 3) ...
-  lifecycle::deprecate_soft(
-    when = "2.7.1", # TODO next inlabru version
-    what = "apmaker(dnames)",
-    with = "apmaker(samplers)",
-    details = "dnames should be provided in the samplers as the dimension names."
-  )
+  if ("dnames" %in% names(list(...))) {
+    lifecycle::deprecate_soft(
+      when = "2.7.1", # TODO next inlabru version
+      what = "apmaker(dnames)",
+      details = "The dnames information is extracted from the names of the domains."
+    )
+  }
 
   # Mandate the domain argument to be specified
   if (missing(domain)) {
@@ -123,7 +127,7 @@ apmaker <- function(domain = NULL, samplers = NULL,
     stop("Domain must be a named list.")
   }
 
-  if (!inherits(samplers, "list")) {
+  if (!is.null(samplers) && !inherits(samplers, "list")) {
     samplers <- list(samplers)
   }
 
@@ -213,9 +217,11 @@ apmaker <- function(domain = NULL, samplers = NULL,
   names_reserved <- c(weight) # coordinate and geometry is not required here
 
   if (length(intersect(names_domain, names_reserved)) > 0) {
-    stop(paste0("The reserved names ",
-                paste0(intersect(names_domain, names_reserved), collapse = ", "),
-                " cannot be used as domain names."))
+    stop(paste0(
+      "The reserved names ",
+      paste0(intersect(names_domain, names_reserved), collapse = ", "),
+      " cannot be used as domain names."
+    ))
   }
 
   lips_samplers <- list()
@@ -230,13 +236,16 @@ apmaker <- function(domain = NULL, samplers = NULL,
     names_intersect <- intersect(names_samplers[[i]], names_domain)
     lips_multidomainsampler <- lapply(
       names_intersect,
-      function(nm) ipoints(
-        samplers = samplers[[i]][[nm]],
-        domain = domain[[nm]],
-        name = nm,
-#        group = names_intersect, # block=group should be the grouping, say season,
-        int.args = int.args
-      ))
+      function(nm) {
+        ipoints(
+          samplers = samplers[[i]][[nm]],
+          domain = domain[[nm]],
+          name = nm,
+          #        group = names_intersect, # block=group should be the grouping, say season,
+          int.args = int.args
+        )
+      }
+    )
     lips_samplers[[i]] <- do.call(cprod, lips_multidomainsampler)
   }
 
@@ -248,12 +257,12 @@ apmaker <- function(domain = NULL, samplers = NULL,
     stopifnot(length(nm) == 1)
     lips_samplers[[i]] <-
       ipoints(
-      samplers = samplers[[i]],
-      domain = domain[[nm]],
-      name = nm,
-#      group = names_intersect, # block=group should be the grouping, say season,
-      int.args = int.args
-    )
+        samplers = samplers[[i]],
+        domain = domain[[nm]],
+        name = nm,
+        #      group = names_intersect, # block=group should be the grouping, say season,
+        int.args = int.args
+      )
   }
 
   # Full domain samplers
@@ -268,7 +277,8 @@ apmaker <- function(domain = NULL, samplers = NULL,
           #      group = names_intersect, # block=group should be the grouping, say season,
           int.args = int.args
         )
-      })
+      }
+    )
 
   ips <- do.call(cprod, c(lips_samplers, lips_full_domain_samplers))
 
@@ -280,25 +290,24 @@ apmaker <- function(domain = NULL, samplers = NULL,
 }
 
 
-  #############################################################################
-  # Warn samplers without domain associated
-  # Store the names in domain but not in samplers
-  # Warn domains without associated samplers
+#############################################################################
+# Warn samplers without domain associated
+# Store the names in domain but not in samplers
+# Warn domains without associated samplers
 
 
-  # Check if the names of samplers and domains match. How to establish the link
-  # between samplers and domain? If names are not provided, follow the order in
-  # list. If names are provided but do not match, what should we do?
+# Check if the names of samplers and domains match. How to establish the link
+# between samplers and domain? If names are not provided, follow the order in
+# list. If names are provided but do not match, what should we do?
 
-  # log the active geometry of the samplers
-  # TODO 20220126 when sf_samplers is a vector, if clause does not work
-  # 20220130 I think it works now
+# log the active geometry of the samplers
+# TODO 20220126 when sf_samplers is a vector, if clause does not work
+# 20220130 I think it works now
 
 
-  # TODO ####
-  # TODO check ibm_values.bru_mapper_factor for character/factor/numeric samplers
-  # TODO weight argument to take effect on samplers. The weight should go to
-  # the integration part
+# TODO ####
+# TODO check ibm_values.bru_mapper_factor for character/factor/numeric samplers
+# TODO weight argument to take effect on samplers. The weight should go to
+# the integration part
 
-  ##########################################################
-
+##########################################################

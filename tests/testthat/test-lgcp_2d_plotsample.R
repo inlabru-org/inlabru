@@ -62,7 +62,7 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
 
   expect_equal(
     sum(fit$bru_info$lhoods[[1]]$E),
-    7.096605,
+    7.092,
     tolerance = lowtol
   )
   # Test points selected with sd+sd less than 1.2, for a more stable check.

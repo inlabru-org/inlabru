@@ -24,7 +24,8 @@ sample with only the count within each plot.
 \examples{
 \donttest{
 # Some features require the raster package
-if (require("raster", quietly = TRUE) &&
+if (bru_safe_sp() &&
+  require("raster", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE)) {
   data(gorillas, package = "inlabru")
   plotpts <- plotsample(gorillas$nests, gorillas$boundary,

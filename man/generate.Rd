@@ -9,14 +9,15 @@ generate(object, ...)
 
 \method{generate}{bru}(
   object,
-  data = NULL,
+  newdata = NULL,
   formula = NULL,
   n.samples = 100,
   seed = 0L,
   num.threads = NULL,
   include = NULL,
   exclude = NULL,
-  ...
+  ...,
+  data = NULL
 )
 }
 \arguments{
@@ -24,7 +25,7 @@ generate(object, ...)
 
 \item{...}{additional, unused arguments.}
 
-\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for
+\item{newdata}{A data.frame or SpatialPointsDataFrame of covariates needed for
 sampling.}
 
 \item{formula}{A formula where the right hand side defines an R expression
@@ -50,6 +51,9 @@ explicitly excluded)}
 predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
+
+\item{data}{Deprecated. Use \code{newdata} instead.
+sampling.}
 }
 \value{
 The form of the value returned by \code{generate()} depends on the data
@@ -82,7 +86,8 @@ generate new realisations for indices greater than \code{n}.
 }
 \examples{
 \donttest{
-if (bru_safe_inla(multicore = FALSE)) {
+if (bru_safe_inla(multicore = FALSE) &&
+    require("sn", quietly = TRUE)) {
 
   # Generate data for a simple linear model
 
@@ -119,7 +124,8 @@ if (bru_safe_inla(multicore = FALSE)) {
 }
 }
 \donttest{
-if (bru_safe_inla(multicore = FALSE)) {
+if (bru_safe_inla(multicore = FALSE) &&
+    require("sn", quietly = TRUE)) {
 
   # Generate data for a simple linear model
 
