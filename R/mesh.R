@@ -104,7 +104,7 @@ vertices.inla.mesh <- function(object) {
 
   vrt <- data.frame(object$loc)
   if (!is.null(colnames(vrt))) {
-    colnames(vrt) <- c("x", "y", "z")[length(colnames(vrt))]
+    colnames(vrt) <- c("x", "y", "z")[seq_along(colnames(vrt))]
   }
   if ((length(colnames(vrt)) > 2) && all(vrt[, 3] == 0)) {
     vrt <- vrt[, 1:2]
