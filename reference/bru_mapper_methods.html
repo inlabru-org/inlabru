@@ -213,7 +213,7 @@ ibm_linear(mapper, input, state, ...)
 ibm_jacobian(mapper, input, state = NULL, ...)
 
 # S3 method for bru_mapper_logsumexp
-ibm_eval(mapper, input, state = NULL, ..., sub_lin = NULL)
+ibm_eval(mapper, input, state = NULL, log = TRUE, ..., sub_lin = NULL)
 
 # S3 method for bru_mapper_logsumexp
 ibm_linear(mapper, input, state, ...)
@@ -385,6 +385,11 @@ that have state dependent output size.</p></dd>
 <dd><p>Internal, optional pre-computed sub-mapper information</p></dd>
 
 
+<dt>log</dt>
+<dd><p>logical; control <code>log</code> output. Default <code>TRUE</code>, see the <code><a href="bru_mapper_generics.html">ibm_eval()</a></code> details
+for <code>logsumexp</code> mappers.</p></dd>
+
+
 <dt>sub_A</dt>
 <dd><p>Internal; precomputed Jacobian matrices.</p></dd>
 
@@ -483,7 +488,9 @@ with unnamed but ordered columns.</p></li>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
     
-<ul><li><p><code>ibm_names(bru_mapper_multi)</code>: Returns the names from the sub-mappers list</p></li>
+<ul><li><p><code>ibm_eval(bru_mapper_logsumexp)</code>: When <code>log</code> is <code>TRUE</code> (default), <code><a href="bru_mapper_generics.html">ibm_eval()</a></code> for <code>logsumexp</code> returns
+the log-sum-weight-exp value. If <code>FALSE</code>, the <code>sum-weight-exp</code> value is returned.</p></li>
+<li><p><code>ibm_names(bru_mapper_multi)</code>: Returns the names from the sub-mappers list</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
