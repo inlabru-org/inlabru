@@ -94,6 +94,7 @@ import.gorillas <- function() {
   data(gorillas, package = "spatstat.data", envir = environment())
 
   # Create SpatialPoints representing nest locations
+  requireNamespace("spatstat.geom")
   nests <- as.data.frame(gorillas)
   coordinates(nests) <- c("x", "y")
   crs <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84") # from the Gorillas help file
