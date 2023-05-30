@@ -1922,8 +1922,9 @@ fm_crs_detect_manifold <- function(crs) {
 
 #' @export
 #' @rdname fm_transform
-fm_transform.inla.mesh <- function(x, ...,
+fm_transform.inla.mesh <- function(x,
                                    crs = fm_crs(x),
+                                   ...,
                                    passthrough = FALSE,
                                    crs0 = fm_crs(x)) {
   x$loc <- fm_transform(x$loc, crs = crs, ..., crs0 = x$crs, passthrough = passthrough)
