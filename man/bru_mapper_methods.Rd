@@ -276,6 +276,9 @@ that have state dependent output size.}
 
 \item{sub_lin}{Internal, optional pre-computed sub-mapper information}
 
+\item{log}{logical; control \code{log} output. Default \code{TRUE}, see the \code{ibm_eval()} details
+for \code{logsumexp} mappers.}
+
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
 
 \item{pre_A}{Internal; precomputed Jacobian matrix}
@@ -348,8 +351,6 @@ equivalent to all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.
 }
 
-\code{log} argument (Default \code{TRUE}) for log scale weight return.
-
 \itemize{
 \item \code{ibm_jacobian} for \code{bru_mapper_multi} accepts a list with
 named entries, or a list with unnamed but ordered elements.
@@ -394,6 +395,9 @@ with unnamed but ordered columns.
 }
 \section{Functions}{
 \itemize{
+\item \code{ibm_eval(bru_mapper_logsumexp)}: When \code{log} is \code{TRUE} (default), \code{ibm_eval()} for \code{logsumexp} returns
+the log-sum-weight-exp value. If \code{FALSE}, the \code{sum-weight-exp} value is returned.
+
 \item \code{ibm_names(bru_mapper_multi)}: Returns the names from the sub-mappers list
 
 }}

@@ -1959,8 +1959,10 @@ ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) 
 
 
 #' @export
-#' @details `log` argument (Default `TRUE`) for log scale weight return.
-#' @rdname bru_mapper_methods
+#' @param log logical; control `log` output. Default `TRUE`, see the `ibm_eval()` details
+#' for `logsumexp` mappers.
+#' @describeIn bru_mapper_methods When `log` is `TRUE` (default), `ibm_eval()` for `logsumexp` returns
+#' the log-sum-weight-exp value. If `FALSE`, the `sum-weight-exp` value is returned.
 ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
                                           log = TRUE, ..., sub_lin = NULL) {
   input <- bm_aggregate_input(input,
