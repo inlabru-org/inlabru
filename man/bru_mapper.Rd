@@ -19,6 +19,7 @@
 \alias{bru_mapper_multi}
 \alias{bru_mapper_collect}
 \alias{bru_mapper_harmonics}
+\alias{bru_mapper_mesh_B}
 \title{Constructors for \code{bru_mapper} objects}
 \usage{
 bru_mapper(...)
@@ -68,6 +69,8 @@ bru_mapper_harmonics(
   interval = c(0, 1),
   ...
 )
+
+bru_mapper_mesh_B(mesh, B, ...)
 }
 \arguments{
 \item{\dots}{Deprecated, alternative way to supply optional method definitions.}
@@ -150,6 +153,8 @@ basis function is a constant. (Default \code{TRUE})}
 
 \item{interval}{numeric length-2 vector specifying a domain interval.
 Default \code{c(0, 1)}.}
+
+\item{B}{a square or tall basis conversion matrix}
 }
 \description{
 Constructors for \code{bru_mapper} objects

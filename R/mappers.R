@@ -2946,3 +2946,131 @@ ibm_jacobian.bru_mapper_harmonics <- function(mapper, input, state = NULL, inla_
   }
   as(A, "Matrix")
 }
+
+
+
+
+
+
+
+
+
+## _mesh_B ####
+
+#' @param B a square or tall basis conversion matrix
+#' @export
+#' @rdname bru_mapper
+bru_mapper_mesh_B <- function(mesh, B, ...) {
+  stopifnot(nrow(B) >= ncol(B))
+  mapper <- list(mapper = bru_mapper(mesh), B = B)
+  bru_mapper_define(mapper, new_class = "bru_mapper_mesh_B")
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_n.bru_mapper_mesh_B <- function(mapper, ...) {
+  ncol(mapper[["B"]])
+}
+#' @export
+#' @rdname bru_mapper_methods
+ibm_values.bru_mapper_mesh_B <- function(mapper, ...) {
+  seq_len(ibm_n(mapper, ...))
+}
+#' @param input The values for which to produce a mapping matrix
+#' @export
+#' @rdname bru_mapper_methods
+ibm_jacobian.bru_mapper_mesh_B <- function(mapper, input, ...) {
+  if (is.null(input)) {
+    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
+  }
+  A <- ibm_jacobian(mapper[["mapper"]], input = input, ...)
+  A %*% mapper[["B"]]
+}
+
+
+# pcmatern_B ####
+
+#' @export
+make_hierarchical_mesh_basis <- function(mesh, forward = TRUE) {
+  # Construct neighbour matrix in a way that doesn't involve the mesh specifics;
+  # only the computational neighbourhood structure:
+  fem <- INLA::inla.mesh.fem(mesh, order = 1)
+  G <- (fem$g1 != 0) * 1.0
+  G <- G - Matrix::Diagonal(nrow(G), diag(G))
+
+  # First point for each disconnected mesh component
+  # Calculate graph distances
+  ii <- list()
+  jj <- list()
+  xx <- list()
+  D <- rep(Inf, nrow(G))
+  while (!all(is.finite(D))) {
+    set <- rep(FALSE, nrow(G))
+    front <- rep(FALSE, nrow(G))
+    start <- min(which(!is.finite(D)))
+    front[start] <- TRUE
+    max_dist <- -1
+    while (any(front)) {
+      max_dist <- max_dist + 1
+      D[front] <- max_dist
+      set <- set | front
+      front <- (as.vector(G %*% front) > 0.5) & !set
+    }
+    set[set] <- (D[set] < max_dist)
+    ii[[length(ii) + 1]] <- which(set)
+    jj[[length(jj) + 1]] <- rep(length(jj) + 1, sum(set))
+    xx[[length(xx) + 1]] <- (max_dist - D[set]) / max_dist
+  }
+
+  # Iteratively add basis functions for the point furthest away from the the
+  # previous core points, i.e. where D is maximal.  The radius of each is equal
+  # to the initial D-value for the new point.
+  while (any(D > 0)) {
+    D_local <- rep(Inf, nrow(G))
+    set <- rep(FALSE, nrow(G))
+    front <- rep(FALSE, nrow(G))
+    start <- which.max(D) # The first maximal distance point
+    front[start] <- TRUE
+    max_dist <- D[start]
+    for (the_dist in c(0, seq_len(max_dist))) {
+      D[front] <- pmin(D[front], the_dist)
+      D_local[front] <- the_dist
+      set <- set | front
+      front <- (as.vector(G %*% front) > 0.5) & !set
+    }
+    set[set] <- (D_local[set] < max_dist)
+    ii[[length(ii) + 1]] <- which(set)
+    jj[[length(jj) + 1]] <- rep(length(jj) + 1, sum(set))
+    xx[[length(xx) + 1]] <- (max_dist - D_local[set]) / max_dist
+  }
+
+  if (forward) {
+    B <- Matrix::sparseMatrix(i = unlist(ii),
+                              j = unlist(jj),
+                              x = unlist(xx),
+                              dims = c(nrow(G), length(ii)))
+  } else {
+    B <- Matrix::sparseMatrix(i = unlist(ii),
+                              j = length(ii) + 1 - unlist(jj),
+                              x = unlist(xx),
+                              dims = c(nrow(G), length(ii)))
+  }
+  B
+}
+
+#' @export
+inla.spde2.pcmatern_B <- function(mesh, ..., B) {
+  model <- INLA::inla.spde2.pcmatern(mesh, ...)
+  model$n.spde <- ncol(B)
+  model$f$n <- ncol(B)
+  if (nrow(B) != ncol(B)) {
+    stop("Rectangular B not supported")
+  }
+  # TODO: check that it's a stationary model, since non-stationary would need
+  # a different precision structure (should use rgeneric or cgeneric) and different
+  # B0, B1, B2 matrices
+  model$param.inla$M0 <- Matrix::t(B) %*% model$param.inla$M0 %*% B
+  model$param.inla$M1 <- Matrix::t(B) %*% model$param.inla$M1 %*% B
+  model$param.inla$M2 <- Matrix::t(B) %*% model$param.inla$M2 %*% B
+  model
+}

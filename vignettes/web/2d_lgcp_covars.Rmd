@@ -169,7 +169,7 @@ the vegetation covariate, using an SPDE:
 ```{r results='hide',warning=FALSE,message=FALSE}
 pcmatern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(0.1, 0.01),
-  prior.range = c(5, 0.01)
+  prior.range = c(1, 0.01)
 )
 
 comp2 <- coordinates ~
@@ -442,7 +442,7 @@ We create our model to pass to lgcp thus:
 ```{r results="hide",warning=FALSE,message=FALSE}
 matern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(0.1, 0.01),
-  prior.range = c(5, 0.01)
+  prior.range = c(1, 0.01)
 )
 
 ecomp <- coordinates ~ elev(f.elev(coordinates(.data.)), model = "linear") +
@@ -489,9 +489,15 @@ Predict and plot the density
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 e.int <- predict(efit, pixels(mesh, mask = boundary), ~ exp(mySmooth + elev + Intercept))
+e.int.log <- predict(efit, pixels(mesh, mask = boundary), ~ (mySmooth + elev + Intercept))
 
 ggplot() +
-  gg(e.int) +
+  gg(e.int, aes(fill=log(sd))) +
+  gg(boundary, alpha = 0) +
+  gg(nests, shape = "+") +
+  coord_equal()
+ggplot() +
+  gg(e.int.log, aes(fill=exp(mean+sd^2/2))) +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+") +
   coord_equal()
@@ -556,6 +562,16 @@ multiplot(plot.e.lp,
 
 You might also want to look at the posteriors of the fixed effects and of the SPDE.
 Adapt the code used for the vegetation factor to do this.
+
+
+```{r warning=FALSE,message=FALSE}
+LambdaE <- predict(
+  efit,
+  ipoints(boundary, mesh),
+  ~ sum(weight * exp(Intercept + elev + mySmooth))
+)
+LambdaE
+```
 
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
