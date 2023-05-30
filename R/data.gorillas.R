@@ -177,13 +177,12 @@ import.gorillas <- function() {
 
   # Extrapolate covariate
   pxl <- pixels(gorillas$mesh, mask = FALSE, nx = 220, ny = 180)
-  pxl <- fm_transform(pxl, fm_crs(fm_CRS(gorillas$gcov[[1]])))
+  pxl <- fm_transform(pxl, fm_crs(gorillas$gcov[[1]]))
   for (k in names(gorillas$gcov)) {
     pxl[[k]] <- NA
-    stop("error!")
     pxl[[k]] <- bru_fill_missing(gorillas$gcov[[k]], pxl, values = pxl[[k]])
-#    gorillas$gcov[[k]] <- sfill(gorillas$gcov[[k]], pxl)
   }
+  gorillas$gcov <- pxl
 
   return(gorillas)
 }
