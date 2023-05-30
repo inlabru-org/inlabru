@@ -171,14 +171,11 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NUL
 #'
 #' Deprecated in favour of the `fm_transform` methods.
 #'
-#' @aliases stransform
 #' @export
 #' @param splist list of Spatial* objects
 #' @param crs Coordinate reference system to change to
-#' @return `stransform`
 #'
 stransform <- function(splist, crs) {
-  # TODO: deprecate_warn
   lifecycle::deprecate_stop("2.7.0", "stransform()", "fm_transform()")
   fm_transform(splist, crs = crs)
 }
