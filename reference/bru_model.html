@@ -86,10 +86,10 @@ string that will determine the label of the effect. See Details for further info
     </div>
 
     <div class="ref-description section level2">
-    <p>The <a href="inlabru.html">inlabru</a> syntax for model formulae is different from what
+    <p>The <a href="inlabru-package.html">inlabru</a> syntax for model formulae is different from what
 <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">INLA::inla</a></code> considers a valid.
 In inla most of the effects are defined by adding an <code>f(...)</code> expression to the formula.
-In <a href="inlabru.html">inlabru</a> the <code>f</code> is replaced by an arbitrary (exceptions: <code>const</code> and <code>offset</code>)
+In <a href="inlabru-package.html">inlabru</a> the <code>f</code> is replaced by an arbitrary (exceptions: <code>const</code> and <code>offset</code>)
 string that will determine the label of the effect. See Details for further information.</p>
     </div>
 
@@ -142,7 +142,7 @@ string that will determine the label of the effect. See Details for further info
 <p>A disadvantage of the inla way is that there is no clear separation between the name of the covariate
 and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
 use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-<a href="inlabru.html">inlabru</a> provides the new <code>main</code> agument. For convenience, the <code>main</code> argument can be used
+<a href="inlabru-package.html">inlabru</a> provides the new <code>main</code> agument. For convenience, the <code>main</code> argument can be used
 like the first argument of the f function, e.g., and is the first argument of the component definition.</p>
 <p><code>y ~ f(temperature, model = 'linear')</code></p>
 <p>is equivalent to</p>

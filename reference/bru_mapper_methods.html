@@ -330,7 +330,16 @@ ibm_names(mapper) &lt;- value
 ibm_n(mapper, inla_f = FALSE, ...)
 
 # S3 method for bru_mapper_harmonics
-ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)</code></pre></div>
+ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
+
+# S3 method for bru_mapper_mesh_B
+ibm_n(mapper, ...)
+
+# S3 method for bru_mapper_mesh_B
+ibm_values(mapper, ...)
+
+# S3 method for bru_mapper_mesh_B
+ibm_jacobian(mapper, input, ...)</code></pre></div>
     </div>
 
     <div class="section level2">
@@ -344,7 +353,7 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)</code></pre></div
 
 
 <dt>input</dt>
-<dd><p>Data input for the mapper.</p></dd>
+<dd><p>The values for which to produce a mapping matrix</p></dd>
 
 
 <dt>state</dt>

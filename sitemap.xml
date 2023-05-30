@@ -370,7 +370,7 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/inlabru.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/reference/inlabru-package.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/input_eval.html</loc>
@@ -413,6 +413,9 @@
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/parse_inclusion.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/pcmatern_B.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/pixels.html</loc>
