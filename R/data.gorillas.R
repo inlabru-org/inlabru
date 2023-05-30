@@ -193,15 +193,20 @@ import.gorillas <- function() {
 
 #' @describeIn import.gorillas Convert gorillas to `sf` and `terra` format
 import.gorillas.sf <- function() {
+  gorillas <- NULL
   data(gorillas, package = "inlabru", envir = environment())
 
   gorillas_sf <- list()
   gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
   gorillas_sf$mesh <- gorillas$mesh
   gorillas_sf$boundary <- sf::st_as_sf(gorillas$boundary)
-  gorillas_sf$gcov <- lapply(gorillas$gcov, terra::rast)
-  gorillas_sf$gcov2 <- do.call(c, gorillas_sf$gcov)
+  gorillas_sf$gcov <- terra::rast(gorillas$gcov[[1]])
+  for (k in seq_len(length(gorillas$gcov) - 1L) + 1L) {
+    terra::add(gorillas_sf$gcov) <- terra::rast(gorillas$gcov[[k]])
+  }
   gorillas_sf$plotsample <- lapply(gorillas$plotsample, sf::st_as_sf)
+
+  gorillas_sf
 }
 
 
