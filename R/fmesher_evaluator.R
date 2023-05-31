@@ -91,8 +91,12 @@ fm_evaluate.fm_evaluator <-
           projector$lattice$dims[2]
         ))
       }
-    } else {
+    } else if (inherits(field, "sparseMatrix")) {
       data <- projector$proj$A %*% field
+      data[!projector$proj$ok, ] <- NA
+      return(data)
+    } else {
+      data <- as.matrix(projector$proj$A %*% field)
       data[!projector$proj$ok, ] <- NA
       return(data)
     }
