@@ -267,14 +267,14 @@ component.character <- function(object,
                                 weights_layer = NULL,
                                 weights_selector = NULL,
                                 # Group model parameters
-                                group = NULL,
+                                group = 1L,
                                 group_mapper = NULL,
                                 group_layer = NULL,
                                 group_selector = NULL,
                                 ngroup = NULL,
                                 control.group = NULL,
                                 # Replicate model parameters
-                                replicate = NULL,
+                                replicate = 1L,
                                 replicate_mapper = NULL,
                                 replicate_layer = NULL,
                                 replicate_selector = NULL,
@@ -1892,8 +1892,10 @@ input_eval.bru_input <- function(input, data, env = NULL,
   }
   assign(".data.", data, envir = envir)
 
-  e_input <- tryCatch(eval(input$input, envir = envir, enclos = enclos),
+  e_input <- tryCatch(
+    eval(input$input, envir = envir, enclos = enclos),
     error = function(e) {
+      e
     }
   )
 
@@ -1913,24 +1915,47 @@ input_eval.bru_input <- function(input, data, env = NULL,
   # ## A matrix.
   #  n <- nrow(as.data.frame(data))
 
-  if (is.null(e_input)) {
-    if (null.on.fail) {
+  handle_problems <- function(val) {
+    if (is.null(val)) {
       return(NULL)
     }
-    #    val <- rep(1, n)
-    val <- 1
-  } else if (is.function(e_input)) {
+    if (inherits(e_input, "simpleError")) {
+      if (null.on.fail) {
+        return(NULL)
+      }
+
+      val <- 1
+      warning(
+        paste0(
+          "The input evaluation '",
+          deparse(input$input),
+          "' for '", input$label,
+          "' failed. Perhaps the data object doesn't contain the needed variables?",
+          " Falling back to '1'."
+        ),
+        immediate. = TRUE
+      )
+      return(val)
+    }
+    return(val)
+  }
+
+  e_input <- handle_problems(e_input)
+  if (is.null(e_input)) { return(NULL) }
+
+  if (is.function(e_input)) {
     # Allow but detect failures:
-    val <- tryCatch(e_input(data),
+    val <- tryCatch(
+      e_input(data),
       error = function(e) {
+        e
       }
     )
-    if (is.null(val)) {
-      # TODO: figure out if we need to do something else in this case.
-      # Returning NULL seems like a good way to keep track of these failures
-      # that are likely to happen for multilikelihood models; A component only
-      # needs to be evaluable for at least one of the likelihoods.
-    } else if (identical(as.character(input$input), "coordinates")) {
+
+    val <- handle_problems(val)
+    if (is.null(val)) { return(NULL) }
+
+    if (identical(as.character(input$input), "coordinates")) {
       tryCatch(
         expr = {
           # Return SpatialPoints instead of a matrix
@@ -1953,16 +1978,15 @@ input_eval.bru_input <- function(input, data, env = NULL,
     }
   } else if (inherits(e_input, "formula")) {
     # Allow but detect failures:
-    val <- tryCatch(MatrixModels::model.Matrix(e_input, data = data, sparse = TRUE),
+    val <- tryCatch(
+      MatrixModels::model.Matrix(e_input, data = data, sparse = TRUE),
       error = function(e) {
+        e
       }
     )
-    if (is.null(val)) {
-      # TODO: figure out if we need to do something else in this case.
-      # Returning NULL seems like a good way to keep track of these failures
-      # that are likely to happen for multilikelihood models; A component only
-      # needs to be evaluable for at least one of the likelihoods.
-    }
+    val <- handle_problems(val)
+    if (is.null(val)) { return(NULL) }
+    val <- as(val, "Matrix")
   } else if (inherits(
     e_input,
     c(

@@ -138,6 +138,22 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.6.0.9000"
     }
 
+    if (utils::compareVersion("2.7.0.9010", old_ver) > 0) {
+      message("Upgrading bru_info to 2.7.0.9010")
+      # Make sure component$group/replicate$input isn't NULL
+      for (k in seq_along(object[["model"]][["effects"]])) {
+        cmp <- object[["model"]][["effects"]][[k]]
+        if (identical(deparse(cmp[["group"]][["input"]][["input"]]), "NULL")) {
+          cmp[["group"]][["input"]][["input"]] <- expression(1L)
+        }
+        if (identical(deparse(cmp[["replicate"]][["input"]][["input"]]), "NULL")) {
+          cmp[["replicate"]][["input"]][["input"]] <- expression(1L)
+        }
+        object[["model"]][["effects"]][[k]] <- cmp
+      }
+      object[["inlabru_version"]] <- "2.7.0.9010"
+    }
+
     object[["inlabru_version"]] <- new_version
   }
   object
@@ -434,7 +450,8 @@ bru <- function(components = ~ Intercept(1),
 #' @rdname bru
 #' @export
 bru_rerun <- function(result, options = list()) {
-  stopifnot(inherits(result, "bru"))
+  result <- bru_check_object_bru(result)
+
   info <- result[["bru_info"]]
   info[["options"]] <- bru_call_options(
     bru_options(
