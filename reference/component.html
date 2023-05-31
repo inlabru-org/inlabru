@@ -36,7 +36,7 @@ method, called inside bru()."><!-- mathjax --><script src="https://cdnjs.cloudfl
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -140,13 +140,13 @@ method, called inside <code><a href="bru.html">bru()</a></code>.</p>
 <span>  copy <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weights_layer <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weights_selector <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  group_mapper <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  group_layer <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  group_selector <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ngroup <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  control.group <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  replicate <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  replicate <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  replicate_mapper <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  replicate_layer <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  replicate_selector <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -331,15 +331,15 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-in"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="component_list.html">component_list</a></span><span class="op">(</span><span class="op">~</span> <span class="fu">myLinearEffectOfX</span><span class="op">(</span>main <span class="op">=</span> <span class="va">x</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cmp</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Label:	myLinearEffectOfX</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Type:	main = linear</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Input:	main = x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Type:	main = linear, group = exchangeable, replicate = iid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Input:	main = x, group = 1L, replicate = 1L</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Map: Not yet initialised</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ~ . + f(myLinearEffectOfX, model =</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       BRU_myLinearEffectOfX_main_model)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Label:	Intercept</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Type:	main = linear</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Input:	main = 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Type:	main = linear, group = exchangeable, replicate = iid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Input:	main = 1, group = 1L, replicate = 1L</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Map: Not yet initialised</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ~ . + f(Intercept, model = BRU_Intercept_main_model)</span>
@@ -350,8 +350,8 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-in"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu">component</span><span class="op">(</span><span class="st">"myLinearEffectOfX"</span>, main <span class="op">=</span> <span class="va">x</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cmp</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Label:	myLinearEffectOfX</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Type:	main = linear</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Input:	main = x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Type:	main = linear, group = exchangeable, replicate = iid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Input:	main = x, group = 1L, replicate = 1L</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Map: Not yet initialised</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ~ . + f(myLinearEffectOfX, model =</span>
@@ -376,8 +376,8 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cmp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Label:	eff</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Type:	main = fixed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Input:	main = ~-1 + x:z</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Type:	main = fixed, group = exchangeable, replicate = iid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Input:	main = ~-1 + x:z, group = 1L, replicate = 1L</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Map: Not yet initialised</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   INLA formula:	</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ~ . + f(eff, model = BRU_eff_main_model, hyper =</span>
