@@ -303,7 +303,8 @@ component.character <- function(object,
   # Force evaluation of explicit inputs
   force(values)
 
-  if (!is.null(substitute(group))) {
+  if (!is.null(substitute(group)) &&
+      !identical(deparse(substitute(group)), "1L")) {
     if (is.null(control.group)) {
       control.group <- INLA::inla.set.control.group.default()
     }
