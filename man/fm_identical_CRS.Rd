@@ -15,4 +15,17 @@ objects, extract and compare only the \code{sp::CRS} objects. Default: \code{FAL
 \description{
 Check if two CRS objects are identical
 }
+\examples{
+
+crs0 <- crs1 <- fm_crs("longlat_globe")
+fm_crs_oblique(crs1) <- c(0, 90)
+print(c(
+    fm_identical_CRS(crs0, crs0),
+    fm_identical_CRS(crs0, crs1),
+    fm_identical_CRS(crs0, crs1, crsonly = TRUE)
+))
+}
+\seealso{
+\link{fm_crs}
+}
 \keyword{internal}

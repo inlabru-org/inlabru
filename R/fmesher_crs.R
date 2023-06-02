@@ -1607,11 +1607,21 @@ fm_internal_update_crs <- function(crs, newcrs, mismatch.allowed) {
 
 
 #' @title Check if two CRS objects are identical
-#' @param crs0,crs1 Two `sp::CRS` or `inla.CRS` objects to be compared.
-#' @param crsonly logical. If `TRUE` and any of `crs0` and `crs1` are `inla.CRS`
-#' objects, extract and compare only the `sp::CRS` objects. Default: `FALSE`
+#' @param crs0,crs1 Two `sf::crs`, `sp::CRS`, `fm_crs` or `inla.CRS` objects to be compared.
+#' @param crsonly logical. If `TRUE` and any of `crs0` and `crs1` are `fm_crs` or `inla.CRS`
+#' objects, extract and compare only the `sf::crs` or `sp::CRS` aspects. Default: `FALSE`
 #' @export
 #' @keywords internal
+#' @seealso [fm_crs()], [fm_CRS()]
+#' @examples
+#'
+#' crs0 <- crs1 <- fm_crs("longlat_globe")
+#' fm_crs_oblique(crs1) <- c(0, 90)
+#' print(c(
+#'     fm_identical_CRS(crs0, crs0),
+#'     fm_identical_CRS(crs0, crs1),
+#'     fm_identical_CRS(crs0, crs1, crsonly = TRUE)
+#' ))
 
 fm_identical_CRS <- function(crs0, crs1, crsonly = FALSE) {
   if (crsonly) {
