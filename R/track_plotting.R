@@ -191,20 +191,21 @@ make_track_plots <- function(fit) {
     ggplot2::ggplot(track_data) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      (.data$mode - .data$mode.prev) / .data$sd,
+      abs(.data$mode - .data$mode.prev) / .data$sd,
       col = .data$index,
       group = factor(.data$index),
       lty = lty_["Mode"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      (.data$new_linearisation - .data$new_linearisation.prev) / .data$sd,
+      abs(.data$new_linearisation - .data$new_linearisation.prev) / .data$sd,
       col = .data$index,
       group = factor(.data$index),
       lty = lty_["Lin"]
     )) +
     pl_theme_norm +
-    ggplot2::ggtitle("Change / sd")
+    scale_y_log10() +
+    ggplot2::ggtitle("|Change| / sd")
 
   pl6 <-
     ggplot2::ggplot(track_data) +
