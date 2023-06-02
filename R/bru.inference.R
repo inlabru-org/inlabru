@@ -882,7 +882,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       ips_coordnames <- sp::coordnames(ips)
       ips_crs <- fm_CRS(ips)
       # For backwards compatibility:
-      data_crs <- fm_CRS(fm_crs(data))
+      data_crs <- fm_CRS(data)
 
       if ("coordinates" %in% names(response)) {
         data_coordnames <- colnames(response$coordinates)

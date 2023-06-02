@@ -50,7 +50,7 @@ test_that("sf gorillas lgcp vignette", {
       ## Offset for extra boundaries, if needed.
       offset = c(0.73, 1.55),
       ## Build mesh in this crs:
-      crs = fm_CRS(fm_crs(gorillas$nests))
+      crs = fm_CRS(gorillas$nests)
     )
   )
 
@@ -71,7 +71,9 @@ test_that("sf gorillas lgcp vignette", {
   ips_sp <- fm_int(mesh_sf, gorillas$boundary)
   ips_sf <- fm_int(mesh_sf, gorillas_sf$boundary)
 
-  expect_equal(ips_sp$weight, ips_sf$weight,
+  expect_equal(
+    ips_sp$weight,
+    ips_sf$weight,
     tolerance = 1e-3
   )
 

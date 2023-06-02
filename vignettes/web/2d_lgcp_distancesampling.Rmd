@@ -216,11 +216,15 @@ Nest <- predict(fit, predpts,
 Nest$plugin_estimate <- dpois(Nest$N, lambda = Lambda$mean)
 ggplot(data = Nest) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +
-  geom_ribbon(aes(x = N,
-                  ymin = mean - 2 * mean.mc_std_err,
-                  ymax = mean + 2 * mean.mc_std_err,
-                  colour = NULL, fill = "Posterior"),
-              alpha = 0.2) +
+  geom_ribbon(
+    aes(
+      x = N,
+      ymin = mean - 2 * mean.mc_std_err,
+      ymax = mean + 2 * mean.mc_std_err,
+      colour = NULL, fill = "Posterior"
+    ),
+    alpha = 0.2
+  ) +
   geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin", fill = "Plugin"))
 ```
 
@@ -298,11 +302,15 @@ Nest1 <- predict(
 Nest1$plugin_estimate <- dpois(Nest1$N, lambda = Lambda1$mean)
 ggplot(data = Nest1) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +
-  geom_ribbon(aes(x = N,
-                  ymin = mean - 2 * mean.mc_std_err,
-                  ymax = mean + 2 * mean.mc_std_err,
-                  colour = NULL, fill = "Posterior"),
-              alpha = 0.2) +
+  geom_ribbon(
+    aes(
+      x = N,
+      ymin = mean - 2 * mean.mc_std_err,
+      ymax = mean + 2 * mean.mc_std_err,
+      colour = NULL, fill = "Posterior"
+    ),
+    alpha = 0.2
+  ) +
   geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin", fill = "Plugin"))
 ```
 

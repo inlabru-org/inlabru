@@ -304,7 +304,7 @@ component.character <- function(object,
   force(values)
 
   if (!is.null(substitute(group)) &&
-      !identical(deparse(substitute(group)), "1L")) {
+    !identical(deparse(substitute(group)), "1L")) {
     if (is.null(control.group)) {
       control.group <- INLA::inla.set.control.group.default()
     }
@@ -1942,7 +1942,9 @@ input_eval.bru_input <- function(input, data, env = NULL,
   }
 
   e_input <- handle_problems(e_input)
-  if (is.null(e_input)) { return(NULL) }
+  if (is.null(e_input)) {
+    return(NULL)
+  }
 
   if (is.function(e_input)) {
     # Allow but detect failures:
@@ -1954,7 +1956,9 @@ input_eval.bru_input <- function(input, data, env = NULL,
     )
 
     val <- handle_problems(val)
-    if (is.null(val)) { return(NULL) }
+    if (is.null(val)) {
+      return(NULL)
+    }
 
     if (identical(as.character(input$input), "coordinates")) {
       tryCatch(
@@ -1986,7 +1990,9 @@ input_eval.bru_input <- function(input, data, env = NULL,
       }
     )
     val <- handle_problems(val)
-    if (is.null(val)) { return(NULL) }
+    if (is.null(val)) {
+      return(NULL)
+    }
     val <- as(val, "Matrix")
   } else if (inherits(
     e_input,
