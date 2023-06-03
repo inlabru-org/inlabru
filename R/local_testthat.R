@@ -183,7 +183,7 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
     # Need to specify specific smtp to ensure consistent tests.
     # To specifically test pardiso, need to override locally
     control.compute = list(dic = FALSE, waic = FALSE, smtp = "taucs"),
-    inla.mode = "experimental",
+    inla.mode = "compact",
     envir = envir
   )
   if (utils::compareVersion(getNamespaceVersion("sp"), "1.6-0") >= 0) {

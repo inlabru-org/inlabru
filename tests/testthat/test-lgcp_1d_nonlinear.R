@@ -224,7 +224,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_max_iter = 10,
       verbose = FALSE,
       bru_initial = list(Intercept = 0, lsig = -1),
-      inla.mode = "experimental"
+      inla.mode = "compact"
     )
   )
 
@@ -242,7 +242,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_max_iter = 10,
       verbose = FALSE,
       bru_initial = list(Intercept = 0, lsig = -1),
-      inla.mode = "experimental"
+      inla.mode = "compact"
     )
   )
 
