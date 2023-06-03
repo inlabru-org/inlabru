@@ -7,10 +7,10 @@
 fm_identical_CRS(crs0, crs1, crsonly = FALSE)
 }
 \arguments{
-\item{crs0, crs1}{Two \code{sp::CRS} or \code{inla.CRS} objects to be compared.}
+\item{crs0, crs1}{Two \code{sf::crs}, \code{sp::CRS}, \code{fm_crs} or \code{inla.CRS} objects to be compared.}
 
-\item{crsonly}{logical. If \code{TRUE} and any of \code{crs0} and \code{crs1} are \code{inla.CRS}
-objects, extract and compare only the \code{sp::CRS} objects. Default: \code{FALSE}}
+\item{crsonly}{logical. If \code{TRUE} and any of \code{crs0} and \code{crs1} are \code{fm_crs} or \code{inla.CRS}
+objects, extract and compare only the \code{sf::crs} or \code{sp::CRS} aspects. Default: \code{FALSE}}
 }
 \description{
 Check if two CRS objects are identical
@@ -26,6 +26,6 @@ print(c(
 ))
 }
 \seealso{
-\link{fm_crs}
+\code{\link[=fm_crs]{fm_crs()}}, \link[=fm_crs]{fm_CRS()}
 }
 \keyword{internal}
