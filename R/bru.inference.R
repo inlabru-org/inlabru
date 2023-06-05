@@ -2787,6 +2787,15 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     #     mode = stk.data[["BRU.offset"]],
     #     sd = NA
     #   )
+    label <- "log.posterior.mode"
+    track_df[[label]] <-
+      data.frame(
+        effect = label,
+        index = 1,
+        iteration = track_size + k,
+        mode = result[["mode"]][["log.posterior.mode"]],
+        sd = Inf
+      )
     track[[k]] <- do.call(rbind, track_df)
 
     # Only update the linearisation state after the non-final "eb" iterations:

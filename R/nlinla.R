@@ -82,11 +82,18 @@ bru_compute_linearisation.component <- function(cmp,
     j = integer(0),
     x = numeric(0)
   )
+  symmetric_diffs <- FALSE
   for (k in seq_len(NROW(state[[label]]))) {
     row_subset <- which(A[, k] != 0.0)
     if (length(row_subset) > 0) {
-      state_eps <- state
-      state_eps[[label]][k] <- state[[label]][k] + eps
+      if (symmetric_diffs) {
+        state_eps <- list(state, state)
+        state_eps[[1]][[label]][k] <- state[[label]][k] - eps
+        state_eps[[2]][[label]][k] <- state[[label]][k] + eps
+      } else {
+        state_eps <- state
+        state_eps[[label]][k] <- state[[label]][k] + eps
+      }
       # TODO:
       # Option: filter out the data and effect rows for which
       # the rows of A have some non-zeros, or all if allow_combine
@@ -95,38 +102,69 @@ bru_compute_linearisation.component <- function(cmp,
       # evaluate_predictor
 
       if (assume_rowwise) {
-        effects_eps <- list()
-        for (label_loop in names(effects)) {
-          if (NROW(effects[[label_loop]]) == 1) {
-            effects_eps[[label_loop]] <-
-              rep(effects[[label_loop]], length(row_subset))
-          } else {
-            effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
+        if (symmetric_diffs) {
+          effects_eps <- list(list(), list())
+          for (label_loop in names(effects)) {
+            if (NROW(effects[[label_loop]]) == 1) {
+              effects_eps[[1]][[label_loop]] <-
+                rep(effects[[label_loop]], length(row_subset))
+              effects_eps[[2]][[label_loop]] <-
+                rep(effects[[label_loop]], length(row_subset))
+            } else {
+              effects_eps[[1]][[label_loop]] <- effects[[label_loop]][row_subset]
+              effects_eps[[2]][[label_loop]] <- effects[[label_loop]][row_subset]
+            }
           }
+          effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - A[row_subset, k] * eps
+          effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + A[row_subset, k] * eps
+        } else {
+          effects_eps <- list()
+          for (label_loop in names(effects)) {
+            if (NROW(effects[[label_loop]]) == 1) {
+              effects_eps[[label_loop]] <-
+                rep(effects[[label_loop]], length(row_subset))
+            } else {
+              effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
+            }
+          }
+          effects_eps[[label]] <- effects_eps[[label]] + A[row_subset, k] * eps
         }
-        effects_eps[[label]] <- effects_eps[[label]] + A[row_subset, k] * eps
       } else {
-        effects_eps <- effects
-        effects_eps[[label]] <- effects_eps[[label]] + A[, k] * eps
+        if (symmetric_diffs) {
+          effects_eps <- list(effects, effects)
+          effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - A[, k] * eps
+          effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + A[, k] * eps
+        } else {
+          effects_eps <- effects
+          effects_eps[[label]] <- effects_eps[[label]] + A[, k] * eps
+        }
       }
       pred_eps <- evaluate_predictor(
         model,
-        state = list(state_eps),
+        state = if (symmetric_diffs) { state_eps } else list(state_eps),
         data =
           if (assume_rowwise) {
             data[row_subset, , drop = FALSE]
           } else {
             data
           },
-        effects = list(effects_eps),
+        effects = if (symmetric_diffs) { effects_eps } else list(effects_eps),
         predictor = lhood_expr,
         format = "matrix"
       )
       # Store sparse triplet information
-      if (assume_rowwise) {
-        values <- (pred_eps - pred0[row_subset])
+      if (symmetric_diffs) {
+        if (assume_rowwise) {
+          values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
+        } else {
+          values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
+        }
       } else {
-        values <- (pred_eps - pred0)
+        if (assume_rowwise) {
+          values <- (pred_eps - pred0[row_subset])
+        } else {
+          values <- (pred_eps - pred0)
+        }
       }
       nonzero <- is.finite(values)
       if (any(!nonzero)) {
