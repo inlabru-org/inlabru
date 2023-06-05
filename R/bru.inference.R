@@ -1755,18 +1755,18 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 #' Summarise and annotate data
 #'
 #' @export
-#' @param data A list of samples, each either numeric or a \code{data.frame}
+#' @param data A list of samples, each either numeric or a `data.frame`
 #' @param probs A numeric vector of probabilities with values in `[0, 1]`,
 #'   passed to `stats::quantile`
-#' @param x A \code{data.frame} of data columns that should be added to the summary data frame
-#' @param cbind.only If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample
+#' @param x A `data.frame` of data columns that should be added to the summary data frame
+#' @param cbind.only If TRUE, only `cbind` the samples and return a matrix where each column is a sample
 #' @param max_moment integer, at least 2. Determines the largest moment
 #'   order information to include in the output. If `max_moment > 2`,
 #'   includes "skew" (skewness, `E[(x-m)^3/s^3]`), and
 #'   if `max_moment > 3`, includes
 #'   "ekurtosis" (excess kurtosis, `E[(x-m)^4/s^4] - 3`). Default 2.
 #'   Note that the Monte Carlo variability of the `ekurtois` estimate may be large.
-#' @return A \code{data.frame} or `Spatial[Points/Pixels]DataFrame` with summary statistics,
+#' @return A `data.frame` or `Spatial[Points/Pixels]DataFrame` with summary statistics,
 #' "mean", "sd", `paste0("q", probs)`, "mean.mc_std_err", "sd.mc_std_err"
 #'
 #' @examples
