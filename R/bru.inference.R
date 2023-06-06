@@ -2639,6 +2639,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       # Reset the predictor values, to avoid spurious iteration effects.
       inla.options[["control.mode"]]$x[result_indexing$APredictor] <- 0
       inla.options[["control.mode"]]$x[result_indexing$Predictor] <- 0
+
+      inla.options[["control.inla"]]$use.directions <-
+        result$misc$opt.directions
     }
     if ((!is.null(result) && !is.null(result$mode))) {
       previous_x <- result$mode$x
