@@ -311,3 +311,118 @@ fm_evaluator.inla.mesh.1d <- function(mesh,
 
   return(projector)
 }
+
+
+
+
+
+
+
+#' Check which mesh triangles are inside a polygon
+#'
+#' Wrapper for the [sf::st_contains()] (previously `sp::over()`) method to find triangle centroids
+#' or vertices inside `sf` or `sp` polygon objects
+#'
+#' @param x geometry (typically an `sf` or `sp::SpatialPolygons` object) for the queries
+#' @param y an `inla.mesh()` object
+#' @param type the query type; either `'centroid'` (default, for triangle centroids),
+#' or `'vertex'` (for mesh vertices)
+#'
+#' @return A vector of triangle indices (when `type` is `'centroid'`) or
+#' vertex indices (when `type` is `'vertex'`)
+#'
+#' @author Haakon Bakka, \email{bakka@@r-inla.org}, and Finn Lindgren \email{finn.lindgren@@gmail.com}
+#'
+#' @examples
+#' if (bru_safe_inla()) {
+#' # Create a polygon and a mesh
+#' obj <- sp::SpatialPolygons(list(Polygons(list(Polygon(rbind(
+#'     c(0, 0),
+#'     c(50, 0),
+#'     c(50, 50),
+#'     c(0, 50)
+#' ))),
+#' ID = 1
+#' )),
+#' proj4string = fm_CRS("longlat_globe")
+#' )
+#' mesh <- INLA::inla.mesh.create(globe = 2, crs = fm_crs("sphere"))
+#'
+#' ## 3 vertices found in the polygon
+#' fm_contains(obj, mesh, type = "vertex")
+#'
+#' ## 3 triangles found in the polygon
+#' fm_contains(obj, mesh)
+#'
+#' ## Multiple transformations can lead to slightly different results due to edge cases
+#' ## 4 triangles found in the polygon
+#' fm_contains(
+#'   obj,
+#'   fm_transform(mesh, crs = fm_crs("mollweide_norm")))
+#' }
+#'
+#' @export
+fm_contains <- function(x, y, type = c("centroid", "vertex")) {
+  if (!inherits(y, "inla.mesh")) {
+    stop(paste0(
+      "'y' must be an 'inla.mesh' object, not '",
+      paste0(class(y), collapse = ", "),
+      "'."
+    ))
+  }
+  UseMethod("fm_contains")
+}
+
+#' @rdname fm_contains
+#' @export
+fm_contains.Spatial <- function(x, y, type = c("centroid", "vertex")) {
+  fm_contains(af::st_as_sf(x), y = y, type = type)
+}
+
+#' @rdname fm_contains
+#' @export
+fm_contains.sf <- function(x, y, type = c("centroid", "vertex")) {
+  fm_contains(sf::st_geometry(x), y = y, type = type)
+}
+
+#' @rdname fm_contains
+#' @export
+fm_contains.sfc <- function(x, y, type = c("centroid", "vertex")) {
+  type <- match.arg(type)
+  if (identical(type, "centroid")) {
+    ## Extract triangle centroids
+    points <- (y$loc[y$graph$tv[, 1], , drop = FALSE] +
+                 y$loc[y$graph$tv[, 2], , drop = FALSE] +
+                 y$loc[y$graph$tv[, 3], , drop = FALSE]) / 3
+  } else if (identical(type, "vertex")) {
+    ## Extract vertices
+    points <- y$loc
+  }
+  if (identical(y$manifold, "S2")) {
+    points <- points / rowSums(points^2)^0.5
+  }
+  ## Convert to sf points
+  ## Extract coordinate system information
+  if (identical(y$manifold, "S2")) {
+    crs <- fm_crs("sphere")
+  } else {
+    crs <- fm_crs(y)
+  }
+  crs_x <- fm_crs(x)
+  ## Create sfc_POINT object and transform the coordinates.
+  points <- sf::st_as_sf(as.data.frame(points),
+                         coords = seq_len(ncol(points)),
+                         crs = crs)
+  if (!fm_crs_is_null(crs) &&
+      !fm_crs_is_null(crs_x)) {
+    ## Convert to the target object CRS
+    points <- fm_transform(points, crs = crs_x)
+  }
+
+  ## Find indices:
+  ids <- unlist(sf::st_contains(x, points, sparse = TRUE))
+
+  ids
+}
+
+
