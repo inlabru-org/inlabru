@@ -1,31 +1,15 @@
 # inlabru (development version)
 
-* Remove `rgdal` and `maptools` dependencies #178
+## Feature updates
 
-* Add `bru_safe_sp()` to check if `sp` can be used safely (checks `rgdal` availability
-  and `sp` evolution status, optionally forcing use of `sf`) #178
-
-* Remove PROJ4 support #178
-
-* Warning: Coordinate names for `Spatial*` objects have been inconsistently
-  available in the predictor expression evaluation. Avoid relying on those being
-  present, and use explicit calls to `coordinates(.data.)` if you need the
-  coordinate values (e.g. for custom spatial covariate evaluation.).
-  When possible, use the built-in covariate evaluation method, `eval_spatial()`,
-  either implicitly with `comp(covariate, ...)` or explicitly,
-  `comp(eval_spatial(covariate, where = .data.), ...)`.
+* Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
+  Supports both `sf` and `sp` sampler objects.
   
-* Change rgl.* functions to *3d. Thanks to Duncan Murdoch #181
+* Add `fm_pixels()` methods for gridded points. The old 
+  `pixels()` method now calls `fm_pixels(..., format = "sp")`
 
-* Speed up `ibm_jacobian.bru_mapper_harmonics` for large models
+* `eval_spatial` support for sf objects (for point-in-polygon data lookups)
 
-* `eval_spatial` supported to sf objects (for point-in-polygon data lookups)
-
-* Add workarounds for inconsistent polygon orientation resulting from `sf::st_*`
-  calls that don't account for the `geos` canonical representation being CW,
-  whereas the canonical Simple Features representation being CCW. See
-  https://github.com/r-spatial/sf/issues/2096
-  
 * Allow precomputed spatial covariates in the data for point process observations
 
 * Add `edge|int|ext.linewidth` arguments to `gg.inla.mesh` #188
@@ -34,12 +18,33 @@
   better compatibility with other `predict()` methods.  The old argument name
   will still be accepted, but give a warning.  Code that does not name the `data`
   argument is not affected.
-  
-* Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
-  Supports `sf` sampler objects.
-  
-* Add `fm_pixels()` methods for gridded points. `pixels()` calls `fm_pixels(..., format = "sp")`
 
+* Warning: Coordinate names for `Spatial*` objects have been inconsistently
+  available in the predictor expression evaluation. Avoid relying on those being
+  present, and use explicit calls to `coordinates(.data.)` if you need the
+  coordinate values (e.g. for custom spatial covariate evaluation.).
+  When possible, use the built-in covariate evaluation method, `eval_spatial()`,
+  either implicitly with `comp(covariate, ...)` or explicitly,
+  `comp(eval_spatial(covariate, where = .data.), ...)`.
+
+## Bug and dependency updates
+
+* Remove `rgdal` and `maptools` dependencies #178
+
+* Add `bru_safe_sp()` to check if `sp` can be used safely (checks `rgdal` availability
+  and `sp` evolution status, optionally forcing use of `sf`) #178
+
+* Remove PROJ4 support #178
+
+* Change rgl.* functions to *3d. Thanks to Duncan Murdoch #181
+
+* Speed up `ibm_jacobian.bru_mapper_harmonics` for large models
+
+* Add workarounds for inconsistent polygon orientation resulting from `sf::st_*`
+  calls that don't account for the `geos` canonical representation being CW,
+  whereas the canonical Simple Features representation being CCW. See
+  https://github.com/r-spatial/sf/issues/2096
+  
 # inlabru 2.7.0
 
 ## Feature overview
