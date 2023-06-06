@@ -328,8 +328,9 @@ fm_evaluator.inla.mesh.1d <- function(mesh,
 #' @param type the query type; either `'centroid'` (default, for triangle centroids),
 #' or `'vertex'` (for mesh vertices)
 #'
-#' @return A vector of triangle indices (when `type` is `'centroid'`) or
-#' vertex indices (when `type` is `'vertex'`)
+#' @return List of vectors of triangle indices (when `type` is `'centroid'`) or
+#' vertex indices (when `type` is `'vertex'`). The list has one entry per row of the `sf` object.
+#' Use `unlist(fm_contains(...))` if the combined union is needed.
 #'
 #' @author Haakon Bakka, \email{bakka@@r-inla.org}, and Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
@@ -376,7 +377,7 @@ fm_contains <- function(x, y, type = c("centroid", "vertex")) {
 #' @rdname fm_contains
 #' @export
 fm_contains.Spatial <- function(x, y, type = c("centroid", "vertex")) {
-  fm_contains(af::st_as_sf(x), y = y, type = type)
+  fm_contains(sf::st_as_sf(x), y = y, type = type)
 }
 
 #' @rdname fm_contains
@@ -420,7 +421,7 @@ fm_contains.sfc <- function(x, y, type = c("centroid", "vertex")) {
   }
 
   ## Find indices:
-  ids <- unlist(sf::st_contains(x, points, sparse = TRUE))
+  ids <- sf::st_contains(x, points, sparse = TRUE)
 
   ids
 }
