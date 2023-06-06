@@ -69,6 +69,11 @@ make_track_plots <- function(fit) {
     ) %>%
     dplyr::mutate(iteration = .data$iteration.x)
 
+  track_data <- track_data %>%
+    dplyr::group_by(.data$effect, .data$iteration) %>%
+    dplyr::mutate(alpha_value = 1 / sqrt(max(.data$index))) %>%
+    dplyr::ungroup()
+
   lty_ <- factor(c("Mode", "Lin", "Mode-Lin", "SD"),
     levels = c("Mode", "Lin", "Mode-Lin", "SD")
   )
@@ -107,18 +112,22 @@ make_track_plots <- function(fit) {
       .data$mode,
       col = .data$index,
       group = factor(.data$index),
-      lty = lty_["Mode"]
+      lty = lty_["Mode"],
+      alpha = .data$alpha_value
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$new_linearisation,
       col = .data$index,
       group = factor(.data$index),
-      lty = lty_["Lin"]
+      lty = lty_["Lin"],
+      alpha = .data$alpha_value / 2
     )) +
+    ggplot2::guides(alpha = "none") +
     pl_theme_abs +
     ggplot2::ggtitle("Tracks")
-  pl2 <-
+
+    pl2 <-
     ggplot2::ggplot(track_data) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
@@ -147,22 +156,26 @@ make_track_plots <- function(fit) {
       .data$mode - .data$new_linearisation,
       col = .data$index,
       group = factor(.data$index),
-      lty = lty_["Mode-Lin"]
+      lty = lty_["Mode-Lin"],
+      alpha = .data$alpha_value
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       -.data$sd,
       col = .data$index,
       group = factor(.data$index),
-      lty = lty_["SD"]
+      lty = lty_["SD"],
+      alpha = .data$alpha_value
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$sd,
       col = .data$index,
       group = factor(.data$index),
-      lty = lty_["SD"]
+      lty = lty_["SD"],
+      alpha = .data$alpha_value
     )) +
+    ggplot2::guides(alpha = "none") +
     pl_theme_rel +
     ggplot2::ggtitle("Mode - Lin")
   pl4 <-
@@ -268,29 +281,34 @@ make_track_plots <- function(fit) {
       (.data$mode - .data$mode.prev),
       col = .data$index,
       group = factor(.data$index),
-      lty = lty_["Mode"]
+      lty = lty_["Mode"],
+      alpha = .data$alpha_value
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       (.data$new_linearisation - .data$new_linearisation.prev),
       col = .data$index,
       group = factor(.data$index),
-      lty = lty_["Lin"]
+      lty = lty_["Lin"],
+      alpha = .data$alpha_value / 2
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$sd,
       col = .data$index,
       group = factor(.data$index),
-      lty = lty_["SD"]
+      lty = lty_["SD"],
+      alpha = .data$alpha_value
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       -.data$sd,
       col = .data$index,
       group = factor(.data$index),
-      lty = lty_["SD"]
+      lty = lty_["SD"],
+      alpha = .data$alpha_value
     )) +
+    ggplot2::guides(alpha = "none") +
     pl_theme_rel +
     ggplot2::ggtitle("Change & sd")
 
