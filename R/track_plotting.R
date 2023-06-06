@@ -221,7 +221,7 @@ make_track_plots <- function(fit) {
       lty = lty_["Lin"]
     )) +
     pl_theme_norm +
-    scale_y_log10() +
+    ggplot2::scale_y_log10() +
     ggplot2::ggtitle("|Change| / sd")
 
   pl5b <-
@@ -249,26 +249,26 @@ make_track_plots <- function(fit) {
       ) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      MaxMode,
+      .data$MaxMode,
       lty = lty_["Mode"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      MeanMode,
+      .data$MeanMode,
       lty = lty_["Mode"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      MaxLin,
+      .data$MaxLin,
       lty = lty_["Lin"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      MeanLin,
+      .data$MeanLin,
       lty = lty_["Lin"]
     )) +
     pl_theme_norm +
-    scale_y_log10() +
+    ggplot2::scale_y_log10() +
     ggplot2::ggtitle("|Change| / sd (Max and Mean)")
 
   pl6 <-
