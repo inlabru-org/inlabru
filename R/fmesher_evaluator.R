@@ -335,7 +335,8 @@ fm_evaluator.inla.mesh.1d <- function(mesh,
 #' @author Haakon Bakka, \email{bakka@@r-inla.org}, and Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 #' @examples
-#' if (bru_safe_inla()) {
+#' if (bru_safe_inla() &&
+#'     bru_safe_sp()) {
 #' # Create a polygon and a mesh
 #' obj <- sp::SpatialPolygons(list(Polygons(list(Polygon(rbind(
 #'     c(0, 0),
