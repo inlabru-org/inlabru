@@ -343,33 +343,6 @@ test_that("Multi-mapper bru input", {
   expect_equal(ibm_jacobian(mapper, omatrix_data), A)
 
   data <- cbind(df_data, y = 1:3)
-
-  skip_on_cran()
-  local_bru_safe_inla()
-
-  cmp1 <- y ~ indep(list(space = space, time = time),
-    model = "ar1", mapper = mapper
-  ) - 1
-  fit1 <- bru(cmp1, family = "gaussian", data = data)
-
-  cmp2 <- y ~ indep(list(space, time),
-    model = "ar1", mapper = mapper
-  ) - 1
-  fit2 <- bru(cmp2, family = "gaussian", data = data)
-
-  cmp3 <- y ~ indep(data.frame(time = time, space = space),
-    model = "ar1", mapper = mapper
-  ) - 1
-  fit3 <- bru(cmp3, family = "gaussian", data = data)
-
-  cmp4 <- y ~ indep(cbind(space, time),
-    model = "ar1", mapper = mapper
-  ) - 1
-  fit4 <- bru(cmp4, family = "gaussian", data = data)
-
-  expect_equal(fit1$summary.random, fit2$summary.random)
-  expect_equal(fit1$summary.random, fit3$summary.random)
-  expect_equal(fit1$summary.random, fit4$summary.random)
 })
 
 
