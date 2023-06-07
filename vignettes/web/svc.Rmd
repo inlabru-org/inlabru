@@ -256,11 +256,12 @@ of the spatial terms in the model.
 In plain `R-INLA`, we would also need to create index vectors and projector matrices
 (or **A matrices** as they are often called).  However, in `inlabru`, these objects
 are created automatically, and the user does not need to deal with them directly.
-This qorks by an automatic creation of a `bru_mapper` object that knows how
+This works by an automatic creation of a `bru_mapper` object that knows how
 to map between mesh nodes and spatial data locations.  Thus, the only two
 `R-INLA` functions needed in the user code of the SPDE modelling steps are
 `inla.mesh.2D()` and `inla.spde2.pcmatern()`, and the `inla.spde.make.index()`
-and `inla.spde.make.A()` are only called internally by the `inlabru` code itself.
+and `inla.spde.make.A()` functions are only called
+internally by the `inlabru` code itself, or rather `fm_evaluator()` is used instead.
 
 ## Modeling mesh
 

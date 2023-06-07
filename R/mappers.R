@@ -742,25 +742,7 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  if (inherits(input, "sfc_POINT")) {
-    # TODO: Add direct sf support to inla.spde.make.A,
-    input <- fm_transform(input,
-      crs = fm_crs(mapper[["mesh"]]),
-      passthrough = TRUE
-    )
-    A <- sf::st_coordinates(input)
-    nm <- intersect(colnames(A), c("X", "Y", "Z"))
-    input <- as.matrix(A[, nm, drop = FALSE])
-  } else if (inherits(input, "Spatial")) {
-    input <- fm_transform(input,
-      crs = fm_crs(mapper[["mesh"]]),
-      passthrough = TRUE
-    )
-    input <- sp::coordinates(input)
-  } else if (!is.matrix(input)) {
-    input <- as.matrix(input)
-  }
-  INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
+  fm_evaluator(mapper[["mesh"]], loc = input)$proj$A
 }
 
 
@@ -814,10 +796,10 @@ ibm_jacobian.bru_mapper_inla_mesh_1d <- function(mapper, input, ...) {
   }
   ok <- !is.na(input)
   if (all(ok)) {
-    A <- INLA::inla.spde.make.A(mapper[["mesh"]], loc = input)
+    A <- fm_evaluator(mapper[["mesh"]], loc = input)$proj$A
   } else {
     A <- Matrix::Matrix(0, length(input), ibm_n(mapper))
-    A[ok, ] <- INLA::inla.spde.make.A(mapper[["mesh"]], loc = input[ok])
+    A[ok, ] <- fm_evaluator(mapper[["mesh"]], loc = input[ok])$proj$A
   }
   A
 }

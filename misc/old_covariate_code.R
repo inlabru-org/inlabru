@@ -36,7 +36,7 @@ covdata.import <- function(dframe, colname, data) {
   dframe[, colname] <- dframe[, colname] / scale
 
   spde.mdl <- INLA::inla.spde2.matern(mesh = data$mesh, alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.1)
-  A <- INLA::inla.spde.make.A(data$mesh, loc = covloc)
+  A <- fm_evaluator(data$mesh, loc = covloc)$proj$A
   stack <- INLA::inla.stack(
     data = list(y = dframe[, colname]), A = list(A, 1),
     effects = list(spde = 1:spde.mdl$n.spde, m = rep(1, nrow(dframe))),
@@ -106,13 +106,13 @@ get.value <- function(covariate, loc) {
   if (length(times) > 0) {
     for (t in times) {
       msk <- loc[, covariate$time.coords] == t
-      A <- INLA::inla.spde.make.A(covariate$mesh, loc = as.matrix(loc[msk, covariate$mesh.coords]))
+      A <- fm_evaluator(covariate$mesh, loc = as.matrix(loc[msk, covariate$mesh.coords]))$proj$A
       inside <- is.inside(covariate$mesh, loc = loc[, covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
       values[msk] <- as.vector(A %*% covariate$values[, as.character(t)])
       values[msk & !inside] <- NA
     }
   } else {
-    A <- INLA::inla.spde.make.A(covariate$mesh, loc = as.matrix(loc[, covariate$mesh.coords]))
+    A <- fm_evaluator(covariate$mesh, loc = as.matrix(loc[, covariate$mesh.coords]))$proj$A
     inside <- is.inside(covariate$mesh, loc = loc[, covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
     values <- as.vector(A %*% covariate$values[, 1])
     values[!inside] <- NA
@@ -172,7 +172,7 @@ get.min <- function(covariate, loc = NULL) {
 get.tmean <- function(covariate, loc = NULL) {
   tm <- apply(covariate$values, MARGIN = 1, mean)
   loc2 <- loc[, covariate$mesh.coords, drop = FALSE]
-  A <- INLA::inla.spde.make.A(covariate$mesh, loc = as.matrix(loc2))
+  A <- fm_evaluator(covariate$mesh, loc = as.matrix(loc2))$proj$A
   values <- as.vector(A %*% tm)
   return(values)
 }

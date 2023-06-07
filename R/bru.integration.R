@@ -332,14 +332,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       subsamplers <- samplers[j, ]
 
       if (identical(int.args[["method"]], "stable")) {
-        A_w <- INLA::inla.spde.make.A(domain,
-          int_loc,
-          weights =
-            int_w *
-              (int_loc >= min(subsamplers)) *
-              (int_loc <= max(subsamplers))
-        )
-        w <- Matrix::colSums(A_w)
+        A_ <- fm_evaluator(domain, int_loc)$proj$A
+        w <- as.vector((int_w *
+                          (int_loc >= min(subsamplers)) *
+                          (int_loc <= max(subsamplers))) %*% A_)
         ips[[j]] <- data.frame(
           loc = domain$loc[w > 0],
           weight = w[w > 0],

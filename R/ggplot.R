@@ -765,7 +765,7 @@ gg.inla.mesh <- function(data,
   }
   if (!is.null(color)) {
     px <- pixels(data, nx = nx, ny = ny)
-    A <- INLA::inla.spde.make.A(data, px)
+    A <- fm_evaluator(data, px)$proj$A
     px$color <- as.vector(A %*% color)
     if (!is.null(alpha)) {
       px$alpha <- as.vector(A %*% alpha)

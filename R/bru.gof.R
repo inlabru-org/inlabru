@@ -195,7 +195,7 @@ devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, me
 
 
     wips <- fm_int(mesh, samplers)
-    A <- INLA::inla.spde.make.A(mesh, loc = wips)
+    A <- fm_evaluator(mesh, loc = wips)$proj$A
 
     weights <- wips$weight
     weights <- weights / sum(weights)

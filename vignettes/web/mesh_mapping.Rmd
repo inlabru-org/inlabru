@@ -66,7 +66,14 @@ A.loc <- inla.spde.make.A(mesh, loc = loc)
 A.loc
 ```
 
-With a `bru_mapper`, this becomes
+A basic conversion of this becomes
+```{r}
+A.loc <- fm_evaluator(mesh, loc = loc)$proj$A
+A.loc
+```
+but this is limited to just the basic case of evaluating on only a mesh.
+
+With a `bru_mapper`, this becomes the more generally useful
 ```{r}
 mapper <- bru_mapper(mesh)
 A.loc <- ibm_jacobian(mapper, input = loc)
