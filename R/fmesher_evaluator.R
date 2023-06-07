@@ -117,6 +117,7 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
 
   # Support INLA <= 22.11.27 by converting globes to spheres
   # TODO: Handle the > 22.11.27 more efficiently
+  loc_needs_normalisation <- FALSE
   if (!fm_crs_is_null(mesh$crs)) {
     if (fm_crs_is_geocent(mesh$crs)) {
       crs.sphere <- fm_CRS("sphere")
@@ -130,7 +131,7 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
         }
       } else {
         if (fm_crs_is_null(crs)) {
-          loc <- loc / rowSums(loc^2)^0.5
+          loc_needs_normalisation <- TRUE
         } else {
           loc <- fm_transform(loc, crs = crs.sphere, crs0 = crs)
         }
@@ -140,7 +141,7 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
     }
   } else if (identical(mesh$manifold, "S2")) {
     mesh$loc <- mesh$loc / rowSums(mesh$loc^2)^0.5
-    loc <- loc / rowSums(loc^2)^0.5
+    loc_needs_normalisation <- TRUE
   }
 
   if (inherits(loc, c("SpatialPoints", "SpatialPointsDataFrame"))) {
@@ -150,6 +151,9 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
     c_names <- colnames(loc)
     c_names <- intersect(c_names, c("X", "Y", "Z"))
     loc <- loc[, c_names, drop = FALSE]
+  }
+  if (loc_needs_normalisation) {
+    loc <- loc / rowSums(loc^2)^0.5
   }
 
   jj <-
