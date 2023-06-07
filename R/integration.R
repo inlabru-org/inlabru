@@ -474,8 +474,8 @@ intersection_mesh <- function(mesh, poly) {
       mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 2], , drop = FALSE] +
       mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 3], , drop = FALSE]) / 3
   ok_tri <-
-    INLA::inla.mesh.projector(mesh, loc = loc_tri)$proj$ok &
-      INLA::inla.mesh.projector(mesh_poly, loc = loc_tri)$proj$ok
+    fm_evaluator(mesh, loc = loc_tri)$proj$ok &
+    fm_evaluator(mesh_poly, loc = loc_tri)$proj$ok
   if (any(ok_tri)) {
     loc_subset <- unique(sort(as.vector(mesh_joint_cover$graph$tv[ok_tri, , drop = FALSE])))
     new_idx <- integer(mesh$n)
@@ -545,7 +545,7 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 
   # Filter away points outside integration domain boundary:
   mesh_bnd <- INLA::inla.mesh.create(boundary = bnd)
-  ok <- INLA::inla.mesh.projector(mesh_bnd, loc = loc)$proj$ok
+  ok <- fm_evaluator(mesh_bnd, loc = loc)$proj$ok
 
   list(
     loc = loc[ok, , drop = FALSE],
@@ -588,7 +588,7 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
 
     # Keep points inside the mesh with positive weights
     ok <-
-      INLA::inla.mesh.project(mesh, integ$loc)$ok &
+      fm_evaluator(mesh, integ$loc)$proj$ok &
         (integ$weight > 0)
 
     ips <- data.frame(integ$loc[ok, 1:2, drop = FALSE])
@@ -627,7 +627,7 @@ bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
 
     # Keep points inside the mesh with positive weights
     ok <-
-      INLA::inla.mesh.project(mesh, integ$loc)$ok &
+      fm_evaluator(mesh, integ$loc)$proj$ok &
         (integ$weight > 0)
 
     if (any(ok)) {

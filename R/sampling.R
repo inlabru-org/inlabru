@@ -116,7 +116,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       Npoints <- rpois(1, lambda = area * exp(wmax))
       if (Npoints > 0) {
         points <- runif(n = Npoints, min = xmin, max = xmax)
-        proj <- INLA::inla.mesh.project(mesh, points)
+        proj <- fm_evaluator(mesh, points)$proj
         if (length(loglambda) == 1) {
           lambda_ratio <- exp(as.vector(Matrix::rowSums(proj$A) * loglambda) - wmax)
         } else {
@@ -272,7 +272,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (sum(Npoints) > 0) {
           points <- sp::SpatialPoints(points, proj4string = target.crs)
 
-          A <- INLA::inla.mesh.project(mesh, points)$A
+          A <- fm_evaluator(mesh, points)$proj$A
           lambda_ratio <- exp(as.vector(A %*% loglambda) - loglambda_max[triangle])
           keep <- (runif(sum(Npoints)) <= lambda_ratio)
           ret <- points[keep]
@@ -309,7 +309,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           )
 
           # Do some thinning
-          proj <- INLA::inla.mesh.project(mesh, points)
+          proj <- fm_evaluator(mesh, points)$proj
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           ret <- points[keep]
@@ -340,7 +340,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           coordinates(points) <- c("x", "y", "z")
           proj4string(points) <- internal.crs
 
-          proj <- INLA::inla.mesh.project(mesh, points)
+          proj <- fm_evaluator(mesh, points)$proj
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           ret <- points[keep]
@@ -392,7 +392,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           coordinates(points) <- c("x", "y", "z")
           proj4string(points) <- internal.crs
 
-          proj <- INLA::inla.mesh.project(mesh, points)
+          proj <- fm_evaluator(mesh, points)$proj
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           sampled.points[[k]] <- points[keep]
