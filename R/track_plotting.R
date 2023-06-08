@@ -127,7 +127,7 @@ make_track_plots <- function(fit) {
     pl_theme_abs +
     ggplot2::ggtitle("Tracks")
 
-    pl2 <-
+  pl2 <-
     ggplot2::ggplot(track_data) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
@@ -148,8 +148,10 @@ make_track_plots <- function(fit) {
   pl3 <-
     ggplot2::ggplot(
       track_data %>%
-        dplyr::filter(is.finite(.data$sd),
-                      is.finite(.data$new_linearisation))
+        dplyr::filter(
+          is.finite(.data$sd),
+          is.finite(.data$new_linearisation)
+        )
     ) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
@@ -227,8 +229,10 @@ make_track_plots <- function(fit) {
   pl5b <-
     ggplot2::ggplot(
       track_data %>%
-        dplyr::group_by(.data$effect,
-                        .data$iteration) %>%
+        dplyr::group_by(
+          .data$effect,
+          .data$iteration
+        ) %>%
         dplyr::mutate(sd = dplyr::if_else(is.finite(.data$sd), .data$sd, 1.0)) %>%
         dplyr::summarise(
           MaxMode = max(abs(.data$mode - .data$mode.prev) / .data$sd),
@@ -237,7 +241,8 @@ make_track_plots <- function(fit) {
           MaxLin = max(abs(.data$new_linearisation - .data$new_linearisation.prev) / .data$sd),
           MeanLin = mean(abs(.data$new_linearisation - .data$new_linearisation.prev) / .data$sd),
           RMSLin = mean((.data$new_linearisation - .data$new_linearisation.prev)^2 / .data$sd^2)^0.5,
-          .groups = "drop") %>%
+          .groups = "drop"
+        ) %>%
         dplyr::mutate(
           MaxMode = dplyr::if_else(.data$MaxMode > 0, .data$MaxMode, NA),
           MeanMode = dplyr::if_else(.data$MeanMode > 0, .data$MeanMode, NA),
@@ -246,7 +251,7 @@ make_track_plots <- function(fit) {
           MeanLin = dplyr::if_else(.data$MeanLin > 0, .data$MeanLin, NA),
           RMSLin = dplyr::if_else(.data$RMSLin > 0, .data$RMSLin, NA),
         )
-      ) +
+    ) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MaxMode,

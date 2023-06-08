@@ -1383,9 +1383,11 @@ fm_proj4string <- function(crs) {
 #' @rdname fm_crs_wkt
 
 fm_crs_get_wkt <- function(crs) {
-  lifecycle::deprecate_warn("2.7.0.9012",
-                            "fm_crs_get_wkt()",
-                            "fm_wkt()")
+  lifecycle::deprecate_warn(
+    "2.7.0.9012",
+    "fm_crs_get_wkt()",
+    "fm_wkt()"
+  )
   fm_wkt(crs)
 }
 
@@ -1621,11 +1623,10 @@ fm_internal_update_crs <- function(crs, newcrs, mismatch.allowed) {
 #' crs0 <- crs1 <- fm_crs("longlat_globe")
 #' fm_crs_oblique(crs1) <- c(0, 90)
 #' print(c(
-#'     fm_identical_CRS(crs0, crs0),
-#'     fm_identical_CRS(crs0, crs1),
-#'     fm_identical_CRS(crs0, crs1, crsonly = TRUE)
+#'   fm_identical_CRS(crs0, crs0),
+#'   fm_identical_CRS(crs0, crs1),
+#'   fm_identical_CRS(crs0, crs1, crsonly = TRUE)
 #' ))
-
 fm_identical_CRS <- function(crs0, crs1, crsonly = FALSE) {
   if (crsonly) {
     crs0 <- fm_crs(crs0, crsonly = TRUE)

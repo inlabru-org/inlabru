@@ -34,31 +34,34 @@ or vertices inside \code{sf} or \code{sp} polygon objects
 }
 \examples{
 if (bru_safe_inla() &&
-    bru_safe_sp()) {
-# Create a polygon and a mesh
-obj <- sp::SpatialPolygons(list(Polygons(list(Polygon(rbind(
-    c(0, 0),
-    c(50, 0),
-    c(50, 50),
-    c(0, 50)
-))),
-ID = 1
-)),
-proj4string = fm_CRS("longlat_globe")
-)
-mesh <- INLA::inla.mesh.create(globe = 2, crs = fm_crs("sphere"))
+  bru_safe_sp()) {
+  # Create a polygon and a mesh
+  obj <- sp::SpatialPolygons(
+    list(Polygons(
+      list(Polygon(rbind(
+        c(0, 0),
+        c(50, 0),
+        c(50, 50),
+        c(0, 50)
+      ))),
+      ID = 1
+    )),
+    proj4string = fm_CRS("longlat_globe")
+  )
+  mesh <- INLA::inla.mesh.create(globe = 2, crs = fm_crs("sphere"))
 
-## 3 vertices found in the polygon
-fm_contains(obj, mesh, type = "vertex")
+  ## 3 vertices found in the polygon
+  fm_contains(obj, mesh, type = "vertex")
 
-## 3 triangles found in the polygon
-fm_contains(obj, mesh)
+  ## 3 triangles found in the polygon
+  fm_contains(obj, mesh)
 
-## Multiple transformations can lead to slightly different results due to edge cases
-## 4 triangles found in the polygon
-fm_contains(
-  obj,
-  fm_transform(mesh, crs = fm_crs("mollweide_norm")))
+  ## Multiple transformations can lead to slightly different results due to edge cases
+  ## 4 triangles found in the polygon
+  fm_contains(
+    obj,
+    fm_transform(mesh, crs = fm_crs("mollweide_norm"))
+  )
 }
 
 }

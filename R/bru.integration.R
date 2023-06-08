@@ -334,8 +334,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       if (identical(int.args[["method"]], "stable")) {
         A_ <- fm_evaluator(domain, int_loc)$proj$A
         w <- as.vector((int_w *
-                          (int_loc >= min(subsamplers)) *
-                          (int_loc <= max(subsamplers))) %*% A_)
+          (int_loc >= min(subsamplers)) *
+          (int_loc <= max(subsamplers))) %*% A_)
         ips[[j]] <- data.frame(
           loc = domain$loc[w > 0],
           weight = w[w > 0],

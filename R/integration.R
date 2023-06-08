@@ -475,7 +475,7 @@ intersection_mesh <- function(mesh, poly) {
       mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 3], , drop = FALSE]) / 3
   ok_tri <-
     fm_evaluator(mesh, loc = loc_tri)$proj$ok &
-    fm_evaluator(mesh_poly, loc = loc_tri)$proj$ok
+      fm_evaluator(mesh_poly, loc = loc_tri)$proj$ok
   if (any(ok_tri)) {
     loc_subset <- unique(sort(as.vector(mesh_joint_cover$graph$tv[ok_tri, , drop = FALSE])))
     new_idx <- integer(mesh$n)

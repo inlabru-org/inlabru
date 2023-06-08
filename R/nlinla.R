@@ -141,14 +141,22 @@ bru_compute_linearisation.component <- function(cmp,
       }
       pred_eps <- evaluate_predictor(
         model,
-        state = if (symmetric_diffs) { state_eps } else list(state_eps),
+        state = if (symmetric_diffs) {
+          state_eps
+        } else {
+          list(state_eps)
+        },
         data =
           if (assume_rowwise) {
             data[row_subset, , drop = FALSE]
           } else {
             data
           },
-        effects = if (symmetric_diffs) { effects_eps } else list(effects_eps),
+        effects = if (symmetric_diffs) {
+          effects_eps
+        } else {
+          list(effects_eps)
+        },
         predictor = lhood_expr,
         format = "matrix"
       )

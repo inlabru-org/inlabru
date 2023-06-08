@@ -116,12 +116,12 @@ ibm_jacobian(mapper, input = list(main = loc, group = group.values))
 Blockwise aggregation can be implemented with a `bru_mapper_aggregate` mapper.
 
 ```{r, eval=FALSE}
-block_rescale <- "none", # one of "none", "count", "weights", "sum"
+block_rescale <- "none" # one of "none", "count", "weights", "sum"
 inla.spde.make.A(...,
-                 weights = weights,
-                 block = block,
-                 block.rescale = block_rescale,
-                 n.block = n_block
+  weights = weights,
+  block = block,
+  block.rescale = block_rescale,
+  n.block = n_block
 )
 ```
 Rescaling options:
