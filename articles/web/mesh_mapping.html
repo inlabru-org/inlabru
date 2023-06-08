@@ -241,13 +241,14 @@ useful</p>
 </h3>
 <p>Blockwise aggregation can be implemented with a
 <code>bru_mapper_aggregate</code> mapper.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>block_rescale <span class="ot">&lt;-</span> <span class="st">"none"</span>, <span class="co"># one of "none", "count", "weights", "sum"</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">inla.spde.make.A</span>(...,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">weights =</span> weights,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">block =</span> block,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">block.rescale =</span> block_rescale,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">n.block =</span> n_block</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">block_rescale</span> <span class="op">&lt;-</span> <span class="st">"none"</span> <span class="co"># one of "none", "count", "weights", "sum"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">inla.spde.make.A</a></span><span class="op">(</span><span class="va">...</span>,</span>
+<span>  weights <span class="op">=</span> <span class="va">weights</span>,</span>
+<span>  block <span class="op">=</span> <span class="va">block</span>,</span>
+<span>  block.rescale <span class="op">=</span> <span class="va">block_rescale</span>,</span>
+<span>  n.block <span class="op">=</span> <span class="va">n_block</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Rescaling options:</p>
 <ul>
 <li>

@@ -129,31 +129,34 @@ Use <code>unlist(fm_contains(...))</code> if the combined union is needed.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="bru_safe_sp.html">bru_safe_sp</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># Create a polygon and a mesh</span></span></span>
-<span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">SpatialPolygons</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">Polygons</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">Polygon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">0</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">50</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>ID <span class="op">=</span> <span class="fl">1</span></span></span>
-<span class="r-in"><span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>proj4string <span class="op">=</span> <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="st">"longlat_globe"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.create.html" class="external-link">inla.mesh.create</a></span><span class="op">(</span>globe <span class="op">=</span> <span class="fl">2</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="st">"sphere"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="bru_safe_sp.html">bru_safe_sp</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># Create a polygon and a mesh</span></span></span>
+<span class="r-in"><span>  <span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">SpatialPolygons</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">Polygons</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">Polygon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">0</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>      ID <span class="op">=</span> <span class="fl">1</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    proj4string <span class="op">=</span> <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="st">"longlat_globe"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.create.html" class="external-link">inla.mesh.create</a></span><span class="op">(</span>globe <span class="op">=</span> <span class="fl">2</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="st">"sphere"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## 3 vertices found in the polygon</span></span></span>
-<span class="r-in"><span><span class="fu">fm_contains</span><span class="op">(</span><span class="va">obj</span>, <span class="va">mesh</span>, type <span class="op">=</span> <span class="st">"vertex"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co">## 3 vertices found in the polygon</span></span></span>
+<span class="r-in"><span>  <span class="fu">fm_contains</span><span class="op">(</span><span class="va">obj</span>, <span class="va">mesh</span>, type <span class="op">=</span> <span class="st">"vertex"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## 3 triangles found in the polygon</span></span></span>
-<span class="r-in"><span><span class="fu">fm_contains</span><span class="op">(</span><span class="va">obj</span>, <span class="va">mesh</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co">## 3 triangles found in the polygon</span></span></span>
+<span class="r-in"><span>  <span class="fu">fm_contains</span><span class="op">(</span><span class="va">obj</span>, <span class="va">mesh</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Multiple transformations can lead to slightly different results due to edge cases</span></span></span>
-<span class="r-in"><span><span class="co">## 4 triangles found in the polygon</span></span></span>
-<span class="r-in"><span><span class="fu">fm_contains</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">obj</span>,</span></span>
-<span class="r-in"><span>  <span class="fu"><a href="fm_transform.html">fm_transform</a></span><span class="op">(</span><span class="va">mesh</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="st">"mollweide_norm"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co">## Multiple transformations can lead to slightly different results due to edge cases</span></span></span>
+<span class="r-in"><span>  <span class="co">## 4 triangles found in the polygon</span></span></span>
+<span class="r-in"><span>  <span class="fu">fm_contains</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">obj</span>,</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="fm_transform.html">fm_transform</a></span><span class="op">(</span><span class="va">mesh</span>, crs <span class="op">=</span> <span class="fu"><a href="fm_crs.html">fm_crs</a></span><span class="op">(</span><span class="st">"mollweide_norm"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 'sp' version &gt;= 1.6-0 detected, rgdal isn't installed, and evolution status is &lt; 2L.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> This may cause issues with some CRS handling code. To avoid this, use 'sp::set_evolution_status(2L)'</span>
