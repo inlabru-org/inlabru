@@ -1,4 +1,13 @@
-# @export
+#' @title Call stack utility functions
+#' @description
+#' Helper functions for displaying call stack information
+#'
+#' @param which TODO
+#' @param override TODO
+#'
+#' @export
+#' @name call-stack
+#' @rdname call-stack
 fm_caller_name <- function(which = 0L, override = NULL) {
   if (is.null(override)) {
     which <- -abs(which) - 1L
@@ -18,7 +27,14 @@ fm_caller_name <- function(which = 0L, override = NULL) {
   name
 }
 
-# @export
+#' @describeIn call-stack
+#'
+#' @param start TODO
+#' @param end TODO
+#' @param with_numbers TODO
+#' @param \dots TODO
+#'
+#' @export
 fm_call_stack <- function(start = 0L, end = 0L, with_numbers = TRUE, ...) {
   stack <- sys.calls()
   stack <- lapply(
@@ -65,25 +81,29 @@ fm_call_stack <- function(start = 0L, end = 0L, with_numbers = TRUE, ...) {
 }
 
 
-# Inspired by berryFunctions::tryStack
-# @export
-try_callstack <- function(expr) {
+#' @describeIn call-stack Inspired by `berryFunctions::tryStack`
+#'
+#' @param expr An `expression` to evaluate
+#'
+#' @export
+fm_try_callstack <- function(expr) {
   try_envir <- new.env()
   assign("error_stack", value = NULL, envir = try_envir)
   error_fun <- function(e) {
     # Get whole stack except the handlers
     stack <- fm_call_stack(start = 0, end = 2, with_numbers = FALSE)
-    # Remove the try_callstack tryCatch calls part(s),
-    # There are 6 of them. First find the try_callstack call (or multiple calls
+    # Remove the fm_try_callstack tryCatch calls part(s),
+    # There are 6 of them. First find the fm_try_callstack call (or multiple calls
     # for nested use, which should theoretically (almost) never happen,
     # since the inner call shouldn't fail!)
     self <- which(
-      vapply(stack, function(x) grepl("^try_callstack\\(", x), TRUE) |
-        vapply(stack, function(x) grepl("^inlabru:::try_callstack\\(", x), TRUE)
+      vapply(stack, function(x) grepl("^fm_try_callstack\\(", x), TRUE) |
+        vapply(stack, function(x) grepl("^inlabru::fm_try_callstack\\(", x), TRUE) |
+        vapply(stack, function(x) grepl("^inlabru:::fm_try_callstack\\(", x), TRUE)
     )
     for (idx in rev(self)) {
       stack <- stack[-(idx + seq_len(6))]
-      stack[idx] <- "try_callstack(...)"
+      stack[idx] <- "fm_try_callstack(...)"
     }
     stack <- paste0(seq_len(length(stack)), ": ", stack, collapse = "\n")
     assign("error_stack", value = stack, envir = try_envir)
