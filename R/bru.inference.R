@@ -2719,7 +2719,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         )
     }
 
-    result <- try_callstack(
+    result <- fmesher::fm_try_callstack(
       do.call(
         INLA::inla,
         inla.options.merged,
