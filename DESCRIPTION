@@ -55,6 +55,7 @@ Depends:
     stats
 Imports:
     dplyr,
+    fmesher (>= 0.0.8),
     lifecycle,
     magrittr,
     MatrixModels,
@@ -118,13 +119,7 @@ Collate:
     'dsmdata.tools.R'
     'effect.R'
     'environment.R'
-    'fmesher_crs.R'
-    'fmesher_evaluator.R'
-    'fmesher_fmesher.R'
-    'fmesher_integration.R'
-    'fmesher_sf_mesh.R'
-    'fmesher_sp_mesh.R'
-    'fmesher_utils.R'
+    'fmesher.R'
     'ggplot.R'
     'inla.R'
     'inlabru-package.R'
