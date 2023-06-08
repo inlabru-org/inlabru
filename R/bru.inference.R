@@ -1391,7 +1391,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' When seed != 0, overridden to "1:1"
 #' @param include Character vector of component labels that are needed by the
 #'   predictor expression; Default: NULL (include all components that are not
-#'   explicitly excluded)
+#'   explicitly excluded) if `newdata` is provided, otherwise `character(0)`.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
@@ -1569,7 +1569,7 @@ predict.bru <- function(object,
 #' When seed != 0, overridden to "1:1"
 #' @param include Character vector of component labels that are needed by the
 #'   predictor expression; Default: NULL (include all components that are not
-#'   explicitly excluded)
+#'   explicitly excluded) if `newdata` is provided, otherwise `character(0)`.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
@@ -1647,7 +1647,7 @@ generate.bru <- function(object,
       state = state,
       data = newdata,
       predictor = formula,
-      include = include,
+      include = if (is.null(newdata)) character(0) else include,
       exclude = exclude
     )
     vals

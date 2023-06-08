@@ -45,7 +45,7 @@ When seed != 0, overridden to "1:1"}
 
 \item{include}{Character vector of component labels that are needed by the
 predictor expression; Default: NULL (include all components that are not
-explicitly excluded)}
+explicitly excluded) if \code{newdata} is provided, otherwise \code{character(0)}.}
 
 \item{exclude}{Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list

@@ -279,7 +279,7 @@ ggplot() +
   coord_equal()
 
 distdf <- data.frame(distance = seq(0, 8, length = 100))
-dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
+dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig), include = "lsig")
 plot(dfun1)
 
 predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
@@ -352,7 +352,7 @@ dfit <- lgcp(
   formula = formula,
   options = list(bru_initial = list(lsig = 1, Intercept = 3))
 )
-detfun <- predict(dfit, distdf, ~ hn(distance, lsig))
+detfun <- predict(dfit, distdf, ~ hn(distance, lsig), include = "lsig")
 ```
 
 Half-normal next
@@ -366,7 +366,7 @@ dfit1 <- lgcp(
   domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
   formula = formula1
 )
-detfun1 <- predict(dfit1, distdf, ~ hr(distance, lsig))
+detfun1 <- predict(dfit1, distdf, ~ hr(distance, lsig), include = "lsig")
 ```
 
 Compare detection function models by DIC:

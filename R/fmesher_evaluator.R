@@ -151,6 +151,12 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
     c_names <- colnames(loc)
     c_names <- intersect(c_names, c("X", "Y", "Z"))
     loc <- loc[, c_names, drop = FALSE]
+  } else if (!is.matrix(loc)) {
+    warning(paste0(
+      "Unclear if the 'loc' class ('",
+      paste0(class(loc), collapse = "', '"),
+      "') is of a type we know how to handle."),
+      immediate. = TRUE)
   }
   if (loc_needs_normalisation) {
     loc <- loc / rowSums(loc^2)^0.5

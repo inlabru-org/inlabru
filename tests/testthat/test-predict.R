@@ -23,7 +23,7 @@ test_that("bru: factor component", {
   skip_if_not_installed("sn")
   xpost <- predict(
     fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ x_latent + fit$summary.random$z$mean[1],
     n.samples = 5,
     seed = 12345L
@@ -31,7 +31,7 @@ test_that("bru: factor component", {
 
   xpost2 <- predict(
     fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ {
       tmp <- c(
         a = x_latent,
@@ -45,7 +45,7 @@ test_that("bru: factor component", {
 
   xpost3 <- predict(
     fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ {
       tmp <- c(
         a = x_latent,
@@ -68,7 +68,7 @@ test_that("bru: factor component", {
 
 
   xipost <- generate(fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ c(
       Intercept = Intercept_latent,
       x = x_latent
@@ -85,7 +85,7 @@ test_that("bru: factor component", {
 
   xpost4 <- generate(
     fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ c(
       z_eval(c(1, 2, 11, 12, 12)),
       z_eval(c(1, 2, 11, 12, 12))
@@ -113,7 +113,7 @@ test_that("bru: factor component", {
 
   xpost5 <- predict(
     fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ z_eval(c(1, 11)) * Precision_for_z^0.5,
     n.samples = 500,
     seed = 12345L
