@@ -2005,9 +2005,9 @@ ibm_linear.bru_mapper_logsumexp <- function(mapper, input, state, ...) {
 
 #' @export
 #' @describeIn bru_mapper
-#' Create a pipe mapper, where, `mappers` is a list of mappers,
-#' where the evaluated output of each mapper is handed as the state to the next
-#' mapper..
+#' Create a pipe mapper, where `mappers` is a list of mappers,
+#' and the evaluated output of each mapper is handed as the state to the next
+#' mapper.
 #' The `input` format for the `ibm_eval` and `ibm_jacobian` methods is
 #' a list of inputs, one for each mapper.
 bru_mapper_pipe <- function(mappers, ...) {
