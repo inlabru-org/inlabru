@@ -2,8 +2,8 @@
 % Please edit documentation in R/local_testthat.R
 \name{local_testthat}
 \alias{local_testthat}
-\alias{local_testthat_assign}
-\alias{local_testthat_tolerances}
+\alias{local_bru_testthat_assign}
+\alias{local_bru_testthat_tolerances}
 \alias{local_bru_options_set}
 \alias{local_basic_intercept_testdata}
 \alias{local_basic_fixed_effect_testdata}
@@ -12,9 +12,9 @@
 \alias{local_bru_testthat_setup}
 \title{Unit test helpers}
 \usage{
-local_testthat_assign(x, values, envir = parent.frame())
+local_bru_testthat_assign(x, values, envir = parent.frame())
 
-local_testthat_tolerances(
+local_bru_testthat_tolerances(
   tolerances = c(1e-04, 0.01, 0.1),
   envir = parent.frame()
 )
@@ -63,11 +63,11 @@ Local helper functions for package unit tests
 }
 \section{Functions}{
 \itemize{
-\item \code{local_testthat_assign()}: Assign local variable. Useful for easy cleanup
+\item \code{local_bru_testthat_assign()}: Assign local variable. Useful for easy cleanup
 of global workspace with \code{withr::deferred_run()} when running tests
 interactively.
 
-\item \code{local_testthat_tolerances()}: Assign test tolerances
+\item \code{local_bru_testthat_tolerances()}: Assign test tolerances
 Assign local tolerance variables. Useful for easy cleanup
 of global workspace with \code{withr::deferred_run()} when running tests
 interactively.

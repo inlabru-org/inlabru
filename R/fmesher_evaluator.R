@@ -116,53 +116,21 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
   stopifnot(inherits(mesh, "inla.mesh"))
 
   # Support INLA <= 22.11.27 by converting globes to spheres
-  # TODO: Handle the > 22.11.27 more efficiently
-  loc_needs_normalisation <- FALSE
-  if (!fm_crs_is_null(mesh$crs)) {
-    if (fm_crs_is_geocent(mesh$crs)) {
-      crs.sphere <- fm_CRS("sphere")
-      if (!fm_identical_CRS(mesh$crs, crs.sphere)) {
+  if (getNamespaceVersion("INLA") <= "22.11.27") {
+    if (fm_crs_is_geocent(fm_crs(mesh))) {
+      crs.sphere <- fm_crs("sphere")
+      if (!fm_identical_CRS(fm_crs(mesh), crs.sphere)) {
         ## Convert the mesh to a perfect sphere.
         mesh <- fm_transform(mesh, crs = crs.sphere)
       }
-      if (!is.matrix(loc)) {
-        if (!fm_identical_CRS(crs, crs.sphere)) {
-          loc <- fm_transform(loc, crs = crs.sphere, crs0 = crs)
-        }
-      } else {
-        if (fm_crs_is_null(crs)) {
-          loc_needs_normalisation <- TRUE
-        } else {
-          loc <- fm_transform(loc, crs = crs.sphere, crs0 = crs)
-        }
-      }
-    } else if (!fm_identical_CRS(crs, mesh$crs)) {
-      mesh <- fm_transform(mesh, crs = mesh$crs, crs0 = crs, passthrough = TRUE)
     }
-  } else if (identical(mesh$manifold, "S2")) {
-    mesh$loc <- mesh$loc / rowSums(mesh$loc^2)^0.5
-    loc_needs_normalisation <- TRUE
   }
+  loc <- fm_onto_mesh(mesh, loc, crs = crs)
 
-  if (inherits(loc, c("SpatialPoints", "SpatialPointsDataFrame"))) {
-    loc <- sp::coordinates(loc)
-  } else if (inherits(loc, c("sf", "sfc", "sfg"))) {
-    loc <- sf::st_coordinates(loc)
-    c_names <- colnames(loc)
-    c_names <- intersect(c_names, c("X", "Y", "Z"))
-    loc <- loc[, c_names, drop = FALSE]
-  } else if (!is.matrix(loc)) {
-    warning(
-      paste0(
-        "Unclear if the 'loc' class ('",
-        paste0(class(loc), collapse = "', '"),
-        "') is of a type we know how to handle."
-      ),
-      immediate. = TRUE
-    )
-  }
-  if (loc_needs_normalisation) {
-    loc <- loc / rowSums(loc^2)^0.5
+  # Avoid sphere accuracy issues by scaling to unit sphere
+  scale <- 1
+  if (identical(mesh$manifold, "S2")) {
+    scale <- 1 / mean(rowSums(mesh$loc^2)^0.5)
   }
 
   jj <-
@@ -170,10 +138,11 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
       nrow = nrow(loc),
       ncol = ncol(loc)
     )) == 0)
-  smorg <- (INLA::inla.fmesher.smorg(mesh$loc,
+  smorg <- INLA::inla.fmesher.smorg(
+    mesh$loc * scale,
     mesh$graph$tv,
-    points2mesh = loc[jj, , drop = FALSE]
-  ))
+    points2mesh = loc[jj, , drop = FALSE] * scale
+  )
   ti <- matrix(0L, nrow(loc), 1)
   b <- matrix(0, nrow(loc), 3)
   ti[jj, 1L] <- smorg$p2m.t

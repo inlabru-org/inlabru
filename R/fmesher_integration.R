@@ -1,3 +1,83 @@
+#' Split lines at mesh edges
+#'
+#' @aliases split_lines
+#' @export
+#' @param mesh An inla.mesh object
+#' @param sp Start points of lines
+#' @param ep End points of lines
+#' @param filter.zero.length Filter out segments with zero length? (Bool)
+#' @param ... argments to int.quadrature
+#' @return List of start and end points resulting from splitting the given lines
+#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
+#' @keywords internal
+split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
+  idx <- seq_len(NROW(sp))
+  if (NROW(sp) > 0) {
+    # Filter out segments not on the mesh
+    t1 <- INLA::inla.fmesher.smorg(
+      loc = mesh$loc, tv = mesh$graph$tv,
+      points2mesh = as.matrix(data.frame(sp, z = 0))
+    )$p2m.t
+    t2 <- INLA::inla.fmesher.smorg(
+      loc = mesh$loc, tv = mesh$graph$tv,
+      points2mesh = as.matrix(data.frame(ep, z = 0))
+    )$p2m.t
+    # if (any(t1==0) | any(t2==0)) { warning("points outside boundary! filtering...")}
+    sp <- sp[!((t1 == 0) | (t2 == 0)), , drop = FALSE]
+    ep <- ep[!((t1 == 0) | (t2 == 0)), , drop = FALSE]
+    idx <- idx[!((t1 == 0) | (t2 == 0))]
+  }
+
+  if (NROW(sp) == 0) {
+    return(list(
+      sp = sp, ep = ep,
+      split.origin = NULL,
+      idx = idx,
+      split.loc = NULL
+    ))
+  }
+
+  loc <- as.matrix(rbind(sp, ep))
+
+  # Split the segments into parts
+  if (NCOL(loc) == 2) {
+    loc <- cbind(loc, rep(0, NROW(loc)))
+  }
+  np <- dim(sp)[1]
+  sp.idx <- t(rbind(seq_len(np), np + seq_len(np)))
+  splt <- INLA::inla.fmesher.smorg(
+    mesh$loc, mesh$graph$tv,
+    splitlines = list(loc = loc, idx = sp.idx)
+  )
+  # plot(data$mesh)
+  # points(loc)
+  # points(splt$split.loc,col="blue)
+
+  # Start points of new segments
+  sp <- splt$split.loc[splt$split.idx[, 1], seq_len(dim(sp)[2]), drop = FALSE]
+  # End points of new segments
+  ep <- splt$split.loc[splt$split.idx[, 2], seq_len(dim(ep)[2]), drop = FALSE]
+  idx <- idx[splt$split.idx[, 1]]
+  origin <- splt$split.origin
+
+  # Filter out zero length segments
+  if (filter.zero.length) {
+    sl <- apply((ep - sp)^2, MARGIN = 1, sum)
+    sp <- sp[!(sl == 0), , drop = FALSE]
+    ep <- ep[!(sl == 0), , drop = FALSE]
+    origin <- origin[!(sl == 0)]
+    idx <- idx[!(sl == 0)]
+  }
+
+  return(list(
+    sp = sp, ep = ep,
+    split.origin = origin,
+    idx = idx,
+    split.loc = splt$split.loc
+  ))
+}
+
+
 #' @title (Blockwise) cross product of integration points
 #'
 #' @description
@@ -367,8 +447,8 @@ fm_int.list <- function(domain, samplers = NULL, ...) {
 
   if (any(sp_samplers) && !any(sf_samplers)) {
     ips <- sf::as_Spatial(ips)
-    cnames <- coordnames(ips)
-    coordnames(ips) <- c("x", "y", "z")[seq_along(cnames)]
+    cnames <- sp::coordnames(ips)
+    sp::coordnames(ips) <- c("x", "y", "z")[seq_along(cnames)]
   }
 
   ips
@@ -697,7 +777,8 @@ fm_vertex_projection <- function(points, mesh) {
     points$.block <- rep(1L, n_points)
   }
 
-  ok <- tri > 0
+  ok <- !is.na(tri)
+  ok[ok] <- (tri[ok] > 0)
   if (any(!ok)) {
     warning("Some integration points were outside the mesh; check your coordinate systems.")
   }
@@ -720,12 +801,12 @@ fm_vertex_projection <- function(points, mesh) {
 
   if (inherits(points, "Spatial")) {
     ret <- sp::SpatialPointsDataFrame(
-      coords[, seq_along(coordnames(points)), drop = FALSE],
+      coords[, seq_along(sp::coordnames(points)), drop = FALSE],
       proj4string = fm_CRS(mesh),
       data = data,
       match.ID = FALSE
     )
-    coordnames(ret) <- coordnames(points)
+    sp::coordnames(ret) <- sp::coordnames(points)
   } else if (inherits(points, "sf")) {
     colnames(coords) <- c("X", "Y", "Z")[seq_len(ncol(coords))]
     d <- length(intersect(colnames(sf::st_coordinates(points)), c("X", "Y", "Z")))
@@ -1390,8 +1471,8 @@ fm_int.inla.mesh <- function(domain,
       }
     } else if ((format == "sp") && !inherits(ips, "Spatial")) {
       ips <- as(ips, "Spatial")
-      cnames <- coordnames(ips)
-      coordnames(ips) <- c("x", "y", "z")[seq_along(cnames)]
+      cnames <- sp::coordnames(ips)
+      sp::coordnames(ips) <- c("x", "y", "z")[seq_along(cnames)]
     }
   }
 

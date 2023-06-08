@@ -12,7 +12,7 @@ NULL
 #' @describeIn local_testthat Assign local variable. Useful for easy cleanup
 #' of global workspace with `withr::deferred_run()` when running tests
 #' interactively.
-local_testthat_assign <- function(x, values, envir = parent.frame()) {
+local_bru_testthat_assign <- function(x, values, envir = parent.frame()) {
   exist <- exists(x, envir = envir)
   if (exist) {
     old_value <- envir[[x]]
@@ -29,11 +29,11 @@ local_testthat_assign <- function(x, values, envir = parent.frame()) {
 #' Assign local tolerance variables. Useful for easy cleanup
 #' of global workspace with `withr::deferred_run()` when running tests
 #' interactively.
-local_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
-                                      envir = parent.frame()) {
-  local_testthat_assign("lowtol", tolerances[1], envir = envir)
-  local_testthat_assign("midtol", tolerances[2], envir = envir)
-  local_testthat_assign("hitol", tolerances[3], envir = envir)
+local_bru_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
+                                          envir = parent.frame()) {
+  local_bru_testthat_assign("lowtol", tolerances[1], envir = envir)
+  local_bru_testthat_assign("midtol", tolerances[2], envir = envir)
+  local_bru_testthat_assign("hitol", tolerances[3], envir = envir)
 }
 
 
@@ -189,7 +189,7 @@ local_bru_safe_inla <- function(multicore = FALSE,
 #' should be called inside each test that relies on INLA.
 #' @export
 local_bru_testthat_setup <- function(envir = parent.frame()) {
-  local_testthat_tolerances(envir = envir)
+  local_bru_testthat_tolerances(envir = envir)
   local_bru_options_set(
     # Need to specify specific smtp to ensure consistent tests.
     # To specifically test pardiso, need to override locally
@@ -205,4 +205,6 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
     )
     bru_safe_sp(quietly = TRUE, force = TRUE)
   }
+
+  invisible()
 }
