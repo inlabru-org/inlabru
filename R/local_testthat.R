@@ -156,6 +156,7 @@ local_bru_safe_inla <- function(multicore = FALSE,
       INLA::inla.setOption(num.threads = old_threads),
       envir
     )
+
     # Save the fmesher.timeout option so it can be restored
     old_fmesher_timeout <- INLA::inla.getOption("fmesher.timeout")
     withr::defer(
@@ -163,6 +164,16 @@ local_bru_safe_inla <- function(multicore = FALSE,
       envir
     )
     INLA::inla.setOption(fmesher.timeout = 30)
+
+    if ("fmesher.evolution" %in% names(INLA::inla.getOption())) {
+      # Save the fmesher.evolution option so it can be restored
+      old_fmesher_evolution <- INLA::inla.getOption("fmesher.evolution")
+      withr::defer(
+        INLA::inla.setOption(fmesher.evolution = old_fmesher_evolution),
+        envir
+      )
+      INLA::inla.setOption(fmesher.evolution = max(old_fmesher_evolution, 2L))
+    }
   }
   if (!multicore) {
     local_bru_options_set(num.threads = "1:1", envir = envir)

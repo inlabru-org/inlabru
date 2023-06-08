@@ -119,6 +119,7 @@ fm_crs_is_null <- function(crs) {
 #' @title Handling CRS/WKT
 #' @description Get and set CRS object or WKT string properties.
 #' @export
+#' @name fm_crs_wkt
 #' @rdname fm_crs_wkt
 
 fm_wkt_is_geocent <- function(wkt) {
@@ -1261,7 +1262,7 @@ fm_wkt_tree_set_item <- function(x, item_tree, duplicate = 1) {
 #' @export
 #' @rdname fm_CRSargs
 fm_CRS_as_list <- function(x, ...) {
-  fm_CRSargs_as_list(fm_CRSargs(x))
+  fm_CRSargs_as_list(fm_proj4string(x))
 }
 
 
@@ -1276,7 +1277,7 @@ fm_list_as_CRS <- function(x, ...) {
 #' Wrappers for `sp::CRS` and `inla.CRS` objects to handle the
 #' coordinate reference system argument string.
 #' These methods should no longer be used with PROJ6/rgdal3;
-#' see [fm_wkt()] for a new approach.
+#' see [fm_wkt()] and [fm_proj4string()] for a new approach.
 #'
 #' @aliases fm_CRSargs fm_CRS_as_list fm_CRSargs_as_list fm_list_as_CRS
 #' fm_list_as_CRSargs
@@ -1299,26 +1300,18 @@ fm_list_as_CRS <- function(x, ...) {
 #' @examples
 #'
 #' crs0 <- fm_CRS("longlat")
-#' p4s <- fm_CRSargs(crs0)
+#' p4s <- fm_proj4string(crs0)
 #' lst <- fm_CRSargs_as_list(p4s)
 #' crs1 <- fm_list_as_CRS(lst)
 #' lst$a <- 2
 #' crs2 <- fm_CRS(p4s, args = lst)
-#' print(fm_CRSargs(crs0))
-#' print(fm_CRSargs(crs1))
-#' print(fm_CRSargs(crs2))
+#' print(fm_proj4string(crs0))
+#' print(fm_proj4string(crs1))
+#' print(fm_proj4string(crs2))
 fm_CRSargs <- function(x, ...) {
-  # TODO: deprecate_warn
-  lifecycle::deprecate_warn("2.7.1", "fm_CRSargs()", details = "No replacement available.")
+  lifecycle::deprecate_warn("2.7.0.9012", "fm_CRSargs()", "fm_proj4string()")
 
-  crs <- fm_crs(x, crsonly = TRUE)
-  if (is.na(crs)) {
-    return(NA_character_)
-  }
-  if (!identical(substr(crs$input, 1, 6), "+proj=")) {
-    stop("proj4 CRSargs not found in the crs object.")
-  }
-  crs$input
+  fm_proj4string(x)
 }
 
 
@@ -1373,18 +1366,28 @@ fm_CRSargs_as_list <- function(x, ...) {
 
 # fm_wkt ----
 
-#' @return For `fm_wkt`, WKT2 string.
+#' @describeIn fm_crs_wkt Returns a WKT2 string, for any input supported by [fm_crs()].
 #' @export
-#' @rdname fm_crs_wkt
 
 fm_wkt <- function(crs) {
   fm_crs(crs, crsonly = TRUE)$wkt
 }
 
+#' @describeIn fm_crs_wkt Returns a proj4 string, for any input supported by [fm_crs()].
+#' @export
+fm_proj4string <- function(crs) {
+  fm_crs(crs, crsonly = TRUE)$proj4string
+}
+
 #' @export
 #' @rdname fm_crs_wkt
 
-fm_crs_get_wkt <- fm_wkt
+fm_crs_get_wkt <- function(...) {
+  lifecycle::deprecate_warn("2.7.0.9012",
+                            "fm_crs_get_wkt()",
+                            "fm_wkt()")
+  fm_wkt(...)
+}
 
 
 fm_rotmat3213 <- function(rot) {

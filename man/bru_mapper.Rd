@@ -240,9 +240,9 @@ shifting the state blockwise with
 \code{(state-log_weights)[block] - max((state-log_weights)[block])},
 and shifting the result back afterwards.
 
-\item \code{bru_mapper_pipe()}: Create a pipe mapper, where, \code{mappers} is a list of mappers,
-where the evaluated output of each mapper is handed as the state to the next
-mapper..
+\item \code{bru_mapper_pipe()}: Create a pipe mapper, where \code{mappers} is a list of mappers,
+and the evaluated output of each mapper is handed as the state to the next
+mapper.
 The \code{input} format for the \code{ibm_eval} and \code{ibm_jacobian} methods is
 a list of inputs, one for each mapper.
 

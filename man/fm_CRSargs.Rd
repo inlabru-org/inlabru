@@ -43,19 +43,19 @@ For \code{fm_CRSargs_as_list()}, a list of name=value pairs from CRS proj4 strin
 Wrappers for \code{sp::CRS} and \code{inla.CRS} objects to handle the
 coordinate reference system argument string.
 These methods should no longer be used with PROJ6/rgdal3;
-see \code{\link[=fm_wkt]{fm_wkt()}} for a new approach.
+see \code{\link[=fm_wkt]{fm_wkt()}} and \code{\link[=fm_proj4string]{fm_proj4string()}} for a new approach.
 }
 \examples{
 
 crs0 <- fm_CRS("longlat")
-p4s <- fm_CRSargs(crs0)
+p4s <- fm_proj4string(crs0)
 lst <- fm_CRSargs_as_list(p4s)
 crs1 <- fm_list_as_CRS(lst)
 lst$a <- 2
 crs2 <- fm_CRS(p4s, args = lst)
-print(fm_CRSargs(crs0))
-print(fm_CRSargs(crs1))
-print(fm_CRSargs(crs2))
+print(fm_proj4string(crs0))
+print(fm_proj4string(crs1))
+print(fm_proj4string(crs2))
 }
 \seealso{
 \code{\link[=fm_CRS]{fm_CRS()}}
