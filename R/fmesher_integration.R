@@ -749,14 +749,19 @@ fm_int.inla.mesh.1d <- function(domain, samplers = NULL, name = "x", int.args = 
 
 # inla.mesh integration ####
 
-# Project integration points to mesh vertices
-#
-# @export
-# @param points A `SpatialPointsDataFrame`, `sf`, lor `list` object
-# @param mesh An `inla.mesh` object
-# @return `SpatialPointsDataFrame`, `sf`m, or `list` of mesh vertices with
-# projected data attached
-# @importFrom rlang .data
+#' @title Project integration points to mesh vertices
+#'
+#' @description
+#' Compute information for assigning points to the vertices of the covering triangle
+#'
+#' @export
+#' @param points A `SpatialPointsDataFrame`, `sf`, or `list` object
+#' @param mesh An `inla.mesh` object
+#' @return `SpatialPointsDataFrame`, `sf`, or `list` of mesh vertices with
+#' projected data attached
+#' @importFrom rlang .data
+#' @keywords internal
+#' @export
 
 fm_vertex_projection <- function(points, mesh) {
   if (inherits(points, "sf") ||
