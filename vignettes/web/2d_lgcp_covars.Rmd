@@ -633,17 +633,23 @@ ggplot(data = Nest.e) +
 ### Non-spatial evaluation of the covariate effect
 
 The previous examples of posterior prediction focused on spatial prediction.
-From `inlabru` version 2.2.8, a feauture is available for overriding the
+From `inlabru` version 2.2.8, a feature is available for overriding the
 component input value specification from the component definition. Each model
 component can be evaluated directly, for arbitrary values by functions named by
 adding the suffix `_eval` to the end of the component name in the predictor
-expression. Since the elevation effect in this model is linear, the resulting plot isn't very interesting, but the same method can be applied to non-linear effects as well, and combined into general R expressions: 
+expression, and disabling normal component evaluation for all components with
+`include = character(0)`
+(since we're both bypassing the normal input to the `elev` component, and not
+supplying data for the other components). Since the elevation effect in this
+model is linear, the resulting plot isn't very interesting, but the same method
+can be applied to non-linear effects as well, and combined into general R expressions: 
 
 ```{r}
 elev.pred <- predict(
   efit,
   data.frame(elevation = seq(0, 100, length.out = 1000)),
-  formula = ~ elev_eval(elevation)
+  formula = ~ elev_eval(elevation),
+  include = character(0)
 )
 
 ggplot(elev.pred) +
