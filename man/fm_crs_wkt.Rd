@@ -98,7 +98,7 @@ fm_wkt(crs)
 
 fm_proj4string(crs)
 
-fm_crs_get_wkt(...)
+fm_crs_get_wkt(crs)
 }
 \arguments{
 \item{wkt}{A WKT2 character string}

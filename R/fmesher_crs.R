@@ -1382,11 +1382,11 @@ fm_proj4string <- function(crs) {
 #' @export
 #' @rdname fm_crs_wkt
 
-fm_crs_get_wkt <- function(...) {
+fm_crs_get_wkt <- function(crs) {
   lifecycle::deprecate_warn("2.7.0.9012",
                             "fm_crs_get_wkt()",
                             "fm_wkt()")
-  fm_wkt(...)
+  fm_wkt(crs)
 }
 
 
