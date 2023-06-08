@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9011</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9012</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -325,9 +325,9 @@ To avoid numerical overflow, it uses the common method of internally
 shifting the state blockwise with
 <code>(state-log_weights)[block] - max((state-log_weights)[block])</code>,
 and shifting the result back afterwards.</p></li>
-<li><p><code>bru_mapper_pipe()</code>: Create a pipe mapper, where, <code>mappers</code> is a list of mappers,
-where the evaluated output of each mapper is handed as the state to the next
-mapper..
+<li><p><code>bru_mapper_pipe()</code>: Create a pipe mapper, where <code>mappers</code> is a list of mappers,
+and the evaluated output of each mapper is handed as the state to the next
+mapper.
 The <code>input</code> format for the <code>ibm_eval</code> and <code>ibm_jacobian</code> methods is
 a list of inputs, one for each mapper.</p></li>
 <li><p><code>bru_mapper_multi()</code>: Constructs a rowwise Kronecker product mapping</p></li>

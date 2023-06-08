@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9011</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9012</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -154,8 +154,22 @@ spatial points to a mesh:</p>
 <span><span class="co">#&gt; [3,] . .          0.11935641 0.1416259 .          .         . . 0.7390177</span></span>
 <span><span class="co">#&gt; [4,] . .          .          0.3522410 0.08180227 .         . . 0.5659568</span></span>
 <span><span class="co">#&gt; [5,] . .          .          .         0.19233634 0.2974006 . . 0.5102631</span></span></code></pre></div>
-<p>With a <code>bru_mapper</code>, this becomes</p>
+<p>A basic conversion of this becomes</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">A.loc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fm_evaluate.html">fm_evaluator</a></span><span class="op">(</span><span class="va">mesh</span>, loc <span class="op">=</span> <span class="va">loc</span><span class="op">)</span><span class="op">$</span><span class="va">proj</span><span class="op">$</span><span class="va">A</span></span>
+<span><span class="va">A.loc</span></span>
+<span><span class="co">#&gt; 5 x 9 sparse Matrix of class "dgCMatrix"</span></span>
+<span><span class="co">#&gt;                                                                          </span></span>
+<span><span class="co">#&gt; [1,] . 0.29227293 0.09984048 .         .          .         . . 0.6078866</span></span>
+<span><span class="co">#&gt; [2,] . 0.02324195 0.36614606 .         .          .         . . 0.6106120</span></span>
+<span><span class="co">#&gt; [3,] . .          0.11935641 0.1416259 .          .         . . 0.7390177</span></span>
+<span><span class="co">#&gt; [4,] . .          .          0.3522410 0.08180227 .         . . 0.5659568</span></span>
+<span><span class="co">#&gt; [5,] . .          .          .         0.19233634 0.2974006 . . 0.5102631</span></span></code></pre></div>
+<p>but this is limited to just the basic case of evaluating on only a
+mesh.</p>
+<p>With a <code>bru_mapper</code>, this becomes the more generally
+useful</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span>
 <span><span class="va">A.loc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru_mapper_generics.html">ibm_jacobian</a></span><span class="op">(</span><span class="va">mapper</span>, input <span class="op">=</span> <span class="va">loc</span><span class="op">)</span></span>
 <span><span class="va">A.loc</span></span>
@@ -169,7 +183,7 @@ spatial points to a mesh:</p>
 <div class="section level3">
 <h3 id="mapping-with-a-precomputed-location-mapping">Mapping with a precomputed location mapping<a class="anchor" aria-label="anchor" href="#mapping-with-a-precomputed-location-mapping"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">inla.spde.make.A</a></span><span class="op">(</span>A.loc <span class="op">=</span> <span class="va">A.loc</span>, index <span class="op">=</span> <span class="va">index</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 6 x 9 sparse Matrix of class "dgCMatrix"</span></span>
@@ -213,7 +227,7 @@ spatial points to a mesh:</p>
 <div class="section level3">
 <h3 id="group-mapping-with-a-group-mesh">Group mapping with a group mesh<a class="anchor" aria-label="anchor" href="#group-mapping-with-a-group-mesh"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">inla.spde.make.A</a></span><span class="op">(</span><span class="va">...</span>, group <span class="op">=</span> <span class="va">group.values</span>, group.mesh <span class="op">=</span> <span class="va">group.mesh</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -225,16 +239,37 @@ spatial points to a mesh:</p>
 <div class="section level3">
 <h3 id="blockwise-aggregation">Blockwise aggregation<a class="anchor" aria-label="anchor" href="#blockwise-aggregation"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">block_rescale</span> <span class="op">&lt;-</span> <span class="co"># one of "none", "count", "weights", "sum"</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">inla.spde.make.A</a></span><span class="op">(</span><span class="va">...</span>,</span>
-<span>    weights <span class="op">=</span> <span class="va">weights</span>,</span>
-<span>    block <span class="op">=</span> <span class="va">block</span>,</span>
-<span>    block.rescale <span class="op">=</span> <span class="va">block_rescale</span>,</span>
-<span>    n.block <span class="op">=</span> <span class="va">n_block</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru_mapper.html">bru_mapper_pipe</a></span><span class="op">(</span></span>
+<p>Blockwise aggregation can be implemented with a
+<code>bru_mapper_aggregate</code> mapper.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>block_rescale <span class="ot">&lt;-</span> <span class="st">"none"</span>, <span class="co"># one of "none", "count", "weights", "sum"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">inla.spde.make.A</span>(...,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">weights =</span> weights,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">block =</span> block,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">block.rescale =</span> block_rescale,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">n.block =</span> n_block</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Rescaling options:</p>
+<ul>
+<li>
+<code>block_rescale = "none"</code> corresponds to
+<code>rescale = FALSE</code>
+</li>
+<li>
+<code>block_rescale = "count"</code> corresponds to
+<code>rescale = TRUE</code> and providing no <code>weights</code>, as
+that is interpreted as all weights being <code>1</code>, so rescaling by
+the sum of the weights is equivalent to dividing by the number of
+elements in each block.</li>
+<li>
+<code>block_rescale = "weights"</code> corresponds to
+<code>rescale = TRUE</code>
+</li>
+<li>
+<code>block_rescale = "sum"</code> is not supported by the
+aggregation mapper.</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bru_mapper.html">bru_mapper_pipe</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    main <span class="op">=</span> <span class="fu"><a href="../../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>main <span class="op">=</span> <span class="fu"><a href="../../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    block <span class="op">=</span> <span class="fu"><a href="../../reference/bru_mapper.html">bru_mapper_aggregate</a></span><span class="op">(</span></span>
@@ -254,7 +289,7 @@ spatial points to a mesh:</p>
 <div class="section level2">
 <h2 id="inla-spde-make-index">inla.spde.make.index<a class="anchor" aria-label="anchor" href="#inla-spde-make-index"></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ngroup</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
 <span><span class="va">nrepl</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span></span>
