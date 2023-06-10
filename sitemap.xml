@@ -238,6 +238,9 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_as.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_centroids.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_contains.html</loc>
   </url>
   <url>
@@ -268,13 +271,22 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_int_multi_sampler.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_is_within.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_pixels.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_store_points.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_transform.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_vertex_projection.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_vertices.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/generate.html</loc>
@@ -503,9 +515,6 @@
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/tsplit.inla.mesh.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/vertices.inla.mesh.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/wkt_tree.html</loc>

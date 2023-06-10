@@ -75,7 +75,7 @@ future version."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Deprecated functions in inlabru</h1>
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/bru.spatial.R" class="external-link"><code>R/bru.spatial.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/environment.R" class="external-link"><code>R/environment.R</code></a>, and 3 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/bru.spatial.R" class="external-link"><code>R/bru.spatial.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/environment.R" class="external-link"><code>R/environment.R</code></a>, and 4 more</small>
       <div class="d-none name"><code>inlabru-deprecated.Rd</code></div>
     </div>
 
@@ -158,6 +158,8 @@ future version.</p>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_collect</span></span>
 <span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">vertices.inla.mesh</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">eval_SpatialDF</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -260,6 +262,9 @@ coordinates.</p></li>
 <li><p><code>ibm_amatrix(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
 <li><p><code>ibm_amatrix(bru_mapper_multi)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
 <li><p><code>ibm_amatrix(bru_mapper_collect)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
+<li><p><code>vertices.inla.mesh()</code>: Extract vertex locations from an <code>inla.mesh</code>.
+Converts the vertices of an <code>inla.mesh</code> object into a <code>SpatialPointsDataFrame</code>.
+Deprecated in favour of <code><a href="fm_vertices.html">fm_vertices()</a></code></p></li>
 <li><p><code>eval_SpatialDF()</code>: Replaced by the generic <code><a href="eval_spatial.html">eval_spatial()</a></code></p></li>
 </ul></div>
     <div class="section level2">
