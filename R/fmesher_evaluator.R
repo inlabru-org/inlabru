@@ -2,7 +2,8 @@
 
 #' @title Methods for projecting to/from an inla.mesh
 #'
-#' @description Calculate a lattice projection to/from an `inla.mesh`
+#' @description Calculate evaluation information and/or evaluate a function
+#' defined on an `inla.mesh` or `inla.mesh.1d` object.
 #'
 #' @param mesh An `inla.mesh` or `inla.mesh.1d` object.
 #' @param loc Projection locations.  Can be a matrix, `SpatialPoints`,
@@ -21,11 +22,6 @@
 #' @param crs An optional CRS or inla.CRS object associated with `loc`
 #' and/or `lattice`.
 #' @param \dots Additional arguments passed on to methods.
-#' @return For `fm_evaluate(mesh, ...)`, a list with projection
-#' information.  For `fm_evaluator(mesh, ...)`, an
-#' `fm_evaluator` object.  For `fm_evaluate(projector,
-#' field, ...)`, a field projected from the mesh onto the locations given by
-#' the projector object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @seealso `inla.mesh`, `inla.mesh.1d`,
 #' `inla.mesh.lattice`
@@ -44,6 +40,15 @@
 #'   plot(mesh, rgl = TRUE, col = field, draw.edges = FALSE, draw.vertices = FALSE)
 #' }
 #' }
+#'
+#' @name fm_evaluate
+#' @rdname fm_evaluate
+NULL
+
+#' @describeIn fm_evaluate
+#' Returns the field function evaluated at the locations determined by an
+#' `fm_evaluator` object. `fm_evaluate(mesh, field = field, ...)` is a
+#' shortcut to `fm_evaluate(fm_evaluator(mesh, ...), field = field)`.
 #' @export fm_evaluate
 fm_evaluate <- function(...) {
   UseMethod("fm_evaluate")
@@ -52,7 +57,10 @@ fm_evaluate <- function(...) {
 #' @export
 #' @rdname fm_evaluate
 fm_evaluate.inla.mesh <- function(mesh, field, ...) {
-  stopifnot(!missing(field) && !is.null(field))
+  lifecycle::deprecate_stop(
+    "2.8.0",
+    "fm_evaluate(field = ' must not be missing or NULL.')",
+    "fm_evaluator()")
 
   proj <- fm_evaluator(mesh, ...)
   fm_evaluate(proj, field = field)
@@ -103,8 +111,13 @@ fm_evaluate.fm_evaluator <-
   }
 
 
+#' @describeIn fm_evaluate
+#' Returns the and `fm_evaluator` list object with evaluation information.
+#' The `proj` element contains a mapping matrix `A` and a logical vector `ok`,
+#' that indicates which locations were mappable to the input mesh. For `inla.mesh`
+#' input, `proj` also contains a matrix `bary` and vector `t`, with the
+#' barycentric coordinates within the triangle each input location falls in.
 #' @export
-#' @rdname fm_evaluate
 fm_evaluator <- function(...) {
   UseMethod("fm_evaluator")
 }
@@ -179,8 +192,9 @@ fm_evaluator_inla_mesh_1d <- function(mesh, loc, ...) {
 
 
 
+#' @describeIn fm_evaluate
+#' Creates an `inla.mesh.lattice`, by default covering the input mesh.
 #' @export
-#' @rdname fm_evaluate
 fm_evaluator_lattice <- function(mesh,
                                  xlim = NULL,
                                  ylim = NULL,
