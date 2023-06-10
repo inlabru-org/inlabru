@@ -1,106 +1,114 @@
 #' @import fmesher
 #'
-#' @export "fm_crs_oblique<-"
+#' @export
 fmesher::`fm_crs_oblique<-`
-#' @export "fm_ellipsoid_radius<-"
+#' @export
 fmesher::`fm_ellipsoid_radius<-`
-#' @export "fm_length_unit<-"
+#' @export
 fmesher::`fm_length_unit<-`
-#' @export fm_CRS
+#' @export
 fmesher::fm_CRS
-#' @export fm_CRS_as_list
+#' @export
 fmesher::fm_CRS_as_list
-#' @export fm_CRSargs
+#' @export
 fmesher::fm_CRSargs
-#' @export fm_CRSargs_as_list
+#' @export
 fmesher::fm_CRSargs_as_list
-#' @export fm_as_inla_mesh
+#' @export
 fmesher::fm_as_inla_mesh
-#' @export fm_as_inla_mesh_segment
+#' @export
 fmesher::fm_as_inla_mesh_segment
-#' @export fm_as_sfc
+#' @export
 fmesher::fm_as_sfc
-#' @export fm_as_sp_crs
+#' @export
 fmesher::fm_as_sp_crs
-#' @export fm_contains
+#' @export
 fmesher::fm_contains
-#' @export fm_cprod
+#' @export
 fmesher::fm_cprod
-#' @export fm_crs
+#' @export
 fmesher::fm_crs
-#' @export fm_crs_get_ellipsoid_radius
+#' @export
 fmesher::fm_crs_get_ellipsoid_radius
-#' @export fm_crs_get_lengthunit
+#' @export
 fmesher::fm_crs_get_lengthunit
-#' @export fm_crs_get_wkt
+#' @export
 fmesher::fm_crs_get_wkt
-#' @export fm_crs_is_geocent
+#' @export
 fmesher::fm_crs_is_geocent
-#' @export fm_crs_oblique
+#' @export
 fmesher::fm_crs_oblique
-#' @export fm_crs_set_ellipsoid_radius
+#' @export
 fmesher::fm_crs_set_ellipsoid_radius
-#' @export fm_crs_set_lengthunit
+#' @export
 fmesher::fm_crs_set_lengthunit
-#' @export fm_ellipsoid_radius
+#' @export
 fmesher::fm_ellipsoid_radius
-#' @export fm_evaluate
+#' @export
 fmesher::fm_evaluate
-#' @export fm_evaluator
+#' @export
 fmesher::fm_evaluator
-#' @export fm_evaluator_inla_mesh
+#' @export
 fmesher::fm_evaluator_inla_mesh
-#' @export fm_evaluator_inla_mesh_1d
+#' @export
 fmesher::fm_evaluator_inla_mesh_1d
-#' @export fm_evaluator_lattice
+#' @export
 fmesher::fm_evaluator_lattice
-#' @export fm_has_PROJ6
+#' @export
 fmesher::fm_has_PROJ6
-#' @export fm_identical_CRS
+#' @export
 fmesher::fm_identical_CRS
-#' @export fm_int
+#' @export
 fmesher::fm_int
-#' @export fm_int_inla_mesh
+#' @export
 fmesher::fm_int_inla_mesh
-#' @export fm_int_multi_sampler
+#' @export
 fmesher::fm_int_multi_sampler
-#' @export fm_length_unit
+#' @export
 fmesher::fm_length_unit
-#' @export fm_list_as_CRS
+#' @export
 fmesher::fm_list_as_CRS
-## @export fm_pixels
-#fmesher::fm_pixels
-#' @export fm_proj4string
+#' @export
 fmesher::fm_proj4string
-#' @export fm_sp2segment
+#' @export
 fmesher::fm_sp2segment
-#' @export fm_spTransform
+#' @export
 fmesher::fm_spTransform
-#' @export fm_sp_get_crs
+#' @export
 fmesher::fm_sp_get_crs
-#' @export fm_transform
+#' @export
 fmesher::fm_transform
-#' @export fm_wkt
+#' @export
 fmesher::fm_wkt
-#' @export fm_wkt_as_wkt_tree
+#' @export
 fmesher::fm_wkt_as_wkt_tree
-#' @export fm_wkt_get_ellipsoid_radius
+#' @export
 fmesher::fm_wkt_get_ellipsoid_radius
-#' @export fm_wkt_get_lengthunit
+#' @export
 fmesher::fm_wkt_get_lengthunit
-#' @export fm_wkt_is_geocent
+#' @export
 fmesher::fm_wkt_is_geocent
-#' @export fm_wkt_predef
+#' @export
 fmesher::fm_wkt_predef
-#' @export fm_wkt_set_ellipsoid_radius
+#' @export
 fmesher::fm_wkt_set_ellipsoid_radius
-#' @export fm_wkt_set_lengthunit
+#' @export
 fmesher::fm_wkt_set_lengthunit
-#' @export fm_wkt_tree_as_wkt
+#' @export
 fmesher::fm_wkt_tree_as_wkt
-#' @export fm_wkt_tree_get_item
+#' @export
 fmesher::fm_wkt_tree_get_item
-#' @export fm_wkt_tree_set_item
+#' @export
 fmesher::fm_wkt_tree_set_item
-#' @export fm_wkt_unit_params
+#' @export
 fmesher::fm_wkt_unit_params
+#' @export
+fmesher::fm_centroids
+#' @export
+fmesher::fm_pixels
+#' @export
+fmesher::fm_store_points
+#' @export
+fmesher::fm_vertices
+#' @export
+fmesher::fm_is_within
