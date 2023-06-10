@@ -349,7 +349,25 @@ fm_evaluator.inla.mesh.1d <- function(mesh,
 #' }
 #'
 #' @export
-fm_contains <- function(x, y, type = c("centroid", "vertex")) {
+fm_contains <- function(x, y, ...) {
+  UseMethod("fm_contains")
+}
+
+#' @rdname fm_contains
+#' @export
+fm_contains.Spatial <- function(x, y, ...) {
+  fm_contains(sf::st_as_sf(x), y = y, ...)
+}
+
+#' @rdname fm_contains
+#' @export
+fm_contains.sf <- function(x, y, ...) {
+  fm_contains(sf::st_geometry(x), y = y, ...)
+}
+
+#' @rdname fm_contains
+#' @export
+fm_contains.sfc <- function(x, y, ..., type = c("centroid", "vertex")) {
   if (!inherits(y, "inla.mesh")) {
     stop(paste0(
       "'y' must be an 'inla.mesh' object, not '",
@@ -357,24 +375,7 @@ fm_contains <- function(x, y, type = c("centroid", "vertex")) {
       "'."
     ))
   }
-  UseMethod("fm_contains")
-}
 
-#' @rdname fm_contains
-#' @export
-fm_contains.Spatial <- function(x, y, type = c("centroid", "vertex")) {
-  fm_contains(sf::st_as_sf(x), y = y, type = type)
-}
-
-#' @rdname fm_contains
-#' @export
-fm_contains.sf <- function(x, y, type = c("centroid", "vertex")) {
-  fm_contains(sf::st_geometry(x), y = y, type = type)
-}
-
-#' @rdname fm_contains
-#' @export
-fm_contains.sfc <- function(x, y, type = c("centroid", "vertex")) {
   type <- match.arg(type)
   if (identical(type, "centroid")) {
     ## Extract triangle centroids
@@ -411,4 +412,42 @@ fm_contains.sfc <- function(x, y, type = c("centroid", "vertex")) {
   ids <- sf::st_contains(x, points, sparse = TRUE)
 
   ids
+}
+
+
+#' @title Query if points are inside a mesh
+#'
+#' @description
+#'  Queries whether each input point is within a mesh or not.
+#'
+#' @param x A set of points of a class supported by `fm_evaluator(y, loc = x)`
+#' @param y An `inla.mesh`
+#' @param \dots Currently unused
+#' @returns A logical vector
+#' @examples
+#' \dontrun{
+#' if (bru_safe_inla(quietly = TRUE)) {
+#'   # Load Gorilla data
+#'
+#'   data("gorillas", package = "inlabru")
+#'
+#'   # Check if all Gorilla nests are inside the mesh
+#'
+#'   all(fm_is_within(gorillas$nests, gorillas$mesh))
+#'
+#'   # Also works for locations not stored as SpatialPoints object
+#'
+#'   loc <- coordinates(gorillas$nests)
+#'   all(fm_is_within(loc, gorillas$mesh))
+#' }
+#' }
+#' @export
+fm_is_within <- function(x, y, ...) {
+  UseMethod("fm_is_within")
+}
+
+#' @rdname fm_is_within
+#' @export
+fm_is_within.default <- function(x, y, ...) {
+  fm_evaluator(y, loc = x)$proj$ok
 }

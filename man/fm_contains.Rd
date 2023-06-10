@@ -7,13 +7,13 @@
 \alias{fm_contains.sfc}
 \title{Check which mesh triangles are inside a polygon}
 \usage{
-fm_contains(x, y, type = c("centroid", "vertex"))
+fm_contains(x, y, ...)
 
-\method{fm_contains}{Spatial}(x, y, type = c("centroid", "vertex"))
+\method{fm_contains}{Spatial}(x, y, ...)
 
-\method{fm_contains}{sf}(x, y, type = c("centroid", "vertex"))
+\method{fm_contains}{sf}(x, y, ...)
 
-\method{fm_contains}{sfc}(x, y, type = c("centroid", "vertex"))
+\method{fm_contains}{sfc}(x, y, ..., type = c("centroid", "vertex"))
 }
 \arguments{
 \item{x}{geometry (typically an \code{sf} or \code{sp::SpatialPolygons} object) for the queries}

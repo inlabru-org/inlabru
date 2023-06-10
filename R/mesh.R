@@ -34,13 +34,20 @@
 #' }
 #'
 is.inside <- function(mesh, loc, mesh.coords = NULL) {
+  lifecycle::deprecate_soft(
+    "2.8.0",
+    "is.inside()",
+    "fm_is_within()",
+    details = "`is.inside(mesh, loc)` becomes `fm_is_within(loc, mesh)`")
+
   if (!is.null(mesh.coords)) {
     loc <- as.matrix(loc[, mesh.coords])
   }
-  proj <- fm_evaluator(mesh, loc = loc)
-
-  return(proj$proj$ok)
+  fm_is_within(loc, mesh)
 }
+
+
+
 
 # Query if a point is inside a polygon AND inside the mesh;
 #
@@ -189,7 +196,7 @@ fm_pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE,
   pixels_within <- rep(TRUE, NROW(pixels))
   if (is.logical(mask)) {
     if (mask) {
-      pixels_within <- is.inside(mesh, pixels)
+      pixels_within <- fm_is_within(pixels, mesh)
       pixels <- pixels[pixels_within, , drop = FALSE]
     }
   } else {
