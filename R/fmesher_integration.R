@@ -121,6 +121,7 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 #' }
 #' }
 #'
+#' @importFrom stats na.omit
 fm_cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
   ipl <- list(...)
 

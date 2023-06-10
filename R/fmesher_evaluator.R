@@ -153,7 +153,7 @@ fm_evaluator_inla_mesh <- function(mesh, loc = NULL, crs = NULL, ...) {
 
   ii <- which(ok)
   A <- (Matrix::sparseMatrix(
-    dims = c(nrow(loc), mesh$n),
+    dims = c(NROW(loc), mesh$n),
     i = rep(ii, 3),
     j = as.vector(mesh$graph$tv[ti[ii, 1L], ]),
     x = as.vector(b[ii, ])
@@ -307,6 +307,7 @@ fm_evaluator.inla.mesh.1d <- function(mesh,
 #'
 #' @param x geometry (typically an `sf` or `sp::SpatialPolygons` object) for the queries
 #' @param y an `inla.mesh()` object
+#' @param \dots Passed on to other methods
 #' @param type the query type; either `'centroid'` (default, for triangle centroids),
 #' or `'vertex'` (for mesh vertices)
 #'
@@ -451,3 +452,4 @@ fm_is_within <- function(x, y, ...) {
 fm_is_within.default <- function(x, y, ...) {
   fm_evaluator(y, loc = x)$proj$ok
 }
+

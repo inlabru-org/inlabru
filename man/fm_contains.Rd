@@ -20,6 +20,8 @@ fm_contains(x, y, ...)
 
 \item{y}{an \code{inla.mesh()} object}
 
+\item{\dots}{Passed on to other methods}
+
 \item{type}{the query type; either \code{'centroid'} (default, for triangle centroids),
 or \code{'vertex'} (for mesh vertices)}
 }

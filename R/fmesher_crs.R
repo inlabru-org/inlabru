@@ -105,11 +105,13 @@ fm_sp_get_crs <- function(x) {
 }
 
 
-fm_crs_is_null <- function(crs) {
-  if (is.null(crs)) {
+#' @describeIn fm_crs Check if an object is or has `NULL` or `NA` CRS information
+#' @export
+fm_crs_is_null <- function(x) {
+  if (is.null(x)) {
     return(TRUE)
   }
-  is.na(fm_crs(crs))
+  is.na(fm_crs(x))
 }
 
 
