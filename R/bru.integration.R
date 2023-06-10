@@ -370,7 +370,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
     }
 
-    ips <- vertices.inla.mesh(domain)
+    ips <- fm_vertices(domain, format = "sp")
     ips$weight <- INLA::inla.mesh.fem(domain, order = 1)$va
 
     # backtransform

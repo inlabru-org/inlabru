@@ -106,14 +106,17 @@ get.value <- function(covariate, loc) {
   if (length(times) > 0) {
     for (t in times) {
       msk <- loc[, covariate$time.coords] == t
-      A <- fm_evaluator(covariate$mesh, loc = as.matrix(loc[msk, covariate$mesh.coords]))$proj$A
-      inside <- is.inside(covariate$mesh, loc = loc[, covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
+      proj <- fm_evaluator(covariate$mesh, loc = as.matrix(loc[msk, covariate$mesh.coords]))$proj
+      A <- proj$A
+      inside <- proj$ok
       values[msk] <- as.vector(A %*% covariate$values[, as.character(t)])
       values[msk & !inside] <- NA
     }
   } else {
-    A <- fm_evaluator(covariate$mesh, loc = as.matrix(loc[, covariate$mesh.coords]))$proj$A
-    inside <- is.inside(covariate$mesh, loc = loc[, covariate$mesh.coords], mesh.coords = covariate$mesh.coords)
+    proj <- fm_evaluator(covariate$mesh, loc = as.matrix(loc[, covariate$mesh.coords]))$proj
+    A <- proj$A
+    inside <- proj$ok
+    inside <- fm_is_within(loc = as.matrix(loc[, covariate$mesh.coords]), covariate$mesh)
     values <- as.vector(A %*% covariate$values[, 1])
     values[!inside] <- NA
   }

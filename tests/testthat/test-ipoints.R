@@ -65,7 +65,7 @@ test_that("conversion of 2D mesh to integration points", {
   ips <- ipoints(gorillas$mesh)
 
   expect_s4_class(ips, "SpatialPointsDataFrame")
-  expect_equal(colnames(as.data.frame(ips)), c("vertex", "weight", "x", "y"))
+  expect_equal(colnames(as.data.frame(ips)), c(".vertex", "weight", "x", "y"))
   expect_equal(sum(ips$weight), 27.64229, tolerance = lowtol)
 })
 

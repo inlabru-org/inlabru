@@ -10,7 +10,7 @@
 # @export
 # @param sp Start points of lines
 # @param ep End points of lines
-# @param scheme Integration scheme (gaussian or equdistant)
+# @param scheme Integration scheme (gaussian or equidistant)
 # @param n Number of integration points
 # @return List with integration poins (ips), weights (w) and weights including line length (wl)
 # @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}

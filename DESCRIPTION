@@ -143,5 +143,5 @@ Collate:
 VignetteBuilder: knitr
 BuildVignettes: true
 LazyData: false
-Remotes:  
+Remotes: 
     inlabru-org/fmesher
