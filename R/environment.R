@@ -782,7 +782,7 @@ bru_log_active <- function(activation = NULL) {
 #' }
 #'
 init.tutorial <- function() {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.5.0",
     I("init.tutorial()"),
     I(

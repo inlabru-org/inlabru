@@ -101,12 +101,12 @@ vertices.inla.mesh <- function(...) {
 #' }
 #'
 pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
-  #  lifecycle::deprecate_soft(
-  #    "2.8.0",
-  #    "pixels()",
-  #   "fm_pixels(format = 'sp')",
-  #   details = "The fm_pixels() function can generate sf, terra, and sp output."
-  # )
+  lifecycle::deprecate_soft(
+    "2.8.0",
+    "pixels()",
+    "fm_pixels(format = 'sp')",
+    details = "The fm_pixels() function can generate sf, terra, and sp output."
+  )
   fm_pixels(mesh, nx = nx, ny = ny, mask = mask, format = "sp")
 }
 

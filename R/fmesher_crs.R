@@ -5,11 +5,9 @@
 #' @export
 
 fm_has_PROJ6 <- function() {
-  # TODO: deprecate_warn
-  lifecycle::deprecate_stop("2.7.1",
+  lifecycle::deprecate_stop("2.8.0",
     "fm_has_PROJ6()",
     details = c(
-      i = "Since inlabru 2.7.1, fm_has_PROJ6() always returns TRUE",
       i = "rgdal/PROJ4 is no longer supported."
     )
   )
@@ -20,28 +18,17 @@ fm_has_PROJ6 <- function() {
 #' features even though PROJ6 is available
 
 fm_not_for_PROJ6 <- function(fun = NULL) {
-  lifecycle::deprecate_warn("2.7.1",
+  lifecycle::deprecate_stop("2.8.0",
     "fm_not_for_PROJ6()",
     details = c(x = "rgdal/PROJ4 is no longer supported.")
   )
-  fun <- fm_caller_name(1, fun)
-  msg <- paste0(
-    "Call stack:\n",
-    paste0(fm_call_stack(end = 1), collapse = "\n")
-  )
-  stop(paste0(
-    "'",
-    fun,
-    "()' should not be used with PROJ6 and rgdal v3\n",
-    msg
-  ))
 }
 
 #' @describeIn inlabru-deprecated `fm_not_for_PROJ4` is called to give an error when
 #' calling methods that are only available for PROJ6
 
 fm_not_for_PROJ4 <- function(fun = NULL) {
-  lifecycle::deprecate_stop("2.7.1",
+  lifecycle::deprecate_stop("2.8.0",
     "fm_not_for_PROJ4()",
     details = c(x = "rgdal/PROJ4 is no longer supported.")
   )
@@ -51,7 +38,7 @@ fm_not_for_PROJ4 <- function(fun = NULL) {
 #' to using old PROJ4 methods when a PROJ6 method hasn't been implemented
 
 fm_fallback_PROJ6 <- function(fun = NULL) {
-  lifecycle::deprecate_stop("2.7.1",
+  lifecycle::deprecate_stop("2.8.0",
     "fm_not_for_PROJ4()",
     details = c(x = "rgdal/PROJ4 requested by PROJ4 is no longer supported.")
   )
@@ -64,11 +51,10 @@ fm_fallback_PROJ6 <- function(fun = NULL) {
 #' is required but not available
 
 fm_requires_PROJ6 <- function(fun = NULL) {
-  lifecycle::deprecate_stop("2.7.1",
+  lifecycle::deprecate_stop("2.8.0",
     "fm_requires_PROJ6()",
-    details = c(x = "Now always returns TRUE. rgdal/PROJ4 is no longer supported.")
+    details = c(x = "rgdal/PROJ4 is no longer supported.")
   )
-  TRUE
 }
 
 
@@ -100,7 +86,7 @@ fm_as_sp_crs <- function(x, ...) {
 #' @export
 
 fm_sp_get_crs <- function(x) {
-  lifecycle::deprecate_warn("2.7.1", "fm_sp_get_crs()", "fm_CRS()")
+  lifecycle::deprecate_warn("2.8.0", "fm_sp_get_crs()", "fm_CRS()")
   fm_CRS(x)
 }
 
@@ -1311,7 +1297,7 @@ fm_list_as_CRS <- function(x, ...) {
 #' print(fm_proj4string(crs1))
 #' print(fm_proj4string(crs2))
 fm_CRSargs <- function(x, ...) {
-  lifecycle::deprecate_warn("2.7.0.9012", "fm_CRSargs()", "fm_proj4string()")
+  lifecycle::deprecate_warn("2.8.0", "fm_CRSargs()", "fm_proj4string()")
 
   fm_proj4string(x)
 }
@@ -1386,7 +1372,7 @@ fm_proj4string <- function(crs) {
 
 fm_crs_get_wkt <- function(crs) {
   lifecycle::deprecate_warn(
-    "2.7.0.9012",
+    "2.8.0",
     "fm_crs_get_wkt()",
     "fm_wkt()"
   )
@@ -1997,7 +1983,7 @@ fm_transform.inla.mesh.segment <- function(x, crs = fm_crs(x), ..., passthrough 
 #' @seealso [fm_transform()]
 #' @export
 fm_spTransform <- function(x, ...) {
-  lifecycle::deprecate_soft("2.7.1", "fm_spTransform()", "fm_transform()")
+  lifecycle::deprecate_soft("2.8.0", "fm_spTransform()", "fm_transform()")
   UseMethod("fm_spTransform")
 }
 
