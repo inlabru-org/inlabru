@@ -49,35 +49,6 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
 
 
 
-# Query if a point is inside a polygon AND inside the mesh;
-#
-#
-# @aliases is.in.polygon
-# @export
-# @param mesh an inla.mesh object
-# @param ploc Points defining a polygon
-# @param loc Points to quer
-# @param mask.mesh Mask points outside mesh, default: TRUE
-# @param mesh.coords Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.
-# @return inside Boolean, TRUE if inside polygon
-# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
-
-is.inside.polygon <- function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = TRUE) {
-  if (!is.null(mesh.coords) && is.data.frame(loc)) {
-    loc <- as.matrix(loc[, mesh.coords, drop = FALSE])
-  }
-  if (!is.null(mesh.coords) && is.data.frame(ploc)) {
-    ploc <- as.matrix(ploc[, mesh.coords, drop = FALSE])
-  }
-
-  mask <- sp::point.in.polygon(loc[, 1], loc[, 2], ploc[, 1], ploc[, 2]) > 0
-  if (mask.mesh) {
-    mask2 <- is.inside(mesh, loc)
-    return(mask & mask2)
-  } else {
-    return(mask)
-  }
-}
 
 #' @describeIn inlabru-deprecated Extract vertex locations from an `inla.mesh`.
 #' Converts the vertices of an `inla.mesh` object into a `SpatialPointsDataFrame`.
@@ -223,49 +194,6 @@ fm_pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE,
 
 
 
-# Triangle indices of points given a mesh
-#
-# @aliases triangle
-# @export
-# @param mesh A inla.mesh
-# @param loc Locations using the coordinate system of the mesh
-# @return tri Triangle indices
-# @examples \\dontrun{}
-# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
-
-triangle <- function(mesh, loc) {
-  warning("'triangle()' is an internal unused function. To be replaced by method using inla.mesh.smorg, and later fmesher")
-  mcross <- function(a, b) {
-    return((a[, 1]) * (b[2]) - (a[, 2]) * (b[1]))
-  }
-  tri <- numeric(length = dim(loc)[1])
-  tv <- mesh$graph$tv
-  for (j in seq_len(nrow(tv))) {
-    v <- mesh$loc[tv[j, ], c(1, 2)]
-
-    a <- v[1, ]
-    b <- v[2, ]
-    c <- v[3, ]
-
-    ap <- loc - cbind(rep(a[1], nrow(loc)), rep(a[2], nrow(loc)))
-    bp <- loc - cbind(rep(b[1], nrow(loc)), rep(b[2], nrow(loc)))
-    cp <- loc - cbind(rep(c[1], nrow(loc)), rep(c[2], nrow(loc)))
-
-    ab <- a - b
-    bc <- b - c
-    ca <- c - a
-
-    c1 <- mcross(ap, ab)
-    c2 <- mcross(bp, bc)
-    c3 <- mcross(cp, ca)
-
-    # AP x AB, BP x BC, and CP x CA must have same sign
-    inside <- which(((sign(c1) == -1) & (sign(c2) == -1) & (sign(c3) == -1)) | ((sign(c1) == 1) & (sign(c2) == 1) & (sign(c3) == 1)))
-
-    tri[inside] <- j
-  }
-  return(tri)
-}
 
 
 
@@ -283,7 +211,12 @@ triangle <- function(mesh, loc) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 
 refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
-  warning("refine.inla.mesh() is experimental and will be replaced by a new method")
+  lifecycle::deprecate_warn(
+    "2.7.0",
+    "refine.inla.mesh()",
+    details = c(
+      "!" = "This function is experimental and will be replaced by a new method"))
+
   rmesh <- INLA::inla.mesh.create(
     loc = mesh$loc,
     interior = INLA::inla.mesh.interior(mesh),
@@ -307,12 +240,11 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 
 tsplit.inla.mesh <- function(mesh, n = 1) {
-  #  lifecycle::deprecate_soft(
-  #    "2.8.0",
-  #    "tsplit.inla.mesh()",
-  #    "fm_subdivide()",
-  #    details = "tsplit.inla.mesh(mesh, n) has been replaced by fm_subdivide(mesh, n = 2^n - 1)"
-  #  )
+  lifecycle::deprecate_warn(
+    "2.7.0",
+    "tsplit.inla.mesh()",
+    details = c(
+      "!" = "This function is experimental and will be replaced by a new method."))
 
   p1 <- mesh$loc[mesh$graph$tv[, 1], ]
   p2 <- mesh$loc[mesh$graph$tv[, 2], ]
