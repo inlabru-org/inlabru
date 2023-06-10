@@ -1448,7 +1448,12 @@ predict.bru <- function(object,
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
   } else if (inherits(newdata, "inla.mesh")) {
-    newdata <- vertices.inla.mesh(newdata)
+    lifecycle::deprecate_soft(
+      "2.8.0",
+      "predict(newdata = 'should not be an inla.mesh object')",
+      details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
+    )
+    newdata <- fm_vertices(newdata, format = "sp")
   } else if (inherits(newdata, "formula")) {
     stop("Formula supplied as data to predict.bru(). Please check your argument order/names.")
   }
@@ -1623,7 +1628,12 @@ generate.bru <- function(object,
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
   } else if (inherits(newdata, "inla.mesh")) {
-    newdata <- vertices.inla.mesh(newdata)
+    lifecycle::deprecate_soft(
+      "2.8.0",
+      "predict(newdata = 'should not be an inla.mesh object')",
+      details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
+    )
+    newdata <- fm_vertices(newdata, format = "sp")
   } else if (inherits(newdata, "formula")) {
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }

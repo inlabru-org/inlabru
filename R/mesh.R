@@ -72,50 +72,26 @@ is.inside.polygon <- function(mesh, ploc, loc, mesh.coords = NULL, mask.mesh = T
   }
 }
 
-#' @title Extract vertex locations from an `inla.mesh`
+#' @describeIn inlabru-deprecated Extract vertex locations from an `inla.mesh`.
+#' Converts the vertices of an `inla.mesh` object into a `SpatialPointsDataFrame`.
+#' Deprecated in favour of [fm_vertices()]
 #'
-#' @description Converts the vertices of an `inla.mesh` object into a `SpatialPointsDataFrame`.
-#'
-#' @aliases vertices.inla.mesh
 #' @export
-#' @param object An `inla.mesh` object.
-#' @return A SpatialPointsDataFrame of mesh vertex locations. The `vrt` column indicates the internal vertex id.
-#'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
-#' @examples
-#' \donttest{
-#' if (require(ggplot2, quietly = TRUE)) {
-#'   data("mrsea", package = "inlabru")
-#'   vrt <- vertices.inla.mesh(mrsea$mesh)
-#'   ggplot() +
-#'     gg(mrsea$mesh) +
-#'     gg(vrt, color = "red")
-#' }
-#' }
-#'
-vertices.inla.mesh <- function(object) {
-  object$crs <- fm_crs(object$crs)
-  if (is.na(object$crs)) {
-    object$crs <- sp::CRS(NA_character_)
-  } else {
-    object$crs <- fm_CRS(object$crs)
-  }
-
-  vrt <- data.frame(object$loc)
-  if (!is.null(colnames(vrt))) {
-    colnames(vrt) <- c("x", "y", "z")[seq_along(colnames(vrt))]
-  }
-  if ((length(colnames(vrt)) > 2) && all(vrt[, 3] == 0)) {
-    vrt <- vrt[, 1:2]
-  }
-  vrt <- SpatialPoints(vrt, proj4string = object$crs)
-  vrt <- SpatialPointsDataFrame(
-    vrt,
-    data = data.frame(vertex = seq_len(nrow(object$loc)))
+vertices.inla.mesh <- function(...) {
+  lifecycle::deprecate_warn(
+    "2.8.0",
+    "vertices.inla.mesh()",
+    "fm_vertices()",
+    details =
+      c("!" = "fm_vertices() by default returns 'sf' instead of SPDF.",
+        "!" = "fm_vertices() includes a '.vertex' column instead of a 'vertex' column.")
   )
 
-  vrt # return
+  vrt <- fm_vertices(..., format = "sp") %>%
+    dplyr::rename(vertex = .data$.vertex)
+
+  vrt
+
 }
 
 
@@ -512,4 +488,121 @@ fm_subdivide <- function(mesh, n = 1) {
   )
 
   mesh2
+}
+
+
+
+#' @title store points in different formats
+#'
+#' @description Convert a matrix of points into different formats.
+#'
+#' @param format character; `"sf"`, `"df"`, `"sp"`
+#' @return
+#' An `sf`, `data.frame`, or `SpatialPointsDataFrame` object, with
+#' optional added information.
+#' @export
+#' @keywords internal
+fm_store_points <- function(loc, crs = NULL, info = NULL, format = NULL) {
+  format <- match.arg(format,
+                      c("sf", "df", "sp"))
+
+  crs <- fm_crs(crs)
+
+  points <- as.data.frame(loc)
+  colnames(points) <- c("x", "y", "z")[seq_len(ncol(points))]
+  if (!fm_crs_is_null(crs) && !fm_crs_is_geocent(crs)) {
+    points <- points[, 1:2, drop = FALSE]
+  }
+
+  if (identical(format, "df")) {
+    points <- cbind(points, info)
+  } else if (identical(format, "sp")) {
+    points <- sp::SpatialPointsDataFrame(points,
+                                         data = info,
+                                         proj4string = fm_CRS(crs))
+  } else if (identical(format, "sf")) {
+    points <- sf::st_as_sf(cbind(points, info),
+                        coords = seq_len(ncol(points)),
+                        crs = crs)
+  }
+
+  points # return
+}
+
+
+#' @title Extract vertex locations from an `inla.mesh`
+#'
+#' @description Extracts the vertices of an `inla.mesh` object.
+#'
+#' @export
+#' @param x An `inla.mesh` object.
+#' @param format character; `"sf"`, `"df"`, `"sp"`
+#' @return
+#' An `sf`, `data.frame`, or `SpatialPointsDataFrame` object, with the vertex
+#' coordinates, and a `.vertex` column with the vertex indices.
+#'
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com},
+#' Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @seealso [fm_centroids()]
+#'
+#' @examples
+#' \donttest{
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   data("mrsea", package = "inlabru")
+#'   vrt <- fm_vertices(mrsea$mesh, format = "sp")
+#'   ggplot() +
+#'     gg(mrsea$mesh) +
+#'     gg(vrt, color = "red")
+#' }
+#' }
+#'
+fm_vertices <- function(x, format = NULL) {
+  fm_store_points(
+    loc = x$loc,
+    info = data.frame(.vertex = seq_len(nrow(x$loc))),
+    crs = fm_crs(x),
+    format = format
+  )
+}
+
+#' @title Extract triangle centroids from an `inla.mesh`
+#'
+#' @description Computes the centroids of the triangles of an `inla.mesh`
+#' object.
+#'
+#' @export
+#' @param x An `inla.mesh` object.
+#' @param format character; `"sf"`, `"df"`, `"sp"`
+#' @return
+#' An `sf`, `data.frame`, or `SpatialPointsDataFrame` object, with the vertex
+#' coordinates, and a `.triangle` column with the triangle indices.
+#'
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @seealso [fm_vertices()]
+#'
+#' @examples
+#' \donttest{
+#' if (require(ggplot2, quietly = TRUE)) {
+#'   data("mrsea", package = "inlabru")
+#'   vrt <- fm_centroids(mrsea$mesh, format = "sp")
+#'   ggplot() +
+#'     gg(mrsea$mesh) +
+#'     gg(vrt, color = "red")
+#' }
+#' }
+#'
+fm_centroids <- function(x, format = NULL) {
+  ## Extract triangle centroids
+  loc <- (x$loc[x$graph$tv[, 1], , drop = FALSE] +
+            x$loc[x$graph$tv[, 2], , drop = FALSE] +
+            x$loc[x$graph$tv[, 3], , drop = FALSE]) / 3
+
+  if (identical(x$manifold, "S2")) {
+    loc <- loc / rowSums(loc^2)^0.5 * sum(x$loc[1, ]^2)^0.5
+  }
+
+  fm_store_points(loc = loc,
+                  info = data.frame(.triangle = seq_len(nrow(loc))),
+                  crs = fm_crs(x),
+                  format = format)
 }
