@@ -120,7 +120,6 @@ Collate:
     'environment.R'
     'fmesher_crs.R'
     'fmesher_evaluator.R'
-    'fmesher_fmesher.R'
     'fmesher_integration.R'
     'fmesher_mesh.R'
     'fmesher_sf_mesh.R'
