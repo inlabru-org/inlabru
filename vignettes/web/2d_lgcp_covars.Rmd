@@ -140,8 +140,8 @@ a `SpatialPixelsDataFrame` only within the boundary, using its `mask` argument, 
 
 
 ```{r warning=FALSE,message=FALSE}
-df <- pixels(mesh, mask = boundary)
-int1 <- predict(fit1, df, ~ exp(vegetation))
+pred.df <- fm_pixels(mesh, mask = boundary, format = "sp")
+int1 <- predict(fit1, pred.df, ~ exp(vegetation))
 
 ggplot() +
   gg(int1) +
@@ -194,8 +194,7 @@ if ((!.cache_recompute) &&
 And plot the median intensity surface
 
 ```{r warning=FALSE,message=FALSE}
-df <- pixels(mesh, mask = boundary)
-int2 <- predict(fit2, df, ~ exp(mySmooth + vegetation), n.samples = 1000)
+int2 <- predict(fit2, pred.df, ~ exp(mySmooth + vegetation), n.samples = 1000)
 
 ggplot() +
   gg(int2, aes(fill = q0.025)) +
@@ -218,7 +217,7 @@ Lambda2
 
 Look at the contributions to the linear predictor from the SPDE and from vegetation:
 ```{r warning=FALSE,message=FALSE}
-lp2 <- predict(fit2, df, ~ list(
+lp2 <- predict(fit2, pred.df, ~ list(
   smooth_veg = mySmooth + vegetation,
   smooth = mySmooth,
   veg = vegetation
@@ -288,7 +287,7 @@ if ((!.cache_recompute) &&
 ```
 
 ```{r results='hide',warning=FALSE,message=FALSE}
-int3 <- predict(fit3, df, ~ exp(mySmooth + Intercept))
+int3 <- predict(fit3, pred.df, ~ exp(mySmooth + Intercept))
 
 ggplot() +
   gg(int3) +
@@ -488,8 +487,8 @@ Predict and plot the density
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-e.int <- predict(efit, pixels(mesh, mask = boundary), ~ exp(mySmooth + elev + Intercept))
-e.int.log <- predict(efit, pixels(mesh, mask = boundary), ~ (mySmooth + elev + Intercept))
+e.int <- predict(efit, pred.df, ~ exp(mySmooth + elev + Intercept))
+e.int.log <- predict(efit, pred.df, ~ (mySmooth + elev + Intercept))
 
 ggplot() +
   gg(e.int, aes(fill = log(sd))) +
@@ -510,7 +509,8 @@ plots and we are interested in comparing the effects of elevation and the SPDE.
 First we need to predict on the linear predictor scale.
 ```{r warning=FALSE,message=FALSE,echo=TRUE}
 e.lp <- predict(
-  efit, pixels(mesh, mask = boundary),
+  efit,
+  pred.df,
   ~ list(
     smooth_elev = mySmooth + elev,
     elev = elev,
@@ -695,7 +695,8 @@ comp <- x ~
 fitcov1D <- lgcp(comp, pts2, domain = list(x = mesh))
 pr.df <- data.frame(x = x)
 prcov1D <- predict(
-  fitcov1D, pr.df,
+  fitcov1D,
+  pr.df,
   ~ list(
     total = exp(beta_z + spde1D + Intercept),
     fx = exp(beta_z + Intercept),

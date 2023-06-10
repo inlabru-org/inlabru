@@ -90,12 +90,11 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 ``` r
 # Load libraries
 library(inlabru)
-#> Loading required package: sp
 library(INLA)
 #> Loading required package: Matrix
 #> Loading required package: foreach
 #> Loading required package: parallel
-#> This is INLA_23.05.22 built 2023-05-21 18:43:44 UTC.
+#> This is INLA_23.05.30-1 built 2023-05-30 11:52:19 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
@@ -123,11 +122,26 @@ fit <- bru(
   ),
   options = list(control.inla = list(int.strategy = "eb"))
 )
+#> Please note that rgdal will be retired during October 2023,
+#> plan transition to sf/stars/terra functions using GDAL and PROJ
+#> at your earliest convenience.
+#> See https://r-spatial.org/r/2023/05/15/evolution4.html and https://github.com/r-spatial/evolution
+#> rgdal: version: 1.6-7, (SVN revision 1203)
+#> Geospatial Data Abstraction Library extensions to R successfully loaded
+#> Loaded GDAL runtime: GDAL 3.4.1, released 2021/12/27
+#> Path to GDAL shared files: /usr/share/gdal
+#> GDAL binary built with GEOS: TRUE 
+#> Loaded PROJ runtime: Rel. 8.2.1, January 1st, 2022, [PJ_VERSION: 821]
+#> Path to PROJ shared files: /home/flindgre/.local/share/proj:/usr/share/proj
+#> PROJ CDN enabled: FALSE
+#> Linking to sp version:1.6-1
+#> To mute warnings of possible GDAL/OSR exportToProj4() degradation,
+#> use options("rgdal_show_exportToProj4_warnings"="none") before loading sp or rgdal.
 
 # Predict Gorilla nest intensity
 lambda <- predict(
   fit,
-  pixels(gorillas$mesh, mask = gorillas$boundary),
+  fm_pixels(gorillas$mesh, mask = gorillas$boundary, format = "sp"),
   ~ exp(mySmooth + Intercept)
 )
 

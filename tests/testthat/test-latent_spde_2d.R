@@ -122,7 +122,7 @@ test_that("Georeferenced data with sp", {
     tolerance = midtol
   )
 
-  pred_df <- pixels(mesh)
+  pred_df <- fm_pixels(mesh, format = "sp")
   coordnames(pred_df) <- coordnames(mydata)
   expect_s4_class(pred_df, "SpatialPixelsDataFrame")
 

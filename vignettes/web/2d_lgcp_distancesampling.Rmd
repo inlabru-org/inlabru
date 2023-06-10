@@ -156,7 +156,7 @@ plot(spde.logvar)
 Predict spatial intensity, and plot it:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
-pxl <- pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly)
+pxl <- fm_pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly, format = "sp")
 pr.int <- predict(fit, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
@@ -263,7 +263,6 @@ plot(spde.range)
 spde.logvar <- spde.posterior(fit1, "mySPDE", what = "log.variance")
 plot(spde.logvar)
 
-pxl <- pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly)
 pr.int1 <- predict(fit1, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +

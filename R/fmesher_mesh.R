@@ -223,8 +223,10 @@ fm_subdivide <- function(mesh, n = 1) {
 #' @export
 #' @keywords internal
 fm_store_points <- function(loc, crs = NULL, info = NULL, format = NULL) {
-  format <- match.arg(format,
-                      c("sf", "df", "sp"))
+  format <- match.arg(
+    format,
+    c("sf", "df", "sp")
+  )
 
   crs <- fm_crs(crs)
 
@@ -238,12 +240,14 @@ fm_store_points <- function(loc, crs = NULL, info = NULL, format = NULL) {
     points <- cbind(points, info)
   } else if (identical(format, "sp")) {
     points <- sp::SpatialPointsDataFrame(points,
-                                         data = info,
-                                         proj4string = fm_CRS(crs))
+      data = info,
+      proj4string = fm_CRS(crs)
+    )
   } else if (identical(format, "sf")) {
     points <- sf::st_as_sf(cbind(points, info),
-                        coords = seq_len(ncol(points)),
-                        crs = crs)
+      coords = seq_len(ncol(points)),
+      crs = crs
+    )
   }
 
   points # return
@@ -314,17 +318,19 @@ fm_vertices <- function(x, format = NULL) {
 fm_centroids <- function(x, format = NULL) {
   ## Extract triangle centroids
   loc <- (x$loc[x$graph$tv[, 1], , drop = FALSE] +
-            x$loc[x$graph$tv[, 2], , drop = FALSE] +
-            x$loc[x$graph$tv[, 3], , drop = FALSE]) / 3
+    x$loc[x$graph$tv[, 2], , drop = FALSE] +
+    x$loc[x$graph$tv[, 3], , drop = FALSE]) / 3
 
   if (identical(x$manifold, "S2")) {
     loc <- loc / rowSums(loc^2)^0.5 * sum(x$loc[1, ]^2)^0.5
   }
 
-  fm_store_points(loc = loc,
-                  info = data.frame(.triangle = seq_len(nrow(loc))),
-                  crs = fm_crs(x),
-                  format = format)
+  fm_store_points(
+    loc = loc,
+    info = data.frame(.triangle = seq_len(nrow(loc))),
+    crs = fm_crs(x),
+    format = format
+  )
 }
 
 
@@ -334,8 +340,10 @@ fm_onto_mesh <- function(mesh, loc, crs = NULL) {
   if (!is.matrix(loc) && !fm_crs_is_null(crs)) {
     warning("loc is non-matrix but crs specified; will be ignored")
   }
-  if (inherits(loc, c("SpatialPoints", "SpatialPointsDataFrame",
-                      "sf", "sfc", "sfg"))) {
+  if (inherits(loc, c(
+    "SpatialPoints", "SpatialPointsDataFrame",
+    "sf", "sfc", "sfg"
+  ))) {
     crs <- fm_crs(loc)
   }
   mesh_crs <- fm_crs(mesh)
@@ -378,4 +386,3 @@ fm_onto_mesh <- function(mesh, loc, crs = NULL) {
 
   loc
 }
-

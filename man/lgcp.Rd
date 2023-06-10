@@ -93,7 +93,11 @@ if (bru_safe_inla() &&
   )
 
   # Predict the spatial intensity surface
-  lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+  lambda <- predict(
+    fit,
+    fm_pixels(gorillas$mesh, format = "sp"),
+    ~ exp(mySmooth + Intercept)
+  )
 
   # Plot the intensity
   ggplot() +

@@ -764,7 +764,7 @@ gg.inla.mesh <- function(data,
     color <- list(...)[["colour"]]
   }
   if (!is.null(color)) {
-    px <- pixels(data, nx = nx, ny = ny)
+    px <- fm_pixels(data, nx = nx, ny = ny, format = "sp")
     A <- fm_evaluator(data, px)$proj$A
     px$color <- as.vector(A %*% color)
     if (!is.null(alpha)) {
