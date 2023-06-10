@@ -154,12 +154,11 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: sp</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
 <span><span class="co">#&gt; Loading required package: foreach</span></span>
 <span><span class="co">#&gt; Loading required package: parallel</span></span>
-<span><span class="co">#&gt; This is INLA_23.05.22 built 2023-05-21 18:43:44 UTC.</span></span>
+<span><span class="co">#&gt; This is INLA_23.05.30-1 built 2023-05-30 11:52:19 UTC.</span></span>
 <span><span class="co">#&gt;  - See www.r-inla.org/contact-us for how to get help.</span></span>
 <span><span class="co">#&gt;  - To enable PARDISO sparse library; see inla.pardiso()</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -187,11 +186,26 @@
 <span>  <span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Please note that rgdal will be retired during October 2023,</span></span>
+<span><span class="co">#&gt; plan transition to sf/stars/terra functions using GDAL and PROJ</span></span>
+<span><span class="co">#&gt; at your earliest convenience.</span></span>
+<span><span class="co">#&gt; See https://r-spatial.org/r/2023/05/15/evolution4.html and https://github.com/r-spatial/evolution</span></span>
+<span><span class="co">#&gt; rgdal: version: 1.6-7, (SVN revision 1203)</span></span>
+<span><span class="co">#&gt; Geospatial Data Abstraction Library extensions to R successfully loaded</span></span>
+<span><span class="co">#&gt; Loaded GDAL runtime: GDAL 3.4.1, released 2021/12/27</span></span>
+<span><span class="co">#&gt; Path to GDAL shared files: /usr/share/gdal</span></span>
+<span><span class="co">#&gt; GDAL binary built with GEOS: TRUE </span></span>
+<span><span class="co">#&gt; Loaded PROJ runtime: Rel. 8.2.1, January 1st, 2022, [PJ_VERSION: 821]</span></span>
+<span><span class="co">#&gt; Path to PROJ shared files: /home/flindgre/.local/share/proj:/usr/share/proj</span></span>
+<span><span class="co">#&gt; PROJ CDN enabled: FALSE</span></span>
+<span><span class="co">#&gt; Linking to sp version:1.6-1</span></span>
+<span><span class="co">#&gt; To mute warnings of possible GDAL/OSR exportToProj4() degradation,</span></span>
+<span><span class="co">#&gt; use options("rgdal_show_exportToProj4_warnings"="none") before loading sp or rgdal.</span></span>
 <span></span>
 <span><span class="co"># Predict Gorilla nest intensity</span></span>
 <span><span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>,</span>
-<span>  <span class="fu"><a href="reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="reference/fm_pixels.html">fm_pixels</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span>,</span>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>

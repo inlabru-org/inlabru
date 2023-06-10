@@ -234,7 +234,7 @@ variance is 4 times as large.</p>
 <p>Predict the field on a lattice, and generate a single realisation
 from the posterior distribution:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pix</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/pixels.html">pixels</a></span><span class="op">(</span><span class="va">mesh</span>, nx <span class="op">=</span> <span class="fl">200</span>, ny <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">pix</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fm_pixels.html">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, nx <span class="op">=</span> <span class="fl">200</span>, ny <span class="op">=</span> <span class="fl">200</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span>
 <span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>, <span class="va">pix</span>,</span>
 <span>  <span class="op">~</span> <span class="va">field</span> <span class="op">+</span> <span class="va">Intercept</span></span>
