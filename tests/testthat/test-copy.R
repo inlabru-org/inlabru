@@ -113,10 +113,8 @@ test_that("Component copy feature with group", {
     z <- rep(c(1, 2), times = length(x1) / 2)
     z2 <- rep(c(1, 2), each = length(x1) / 2)
   })
-  mydata <- rbind(mydata, mydata)
-  mydata <- rbind(mydata, mydata)
   mydata <- within(mydata, {
-    y <- rnorm(prod(n), x1^1.0 / n[1] * 4 + x2^1.0 / n[1] * 4 * 2, 1)
+    y <- rnorm(prod(n), x1^1.0 / n[1] * 4 + x2^1.0 / n[1] * 4 * 10, 1)
   })
 
   inlaform <- y ~ -1 + Intercept +
