@@ -113,8 +113,10 @@ test_that("Component copy feature with group", {
     z <- rep(c(1, 2), times = length(x1) / 2)
     z2 <- rep(c(1, 2), each = length(x1) / 2)
   })
+  mydata <- rbind(mydata, mydata)
+  mydata <- rbind(mydata, mydata)
   mydata <- within(mydata, {
-    y <- rnorm(prod(n), x1^1.1 / n[1] * 4 + x2^0.9 / n[1] * 4 * 2 + z + z2, 1)
+    y <- rnorm(prod(n), x1^1.0 / n[1] * 4 + x2^1.0 / n[1] * 4 * 2, 1)
   })
 
   inlaform <- y ~ -1 + Intercept +
@@ -131,12 +133,26 @@ test_that("Component copy feature with group", {
     x1(x1, model = "rw1", scale.model = TRUE, group = z) +
     x2(x2, copy = "x1", fixed = FALSE, group = z2)
   fit_bru <- bru(cmp,
-    formula = y ~ Intercept + x1 + x2,
-    family = "normal", data = mydata,
-    options = list(
-      bru_max_iter = 1,
-      control.inla = list(int.strategy = "eb")
-    )
+                 formula = y ~ Intercept + x1 + x2,
+                 family = "normal", data = mydata,
+                 options = list(
+                   bru_max_iter = 1,
+                   control.inla = list(int.strategy = "eb")
+                 )
+  )
+
+  cmp2 <- ~ -1 + Intercept +
+    x1(x1, model = "rw1", scale.model = TRUE, group = z) +
+    x1copy(x2, copy = "x1", fixed = TRUE, group = z2) +
+    beta(1, model = "linear")
+  fit_bru2 <- bru(cmp2,
+                 formula = y ~ Intercept + x1 + beta * x1copy,
+                 family = "normal", data = mydata,
+                 options = list(
+                   bru_max_iter = 5,
+                   bru_initial = list(beta = 1),
+                   control.inla = list(int.strategy = "eb")
+                 )
   )
 
   expect_equal(
@@ -144,9 +160,9 @@ test_that("Component copy feature with group", {
     fit$summary.hyperpar$mean,
     tolerance = hitol
   )
-  #  expect_equal(
-  #    fit_bru$summary.hyperpar$sd,
-  #    fit$summary.hyperpar$sd,
-  #    tolerance = hitol
-  #  )
+  expect_equal(
+    fit_bru$summary.hyperpar$sd,
+    fit$summary.hyperpar$sd,
+    tolerance = hitol
+  )
 })
