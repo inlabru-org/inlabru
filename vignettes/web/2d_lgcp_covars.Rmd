@@ -34,6 +34,7 @@ library(inlabru)
 library(RColorBrewer)
 library(ggplot2)
 bru_safe_sp(force = TRUE)
+bru_options_set(control.compute = list(dic = TRUE)) # Activate DIC output
 ```
 
 Introduction
@@ -304,48 +305,34 @@ Lambda3 <- predict(
 Lambda3
 ```
 ```{r warning=FALSE,message=FALSE}
-knitr::kable(cbind(
-  deltaIC(fit1, fit2, fit3, criterion = c("DIC")),
-  deltaIC(fit1, fit2, fit3, criterion = c("WAIC"))
-))
+knitr::kable(deltaIC(fit1, fit2, fit3, criterion = c("DIC")))
 ```
-NOTE: the behaviour of DIC and WAIC is currently a bit unclear, in particular for experimental
-mode, and is being investigated.
+NOTE: the behaviour of DIC is currently a bit unclear, and is being investigated.
+WAIC is related to leave-one-out cross-validation, and is not appropriate to
+use with the current current LGCP likelihood implementation.
 
 Classic mode:
 ```{r echo=FALSE}
-knitr::kable(cbind(
+knitr::kable(
   dplyr::tribble(
     ~Model, ~DIC, ~Delta.DIC,
     "fit2", 2224.131, 0.00000,
     "fit3", 2274.306, 50.17504,
     "fit1", 3124.784, 900.65339
-  ),
-  dplyr::tribble(
-    ~Model, ~WAIC, ~Delta.WAIC,
-    "fit1", 2672.234, 0.0000,
-    "fit3", 2949.498, 277.2636,
-    "fit2", 3040.140, 367.9051
   )
-))
+)
 ```
 
 Experimental mode:
 ```{r echo=FALSE}
-knitr::kable(cbind(
+knitr::kable(
   dplyr::tribble(
     ~Model, ~DIC, ~Delta.DIC,
     "fit1", -563.3583, 0.000,
     "fit3", 509.4010, 1072.759,
     "fit2", 597.6459, 1161.004
-  ),
-  dplyr::tribble(
-    ~Model, ~WAIC, ~Delta.WAIC,
-    "fit1", 1373.241, 0.0000,
-    "fit3", 1584.543, 211.3021,
-    "fit2", 1636.864, 263.6225
   )
-))
+)
 ```
 
 #### CV and SPDE parameters for Model 2

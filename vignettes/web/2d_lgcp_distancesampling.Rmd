@@ -90,7 +90,7 @@ ggplot(data.frame(mexdolphin$points)) +
 ```
 
 We need to define a half-normal detection probability function. This must take distance as its first
-arguent and the linear predictor of the sigma parameter (which we will call `lsig`) as its second:
+argument and the linear predictor of the sigma parameter (which we will call `lsig`) as its second:
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
 hn <- function(distance, lsig) {
@@ -316,10 +316,9 @@ ggplot(data = Nest1) +
 Comparing the models
 -----------------------
 
-```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-deltaIC(fit1, fit)
 
-# Look at the goodness-of-fit of the two models in the distance dimension
+Look at the goodness-of-fit of the two models in the distance dimension
+```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 bc <- bincount(
   result = fit,
   observations = mexdolphin$points$distance,
@@ -368,11 +367,6 @@ dfit1 <- lgcp(
 detfun1 <- predict(dfit1, distdf, ~ hr(distance, lsig), include = "lsig")
 ```
 
-Compare detection function models by DIC:
-
-```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-deltaIC(dfit1, dfit)
-```
 
 Plot both lines on histogram of observations
 First scale lines to have same area as that of histogram
