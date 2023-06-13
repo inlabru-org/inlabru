@@ -717,8 +717,10 @@ extended_bind_rows <- function(...) {
 #' @param ips Integration points for 'cp' family. Overrides `samplers`.
 #' @param domain Named list of domain definitions.
 #' @param include Character vector of component labels that are needed by the
-#'   predictor expression; Default: NULL (include all components that are not
-#'   explicitly excluded)
+#'   predictor expression; Default: the result of `[all.vars()]` on the
+#'   predictor expression, unless the expression is not ".", in which case
+#'   `include=NULL`, to include all components that are not
+#'   explicitly excluded.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
@@ -1033,6 +1035,13 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       BRU_Ntrials = Ntrials
     )
     response <- "BRU_response"
+  }
+
+  if (is.null(include)) {
+    include <- all.vars(replace_dollar(formula[[length(formula)]]))
+    if (identical(include, ".")) {
+      include <- NULL
+    }
   }
 
   # The likelihood object that will be returned
@@ -1394,8 +1403,10 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
 #' @param include Character vector of component labels that are needed by the
-#'   predictor expression; Default: NULL (include all components that are not
-#'   explicitly excluded) if `newdata` is provided, otherwise `character(0)`.
+#'   predictor expression; Default: the result of `[all.vars()]` on the
+#'   predictor expression, unless the expression is not ".", in which case
+#'   `include=NULL`, to include all components that are not
+#'   explicitly excluded.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
@@ -1550,6 +1561,24 @@ predict.bru <- function(object,
   smy
 }
 
+
+# Function from
+# https://stackoverflow.com/questions/63580260/is-there-a-way-to-stop-all-vars-returning-names-from-the-right-hand-side-of
+# corrected to handle multiple $ correctly
+replace_dollar <- function(expr) {
+  if (!is.language(expr) || length(expr) == 1L) return(expr)
+  if (expr[[1]] == quote(`$`)) {
+    expr[[1]] <- quote(`[[`)
+    expr[[3]] <- as.character(expr[[3]])
+    expr[[2]] <- replace_dollar(expr[[2]])
+    expr[[3]] <- replace_dollar(expr[[3]])
+  } else {
+    for (i in seq_along(expr)[-1])
+      expr[[i]] <- replace_dollar(expr[[i]])
+  }
+  expr
+}
+
 #' Sampling based on bru posteriors
 #'
 #' @description
@@ -1656,6 +1685,20 @@ generate.bru <- function(object,
     state
   } else {
     # TODO: clarify the output format, and use the format parameter
+
+    if (is.null(include)) {
+      include <- all.vars(replace_dollar(formula[[length(formula)]]))
+      if (identical(include, ".")) {
+        include <- NULL
+      }
+    }
+    if (is.null(include)) {
+      include <- intersect(
+        include,
+        names(object$bru_info$model$effects)
+      )
+    }
+
     vals <- evaluate_model(
       model = object$bru_info$model,
       state = state,
