@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9013</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,8 +125,10 @@ If <code>mask</code> is a <code>Spatial</code> object, only return pixels covere
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"mrsea"</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">pxl</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_pixels.html">fm_pixels</a></span><span class="op">(</span><span class="va">mrsea</span><span class="op">$</span><span class="va">mesh</span>, nx <span class="op">=</span> <span class="fl">50</span>, ny <span class="op">=</span> <span class="fl">50</span>, mask <span class="op">=</span> <span class="va">mrsea</span><span class="op">$</span><span class="va">boundary</span>,</span></span>
-<span class="r-in"><span>    format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">pxl</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_pixels.html">fm_pixels</a></span><span class="op">(</span><span class="va">mrsea</span><span class="op">$</span><span class="va">mesh</span>,</span></span>
+<span class="r-in"><span>    nx <span class="op">=</span> <span class="fl">50</span>, ny <span class="op">=</span> <span class="fl">50</span>, mask <span class="op">=</span> <span class="va">mrsea</span><span class="op">$</span><span class="va">boundary</span>,</span></span>
+<span class="r-in"><span>    format <span class="op">=</span> <span class="st">"sp"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">pxl</span>, fill <span class="op">=</span> <span class="st">"grey"</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="gg.html">gg</a></span><span class="op">(</span><span class="va">mrsea</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span></span></span>

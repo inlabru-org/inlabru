@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9013</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-06-10</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-06-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_distancesampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_distancesampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_distancesampling.Rmd</code></div>
@@ -178,7 +178,7 @@ intervals:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">distance</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">0</span>, pch <span class="op">=</span> <span class="st">"|"</span>, cex <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-4-1.png" width="960"></p>
 <p>We need to define a half-normal detection probability function. This
-must take distance as its first arguent and the linear predictor of the
+must take distance as its first argument and the linear predictor of the
 sigma parameter (which we will call <code>lsig</code>) as its
 second:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -262,17 +262,17 @@ of component names to include in the prediction calculations, here only
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dfun</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-12-1.png" width="960">
 The average detection probability within the maximum detection distance
-is estimated to be 0.7127336.</p>
+is estimated to be 0.7024974.</p>
 <p>We can look at the posterior for expected number of dolphins as
 usual:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fm_int.html">fm_int</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5  q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 234.1426 43.36634 169.8041 227.0179 326.208 227.0179        4.336634</span></span>
+<span><span class="co">#&gt;      mean       sd   q0.025    q0.5   q0.975  median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 237.192 52.40041 160.7939 229.607 340.0222 229.607        5.240041</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      2.838565</span></span></code></pre></div>
+<span><span class="co">#&gt; 1       4.63649</span></span></code></pre></div>
 <p>and including the randomness about the expected number. In this case,
 it turns out that you need lots of posterior samples, e.g. 2,000 to
 smooth out the Monte Carlo error in the posterior, and this takes a
@@ -365,10 +365,10 @@ model:</p>
 <span><span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fm_int.html">fm_int</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span></span>
-<span><span class="co">#&gt;      mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 299.046 84.32715 167.3999 296.6426 462.4444 296.6426        8.432715</span></span>
+<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 299.5402 92.46464 163.1708 285.8625 510.7943 285.8625        9.246464</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      4.782433</span></span>
+<span><span class="co">#&gt; 1      8.367746</span></span>
 <span></span>
 <span><span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -401,14 +401,10 @@ model:</p>
 <div class="section level2">
 <h2 id="comparing-the-models">Comparing the models<a class="anchor" aria-label="anchor" href="#comparing-the-models"></a>
 </h2>
+<p>Look at the goodness-of-fit of the two models in the distance
+dimension</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Model       DIC Delta.DIC</span></span>
-<span><span class="co">#&gt; 1   fit -804.4106  0.000000</span></span>
-<span><span class="co">#&gt; 2  fit1 -801.9081  2.502437</span></span>
-<span></span>
-<span><span class="co"># Look at the goodness-of-fit of the two models in the distance dimension</span></span>
-<span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bincount.html">bincount</a></span><span class="op">(</span></span>
 <span>  result <span class="op">=</span> <span class="va">fit</span>,</span>
 <span>  observations <span class="op">=</span> <span class="va">mexdolphin</span><span class="op">$</span><span class="va">points</span><span class="op">$</span><span class="va">distance</span>,</span>
 <span>  breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">points</span><span class="op">$</span><span class="va">distance</span><span class="op">)</span>, length <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>,</span>
@@ -453,15 +449,9 @@ model:</p>
 <span>  formula <span class="op">=</span> <span class="va">formula1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">detfun1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">dfit1</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hr</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span>, include <span class="op">=</span> <span class="st">"lsig"</span><span class="op">)</span></span></code></pre></div>
-<p>Compare detection function models by DIC:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">dfit1</span>, <span class="va">dfit</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Model       DIC Delta.DIC</span></span>
-<span><span class="co">#&gt; 1  dfit -8.707857  0.000000</span></span>
-<span><span class="co">#&gt; 2 dfit1 -6.585941  2.121916</span></span></code></pre></div>
 <p>Plot both lines on histogram of observations First scale lines to
 have same area as that of histogram Half-normal:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hnline</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">distance</span>, p <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">mean</span>, lower <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">q0.025</span>, upper <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">q0.975</span><span class="op">)</span></span>
 <span><span class="va">wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">hnline</span><span class="op">$</span><span class="va">distance</span><span class="op">)</span></span>
 <span><span class="va">wts</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">wts</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="fl">2</span></span>
@@ -473,7 +463,7 @@ have same area as that of histogram Half-normal:</p>
 <span><span class="va">hnline</span><span class="op">$</span><span class="va">En.lower</span> <span class="op">&lt;-</span> <span class="va">hnline</span><span class="op">$</span><span class="va">lower</span> <span class="op">*</span> <span class="va">scale</span></span>
 <span><span class="va">hnline</span><span class="op">$</span><span class="va">En.upper</span> <span class="op">&lt;-</span> <span class="va">hnline</span><span class="op">$</span><span class="va">upper</span> <span class="op">*</span> <span class="va">scale</span></span></code></pre></div>
 <p>Hazard-rate:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hrline</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="va">detfun1</span><span class="op">$</span><span class="va">distance</span>, p <span class="op">=</span> <span class="va">detfun1</span><span class="op">$</span><span class="va">mean</span>, lower <span class="op">=</span> <span class="va">detfun1</span><span class="op">$</span><span class="va">q0.025</span>, upper <span class="op">=</span> <span class="va">detfun1</span><span class="op">$</span><span class="va">q0.975</span><span class="op">)</span></span>
 <span><span class="va">wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">hrline</span><span class="op">$</span><span class="va">distance</span><span class="op">)</span></span>
 <span><span class="va">wts</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">wts</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="fl">2</span></span>
@@ -485,21 +475,21 @@ have same area as that of histogram Half-normal:</p>
 <span><span class="va">hrline</span><span class="op">$</span><span class="va">En.lower</span> <span class="op">&lt;-</span> <span class="va">hrline</span><span class="op">$</span><span class="va">lower</span> <span class="op">*</span> <span class="va">scale</span></span>
 <span><span class="va">hrline</span><span class="op">$</span><span class="va">En.upper</span> <span class="op">&lt;-</span> <span class="va">hrline</span><span class="op">$</span><span class="va">upper</span> <span class="op">*</span> <span class="va">scale</span></span></code></pre></div>
 <p>Combine lines in a single object for plotting</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dlines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">hnline</span>, model <span class="op">=</span> <span class="st">"Half-normal"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">hrline</span>, model <span class="op">=</span> <span class="st">"Hazard-rate"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Plot without the 95% credible intervals</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">points</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">distance</span><span class="op">)</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, length <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">distance</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">0.2</span>, shape <span class="op">=</span> <span class="st">"|"</span>, size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dlines</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">distance</span>, y <span class="op">=</span> <span class="va">En</span>, group <span class="op">=</span> <span class="va">model</span>, col <span class="op">=</span> <span class="va">model</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-25-1.png" width="672"></p>
+<p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-24-1.png" width="672"></p>
 <p>Plot with the 95% credible intervals (without taking the count
 rescaling into account)</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">points</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">distance</span><span class="op">)</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, length <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">distance</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">0.2</span>, shape <span class="op">=</span> <span class="st">"|"</span>, size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
@@ -508,7 +498,7 @@ rescaling into account)</p>
 <span>    data <span class="op">=</span> <span class="va">dlines</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">distance</span>, ymin <span class="op">=</span> <span class="va">En.lower</span>, ymax <span class="op">=</span> <span class="va">En.upper</span>, group <span class="op">=</span> <span class="va">model</span>, col <span class="op">=</span> <span class="va">model</span>, fill <span class="op">=</span> <span class="va">model</span><span class="op">)</span>,</span>
 <span>    alpha <span class="op">=</span> <span class="fl">0.2</span>, lty <span class="op">=</span> <span class="fl">2</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-26-1.png" width="672"></p>
+<p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-25-1.png" width="672"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
