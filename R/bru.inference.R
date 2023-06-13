@@ -1670,7 +1670,7 @@ generate.bru <- function(object,
 
 
 
-# Monte Carlo method for estimating aposterior
+# Monte Carlo method for estimating posterior
 #
 # @aliases montecarlo.posterior
 # @export
