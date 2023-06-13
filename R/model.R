@@ -178,7 +178,7 @@ evaluate_model <- function(model,
   if (is.null(state)) {
     stop("Not enough information to evaluate model states.")
   }
-  if (is.null(input) && !is.null(data)) {
+  if (is.null(input)) {
     input <- input_eval(
       components = model$effects[included],
       data = data,
