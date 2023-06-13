@@ -190,7 +190,7 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
 #' \item{rel_tol}{Stop the iterations when the largest change in linearisation point
 #' (the conditional latent state mode) in relation to the estimated posterior
-#' standard deviation is less than `rel_tol`. Default 0.01 (one percent).}
+#' standard deviation is less than `rel_tol`. Default 0.05 (five percent).}
 #' \item{max_step}{The largest allowed line search step factor. Factor 1 is the
 #' full INLA step. Default is 2.}
 #' \item{lin_opt_method}{Which method to use for the line search optimisation step.
@@ -300,7 +300,7 @@ bru_options_default <- function() {
       taylor = "pandemic",
       search = "all",
       factor = (1 + sqrt(5)) / 2,
-      rel_tol = 0.01,
+      rel_tol = 0.05,
       max_step = 2,
       lin_opt_method = "onestep"
     ),
