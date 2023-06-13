@@ -274,7 +274,8 @@ make_track_plots <- function(fit) {
     )) +
     pl_theme_norm +
     ggplot2::scale_y_log10() +
-    ggplot2::ggtitle("|Change| / sd (Max and Mean)")
+    ggplot2::ggtitle("|Change| / sd (Max and Mean)") +
+    ggplot2::geom_hline(yintercept = fit$bru_info$options$bru_method$rel_tol)
 
   pl6 <-
     ggplot2::ggplot(

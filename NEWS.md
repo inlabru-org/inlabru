@@ -2,6 +2,18 @@
 
 ## Feature updates
 
+* The iterative inla method has been given both sharper internal `inla()` optimisation
+  criteria for the iterations (thanks to Haavard Rue), _and_ a more relaxed
+  nonlinear iteration stopping criterion; the default `bru_method$rel_tol`
+  values has been changed from 1 to 10 percent change, relative to the posterior standard deviation.
+  This seems to strike a useful balance between the different optimisation
+  criteria, allowing the iterations to converge faster and also detect that
+  convergence sooner.
+
+* The logic for which components are needed for a predictor expression (in `like()` or `generate()`/`predict()`)
+  has been updated to when possible extract the list of components from the expression itself.
+  The user can override this default if necessary, using the `include`/`exclude` arguments.
+
 * Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
   Supports both `sf` and `sp` sampler objects.
   
