@@ -81,8 +81,12 @@ interpreted with great care.}
 \item{domain}{Named list of domain definitions.}
 
 \item{include}{Character vector of component labels that are needed by the
-predictor expression; Default: NULL (include all components that are not
-explicitly excluded)}
+predictor expression; Default: the result of \verb{[all.vars()]} on the
+predictor expression, unless the expression is not ".", in which case
+\code{include=NULL}, to include all components that are not
+explicitly excluded. The \verb{[bru_expression_vars()]} function is used
+to extract the variable names, followed by removal of non-component names
+when the components are available.}
 
 \item{exclude}{Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list
@@ -121,7 +125,7 @@ the calling environment.}
 \item{i}{indices specifying elements to extract}
 }
 \value{
-A likelihood configuration which can be used to parameterize \code{\link[=bru]{bru()}}.
+A likelihood configuration which can be used to parameterise \code{\link[=bru]{bru()}}.
 }
 \description{
 Likelihood construction for usage with \code{\link[=bru]{bru()}}

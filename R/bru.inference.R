@@ -720,7 +720,9 @@ extended_bind_rows <- function(...) {
 #'   predictor expression; Default: the result of `[all.vars()]` on the
 #'   predictor expression, unless the expression is not ".", in which case
 #'   `include=NULL`, to include all components that are not
-#'   explicitly excluded.
+#'   explicitly excluded. The `[bru_expression_vars()]` function is used
+#'   to extract the variable names, followed by removal of non-component names
+#'   when the components are available.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
@@ -742,7 +744,7 @@ extended_bind_rows <- function(...) {
 #' (`E`, `Ntrials`, and `weights`) if not found in `response_data` or `data`. Defaults to
 #' the calling environment.
 #'
-#' @return A likelihood configuration which can be used to parameterize [bru()].
+#' @return A likelihood configuration which can be used to parameterise [bru()].
 #'
 #' @example inst/examples/like.R
 
@@ -1038,9 +1040,9 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   }
 
   if (is.null(include)) {
-    include <- all.vars(replace_dollar(formula[[length(formula)]]))
-    if (identical(include, ".")) {
-      include <- NULL
+    include <- bru_expression_vars(deparse(formula[[length(formula)]]))
+    if (!is.null(include)) {
+      include <- union(include, bru_expression_vars(expr))
     }
   }
 
@@ -1406,7 +1408,9 @@ expand_to_dataframe <- function(x, data = NULL) {
 #'   predictor expression; Default: the result of `[all.vars()]` on the
 #'   predictor expression, unless the expression is not ".", in which case
 #'   `include=NULL`, to include all components that are not
-#'   explicitly excluded.
+#'   explicitly excluded. The `[bru_expression_vars()]` function is used
+#'   to extract the variable names, followed by removal of non-component names
+#'   when the components are available.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
@@ -1579,6 +1583,28 @@ replace_dollar <- function(expr) {
   expr
 }
 
+#' Extract basic variable names from expression
+#'
+#' First replaces `$` with `[[` indexing, so that internal column/variable names are ignored,
+#' then calls `all.vars()`.
+#'
+#' @param expr An `expression`
+#'
+#' @returns If successful, a character vector, otherwise `NULL`
+#'
+#' @keywords internal
+#' @export
+bru_expression_vars <- function(expr) {
+  ex <- as.character(expr)
+  ex <- as.formula(paste0("~ ", paste0(expr, collapse = "\n")))
+  ex <- ex[[length(ex)]]
+  vars <- all.vars(replace_dollar(ex))
+  if (identical(vars, ".") || identical(vars, character(0))) {
+    vars <- NULL
+  }
+  vars
+}
+
 #' Sampling based on bru posteriors
 #'
 #' @description
@@ -1687,12 +1713,9 @@ generate.bru <- function(object,
     # TODO: clarify the output format, and use the format parameter
 
     if (is.null(include)) {
-      include <- all.vars(replace_dollar(formula[[length(formula)]]))
-      if (identical(include, ".")) {
-        include <- NULL
-      }
+      include <- bru_expression_vars(deparse(formula[[length(formula)]]))
     }
-    if (is.null(include)) {
+    if (!is.null(include)) {
       include <- intersect(
         include,
         names(object$bru_info$model$effects)

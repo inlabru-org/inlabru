@@ -109,7 +109,9 @@ residual_df <- function(model, df, expr, A_sum, A_integrate) {
                        as.vector(A_sum %*% h3[obs]) -
                        as.vector(A_integrate %*% (h3 * lambda)[!obs])
                    )
-                 })
+                 },
+                 include = bru_expression_vars(deparse(expr))
+  )
 
   # Label the three types of residuals
   res$Scaling_Residuals$Type <- "Scaling Residuals"

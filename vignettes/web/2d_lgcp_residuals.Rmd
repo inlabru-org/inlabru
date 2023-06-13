@@ -253,7 +253,7 @@ The residuals of the model are also computed where $B = W$.
 ```{r veg-mod, echo=TRUE}
 # Define the vegetation model
 comp1 <- coordinates ~
-  vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(x * 0 + 1)
+  vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(1)
 
 fit1 <- lgcp(comp1, nests,
   samplers = boundary,
