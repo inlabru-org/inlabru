@@ -1661,7 +1661,7 @@ generate.bru <- function(object,
       state = state,
       data = newdata,
       predictor = formula,
-      include = if (is.null(newdata)) character(0) else include,
+      include = if (is.null(newdata) && is.null(include)) character(0) else include,
       exclude = exclude
     )
     vals
