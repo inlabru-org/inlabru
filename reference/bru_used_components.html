@@ -12,7 +12,7 @@ individual observation models."><!-- mathjax --><script src="https://cdnjs.cloud
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9017</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9018</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,6 +88,9 @@ individual observation models.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_used_components</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">bru_used_components</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for bru</span></span>
 <span><span class="fu">bru_used_components</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, join <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -95,7 +98,10 @@ individual observation models.</p>
 <span><span class="fu">bru_used_components</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, join <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_like</span></span>
-<span><span class="fu">bru_used_components</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">bru_used_components</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bru_used_components</span></span>
+<span><span class="fu">bru_used_components</span><span class="op">(</span><span class="va">x</span>, labels <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -112,6 +118,11 @@ individual observation models.</p>
 <dd><p>Whether to join list output into a single object; Default
 may depend on the input object class</p></dd>
 
+
+<dt>labels</dt>
+<dd><p>character; component labels passed on to
+<code><a href="bru_used_components_update.html">bru_used_components_update()</a></code></p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -122,6 +133,20 @@ may depend on the input object class</p></dd>
 
 <p>and <code>latent</code>), or a list of such objects
 (for methods with <code>join = FALSE</code>)</p>
+    </div>
+    <div class="section level2">
+    <h2 id="methods-by-class-">Methods (by class)<a class="anchor" aria-label="anchor" href="#methods-by-class-"></a></h2>
+    
+<ul><li><p><code>bru_used_components(default)</code>: create default <code>bru_used_components</code> object
+that will include all components as both effects and latent. The <code>...</code>
+arguments are passed on to <code>bru_used_components_create</code>, so a <code>labels</code>
+argument may be supplied.</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other bru_used_components: 
+<code><a href="bru_used_components_create.html">bru_used_components_create</a>()</code>,
+<code><a href="bru_used_components_update.html">bru_used_components_update</a>()</code></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

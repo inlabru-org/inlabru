@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9017</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9018</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -184,11 +184,12 @@ interpreted with great care.</p></dd>
 
 
 <dt>include</dt>
-<dd><p>Character vector of component labels that are needed by the
+<dd><p>Character vector of component labels that are used as effects
+by the
 predictor expression; Default: the result of <code>[all.vars()]</code> on the
 predictor expression, unless the expression is not ".", in which case
 <code>include=NULL</code>, to include all components that are not
-explicitly excluded. The <code>[bru_expression_vars()]</code> function is used
+explicitly excluded. The <code><a href="bru_expression_vars.html">bru_expression_vars()</a></code> function is used
 to extract the variable names, followed by removal of non-component names
 when the components are available.</p></dd>
 
