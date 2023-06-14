@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9014</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,9 @@
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
 <div class="section level3">
 <h3 id="feature-updates-development-version">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-development-version"></a></h3>
-<ul><li><p>Add <code><a href="../reference/fm_int.html">fm_int()</a></code> integration methods, replacing the old <code>ipmaker()</code> and <code><a href="../reference/ipoints.html">ipoints()</a></code> methods. Supports both <code>sf</code> and <code>sp</code> sampler objects.</p></li>
+<ul><li><p>The iterative inla method has been given both sharper internal <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code> optimisation criteria for the iterations (thanks to Haavard Rue), <em>and</em> a more relaxed nonlinear iteration stopping criterion; the default <code>bru_method$rel_tol</code> values has been changed from 1 to 10 percent change, relative to the posterior standard deviation. This seems to strike a useful balance between the different optimisation criteria, allowing the iterations to converge faster and also detect that convergence sooner.</p></li>
+<li><p>The logic for which components are needed for a predictor expression (in <code><a href="../reference/like.html">like()</a></code> or <code><a href="../reference/generate.html">generate()</a></code>/<code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code>) has been updated to when possible extract the list of components from the expression itself. The user can override this default if necessary, using the <code>include</code>/<code>exclude</code> arguments. The <code><a href="../reference/bru_expression_vars.html">bru_expression_vars()</a></code> is used to guess the needed component names, applied to the right-hand side of the <code>formula</code> arguments.</p></li>
+<li><p>Add <code><a href="../reference/fm_int.html">fm_int()</a></code> integration methods, replacing the old <code>ipmaker()</code> and <code><a href="../reference/ipoints.html">ipoints()</a></code> methods. Supports both <code>sf</code> and <code>sp</code> sampler objects.</p></li>
 <li><p>Add <code><a href="../reference/fm_pixels.html">fm_pixels()</a></code> methods for gridded points. The old <code><a href="../reference/pixels.html">pixels()</a></code> method now calls <code>fm_pixels(..., format = "sp")</code></p></li>
 <li><p><code>eval_spatial</code> support for sf objects (for point-in-polygon data lookups)</p></li>
 <li><p>Allow precomputed spatial covariates in the data for point process observations</p></li>
