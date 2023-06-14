@@ -1104,6 +1104,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
     )
   } else {
     if (!is.null(lhoods)) {
+      if (length(lhoods) > 0) {
       inp <- lapply(
         lhoods,
         function(lh) {
@@ -1115,6 +1116,21 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
           )
         }
       )
+      } else {
+        # Component not directly used in any likelihood.
+        # Attempt to evaluate with no data;
+        # useful for intercept-like components only used via the
+        # *_latent technique.
+        inp <- list(
+          input_eval(subcomp$input,
+                     data = NULL,
+                     env = env,
+                     label = subcomp$input$label,
+                     null.on.fail = TRUE
+          )
+        )
+
+      }
       # Check for
       # 1) All NULL; Deprecated unless input is NULL. Since version 2.1.14,
       #              intercepts should be notated explicitly with label(1)
