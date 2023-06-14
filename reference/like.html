@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9014</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9015</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -189,7 +189,8 @@ predictor expression, unless the expression is not ".", in which case
 <code>include=NULL</code>, to include all components that are not
 explicitly excluded. The <code>[bru_expression_vars()]</code> function is used
 to extract the variable names, followed by removal of non-component names
-when the components are available.</p></dd>
+when the components are available. See also the <code>allow_latent</code> argument that
+in some cases requires explicit <code>include</code> specifications.</p></dd>
 
 
 <dt>exclude</dt>
@@ -205,7 +206,7 @@ directly available to the predictor expression, with a <code>_latent</code> suff
 This also makes evaluator functions with suffix <code>_eval</code> available, taking
 parameters <code>main</code>, <code>group</code>, and <code>replicate</code>, taking values for where to
 evaluate the component effect that are different than those defined in the
-component definition itself (see <code><a href="component_eval.html">component_eval()</a></code>). Default <code>FALSE</code></p></dd>
+component definition itself (see <code><a href="component_eval.html">component_eval()</a></code>). Default <code>FALSE</code>.</p></dd>
 
 
 <dt>allow_combine</dt>
