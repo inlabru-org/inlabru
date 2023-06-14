@@ -179,10 +179,12 @@ providing distances and no spatial coordinates, so we cannot evaluate the
 spatial random field in this `predict()` call. We can specify this by providing
 a vector of component names to include in the prediction calculations, here only
 "lsig", with `include = "lsig"`. See `?predict.bru` for more information.
+From version `2.8.0`, inlabru attmepts to automatically detect which components
+are used by the predictor expression, and the `include` argument can usually be left out.
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=TRUE, fig.width=10, fig.heigth=4}
 distdf <- data.frame(distance = seq(0, 8, length = 100))
-dfun <- predict(fit, distdf, ~ hn(distance, lsig), include = "lsig")
+dfun <- predict(fit, distdf, ~ hn(distance, lsig))
 plot(dfun)
 ```
 The average detection probability within the maximum detection distance is estimated to be
@@ -278,7 +280,7 @@ ggplot() +
   coord_equal()
 
 distdf <- data.frame(distance = seq(0, 8, length = 100))
-dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig), include = "lsig")
+dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
 plot(dfun1)
 
 predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
@@ -350,7 +352,7 @@ dfit <- lgcp(
   formula = formula,
   options = list(bru_initial = list(lsig = 1, Intercept = 3))
 )
-detfun <- predict(dfit, distdf, ~ hn(distance, lsig), include = "lsig")
+detfun <- predict(dfit, distdf, ~ hn(distance, lsig))
 ```
 
 Half-normal next
@@ -364,7 +366,7 @@ dfit1 <- lgcp(
   domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
   formula = formula1
 )
-detfun1 <- predict(dfit1, distdf, ~ hr(distance, lsig), include = "lsig")
+detfun1 <- predict(dfit1, distdf, ~ hr(distance, lsig))
 ```
 
 

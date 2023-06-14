@@ -627,16 +627,20 @@ adding the suffix `_eval` to the end of the component name in the predictor
 expression, and disabling normal component evaluation for all components with
 `include = character(0)`
 (since we're both bypassing the normal input to the `elev` component, and not
-supplying data for the other components). Since the elevation effect in this
+supplying data for the other components).  From version `2.8.0`, `inlabru` attempts
+to automatically detect which model components are used in the expression, and the
+`include` argument can usually be left out entirely.
+
+Since the elevation effect in this
 model is linear, the resulting plot isn't very interesting, but the same method
-can be applied to non-linear effects as well, and combined into general R expressions: 
+can be applied to non-linear effects as well, and combined into general R expressions.
 
 ```{r}
 elev.pred <- predict(
   efit,
   data.frame(elevation = seq(0, 100, length.out = 1000)),
   formula = ~ elev_eval(elevation),
-  include = character(0)
+  include = character(0) # Not needed from version 2.8.0
 )
 
 ggplot(elev.pred) +
