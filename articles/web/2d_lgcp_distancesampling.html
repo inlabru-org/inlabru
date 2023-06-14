@@ -255,14 +255,17 @@ so we cannot evaluate the spatial random field in this
 <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> call. We can specify this by providing a vector
 of component names to include in the prediction calculations, here only
 “lsig”, with <code>include = "lsig"</code>. See
-<code><a href="../../reference/predict.bru.html">?predict.bru</a></code> for more information.</p>
+<code><a href="../../reference/predict.bru.html">?predict.bru</a></code> for more information. From version
+<code>2.8.0</code>, inlabru attmepts to automatically detect which
+components are used by the predictor expression, and the
+<code>include</code> argument can usually be left out.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">distdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">dfun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hn</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span>, include <span class="op">=</span> <span class="st">"lsig"</span><span class="op">)</span></span>
+<span><span class="va">dfun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hn</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dfun</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-12-1.png" width="960">
 The average detection probability within the maximum detection distance
-is estimated to be 0.7159655.</p>
+is estimated to be 0.6888861.</p>
 <p>We can look at the posterior for expected number of dolphins as
 usual:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -270,9 +273,9 @@ usual:</p>
 <span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 242.7042 54.36921 159.0711 233.7994 363.9115 233.7994        5.436921</span></span>
+<span><span class="co">#&gt; 1 237.3466 49.10626 168.2299 228.0245 342.3914 228.0245        4.910626</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      4.587686</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      4.060298</span></span></code></pre></div>
 <p>and including the randomness about the expected number. In this case,
 it turns out that you need lots of posterior samples, e.g. 2,000 to
 smooth out the Monte Carlo error in the posterior, and this takes a
@@ -357,7 +360,7 @@ model:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">distdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">dfun1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hr</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span>, include <span class="op">=</span> <span class="st">"lsig"</span><span class="op">)</span></span>
+<span><span class="va">dfun1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hr</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dfun1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-17-4.png" width="672"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
@@ -366,9 +369,9 @@ model:</p>
 <span><span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 294.1002 110.6833 154.1712 274.6438 540.9205 274.6438        11.06833</span></span>
+<span><span class="co">#&gt; 1 283.3873 87.42933 144.8248 267.7382 478.6867 267.7382        8.742933</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      17.08361</span></span>
+<span><span class="co">#&gt; 1       8.07642</span></span>
 <span></span>
 <span><span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -437,7 +440,7 @@ dimension</p>
 <span>  formula <span class="op">=</span> <span class="va">formula</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bru_initial <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lsig <span class="op">=</span> <span class="fl">1</span>, Intercept <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">detfun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">dfit</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hn</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span>, include <span class="op">=</span> <span class="st">"lsig"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">detfun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">dfit</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hn</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Half-normal next</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">formula1</span> <span class="op">&lt;-</span> <span class="va">distance</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu">hr</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="va">Intercept</span></span>
@@ -448,7 +451,7 @@ dimension</p>
 <span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html" class="external-link">inla.mesh.1d</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, length.out <span class="op">=</span> <span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  formula <span class="op">=</span> <span class="va">formula1</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">detfun1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">dfit1</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hr</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span>, include <span class="op">=</span> <span class="st">"lsig"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">detfun1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">dfit1</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hr</span><span class="op">(</span><span class="va">distance</span>, <span class="va">lsig</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Plot both lines on histogram of observations First scale lines to
 have same area as that of histogram Half-normal:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
