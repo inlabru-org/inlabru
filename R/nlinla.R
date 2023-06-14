@@ -300,7 +300,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
             comp_simple = comp_simple[[label]],
             effects = effects,
             pred0 = pred0,
-            allow_latent = length(used[["latent"]]) > 0,
+            allow_latent = label %in% used[["latent"]],
             allow_combine = lhood[["allow_combine"]],
             eps = eps,
             ...
