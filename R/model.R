@@ -68,20 +68,9 @@ bru_model <- function(components, lhoods) {
 
   # Create joint formula that will be used by inla
   formula <- BRU_response ~ -1
-  linear <- TRUE
-  included <- character(0)
-  for (lh in lhoods) {
-    linear <- linear && lh[["linear"]]
-    included <- union(
-      included,
-      parse_inclusion(
-        names(components),
-        include = union(lh[["include_components"]],
-                        lh[["include_latent"]]),
-        exclude = NULL
-      )
-    )
-  }
+  included <- bru_used_components(lhoods)
+  included <- union(included[["effect"]], included[["latent"]])
+  linear <- all(vapply(lhoods, function(lh) lh[["linear"]], TRUE))
 
   for (cmp in included) {
     if (linear ||
@@ -794,11 +783,7 @@ evaluate_inputs <- function(model, lhoods, inla_f) {
   lapply(
     lhoods,
     function(lh) {
-      included <- parse_inclusion(
-        names(model[["effects"]]),
-        lh[["include_components"]],
-        lh[["exclude_components"]]
-      )
+      included <- bru_used_components(lh)[["effect"]]
 
       input_eval(
         model$effects[included],
@@ -822,20 +807,8 @@ evaluate_inputs <- function(model, lhoods, inla_f) {
 #' @rdname evaluate_index
 evaluate_index <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
-  included <-
-  unique(do.call(
-    c,
-    lapply(
-      lhoods,
-      function(lh) {
-        parse_inclusion(
-          names(model[["effects"]]),
-          union(lh[["include_components"]],
-                lh[["include_latent"]])
-        )
-      }
-    )
-  ))
+  included <- bru_used_components(lhoods)
+  included <- union(included[["effect"]], included[["latent"]])
 
   list(
     idx_full = index_eval(model[["effects"]][included], inla_f = FALSE),

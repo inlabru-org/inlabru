@@ -690,6 +690,7 @@ component_list.list <- function(object,
   class(object) <- c("component_list", "list")
   environment(object) <- .envir
   if (!is.null(lhoods)) {
+    lhoods <- bru_inclusion_update(lhoods, names(object))
     object <- add_mappers(object, lhoods = lhoods)
   }
   object
@@ -773,11 +774,7 @@ add_mappers.component <- function(component, lhoods, ...) {
   keep_lh <-
     vapply(lhoods,
       function(lh, label) {
-        label %in% parse_inclusion(
-          label,
-          lh[["include_components"]],
-          lh[["exclude_components"]]
-        )
+        label %in% bru_used_components(lh)[["effect"]]
       },
       TRUE,
       label = component$label

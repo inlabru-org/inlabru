@@ -165,8 +165,8 @@ bru_info_upgrade <- function(object,
           # Force inclusion of all components
           object[["lhoods"]][[k]][["include_latent"]] <- NULL
         } else {
-          if (is.null(object[["lhoods"]][[k]][["incude_latent"]])) {
-            object[["lhoods"]][[k]][["incude_latent"]] <- character(0)
+          if (is.null(object[["lhoods"]][[k]][["include_latent"]])) {
+            object[["lhoods"]][[k]][["include_latent"]] <- character(0)
           }
         }
       }
@@ -175,19 +175,33 @@ bru_info_upgrade <- function(object,
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
-
-
-      for (k in seq_along(object[["model"]][["effects"]])) {
-        cmp <- object[["model"]][["effects"]][[k]]
-        if (identical(deparse(cmp[["group"]][["input"]][["input"]]), "NULL")) {
-          cmp[["group"]][["input"]][["input"]] <- expression(1L)
-        }
-        if (identical(deparse(cmp[["replicate"]][["input"]][["input"]]), "NULL")) {
-          cmp[["replicate"]][["input"]][["input"]] <- expression(1L)
-        }
-        object[["model"]][["effects"]][[k]] <- cmp
-      }
       object[["inlabru_version"]] <- "2.7.0.9016"
+    }
+
+    if (utils::compareVersion("2.7.0.9017", old_ver) > 0) {
+      message("Upgrading bru_info to 2.7.0.9017")
+      # Convert old style include_component/allow_latent to new
+      # used_components format
+
+      # Update include/exclude information to limit it to existing components
+      for (k in seq_along(object[["lhoods"]])) {
+        if (is.null(object[["lhoods"]][[k]][["used_components"]])) {
+          if (isTRUE(object[["lhoods"]][[k]][["allow_latent"]])) {
+            # Force inclusion of all components
+            object[["lhoods"]][[k]][["include_latent"]] <- NULL
+          } else {
+            if (is.null(object[["lhoods"]][[k]][["include_latent"]])) {
+              object[["lhoods"]][[k]][["include_latent"]] <- character(0)
+            }
+          }
+        }
+      }
+      object[["lhoods"]] <-
+        bru_inclusion_update(
+          object[["lhoods"]],
+          labels = names(object[["model"]][["effects"]])
+        )
+      object[["inlabru_version"]] <- "2.7.0.9017"
     }
 
     object[["inlabru_version"]] <- new_version
@@ -315,23 +329,103 @@ bru_info.bru <- function(object, ...) {
 
 bru_inclusion_update <- function(lhoods, labels) {
   for (k in seq_along(lhoods)) {
-    lhoods[[k]][["include_components"]] <-
-      parse_inclusion(
-        labels,
-        include = lhoods[[k]][["include_components"]],
-        exclude = lhoods[[k]][["exclude_components"]]
-      )
+    if (is.null(lhoods[[k]][["used_components"]])) {
+      lhoods[[k]][["include_components"]] <-
+        parse_inclusion(
+          labels,
+          include = lhoods[[k]][["include_components"]],
+          exclude = lhoods[[k]][["exclude_components"]]
+        )
+      lhoods[[k]][["exclude_components"]] <- NULL
+      lhoods[[k]][["include_latent"]] <-
+        parse_inclusion(
+          labels,
+          include = lhoods[[k]][["include_latent"]],
+          exclude = NULL
+        )
+    } else {
+      used <- bru_used_components(lhoods[[k]])
+      used$effects <-
+        parse_inclusion(
+          labels,
+          include = used$effects,
+          exclude = NULL
+        )
+      used$latent <-
+        parse_inclusion(
+          labels,
+          include = used$latent,
+          exclude = NULL
+        )
+      lhoods[[k]][["used_components"]] <- used
+    }
+
+    lhoods[[k]][["used_components"]] <- bru_used_components(lhoods[[k]])
+    lhoods[[k]][["include_components"]] <- NULL
     lhoods[[k]][["exclude_components"]] <- NULL
-    lhoods[[k]][["include_latent"]] <-
-      parse_inclusion(
-        labels,
-        include = lhoods[[k]][["include_latent"]],
-        exclude = NULL
-      )
+    lhoods[[k]][["include_latent"]] <- NULL
   }
   lhoods
 }
 
+
+#' List components used in a model
+#'
+#' Extract information about which components are used by a model, or its
+#' individual observation models.
+#'
+#' @param x An object that contains information about used components
+#' @param join Whether to join list output into a single object; Default
+#' may depend on the input object class
+#' @param ... Parameters passed on to the other methods
+#' @returns A `bru_used_components` object (a list with elements `effect`
+#' and `latent`), or a list of such objects
+#' (for methods with `join = FALSE`)
+#'
+#' @export
+#' @keywords internal
+bru_used_components <- function(...) {
+  UseMethod("bru_used_components")
+}
+
+#' @rdname bru_used_components
+#' @export
+bru_used_components.bru <- function(x, ..., join = TRUE) {
+  bru_used_components(x[["bru_info"]][["lhoods"]], ..., join = join)
+}
+
+#' @rdname bru_used_components
+#' @export
+bru_used_components.bru_like_list <- function(x, ..., join = TRUE) {
+  used <- lapply(x, function(y) bru_used_components(y, ...))
+  if (join) {
+    used <-
+      list(
+        effect = unique(unlist(lapply(used, function(y) y[["effect"]]))),
+        latent = unique(unlist(lapply(used, function(y) y[["latent"]])))
+      )
+    class(used) <- c("bru_used_components", class(used))
+  }
+  used
+}
+
+#' @rdname bru_used_components
+#' @export
+bru_used_components.bru_like <- function(x, ...) {
+  if (is.null(x[["used_components"]])) {
+    used <- list(
+      effect = x[["include_components"]],
+      latent = x[["include_latent"]]
+    )
+    class(used) <- c("bru_used_components", class(used))
+  } else {
+    used <- x[["used_components"]]
+    if (!inherits(used, "bru_used_components")) {
+      warning("'used_components' information detected, but not of 'bru_used_components' class.", immediate. = TRUE)
+    }
+  }
+  used
+}
 
 
 #' @title Convenient model fitting using (iterated) INLA
@@ -1297,12 +1391,7 @@ bru_like_expr <- function(lhood, components) {
     pattern = "BRU_EXPRESSION",
     x = expr_text
   )) {
-    included <-
-      parse_inclusion(
-        names(components),
-        include = lhood[["include_components"]],
-        exclude = lhood[["exclude_components"]]
-      )
+    included <- bru_used_components(lhood)[["effect"]]
     expr_text <-
       gsub(
         pattern = "BRU_EXPRESSION",

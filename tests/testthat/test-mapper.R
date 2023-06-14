@@ -487,8 +487,8 @@ test_that("Collect mapper, automatic construction", {
   lik <- like(formula = y ~ ., data = data)
 
   # This tests do not trigger INLA:inla.mesh.1d usage:
-  cmp1 <- component_list(cmp1, lhoods = list(lik))
-  cmp2 <- component_list(cmp2, lhoods = list(lik))
+  cmp1 <- component_list(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- component_list(cmp2, lhoods = like_list(list(lik)))
 
   for (inla_f in c(FALSE, TRUE)) {
     expect_identical(

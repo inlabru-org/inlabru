@@ -231,17 +231,12 @@ bru_compute_linearisation.bru_like <- function(lhood,
                                                comp_simple,
                                                eps,
                                                ...) {
-  include_latent <- lhood[["include_latent"]]
+  used <- bru_used_components(lhood)
   allow_combine <- lhood[["allow_combine"]]
-  include_effects <- parse_inclusion(
-    names(model[["effects"]]),
-    lhood[["include_components"]],
-    lhood[["exclude_components"]]
-  )
   effects <- evaluate_effect_single_state(
-    comp_simple[include_effects],
-    input = input[include_effects],
-    state = state[include_effects],
+    comp_simple[used[["effect"]]],
+    input = input[used[["effect"]]],
+    state = state[used[["effect"]]],
   )
 
   lhood_expr <- bru_like_expr(lhood, model[["effects"]])
@@ -274,7 +269,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
   offset <- pred0
   # Either this loop or the internal bru_component specific loop
   # can in principle be parallelised.
-  for (label in union(include_effects, include_latent)) {
+  for (label in union(used[["effect"]], used[["latent"]])) {
     if (ibm_n(model[["effects"]][[label]][["mapper"]]) > 0) {
       if (lhood[["linear"]] && !lhood[["allow_combine"]]) {
         # If linear and no combinations allowed, just need to copy the
@@ -305,7 +300,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
             comp_simple = comp_simple[[label]],
             effects = effects,
             pred0 = pred0,
-            allow_latent = length(include_latent) > 0,
+            allow_latent = length(used[["latent"]]) > 0,
             allow_combine = lhood[["allow_combine"]],
             eps = eps,
             ...
