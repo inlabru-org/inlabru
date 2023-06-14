@@ -154,6 +154,42 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.7.0.9010"
     }
 
+    if (utils::compareVersion("2.7.0.9016", old_ver) > 0) {
+      message("Upgrading bru_info to 2.7.0.9016")
+      # Convert old style include_component/allow_latent to intermediate
+      # include_component/include_latent format
+
+      # Update include/exclude information to limit it to existing components
+      for (k in seq_along(object[["lhoods"]])) {
+        if (isTRUE(object[["lhoods"]][[k]][["allow_latent"]])) {
+          # Force inclusion of all components
+          object[["lhoods"]][[k]][["include_latent"]] <- NULL
+        } else {
+          if (is.null(object[["lhoods"]][[k]][["incude_latent"]])) {
+            object[["lhoods"]][[k]][["incude_latent"]] <- character(0)
+          }
+        }
+      }
+      object[["lhoods"]] <-
+        bru_inclusion_update(
+          object[["lhoods"]],
+          labels = names(object[["model"]][["effects"]])
+        )
+
+
+      for (k in seq_along(object[["model"]][["effects"]])) {
+        cmp <- object[["model"]][["effects"]][[k]]
+        if (identical(deparse(cmp[["group"]][["input"]][["input"]]), "NULL")) {
+          cmp[["group"]][["input"]][["input"]] <- expression(1L)
+        }
+        if (identical(deparse(cmp[["replicate"]][["input"]][["input"]]), "NULL")) {
+          cmp[["replicate"]][["input"]][["input"]] <- expression(1L)
+        }
+        object[["model"]][["effects"]][[k]] <- cmp
+      }
+      object[["inlabru_version"]] <- "2.7.0.9016"
+    }
+
     object[["inlabru_version"]] <- new_version
   }
   object
@@ -286,6 +322,12 @@ bru_inclusion_update <- function(lhoods, labels) {
         exclude = lhoods[[k]][["exclude_components"]]
       )
     lhoods[[k]][["exclude_components"]] <- NULL
+    lhoods[[k]][["include_latent"]] <-
+      parse_inclusion(
+        labels,
+        include = lhoods[[k]][["include_latent"]],
+        exclude = NULL
+      )
   }
   lhoods
 }
@@ -740,18 +782,20 @@ extended_bind_rows <- function(...) {
 #'   `include=NULL`, to include all components that are not
 #'   explicitly excluded. The `[bru_expression_vars()]` function is used
 #'   to extract the variable names, followed by removal of non-component names
-#'   when the components are available. See also the `allow_latent` argument that
-#'   in some cases requires explicit `include` specifications.
+#'   when the components are available.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#' @param allow_latent logical. If `TRUE`, the latent state of each component is
+#' @param include_latent character vector.
+#' Specifies which the latent state variables are
 #' directly available to the predictor expression, with a `_latent` suffix.
 #' This also makes evaluator functions with suffix `_eval` available, taking
 #' parameters `main`, `group`, and `replicate`, taking values for where to
 #' evaluate the component effect that are different than those defined in the
-#' component definition itself (see [component_eval()]). Default `FALSE`.
+#' component definition itself (see [component_eval()]). Default `NULL`
+#' auto-detects use of `_latent` and `_eval` in the predictor expression.
+#' @param allow_latent logical, deprecated. Use `include_latent` instead.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
 #' Default `FALSE`, but forced to `TRUE` if `response_data` is `NULL` or
@@ -771,8 +815,10 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  response_data = NULL, # agg
                  mesh = NULL, E = NULL, Ntrials = NULL, weights = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
-                 include = NULL, exclude = NULL,
-                 allow_latent = FALSE,
+                 include = NULL,
+                 exclude = NULL,
+                 include_latent = NULL,
+                 allow_latent = NULL,
                  allow_combine = NULL,
                  control.family = NULL,
                  options = list(),
@@ -1059,11 +1105,43 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   }
 
   if (is.null(include)) {
-    include <- bru_expression_vars(deparse(formula[[length(formula)]]))
+    include <- bru_expression_vars(deparse(formula[[length(formula)]]),
+                                   functions = FALSE)
     if (!is.null(include)) {
       include <- union(include, bru_expression_vars(expr))
     }
+    include <- include[!grepl("^.*_latent$", include)]
   }
+  if (is.null(include_latent)) {
+    include_latent <- bru_expression_vars(deparse(formula[[length(formula)]]),
+                                          functions = TRUE)
+    if (!is.null(include_latent)) {
+      include_latent <- union(include_latent,
+                              bru_expression_vars(expr, functions = TRUE))
+    }
+    include_eval <- include_latent
+    include_latent <- include_latent[grepl("^.*_latent$", include_latent)]
+    include_latent <- gsub("_latent$", "", include_latent)
+    include_eval <- include_eval[grepl("^.*_eval$", include_eval)]
+    include_eval <- gsub("_eval$", "", include_eval)
+    include_latent <- union(include_latent, include_eval)
+    if (length(include_latent) == 0) {
+      include_latent <- character(0)
+    }
+  }
+  if (!is.null(allow_latent)) {
+    lifecycle::deprecate_soft(
+      "2.8.0",
+      "like(allow_latent = 'is deprecated')",
+      "like(include_latent)",
+      details = "The default `like(..., include_latent = NULL)` auto-detects use of `_latent` and `_eval`."
+    )
+    if (allow_latent) {
+      # Set to NULL so that later bru_inclusion_update adds all components.
+      include_latent <- NULL
+    }
+  }
+
 
   # The likelihood object that will be returned
 
@@ -1084,7 +1162,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     drange = NULL,
     include_components = include,
     exclude_components = exclude,
-    allow_latent = allow_latent,
+    include_latent = include_latent,
     allow_combine = allow_combine,
     control.family = control.family
   )
@@ -1608,16 +1686,17 @@ replace_dollar <- function(expr) {
 #' then calls `all.vars()`.
 #'
 #' @param expr An `expression`
+#' @param functions logical; if TRUE, include function names
 #'
 #' @returns If successful, a character vector, otherwise `NULL`
 #'
 #' @keywords internal
 #' @export
-bru_expression_vars <- function(expr) {
+bru_expression_vars <- function(expr, functions = FALSE) {
   ex <- as.character(expr)
   ex <- as.formula(paste0("~ ", paste0(expr, collapse = "\n")))
   ex <- ex[[length(ex)]]
-  vars <- all.vars(replace_dollar(ex))
+  vars <- all.vars(replace_dollar(ex), functions = functions)
   if (identical(vars, ".") || identical(vars, character(0))) {
     vars <- NULL
   }

@@ -620,6 +620,11 @@ ibm_is_linear.default <- function(mapper, ...) {
 #' Mapper classes should implement their own `ibm_jacobian` method.
 #' @export
 ibm_jacobian.default <- function(mapper, input, state, ...) {
+  if (is.null(mapper)) {
+    stop(paste0(
+      "NULL mapper detected."
+    ))
+  }
   if (!ibm_is_linear(mapper)) {
     stop(paste0(
       "Non-linear mappers must implement their own 'ibm_jacobian()' method.",

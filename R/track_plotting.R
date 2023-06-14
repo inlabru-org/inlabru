@@ -74,6 +74,8 @@ make_track_plots <- function(fit) {
     dplyr::mutate(alpha_value = 1 / sqrt(max(.data$index))) %>%
     dplyr::ungroup()
 
+  alpha_value_lin_scale <- 0.8
+
   lty_ <- factor(c("Mode", "Lin", "Mode-Lin", "SD"),
     levels = c("Mode", "Lin", "Mode-Lin", "SD")
   )
@@ -121,7 +123,7 @@ make_track_plots <- function(fit) {
       col = .data$index,
       group = factor(.data$index),
       lty = lty_["Lin"],
-      alpha = .data$alpha_value / 2
+      alpha = .data$alpha_value * alpha_value_lin_scale
     )) +
     ggplot2::guides(alpha = "none") +
     pl_theme_abs +
@@ -296,7 +298,7 @@ make_track_plots <- function(fit) {
       col = .data$index,
       group = factor(.data$index),
       lty = lty_["Lin"],
-      alpha = .data$alpha_value / 2
+      alpha = .data$alpha_value * alpha_value_lin_scale
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,

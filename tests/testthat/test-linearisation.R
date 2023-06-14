@@ -15,14 +15,13 @@ test_that("Linearisation", {
   lhoods <-
     like_list(
       like(
-        formula = y ~ exp(x) + Int_y_latent, data = data,
-        allow_latent = TRUE,
-        include = c("x", "Int_y")
+        formula = y ~ exp(x) + Int_y_latent, data = data
       ),
       like(
         formula = z ~ exp(x) + Int_z, data = data, family = "poisson"
       )
     )
+  lhoods <- bru_inclusion_update(lhoods, names(component_list(cmp)))
   model <- bru_model(component_list(cmp, lhoods), lhoods)
 
 

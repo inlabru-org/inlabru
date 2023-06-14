@@ -4,10 +4,12 @@
 \alias{bru_expression_vars}
 \title{Extract basic variable names from expression}
 \usage{
-bru_expression_vars(expr)
+bru_expression_vars(expr, functions = FALSE)
 }
 \arguments{
 \item{expr}{An \code{expression}}
+
+\item{functions}{logical; if TRUE, include function names}
 }
 \value{
 If successful, a character vector, otherwise \code{NULL}

@@ -9,7 +9,7 @@ evaluate_index(model, lhoods)
 \arguments{
 \item{model}{A \code{bru_model} object}
 
-\item{lhoods}{A \code{bru__like_list} object}
+\item{lhoods}{A \code{bru_like_list} object. Deprecated and ignored}
 }
 \value{
 A named list of \code{idx_full} and \code{idx_inla},

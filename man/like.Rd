@@ -22,7 +22,8 @@ like(
   domain = NULL,
   include = NULL,
   exclude = NULL,
-  allow_latent = FALSE,
+  include_latent = NULL,
+  allow_latent = NULL,
   allow_combine = NULL,
   control.family = NULL,
   options = list(),
@@ -86,20 +87,23 @@ predictor expression, unless the expression is not ".", in which case
 \code{include=NULL}, to include all components that are not
 explicitly excluded. The \verb{[bru_expression_vars()]} function is used
 to extract the variable names, followed by removal of non-component names
-when the components are available. See also the \code{allow_latent} argument that
-in some cases requires explicit \code{include} specifications.}
+when the components are available.}
 
 \item{exclude}{Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
 
-\item{allow_latent}{logical. If \code{TRUE}, the latent state of each component is
+\item{include_latent}{character vector.
+Specifies which the latent state variables are
 directly available to the predictor expression, with a \verb{_latent} suffix.
 This also makes evaluator functions with suffix \verb{_eval} available, taking
 parameters \code{main}, \code{group}, and \code{replicate}, taking values for where to
 evaluate the component effect that are different than those defined in the
-component definition itself (see \code{\link[=component_eval]{component_eval()}}). Default \code{FALSE}.}
+component definition itself (see \code{\link[=component_eval]{component_eval()}}). Default \code{NULL}
+auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.}
+
+\item{allow_latent}{logical, deprecated. Use \code{include_latent} instead.}
 
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
 involve several rows of the input data to influence the same row.

@@ -46,15 +46,26 @@ bru_compute_linearisation.component <- function(cmp,
                                                 ...) {
   label <- cmp[["label"]]
 
-  if (!inherits(comp_simple, "bru_mapper_taylor")) {
-    warning("Non-linear component mappers not fully supported!", immediate. = TRUE)
+  if (!is.null(comp_simple) &&
+      !inherits(comp_simple, "bru_mapper_taylor")) {
+    warning(paste0(
+      "Non-linear component mappers not fully supported!",
+      "\nClass for '", label, "': '",
+      paste0(class(comp_simple), collapse = "', '"),
+      "'"
+      ), immediate. = TRUE)
   }
-  A <- ibm_jacobian(comp_simple,
-    input = input[[label]],
-    state = state[[label]]
-  )
+  if (is.null(comp_simple)) {
+    A <- NULL
+    assume_rowwise <- FALSE
+  } else {
+    A <- ibm_jacobian(comp_simple,
+                      input = input[[label]],
+                      state = state[[label]]
+    )
 
-  assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
+    assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
+  }
 
   if (assume_rowwise) {
     if (NROW(A) == 1) {
@@ -84,7 +95,11 @@ bru_compute_linearisation.component <- function(cmp,
   )
   symmetric_diffs <- FALSE
   for (k in seq_len(NROW(state[[label]]))) {
-    row_subset <- which(A[, k] != 0.0)
+    if (is.null(A)) {
+      row_subset <- seq_len(NROW(pred0))
+    } else {
+      row_subset <- which(A[, k] != 0.0)
+    }
     if (length(row_subset) > 0) {
       if (symmetric_diffs) {
         state_eps <- list(state, state)
@@ -101,6 +116,9 @@ bru_compute_linearisation.component <- function(cmp,
       # constructing multiple states and corresponding effects before calling
       # evaluate_predictor
 
+      if (is.null(A)) {
+        effects_eps <- NULL
+      }
       if (assume_rowwise) {
         if (symmetric_diffs) {
           effects_eps <- list(list(), list())
@@ -152,11 +170,14 @@ bru_compute_linearisation.component <- function(cmp,
           } else {
             data
           },
-        effects = if (symmetric_diffs) {
-          effects_eps
-        } else {
-          list(effects_eps)
-        },
+        effects =
+          if (is.null(effects_eps)) {
+            NULL
+          } else if (symmetric_diffs) {
+            effects_eps
+          } else {
+            list(effects_eps)
+          },
         predictor = lhood_expr,
         format = "matrix"
       )
@@ -210,17 +231,17 @@ bru_compute_linearisation.bru_like <- function(lhood,
                                                comp_simple,
                                                eps,
                                                ...) {
-  allow_latent <- lhood[["allow_latent"]]
+  include_latent <- lhood[["include_latent"]]
   allow_combine <- lhood[["allow_combine"]]
-  included <- parse_inclusion(
+  include_effects <- parse_inclusion(
     names(model[["effects"]]),
     lhood[["include_components"]],
     lhood[["exclude_components"]]
   )
   effects <- evaluate_effect_single_state(
-    comp_simple[included],
-    input = input[included],
-    state = state[included],
+    comp_simple[include_effects],
+    input = input[include_effects],
+    state = state[include_effects],
   )
 
   lhood_expr <- bru_like_expr(lhood, model[["effects"]])
@@ -253,7 +274,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
   offset <- pred0
   # Either this loop or the internal bru_component specific loop
   # can in principle be parallelised.
-  for (label in included) {
+  for (label in union(include_effects, include_latent)) {
     if (ibm_n(model[["effects"]][[label]][["mapper"]]) > 0) {
       if (lhood[["linear"]] && !lhood[["allow_combine"]]) {
         # If linear and no combinations allowed, just need to copy the
@@ -284,7 +305,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
             comp_simple = comp_simple[[label]],
             effects = effects,
             pred0 = pred0,
-            allow_latent = lhood[["allow_latent"]],
+            allow_latent = length(include_latent) > 0,
             allow_combine = lhood[["allow_combine"]],
             eps = eps,
             ...

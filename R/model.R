@@ -76,8 +76,9 @@ bru_model <- function(components, lhoods) {
       included,
       parse_inclusion(
         names(components),
-        include = lh[["include_components"]],
-        exclude = lh[["exclude_components"]]
+        include = union(lh[["include_components"]],
+                        lh[["include_latent"]]),
+        exclude = NULL
       )
     )
   }
@@ -813,7 +814,7 @@ evaluate_inputs <- function(model, lhoods, inla_f) {
 #' Computes the index values matrices for included components
 #'
 #' @param model A `bru_model` object
-#' @param lhoods A `bru__like_list` object
+#' @param lhoods A `bru_like_list` object. Deprecated and ignored
 #' @return A named list of `idx_full` and `idx_inla`,
 #' named list of indices, and `inla_subset`, and `inla_subset`,
 #' a named list of logical subset specifications for extracting the `INLA::f()`
@@ -822,19 +823,19 @@ evaluate_inputs <- function(model, lhoods, inla_f) {
 evaluate_index <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
   included <-
-    unique(do.call(
-      c,
-      lapply(
-        lhoods,
-        function(lh) {
-          parse_inclusion(
-            names(model[["effects"]]),
-            lh[["include_components"]],
-            lh[["exclude_components"]]
-          )
-        }
-      )
-    ))
+  unique(do.call(
+    c,
+    lapply(
+      lhoods,
+      function(lh) {
+        parse_inclusion(
+          names(model[["effects"]]),
+          union(lh[["include_components"]],
+                lh[["include_latent"]])
+        )
+      }
+    )
+  ))
 
   list(
     idx_full = index_eval(model[["effects"]][included], inla_f = FALSE),
