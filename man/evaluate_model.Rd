@@ -13,8 +13,7 @@ evaluate_model(
   comp_simple = NULL,
   predictor = NULL,
   format = NULL,
-  include = NULL,
-  exclude = NULL,
+  used = NULL,
   ...
 )
 
@@ -57,15 +56,6 @@ expression for a state.
 expression for a state.
 }}
 
-\item{include}{Character vector of component labels that are needed by the
-predictor expression; Default: NULL (include all components that are not
-explicitly excluded)}
-
-\item{exclude}{Character vector of component labels that are not used by the
-predictor expression. The exclusion list is applied to the list
-as determined by the \code{include} parameter; Default: NULL (do not remove
-any components from the inclusion list)}
-
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
 
 \item{result}{A \code{bru} object from \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}}
@@ -87,6 +77,15 @@ When seed != 0, overridden to "1:1"}
 \item{internal_hyperpar}{logical; If \code{TRUE}, return hyperparameter properties
 on the internal scale. Currently ignored when \code{property="sample"}.
 Default is \code{FALSE}.}
+
+\item{include}{Character vector of component labels that are needed by the
+predictor expression; Default: NULL (include all components that are not
+explicitly excluded)}
+
+\item{exclude}{Character vector of component labels that are not used by the
+predictor expression. The exclusion list is applied to the list
+as determined by the \code{include} parameter; Default: NULL (do not remove
+any components from the inclusion list)}
 }
 \description{
 Evaluate or sample from a posterior result given a model and locations

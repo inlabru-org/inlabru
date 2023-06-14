@@ -21,9 +21,21 @@ test_that("Linearisation", {
         formula = z ~ exp(x) + Int_z, data = data, family = "poisson"
       )
     )
-  lhoods <- bru_inclusion_update(lhoods, names(component_list(cmp)))
-  model <- bru_model(component_list(cmp, lhoods), lhoods)
+  lhoods <- bru_used_components_update(lhoods, names(component_list(cmp)))
 
+  used <- bru_used_components(lhoods[[1]])
+  expect_equal(used[["effect"]], "x")
+  expect_equal(used[["latent"]], "Int_y")
+
+  used <- bru_used_components(lhoods[[2]])
+  expect_equal(used[["effect"]], c("x", "Int_z"))
+  expect_equal(used[["latent"]], character(0))
+
+  used <- bru_used_components(lhoods)
+  expect_equal(used[["effect"]], c("x", "Int_z"))
+  expect_equal(used[["latent"]], "Int_y")
+
+  model <- bru_model(component_list(cmp, lhoods), lhoods)
 
   idx <- evaluate_index(model, lhoods)
   inp <- evaluate_inputs(model, lhoods, inla_f = FALSE)

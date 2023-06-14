@@ -160,23 +160,22 @@ evaluate_model <- function(model,
                            comp_simple = NULL,
                            predictor = NULL,
                            format = NULL,
-                           include = NULL,
-                           exclude = NULL,
+                           used = NULL,
                            ...) {
-  included <- parse_inclusion(names(model$effects), include, exclude)
+  used <- bru_used_components(used, labels = names(model$effects))
 
   if (is.null(state)) {
     stop("Not enough information to evaluate model states.")
   }
   if (is.null(input)) {
     input <- input_eval(
-      components = model$effects[included],
+      components = model$effects[used$effect],
       data = data,
       inla_f = TRUE
     )
   }
   if (is.null(comp_simple) && !is.null(input)) {
-    comp_simple <- evaluate_comp_simple(model$effects[included],
+    comp_simple <- evaluate_comp_simple(model$effects[used$effect],
       input = input,
       inla_f = TRUE
     )
@@ -201,7 +200,8 @@ evaluate_model <- function(model,
     data = data,
     effects = effects,
     predictor = predictor,
-    format = format
+    format = format,
+    used = used
   )
 
   values
@@ -363,6 +363,7 @@ evaluate_effect_multi_state.component_list <- function(components, input, state,
 #' @param effects A list where each element is list of named evaluated effects,
 #' as computed by [evaluate_effect_multi_state.component_list()]
 #' @param predictor Either a formula or expression
+#' @param used A `bru_used_components` object, or NULL (default)
 #' @param format character; determines the storage format of the output.
 #' Available options:
 #' * `"auto"` If the first evaluated result is a vector or single-column matrix,
@@ -385,6 +386,7 @@ evaluate_predictor <- function(model,
                                data,
                                effects,
                                predictor,
+                               used = NULL,
                                format = "auto") {
   stopifnot(inherits(model, "bru_model"))
   format <- match.arg(format, c("auto", "matrix", "list"))
@@ -401,6 +403,8 @@ evaluate_predictor <- function(model,
     } else {
       parent.frame()
     }
+
+  used <- bru_used_components(used, labels = names(model$effects))
 
   envir <- new.env(parent = enclos)
   # Find .data. first,

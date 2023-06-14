@@ -2,18 +2,24 @@
 % Please edit documentation in R/bru.inference.R
 \name{bru_used_components}
 \alias{bru_used_components}
+\alias{bru_used_components.default}
 \alias{bru_used_components.bru}
 \alias{bru_used_components.bru_like_list}
 \alias{bru_used_components.bru_like}
+\alias{bru_used_components.bru_used_components}
 \title{List components used in a model}
 \usage{
 bru_used_components(...)
+
+\method{bru_used_components}{default}(x, ...)
 
 \method{bru_used_components}{bru}(x, ..., join = TRUE)
 
 \method{bru_used_components}{bru_like_list}(x, ..., join = TRUE)
 
 \method{bru_used_components}{bru_like}(x, ...)
+
+\method{bru_used_components}{bru_used_components}(x, labels = NULL, ...)
 }
 \arguments{
 \item{...}{Parameters passed on to the other methods}
@@ -22,6 +28,9 @@ bru_used_components(...)
 
 \item{join}{Whether to join list output into a single object; Default
 may depend on the input object class}
+
+\item{labels}{character; component labels passed on to
+\code{\link[=bru_used_components_update]{bru_used_components_update()}}}
 }
 \value{
 A \code{bru_used_components} object (a list with elements \code{effect}
@@ -32,4 +41,18 @@ and \code{latent}), or a list of such objects
 Extract information about which components are used by a model, or its
 individual observation models.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{bru_used_components(default)}: create default \code{bru_used_components} object
+that will include all components as both effects and latent. The \code{...}
+arguments are passed on to \code{bru_used_components_create}, so a \code{labels}
+argument may be supplied.
+
+}}
+\seealso{
+Other bru_used_components: 
+\code{\link{bru_used_components_create}()},
+\code{\link{bru_used_components_update}()}
+}
+\concept{bru_used_components}
 \keyword{internal}

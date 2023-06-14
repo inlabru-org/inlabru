@@ -47,7 +47,7 @@ When seed != 0, overridden to "1:1"}
 predictor expression; Default: the result of \verb{[all.vars()]} on the
 predictor expression, unless the expression is not ".", in which case
 \code{include=NULL}, to include all components that are not
-explicitly excluded. The \verb{[bru_expression_vars()]} function is used
+explicitly excluded. The \code{\link[=bru_expression_vars]{bru_expression_vars()}} function is used
 to extract the variable names, followed by removal of non-component names
 when the components are available.}
 

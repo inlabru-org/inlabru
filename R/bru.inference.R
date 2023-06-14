@@ -171,7 +171,7 @@ bru_info_upgrade <- function(object,
         }
       }
       object[["lhoods"]] <-
-        bru_inclusion_update(
+        bru_used_components_upgrade(
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
@@ -197,11 +197,23 @@ bru_info_upgrade <- function(object,
         }
       }
       object[["lhoods"]] <-
-        bru_inclusion_update(
+        bru_used_components_upgrade(
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
       object[["inlabru_version"]] <- "2.7.0.9017"
+    }
+
+    if (utils::compareVersion("2.7.0.9018", old_ver) > 0) {
+      message("Upgrading bru_info to 2.7.0.9018")
+      # Make sure used_components format is properly stored
+
+      object[["lhoods"]] <-
+        bru_used_components_upgrade(
+          object[["lhoods"]],
+          labels = names(object[["model"]][["effects"]])
+        )
+      object[["inlabru_version"]] <- "2.7.0.9018"
     }
 
     object[["inlabru_version"]] <- new_version
@@ -327,45 +339,80 @@ bru_info.bru <- function(object, ...) {
 }
 
 
-bru_inclusion_update <- function(lhoods, labels) {
+# Used for upgrading from versions <= 2.7.0.9017
+bru_used_components_upgrade <- function(lhoods, labels) {
   for (k in seq_along(lhoods)) {
     if (is.null(lhoods[[k]][["used_components"]])) {
-      lhoods[[k]][["include_components"]] <-
-        parse_inclusion(
-          labels,
-          include = lhoods[[k]][["include_components"]],
-          exclude = lhoods[[k]][["exclude_components"]]
-        )
+      used <- bru_used_components_create(
+        effect = lhoods[[k]][["include_components"]],
+        latent = lhoods[[k]][["include_latent"]],
+        effect_exclude = lhoods[[k]][["exclude_components"]],
+      )
+
+      lhoods[[k]][["include_components"]] <- NULL
       lhoods[[k]][["exclude_components"]] <- NULL
-      lhoods[[k]][["include_latent"]] <-
-        parse_inclusion(
-          labels,
-          include = lhoods[[k]][["include_latent"]],
-          exclude = NULL
-        )
+      lhoods[[k]][["include_latent"]] <- NULL
     } else {
       used <- bru_used_components(lhoods[[k]])
-      used$effects <-
-        parse_inclusion(
-          labels,
-          include = used$effects,
-          exclude = NULL
-        )
-      used$latent <-
-        parse_inclusion(
-          labels,
-          include = used$latent,
-          exclude = NULL
-        )
-      lhoods[[k]][["used_components"]] <- used
     }
 
-    lhoods[[k]][["used_components"]] <- bru_used_components(lhoods[[k]])
-    lhoods[[k]][["include_components"]] <- NULL
-    lhoods[[k]][["exclude_components"]] <- NULL
-    lhoods[[k]][["include_latent"]] <- NULL
+    used <- bru_used_components_update(used, labels = labels)
+    lhoods[[k]][["used_components"]] <- used
   }
   lhoods
+}
+
+
+#' Update used_component information objects
+#'
+#' Merge available component labels information with used components information
+#'
+#' @param x Object to be updated
+#' @param labels character vector of component labels
+#' @param ... Unused
+#'
+#' @keywords internal
+#' @export
+#' @family bru_used_components
+bru_used_components_update <- function(x, labels, ...) {
+  UseMethod("bru_used_components_update")
+}
+
+#' @rdname bru_used_components_update
+#' @export
+bru_used_components_update.bru_like_list <- function(x, labels, ...) {
+  for (k in seq_along(x)) {
+    x[[k]] <- bru_used_components_update(x[[k]], labels = labels, ...)
+  }
+  x
+}
+
+#' @rdname bru_used_components_update
+#' @export
+bru_used_components_update.bru_like <- function(x, labels, ...) {
+  x[["used_components"]] <-
+    bru_used_components_update(bru_used_components(x), labels = labels, ...)
+  x
+}
+
+#' @rdname bru_used_components_update
+#' @export
+bru_used_components_update.bru_used_components <- function(x, labels, ...) {
+  used <- x
+  used$effect <-
+    parse_inclusion(
+      labels,
+      include = used[["effect"]],
+      exclude = used[["effect_exclude"]]
+    )
+  used[["effect_exclude"]] <- NULL
+  used$latent <-
+    parse_inclusion(
+      labels,
+      include = used[["latent"]],
+      exclude = NULL
+    )
+  used
 }
 
 
@@ -384,8 +431,27 @@ bru_inclusion_update <- function(lhoods, labels) {
 #'
 #' @export
 #' @keywords internal
+#' @family bru_used_components
 bru_used_components <- function(...) {
   UseMethod("bru_used_components")
+}
+
+#' @describeIn bru_used_components create default `bru_used_components` object
+#' that will include all components as both effects and latent. The `...`
+#' arguments are passed on to `bru_used_components_create`, so a `labels`
+#' argument may be supplied.
+#' @export
+bru_used_components.default <- function(x, ...) {
+  if (!is.null(x)) {
+    stop(paste0(
+      "bru_used_components input class not supported: ",
+      "'", paste0(class(x), collapse = "', '"), "'"
+      ))
+  }
+  bru_used_components_create(effect = NULL,
+                             effect_exclude = NULL,
+                             latent = NULL,
+                             ...)
 }
 
 #' @rdname bru_used_components
@@ -400,11 +466,10 @@ bru_used_components.bru_like_list <- function(x, ..., join = TRUE) {
   used <- lapply(x, function(y) bru_used_components(y, ...))
   if (join) {
     used <-
-      list(
+      bru_used_components_create(
         effect = unique(unlist(lapply(used, function(y) y[["effect"]]))),
         latent = unique(unlist(lapply(used, function(y) y[["latent"]])))
       )
-    class(used) <- c("bru_used_components", class(used))
   }
   used
 }
@@ -412,18 +477,51 @@ bru_used_components.bru_like_list <- function(x, ..., join = TRUE) {
 #' @rdname bru_used_components
 #' @export
 bru_used_components.bru_like <- function(x, ...) {
-  if (is.null(x[["used_components"]])) {
-    used <- list(
-      effect = x[["include_components"]],
-      latent = x[["include_latent"]]
-    )
-    class(used) <- c("bru_used_components", class(used))
-  } else {
-    used <- x[["used_components"]]
-    if (!inherits(used, "bru_used_components")) {
-      warning("'used_components' information detected, but not of 'bru_used_components' class.", immediate. = TRUE)
-    }
+  bru_used_components(x[["used_components"]], ...)
+}
+
+#' @param labels character; component labels passed on to
+#' [bru_used_components_update()]
+#' @rdname bru_used_components
+#' @export
+bru_used_components.bru_used_components <- function(x, labels = NULL, ...) {
+  if (!is.null(labels)) {
+    x <- bru_used_components_update(x, labels = labels)
   }
+  x
+}
+
+#' Create used components information object
+#'
+#' Create a `bru_used_components` object
+#'
+#' @param effect character; components used as effects
+#' @param effect_exclude character; components to specifically exclude from
+#' effect evaluation
+#' @param latent character; components used as `_latent` or `_eval()`
+#' @param labels character; if non-NULL, [bru_used_components_update()] is called
+#' on the newly created object.
+#' @param ... Unused
+#'
+#' @keywords internal
+#' @export
+#' @family bru_used_components
+bru_used_components_create <- function(effect = NULL,
+                                       effect_exclude = NULL,
+                                       latent = NULL,
+                                       labels = NULL,
+                                       ...) {
+  used <- list(
+    effect = effect,
+    latent = latent
+  )
+  used[["effect_exclude"]] <- effect_exclude
+  class(used) <- c("bru_used_components", class(used))
+
+  if (!is.null(labels)) {
+    used <- bru_used_components_update(used, labels = labels)
+  }
+
   used
 }
 
@@ -549,7 +647,7 @@ bru <- function(components = ~ Intercept(1),
   components <- component_list(components, .envir = .envir)
 
   # Update include/exclude information to limit it to existing components
-  lhoods <- bru_inclusion_update(lhoods, labels = names(components))
+  lhoods <- bru_used_components_update(lhoods, labels = names(components))
 
   # Turn model components into internal bru model
   bru.model <- bru_model(components, lhoods)
@@ -870,11 +968,12 @@ extended_bind_rows <- function(...) {
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides `samplers`.
 #' @param domain Named list of domain definitions.
-#' @param include Character vector of component labels that are needed by the
+#' @param include Character vector of component labels that are used as effects
+#'   by the
 #'   predictor expression; Default: the result of `[all.vars()]` on the
 #'   predictor expression, unless the expression is not ".", in which case
 #'   `include=NULL`, to include all components that are not
-#'   explicitly excluded. The `[bru_expression_vars()]` function is used
+#'   explicitly excluded. The [bru_expression_vars()] function is used
 #'   to extract the variable names, followed by removal of non-component names
 #'   when the components are available.
 #' @param exclude Character vector of component labels that are not used by the
@@ -1231,11 +1330,16 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       details = "The default `like(..., include_latent = NULL)` auto-detects use of `_latent` and `_eval`."
     )
     if (allow_latent) {
-      # Set to NULL so that later bru_inclusion_update adds all components.
+      # Set to NULL so that later bru_used_components_update adds all components.
       include_latent <- NULL
     }
   }
 
+  used_components <- bru_used_components_create(
+    effect = include,
+    effect_exclude = exclude,
+    latent = include_latent
+  )
 
   # The likelihood object that will be returned
 
@@ -1254,9 +1358,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     inla.family = inla.family,
     domain = domain,
     drange = NULL,
-    include_components = include,
-    exclude_components = exclude,
-    include_latent = include_latent,
+    used_components = used_components,
     allow_combine = allow_combine,
     control.family = control.family
   )
@@ -1594,7 +1696,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #'   predictor expression; Default: the result of `[all.vars()]` on the
 #'   predictor expression, unless the expression is not ".", in which case
 #'   `include=NULL`, to include all components that are not
-#'   explicitly excluded. The `[bru_expression_vars()]` function is used
+#'   explicitly excluded. The [bru_expression_vars()] function is used
 #'   to extract the variable names, followed by removal of non-component names
 #'   when the components are available.
 #' @param exclude Character vector of component labels that are not used by the
@@ -1902,20 +2004,25 @@ generate.bru <- function(object,
     if (is.null(include)) {
       include <- bru_expression_vars(deparse(formula[[length(formula)]]))
     }
-    if (!is.null(include)) {
-      include <- intersect(
-        include,
-        names(object$bru_info$model$effects)
+    used <-
+      bru_used_components_create(
+        effect = if (is.null(newdata) &&
+                     is.null(include)) {
+          character(0)
+        } else {
+          include
+        },
+        effect_exclude = exclude,
+        latent = NULL,
+        labels = names(object$bru_info$model$effects)
       )
-    }
 
     vals <- evaluate_model(
       model = object$bru_info$model,
       state = state,
       data = newdata,
       predictor = formula,
-      include = if (is.null(newdata) && is.null(include)) character(0) else include,
-      exclude = exclude
+      used = used
     )
     vals
   }

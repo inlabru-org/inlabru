@@ -690,7 +690,7 @@ component_list.list <- function(object,
   class(object) <- c("component_list", "list")
   environment(object) <- .envir
   if (!is.null(lhoods)) {
-    lhoods <- bru_inclusion_update(lhoods, names(object))
+    lhoods <- bru_used_components_update(lhoods, names(object))
     object <- add_mappers(object, lhoods = lhoods)
   }
   object

@@ -10,12 +10,15 @@
   criteria, allowing the iterations to converge faster and also detect that
   convergence sooner.
 
-* The logic for which components are needed for a predictor expression (in `like()` or `generate()`/`predict()`)
-  has been updated to when possible extract the list of components from the expression itself.
+* The logic for which components are needed for a predictor expression
+  (in `like()` or `generate()`/`predict()`) has been updated to when possible
+  extract the list of components from the expression itself.
   The user can override this default if necessary, using the `include`/`exclude` arguments.
   The `bru_expression_vars()` is used to guess the needed component names, applied
   to the right-hand side of the `formula` arguments.  The `allow_latent` argument `like()` has been
-  deprecated in favour of `include_latent` (by default auto-detected for use of `_latent` and `_eval`)
+  deprecated in favour of `include_latent` (by default auto-detected for use of `_latent` and `_eval`).
+  The internal information storage is handled by the new `bru_used_components()`
+  methods.
 
 * Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
   Supports both `sf` and `sp` sampler objects.
@@ -36,11 +39,13 @@
 
 * Warning: Coordinate names for `Spatial*` objects have been inconsistently
   available in the predictor expression evaluation. Avoid relying on those being
-  present, and use explicit calls to `coordinates(.data.)` if you need the
-  coordinate values (e.g. for custom spatial covariate evaluation.).
+  present, and use explicit calls to `coordinates(.data.)` if you need access
+  to the raw coordinate values (e.g. for custom spatial covariate evaluation.).
   When possible, use the built-in covariate evaluation method, `eval_spatial()`,
   either implicitly with `comp(covariate, ...)` or explicitly,
-  `comp(eval_spatial(covariate, where = .data.), ...)`.
+  `comp(eval_spatial(covariate, where = .data.), ...)`, that handles `crs` information
+  correctly.  Also consider transitioning from `sp` to `sf` data storage, using
+  `geometry` instead of raw coordinates.
 
 ## Bug and dependency updates
 
