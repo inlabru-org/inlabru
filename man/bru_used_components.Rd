@@ -39,7 +39,9 @@ and \code{latent}), or a list of such objects
 }
 \description{
 Extract information about which components are used by a model, or its
-individual observation models.
+individual observation models. If a non-NULL \code{labels} argument
+is supplied, also calls \code{\link[=bru_used_components_update]{bru_used_components_update()}} on the \code{bru_used_components}
+objects.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -47,6 +49,10 @@ individual observation models.
 that will include all components as both effects and latent. The \code{...}
 arguments are passed on to \code{bru_used_components_create}, so a \code{labels}
 argument may be supplied.
+
+\item \code{bru_used_components(bru_used_components)}: Convenience method that takes
+an existing \code{bru_used_components} object and calls \code{\link[=bru_used_components_update]{bru_used_components_update()}}
+if \code{labels} is non-NULL.
 
 }}
 \seealso{

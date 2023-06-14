@@ -419,7 +419,9 @@ bru_used_components_update.bru_used_components <- function(x, labels, ...) {
 #' List components used in a model
 #'
 #' Extract information about which components are used by a model, or its
-#' individual observation models.
+#' individual observation models. If a non-NULL `labels` argument
+#' is supplied, also calls [bru_used_components_update()] on the `bru_used_components`
+#' objects.
 #'
 #' @param x An object that contains information about used components
 #' @param join Whether to join list output into a single object; Default
@@ -482,7 +484,9 @@ bru_used_components.bru_like <- function(x, ...) {
 
 #' @param labels character; component labels passed on to
 #' [bru_used_components_update()]
-#' @rdname bru_used_components
+#' @describeIn bru_used_components Convenience method that takes
+#' an existing `bru_used_components` object and calls [bru_used_components_update()]
+#' if `labels` is non-NULL.
 #' @export
 bru_used_components.bru_used_components <- function(x, labels = NULL, ...) {
   if (!is.null(labels)) {
