@@ -86,7 +86,8 @@ predictor expression, unless the expression is not ".", in which case
 \code{include=NULL}, to include all components that are not
 explicitly excluded. The \verb{[bru_expression_vars()]} function is used
 to extract the variable names, followed by removal of non-component names
-when the components are available.}
+when the components are available. See also the \code{allow_latent} argument that
+in some cases requires explicit \code{include} specifications.}
 
 \item{exclude}{Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list
@@ -98,7 +99,7 @@ directly available to the predictor expression, with a \verb{_latent} suffix.
 This also makes evaluator functions with suffix \verb{_eval} available, taking
 parameters \code{main}, \code{group}, and \code{replicate}, taking values for where to
 evaluate the component effect that are different than those defined in the
-component definition itself (see \code{\link[=component_eval]{component_eval()}}). Default \code{FALSE}}
+component definition itself (see \code{\link[=component_eval]{component_eval()}}). Default \code{FALSE}.}
 
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
 involve several rows of the input data to influence the same row.

@@ -11,15 +11,16 @@ test_that("Linearisation", {
   })
 
   cmp <- ~ -1 + x + Int_y(1) + Int_z(1)
+  # NOTE: Need explicit include specification to allow mapper construction for Int_y
   lhoods <-
     like_list(
       like(
         formula = y ~ exp(x) + Int_y_latent, data = data,
+        allow_latent = TRUE,
         include = c("x", "Int_y")
       ),
       like(
-        formula = z ~ exp(x) + Int_z, data = data, family = "poisson",
-        include = c("x", "Int_z")
+        formula = z ~ exp(x) + Int_z, data = data, family = "poisson"
       )
     )
   model <- bru_model(component_list(cmp, lhoods), lhoods)

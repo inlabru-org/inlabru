@@ -277,6 +277,21 @@ bru_info.bru <- function(object, ...) {
 }
 
 
+bru_inclusion_update <- function(lhoods, labels) {
+  for (k in seq_along(lhoods)) {
+    lhoods[[k]][["include_components"]] <-
+      parse_inclusion(
+        labels,
+        include = lhoods[[k]][["include_components"]],
+        exclude = lhoods[[k]][["exclude_components"]]
+      )
+    lhoods[[k]][["exclude_components"]] <- NULL
+  }
+  lhoods
+}
+
+
+
 #' @title Convenient model fitting using (iterated) INLA
 #'
 #' @description This method is a wrapper for `INLA::inla` and provides
@@ -396,6 +411,9 @@ bru <- function(components = ~ Intercept(1),
 
   # Turn input into a list of components (from existing list, or a special formula)
   components <- component_list(components, .envir = .envir)
+
+  # Update include/exclude information to limit it to existing components
+  lhoods <- bru_inclusion_update(lhoods, labels = names(components))
 
   # Turn model components into internal bru model
   bru.model <- bru_model(components, lhoods)
@@ -722,7 +740,8 @@ extended_bind_rows <- function(...) {
 #'   `include=NULL`, to include all components that are not
 #'   explicitly excluded. The `[bru_expression_vars()]` function is used
 #'   to extract the variable names, followed by removal of non-component names
-#'   when the components are available.
+#'   when the components are available. See also the `allow_latent` argument that
+#'   in some cases requires explicit `include` specifications.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
@@ -732,7 +751,7 @@ extended_bind_rows <- function(...) {
 #' This also makes evaluator functions with suffix `_eval` available, taking
 #' parameters `main`, `group`, and `replicate`, taking values for where to
 #' evaluate the component effect that are different than those defined in the
-#' component definition itself (see [component_eval()]). Default `FALSE`
+#' component definition itself (see [component_eval()]). Default `FALSE`.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
 #' Default `FALSE`, but forced to `TRUE` if `response_data` is `NULL` or
