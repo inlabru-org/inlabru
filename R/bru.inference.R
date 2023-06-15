@@ -1891,8 +1891,7 @@ replace_dollar <- function(expr) {
 #' @export
 bru_expression_vars <- function(expr, functions = FALSE) {
   attributes(expr) <- NULL
-  ex <- deparse(expr)
-  ex <- paste0(ex, collapse = "\n")
+  ex <- deparse1(expr, collapse = "\n")
   ex <- str2lang(ex)
   ex <- replace_dollar(ex)
   vars <- all.vars(ex, functions = functions)
