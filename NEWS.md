@@ -37,10 +37,16 @@
   will still be accepted, but give a warning.  Code that does not name the `data`
   argument is not affected.
 
-* Warning: Coordinate names for `Spatial*` objects have been inconsistently
-  available in the predictor expression evaluation. Avoid relying on those being
-  present, and use explicit calls to `coordinates(.data.)` if you need access
-  to the raw coordinate values (e.g. for custom spatial covariate evaluation.).
+* Note: Coordinate names for `Spatial*` objects have been inconsistently
+  available in the predictor expression evaluation. However, due to how internal
+  conversions might inadvertently change these names, they can not be relied
+  on, and they are no longer being made available to the predictor expression.
+  As a side effect, this change also speeds up some `bru()` runs by around a
+  factor 2, since it avoids converting the `Spatial*` to a regular `data.frame`
+  in time-sensitive core evaluation code.
+  
+  If you need access to the raw coordinate values, use explicit calls to
+  `sp::coordinates(.data.)` (e.g. for custom spatial covariate evaluation.).
   When possible, use the built-in covariate evaluation method, `eval_spatial()`,
   either implicitly with `comp(covariate, ...)` or explicitly,
   `comp(eval_spatial(covariate, where = .data.), ...)`, that handles `crs` information

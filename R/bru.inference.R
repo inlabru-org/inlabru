@@ -59,7 +59,8 @@ bru_info_upgrade <- function(object,
     warning(
       "Old bru_info object version ",
       old_ver,
-      " detected. Attempting upgrade."
+      " detected. Attempting upgrade to version ",
+      new_version
     )
 
     message("Detected bru_info version ", old_ver)
@@ -217,6 +218,7 @@ bru_info_upgrade <- function(object,
     }
 
     object[["inlabru_version"]] <- new_version
+    message(paste0("Upgraded bru_info to ", new_version))
   }
   object
 }

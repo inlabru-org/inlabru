@@ -414,15 +414,11 @@ evaluate_predictor <- function(model,
   #  for (nm in names(pred.envir)) {
   #    assign(nm, pred.envir[[nm]], envir = envir)
   #  }
-  if (is.list(data)) {
-    for (nm in names(data)) {
-      assign(nm, data[[nm]], envir = envir)
-    }
-  } else {
-    data_df <- as.data.frame(data)
-    for (nm in names(data_df)) {
-      assign(nm, data_df[[nm]], envir = envir)
-    }
+  #
+  # Note: Since 2.7.0.9019, no longer converts Spatial*DataFrame to data frame
+  # here; coordinates must be accessed via sp::coordinates() if needed.
+  for (nm in names(data)) {
+    assign(nm, data[[nm]], envir = envir)
   }
   assign(".data.", data, envir = envir)
 

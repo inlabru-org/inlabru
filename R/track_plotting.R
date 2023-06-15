@@ -21,6 +21,7 @@
 #' }
 bru_convergence_plot <- function(x) {
   stopifnot(inherits(x, "bru"))
+  x <- bru_check_object_bru(x)
   make_track_plots(x)[["default"]]
 }
 
