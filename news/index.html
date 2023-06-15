@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9018</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9019</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,10 @@
 <li><p>Allow precomputed spatial covariates in the data for point process observations</p></li>
 <li><p>Add <code>edge|int|ext.linewidth</code> arguments to <code>gg.inla.mesh</code> <a href="https://github.com/inlabru-org/inlabru/issues/188" class="external-link">#188</a></p></li>
 <li><p>Rename the <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> and <code><a href="../reference/generate.html">generate()</a></code> <code>data</code> arguments to <code>newdata</code>, for better compatibility with other <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> methods. The old argument name will still be accepted, but give a warning. Code that does not name the <code>data</code> argument is not affected.</p></li>
-<li><p>Warning: Coordinate names for <code>Spatial*</code> objects have been inconsistently available in the predictor expression evaluation. Avoid relying on those being present, and use explicit calls to <code>coordinates(.data.)</code> if you need access to the raw coordinate values (e.g. for custom spatial covariate evaluation.). When possible, use the built-in covariate evaluation method, <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>, either implicitly with <code>comp(covariate, ...)</code> or explicitly, <code>comp(eval_spatial(covariate, where = .data.), ...)</code>, that handles <code>crs</code> information correctly. Also consider transitioning from <code>sp</code> to <code>sf</code> data storage, using <code>geometry</code> instead of raw coordinates.</p></li>
+<li>
+<p>Note: Coordinate names for <code>Spatial*</code> objects have been inconsistently available in the predictor expression evaluation. However, due to how internal conversions might inadvertently change these names, they can not be relied on, and they are no longer being made available to the predictor expression. As a side effect, this change also speeds up some <code><a href="../reference/bru.html">bru()</a></code> runs by around a factor 2, since it avoids converting the <code>Spatial*</code> to a regular <code>data.frame</code> in time-sensitive core evaluation code.</p>
+<p>If you need access to the raw coordinate values, use explicit calls to <code>sp::coordinates(.data.)</code> (e.g. for custom spatial covariate evaluation.). When possible, use the built-in covariate evaluation method, <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>, either implicitly with <code>comp(covariate, ...)</code> or explicitly, <code>comp(eval_spatial(covariate, where = .data.), ...)</code>, that handles <code>crs</code> information correctly. Also consider transitioning from <code>sp</code> to <code>sf</code> data storage, using <code>geometry</code> instead of raw coordinates.</p>
+</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-and-dependency-updates-development-version">Bug and dependency updates<a class="anchor" aria-label="anchor" href="#bug-and-dependency-updates-development-version"></a></h3>
