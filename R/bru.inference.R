@@ -1304,16 +1304,16 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   }
 
   if (is.null(include)) {
-    include <- bru_expression_vars(deparse(formula[[length(formula)]]),
-                                   functions = FALSE)
+    form <- formula[[length(formula)]]
+    include <- bru_expression_vars(form, functions = FALSE)
     if (!is.null(include)) {
       include <- union(include, bru_expression_vars(expr))
     }
     include <- include[!grepl("^.*_latent$", include)]
   }
   if (is.null(include_latent)) {
-    include_latent <- bru_expression_vars(deparse(formula[[length(formula)]]),
-                                          functions = TRUE)
+    form <- formula[[length(formula)]]
+    include_latent <- bru_expression_vars(form, functions = TRUE)
     if (!is.null(include_latent)) {
       include_latent <- union(include_latent,
                               bru_expression_vars(expr, functions = TRUE))
@@ -1890,11 +1890,13 @@ replace_dollar <- function(expr) {
 #' @keywords internal
 #' @export
 bru_expression_vars <- function(expr, functions = FALSE) {
-  ex <- as.character(expr)
-  ex <- as.formula(paste0("~ ", paste0(expr, collapse = "\n")))
-  ex <- ex[[length(ex)]]
-  vars <- all.vars(replace_dollar(ex), functions = functions)
-  if (identical(vars, ".") || identical(vars, character(0))) {
+  attributes(expr) <- NULL
+  ex <- deparse(expr)
+  ex <- paste0(ex, collapse = "\n")
+  ex <- str2lang(ex)
+  ex <- replace_dollar(ex)
+  vars <- all.vars(ex, functions = functions)
+  if (("." %in% vars) || identical(vars, character(0))) {
     vars <- NULL
   }
   vars
@@ -2008,7 +2010,8 @@ generate.bru <- function(object,
     # TODO: clarify the output format, and use the format parameter
 
     if (is.null(include)) {
-      include <- bru_expression_vars(deparse(formula[[length(formula)]]))
+      form <- formula[[length(formula)]]
+      include <- bru_expression_vars(form)
     }
     used <-
       bru_used_components_create(

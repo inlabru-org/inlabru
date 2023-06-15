@@ -120,43 +120,44 @@ bru_compute_linearisation.component <- function(cmp,
 
       if (is.null(A)) {
         effects_eps <- NULL
-      }
-      if (assume_rowwise) {
-        if (symmetric_diffs) {
-          effects_eps <- list(list(), list())
-          for (label_loop in names(effects)) {
-            if (NROW(effects[[label_loop]]) == 1) {
-              effects_eps[[1]][[label_loop]] <-
-                rep(effects[[label_loop]], length(row_subset))
-              effects_eps[[2]][[label_loop]] <-
-                rep(effects[[label_loop]], length(row_subset))
-            } else {
-              effects_eps[[1]][[label_loop]] <- effects[[label_loop]][row_subset]
-              effects_eps[[2]][[label_loop]] <- effects[[label_loop]][row_subset]
-            }
-          }
-          effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak[row_subset] * eps
-          effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak[row_subset] * eps
-        } else {
-          effects_eps <- list()
-          for (label_loop in names(effects)) {
-            if (NROW(effects[[label_loop]]) == 1) {
-              effects_eps[[label_loop]] <-
-                rep(effects[[label_loop]], length(row_subset))
-            } else {
-              effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
-            }
-          }
-          effects_eps[[label]] <- effects_eps[[label]] + Ak[row_subset] * eps
-        }
       } else {
-        if (symmetric_diffs) {
-          effects_eps <- list(effects, effects)
-          effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak * eps
-          effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak * eps
+        if (assume_rowwise) {
+          if (symmetric_diffs) {
+            effects_eps <- list(list(), list())
+            for (label_loop in names(effects)) {
+              if (NROW(effects[[label_loop]]) == 1) {
+                effects_eps[[1]][[label_loop]] <-
+                  rep(effects[[label_loop]], length(row_subset))
+                effects_eps[[2]][[label_loop]] <-
+                  rep(effects[[label_loop]], length(row_subset))
+              } else {
+                effects_eps[[1]][[label_loop]] <- effects[[label_loop]][row_subset]
+                effects_eps[[2]][[label_loop]] <- effects[[label_loop]][row_subset]
+              }
+            }
+            effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak[row_subset] * eps
+            effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak[row_subset] * eps
+          } else {
+            effects_eps <- list()
+            for (label_loop in names(effects)) {
+              if (NROW(effects[[label_loop]]) == 1) {
+                effects_eps[[label_loop]] <-
+                  rep(effects[[label_loop]], length(row_subset))
+              } else {
+                effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
+              }
+            }
+            effects_eps[[label]] <- effects_eps[[label]] + Ak[row_subset] * eps
+          }
         } else {
-          effects_eps <- effects
-          effects_eps[[label]] <- effects_eps[[label]] + Ak * eps
+          if (symmetric_diffs) {
+            effects_eps <- list(effects, effects)
+            effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak * eps
+            effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak * eps
+          } else {
+            effects_eps <- effects
+            effects_eps[[label]] <- effects_eps[[label]] + Ak * eps
+          }
         }
       }
       pred_eps <- evaluate_predictor(
