@@ -93,12 +93,14 @@ bru_compute_linearisation.component <- function(cmp,
     j = integer(0),
     x = numeric(0)
   )
+
   symmetric_diffs <- FALSE
   for (k in seq_len(NROW(state[[label]]))) {
     if (is.null(A)) {
       row_subset <- seq_len(NROW(pred0))
     } else {
-      row_subset <- which(A[, k] != 0.0)
+      Ak <- A[, k, drop = TRUE]
+      row_subset <- which(Ak != 0.0)
     }
     if (length(row_subset) > 0) {
       if (symmetric_diffs) {
@@ -133,8 +135,8 @@ bru_compute_linearisation.component <- function(cmp,
               effects_eps[[2]][[label_loop]] <- effects[[label_loop]][row_subset]
             }
           }
-          effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - A[row_subset, k] * eps
-          effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + A[row_subset, k] * eps
+          effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak[row_subset] * eps
+          effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak[row_subset] * eps
         } else {
           effects_eps <- list()
           for (label_loop in names(effects)) {
@@ -145,16 +147,16 @@ bru_compute_linearisation.component <- function(cmp,
               effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
             }
           }
-          effects_eps[[label]] <- effects_eps[[label]] + A[row_subset, k] * eps
+          effects_eps[[label]] <- effects_eps[[label]] + Ak[row_subset] * eps
         }
       } else {
         if (symmetric_diffs) {
           effects_eps <- list(effects, effects)
-          effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - A[, k] * eps
-          effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + A[, k] * eps
+          effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak * eps
+          effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak * eps
         } else {
           effects_eps <- effects
-          effects_eps[[label]] <- effects_eps[[label]] + A[, k] * eps
+          effects_eps[[label]] <- effects_eps[[label]] + Ak * eps
         }
       }
       pred_eps <- evaluate_predictor(
