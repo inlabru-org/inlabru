@@ -110,7 +110,7 @@ residual_df <- function(model, df, expr, A_sum, A_integrate) {
                        as.vector(A_integrate %*% (h3 * lambda)[!obs])
                    )
                  },
-                 include = bru_expression_vars(deparse(expr))
+                 include = bru_expression_vars(expr)
   )
 
   # Label the three types of residuals
