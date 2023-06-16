@@ -16,6 +16,7 @@ generate(object, ...)
   num.threads = NULL,
   include = NULL,
   exclude = NULL,
+  used = NULL,
   ...,
   data = NULL
 )
@@ -51,6 +52,8 @@ explicitly excluded) if \code{newdata} is provided, otherwise \code{character(0)
 predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
+
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include} and \code{exclude}.}
 
 \item{data}{Deprecated. Use \code{newdata} instead.
 sampling.}

@@ -14,11 +14,15 @@
   (in `like()` or `generate()`/`predict()`) has been updated to when possible
   extract the list of components from the expression itself.
   The user can override this default if necessary, using the `include`/`exclude` arguments.
-  The `bru_expression_vars()` is used to guess the needed component names, applied
-  to the right-hand side of the `formula` arguments.  The `allow_latent` argument `like()` has been
-  deprecated in favour of `include_latent` (by default auto-detected for use of `_latent` and `_eval`).
+  
+  The `bru_used()` methods are used to guess the needed component names, applied
+  to the right-hand side of the `formula` arguments.  The `allow_latent` argument
+  to `like()` has been deprecated in favour of `include_latent`
+  (by default auto-detected for use of `_latent` and `_eval`).
+  
   The internal information storage is handled by the new `bru_used()`
-  methods.
+  methods, that can also be used directly by the user and supplied via the
+  `used` argument to `like()`/`generate()`/`predict()`.
 
 * Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
   Supports both `sf` and `sp` sampler objects.

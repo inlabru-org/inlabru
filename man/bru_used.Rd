@@ -3,6 +3,8 @@
 \name{bru_used}
 \alias{bru_used}
 \alias{bru_used.default}
+\alias{bru_used.expression}
+\alias{bru_used.formula}
 \alias{bru_used.bru}
 \alias{bru_used.list}
 \alias{bru_used.bru_like}
@@ -13,6 +15,24 @@ bru_used(x = NULL, ...)
 
 \method{bru_used}{default}(
   x = NULL,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+)
+
+\method{bru_used}{expression}(
+  x,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+)
+
+\method{bru_used}{formula}(
+  x,
   ...,
   effect = NULL,
   effect_exclude = NULL,
@@ -63,6 +83,10 @@ objects.
 \itemize{
 \item \code{bru_used(default)}: Create a \code{bru_used} object.
 
+\item \code{bru_used(expression)}: Create a \code{bru_used} object from an expression object.
+
+\item \code{bru_used(formula)}: Create a \code{bru_used} object from a formula.
+
 \item \code{bru_used(bru_used)}: Convenience method that takes
 an existing \code{bru_used} object and calls \code{\link[=bru_used_update]{bru_used_update()}}
 if \code{labels} is non-NULL.
@@ -70,7 +94,8 @@ if \code{labels} is non-NULL.
 }}
 \seealso{
 Other bru_used: 
-\code{\link{bru_used_update}()}
+\code{\link{bru_used_update}()},
+\code{\link{bru_used_vars}()}
 }
 \concept{bru_used}
 \keyword{internal}

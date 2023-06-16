@@ -27,6 +27,7 @@ Merge available component labels information with used components information.
 }
 \seealso{
 Other bru_used: 
+\code{\link{bru_used_vars}()},
 \code{\link{bru_used}()}
 }
 \concept{bru_used}

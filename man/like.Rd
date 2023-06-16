@@ -23,6 +23,7 @@ like(
   include = NULL,
   exclude = NULL,
   include_latent = NULL,
+  used = NULL,
   allow_latent = NULL,
   allow_combine = NULL,
   control.family = NULL,
@@ -86,7 +87,7 @@ by the
 predictor expression; Default: the result of \verb{[all.vars()]} on the
 predictor expression, unless the expression is not ".", in which case
 \code{include=NULL}, to include all components that are not
-explicitly excluded. The \code{\link[=bru_expression_vars]{bru_expression_vars()}} function is used
+explicitly excluded. The \code{\link[=bru_used]{bru_used()}} methods are used
 to extract the variable names, followed by removal of non-component names
 when the components are available.}
 
@@ -103,6 +104,9 @@ parameters \code{main}, \code{group}, and \code{replicate}, taking values for wh
 evaluate the component effect that are different than those defined in the
 component definition itself (see \code{\link[=component_eval]{component_eval()}}). Default \code{NULL}
 auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.}
+
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include}, \code{exclude},
+and \code{include_latent}.}
 
 \item{allow_latent}{logical, deprecated. Use \code{include_latent} instead.}
 

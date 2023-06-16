@@ -205,8 +205,8 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.7.0.9017"
     }
 
-    if (utils::compareVersion("2.7.0.9020", old_ver) > 0) {
-      message("Upgrading bru_info to 2.7.0.9020")
+    if (utils::compareVersion("2.7.0.9021", old_ver) > 0) {
+      message("Upgrading bru_info to 2.7.0.9021")
       # Make sure 'used' components format is properly stored
 
       object[["lhoods"]] <-
@@ -214,7 +214,7 @@ bru_info_upgrade <- function(object,
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
-      object[["inlabru_version"]] <- "2.7.0.9020"
+      object[["inlabru_version"]] <- "2.7.0.9021"
     }
 
     object[["inlabru_version"]] <- new_version
@@ -341,7 +341,7 @@ bru_info.bru <- function(object, ...) {
 }
 
 
-# Used for upgrading from versions <= 2.7.0.9017
+# Used for upgrading from versions <= 2.7.0.9017 to >= 2.7.0.2021
 bru_used_upgrade <- function(lhoods, labels) {
   for (k in seq_along(lhoods)) {
     if (is.null(lhoods[[k]][["used"]]) &&
@@ -481,6 +481,98 @@ bru_used.default <- function(x = NULL, ...,
 
   used
 
+}
+
+
+# Function from
+# https://stackoverflow.com/questions/63580260/is-there-a-way-to-stop-all-vars-returning-names-from-the-right-hand-side-of
+# corrected to handle multiple $ correctly
+replace_dollar <- function(expr) {
+  if (!is.language(expr) || length(expr) == 1L) return(expr)
+  if (expr[[1]] == quote(`$`)) {
+    expr[[1]] <- quote(`[[`)
+    expr[[3]] <- as.character(expr[[3]])
+    expr[[2]] <- replace_dollar(expr[[2]])
+    expr[[3]] <- replace_dollar(expr[[3]])
+  } else {
+    for (i in seq_along(expr)[-1])
+      expr[[i]] <- replace_dollar(expr[[i]])
+  }
+  expr
+}
+
+#' Extract basic variable names from expression
+#'
+#' First replaces `$` with `[[` indexing, so that internal column/variable names are ignored,
+#' then calls `all.vars()`.
+#'
+#' @param expr An `expression`
+#' @param functions logical; if TRUE, include function names
+#'
+#' @returns If successful, a character vector, otherwise `NULL`
+#'
+#' @keywords internal
+#' @export
+#' @family bru_used
+bru_used_vars <- function(expr, functions = FALSE) {
+  attributes(expr) <- NULL
+  ex <- deparse1(expr, collapse = "\n")
+  ex <- str2lang(ex)
+  ex <- replace_dollar(ex)
+  vars <- all.vars(ex, functions = functions)
+  if (identical(vars, ".") || identical(vars, character(0))) {
+    vars <- NULL
+  }
+  vars
+}
+
+
+
+#' @describeIn bru_used Create a `bru_used` object from an expression object.
+#' @export
+bru_used.expression <- function(x, ...,
+                                effect = NULL,
+                                effect_exclude = NULL,
+                                latent = NULL,
+                                labels = NULL) {
+  form <- x
+  if (is.null(effect)) {
+    effect <- bru_used_vars(form, functions = FALSE)
+    effect <- effect[!grepl("^.*_latent$", effect) &
+                       !grepl("^.*_eval$", effect)]
+  }
+  if (is.null(latent)) {
+    latent <- bru_used_vars(form, functions = TRUE)
+
+    include_latent <- latent[grepl("^.*_latent$", latent)]
+    include_latent <- gsub("_latent$", "", include_latent)
+    include_eval <- latent[grepl("^.*_eval$", latent)]
+    include_eval <- gsub("_eval$", "", include_eval)
+    latent <- union(include_latent, include_eval)
+    if (length(latent) == 0) {
+      include_latent <- character(0)
+    }
+  }
+
+  bru_used(effect = effect,
+           effect_exclude = effect_exclude,
+           latent = latent,
+           labels = labels)
+}
+
+#' @describeIn bru_used Create a `bru_used` object from a formula.
+#' @export
+bru_used.formula <- function(x, ...,
+                             effect = NULL,
+                             effect_exclude = NULL,
+                             latent = NULL,
+                             labels = NULL) {
+  form <- as.expression(x[[length(x)]])
+  bru_used(form,
+           effect = effect,
+           effect_exclude = effect_exclude,
+           latent = latent,
+           labels = labels)
 }
 
 #' @rdname bru_used
@@ -973,7 +1065,7 @@ extended_bind_rows <- function(...) {
 #'   predictor expression; Default: the result of `[all.vars()]` on the
 #'   predictor expression, unless the expression is not ".", in which case
 #'   `include=NULL`, to include all components that are not
-#'   explicitly excluded. The [bru_expression_vars()] function is used
+#'   explicitly excluded. The [bru_used()] methods are used
 #'   to extract the variable names, followed by removal of non-component names
 #'   when the components are available.
 #' @param exclude Character vector of component labels that are not used by the
@@ -988,6 +1080,8 @@ extended_bind_rows <- function(...) {
 #' evaluate the component effect that are different than those defined in the
 #' component definition itself (see [component_eval()]). Default `NULL`
 #' auto-detects use of `_latent` and `_eval` in the predictor expression.
+#' @param used Either `NULL` or a [bru_used()] object, overriding `include`, `exclude`,
+#' and `include_latent`.
 #' @param allow_latent logical, deprecated. Use `include_latent` instead.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
@@ -1011,6 +1105,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  include = NULL,
                  exclude = NULL,
                  include_latent = NULL,
+                 used = NULL,
                  allow_latent = NULL,
                  allow_combine = NULL,
                  control.family = NULL,
@@ -1297,31 +1392,13 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response <- "BRU_response"
   }
 
-  if (is.null(include)) {
-    form <- formula[[length(formula)]]
-    include <- bru_expression_vars(form, functions = FALSE)
-    if (!is.null(include)) {
-      include <- union(include, bru_expression_vars(expr))
-    }
-    include <- include[!grepl("^.*_latent$", include) &
-                         !grepl("^.*_eval$", include)]
-  }
-  if (is.null(include_latent)) {
-    form <- formula[[length(formula)]]
-    include_latent <- bru_expression_vars(form, functions = TRUE)
-    if (!is.null(include_latent)) {
-      include_latent <- union(include_latent,
-                              bru_expression_vars(expr, functions = TRUE))
-    }
-    include_eval <- include_latent
-    include_latent <- include_latent[grepl("^.*_latent$", include_latent)]
-    include_latent <- gsub("_latent$", "", include_latent)
-    include_eval <- include_eval[grepl("^.*_eval$", include_eval)]
-    include_eval <- gsub("_eval$", "", include_eval)
-    include_latent <- union(include_latent, include_eval)
-    if (length(include_latent) == 0) {
-      include_latent <- character(0)
-    }
+  if (is.null(used)) {
+    used <- bru_used(
+      formula,
+      effect = include,
+      effect_exclude = exclude,
+      latent = include_latent
+    )
   }
   if (!is.null(allow_latent)) {
     lifecycle::deprecate_soft(
@@ -1330,17 +1407,12 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       "like(include_latent)",
       details = "The default `like(..., include_latent = NULL)` auto-detects use of `_latent` and `_eval`."
     )
-    if (allow_latent) {
+    if (allow_latent && is.null(include_latent)) {
       # Set to NULL so that later bru_used_update adds all components.
-      include_latent <- NULL
+      used[["latent"]] <- NULL
     }
   }
 
-  used <- bru_used(
-    effect = include,
-    effect_exclude = exclude,
-    latent = include_latent
-  )
 
   # The likelihood object that will be returned
 
@@ -1697,13 +1769,15 @@ expand_to_dataframe <- function(x, data = NULL) {
 #'   predictor expression; Default: the result of `[all.vars()]` on the
 #'   predictor expression, unless the expression is not ".", in which case
 #'   `include=NULL`, to include all components that are not
-#'   explicitly excluded. The [bru_expression_vars()] function is used
+#'   explicitly excluded. The [bru_used()] methods are used
 #'   to extract the variable names, followed by removal of non-component names
 #'   when the components are available.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
+#' @param used Either `NULL` or a [bru_used()] object, overriding `include` and `exclude`.
+#' Default `NULL`
 #' @param drop logical; If `keep=FALSE`, `newdata` is a `Spatial*DataFrame`, and the
 #' prediciton summary has the same number of rows as `newdata`, then the output is
 #' a `Spatial*DataFrame` object. Default `FALSE`.
@@ -1717,7 +1791,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' other input values than the expressions defined in the component definition
 #' itself, e.g. `field_eval(cbind(x, y))` for a component that was defined with
 #' `field(coordinates, ...)` (see also [component_eval()]).
-#'
+#'f
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
@@ -1734,6 +1808,7 @@ predict.bru <- function(object,
                         num.threads = NULL,
                         include = NULL,
                         exclude = NULL,
+                        used = NULL,
                         drop = FALSE,
                         ...,
                         data = NULL) {
@@ -1774,6 +1849,7 @@ predict.bru <- function(object,
     num.threads = num.threads,
     include = include,
     exclude = exclude,
+    used = used,
     ...
   )
 
@@ -1855,47 +1931,6 @@ predict.bru <- function(object,
 }
 
 
-# Function from
-# https://stackoverflow.com/questions/63580260/is-there-a-way-to-stop-all-vars-returning-names-from-the-right-hand-side-of
-# corrected to handle multiple $ correctly
-replace_dollar <- function(expr) {
-  if (!is.language(expr) || length(expr) == 1L) return(expr)
-  if (expr[[1]] == quote(`$`)) {
-    expr[[1]] <- quote(`[[`)
-    expr[[3]] <- as.character(expr[[3]])
-    expr[[2]] <- replace_dollar(expr[[2]])
-    expr[[3]] <- replace_dollar(expr[[3]])
-  } else {
-    for (i in seq_along(expr)[-1])
-      expr[[i]] <- replace_dollar(expr[[i]])
-  }
-  expr
-}
-
-#' Extract basic variable names from expression
-#'
-#' First replaces `$` with `[[` indexing, so that internal column/variable names are ignored,
-#' then calls `all.vars()`.
-#'
-#' @param expr An `expression`
-#' @param functions logical; if TRUE, include function names
-#'
-#' @returns If successful, a character vector, otherwise `NULL`
-#'
-#' @keywords internal
-#' @export
-bru_expression_vars <- function(expr, functions = FALSE) {
-  attributes(expr) <- NULL
-  ex <- deparse1(expr, collapse = "\n")
-  ex <- str2lang(ex)
-  ex <- replace_dollar(ex)
-  vars <- all.vars(ex, functions = functions)
-  if (("." %in% vars) || identical(vars, character(0))) {
-    vars <- NULL
-  }
-  vars
-}
-
 #' Sampling based on bru posteriors
 #'
 #' @description
@@ -1929,6 +1964,7 @@ bru_expression_vars <- function(expr, functions = FALSE) {
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
+#' @param used Either `NULL` or a [bru_used()] object, overriding `include` and `exclude`.
 #' @param ... additional, unused arguments.
 #' @param data Deprecated. Use `newdata` instead.
 #' sampling.
@@ -1957,6 +1993,7 @@ generate.bru <- function(object,
                          num.threads = NULL,
                          include = NULL,
                          exclude = NULL,
+                         used = NULL,
                          ...,
                          data = NULL) {
   object <- bru_check_object_bru(object)
@@ -2003,22 +2040,24 @@ generate.bru <- function(object,
   } else {
     # TODO: clarify the output format, and use the format parameter
 
-    if (is.null(include)) {
-      form <- formula[[length(formula)]]
-      include <- bru_expression_vars(form)
+    if (is.null(used)) {
+      if (is.null(include)) {
+        form <- formula[[length(formula)]]
+        include <- bru_used_vars(form)
+      }
+      used <-
+        bru_used(
+          effect = if (is.null(newdata) &&
+                       is.null(include)) {
+            character(0)
+          } else {
+            include
+          },
+          effect_exclude = exclude,
+          latent = NULL,
+          labels = names(object$bru_info$model$effects)
+        )
     }
-    used <-
-      bru_used(
-        effect = if (is.null(newdata) &&
-                     is.null(include)) {
-          character(0)
-        } else {
-          include
-        },
-        effect_exclude = exclude,
-        latent = NULL,
-        labels = names(object$bru_info$model$effects)
-      )
 
     vals <- evaluate_model(
       model = object$bru_info$model,
