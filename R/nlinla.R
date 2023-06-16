@@ -234,7 +234,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
                                                comp_simple,
                                                eps,
                                                ...) {
-  used <- bru_used_components(lhood)
+  used <- bru_used(lhood)
   allow_combine <- lhood[["allow_combine"]]
   effects <- evaluate_effect_single_state(
     comp_simple[used[["effect"]]],

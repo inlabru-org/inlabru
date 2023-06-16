@@ -26,7 +26,7 @@ as computed by \code{\link[=evaluate_effect_multi_state.component_list]{evaluate
 
 \item{predictor}{Either a formula or expression}
 
-\item{used}{A \code{bru_used_components} object, or NULL (default)}
+\item{used}{A \code{\link[=bru_used]{bru_used()}} object, or NULL (default)}
 
 \item{format}{character; determines the storage format of the output.
 Available options:

@@ -68,7 +68,7 @@ bru_model <- function(components, lhoods) {
 
   # Create joint formula that will be used by inla
   formula <- BRU_response ~ -1
-  included <- bru_used_components(lhoods)
+  included <- bru_used(lhoods)
   included <- union(included[["effect"]], included[["latent"]])
   linear <- all(vapply(lhoods, function(lh) lh[["linear"]], TRUE))
 
@@ -162,7 +162,7 @@ evaluate_model <- function(model,
                            format = NULL,
                            used = NULL,
                            ...) {
-  used <- bru_used_components(used, labels = names(model$effects))
+  used <- bru_used(used, labels = names(model$effects))
 
   if (is.null(state)) {
     stop("Not enough information to evaluate model states.")
@@ -363,7 +363,7 @@ evaluate_effect_multi_state.component_list <- function(components, input, state,
 #' @param effects A list where each element is list of named evaluated effects,
 #' as computed by [evaluate_effect_multi_state.component_list()]
 #' @param predictor Either a formula or expression
-#' @param used A `bru_used_components` object, or NULL (default)
+#' @param used A [bru_used()] object, or NULL (default)
 #' @param format character; determines the storage format of the output.
 #' Available options:
 #' * `"auto"` If the first evaluated result is a vector or single-column matrix,
@@ -404,7 +404,7 @@ evaluate_predictor <- function(model,
       parent.frame()
     }
 
-  used <- bru_used_components(used, labels = names(model$effects))
+  used <- bru_used(used, labels = names(model$effects))
 
   envir <- new.env(parent = enclos)
   # Find .data. first,
@@ -783,7 +783,7 @@ evaluate_inputs <- function(model, lhoods, inla_f) {
   lapply(
     lhoods,
     function(lh) {
-      included <- bru_used_components(lh)[["effect"]]
+      included <- bru_used(lh)[["effect"]]
 
       input_eval(
         model$effects[included],
@@ -807,7 +807,7 @@ evaluate_inputs <- function(model, lhoods, inla_f) {
 #' @rdname evaluate_index
 evaluate_index <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
-  included <- bru_used_components(lhoods)
+  included <- bru_used(lhoods)
   included <- union(included[["effect"]], included[["latent"]])
 
   list(

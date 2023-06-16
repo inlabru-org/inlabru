@@ -17,7 +17,7 @@
   The `bru_expression_vars()` is used to guess the needed component names, applied
   to the right-hand side of the `formula` arguments.  The `allow_latent` argument `like()` has been
   deprecated in favour of `include_latent` (by default auto-detected for use of `_latent` and `_eval`).
-  The internal information storage is handled by the new `bru_used_components()`
+  The internal information storage is handled by the new `bru_used()`
   methods.
 
 * Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
