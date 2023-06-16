@@ -18,7 +18,7 @@ posterior of the estimated random effects."><!-- mathjax --><script src="https:/
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9019</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9021</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -106,6 +106,7 @@ posterior of the estimated random effects.</p>
 <span>  num.threads <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  include <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  used <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  drop <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -156,7 +157,7 @@ When seed != 0, overridden to "1:1"</p></dd>
 predictor expression; Default: the result of <code>[all.vars()]</code> on the
 predictor expression, unless the expression is not ".", in which case
 <code>include=NULL</code>, to include all components that are not
-explicitly excluded. The <code><a href="bru_expression_vars.html">bru_expression_vars()</a></code> function is used
+explicitly excluded. The <code><a href="bru_used.html">bru_used()</a></code> methods are used
 to extract the variable names, followed by removal of non-component names
 when the components are available.</p></dd>
 
@@ -166,6 +167,11 @@ when the components are available.</p></dd>
 predictor expression. The exclusion list is applied to the list
 as determined by the <code>include</code> parameter; Default: NULL (do not remove
 any components from the inclusion list)</p></dd>
+
+
+<dt>used</dt>
+<dd><p>Either <code>NULL</code> or a <code><a href="bru_used.html">bru_used()</a></code> object, overriding <code>include</code> and <code>exclude</code>.
+Default <code>NULL</code></p></dd>
 
 
 <dt>drop</dt>
@@ -204,8 +210,9 @@ variable name can be used to directly access the latent state for a component,
 and the suffix function <code>_eval</code> can be used to evaluate a component at
 other input values than the expressions defined in the component definition
 itself, e.g. <code>field_eval(cbind(x, y))</code> for a component that was defined with
-<code>field(coordinates, ...)</code> (see also <code><a href="component_eval.html">component_eval()</a></code>).</p>
-<p>For "iid" models with <code>mapper = bru_mapper_index(n)</code>, <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm()</a></code> is used to
+<code>field(coordinates, ...)</code> (see also <code><a href="component_eval.html">component_eval()</a></code>).
+f
+For "iid" models with <code>mapper = bru_mapper_index(n)</code>, <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm()</a></code> is used to
 generate new realisations for indices greater than <code>n</code>.</p>
     </div>
 

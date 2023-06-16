@@ -112,9 +112,6 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_env_get.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_expression_vars.html</loc>
-  </url>
-  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_fill_missing.html</loc>
   </url>
   <url>
@@ -169,13 +166,13 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_transformation.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_used_components.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_used.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_used_components_create.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_used_update.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_used_components_update.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_used_vars.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/call-stack.html</loc>

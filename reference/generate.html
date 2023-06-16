@@ -22,7 +22,7 @@ posterior of the estimated random effects."><!-- mathjax --><script src="https:/
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9019</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9021</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,6 +113,7 @@ posterior of the estimated random effects.</p>
 <span>  num.threads <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  include <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  used <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -167,6 +168,10 @@ explicitly excluded) if <code>newdata</code> is provided, otherwise <code>charac
 predictor expression. The exclusion list is applied to the list
 as determined by the <code>include</code> parameter; Default: NULL (do not remove
 any components from the inclusion list)</p></dd>
+
+
+<dt>used</dt>
+<dd><p>Either <code>NULL</code> or a <code><a href="bru_used.html">bru_used()</a></code> object, overriding <code>include</code> and <code>exclude</code>.</p></dd>
 
 
 <dt>data</dt>
