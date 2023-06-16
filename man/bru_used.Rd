@@ -92,6 +92,15 @@ an existing \code{bru_used} object and calls \code{\link[=bru_used_update]{bru_u
 if \code{labels} is non-NULL.
 
 }}
+\examples{
+(used <- bru_used(~ .))
+bru_used(used, labels = c("a", "c"))
+(used <- bru_used(~ a + b + c_latent + d_latent))
+bru_used(used, labels = c("a", "c"))
+(used <- bru_used(expression(a + b + c_latent + d_latent)))
+bru_used(used, labels = c("a", "c"))
+
+}
 \seealso{
 Other bru_used: 
 \code{\link{bru_used_update}()},

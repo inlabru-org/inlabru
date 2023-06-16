@@ -447,6 +447,14 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #' and `latent`), or a list of such objects
 #' (for methods with `join = FALSE`)
 #'
+#' @examples
+#' (used <- bru_used(~ .))
+#' bru_used(used, labels = c("a", "c"))
+#' (used <- bru_used(~ a + b + c_latent + d_latent))
+#' bru_used(used, labels = c("a", "c"))
+#' (used <- bru_used(expression(a + b + c_latent + d_latent)))
+#' bru_used(used, labels = c("a", "c"))
+#'
 #' @export
 #' @keywords internal
 #' @family bru_used
