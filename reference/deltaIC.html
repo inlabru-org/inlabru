@@ -118,14 +118,18 @@ and/or WAIC and Delta.WAIC.</p>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Fit two models</span></span></span>
-<span class="r-in"><span>  <span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru.html">bru</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span>,</span></span>
-<span class="r-in"><span>              family <span class="op">=</span> <span class="st">"poisson"</span>,</span></span>
-<span class="r-in"><span>              data <span class="op">=</span> <span class="va">input.df</span>,</span></span>
-<span class="r-in"><span>              options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>dic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru.html">bru</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="fu">rand</span><span class="op">(</span><span class="va">idx</span>, model <span class="op">=</span> <span class="st">"iid"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>              family <span class="op">=</span> <span class="st">"poisson"</span>,</span></span>
-<span class="r-in"><span>              data <span class="op">=</span> <span class="va">input.df</span>,</span></span>
-<span class="r-in"><span>              options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>dic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru.html">bru</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">y</span> <span class="op">~</span> <span class="va">x</span>,</span></span>
+<span class="r-in"><span>    family <span class="op">=</span> <span class="st">"poisson"</span>,</span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">input.df</span>,</span></span>
+<span class="r-in"><span>    options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>dic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru.html">bru</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="fu">rand</span><span class="op">(</span><span class="va">idx</span>, model <span class="op">=</span> <span class="st">"iid"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    family <span class="op">=</span> <span class="st">"poisson"</span>,</span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">input.df</span>,</span></span>
+<span class="r-in"><span>    options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>dic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Compare DIC</span></span></span>
 <span class="r-in"><span></span></span>
@@ -133,9 +137,9 @@ and/or WAIC and Delta.WAIC.</p>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Model      DIC   Delta.DIC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  fit2 43.01280 0.000000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  fit1 43.01904 0.006240148</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Model      DIC  Delta.DIC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  fit2 44.12545 0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  fit1 44.13706 0.01161184</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
