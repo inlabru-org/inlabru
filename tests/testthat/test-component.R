@@ -118,17 +118,20 @@ test_that("Component construction: terra", {
 
   data <- sf::st_sf(
     data.frame(
-      geometry = sf::st_sfc(sf::st_point(cbind(6, 50)),
-                            crs = "epsg:4326"
+      geometry = sf::st_sfc(
+        sf::st_point(cbind(6, 50)),
+        crs = "epsg:4326"
       ),
       response = 1
-    ))
+    )
+  )
 
   expect_equal(eval_spatial(r, data), 406)
 
   llik <- like_list(list(like(formula = response ~ ., data = data)))
 
-  cmp <- component_list(~ -1 + something(eval_spatial(r, geometry), model = "linear"),
+  cmp <- component_list(
+    ~ -1 + something(eval_spatial(r, geometry), model = "linear"),
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)

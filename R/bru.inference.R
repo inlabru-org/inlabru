@@ -345,7 +345,7 @@ bru_info.bru <- function(object, ...) {
 bru_used_upgrade <- function(lhoods, labels) {
   for (k in seq_along(lhoods)) {
     if (is.null(lhoods[[k]][["used"]]) &&
-        is.null(lhoods[[k]][["used_components"]])) {
+      is.null(lhoods[[k]][["used_components"]])) {
       used <- bru_used(
         effect = lhoods[[k]][["include_components"]],
         latent = lhoods[[k]][["include_latent"]],
@@ -356,8 +356,10 @@ bru_used_upgrade <- function(lhoods, labels) {
       lhoods[[k]][["exclude_components"]] <- NULL
       lhoods[[k]][["include_latent"]] <- NULL
     } else if (!is.null(lhoods[[k]][["used_components"]])) {
-      used <- bru_used(effect = lhoods[[k]][["effect"]],
-                       latent = lhoods[[k]][["latent"]])
+      used <- bru_used(
+        effect = lhoods[[k]][["effect"]],
+        latent = lhoods[[k]][["latent"]]
+      )
       lhoods[[k]][["used_components"]] <- NULL
     } else {
       used <- bru_used(lhoods[[k]])
@@ -448,7 +450,7 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #' (for methods with `join = FALSE`)
 #'
 #' @examples
-#' (used <- bru_used(~ .))
+#' (used <- bru_used(~.))
 #' bru_used(used, labels = c("a", "c"))
 #' (used <- bru_used(~ a + b + c_latent + d_latent))
 #' bru_used(used, labels = c("a", "c"))
@@ -465,15 +467,15 @@ bru_used <- function(x = NULL, ...) {
 #' @describeIn bru_used Create a `bru_used` object.
 #' @export
 bru_used.default <- function(x = NULL, ...,
-                                        effect = NULL,
-                                        effect_exclude = NULL,
-                                        latent = NULL,
-                                        labels = NULL) {
+                             effect = NULL,
+                             effect_exclude = NULL,
+                             latent = NULL,
+                             labels = NULL) {
   if (!is.null(x)) {
     stop(paste0(
       "bru_used input class not supported: ",
       "'", paste0(class(x), collapse = "', '"), "'"
-      ))
+    ))
   }
 
   used <- list(
@@ -488,7 +490,6 @@ bru_used.default <- function(x = NULL, ...,
   }
 
   used
-
 }
 
 
@@ -496,15 +497,18 @@ bru_used.default <- function(x = NULL, ...,
 # https://stackoverflow.com/questions/63580260/is-there-a-way-to-stop-all-vars-returning-names-from-the-right-hand-side-of
 # corrected to handle multiple $ correctly
 replace_dollar <- function(expr) {
-  if (!is.language(expr) || length(expr) == 1L) return(expr)
+  if (!is.language(expr) || length(expr) == 1L) {
+    return(expr)
+  }
   if (expr[[1]] == quote(`$`)) {
     expr[[1]] <- quote(`[[`)
     expr[[3]] <- as.character(expr[[3]])
     expr[[2]] <- replace_dollar(expr[[2]])
     expr[[3]] <- replace_dollar(expr[[3]])
   } else {
-    for (i in seq_along(expr)[-1])
+    for (i in seq_along(expr)[-1]) {
       expr[[i]] <- replace_dollar(expr[[i]])
+    }
   }
   expr
 }
@@ -547,7 +551,7 @@ bru_used.expression <- function(x, ...,
   if (is.null(effect)) {
     effect <- bru_used_vars(form, functions = FALSE)
     effect <- effect[!grepl("^.*_latent$", effect) &
-                       !grepl("^.*_eval$", effect)]
+      !grepl("^.*_eval$", effect)]
   }
   if (is.null(latent)) {
     latent <- bru_used_vars(form, functions = TRUE)
@@ -562,10 +566,12 @@ bru_used.expression <- function(x, ...,
     }
   }
 
-  bru_used(effect = effect,
-           effect_exclude = effect_exclude,
-           latent = latent,
-           labels = labels)
+  bru_used(
+    effect = effect,
+    effect_exclude = effect_exclude,
+    latent = latent,
+    labels = labels
+  )
 }
 
 #' @describeIn bru_used Create a `bru_used` object from a formula.
@@ -577,10 +583,11 @@ bru_used.formula <- function(x, ...,
                              labels = NULL) {
   form <- as.expression(x[[length(x)]])
   bru_used(form,
-           effect = effect,
-           effect_exclude = effect_exclude,
-           latent = latent,
-           labels = labels)
+    effect = effect,
+    effect_exclude = effect_exclude,
+    latent = latent,
+    labels = labels
+  )
 }
 
 #' @rdname bru_used
@@ -1799,7 +1806,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' other input values than the expressions defined in the component definition
 #' itself, e.g. `field_eval(cbind(x, y))` for a component that was defined with
 #' `field(coordinates, ...)` (see also [component_eval()]).
-#'f
+#' f
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
@@ -2056,7 +2063,7 @@ generate.bru <- function(object,
       used <-
         bru_used(
           effect = if (is.null(newdata) &&
-                       is.null(include)) {
+            is.null(include)) {
             character(0)
           } else {
             include
@@ -3074,7 +3081,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       inla.options[["control.inla"]]$tolerance.step <- 1e-10
 
       if (result$.args$control.inla$stencil ==
-          INLA::inla.set.control.inla.default()$stencil) {
+        INLA::inla.set.control.inla.default()$stencil) {
         inla.options$control.inla$stencil <- 9
       }
 
@@ -3091,7 +3098,6 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       } else {
         inla.options$control.inla$tolerance <- max(tol.def^2, result$.args$control.inla$tolerance * 0.1)
       }
-
     }
     if ((!is.null(result) && !is.null(result$mode))) {
       previous_x <- result$mode$x

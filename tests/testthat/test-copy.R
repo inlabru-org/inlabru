@@ -83,8 +83,10 @@ test_that("Component copy feature", {
   cmp <- y ~ -1 +
     x1(x1, model = "rw2", scale.model = TRUE) +
     x2(x2, copy = "x1", fixed = FALSE)
-  fit_bru <- bru(cmp,
-    family = "poisson", data = mydata,
+  fit_bru <- bru(
+    cmp,
+    family = "poisson",
+    data = mydata,
     options = list(control.inla = list(int.strategy = "eb"))
   )
 
@@ -130,27 +132,30 @@ test_that("Component copy feature with group", {
   cmp <- ~ -1 + Intercept +
     x1(x1, model = "rw1", scale.model = TRUE, group = z) +
     x2(x2, copy = "x1", fixed = FALSE, group = z2)
-  fit_bru <- bru(cmp,
-                 formula = y ~ Intercept + x1 + x2,
-                 family = "normal", data = mydata,
-                 options = list(
-                   bru_max_iter = 1,
-                   control.inla = list(int.strategy = "eb")
-                 )
+  fit_bru <- bru(
+    cmp,
+    formula = y ~ Intercept + x1 + x2,
+    family = "normal", data = mydata,
+    options = list(
+      bru_max_iter = 1,
+      control.inla = list(int.strategy = "eb")
+    )
   )
 
   cmp2 <- ~ -1 + Intercept +
     x1(x1, model = "rw1", scale.model = TRUE, group = z) +
     x1copy(x2, copy = "x1", fixed = TRUE, group = z2) +
     beta(1, model = "linear")
-  fit_bru2 <- bru(cmp2,
-                 formula = y ~ Intercept + x1 + beta * x1copy,
-                 family = "normal", data = mydata,
-                 options = list(
-                   bru_max_iter = 5,
-                   bru_initial = list(beta = 1),
-                   control.inla = list(int.strategy = "eb")
-                 )
+  fit_bru2 <- bru(
+    cmp2,
+    formula = y ~ Intercept + x1 + beta * x1copy,
+    family = "normal",
+    data = mydata,
+    options = list(
+      bru_max_iter = 5,
+      bru_initial = list(beta = 1),
+      control.inla = list(int.strategy = "eb")
+    )
   )
 
   expect_equal(

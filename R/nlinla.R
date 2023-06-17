@@ -47,21 +47,22 @@ bru_compute_linearisation.component <- function(cmp,
   label <- cmp[["label"]]
 
   if (!is.null(comp_simple) &&
-      !inherits(comp_simple, "bru_mapper_taylor")) {
+    !inherits(comp_simple, "bru_mapper_taylor")) {
     warning(paste0(
       "Non-linear component mappers not fully supported!",
       "\nClass for '", label, "': '",
       paste0(class(comp_simple), collapse = "', '"),
       "'"
-      ), immediate. = TRUE)
+    ), immediate. = TRUE)
   }
   if (is.null(comp_simple)) {
     A <- NULL
     assume_rowwise <- FALSE
   } else {
-    A <- ibm_jacobian(comp_simple,
-                      input = input[[label]],
-                      state = state[[label]]
+    A <- ibm_jacobian(
+      comp_simple,
+      input = input[[label]],
+      state = state[[label]]
     )
 
     assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
