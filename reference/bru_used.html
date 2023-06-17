@@ -104,6 +104,16 @@ objects.</p>
 <span>  labels <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for character</span></span>
+<span><span class="fu">bru_used</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  effect <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  effect_exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  latent <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for expression</span></span>
 <span><span class="fu">bru_used</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
@@ -186,8 +196,11 @@ may depend on the input object class</p></dd>
     <h2 id="methods-by-class-">Methods (by class)<a class="anchor" aria-label="anchor" href="#methods-by-class-"></a></h2>
     
 <ul><li><p><code>bru_used(default)</code>: Create a <code>bru_used</code> object.</p></li>
+<li><p><code>bru_used(character)</code>: Create a <code>bru_used</code> object from a <code>character</code>
+representation of an expression.</p></li>
 <li><p><code>bru_used(expression)</code>: Create a <code>bru_used</code> object from an expression object.</p></li>
-<li><p><code>bru_used(formula)</code>: Create a <code>bru_used</code> object from a formula.</p></li>
+<li><p><code>bru_used(formula)</code>: Create a <code>bru_used</code> object from a formula (only the
+right-hand side is used).</p></li>
 <li><p><code>bru_used(bru_used)</code>: Convenience method that takes
 an existing <code>bru_used</code> object and calls <code><a href="bru_used_update.html">bru_used_update()</a></code>
 if <code>labels</code> is non-NULL.</p></li>
