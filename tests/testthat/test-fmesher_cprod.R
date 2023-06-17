@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 # sp sf test
 test_that("fm_cprod(..., na.rm = TRUE) sf output can be generated", {
   local_bru_safe_inla()

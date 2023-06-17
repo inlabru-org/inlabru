@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("fm_transform: geocentric globe transformation", {
   skip_on_cran()
   skip_if_not_installed("sf")

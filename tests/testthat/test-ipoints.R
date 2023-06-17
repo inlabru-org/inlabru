@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("1D integration points can be generated", {
   local_bru_safe_inla()
   ips <- ipoints(c(0, 10), 3, name = "myDim")

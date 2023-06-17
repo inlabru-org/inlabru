@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 latent_ar1_testdata <- function() {
   data1 <- data.frame(
     time = c(1, 2, 3, 5, 4),

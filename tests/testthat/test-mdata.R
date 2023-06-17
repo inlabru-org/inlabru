@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("mdata", {
   local_bru_safe_inla()
 

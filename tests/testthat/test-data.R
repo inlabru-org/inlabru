@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 # Test for data input with mismatching input/output sizes (e.g. for regional
 # integration models, etc)
 

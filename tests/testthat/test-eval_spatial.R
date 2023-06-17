@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("eval_spatial.SpatRaster", {
   skip_if_not_installed("terra")
 

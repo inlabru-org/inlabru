@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("Missing data infilling", {
   skip_on_cran()
   local_bru_safe_inla()

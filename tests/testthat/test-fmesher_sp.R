@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 # FL note: see the inla.mesh.segment documentation for the idx and is.bnd arguments
 # Further note: inla.mesh.segment has two ways of specifying the index;
 # as a sequence, or as a two-column matrix. But it is always stored as a two column matrix,

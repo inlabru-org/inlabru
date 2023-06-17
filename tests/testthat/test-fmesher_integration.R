@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("Discrete integration", {
   domain <- 2:5
   samplers <- 3:7

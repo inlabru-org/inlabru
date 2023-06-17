@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("Linear mapper", {
   mapper <- bru_mapper_linear()
 
