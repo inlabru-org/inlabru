@@ -116,10 +116,14 @@ fit <- lgcp(cmp,
 Predict and plot the intensity for all seasons:
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ppxl <- pixels(mrsea$mesh, mask = mrsea$boundary)
-ppxl_all <- cprod(ppxl, data.frame(season = seq_len(4)))
+ppxl <- fm_pixels(mrsea$mesh, mask = mrsea$boundary, format = "sp")
+ppxl_all <- fm_cprod(ppxl, data.frame(season = seq_len(4)))
 
-lambda1 <- predict(fit, ppxl_all, ~ data.frame(season = season, lambda = exp(mySmooth + Intercept)))
+lambda1 <- predict(
+  fit,
+  ppxl_all,
+  ~ data.frame(season = season, lambda = exp(mySmooth + Intercept))
+)
 ```
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 pl1 <- ggplot() +

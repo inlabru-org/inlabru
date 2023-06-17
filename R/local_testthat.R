@@ -193,7 +193,7 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
   local_bru_options_set(
     # Need to specify specific smtp to ensure consistent tests.
     # To specifically test pardiso, need to override locally
-    control.compute = list(dic = FALSE, waic = FALSE, smtp = "taucs"),
+    control.compute = list(smtp = "taucs"),
     inla.mode = "compact",
     envir = envir
   )

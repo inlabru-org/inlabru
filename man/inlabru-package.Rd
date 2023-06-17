@@ -35,6 +35,7 @@ Useful links:
 \itemize{
   \item \url{http://www.inlabru.org}
   \item \url{https://inlabru-org.github.io/inlabru/}
+  \item \url{https://github.com/inlabru-org/inlabru}
   \item Report bugs at \url{https://github.com/inlabru-org/inlabru/issues}
 }
 

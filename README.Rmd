@@ -78,6 +78,9 @@ install.packages("inlabru")
 
 This is a basic example which shows you how fit a simple spatial Log Gaussian Cox Process (LGCP)
 and predicts its intensity:
+```{r special-setup, echo=FALSE}
+suppressPackageStartupMessages(library(sp))
+```
 ```{r example}
 # Load libraries
 library(inlabru)
@@ -111,7 +114,7 @@ fit <- bru(
 # Predict Gorilla nest intensity
 lambda <- predict(
   fit,
-  pixels(gorillas$mesh, mask = gorillas$boundary),
+  fm_pixels(gorillas$mesh, mask = gorillas$boundary, format = "sp"),
   ~ exp(mySmooth + Intercept)
 )
 

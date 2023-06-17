@@ -21,6 +21,7 @@
 #' }
 bru_convergence_plot <- function(x) {
   stopifnot(inherits(x, "bru"))
+  x <- bru_check_object_bru(x)
   make_track_plots(x)[["default"]]
 }
 
@@ -74,6 +75,8 @@ make_track_plots <- function(fit) {
     dplyr::mutate(alpha_value = 1 / sqrt(max(.data$index))) %>%
     dplyr::ungroup()
 
+  alpha_value_lin_scale <- 0.8
+
   lty_ <- factor(c("Mode", "Lin", "Mode-Lin", "SD"),
     levels = c("Mode", "Lin", "Mode-Lin", "SD")
   )
@@ -121,7 +124,7 @@ make_track_plots <- function(fit) {
       col = .data$index,
       group = factor(.data$index),
       lty = lty_["Lin"],
-      alpha = .data$alpha_value / 2
+      alpha = .data$alpha_value * alpha_value_lin_scale
     )) +
     ggplot2::guides(alpha = "none") +
     pl_theme_abs +
@@ -274,7 +277,8 @@ make_track_plots <- function(fit) {
     )) +
     pl_theme_norm +
     ggplot2::scale_y_log10() +
-    ggplot2::ggtitle("|Change| / sd (Max and Mean)")
+    ggplot2::ggtitle("|Change| / sd (Max and Mean)") +
+    ggplot2::geom_hline(yintercept = fit$bru_info$options$bru_method$rel_tol)
 
   pl6 <-
     ggplot2::ggplot(
@@ -295,7 +299,7 @@ make_track_plots <- function(fit) {
       col = .data$index,
       group = factor(.data$index),
       lty = lty_["Lin"],
-      alpha = .data$alpha_value / 2
+      alpha = .data$alpha_value * alpha_value_lin_scale
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,

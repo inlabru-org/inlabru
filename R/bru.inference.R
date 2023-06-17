@@ -59,7 +59,8 @@ bru_info_upgrade <- function(object,
     warning(
       "Old bru_info object version ",
       old_ver,
-      " detected. Attempting upgrade."
+      " detected. Attempting upgrade to version ",
+      new_version
     )
 
     message("Detected bru_info version ", old_ver)
@@ -154,7 +155,70 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.7.0.9010"
     }
 
+    if (utils::compareVersion("2.7.0.9016", old_ver) > 0) {
+      message("Upgrading bru_info to 2.7.0.9016")
+      # Convert old style include_component/allow_latent to intermediate
+      # include_component/include_latent format
+
+      # Update include/exclude information to limit it to existing components
+      for (k in seq_along(object[["lhoods"]])) {
+        if (isTRUE(object[["lhoods"]][[k]][["allow_latent"]])) {
+          # Force inclusion of all components
+          object[["lhoods"]][[k]][["include_latent"]] <- NULL
+        } else {
+          if (is.null(object[["lhoods"]][[k]][["include_latent"]])) {
+            object[["lhoods"]][[k]][["include_latent"]] <- character(0)
+          }
+        }
+      }
+      object[["lhoods"]] <-
+        bru_used_upgrade(
+          object[["lhoods"]],
+          labels = names(object[["model"]][["effects"]])
+        )
+      object[["inlabru_version"]] <- "2.7.0.9016"
+    }
+
+    if (utils::compareVersion("2.7.0.9017", old_ver) > 0) {
+      message("Upgrading bru_info to 2.7.0.9017")
+      # Convert old style include_component/allow_latent to new
+      # bru_used format
+
+      # Update include/exclude information to limit it to existing components
+      for (k in seq_along(object[["lhoods"]])) {
+        if (is.null(object[["lhoods"]][[k]][["used_components"]])) {
+          if (isTRUE(object[["lhoods"]][[k]][["allow_latent"]])) {
+            # Force inclusion of all components
+            object[["lhoods"]][[k]][["include_latent"]] <- NULL
+          } else {
+            if (is.null(object[["lhoods"]][[k]][["include_latent"]])) {
+              object[["lhoods"]][[k]][["include_latent"]] <- character(0)
+            }
+          }
+        }
+      }
+      object[["lhoods"]] <-
+        bru_used_upgrade(
+          object[["lhoods"]],
+          labels = names(object[["model"]][["effects"]])
+        )
+      object[["inlabru_version"]] <- "2.7.0.9017"
+    }
+
+    if (utils::compareVersion("2.7.0.9021", old_ver) > 0) {
+      message("Upgrading bru_info to 2.7.0.9021")
+      # Make sure 'used' components format is properly stored
+
+      object[["lhoods"]] <-
+        bru_used_upgrade(
+          object[["lhoods"]],
+          labels = names(object[["model"]][["effects"]])
+        )
+      object[["inlabru_version"]] <- "2.7.0.9021"
+    }
+
     object[["inlabru_version"]] <- new_version
+    message(paste0("Upgraded bru_info to ", new_version))
   }
   object
 }
@@ -277,6 +341,298 @@ bru_info.bru <- function(object, ...) {
 }
 
 
+# Used for upgrading from versions <= 2.7.0.9017 to >= 2.7.0.2021
+bru_used_upgrade <- function(lhoods, labels) {
+  for (k in seq_along(lhoods)) {
+    if (is.null(lhoods[[k]][["used"]]) &&
+      is.null(lhoods[[k]][["used_components"]])) {
+      used <- bru_used(
+        effect = lhoods[[k]][["include_components"]],
+        latent = lhoods[[k]][["include_latent"]],
+        effect_exclude = lhoods[[k]][["exclude_components"]],
+      )
+
+      lhoods[[k]][["include_components"]] <- NULL
+      lhoods[[k]][["exclude_components"]] <- NULL
+      lhoods[[k]][["include_latent"]] <- NULL
+    } else if (!is.null(lhoods[[k]][["used_components"]])) {
+      used <- bru_used(
+        effect = lhoods[[k]][["effect"]],
+        latent = lhoods[[k]][["latent"]]
+      )
+      lhoods[[k]][["used_components"]] <- NULL
+    } else {
+      used <- bru_used(lhoods[[k]])
+    }
+
+    used <- bru_used_update(used, labels = labels)
+    lhoods[[k]][["used"]] <- used
+  }
+  lhoods
+}
+
+
+#' Update used_component information objects
+#'
+#' Merge available component labels information with used components information.
+#'
+#' @param x Object to be updated
+#' @param labels character vector of component labels
+#' @param ... Unused
+#'
+#' @keywords internal
+#' @export
+#' @family bru_used
+bru_used_update <- function(x, labels, ...) {
+  UseMethod("bru_used_update")
+}
+
+#' @rdname bru_used_update
+#' @export
+bru_used_update.bru_like_list <- function(x, labels, ...) {
+  for (k in seq_along(x)) {
+    x[[k]] <- bru_used_update(x[[k]], labels = labels, ...)
+  }
+  x
+}
+
+#' @rdname bru_used_update
+#' @export
+bru_used_update.bru_like <- function(x, labels, ...) {
+  x[["used"]] <-
+    bru_used_update(bru_used(x), labels = labels, ...)
+  x
+}
+
+#' @rdname bru_used_update
+#' @export
+bru_used_update.bru_used <- function(x, labels, ...) {
+  used <- x
+  used$effect <-
+    parse_inclusion(
+      labels,
+      include = used[["effect"]],
+      exclude = used[["effect_exclude"]]
+    )
+  used[["effect_exclude"]] <- NULL
+  used$latent <-
+    parse_inclusion(
+      labels,
+      include = used[["latent"]],
+      exclude = NULL
+    )
+  used
+}
+
+
+#' List components used in a model
+#'
+#' Create or extract information about which components are used by a model, or its
+#' individual observation models. If a non-NULL `labels` argument
+#' is supplied, also calls [bru_used_update()] on the `bru_used`
+#' objects.
+#'
+#' @param x An object that contains information about used components
+#' @param effect character; components used as effects. When `NULL`, auto-detect
+#' components to include or include all components.
+#' @param effect_exclude character; components to specifically exclude from
+#' effect evaluation. When `NULL`, do not specifically exclude any components.
+#' @param latent character; components used as `_latent` or `_eval()`. When
+#' `NULL`, auto-detect components.
+#' @param labels character; component labels passed on to
+#' [bru_used_update()]
+
+#' @param join Whether to join list output into a single object; Default
+#' may depend on the input object class
+#' @param ... Parameters passed on to the other methods
+#' @returns A `bru_used` object (a list with elements `effect`
+#' and `latent`), or a list of such objects
+#' (for methods with `join = FALSE`)
+#'
+#' @examples
+#' (used <- bru_used(~.))
+#' bru_used(used, labels = c("a", "c"))
+#' (used <- bru_used(~ a + b + c_latent + d_latent))
+#' bru_used(used, labels = c("a", "c"))
+#' (used <- bru_used(expression(a + b + c_latent + d_latent)))
+#' bru_used(used, labels = c("a", "c"))
+#'
+#' @export
+#' @keywords internal
+#' @family bru_used
+bru_used <- function(x = NULL, ...) {
+  UseMethod("bru_used")
+}
+
+#' @describeIn bru_used Create a `bru_used` object.
+#' @export
+bru_used.default <- function(x = NULL, ...,
+                             effect = NULL,
+                             effect_exclude = NULL,
+                             latent = NULL,
+                             labels = NULL) {
+  if (!is.null(x)) {
+    stop(paste0(
+      "bru_used input class not supported: ",
+      "'", paste0(class(x), collapse = "', '"), "'"
+    ))
+  }
+
+  used <- list(
+    effect = effect,
+    latent = latent
+  )
+  used[["effect_exclude"]] <- effect_exclude
+  class(used) <- c("bru_used", class(used))
+
+  if (!is.null(labels)) {
+    used <- bru_used_update(used, labels = labels)
+  }
+
+  used
+}
+
+
+# Function from
+# https://stackoverflow.com/questions/63580260/is-there-a-way-to-stop-all-vars-returning-names-from-the-right-hand-side-of
+# corrected to handle multiple $ correctly
+replace_dollar <- function(expr) {
+  if (!is.language(expr) || length(expr) == 1L) {
+    return(expr)
+  }
+  if (expr[[1]] == quote(`$`)) {
+    expr[[1]] <- quote(`[[`)
+    expr[[3]] <- as.character(expr[[3]])
+    expr[[2]] <- replace_dollar(expr[[2]])
+    expr[[3]] <- replace_dollar(expr[[3]])
+  } else {
+    for (i in seq_along(expr)[-1]) {
+      expr[[i]] <- replace_dollar(expr[[i]])
+    }
+  }
+  expr
+}
+
+#' Extract basic variable names from expression
+#'
+#' First replaces `$` with `[[` indexing, so that internal column/variable names are ignored,
+#' then calls `all.vars()`.
+#'
+#' @param expr An `expression`
+#' @param functions logical; if TRUE, include function names
+#'
+#' @returns If successful, a character vector, otherwise `NULL`
+#'
+#' @keywords internal
+#' @export
+#' @family bru_used
+bru_used_vars <- function(expr, functions = FALSE) {
+  attributes(expr) <- NULL
+  ex <- deparse1(expr, collapse = "\n")
+  ex <- str2lang(ex)
+  ex <- replace_dollar(ex)
+  vars <- all.vars(ex, functions = functions)
+  if (identical(vars, ".") || identical(vars, character(0))) {
+    vars <- NULL
+  }
+  vars
+}
+
+
+
+#' @describeIn bru_used Create a `bru_used` object from an expression object.
+#' @export
+bru_used.expression <- function(x, ...,
+                                effect = NULL,
+                                effect_exclude = NULL,
+                                latent = NULL,
+                                labels = NULL) {
+  form <- x
+  if (is.null(effect)) {
+    effect <- bru_used_vars(form, functions = FALSE)
+    effect <- effect[!grepl("^.*_latent$", effect) &
+      !grepl("^.*_eval$", effect)]
+  }
+  if (is.null(latent)) {
+    latent <- bru_used_vars(form, functions = TRUE)
+
+    include_latent <- latent[grepl("^.*_latent$", latent)]
+    include_latent <- gsub("_latent$", "", include_latent)
+    include_eval <- latent[grepl("^.*_eval$", latent)]
+    include_eval <- gsub("_eval$", "", include_eval)
+    latent <- union(include_latent, include_eval)
+    if (length(latent) == 0) {
+      include_latent <- character(0)
+    }
+  }
+
+  bru_used(
+    effect = effect,
+    effect_exclude = effect_exclude,
+    latent = latent,
+    labels = labels
+  )
+}
+
+#' @describeIn bru_used Create a `bru_used` object from a formula.
+#' @export
+bru_used.formula <- function(x, ...,
+                             effect = NULL,
+                             effect_exclude = NULL,
+                             latent = NULL,
+                             labels = NULL) {
+  form <- as.expression(x[[length(x)]])
+  bru_used(form,
+    effect = effect,
+    effect_exclude = effect_exclude,
+    latent = latent,
+    labels = labels
+  )
+}
+
+#' @rdname bru_used
+#' @export
+bru_used.bru <- function(x, ..., join = TRUE) {
+  bru_used(x[["bru_info"]][["lhoods"]], ..., join = join)
+}
+
+#' @rdname bru_used
+#' @export
+bru_used.list <- function(x, ..., join = TRUE) {
+  used <- lapply(x, function(y) bru_used(y, ...))
+  if (join) {
+    effect_exclude <- unique(unlist(lapply(used, function(y) y[["effect_exclude"]])))
+    if (length(effect_exclude) > 0) {
+      stop("Cannot join 'bru_used' objects with non-null 'effect_exclude' information.")
+    }
+    used <-
+      bru_used(
+        effect = unique(unlist(lapply(used, function(y) y[["effect"]]))),
+        latent = unique(unlist(lapply(used, function(y) y[["latent"]])))
+      )
+  }
+  used
+}
+
+#' @rdname bru_used
+#' @export
+bru_used.bru_like <- function(x, ...) {
+  bru_used(x[["used"]], ...)
+}
+
+#' @describeIn bru_used Convenience method that takes
+#' an existing `bru_used` object and calls [bru_used_update()]
+#' if `labels` is non-NULL.
+#' @export
+bru_used.bru_used <- function(x, labels = NULL, ...) {
+  if (!is.null(labels)) {
+    x <- bru_used_update(x, labels = labels)
+  }
+  x
+}
+
+
+
 #' @title Convenient model fitting using (iterated) INLA
 #'
 #' @description This method is a wrapper for `INLA::inla` and provides
@@ -396,6 +752,9 @@ bru <- function(components = ~ Intercept(1),
 
   # Turn input into a list of components (from existing list, or a special formula)
   components <- component_list(components, .envir = .envir)
+
+  # Update include/exclude information to limit it to existing components
+  lhoods <- bru_used_update(lhoods, labels = names(components))
 
   # Turn model components into internal bru model
   bru.model <- bru_model(components, lhoods)
@@ -716,19 +1075,29 @@ extended_bind_rows <- function(...) {
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides `samplers`.
 #' @param domain Named list of domain definitions.
-#' @param include Character vector of component labels that are needed by the
-#'   predictor expression; Default: NULL (include all components that are not
-#'   explicitly excluded)
+#' @param include Character vector of component labels that are used as effects
+#'   by the
+#'   predictor expression; Default: the result of `[all.vars()]` on the
+#'   predictor expression, unless the expression is not ".", in which case
+#'   `include=NULL`, to include all components that are not
+#'   explicitly excluded. The [bru_used()] methods are used
+#'   to extract the variable names, followed by removal of non-component names
+#'   when the components are available.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#' @param allow_latent logical. If `TRUE`, the latent state of each component is
+#' @param include_latent character vector.
+#' Specifies which the latent state variables are
 #' directly available to the predictor expression, with a `_latent` suffix.
 #' This also makes evaluator functions with suffix `_eval` available, taking
 #' parameters `main`, `group`, and `replicate`, taking values for where to
 #' evaluate the component effect that are different than those defined in the
-#' component definition itself (see [component_eval()]). Default `FALSE`
+#' component definition itself (see [component_eval()]). Default `NULL`
+#' auto-detects use of `_latent` and `_eval` in the predictor expression.
+#' @param used Either `NULL` or a [bru_used()] object, overriding `include`, `exclude`,
+#' and `include_latent`.
+#' @param allow_latent logical, deprecated. Use `include_latent` instead.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
 #' Default `FALSE`, but forced to `TRUE` if `response_data` is `NULL` or
@@ -740,7 +1109,7 @@ extended_bind_rows <- function(...) {
 #' (`E`, `Ntrials`, and `weights`) if not found in `response_data` or `data`. Defaults to
 #' the calling environment.
 #'
-#' @return A likelihood configuration which can be used to parameterize [bru()].
+#' @return A likelihood configuration which can be used to parameterise [bru()].
 #'
 #' @example inst/examples/like.R
 
@@ -748,8 +1117,11 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  response_data = NULL, # agg
                  mesh = NULL, E = NULL, Ntrials = NULL, weights = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
-                 include = NULL, exclude = NULL,
-                 allow_latent = FALSE,
+                 include = NULL,
+                 exclude = NULL,
+                 include_latent = NULL,
+                 used = NULL,
+                 allow_latent = NULL,
                  allow_combine = NULL,
                  control.family = NULL,
                  options = list(),
@@ -1035,6 +1407,28 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response <- "BRU_response"
   }
 
+  if (is.null(used)) {
+    used <- bru_used(
+      formula,
+      effect = include,
+      effect_exclude = exclude,
+      latent = include_latent
+    )
+  }
+  if (!is.null(allow_latent)) {
+    lifecycle::deprecate_soft(
+      "2.8.0",
+      "like(allow_latent = 'is deprecated')",
+      "like(include_latent)",
+      details = "The default `like(..., include_latent = NULL)` auto-detects use of `_latent` and `_eval`."
+    )
+    if (allow_latent && is.null(include_latent)) {
+      # Set to NULL so that later bru_used_update adds all components.
+      used[["latent"]] <- NULL
+    }
+  }
+
+
   # The likelihood object that will be returned
 
   lh <- list(
@@ -1052,9 +1446,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     inla.family = inla.family,
     domain = domain,
     drange = NULL,
-    include_components = include,
-    exclude_components = exclude,
-    allow_latent = allow_latent,
+    used = used,
     allow_combine = allow_combine,
     control.family = control.family
   )
@@ -1189,12 +1581,7 @@ bru_like_expr <- function(lhood, components) {
     pattern = "BRU_EXPRESSION",
     x = expr_text
   )) {
-    included <-
-      parse_inclusion(
-        names(components),
-        include = lhood[["include_components"]],
-        exclude = lhood[["exclude_components"]]
-      )
+    included <- bru_used(lhood)[["effect"]]
     expr_text <-
       gsub(
         pattern = "BRU_EXPRESSION",
@@ -1279,7 +1666,11 @@ bru_like_expr <- function(lhood, components) {
 #'   )
 #'
 #'   # Predict the spatial intensity surface
-#'   lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+#'   lambda <- predict(
+#'     fit,
+#'     fm_pixels(gorillas$mesh, format = "sp"),
+#'     ~ exp(mySmooth + Intercept)
+#'   )
 #'
 #'   # Plot the intensity
 #'   ggplot() +
@@ -1390,12 +1781,18 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
 #' @param include Character vector of component labels that are needed by the
-#'   predictor expression; Default: NULL (include all components that are not
-#'   explicitly excluded) if `newdata` is provided, otherwise `character(0)`.
+#'   predictor expression; Default: the result of `[all.vars()]` on the
+#'   predictor expression, unless the expression is not ".", in which case
+#'   `include=NULL`, to include all components that are not
+#'   explicitly excluded. The [bru_used()] methods are used
+#'   to extract the variable names, followed by removal of non-component names
+#'   when the components are available.
 #' @param exclude Character vector of component labels that are not used by the
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
+#' @param used Either `NULL` or a [bru_used()] object, overriding `include` and `exclude`.
+#' Default `NULL`
 #' @param drop logical; If `keep=FALSE`, `newdata` is a `Spatial*DataFrame`, and the
 #' prediciton summary has the same number of rows as `newdata`, then the output is
 #' a `Spatial*DataFrame` object. Default `FALSE`.
@@ -1409,7 +1806,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' other input values than the expressions defined in the component definition
 #' itself, e.g. `field_eval(cbind(x, y))` for a component that was defined with
 #' `field(coordinates, ...)` (see also [component_eval()]).
-#'
+#' f
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
@@ -1426,6 +1823,7 @@ predict.bru <- function(object,
                         num.threads = NULL,
                         include = NULL,
                         exclude = NULL,
+                        used = NULL,
                         drop = FALSE,
                         ...,
                         data = NULL) {
@@ -1466,6 +1864,7 @@ predict.bru <- function(object,
     num.threads = num.threads,
     include = include,
     exclude = exclude,
+    used = used,
     ...
   )
 
@@ -1546,6 +1945,7 @@ predict.bru <- function(object,
   smy
 }
 
+
 #' Sampling based on bru posteriors
 #'
 #' @description
@@ -1579,6 +1979,7 @@ predict.bru <- function(object,
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
+#' @param used Either `NULL` or a [bru_used()] object, overriding `include` and `exclude`.
 #' @param ... additional, unused arguments.
 #' @param data Deprecated. Use `newdata` instead.
 #' sampling.
@@ -1607,6 +2008,7 @@ generate.bru <- function(object,
                          num.threads = NULL,
                          include = NULL,
                          exclude = NULL,
+                         used = NULL,
                          ...,
                          data = NULL) {
   object <- bru_check_object_bru(object)
@@ -1652,13 +2054,32 @@ generate.bru <- function(object,
     state
   } else {
     # TODO: clarify the output format, and use the format parameter
+
+    if (is.null(used)) {
+      if (is.null(include)) {
+        form <- formula[[length(formula)]]
+        include <- bru_used_vars(form)
+      }
+      used <-
+        bru_used(
+          effect = if (is.null(newdata) &&
+            is.null(include)) {
+            character(0)
+          } else {
+            include
+          },
+          effect_exclude = exclude,
+          latent = NULL,
+          labels = names(object$bru_info$model$effects)
+        )
+    }
+
     vals <- evaluate_model(
       model = object$bru_info$model,
       state = state,
       data = newdata,
       predictor = formula,
-      include = if (is.null(newdata)) character(0) else include,
-      exclude = exclude
+      used = used
     )
     vals
   }
@@ -1666,7 +2087,7 @@ generate.bru <- function(object,
 
 
 
-# Monte Carlo method for estimating aposterior
+# Monte Carlo method for estimating posterior
 #
 # @aliases montecarlo.posterior
 # @export
@@ -2652,6 +3073,31 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
       inla.options[["control.inla"]]$use.directions <-
         result$misc$opt.directions
+
+      # Further settings, from inla.rerun
+      inla.options[["control.inla"]]$optimise.strategy <- "plain"
+
+      inla.options[["control.inla"]]$step.factor <- 1
+      inla.options[["control.inla"]]$tolerance.step <- 1e-10
+
+      if (result$.args$control.inla$stencil ==
+        INLA::inla.set.control.inla.default()$stencil) {
+        inla.options$control.inla$stencil <- 9
+      }
+
+      h.def <- INLA::inla.set.control.inla.default()$h
+      if (result$.args$control.inla$h == h.def) {
+        inla.options$control.inla$h <- 0.2 * result$.args$control.inla$h
+      } else {
+        inla.options$control.inla$h <- max(0.1 * h.def, 0.75 * result$.args$control.inla$h)
+      }
+
+      tol.def <- INLA::inla.set.control.inla.default()$tolerance
+      if (result$.args$control.inla$tolerance == tol.def) {
+        inla.options$control.inla$tolerance <- result$.args$control.inla$tolerance * 0.01
+      } else {
+        inla.options$control.inla$tolerance <- max(tol.def^2, result$.args$control.inla$tolerance * 0.1)
+      }
     }
     if ((!is.null(result) && !is.null(result$mode))) {
       previous_x <- result$mode$x

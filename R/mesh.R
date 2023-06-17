@@ -38,7 +38,8 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
     "2.8.0",
     "is.inside()",
     "fm_is_within()",
-    details = "`is.inside(mesh, loc)` becomes `fm_is_within(loc, mesh)`")
+    details = "`is.inside(mesh, loc)` becomes `fm_is_within(loc, mesh)`"
+  )
 
   if (!is.null(mesh.coords)) {
     loc <- as.matrix(loc[, mesh.coords])
@@ -61,15 +62,16 @@ vertices.inla.mesh <- function(...) {
     "vertices.inla.mesh()",
     "fm_vertices()",
     details =
-      c("!" = "fm_vertices() by default returns 'sf' instead of SPDF.",
-        "!" = "fm_vertices() includes a '.vertex' column instead of a 'vertex' column.")
+      c(
+        "!" = "fm_vertices() by default returns 'sf' instead of SPDF.",
+        "!" = "fm_vertices() includes a '.vertex' column instead of a 'vertex' column."
+      )
   )
 
   vrt <- fm_vertices(..., format = "sp") %>%
     dplyr::rename(vertex = .data$.vertex)
 
   vrt
-
 }
 
 
@@ -93,7 +95,10 @@ vertices.inla.mesh <- function(...) {
 #' \donttest{
 #' if (require(ggplot2, quietly = TRUE)) {
 #'   data("mrsea", package = "inlabru")
-#'   pxl <- pixels(mrsea$mesh, nx = 50, ny = 50, mask = mrsea$boundary)
+#'   pxl <- fm_pixels(mrsea$mesh,
+#'     nx = 50, ny = 50, mask = mrsea$boundary,
+#'     format = "sp"
+#'   )
 #'   ggplot() +
 #'     gg(pxl, fill = "grey", alpha = 0.5) +
 #'     gg(mrsea$mesh)
@@ -101,12 +106,12 @@ vertices.inla.mesh <- function(...) {
 #' }
 #'
 pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
-  #  lifecycle::deprecate_soft(
-  #    "2.8.0",
-  #    "pixels()",
-  #   "fm_pixels(format = 'sp')",
-  #   details = "The fm_pixels() function can generate sf, terra, and sp output."
-  # )
+  lifecycle::deprecate_soft(
+    "2.8.0",
+    "pixels()",
+    "fm_pixels(format = 'sp')",
+    details = "The fm_pixels() function can generate sf, terra, and sp output."
+  )
   fm_pixels(mesh, nx = nx, ny = ny, mask = mask, format = "sp")
 }
 
@@ -131,7 +136,9 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
     "2.7.0",
     "refine.inla.mesh()",
     details = c(
-      "!" = "This function is experimental and will be replaced by a new method"))
+      "!" = "This function is experimental and will be replaced by a new method"
+    )
+  )
 
   rmesh <- INLA::inla.mesh.create(
     loc = mesh$loc,
@@ -160,7 +167,9 @@ tsplit.inla.mesh <- function(mesh, n = 1) {
     "2.7.0",
     "tsplit.inla.mesh()",
     details = c(
-      "!" = "This function is experimental and will be replaced by a new method."))
+      "!" = "This function is experimental and will be replaced by a new method."
+    )
+  )
 
   p1 <- mesh$loc[mesh$graph$tv[, 1], ]
   p2 <- mesh$loc[mesh$graph$tv[, 2], ]
@@ -215,4 +224,3 @@ tsplit.inla.mesh <- function(mesh, n = 1) {
     return(tsplit.inla.mesh(mesh2, n - 1))
   }
 }
-

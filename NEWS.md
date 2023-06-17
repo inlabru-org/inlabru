@@ -2,6 +2,28 @@
 
 ## Feature updates
 
+* The iterative inla method has been given both sharper internal `inla()` optimisation
+  criteria for the iterations (thanks to Haavard Rue), _and_ a more relaxed
+  nonlinear iteration stopping criterion; the default `bru_method$rel_tol`
+  values has been changed from 1 to 10 percent change, relative to the posterior standard deviation.
+  This seems to strike a useful balance between the different optimisation
+  criteria, allowing the iterations to converge faster and also detect that
+  convergence sooner.
+
+* The logic for which components are needed for a predictor expression
+  (in `like()` or `generate()`/`predict()`) has been updated to when possible
+  extract the list of components from the expression itself.
+  The user can override this default if necessary, using the `include`/`exclude` arguments.
+  
+  The `bru_used()` methods are used to guess the needed component names, applied
+  to the right-hand side of the `formula` arguments.  The `allow_latent` argument
+  to `like()` has been deprecated in favour of `include_latent`
+  (by default auto-detected for use of `_latent` and `_eval`).
+  
+  The internal information storage is handled by the new `bru_used()`
+  methods, that can also be used directly by the user and supplied via the
+  `used` argument to `like()`/`generate()`/`predict()`.
+
 * Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
   Supports both `sf` and `sp` sampler objects.
   
@@ -19,13 +41,21 @@
   will still be accepted, but give a warning.  Code that does not name the `data`
   argument is not affected.
 
-* Warning: Coordinate names for `Spatial*` objects have been inconsistently
-  available in the predictor expression evaluation. Avoid relying on those being
-  present, and use explicit calls to `coordinates(.data.)` if you need the
-  coordinate values (e.g. for custom spatial covariate evaluation.).
+* Note: Coordinate names for `Spatial*` objects have been inconsistently
+  available in the predictor expression evaluation. However, due to how internal
+  conversions might inadvertently change these names, they can not be relied
+  on, and they are no longer being made available to the predictor expression.
+  As a side effect, this change also speeds up some `bru()` runs by around a
+  factor 2, since it avoids converting the `Spatial*` to a regular `data.frame`
+  in time-sensitive core evaluation code.
+  
+  If you need access to the raw coordinate values, use explicit calls to
+  `sp::coordinates(.data.)` (e.g. for custom spatial covariate evaluation.).
   When possible, use the built-in covariate evaluation method, `eval_spatial()`,
   either implicitly with `comp(covariate, ...)` or explicitly,
-  `comp(eval_spatial(covariate, where = .data.), ...)`.
+  `comp(eval_spatial(covariate, where = .data.), ...)`, that handles `crs` information
+  correctly.  Also consider transitioning from `sp` to `sf` data storage, using
+  `geometry` instead of raw coordinates.
 
 ## Bug and dependency updates
 

@@ -162,7 +162,7 @@ Predict the field on a lattice, and generate
 a single realisation from the posterior distribution:
 
 ```{r warning=FALSE,message=FALSE}
-pix <- pixels(mesh, nx = 200, ny = 200)
+pix <- fm_pixels(mesh, nx = 200, ny = 200, format = "sp")
 pred <- predict(
   fit, pix,
   ~ field + Intercept

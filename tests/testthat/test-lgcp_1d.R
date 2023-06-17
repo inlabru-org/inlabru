@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_data <- function() {
   data(Poisson2_1D, package = "inlabru", envir = environment())
   x <- seq(0, 55, length = 50)

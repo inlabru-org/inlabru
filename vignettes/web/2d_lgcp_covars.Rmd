@@ -34,6 +34,7 @@ library(inlabru)
 library(RColorBrewer)
 library(ggplot2)
 bru_safe_sp(force = TRUE)
+bru_options_set(control.compute = list(dic = TRUE)) # Activate DIC output
 ```
 
 Introduction
@@ -140,8 +141,8 @@ a `SpatialPixelsDataFrame` only within the boundary, using its `mask` argument, 
 
 
 ```{r warning=FALSE,message=FALSE}
-df <- pixels(mesh, mask = boundary)
-int1 <- predict(fit1, df, ~ exp(vegetation))
+pred.df <- fm_pixels(mesh, mask = boundary, format = "sp")
+int1 <- predict(fit1, pred.df, ~ exp(vegetation))
 
 ggplot() +
   gg(int1) +
@@ -194,8 +195,7 @@ if ((!.cache_recompute) &&
 And plot the median intensity surface
 
 ```{r warning=FALSE,message=FALSE}
-df <- pixels(mesh, mask = boundary)
-int2 <- predict(fit2, df, ~ exp(mySmooth + vegetation), n.samples = 1000)
+int2 <- predict(fit2, pred.df, ~ exp(mySmooth + vegetation), n.samples = 1000)
 
 ggplot() +
   gg(int2, aes(fill = q0.025)) +
@@ -218,7 +218,7 @@ Lambda2
 
 Look at the contributions to the linear predictor from the SPDE and from vegetation:
 ```{r warning=FALSE,message=FALSE}
-lp2 <- predict(fit2, df, ~ list(
+lp2 <- predict(fit2, pred.df, ~ list(
   smooth_veg = mySmooth + vegetation,
   smooth = mySmooth,
   veg = vegetation
@@ -288,7 +288,7 @@ if ((!.cache_recompute) &&
 ```
 
 ```{r results='hide',warning=FALSE,message=FALSE}
-int3 <- predict(fit3, df, ~ exp(mySmooth + Intercept))
+int3 <- predict(fit3, pred.df, ~ exp(mySmooth + Intercept))
 
 ggplot() +
   gg(int3) +
@@ -305,48 +305,34 @@ Lambda3 <- predict(
 Lambda3
 ```
 ```{r warning=FALSE,message=FALSE}
-knitr::kable(cbind(
-  deltaIC(fit1, fit2, fit3, criterion = c("DIC")),
-  deltaIC(fit1, fit2, fit3, criterion = c("WAIC"))
-))
+knitr::kable(deltaIC(fit1, fit2, fit3, criterion = c("DIC")))
 ```
-NOTE: the behaviour of DIC and WAIC is currently a bit unclear, in particular for experimental
-mode, and is being investigated.
+NOTE: the behaviour of DIC is currently a bit unclear, and is being investigated.
+WAIC is related to leave-one-out cross-validation, and is not appropriate to
+use with the current current LGCP likelihood implementation.
 
 Classic mode:
 ```{r echo=FALSE}
-knitr::kable(cbind(
+knitr::kable(
   dplyr::tribble(
     ~Model, ~DIC, ~Delta.DIC,
     "fit2", 2224.131, 0.00000,
     "fit3", 2274.306, 50.17504,
     "fit1", 3124.784, 900.65339
-  ),
-  dplyr::tribble(
-    ~Model, ~WAIC, ~Delta.WAIC,
-    "fit1", 2672.234, 0.0000,
-    "fit3", 2949.498, 277.2636,
-    "fit2", 3040.140, 367.9051
   )
-))
+)
 ```
 
 Experimental mode:
 ```{r echo=FALSE}
-knitr::kable(cbind(
+knitr::kable(
   dplyr::tribble(
     ~Model, ~DIC, ~Delta.DIC,
     "fit1", -563.3583, 0.000,
     "fit3", 509.4010, 1072.759,
     "fit2", 597.6459, 1161.004
-  ),
-  dplyr::tribble(
-    ~Model, ~WAIC, ~Delta.WAIC,
-    "fit1", 1373.241, 0.0000,
-    "fit3", 1584.543, 211.3021,
-    "fit2", 1636.864, 263.6225
   )
-))
+)
 ```
 
 #### CV and SPDE parameters for Model 2
@@ -488,8 +474,8 @@ Predict and plot the density
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-e.int <- predict(efit, pixels(mesh, mask = boundary), ~ exp(mySmooth + elev + Intercept))
-e.int.log <- predict(efit, pixels(mesh, mask = boundary), ~ (mySmooth + elev + Intercept))
+e.int <- predict(efit, pred.df, ~ exp(mySmooth + elev + Intercept))
+e.int.log <- predict(efit, pred.df, ~ (mySmooth + elev + Intercept))
 
 ggplot() +
   gg(e.int, aes(fill = log(sd))) +
@@ -510,7 +496,8 @@ plots and we are interested in comparing the effects of elevation and the SPDE.
 First we need to predict on the linear predictor scale.
 ```{r warning=FALSE,message=FALSE,echo=TRUE}
 e.lp <- predict(
-  efit, pixels(mesh, mask = boundary),
+  efit,
+  pred.df,
   ~ list(
     smooth_elev = mySmooth + elev,
     elev = elev,
@@ -640,16 +627,20 @@ adding the suffix `_eval` to the end of the component name in the predictor
 expression, and disabling normal component evaluation for all components with
 `include = character(0)`
 (since we're both bypassing the normal input to the `elev` component, and not
-supplying data for the other components). Since the elevation effect in this
+supplying data for the other components).  From version `2.8.0`, `inlabru` attempts
+to automatically detect which model components are used in the expression, and the
+`include` argument can usually be left out entirely.
+
+Since the elevation effect in this
 model is linear, the resulting plot isn't very interesting, but the same method
-can be applied to non-linear effects as well, and combined into general R expressions: 
+can be applied to non-linear effects as well, and combined into general R expressions.
 
 ```{r}
 elev.pred <- predict(
   efit,
   data.frame(elevation = seq(0, 100, length.out = 1000)),
   formula = ~ elev_eval(elevation),
-  include = character(0)
+  include = character(0) # Not needed from version 2.8.0
 )
 
 ggplot(elev.pred) +
@@ -695,7 +686,8 @@ comp <- x ~
 fitcov1D <- lgcp(comp, pts2, domain = list(x = mesh))
 pr.df <- data.frame(x = x)
 prcov1D <- predict(
-  fitcov1D, pr.df,
+  fitcov1D,
+  pr.df,
   ~ list(
     total = exp(beta_z + spde1D + Intercept),
     fx = exp(beta_z + Intercept),

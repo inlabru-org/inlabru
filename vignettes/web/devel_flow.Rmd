@@ -222,7 +222,7 @@ classDiagram
 
     class cprod{
         Cross product of integration points with weights and Spatial arguments
-        cprod(...) with weight = weight.x * weight.y and sp::merge
+        fm_cprod(...) with weight = weight.x * weight.y and sp::merge
         }
     class ips{
         integration points via samplers except "coordinates"

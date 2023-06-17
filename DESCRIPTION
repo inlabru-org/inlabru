@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.7.0.9012
+Version: 2.7.0.9021
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -30,7 +30,7 @@ Authors@R: c(
   person("Reddy Peddinenikalva", "Niharika", role = c("ctb", "cph"),
          comment = "Niharika Peddinenikalva contributed the LGCP residuals vignette")
   )
-URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/
+URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/, https://github.com/inlabru-org/inlabru
 BugReports: https://github.com/inlabru-org/inlabru/issues
 Description: Facilitates spatial and general latent Gaussian modeling using
   integrated nested Laplace approximation via the INLA package (<https://www.r-inla.org>).

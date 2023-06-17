@@ -177,7 +177,10 @@ import.gorillas <- function() {
   proj4string(gorillas$plotsample$counts) <- crs
 
   # Extrapolate covariate
-  pxl <- pixels(gorillas$mesh, mask = FALSE, nx = 220, ny = 180)
+  pxl <- fm_pixels(gorillas$mesh,
+    mask = FALSE, nx = 220, ny = 180,
+    format = "sp"
+  )
   pxl <- fm_transform(pxl, fm_crs(gorillas$gcov[[1]]))
   for (k in names(gorillas$gcov)) {
     NA_value <- gorillas$gcov[[k]][[1]][1]

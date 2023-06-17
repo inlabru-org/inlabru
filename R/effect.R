@@ -690,6 +690,7 @@ component_list.list <- function(object,
   class(object) <- c("component_list", "list")
   environment(object) <- .envir
   if (!is.null(lhoods)) {
+    lhoods <- bru_used_update(lhoods, names(object))
     object <- add_mappers(object, lhoods = lhoods)
   }
   object
@@ -773,11 +774,7 @@ add_mappers.component <- function(component, lhoods, ...) {
   keep_lh <-
     vapply(lhoods,
       function(lh, label) {
-        label %in% parse_inclusion(
-          label,
-          lh[["include_components"]],
-          lh[["exclude_components"]]
-        )
+        label %in% bru_used(lh)[["effect"]]
       },
       TRUE,
       label = component$label
@@ -1104,17 +1101,32 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
     )
   } else {
     if (!is.null(lhoods)) {
-      inp <- lapply(
-        lhoods,
-        function(lh) {
+      if (length(lhoods) > 0) {
+        inp <- lapply(
+          lhoods,
+          function(lh) {
+            input_eval(subcomp$input,
+              data = lh$data,
+              env = env,
+              label = subcomp$input$label,
+              null.on.fail = TRUE
+            )
+          }
+        )
+      } else {
+        # Component not directly used in any likelihood.
+        # Attempt to evaluate with no data;
+        # useful for intercept-like components only used via the
+        # *_latent technique.
+        inp <- list(
           input_eval(subcomp$input,
-            data = lh$data,
+            data = NULL,
             env = env,
             label = subcomp$input$label,
             null.on.fail = TRUE
           )
-        }
-      )
+        )
+      }
       # Check for
       # 1) All NULL; Deprecated unless input is NULL. Since version 2.1.14,
       #              intercepts should be notated explicitly with label(1)

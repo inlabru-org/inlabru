@@ -120,7 +120,8 @@ fit <- lgcp(cmp, sample$nests, samplers = sample$plots, domain = list(coordinate
 Plot the density surface from your fitted model
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-lambda.sample <- predict(fit, pixels(mesh, mask = boundary), ~ exp(my.spde + Intercept))
+pxl <- fm_pixels(mesh, mask = boundary, format = "sp")
+lambda.sample <- predict(fit, pxl, ~ exp(my.spde + Intercept))
 ```
 
 ```{r warning=FALSE,message=FALSE}
@@ -165,7 +166,7 @@ fit.all <- lgcp(cmp, gorillas$nests,
   samplers = gorillas$boundary,
   domain = list(coordinates = mesh)
 )
-lambda.all <- predict(fit.all, pixels(mesh, mask = boundary), ~ exp(my.spde + Intercept))
+lambda.all <- predict(fit.all, pxl, ~ exp(my.spde + Intercept))
 Lambda.all <- predict(fit.all, fm_int(mesh, boundary), ~ sum(weight * exp(my.spde + Intercept)))
 ```
 

@@ -1,12 +1,12 @@
-local_bru_testthat_setup()
-
 test_that("Component construction: linear model", {
-  df <- data.frame(x = 1:10)
+  df <- data.frame(x = 1:10, response = 1:10)
+
+  llik <- like_list(list(like(formula = response ~ ., data = df)))
 
   # Using label as input:
   cmp0 <- component_list(
     ~x,
-    lhoods = list(list(data = df))
+    lhoods = llik
   )[["x"]]
 
   expect_equal(cmp0$label, "x")
@@ -15,7 +15,7 @@ test_that("Component construction: linear model", {
 
   cmp <- component_list(
     ~ beta(main = x, model = "linear", values = 1),
-    lhoods = list(list(data = df))
+    lhoods = llik
   )[["beta"]]
 
   expect_equal(cmp$label, "beta")
@@ -114,14 +114,23 @@ test_that("Component construction: terra", {
   f <- system.file("ex/elev.tif", package = "terra")
   r <- terra::rast(f)
 
-  data <- sf::st_sf(data.frame(geometry = sf::st_sfc(sf::st_point(cbind(6, 50)),
-    crs = "epsg:4326"
-  )))
+  data <- sf::st_sf(
+    data.frame(
+      geometry = sf::st_sfc(
+        sf::st_point(cbind(6, 50)),
+        crs = "epsg:4326"
+      ),
+      response = 1
+    )
+  )
 
   expect_equal(eval_spatial(r, data), 406)
 
-  cmp <- component_list(~ -1 + something(eval_spatial(r, geometry), model = "linear"),
-    lhoods = list(list(data = data))
+  llik <- like_list(list(like(formula = response ~ ., data = data)))
+
+  cmp <- component_list(
+    ~ -1 + something(eval_spatial(r, geometry), model = "linear"),
+    lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
   comp_lin <- comp_lin_eval(cmp,
@@ -139,7 +148,7 @@ test_that("Component construction: terra", {
   )
 
   cmp <- component_list(~ -1 + something(r, model = "linear"),
-    lhoods = list(list(data = data))
+    lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
   comp_lin <- comp_lin_eval(cmp,
@@ -157,7 +166,7 @@ test_that("Component construction: terra", {
   )
 
   cmp <- component_list(~ -1 + something(r, model = "linear", main_layer = 1),
-    lhoods = list(list(data = data))
+    lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
   comp_lin <- comp_lin_eval(cmp,
@@ -175,7 +184,7 @@ test_that("Component construction: terra", {
   )
 
   cmp <- component_list(~ -1 + something(r, model = "linear", main_layer = "elevation"),
-    lhoods = list(list(data = data))
+    lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
   comp_lin <- comp_lin_eval(cmp,
@@ -194,14 +203,14 @@ test_that("Component construction: terra", {
 
   expect_error(
     component_list(~ something(r, model = "linear", main_layer = 2),
-      lhoods = list(list(data = data))
+      lhoods = llik
     ),
     NULL
   )
 
   expect_error(
     component_list(~ something(r, model = "linear", main_layer = "elev"),
-      lhoods = list(list(data = data))
+      lhoods = llik
     ),
     NULL
   )
@@ -221,7 +230,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
   )
 
   cmp1 <- component_list(~ effect(c(1, 1.5, 2, NA, 4), model = "iid") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
@@ -235,7 +244,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
   )
 
   cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
@@ -257,7 +266,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
       mapper = bru_mapper(mesh1, indexed = FALSE)
     ) - 1
   )
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
@@ -269,7 +278,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
       mapper = bru_mapper(mesh1, indexed = TRUE)
     ) - 1
   )
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     seq_along(sort(unique(lik$data$x), na.last = NA))
@@ -290,7 +299,7 @@ test_that("Component construction: main iid factor construction", {
   cmp1 <- component_list(~ effect(as.factor(c(1, 1.5, 2, 3, 4)),
     model = "iid"
   ) - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     as.character(lik$data$x)
@@ -322,7 +331,7 @@ test_that("Component construction: group iid factor construction", {
         control.group = list(model = "iid")
       )
   )
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$group,
     as.numeric(lik$data$x)
@@ -356,7 +365,7 @@ test_that("Component construction: replicate iid factor construction", {
         model = "iid"
       )
   )
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik))
+  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$replicate,
     as.numeric(lik$data$x)
@@ -381,7 +390,7 @@ test_that("Component construction: unsafe intercepts", {
   lik <- like(formula = response ~ ., data = data.frame(response = 1:5))
   expect_warning(
     object = {
-      model <- bru_model(cmp, list(lik))
+      model <- bru_model(cmp, like_list(list(lik)))
     },
     "All covariate evaluations for 'something_unknown' are NULL"
   )

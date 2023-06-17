@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("bru: factor component", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -90,12 +88,12 @@ test_that("bru: factor component", {
   )
   expect_equal(
     pr[, "mean"],
-    c(1.137234, -1.941325, -2.878998),
+    c(1.119, -1.952, -2.917),
     tolerance = midtol
   )
   expect_equal(
     pr[, "sd"],
-    c(0.43, 0.41, 0.45),
+    c(0.49, 0.52, 0.504),
     tolerance = hitol
   )
 })

@@ -14,6 +14,7 @@
   num.threads = NULL,
   include = NULL,
   exclude = NULL,
+  used = NULL,
   drop = FALSE,
   ...,
   data = NULL
@@ -44,13 +45,20 @@ computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"}
 
 \item{include}{Character vector of component labels that are needed by the
-predictor expression; Default: NULL (include all components that are not
-explicitly excluded) if \code{newdata} is provided, otherwise \code{character(0)}.}
+predictor expression; Default: the result of \verb{[all.vars()]} on the
+predictor expression, unless the expression is not ".", in which case
+\code{include=NULL}, to include all components that are not
+explicitly excluded. The \code{\link[=bru_used]{bru_used()}} methods are used
+to extract the variable names, followed by removal of non-component names
+when the components are available.}
 
 \item{exclude}{Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
+
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include} and \code{exclude}.
+Default \code{NULL}}
 
 \item{drop}{logical; If \code{keep=FALSE}, \code{newdata} is a \code{Spatial*DataFrame}, and the
 prediciton summary has the same number of rows as \code{newdata}, then the output is
@@ -88,7 +96,7 @@ and the suffix function \verb{_eval} can be used to evaluate a component at
 other input values than the expressions defined in the component definition
 itself, e.g. \code{field_eval(cbind(x, y))} for a component that was defined with
 \code{field(coordinates, ...)} (see also \code{\link[=component_eval]{component_eval()}}).
-
+f
 For "iid" models with \code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to
 generate new realisations for indices greater than \code{n}.
 }
@@ -186,7 +194,7 @@ if (bru_safe_inla(multicore = FALSE) &&
   # Alternatively, we can predict the spatial field at a grid of locations, e.g. a
   # SpatialPixels object covering the mesh
 
-  pxl <- pixels(gorillas$mesh)
+  pxl <- fm_pixels(gorillas$mesh, format = "sp")
   mySmooth2 <- predict(fit, pxl, ~mySmooth)
 
   # This will give us a SpatialPixelDataFrame with the columns we are looking for

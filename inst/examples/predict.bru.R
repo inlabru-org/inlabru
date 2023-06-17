@@ -91,7 +91,7 @@ if (bru_safe_inla(multicore = FALSE) &&
   # Alternatively, we can predict the spatial field at a grid of locations, e.g. a
   # SpatialPixels object covering the mesh
 
-  pxl <- pixels(gorillas$mesh)
+  pxl <- fm_pixels(gorillas$mesh, format = "sp")
   mySmooth2 <- predict(fit, pxl, ~mySmooth)
 
   # This will give us a SpatialPixelDataFrame with the columns we are looking for

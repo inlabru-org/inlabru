@@ -606,6 +606,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' }
 #'
 cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
+  # lifecycle::deprecate_soft("2.8.0")
   fm_cprod(..., na.rm = na.rm, .blockwise = .blockwise)
 }
 
