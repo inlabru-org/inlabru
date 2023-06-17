@@ -38,9 +38,13 @@ then calls \code{all.vars()}.
 bru_used_vars(~.)
 bru_used_vars(~ a + b + c_latent + d_eval())
 bru_used_vars(expression(a + b + c_latent + d_eval()))
+
 bru_used_vars(~., functions = TRUE)
 bru_used_vars(~ a + b + c_latent + d_eval(), functions = TRUE)
 bru_used_vars(expression(a + b + c_latent + d_eval()), functions = TRUE)
+
+bru_used_vars(a ~ b)
+bru_used_vars(expression(a ~ b))
 
 }
 \seealso{
