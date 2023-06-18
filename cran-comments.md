@@ -9,10 +9,10 @@
 
 ## Test environments
 
-* ubuntu 22.04 (local, with INLA), R 4.3.0, 4.2.3, R devel
-* macOS-latest (on github, with INLA), R 4.3.0
-* windows-latest (on github, with INLA), R 4.3.0
-* win-builder; R devel, 4.3.0, 4.2.3
+* ubuntu 22.04 (local, with INLA), R 4.3.1, 4.2.3, R devel
+* macOS-latest (on github, with INLA), R 4.3.1
+* windows-latest (on github, with INLA), R 4.3.1
+* win-builder; R devel, 4.3.1, 4.2.3
 * R-hub;
     Windows Server R-devel
     Fedora Linux R-devel
@@ -52,7 +52,7 @@ Availability using Additional_repositories specification:
 
 ### revdepcheck results
 
-We checked 6 reverse dependencies (5 from CRAN + 1 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
+We checked 6 reverse dependencies (6 from CRAN + 0 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
 
  * We saw 0 new problems
- * We failed to check 0 packages
+ * One package could not be checked due to failure to install (bmstdr)
