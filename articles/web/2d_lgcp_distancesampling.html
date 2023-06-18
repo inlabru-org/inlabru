@@ -265,17 +265,17 @@ components are used by the predictor expression, and the
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dfun</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-12-1.png" width="960">
 The average detection probability within the maximum detection distance
-is estimated to be 0.7047614.</p>
+is estimated to be 0.701846.</p>
 <p>We can look at the posterior for expected number of dolphins as
 usual:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fm_int.html">fm_int</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5 q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 238.1515 50.24229 153.6291 236.4352 338.84 236.4352        5.024229</span></span>
+<span><span class="co">#&gt;       mean      sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 249.7087 56.2036 160.8138 245.1265 378.0865 245.1265         5.62036</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      3.936818</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      4.217882</span></span></code></pre></div>
 <p>and including the randomness about the expected number. In this case,
 it turns out that you need lots of posterior samples, e.g. 2,000 to
 smooth out the Monte Carlo error in the posterior, and this takes a
@@ -368,10 +368,10 @@ model:</p>
 <span><span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fm_int.html">fm_int</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5  q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 314.7058 94.67403 159.1508 300.5668 498.107 300.5668        9.467403</span></span>
+<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 302.6311 86.76788 173.3775 285.7998 503.3272 285.7998        8.676788</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      8.968814</span></span>
+<span><span class="co">#&gt; 1       6.82532</span></span>
 <span></span>
 <span><span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
