@@ -142,6 +142,7 @@ then calls <code><a href="https://rdrr.io/r/base/allnames.html" class="external-
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"        "b"        "c_latent"</span>
 <span class="r-in"><span><span class="fu">bru_used_vars</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">a</span> <span class="op">+</span> <span class="va">b</span> <span class="op">+</span> <span class="va">c_latent</span> <span class="op">+</span> <span class="fu">d_eval</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"        "b"        "c_latent"</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">bru_used_vars</span><span class="op">(</span><span class="op">~</span><span class="va">.</span>, functions <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-in"><span><span class="fu">bru_used_vars</span><span class="op">(</span><span class="op">~</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span> <span class="op">+</span> <span class="va">c_latent</span> <span class="op">+</span> <span class="fu">d_eval</span><span class="op">(</span><span class="op">)</span>, functions <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -149,6 +150,11 @@ then calls <code><a href="https://rdrr.io/r/base/allnames.html" class="external-
 <span class="r-in"><span><span class="fu">bru_used_vars</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">a</span> <span class="op">+</span> <span class="va">b</span> <span class="op">+</span> <span class="va">c_latent</span> <span class="op">+</span> <span class="fu">d_eval</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, functions <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "expression" "+"          "a"          "b"          "c_latent"  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [6] "d_eval"    </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">bru_used_vars</span><span class="op">(</span><span class="va">a</span> <span class="op">~</span> <span class="va">b</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b"</span>
+<span class="r-in"><span><span class="fu">bru_used_vars</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">a</span> <span class="op">~</span> <span class="va">b</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a" "b"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
