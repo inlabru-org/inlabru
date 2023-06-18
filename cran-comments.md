@@ -16,7 +16,7 @@
 * R-hub;
     Windows Server R-devel
     Fedora Linux R-devel
-    Ubuntu Linux 22.04 R-release
+    Ubuntu Linux 20.04 R-release
 * For the github platforms, separate tests were also
   done without installing packages in Suggests.
 

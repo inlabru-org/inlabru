@@ -234,10 +234,27 @@ test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
   line_sfc_u <- sf::st_union(line_sfc)
   seg_sf_u <- fm_as_inla_mesh_segment(line_sfc_u)
 
-  expect_identical(seg_sf_u$loc[c(2:4, 1), ], seg_1$loc[1:4, ])
-  expect_identical(seg_sf_u$loc[4 + c(2:4, 1), ], seg_1$loc[4 + 1:4, ])
-  expect_identical(seg_sf_u$loc[8 + c(2:4, 1), ], seg_1$loc[8 + 1:4, ])
-  expect_identical(seg_sf_u$loc[12 + c(2:4, 1), ], seg_1$loc[12 + 1:4, ])
+  minimal_shift <- function(a, b) {
+    minimal_shift <- NA
+    minimum <- Inf
+    n <- nrow(b)
+    for (shift in seq_len(n) - 1L) {
+      val <- max(abs(a - b[(shift + seq_len(n) - 1L) %% n + 1L, ]))
+      if (val < minimum) {
+        minimal_shift <- shift
+      }
+    }
+    b[(minimal_shift + seq_len(n) - 1L) %% n + 1L, ]
+  }
+  expect_equal(nrow(seg_sf_u$loc), 4 * 4)
+  B <- minimal_shift(seg_sf_u$loc[1:4, ], seg_1$loc[1:4, ])
+  expect_identical(seg_sf_u$loc[1:4, ], B)
+  B <- minimal_shift(seg_sf_u$loc[4 + 1:4, ], seg_1$loc[4 + 1:4, ])
+  expect_identical(seg_sf_u$loc[4 + 1:4, ], B)
+  B <- minimal_shift(seg_sf_u$loc[8 + 1:4, ], seg_1$loc[8 + 1:4, ])
+  expect_identical(seg_sf_u$loc[8 + 1:4, ], B)
+  B <- minimal_shift(seg_sf_u$loc[12 + 1:4, ], seg_1$loc[12 + 1:4, ])
+  expect_identical(seg_sf_u$loc[12 + 1:4, ], B)
 })
 
 
