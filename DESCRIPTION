@@ -135,7 +135,6 @@ Collate:
     'model.R'
     'nlinla.R'
     'plotsample.R'
-    'prediction.R'
     'rgl.R'
     'sampling.R'
     'sf_utils.R'

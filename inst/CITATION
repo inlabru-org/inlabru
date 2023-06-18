@@ -1,7 +1,7 @@
 citHeader("To cite inlabru in publications use:")
 
 bibentry(bibtype = "Article",
-  title = "{inlabru}: an {R} package for Bayesian spatial modelling from ecological survey data",
+  title = "{inlabru}: an {R} package for {Bayesian} spatial modelling from ecological survey data",
   author = c(person(given = "Fabian E.",
                     family = "Bachl"),
              person(given = "Finn",
@@ -24,7 +24,7 @@ bibentry(bibtype = "Article",
              "doi:10.1111/2041-210X.13168")
 )
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
   header = "Related methodology papers:",
   author = "Yuan, Yuan and Bachl, Fabian E. and Lindgren, Finn and Borchers, David L. and Illian, Janine B. and Buckland, Stephen T. and Rue, Håvard and Gerrodette, Tim",
   doi = "10.1214/17-AOAS1078",
