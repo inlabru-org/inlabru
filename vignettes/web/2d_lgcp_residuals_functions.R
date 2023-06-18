@@ -40,8 +40,10 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
   # Set-up the A_integrate matrix
   # A_integrate has as many rows as polygons in the samplers,
   # as many columns as mesh points
-  A_integrate <- inla.spde.make.A(mesh = domain, ips, weights = ips$weight,
-                                  block = ips$.block, block.rescale = "none")
+  A_integrate <- inla.spde.make.A(
+    mesh = domain, ips, weights = ips$weight,
+    block = ips$.block, block.rescale = "none"
+  )
 
 
   # Set-up the A_sum matrix
@@ -49,19 +51,24 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
   # as many columns as observed points
   # each row has 1s for the points in the corresponding polygon
   idx <- sf::st_within(sf::st_as_sf(observations), sf::st_as_sf(samplers), sparse = TRUE)
-  A_sum <- sparseMatrix(i = unlist(idx),
-                        j = rep(seq_len(nrow(observations)),
-                                vapply(idx, length, 1L)),
-                        x = rep(1, length(unlist(idx))),
-                        dims = c(nrow(samplers), nrow(observations)))
+  A_sum <- sparseMatrix(
+    i = unlist(idx),
+    j = rep(
+      seq_len(nrow(observations)),
+      vapply(idx, length, 1L)
+    ),
+    x = rep(1, length(unlist(idx))),
+    dims = c(nrow(samplers), nrow(observations))
+  )
 
 
   # Setting up the data frame for calculating residuals
   observations$obs <- TRUE
   df <- SpatialPointsDataFrame(
-    coords = rbind(domain$loc[,1:2], coordinates(observations)),
+    coords = rbind(domain$loc[, 1:2], coordinates(observations)),
     data = bind_rows(data.frame(obs = rep(FALSE, domain$n)), observations@data),
-    proj4string = domain$crs)
+    proj4string = domain$crs
+  )
 
   # Return A-sum, A_integrate and the data frame for predicting the residuals
   list(A_sum = A_sum, A_integrate = A_integrate, df = df)
@@ -91,26 +98,27 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
 
 residual_df <- function(model, df, expr, A_sum, A_integrate) {
   # Compute residuals
-  res <- predict(object = model,
-                 newdata = df,
-                 ~{
-                   lambda <- eval(expr)
-                   h1 <- lambda * 0 + 1
-                   h2 <- 1 / lambda
-                   h3 <- 1 / sqrt(lambda)
-                   data.frame(
-                     Scaling_Residuals =
-                       as.vector(A_sum %*% h1[obs]) -
-                       as.vector(A_integrate %*% (h1 * lambda)[!obs]),
-                     Inverse_Residuals =
-                       as.vector(A_sum %*% h2[obs]) -
-                       as.vector(A_integrate %*% (h2 * lambda)[!obs]),
-                     Pearson_Residuals =
-                       as.vector(A_sum %*% h3[obs]) -
-                       as.vector(A_integrate %*% (h3 * lambda)[!obs])
-                   )
-                 },
-                 used = bru_used(expr)
+  res <- predict(
+    object = model,
+    newdata = df,
+    ~ {
+      lambda <- eval(expr)
+      h1 <- lambda * 0 + 1
+      h2 <- 1 / lambda
+      h3 <- 1 / sqrt(lambda)
+      data.frame(
+        Scaling_Residuals =
+          as.vector(A_sum %*% h1[obs]) -
+            as.vector(A_integrate %*% (h1 * lambda)[!obs]),
+        Inverse_Residuals =
+          as.vector(A_sum %*% h2[obs]) -
+            as.vector(A_integrate %*% (h2 * lambda)[!obs]),
+        Pearson_Residuals =
+          as.vector(A_sum %*% h3[obs]) -
+            as.vector(A_integrate %*% (h3 * lambda)[!obs])
+      )
+    },
+    used = bru_used(expr)
   )
 
   # Label the three types of residuals
@@ -141,30 +149,39 @@ residual_df <- function(model, df, expr, A_sum, A_integrate) {
 
 set_csc <- function(residuals, col_theme) {
   # Store data for the colour scale of the plots for each type of residual
-  cscrange <- data.frame(residuals %>% group_by(Type) %>%
-                           summarise(maxabs=max(abs(mean))))
+  cscrange <- data.frame(
+    residuals %>%
+      group_by(Type) %>%
+      summarise(maxabs = max(abs(mean)))
+  )
 
   # Set the colour scale for all three types of residuals
   scaling_csc <-
-    scale_fill_gradientn(colours = brewer.pal(9, col_theme[1]),
-                         name = "Scaling Residual",
-                         limits =
-                           cscrange[cscrange$Type == "Scaling Residuals", 2] *
-                           c(-1,1))
+    scale_fill_gradientn(
+      colours = brewer.pal(9, col_theme[1]),
+      name = "Scaling Residual",
+      limits =
+        cscrange[cscrange$Type == "Scaling Residuals", 2] *
+          c(-1, 1)
+    )
 
   inverse_csc <-
-    scale_fill_gradientn(colours = brewer.pal(9, col_theme[2]),
-                         name = "Inverse Residual",
-                         limits =
-                           cscrange[cscrange$Type == "Inverse Residuals", 2] *
-                           c(-1,1))
+    scale_fill_gradientn(
+      colours = brewer.pal(9, col_theme[2]),
+      name = "Inverse Residual",
+      limits =
+        cscrange[cscrange$Type == "Inverse Residuals", 2] *
+          c(-1, 1)
+    )
 
   pearson_csc <-
-    scale_fill_gradientn(colours = brewer.pal(9, col_theme[3]),
-                         name = "Pearson Residual",
-                         limits =
-                           cscrange[cscrange$Type == "Pearson Residuals", 2] *
-                           c(-1,1))
+    scale_fill_gradientn(
+      colours = brewer.pal(9, col_theme[3]),
+      name = "Pearson Residual",
+      limits =
+        cscrange[cscrange$Type == "Pearson Residuals", 2] *
+          c(-1, 1)
+    )
 
   list("Scaling" = scaling_csc, "Inverse" = inverse_csc, "Pearson" = pearson_csc)
 }
@@ -222,8 +239,10 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
     labs(subtitle = paste(model_name, "Pearson"))
 
   # Return the three plots in a list
-  list(Scaling = scaling, Inverse = inverse,
-       Pearson = pearson)
+  list(
+    Scaling = scaling, Inverse = inverse,
+    Pearson = pearson
+  )
 }
 
 
@@ -251,14 +270,17 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
 partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   # Create a grid for the given boundary
   if (is.null(resolution)) {
-    grid <- rast(terra::ext(samplers), crs = proj4string(samplers),
-                   nrows = nrows, ncols = ncols)
+    grid <- rast(terra::ext(samplers),
+      crs = proj4string(samplers),
+      nrows = nrows, ncols = ncols
+    )
   }
 
   if (is.null(c(nrows, ncols))) {
-    grid <- rast(terra::ext(samplers), crs = proj4string(samplers),
-                 resolution = resolution)
-
+    grid <- rast(terra::ext(samplers),
+      crs = proj4string(samplers),
+      resolution = resolution
+    )
   }
 
   gridPolygon <- terra::as.polygons(grid)
@@ -285,5 +307,4 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
 edit_df <- function(df, columns) {
   # Remove the columns that are not required
   df[, !(colnames(df) %in% columns)]
-
 }

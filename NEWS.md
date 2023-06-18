@@ -5,7 +5,9 @@
 * The iterative inla method has been given both sharper internal `inla()` optimisation
   criteria for the iterations (thanks to Haavard Rue), _and_ a more relaxed
   nonlinear iteration stopping criterion; the default `bru_method$rel_tol`
-  values has been changed from 1 to 10 percent change, relative to the posterior standard deviation.
+  values has been changed from 1 to 10 percent change. The iterations are
+  terminated when all latent and hyper-parameter mode changes fullfil
+  `|change|/SD < rel_tol`, and the non-linear line search is inactive.
   This seems to strike a useful balance between the different optimisation
   criteria, allowing the iterations to converge faster and also detect that
   convergence sooner.
@@ -66,7 +68,7 @@
 
 * Remove PROJ4 support #178
 
-* Change rgl.* functions to *3d. Thanks to Duncan Murdoch #181
+* Change `rgl.*` functions to `*3d`. Thanks to Duncan Murdoch #181
 
 * Speed up `ibm_jacobian.bru_mapper_harmonics` for large models
 

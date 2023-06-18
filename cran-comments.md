@@ -9,14 +9,14 @@
 
 ## Test environments
 
-* ubuntu 22.04 (local, with INLA), R 4.3.0, 4.2.3, R devel
-* macOS-latest (on github, with INLA), R 4.3.0
-* windows-latest (on github, with INLA), R 4.3.0
-* win-builder; R devel, 4.3.0, 4.2.3
+* ubuntu 22.04 (local, with INLA), R 4.3.1, 4.2.3, R devel
+* macOS-latest (on github, with INLA), R 4.3.1
+* windows-latest (on github, with INLA), R 4.3.1
+* win-builder; R devel, 4.3.1, 4.2.3
 * R-hub;
     Windows Server R-devel
     Fedora Linux R-devel
-    Ubuntu Linux 22.04 R-release
+    Ubuntu Linux 20.04 R-release
 * For the github platforms, separate tests were also
   done without installing packages in Suggests.
 
@@ -33,10 +33,10 @@ Suggests or Enhances not in mainstream repositories:
 Availability using Additional_repositories specification:
   INLA   yes   https://inla.r-inla-download.org/R/testing
 ``` 
-* Spurious URL issue noted by `urlchecker` and some other checkers:
+* Spurious URL issue noted by `urlchecker` and win-builder on R 4.2.3:
 ```
 > urlchecker::url_check()
-✖ Error: README.md:37:31 503: Service Unavailable
+✖ Error: README.md:37:31 403: Forbidden
 [doi:10.1111/2041-210X.13168](https://doi.org/10.1111/2041-210X.13168),
                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```                              
@@ -52,7 +52,7 @@ Availability using Additional_repositories specification:
 
 ### revdepcheck results
 
-We checked 6 reverse dependencies (5 from CRAN + 1 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
+We checked 6 reverse dependencies (6 from CRAN + 0 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
 
  * We saw 0 new problems
- * We failed to check 0 packages
+ * One package could not be checked due to failure to install (bmstdr)

@@ -347,6 +347,7 @@ bru_used_upgrade <- function(lhoods, labels) {
     if (is.null(lhoods[[k]][["used"]]) &&
       is.null(lhoods[[k]][["used_components"]])) {
       used <- bru_used(
+        NULL,
         effect = lhoods[[k]][["include_components"]],
         latent = lhoods[[k]][["include_latent"]],
         effect_exclude = lhoods[[k]][["exclude_components"]],
@@ -357,6 +358,7 @@ bru_used_upgrade <- function(lhoods, labels) {
       lhoods[[k]][["include_latent"]] <- NULL
     } else if (!is.null(lhoods[[k]][["used_components"]])) {
       used <- bru_used(
+        NULL,
         effect = lhoods[[k]][["effect"]],
         latent = lhoods[[k]][["latent"]]
       )
@@ -461,7 +463,8 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #' @keywords internal
 #' @family bru_used
 bru_used <- function(x = NULL, ...) {
-  UseMethod("bru_used")
+  # Need to specify the dispatch object explicitly to handle the NULL case:
+  UseMethod("bru_used", x)
 }
 
 #' @describeIn bru_used Create a `bru_used` object.
@@ -513,45 +516,84 @@ replace_dollar <- function(expr) {
   expr
 }
 
-#' Extract basic variable names from expression
+#' @title Extract basic variable names from expression
 #'
+#' @description
+#' Extracts the variable names from an R expression by pre- and post-processing
+#' around [all.vars()].
 #' First replaces `$` with `[[` indexing, so that internal column/variable names are ignored,
 #' then calls `all.vars()`.
 #'
-#' @param expr An `expression`
+#' @param x A `formula`, `expression`, or `character`
 #' @param functions logical; if TRUE, include function names
 #'
 #' @returns If successful, a character vector, otherwise `NULL`
 #'
+#' @examples
+#' bru_used_vars(~.)
+#' bru_used_vars(~ a + b + c_latent + d_eval())
+#' bru_used_vars(expression(a + b + c_latent + d_eval()))
+#'
+#' bru_used_vars(~., functions = TRUE)
+#' bru_used_vars(~ a + b + c_latent + d_eval(), functions = TRUE)
+#' bru_used_vars(expression(a + b + c_latent + d_eval()), functions = TRUE)
+#'
+#' bru_used_vars(a ~ b)
+#' bru_used_vars(expression(a ~ b))
+#'
 #' @keywords internal
 #' @export
 #' @family bru_used
-bru_used_vars <- function(expr, functions = FALSE) {
-  attributes(expr) <- NULL
-  ex <- deparse1(expr, collapse = "\n")
+bru_used_vars <- function(x, functions = FALSE) {
+  UseMethod("bru_used_vars")
+}
+
+#' @rdname bru_used_vars
+#' @export
+bru_used_vars.character <- function(x, functions = FALSE) {
+  ex <- paste0(x, collapse = "\n")
   ex <- str2lang(ex)
   ex <- replace_dollar(ex)
-  vars <- all.vars(ex, functions = functions)
+  vars <- all.vars(ex, functions = functions, unique = TRUE)
   if (identical(vars, ".") || identical(vars, character(0))) {
     vars <- NULL
   }
   vars
 }
 
-
-
-#' @describeIn bru_used Create a `bru_used` object from an expression object.
+#' @rdname bru_used_vars
 #' @export
-bru_used.expression <- function(x, ...,
-                                effect = NULL,
-                                effect_exclude = NULL,
-                                latent = NULL,
-                                labels = NULL) {
+bru_used_vars.expression <- function(x, functions = FALSE) {
+  attributes(x) <- NULL
+  ex <- deparse1(x, collapse = "\n")
+  bru_used_vars(ex, functions = functions)
+}
+
+#' @describeIn bru_used_vars Only the right-hand side is used.
+#' @export
+bru_used_vars.formula <- function(x, functions = FALSE) {
+  form <- x[[length(x)]]
+  ex <- deparse1(form, collapse = "\n")
+  bru_used_vars(ex, functions = functions)
+}
+
+
+
+#' @describeIn bru_used Create a `bru_used` object from a `character`
+#' representation of an expression.
+#' @export
+bru_used.character <- function(x, ...,
+                               effect = NULL,
+                               effect_exclude = NULL,
+                               latent = NULL,
+                               labels = NULL) {
   form <- x
   if (is.null(effect)) {
     effect <- bru_used_vars(form, functions = FALSE)
-    effect <- effect[!grepl("^.*_latent$", effect) &
-      !grepl("^.*_eval$", effect)]
+    effect <- effect[
+      !grepl("^.*_latent$", effect) &
+        !grepl("^.*_eval$", effect)
+    ]
   }
   if (is.null(latent)) {
     latent <- bru_used_vars(form, functions = TRUE)
@@ -567,6 +609,8 @@ bru_used.expression <- function(x, ...,
   }
 
   bru_used(
+    x = NULL,
+    ...,
     effect = effect,
     effect_exclude = effect_exclude,
     latent = latent,
@@ -574,15 +618,40 @@ bru_used.expression <- function(x, ...,
   )
 }
 
-#' @describeIn bru_used Create a `bru_used` object from a formula.
+
+#' @describeIn bru_used Create a `bru_used` object from an expression object.
+#' @export
+bru_used.expression <- function(x, ...,
+                                effect = NULL,
+                                effect_exclude = NULL,
+                                latent = NULL,
+                                labels = NULL) {
+  attributes(x) <- NULL
+  y <- deparse1(x, collapse = "\n")
+  bru_used(
+    x = y,
+    ...,
+    effect = effect,
+    effect_exclude = effect_exclude,
+    latent = latent,
+    labels = labels
+  )
+}
+
+
+#' @describeIn bru_used Create a `bru_used` object from a formula (only the
+#' right-hand side is used).
 #' @export
 bru_used.formula <- function(x, ...,
                              effect = NULL,
                              effect_exclude = NULL,
                              latent = NULL,
                              labels = NULL) {
-  form <- as.expression(x[[length(x)]])
-  bru_used(form,
+  form <- x[[length(x)]]
+  ex <- deparse1(form, collapse = "\n")
+  bru_used(
+    x = ex,
+    ...,
     effect = effect,
     effect_exclude = effect_exclude,
     latent = latent,
@@ -2057,8 +2126,7 @@ generate.bru <- function(object,
 
     if (is.null(used)) {
       if (is.null(include)) {
-        form <- formula[[length(formula)]]
-        include <- bru_used_vars(form)
+        include <- bru_used_vars(formula)
       }
       used <-
         bru_used(
@@ -3336,7 +3404,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         paste0(
           "iinla: Max deviation from previous: ",
           signif(100 * max(dev), 3),
-          "% of SD [stop if: <", 100 * max.dev, "%]"
+          "% of SD, and line search is ",
+          if (line_search[["active"]]) "active" else "inactive",
+          " [stop if: <", 100 * max.dev, "% and line search inactive]"
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,

@@ -29,7 +29,7 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
 
   # 3. GET THE START AND END POINTS OF ALL SEGMENTS
   # NOTE: x and y get renamed to mid.x and mid.y to avoid confusion with detection coordinates
-  segdata <- start.end.points.segments.f(seg = segdata, use.tran = FALSE, geometry = "euc")
+  segdata <- start_end_points_segments_f(seg = segdata, use.tran = FALSE, geometry = "euc")
   # segdata[1:2, ]
 
   # 4. AMALGAMATE SEGMENTS INTO NEW BLOCKS
@@ -45,7 +45,7 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   # Generate location for detections if location missing
   # Use do.plot=T to see the location generated for each detection
   if (!("x" %in% colnames(distdata))) {
-    det.new.coords <- generate.obs.location.f(
+    det.new.coords <- generate_obs_location_f(
       seg = segdata,
       dists = distdata,
       geometry = "euc",

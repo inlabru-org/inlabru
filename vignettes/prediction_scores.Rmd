@@ -291,12 +291,12 @@ pred <- generate(fit, newdata,
       lapply(
         seq_along(y),
         function(i) {
-          F <- ppois(k, rate = lambda[i])
+          Fpred <- ppois(k, rate = lambda[i])
           data.frame(
             k = c(k, k),
             i = c(i, i),
-            type = rep(c("F", "residual"), each = length(F)),
-            value = c(F, F - (y[i] <= k))
+            type = rep(c("F", "residual"), each = length(Fpred)),
+            value = c(Fpred, Fpred - (y[i] <= k))
           )
         }
       )
@@ -309,7 +309,7 @@ F_estimate <-
     filter(type == "F") %>%
     group_by(i) %>%
     summarise(F = sum(mean), groups = "drop") %>%
-    pull(F))
+    pull("F"))
 crps_score <-
   (pred %>%
     filter(type == "residual") %>%

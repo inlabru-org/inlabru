@@ -1,7 +1,7 @@
 #' @name mrsea
 #' @title Marine renewables strategic environmental assessment
 #' @docType data
-#' @description Data imported from package MRSea, see <http://creem2.st-andrews.ac.uk/software/>
+#' @description Data imported from package MRSea, see <https://www.creem.st-andrews.ac.uk/software/>
 #'
 #' @usage data(mrsea)
 #'
