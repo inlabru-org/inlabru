@@ -3402,7 +3402,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         paste0(
           "iinla: Max deviation from previous: ",
           signif(100 * max(dev), 3),
-          "% of SD [stop if: <", 100 * max.dev, "%]"
+          "% of SD, and line search is ",
+          if (line_search[["active"]]) "active" else "inactive",
+          " [stop if: <", 100 * max.dev, "% and line search inactive]"
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
