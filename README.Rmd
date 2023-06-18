@@ -61,7 +61,7 @@ You can install the development version of inlabru from [GitHub](https://github.
 # install.packages("remotes")
 remotes::install_github("inlabru-org/inlabru", ref = "devel")
 ```
-or track the development version builds via [inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/ui#builds):
+or track the development version builds via [inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
 ```{r universe-installation, eval = FALSE}
 # Enable universe(s) by inlabru-org
 options(repos = c(

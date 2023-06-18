@@ -68,7 +68,7 @@ remotes::install_github("inlabru-org/inlabru", ref = "devel")
 ```
 
 or track the development version builds via
-[inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/ui#builds):
+[inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
 
 ``` r
 # Enable universe(s) by inlabru-org
@@ -92,11 +92,8 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 library(inlabru)
 library(INLA)
 #> Loading required package: Matrix
-#> Loading required package: foreach
-#> Loading required package: parallel
-#> This is INLA_23.05.30-1 built 2023-05-30 11:52:19 UTC.
+#> This is INLA_23.06.15 built 2023-06-15 06:01:53 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
-#>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
 bru_safe_sp(force = TRUE) # Ensures sp works without rgdal installed
 
