@@ -33,10 +33,10 @@ Suggests or Enhances not in mainstream repositories:
 Availability using Additional_repositories specification:
   INLA   yes   https://inla.r-inla-download.org/R/testing
 ``` 
-* Spurious URL issue noted by `urlchecker` and some other checkers:
+* Spurious URL issue noted by `urlchecker` and win-builder on R 4.2.3:
 ```
 > urlchecker::url_check()
-✖ Error: README.md:37:31 503: Service Unavailable
+✖ Error: README.md:37:31 403: Forbidden
 [doi:10.1111/2041-210X.13168](https://doi.org/10.1111/2041-210X.13168),
                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```                              
