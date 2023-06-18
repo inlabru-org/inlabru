@@ -590,8 +590,10 @@ bru_used.character <- function(x, ...,
   form <- x
   if (is.null(effect)) {
     effect <- bru_used_vars(form, functions = FALSE)
-    effect <- effect[!grepl("^.*_latent$", effect) &
-                       !grepl("^.*_eval$", effect)]
+    effect <- effect[
+      !grepl("^.*_latent$", effect) &
+        !grepl("^.*_eval$", effect)
+    ]
   }
   if (is.null(latent)) {
     latent <- bru_used_vars(form, functions = TRUE)
